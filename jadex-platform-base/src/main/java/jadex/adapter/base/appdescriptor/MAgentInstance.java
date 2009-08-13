@@ -34,8 +34,8 @@ public class MAgentInstance
 	/** The master flag. */
 	protected boolean master;
 	
-	/** The list of contained parameters. */
-	protected List parameters;
+	/** The list of contained arguments. */
+	protected List arguments;
 	
 	/** The argument parser. */
 	protected JavaCCExpressionParser parser;
@@ -47,7 +47,7 @@ public class MAgentInstance
 	 */
 	public MAgentInstance()
 	{
-		this.parameters = new ArrayList();
+		this.arguments = new ArrayList();
 		this.start = true;
 		this.number = 1;
 	}
@@ -168,24 +168,16 @@ public class MAgentInstance
 	 */
 	public void addMArgument(MArgument arg)
 	{
-		this.parameters.add(arg);
-	}
-	
-	/**
-	 *  Add an argument set.
-	 */
-	public void addMArgumentSet(MArgumentSet argset)
-	{
-		this.parameters.add(argset);
+		this.arguments.add(arg);
 	}
 
 	/**
-	 *  Get the list of paparameters and parameter sets.
-	 *  @return The parameters and parameter sets.
+	 *  Get the list of arguments.
+	 *  @return The arguments.
 	 */
 	public List getMArguments()
 	{
-		return this.parameters;
+		return this.arguments;
 	}
 	
 	/**
@@ -196,44 +188,23 @@ public class MAgentInstance
 	{
 		Map ret = null;
 
-		if(parameters!=null)
+		if(arguments!=null)
 		{
 			ret = new HashMap();
 			SimpleValueFetcher fetcher = new SimpleValueFetcher();
 			fetcher.setValue("$platform", platform);
 
 			String[] imports = apptype.getAllImports();
-			for(int i=0; i<parameters.size(); i++)
+			for(int i=0; i<arguments.size(); i++)
 			{
-				Object tmp = parameters.get(i);
-				if(tmp instanceof MArgument)
-				{
-					MArgument p = (MArgument)tmp;
-					String valtext = p.getValue();
-					
-					if(parser==null)
-						parser = new JavaCCExpressionParser();
-					
-					Object val = parser.parseExpression(valtext, imports, null, classloader).getValue(fetcher);
-					ret.put(p.getName(), val);
-				}
-				else //if(tmp instanceof ParameterSet)
-				{
-					MArgumentSet ps = (MArgumentSet)tmp;
-					List vals = new ArrayList();
-					List textvals = ps.getValues();
-					if(textvals!=null)
-					{
-						if(parser==null)
-							parser = new JavaCCExpressionParser();
-						for(int j=0; j<textvals.size(); j++)
-						{
-							Object val = parser.parseExpression((String)textvals.get(j), imports, null, classloader).getValue(fetcher);
-							vals.add(val);
-						}
-					}
-					ret.put(ps.getName(), vals);
-				}
+				MArgument p = (MArgument)arguments.get(i);
+				String valtext = p.getValue();
+				
+				if(parser==null)
+					parser = new JavaCCExpressionParser();
+				
+				Object val = parser.parseExpression(valtext, imports, null, classloader).getValue(fetcher);
+				ret.put(p.getName(), val);
 			}
 		}
 		

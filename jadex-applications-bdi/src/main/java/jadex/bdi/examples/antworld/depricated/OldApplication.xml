@@ -5,11 +5,11 @@
 	This scenario will be used to apply and analyze different coordination strategies.
 - ->
 
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
-	xmlns:env="http://jadex.sourceforge.net/jadex-env"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
-	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="AntCoordinationSpace" package="jadex.bdi.examples.antworld"> -->
 <applicationtype name="AntCoordinationSpace" package="jadex.bdi.examples.antworld">
 	<imports>

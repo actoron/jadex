@@ -118,7 +118,7 @@ public class OAVBDIXMLReader
 			new SubobjectInfo(new AttributeInfo("properties/property", OAVBDIMetaModel.capability_has_properties)),
 
 			new SubobjectInfo(new AttributeInfo("configurations/configuration", OAVBDIMetaModel.capability_has_configurations)),
-			}, new Namespace("bdi", "http://jadex.sourceforge.net/jadex-2.0.xsd")
+			}, new Namespace("bdi", "http://jadex.sourceforge.net/jadex-bdi-2.0.xsd")
 		);
 		typeinfos.add(ti_capability);
 		

@@ -6,11 +6,13 @@
 	of the Jason BDI agent engine.
 -->
 
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-appdescriptor"
-	xmlns:env="http://jadex.sourceforge.net/jadex-env"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
-	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
+	                    http://jadex.sourceforge.net/jadex-envspace 
+	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
 	name="GarbageCollector" package="jadex.bdi.examples.garbagecollector">
 	
 	<imports>

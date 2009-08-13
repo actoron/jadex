@@ -8,7 +8,7 @@
 	for all contained words to a present translation agent
 	which is searched by the DF.
 -->
-<agent xmlns="http://jadex.sourceforge.net/jadex"
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
 	                    http://jadex.sourceforge.net/jadex-0.96.xsd"

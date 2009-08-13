@@ -12,9 +12,9 @@
 	Objective is to carry as much ore as possible to the<br>
 	home base in a predefined mission time.<br>
 -->
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-appdescriptor"
-	xmlns:agr="http://jadex.sourceforge.net/jadex-agr"
-	xmlns:env="http://jadex.sourceforge.net/jadex-env"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+	xmlns:agr="http://jadex.sourceforge.net/jadex-agrspace"
+	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	name="MarsWorld" package="jadex.bpmn.examples.marsworld">
 		

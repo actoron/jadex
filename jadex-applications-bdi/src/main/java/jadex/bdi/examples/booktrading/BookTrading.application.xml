@@ -5,10 +5,12 @@
 	initial configurations of buyer and seller agents.
 -->
 
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-appdescriptor"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
-	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
+	                    http://jadex.sourceforge.net/jadex-envspace 
+	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
 	name="BookTrading" package="jadex.bdi.examples.booktrading">
 	
 	<imports>
@@ -26,66 +28,84 @@
 		<application name="One buyer and one seller">
 			<agents>
 				<agent type="Buyer" >
-					<parameters>
-						<parameterset name="initial_orders">
-							<value>new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)$platform.getService(IClockService.class))</value>
-							<value>new Order("All about web services", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 40, 60, true, (IClockService)$platform.getService(IClockService.class))</value>
-							<value>new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 5, 10, true, (IClockService)$platform.getService(IClockService.class))</value>
-							<value>new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 30, 65, true, (IClockService)$platform.getService(IClockService.class))</value>
-						</parameterset>
-					</parameters>
+					<arguments>
+						<argument name="initial_orders">
+							new Order[]
+							{
+								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)$platform.getService(IClockService.class)),
+								new Order("All about web services", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 40, 60, true, (IClockService)$platform.getService(IClockService.class)),
+								new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 5, 10, true, (IClockService)$platform.getService(IClockService.class)),
+								new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 30, 65, true, (IClockService)$platform.getService(IClockService.class))
+							}
+						</argument>
+					</arguments>
 				</agent>
 				<agent type="Seller">
-					<parameters>
-						<parameterset name="initial_orders">
-							<value>new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)$platform.getService(IClockService.class))</value>
-							<value>new Order("All about web services", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 50, 30, false, (IClockService)$platform.getService(IClockService.class))</value>
-							<value>new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 15, 9, false, (IClockService)$platform.getService(IClockService.class))</value>
-							<value>new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 60, false, (IClockService)$platform.getService(IClockService.class))</value>
-						</parameterset>
-					</parameters>
+					<arguments>
+						<argument name="initial_orders">
+							new Order[]
+							{
+								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)$platform.getService(IClockService.class)),
+								new Order("All about web services", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 50, 30, false, (IClockService)$platform.getService(IClockService.class)),
+								new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 15, 9, false, (IClockService)$platform.getService(IClockService.class)),
+								new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 60, false, (IClockService)$platform.getService(IClockService.class))
+							}
+						</argument>
+					</arguments>
 				</agent>
 			</agents>
 		</application>
 		<application name="One buyer and one seller (one order)">
 			<agents>
 				<agent type="Buyer" >
-					<parameters>
-						<parameterset name="initial_orders">
-							<value>new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)$platform.getService(IClockService.class))</value>
-						</parameterset>
-					</parameters>
+					<arguments>
+						<argument name="initial_orders">
+							new Order[]
+							{
+								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)$platform.getService(IClockService.class))
+							}
+						</argument>
+					</arguments>
 				</agent>
 				<agent type="Seller">
-					<parameters>
-						<parameterset name="initial_orders">
-							<value>new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)$platform.getService(IClockService.class))</value>
-						</parameterset>
-					</parameters>
+					<arguments>
+						<argument name="initial_orders">
+							new Order[]
+							{
+								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)$platform.getService(IClockService.class))
+							}
+						</argument>
+					</arguments>
 				</agent>
 			</agents>
 		</application>
 		<application name="Two buyers and one seller">
 			<agents>
 				<agent type="Buyer" number="3">
-					<parameters>
-						<parameterset name="initial_orders">
-							<value>new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)$platform.getService(IClockService.class))</value>
-							<value>new Order("All about web services", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 40, 60, true, (IClockService)$platform.getService(IClockService.class))</value>
-							<value>new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 5, 10, true, (IClockService)$platform.getService(IClockService.class))</value>
-							<value>new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 30, 65, true, (IClockService)$platform.getService(IClockService.class))</value>
-						</parameterset>
-					</parameters>
+					<arguments>
+						<argument name="initial_orders">
+							new Order[]
+							{
+								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)$platform.getService(IClockService.class)),
+								new Order("All about web services", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 40, 60, true, (IClockService)$platform.getService(IClockService.class)),
+								new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 5, 10, true, (IClockService)$platform.getService(IClockService.class)),
+								new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 30, 65, true, (IClockService)$platform.getService(IClockService.class))
+							}
+						</argument>
+					</arguments>
 				</agent>
 				<agent type="Seller">
-					<parameters>
-						<parameterset name="initial_orders">
-							<value>new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)$platform.getService(IClockService.class))</value>
-							<value>new Order("All about web services", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 50, 30, false, (IClockService)$platform.getService(IClockService.class))</value>
-							<value>new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 15, 9, false, (IClockService)$platform.getService(IClockService.class))</value>
-							<value>new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 60, false, (IClockService)$platform.getService(IClockService.class))</value>
-						</parameterset>
-					</parameters>
+					<arguments>
+						<argument name="initial_orders">
+							new Order[]
+							{
+								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)$platform.getService(IClockService.class)),
+								new Order("All about web services", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 50, 30, false, (IClockService)$platform.getService(IClockService.class)),
+								new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 15, 9, false, (IClockService)$platform.getService(IClockService.class)),
+								new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 60, false, (IClockService)$platform.getService(IClockService.class))
+							}
+						</argument>
+					</arguments>
 				</agent>
 			</agents>
 		</application>

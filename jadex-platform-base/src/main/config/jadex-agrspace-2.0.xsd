@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-agr"
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-agrspace"
 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	xmlns:app="http://jadex.sourceforge.net/jadex-appdescriptor"
-	xmlns="http://jadex.sourceforge.net/jadex-agr"
+	xmlns="http://jadex.sourceforge.net/jadex-agrspace"
 	elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 
 <!-- 	
-	<xs:import namespace="http://jadex.sourceforge.net/jadex-appdescriptor" schemaLocation="http://jadex.sourceforge.net/application.xsd"/>
+	<xs:import namespace="http://jadex.sourceforge.net/jadex-application" schemaLocation="http://jadex.sourceforge.net/jadex-application-2.0.xsd"/>
 	
 	<xs:complexType name="spacetype">
 		<xs:complexContent>

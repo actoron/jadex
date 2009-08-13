@@ -4,10 +4,10 @@
 	Sends a message to itself and waits for an answer
 	sent by an another plan.
 -->
-<agent xmlns="http://jadex.sourceforge.net/jadex"
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex2 
-	                    http://jadex.sourceforge.net/jadex-2.0.xsd"
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	name="SendAndWait"
 	package="jadex.bdi.testcases.events">
 

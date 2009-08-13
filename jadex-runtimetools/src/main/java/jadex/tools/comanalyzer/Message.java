@@ -109,7 +109,7 @@ public class Message extends ParameterElement
 	/**
 	 * For loading from file.
 	 * Create a message with given parameters and sequence number.
-	 * @param parameters The parameters of the message.
+	 * @param arguments The parameters of the message.
 	 * @param sequence The sequence number of the message.
 	 */
 	public Message()
@@ -118,7 +118,7 @@ public class Message extends ParameterElement
 	
 	/**
 	 * Create a message with given parameters and sequence number.
-	 * @param parameters The parameters of the message.
+	 * @param arguments The parameters of the message.
 	 * @param sequence The sequence number of the message.
 	 */
 	public Message(IMessageAdapter msg, int sequence, IAgentIdentifier receiver)

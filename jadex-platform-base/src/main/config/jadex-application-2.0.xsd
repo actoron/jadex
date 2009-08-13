@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-application"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://jadex.sourceforge.net/jadex-application"
+	elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+	<xs:element name="applicationtype">
+        <xs:annotation>
+        	<xs:documentation>An application type specifies the structure and content of a agent application.</xs:documentation>
+        </xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="applicationtype"/>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="applicationtype">
+        <xs:sequence>
+					<xs:element name="imports" minOccurs="0">
+                <xs:annotation>
+                	<xs:documentation>Imports allow to add packages (e.g. java.util.*) and classes (e.g. java.util.Map) to the class lookup mechanism.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+								<xs:element name="import" type="import" minOccurs="0" maxOccurs="unbounded" ><xs:annotation>
+										<xs:documentation>An import allows to add a package (e.g. java.util.*) or a class (e.g. java.util.Map) to the class lookup mechanism.</xs:documentation>
+									</xs:annotation></xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+                    <xs:element name="spacetypes" minOccurs="0">
+                <xs:annotation>
+                	<xs:documentation>Space types define concrete substructures of the application context, e.g. a 2D environment space or an agent-group-role based organization space. The elements of space types are defined by external XML schemas.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+					<xs:sequence>
+						<!-- <xs:element name="spacetype" type="spacetype" minOccurs="0" maxOccurs="unbounded"/> -->
+						<xs:any minOccurs="0" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+                    <xs:element name="agenttypes" minOccurs="0">
+                <xs:annotation>
+                	<xs:documentation>The agent types that should be available in this application. Only agents of the sepcified type(s) can participate in the application, i.e. join the application context.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+							<xs:sequence>
+								<xs:element name="agenttype" type="agenttype" minOccurs="0" maxOccurs="unbounded" >
+									<xs:annotation>
+										<xs:documentation>A type of agent that can be contained in the application.</xs:documentation>
+									</xs:annotation></xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="applications" minOccurs="0">
+                <xs:annotation>
+                	<xs:documentation>In the applications section, predefined application configurations (i.e. application instances) can be defined.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+							<xs:sequence>
+								<xs:element name="application" type="application" minOccurs="0" maxOccurs="unbounded" >
+									<xs:annotation>
+										<xs:documentation>A predefined application configuration.</xs:documentation>
+									</xs:annotation></xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+                <xs:attribute name="name" type="xs:string" >
+                	<xs:annotation>
+                		<xs:documentation>The name of the application type is used as a default name for creating application instances and should correspond to the file name (without application.xml).</xs:documentation>
+                	</xs:annotation></xs:attribute>
+                <xs:attribute name="package" type="xs:string" >
+                	<xs:annotation>
+                		<xs:documentation>The package of the application type. The package should correspond to the directory structure, the application descriptor is contained in (like the package of a Java class). The package is also used for lookup of classes and other files (e.g. agent descriptors).</xs:documentation>
+                	</xs:annotation></xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="agenttype">
+		<xs:annotation>
+			<xs:documentation>Defines an agent type.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="name" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>The name of the agent type (used for referring to the agent type from other parts of the application descriptor).</xs:documentation>
+			</xs:annotation></xs:attribute>
+		<xs:attribute name="filename" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>The implementation of the agent type. Can be a logical name (resolved using imports) or a concrete file name (e.g. to a bdi agent.xml).</xs:documentation>
+			</xs:annotation></xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="application">
+		<xs:sequence>
+			<xs:element name="spaces" maxOccurs="1" minOccurs="0">
+                <xs:annotation>
+                	<xs:documentation>The spaces that should available in the application context. These are space instances (or space configurations) usually referring to some defined space type. The details of a space specification are handled in separate XML schemas (e.g. for an AGR space or an evnironment space).</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+					<xs:sequence>
+						<xs:any maxOccurs="unbounded" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+            <xs:element name="agents" maxOccurs="1" minOccurs="0">
+                <xs:annotation>
+                	<xs:documentation>The agent instances to be created when the application is started.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+					<xs:sequence>
+						<xs:element name="agent" type="agent" maxOccurs="unbounded" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>An agent instance to be created when the application is started.</xs:documentation>
+							</xs:annotation></xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+        </xs:sequence>
+		<xs:attribute name="name" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>The name of the application.</xs:documentation>
+			</xs:annotation></xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="agent">
+		<xs:sequence>
+			<xs:element name="arguments" minOccurs="0">
+                <xs:annotation>
+                	<xs:documentation>Argument values to be supplied, when creating the agent.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+					<xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>A single argument value. Arguments are passed as name / value pairs, where the name is supplied as attribute while the value is given as the text content of the element.</xs:documentation>
+							</xs:annotation></xs:element>
+                    </xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>The name for the agent instance (if omitted, a name will be generated).</xs:documentation>
+			</xs:annotation></xs:attribute>
+		<xs:attribute name="type" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>The type of agent to be created (as specified in the agenttypes section).</xs:documentation>
+			</xs:annotation></xs:attribute>
+		<xs:attribute name="configuration" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>The configuration of the agent (as specified in the agent's ADF).</xs:documentation>
+			</xs:annotation></xs:attribute>
+		<xs:attribute name="start" type="xs:boolean" default="true">
+			<xs:annotation>
+				<xs:documentation>Per default, each created agent is also started (i.e. will immidiately start to execute any actions). Set the start flag to false, if the agent should be started later manually.</xs:documentation>
+			</xs:annotation></xs:attribute>
+		<xs:attribute name="number" type="xs:int" default="1">
+			<xs:annotation>
+				<xs:documentation>Allows the create multiple agent instances at once. If omitted only one agent is created.</xs:documentation>
+			</xs:annotation></xs:attribute>
+		<xs:attribute name="master" type="xs:boolean" default="false">
+			<xs:annotation>
+				<xs:documentation>A master agent ist required for the application, thus, if a master agent is killed, the application will be closed down. Default is false.</xs:documentation>
+			</xs:annotation></xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="argument" mixed="true">
+		<xs:attribute name="name" type="xs:string" >
+			<xs:annotation>
+				<xs:documentation>The name of the argument.</xs:documentation>
+			</xs:annotation></xs:attribute>
+	</xs:complexType>
+	
+	<xs:complexType name="spacetype">
+		<xs:sequence>
+			<xs:element name="property" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType mixed="true">
+					<xs:attribute name="name" type="xs:string"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="type" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="space">
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="type" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="import" mixed="true">
+											</xs:complexType>
+</xs:schema>

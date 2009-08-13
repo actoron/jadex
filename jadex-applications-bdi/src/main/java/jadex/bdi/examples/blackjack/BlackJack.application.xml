@@ -2,10 +2,10 @@
 	BlackJack application descriptor.
 -->
 
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-appdescriptor"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
-	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="BlackJack" package="jadex.bdi.examples.blackjack">
 	
 	<agenttypes>

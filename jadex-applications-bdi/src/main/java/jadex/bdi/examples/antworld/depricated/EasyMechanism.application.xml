@@ -4,10 +4,10 @@
 		can be removed!
 	- ->
 
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex"
-	xmlns:env="http://jadex.sourceforge.net/jadex-env" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
-	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:env="http://jadex.sourceforge.net/jadex-envspace" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="EasyMechanism" package="jadex.bdi.examples.antworld.depricated">-->
 <applicationtype>
 	<imports>

@@ -18,7 +18,7 @@ public class Test
 		{
 			// Load model.
 			
-			String filename = "jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn";
+//			String filename = "jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn";
 //			String filename = "jadex/bpmn/examples/helloworld/test_parallel.bpmn";
 //			String filename = "jadex/bpmn/examples/helloworld/test2.bpmn";
 //			String filename = "jadex/bpmn/examples/helloworld/all_activities.bpmn"
@@ -26,7 +26,7 @@ public class Test
 //			String filename = "jadex/bpmn/examples/helloworld/Exception.bpmn";
 //			String filename = "jadex/bpmn/examples/helloworld/test_rule.bpmn";
 //			String filename = "jadex/bpmn/examples/helloworld/SubProcess.bpmn"
-//			String filename = "jadex/bpmn/examples/helloworld/UserInteraction.bpmn";
+			String filename = "jadex/bpmn/examples/helloworld/UserInteraction.bpmn";
 //			String filename = "jadex/bpmn/examples/helloworld/ForLoop.bpmn";
 //			String filename = "jadex/bpmn/examples/helloworld/Scopes.bpmn";
 			

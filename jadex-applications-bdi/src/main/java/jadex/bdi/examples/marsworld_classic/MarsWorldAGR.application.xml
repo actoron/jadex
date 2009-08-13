@@ -13,11 +13,15 @@
 	homebase in a predefined mission time.<br>
 -->
 
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-appdescriptor"
-	xmlns:agr="http://jadex.sourceforge.net/jadex-agr"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+	xmlns:agr="http://jadex.sourceforge.net/jadex-agrspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-appdescriptor 
-	                    http://jadex.sourceforge.net/jadex-appdescriptor.xsd"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
+	                    http://jadex.sourceforge.net/jadex-agrspace 
+	                    http://jadex.sourceforge.net/jadex-agrspace-2.0.xsd
+	                    http://jadex.sourceforge.net/jadex-envspace 
+	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
 	name="MarsWorldAGR" package="jadex.bdi.examples.marsworld_classic">
 	
 	<spacetypes>
