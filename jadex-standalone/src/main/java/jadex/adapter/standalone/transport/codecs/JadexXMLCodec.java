@@ -18,7 +18,7 @@ public class JadexXMLCodec implements IEncoder, IDecoder
 	public static final byte CODEC_ID = 3;
 
 	/** The debug flag. */
-	protected boolean DEBUG = true;
+	protected boolean DEBUG = false;
 	
 	//-------- methods --------
 	

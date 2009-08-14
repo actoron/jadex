@@ -276,7 +276,7 @@ public class NIOTCPTransport implements ITransport
 			String[] addrs = recstodel[i].getAddresses();
 			for(int j=0; j<addrs.length; j++)
 			{
-				adrsets.put(addrs[i], recstodel[i]);
+				adrsets.put(addrs[j], recstodel[i]);
 			}
 		}
 
@@ -430,23 +430,23 @@ public class NIOTCPTransport implements ITransport
 		if(address.startsWith(getServiceSchema()))
 		{
 			// Parse the address
-			int schemalen = getServiceSchema().length();
-			int div = address.indexOf(':', schemalen);
-			String hostname;
-			int iport;
-			if(div>0)
-			{
-				hostname = address.substring(schemalen, div);
-				iport = Integer.parseInt(address.substring(div+1));
-			}
-			else
-			{
-				hostname = address.substring(schemalen);
-				iport = DEFAULT_PORT;
-			}
-
 			try
 			{
+				int schemalen = getServiceSchema().length();
+				int div = address.indexOf(':', schemalen);
+				String hostname;
+				int iport;
+				if(div>0)
+				{
+					hostname = address.substring(schemalen, div);
+					iport = Integer.parseInt(address.substring(div+1));
+				}
+				else
+				{
+					hostname = address.substring(schemalen);
+					iport = DEFAULT_PORT;
+				}
+			
 				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
 				ret = new NIOTCPOutputConnection(InetAddress.getByName(hostname), iport, codecfac, new Cleaner(address), cl);
 				connections.put(address, ret);
@@ -454,7 +454,7 @@ public class NIOTCPTransport implements ITransport
 			catch(Exception e)
 			{ 
 				connections.put(address, new NIOTCPDeadConnection());
-				logger.warning("Could not establish connection to: "+hostname+":"+iport);
+				logger.warning("Could not establish connection to: "+address);
 				//e.printStackTrace();
 			}
 		}

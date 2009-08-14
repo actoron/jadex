@@ -56,7 +56,7 @@
 			<property type="jadex.bridge.IMessageService" name="message_service">new jadex.adapter.standalone.MessageService($platform, 
 				new jadex.adapter.standalone.transport.ITransport[]
 				{
-					new jadex.adapter.standalone.transport.localmtp.LocalTransport($platform),
+					//new jadex.adapter.standalone.transport.localmtp.LocalTransport($platform),
 					new jadex.adapter.standalone.transport.tcpmtp.TCPTransport($platform, 9876),
 					new jadex.adapter.standalone.transport.niotcpmtp.NIOTCPTransport($platform, 8765)
 				})

@@ -494,8 +494,8 @@ public class Platform extends AbstractPlatform
 			new BeanAttributeInfo[]{new BeanAttributeInfo("schemaLocation", null, AttributeInfo.IGNORE_READWRITE)}, null, null,
 			new SubobjectInfo[]
 			{
-				new SubobjectInfo(new BeanAttributeInfo("property", "properties")), 
-				new SubobjectInfo(new BeanAttributeInfo("properties", "subproperties"))
+				new SubobjectInfo(new BeanAttributeInfo("property", "properties"), null, null, true), 
+				new SubobjectInfo(new BeanAttributeInfo("properties", "subproperties"), null, null, true)
 			}
 		));
 		
