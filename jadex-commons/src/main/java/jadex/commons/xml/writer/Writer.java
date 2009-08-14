@@ -1,7 +1,5 @@
 package jadex.commons.xml.writer;
 
-import jadex.commons.SReflect;
-import jadex.commons.xml.AbstractInfo;
 import jadex.commons.xml.Namespace;
 import jadex.commons.xml.StackElement;
 import jadex.commons.xml.TypeInfo;
@@ -10,13 +8,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
@@ -36,8 +32,6 @@ public class Writer
 	/** The object creator. */
 	protected IObjectWriterHandler handler;
 	
-	/** The type mappings. */
-	protected Map typeinfos;
 	
 	/** The ignored attribute types. */
 	protected Set ignoredattrs;
@@ -57,10 +51,9 @@ public class Writer
 	 *  Create a new reader.
 	 *  @param handler The handler.
 	 */
-	public Writer(IObjectWriterHandler handler, Set typeinfos)
+	public Writer(IObjectWriterHandler handler)
 	{
 		this.handler = handler;
-		this.typeinfos = typeinfos!=null? createTypeInfos(typeinfos): Collections.EMPTY_MAP;
 		this.genids = true;
 		this.indent = true;
 	}
@@ -96,10 +89,7 @@ public class Writer
 	{
 //		if(tagname!=null)
 //			System.out.println("tagname: "+tagname);
-//		TypeInfo typeinfo = tagname!=null? getTypeInfo(object, getXMLPath(stack)+"/"+tagname, context, true):
-//			getTypeInfo(object, getXMLPath(stack), context, false); 
-		
-		TypeInfo typeinfo = getTypeInfo(object, getXMLPath(stack), context, false); 
+		TypeInfo typeinfo = handler.getTypeInfo(object, getXMLPath(stack), context); 
 		if(typeinfo!=null)
 			tagname = typeinfo.getXMLTag();
 		
@@ -239,62 +229,7 @@ public class Writer
 		}
 	}
 	
-	/**
-	 *  Get the most specific mapping info.
-	 *  @param tag The tag.
-	 *  @param fullpath The full path.
-	 *  @return The most specific mapping info.
-	 */
-	protected TypeInfo getTypeInfo(Object object, String fullpath, Object context, boolean full)//, Map rawattributes)
-	{
-		TypeInfo ret = null;
-		Object type = handler.getObjectType(object, context);
-//		System.out.println("type is: "+type);
-		Set maps = (Set)typeinfos.get(type);
-		
-		// Hack! due to HashMap.Entry is not visible as class
-		if(maps==null && type instanceof Class)
-		{
-			type = SReflect.getClassName((Class)type);
-			maps = (Set)typeinfos.get(type);
-		}
-		
-		if(maps!=null)
-		{
-			for(Iterator it=maps.iterator(); ret==null && it.hasNext(); )
-			{
-				TypeInfo tmp = (TypeInfo)it.next();
-				if(!full && fullpath.endsWith(tmp.getXMLPathWithoutElement()) ||
-					(full && fullpath.endsWith(tmp.getXMLPath())))// && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
-					ret = tmp;
-			}
-		}
-		return ret;
-	}
-	
-	/**
-	 *  Create type infos for each tag sorted by specificity.
-	 *  @param linkinfos The mapping infos.
-	 *  @return Map of mapping infos.
-	 */
-	protected Map createTypeInfos(Set typeinfos)
-	{
-		Map ret = new HashMap();
-		
-		for(Iterator it=typeinfos.iterator(); it.hasNext(); )
-		{
-			TypeInfo mapinfo = (TypeInfo)it.next();
-			TreeSet maps = (TreeSet)ret.get(mapinfo.getTypeInfo());
-			if(maps==null)
-			{
-				maps = new TreeSet(new AbstractInfo.SpecificityComparator());
-				ret.put(mapinfo.getTypeInfo(), maps);
-			}
-			maps.add(mapinfo);
-		}
-		
-		return ret;
-	}
+
 	
 	/**
 	 *  Write the start of an object.
@@ -351,16 +286,23 @@ public class Writer
 	 *  @param stack The stack.
 	 *  @return The string representig the xml stack (e.g. tag1/tag2/tag3)
 	 */
-	protected String getXMLPath(List stack)
+	protected String[] getXMLPath(List stack)
 	{
-		StringBuffer ret = new StringBuffer();
+		String[] ret = new String[stack.size()];
 		for(int i=0; i<stack.size(); i++)
 		{
-			ret.append(((StackElement)stack.get(i)).getTag());
-			if(i<stack.size()-1)
-				ret.append("/");
+			ret[i] = ((StackElement)stack.get(i)).getTag();
 		}
-		return ret.toString();
+		return ret;
+		
+//		StringBuffer ret = new StringBuffer();
+//		for(int i=0; i<stack.size(); i++)
+//		{
+//			ret.append(((StackElement)stack.get(i)).getTag());
+//			if(i<stack.size()-1)
+//				ret.append("/");
+//		}
+//		return ret.toString();
 	}
 	
 	/**

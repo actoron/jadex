@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,7 +27,7 @@ public class JavaWriter extends Writer
 	 */
 	public JavaWriter(Set typeinfos)
 	{
-		super(new BeanObjectWriterHandler(true), joinTypeInfos(typeinfos));
+		super(new BeanObjectWriterHandler(true, joinTypeInfos(typeinfos)));
 	}
 
 	/**
@@ -53,14 +54,21 @@ public class JavaWriter extends Writer
 		{
 			// java.util.HashMap
 			
-			TypeInfo ti_hashmapw = new TypeInfo(null, "java.util.HashMap", HashMap.class, null, null, null, null, null,
+//			TypeInfo ti_hashmapw = new TypeInfo(null, "java.util.HashMap", HashMap.class, null, null, null, null, null,
+//				new SubobjectInfo[]{
+//				new SubobjectInfo(new BeanAttributeInfo("entries", "entrySet", 
+//					null, null, null, null, null, HashMap.class.getMethod("entrySet", new Class[0]), null), null, null, true)
+//			});
+			TypeInfo ti_hashmapw = new TypeInfo(null, null, Map.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo("entries", "entrySet", 
-					null, null, null, null, null, HashMap.class.getMethod("entrySet", new Class[0]), null), null, null, true)
+					null, null, null, null, null, Map.class.getMethod("entrySet", new Class[0]), null), null, null, true)
 			});
+
 			typeinfosw.add(ti_hashmapw);
 			
-			TypeInfo ti_hashmapentryw = new TypeInfo(null, "entry", "java.util.HashMap$Entry", null, null, null, null, null,
+			// Cannot let xmltag be null, because class name then contains $ which is not allowed in a tag
+			TypeInfo ti_hashmapentryw = new TypeInfo(null, "entry", Map.Entry.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo("key", "key", 
 					null, null, null, null, null, Map.Entry.class.getMethod("getKey", new Class[0]), null)),
@@ -71,21 +79,29 @@ public class JavaWriter extends Writer
 			
 			// java.util.ArrayList
 			
-			TypeInfo ti_arraylist = new TypeInfo(null, "java.util.ArrayList", ArrayList.class, null, null, null, null, null,
+			TypeInfo ti_arraylist = new TypeInfo(null, null, List.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo("entries", AttributeInfo.THIS,
-					null, null, null, null, null, null, ArrayList.class.getMethod("add", new Class[]{Object.class})))
+					null, null, null, null, null, null, ArrayList.class.getMethod("add", new Class[]{Object.class})), null, null, true)
 			});
 			typeinfosw.add(ti_arraylist);
 			
 			// java.util.HashSet
 			
-			TypeInfo ti_hashset = new TypeInfo(null, "java.util.HashSet", HashSet.class, null, null, null, null, null,
+			TypeInfo ti_hashset = new TypeInfo(null, null, Set.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo("entries", AttributeInfo.THIS,
-					null, null, null, null, null, null, HashSet.class.getMethod("add", new Class[]{Object.class})))
+					null, null, null, null, null, null, HashSet.class.getMethod("add", new Class[]{Object.class})), null, null, true)
 			});
 			typeinfosw.add(ti_hashset);
+			
+//			TypeInfo ti_array = new TypeInfo(null, null, Object[].class, null, null, null, null, null,
+//				new SubobjectInfo[]{
+//				new SubobjectInfo(new BeanAttributeInfo("entries", AttributeInfo.THIS,
+//					null, null, null, null, null, null, HashSet.class.getMethod("add", new Class[]{Object.class})), null, null, true)
+//			});
+//			typeinfosw.add(ti_array);
+
 		}
 		catch(Exception e)
 		{

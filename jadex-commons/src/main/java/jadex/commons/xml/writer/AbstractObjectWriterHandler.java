@@ -1,10 +1,15 @@
 package jadex.commons.xml.writer;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import jadex.commons.SReflect;
+import jadex.commons.xml.AbstractInfo;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.ITypeConverter;
 import jadex.commons.xml.SubobjectInfo;
@@ -21,7 +26,86 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	/** Control flag for generating container tags. */
 	protected boolean gentypetags = true;
 	
+	/** The type mappings. */
+	protected Map typeinfos;
+
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new writer handler.
+	 */
+	public AbstractObjectWriterHandler(Set typeinfos)
+	{
+		this.typeinfos = createTypeInfos(typeinfos);
+	}
+	
 	//-------- methods --------
+	
+	/**
+	 *  Create type infos for each tag sorted by specificity.
+	 *  @param linkinfos The mapping infos.
+	 *  @return Map of mapping infos.
+	 */
+	protected Map createTypeInfos(Set typeinfos)
+	{
+		Map ret = new HashMap();
+		
+		for(Iterator it=typeinfos.iterator(); it.hasNext(); )
+		{
+			TypeInfo mapinfo = (TypeInfo)it.next();
+			TreeSet maps = (TreeSet)ret.get(mapinfo.getTypeInfo());
+			if(maps==null)
+			{
+				maps = new TreeSet(new AbstractInfo.SpecificityComparator());
+				ret.put(mapinfo.getTypeInfo(), maps);
+			}
+			maps.add(mapinfo);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the most specific mapping info.
+	 *  @param tag The tag.
+	 *  @param fullpath The full path.
+	 *  @return The most specific mapping info.
+	 */
+	public TypeInfo getTypeInfo(Object object, String[] fullpath, Object context)//, Map rawattributes)
+	{
+		Object type = getObjectType(object, context);
+//		System.out.println("type is: "+type);
+		TypeInfo ret = findTypeInfo((Set)typeinfos.get(type), fullpath);
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected TypeInfo findTypeInfo(Set typeinfos, String[] fullpath)
+	{
+		TypeInfo ret = null;
+		if(typeinfos!=null)
+		{
+			for(Iterator it=typeinfos.iterator(); ret==null && it.hasNext(); )
+			{
+				TypeInfo ti = (TypeInfo)it.next();
+				String[] tmp = ti.getXMLPathElementsWithoutElement();
+				boolean ok = true;
+				if(tmp!=null)
+				{
+					for(int i=1; i<=tmp.length && ok; i++)
+					{
+						ok = tmp[tmp.length-i].equals(fullpath[fullpath.length-i]);
+					}
+				}
+				if(ok)
+					ret = ti;
+//				if(fullpath.endsWith(tmp.getXMLPathWithoutElement())) // && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
+			}
+		}
+		return ret;
+	}
 	
 	/**
 	 *  Get the object type
@@ -168,25 +252,32 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 								Object value = getValue(object, property, context, info);
 								if(value!=null)
 								{
-									String xmlsoname = soinfo.getXMLPath()!=null? soinfo.getXMLPath(): getPropertyName(property);
+//									String xmlsoname = soinfo.getXMLPath()!=null? soinfo.getXMLPath(): getPropertyName(property);
+									String[] xmlpath = soinfo.getXMLPathElements();
+									if(xmlpath==null)
+										xmlpath = new String[]{getPropertyName(property)};
 									
-									// Hack special case array, todo: support generically via typeinfo
-//									if(SReflect.isIterable(value))
-									if(soinfo.isMulti() || value.getClass().isArray()
-										|| (property.equals(AttributeInfo.THIS) && SReflect.isIterable(value)))
+//									if(soinfo.isMulti() || value.getClass().isArray()
+//										|| (property.equals(AttributeInfo.THIS) && SReflect.isIterable(value)))
+									// Fetch elements directly if it is a multi subobject
+									if(soinfo.isMulti())
 									{
 										Iterator it2 = SReflect.getIterator(value);
-										if(it2.hasNext())
+										while(it2.hasNext())
 										{
-											while(it2.hasNext())
+											Object val = it2.next();
+											
+											if(isTypeCompatible(val, sotypeinfo, context))
 											{
-												Object val = it2.next();
-												
-												if(isTypeCompatible(val, sotypeinfo, context))
+												String[] tmp = xmlpath;
+												if(gentypetags)
 												{
-													String pathname = gentypetags? xmlsoname+"/"+getTagName(val, context): xmlsoname;
-													wi.addSubobject(pathname, val);
+													tmp = new String[xmlpath.length+1];
+													System.arraycopy(xmlpath, 0, tmp, 0, xmlpath.length);
+													tmp[tmp.length-1] = getTagName(val, context);
 												}
+//												String pathname = gentypetags? xmlsoname+"/"+getTagName(val, context): xmlsoname;
+												wi.addSubobject(tmp, val);
 											}
 										}
 									}
@@ -194,8 +285,15 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 									{
 										if(isTypeCompatible(value, sotypeinfo, context))
 										{
-											String pathname = gentypetags? xmlsoname+"/"+getTagName(value, context): xmlsoname;
-											wi.addSubobject(pathname, value);
+//											String pathname = gentypetags? xmlsoname+"/"+getTagName(value, context): xmlsoname;
+											String[] tmp = xmlpath;
+											if(gentypetags)
+											{
+												tmp = new String[xmlpath.length+1];
+												System.arraycopy(xmlpath, 0, tmp, 0, xmlpath.length);
+												tmp[tmp.length-1] = getTagName(value, context);
+											}
+											wi.addSubobject(tmp, value);
 										}
 									}
 								}
@@ -209,19 +307,6 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 				}
 			}
 		}
-		/*else if(isMultiObject(object, context))
-		{
-			Iterator it = handler.getIterator();
-			{
-				if(it.hasNext())
-				{
-					while(it.hasNext())
-					{
-						wi.addSubobject(gentypetags? propname+"/"+getTagName(val, context): propname, val);
-					}
-				}
-			}
-		}*/
 			
 		Collection props = getProperties(object, context);
 		if(props!=null)
@@ -248,9 +333,8 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 							else
 							{
 								// todo: remove
-								// Hack special case array, todo: support generically via typeinfo
-								if(value.getClass().isArray())//SReflect.isIterable(value))
-//								if(SReflect.isIterable(value))
+								// Hack special case array, todo: support generically via typeinfo???
+								if(value.getClass().isArray())
 								{
 									Iterator it2 = SReflect.getIterator(value);
 									if(it2.hasNext())
@@ -258,13 +342,29 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 										while(it2.hasNext())
 										{
 											Object val = it2.next();
-											wi.addSubobject(gentypetags? propname+"/"+getTagName(val, context): propname, val);
+											String[] xmlpath = new String[]{propname};
+											String[] tmp = xmlpath;
+											if(gentypetags)
+											{
+												tmp = new String[xmlpath.length+1];
+												System.arraycopy(xmlpath, 0, tmp, 0, xmlpath.length);
+												tmp[tmp.length-1] = getTagName(val, context);
+											}
+											wi.addSubobject(tmp, val);
 										}
 									}
 								}
 								else
 								{
-									wi.addSubobject(gentypetags? propname+"/"+getTagName(value, context): propname, value);
+									String[] xmlpath = new String[]{propname};
+									String[] tmp = xmlpath;
+									if(gentypetags)
+									{
+										tmp = new String[xmlpath.length+1];
+										System.arraycopy(xmlpath, 0, tmp, 0, xmlpath.length);
+										tmp[tmp.length-1] = getTagName(value, context);
+									}
+									wi.addSubobject(tmp, value);
 								}
 							}
 						}

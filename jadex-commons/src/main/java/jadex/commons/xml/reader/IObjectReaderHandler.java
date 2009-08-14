@@ -43,6 +43,6 @@ public interface IObjectReaderHandler
 	 *  @param tagname The current tagname (for name guessing).
 	 *  @param context The context.
 	 */
-	public void linkObject(Object object, Object parent, Object linkinfo, String tagname, 
+	public void linkObject(Object object, Object parent, Object linkinfo, String[] pathname, 
 		Object context, ClassLoader classloader, Object root) throws Exception;
 }

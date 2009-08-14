@@ -1180,7 +1180,7 @@ public class ControlCenter implements IControlCenter
 	{
 		if(writer==null)
 		{
-			writer = new jadex.commons.xml.writer.Writer(new BeanObjectWriterHandler(), typeinfos);
+			writer = new jadex.commons.xml.writer.Writer(new BeanObjectWriterHandler(typeinfos));
 		}
 		return writer;
 	}

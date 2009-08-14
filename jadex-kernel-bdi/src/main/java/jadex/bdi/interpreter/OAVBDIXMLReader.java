@@ -325,7 +325,7 @@ public class OAVBDIXMLReader
 //		ignoredattrs.add("schemaLocation");
 		
 		reader = new Reader(new OAVObjectReaderHandler(), typeinfos);
-		writer = new Writer(new OAVObjectWriterHandler(), typeinfos);
+		writer = new Writer(new OAVObjectWriterHandler(typeinfos));
 	}
 	
 	/**

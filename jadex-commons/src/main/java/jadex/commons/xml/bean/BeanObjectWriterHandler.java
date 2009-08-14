@@ -7,7 +7,11 @@ import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.writer.AbstractObjectWriterHandler;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  *  Java bean version for fetching write info for an object. 
@@ -18,26 +22,69 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	
 	/** The bean introspector. */
 	protected IBeanIntrospector introspector = new BeanReflectionIntrospector();
-	
+		
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new writer.
 	 */
-	public BeanObjectWriterHandler()
+	public BeanObjectWriterHandler(Set typeinfos)
 	{
-		this(false);
+		this(false, typeinfos);
 	}
 	
 	/**
 	 *  Create a new writer.
 	 */
-	public BeanObjectWriterHandler(boolean gentypetags)
+	public BeanObjectWriterHandler(boolean gentypetags, Set typeinfos)
 	{
+		super(typeinfos);
 		this.gentypetags = gentypetags;
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Get the most specific mapping info.
+	 *  @param tag The tag.
+	 *  @param fullpath The full path.
+	 *  @return The most specific mapping info.
+	 */
+	public TypeInfo getTypeInfo(Object object, String[] fullpath, Object context)//, Map rawattributes)
+	{
+		TypeInfo ret = super.getTypeInfo(object, fullpath, context);
+		
+		// Hack! due to HashMap.Entry is not visible as class
+		if(ret==null)
+		{
+			Object type = getObjectType(object, context);
+			if(type instanceof Class)
+			{
+				Class clazz = (Class)type;
+				type = SReflect.getClassName(clazz);
+				ret = findTypeInfo((Set)typeinfos.get(type), fullpath);
+				
+				if(ret==null)
+				{
+					// Try if one! interface is registered
+					
+					while(clazz!=null && ret==null)
+					{
+						Class[] interfaces = clazz.getInterfaces();
+						for(int i=0; i<interfaces.length && ret==null ; i++)
+						{
+							ret = findTypeInfo((Set)typeinfos.get(interfaces[i]), fullpath);
+//							throw new RuntimeException("Multiple interfaces matching a given type found: "+tmp+" "+ret+" "+object);
+						}
+						
+						clazz = clazz.getSuperclass();
+					}
+				}
+			}
+		}
+		
+		return ret;
+	}
 	
 	/**
 	 *  Get the object type

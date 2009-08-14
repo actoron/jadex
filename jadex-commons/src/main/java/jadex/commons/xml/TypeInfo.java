@@ -292,27 +292,55 @@ public class TypeInfo	extends AbstractInfo
 	 *  @param fullpath The full path.
 	 *  @return The most specific subobject info.
 	 */
-	public SubobjectInfo getSubobjectInfoRead(String tag, String fullpath, Map rawattributes)
+	public SubobjectInfo getSubobjectInfoRead(String tag, String[] fullpath, Map rawattributes)
 	{
 		SubobjectInfo ret = null;
 		
 		// Hack exclude tag when classname :-(
 		if(tag.indexOf(".")!=-1)
 		{
-			int idx = fullpath.lastIndexOf("/");
-			fullpath = fullpath.substring(0, idx);
-			idx = fullpath.lastIndexOf("/");
-			tag = fullpath.substring(idx+1);
+			tag = fullpath[fullpath.length-2];
+			String[] tmp = new String[fullpath.length-1];
+			System.arraycopy(fullpath, 0, tmp, 0, tmp.length);
+			fullpath = tmp;
 		}
 		
-		Set subobjects = subobjectinfosread!=null? (Set)subobjectinfosread.get(tag): null;			
-		if(subobjects!=null)
+		Set subobjects = subobjectinfosread!=null? (Set)subobjectinfosread.get(tag): null;
+		ret = findSubobjectInfo(subobjects, fullpath);
+		
+//		Set subobjects = subobjectinfosread!=null? (Set)subobjectinfosread.get(tag): null;			
+//		if(subobjects!=null)
+//		{
+//			for(Iterator it=subobjects.iterator(); ret==null && it.hasNext(); )
+//			{
+//				SubobjectInfo tmp = (SubobjectInfo)it.next();
+//				if(fullpath.endsWith(tmp.getXMLPath()) && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
+//					ret = tmp;
+//			}
+//		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected SubobjectInfo findSubobjectInfo(Set soinfos, String[] fullpath)
+	{
+		SubobjectInfo ret = null;
+		if(soinfos!=null)
 		{
-			for(Iterator it=subobjects.iterator(); ret==null && it.hasNext(); )
+			for(Iterator it=soinfos.iterator(); ret==null && it.hasNext(); )
 			{
-				SubobjectInfo tmp = (SubobjectInfo)it.next();
-				if(fullpath.endsWith(tmp.getXMLPath()) && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
-					ret = tmp;
+				SubobjectInfo si = (SubobjectInfo)it.next();
+				String[] tmp = si.getXMLPathElementsWithoutElement();
+				boolean ok = true;
+				for(int i=1; i<=tmp.length && ok; i++)
+				{
+					ok = tmp[tmp.length-i].equals(fullpath[fullpath.length-i]);
+				}
+				if(ok)
+					ret = si;
+//				if(fullpath.endsWith(tmp.getXMLPathWithoutElement())) // && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
 			}
 		}
 		return ret;

@@ -32,8 +32,18 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	{
 		Object ret = null;
 		if(type instanceof TypeInfo)
-			type =  ((TypeInfo)type).getTypeInfo();
-			
+		{
+			Object ti =  ((TypeInfo)type).getTypeInfo();
+			if(ti instanceof Class && ((Class)ti).isInterface())
+			{
+				type = ((TypeInfo)type).getXMLTag();
+			}
+			else
+			{
+				type = ti;
+			}
+		}	
+		
 		if(type instanceof Class)
 		{
 			Class clazz = (Class)type;
@@ -107,11 +117,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 */
 	public void linkObject(Object object, Object parent, Object linkinfo, 
-		String pathname, Object context, ClassLoader classloader, Object root) throws Exception
+		String[] pathname, Object context, ClassLoader classloader, Object root) throws Exception
 	{
-		int idx = pathname.lastIndexOf("/");
-		String tagname = idx!=-1? pathname.substring(idx+1): pathname;
-//		pathname = idx!=-1? pathname.substring(0, idx-1): null;
+		String tagname = pathname[pathname.length-1];
 		
 		// Add object to its parent.
 		boolean	linked	= false;
@@ -124,13 +132,11 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		List classes	= new LinkedList();
 		classes.add(object.getClass());
 		
-		StringTokenizer stok = new StringTokenizer(pathname, "/");
-		String[] plunames = new String[stok.countTokens()];
-		String[] sinnames = new String[stok.countTokens()];
-		for(int i=0; stok.hasMoreTokens(); i++)
+		String[] plunames = new String[pathname.length];
+		String[] sinnames = new String[pathname.length];
+		for(int i=0; i<pathname.length; i++)
 		{
-			String tok = stok.nextToken();
-			String name = tok.substring(0, 1).toUpperCase()+tok.substring(1);
+			String name = pathname[i].substring(0, 1).toUpperCase()+pathname[i].substring(1);
 			plunames[i] = name;
 			sinnames[i] = SUtil.getSingular(name);
 		}

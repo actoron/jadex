@@ -111,7 +111,7 @@ public class Reader
 				
 				Object object = null;
 				
-				String fullpath = getXMLPath(stack)+"/"+parser.getLocalName();
+				String[] fullpath = getXMLPath(stack, parser.getLocalName());
 				TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), fullpath, rawattrs);
 
 				
@@ -289,11 +289,12 @@ public class Reader
 					if(stack.size()>1)
 					{
 						StackElement pse = (StackElement)stack.get(stack.size()-2);
-						String pathname = parser.getLocalName();
+						List pathname = new ArrayList();
+						pathname.add(parser.getLocalName());
 						for(int i=stack.size()-3; i>=0 && pse.getObject()==null; i--)
 						{
 							pse = (StackElement)stack.get(i);
-							pathname = ((StackElement)stack.get(i+1)).getTag()+"/"+pathname;
+							pathname.add(0, ((StackElement)stack.get(i+1)).getTag());
 						}
 //						System.out.println("here: "+parser.getLocalName()+" "+getXMLPath(stack)+" "+topse.getRawAttributes());
 						
@@ -301,7 +302,8 @@ public class Reader
 						SubobjectInfo linkinfo = null;
 						if(patypeinfo!=null)
 							linkinfo = patypeinfo.getSubobjectInfoRead(parser.getLocalName(), getXMLPath(stack), topse.getRawAttributes());
-						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), pathname, context, classloader, root);
+						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), 
+							(String[])pathname.toArray(new String[pathname.size()]), context, classloader, root);
 					}
 				}
 				
@@ -336,17 +338,42 @@ public class Reader
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	protected TypeInfo getTypeInfo(String tag, String fullpath, Map rawattributes)
+	protected TypeInfo getTypeInfo(String tag, String[] fullpath, Map rawattributes)
+	{
+		TypeInfo ret = findTypeInfo((Set)typeinfos.get(tag), fullpath);
+
+//		if(maps!=null)
+//		{
+//			for(Iterator it=maps.iterator(); ret==null && it.hasNext(); )
+//			{
+//				TypeInfo tmp = (TypeInfo)it.next();
+//				if(fullpath.endsWith(tmp.getXMLPath()) && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
+//					ret = tmp;
+//			}
+//		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected TypeInfo findTypeInfo(Set typeinfos, String[] fullpath)
 	{
 		TypeInfo ret = null;
-		Set maps = (Set)typeinfos.get(tag);
-		if(maps!=null)
+		if(typeinfos!=null)
 		{
-			for(Iterator it=maps.iterator(); ret==null && it.hasNext(); )
+			for(Iterator it=typeinfos.iterator(); ret==null && it.hasNext(); )
 			{
-				TypeInfo tmp = (TypeInfo)it.next();
-				if(fullpath.endsWith(tmp.getXMLPath()) && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
-					ret = tmp;
+				TypeInfo ti = (TypeInfo)it.next();
+				String[] tmp = ti.getXMLPathElements();
+				boolean ok = true;
+				for(int i=1; i<=tmp.length && ok; i++)
+				{
+					ok = tmp[tmp.length-i].equals(fullpath[fullpath.length-i]);
+				}
+				if(ok)
+					ret = ti;
+//				if(fullpath.endsWith(tmp.getXMLPathWithoutElement())) // && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
 			}
 		}
 		return ret;
@@ -357,16 +384,39 @@ public class Reader
 	 *  @param stack The stack.
 	 *  @return The string representig the xml stack (e.g. tag1/tag2/tag3)
 	 */
-	protected String getXMLPath(List stack)
+	protected String[] getXMLPath(List stack)
 	{
-		StringBuffer ret = new StringBuffer();
+		String[] ret = new String[stack.size()];
 		for(int i=0; i<stack.size(); i++)
 		{
-			ret.append(((StackElement)stack.get(i)).getTag());
-			if(i<stack.size()-1)
-				ret.append("/");
+			ret[i] = ((StackElement)stack.get(i)).getTag();
 		}
-		return ret.toString();
+		return ret;
+	}
+	
+	/**
+	 *  Get the xml path for a stack.
+	 *  @param stack The stack.
+	 *  @return The string representig the xml stack (e.g. tag1/tag2/tag3)
+	 */
+	protected String[] getXMLPath(List stack, String tag)
+	{
+		String[] ret = new String[stack.size()+1];
+		for(int i=0; i<stack.size(); i++)
+		{
+			ret[i] = ((StackElement)stack.get(i)).getTag();
+		}
+		ret[ret.length-1] = tag;
+		return ret;
+		
+//		StringBuffer ret = new StringBuffer();
+//		for(int i=0; i<stack.size(); i++)
+//		{
+//			ret.append(((StackElement)stack.get(i)).getTag());
+//			if(i<stack.size()-1)
+//				ret.append("/");
+//		}
+//		return ret.toString();
 	}
 	
 	/**

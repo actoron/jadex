@@ -21,11 +21,11 @@ public class AbstractInfo
 	/** The xml tag/path. */
 	protected String xmlpath;
 	
-	/** The xml tag. */
-	protected String xmltag;
+	/** The xml path elements. */
+	protected String[] xmlpathelements;
 	
-	/** The xml path depth. */
-	protected int xmlpathdepth;
+	/** The xml path elements without tag. */
+	protected String[] xmlpathelementswithouttag;
 	
 	/** The procedural filter. */
 	protected IFilter filter;
@@ -44,6 +44,19 @@ public class AbstractInfo
 	public AbstractInfo(String xmlpath, IFilter filter)
 	{
 		this.xmlpath = xmlpath;
+		if(xmlpath!=null)
+		{
+			StringTokenizer stok = new StringTokenizer(xmlpath, "/");
+			this.xmlpathelements = new String[stok.countTokens()];
+			this.xmlpathelementswithouttag = new String[stok.countTokens()-1];
+			for(int i=0; stok.hasMoreTokens(); i++)
+			{
+				xmlpathelements[i] = stok.nextToken();
+				if(i<xmlpathelementswithouttag.length)
+					xmlpathelementswithouttag[i] = xmlpathelements[i];
+			}
+		}
+		
 		this.filter = filter;
 		synchronized(AbstractInfo.class)
 		{
@@ -56,7 +69,7 @@ public class AbstractInfo
 	/**
 	 *  Get the xmlpath
 	 */
-	public String getXMLPath()
+	private String getXMLPath()
 	{
 		return this.xmlpath;
 	}
@@ -66,16 +79,7 @@ public class AbstractInfo
 	 */
 	public String getXMLTag()
 	{
-		if(xmltag==null)
-		{
-			int idx = xmlpath.lastIndexOf("/");
-			if(idx!=-1)
-				xmltag = xmlpath.substring(idx+1);
-			else
-				xmltag = xmlpath;
-		}
-		
-		return xmltag;
+		return xmlpathelements!=null? xmlpathelements[xmlpathelements.length-1]: null;
 	}
 	
 	/**
@@ -84,42 +88,39 @@ public class AbstractInfo
 	 */
 	public String[] getXMLPathElements()
 	{
-		List ret = new ArrayList();
-		StringTokenizer stok = new StringTokenizer("/");
-		while(stok.hasMoreElements())
-			ret.add(stok.nextToken());
-		return (String[])ret.toArray(new String[ret.size()]);
+		return xmlpathelements;
 	}
 	
 	/**
 	 *  Get the xml path without element.
 	 */
+	public String[] getXMLPathElementsWithoutElement()
+	{
+		return xmlpathelementswithouttag;
+	}
+	
+	/**
+	 *  Get the xml path without element.
+	 * /
 	public String getXMLPathWithoutElement()
 	{
 		String ret = "";
 		String xmlpath = getXMLPath();
-		int idx = xmlpath.lastIndexOf("/");
-		if(idx!=-1)
-			ret = xmlpath.substring(0, idx-1);
+		if(xmlpath!=null)
+		{
+			int idx = xmlpath.lastIndexOf("/");
+			if(idx!=-1)
+				ret = xmlpath.substring(0, idx-1);
+		}
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Get the path depth.
 	 */
 	public int getXMLPathDepth()
 	{
-		if(xmlpathdepth==0)
-		{
-			int idx = xmlpath.indexOf("/");
-			while(idx!=-1)
-			{
-				xmlpathdepth++;
-				idx = xmlpath.indexOf("/", idx+1);
-			}
-		}
-		
-		return xmlpathdepth;
+		return xmlpathelements!=null? xmlpathelements.length-1: 0;
 	}
 	
 	/**

@@ -1,5 +1,7 @@
 package jadex.commons.xml.writer;
 
+import java.util.Iterator;
+
 import jadex.commons.xml.TypeInfo;
 
 /**
@@ -18,7 +20,15 @@ public interface IObjectWriterHandler
 	 *  @param object The object.
 	 *  @return The object type.
 	 */
-	public Object getObjectType(Object object, Object context);
+//	public Object getObjectType(Object object, Object context);
+	
+	/**
+	 *  Get the most specific mapping info.
+	 *  @param tag The tag.
+	 *  @param fullpath The full path.
+	 *  @return The most specific mapping info.
+	 */
+	public TypeInfo getTypeInfo(Object object, String[] fullpath, Object context);
 	
 	/**
 	 *  Get all subobjects of an object.
@@ -26,5 +36,4 @@ public interface IObjectWriterHandler
 	 *  @param typeinfo The Typeinfo.
 	 */
 	public WriteObjectInfo getObjectWriteInfo(Object object, TypeInfo typeinfo, Object context, ClassLoader classloader);
-
 }

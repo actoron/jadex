@@ -511,7 +511,7 @@ public class Platform extends AbstractPlatform
 	{
 		if(writer==null)
 		{
-			writer = new jadex.commons.xml.writer.Writer(new BeanObjectWriterHandler(), typeinfos);
+			writer = new jadex.commons.xml.writer.Writer(new BeanObjectWriterHandler(typeinfos));
 		}
 		return writer;
 	}

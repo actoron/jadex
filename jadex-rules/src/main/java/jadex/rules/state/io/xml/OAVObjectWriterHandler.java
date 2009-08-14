@@ -1,5 +1,6 @@
 package jadex.rules.state.io.xml;
 
+import jadex.commons.SReflect;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.TypeInfo;
@@ -10,7 +11,9 @@ import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  *  OAV version for fetching write info for an object. 
@@ -22,16 +25,17 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Create a new writer.
 	 */
-	public OAVObjectWriterHandler()
+	public OAVObjectWriterHandler(Set typeinfos)
 	{
-		this(false);
+		this(false, typeinfos);
 	}
 	
 	/**
 	 *  Create a new writer.
 	 */
-	public OAVObjectWriterHandler(boolean gencontainertags)
+	public OAVObjectWriterHandler(boolean gencontainertags, Set typeinfos)
 	{
+		super(typeinfos);
 		this.gentypetags = gencontainertags;
 	}
 	

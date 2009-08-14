@@ -1,5 +1,7 @@
 package jadex.commons.xml.writer;
 
+import jadex.commons.SUtil;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -98,18 +100,13 @@ public class WriteObjectInfo
 	/**
 	 *  Add a subobject.
 	 */
-	public void addSubobject(String pathname, Object subobject)
+	public void addSubobject(String[] pathname, Object subobject)
 	{
-//		System.out.println("added: "+pathname+" "+subobject);
+//		System.out.println("added: "+SUtil.arrayToString(pathname)+" "+subobject);
 		if(subobjects==null)
 			subobjects = new LinkedHashMap();
 		
-		StringTokenizer stok = new StringTokenizer(pathname, "/");
-		String[] tags = new String[stok.countTokens()];
-		for(int i=0; stok.hasMoreTokens(); i++)
-			tags[i] = stok.nextToken();
-		
-		insertSubobject(subobjects, tags, subobject, 0);
+		insertSubobject(subobjects, pathname, subobject, 0);
 	}
 	
 	public static final String SUBTAGMAP = "subtagmap";
