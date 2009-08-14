@@ -73,6 +73,7 @@ public class Reader
 		XMLStreamReader	parser	= factory.createXMLStreamReader(input);
 		Object root = null;
 		List stack = new ArrayList();
+		List path = new ArrayList();
 		StackElement topse	= null;
 		String comment = null;
 		MultiCollection postprocs = new MultiCollection();
@@ -111,7 +112,9 @@ public class Reader
 				
 				Object object = null;
 				
-				String[] fullpath = getXMLPath(stack, parser.getLocalName());
+//				String[] fullpath = getXMLPath(stack, parser.getLocalName());
+				String[] fullpath = (String[])path.toArray(new String[path.size()+1]);
+				fullpath[fullpath.length-1] = parser.getLocalName();
 				TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), fullpath, rawattrs);
 
 				
@@ -122,6 +125,7 @@ public class Reader
 					object = readobjects.get(idref);
 					topse	= new StackElement(parser.getLocalName(), object, rawattrs, typeinfo);
 					stack.add(topse);
+					path.add(parser.getLocalName());
 				}
 				else
 				{	
@@ -140,6 +144,7 @@ public class Reader
 					
 					topse	= new StackElement(parser.getLocalName(), object, rawattrs, typeinfo);
 					stack.add(topse);
+					path.add(parser.getLocalName());
 					if(stack.size()==1)
 					{
 						root = object;
@@ -215,7 +220,8 @@ public class Reader
 			else if(next==XMLStreamReader.END_ELEMENT)
 			{
 //				System.out.println("end: "+parser.getLocalName());
-				final TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), getXMLPath(stack), topse.getRawAttributes());
+				String[] fullpath = (String[])path.toArray(new String[path.size()]);
+				final TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), fullpath, topse.getRawAttributes());
 
 				// Hack. Change object to content when it is element of its own.
 				if(topse.getContent()!=null && topse.getContent().trim().length()>0 && topse.getObject()==null)
@@ -301,13 +307,14 @@ public class Reader
 						TypeInfo patypeinfo = pse.getTypeInfo();
 						SubobjectInfo linkinfo = null;
 						if(patypeinfo!=null)
-							linkinfo = patypeinfo.getSubobjectInfoRead(parser.getLocalName(), getXMLPath(stack), topse.getRawAttributes());
+							linkinfo = patypeinfo.getSubobjectInfoRead(parser.getLocalName(), fullpath, topse.getRawAttributes());
 						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), 
 							(String[])pathname.toArray(new String[pathname.size()]), context, classloader, root);
 					}
 				}
 				
 				stack.remove(stack.size()-1);
+				path.remove(path.size()-1);
 				if(stack.size()>0)
 					topse	= (StackElement)stack.get(stack.size()-1);
 				else
@@ -383,31 +390,31 @@ public class Reader
 	 *  Get the xml path for a stack.
 	 *  @param stack The stack.
 	 *  @return The string representig the xml stack (e.g. tag1/tag2/tag3)
-	 */
+	 * /
 	protected String[] getXMLPath(List stack)
 	{
-		String[] ret = new String[stack.size()];
-		for(int i=0; i<stack.size(); i++)
-		{
-			ret[i] = ((StackElement)stack.get(i)).getTag();
-		}
-		return ret;
-	}
+//		String[] ret = new String[stack.size()];
+//		for(int i=0; i<stack.size(); i++)
+//		{
+//			ret[i] = ((StackElement)stack.get(i)).getTag();
+//		}
+//		return ret;
+	}*/
 	
 	/**
 	 *  Get the xml path for a stack.
 	 *  @param stack The stack.
 	 *  @return The string representig the xml stack (e.g. tag1/tag2/tag3)
-	 */
+	 * /
 	protected String[] getXMLPath(List stack, String tag)
 	{
-		String[] ret = new String[stack.size()+1];
-		for(int i=0; i<stack.size(); i++)
-		{
-			ret[i] = ((StackElement)stack.get(i)).getTag();
-		}
-		ret[ret.length-1] = tag;
-		return ret;
+//		String[] ret = new String[stack.size()+1];
+//		for(int i=0; i<stack.size(); i++)
+//		{
+//			ret[i] = ((StackElement)stack.get(i)).getTag();
+//		}
+//		ret[ret.length-1] = tag;
+//		return ret;
 		
 //		StringBuffer ret = new StringBuffer();
 //		for(int i=0; i<stack.size(); i++)
@@ -417,7 +424,7 @@ public class Reader
 //				ret.append("/");
 //		}
 //		return ret.toString();
-	}
+	}*/
 	
 	/**
 	 *  Create type infos for each tag sorted by specificity.
