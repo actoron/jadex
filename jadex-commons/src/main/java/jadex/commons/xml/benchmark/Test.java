@@ -31,17 +31,17 @@ public class Test //extends TestCase
 		{
 			int cnt = 1000;
 			long start = System.currentTimeMillis();
-//			for(int i=0; i<cnt; i++)
-			while(true)
+			for(int i=0; i<cnt; i++)
+//			while(true)
 			{
 				t.testBean();
 				t.testList();
 				t.testSet();
 				t.testMap();
 			}
-//			long dur = System.currentTimeMillis()-start;
+			long dur = System.currentTimeMillis()-start;
 			
-//			System.out.println("Needed: "+dur+" for cnt="+cnt);
+			System.out.println("Needed: "+dur+" for cnt="+cnt);
 		}
 		catch(Exception e)
 		{

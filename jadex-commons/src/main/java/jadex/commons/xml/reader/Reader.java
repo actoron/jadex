@@ -348,21 +348,11 @@ public class Reader
 	protected TypeInfo getTypeInfo(String tag, String[] fullpath, Map rawattributes)
 	{
 		TypeInfo ret = findTypeInfo((Set)typeinfos.get(tag), fullpath);
-
-//		if(maps!=null)
-//		{
-//			for(Iterator it=maps.iterator(); ret==null && it.hasNext(); )
-//			{
-//				TypeInfo tmp = (TypeInfo)it.next();
-//				if(fullpath.endsWith(tmp.getXMLPath()) && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
-//					ret = tmp;
-//			}
-//		}
 		return ret;
 	}
 	
 	/**
-	 * 
+	 *  Find type find in the set of type infos.
 	 */
 	protected TypeInfo findTypeInfo(Set typeinfos, String[] fullpath)
 	{
@@ -373,10 +363,13 @@ public class Reader
 			{
 				TypeInfo ti = (TypeInfo)it.next();
 				String[] tmp = ti.getXMLPathElements();
-				boolean ok = true;
-				for(int i=1; i<=tmp.length && ok; i++)
+				boolean ok = tmp==null || tmp.length<=fullpath.length;;
+				if(tmp!=null)
 				{
-					ok = tmp[tmp.length-i].equals(fullpath[fullpath.length-i]);
+					for(int i=1; i<=tmp.length && ok; i++)
+					{
+						ok = tmp[tmp.length-i].equals(fullpath[fullpath.length-i]);
+					}
 				}
 				if(ok)
 					ret = ti;

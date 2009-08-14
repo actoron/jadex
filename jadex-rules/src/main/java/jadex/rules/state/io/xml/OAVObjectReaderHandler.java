@@ -194,12 +194,13 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param tagname The current tagname (for name guessing).
 	 *  @param context The context.
 	 */
-	public void linkObject(Object elem, Object parent, Object linkinfo, String pathname, Object context, ClassLoader classloader, Object root) throws Exception
+	public void linkObject(Object elem, Object parent, Object linkinfo, String[] pathname, Object context, ClassLoader classloader, Object root) throws Exception
 	{
 		IOAVState state = (IOAVState)context;
 	
-		int idx = pathname.lastIndexOf("/");
-		String tagname = idx!=-1? pathname.substring(idx+1): pathname;
+//		int idx = pathname.lastIndexOf("/");
+//		String tagname = idx!=-1? pathname.substring(idx+1): pathname;
+		String tagname = pathname[pathname.length-1];
 		
 //		System.out.println("link: "+elem+" "+parent);
 		

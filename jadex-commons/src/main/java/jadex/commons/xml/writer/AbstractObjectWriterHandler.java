@@ -91,7 +91,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 			{
 				TypeInfo ti = (TypeInfo)it.next();
 				String[] tmp = ti.getXMLPathElementsWithoutElement();
-				boolean ok = true;
+				boolean ok = tmp==null || tmp.length<=fullpath.length;;
 				if(tmp!=null)
 				{
 					for(int i=1; i<=tmp.length && ok; i++)
