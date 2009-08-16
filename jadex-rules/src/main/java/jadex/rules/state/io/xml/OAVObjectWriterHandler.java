@@ -54,9 +54,9 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Get the tag name for an object.
 	 */
-	public String getTagName(Object object, Object context)
+	public Object[] getTagName(Object object, Object context)
 	{
-		return ((IOAVState)context).getType(object).getName();
+		return new Object[]{null, ((IOAVState)context).getType(object).getName()};
 	}
 	
 	/**

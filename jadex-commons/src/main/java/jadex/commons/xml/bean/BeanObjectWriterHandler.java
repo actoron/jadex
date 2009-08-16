@@ -3,14 +3,14 @@ package jadex.commons.xml.bean;
 import jadex.commons.SReflect;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
+import jadex.commons.xml.Namespace;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.writer.AbstractObjectWriterHandler;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -21,8 +21,13 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	//-------- attributes --------
 	
 	/** The bean introspector. */
-	protected IBeanIntrospector introspector = new BeanReflectionIntrospector();
-		
+//	protected IBeanIntrospector introspector = new BeanReflectionIntrospector();
+	protected IBeanIntrospector introspector = new BeanInfoIntrospector();
+	
+	/** The namespaces by package. */
+	protected Map namespacebypackage = new HashMap();
+	protected int nscnt;
+	
 	//-------- constructors --------
 	
 	/**
@@ -66,7 +71,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				
 				if(ret==null)
 				{
-					// Try if one! interface is registered
+					// Try if interface is registered
 					
 					while(clazz!=null && ret==null)
 					{
@@ -78,6 +83,17 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 						}
 						
 						clazz = clazz.getSuperclass();
+					}
+					
+					// Add concrete class for same info if it is used
+					if(ret!=null)
+					{
+						TypeInfo ti = new TypeInfo(ret.getSupertype(), ret.getXMLPath(), 
+							type, ret.getCommentInfo(), ret.getContentInfo(), 
+							ret.getDeclaredAttributeInfos(), ret.getPostProcessor(), ret.getFilter(), 
+							ret.getDeclaredSubobjectInfos(), ret.getNamespace());
+						
+						addTypeInfo(ti, typeinfos);
 					}
 				}
 			}
@@ -93,18 +109,35 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	public Object getObjectType(Object object, Object context)
 	{
-		if(object==null)
-			System.out.println("here");
 		return object.getClass();
 	}
 	
 	/**
 	 *  Get the tag name for an object.
 	 */
-	public String getTagName(Object object, Object context)
+	public Object[] getTagName(Object object, Object context)
 	{
 //		return SReflect.getInnerClassName(object.getClass());
-		return SReflect.getClassName(object.getClass());
+
+		Object[] ret = new Object[2];
+		String clazzname = SReflect.getClassName(object.getClass());
+		Namespace ns;
+		int idx = clazzname.lastIndexOf(".");
+		String pck = clazzname.substring(0, idx-1);
+		String tag = clazzname.substring(idx+1);
+		int cnt;
+		
+		ns = (Namespace)namespacebypackage.get(pck);
+		if(ns==null)
+		{
+			String prefix = "pck_"+nscnt;
+			ns = new Namespace(prefix, pck);
+			namespacebypackage.put(pck, ns);
+			nscnt++;
+		}
+		
+//		return new Object[]{ns, tag};
+		return new Object[]{ns, clazzname};
 	}
 
 	/**
@@ -116,18 +149,39 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			return object;
 		
 		Object value = null;
-		try
+		
+		Method method;
+		
+		BeanAttributeInfo binfo = null;
+		if(info instanceof BeanAttributeInfo)
+			binfo = (BeanAttributeInfo)info;
+		
+		if(binfo!=null && binfo.getReadMethod()!=null)
 		{
-			Method method;
-			if(info instanceof BeanAttributeInfo && ((BeanAttributeInfo)info).getReadMethod()!=null)
-				method = ((BeanAttributeInfo)info).getReadMethod();
-			else if(attr instanceof BeanProperty)
-				method = ((BeanProperty)attr).getGetter();
-			else if(attr instanceof String)
-				method = findGetMethod(object, (String)attr, new String[]{"get", "is"});
-			else
-				throw new RuntimeException("Unknown attribute type: "+attr);
-			
+			method = ((BeanAttributeInfo)info).getReadMethod();
+		}
+		else if(attr instanceof BeanProperty)
+		{
+			method = ((BeanProperty)attr).getGetter();
+		}
+		else if(attr instanceof String)
+		{
+			method = findGetMethod(object, (String)attr, new String[]{"get", "is"});
+		}
+		else
+		{
+			throw new RuntimeException("Unknown attribute type: "+attr);
+		}
+		
+		// Cache the read method.
+//		if(binfo!=null && binfo.getReadMethod()==null)
+//		{
+//			System.out.println("Remembered: "+method.getName());
+//			binfo.setReadMethod(method);
+//		}
+		
+		try
+		{	
 			value = method.invoke(object, new Object[0]);
 		}
 		catch(Exception e)

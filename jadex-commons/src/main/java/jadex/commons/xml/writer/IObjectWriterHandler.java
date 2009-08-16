@@ -1,7 +1,5 @@
 package jadex.commons.xml.writer;
 
-import java.util.Iterator;
-
 import jadex.commons.xml.TypeInfo;
 
 /**
@@ -13,7 +11,7 @@ public interface IObjectWriterHandler
 	/**
 	 *  Get the tag name for an object.
 	 */
-	public String getTagName(Object object, Object context);
+	public Object[] getTagName(Object object, Object context);
 	
 	/**
 	 *  Get the object type

@@ -156,6 +156,15 @@ public class BeanAttributeInfo extends AttributeInfo
 	{
 		return this.readmethod;
 	}
+	
+	/**
+	 *  Set the read method.
+	 *  @param readmethod The read method.
+	 * /
+	public void setReadMethod(Method readmethod)
+	{
+		this.readmethod = readmethod;
+	}*/
 
 	/**
 	 *  Get the write method.

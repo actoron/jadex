@@ -99,10 +99,11 @@ public class Reader
 			{				
 				// Fetch for info when creating attributes.
 				Map rawattrs = null;
-				if(parser.getAttributeCount()>0)
+				int attrcnt = parser.getAttributeCount();
+				if(attrcnt>0)
 				{
 					rawattrs = new HashMap();
-					for(int i=0; i<parser.getAttributeCount(); i++)
+					for(int i=0; i<attrcnt; i++)
 					{
 						String attrname = parser.getAttributeLocalName(i);
 						String attrval = parser.getAttributeValue(i);
@@ -111,29 +112,28 @@ public class Reader
 				}
 				
 				Object object = null;
+				String localname = parser.getLocalName();
 				
-//				String[] fullpath = getXMLPath(stack, parser.getLocalName());
 				String[] fullpath = (String[])path.toArray(new String[path.size()+1]);
-				fullpath[fullpath.length-1] = parser.getLocalName();
-				TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), fullpath, rawattrs);
-
+				fullpath[fullpath.length-1] = localname;
+				TypeInfo typeinfo = getTypeInfo(localname, fullpath, rawattrs);
 				
 				// Test if it is an object reference
 				String idref = rawattrs!=null? (String)rawattrs.get(IDREF): null;
 				if(idref!=null)
 				{
 					object = readobjects.get(idref);
-					topse	= new StackElement(parser.getLocalName(), object, rawattrs, typeinfo);
+					topse = new StackElement(localname, object, rawattrs, typeinfo);
 					stack.add(topse);
-					path.add(parser.getLocalName());
+					path.add(localname);
 				}
 				else
 				{	
 					// Create object.
 					// todo: do not call createObject on every tag?!
-					object = handler.createObject(typeinfo!=null? typeinfo: parser.getLocalName(), stack.isEmpty(), context, rawattrs, classloader);
+					object = handler.createObject(typeinfo!=null? typeinfo: localname, stack.isEmpty(), context, rawattrs, classloader);
 					if(DEBUG && object==null)
-						System.out.println("No mapping found: "+parser.getLocalName());
+						System.out.println("No mapping found: "+localname);
 					
 					// If object has internal id save it in the readobjects map.
 					String id = rawattrs!=null? (String)rawattrs.get(ID): null;
@@ -142,17 +142,16 @@ public class Reader
 						readobjects.put(id, object);
 					}
 					
-					topse	= new StackElement(parser.getLocalName(), object, rawattrs, typeinfo);
+					topse	= new StackElement(localname, object, rawattrs, typeinfo);
 					stack.add(topse);
-					path.add(parser.getLocalName());
+					path.add(localname);
 					if(stack.size()==1)
 					{
 						root = object;
 					}
 				
 					// Handle attributes.
-					if(parser.getAttributeCount()>0 && 
-						!(parser.getAttributeCount()==1 && rawattrs.get(ID)!=null))
+					if(attrcnt>0 && !(attrcnt==1 && rawattrs.get(ID)!=null))
 					{
 						List	attrpath	= null;
 						// If no type use last element from stack to map attributes.
@@ -220,8 +219,9 @@ public class Reader
 			else if(next==XMLStreamReader.END_ELEMENT)
 			{
 //				System.out.println("end: "+parser.getLocalName());
+				String localname = parser.getLocalName();
 				String[] fullpath = (String[])path.toArray(new String[path.size()]);
-				final TypeInfo typeinfo = getTypeInfo(parser.getLocalName(), fullpath, topse.getRawAttributes());
+				final TypeInfo typeinfo = getTypeInfo(localname, fullpath, topse.getRawAttributes());
 
 				// Hack. Change object to content when it is element of its own.
 				if(topse.getContent()!=null && topse.getContent().trim().length()>0 && topse.getObject()==null)
@@ -240,8 +240,7 @@ public class Reader
 					}
 					else
 					{
-						String tagname = parser.getLocalName();
-						val = handler.convertContentObject(val, tagname, context, classloader);
+						val = handler.convertContentObject(val, localname, context, classloader);
 					}
 					
 					topse = new StackElement(topse.getTag(), val, topse.getRawAttributes());
@@ -296,7 +295,7 @@ public class Reader
 					{
 						StackElement pse = (StackElement)stack.get(stack.size()-2);
 						List pathname = new ArrayList();
-						pathname.add(parser.getLocalName());
+						pathname.add(localname);
 						for(int i=stack.size()-3; i>=0 && pse.getObject()==null; i--)
 						{
 							pse = (StackElement)stack.get(i);
@@ -307,7 +306,7 @@ public class Reader
 						TypeInfo patypeinfo = pse.getTypeInfo();
 						SubobjectInfo linkinfo = null;
 						if(patypeinfo!=null)
-							linkinfo = patypeinfo.getSubobjectInfoRead(parser.getLocalName(), fullpath, topse.getRawAttributes());
+							linkinfo = patypeinfo.getSubobjectInfoRead(localname, fullpath, topse.getRawAttributes());
 						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), 
 							(String[])pathname.toArray(new String[pathname.size()]), context, classloader, root);
 					}
@@ -316,9 +315,9 @@ public class Reader
 				stack.remove(stack.size()-1);
 				path.remove(path.size()-1);
 				if(stack.size()>0)
-					topse	= (StackElement)stack.get(stack.size()-1);
+					topse = (StackElement)stack.get(stack.size()-1);
 				else
-					topse	= null;
+					topse = null;
 			}
 		}
 		parser.close();

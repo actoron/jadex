@@ -156,6 +156,8 @@ public class TypeInfo	extends AbstractInfo
 	
 	//-------- methods --------
 
+	
+	
 	/**
 	 *  Get the type info.
 	 *  @return The type.
@@ -163,6 +165,15 @@ public class TypeInfo	extends AbstractInfo
 	public Object getTypeInfo()
 	{
 		return this.typeinfo;
+	}
+
+	/**
+	 *  Get the supertype.
+	 *  @return The super type.
+	 */
+	public TypeInfo getSupertype()
+	{
+		return supertype;
 	}
 
 	/**
@@ -239,6 +250,22 @@ public class TypeInfo	extends AbstractInfo
 		if(supertype!=null)
 			ret.addAll(supertype.getAttributeInfos());
 		return ret;
+	}
+	
+	/**
+	 *  Get the declared attribute infos.
+	 */
+	public AttributeInfo[] getDeclaredAttributeInfos()
+	{
+		return attributeinfos==null? null: (AttributeInfo[])attributeinfos.values().toArray(new AttributeInfo[0]);
+	}
+	
+	/**
+	 *  Get the declared subobject infos.
+	 */
+	public SubobjectInfo[] getDeclaredSubobjectInfos()
+	{
+		return subobjectinfoswrite==null? null: (SubobjectInfo[])subobjectinfoswrite.values().toArray(new SubobjectInfo[0]);
 	}
 	
 	/**
@@ -415,5 +442,4 @@ public class TypeInfo	extends AbstractInfo
 		}
 		return ret;
 	}
-
 }

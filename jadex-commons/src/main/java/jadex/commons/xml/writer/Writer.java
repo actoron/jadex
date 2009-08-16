@@ -27,6 +27,12 @@ public class Writer
 	/** The linefeed separator. */
 	public static final String lf = (String)System.getProperty("line.separator");
 	
+	/** The ID attribute constant. */
+	public static final String ID = "__ID";
+	
+	/** The IDREF attribute constant. */
+	public static final String IDREF = "__IDREF";
+	
 	//-------- attributes --------
 	
 	/** The object creator. */
@@ -77,7 +83,7 @@ public class Writer
 		
 		writer.writeStartDocument();//"utf-8", "1.0");
 		writer.writeCharacters(lf);
-		writeObject(writer, object, writtenobs, null, stack, context, classloader);
+		writeObject(writer, object, writtenobs, null, stack, context, classloader, null);
 		writer.writeEndDocument();
 		writer.close();
 	}
@@ -85,22 +91,29 @@ public class Writer
 	/**
 	 *  Write an object to xml.
 	 */
-	public void writeObject(XMLStreamWriter writer, Object object, Map writtenobs, String tagname, List stack, Object context, ClassLoader classloader) throws Exception
+	public void writeObject(XMLStreamWriter writer, Object object, Map writtenobs, String tagname, 
+		List stack, Object context, ClassLoader classloader, Namespace namespace) throws Exception
 	{
 //		if(tagname!=null)
 //			System.out.println("tagname: "+tagname);
 		TypeInfo typeinfo = handler.getTypeInfo(object, getXMLPath(stack), context); 
 		if(typeinfo!=null)
+		{
 			tagname = typeinfo.getXMLTag();
+			namespace = typeinfo.getNamespace();
+		}
 		
 		if(tagname==null)
-			tagname = handler.getTagName(object, context);
+		{
+			Object[] tn = handler.getTagName(object, context);
+			namespace = (Namespace)tn[0];
+			tagname = (String)tn[1];
+		}
 		
 		if(genids && writtenobs.containsKey(object))
 		{
 			writeStartObject(writer, tagname, typeinfo!=null? typeinfo.getNamespace(): null, stack.size());
-//			writer.writeEntityRef("ü");
-			writer.writeAttribute("__IDREF", (String)writtenobs.get(object));
+			writer.writeAttribute(IDREF, (String)writtenobs.get(object));
 			writeEndObject(writer, 0);
 		}
 		else
@@ -134,7 +147,7 @@ public class Writer
 			stack.add(topse);
 			writtenobs.put(object, ""+id);
 			if(genids)
-				writer.writeAttribute("__ID", ""+id);
+				writer.writeAttribute(ID, ""+id);
 			id++;
 			
 			// Attributes
@@ -219,18 +232,16 @@ public class Writer
 					Object so = sos.get(i);
 					if(WriteObjectInfo.SUBTAGMAP.equals(so))
 						continue;
-					writeObject(writer, so, writtenobs, subtag, stack, context, classloader);
+					writeObject(writer, so, writtenobs, subtag, stack, context, classloader, null);
 				}				
 			}	
 			else
 			{
-				writeObject(writer, subob, writtenobs, subtag, stack, context, classloader);
+				writeObject(writer, subob, writtenobs, subtag, stack, context, classloader, null);
 			}
 		}
 	}
-	
 
-	
 	/**
 	 *  Write the start of an object.
 	 */
@@ -238,17 +249,17 @@ public class Writer
 	{
 		writeIndentation(writer, level);
 		
-		writer.writeStartElement(name);
-//		if(ns==null)
-//		{
-//			writer.writeStartElement(name);
-//		}
-//		else
-//		{
-////			System.out.println("huhu: "+ns.getPrefix()+" "+ns.getURI()+" "+name);
-//			writer.writeStartElement(ns.getPrefix(), name, ns.getURI());
-//			writer.writeNamespace(ns.getPrefix(), ns.getURI());
-//		}
+//		writer.writeStartElement(name);
+		if(ns==null)
+		{
+			writer.writeStartElement(name);
+		}
+		else
+		{
+//			System.out.println("huhu: "+ns.getPrefix()+" "+ns.getURI()+" "+name);
+			writer.writeStartElement(ns.getPrefix(), name, ns.getURI());
+			writer.writeNamespace(ns.getPrefix(), ns.getURI());
+		}
 	}
 	
 	/**

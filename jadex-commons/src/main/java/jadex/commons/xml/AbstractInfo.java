@@ -69,7 +69,7 @@ public class AbstractInfo
 	/**
 	 *  Get the xmlpath
 	 */
-	private String getXMLPath()
+	public String getXMLPath()
 	{
 		return this.xmlpath;
 	}
@@ -140,7 +140,7 @@ public class AbstractInfo
 	{
 		return this.id;
 	}
-
+	
 	/**
 	 *  Get a string representation of this mapping.
 	 */

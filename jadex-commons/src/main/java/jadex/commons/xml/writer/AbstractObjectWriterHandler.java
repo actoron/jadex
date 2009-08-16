@@ -52,17 +52,26 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 		
 		for(Iterator it=typeinfos.iterator(); it.hasNext(); )
 		{
-			TypeInfo mapinfo = (TypeInfo)it.next();
-			TreeSet maps = (TreeSet)ret.get(mapinfo.getTypeInfo());
-			if(maps==null)
-			{
-				maps = new TreeSet(new AbstractInfo.SpecificityComparator());
-				ret.put(mapinfo.getTypeInfo(), maps);
-			}
-			maps.add(mapinfo);
+			addTypeInfo((TypeInfo)it.next(), ret);
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Add a typeinfo.
+	 */
+	protected void addTypeInfo(TypeInfo typeinfo, Map typeinfos)
+	{
+//		System.out.println("added typeinfo: "+typeinfo+" "+typeinfo.getTypeInfo());
+//		TypeInfo mapinfo = (TypeInfo)it.next();
+		TreeSet maps = (TreeSet)typeinfos.get(typeinfo.getTypeInfo());
+		if(maps==null)
+		{
+			maps = new TreeSet(new AbstractInfo.SpecificityComparator());
+			typeinfos.put(typeinfo.getTypeInfo(), maps);
+		}
+		maps.add(typeinfo);
 	}
 	
 	/**
@@ -80,7 +89,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	}
 	
 	/**
-	 * 
+	 *  Find a type info from a set of possible matching typeinfos.
 	 */
 	protected TypeInfo findTypeInfo(Set typeinfos, String[] fullpath)
 	{
@@ -113,11 +122,6 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	 *  @return The object type.
 	 */
 	public abstract Object getObjectType(Object object, Object context);
-		
-	/**
-	 *  Get the tag name for an object.
-	 */
-	public abstract String getTagName(Object object, Object context);
 	
 	/**
 	 *  Get write info for an object.
@@ -142,18 +146,11 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 					doneprops.add(getPropertyName(property));
 					if(!(info instanceof AttributeInfo && ((AttributeInfo)info).isIgnoreWrite()))
 					{
-						try
+						Object value = getValue(object, property, context, info);
+						if(value!=null)
 						{
-							Object value = getValue(object, property, context, info);
-							if(value!=null)
-							{
-								value = convertValue(info, value, classloader, context);
-								wi.setComment(value.toString());
-							}
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
+							value = convertValue(info, value, classloader, context);
+							wi.setComment(value.toString());
 						}
 					}
 				}
@@ -170,18 +167,11 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 					doneprops.add(getPropertyName(property));
 					if(!(info instanceof AttributeInfo && ((AttributeInfo)info).isIgnoreWrite()))
 					{
-						try
+						Object value = getValue(object, property, context, info);
+						if(value!=null)
 						{
-							Object value = getValue(object, property, context, info);
-							if(value!=null)
-							{
-								value = convertValue(info, value, classloader, context);
-								wi.setContent(value.toString());
-							}
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
+							value = convertValue(info, value, classloader, context);
+							wi.setContent(value.toString());
 						}
 					}
 				}
@@ -201,29 +191,22 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 						doneprops.add(getPropertyName(property));
 						if(!(info instanceof AttributeInfo && ((AttributeInfo)info).isIgnoreWrite()))
 						{	
-							try
+							Object value = getValue(object, property, context, info);
+							if(value!=null)
 							{
-								Object value = getValue(object, property, context, info);
-								if(value!=null)
+								Object defval = getDefaultValue(info);
+								
+								if(!value.equals(defval))
 								{
-									Object defval = getDefaultValue(info);
+									String xmlattrname = null;
+									if(info instanceof AttributeInfo)
+										xmlattrname = ((AttributeInfo)info).getXMLAttributeName();
+									if(xmlattrname==null)
+										xmlattrname = getPropertyName(property);
 									
-									if(!value.equals(defval))
-									{
-										String xmlattrname = null;
-										if(info instanceof AttributeInfo)
-											xmlattrname = ((AttributeInfo)info).getXMLAttributeName();
-										if(xmlattrname==null)
-											xmlattrname = getPropertyName(property);
-										
-										value = convertValue(info, value, classloader, context);
-										wi.addAttribute(xmlattrname, value.toString());
-									}
+									value = convertValue(info, value, classloader, context);
+									wi.addAttribute(xmlattrname, value.toString());
 								}
-							}
-							catch(Exception e)
-							{
-								e.printStackTrace();
 							}
 						}
 					}
@@ -237,77 +220,74 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 			{
 				for(Iterator it=subobsinfos.iterator(); it.hasNext(); )
 				{
-					try
+					SubobjectInfo soinfo = (SubobjectInfo)it.next();
+					info = soinfo.getLinkInfo();
+					TypeInfo sotypeinfo = soinfo.getTypeInfo();
+					Object property = getProperty(info);
+					if(property!=null)
 					{
-						SubobjectInfo soinfo = (SubobjectInfo)it.next();
-						info = soinfo.getLinkInfo();
-						TypeInfo sotypeinfo = soinfo.getTypeInfo();
-						Object property = getProperty(info);
-						if(property!=null)
-						{
-							doneprops.add(getPropertyName(property));
-							if(!(info instanceof AttributeInfo && ((AttributeInfo)info).isIgnoreWrite()))
-							{	
-								String propname = getPropertyName(property);
-								Object value = getValue(object, property, context, info);
-								if(value!=null)
-								{
+						doneprops.add(getPropertyName(property));
+						if(!(info instanceof AttributeInfo && ((AttributeInfo)info).isIgnoreWrite()))
+						{	
+							String propname = getPropertyName(property);
+							Object value = getValue(object, property, context, info);
+							if(value!=null)
+							{
 //									String xmlsoname = soinfo.getXMLPath()!=null? soinfo.getXMLPath(): getPropertyName(property);
-									String[] xmlpath = soinfo.getXMLPathElements();
-									if(xmlpath==null)
-										xmlpath = new String[]{getPropertyName(property)};
-									
-//									if(soinfo.isMulti() || value.getClass().isArray()
-//										|| (property.equals(AttributeInfo.THIS) && SReflect.isIterable(value)))
-									// Fetch elements directly if it is a multi subobject
-									if(soinfo.isMulti())
+								String[] xmlpath = soinfo.getXMLPathElements();
+								if(xmlpath==null)
+									xmlpath = new String[]{getPropertyName(property)};
+								
+//								if(soinfo.isMulti() || value.getClass().isArray()
+//									|| (property.equals(AttributeInfo.THIS) && SReflect.isIterable(value)))
+								// Fetch elements directly if it is a multi subobject
+								if(soinfo.isMulti())
+								{
+									Iterator it2 = SReflect.getIterator(value);
+									while(it2.hasNext())
 									{
-										Iterator it2 = SReflect.getIterator(value);
-										while(it2.hasNext())
+										Object val = it2.next();
+										
+										if(isTypeCompatible(val, sotypeinfo, context))
 										{
-											Object val = it2.next();
-											
-											if(isTypeCompatible(val, sotypeinfo, context))
-											{
-												String[] tmp = xmlpath;
-												if(gentypetags)
-												{
-													tmp = new String[xmlpath.length+1];
-													System.arraycopy(xmlpath, 0, tmp, 0, xmlpath.length);
-													tmp[tmp.length-1] = getTagName(val, context);
-												}
-//												String pathname = gentypetags? xmlsoname+"/"+getTagName(val, context): xmlsoname;
-												wi.addSubobject(tmp, val);
-											}
-										}
-									}
-									else
-									{
-										if(isTypeCompatible(value, sotypeinfo, context))
-										{
-//											String pathname = gentypetags? xmlsoname+"/"+getTagName(value, context): xmlsoname;
 											String[] tmp = xmlpath;
 											if(gentypetags)
 											{
 												tmp = new String[xmlpath.length+1];
 												System.arraycopy(xmlpath, 0, tmp, 0, xmlpath.length);
-												tmp[tmp.length-1] = getTagName(value, context);
+												Object[] tag = getTagName(val, context);
+												tmp[tmp.length-1] = (String)tag[1];
 											}
-											wi.addSubobject(tmp, value);
+//											String pathname = gentypetags? xmlsoname+"/"+getTagName(val, context): xmlsoname;
+											wi.addSubobject(tmp, val);
 										}
+									}
+								}
+								else
+								{
+									if(isTypeCompatible(value, sotypeinfo, context))
+									{
+//											String pathname = gentypetags? xmlsoname+"/"+getTagName(value, context): xmlsoname;
+										String[] tmp = xmlpath;
+										if(gentypetags)
+										{
+											tmp = new String[xmlpath.length+1];
+											System.arraycopy(xmlpath, 0, tmp, 0, xmlpath.length);
+											Object[] tag = getTagName(value, context);
+											tmp[tmp.length-1] = (String)tag[1];
+										}
+										wi.addSubobject(tmp, value);
 									}
 								}
 							}
 						}
 					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
 				}
 			}
 		}
 			
+		// Get properties from type inspection.
+		
 		Collection props = getProperties(object, context);
 		if(props!=null)
 		{
@@ -319,59 +299,54 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 				if(!doneprops.contains(propname))
 				{
 					doneprops.add(propname);
-					try
+					Object value = getValue(object, property, context, null);
+	
+					if(value!=null)
 					{
-						Object value = getValue(object, property, context, null);
-		
-						if(value!=null)
+						if(isBasicType(property, value))
 						{
-							if(isBasicType(property, value))
+							if(!value.equals(getDefaultValue(property)))
+								wi.addAttribute(propname, value.toString());
+						}
+						else
+						{
+							// todo: remove
+							// Hack special case array, todo: support generically via typeinfo???
+							if(value.getClass().isArray())
 							{
-								if(!value.equals(getDefaultValue(property)))
-									wi.addAttribute(propname, value.toString());
+								Iterator it2 = SReflect.getIterator(value);
+								if(it2.hasNext())
+								{
+									while(it2.hasNext())
+									{
+										Object val = it2.next();
+										String[] xmlpath = new String[]{propname};
+										String[] tmp = xmlpath;
+										if(gentypetags)
+										{
+											tmp = new String[xmlpath.length+1];
+											System.arraycopy(xmlpath, 0, tmp, 0, xmlpath.length);
+											Object[] tag = getTagName(val, context);
+											tmp[tmp.length-1] = (String)tag[1];
+										}
+										wi.addSubobject(tmp, val);
+									}
+								}
 							}
 							else
 							{
-								// todo: remove
-								// Hack special case array, todo: support generically via typeinfo???
-								if(value.getClass().isArray())
+								String[] xmlpath = new String[]{propname};
+								String[] tmp = xmlpath;
+								if(gentypetags)
 								{
-									Iterator it2 = SReflect.getIterator(value);
-									if(it2.hasNext())
-									{
-										while(it2.hasNext())
-										{
-											Object val = it2.next();
-											String[] xmlpath = new String[]{propname};
-											String[] tmp = xmlpath;
-											if(gentypetags)
-											{
-												tmp = new String[xmlpath.length+1];
-												System.arraycopy(xmlpath, 0, tmp, 0, xmlpath.length);
-												tmp[tmp.length-1] = getTagName(val, context);
-											}
-											wi.addSubobject(tmp, val);
-										}
-									}
+									tmp = new String[xmlpath.length+1];
+									System.arraycopy(xmlpath, 0, tmp, 0, xmlpath.length);
+									Object[] tag = getTagName(value, context);
+									tmp[tmp.length-1] = (String)tag[1];
 								}
-								else
-								{
-									String[] xmlpath = new String[]{propname};
-									String[] tmp = xmlpath;
-									if(gentypetags)
-									{
-										tmp = new String[xmlpath.length+1];
-										System.arraycopy(xmlpath, 0, tmp, 0, xmlpath.length);
-										tmp[tmp.length-1] = getTagName(value, context);
-									}
-									wi.addSubobject(tmp, value);
-								}
+								wi.addSubobject(tmp, value);
 							}
 						}
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
 					}
 				}
 			}
