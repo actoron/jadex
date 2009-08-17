@@ -134,6 +134,25 @@ public class Testcase
 	}
 
 	/**
+	 *  Add a report.
+	 *  @param report The report.
+	 */
+	public void addReport(TestReport report)
+	{
+		if(reports==null)
+		{
+			reports	= new TestReport[]{report};
+		}
+		else
+		{
+			TestReport[]	tmp	= new TestReport[reports.length+1];
+			System.arraycopy(reports, 0, tmp, 0, reports.length);
+			tmp[reports.length]	= report;
+			reports	= tmp;
+		}
+	}
+
+	/**
 	 *  Set the reports.
 	 *  @param reports The reports.
 	 */

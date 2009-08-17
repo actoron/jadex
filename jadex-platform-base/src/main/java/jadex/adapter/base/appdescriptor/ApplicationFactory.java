@@ -77,7 +77,6 @@ public class ApplicationFactory implements IApplicationFactory
 		types.add(new TypeInfo(null, "agent", MAgentInstance.class, null, null, new BeanAttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null));
 		types.add(new TypeInfo(null, "argument", MArgument.class, null, "value"));
 		types.add(new TypeInfo(null, "import", String.class));
-		types.add(new TypeInfo(null, "property", String.class));
 		
 		for(int i=0; mappings!=null && i<mappings.length; i++)
 		{

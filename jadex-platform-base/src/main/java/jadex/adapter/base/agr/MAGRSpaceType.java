@@ -2,10 +2,8 @@ package jadex.adapter.base.agr;
 
 import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.TypeInfo;
-import jadex.commons.xml.bean.BeanAttributeInfo;
 
 import java.util.ArrayList;
 import java.util.HashSet;
