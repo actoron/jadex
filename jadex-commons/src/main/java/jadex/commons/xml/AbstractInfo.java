@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
 
 
 /**
@@ -22,10 +23,10 @@ public class AbstractInfo
 	protected String xmlpath;
 	
 	/** The xml path elements. */
-	protected String[] xmlpathelements;
+	protected QName[] xmlpathelements;
 	
 	/** The xml path elements without tag. */
-	protected String[] xmlpathelementswithouttag;
+	protected QName[] xmlpathelementswithouttag;
 	
 	/** The procedural filter. */
 	protected IFilter filter;
@@ -47,14 +48,42 @@ public class AbstractInfo
 		if(xmlpath!=null)
 		{
 			StringTokenizer stok = new StringTokenizer(xmlpath, "/");
-			this.xmlpathelements = new String[stok.countTokens()];
-			this.xmlpathelementswithouttag = new String[stok.countTokens()-1];
+			this.xmlpathelements = new QName[stok.countTokens()];
+			this.xmlpathelementswithouttag = new QName[stok.countTokens()-1];
 			for(int i=0; stok.hasMoreTokens(); i++)
 			{
-				xmlpathelements[i] = stok.nextToken();
+				xmlpathelements[i] = QName.valueOf(stok.nextToken());//convertStringToQName(stok.nextToken());
 				if(i<xmlpathelementswithouttag.length)
 					xmlpathelementswithouttag[i] = xmlpathelements[i];
 			}
+		}
+		
+		this.filter = filter;
+		synchronized(AbstractInfo.class)
+		{
+			this.id = idcnt++;
+		}
+	}
+	
+	/**
+	 *  Create an abstract OAV info.
+	 */
+	public AbstractInfo(QName[] xmlpath, IFilter filter)
+	{
+		if(xmlpath!=null)
+		{
+			// Only use local part
+			StringBuffer buf = new StringBuffer();
+			for(int i=0; i<xmlpath.length; i++)
+			{
+				if(i>0)
+					buf.append("/");
+				buf.append(xmlpath[i].getLocalPart());
+			}
+			this.xmlpath = buf.toString();
+			this.xmlpathelements = xmlpath;
+			this.xmlpathelementswithouttag = new QName[xmlpathelements.length-1];
+			System.arraycopy(xmlpathelements, 0, xmlpathelementswithouttag, 0, xmlpathelementswithouttag.length);
 		}
 		
 		this.filter = filter;
@@ -77,7 +106,7 @@ public class AbstractInfo
 	/**
 	 *  Get the xml tag
 	 */
-	public String getXMLTag()
+	public QName getXMLTag()
 	{
 		return xmlpathelements!=null? xmlpathelements[xmlpathelements.length-1]: null;
 	}
@@ -86,7 +115,7 @@ public class AbstractInfo
 	 *  Get the xmlpath as string array.
 	 *  @return The xmlpath.
 	 */
-	public String[] getXMLPathElements()
+	public QName[] getXMLPathElements()
 	{
 		return xmlpathelements;
 	}
@@ -94,7 +123,7 @@ public class AbstractInfo
 	/**
 	 *  Get the xml path without element.
 	 */
-	public String[] getXMLPathElementsWithoutElement()
+	public QName[] getXMLPathElementsWithoutElement()
 	{
 		return xmlpathelementswithouttag;
 	}
@@ -140,6 +169,16 @@ public class AbstractInfo
 	{
 		return this.id;
 	}
+	
+	/**
+	 *  Convert a string to a qname.
+	 *  @param s The string.
+	 *  @return The qname.
+	 * /
+	public QName convertStringToQName(String s)
+	{
+		return QName.valueOf(s);
+	}*/
 	
 	/**
 	 *  Get a string representation of this mapping.

@@ -7,12 +7,16 @@ import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.ITypeConverter;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.reader.IObjectReaderHandler;
+import jadex.commons.xml.reader.Reader;
 
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
 
 /**
  *  Handler for reading XML into Java beans.
@@ -43,7 +47,6 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				type = ti;
 			}
 		}	
-		
 		if(type instanceof Class)
 		{
 			Class clazz = (Class)type;
@@ -57,17 +60,17 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		{
 			ret = ((IBeanObjectCreator)type).createObject(context, rawattributes, classloader);
 		}
-		else if(type instanceof String)
+		else if(type instanceof QName)
 		{
 //			System.out.println("here: "+typeinfo);
-			if(((String)type).indexOf(".")!=-1)
+			QName tag = (QName)type;
+			String pck = tag.getNamespaceURI().substring(8);
+			String clazzname = pck+"."+tag.getLocalPart();
+			Class clazz = SReflect.classForName0(clazzname, classloader);
+			if(clazz!=null && !BasicTypeConverter.isBuiltInType(clazz))
 			{
-				Class clazz = SReflect.classForName0((String)type, classloader);
-				if(clazz!=null && !BasicTypeConverter.isBuiltInType(clazz))
-				{
-					// Must have empty constructor.
-					ret = clazz.newInstance();
-				}
+				// Must have empty constructor.
+				ret = clazz.newInstance();
 			}
 		}
 		return ret;
@@ -76,15 +79,19 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	/**
 	 *  Convert an object to another type of object.
 	 */
-	public Object convertContentObject(Object object, String tagname, Object context, ClassLoader classloader)
+	public Object convertContentObject(Object object, QName tag, Object context, ClassLoader classloader)
 	{
 		Object ret = object;
-		Class clazz = SReflect.classForName0(tagname, classloader);
-		if(clazz!=null)
+		if(tag.getNamespaceURI().startsWith(Reader.PACKAGE_PROTOCOL))
 		{
-			if(!BasicTypeConverter.isBuiltInType(clazz))
-				throw new RuntimeException("No converter known for: "+clazz);
-			ret = BasicTypeConverter.getBasicConverter(clazz).convertObject(object, null, classloader, context);
+			String clazzname = tag.getNamespaceURI().substring(8)+"."+tag.getLocalPart();
+			Class clazz = SReflect.classForName0(clazzname, classloader);
+			if(clazz!=null)
+			{
+				if(!BasicTypeConverter.isBuiltInType(clazz))
+					throw new RuntimeException("No converter known for: "+clazz);
+				ret = BasicTypeConverter.getBasicConverter(clazz).convertObject(object, null, classloader, context);
+			}
 		}
 		return ret;
 	}
@@ -117,9 +124,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 */
 	public void linkObject(Object object, Object parent, Object linkinfo, 
-		String[] pathname, Object context, ClassLoader classloader, Object root) throws Exception
+		QName[] pathname, Object context, ClassLoader classloader, Object root) throws Exception
 	{
-		String tagname = pathname[pathname.length-1];
+		String tagname = pathname[pathname.length-1].getLocalPart();
 		
 		// Add object to its parent.
 		boolean	linked	= false;
@@ -136,7 +143,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		String[] sinnames = new String[pathname.length];
 		for(int i=0; i<pathname.length; i++)
 		{
-			String name = pathname[i].substring(0, 1).toUpperCase()+pathname[i].substring(1);
+			String name = pathname[i].getLocalPart().substring(0, 1).toUpperCase()+pathname[i].getLocalPart().substring(1);
 			plunames[i] = name;
 			sinnames[i] = SUtil.getSingular(name);
 		}

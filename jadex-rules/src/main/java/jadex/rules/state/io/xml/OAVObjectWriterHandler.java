@@ -3,23 +3,35 @@ package jadex.rules.state.io.xml;
 import jadex.commons.SReflect;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
+import jadex.commons.xml.Namespace;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.writer.AbstractObjectWriterHandler;
+import jadex.commons.xml.writer.Writer;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 /**
  *  OAV version for fetching write info for an object. 
  */
 public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 {
+	//-------- attributes --------
+	
+	/** The namespaces by package. */
+	protected Map namespacebypackage = new HashMap();
+	protected int nscnt;
+	
 	//-------- constructors --------
 	
 	/**
@@ -54,9 +66,36 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Get the tag name for an object.
 	 */
-	public Object[] getTagName(Object object, Object context)
+	public QName getTagName(Object object, Object context)
 	{
-		return new Object[]{null, ((IOAVState)context).getType(object).getName()};
+		QName ret;
+		IOAVState state = (IOAVState)context;
+		
+		if(state.containsObject(object))
+		{
+			String typename = state.getType(object).getName();
+			ret = new QName(typename);
+		}
+		else
+		{
+			String clazzname = SReflect.getClassName(object.getClass());
+			Namespace ns;
+			int idx = clazzname.lastIndexOf(".");
+			String pck = Writer.PACKAGE_PROTOCOL+clazzname.substring(0, idx);
+			String tag = clazzname.substring(idx+1);
+			
+			ns = (Namespace)namespacebypackage.get(pck);
+			if(ns==null)
+			{
+				String prefix = "p"+nscnt;
+				ns = new Namespace(prefix, pck);
+				namespacebypackage.put(pck, ns);
+				nscnt++;
+			}
+			ret = new QName(ns.getURI(), tag, ns.getPrefix());
+		}
+		
+		return ret;
 	}
 	
 	/**

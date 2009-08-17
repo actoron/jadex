@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
@@ -38,6 +40,9 @@ public class Reader
 	
 	/** The IDREF attribute constant. */
 	public static final String IDREF = "__IDREF";
+	
+	/** The package protocol constant. */
+	public static final String PACKAGE_PROTOCOL = "package:";
 	
 	//-------- attributes --------
 	
@@ -112,9 +117,10 @@ public class Reader
 				}
 				
 				Object object = null;
-				String localname = parser.getLocalName();
+				QName localname = parser.getPrefix()==null || parser.getPrefix()==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
+					: new QName(parser.getNamespaceURI(), parser.getLocalName(), parser.getPrefix());
 				
-				String[] fullpath = (String[])path.toArray(new String[path.size()+1]);
+				QName[] fullpath = (QName[])path.toArray(new QName[path.size()+1]);
 				fullpath[fullpath.length-1] = localname;
 				TypeInfo typeinfo = getTypeInfo(localname, fullpath, rawattrs);
 				
@@ -131,7 +137,10 @@ public class Reader
 				{	
 					// Create object.
 					// todo: do not call createObject on every tag?!
-					object = handler.createObject(typeinfo!=null? typeinfo: localname, stack.isEmpty(), context, rawattrs, classloader);
+					Object ti = typeinfo;
+					if(typeinfo==null && localname.getNamespaceURI().startsWith(PACKAGE_PROTOCOL))
+						ti = localname;
+					object = handler.createObject(ti, stack.isEmpty(), context, rawattrs, classloader);
 					if(DEBUG && object==null)
 						System.out.println("No mapping found: "+localname);
 					
@@ -219,8 +228,9 @@ public class Reader
 			else if(next==XMLStreamReader.END_ELEMENT)
 			{
 //				System.out.println("end: "+parser.getLocalName());
-				String localname = parser.getLocalName();
-				String[] fullpath = (String[])path.toArray(new String[path.size()]);
+				QName localname = parser.getPrefix()==null || parser.getPrefix()==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
+					: new QName(parser.getNamespaceURI(), parser.getLocalName(), parser.getPrefix());
+				QName[] fullpath = (QName[])path.toArray(new QName[path.size()]);
 				final TypeInfo typeinfo = getTypeInfo(localname, fullpath, topse.getRawAttributes());
 
 				// Hack. Change object to content when it is element of its own.
@@ -305,10 +315,22 @@ public class Reader
 						
 						TypeInfo patypeinfo = pse.getTypeInfo();
 						SubobjectInfo linkinfo = null;
+						
+						QName tag = localname;
+						QName[] fpath = fullpath;
 						if(patypeinfo!=null)
-							linkinfo = patypeinfo.getSubobjectInfoRead(localname, fullpath, topse.getRawAttributes());
+						{
+							// Hack! If localname is classname remove it
+							if(localname.getNamespaceURI().startsWith(PACKAGE_PROTOCOL))
+							{
+								tag = fullpath[fullpath.length-2];
+								fpath = new QName[fullpath.length-1];
+								System.arraycopy(fullpath, 0, fpath, 0, fpath.length);
+							}
+							linkinfo = patypeinfo.getSubobjectInfoRead(tag, fpath, topse.getRawAttributes());
+						}
 						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), 
-							(String[])pathname.toArray(new String[pathname.size()]), context, classloader, root);
+							(QName[])pathname.toArray(new QName[pathname.size()]), context, classloader, root);
 					}
 				}
 				
@@ -344,16 +366,15 @@ public class Reader
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	protected TypeInfo getTypeInfo(String tag, String[] fullpath, Map rawattributes)
+	protected TypeInfo getTypeInfo(QName tag, QName[] fullpath, Map rawattributes)
 	{
-		TypeInfo ret = findTypeInfo((Set)typeinfos.get(tag), fullpath);
-		return ret;
+		return findTypeInfo((Set)typeinfos.get(tag), fullpath);
 	}
 	
 	/**
 	 *  Find type find in the set of type infos.
 	 */
-	protected TypeInfo findTypeInfo(Set typeinfos, String[] fullpath)
+	protected TypeInfo findTypeInfo(Set typeinfos, QName[] fullpath)
 	{
 		TypeInfo ret = null;
 		if(typeinfos!=null)
@@ -361,7 +382,7 @@ public class Reader
 			for(Iterator it=typeinfos.iterator(); ret==null && it.hasNext(); )
 			{
 				TypeInfo ti = (TypeInfo)it.next();
-				String[] tmp = ti.getXMLPathElements();
+				QName[] tmp = ti.getXMLPathElements();
 				boolean ok = tmp==null || tmp.length<=fullpath.length;;
 				if(tmp!=null)
 				{

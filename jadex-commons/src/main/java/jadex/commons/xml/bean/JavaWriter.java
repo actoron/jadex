@@ -59,7 +59,7 @@ public class JavaWriter extends Writer
 //				new SubobjectInfo(new BeanAttributeInfo("entries", "entrySet", 
 //					null, null, null, null, null, HashMap.class.getMethod("entrySet", new Class[0]), null), null, null, true)
 //			});
-			TypeInfo ti_hashmapw = new TypeInfo(null, null, Map.class, null, null, null, null, null,
+			TypeInfo ti_hashmapw = new TypeInfo(null, (String)null, Map.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo("entries", "entrySet", 
 					null, null, null, null, null, Map.class.getMethod("entrySet", new Class[0]), null), null, null, true)
@@ -79,7 +79,7 @@ public class JavaWriter extends Writer
 			
 			// java.util.ArrayList
 			
-			TypeInfo ti_arraylist = new TypeInfo(null, null, List.class, null, null, null, null, null,
+			TypeInfo ti_arraylist = new TypeInfo(null, (String)null, List.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo("entries", AttributeInfo.THIS,
 					null, null, null, null, null, null, ArrayList.class.getMethod("add", new Class[]{Object.class})), null, null, true)
@@ -88,7 +88,7 @@ public class JavaWriter extends Writer
 			
 			// java.util.HashSet
 			
-			TypeInfo ti_hashset = new TypeInfo(null, null, Set.class, null, null, null, null, null,
+			TypeInfo ti_hashset = new TypeInfo(null, (String)null, Set.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo("entries", AttributeInfo.THIS,
 					null, null, null, null, null, null, HashSet.class.getMethod("add", new Class[]{Object.class})), null, null, true)

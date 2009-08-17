@@ -6,12 +6,15 @@ import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.Namespace;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.writer.AbstractObjectWriterHandler;
+import jadex.commons.xml.writer.Writer;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 /**
  *  Java bean version for fetching write info for an object. 
@@ -55,7 +58,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public TypeInfo getTypeInfo(Object object, String[] fullpath, Object context)//, Map rawattributes)
+	public TypeInfo getTypeInfo(Object object, QName[] fullpath, Object context)//, Map rawattributes)
 	{
 		TypeInfo ret = super.getTypeInfo(object, fullpath, context);
 		
@@ -115,7 +118,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Get the tag name for an object.
 	 */
-	public Object[] getTagName(Object object, Object context)
+	public QName getTagName(Object object, Object context)
 	{
 //		return SReflect.getInnerClassName(object.getClass());
 
@@ -123,21 +126,20 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		String clazzname = SReflect.getClassName(object.getClass());
 		Namespace ns;
 		int idx = clazzname.lastIndexOf(".");
-		String pck = clazzname.substring(0, idx-1);
+		String pck = Writer.PACKAGE_PROTOCOL+clazzname.substring(0, idx);
 		String tag = clazzname.substring(idx+1);
 		int cnt;
 		
 		ns = (Namespace)namespacebypackage.get(pck);
 		if(ns==null)
 		{
-			String prefix = "pck_"+nscnt;
+			String prefix = "p"+nscnt;
 			ns = new Namespace(prefix, pck);
 			namespacebypackage.put(pck, ns);
 			nscnt++;
 		}
 		
-//		return new Object[]{ns, tag};
-		return new Object[]{ns, clazzname};
+		return new QName(ns.getURI(), tag, ns.getPrefix());
 	}
 
 	/**
@@ -168,6 +170,10 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		{
 			method = findGetMethod(object, (String)attr, new String[]{"get", "is"});
 		}
+//		else if(attr instanceof QName)
+//		{
+//			method = findGetMethod(object, ((QName)attr).getLocalPart(), new String[]{"get", "is"});
+//		}
 		else
 		{
 			throw new RuntimeException("Unknown attribute type: "+attr);
@@ -206,6 +212,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		{
 			ret = info;
 		}
+		
 		return ret;
 	}
 	
@@ -219,6 +226,8 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			ret = ((BeanProperty)property).getName();
 		else if(property instanceof String)
 			ret = (String)property;
+		else if(property instanceof QName)
+			ret = ((QName)property).getLocalPart();
 		else
 			throw new RuntimeException("Unknown property type: "+property);
 		return ret;

@@ -1,5 +1,7 @@
 package jadex.commons.xml.writer;
 
+import javax.xml.namespace.QName;
+
 import jadex.commons.xml.TypeInfo;
 
 /**
@@ -11,7 +13,7 @@ public interface IObjectWriterHandler
 	/**
 	 *  Get the tag name for an object.
 	 */
-	public Object[] getTagName(Object object, Object context);
+	public QName getTagName(Object object, Object context);
 	
 	/**
 	 *  Get the object type
@@ -26,7 +28,7 @@ public interface IObjectWriterHandler
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public TypeInfo getTypeInfo(Object object, String[] fullpath, Object context);
+	public TypeInfo getTypeInfo(Object object, QName[] fullpath, Object context);
 	
 	/**
 	 *  Get all subobjects of an object.

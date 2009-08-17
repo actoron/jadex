@@ -3,6 +3,8 @@ package jadex.commons.xml.reader;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
 /**
  *  Interface for object reader handler.
  *  Is called when a tag start is found and an object could be created.
@@ -22,7 +24,7 @@ public interface IObjectReaderHandler
 	/**
 	 *  Convert a content string object to another type of object.
 	 */
-	public Object convertContentObject(Object object, String tagname, Object context, ClassLoader classloader);
+	public Object convertContentObject(Object object, QName tag, Object context, ClassLoader classloader);
 	
 	/**
 	 *  Handle the attribute of an object.
@@ -43,6 +45,6 @@ public interface IObjectReaderHandler
 	 *  @param tagname The current tagname (for name guessing).
 	 *  @param context The context.
 	 */
-	public void linkObject(Object object, Object parent, Object linkinfo, String[] pathname, 
+	public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, 
 		Object context, ClassLoader classloader, Object root) throws Exception;
 }

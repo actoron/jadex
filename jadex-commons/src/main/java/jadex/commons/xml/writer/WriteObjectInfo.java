@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import javax.xml.namespace.QName;
+
 /**
  *  Info for writing an object.
  */
@@ -100,7 +102,7 @@ public class WriteObjectInfo
 	/**
 	 *  Add a subobject.
 	 */
-	public void addSubobject(String[] pathname, Object subobject)
+	public void addSubobject(QName[] pathname, Object subobject)
 	{
 //		System.out.println("added: "+SUtil.arrayToString(pathname)+" "+subobject);
 		if(subobjects==null)
@@ -113,7 +115,7 @@ public class WriteObjectInfo
 	/**
 	 * 
 	 */
-	protected void insertSubobject(Map tagmap, String[] tags, Object subob, int i)
+	protected void insertSubobject(Map tagmap, QName[] tags, Object subob, int i)
 	{
 		if(i+1==tags.length)
 		{

@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.xml.namespace.QName;
+
 /**
  *  Mapping from tag (or path fragment) to OAV type.
  */
@@ -154,9 +156,107 @@ public class TypeInfo	extends AbstractInfo
 		this.subobjectinfosread = createSubobjectInfosRead(subobjectinfos);
 	}
 	
-	//-------- methods --------
-
+	//-------- all constructors also with xmlpath as QName[] :-(  --------
 	
+	/**
+	 *  Create a new type info.
+	 *  @param xmlpath The path or tag.
+	 *  @param typeinfo The type of object to create.
+	 */
+	public TypeInfo(TypeInfo supertype, QName[] xmlpath, Object typeinfo)
+	{
+		this(supertype, xmlpath, typeinfo, null, null);
+	}
+	
+	/**
+	 *  Create a new type info.
+	 *  @param xmlpath The path or tag.
+	 *  @param type The type of object to create.
+	 *  @param commentinfo The commnentinfo.
+	 *  @param contentinfo The contentinfo.
+	 */
+	public TypeInfo(TypeInfo supertype, QName[] xmlpath, Object typeinfo, Object commentinfo, Object contentinfo)
+	{
+		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, null, null);
+	}
+	
+	/**
+	 *  Create a new type info.
+	 *  @param xmlpath The path or tag.
+	 *  @param typeinfo The type of object to create.
+	 *  @param commentinfo The commnent.
+	 *  @param contentinfo The content.
+	 *  @param attributesinfo The attributes map.
+	 *  @param postproc The post processor. 
+	 */
+	public TypeInfo(TypeInfo supertype, QName[] xmlpath, Object typeinfo, Object commentinfo, Object contentinfo, 
+		AttributeInfo[] attributesinfo, IPostProcessor postproc)
+	{
+		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributesinfo, postproc, null);
+	}
+	
+	/**
+	 *  Create a new type info.
+	 *  @param xmlpath The path or tag.
+	 *  @param typeinfo The type of object to create.
+	 *  @param commentinfo The commnent.
+	 *  @param contentinfo The content.
+	 *  @param attributesinfo The attributes map.
+	 *  @param postproc The post processor. 
+	 */
+	public TypeInfo(TypeInfo supertype, QName[] xmlpath, Object typeinfo, Object commentinfo, Object contentinfo, 
+		AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter)
+	{
+		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributeinfos, postproc, filter, null);
+	}
+	
+	/**
+	 *  Create a new type info.
+	 * @param xmlpath The path or tag.
+	 * @param typeinfo The type of object to create.
+	 * @param commentinfo The commnent.
+	 * @param contentinfo The content.
+	 * @param attributeinfos The attributes map.
+	 * @param postproc The post processor. 
+	 */
+	public TypeInfo(TypeInfo supertype, QName[] xmlpath, Object typeinfo, Object commentinfo, 
+		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
+		SubobjectInfo[] subobjectinfos)
+	{
+		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributeinfos, 
+			postproc, filter, subobjectinfos, null);
+	}
+	
+	/**
+	 *  Create a new type info.
+	 * @param xmlpath The path or tag.
+	 * @param typeinfo The type of object to create.
+	 * @param commentinfo The commnent.
+	 * @param contentinfo The content.
+	 * @param attributeinfos The attributes map.
+	 * @param postproc The post processor. 
+	 */
+	public TypeInfo(TypeInfo supertype, QName[] xmlpath, Object typeinfo, Object commentinfo, 
+		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
+		SubobjectInfo[] subobjectinfos, Namespace namespace)
+	{
+		super(xmlpath, filter);
+		this.supertype = supertype;
+		this.typeinfo = typeinfo;
+		this.commentinfo = commentinfo;
+		this.contentinfo = contentinfo;
+		this.postproc = postproc;
+		this.namespace = namespace;
+		
+		if(attributeinfos!=null)
+			this.attributeinfos = createAttributeInfos(attributeinfos);
+		
+		if(subobjectinfos!=null)
+			this.subobjectinfoswrite = createSubobjectInfosWrite(subobjectinfos);
+		this.subobjectinfosread = createSubobjectInfosRead(subobjectinfos);
+	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Get the type info.
@@ -319,18 +419,18 @@ public class TypeInfo	extends AbstractInfo
 	 *  @param fullpath The full path.
 	 *  @return The most specific subobject info.
 	 */
-	public SubobjectInfo getSubobjectInfoRead(String tag, String[] fullpath, Map rawattributes)
+	public SubobjectInfo getSubobjectInfoRead(QName tag, QName[] fullpath, Map rawattributes)
 	{
 		SubobjectInfo ret = null;
 		
 		// Hack exclude tag when classname :-(
-		if(tag.indexOf(".")!=-1)
-		{
-			tag = fullpath[fullpath.length-2];
-			String[] tmp = new String[fullpath.length-1];
-			System.arraycopy(fullpath, 0, tmp, 0, tmp.length);
-			fullpath = tmp;
-		}
+//		if(tag.indexOf(".")!=-1)
+//		{
+//			tag = fullpath[fullpath.length-2];
+//			String[] tmp = new String[fullpath.length-1];
+//			System.arraycopy(fullpath, 0, tmp, 0, tmp.length);
+//			fullpath = tmp;
+//		}
 		
 		Set subobjects = subobjectinfosread!=null? (Set)subobjectinfosread.get(tag): null;
 		ret = findSubobjectInfo(subobjects, fullpath);
@@ -351,7 +451,7 @@ public class TypeInfo	extends AbstractInfo
 	/**
 	 * 
 	 */
-	protected SubobjectInfo findSubobjectInfo(Set soinfos, String[] fullpath)
+	protected SubobjectInfo findSubobjectInfo(Set soinfos, QName[] fullpath)
 	{
 		SubobjectInfo ret = null;
 		if(soinfos!=null)
@@ -359,7 +459,7 @@ public class TypeInfo	extends AbstractInfo
 			for(Iterator it=soinfos.iterator(); ret==null && it.hasNext(); )
 			{
 				SubobjectInfo si = (SubobjectInfo)it.next();
-				String[] tmp = si.getXMLPathElementsWithoutElement();
+				QName[] tmp = si.getXMLPathElementsWithoutElement();
 				boolean ok = true;
 				for(int i=1; i<=tmp.length && ok; i++)
 				{

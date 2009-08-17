@@ -2,6 +2,8 @@ package jadex.commons.xml;
 
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
 /**
  *  A struct to represent an element on the stack while parsing.
  */
@@ -10,7 +12,7 @@ public class StackElement
 	//-------- attributes --------
 	
 	/** The xml tag. */
-	protected String tag;
+	protected QName tag;
 	
 	/** The created object. */
 	protected Object object;
@@ -31,7 +33,7 @@ public class StackElement
 	/**
 	 *  Create a new stack element.
 	 */
-	public StackElement(String tag, Object object)
+	public StackElement(QName tag, Object object)
 	{
 		this(tag, object, null);
 	}
@@ -39,17 +41,15 @@ public class StackElement
 	/**
 	 *  Create a new stack element.
 	 */
-	public StackElement(String tag, Object object, Map rawattrs)
+	public StackElement(QName tag, Object object, Map rawattrs)
 	{
-		this.tag = tag;
-		this.object = object;
-		this.rawattrs = rawattrs;
+		this(tag, object, rawattrs, null);
 	}
 	
 	/**
 	 *  Create a new stack element.
 	 */
-	public StackElement(String tag, Object object, Map rawattrs, TypeInfo typeinfo)
+	public StackElement(QName tag, Object object, Map rawattrs, TypeInfo typeinfo)
 	{
 		this.tag = tag;
 		this.object = object;
@@ -63,7 +63,7 @@ public class StackElement
 	 *  Get the tag.
 	 *  @return The tag.
 	 */
-	public String getTag()
+	public QName getTag()
 	{
 		return this.tag;
 	}

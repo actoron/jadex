@@ -55,6 +55,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.xml.namespace.QName;
 
 
 /**
@@ -1159,7 +1160,8 @@ public class ControlCenter implements IControlCenter
 	static
 	{
 		typeinfos = new HashSet();
-		typeinfos.add(new TypeInfo(null, "properties", Properties.class, null, null, 
+//		typeinfos.add(new TypeInfo(null, new QName[]{new QName("http://jadex.sourceforge.net/jadexconf", "properties")}, Properties.class, null, null, 
+		typeinfos.add(new TypeInfo(null, new QName[]{new QName("properties")}, Properties.class, null, null, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("schemaLocation", null, AttributeInfo.IGNORE_READWRITE)}, null, null,
 			new SubobjectInfo[]
 			{

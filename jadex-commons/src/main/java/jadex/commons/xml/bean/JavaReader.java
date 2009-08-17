@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 /**
  * 
  */
@@ -51,14 +53,14 @@ public class JavaReader extends Reader
 		try
 		{
 			// java.util.HashMap
-			
-			TypeInfo ti_hashmapr = new TypeInfo(null, "java.util.HashMap", Map.class, null, null, null, null, null,
+		
+			TypeInfo ti_hashmapr = new TypeInfo(null, new QName[]{new QName(Reader.PACKAGE_PROTOCOL+"java.util", "HashMap")}, Map.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo("entry", null, 
 					null, new MapEntryConverter(), null, "", null, null, Map.class.getMethod("put", new Class[]{Object.class, Object.class}), MapEntry.class.getMethod("getKey", new Class[0])))
 			});
 			typeinfosr.add(ti_hashmapr);
-			TypeInfo ti_linkedhashmapr = new TypeInfo(null, "java.util.LinkedHashMap", Map.class, null, null, null, null, null,
+			TypeInfo ti_linkedhashmapr = new TypeInfo(null, new QName[]{new QName(Reader.PACKAGE_PROTOCOL+"java.util", "LinkedHashMap")}, Map.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo("entry", null, 
 					null, new MapEntryConverter(), null, "", null, null, Map.class.getMethod("put", new Class[]{Object.class, Object.class}), MapEntry.class.getMethod("getKey", new Class[0])))
@@ -76,7 +78,7 @@ public class JavaReader extends Reader
 			
 			// java.util.ArrayList
 			
-			TypeInfo ti_arraylist = new TypeInfo(null, "java.util.ArrayList", List.class, null, null, null, null, null,
+			TypeInfo ti_arraylist = new TypeInfo(null, new QName[]{new QName(Reader.PACKAGE_PROTOCOL+"java.util", "ArrayList")}, List.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo("entries", AttributeInfo.THIS,
 					null, null, null, null, null, null, ArrayList.class.getMethod("add", new Class[]{Object.class})))
@@ -85,7 +87,7 @@ public class JavaReader extends Reader
 			
 			// java.util.HashSet
 			
-			TypeInfo ti_hashset = new TypeInfo(null, "java.util.HashSet", Set.class, null, null, null, null, null,
+			TypeInfo ti_hashset = new TypeInfo(null, new QName[]{new QName(Reader.PACKAGE_PROTOCOL+"java.util", "HashSet")}, Set.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo("entries", AttributeInfo.THIS,
 					null, null, null, null, null, null, HashSet.class.getMethod("add", new Class[]{Object.class})))

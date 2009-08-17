@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
+
 
 /**
  *  Built-in standalone agent platform, with onyl basic features.
@@ -490,7 +492,9 @@ public class Platform extends AbstractPlatform
 	static
 	{
 		typeinfos = new HashSet();
-		typeinfos.add(new TypeInfo(null, "properties", Properties.class, null, null, 
+		
+//		typeinfos.add(new TypeInfo(null, new QName[]{new QName("http://jadex.sourceforge.net/jadexconf", "properties")}, Properties.class, null, null, 
+		typeinfos.add(new TypeInfo(null, new QName[]{new QName("properties")}, Properties.class, null, null, 
 			new BeanAttributeInfo[]{new BeanAttributeInfo("schemaLocation", null, AttributeInfo.IGNORE_READWRITE)}, null, null,
 			new SubobjectInfo[]
 			{
@@ -499,7 +503,8 @@ public class Platform extends AbstractPlatform
 			}
 		));
 		
-		typeinfos.add(new TypeInfo(null, "property", Property.class, null, new BeanAttributeInfo(null, "value")));
+//		typeinfos.add(new TypeInfo(null, new QName[]{new QName("http://jadex.sourceforge.net/jadexconf", "property")}, Property.class, null, new BeanAttributeInfo(null, "value")));
+		typeinfos.add(new TypeInfo(null, new QName[]{new QName("property")}, Property.class, null, new BeanAttributeInfo(null, "value")));
 	}
 	public static jadex.commons.xml.writer.Writer writer;
 	public static jadex.commons.xml.reader.Reader reader;

@@ -36,6 +36,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 /**
  *  Loader for reading agent XMLs into OAV representation.
  */
@@ -187,7 +189,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 				model.addSubcapabilityModel(cmodel);
 				if(!cmodel.getReport().isEmpty())
 				{
-					StackElement se	= new StackElement("capability", mcaparef, null);
+					StackElement se	= new StackElement(new QName("capability"), mcaparef, null);
 //					se.path	= model instanceof OAVAgentModel ? "agent/capabilities/capability" : "capability/capabilities/capability";
 //					se.object	= mcaparef;
 					report.addEntry(se, "Included capability <a href=\"#"+cmodel.getFilename()+"\">"+cmodel.getName()+"</a> has errors.");

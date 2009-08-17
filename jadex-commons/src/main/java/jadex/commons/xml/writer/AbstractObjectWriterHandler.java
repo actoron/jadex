@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.xml.namespace.QName;
+
 import jadex.commons.SReflect;
 import jadex.commons.xml.AbstractInfo;
 import jadex.commons.xml.AttributeInfo;
@@ -80,7 +82,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public TypeInfo getTypeInfo(Object object, String[] fullpath, Object context)//, Map rawattributes)
+	public TypeInfo getTypeInfo(Object object, QName[] fullpath, Object context)//, Map rawattributes)
 	{
 		Object type = getObjectType(object, context);
 //		System.out.println("type is: "+type);
@@ -91,7 +93,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	/**
 	 *  Find a type info from a set of possible matching typeinfos.
 	 */
-	protected TypeInfo findTypeInfo(Set typeinfos, String[] fullpath)
+	protected TypeInfo findTypeInfo(Set typeinfos, QName[] fullpath)
 	{
 		TypeInfo ret = null;
 		if(typeinfos!=null)
@@ -99,7 +101,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 			for(Iterator it=typeinfos.iterator(); ret==null && it.hasNext(); )
 			{
 				TypeInfo ti = (TypeInfo)it.next();
-				String[] tmp = ti.getXMLPathElementsWithoutElement();
+				QName[] tmp = ti.getXMLPathElementsWithoutElement();
 				boolean ok = tmp==null || tmp.length<=fullpath.length;;
 				if(tmp!=null)
 				{
@@ -234,9 +236,9 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 							if(value!=null)
 							{
 //									String xmlsoname = soinfo.getXMLPath()!=null? soinfo.getXMLPath(): getPropertyName(property);
-								String[] xmlpath = soinfo.getXMLPathElements();
+								QName[] xmlpath = soinfo.getXMLPathElements();
 								if(xmlpath==null)
-									xmlpath = new String[]{getPropertyName(property)};
+									xmlpath = new QName[]{QName.valueOf(getPropertyName(property))};
 								
 //								if(soinfo.isMulti() || value.getClass().isArray()
 //									|| (property.equals(AttributeInfo.THIS) && SReflect.isIterable(value)))
@@ -250,16 +252,8 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 										
 										if(isTypeCompatible(val, sotypeinfo, context))
 										{
-											String[] tmp = xmlpath;
-											if(gentypetags)
-											{
-												tmp = new String[xmlpath.length+1];
-												System.arraycopy(xmlpath, 0, tmp, 0, xmlpath.length);
-												Object[] tag = getTagName(val, context);
-												tmp[tmp.length-1] = (String)tag[1];
-											}
-//											String pathname = gentypetags? xmlsoname+"/"+getTagName(val, context): xmlsoname;
-											wi.addSubobject(tmp, val);
+											QName[] path = createPath(xmlpath, val, context);
+											wi.addSubobject(path, val);
 										}
 									}
 								}
@@ -267,16 +261,8 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 								{
 									if(isTypeCompatible(value, sotypeinfo, context))
 									{
-//											String pathname = gentypetags? xmlsoname+"/"+getTagName(value, context): xmlsoname;
-										String[] tmp = xmlpath;
-										if(gentypetags)
-										{
-											tmp = new String[xmlpath.length+1];
-											System.arraycopy(xmlpath, 0, tmp, 0, xmlpath.length);
-											Object[] tag = getTagName(value, context);
-											tmp[tmp.length-1] = (String)tag[1];
-										}
-										wi.addSubobject(tmp, value);
+										QName[] path = createPath(xmlpath, value, context);
+										wi.addSubobject(path, value);
 									}
 								}
 							}
@@ -312,6 +298,8 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 						{
 							// todo: remove
 							// Hack special case array, todo: support generically via typeinfo???
+							QName[] xmlpath = new QName[]{QName.valueOf(propname)};
+							
 							if(value.getClass().isArray())
 							{
 								Iterator it2 = SReflect.getIterator(value);
@@ -320,31 +308,15 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 									while(it2.hasNext())
 									{
 										Object val = it2.next();
-										String[] xmlpath = new String[]{propname};
-										String[] tmp = xmlpath;
-										if(gentypetags)
-										{
-											tmp = new String[xmlpath.length+1];
-											System.arraycopy(xmlpath, 0, tmp, 0, xmlpath.length);
-											Object[] tag = getTagName(val, context);
-											tmp[tmp.length-1] = (String)tag[1];
-										}
-										wi.addSubobject(tmp, val);
+										QName[] path = createPath(xmlpath, val, context);
+										wi.addSubobject(path, val);
 									}
 								}
 							}
 							else
 							{
-								String[] xmlpath = new String[]{propname};
-								String[] tmp = xmlpath;
-								if(gentypetags)
-								{
-									tmp = new String[xmlpath.length+1];
-									System.arraycopy(xmlpath, 0, tmp, 0, xmlpath.length);
-									Object[] tag = getTagName(value, context);
-									tmp[tmp.length-1] = (String)tag[1];
-								}
-								wi.addSubobject(tmp, value);
+								QName[] path = createPath(xmlpath, value, context);
+								wi.addSubobject(path, value);
 							}
 						}
 					}
@@ -363,6 +335,22 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 //		System.out.println("wi: "+object+" "+wi.getContent()+" "+wi.getSubobjects());
 		
 		return wi;
+	}
+	
+	/**
+	 * 
+	 */
+	protected QName[] createPath(QName[] xmlpath, Object value, Object context)
+	{
+		QName[] ret = xmlpath;
+		if(gentypetags)
+		{
+			ret = new QName[xmlpath.length+1];
+			System.arraycopy(xmlpath, 0, ret, 0, xmlpath.length);
+			QName tag = getTagName(value, context);
+			ret[ret.length-1] = tag;
+		}
+		return ret;
 	}
 	
 	/**

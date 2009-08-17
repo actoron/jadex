@@ -73,6 +73,8 @@ public class Test //extends TestCase
 //		System.out.println("Read: "+ro+" / class="+ro.getClass());
 		
 //		System.out.println("equals: "+wo.equals(ro));
+		if(!wo.equals(ro))
+			System.out.println("Not equal: "+wo+" \n\n"+ro);
 		
 //		assertEquals("Written and read objects should be equal:", wo, ro);
 	}

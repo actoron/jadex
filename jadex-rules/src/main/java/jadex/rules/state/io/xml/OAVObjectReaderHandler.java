@@ -7,14 +7,16 @@ import jadex.commons.xml.ITypeConverter;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.bean.IBeanObjectCreator;
 import jadex.commons.xml.reader.IObjectReaderHandler;
+import jadex.commons.xml.reader.Reader;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.namespace.QName;
 
 /**
  *  Handler for reading XML into OAV objects.
@@ -40,14 +42,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		
 		if(type instanceof OAVObjectType)
 		{
-			if(root)
-			{
-				ret	= state.createRootObject((OAVObjectType)type);
-			}
-			else if(type!=null)
-			{
-				ret	= state.createObject((OAVObjectType)type);
-			}
+			ret	= root? state.createRootObject((OAVObjectType)type): state.createObject((OAVObjectType)type);
 		}
 		else if(type instanceof Class)
 		{
@@ -62,6 +57,16 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		{
 			ret = ((IBeanObjectCreator)type).createObject(context, rawattributes, classloader);
 		}
+		else if(type instanceof QName)
+		{
+//			System.out.println("here: "+typeinfo);
+			QName tag = (QName)type;
+			OAVObjectType oavtype = state.getTypeModel().getObjectType(tag.getLocalPart());
+			if(oavtype!=null)
+			{
+				ret = root? state.createRootObject(oavtype): state.createObject(oavtype);
+			}
+		}
 		
 		return ret;
 	}
@@ -69,30 +74,34 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	/**
 	 *  Convert an object to another type of object.
 	 */
-	public Object convertContentObject(Object object, String tagname, Object context, ClassLoader classloader)
+	public Object convertContentObject(Object object, QName tag, Object context, ClassLoader classloader)
 	{
-		// todo: also support OAVObjectTypes as tagname for conversion? 
-		
 		Object ret = object;
-		Class clazz = SReflect.classForName0(tagname, classloader);
-		if(clazz!=null)
+		if(tag.getNamespaceURI().startsWith(Reader.PACKAGE_PROTOCOL))
 		{
-			if(!BasicTypeConverter.isBuiltInType(clazz))
-				throw new RuntimeException("No converter known for: "+clazz);
-			ret = BasicTypeConverter.getBasicConverter(clazz).convertObject(object, null, classloader, context);
+			String clazzname = tag.getNamespaceURI().substring(8)+"."+tag.getLocalPart();
+			Class clazz = SReflect.classForName0(clazzname, classloader);
+			if(clazz!=null)
+			{
+				if(!BasicTypeConverter.isBuiltInType(clazz))
+					throw new RuntimeException("No converter known for: "+clazz);
+				ret = BasicTypeConverter.getBasicConverter(clazz).convertObject(object, null, classloader, context);
+			}
 		}
-		return ret;
 		
-//		Object ret = object;
-//		IOAVState state = (IOAVState)context;
-//		
-//		OAVObjectType type = state.getTypeModel().getObjectType(tagname);
-//		if(type!=null)
+		// todo: also support OAVObjectTypes as tagname for conversion? 
+//		else
 //		{
-//			ret = state.createObject(type);
-//			Collection attrs = type.getDeclaredAttributeTypes()
+//			IOAVState state = (IOAVState)context;
+//			
+//			OAVObjectType type = state.getTypeModel().getObjectType(tag.getLocalPart());
+//			if(type!=null)
+//			{
+//				ret = state.createObject(type);
+//				Collection attrs = type.getDeclaredAttributeTypes();
+//			}
 //		}
-//		return ret;
+		return ret;
 	}
 	
 	/**
@@ -165,7 +174,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 				
 				// Search for outer tags
 				if(attrpath!=null && attrpath.size()>pathidx)
-					tmpname	= (String)attrpath.get(pathidx);
+					tmpname	= ((QName)attrpath.get(pathidx)).getLocalPart();
 				pathidx++;
 			}
 			while(attrtype==null && attrpath!=null && attrpath.size()>=pathidx);
@@ -194,13 +203,13 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param tagname The current tagname (for name guessing).
 	 *  @param context The context.
 	 */
-	public void linkObject(Object elem, Object parent, Object linkinfo, String[] pathname, Object context, ClassLoader classloader, Object root) throws Exception
+	public void linkObject(Object elem, Object parent, Object linkinfo, QName[] pathname, Object context, ClassLoader classloader, Object root) throws Exception
 	{
 		IOAVState state = (IOAVState)context;
 	
 //		int idx = pathname.lastIndexOf("/");
 //		String tagname = idx!=-1? pathname.substring(idx+1): pathname;
-		String tagname = pathname[pathname.length-1];
+		String tagname = pathname[pathname.length-1].getLocalPart();
 		
 //		System.out.println("link: "+elem+" "+parent);
 		

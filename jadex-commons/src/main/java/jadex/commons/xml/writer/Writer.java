@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -32,6 +34,10 @@ public class Writer
 	
 	/** The IDREF attribute constant. */
 	public static final String IDREF = "__IDREF";
+	
+	/** The package protocol constant. */
+	public static final String PACKAGE_PROTOCOL = "package:";
+
 	
 	//-------- attributes --------
 	
@@ -83,7 +89,7 @@ public class Writer
 		
 		writer.writeStartDocument();//"utf-8", "1.0");
 		writer.writeCharacters(lf);
-		writeObject(writer, object, writtenobs, null, stack, context, classloader, null);
+		writeObject(writer, object, writtenobs, null, stack, context, classloader);
 		writer.writeEndDocument();
 		writer.close();
 	}
@@ -91,28 +97,25 @@ public class Writer
 	/**
 	 *  Write an object to xml.
 	 */
-	public void writeObject(XMLStreamWriter writer, Object object, Map writtenobs, String tagname, 
-		List stack, Object context, ClassLoader classloader, Namespace namespace) throws Exception
+	public void writeObject(XMLStreamWriter writer, Object object, Map writtenobs, QName tag, 
+		List stack, Object context, ClassLoader classloader) throws Exception
 	{
 //		if(tagname!=null)
 //			System.out.println("tagname: "+tagname);
 		TypeInfo typeinfo = handler.getTypeInfo(object, getXMLPath(stack), context); 
 		if(typeinfo!=null)
 		{
-			tagname = typeinfo.getXMLTag();
-			namespace = typeinfo.getNamespace();
+			tag = typeinfo.getXMLTag();
 		}
 		
-		if(tagname==null)
+		if(tag==null)
 		{
-			Object[] tn = handler.getTagName(object, context);
-			namespace = (Namespace)tn[0];
-			tagname = (String)tn[1];
+			tag = handler.getTagName(object, context);
 		}
 		
 		if(genids && writtenobs.containsKey(object))
 		{
-			writeStartObject(writer, tagname, typeinfo!=null? typeinfo.getNamespace(): null, stack.size());
+			writeStartObject(writer, tag, stack.size());
 			writer.writeAttribute(IDREF, (String)writtenobs.get(object));
 			writeEndObject(writer, 0);
 		}
@@ -141,9 +144,9 @@ public class Writer
 				writer.writeCharacters(lf);
 			}
 			
-			writeStartObject(writer, tagname, typeinfo!=null? typeinfo.getNamespace(): null, stack.size());
+			writeStartObject(writer, tag, stack.size());
 			
-			StackElement topse = new StackElement(tagname, object);
+			StackElement topse = new StackElement(tag, object);
 			stack.add(topse);
 			writtenobs.put(object, ""+id);
 			if(genids)
@@ -208,14 +211,15 @@ public class Writer
 	{
 		for(Iterator it=subobs.keySet().iterator(); it.hasNext(); )
 		{
-			String subtag = (String)it.next();
-			if(WriteObjectInfo.SUBTAGMAP.equals(subtag))
+			Object tmp = it.next();
+			if(WriteObjectInfo.SUBTAGMAP.equals(tmp))
 				continue;
 				
+			QName subtag = (QName)tmp;
 			Object subob = subobs.get(subtag);
 			if(subob instanceof Map && ((Map)subob).containsKey(WriteObjectInfo.SUBTAGMAP))
 			{		
-				writeStartObject(writer, subtag, typeinfo!=null? typeinfo.getNamespace(): null, stack.size());
+				writeStartObject(writer, subtag, stack.size());
 				writer.writeCharacters(lf);
 				stack.add(new StackElement(subtag, null));
 				
@@ -232,12 +236,12 @@ public class Writer
 					Object so = sos.get(i);
 					if(WriteObjectInfo.SUBTAGMAP.equals(so))
 						continue;
-					writeObject(writer, so, writtenobs, subtag, stack, context, classloader, null);
+					writeObject(writer, so, writtenobs, subtag, stack, context, classloader);
 				}				
 			}	
 			else
 			{
-				writeObject(writer, subob, writtenobs, subtag, stack, context, classloader, null);
+				writeObject(writer, subob, writtenobs, subtag, stack, context, classloader);
 			}
 		}
 	}
@@ -245,20 +249,29 @@ public class Writer
 	/**
 	 *  Write the start of an object.
 	 */
-	public void writeStartObject(XMLStreamWriter writer, String name, Namespace ns, int level) throws Exception
+	public void writeStartObject(XMLStreamWriter writer, QName tag, int level) throws Exception
 	{
 		writeIndentation(writer, level);
+			
+		String uri = tag.getNamespaceURI();
+		String prefix = tag.getPrefix();
+//		System.out.println("name"+tag.getLocalPart()+" prefix:"+prefix+" writerprefix:"+writer.getPrefix(uri)+" uri:"+uri);
 		
-//		writer.writeStartElement(name);
-		if(ns==null)
+		if(!XMLConstants.NULL_NS_URI.equals(uri))
 		{
-			writer.writeStartElement(name);
+			if(!prefix.equals(writer.getPrefix(uri)))
+			{
+				writer.writeStartElement(tag.getPrefix(), tag.getLocalPart(), tag.getNamespaceURI());
+				writer.writeNamespace(tag.getPrefix(), tag.getNamespaceURI());
+			}
+			else
+			{
+				writer.writeStartElement(tag.getPrefix(), tag.getLocalPart(), tag.getNamespaceURI());
+			}
 		}
 		else
 		{
-//			System.out.println("huhu: "+ns.getPrefix()+" "+ns.getURI()+" "+name);
-			writer.writeStartElement(ns.getPrefix(), name, ns.getURI());
-			writer.writeNamespace(ns.getPrefix(), ns.getURI());
+			writer.writeStartElement(tag.getLocalPart());
 		}
 	}
 	
@@ -297,9 +310,9 @@ public class Writer
 	 *  @param stack The stack.
 	 *  @return The string representig the xml stack (e.g. tag1/tag2/tag3)
 	 */
-	protected String[] getXMLPath(List stack)
+	protected QName[] getXMLPath(List stack)
 	{
-		String[] ret = new String[stack.size()];
+		QName[] ret = new QName[stack.size()];
 		for(int i=0; i<stack.size(); i++)
 		{
 			ret[i] = ((StackElement)stack.get(i)).getTag();
