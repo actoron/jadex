@@ -120,6 +120,9 @@ public class Reader
 				QName localname = parser.getPrefix()==null || parser.getPrefix()==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
 					: new QName(parser.getNamespaceURI(), parser.getLocalName(), parser.getPrefix());
 				
+				if(localname.getLocalPart().equals("envspacetype"))
+					System.out.println("asdf");
+					
 				QName[] fullpath = (QName[])path.toArray(new QName[path.size()+1]);
 				fullpath[fullpath.length-1] = localname;
 				TypeInfo typeinfo = getTypeInfo(localname, fullpath, rawattrs);

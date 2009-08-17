@@ -26,6 +26,7 @@ import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
+import javax.xml.namespace.QName;
 
 /**
  *  Factory for creating agent applications.
@@ -68,6 +69,7 @@ public class ApplicationFactory implements IApplicationFactory
 		this.platform = platform;
 		
 		Set types = new HashSet();
+		
 		types.add(new TypeInfo(null, "applicationtype", MApplicationType.class, "description", null,
 			new BeanAttributeInfo[]{new BeanAttributeInfo("schemaLocation", null, AttributeInfo.IGNORE_READWRITE)}, null));
 		types.add(new TypeInfo(null, "spacetype", MSpaceType.class));
@@ -77,6 +79,17 @@ public class ApplicationFactory implements IApplicationFactory
 		types.add(new TypeInfo(null, "agent", MAgentInstance.class, null, null, new BeanAttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null));
 		types.add(new TypeInfo(null, "argument", MArgument.class, null, "value"));
 		types.add(new TypeInfo(null, "import", String.class));
+
+//		String uri = "http://jadex.sourceforge.net/jadex-envspace";
+//		types.add(new TypeInfo(null, new QName[]{new QName(uri, "applicationtype")}, MApplicationType.class, "description", null,
+//			new BeanAttributeInfo[]{new BeanAttributeInfo("schemaLocation", null, AttributeInfo.IGNORE_READWRITE)}, null));
+//		types.add(new TypeInfo(null, new QName[]{new QName(uri, "spacetype")}, MSpaceType.class));
+//		types.add(new TypeInfo(null, new QName[]{new QName(uri, "agenttype")}, MAgentType.class));
+//		types.add(new TypeInfo(null, new QName[]{new QName(uri, "application")}, MApplicationInstance.class, null, null, new BeanAttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null));
+//		types.add(new TypeInfo(null, new QName[]{new QName(uri, "space")}, MSpaceInstance.class));
+//		types.add(new TypeInfo(null, new QName[]{new QName(uri, "agent")}, MAgentInstance.class, null, null, new BeanAttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null));
+//		types.add(new TypeInfo(null, new QName[]{new QName(uri, "argument")}, MArgument.class, null, "value"));
+//		types.add(new TypeInfo(null, new QName[]{new QName(uri, "import")}, String.class));
 		
 		for(int i=0; mappings!=null && i<mappings.length; i++)
 		{
