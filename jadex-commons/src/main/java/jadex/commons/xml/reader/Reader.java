@@ -279,7 +279,7 @@ public class Reader
 						}
 						else
 						{
-							throw new RuntimeException("No content mapping for: "+topse.getContent()+stack);
+							throw new RuntimeException("No content mapping for: "+topse.getContent()+" tag="+topse.getTag());
 						}
 					}
 					

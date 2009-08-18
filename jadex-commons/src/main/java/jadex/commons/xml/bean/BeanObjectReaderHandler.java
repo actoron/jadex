@@ -47,10 +47,10 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			// Special case array
 			int length = -1;
-			int idx = clazzname.indexOf("_");
+			int idx = clazzname.indexOf("__");
 			if(idx!=-1)
 			{
-				length = Integer.parseInt(clazzname.substring(idx+1));
+				length = Integer.parseInt(clazzname.substring(idx+2));
 				clazzname = clazzname.substring(0, idx);
 			}
 			

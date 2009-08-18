@@ -159,7 +159,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		// Special case array length
 		
 		if(clazz.isArray())
-			tag = tag.substring(0, tag.length()-2)+"_"+Array.getLength(object);
+			tag = tag.substring(0, tag.length()-2)+"__"+Array.getLength(object);
 		
 		int cnt;
 		
