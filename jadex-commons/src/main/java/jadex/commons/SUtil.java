@@ -356,7 +356,7 @@ public class SUtil
 	public static boolean	equals(Object val1, Object val2)
 	{
 		// Should try comparable first, for consistency???
-		return val1==val2 || val1!=null && val1.equals(val2);
+		return val1==val2 || val1!=null && val1.equals(val2); 
 	}
 	
 	/**

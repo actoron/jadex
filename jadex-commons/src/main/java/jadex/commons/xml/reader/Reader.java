@@ -1,5 +1,6 @@
 package jadex.commons.xml.reader;
 
+import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.xml.AbstractInfo;
 import jadex.commons.xml.AttributeInfo;
@@ -138,11 +139,14 @@ public class Reader
 					// Create object.
 					// todo: do not call createObject on every tag?!
 					Object ti = typeinfo;
-					if(typeinfo==null && localname.getNamespaceURI().startsWith(PACKAGE_PROTOCOL))
+					if(localname.getNamespaceURI().startsWith(PACKAGE_PROTOCOL))
 						ti = localname;
 					object = handler.createObject(ti, stack.isEmpty(), context, rawattrs, classloader);
 					if(DEBUG && object==null)
 						System.out.println("No mapping found: "+localname);
+					
+					// Try to search type info via type (when tag contained type information)
+					typeinfo = getTypeInfo(localname, fullpath, rawattrs);
 					
 					// If object has internal id save it in the readobjects map.
 					String id = rawattrs!=null? (String)rawattrs.get(ID): null;
@@ -314,6 +318,10 @@ public class Reader
 							pse = (StackElement)stack.get(i);
 							pathname.add(0, ((StackElement)stack.get(i+1)).getTag());
 						}
+						
+						if(pse.getObject()==null)
+							throw new RuntimeException("No parent object found for: "+SUtil.arrayToString(fullpath));
+						
 //						System.out.println("here: "+parser.getLocalName()+" "+getXMLPath(stack)+" "+topse.getRawAttributes());
 						
 						TypeInfo patypeinfo = pse.getTypeInfo();
@@ -332,6 +340,7 @@ public class Reader
 							}
 							linkinfo = patypeinfo.getSubobjectInfoRead(tag, fpath, topse.getRawAttributes());
 						}
+						
 						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), 
 							(QName[])pathname.toArray(new QName[pathname.size()]), context, classloader, root);
 					}
@@ -386,7 +395,7 @@ public class Reader
 			{
 				TypeInfo ti = (TypeInfo)it.next();
 				QName[] tmp = ti.getXMLPathElements();
-				boolean ok = tmp==null || tmp.length<=fullpath.length;;
+				boolean ok = tmp==null || tmp.length<=fullpath.length;
 				if(tmp!=null)
 				{
 					for(int i=1; i<=tmp.length && ok; i++)

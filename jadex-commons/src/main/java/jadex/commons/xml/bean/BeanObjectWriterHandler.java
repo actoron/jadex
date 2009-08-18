@@ -8,9 +8,13 @@ import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.writer.AbstractObjectWriterHandler;
 import jadex.commons.xml.writer.Writer;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,6 +34,9 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/** The namespaces by package. */
 	protected Map namespacebypackage = new HashMap();
 	protected int nscnt;
+	
+	/** No type infos. */
+	protected Set no_typeinfos;
 	
 	//-------- constructors --------
 	
@@ -60,44 +67,65 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	public TypeInfo getTypeInfo(Object object, QName[] fullpath, Object context)//, Map rawattributes)
 	{
-		TypeInfo ret = super.getTypeInfo(object, fullpath, context);
+		Object type = getObjectType(object, context);
 		
+		if(no_typeinfos!=null && no_typeinfos.contains(type))
+			return null;
+			
+		TypeInfo ret = super.getTypeInfo(object, fullpath, context);
 		// Hack! due to HashMap.Entry is not visible as class
 		if(ret==null)
 		{
-			Object type = getObjectType(object, context);
 			if(type instanceof Class)
 			{
-				Class clazz = (Class)type;
-				type = SReflect.getClassName(clazz);
-				ret = findTypeInfo((Set)typeinfos.get(type), fullpath);
+				// Class name not necessary no more
+//				Class clazz = (Class)type;
+//				type = SReflect.getClassName(clazz);
+//				ret = findTypeInfo((Set)typeinfos.get(type), fullpath);
+//				if(ret==null)
+//				{
 				
-				if(ret==null)
+				// Try if interface or supertype is registered
+				List tocheck = new ArrayList();
+				tocheck.add(type);
+				
+				for(int i=0; i<tocheck.size() && ret==null; i++)
 				{
-					// Try if interface is registered
-					
-					while(clazz!=null && ret==null)
+					Class clazz = (Class)tocheck.get(i);
+					ret = findTypeInfo((Set)typeinfos.get(clazz), fullpath);
+					if(ret==null)
 					{
 						Class[] interfaces = clazz.getInterfaces();
-						for(int i=0; i<interfaces.length && ret==null ; i++)
-						{
-							ret = findTypeInfo((Set)typeinfos.get(interfaces[i]), fullpath);
-//							throw new RuntimeException("Multiple interfaces matching a given type found: "+tmp+" "+ret+" "+object);
-						}
-						
+						for(int j=0; j<interfaces.length; j++)
+							tocheck.add(interfaces[j]);
 						clazz = clazz.getSuperclass();
+						if(clazz!=null)
+							tocheck.add(clazz);
 					}
+				}
+				
+				// Special case array
+				
+				if(ret==null && ((Class)type).isArray())
+				{
+					ret = findTypeInfo((Set)typeinfos.get(Object[].class), fullpath);
+				}
+				
+				// Add concrete class for same info if it is used
+				if(ret!=null)
+				{
+					TypeInfo ti = new TypeInfo(ret.getSupertype(), ret.getXMLPath(), 
+						type, ret.getCommentInfo(), ret.getContentInfo(), 
+						ret.getDeclaredAttributeInfos(), ret.getPostProcessor(), ret.getFilter(), 
+						ret.getDeclaredSubobjectInfos(), ret.getNamespace());
 					
-					// Add concrete class for same info if it is used
-					if(ret!=null)
-					{
-						TypeInfo ti = new TypeInfo(ret.getSupertype(), ret.getXMLPath(), 
-							type, ret.getCommentInfo(), ret.getContentInfo(), 
-							ret.getDeclaredAttributeInfos(), ret.getPostProcessor(), ret.getFilter(), 
-							ret.getDeclaredSubobjectInfos(), ret.getNamespace());
-						
-						addTypeInfo(ti, typeinfos);
-					}
+					addTypeInfo(ti, typeinfos);
+				}
+				else
+				{
+					if(no_typeinfos==null)
+						no_typeinfos = new HashSet();
+					no_typeinfos.add(type);
 				}
 			}
 		}
@@ -120,14 +148,19 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	public QName getTagName(Object object, Object context)
 	{
-//		return SReflect.getInnerClassName(object.getClass());
-
 		Object[] ret = new Object[2];
-		String clazzname = SReflect.getClassName(object.getClass());
+		Class clazz = object.getClass();
+		String clazzname = SReflect.getClassName(clazz);
 		Namespace ns;
 		int idx = clazzname.lastIndexOf(".");
 		String pck = Writer.PACKAGE_PROTOCOL+clazzname.substring(0, idx);
 		String tag = clazzname.substring(idx+1);
+		
+		// Special case array length
+		
+		if(clazz.isArray())
+			tag = tag.substring(0, tag.length()-2)+"_"+Array.getLength(object);
+		
 		int cnt;
 		
 		ns = (Namespace)namespacebypackage.get(pck);

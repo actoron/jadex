@@ -5,6 +5,7 @@ import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.reader.Reader;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -93,6 +94,15 @@ public class JavaReader extends Reader
 					null, null, null, null, null, null, HashSet.class.getMethod("add", new Class[]{Object.class})))
 			});
 			typeinfosr.add(ti_hashset);
+			
+			// Arrays
+			
+//			TypeInfo ti_array = new TypeInfo(null, (String)null, Object[].class, null, null, null, null, null,
+//				new SubobjectInfo[]{
+//				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS,
+//					null, null, null, null, null, null, Array.class.getMethod("set", new Class[]{Object.class, int.class, Object.class})), null, null, true)
+//			});
+//			typeinfosr.add(ti_array);
 		}
 		catch(Exception e)
 		{

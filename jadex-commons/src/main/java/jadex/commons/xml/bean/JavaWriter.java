@@ -7,6 +7,7 @@ import jadex.commons.xml.writer.Writer;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -97,13 +98,12 @@ public class JavaWriter extends Writer
 			});
 			typeinfosw.add(ti_hashset);
 			
-//			TypeInfo ti_array = new TypeInfo(null, null, Object[].class, null, null, null, null, null,
-//				new SubobjectInfo[]{
-//				new SubobjectInfo(new BeanAttributeInfo("entries", AttributeInfo.THIS,
-//					null, null, null, null, null, null, HashSet.class.getMethod("add", new Class[]{Object.class})), null, null, true)
-//			});
-//			typeinfosw.add(ti_array);
-
+			TypeInfo ti_array = new TypeInfo(null, (String)null, Object[].class, null, null, null, null, null,
+				new SubobjectInfo[]{
+				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS,
+					null, null, null, null, null, null, HashSet.class.getMethod("add", new Class[]{Object.class})), null, null, true)
+			});
+			typeinfosw.add(ti_array);
 		}
 		catch(Exception e)
 		{

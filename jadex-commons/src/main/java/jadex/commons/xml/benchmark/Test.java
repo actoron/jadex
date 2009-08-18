@@ -1,9 +1,11 @@
 package jadex.commons.xml.benchmark;
 
+import jadex.commons.SUtil;
 import jadex.commons.xml.bean.JavaReader;
 import jadex.commons.xml.bean.JavaWriter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -34,6 +36,7 @@ public class Test //extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
+				t.testArray();
 				t.testBean();
 				t.testList();
 				t.testSet();
@@ -73,10 +76,23 @@ public class Test //extends TestCase
 //		System.out.println("Read: "+ro+" / class="+ro.getClass());
 		
 //		System.out.println("equals: "+wo.equals(ro));
-		if(!wo.equals(ro))
-			System.out.println("Not equal: "+wo+" \n\n"+ro);
+		if(!wo.equals(ro) && !(wo.getClass().isArray() && Arrays.equals((Object[])wo, (Object[])ro)))
+			System.out.println("Not equal: "+wo.getClass()+" \n"+ro.getClass());
 		
 //		assertEquals("Written and read objects should be equal:", wo, ro);
+	}
+	
+	/**
+	 *  Test if array transfer works.
+	 */
+	public void testArray() throws Exception
+	{
+		Object[] array = new Object[3]; 
+		array[0] = new Integer(0);
+		array[1] = new Integer(1);
+		array[2] = new Integer(2);
+		
+		doWriteAndRead(array);
 	}
 	
 	/**

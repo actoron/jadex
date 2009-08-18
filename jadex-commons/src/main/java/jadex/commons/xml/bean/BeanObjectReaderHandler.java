@@ -9,11 +9,13 @@ import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.reader.IObjectReaderHandler;
 import jadex.commons.xml.reader.Reader;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.WeakHashMap;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -35,7 +37,39 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	public Object createObject(Object type, boolean root, Object context, Map rawattributes, ClassLoader classloader) throws Exception
 	{
 		Object ret = null;
-		if(type instanceof TypeInfo)
+		
+		if(type instanceof QName)
+		{
+//			System.out.println("here: "+typeinfo);
+			QName tag = (QName)type;
+			String pck = tag.getNamespaceURI().substring(8);
+			String clazzname = pck+"."+tag.getLocalPart();
+			
+			// Special case array
+			int length = -1;
+			int idx = clazzname.indexOf("_");
+			if(idx!=-1)
+			{
+				length = Integer.parseInt(clazzname.substring(idx+1));
+				clazzname = clazzname.substring(0, idx);
+			}
+			
+			Class clazz = SReflect.classForName0(clazzname, classloader);
+			
+			if(clazz!=null)
+			{
+				if(length!=-1)
+				{
+					ret = Array.newInstance(clazz, length);
+				}
+				else if(!BasicTypeConverter.isBuiltInType(clazz))
+				{
+					// Must have empty constructor.
+					ret = clazz.newInstance();
+				}
+			}
+		}
+		else if(type instanceof TypeInfo)
 		{
 			Object ti =  ((TypeInfo)type).getTypeInfo();
 			if(ti instanceof Class && ((Class)ti).isInterface())
@@ -47,6 +81,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				type = ti;
 			}
 		}	
+		
 		if(type instanceof Class)
 		{
 			Class clazz = (Class)type;
@@ -60,19 +95,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		{
 			ret = ((IBeanObjectCreator)type).createObject(context, rawattributes, classloader);
 		}
-		else if(type instanceof QName)
-		{
-//			System.out.println("here: "+typeinfo);
-			QName tag = (QName)type;
-			String pck = tag.getNamespaceURI().substring(8);
-			String clazzname = pck+"."+tag.getLocalPart();
-			Class clazz = SReflect.classForName0(clazzname, classloader);
-			if(clazz!=null && !BasicTypeConverter.isBuiltInType(clazz))
-			{
-				// Must have empty constructor.
-				ret = clazz.newInstance();
-			}
-		}
+		
 		return ret;
 	}
 	
@@ -115,6 +138,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			setAttributeValue(attrinfo, xmlattrname, object, ((BeanAttributeInfo)attrinfo).getDefaultValue(), root, classloader);
 	}
 		
+	// Hack!!!
+	protected Map arraycounter;
 	/**
 	 *  Link an object to its parent.
 	 *  @param object The object.
@@ -136,58 +161,84 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			setAttributeValue(linkinfo, tag, parent, object, root, classloader);
 			linked = true;
 		}
-		List classes	= new LinkedList();
-		classes.add(object.getClass());
 		
-		String[] plunames = new String[pathname.length];
-		String[] sinnames = new String[pathname.length];
-		for(int i=0; i<pathname.length; i++)
-		{
-			String name = pathname[i].getLocalPart().substring(0, 1).toUpperCase()+pathname[i].getLocalPart().substring(1);
-			plunames[i] = name;
-			sinnames[i] = SUtil.getSingular(name);
-		}
+		// Special case array
 		
-		// Try name guessing via class/superclass/interface names of object to add
-		while(!linked && !classes.isEmpty())
+		if(parent.getClass().isArray())
 		{
-			Class clazz = (Class)classes.remove(0);
-			
-			for(int i=0; i<plunames.length && !linked; i++)
+			Integer cnt = null;
+			if(arraycounter==null)
 			{
-				linked = internalLinkObjects(clazz, "set"+plunames[i], object, parent, root, classloader);
-				if(!linked)
-				{
-					linked = internalLinkObjects(clazz, "add"+sinnames[i], object, parent, root, classloader);
-					if(!linked && sinnames[i].equals(plunames[i]))
-						linked = internalLinkObjects(clazz, "add"+plunames[i], object, parent, root, classloader);
-				}
+				arraycounter = new WeakHashMap();
+			}
+			else
+			{
+				cnt = (Integer)arraycounter.get(parent);
+			}
+			if(cnt==null)
+				cnt = new Integer(0);
+			
+			Array.set(parent, cnt.intValue(), object);
+			
+			arraycounter.put(parent, new Integer(cnt.intValue()+1));
+			
+			linked = true;
+		}
+		else
+		{
+			List classes	= new LinkedList();
+			classes.add(object.getClass());
+			
+			String[] plunames = new String[pathname.length];
+			String[] sinnames = new String[pathname.length];
+			for(int i=0; i<pathname.length; i++)
+			{
+				String name = pathname[i].getLocalPart().substring(0, 1).toUpperCase()+pathname[i].getLocalPart().substring(1);
+				plunames[i] = name;
+				sinnames[i] = SUtil.getSingular(name);
 			}
 			
-			if(!linked && !BasicTypeConverter.isBuiltInType(clazz))
+			// Try name guessing via class/superclass/interface names of object to add
+			while(!linked && !classes.isEmpty())
 			{
-				String name = SReflect.getInnerClassName(clazz);
-				linked = internalLinkObjects(clazz, "set"+name, object, parent, root, classloader);
-				if(!linked)
+				Class clazz = (Class)classes.remove(0);
+				
+				for(int i=0; i<plunames.length && !linked; i++)
 				{
-					linked = internalLinkObjects(clazz, "add"+name, object, parent, root, classloader);
+					linked = internalLinkObjects(clazz, "set"+plunames[i], object, parent, root, classloader);
 					if(!linked)
 					{
-						String sinname = SUtil.getSingular(name);
-						if(!name.equals(sinname))
-							linked = internalLinkObjects(clazz, "add"+sinname, object, parent, root, classloader);
+						linked = internalLinkObjects(clazz, "add"+sinnames[i], object, parent, root, classloader);
+						if(!linked && sinnames[i].equals(plunames[i]))
+							linked = internalLinkObjects(clazz, "add"+plunames[i], object, parent, root, classloader);
 					}
 				}
-			}
-			
-			if(!linked)
-			{
-				if(clazz.getSuperclass()!=null)
-					classes.add(clazz.getSuperclass());
-				Class[]	ifs	= clazz.getInterfaces();
-				for(int i=0; i<ifs.length; i++)
+				
+				if(!linked && !BasicTypeConverter.isBuiltInType(clazz))
 				{
-					classes.add(ifs[i]);
+					String name = SReflect.getInnerClassName(clazz);
+					linked = internalLinkObjects(clazz, "set"+name, object, parent, root, classloader);
+					if(!linked)
+					{
+						linked = internalLinkObjects(clazz, "add"+name, object, parent, root, classloader);
+						if(!linked)
+						{
+							String sinname = SUtil.getSingular(name);
+							if(!name.equals(sinname))
+								linked = internalLinkObjects(clazz, "add"+sinname, object, parent, root, classloader);
+						}
+					}
+				}
+				
+				if(!linked)
+				{
+					if(clazz.getSuperclass()!=null)
+						classes.add(clazz.getSuperclass());
+					Class[]	ifs	= clazz.getInterfaces();
+					for(int i=0; i<ifs.length; i++)
+					{
+						classes.add(ifs[i]);
+					}
 				}
 			}
 		}
@@ -397,6 +448,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		
 		for(int i=0; i<prefixes.length && !set; i++)
 		{
+			try
+			{
 			Method[] ms = SReflect.getMethods(object.getClass(), prefixes[i]+postfix);
 			
 			for(int j=0; j<ms.length && !set; j++)
@@ -415,6 +468,11 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					{
 					}
 				}
+			}
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
 			}
 		}
 		

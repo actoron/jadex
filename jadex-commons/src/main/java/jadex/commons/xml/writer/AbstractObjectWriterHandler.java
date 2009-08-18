@@ -300,20 +300,20 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 							// Hack special case array, todo: support generically via typeinfo???
 							QName[] xmlpath = new QName[]{QName.valueOf(propname)};
 							
-							if(value.getClass().isArray())
-							{
-								Iterator it2 = SReflect.getIterator(value);
-								if(it2.hasNext())
-								{
-									while(it2.hasNext())
-									{
-										Object val = it2.next();
-										QName[] path = createPath(xmlpath, val, context);
-										wi.addSubobject(path, val);
-									}
-								}
-							}
-							else
+//							if(value.getClass().isArray())
+//							{
+//								Iterator it2 = SReflect.getIterator(value);
+//								if(it2.hasNext())
+//								{
+//									while(it2.hasNext())
+//									{
+//										Object val = it2.next();
+//										QName[] path = createPath(xmlpath, val, context);
+//										wi.addSubobject(path, val);
+//									}
+//								}
+//							}
+//							else
 							{
 								QName[] path = createPath(xmlpath, value, context);
 								wi.addSubobject(path, value);
