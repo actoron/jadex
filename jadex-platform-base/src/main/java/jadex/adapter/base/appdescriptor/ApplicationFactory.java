@@ -71,7 +71,7 @@ public class ApplicationFactory implements IApplicationFactory
 		Set types = new HashSet();
 		
 		types.add(new TypeInfo(null, "applicationtype", MApplicationType.class, "description", null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("schemaLocation", null, AttributeInfo.IGNORE_READWRITE)}, null));
+			new BeanAttributeInfo[]{new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE)}, null));
 		types.add(new TypeInfo(null, "spacetype", MSpaceType.class));
 		types.add(new TypeInfo(null, "agenttype", MAgentType.class));
 		types.add(new TypeInfo(null, "application", MApplicationInstance.class, null, null, new BeanAttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null));

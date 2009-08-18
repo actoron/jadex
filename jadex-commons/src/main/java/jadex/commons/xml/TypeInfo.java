@@ -319,8 +319,21 @@ public class TypeInfo	extends AbstractInfo
 	 *  Get the attribute info.
 	 *  @param xmlname The xml name of the attribute.
 	 *  @return The attribute info.
-	 */
+	 * /
 	public Object getAttributeInfo(String xmlname)
+	{
+		Object ret = attributeinfos==null? null: attributeinfos.get(xmlname);
+		if(ret==null && supertype!=null)
+			ret = supertype.getAttributeInfo(xmlname);
+		return ret;
+	}*/
+	
+	/**
+	 *  Get the attribute info.
+	 *  @param xmlname The xml name of the attribute.
+	 *  @return The attribute info.
+	 */
+	public Object getAttributeInfo(QName xmlname)
 	{
 		Object ret = attributeinfos==null? null: attributeinfos.get(xmlname);
 		if(ret==null && supertype!=null)

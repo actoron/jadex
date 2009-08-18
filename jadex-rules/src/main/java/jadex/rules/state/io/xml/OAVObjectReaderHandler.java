@@ -112,7 +112,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param attrinfo The attribute info.
 	 *  @param context The context.
 	 */
-	public void handleAttributeValue(Object object, String xmlattrname, List attrpath, String attrval, 
+	public void handleAttributeValue(Object object, QName xmlattrname, List attrpath, String attrval, 
 		Object attrinfo, Object context, ClassLoader classloader, Object root) throws Exception
 	{
 		// If attrval==null only set if default value available.
@@ -151,7 +151,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		if(attrtype==null)
 		{
 			int	pathidx	= 0;
-			String	tmpname	= xmlattrname;
+			String	tmpname	= xmlattrname.getLocalPart();
 			do
 			{
 //				System.out.println("tmpname: "+tmpname);

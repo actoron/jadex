@@ -56,22 +56,22 @@ public class JavaReader extends Reader
 		
 			TypeInfo ti_hashmapr = new TypeInfo(null, new QName[]{new QName(Reader.PACKAGE_PROTOCOL+"java.util", "HashMap")}, Map.class, null, null, null, null, null,
 				new SubobjectInfo[]{
-				new SubobjectInfo(new BeanAttributeInfo("entry", null, 
+				new SubobjectInfo(new BeanAttributeInfo(new QName("entry"), null, 
 					null, new MapEntryConverter(), null, "", null, null, Map.class.getMethod("put", new Class[]{Object.class, Object.class}), MapEntry.class.getMethod("getKey", new Class[0])))
 			});
 			typeinfosr.add(ti_hashmapr);
 			TypeInfo ti_linkedhashmapr = new TypeInfo(null, new QName[]{new QName(Reader.PACKAGE_PROTOCOL+"java.util", "LinkedHashMap")}, Map.class, null, null, null, null, null,
 				new SubobjectInfo[]{
-				new SubobjectInfo(new BeanAttributeInfo("entry", null, 
+				new SubobjectInfo(new BeanAttributeInfo(new QName("entry"), null, 
 					null, new MapEntryConverter(), null, "", null, null, Map.class.getMethod("put", new Class[]{Object.class, Object.class}), MapEntry.class.getMethod("getKey", new Class[0])))
 			});
 			typeinfosr.add(ti_linkedhashmapr);
 			
 			TypeInfo ti_hashmapentryr = new TypeInfo(null, "entry", MapEntry.class, null, null, null, null, null,
 				new SubobjectInfo[]{
-				new SubobjectInfo(new BeanAttributeInfo("key", "key", 
+				new SubobjectInfo(new BeanAttributeInfo(new QName("key"), "key", 
 					null, null, null, null, null, Map.Entry.class.getMethod("getKey", new Class[0]), null)),
-				new SubobjectInfo(new BeanAttributeInfo("value", "value", 
+				new SubobjectInfo(new BeanAttributeInfo(new QName("value"), "value", 
 					null, null, null, null, null, Map.Entry.class.getMethod("getValue", new Class[0]), null))
 			});
 			typeinfosr.add(ti_hashmapentryr);
@@ -80,7 +80,7 @@ public class JavaReader extends Reader
 			
 			TypeInfo ti_arraylist = new TypeInfo(null, new QName[]{new QName(Reader.PACKAGE_PROTOCOL+"java.util", "ArrayList")}, List.class, null, null, null, null, null,
 				new SubobjectInfo[]{
-				new SubobjectInfo(new BeanAttributeInfo("entries", AttributeInfo.THIS,
+				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS,
 					null, null, null, null, null, null, ArrayList.class.getMethod("add", new Class[]{Object.class})))
 			});
 			typeinfosr.add(ti_arraylist);
@@ -89,7 +89,7 @@ public class JavaReader extends Reader
 			
 			TypeInfo ti_hashset = new TypeInfo(null, new QName[]{new QName(Reader.PACKAGE_PROTOCOL+"java.util", "HashSet")}, Set.class, null, null, null, null, null,
 				new SubobjectInfo[]{
-				new SubobjectInfo(new BeanAttributeInfo("entries", AttributeInfo.THIS,
+				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS,
 					null, null, null, null, null, null, HashSet.class.getMethod("add", new Class[]{Object.class})))
 			});
 			typeinfosr.add(ti_hashset);

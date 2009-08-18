@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.text.html.StyleSheet;
+import javax.xml.namespace.QName;
 
 /**
  *  Java representation of environment space type for xml description.
@@ -136,16 +137,18 @@ public class MEnvSpaceType	extends MSpaceType
 		ITypeConverter tintconv = new TolerantIntegerTypeConverter();
 		ITypeConverter nameconv = new NameAttributeToObjectConverter();
 		
+		String uri =  "http://jadex.sourceforge.net/jadex-envspace"; 
+		
 		TypeInfo ti_po = new TypeInfo(null, "abstract_propertyobject", MultiCollection.class, null, null, null, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("property", "properties", null, null, null, ""))
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "property"), "properties", null, null, null, ""))
 			}
 		);
 		
-		types.add(new TypeInfo(ti_po, "objecttype", MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("name", "name", null, null, null, "")}, null));
+		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "objecttype")}, MultiCollection.class, null, null,
+			new BeanAttributeInfo[]{new BeanAttributeInfo(new QName("name"), "name", null, null, null, "")}, null));
 		
-		types.add(new TypeInfo(null, "envspacetype", MEnvSpaceType.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "envspacetype")}, MEnvSpaceType.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, "property"),
 			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, "property"),
@@ -155,21 +158,21 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo("neighborhood", null, null, null, null, "property")
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("property", "properties", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("objecttype", "objecttypes", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("avatarmapping", "avatarmappings", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("actiontype", "actiontypes", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("processtype", "processtypes", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("tasktype", "tasktypes", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("perceptgenerator", "perceptgenerators", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("perceptprocessor", "perceptprocessors", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("view", "views", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("spaceexecutor", null, null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("perspective", "perspectives", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("percepttype", "percepttypes", null, null, null, "property"))
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "property"), "properties", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "objecttype"), "objecttypes", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "avatarmapping"), "avatarmappings", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "actiontype"), "actiontypes", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "processtype"), "processtypes", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "tasktype"), "tasktypes", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "perceptgenerator"), "perceptgenerators", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "perceptprocessor"), "perceptprocessors", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "view"), "views", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "spaceexecutor"), null, null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "perspective"), "perspectives", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "percepttype"), "percepttypes", null, null, null, "property"))
 		}));
 		
-		types.add(new TypeInfo(null, "avatarmapping", MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "avatarmapping")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("agenttype", null, null, null, null, ""),
 			new BeanAttributeInfo("objecttype", null, null, null, null, ""),
@@ -179,7 +182,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo("killagent", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "")
 			}, null));
 		
-		types.add(new TypeInfo(null, "percepttype", MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "percepttype")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("objecttype", "objecttypes", null, null, null, ""),
@@ -188,49 +191,49 @@ public class MEnvSpaceType	extends MSpaceType
 			new SubobjectInfo[]{
 //			new SubobjectInfo("percepttype/objecttypes/objecttype", new BeanAttributeInfo("objecttype", "objecttypes", null, "")),
 //			new SubobjectInfo("percepttype/agenttypes/agenttype", new BeanAttributeInfo("percepttype", "agenttypes", new ITypeConverter()
-			new SubobjectInfo(new BeanAttributeInfo("objecttypes/objecttype", "objecttypes", null, null, null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("agenttypes/agenttype", "agenttypes", null, nameconv, null, ""))
+			new SubobjectInfo(new QName[]{new QName(uri, "objecttypes")}, new BeanAttributeInfo(new QName(uri, "objecttype"), "objecttypes", null, null, null, "")),
+			new SubobjectInfo(new QName[]{new QName(uri, "agenttypes")}, new BeanAttributeInfo(new QName(uri, "agenttype"), "agenttypes", null, nameconv, null, ""))
 			}));
 		
-		types.add(new TypeInfo(ti_po, "actiontype", MultiCollection.class, null, null,
+		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "actiontype")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("name", null, null, null, null, "")
 			}, null));
 		
-		types.add(new TypeInfo(ti_po, "processtype", MultiCollection.class, null, null,
+		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "processtype")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("name", null, null, null, null, "")
 			}, null));
 		
-		types.add(new TypeInfo(ti_po, "tasktype", MultiCollection.class, null, null,
+		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "tasktype")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("name", null, null, null, null, "")
 			}, null));
 		
-		types.add(new TypeInfo(ti_po, "perceptgenerator", MultiCollection.class, null, null,
+		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri,"perceptgenerator")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("name", null, null, null, null, "")
 			}, null));
 
-		types.add(new TypeInfo(ti_po, "perceptprocessor", MultiCollection.class, null, null,
+		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri,"perceptprocessor")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{	
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("agenttype", null, null, null, null, "")
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("percepttype", "percepttypes", null, nameconv, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "percepttype"), "percepttypes", null, nameconv, null, "")),
 			}));
 		
-		types.add(new TypeInfo(null, "perceptprocessor/percepttype", HashMap.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri,"perceptprocessor"), new QName(uri, "percepttype")}, HashMap.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, "")
 			}, null));
 		
-		types.add(new TypeInfo(ti_po, "view", MultiCollection.class, null, null,
+		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "view")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("name", null, null, null, null, ""),
@@ -258,7 +261,7 @@ public class MEnvSpaceType	extends MSpaceType
 			}),
 			}, null));
 		
-		types.add(new TypeInfo(ti_po, "perspective", MultiCollection.class, null, null,
+		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "perspective")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),		
 			new BeanAttributeInfo("name", null, null, null, null, ""),
@@ -347,16 +350,16 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("drawable", "drawables", null, null, null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("prelayers/gridlayer", "prelayers", null, null, null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("prelayers/tiledlayer", "prelayers", null, null, null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("prelayers/colorlayer", "prelayers", null, null, null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("postlayers/gridlayer", "postlayers", null, null, null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("postlayers/tiledlayer", "postlayers", null, null, null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("postlayers/colorlayer", "postlayers", null, null, null, ""))
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "drawable"), "drawables", null, null, null, "")),
+			new SubobjectInfo(new QName[]{new QName(uri, "prelayers")}, new BeanAttributeInfo(new QName(uri, "gridlayer"), "prelayers", null, null, null, "")),
+			new SubobjectInfo(new QName[]{new QName(uri, "prelayers")}, new BeanAttributeInfo(new QName(uri, "tiledlayer"), "prelayers", null, null, null, "")),
+			new SubobjectInfo(new QName[]{new QName(uri, "prelayers")}, new BeanAttributeInfo(new QName(uri, "colorlayer"), "prelayers", null, null, null, "")),
+			new SubobjectInfo(new QName[]{new QName(uri, "postlayers")}, new BeanAttributeInfo(new QName(uri, "gridlayer"), "postlayers", null, null, null, "")),
+			new SubobjectInfo(new QName[]{new QName(uri, "postlayers")}, new BeanAttributeInfo(new QName(uri, "tiledlayer"), "postlayers", null, null, null, "")),
+			new SubobjectInfo(new QName[]{new QName(uri, "postlayers")}, new BeanAttributeInfo(new QName(uri, "colorlayer"), "postlayers", null, null, null, ""))
 			}));
 		
-		types.add(new TypeInfo(ti_po, "drawable", MultiCollection.class, null, null,
+		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "drawable")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("objecttype", null, null, null, null, ""),
 			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
@@ -416,16 +419,16 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("texturedrectangle", "parts", null, null, null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("triangle", "parts", null, null, null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("rectangle", "parts", null, null, null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("regularpolygon", "parts", null, null, null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("ellipse", "parts", null, null, null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("text", "parts", null, null, null, "")),
-			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, null, expconv, null, ""))
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "texturedrectangle"), "parts", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "triangle"), "parts", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "rectangle"), "parts", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "regularpolygon"), "parts", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "ellipse"), "parts", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "text"), "parts", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "drawcondition"), null, null, expconv, null, ""))
 			}));
 
-		types.add(new TypeInfo(null, "texturedrectangle", MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "texturedrectangle")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
@@ -477,10 +480,10 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, null, expconv, null, ""))
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "drawcondition"), null, null, expconv, null, ""))
 			}));
 		
-		types.add(new TypeInfo(null, "triangle", MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "triangle")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
@@ -532,10 +535,10 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, null, expconv, null, ""))
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "drawcondition"), null, null, expconv, null, ""))
 			}));
 		
-		types.add(new TypeInfo(null, "rectangle", MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "rectangle")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
@@ -586,10 +589,10 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, null, expconv, null, ""))
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "drawcondition"), null, null, expconv, null, ""))
 			}));
 		
-		types.add(new TypeInfo(null, "regularpolygon", MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "regularpolygon")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
@@ -645,10 +648,10 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, null, expconv, null, ""))
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "drawcondition"), null, null, expconv, null, ""))
 			}));
 	
-		types.add(new TypeInfo(null, "ellipse", MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "ellipse")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
@@ -700,10 +703,10 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, null, expconv, null, ""))
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "drawcondition"), null, null, expconv, null, ""))
 			}));
 		
-		types.add(new TypeInfo(null, "text", MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "text")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
@@ -768,10 +771,10 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("drawcondition", null, null, expconv, null, ""))
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "drawcondition"), null, null, expconv, null, ""))
 			}));
 		
-		types.add(new TypeInfo(null, "gridlayer", MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "gridlayer")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("color", null, null, tcolorconv, null, ""),
 			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
@@ -788,7 +791,7 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null));
 
-		types.add(new TypeInfo(null, "tiledlayer", MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "tiledlayer")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("imagepath", null, null, null, null, ""),
 			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
@@ -806,7 +809,7 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null));
 		
-		types.add(new TypeInfo(null, "colorlayer", MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "colorlayer")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("color", null, null, tcolorconv, null, ""),
 			new BeanAttributeInfo("type", null, null, null, null, "", "colorlayer"),
@@ -819,102 +822,102 @@ public class MEnvSpaceType	extends MSpaceType
 			})
 			}, null));
 		
-		types.add(new TypeInfo(ti_po, "spaceexecutor", MultiCollection.class, null, 
+		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "spaceexecutor")}, MultiCollection.class, null, 
 			new BeanAttributeInfo("expression", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, "")
 			}, null));
 		
-		types.add(new TypeInfo(null, "envspacetype/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "envspacetype"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)
 			}, null));
 		
-		types.add(new TypeInfo(null, "envspace/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "envspace"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 		
-		types.add(new TypeInfo(null, "processtype/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "processtype"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 
-		types.add(new TypeInfo(null, "tasktype/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "tasktype"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 		
-		types.add(new TypeInfo(null, "actiontype/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "actiontype"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 
-		types.add(new TypeInfo(null, "percepttype/agenttypes/agenttype", HashMap.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "percepttype"), new QName(uri, "agenttypes"), new QName(uri, "agenttype")}, HashMap.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, "")}, null));
 		
-		types.add(new TypeInfo(null, "perceptgenerator/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "perceptgenerator"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 		
-		types.add(new TypeInfo(null, "perceptprocessor/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "perceptprocessor"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 		
-		types.add(new TypeInfo(null, "view/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "view"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""), 
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 		
-		types.add(new TypeInfo(null, "perspective/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "perspective"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 		
-		types.add(new TypeInfo(null, "object/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "object"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 
-		types.add(new TypeInfo(null, "avatar/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "avatar"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),			
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 
-		types.add(new TypeInfo(null, "process/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "process"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 
-		types.add(new TypeInfo(null, "objecttype/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "objecttype"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 
-		types.add(new TypeInfo(null, "drawable/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "drawable"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 
-		types.add(new TypeInfo(null, "spaceexecutor/property", HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "spaceexecutor"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
@@ -922,7 +925,7 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		// type instance declarations.
 		
-		types.add(new TypeInfo(null, "envspace", MEnvSpaceInstance.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "envspace")}, MEnvSpaceInstance.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("type", "typeName"),
 			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, "property"),
@@ -932,48 +935,48 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo("neighborhood", null, null, null, null, "property")
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("property", "properties", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("object", "objects", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("avatar", "avatars", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("process", "processes", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("spaceaction", "spaceactions", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo("observer", "observers", null, null, null, "property"))
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "property"), "properties", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "object"), "objects", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "avatar"), "avatars", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "process"), "processes", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "spaceaction"), "spaceactions", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "observer"), "observers", null, null, null, "property"))
 			}));
 		
-		types.add(new TypeInfo(ti_po, "object", MultiCollection.class, null, null,
+		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "object")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("type", null, null, null, null, ""),
 			new BeanAttributeInfo("number", null, null, BasicTypeConverter.INTEGER_CONVERTER, null, "")
 			}, null));
 			
-		types.add(new TypeInfo(ti_po, "avatar", MultiCollection.class, null, null,
+		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "avatar")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("type", null, null, null, null, ""),
 			new BeanAttributeInfo("owner", null, null, null, null, "")
 			}, null));
 			
-		types.add(new TypeInfo(ti_po, "process", MultiCollection.class, null, null,
+		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "process")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("type", null, null, null, null, ""),
 			}, null));
 		
-		types.add(new TypeInfo(null, "spaceaction", MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "spaceaction")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("type", null, null, null, null, "")
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("parameter", "parameters", null, null, null, ""))
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "parameter"), "parameters", null, null, null, ""))
 			}));
 		
-		types.add(new TypeInfo(null, "spaceaction/parameter", HashMap.class, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "spaceaction"), new QName(uri, "parameter")}, HashMap.class, null,
 			new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, "")}, null));
 
-		types.add(new TypeInfo(null, "observer", MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "observer")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("view", null, null, null, null, ""),
@@ -1192,7 +1195,14 @@ public class MEnvSpaceType	extends MSpaceType
 				{
 					ret	= new Color(c.getRed(), c.getGreen(), c.getBlue(), Integer.parseInt(alpha, 16));
 				}
+				else if(c!=null)
+				{
+					ret = c;
+				}
 			}
+			
+//			System.out.println("tolerant conv: "+val+" "+ret+" "+(ret!=null? ""+ret.getClass(): ""));
+			
 			return ret;
 		}
 		

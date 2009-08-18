@@ -2,6 +2,8 @@ package jadex.commons.xml.bean;
 
 import java.lang.reflect.Method;
 
+import javax.xml.namespace.QName;
+
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.ITypeConverter;
 
@@ -45,6 +47,64 @@ public class BeanAttributeInfo extends AttributeInfo
 	/**
 	 *  Create a new bean attribute info. 
 	 */
+	public BeanAttributeInfo(QName xmlattributename, String attributename)
+	{
+		this(xmlattributename, attributename, null);
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public BeanAttributeInfo(QName xmlattributename, String attributename, String ignore)
+	{
+		this(xmlattributename, attributename, ignore, null, null, null);
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public BeanAttributeInfo(QName xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, String mapname)
+	{
+		this(xmlattributename, attributename, ignore, converterread, converterwrite, mapname, null);
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public BeanAttributeInfo(QName xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, String mapname, Object defaultvalue)
+	{
+		this(xmlattributename, attributename, ignore, converterread, converterwrite, mapname, defaultvalue, null, null);
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public BeanAttributeInfo(QName xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, 
+		String mapname, Object defaultvalue, Method readmethod, Method writemethod)
+	{
+		this(xmlattributename, attributename, ignore, converterread, converterwrite, mapname, defaultvalue, readmethod, writemethod, null);
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public BeanAttributeInfo(QName xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, 
+		String mapname, Object defaultvalue, Method readmethod, Method writemethod, Method readmapkeymethod)
+	{
+		super(xmlattributename, attributename!=null? attributename: xmlattributename.getLocalPart(), ignore);
+		
+		this.converterread = converterread;
+		this.converterwrite = converterwrite;
+		this.mapname = mapname;
+		this.defaultvalue = defaultvalue;
+		this.readmethod = readmethod;
+		this.writemethod = writemethod;
+		this.readmapkeymethod = readmapkeymethod;
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
 	public BeanAttributeInfo(String xmlattributename, String attributename)
 	{
 		this(xmlattributename, attributename, null);
@@ -58,10 +118,12 @@ public class BeanAttributeInfo extends AttributeInfo
 		this(xmlattributename, attributename, ignore, null, null, null);
 	}
 	
+	
 	/**
 	 *  Create a new bean attribute info. 
 	 */
-	public BeanAttributeInfo(String xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, String mapname)
+	public BeanAttributeInfo(String xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, 
+		String mapname)
 	{
 		this(xmlattributename, attributename, ignore, converterread, converterwrite, mapname, null);
 	}
@@ -71,16 +133,7 @@ public class BeanAttributeInfo extends AttributeInfo
 	 */
 	public BeanAttributeInfo(String xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, String mapname, Object defaultvalue)
 	{
-		this(xmlattributename, attributename, ignore, converterread, converterwrite, mapname, defaultvalue, null, null);
-	}
-	
-	/**
-	 *  Create a new bean attribute info. 
-	 */
-	public BeanAttributeInfo(String xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, 
-		String mapname, Object defaultvalue, Method readmethod, Method writemethod)
-	{
-		this(xmlattributename, attributename, ignore, converterread, converterwrite, mapname, defaultvalue, readmethod, writemethod, null);
+		this(xmlattributename, attributename, ignore, converterread, converterwrite, mapname, defaultvalue, null, null, null);
 	}
 	
 	/**
@@ -89,15 +142,7 @@ public class BeanAttributeInfo extends AttributeInfo
 	public BeanAttributeInfo(String xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, 
 		String mapname, Object defaultvalue, Method readmethod, Method writemethod, Method readmapkeymethod)
 	{
-		super(xmlattributename, attributename!=null? attributename: xmlattributename, ignore);
-		
-		this.converterread = converterread;
-		this.converterwrite = converterwrite;
-		this.mapname = mapname;
-		this.defaultvalue = defaultvalue;
-		this.readmethod = readmethod;
-		this.writemethod = writemethod;
-		this.readmapkeymethod = readmapkeymethod;
+		this(xmlattributename==null? null: QName.valueOf(xmlattributename), attributename, ignore, converterread, converterwrite, mapname, defaultvalue, readmethod, writemethod, readmapkeymethod);
 	}
 
 	//-------- methods --------

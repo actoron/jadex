@@ -4,11 +4,14 @@ import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.commons.SReflect;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.TypeInfo;
+import jadex.commons.xml.bean.BeanAttributeInfo;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 /**
  * An AGR space description.
@@ -101,16 +104,17 @@ public class MAGRSpaceType	extends MSpaceType
 	public static Set getXMLMapping()
 	{
 		Set types = new HashSet();
-		types.add(new TypeInfo(null, "agrspacetype", MAGRSpaceType.class));
-		types.add(new TypeInfo(null, "grouptype", MGroupType.class));
-		types.add(new TypeInfo(null, "role", MRoleType.class));
-		types.add(new TypeInfo(null, "agrspace", MAGRSpaceInstance.class, null, null,
-			new AttributeInfo[]{new AttributeInfo("type", "typeName")}, null));	
-		types.add(new TypeInfo(null, "group", MGroupInstance.class, null, null,
-			new AttributeInfo[]{new AttributeInfo("type", "typeName")}, null));
-		types.add(new TypeInfo(null, "position", MPosition.class, null, null,
-			new AttributeInfo[]{new AttributeInfo("agenttype", "agentType"), 
-			new AttributeInfo("role", "roleType")}, null));
+		String uri = "http://jadex.sourceforge.net/jadex-agrspace";
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "agrspacetype")}, MAGRSpaceType.class));
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "grouptype")}, MGroupType.class));
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "role")}, MRoleType.class));
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "agrspace")}, MAGRSpaceInstance.class, null, null,
+			new AttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null));	
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "group")}, MGroupInstance.class, null, null,
+			new AttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null));
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "position")}, MPosition.class, null, null,
+			new AttributeInfo[]{new BeanAttributeInfo("agenttype", "agentType"), 
+			new BeanAttributeInfo("role", "roleType")}, null));
 		return types;
 	}
 }

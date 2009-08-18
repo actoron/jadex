@@ -34,6 +34,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.xml.namespace.QName;
+
 /**
  *  Reader for loading Bpmn XML models into a Java representation states.
  */
@@ -87,7 +89,7 @@ public class BpmnXMLReader
 		
 		types.add(new TypeInfo(null, "BpmnDiagram", MBpmnModel.class, null, null, 
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("schemaLocation", null, AttributeInfo.IGNORE_READWRITE),
+			new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE),
 			new BeanAttributeInfo("version", null, AttributeInfo.IGNORE_READWRITE),
 			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
 			}, new BpmnModelPostProcessor(), null,

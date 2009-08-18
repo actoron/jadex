@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 /**
  *  Reader for loading BDI XML models into OAV states.
  */
@@ -90,34 +92,34 @@ public class OAVBDIXMLReader
 		
 		TypeInfo ti_capability = new TypeInfo(null, "capability", OAVBDIMetaModel.capability_type, OAVBDIMetaModel.modelelement_has_description, null, 
 			new AttributeInfo[]{
-			new AttributeInfo("schemaLocation", null, AttributeInfo.IGNORE_READWRITE)}, null, null, 
+			new AttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE)}, null, null, 
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AttributeInfo("imports/import", OAVBDIMetaModel.capability_has_imports)),
+			new SubobjectInfo("imports", new AttributeInfo("import", OAVBDIMetaModel.capability_has_imports)),
 			
-			new SubobjectInfo(new AttributeInfo("beliefs/beliefref", OAVBDIMetaModel.capability_has_beliefrefs)),
-			new SubobjectInfo(new AttributeInfo("beliefs/beliefsetref", OAVBDIMetaModel.capability_has_beliefsetrefs)),
-			new SubobjectInfo(new AttributeInfo("beliefs/belief", OAVBDIMetaModel.capability_has_beliefs)),
-			new SubobjectInfo(new AttributeInfo("beliefs/beliefset", OAVBDIMetaModel.capability_has_beliefsets)),
+			new SubobjectInfo("beliefs", new AttributeInfo("beliefref", OAVBDIMetaModel.capability_has_beliefrefs)),
+			new SubobjectInfo("beliefs", new AttributeInfo("beliefsetref", OAVBDIMetaModel.capability_has_beliefsetrefs)),
+			new SubobjectInfo("beliefs", new AttributeInfo("belief", OAVBDIMetaModel.capability_has_beliefs)),
+			new SubobjectInfo("beliefs", new AttributeInfo("beliefset", OAVBDIMetaModel.capability_has_beliefsets)),
 
-			new SubobjectInfo(new AttributeInfo("goals/performgoal", OAVBDIMetaModel.capability_has_goals), null, ti_performgoal),
-			new SubobjectInfo(new AttributeInfo("goals/achievegoal", OAVBDIMetaModel.capability_has_goals), null, ti_achievegoal),
-			new SubobjectInfo(new AttributeInfo("goals/querygoal", OAVBDIMetaModel.capability_has_goals), null, ti_querygoal),
-			new SubobjectInfo(new AttributeInfo("goals/maintaingoal", OAVBDIMetaModel.capability_has_goals), null, ti_maintaingoal),
-			new SubobjectInfo(new AttributeInfo("goals/metagoal", OAVBDIMetaModel.capability_has_goals), null, ti_metagoal),
-			new SubobjectInfo(new AttributeInfo("goals/performgoalref", OAVBDIMetaModel.capability_has_goalrefs), null, ti_performgoalref),
-			new SubobjectInfo(new AttributeInfo("goals/achievegoalref", OAVBDIMetaModel.capability_has_goalrefs), null, ti_achievegoalref),
-			new SubobjectInfo(new AttributeInfo("goals/querygoalref", OAVBDIMetaModel.capability_has_goalrefs), null, ti_querygoalref),
-			new SubobjectInfo(new AttributeInfo("goals/maintaingoalref", OAVBDIMetaModel.capability_has_goalrefs), null, ti_maintaingoalref),
-			new SubobjectInfo(new AttributeInfo("goals/metagoalref", OAVBDIMetaModel.capability_has_goalrefs), null, ti_metagoalref),
+			new SubobjectInfo("goals", new AttributeInfo("performgoal", OAVBDIMetaModel.capability_has_goals), null, ti_performgoal),
+			new SubobjectInfo("goals", new AttributeInfo("achievegoal", OAVBDIMetaModel.capability_has_goals), null, ti_achievegoal),
+			new SubobjectInfo("goals", new AttributeInfo("querygoal", OAVBDIMetaModel.capability_has_goals), null, ti_querygoal),
+			new SubobjectInfo("goals", new AttributeInfo("maintaingoal", OAVBDIMetaModel.capability_has_goals), null, ti_maintaingoal),
+			new SubobjectInfo("goals", new AttributeInfo("metagoal", OAVBDIMetaModel.capability_has_goals), null, ti_metagoal),
+			new SubobjectInfo("goals", new AttributeInfo("performgoalref", OAVBDIMetaModel.capability_has_goalrefs), null, ti_performgoalref),
+			new SubobjectInfo("goals", new AttributeInfo("achievegoalref", OAVBDIMetaModel.capability_has_goalrefs), null, ti_achievegoalref),
+			new SubobjectInfo("goals", new AttributeInfo("querygoalref", OAVBDIMetaModel.capability_has_goalrefs), null, ti_querygoalref),
+			new SubobjectInfo("goals", new AttributeInfo("maintaingoalref", OAVBDIMetaModel.capability_has_goalrefs), null, ti_maintaingoalref),
+			new SubobjectInfo("goals", new AttributeInfo("metagoalref", OAVBDIMetaModel.capability_has_goalrefs), null, ti_metagoalref),
 
-			new SubobjectInfo(new AttributeInfo("plans/plan", OAVBDIMetaModel.capability_has_plans)),
+			new SubobjectInfo("plans", new AttributeInfo("plan", OAVBDIMetaModel.capability_has_plans)),
 
-			new SubobjectInfo(new AttributeInfo("events/messageeventref", OAVBDIMetaModel.capability_has_messageeventrefs)),
-			new SubobjectInfo(new AttributeInfo("events/internaleventref", OAVBDIMetaModel.capability_has_internaleventrefs)),
+			new SubobjectInfo("events", new AttributeInfo("messageeventref", OAVBDIMetaModel.capability_has_messageeventrefs)),
+			new SubobjectInfo("events", new AttributeInfo("internaleventref", OAVBDIMetaModel.capability_has_internaleventrefs)),
 
-			new SubobjectInfo(new AttributeInfo("properties/property", OAVBDIMetaModel.capability_has_properties)),
+			new SubobjectInfo("properties", new AttributeInfo("property", OAVBDIMetaModel.capability_has_properties)),
 
-			new SubobjectInfo(new AttributeInfo("configurations/configuration", OAVBDIMetaModel.capability_has_configurations)),
+			new SubobjectInfo("configurations", new AttributeInfo("configuration", OAVBDIMetaModel.capability_has_configurations)),
 			}, new Namespace("bdi", "http://jadex.sourceforge.net/jadex-bdi-2.0.xsd")
 		);
 		typeinfos.add(ti_capability);
@@ -127,14 +129,14 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo(null, "belief", OAVBDIMetaModel.belief_type, null, null, 
 			new AttributeInfo[]{
 			new AttributeInfo("class", OAVBDIMetaModel.typedelement_has_classname),
-			new AttributeInfo(null, OAVBDIMetaModel.typedelement_has_class, AttributeInfo.IGNORE_WRITE)
+			new AttributeInfo((String)null, OAVBDIMetaModel.typedelement_has_class, AttributeInfo.IGNORE_WRITE)
 			}, tepost));
 		typeinfos.add(new TypeInfo(null, "beliefref", OAVBDIMetaModel.beliefreference_type));
 		
 		TypeInfo ti_belset = new TypeInfo(null, "beliefset", OAVBDIMetaModel.beliefset_type, null, null, 
 			new AttributeInfo[]{
 			new AttributeInfo("class", OAVBDIMetaModel.typedelement_has_classname),
-			new AttributeInfo(null, OAVBDIMetaModel.typedelement_has_class, AttributeInfo.IGNORE_WRITE)
+			new AttributeInfo((String)null, OAVBDIMetaModel.typedelement_has_class, AttributeInfo.IGNORE_WRITE)
 			}, tepost, null, 
 			new SubobjectInfo[]{
 			new SubobjectInfo(new AttributeInfo("facts", OAVBDIMetaModel.beliefset_has_factsexpression)),
@@ -143,9 +145,9 @@ public class OAVBDIXMLReader
 		typeinfos.add(ti_belset);
 		typeinfos.add(new TypeInfo(null, "beliefsetref", OAVBDIMetaModel.beliefsetreference_type));
 		typeinfos.add(new TypeInfo(null, "fact", OAVBDIMetaModel.expression_type, null, 
-			new AttributeInfo(null, OAVBDIMetaModel.expression_has_content, null, null, exconv), null, expost));
+			new AttributeInfo((String)null, OAVBDIMetaModel.expression_has_content, null, null, exconv), null, expost));
 		typeinfos.add(new TypeInfo(null, "facts", OAVBDIMetaModel.expression_type, null, 
-			new AttributeInfo(null, OAVBDIMetaModel.expression_has_content, null, null, exconv), null, expost));
+			new AttributeInfo((String)null, OAVBDIMetaModel.expression_has_content, null, null, exconv), null, expost));
 		
 		typeinfos.add(new TypeInfo(null, "plan", OAVBDIMetaModel.plan_type, OAVBDIMetaModel.modelelement_has_description, null, null, null, null, 
 			new SubobjectInfo[]{
@@ -199,13 +201,13 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo(null, "parameter", OAVBDIMetaModel.parameter_type, null, null, 
 			new AttributeInfo[]{
 			new AttributeInfo("class", OAVBDIMetaModel.typedelement_has_classname),
-			new AttributeInfo(null, OAVBDIMetaModel.typedelement_has_class, AttributeInfo.IGNORE_WRITE)
+			new AttributeInfo((String)null, OAVBDIMetaModel.typedelement_has_class, AttributeInfo.IGNORE_WRITE)
 			}, tepost));
 		
 		TypeInfo ti_paramset = new TypeInfo(null, "parameterset", OAVBDIMetaModel.parameterset_type, null, null, 
 			new AttributeInfo[]{
 			new AttributeInfo("class", OAVBDIMetaModel.typedelement_has_classname),
-			new AttributeInfo(null, OAVBDIMetaModel.typedelement_has_class, AttributeInfo.IGNORE_WRITE)
+			new AttributeInfo((String)null, OAVBDIMetaModel.typedelement_has_class, AttributeInfo.IGNORE_WRITE)
 			}, tepost, null,
 			new SubobjectInfo[]{
 			new SubobjectInfo(new AttributeInfo("values", OAVBDIMetaModel.parameterset_has_valuesexpression)),	
@@ -216,21 +218,21 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo(null, "plan/parameter", OAVBDIMetaModel.planparameter_type, null, null, 
 			new AttributeInfo[]{
 			new AttributeInfo("class", OAVBDIMetaModel.typedelement_has_classname),
-			new AttributeInfo(null, OAVBDIMetaModel.typedelement_has_class, AttributeInfo.IGNORE_WRITE)
+			new AttributeInfo((String)null, OAVBDIMetaModel.typedelement_has_class, AttributeInfo.IGNORE_WRITE)
 			}, tepost));
 		typeinfos.add(new TypeInfo(null, "plan/parameterset", OAVBDIMetaModel.planparameterset_type, null, null, 
 			new AttributeInfo[]{
 			new AttributeInfo("class", OAVBDIMetaModel.typedelement_has_classname),
-			new AttributeInfo(null, OAVBDIMetaModel.typedelement_has_class, AttributeInfo.IGNORE_WRITE)
+			new AttributeInfo((String)null, OAVBDIMetaModel.typedelement_has_class, AttributeInfo.IGNORE_WRITE)
 			}, tepost, null,
 			new SubobjectInfo[]{
 			new SubobjectInfo(new AttributeInfo("values", OAVBDIMetaModel.parameterset_has_valuesexpression)),	
 			new SubobjectInfo(new AttributeInfo("value", OAVBDIMetaModel.parameterset_has_values))	
 			}));
 		typeinfos.add(new TypeInfo(null, "value", OAVBDIMetaModel.expression_type, null, 
-			new AttributeInfo(null, OAVBDIMetaModel.expression_has_content, null, null, exconv), null, expost));
+			new AttributeInfo((String)null, OAVBDIMetaModel.expression_has_content, null, null, exconv), null, expost));
 		typeinfos.add(new TypeInfo(null, "values", OAVBDIMetaModel.expression_type, null, 
-			new AttributeInfo(null, OAVBDIMetaModel.expression_has_content, null, null, exconv), null, expost));
+			new AttributeInfo((String)null, OAVBDIMetaModel.expression_has_content, null, null, exconv), null, expost));
 //		typeinfos.add(new TypeInfo(null, "goalmapping", OAVJavaType.java_string_type));
 //		typeinfos.add(new TypeInfo(null, "messageeventmapping", OAVJavaType.java_string_type));
 //		typeinfos.add(new TypeInfo(null, "internaleventmapping", OAVJavaType.java_string_type));
@@ -244,16 +246,16 @@ public class OAVBDIXMLReader
 			}, null));
 		typeinfos.add(new TypeInfo(null, "configuration", OAVBDIMetaModel.configuration_type, null, null, null, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AttributeInfo("beliefs/initialbelief", OAVBDIMetaModel.configuration_has_initialbeliefs)),
-			new SubobjectInfo(new AttributeInfo("beliefs/initialbeliefset", OAVBDIMetaModel.configuration_has_initialbeliefsets)),
-			new SubobjectInfo(new AttributeInfo("goals/initialgoal", OAVBDIMetaModel.configuration_has_initialgoals)),
-			new SubobjectInfo(new AttributeInfo("goals/endgoal", OAVBDIMetaModel.configuration_has_endgoals)),
-			new SubobjectInfo(new AttributeInfo("plans/initialplan", OAVBDIMetaModel.configuration_has_initialplans)),
-			new SubobjectInfo(new AttributeInfo("plans/endplan", OAVBDIMetaModel.configuration_has_endplans)),
-			new SubobjectInfo(new AttributeInfo("events/initialinternalevent", OAVBDIMetaModel.configuration_has_initialinternalevents)),
-			new SubobjectInfo(new AttributeInfo("events/initialmessageevent", OAVBDIMetaModel.configuration_has_initialmessageevents)),
-			new SubobjectInfo(new AttributeInfo("events/endinternalevent", OAVBDIMetaModel.configuration_has_endinternalevents)),
-			new SubobjectInfo(new AttributeInfo("events/endmessageevent", OAVBDIMetaModel.configuration_has_endmessageevents))
+			new SubobjectInfo("beliefs", new AttributeInfo("initialbelief", OAVBDIMetaModel.configuration_has_initialbeliefs)),
+			new SubobjectInfo("beliefs", new AttributeInfo("initialbeliefset", OAVBDIMetaModel.configuration_has_initialbeliefsets)),
+			new SubobjectInfo("goals", new AttributeInfo("initialgoal", OAVBDIMetaModel.configuration_has_initialgoals)),
+			new SubobjectInfo("goals", new AttributeInfo("endgoal", OAVBDIMetaModel.configuration_has_endgoals)),
+			new SubobjectInfo("plans", new AttributeInfo("initialplan", OAVBDIMetaModel.configuration_has_initialplans)),
+			new SubobjectInfo("plans", new AttributeInfo("endplan", OAVBDIMetaModel.configuration_has_endplans)),
+			new SubobjectInfo("events", new AttributeInfo("initialinternalevent", OAVBDIMetaModel.configuration_has_initialinternalevents)),
+			new SubobjectInfo("events", new AttributeInfo("initialmessageevent", OAVBDIMetaModel.configuration_has_initialmessageevents)),
+			new SubobjectInfo("events", new AttributeInfo("endinternalevent", OAVBDIMetaModel.configuration_has_endinternalevents)),
+			new SubobjectInfo("events", new AttributeInfo("endmessageevent", OAVBDIMetaModel.configuration_has_endmessageevents))
 			}));
 		typeinfos.add(new TypeInfo(null, "initialcapability", OAVBDIMetaModel.initialcapability_type));
 		typeinfos.add(new TypeInfo(null, "initialbelief", OAVBDIMetaModel.configbelief_type));

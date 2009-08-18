@@ -202,7 +202,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 								{
 									String xmlattrname = null;
 									if(info instanceof AttributeInfo)
-										xmlattrname = ((AttributeInfo)info).getXMLAttributeName();
+										xmlattrname = ((AttributeInfo)info).getXMLAttributeName().getLocalPart();
 									if(xmlattrname==null)
 										xmlattrname = getPropertyName(property);
 									
@@ -235,7 +235,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 							Object value = getValue(object, property, context, info);
 							if(value!=null)
 							{
-//									String xmlsoname = soinfo.getXMLPath()!=null? soinfo.getXMLPath(): getPropertyName(property);
+//								String xmlsoname = soinfo.getXMLPath()!=null? soinfo.getXMLPath(): getPropertyName(property);
 								QName[] xmlpath = soinfo.getXMLPathElements();
 								if(xmlpath==null)
 									xmlpath = new QName[]{QName.valueOf(getPropertyName(property))};

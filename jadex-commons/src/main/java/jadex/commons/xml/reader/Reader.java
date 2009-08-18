@@ -120,9 +120,6 @@ public class Reader
 				QName localname = parser.getPrefix()==null || parser.getPrefix()==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
 					: new QName(parser.getNamespaceURI(), parser.getLocalName(), parser.getPrefix());
 				
-				if(localname.getLocalPart().equals("envspacetype"))
-					System.out.println("asdf");
-					
 				QName[] fullpath = (QName[])path.toArray(new QName[path.size()+1]);
 				fullpath[fullpath.length-1] = localname;
 				TypeInfo typeinfo = getTypeInfo(localname, fullpath, rawattrs);
@@ -186,8 +183,10 @@ public class Reader
 						Set attrs = typeinfo==null? Collections.EMPTY_SET: typeinfo.getXMLAttributeNames();
 						for(int i=0; i<parser.getAttributeCount(); i++)
 						{
-							String attrname = parser.getAttributeLocalName(i);
-							if(!attrname.equals(ID))
+							QName attrname = parser.getAttributePrefix(i)==null || parser.getAttributePrefix(i)==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getAttributeLocalName(i))
+								: new QName(parser.getAttributeNamespace(i), parser.getAttributeLocalName(i), parser.getAttributePrefix(i));
+
+							if(!attrname.getLocalPart().equals(ID))
 							{	
 								String attrval = parser.getAttributeValue(i);
 								attrs.remove(attrname);
@@ -197,6 +196,7 @@ public class Reader
 								{
 		//							ITypeConverter attrconverter = typeinfo!=null ? typeinfo.getAttributeConverter(attrname) : null;
 		//							Object val = attrconverter!=null? attrconverter.convertObject(attrval, root, classloader): attrval;
+									
 									handler.handleAttributeValue(object, attrname, attrpath, attrval, attrinfo, context, classloader, root);
 								}
 							}
@@ -204,7 +204,7 @@ public class Reader
 						// Handle unset attributes (possibly have default value).
 						for(Iterator it=attrs.iterator(); it.hasNext(); )
 						{
-							String attrname = (String)it.next();
+							QName attrname = (QName)it.next();
 							Object attrinfo = typeinfo.getAttributeInfo(attrname);
 							
 							// Hack. want to read attribute info here

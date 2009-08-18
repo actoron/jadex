@@ -105,7 +105,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param attrinfo The attribute info.
 	 *  @param context The context.
 	 */
-	public void handleAttributeValue(Object object, String xmlattrname, List attrpath, String attrval, 
+	public void handleAttributeValue(Object object, QName xmlattrname, List attrpath, String attrval, 
 		Object attrinfo, Object context, ClassLoader classloader, Object root) throws Exception
 	{
 		// Hack!
@@ -126,14 +126,14 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	public void linkObject(Object object, Object parent, Object linkinfo, 
 		QName[] pathname, Object context, ClassLoader classloader, Object root) throws Exception
 	{
-		String tagname = pathname[pathname.length-1].getLocalPart();
+		QName tag = pathname[pathname.length-1];
 		
 		// Add object to its parent.
 		boolean	linked	= false;
 		
 		if(linkinfo!=null)
 		{
-			setAttributeValue(linkinfo, tagname, parent, object, root, classloader);
+			setAttributeValue(linkinfo, tag, parent, object, root, classloader);
 			linked = true;
 		}
 		List classes	= new LinkedList();
@@ -208,7 +208,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param root The root object.
 	 *  @param classloader The classloader.
 	 */
-	protected void setAttributeValue(Object attrinfo, String xmlattrname, Object object, 
+	protected void setAttributeValue(Object attrinfo, QName xmlattrname, Object object, 
 		Object attrval, Object root, ClassLoader classloader)
 	{
 		boolean set = false;
@@ -311,7 +311,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			String postfix = ai.getAttributeIdentifier()!=null? ((String)ai.getAttributeIdentifier())
 				.substring(0,1).toUpperCase()+((String)ai.getAttributeIdentifier()).substring(1)
-				: xmlattrname.substring(0,1).toUpperCase()+xmlattrname.substring(1);
+				: xmlattrname.getLocalPart().substring(0,1).toUpperCase()+xmlattrname.getLocalPart().substring(1);
 				
 			set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, 
 				ai instanceof BeanAttributeInfo? ((BeanAttributeInfo)ai).getConverterRead(): null);
@@ -333,7 +333,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			// Write as normal bean attribute.
 			
 			String postfix = attrinfo instanceof String? ((String)attrinfo).substring(0,1).toUpperCase()+((String)attrinfo).substring(1)
-				: xmlattrname.substring(0,1).toUpperCase()+xmlattrname.substring(1);
+				: xmlattrname.getLocalPart().substring(0,1).toUpperCase()+xmlattrname.getLocalPart().substring(1);
 			
 			set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, null);
 		

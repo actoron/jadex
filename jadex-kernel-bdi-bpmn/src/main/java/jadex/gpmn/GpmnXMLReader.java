@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 /**
  *  Reader for loading Gpmn XML models into a Java representation states.
  */
@@ -86,7 +88,7 @@ public class GpmnXMLReader
 		types.add(new TypeInfo(null, "GpmnDiagram", MGpmnModel.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("ID", "Id"),
-			new BeanAttributeInfo("schemaLocation", null, AttributeInfo.IGNORE_READWRITE),
+			new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE),
 			new BeanAttributeInfo("version", null, AttributeInfo.IGNORE_READWRITE),
 			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
 			}, null, null,

@@ -34,7 +34,7 @@ public interface IObjectReaderHandler
 	 *  @param attrinfo The attribute info.
 	 *  @param context The context.
 	 */
-	public void handleAttributeValue(Object object, String xmlattrname, List attrpath, String attrval, 
+	public void handleAttributeValue(Object object, QName xmlattrname, List attrpath, String attrval, 
 		Object attrinfo, Object context, ClassLoader classloader, Object root) throws Exception;
 	
 	/**

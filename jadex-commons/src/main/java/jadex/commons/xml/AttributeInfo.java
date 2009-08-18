@@ -1,5 +1,7 @@
 package jadex.commons.xml;
 
+import javax.xml.namespace.QName;
+
 /**
  *  Base class for attribute infos.
  */
@@ -26,7 +28,7 @@ public class AttributeInfo
 	protected Object attributeidentifier;
 
 	/** The xml attribute name. */
-	protected String xmlattributename;
+	protected QName xmlattributename;
 	
 	/** The default value. */
 	protected Object defaultvalue;
@@ -46,6 +48,43 @@ public class AttributeInfo
 	
 	//-------- constructors --------
 		
+	/**
+	 *  Create a new attribute info. 
+	 */
+	public AttributeInfo(QName xmlattributename, Object attributeidentifier)
+	{
+		this(xmlattributename, attributeidentifier, null);
+	}
+	
+	/**
+	 *  Create a new attribute info. 
+	 */
+	public AttributeInfo(QName xmlattributename, Object attributeidentifier, String ignore)
+	{
+		this(xmlattributename, attributeidentifier, ignore, null, null);
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public AttributeInfo(QName xmlattributename, Object attributeidentifier, String ignore, ITypeConverter converterread, ITypeConverter converterwrite)
+	{
+		this(xmlattributename, attributeidentifier, ignore, converterread, converterwrite, null);
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public AttributeInfo(QName xmlattributename, Object attributeidentifier, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, Object defaultvalue)
+	{
+		this.xmlattributename = xmlattributename;
+		this.attributeidentifier = attributeidentifier;
+		this.ignore = ignore;
+		this.converterread = converterread;
+		this.converterwrite = converterwrite;
+		this.defaultvalue = defaultvalue;
+	}
+	
 	/**
 	 *  Create a new attribute info. 
 	 */
@@ -75,12 +114,7 @@ public class AttributeInfo
 	 */
 	public AttributeInfo(String xmlattributename, Object attributeidentifier, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, Object defaultvalue)
 	{
-		this.xmlattributename = xmlattributename;
-		this.attributeidentifier = attributeidentifier;
-		this.ignore = ignore;
-		this.converterread = converterread;
-		this.converterwrite = converterwrite;
-		this.defaultvalue = defaultvalue;
+		this(xmlattributename==null? null: QName.valueOf(xmlattributename), attributeidentifier, ignore, converterread, converterwrite, defaultvalue);
 	}
 
 	//-------- methods --------
@@ -98,7 +132,7 @@ public class AttributeInfo
 	 *  Get the attribut name.
 	 *  @return The attributename.
 	 */
-	public String getXMLAttributeName()
+	public QName getXMLAttributeName()
 	{
 		return this.xmlattributename;
 	}

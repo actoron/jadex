@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
+
 /**
  * 
  */
@@ -61,7 +63,7 @@ public class JavaWriter extends Writer
 //			});
 			TypeInfo ti_hashmapw = new TypeInfo(null, (String)null, Map.class, null, null, null, null, null,
 				new SubobjectInfo[]{
-				new SubobjectInfo(new BeanAttributeInfo("entries", "entrySet", 
+				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), "entrySet", 
 					null, null, null, null, null, Map.class.getMethod("entrySet", new Class[0]), null), null, null, true)
 			});
 
@@ -70,9 +72,9 @@ public class JavaWriter extends Writer
 			// Cannot let xmltag be null, because class name then contains $ which is not allowed in a tag
 			TypeInfo ti_hashmapentryw = new TypeInfo(null, "entry", Map.Entry.class, null, null, null, null, null,
 				new SubobjectInfo[]{
-				new SubobjectInfo(new BeanAttributeInfo("key", "key", 
+				new SubobjectInfo(new BeanAttributeInfo(new QName("key"), "key", 
 					null, null, null, null, null, Map.Entry.class.getMethod("getKey", new Class[0]), null)),
-				new SubobjectInfo(new BeanAttributeInfo("value", "value", 
+				new SubobjectInfo(new BeanAttributeInfo(new QName("value"), "value", 
 					null, null, null, null, null, Map.Entry.class.getMethod("getValue", new Class[0]), null))
 			});
 			typeinfosw.add(ti_hashmapentryw);
@@ -81,7 +83,7 @@ public class JavaWriter extends Writer
 			
 			TypeInfo ti_arraylist = new TypeInfo(null, (String)null, List.class, null, null, null, null, null,
 				new SubobjectInfo[]{
-				new SubobjectInfo(new BeanAttributeInfo("entries", AttributeInfo.THIS,
+				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS,
 					null, null, null, null, null, null, ArrayList.class.getMethod("add", new Class[]{Object.class})), null, null, true)
 			});
 			typeinfosw.add(ti_arraylist);
@@ -90,7 +92,7 @@ public class JavaWriter extends Writer
 			
 			TypeInfo ti_hashset = new TypeInfo(null, (String)null, Set.class, null, null, null, null, null,
 				new SubobjectInfo[]{
-				new SubobjectInfo(new BeanAttributeInfo("entries", AttributeInfo.THIS,
+				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS,
 					null, null, null, null, null, null, HashSet.class.getMethod("add", new Class[]{Object.class})), null, null, true)
 			});
 			typeinfosw.add(ti_hashset);
