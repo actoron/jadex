@@ -4,9 +4,9 @@ import jadex.commons.SReflect;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.Namespace;
+import jadex.commons.xml.SXML;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.writer.AbstractObjectWriterHandler;
-import jadex.commons.xml.writer.Writer;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
@@ -14,7 +14,6 @@ import jadex.rules.state.OAVObjectType;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -81,7 +80,7 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 			String clazzname = SReflect.getClassName(object.getClass());
 			Namespace ns;
 			int idx = clazzname.lastIndexOf(".");
-			String pck = Writer.PACKAGE_PROTOCOL+clazzname.substring(0, idx);
+			String pck = SXML.PROTOCOL_TYPEINFO+clazzname.substring(0, idx);
 			String tag = clazzname.substring(idx+1);
 			
 			ns = (Namespace)namespacebypackage.get(pck);

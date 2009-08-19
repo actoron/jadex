@@ -1,13 +1,12 @@
 package jadex.commons.xml.bean;
 
 import jadex.commons.xml.AttributeInfo;
+import jadex.commons.xml.SXML;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.reader.Reader;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -16,26 +15,30 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 /**
- * 
+ *  Java specific reader that supports collection classes and arrays.
  */
 public class JavaReader extends Reader
 {
+	//-------- attributes --------
+
 	/** The reader. */
 	protected static Reader reader;
-	
+
+	//-------- constructors --------
+
 	/**
 	 *  Create a new reader.
 	 *  @param handler The handler.
 	 */
 	public JavaReader(Set typeinfos)
 	{
-		super(new BeanObjectReaderHandler(), joinTypeInfos(typeinfos));
+		super(new BeanObjectReaderHandler(joinTypeInfos(typeinfos)));
 	}
 
 	/**
-	 * 
-	 * @param typeinfos
-	 * @return
+	 *  Join sets of typeinfos.
+	 *  @param typeinfos The user specific type infos. 
+	 *  @return The joined type infos.
 	 */
 	public static Set joinTypeInfos(Set typeinfos)
 	{
@@ -46,69 +49,55 @@ public class JavaReader extends Reader
 	}
 	
 	/**
-	 * 
+	 *  Get the type infos.
 	 */
 	public static Set getTypeInfos()
 	{
-		Set typeinfosr = new HashSet();
+		Set typeinfos = new HashSet();
 		try
 		{
-			// java.util.HashMap
-		
-			TypeInfo ti_hashmapr = new TypeInfo(null, new QName[]{new QName(Reader.PACKAGE_PROTOCOL+"java.util", "HashMap")}, Map.class, null, null, null, null, null,
-				new SubobjectInfo[]{
-				new SubobjectInfo(new BeanAttributeInfo(new QName("entry"), null, 
-					null, new MapEntryConverter(), null, "", null, null, Map.class.getMethod("put", new Class[]{Object.class, Object.class}), MapEntry.class.getMethod("getKey", new Class[0])))
-			});
-			typeinfosr.add(ti_hashmapr);
-			TypeInfo ti_linkedhashmapr = new TypeInfo(null, new QName[]{new QName(Reader.PACKAGE_PROTOCOL+"java.util", "LinkedHashMap")}, Map.class, null, null, null, null, null,
-				new SubobjectInfo[]{
-				new SubobjectInfo(new BeanAttributeInfo(new QName("entry"), null, 
-					null, new MapEntryConverter(), null, "", null, null, Map.class.getMethod("put", new Class[]{Object.class, Object.class}), MapEntry.class.getMethod("getKey", new Class[0])))
-			});
-			typeinfosr.add(ti_linkedhashmapr);
+			// java.util.Map
 			
-			TypeInfo ti_hashmapentryr = new TypeInfo(null, "entry", MapEntry.class, null, null, null, null, null,
+			TypeInfo ti_map = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Map")}, Map.class, null, null, null, null, null,
+				new SubobjectInfo[]{
+				new SubobjectInfo(new BeanAttributeInfo(new QName("entry"), null, 
+					null, new MapEntryConverter(), null, "", null, null, Map.class.getMethod("put", new Class[]{Object.class, Object.class}), MapEntry.class.getMethod("getKey", new Class[0])))
+			});
+			typeinfos.add(ti_map);
+			
+			TypeInfo ti_mapentry = new TypeInfo(null, "entry", MapEntry.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo(new QName("key"), "key", 
 					null, null, null, null, null, Map.Entry.class.getMethod("getKey", new Class[0]), null)),
 				new SubobjectInfo(new BeanAttributeInfo(new QName("value"), "value", 
 					null, null, null, null, null, Map.Entry.class.getMethod("getValue", new Class[0]), null))
 			});
-			typeinfosr.add(ti_hashmapentryr);
+			typeinfos.add(ti_mapentry);
 			
-			// java.util.ArrayList
+			// java.util.List
 			
-			TypeInfo ti_arraylist = new TypeInfo(null, new QName[]{new QName(Reader.PACKAGE_PROTOCOL+"java.util", "ArrayList")}, List.class, null, null, null, null, null,
+			TypeInfo ti_list = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "List")}, List.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS,
 					null, null, null, null, null, null, ArrayList.class.getMethod("add", new Class[]{Object.class})))
 			});
-			typeinfosr.add(ti_arraylist);
+			typeinfos.add(ti_list);
 			
-			// java.util.HashSet
+			// java.util.Set
 			
-			TypeInfo ti_hashset = new TypeInfo(null, new QName[]{new QName(Reader.PACKAGE_PROTOCOL+"java.util", "HashSet")}, Set.class, null, null, null, null, null,
+			TypeInfo ti_set = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Set")}, Set.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS,
 					null, null, null, null, null, null, HashSet.class.getMethod("add", new Class[]{Object.class})))
 			});
-			typeinfosr.add(ti_hashset);
+			typeinfos.add(ti_set);
 			
-			// Arrays
-			
-//			TypeInfo ti_array = new TypeInfo(null, (String)null, Object[].class, null, null, null, null, null,
-//				new SubobjectInfo[]{
-//				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS,
-//					null, null, null, null, null, null, Array.class.getMethod("set", new Class[]{Object.class, int.class, Object.class})), null, null, true)
-//			});
-//			typeinfosr.add(ti_array);
 		}
 		catch(Exception e)
 		{
 			throw new RuntimeException(e);
 		}
-		return typeinfosr;
+		return typeinfos;
 	}
 	
 	/**

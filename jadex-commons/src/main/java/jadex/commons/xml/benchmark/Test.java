@@ -61,7 +61,7 @@ public class Test //extends TestCase
 	{
 		String xml = JavaWriter.objectToXML(wo, null);
 		
-//		System.out.println("xml is:"+xml);
+		System.out.println("xml is:"+xml);
 		
 		Object ro = JavaReader.objectFromXML(xml, null);
 		

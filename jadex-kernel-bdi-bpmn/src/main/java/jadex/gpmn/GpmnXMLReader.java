@@ -45,11 +45,7 @@ public class GpmnXMLReader
 	// Initialize reader instance.
 	static
 	{
-//		Set ignored = new HashSet();
-//		ignored.add("xmi");
-//		ignored.add("iD");
-//		ignored.add("version");
-		reader = new Reader(new BeanObjectReaderHandler(), getXMLMapping());
+		reader = new Reader(new BeanObjectReaderHandler(getXMLMapping()));
 	}
 	
 	/**

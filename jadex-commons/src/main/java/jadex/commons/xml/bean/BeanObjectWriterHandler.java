@@ -4,9 +4,11 @@ import jadex.commons.SReflect;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.Namespace;
+import jadex.commons.xml.SXML;
 import jadex.commons.xml.TypeInfo;
+import jadex.commons.xml.TypeInfoPathManager;
+import jadex.commons.xml.TypeInfoTypeManager;
 import jadex.commons.xml.writer.AbstractObjectWriterHandler;
-import jadex.commons.xml.writer.Writer;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
@@ -34,7 +36,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/** The namespaces by package. */
 	protected Map namespacebypackage = new HashMap();
 	protected int nscnt;
-	
+		
 	/** No type infos. */
 	protected Set no_typeinfos;
 	
@@ -65,10 +67,9 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public TypeInfo getTypeInfo(Object object, QName[] fullpath, Object context)//, Map rawattributes)
+	public TypeInfo getTypeInfo(Object object, QName[] fullpath, Object context)
 	{
 		Object type = getObjectType(object, context);
-		
 		if(no_typeinfos!=null && no_typeinfos.contains(type))
 			return null;
 			
@@ -92,7 +93,8 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				for(int i=0; i<tocheck.size() && ret==null; i++)
 				{
 					Class clazz = (Class)tocheck.get(i);
-					ret = findTypeInfo((Set)typeinfos.get(clazz), fullpath);
+					Set tis = titmanager.getTypeInfosByType(clazz);
+					ret = titmanager.findTypeInfo(tis, fullpath);
 					if(ret==null)
 					{
 						Class[] interfaces = clazz.getInterfaces();
@@ -105,10 +107,10 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				}
 				
 				// Special case array
-				
+				// Requires Object[].class being registered 
 				if(ret==null && ((Class)type).isArray())
 				{
-					ret = findTypeInfo((Set)typeinfos.get(Object[].class), fullpath);
+					ret = titmanager.findTypeInfo(titmanager.getTypeInfosByType(Object[].class), fullpath);
 				}
 				
 				// Add concrete class for same info if it is used
@@ -119,7 +121,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 						ret.getDeclaredAttributeInfos(), ret.getPostProcessor(), ret.getFilter(), 
 						ret.getDeclaredSubobjectInfos(), ret.getNamespace());
 					
-					addTypeInfo(ti, typeinfos);
+					titmanager.addTypeInfo(ti);
 				}
 				else
 				{
@@ -153,7 +155,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		String clazzname = SReflect.getClassName(clazz);
 		Namespace ns;
 		int idx = clazzname.lastIndexOf(".");
-		String pck = Writer.PACKAGE_PROTOCOL+clazzname.substring(0, idx);
+		String pck = SXML.PROTOCOL_TYPEINFO+clazzname.substring(0, idx);
 		String tag = clazzname.substring(idx+1);
 		
 		// Special case array length

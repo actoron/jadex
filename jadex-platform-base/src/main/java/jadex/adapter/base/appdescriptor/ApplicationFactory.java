@@ -105,8 +105,7 @@ public class ApplicationFactory implements IApplicationFactory
 //		Set ignored = new HashSet();
 //		ignored.add("schemaLocation");
 		
-//		this.reader = new Reader(new BeanObjectReaderHandler(), types, links, ignored);
-		this.reader = new Reader(new BeanObjectReaderHandler(), types);
+		this.reader = new Reader(new BeanObjectReaderHandler(types));
 	}
 	
 	//-------- IAgentFactory interface --------

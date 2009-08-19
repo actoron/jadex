@@ -51,12 +51,7 @@ public class BpmnXMLReader
 	// Initialize reader instance.
 	static
 	{
-//		Set ignored = new HashSet();
-//		ignored.add("xmi");
-//		ignored.add("iD");
-//		ignored.add("version");
-//		reader = new Reader(new BeanObjectReaderHandler(), getXMLMapping(), getXMLLinkInfos(), ignored);
-		reader = new Reader(new BeanObjectReaderHandler(), getXMLMapping());
+		reader = new Reader(new BeanObjectReaderHandler(getXMLMapping()));
 	}
 	
 	/**
@@ -87,10 +82,12 @@ public class BpmnXMLReader
 	{
 		Set types = new HashSet();
 		
-		types.add(new TypeInfo(null, "BpmnDiagram", MBpmnModel.class, null, null, 
+		String uri = "http://stp.eclipse.org/bpmn";
+		
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "BpmnDiagram")}, MBpmnModel.class, null, null, 
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE),
-			new BeanAttributeInfo("version", null, AttributeInfo.IGNORE_READWRITE),
+			new BeanAttributeInfo(new QName("http://www.omg.org/XMI", "version"), null, AttributeInfo.IGNORE_READWRITE),
 			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
 			}, new BpmnModelPostProcessor(), null,
 			new SubobjectInfo[]{

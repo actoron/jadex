@@ -462,7 +462,7 @@ public class TypeInfo	extends AbstractInfo
 	}
 	
 	/**
-	 * 
+	 *  Find a subobject info.
 	 */
 	protected SubobjectInfo findSubobjectInfo(Set soinfos, QName[] fullpath)
 	{

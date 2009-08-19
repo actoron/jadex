@@ -1,5 +1,7 @@
 package jadex.commons.xml.reader;
 
+import jadex.commons.xml.TypeInfo;
+
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +22,13 @@ public interface IObjectReaderHandler
 	 *  @return The created object (or null for none).
 	 */
 	public Object createObject(Object typeinfo, boolean root, Object context, Map rawattributes, ClassLoader classloader) throws Exception;
+	
+	/**
+	 *  Get the object type
+	 *  @param object The object.
+	 *  @return The object type.
+	 */
+	public Object getObjectType(Object object, Object context);
 	
 	/**
 	 *  Convert a content string object to another type of object.
@@ -47,4 +56,20 @@ public interface IObjectReaderHandler
 	 */
 	public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, 
 		Object context, ClassLoader classloader, Object root) throws Exception;
+	
+	/**
+	 *  Get the most specific mapping info.
+	 *  @param tag The tag.
+	 *  @param fullpath The full path.
+	 *  @return The most specific mapping info.
+	 */
+	public TypeInfo getTypeInfo(QName tag, QName[] fullpath, Map rawattributes);
+	
+	/**
+	 *  Get the most specific mapping info.
+	 *  @param tag The tag.
+	 *  @param fullpath The full path.
+	 *  @return The most specific mapping info.
+	 */
+	public TypeInfo getTypeInfo(Object type, QName[] fullpath, Object context);
 }

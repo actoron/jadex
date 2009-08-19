@@ -1,6 +1,6 @@
 package jadex.commons.xml.writer;
 
-import jadex.commons.xml.Namespace;
+import jadex.commons.xml.SXML;
 import jadex.commons.xml.StackElement;
 import jadex.commons.xml.TypeInfo;
 
@@ -28,17 +28,7 @@ public class Writer
 	
 	/** The linefeed separator. */
 	public static final String lf = (String)System.getProperty("line.separator");
-	
-	/** The ID attribute constant. */
-	public static final String ID = "__ID";
-	
-	/** The IDREF attribute constant. */
-	public static final String IDREF = "__IDREF";
-	
-	/** The package protocol constant. */
-	public static final String PACKAGE_PROTOCOL = "package:";
-
-	
+		
 	//-------- attributes --------
 	
 	/** The object creator. */
@@ -116,7 +106,7 @@ public class Writer
 		if(genids && writtenobs.containsKey(object))
 		{
 			writeStartObject(writer, tag, stack.size());
-			writer.writeAttribute(IDREF, (String)writtenobs.get(object));
+			writer.writeAttribute(SXML.IDREF, (String)writtenobs.get(object));
 			writeEndObject(writer, 0);
 		}
 		else
@@ -150,7 +140,7 @@ public class Writer
 			stack.add(topse);
 			writtenobs.put(object, ""+id);
 			if(genids)
-				writer.writeAttribute(ID, ""+id);
+				writer.writeAttribute(SXML.ID, ""+id);
 			id++;
 			
 			// Attributes

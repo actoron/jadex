@@ -2,10 +2,10 @@ package jadex.commons.xml.reader;
 
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
-import jadex.commons.xml.AbstractInfo;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.IPostProcessor;
 import jadex.commons.xml.ITypeConverter;
+import jadex.commons.xml.SXML;
 import jadex.commons.xml.StackElement;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -35,34 +34,21 @@ public class Reader
 	
 	/** The debug flag. */
 	public static boolean DEBUG = false;
-	
-	/** The ID attribute constant. */
-	public static final String ID = "__ID";
-	
-	/** The IDREF attribute constant. */
-	public static final String IDREF = "__IDREF";
-	
-	/** The package protocol constant. */
-	public static final String PACKAGE_PROTOCOL = "package:";
-	
+		
 	//-------- attributes --------
 	
 	/** The object creator. */
 	protected IObjectReaderHandler handler;
-	
-	/** The type mappings. */
-	protected Map typeinfos;
-	
+		
 	//-------- constructors --------
 
 	/**
 	 *  Create a new reader.
 	 *  @param handler The handler.
 	 */
-	public Reader(IObjectReaderHandler handler, Set typeinfos)
+	public Reader(IObjectReaderHandler handler)
 	{
 		this.handler = handler;
-		this.typeinfos = typeinfos!=null? createTypeInfos(typeinfos): Collections.EMPTY_MAP;
 	}
 	
 	//-------- methods --------
@@ -123,10 +109,10 @@ public class Reader
 				
 				QName[] fullpath = (QName[])path.toArray(new QName[path.size()+1]);
 				fullpath[fullpath.length-1] = localname;
-				TypeInfo typeinfo = getTypeInfo(localname, fullpath, rawattrs);
+				TypeInfo typeinfo = handler.getTypeInfo(localname, fullpath, rawattrs);
 				
 				// Test if it is an object reference
-				String idref = rawattrs!=null? (String)rawattrs.get(IDREF): null;
+				String idref = rawattrs!=null? (String)rawattrs.get(SXML.IDREF): null;
 				if(idref!=null)
 				{
 					object = readobjects.get(idref);
@@ -139,17 +125,20 @@ public class Reader
 					// Create object.
 					// todo: do not call createObject on every tag?!
 					Object ti = typeinfo;
-					if(localname.getNamespaceURI().startsWith(PACKAGE_PROTOCOL))
+					if(localname.getNamespaceURI().startsWith(SXML.PROTOCOL_TYPEINFO))
 						ti = localname;
 					object = handler.createObject(ti, stack.isEmpty(), context, rawattrs, classloader);
 					if(DEBUG && object==null)
 						System.out.println("No mapping found: "+localname);
 					
 					// Try to search type info via type (when tag contained type information)
-					typeinfo = getTypeInfo(localname, fullpath, rawattrs);
+					if(typeinfo==null && object!=null)
+					{
+						typeinfo = handler.getTypeInfo(object, fullpath, context);
+					}
 					
 					// If object has internal id save it in the readobjects map.
-					String id = rawattrs!=null? (String)rawattrs.get(ID): null;
+					String id = rawattrs!=null? (String)rawattrs.get(SXML.ID): null;
 					if(id!=null && object!=null)
 					{
 						readobjects.put(id, object);
@@ -164,7 +153,7 @@ public class Reader
 					}
 				
 					// Handle attributes.
-					if(attrcnt>0 && !(attrcnt==1 && rawattrs.get(ID)!=null))
+					if(attrcnt>0 && !(attrcnt==1 && rawattrs.get(SXML.ID)!=null))
 					{
 						List	attrpath	= null;
 						// If no type use last element from stack to map attributes.
@@ -190,7 +179,7 @@ public class Reader
 							QName attrname = parser.getAttributePrefix(i)==null || parser.getAttributePrefix(i)==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getAttributeLocalName(i))
 								: new QName(parser.getAttributeNamespace(i), parser.getAttributeLocalName(i), parser.getAttributePrefix(i));
 
-							if(!attrname.getLocalPart().equals(ID))
+							if(!attrname.getLocalPart().equals(SXML.ID))
 							{	
 								String attrval = parser.getAttributeValue(i);
 								attrs.remove(attrname);
@@ -238,7 +227,7 @@ public class Reader
 				QName localname = parser.getPrefix()==null || parser.getPrefix()==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
 					: new QName(parser.getNamespaceURI(), parser.getLocalName(), parser.getPrefix());
 				QName[] fullpath = (QName[])path.toArray(new QName[path.size()]);
-				final TypeInfo typeinfo = getTypeInfo(localname, fullpath, topse.getRawAttributes());
+				final TypeInfo typeinfo = handler.getTypeInfo(localname, fullpath, topse.getRawAttributes());
 
 				// Hack. Change object to content when it is element of its own.
 				if(topse.getContent()!=null && topse.getContent().trim().length()>0 && topse.getObject()==null)
@@ -332,7 +321,7 @@ public class Reader
 						if(patypeinfo!=null)
 						{
 							// Hack! If localname is classname remove it
-							if(localname.getNamespaceURI().startsWith(PACKAGE_PROTOCOL))
+							if(localname.getNamespaceURI().startsWith(SXML.PROTOCOL_TYPEINFO))
 							{
 								tag = fullpath[fullpath.length-2];
 								fpath = new QName[fullpath.length-1];
@@ -370,45 +359,6 @@ public class Reader
 		}
 			
 		return root;
-	}
-	
-	/**
-	 *  Get the most specific mapping info.
-	 *  @param tag The tag.
-	 *  @param fullpath The full path.
-	 *  @return The most specific mapping info.
-	 */
-	protected TypeInfo getTypeInfo(QName tag, QName[] fullpath, Map rawattributes)
-	{
-		return findTypeInfo((Set)typeinfos.get(tag), fullpath);
-	}
-	
-	/**
-	 *  Find type find in the set of type infos.
-	 */
-	protected TypeInfo findTypeInfo(Set typeinfos, QName[] fullpath)
-	{
-		TypeInfo ret = null;
-		if(typeinfos!=null)
-		{
-			for(Iterator it=typeinfos.iterator(); ret==null && it.hasNext(); )
-			{
-				TypeInfo ti = (TypeInfo)it.next();
-				QName[] tmp = ti.getXMLPathElements();
-				boolean ok = tmp==null || tmp.length<=fullpath.length;
-				if(tmp!=null)
-				{
-					for(int i=1; i<=tmp.length && ok; i++)
-					{
-						ok = tmp[tmp.length-i].equals(fullpath[fullpath.length-i]);
-					}
-				}
-				if(ok)
-					ret = ti;
-//				if(fullpath.endsWith(tmp.getXMLPathWithoutElement())) // && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
-			}
-		}
-		return ret;
 	}
 	
 	/**
@@ -450,30 +400,6 @@ public class Reader
 //		}
 //		return ret.toString();
 	}*/
-	
-	/**
-	 *  Create type infos for each tag sorted by specificity.
-	 *  @param linkinfos The mapping infos.
-	 *  @return Map of mapping infos.
-	 */
-	protected Map createTypeInfos(Set typeinfos)
-	{
-		Map ret = new HashMap();
-		
-		for(Iterator it=typeinfos.iterator(); it.hasNext(); )
-		{
-			TypeInfo mapinfo = (TypeInfo)it.next();
-			TreeSet maps = (TreeSet)ret.get(mapinfo.getXMLTag());
-			if(maps==null)
-			{
-				maps = new TreeSet(new AbstractInfo.SpecificityComparator());
-				ret.put(mapinfo.getXMLTag(), maps);
-			}
-			maps.add(mapinfo);
-		}
-		
-		return ret;
-	}
 	
 	/**
 	 *  @param val The string value.

@@ -528,7 +528,7 @@ public class Platform extends AbstractPlatform
 	{
 		if(reader==null)
 		{
-			reader = new jadex.commons.xml.reader.Reader(new BeanObjectReaderHandler(), typeinfos);
+			reader = new jadex.commons.xml.reader.Reader(new BeanObjectReaderHandler(typeinfos));
 		}
 		return reader;
 	}

@@ -4,17 +4,22 @@ import jadex.commons.SReflect;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.ITypeConverter;
+import jadex.commons.xml.SXML;
 import jadex.commons.xml.TypeInfo;
+import jadex.commons.xml.TypeInfoPathManager;
+import jadex.commons.xml.TypeInfoTypeManager;
 import jadex.commons.xml.bean.IBeanObjectCreator;
 import jadex.commons.xml.reader.IObjectReaderHandler;
-import jadex.commons.xml.reader.Reader;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -23,7 +28,117 @@ import javax.xml.namespace.QName;
  */
 public class OAVObjectReaderHandler implements IObjectReaderHandler
 {
+	//-------- attributes --------
+	
+	/** The type info path manager. */
+	protected TypeInfoPathManager tipmanager;
+	
+	/** The type info manager. */
+	// For special case that an object is created via the built-in 
+	// tag mechanism and there is a type info for that kind of created
+	// object. Allows specifying generic type infos with interfaces.
+	protected TypeInfoTypeManager titmanager;
+	
+	/** No type infos. */
+	protected Set no_typeinfos;
+	
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new handler.
+	 */
+	public OAVObjectReaderHandler(Set typeinfos)
+	{
+		this.tipmanager = new TypeInfoPathManager(typeinfos);
+		this.titmanager = new TypeInfoTypeManager(typeinfos);
+	}
+	
 	//-------- methods --------
+	
+	/**
+	 *  Get the most specific mapping info.
+	 *  @param tag The tag.
+	 *  @param fullpath The full path.
+	 *  @return The most specific mapping info.
+	 */
+	public TypeInfo getTypeInfo(QName tag, QName[] fullpath, Map rawattributes)
+	{
+		return tipmanager.getTypeInfo(tag, fullpath, rawattributes);
+	}
+	
+	/**
+	 *  Get the most specific mapping info.
+	 *  @param tag The tag.
+	 *  @param fullpath The full path.
+	 *  @return The most specific mapping info.
+	 */
+	public TypeInfo getTypeInfo(Object object, QName[] fullpath, Object context)
+	{
+		Object type = getObjectType(object, context);
+		if(no_typeinfos!=null && no_typeinfos.contains(type))
+			return null;
+			
+		TypeInfo ret = titmanager.getTypeInfo(type, fullpath);
+		// Hack! due to HashMap.Entry is not visible as class
+		if(ret==null)
+		{
+			if(type instanceof Class)
+			{
+				// Class name not necessary no more
+//				Class clazz = (Class)type;
+//				type = SReflect.getClassName(clazz);
+//				ret = findTypeInfo((Set)typeinfos.get(type), fullpath);
+//				if(ret==null)
+//				{
+				
+				// Try if interface or supertype is registered
+				List tocheck = new ArrayList();
+				tocheck.add(type);
+				
+				for(int i=0; i<tocheck.size() && ret==null; i++)
+				{
+					Class clazz = (Class)tocheck.get(i);
+					Set tis = titmanager.getTypeInfosByType(clazz);
+					ret = titmanager.findTypeInfo(tis, fullpath);
+					if(ret==null)
+					{
+						Class[] interfaces = clazz.getInterfaces();
+						for(int j=0; j<interfaces.length; j++)
+							tocheck.add(interfaces[j]);
+						clazz = clazz.getSuperclass();
+						if(clazz!=null)
+							tocheck.add(clazz);
+					}
+				}
+				
+				// Special case array
+				// Requires Object[].class being registered 
+				if(ret==null && ((Class)type).isArray())
+				{
+					ret = titmanager.findTypeInfo(titmanager.getTypeInfosByType(Object[].class), fullpath);
+				}
+				
+				// Add concrete class for same info if it is used
+				if(ret!=null)
+				{
+					TypeInfo ti = new TypeInfo(ret.getSupertype(), ret.getXMLPath(), 
+						type, ret.getCommentInfo(), ret.getContentInfo(), 
+						ret.getDeclaredAttributeInfos(), ret.getPostProcessor(), ret.getFilter(), 
+						ret.getDeclaredSubobjectInfos(), ret.getNamespace());
+					
+					titmanager.addTypeInfo(ti);
+				}
+				else
+				{
+					if(no_typeinfos==null)
+						no_typeinfos = new HashSet();
+					no_typeinfos.add(type);
+				}
+			}
+		}
+		
+		return ret;
+	}
 	
 	/**
 	 *  Create an object for the current tag.
@@ -72,12 +187,22 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	}
 	
 	/**
+	 *  Get the object type
+	 *  @param object The object.
+	 *  @return The object type.
+	 */
+	public Object getObjectType(Object object, Object context)
+	{
+		return ((IOAVState)context).getType(object);
+	}
+	
+	/**
 	 *  Convert an object to another type of object.
 	 */
 	public Object convertContentObject(Object object, QName tag, Object context, ClassLoader classloader)
 	{
 		Object ret = object;
-		if(tag.getNamespaceURI().startsWith(Reader.PACKAGE_PROTOCOL))
+		if(tag.getNamespaceURI().startsWith(SXML.PROTOCOL_TYPEINFO))
 		{
 			String clazzname = tag.getNamespaceURI().substring(8)+"."+tag.getLocalPart();
 			Class clazz = SReflect.classForName0(clazzname, classloader);
@@ -302,8 +427,5 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 			state.addAttributeValue(object, attrtype, elem);
 		}
 	}
-	
-
-	
 
 }
