@@ -14,6 +14,8 @@
 		</xs:complexType>
 	</xs:element>
 	<xs:complexType name="applicationtype">
+        <xs:annotation>
+        	<xs:documentation>An application type specifies the structure and content of a agent application.</xs:documentation></xs:annotation>
         <xs:sequence>
 					<xs:element name="imports" minOccurs="0">
                 <xs:annotation>
@@ -88,7 +90,9 @@
 			</xs:annotation></xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="application">
-		<xs:sequence>
+        <xs:annotation>
+        	<xs:documentation>A predefined application configuration.</xs:documentation></xs:annotation>
+        <xs:sequence>
 			<xs:element name="spaces" maxOccurs="1" minOccurs="0">
                 <xs:annotation>
                 	<xs:documentation>The spaces that should available in the application context. These are space instances (or space configurations) usually referring to some defined space type. The details of a space specification are handled in separate XML schemas (e.g. for an AGR space or an evnironment space).</xs:documentation>
@@ -119,7 +123,10 @@
 			</xs:annotation></xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="agent">
-		<xs:sequence>
+        <xs:annotation>
+        	<xs:documentation>An agent instance to be created when the application is started.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
 			<xs:element name="arguments" minOccurs="0">
                 <xs:annotation>
                 	<xs:documentation>Argument values to be supplied, when creating the agent.</xs:documentation>
@@ -160,27 +167,17 @@
 			</xs:annotation></xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="argument" mixed="true">
-		<xs:attribute name="name" type="xs:string" >
+        <xs:annotation>
+        	<xs:documentation>A single argument value. Arguments are passed as name / value pairs, where the name is supplied as attribute while the value is given as the text content of the element.</xs:documentation></xs:annotation>
+        <xs:attribute name="name" type="xs:string" >
 			<xs:annotation>
 				<xs:documentation>The name of the argument.</xs:documentation>
 			</xs:annotation></xs:attribute>
 	</xs:complexType>
-	
-	<xs:complexType name="spacetype">
-		<xs:sequence>
-			<xs:element name="property" minOccurs="0" maxOccurs="unbounded">
-				<xs:complexType mixed="true">
-					<xs:attribute name="name" type="xs:string"/>
-				</xs:complexType>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="name" type="xs:string"/>
-		<xs:attribute name="type" type="xs:string"/>
-	</xs:complexType>
-	<xs:complexType name="space">
-		<xs:attribute name="name" type="xs:string"/>
-		<xs:attribute name="type" type="xs:string"/>
-	</xs:complexType>
+	
 	<xs:complexType name="import" mixed="true">
-											</xs:complexType>
+        <xs:annotation>
+        	<xs:documentation>An import allows to add a package (e.g. java.util.*) or a class (e.g. java.util.Map) to the class lookup mechanism.</xs:documentation>
+        </xs:annotation>
+	</xs:complexType>
 </xs:schema>

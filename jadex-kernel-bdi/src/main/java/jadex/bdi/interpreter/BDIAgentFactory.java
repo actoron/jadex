@@ -12,7 +12,6 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 
@@ -144,9 +143,11 @@ public class BDIAgentFactory implements IAgentFactory
 	 *  @param model The model.
 	 *  @return True, if model can be loaded.
 	 */
+	// Todo: support imports when loading models.
 	public boolean	isLoadable(String model)
 	{
-		return model.toLowerCase().endsWith(".agent.xml") || model.toLowerCase().endsWith(".capability.xml");
+		return loader.isLoadable(model, null);
+//		return model.toLowerCase().endsWith(".agent.xml") || model.toLowerCase().endsWith(".capability.xml");
 		
 //		boolean ret =  model.indexOf("/bdi/")!=-1 || model.indexOf(".bdi.")!=-1 || model.indexOf("\\bdi\\")!=-1 
 //			|| model.indexOf("v2")!=-1 || model.indexOf("V2")!=-1;

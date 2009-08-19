@@ -29,16 +29,7 @@ public abstract class AbstractModelLoader
 	 */
 	public AbstractModelLoader(String[] extensions)
 	{
-		if(extensions!=null)
-		{
-			this.extensions	= new String[extensions.length+1];
-			this.extensions[0]	= "";
-			System.arraycopy(extensions, 0, this.extensions, 1, extensions.length);
-		}
-		else
-		{
-			this.extensions	= new String[]{""};
-		}
+		this.extensions	= extensions;
 		this.modelcache	= new HashMap();
 	}
 
@@ -56,17 +47,33 @@ public abstract class AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 *  @return The resource info identifying the file.
+	 *  @throws	Exception when the file could not be found.
 	 */
 	protected ResourceInfo	getResourceInfo(String name, String[] imports) throws Exception
 	{
+		ResourceInfo ret = getResourceInfo0(name, imports);
+
+		if(ret==null || ret.getInputStream()==null)
+			throw new IOException("File "+name+" not found in imports: "+SUtil.arrayToString(imports));
+
+		return ret;
+	}
+
+	/**
+	 *  Find the file for a given name using any supported extension.
+	 *  @param name	The filename or logical name (resolved via imports and extensions).
+	 *  @param imports	The imports, if any.
+	 *  @return The resource info identifying the file or null.
+	 */
+	protected ResourceInfo getResourceInfo0(String name, String[] imports)
+	{
 		// Try to find directly as absolute path.
-		String resstr = name;
-		ResourceInfo ret = SUtil.getResourceInfo0(resstr, classloader);
+		ResourceInfo ret = SUtil.getResourceInfo0(name, classloader);
 
 		for(int ex=0; (ret==null || ret.getInputStream()==null) && ex<extensions.length; ex++)
 		{
 			// Fully qualified package name? Can also be full package name with empty package ;-)
-			resstr	= SUtil.replace(name, ".", "/") + extensions[ex];
+			String	resstr	= SUtil.replace(name, ".", "/") + extensions[ex];
 			ret	= SUtil.getResourceInfo0(resstr, classloader);
 
 			// Try to find in imports.
@@ -87,10 +94,6 @@ public abstract class AbstractModelLoader
 				}
 			}
 		}
-
-		if(ret==null || ret.getInputStream()==null)
-			throw new IOException("File "+name+" not found in imports: "+SUtil.arrayToString(imports));
-
 		return ret;
 	}
 	
@@ -156,6 +159,8 @@ public abstract class AbstractModelLoader
 
 	/**
 	 *  Load a model.
+	 *  @param name	The name of the model (file name or logical name).
+	 *  @param imports	The imports to use when resolving logical names.
 	 */
 	public synchronized ICacheableModel	loadModel(String name, String[] imports) throws Exception
 	{
@@ -164,6 +169,9 @@ public abstract class AbstractModelLoader
 
 	/**
 	 *  Load a model with a required extension.
+	 *  @param name	The name of the model (file name or logical name).
+	 *  @param extension	The specific extension to look for.
+	 *  @param imports	The imports to use when resolving logical names.
 	 */
 	public synchronized ICacheableModel	loadModel(String name, String extension, String[] imports) throws Exception
 	{
@@ -240,6 +248,27 @@ public abstract class AbstractModelLoader
 		}
 
 		return cached;
+	}
+	
+	/**
+	 *  Test, if a resource is loadable (in principle).
+	 *  Tests if the resource is a file that matches the supported file extensions
+	 *  or if the resource is a logical name, tests if a corresponding file exist.
+	 *  The file is not actually loaded, i.e. the content of the file is not checked.
+	 */
+	public boolean	isLoadable(String name, String[] imports)
+	{
+		boolean	loadable	= false;
+		ResourceInfo	rinfo	= getResourceInfo0(name, imports);
+		if(rinfo!=null)
+		{
+			String filename	= rinfo.getFilename();
+			for(int i=0; !loadable && i<extensions.length; i++)
+			{
+				loadable	= filename.endsWith(extensions[i]);
+			}
+		}
+		return loadable;
 	}
 
 	/**
