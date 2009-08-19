@@ -1,6 +1,8 @@
 package com.daimler.client.gui.event;
 
-import java.awt.Color;
+import jadex.wfms.client.GuiClient;
+import jadex.wfms.client.IWorkitem;
+
 import java.awt.Component;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -9,9 +11,6 @@ import java.awt.event.ActionListener;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-
-import com.daimler.client.connector.UserNotification;
-import com.daimler.client.gui.GuiClient;
 
 public abstract class AbstractTaskSelectAction extends AbstractAction
 {
@@ -28,7 +27,7 @@ public abstract class AbstractTaskSelectAction extends AbstractAction
 							.replaceAll("\\.", "/")
 							+ "info.gif")));
 	
-	private UserNotification notification;
+	private IWorkitem workitem;
 
 	private Component theContent;
 
@@ -38,16 +37,16 @@ public abstract class AbstractTaskSelectAction extends AbstractAction
 
 	protected GuiClient client;
 
-	public AbstractTaskSelectAction(GuiClient client, String title, UserNotification notification)
+	public AbstractTaskSelectAction(GuiClient client, String title, IWorkitem workitem)
 	{
 		this.client = client;
 		this.title = title;
-		this.notification = notification;
+		this.workitem = workitem;
 	}
 	
-	public UserNotification getNotification()
+	public IWorkitem getWorkitem()
 	{
-		return notification;
+		return workitem;
 	}
 	
 	public String getTitle()
@@ -62,7 +61,7 @@ public abstract class AbstractTaskSelectAction extends AbstractAction
 			okButtonPressed();
 		} else
 		{
-			client.activateComponent(getTheContent(), notification);
+			client.activateComponent(getTheContent(), workitem);
 			client.getBackgroundPanel().setTheTitle(title);
 			client.getBackgroundPanel().setTheCategory("NoCategory");
 			JButton okButton = client.getOkButton();

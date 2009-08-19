@@ -1,14 +1,26 @@
 package jadex.wfms;
 
-import jadex.bpmn.BpmnExecutor;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bridge.IPlatform;
+import jadex.wfms.client.GuiClient;
+import jadex.wfms.client.ProcessStarterClient;
+import jadex.wfms.service.IAuthenticationService;
+import jadex.wfms.service.IBpmnProcessService;
+import jadex.wfms.service.IGpmnProcessService;
 import jadex.wfms.service.IModelRepositoryService;
+import jadex.wfms.service.IRoleService;
+import jadex.wfms.service.IWfmsClientService;
+import jadex.wfms.service.IWorkitemQueueService;
+import jadex.wfms.service.impl.BasicModelRepositoryService;
+import jadex.wfms.service.impl.BasicRoleService;
+import jadex.wfms.service.impl.BpmnProcessService;
+import jadex.wfms.service.impl.ClientConnector;
+import jadex.wfms.service.impl.GpmnProcessService;
+import jadex.wfms.service.impl.NullAuthenticationService;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -16,8 +28,7 @@ import java.util.Map;
  */
 public class BasicWfms implements IWfms
 {
-	/** Running BPMN processes */
-	private List bpmnProcesses;
+	private IPlatform platform;
 	
 	/** Wfms services */
 	private Map services;
@@ -26,22 +37,6 @@ public class BasicWfms implements IWfms
 	public BasicWfms()
 	{
 		services = new HashMap();
-		bpmnProcesses = new LinkedList();
-	}
-	
-	/**
-	 * Starts a BPMN process
-	 * @param name name of the BPMN model
-	 * @param stepmode if true, the process will start in step mode
-	 */
-	public synchronized void startBpmnProcess(String name, boolean stepmode)
-	{
-		IModelRepositoryService mr = (IModelRepositoryService) getService(IModelRepositoryService.class);
-		MBpmnModel model = mr.getBpmnModel(name);
-		BpmnInstance instance = new BpmnInstance(model);
-		instance.setWfms(this);
-		new BpmnExecutor(instance, stepmode);
-		bpmnProcesses.add(instance);
 	}
 	
 	/**

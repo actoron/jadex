@@ -1,11 +1,14 @@
 package com.daimler.client.gui.components;
 
+import jadex.wfms.client.IWorkitem;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -32,7 +35,7 @@ public class GuiDataScrollPanel extends JScrollPane
 	
 	private FetchDataTaskSelectAction theFetchDataTaskSelection = null;
 	
-	public GuiDataScrollPanel(Map initVals, Collection parameters, FetchDataTaskSelectAction fdtsa)
+	public GuiDataScrollPanel(IWorkitem workitem, FetchDataTaskSelectAction fdtsa)
 	{
 		setViewportBorder(null);
 		setBorder(null);
@@ -54,7 +57,7 @@ public class GuiDataScrollPanel extends JScrollPane
 		//if only one category and it is the general category than add it without a title
 		//if (iRows == 1 && sCategories[0].equalsIgnoreCase(GetInputTaskProperty.GENERAL_CATEGORY))
 		//{
-		catPan = new GuiCategoryPanel(initVals, parameters, null, theLightBlue);
+		catPan = new GuiCategoryPanel(workitem, null, theLightBlue);
 		pGround.add(catPan);
 		theCategories.add(catPan);
 		/*}

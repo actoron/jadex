@@ -25,6 +25,18 @@ public class InputFieldFactory
 	{
 		if (String.valueOf(clazz).equals("boolean"))
 			clazz = Boolean.class;
+		if (String.valueOf(clazz).equals("byte"))
+			clazz = Byte.class;
+		if (String.valueOf(clazz).equals("short"))
+			clazz = Short.class;
+		if (String.valueOf(clazz).equals("int"))
+			clazz = Integer.class;
+		if (String.valueOf(clazz).equals("long"))
+			clazz = Long.class;
+		if (String.valueOf(clazz).equals("float"))
+			clazz = Float.class;
+		if (String.valueOf(clazz).equals("double"))
+			clazz = Double.class;
 		/*if (property instanceof List)
 		{((List) property).get(0)
 			return new CollectionInputPanel(name, labelText, helpText, bgColor, isRequired, null, 0);//taskProperty, bgColor);
@@ -75,6 +87,7 @@ public class InputFieldFactory
 			// "Please query every attribute on its own");
 			// return null;
 		//}
+		System.out.println(clazz);
 		return null;
 	}
 }

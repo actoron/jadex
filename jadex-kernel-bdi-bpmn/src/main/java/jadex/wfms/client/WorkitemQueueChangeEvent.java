@@ -4,9 +4,9 @@ public class WorkitemQueueChangeEvent
 {
 	private IWorkitem workitem;
 	
-	public WorkitemQueueChangeEvent(IWorkitem notification)
+	public WorkitemQueueChangeEvent(IWorkitem workitem)
 	{
-		this.workitem = notification;
+		this.workitem = workitem;
 	}
 	
 	public IWorkitem getWorkitem()

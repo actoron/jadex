@@ -1,5 +1,6 @@
 package jadex.wfms.client;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -8,6 +9,9 @@ import java.util.Set;
  */
 public interface IWorkitem
 {
+	public static final int TEXT_INFO_WORKITEM_TYPE = 0;
+	public static final int DATA_FETCH_WORKITEM_TYPE = 1;
+	
 	/**
 	 * Gets the name of the workitem.
 	 * 
@@ -52,6 +56,14 @@ public interface IWorkitem
 	 * @throws IllegalArgumentException if the parameter is read-only
 	 */
 	public void setParameterValue(String parameterName, Object value);
+	
+	/**
+	 * Sets the value of multiple parameters.
+	 * 
+	 * @param parameters the parameters
+	 * @throws IllegalArgumentException if the parameter is read-only
+	 */
+	public void setParameterValues(Map parameters);
 	
 	/**
 	 * Gets the type of a parameter.

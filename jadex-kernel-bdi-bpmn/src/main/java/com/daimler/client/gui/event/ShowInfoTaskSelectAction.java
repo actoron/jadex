@@ -1,5 +1,8 @@
 package com.daimler.client.gui.event;
 
+import jadex.wfms.client.GuiClient;
+import jadex.wfms.client.IWorkitem;
+
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -11,17 +14,16 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.ChangedCharSetException;
 import javax.swing.text.html.HTMLEditorKit;
 
-import com.daimler.client.connector.ClientConnector;
-import com.daimler.client.connector.UserNotification;
-import com.daimler.client.gui.GuiClient;
-
 public class ShowInfoTaskSelectAction extends AbstractTaskSelectAction{
 
-    public ShowInfoTaskSelectAction(GuiClient client, UserNotification notification)
+    public ShowInfoTaskSelectAction(GuiClient client, IWorkitem workitem)
     {
-    	super(client, notification.getContext().getModelElement().getName(), notification);
+    	super(client, workitem.getName(), workitem);
         initAction();
-        initPanel((String) notification.getContext().getParameterValue("info_text"));
+        String infoText = (String) workitem.getParameterValue("info_test");
+        if (infoText == null)
+        	infoText = "<html><center><h1>" + workitem.getName() + "</h1></center></html>";
+        initPanel(infoText);
     }
     
     private void initAction()
@@ -90,7 +92,7 @@ public class ShowInfoTaskSelectAction extends AbstractTaskSelectAction{
     
     public void okButtonPressed()
     {
-        ClientConnector.getInstance().commitNotification(getNotification(), null);
+    	client.commitWorkitem(getWorkitem());
         dispose();
     }
 

@@ -68,7 +68,7 @@ public class TextInputPanel extends AbstractInputPanel
 		mainPanel.setBorder(border);
 	}
 	
-	public void setEditable(boolean editable)
+	protected void setEditableState(boolean editable)
     {
     	textField.setEnabled(editable);
     }

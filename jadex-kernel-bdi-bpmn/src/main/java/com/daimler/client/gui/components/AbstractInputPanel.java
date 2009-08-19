@@ -43,10 +43,13 @@ public abstract class AbstractInputPanel extends JPanel implements Comparable
 	
 	private Object initialValue;
 
+	private boolean editable;
+
 	public AbstractInputPanel(String name, String helpText,
 			Color bgColor, Object initialValue, boolean isRequired)
 	{
 		super();
+		this.editable = true;
 		setName(name);
 		this.isRequired = isRequired;
 		this.backgroundColor = bgColor;
@@ -165,7 +168,18 @@ public abstract class AbstractInputPanel extends JPanel implements Comparable
 	// return theAccessible;
 	// }
 	
-	public abstract void setEditable(boolean editable);
+	public void setEditable(boolean editable)
+	{
+		this.editable = editable;
+		setEditableState(editable);
+	}
+	
+	public boolean isEditable()
+	{
+		return editable;
+	}
+	
+	protected abstract void setEditableState(boolean editable);
 	
 	public int compareTo(Object arg0)
 	{

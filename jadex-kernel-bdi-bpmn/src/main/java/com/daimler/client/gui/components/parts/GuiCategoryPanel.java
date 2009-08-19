@@ -7,6 +7,7 @@
 package com.daimler.client.gui.components.parts;
 
 import jadex.bpmn.model.MParameter;
+import jadex.wfms.client.IWorkitem;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -33,8 +35,7 @@ import com.daimler.util.swing.SwingUtils;
  */
 public class GuiCategoryPanel extends JPanel
 {
-
-	private Collection categoryParameters;
+	private IWorkitem workitem;
 
 	private String theCategoryName;
 
@@ -46,38 +47,42 @@ public class GuiCategoryPanel extends JPanel
 
 	private ArrayList theInputFields;
 
-	public GuiCategoryPanel(Collection parameters, String categoryName)
+	/*public GuiCategoryPanel(Collection parameters, String categoryName)
 	{
 		this(new HashMap(), parameters, categoryName, (new JPanel()).getBackground());
-	}
+	}*/
 
-	public GuiCategoryPanel(Map initVals, Collection parameters, String categoryName, Color bgColor)
+	public GuiCategoryPanel(IWorkitem workitem, String categoryName, Color bgColor)
 	{
 		super();
-		this.categoryParameters = parameters;
+		this.workitem = workitem;
 		this.theCategoryName = categoryName;
 		this.theBackgroundColor = bgColor;
 		this.setBackground(Color.WHITE);
-		init(initVals);
+		init();
 	}
 
-	private void init(Map initVals)
+	private void init()
 	{
 		// create all input fields for every task in the list of taskproperties
 		// order them by their weight
 		// add them to this panel
 		theInputFields = new ArrayList();
-		for(Iterator it=categoryParameters.iterator(); it.hasNext(); )
+		Set paramNames = workitem.getParameterNames();
+		for(Iterator it = paramNames.iterator(); it.hasNext(); )
 		{
 			// System.out.println("Creating panel for: " +
 			// theCategoryProperties.get(i).getTheName());
-			MParameter parameter = (MParameter)it.next();
-			Object initVal = initVals.get(parameter.getName());
-			AbstractInputPanel inputField = InputFieldFactory.createInputPanel(parameter
-					.getName(), parameter.getName(), "", "",
-					theBackgroundColor, true, parameter.getClazz(), initVal);
-			if (parameter.getDirection().equals(MParameter.DIRECTION_IN))
+			String paramName = (String) it.next();
+			Object initVal = workitem.getParameterValue(paramName);
+			AbstractInputPanel inputField = InputFieldFactory.createInputPanel(paramName, paramName, "", "",
+					theBackgroundColor, true, workitem.getParameterType(paramName), initVal);
+			if (workitem.isReadOnly(paramName))
+			{
+				System.out.println("Read only: " + paramName);
 				inputField.setEditable(false);
+				System.out.println(inputField.isEditable());
+			}
 			theInputFields.add(inputField);
 		}
 		AbstractInputPanel[] fields = (AbstractInputPanel[]) theInputFields
@@ -135,7 +140,8 @@ public class GuiCategoryPanel extends JPanel
         while (it.hasNext())
         {
         	AbstractInputPanel panel = (AbstractInputPanel) it.next();
-            ret.put(panel.getName(), panel.getCurrentValue());
+        	if (panel.isEditable())
+            	ret.put(panel.getName(), panel.getCurrentValue());
         }
         return ret;
     }

@@ -1,7 +1,19 @@
-package com.daimler.client.gui;
+package jadex.wfms.client;
 
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.commons.SGUI;
+import jadex.wfms.BasicWfms;
+import jadex.wfms.IWfms;
+import jadex.wfms.service.IAuthenticationService;
+import jadex.wfms.service.IModelRepositoryService;
+import jadex.wfms.service.IRoleService;
+import jadex.wfms.service.IWfmsClientService;
+import jadex.wfms.service.IWorkitemQueueService;
+import jadex.wfms.service.impl.BasicModelRepositoryService;
+import jadex.wfms.service.impl.BasicRoleService;
+import jadex.wfms.service.impl.ClientConnector;
+import jadex.wfms.service.impl.NullAuthenticationService;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -9,8 +21,10 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -24,10 +38,6 @@ import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.JXTaskPane;
 
-import com.daimler.client.connector.ClientConnector;
-import com.daimler.client.connector.UserNotification;
-import com.daimler.client.connector.INotificationStateListener;
-import com.daimler.client.connector.UserNotificationStateChangeEvent;
 import com.daimler.client.gui.components.parts.GuiBackgroundPanel;
 import com.daimler.client.gui.components.parts.GuiHelpBrowser;
 import com.daimler.client.gui.event.AbstractTaskSelectAction;
@@ -37,7 +47,7 @@ import com.daimler.util.swing.autohidepanel.AutoHidePanel;
 import com.daimler.util.swing.autohidepanel.HideablePanelGlassPane;
 import com.daimler.util.swing.layout.EqualsLayout;
 
-public class GuiClient
+public class GuiClient implements IClient
 {
 	private JXFrame mainFrame;
 
@@ -53,21 +63,51 @@ public class GuiClient
 	
 	private Map taskMapping;
 	
-	private UserNotification activeNotification;
+	private IWorkitem activeWorkitem;
 	
 	private GuiHelpBrowser helpBrowser;
 	
-	public GuiClient()
+	private String userName;
+	
+	private IWfmsClientService clientService;
+	
+	public GuiClient(String userName, IWfmsClientService clientService) 
 	{
+		this.userName = userName;
+		this.clientService = clientService;
 		taskMapping = new HashMap();
 		helpBrowser = new GuiHelpBrowser();
 		initMainFrame();
-		ClientConnector.getInstance().addNotificationStateListener(new ConnectorController());
+		clientService.addWorkitemListener(new ConnectorController());
+		synchronized (clientService)
+		{
+			Set workitems = clientService.getAvailableWorkitems(this);
+			for (Iterator it = workitems.iterator(); it.hasNext(); )
+			{
+				IWorkitem workitem = (IWorkitem) it.next();
+				
+				int type = workitem.getType();
+				switch (type)
+				{
+					case IWorkitem.TEXT_INFO_WORKITEM_TYPE:
+						showText(workitem);
+						break;
+						
+					case IWorkitem.DATA_FETCH_WORKITEM_TYPE:
+						fetchData(workitem);
+						break;
+						
+					default:
+						throw new RuntimeException("Unknown Workitem type: " + String.valueOf(type));
+				}
+			}
+		}
+		//ClientConnector.getInstance().addNotificationStateListener(new ConnectorController());
 	}
 	
-	public static void main(String[] args)
+	public String getUserName()
 	{
-		ClientConnector.getInstance();
+		return userName;
 	}
 	
 	public void activateComponent(Component comp)
@@ -75,27 +115,22 @@ public class GuiClient
 		activateComponent(comp, null);
 	}
 	
-	public void activateComponent(final Component comp, final UserNotification notification)
+	public void activateComponent(final Component comp, final IWorkitem workitem)
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				if (notification != null)
+				if (workitem != null)
 				{
-					if (notification.equals(activeNotification))
+					if (workitem.equals(activeWorkitem))
 						return;
-					ClientConnector c = ClientConnector.getInstance();
-					synchronized (c)
+					IWorkitem oldActive = activeWorkitem;
+					activeWorkitem = workitem;
+					if (!clientService.acquireWorkitem(GuiClient.this, workitem))
 					{
-						if (!c.isAvailable(notification))
-							return;
-						if (activeNotification != null)
-						{
-							c.releaseNotification(activeNotification);
-						}
-						activeNotification = notification;
-						c.claimNotification(notification);
+						activeWorkitem = oldActive;
+						return;
 					}
 				}
 				scrollPane.getViewport().setView(comp);
@@ -126,17 +161,26 @@ public class GuiClient
 		return helpBrowser;
 	}
 	
-	public AbstractTaskSelectAction showText(UserNotification notification)
+	public void commitWorkitem(IWorkitem workitem)
 	{
-		ShowInfoTaskSelectAction sitsa = new ShowInfoTaskSelectAction(this, notification);
-		addTaskSelectAction(notification, sitsa);
+		assert workitem != null;
+		activateComponent(emptyLabel);
+		getHelpBrowser().setVisible(false);
+		removeWorkitem(workitem);
+		clientService.commitWorkitem(this, workitem);
+	}
+	
+	public AbstractTaskSelectAction showText(IWorkitem workitem)
+	{
+		ShowInfoTaskSelectAction sitsa = new ShowInfoTaskSelectAction(this, workitem);
+		addTaskSelectAction(workitem, sitsa);
 		return sitsa;
 	}
 	
-	public AbstractTaskSelectAction fetchData(UserNotification notification)
+	public AbstractTaskSelectAction fetchData(IWorkitem workitem)
 	{
-		FetchDataTaskSelectAction fdtsa = new FetchDataTaskSelectAction(this, notification);
-		addTaskSelectAction(notification, fdtsa);
+		FetchDataTaskSelectAction fdtsa = new FetchDataTaskSelectAction(this, workitem);
+		addTaskSelectAction(workitem, fdtsa);
 		return fdtsa;
 	}
 	
@@ -208,6 +252,7 @@ public class GuiClient
 
 		mainFrame.setResizable(false);
 		activateComponent(emptyLabel);
+		mainFrame.setLocation(SGUI.calculateMiddlePosition(mainFrame));
 		mainFrame.setVisible(true);
 	}
 
@@ -221,7 +266,7 @@ public class GuiClient
 		return lbTemp;
 	}
 
-	private void addTaskSelectAction(UserNotification notification, AbstractTaskSelectAction taskAction)
+	private void addTaskSelectAction(IWorkitem workitem, AbstractTaskSelectAction taskAction)
 	{
 		JXTaskPane tpg = null;
 		for (int i = 0; i < taskPanel.getItemCount(); i++)
@@ -241,7 +286,7 @@ public class GuiClient
 		Component c = tpg.add(taskAction);
 		taskAction.setTaskListComponent(c);
 
-		taskMapping.put(notification, taskAction);
+		taskMapping.put(workitem, taskAction);
 		taskPanel.repaint();
 		taskPanel.updateUI();
 		if (emptyLabel.equals(scrollPane.getViewport().getView()))
@@ -251,9 +296,9 @@ public class GuiClient
 		}
 	}
 	
-	private void removeNotification(UserNotification notification)
+	private void removeWorkitem(IWorkitem workitem)
 	{
-		AbstractTaskSelectAction action = (AbstractTaskSelectAction) taskMapping.get(notification);
+		AbstractTaskSelectAction action = (AbstractTaskSelectAction) taskMapping.get(workitem);
 		Component comp = action.getTaskListComponent();
         JXTaskPane tpgTemp;
         for (int i = 0; i < taskPanel.getItemCount(); ++i)
@@ -272,7 +317,7 @@ public class GuiClient
         } else {
             theTaskMapping.remove(ticket);
         }*/
-        taskMapping.remove(notification);
+        taskMapping.remove(workitem);
         taskPanel.repaint();
         taskPanel.updateUI();
         if (taskPanel.getItemCount() == 0) {
@@ -297,9 +342,41 @@ public class GuiClient
         taskPanel.updateUI();
 	}
 	
-	private class ConnectorController implements INotificationStateListener
+	private class ConnectorController implements IWorkitemListener
 	{
-		public void notificationAdded(UserNotificationStateChangeEvent event)
+		public void workitemAdded(WorkitemQueueChangeEvent event)
+		{
+			int type = event.getWorkitem().getType();
+			switch (type)
+			{
+				case IWorkitem.TEXT_INFO_WORKITEM_TYPE:
+					showText(event.getWorkitem());
+					break;
+					
+				case IWorkitem.DATA_FETCH_WORKITEM_TYPE:
+					fetchData(event.getWorkitem());
+					break;
+					
+				default:
+					throw new RuntimeException("Unknown Workitem type: " + String.valueOf(type));
+			}
+		}
+		
+		public void workitemRemoved(WorkitemQueueChangeEvent event)
+		{
+			if (!event.getWorkitem().equals(activeWorkitem))
+			{
+				removeWorkitem(event.getWorkitem());
+				activeWorkitem = null;
+			}
+		}
+		
+		public IClient getClient()
+		{
+			return GuiClient.this;
+		}
+		
+		/*public void notificationAdded(UserNotificationStateChangeEvent event)
 		{
 			int type = event.getNotification().getType();
 			switch (type)
@@ -338,6 +415,6 @@ public class GuiClient
 		{
 			if (!taskMapping.containsKey(event.getNotification()))
 				notificationAdded(event);
-		}
+		}*/
 	}
 }

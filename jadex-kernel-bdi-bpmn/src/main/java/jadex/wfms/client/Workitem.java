@@ -1,5 +1,6 @@
 package jadex.wfms.client;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,9 +12,6 @@ import jadex.commons.concurrent.IResultListener;
  */
 public class Workitem implements IWorkitem
 {
-	public static final int TEXT_INFO_WORKITEM_TYPE = 0;
-	public static final int DATA_FETCH_WORKITEM_TYPE = 1;
-	
 	/** Name of the workitem */
 	private String name;
 	
@@ -32,6 +30,9 @@ public class Workitem implements IWorkitem
 	/** Read-only parameters */
 	private Set readOnlyParameters;
 	
+	/** Whether the workitem has been acquired */
+	private boolean acquired;
+	
 	/** Result Listener when the workitem has been processed. */
 	private IResultListener listener;
 	
@@ -43,6 +44,7 @@ public class Workitem implements IWorkitem
 		this.parameterTypes = parameterTypes;
 		this.parameterValues = parameterValues;
 		this.readOnlyParameters = readOnlyParameters;
+		this.acquired = false;
 		this.listener = listener;
 	}
 	
@@ -77,6 +79,26 @@ public class Workitem implements IWorkitem
 	}
 	
 	/**
+	 * Returns whether the workitem has been acquired.
+	 * 
+	 * @return true, if the workitem has been acquired.
+	 */
+	public boolean isAcquired()
+	{
+		return acquired;
+	}
+	
+	/**
+	 * Sets the workitem acquire state.
+	 * 
+	 * @param acquired workitem acquire state
+	 */
+	public void setAcquired(boolean acquired)
+	{
+		this.acquired = acquired;
+	}
+	
+	/**
 	 * Gets the parameter names.
 	 * 
 	 * @return parameter names
@@ -108,7 +130,24 @@ public class Workitem implements IWorkitem
 	{
 		if (readOnlyParameters.contains(parameterName))
 			throw new IllegalArgumentException("Parameter is read-only: " + parameterName);
+		if (!acquired)
+			throw new IllegalArgumentException("Attempted to write to an unacquired workitem: " + getName() + " " + parameterName);
 		parameterValues.put(parameterName, value);
+	}
+	
+	/**
+	 * Sets the value of multiple parameters.
+	 * 
+	 * @param parameters the parameters
+	 * @throws IllegalArgumentException if the parameter is read-only
+	 */
+	public void setParameterValues(Map parameters)
+	{
+		if ((new HashSet(readOnlyParameters)).removeAll(parameters.keySet()))
+			throw new IllegalArgumentException("Some parameter are read-only.");
+		if (!acquired)
+			throw new IllegalArgumentException("Attempted to write to an unacquired workitem: " + getName());
+		parameterValues.putAll(parameters);
 	}
 	
 	/**

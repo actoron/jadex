@@ -61,7 +61,8 @@ public class StringTextField extends JFormattedTextField implements
 
 	public Object getValue()
 	{
-		return value;
+		Object obj = super.getValue();
+		return obj;
 	}
 
 	public void setValue(Object v)
@@ -87,15 +88,14 @@ public class StringTextField extends JFormattedTextField implements
 
 	public void insertUpdate(DocumentEvent evt)
 	{
-
-		Object obj = getValue();
+		Object obj = super.getValue();
 		if (getFormatter() == null && obj == null)
 		{
 			obj = getText();
 		}
 		try
 		{
-			value = format.parseObject((String) obj);
+			value = format.parseObject((String) obj.toString());
 		} catch (ParseException e)
 		{
 			e.printStackTrace();
@@ -104,14 +104,14 @@ public class StringTextField extends JFormattedTextField implements
 
 	public void removeUpdate(DocumentEvent evt)
 	{
-		Object obj = getValue();
+		Object obj = super.getValue();
 		if (getFormatter() == null && obj == null)
 		{
 			obj = getText();
 		}
 		try
 		{
-			value = format.parseObject((String) obj);
+			value = format.parseObject((String) obj.toString());
 		} catch (ParseException e)
 		{
 			e.printStackTrace();

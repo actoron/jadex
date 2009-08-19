@@ -68,7 +68,7 @@ public class BooleanInputPanel extends AbstractInputPanel
 		// theCheckBox.addActionListener(this);
 	}
 	
-	public void setEditable(boolean editable)
+	protected void setEditableState(boolean editable)
 	{
 		checkBox.setEnabled(editable);
 	}

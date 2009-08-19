@@ -31,13 +31,17 @@ public abstract class AbstractClientTask implements ITask
 		Map parameterTypes = new HashMap();
 		final Map parameterValues = new HashMap();
 		final Set readOnlyParameters = new HashSet();
-		for (Iterator it = context.getModelElement().getParameters().values().iterator(); it.hasNext(); )
+		Map parameters = context.getModelElement().getParameters();
+		if (parameters != null)
 		{
-			MParameter param = (MParameter) it.next();
-			parameterTypes.put(param.getName(), param.getClazz());
-			parameterValues.put(param.getName(), context.getParameterValue(param.getName()));
-			if (param.getDirection().equals(MParameter.DIRECTION_IN))
-				readOnlyParameters.add(param.getName());
+			for (Iterator it = context.getModelElement().getParameters().values().iterator(); it.hasNext(); )
+			{
+				MParameter param = (MParameter) it.next();
+				parameterTypes.put(param.getName(), param.getClazz());
+				parameterValues.put(param.getName(), context.getParameterValue(param.getName()));
+				if (param.getDirection().equals(MParameter.DIRECTION_IN))
+					readOnlyParameters.add(param.getName());
+			}
 		}
 		IResultListener redirListener = new IResultListener()
 		{
@@ -48,7 +52,9 @@ public abstract class AbstractClientTask implements ITask
 				{
 					Map.Entry paramEntry = (Map.Entry) it.next();
 					if (!readOnlyParameters.contains(paramEntry.getKey()))
+					{
 						context.setParameterValue((String) paramEntry.getKey(), paramEntry.getValue());
+					}
 				}
 				listener.resultAvailable(result);
 			}
@@ -58,6 +64,7 @@ public abstract class AbstractClientTask implements ITask
 				listener.exceptionOccurred(exception);
 			}
 		};
-		return new Workitem(context.getModelElement().getName(), type, context.getModelElement().getLane().getName(), parameterTypes, parameterValues, readOnlyParameters, redirListener);
+		System.out.println(context.getModelElement().getLane());
+		return new Workitem(context.getModelElement().getName(), type, "NoRole", parameterTypes, parameterValues, readOnlyParameters, redirListener);
 	}
 }

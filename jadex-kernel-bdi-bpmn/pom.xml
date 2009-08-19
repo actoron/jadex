@@ -45,5 +45,20 @@
   		<artifactId>jadex-platform-base</artifactId>
   		<version>2.0-beta4</version>
   	</dependency>
+  	<dependency>
+  		<groupId>jadex</groupId>
+  		<artifactId>jadex-standalone</artifactId>
+  		<version>2.0-beta4</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>jadex</groupId>
+  		<artifactId>jadex-runtimetools</artifactId>
+  		<version>2.0-beta4</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>jadex</groupId>
+  		<artifactId>jadex-kernel-micro</artifactId>
+  		<version>2.0-beta4</version>
+  	</dependency>
   </dependencies>
 </project>

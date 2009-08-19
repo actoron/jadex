@@ -9,6 +9,8 @@ import java.util.Set;
  */
 public interface IRoleService extends IPlatformService
 {
+	public static final String ALL_ROLES = "all";
+	
 	/**
 	 * Returns the roles of a particular user
 	 * @param userName identifier of the user

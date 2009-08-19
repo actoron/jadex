@@ -117,7 +117,7 @@ public class StringInputPanel extends AbstractInputPanel
 		return labelText;
 	}
 	
-	public void setEditable(boolean editable)
+	protected void setEditableState(boolean editable)
     {
     	textField.setEditable(editable);
     }

@@ -13,8 +13,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import com.daimler.client.gui.GuiClient;
-
 public class ClientConnector
 {
 	private Set availableNotifications;
@@ -30,7 +28,7 @@ public class ClientConnector
 		if (instance == null)
 		{
 			instance = new ClientConnector();
-			new GuiClient();
+			//new GuiClient();
 			//new GuiClient();
 		}
 		return instance;

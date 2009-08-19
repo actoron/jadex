@@ -2,6 +2,8 @@ package com.daimler.client.gui.event;
 
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.wfms.client.GuiClient;
+import jadex.wfms.client.IWorkitem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,19 +13,16 @@ import java.util.Map;
 
 import javax.swing.Action;
 
-import com.daimler.client.connector.ClientConnector;
-import com.daimler.client.connector.UserNotification;
-import com.daimler.client.gui.GuiClient;
 import com.daimler.client.gui.components.GuiDataScrollPanel;
 
 public class FetchDataTaskSelectAction extends AbstractTaskSelectAction{
 
     private GuiDataScrollPanel theDataPanel;
     
-    public FetchDataTaskSelectAction(GuiClient client, UserNotification notification) {
-    	super(client, notification.getContext().getModelElement().getName(), notification);
+    public FetchDataTaskSelectAction(GuiClient client, IWorkitem workitem) {
+    	super(client, workitem.getName(), workitem);
         initAction();
-        initPanel(notification.getContext());
+        initPanel(workitem);
     }
     
     private void initAction() {
@@ -33,19 +32,9 @@ public class FetchDataTaskSelectAction extends AbstractTaskSelectAction{
         putValue(Action.NAME, sTitle);
     }
     
-    private void initPanel(ITaskContext context)
+    private void initPanel(IWorkitem workitem)
     {
-    	Map initVals = new HashMap();
-		for (Iterator it = context.getModelElement().getParameters().values().iterator(); it.hasNext();)
-		{
-			MParameter param = (MParameter) it.next();
-			if ((param.getDirection().equals(MParameter.DIRECTION_INOUT)) ||
-				(param.getDirection().equals(MParameter.DIRECTION_IN)))
-			{
-				initVals.put(param.getName(), context.getParameterValue(param.getName()));
-			}				
-		}
-        theDataPanel = new GuiDataScrollPanel(initVals, context.getModelElement().getParameters().values(), this);
+        theDataPanel = new GuiDataScrollPanel(workitem, this);
         setTheContent(theDataPanel);
     }
     
@@ -69,8 +58,8 @@ public class FetchDataTaskSelectAction extends AbstractTaskSelectAction{
             }
             
             Map data = theDataPanel.getTheData();
-            client.getHelpBrowser().setVisible(false);
-            ClientConnector.getInstance().commitNotification(getNotification(), data);
+            getWorkitem().setParameterValues(data);
+            client.commitWorkitem(getWorkitem());
             
             /*ArrayList<IdentifierValueTuple> fetchedData = theDataPanel.getTheData();
             if (fetchedData != null && fetchedData.size() > 0 && getTheGuiConnector().getTheConfig().getBooleanProperty("Record_Process", false, "GUI_Options")) {

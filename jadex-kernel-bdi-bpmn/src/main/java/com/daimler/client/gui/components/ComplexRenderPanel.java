@@ -74,7 +74,7 @@ public class ComplexRenderPanel extends AbstractInputPanel
 				Component.CENTER_ALIGNMENT), BorderLayout.WEST);
 	}
 	
-	public void setEditable(boolean editable)
+	protected void setEditableState(boolean editable)
     {
     	//TODO: FIXME
     }

@@ -270,7 +270,7 @@ public class CollectionInputPanel extends AbstractInputPanel implements ActionLi
         return null;
     }*/
     
-    public void setEditable(boolean editable)
+    protected void setEditableState(boolean editable)
     {
     	//TODO: FIXME
     }
