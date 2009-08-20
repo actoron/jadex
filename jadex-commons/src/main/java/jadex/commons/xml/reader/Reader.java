@@ -109,6 +109,7 @@ public class Reader
 				
 				QName[] fullpath = (QName[])path.toArray(new QName[path.size()+1]);
 				fullpath[fullpath.length-1] = localname;
+				
 				TypeInfo typeinfo = handler.getTypeInfo(localname, fullpath, rawattrs);
 				
 				// Test if it is an object reference
@@ -425,6 +426,7 @@ public class Reader
 		}
 		catch(Exception e)
 		{
+			System.out.println("problem: "+new String(val));
 			throw new RuntimeException(e);
 		}
 	}

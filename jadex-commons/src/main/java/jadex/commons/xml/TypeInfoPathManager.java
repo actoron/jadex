@@ -46,7 +46,7 @@ public class TypeInfoPathManager
 	 */
 	public TypeInfo getTypeInfo(QName tag, QName[] fullpath, Map rawattributes)
 	{
-		return findTypeInfo((Set)typeinfos.get(tag), fullpath);
+		return findTypeInfo((Set)typeinfos.get(tag), fullpath, rawattributes);
 	}
 	
 	/**
@@ -70,7 +70,7 @@ public class TypeInfoPathManager
 	/**
 	 *  Find type find in the set of type infos.
 	 */
-	protected TypeInfo findTypeInfo(Set typeinfos, QName[] fullpath)
+	protected TypeInfo findTypeInfo(Set typeinfos, QName[] fullpath, Map rawattributes)
 	{
 		TypeInfo ret = null;
 		if(typeinfos!=null)
@@ -79,7 +79,8 @@ public class TypeInfoPathManager
 			{
 				TypeInfo ti = (TypeInfo)it.next();
 				QName[] tmp = ti.getXMLPathElements();
-				boolean ok = tmp==null || tmp.length<=fullpath.length;
+				boolean ok = (ti.getFilter()==null || ti.getFilter().filter(rawattributes)) && 
+					(tmp==null || tmp.length<=fullpath.length);
 				if(tmp!=null)
 				{
 					for(int i=1; i<=tmp.length && ok; i++)
@@ -89,7 +90,6 @@ public class TypeInfoPathManager
 				}
 				if(ok)
 					ret = ti;
-//				if(fullpath.endsWith(tmp.getXMLPathWithoutElement())) // && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
 			}
 		}
 		return ret;

@@ -6,6 +6,7 @@ import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.Namespace;
 import jadex.commons.xml.SXML;
 import jadex.commons.xml.TypeInfo;
+import jadex.commons.xml.bean.BeanProperty;
 import jadex.commons.xml.writer.AbstractObjectWriterHandler;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
@@ -210,6 +211,22 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 		{
 			OAVObjectType otype = (OAVObjectType)info.getTypeInfo();
 			ret = ((IOAVState)context).getType(object).isSubtype(otype);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Test if a value is decodable to the same type.
+	 *  Works for basic (final) types only and checks if the
+	 *  two types are of same class.
+	 */
+	protected boolean isDecodableToSameType(Object property, Object value, Object context)
+	{
+		boolean ret = true;
+		if(value!=null)
+		{
+			OAVAttributeType attr = (OAVAttributeType)property;
+			ret = value.getClass().equals(attr.getType());
 		}
 		return ret;
 	}

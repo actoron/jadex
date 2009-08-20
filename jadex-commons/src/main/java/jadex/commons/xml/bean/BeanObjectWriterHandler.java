@@ -324,5 +324,21 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Test if a value is decodable to the same type.
+	 *  Works for basic (final) types only and checks if the
+	 *  two types are of same class.
+	 */
+	protected boolean isDecodableToSameType(Object property, Object value, Object context)
+	{
+		boolean ret = true;
+		if(value!=null)
+		{
+			BeanProperty prop = (BeanProperty)property;
+			ret = value.getClass().equals(prop.getSetterType());
+		}
+		return ret;
+	}
 }
 

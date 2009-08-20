@@ -178,8 +178,6 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 								if(xmlpath==null)
 									xmlpath = new QName[]{QName.valueOf(getPropertyName(property))};
 								
-//								if(soinfo.isMulti() || value.getClass().isArray()
-//									|| (property.equals(AttributeInfo.THIS) && SReflect.isIterable(value)))
 								// Fetch elements directly if it is a multi subobject
 								if(soinfo.isMulti())
 								{
@@ -227,7 +225,10 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	
 					if(value!=null)
 					{
-						if(isBasicType(property, value))
+						// Make to an attribute when
+						// a) it is a basic type
+						// b) it can be decoded to the right object type
+						if(isBasicType(property, value) && isDecodableToSameType(property, value, context))
 						{
 							if(!value.equals(getDefaultValue(property)))
 								wi.addAttribute(propname, value.toString());
@@ -350,4 +351,9 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	 *  Test if a value is compatible with the defined typeinfo.
 	 */
 	protected abstract boolean isTypeCompatible(Object object, TypeInfo info, Object context);
+	
+	/**
+	 *  Test if a value is decodable to the same type.
+	 */
+	protected abstract boolean isDecodableToSameType(Object property, Object value, Object context); 
 }

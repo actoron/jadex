@@ -1,33 +1,31 @@
-/*
- * BeanProperty.java
- * Copyright (c) 2005 by University of Hamburg. All Rights Reserved.
- * Departament of Informatics. 
- * Distributed Systems and Information Systems.
- *
- * Created by walczak on Mar 22, 2006.  
- * Last revision $Revision: 4401 $ by:
- * $Author: walczak $ on $Date: 2006-06-29 19:27:25 +0200 (Do, 29 Jun 2006) $.
- */
 package jadex.commons.xml.bean;
 
 import java.lang.reflect.Method;
 
 /**
- *  BeanProperty
+ *  This class is a struct for saving data about an inspected bean property.
  */
 public class BeanProperty
 {
+	//-------- attributes --------
 
+	/** The name. */
 	protected String name;
 
+	/** The type. */
 	protected Class	type;
 
+	/** The getter. */
 	protected Method getter;
 
+	/** The setter. */
 	protected Method setter;
 
-	protected Class	setter_type;
+	/** The setter type. */
+	protected Class	settertype;
 
+	//-------- constructors --------
+	
 	/**
 	 *  Create a new bean property.
 	 */
@@ -38,15 +36,17 @@ public class BeanProperty
 	/**
 	 *  Create a new bean property.
 	 */
-	public BeanProperty(String name, Class type, Method getter, Method setter, Class setter_type)
+	public BeanProperty(String name, Class type, Method getter, Method setter, Class settertype)
 	{
 		this.name = name;
 		this.type = type;
 		this.getter = getter;
 		this.setter = setter;
-		this.setter_type = setter_type;
+		this.settertype = settertype;
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Get the name.
 	 *  @return The name.
@@ -121,20 +121,20 @@ public class BeanProperty
 
 	/**
 	 *  Get the setter_type.
-	 *  @return The setter_type.
+	 *  @return The setterttype.
 	 */
-	public Class getSetter_type()
+	public Class getSetterType()
 	{
-		return this.setter_type;
+		return this.settertype;
 	}
 
 	/**
-	 *  Set the setter_type.
-	 *  @param setterType The setter_type to set.
+	 *  Set the setter type.
+	 *  @param settertype The setter type to set.
 	 */
-	public void setSetter_type(Class setterType)
+	public void setSetterType(Class settertype)
 	{
-		this.setter_type = setterType;
+		this.settertype = settertype;
 	}
 
 }

@@ -624,7 +624,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			Class[] ps = ms[i].getParameterTypes();
 			if(ps.length==1)
 			{
-				if(ps[0].isAssignableFrom(clazz))
+				if(SReflect.getWrappedType(ps[0]).isAssignableFrom(clazz))
 				{
 					try
 					{
