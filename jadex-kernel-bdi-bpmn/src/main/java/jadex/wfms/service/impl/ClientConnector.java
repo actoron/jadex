@@ -6,11 +6,11 @@ import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.IWorkitemListener;
 import jadex.wfms.client.Workitem;
 import jadex.wfms.client.WorkitemQueueChangeEvent;
-import jadex.wfms.service.IAuthenticationService;
 import jadex.wfms.service.IBpmnProcessService;
+import jadex.wfms.service.IGpmnProcessService;
 import jadex.wfms.service.IModelRepositoryService;
-import jadex.wfms.service.IRoleService;
-import jadex.wfms.service.IWfmsClientService;
+import jadex.wfms.service.IAAAService;
+import jadex.wfms.service.IClientService;
 import jadex.wfms.service.IWorkitemQueueService;
 
 import java.util.HashMap;
@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class ClientConnector implements IWfmsClientService, IWorkitemQueueService
+public class ClientConnector implements IClientService, IWorkitemQueueService
 {
 	
 	private IWfms wfms;
@@ -51,10 +51,13 @@ public class ClientConnector implements IWfmsClientService, IWorkitemQueueServic
 	/**
 	 * Starts a new BPMN-process
 	 * 
+	 * @param client the client
 	 * @param name name of the process
 	 */
-	public void startBpmnProcess(String name)
+	public void startBpmnProcess(IClient client, String name)
 	{
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.START_BPMN_PROCESS))
+			return;
 		IBpmnProcessService bps = (IBpmnProcessService) wfms.getService(IBpmnProcessService.class);
 		String instanceName = bps.startProcess(name, false);
 		System.out.println("Started process instance " + instanceName);
@@ -63,16 +66,50 @@ public class ClientConnector implements IWfmsClientService, IWorkitemQueueServic
 	/**
 	 * Gets the names of all available BPMN-models
 	 * 
+	 * @param client the client
 	 * @return the names of all available BPMN-models
 	 */
-	public Set getBpmnModelNames()
+	public Set getBpmnModelNames(IClient client)
 	{
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_BPMN_MODEL_NAMES))
+			return null;
 		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
 		return rs.getBpmnModelNames();
 	}
 	
+	/**
+	 * Starts a new GPMN-process
+	 * 
+	 * @param client the client
+	 * @param name name of the process
+	 */
+	public void startGpmnProcess(IClient client, String name)
+	{
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.START_GPMN_PROCESS))
+			return;
+		IGpmnProcessService gps = (IGpmnProcessService) wfms.getService(IGpmnProcessService.class);
+		String instanceName = gps.startProcess(name);
+		System.out.println("Started process instance " + instanceName);
+	}
+	
+	/**
+	 * Gets the names of all available GPMN-models
+	 * 
+	 * @param client the client
+	 * @return the names of all available GPMN-models
+	 */
+	public Set getGpmnModelNames(IClient client)
+	{
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_GPMN_MODEL_NAMES))
+			return null;
+		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		return rs.getGpmnModelNames();
+	}
+	
 	public synchronized void commitWorkitem(IClient client, IWorkitem workitem)
 	{
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.COMMIT_WORKITEM))
+			return;
 		Workitem wi = (Workitem) workitem;
 		assert wi.isAcquired();
 		wi.setAcquired(false);
@@ -81,6 +118,8 @@ public class ClientConnector implements IWfmsClientService, IWorkitemQueueServic
 	
 	public synchronized boolean acquireWorkitem(IClient client, IWorkitem workitem)
 	{
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ACQUIRE_WORKITEM))
+			return false;
 		Set workitems = (Set) workitemQueues.get(workitem.getRole());
 		boolean ret = workitems.remove(workitem);
 		if (ret)
@@ -93,6 +132,8 @@ public class ClientConnector implements IWfmsClientService, IWorkitemQueueServic
 	
 	public synchronized void releaseWorkitem(IClient client, IWorkitem workitem)
 	{
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.RELEASE_WORKITEM))
+			return;
 		assert ((Workitem) workitem).isAcquired();
 		((Workitem) workitem).setAcquired(false);
 		queueWorkitem(workitem);
@@ -100,10 +141,12 @@ public class ClientConnector implements IWfmsClientService, IWorkitemQueueServic
 	
 	public synchronized Set getAvailableWorkitems(IClient client)
 	{
-		IRoleService roleService = (IRoleService) wfms.getService(IRoleService.class);
-		Set roles = roleService.getRoles(client.getUserName());
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_AVAILABLE_WORKITEMS))
+			return null;
+		IAAAService roleService = (IAAAService) wfms.getService(IAAAService.class);
+		Set roles = roleService.getRoles(client);
 		Set workitems = new HashSet();
-		if (roles.contains(IRoleService.ALL_ROLES))
+		if (roles.contains(IAAAService.ALL_ROLES))
 		{
 			for (Iterator it = workitemQueues.values().iterator(); it.hasNext(); )
 			{
@@ -140,13 +183,14 @@ public class ClientConnector implements IWfmsClientService, IWorkitemQueueServic
 	
 	private synchronized void fireWorkitemAddedEvent(IWorkitem workitem)
 	{
-		IRoleService rs = (IRoleService) wfms.getService(IRoleService.class);
+		IAAAService as = (IAAAService) wfms.getService(IAAAService.class);
 		for (Iterator it = workitemListeners.iterator(); it.hasNext(); )
 		{
 			IWorkitemListener listener = (IWorkitemListener) it.next();
-			Set roles = rs.getRoles(listener.getClient().getUserName());
-			if ((roles.contains(workitem.getRole())) || (roles.contains(IRoleService.ALL_ROLES)))
-				listener.workitemAdded(new WorkitemQueueChangeEvent(workitem));
+			WorkitemQueueChangeEvent evt = new WorkitemQueueChangeEvent(workitem);
+			
+			if (as.accessEvent(listener.getClient(), evt))
+				listener.workitemAdded(evt);
 		}
 	}
 	
@@ -155,7 +199,10 @@ public class ClientConnector implements IWfmsClientService, IWorkitemQueueServic
 		for (Iterator it = workitemListeners.iterator(); it.hasNext(); )
 		{
 			IWorkitemListener listener = (IWorkitemListener) it.next();
-			listener.workitemRemoved(new WorkitemQueueChangeEvent(workitem));
+			IAAAService as = (IAAAService) wfms.getService(IAAAService.class);
+			WorkitemQueueChangeEvent evt = new WorkitemQueueChangeEvent(workitem);
+			if (as.accessEvent(listener.getClient(), evt))
+				listener.workitemRemoved(evt);
 		}
 	}
 }

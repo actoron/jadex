@@ -1,26 +1,9 @@
 package jadex.wfms;
 
 import jadex.bridge.IPlatform;
-import jadex.wfms.client.GuiClient;
-import jadex.wfms.client.ProcessStarterClient;
-import jadex.wfms.service.IAuthenticationService;
-import jadex.wfms.service.IBpmnProcessService;
-import jadex.wfms.service.IGpmnProcessService;
-import jadex.wfms.service.IModelRepositoryService;
-import jadex.wfms.service.IRoleService;
-import jadex.wfms.service.IWfmsClientService;
-import jadex.wfms.service.IWorkitemQueueService;
-import jadex.wfms.service.impl.BasicModelRepositoryService;
-import jadex.wfms.service.impl.BasicRoleService;
-import jadex.wfms.service.impl.BpmnProcessService;
-import jadex.wfms.service.impl.ClientConnector;
-import jadex.wfms.service.impl.GpmnProcessService;
-import jadex.wfms.service.impl.NullAuthenticationService;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 
 /**

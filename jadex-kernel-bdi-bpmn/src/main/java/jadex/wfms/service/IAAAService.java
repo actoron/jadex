@@ -1,0 +1,51 @@
+package jadex.wfms.service;
+
+import jadex.wfms.client.IClient;
+import jadex.wfms.client.IWorkitem;
+import jadex.wfms.client.IWorkitemListener;
+
+import java.util.Set;
+
+/** 
+ * Authentication, Access control and Accounting Service.
+ */
+public interface IAAAService
+{
+	/** Keyword representing all roles */
+	public static final String ALL_ROLES = "all";
+	
+	// Actions
+	public static final int ADD_BPMN_PROCESS 		 	= 0;
+	public static final int ADD_GPMN_PROCESS 		 	= 1;
+	public static final int START_BPMN_PROCESS 		 	= 100;
+	public static final int START_GPMN_PROCESS 		 	= 101;
+	public static final int REQUEST_BPMN_MODEL_NAMES 	= 102;
+	public static final int REQUEST_GPMN_MODEL_NAMES 	= 103;
+	public static final int REQUEST_AVAILABLE_WORKITEMS = 104;
+	public static final int COMMIT_WORKITEM			 	= 105;
+	public static final int ACQUIRE_WORKITEM		 	= 106;
+	public static final int RELEASE_WORKITEM		 	= 107;
+	
+	/**
+	 * Checks if a client can access an action
+	 * @param client the client requesting the action
+	 * @param action the action the client is requesting
+	 * @return true, if the client is authorized to perform the action, false otherwise
+	 */
+	public boolean accessAction(IClient client, int action);
+	
+	/**
+	 * Checks if a client can access an event
+	 * @param client the client scheduled to receive the event
+	 * @param event the event
+	 * @return true, if the client is authorized to perform the action, false otherwise
+	 */
+	public boolean accessEvent(IClient client, Object event);
+	
+	/**
+	 * Returns the roles of a particular client
+	 * @param client the client
+	 * @return the roles of the client
+	 */
+	public Set getRoles(IClient client);
+}

@@ -7,21 +7,39 @@ import jadex.wfms.client.IWorkitemListener;
 import java.util.Set;
 
 
-public interface IWfmsClientService
+public interface IClientService
 {
 	/**
 	 * Starts a new BPMN-process
 	 * 
+	 * @param client the client
 	 * @param name name of the process
 	 */
-	public void startBpmnProcess(String name);
+	public void startBpmnProcess(IClient client, String name);
 	
 	/**
 	 * Gets the names of all available BPMN-models
 	 * 
+	 * @param client the client
 	 * @return the names of all available BPMN-models
 	 */
-	public Set getBpmnModelNames();
+	public Set getBpmnModelNames(IClient client);
+	
+	/**
+	 * Starts a new GPMN-process
+	 * 
+	 * @param client the client
+	 * @param name name of the process
+	 */
+	public void startGpmnProcess(IClient client, String name);
+	
+	/**
+	 * Gets the names of all available GPMN-models
+	 * 
+	 * @param client the client
+	 * @return the names of all available GPMN-models
+	 */
+	public Set getGpmnModelNames(IClient client);
 	
 	/**
 	 * Commits an acquired workitem.

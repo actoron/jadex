@@ -1,19 +1,7 @@
 package jadex.wfms.client;
 
-import jadex.bpmn.model.MParameter;
-import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.SGUI;
-import jadex.wfms.BasicWfms;
-import jadex.wfms.IWfms;
-import jadex.wfms.service.IAuthenticationService;
-import jadex.wfms.service.IModelRepositoryService;
-import jadex.wfms.service.IRoleService;
-import jadex.wfms.service.IWfmsClientService;
-import jadex.wfms.service.IWorkitemQueueService;
-import jadex.wfms.service.impl.BasicModelRepositoryService;
-import jadex.wfms.service.impl.BasicRoleService;
-import jadex.wfms.service.impl.ClientConnector;
-import jadex.wfms.service.impl.NullAuthenticationService;
+import jadex.wfms.service.IClientService;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -21,7 +9,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +19,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import javax.swing.border.EmptyBorder;
 
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXPanel;
@@ -69,9 +55,9 @@ public class GuiClient implements IClient
 	
 	private String userName;
 	
-	private IWfmsClientService clientService;
+	private IClientService clientService;
 	
-	public GuiClient(String userName, IWfmsClientService clientService) 
+	public GuiClient(String userName, IClientService clientService) 
 	{
 		this.userName = userName;
 		this.clientService = clientService;
