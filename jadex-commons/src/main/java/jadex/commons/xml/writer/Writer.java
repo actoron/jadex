@@ -90,6 +90,14 @@ public class Writer
 	public void writeObject(XMLStreamWriter writer, Object object, Map writtenobs, QName tag, 
 		List stack, Object context, ClassLoader classloader) throws Exception
 	{
+		// Special case null
+		if(object==null)
+		{
+			writeStartObject(writer, tag==null? SXML.NULL: tag, stack.size());
+			writeEndObject(writer, stack.size());
+			return;
+		}
+		
 //		if(tagname!=null)
 //			System.out.println("tagname: "+tagname);
 		TypeInfo typeinfo = handler.getTypeInfo(object, getXMLPath(stack), context); 
@@ -220,14 +228,22 @@ public class Writer
 			}
 			else if(subob instanceof List && ((List)subob).contains(WriteObjectInfo.SUBTAGMAP))
 			{
+				writeStartObject(writer, subtag, stack.size());
+				writer.writeCharacters(lf);
+				stack.add(new StackElement(subtag, null));
+				
 				List sos = (List)subob;
 				for(int i=0; i<sos.size(); i++)
 				{
 					Object so = sos.get(i);
 					if(WriteObjectInfo.SUBTAGMAP.equals(so))
 						continue;
-					writeObject(writer, so, writtenobs, subtag, stack, context, classloader);
-				}				
+					Object[] info = (Object[])so;
+					writeObject(writer, info[1], writtenobs, (QName)info[0], stack, context, classloader);
+				}			
+				
+				stack.remove(stack.size()-1);
+				writeEndObject(writer, stack.size());
 			}	
 			else
 			{

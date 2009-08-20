@@ -112,21 +112,22 @@ public class WriteObjectInfo
 	}
 	
 	public static final String SUBTAGMAP = "subtagmap";
+
 	/**
 	 * 
 	 */
 	protected void insertSubobject(Map tagmap, QName[] tags, Object subob, int i)
 	{
-		if(i+1==tags.length)
+		if(i+2>=tags.length)
 		{
 			List elems = (List)tagmap.get(tags[i]);
 			if(elems==null)
 			{
 				elems = new ArrayList();
 				elems.add(SUBTAGMAP);
+				tagmap.put(tags[i], elems);
 			}
-			tagmap.put(tags[i], elems);
-			elems.add(subob);
+			elems.add(new Object[]{tags[i+1], subob});
 		}
 		else
 		{
@@ -137,10 +138,39 @@ public class WriteObjectInfo
 				subtagmap.put(SUBTAGMAP, SUBTAGMAP);
 				tagmap.put(tags[i], subtagmap);
 			}
-		
 			insertSubobject(subtagmap, tags, subob, i+1);
 		}
-	}
+	}	
+	
+//	/**
+//	 * 
+//	 */
+//	protected void insertSubobject(Map tagmap, QName[] tags, Object subob, int i)
+//	{
+//		if(i+1==tags.length)
+//		{
+//			List elems = (List)tagmap.get(tags[i]);
+//			if(elems==null)
+//			{
+//				elems = new ArrayList();
+//				elems.add(SUBTAGMAP);
+//			}
+//			tagmap.put(tags[i], elems);
+//			elems.add(subob);
+//		}
+//		else
+//		{
+//			Map subtagmap = (Map)tagmap.get(tags[i]);
+//			if(subtagmap==null)
+//			{
+//				subtagmap = new LinkedHashMap();
+//				subtagmap.put(SUBTAGMAP, SUBTAGMAP);
+//				tagmap.put(tags[i], subtagmap);
+//			}
+//		
+//			insertSubobject(subtagmap, tags, subob, i+1);
+//		}
+//	}
 
 	
 }

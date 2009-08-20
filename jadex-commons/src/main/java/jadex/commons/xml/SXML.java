@@ -1,5 +1,10 @@
 package jadex.commons.xml;
 
+import javax.xml.namespace.QName;
+
+/**
+ *  Constants for xml handling.
+ */
 public class SXML
 {
 	/** The ID attribute constant. */
@@ -11,4 +16,6 @@ public class SXML
 	/** The package protocol constant. */
 	public static final String PROTOCOL_TYPEINFO = "typeinfo:";
 
+	/** The null tag. */
+	public static QName NULL = new QName(SXML.PROTOCOL_TYPEINFO, "null");
 }

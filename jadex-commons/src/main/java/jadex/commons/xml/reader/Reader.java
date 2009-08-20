@@ -34,7 +34,7 @@ public class Reader
 	
 	/** The debug flag. */
 	public static boolean DEBUG = false;
-		
+	
 	//-------- attributes --------
 	
 	/** The object creator. */

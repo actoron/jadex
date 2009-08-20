@@ -150,21 +150,34 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	public QName getTagName(Object object, Object context)
 	{
 		Object[] ret = new Object[2];
-		Class clazz = object.getClass();
-		String clazzname = SReflect.getClassName(clazz);
-		Namespace ns;
-		int idx = clazzname.lastIndexOf(".");
-		String pck = SXML.PROTOCOL_TYPEINFO+clazzname.substring(0, idx);
-		String tag = clazzname.substring(idx+1);
 		
-		// Special case array length
+		String pck;
+		String tag;
+		if(object!=null)
+		{
+			Class clazz = object.getClass();
+			String clazzname = SReflect.getClassName(clazz);
+			Namespace ns;
+			int idx = clazzname.lastIndexOf(".");
+			pck = SXML.PROTOCOL_TYPEINFO+clazzname.substring(0, idx);
+			tag = clazzname.substring(idx+1);
+			
+			// Special case array length
+			
+			if(clazz.isArray())
+				tag = tag.substring(0, tag.length()-2)+"__"+Array.getLength(object);
+			
+			int cnt;
+			
+			
+		}
+		else
+		{
+			pck = SXML.PROTOCOL_TYPEINFO;
+			tag = "null";
+		}
 		
-		if(clazz.isArray())
-			tag = tag.substring(0, tag.length()-2)+"__"+Array.getLength(object);
-		
-		int cnt;
-		
-		ns = (Namespace)namespacebypackage.get(pck);
+		Namespace ns = (Namespace)namespacebypackage.get(pck);
 		if(ns==null)
 		{
 			String prefix = "p"+nscnt;

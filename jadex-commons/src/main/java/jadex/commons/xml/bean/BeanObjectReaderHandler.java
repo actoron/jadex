@@ -10,7 +10,6 @@ import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.TypeInfoPathManager;
 import jadex.commons.xml.TypeInfoTypeManager;
 import jadex.commons.xml.reader.IObjectReaderHandler;
-import jadex.commons.xml.reader.Reader;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
@@ -20,10 +19,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.WeakHashMap;
 
-import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
 /**
@@ -31,6 +28,11 @@ import javax.xml.namespace.QName;
  */
 public class BeanObjectReaderHandler implements IObjectReaderHandler
 {
+	//-------- constants --------
+	
+	/** The null object. */
+	public static final Object NULL = new Object();
+	
 	//-------- attributes --------
 	
 	/** The type info path manager. */
@@ -156,32 +158,40 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		
 		if(type instanceof QName)
 		{
-//			System.out.println("here: "+typeinfo);
 			QName tag = (QName)type;
-			String pck = tag.getNamespaceURI().substring(SXML.PROTOCOL_TYPEINFO.length());
-			String clazzname = pck+"."+tag.getLocalPart();
-			
-			// Special case array
-			int length = -1;
-			int idx = clazzname.indexOf("__");
-			if(idx!=-1)
-			{
-				length = Integer.parseInt(clazzname.substring(idx+2));
-				clazzname = clazzname.substring(0, idx);
+			if(tag.equals(SXML.NULL))
+			{	
+				ret = NULL;
 			}
-			
-			Class clazz = SReflect.classForName0(clazzname, classloader);
-			
-			if(clazz!=null)
+			else
 			{
-				if(length!=-1)
+	//			System.out.println("here: "+typeinfo);
+				
+				String pck = tag.getNamespaceURI().substring(SXML.PROTOCOL_TYPEINFO.length());
+				String clazzname = pck+"."+tag.getLocalPart();
+				
+				// Special case array
+				int length = -1;
+				int idx = clazzname.indexOf("__");
+				if(idx!=-1)
 				{
-					ret = Array.newInstance(clazz, length);
+					length = Integer.parseInt(clazzname.substring(idx+2));
+					clazzname = clazzname.substring(0, idx);
 				}
-				else if(!BasicTypeConverter.isBuiltInType(clazz))
+				
+				Class clazz = SReflect.classForName0(clazzname, classloader);
+				
+				if(clazz!=null)
 				{
-					// Must have empty constructor.
-					ret = clazz.newInstance();
+					if(length!=-1)
+					{
+						ret = Array.newInstance(clazz, length);
+					}
+					else if(!BasicTypeConverter.isBuiltInType(clazz))
+					{
+						// Must have empty constructor.
+						ret = clazz.newInstance();
+					}
 				}
 			}
 		}
@@ -304,7 +314,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			if(cnt==null)
 				cnt = new Integer(0);
 			
-			Array.set(parent, cnt.intValue(), object);
+			if(!NULL.equals(object))
+				Array.set(parent, cnt.intValue(), object);
 			
 			arraycounter.put(parent, new Integer(cnt.intValue()+1));
 			
@@ -388,6 +399,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	protected void setAttributeValue(Object attrinfo, QName xmlattrname, Object object, 
 		Object attrval, Object root, ClassLoader classloader)
 	{
+		if(NULL.equals(attrval))
+			return;
+		
 		boolean set = false;
 		
 		// Write to a map.
@@ -554,7 +568,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			if(conv!=null)// && conv.acceptsInputType(attrval.getClass()))
 				ret = conv.convertObject(attrval, root, classloader, null);
 		}
-	
+			
 		return ret;
 	}
 	

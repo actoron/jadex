@@ -61,7 +61,7 @@ public class Test //extends TestCase
 	{
 		String xml = JavaWriter.objectToXML(wo, null);
 		
-		System.out.println("xml is:"+xml);
+//		System.out.println("xml is:"+xml);
 		
 		Object ro = JavaReader.objectFromXML(xml, null);
 		
@@ -89,7 +89,7 @@ public class Test //extends TestCase
 	{
 		Object[] array = new Object[3]; 
 		array[0] = new Integer(0);
-		array[1] = new Integer(1);
+//		array[1] = new Integer(1);
 		array[2] = new Integer(2);
 		
 		doWriteAndRead(array);
