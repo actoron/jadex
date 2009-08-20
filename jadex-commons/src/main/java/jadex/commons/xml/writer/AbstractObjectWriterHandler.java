@@ -265,7 +265,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 		
 		// Special case that no info about object was found.
 		// Hack?!
-		if(wi.getAttributes()==null && wi.getSubobjects()==null && wi.getContent()==null)
+		if(typeinfo==null && wi.getAttributes()==null && wi.getSubobjects()==null && wi.getContent()==null)
 		{
 			// todo: use prewriter
 			wi.setContent(object.toString());

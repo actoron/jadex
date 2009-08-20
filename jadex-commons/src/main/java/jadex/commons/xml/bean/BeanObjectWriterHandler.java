@@ -6,8 +6,6 @@ import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.Namespace;
 import jadex.commons.xml.SXML;
 import jadex.commons.xml.TypeInfo;
-import jadex.commons.xml.TypeInfoPathManager;
-import jadex.commons.xml.TypeInfoTypeManager;
 import jadex.commons.xml.writer.AbstractObjectWriterHandler;
 
 import java.lang.reflect.Array;
@@ -110,6 +108,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				// Requires Object[].class being registered 
 				if(ret==null && ((Class)type).isArray())
 				{
+//					System.out.println("array: "+type);
 					ret = titmanager.findTypeInfo(titmanager.getTypeInfosByType(Object[].class), fullpath);
 				}
 				
@@ -317,7 +316,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	protected boolean isTypeCompatible(Object object, TypeInfo info, Object context)
 	{
 		boolean ret = true;
-		if(info!=null)
+		if(info!=null && object!=null)
 		{
 			Class clazz = (Class)info.getTypeInfo();
 			ret = clazz.isAssignableFrom(object.getClass());
