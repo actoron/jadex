@@ -1,7 +1,6 @@
 <!--
-	BlackJack application descriptor.
+	<H3>BlackJack application descriptor</H3>
 -->
-
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 

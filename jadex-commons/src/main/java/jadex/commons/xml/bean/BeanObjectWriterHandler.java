@@ -348,7 +348,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		if(value!=null)
 		{
 			BeanProperty prop = (BeanProperty)property;
-			ret = value.getClass().equals(prop.getSetterType());
+			ret = value.getClass().equals(SReflect.getWrappedType(prop.getSetterType()));
 		}
 		return ret;
 	}

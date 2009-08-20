@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3> The Ping Application </H3>
+	
+	Starts pinging agents and agents to be ping'd. 
+-->
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application
+						http://jadex.sourceforge.net/jadex-application-2.0.xsd"
+	name="Ping" package="jadex.bdi.examples.ping">
+	
+	<agenttypes>
+		<agenttype name="Ping" filename="jadex/bdi/examples/ping/Ping.agent.xml"/>
+		<agenttype name="Pinging" filename="jadex.bdi.examples.ping.Pinging"/>
+	</agenttypes>
+	
+	<applications>
+		<application name="Simple Pinging">
+			<agents>
+				<agent type="Ping" name="Ping" />
+				<agent type="Pinging" name="Pinging" />
+			</agents>
+		</application>
+
+		<application name="Multi Pinging">
+			<agents>
+				<agent type="Ping" name="Ping"/>
+				<agent type="Pinging" number="2"/>
+			</agents>
+		</application>
+
+		<application name="Fast Pinging">
+			<agents>
+				<agent type="Ping" name="Ping"/>
+				<agent type="Pinging" name="FastPinging">
+					<arguments>
+						<argument name="ping_delay">
+							500
+						</argument>
+					</arguments>
+				</agent>
+			</agents>
+		</application>
+	</applications>
+	
+</applicationtype>
