@@ -8,11 +8,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Iterator;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.ListModel;
 
 public class ProcessStarterClient extends JFrame implements IClient
 {
@@ -28,7 +31,9 @@ public class ProcessStarterClient extends JFrame implements IClient
 		this.clientService = (IWfmsClientService) wfms.getService(IWfmsClientService.class);
 		this.adminService = (IAdminService) wfms.getService(IAdminService.class);
 		
-		processList = new JList(clientService.getBpmnModelNames().toArray());
+		processList = new JList(new DefaultListModel());
+		for (Iterator it = clientService.getBpmnModelNames().iterator(); it.hasNext(); )
+			((DefaultListModel) processList.getModel()).addElement(it.next());
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
@@ -80,6 +85,9 @@ public class ProcessStarterClient extends JFrame implements IClient
 				  		   										   null,
 																   "");
 				adminService.addBpmnModel(name, path);
+				((DefaultListModel) processList.getModel()).clear();
+				for (Iterator it = clientService.getBpmnModelNames().iterator(); it.hasNext(); )
+					((DefaultListModel) processList.getModel()).addElement(it.next());
 			}
 		});
 		c = new GridBagConstraints();
