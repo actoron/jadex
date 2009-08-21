@@ -170,27 +170,6 @@ public class SubobjectInfo extends AbstractInfo
 		return ret;
 	}
 	
-	/**
-	 *  Create a link info. 
-	 *  @param xmlpath The xmlpath.
-	 *  @param linkinfo The link info.
-	 * /
-	public SubobjectInfo(String xmlpath, AttributeInfo linkinfo)
-	{
-		this(xmlpath, linkinfo, null);
-	}*/
-	
-	/**
-	 *  Create a link info. 
-	 *  @param xmlpath The xmlpath.
-	 *  @param linkinfo The link info.
-	 * /
-	public SubobjectInfo(String xmlpath, AttributeInfo linkinfo, IFilter filter)
-	{
-		super(xmlpath, filter);
-		this.linkinfo = linkinfo;
-	}*/
-	
 	//-------- methods --------
 	
 	/**

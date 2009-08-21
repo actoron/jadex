@@ -39,7 +39,7 @@ public class TypeInfo	extends AbstractInfo
 	protected Map attributeinfos;
 	
 	/** The namespace. */
-	protected Namespace namespace;
+//	protected Namespace namespace;
 	
 	// read
 	
@@ -123,30 +123,12 @@ public class TypeInfo	extends AbstractInfo
 		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
 		SubobjectInfo[] subobjectinfos)
 	{
-		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributeinfos, 
-			postproc, filter, subobjectinfos, null);
-	}
-	
-	/**
-	 *  Create a new type info.
-	 * @param xmlpath The path or tag.
-	 * @param typeinfo The type of object to create.
-	 * @param commentinfo The commnent.
-	 * @param contentinfo The content.
-	 * @param attributeinfos The attributes map.
-	 * @param postproc The post processor. 
-	 */
-	public TypeInfo(TypeInfo supertype, String xmlpath, Object typeinfo, Object commentinfo, 
-		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
-		SubobjectInfo[] subobjectinfos, Namespace namespace)
-	{
 		super(xmlpath, filter);
 		this.supertype = supertype;
 		this.typeinfo = typeinfo;
 		this.commentinfo = commentinfo;
 		this.contentinfo = contentinfo;
 		this.postproc = postproc;
-		this.namespace = namespace;
 		
 		if(attributeinfos!=null)
 			this.attributeinfos = createAttributeInfos(attributeinfos);
@@ -246,7 +228,6 @@ public class TypeInfo	extends AbstractInfo
 		this.commentinfo = commentinfo;
 		this.contentinfo = contentinfo;
 		this.postproc = postproc;
-		this.namespace = namespace;
 		
 		if(attributeinfos!=null)
 			this.attributeinfos = createAttributeInfos(attributeinfos);
@@ -297,11 +278,11 @@ public class TypeInfo	extends AbstractInfo
 	/**
 	 *  Get the namespace.
 	 *  @return The namespace.
-	 */
+	 * /
 	public Namespace getNamespace()
 	{
 		return namespace!=null? namespace: supertype!=null? supertype.getNamespace(): null;
-	}
+	}*/
 	
 	/**
 	 *  Add an attribute info.

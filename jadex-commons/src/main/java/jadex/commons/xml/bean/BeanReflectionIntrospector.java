@@ -10,18 +10,43 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- *
+ *  Introspector for Java beans. It uses the reflection
+ *  to build up a map with property infos (name, read/write method, etc.) 
  */
 public class BeanReflectionIntrospector implements IBeanIntrospector
 {
+	//-------- attributes --------
+	
+	/** The cache for saving time for multiple lookups. */
 	protected LRU beaninfos;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 * Create a new introspector.
+	 */
+	public BeanReflectionIntrospector()
+	{
+		this(200);
+	}
+	
+	/**
+	 * Create a new introspector.
+	 */
+	public BeanReflectionIntrospector(int lrusize)
+	{
+		this.beaninfos = new LRU(lrusize);
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Get the bean properties for a specific clazz.
 	 */
 	public Map getBeanProperties(Class clazz)
 	{
-		Map ret = (Map)(beaninfos!=null? beaninfos.get(clazz): null);
+//		Map ret = (Map)(beaninfos!=null? beaninfos.get(clazz): null);
+		Map ret = (Map)beaninfos.get(clazz);
 		
 		if(ret==null)
 		{
@@ -62,8 +87,8 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 				}
 			}
             
-            if(beaninfos==null)
-            	beaninfos = new LRU(200);
+//            if(beaninfos==null)
+//            	beaninfos = new LRU(200);
             beaninfos.put(clazz, ret);
 		}
             

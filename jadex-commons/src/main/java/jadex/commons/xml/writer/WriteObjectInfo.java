@@ -111,10 +111,12 @@ public class WriteObjectInfo
 		insertSubobject(subobjects, pathname, subobject, 0);
 	}
 	
-	public static final String SUBTAGMAP = "subtagmap";
-
+	
+//	public static final String INTERAL_STRUCTURE = "internal";
 	/**
-	 * 
+	 *  Insert a subobject into the tag map.
+	 *  The tag map saves info about the tags and objects to write.
+	 *  The format is: map([tagname]->map[tagname]->list[Object[]{lasttag, object}]
 	 */
 	protected void insertSubobject(Map tagmap, QName[] tags, Object subob, int i)
 	{
@@ -124,7 +126,7 @@ public class WriteObjectInfo
 			if(elems==null)
 			{
 				elems = new ArrayList();
-				elems.add(SUBTAGMAP);
+//				elems.add(INTERAL_STRUCTURE);
 				tagmap.put(tags[i], elems);
 			}
 			elems.add(new Object[]{tags[i+1], subob});
@@ -135,7 +137,7 @@ public class WriteObjectInfo
 			if(subtagmap==null)
 			{
 				subtagmap = new LinkedHashMap();
-				subtagmap.put(SUBTAGMAP, SUBTAGMAP);
+//				subtagmap.put(INTERAL_STRUCTURE, INTERAL_STRUCTURE);
 				tagmap.put(tags[i], subtagmap);
 			}
 			insertSubobject(subtagmap, tags, subob, i+1);

@@ -118,7 +118,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 					TypeInfo ti = new TypeInfo(ret.getSupertype(), ret.getXMLPath(), 
 						type, ret.getCommentInfo(), ret.getContentInfo(), 
 						ret.getDeclaredAttributeInfos(), ret.getPostProcessor(), ret.getFilter(), 
-						ret.getDeclaredSubobjectInfos(), ret.getNamespace());
+						ret.getDeclaredSubobjectInfos());
 					
 					titmanager.addTypeInfo(ti);
 				}

@@ -101,8 +101,9 @@ public class JavaReader extends Reader
 	}
 	
 	/**
+	 *  Convert an xml to an object.
 	 *  @param val The string value.
-	 *  @return The encoded object.
+	 *  @return The decoded object.
 	 */
 	public static Object objectFromXML(String val, ClassLoader classloader)
 	{
@@ -112,7 +113,10 @@ public class JavaReader extends Reader
 	}
 	
 	/**
-	 * 
+	 *  Convert a byte array (of an xml) to an object.
+	 *  @param val The byte array.
+	 *  @param classloader The class loader.
+	 *  @return The decoded object.
 	 */
 	public static Object objectFromByteArray(byte[] val, ClassLoader classloader)
 	{

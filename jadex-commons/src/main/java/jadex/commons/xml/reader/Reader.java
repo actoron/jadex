@@ -65,7 +65,6 @@ public class Reader
 		XMLStreamReader	parser	= factory.createXMLStreamReader(input);
 		Object root = null;
 		List stack = new ArrayList();
-		List path = new ArrayList();
 		StackElement topse	= null;
 		String comment = null;
 		MultiCollection postprocs = new MultiCollection();
@@ -107,8 +106,7 @@ public class Reader
 				QName localname = parser.getPrefix()==null || parser.getPrefix()==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
 					: new QName(parser.getNamespaceURI(), parser.getLocalName(), parser.getPrefix());
 				
-				QName[] fullpath = (QName[])path.toArray(new QName[path.size()+1]);
-				fullpath[fullpath.length-1] = localname;
+				QName[] fullpath = getXMLPath(stack, localname);
 				
 				TypeInfo typeinfo = handler.getTypeInfo(localname, fullpath, rawattrs);
 				
@@ -119,7 +117,6 @@ public class Reader
 					object = readobjects.get(idref);
 					topse = new StackElement(localname, object, rawattrs, typeinfo);
 					stack.add(topse);
-					path.add(localname);
 				}
 				else
 				{	
@@ -147,7 +144,6 @@ public class Reader
 					
 					topse	= new StackElement(localname, object, rawattrs, typeinfo);
 					stack.add(topse);
-					path.add(localname);
 					if(stack.size()==1)
 					{
 						root = object;
@@ -227,7 +223,7 @@ public class Reader
 //				System.out.println("end: "+parser.getLocalName());
 				QName localname = parser.getPrefix()==null || parser.getPrefix()==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
 					: new QName(parser.getNamespaceURI(), parser.getLocalName(), parser.getPrefix());
-				QName[] fullpath = (QName[])path.toArray(new QName[path.size()]);
+				QName[] fullpath = getXMLPath(stack);
 				final TypeInfo typeinfo = handler.getTypeInfo(localname, fullpath, topse.getRawAttributes());
 
 				// Hack. Change object to content when it is element of its own.
@@ -337,7 +333,6 @@ public class Reader
 				}
 				
 				stack.remove(stack.size()-1);
-				path.remove(path.size()-1);
 				if(stack.size()>0)
 					topse = (StackElement)stack.get(stack.size()-1);
 				else
@@ -366,41 +361,32 @@ public class Reader
 	 *  Get the xml path for a stack.
 	 *  @param stack The stack.
 	 *  @return The string representig the xml stack (e.g. tag1/tag2/tag3)
-	 * /
-	protected String[] getXMLPath(List stack)
+	 */
+	protected QName[] getXMLPath(List stack)
 	{
-//		String[] ret = new String[stack.size()];
-//		for(int i=0; i<stack.size(); i++)
-//		{
-//			ret[i] = ((StackElement)stack.get(i)).getTag();
-//		}
-//		return ret;
-	}*/
+		QName[] ret = new QName[stack.size()];
+		for(int i=0; i<stack.size(); i++)
+		{
+			ret[i] = ((StackElement)stack.get(i)).getTag();
+		}
+		return ret;
+	}
 	
 	/**
 	 *  Get the xml path for a stack.
 	 *  @param stack The stack.
 	 *  @return The string representig the xml stack (e.g. tag1/tag2/tag3)
-	 * /
-	protected String[] getXMLPath(List stack, String tag)
+	 */
+	protected QName[] getXMLPath(List stack, QName tag)
 	{
-//		String[] ret = new String[stack.size()+1];
-//		for(int i=0; i<stack.size(); i++)
-//		{
-//			ret[i] = ((StackElement)stack.get(i)).getTag();
-//		}
-//		ret[ret.length-1] = tag;
-//		return ret;
-		
-//		StringBuffer ret = new StringBuffer();
-//		for(int i=0; i<stack.size(); i++)
-//		{
-//			ret.append(((StackElement)stack.get(i)).getTag());
-//			if(i<stack.size()-1)
-//				ret.append("/");
-//		}
-//		return ret.toString();
-	}*/
+		QName[] ret = new QName[stack.size()+1];
+		for(int i=0; i<stack.size(); i++)
+		{
+			ret[i] = ((StackElement)stack.get(i)).getTag();
+		}
+		ret[ret.length-1] = tag;
+		return ret;		
+	}
 	
 	/**
 	 *  @param val The string value.

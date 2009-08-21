@@ -1,19 +1,15 @@
 package jadex.commons.xml.benchmark;
 
-import jadex.commons.SUtil;
 import jadex.commons.xml.bean.JavaReader;
 import jadex.commons.xml.bean.JavaWriter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import junit.framework.TestCase;
 
 /**
  *  Testcases for writer and reader.

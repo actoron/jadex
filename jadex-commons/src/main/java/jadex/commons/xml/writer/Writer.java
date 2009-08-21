@@ -210,12 +210,12 @@ public class Writer
 		for(Iterator it=subobs.keySet().iterator(); it.hasNext(); )
 		{
 			Object tmp = it.next();
-			if(WriteObjectInfo.SUBTAGMAP.equals(tmp))
-				continue;
+//			if(WriteObjectInfo.INTERAL_STRUCTURE.equals(tmp))
+//				continue;
 				
 			QName subtag = (QName)tmp;
 			Object subob = subobs.get(subtag);
-			if(subob instanceof Map && ((Map)subob).containsKey(WriteObjectInfo.SUBTAGMAP))
+			if(subob instanceof Map)// && ((Map)subob).containsKey(WriteObjectInfo.INTERAL_STRUCTURE))
 			{		
 				writeStartObject(writer, subtag, stack.size());
 				writer.writeCharacters(lf);
@@ -226,7 +226,7 @@ public class Writer
 				stack.remove(stack.size()-1);
 				writeEndObject(writer, stack.size());
 			}
-			else if(subob instanceof List && ((List)subob).contains(WriteObjectInfo.SUBTAGMAP))
+			else if(subob instanceof List)// && ((List)subob).contains(WriteObjectInfo.INTERAL_STRUCTURE))
 			{
 				writeStartObject(writer, subtag, stack.size());
 				writer.writeCharacters(lf);
@@ -236,8 +236,8 @@ public class Writer
 				for(int i=0; i<sos.size(); i++)
 				{
 					Object so = sos.get(i);
-					if(WriteObjectInfo.SUBTAGMAP.equals(so))
-						continue;
+//					if(WriteObjectInfo.INTERAL_STRUCTURE.equals(so))
+//						continue;
 					Object[] info = (Object[])so;
 					writeObject(writer, info[1], writtenobs, (QName)info[0], stack, context, classloader);
 				}			
@@ -247,6 +247,8 @@ public class Writer
 			}	
 			else
 			{
+//				if(subob instanceof Map || subob instanceof List)
+//					System.out.println("here");
 				writeObject(writer, subob, writtenobs, subtag, stack, context, classloader);
 			}
 		}
