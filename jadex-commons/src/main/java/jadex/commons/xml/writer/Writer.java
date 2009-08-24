@@ -1,5 +1,6 @@
 package jadex.commons.xml.writer;
 
+import jadex.commons.xml.QName;
 import jadex.commons.xml.SXML;
 import jadex.commons.xml.StackElement;
 import jadex.commons.xml.TypeInfo;
@@ -14,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.XMLConstants;
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -265,7 +264,7 @@ public class Writer
 		String prefix = tag.getPrefix();
 //		System.out.println("name"+tag.getLocalPart()+" prefix:"+prefix+" writerprefix:"+writer.getPrefix(uri)+" uri:"+uri);
 		
-		if(!XMLConstants.NULL_NS_URI.equals(uri))
+		if(!SXML.NULL_NS_URI.equals(uri))
 		{
 			if(!prefix.equals(writer.getPrefix(uri)))
 			{

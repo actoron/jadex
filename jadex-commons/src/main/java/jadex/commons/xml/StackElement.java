@@ -2,8 +2,6 @@ package jadex.commons.xml;
 
 import java.util.Map;
 
-import javax.xml.namespace.QName;
-
 /**
  *  A struct to represent an element on the stack while parsing.
  */

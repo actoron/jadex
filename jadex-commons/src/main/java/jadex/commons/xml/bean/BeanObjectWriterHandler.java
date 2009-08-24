@@ -4,6 +4,7 @@ import jadex.commons.SReflect;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.Namespace;
+import jadex.commons.xml.QName;
 import jadex.commons.xml.SXML;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.writer.AbstractObjectWriterHandler;
@@ -17,8 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.xml.namespace.QName;
 
 /**
  *  Java bean version for fetching write info for an object. 

@@ -19,7 +19,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
+import jadex.commons.xml.QName;
 
 /**
  *  OAV version for fetching write info for an object. 

@@ -55,8 +55,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.xml.namespace.QName;
-
+import jadex.commons.xml.QName;
 
 /**
  * The Jadex control center.

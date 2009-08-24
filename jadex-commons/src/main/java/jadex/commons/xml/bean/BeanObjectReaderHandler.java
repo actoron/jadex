@@ -5,6 +5,7 @@ import jadex.commons.SUtil;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.ITypeConverter;
+import jadex.commons.xml.QName;
 import jadex.commons.xml.SXML;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.TypeInfoPathManager;
@@ -20,8 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-
-import javax.xml.namespace.QName;
 
 /**
  *  Handler for reading XML into Java beans.
@@ -428,7 +427,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				}
 				else
 				{
-					key =  bai.getAttributeName()!=null? bai.getAttributeName(): xmlattrname;
+					key =  bai.getAttributeIdentifier()!=null? bai.getAttributeIdentifier(): xmlattrname;
 				}
 				
 				if(bai.getReadMethod()!=null)

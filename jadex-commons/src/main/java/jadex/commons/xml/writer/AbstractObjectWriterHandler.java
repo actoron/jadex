@@ -3,6 +3,7 @@ package jadex.commons.xml.writer;
 import jadex.commons.SReflect;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.ITypeConverter;
+import jadex.commons.xml.QName;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.TypeInfoTypeManager;
@@ -11,8 +12,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
-import javax.xml.namespace.QName;
 
 /**
  *  Abstract base class for an object writer handler. Is object type agnostic and

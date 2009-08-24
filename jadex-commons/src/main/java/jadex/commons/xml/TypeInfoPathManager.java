@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.xml.namespace.QName;
-
 /**
  *  Type path info manager. This manager organizes type infos via their paths.
  *  This allows for searching for a type info via a specific tag or subpath of

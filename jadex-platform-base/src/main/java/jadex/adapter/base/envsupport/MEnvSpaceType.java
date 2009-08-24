@@ -45,7 +45,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.text.html.StyleSheet;
-import javax.xml.namespace.QName;
+import jadex.commons.xml.QName;
 
 /**
  *  Java representation of environment space type for xml description.

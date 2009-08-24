@@ -1,8 +1,8 @@
 package jadex.commons.xml.writer;
 
-import javax.xml.namespace.QName;
-
+import jadex.commons.xml.QName;
 import jadex.commons.xml.TypeInfo;
+
 
 /**
  *  Interface for an object writer handler.

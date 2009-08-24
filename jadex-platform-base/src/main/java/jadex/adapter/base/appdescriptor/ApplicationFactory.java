@@ -26,7 +26,7 @@ import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
-import javax.xml.namespace.QName;
+import jadex.commons.xml.QName;
 
 /**
  *  Factory for creating agent applications.

@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.xml.namespace.QName;
-
 /**
  *  The type info type manager organizes type infos via their objects
  *  types. It allows fetching a type info for a given object type. 

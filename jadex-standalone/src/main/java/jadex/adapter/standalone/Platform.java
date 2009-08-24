@@ -36,8 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.xml.namespace.QName;
-
+import jadex.commons.xml.QName;
 
 /**
  *  Built-in standalone agent platform, with onyl basic features.

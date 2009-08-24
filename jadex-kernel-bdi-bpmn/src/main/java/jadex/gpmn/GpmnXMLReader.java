@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
+import jadex.commons.xml.QName;
 
 /**
  *  Reader for loading Gpmn XML models into a Java representation states.

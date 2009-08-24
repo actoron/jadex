@@ -1,11 +1,10 @@
 package jadex.commons.xml.reader;
 
+import jadex.commons.xml.QName;
 import jadex.commons.xml.TypeInfo;
 
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.namespace.QName;
 
 /**
  *  Interface for object reader handler.

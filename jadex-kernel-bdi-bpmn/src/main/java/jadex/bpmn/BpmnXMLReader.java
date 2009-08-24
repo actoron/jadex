@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import javax.xml.namespace.QName;
+import jadex.commons.xml.QName;
 
 /**
  *  Reader for loading Bpmn XML models into a Java representation states.

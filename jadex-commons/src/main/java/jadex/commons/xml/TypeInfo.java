@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.xml.namespace.QName;
-
 /**
  *  Mapping from tag (or path fragment) to OAV type.
  */

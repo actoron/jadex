@@ -2,8 +2,6 @@ package jadex.commons.xml;
 
 import java.util.StringTokenizer;
 
-import javax.xml.namespace.QName;
-
 import jadex.commons.IFilter;
 
 /**

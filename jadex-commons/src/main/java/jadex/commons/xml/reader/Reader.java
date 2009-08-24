@@ -9,6 +9,7 @@ import jadex.commons.xml.SXML;
 import jadex.commons.xml.StackElement;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
+import jadex.commons.xml.QName;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -20,8 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.XMLConstants;
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
@@ -103,7 +102,7 @@ public class Reader
 				}
 				
 				Object object = null;
-				QName localname = parser.getPrefix()==null || parser.getPrefix()==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
+				QName localname = parser.getPrefix()==null || parser.getPrefix()==SXML.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
 					: new QName(parser.getNamespaceURI(), parser.getLocalName(), parser.getPrefix());
 				
 				QName[] fullpath = getXMLPath(stack, localname);
@@ -173,7 +172,7 @@ public class Reader
 						Set attrs = typeinfo==null? Collections.EMPTY_SET: typeinfo.getXMLAttributeNames();
 						for(int i=0; i<parser.getAttributeCount(); i++)
 						{
-							QName attrname = parser.getAttributePrefix(i)==null || parser.getAttributePrefix(i)==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getAttributeLocalName(i))
+							QName attrname = parser.getAttributePrefix(i)==null || parser.getAttributePrefix(i)==SXML.DEFAULT_NS_PREFIX? new QName(parser.getAttributeLocalName(i))
 								: new QName(parser.getAttributeNamespace(i), parser.getAttributeLocalName(i), parser.getAttributePrefix(i));
 
 							if(!attrname.getLocalPart().equals(SXML.ID))
@@ -221,7 +220,7 @@ public class Reader
 			else if(next==XMLStreamReader.END_ELEMENT)
 			{
 //				System.out.println("end: "+parser.getLocalName());
-				QName localname = parser.getPrefix()==null || parser.getPrefix()==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
+				QName localname = parser.getPrefix()==null || parser.getPrefix()==SXML.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
 					: new QName(parser.getNamespaceURI(), parser.getLocalName(), parser.getPrefix());
 				QName[] fullpath = getXMLPath(stack);
 				final TypeInfo typeinfo = handler.getTypeInfo(localname, fullpath, topse.getRawAttributes());

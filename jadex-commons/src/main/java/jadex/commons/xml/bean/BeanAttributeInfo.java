@@ -1,11 +1,10 @@
 package jadex.commons.xml.bean;
 
-import java.lang.reflect.Method;
-
-import javax.xml.namespace.QName;
-
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.ITypeConverter;
+import jadex.commons.xml.QName;
+
+import java.lang.reflect.Method;
 
 
 /**
@@ -150,11 +149,11 @@ public class BeanAttributeInfo extends AttributeInfo
 	/**
 	 *  Get the attribut name.
 	 *  @return The attributename.
-	 */
+	 * /
 	public String getAttributeName()
 	{
 		return (String)getAttributeIdentifier();
-	}
+	}*
 
 	/**
 	 *  Get the attribute converter for reading.

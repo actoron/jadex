@@ -1,7 +1,5 @@
 package jadex.commons.xml;
 
-import javax.xml.namespace.QName;
-
 /**
  *  Base class for attribute infos.
  */

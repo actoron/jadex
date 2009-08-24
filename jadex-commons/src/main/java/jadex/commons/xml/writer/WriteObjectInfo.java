@@ -1,14 +1,12 @@
 package jadex.commons.xml.writer;
 
-import jadex.commons.SUtil;
+import jadex.commons.xml.QName;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
-import javax.xml.namespace.QName;
 
 /**
  *  Info for writing an object.

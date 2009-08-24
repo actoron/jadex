@@ -1,6 +1,7 @@
 package jadex.commons.xml.bean;
 
 import jadex.commons.xml.AttributeInfo;
+import jadex.commons.xml.QName;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.writer.Writer;
@@ -9,8 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.xml.namespace.QName;
 
 /**
  * Java specific reader that supports collection classes and arrays.

@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
+import jadex.commons.xml.QName;
 
 /**
  *  Handler for reading XML into OAV objects.

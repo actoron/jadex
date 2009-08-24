@@ -3,13 +3,9 @@ package jadex.commons.xml;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.StringTokenizer;
 
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.namespace.QName;
 
 
 /**
