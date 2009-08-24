@@ -425,7 +425,7 @@ public class TypeInfo	extends AbstractInfo
 //		}
 		
 		Set subobjects = subobjectinfosread!=null? (Set)subobjectinfosread.get(tag): null;
-		ret = findSubobjectInfo(subobjects, fullpath);
+		ret = findSubobjectInfo(subobjects, fullpath, rawattributes);
 		
 //		Set subobjects = subobjectinfosread!=null? (Set)subobjectinfosread.get(tag): null;			
 //		if(subobjects!=null)
@@ -443,7 +443,7 @@ public class TypeInfo	extends AbstractInfo
 	/**
 	 *  Find a subobject info.
 	 */
-	protected SubobjectInfo findSubobjectInfo(Set soinfos, QName[] fullpath)
+	protected SubobjectInfo findSubobjectInfo(Set soinfos, QName[] fullpath, Map rawattributes)
 	{
 		SubobjectInfo ret = null;
 		if(soinfos!=null)
@@ -452,7 +452,8 @@ public class TypeInfo	extends AbstractInfo
 			{
 				SubobjectInfo si = (SubobjectInfo)it.next();
 				QName[] tmp = si.getXMLPathElementsWithoutElement();
-				boolean ok = true;
+				boolean ok = (si.getFilter()==null || si.getFilter().filter(rawattributes)) && 
+					(tmp==null || tmp.length<=fullpath.length);
 				for(int i=1; i<=tmp.length && ok; i++)
 				{
 					ok = tmp[tmp.length-i].equals(fullpath[fullpath.length-i-1]);

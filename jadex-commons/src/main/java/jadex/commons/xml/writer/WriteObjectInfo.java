@@ -127,7 +127,14 @@ public class WriteObjectInfo
 //				elems.add(INTERAL_STRUCTURE);
 				tagmap.put(tags[i], elems);
 			}
-			elems.add(new Object[]{tags[i+1], subob});
+			try
+			{
+				elems.add(new Object[]{tags[i+1], subob});
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 		else
 		{

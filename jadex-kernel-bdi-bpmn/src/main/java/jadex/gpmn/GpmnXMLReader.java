@@ -81,7 +81,9 @@ public class GpmnXMLReader
 	{
 		Set types = new HashSet();
 		
-		types.add(new TypeInfo(null, "GpmnDiagram", MGpmnModel.class, null, null,
+		String uri = "http://jadex.sourceforge.net/gpmn";
+		
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "GpmnDiagram")}, MGpmnModel.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("ID", "Id"),
 			new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE),
@@ -139,7 +141,6 @@ public class GpmnXMLReader
 //			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge"))
 			new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
 			new SubobjectInfo(new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")),
-
 		}));
 		
 		

@@ -5,7 +5,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 
 /**
- * 
+ *  Service wrapper for a threadpool.
  */
 public class ThreadPoolService implements IThreadPool, IPlatformService
 {
@@ -17,7 +17,7 @@ public class ThreadPoolService implements IThreadPool, IPlatformService
 	//-------- constructors -------- 
 	
 	/**
-	 * 
+	 *  Create a new threadpool service.
 	 */
 	public ThreadPoolService(IThreadPool threadpool)
 	{
