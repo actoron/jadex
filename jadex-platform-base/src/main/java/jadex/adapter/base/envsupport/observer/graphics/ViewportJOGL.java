@@ -204,7 +204,6 @@ public class ViewportJOGL extends AbstractViewport
 	 */
 	public int getRepeatingTexture(GL gl, String path)
 	{
-
 		Integer texture = (Integer)repeatingTextureCache_.get(path);
 		if(texture == null)
 		{

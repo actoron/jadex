@@ -1,5 +1,7 @@
 package jadex.commons.xml.writer;
 
+import jadex.commons.collection.Tree;
+import jadex.commons.collection.TreeNode;
 import jadex.commons.xml.QName;
 import jadex.commons.xml.SXML;
 import jadex.commons.xml.StackElement;
@@ -163,7 +165,7 @@ public class Writer
 				}
 			}
 			
-			if(wi.getContent()==null && (wi.getSubobjects()==null || wi.getSubobjects().size()==0))
+			if(wi.getContent()==null && (wi.getSubobjects()==null || wi.getSubobjects().isEmpty()))
 			{
 				writeEndObject(writer, 0);
 			}
@@ -182,8 +184,8 @@ public class Writer
 				
 				// Subobjects
 				
-				Map subobs = wi.getSubobjects();
-				if(subobs==null || subobs.size()==0)
+				Tree subobs = wi.getSubobjects();
+				if(subobs==null || subobs.isEmpty())
 				{
 					writeEndObject(writer, 0);
 				}
@@ -191,7 +193,7 @@ public class Writer
 				{	
 					writer.writeCharacters(lf);
 					
-					writeSubobjects(writer, subobs, writtenobs, stack, context, classloader, typeinfo);
+					writeSubobjects(writer, subobs.getRootNode(), writtenobs, stack, context, classloader, typeinfo);
 					
 					writeEndObject(writer, stack.size()-1);
 				}
@@ -203,6 +205,37 @@ public class Writer
 	/**
 	 *  Write the subobjects of an object.
 	 */
+	protected void writeSubobjects(XMLStreamWriter writer, TreeNode node, Map writtenobs, 
+		List stack, Object context, ClassLoader classloader, TypeInfo typeinfo) throws Exception
+	{
+		List children = node.getChildren();
+		for(int i=0; i<children.size(); i++)
+		{
+			TreeNode subnode = (TreeNode)children.get(i);
+			Object tmp = subnode.getData();
+			if(tmp instanceof QName)
+			{
+				QName subtag = (QName)tmp; 
+ 
+				writeStartObject(writer, subtag, stack.size());
+				writer.writeCharacters(lf);
+				stack.add(new StackElement(subtag, null));
+ 
+				writeSubobjects(writer, subnode, writtenobs, stack, context, classloader, typeinfo);
+					
+				stack.remove(stack.size()-1);
+				writeEndObject(writer, stack.size());
+			}
+			else
+			{
+				writeObject(writer, ((Object[])tmp)[1], writtenobs, (QName)((Object[])tmp)[0], stack, context, classloader);
+			}
+		}
+	}
+	
+	/**
+	 *  Write the subobjects of an object.
+	 * /
 	protected void writeSubobjects(XMLStreamWriter writer, Map subobs, Map writtenobs, 
 		List stack, Object context, ClassLoader classloader, TypeInfo typeinfo) throws Exception
 	{
@@ -251,7 +284,7 @@ public class Writer
 				writeObject(writer, subob, writtenobs, subtag, stack, context, classloader);
 			}
 		}
-	}
+	}*/
 
 	/**
 	 *  Write the start of an object.

@@ -1,8 +1,9 @@
 package jadex.commons.xml.writer;
 
+import jadex.commons.collection.Tree;
+import jadex.commons.collection.TreeNode;
 import jadex.commons.xml.QName;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +25,9 @@ public class WriteObjectInfo
 	/** The content. */
 	protected String content;
 	
-	/** The subobjects map. */
-	protected Map subobjects;
+	/** The subobjects tree. */
+//	protected Map subobjects;
+	protected Tree subobjects;
 	
 	//-------- methods --------
 
@@ -92,7 +94,7 @@ public class WriteObjectInfo
 	 *  Get the subobjects.
 	 *  @return The subobjects.
 	 */
-	public Map getSubobjects()
+	public Tree getSubobjects()
 	{
 		return this.subobjects;
 	}
@@ -100,84 +102,52 @@ public class WriteObjectInfo
 	/**
 	 *  Add a subobject.
 	 */
-	public void addSubobject(QName[] pathname, Object subobject)
+	public void addSubobject(QName[] pathname, Object subobject, boolean flatten)
 	{
 //		System.out.println("added: "+SUtil.arrayToString(pathname)+" "+subobject);
 		if(subobjects==null)
-			subobjects = new LinkedHashMap();
+			subobjects = new Tree();
 		
-		insertSubobject(subobjects, pathname, subobject, 0);
+		// Build the path in the tree (on each level a decision about flattening needs to be done)
+		TreeNode node = subobjects.getRootNode();
+		for(int i=0; i<pathname.length; i++)
+		{
+			// Never flatten last (object) layer (is this a hack?)
+			node = getOrCreateChild(node, pathname[i], i+1==pathname.length? false: flatten);
+		}
+		
+		// Last node data is [tag, object]
+		node.setData(new Object[]{node.getData(), subobject});
 	}
 	
-	
-//	public static final String INTERAL_STRUCTURE = "internal";
 	/**
-	 *  Insert a subobject into the tag map.
-	 *  The tag map saves info about the tags and objects to write.
-	 *  The format is: map([tagname]->map[tagname]->list[Object[]{lasttag, object}]
+	 *  Get or create a tree child.
 	 */
-	protected void insertSubobject(Map tagmap, QName[] tags, Object subob, int i)
+	protected TreeNode getOrCreateChild(TreeNode node, QName tag, boolean flatten)
 	{
-		if(i+2>=tags.length)
+		TreeNode ret = null;
+		
+		if(flatten)
 		{
-			List elems = (List)tagmap.get(tags[i]);
-			if(elems==null)
+			// Find fitting tag 
+			List children = node.getChildren();
+			if(children!=null)
 			{
-				elems = new ArrayList();
-//				elems.add(INTERAL_STRUCTURE);
-				tagmap.put(tags[i], elems);
-			}
-			try
-			{
-				elems.add(new Object[]{tags[i+1], subob});
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
+				for(int i=0; i<children.size() && ret==null; i++)
+				{
+					TreeNode tmp = (TreeNode)children.get(i);
+					if(tag.equals(tmp.getData()))
+						ret = tmp;
+				}
 			}
 		}
-		else
+		
+		if(ret==null)
 		{
-			Map subtagmap = (Map)tagmap.get(tags[i]);
-			if(subtagmap==null)
-			{
-				subtagmap = new LinkedHashMap();
-//				subtagmap.put(INTERAL_STRUCTURE, INTERAL_STRUCTURE);
-				tagmap.put(tags[i], subtagmap);
-			}
-			insertSubobject(subtagmap, tags, subob, i+1);
+			ret = new TreeNode(tag);
+			node.addChild(ret);
 		}
-	}	
-	
-//	/**
-//	 * 
-//	 */
-//	protected void insertSubobject(Map tagmap, QName[] tags, Object subob, int i)
-//	{
-//		if(i+1==tags.length)
-//		{
-//			List elems = (List)tagmap.get(tags[i]);
-//			if(elems==null)
-//			{
-//				elems = new ArrayList();
-//				elems.add(SUBTAGMAP);
-//			}
-//			tagmap.put(tags[i], elems);
-//			elems.add(subob);
-//		}
-//		else
-//		{
-//			Map subtagmap = (Map)tagmap.get(tags[i]);
-//			if(subtagmap==null)
-//			{
-//				subtagmap = new LinkedHashMap();
-//				subtagmap.put(SUBTAGMAP, SUBTAGMAP);
-//				tagmap.put(tags[i], subtagmap);
-//			}
-//		
-//			insertSubobject(subtagmap, tags, subob, i+1);
-//		}
-//	}
-
-	
+		
+		return ret;
+	}
 }

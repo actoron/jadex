@@ -24,6 +24,9 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	/** Control flag for generating container tags. */
 	protected boolean gentypetags = true;
 	
+	/** The flattening flag for tags, i.e. generate always new containing tags or use one. */
+	protected boolean flattening = true;
+	
 	/** The type info manager. */
 	protected TypeInfoTypeManager titmanager;
 	
@@ -184,7 +187,8 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 										if(isTypeCompatible(val, sotypeinfo, context))
 										{
 											QName[] path = createPath(xmlpath, val, context);
-											wi.addSubobject(path, val);
+											// todo: extract flattening info from subobject info
+											wi.addSubobject(path, val, flattening);
 										}
 									}
 								}
@@ -193,7 +197,8 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 									if(isTypeCompatible(value, sotypeinfo, context))
 									{
 										QName[] path = createPath(xmlpath, value, context);
-										wi.addSubobject(path, value);
+										// todo: extract flattening info from subobject info
+										wi.addSubobject(path, value, flattening);
 									}
 								}
 							}
@@ -250,7 +255,8 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 //							else
 							{
 								QName[] path = createPath(xmlpath, value, context);
-								wi.addSubobject(path, value);
+								// todo: use some default for flattening
+								wi.addSubobject(path, value, flattening);
 							}
 						}
 					}
