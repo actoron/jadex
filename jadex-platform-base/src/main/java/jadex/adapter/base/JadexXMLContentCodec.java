@@ -15,7 +15,7 @@ public class JadexXMLContentCodec implements IContentCodec, Serializable
 	public static final String	JADEX_XML	= "nuggets-xml";
 	
 	/** The debug flag. */
-	protected boolean DEBUG = true;
+	protected boolean DEBUG = false;
 	
 	/**
 	 *  Test if the codec can be used with the provided meta information.
