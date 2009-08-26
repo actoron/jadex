@@ -11,6 +11,7 @@ import jadex.wfms.service.IGpmnProcessService;
 import jadex.wfms.service.IModelRepositoryService;
 import jadex.wfms.service.IAAAService;
 import jadex.wfms.service.IClientService;
+import jadex.wfms.service.IProcessDefinitionService;
 import jadex.wfms.service.IWorkitemQueueService;
 
 import java.util.HashMap;
@@ -49,12 +50,25 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 	}
 	
 	/**
+	 * Requests the Process Definition Service
+	 * 
+	 * @param client the client
+	 * @return the process definition service
+	 */
+	public IProcessDefinitionService getProcessDefinitionService(IClient client)
+	{
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_PD_SERVICE))
+			return null;
+		return (IProcessDefinitionService) wfms.getService(IProcessDefinitionService.class);
+	}
+	
+	/**
 	 * Starts a new BPMN-process
 	 * 
 	 * @param client the client
 	 * @param name name of the process
 	 */
-	public void startBpmnProcess(IClient client, String name)
+	public synchronized void startBpmnProcess(IClient client, String name)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.START_BPMN_PROCESS))
 			return;
@@ -64,46 +78,18 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 	}
 	
 	/**
-	 * Gets the names of all available BPMN-models
-	 * 
-	 * @param client the client
-	 * @return the names of all available BPMN-models
-	 */
-	public Set getBpmnModelNames(IClient client)
-	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_BPMN_MODEL_NAMES))
-			return null;
-		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		return rs.getBpmnModelNames();
-	}
-	
-	/**
 	 * Starts a new GPMN-process
 	 * 
 	 * @param client the client
 	 * @param name name of the process
 	 */
-	public void startGpmnProcess(IClient client, String name)
+	public synchronized void startGpmnProcess(IClient client, String name)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.START_GPMN_PROCESS))
 			return;
 		IGpmnProcessService gps = (IGpmnProcessService) wfms.getService(IGpmnProcessService.class);
 		String instanceName = gps.startProcess(name);
 		System.out.println("Started process instance " + instanceName);
-	}
-	
-	/**
-	 * Gets the names of all available GPMN-models
-	 * 
-	 * @param client the client
-	 * @return the names of all available GPMN-models
-	 */
-	public Set getGpmnModelNames(IClient client)
-	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_GPMN_MODEL_NAMES))
-			return null;
-		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		return rs.getGpmnModelNames();
 	}
 	
 	public synchronized void commitWorkitem(IClient client, IWorkitem workitem)

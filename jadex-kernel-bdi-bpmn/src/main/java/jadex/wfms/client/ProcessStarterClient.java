@@ -1,7 +1,7 @@
 package jadex.wfms.client;
 
 import jadex.wfms.IWfms;
-import jadex.wfms.service.IAdminService;
+import jadex.wfms.service.IProcessDefinitionService;
 import jadex.wfms.service.IClientService;
 
 import java.awt.GridBagConstraints;
@@ -20,21 +20,19 @@ import javax.swing.ListModel;
 public class ProcessStarterClient extends JFrame implements IClient
 {
 	private IClientService clientService;
-	private IAdminService adminService;
 	
 	private JList bpmnProcessList;
 	
 	private JList gpmnProcessList;
 	
-	public ProcessStarterClient(IWfms wfms)
+	public ProcessStarterClient(IClientService clntService)
 	{
 		setLayout(new GridBagLayout());
 		setTitle("BPMN Process Starter");
-		this.clientService = (IClientService) wfms.getService(IClientService.class);
-		this.adminService = (IAdminService) wfms.getService(IAdminService.class);
+		this.clientService = clntService;
 		
 		bpmnProcessList = new JList(new DefaultListModel());
-		for (Iterator it = clientService.getBpmnModelNames(this).iterator(); it.hasNext(); )
+		for (Iterator it = clientService.getProcessDefinitionService(this).getBpmnModelNames(this).iterator(); it.hasNext(); )
 			((DefaultListModel) bpmnProcessList.getModel()).addElement(it.next());
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
@@ -47,7 +45,7 @@ public class ProcessStarterClient extends JFrame implements IClient
 		add(bpmnProcessList, c);
 		
 		gpmnProcessList = new JList(new DefaultListModel());
-		for (Iterator it = clientService.getGpmnModelNames(this).iterator(); it.hasNext(); )
+		for (Iterator it = clientService.getProcessDefinitionService(this).getGpmnModelNames(this).iterator(); it.hasNext(); )
 			((DefaultListModel) gpmnProcessList.getModel()).addElement(it.next());
 		c = new GridBagConstraints();
 		c.gridx = 2;
@@ -79,9 +77,9 @@ public class ProcessStarterClient extends JFrame implements IClient
 				  		   										   null,
 				  		   										   null,
 																   "");
-				adminService.addBpmnModel(ProcessStarterClient.this, name, path);
+				clientService.getProcessDefinitionService(ProcessStarterClient.this).addBpmnModel(ProcessStarterClient.this, name, path);
 				((DefaultListModel) bpmnProcessList.getModel()).clear();
-				for (Iterator it = clientService.getBpmnModelNames(ProcessStarterClient.this).iterator(); it.hasNext(); )
+				for (Iterator it = clientService.getProcessDefinitionService(ProcessStarterClient.this).getBpmnModelNames(ProcessStarterClient.this).iterator(); it.hasNext(); )
 					((DefaultListModel) bpmnProcessList.getModel()).addElement(it.next());
 			}
 		});
@@ -135,9 +133,9 @@ public class ProcessStarterClient extends JFrame implements IClient
 							   									   null,
 							   									   null,
 							   									   "");
-				adminService.addGpmnModel(ProcessStarterClient.this, name, path);
+				clientService.getProcessDefinitionService(ProcessStarterClient.this).addGpmnModel(ProcessStarterClient.this, name, path);
 				((DefaultListModel) gpmnProcessList.getModel()).clear();
-				for (Iterator it = clientService.getGpmnModelNames(ProcessStarterClient.this).iterator(); it.hasNext(); )
+				for (Iterator it = clientService.getProcessDefinitionService(ProcessStarterClient.this).getGpmnModelNames(ProcessStarterClient.this).iterator(); it.hasNext(); )
 					((DefaultListModel) gpmnProcessList.getModel()).addElement(it.next());
 			}
 		});

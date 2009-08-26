@@ -15,8 +15,11 @@ public interface IAAAService
 	public static final String ALL_ROLES = "all";
 	
 	// Actions
-	public static final int ADD_BPMN_PROCESS 		 	= 0;
-	public static final int ADD_GPMN_PROCESS 		 	= 1;
+	public static final int REQUEST_PD_SERVICE	 	 	= 0;
+	public static final int ADD_BPMN_PROCESS_MODEL 	 	= 50;
+	public static final int ADD_GPMN_PROCESS_MODEL 	 	= 51;
+	public static final int REQUEST_BPMN_PROCESS_MODEL	= 52;
+	public static final int REQUEST_GPMN_PROCESS_MODEL	= 53;
 	public static final int START_BPMN_PROCESS 		 	= 100;
 	public static final int START_GPMN_PROCESS 		 	= 101;
 	public static final int REQUEST_BPMN_MODEL_NAMES 	= 102;

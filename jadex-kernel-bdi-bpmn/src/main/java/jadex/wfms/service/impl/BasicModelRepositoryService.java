@@ -7,6 +7,8 @@ import java.util.Set;
 
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.gpmn.GpmnXMLReader;
+import jadex.gpmn.model.MGpmnModel;
 import jadex.wfms.service.IModelRepositoryService;
 
 /**
@@ -106,7 +108,25 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 	 * @param name name of the model
 	 * @return the model
 	 */
-	public synchronized String getGpmnModel(String name)
+	public synchronized MGpmnModel getGpmnModel(String name)
+	{
+		MGpmnModel model = null;
+		try
+		{
+			model = GpmnXMLReader.read(getGpmnModelPath(name), null, null);
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return model;
+	}
+	
+	/**
+	 * Gets a GPMN model path.
+	 * @param name name of the model
+	 * @return path to the model
+	 */
+	public synchronized String getGpmnModelPath(String name)
 	{
 		return (String) gpmnModels.get(name);
 	}

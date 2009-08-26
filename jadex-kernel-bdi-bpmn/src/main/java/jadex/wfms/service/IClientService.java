@@ -10,6 +10,14 @@ import java.util.Set;
 public interface IClientService
 {
 	/**
+	 * Requests the Process Definition Service
+	 * 
+	 * @param client the client
+	 * @return the process definition service
+	 */
+	public IProcessDefinitionService getProcessDefinitionService(IClient client);
+	
+	/**
 	 * Starts a new BPMN-process
 	 * 
 	 * @param client the client
@@ -18,28 +26,12 @@ public interface IClientService
 	public void startBpmnProcess(IClient client, String name);
 	
 	/**
-	 * Gets the names of all available BPMN-models
-	 * 
-	 * @param client the client
-	 * @return the names of all available BPMN-models
-	 */
-	public Set getBpmnModelNames(IClient client);
-	
-	/**
 	 * Starts a new GPMN-process
 	 * 
 	 * @param client the client
 	 * @param name name of the process
 	 */
 	public void startGpmnProcess(IClient client, String name);
-	
-	/**
-	 * Gets the names of all available GPMN-models
-	 * 
-	 * @param client the client
-	 * @return the names of all available GPMN-models
-	 */
-	public Set getGpmnModelNames(IClient client);
 	
 	/**
 	 * Commits an acquired workitem.

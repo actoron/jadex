@@ -1,6 +1,8 @@
 package jadex.wfms.service.impl;
 
 import jadex.adapter.base.fipa.IAMS;
+import jadex.adapter.base.fipa.IAMSAgentDescription;
+import jadex.adapter.base.fipa.IAMSListener;
 import jadex.adapter.standalone.Platform;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IPlatform;
@@ -65,6 +67,22 @@ public class GpmnProcessService implements IGpmnProcessService
 		
 		long startup = System.currentTimeMillis() - starttime;
 		((Platform) platform).getLogger().info("Platform startup time: " + startup + " ms.");
+		
+		((IAMS) platform.getService(IAMS.class)).addAMSListener(new IAMSListener()
+		{
+			
+			public void agentRemoved(IAMSAgentDescription desc)
+			{
+				synchronized(GpmnProcessService.this)
+				{
+					processes.remove(desc.getName().getLocalName());
+				}
+			}
+			
+			public void agentAdded(IAMSAgentDescription desc)
+			{
+			}
+		});
 	}
 	
 	/**
@@ -76,7 +94,7 @@ public class GpmnProcessService implements IGpmnProcessService
 	public synchronized String startProcess(String name)
 	{
 		IModelRepositoryService mr = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		String modelPath = mr.getGpmnModel(name);
+		String modelPath = mr.getGpmnModelPath(name);
 		
 		String tmpName;
 		do

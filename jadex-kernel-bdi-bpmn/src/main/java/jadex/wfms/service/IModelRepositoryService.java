@@ -3,6 +3,7 @@ package jadex.wfms.service;
 import java.util.Set;
 
 import jadex.bpmn.model.MBpmnModel;
+import jadex.gpmn.model.MGpmnModel;
 /**
  * Repository service for accessing process models.
  *
@@ -27,7 +28,14 @@ public interface IModelRepositoryService
 	 * @param name name of the model
 	 * @return the model
 	 */
-	public String getGpmnModel(String name);
+	public MGpmnModel getGpmnModel(String name);
+	
+	/**
+	 * Gets a GPMN model path.
+	 * @param name name of the model
+	 * @return path to the model
+	 */
+	public String getGpmnModelPath(String name);
 	
 	/**
 	 * Gets all available GPMN models.
