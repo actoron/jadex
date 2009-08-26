@@ -14,9 +14,9 @@ import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
-import jadex.bridge.IClockService;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.clock.IClockService;
 
 /**
  *  Process responsible for creating truck agents in response to full wastebins.

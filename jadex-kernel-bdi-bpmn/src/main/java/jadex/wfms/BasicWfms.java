@@ -1,34 +1,39 @@
 package jadex.wfms;
 
-import jadex.bridge.IPlatform;
-
 import java.util.HashMap;
 import java.util.Map;
 
 
 /**
- *  Basic Wfms implementation.
+ *  Basic wfms implementation.
  */
 public class BasicWfms implements IWfms
 {
-	private IPlatform platform;
+	//-------- attributes --------
 	
 	/** Wfms services */
-	private Map services;
+	protected Map services;
 	
-	/** Initializes the Wfms */
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new wfms.
+	 */ 
 	public BasicWfms()
 	{
-		services = new HashMap();
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Add a service to the Wfms.
 	 *  @param type type of service
 	 *  @param service The service.
 	 */
-	public synchronized void addService(Class type, Object service)
+	public void addService(Class type, Object service)
 	{
+		if(services==null)
+			services = new HashMap();
 		services.put(type, service);
 	}
 	
@@ -36,18 +41,19 @@ public class BasicWfms implements IWfms
 	 *  Removes a service from the Wfms.
 	 *  @param type type of service
 	 */
-	public synchronized void removeService(Class type)
+	public void removeService(Class type)
 	{
-		services.remove(type);
+		if(services!=null)
+			services.remove(type);
 	}
 	
 	/**
 	 *  Get a Wfms-service.
 	 *  @param type The service interface/type.
-	 *  @return The corresponding Wfms-service.
+	 *  @return The corresponding wfms-service.
 	 */
-	public synchronized Object getService(Class type)
+	public Object getService(Class type)
 	{
-		return services.get(type);
+		return services==null? null: services.get(type);
 	}
 }

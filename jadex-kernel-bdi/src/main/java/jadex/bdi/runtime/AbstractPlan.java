@@ -25,13 +25,13 @@ import jadex.bdi.runtime.impl.PlanbaseFlyweight;
 import jadex.bdi.runtime.impl.PropertybaseFlyweight;
 import jadex.bdi.runtime.impl.WaitqueueFlyweight;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IClockService;
 import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.state.IOAVState;
+import jadex.service.clock.IClockService;
 
 import java.util.Collection;
 import java.util.HashMap;

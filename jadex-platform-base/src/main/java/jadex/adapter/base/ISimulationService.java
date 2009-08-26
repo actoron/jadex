@@ -1,12 +1,13 @@
 package jadex.adapter.base;
 
-import jadex.bridge.IPlatformService;
 import jadex.commons.IChangeListener;
+import jadex.commons.concurrent.IThreadPool;
+import jadex.service.IService;
 
 /**
  *  Interface for the time simulation service.
  */
-public interface ISimulationService extends IPlatformService
+public interface ISimulationService extends IService
 {
 	//-------- constants --------
 	
@@ -45,7 +46,8 @@ public interface ISimulationService extends IPlatformService
 	 *  Set the clock type.
 	 *  @param type The clock type.
 	 */
-	public void setClockType(String type);
+	// todo: remove thread pool
+	public void setClockType(String type, IThreadPool tp);
 	
 	/**
 	 *  Get the execution mode.

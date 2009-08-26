@@ -5,9 +5,8 @@ import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
-import jadex.bridge.ILibraryService;
-import jadex.commons.IPropertyObject;
 import jadex.commons.SUtil;
+import jadex.service.library.ILibraryService;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;

@@ -6,23 +6,24 @@ import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IAMSListener;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IApplicationFactory;
-import jadex.bridge.ILibraryService;
-import jadex.bridge.IPlatformService;
-import jadex.bridge.Properties;
-import jadex.bridge.Property;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.xml.AbstractInfo;
 import jadex.commons.xml.AttributeInfo;
+import jadex.commons.xml.QName;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.bean.BeanAttributeInfo;
 import jadex.commons.xml.bean.BeanObjectReaderHandler;
 import jadex.commons.xml.bean.BeanObjectWriterHandler;
+import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.service.IService;
+import jadex.service.library.ILibraryService;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -35,8 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
-
-import jadex.commons.xml.QName;
 
 /**
  *  Built-in standalone agent platform, with onyl basic features.
@@ -196,22 +195,24 @@ public class Platform extends AbstractPlatform
 		Property[] props = platconf.getProperties(MESSAGETYPE);
 		for(int i = 0; i < props.length; i++)
 		{
-			messagetypes.put(props[i].getName(), props[i].getJavaObject(fetcher));
+			messagetypes.put(props[i].getName(), SJavaParser.evaluateExpression(props[i].getValue(), fetcher));
 		}
 		
 		// Initialize services.
-		props = platconf.getSubproperty(SERVICES).getProperties();
-		for(int i = 0; i < props.length; i++)
-		{
-			Class type;
-			if(props[i].getType()==null)
-				type = IPlatformService.class;
-			else
-				type = SReflect.classForName0(props[i].getType(), null);
-			if(type==null)
-				throw new RuntimeException("Could not resolve service type: "+props[i].getType());
-			addService(type, props[i].getName(), (IPlatformService)props[i].getJavaObject(fetcher));
-		}
+//		props = platconf.getSubproperty(SERVICES).getProperties();
+		init(platconf.getSubproperty(SERVICES), fetcher);
+		
+//		for(int i = 0; i < props.length; i++)
+//		{
+//			Class type;
+//			if(props[i].getType()==null)
+//				type = IService.class;
+//			else
+//				type = SReflect.classForName0(props[i].getType(), null);
+//			if(type==null)
+//				throw new RuntimeException("Could not resolve service type: "+props[i].getType());
+//			addService(type, props[i].getName(), (IService)SJavaParser.evaluateExpression(props[i].getValue(), fetcher));
+//		}
 
 		this.agentfactory = createAgentFactory(platconf, fetcher);
 		
@@ -245,7 +246,7 @@ public class Platform extends AbstractPlatform
 				for(Iterator it2=tmp.keySet().iterator(); it2.hasNext(); )
 				{
 					Object key2 = it2.next();
-					IPlatformService service = (IPlatformService)tmp.get(key2);
+					IService service = (IService)tmp.get(key2);
 					service.start();
 				}
 			}
@@ -331,7 +332,7 @@ public class Platform extends AbstractPlatform
 			if(af == null)
 				throw new RuntimeException("Agent factory property not configured for kernel.");
 			fetcher.setValue("$props", kernel_props[i]);
-			IAgentFactory fac = (IAgentFactory)af.getJavaObject(fetcher);
+			IAgentFactory fac = (IAgentFactory)SJavaParser.evaluateExpression(af.getValue(), fetcher);
 			factories.add(fac);
 		}
 		return new MetaAgentFactory(factories);
@@ -343,7 +344,7 @@ public class Platform extends AbstractPlatform
 	public IApplicationFactory createApplicationFactory(Properties platconf, SimpleValueFetcher fetcher)
 	{
 		Property af = platconf.getProperty(APPLICATION_FACTORY);
-		IApplicationFactory ret = (IApplicationFactory)af.getJavaObject(fetcher);
+		IApplicationFactory ret = (IApplicationFactory)SJavaParser.evaluateExpression(af.getValue(), fetcher);
 		return ret;
 	}
 	

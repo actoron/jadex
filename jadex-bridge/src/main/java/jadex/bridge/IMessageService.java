@@ -1,18 +1,18 @@
 package jadex.bridge;
 
+import jadex.service.IService;
 
 import java.util.Map;
-
 
 /**
  *  The interface for the message service. It is responsible for
  *  managing the transports and sending/delivering messages.
  */
-public interface IMessageService extends IPlatformService
+public interface IMessageService extends IService
 {
 	/**
 	 *  Send a message.
-	 *  @param cl	The class loader used by the sending agent (i.e. corresponding to classes of objects in the message map).
+	 *  @param cl The class loader used by the sending agent (i.e. corresponding to classes of objects in the message map).
 	 */
 	public void sendMessage(Map message, MessageType msgtype, IAgentIdentifier sender, ClassLoader cl);
 	
@@ -22,35 +22,14 @@ public interface IMessageService extends IPlatformService
 	public void deliverMessage(Map message, String msgtype, IAgentIdentifier[] receivers);
 	
 	/**
-	 *  Adds a transport for the message service.
-	 *  @param transport The transport.
-	 * /
-	public void addTransport(ITransport transport);*/
-	
-	/**
-	 *  Remove a transport for the message service.
-	 *  @param transport The transport.
-	 * /
-	public void removeTransport(ITransport transport);*/
-	
-	/**
-	 *  todo: better method
-	 *  Change transport position.
-	 *  @param up Move up?
-	 *  @param transport The transport to move.
-	 * /
-	public void changeTransportPosition(boolean up, ITransport transport);*/
-	
-	/**
-	 *  Get the transports.
-	 *  @return The transports.
-	 * /
-	public ITransport[] getTransports();*/
-	
-	/**
 	 *  Get addresses of all transports.
 	 *  @return The addresses of all transports.
 	 */
+	// todo: remove
+	// It could be a good idea to NOT have the addresses in the agent identifiers all the time.
+	// Only when sending a message across platform borders the agent identifiers should be 
+	// enhanced with the addresses to enable the other platform answering.
+	// In the local case one could always omit the addresses and try out the services.
 	public String[] getAddresses();
 
 }

@@ -14,11 +14,11 @@ import jadex.bdi.runtime.IPropertybase;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
-import jadex.bridge.IClockService;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
 import jadex.bridge.IPlatform;
 import jadex.rules.state.IOAVState;
+import jadex.service.clock.IClockService;
 
 import java.util.logging.Logger;
 

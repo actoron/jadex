@@ -1,17 +1,16 @@
 package jadex.tools.common.modeltree;
 
 import jadex.adapter.base.ThreadPoolService;
-import jadex.bridge.IApplicationFactory;
-import jadex.bridge.ILibraryService;
-import jadex.bridge.ILibraryServiceListener;
-import jadex.bridge.Properties;
-import jadex.bridge.Property;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.LoadManagingExecutionService;
+import jadex.service.library.ILibraryService;
+import jadex.service.library.ILibraryServiceListener;
 import jadex.tools.common.PopupBuilder;
 import jadex.tools.common.ToolTipAction;
 import jadex.tools.common.plugin.IControlCenter;

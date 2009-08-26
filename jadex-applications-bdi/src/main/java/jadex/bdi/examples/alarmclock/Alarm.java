@@ -1,8 +1,8 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.bridge.IClockService;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
+import jadex.service.clock.IClockService;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

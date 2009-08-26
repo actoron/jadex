@@ -1,8 +1,5 @@
 package jadex.adapter.jade;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import jade.content.Concept;
 import jade.content.ContentElementList;
 import jade.content.ContentManager;
@@ -40,7 +37,9 @@ import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bridge.IContentCodec;
 import jadex.bridge.IKernelAgent;
-import jadex.bridge.ILibraryService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**

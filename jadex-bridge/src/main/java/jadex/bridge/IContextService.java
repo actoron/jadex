@@ -2,6 +2,7 @@ package jadex.bridge;
 
 import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 
 import java.util.Map;
 
@@ -9,7 +10,7 @@ import java.util.Map;
  *  Contexts are an abstract grouping mechanism for agents on a platform,
  *  which is managed using the context service.
  */
-public interface IContextService extends IPlatformService
+public interface IContextService extends IService
 {
 	//-------- constants --------
 	

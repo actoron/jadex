@@ -1,8 +1,7 @@
 package jadex.wfms.client;
 
 /**
- * A client connected to the WFMS.
- *
+ *  A client connected to the WFMS.
  */
 public interface IClient
 {

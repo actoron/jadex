@@ -6,8 +6,8 @@ import jadex.bdi.runtime.IBeliefSetListener;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
-import jadex.bridge.IClockService;
 import jadex.commons.SGUI;
+import jadex.service.clock.IClockService;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

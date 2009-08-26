@@ -2,8 +2,6 @@ package jadex.bdi.interpreter;
 
 import jadex.bdi.runtime.impl.InterpreterTimedObject;
 import jadex.bdi.runtime.impl.InterpreterTimedObjectAction;
-import jadex.bridge.IClockService;
-import jadex.bridge.ITimedObject;
 import jadex.commons.SReflect;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
@@ -20,6 +18,8 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
+import jadex.service.clock.IClockService;
+import jadex.service.clock.ITimedObject;
 
 import java.beans.PropertyChangeListener;
 import java.util.Collection;

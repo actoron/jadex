@@ -3,8 +3,8 @@ package jadex.tools.dfbrowser;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.Properties;
-import jadex.bridge.Property;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.jtable.TableSorter;
 

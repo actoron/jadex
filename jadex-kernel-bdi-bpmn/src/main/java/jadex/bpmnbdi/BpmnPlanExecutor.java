@@ -13,8 +13,8 @@ import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler.EventEndErrorException;
-import jadex.bridge.ILibraryService;
 import jadex.bridge.IPlatform;
+import jadex.service.library.ILibraryService;
 
 import java.io.Serializable;
 import java.util.Iterator;

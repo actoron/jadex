@@ -1,7 +1,7 @@
 package jadex.bdi.examples.alarmclock;
 
 import jadex.bdi.runtime.IExternalAccess;
-import jadex.bridge.IClockService;
+import jadex.service.clock.IClockService;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

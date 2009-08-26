@@ -10,8 +10,6 @@ import jadex.bdi.runtime.impl.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.InterpreterTimedObject;
 import jadex.bdi.runtime.impl.InterpreterTimedObjectAction;
 import jadex.bdi.runtime.impl.MessageEventFlyweight;
-import jadex.bridge.IClockService;
-import jadex.bridge.ITimer;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
@@ -33,6 +31,8 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
+import jadex.service.clock.IClockService;
+import jadex.service.clock.ITimer;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

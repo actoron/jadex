@@ -1,6 +1,5 @@
 package jadex.adapter.standalone;
 
-import jadex.adapter.base.execution.IExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.standalone.ams.AMS;
@@ -8,12 +7,13 @@ import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IClockService;
 import jadex.bridge.IKernelAgent;
 import jadex.bridge.IPlatform;
 import jadex.bridge.MessageType;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.clock.IClockService;
+import jadex.service.execution.IExecutionService;
 
 import java.io.Serializable;
 import java.util.Map;

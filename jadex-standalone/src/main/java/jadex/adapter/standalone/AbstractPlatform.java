@@ -6,16 +6,14 @@ import jadex.bridge.IAgentFactory;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IPlatform;
-import jadex.bridge.IPlatformService;
 import jadex.bridge.MessageType;
+import jadex.commons.Properties;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.javaparser.IValueFetcher;
+import jadex.service.PropertyServiceContainer;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -25,7 +23,7 @@ import java.util.logging.Logger;
 /**
  *  Abstract base class for standalone platform.
  */
-public abstract class AbstractPlatform implements IPlatform
+public abstract class AbstractPlatform extends PropertyServiceContainer implements IPlatform
 {
 	//-------- constants --------
 
@@ -38,7 +36,7 @@ public abstract class AbstractPlatform implements IPlatform
 	//-------- attributes --------
 
 	/** The map of platform services. */
-	protected Map services;
+//	protected Map services;
 
 	/** The optional system agents (ams, df). */
 	protected Set daemonagents;
@@ -68,13 +66,13 @@ public abstract class AbstractPlatform implements IPlatform
 	protected IThreadPool threadpool;
 
 	//-------- methods --------
-
+	
 	/**
 	 *  Add a service to the platform.
 	 *  @param name The name.
 	 *  @param service The service.
-	 */
-	public void addService(Class type, String name, IPlatformService service)
+	 * /
+	public void addService(Class type, String name, IService service)
 	{
 //		System.out.println("Adding service: " + name + " " + type + " " + service);
 		Map tmp = (Map)services.get(type);
@@ -84,14 +82,14 @@ public abstract class AbstractPlatform implements IPlatform
 			services.put(type, tmp);
 		}
 		tmp.put(name, service);
-	}
+	}*/
 
 	/**
 	 *  Add a service to the platform.
 	 *  @param name The name.
 	 *  @param service The service.
-	 */
-	public void removeService(Class type, IPlatformService service)
+	 * /
+	public void removeService(Class type, IService service)
 	{
 		//		System.out.println("Removing service: " + type + " " + service);
 		Map tmp = (Map)services.get(type);
@@ -122,13 +120,13 @@ public abstract class AbstractPlatform implements IPlatform
 
 		if(tmp.size() == 0)
 			services.remove(type);
-	}
+	}*/
 
 	/**
 	 *  Get a platform service.
 	 *  @param type The class.
 	 *  @return The corresponding platform services.
-	 */
+	 * /
 	public Collection getServices(Class type)
 	{
 		Collection	ret	= null;
@@ -140,13 +138,13 @@ public abstract class AbstractPlatform implements IPlatform
 //			throw new RuntimeException("No services found of type: " + type);
 
 		return ret;
-	}
+	}*/
 
 	/**
 	 *  Get a platform service.
 	 *  @param name The name.
 	 *  @return The corresponding platform service.
-	 */
+	 * /
 	public Object getService(Class type, String name)
 	{
 		Object ret	= null;
@@ -156,13 +154,13 @@ public abstract class AbstractPlatform implements IPlatform
 //		if(ret == null)
 //			throw new RuntimeException("Service not found");
 		return ret;
-	}
+	}*/
 
 	/**
 	 *  Get the first declared platform service of a given type.
 	 *  @param type The type.
 	 *  @return The corresponding platform service.
-	 */
+	 * /
 	public Object getService(Class type)
 	{
 		Object ret	= null;
@@ -172,7 +170,7 @@ public abstract class AbstractPlatform implements IPlatform
 //		if(ret == null)
 //			throw new RuntimeException("Service not found");
 		return ret;
-	}
+	}*/
 
 	/**
 	 *  Get the name of the platform
@@ -394,21 +392,22 @@ public abstract class AbstractPlatform implements IPlatform
 				}*/
 
 				// Stop the services.
-				for(Iterator it = services.keySet().iterator(); it.hasNext();)
-				{
-					Object key = it.next();
-					Map tmp = (Map)services.get(key);
-					if(tmp != null)
-					{
-						for(Iterator it2 = tmp.keySet().iterator(); it2.hasNext();)
-						{
-							Object key2 = it2.next();
-							IPlatformService service = (IPlatformService)tmp.get(key2);
-//							System.out.println("Service shutdown: " + service);
-							service.shutdown(null); // Todo: use result listener?
-						}
-					}
-				}
+				AbstractPlatform.super.shutdown(listener);
+//				for(Iterator it = services.keySet().iterator(); it.hasNext();)
+//				{
+//					Object key = it.next();
+//					Map tmp = (Map)services.get(key);
+//					if(tmp != null)
+//					{
+//						for(Iterator it2 = tmp.keySet().iterator(); it2.hasNext();)
+//						{
+//							Object key2 = it2.next();
+//							IService service = (IService)tmp.get(key2);
+////							System.out.println("Service shutdown: " + service);
+//							service.shutdown(null); // Todo: use result listener?
+//						}
+//					}
+//				}
 
 				//				if(listener!=null)
 				//					listener.resultAvailable(null);

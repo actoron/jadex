@@ -3,15 +3,15 @@ package jadex.microkernel;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
-import jadex.bridge.IClockService;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatform;
-import jadex.bridge.ITimedObject;
-import jadex.bridge.ITimer;
 import jadex.bridge.MessageType;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.clock.IClockService;
+import jadex.service.clock.ITimedObject;
+import jadex.service.clock.ITimer;
 
 import java.util.ArrayList;
 import java.util.HashMap;

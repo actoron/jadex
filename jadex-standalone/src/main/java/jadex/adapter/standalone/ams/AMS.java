@@ -2,7 +2,6 @@ package jadex.adapter.standalone.ams;
 
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.contextservice.BaseContext;
-import jadex.adapter.base.execution.IExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IAMSListener;
@@ -18,9 +17,10 @@ import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IMessageService;
-import jadex.bridge.IPlatformService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
+import jadex.service.execution.IExecutionService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  *  Built-in standalone agent platform, with only basic features.
  *  // todo: what about this property change support? where used?
  */
-public class AMS implements IAMS, IPlatformService
+public class AMS implements IAMS, IService
 {
 	//-------- constants --------
 

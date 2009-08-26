@@ -4,14 +4,14 @@ import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.Vector1Long;
-import jadex.adapter.base.execution.IExecutionService;
-import jadex.bridge.IClockService;
 import jadex.bridge.IPlatform;
-import jadex.bridge.ITimedObject;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IExecutable;
+import jadex.service.clock.IClockService;
+import jadex.service.clock.ITimedObject;
+import jadex.service.execution.IExecutionService;
 
 import java.util.Iterator;
 

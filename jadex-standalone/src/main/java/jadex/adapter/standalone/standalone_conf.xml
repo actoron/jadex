@@ -34,8 +34,8 @@
 		<!-- Platform services. -->
 		<properties type="services">
 			<!-- Library service. -->
-			<property type="jadex.bridge.ILibraryService" name="library_service">
-				new jadex.adapter.base.libraryservice.LibraryService()
+			<property type="jadex.service.library.ILibraryService" name="library_service">
+				new jadex.service.library.LibraryService()
 			</property>
 			
 			<!-- Threadpool service. -->
@@ -63,10 +63,10 @@
 			</property>
 			
 			<!-- Clock service. -->
-			<property type="jadex.bridge.IClockService" name="clock_service">
-				new jadex.adapter.base.clock.ClockService(
-					new jadex.adapter.base.clock.SystemClock("system_clock", 100,
-					$platform.getService(jadex.adapter.base.ThreadPoolService.class)), $platform)
+			<property type="jadex.service.clock.IClockService" name="clock_service">
+				new jadex.service.clock.ClockService(
+					new jadex.service.clock.SystemClock("system_clock", 100,
+					$platform.getService(jadex.adapter.base.ThreadPoolService.class)))
 //				new jadex.adapter.base.clock.SimulationEventClock("simulation_clock",
 //					System.currentTimeMillis(), 200))
 			</property>
@@ -77,8 +77,8 @@
 			</property>
 		
 			<!-- Execution service. -->
-			<property type="jadex.adapter.base.execution.IExecutionService" name="execution_service">
-				new jadex.adapter.base.execution.SyncExecutionService(
+			<property type="jadex.service.execution.IExecutionService" name="execution_service">
+				new jadex.service.execution.SyncExecutionService(
 					$platform.getService(jadex.adapter.base.ThreadPoolService.class))
 			</property>
 

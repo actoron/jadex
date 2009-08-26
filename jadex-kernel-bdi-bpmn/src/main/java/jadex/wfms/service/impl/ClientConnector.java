@@ -6,21 +6,22 @@ import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.IWorkitemListener;
 import jadex.wfms.client.Workitem;
 import jadex.wfms.client.WorkitemQueueChangeEvent;
-import jadex.wfms.service.IBpmnProcessService;
-import jadex.wfms.service.IGpmnProcessService;
-import jadex.wfms.service.IModelRepositoryService;
 import jadex.wfms.service.IAAAService;
 import jadex.wfms.service.IClientService;
+import jadex.wfms.service.IModelRepositoryService;
 import jadex.wfms.service.IProcessDefinitionService;
 import jadex.wfms.service.IWorkitemQueueService;
 
+import java.security.AccessControlException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-
+/**
+ * 
+ */
 public class ClientConnector implements IClientService, IWorkitemQueueService
 {
 	
@@ -70,11 +71,45 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 	 */
 	public synchronized void startBpmnProcess(IClient client, String name)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.START_BPMN_PROCESS))
-			return;
-		IBpmnProcessService bps = (IBpmnProcessService) wfms.getService(IBpmnProcessService.class);
-		String instanceName = bps.startProcess(name, false);
-		System.out.println("Started process instance " + instanceName);
+		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.START_BPMN_PROCESS))
+			throw new AccessControlException("Not allowed: "+client);
+		
+		IModelRepositoryService rs = (IModelRepositoryService)wfms.getService(IModelRepositoryService.class);
+		String filename = rs.getProcessModelPath(name);
+		
+		IExecutionService bps = (IExecutionService)wfms.getService(IExecutionService.class);
+		Object id  = bps.startProcess(filename, null, null, false);
+		System.out.println("Started process instance " + id);
+	}
+	
+	/**
+	 * Gets the names of all available BPMN-models
+	 * 
+	 * @param client the client
+	 * @return the names of all available BPMN-models
+	 */
+	public Set getBpmnModelNames(IClient client)
+	{
+		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_BPMN_MODEL_NAMES))
+			throw new AccessControlException("Not allowed: "+client);
+		
+		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		return new HashSet(rs.getModelNames());
+	}
+	
+	/**
+	 * Gets the names of all available BPMN-models
+	 * 
+	 * @param client the client
+	 * @return the names of all available BPMN-models
+	 */
+	public Set getGpmnModelNames(IClient client)
+	{
+		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_BPMN_MODEL_NAMES))
+			throw new AccessControlException("Not allowed: "+client);
+		
+		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		return new HashSet(rs.getModelNames());
 	}
 	
 	/**
@@ -85,11 +120,15 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 	 */
 	public synchronized void startGpmnProcess(IClient client, String name)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.START_GPMN_PROCESS))
-			return;
-		IGpmnProcessService gps = (IGpmnProcessService) wfms.getService(IGpmnProcessService.class);
-		String instanceName = gps.startProcess(name);
-		System.out.println("Started process instance " + instanceName);
+		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.START_BPMN_PROCESS))
+			throw new AccessControlException("Not allowed: "+client);
+		
+		IModelRepositoryService rs = (IModelRepositoryService)wfms.getService(IModelRepositoryService.class);
+		String filename = rs.getProcessModelPath(name);
+		
+		IExecutionService bps = (IExecutionService)wfms.getService(IExecutionService.class);
+		Object id  = bps.startProcess(filename, null, null, false);
+		System.out.println("Started process instance " + id);
 	}
 	
 	public synchronized void commitWorkitem(IClient client, IWorkitem workitem)

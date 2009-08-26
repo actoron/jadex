@@ -9,9 +9,9 @@ import jadex.adapter.base.envsupport.observer.gui.plugin.IObserverCenterPlugin;
 import jadex.adapter.base.envsupport.observer.gui.plugin.IntrospectorPlugin;
 import jadex.adapter.base.envsupport.observer.gui.plugin.VisualsPlugin;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
-import jadex.bridge.IClockService;
-import jadex.bridge.ILibraryService;
 import jadex.commons.IChangeListener;
+import jadex.service.clock.IClockService;
+import jadex.service.library.ILibraryService;
 
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -19,7 +19,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,6 +32,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -197,16 +197,17 @@ public class ObserverCenter
 		}
 		else
 		{
-			try
-			{
-				EventQueue.invokeAndWait(init);
-			}
-			catch (InterruptedException e)
-			{
-			}
-			catch (InvocationTargetException e)
-			{
-			}
+//			try
+//			{
+//				EventQueue.invokeAndWait(init);
+				EventQueue.invokeLater(init);
+//			}
+//			catch (InterruptedException e)
+//			{
+//			}
+//			catch (InvocationTargetException e)
+//			{
+//			}
 		}
 	}
 	
@@ -228,7 +229,7 @@ public class ObserverCenter
 	 */
 	public void addDataView(String name, IDataView dataview)
 	{
-		synchronized (dataview)
+		synchronized(externaldataviews)
 		{
 			externaldataviews.put(name, dataview);
 			if (selecteddataviewname == null)
@@ -291,18 +292,41 @@ public class ObserverCenter
 	 * @param name name of the perspective
 	 * @param perspective the perspective
 	 */
-	public void addPerspective(String name, IPerspective perspective)
+	public void addPerspective(final String name, final IPerspective perspective)
 	{
-		synchronized(perspective)
+		if(SwingUtilities.isEventDispatchThread())
 		{
-			perspective.setObserverCenter(this);
-			perspective.setName(name);
-			perspectives.put(name, perspective);
-			if (perspectives.size() == 1)
+			synchronized(perspectives)
 			{
-				setSelectedPerspective(name);
+				perspective.setObserverCenter(this);
+				perspective.setName(name);
+				perspectives.put(name, perspective);
+				if (perspectives.size() == 1)
+				{
+					setSelectedPerspective(name);
+				}
 			}
 		}
+		else
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run() 
+				{
+					synchronized(perspectives)
+					{
+						perspective.setObserverCenter(ObserverCenter.this);
+						perspective.setName(name);
+						perspectives.put(name, perspective);
+						if (perspectives.size() == 1)
+						{
+							setSelectedPerspective(name);
+						}
+					}
+				}
+			});
+		}
+		
 	}
 	
 	/**
@@ -341,15 +365,35 @@ public class ObserverCenter
 	 * 
 	 *  @param name name of the perspective
 	 */
-	public void setSelectedPerspective(String name)
+	public void setSelectedPerspective(final String name)
 	{
-		synchronized(perspectives)
+		if(SwingUtilities.isEventDispatchThread())
 		{
-			IPerspective perspective = (IPerspective) perspectives.get(name);
-			perspective.setObserverCenter(this);
-			selectedperspective = perspective;
-			mainwindow.setPerspectiveView(perspective.getView());
-			perspective.setSelectedObject(null);
+			synchronized(perspectives)
+			{
+				IPerspective perspective = (IPerspective)perspectives.get(name);
+				perspective.setObserverCenter(this);
+				selectedperspective = perspective;
+				mainwindow.setPerspectiveView(perspective.getView());
+				perspective.setSelectedObject(null);
+			}
+		}
+		else
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run() 
+				{
+					synchronized(perspectives)
+					{
+						IPerspective perspective = (IPerspective)perspectives.get(name);
+						perspective.setObserverCenter(ObserverCenter.this);
+						selectedperspective = perspective;
+						mainwindow.setPerspectiveView(perspective.getView());
+						perspective.setSelectedObject(null);
+					}
+				}
+			});
 		}
 	}
 	
@@ -457,7 +501,7 @@ public class ObserverCenter
 	
 	private void activatePlugin(IObserverCenterPlugin plugin)
 	{
-		synchronized (this.plugins)
+		synchronized(this.plugins)
 		{
 			IObserverCenterPlugin oldPlugin = activeplugin;
 			if (oldPlugin != null)

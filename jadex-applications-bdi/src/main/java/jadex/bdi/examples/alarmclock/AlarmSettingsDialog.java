@@ -2,8 +2,8 @@ package jadex.bdi.examples.alarmclock;
 
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
-import jadex.bridge.IClockService;
 import jadex.commons.SGUI;
+import jadex.service.clock.IClockService;
 
 import java.awt.Dialog;
 import java.awt.Dimension;

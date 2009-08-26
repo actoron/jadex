@@ -1,8 +1,8 @@
 package jadex.tools.common;
 
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.bridge.Properties;
-import jadex.bridge.Property;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;

@@ -5,9 +5,9 @@ import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IAMSListener;
 import jadex.bridge.IApplicationFactory;
-import jadex.bridge.IPlatformService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -196,7 +196,7 @@ public class SpringPlatform extends AbstractPlatform
 				for(Iterator it2=tmp.keySet().iterator(); it2.hasNext(); )
 				{
 					Object key2 = it2.next();
-					IPlatformService service = (IPlatformService)tmp.get(key2);
+					IService service = (IService)tmp.get(key2);
 					service.start();
 				}
 			}

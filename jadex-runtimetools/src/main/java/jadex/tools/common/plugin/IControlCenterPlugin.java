@@ -1,6 +1,6 @@
 package jadex.tools.common.plugin;
 
-import jadex.bridge.Properties;
+import jadex.commons.Properties;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;

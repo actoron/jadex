@@ -16,7 +16,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- *  A rule system executor can execute rule systems on a separate thread.
+ *  A bpmn process executor can execute a bpmn instance on a separate thread.
  */
 public class BpmnExecutor	implements IBpmnExecutor, ISteppable
 {

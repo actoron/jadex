@@ -1,5 +1,6 @@
 package jadex.wfms.service.impl;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import jadex.bpmn.model.MBpmnModel;
@@ -32,7 +33,7 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_BPMN_PROCESS_MODEL))
 			return;
 		BasicModelRepositoryService mr = (BasicModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		mr.addBpmnModel(name, path);
+		mr.addProcessModel(name, path);
 	}
 	
 	/**
@@ -45,7 +46,10 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_BPMN_PROCESS_MODEL))
 			return null;
 		IModelRepositoryService mr = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		return mr.getBpmnModel(name);
+		
+		// todo:
+		return null;
+//		return mr.getBpmnModel(name);
 	}
 	
 	/**
@@ -59,7 +63,7 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_BPMN_MODEL_NAMES))
 			return null;
 		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		return rs.getBpmnModelNames();
+		return new HashSet(rs.getModelNames());
 	}
 	
 	/**
@@ -73,7 +77,7 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_GPMN_PROCESS_MODEL))
 			return;
 		BasicModelRepositoryService mr = (BasicModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		mr.addGpmnModel(name, path);
+		mr.addProcessModel(name, path);
 	}
 	
 	/**
@@ -86,7 +90,10 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_GPMN_PROCESS_MODEL))
 			return null;
 		IModelRepositoryService mr = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		return mr.getGpmnModel(name);
+		
+		// todo:
+		return null;
+//		return mr.getGpmnModel(name);
 	}
 	
 	/**
@@ -100,6 +107,6 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_GPMN_MODEL_NAMES))
 			return null;
 		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		return rs.getGpmnModelNames();
+		return new HashSet(rs.getModelNames());
 	}
 }

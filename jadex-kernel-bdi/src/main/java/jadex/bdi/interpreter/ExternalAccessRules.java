@@ -1,7 +1,6 @@
 package jadex.bdi.interpreter;
 
 import jadex.bdi.runtime.impl.WakeupAction;
-import jadex.bridge.ITimer;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
@@ -16,6 +15,7 @@ import jadex.rules.rulesystem.rules.OrConstraint;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
+import jadex.service.clock.ITimer;
 
 /**
  *  Rules for the external access.

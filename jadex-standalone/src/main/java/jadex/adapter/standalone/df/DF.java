@@ -13,10 +13,10 @@ import jadex.adapter.standalone.fipaimpl.DFAgentDescription;
 import jadex.adapter.standalone.fipaimpl.DFServiceDescription;
 import jadex.adapter.standalone.fipaimpl.SearchConstraints;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IClockService;
-import jadex.bridge.IPlatformService;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
+import jadex.service.clock.IClockService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,7 +27,7 @@ import java.util.Set;
 /**
  *  Directory facilitator implementation for standalone platform.
  */
-public class DF implements IDF, IPlatformService
+public class DF implements IDF, IService
 {
 	//-------- attributes --------
 

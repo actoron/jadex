@@ -3,14 +3,14 @@ package jadex.bdi.interpreter;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IKernelAgent;
-import jadex.bridge.ILibraryService;
-import jadex.bridge.ILibraryServiceListener;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
+import jadex.service.library.ILibraryService;
+import jadex.service.library.ILibraryServiceListener;
 
 import java.net.URL;
 import java.util.Map;

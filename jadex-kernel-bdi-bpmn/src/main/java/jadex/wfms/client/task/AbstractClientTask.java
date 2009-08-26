@@ -15,7 +15,6 @@ import jadex.wfms.client.Workitem;
 
 /**
  * Abstract class for client interactions.
- *
  */
 public abstract class AbstractClientTask implements ITask
 {

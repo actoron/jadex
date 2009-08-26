@@ -1,13 +1,13 @@
 package jadex.adapter.base;
 
-import jadex.bridge.IPlatformService;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.service.IService;
 
 /**
  *  Service wrapper for a threadpool.
  */
-public class ThreadPoolService implements IThreadPool, IPlatformService
+public class ThreadPoolService implements IThreadPool, IService
 {
 	//-------- attributes --------
 	

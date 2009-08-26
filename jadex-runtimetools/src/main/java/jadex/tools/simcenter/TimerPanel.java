@@ -1,10 +1,10 @@
 package jadex.tools.simcenter;
 
-import jadex.adapter.base.clock.Timer;
-import jadex.bridge.IClockService;
-import jadex.bridge.ITimer;
 import jadex.commons.collection.SCollection;
 import jadex.commons.jtable.ObjectTableModel;
+import jadex.service.clock.IClockService;
+import jadex.service.clock.ITimer;
+import jadex.service.clock.Timer;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

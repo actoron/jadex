@@ -8,8 +8,8 @@ import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Int;
 import jadex.adapter.base.envsupport.math.Vector2Int;
-import jadex.bridge.IClockService;
 import jadex.commons.SimplePropertyObject;
+import jadex.service.clock.IClockService;
 
 import java.util.HashMap;
 import java.util.Iterator;

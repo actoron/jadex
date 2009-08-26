@@ -1,11 +1,11 @@
 package jadex.tools.libtool;
 
-import jadex.bridge.ILibraryService;
-import jadex.bridge.ILibraryServiceListener;
-import jadex.bridge.Properties;
-import jadex.bridge.Property;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.service.library.ILibraryService;
+import jadex.service.library.ILibraryServiceListener;
 import jadex.tools.common.EditableList;
 import jadex.tools.common.EditableListEvent;
 import jadex.tools.common.plugin.AbstractJCCPlugin;

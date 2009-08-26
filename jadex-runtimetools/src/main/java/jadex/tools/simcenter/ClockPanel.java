@@ -1,6 +1,8 @@
 package jadex.tools.simcenter;
 
-import jadex.bridge.IClock;
+import jadex.adapter.base.ThreadPoolService;
+import jadex.commons.concurrent.IThreadPool;
+import jadex.service.clock.IClock;
 
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -193,6 +195,7 @@ public class ClockPanel extends AbstractTimePanel
 		//this.add(buts, new GridBagConstraints(x=0,++y,2,1,1,0,
 		//	GridBagConstraints.EAST,GridBagConstraints.NONE,new Insets(4,2,2,4),0,0));
 	
+		final IThreadPool tp = (IThreadPool)getPlatform().getService(ThreadPoolService.class);
 		emode.addItemListener(new ItemListener()
 		{
 			public void itemStateChanged(ItemEvent e)
@@ -201,7 +204,7 @@ public class ClockPanel extends AbstractTimePanel
 				{
 					if(!IClock.TYPE_SYSTEM.equals(lastclocktype))
 					{
-						getSimulationService().setClockType(IClock.TYPE_SYSTEM);
+						getSimulationService().setClockType(IClock.TYPE_SYSTEM, tp);
 //						updateView();
 						simp.updateView();
 					}
@@ -210,7 +213,7 @@ public class ClockPanel extends AbstractTimePanel
 				{
 					if(!IClock.TYPE_CONTINUOUS.equals(lastclocktype))
 					{
-						getSimulationService().setClockType(IClock.TYPE_CONTINUOUS);
+						getSimulationService().setClockType(IClock.TYPE_CONTINUOUS, tp);
 //						updateView();
 						simp.updateView();
 					}
@@ -219,7 +222,7 @@ public class ClockPanel extends AbstractTimePanel
 				{
 					if(!IClock.TYPE_TIME_DRIVEN.equals(lastclocktype))
 					{
-						getSimulationService().setClockType(IClock.TYPE_TIME_DRIVEN);
+						getSimulationService().setClockType(IClock.TYPE_TIME_DRIVEN, tp);
 //						updateView();
 						simp.updateView();
 					}
@@ -228,7 +231,7 @@ public class ClockPanel extends AbstractTimePanel
 				{
 					if(!IClock.TYPE_EVENT_DRIVEN.equals(lastclocktype))
 					{
-						getSimulationService().setClockType(IClock.TYPE_EVENT_DRIVEN);
+						getSimulationService().setClockType(IClock.TYPE_EVENT_DRIVEN, tp);
 //						updateView();
 						simp.updateView();
 					}

@@ -34,13 +34,12 @@ import jadex.adapter.base.fipa.ISearchConstraints;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bridge.ContentException;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IClockService;
 import jadex.bridge.IContentCodec;
-import jadex.bridge.ILibraryService;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.clock.IClockService;
 
 import java.util.Collection;
 import java.util.Iterator;

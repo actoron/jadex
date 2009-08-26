@@ -4,10 +4,10 @@ import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IArgument;
-import jadex.bridge.IClockService;
 import jadex.commons.concurrent.IResultListener;
 import jadex.microkernel.MicroAgent;
 import jadex.microkernel.MicroAgentMetaInfo;
+import jadex.service.clock.IClockService;
 
 import java.util.HashMap;
 import java.util.Map;

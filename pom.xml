@@ -24,6 +24,7 @@
 		    </plugins>
   		</build>
 		<modules>
+				<module>jadex-services</module>
 		    <module>jadex-commons</module>
 		    <module>jadex-rules</module>
 		    <module>jadex-rules-applications</module>
@@ -33,6 +34,7 @@
   	<profile>
   		<id>jadex-full-dist</id>
 		<modules>
+		 		<module>jadex-services</module>
 		    <module>jadex-commons</module>
 		    <module>jadex-javaparser</module>
 		    <module>jadex-bridge</module>

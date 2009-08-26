@@ -1,7 +1,7 @@
 package jadex.tools.testcenter;
 
-import jadex.bridge.Properties;
-import jadex.bridge.Property;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.collection.SCollection;
 import jadex.tools.common.PopupBuilder;

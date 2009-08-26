@@ -2,12 +2,12 @@ package jadex.bdi.interpreter;
 
 import jadex.bdi.runtime.IExternalCondition;
 import jadex.bridge.IMessageAdapter;
-import jadex.bridge.ITimer;
 import jadex.commons.concurrent.IResultListener;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
+import jadex.service.clock.ITimer;
 
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;

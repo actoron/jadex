@@ -1,6 +1,8 @@
 package jadex.gpmn.model;
 
+import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
+import jadex.wfms.IProcessModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +12,7 @@ import java.util.Map;
 /**
  *  Java representation of a bpmn model for xml description.
  */
-public class MGpmnModel extends MIdElement
+public class MGpmnModel extends MIdElement implements ICacheableModel, IProcessModel
 {
 	//-------- attributes --------
 	
@@ -26,12 +28,6 @@ public class MGpmnModel extends MIdElement
 	/** The description. */
 	protected String description;
 	
-	/** The filename. */
-	protected String filename;
-	
-	/** The last modified date. */
-	protected long lastmodified;
-	
 	//-------- init structures --------
 	
 	/** The cached edges of the model. */
@@ -44,6 +40,17 @@ public class MGpmnModel extends MIdElement
 	
 	/** The imports. */
 	protected String[] imports;
+	
+	//-------- model management --------
+	
+	/** The filename. */
+	protected String filename;
+	
+	/** The last modified date. */
+	protected long lastmodified;
+	
+	/** The last check date. */
+	protected long lastchecked;
 	
 	//-------- methods --------
 
@@ -257,6 +264,24 @@ public class MGpmnModel extends MIdElement
 				edges.put(edge.getId(), edge);
 			}
 		}
+	}
+	
+	/**
+	 *  Get the last checked date.
+	 *  @return The last checked date
+	 */
+	public long getLastChecked()
+	{
+		return this.lastchecked;
+	}
+
+	/**
+	 *  Set the last checked date.
+	 *  @param lastchecked The last checked date to set.
+	 */
+	public void setLastChecked(long lastchecked)
+	{
+		this.lastchecked = lastchecked;
 	}
 	
 	/**

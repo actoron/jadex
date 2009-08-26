@@ -1,16 +1,17 @@
 package jadex.adapter.base;
 
-import jadex.adapter.base.clock.ClockService;
-import jadex.adapter.base.execution.IExecutionService;
-import jadex.bridge.IClock;
-import jadex.bridge.IClockService;
 import jadex.bridge.IPlatform;
-import jadex.bridge.ITimer;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.IThreadPool;
+import jadex.service.clock.ClockService;
+import jadex.service.clock.IClock;
+import jadex.service.clock.IClockService;
+import jadex.service.clock.ITimer;
+import jadex.service.execution.IExecutionService;
 
 import java.util.List;
 
@@ -272,7 +273,7 @@ public class SimulationService implements ISimulationService
 	 *  Set the clock.
 	 *  @param clock The new clock.
 	 */
-	public void setClockType(String type)
+	public void setClockType(String type, IThreadPool tp)
 	{
 		if(isExecuting())
 			return;
@@ -291,7 +292,7 @@ public class SimulationService implements ISimulationService
 				getExecutorService().removeIdleCommand(simcommand);
 			}
 			
-			((ClockService)cs).setClock(type);
+			((ClockService)cs).setClock(type, tp);
 			
 			if(IClock.TYPE_EVENT_DRIVEN.equals(type)
 				|| IClock.TYPE_TIME_DRIVEN.equals(type))

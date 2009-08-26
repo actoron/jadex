@@ -19,7 +19,6 @@ import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContextService;
-import jadex.bridge.ILibraryService;
 import jadex.bridge.ISpace;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
@@ -28,6 +27,7 @@ import jadex.commons.collection.MultiCollection;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
+import jadex.service.library.ILibraryService;
 
 import java.util.HashMap;
 import java.util.HashSet;

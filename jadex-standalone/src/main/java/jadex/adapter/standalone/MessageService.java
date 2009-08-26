@@ -1,15 +1,12 @@
 package jadex.adapter.standalone;
 
 import jadex.adapter.base.DefaultResultListener;
-import jadex.adapter.base.execution.IExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IClockService;
 import jadex.bridge.IContentCodec;
-import jadex.bridge.ILibraryService;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
@@ -17,6 +14,8 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.clock.IClockService;
+import jadex.service.execution.IExecutionService;
 
 import java.util.ArrayList;
 import java.util.Collection;

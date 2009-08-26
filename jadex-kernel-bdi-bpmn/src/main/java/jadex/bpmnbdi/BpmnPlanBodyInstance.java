@@ -60,11 +60,11 @@ import jadex.bpmnbdi.handler.EventIntermediateRuleActicityHandler;
 import jadex.bpmnbdi.handler.EventIntermediateSignalActivityHandler;
 import jadex.bpmnbdi.handler.EventIntermediateTimerActivityHandler;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IClockService;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.state.IOAVState;
+import jadex.service.clock.IClockService;
 
 import java.util.Collection;
 import java.util.Collections;

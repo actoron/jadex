@@ -6,7 +6,7 @@ import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IParameterSet;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.Properties;
+import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.tools.common.AgentTreeTable;
 import jadex.tools.common.GuiProperties;

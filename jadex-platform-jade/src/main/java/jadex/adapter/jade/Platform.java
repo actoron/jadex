@@ -12,29 +12,22 @@ import jadex.adapter.base.ThreadPoolService;
 import jadex.adapter.base.agr.MAGRSpaceType;
 import jadex.adapter.base.appdescriptor.ApplicationContextFactory;
 import jadex.adapter.base.appdescriptor.ApplicationFactory;
-import jadex.adapter.base.clock.ClockService;
-import jadex.adapter.base.clock.SystemClock;
 import jadex.adapter.base.contextservice.BaseContext;
 import jadex.adapter.base.contextservice.ContextService;
 import jadex.adapter.base.contextservice.DefaultContextFactory;
 import jadex.adapter.base.contextservice.IContextFactory;
 import jadex.adapter.base.envsupport.MEnvSpaceType;
-import jadex.adapter.base.execution.IExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.SFipa;
-import jadex.adapter.base.libraryservice.LibraryService;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IApplicationFactory;
-import jadex.bridge.IClockService;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
-import jadex.bridge.ILibraryService;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatform;
-import jadex.bridge.IPlatformService;
 import jadex.bridge.MessageType;
 import jadex.commons.ICommand;
 import jadex.commons.SReflect;
@@ -43,6 +36,13 @@ import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPoolFactory;
+import jadex.service.IService;
+import jadex.service.clock.ClockService;
+import jadex.service.clock.IClockService;
+import jadex.service.clock.SystemClock;
+import jadex.service.execution.IExecutionService;
+import jadex.service.library.ILibraryService;
+import jadex.service.library.LibraryService;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -109,7 +109,7 @@ public class Platform implements IPlatform
 		services.put(ThreadPoolService.class, new ThreadPoolService(threadpool));
 		services.put(IAMS.class, new AMS(this));
 		services.put(IDF.class, new DF(this));
-		services.put(IClockService.class, new ClockService(new SystemClock("system", 1000, threadpool), this));
+		services.put(IClockService.class, new ClockService(new SystemClock("system", 1000, threadpool)));
 		services.put(ISimulationService.class, new SimulationService(this));
 		services.put(IMessageService.class, new MessageService(this));
 		services.put(IContextService.class, new ContextService(
@@ -216,7 +216,7 @@ public class Platform implements IPlatform
 		
 		for(Iterator it=services.keySet().iterator(); it.hasNext(); )
 		{
-			IPlatformService	service	= (IPlatformService) services.get(it.next());
+			IService	service	= (IService) services.get(it.next());
 			service.start();
 		}
 	}

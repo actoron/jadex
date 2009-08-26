@@ -7,11 +7,11 @@ import jadex.bdi.runtime.IParameter;
 import jadex.bdi.runtime.IParameterSet;
 import jadex.bridge.ContentException;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.ILibraryService;
-import jadex.bridge.Properties;
-import jadex.bridge.Property;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.service.library.ILibraryService;
 import jadex.tools.common.FipaMessagePanel;
 import jadex.tools.common.GuiProperties;
 

@@ -6,35 +6,41 @@ import jadex.adapter.base.fipa.IAMSListener;
 import jadex.adapter.standalone.Platform;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IPlatform;
-import jadex.bridge.Properties;
+import jadex.commons.Properties;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.wfms.IWfms;
-import jadex.wfms.service.IGpmnProcessService;
+import jadex.wfms.client.IClient;
 import jadex.wfms.service.IModelRepositoryService;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class GpmnProcessService implements IGpmnProcessService
+/**
+ * 
+ */
+public class GpmnProcessService implements IExecutionService
 {
+	//-------- attributes --------
+	
 	/** The WFMS */
-	private IWfms wfms;
-	
-	/** Running Gpmn process instances */
-	private Map processes;
-	
-	/** Counter for instance names */
-	private long instanceCounter;
+	protected IWfms wfms;
 	
 	/** The platform */
-	private IPlatform platform;
+	protected IPlatform platform;
+
+	/** The created processes. (processid -> agentid) */
+	protected Map processes;
 	
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new GpmnProcessService.
+	 */
 	public GpmnProcessService(IWfms wfms)
 	{
-		this.instanceCounter = 0;
-		this.processes = new HashMap();
 		this.wfms = wfms;
+		this.processes = new HashMap();
 		
 		// Absolute start time (for testing and benchmarking).
 		long starttime = System.currentTimeMillis();
@@ -57,7 +63,8 @@ public class GpmnProcessService implements IGpmnProcessService
 		try
 		{
 			configuration = (Properties)Platform.getPropertyReader().read(SUtil.getResource(conffile, cl), cl, null);
-		} catch (Exception e)
+		} 
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -85,36 +92,42 @@ public class GpmnProcessService implements IGpmnProcessService
 		});
 	}
 	
+	//-------- methods --------
+	
 	/**
 	 * Starts a Gpmn process
 	 * @param name name of the Gpmn model
 	 * @param stepmode if true, the process will start in step mode
 	 * @return instance name
 	 */
-	public synchronized String startProcess(String name)
+	public Object startProcess(String modelname, final Object id, Map arguments, boolean stepmode)
 	{
-		IModelRepositoryService mr = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		String modelPath = mr.getGpmnModelPath(name);
-		
-		String tmpName;
-		do
-			tmpName = name + "_" + String.valueOf(++instanceCounter);
-		while (processes.containsKey(tmpName));
-		final String instanceName = tmpName;
-		final IAMS ams = (IAMS) platform.getService(IAMS.class);
-		ams.createAgent(instanceName, modelPath, null, null, new IResultListener()
+		final String name = id.toString();
+		final IAMS ams = (IAMS)platform.getService(IAMS.class);
+		ams.createAgent(name, modelname, null, null, new IResultListener()
 		{
 			
 			public void resultAvailable(Object result)
 			{
-				ams.startAgent((IAgentIdentifier) result, null);
-				processes.put(instanceName, result);
+				ams.startAgent((IAgentIdentifier)result, null);
+				processes.put(id, result);
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
 			}
 		}, null);
-		return instanceName;
+		
+		return id;
+	}
+	
+	/**
+	 *  Test if a model can be loaded by the factory.
+	 *  @param modelname The model name.
+	 *  @return True, if model can be loaded.
+	 */
+	public boolean isLoadable(String modelname)
+	{
+		return modelname.endsWith(".gpmn");
 	}
 }

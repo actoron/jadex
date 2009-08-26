@@ -77,6 +77,7 @@ public class ProcessStarterClient extends JFrame implements IClient
 				  		   										   null,
 				  		   										   null,
 																   "");
+//				adminService.addProcessModel(ProcessStarterClient.this, name, path);
 				clientService.getProcessDefinitionService(ProcessStarterClient.this).addBpmnModel(ProcessStarterClient.this, name, path);
 				((DefaultListModel) bpmnProcessList.getModel()).clear();
 				for (Iterator it = clientService.getProcessDefinitionService(ProcessStarterClient.this).getBpmnModelNames(ProcessStarterClient.this).iterator(); it.hasNext(); )
@@ -133,6 +134,7 @@ public class ProcessStarterClient extends JFrame implements IClient
 							   									   null,
 							   									   null,
 							   									   "");
+//				adminService.addProcessModel(ProcessStarterClient.this, name, path);
 				clientService.getProcessDefinitionService(ProcessStarterClient.this).addGpmnModel(ProcessStarterClient.this, name, path);
 				((DefaultListModel) gpmnProcessList.getModel()).clear();
 				for (Iterator it = clientService.getProcessDefinitionService(ProcessStarterClient.this).getGpmnModelNames(ProcessStarterClient.this).iterator(); it.hasNext(); )

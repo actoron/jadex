@@ -1,40 +1,25 @@
 package jadex.adapter.base.envsupport.observer.graphics;
 
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector2Double;
-import jadex.adapter.base.envsupport.observer.graphics.AbstractViewport.MouseController;
 import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
-import jadex.bridge.ILibraryService;
-import jadex.commons.IPropertyObject;
+import jadex.service.library.ILibraryService;
 
 import java.awt.Canvas;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.color.ColorSpace;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.font.FontRenderContext;
-import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
-import java.awt.image.DataBuffer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;

@@ -14,7 +14,7 @@
 	<imports>
 		<import>jadex.bdi.examples.booktrading.common.*</import>
 		<import>java.util.*</import>
-		<import>jadex.bridge.IClockService</import>
+		<import>jadex.service.clock.IClockService</import>
 	</imports>
 	
 	<agenttypes>

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *  Process element.
  */
 public class MProcess extends MNamedIdElement
 {

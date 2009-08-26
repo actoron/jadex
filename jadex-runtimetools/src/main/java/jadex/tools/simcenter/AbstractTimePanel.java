@@ -1,10 +1,10 @@
 package jadex.tools.simcenter;
 
 import jadex.adapter.base.ISimulationService;
-import jadex.bridge.IClockService;
 import jadex.bridge.IPlatform;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
+import jadex.service.clock.IClockService;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;

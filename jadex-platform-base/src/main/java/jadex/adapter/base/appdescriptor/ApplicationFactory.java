@@ -4,7 +4,6 @@ import jadex.adapter.base.DefaultResultListener;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IContextService;
-import jadex.bridge.ILibraryService;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IPlatform;
 import jadex.bridge.ISpace;
@@ -12,10 +11,12 @@ import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.xml.AttributeInfo;
+import jadex.commons.xml.QName;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.bean.BeanAttributeInfo;
 import jadex.commons.xml.bean.BeanObjectReaderHandler;
 import jadex.commons.xml.reader.Reader;
+import jadex.service.library.ILibraryService;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -26,7 +27,6 @@ import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
-import jadex.commons.xml.QName;
 
 /**
  *  Factory for creating agent applications.

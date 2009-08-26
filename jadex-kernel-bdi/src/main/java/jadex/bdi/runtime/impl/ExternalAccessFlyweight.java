@@ -9,9 +9,9 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.TimeoutException;
-import jadex.bridge.IClockService;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVObjectType;
+import jadex.service.clock.IClockService;
 
 import java.util.ArrayList;
 import java.util.Collection;

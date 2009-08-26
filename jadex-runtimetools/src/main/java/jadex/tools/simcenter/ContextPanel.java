@@ -1,8 +1,8 @@
 package jadex.tools.simcenter;
 
 import jadex.adapter.base.ISimulationService;
-import jadex.bridge.IClock;
 import jadex.commons.SGUI;
+import jadex.service.clock.IClock;
 import jadex.tools.common.ToolTipAction;
 
 import java.awt.FlowLayout;

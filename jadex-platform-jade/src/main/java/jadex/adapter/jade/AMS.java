@@ -24,10 +24,10 @@ import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IMessageService;
-import jadex.bridge.IPlatformService;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  *  Built-in standalone agent platform, with only basic features.
  *  // todo: what about this property change support? where used?
  */
-public class AMS implements IAMS, IPlatformService
+public class AMS implements IAMS, IService
 {
 	//-------- constants --------
 

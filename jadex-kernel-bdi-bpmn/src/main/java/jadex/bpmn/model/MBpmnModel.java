@@ -3,6 +3,7 @@ package jadex.bpmn.model;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 import jadex.javaparser.IParsedExpression;
+import jadex.wfms.IProcessModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +17,7 @@ import java.util.StringTokenizer;
 /**
  *  Java representation of a bpmn model for xml description.
  */
-public class MBpmnModel extends MIdElement	implements ICacheableModel
+public class MBpmnModel extends MIdElement implements ICacheableModel, IProcessModel
 {
 	//-------- constants --------
 	

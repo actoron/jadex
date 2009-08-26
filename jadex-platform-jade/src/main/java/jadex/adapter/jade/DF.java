@@ -26,9 +26,9 @@ import jadex.adapter.jade.fipaimpl.DFAgentDescription;
 import jadex.adapter.jade.fipaimpl.DFServiceDescription;
 import jadex.adapter.jade.fipaimpl.SearchConstraints;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IPlatformService;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -37,7 +37,7 @@ import java.util.Set;
 /**
  *  Directory facilitator implementation for standalone platform.
  */
-public class DF implements IDF, IPlatformService
+public class DF implements IDF, IService
 {
 	//-------- attributes --------
 

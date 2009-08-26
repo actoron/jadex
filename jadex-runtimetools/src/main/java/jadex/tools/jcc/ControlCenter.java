@@ -9,19 +9,19 @@ import jadex.bdi.runtime.IGoalListener;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.ILibraryService;
 import jadex.bridge.IVersionInfo;
-import jadex.bridge.Properties;
-import jadex.bridge.Property;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.xml.AbstractInfo;
 import jadex.commons.xml.AttributeInfo;
+import jadex.commons.xml.QName;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.bean.BeanAttributeInfo;
 import jadex.commons.xml.bean.BeanObjectReaderHandler;
 import jadex.commons.xml.bean.BeanObjectWriterHandler;
+import jadex.service.library.ILibraryService;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.RememberOptionMessage;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
@@ -55,7 +55,6 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import jadex.commons.xml.QName;
 
 /**
  * The Jadex control center.

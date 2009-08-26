@@ -2,8 +2,8 @@ package jadex.bdi.runtime.impl;
 
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bridge.AgentTerminatedException;
-import jadex.bridge.ITimedObject;
 import jadex.rules.state.IOAVState;
+import jadex.service.clock.ITimedObject;
 
 /**
  *  This timed object ensures that timed objects are executed

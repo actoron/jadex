@@ -1,7 +1,5 @@
 package jadex.bdi.testcases.semiautomatic;
 
-import jadex.adapter.base.clock.ClockService;
-import jadex.adapter.base.clock.SystemClock;
 import jadex.adapter.base.fipa.FIPAMessageType;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.interpreter.BDIInterpreter;
@@ -11,7 +9,6 @@ import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationFactory;
-import jadex.bridge.IClockService;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IPlatform;
 import jadex.bridge.MessageType;
@@ -19,6 +16,9 @@ import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.ThreadPoolFactory;
+import jadex.service.clock.ClockService;
+import jadex.service.clock.IClockService;
+import jadex.service.clock.SystemClock;
 
 import java.io.IOException;
 import java.util.Collection;

@@ -1,16 +1,10 @@
 package jadex.adapter.base.envsupport.observer.gui;
 
-import jadex.adapter.base.envsupport.observer.graphics.IViewport;
-import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
-import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
-import jadex.bridge.ILibraryService;
 import jadex.commons.SGUI;
 
 import java.awt.BorderLayout;
-import java.awt.Canvas;
 import java.awt.Component;
 import java.awt.EventQueue;
-import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -80,16 +74,17 @@ public class ObserverCenterWindow extends JFrame
 		}
 		else
 		{
-			try
+//			try
 			{
-				EventQueue.invokeAndWait(runnable);
+//				EventQueue.invokeAndWait(runnable);
+				EventQueue.invokeLater(runnable);
 			}
-			catch (InterruptedException e)
-			{
-			}
-			catch (InvocationTargetException e)
-			{
-			}
+//			catch (InterruptedException e)
+//			{
+//			}
+//			catch (InvocationTargetException e)
+//			{
+//			}
 		}
 	}
 	
@@ -150,7 +145,7 @@ public class ObserverCenterWindow extends JFrame
 	 *  
 	 *  @param view the view
 	 */
-	public void setPerspectiveView(Component view)
+	public void setPerspectiveView(final Component view)
 	{
 		mainpane.setRightComponent(view);
 		mainpane.setDividerLocation(250 + mainpane.getInsets().left);

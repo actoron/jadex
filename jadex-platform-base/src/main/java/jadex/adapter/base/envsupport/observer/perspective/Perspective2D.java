@@ -15,10 +15,10 @@ import jadex.adapter.base.envsupport.observer.graphics.drawable.TexturedRectangl
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
-import jadex.bridge.ILibraryService;
 import jadex.commons.SimplePropertyObject;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
+import jadex.service.library.ILibraryService;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
