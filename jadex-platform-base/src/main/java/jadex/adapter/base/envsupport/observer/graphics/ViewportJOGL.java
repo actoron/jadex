@@ -207,7 +207,9 @@ public class ViewportJOGL extends AbstractViewport
 		Integer texture = (Integer)repeatingTextureCache_.get(path);
 		if(texture == null)
 		{
-			texture = loadTexture(gl, path, GL.GL_REPEAT, GL.GL_LINEAR_MIPMAP_LINEAR);
+			// Disable dodgy MipMapping in JOGL (AssertionError), use plain bilinear interpolation
+			//texture = loadTexture(gl, path, GL.GL_REPEAT, GL.GL_LINEAR_MIPMAP_LINEAR);
+			texture = loadTexture(gl, path, GL.GL_REPEAT, GL.GL_LINEAR);
 			repeatingTextureCache_.put(path, texture);
 		}
 
