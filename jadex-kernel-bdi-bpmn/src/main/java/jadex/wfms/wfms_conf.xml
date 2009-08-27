@@ -1,0 +1,63 @@
+<!--
+  Wfms properties.
+-->
+<properties xmlns="http://jadex.sourceforge.net/jadexconf"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadexconf 
+	                    http://jadex.sourceforge.net/configuration.xsd"
+	name="wfms_conf">
+	
+	<properties type="wfms">
+		<properties type="services">
+			<property type="jadex.service.library.ILibraryService" name="library_service">
+				new jadex.service.library.LibraryService()
+			</property>
+			
+			<property type="jadex.service.threadpool.ThreadPoolService" name="threadpool_service">
+				new jadex.service.threadpool.ThreadPoolService(
+					//new jadex.commons.concurrent.java5.JavaThreadPool()
+					new jadex.commons.concurrent.ThreadPool(
+						new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
+			</property>
+			
+			<property type="jadex.service.clock.IClockService" name="clock_service">
+				new jadex.service.clock.ClockService(
+					new jadex.service.clock.SystemClock("system_clock", 100,
+					$wfms.getService(jadex.service.threadpool.ThreadPoolService.class)))
+//				new jadex.adapter.base.clock.SimulationEventClock("simulation_clock",
+//					System.currentTimeMillis(), 200))
+			</property>
+			
+			<property type="jadex.wfms.service.IModelRepositoryService" name="repository_service">
+				new jadex.wfms.service.impl.BasicModelRepositoryService(new String[]{"jadex.wfms.*", "jadex.bpmn.examples.dipp.*" })
+			</property>
+			
+			<property type="jadex.wfms.service.IAAAService" name="authentication_service">
+				new jadex.wfms.service.impl.BasicAAAService(jadex.commons.SUtil.createHashMap(
+					new Object[]{"TestUser"},
+					new Object[]{jadex.commons.SUtil.createHashSet(new Object[]{"all"})}
+				))
+			</property>
+			
+			<property type="jadex.wfms.service.IExecutionService" name="execution_service">
+				new jadex.wfms.service.impl.MetaExecutionService($wfms, jadex.commons.SUtil.createArrayList(new Object[]{
+					new jadex.wfms.service.impl.BpmnProcessService($wfms), 
+					new jadex.wfms.service.impl.GpmnProcessService($wfms)
+				}))
+			</property>
+			
+			<property type="jadex.wfms.service.IClientService" name="client_service">
+				new jadex.wfms.service.impl.ClientConnector($wfms)
+			</property>
+			
+			<property type="jadex.wfms.service.IWorkitemQueueService" name="workitem_service">
+				$wfms.getService(jadex.wfms.service.IClientService.class)
+			</property>
+			
+			<property type="jadex.wfms.service.IProcessDefinitionService" name="processdef_service">
+				new jadex.wfms.service.impl.ProcessDefinitionConnector($wfms)
+			</property>
+		</properties>
+	</properties>
+	
+</properties>
