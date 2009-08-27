@@ -5,7 +5,6 @@ import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
-import jadex.commons.IPropertyObject;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

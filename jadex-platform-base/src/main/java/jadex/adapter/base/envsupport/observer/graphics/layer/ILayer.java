@@ -3,14 +3,10 @@ package jadex.adapter.base.envsupport.observer.graphics.layer;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
-import jadex.adapter.base.envsupport.observer.graphics.drawable.IDrawable;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
-import jadex.commons.IPropertyObject;
 
 import java.awt.Graphics2D;
 import java.io.Serializable;
-import java.util.Iterator;
-import java.util.List;
 
 import javax.media.opengl.GL;
 

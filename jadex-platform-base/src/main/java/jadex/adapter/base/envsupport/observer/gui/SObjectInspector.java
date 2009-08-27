@@ -1,24 +1,20 @@
 package jadex.adapter.base.envsupport.observer.gui;
 
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.commons.IPropertyObject;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SimpleValueFetcher;
+
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.math.IVector1;
-import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.IVector3;
-import jadex.commons.IPropertyObject;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.SimpleValueFetcher;
 
 /**
  * A convenience class for retrieving properties from objects.

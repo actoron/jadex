@@ -1,6 +1,5 @@
 package jadex.adapter.base.envsupport.observer.graphics.drawable;
 
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.IVector3;
 import jadex.adapter.base.envsupport.math.Vector2Double;
@@ -9,14 +8,11 @@ import jadex.adapter.base.envsupport.observer.graphics.IViewport;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
-import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.commons.IPropertyObject;
-import jadex.commons.SimplePropertyChangeSupport;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
 import java.awt.Graphics2D;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

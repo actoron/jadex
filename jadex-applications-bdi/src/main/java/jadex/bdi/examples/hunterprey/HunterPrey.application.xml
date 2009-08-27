@@ -331,19 +331,6 @@
 	 			</env:envspace>
 			</spaces>
  			<agents>
-<!-- 
-						<value>new StartAgentInfo("jadex.examples.hunterprey.environment.Environment", "Environment_%n", 2000, null)</value>
-						<value>new StartAgentInfo("jadex.examples.hunterprey.creature.preys.dumbprey.DumbPrey", "Dumbo_%n", 0, null)</value>
-						<!- -<value>new StartAgentInfo("jadex.examples.hunterprey.creature.preys.dumbprey.DumbPrey", "Duffy_%n", 0, null)</value>- ->
-						<value>new StartAgentInfo("jadex.examples.hunterprey.creature.preys.lazyprey.LazyPrey", "Heinz_%n", 0, null)</value>
-						<!- -<value>new StartAgentInfo("jadex.examples.hunterprey.creature.preys.lazyprey.LazyPrey", "Harald_%n", 0, null)</value>- ->
-						<value>new StartAgentInfo("jadex.examples.hunterprey.creature.preys.cleverprey.CleverPrey", "Clever_%n", 0, null)</value>
-						<!- -<value>new StartAgentInfo("jadex.examples.hunterprey.creature.preys.cleverprey.CleverPrey", "Charlton_%n", 0, null)</value>- ->
-						<value>new StartAgentInfo("jadex.examples.hunterprey.creature.hunters.dumbhunter.DumbHunter", "Lenny_%n", 0, null)</value>
-						<value>new StartAgentInfo("jadex.examples.hunterprey.creature.hunters.dumbhunter.DumbHunter", "Louis_%n", 0, null)</value>
-						<value>new StartAgentInfo("jadex.examples.hunterprey.creature.hunters.ldahunter.LAHunter", "Willy_%n", 0, null)</value>
-						<!- -<value>new StartAgentInfo("jadex.examples.hunterprey.creature.hunters.ldahunter.LAHunter", "Wolfram_%n", 0, null)</value>- ->
- -->
 				<agent type="DumbPrey" name="Dumbo"/>
 				<!-- <agent type="DumbPrey" name="Duffy"/> -->
 				<agent type="CleverPrey" name="Heinz" configuration="Lazy"/>

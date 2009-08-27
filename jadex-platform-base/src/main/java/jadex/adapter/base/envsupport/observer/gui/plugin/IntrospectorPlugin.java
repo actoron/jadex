@@ -6,7 +6,6 @@ import jadex.adapter.base.envsupport.environment.SpaceObject;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
-import jadex.commons.SReflect;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

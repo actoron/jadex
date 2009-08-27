@@ -2,19 +2,13 @@ package jadex.adapter.base.envsupport.observer.graphics.layer;
 
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
-import jadex.adapter.base.envsupport.math.Vector2Int;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
-import jadex.commons.IPropertyObject;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.Stroke;
-import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.Map;

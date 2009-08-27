@@ -2,7 +2,6 @@ package jadex.adapter.base.envsupport.observer.graphics;
 
 
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.adapter.base.envsupport.observer.graphics.layer.ILayer;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 

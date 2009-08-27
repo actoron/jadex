@@ -3,7 +3,6 @@ package jadex.adapter.base.envsupport.observer.graphics.drawable;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.javaparser.IParsedExpression;
 
-import java.awt.Color;
 import java.awt.geom.Ellipse2D;
 
 

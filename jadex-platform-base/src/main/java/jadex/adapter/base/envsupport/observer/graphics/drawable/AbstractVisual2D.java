@@ -4,11 +4,6 @@ import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.IVector3;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.math.Vector3Double;
-import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
-import jadex.commons.SimplePropertyObject;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.IValueFetcher;
-import jadex.javaparser.SimpleValueFetcher;
 
 /**
  *  Base class for visual elements.

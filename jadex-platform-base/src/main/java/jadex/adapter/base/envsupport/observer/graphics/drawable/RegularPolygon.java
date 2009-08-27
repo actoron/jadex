@@ -4,7 +4,6 @@ import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.javaparser.IParsedExpression;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
