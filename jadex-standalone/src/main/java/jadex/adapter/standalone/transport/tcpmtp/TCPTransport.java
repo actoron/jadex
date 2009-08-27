@@ -1,6 +1,5 @@
 package jadex.adapter.standalone.transport.tcpmtp;
 
-import jadex.adapter.base.ThreadPoolService;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.adapter.standalone.transport.MessageEnvelope;
@@ -18,6 +17,7 @@ import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
 import jadex.service.library.ILibraryService;
+import jadex.service.threadpool.ThreadPoolService;
 
 import java.io.IOException;
 import java.net.InetAddress;

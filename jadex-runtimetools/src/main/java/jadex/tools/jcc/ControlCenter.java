@@ -21,6 +21,7 @@ import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.bean.BeanAttributeInfo;
 import jadex.commons.xml.bean.BeanObjectReaderHandler;
 import jadex.commons.xml.bean.BeanObjectWriterHandler;
+import jadex.service.PropertiesXMLHelper;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.RememberOptionMessage;
@@ -313,7 +314,7 @@ public class ControlCenter implements IControlCenter
 		try
 		{
 			FileInputStream fis = new FileInputStream(pd);
-			props = (Properties)getPropertyReader().read(fis, ((ILibraryService)agent.getPlatform()
+			props = (Properties)PropertiesXMLHelper.getPropertyReader().read(fis, ((ILibraryService)agent.getPlatform()
 				.getService(ILibraryService.class)).getClassLoader(), null);
 //			props = XMLPropertiesReader.readProperties(fis,
 //					((ILibraryService)agent.getPlatform().getService(
@@ -469,7 +470,7 @@ public class ControlCenter implements IControlCenter
 				
 				// for testing the writer
 				FileOutputStream os = new FileOutputStream(project);
-				getPropertyWriter().write(props, os, ((ILibraryService)agent.getPlatform()
+				PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)agent.getPlatform()
 					.getService(ILibraryService.class)).getClassLoader(), null);
 				os.close();
 				setStatusText("Project saved successfully: "+ project.getAbsolutePath());
@@ -1152,48 +1153,5 @@ public class ControlCenter implements IControlCenter
 	{
 		return (IControlCenterPlugin[])plugins.keySet().toArray(
 			new IControlCenterPlugin[plugins.size()]);
-	}
-
-	public static Set typeinfos;	
-	static
-	{
-		typeinfos = new HashSet();
-//		typeinfos.add(new TypeInfo(null, new QName[]{new QName("http://jadex.sourceforge.net/jadexconf", "properties")}, Properties.class, null, null, 
-		typeinfos.add(new TypeInfo(null, new QName[]{new QName("properties")}, Properties.class, null, null, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE)}, null, null,
-			new SubobjectInfo[]
-			{
-				new SubobjectInfo(new BeanAttributeInfo("property", "properties"), null, null, true), 
-				new SubobjectInfo(new BeanAttributeInfo("properties", "subproperties"), null, null, true)
-			}
-		));
-		
-		typeinfos.add(new TypeInfo(null, "property", Property.class, null, new BeanAttributeInfo((String)null, "value")));
-	}
-	public static jadex.commons.xml.writer.Writer writer;
-	public static jadex.commons.xml.reader.Reader reader;
-	
-	/**
-	 *  Get the xml properties writer.
-	 */
-	public static jadex.commons.xml.writer.Writer getPropertyWriter()
-	{
-		if(writer==null)
-		{
-			writer = new jadex.commons.xml.writer.Writer(new BeanObjectWriterHandler(typeinfos));
-		}
-		return writer;
-	}
-	
-	/**
-	 *  Get the xml properties reader.
-	 */
-	public static jadex.commons.xml.reader.Reader getPropertyReader()
-	{
-		if(reader==null)
-		{
-			reader = new jadex.commons.xml.reader.Reader(new BeanObjectReaderHandler(typeinfos));
-		}
-		return reader;
 	}
 }

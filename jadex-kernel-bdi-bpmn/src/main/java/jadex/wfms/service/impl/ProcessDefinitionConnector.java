@@ -4,7 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jadex.bpmn.model.MBpmnModel;
+import jadex.commons.concurrent.IResultListener;
 import jadex.gpmn.model.MGpmnModel;
+import jadex.service.execution.IExecutionService;
 import jadex.wfms.IWfms;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IAAAService;
@@ -22,18 +24,33 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	}
 	
 	/**
+	 *  Start the service.
+	 */
+	public void start()
+	{
+	}
+	
+	/**
+	 *  Shutdown the service.
+	 *  @param listener The listener.
+	 */
+	public void shutdown(IResultListener listener)
+	{
+	}
+	
+	/**
 	 * Adds a BPMN model to the repository
 	 * 
 	 * @param client the client
 	 * @param name name of the model
 	 * @param path path to the model
 	 */
-	public void addBpmnModel(IClient client, String name, String path)
+	public void addBpmnModel(IClient client, String path)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_BPMN_PROCESS_MODEL))
 			return;
 		BasicModelRepositoryService mr = (BasicModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		mr.addProcessModel(name, path);
+		mr.addProcessModel(path);
 	}
 	
 	/**
@@ -47,9 +64,7 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 			return null;
 		IModelRepositoryService mr = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
 		
-		// todo:
-		return null;
-//		return mr.getBpmnModel(name);
+		return (MBpmnModel)mr.getProcessModel(name);
 	}
 	
 	/**
@@ -72,12 +87,12 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	 * @param name name of the model
 	 * @param path path to the model
 	 */
-	public void addGpmnModel(IClient client, String name, String path)
+	public void addGpmnModel(IClient client, String path)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_GPMN_PROCESS_MODEL))
 			return;
 		BasicModelRepositoryService mr = (BasicModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		mr.addProcessModel(name, path);
+		mr.addProcessModel(path);
 	}
 	
 	/**

@@ -1,5 +1,6 @@
 package jadex.wfms.service;
 
+import jadex.service.IService;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.IWorkitemListener;
@@ -9,7 +10,7 @@ import java.util.Set;
 /** 
  * Authentication, Access control and Accounting Service.
  */
-public interface IAAAService
+public interface IAAAService extends IService
 {
 	/** Keyword representing all roles */
 	public static final String ALL_ROLES = "all";

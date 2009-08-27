@@ -1,14 +1,10 @@
 package jadex.wfms;
 
+import jadex.service.IServiceContainer;
+
 /**
  * The Workflow Management System interface.
  */
-public interface IWfms
+public interface IWfms extends IServiceContainer
 {
-	/**
-	 *  Get a Wfms-service.
-	 *  @param type The service interface/type.
-	 *  @return The corresponding Wfms-service.
-	 */
-	public Object getService(Class type);
 }

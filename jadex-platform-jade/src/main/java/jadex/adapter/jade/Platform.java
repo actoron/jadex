@@ -8,7 +8,6 @@ import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.ISimulationService;
 import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.SimulationService;
-import jadex.adapter.base.ThreadPoolService;
 import jadex.adapter.base.agr.MAGRSpaceType;
 import jadex.adapter.base.appdescriptor.ApplicationContextFactory;
 import jadex.adapter.base.appdescriptor.ApplicationFactory;
@@ -43,6 +42,7 @@ import jadex.service.clock.SystemClock;
 import jadex.service.execution.IExecutionService;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.LibraryService;
+import jadex.service.threadpool.ThreadPoolService;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;

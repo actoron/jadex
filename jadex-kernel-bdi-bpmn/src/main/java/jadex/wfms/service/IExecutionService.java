@@ -1,12 +1,23 @@
-package jadex.wfms.service.impl;
+package jadex.wfms.service;
+
+import jadex.service.IService;
+import jadex.wfms.IProcessModel;
 
 import java.util.Map;
 
 /**
  * 
  */
-public interface IExecutionService
+public interface IExecutionService extends IService
 {
+	/**
+	 *  Load a process model.
+	 *  @param filename The file name.
+	 *  @param imports The imports.
+	 *  @return The process model.
+	 */
+	public IProcessModel loadModel(String filename, String[] imports);
+	
 	/**
 	 *  Create a new process.
 	 * /

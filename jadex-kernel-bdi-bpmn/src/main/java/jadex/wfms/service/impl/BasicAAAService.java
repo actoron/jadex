@@ -16,11 +16,31 @@ import java.util.Set;
  */
 public class BasicAAAService implements IAAAService
 {
-	private Map userRoles;
+	private Map userroles;
 	
 	public BasicAAAService()
 	{
-		userRoles = new HashMap();
+		this(null);
+	}
+	
+	public BasicAAAService(Map userroles)
+	{
+		userroles = userroles!=null? userroles: new HashMap();
+	}
+	
+	/**
+	 *  Start the service.
+	 */
+	public void start()
+	{
+	}
+	
+	/**
+	 *  Shutdown the service.
+	 *  @param listener The listener.
+	 */
+	public void shutdown(IResultListener listener)
+	{
 	}
 	
 	/**
@@ -54,18 +74,18 @@ public class BasicAAAService implements IAAAService
 	
 	public synchronized void addUser(String userName, Set roles)
 	{
-		userRoles.put(userName, roles);
+		userroles.put(userName, roles);
 	}
 	
 	public synchronized void removeUser(String userName)
 	{
-		userRoles.remove(userName);
+		userroles.remove(userName);
 	}
 	
 	public Set getRoles(IClient client)
 	{
 		String userName = client.getUserName();
-		Set roles = (Set) userRoles.get(userName);
+		Set roles = (Set) userroles.get(userName);
 		if (roles == null)
 			roles = new HashSet();
 		return roles;

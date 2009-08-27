@@ -19,19 +19,21 @@ public class PropertyServiceContainer extends BasicServiceContainer
 	public void init(Properties props, IValueFetcher fetcher)
 	{
 		// Initialize services.
-		Property[] services = props.getProperties();
-		
-		for(int i=0; i<services.length; i++)
+		if(props!=null)
 		{
-			Class type;
-			if(services[i].getType()==null)
-				type = IService.class;
-			else
-				type = SReflect.classForName0(services[i].getType(), null);
-			if(type==null)
-				throw new RuntimeException("Could not resolve service type: "+services[i].getType());
+			Property[] services = props.getProperties();
+			for(int i=0; i<services.length; i++)
+			{
+				Class type;
+				if(services[i].getType()==null)
+					type = IService.class;
+				else
+					type = SReflect.classForName0(services[i].getType(), null);
+				if(type==null)
+					throw new RuntimeException("Could not resolve service type: "+services[i].getType());
 			
-			addService(type, services[i].getName(), (IService)SJavaParser.evaluateExpression(services[i].getValue(), fetcher));
+				addService(type, services[i].getName(), (IService)SJavaParser.evaluateExpression(services[i].getValue(), fetcher));
+			}
 		}
 	}
 	

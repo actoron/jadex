@@ -1,17 +1,13 @@
 package jadex.wfms.service;
 
-import java.util.Collection;
-import java.util.Set;
-
+import jadex.service.IService;
 import jadex.wfms.IProcessModel;
-import jadex.wfms.client.IClient;
 
-
-import jadex.gpmn.model.MGpmnModel;
+import java.util.Collection;
 /**
  * Repository service for accessing process models.
  */
-public interface IModelRepositoryService
+public interface IModelRepositoryService extends IService
 {
 	/**
 	 * Gets a BPMN model.
@@ -52,7 +48,7 @@ public interface IModelRepositoryService
 	 *  @param name The name of the model.
 	 *  @param path The path to the model.
 	 */
-	public void addProcessModel(String name, String path);
+	public void addProcessModel(String filename);
 	
 	/**
 	 * Gets all available models.
@@ -73,7 +69,7 @@ public interface IModelRepositoryService
 	 *  @param name The model name.
 	 *  @return The process model.
 	 */
-	public String getProcessModelPath(String name);
+	public IProcessModel getProcessModel(String name);
 	
 	/**
 	 *  Get the imports.

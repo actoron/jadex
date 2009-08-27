@@ -8,7 +8,11 @@ import java.util.Set;
 
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.commons.concurrent.IResultListener;
+import jadex.wfms.IProcessModel;
+import jadex.wfms.IWfms;
 import jadex.wfms.client.IClient;
+import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
 
 /**
@@ -17,6 +21,9 @@ import jadex.wfms.service.IModelRepositoryService;
  */
 public class BasicModelRepositoryService implements IModelRepositoryService
 {
+	/** The wfms. */
+	protected IWfms wfms;
+	
 	/** The imports */
 	private String[] imports;
 	
@@ -33,13 +40,29 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 //	private BpmnModelLoader loader;
 	
 	
-	public BasicModelRepositoryService(String[] imports)
+	public BasicModelRepositoryService(IWfms wfms, String[] imports)
 	{
+		this.wfms = wfms;
 		this.imports = imports;
 		this.models = new HashMap();
 //		this.loader = new BpmnModelLoader();
 //		bpmnModels = new HashMap();
 //		gpmnModels = new HashMap();
+	}
+	
+	/**
+	 *  Start the service.
+	 */
+	public void start()
+	{
+	}
+	
+	/**
+	 *  Shutdown the service.
+	 *  @param listener The listener.
+	 */
+	public void shutdown(IResultListener listener)
+	{
 	}
 	
 	/**
@@ -151,11 +174,23 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 	 *  @param name The name of the model.
 	 *  @param path The path to the model.
 	 */
-	public void addProcessModel(String name, String path)
+	public void addProcessModel(String filename)
 	{
 		// todo check access
 		
-		models.put(name, path);
+		IExecutionService ex = (IExecutionService)wfms.getService(IExecutionService.class);
+		IProcessModel model = ex.loadModel(filename, imports);
+		models.put(model.getName(), model);
+	}
+	
+	/**
+	 *  Get a process model of a specific name.
+	 *  @param name The model name.
+	 *  @return The process model.
+	 */
+	public IProcessModel getProcessModel(String name)
+	{
+		return (IProcessModel)models.get(name);
 	}
 	
 	/**
@@ -175,16 +210,6 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 	 */
 //	public void removeProcessModel(IClient client, String name);
 	
-	/**
-	 *  Get a process model of a specific name.
-	 *  @param name The model name.
-	 *  @return The process model.
-	 */
-	public String getProcessModelPath(String name)
-	{
-		return (String)models.get(name);
-	}
-
 	/**
 	 *  Get the imports.
 	 */

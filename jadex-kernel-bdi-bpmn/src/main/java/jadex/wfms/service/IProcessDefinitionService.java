@@ -4,13 +4,14 @@ import java.util.Set;
 
 import jadex.bpmn.model.MBpmnModel;
 import jadex.gpmn.model.MGpmnModel;
+import jadex.service.IService;
 import jadex.wfms.client.IClient;
 
 /**
  * Administrative service interface
  *
  */
-public interface IProcessDefinitionService
+public interface IProcessDefinitionService extends IService
 {
 	/**
 	 * Adds a BPMN model to the repository
@@ -18,7 +19,7 @@ public interface IProcessDefinitionService
 	 * @param name name of the model
 	 * @param path path to the model
 	 */
-	public void addBpmnModel(IClient client, String name, String path);
+	public void addBpmnModel(IClient client, String path);
 	
 	/**
 	 * Gets a BPMN model.
@@ -41,7 +42,7 @@ public interface IProcessDefinitionService
 	 * @param name name of the model
 	 * @param path path to the model
 	 */
-	public void addGpmnModel(IClient client, String name, String path);
+	public void addGpmnModel(IClient client, String path);
 	
 	/**
 	 * Gets a GPMN model.

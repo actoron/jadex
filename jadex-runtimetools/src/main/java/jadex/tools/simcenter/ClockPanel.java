@@ -1,8 +1,8 @@
 package jadex.tools.simcenter;
 
-import jadex.adapter.base.ThreadPoolService;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.clock.IClock;
+import jadex.service.threadpool.ThreadPoolService;
 
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;

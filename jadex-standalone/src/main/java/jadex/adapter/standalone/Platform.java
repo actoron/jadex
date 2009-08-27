@@ -23,6 +23,7 @@ import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.service.IService;
+import jadex.service.PropertiesXMLHelper;
 import jadex.service.library.ILibraryService;
 
 import java.net.InetAddress;
@@ -423,7 +424,7 @@ public class Platform extends AbstractPlatform
 		// Hack as long as no loader is present.
 		ClassLoader cl = Platform.class.getClassLoader();
 //		Properties configuration = XMLPropertiesReader.readProperties(SUtil.getResource(conffile, cl), cl);
-		Properties configuration = (Properties)getPropertyReader().read(SUtil.getResource(conffile, cl), cl, null);
+		Properties configuration = (Properties)PropertiesXMLHelper.getPropertyReader().read(SUtil.getResource(conffile, cl), cl, null);
 		platform = new Platform(configuration);
 		platform.start();
 		startAgents(args, platform);
@@ -487,50 +488,5 @@ public class Platform extends AbstractPlatform
 			System.arraycopy(args, i, ret, 0, ret.length);
 		return ret;
 	}*/
-	
-	public static Set typeinfos;	
-	static
-	{
-		typeinfos = new HashSet();
-		
-//		typeinfos.add(new TypeInfo(null, new QName[]{new QName("http://jadex.sourceforge.net/jadexconf", "properties")}, Properties.class, null, null, 
-		typeinfos.add(new TypeInfo(null, new QName[]{new QName("properties")}, Properties.class, null, null, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE)}, null, null,
-			new SubobjectInfo[]
-			{
-				new SubobjectInfo(new BeanAttributeInfo("property", "properties"), null, null, true), 
-				new SubobjectInfo(new BeanAttributeInfo("properties", "subproperties"), null, null, true)
-			}
-		));
-		
-//		typeinfos.add(new TypeInfo(null, new QName[]{new QName("http://jadex.sourceforge.net/jadexconf", "property")}, Property.class, null, new BeanAttributeInfo(null, "value")));
-		typeinfos.add(new TypeInfo(null, new QName[]{new QName("property")}, Property.class, null, new BeanAttributeInfo((String)null, "value")));
-	}
-	public static jadex.commons.xml.writer.Writer writer;
-	public static jadex.commons.xml.reader.Reader reader;
-	
-	/**
-	 *  Get the xml properties writer.
-	 */
-	public static jadex.commons.xml.writer.Writer getPropertyWriter()
-	{
-		if(writer==null)
-		{
-			writer = new jadex.commons.xml.writer.Writer(new BeanObjectWriterHandler(typeinfos));
-		}
-		return writer;
-	}
-	
-	/**
-	 *  Get the xml properties reader.
-	 */
-	public static jadex.commons.xml.reader.Reader getPropertyReader()
-	{
-		if(reader==null)
-		{
-			reader = new jadex.commons.xml.reader.Reader(new BeanObjectReaderHandler(typeinfos));
-		}
-		return reader;
-	}
 }
 

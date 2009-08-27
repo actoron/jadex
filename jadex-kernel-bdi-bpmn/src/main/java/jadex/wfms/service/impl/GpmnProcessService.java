@@ -9,8 +9,14 @@ import jadex.bridge.IPlatform;
 import jadex.commons.Properties;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
+import jadex.gpmn.GpmnXMLReader;
+import jadex.gpmn.model.MGpmnModel;
+import jadex.service.PropertiesXMLHelper;
+import jadex.service.library.ILibraryService;
+import jadex.wfms.IProcessModel;
 import jadex.wfms.IWfms;
 import jadex.wfms.client.IClient;
+import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
 
 import java.util.HashMap;
@@ -62,7 +68,7 @@ public class GpmnProcessService implements IExecutionService
 		Properties configuration = null;
 		try
 		{
-			configuration = (Properties)Platform.getPropertyReader().read(SUtil.getResource(conffile, cl), cl, null);
+			configuration = (Properties)PropertiesXMLHelper.getPropertyReader().read(SUtil.getResource(conffile, cl), cl, null);
 		} 
 		catch (Exception e)
 		{
@@ -93,6 +99,40 @@ public class GpmnProcessService implements IExecutionService
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Start the service.
+	 */
+	public void start()
+	{
+	}
+	
+	/**
+	 *  Shutdown the service.
+	 *  @param listener The listener.
+	 */
+	public void shutdown(IResultListener listener)
+	{
+	}
+	
+	/**
+	 *  Load a process model.
+	 *  @param filename The file name.
+	 *  @return The process model.
+	 */
+	public IProcessModel loadModel(String filename, String[] imports)
+	{
+		IProcessModel ret = null;
+		try
+		{
+			ret = GpmnXMLReader.read(filename, ((ILibraryService)wfms.getService(ILibraryService.class)).getClassLoader(), null);
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		return ret;
+	}
 	
 	/**
 	 * Starts a Gpmn process

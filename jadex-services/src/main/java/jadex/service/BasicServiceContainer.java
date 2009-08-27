@@ -77,17 +77,20 @@ public class BasicServiceContainer implements IServiceContainer
 	public void start()
 	{
 		// Start the services.
-		for(Iterator it=services.keySet().iterator(); it.hasNext(); )
+		if(services!=null)
 		{
-			Object key = it.next();
-			Map tmp = (Map)services.get(key);
-			if(tmp!=null)
+			for(Iterator it=services.keySet().iterator(); it.hasNext(); )
 			{
-				for(Iterator it2=tmp.keySet().iterator(); it2.hasNext(); )
+				Object key = it.next();
+				Map tmp = (Map)services.get(key);
+				if(tmp!=null)
 				{
-					Object key2 = it2.next();
-					IService service = (IService)tmp.get(key2);
-					service.start();
+					for(Iterator it2=tmp.keySet().iterator(); it2.hasNext(); )
+					{
+						Object key2 = it2.next();
+						IService service = (IService)tmp.get(key2);
+						service.start();
+					}
 				}
 			}
 		}
@@ -100,18 +103,21 @@ public class BasicServiceContainer implements IServiceContainer
 	public void shutdown(IResultListener listener)
 	{
 		// Stop the services.
-		for(Iterator it = services.keySet().iterator(); it.hasNext();)
+		if(services!=null)
 		{
-			Object key = it.next();
-			Map tmp = (Map)services.get(key);
-			if(tmp != null)
+			for(Iterator it = services.keySet().iterator(); it.hasNext();)
 			{
-				for(Iterator it2 = tmp.keySet().iterator(); it2.hasNext();)
+				Object key = it.next();
+				Map tmp = (Map)services.get(key);
+				if(tmp != null)
 				{
-					Object key2 = it2.next();
-					IService service = (IService)tmp.get(key2);
-//					System.out.println("Service shutdown: " + service);
-					service.shutdown(null); // Todo: use result listener?
+					for(Iterator it2 = tmp.keySet().iterator(); it2.hasNext();)
+					{
+						Object key2 = it2.next();
+						IService service = (IService)tmp.get(key2);
+	//					System.out.println("Service shutdown: " + service);
+						service.shutdown(null); // Todo: use result listener?
+					}
 				}
 			}
 		}
@@ -127,10 +133,12 @@ public class BasicServiceContainer implements IServiceContainer
 	public void addService(Class type, String name, IService service)
 	{
 //		System.out.println("Adding service: " + name + " " + type + " " + service);
-		Map tmp = (Map)services.get(type);
+		Map tmp = getServiceMap(type);
 		if(tmp == null)
 		{
 			tmp = new HashMap();
+			if(services==null)
+				services = new HashMap();
 			services.put(type, tmp);
 		}
 		tmp.put(name, service);

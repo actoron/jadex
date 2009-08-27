@@ -33,7 +33,7 @@ public class AdminConnector implements IAdminService
 			throw new AccessControlException("Insufficient access rights: "+client);
 		
 		IModelRepositoryService mr = (IModelRepositoryService)wfms.getService(IModelRepositoryService.class);
-		mr.addProcessModel(name, path);
+		mr.addProcessModel(path);
 	}
 	
 	/**
@@ -53,12 +53,12 @@ public class AdminConnector implements IAdminService
 	 *  @param name name of the model
 	 *  @param path path to the model
 	 */
-	public void addBpmnModel(IClient client, String name, String path)
+	public void addBpmnModel(IClient client, String path)
 	{
 		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_BPMN_PROCESS_MODEL))
 			return;
 		BasicModelRepositoryService mr = (BasicModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		mr.addProcessModel(name, path);
+		mr.addProcessModel(path);
 	}
 	
 	/**
@@ -67,11 +67,11 @@ public class AdminConnector implements IAdminService
 	 *  @param name name of the model
 	 *  @param path path to the model
 	 */
-	public void addGpmnModel(IClient client, String name, String path)
+	public void addGpmnModel(IClient client, String path)
 	{
 		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_GPMN_PROCESS_MODEL))
 			return;
 		BasicModelRepositoryService mr = (BasicModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		mr.addProcessModel(name, path);
+		mr.addProcessModel(path);
 	}
 }

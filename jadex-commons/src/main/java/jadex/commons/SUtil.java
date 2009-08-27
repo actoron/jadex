@@ -1442,14 +1442,28 @@ public class SUtil
 	}
 	
 	/**
-	 *  Create a hash map from keys and values.
-	 *  @param keys The keys.
+	 *  Create a hash set from values.
 	 *  @param values The values.
 	 *  @return The map.
 	 */
 	public static Set createHashSet(Object[] values)
 	{
 		Set ret = new HashSet();
+		for(int i=0; i<values.length; i++)
+		{
+			ret.add(values[i]);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Create an array list from values.
+	 *  @param values The values.
+	 *  @return The map.
+	 */
+	public static List createArrayList(Object[] values)
+	{
+		List ret = new ArrayList();
 		for(int i=0; i<values.length; i++)
 		{
 			ret.add(values[i]);

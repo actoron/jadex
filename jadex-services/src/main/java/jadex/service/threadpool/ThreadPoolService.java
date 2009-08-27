@@ -1,4 +1,4 @@
-package jadex.adapter.base;
+package jadex.service.threadpool;
 
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;

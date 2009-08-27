@@ -6,8 +6,11 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInstance;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
+import jadex.commons.concurrent.IResultListener;
+import jadex.wfms.IProcessModel;
 import jadex.wfms.IWfms;
 import jadex.wfms.client.IClient;
+import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
 
 import java.util.HashMap;
@@ -42,6 +45,42 @@ public class BpmnProcessService implements IExecutionService
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Start the service.
+	 */
+	public void start()
+	{
+	}
+	
+	/**
+	 *  Shutdown the service.
+	 *  @param listener The listener.
+	 */
+	public void shutdown(IResultListener listener)
+	{
+	}
+	
+	/**
+	 *  Load a process model.
+	 *  @param filename The file name.
+	 *  @return The process model.
+	 */
+	public IProcessModel loadModel(String filename, String[] imports)
+	{
+		IProcessModel ret = null;
+		
+		try
+		{
+			ret = loader.loadBpmnModel(filename, imports);
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		return ret;
+	}
 	
 	/**
 	 * Starts a BPMN process

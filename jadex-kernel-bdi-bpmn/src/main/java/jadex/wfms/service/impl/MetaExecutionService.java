@@ -1,7 +1,10 @@
 package jadex.wfms.service.impl;
 
+import jadex.commons.concurrent.IResultListener;
 import jadex.wfms.IProcess;
+import jadex.wfms.IProcessModel;
 import jadex.wfms.IWfms;
+import jadex.wfms.service.IExecutionService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +45,44 @@ public class MetaExecutionService implements IExecutionService
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Start the service.
+	 */
+	public void start()
+	{
+	}
+	
+	/**
+	 *  Shutdown the service.
+	 *  @param listener The listener.
+	 */
+	public void shutdown(IResultListener listener)
+	{
+	}
+	
+	/**
+	 *  Load a process model.
+	 *  @param filename The file name.
+	 *  @return The process model.
+	 */
+	public IProcessModel loadModel(String filename, String[] imports)
+	{
+		IProcessModel ret = null;
+		
+		for(int i=0; ret==null && i<exeservices.size(); i++)
+		{
+			IExecutionService es = (IExecutionService)exeservices.get(i);
+			if(es.isLoadable(filename))
+			{
+				ret = es.loadModel(filename, imports);
+			}
+		}
+		
+		if(ret==null)
+			throw new RuntimeException("Could not load process model: "+filename, null);
+		return ret;
+	}
 	
 	/**
 	 *  Start a process instance.

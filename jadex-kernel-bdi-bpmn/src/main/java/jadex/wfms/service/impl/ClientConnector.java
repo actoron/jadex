@@ -1,5 +1,6 @@
 package jadex.wfms.service.impl;
 
+import jadex.commons.concurrent.IResultListener;
 import jadex.wfms.IWfms;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IWorkitem;
@@ -8,6 +9,7 @@ import jadex.wfms.client.Workitem;
 import jadex.wfms.client.WorkitemQueueChangeEvent;
 import jadex.wfms.service.IAAAService;
 import jadex.wfms.service.IClientService;
+import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
 import jadex.wfms.service.IProcessDefinitionService;
 import jadex.wfms.service.IWorkitemQueueService;
@@ -38,6 +40,21 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 		workitemListeners = new HashSet();
 	}
 	
+	/**
+	 *  Start the service.
+	 */
+	public void start()
+	{
+	}
+	
+	/**
+	 *  Shutdown the service.
+	 *  @param listener The listener.
+	 */
+	public void shutdown(IResultListener listener)
+	{
+	}
+	
 	public synchronized void queueWorkitem(IWorkitem workitem)
 	{
 		Set workitems = (Set) workitemQueues.get(workitem.getRole());
@@ -60,6 +77,7 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_PD_SERVICE))
 			return null;
+		
 		return (IProcessDefinitionService) wfms.getService(IProcessDefinitionService.class);
 	}
 	
@@ -75,7 +93,7 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 			throw new AccessControlException("Not allowed: "+client);
 		
 		IModelRepositoryService rs = (IModelRepositoryService)wfms.getService(IModelRepositoryService.class);
-		String filename = rs.getProcessModelPath(name);
+		String filename = rs.getProcessModel(name).getFilename();
 		
 		IExecutionService bps = (IExecutionService)wfms.getService(IExecutionService.class);
 		Object id  = bps.startProcess(filename, null, null, false);
@@ -124,7 +142,7 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 			throw new AccessControlException("Not allowed: "+client);
 		
 		IModelRepositoryService rs = (IModelRepositoryService)wfms.getService(IModelRepositoryService.class);
-		String filename = rs.getProcessModelPath(name);
+		String filename = rs.getProcessModel(name).getFilename();
 		
 		IExecutionService bps = (IExecutionService)wfms.getService(IExecutionService.class);
 		Object id  = bps.startProcess(filename, null, null, false);
