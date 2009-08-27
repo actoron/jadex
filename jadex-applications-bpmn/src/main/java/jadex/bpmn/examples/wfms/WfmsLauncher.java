@@ -1,6 +1,5 @@
 package jadex.bpmn.examples.wfms;
 
-import jadex.commons.SUtil;
 import jadex.wfms.BasicWfms;
 import jadex.wfms.client.GuiClient;
 import jadex.wfms.client.ProcessStarterClient;
@@ -33,12 +32,12 @@ public class WfmsLauncher
 	{
 		BasicWfms wfms = new BasicWfms(null);
 		String[] imports = {"jadex.wfms.*", "jadex.bpmn.examples.dipp.*" };
-		BasicModelRepositoryService mr = new BasicModelRepositoryService(imports);
+		BasicModelRepositoryService mr = new BasicModelRepositoryService(wfms, imports);
 		
 		//mr.addBpmnModel("Ladungstraeger absichern", "jadex/wfms/DiPP1_LOG_Ladungstraeger_absichern.bpmn");
 		//mr.addBpmnModel("User Interaction", "jadex/wfms/UserInteraction.bpmn");
-		mr.addProcessModel("HelloWorld", "jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn");
-		mr.addProcessModel("DiPP", "jadex/bpmn/examples/dipp/dipp.gpmn");
+		mr.addProcessModel("jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn");
+		mr.addProcessModel("jadex/bpmn/examples/dipp/dipp.gpmn");
 		wfms.addService(IModelRepositoryService.class, "repo_service", mr);
 		
 		BasicAAAService as = new BasicAAAService();
