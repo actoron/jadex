@@ -122,8 +122,11 @@ public class Reader
 					// Create object.
 					// todo: do not call createObject on every tag?!
 					Object ti = typeinfo;
-					if(localname.getNamespaceURI().startsWith(SXML.PROTOCOL_TYPEINFO))
+					if(localname.getNamespaceURI().startsWith(SXML.PROTOCOL_TYPEINFO)
+						&& (typeinfo==null || typeinfo.isCreateFromTag()))
+					{
 						ti = localname;
+					}
 					object = handler.createObject(ti, stack.isEmpty(), context, rawattrs, classloader);
 					if(DEBUG && object==null)
 						System.out.println("No mapping found: "+localname);
@@ -275,8 +278,9 @@ public class Reader
 						final IPostProcessor postproc = typeinfo.getPostProcessor();
 						if(postproc.getPass()==1)
 						{
-//							topse.object = 
-							typeinfo.getPostProcessor().postProcess(context, topse.getObject(), root, classloader);
+							Object changed = typeinfo.getPostProcessor().postProcess(context, topse.getObject(), root, classloader);
+							if(changed!=null)
+								topse.setObject(changed);
 						}
 						else
 						{
@@ -286,7 +290,9 @@ public class Reader
 							{
 								public void run()
 								{
-									postproc.postProcess(context, object, ro, classloader);
+									Object check = postproc.postProcess(context, object, ro, classloader);
+									if(check!=null)
+										throw new RuntimeException("Object replacement only possible in first pass.");
 								}
 							});
 						}

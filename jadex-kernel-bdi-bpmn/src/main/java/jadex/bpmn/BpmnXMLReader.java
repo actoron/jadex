@@ -259,7 +259,7 @@ public class BpmnXMLReader
 		/**
 		 *  Establish element connections.
 		 */
-		public void postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
 		{
 			MBpmnModel dia = (MBpmnModel)root;
 			MActivity act = (MActivity)object;
@@ -374,6 +374,8 @@ public class BpmnXMLReader
 					}
 				}
 			}
+			
+			return null;
 		}
 		
 		/**
@@ -382,7 +384,7 @@ public class BpmnXMLReader
 		 */
 		public int getPass()
 		{
-			return 3;
+			return 2;
 		}
 	}
 	
@@ -396,7 +398,7 @@ public class BpmnXMLReader
 		/**
 		 *  Establish element connections.
 		 */
-		public void postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
 		{
 			super.postProcess(context, object, root, classloader);
 			
@@ -410,6 +412,8 @@ public class BpmnXMLReader
 					((MActivity)activities.get(i)).setPool(pool);
 				}
 			}
+			
+			return null;
 		}
 	}
 	
@@ -424,7 +428,7 @@ public class BpmnXMLReader
 		/**
 		 *  Establish element connections.
 		 */
-		public void postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
 		{
 			super.postProcess(context, object, root, classloader);
 			
@@ -444,6 +448,8 @@ public class BpmnXMLReader
 					activity.setLane(lane);
 				}
 			}
+			
+			return null;
 		}
 	}
 	
@@ -457,7 +463,7 @@ public class BpmnXMLReader
 		/**
 		 *  Set source and target of association.
 		 */
-		public void postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
 		{
 			MBpmnModel dia = (MBpmnModel)root;
 			MAssociation asso = (MAssociation)object;
@@ -475,6 +481,8 @@ public class BpmnXMLReader
 			
 			source.addAssociation(asso);
 			target.addAssociation(asso);
+		
+			return null;
 		}
 	
 		/**
@@ -483,7 +491,7 @@ public class BpmnXMLReader
 		 */
 		public int getPass()
 		{
-			return 3;
+			return 2;
 		}
 	}
 	
@@ -497,7 +505,7 @@ public class BpmnXMLReader
 		/**
 		 *  Establish element connections.
 		 */
-		public void postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
 		{
 			MBpmnModel dia = (MBpmnModel)root;
 			MSequenceEdge edge = (MSequenceEdge)object;
@@ -558,6 +566,8 @@ public class BpmnXMLReader
 					edge.setCondition(cond);
 				}
 			}
+			
+			return null;
 		}
 		
 		/**
@@ -566,7 +576,7 @@ public class BpmnXMLReader
 		 */
 		public int getPass()
 		{
-			return 3;
+			return 2;
 		}
 	}
 	
@@ -581,7 +591,7 @@ public class BpmnXMLReader
 		/**
 		 *  Establish element connections.
 		 */
-		public void postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
 		{
 			MBpmnModel dia = (MBpmnModel)root;
 			MNamedIdElement namedelem = (MNamedIdElement)object;
@@ -611,6 +621,8 @@ public class BpmnXMLReader
 					}
 				}
 			}
+			
+			return null;
 		}
 		
 		/**
@@ -619,7 +631,7 @@ public class BpmnXMLReader
 		 */
 		public int getPass()
 		{
-			return 3;
+			return 2;
 		}
 	}
 	
@@ -633,7 +645,7 @@ public class BpmnXMLReader
 		/**
 		 *  Establish element connections.
 		 */
-		public void postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
 		{
 			MBpmnModel model = (MBpmnModel)root;
 			JavaCCExpressionParser parser = new JavaCCExpressionParser();
@@ -697,6 +709,8 @@ public class BpmnXMLReader
 					imports.add(model.getPackage()+".*");
 				model.setImports((String[])imports.toArray(new String[imports.size()]));
 			}
+			
+			return null;
 		}
 		
 		/**
@@ -705,7 +719,7 @@ public class BpmnXMLReader
 		 */
 		public int getPass()
 		{
-			return 2;
+			return 1;
 		}
 	}
 }

@@ -76,6 +76,15 @@ public class StackElement
 	}
 	
 	/**
+	 *  Set the object.
+	 *  @param object The object to set.
+	 */
+	public void setObject(Object object)
+	{
+		this.object = object;
+	}
+
+	/**
 	 *  Get the content (if any).
 	 *  @return The content or null for empty elements.
 	 */

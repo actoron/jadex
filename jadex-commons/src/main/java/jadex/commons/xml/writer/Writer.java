@@ -112,6 +112,12 @@ public class Writer
 			tag = handler.getTagName(object, context);
 		}
 		
+		// Create tag with prefix if it has a namespace but no prefix.
+		if(!SXML.NULL_NS_URI.equals(tag.getNamespaceURI()) && SXML.DEFAULT_NS_PREFIX.equals(tag.getPrefix()))
+		{
+			tag = handler.getTagWithPrefix(tag);
+		}
+		
 		if(genids && writtenobs.containsKey(object))
 		{
 			writeStartObject(writer, tag, stack.size());

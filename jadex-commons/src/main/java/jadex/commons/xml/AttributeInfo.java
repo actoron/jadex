@@ -9,6 +9,10 @@ public class AttributeInfo
 	
 	public static final String THIS = "__this"; 
 
+	public static final String CONTENT = "__content"; 
+	
+	public static final String COMMENT = "__comment"; 
+	
 	/** Ignore when reading. */
 	public static final String IGNORE_READ = "ignore_read";
 	

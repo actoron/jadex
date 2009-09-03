@@ -17,6 +17,9 @@ import java.util.TreeSet;
  */
 public class TypeInfo	extends AbstractInfo
 {
+	/** Constant indicating that the type is not creatable from tag information. */
+	public static String NOT_CREATEDABLE_FROM_TAG = "not_creatable_from_tag";
+	
 	//-------- attributes -------- 
 	
 	// read + write 
@@ -43,6 +46,9 @@ public class TypeInfo	extends AbstractInfo
 	
 	/** The post processor (if any). */
 	protected IPostProcessor postproc;
+	
+	/** Create from tag flag. */
+	protected boolean createfromtag;
 	
 	// todo: IPreWriter for doing sth with the object before writing?
 	
@@ -121,12 +127,29 @@ public class TypeInfo	extends AbstractInfo
 		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
 		SubobjectInfo[] subobjectinfos)
 	{
+		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributeinfos, postproc, filter, subobjectinfos, true);
+	}
+	
+	/**
+	 *  Create a new type info.
+	 * @param xmlpath The path or tag.
+	 * @param typeinfo The type of object to create.
+	 * @param commentinfo The commnent.
+	 * @param contentinfo The content.
+	 * @param attributeinfos The attributes map.
+	 * @param postproc The post processor. 
+	 */
+	public TypeInfo(TypeInfo supertype, String xmlpath, Object typeinfo, Object commentinfo, 
+		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
+		SubobjectInfo[] subobjectinfos, boolean createfromtag)
+	{
 		super(xmlpath, filter);
 		this.supertype = supertype;
 		this.typeinfo = typeinfo;
 		this.commentinfo = commentinfo;
 		this.contentinfo = contentinfo;
 		this.postproc = postproc;
+		this.createfromtag = createfromtag;
 		
 		if(attributeinfos!=null)
 			this.attributeinfos = createAttributeInfos(attributeinfos);
@@ -203,8 +226,7 @@ public class TypeInfo	extends AbstractInfo
 		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
 		SubobjectInfo[] subobjectinfos)
 	{
-		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributeinfos, 
-			postproc, filter, subobjectinfos, null);
+		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributeinfos, postproc, filter, subobjectinfos, true);
 	}
 	
 	/**
@@ -218,7 +240,7 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public TypeInfo(TypeInfo supertype, QName[] xmlpath, Object typeinfo, Object commentinfo, 
 		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
-		SubobjectInfo[] subobjectinfos, Namespace namespace)
+		SubobjectInfo[] subobjectinfos, boolean createfromtag)
 	{
 		super(xmlpath, filter);
 		this.supertype = supertype;
@@ -226,6 +248,7 @@ public class TypeInfo	extends AbstractInfo
 		this.commentinfo = commentinfo;
 		this.contentinfo = contentinfo;
 		this.postproc = postproc;
+		this.createfromtag = createfromtag;
 		
 		if(attributeinfos!=null)
 			this.attributeinfos = createAttributeInfos(attributeinfos);
@@ -438,6 +461,14 @@ public class TypeInfo	extends AbstractInfo
 //			}
 //		}
 		return ret;
+	}
+	
+	/**
+	 *  Test if object should be created from tag name.
+	 */
+	public boolean isCreateFromTag()
+	{
+		return createfromtag;
 	}
 	
 	/**

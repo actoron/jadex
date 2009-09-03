@@ -1,13 +1,21 @@
 package jadex.commons.xml.bean;
 
 import jadex.commons.xml.AttributeInfo;
+import jadex.commons.xml.BasicTypeConverter;
+import jadex.commons.xml.IPostProcessor;
+import jadex.commons.xml.ITypeConverter;
 import jadex.commons.xml.QName;
 import jadex.commons.xml.SXML;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.reader.Reader;
 
+import java.awt.Color;
+import java.lang.reflect.Method;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +98,56 @@ public class JavaReader extends Reader
 					null, null, null, null, null, null, HashSet.class.getMethod("add", new Class[]{Object.class})))
 			});
 			typeinfos.add(ti_set);
+			
+			// java.util.Color
+			
+			TypeInfo ti_color = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.awt", "Color")}, null, null, 
+				new BeanAttributeInfo(null, AttributeInfo.THIS, null, new ITypeConverter()
+				{
+					public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
+					{
+						return Color.decode((String)val);
+					}
+				}, null),
+			null, null, null, null, false);
+			
+			// java.util.Date
+			
+//			DateFormat df = new DateFormat();
+//			TypeInfo ti_date = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Date")}, null, null, 
+//				new BeanAttributeInfo(null, AttributeInfo.THIS, null, new ITypeConverter()
+//				{
+//					public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
+//					{
+//						return new Date((String)val);
+////						return df.parse((String)val);
+//					}
+//				}, null),
+//			null, null, null, null, false);
+			
+//			TypeInfo ti_color = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.awt", "Color")}, HashMap.class, null, null, 
+//				new BeanAttributeInfo[]{
+//				new BeanAttributeInfo("red", null, null, BasicTypeConverter.INTEGER_CONVERTER, null, ""),
+//				new BeanAttributeInfo("green", null, null, BasicTypeConverter.INTEGER_CONVERTER, null, ""),
+//				new BeanAttributeInfo("blue", null, null, BasicTypeConverter.INTEGER_CONVERTER, null, "")
+//				}, new IPostProcessor()
+//				{
+//					public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
+//					{
+//						Map tmp = (Map)object;
+//						int red = ((Integer)tmp.get("red")).intValue();
+//						int green = ((Integer)tmp.get("red")).intValue();
+//						int blue = ((Integer)tmp.get("red")).intValue();
+//						return new Color(red, green, blue);
+//					}
+//					
+//					public int getPass()
+//					{
+//						return 0;
+//					}
+//				}
+//			);
+			typeinfos.add(ti_color);
 			
 		}
 		catch(Exception e)

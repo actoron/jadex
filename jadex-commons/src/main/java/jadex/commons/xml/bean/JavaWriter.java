@@ -1,11 +1,14 @@
 package jadex.commons.xml.bean;
 
 import jadex.commons.xml.AttributeInfo;
+import jadex.commons.xml.ITypeConverter;
 import jadex.commons.xml.QName;
+import jadex.commons.xml.SXML;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.writer.Writer;
 
+import java.awt.Color;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +101,42 @@ public class JavaWriter extends Writer
 				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS), null, null, true)
 			});
 			typeinfos.add(ti_array);
+			
+			// java.util.Color
+			
+			TypeInfo ti_color = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.awt", "Color")}, Color.class, null, 
+				new BeanAttributeInfo(null, AttributeInfo.THIS, null, null, new ITypeConverter()
+				{
+					public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
+					{
+						return ""+((Color)val).getRGB();
+					}
+				})
+			);
+			
+//			TypeInfo ti_color = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.awt", "Color")}, Color.class, null, null, 
+//				new BeanAttributeInfo[]{
+//				new BeanAttributeInfo("red", null, null, null, null, null, null, Color.class.getMethod("", new Class[]{})),
+//				new BeanAttributeInfo("green", null, null, BasicTypeConverter.INTEGER_CONVERTER, null, ""),
+//				new BeanAttributeInfo("blue", null, null, BasicTypeConverter.INTEGER_CONVERTER, null, "")
+//				}, new IPostProcessor()
+//				{
+//					public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
+//					{
+//						Map tmp = (Map)object;
+//						int red = ((Integer)tmp.get("red")).intValue();
+//						int green = ((Integer)tmp.get("red")).intValue();
+//						int blue = ((Integer)tmp.get("red")).intValue();
+//						return new Color(red, green, blue);
+//					}
+//					
+//					public int getPass()
+//					{
+//						return 0;
+//					}
+//				}
+//			);
+			typeinfos.add(ti_color);
 		}
 		catch(Exception e)
 		{

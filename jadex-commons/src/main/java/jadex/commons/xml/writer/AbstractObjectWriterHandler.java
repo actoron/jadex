@@ -78,7 +78,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 			Object info = typeinfo.getCommentInfo();
 			if(info!=null)
 			{
-				Object property = getProperty(info);
+				Object property = getProperty(info);//==null? AttributeInfo.COMMENT: getProperty(info);
 				if(property!=null)
 				{
 					doneprops.add(getPropertyName(property));
@@ -99,7 +99,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 			info = typeinfo.getContentInfo();
 			if(info!=null)
 			{
-				Object property = getProperty(info);
+				Object property = getProperty(info);//==null? AttributeInfo.CONTENT: getProperty(info);
 				if(property!=null)
 				{
 					doneprops.add(getPropertyName(property));

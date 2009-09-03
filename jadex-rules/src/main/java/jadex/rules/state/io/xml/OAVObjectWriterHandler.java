@@ -84,18 +84,37 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 			String pck = SXML.PROTOCOL_TYPEINFO+clazzname.substring(0, idx);
 			String tag = clazzname.substring(idx+1);
 			
-			ns = (Namespace)namespacebypackage.get(pck);
-			if(ns==null)
-			{
-				String prefix = "p"+nscnt;
-				ns = new Namespace(prefix, pck);
-				namespacebypackage.put(pck, ns);
-				nscnt++;
-			}
+			ns = getNamespace(pck);
 			ret = new QName(ns.getURI(), tag, ns.getPrefix());
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the tag with namespace.
+	 */
+	public QName getTagWithPrefix(QName tag)
+	{
+		Namespace ns = getNamespace(tag.getNamespaceURI());
+		return new QName(ns.getURI(), tag.getLocalPart(), ns.getPrefix());
+	}
+	
+	/**
+	 *  Get or create a namespace.
+	 *  @param uri The namespace uri.
+	 */
+	protected Namespace getNamespace(String uri)
+	{
+		Namespace ns = (Namespace)namespacebypackage.get(uri);
+		if(ns==null)
+		{
+			String prefix = "p"+nscnt;
+			ns = new Namespace(prefix, uri);
+			namespacebypackage.put(uri, ns);
+			nscnt++;
+		}
+		return ns;
 	}
 	
 	/**

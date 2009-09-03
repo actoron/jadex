@@ -290,7 +290,7 @@ public class GpmnXMLReader
 		/**
 		 *  Establish element connections.
 		 */
-		public void postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
 		{
 			MGpmnModel dia = (MGpmnModel)root;
 			MProcessElement pe = (MProcessElement)object;
@@ -322,6 +322,8 @@ public class GpmnXMLReader
 					edge.setSource(pe);
 				}
 			}
+			
+			return null;
 		}
 		
 		/**
@@ -330,7 +332,7 @@ public class GpmnXMLReader
 		 */
 		public int getPass()
 		{
-			return 2;
+			return 1;
 		}
 	}
 

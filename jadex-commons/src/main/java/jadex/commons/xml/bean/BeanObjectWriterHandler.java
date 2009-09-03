@@ -176,16 +176,34 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			tag = "null";
 		}
 		
-		Namespace ns = (Namespace)namespacebypackage.get(pck);
+		Namespace ns = getNamespace(pck);
+		return new QName(ns.getURI(), tag, ns.getPrefix());
+	}
+	
+	/**
+	 *  Get the tag with namespace.
+	 */
+	public QName getTagWithPrefix(QName tag)
+	{
+		Namespace ns = getNamespace(tag.getNamespaceURI());
+		return new QName(ns.getURI(), tag.getLocalPart(), ns.getPrefix());
+	}
+	
+	/**
+	 *  Get or create a namespace.
+	 *  @param uri The namespace uri.
+	 */
+	protected Namespace getNamespace(String uri)
+	{
+		Namespace ns = (Namespace)namespacebypackage.get(uri);
 		if(ns==null)
 		{
 			String prefix = "p"+nscnt;
-			ns = new Namespace(prefix, pck);
-			namespacebypackage.put(pck, ns);
+			ns = new Namespace(prefix, uri);
+			namespacebypackage.put(uri, ns);
 			nscnt++;
 		}
-		
-		return new QName(ns.getURI(), tag, ns.getPrefix());
+		return ns;
 	}
 
 	/**

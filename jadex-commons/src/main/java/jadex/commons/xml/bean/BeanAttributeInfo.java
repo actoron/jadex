@@ -62,6 +62,14 @@ public class BeanAttributeInfo extends AttributeInfo
 	/**
 	 *  Create a new bean attribute info. 
 	 */
+	public BeanAttributeInfo(QName xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite)
+	{
+		this(xmlattributename, attributename, ignore, converterread, converterwrite, null);
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
 	public BeanAttributeInfo(QName xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, String mapname)
 	{
 		this(xmlattributename, attributename, ignore, converterread, converterwrite, mapname, null);
@@ -90,7 +98,7 @@ public class BeanAttributeInfo extends AttributeInfo
 	public BeanAttributeInfo(QName xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, 
 		String mapname, Object defaultvalue, Method readmethod, Method writemethod, Method readmapkeymethod)
 	{
-		super(xmlattributename, attributename!=null? attributename: xmlattributename.getLocalPart(), ignore);
+		super(xmlattributename, attributename!=null || xmlattributename==null? attributename: xmlattributename.getLocalPart(), ignore);
 		
 		this.converterread = converterread;
 		this.converterwrite = converterwrite;
