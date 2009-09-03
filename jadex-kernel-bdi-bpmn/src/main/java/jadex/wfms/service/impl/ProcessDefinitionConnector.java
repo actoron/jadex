@@ -7,6 +7,7 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.commons.concurrent.IResultListener;
 import jadex.gpmn.model.MGpmnModel;
 import jadex.service.execution.IExecutionService;
+import jadex.wfms.IProcessModel;
 import jadex.wfms.IWfms;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IAAAService;
@@ -39,87 +40,42 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	}
 	
 	/**
-	 * Adds a BPMN model to the repository
-	 * 
+	 * Adds a process model to the repository
 	 * @param client the client
 	 * @param name name of the model
 	 * @param path path to the model
 	 */
-	public void addBpmnModel(IClient client, String path)
+	public void addProcessModel(IClient client, String path)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_BPMN_PROCESS_MODEL))
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_PROCESS_MODEL))
 			return;
 		BasicModelRepositoryService mr = (BasicModelRepositoryService) wfms.getService(IModelRepositoryService.class);
 		mr.addProcessModel(path);
 	}
 	
 	/**
-	 * Gets a BPMN model.
+	 * Gets a process model.
 	 * @param name name of the model
 	 * @return the model
 	 */
-	public MBpmnModel getBpmnModel(IClient client, String name)
+	public IProcessModel getProcessModel(IClient client, String name)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_BPMN_PROCESS_MODEL))
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_PROCESS_MODEL))
 			return null;
 		IModelRepositoryService mr = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
 		
-		return (MBpmnModel)mr.getProcessModel(name);
+		return mr.getProcessModel(name);
 	}
 	
 	/**
-	 * Gets the names of all available BPMN-models
+	 * Gets the names of all available process models
 	 * 
 	 * @param client the client
-	 * @return the names of all available BPMN-models
+	 * @return the names of all available process models
 	 */
-	public Set getBpmnModelNames(IClient client)
+	public Set getProcessModelNames(IClient client)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_BPMN_MODEL_NAMES))
-			return null;
-		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		return new HashSet(rs.getModelNames());
-	}
-	
-	/**
-	 * Adds a GPMN model to the repository
-	 * @param client the client
-	 * @param name name of the model
-	 * @param path path to the model
-	 */
-	public void addGpmnModel(IClient client, String path)
-	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_GPMN_PROCESS_MODEL))
-			return;
-		BasicModelRepositoryService mr = (BasicModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		mr.addProcessModel(path);
-	}
-	
-	/**
-	 * Gets a GPMN model.
-	 * @param name name of the model
-	 * @return the model
-	 */
-	public MGpmnModel getGpmnModel(IClient client, String name)
-	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_GPMN_PROCESS_MODEL))
-			return null;
-		IModelRepositoryService mr = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		
-		// todo:
-		return null;
-//		return mr.getGpmnModel(name);
-	}
-	
-	/**
-	 * Gets the names of all available GPMN-models
-	 * 
-	 * @param client the client
-	 * @return the names of all available GPMN-models
-	 */
-	public Set getGpmnModelNames(IClient client)
-	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_GPMN_MODEL_NAMES))
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_MODEL_NAMES))
 			return null;
 		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
 		return new HashSet(rs.getModelNames());

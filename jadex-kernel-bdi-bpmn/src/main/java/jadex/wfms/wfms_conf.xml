@@ -29,7 +29,7 @@
 			</property>
 			
 			<property type="jadex.wfms.service.IModelRepositoryService" name="repository_service">
-				new jadex.wfms.service.impl.BasicModelRepositoryService(new String[]{"jadex.wfms.*", "jadex.bpmn.examples.dipp.*" })
+				new jadex.wfms.service.impl.BasicModelRepositoryService($wfms, new String[]{"jadex.wfms.*", "jadex.bpmn.examples.dipp.*" })
 			</property>
 			
 			<property type="jadex.wfms.service.IAAAService" name="authentication_service">

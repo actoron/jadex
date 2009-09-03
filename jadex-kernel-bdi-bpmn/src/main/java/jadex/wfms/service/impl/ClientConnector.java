@@ -108,7 +108,7 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 	 */
 	public Set getBpmnModelNames(IClient client)
 	{
-		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_BPMN_MODEL_NAMES))
+		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_MODEL_NAMES))
 			throw new AccessControlException("Not allowed: "+client);
 		
 		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
@@ -121,9 +121,9 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 	 * @param client the client
 	 * @return the names of all available BPMN-models
 	 */
-	public Set getGpmnModelNames(IClient client)
+	public Set getModelNames(IClient client)
 	{
-		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_BPMN_MODEL_NAMES))
+		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_MODEL_NAMES))
 			throw new AccessControlException("Not allowed: "+client);
 		
 		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
@@ -136,7 +136,7 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 	 * @param client the client
 	 * @param name name of the process
 	 */
-	public synchronized void startGpmnProcess(IClient client, String name)
+	public synchronized void startProcess(IClient client, String name)
 	{
 		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.START_BPMN_PROCESS))
 			throw new AccessControlException("Not allowed: "+client);

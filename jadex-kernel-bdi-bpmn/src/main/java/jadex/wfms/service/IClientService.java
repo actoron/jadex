@@ -21,26 +21,18 @@ public interface IClientService extends IService
 	public IProcessDefinitionService getProcessDefinitionService(IClient client);
 	
 	/**
-	 * Starts a new BPMN-process
-	 * 
-	 * @param client the client
-	 * @param name name of the process
-	 */
-	public void startBpmnProcess(IClient client, String name);
-	
-	/**
-	 *  Starts a new GPMN-process
+	 *  Starts a new process
 	 *  @param client the client
 	 *  @param name name of the process
 	 */
-	public void startGpmnProcess(IClient client, String name);
+	public void startProcess(IClient client, String name);
 	
 	/**
-	 *  Gets the names of all available GPMN-models
+	 *  Gets the names of all available process models
 	 *  @param client the client
-	 *  @return the names of all available GPMN-models
+	 *  @return the names of all available process models
 	 */
-	public Set getGpmnModelNames(IClient client);
+	public Set getModelNames(IClient client);
 	
 	/**
 	 *  Commits an acquired workitem.

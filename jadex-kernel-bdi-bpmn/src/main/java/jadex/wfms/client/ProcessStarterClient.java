@@ -21,9 +21,7 @@ public class ProcessStarterClient extends JFrame implements IClient
 {
 	private IClientService clientService;
 	
-	private JList bpmnProcessList;
-	
-	private JList gpmnProcessList;
+	private JList processList;
 	
 	public ProcessStarterClient(IClientService clntService)
 	{
@@ -31,9 +29,9 @@ public class ProcessStarterClient extends JFrame implements IClient
 		setTitle("BPMN Process Starter");
 		this.clientService = clntService;
 		
-		bpmnProcessList = new JList(new DefaultListModel());
-		for (Iterator it = clientService.getProcessDefinitionService(this).getBpmnModelNames(this).iterator(); it.hasNext(); )
-			((DefaultListModel) bpmnProcessList.getModel()).addElement(it.next());
+		processList = new JList(new DefaultListModel());
+		for (Iterator it = clientService.getProcessDefinitionService(this).getProcessModelNames(this).iterator(); it.hasNext(); )
+			((DefaultListModel) processList.getModel()).addElement(it.next());
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
@@ -42,22 +40,9 @@ public class ProcessStarterClient extends JFrame implements IClient
 		c.weighty = 1;
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.CENTER;
-		add(bpmnProcessList, c);
+		add(processList, c);
 		
-		gpmnProcessList = new JList(new DefaultListModel());
-		for (Iterator it = clientService.getProcessDefinitionService(this).getGpmnModelNames(this).iterator(); it.hasNext(); )
-			((DefaultListModel) gpmnProcessList.getModel()).addElement(it.next());
-		c = new GridBagConstraints();
-		c.gridx = 2;
-		c.gridy = 0;
-		c.gridwidth = 2;
-		c.weightx = 1;
-		c.weighty = 1;
-		c.fill = GridBagConstraints.BOTH;
-		c.anchor = GridBagConstraints.CENTER;
-		add(gpmnProcessList, c);
-		
-		JButton button = new JButton("Add BPMN Process...");
+		JButton button = new JButton("Add Process...");
 		button.addActionListener(new ActionListener()
 		{
 			
@@ -69,7 +54,7 @@ public class ProcessStarterClient extends JFrame implements IClient
 														  		   JOptionPane.PLAIN_MESSAGE,
 														  		   null,
 														  		   null,
-														  		   "New BPMN Process");
+														  		   "New Process Path");
 				String path = (String) JOptionPane.showInputDialog(ProcessStarterClient.this,
 				  		   										   "Input new process path:",
 				  		   										   "New Process Path",
@@ -78,93 +63,36 @@ public class ProcessStarterClient extends JFrame implements IClient
 				  		   										   null,
 																   "");
 //				adminService.addProcessModel(ProcessStarterClient.this, name, path);
-				clientService.getProcessDefinitionService(ProcessStarterClient.this).addBpmnModel(ProcessStarterClient.this, path);
-				((DefaultListModel) bpmnProcessList.getModel()).clear();
-				for (Iterator it = clientService.getProcessDefinitionService(ProcessStarterClient.this).getBpmnModelNames(ProcessStarterClient.this).iterator(); it.hasNext(); )
-					((DefaultListModel) bpmnProcessList.getModel()).addElement(it.next());
+				clientService.getProcessDefinitionService(ProcessStarterClient.this).addProcessModel(ProcessStarterClient.this, path);
+				((DefaultListModel) processList.getModel()).clear();
+				for (Iterator it = clientService.getProcessDefinitionService(ProcessStarterClient.this).getProcessModelNames(ProcessStarterClient.this).iterator(); it.hasNext(); )
+					((DefaultListModel) processList.getModel()).addElement(it.next());
 			}
 		});
 		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 1;
-		c.weightx = 0;
+		c.weightx = 1;
 		c.weighty = 0;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.CENTER;
 		add(button, c);
 		
-		button = new JButton("Start BPMN Process");
+		button = new JButton("Start Process");
 		button.addActionListener(new ActionListener()
 		{
 			
 			public void actionPerformed(ActionEvent e)
 			{
-				String name = (String) bpmnProcessList.getSelectedValue();
+				String name = (String) processList.getSelectedValue();
 				if (name != null)
-					clientService.startBpmnProcess(ProcessStarterClient.this, name);
+					clientService.startProcess(ProcessStarterClient.this, name);
 			}
 		});
 		c = new GridBagConstraints();
 		c.gridx = 1;
 		c.gridy = 1;
-		c.weightx = 0;
-		c.weighty = 0;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.anchor = GridBagConstraints.CENTER;
-		add(button, c);
-		
-		
-		button = new JButton("Add GPMN Process...");
-		button.addActionListener(new ActionListener()
-		{
-			
-			public void actionPerformed(ActionEvent e)
-			{
-				String name = (String) JOptionPane.showInputDialog(ProcessStarterClient.this,
-				  		   										   "Input new process name:",
-				  		   										   "New Process Name",
-				  		   										   JOptionPane.PLAIN_MESSAGE,
-				  		   										   null,
-				  		   										   null,
-				  		   										   "New GPMN Process");
-				String path = (String) JOptionPane.showInputDialog(ProcessStarterClient.this,
-							   									   "Input new process path:",
-							   									   "New Process Path",
-							   									   JOptionPane.PLAIN_MESSAGE,
-							   									   null,
-							   									   null,
-							   									   "");
-//				adminService.addProcessModel(ProcessStarterClient.this, name, path);
-				clientService.getProcessDefinitionService(ProcessStarterClient.this).addGpmnModel(ProcessStarterClient.this, path);
-				((DefaultListModel) gpmnProcessList.getModel()).clear();
-				for (Iterator it = clientService.getProcessDefinitionService(ProcessStarterClient.this).getGpmnModelNames(ProcessStarterClient.this).iterator(); it.hasNext(); )
-					((DefaultListModel) gpmnProcessList.getModel()).addElement(it.next());
-			}
-		});
-		c = new GridBagConstraints();
-		c.gridx = 2;
-		c.gridy = 1;
-		c.weightx = 0;
-		c.weighty = 0;
-		c.fill = GridBagConstraints.HORIZONTAL;
-		c.anchor = GridBagConstraints.CENTER;
-		add(button, c);
-		
-		button = new JButton("Start GPMN Process");
-		button.addActionListener(new ActionListener()
-		{
-			
-			public void actionPerformed(ActionEvent e)
-			{
-				String name = (String) gpmnProcessList.getSelectedValue();
-				if (name != null)
-					clientService.startGpmnProcess(ProcessStarterClient.this, name);
-			}
-		});
-		c = new GridBagConstraints();
-		c.gridx = 3;
-		c.gridy = 1;
-		c.weightx = 0;
+		c.weightx = 1;
 		c.weighty = 0;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.anchor = GridBagConstraints.CENTER;

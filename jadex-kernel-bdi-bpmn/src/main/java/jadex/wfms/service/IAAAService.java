@@ -17,18 +17,15 @@ public interface IAAAService extends IService
 	
 	// Actions
 	public static final int REQUEST_PD_SERVICE	 	 	= 0;
-	public static final int ADD_BPMN_PROCESS_MODEL 	 	= 50;
-	public static final int ADD_GPMN_PROCESS_MODEL 	 	= 51;
-	public static final int REQUEST_BPMN_PROCESS_MODEL	= 52;
-	public static final int REQUEST_GPMN_PROCESS_MODEL	= 53;
+	public static final int ADD_PROCESS_MODEL 	 		= 50;
+	public static final int REQUEST_PROCESS_MODEL		= 51;
 	public static final int START_BPMN_PROCESS 		 	= 100;
 	public static final int START_GPMN_PROCESS 		 	= 101;
-	public static final int REQUEST_BPMN_MODEL_NAMES 	= 102;
-	public static final int REQUEST_GPMN_MODEL_NAMES 	= 103;
-	public static final int REQUEST_AVAILABLE_WORKITEMS = 104;
-	public static final int COMMIT_WORKITEM			 	= 105;
-	public static final int ACQUIRE_WORKITEM		 	= 106;
-	public static final int RELEASE_WORKITEM		 	= 107;
+	public static final int REQUEST_MODEL_NAMES 		= 102;
+	public static final int REQUEST_AVAILABLE_WORKITEMS = 103;
+	public static final int COMMIT_WORKITEM			 	= 104;
+	public static final int ACQUIRE_WORKITEM		 	= 105;
+	public static final int RELEASE_WORKITEM		 	= 106;
 	
 	/**
 	 * Checks if a client can access an action

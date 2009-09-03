@@ -25,7 +25,7 @@ public class BasicAAAService implements IAAAService
 	
 	public BasicAAAService(Map userroles)
 	{
-		userroles = userroles!=null? userroles: new HashMap();
+		this.userroles = userroles!=null? userroles: new HashMap();
 	}
 	
 	/**

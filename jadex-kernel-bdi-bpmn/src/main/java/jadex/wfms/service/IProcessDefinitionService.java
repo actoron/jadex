@@ -5,6 +5,7 @@ import java.util.Set;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.gpmn.model.MGpmnModel;
 import jadex.service.IService;
+import jadex.wfms.IProcessModel;
 import jadex.wfms.client.IClient;
 
 /**
@@ -14,27 +15,27 @@ import jadex.wfms.client.IClient;
 public interface IProcessDefinitionService extends IService
 {
 	/**
-	 * Adds a BPMN model to the repository
+	 * Adds a process model to the repository
 	 * @param client the client
 	 * @param name name of the model
 	 * @param path path to the model
 	 */
-	public void addBpmnModel(IClient client, String path);
+	public void addProcessModel(IClient client, String path);
 	
 	/**
-	 * Gets a BPMN model.
+	 * Gets a process model.
 	 * @param name name of the model
 	 * @return the model
 	 */
-	public MBpmnModel getBpmnModel(IClient client, String name);
+	public IProcessModel getProcessModel(IClient client, String name);
 	
 	/**
-	 * Gets the names of all available BPMN-models
+	 * Gets the names of all available process models
 	 * 
 	 * @param client the client
-	 * @return the names of all available BPMN-models
+	 * @return the names of all available process models
 	 */
-	public Set getBpmnModelNames(IClient client);
+	public Set getProcessModelNames(IClient client);
 	
 	/**
 	 * Adds a GPMN model to the repository
@@ -42,14 +43,14 @@ public interface IProcessDefinitionService extends IService
 	 * @param name name of the model
 	 * @param path path to the model
 	 */
-	public void addGpmnModel(IClient client, String path);
+	//public void addGpmnModel(IClient client, String path);
 	
 	/**
 	 * Gets a GPMN model.
 	 * @param name name of the model
 	 * @return the model
 	 */
-	public MGpmnModel getGpmnModel(IClient client, String name);
+	//public MGpmnModel getGpmnModel(IClient client, String name);
 	
 	/**
 	 * Gets the names of all available GPMN-models
@@ -57,5 +58,5 @@ public interface IProcessDefinitionService extends IService
 	 * @param client the client
 	 * @return the names of all available GPMN-models
 	 */
-	public Set getGpmnModelNames(IClient client);
+	//public Set getGpmnModelNames(IClient client);
 }
