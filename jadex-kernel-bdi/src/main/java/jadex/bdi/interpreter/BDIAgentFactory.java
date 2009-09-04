@@ -146,6 +146,8 @@ public class BDIAgentFactory implements IAgentFactory
 	// Todo: support imports when loading models.
 	public boolean	isLoadable(String model)
 	{
+		init();
+
 		return loader.isLoadable(model, null);
 //		return model.toLowerCase().endsWith(".agent.xml") || model.toLowerCase().endsWith(".capability.xml");
 		

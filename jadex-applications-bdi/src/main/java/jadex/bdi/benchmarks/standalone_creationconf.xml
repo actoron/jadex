@@ -25,7 +25,7 @@
 		<properties type="services">
 			<!-- Library service. -->
 			<property type="jadex.service.library.ILibraryService" name="library_service">
-				new jadex.service.library.LibraryService()
+				new jadex.service.library.LibraryService(new Object[]{"../jadex-applications-bdi/target/classes"})
 			</property>
 			
 			<!-- Threadpool service. -->

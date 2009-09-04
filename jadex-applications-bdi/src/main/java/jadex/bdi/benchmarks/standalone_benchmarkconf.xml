@@ -19,22 +19,19 @@
 		<!-- <propertiesref ref="kernel_v2_bdi"/>-->
 		
 		<property type="application_factory">
-			new jadex.adapter.base.appdescriptor.ApplicationFactory($platform, null, null)
+			new jadex.adapter.base.appdescriptor.ApplicationFactory($platform, null)
 		</property>
 		
 		<!-- Platform services. -->
 		<properties type="services">			
 			<!-- Library service. -->
-			<property type="jadex.bridge.ILibraryService" name="library_service">new jadex.adapter.base.libraryservice.LibraryService(
-				new Object[]
-				{
-					"../jadex-applications-bdi/target/classes"
-				})
+			<property type="jadex.service.library.ILibraryService" name="library_service">
+				new jadex.service.library.LibraryService(new Object[]{"../jadex-applications-bdi/target/classes"})
 			</property>
 			
 			<!-- Threadpool service. -->
-			<property type="jadex.adapter.base.ThreadPoolService" name="threadpool_service">
-				new jadex.adapter.base.ThreadPoolService(
+			<property type="jadex.service.threadpool.ThreadPoolService" name="threadpool_service">
+				new jadex.service.threadpool.ThreadPoolService(
 					//new jadex.commons.concurrent.java5.JavaThreadPool()
 					new jadex.commons.concurrent.ThreadPool(
 						new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
@@ -55,23 +52,23 @@
 			</property>
 			
 			<!-- Clock service. -->
-			<property type="jadex.bridge.IClockService" name="clock_service">
-				new jadex.adapter.base.clock.ClockService(
-					new jadex.adapter.base.clock.SystemClock("system_clock", 1,
-					$platform.getService(jadex.adapter.base.ThreadPoolService.class)), $platform)
+			<property type="jadex.service.clock.IClockService" name="clock_service">
+				new jadex.service.clock.ClockService(
+					new jadex.service.clock.SystemClock("system_clock", 100,
+					$platform.getService(jadex.service.threadpool.ThreadPoolService.class)))
 //				new jadex.adapter.base.clock.SimulationEventClock("simulation_clock",
-//					System.currentTimeMillis(), 100))
+//					System.currentTimeMillis(), 200))
 			</property>
 
-			<!-- Simulation service. - ->
-			<property type="jadex.adapter.base.ISimulationService" name="simulation_service">
+			<!-- Simulation service. -->
+			<!-- <property type="jadex.adapter.base.ISimulationService" name="simulation_service">
 				new jadex.adapter.base.SimulationService($platform)
 			</property> -->
 		
 			<!-- Execution service. -->
-			<property type="jadex.adapter.base.execution.IExecutionService" name="execution_service">
-				new jadex.adapter.base.execution.AsyncExecutionService(
-					$platform.getService(jadex.adapter.base.ThreadPoolService.class))
+			<property type="jadex.service.execution.IExecutionService" name="execution_service">
+				new jadex.service.execution.SyncExecutionService(
+					$platform.getService(jadex.service.threadpool.ThreadPoolService.class))
 			</property>
 		</properties>
 		
@@ -94,7 +91,7 @@
 					new Object[]
 					{
 						new jadex.adapter.base.fipa.FIPAMessageType(), 
-						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.adapter.base.ThreadPoolService.class)),
+						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class)),
 						new java.lang.Long(10000),
 						jadex.tools.introspector.IntrospectorAdapter.class,
 						Boolean.FALSE
