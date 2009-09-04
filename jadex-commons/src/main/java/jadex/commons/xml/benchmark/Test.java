@@ -32,6 +32,7 @@ public class Test //extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
+				t.testDate();
 				t.testColor();
 				t.testArray();
 				t.testBean();
@@ -77,6 +78,14 @@ public class Test //extends TestCase
 			System.out.println("Not equal: "+wo.getClass()+" \n"+ro.getClass());
 		
 //		assertEquals("Written and read objects should be equal:", wo, ro);
+	}
+	
+	/**
+	 *  Test if date transfer works.
+	 */
+	public void testDate() throws Exception
+	{
+		doWriteAndRead(new java.util.Date());
 	}
 	
 	/**

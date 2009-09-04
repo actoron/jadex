@@ -562,7 +562,17 @@ public class TypeInfo	extends AbstractInfo
 		Map ret = new HashMap();
 		for(int i=0; i<attributeinfos.length; i++)
 		{
-			ret.put(attributeinfos[i].getXMLAttributeName(), attributeinfos[i]);
+			QName xmlname = attributeinfos[i].getXMLAttributeName();
+			if(xmlname==null)
+			{
+				Object attrid = attributeinfos[i].getAttributeIdentifier();
+				if(attrid!=null)
+				{
+					xmlname = new QName(attrid.toString());
+					System.out.println("Warning, no xml name for attribute:"+attrid);
+				}
+			}
+			ret.put(xmlname, attributeinfos[i]);
 		}
 		return ret;
 	}

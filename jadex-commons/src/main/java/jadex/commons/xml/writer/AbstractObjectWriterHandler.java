@@ -266,9 +266,10 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 		
 		// Special case that no info about object was found.
 		// Hack?!
-		if(typeinfo==null && wi.getAttributes()==null && wi.getSubobjects()==null && wi.getContent()==null)
+		if(typeinfo==null && wi.getAttributes()==null && wi.getSubobjects()==null && wi.getContent()==null && doneprops.size()==0)
 		{
 			// todo: use prewriter
+//			System.out.println("Special case for content: "+object);
 			wi.setContent(object.toString());
 		}
 		

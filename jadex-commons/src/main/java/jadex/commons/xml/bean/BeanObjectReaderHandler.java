@@ -46,6 +46,10 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	/** No type infos. */
 	protected Set no_typeinfos;
 	
+	/** The bean introspector. */
+//	protected IBeanIntrospector introspector = new BeanReflectionIntrospector();
+	protected IBeanIntrospector introspector = new BeanInfoIntrospector();
+	
 	//-------- constructors --------
 	
 	/**
@@ -447,6 +451,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				}
 				else
 				{
+					
+					
 					String[] prefixes = new String[]{"put", "set", "add"};
 					for(int i=0; i<prefixes.length && !set; i++)
 					{
@@ -522,18 +528,38 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		{
 			// Write as normal bean attribute.
 			
-			String postfix = attrinfo instanceof String? ((String)attrinfo).substring(0,1).toUpperCase()+((String)attrinfo).substring(1)
-				: xmlattrname.getLocalPart().substring(0,1).toUpperCase()+xmlattrname.getLocalPart().substring(1);
+			// Try to find bean class information
 			
-			set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, null);
-		
+			Map props = introspector.getBeanProperties(object.getClass());
+			BeanProperty prop = (BeanProperty)props.get(attrinfo instanceof String? attrinfo: xmlattrname.getLocalPart());
+			if(prop!=null)
+			{
+				Object arg = convertAttributeValue(attrval, prop.getSetterType(), null, root, classloader);
+
+				try
+				{
+					prop.getSetter().invoke(object, new Object[]{arg});
+					set = true;
+				}
+				catch(Exception e)
+				{
+				}
+			}
+			
 			if(!set)
 			{
-				String oldpostfix = postfix;
-				postfix = SUtil.getSingular(postfix);
-				if(!postfix.equals(oldpostfix))
+				String postfix = attrinfo instanceof String? ((String)attrinfo).substring(0,1).toUpperCase()+((String)attrinfo).substring(1)
+					: xmlattrname.getLocalPart().substring(0,1).toUpperCase()+xmlattrname.getLocalPart().substring(1);
+				set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, null);
+			
+				if(!set)
 				{
-					set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, null);
+					String oldpostfix = postfix;
+					postfix = SUtil.getSingular(postfix);
+					if(!postfix.equals(oldpostfix))
+					{
+						set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, null);
+					}
 				}
 			}
 		}

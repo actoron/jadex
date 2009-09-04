@@ -276,7 +276,7 @@ public class Reader
 					if(typeinfo!=null && typeinfo.getPostProcessor()!=null)
 					{
 						final IPostProcessor postproc = typeinfo.getPostProcessor();
-						if(postproc.getPass()==1)
+						if(postproc.getPass()==0)
 						{
 							Object changed = typeinfo.getPostProcessor().postProcess(context, topse.getObject(), root, classloader);
 							if(changed!=null)
@@ -347,7 +347,7 @@ public class Reader
 		parser.close();
 		
 		// Handle post-processors.
-		for(int i=2; postprocs.size()>0; i++)
+		for(int i=1; postprocs.size()>0; i++)
 		{
 			List ps = (List)postprocs.remove(new Integer(i));
 			if(ps!=null)
@@ -357,6 +357,7 @@ public class Reader
 					((Runnable)ps.get(j)).run();
 				}
 			}
+			System.out.println("i: "+i);
 		}
 			
 		return root;

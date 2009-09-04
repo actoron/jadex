@@ -4,7 +4,6 @@ import jadex.commons.SReflect;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.IPostProcessor;
 import jadex.commons.xml.ITypeConverter;
-import jadex.commons.xml.Namespace;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.bean.IBeanObjectCreator;

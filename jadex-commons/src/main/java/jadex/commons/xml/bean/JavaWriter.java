@@ -9,6 +9,7 @@ import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.writer.Writer;
 
 import java.awt.Color;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -113,30 +114,23 @@ public class JavaWriter extends Writer
 					}
 				})
 			);
-			
-//			TypeInfo ti_color = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.awt", "Color")}, Color.class, null, null, 
-//				new BeanAttributeInfo[]{
-//				new BeanAttributeInfo("red", null, null, null, null, null, null, Color.class.getMethod("", new Class[]{})),
-//				new BeanAttributeInfo("green", null, null, BasicTypeConverter.INTEGER_CONVERTER, null, ""),
-//				new BeanAttributeInfo("blue", null, null, BasicTypeConverter.INTEGER_CONVERTER, null, "")
-//				}, new IPostProcessor()
-//				{
-//					public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
-//					{
-//						Map tmp = (Map)object;
-//						int red = ((Integer)tmp.get("red")).intValue();
-//						int green = ((Integer)tmp.get("red")).intValue();
-//						int blue = ((Integer)tmp.get("red")).intValue();
-//						return new Color(red, green, blue);
-//					}
-//					
-//					public int getPass()
-//					{
-//						return 0;
-//					}
-//				}
-//			);
 			typeinfos.add(ti_color);
+			
+			// java.util.Date
+			
+			// Ignores several redundant bean attributes for performance reasons.
+			
+			TypeInfo ti_date = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Date")}, Date.class, null, null, 
+				new AttributeInfo[]{
+				new BeanAttributeInfo("hours", null, AttributeInfo.IGNORE_READWRITE),
+				new BeanAttributeInfo("minutes", null, AttributeInfo.IGNORE_READWRITE),
+				new BeanAttributeInfo("seconds", null, AttributeInfo.IGNORE_READWRITE),
+				new BeanAttributeInfo("month", null, AttributeInfo.IGNORE_READWRITE),
+				new BeanAttributeInfo("year", null, AttributeInfo.IGNORE_READWRITE),
+				new BeanAttributeInfo("date", null, AttributeInfo.IGNORE_READWRITE)},
+				null
+			);
+			typeinfos.add(ti_date);
 		}
 		catch(Exception e)
 		{

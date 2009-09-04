@@ -128,7 +128,7 @@ public class BDIAgentFactory implements IAgentFactory
 		try
 		{
 //			System.out.println("loading: "+filename);
-			OAVCapabilityModel loaded = (OAVCapabilityModel) loader.loadModel(filename, null);
+			OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, null);
 			return loaded;
 		}
 		catch(Exception e)
