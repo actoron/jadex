@@ -4,7 +4,7 @@ import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
-import jadex.bridge.IClockService;
+import jadex.service.clock.IClockService;
 import jadex.commons.SimplePropertyObject;
 
 /**

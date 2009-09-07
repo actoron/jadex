@@ -16,8 +16,8 @@
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
 		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor</import>
 		<import>jadex.adapter.base.envsupport.environment.*</import>		
-		<import>jadex.adapter.base.envsupport.math.*</import>
-		<import>jadex.bridge.IClockService</import>
+		<import>jadex.adapter.base.envsupport.math.*</import>		
+		<import>jadex.service.clock.IClockService</import>
 		<import>jadex.adapter.base.envsupport.dataview.GeneralDataView2D</import>
 		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
 	</imports>
