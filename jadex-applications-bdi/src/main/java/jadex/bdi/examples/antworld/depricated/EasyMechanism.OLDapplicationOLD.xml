@@ -2,14 +2,16 @@
 	<!--
 		<H3>Test applikation for V2 and Deco4MAS</H3> Work in progress...
 		can be removed!
-	- ->
+	-->
 
-<applicationtype xmlns="http://jadex.sourceforge.net/jadex-bdi"
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
 	xmlns:env="http://jadex.sourceforge.net/jadex-envspace" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
-	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
-	name="EasyMechanism" package="jadex.bdi.examples.antworld.depricated">-->
-<applicationtype>
+	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
+	                    http://jadex.sourceforge.net/jadex-envspace 
+	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
+	name="EasyMechanism" package="jadex.bdi.examples.antworld.depricated">
+	
 	<imports>
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
 		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor</import>
@@ -114,7 +116,7 @@
 
 			<!-- executor -->
 			<env:spaceexecutor class="RoundBasedExecutor">
-				<property name="space">$space</property>
+				<env:property name="space">$space</env:property>
 			</env:spaceexecutor>
 		</env:envspacetype>
 	</spacetypes>
@@ -128,11 +130,7 @@
 
 	<applications>
 		<application name="Test">
-			<agents>
-				<agent type="Receiver" number="1" />
-				<agent type="Environment" />
-			</agents>
-
+		<spaces>
 			<env:envspace name="mygc2dspace" type="gc2dspace">
 				<env:objects>
 					<!-- <env:object type="nest">
@@ -154,6 +152,13 @@
 					</env:observer>
 				</env:observers>
 			</env:envspace>
+			</spaces>
+			
+				<agents>
+				<agent type="Receiver" number="1" />
+				<agent type="Environment" />
+			</agents>
+			
 		</application>
 
 	</applications>
