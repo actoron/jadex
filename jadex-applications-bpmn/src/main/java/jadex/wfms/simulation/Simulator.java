@@ -1,34 +1,37 @@
 package jadex.wfms.simulation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-import javax.swing.JFrame;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
-
-import jadex.bpmn.BpmnModelLoader;
-import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.gpmn.model.MGpmnModel;
-import jadex.gpmn.model.MPlan;
-import jadex.gpmn.model.MProcess;
-import jadex.wfms.IWfms;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IClientService;
-import jadex.wfms.service.IModelRepositoryService;
-import jadex.wfms.service.IProcessDefinitionService;
+import jadex.wfms.simulation.gui.SimulationWindow;
 
 public class Simulator implements IClient
 {
 	private IClientService clientService;
 	
+	private SimulationWindow simWindow;
+	
+	private String userName;
+	
 	public Simulator(IClientService clientService)
 	{
+		this(clientService, "TestUser");
+	}
+	
+	public Simulator(IClientService clientService, String userName)
+	{
 		this.clientService = clientService;
+		simWindow = new SimulationWindow(this);
+		
+		simWindow.addWindowListener(new WindowAdapter()
+		{
+			public void windowClosed(WindowEvent e)
+			{
+				System.exit(0);
+			}
+		});
 	}
 	
 	public IClientService getClientService()
@@ -36,32 +39,8 @@ public class Simulator implements IClient
 		return clientService;
 	}
 	
-	public void test()
-	{
-		MGpmnModel gpmnModel = (MGpmnModel) clientService.getProcessDefinitionService(this).getProcessModel(this, "dipp");
-		System.err.println(gpmnModel);
-		ProcessTreeModel model = new ProcessTreeModel();
-		try
-		{
-			model.setRootModel(gpmnModel);
-		} catch (Exception e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		JFrame frame = new JFrame("Simulator");
-		JTree tree = new JTree(model);
-		frame.add(tree);
-		frame.pack();
-		frame.setSize(300,300);
-		frame.setVisible(true);
-		int row = 0;
-		while (row < tree.getRowCount())
-			tree.collapseRow(row++);
-	}
-	
 	public String getUserName()
 	{
-		return "TestUser";
+		return userName;
 	}
 }

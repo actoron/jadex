@@ -31,16 +31,26 @@ import java.util.Set;
 
 public class WfmsLauncher
 {
+	private IWfms wfms;
+	
 	/**
 	 * @throws Exception 
 	 * 
 	 */
 	public static void main(String[] args) throws Exception
 	{
-		launchWfms(args);
+		WfmsLauncher launcher = new WfmsLauncher();
+		launcher.launchBasicWfms(args);
+		launcher.launchGuiClient();
+		launcher.launchProcessStarter();
 	}
 	
-	public static IWfms launchWfms(String[] args) throws Exception
+	public IWfms getWfms()
+	{
+		return wfms;
+	}
+	
+	public void launchBasicWfms(String[] args) throws Exception
 	{
 		long starttime = System.currentTimeMillis();
 		
@@ -57,11 +67,11 @@ public class WfmsLauncher
 		// Hack as long as no loader is present.
 		ClassLoader cl = Platform.class.getClassLoader();
 		Properties configuration = (Properties)PropertiesXMLHelper.getPropertyReader().read(SUtil.getResource(conffile, cl), cl, null);
-		BasicWfms wfms = new BasicWfms(configuration);
+		wfms = new BasicWfms(configuration);
 		wfms.start();
 		
 		long startup = System.currentTimeMillis() - starttime;
-		wfms.getLogger().info("Wfms startup time: " + startup + " ms.");
+		((BasicWfms) wfms).getLogger().info("Wfms startup time: " + startup + " ms.");
 		
 		/*String[] imports = {"jadex.wfms.*", "jadex.bpmn.examples.dipp.*" };
 		BasicModelRepositoryService mr = new BasicModelRepositoryService(wfms, imports);
@@ -83,16 +93,27 @@ public class WfmsLauncher
 		Set roles = new HashSet();
 		roles.add("all");
 		as.addUser("TestUser", roles);
-		wfms.addService(IAAAService.class, "auth_service", as);
+		((BasicWfms) wfms).addService(IAAAService.class, "auth_service", as);
 			
 		/*ClientConnector cc = new ClientConnector(wfms);
 		wfms.addService(IClientService.class, "client_service", cc);
 		wfms.addService(IWorkitemQueueService.class, "workitem_service", cc);
 		wfms.addService(IProcessDefinitionService.class, "procdef_service", new ProcessDefinitionConnector(wfms));*/
 		
-		IClientService cs = (IClientService) wfms.getService(IClientService.class);
-		new GuiClient("TestUser", cs);
-		new ProcessStarterClient(cs);
-		return wfms;
+	}
+	
+	public IClientService getClientService()
+	{
+		return (IClientService) wfms.getService(IClientService.class);
+	}
+	
+	public void launchGuiClient()
+	{
+		new GuiClient("TestUser", getClientService());
+	}
+	
+	public void launchProcessStarter()
+	{
+		new ProcessStarterClient(getClientService());
 	}
 }

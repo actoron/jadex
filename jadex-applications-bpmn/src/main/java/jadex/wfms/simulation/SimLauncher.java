@@ -1,5 +1,7 @@
 package jadex.wfms.simulation;
 
+import java.awt.EventQueue;
+
 import jadex.bpmn.examples.wfms.WfmsLauncher;
 import jadex.wfms.IWfms;
 import jadex.wfms.service.IClientService;
@@ -8,8 +10,16 @@ public class SimLauncher
 {
 	public static void main(String[] args) throws Exception
 	{
-		IWfms wfms = WfmsLauncher.launchWfms(args);
-		(new Simulator((IClientService) wfms.getService(IClientService.class))).test();
+		final WfmsLauncher launcher = new WfmsLauncher();
+		launcher.launchBasicWfms(args);
+		EventQueue.invokeLater(new Runnable()
+		{
+			
+			public void run()
+			{
+				new Simulator(launcher.getClientService());
+			}
+		});
 	}
 
 }
