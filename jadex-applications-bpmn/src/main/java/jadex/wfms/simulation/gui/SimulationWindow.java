@@ -6,6 +6,7 @@ import java.beans.PropertyChangeListener;
 import java.util.Set;
 
 import jadex.commons.SGUI;
+import jadex.commons.collection.TreeNode;
 import jadex.wfms.simulation.Simulator;
 
 import javax.swing.AbstractAction;
@@ -14,11 +15,15 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 
 public class SimulationWindow extends JFrame
 {
@@ -34,11 +39,15 @@ public class SimulationWindow extends JFrame
 	
 	private static final JPanel EMPTY_PANEL = new JPanel();
 	
+	private static final TreeModel EMPTY_MODEL = new DefaultTreeModel(new DefaultMutableTreeNode("No Process"));
+	
 	private Simulator simulator;
 	
 	private JTree processModelTree;
 	
 	private JMenuBar menuBar;
+	
+	private JMenuItem openMenuItem;
 	
 	public SimulationWindow(Simulator simulator)
 	{
@@ -49,16 +58,12 @@ public class SimulationWindow extends JFrame
 		mainPane.setOneTouchExpandable(true);
 		add(mainPane);
 		
-		JScrollPane treePane = new JScrollPane();
+		processModelTree = new JTree(EMPTY_MODEL);
+		JScrollPane treePane = new JScrollPane(processModelTree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		mainPane.setLeftComponent(treePane);
-		processModelTree = new JTree();
-		treePane.add(processModelTree);
+		//mainPane.setLeftComponent(processModelTree);
 		
 		mainPane.setRightComponent(EMPTY_PANEL);
-		
-		/*int row = 0;
-		while (row < tree.getRowCount())
-			tree.collapseRow(row++);*/
 		
 		buildMenuBar();
 		
@@ -78,76 +83,122 @@ public class SimulationWindow extends JFrame
 		processMenu.setMnemonic(KeyEvent.VK_P);
 		menuBar.add(processMenu);
 		
-		JMenuItem openItem = new JMenuItem();
-		openItem.setAction(new AbstractAction()
+		openMenuItem = new JMenuItem();
+		openMenuItem.setAction(new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 				System.out.println("Open active!");
 			}
 		});
-		openItem.setText(OPEN_MENU_ITEM_NAME);
-		openItem.setMnemonic(KeyEvent.VK_O);
-		openItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-		processMenu.add(openItem);
+		openMenuItem.setText(OPEN_MENU_ITEM_NAME);
+		openMenuItem.setMnemonic(KeyEvent.VK_O);
+		openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+		processMenu.add(openMenuItem);
 		
-		JMenuItem closeItem = new JMenuItem();
-		closeItem.setAction(new AbstractAction()
+		JMenuItem closeMenuItem = new JMenuItem();
+		closeMenuItem.setAction(new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 				System.out.println("Close active!");
 			}
 		});
-		closeItem.setText(CLOSE_MENU_ITEM_NAME);
-		closeItem.setMnemonic(KeyEvent.VK_C);
-		closeItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK));
-		processMenu.add(closeItem);
+		closeMenuItem.setText(CLOSE_MENU_ITEM_NAME);
+		closeMenuItem.setMnemonic(KeyEvent.VK_C);
+		closeMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK));
+		processMenu.add(closeMenuItem);
 		
 		processMenu.addSeparator();
 		
-		JMenuItem exitItem = new JMenuItem();
-		exitItem.setAction(new AbstractAction()
+		JMenuItem exitMenuItem = new JMenuItem();
+		exitMenuItem.setAction(new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 				SimulationWindow.this.dispose();
 			}
 		});
-		exitItem.setText(EXIT_MENU_ITEM_NAME);
-		exitItem.setMnemonic(KeyEvent.VK_X);
-		exitItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
-		processMenu.add(exitItem);
+		exitMenuItem.setText(EXIT_MENU_ITEM_NAME);
+		exitMenuItem.setMnemonic(KeyEvent.VK_X);
+		exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
+		processMenu.add(exitMenuItem);
 		
 		
 		JMenu simMenu = new JMenu(SIMULATION_MENU_NAME);
 		simMenu.setMnemonic(KeyEvent.VK_S);
 		menuBar.add(simMenu);
 		
-		JMenuItem startItem = new JMenuItem();
-		startItem.setAction(new AbstractAction()
+		JMenuItem startMenuItem = new JMenuItem();
+		startMenuItem.setAction(new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 				System.out.println("Start active!");
 			}
 		});
-		startItem.setText(START_MENU_ITEM_NAME);
-		startItem.setMnemonic(KeyEvent.VK_S);
-		startItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
-		simMenu.add(startItem);
+		startMenuItem.setText(START_MENU_ITEM_NAME);
+		startMenuItem.setMnemonic(KeyEvent.VK_S);
+		startMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+		simMenu.add(startMenuItem);
 		
-		JMenuItem stopItem = new JMenuItem();
-		stopItem.setAction(new AbstractAction()
+		JMenuItem stopMenuItem = new JMenuItem();
+		stopMenuItem.setAction(new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 				System.out.println("Stop active!");
 			}
 		});
-		stopItem.setText(STOP_MENU_ITEM_NAME);
-		stopItem.setMnemonic(KeyEvent.VK_T);
-		stopItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
-		simMenu.add(stopItem);
+		stopMenuItem.setText(STOP_MENU_ITEM_NAME);
+		stopMenuItem.setMnemonic(KeyEvent.VK_T);
+		stopMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
+		simMenu.add(stopMenuItem);
+	}
+	
+	public String showProcessPickerDialog(Set modelNames)
+	{
+		return (String)JOptionPane.showInputDialog(this,
+                "Pick a process",
+                "Processes",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                modelNames.toArray(),
+                "ham");
+
+	}
+	
+	public void showMessage(int type, String title, String text)
+	{
+		JOptionPane.showMessageDialog(this, text, title, type);
+	}
+	
+	public void setOpenAction(Action action)
+	{
+		setMenuAction(openMenuItem, action);
+	}
+	
+	public void setProcessTreeModel(TreeModel model)
+	{
+		if (model == null)
+			model = EMPTY_MODEL;
+		processModelTree.setModel(model);
+		int row = 0;
+		while (row < processModelTree.getRowCount())
+			processModelTree.collapseRow(row++);
+		processModelTree.repaint();
+	}
+	
+	private void setMenuAction(JMenuItem menuItem, Action action)
+	{
+		int mnemonic = menuItem.getMnemonic();
+		KeyStroke accelerator = menuItem.getAccelerator();
+		String text = menuItem.getText();
+		
+		menuItem.setAction(action);
+		
+		menuItem.setMnemonic(mnemonic);
+		menuItem.setAccelerator(accelerator);
+		menuItem.setText(text);
 	}
 }

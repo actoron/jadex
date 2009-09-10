@@ -13,6 +13,7 @@ import jadex.gpmn.model.MProcess;
 import jadex.javaparser.javaccimpl.ReflectNode;
 import jadex.wfms.IProcessModel;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -219,13 +220,22 @@ public class ProcessTreeModel extends Tree implements TreeModel
 		public String toString()
 		{
 			if (data instanceof IProcessModel)
-				return String.valueOf(((IProcessModel) data).getFilename());
+			{
+				IProcessModel model = ((IProcessModel) data);
+				String ret = model.getName();
+				if (ret == null)
+				{
+					ret = model.getFilename();
+					ret = ret.substring(ret.lastIndexOf(File.separator) + 1);
+				}
+				return ret;
+			}
 			else if (data instanceof MActivity)
 				return ((MActivity) data).getName();
 			else if (data instanceof MParameter)
 				return ((MParameter) data).getName();
 			else
-				return data.toString();
+				return String.valueOf(data);
 		}
 	}
 }
