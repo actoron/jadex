@@ -15,10 +15,12 @@ import jadex.wfms.IProcessModel;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.event.TreeModelListener;
@@ -35,7 +37,9 @@ public class ProcessTreeModel extends Tree implements TreeModel
 	
 	private BpmnModelLoader bpmnLoader;
 	
-	private Set processNames;
+	private Map processes;
+	
+	private Map tasks;
 	
 	public ProcessTreeModel()
 	{
@@ -44,9 +48,13 @@ public class ProcessTreeModel extends Tree implements TreeModel
 	
 	public void setRootModel(IProcessModel model) throws Exception
 	{
-		processNames = new HashSet();
-		processNames.add(model.getFilename());
-		root = buildTree(model);
+		processes = new HashMap();
+		tasks = new HashMap();
+		TreeNode tmpRoot = buildTree(model);
+		processes.put(resolveProcessName(model), model);
+		root = new ModelTreeNode();
+		root.setChildren(tmpRoot.getChildren());
+		root.setData(tmpRoot.getData());
 	}
 	
 	public TreeNode buildTree(IProcessModel processModel) throws Exception
@@ -59,40 +67,53 @@ public class ProcessTreeModel extends Tree implements TreeModel
 		for (Iterator it = subProcesses.iterator(); it.hasNext(); )
 		{
 			IProcessModel subModel = (IProcessModel) it.next();
-			System.out.println(processModel.getName() + " Submodel: " + subModel.getName() + " " + subModel.getFilename());
-			if (processNames.contains(subModel.getFilename()))
+			if (processes.containsKey(resolveProcessName(subModel)))
+			{
 				it.remove();
-			else
-				processNames.add(subModel.getFilename());
+				ModelTreeNode linkNode = new ModelTreeNode();
+				linkNode.setData(processes.get(resolveProcessName(subModel)));
+				node.addChild(linkNode);
+			}
+			/*else
+			{
+				processes.put(resolveProcessName(subModel), "");
+			}*/
 		}
 		
 		// Add subprocesses
 		for (Iterator it = subProcesses.iterator(); it.hasNext(); )
 		{
 			IProcessModel subModel = (IProcessModel) it.next();
-			node.addChild(buildTree(subModel));
+			ModelTreeNode tmpNode = new ModelTreeNode();
+			processes.put(resolveProcessName(subModel), tmpNode);
+			TreeNode subTree = buildTree(subModel);
+			tmpNode.setChildren(subTree.getChildren());
+			tmpNode.setData(subTree.getData());
+			node.addChild(tmpNode);
 		}
 		
-		// Add activities
-		Set activities = getDataActivities(processModel);
-		for (Iterator it = activities.iterator(); it.hasNext(); )
+		// Add tasks
+		Set tasks = getDataTasks(processModel);
+		for (Iterator it = tasks.iterator(); it.hasNext(); )
 		{
-			MActivity activity = (MActivity) it.next();
-			node.addChild(getActivityNode(activity));
+			MActivity task = (MActivity) it.next();
+			TreeNode taskNode = getTaskNode(task);
+			node.addChild(taskNode);
+			this.tasks.put(task.getName(), taskNode);
 		}
 		
 		return node;
 	}
 	
-	private TreeNode getActivityNode(MActivity activity)
+	private TreeNode getTaskNode(MActivity task)
 	{
 		TreeNode node = new ModelTreeNode();
-		node.setData(activity);
-		List outParams = activity.getOutParameters();
+		node.setData(task);
+		List outParams = task.getOutParameters();
 		for (Iterator it = outParams.iterator(); it.hasNext(); )
 		{
 			MParameter param = (MParameter) it.next();
-			node.addChild(new ModelTreeNode(param));
+			node.addChild(new ModelTreeNode(new ParameterStatePair(param, ParameterStateHolderFactory.createStateHolder(param))));
 		}
 		return node;
 	}
@@ -111,7 +132,6 @@ public class ProcessTreeModel extends Tree implements TreeModel
 				for(Iterator it2 = proc.getPlans().iterator(); it2.hasNext(); )
 				{
 					MPlan plan = (MPlan) it2.next();
-					System.out.println("BPMN Plan: " + plan.getBpmnPlan());
 					MBpmnModel bpmnModel = bpmnLoader.loadBpmnModel(plan.getBpmnPlan(), gpmnModel.getImports());
 					if (bpmnModel != null)
 						ret.add(bpmnModel);
@@ -126,7 +146,7 @@ public class ProcessTreeModel extends Tree implements TreeModel
 		return ret;
 	}
 	
-	private Set getDataActivities(Object processModel)
+	private Set getDataTasks(Object processModel)
 	{
 		Set ret = new HashSet();
 		
@@ -141,24 +161,12 @@ public class ProcessTreeModel extends Tree implements TreeModel
 				if (classNode != null)
 				{
 					Class activityClass = (Class) classNode.getConstantValue();
-					System.out.println(activityClass);
 					if (DATA_TASKS.contains(activityClass))
 						ret.add(activity);
 				}
 			}
 		}
 		
-		return ret;
-	}
-	
-	private Set modelSetToNameSet(Set modelSet)
-	{
-		Set ret = new HashSet();
-		for (Iterator it = modelSet.iterator(); it.hasNext(); )
-		{
-			IProcessModel model = (IProcessModel) it.next();
-			ret.add(model.getName());
-		}
 		return ret;
 	}
 	
@@ -205,6 +213,17 @@ public class ProcessTreeModel extends Tree implements TreeModel
 	{
 	}
 	
+	private static final String resolveProcessName(IProcessModel model)
+	{
+		String ret = model.getName();
+		if (ret == null)
+		{
+			ret = model.getFilename();
+			ret = ret.substring(Math.max(ret.lastIndexOf('/'), ret.lastIndexOf(File.separator)) + 1);
+		}
+		return ret;
+	}
+	
 	private class ModelTreeNode extends TreeNode
 	{
 		public ModelTreeNode()
@@ -217,6 +236,13 @@ public class ProcessTreeModel extends Tree implements TreeModel
 			super(data);
 		}
 		
+		public void addChild(TreeNode child)
+		{
+			if (child.getData() == null)
+				throw new RuntimeException("Child is null: " + this.getData().toString());
+			super.addChild(child);
+		}
+		
 		public String toString()
 		{
 			if (data instanceof IProcessModel)
@@ -226,16 +252,18 @@ public class ProcessTreeModel extends Tree implements TreeModel
 				if (ret == null)
 				{
 					ret = model.getFilename();
-					ret = ret.substring(ret.lastIndexOf(File.separator) + 1);
+					ret = resolveProcessName(model);
 				}
 				return ret;
 			}
 			else if (data instanceof MActivity)
 				return ((MActivity) data).getName();
-			else if (data instanceof MParameter)
-				return ((MParameter) data).getName();
+			else if (data instanceof ParameterStatePair)
+				return ((ParameterStatePair) data).getParameter().getName();
 			else
 				return String.valueOf(data);
 		}
 	}
 }
+
+

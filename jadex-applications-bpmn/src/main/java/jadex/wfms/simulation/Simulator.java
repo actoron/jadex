@@ -29,7 +29,7 @@ public class Simulator implements IClient
 	public Simulator(IClientService clientService, String userName)
 	{
 		this.clientService = clientService;
-		simWindow = new SimulationWindow(this);
+		simWindow = new SimulationWindow();
 		
 		simWindow.addWindowListener(new WindowAdapter()
 		{
@@ -65,12 +65,21 @@ public class Simulator implements IClient
 				try
 				{
 					model.setRootModel(clientService.getProcessDefinitionService(Simulator.this).getProcessModel(Simulator.this, modelName));
+					simWindow.setProcessTreeModel(model);
 				}
 				catch (Exception e1)
 				{
+					e1.printStackTrace();
 					simWindow.showMessage(JOptionPane.ERROR_MESSAGE, "Cannot open the process", "Opening the process failed.");
 				}
-				simWindow.setProcessTreeModel(model);
+			}
+		});
+		
+		simWindow.setCloseAction(new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				simWindow.setProcessTreeModel(null);
 			}
 		});
 	}
