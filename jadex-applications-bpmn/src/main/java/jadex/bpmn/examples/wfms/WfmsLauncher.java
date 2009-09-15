@@ -87,6 +87,7 @@ public class WfmsLauncher
 		//mr.addProcessModel("jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn");
 		BasicModelRepositoryService mr = (BasicModelRepositoryService) wfms.getService(IModelRepositoryService.class);
 		mr.addProcessModel("jadex/bpmn/examples/dipp/dipp.gpmn");
+		mr.addProcessModel("jadex/bpmn/examples/helloworld/UserInteraction2.bpmn");
 		//wfms.addService(IModelRepositoryService.class, "repo_service", mr);
 		
 		BasicAAAService as = (BasicAAAService) wfms.getService(IAAAService.class);

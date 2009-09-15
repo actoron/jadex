@@ -1,4 +1,4 @@
-package jadex.wfms.simulation;
+package jadex.wfms.simulation.stateholder;
 
 public interface IParameterStateHolder
 {
@@ -17,6 +17,12 @@ public interface IParameterStateHolder
 	 * Switches to the next available state.
 	 */
 	public void nextState();
+	
+	/**
+	 * Returns the current state
+	 * @return current state
+	 */
+	public long getCurrentState();
 	
 	/**
 	 * Test if the holder is in the final state.

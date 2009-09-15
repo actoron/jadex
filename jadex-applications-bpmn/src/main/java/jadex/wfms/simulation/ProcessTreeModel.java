@@ -12,6 +12,8 @@ import jadex.gpmn.model.MPlan;
 import jadex.gpmn.model.MProcess;
 import jadex.javaparser.javaccimpl.ReflectNode;
 import jadex.wfms.IProcessModel;
+import jadex.wfms.client.task.FetchDataTask;
+import jadex.wfms.simulation.stateholder.ParameterStateHolderFactory;
 
 import java.io.File;
 import java.util.Collection;
@@ -32,7 +34,7 @@ public class ProcessTreeModel extends Tree implements TreeModel
 	private static final Set DATA_TASKS = new HashSet();
 	static
 	{
-		DATA_TASKS.add(ShowClientInfoTask.class);
+		DATA_TASKS.add(FetchDataTask.class);
 	}
 	
 	private BpmnModelLoader bpmnLoader;
@@ -50,9 +52,9 @@ public class ProcessTreeModel extends Tree implements TreeModel
 	{
 		processes = new HashMap();
 		tasks = new HashMap();
-		TreeNode tmpRoot = buildTree(model);
-		processes.put(resolveProcessName(model), model);
 		root = new ModelTreeNode();
+		processes.put(resolveProcessName(model), root);
+		TreeNode tmpRoot = buildTree(model);
 		root.setChildren(tmpRoot.getChildren());
 		root.setData(tmpRoot.getData());
 	}
@@ -72,12 +74,9 @@ public class ProcessTreeModel extends Tree implements TreeModel
 				it.remove();
 				ModelTreeNode linkNode = new ModelTreeNode();
 				linkNode.setData(processes.get(resolveProcessName(subModel)));
+				System.out.println("LinkNode: " + resolveProcessName(subModel) + " top model:" + resolveProcessName(processModel));
 				node.addChild(linkNode);
 			}
-			/*else
-			{
-				processes.put(resolveProcessName(subModel), "");
-			}*/
 		}
 		
 		// Add subprocesses
@@ -121,7 +120,7 @@ public class ProcessTreeModel extends Tree implements TreeModel
 	private List getSubProcessModels(IProcessModel processModel) throws Exception
 	{
 		List ret = new LinkedList();
-		ret.add(processModel);
+		//ret.add(processModel);
 		if (processModel instanceof MGpmnModel)
 		{
 			
@@ -154,6 +153,7 @@ public class ProcessTreeModel extends Tree implements TreeModel
 		{
 			MBpmnModel bpmnModel = (MBpmnModel) processModel;
 			Collection activities = (bpmnModel.getAllActivities().values());
+			System.out.println("Activities: " + activities.toString());
 			for (Iterator it = activities.iterator(); it.hasNext(); )
 			{
 				MActivity activity = (MActivity) it.next();
@@ -161,6 +161,7 @@ public class ProcessTreeModel extends Tree implements TreeModel
 				if (classNode != null)
 				{
 					Class activityClass = (Class) classNode.getConstantValue();
+					System.out.println(activityClass);
 					if (DATA_TASKS.contains(activityClass))
 						ret.add(activity);
 				}
@@ -213,7 +214,7 @@ public class ProcessTreeModel extends Tree implements TreeModel
 	{
 	}
 	
-	private static final String resolveProcessName(IProcessModel model)
+	public static final String resolveProcessName(IProcessModel model)
 	{
 		String ret = model.getName();
 		if (ret == null)
@@ -222,47 +223,6 @@ public class ProcessTreeModel extends Tree implements TreeModel
 			ret = ret.substring(Math.max(ret.lastIndexOf('/'), ret.lastIndexOf(File.separator)) + 1);
 		}
 		return ret;
-	}
-	
-	private class ModelTreeNode extends TreeNode
-	{
-		public ModelTreeNode()
-		{
-			super();
-		}
-		
-		public ModelTreeNode(Object data)
-		{
-			super(data);
-		}
-		
-		public void addChild(TreeNode child)
-		{
-			if (child.getData() == null)
-				throw new RuntimeException("Child is null: " + this.getData().toString());
-			super.addChild(child);
-		}
-		
-		public String toString()
-		{
-			if (data instanceof IProcessModel)
-			{
-				IProcessModel model = ((IProcessModel) data);
-				String ret = model.getName();
-				if (ret == null)
-				{
-					ret = model.getFilename();
-					ret = resolveProcessName(model);
-				}
-				return ret;
-			}
-			else if (data instanceof MActivity)
-				return ((MActivity) data).getName();
-			else if (data instanceof ParameterStatePair)
-				return ((ParameterStatePair) data).getParameter().getName();
-			else
-				return String.valueOf(data);
-		}
 	}
 }
 

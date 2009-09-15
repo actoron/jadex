@@ -1,6 +1,7 @@
 package jadex.wfms.simulation;
 
 import jadex.bpmn.model.MParameter;
+import jadex.wfms.simulation.stateholder.IParameterStateHolder;
 
 public class ParameterStatePair
 {

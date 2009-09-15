@@ -5,8 +5,10 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.commons.SGUI;
 import jadex.commons.collection.TreeNode;
 import jadex.gpmn.model.MGpmnModel;
+import jadex.wfms.simulation.ModelTreeNode;
 import jadex.wfms.simulation.ParameterStatePair;
 import jadex.wfms.simulation.SimLauncher;
+import jadex.wfms.simulation.stateholder.gui.StatePanelFactory;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -15,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URL;
+import java.util.LinkedList;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
@@ -36,7 +39,10 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 public class SimulationWindow extends JFrame
 {
@@ -62,6 +68,8 @@ public class SimulationWindow extends JFrame
 	
 	private static final TreeModel EMPTY_MODEL = new DefaultTreeModel(new DefaultMutableTreeNode("No Process"));
 	
+	private JSplitPane mainPane;
+	
 	private JTree processModelTree;
 	
 	private JMenuBar menuBar;
@@ -73,11 +81,13 @@ public class SimulationWindow extends JFrame
 	{
 		super("Process Simulator");
 		
-		JSplitPane mainPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		mainPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		mainPane.setOneTouchExpandable(true);
 		add(mainPane);
 		
 		processModelTree = new JTree(EMPTY_MODEL);
+		processModelTree.setSelectionModel(new DefaultTreeSelectionModel());
+		processModelTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		processModelTree.setCellRenderer(new DefaultTreeCellRenderer()
 		{
 			public Component getTreeCellRendererComponent(JTree tree,
@@ -87,27 +97,17 @@ public class SimulationWindow extends JFrame
 				if (value instanceof TreeNode)
 				{
 					Object data = ((TreeNode) value).getData();
-					System.out.println("Class: " + data.getClass().toString());
 					if (data instanceof MGpmnModel)
 						setIcon(GPMN_ICON);
 					else if (data instanceof MBpmnModel)
-					{
 						setIcon(BPMN_ICON);
-					}
 					else if (data instanceof MActivity)
 						setIcon(TASK_ICON);
 					else if (data instanceof ParameterStatePair)
 						setIcon(PARAM_ICON);
 					else if (data instanceof TreeNode)
-					{
-						System.out.println("X");
 						setForeground(Color.LIGHT_GRAY);
-					}
 				}
-				/*else if (data instanceof MActivity)
-					return ((MActivity) data).getName();
-				else if (data instanceof MParameter)
-					return ((MParameter) data).getName();*/
 				
 				return this;
 			}
@@ -115,21 +115,34 @@ public class SimulationWindow extends JFrame
 		processModelTree.addTreeSelectionListener(new TreeSelectionListener() {
 		    public void valueChanged(TreeSelectionEvent e)
 		    {
+		    	
 		        TreeNode node = (TreeNode) processModelTree.getLastSelectedPathComponent();
 		        
 		        if (node == null)
 		        	return;
-		       if (node.getData() instanceof TreeNode)
-		       {
-		    	   int row = 0;
-		    	   while (row < processModelTree.getRowCount())
-		    		   processModelTree.expandRow(row++);
-		   		
-		    	   for (int i = 0; i < processModelTree.getRowCount();)
-		    	   {
-		    		   //TODO:if (processModelTree.get)
-		    	   }
-		       }
+		        if (node.getData() instanceof ModelTreeNode)
+		        {
+		        	ModelTreeNode mNode = (ModelTreeNode) node.getData();
+		        	LinkedList pathList = new LinkedList();
+		        	pathList.addFirst(mNode);
+		        	while ((mNode = mNode.getParent()) != null)
+		        		pathList.addFirst(mNode);
+		        	TreePath path = new TreePath(pathList.toArray());
+		        	processModelTree.expandPath(path);
+		        	processModelTree.scrollPathToVisible(path);
+		        	processModelTree.setSelectionPath(path);
+		        }
+		        else if (node.getData() instanceof ParameterStatePair)
+		        {
+		        	JPanel statePanel = StatePanelFactory.createStatePanel(((ParameterStatePair) node.getData()).getStateHolder());
+		        	if (statePanel == null)
+		        		statePanel = EMPTY_PANEL;
+		        	mainPane.setRightComponent(statePanel);
+		        }
+		        else
+		        {
+		        	mainPane.setRightComponent(EMPTY_PANEL);
+		        }
 		    }
 		});
 
