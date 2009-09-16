@@ -312,7 +312,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 				BasicTypeConverter.getBasicConverter((((OAVJavaType)attrtype.getType()).getClazz())).convertObject(attrval, root, classloader, null):
 					val;
 	
-			setAttributeValue(state, object, attrtype, arg);
+			setAttributeValue(state, object, attrtype, arg);		
 		}
 		else
 		{

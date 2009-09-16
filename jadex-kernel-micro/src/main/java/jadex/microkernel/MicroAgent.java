@@ -65,7 +65,8 @@ public abstract class MicroAgent implements IMicroAgent
 	}*/
 	
 	/**
-	 * 
+	 *  Execute the functional body of the agent.
+	 *  Is only called once.
 	 */
 	public void executeBody()
 	{
