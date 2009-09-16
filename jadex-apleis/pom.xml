@@ -2,10 +2,10 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>jadex</groupId>
-  <artifactId>jadex-applications-micro</artifactId>
+  <artifactId>jadex-apleis</artifactId>
   <packaging>jar</packaging>
   <version>2.0-beta4</version>
-  <name>jadex-applications-micro</name>
+  <name>jadex-apleis</name>
 <!-- <url>http://jadex.sourceforge.net</url> -->
   <parent>
     <groupId>jadex</groupId>
@@ -28,16 +28,6 @@
     <dependency>
     	<groupId>jadex</groupId>
     	<artifactId>jadex-platform-base</artifactId>
-    	<version>2.0-beta4</version>
-    </dependency>
-    <dependency>
-    	<groupId>jadex</groupId>
-    	<artifactId>jadex-kernel-micro</artifactId>
-    	<version>2.0-beta4</version>
-    </dependency>
-    <dependency>
-    	<groupId>jadex</groupId>
-    	<artifactId>jadex-applications-bdi</artifactId>
     	<version>2.0-beta4</version>
     </dependency>
   </dependencies>
