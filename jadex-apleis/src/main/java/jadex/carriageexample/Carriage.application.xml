@@ -22,8 +22,7 @@
 	</imports>
 	
 	<spacetypes>
-		<eis:eisspacetype name="env" class="carriageexample.EnvironmentInterface">
-		</eis:eisspacetype>
+		<eis:eisspacetype name="env" class="carriageexample.EnvironmentInterface"/>
 	</spacetypes>
 	
 	<agenttypes>
@@ -34,8 +33,7 @@
 	<applications>
 		<application name="carriage">
 			<spaces>
-				<eis:eisspace name="myenv" type="env">
-				</eis:eisspace>
+				<eis:eisspace name="myenv" type="env"/>
 			</spaces>
 
 			<agents>
