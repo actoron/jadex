@@ -41,7 +41,7 @@ public class Main implements EnvironmentListener,AgentListener {
 			ei.performAction("ag1", new Action("tellall", new Identifier("Hi")));
 			ei.performAction("ag2", new Action("tellall", new Identifier("Hello")));
 			ei.performAction("ag3", new Action("tellall", new Identifier("Bonjour")));
-			ei.performAction("ag4", new Action("tellall", new Identifier("Greetings"))); 
+//			ei.performAction("ag4", new Action("tellall", new Identifier("Greetings"))); 
 
 		} 
 		catch(AgentException e) {

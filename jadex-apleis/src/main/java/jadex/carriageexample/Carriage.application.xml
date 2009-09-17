@@ -11,15 +11,7 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-eisspace 
 	                    http://jadex.sourceforge.net/jadex-eisspace-1.0.xsd"
-	name="Carriage" package="jadex.micro.examples.carriage">
-	
-	<imports>
-		<import>jadex.adapter.base.envsupport.environment.*</import>
-		<import>jadex.adapter.base.envsupport.math.*</import>
-		<import>jadex.adapter.base.envsupport.dataview.*</import>
-		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
-		<import>jadex.bdi.planlib.*</import>
-	</imports>
+	name="Carriage" package="jadex.carriageexample">
 	
 	<spacetypes>
 		<eis:eisspacetype name="env" class="carriageexample.EnvironmentInterface"/>
