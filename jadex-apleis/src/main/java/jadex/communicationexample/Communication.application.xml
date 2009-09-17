@@ -19,8 +19,7 @@
 	</spacetypes>
 	
 	<agenttypes>
-		<agenttype name="CommunicationAgent" filename="jadex/carriageexample/PushingAgent.class"/>
-		<agenttype name="CommunicationAgent" filename="jadex/carriageexample/AlternatingAgent.class"/>
+		<agenttype name="CommunicationAgent" filename="jadex/communicationexample/CommunicationAgent.class"/>
 	</agenttypes>
 	
 	<applications>

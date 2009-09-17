@@ -148,7 +148,8 @@ public class BDIAgentFactory implements IAgentFactory
 	{
 		init();
 
-		return loader.isLoadable(model, null);
+		return model.toLowerCase().endsWith(".agent.xml") || model.toLowerCase().endsWith(".capability.xml");
+//		return loader.isLoadable(model, null);
 //		return model.toLowerCase().endsWith(".agent.xml") || model.toLowerCase().endsWith(".capability.xml");
 		
 //		boolean ret =  model.indexOf("/bdi/")!=-1 || model.indexOf(".bdi.")!=-1 || model.indexOf("\\bdi\\")!=-1 

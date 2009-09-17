@@ -1,5 +1,7 @@
 package jadex.communicationexample;
 
+import java.util.Collections;
+
 import jadex.microkernel.MicroAgent;
 
 import communicationexample.EnvironmentInterface;
@@ -13,7 +15,7 @@ import eis.jadex.EisSpace;
 /**
  *  Simple agent that communicates over the environment.
  */
-public class CommunicationAgent extends MicroAgent
+public class CommunicationAgent extends MicroAgent implements AgentListener
 {
 	//-------- attributes --------
 	
@@ -56,13 +58,7 @@ public class CommunicationAgent extends MicroAgent
 			String myentityname = "en"+myname.substring(myname.length()-1);
 			eis.associateEntity(myname, myentityname);
 			
-			eis.attachAgentListener(getAgentIdentifier().getLocalName(),new AgentListener()
-			{
-				public void handlePercept(String agent, Percept percept)
-				{
-					System.out.println("Agent received percept: "+percept);
-				}
-			});
+			eis.attachAgentListener(getAgentIdentifier().getLocalName(), this);
 		}
 		catch(Exception e)
 		{
@@ -89,4 +85,19 @@ public class CommunicationAgent extends MicroAgent
 		// Hack! Should not have to wait.
 		waitFor(50, run);
 	}
+	
+	/**
+	 *  Handle a percept from the environment.
+	 */
+	public void handlePercept(final String agent, final Percept percept)
+	{
+		invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				System.out.println("Agent:"+agent+" received percept: "+percept);
+			}
+		});
+	}
+	
 }

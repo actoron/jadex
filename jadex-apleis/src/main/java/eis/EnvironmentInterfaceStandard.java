@@ -194,8 +194,8 @@ public abstract class EnvironmentInterfaceStandard {
 	protected final void notifyAgents(Percept percept, String...agents) throws EnvironmentInterfaceException {
 
 		// no listeners, no notification
-		if (environmentListeners.isEmpty())
-			return;
+//		if (environmentListeners.isEmpty())
+//			return;
 
 		// send to all registered agents
 		if (agents == null) {

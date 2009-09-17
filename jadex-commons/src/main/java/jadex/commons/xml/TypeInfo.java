@@ -569,7 +569,7 @@ public class TypeInfo	extends AbstractInfo
 				if(attrid!=null)
 				{
 					xmlname = new QName(attrid.toString());
-					System.out.println("Warning, no xml name for attribute:"+attrid);
+//					System.out.println("Warning, no xml name for attribute:"+attrid);
 				}
 			}
 			ret.put(xmlname, attributeinfos[i]);

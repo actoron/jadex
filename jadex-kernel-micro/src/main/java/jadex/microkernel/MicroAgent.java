@@ -248,8 +248,7 @@ public abstract class MicroAgent implements IMicroAgent
 	{
 		interpreter.getAgentAdapter().killAgent();
 	}
-	
-	
+		
 	/**
 	 *  Send a message.
 	 *  @param me	The message content (name value pairs).
@@ -338,4 +337,12 @@ public abstract class MicroAgent implements IMicroAgent
 		return ret;
 	}
 	
+	/**
+	 *  Invoke a runnable later that is guaranteed 
+	 *  to be executed on agent thread.
+	 */
+	public void invokeLater(Runnable run)
+	{
+		interpreter.invokeLater(run);
+	}
 }
