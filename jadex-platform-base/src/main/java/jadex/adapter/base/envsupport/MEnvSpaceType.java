@@ -199,7 +199,15 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("name", null, null, null, null, "")
-			}, null));
+			}, null, null,
+			new SubobjectInfo[]{
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "parameter"), "parameters", null, null, null, ""))
+		}));
+		
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "parameter")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, "")}, null));
 		
 		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "processtype")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{

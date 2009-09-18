@@ -17,6 +17,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -48,8 +49,12 @@ import eis.iilang.Percept;
  */
 public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 {
+	//-------- constants --------
+	
 	/** Basic entity type (as EIS is untyped). */
 	public static final String ENTITY = "entity";
+	
+	//-------- attributes --------
 	
 	/** The space. */
 	protected AbstractEnvironmentSpace space;
@@ -60,16 +65,20 @@ public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 	/** Registered agents. */
 	protected List regagents;
 	
+	//-------- constructors --------
+	
 	/**
 	 *  Create a new environment space.
 	 */
 	public JadexDelegationEisImpl(AbstractEnvironmentSpace space)
 	{
 		this.space = space;
-		this.envlisteners = new HashMap();
-		this.regagents = new ArrayList();
+		this.envlisteners = Collections.synchronizedMap(new HashMap());
+		this.regagents = Collections.synchronizedList(new ArrayList());
 		space.addSpaceObjectType(ENTITY, null);
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 * Attaches an environment-listener.
@@ -93,6 +102,7 @@ public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 				}
 				else
 				{
+					// todo:
 					System.out.println("support me: "+event);
 				}
 			}
