@@ -1,6 +1,7 @@
 package carriageexample;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import eis.exceptions.ActException;
 import eis.exceptions.AgentException;
@@ -44,12 +45,12 @@ class PushingAgent extends Agent {
 		try {
 
 			//ei.performAction(id, new Item("enter"));
-			ei.associateEntity(id, ei.getFreeEntities().getFirst());
+			ei.associateEntity(id, ei.getFreeEntities().get(0));
 			
 			while(true) {
 			
 				// perceive
-				LinkedList<Percept> percepts = null;
+				List<Percept> percepts = null;
 				percepts = ei.getAllPercepts(id);
 				say("I believe the carriage is at " + percepts);
 
@@ -90,12 +91,12 @@ class AlternatingAgent extends Agent {
 		
 		try {
 
-			ei.associateEntity(id, ei.getFreeEntities().getFirst());
+			ei.associateEntity(id, ei.getFreeEntities().get(0));
 			
 			while(true) {
 				
 				// perceive
-				LinkedList<Percept> percepts = null;
+				List<Percept> percepts = null;
 				percepts = ei.getAllPercepts(id);
 				say("I believe the carriage is at " + percepts);
 

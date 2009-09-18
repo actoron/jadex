@@ -57,7 +57,9 @@
 		
 			<!-- Actions that can be performed in the environment. -->
 			<env:actiontypes>
-				<env:actiontype name="pickup" class="PickupWasteAction" />
+				<env:actiontype name="pickup" class="PickupWasteAction">
+					<!-- <env:parameter name="" class=""></env:parameter>-->
+				</env:actiontype>
 				<env:actiontype name="drop" class="DropWasteAction" />
 				<env:actiontype name="burn" class="BurnWasteAction" />
 				<env:actiontype name="go" class="GoAction" />
@@ -290,6 +292,22 @@
 				<agent type="Collector" number="30"/>
 				<agent type="Burner" number="5"/>
 			</agents>
+		</application>
+		
+		<application name="No Agents">
+			<spaces>
+				<env:envspace name="mygc2dspace" type="gc2dspace">
+					<env:processes>
+						<env:process type="create">
+							<env:property name="tickrate">15</env:property>
+						</env:process>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="world" view="view_all" perspective="abstract"/>
+					</env:observers>
+				</env:envspace>
+			</spaces>
 		</application>
 	</applications>
 

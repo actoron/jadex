@@ -7,11 +7,9 @@ import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IPlatform;
 import jadex.bridge.MessageType;
-import jadex.commons.Properties;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.javaparser.IValueFetcher;
 import jadex.service.PropertyServiceContainer;
 
 import java.util.Map;
@@ -34,9 +32,6 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 	public static final long MAX_SHUTDOWM_TIME = 3000;
 
 	//-------- attributes --------
-
-	/** The map of platform services. */
-//	protected Map services;
 
 	/** The optional system agents (ams, df). */
 	protected Set daemonagents;
@@ -67,111 +62,6 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 
 	//-------- methods --------
 	
-	/**
-	 *  Add a service to the platform.
-	 *  @param name The name.
-	 *  @param service The service.
-	 * /
-	public void addService(Class type, String name, IService service)
-	{
-//		System.out.println("Adding service: " + name + " " + type + " " + service);
-		Map tmp = (Map)services.get(type);
-		if(tmp == null)
-		{
-			tmp = new HashMap();
-			services.put(type, tmp);
-		}
-		tmp.put(name, service);
-	}*/
-
-	/**
-	 *  Add a service to the platform.
-	 *  @param name The name.
-	 *  @param service The service.
-	 * /
-	public void removeService(Class type, IService service)
-	{
-		//		System.out.println("Removing service: " + type + " " + service);
-		Map tmp = (Map)services.get(type);
-		if(tmp == null || (service != null && !tmp.containsValue(service)))
-			throw new RuntimeException("Service not found: " + service);
-
-		boolean removed = false;
-		if(service == null && tmp.size() == 1)
-		{
-			tmp.remove(tmp.keySet().iterator().next());
-			removed = true;
-		}
-		else
-		{
-			for(Iterator it = tmp.keySet().iterator(); it.hasNext();)
-			{
-				Object key = it.next();
-				if(tmp.get(key).equals(service))
-				{
-					tmp.remove(key);
-					removed = true;
-				}
-			}
-		}
-
-		if(!removed)
-			throw new RuntimeException("Service not found: " + service);
-
-		if(tmp.size() == 0)
-			services.remove(type);
-	}*/
-
-	/**
-	 *  Get a platform service.
-	 *  @param type The class.
-	 *  @return The corresponding platform services.
-	 * /
-	public Collection getServices(Class type)
-	{
-		Collection	ret	= null;
-		Map tmp = (Map)services.get(type);
-		if(tmp != null)
-			ret	= tmp.values();
-		else
-			ret	= Collections.EMPTY_SET;
-//			throw new RuntimeException("No services found of type: " + type);
-
-		return ret;
-	}*/
-
-	/**
-	 *  Get a platform service.
-	 *  @param name The name.
-	 *  @return The corresponding platform service.
-	 * /
-	public Object getService(Class type, String name)
-	{
-		Object ret	= null;
-		Map tmp = (Map)services.get(type);
-		if(tmp != null)
-		 ret = tmp.get(name);
-//		if(ret == null)
-//			throw new RuntimeException("Service not found");
-		return ret;
-	}*/
-
-	/**
-	 *  Get the first declared platform service of a given type.
-	 *  @param type The type.
-	 *  @return The corresponding platform service.
-	 * /
-	public Object getService(Class type)
-	{
-		Object ret	= null;
-		Map tmp = (Map)services.get(type);
-		if(tmp != null && !tmp.isEmpty())
-			ret = tmp.values().iterator().next();
-//		if(ret == null)
-//			throw new RuntimeException("Service not found");
-		return ret;
-	}*/
-
 	/**
 	 *  Get the name of the platform
 	 *  @return The name of this platform.
@@ -440,14 +330,29 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 			}
 		}, null);
 	}
-
+	
+	/**
+	 *  Create an application.
+	 */
+	protected void createApplication(String name, String model, String config, Map args)
+	{
+		try
+		{
+			getApplicationFactory().createApplication(name, model, config, args);
+		}
+		catch(Exception e)
+		{
+			System.err.println("Exception occurred: " + e);
+		}
+	}
+	
 	//-------- static part --------
 
 	/**
 	 *  Start command line agents.
 	 *  @param args The command line arguments.
 	 *  @param platform The platform.
-	 */
+	 * /
 	protected static void startAgents(String[] args, final IPlatform platform)
 	{
 		// Create agents on the platform.
@@ -540,5 +445,5 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 				e.printStackTrace();
 			}
 		}
-	}
+	}*/
 }

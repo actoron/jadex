@@ -837,6 +837,18 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	}
 	
 	/**
+	 *  Get the avatar objects.
+	 *  @return The avatar objects. 
+	 */
+	public IAgentIdentifier[] getAgents()
+	{
+		synchronized(monitor)
+		{
+			return (IAgentIdentifier[])spaceobjectsbyowner.keySet().toArray(new IAgentIdentifier[spaceobjectsbyowner.keySet().size()]);
+		}
+	}
+	
+	/**
 	 *  Get the avatar object.
 	 *  @return The avatar object. 
 	 */

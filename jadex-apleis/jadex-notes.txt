@@ -11,9 +11,15 @@ a method invocation of a constructed method name.
 (you should split responsibility of performing the action which could be done
 in any way and thereafter notification of listers)
 
-- Bug: 
-EnvironmentInterfaceStandard 
+- Bugs: 
+- EnvironmentInterfaceStandard 
 line 196-198
 // no listeners, no notification
 	if(environmentListeners.isEmpty())
 		return;
+		
+- EnvironmentInterfaceStandard is currently not thread safe.
+This will probably lead to unwanted effects when several
+agents are trying to access the environment concurrently.
+There also seems not to be any thread decoupling, i.e.
+the caller thread always also invokes listeners etc. 

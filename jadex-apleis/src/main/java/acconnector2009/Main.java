@@ -1,6 +1,7 @@
 package acconnector2009;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import eis.EnvironmentListener;
 import eis.EnvironmentInterfaceStandard;
@@ -76,7 +77,7 @@ public class Main implements EnvironmentListener {
 		
 		}
 	
-		LinkedList<ActionResult> ar = null;
+		List<ActionResult> ar = null;
 		try {
 
 			Action action = new Action(

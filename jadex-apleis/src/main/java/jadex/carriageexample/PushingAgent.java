@@ -51,7 +51,7 @@ public class PushingAgent extends MicroAgent
 		
 		try
 		{
-			eis.associateEntity(getAgentIdentifier().getName(), (String)eis.getFreeEntities().getFirst());
+			eis.associateEntity(getAgentIdentifier().getName(), (String)eis.getFreeEntities().get(0));
 		}
 		catch(RelationException e)
 		{

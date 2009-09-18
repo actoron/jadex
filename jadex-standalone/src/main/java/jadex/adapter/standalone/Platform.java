@@ -68,6 +68,9 @@ public class Platform extends AbstractPlatform
 
 	/** An application agent. */
 	public static final String AGENT = "agent";
+
+	/** An application agent. */
+	public static final String APPLICATION = "application";
 	
 	/** An agent argument. */
 	public static final String ARGUMENT = "argument";
@@ -314,6 +317,21 @@ public class Platform extends AbstractPlatform
 				Property config = subprops[i].getProperty(CONFIG);
 				createAgent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, false);
 			}
+			
+			// Create applications.
+			props = platconf.getProperties(APPLICATION);
+			for(int i = 0; i < props.length; i++)
+			{
+				createApplication(props[i].getName(), props[i].getValue(), null, null);
+			}
+			subprops = platconf.getSubproperties(APPLICATION);
+			for(int i = 0; i < subprops.length; i++)
+			{
+				Map args = getArguments(subprops[i]);
+				Property model = subprops[i].getProperty(MODEL);
+				Property config = subprops[i].getProperty(CONFIG);
+				createApplication(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args);
+			}
 		}
 		
 		platconf = null;
@@ -427,7 +445,7 @@ public class Platform extends AbstractPlatform
 		Properties configuration = (Properties)PropertiesXMLHelper.getPropertyReader().read(SUtil.getResource(conffile, cl), cl, null);
 		platform = new Platform(configuration);
 		platform.start();
-		startAgents(args, platform);
+//		startAgents(args, platform);
 		
 		long startup = System.currentTimeMillis() - starttime;
 		platform.logger.info("Platform startup time: " + startup + " ms.");

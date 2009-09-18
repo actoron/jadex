@@ -9,6 +9,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -113,7 +115,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * 
 	 * @param listener
 	 */
-	public final void attachEnvironmentListener(EnvironmentListener listener) {
+	public void attachEnvironmentListener(EnvironmentListener listener) {
 		
 		if( environmentListeners.contains(listener) == false)
 			environmentListeners.add(listener);
@@ -127,7 +129,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * 
 	 * @param listener
 	 */
-	public final void detachEnvironmentListener(EnvironmentListener listener) {
+	public void detachEnvironmentListener(EnvironmentListener listener) {
 		
 		if( environmentListeners.contains(listener) == true)
 			environmentListeners.remove(listener);
@@ -142,7 +144,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * @param agent
 	 * @param listener
 	 */
-	public final void attachAgentListener(String agent, AgentListener listener) {
+	public void attachAgentListener(String agent, AgentListener listener) {
 		
 		if( registeredAgents.contains(agent) == false )
 			return;
@@ -165,7 +167,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * @param agent
 	 * @param listener
 	 */
-	public final void detachAgentListener(String agent, AgentListener listener) {
+	public void detachAgentListener(String agent, AgentListener listener) {
 
 		if( registeredAgents.contains(agent) == false )
 			return;
@@ -191,7 +193,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * @throws AgentException is thrown if at least one of the agents in the array is not
 	 * registered.
 	 */
-	protected final void notifyAgents(Percept percept, String...agents) throws EnvironmentInterfaceException {
+	protected void notifyAgents(Percept percept, String...agents) throws EnvironmentInterfaceException {
 
 		// no listeners, no notification
 //		if (environmentListeners.isEmpty())
@@ -248,7 +250,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * @param entity
 	 * @throws EnvironmentInterfaceException
 	 */
-	protected final void notifyAgentsViaEntity(Percept percept, String...pEntities) throws EnvironmentInterfaceException {
+	protected void notifyAgentsViaEntity(Percept percept, String...pEntities) throws EnvironmentInterfaceException {
 		
 		// check
 		for( String entity : pEntities)
@@ -290,7 +292,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * 
 	 * @param entity is the free entity.
 	 */
-	protected final void notifyFreeEntity(String entity) {
+	protected void notifyFreeEntity(String entity) {
 		
 		for( EnvironmentListener listener : environmentListeners ) {
 			
@@ -307,7 +309,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * 
 	 * @param entity is the new entity.
 	 */
-	protected final void notifyNewEntity(String entity) {
+	protected void notifyNewEntity(String entity) {
 		
 		for( EnvironmentListener listener : environmentListeners ) {
 			
@@ -324,7 +326,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * 
 	 * @param entity is the deleted entity.
 	 */
-	protected final void notifyDeletedEntity(String entity) {
+	protected void notifyDeletedEntity(String entity) {
 		
 		for( EnvironmentListener listener : environmentListeners ) {
 			
@@ -342,7 +344,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * 
 	 * @param event
 	 */
-	protected final void notifyEnvironmentEvent(EnvironmentEvent event) {
+	protected void notifyEnvironmentEvent(EnvironmentEvent event) {
 		
 		for( EnvironmentListener listener : environmentListeners ) {
 			
@@ -364,7 +366,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * @param agent the identifier of the agent.
 	 * @throws PlatformException if the agent has already been registered.
 	 */
-	public final void registerAgent(String agent) throws AgentException {
+	public void registerAgent(String agent) throws AgentException {
 
 		if (registeredAgents.contains(agent))
 			throw new AgentException("Agent " + agent
@@ -380,7 +382,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * @param agent the identifier of the agent.
 	 * @throws AbstractException if the agent has not registered before.
 	 */
-	public final void unregisterAgent(String agent) throws AgentException {
+	public void unregisterAgent(String agent) throws AgentException {
 
 		// fail if agents is not registered
 		if (!registeredAgents.contains(agent))
@@ -407,7 +409,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * @return a list of agent-ids.
 	 */
 	@SuppressWarnings("unchecked")
-	public final LinkedList<String> getAgents() {
+	public List<String> getAgents() {
 		
 		return (LinkedList<String>)registeredAgents.clone();
 		
@@ -419,7 +421,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * @param entity is the identifier of the entity that is to be added.
 	 * @throws PlatformException is thrown if the entity already exists.
 	 */
-	protected final void addEntity(String entity) throws EntityException {
+	public void addEntity(String entity) throws EntityException {
 
 		// fail if entity does exist
 		if( entities.contains(entity) )
@@ -439,7 +441,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * @throws PlatformException if the agent does not exist.
 	 */
 	// TODO use freeEntity here
-	protected final void deleteEntity(String entity) throws EntityException {
+	public void deleteEntity(String entity) throws EntityException {
 	
 		// fail if entity does not exist
 		if( !entities.contains(entity) )
@@ -458,8 +460,7 @@ public abstract class EnvironmentInterfaceStandard {
 				agentsToEntities.put(agent, ens);
 				
 				break;
-			}
-			
+			}		
 		}
 
 		// finally delete
@@ -476,9 +477,9 @@ public abstract class EnvironmentInterfaceStandard {
 	 * @return a list of entity-ids.
 	 */
 	@SuppressWarnings("unchecked")
-	public final LinkedList<String> getEntities() {
+	public List<String> getEntities() {
 		
-		return (LinkedList<String>)entities.clone();
+		return (List<String>)entities.clone();
 		
 	}
 
@@ -528,7 +529,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * @param entity the id of the entity to be freed.
 	 * @throws PlatformException is thrown if the entity does not exist, or if it is not associated.
 	 */
-	public final void freeEntity(String entity) throws RelationException {
+	public void freeEntity(String entity) throws RelationException {
 
 		// check if exists
 		if( !entities.contains(entity) )
@@ -569,7 +570,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * @param agent is the agent to be freed.
 	 * @throws RelationException is thrown if the agent has not been registered.
 	 */
-	public final void freeAgent(String agent) throws RelationException {
+	public void freeAgent(String agent) throws RelationException {
 		
 		// check if exists
 		if( !registeredAgents.contains(agent) )
@@ -591,7 +592,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * @return a set of entities.
 	 * @throws AgentException 
 	 */
-	protected final HashSet<String> getAssociatedEntities(String agent) throws AgentException {
+	protected Set<String> getAssociatedEntities(String agent) throws AgentException {
 		
 		if( registeredAgents.contains(agent) == false )
 			throw new AgentException("Agent \"" + agent + "\" has not been registered.");
@@ -607,7 +608,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * @return a set of agents.
 	 * @throws AgentException 
 	 */
-	protected final HashSet<String> getAssociatedAgents(String entity) throws EntityException {
+	protected Set<String> getAssociatedAgents(String entity) throws EntityException {
 		
 		if( entities.contains(entity) == false )
 			throw new EntityException("Entity \"" + entity + "\" has not been registered.");
@@ -631,7 +632,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * @return a list of entity-ids.
 	 */
 	@SuppressWarnings("unchecked")
-	public final LinkedList<String> getFreeEntities() {
+	public List<String> getFreeEntities() {
 		
 		return (LinkedList<String>)freeEntities.clone();
 		
@@ -661,7 +662,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 */
 	// TODO use freeAgent here
 	// TODO maybe use isConnencted here
-	public final LinkedList<ActionResult> performAction(String agent, Action action, String...entities)
+	public List<ActionResult> performAction(String agent, Action action, String...entities)
 	throws ActException, NoEnvironmentException {
 
 		// unregistered agents cannot act
@@ -781,7 +782,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * @throws PerceiveException if the agent is not registered or if the agents requests percepts from an entity that is not associated.
 	 */
 	// TODO maybe use isConnencted here
-	public final LinkedList<Percept> getAllPercepts(String agent, String...entities) 
+	public List<Percept> getAllPercepts(String agent, String...entities) 
 	throws PerceiveException, NoEnvironmentException {
 		
 		// fail if ther agent is not registered
@@ -831,7 +832,7 @@ public abstract class EnvironmentInterfaceStandard {
 	 * @param entity is the entity whose percepts should be retrieved.
 	 * @return a list of percepts.
 	 */
-	protected abstract LinkedList<Percept> getAllPerceptsFromEntity(String entity);
+	protected abstract List<Percept> getAllPerceptsFromEntity(String entity);
 
 	
 	

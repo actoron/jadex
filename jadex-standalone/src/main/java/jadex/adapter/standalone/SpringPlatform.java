@@ -289,7 +289,7 @@ public class SpringPlatform extends AbstractPlatform
 		ApplicationContext context = new ClassPathXmlApplicationContext(new String[]{conffile});
 		SpringPlatform platform = (SpringPlatform)context.getBean("platform");
 		platform.start();
-		startAgents(args, platform);
+//		startAgents(args, platform);
 		
 		long startup = System.currentTimeMillis() - starttime;
 		platform.logger.info("Platform startup time: " + startup + " ms.");
