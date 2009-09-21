@@ -6,7 +6,6 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
-import jadex.bdi.examples.antworld.depricated.AntVisionGenerator;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.Map;

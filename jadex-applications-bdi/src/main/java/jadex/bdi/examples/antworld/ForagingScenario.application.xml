@@ -360,10 +360,7 @@
 
 					<env:observers>
 						<env:observer name="world" view="view_all"
-							perspective="abstract">
-							<env:plugins>
-							</env:plugins>
-						</env:observer>
+							perspective="abstract"></env:observer>
 					</env:observers>
 				</env:envspace>
 			</spaces>
@@ -407,10 +404,7 @@
 
 				<env:observers>
 					<env:observer name="world" view="view_all"
-						perspective="abstract">
-						<env:plugins>
-						</env:plugins>
-					</env:observer>
+						perspective="abstract"></env:observer>
 				</env:observers>
 			</env:envspace>
 			</spaces>
