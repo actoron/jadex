@@ -1,5 +1,6 @@
 package jadex.wfms.service.impl;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -180,7 +181,13 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 		
 		IExecutionService ex = (IExecutionService)wfms.getService(IExecutionService.class);
 		IProcessModel model = ex.loadModel(filename, imports);
-		models.put(model.getName(), model);
+		String modelName = model.getName();
+		if (modelName == null)
+		{
+			modelName = model.getFilename();
+			modelName = modelName.substring(Math.max(modelName.lastIndexOf('/'), modelName.lastIndexOf(File.separator)) + 1);
+		}
+		models.put(modelName, model);
 	}
 	
 	/**

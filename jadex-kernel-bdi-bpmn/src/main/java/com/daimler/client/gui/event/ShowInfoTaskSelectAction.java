@@ -92,7 +92,7 @@ public class ShowInfoTaskSelectAction extends AbstractTaskSelectAction{
     
     public void okButtonPressed()
     {
-    	client.commitWorkitem(getWorkitem());
+    	client.finishActivity(getWorkitem());
         dispose();
     }
 

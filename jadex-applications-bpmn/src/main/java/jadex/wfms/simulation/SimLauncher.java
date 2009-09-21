@@ -17,7 +17,7 @@ public class SimLauncher
 			
 			public void run()
 			{
-				new Simulator(launcher.getClientService());
+				new ClientSimulator(launcher.getClientService());
 			}
 		});
 	}

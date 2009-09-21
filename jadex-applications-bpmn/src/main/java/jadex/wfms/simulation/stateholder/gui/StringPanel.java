@@ -1,13 +1,12 @@
 package jadex.wfms.simulation.stateholder.gui;
 
+import jadex.wfms.simulation.stateholder.StringStateSet;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
@@ -16,17 +15,13 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import jadex.wfms.simulation.stateholder.AbstractNumericStateHolder;
-import jadex.wfms.simulation.stateholder.NumberRange;
-import jadex.wfms.simulation.stateholder.StringStateHolder;
-
 public class StringPanel extends JPanel
 {
-	private StringStateHolder stateHolder;
+	private StringStateSet stateHolder;
 	
 	private JList stringList;
 	
-	public StringPanel(StringStateHolder stateHolder)
+	public StringPanel(StringStateSet stateHolder)
 	{
 		this.stateHolder = stateHolder;
 		setLayout(new GridBagLayout());
@@ -59,7 +54,7 @@ public class StringPanel extends JPanel
 				if (inputString == null)
 					return;
 				
-				StringStateHolder stateHolder = StringPanel.this.stateHolder;
+				StringStateSet stateHolder = StringPanel.this.stateHolder;
 				stateHolder.addString(inputString);
 				
 				refreshList();
@@ -96,7 +91,7 @@ public class StringPanel extends JPanel
 	private void refreshList()
 	{
 		((DefaultListModel) stringList.getModel()).clear();
-		SortedSet strings = stateHolder.getStrings();
+		List strings = stateHolder.getStrings();
 		for (Iterator it = strings.iterator(); it.hasNext(); )
 			((DefaultListModel) stringList.getModel()).addElement(it.next());
 	}

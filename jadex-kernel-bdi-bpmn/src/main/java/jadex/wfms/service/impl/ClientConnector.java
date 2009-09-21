@@ -3,6 +3,7 @@ package jadex.wfms.service.impl;
 import jadex.commons.concurrent.IResultListener;
 import jadex.wfms.IWfms;
 import jadex.wfms.client.IClient;
+import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.IWorkitemListener;
 import jadex.wfms.client.Workitem;
@@ -149,37 +150,47 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 		System.out.println("Started process instance " + id);
 	}
 	
-	public synchronized void commitWorkitem(IClient client, IWorkitem workitem)
+	/**
+	 *  Finishes an Activity.
+	 *  @param client the client
+	 *  @param workitem the activity being finished
+	 */
+	public synchronized void finishActivity(IClient client, IClientActivity activity)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.COMMIT_WORKITEM))
 			return;
-		Workitem wi = (Workitem) workitem;
-		assert wi.isAcquired();
-		wi.setAcquired(false);
-		wi.getListener().resultAvailable(null);
+		((Workitem) activity).getListener().resultAvailable(null);
 	}
 	
-	public synchronized boolean acquireWorkitem(IClient client, IWorkitem workitem)
+	/**
+	 *  Begins an activity for a client.
+	 *  @param client the client
+	 *  @param workitem the workitem being requested for the activity
+	 *  @return the corresponding activity, if the acquisition was successful, null otherwise
+	 */
+	public synchronized IClientActivity beginActivity(IClient client, IWorkitem workitem)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ACQUIRE_WORKITEM))
-			return false;
+			return null;
 		Set workitems = (Set) workitemQueues.get(workitem.getRole());
-		boolean ret = workitems.remove(workitem);
-		if (ret)
+		if (workitems.remove(workitem))
 		{
 			fireWorkitemRemovedEvent(workitem);
-			((Workitem) workitem).setAcquired(true);
+			return (IClientActivity) workitem;
 		}
-		return ret;
+		return null;
 	}
 	
-	public synchronized void releaseWorkitem(IClient client, IWorkitem workitem)
+	/**
+	 *  Cancel an activity.
+	 *  @param client the client
+	 *  @param activity the activity being canceled
+	 */
+	public void cancelActivity(IClient client, IClientActivity activity)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.RELEASE_WORKITEM))
 			return;
-		assert ((Workitem) workitem).isAcquired();
-		((Workitem) workitem).setAcquired(false);
-		queueWorkitem(workitem);
+		queueWorkitem((IWorkitem) activity);
 	}
 	
 	public synchronized Set getAvailableWorkitems(IClient client)

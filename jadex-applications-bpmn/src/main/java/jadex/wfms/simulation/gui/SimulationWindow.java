@@ -6,8 +6,8 @@ import jadex.commons.SGUI;
 import jadex.commons.collection.TreeNode;
 import jadex.gpmn.model.MGpmnModel;
 import jadex.wfms.simulation.ModelTreeNode;
-import jadex.wfms.simulation.ParameterStatePair;
 import jadex.wfms.simulation.SimLauncher;
+import jadex.wfms.simulation.stateholder.IParameterStateSet;
 import jadex.wfms.simulation.stateholder.gui.StatePanelFactory;
 
 import java.awt.Color;
@@ -103,7 +103,7 @@ public class SimulationWindow extends JFrame
 						setIcon(BPMN_ICON);
 					else if (data instanceof MActivity)
 						setIcon(TASK_ICON);
-					else if (data instanceof ParameterStatePair)
+					else if (data instanceof IParameterStateSet)
 						setIcon(PARAM_ICON);
 					else if (data instanceof TreeNode)
 						setForeground(Color.LIGHT_GRAY);
@@ -132,9 +132,9 @@ public class SimulationWindow extends JFrame
 		        	processModelTree.scrollPathToVisible(path);
 		        	processModelTree.setSelectionPath(path);
 		        }
-		        else if (node.getData() instanceof ParameterStatePair)
+		        else if (node.getData() instanceof IParameterStateSet)
 		        {
-		        	JPanel statePanel = StatePanelFactory.createStatePanel(((ParameterStatePair) node.getData()).getStateHolder());
+		        	JPanel statePanel = StatePanelFactory.createStatePanel(((IParameterStateSet) node.getData()));
 		        	if (statePanel == null)
 		        		statePanel = EMPTY_PANEL;
 		        	mainPane.setRightComponent(statePanel);

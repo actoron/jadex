@@ -49,7 +49,7 @@ public class GuiClient implements IClient
 	
 	private Map taskMapping;
 	
-	private IWorkitem activeWorkitem;
+	private IClientActivity currentActivity;
 	
 	private GuiHelpBrowser helpBrowser;
 	
@@ -96,6 +96,11 @@ public class GuiClient implements IClient
 		return userName;
 	}
 	
+	public IClientActivity getCurrentActivity()
+	{
+		return currentActivity;
+	}
+	
 	public void activateComponent(Component comp)
 	{
 		activateComponent(comp, null);
@@ -109,13 +114,13 @@ public class GuiClient implements IClient
 			{
 				if (workitem != null)
 				{
-					if (workitem.equals(activeWorkitem))
+					if (workitem.equals(currentActivity))
 						return;
-					IWorkitem oldActive = activeWorkitem;
-					activeWorkitem = workitem;
-					if (!clientService.acquireWorkitem(GuiClient.this, workitem))
+					IClientActivity oldActive = currentActivity;
+					currentActivity = clientService.beginActivity(GuiClient.this, workitem);
+					if (currentActivity == null)
 					{
-						activeWorkitem = oldActive;
+						currentActivity = oldActive;
 						return;
 					}
 				}
@@ -147,13 +152,13 @@ public class GuiClient implements IClient
 		return helpBrowser;
 	}
 	
-	public void commitWorkitem(IWorkitem workitem)
+	public void finishActivity(IWorkitem workitem)
 	{
 		assert workitem != null;
 		activateComponent(emptyLabel);
 		getHelpBrowser().setVisible(false);
 		removeWorkitem(workitem);
-		clientService.commitWorkitem(this, workitem);
+		clientService.finishActivity(this, currentActivity);
 	}
 	
 	public AbstractTaskSelectAction showText(IWorkitem workitem)
@@ -350,10 +355,10 @@ public class GuiClient implements IClient
 		
 		public void workitemRemoved(WorkitemQueueChangeEvent event)
 		{
-			if (!event.getWorkitem().equals(activeWorkitem))
+			if (!event.getWorkitem().equals(currentActivity))
 			{
 				removeWorkitem(event.getWorkitem());
-				activeWorkitem = null;
+				currentActivity = null;
 			}
 		}
 		

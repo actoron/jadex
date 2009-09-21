@@ -1,14 +1,12 @@
 package jadex.wfms.simulation.stateholder;
 
-import jadex.tools.ontology.CurrentState;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class AbstractNumericStateHolder implements IParameterStateHolder
+public abstract class AbstractNumericStateHolder extends AbstractParameterStateSet
 {
 	protected List ranges;
 	
@@ -16,12 +14,9 @@ public abstract class AbstractNumericStateHolder implements IParameterStateHolde
 	
 	protected long upperBound;
 	
-	protected int currentRange;
-	
-	protected long currentIndex;
-	
-	protected AbstractNumericStateHolder(long lowerBound, long upperBound)
+	protected AbstractNumericStateHolder(String parameterName, long lowerBound, long upperBound)
 	{
+		this.name = parameterName;
 		ranges = new ArrayList();
 		this.lowerBound = lowerBound;
 		this.upperBound = upperBound;
@@ -77,7 +72,6 @@ public abstract class AbstractNumericStateHolder implements IParameterStateHolde
 				return (int) (diff / Math.abs(diff));
 			}
 		});
-		reset();
 	}
 	
 	/**
@@ -105,51 +99,6 @@ public abstract class AbstractNumericStateHolder implements IParameterStateHolde
 	}
 	
 	/**
-	 * Resets the state holder to the first available state.
-	 */
-	public void reset()
-	{
-		currentIndex = 0;
-		currentRange = 0;
-	}
-	
-	/**
-	 * Switches to the next available state.
-	 */
-	public void nextState()
-	{
-		currentIndex++;
-		if ((currentIndex + 1) >= ((NumberRange) ranges.get(currentRange)).getValueCount());
-			currentRange = (currentRange + 1) % ranges.size();
-	}
-	
-	/**
-	 * Returns the current state
-	 * @return current state
-	 */
-	public long getCurrentState()
-	{
-		long ret = 0;
-		for (int i = 0; i < currentRange; ++i)
-		{
-			NumberRange range = (NumberRange) ranges.get(i);
-			ret += range.getValueCount();
-		}
-		ret += currentIndex;
-		return ret;
-	}
-	
-	/**
-	 * Test if the holder is in the final state.
-	 * @return true, if in the final state
-	 */
-	public boolean finalState()
-	{
-		return (((currentRange + 1) == ranges.size()) &&
-				((currentIndex + 1) == ((NumberRange) ranges.get(currentRange)).getValueCount()));
-	}
-	
-	/**
 	 * Returns all ranges
 	 * @return all ranges
 	 */
@@ -159,17 +108,26 @@ public abstract class AbstractNumericStateHolder implements IParameterStateHolde
 	}
 	
 	/**
-	 * Returns the current state.
-	 * @return the current state
+	 * Returns a specific state.
+	 * @param index index of the state
+	 * @return the specified state
 	 */
-	public abstract Object getState();
+	public abstract Object getState(long index);
 	
 	/**
-	 * Returns the current state as a long value.
-	 * @return the current state as a long value
+	 * Returns a specific state as a long value.
+	 * 
+	 * @param index the index of the state
+	 * @return the specified state as a long value
 	 */
-	protected long getStateAsLong()
+	protected long getStateAsLong(long index)
 	{
-		return ((NumberRange) ranges.get(currentRange)).getValue(currentIndex);
+		int i = 0;
+		while ((i < ranges.size()) && (((NumberRange) ranges.get(0)).getValueCount() < index))
+		{
+			index -= ((NumberRange) ranges.get(0)).getValueCount();
+			++i;
+		}
+		return ((NumberRange) ranges.get(i)).getValue(index);
 	}
 }

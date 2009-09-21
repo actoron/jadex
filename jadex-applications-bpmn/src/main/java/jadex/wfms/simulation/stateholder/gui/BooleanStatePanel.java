@@ -6,11 +6,11 @@ import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
-import jadex.wfms.simulation.stateholder.BooleanStateHolder;
+import jadex.wfms.simulation.stateholder.BooleanStateSet;
 
 public class BooleanStatePanel extends JPanel
 {
-	public BooleanStatePanel(final BooleanStateHolder stateHolder)
+	public BooleanStatePanel(final BooleanStateSet stateHolder)
 	{
 		JCheckBox falseBox = new JCheckBox();
 		falseBox.setSelected(stateHolder.hasState(Boolean.FALSE));

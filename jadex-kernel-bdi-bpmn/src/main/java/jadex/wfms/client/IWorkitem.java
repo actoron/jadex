@@ -49,23 +49,6 @@ public interface IWorkitem
 	public Object getParameterValue(String parameterName);
 	
 	/**
-	 * Sets the value of a parameter.
-	 * 
-	 * @param parameterName name of the parameter
-	 * @param value new value of the parameter
-	 * @throws IllegalArgumentException if the parameter is read-only
-	 */
-	public void setParameterValue(String parameterName, Object value);
-	
-	/**
-	 * Sets the value of multiple parameters.
-	 * 
-	 * @param parameters the parameters
-	 * @throws IllegalArgumentException if the parameter is read-only
-	 */
-	public void setParameterValues(Map parameters);
-	
-	/**
 	 * Gets the type of a parameter.
 	 * 
 	 * @param parameterName name of the parameter

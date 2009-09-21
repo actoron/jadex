@@ -58,8 +58,8 @@ public class FetchDataTaskSelectAction extends AbstractTaskSelectAction{
             }
             
             Map data = theDataPanel.getTheData();
-            getWorkitem().setParameterValues(data);
-            client.commitWorkitem(getWorkitem());
+            client.getCurrentActivity().setParameterValues(data);
+            client.finishActivity(getWorkitem());
             
             /*ArrayList<IdentifierValueTuple> fetchedData = theDataPanel.getTheData();
             if (fetchedData != null && fetchedData.size() > 0 && getTheGuiConnector().getTheConfig().getBooleanProperty("Record_Process", false, "GUI_Options")) {

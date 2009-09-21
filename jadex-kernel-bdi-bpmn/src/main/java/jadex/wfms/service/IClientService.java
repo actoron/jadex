@@ -2,6 +2,7 @@ package jadex.wfms.service;
 
 import jadex.service.IService;
 import jadex.wfms.client.IClient;
+import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.IWorkitemListener;
 
@@ -35,26 +36,26 @@ public interface IClientService extends IService
 	public Set getModelNames(IClient client);
 	
 	/**
-	 *  Commits an acquired workitem.
+	 *  Finishes an Activity.
 	 *  @param client the client
-	 *  @param workitem the workitem being committed
+	 *  @param workitem the activity being finished
 	 */
-	public void commitWorkitem(IClient client, IWorkitem workitem);
+	public void finishActivity(IClient client, IClientActivity activity);
 	
 	/**
-	 *  Acquires a workitem for a client.
+	 *  Begins an activity for a client.
 	 *  @param client the client
-	 *  @param workitem the workitem being requested for acquisition
-	 *  @return true, if the acquisition was successful, false otherwise
+	 *  @param workitem the workitem being requested for the activity
+	 *  @return the corresponding activity, if the acquisition was successful, null otherwise
 	 */
-	public boolean acquireWorkitem(IClient client, IWorkitem workitem);
+	public IClientActivity beginActivity(IClient client, IWorkitem workitem);
 	
 	/**
-	 *  Releases an acquired workitem back to the queue.
+	 *  Cancel an activity.
 	 *  @param client the client
-	 *  @param workitem the workitem being released
+	 *  @param activity the activity being canceled
 	 */
-	public void releaseWorkitem(IClient client, IWorkitem workitem);
+	public void cancelActivity(IClient client, IClientActivity activity);
 	
 	/**
 	 *  Returns all workitems available to a client.
