@@ -14,8 +14,7 @@
 	name="Communication" package="jadex.communicationexample">
 	
 	<spacetypes>
-		<eis:eisspacetype name="env" class="communicationexample.EnvironmentInterface">
-		</eis:eisspacetype>
+		<eis:eisspacetype name="env" class="communicationexample.EnvironmentInterface"></eis:eisspacetype>
 	</spacetypes>
 	
 	<agenttypes>
@@ -25,8 +24,7 @@
 	<applications>
 		<application name="communication">
 			<spaces>
-				<eis:eisspace name="myenv" type="env">
-				</eis:eisspace>
+				<eis:eisspace name="myenv" type="env"></eis:eisspace>
 			</spaces>
 
 			<agents>
