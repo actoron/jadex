@@ -59,17 +59,17 @@
 			<!-- Actions that can be performed in the environment. -->
 			<env:actiontypes>
 				<env:actiontype name="pickup" class="PickupWasteAction">
-					<env:parameter name="actor_id" class="IAgentIdentifier"/>
+					<env:property name="actor_id" class="IAgentIdentifier"/>
 				</env:actiontype>
 				<env:actiontype name="drop" class="DropWasteAction" >
-					<env:parameter name="actor_id" class="IAgentIdentifier"/>
+					<env:property name="actor_id" class="IAgentIdentifier"/>
 				</env:actiontype>
 				<env:actiontype name="burn" class="BurnWasteAction" >
-					<env:parameter name="actor_id" class="IAgentIdentifier"/>
+					<env:property name="actor_id" class="IAgentIdentifier"/>
 				</env:actiontype>
 				<env:actiontype name="go" class="GoAction" >
-					<env:parameter name="object_id" class="Object"/>
-					<env:parameter name="direction" class="String"/>
+					<env:property name="object_id" class="Object"/>
+					<env:property name="direction" class="String"/>
 				</env:actiontype>
 			</env:actiontypes>
 			

@@ -2,7 +2,7 @@ package jadex.commons;
 
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,7 +58,7 @@ public class SimplePropertyObject implements IPropertyObject
 	public void setProperty(String name, Object value)
 	{
 		if(properties==null)
-			properties = new HashMap();
+			properties = new LinkedHashMap(); // preserve order for EIS :-( parameters
 		Object oldval = properties.get(name);
 		properties.put(name, value);
 		pcs.firePropertyChange(name, oldval, value);

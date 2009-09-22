@@ -2,6 +2,7 @@ package eis.jadex;
 
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.IEnvironmentListener;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IAgentIdentifier;
@@ -9,13 +10,6 @@ import jadex.bridge.IApplicationContext;
 import jadex.bridge.IPlatform;
 import jadex.commons.SUtil;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,7 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import eis.AgentListener;
 import eis.EnvironmentInterfaceStandard;
@@ -41,7 +34,6 @@ import eis.iilang.Action;
 import eis.iilang.ActionResult;
 import eis.iilang.EnvironmentCommand;
 import eis.iilang.EnvironmentEvent;
-import eis.iilang.Parameter;
 import eis.iilang.Percept;
 
 /**
@@ -385,9 +377,21 @@ public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 	public List<ActionResult> performAction(String agent, Action action, String...entities)
 		throws ActException, NoEnvironmentException 
 	{
-		LinkedList params = action.getParameters();
+		LinkedList paramvals = action.getParameters();
 		List ret = new ArrayList();
-		Object val = space.performSpaceAction(action.getName(), params);
+		ISpaceAction spact = space.getSpaceAction(action.getName());
+		String[] propnames = (String[])spact.getPropertyNames().toArray(new String[0]);
+		Map ps = new HashMap();
+		
+		if(paramvals.size()!=propnames.length)
+			throw new RuntimeException("Parameter problem: "+paramvals+" "+propnames);
+		
+		for(int i=0; i<propnames.length; i++)
+		{
+			ps.put(propnames[i], paramvals.get(i));
+		}
+		
+		Object val = space.performSpaceAction(action.getName(), ps);
 		if(val!=null)
 			ret.add(new ActionResult(val.toString(), null));
 		return ret;

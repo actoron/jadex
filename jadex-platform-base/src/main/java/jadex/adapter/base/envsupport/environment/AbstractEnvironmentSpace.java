@@ -661,7 +661,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 * @param actionId the action ID
 	 * @param action the action
 	 */
-	protected ISpaceAction	getSpaceAction(String id)
+	public ISpaceAction	getSpaceAction(String id)
 	{
 		ISpaceAction	ret	= (ISpaceAction)actions.get(id);
 		if(ret==null)

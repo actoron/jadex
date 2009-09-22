@@ -4,7 +4,8 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * 
+ *  Class for representation a percept type, which has a name,
+ *  a set of object types and a set of agent types.
  */
 public class PerceptType
 {
@@ -38,31 +39,6 @@ public class PerceptType
 		this.name = name;
 		this.objecttypes = objecttypes==null? Collections.EMPTY_SET: objecttypes;
 		this.agenttypes = agenttypes==null? Collections.EMPTY_SET: agenttypes;
-		
-		/*if(objecttypes!=null)
-		{
-			this.objecttypes = new HashSet();
-			for(int i=0; i<objecttypes.length; i++)
-			{
-				this.objecttypes.add(objecttypes[i]);
-			}
-		}
-		else
-		{
-			this.objecttypes = Collections.EMPTY_SET;
-		}
-		if(agenttypes!=null)
-		{
-			this.agenttypes = new HashSet();
-			for(int i=0; i<agenttypes.length; i++)
-			{
-				this.agenttypes.add(agenttypes[i]);
-			}
-		}
-		else
-		{
-			this.agenttypes = Collections.EMPTY_SET;
-		}*/
 	}
 
 	//-------- methods --------
