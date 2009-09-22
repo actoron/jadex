@@ -16,7 +16,7 @@ public class Numeral extends Parameter {
 	 * 
 	 * @param value
 	 */
-	public Numeral(double value) {
+	public Numeral(Number value) {
 		
 		this.value = value;
 		

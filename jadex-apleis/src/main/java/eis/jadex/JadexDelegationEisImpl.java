@@ -324,9 +324,18 @@ public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 	 * @return a set of entities.
 	 * @throws AgentException 
 	 */
-	protected Set<String> getAssociatedEntities(String agent) throws AgentException 
+	public Set<String> getAssociatedEntities(String agent) throws AgentException 
 	{
-		return SUtil.arrayToSet(space.getAvatars(convertStringToAgentIdentifier(agent)));
+		ISpaceObject[] obs = space.getAvatars(convertStringToAgentIdentifier(agent));
+		Set ret = new HashSet();
+		if(obs!=null)
+		{
+			for(int i=0; i<obs.length; i++)
+			{
+				ret.add(obs[i].getId().toString());
+			}
+		}
+		return ret;
 	}
 
 	/**
