@@ -34,6 +34,9 @@ import eis.iilang.Action;
 import eis.iilang.ActionResult;
 import eis.iilang.EnvironmentCommand;
 import eis.iilang.EnvironmentEvent;
+import eis.iilang.Identifier;
+import eis.iilang.Numeral;
+import eis.iilang.Parameter;
 import eis.iilang.Percept;
 
 /**
@@ -397,7 +400,15 @@ public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 		
 		for(int i=0; i<propnames.length; i++)
 		{
-			ps.put(propnames[i], paramvals.get(i));
+			Parameter param = (Parameter)paramvals.get(i);
+			Object paramval;
+			if(param instanceof Identifier)
+				paramval = ((Identifier)param).getValue();
+			else if(param instanceof Numeral)
+				paramval = ((Numeral)param).getValue();
+			else
+				throw new RuntimeException("Unknown parameter type: "+param);
+			ps.put(propnames[i], paramval);
 		}
 		
 		Object val = space.performSpaceAction(action.getName(), ps);
@@ -480,6 +491,6 @@ public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 	{
 		IPlatform platform = ((IApplicationContext)space.getContext()).getPlatform();
 		IAMS ams = (IAMS)platform.getService(IAMS.class);
-		return ams.createAgentIdentifier(name, true);
+		return ams.createAgentIdentifier(name, name.contains("@")? false: true);
 	}
 }

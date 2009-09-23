@@ -125,24 +125,18 @@ public class Platform extends AbstractPlatform
 
 	/** The platform config. */
 	protected Properties platconf;
-	
-//	static
-//	{
-//		COMMAND_LINE_OPTIONS = SCollection.createHashSet();
-//		COMMAND_LINE_OPTIONS.add("-" + Configuration.PLATFORMNAME);
-//		COMMAND_LINE_OPTIONS.add("-" + CONFIGURATION);
-//		COMMAND_LINE_OPTIONS.add("-" + DF);
-
-//		COMMAND_LINE_FLAGS = SCollection.createHashSet();
-//		COMMAND_LINE_FLAGS.add("-" + NOGUI);
-		//		COMMAND_LINE_FLAGS.add("-"+NOAMSAGENT);
-		//		COMMAND_LINE_FLAGS.add("-"+NODFAGENT);
-//		COMMAND_LINE_FLAGS.add("-" + NOTRANSPORT);
-//		COMMAND_LINE_FLAGS.add("-" + AUTOSHUTDOWN);
-//	}
 
 	//-------- attributes --------
 
+	/**
+	 *  Create a new Platform.
+	 */
+	public Platform(String conffile, ClassLoader classloader) throws Exception
+	{
+		this((Properties)PropertiesXMLHelper.getPropertyReader().read(
+			SUtil.getResource(conffile, classloader), classloader, null));
+	}
+	
 	/**
 	 *  Create a new Platform.
 	 */
@@ -441,11 +435,8 @@ public class Platform extends AbstractPlatform
 		// Create an instance of the platform.
 		// Hack as long as no loader is present.
 		ClassLoader cl = Platform.class.getClassLoader();
-//		Properties configuration = XMLPropertiesReader.readProperties(SUtil.getResource(conffile, cl), cl);
-		Properties configuration = (Properties)PropertiesXMLHelper.getPropertyReader().read(SUtil.getResource(conffile, cl), cl, null);
-		platform = new Platform(configuration);
+		platform = createPlatform(conffile, cl);
 		platform.start();
-//		startAgents(args, platform);
 		
 		long startup = System.currentTimeMillis() - starttime;
 		platform.logger.info("Platform startup time: " + startup + " ms.");
@@ -472,39 +463,19 @@ public class Platform extends AbstractPlatform
 	}
 
 	/**
-	 *  Parse options from command line arguments.
-	 *  @param args	The arguments to scan.
-	 *  @param props	The properties to be read in from options.
-	 *  @return The remaining arguments, which are not options.
-	 * /
-	protected static String[] parseOptions(String[] args, java.util.Properties props)
+	 *  Create a platform for a configuration file.
+	 *  @param conffile The configuration file.
+	 *  @return The platform.
+	 */
+	public static Platform createPlatform(String conffile, ClassLoader classloader) throws Exception
 	{
-		int i = 0;
-
-		// todo: fix me
-
-		while(i<args.length && args[i].startsWith("-"))
-		{
-			if(COMMAND_LINE_OPTIONS.contains(args[i]))
-			{
-				props.setProperty(args[i++].substring(1), args[i++]);
-			}
-			else if(COMMAND_LINE_FLAGS.contains(args[i]))
-			{
-				props.setProperty(args[i++].substring(1), "true");
-			}
-			else
-			{
-				System.out.println("Argument could not be understood: "+args[i++]);
-				//throw new IllegalArgumentException("Unknown argument: "+args[i]);
-			}
-		}
-
-		// Return remaining arguments, i.e. agents to start.
-		String[] ret = new String[args.length - i];
-		if(ret.length > 0)
-			System.arraycopy(args, i, ret, 0, ret.length);
-		return ret;
-	}*/
+		// Create an instance of the platform.
+		// Hack as long as no loader is present.
+		Properties configuration = (Properties)PropertiesXMLHelper.getPropertyReader().read(
+			SUtil.getResource(conffile, classloader), classloader, null);
+		Platform platform = new Platform(configuration);
+//		platform.start();
+		return platform;
+	}
 }
 

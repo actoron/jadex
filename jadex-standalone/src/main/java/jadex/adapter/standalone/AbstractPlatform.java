@@ -342,7 +342,8 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 		}
 		catch(Exception e)
 		{
-			System.err.println("Exception occurred: " + e);
+			System.err.println("Exception occurred while creating application: ");
+			e.printStackTrace();
 		}
 	}
 	

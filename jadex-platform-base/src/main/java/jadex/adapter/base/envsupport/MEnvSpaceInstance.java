@@ -478,7 +478,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				if(dyn)
 					object.setProperty((String)prop.get("name"), exp);
 				else
-					object.setProperty((String)prop.get("name"), exp.getValue(fetcher));
+					object.setProperty((String)prop.get("name"), exp==null? null: exp.getValue(fetcher));
 			}
 		}
 	}

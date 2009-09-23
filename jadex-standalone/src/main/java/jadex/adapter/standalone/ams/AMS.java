@@ -530,7 +530,11 @@ public class AMS implements IAMS, IService
 	public IAgentIdentifier createAgentIdentifier(String name, boolean local)
 	{
 		if(local)
+		{
+			if(name.indexOf("@")!=-1)
+				throw new RuntimeException("Agent local name must not contain '@' sign: "+name);
 			name = name + "@" + platform.getName();
+		}
 		return new AgentIdentifier(name);
 	}
 	

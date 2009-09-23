@@ -102,14 +102,14 @@
 		</properties>
 		
 		<!-- Agents. -->
-  		<property type="daemonagent" name="ams">jadex/bdi/amsagent/AMS.agent.xml</property>
-		<property type="daemonagent" name="df">jadex/bdi/dfagent/DF.agent.xml</property>
+  		<!-- <property type="daemonagent" name="ams">jadex/bdi/amsagent/AMS.agent.xml</property> -->
+		<!-- <property type="daemonagent" name="df">jadex/bdi/dfagent/DF.agent.xml</property> -->
  		<!-- <property type="agent" name="jcc">jadex/tools/jcc/JCC.agent.xml</property> -->
 	
 		<!-- Applications. -->
 		<!-- <property type="application" name="comm">jadex/bdi/examples/garbagecollector/GarbageCollector.application.xml</property>  -->
 		<properties type="application" name="gc">
-			<property type="model">jadex/bdi/examples/garbagecollector/GarbageCollector.application.xml</property>
+			<property type="model">jadex/garbagecollector/GarbageCollector.application.xml</property>
 			<property type="config">No Agents</property>
 		</properties>
 		
@@ -121,7 +121,7 @@
 						"messagetype_fipa", 
 						"planexecutor_standard", 
 						"standard.timeout", 
-						"tooladapter.introspector",
+						//"tooladapter.introspector",
 						"microplansteps" //,
 						//"planexecutor_bpmn"
 					},
@@ -130,7 +130,7 @@
 						new jadex.adapter.base.fipa.FIPAMessageType(), 
 						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class)),
 						new java.lang.Long(10000),
-						jadex.tools.introspector.IntrospectorAdapter.class,
+						//jadex.tools.introspector.IntrospectorAdapter.class,
 						Boolean.TRUE //,
 						//new jadex.bdi.runtime.BpmnPlanExecutor()
 					}
