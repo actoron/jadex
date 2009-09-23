@@ -454,8 +454,25 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				AvatarMapping mapping = getAvatarMapping(agenttype, typename);
 				if(mapping.isCreateAgent())
 				{
+					final Object	fid	= id;
 					// todo: what about arguments etc.?
-					((ApplicationContext)getContext()).createAgent(null, agenttype, null, null, true, false, null, null);
+					((ApplicationContext)getContext()).createAgent(null, agenttype, null, null, false, false, new IResultListener() {
+						
+						public void resultAvailable(Object result)
+						{
+							IAgentIdentifier	agent	= (IAgentIdentifier)result;
+							
+							setOwner(fid, agent);
+							
+							((IAMS)((ApplicationContext)getContext()).getPlatform().getService(IAMS.class))
+								.startAgent(agent, null);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							exception.printStackTrace();
+						}
+					}, null);
 				}
 			}
 		}
