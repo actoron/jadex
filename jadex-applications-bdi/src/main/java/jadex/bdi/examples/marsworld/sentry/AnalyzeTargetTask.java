@@ -4,8 +4,8 @@ import jadex.adapter.base.envsupport.environment.AbstractTask;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.service.clock.IClockService;
 
 /**
  *  Analyze a given target.
@@ -91,14 +91,14 @@ public class AnalyzeTargetTask extends AbstractTask
 	 *  @param obj	The object that is executing the task.
 	 *  @param progress	The time that has passed according to the environment executor.
 	 */
-	public void execute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
+	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
 		IVector2	loc	= (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
 		IVector2	tloc	= (IVector2)target.getProperty(Space2D.PROPERTY_POSITION);
 		if(!loc.equals(tloc))
 			throw new RuntimeException("Not at location: "+obj+", "+target);
 		
-		time	-= progress.getAsInteger();
+		time	-= progress;
 		
 		if(time<=0)
 		{

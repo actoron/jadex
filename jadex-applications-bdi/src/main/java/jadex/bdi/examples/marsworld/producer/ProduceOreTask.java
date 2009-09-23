@@ -4,9 +4,9 @@ import jadex.adapter.base.envsupport.environment.AbstractTask;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bdi.examples.marsworld.sentry.AnalyzeTargetTask;
+import jadex.service.clock.IClockService;
 
 /**
  *  Move an object towards a destination.
@@ -34,7 +34,7 @@ public class ProduceOreTask extends AbstractTask
 	protected ISpaceObject	target;
 	
 	/** The remaining time. */
-	protected int	time;
+	protected long	time;
 	
 	//-------- constructors --------
 	
@@ -58,7 +58,7 @@ public class ProduceOreTask extends AbstractTask
 	 *  @param obj	The object that is executing the task.
 	 *  @param progress	The time that has passed according to the environment executor.
 	 */
-	public void execute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
+	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
 		ISpaceObject target = (ISpaceObject)getProperty(PROPERTY_TARGET);
 		
@@ -69,9 +69,9 @@ public class ProduceOreTask extends AbstractTask
 		
 		int	ore	= ((Number)target.getProperty(AnalyzeTargetTask.PROPERTY_ORE)).intValue();
 		int	capacity	= ((Number)target.getProperty(PROPERTY_CAPACITY)).intValue();
-		capacity	+= Math.min(ore, (time + progress.getAsInteger())/TIME);
-		ore	-= Math.min(ore, (time + progress.getAsInteger())/TIME);
-		time	= (time + progress.getAsInteger())%TIME;
+		capacity	+= Math.min(ore, (time + progress)/TIME);
+		ore	-= Math.min(ore, (time + progress)/TIME);
+		time	= (time + progress)%TIME;
 		target.setProperty(AnalyzeTargetTask.PROPERTY_ORE, new Integer(ore));
 		target.setProperty(PROPERTY_CAPACITY, new Integer(capacity));
 		

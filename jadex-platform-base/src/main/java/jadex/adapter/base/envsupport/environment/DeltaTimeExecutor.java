@@ -2,8 +2,6 @@ package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.dataview.IDataView;
-import jadex.adapter.base.envsupport.math.IVector1;
-import jadex.adapter.base.envsupport.math.Vector1Long;
 import jadex.bridge.IPlatform;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
@@ -66,7 +64,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 			public boolean execute()
 			{
 				long currenttime = clockservice.getTime();
-				IVector1 progress = new Vector1Long(currenttime - timestamp);
+				long progress = currenttime - timestamp;
 				timestamp = currenttime;
 
 //				System.out.println("step: "+timestamp+" "+progress);
@@ -74,10 +72,11 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 				synchronized(space.getMonitor())
 				{
 					// Update the environment objects.
-					for(Iterator it = space.getSpaceObjectsCollection().iterator(); it.hasNext(); )
+					Object[]	objs	= space.getSpaceObjectsCollection().toArray();
+					for(int i=0; i<objs.length; i++)
 					{
-						SpaceObject obj = (SpaceObject)it.next();
-						obj.updateObject(space, progress);
+						SpaceObject obj = (SpaceObject)objs[i];
+						obj.updateObject(space, progress, clockservice);
 					}
 					
 					// Execute the scheduled agent actions.

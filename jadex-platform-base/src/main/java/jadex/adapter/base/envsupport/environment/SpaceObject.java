@@ -1,11 +1,11 @@
 package jadex.adapter.base.envsupport.environment;
 
-import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
+import jadex.service.clock.IClockService;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -298,9 +298,10 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	/**
 	 * Updates the object to the current time.
 	 * time the current time	
-	 * @param progress some indicator of progress (may be time, step number or set to 0 if not needed)
+	 *  @param progress	The time that has passed according to the environment executor.
+	 *  @param clock	The clock service.
 	 */
-	public void updateObject(IEnvironmentSpace space, IVector1 progress)
+	public void updateObject(IEnvironmentSpace space, long progress, IClockService clock)
 	{
 		synchronized(monitor)
 		{
@@ -311,7 +312,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 				{
 					if(!atasks[i].isFinished(space, this))
 					{
-						atasks[i].execute(space, this, progress);
+						atasks[i].execute(space, this, progress, clock);
 					}
 					else
 					{

@@ -4,8 +4,8 @@ import jadex.adapter.base.envsupport.environment.AbstractTask;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.service.clock.IClockService;
 
 /**
  *  Move an object towards a destination.
@@ -22,7 +22,7 @@ public class LoadBatteryTask extends AbstractTask
 
 	
 	/** The time required for loading full energy. */
-	public static final int	TIME = 10000;
+	public static final double	TIME = 10000.0;
 	
 	/** The property for the charge state. */
 	public static final String PROPERTY_CHARGESTATE = "chargestate";
@@ -41,7 +41,7 @@ public class LoadBatteryTask extends AbstractTask
 	 *  @param obj	The object that is executing the task.
 	 *  @param progress	The time that has passed according to the environment executor.
 	 */
-	public void execute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
+	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
 		ISpaceObject target	= (ISpaceObject)getProperty(PROPERTY_TARGET);
 		IVector2 loc = (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
@@ -53,7 +53,7 @@ public class LoadBatteryTask extends AbstractTask
 	
 		if(chargestate<1.0)
 		{
-			double inc = progress.getAsDouble()/TIME;
+			double inc = progress/TIME;
 			chargestate = Math.min(1.0, chargestate+inc);
 		}
 		

@@ -4,10 +4,10 @@ import jadex.adapter.base.envsupport.environment.AbstractTask;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bdi.examples.marsworld.producer.ProduceOreTask;
 import jadex.bdi.examples.marsworld.sentry.AnalyzeTargetTask;
+import jadex.service.clock.IClockService;
 
 /**
  *  Move an object towards a destination.
@@ -37,7 +37,7 @@ public class LoadOreTask extends AbstractTask
 //	protected boolean	load;
 	
 	/** The remaining time. */
-	protected int	time;
+	protected long	time;
 	
 	//-------- constructors --------
 	
@@ -63,7 +63,7 @@ public class LoadOreTask extends AbstractTask
 	 *  @param obj	The object that is executing the task.
 	 *  @param progress	The time that has passed according to the environment executor.
 	 */
-	public void execute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
+	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
 		ISpaceObject target = (ISpaceObject)getProperty(PROPERTY_TARGET);
 		boolean load = ((Boolean)getProperty(PROPERTY_LOAD)).booleanValue();
@@ -82,19 +82,19 @@ public class LoadOreTask extends AbstractTask
 		boolean	finished;
 		if(load)
 		{
-			int	units	= Math.min(mycap-ore, Math.min(capacity, (time + progress.getAsInteger())/TIME));
+			long	units	= Math.min(mycap-ore, Math.min(capacity, (time + progress)/TIME));
 			ore	+= units;
 			capacity	-= units;
 			finished	= ore==mycap || capacity==0;
 		}
 		else
 		{
-			int	units	= Math.min(ore, (time + progress.getAsInteger())/TIME);
+			long	units	= Math.min(ore, (time + progress)/TIME);
 			ore	-= units;
 			capacity	+= units;
 			finished	= ore==0;
 		}
-		time	= (time + progress.getAsInteger())%TIME;
+		time	= (time + progress)%TIME;
 		obj.setProperty(AnalyzeTargetTask.PROPERTY_ORE, new Integer(ore));
 		target.setProperty(targetcapprop, new Integer(capacity));
 		

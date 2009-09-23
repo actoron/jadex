@@ -1,7 +1,7 @@
 package jadex.adapter.base.envsupport.environment;
 
-import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.commons.IPropertyObject;
+import jadex.service.clock.IClockService;
 
 /**
  *  Interface for a task of an object.
@@ -32,8 +32,9 @@ public interface IObjectTask extends IPropertyObject
 	 *  @param space	The environment in which the task is executing.
 	 *  @param obj	The object that is executing the task.
 	 *  @param progress	The time that has passed according to the environment executor.
+	 *  @param clock	The clock service.
 	 */
-	public void execute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress);
+	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock);
 
 	/**
 	 *  Check if a task is finished and should be removed.

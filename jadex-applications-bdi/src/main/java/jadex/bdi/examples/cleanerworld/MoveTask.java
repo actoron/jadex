@@ -4,8 +4,8 @@ import jadex.adapter.base.envsupport.environment.AbstractTask;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.service.clock.IClockService;
 
 /**
  *  Move an object towards a destination.
@@ -42,12 +42,12 @@ public class MoveTask extends AbstractTask
 	 *  @param obj	The object that is executing the task.
 	 *  @param progress	The time that has passed according to the environment executor.
 	 */
-	public void execute(IEnvironmentSpace space, ISpaceObject obj, IVector1 progress)
+	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
 		IVector2 destination = (IVector2)getProperty(PROPERTY_DESTINATION);
 		
 		double speed = ((Number)obj.getProperty(PROPERTY_SPEED)).doubleValue();
-		double maxdist = progress.getAsDouble()*speed*0.001;
+		double maxdist = progress*speed*0.001;
 		double energy = ((Double)obj.getProperty(PROPERTY_CHARGESTATE)).doubleValue();
 		IVector2 loc = (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
 		

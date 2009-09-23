@@ -3,8 +3,6 @@ package jadex.adapter.base.envsupport.environment;
 import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.AgentActionList.ActionEntry;
-import jadex.adapter.base.envsupport.math.IVector1;
-import jadex.adapter.base.envsupport.math.Vector1Long;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IPlatform;
 import jadex.commons.ICommand;
@@ -125,7 +123,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 			{
 //				System.out.println("---+++--- New round: "+currenttime+" ---+++---");
 				
-				IVector1 progress = new Vector1Long(currenttime - timestamp);
+				long progress = currenttime - timestamp;
 				timestamp = currenttime;
 				
 				synchronized(space.getMonitor())
@@ -136,7 +134,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 						for(Iterator it = space.getSpaceObjectsCollection().iterator(); it.hasNext(); )
 						{
 							SpaceObject obj = (SpaceObject)it.next();
-							obj.updateObject(space, progress);
+							obj.updateObject(space, progress, clockservice);
 						}
 						
 						// Execute the scheduled agent actions.
