@@ -2,12 +2,18 @@ package jadex.garbagecollector;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import eis.jadex.JadexDelegationEisImpl;
+import eis.jadex.SpacePerceptProcessor;
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.standalone.Platform;
+import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContextService;
+import jadex.bridge.ISpace;
 
 /**
  * 
@@ -26,7 +32,16 @@ public class Main
 		// Create environment connector, i.e. eis 
 		IContextService cs = (IContextService)plat.getService(IContextService.class);
 		IApplicationContext app = (IApplicationContext)cs.getContext("gc");
-		JadexDelegationEisImpl eis = new JadexDelegationEisImpl((AbstractEnvironmentSpace)app.getSpace("mygc2dspace"));
+		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)app.getSpace("mygc2dspace");
+		JadexDelegationEisImpl eis = new JadexDelegationEisImpl(space);
+		
+		// Add default eis percept processor for each external agent type of the app.
+		String[] agenttypes = app.getAgentTypes();
+		SpacePerceptProcessor perproc = new SpacePerceptProcessor(eis);
+		for(int i=0; i<agenttypes.length; i++)
+		{
+			space.addPerceptProcessor(agenttypes[i], null, perproc);
+		}
 		
 		// Create (external) agents and connect them to the environment
 		// Problem: currently the creation of entities in EIS does not allow to specify 

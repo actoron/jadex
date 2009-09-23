@@ -110,7 +110,7 @@
 				</env:perceptgenerator>
 				
 				<!-- Percept processors consume percepts and push them into the agents. -->
-				<env:perceptprocessor agenttype="Collector" class="DefaultBDIVisionProcessor" >
+				<!-- <env:perceptprocessor agenttype="Collector" class="DefaultBDIVisionProcessor" >
 					<env:property name="percepttypes">
 						new Object[]
 						{
@@ -118,7 +118,7 @@
 							new String[]{"garbage_disappeared", "remove", "garbages"}
 						}
 					</env:property>
-				</env:perceptprocessor>
+				</env:perceptprocessor>-->
 				
 				<env:perceptprocessor agenttype="Burner" class="DefaultBDIVisionProcessor" >
 					<env:property name="percepttypes">

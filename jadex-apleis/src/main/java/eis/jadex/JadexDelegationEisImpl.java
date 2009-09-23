@@ -1,16 +1,22 @@
 package eis.jadex;
 
+import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.IEnvironmentListener;
+import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IPlatform;
+import jadex.bridge.ISpace;
 import jadex.commons.SUtil;
+import jadex.commons.SimplePropertyObject;
+import jadex.commons.collection.MultiCollection;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,7 +46,8 @@ import eis.iilang.Parameter;
 import eis.iilang.Percept;
 
 /**
- * 
+ *  Implementation draft for a delegation implementation of EIS.
+ *  todo: make thread safe.
  */
 public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 {
@@ -56,6 +63,9 @@ public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 	
 	/** Listener to listener support. */
 	protected Map envlisteners;
+
+	/** Agent listeners for percept handling. */
+	protected MultiCollection agentlisteners;
 	
 	/** Registered agents. */
 	protected List regagents;
@@ -69,6 +79,7 @@ public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 	{
 		this.space = space;
 		this.envlisteners = Collections.synchronizedMap(new HashMap());
+		this.agentlisteners = new MultiCollection();
 		this.regagents = Collections.synchronizedList(new ArrayList());
 		space.addSpaceObjectType(ENTITY, null);
 	}
@@ -127,7 +138,7 @@ public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 	 */
 	public void attachAgentListener(String agent, AgentListener listener) 
 	{
-		// todo:
+		agentlisteners.put(agent, listener);
 	}
 	
 	/**
@@ -138,7 +149,15 @@ public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 	 */
 	public void detachAgentListener(String agent, AgentListener listener) 
 	{
-		// todo:
+		agentlisteners.remove(agent, listener);
+	}
+	
+	/**
+	 *  Get agent listeners for a specific agent.
+	 */
+	public AgentListener[] getAgentListeners(String agent)
+	{
+		return (AgentListener[])agentlisteners.getCollection(agent).toArray(new AgentListener[0]);
 	}
 	
 	/**
@@ -493,4 +512,8 @@ public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 		IAMS ams = (IAMS)platform.getService(IAMS.class);
 		return ams.createAgentIdentifier(name, name.contains("@")? false: true);
 	}
+	
+
 }
+
+

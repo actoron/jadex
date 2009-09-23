@@ -7,6 +7,7 @@ import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
 import jadex.bridge.IPlatform;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.HashMap;
@@ -291,6 +292,24 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	public synchronized String	getAgentType(IAgentIdentifier aid)
 	{
 		return agenttypes!=null ? (String)agenttypes.get(aid) : null;
+	}
+	
+	/**
+	 *  Get the agent types.
+	 *  @return The agent types.
+	 */
+	public String[] getAgentTypes()
+	{
+		List atypes = apptype.getMAgentTypes();
+		String[] ret = atypes!=null? new String[atypes.size()]: SUtil.EMPTY_STRING;
+		
+		for(int i=0; i<ret.length; i++)
+		{
+			MAgentType at = (MAgentType)atypes.get(i);
+			ret[i] = at.getName();
+		}
+		
+		return ret;
 	}
 	
 	/**

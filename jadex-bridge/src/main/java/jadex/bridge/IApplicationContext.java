@@ -5,7 +5,8 @@ import jadex.commons.concurrent.IResultListener;
 import java.util.Map;
 
 /**
- * 
+ *  The application context for agents. Each agent is contained
+ *  in exactly 0..1 applications. 
  */
 public interface IApplicationContext extends IContext
 {
@@ -32,6 +33,12 @@ public interface IApplicationContext extends IContext
 	 *  @return The agent type name.
 	 */
 	public String getAgentType(String filename);
+	
+	/**
+	 *  Get the agent types.
+	 *  @return The agent types.
+	 */
+	public String[] getAgentTypes();
 	
 	/**
 	 *  Set an agent as master (causes context to be terminated on its deletion).

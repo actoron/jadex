@@ -49,7 +49,10 @@ public class MoveAgent extends MicroAgent implements AgentListener
 	 */
 	public void executeBody()
 	{
-		final JadexDelegationEisImpl eisspace = (JadexDelegationEisImpl)getArgument("eis");
+		final JadexDelegationEisImpl eis = (JadexDelegationEisImpl)getArgument("eis");
+		
+		// Register an agent listener to receive percepts
+		eis.attachAgentListener(getAgentIdentifier().getName(), this);
 		
 		Runnable run = new Runnable()
 		{
@@ -57,14 +60,14 @@ public class MoveAgent extends MicroAgent implements AgentListener
 			{
 				try
 				{
-					Object[] ids = eisspace.getAssociatedEntities(getAgentIdentifier().getName()).toArray();
+					Object[] ids = eis.getAssociatedEntities(getAgentIdentifier().getName()).toArray();
 					String entity = (String)ids[0];
 					
 					Parameter param_id = new Numeral(Long.parseLong(entity));
 					Parameter param_dir = new Identifier(GoAction.LEFT);
 					
 					Action action = new Action("go", new Parameter[]{param_id, param_dir});
-					eisspace.performAction(getAgentIdentifier().getName(), action, entity);
+					eis.performAction(getAgentIdentifier().getName(), action, entity);
 					
 					waitFor(100, this);
 				}

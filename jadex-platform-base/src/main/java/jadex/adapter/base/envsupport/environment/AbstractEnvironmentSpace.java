@@ -1269,43 +1269,6 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		return views.values();
 	}
 	
-	/** 
-	 * Steps the space. May be non-functional in spaces that do not have
-	 * a concept of steps.
-	 * @param progress some indicator of progress (may be time, step number or set to 0 if not needed)
-	 * /
-	public void step(IVector1 progress)
-	{
-		synchronized(monitor)
-		{
-			// Update the environment objects.
-			for(Iterator it = spaceobjects.values().iterator(); it.hasNext(); )
-			{
-				SpaceObject obj = (SpaceObject)it.next();
-				obj.updateObject(progress);
-			}
-			
-			// Execute the scheduled agent actions.
-			actionexecutor.executeEntries(null); // todo: where to get filter
-			
-			// Execute the processes.
-			Object[] procs = processes.values().toArray();
-			for(int i = 0; i < procs.length; ++i)
-			{
-				ISpaceProcess process = (ISpaceProcess) procs[i];
-				process.execute(progress, this);
-			}
-			
-			// Update the views.
-			for (Iterator it = views.values().iterator(); it.hasNext(); )
-			{
-				IView view = (IView) it.next();
-				view.update(this);
-			}
-		}
-	}*/
-	
-	
 	/**
 	 *  Fire an environment event.
 	 *  @param event The event.
@@ -1360,7 +1323,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	}
 	
 	/**
-	 * 
+	 *  Get the avatar mapping for an agent avatar combination.
 	 */
 	protected AvatarMapping getAvatarMapping(String agenttype, String avatartype)
 	{
