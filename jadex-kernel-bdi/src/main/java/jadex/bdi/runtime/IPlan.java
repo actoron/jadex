@@ -51,6 +51,11 @@ public interface IPlan	extends IParameterElement
 	 */
 	public IElement getReason();
 	
+	/**
+	 *  Abort a running plan. 
+	 */
+	public void abortPlan();
+	
 	//-------- listeners --------
 	
 	/**

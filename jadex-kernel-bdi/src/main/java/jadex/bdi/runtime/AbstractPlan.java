@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  *  The abstract plan is the abstract superclass
  *  for standard plans and mobile plans.
  */
-public abstract class AbstractPlan implements java.io.Serializable, IPlan
+public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 {
 	//-------- attributes --------
 

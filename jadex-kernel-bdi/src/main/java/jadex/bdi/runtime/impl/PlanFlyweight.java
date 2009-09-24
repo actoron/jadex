@@ -2,6 +2,7 @@ package jadex.bdi.runtime.impl;
 
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.interpreter.PlanRules;
 import jadex.bdi.runtime.IElement;
 import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.IPlanListener;
@@ -142,6 +143,30 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 		else
 		{
 			return getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.plan_has_body);
+		}
+	}
+	
+	/**
+	 *  Abort a running plan. 
+	 */
+	public void abortPlan()
+	{
+		// what about when the plan is handling a goal.
+		// is the goal properly executed?
+		
+		if(getInterpreter().isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					PlanRules.abortPlan(getState(), getScope(), getHandle());
+				}
+			};
+		}
+		else
+		{
+			PlanRules.abortPlan(getState(), getScope(), getHandle());
 		}
 	}
 	
