@@ -24,6 +24,7 @@ import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.adapter.base.envsupport.observer.perspective.Perspective2D;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.ITypeConverter;
 import jadex.commons.xml.SubobjectInfo;
@@ -169,7 +170,10 @@ public class MEnvSpaceType	extends MSpaceType
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "view"), "views", null, null, null, "property")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "spaceexecutor"), null, null, null, null, "property")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "perspective"), "perspectives", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "percepttype"), "percepttypes", null, null, null, "property"))
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "percepttype"), "percepttypes", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "data"), "datacollectors", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "function"), "datacollectors", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "filewriter"), "dataconsumers", null, null, null, "property"))
 		}));
 		
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "avatarmapping")}, MultiCollection.class, null, null,
@@ -990,6 +994,59 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo("view", null, null, null, null, ""),
 			new BeanAttributeInfo("perspective", null, null, null, null, ""),
 			}, null));
+		
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "data")}, MultiCollection.class, null, 
+			new BeanAttributeInfo((String)null, "content", null, null, null, ""),
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("name", null, null, null, null, "")
+			}, null, null,
+			new SubobjectInfo[]{
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "selector"), "selector", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "data"), "subdata", null, null, null, ""))
+			}));
+		
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "function")}, MultiCollection.class, null, null,
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("type", null, null, null, null, ""),
+			new BeanAttributeInfo("source", null, null, null, null, "")
+			}, null));
+		
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "selector")}, HashMap.class, null, null,
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("objecttype", null, null, null, null, "")
+			}, null));
+		
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "filewriter")}, MultiCollection.class, null, null,
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("filename", null, null, null, null, "")
+			}, null, null,
+			new SubobjectInfo[]{
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "data"), "subdata", null, null, null, ""))
+			}));
+		
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "filewriter"), new QName(uri, "data")}, MultiCollection.class, null, null,
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("ref", null, null, null, null, "")
+			}, null));
+		
+//		<env:datacollectors>
+//		<env:data name="individual_unhappiness">
+//			<env:selector objecttype="heatbug" /> <!- - All / one / subset of objects - ->
+//			<env:data name="name">$object.name</env:data>
+//			<env:data name="unhappiness">$object.unhappiness</env:data> 
+//		</env:data>
+//		
+//		<env:function name="global_unhappiness" class="MeanFunction">
+//			<env:source name="individual_unhappiness.unhappiness"></env:source>
+//		</env:function>
+//	</env:datacollectors>
+//	
+//	<env:dataconsumers>
+//		<env:filewriter filename="stats.csv">
+//			<env:data ref="individual_unhappiness"/>
+//		</env:filewriter>
+//	</env:dataconsumers>
 		
 		return types;
 	}

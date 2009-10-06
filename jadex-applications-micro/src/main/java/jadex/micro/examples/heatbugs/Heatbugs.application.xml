@@ -70,7 +70,6 @@
 			
 			<env:perspectives>
 				<env:perspective name="main" class="Perspective2D" opengl="true" objectplacement="center">
-					
 					<env:drawable objecttype="patch" width="1.0" height="1.0">
 						<env:property name="color" dynamic="true">new java.awt.Color((int)(Math.min(255, $object.heat)),0,0)</env:property>
 						<env:rectangle color="color" />
@@ -80,9 +79,25 @@
 						<env:property name="color" dynamic="true">new java.awt.Color(0,(int)(Math.min(255, $object.ideal_temp)),255)</env:property>
 						<env:rectangle color="color" />
 					</env:drawable>
-				
 				</env:perspective>
 			</env:perspectives>
+			
+			<env:datacollectors>
+				<env:data name="individual_unhappiness">
+					<env:selector objecttype="heatbug" /> <!-- All / one / subset of objects -->
+					<env:data name="name">$object.name</env:data>
+					<env:data name="unhappiness">$object.unhappiness</env:data> 
+				</env:data>
+				
+				<env:function name="global_unhappiness" type="mean" source="individual_unhappiness.unhappiness">
+				</env:function>
+			</env:datacollectors>
+			
+			<env:dataconsumers>
+				<env:filewriter filename="stats.csv">
+					<env:data ref="individual_unhappiness"/>
+				</env:filewriter>
+			</env:dataconsumers>
 			
 			<env:spaceexecutor class="RoundBasedExecutor">
 				<env:property name="space">$space</env:property>
@@ -105,6 +120,8 @@
 					<env:observers>
 						<env:observer name="world" view="view_all" perspective="main"/>
 					</env:observers>
+					
+					
 				</env:envspace>
 			</spaces>
 

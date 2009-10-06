@@ -427,6 +427,14 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			}
 		}
 		
+		// Create the data collectors.
+		Map dcols = (Map)MEnvSpaceInstance.getProperty(mspacetype.getProperties(), "datacollectors");
+		System.out.println("datacollectors: "+dcols);
+		
+		// Create the data consumers.
+		Map dcons = (Map)MEnvSpaceInstance.getProperty(mspacetype.getProperties(), "dataconsumers");
+		System.out.println("dataconsumers: "+dcols);
+		
 		// Create the environment executor.
 		Map mse = (Map)MEnvSpaceInstance.getProperty(mspacetype.getProperties(), "spaceexecutor");
 		IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(mse, "expression");
@@ -442,7 +450,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			setProperties(exe, props, fetcher);
 		}
 		if(exe!=null)
-			exe.start();
+			exe.start();	
 		
 		return ret;		
 	}
