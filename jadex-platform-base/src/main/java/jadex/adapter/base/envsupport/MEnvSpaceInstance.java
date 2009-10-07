@@ -274,6 +274,21 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			}
 		}
 
+		return ret;		
+	}
+	
+	/**
+	 *  Initialize a space.
+	 *  Do all initialization that requires the space already being registered in the context.
+	 *  Override, if needed. 
+	 */
+	public void	initSpace(ISpace space, final IApplicationContext app) throws Exception
+	{
+		MApplicationType mapt = ((ApplicationContext)app).getApplicationType();
+		MEnvSpaceType mspacetype = (MEnvSpaceType)mapt.getMSpaceType(getTypeName());
+		AbstractEnvironmentSpace	ret	= (AbstractEnvironmentSpace) space;
+		SimpleValueFetcher	fetcher	= ret.getFetcher();
+		
 		// Create initial objects.
 		List objects = (List)getPropertyList("objects");
 		if(objects!=null)
@@ -290,6 +305,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				
 				for(int j=0; j<num; j++)
 				{
+					fetcher.setValue("$number", new Integer(j));
 					Map props = convertProperties(mprops, fetcher);
 					ret.createSpaceObject((String)MEnvSpaceInstance.getProperty(mobj, "type"), props, null);
 				}
@@ -450,9 +466,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			setProperties(exe, props, fetcher);
 		}
 		if(exe!=null)
-			exe.start();	
-		
-		return ret;		
+			exe.start();			
 	}
 
 	/**

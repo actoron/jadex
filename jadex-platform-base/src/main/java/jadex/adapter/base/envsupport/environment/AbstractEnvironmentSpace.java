@@ -452,7 +452,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			{
 				String agenttype = (String)it.next();
 				AvatarMapping mapping = getAvatarMapping(agenttype, typename);
-				if(mapping.isCreateAgent())
+				if(mapping!=null && mapping.isCreateAgent())
 				{
 					final Object	fid	= id;
 					// todo: what about arguments etc.?
@@ -1328,11 +1328,11 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	protected AvatarMapping getAvatarMapping(String agenttype, String avatartype)
 	{
 		AvatarMapping mapping = null;
-		for(Iterator it=avatarmappings.getCollection(agenttype).iterator(); it.hasNext(); )
+		for(Iterator it=avatarmappings.getCollection(agenttype).iterator(); mapping==null && it.hasNext(); )
 		{
-			mapping = (AvatarMapping)it.next();
-			if(avatartype.equals(mapping.getAvatarType()))
-				break;
+			AvatarMapping	test = (AvatarMapping)it.next();
+			if(avatartype.equals(test.getAvatarType()))
+				mapping	= test;
 		}
 		return mapping;
 	}

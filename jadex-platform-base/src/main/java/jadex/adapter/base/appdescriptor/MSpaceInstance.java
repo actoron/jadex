@@ -87,5 +87,15 @@ public abstract class MSpaceInstance
 	/**
 	 *  Create a space.
 	 */
-	public abstract ISpace createSpace(IApplicationContext app) throws Exception;
+	public abstract ISpace	createSpace(IApplicationContext app) throws Exception;
+	
+	/**
+	 *  Initialize a space.
+	 *  Do all initialization that requires the space already being registered in the context.
+	 *  Override, if needed. 
+	 */
+	public void	initSpace(ISpace space, IApplicationContext app) throws Exception
+	{
+		// empty default implementation. 
+	}
 }

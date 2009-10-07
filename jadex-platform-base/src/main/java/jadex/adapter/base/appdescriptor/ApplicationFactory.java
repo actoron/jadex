@@ -171,6 +171,7 @@ public class ApplicationFactory implements IApplicationFactory
 					MSpaceInstance si = (MSpaceInstance)spaces.get(i);
 					ISpace space = si.createSpace(context);
 					context.addSpace(space);
+					si.initSpace(space, context);
 				}
 			}
 		}
