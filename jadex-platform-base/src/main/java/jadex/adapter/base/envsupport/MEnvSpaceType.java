@@ -171,8 +171,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "spaceexecutor"), null, null, null, null, "property")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "perspective"), "perspectives", null, null, null, "property")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "percepttype"), "percepttypes", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "data"), "datacollectors", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "function"), "datacollectors", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "data"), "dataproviders", null, null, null, "property")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "filewriter"), "dataconsumers", null, null, null, "property"))
 		}));
 		
@@ -1010,25 +1009,21 @@ public class MEnvSpaceType	extends MSpaceType
 			}, null));
 		
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "data")}, MultiCollection.class, null, 
-			new BeanAttributeInfo((String)null, "content", null, null, null, ""),
+			new BeanAttributeInfo((String)null, "content", null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, "")
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "selector"), "selector", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "source"), "source", null, null, null, "")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "data"), "subdata", null, null, null, ""))
 			}));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "function")}, MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "source")}, HashMap.class, null, 
+			new BeanAttributeInfo("content", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
-			new BeanAttributeInfo("type", null, null, null, null, ""),
-			new BeanAttributeInfo("source", null, null, null, null, "")
-			}, null));
-		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "selector")}, HashMap.class, null, null,
-			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("objecttype", null, null, null, null, "")
+			new BeanAttributeInfo("objecttype", null, null, null, null, ""),
+			new BeanAttributeInfo("aggregate", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "")
 			}, null));
 		
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "filewriter")}, MultiCollection.class, null, null,

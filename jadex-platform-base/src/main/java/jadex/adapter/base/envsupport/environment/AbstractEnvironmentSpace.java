@@ -4,6 +4,8 @@ import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.IObjectCreator;
 import jadex.adapter.base.envsupport.MEnvSpaceInstance;
 import jadex.adapter.base.envsupport.dataview.IDataView;
+import jadex.adapter.base.envsupport.evaluation.ITableDataConsumer;
+import jadex.adapter.base.envsupport.evaluation.ITableDataProvider;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IContext;
@@ -96,6 +98,12 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	
 	/** The fetcher. */
 	protected SimpleValueFetcher fetcher;
+	
+	/** The data providers (name -> provider). */
+	protected Map dataproviders;
+	
+	/** The data consumers. */
+	protected List dataconsumers;
 
 	//-------- constructors --------
 	
@@ -124,6 +132,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		this.taskidcounter = new AtomicCounter();
 		this.actionlist	= new AgentActionList(this);
 		this.perceptlist = new PerceptList(this);
+		
+		this.dataproviders = new HashMap();
+		this.dataconsumers = new ArrayList();
 	}
 	
 	//-------- methods --------
@@ -1335,5 +1346,43 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				mapping	= test;
 		}
 		return mapping;
+	}
+	
+	/**
+	 *  Add a new data provider.
+	 *  @param name The name.
+	 *  @param provider The provider.
+	 */
+	public void addDataProvider(String name, ITableDataProvider provider)
+	{
+		dataproviders.put(name, provider);
+	}
+	
+	/**
+	 *  Get a data provider.
+	 *  @param name The name.
+	 *  @return The provider.
+	 */
+	public ITableDataProvider getDataProvider(String name)
+	{
+		return (ITableDataProvider)dataproviders.get(name);
+	}
+	
+	/**
+	 *  Add a new data consumer.
+	 *  @param consumer The consumer.
+	 */
+	public void addDataConsumer(ITableDataConsumer consumer)
+	{
+		dataconsumers.add(consumer);
+	}
+	
+	/**
+	 *  Get the data consumers.
+	 *  @return The data consumers.
+	 */
+	public List getDataConsumers()
+	{
+		return dataconsumers;
 	}
 }

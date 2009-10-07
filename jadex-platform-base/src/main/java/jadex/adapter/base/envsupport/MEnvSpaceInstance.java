@@ -12,6 +12,12 @@ import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceExecutor;
 import jadex.adapter.base.envsupport.environment.PerceptType;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.adapter.base.envsupport.evaluation.IRowObjectProvider;
+import jadex.adapter.base.envsupport.evaluation.ITableDataConsumer;
+import jadex.adapter.base.envsupport.evaluation.ITableDataProvider;
+import jadex.adapter.base.envsupport.evaluation.SpaceObjectDataProvider;
+import jadex.adapter.base.envsupport.evaluation.ObjectRowProvider;
+import jadex.adapter.base.envsupport.evaluation.TableCSVFileWriter;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
@@ -443,13 +449,57 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			}
 		}
 		
-		// Create the data collectors.
-		Map dcols = (Map)MEnvSpaceInstance.getProperty(mspacetype.getProperties(), "datacollectors");
-		System.out.println("datacollectors: "+dcols);
+		// Create the data providers.
+		List dcols = mspacetype.getPropertyList("dataproviders");
+		System.out.println("data providers: "+dcols);
+		if(dcols!=null)
+		{
+			for(int i=0; i<dcols.size(); i++)
+			{
+				Map dcol = (Map)dcols.get(i);
+
+				Map source = (Map)getProperty(dcol, "source");
+				String varname = source.get("name")!=null? (String)source.get("name"): "$object";
+				String objecttype = (String)source.get("objecttype");
+				Boolean aggregate = (Boolean)source.get("aggregate");
+				IParsedExpression exp = (IParsedExpression)source.get("content");
+				IRowObjectProvider rprov = new ObjectRowProvider(varname, ret, objecttype, aggregate!=null? aggregate.booleanValue(): false, exp);
+				
+				String tablename = (String)getProperty(dcol, "name");
+				List subdatas = (List)dcol.get("subdata");
+				String[] columnnames = new String[subdatas.size()];
+				IParsedExpression[] exps = new IParsedExpression[subdatas.size()];
+				for(int j=0; j<subdatas.size(); j++)
+				{
+					Map subdata = (Map)subdatas.get(j);
+					columnnames[j] = (String)getProperty(subdata, "name");
+					exps[j] = (IParsedExpression)getProperty(subdata, "content");
+				}
+				
+				ITableDataProvider tprov = new SpaceObjectDataProvider(ret, rprov, tablename, columnnames, exps);
+				ret.addDataProvider(tablename, tprov);
+			}
+		}
+		
 		
 		// Create the data consumers.
-		Map dcons = (Map)MEnvSpaceInstance.getProperty(mspacetype.getProperties(), "dataconsumers");
-		System.out.println("dataconsumers: "+dcols);
+		List dcons = mspacetype.getPropertyList("dataconsumers");
+		System.out.println("data consumers: "+dcons);
+		if(dcons!=null)
+		{
+			for(int i=0; i<dcons.size(); i++)
+			{
+				Map dcon = (Map)dcons.get(i);
+
+				String filename = (String)getProperty(dcon, "filename");
+				Map data = (Map)getProperty(dcon, "subdata");
+				String provname = (String)getProperty(data, "ref");
+				ITableDataProvider prov = ret.getDataProvider(provname);
+				
+				ITableDataConsumer tcon = new TableCSVFileWriter(prov, filename);
+				ret.addDataConsumer(tcon);
+			}
+		}
 		
 		// Create the environment executor.
 		Map mse = (Map)MEnvSpaceInstance.getProperty(mspacetype.getProperties(), "spaceexecutor");

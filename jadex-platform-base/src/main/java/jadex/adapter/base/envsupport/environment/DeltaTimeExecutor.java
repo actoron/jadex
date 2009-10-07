@@ -2,6 +2,7 @@ package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.dataview.IDataView;
+import jadex.adapter.base.envsupport.evaluation.ITableDataConsumer;
 import jadex.bridge.IPlatform;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
@@ -72,7 +73,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 				synchronized(space.getMonitor())
 				{
 					// Update the environment objects.
-					Object[]	objs	= space.getSpaceObjectsCollection().toArray();
+					Object[] objs = space.getSpaceObjectsCollection().toArray();
 					for(int i=0; i<objs.length; i++)
 					{
 						SpaceObject obj = (SpaceObject)objs[i];
@@ -91,12 +92,19 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 					}
 					
 					// Update the views.
-					for (Iterator it = space.getViews().iterator(); it.hasNext(); )
+					for(Iterator it = space.getViews().iterator(); it.hasNext(); )
 					{
-						IDataView view = (IDataView) it.next();
+						IDataView view = (IDataView)it.next();
 						view.update(space);
 					}
 
+					// Execute the data consumers.
+					for(Iterator it = space.getDataConsumers().iterator(); it.hasNext(); )
+					{
+						ITableDataConsumer consumer = (ITableDataConsumer)it.next();
+						consumer.consumeData(currenttime);
+					}
+					
 					// Send the percepts to the agents.
 					space.getPerceptList().processPercepts(null);
 				}

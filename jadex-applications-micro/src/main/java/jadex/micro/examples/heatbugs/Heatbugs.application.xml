@@ -82,20 +82,27 @@
 				</env:perspective>
 			</env:perspectives>
 			
-			<env:datacollectors>
+			<env:dataproviders>
 				<env:data name="individual_unhappiness">
-					<env:selector objecttype="heatbug" /> <!-- All / one / subset of objects -->
-					<env:data name="name">$object.name</env:data>
-					<env:data name="unhappiness">$object.unhappiness</env:data> 
+					<env:source name="$heatbug" objecttype="heatbug" /> <!-- All / one / subset of objects -->
+					<env:data name="time">$time</env:data>
+					<env:data name="id">$heatbug.getId()</env:data>
+					<env:data name="unhappiness">$heatbug.unhappiness</env:data> 
 				</env:data>
 				
-				<env:function name="global_unhappiness" type="mean" source="individual_unhappiness.unhappiness">
-				</env:function>
-			</env:datacollectors>
+				<env:data name="global_unhappiness">
+					<env:source name="$unhappinesses" objecttype="heatbug" aggregate="true">$object.unhappiness</env:source>
+					<env:data name="time">$time</env:data>
+					<env:data name="unhappiness">jadex.adapter.base.envsupport.evaluation.SFunction.mean($unhappinesses)</env:data>
+				</env:data>				
+			</env:dataproviders>
 			
 			<env:dataconsumers>
-				<env:filewriter filename="stats.csv">
+				<!-- <env:filewriter filename="individual_unhappiness.csv">
 					<env:data ref="individual_unhappiness"/>
+				</env:filewriter>-->
+				<env:filewriter filename="global_unhappiness.csv">
+					<env:data ref="global_unhappiness"/>
 				</env:filewriter>
 			</env:dataconsumers>
 			
@@ -118,10 +125,18 @@
 					</env:processes>
 					
 					<env:observers>
-						<env:observer name="world" view="view_all" perspective="main"/>
+						<env:observer name="world" view="view_all" perspective="main">
+							<!-- <env:tab name="evaluation">
+								<env:chart>
+									<env:series name="unhappiness" color="red">
+										<env:data ref="global_unhappiness"/>
+										<env:x>$object.time</env:x>
+										<env:y>$object.unhappiness</env:y>
+									</env:series>
+								</env:chart>
+							</env:tab>  -->
+						</env:observer>
 					</env:observers>
-					
-					
 				</env:envspace>
 			</spaces>
 

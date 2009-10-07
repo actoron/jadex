@@ -3,6 +3,7 @@ package jadex.adapter.base.envsupport.environment;
 import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.AgentActionList.ActionEntry;
+import jadex.adapter.base.envsupport.evaluation.ITableDataConsumer;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IPlatform;
 import jadex.commons.ICommand;
@@ -149,10 +150,17 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 						}
 						
 						// Update the views.
-						for (Iterator it = space.getViews().iterator(); it.hasNext(); )
+						for(Iterator it = space.getViews().iterator(); it.hasNext(); )
 						{
 							IDataView view = (IDataView) it.next();
 							view.update(space);
+						}
+						
+						// Execute the data consumers.
+						for(Iterator it = space.getDataConsumers().iterator(); it.hasNext(); )
+						{
+							ITableDataConsumer consumer = (ITableDataConsumer)it.next();
+							consumer.consumeData(currenttime);
 						}
 					}
 					
