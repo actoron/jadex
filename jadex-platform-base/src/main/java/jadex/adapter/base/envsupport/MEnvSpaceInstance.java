@@ -133,24 +133,24 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		{
 			for(int i=0; i<avmappings.size(); i++)
 			{
-				Map mmapping = (Map)avmappings.get(i);
-				String agenttype = (String)MEnvSpaceInstance.getProperty(mmapping, "agenttype");
-				String avatartype = (String)(String)MEnvSpaceInstance.getProperty(mmapping, "objecttype");
-				Boolean createavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createavatar");
-				Boolean createagent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createagent");
-				Boolean killavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killavatar");
-				Boolean killagent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killagent");
-				
-				AvatarMapping mapping = new AvatarMapping(agenttype, avatartype);
-				if(createavatar!=null)
-					mapping.setCreateAvatar(createavatar.booleanValue());
-				if(createagent!=null)
-					mapping.setCreateAgent(createagent.booleanValue());
-				if(killavatar!=null)
-					mapping.setKillAvatar(killavatar.booleanValue());
-				if(killagent!=null)
-					mapping.setKillAgent(killagent.booleanValue());
-				
+				AvatarMapping mapping = (AvatarMapping)avmappings.get(i);
+//				String agenttype = (String)MEnvSpaceInstance.getProperty(mmapping, "agenttype");
+//				String avatartype = (String)(String)MEnvSpaceInstance.getProperty(mmapping, "objecttype");
+//				Boolean createavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createavatar");
+//				Boolean createagent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createagent");
+//				Boolean killavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killavatar");
+//				Boolean killagent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killagent");
+//				
+//				AvatarMapping mapping = new AvatarMapping(agenttype, avatartype);
+//				if(createavatar!=null)
+//					mapping.setCreateAvatar(createavatar.booleanValue());
+//				if(createagent!=null)
+//					mapping.setCreateAgent(createagent.booleanValue());
+//				if(killavatar!=null)
+//					mapping.setKillAvatar(killavatar.booleanValue());
+//				if(killagent!=null)
+//					mapping.setKillAgent(killagent.booleanValue());
+//				
 				ret.addAvatarMappings(mapping);
 			}
 		}

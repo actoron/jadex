@@ -1109,7 +1109,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						{
 							Map	props	= new HashMap();
 							props.put(ISpaceObject.PROPERTY_OWNER, aid);
-							createSpaceObject(mapping.getAvatarType(), props, null);
+							createSpaceObject(mapping.getObjectType(), props, null);
 						}
 					}
 				}
@@ -1331,7 +1331,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		for(Iterator it=avatarmappings.getCollection(agenttype).iterator(); mapping==null && it.hasNext(); )
 		{
 			AvatarMapping	test = (AvatarMapping)it.next();
-			if(avatartype.equals(test.getAvatarType()))
+			if(avatartype.equals(test.getObjectType()))
 				mapping	= test;
 		}
 		return mapping;

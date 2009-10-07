@@ -3,6 +3,7 @@ package jadex.adapter.base.envsupport;
 import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.adapter.base.envsupport.dataview.IDataView;
+import jadex.adapter.base.envsupport.environment.AvatarMapping;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
@@ -24,9 +25,9 @@ import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.adapter.base.envsupport.observer.perspective.Perspective2D;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
-import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.ITypeConverter;
+import jadex.commons.xml.QName;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.bean.BeanAttributeInfo;
@@ -46,7 +47,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.text.html.StyleSheet;
-import jadex.commons.xml.QName;
 
 /**
  *  Java representation of environment space type for xml description.
@@ -176,16 +176,30 @@ public class MEnvSpaceType	extends MSpaceType
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "filewriter"), "dataconsumers", null, null, null, "property"))
 		}));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "avatarmapping")}, MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "avatarmapping")}, AvatarMapping.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("agenttype", null, null, null, null, ""),
-			new BeanAttributeInfo("objecttype", null, null, null, null, ""),
-			new BeanAttributeInfo("createavatar", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
-			new BeanAttributeInfo("createagent", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
-			new BeanAttributeInfo("killavatar", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, ""),
-			new BeanAttributeInfo("killagent", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "")
+			new BeanAttributeInfo("agenttype", "agentType"),
+			new BeanAttributeInfo("objecttype", "objectType"),
+			new BeanAttributeInfo("createavatar", "createAvatar"),
+			new BeanAttributeInfo("createagent", "createAgent"),
+			new BeanAttributeInfo("killavatar", "killAvatar"),
+			new BeanAttributeInfo("killagent", "killAgent")
 			}, null));
-		
+		/*
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "createagent")}, MultiCollection.class, null, null,
+			null, null, null,
+			new SubobjectInfo[]{
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "name"), "name", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "argument"), "arguments", null, null, null, ""))
+			}));
+
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "name")}, IParsedExpression.class, null, null,
+			null, null, null,
+			new SubobjectInfo[]{
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "name"), "name", null, null, null, "")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "argument"), "arguments", null, null, null, ""))
+			}));
+*/
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "percepttype")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),

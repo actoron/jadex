@@ -10,8 +10,8 @@ public class AvatarMapping
 	/** The agent type name. */
 	protected String agenttype;
 	
-	/** The avatar type. */
-	protected String avatartype;
+	/** The object type. */
+	protected String objecttype;
 
 	/** The flag for creating the avatar when an agent is created. */
 	protected boolean createavatar;
@@ -30,19 +30,28 @@ public class AvatarMapping
 	/**
 	 *  Create a new avatar mapping. 
 	 */
-	public AvatarMapping(String agenttype, String avatartype)
+	public AvatarMapping()
 	{
-		this(agenttype, avatartype, true, false, true, false);
+		// bean constructor
+		this(null, null);
 	}
 	
 	/**
 	 *  Create a new avatar mapping. 
 	 */
-	public AvatarMapping(String agenttype, String avatartype, boolean createavatar, 
+	public AvatarMapping(String agenttype, String objecttype)
+	{
+		this(agenttype, objecttype, true, false, true, false);
+	}
+	
+	/**
+	 *  Create a new avatar mapping. 
+	 */
+	public AvatarMapping(String agenttype, String objecttype, boolean createavatar, 
 		boolean createagent, boolean killavatar, boolean killagent)
 	{
 		this.agenttype = agenttype;
-		this.avatartype = avatartype;
+		this.objecttype = objecttype;
 		this.createavatar = createavatar;
 		this.createagent = createagent;
 		this.killavatar = killavatar;
@@ -61,12 +70,12 @@ public class AvatarMapping
 	}
 
 	/**
-	 *  Get the avatartype.
-	 *  @return The avatartype.
+	 *  Get the objecttype.
+	 *  @return The objecttype.
 	 */
-	public String getAvatarType()
+	public String getObjectType()
 	{
-		return this.avatartype;
+		return this.objecttype;
 	}
 
 	/**
@@ -114,11 +123,11 @@ public class AvatarMapping
 	}
 
 	/**
-	 * @param avatartype the avatartype to set
+	 * @param object the objecttype to set
 	 */
-	public void setAvatarType(String avatartype)
+	public void setObjectType(String object)
 	{
-		this.avatartype = avatartype;
+		this.objecttype = object;
 	}
 
 	/**
