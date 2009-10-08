@@ -80,5 +80,4 @@ public class ObjectRowProvider implements IRowObjectProvider
 		return this.varname;
 	}
 	
-	
 }

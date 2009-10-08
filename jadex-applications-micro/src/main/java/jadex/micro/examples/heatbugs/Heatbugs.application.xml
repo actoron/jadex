@@ -20,6 +20,7 @@
 		<import>jadex.adapter.base.envsupport.dataview.*</import>
 		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.planlib.*</import>
+		<import>jadex.adapter.base.envsupport.evaluation.*</import>
 	</imports>
 	
 	<spacetypes>
@@ -83,8 +84,17 @@
 			</env:perspectives>
 			
 			<env:dataproviders>
-				<env:data name="individual_unhappiness">
+				<env:data name="unhappiness">
 					<env:source name="$heatbug" objecttype="heatbug" /> <!-- All / one / subset of objects -->
+					<env:source name="$unhappinesses" objecttype="heatbug" aggregate="true">$object.unhappiness</env:source>
+					<env:data name="time">$time</env:data>
+					<env:data name="id">$heatbug.getId()</env:data>
+					<env:data name="unhappiness">$heatbug.unhappiness</env:data> 
+					<env:data name="avg_unhappiness">SFunction.mean($unhappinesses)</env:data>
+				</env:data>
+				
+				<!-- <env:data name="individual_unhappiness">
+					<env:source name="$heatbug" objecttype="heatbug" />
 					<env:data name="time">$time</env:data>
 					<env:data name="id">$heatbug.getId()</env:data>
 					<env:data name="unhappiness">$heatbug.unhappiness</env:data> 
@@ -93,17 +103,45 @@
 				<env:data name="global_unhappiness">
 					<env:source name="$unhappinesses" objecttype="heatbug" aggregate="true">$object.unhappiness</env:source>
 					<env:data name="time">$time</env:data>
-					<env:data name="unhappiness">jadex.adapter.base.envsupport.evaluation.SFunction.mean($unhappinesses)</env:data>
-				</env:data>				
+					<env:data name="unhappiness">SFunction.mean($unhappinesses)</env:data>
+				</env:data>	 -->			
 			</env:dataproviders>
 			
 			<env:dataconsumers>
-				<!-- <env:filewriter filename="individual_unhappiness.csv">
-					<env:data ref="individual_unhappiness"/>
-				</env:filewriter>-->
-				<env:filewriter filename="global_unhappiness.csv">
-					<env:data ref="global_unhappiness"/>
-				</env:filewriter>
+				<!-- <env:dataconsumer class="CSVFileDataConsumer">
+					<env:property name="dataprovider">$space.getDataProvider("global_unhappiness")</env:property>
+					<env:property name="filename">"global_unhappiness.csv"</env:property>
+				</env:dataconsumer> -->
+				
+				<!-- <env:dataconsumer class="ChartDataConsumer">
+					<env:property name="dataprovider">$space.getDataProvider("global_unhappiness")</env:property>
+					<env:property name="title">"Global Bug Unhappiness"</env:property>
+					<env:property name="labelx">"Time"</env:property>
+					<env:property name="labely">"Unhappiness"</env:property>
+					<!- - <env:property name="valuex">"time"</env:property> - ->
+					<!- - <env:property name="valuey">"unhappiness"</env:property> - ->
+					<env:property name="valuex" dynamic="true">$object.getData($rowcnt, $object.getColumnIndex("time"))</env:property>
+					<env:property name="valuey" dynamic="true">$object.getData($rowcnt, $object.getColumnIndex("unhappiness"))</env:property>
+				</env:dataconsumer> -->
+				
+				<!-- <env:dataconsumer class="CSVFileDataConsumer">
+					<env:property name="dataprovider">$space.getDataProvider("unhappiness")</env:property>
+					<env:property name="filename">"unhappiness.csv"</env:property>
+				</env:dataconsumer> -->
+				
+				<env:dataconsumer class="ChartDataConsumer">
+					<env:property name="dataprovider">$space.getDataProvider("unhappiness")</env:property>
+					<env:property name="title">"Individual Bug Unhappiness"</env:property>
+					<env:property name="labelx">"Time"</env:property>
+					<env:property name="labely">"Unhappiness"</env:property>
+					
+					<env:property name="seriesid">"id"</env:property>
+					<env:property name="valuex">"time"</env:property>
+					<env:property name="valuey">"unhappiness"</env:property>
+
+					<!-- <env:property name="valuex">"time"</env:property>
+					<env:property name="valuey">"avg_unhappiness"</env:property> -->
+				</env:dataconsumer>
 			</env:dataconsumers>
 			
 			<env:spaceexecutor class="RoundBasedExecutor">
@@ -117,7 +155,26 @@
 	</agenttypes>
 	
 	<applications>
-		<application name="30x30">
+		<application name="20x20 and 10 bugs">
+			<spaces>
+				<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
+					<env:processes>
+						<env:process type="diffuse"/>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="world" view="view_all" perspective="main">
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</spaces>
+
+			<agents>
+				<agent type="Heatbug" number="2"/>
+			</agents>
+		</application>
+		
+		<application name="30x30 and 40 bugs">
 			<spaces>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
 					<env:processes>
@@ -134,7 +191,7 @@
 										<env:y>$object.unhappiness</env:y>
 									</env:series>
 								</env:chart>
-							</env:tab>  -->
+							</env:tab> -->
 						</env:observer>
 					</env:observers>
 				</env:envspace>
@@ -145,7 +202,7 @@
 			</agents>
 		</application>
 		
-		<application name="50x50">
+		<application name="50x50 and 100 bugs">
 			<spaces>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="50" height="50">
 					<env:processes>

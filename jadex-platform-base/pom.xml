@@ -44,5 +44,10 @@
   		<artifactId>gluegen-rt</artifactId>
   		<version>1</version>
   	</dependency>
+  	 <dependency>
+      <groupId>jfree</groupId>
+      <artifactId>jfreechart</artifactId>
+      <version>1.0.9</version>
+    </dependency>
   </dependencies>
 </project>

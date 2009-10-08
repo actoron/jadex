@@ -174,7 +174,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "perspective"), "perspectives", null, null, null, "property")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "percepttype"), "percepttypes", null, null, null, "property")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "data"), "dataproviders", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "filewriter"), "dataconsumers", null, null, null, "property"))
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "dataconsumer"), "dataconsumers", null, null, null, "property"))
 		}));
 		
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "avatarmapping")}, AvatarMapping.class, null, null,
@@ -958,6 +958,12 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 		
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "dataconsumer"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+		
 		// type instance declarations.
 		
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "envspace")}, MEnvSpaceInstance.class, null, null,
@@ -1036,36 +1042,13 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo("aggregate", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "")
 			}, null));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "filewriter")}, MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "dataconsumer")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("filename", null, null, null, null, "")
+			new BeanAttributeInfo("class", null, null, typeconv, null, "")
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "data"), "subdata", null, null, null, ""))
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "property"), "properties", null, null, null, ""))
 			}));
-		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "filewriter"), new QName(uri, "data")}, MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("ref", null, null, null, null, "")
-			}, null));
-		
-//		<env:datacollectors>
-//		<env:data name="individual_unhappiness">
-//			<env:selector objecttype="heatbug" /> <!- - All / one / subset of objects - ->
-//			<env:data name="name">$object.name</env:data>
-//			<env:data name="unhappiness">$object.unhappiness</env:data> 
-//		</env:data>
-//		
-//		<env:function name="global_unhappiness" class="MeanFunction">
-//			<env:source name="individual_unhappiness.unhappiness"></env:source>
-//		</env:function>
-//	</env:datacollectors>
-//	
-//	<env:dataconsumers>
-//		<env:filewriter filename="stats.csv">
-//			<env:data ref="individual_unhappiness"/>
-//		</env:filewriter>
-//	</env:dataconsumers>
 		
 		return types;
 	}

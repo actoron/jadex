@@ -1,5 +1,7 @@
 package jadex.adapter.base.envsupport.evaluation;
 
+import jadex.commons.SimplePropertyObject;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.Writer;
@@ -8,16 +10,16 @@ import java.util.List;
 /**
  * 
  */
-public class TableCSVFileWriter implements ITableDataConsumer
+public class CSVFileDataConsumer extends SimplePropertyObject implements ITableDataConsumer
 {
 	/** The linefeed separator. */
 	public static final String lf = (String)System.getProperty("line.separator");
 	
-	/** The table data provider. */
-	protected ITableDataProvider provider;
-	
-	/** The filename. */
-	protected String filename;
+//	/** The table data provider. */
+//	protected ITableDataProvider provider;
+//	
+//	/** The filename. */
+//	protected String filename;
 	
 	/** The writer. */
 	protected Writer writer;
@@ -25,11 +27,18 @@ public class TableCSVFileWriter implements ITableDataConsumer
 	/**
 	 * 
 	 */
-	public TableCSVFileWriter(ITableDataProvider provider, String filename)
+	public CSVFileDataConsumer()
 	{
-		this.provider = provider;
-		this.filename = filename;
 	}
+	
+	/**
+	 * 
+	 */
+//	public TableCSVFileWriter(ITableDataProvider provider, String filename)
+//	{
+//		this.provider = provider;
+//		this.filename = filename;
+//	}
 	
 	/**
 	 *  Consume data from the provider.
@@ -38,10 +47,12 @@ public class TableCSVFileWriter implements ITableDataConsumer
 	{
 		try
 		{
+			ITableDataProvider provider = (ITableDataProvider)getProperty("dataprovider");
 			DataTable table = provider.getTableData(time);
 			
 			if(writer==null)
 			{
+				String filename = (String)getProperty("filename");
 				writer = new BufferedWriter(new FileWriter(filename));
 				String[] colnames = table.getColumnNames();
 				for(int i=0; i<colnames.length; i++)

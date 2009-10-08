@@ -2,7 +2,9 @@ package jadex.adapter.base.envsupport.evaluation;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -17,6 +19,9 @@ public class DataTable
 	
 	/** The data rows. */
 	protected List rows;
+	
+	/** The map of column indices. */
+	protected Map columns;
 
 	/**
 	 *  Create a new data table. 
@@ -25,6 +30,9 @@ public class DataTable
 	{
 		this.name = name;
 		this.columnnames = columnnames;
+		this.columns = new HashMap();
+		for(int i=0; i<columnnames.length; i++)
+			columns.put(columnnames[i], new Integer(i));
 	}
 	
 	/**
@@ -57,5 +65,33 @@ public class DataTable
 	{
 		return this.columnnames;
 	}
+	
+	/**
+	 *  Get the column index for a column name.
+	 *  @param columnname The column name.
+	 *  @return The column index.
+	 */
+	public int getColumnIndex(String columnname)
+	{
+		Integer ret = (Integer)columns.get(columnname);
+		return ret==null? -1: ret.intValue();
+	}
+	
+	/**
+	 *  Get the data element from a specific row and column.
+	 */
+	public Object getData(int row, int column)
+	{
+		return ((Object[])rows.get(row))[column];
+	}
+
+	/**
+	 *  Get the name.
+	 *  @return The name.
+	 */
+	public String getName()
+	{
+		return this.name;
+	}	
 	
 }

@@ -17,7 +17,7 @@ import jadex.adapter.base.envsupport.evaluation.ITableDataConsumer;
 import jadex.adapter.base.envsupport.evaluation.ITableDataProvider;
 import jadex.adapter.base.envsupport.evaluation.SpaceObjectDataProvider;
 import jadex.adapter.base.envsupport.evaluation.ObjectRowProvider;
-import jadex.adapter.base.envsupport.evaluation.TableCSVFileWriter;
+import jadex.adapter.base.envsupport.evaluation.CSVFileDataConsumer;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
@@ -458,12 +458,17 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			{
 				Map dcol = (Map)dcols.get(i);
 
-				Map source = (Map)getProperty(dcol, "source");
-				String varname = source.get("name")!=null? (String)source.get("name"): "$object";
-				String objecttype = (String)source.get("objecttype");
-				Boolean aggregate = (Boolean)source.get("aggregate");
-				IParsedExpression exp = (IParsedExpression)source.get("content");
-				IRowObjectProvider rprov = new ObjectRowProvider(varname, ret, objecttype, aggregate!=null? aggregate.booleanValue(): false, exp);
+				List sources = (List)dcol.get("source");
+				IRowObjectProvider[] provs = new IRowObjectProvider[sources.size()];
+				for(int j=0; j<sources.size(); j++)
+				{
+					Map source = (Map)sources.get(j);
+					String varname = source.get("name")!=null? (String)source.get("name"): "$object";
+					String objecttype = (String)source.get("objecttype");
+					boolean aggregate = source.get("aggregate")!=null? ((Boolean)source.get("aggregate")).booleanValue(): false;
+					IParsedExpression exp = (IParsedExpression)source.get("content");
+					provs[j] = new ObjectRowProvider(varname, ret, objecttype, aggregate, exp);
+				}
 				
 				String tablename = (String)getProperty(dcol, "name");
 				List subdatas = (List)dcol.get("subdata");
@@ -476,11 +481,10 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					exps[j] = (IParsedExpression)getProperty(subdata, "content");
 				}
 				
-				ITableDataProvider tprov = new SpaceObjectDataProvider(ret, rprov, tablename, columnnames, exps);
+				ITableDataProvider tprov = new SpaceObjectDataProvider(ret, provs, tablename, columnnames, exps);
 				ret.addDataProvider(tablename, tprov);
 			}
 		}
-		
 		
 		// Create the data consumers.
 		List dcons = mspacetype.getPropertyList("dataconsumers");
@@ -490,14 +494,10 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			for(int i=0; i<dcons.size(); i++)
 			{
 				Map dcon = (Map)dcons.get(i);
-
-				String filename = (String)getProperty(dcon, "filename");
-				Map data = (Map)getProperty(dcon, "subdata");
-				String provname = (String)getProperty(data, "ref");
-				ITableDataProvider prov = ret.getDataProvider(provname);
-				
-				ITableDataConsumer tcon = new TableCSVFileWriter(prov, filename);
-				ret.addDataConsumer(tcon);
+				Class clazz = (Class)getProperty(dcon, "class");
+				ITableDataConsumer con = (ITableDataConsumer)clazz.newInstance();
+				setProperties(con, (List)dcon.get("properties"), fetcher);
+				ret.addDataConsumer(con);
 			}
 		}
 		
