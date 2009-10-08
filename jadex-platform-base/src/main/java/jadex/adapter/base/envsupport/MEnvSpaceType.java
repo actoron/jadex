@@ -25,12 +25,14 @@ import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.adapter.base.envsupport.observer.perspective.Perspective2D;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.ITypeConverter;
 import jadex.commons.xml.QName;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.bean.BeanAttributeInfo;
+import jadex.commons.xml.bean.IBeanObjectCreator;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
@@ -183,7 +185,15 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo("createagent", "createAgent"),
 			new BeanAttributeInfo("killavatar", "killAvatar"),
 			new BeanAttributeInfo("killagent", "killAgent")
-			}, null));
+			}, null, null,
+			new SubobjectInfo[]{
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "name"), "agentName"))
+			}));
+		
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "name")}, null, null,
+			new BeanAttributeInfo(null, AttributeInfo.THIS, null, expconv, null),
+			null, null, null, null, false));
+
 		/*
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "createagent")}, MultiCollection.class, null, null,
 			null, null, null,

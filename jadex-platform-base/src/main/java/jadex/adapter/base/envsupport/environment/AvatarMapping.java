@@ -1,5 +1,7 @@
 package jadex.adapter.base.envsupport.environment;
 
+import jadex.javaparser.IParsedExpression;
+
 /**
  *  Relationship specification between an agent type and an avatar type.
  */
@@ -24,6 +26,9 @@ public class AvatarMapping
 	
 	/** The flag for deleting the agent when avatar is killed. */
 	protected boolean killagent;
+	
+	/** The name of the agent to be created for an avatar. */
+	protected IParsedExpression	agentname;
 	
 	//-------- constructors --------
 	
@@ -115,6 +120,15 @@ public class AvatarMapping
 	}
 
 	/**
+	 *  Get the agent name expression, if any.
+	 *  @return The agent name expression or null.
+	 */
+	public IParsedExpression	getAgentName()
+	{
+		return this.agentname;
+	}
+
+	/**
 	 * @param agenttype the agenttype to set
 	 */
 	public void setAgentType(String agenttype)
@@ -160,5 +174,14 @@ public class AvatarMapping
 	public void setKillAgent(boolean killagent)
 	{
 		this.killagent = killagent;
+	}
+
+	/**
+	 *  Set the agent name expression.
+	 *  @param name	The agent name expression.
+	 */
+	public void setAgentName(IParsedExpression agentname)
+	{
+		this.agentname = agentname;
 	}
 }

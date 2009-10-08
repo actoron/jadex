@@ -466,8 +466,18 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				if(mapping!=null && mapping.isCreateAgent())
 				{
 					final Object	fid	= id;
+					
+					String	name	= null;
+					if(mapping.getAgentName()!=null)
+					{
+						SimpleValueFetcher	fetch	= new SimpleValueFetcher();
+						fetch.setValue("$space", this);
+						fetch.setValue("$object", ret);
+						name	= (String) mapping.getAgentName().getValue(fetch);
+					}
+					
 					// todo: what about arguments etc.?
-					((ApplicationContext)getContext()).createAgent(null, agenttype, null, null, false, false, new IResultListener() {
+					((ApplicationContext)getContext()).createAgent(name, agenttype, null, null, false, false, new IResultListener() {
 						
 						public void resultAvailable(Object result)
 						{
