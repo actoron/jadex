@@ -97,5 +97,13 @@ public class EisSpace implements ISpace
 	{
 		return eis;
 	}
+	
+	/**
+	 *  Terminate the space.
+	 */
+	public void terminate()
+	{
+		// nothing to do.
+	}
 
 }

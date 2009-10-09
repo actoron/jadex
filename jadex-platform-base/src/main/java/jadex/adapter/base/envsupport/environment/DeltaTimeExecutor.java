@@ -3,6 +3,7 @@ package jadex.adapter.base.envsupport.environment;
 import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.evaluation.ITableDataConsumer;
+import jadex.bridge.IContextService;
 import jadex.bridge.IPlatform;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
@@ -10,6 +11,7 @@ import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IExecutable;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
+import jadex.service.clock.ITimer;
 import jadex.service.execution.IExecutionService;
 
 import java.util.Iterator;
@@ -24,6 +26,18 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 	
 	/** Current time stamp */
 	protected long timestamp;
+	
+	/** The platform. */
+	protected IPlatform platform;
+	
+	/** The clock listener. */
+	protected IChangeListener clocklistener;
+	
+	/** The tick timer. */
+	protected ITimer timer;
+	
+	/** The flag indicating that the executor is terminated. */
+	protected boolean terminated;
 	
 	//-------- constructors--------
 	
@@ -53,13 +67,15 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 	 *  Start the space executor.
 	 */
 	public void start()
-	{
+	{	
+		this.terminated = false;
+
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
 		final boolean tick = getProperty("tick")!=null && ((Boolean)getProperty("tick")).booleanValue();
-		IPlatform	platform	= ((ApplicationContext)space.getContext()).getPlatform();
+		this.platform	= ((ApplicationContext)space.getContext()).getPlatform();
 		final IClockService clockservice = (IClockService)platform.getService(IClockService.class);
 		final IExecutionService exeservice = (IExecutionService)platform.getService(IExecutionService.class);
-		
+				
 		final IExecutable	executable	= new IExecutable()
 		{
 			public boolean execute()
@@ -102,7 +118,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 					for(Iterator it = space.getDataConsumers().iterator(); it.hasNext(); )
 					{
 						ITableDataConsumer consumer = (ITableDataConsumer)it.next();
-						consumer.consumeData(currenttime);
+						consumer.consumeData(currenttime, clockservice.getTick());
 					}
 					
 					// Send the percepts to the agents.
@@ -124,24 +140,69 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 
 		if(tick)
 		{
-			clockservice.createTickTimer(new ITimedObject()
+			timer = clockservice.createTickTimer(new ITimedObject()
 			{
 				public void timeEventOccurred(long currenttime)
 				{
-					exeservice.execute(executable);
-					clockservice.createTickTimer(this);
+//					boolean t = false;
+//					synchronized(DeltaTimeExecutor.this)
+//					{
+//						t = terminated;
+//					}
+//					if(t)
+//					{
+						if(!terminated)
+						{
+							exeservice.execute(executable);
+							timer = clockservice.createTickTimer(this);
+						}
+//					}
 				}
 			});
 		}
 		else
 		{
-			clockservice.addChangeListener(new IChangeListener()
+			clocklistener = new IChangeListener()
 			{
 				public void changeOccurred(ChangeEvent e)
 				{
 					exeservice.execute(executable);
 				}
-			});
+			};
+			clockservice.addChangeListener(clocklistener);
+		}
+		
+		// Add the executor as context listener on the application.
+		IContextService cs = (IContextService)platform.getService(IContextService.class);
+		cs.addContextListener(new IChangeListener()
+		{
+			public void changeOccurred(ChangeEvent event)
+			{
+				if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()))
+				{
+					terminate();
+				}
+			}
+		});
+	}
+	
+	/**
+	 *  Terminate the space executor.
+	 */
+//	public synchronized void terminate()
+	public void terminate()
+	{
+		IClockService clockservice = (IClockService)platform.getService(IClockService.class);
+
+		if(clocklistener!=null)
+		{
+			clockservice.removeChangeListener(clocklistener);
+		}
+		else
+		{
+			terminated = true;
+			if(timer!=null)
+				timer.cancel();
 		}
 	}
 }

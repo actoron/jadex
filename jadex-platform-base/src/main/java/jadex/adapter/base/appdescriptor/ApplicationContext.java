@@ -332,4 +332,13 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 		
 		return ret;
 	}
+	
+	/**
+	 *  Get the imports.
+	 *  @return The imports.
+	 */
+	public String[] getAllImports()
+	{
+		return apptype.getAllImports();
+	}
 }

@@ -21,6 +21,7 @@
 		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.planlib.*</import>
 		<import>jadex.adapter.base.envsupport.evaluation.*</import>
+		<import>jadex.commons.*</import>
 	</imports>
 	
 	<spacetypes>
@@ -109,12 +110,12 @@
 			
 			<env:dataconsumers>
 				<!-- <env:dataconsumer class="CSVFileDataConsumer">
-					<env:property name="dataprovider">$space.getDataProvider("global_unhappiness")</env:property>
+					<env:property name="dataprovider">"global_unhappiness"</env:property>
 					<env:property name="filename">"global_unhappiness.csv"</env:property>
 				</env:dataconsumer> -->
 				
 				<!-- <env:dataconsumer class="ChartDataConsumer">
-					<env:property name="dataprovider">$space.getDataProvider("global_unhappiness")</env:property>
+					<env:property name="dataprovider">"global_unhappiness"</env:property>
 					<env:property name="title">"Global Bug Unhappiness"</env:property>
 					<env:property name="labelx">"Time"</env:property>
 					<env:property name="labely">"Unhappiness"</env:property>
@@ -125,22 +126,32 @@
 				</env:dataconsumer> -->
 				
 				<!-- <env:dataconsumer class="CSVFileDataConsumer">
-					<env:property name="dataprovider">$space.getDataProvider("unhappiness")</env:property>
+					<env:property name="dataprovider">"unhappiness"</env:property>
 					<env:property name="filename">"unhappiness.csv"</env:property>
 				</env:dataconsumer> -->
 				
-				<env:dataconsumer class="ChartDataConsumer">
-					<env:property name="dataprovider">$space.getDataProvider("unhappiness")</env:property>
-					<env:property name="title">"Individual Bug Unhappiness"</env:property>
+				<env:dataconsumer class="CategoryChartDataConsumer">
+					<env:property name="dataprovider">"unhappiness"</env:property>
+					<env:property name="title">"Global and Individual Bug Unhappiness"</env:property>
 					<env:property name="labelx">"Time"</env:property>
 					<env:property name="labely">"Unhappiness"</env:property>
+					<env:property name="bgimage">"unhappy.jpg"</env:property>
+					<!-- <env:property name="maxitemcount">30</env:property> -->
+					<!-- <env:property name="timescale">org.jfree.data.time.Millisecond.class</env:property> -->
 					
 					<env:property name="seriesid">"id"</env:property>
 					<env:property name="valuex">"time"</env:property>
 					<env:property name="valuey">"unhappiness"</env:property>
+					
+					<!-- Defines a multi series (as many series as seriesid's) -->
+					<!-- <env:property name="seriesid_0">"id"</env:property>
+					<env:property name="valuex_0">"time"</env:property>
+					<env:property name="valuey_0">"unhappiness"</env:property>-->
 
-					<!-- <env:property name="valuex">"time"</env:property>
-					<env:property name="valuey">"avg_unhappiness"</env:property> -->
+					<!-- Defines a normal series. -->
+					<!-- <env:property name="seriesname_1">"Average unhappiness"</env:property>
+					<env:property name="valuex_1">"time"</env:property>
+					<env:property name="valuey_1">"avg_unhappiness"</env:property> -->
 				</env:dataconsumer>
 			</env:dataconsumers>
 			
@@ -170,7 +181,7 @@
 			</spaces>
 
 			<agents>
-				<agent type="Heatbug" number="2"/>
+				<agent type="Heatbug" number="10"/>
 			</agents>
 		</application>
 		

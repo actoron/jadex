@@ -5,12 +5,16 @@ import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.AgentActionList.ActionEntry;
 import jadex.adapter.base.envsupport.evaluation.ITableDataConsumer;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IContextService;
 import jadex.bridge.IPlatform;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IExecutable;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
+import jadex.service.clock.ITimer;
 import jadex.service.execution.IExecutionService;
 
 import java.util.Comparator;
@@ -36,6 +40,12 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	
 	/** Current time. */
 	protected long currenttime;
+	
+	/** The tick timer. */
+	protected ITimer timer;
+	
+	/** The flag indicating that the executor is terminated. */
+	protected boolean terminated;
 	
 	//-------- constructors--------
 	
@@ -76,7 +86,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	public void start()
 	{
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
-		IPlatform	platform	= ((ApplicationContext)space.getContext()).getPlatform();
+		IPlatform platform	= ((ApplicationContext)space.getContext()).getPlatform();
 		final IClockService clockservice = (IClockService)platform.getService(IClockService.class);
 		final IExecutionService exeservice = (IExecutionService)platform.getService(IExecutionService.class);
 
@@ -160,7 +170,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 						for(Iterator it = space.getDataConsumers().iterator(); it.hasNext(); )
 						{
 							ITableDataConsumer consumer = (ITableDataConsumer)it.next();
-							consumer.consumeData(currenttime);
+							consumer.consumeData(currenttime, clockservice.getTick());
 						}
 					}
 					
@@ -189,14 +199,42 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 		}
 		
 		// In the first round only percepts are distributed.
-		clockservice.createTickTimer(new ITimedObject()
+		timer = clockservice.createTickTimer(new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{
-				RoundBasedExecutor.this.currenttime = currenttime;
-				exeservice.execute(executable);
-				clockservice.createTickTimer(this);
+				if(!terminated)
+				{
+					RoundBasedExecutor.this.currenttime = currenttime;
+					exeservice.execute(executable);
+					clockservice.createTickTimer(this);
+				}
 			}
 		});
+		
+		// Add the executor as context listener on the application.
+		IContextService cs = (IContextService)platform.getService(IContextService.class);
+		cs.addContextListener(new IChangeListener()
+		{
+			public void changeOccurred(ChangeEvent event)
+			{
+				System.out.println("Received event: "+event);
+				if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()))
+				{
+					terminate();
+				}
+			}
+		});
+	}
+	
+	/**
+	 *  Terminate the space executor.
+	 */
+//	public synchronized void terminate()
+	public void terminate()
+	{
+		terminated = true;
+		if(timer!=null)
+			timer.cancel();
 	}
 }

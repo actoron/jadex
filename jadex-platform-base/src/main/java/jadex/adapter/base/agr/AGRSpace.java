@@ -84,7 +84,7 @@ public class AGRSpace implements ISpace
 	 *  is newly added to the context.
 	 *  @param aid	The id of the added agent.
 	 */
-	public synchronized void	agentAdded(IAgentIdentifier aid)
+	public synchronized void agentAdded(IAgentIdentifier aid)
 	{
 		if(groups!=null)
 		{
@@ -107,5 +107,14 @@ public class AGRSpace implements ISpace
 	 */
 	public void	agentRemoved(IAgentIdentifier aid)
 	{
+		// nothing to do.
+	}
+	
+	/**
+	 *  Terminate the space.
+	 */
+	public void terminate()
+	{
+		// nothing to do.
 	}
 }

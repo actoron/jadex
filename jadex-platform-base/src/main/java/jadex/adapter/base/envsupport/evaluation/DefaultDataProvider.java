@@ -10,9 +10,9 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
 /**
- * 
+ *  Provides data on basis of the environment space. 
  */
-public class SpaceObjectDataProvider implements ITableDataProvider
+public class DefaultDataProvider implements ITableDataProvider
 {
 	//-------- attributes --------
 	
@@ -20,7 +20,7 @@ public class SpaceObjectDataProvider implements ITableDataProvider
 	protected AbstractEnvironmentSpace envspace;
 	
 	/** The space object selector. */
-	protected IRowObjectProvider[] rowproviders;
+	protected IObjectSource[] rowproviders;
 	
 	/** The table name. */
 	protected String tablename;
@@ -36,7 +36,7 @@ public class SpaceObjectDataProvider implements ITableDataProvider
 	/**
 	 *  Create a new space object table data provider.
 	 */
-	public SpaceObjectDataProvider(AbstractEnvironmentSpace envspace, IRowObjectProvider[] rowproviders,
+	public DefaultDataProvider(AbstractEnvironmentSpace envspace, IObjectSource[] rowproviders,
 		String tablename, String[] columnnames, IParsedExpression[] exps)
 	{
 		this.envspace = envspace;
@@ -52,7 +52,7 @@ public class SpaceObjectDataProvider implements ITableDataProvider
 	 *  Get the data from a data provider.
 	 *  @return The data.
 	 */
-	public DataTable getTableData(long time)
+	public DataTable getTableData(long time, double tick)
 	{
 		DataTable ret = new DataTable(tablename, columnnames);
 		
@@ -60,16 +60,16 @@ public class SpaceObjectDataProvider implements ITableDataProvider
 		Object[] values = new Object[rowproviders.length];
 		for(int i=0; i<rowproviders.length; i++)
 		{
-			names[i] = rowproviders[i].getVariableName();
-			values[i]	=rowproviders[i].getRowObjects();
+			names[i] = rowproviders[i].getSourceName();
+			values[i] = rowproviders[i].getObjects();
 		}
 		
 		List res = SUtil.calculateCartesianProduct(names, values);
 		
-
 		SimpleValueFetcher fetcher = new SimpleValueFetcher();
 		fetcher.setValue("$space", envspace);
 		fetcher.setValue("$time", new Double(time));
+		fetcher.setValue("$tick", new Double(tick));
 		for(int i=0; i<res.size(); i++)
 		{
 			Map binding = (Map)res.get(i);
@@ -88,29 +88,6 @@ public class SpaceObjectDataProvider implements ITableDataProvider
 			}
 			ret.addRow(row);
 		}
-		
-//		List objects = rowprovider.getRowObjects();
-//		String varname = rowprovider.getVariableName();
-//		
-//		if(objects!=null)
-//		{
-//			SimpleValueFetcher fetcher = new SimpleValueFetcher();
-//			fetcher.setValue("$space", envspace);
-//			fetcher.setValue("$time", new Double(time));
-//			
-//			for(int i=0; i<objects.size(); i++)
-//			{
-//				Object obj = objects.get(i);
-//				fetcher.setValue(varname, obj);
-//				
-//				Object[] row = new Object[exps.length];
-//				for(int j=0; j<exps.length; j++)
-//				{
-//					row[j] = exps[j].getValue(fetcher);
-//				}
-//				ret.addRow(row);
-//			}
-//		}
 		
 		return ret;
 	}

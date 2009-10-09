@@ -12,11 +12,11 @@ import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceExecutor;
 import jadex.adapter.base.envsupport.environment.PerceptType;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.evaluation.IRowObjectProvider;
+import jadex.adapter.base.envsupport.evaluation.IObjectSource;
 import jadex.adapter.base.envsupport.evaluation.ITableDataConsumer;
 import jadex.adapter.base.envsupport.evaluation.ITableDataProvider;
-import jadex.adapter.base.envsupport.evaluation.SpaceObjectDataProvider;
-import jadex.adapter.base.envsupport.evaluation.ObjectRowProvider;
+import jadex.adapter.base.envsupport.evaluation.DefaultDataProvider;
+import jadex.adapter.base.envsupport.evaluation.SpaceObjectSource;
 import jadex.adapter.base.envsupport.evaluation.CSVFileDataConsumer;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
@@ -459,7 +459,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				Map dcol = (Map)dcols.get(i);
 
 				List sources = (List)dcol.get("source");
-				IRowObjectProvider[] provs = new IRowObjectProvider[sources.size()];
+				IObjectSource[] provs = new IObjectSource[sources.size()];
 				for(int j=0; j<sources.size(); j++)
 				{
 					Map source = (Map)sources.get(j);
@@ -467,7 +467,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					String objecttype = (String)source.get("objecttype");
 					boolean aggregate = source.get("aggregate")!=null? ((Boolean)source.get("aggregate")).booleanValue(): false;
 					IParsedExpression exp = (IParsedExpression)source.get("content");
-					provs[j] = new ObjectRowProvider(varname, ret, objecttype, aggregate, exp);
+					provs[j] = new SpaceObjectSource(varname, ret, objecttype, aggregate, exp);
 				}
 				
 				String tablename = (String)getProperty(dcol, "name");
@@ -481,7 +481,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					exps[j] = (IParsedExpression)getProperty(subdata, "content");
 				}
 				
-				ITableDataProvider tprov = new SpaceObjectDataProvider(ret, provs, tablename, columnnames, exps);
+				ITableDataProvider tprov = new DefaultDataProvider(ret, provs, tablename, columnnames, exps);
 				ret.addDataProvider(tablename, tprov);
 			}
 		}
@@ -497,6 +497,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				Class clazz = (Class)getProperty(dcon, "class");
 				ITableDataConsumer con = (ITableDataConsumer)clazz.newInstance();
 				setProperties(con, (List)dcon.get("properties"), fetcher);
+				con.setProperty("envspace", ret);
 				ret.addDataConsumer(con);
 			}
 		}

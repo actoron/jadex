@@ -12,4 +12,9 @@ public interface ISpaceExecutor extends IPropertyObject
 	 *  Start the space executor.
 	 */
 	public void start();
+	
+	/**
+	 *  Terminate the space executor.
+	 */
+	public void terminate();
 }

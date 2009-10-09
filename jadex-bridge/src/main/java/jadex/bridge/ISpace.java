@@ -31,4 +31,9 @@ public interface ISpace
 	 *  @param aid	The id of the removed agent.
 	 */
 	public void	agentRemoved(IAgentIdentifier aid);
+	
+	/**
+	 *  Terminate the space.
+	 */
+	public void terminate();
 }

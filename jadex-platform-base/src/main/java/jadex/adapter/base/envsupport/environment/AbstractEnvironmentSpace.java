@@ -1198,6 +1198,14 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	}
 	
 	/**
+	 *  Terminate the space.
+	 */
+	public void terminate()
+	{
+		
+	}
+	
+	/**
 	 *  Set the context.
 	 *  @param context The context.
 	 */

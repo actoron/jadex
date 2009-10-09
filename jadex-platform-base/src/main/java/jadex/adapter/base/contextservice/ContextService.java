@@ -267,9 +267,10 @@ public class ContextService	implements IContextService
 	{
 		if(listeners!=null)
 		{
-			for(int i=0; i<listeners.size(); i++)
+			IChangeListener[] lis = (IChangeListener[])listeners.toArray(new IChangeListener[listeners.size()]);
+			for(int i=0; i<lis.length; i++)
 			{
-				((IChangeListener)listeners.get(i)).changeOccurred(event);
+				lis[i].changeOccurred(event);
 			}
 		}
 	}

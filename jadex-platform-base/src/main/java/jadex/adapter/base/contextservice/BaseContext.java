@@ -254,6 +254,12 @@ public class BaseContext	implements IContext
 	{
 //		System.out.println("Deleted: "+this);
 
+		for(Iterator it=spaces.values().iterator(); it.hasNext(); )
+		{
+			ISpace space = (ISpace)it.next();
+			space.terminate();
+		}
+		
 		if(listener!=null)
 			listener.resultAvailable(this);
 	}

@@ -1,5 +1,6 @@
 package jadex.adapter.base.envsupport.evaluation;
 
+import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.commons.SimplePropertyObject;
 
 import java.io.BufferedWriter;
@@ -8,21 +9,21 @@ import java.io.Writer;
 import java.util.List;
 
 /**
- * 
+ *  Simple file consumer that writes data into a text file.
  */
 public class CSVFileDataConsumer extends SimplePropertyObject implements ITableDataConsumer
 {
+	//-------- constants --------
+	
 	/** The linefeed separator. */
 	public static final String lf = (String)System.getProperty("line.separator");
 	
-//	/** The table data provider. */
-//	protected ITableDataProvider provider;
-//	
-//	/** The filename. */
-//	protected String filename;
+	//-------- attributes --------
 	
 	/** The writer. */
 	protected Writer writer;
+	
+	//-------- constructors --------
 	
 	/**
 	 * 
@@ -31,24 +32,17 @@ public class CSVFileDataConsumer extends SimplePropertyObject implements ITableD
 	{
 	}
 	
-	/**
-	 * 
-	 */
-//	public TableCSVFileWriter(ITableDataProvider provider, String filename)
-//	{
-//		this.provider = provider;
-//		this.filename = filename;
-//	}
+	//-------- methods --------
 	
 	/**
 	 *  Consume data from the provider.
 	 */
-	public void consumeData(long time)
+	public void consumeData(long time, double tick)
 	{
 		try
 		{
-			ITableDataProvider provider = (ITableDataProvider)getProperty("dataprovider");
-			DataTable table = provider.getTableData(time);
+			ITableDataProvider provider = getTableDataProvider();
+			DataTable table = provider.getTableData(time, tick);
 			
 			if(writer==null)
 			{
@@ -89,4 +83,26 @@ public class CSVFileDataConsumer extends SimplePropertyObject implements ITableD
 	}
 	
 	// todo: when to close?
+
+	/**
+	 *  Get the space.
+	 *  @return The space.
+	 */
+	public AbstractEnvironmentSpace getSpace()
+	{
+		return (AbstractEnvironmentSpace)getProperty("envspace");
+	}
+	
+	/**
+	 *  Get the table data provider.
+	 *  @return The table data provider.
+	 */
+	protected ITableDataProvider getTableDataProvider()
+	{
+		String providername = (String)getProperty("dataprovider");
+		ITableDataProvider provider = getSpace().getDataProvider(providername);
+		if(provider==null)
+			throw new RuntimeException("Data provider nulls: "+providername);
+		return provider;
+	}
 }

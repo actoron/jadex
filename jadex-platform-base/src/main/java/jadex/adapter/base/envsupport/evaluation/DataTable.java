@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  Basic data structure for all collected data.
  */
 public class DataTable
 {
+	//-------- attributes --------
+	
 	/** The table name. */
 	protected String name;
 	
@@ -23,6 +25,8 @@ public class DataTable
 	/** The map of column indices. */
 	protected Map columns;
 
+	//-------- constructors --------
+	
 	/**
 	 *  Create a new data table. 
 	 */
@@ -34,6 +38,8 @@ public class DataTable
 		for(int i=0; i<columnnames.length; i++)
 			columns.put(columnnames[i], new Integer(i));
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Add a data row.

@@ -9,10 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *  A space object source can provide space objects of a specific object type.
+ *  If aggregation is used the values are provided as one element (a list).
  */
-public class ObjectRowProvider implements IRowObjectProvider
+public class SpaceObjectSource implements IObjectSource
 {	
+	//-------- attributes --------
+	
 	/** The variable name. */
 	protected String varname;
 	
@@ -28,10 +31,12 @@ public class ObjectRowProvider implements IRowObjectProvider
 	/** The object expression. */
 	protected IParsedExpression exp;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new row provider.
 	 */
-	public ObjectRowProvider(String varname, AbstractEnvironmentSpace envspace, String objecttype, boolean aggregate, IParsedExpression exp)
+	public SpaceObjectSource(String varname, AbstractEnvironmentSpace envspace, String objecttype, boolean aggregate, IParsedExpression exp)
 	{
 		this.varname = varname;
 		this.envspace = envspace;
@@ -41,9 +46,9 @@ public class ObjectRowProvider implements IRowObjectProvider
 	}
 	
 	/**
-	 * 
+	 *  Get the row objects.
 	 */
-	public List getRowObjects()
+	public List getObjects()
 	{
 		List ret = new ArrayList();
 		
@@ -75,7 +80,7 @@ public class ObjectRowProvider implements IRowObjectProvider
 	 *  Get the variable name.
 	 *  @return The variable name.
 	 */
-	public String getVariableName()
+	public String getSourceName()
 	{
 		return this.varname;
 	}

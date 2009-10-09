@@ -21,6 +21,12 @@ public interface IApplicationContext extends IContext
 	//-------- methods --------
 	
 	/**
+	 *  Get all imports.
+	 *  @return All imports including the own package.
+	 */
+	public String[] getAllImports();
+	
+	/**
 	 *  Get the agent type for an agent id.
 	 *  @param aid	The agent id.
 	 *  @return The agent type name.
