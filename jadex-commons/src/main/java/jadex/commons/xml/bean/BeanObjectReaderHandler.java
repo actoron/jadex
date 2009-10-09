@@ -492,6 +492,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					}
 					catch(Exception e)
 					{
+						e.printStackTrace();
 					}
 				}
 				else

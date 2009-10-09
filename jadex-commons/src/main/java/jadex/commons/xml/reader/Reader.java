@@ -113,6 +113,8 @@ public class Reader
 				String idref = rawattrs!=null? (String)rawattrs.get(SXML.IDREF): null;
 				if(idref!=null)
 				{
+					if(readobjects.containsKey(idref))
+						System.out.println("idref not contained: "+idref);
 					object = readobjects.get(idref);
 					topse = new StackElement(localname, object, rawattrs, typeinfo);
 					stack.add(topse);
