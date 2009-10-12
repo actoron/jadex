@@ -113,8 +113,8 @@ public class Reader
 				String idref = rawattrs!=null? (String)rawattrs.get(SXML.IDREF): null;
 				if(idref!=null)
 				{
-					if(readobjects.containsKey(idref))
-						System.out.println("idref not contained: "+idref);
+					if(!readobjects.containsKey(idref))
+						throw new RuntimeException("idref not contained: "+idref);
 					object = readobjects.get(idref);
 					topse = new StackElement(localname, object, rawattrs, typeinfo);
 					stack.add(topse);
@@ -143,6 +143,7 @@ public class Reader
 					String id = rawattrs!=null? (String)rawattrs.get(SXML.ID): null;
 					if(id!=null && object!=null)
 					{
+//						System.out.println("ID: "+id+", "+object.getClass());
 						readobjects.put(id, object);
 					}
 					
@@ -255,6 +256,14 @@ public class Reader
 					// If this is the only element on stack, set also root to it
 					if(stack.size()==1)
 						root = topse.getObject();
+
+					// If object has internal id save it in the readobjects map.
+					String id = topse.getRawAttributes()!=null? (String)topse.getRawAttributes().get(SXML.ID): null;
+					if(id!=null && val!=null)
+					{
+//						System.out.println("ID: "+id+", "+val.getClass());
+						readobjects.put(id, val);
+					}	
 				}
 				
 				// Link current object to parent
