@@ -6,8 +6,6 @@ import jadex.service.library.ILibraryService;
 
 import java.awt.BorderLayout;
 import java.awt.Image;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -16,30 +14,27 @@ import javax.swing.JPanel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.xy.VectorSeries;
-import org.jfree.data.xy.VectorSeriesCollection;
-import org.jfree.data.xy.XYDataset;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.statistics.HistogramDataset;
+import org.jfree.data.statistics.SimpleHistogramBin;
+import org.jfree.data.statistics.SimpleHistogramDataset;
+import org.jfree.data.xy.IntervalXYDataset;
 
 /**
- *  Create a X/Y chart consumer, x an y must be double values.
+ *  Create a category chart consumer, x must be a comparable and y must be double value.
  */
-public class XYChartDataConsumer extends AbstractChartDataConsumer
+public class HistogramDataConsumer extends AbstractChartDataConsumer
 {	
-	//-------- attributes --------
-	
-	/** The series map. */
-	protected Map seriesmap;
-	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new chart consumer.
 	 */
-	public XYChartDataConsumer()
+	public HistogramDataConsumer()
 	{
-		this.seriesmap = new HashMap();
 	}
 		
 	//-------- methods --------
@@ -57,8 +52,14 @@ public class XYChartDataConsumer extends AbstractChartDataConsumer
 		boolean tooltips = getProperty("tooltips")==null? true: ((Boolean)getProperty("tooltips")).booleanValue();
 		boolean urls = getProperty("urls")==null? false: ((Boolean)getProperty("urls")).booleanValue();
 		
-		XYDataset dataset = new VectorSeriesCollection();
-		JFreeChart chart = ChartFactory.createXYLineChart(title, labelx, labely, dataset, PlotOrientation.VERTICAL, legend, tooltips, urls);
+		String seriesname = (String)getProperty("seriesname");
+		
+		SimpleHistogramDataset dataset = new SimpleHistogramDataset(seriesname);
+		dataset.setAdjustForBinSize(true);
+		for(int i=0; i<10; i++)
+			dataset.addBin(new SimpleHistogramBin(i*10, (i+1)*10-0.01));
+		
+		JFreeChart chart = ChartFactory.createHistogram(title, labelx, labely, dataset, PlotOrientation.VERTICAL, legend, tooltips, urls);
 //		chart.setBackgroundPaint(new Color(100,100,100,100));
 //		chart.getPlot().setBackgroundAlpha(0.5f);
 		
@@ -73,7 +74,7 @@ public class XYChartDataConsumer extends AbstractChartDataConsumer
 				Image image = ImageIO.read(rinfo.getInputStream());
 				rinfo.getInputStream().close();
 				
-//				chart.setBackgroundImage(image);
+//						chart.setBackgroundImage(image);
 				chart.getPlot().setBackgroundImage(image);
 			}
 			catch(Exception e)
@@ -104,43 +105,7 @@ public class XYChartDataConsumer extends AbstractChartDataConsumer
 	 */
 	protected void addValue(Comparable seriesname, Object valx, Object valy, DataTable data, Object[] row)
 	{
-		// Determine series number for adding the new data.
-		
-		int seriesnum = 0;
-		VectorSeriesCollection dataset = (VectorSeriesCollection)((XYPlot)getChart().getPlot()).getDataset();
-		int sercnt = dataset.getSeriesCount();
-		Integer sernum = (Integer)seriesmap.get(seriesname);
-		if(sernum!=null)
-			seriesnum = sernum.intValue();
-		else
-			seriesnum = sercnt;
-		
-		for(int j=sercnt; j<=seriesnum; j++)
-		{
-			Integer maxitemcnt = (Integer)getProperty("maxitemcount");
-			VectorSeries series;
-			if(seriesname!=null)
-			{
-				series = new VectorSeries(seriesname);
-				if(maxitemcnt!=null)
-					series.setMaximumItemCount(maxitemcnt.intValue());
-				seriesmap.put(seriesname, new Integer(j));
-			}
-			else
-			{
-				series = new VectorSeries(new Integer(j));
-				if(maxitemcnt!=null)
-					series.setMaximumItemCount(maxitemcnt.intValue());
-				seriesmap.put(new Integer(j), new Integer(j));
-			}
-			dataset.addSeries(series);
-			System.out.println("Created series: "+seriesname+" "+j);
-		}	
-		VectorSeries ser = dataset.getSeries(seriesnum);
-		
-		// Add the value.
-		
-//		System.out.println("Added: "+valx+" "+valy);
-		ser.add(((Double)valx).doubleValue(), ((Double)valy).doubleValue(), 0, 0);
+		SimpleHistogramDataset dataset = (SimpleHistogramDataset)((XYPlot)getChart().getPlot()).getDataset();
+		dataset.addObservation(((Double)valy).doubleValue());
 	}
 }

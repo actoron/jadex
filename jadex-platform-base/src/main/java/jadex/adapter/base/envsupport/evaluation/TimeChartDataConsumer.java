@@ -110,36 +110,30 @@ public class TimeChartDataConsumer extends AbstractChartDataConsumer
 	 *  @param data The data table.
 	 *  @param row The current data row. 
 	 */
-	protected void addValue(Object valx, Object valy, DataTable data, Object[] row)
+	protected void addValue(Comparable seriesname, Object valx, Object valy, DataTable data, Object[] row)
 	{
 		// Determine series number for adding the new data.
 		
 		int seriesnum = 0;
 		TimeSeriesCollection dataset = (TimeSeriesCollection)((XYPlot)getChart().getPlot()).getDataset();
 		int sercnt = dataset.getSeriesCount();
-		String seriesidname = (String)getProperty("seriesid");
-		Comparable seriesid = null;
-		if(seriesidname!=null)
-		{
-			seriesid = (Comparable)row[data.getColumnIndex(seriesidname)]; 
-			Integer sernum = (Integer)seriesmap.get(seriesid);
-			if(sernum!=null)
-				seriesnum = sernum.intValue();
-			else
-				seriesnum = sercnt;
-		}
+		Integer sernum = (Integer)seriesmap.get(seriesname);
+		if(sernum!=null)
+			seriesnum = sernum.intValue();
+		else
+			seriesnum = sercnt;
 		
 		Class time = getProperty("timescale")!=null? (Class)getProperty("timescale"): Millisecond.class;
 		for(int j=sercnt; j<=seriesnum; j++)
 		{
 			Integer maxitemcnt = (Integer)getProperty("maxitemcount");
 			TimeSeries series;
-			if(seriesid!=null)
+			if(seriesname!=null)
 			{
-				series = new TimeSeries(seriesid, time);
+				series = new TimeSeries(seriesname, time);
 				if(maxitemcnt!=null)
 					series.setMaximumItemCount(maxitemcnt.intValue());
-				seriesmap.put(seriesid, new Integer(j));
+				seriesmap.put(seriesname, new Integer(j));
 			}
 			else
 			{
@@ -149,7 +143,7 @@ public class TimeChartDataConsumer extends AbstractChartDataConsumer
 				seriesmap.put(new Integer(j), new Integer(j));
 			}
 			dataset.addSeries(series);
-			System.out.println("Created series: "+seriesid+" "+j);
+			System.out.println("Created series: "+seriesname+" "+j);
 		}	
 		TimeSeries ser = dataset.getSeries(seriesnum);
 		

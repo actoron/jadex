@@ -86,20 +86,15 @@ public class CategoryChartDataConsumer extends AbstractChartDataConsumer
 	
 	/**
 	 *  Add a value to a specific series of the chart.
+	 *  @param seriesname The series name.
 	 *  @param valx The x value.
 	 *  @param valy The y value.
 	 *  @param data The data table.
 	 *  @param row The current data row. 
 	 */
-	protected void addValue(Object valx, Object valy, DataTable data, Object[] row)
+	protected void addValue(Comparable seriesname, Object valx, Object valy, DataTable data, Object[] row)
 	{
 		DefaultCategoryDataset dataset = (DefaultCategoryDataset)((CategoryPlot)getChart().getPlot()).getDataset();
-		
-		String seriesidname = (String)getProperty("seriesid");
-		Comparable seriesname = seriesidname!=null? (Comparable)row[data.getColumnIndex(seriesidname)]: (String)getProperty("seriesname");
-		if(seriesname==null)
-			seriesname = "default";
-		
 		dataset.addValue(((Double)valy).doubleValue(), seriesname, (Comparable)valx);
 	}
 }

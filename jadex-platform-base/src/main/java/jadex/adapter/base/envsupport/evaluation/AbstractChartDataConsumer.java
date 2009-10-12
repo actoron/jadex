@@ -49,42 +49,106 @@ public abstract class AbstractChartDataConsumer extends SimplePropertyObject imp
 		{
 			SimpleValueFetcher fetcher = new SimpleValueFetcher();
 			fetcher.setValue("$object", data);
-			
-			for(int i=0; i<rows.size(); i++)
+
+			for(int s=0; ;s++)
 			{
-				// Determine x, y values for series.
-				fetcher.setValue("$rowcnt", new Integer(i));
+				String serid;
+				if(s==0 && getPropertyNames().contains("seriesid"))
+					serid = (String)getProperty("seriesid");
+				else
+					serid = (String)getProperty("seriesid_"+s);
 				
-				Object[] row = (Object[])rows.get(i);
-				
-				Object valuex = getProperty("valuex");
-				Object valuey = getProperty("valuey");
-				
-				Object valx;
-				if(valuex instanceof String)
+				if(serid!=null)
 				{
-					valx = (Double)row[data.getColumnIndex((String)valuex)]; 
+					// For a multi-series each row has to be processed.
+
+					for(int i=0; i<rows.size(); i++)
+					{
+						// Determine x, y values for series.
+						fetcher.setValue("$rowcnt", new Integer(i));
+						
+						Object[] row = (Object[])rows.get(i);
+						
+						Object[] values = getValues(s, data, row, fetcher);
+							
+						// Add value to series
+						
+						Comparable sername = (Comparable)row[data.getColumnIndex(serid)];
+										
+						addValue(sername, values[0], values[1], data, row);
+					}	
 				}
-				else //if(valuex instanceof IParsedExpression)
+				else
 				{
-					valx = ((IParsedExpression)valuex).getValue(fetcher);
+					// For a named series only one (all should be the same) value will be processed.
+					Comparable sername;
+					if(s==0 && getPropertyNames().contains("seriesname"))
+						sername = (String)getProperty("seriesname");
+					else
+						sername = (String)getProperty("seriesname_"+s);
+					
+					if(sername!=null)
+					{
+						// Determine x, y values for series.
+						fetcher.setValue("$rowcnt", new Integer(0));
+						
+						Object[] row = (Object[])rows.get(0);
+						
+						Object[] values = getValues(s, data, row, fetcher);
+							
+						// Add value to series
+						
+						addValue(sername, values[0], values[1], data, row);
+					}
+					else
+					{
+						break;
+					}
 				}
-				
-				Object valy;
-				if(valuey instanceof String)
-				{
-					valy = (Double)row[data.getColumnIndex((String)valuey)]; 
-				}
-				else //if(valuey instanceof IParsedExpression)
-				{
-					valy = ((IParsedExpression)valuey).getValue(fetcher);
-				}
-				
-				// Add value to series
-				
-				addValue(valx, valy, data, row);
 			}
 		}
+	}
+	
+	/**
+	 *  Get the x/y values for a specific series number.
+	 *  In case of a multi series the row array defines the specific data to read.
+	 */
+	protected Object[] getValues(int num, DataTable data, Object[] row, SimpleValueFetcher fetcher)
+	{
+		Object valuex;
+		Object valuey;
+		
+		if(num==0 && getPropertyNames().contains("valuex"))
+			valuex = getProperty("valuex");
+		else
+			valuex = getProperty("valuex_"+num);
+
+		if(num==0 && getPropertyNames().contains("valuey"))
+			valuey = getProperty("valuey");
+		else
+			valuey = getProperty("valuey_"+num);
+		
+		Object valx;
+		if(valuex instanceof String)
+		{
+			valx = (Double)row[data.getColumnIndex((String)valuex)]; 
+		}
+		else //if(valuex instanceof IParsedExpression)
+		{
+			valx = ((IParsedExpression)valuex).getValue(fetcher);
+		}
+		
+		Object valy;
+		if(valuey instanceof String)
+		{
+			valy = (Double)row[data.getColumnIndex((String)valuey)]; 
+		}
+		else //if(valuey instanceof IParsedExpression)
+		{
+			valy = ((IParsedExpression)valuey).getValue(fetcher);
+		}
+
+		return new Object[]{valx, valy};
 	}
 	
 	/**
@@ -161,10 +225,11 @@ public abstract class AbstractChartDataConsumer extends SimplePropertyObject imp
 	
 	/**
 	 *  Add a value to a specific series of the chart.
+	 *  @param seriesname The seriesname.
 	 *  @param valx The x value.
 	 *  @param valy The y value.
 	 *  @param data The data table.
 	 *  @param row The current data row. 
 	 */
-	protected abstract void addValue(Object valx, Object valy, DataTable data, Object[] row);
+	protected abstract void addValue(Comparable seriesname, Object valx, Object valy, DataTable data, Object[] row);
 }
