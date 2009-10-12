@@ -5,6 +5,7 @@ import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.adapter.base.envsupport.observer.gui.plugin.EvaluationPlugin;
 import jadex.adapter.base.envsupport.observer.gui.plugin.IObserverCenterPlugin;
 import jadex.adapter.base.envsupport.observer.gui.plugin.IntrospectorPlugin;
 import jadex.adapter.base.envsupport.observer.gui.plugin.VisualsPlugin;
@@ -37,7 +38,8 @@ import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-/** The default observer center
+/** 
+ *  The default observer center.
  */
 public class ObserverCenter
 {
@@ -46,28 +48,23 @@ public class ObserverCenter
 	private static final int[] VIEWPORT_RATES = { -1, 0, 5, 10, 20, 30, 50, 60, 70, 75, 85, 100, 120 };
 	private static final int DEFAULT_VIEWPORT_RATE = -1;
 	
-	/** The main window.
-	 */
+	/** The main window. */
 	private ObserverCenterWindow mainwindow;
 	
-	/** Currently active plugin
-	 */
+	/** Currently active plugin. */
 	private IObserverCenterPlugin activeplugin;
 	
-	/** The plugins
-	 */
+	/** The plugins. */
 	private IObserverCenterPlugin[] plugins;
 	
-	/** Viewport refresh timer
-	 */
+	/** Viewport refresh timer. */
 	private Timer vptimer;
 	
-	/** Plugin refresh timer
-	 */
+	/** Plugin refresh timer. */
 	private Timer plugintimer;
 	
 	/** The library service */
-	private ILibraryService libService;
+	private ILibraryService libservice;
 	
 	/** Additional IDataView objects */
 	private Map externaldataviews;
@@ -96,31 +93,31 @@ public class ObserverCenter
 	
 	/** Creates an observer center.
 	 *  
-	 *  @param windowTitle title of the observer window
+	 *  @param title title of the observer window
 	 *  @param space the space being observed
 	 *  @param libSrvc the platform library service for loading resources (images etc.)
-	 *  @param customplugins custom plugins used in the observer
+	 *  @param plugins custom plugins used in the observer
 	 */
-	public ObserverCenter(final String windowTitle, final IEnvironmentSpace space, ILibraryService libSrvc, List customplugins)
+	public ObserverCenter(final String title, final IEnvironmentSpace space, ILibraryService libSrvc, List plugins)
 	{
 		selectedObjectListeners = Collections.synchronizedList(new ArrayList());
 		this.space = (Space2D) space;
 		areasize = ((Space2D)space).getAreaSize().copy();
 		perspectives = Collections.synchronizedMap(new HashMap());
 		externaldataviews = Collections.synchronizedMap(new HashMap());
-		final List cPlugins = customplugins == null? new ArrayList(): customplugins;
-		this.libService = libSrvc;
+		final List cplugins = plugins == null? new ArrayList(): plugins;
+		this.libservice = libSrvc;
 		Map spaceviews = space.getDataViews();
 		if(!spaceviews.isEmpty())
-			selecteddataviewname = (String) spaceviews.keySet().iterator().next();
+			selecteddataviewname = (String)spaceviews.keySet().iterator().next();
 		activeplugin = null;
 		
 		Runnable init = new Runnable()
 		{
 			public void run()
 			{
-				mainwindow = new ObserverCenterWindow(windowTitle);
-				loadPlugins(cPlugins);
+				mainwindow = new ObserverCenterWindow(title);
+				loadPlugins(cplugins);
 				
 				JMenu refreshMenu = new JMenu("Display");
 				
@@ -336,7 +333,7 @@ public class ObserverCenter
 	 */
 	public ILibraryService getLibraryService()
 	{
-		return libService;
+		return libservice;
 	}
 	
 	/**
@@ -448,17 +445,23 @@ public class ObserverCenter
 		ArrayList plugins = new ArrayList();
 		
 		IObserverCenterPlugin plugin = new IntrospectorPlugin();
+		
 		// default plugins
 		// TODO: remove hard coding
 		plugins.add(plugin);
+		
 		// TODO: port from simsupport
 		plugin = new VisualsPlugin();
 		plugins.add(plugin);
+		
+//		plugin = new EvaluationPlugin();
+//		plugins.add(plugin);
+		
 		//plugin = new ToolboxPlugin();
 		//plugins.add(plugin);
 		plugins.addAll(customplugins);
 		
-		this.plugins = (IObserverCenterPlugin[]) plugins.toArray(new IObserverCenterPlugin[0]);
+		this.plugins = (IObserverCenterPlugin[])plugins.toArray(new IObserverCenterPlugin[0]);
 		
 		for (int i = 0; i < this.plugins.length; ++i)
 		{
@@ -482,7 +485,7 @@ public class ObserverCenter
 		}
 		else
 		{
-			ClassLoader cl = libService.getClassLoader();
+			ClassLoader cl = libservice.getClassLoader();
 			try
 			{
 //				System.out.println(iconPath);

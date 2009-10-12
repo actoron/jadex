@@ -14,14 +14,10 @@ import javax.swing.JPanel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.SimpleHistogramBin;
 import org.jfree.data.statistics.SimpleHistogramDataset;
-import org.jfree.data.xy.IntervalXYDataset;
 
 /**
  *  Create a category chart consumer, x must be a comparable and y must be double value.
@@ -53,11 +49,50 @@ public class HistogramDataConsumer extends AbstractChartDataConsumer
 		boolean urls = getProperty("urls")==null? false: ((Boolean)getProperty("urls")).booleanValue();
 		
 		String seriesname = (String)getProperty("seriesname");
-		
+
 		SimpleHistogramDataset dataset = new SimpleHistogramDataset(seriesname);
-		dataset.setAdjustForBinSize(true);
-		for(int i=0; i<10; i++)
-			dataset.addBin(new SimpleHistogramBin(i*10, (i+1)*10-0.01));
+
+		Number low = (Number)getProperty("lowvalue");
+		Number high = (Number)getProperty("highvalue");
+		Number bincnt = (Number)getProperty("bincount");
+		if(low!=null && high!=null)
+		{
+			int cnt = bincnt!=null? bincnt.intValue(): 1;
+			double lv = low.doubleValue();
+			double hv = high.doubleValue();
+			double bsize = (hv-lv)/cnt;
+			for(int i=0; i<cnt; i++)
+				dataset.addBin(new SimpleHistogramBin(lv+(i*bsize), lv+((i+1)*bsize), true, false));
+		}
+		else
+		{
+			for(int i=0; ; i++)
+			{
+				Number lb;
+				if(i==0 && getPropertyNames().contains("lowbin"))
+					lb = (Number)getProperty("lowbin");
+				else
+					lb = (Number)getProperty("lowbin_"+i);
+				
+				Number hb;
+				if(i==0 && getPropertyNames().contains("highbin"))
+					hb = (Number)getProperty("highbin");
+				else
+					hb = (Number)getProperty("highhbin_"+i);
+				
+				if(lb!=null && hb!=null)
+				{
+					// todo: what about the borders?!
+					dataset.addBin(new SimpleHistogramBin(lb.doubleValue(), hb.doubleValue(), true, false));
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+		if(dataset.getItemCount(0)==0)
+			throw new RuntimeException("No bins defined.");
 		
 		JFreeChart chart = ChartFactory.createHistogram(title, labelx, labely, dataset, PlotOrientation.VERTICAL, legend, tooltips, urls);
 //		chart.setBackgroundPaint(new Color(100,100,100,100));
@@ -73,8 +108,6 @@ public class HistogramDataConsumer extends AbstractChartDataConsumer
 				ResourceInfo rinfo = getResourceInfo(bgimagefn, app.getAllImports(), cl);
 				Image image = ImageIO.read(rinfo.getInputStream());
 				rinfo.getInputStream().close();
-				
-//						chart.setBackgroundImage(image);
 				chart.getPlot().setBackgroundImage(image);
 			}
 			catch(Exception e)
@@ -83,14 +116,14 @@ public class HistogramDataConsumer extends AbstractChartDataConsumer
 			}
 		}
 		
-        ChartPanel panel = new ChartPanel(chart);
-        panel.setFillZoomRectangle(true);
-        JFrame f = new JFrame();
-		JPanel content = new JPanel(new BorderLayout());
-		content.add(panel, BorderLayout.CENTER);
-		f.setContentPane(panel);
-		f.pack();
-		f.setVisible(true);
+//		ChartPanel panel = new ChartPanel(chart);
+//		panel.setFillZoomRectangle(true);
+//		JFrame f = new JFrame();
+//		JPanel content = new JPanel(new BorderLayout());
+//		content.add(panel, BorderLayout.CENTER);
+//		f.setContentPane(panel);
+//		f.pack();
+//		f.setVisible(true);
 		
 		return chart;
 	}
@@ -106,6 +139,13 @@ public class HistogramDataConsumer extends AbstractChartDataConsumer
 	protected void addValue(Comparable seriesname, Object valx, Object valy, DataTable data, Object[] row)
 	{
 		SimpleHistogramDataset dataset = (SimpleHistogramDataset)((XYPlot)getChart().getPlot()).getDataset();
-		dataset.addObservation(((Double)valy).doubleValue());
+		try
+		{
+			dataset.addObservation(((Double)valy).doubleValue());
+		}
+		catch(Exception e)
+		{
+			System.out.println("Bin problem with value: "+valy);
+		}
 	}
 }

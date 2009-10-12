@@ -32,7 +32,6 @@ import jadex.commons.xml.QName;
 import jadex.commons.xml.SubobjectInfo;
 import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.bean.BeanAttributeInfo;
-import jadex.commons.xml.bean.IBeanObjectCreator;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
@@ -964,6 +963,13 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 		
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "plugin"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+
+		
 		// type instance declarations.
 		
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "envspace")}, MEnvSpaceInstance.class, null, null,
@@ -981,8 +987,10 @@ public class MEnvSpaceType	extends MSpaceType
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "avatar"), "avatars", null, null, null, "property")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "process"), "processes", null, null, null, "property")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "spaceaction"), "spaceactions", null, null, null, "property")),
-			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "observer"), "observers", null, null, null, "property"))
-			}));
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "data"), "dataproviders", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "dataconsumer"), "dataconsumers", null, null, null, "property")),
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "observer"), "observers", null, null, null, "property"))			
+		}));
 		
 		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "object")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
@@ -1022,7 +1030,19 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("view", null, null, null, null, ""),
 			new BeanAttributeInfo("perspective", null, null, null, null, ""),
-			}, null));
+			}, null, null,
+			new SubobjectInfo[]{
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "plugin"), "plugins", null, null, null, "")),
+		}));
+			
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "plugin")}, MultiCollection.class, null, null,
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", null, null, typeconv, null, ""),
+			}, null, null,
+			new SubobjectInfo[]{
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "property"), "properties", null, null, null, "")),
+		}));
 		
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "data")}, MultiCollection.class, null, 
 			new BeanAttributeInfo((String)null, "content", null, expconv, null, ""),
@@ -1044,6 +1064,7 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "dataconsumer")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", null, null, typeconv, null, "")
 			}, null, null,
 			new SubobjectInfo[]{

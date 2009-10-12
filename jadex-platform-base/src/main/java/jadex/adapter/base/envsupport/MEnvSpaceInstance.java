@@ -12,12 +12,11 @@ import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceExecutor;
 import jadex.adapter.base.envsupport.environment.PerceptType;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.adapter.base.envsupport.evaluation.DefaultDataProvider;
 import jadex.adapter.base.envsupport.evaluation.IObjectSource;
 import jadex.adapter.base.envsupport.evaluation.ITableDataConsumer;
 import jadex.adapter.base.envsupport.evaluation.ITableDataProvider;
-import jadex.adapter.base.envsupport.evaluation.DefaultDataProvider;
 import jadex.adapter.base.envsupport.evaluation.SpaceObjectSource;
-import jadex.adapter.base.envsupport.evaluation.CSVFileDataConsumer;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
@@ -35,6 +34,7 @@ import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.service.library.ILibraryService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -404,59 +404,21 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			}
 		}
 		
-		List sourceobs = getPropertyList("observers");
-		if(sourceobs!=null)
-		{
-			for(int i=0; i<sourceobs.size(); i++)
-			{				
-				Map sourceob = (Map)sourceobs.get(i);
-				
-				String title = getProperty(sourceob, "name")!=null? (String)getProperty(sourceob, "name"): "Default Observer";
-				// todo: add plugins
-				
-				// Hack!
-				final ObserverCenter oc = new ObserverCenter(title, ret, (ILibraryService)app.getPlatform().getService(ILibraryService.class), null);
-				final IContextService cs = (IContextService)app.getPlatform().getService(IContextService.class);
-				if(cs!=null)
-				{
-					cs.addContextListener(new IChangeListener()
-					{
-						public void changeOccurred(ChangeEvent event)
-						{
-							if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()) && app.equals(event.getValue()))
-							{
-								oc.dispose();
-								cs.removeContextListener(this);
-							}
-						}
-					});
-				}
-				
-				List perspectives = mspacetype.getPropertyList("perspectives");
-				for(int j=0; j<perspectives.size(); j++)
-				{
-					Map sourcepers = (Map)perspectives.get(j);
-					Map args = new HashMap();
-					args.put("object", sourcepers);
-					args.put("fetcher", fetcher);
-					IPerspective persp	= (IPerspective)((IObjectCreator)getProperty(sourcepers, "creator")).createObject(args);
-					
-					List props = (List)sourcepers.get("properties");
-					setProperties(persp, props, fetcher);
-					
-					oc.addPerspective((String)getProperty(sourcepers, "name"), persp);
-				}
-			}
-		}
-		
 		// Create the data providers.
-		List dcols = mspacetype.getPropertyList("dataproviders");
-		System.out.println("data providers: "+dcols);
-		if(dcols!=null)
+		List providers = mspacetype.getPropertyList("dataproviders");
+		List tmp = getPropertyList("dataproviders");
+		
+		if(providers==null && tmp!=null)
+			providers = tmp;
+		else if(providers!=null && tmp!=null)
+			providers.addAll(tmp);
+		
+//		System.out.println("data providers: "+providers);
+		if(providers!=null)
 		{
-			for(int i=0; i<dcols.size(); i++)
+			for(int i=0; i<providers.size(); i++)
 			{
-				Map dcol = (Map)dcols.get(i);
+				Map dcol = (Map)providers.get(i);
 
 				List sources = (List)dcol.get("source");
 				IObjectSource[] provs = new IObjectSource[sources.size()];
@@ -487,18 +449,85 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		}
 		
 		// Create the data consumers.
-		List dcons = mspacetype.getPropertyList("dataconsumers");
-		System.out.println("data consumers: "+dcons);
-		if(dcons!=null)
+		List consumers = mspacetype.getPropertyList("dataconsumers");
+		tmp = getPropertyList("dataconsumers");
+		
+		if(consumers==null && tmp!=null)
+			consumers = tmp;
+		else if(consumers!=null && tmp!=null)
+			consumers.addAll(tmp);
+		
+//		System.out.println("data consumers: "+consumers);
+		if(consumers!=null)
 		{
-			for(int i=0; i<dcons.size(); i++)
+			for(int i=0; i<consumers.size(); i++)
 			{
-				Map dcon = (Map)dcons.get(i);
+				Map dcon = (Map)consumers.get(i);
+				String name = (String)getProperty(dcon, "name");
 				Class clazz = (Class)getProperty(dcon, "class");
 				ITableDataConsumer con = (ITableDataConsumer)clazz.newInstance();
 				setProperties(con, (List)dcon.get("properties"), fetcher);
 				con.setProperty("envspace", ret);
-				ret.addDataConsumer(con);
+				ret.addDataConsumer(name, con);
+			}
+		}
+		
+		List observers = getPropertyList("observers");
+		if(observers!=null)
+		{
+			for(int i=0; i<observers.size(); i++)
+			{				
+				Map observer = (Map)observers.get(i);
+				
+				String title = getProperty(observer, "name")!=null? (String)getProperty(observer, "name"): "Default Observer";
+				
+				List plugs = (List)observer.get("plugins");
+				List plugins = null;
+				if(plugs!=null)
+				{
+					plugins = new ArrayList();
+					for(int j=0; j<plugs.size(); j++)
+					{
+						Map plug = (Map)plugs.get(j);
+						Class clazz = (Class)getProperty(plug, "class");
+						IPropertyObject po = (IPropertyObject)clazz.newInstance();
+						setProperties(po, (List)plug.get("properties"), fetcher);
+						plugins.add(po);
+					}
+				}
+				
+				final ObserverCenter oc = new ObserverCenter(title, ret, (ILibraryService)app.getPlatform().getService(ILibraryService.class), plugins);
+							
+				final IContextService cs = (IContextService)app.getPlatform().getService(IContextService.class);
+				if(cs!=null)
+				{
+					cs.addContextListener(new IChangeListener()
+					{
+						public void changeOccurred(ChangeEvent event)
+						{
+							if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()) && app.equals(event.getValue()))
+							{
+								oc.dispose();
+								cs.removeContextListener(this);
+							}
+						}
+					});
+				}
+				
+				List perspectives = mspacetype.getPropertyList("perspectives");
+				for(int j=0; j<perspectives.size(); j++)
+				{
+					Map sourcepers = (Map)perspectives.get(j);
+					Map args = new HashMap();
+					args.put("object", sourcepers);
+					args.put("fetcher", fetcher);
+					IPerspective persp	= (IPerspective)((IObjectCreator)getProperty(sourcepers, "creator")).createObject(args);
+					
+					List props = (List)sourcepers.get("properties");
+					setProperties(persp, props, fetcher);
+					
+					oc.addPerspective((String)getProperty(sourcepers, "name"), persp);
+				}
 			}
 		}
 		

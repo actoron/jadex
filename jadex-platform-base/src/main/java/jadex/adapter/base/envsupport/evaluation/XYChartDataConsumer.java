@@ -4,17 +4,13 @@ import jadex.bridge.IApplicationContext;
 import jadex.commons.ResourceInfo;
 import jadex.service.library.ILibraryService;
 
-import java.awt.BorderLayout;
 import java.awt.Image;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -82,14 +78,14 @@ public class XYChartDataConsumer extends AbstractChartDataConsumer
 			}
 		}
 		
-        ChartPanel panel = new ChartPanel(chart);
-        panel.setFillZoomRectangle(true);
-        JFrame f = new JFrame();
-		JPanel content = new JPanel(new BorderLayout());
-		content.add(panel, BorderLayout.CENTER);
-		f.setContentPane(panel);
-		f.pack();
-		f.setVisible(true);
+//		ChartPanel panel = new ChartPanel(chart);
+//		panel.setFillZoomRectangle(true);
+//		JFrame f = new JFrame();
+//		JPanel content = new JPanel(new BorderLayout());
+//		content.add(panel, BorderLayout.CENTER);
+//		f.setContentPane(panel);
+//		f.pack();
+//		f.setVisible(true);
 		
 		return chart;
 	}

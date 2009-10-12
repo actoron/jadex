@@ -72,14 +72,14 @@ public class CategoryChartDataConsumer extends AbstractChartDataConsumer
 			}
 		}
 		
-        ChartPanel panel = new ChartPanel(chart);
-        panel.setFillZoomRectangle(true);
-        JFrame f = new JFrame();
-		JPanel content = new JPanel(new BorderLayout());
-		content.add(panel, BorderLayout.CENTER);
-		f.setContentPane(panel);
-		f.pack();
-		f.setVisible(true);
+//		ChartPanel panel = new ChartPanel(chart);
+//		panel.setFillZoomRectangle(true);
+//		JFrame f = new JFrame();
+//		JPanel content = new JPanel(new BorderLayout());
+//		content.add(panel, BorderLayout.CENTER);
+//		f.setContentPane(panel);
+//		f.pack();
+//		f.setVisible(true);
 		
 		return chart;
 	}

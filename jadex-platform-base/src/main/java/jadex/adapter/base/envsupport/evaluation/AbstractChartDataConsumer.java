@@ -10,6 +10,9 @@ import jadex.javaparser.SimpleValueFetcher;
 import java.io.IOException;
 import java.util.List;
 
+import javax.swing.JPanel;
+
+import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 
 /**
@@ -38,9 +41,6 @@ public abstract class AbstractChartDataConsumer extends SimplePropertyObject imp
 	 */
 	public void consumeData(long currenttime, double tick)
 	{
-		if(chart==null)
-			chart = createChart();
-		
 		ITableDataProvider provider = getTableDataProvider();
 		DataTable data = provider.getTableData(currenttime, tick);
 		List rows = data.getRows();
@@ -157,6 +157,8 @@ public abstract class AbstractChartDataConsumer extends SimplePropertyObject imp
 	 */
 	public JFreeChart getChart()
 	{
+		if(chart==null)
+			chart = createChart();
 		return this.chart;
 	}
 	
@@ -217,6 +219,17 @@ public abstract class AbstractChartDataConsumer extends SimplePropertyObject imp
 		return ret;
 	}
 
+	/**
+	 *  Get the chart panel.
+	 *  @return The chart panel.
+	 */
+	public JPanel getChartPanel()
+	{
+		ChartPanel panel = new ChartPanel(getChart());
+        panel.setFillZoomRectangle(true);
+        return panel;
+	}
+	
 	/**
 	 *  Create a chart with the underlying dataset.
 	 *  @return The chart.

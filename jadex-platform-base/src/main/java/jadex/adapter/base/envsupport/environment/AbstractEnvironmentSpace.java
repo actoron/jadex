@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -103,7 +104,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	protected Map dataproviders;
 	
 	/** The data consumers. */
-	protected List dataconsumers;
+	protected Map dataconsumers;
 
 	//-------- constructors --------
 	
@@ -134,7 +135,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		this.perceptlist = new PerceptList(this);
 		
 		this.dataproviders = new HashMap();
-		this.dataconsumers = new ArrayList();
+		this.dataconsumers = new HashMap();
 	}
 	
 	//-------- methods --------
@@ -1390,17 +1391,27 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  Add a new data consumer.
 	 *  @param consumer The consumer.
 	 */
-	public void addDataConsumer(ITableDataConsumer consumer)
+	public void addDataConsumer(String name, ITableDataConsumer consumer)
 	{
-		dataconsumers.add(consumer);
+		dataconsumers.put(name, consumer);
+	}
+	
+	/**
+	 *  Get a data consumer.
+	 *  @param name The name.
+	 *  @return The consumer.
+	 */
+	public ITableDataConsumer getDataConsumer(String name)
+	{
+		return (ITableDataConsumer)dataconsumers.get(name);
 	}
 	
 	/**
 	 *  Get the data consumers.
 	 *  @return The data consumers.
 	 */
-	public List getDataConsumers()
+	public Collection getDataConsumers()
 	{
-		return dataconsumers;
+		return dataconsumers.values();
 	}
 }
