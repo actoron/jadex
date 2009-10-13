@@ -3,10 +3,16 @@ package jadex.adapter.base.envsupport.observer.gui.plugin;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.commons.SimplePropertyObject;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+
+import org.jfree.chart.ChartPanel;
 
 /**
  *  Th evaluation plugin.
@@ -19,10 +25,13 @@ public class EvaluationPlugin extends SimplePropertyObject implements IObserverC
 	private static final String NAME = "Evaluation";
 	
 	/** The main panel. */
-	private JSplitPane mainpane;
+	private Component mainpane;
 	
 	/** The observer center. */
 	private ObserverCenter obscenter;
+	
+	/** The evaluation components. */
+	protected List components;
 	
 	//-------- attributes --------
 
@@ -31,19 +40,6 @@ public class EvaluationPlugin extends SimplePropertyObject implements IObserverC
 	 */
 	public EvaluationPlugin()
 	{
-		mainpane = new JSplitPane();
-		mainpane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		mainpane.setOneTouchExpandable(true);
-		mainpane.setDividerLocation(160);
-		mainpane.setResizeWeight(0.5);
-		mainpane.setMinimumSize(new Dimension(200, 200));
-		
-//		JSplitPane persViewPane = new JSplitPane();
-//		persViewPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-//		persViewPane.setOneTouchExpandable(true);
-//		persViewPane.setDividerLocation(80);
-//		persViewPane.setResizeWeight(0.5);
-//		mainpane.setTopComponent(persViewPane);
 	}
 	
 	/** 
@@ -53,7 +49,6 @@ public class EvaluationPlugin extends SimplePropertyObject implements IObserverC
 	public void start(ObserverCenter main)
 	{
 		obscenter = main;
-		
 		refresh();
 	}
 	
@@ -89,15 +84,85 @@ public class EvaluationPlugin extends SimplePropertyObject implements IObserverC
 	 */
 	public Component getView()
 	{
-		Component c = (Component)getProperty("panel_0");
-		System.out.println("comp: "+c);
-		return c;
-		//		return mainpane;
+		components = new ArrayList();
+		
+		for(int i=0; ;i++)
+		{
+			if(i==0 && getPropertyNames().contains("component"))
+			{
+				components.add(getProperty("component"));
+			}
+			else
+			{
+				Component c = (Component)getProperty("component_"+i);
+				if(c!=null)
+					components.add(c);
+				else
+					break;
+			}
+		}
+		
+		mainpane = new JPanel(new BorderLayout());
+		mainpane.setMinimumSize(new Dimension(200, 200));
+
+		Component parent = mainpane;
+		for(int i=0; i<components.size(); i++)
+		{
+			// Creation of child.
+			Component child;
+			if(components.size()-i>1)
+			{
+				JSplitPane p = new JSplitPane();
+				p.setOrientation(JSplitPane.VERTICAL_SPLIT);
+				p.setOneTouchExpandable(true);
+				p.setDividerLocation(250);
+				p.setResizeWeight(0.5);
+				p.setTopComponent((Component)components.get(i));
+				child = p;
+			}
+			else
+			{
+				child = (Component)components.get(i);
+			}
+			
+			// Addition of child.
+			if(parent instanceof JPanel)
+			{
+				((JPanel)parent).add(BorderLayout.CENTER, child);
+			}
+			else // if(c instanceof JSpiltPane)
+			{
+				((JSplitPane)parent).setBottomComponent(child);
+			}
+			
+			parent = child;
+		}
+		
+		return mainpane;
 	}
 	
-	/** Refreshes the display
+	/** 
+	 * Refreshes the display
 	 */
 	public void refresh()
 	{
+//		System.out.println("refresh called");
+
+		if(components!=null)
+		{
+			for(int i=0; i<components.size(); i++)
+			{
+				Component c = (Component)components.get(i);
+				c.repaint();
+			}
+		}
+	}
+	
+	public static void main(String[] args)
+	{
+		double test = Math.sqrt(2);
+		System.out.println(test);
+		double t2 = ((int)(test*100))/100.0;
+		System.out.println(t2);
 	}
 }

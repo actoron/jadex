@@ -61,7 +61,6 @@ public class DiffusionProcess extends SimplePropertyObject implements ISpaceProc
 				grid.createSpaceObject("patch", props, null);
 			}
 		}
-//		System.out.println("create waste process started.");
 	}
 
 	/**
@@ -99,7 +98,7 @@ public class DiffusionProcess extends SimplePropertyObject implements ISpaceProc
 			int sizex = grid.getAreaSize().getXAsInteger();
 			int sizey = grid.getAreaSize().getYAsInteger();
 			
-			int[][] adds = new int[sizex][sizey];
+			double[][] adds = new double[sizex][sizey];
 			for(int x=0; x<sizex; x++)
 			{
 				for(int y=0; y<sizey; y++)

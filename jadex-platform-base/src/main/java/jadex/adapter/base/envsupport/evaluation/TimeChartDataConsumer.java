@@ -66,10 +66,11 @@ public class TimeChartDataConsumer extends AbstractChartDataConsumer
 		boolean legend = getProperty("legend")==null? true: ((Boolean)getProperty("legend")).booleanValue();
 		boolean tooltips = getProperty("tooltips")==null? true: ((Boolean)getProperty("tooltips")).booleanValue();
 		boolean urls = getProperty("urls")==null? false: ((Boolean)getProperty("urls")).booleanValue();
+		boolean autorepaint = getProperty("autorepaint")==null? false: ((Boolean)getProperty("autorepaint")).booleanValue();
 
 		XYDataset dataset = new TimeSeriesCollection();
 		JFreeChart chart = ChartFactory.createTimeSeriesChart(title, labelx, labely, dataset, legend, tooltips, urls);
-//		chart.setBackgroundPaint(Color.white);
+		chart.setNotify(autorepaint);
 		
 		String bgimagefn = (String)getProperty("bgimage");
 		if(bgimagefn!=null)

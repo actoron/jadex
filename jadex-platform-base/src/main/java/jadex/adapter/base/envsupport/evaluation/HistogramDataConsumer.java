@@ -47,7 +47,8 @@ public class HistogramDataConsumer extends AbstractChartDataConsumer
 		boolean legend = getProperty("legend")==null? true: ((Boolean)getProperty("legend")).booleanValue();
 		boolean tooltips = getProperty("tooltips")==null? true: ((Boolean)getProperty("tooltips")).booleanValue();
 		boolean urls = getProperty("urls")==null? false: ((Boolean)getProperty("urls")).booleanValue();
-		
+		boolean autorepaint = getProperty("autorepaint")==null? false: ((Boolean)getProperty("autorepaint")).booleanValue();
+
 		String seriesname = (String)getProperty("seriesname");
 
 		SimpleHistogramDataset dataset = new SimpleHistogramDataset(seriesname);
@@ -95,6 +96,7 @@ public class HistogramDataConsumer extends AbstractChartDataConsumer
 			throw new RuntimeException("No bins defined.");
 		
 		JFreeChart chart = ChartFactory.createHistogram(title, labelx, labely, dataset, PlotOrientation.VERTICAL, legend, tooltips, urls);
+		chart.setNotify(autorepaint);
 //		chart.setBackgroundPaint(new Color(100,100,100,100));
 //		chart.getPlot().setBackgroundAlpha(0.5f);
 		

@@ -163,6 +163,14 @@ public abstract class AbstractChartDataConsumer extends SimplePropertyObject imp
 	}
 	
 	/**
+	 *  Refresh the chart.
+	 */
+	public void refresh()
+	{
+		getChart().fireChartChanged();
+	}
+	
+	/**
 	 *  Get the space.
 	 *  @return The space.
 	 */

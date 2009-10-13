@@ -3,6 +3,7 @@ package jadex.adapter.base.envsupport.observer.graphics.drawable;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.graphics.AbstractViewport;
+import jadex.adapter.base.envsupport.observer.graphics.IViewport;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJ2D;
 import jadex.adapter.base.envsupport.observer.graphics.ViewportJOGL;
 import jadex.adapter.base.envsupport.observer.gui.SObjectInspector;
@@ -153,7 +154,7 @@ public final class Text implements IDrawable
 			double xPos = pos.getXAsDouble();
 			double yPos = pos.getYAsDouble();
 			
-			String text = getReplacedText(obj, this.text);
+			String text = getReplacedText(dc, obj, this.text, vp);
 			String[] lines = text.split("(\n\r?)|(\r)");
 			
 			AffineTransform t = g.getTransform();
@@ -222,7 +223,7 @@ public final class Text implements IDrawable
 			double xPos = pos.getXAsDouble();
 			double yPos = pos.getYAsDouble();
 			
-			String text = getReplacedText(obj, this.text);
+			String text = getReplacedText(dc, obj, this.text, vp);
 			String[] lines = text.split("(\n\r?)|(\r)");
 			
 			for (int i = 0; i < lines.length; ++i)
@@ -282,9 +283,8 @@ public final class Text implements IDrawable
 		return ((Math.min(canvasSize.getXAsFloat(), canvasSize.getYAsFloat()) / BASE_VIEWPORT_SIZE) * areaSize.copy().divide(size).getMean().getAsFloat());
 	}
 	
-	private final static String getReplacedText(Object obj, String text)
+	private final static String getReplacedText(DrawableCombiner dc, Object obj, String text, IViewport vp)
 	{
-		
 		String[] tokens = text.split("\\$");
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < tokens.length; ++i)
@@ -296,13 +296,14 @@ public final class Text implements IDrawable
 			}
 			else
 			{
-				if (tokens[i] == "")
+				if(tokens[i] == "")
 				{
 					sb.append("$");
 				}
 				else
 				{
-					sb.append(String.valueOf(SObjectInspector.getProperty(obj, tokens[i])));
+					sb.append(String.valueOf(dc.getBoundValue(obj, tokens[i], vp)));
+//					sb.append(String.valueOf(SObjectInspector.getProperty(obj, tokens[i])));
 				}
 			}
 		}
