@@ -46,11 +46,6 @@
 						<bean class="jadex.adapter.base.envsupport.MEnvSpaceType" factory-method="getXMLMapping"/>
 					</list>
 				</constructor-arg>
-				<constructor-arg>
-					<list>
-						<bean class="jadex.adapter.base.envsupport.MEnvSpaceType" factory-method="getXMLLinkInfos"/>
-					</list>
-				</constructor-arg>
 			</bean>
 		</property>
 			
@@ -107,28 +102,28 @@
 			<map>
 				<entry>
 					<key>
-						<value type="java.lang.Class">jadex.bridge.ILibraryService</value>
+						<value type="java.lang.Class">jadex.service.library.ILibraryService</value>
 					</key>
 					<map>
 						<entry>
 							<key>
 								<value type="java.lang.String">library_service</value>
 							</key>
-							<bean class="jadex.adapter.base.libraryservice.LibraryService"></bean>
+							<bean class="jadex.service.library.LibraryService"></bean>
 						</entry>
 					</map>
 				</entry>
 				
 				<entry>
 					<key>
-						<value type="java.lang.Class">jadex.adapter.base.ThreadPoolService</value>
+						<value type="java.lang.Class">jadex.service.threadpool.ThreadPoolService</value>
 					</key>
 					<map>
 						<entry>
 							<key>
 								<value type="java.lang.String">threadpool_service</value>
 							</key>
-							<bean class="jadex.adapter.base.ThreadPoolService">
+							<bean class="jadex.service.threadpool.ThreadPoolService">
 								<constructor-arg ref="threadPool"/>
 							</bean>
 						</entry>
@@ -200,7 +195,7 @@
 				
 				<entry>
 					<key>
-						<value type="java.lang.Class">jadex.bridge.IClockService</value>
+						<value type="java.lang.Class">jadex.service.clock.IClockService</value>
 					</key>
 					<map>
 						<entry>
@@ -208,15 +203,14 @@
 								<value type="java.lang.String">clock_service</value>
 							</key>
 
-							<bean class="jadex.adapter.base.clock.ClockService">
+							<bean class="jadex.service.clock.ClockService">
 								<constructor-arg>
-									<bean class="jadex.adapter.base.clock.SystemClock">
+									<bean class="jadex.service.clock.SystemClock">
 										<constructor-arg type="java.lang.String" value="system_clock"/>
 										<constructor-arg type="long" value="100"/>
 										<constructor-arg type="jadex.commons.concurrent.IThreadPool" ref="threadPool"/>
 									</bean>
 								</constructor-arg>
-								<constructor-arg ref="platform"/>
 							</bean>	
 						</entry>
 					</map>
@@ -240,14 +234,14 @@
 				
 				<entry>
 					<key>
-						<value type="java.lang.Class">jadex.adapter.base.execution.IExecutionService</value>
+						<value type="java.lang.Class">jadex.service.execution.IExecutionService</value>
 					</key>
 					<map>
 						<entry>
 							<key>
 								<value type="java.lang.String">execution_service</value>
 							</key>
-							<bean class="jadex.adapter.base.execution.SyncExecutionService">
+							<bean class="jadex.service.execution.SyncExecutionService">
 								<constructor-arg ref="threadPool"/>
 							</bean>
 						</entry>
