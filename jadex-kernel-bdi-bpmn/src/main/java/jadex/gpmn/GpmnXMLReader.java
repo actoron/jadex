@@ -83,18 +83,7 @@ public class GpmnXMLReader
 		
 		String uri = "http://jadex.sourceforge.net/gpmn";
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "GpmnDiagram")}, MGpmnModel.class, null, null,
-			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("ID", "Id"),
-			new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE),
-			new BeanAttributeInfo("version", null, AttributeInfo.IGNORE_READWRITE),
-			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
-			}, null, null,
-			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("processes", "process"))
-		}));
-		
-		types.add(new TypeInfo(null, "processes", MProcess.class, null, null,
+		TypeInfo ti_proc = new TypeInfo(null, "processes", MProcess.class, null, null,
 			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")}, null, null,
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge")),
@@ -118,7 +107,18 @@ public class GpmnXMLReader
 					return type.endsWith("Plan");
 				}
 			})
-		}));	
+		});	
+		
+		types.add(new TypeInfo(ti_proc, new QName[]{new QName(uri, "GpmnDiagram")}, MGpmnModel.class, null, null,
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("ID", "Id"),
+			new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE),
+			new BeanAttributeInfo("version", null, AttributeInfo.IGNORE_READWRITE),
+			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
+			}, null));//, null, null,
+//			new SubobjectInfo[]{
+//			new SubobjectInfo(new BeanAttributeInfo("processes", "process"))
+//		}));
 		
 		types.add(new TypeInfo(null, "associations", MAssociation.class));
 		

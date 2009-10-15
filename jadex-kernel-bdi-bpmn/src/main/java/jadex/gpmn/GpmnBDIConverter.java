@@ -6,6 +6,7 @@ import jadex.bdi.interpreter.OAVBDIModelLoader;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.interpreter.OAVBDIXMLReader;
 import jadex.bdi.interpreter.Report;
+import jadex.commons.SReflect;
 import jadex.commons.xml.IPostProcessor;
 import jadex.gpmn.model.MAchieveGoal;
 import jadex.gpmn.model.MArtifact;
@@ -57,24 +58,26 @@ public class GpmnBDIConverter
 	/**
 	 *  Convert a gpmn model to a bdi agent.
 	 */
-	public OAVAgentModel[] convertGpmnModelToBDIAgents(MGpmnModel model, ClassLoader classloader)
+	public OAVAgentModel convertGpmnModelToBDIAgents(MGpmnModel model, ClassLoader classloader)
 	{
-		OAVAgentModel[] ret = null;
+		return createBDIAgentForProcess(model, model, classloader);
 		
-		// todo: more than one process?!
-		List procs = model.getProcesses();
-		if(procs!=null)
-		{
-			ret	= new OAVAgentModel[procs.size()];
-			for(int i=0; i<procs.size(); i++)
-			{
-				MProcess proc = (MProcess)procs.get(i);
-				
-				ret[i] = createBDIAgentForProcess(model, proc, classloader);
-			}
-		}
-		
-		return ret;
+//		OAVAgentModel[] ret = null;
+//		
+//		// todo: more than one process?!
+//		List procs = model.getProcesses();
+//		if(procs!=null)
+//		{
+//			ret	= new OAVAgentModel[procs.size()];
+//			for(int i=0; i<procs.size(); i++)
+//			{
+//				MProcess proc = (MProcess)procs.get(i);
+//				
+//				ret[i] = createBDIAgentForProcess(model, proc, classloader);
+//			}
+//		}
+//		
+//		return ret;
 	}
 	
 	/**
@@ -287,7 +290,7 @@ public class GpmnBDIConverter
 		}
 		
 		// Create plan for starting/monitoring the process.
-		String planname = "startandmonitor_"+proc.getName().substring(0, proc.getName().indexOf("."));
+		String planname = "startandmonitor_"+proc.getName();//.substring(0, proc.getName().indexOf("."));
 		Object planhandle = createPlan(scopehandle, state, planname, "jadex.gpmn.runtime.plan.StartAndMonitorProcessPlan", null);
 		
 		// Create achieve_goals maintain_goals paramterset
@@ -373,7 +376,7 @@ public class GpmnBDIConverter
 			for(Iterator it = goalhandles.iterator(); it.hasNext(); )
 			{
 				Object goalhandle = it.next();
-				postProcessParameterElement(state, scopehandle, goalhandle, expost, classloader);
+				postProcessParameterElement(state, scopehandle, goalhandle, expost, clpost, classloader);
 
 				Object condhandle = state.getAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_creationcondition);
 				if(condhandle!=null)
@@ -407,7 +410,7 @@ public class GpmnBDIConverter
 			for(Iterator it = planhandles.iterator(); it.hasNext(); )
 			{
 				planhandle = it.next();
-				postProcessParameterElement(state, scopehandle, planhandle, expost, classloader);
+				postProcessParameterElement(state, scopehandle, planhandle, expost, clpost, classloader);
 			}
 		}
 	}
@@ -632,7 +635,7 @@ public class GpmnBDIConverter
 	 *  Post process a parameter element.
 	 */
 	protected void postProcessParameterElement(IOAVState state, Object scopehandle, Object paramelem, 
-		IPostProcessor postproc, ClassLoader classloader)
+		IPostProcessor exproc, IPostProcessor clproc, ClassLoader classloader)
 	{
 		Collection paramhandles = state.getAttributeValues(paramelem, OAVBDIMetaModel.parameterelement_has_parameters);
 		if(paramhandles!=null)
@@ -640,9 +643,10 @@ public class GpmnBDIConverter
 			for(Iterator it2 = paramhandles.iterator(); it2.hasNext(); )
 			{
 				Object paramhandle = it2.next();
+				clproc.postProcess(state, paramhandle, scopehandle, classloader);
 				Object exphandle = state.getAttributeValue(paramhandle, OAVBDIMetaModel.parameter_has_value);
 				if(exphandle!=null)
-					postproc.postProcess(state, exphandle, scopehandle, classloader);
+					exproc.postProcess(state, exphandle, scopehandle, classloader);
 			}
 		}
 		Collection paramsethandles = state.getAttributeValues(paramelem, OAVBDIMetaModel.parameterelement_has_parametersets);
@@ -651,16 +655,17 @@ public class GpmnBDIConverter
 			for(Iterator it2 = paramsethandles.iterator(); it2.hasNext(); )
 			{
 				Object paramsethandle = it2.next();
+				clproc.postProcess(state, paramsethandle, scopehandle, classloader);
 				Object exphandle = state.getAttributeValue(paramsethandle, OAVBDIMetaModel.parameterset_has_valuesexpression);
 				if(exphandle!=null)
-					postproc.postProcess(state, exphandle, scopehandle, classloader);
+					exproc.postProcess(state, exphandle, scopehandle, classloader);
 				Collection expshandle = state.getAttributeValues(paramsethandle, OAVBDIMetaModel.parameterset_has_values);
 				if(expshandle!=null)
 				{
 					for(Iterator it3=expshandle.iterator(); it3.hasNext(); )
 					{
 						exphandle = it3.next();
-						postproc.postProcess(state, exphandle, scopehandle, classloader);
+						exproc.postProcess(state, exphandle, scopehandle, classloader);
 					}
 				}
 			}

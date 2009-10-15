@@ -19,8 +19,8 @@ public class StartAndMonitorProcessPlan extends Plan
 	 */
 	public void body()
 	{
-		final String[] agoalnames = (String[]) getParameterSet("achieve_goals").getValues();
-		String[] mgoalnames = (String[]) getParameterSet("maintain_goals").getValues();
+		final String[] agoalnames = (String[])getParameterSet("achieve_goals").getValues();
+		String[] mgoalnames = (String[])getParameterSet("maintain_goals").getValues();
 		
 		System.out.println("Process start: "+SUtil.arrayToString(mgoalnames)+" "+SUtil.arrayToString(agoalnames));
 

@@ -64,18 +64,14 @@ public class GpmnAgentFactory extends BDIAgentFactory
 		try
 		{
 			MGpmnModel gpmn = GpmnXMLReader.read(model, libservice.getClassLoader(), null);
-			OAVAgentModel[]	agents	= converter.convertGpmnModelToBDIAgents(gpmn, libservice.getClassLoader());
-			if(agents==null || agents.length!=1)
-			{
-				throw new RuntimeException("Model must contain a single process: "+model);
-			}
+			OAVAgentModel agent	= converter.convertGpmnModelToBDIAgents(gpmn, libservice.getClassLoader());
 			
 			FileOutputStream os = new FileOutputStream("wurst.xml");
 			Writer writer = OAVBDIXMLReader.getWriter();
-			writer.write(agents[0].getState().getRootObjects().next(), os, libservice.getClassLoader(), agents[0].getState());
+			writer.write(agent.getState().getRootObjects().next(), os, libservice.getClassLoader(), agent.getState());
 			os.close();
 			
-			return agents[0];
+			return agent;
 		}
 		catch(Exception e)
 		{

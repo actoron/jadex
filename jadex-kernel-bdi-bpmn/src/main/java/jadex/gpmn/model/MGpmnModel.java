@@ -12,18 +12,18 @@ import java.util.Map;
 /**
  *  Java representation of a bpmn model for xml description.
  */
-public class MGpmnModel extends MIdElement implements ICacheableModel, IProcessModel
+public class MGpmnModel extends MProcess implements ICacheableModel, IProcessModel
 {
 	//-------- attributes --------
 	
 	/** The processes. */
-	protected List processes;
+//	protected List processes;
 	
 	/** The artifacts. */
 	protected List artifacts;
 	
 	/** The name of the model. */
-	protected String name;
+//	protected String name;
 
 	/** The description. */
 	protected String description;
@@ -54,35 +54,35 @@ public class MGpmnModel extends MIdElement implements ICacheableModel, IProcessM
 	
 	//-------- methods --------
 
-	/**
-	 *  Get the processs.
-	 *  @return The processs.
-	 */
-	public List getProcesses()
-	{
-		return processes;
-	}
-	
-	/**
-	 *  Add a process.
-	 *  @param process The process. 
-	 */
-	public void addProcess(MProcess process)
-	{
-		if(processes==null)
-			processes = new ArrayList();
-		processes.add(process);
-	}
-	
-	/**
-	 *  Remove a process.
-	 *  @param process The process.
-	 */
-	public void removeProcess(MProcess process)
-	{
-		if(processes!=null)
-			processes.remove(process);
-	}
+//	/**
+//	 *  Get the processs.
+//	 *  @return The processs.
+//	 */
+//	public List getProcesses()
+//	{
+//		return processes;
+//	}
+//	
+//	/**
+//	 *  Add a process.
+//	 *  @param process The process. 
+//	 */
+//	public void addProcess(MProcess process)
+//	{
+//		if(processes==null)
+//			processes = new ArrayList();
+//		processes.add(process);
+//	}
+//	
+//	/**
+//	 *  Remove a process.
+//	 *  @param process The process.
+//	 */
+//	public void removeProcess(MProcess process)
+//	{
+//		if(processes!=null)
+//			processes.remove(process);
+//	}
 	
 	/**
 	 *  Get the artifacts.
@@ -119,20 +119,20 @@ public class MGpmnModel extends MIdElement implements ICacheableModel, IProcessM
 	/**
 	 *  Get the name of the model.
 	 *  @return The name of the model.
-	 */
+	 * /
 	public String	getName()
 	{
 		return name;
-	}
+	}*/
 	
 	/**
 	 *  Set the name of the model.
 	 *  @param name	The name to set.
-	 */
+	 * /
 	public void	setName(String name)
 	{
 		this.name	= name;
-	}
+	}*/
 	
 	/**
 	 *  Get the description of the model.
@@ -235,15 +235,17 @@ public class MGpmnModel extends MIdElement implements ICacheableModel, IProcessM
 			this.alledges = new HashMap();
 			// todo: hierarchical search also in lanes of pools?!
 			
-			List procs = getProcesses();
-			if(procs!=null)
-			{
-				for(int i=0; i<procs.size(); i++)
-				{
-					MProcess tmp = (MProcess)processes.get(i);
-					addEdges(tmp.getSequenceEdges(), alledges);
-				}
-			}
+			addEdges(getSequenceEdges(), alledges);
+			
+//			List procs = getProcesses();
+//			if(procs!=null)
+//			{
+//				for(int i=0; i<procs.size(); i++)
+//				{
+//					MProcess tmp = (MProcess)processes.get(i);
+//					addEdges(tmp.getSequenceEdges(), alledges);
+//				}
+//			}
 		}
 		
 		return alledges;
