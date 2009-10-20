@@ -1,6 +1,7 @@
 package jadex.wfms.service.impl;
 
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 import jadex.wfms.IProcess;
 import jadex.wfms.IProcessModel;
 import jadex.wfms.IWfms;
@@ -51,6 +52,13 @@ public class MetaExecutionService implements IExecutionService
 	 */
 	public void start()
 	{
+		if(exeservices!=null)
+		{
+			for(int i=0; i<exeservices.size(); i++)
+			{
+				((IService)exeservices.get(i)).start();
+			}
+		}
 	}
 	
 	/**
@@ -59,6 +67,14 @@ public class MetaExecutionService implements IExecutionService
 	 */
 	public void shutdown(IResultListener listener)
 	{
+		if(exeservices!=null)
+		{
+			for(int i=0; i<exeservices.size(); i++)
+			{
+				((IService)exeservices.get(i)).shutdown(null);
+			}
+		}
+		listener.resultAvailable(null);
 	}
 	
 	/**

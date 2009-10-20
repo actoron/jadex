@@ -16,14 +16,13 @@
 
 	<imports>
 		<import>jadex.bdi.runtime.*</import>
-		<import>jadex.bdi.examples.puzzle.*</import>
 	</imports>
 
 	<beliefs>
 		<!-- The game board offers possibilities to make moves,
 			take back moves and keep track of the game history. -->
 		<belief name="board" class="IBoard">
-			<fact>new JackBoard()</fact>
+			<fact>new Board()</fact>
 		</belief>
 		<!-- The number of moves already tried. -->
 		<belief name="triescnt" class="int">

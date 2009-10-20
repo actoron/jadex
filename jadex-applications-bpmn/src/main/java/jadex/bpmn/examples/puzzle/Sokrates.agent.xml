@@ -20,7 +20,6 @@
 
 	<imports>
 		<import>jadex.bdi.runtime.*</import>
-		<import>jadex.bdi.examples.puzzle.*</import>
 	</imports>
 
 	<beliefs>
@@ -56,16 +55,6 @@
 			<parameter name="depth" class="int"/>
 			<targetcondition language="jcl">
 				$beliefbase.board.isSolution()
-				
-				// $beliefbase.getBelief("board").getFact().isSolution()
-				// ?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?board))
-				// ?mbelief = (mbelief (melement_has_name "board"))
-				// ?board = (IBoard (solution true))
-				
-				// ?rbelief = (belief (element_has_model.melement_has_name "board") (belief_has_fact ?board))
-				// ?board = (IBoard (solution true))
-
-				// ?rbelief = (belief (element_has_model.melement_has_name "board") (belief_has_fact.IBoard:solution true))
 			</targetcondition>
  		</achievegoal>
 
@@ -159,7 +148,7 @@
 				<initialplan name="start_playing" ref="play_game_plan"/>
 			</plans>
 		</configuration>
-		<configuration name="jack-5x5">
+		<!-- <configuration name="jack-5x5">
 			<beliefs>
 				<initialbelief ref="board">
  					<fact>new JackBoard()</fact>
@@ -168,6 +157,6 @@
 			<plans>
 				<initialplan name="start_playing" ref="play_game_plan"/>
 			</plans>
-		</configuration>
+		</configuration> -->
 	</configurations>
 </agent>

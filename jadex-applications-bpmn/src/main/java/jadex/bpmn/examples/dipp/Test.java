@@ -21,7 +21,7 @@ public class Test
 			
 			MGpmnModel model = GpmnXMLReader.read(filename, null, null);
 			GpmnBDIConverter conv = new GpmnBDIConverter(new OAVBDIModelLoader());
-			Object[] ret = conv.convertGpmnModelToBDIAgents(model, null);
+			Object ret = conv.convertGpmnModelToBDIAgents(model, null);
 			System.out.println("Converted: "+SUtil.arrayToString(ret));
 		}
 		catch(Exception e)

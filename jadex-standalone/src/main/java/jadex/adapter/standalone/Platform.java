@@ -23,6 +23,7 @@ import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.service.IService;
+import jadex.service.IServiceContainer;
 import jadex.service.PropertiesXMLHelper;
 import jadex.service.library.ILibraryService;
 
@@ -134,13 +135,21 @@ public class Platform extends AbstractPlatform
 	public Platform(String conffile, ClassLoader classloader) throws Exception
 	{
 		this((Properties)PropertiesXMLHelper.getPropertyReader().read(
-			SUtil.getResource(conffile, classloader), classloader, null));
+			SUtil.getResource(conffile, classloader), classloader, null), null);
 	}
 	
 	/**
 	 *  Create a new Platform.
 	 */
 	public Platform(Properties configuration)
+	{
+		this(configuration, null);
+	}
+	
+	/**
+	 *  Create a new Platform.
+	 */
+	public Platform(Properties configuration, IServiceContainer parent)
 	{
 		//    	long freeStartupMemory = Runtime.getRuntime().freeMemory();
 		//    	long startupTime = System.currentTimeMillis();
@@ -198,7 +207,7 @@ public class Platform extends AbstractPlatform
 		
 		// Initialize services.
 //		props = platconf.getSubproperty(SERVICES).getProperties();
-		init(platconf.getSubproperty(SERVICES), fetcher);
+		init(platconf.getSubproperty(SERVICES), fetcher, parent);
 		
 //		for(int i = 0; i < props.length; i++)
 //		{

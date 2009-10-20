@@ -47,7 +47,15 @@ public class GpmnProcessService implements IExecutionService
 	{
 		this.wfms = wfms;
 		this.processes = new HashMap();
-		
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Start the service.
+	 */
+	public void start()
+	{
 		// Absolute start time (for testing and benchmarking).
 		long starttime = System.currentTimeMillis();
 		
@@ -75,13 +83,14 @@ public class GpmnProcessService implements IExecutionService
 			e.printStackTrace();
 		}
 		System.out.println(configuration);
-		platform = new Platform(configuration);
-		((Platform) platform).start();
+		
+		platform = new Platform(configuration, wfms);
+		((Platform)platform).start();
 		
 		long startup = System.currentTimeMillis() - starttime;
-		((Platform) platform).getLogger().info("Platform startup time: " + startup + " ms.");
+		((Platform)platform).getLogger().info("Platform startup time: " + startup + " ms.");
 		
-		((IAMS) platform.getService(IAMS.class)).addAMSListener(new IAMSListener()
+		((IAMS)platform.getService(IAMS.class)).addAMSListener(new IAMSListener()
 		{
 			
 			public void agentRemoved(IAMSAgentDescription desc)
@@ -96,15 +105,6 @@ public class GpmnProcessService implements IExecutionService
 			{
 			}
 		});
-	}
-	
-	//-------- methods --------
-	
-	/**
-	 *  Start the service.
-	 */
-	public void start()
-	{
 	}
 	
 	/**

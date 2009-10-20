@@ -15,8 +15,10 @@ import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler.EventEndErrorException;
 import jadex.bridge.IPlatform;
 import jadex.service.library.ILibraryService;
+import jadex.service.library.ILibraryServiceListener;
 
 import java.io.Serializable;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -40,8 +42,21 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 	public BpmnPlanExecutor(IPlatform platform)
 	{
 		this.loader = new BpmnModelLoader();
-		loader.setClassLoader(((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader());
-		// Todo: different agents may have different class loaders?
+		final ILibraryService libservice = (ILibraryService)platform.getService(ILibraryService.class);
+		loader.setClassLoader(libservice.getClassLoader());
+		ILibraryServiceListener lsl = new ILibraryServiceListener()
+		{
+			public void urlAdded(URL url)
+			{
+				loader.setClassLoader(libservice.getClassLoader());
+			}
+			
+			public void urlRemoved(URL url)
+			{
+				loader.setClassLoader(libservice.getClassLoader());
+			}
+		};
+		libservice.addLibraryServiceListener(lsl);
 	}
 
 	//-------- IPlanExecutor interface --------
@@ -59,7 +74,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		Object	mbody	= interpreter.getState().getAttributeValue(mplan, OAVBDIMetaModel.plan_has_body);
 		String	impl	= (String)interpreter.getState().getAttributeValue(mbody, OAVBDIMetaModel.body_has_impl);
 		Object	mcapa	= interpreter.getState().getAttributeValue(rcapability, OAVBDIRuntimeModel.element_has_model);
-		String[]	imports	= OAVBDIMetaModel.getImports(interpreter.getState(), mcapa);
+		String[] imports	= OAVBDIMetaModel.getImports(interpreter.getState(), mcapa);
 		
 		MBpmnModel bodymodel = loader.loadBpmnModel(impl, imports); 
 

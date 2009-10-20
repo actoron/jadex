@@ -1,8 +1,5 @@
 package jadex.bpmn.examples.puzzle;
 
-import jadex.bdi.examples.puzzle.IBoard;
-import jadex.bdi.examples.puzzle.Move;
-import jadex.bdi.examples.puzzle.Piece;
 import jadex.bdi.runtime.ICandidateInfo;
 import jadex.bpmn.runtime.IProcessInstance;
 import jadex.bpmn.runtime.ITaskContext;

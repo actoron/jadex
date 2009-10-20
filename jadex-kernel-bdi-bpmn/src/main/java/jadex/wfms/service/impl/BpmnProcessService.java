@@ -7,12 +7,15 @@ import jadex.bpmn.runtime.BpmnInstance;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.library.ILibraryService;
+import jadex.service.library.ILibraryServiceListener;
 import jadex.wfms.IProcessModel;
 import jadex.wfms.IWfms;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,6 +54,21 @@ public class BpmnProcessService implements IExecutionService
 	 */
 	public void start()
 	{
+		final ILibraryService libservice = (ILibraryService)wfms.getService(ILibraryService.class);
+		loader.setClassLoader(libservice.getClassLoader());
+		ILibraryServiceListener lsl = new ILibraryServiceListener()
+		{
+			public void urlAdded(URL url)
+			{
+				loader.setClassLoader(libservice.getClassLoader());
+			}
+			
+			public void urlRemoved(URL url)
+			{
+				loader.setClassLoader(libservice.getClassLoader());
+			}
+		};
+		libservice.addLibraryServiceListener(lsl);
 	}
 	
 	/**

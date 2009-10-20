@@ -9,7 +9,12 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * 
+ *  A service container is a simple infrastructure for a collection of
+ *  services. It allows for starting/shutdowning the container and fetching
+ *  service by their type/name.
+ *  
+ *  The configuration of services is not handled here but can be done
+ *  e.g. in subclasses like the PropertyServiceContainer.
  */
 public class BasicServiceContainer implements IServiceContainer
 {	
