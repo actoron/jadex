@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_JerAoXz_Ed6Ya8z0CnMcMA" iD="_JerAoHz_Ed6Ya8z0CnMcMA">
-  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_jVa_YX0DEd6Ya8z0CnMcMA" iD="_jVa_YH0DEd6Ya8z0CnMcMA" name="package jadex.bpmn.examples.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.bpmnbdi.task.*;&#xD;&#xA;import jadex.bdi.examples.marsworld.movement.*;&#xD;&#xA;import jadex.adapter.base.envsupport.environment.*;&#xD;&#xA;import java.util.Map;&#xD;&#xA;import jadex.commons.SUtil;&#xD;&#xA;import jadex.bdi.planlib.*;&#xD;&#xA;&#xD;&#xA;Object _taskid;">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_jVa_YX0DEd6Ya8z0CnMcMA" iD="_jVa_YH0DEd6Ya8z0CnMcMA" name="package jadex.bpmn.examples.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.bpmnbdi.task.*;&#xD;&#xA;import jadex.adapter.base.envsupport.environment.*;&#xD;&#xA;import java.util.Map;&#xD;&#xA;import jadex.commons.SUtil;&#xD;&#xA;import jadex.bdi.planlib.*;&#xD;&#xA;&#xD;&#xA;Object _taskid;">
     <associations xmi:type="bpmn:Association" xmi:id="_jVa_aX0DEd6Ya8z0CnMcMA"/>
   </artifacts>
   <pools xmi:type="bpmn:Pool" xmi:id="_Je0xoXz_Ed6Ya8z0CnMcMA" iD="_Je0xoHz_Ed6Ya8z0CnMcMA" associations="_jVa_aX0DEd6Ya8z0CnMcMA" name="Pool">

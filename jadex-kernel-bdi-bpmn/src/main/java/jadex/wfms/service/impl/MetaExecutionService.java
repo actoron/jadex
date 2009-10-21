@@ -74,7 +74,8 @@ public class MetaExecutionService implements IExecutionService
 				((IService)exeservices.get(i)).shutdown(null);
 			}
 		}
-		listener.resultAvailable(null);
+		if(listener!=null)
+			listener.resultAvailable(null);
 	}
 	
 	/**

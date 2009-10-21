@@ -368,7 +368,7 @@ public class Reader
 					((Runnable)ps.get(j)).run();
 				}
 			}
-			System.out.println("i: "+i);
+//			System.out.println("i: "+i);
 		}
 			
 		return root;
