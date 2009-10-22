@@ -1,35 +1,18 @@
 package jadex.tools.jcc;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IAgentListener;
-import jadex.bdi.runtime.IExternalAccess;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
-import jadex.bdi.runtime.IMessageEvent;
-import jadex.bridge.AgentTerminatedException;
-import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IVersionInfo;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.xml.AttributeInfo;
-import jadex.commons.xml.QName;
-import jadex.commons.xml.SubobjectInfo;
-import jadex.commons.xml.TypeInfo;
-import jadex.commons.xml.bean.BeanAttributeInfo;
-import jadex.commons.xml.bean.BeanObjectReaderHandler;
-import jadex.commons.xml.bean.BeanObjectWriterHandler;
+import jadex.service.IServiceContainer;
 import jadex.service.PropertiesXMLHelper;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.RememberOptionMessage;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
-import jadex.tools.common.plugin.IAgentListListener;
 import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.common.plugin.IControlCenterPlugin;
-import jadex.tools.common.plugin.IMessageListener;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -42,15 +25,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Vector;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -58,7 +38,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 /**
- * The Jadex control center.
+ * The control center.
  */
 public class ControlCenter implements IControlCenter
 {
@@ -81,6 +61,9 @@ public class ControlCenter implements IControlCenter
 
 	// -------- attributes --------
 
+	/** The service container. */
+	protected IServiceContainer container;
+	
 	/** The plugins (plugin->panel). */
 	protected Map					plugins;
 
@@ -93,16 +76,6 @@ public class ControlCenter implements IControlCenter
 	/** The current project properties. */
 	protected Properties			props;
 
-	/** The external access. */
-	protected IExternalAccess		agent;
-
-	/** The listeners for messages. */
-	protected List					msglisteners;
-
-	/** The agent list. */
-	// Todo: remove (use belief listener).
-	protected AgentList				agentlist;
-
 	/** Flag indicating if exit was initiated. */
 	protected boolean				killed;
 
@@ -114,14 +87,10 @@ public class ControlCenter implements IControlCenter
 	/**
 	 * Create a control center.
 	 */
-	public ControlCenter(final IExternalAccess agent)
+	public ControlCenter(IServiceContainer container, final String plugins_prop)
 	{
-		this.agent = agent;
+		this.container = container;
 		this.plugins = new LinkedHashMap();
-		this.msglisteners = new ArrayList();
-		this.agentlist = new AgentList();
-
-		msglisteners = new Vector();
 
 		assert Thread.currentThread().getContextClassLoader() != null;
 
@@ -131,33 +100,11 @@ public class ControlCenter implements IControlCenter
 			{
 				window = new ControlCenterWindow(ControlCenter.this);
 
-				agent.addAgentListener(new IAgentListener()
-				{
-					public void agentTerminating(AgentEvent ae)
-					{
-						if(!killed)
-						{
-							closeProject();
-							closePlugins();
-							killed = true;
-						}
-						window.setVisible(false);
-						window.dispose();
-					}
-
-					public void agentTerminated(AgentEvent ae)
-					{
-					}
-				});
-
 				// Load plugins.
-				String plugins_prop = (String)agent.getBeliefbase().getBelief(
-						"plugins").getFact();
 				if(plugins_prop != null)
 				{
 					Set plugin_set = new HashSet();
-					StringTokenizer tokenizer = new StringTokenizer(
-							plugins_prop, ", ");
+					StringTokenizer tokenizer = new StringTokenizer(plugins_prop, ", ");
 					while(tokenizer.hasMoreTokens())
 					{
 						Class plugin_class = null;
@@ -167,12 +114,10 @@ public class ControlCenter implements IControlCenter
 									.loadClass(tokenizer.nextToken().trim());
 							if(!plugin_set.contains(plugin_class))
 							{
-								IControlCenterPlugin p = (IControlCenterPlugin)plugin_class
-										.newInstance();
+								IControlCenterPlugin p = (IControlCenterPlugin)plugin_class.newInstance();
 								plugins.put(p, null);
 								plugin_set.add(plugin_class);
-								setStatusText("Plugin loaded successfully: "
-										+ p.getName());
+								setStatusText("Plugin loaded successfully: "+ p.getName());
 							}
 						}
 						catch(Throwable e)
@@ -213,8 +158,7 @@ public class ControlCenter implements IControlCenter
 						{
 							File project = new File(proj);
 							openProject(project);// , false);
-							window.filechooser.setCurrentDirectory(project
-									.getParentFile());
+							window.filechooser.setCurrentDirectory(project.getParentFile());
 							window.filechooser.setSelectedFile(project);
 							window.setVisible(true);
 						}
@@ -259,15 +203,14 @@ public class ControlCenter implements IControlCenter
 				}
 				else
 				{
-					JOptionPane.showMessageDialog(null, "No plugins found. The Jadex IDE cannot start.",
-						"Cannot start Jadex IDE", JOptionPane.ERROR_MESSAGE);
-					agent.killAgent();
+					JOptionPane.showMessageDialog(null, "No plugins found.",
+						"No plugins found.", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
 	}
 
-	// -------- project management --------
+	//-------- project management --------
 
 	/**
 	 * Close the current project.
@@ -314,7 +257,7 @@ public class ControlCenter implements IControlCenter
 		try
 		{
 			FileInputStream fis = new FileInputStream(pd);
-			props = (Properties)PropertiesXMLHelper.getPropertyReader().read(fis, ((ILibraryService)agent.getPlatform()
+			props = (Properties)PropertiesXMLHelper.getPropertyReader().read(fis, ((ILibraryService)container
 				.getService(ILibraryService.class)).getClassLoader(), null);
 //			props = XMLPropertiesReader.readProperties(fis,
 //					((ILibraryService)agent.getPlatform().getService(
@@ -412,25 +355,17 @@ public class ControlCenter implements IControlCenter
 			// Write project properties
 			Properties oldprops = props;
 			props = new Properties();
-			props.addProperty(new Property("perspective", window
-					.getPerspective().getName()));
+			props.addProperty(new Property("perspective", window.getPerspective().getName()));
 
 			// Save window appearance
 			Properties windowprops = new Properties();
-			windowprops.addProperty(new Property("width", Integer
-					.toString(window.getWidth())));
-			windowprops.addProperty(new Property("height", Integer
-					.toString(window.getHeight())));
-			windowprops.addProperty(new Property("x", Integer.toString(window
-					.getX())));
-			windowprops.addProperty(new Property("y", Integer.toString(window
-					.getY())));
-			windowprops.addProperty(new Property("extendedState", Integer
-					.toString(window.getExtendedState())));
-			windowprops.addProperty(new Property("console_on", Boolean
-					.toString(window.isConsoleEnabled())));
-			windowprops.addProperty(new Property("jccexit", jccexit != null
-					? jccexit : JCC_EXIT_ASK));
+			windowprops.addProperty(new Property("width", Integer.toString(window.getWidth())));
+			windowprops.addProperty(new Property("height", Integer.toString(window.getHeight())));
+			windowprops.addProperty(new Property("x", Integer.toString(window.getX())));
+			windowprops.addProperty(new Property("y", Integer.toString(window.getY())));
+			windowprops.addProperty(new Property("extendedState", Integer.toString(window.getExtendedState())));
+			windowprops.addProperty(new Property("console_on", Boolean.toString(window.isConsoleEnabled())));
+			windowprops.addProperty(new Property("jccexit", jccexit != null? jccexit : JCC_EXIT_ASK));
 			AbstractJCCPlugin.addSubproperties(props, "window", windowprops);
 
 			// Save the console heights.
@@ -470,7 +405,7 @@ public class ControlCenter implements IControlCenter
 				
 				// for testing the writer
 				FileOutputStream os = new FileOutputStream(project);
-				PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)agent.getPlatform()
+				PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)container
 					.getService(ILibraryService.class)).getClassLoader(), null);
 				os.close();
 				setStatusText("Project saved successfully: "+ project.getAbsolutePath());
@@ -679,191 +614,6 @@ public class ControlCenter implements IControlCenter
 	// -------- IControlCenter interface --------
 
 	/**
-	 * Listen for changes to the list of known agents.
-	 */
-	public void addAgentListListener(IAgentListListener listener)
-	{
-		agentlist.addListener(listener);
-	}
-
-	/**
-	 * Listen for incoming messages.
-	 */
-	public void addMessageListener(IMessageListener listener)
-	{
-		msglisteners.add(listener);
-	}
-
-	/**
-	 * Create a new agent on the platform. Any errors will be displayed in a
-	 * dialog to the user.
-	 */
-	public void createAgent(String type, String name, String configname,
-		Map arguments)//, final IResultListener listener)
-	{
-		try
-		{
-			final IGoal start = agent.createGoal("ams_create_agent");
-			start.getParameter("type").setValue(type);
-			start.getParameter("name").setValue(name);
-			// start.getParameter("classloader").setValue(classloader);
-			if(configname != null && configname.length() != 0)
-			{
-				start.getParameter("configuration").setValue(configname);
-			}
-			if(arguments != null)
-			{
-				start.getParameter("arguments").setValue(arguments);
-			}
-			start.addGoalListener(new IGoalListener()
-			{
-				public void goalAdded(AgentEvent ae)
-				{
-				}
-
-				public void goalFinished(AgentEvent ae)
-				{
-					if(start.isSucceeded())
-					{
-						IAgentIdentifier aid = (IAgentIdentifier)start
-							.getParameter("agentidentifier").getValue();
-						setStatusText("Started agent: " + aid.getLocalName());
-//						if(listener!=null)
-//							listener.resultAvailable(aid);
-					}
-//					else
-//					{
-//						if(listener!=null)
-//							listener.exceptionOccurred(new RuntimeException("Goal failed: "+ae));
-//					}
-				}
-			});
-
-			dispatchGoal(start, "Problem Starting Agent",
-				"Agent could not be started.");
-		}
-		catch(AgentTerminatedException ex)
-		{
-			// Thrown when killing myself -> ignore.
-		}
-	}
-
-	/**
-	 * Kill an agent on the platform. Any errors will be displayed in a dialog
-	 * to the user.
-	 */
-	public void killAgent(final IAgentIdentifier name)
-	{
-		try
-		{
-			final IGoal kill = agent.getGoalbase().createGoal(
-					"ams_destroy_agent");
-			kill.getParameter("agentidentifier").setValue(name);
-			kill.addGoalListener(new IGoalListener()
-			{
-				public void goalAdded(AgentEvent ae)
-				{
-				}
-
-				public void goalFinished(AgentEvent ae)
-				{
-					if(kill.isSucceeded())
-						setStatusText("Killed agent: " + name.getLocalName());
-				}
-			});
-			if(name.equals(agent.getAgentIdentifier()))
-			{
-				// Do not display error message when killing self.
-				agent.dispatchTopLevelGoal(kill);
-			}
-			else
-			{
-				dispatchGoal(kill, "Problem Killing Agent",
-						"Agent could not be killed.");
-			}
-		}
-		catch(AgentTerminatedException ex)
-		{
-			// Thrown when killing myself -> ignore.
-		}
-	}
-
-	/**
-	 * Suspend an agent on the platform. Any errors will be displayed in a
-	 * dialog to the user.
-	 */
-	public void suspendAgent(IAgentIdentifier name)
-	{
-		try
-		{
-			final IGoal suspend = agent.getGoalbase().createGoal(
-					"ams_suspend_agent");
-			suspend.getParameter("agentidentifier").setValue(name);
-			suspend.addGoalListener(new IGoalListener()
-			{
-				public void goalAdded(AgentEvent ae)
-				{
-				}
-
-				public void goalFinished(AgentEvent ae)
-				{
-					if(suspend.isSucceeded())
-						setStatusText("Suspended agent: "
-								+ agent.getAgentName());
-				}
-			});
-			dispatchGoal(suspend, "Problem Suspending Agent",
-					"Agent could not be suspended.");
-		}
-		catch(AgentTerminatedException ex)
-		{
-			// Thrown when killing myself -> ignore.
-		}
-	}
-
-	/**
-	 * Resume an agent on the platform. Any errors will be displayed in a dialog
-	 * to the user.
-	 */
-	public void resumeAgent(IAgentIdentifier name)
-	{
-		try
-		{
-			final IGoal resume = agent.getGoalbase().createGoal(
-					"ams_resume_agent");
-			resume.getParameter("agentidentifier").setValue(name);
-			resume.addGoalListener(new IGoalListener()
-			{
-				public void goalAdded(AgentEvent ae)
-				{
-				}
-
-				public void goalFinished(AgentEvent ae)
-				{
-					if(resume.isSucceeded())
-						setStatusText("Resumed agent: " + agent.getAgentName());
-				}
-			});
-			dispatchGoal(resume, "Problem Resuming Agent",
-					"Agent could not be resumed.");
-		}
-		catch(AgentTerminatedException ex)
-		{
-			// Thrown when killing myself -> ignore.
-		}
-	}
-
-	/**
-	 * Get the external access interface.
-	 * 
-	 * @return the external agent access.
-	 */
-	public IExternalAccess getAgent()
-	{
-		return agent;
-	}
-
-	/**
 	 * Set a text to be displayed in the status bar. The text will be removed
 	 * automatically after some delay (or replaced by some other text).
 	 */
@@ -953,79 +703,6 @@ public class ControlCenter implements IControlCenter
 		return window.isConsoleEnabled();
 	}
 
-	// -------- helper methods --------
-
-	/**
-	 * Dispatch a goal and display errors (if any).
-	 * 
-	 * @param goal The goal to dispatch.
-	 * @param errortitle The title to use for an error dialog.
-	 * @param errormessage An optional error message displayed before the
-	 *        exception.
-	 */
-	protected void dispatchGoal(IGoal goal, final String errortitle,
-			final String errormessage)
-	{
-		// System.out.println("dG: "+goal);
-		goal.addGoalListener(new IGoalListener()
-		{
-			public void goalFinished(AgentEvent ae)
-			{
-				// Is called on agent thread!
-				IGoal goal = (IGoal)ae.getSource();
-				if(!goal.isSucceeded())
-				{
-					final String text;
-					String exmsg = goal.getException() == null ? null : goal
-							.getException().getMessage();
-					if(errormessage == null && exmsg == null)
-					{
-						text = errortitle;
-					}
-					else if(errormessage != null && exmsg == null)
-					{
-						text = errormessage;
-					}
-					else if(errormessage == null && exmsg != null)
-					{
-						text = "" + exmsg;
-					}
-					else
-					// if(errormessage!=null && exmsg!=null)
-					{
-						text = errormessage + "\n" + exmsg;
-					}
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
-							JOptionPane.showMessageDialog(window, SUtil.wrapText(text), errortitle,
-								JOptionPane.ERROR_MESSAGE);
-						}
-					});
-				}
-				goal.removeGoalListener(this);
-			}
-
-			public void goalAdded(AgentEvent ae)
-			{
-			}
-		});
-		agent.dispatchTopLevelGoal(goal);
-	}
-
-	/**
-	 * Process a received message. Called by MailPlan.
-	 */
-	protected void processMessage(IMessageEvent me)
-	{
-		for(int i = 0; i < msglisteners.size(); i++)
-		{
-			IMessageListener msgl = (IMessageListener)msglisteners.get(i);
-			if(msgl.processMessage(me))
-				break;
-		}
-	}
 
 	/**
 	 * Set the title of the window.
@@ -1100,18 +777,9 @@ public class ControlCenter implements IControlCenter
 			closeProject();
 			closePlugins();
 			killed = true;
-			try
-			{
-				agent.dispatchTopLevelGoal(agent
-						.createGoal("ams_shutdown_platform"));
-			}
-			catch(GoalFailureException ex)
-			{
-				String text = SUtil.wrapText("Could not kill platform: "
-						+ ex.getMessage());
-				JOptionPane.showMessageDialog(window, text,
-						"Platform Shutdown Problem", JOptionPane.ERROR_MESSAGE);
-			}
+			
+			container.shutdown(null);
+			
 		}
 		else if(JOptionPane.NO_OPTION == choice)
 		{
@@ -1122,7 +790,8 @@ public class ControlCenter implements IControlCenter
 			closeProject();
 			closePlugins();
 			killed = true;
-			agent.killAgent();
+			
+			container.shutdown(null);
 		}
 		// else CANCEL
 
@@ -1130,7 +799,7 @@ public class ControlCenter implements IControlCenter
 	}
 
 	/**
-	 * Get the JCC window.
+	 * Get the window.
 	 */
 	public JFrame getWindow()
 	{
@@ -1153,5 +822,14 @@ public class ControlCenter implements IControlCenter
 	{
 		return (IControlCenterPlugin[])plugins.keySet().toArray(
 			new IControlCenterPlugin[plugins.size()]);
+	}
+	
+	/**
+	 *  Get the service container.
+	 *  @return The service container.
+	 */
+	public IServiceContainer getServiceContainer()
+	{
+		return container;
 	}
 }

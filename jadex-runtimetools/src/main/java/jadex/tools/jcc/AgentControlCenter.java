@@ -1,0 +1,65 @@
+package jadex.tools.jcc;
+
+import jadex.bdi.runtime.AgentEvent;
+import jadex.bdi.runtime.IAgentListener;
+import jadex.bdi.runtime.IExternalAccess;
+import jadex.service.IServiceContainer;
+
+import javax.swing.SwingUtilities;
+
+/**
+ * The Jadex control center.
+ */
+public class AgentControlCenter extends ControlCenter
+{
+	//-------- attributes --------
+	
+	/** The external access. */
+	protected IExternalAccess agent;
+
+	//-------- constructors --------
+
+	/**
+	 * Create a control center.
+	 */
+	public AgentControlCenter(IServiceContainer container, String plugins_prop, final IExternalAccess agent)
+	{
+		super(container, plugins_prop);
+		
+		this.agent = agent;
+
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				agent.addAgentListener(new IAgentListener()
+				{
+					public void agentTerminating(AgentEvent ae)
+					{
+						if(!killed)
+						{
+							closeProject();
+							closePlugins();
+							killed = true;
+						}
+						window.setVisible(false);
+						window.dispose();
+					}
+
+					public void agentTerminated(AgentEvent ae)
+					{
+					}
+				});
+			}
+		});
+	}
+
+	/**
+	 *  Get the agent.
+	 *  @return The agent.
+	 */
+	public IExternalAccess getAgent()
+	{
+		return this.agent;
+	}
+}

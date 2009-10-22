@@ -2,8 +2,11 @@ package jadex.tools.convcenter;
 
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
+import jadex.adapter.base.fipa.IAMSListener;
 import jadex.adapter.base.fipa.SFipa;
+import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.IParameterSet;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.Properties;
@@ -14,6 +17,7 @@ import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.common.plugin.IAgentListListener;
 import jadex.tools.common.plugin.IMessageListener;
+import jadex.tools.jcc.AgentControlCenter;
 import jadex.tools.starter.StarterPlugin;
 
 import java.awt.Dimension;
@@ -87,7 +91,7 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable().getTree().getSelectionPath().getLastPathComponent();
 			IAMSAgentDescription desc = (IAMSAgentDescription)node.getUserObject();
 			// Use clone, as added agent id might be modified by user.
-			IAMS	ams	= (IAMS)getJCC().getAgent().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+			IAMS	ams	= (IAMS)jcc.getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE);
 			IAgentIdentifier	receiver	= desc.getName();
 			receiver	= ams.createAgentIdentifier(receiver.getName(), false, receiver.getAddresses());
 			IMessageEvent	message	= convcenter.getMessagePanel().getMessage();
@@ -113,13 +117,13 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		agents = new AgentTreeTable(getJCC().getAgent().getPlatform().getName());
+		agents = new AgentTreeTable(((AgentControlCenter)getJCC()).getAgent().getPlatform().getName());
 		agents.setMinimumSize(new Dimension(0, 0));
 		split.add(agents);
 		agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		agents.getNodeType(AgentTreeTable.NODE_AGENT).addPopupAction(SEND_MESSAGE);
 
-		split.add(convcenter = new FipaConversationPanel(getJCC().getAgent(), null));
+		split.add(convcenter = new FipaConversationPanel(((AgentControlCenter)getJCC()).getAgent(), null));
 
 		GuiProperties.setupHelp(split, "tools.conversationcenter");
 
@@ -141,7 +145,22 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 			}
 		});
 
-		jcc.addAgentListListener(this);
+//		jcc.addAgentListListener(this);
+		
+		IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
+		ams.addAMSListener(new IAMSListener()
+		{
+			public void agentRemoved(IAMSAgentDescription desc)
+			{
+				agentDied(desc);
+			}
+			
+			public void agentAdded(IAMSAgentDescription desc)
+			{
+				agentAdded(desc);
+			}
+		});
+		
 //		SwingUtilities.invokeLater(new Runnable()
 //		{
 //			public void run()
@@ -149,7 +168,23 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 //				agents.adjustColumnWidths();
 //			}
 //		});
-		jcc.addMessageListener(this);
+		
+//		jcc.addMessageListener(this);
+		
+		IMessageEventListener lis = new IMessageEventListener()
+		{
+			public void messageEventSent(AgentEvent ae)
+			{
+			}
+			
+			public void messageEventReceived(AgentEvent ae)
+			{
+				processMessage((IMessageEvent)ae.getValue());
+			}
+		};
+		
+		((AgentControlCenter)jcc).getAgent().getEventbase().addMessageEventListener("fipamsg", lis);
+		((AgentControlCenter)jcc).getAgent().getEventbase().addMessageEventListener("agent_inform", lis);
 
 		return split;
 	}

@@ -110,13 +110,13 @@
 			</waitqueue> -->
 		</plan>
 
-		<plan name="receiver">
+		<!-- <plan name="receiver">
 			<body class="MailPlan" />
 			<trigger>
 				<messageevent ref="fipamsg" />
 				<messageevent ref="agent_inform"/>
 			</trigger>
-		</plan>
+		</plan> -->
 	</plans>
 
 	<events>

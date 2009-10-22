@@ -178,16 +178,16 @@ public class	DefaultNodeFunctionality
 				
 //				IAgentFactory agfac = jcc.getAgent().getPlatform().getAgentFactory();
 //				String	type = agfac.getFileType(fn.getFile().getAbsolutePath());
-				String type = MetaAgentFactory.getFileType(jcc.getAgent().getPlatform(), fn.getFile().getAbsolutePath());
+				String type = MetaAgentFactory.getFileType(jcc.getServiceContainer(), fn.getFile().getAbsolutePath());
 				if(type!=null)
-					icon = MetaAgentFactory.getFileTypeIcon(jcc.getAgent().getPlatform(), type);
+					icon = MetaAgentFactory.getFileTypeIcon(jcc.getServiceContainer(), type);
 				
 				if(icon==null)
 				{
 //					IApplicationFactory apfac = jcc.getAgent().getPlatform().getApplicationFactory();
-					type = MetaAgentFactory.getFileType(jcc.getAgent().getPlatform(), fn.getFile().getAbsolutePath());
+					type = MetaAgentFactory.getFileType(jcc.getServiceContainer(), fn.getFile().getAbsolutePath());
 					if(type!=null)
-						icon = MetaAgentFactory.getFileTypeIcon(jcc.getAgent().getPlatform(), type);
+						icon = MetaAgentFactory.getFileTypeIcon(jcc.getServiceContainer(), type);
 				}
 			}
 		}

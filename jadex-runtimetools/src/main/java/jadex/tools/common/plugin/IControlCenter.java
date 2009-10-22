@@ -1,10 +1,6 @@
 package jadex.tools.common.plugin;
 
-import jadex.bdi.runtime.IExternalAccess;
-import jadex.bridge.IAgentIdentifier;
-import jadex.commons.concurrent.IResultListener;
-
-import java.util.Map;
+import jadex.service.IServiceContainer;
 
 import javax.swing.JComponent;
 
@@ -15,44 +11,50 @@ import javax.swing.JComponent;
 public interface IControlCenter
 {
 	/**
-	 *  Get the external access interface.
-	 *  @return the external agent access.
+	 *  Get the service container.
+	 *  @return The service container.
 	 */
-	public IExternalAccess getAgent();
-
-	/**
-	 *  Listen for changes to the list of known agents.
-	 */
-	public void addAgentListListener(IAgentListListener listener);
-
-	/**
-	 *  Listen for incoming messages.
-	 */
-	public void addMessageListener(IMessageListener listener);
-
-	/**
-	 *  Create a new agent on the platform.
-	 *  Any errors will be displayed in a dialog to the user.
-	 */
-	public void createAgent(String type, String name, String configname, Map arguments);
-
-	/**
-	 *  Kill an agent on the platform.
-	 *  Any errors will be displayed in a dialog to the user.
-	 */
-	public void killAgent(IAgentIdentifier name);
+	public IServiceContainer getServiceContainer();
 	
-	/**
-	 *  Suspend an agent on the platform.
-	 *  Any errors will be displayed in a dialog to the user.
-	 */
-	public void suspendAgent(IAgentIdentifier name);
-	
-	/**
-	 *  Resume an agent on the platform.
-	 *  Any errors will be displayed in a dialog to the user.
-	 */
-	public void resumeAgent(IAgentIdentifier name);
+//	/**
+//	 *  Get the external access interface.
+//	 *  @return the external agent access.
+//	 */
+//	public IExternalAccess getAgent();
+//
+//	/**
+//	 *  Listen for changes to the list of known agents.
+//	 */
+//	public void addAgentListListener(IAgentListListener listener);
+//
+//	/**
+//	 *  Listen for incoming messages.
+//	 */
+//	public void addMessageListener(IMessageListener listener);
+//
+//	/**
+//	 *  Create a new agent on the platform.
+//	 *  Any errors will be displayed in a dialog to the user.
+//	 */
+//	public void createAgent(String type, String name, String configname, Map arguments);
+//
+//	/**
+//	 *  Kill an agent on the platform.
+//	 *  Any errors will be displayed in a dialog to the user.
+//	 */
+//	public void killAgent(IAgentIdentifier name);
+//	
+//	/**
+//	 *  Suspend an agent on the platform.
+//	 *  Any errors will be displayed in a dialog to the user.
+//	 */
+//	public void suspendAgent(IAgentIdentifier name);
+//	
+//	/**
+//	 *  Resume an agent on the platform.
+//	 *  Any errors will be displayed in a dialog to the user.
+//	 */
+//	public void resumeAgent(IAgentIdentifier name);
 	
 	/**
 	 *  Set a text to be displayed in the status bar.
