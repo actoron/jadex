@@ -4,11 +4,6 @@ import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IAMSListener;
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IGoalListener;
-import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContext;
@@ -404,6 +399,19 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		// todo: ?! is this ok?
 		
 		IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
+		ams.getAgentDescriptions(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				IAMSAgentDescription[] res = (IAMSAgentDescription[])result;
+				for(int i=0; i<res.length; i++)
+					agentBorn(res[i]);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		});
 		ams.addAMSListener(new IAMSListener()
 		{
 			public void agentRemoved(IAMSAgentDescription desc)

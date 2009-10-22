@@ -11,6 +11,7 @@ import jadex.bdi.runtime.IParameterSet;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.IResultListener;
 import jadex.tools.common.AgentTreeTable;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
@@ -145,9 +146,20 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 			}
 		});
 
-//		jcc.addAgentListListener(this);
-		
 		IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
+		ams.getAgentDescriptions(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				IAMSAgentDescription[] res = (IAMSAgentDescription[])result;
+				for(int i=0; i<res.length; i++)
+					agentBorn(res[i]);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		});
 		ams.addAMSListener(new IAMSListener()
 		{
 			public void agentRemoved(IAMSAgentDescription desc)
@@ -157,7 +169,7 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 			
 			public void agentAdded(IAMSAgentDescription desc)
 			{
-				agentAdded(desc);
+				agentBorn(desc);
 			}
 		});
 		

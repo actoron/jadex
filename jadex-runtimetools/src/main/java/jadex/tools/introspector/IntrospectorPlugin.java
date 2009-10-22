@@ -6,6 +6,7 @@ import jadex.adapter.base.fipa.IAMSListener;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.IResultListener;
 import jadex.rules.tools.stateviewer.OAVTreeModel;
 import jadex.tools.common.AgentTreeTable;
 import jadex.tools.common.GuiProperties;
@@ -350,9 +351,20 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 
 //		jcc.addAgentListListener(this);
 		
-		// todo: ?! is this ok?
-		
 		IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
+		ams.getAgentDescriptions(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				IAMSAgentDescription[] res = (IAMSAgentDescription[])result;
+				for(int i=0; i<res.length; i++)
+					agentBorn(res[i]);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		});
 		ams.addAMSListener(new IAMSListener()
 		{
 			public void agentRemoved(IAMSAgentDescription desc)
@@ -362,7 +374,7 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 			
 			public void agentAdded(IAMSAgentDescription desc)
 			{
-				agentAdded(desc);
+				agentBorn(desc);
 			}
 		});
 		

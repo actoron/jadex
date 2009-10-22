@@ -461,9 +461,20 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 
 //		jcc.addAgentListListener(this);
 		
-		// todo: ?! is this ok?
-		
 		IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
+		ams.getAgentDescriptions(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				IAMSAgentDescription[] res = (IAMSAgentDescription[])result;
+				for(int i=0; i<res.length; i++)
+					agentBorn(res[i]);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+			}
+		});
 		ams.addAMSListener(new IAMSListener()
 		{
 			public void agentRemoved(IAMSAgentDescription desc)
