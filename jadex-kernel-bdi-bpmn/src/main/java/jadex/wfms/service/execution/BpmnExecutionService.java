@@ -4,25 +4,43 @@ import jadex.bpmn.BpmnExecutor;
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bridge.ILoadableElementModel;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
+import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
+import jadex.microkernel.MicroAgentFactory;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
 import jadex.wfms.IProcessModel;
 import jadex.wfms.IWfms;
-import jadex.wfms.client.IClient;
 import jadex.wfms.service.repository.IModelRepositoryService;
 
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.Icon;
+import javax.swing.UIDefaults;
+
 /**
  * 
  */
 public class BpmnExecutionService implements IExecutionService
 {
+	//-------- constants --------
+	
+	/** The micro agent file type. */
+	public static final String	FILETYPE_BPMNPROCESS = "BPMN Process";
+	
+	/**
+	 * The image icons.
+	 */
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
+	{
+		"bpmn_process",	SGUI.makeIcon(MicroAgentFactory.class, "/jadex/microkernel/images/micro_agent.png"),
+	});
+	
 	//-------- attributes --------
 	
 	/** The WFMS */
@@ -83,13 +101,13 @@ public class BpmnExecutionService implements IExecutionService
 	 *  @param filename The file name.
 	 *  @return The process model.
 	 */
-	public IProcessModel loadModel(String filename, String[] imports)
+	public ILoadableElementModel loadModel(String filename)
 	{
 		IProcessModel ret = null;
 		
 		try
 		{
-			ret = loader.loadBpmnModel(filename, imports);
+			ret = loader.loadBpmnModel(filename, null);
 		}
 		catch(Exception e)
 		{
@@ -149,5 +167,39 @@ public class BpmnExecutionService implements IExecutionService
 	public boolean isLoadable(String modelname)
 	{
 		return modelname.endsWith(".bpmn");
+	}
+
+	/**
+	 *  Test if a model is startable (e.g. an agent).
+	 *  @param model The model.
+	 *  @return True, if startable (and loadable).
+	 */
+	public boolean isStartable(String model)
+	{
+		return true;
+	}
+	
+	/**
+	 *  Get the names of ADF file types supported by this factory.
+	 */
+	public String[] getFileTypes()
+	{
+		return new String[]{FILETYPE_BPMNPROCESS};
+	}
+
+	/**
+	 *  Get a default icon for a file type.
+	 */
+	public Icon getFileTypeIcon(String type)
+	{
+		return type.equals(FILETYPE_BPMNPROCESS) ? icons.getIcon("micro_agent") : null;
+	}
+
+	/**
+	 *  Get the file type of a model.
+	 */
+	public String getFileType(String model)
+	{
+		return model.toLowerCase().endsWith("agent.class") ? FILETYPE_BPMNPROCESS: null;
 	}
 }

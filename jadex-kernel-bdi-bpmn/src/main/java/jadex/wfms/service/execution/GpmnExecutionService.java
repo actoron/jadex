@@ -5,12 +5,15 @@ import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IAMSListener;
 import jadex.adapter.standalone.Platform;
 import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IPlatform;
 import jadex.commons.Properties;
+import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.gpmn.GpmnXMLReader;
 import jadex.gpmn.model.MGpmnModel;
+import jadex.microkernel.MicroAgentFactory;
 import jadex.service.PropertiesXMLHelper;
 import jadex.service.library.ILibraryService;
 import jadex.wfms.IProcessModel;
@@ -21,11 +24,27 @@ import jadex.wfms.service.repository.IModelRepositoryService;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.Icon;
+import javax.swing.UIDefaults;
+
 /**
  * 
  */
 public class GpmnExecutionService implements IExecutionService
 {
+	//-------- constants --------
+	
+	/** The gpmn process file type. */
+	public static final String	FILETYPE_GPMNPROCESS = "GPMN Process";
+	
+	/**
+	 * The image icons.
+	 */
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
+	{
+		"gpmn_process",	SGUI.makeIcon(MicroAgentFactory.class, "/jadex/microkernel/images/micro_agent.png"),
+	});
+	
 	//-------- attributes --------
 	
 	/** The WFMS */
@@ -119,7 +138,7 @@ public class GpmnExecutionService implements IExecutionService
 	 *  @param filename The file name.
 	 *  @return The process model.
 	 */
-	public IProcessModel loadModel(String filename, String[] imports)
+	public ILoadableElementModel loadModel(String filename)
 	{
 		IProcessModel ret = null;
 		try
@@ -169,5 +188,39 @@ public class GpmnExecutionService implements IExecutionService
 	public boolean isLoadable(String modelname)
 	{
 		return modelname.endsWith(".gpmn");
+	}
+	
+	/**
+	 *  Test if a model is startable (e.g. an agent).
+	 *  @param model The model.
+	 *  @return True, if startable (and loadable).
+	 */
+	public boolean isStartable(String model)
+	{
+		return true;
+	}
+	
+	/**
+	 *  Get the names of ADF file types supported by this factory.
+	 */
+	public String[] getFileTypes()
+	{
+		return new String[]{FILETYPE_GPMNPROCESS};
+	}
+
+	/**
+	 *  Get a default icon for a file type.
+	 */
+	public Icon getFileTypeIcon(String type)
+	{
+		return type.equals(FILETYPE_GPMNPROCESS) ? icons.getIcon("micro_agent") : null;
+	}
+
+	/**
+	 *  Get the file type of a model.
+	 */
+	public String getFileType(String model)
+	{
+		return model.toLowerCase().endsWith("agent.class") ? FILETYPE_GPMNPROCESS: null;
 	}
 }

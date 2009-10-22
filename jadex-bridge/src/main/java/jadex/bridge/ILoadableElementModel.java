@@ -51,7 +51,7 @@ public interface ILoadableElementModel
 	 *  Get the model type.
 	 *  @return The model type (kernel specific).
 	 */
-	public String getType();
+//	public String getType();
 	
 	/**
 	 *  Get the filename.

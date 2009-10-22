@@ -1,14 +1,14 @@
 package jadex.wfms.service.execution;
 
+import jadex.bridge.IElementFactory;
 import jadex.service.IService;
-import jadex.wfms.IProcessModel;
 
 import java.util.Map;
 
 /**
  * 
  */
-public interface IExecutionService extends IService
+public interface IExecutionService extends IService, IElementFactory
 {
 	/**
 	 *  Load a process model.
@@ -16,7 +16,7 @@ public interface IExecutionService extends IService
 	 *  @param imports The imports.
 	 *  @return The process model.
 	 */
-	public IProcessModel loadModel(String filename, String[] imports);
+//	public IProcessModel loadModel(String filename, String[] imports);
 	
 	/**
 	 *  Create a new process.
@@ -38,5 +38,5 @@ public interface IExecutionService extends IService
 	 *  @param modelname The model name.
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String modelname);
+//	public boolean isLoadable(String modelname);
 }

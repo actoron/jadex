@@ -1,7 +1,10 @@
 package jadex.bpmn.model;
 
+import jadex.bridge.IArgument;
+import jadex.bridge.IReport;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.javaparser.IParsedExpression;
 import jadex.wfms.IProcessModel;
 
@@ -74,6 +77,9 @@ public class MBpmnModel extends MIdElement implements ICacheableModel, IProcessM
 	
 	/** The name of the model. */
 	protected String name;
+	
+	/** The description. */
+	protected String description;
 	
 	//-------- init structures --------
 	
@@ -759,5 +765,86 @@ public class MBpmnModel extends MIdElement implements ICacheableModel, IProcessM
 	public void setLastChecked(long lastchecked)
 	{
 		this.lastchecked = lastchecked;
+	}
+	
+	/**
+	 *  Get the configurations.
+	 *  @return The configuration.
+	 */
+	public String[] getConfigurations()
+	{
+		// todo: implement me
+		
+		String[] ret = SUtil.EMPTY_STRING;
+		return ret;
+	}
+	
+	/**
+	 *  Is the model startable.
+	 *  @return True, if startable.
+	 */
+	public boolean isStartable()
+	{
+		return true;
+	}
+	
+	/**
+	 *  Set the description.
+	 *  @param description The description to set.
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+	
+	/**
+	 *  Get the model description.
+	 *  @return The model description.
+	 */
+	public String getDescription()
+	{
+		// todo: implement me
+		// use description from artifact, or from property field of special editor
+		
+		return description;
+	}
+	
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public IArgument[] getArguments()
+	{		
+		// todo: 
+		
+		IArgument[] ret = new IArgument[0];
+		return ret;
+	}
+	
+	/**
+	 *  Get the report.
+	 *  @return The report.
+	 */
+	public IReport getReport()
+	{
+		// todo: 
+		
+		return new IReport()
+		{
+			public Map getDocuments()
+			{
+				return null;
+			}
+			
+			public boolean isEmpty()
+			{
+				return true;
+			}
+			
+			public String toHTMLString()
+			{
+				return "";
+			}
+		};
 	}
 }

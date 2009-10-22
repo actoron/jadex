@@ -189,12 +189,12 @@ public class ApplicationModel implements ILoadableElementModel
 	/**
 	 *  Get the model type.
 	 *  @return The model type (kernel specific).
-	 */
+	 * /
 	public String getType()
 	{
 		// todo:
 		return "application";
-	}
+	}*/
 	
 	/**
 	 *  Get the filename.

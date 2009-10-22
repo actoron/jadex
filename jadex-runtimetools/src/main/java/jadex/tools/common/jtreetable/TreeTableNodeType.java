@@ -113,7 +113,7 @@ public class TreeTableNodeType
 	 */
 	public Icon	getIcon(Object value)
 	{
-		return selectIcon(value)==null
+		return selectIcon(value)==null && supertype!=null
 			? supertype.selectIcon(value)
 			: selectIcon(value);
 	}

@@ -1,7 +1,10 @@
 package jadex.gpmn.model;
 
+import jadex.bridge.IArgument;
+import jadex.bridge.IReport;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.wfms.IProcessModel;
 
 import java.util.ArrayList;
@@ -298,6 +301,66 @@ public class MGpmnModel extends MProcess implements ICacheableModel, IProcessMod
 		sbuf.append(getName());
 		sbuf.append(")");
 		return sbuf.toString();
+	}
+	
+	/**
+	 *  Get the configurations.
+	 *  @return The configuration.
+	 */
+	public String[] getConfigurations()
+	{
+		// todo: implement me
+		
+		String[] ret = SUtil.EMPTY_STRING;
+		return ret;
+	}
+	
+	/**
+	 *  Is the model startable.
+	 *  @return True, if startable.
+	 */
+	public boolean isStartable()
+	{
+		return true;
+	}
+	
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public IArgument[] getArguments()
+	{		
+		// todo: 
+		
+		IArgument[] ret = new IArgument[0];
+		return ret;
+	}
+	
+	/**
+	 *  Get the report.
+	 *  @return The report.
+	 */
+	public IReport getReport()
+	{
+		// todo: 
+		
+		return new IReport()
+		{
+			public Map getDocuments()
+			{
+				return null;
+			}
+			
+			public boolean isEmpty()
+			{
+				return true;
+			}
+			
+			public String toHTMLString()
+			{
+				return "";
+			}
+		};
 	}
 	
 }

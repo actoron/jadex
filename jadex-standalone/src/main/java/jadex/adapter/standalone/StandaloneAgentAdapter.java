@@ -73,19 +73,24 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	 */
 	public void wakeup()
 	{
-		// Verify that the  agent is running.
-		assert !IAMSAgentDescription.STATE_INITIATED.equals(state) : this;
+		// todo: check this assert meaning!
+		
+		// Verify that the agent is running.
+//		assert !IAMSAgentDescription.STATE_INITIATED.equals(state) : this;
 		
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
 			throw new AgentTerminatedException(aid.getName());
 		
-		// Resume execution of the agent (when active).
-		//System.out.println("wakeup called: "+state);
-		//if(AMSAgentDescription.STATE_ACTIVE.equals(state)
-		//	|| AMSAgentDescription.STATE_TERMINATING.equals(state))
+		if(IAMSAgentDescription.STATE_ACTIVE.equals(state))
 		{
-//			platform.getExecutorService().execute(this);
-			((IExecutionService)platform.getService(IExecutionService.class)).execute(this);
+			// Resume execution of the agent (when active).
+			//System.out.println("wakeup called: "+state);
+			//if(AMSAgentDescription.STATE_ACTIVE.equals(state)
+			//	|| AMSAgentDescription.STATE_TERMINATING.equals(state))
+			{
+	//			platform.getExecutorService().execute(this);
+				((IExecutionService)platform.getService(IExecutionService.class)).execute(this);
+			}
 		}
 	}
 

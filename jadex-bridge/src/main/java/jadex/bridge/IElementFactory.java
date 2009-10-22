@@ -10,7 +10,7 @@ import javax.swing.Icon;
 public interface IElementFactory extends IService
 {
 	/**
-	 *  Load an agent model.
+	 *  Load a  model.
 	 *  @param model The model.
 	 *  @return The loaded model.
 	 */

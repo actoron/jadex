@@ -1,27 +1,17 @@
 package jadex.wfms;
 
+import jadex.bridge.ILoadableElementModel;
+
 /**
  *  Interface for process models.
  */
-public interface IProcessModel
+public interface IProcessModel extends ILoadableElementModel
 {
-	/**
-	 *  Get the process model name.
-	 *  @return The process model name.
-	 */
-	public String getName();
-
 	/**
 	 *  Get the package name.
 	 *  @return The package name.
 	 */
 	public String getPackage();
-	
-	/**
-	 *  Get the filename.
-	 *  @return The filename.
-	 */
-	public String getFilename();
 	
 	/**
 	 *  Get the lastmodified date.

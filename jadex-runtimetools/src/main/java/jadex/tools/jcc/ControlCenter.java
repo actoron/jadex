@@ -215,7 +215,7 @@ public class ControlCenter implements IControlCenter
 	/**
 	 * Close the current project.
 	 */
-	protected void closeProject()
+	public void closeProject()
 	{
 		// Unconditionally save project (saves platform settings even when no
 		// project is open).
@@ -231,7 +231,7 @@ public class ControlCenter implements IControlCenter
 	 * 
 	 * @param file The project file or null for no project.
 	 */
-	protected void setCurrentProject(File file)
+	public void setCurrentProject(File file)
 	{
 		this.project = file;
 		if(file != null)
@@ -251,7 +251,7 @@ public class ControlCenter implements IControlCenter
 	/**
 	 * Open a given project.
 	 */
-	protected void openProject(File pd) throws Exception
+	public void openProject(File pd) throws Exception
 	{
 		// Read project properties
 		try
@@ -348,7 +348,7 @@ public class ControlCenter implements IControlCenter
 	/**
 	 * Save settings of JCC and all plugins in current project.
 	 */
-	protected void saveProject()
+	public void saveProject()
 	{
 		if(project != null)
 		{
@@ -560,7 +560,7 @@ public class ControlCenter implements IControlCenter
 	/**
 	 * Activate a plugin.
 	 */
-	protected void activatePlugin(IControlCenterPlugin plugin)
+	public void activatePlugin(IControlCenterPlugin plugin)
 	{
 		window.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
@@ -719,7 +719,7 @@ public class ControlCenter implements IControlCenter
 	 * Informs the window if it should dispose its resources.
 	 * @return true if the agent has been killed.
 	 */
-	protected boolean exit()
+	public boolean exit()
 	{
 		// Called on swing thread, hence invoke synchronized for JOptionPanel not necessary.
 		if(killed)
@@ -809,7 +809,7 @@ public class ControlCenter implements IControlCenter
 	/**
 	 * Check if a project is active.
 	 */
-	protected boolean hasProject()
+	public boolean hasProject()
 	{
 		return project != null;
 	}

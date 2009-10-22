@@ -43,12 +43,12 @@ public class OAVAgentModel	extends OAVCapabilityModel
 	/**
 	 *  Get the model type.
 	 *  @reeturn The model type (kernel specific).
-	 */
+	 * /
 	public String getType()
 	{
 		// todo: 
 		return "v2bdiagent";
-	}
+	}*/
 
 
 	/**
