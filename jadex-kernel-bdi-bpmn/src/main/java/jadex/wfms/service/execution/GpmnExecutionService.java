@@ -1,4 +1,4 @@
-package jadex.wfms.service.impl;
+package jadex.wfms.service.execution;
 
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
@@ -16,8 +16,7 @@ import jadex.service.library.ILibraryService;
 import jadex.wfms.IProcessModel;
 import jadex.wfms.IWfms;
 import jadex.wfms.client.IClient;
-import jadex.wfms.service.IExecutionService;
-import jadex.wfms.service.IModelRepositoryService;
+import jadex.wfms.service.repository.IModelRepositoryService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +24,7 @@ import java.util.Map;
 /**
  * 
  */
-public class GpmnProcessService implements IExecutionService
+public class GpmnExecutionService implements IExecutionService
 {
 	//-------- attributes --------
 	
@@ -43,7 +42,7 @@ public class GpmnProcessService implements IExecutionService
 	/**
 	 *  Create a new GpmnProcessService.
 	 */
-	public GpmnProcessService(IWfms wfms)
+	public GpmnExecutionService(IWfms wfms)
 	{
 		this.wfms = wfms;
 		this.processes = new HashMap();
@@ -95,7 +94,7 @@ public class GpmnProcessService implements IExecutionService
 			
 			public void agentRemoved(IAMSAgentDescription desc)
 			{
-				synchronized(GpmnProcessService.this)
+				synchronized(GpmnExecutionService.this)
 				{
 					processes.remove(desc.getName().getLocalName());
 				}

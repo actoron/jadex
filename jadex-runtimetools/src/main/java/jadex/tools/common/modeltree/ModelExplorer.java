@@ -1,5 +1,7 @@
 package jadex.tools.common.modeltree;
 
+import jadex.adapter.base.MetaAgentFactory;
+import jadex.bridge.IElementFactory;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -8,12 +10,12 @@ import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.LoadManagingExecutionService;
+import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
 import jadex.service.threadpool.ThreadPoolService;
 import jadex.tools.common.PopupBuilder;
 import jadex.tools.common.ToolTipAction;
-import jadex.tools.common.plugin.IControlCenter;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,7 +27,9 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -75,8 +79,8 @@ public class ModelExplorer extends JTree
 
 	//-------- attributes --------
 
-	/** The JCC. */
-	protected IControlCenter jcc;
+	/** The service container. */
+	protected IServiceContainer container;
 
 	/** The root node. */
 	protected RootNode root;
@@ -119,10 +123,10 @@ public class ModelExplorer extends JTree
 	/**
 	 *  Create a new ModelExplorer.
 	 */
-	public ModelExplorer(IControlCenter jcc, DefaultNodeFunctionality nof)
+	public ModelExplorer(IServiceContainer container, DefaultNodeFunctionality nof)
 	{
 		super(new ModelExplorerTreeModel(new RootNode(), nof));
-		this.jcc = jcc;
+		this.container = container;
 		this.nof = nof;
 		nof.setModelExplorer(this);
 		this.root = (RootNode)getModel().getRoot();
@@ -131,7 +135,7 @@ public class ModelExplorer extends JTree
 		this.pubuilder = pubuilder!=null? pubuilder: new PopupBuilder(
 			new Action[]{ADD_PATH, REMOVE_PATH, REFRESH});
 		this.worker	= new LoadManagingExecutionService(
-			((IThreadPool)jcc.getAgent().getPlatform().getService(ThreadPoolService.class)));
+			((IThreadPool)container.getService(ThreadPoolService.class)));
 		
 		setCellRenderer(new ModelTreeCellRenderer(nof));
 		setRowHeight(16);
@@ -235,7 +239,7 @@ public class ModelExplorer extends JTree
 		});
 		ToolTipManager.sharedInstance().registerComponent(this);
 		
-		final ILibraryService ls = (ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class);
+		final ILibraryService ls = (ILibraryService)container.getService(ILibraryService.class);
 		ls.addLibraryServiceListener(new ILibraryServiceListener()
 		{
 			public void urlAdded(URL url)
@@ -335,7 +339,7 @@ public class ModelExplorer extends JTree
 				}
 			}
 		}
-		ClassLoader cl = ((ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class)).getClassLoader();
+		ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
 		String	treesave	= Nuggets.objectToXML(mep, cl);
 		props.addProperty(new Property("tree", treesave));
 				
@@ -377,7 +381,7 @@ public class ModelExplorer extends JTree
 		{
 			try
 			{
-				ClassLoader cl = ((ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class)).getClassLoader();
+				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
 				ModelExplorerProperties	mep	= (ModelExplorerProperties)Nuggets.objectFromXML(treexml, cl); 
 				this.root	= mep.root;
 				((ModelExplorerTreeModel)getModel()).setRoot(this.root);
@@ -418,7 +422,7 @@ public class ModelExplorer extends JTree
 	//			}
 //				try
 				{
-					ILibraryService ls = (ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class);
+					ILibraryService ls = (ILibraryService)container.getService(ILibraryService.class);
 //					ls.addPath(file.getAbsolutePath());
 					try
 					{
@@ -506,7 +510,7 @@ public class ModelExplorer extends JTree
 		Object[] cs = getRootNode().getChildCount()>0 ? getRootNode().getChildren().toArray() : null;
 		if(cs!=null)
 		{
-			ILibraryService ls = (ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class);
+			ILibraryService ls = (ILibraryService)container.getService(ILibraryService.class);
 			for(int i=0; i<cs.length; i++)
 			{
 				try
@@ -630,38 +634,51 @@ public class ModelExplorer extends JTree
 		refreshmenu.setState(this.refresh);
 		menu.add(refreshmenu);
 		
-		String[] ft1 = jcc.getAgent().getPlatform().getAgentFactory().getFileTypes();
-		String[] ft2 = jcc.getAgent().getPlatform().getApplicationFactory().getFileTypes();
-		String[] filetypes = (String[])SUtil.joinArrays(ft1, ft2);
+//		String[] ft1 = jcc.getAgent().getPlatform().getAgentFactory().getFileTypes();
+//		String[] ft2 = jcc.getAgent().getPlatform().getApplicationFactory().getFileTypes();
+//		String[] filetypes = (String[])SUtil.joinArrays(ft1, ft2);
+//		
 		
-		if(filetypes.length>1)
+		Collection facts = container.getServices(IElementFactory.class);
+		
+		if(facts!=null)
 		{
-			Icon[]	icons	= new Icon[filetypes.length];
-			for(int i=0; i<ft1.length; i++)
-			{
-				icons[i]	= jcc.getAgent().getPlatform().getAgentFactory().getFileTypeIcon(ft1[i]);
-			}
-			for(int i=0; i<ft2.length; i++)
-			{
-				icons[ft1.length+i]	= jcc.getAgent().getPlatform().getApplicationFactory().getFileTypeIcon(ft2[i]);
-			}
+//			if(filetypes.length>1)
+//			{
+//				Icon[]	icons	= new Icon[filetypes.length];
+//				for(int i=0; i<ft1.length; i++)
+//				{
+//					icons[i] = jcc.getAgent().getPlatform().getAgentFactory().getFileTypeIcon(ft1[i]);
+//				}
+//				for(int i=0; i<ft2.length; i++)
+//				{
+//					icons[ft1.length+i]	= jcc.getAgent().getPlatform().getApplicationFactory().getFileTypeIcon(ft2[i]);
+//				}
+	
+				filtermenu = new JMenu("File filter");
 
-			filtermenu = new JMenu("File filter");
-			for(int i=0; i<filetypes.length; i++)
-			{
-				JCheckBoxMenuItem ff = new JCheckBoxMenuItem(filetypes[i], icons[i], true);
-				filtermenu.add(ff);
-				ff.addActionListener(new ActionListener()
+//				for(int i=0; i<filetypes.length; i++)
+				for(Iterator it=facts.iterator(); it.hasNext(); )
 				{
-					public void actionPerformed(ActionEvent e)
+					IElementFactory fac = (IElementFactory)it.next();
+					
+					String[] filetypes = fac.getFileTypes();
+					for(int i=0; i<filetypes.length; i++)
 					{
-						refreshAll(getRootNode());
+						JCheckBoxMenuItem ff = new JCheckBoxMenuItem(filetypes[i], (Icon)fac.getFileTypeIcon(filetypes[i]), true);
+						filtermenu.add(ff);
+						ff.addActionListener(new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								refreshAll(getRootNode());
+							}
+						});
 					}
-				});
-			}
-			menu.add(filtermenu);
+				}
+				menu.add(filtermenu);
+//			}
 		}
-		
 		return new JMenu[]{menu};
 	}
 
@@ -681,8 +698,7 @@ public class ModelExplorer extends JTree
 						public boolean accept(File file)
 						{
 							return file.isDirectory() 
-								|| jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file.getAbsolutePath())
-								|| jcc.getAgent().getPlatform().getApplicationFactory().isLoadable(file.getAbsolutePath());
+								|| MetaAgentFactory.isLoadable(container, file.getAbsolutePath());
 						}
 					};
 				}
@@ -885,7 +901,7 @@ public class ModelExplorer extends JTree
 						IExplorerTreeNode	node	= getRootNode().addPathEntry(file);
 						
 						// todo: jars
-						ILibraryService ls = (ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class);
+						ILibraryService ls = (ILibraryService)container.getService(ILibraryService.class);
 						file = new File(file.getParentFile(), file.getName());
 						try
 						{
@@ -939,7 +955,7 @@ public class ModelExplorer extends JTree
 				getRootNode().removePathEntry(node);
 				
 				// todo: jars
-				ILibraryService ls = (ILibraryService)jcc.getAgent().getPlatform().getService(ILibraryService.class);
+				ILibraryService ls = (ILibraryService)container.getService(ILibraryService.class);
 				File file = node.getFile();
 				file = new File(file.getParentFile(), file.getName());
 				try

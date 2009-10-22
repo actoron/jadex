@@ -1,4 +1,4 @@
-package jadex.wfms.service;
+package jadex.wfms.service.repository;
 
 import jadex.service.IService;
 import jadex.wfms.IProcessModel;

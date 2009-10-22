@@ -1,5 +1,6 @@
 package jadex.tools.starter;
 
+import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bridge.IAgentFactory;
@@ -236,7 +237,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		lsplit.setOneTouchExpandable(true);
 		lsplit.setResizeWeight(0.7);
 
-		mpanel = new ModelExplorer(getJCC(), new StarterNodeFunctionality(this));
+		mpanel = new ModelExplorer(getJCC().getAgent().getPlatform(), new StarterNodeFunctionality(this));
 //		mpanel.setAction(FileNode.class, new INodeAction()
 //		{
 //			public void validStateChanged(TreeNode node, boolean valid)
@@ -268,14 +269,15 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 					//  |  +- MyAgent.agent.xml
 
 					String model = ((FileNode)node).getRelativePath();
-					if(getJCC().getAgent().getPlatform().getAgentFactory().isLoadable(model))
+//					if(getJCC().getAgent().getPlatform().getAgentFactory().isLoadable(model))
+					if(MetaAgentFactory.isLoadable(getJCC().getAgent().getPlatform(), model))
 					{
 						loadModel(model);
 					}
-					else if(getJCC().getAgent().getPlatform().getApplicationFactory().isLoadable(model))
-					{
-						loadModel(model);
-					}
+//					else if(getJCC().getAgent().getPlatform().getApplicationFactory().isLoadable(model))
+//					{
+//						loadModel(model);
+//					}
 				}
 			}
 		});
@@ -293,7 +295,8 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 						{
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 							String type = ((FileNode)node).getFile().getAbsolutePath();
-							if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(type))
+//							if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(type))
+							if(MetaAgentFactory.isStartable(getJCC().getAgent().getPlatform(), type))
 								getJCC().createAgent(type, null, null, null);
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
@@ -757,12 +760,12 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 				if(node instanceof FileNode)
 				{
 					final String type = ((FileNode)node).getFile().getAbsolutePath();
-					if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(type) )//&& ((FileNode)node).isValid())
+					if(MetaAgentFactory.isStartable(getJCC().getAgent().getPlatform(), type))//&& ((FileNode)node).isValid())
 					{
 						try
 						{
-							IAgentFactory agentfactory = getJCC().getAgent().getPlatform().getAgentFactory();
-							ILoadableElementModel model = agentfactory.loadModel(type);
+//							IAgentFactory agentfactory = getJCC().getAgent().getPlatform().getAgentFactory();
+							ILoadableElementModel model = MetaAgentFactory.loadModel(getJCC().getAgent().getPlatform(), type);
 							String[] inistates = model.getConfigurations();
 //							IMBDIAgent model = SXML.loadAgentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();

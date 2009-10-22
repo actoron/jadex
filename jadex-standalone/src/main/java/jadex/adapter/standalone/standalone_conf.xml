@@ -13,24 +13,9 @@
 		<property type="welcome">true</property>
 		<property type="autoshutdown">true</property>
 		
-		<property type="application_factory">
-			new jadex.adapter.base.appdescriptor.ApplicationFactory($platform,
-				new java.util.Set[]
-				{
-					jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping(),
-					jadex.adapter.base.envsupport.MEnvSpaceType.getXMLMapping()
-				}
-			)		
-		</property>
-		
 		<!-- Message types. -->
 		<property type="messagetype" name="fipa">new jadex.adapter.base.fipa.FIPAMessageType()</property>
 		
-		<!-- Kernels. -->
-		<!-- todo -->
-		<!-- <propertiesref ref="kernel_v2_bdi"/>
-	 	<propertiesref ref="kernel_v2_micro"/> -->
-				
 		<!-- Platform services. -->
 		<properties type="services">
 			<!-- Library service. -->
@@ -98,6 +83,46 @@
 						new jadex.adapter.base.appdescriptor.ApplicationContextFactory($platform)
 					})
 			</property>
+			
+			<!-- Element factories -->
+			
+			<property type="jadex.bridge.IElementFactory" name="application_factory">
+				new jadex.adapter.base.appdescriptor.ApplicationFactory($platform,
+					new java.util.Set[]
+					{
+						jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping(),
+						jadex.adapter.base.envsupport.MEnvSpaceType.getXMLMapping()
+					}
+				)		
+			</property>
+			
+			<property type="jadex.bridge.IElementFactory" name="bdi_factory">
+				new jadex.bdi.interpreter.BDIAgentFactory(
+					jadex.commons.SUtil.createHashMap(
+					new String[]
+					{
+						"messagetype_fipa", 
+						"planexecutor_standard", 
+						"standard.timeout", 
+						"tooladapter.introspector",
+						"microplansteps" //,
+						//"planexecutor_bpmn"
+					},
+					new Object[]
+					{
+						new jadex.adapter.base.fipa.FIPAMessageType(), 
+						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class)),
+						new java.lang.Long(10000),
+						jadex.tools.introspector.IntrospectorAdapter.class,
+						Boolean.TRUE //,
+						//new jadex.bdi.runtime.BpmnPlanExecutor()
+					}
+				), $platform)
+			</property>
+			
+			<property type="jadex.bridge.IElementFactory" name="micro_factory">
+				new jadex.microkernel.MicroAgentFactory($platform)
+			</property>
 		</properties>
 		
 		<!-- Agents. -->
@@ -105,7 +130,7 @@
 		<property type="daemonagent" name="df">jadex/bdi/dfagent/DF.agent.xml</property>
  		<property type="agent" name="jcc">jadex/tools/jcc/JCC.agent.xml</property>
 	
-		<properties type="kernel" id="kernel_v2_bdi">
+		<!--  <properties type="kernel" id="kernel_v2_bdi">
 			<property type="agent_factory">new jadex.bdi.interpreter.BDIAgentFactory(
 				jadex.commons.SUtil.createHashMap(
 					new String[]
@@ -132,7 +157,7 @@
 	
 		<properties type="kernel" id="kernel_v2_micro">
 			<property type="agent_factory">new jadex.microkernel.MicroAgentFactory($platform)</property>
-		</properties> 
+		</properties> -->
 	</properties>
 	
 </properties>

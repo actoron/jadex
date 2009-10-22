@@ -1,4 +1,4 @@
-package jadex.wfms.service;
+package jadex.wfms.service.client;
 
 import jadex.wfms.client.IWorkitem;
 

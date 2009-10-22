@@ -1,5 +1,6 @@
 package jadex.tools.testcenter;
 
+import jadex.adapter.base.MetaAgentFactory;
 import jadex.bdi.planlib.test.Testcase;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IGoal;
@@ -120,7 +121,7 @@ public class TestCenterPanel extends JSplitPane
 	
 		final JFileChooser addchooser = new JFileChooser(".");
 		addchooser.setAcceptAllFileFilterUsed(true);
-		final IAgentFactory agentfactory = plugin.getJCC().getAgent().getPlatform().getAgentFactory();
+//		final IAgentFactory agentfactory = plugin.getJCC().getAgent().getPlatform().getAgentFactory();
 		final javax.swing.filechooser.FileFilter load_filter = new javax.swing.filechooser.FileFilter()
 		{
 			public String getDescription()
@@ -132,7 +133,7 @@ public class TestCenterPanel extends JSplitPane
 			{
 				String name = f.getName();
 //				return f.isDirectory() || SXML.isAgentFilename(name);
-				return f.isDirectory() || agentfactory.isStartable(name);
+				return f.isDirectory() || MetaAgentFactory.isStartable(plugin.getJCC().getAgent().getPlatform(), name);
 			}
 		};
 		addchooser.addChoosableFileFilter(load_filter);

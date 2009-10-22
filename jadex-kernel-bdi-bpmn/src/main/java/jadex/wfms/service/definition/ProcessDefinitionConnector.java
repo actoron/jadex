@@ -1,4 +1,4 @@
-package jadex.wfms.service.impl;
+package jadex.wfms.service.definition;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,9 +10,9 @@ import jadex.service.execution.IExecutionService;
 import jadex.wfms.IProcessModel;
 import jadex.wfms.IWfms;
 import jadex.wfms.client.IClient;
-import jadex.wfms.service.IAAAService;
-import jadex.wfms.service.IProcessDefinitionService;
-import jadex.wfms.service.IModelRepositoryService;
+import jadex.wfms.service.repository.BasicModelRepositoryService;
+import jadex.wfms.service.repository.IModelRepositoryService;
+import jadex.wfms.service.security.IAAAService;
 
 public class ProcessDefinitionConnector implements IProcessDefinitionService
 {

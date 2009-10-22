@@ -1,5 +1,6 @@
 package jadex.tools.common.modeltree;
 
+import jadex.adapter.base.MetaAgentFactory;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IApplicationFactory;
 import jadex.commons.SGUI;
@@ -55,7 +56,7 @@ public class	DefaultNodeFunctionality
 	protected ModelExplorer	explorer;
 	
 	/** The JCC. */
-	protected IControlCenter	jcc;
+	protected IControlCenter jcc;
 	
 	/** The refresh indicator for the status bar. */
 	protected JLabel	refreshcomp;
@@ -175,17 +176,18 @@ public class	DefaultNodeFunctionality
 			{
 				FileNode fn = (FileNode)node;
 				
-				IAgentFactory agfac = jcc.getAgent().getPlatform().getAgentFactory();
-				String	type = agfac.getFileType(fn.getFile().getAbsolutePath());
+//				IAgentFactory agfac = jcc.getAgent().getPlatform().getAgentFactory();
+//				String	type = agfac.getFileType(fn.getFile().getAbsolutePath());
+				String type = MetaAgentFactory.getFileType(jcc.getAgent().getPlatform(), fn.getFile().getAbsolutePath());
 				if(type!=null)
-					icon = agfac.getFileTypeIcon(type);
+					icon = MetaAgentFactory.getFileTypeIcon(jcc.getAgent().getPlatform(), type);
 				
 				if(icon==null)
 				{
-					IApplicationFactory apfac = jcc.getAgent().getPlatform().getApplicationFactory();
-					type = apfac.getFileType(fn.getFile().getAbsolutePath());
+//					IApplicationFactory apfac = jcc.getAgent().getPlatform().getApplicationFactory();
+					type = MetaAgentFactory.getFileType(jcc.getAgent().getPlatform(), fn.getFile().getAbsolutePath());
 					if(type!=null)
-						icon = apfac.getFileTypeIcon(type);
+						icon = MetaAgentFactory.getFileTypeIcon(jcc.getAgent().getPlatform(), type);
 				}
 			}
 		}

@@ -1,4 +1,4 @@
-package jadex.wfms.service.impl;
+package jadex.wfms.service.repository;
 
 import java.io.File;
 import java.util.Collection;
@@ -13,8 +13,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.wfms.IProcessModel;
 import jadex.wfms.IWfms;
 import jadex.wfms.client.IClient;
-import jadex.wfms.service.IExecutionService;
-import jadex.wfms.service.IModelRepositoryService;
+import jadex.wfms.service.execution.IExecutionService;
 
 /**
  * Basic Model Repository Service implementation

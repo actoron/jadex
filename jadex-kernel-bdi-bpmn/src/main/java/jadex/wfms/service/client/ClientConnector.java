@@ -1,4 +1,4 @@
-package jadex.wfms.service.impl;
+package jadex.wfms.service.client;
 
 import jadex.commons.concurrent.IResultListener;
 import jadex.wfms.IWfms;
@@ -8,12 +8,10 @@ import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.IWorkitemListener;
 import jadex.wfms.client.Workitem;
 import jadex.wfms.client.WorkitemQueueChangeEvent;
-import jadex.wfms.service.IAAAService;
-import jadex.wfms.service.IClientService;
-import jadex.wfms.service.IExecutionService;
-import jadex.wfms.service.IModelRepositoryService;
-import jadex.wfms.service.IProcessDefinitionService;
-import jadex.wfms.service.IWorkitemQueueService;
+import jadex.wfms.service.definition.IProcessDefinitionService;
+import jadex.wfms.service.execution.IExecutionService;
+import jadex.wfms.service.repository.IModelRepositoryService;
+import jadex.wfms.service.security.IAAAService;
 
 import java.security.AccessControlException;
 import java.util.HashMap;

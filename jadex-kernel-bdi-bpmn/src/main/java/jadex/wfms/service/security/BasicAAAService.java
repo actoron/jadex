@@ -1,9 +1,8 @@
-package jadex.wfms.service.impl;
+package jadex.wfms.service.security;
 
 import jadex.commons.concurrent.IResultListener;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.WorkitemQueueChangeEvent;
-import jadex.wfms.service.IAAAService;
 
 import java.util.HashMap;
 import java.util.HashSet;

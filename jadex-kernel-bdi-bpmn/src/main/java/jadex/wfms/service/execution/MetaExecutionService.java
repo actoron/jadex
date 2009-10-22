@@ -1,11 +1,10 @@
-package jadex.wfms.service.impl;
+package jadex.wfms.service.execution;
 
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.wfms.IProcess;
 import jadex.wfms.IProcessModel;
 import jadex.wfms.IWfms;
-import jadex.wfms.service.IExecutionService;
 
 import java.util.HashMap;
 import java.util.List;

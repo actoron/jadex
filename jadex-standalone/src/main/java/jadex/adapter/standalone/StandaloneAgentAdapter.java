@@ -1,5 +1,6 @@
 package jadex.adapter.standalone;
 
+import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.standalone.ams.AMS;
@@ -53,7 +54,8 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	{
 		this.platform	= platform;
 		this.aid	= aid;
-		this.agent = platform.getAgentFactory().createKernelAgent(this, model, state, args);		
+		this.agent = MetaAgentFactory.createKernelAgent(platform, this, model, state, args);
+//		this.agent = platform.getAgentFactory().createKernelAgent(this, model, state, args);		
 	}
 
 	//-------- IAgentAdapter methods --------

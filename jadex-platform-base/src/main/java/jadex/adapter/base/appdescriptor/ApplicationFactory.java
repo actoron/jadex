@@ -10,6 +10,7 @@ import jadex.bridge.ISpace;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.QName;
 import jadex.commons.xml.TypeInfo;
@@ -106,6 +107,24 @@ public class ApplicationFactory implements IApplicationFactory
 //		ignored.add("schemaLocation");
 		
 		this.reader = new Reader(new BeanObjectReaderHandler(types));
+	}
+	
+	/**
+	 *  Start the service.
+	 */
+	public void start()
+	{
+		
+	}
+	
+	/**
+	 *  Shutdown the service.
+	 *  @param listener The listener.
+	 */
+	public void shutdown(IResultListener listener)
+	{
+		if(listener!=null)
+			listener.resultAvailable(null);
 	}
 	
 	//-------- IAgentFactory interface --------

@@ -13,6 +13,7 @@ import jade.util.Event;
 import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
 import jadex.adapter.base.DefaultResultListener;
+import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IAMSListener;
@@ -969,7 +970,8 @@ public class AMS implements IAMS, IService
 	 */
 	public String getShortName(String filename)
 	{
-		ILoadableElementModel	model	= platform.getAgentFactory().loadModel(filename);
+		ILoadableElementModel model = MetaAgentFactory.loadModel(platform, filename);
+//		ILoadableElementModel	model	= platform.getAgentFactory().loadModel(filename);
 		return model.getName();
 	}
 

@@ -1,8 +1,8 @@
 package jadex.wfms.client;
 
 import jadex.wfms.IWfms;
-import jadex.wfms.service.IProcessDefinitionService;
-import jadex.wfms.service.IClientService;
+import jadex.wfms.service.client.IClientService;
+import jadex.wfms.service.definition.IProcessDefinitionService;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

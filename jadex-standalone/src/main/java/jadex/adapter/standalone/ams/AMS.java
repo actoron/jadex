@@ -1,6 +1,7 @@
 package jadex.adapter.standalone.ams;
 
 import jadex.adapter.base.DefaultResultListener;
+import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.contextservice.BaseContext;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
@@ -689,7 +690,8 @@ public class AMS implements IAMS, IService
 	 */
 	public String getShortName(String filename)
 	{
-		ILoadableElementModel	model	= platform.getAgentFactory().loadModel(filename);
+//		ILoadableElementModel	model	= platform.getAgentFactory().loadModel(filename);
+		ILoadableElementModel	model	= MetaAgentFactory.loadModel(platform, filename);
 		return model.getName();
 	}
 

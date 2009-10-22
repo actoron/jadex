@@ -148,20 +148,20 @@ public class SpringPlatform extends AbstractPlatform
 	/**
 	 *  Set the agent factories.
 	 *  @param factories The agent factories.
-	 */
+	 * /
 	public void setAgentFactories(List factories)
 	{
 		this.agentfactory = new MetaAgentFactory(factories);
-	}
+	}*/
 
 	/**
 	 *  Set the application factory.
 	 *  @param appfactory The application factory.
-	 */
+	 * /
 	public void setApplicationFactory(IApplicationFactory appfactory)
 	{
 		this.appfactory = appfactory;
-	}
+	}*/
 	
 	/**
 	 *  Set the daemon agents.

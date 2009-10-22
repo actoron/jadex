@@ -4,7 +4,7 @@ import java.awt.EventQueue;
 
 import jadex.bpmn.examples.wfms.WfmsLauncher;
 import jadex.wfms.IWfms;
-import jadex.wfms.service.IClientService;
+import jadex.wfms.service.client.IClientService;
 
 public class SimLauncher
 {

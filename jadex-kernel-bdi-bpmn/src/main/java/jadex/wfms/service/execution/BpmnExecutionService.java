@@ -1,4 +1,4 @@
-package jadex.wfms.service.impl;
+package jadex.wfms.service.execution;
 
 import jadex.bpmn.BpmnExecutor;
 import jadex.bpmn.BpmnModelLoader;
@@ -12,8 +12,7 @@ import jadex.service.library.ILibraryServiceListener;
 import jadex.wfms.IProcessModel;
 import jadex.wfms.IWfms;
 import jadex.wfms.client.IClient;
-import jadex.wfms.service.IExecutionService;
-import jadex.wfms.service.IModelRepositoryService;
+import jadex.wfms.service.repository.IModelRepositoryService;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -22,7 +21,7 @@ import java.util.Map;
 /**
  * 
  */
-public class BpmnProcessService implements IExecutionService
+public class BpmnExecutionService implements IExecutionService
 {
 	//-------- attributes --------
 	
@@ -40,7 +39,7 @@ public class BpmnProcessService implements IExecutionService
 	/**
 	 *  Create a new BpmnProcessService.
 	 */
-	public BpmnProcessService(IWfms wfms)
+	public BpmnExecutionService(IWfms wfms)
 	{
 		this.wfms = wfms;
 		this.processes = new HashMap();
@@ -125,7 +124,7 @@ public class BpmnProcessService implements IExecutionService
 				{
 					if (instance.isFinished(null, null))
 					{
-						synchronized (BpmnProcessService.this)
+						synchronized (BpmnExecutionService.this)
 						{
 							processes.remove(id);
 						}

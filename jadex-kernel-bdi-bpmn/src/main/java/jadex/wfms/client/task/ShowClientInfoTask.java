@@ -6,7 +6,7 @@ import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.concurrent.IResultListener;
 import jadex.wfms.IWfms;
 import jadex.wfms.client.Workitem;
-import jadex.wfms.service.IWorkitemQueueService;
+import jadex.wfms.service.client.IWorkitemQueueService;
 
 public class ShowClientInfoTask extends AbstractClientTask
 {

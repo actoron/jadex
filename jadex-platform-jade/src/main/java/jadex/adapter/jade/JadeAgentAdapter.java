@@ -4,6 +4,7 @@ import jade.content.ContentElement;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
+import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.SFipa;
@@ -151,7 +152,8 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 					argsmap.putAll((Map)args2[i]);
 				}
 			}
-			this.agent = platform.getAgentFactory().createKernelAgent(this, (String)args[0], (String)args[1], argsmap);
+//			this.agent = platform.getAgentFactory().createKernelAgent(this, (String)args[0], (String)args[1], argsmap);
+			this.agent = MetaAgentFactory.createKernelAgent(platform, this, (String)args[0], (String)args[1], argsmap);
 		}
 		else //if(args[0] instanceof IMBDIAgent)
 		{

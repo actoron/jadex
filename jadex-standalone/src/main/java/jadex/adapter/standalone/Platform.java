@@ -176,7 +176,7 @@ public class Platform extends AbstractPlatform
 
 		this.platconf = configuration.getSubproperty(PLATFORM);
 		
-		this.services = new LinkedHashMap();
+//		this.services = new LinkedHashMap();
 		this.messagetypes = new LinkedHashMap();
 		this.shutdowntime = platconf.getLongProperty(PLATFORM_SHUTDOWN_TIME);
 		this.platformname = (String)((Property)platconf.getProperty(PLATFORMNAME)).getValue();
@@ -221,9 +221,9 @@ public class Platform extends AbstractPlatform
 //			addService(type, props[i].getName(), (IService)SJavaParser.evaluateExpression(props[i].getValue(), fetcher));
 //		}
 
-		this.agentfactory = createAgentFactory(platconf, fetcher);
+//		this.agentfactory = createAgentFactory(platconf, fetcher);
 		
-		this.appfactory = createApplicationFactory(platconf, fetcher);
+//		this.appfactory = createApplicationFactory(platconf, fetcher);
 		
 		this.logger = Logger.getLogger("Platform_" + getName());
 
@@ -342,7 +342,7 @@ public class Platform extends AbstractPlatform
 	
 	/**
 	 *  Create the agent factory.
-	 */
+	 * /
 	public IAgentFactory createAgentFactory(Properties platconf, SimpleValueFetcher fetcher)
 	{
 		Properties[] kernel_props = platconf.getSubproperties(KERNEL);
@@ -358,17 +358,17 @@ public class Platform extends AbstractPlatform
 			factories.add(fac);
 		}
 		return new MetaAgentFactory(factories);
-	}
+	}*/
 	
 	/**
 	 *  Create the application factory.
-	 */
+	 * /
 	public IApplicationFactory createApplicationFactory(Properties platconf, SimpleValueFetcher fetcher)
 	{
 		Property af = platconf.getProperty(APPLICATION_FACTORY);
 		IApplicationFactory ret = (IApplicationFactory)SJavaParser.evaluateExpression(af.getValue(), fetcher);
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Get an agent's arguments.

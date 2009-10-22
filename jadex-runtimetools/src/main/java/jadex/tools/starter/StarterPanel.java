@@ -1,5 +1,6 @@
 package jadex.tools.starter;
 
+import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.appdescriptor.ApplicationModel;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IApplicationContext;
@@ -125,10 +126,10 @@ public class StarterPanel extends JPanel
 	protected JPanel apppanel;
 	
 	/** The agent factory. */
-	protected IAgentFactory agentfactory;
+//	protected IAgentFactory agentfactory;
 	
 	/** The application factory. */
-	protected IApplicationFactory appfactory;
+//	protected IApplicationFactory appfactory;
 	
 	/** The starter plugin. */
 	protected StarterPlugin	starter;
@@ -156,8 +157,8 @@ public class StarterPanel extends JPanel
 		browse.setMargin(new Insets(0,0,0,0));
 		// Create the filechooser.
 		// Hack!!! might trhow exception in applet / webstart
-		agentfactory = starter.getJCC().getAgent().getPlatform().getAgentFactory();
-		appfactory = starter.getJCC().getAgent().getPlatform().getApplicationFactory();
+//		agentfactory = starter.getJCC().getAgent().getPlatform().getAgentFactory();
+//		appfactory = starter.getJCC().getAgent().getPlatform().getApplicationFactory();
 		try
 		{
 			filechooser = new JFileChooser(".");
@@ -173,7 +174,8 @@ public class StarterPanel extends JPanel
 				{
 					String name = f.getName();
 //					return f.isDirectory() || name.endsWith(SXML.FILE_EXTENSION_AGENT) || name.endsWith(SXML.FILE_EXTENSION_CAPABILITY);
-					boolean	ret	= f.isDirectory() || agentfactory.isLoadable(name) || appfactory.isLoadable(name);
+//					boolean	ret	= f.isDirectory() || agentfactory.isLoadable(name) || appfactory.isLoadable(name);
+					boolean	ret	= f.isDirectory() || MetaAgentFactory.isLoadable(starter.getJCC().getAgent().getPlatform(), name);
 
 //					Thread.currentThread().setContextClassLoader(oldcl);
 
@@ -373,10 +375,10 @@ public class StarterPanel extends JPanel
 					{
 						if(model instanceof ApplicationModel)
 						{
-							IApplicationFactory fac = starter.getJCC().getAgent().getPlatform().getApplicationFactory();
+//							IApplicationFactory fac = starter.getJCC().getAgent().getPlatform().getApplicationFactory();
 							try
 							{
-								fac.createApplication((String)appname.getSelectedItem(), filename.getText(), configname, args);
+								MetaAgentFactory.createApplication(starter.getJCC().getAgent().getPlatform(), (String)appname.getSelectedItem(), filename.getText(), configname, args);
 							}
 							catch(Exception e)
 							{
@@ -626,10 +628,9 @@ public class StarterPanel extends JPanel
 
 			try
 			{
-				if(appfactory.isLoadable(adf))
+				if(MetaAgentFactory.isLoadable(starter.getJCC().getAgent().getPlatform(), adf))
 				{
-					model = appfactory.loadModel(adf);
-//					System.out.println("Model loaded: "+adf);
+					model = MetaAgentFactory.loadModel(starter.getJCC().getAgent().getPlatform(), adf);
 					SwingUtilities.invokeLater(new Runnable()
 					{
 						public void run()
@@ -637,58 +638,50 @@ public class StarterPanel extends JPanel
 							updateGuiForNewModel(adf);
 						}
 					});
-					createArguments();
-					arguments.setVisible(false);
-					apppanel.setVisible(true);
-					agentpanel.setVisible(false);
-					start.setVisible(true);
 					
-					filenamel.setMinimumSize(appnamel.getMinimumSize());
-					filenamel.setPreferredSize(appnamel.getPreferredSize());
-					confl.setMinimumSize(appnamel.getMinimumSize());
-					confl.setPreferredSize(appname.getPreferredSize());
-				}
-				else if(agentfactory.isStartable(adf))
-				{
-					model = agentfactory.loadModel(adf);
-	//				System.out.println("Model loaded: "+adf);
-					SwingUtilities.invokeLater(new Runnable()
+	//				if(appfactory.isLoadable(adf))
+					if(model instanceof ApplicationModel)
 					{
-						public void run()
-						{
-							updateGuiForNewModel(adf);
-						}
-					});
-					createArguments();
-					apppanel.setVisible(true);
-					arguments.setVisible(true);
-					agentpanel.setVisible(true);
-					start.setVisible(true);
-					
-					filenamel.setMinimumSize(confdummy.getMinimumSize());
-					filenamel.setPreferredSize(confdummy.getPreferredSize());
-					confl.setMinimumSize(confdummy.getMinimumSize());
-					confl.setPreferredSize(confdummy.getPreferredSize());
-				}
-				else if(agentfactory.isLoadable(adf))
-				{
-					model = agentfactory.loadModel(adf);
-					SwingUtilities.invokeLater(new Runnable()
+	//					System.out.println("Model loaded: "+adf);
+						
+						createArguments();
+						arguments.setVisible(false);
+						apppanel.setVisible(true);
+						agentpanel.setVisible(false);
+						start.setVisible(true);
+						
+						filenamel.setMinimumSize(appnamel.getMinimumSize());
+						filenamel.setPreferredSize(appnamel.getPreferredSize());
+						confl.setMinimumSize(appnamel.getMinimumSize());
+						confl.setPreferredSize(appname.getPreferredSize());
+					}
+					else if(MetaAgentFactory.isStartable(starter.getJCC().getAgent().getPlatform(), adf))
 					{
-						public void run()
-						{
-							updateGuiForNewModel(adf);
-						}
-					});
-					apppanel.setVisible(false);
-					arguments.setVisible(false);
-					agentpanel.setVisible(false);
-					start.setVisible(false);
-					
-					agentnamel.setMinimumSize(confdummy.getMinimumSize());
-					agentnamel.setPreferredSize(confdummy.getPreferredSize());
-					confl.setMinimumSize(confdummy.getMinimumSize());
-					confl.setPreferredSize(confdummy.getPreferredSize());
+		//				System.out.println("Model loaded: "+adf);
+						
+						createArguments();
+						apppanel.setVisible(true);
+						arguments.setVisible(true);
+						agentpanel.setVisible(true);
+						start.setVisible(true);
+						
+						filenamel.setMinimumSize(confdummy.getMinimumSize());
+						filenamel.setPreferredSize(confdummy.getPreferredSize());
+						confl.setMinimumSize(confdummy.getMinimumSize());
+						confl.setPreferredSize(confdummy.getPreferredSize());
+					}
+					else //if(agentfactory.isLoadable(adf))
+					{
+						apppanel.setVisible(false);
+						arguments.setVisible(false);
+						agentpanel.setVisible(false);
+						start.setVisible(false);
+						
+						agentnamel.setMinimumSize(confdummy.getMinimumSize());
+						agentnamel.setPreferredSize(confdummy.getPreferredSize());
+						confl.setMinimumSize(confdummy.getMinimumSize());
+						confl.setPreferredSize(confdummy.getPreferredSize());
+					}
 				}
 				else
 				{

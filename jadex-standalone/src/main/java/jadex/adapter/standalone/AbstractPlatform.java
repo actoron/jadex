@@ -2,16 +2,22 @@ package jadex.adapter.standalone;
 
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
+import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationFactory;
+import jadex.bridge.IElementFactory;
+import jadex.bridge.IKernelAgent;
 import jadex.bridge.IPlatform;
 import jadex.bridge.MessageType;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.service.IServiceContainer;
 import jadex.service.PropertyServiceContainer;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -43,10 +49,10 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 	protected boolean shuttingdown;
 
 	/** The agent factory. */
-	protected IAgentFactory agentfactory;
+//	protected IAgentFactory agentfactory;
 
 	/** The application factory. */
-	protected IApplicationFactory appfactory;
+//	protected IApplicationFactory appfactory;
 	
 	/** The platform name. */
 	protected String platformname;
@@ -84,21 +90,21 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 	/**
 	 *  Get the agent factory.
 	 *  @return The agent factory.
-	 */
+	 * /
 	public IAgentFactory getAgentFactory()
 	{
 		return agentfactory;
-	}
+	}*/
 	
 	/**
 	 *  Get the agent factory.
 	 *  @return The agent factory.
-	 */
+	 * /
 	// Todo: remove from external platform interface
 	public IApplicationFactory getApplicationFactory()
 	{
 		return appfactory;
-	}
+	}*/
 	
 	/**
 	 *  Check if the platform is currently shutting down.
@@ -338,7 +344,24 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 	{
 		try
 		{
-			getApplicationFactory().createApplication(name, model, config, args);
+			Collection facts = getServices(IElementFactory.class);
+			if(facts!=null)
+			{
+				for(Iterator it=facts.iterator(); it.hasNext(); )
+				{
+					IElementFactory fac = (IElementFactory)it.next();
+					if(it instanceof IApplicationFactory)
+					{
+						IApplicationFactory afac = (IApplicationFactory)fac;
+						if(afac.isLoadable(model))
+						{
+							afac.createApplication(name, model, config, args);
+							break;
+						}
+					}
+				}
+			}
+//			getApplicationFactory().createApplication(name, model, config, args);
 		}
 		catch(Exception e)
 		{
@@ -447,4 +470,5 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 			}
 		}
 	}*/
+
 }

@@ -7,6 +7,7 @@ import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
+import jadex.commons.concurrent.IResultListener;
 import jadex.service.library.ILibraryService;
 
 import java.util.Map;
@@ -45,6 +46,24 @@ public class MicroAgentFactory implements IAgentFactory
 	public MicroAgentFactory(IPlatform platform)
 	{
 		this.platform = platform;
+	}
+	
+	/**
+	 *  Start the service.
+	 */
+	public void start()
+	{
+		
+	}
+	
+	/**
+	 *  Shutdown the service.
+	 *  @param listener The listener.
+	 */
+	public void shutdown(IResultListener listener)
+	{
+		if(listener!=null)
+			listener.resultAvailable(null);
 	}
 	
 	//-------- IAgentFactory interface --------

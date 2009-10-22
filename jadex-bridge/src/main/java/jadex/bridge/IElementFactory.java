@@ -1,11 +1,13 @@
 package jadex.bridge;
 
+import jadex.service.IService;
+
 import javax.swing.Icon;
 
 /**
  * 
  */
-public interface IElementFactory
+public interface IElementFactory extends IService
 {
 	/**
 	 *  Load an agent model.

@@ -10,7 +10,7 @@ import javax.swing.JOptionPane;
 
 import jadex.bpmn.examples.wfms.WfmsLauncher;
 import jadex.wfms.client.IClient;
-import jadex.wfms.service.IClientService;
+import jadex.wfms.service.client.IClientService;
 import jadex.wfms.simulation.gui.SimulationWindow;
 
 public class ClientSimulator implements IClient

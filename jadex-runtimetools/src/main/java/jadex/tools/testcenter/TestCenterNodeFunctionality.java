@@ -1,5 +1,6 @@
 package jadex.tools.testcenter;
 
+import jadex.adapter.base.MetaAgentFactory;
 import jadex.bdi.interpreter.OAVAgentModel;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bridge.ILoadableElementModel;
@@ -199,11 +200,13 @@ public class TestCenterNodeFunctionality extends DefaultNodeFunctionality
 				else
 				{
 					String	file	= fn.getFile().getAbsolutePath();
-					if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
+//					if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
+					if(MetaAgentFactory.isLoadable(jcc.getAgent().getPlatform(), file))
 					{
 						try
 						{
-							ILoadableElementModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
+//							ILoadableElementModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
+							ILoadableElementModel model = MetaAgentFactory.loadModel(jcc.getAgent().getPlatform(), file);
 							
 							if(model!=null)
 							{

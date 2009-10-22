@@ -35,6 +35,7 @@ import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.ThreadPoolFactory;
+import jadex.service.BasicServiceContainer;
 import jadex.service.IService;
 import jadex.service.clock.ClockService;
 import jadex.service.clock.IClockService;
@@ -57,16 +58,16 @@ import java.util.logging.Logger;
 /**
  *  Built-in standalone agent platform, with onyl basic features.
  */
-public class Platform implements IPlatform
+public class Platform extends BasicServiceContainer implements IPlatform
 {
 	/** The services. */
-	protected Map services;
+//	protected Map services;
 	
 	/** The threadpool. */
 	protected IThreadPool threadpool;
 	
 	/** The agent factory. */
-	protected IAgentFactory agentfactory;
+//	protected IAgentFactory agentfactory;
 	
 	/** The application factory. */
 	protected IApplicationFactory appfactory;
@@ -263,7 +264,7 @@ public class Platform implements IPlatform
 	/**
 	 *  Get the agent factory.
 	 *  @return The agent factory.
-	 */
+	 * /
 	// Todo: remove from external platform interface
 	public IAgentFactory getAgentFactory()
 	{
@@ -312,17 +313,17 @@ public class Platform implements IPlatform
 		}
 		
 		return agentfactory;
-	}
+	}*/
 
 	/**
 	 *  Get the agent factory.
 	 *  @return The agent factory.
-	 */
+	 * /
 	// Todo: remove from external platform interface
 	public IApplicationFactory getApplicationFactory()
 	{
 		return appfactory;
-	}
+	}*/
 	
 	/**
 	 *  Get the message type.

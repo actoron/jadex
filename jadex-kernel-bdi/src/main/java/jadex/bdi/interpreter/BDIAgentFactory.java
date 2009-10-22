@@ -6,6 +6,7 @@ import jadex.bridge.IKernelAgent;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.IResultListener;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
@@ -66,6 +67,24 @@ public class BDIAgentFactory implements IAgentFactory
 		this.props = props;
 		this.loader	= new OAVBDIModelLoader();
 		this.platform = platform;
+	}
+	
+	/**
+	 *  Start the service.
+	 */
+	public void start()
+	{
+		init();
+	}
+	
+	/**
+	 *  Shutdown the service.
+	 *  @param listener The listener.
+	 */
+	public void shutdown(IResultListener listener)
+	{
+		if(listener!=null)
+			listener.resultAvailable(null);
 	}
 	
 	/**

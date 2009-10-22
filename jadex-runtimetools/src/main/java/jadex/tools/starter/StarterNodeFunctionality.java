@@ -1,5 +1,6 @@
 package jadex.tools.starter;
 
+import jadex.adapter.base.MetaAgentFactory;
 import jadex.bridge.ILoadableElementModel;
 import jadex.commons.SGUI;
 import jadex.tools.common.modeltree.CombiIcon;
@@ -198,22 +199,24 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 					String	file	= fn.getFile().getAbsolutePath();
 					try
 					{
-						if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
+//						if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
+						if(MetaAgentFactory.isLoadable(jcc.getAgent().getPlatform(), file))
 						{
-							ILoadableElementModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
+//							ILoadableElementModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
+							ILoadableElementModel model = MetaAgentFactory.loadModel(jcc.getAgent().getPlatform(), file);
 							if(model!=null)
 							{
 								newvalid	= model.getReport().isEmpty();
 							}
 						}
-						else if(jcc.getAgent().getPlatform().getApplicationFactory().isLoadable(file))
-						{
-							ILoadableElementModel model = jcc.getAgent().getPlatform().getApplicationFactory().loadModel(file);
-							if(model!=null)
-							{
-								newvalid	= model.getReport().isEmpty();
-							}
-						}
+//						else if(jcc.getAgent().getPlatform().getApplicationFactory().isLoadable(file))
+//						{
+//							ILoadableElementModel model = jcc.getAgent().getPlatform().getApplicationFactory().loadModel(file);
+//							if(model!=null)
+//							{
+//								newvalid	= model.getReport().isEmpty();
+//							}
+//						}
 						// else unknown jadex file type -> ignore.
 					}
 					catch(Exception e)

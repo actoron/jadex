@@ -1,10 +1,11 @@
-package jadex.wfms.service;
+package jadex.wfms.service.client;
 
 import jadex.service.IService;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.IWorkitemListener;
+import jadex.wfms.service.definition.IProcessDefinitionService;
 
 import java.util.Set;
 

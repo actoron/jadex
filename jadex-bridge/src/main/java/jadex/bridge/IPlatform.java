@@ -1,10 +1,12 @@
 package jadex.bridge;
 
+import jadex.service.IServiceContainer;
+
 
 /**
  *  The agent platform interface.
  */
-public interface IPlatform
+public interface IPlatform extends IServiceContainer
 {	
 	/**
 	 *  Get the name of the platform
@@ -24,28 +26,28 @@ public interface IPlatform
 	 *  @param name The name.
 	 *  @return The corresponding platform service.
 	 */
-	public Object getService(Class type, String name);
+//	public Object getService(Class type, String name);
 	
 	/**
 	 *  Get a platform service.
 	 *  @param type The service interface/type.
 	 *  @return The corresponding platform service.
 	 */
-	public Object getService(Class type);
+//	public Object getService(Class type);
 		
 	/**
 	 *  Get the agent factory.
 	 *  @return The agent factory.
 	 */
 	// Todo: remove from external platform interface
-	public IAgentFactory getAgentFactory();
+//	public IAgentFactory getAgentFactory();
 	
 	/**
 	 *  Get the agent factory.
 	 *  @return The agent factory.
 	 */
 	// Todo: remove from external platform interface
-	public IApplicationFactory getApplicationFactory();
+//	public IApplicationFactory getApplicationFactory();
 	
 	/**
 	 *  Get the configuration.

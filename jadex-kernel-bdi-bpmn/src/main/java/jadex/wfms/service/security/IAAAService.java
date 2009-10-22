@@ -1,4 +1,4 @@
-package jadex.wfms.service;
+package jadex.wfms.service.security;
 
 import jadex.service.IService;
 import jadex.wfms.client.IClient;

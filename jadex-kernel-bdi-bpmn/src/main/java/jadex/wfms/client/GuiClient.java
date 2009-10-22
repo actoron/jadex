@@ -1,7 +1,7 @@
 package jadex.wfms.client;
 
 import jadex.commons.SGUI;
-import jadex.wfms.service.IClientService;
+import jadex.wfms.service.client.IClientService;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
