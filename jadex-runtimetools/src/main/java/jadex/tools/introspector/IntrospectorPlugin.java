@@ -1,6 +1,8 @@
 package jadex.tools.introspector;
 
+import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
+import jadex.adapter.base.fipa.IAMSListener;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -12,6 +14,7 @@ import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.jtreetable.TreeTableNodeType;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.common.plugin.IAgentListListener;
+import jadex.tools.jcc.AgentControlCenter;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -273,7 +276,7 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 		this.split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		agents = new AgentTreeTable(getJCC().getAgent().getPlatform().getName());
+		agents = new AgentTreeTable(((AgentControlCenter)getJCC()).getAgent().getPlatform().getName());
 		agents.setMinimumSize(new Dimension(0, 0));
 		split.add(agents);
 		agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -345,7 +348,24 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 			}
 		});
 
-		jcc.addAgentListListener(this);
+//		jcc.addAgentListListener(this);
+		
+		// todo: ?! is this ok?
+		
+		IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
+		ams.addAMSListener(new IAMSListener()
+		{
+			public void agentRemoved(IAMSAgentDescription desc)
+			{
+				agentDied(desc);
+			}
+			
+			public void agentAdded(IAMSAgentDescription desc)
+			{
+				agentAdded(desc);
+			}
+		});
+		
 //		SwingUtilities.invokeLater(new Runnable()
 //		{
 //			public void run()
@@ -419,7 +439,7 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 			boolean[]	active	= new boolean[checkboxes.length];
 			for(int i=0; i<checkboxes.length; i++)
 				active[i]	= checkboxes[i].isSelected();
-			ToolPanel	intro = new ToolPanel(getJCC().getAgent(), desc.getName());
+			ToolPanel	intro = new ToolPanel(((AgentControlCenter)getJCC()).getAgent(), desc.getName());
 			GuiProperties.setupHelp(intro, "tools.introspector");
 			detail.add(intro, node.getUserObject());
 			agents.updateAgent(desc);

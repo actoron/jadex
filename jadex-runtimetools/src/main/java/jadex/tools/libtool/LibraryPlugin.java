@@ -134,7 +134,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 					, "Load")==JFileChooser.APPROVE_OPTION)
 				{
 					File[] files = cchooser.getSelectedFiles();
-					ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+					ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
 					for(int i=0; i<files.length; i++)
 					{
 						try
@@ -160,7 +160,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 				for(int i=0; i<sel.length; i++)
 				{
 					classpaths.removeEntry(entries[sel[i]]);
-					ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+					ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
 					try
 					{
 						ls.removeURL(new URL("file:///"+entries[sel[i]]));
@@ -197,7 +197,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 
 					for(int i=0; i<=end-start; i++)
 					{
-						ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+						ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
 						if(ele.getData(i)!=null && ((String)ele.getData(i)).length()>0)
 						{
 							try
@@ -249,7 +249,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		lists.add("System Classpath Entries", otherview);
 
 		// Add a library service listener to be informed about library changes.
-		ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
 		ls.addLibraryServiceListener(new ILibraryServiceListener()
 		{
 			public void urlAdded(URL url)
@@ -275,7 +275,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	public void setProperties(Properties props)
 	{
 		Property[] ps = props.getProperties("cp");
-		ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
 		for(int i=0; i<ps.length; i++)
 		{
 			try
@@ -303,7 +303,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	public Properties	getProperties()
 	{
 		Properties	props	= new Properties();
-		ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
 		List urls = ls.getURLs();
 
 		for(int i=0; i<urls.size(); i++)
@@ -338,7 +338,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	 */
 	public void	reset()
 	{
-		ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
 		URL[]	urls	= (URL[])ls.getURLs().toArray(new URL[ls.getURLs().size()]);
 
 		for(int i=0; i<urls.length; i++)
@@ -354,7 +354,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	protected java.util.List fetchManagedClasspathEntries()
 	{
 		List ret = new ArrayList();
-		ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
 		List urls = ls.getURLs();
 		for(Iterator it=urls.iterator(); it.hasNext(); )
 		{
@@ -386,7 +386,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	{
 		java.util.List	ret	= new ArrayList();
 
-		ILibraryService ls = (ILibraryService)getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
 		
 		List cps = SUtil.getClasspathURLs(ls.getClassLoader().getParent());	// todo: classpath?
 		for(int i=0; i<cps.size(); i++)

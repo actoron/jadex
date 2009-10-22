@@ -1,6 +1,9 @@
 package jadex.tools.ruleprofiler;
 
+import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
+import jadex.adapter.base.fipa.IAMSListener;
+import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
 import jadex.tools.common.AgentTreeTable;
 import jadex.tools.common.GuiProperties;
@@ -9,6 +12,7 @@ import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.jtreetable.TreeTableNodeType;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.common.plugin.IAgentListListener;
+import jadex.tools.jcc.AgentControlCenter;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -125,7 +129,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 		this.split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		agents = new AgentTreeTable(getJCC().getAgent().getPlatform().getName());
+		agents = new AgentTreeTable(((IPlatform)getJCC().getServiceContainer()).getName());
 		agents.setMinimumSize(new Dimension(0, 0));
 		split.add(agents);
 		agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -197,7 +201,23 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 			}
 		});
 
-		jcc.addAgentListListener(this);
+//		jcc.addAgentListListener(this);
+		// todo: ?! is this ok?
+		
+		IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
+		ams.addAMSListener(new IAMSListener()
+		{
+			public void agentRemoved(IAMSAgentDescription desc)
+			{
+				agentDied(desc);
+			}
+			
+			public void agentAdded(IAMSAgentDescription desc)
+			{
+				agentAdded(desc);
+			}
+		});
+		
 //		SwingUtilities.invokeLater(new Runnable()
 //		{
 //			public void run()
@@ -271,7 +291,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable()
 				.getTree().getSelectionPath().getLastPathComponent();
 			IAMSAgentDescription desc = (IAMSAgentDescription)node.getUserObject();
-			RuleProfilerPanel	panel = new RuleProfilerPanel(getJCC().getAgent(), desc.getName());
+			RuleProfilerPanel	panel = new RuleProfilerPanel(((AgentControlCenter)getJCC()).getAgent(), desc.getName());
 			GuiProperties.setupHelp(panel, getHelpID());
 			detail.add(panel, node.getUserObject());
 			agents.updateAgent(desc);

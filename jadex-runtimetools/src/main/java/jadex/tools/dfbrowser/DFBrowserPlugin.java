@@ -1,6 +1,8 @@
 package jadex.tools.dfbrowser;
 
+import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
+import jadex.adapter.base.fipa.IAMSListener;
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
@@ -14,6 +16,7 @@ import jadex.tools.common.GuiProperties;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.common.plugin.IAgentListListener;
+import jadex.tools.jcc.AgentControlCenter;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -156,7 +159,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 	 */
 	public JComponent createView()
 	{
-		df_agents = new AgentTreeTable(getJCC().getAgent().getPlatform().getName());
+		df_agents = new AgentTreeTable(((AgentControlCenter)getJCC()).getAgent().getPlatform().getName());
 		df_agents.setMinimumSize(new Dimension(0, 0));
 		df_agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		df_agents.getNodeType(AgentTreeTable.NODE_AGENT).addPopupAction(REFRESH_DF);
@@ -171,7 +174,23 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 		atscroll.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Registered Agent Descriptions"));
 		
 		// Listeners
-		jcc.addAgentListListener(this);
+//		jcc.addAgentListListener(this);
+
+		// todo: ?! is this ok?
+		
+		IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
+		ams.addAMSListener(new IAMSListener()
+		{
+			public void agentRemoved(IAMSAgentDescription desc)
+			{
+				agentDied(desc);
+			}
+			
+			public void agentAdded(IAMSAgentDescription desc)
+			{
+				agentAdded(desc);
+			}
+		});
 		
 		df_agents.getTreetable().getSelectionModel().addListSelectionListener(
 			new ListSelectionListener()
@@ -410,17 +429,17 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 		
 		if(getSelectedDF() != null)
 		{
-			IDF	df	= (IDF)getJCC().getAgent().getPlatform().getService(IDF.class);
+			IDF	df	= (IDF)((AgentControlCenter)getJCC()).getAgent().getPlatform().getService(IDF.class);
 
 			// Use a subgoal to search
-			IGoal ft = getJCC().getAgent().createGoal("df_search");
+			IGoal ft = ((AgentControlCenter)getJCC()).getAgent().createGoal("df_search");
 			ft.getParameter("description").setValue(df.createDFAgentDescription(null, null));
 			ft.getParameter("constraints").setValue(df.createSearchConstraints(-1, 0));
 			ft.getParameter("df").setValue(getSelectedDF().getName());
 
 			try
 			{
-				getJCC().getAgent().dispatchTopLevelGoalAndWait(ft);
+				((AgentControlCenter)getJCC()).getAgent().dispatchTopLevelGoalAndWait(ft);
 				ads = (IDFAgentDescription[])ft.getParameterSet("result").getValues();
 //				System.out.println("Found: "+SUtil.arrayToString(ads));
 			}
@@ -631,10 +650,10 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 	{
 		try
 		{
-			IGoal deregister = getJCC().getAgent().createGoal("df_deregister");
+			IGoal deregister = ((AgentControlCenter)getJCC()).getAgent().createGoal("df_deregister");
 			deregister.getParameter("description").setValue(description);
 			deregister.getParameter("df").setValue(getSelectedDF().getName());
-			getJCC().getAgent().dispatchTopLevelGoalAndWait(deregister, 100);
+			((AgentControlCenter)getJCC()).getAgent().dispatchTopLevelGoalAndWait(deregister, 100);
 			refresh();
 		}
 		catch(Exception e)
