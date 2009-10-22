@@ -175,11 +175,12 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 		{
 			public void messageEventSent(AgentEvent ae)
 			{
+//				System.out.println("messageEventSent");
 			}
 			
 			public void messageEventReceived(AgentEvent ae)
 			{
-				processMessage((IMessageEvent)ae.getValue());
+				processMessage((IMessageEvent)ae.getSource());
 			}
 		};
 		
