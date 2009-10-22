@@ -203,7 +203,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 //		});
 
 		nof	= new TestCenterNodeFunctionality(this);
-		mpanel = new ModelExplorer(getJCC().getAgent().getPlatform(), nof);
+		mpanel = new ModelExplorer(getJCC().getServiceContainer(), nof);
 		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{mpanel.ADD_PATH, mpanel.REMOVE_PATH, mpanel.REFRESH,
 			ADD_TESTCASE, ADD_TESTCASES, REMOVE_TESTCASE, REMOVE_TESTCASES}));
 
@@ -234,7 +234,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 					{
 						String model = ((FileNode)node).getRelativePath();
 //						if(SXML.isAgentFilename(model))
-						if(MetaAgentFactory.isStartable(getJCC().getAgent().getPlatform(), model))
+						if(MetaAgentFactory.isStartable(getJCC().getServiceContainer(), model))
 						{
 							tcpanel.getTestList().addEntry(model);
 						}
@@ -338,7 +338,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 				if(n instanceof FileNode && !(n instanceof DirNode))
 				{
 					String model = ((FileNode)n).getRelativePath();
-					if(MetaAgentFactory.isStartable(getJCC().getAgent().getPlatform(), model)
+					if(MetaAgentFactory.isStartable(getJCC().getServiceContainer(), model)
 						&& nof.isTestcase((IExplorerTreeNode) n))
 					{
 						tcpanel.getTestList().addEntry(model);
@@ -350,7 +350,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		{
 			String model = ((FileNode)node).getRelativePath();
 //			if(SXML.isAgentFilename(model) && ((FileNode)node).isValid())
-			if(MetaAgentFactory.isStartable(getJCC().getAgent().getPlatform(), model)
+			if(MetaAgentFactory.isStartable(getJCC().getServiceContainer(), model)
 				&& nof.isTestcase((IExplorerTreeNode) node))
 			{
 				tcpanel.getTestList().addEntry(model);

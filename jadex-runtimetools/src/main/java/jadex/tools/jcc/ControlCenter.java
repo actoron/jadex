@@ -823,6 +823,42 @@ public class ControlCenter implements IControlCenter
 		return (IControlCenterPlugin[])plugins.keySet().toArray(
 			new IControlCenterPlugin[plugins.size()]);
 	}
+
+	/**
+	 *  Display an error dialog.
+	 * 
+	 *  @param errortitle The title to use for an error dialog (required).
+	 *  @param errormessage An optional error message displayed before the exception.
+	 *  @param exception The exception (if any).
+	 */
+	public void displayError(final String errortitle, String errormessage, Exception exception)
+	{
+		final String	text;
+		String	exmsg	= exception==null ? null : exception.getMessage();
+		if(errormessage==null && exmsg==null)
+		{
+			text	= errortitle;
+		}
+		else if(errormessage!=null && exmsg==null)
+		{
+			text	= errormessage;
+		}
+		else if(errormessage==null && exmsg!=null)
+		{
+			text	= exmsg;
+		}
+		else// if(errormessage!=null && exmsg!=null)
+		{
+			text = errormessage + "\n" + exmsg;
+		}
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				JOptionPane.showMessageDialog(window, SUtil.wrapText(text), errortitle, JOptionPane.ERROR_MESSAGE);
+			}
+		});
+	}
 	
 	/**
 	 *  Get the service container.

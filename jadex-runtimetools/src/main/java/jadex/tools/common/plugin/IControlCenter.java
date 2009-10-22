@@ -111,4 +111,13 @@ public interface IControlCenter
 	 *  @return True, if enabled.
 	 */
 	public boolean isConsoleEnabled();
+
+	/**
+	 *  Display an error dialog.
+	 * 
+	 *  @param errortitle The title to use for an error dialog (required).
+	 *  @param errormessage An optional error message displayed before the exception.
+	 *  @param exception The exception (if any).
+	 */
+	public void displayError(final String errortitle, String errormessage, Exception exception);
 }

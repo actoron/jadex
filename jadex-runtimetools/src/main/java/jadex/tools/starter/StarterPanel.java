@@ -2,9 +2,7 @@ package jadex.tools.starter;
 
 import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.appdescriptor.ApplicationModel;
-import jadex.bridge.IAgentFactory;
 import jadex.bridge.IApplicationContext;
-import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IArgument;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
@@ -175,7 +173,7 @@ public class StarterPanel extends JPanel
 					String name = f.getName();
 //					return f.isDirectory() || name.endsWith(SXML.FILE_EXTENSION_AGENT) || name.endsWith(SXML.FILE_EXTENSION_CAPABILITY);
 //					boolean	ret	= f.isDirectory() || agentfactory.isLoadable(name) || appfactory.isLoadable(name);
-					boolean	ret	= f.isDirectory() || MetaAgentFactory.isLoadable(starter.getJCC().getAgent().getPlatform(), name);
+					boolean	ret	= f.isDirectory() || MetaAgentFactory.isLoadable(starter.getJCC().getServiceContainer(), name);
 
 //					Thread.currentThread().setContextClassLoader(oldcl);
 
@@ -281,8 +279,7 @@ public class StarterPanel extends JPanel
 		// The application name.
 		appmodel = new DefaultComboBoxModel();
 		appmodel.addElement("");
-		IContextService cs = (IContextService)starter.getJCC()
-			.getAgent().getPlatform().getService(IContextService.class);
+		IContextService cs = (IContextService)starter.getJCC().getServiceContainer().getService(IContextService.class);
 		cs.addContextListener(new IChangeListener()
 		{
 			public void changeOccurred(jadex.commons.ChangeEvent event)
@@ -354,7 +351,7 @@ public class StarterPanel extends JPanel
 							Object arg = null;
 							try
 							{
-								ILibraryService ls = (ILibraryService)StarterPanel.this.starter.getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+								ILibraryService ls = (ILibraryService)StarterPanel.this.starter.getJCC().getServiceContainer().getService(ILibraryService.class);
 								arg = new JavaCCExpressionParser().parseExpression(argval, null, null, ls.getClassLoader()).getValue(null);
 							}
 							catch(Exception e)
@@ -378,7 +375,7 @@ public class StarterPanel extends JPanel
 //							IApplicationFactory fac = starter.getJCC().getAgent().getPlatform().getApplicationFactory();
 							try
 							{
-								MetaAgentFactory.createApplication(starter.getJCC().getAgent().getPlatform(), (String)appname.getSelectedItem(), filename.getText(), configname, args);
+								MetaAgentFactory.createApplication(starter.getJCC().getServiceContainer(), (String)appname.getSelectedItem(), filename.getText(), configname, args);
 							}
 							catch(Exception e)
 							{
@@ -393,7 +390,7 @@ public class StarterPanel extends JPanel
 							final String apn = (String)appname.getSelectedItem();
 							if(apn!=null && apn.length()>0)
 							{
-								IContextService cs = (IContextService)starter.getJCC().getAgent().getPlatform().getService(IContextService.class);
+								IContextService cs = (IContextService)starter.getJCC().getServiceContainer().getService(IContextService.class);
 								if(cs!=null)
 								{
 									ac = (IApplicationContext)cs.getContext(apn);
@@ -415,17 +412,25 @@ public class StarterPanel extends JPanel
 									for(int i=0; i<max; i++)
 									{
 										if(ac!=null)
+										{
 											ac.createAgent(an, typename, configname, args, true, false, null, null);
+										}
 										else
-											starter.getJCC().createAgent(typename, an, configname, args);
+										{
+											starter.createAgent(typename, an, configname, args);
+										}
 									}
 								}
 								else
 								{
 									if(ac!=null)
+									{
 										ac.createAgent(an, typename, configname, args, true, false, null, null);
+									}
 									else
-										starter.getJCC().createAgent(typename, an, configname, args);
+									{
+										starter.createAgent(typename, an, configname, args);
+									}
 								}
 							}
 						}
@@ -628,9 +633,9 @@ public class StarterPanel extends JPanel
 
 			try
 			{
-				if(MetaAgentFactory.isLoadable(starter.getJCC().getAgent().getPlatform(), adf))
+				if(MetaAgentFactory.isLoadable(starter.getJCC().getServiceContainer(), adf))
 				{
-					model = MetaAgentFactory.loadModel(starter.getJCC().getAgent().getPlatform(), adf);
+					model = MetaAgentFactory.loadModel(starter.getJCC().getServiceContainer(), adf);
 					SwingUtilities.invokeLater(new Runnable()
 					{
 						public void run()
@@ -655,7 +660,7 @@ public class StarterPanel extends JPanel
 						confl.setMinimumSize(appnamel.getMinimumSize());
 						confl.setPreferredSize(appname.getPreferredSize());
 					}
-					else if(MetaAgentFactory.isStartable(starter.getJCC().getAgent().getPlatform(), adf))
+					else if(MetaAgentFactory.isStartable(starter.getJCC().getServiceContainer(), adf))
 					{
 		//				System.out.println("Model loaded: "+adf);
 						
@@ -1043,7 +1048,7 @@ public class StarterPanel extends JPanel
 		final JValidatorTextField valt = new JValidatorTextField(15);
 		
 		// todo:
-		ILibraryService ls = (ILibraryService)StarterPanel.this.starter.getJCC().getAgent().getPlatform().getService(ILibraryService.class);
+		ILibraryService ls = (ILibraryService)StarterPanel.this.starter.getJCC().getServiceContainer().getService(ILibraryService.class);
 		valt.setValidator(new ParserValidator(ls.getClassLoader()));
 		
 		String configname = (String)config.getSelectedItem();

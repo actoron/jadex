@@ -133,7 +133,7 @@ public class TestCenterPanel extends JSplitPane
 			{
 				String name = f.getName();
 //				return f.isDirectory() || SXML.isAgentFilename(name);
-				return f.isDirectory() || MetaAgentFactory.isStartable(plugin.getJCC().getAgent().getPlatform(), name);
+				return f.isDirectory() || MetaAgentFactory.isStartable(plugin.getJCC().getServiceContainer(), name);
 			}
 		};
 		addchooser.addChoosableFileFilter(load_filter);
@@ -324,7 +324,7 @@ public class TestCenterPanel extends JSplitPane
 							}
 							Nuggets nug = new Nuggets();
 							FileOutputStream fos = new FileOutputStream(file);
-							ClassLoader cl = ((ILibraryService)plugin.getJCC().getAgent().getPlatform().getService(ILibraryService.class)).getClassLoader();
+							ClassLoader cl = ((ILibraryService)plugin.getJCC().getServiceContainer().getService(ILibraryService.class)).getClassLoader();
 							nug.write(teststable.getEntries(), fos, cl);
 							fos.close();
 						}
@@ -352,7 +352,7 @@ public class TestCenterPanel extends JSplitPane
 							FileInputStream fis = new FileInputStream(file);
 							Nuggets nug = new Nuggets();
 							
-							ClassLoader cl = ((ILibraryService)plugin.getJCC().getAgent().getPlatform().getService(ILibraryService.class)).getClassLoader();
+							ClassLoader cl = ((ILibraryService)plugin.getJCC().getServiceContainer().getService(ILibraryService.class)).getClassLoader();
 							String[] names = (String[])nug.readObject(fis, cl);
 							teststable.setEntries(names);
 						}

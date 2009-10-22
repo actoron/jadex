@@ -1,13 +1,19 @@
 package jadex.tools.starter;
 
 import jadex.adapter.base.MetaAgentFactory;
+import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
+import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.GoalFailureException;
-import jadex.bridge.IAgentFactory;
+import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.IGoalListener;
+import jadex.bridge.AgentTerminatedException;
+import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
 import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.IPlatform;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.Properties;
@@ -36,6 +42,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
@@ -237,7 +244,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		lsplit.setOneTouchExpandable(true);
 		lsplit.setResizeWeight(0.7);
 
-		mpanel = new ModelExplorer(getJCC().getAgent().getPlatform(), new StarterNodeFunctionality(this));
+		mpanel = new ModelExplorer(getJCC().getServiceContainer(), new StarterNodeFunctionality(this));
 //		mpanel.setAction(FileNode.class, new INodeAction()
 //		{
 //			public void validStateChanged(TreeNode node, boolean valid)
@@ -270,7 +277,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 
 					String model = ((FileNode)node).getRelativePath();
 //					if(getJCC().getAgent().getPlatform().getAgentFactory().isLoadable(model))
-					if(MetaAgentFactory.isLoadable(getJCC().getAgent().getPlatform(), model))
+					if(MetaAgentFactory.isLoadable(getJCC().getServiceContainer(), model))
 					{
 						loadModel(model);
 					}
@@ -296,8 +303,8 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 							String type = ((FileNode)node).getFile().getAbsolutePath();
 //							if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(type))
-							if(MetaAgentFactory.isStartable(getJCC().getAgent().getPlatform(), type))
-								getJCC().createAgent(type, null, null, null);
+							if(MetaAgentFactory.isStartable(getJCC().getServiceContainer(), type))
+								createAgent(type, null, null, null);
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
 					}
@@ -306,7 +313,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
   		};
   		mpanel.addMouseListener(ml);
 
-		agents = new AgentTreeTable(getJCC().getAgent().getPlatform().getName());
+		agents = new AgentTreeTable(((IPlatform)getJCC().getServiceContainer()).getName());
 		agents.setMinimumSize(new Dimension(0, 0));
 		agents.getTreetable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		
@@ -336,7 +343,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		agents.getNodeType(AgentTreeTable.NODE_PLATFORM).addPopupAction(KILL_PLATFORM);
 		agents.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
 		
-		applications = new ApplicationTreeTable(getJCC().getAgent().getPlatform().getName());
+		applications = new ApplicationTreeTable(((IPlatform)getJCC().getServiceContainer()).getName());
 		applications.setMinimumSize(new Dimension(0, 0));
 		applications.getTreetable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		
@@ -345,7 +352,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		applications.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
 		applications.setColumnWidths(new int[]{200});
 		
-		IContextService cs = (IContextService)jcc.getAgent().getPlatform().getService(IContextService.class);
+		IContextService cs = (IContextService)jcc.getServiceContainer().getService(IContextService.class);
 		if(cs!=null)
 		{
 			cs.addContextListener(new IChangeListener()
@@ -623,7 +630,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			IContextService cs = (IContextService)jcc.getAgent().getPlatform().getService(IContextService.class);
+			IContextService cs = (IContextService)jcc.getServiceContainer().getService(IContextService.class);
 			if(cs!=null)
 			{
 				TreePath[] paths = applications.getTreetable().getTree().getSelectionPaths();
@@ -760,12 +767,12 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 				if(node instanceof FileNode)
 				{
 					final String type = ((FileNode)node).getFile().getAbsolutePath();
-					if(MetaAgentFactory.isStartable(getJCC().getAgent().getPlatform(), type))//&& ((FileNode)node).isValid())
+					if(MetaAgentFactory.isStartable(getJCC().getServiceContainer(), type))//&& ((FileNode)node).isValid())
 					{
 						try
 						{
 //							IAgentFactory agentfactory = getJCC().getAgent().getPlatform().getAgentFactory();
-							ILoadableElementModel model = MetaAgentFactory.loadModel(getJCC().getAgent().getPlatform(), type);
+							ILoadableElementModel model = MetaAgentFactory.loadModel(getJCC().getServiceContainer(), type);
 							String[] inistates = model.getConfigurations();
 //							IMBDIAgent model = SXML.loadAgentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
@@ -783,7 +790,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 									{
 										public void actionPerformed(ActionEvent e)
 										{
-											getJCC().createAgent(type, null, config, null);
+											createAgent(type, null, config, null);
 										}
 									});
 									me.setToolTipText("Start in configuration: "+config);
@@ -809,7 +816,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 								{
 									public void actionPerformed(ActionEvent e)
 									{
-										getJCC().createAgent(type, null, null, null);
+										createAgent(type, null, null, null);
 									}
 								});
 							}
@@ -897,6 +904,40 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		return filename!=null && filename.toLowerCase().endsWith(FILE_EXTENSION_CAPABILITY);
 	}*/
 
+
+	/**
+	 *  Create a new agent on the platform.
+	 *  Any errors will be displayed in a dialog to the user.
+	 */
+	public void createAgent(String type, String name, String configname, Map arguments)
+	{
+		final IAMS	ams	= (IAMS)getJCC().getServiceContainer().getService(IAMS.class);
+		ams.createAgent(name, type, configname, arguments, new IResultListener()
+		{
+			
+			public void resultAvailable(Object result)
+			{
+				final IAgentIdentifier aid = (IAgentIdentifier)result;
+				ams.startAgent(aid, new IResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						getJCC().setStatusText("Started agent: " + aid.getLocalName());
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						getJCC().displayError("Problem Starting Agent", "Agent could not be started.", exception);
+					}
+				});
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				getJCC().displayError("Problem Starting Agent", "Agent could not be started.", exception);
+			}
+		}, null);
+		
+			
+	}
 }
-
-

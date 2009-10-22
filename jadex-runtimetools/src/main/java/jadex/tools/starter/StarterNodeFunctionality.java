@@ -200,10 +200,10 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 					try
 					{
 //						if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
-						if(MetaAgentFactory.isLoadable(jcc.getAgent().getPlatform(), file))
+						if(MetaAgentFactory.isLoadable(jcc.getServiceContainer(), file))
 						{
 //							ILoadableElementModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
-							ILoadableElementModel model = MetaAgentFactory.loadModel(jcc.getAgent().getPlatform(), file);
+							ILoadableElementModel model = MetaAgentFactory.loadModel(jcc.getServiceContainer(), file);
 							if(model!=null)
 							{
 								newvalid	= model.getReport().isEmpty();
