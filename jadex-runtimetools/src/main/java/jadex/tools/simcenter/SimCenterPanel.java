@@ -1,8 +1,8 @@
 package jadex.tools.simcenter;
 
 import jadex.adapter.base.ISimulationService;
-import jadex.bridge.IPlatform;
 import jadex.commons.TimeFormat;
+import jadex.service.IServiceContainer;
 
 import java.awt.BorderLayout;
 import java.text.DateFormat;
@@ -57,7 +57,7 @@ public class SimCenterPanel extends JPanel
 		super(new BorderLayout());
 		this.simcenter = simcenter;
 		
-		ISimulationService simservice = (ISimulationService)simcenter.getJCC().getAgent().getPlatform().getService(ISimulationService.class);
+		ISimulationService simservice = (ISimulationService)simcenter.getJCC().getServiceContainer().getService(ISimulationService.class);
 		if(simservice==null)
 			throw new RuntimeException("Could not find simulation service: "+simservice);
 		
@@ -90,12 +90,12 @@ public class SimCenterPanel extends JPanel
 	}
 	
 	/**
-	 *  Get the platform.
-	 *  @return The platform.
+	 *  Get the service container.
+	 *  @return The service container.
 	 */
-	public IPlatform getPlatform()
+	public IServiceContainer	getServiceContainer()
 	{
-		return (IPlatform)simcenter.getJCC().getAgent().getPlatform();
+		return (IServiceContainer)simcenter.getJCC().getServiceContainer();
 	}
 	
 	/**

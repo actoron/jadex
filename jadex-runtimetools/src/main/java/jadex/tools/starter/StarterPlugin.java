@@ -3,6 +3,7 @@ package jadex.tools.starter;
 import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
+import jadex.adapter.base.fipa.IAMSListener;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
@@ -398,7 +399,24 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		csplit.add(spanel);
 		csplit.setDividerLocation(180);
             			
-		jcc.addAgentListListener(this);
+//		jcc.addAgentListListener(this);
+		
+		// todo: ?! is this ok?
+		
+		IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
+		ams.addAMSListener(new IAMSListener()
+		{
+			public void agentRemoved(IAMSAgentDescription desc)
+			{
+				agentDied(desc);
+			}
+			
+			public void agentAdded(IAMSAgentDescription desc)
+			{
+				agentAdded(desc);
+			}
+		});
+
 //		SwingUtilities.invokeLater(new Runnable()
 //		{
 //			public void run()
@@ -547,7 +565,18 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
 				if(node!=null && node.getUserObject() instanceof IAMSAgentDescription)
 				{
-					jcc.suspendAgent(((IAMSAgentDescription)node.getUserObject()).getName());
+					IAMS	ams	= (IAMS)getJCC().getServiceContainer().getService(IAMS.class);
+					ams.suspendAgent(((IAMSAgentDescription)node.getUserObject()).getName(), new IResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+							getJCC().setStatusText("Suspended agent: " + result);
+						}						
+						public void exceptionOccurred(Exception exception)
+						{
+							getJCC().displayError("Problem Suspending Agent", "Agent could not be suspended.", exception);
+						}
+					});
 				}
 			}
 		}
@@ -582,7 +611,18 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
 				if(node!=null && node.getUserObject() instanceof IAMSAgentDescription)
 				{
-					jcc.resumeAgent(((IAMSAgentDescription)node.getUserObject()).getName());
+					IAMS	ams	= (IAMS)getJCC().getServiceContainer().getService(IAMS.class);
+					ams.resumeAgent(((IAMSAgentDescription)node.getUserObject()).getName(), new IResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+							getJCC().setStatusText("Resumed agent: " + result);
+						}						
+						public void exceptionOccurred(Exception exception)
+						{
+							getJCC().displayError("Problem Resuming Agent", "Agent could not be resumed.", exception);
+						}
+					});
 				}
 			}
 		}
@@ -617,7 +657,18 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
 				if(node!=null && node.getUserObject() instanceof IAMSAgentDescription)
 				{
-					jcc.killAgent(((IAMSAgentDescription)node.getUserObject()).getName());
+					IAMS	ams	= (IAMS)getJCC().getServiceContainer().getService(IAMS.class);
+					ams.destroyAgent(((IAMSAgentDescription)node.getUserObject()).getName(), new IResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+							getJCC().setStatusText("Killed agent: " + result);
+						}						
+						public void exceptionOccurred(Exception exception)
+						{
+							getJCC().displayError("Problem Killing Agent", "Agent could not be killed.", exception);
+						}
+					});
 				}
 			}
 		}
@@ -671,21 +722,17 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			try
+			IAMS	ams	= (IAMS)getJCC().getServiceContainer().getService(IAMS.class);
+			ams.shutdownPlatform(new IResultListener()
 			{
-				jcc.getAgent().dispatchTopLevelGoal(jcc.getAgent().createGoal("ams_shutdown_platform"));
-			}
-			catch(final GoalFailureException ex)
-			{
-				SwingUtilities.invokeLater(new Runnable()
+				public void resultAvailable(Object result)
 				{
-					public void run()
-					{
-						String text = SUtil.wrapText("Could not kill platform: "+ex.getMessage());
-						JOptionPane.showMessageDialog(SGUI.getWindowParent(spanel), text, "Platform Shutdown Problem", JOptionPane.INFORMATION_MESSAGE);
-					}
-				});
-			}
+				}						
+				public void exceptionOccurred(Exception exception)
+				{
+					getJCC().displayError("Platform Shutdown Problem", "Could not kill platform.", exception);
+				}
+			});
 		}
 	};
 

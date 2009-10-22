@@ -15,6 +15,7 @@ import jadex.tools.common.BrowserPane;
 import jadex.tools.common.EditableList;
 import jadex.tools.common.ElementPanel;
 import jadex.tools.common.ScrollablePanel;
+import jadex.tools.jcc.AgentControlCenter;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -180,7 +181,7 @@ public class TestCenterPanel extends JSplitPane
 		
 		JScrollPane	scroll	= new JScrollPane(teststable);
 		teststable.setPreferredScrollableViewportSize(new Dimension(400, 200)); // todo: hack
-		tfto = new JTextField(""+plugin.getJCC().getAgent().getBeliefbase().getBelief("testcase_timeout").getFact(), 6);
+		tfto = new JTextField(""+((AgentControlCenter)plugin.getJCC()).getAgent().getBeliefbase().getBelief("testcase_timeout").getFact(), 6);
 		tfto.setMinimumSize(tfto.getPreferredSize());
 		tfto.addActionListener(new ActionListener()
 		{
@@ -464,11 +465,11 @@ public class TestCenterPanel extends JSplitPane
 		for(int i=0; i<entries.length; i++)
 			teststable.addEntry(entries[i].getValue());
 		
-		String timeout	= ""+plugin.getJCC().getAgent().getBeliefbase().getBelief("testcase_timeout").getFact();
+		String timeout	= ""+((AgentControlCenter)plugin.getJCC()).getAgent().getBeliefbase().getBelief("testcase_timeout").getFact();
 		if(props.getProperty("timeout")!=null)
 		{
 			timeout	= props.getStringProperty("timeout");
-			plugin.getJCC().getAgent().getBeliefbase().getBelief("testcase_timeout").setFact(new Integer(timeout));
+			((AgentControlCenter)plugin.getJCC()).getAgent().getBeliefbase().getBelief("testcase_timeout").setFact(new Integer(timeout));
 		}
 		tfto.setText(timeout);
 
@@ -840,7 +841,7 @@ public class TestCenterPanel extends JSplitPane
 		try
 		{
 			Integer to = new Integer(text);
-			plugin.getJCC().getAgent().getBeliefbase().getBelief("testcase_timeout").setFact(to);
+			((AgentControlCenter)plugin.getJCC()).getAgent().getBeliefbase().getBelief("testcase_timeout").setFact(to);
 		}
 		catch(final Exception e)
 		{
@@ -1040,12 +1041,12 @@ public class TestCenterPanel extends JSplitPane
 				{
 					// Create testcase and dispatch goal.
 					testcases[i]	= new Testcase(names[i]);
-					IGoal pt = plugin.getJCC().getAgent().createGoal("perform_test");
+					IGoal pt = ((AgentControlCenter)plugin.getJCC()).getAgent().createGoal("perform_test");
 					pt.getParameter("testcase").setValue(testcases[i]);
 //					pt.getParameter("classloader").setValue(plugin.getModelExplorer().getClassLoader());
 					pt.addGoalListener(this);
 					goals.add(pt);
-					plugin.getJCC().getAgent().dispatchTopLevelGoal(pt);
+					((AgentControlCenter)plugin.getJCC()).getAgent().dispatchTopLevelGoal(pt);
 					plugin.getJCC().setStatusText("Performing test "+names[i]);
 				}
 			}			

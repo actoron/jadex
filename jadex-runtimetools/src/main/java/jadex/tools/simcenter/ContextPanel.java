@@ -59,7 +59,7 @@ public class ContextPanel extends AbstractTimePanel
 	 */
 	public ContextPanel(SimCenterPanel simp)
 	{
-		super(simp.getPlatform());
+		super(simp.getServiceContainer());
 		this.setLayout(new FlowLayout());
 		this.simp = simp;
 		

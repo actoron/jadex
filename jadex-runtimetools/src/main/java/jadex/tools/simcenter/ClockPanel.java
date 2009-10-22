@@ -84,7 +84,7 @@ public class ClockPanel extends AbstractTimePanel
 	 */
 	public ClockPanel(final SimCenterPanel simp)
 	{
-		super(simp.getPlatform());
+		super(simp.getServiceContainer());
 		this.setLayout(new GridBagLayout());
 		//this.clock = clock;
 		//this.context = context;

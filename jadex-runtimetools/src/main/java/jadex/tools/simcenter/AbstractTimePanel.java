@@ -1,9 +1,9 @@
 package jadex.tools.simcenter;
 
 import jadex.adapter.base.ISimulationService;
-import jadex.bridge.IPlatform;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
+import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 
 import javax.swing.JPanel;
@@ -17,8 +17,8 @@ public abstract class AbstractTimePanel extends JPanel
 {
 	//-------- attributes --------
 	
-	/** The platform. */
-	protected IPlatform platform;
+	/** The service container. */
+	protected IServiceContainer container;
 	
 	/** The clock listener. */
 	protected IChangeListener clocklistener;
@@ -37,9 +37,9 @@ public abstract class AbstractTimePanel extends JPanel
 	/**
 	 *  Create an abstract time panel.
 	 */
-	public AbstractTimePanel(IPlatform platform)
+	public AbstractTimePanel(IServiceContainer container)
 	{
-		this.platform = platform;
+		this.container = container;
 //		this.simservice = context;
 		
 		// The clock listener updates the gui when the clock changes.
@@ -112,9 +112,9 @@ public abstract class AbstractTimePanel extends JPanel
 	 *  Get the platform.
 	 *  @return The platform.
 	 */
-	protected IPlatform getPlatform()
+	protected IServiceContainer getPlatform()
 	{
-		return platform;
+		return container;
 	}
 	
 	/**

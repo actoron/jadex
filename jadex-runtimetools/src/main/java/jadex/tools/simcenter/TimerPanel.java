@@ -53,7 +53,7 @@ public class TimerPanel extends AbstractTimePanel
 	 */
 	public TimerPanel(SimCenterPanel simp)
 	{
-		super(simp.getPlatform());
+		super(simp.getServiceContainer());
 		//this.clock = clock;
 		//this.context = context;
 		this.simp = simp;
