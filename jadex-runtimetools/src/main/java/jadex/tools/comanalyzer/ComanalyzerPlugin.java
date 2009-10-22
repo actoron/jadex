@@ -473,7 +473,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 			
 			public void agentAdded(IAMSAgentDescription desc)
 			{
-				agentAdded(desc);
+				agentBorn(desc);
 			}
 		});
 		

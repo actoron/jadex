@@ -22,9 +22,7 @@
 	</capabilities>
 
 	<beliefs>
-		<belief name="jcc" class="ControlCenter" />
-
-		<belief name="plugins" class="String" />
+		<belief name="jcc" class="AgentControlCenter" />
 
 		<beliefsetref name="agents">
 			<concrete ref="ams.agents"/>
@@ -102,13 +100,13 @@
 			</trigger>
 		</plan> -->
 		
-		<plan name="agent_list_update">
+		<!-- <plan name="agent_list_update">
 			<body class="AgentListUpdatePlan" />
-			<!-- <waitqueue>
+			<!- - <waitqueue>
 				<factadded ref="agents"/>
 				<factremoved ref="agents"/>
-			</waitqueue> -->
-		</plan>
+			</waitqueue> - ->
+		</plan> -->
 
 		<!-- <plan name="receiver">
 			<body class="MailPlan" />
@@ -174,10 +172,8 @@
 			</capabilities>
 			<beliefs>
 				<initialbelief ref="jcc">
-					<fact>new ControlCenter($scope.getExternalAccess())</fact>
-				</initialbelief>
-				<initialbelief ref="plugins">
 					<fact>
+						new AgentControlCenter($scope.getPlatform(),
 						"jadex.tools.starter.StarterPlugin"
 						+" jadex.tools.dfbrowser.DFBrowserPlugin"
 						+" jadex.tools.convcenter.ConversationPlugin"
@@ -187,13 +183,11 @@
 						+" jadex.tools.simcenter.SimCenterPlugin"
 						+" jadex.tools.introspector.IntrospectorPlugin"
 						+" jadex.tools.ruleprofiler.RuleProfilerPlugin"
-						+" jadex.tools.libtool.LibraryPlugin"
+						+" jadex.tools.libtool.LibraryPlugin",
+						$scope.getExternalAccess())
 					</fact>
 				</initialbelief>
 			</beliefs>
-			<plans>
-				<initialplan ref="agent_list_update" />
-			</plans>
 		</configuration>
 	</configurations>
 

@@ -413,7 +413,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 			
 			public void agentAdded(IAMSAgentDescription desc)
 			{
-				agentAdded(desc);
+				agentBorn(desc);
 			}
 		});
 
