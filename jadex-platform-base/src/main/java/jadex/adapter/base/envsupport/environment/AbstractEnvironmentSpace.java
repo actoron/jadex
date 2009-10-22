@@ -144,7 +144,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  @param typename The type name.
 	 *  @param properties The properties.
 	 */
-	public void addSpaceObjectType(String typename, List properties)
+	public void addSpaceObjectType(String typename, Map properties)
 	{
 		synchronized(monitor)
 		{
@@ -405,10 +405,10 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			while(spaceobjects.containsKey(id));
 			
 			// Prepare properties (runtime props override type props).
-			properties = mergeProperties((List)objecttypes.get(typename), properties);
+			properties = mergeProperties(objecttypes.get(typename)!=null ? ((Map)objecttypes.get(typename)).values() : null, properties);
 			
 			// Create the object.
-			ret = new SpaceObject(id, typename, properties, tasks, null, monitor, this);
+			ret = new SpaceObject(id, typename, properties, tasks, monitor, this);
 			spaceobjects.put(id, ret);
 
 			// Store in type objects.
@@ -500,7 +500,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		
 		if(listeners!=null)
 		{
-			EnvironmentEvent event = new EnvironmentEvent(EnvironmentEvent.OBJECT_CREATED, this, ret, null);
+			EnvironmentEvent event = new EnvironmentEvent(EnvironmentEvent.OBJECT_CREATED, this, ret, null, null);
 			for(int i=0; i<listeners.size(); i++)
 			{
 				IEnvironmentListener lis = (IEnvironmentListener)listeners.get(i);
@@ -518,7 +518,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  @param properties	The runtime properties or null.
 	 *  @return	The merged runtime properties.
 	 */
-	protected Map mergeProperties(List typeprops, Map properties)
+	protected Map mergeProperties(Collection typeprops, Map properties)
 	{
 		if(typeprops!=null)
 		{
@@ -526,7 +526,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				properties = new HashMap();
 			for(Iterator it=typeprops.iterator(); it.hasNext(); )
 			{
-				Map	prop	= (Map) it.next();
+				Map	prop	= (Map)it.next();
 				String propname = (String)prop.get("name");
 				if(!properties.containsKey(propname))
 				{
@@ -599,14 +599,14 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		}
 		
 		// signal removal
-		// hmm? what about calling destroy on object? could it do sth. else than throwing event?
-		ObjectEvent event = new ObjectEvent(ObjectEvent.OBJECT_REMOVED);
-		event.setParameter("space_name", getName());
-		obj.fireObjectEvent(event);
+//		// hmm? what about calling destroy on object? could it do sth. else than throwing event?
+//		ObjectEvent event = new ObjectEvent(ObjectEvent.OBJECT_REMOVED);
+//		event.setParameter("space_name", getName());
+//		obj.fireObjectEvent(event);
 		
 		if(listeners!=null)
 		{
-			EnvironmentEvent ev = new EnvironmentEvent(EnvironmentEvent.OBJECT_DESTROYED, this, obj, null);
+			EnvironmentEvent ev = new EnvironmentEvent(EnvironmentEvent.OBJECT_DESTROYED, this, obj, null, null);
 			for(int i=0; i<listeners.size(); i++)
 			{
 				IEnvironmentListener lis = (IEnvironmentListener)listeners.get(i);
@@ -1304,16 +1304,46 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 */
 	protected void fireEnvironmentEvent(EnvironmentEvent event)
 	{
+		IEnvironmentListener[]	alisteners	= null;
 		synchronized(monitor)
 		{
 			if(listeners!=null)
+				alisteners	= (IEnvironmentListener[])listeners.toArray(new IEnvironmentListener[listeners.size()]);
+		}
+
+		if(alisteners!=null)
+		{
+			for(int i=0; i<alisteners.length; i++)
 			{
-				for(int i=0; i<listeners.size(); i++)
+				alisteners[i].dispatchEnvironmentEvent(event);
+			}
+		}
+	}
+	
+	/**
+	 *  Fire an object event.
+	 *  @param object The object.
+	 *  @param property The changed property.
+	 *  @param value The new property value.
+	 */
+	protected void fireObjectEvent(SpaceObject object, String property, Object value)
+	{
+		boolean	fire	= false;
+		synchronized(monitor)
+		{
+			Map	props	= (Map)objecttypes.get(object.getType());
+			if(props!=null)
+			{
+				Map	prop	= (Map)props.get(property);
+				if(prop!=null)
 				{
-					((IEnvironmentListener)listeners.get(i)).dispatchEnvironmentEvent(event);
+					Object	event	= prop.get("event");
+					fire	= event!=null && ((Boolean)event).booleanValue();
 				}
 			}
 		}
+		if(fire)
+			fireEnvironmentEvent(new EnvironmentEvent(EnvironmentEvent.OBJECT_PROPERTY_CHANGED, this, object, property, value));
 	}
 	
 	/**

@@ -77,10 +77,4 @@ public interface ISpaceObject extends IPropertyObject
 	 */
 	// Internal method (not for user)
 //	public void updateObject(long time, IVector1 deltaT);
-	
-	/**
-	 *  Fires an ObjectEvent.
-	 *  @param event the ObjectEvent.
-	 */
-	public void fireObjectEvent(ObjectEvent event);
 }

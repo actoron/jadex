@@ -43,11 +43,14 @@
 						new Vector3Double(0,0,Math.PI/2)
 					</env:property>
 					<env:property name="vision_range">0</env:property>
+					<env:property name="position" event="true"/>
 				</env:objecttype>
 				<env:objecttype name="burner">
 					<env:property name="vision_range">0</env:property>
 				</env:objecttype>
-				<env:objecttype name="garbage" />
+				<env:objecttype name="garbage">
+					<env:property name="position" event="true"/>
+				</env:objecttype>
 			</env:objecttypes>
 			
 			<!-- Declaration of the relationships between agents and their avatar objects in the space. -->

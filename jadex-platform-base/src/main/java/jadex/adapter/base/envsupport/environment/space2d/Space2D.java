@@ -1,7 +1,6 @@
 package jadex.adapter.base.envsupport.environment.space2d;
 
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.EnvironmentEvent;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
@@ -134,10 +133,8 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 			if(obj==null)
 				throw new RuntimeException("Space object not found: "+id);
 			
-			IVector2 oldpos = (IVector2)obj.getProperty(PROPERTY_POSITION);
 			IVector2 newpos = adjustPosition(pos);
 			obj.setProperty(PROPERTY_POSITION, newpos);
-			fireEnvironmentEvent(new EnvironmentEvent(EnvironmentEvent.OBJECT_POSITION_CHANGED, this, obj, oldpos));
 		}
 	}
 

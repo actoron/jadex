@@ -943,7 +943,8 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
-			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE),
+			new BeanAttributeInfo("event", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "drawable"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{

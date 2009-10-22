@@ -32,11 +32,11 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	/** The task listeners. */
 	protected MultiCollection tasklisteners;
 
-	/** Event listeners. */
-	protected List listeners;
-	
 	/** The fetcher. */
 	protected SimpleValueFetcher fetcher;
+	
+	/** The space. */
+	protected AbstractEnvironmentSpace	space;
 	
 	//-------- constructors --------
 	
@@ -47,16 +47,15 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	 * @param typename the object's type
 	 * @param properties initial properties (may be null)
 	 * @param tasks initial task list (may be null)
-	 * @param listeners initial listeners (may be null)
 	 */
-	public SpaceObject(Object id, String typename, Map properties, List tasks, List listeners, Object monitor, IEnvironmentSpace space)
+	public SpaceObject(Object id, String typename, Map properties, List tasks, Object monitor, AbstractEnvironmentSpace space)
 	{
 		super(monitor);
 		
 		this.id = id;
 		this.typename = typename;
 		this.properties = properties;
-		this.listeners = listeners;
+		this.space = space;
 		
 		this.tasks = new LinkedHashMap();
 		if(tasks != null)
@@ -105,14 +104,21 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	
 	/**
 	 *  Only for debugging.
-	 * /
+	 */
 	public void setProperty(String name, Object value)
 	{
-		if(getType().equals("cleaner") && name.equals(Space2D.PROPERTY_POSITION))
-			System.out.println("Setting: "+name+" "+value);
+//		if(getType().equals("cleaner") && name.equals(Space2D.PROPERTY_POSITION))
+//			System.out.println("Setting: "+name+" "+value);
 		
-		super.setProperty(name, value);
-	}*/
+		Object	oldvalue;
+		synchronized(getMonitor())
+		{
+			oldvalue	= super.getProperty(name); 
+			super.setProperty(name, value);
+		}
+		
+		space.fireObjectEvent(this, name, oldvalue);
+	}
 	
 	/**
 	 *  Get the objects id.
@@ -339,27 +345,6 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 					
 					removeTask(atasks[i].getProperty(IObjectTask.PROPERTY_ID));
 				}
-			}
-		}
-	}
-	
-	/**
-	 * Fires an ObjectEvent.
-	 * @param event the ObjectEvent
-	 */
-	public void fireObjectEvent(ObjectEvent event)
-	{
-		if(event.getParameter("object_id") == null)
-		{
-			event.setParameter("object_id", id);
-		}
-		
-		if(listeners!=null)
-		{
-			for(Iterator it = listeners.iterator(); it.hasNext(); )
-			{
-				IObjectListener listener = (IObjectListener)it.next();
-				listener.dispatchObjectEvent(event);
 			}
 		}
 	}

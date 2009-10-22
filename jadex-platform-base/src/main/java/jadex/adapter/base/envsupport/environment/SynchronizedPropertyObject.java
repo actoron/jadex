@@ -89,7 +89,8 @@ public abstract class SynchronizedPropertyObject extends SimplePropertyObject
 			oldval = properties.get(name);
 			properties.put(name, value);
 		}
-		pcs.firePropertyChange(name, oldval, value);
+		if(pcs!=null)
+			pcs.firePropertyChange(name, oldval, value);
 	}
 
 	/**

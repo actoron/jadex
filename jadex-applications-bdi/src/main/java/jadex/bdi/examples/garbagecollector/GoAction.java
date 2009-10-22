@@ -25,8 +25,6 @@ public class GoAction extends SimplePropertyObject implements ISpaceAction
 
 	public static final String DIRECTION = "direction";
 	
-//	public static final String POSITION_CHANGED = "position_changed";
-
 	
 	//-------- methods --------
 	

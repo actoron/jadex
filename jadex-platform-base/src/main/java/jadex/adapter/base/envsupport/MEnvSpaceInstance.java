@@ -37,6 +37,7 @@ import jadex.service.library.ILibraryService;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -127,9 +128,19 @@ public class MEnvSpaceInstance extends MSpaceInstance
 			{
 				Map mobjecttype = (Map)objecttypes.get(i);
 				List props = (List)mobjecttype.get("properties");
+				Map	properties	= null;
+				if(props!=null)
+				{
+					properties	= new LinkedHashMap();
+					for(int j=0; j<props.size(); j++)
+					{
+						Map	prop	= (Map)props.get(j);
+						properties.put(prop.get("name"), prop);
+					}
+				}
 //				Map properties = convertProperties(props, fetcher);
 //				System.out.println("Adding environment object type: "+(String)getProperty(mobjecttype, "name")+" "+props);
-				ret.addSpaceObjectType((String)getProperty(mobjecttype, "name"), props);
+				ret.addSpaceObjectType((String)getProperty(mobjecttype, "name"), properties);
 			}
 		}
 		

@@ -335,7 +335,7 @@
 					<env:observers>
 						<env:observer name="world" view="view_all" perspective="main">
 							<env:plugin name="evaluation" class="EvaluationPlugin">
-								<env:property name="component_1">((AbstractChartDataConsumer)$space.getDataConsumer("unhappiness_histogram")).getChartPanel()</env:property>
+								<env:property name="component_0">((AbstractChartDataConsumer)$space.getDataConsumer("unhappiness_histogram")).getChartPanel()</env:property>
 							</env:plugin>
 						</env:observer>
 					</env:observers>

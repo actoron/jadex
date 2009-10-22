@@ -94,11 +94,11 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 		IVector1 maxrange = getDefaultRange();
 		
 		IVector2 pos = (IVector2)event.getSpaceObject().getProperty(Space2D.PROPERTY_POSITION);
-		IVector2 oldpos = (IVector2)event.getInfo();
 		IAgentIdentifier eventowner	= (IAgentIdentifier)event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);
 
-		if(EnvironmentEvent.OBJECT_POSITION_CHANGED.equals(event.getType()))
+		if(EnvironmentEvent.OBJECT_PROPERTY_CHANGED.equals(event.getType()) && Space2D.PROPERTY_POSITION.equals(event.getProperty()))
 		{
+			IVector2 oldpos = (IVector2)event.getOldValue();
 			ISpaceObject[] objects = pos==null? EMPTY_SPACEOBJECTS: (ISpaceObject[])space.getNearObjects(pos, maxrange, null).toArray(new ISpaceObject[0]);
 			ISpaceObject[] oldobjects = oldpos==null? EMPTY_SPACEOBJECTS: (ISpaceObject[])space.getNearObjects(oldpos, maxrange, null).toArray(new ISpaceObject[0]);
 			
@@ -197,7 +197,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					
 					if(eventowner!=null)
 					{
-						if(!space.getDistance(pos==null? oldpos: pos, objpos).greater(getRange(event.getSpaceObject())))
+						if(!space.getDistance(pos, objpos).greater(getRange(event.getSpaceObject())))
 						{
 							String percepttype = getPerceptType(space, ((IApplicationContext)event.getSpace().getContext()).getAgentType(eventowner), objects[i].getType(), CREATED);
 							if(percepttype!=null)

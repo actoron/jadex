@@ -26,7 +26,6 @@ public class SimplePropertyObject implements IPropertyObject
 	 */
 	public SimplePropertyObject()
 	{
-		this.pcs = new SimplePropertyChangeSupport(this);
 	}
 	
 	//-------- methods --------
@@ -61,7 +60,8 @@ public class SimplePropertyObject implements IPropertyObject
 			properties = new LinkedHashMap(); // preserve order for EIS :-( parameters
 		Object oldval = properties.get(name);
 		properties.put(name, value);
-		pcs.firePropertyChange(name, oldval, value);
+		if(pcs!=null)
+			pcs.firePropertyChange(name, oldval, value);
 	}
 	
 	//-------- bean accessors --------
@@ -91,6 +91,8 @@ public class SimplePropertyObject implements IPropertyObject
      */
     public void addPropertyChangeListener(PropertyChangeListener listener)
 	{
+    	if(pcs==null)
+    		this.pcs = new SimplePropertyChangeSupport(this);
 		pcs.addPropertyChangeListener(listener);
     }
 
@@ -102,6 +104,7 @@ public class SimplePropertyObject implements IPropertyObject
      */
     public void removePropertyChangeListener(PropertyChangeListener listener)
 	{
-		pcs.removePropertyChangeListener(listener);
+    	if(pcs!=null)
+    		pcs.removePropertyChangeListener(listener);
     }
 }

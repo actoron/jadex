@@ -87,9 +87,9 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	/**
 	 *  Add a space object type.
 	 *  @param typename The type name.
-	 *  @param properties The properties (list of maps with name/value/dynamic).
+	 *  @param properties The properties (map of maps with name->name/value/dynamic/event).
 	 */
-	public void addSpaceObjectType(String typename, List properties);
+	public void addSpaceObjectType(String typename, Map properties);
 	
 	/**
 	 *  Remove a space object type.
