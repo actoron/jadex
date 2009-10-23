@@ -412,7 +412,7 @@ public class StarterPanel extends JPanel
 										}
 										else
 										{
-											starter.createAgent(typename, an, configname, args);
+											starter.createComponent(typename, an, configname, args);
 										}
 									}
 								}
@@ -424,7 +424,7 @@ public class StarterPanel extends JPanel
 									}
 									else
 									{
-										starter.createAgent(typename, an, configname, args);
+										starter.createComponent(typename, an, configname, args);
 									}
 								}
 							}

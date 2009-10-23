@@ -1,8 +1,6 @@
 package jadex.tools.common.modeltree;
 
 import jadex.adapter.base.SComponentFactory;
-import jadex.bridge.IAgentFactory;
-import jadex.bridge.IApplicationFactory;
 import jadex.commons.SGUI;
 import jadex.tools.common.plugin.IControlCenter;
 

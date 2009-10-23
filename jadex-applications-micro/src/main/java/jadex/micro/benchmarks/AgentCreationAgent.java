@@ -1,5 +1,6 @@
 package jadex.micro.benchmarks;
 
+import jadex.adapter.base.SComponentExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bridge.IAgentIdentifier;
@@ -52,13 +53,13 @@ public class AgentCreationAgent extends MicroAgent
 		{
 			args.put("num", new Integer(num+1));
 //				System.out.println("Args: "+num+" "+args);
-			final IAMS ams = (IAMS)getPlatform().getService(IAMS.class);
-			ams.createAgent(createPeerName(num+1), getClass().getName()+".class", null, args, 
+//			final IAMS ams = (IAMS)getPlatform().getService(IAMS.class);
+			SComponentExecutionService.createComponent(getPlatform(), createPeerName(num+1), getClass().getName()+".class", null, args, 
 				createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
-					ams.startAgent((IAgentIdentifier)result, null);
+					SComponentExecutionService.startComponent(getPlatform(), (IAgentIdentifier)result, null);
 				}
 				public void exceptionOccurred(Exception exception)
 				{
@@ -112,7 +113,7 @@ public class AgentCreationAgent extends MicroAgent
 	{
 		final String name = createPeerName(cnt);
 //		System.out.println("Destroying peer: "+name);
-		final IAMS ams = (IAMS)getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+//		final IAMS ams = (IAMS)getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
 		IAgentIdentifier aid = ams.createAgentIdentifier(name, true);
 		ams.destroyAgent(aid, createResultListener(new IResultListener()
 		{

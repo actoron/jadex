@@ -1,5 +1,6 @@
 package jadex.tools.starter;
 
+import jadex.adapter.base.SComponentExecutionService;
 import jadex.adapter.base.SComponentFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
@@ -301,7 +302,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 							String type = ((FileNode)node).getFile().getAbsolutePath();
 //							if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(type))
 							if(SComponentFactory.isStartable(getJCC().getServiceContainer(), type))
-								createAgent(type, null, null, null);
+								createComponent(type, null, null, null);
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
 					}
@@ -413,16 +414,17 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 			{
 			}
 		});
-		ams.addAMSListener(new IComponentListener()
+		
+		ams.addComponentListener(new IComponentListener()
 		{
-			public void agentRemoved(IAMSAgentDescription desc)
+			public void componentRemoved(Object desc)
 			{
-				agentDied(desc);
+				agentDied((IAMSAgentDescription)desc);
 			}
 			
-			public void agentAdded(IAMSAgentDescription desc)
+			public void componentAdded(Object desc)
 			{
-				agentBorn(desc);
+				agentBorn((IAMSAgentDescription)desc);
 			}
 		});
 
@@ -574,8 +576,8 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
 				if(node!=null && node.getUserObject() instanceof IAMSAgentDescription)
 				{
-					IAMS	ams	= (IAMS)getJCC().getServiceContainer().getService(IAMS.class);
-					ams.suspendAgent(((IAMSAgentDescription)node.getUserObject()).getName(), new IResultListener()
+					IComponentExecutionService ces = (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
+					ces.suspendComponent(((IAMSAgentDescription)node.getUserObject()).getName(), new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -620,8 +622,8 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
 				if(node!=null && node.getUserObject() instanceof IAMSAgentDescription)
 				{
-					IAMS	ams	= (IAMS)getJCC().getServiceContainer().getService(IAMS.class);
-					ams.resumeAgent(((IAMSAgentDescription)node.getUserObject()).getName(), new IResultListener()
+					IComponentExecutionService ces = (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
+					ces.resumeComponent(((IAMSAgentDescription)node.getUserObject()).getName(), new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -666,8 +668,8 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
 				if(node!=null && node.getUserObject() instanceof IAMSAgentDescription)
 				{
-					IAMS	ams	= (IAMS)getJCC().getServiceContainer().getService(IAMS.class);
-					ams.destroyAgent(((IAMSAgentDescription)node.getUserObject()).getName(), new IResultListener()
+					IComponentExecutionService ces = (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
+					ces.destroyComponent(((IAMSAgentDescription)node.getUserObject()).getName(), new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -846,7 +848,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 									{
 										public void actionPerformed(ActionEvent e)
 										{
-											createAgent(type, null, config, null);
+											createComponent(type, null, config, null);
 										}
 									});
 									me.setToolTipText("Start in configuration: "+config);
@@ -872,7 +874,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 								{
 									public void actionPerformed(ActionEvent e)
 									{
-										createAgent(type, null, null, null);
+										createComponent(type, null, null, null);
 									}
 								});
 							}
@@ -965,18 +967,14 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	 *  Create a new agent on the platform.
 	 *  Any errors will be displayed in a dialog to the user.
 	 */
-	public void createAgent(String type, String name, String configname, Map arguments)
+	public void createComponent(String type, String name, String configname, Map arguments)
 	{
-		final IAMS	ams	= (IAMS)getJCC().getServiceContainer().getService(IAMS.class);
-		final IComponentExecutionService es = (I)getJCC().getServiceContainer().getService(IAMS.class);
-		
-		ams.createAgent(name, type, configname, arguments, new IResultListener()
+		SComponentExecutionService.createComponent(getJCC().getServiceContainer(), name, type, configname, arguments, new IResultListener()
 		{
-			
 			public void resultAvailable(Object result)
 			{
 				final IAgentIdentifier aid = (IAgentIdentifier)result;
-				ams.startAgent(aid, new IResultListener()
+				SComponentExecutionService.startComponent(getJCC().getServiceContainer(), aid, new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{

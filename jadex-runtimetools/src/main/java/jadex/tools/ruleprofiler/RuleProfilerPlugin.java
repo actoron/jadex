@@ -205,16 +205,16 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 		// todo: ?! is this ok?
 		
 		IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
-		ams.addAMSListener(new IComponentListener()
+		ams.addComponentListener(new IComponentListener()
 		{
-			public void agentRemoved(IAMSAgentDescription desc)
+			public void componentRemoved(Object desc)
 			{
-				agentDied(desc);
+				agentDied((IAMSAgentDescription)desc);
 			}
 			
-			public void agentAdded(IAMSAgentDescription desc)
+			public void componentAdded(Object desc)
 			{
-				agentAdded(desc);
+				agentBorn((IAMSAgentDescription)desc);
 			}
 		});
 		

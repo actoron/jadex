@@ -76,7 +76,7 @@ public class MicroAgentFactory implements IComponentFactory
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 *  @return	An instance of a kernel agent.
 	 */
-	public IComponentInstance	createKernelAgent(IAgentAdapter adapter, String model, String config, Map arguments)
+	public IComponentInstance	createComponentInstance(IAgentAdapter adapter, String model, String config, Map arguments)
 	{
 		MicroAgentModel lm = (MicroAgentModel)loadModel(model);
 		return new MicroAgentInterpreter(adapter, lm, arguments, config);
@@ -174,9 +174,9 @@ public class MicroAgentFactory implements IComponentFactory
 	/**
 	 *  Get the element type.
 	 *  @return The element type (e.g. an agent, application or process).
-	 */
+	 * /
 	public String getElementType()
 	{
 		return IComponentFactory.ELEMENT_TYPE_AGENT;
-	}
+	}*/
 }

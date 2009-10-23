@@ -5,7 +5,6 @@ import jadex.bdi.planlib.test.Testcase;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
-import jadex.bridge.IAgentFactory;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
