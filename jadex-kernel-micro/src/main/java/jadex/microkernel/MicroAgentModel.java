@@ -1,7 +1,7 @@
 package jadex.microkernel;
 
 import jadex.bridge.IArgument;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IReport;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -13,7 +13,7 @@ import java.util.Map;
  *  The agent model contains a loaded micro agent model (class)
  *  and provides meta-information (arguments, etc).
  */
-public class MicroAgentModel implements ILoadableElementModel
+public class MicroAgentModel implements ILoadableComponentModel
 {
 	//-------- attributes --------
 

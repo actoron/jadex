@@ -36,7 +36,7 @@ import jadex.adapter.base.fipa.IAgentAction;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bridge.IContentCodec;
-import jadex.bridge.IKernelAgent;
+import jadex.bridge.IComponentInstance;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -71,7 +71,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 	protected Platform platform;
 	
 	/** The jadex agent. */
-	protected IKernelAgent		agent;
+	protected IComponentInstance		agent;
 
 	/** The ams. */
 	protected IAMS ams;
@@ -91,7 +91,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 	 * Create the message receiver behaviour.
 	 * @param agent The bdi agent.
 	 */
-	public MessageReceiverBehaviour(Platform platform, IKernelAgent agent, IAMS ams)
+	public MessageReceiverBehaviour(Platform platform, IComponentInstance agent, IAMS ams)
 	{
 		this.platform = platform;
 		this.agent = agent;

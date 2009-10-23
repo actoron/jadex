@@ -3,13 +3,13 @@ package jadex.tools.starter;
 import jadex.adapter.base.SElementFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.bridge.IElementListener;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
-import jadex.bridge.IElementExecutionService;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IPlatform;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
@@ -413,7 +413,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 			{
 			}
 		});
-		ams.addAMSListener(new IElementListener()
+		ams.addAMSListener(new IComponentListener()
 		{
 			public void agentRemoved(IAMSAgentDescription desc)
 			{
@@ -828,7 +828,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 						try
 						{
 //							IAgentFactory agentfactory = getJCC().getAgent().getPlatform().getAgentFactory();
-							ILoadableElementModel model = SElementFactory.loadModel(getJCC().getServiceContainer(), type);
+							ILoadableComponentModel model = SElementFactory.loadModel(getJCC().getServiceContainer(), type);
 							String[] inistates = model.getConfigurations();
 //							IMBDIAgent model = SXML.loadAgentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
@@ -968,7 +968,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	public void createAgent(String type, String name, String configname, Map arguments)
 	{
 		final IAMS	ams	= (IAMS)getJCC().getServiceContainer().getService(IAMS.class);
-		final IElementExecutionService es = (I)getJCC().getServiceContainer().getService(IAMS.class);
+		final IComponentExecutionService es = (I)getJCC().getServiceContainer().getService(IAMS.class);
 		
 		ams.createAgent(name, type, configname, arguments, new IResultListener()
 		{

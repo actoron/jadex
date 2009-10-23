@@ -1,7 +1,7 @@
 package jadex.wfms.service.execution;
 
-import jadex.bridge.IElementFactory;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.IComponentFactory;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
@@ -90,9 +90,9 @@ public class MetaExecutionService implements IExecutionService
 	 *  @param model The model.
 	 *  @return The loaded model.
 	 */
-	public ILoadableElementModel loadModel(String model)
+	public ILoadableComponentModel loadModel(String model)
 	{
-		ILoadableElementModel ret = null;
+		ILoadableComponentModel ret = null;
 		
 		for(int i=0; ret==null && i<exeservices.size(); i++)
 		{
@@ -223,7 +223,7 @@ public class MetaExecutionService implements IExecutionService
 		{
 			for(Iterator it=exeservices.iterator(); it.hasNext(); )
 			{
-				IElementFactory fac = (IElementFactory)it.next();
+				IComponentFactory fac = (IComponentFactory)it.next();
 				ret	= (String[])SUtil.joinArrays(ret, fac.getFileTypes());
 			}
 		}
@@ -240,7 +240,7 @@ public class MetaExecutionService implements IExecutionService
 		{
 			for(Iterator it=exeservices.iterator(); it.hasNext() && ret==null; )
 			{
-				IElementFactory fac = (IElementFactory)it.next();
+				IComponentFactory fac = (IComponentFactory)it.next();
 				ret = fac.getFileTypeIcon(type);
 			}
 		}
@@ -258,7 +258,7 @@ public class MetaExecutionService implements IExecutionService
 		{
 			for(Iterator it=exeservices.iterator(); it.hasNext() && ret==null; )
 			{
-				IElementFactory fac = (IElementFactory)it.next();
+				IComponentFactory fac = (IComponentFactory)it.next();
 				ret = fac.getFileType(model);
 			}
 		}

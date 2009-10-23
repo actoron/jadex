@@ -1,6 +1,6 @@
 package jadex.wfms.service.execution;
 
-import jadex.bridge.IElementFactory;
+import jadex.bridge.IComponentFactory;
 import jadex.service.IService;
 
 import java.util.Map;
@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * 
  */
-public interface IExecutionService extends IService, IElementFactory
+public interface IExecutionService extends IService, IComponentFactory
 {
 	/**
 	 *  Load a process model.

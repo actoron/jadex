@@ -3,7 +3,7 @@ package jadex.microkernel;
 import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IArgument;
-import jadex.bridge.IKernelAgent;
+import jadex.bridge.IComponentInstance;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.concurrent.IResultListener;
 
@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  *  The micro agent interpreter is the connection between the agent platform 
  *  and a user-written micro agent. 
  */
-public class MicroAgentInterpreter implements IKernelAgent
+public class MicroAgentInterpreter implements IComponentInstance
 {
 	//-------- attributes --------
 	
@@ -110,7 +110,7 @@ public class MicroAgentInterpreter implements IKernelAgent
 	 *  The platform guarantees that executeAction() will not be called in parallel. 
 	 *  @return True, when there are more actions waiting to be executed. 
 	 */
-	public boolean executeAction()
+	public boolean executeStep()
 	{
 		try
 		{
@@ -188,7 +188,7 @@ public class MicroAgentInterpreter implements IKernelAgent
 	 *  Can be called concurrently (also during executeAction()).
 	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
 	 */
-	public void killAgent(final IResultListener listener)
+	public void killComponent(final IResultListener listener)
 	{
 		invokeLater(new Runnable()
 		{

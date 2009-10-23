@@ -1,9 +1,9 @@
 package jadex.bdi.interpreter;
 
 import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IElementFactory;
-import jadex.bridge.IKernelAgent;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.IComponentFactory;
+import jadex.bridge.IComponentInstance;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
@@ -122,7 +122,7 @@ public class BDIAgentFactory
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 *  @return	An instance of a kernel agent.
 	 */
-	public IKernelAgent	createKernelAgent(IAgentAdapter adapter, String model, String config, Map arguments)
+	public IComponentInstance	createKernelAgent(IAgentAdapter adapter, String model, String config, Map arguments)
 	{
 		init();
 		
@@ -140,7 +140,7 @@ public class BDIAgentFactory
 	 *  Load an agent model.
 	 *  @param filename The filename.
 	 */
-	public ILoadableElementModel loadModel(String filename)
+	public ILoadableComponentModel loadModel(String filename)
 	{
 		init();
 		
@@ -224,6 +224,6 @@ public class BDIAgentFactory
 	 */
 	public String getElementType()
 	{
-		return IElementFactory.ELEMENT_TYPE_AGENT;
+		return IComponentFactory.ELEMENT_TYPE_AGENT;
 	}
 }

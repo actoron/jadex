@@ -4,7 +4,7 @@ import jadex.adapter.base.SElementExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IElementExecutionService;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.MessageType;
 import jadex.commons.concurrent.IResultListener;
@@ -145,7 +145,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 							// Do not kill ams and df agents immediately.
 							if(!daemonagents.contains(agents[i]))
 							{
-								ams.destroyElement(agents[i], null);
+								ams.destroyComponent(agents[i], null);
 								//System.out.println("Killing normal agent: "+agents[i]);
 							}
 						}
@@ -372,12 +372,12 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 	protected IAMS getAMSService()
 	{
 		IAMS ret = null;
-		Collection exes = getServices(IElementExecutionService.class);
+		Collection exes = getServices(IComponentExecutionService.class);
 		if(exes!=null)
 		{
 			for(Iterator it=exes.iterator(); it.hasNext() && ret==null; )
 			{
-				IElementExecutionService es = (IElementExecutionService)it.next();
+				IComponentExecutionService es = (IComponentExecutionService)it.next();
 				if(es instanceof IAMS)
 					ret = (IAMS)es;
 			}

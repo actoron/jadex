@@ -6,7 +6,7 @@ import java.util.Map;
  *  Interface for an agent factory
  *  (a factory typically belongs to a specific kernel).
  */
-public interface IApplicationFactory extends IElementFactory
+public interface IApplicationFactory extends IComponentFactory
 {
 	/**
 	 *  Create a new agent application.

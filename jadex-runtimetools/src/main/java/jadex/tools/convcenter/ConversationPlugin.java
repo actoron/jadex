@@ -7,7 +7,7 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.IParameterSet;
-import jadex.bridge.IElementListener;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
@@ -160,7 +160,7 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 			{
 			}
 		});
-		ams.addAMSListener(new IElementListener()
+		ams.addAMSListener(new IComponentListener()
 		{
 			public void agentRemoved(IAMSAgentDescription desc)
 			{

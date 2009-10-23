@@ -1,7 +1,7 @@
 package jadex.adapter.base;
 
-import jadex.bridge.IElementExecutionService;
-import jadex.bridge.IElementFactory;
+import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentFactory;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 
@@ -29,15 +29,15 @@ public class SElementExecutionService
 	 */
 	public static void	createElement(IServiceContainer container, String name, String model, String config, Map args, IResultListener listener, Object creator)
 	{
-		Collection facts = container.getServices(IElementFactory.class);
+		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
 		{
 			for(Iterator it=facts.iterator(); it.hasNext(); )
 			{
-				IElementExecutionService es = (IElementExecutionService)it.next();
+				IComponentExecutionService es = (IComponentExecutionService)it.next();
 				if(es.isResponsible(model))
 				{
-					es.createElement(name, model, config, args, listener, creator);
+					es.createComponent(name, model, config, args, listener, creator);
 					break;
 				}
 			}
@@ -50,15 +50,15 @@ public class SElementExecutionService
 	 */
 	public static void	startElement(IServiceContainer container, Object elementid, IResultListener listener)
 	{
-		Collection facts = container.getServices(IElementFactory.class);
+		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
 		{
 			for(Iterator it=facts.iterator(); it.hasNext(); )
 			{
-				IElementExecutionService es = (IElementExecutionService)it.next();
+				IComponentExecutionService es = (IComponentExecutionService)it.next();
 				if(es.isResponsible(elementid))
 				{
-					es.startElement(elementid, listener);
+					es.startComponent(elementid, listener);
 					break;
 				}
 			}
@@ -71,15 +71,15 @@ public class SElementExecutionService
 	 */
 	public static void destroyElement(IServiceContainer container, Object elementid, IResultListener listener)
 	{
-		Collection facts = container.getServices(IElementFactory.class);
+		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
 		{
 			for(Iterator it=facts.iterator(); it.hasNext(); )
 			{
-				IElementExecutionService es = (IElementExecutionService)it.next();
+				IComponentExecutionService es = (IComponentExecutionService)it.next();
 				if(es.isResponsible(elementid))
 				{
-					es.destroyElement(elementid, listener);
+					es.destroyComponent(elementid, listener);
 					break;
 				}
 			}
@@ -92,15 +92,15 @@ public class SElementExecutionService
 	 */
 	public static void suspendElement(IServiceContainer container, Object elementid, IResultListener listener)
 	{
-		Collection facts = container.getServices(IElementFactory.class);
+		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
 		{
 			for(Iterator it=facts.iterator(); it.hasNext(); )
 			{
-				IElementExecutionService es = (IElementExecutionService)it.next();
+				IComponentExecutionService es = (IComponentExecutionService)it.next();
 				if(es.isResponsible(elementid))
 				{
-					es.suspendElement(elementid, listener);
+					es.suspendComponent(elementid, listener);
 					break;
 				}
 			}
@@ -113,15 +113,15 @@ public class SElementExecutionService
 	 */
 	public static void resumeElement(IServiceContainer container, Object elementid, IResultListener listener)
 	{
-		Collection facts = container.getServices(IElementFactory.class);
+		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
 		{
 			for(Iterator it=facts.iterator(); it.hasNext(); )
 			{
-				IElementExecutionService es = (IElementExecutionService)it.next();
+				IComponentExecutionService es = (IComponentExecutionService)it.next();
 				if(es.isResponsible(elementid))
 				{
-					es.destroyElement(elementid, listener);
+					es.destroyComponent(elementid, listener);
 					break;
 				}
 			}

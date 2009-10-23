@@ -81,7 +81,7 @@ public class InterpreterTest
 				public void killAgent()
 				{
 					System.out.println("clean");
-					interpreters[0].killAgent(new IResultListener()
+					interpreters[0].killComponent(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -181,7 +181,7 @@ public class InterpreterTest
 				{
 					// Execute agent.
 	//				System.out.println("Executed agent step.");
-					return interpreter.executeAction();
+					return interpreter.executeStep();
 				}
 			});
 			interpreters[0]	= interpreter;

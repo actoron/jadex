@@ -4,8 +4,8 @@ import jadex.adapter.base.DefaultResultListener;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IContextService;
-import jadex.bridge.IElementFactory;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.IComponentFactory;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IPlatform;
 import jadex.bridge.ISpace;
 import jadex.commons.ResourceInfo;
@@ -233,9 +233,9 @@ public class ApplicationFactory implements IApplicationFactory
 	 *  Load an agent model.
 	 *  @param filename The filename.
 	 */
-	public ILoadableElementModel loadModel(String filename)
+	public ILoadableComponentModel loadModel(String filename)
 	{
-		ILoadableElementModel ret = null;
+		ILoadableComponentModel ret = null;
 		
 		if(filename!=null && filename.toLowerCase().endsWith(FILE_EXTENSION_APPLICATION))
 		{
@@ -377,6 +377,6 @@ public class ApplicationFactory implements IApplicationFactory
 	 */
 	public String getElementType()
 	{
-		return IElementFactory.ELEMENT_TYPE_AGENT;
+		return IComponentFactory.ELEMENT_TYPE_AGENT;
 	}
 }

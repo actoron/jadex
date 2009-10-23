@@ -1,7 +1,7 @@
 package jadex.adapter.base.appdescriptor;
 
 import jadex.bridge.IArgument;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IReport;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  *  Model representation of an application.
  */
-public class ApplicationModel implements ILoadableElementModel
+public class ApplicationModel implements ILoadableComponentModel
 {
 	//-------- attributes --------
 	

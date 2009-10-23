@@ -3,7 +3,7 @@ package jadex.gpmn;
 import jadex.bdi.interpreter.BDIAgentFactory;
 import jadex.bdi.interpreter.OAVAgentModel;
 import jadex.bdi.interpreter.OAVBDIXMLReader;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
 import jadex.commons.xml.writer.Writer;
@@ -56,7 +56,7 @@ public class GpmnAgentFactory extends BDIAgentFactory
 	 *  @param model The model.
 	 *  @return The loaded model.
 	 */
-	public ILoadableElementModel loadModel(String model)
+	public ILoadableComponentModel loadModel(String model)
 	{
 		init();
 

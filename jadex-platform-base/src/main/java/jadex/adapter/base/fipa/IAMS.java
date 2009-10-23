@@ -1,14 +1,14 @@
 package jadex.adapter.base.fipa;
 
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IElementExecutionService;
+import jadex.bridge.IComponentExecutionService;
 import jadex.commons.concurrent.IResultListener;
 
 /**
  *  Interface for the agent management system (AMS). It provides basic platform 
  *  services for managing agent creation, deletion and search.
  */
-public interface IAMS extends IElementExecutionService
+public interface IAMS extends IComponentExecutionService
 {
 //	/**
 //	 *  Create a new agent on the platform.

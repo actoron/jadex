@@ -3,7 +3,7 @@ package jadex.adapter.standalone;
 import jadex.adapter.base.SElementFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.bridge.IElementListener;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IApplicationFactory;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
@@ -33,7 +33,7 @@ public class SpringPlatform extends AbstractPlatform
 	//-------- attributes --------
 	
 	/** The ams listener. */
-	protected IElementListener amslistener;
+	protected IComponentListener amslistener;
 	
 	/** The daemon agents. */
 	protected Map daemagents;
@@ -88,13 +88,13 @@ public class SpringPlatform extends AbstractPlatform
 		{
 			if(amslistener==null)
 			{
-				amslistener = new IElementListener()
+				amslistener = new IComponentListener()
 				{
-					public void elementAdded(Object desc)
+					public void componentAdded(Object desc)
 					{
 					}
 	
-					public void elementRemoved(Object desc)
+					public void componentRemoved(Object desc)
 					{
 						((IAMS)getService(IAMS.class)).getAgentCount(new IResultListener()
 						{

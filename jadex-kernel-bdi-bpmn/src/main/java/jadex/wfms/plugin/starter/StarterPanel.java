@@ -1,8 +1,8 @@
 package jadex.wfms.plugin.starter;
 
 import jadex.bridge.IArgument;
-import jadex.bridge.IElementFactory;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.IComponentFactory;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IReport;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -71,7 +71,7 @@ public class StarterPanel extends JPanel
 	//-------- attributes --------
 
 	/** The model. */
-	protected ILoadableElementModel model;
+	protected ILoadableComponentModel model;
 
 	/** The last loaded filename. */
 	protected String lastfile;
@@ -151,7 +151,7 @@ public class StarterPanel extends JPanel
 				public boolean accept(File f)
 				{
 					boolean	ret	= f.isDirectory() || 
-						((IElementFactory)starter.getJCC().getServiceContainer().getService(IElementFactory.class)).isLoadable(f.getAbsolutePath());
+						((IComponentFactory)starter.getJCC().getServiceContainer().getService(IComponentFactory.class)).isLoadable(f.getAbsolutePath());
 
 					return ret;
 				}

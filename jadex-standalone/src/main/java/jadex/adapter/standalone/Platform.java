@@ -1,7 +1,7 @@
 package jadex.adapter.standalone;
 
 import jadex.adapter.base.fipa.IAMS;
-import jadex.bridge.IElementListener;
+import jadex.bridge.IComponentListener;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
@@ -249,13 +249,13 @@ public class Platform extends AbstractPlatform
 			// Add ams listener if auto shutdown.
 			if(platconf.getBooleanProperty(AUTOSHUTDOWN))
 			{
-				getAMSService().addElementListener(new IElementListener()
+				getAMSService().addElementListener(new IComponentListener()
 				{
-					public void elementAdded(Object desc)
+					public void componentAdded(Object desc)
 					{
 					}
 	
-					public void elementRemoved(Object desc)
+					public void componentRemoved(Object desc)
 					{
 						((IAMS)getService(IAMS.class)).getAgentCount(new IResultListener()
 						{

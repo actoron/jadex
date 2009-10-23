@@ -20,11 +20,11 @@ import jadex.adapter.base.fipa.ISearchConstraints;
 import jadex.adapter.jade.fipaimpl.AMSAgentDescription;
 import jadex.adapter.jade.fipaimpl.AgentIdentifier;
 import jadex.adapter.jade.fipaimpl.SearchConstraints;
-import jadex.bridge.IElementFactory;
-import jadex.bridge.IElementListener;
+import jadex.bridge.IComponentFactory;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageService;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
@@ -91,7 +91,7 @@ public class AMS implements IAMS, IService
 		
 		if(!ret && element instanceof String)
 		{
-			ret = IElementFactory.ELEMENT_TYPE_AGENT.equals(
+			ret = IComponentFactory.ELEMENT_TYPE_AGENT.equals(
 				SElementFactory.getElementType(platform, (String)element));
 		}
 		
@@ -258,15 +258,15 @@ public class AMS implements IAMS, IService
 		
 //		System.out.println("added: "+agentdescs.size()+", "+aid);
 
-		IElementListener[]	alisteners;
+		IComponentListener[]	alisteners;
 		synchronized(listeners)
 		{
-			alisteners	= (IElementListener[])listeners.toArray(new IElementListener[listeners.size()]);
+			alisteners	= (IComponentListener[])listeners.toArray(new IComponentListener[listeners.size()]);
 		}
 		// todo: can be called after listener has (concurrently) deregistered
 		for(int i=0; i<alisteners.length; i++)
 		{
-			alisteners[i].elementAdded(ad);
+			alisteners[i].componentAdded(ad);
 		}
 		
 //		System.out.println("Created agent: "+aid);
@@ -961,7 +961,7 @@ public class AMS implements IAMS, IService
      *  The listener is registered for ams changes.
      *  @param listener  The listener to be added.
      */
-    public void addElementListener(IElementListener listener)
+    public void addElementListener(IComponentListener listener)
 	{
 		synchronized(listeners)
 		{
@@ -973,7 +973,7 @@ public class AMS implements IAMS, IService
      *  Remove an ams listener.
      *  @param listener  The listener to be removed.
      */
-    public void removeElementListener(IElementListener listener)
+    public void removeElementListener(IComponentListener listener)
 	{
 		synchronized(listeners)
 		{
@@ -988,7 +988,7 @@ public class AMS implements IAMS, IService
 	 */
 	public String getShortName(String filename)
 	{
-		ILoadableElementModel model = SElementFactory.loadModel(platform, filename);
+		ILoadableComponentModel model = SElementFactory.loadModel(platform, filename);
 //		ILoadableElementModel	model	= platform.getAgentFactory().loadModel(filename);
 		return model.getName();
 	}
@@ -1020,17 +1020,17 @@ public class AMS implements IAMS, IService
 				adapter.cleanupAgent();
 			}
 			
-			IElementListener[]	alisteners;
+			IComponentListener[]	alisteners;
 			synchronized(listeners)
 			{
-				alisteners	= (IElementListener[])listeners.toArray(new IElementListener[listeners.size()]);
+				alisteners	= (IComponentListener[])listeners.toArray(new IComponentListener[listeners.size()]);
 			}
 			// todo: can be called after listener has (concurrently) deregistered
 			for(int i=0; i<alisteners.length; i++)
 			{
 				AMSAgentDescription ad = new AMSAgentDescription();
 				ad.setName(aid);
-				alisteners[i].elementRemoved(ad);
+				alisteners[i].componentRemoved(ad);
 			}
 			
 			if(listener!=null)

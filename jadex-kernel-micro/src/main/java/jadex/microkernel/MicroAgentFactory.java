@@ -1,9 +1,9 @@
 package jadex.microkernel;
 
 import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IElementFactory;
-import jadex.bridge.IKernelAgent;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.IComponentFactory;
+import jadex.bridge.IComponentInstance;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
@@ -18,7 +18,7 @@ import javax.swing.UIDefaults;
 /**
  *  Factory for creating micro agents.
  */
-public class MicroAgentFactory implements IElementFactory
+public class MicroAgentFactory implements IComponentFactory
 {
 	//-------- constants --------
 	
@@ -76,7 +76,7 @@ public class MicroAgentFactory implements IElementFactory
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 *  @return	An instance of a kernel agent.
 	 */
-	public IKernelAgent	createKernelAgent(IAgentAdapter adapter, String model, String config, Map arguments)
+	public IComponentInstance	createKernelAgent(IAgentAdapter adapter, String model, String config, Map arguments)
 	{
 		MicroAgentModel lm = (MicroAgentModel)loadModel(model);
 		return new MicroAgentInterpreter(adapter, lm, arguments, config);
@@ -87,10 +87,10 @@ public class MicroAgentFactory implements IElementFactory
 	 *  @param model The model.
 	 *  @return The loaded model.
 	 */
-	public ILoadableElementModel loadModel(String model)
+	public ILoadableComponentModel loadModel(String model)
 	{
 //		System.out.println("loading micro: "+model);
-		ILoadableElementModel ret = null;
+		ILoadableComponentModel ret = null;
 		ILibraryService libservice = (ILibraryService)platform.getService(ILibraryService.class);
 		
 		String clname = model;
@@ -177,6 +177,6 @@ public class MicroAgentFactory implements IElementFactory
 	 */
 	public String getElementType()
 	{
-		return IElementFactory.ELEMENT_TYPE_AGENT;
+		return IComponentFactory.ELEMENT_TYPE_AGENT;
 	}
 }

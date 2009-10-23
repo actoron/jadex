@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import java.util.Map;
+
 import jadex.service.IService;
 
 import javax.swing.Icon;
@@ -7,18 +9,18 @@ import javax.swing.Icon;
 /**
  * 
  */
-public interface IElementFactory extends IService
+public interface IComponentFactory extends IService
 {
 	//-------- constants --------
 
-	/** The element type application. */
-	public static final String ELEMENT_TYPE_APPLICATION = "application";
-	
-	/** The element type agent. */
-	public static final String ELEMENT_TYPE_AGENT = "agent";
-	
-	/** The element type process. */
-	public static final String ELEMENT_TYPE_PROCESS = "process";
+//	/** The component type application. */
+//	public static final String COMPONENT_TYPE_APPLICATION = "application";
+//	
+//	/** The component type agent. */
+//	public static final String COMPONENT_TYPE_AGENT = "agent";
+//	
+//	/** The component type process. */
+//	public static final String COMPONENT_TYPE_PROCESS = "process";
 
 	//-------- methods --------
 	
@@ -27,7 +29,7 @@ public interface IElementFactory extends IService
 	 *  @param model The model.
 	 *  @return The loaded model.
 	 */
-	public ILoadableElementModel loadModel(String model);
+	public ILoadableComponentModel loadModel(String model);
 
 	/**
 	 *  Test if a model can be loaded by the factory.
@@ -63,5 +65,15 @@ public interface IElementFactory extends IService
 	 *  Get the element type.
 	 *  @return The element type (e.g. an agent, application or process).
 	 */
-	public String getElementType();
+//	public String getElementType();
+	
+	/**
+	* Create a kernel agent.
+	* @param adapter The platform adapter for the agent. 
+	* @param model The agent model file (i.e. the name of the XML file).
+	* @param config The name of the configuration (or null for default configuration) 
+	* @param arguments The arguments for the agent as name/value pairs.
+	* @return An instance of a kernel agent.
+	*/
+	public IComponentInstance createComponentInstance(IAgentAdapter adapter, String model, String config, Map arguments);
 }

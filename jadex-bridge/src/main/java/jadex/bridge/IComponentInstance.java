@@ -8,7 +8,7 @@ import jadex.commons.concurrent.IResultListener;
  *  To create a kernel agent instance use the kernel's agent factory
  *  @link{IAgentFactory}. 
  */
-public interface IKernelAgent
+public interface IComponentInstance
 {
 	//-------- methods to be called by adapter --------
 
@@ -24,7 +24,7 @@ public interface IKernelAgent
 	 *  The platform guarantees that executeAction() will not be called in parallel. 
 	 *  @return True, when there are more actions waiting to be executed. 
 	 */
-	public boolean executeAction();
+	public boolean executeStep();
 
 	/**
 	 *  Can be called concurrently (also during executeAction()).
@@ -44,7 +44,7 @@ public interface IKernelAgent
 	 *  Can be called concurrently (also during executeAction()).
 	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
 	 */
-	public void killAgent(IResultListener listener);
+	public void killComponent(IResultListener listener);
 	
 	/**
 	 *  Can be called concurrently (also during executeAction()).

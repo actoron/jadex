@@ -13,7 +13,7 @@ import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IKernelAgent;
+import jadex.bridge.IComponentInstance;
 import jadex.bridge.IPlatform;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
@@ -50,7 +50,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 //	protected IAgentIdentifier	aid;
 
 	/** The kernel agent. */
-	protected IKernelAgent	agent;
+	protected IComponentInstance	agent;
 
 	/** The state of the agent (according to FIPA, managed by AMS). */
 	protected String	state;
@@ -368,7 +368,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 			throw new AgentTerminatedException(getAgentIdentifier().getName());
 
 		if(!fatalerror)
-			agent.killAgent(listener);
+			agent.killComponent(listener);
 		else if(listener!=null)
 			listener.resultAvailable(getAgentIdentifier());
 			
@@ -445,7 +445,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	/**
 	 *  Make kernel agent available.
 	 */
-	public IKernelAgent	getKernelAgent()
+	public IComponentInstance	getKernelAgent()
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state) || fatalerror)
 			throw new AgentTerminatedException(getAgentIdentifier().getName());
@@ -535,7 +535,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	{
 		// Add agenda action to avoid threading issues
 		// super.doDelete() would interrupt agent thread (while e.g. waiting for plan).
-		agent.killAgent(new IResultListener()
+		agent.killComponent(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

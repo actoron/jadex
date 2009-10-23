@@ -1,6 +1,6 @@
 package jadex.tools.comanalyzer;
 
-import jadex.bridge.IKernelAgent;
+import jadex.bridge.IComponentInstance;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IToolAdapter;
 
@@ -26,7 +26,7 @@ public class ComanalyzerAdapter implements IToolAdapter//, ISystemEventListener,
 	//-------- attibutes -------
 	
 	/** The agent. */
-	protected IKernelAgent agent;
+	protected IComponentInstance agent;
 	
 	/** The sniff state. */
 //	protected boolean issniffing;
@@ -39,7 +39,7 @@ public class ComanalyzerAdapter implements IToolAdapter//, ISystemEventListener,
 	/**
 	 *  Create a new comanalyzer adapter.
 	 */
-	public void init(IKernelAgent agent)
+	public void init(IComponentInstance agent)
 	{
 		this.agent = agent;
 		this.tools = new ArrayList();

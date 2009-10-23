@@ -1,6 +1,6 @@
 package jadex.wfms.plugin.starter;
 
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
 import jadex.tools.common.modeltree.CombiIcon;
 import jadex.tools.common.modeltree.DefaultNodeFunctionality;
@@ -203,7 +203,7 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 						if(((IExecutionService)jcc.getServiceContainer().getService(IExecutionService.class)).isLoadable(file))
 						{
 //							IModelRepositoryService repo = (IModelRepositoryService)jcc.getServiceContainer().getService(IModelRepositoryService.class);
-							ILoadableElementModel model = ((IExecutionService)jcc.getServiceContainer().getService(IExecutionService.class)).loadModel(file);
+							ILoadableComponentModel model = ((IExecutionService)jcc.getServiceContainer().getService(IExecutionService.class)).loadModel(file);
 							if(model!=null)
 							{
 								newvalid	= model.getReport().isEmpty();

@@ -3,9 +3,9 @@ package jadex.wfms.service.execution;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.standalone.Platform;
-import jadex.bridge.IElementListener;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IPlatform;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
@@ -108,7 +108,7 @@ public class GpmnExecutionService implements IExecutionService
 		long startup = System.currentTimeMillis() - starttime;
 		((Platform)platform).getLogger().info("Platform startup time: " + startup + " ms.");
 		
-		((IAMS)platform.getService(IAMS.class)).addAMSListener(new IElementListener()
+		((IAMS)platform.getService(IAMS.class)).addAMSListener(new IComponentListener()
 		{
 			
 			public void agentRemoved(IAMSAgentDescription desc)
@@ -138,7 +138,7 @@ public class GpmnExecutionService implements IExecutionService
 	 *  @param filename The file name.
 	 *  @return The process model.
 	 */
-	public ILoadableElementModel loadModel(String filename)
+	public ILoadableComponentModel loadModel(String filename)
 	{
 		IProcessModel ret = null;
 		try

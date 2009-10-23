@@ -3,7 +3,7 @@ package jadex.wfms.plugin.starter;
 import jadex.adapter.base.SElementFactory;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.bdi.runtime.GoalFailureException;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -685,7 +685,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 					{
 						try
 						{
-							ILoadableElementModel model = SElementFactory.loadModel(jcc.getServiceContainer(), type);
+							ILoadableComponentModel model = SElementFactory.loadModel(jcc.getServiceContainer(), type);
 							String[] inistates = model.getConfigurations();
 //							IMBDIAgent model = SXML.loadAgentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();

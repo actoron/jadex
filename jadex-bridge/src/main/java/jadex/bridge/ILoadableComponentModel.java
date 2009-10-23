@@ -9,7 +9,7 @@ package jadex.bridge;
  *  Agent types can be loaded by the kernel's agent factory
  *  @link{IAgentFactory}. 
  */
-public interface ILoadableElementModel
+public interface ILoadableComponentModel
 {
 	/**
 	 *  Get the name.

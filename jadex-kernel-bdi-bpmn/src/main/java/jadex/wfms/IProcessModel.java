@@ -1,11 +1,11 @@
 package jadex.wfms;
 
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.ILoadableComponentModel;
 
 /**
  *  Interface for process models.
  */
-public interface IProcessModel extends ILoadableElementModel
+public interface IProcessModel extends ILoadableComponentModel
 {
 	/**
 	 *  Get the package name.

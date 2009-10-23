@@ -1,7 +1,7 @@
 package jadex.adapter.jade;
 
 import jade.core.behaviours.CyclicBehaviour;
-import jadex.bridge.IKernelAgent;
+import jadex.bridge.IComponentInstance;
 
 /**
  *  The jadex Timing Behaviour is responsible for
@@ -13,7 +13,7 @@ public class TimingBehaviour extends CyclicBehaviour
 	//-------- attributes --------
 
 	/** The agent. */
-	protected IKernelAgent agent;
+	protected IComponentInstance agent;
 
 	/** The clock. */
 //	protected JadeAgentClock clock;

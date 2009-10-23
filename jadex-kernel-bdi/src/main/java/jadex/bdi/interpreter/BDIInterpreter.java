@@ -15,7 +15,7 @@ import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.InterpreterTimedObjectAction;
 import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IKernelAgent;
+import jadex.bridge.IComponentInstance;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IToolAdapter;
 import jadex.commons.collection.LRU;
@@ -49,7 +49,7 @@ import java.util.Set;
  *  and performing the agent execution when
  *  being called from the platform.
  */
-public class BDIInterpreter implements IKernelAgent, ISynchronizator
+public class BDIInterpreter implements IComponentInstance, ISynchronizator
 {
 	//-------- static part --------
 	
@@ -264,7 +264,7 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 	 *  To avoid idle waiting, the return value can be checked. 
 	 *  @return True, when there are more steps waiting to be executed. 
 	 */
-	public boolean executeAction()
+	public boolean executeStep()
 	{
 		// Remember execution thread.
 		this.agentthread	= Thread.currentThread();
@@ -556,7 +556,7 @@ public class BDIInterpreter implements IKernelAgent, ISynchronizator
 	/**
 	 *  Request agent to kill itself.
 	 */
-	public void killAgent(final IResultListener listener)
+	public void killComponent(final IResultListener listener)
 	{
 		invokeLater(new Runnable()
 		{

@@ -1,7 +1,7 @@
 package jadex.adapter.jade;
 
 import jade.core.behaviours.CyclicBehaviour;
-import jadex.bridge.IKernelAgent;
+import jadex.bridge.IComponentInstance;
 
 /**
  *  This behaviour is responsible for selecting an agenda
@@ -12,7 +12,7 @@ public class ActionExecutionBehaviour extends CyclicBehaviour
 	//-------- attributes --------
 
 	/** The jadex agent. */
-	protected IKernelAgent agent;
+	protected IComponentInstance agent;
 
 	//-------- constructor --------
 
@@ -20,7 +20,7 @@ public class ActionExecutionBehaviour extends CyclicBehaviour
 	 *  Create a new agenda control behaviour.
 	 *  @param agent The jadex agent.
 	 */
-	public ActionExecutionBehaviour(IKernelAgent agent)
+	public ActionExecutionBehaviour(IComponentInstance agent)
 	{
 		this.agent	= agent;
 	}
@@ -32,7 +32,7 @@ public class ActionExecutionBehaviour extends CyclicBehaviour
 	 */
 	public void action()
 	{
-		if(!agent.executeAction())
+		if(!agent.executeStep())
 			block();
 	}
 }

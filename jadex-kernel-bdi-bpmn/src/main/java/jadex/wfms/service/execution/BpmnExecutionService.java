@@ -4,7 +4,7 @@ import jadex.bpmn.BpmnExecutor;
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInstance;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SGUI;
@@ -101,7 +101,7 @@ public class BpmnExecutionService implements IExecutionService
 	 *  @param filename The file name.
 	 *  @return The process model.
 	 */
-	public ILoadableElementModel loadModel(String filename)
+	public ILoadableComponentModel loadModel(String filename)
 	{
 		IProcessModel ret = null;
 		

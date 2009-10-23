@@ -3,7 +3,7 @@ package jadex.tools.testcenter;
 import jadex.adapter.base.SElementFactory;
 import jadex.bdi.interpreter.OAVAgentModel;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
 import jadex.rules.state.IOAVState;
 import jadex.tools.common.modeltree.CombiIcon;
@@ -206,7 +206,7 @@ public class TestCenterNodeFunctionality extends DefaultNodeFunctionality
 						try
 						{
 //							ILoadableElementModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
-							ILoadableElementModel model = SElementFactory.loadModel(jcc.getServiceContainer(), file);
+							ILoadableComponentModel model = SElementFactory.loadModel(jcc.getServiceContainer(), file);
 							
 							if(model!=null)
 							{

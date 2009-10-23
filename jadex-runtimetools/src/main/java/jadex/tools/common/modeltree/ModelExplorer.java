@@ -1,7 +1,7 @@
 package jadex.tools.common.modeltree;
 
 import jadex.adapter.base.SElementFactory;
-import jadex.bridge.IElementFactory;
+import jadex.bridge.IComponentFactory;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -639,7 +639,7 @@ public class ModelExplorer extends JTree
 //		String[] filetypes = (String[])SUtil.joinArrays(ft1, ft2);
 //		
 		
-		Collection facts = container.getServices(IElementFactory.class);
+		Collection facts = container.getServices(IComponentFactory.class);
 		
 		if(facts!=null)
 		{
@@ -660,7 +660,7 @@ public class ModelExplorer extends JTree
 //				for(int i=0; i<filetypes.length; i++)
 				for(Iterator it=facts.iterator(); it.hasNext(); )
 				{
-					IElementFactory fac = (IElementFactory)it.next();
+					IComponentFactory fac = (IComponentFactory)it.next();
 					
 					String[] filetypes = fac.getFileTypes();
 					for(int i=0; i<filetypes.length; i++)

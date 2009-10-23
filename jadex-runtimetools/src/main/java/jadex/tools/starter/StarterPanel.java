@@ -6,7 +6,7 @@ import jadex.bridge.IApplicationContext;
 import jadex.bridge.IArgument;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IReport;
 import jadex.commons.IChangeListener;
 import jadex.commons.Properties;
@@ -75,7 +75,7 @@ public class StarterPanel extends JPanel
 	//-------- attributes --------
 
 	/** The model. */
-	protected ILoadableElementModel model;
+	protected ILoadableComponentModel model;
 
 	/** The last loaded filename. */
 	protected String lastfile;

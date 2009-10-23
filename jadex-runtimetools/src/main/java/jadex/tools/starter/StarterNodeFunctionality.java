@@ -1,7 +1,7 @@
 package jadex.tools.starter;
 
 import jadex.adapter.base.SElementFactory;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
 import jadex.tools.common.modeltree.CombiIcon;
 import jadex.tools.common.modeltree.DefaultNodeFunctionality;
@@ -203,7 +203,7 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 						if(SElementFactory.isLoadable(jcc.getServiceContainer(), file))
 						{
 //							ILoadableElementModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
-							ILoadableElementModel model = SElementFactory.loadModel(jcc.getServiceContainer(), file);
+							ILoadableComponentModel model = SElementFactory.loadModel(jcc.getServiceContainer(), file);
 							if(model!=null)
 							{
 								newvalid	= model.getReport().isEmpty();
