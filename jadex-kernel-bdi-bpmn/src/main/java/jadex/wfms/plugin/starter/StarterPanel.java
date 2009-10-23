@@ -1,15 +1,9 @@
 package jadex.wfms.plugin.starter;
 
-import jadex.adapter.base.appdescriptor.ApplicationModel;
-import jadex.bridge.IAgentFactory;
-import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IArgument;
-import jadex.bridge.IContext;
-import jadex.bridge.IContextService;
 import jadex.bridge.IElementFactory;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IReport;
-import jadex.commons.IChangeListener;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -23,7 +17,6 @@ import jadex.tools.common.GuiProperties;
 import jadex.tools.common.JValidatorTextField;
 import jadex.tools.common.ParserValidator;
 import jadex.wfms.service.execution.IExecutionService;
-import jadex.wfms.service.repository.IModelRepositoryService;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

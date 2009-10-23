@@ -1,7 +1,7 @@
 package jadex.microkernel;
 
 import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IAgentFactory;
+import jadex.bridge.IElementFactory;
 import jadex.bridge.IKernelAgent;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IPlatform;
@@ -18,7 +18,7 @@ import javax.swing.UIDefaults;
 /**
  *  Factory for creating micro agents.
  */
-public class MicroAgentFactory implements IAgentFactory
+public class MicroAgentFactory implements IElementFactory
 {
 	//-------- constants --------
 	
@@ -169,5 +169,14 @@ public class MicroAgentFactory implements IAgentFactory
 	{
 		return model.toLowerCase().endsWith("agent.class") ? FILETYPE_MICROAGENT
 			: null;
+	}
+	
+	/**
+	 *  Get the element type.
+	 *  @return The element type (e.g. an agent, application or process).
+	 */
+	public String getElementType()
+	{
+		return IElementFactory.ELEMENT_TYPE_AGENT;
 	}
 }

@@ -4,7 +4,8 @@ import jade.content.ContentElement;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
-import jadex.adapter.base.MetaAgentFactory;
+import jadex.adapter.base.SElementExecutionService;
+import jadex.adapter.base.SElementFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.SFipa;
@@ -153,7 +154,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 				}
 			}
 //			this.agent = platform.getAgentFactory().createKernelAgent(this, (String)args[0], (String)args[1], argsmap);
-			this.agent = MetaAgentFactory.createKernelAgent(platform, this, (String)args[0], (String)args[1], argsmap);
+			this.agent = SElementFactory.createKernelAgent(platform, this, (String)args[0], (String)args[1], argsmap);
 		}
 		else //if(args[0] instanceof IMBDIAgent)
 		{
@@ -351,7 +352,8 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	 */
 	public void killAgent()
 	{
-		((IAMS)platform.getService(IAMS.class)).destroyAgent(getAgentIdentifier(), null);
+		SElementExecutionService.destroyElement(platform, getAgentIdentifier(), null);
+//		((IAMS)platform.getService(IAMS.class)).destroyAgent(getAgentIdentifier(), null);
 	}
 
 	/**

@@ -2,7 +2,7 @@ package jadex.tools.ruleprofiler;
 
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.base.fipa.IAMSListener;
+import jadex.bridge.IElementListener;
 import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
 import jadex.tools.common.AgentTreeTable;
@@ -205,7 +205,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 		// todo: ?! is this ok?
 		
 		IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
-		ams.addAMSListener(new IAMSListener()
+		ams.addAMSListener(new IElementListener()
 		{
 			public void agentRemoved(IAMSAgentDescription desc)
 			{

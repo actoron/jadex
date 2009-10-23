@@ -1,5 +1,6 @@
 package jadex.adapter.base.envsupport.environment;
 
+import jadex.adapter.base.SElementExecutionService;
 import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.IObjectCreator;
 import jadex.adapter.base.envsupport.MEnvSpaceInstance;
@@ -485,8 +486,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 							
 							setOwner(fid, agent);
 							
-							((IAMS)((ApplicationContext)getContext()).getPlatform().getService(IAMS.class))
-								.startAgent(agent, null);
+//							((IAMS)((ApplicationContext)getContext()).getPlatform().getService(IAMS.class)).startAgent(agent, null);
+							SElementExecutionService.startElement(((ApplicationContext)getContext()).getPlatform(), agent, null);
 						}
 						
 						public void exceptionOccurred(Exception exception)
@@ -564,8 +565,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				AvatarMapping mapping = getAvatarMapping(agenttype, objecttype);
 				if(mapping.isKillAgent())
 				{
-					IAMS ams = (IAMS)((ApplicationContext)getContext()).getPlatform().getService(IAMS.class);
-					ams.destroyAgent(agent, null);
+//					IAMS ams = (IAMS)((ApplicationContext)getContext()).getPlatform().getService(IAMS.class);
+					SElementExecutionService.destroyElement(((ApplicationContext)getContext()).getPlatform(), agent, null);
 				}
 			}
 			

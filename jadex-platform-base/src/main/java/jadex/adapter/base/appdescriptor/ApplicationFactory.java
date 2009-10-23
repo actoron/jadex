@@ -4,6 +4,7 @@ import jadex.adapter.base.DefaultResultListener;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IContextService;
+import jadex.bridge.IElementFactory;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IPlatform;
 import jadex.bridge.ISpace;
@@ -368,5 +369,14 @@ public class ApplicationFactory implements IApplicationFactory
 			throw new IOException("File "+xml+" not found in imports: "+SUtil.arrayToString(imports));
 
 		return ret;
+	}
+	
+	/**
+	 *  Get the element type.
+	 *  @return The element type (e.g. an agent, application or process).
+	 */
+	public String getElementType()
+	{
+		return IElementFactory.ELEMENT_TYPE_AGENT;
 	}
 }

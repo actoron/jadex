@@ -2,11 +2,11 @@ package jadex.tools.dfbrowser;
 
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.base.fipa.IAMSListener;
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.bdi.runtime.IGoal;
+import jadex.bridge.IElementListener;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -191,7 +191,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 			{
 			}
 		});
-		ams.addAMSListener(new IAMSListener()
+		ams.addAMSListener(new IElementListener()
 		{
 			public void agentRemoved(IAMSAgentDescription desc)
 			{

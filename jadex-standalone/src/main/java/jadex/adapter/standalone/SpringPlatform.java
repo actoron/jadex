@@ -1,9 +1,9 @@
 package jadex.adapter.standalone;
 
-import jadex.adapter.base.MetaAgentFactory;
+import jadex.adapter.base.SElementFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.base.fipa.IAMSListener;
+import jadex.bridge.IElementListener;
 import jadex.bridge.IApplicationFactory;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
@@ -33,7 +33,7 @@ public class SpringPlatform extends AbstractPlatform
 	//-------- attributes --------
 	
 	/** The ams listener. */
-	protected IAMSListener amslistener;
+	protected IElementListener amslistener;
 	
 	/** The daemon agents. */
 	protected Map daemagents;
@@ -88,13 +88,13 @@ public class SpringPlatform extends AbstractPlatform
 		{
 			if(amslistener==null)
 			{
-				amslistener = new IAMSListener()
+				amslistener = new IElementListener()
 				{
-					public void agentAdded(IAMSAgentDescription desc)
+					public void elementAdded(Object desc)
 					{
 					}
 	
-					public void agentRemoved(IAMSAgentDescription desc)
+					public void elementRemoved(Object desc)
 					{
 						((IAMS)getService(IAMS.class)).getAgentCount(new IResultListener()
 						{
@@ -113,15 +113,13 @@ public class SpringPlatform extends AbstractPlatform
 				};
 			}
 			
-			IAMS ams = (IAMS)getService(IAMS.class);
-			if(ams != null)
-				ams.addAMSListener(amslistener);
+			if(getAMSService() != null)
+				getAMSService().addElementListener(amslistener);
 		}
 		else if(!autoshutdown && this.autoshutdown)
 		{
-			IAMS ams = (IAMS)getService(IAMS.class);
-			if(ams != null)
-				ams.removeAMSListener(amslistener);
+			if(getAMSService() != null)
+				getAMSService().removeElementListener(amslistener);
 		}
 		
 		this.autoshutdown = autoshutdown;
@@ -224,7 +222,7 @@ public class SpringPlatform extends AbstractPlatform
 					model = (String)args.remove("model");
 					config = (String)args.remove("config");
 				}
-				createAgent(name, model, config, args, true);
+				createElement(name, model, config, args, true);
 			}
 		}
 		
@@ -249,7 +247,7 @@ public class SpringPlatform extends AbstractPlatform
 					model = (String)args.remove("model");
 					config = (String)args.remove("config");
 				}
-				createAgent(name, model, config, args, false);
+				createElement(name, model, config, args, false);
 			}
 		}
 	}

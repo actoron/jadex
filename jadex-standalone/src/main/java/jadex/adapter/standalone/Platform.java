@@ -1,24 +1,12 @@
 package jadex.adapter.standalone;
 
-import jadex.adapter.base.MetaAgentFactory;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.base.fipa.IAMSListener;
-import jadex.bridge.IAgentFactory;
-import jadex.bridge.IApplicationFactory;
+import jadex.bridge.IElementListener;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.xml.AttributeInfo;
-import jadex.commons.xml.QName;
-import jadex.commons.xml.SubobjectInfo;
-import jadex.commons.xml.TypeInfo;
-import jadex.commons.xml.bean.BeanAttributeInfo;
-import jadex.commons.xml.bean.BeanObjectReaderHandler;
-import jadex.commons.xml.bean.BeanObjectWriterHandler;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -29,14 +17,10 @@ import jadex.service.library.ILibraryService;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -259,19 +243,19 @@ public class Platform extends AbstractPlatform
 			}
 		}
 		
-		IAMS ams = (IAMS)getService(IAMS.class);
-		if(ams!=null)
+//		IAMS ams = (IAMS)getService(IAMS.class);
+		if(getAMSService()!=null)
 		{
 			// Add ams listener if auto shutdown.
 			if(platconf.getBooleanProperty(AUTOSHUTDOWN))
 			{
-				ams.addAMSListener(new IAMSListener()
+				getAMSService().addElementListener(new IElementListener()
 				{
-					public void agentAdded(IAMSAgentDescription desc)
+					public void elementAdded(Object desc)
 					{
 					}
 	
-					public void agentRemoved(IAMSAgentDescription desc)
+					public void elementRemoved(Object desc)
 					{
 						((IAMS)getService(IAMS.class)).getAgentCount(new IResultListener()
 						{
@@ -295,7 +279,7 @@ public class Platform extends AbstractPlatform
 			Property[] props = platconf.getProperties(DAEMONAGENT);
 			for(int i = 0; i < props.length; i++)
 			{
-				createAgent(props[i].getName(), props[i].getValue(), null, null, true);
+				createElement(props[i].getName(), props[i].getValue(), null, null, true);
 			}
 			Properties[] subprops = platconf.getSubproperties(DAEMONAGENT);
 			for(int i = 0; i < subprops.length; i++)
@@ -303,14 +287,14 @@ public class Platform extends AbstractPlatform
 				Map args = getArguments(subprops[i]);
 				Property model = subprops[i].getProperty(MODEL);
 				Property config = subprops[i].getProperty(CONFIG);
-				createAgent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, true);
+				createElement(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, true);
 			}
 	
 			// Create application agents.
 			props = platconf.getProperties(AGENT);
 			for(int i = 0; i < props.length; i++)
 			{
-				createAgent(props[i].getName(), props[i].getValue(), null, null, false);
+				createElement(props[i].getName(), props[i].getValue(), null, null, false);
 			}
 			subprops = platconf.getSubproperties(AGENT);
 			for(int i = 0; i < subprops.length; i++)
@@ -318,14 +302,14 @@ public class Platform extends AbstractPlatform
 				Map args = getArguments(subprops[i]);
 				Property model = subprops[i].getProperty(MODEL);
 				Property config = subprops[i].getProperty(CONFIG);
-				createAgent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, false);
+				createElement(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, false);
 			}
 			
 			// Create applications.
 			props = platconf.getProperties(APPLICATION);
 			for(int i = 0; i < props.length; i++)
 			{
-				createApplication(props[i].getName(), props[i].getValue(), null, null);
+				createElement(props[i].getName(), props[i].getValue(), null, null, false);
 			}
 			subprops = platconf.getSubproperties(APPLICATION);
 			for(int i = 0; i < subprops.length; i++)
@@ -333,7 +317,7 @@ public class Platform extends AbstractPlatform
 				Map args = getArguments(subprops[i]);
 				Property model = subprops[i].getProperty(MODEL);
 				Property config = subprops[i].getProperty(CONFIG);
-				createApplication(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args);
+				createElement(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, false);
 			}
 		}
 		

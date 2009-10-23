@@ -30,10 +30,7 @@
 					new jadex.commons.concurrent.ThreadPool(
 						new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
 			</property>
-			
-			<!-- AMS service. -->
-			<property type="jadex.adapter.base.fipa.IAMS" name="ams_service">new jadex.adapter.standalone.ams.AMS($platform)</property> 
-			
+						
 			<!-- DF service. -->
 			<property type="jadex.adapter.base.fipa.IDF" name="df_service">new jadex.adapter.standalone.df.DF($platform)</property>
 			
@@ -123,6 +120,12 @@
 			<property type="jadex.bridge.IElementFactory" name="micro_factory">
 				new jadex.microkernel.MicroAgentFactory($platform)
 			</property>
+			
+			<!-- Element execution factories -->
+			
+			<!-- AMS service. -->
+			<property type="jadex.bridge.IElementExecutionService" name="ams_service">new jadex.adapter.standalone.ams.AMS($platform)</property> 
+			
 		</properties>
 		
 		<!-- Agents. -->

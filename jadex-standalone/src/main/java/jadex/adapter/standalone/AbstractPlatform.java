@@ -1,26 +1,20 @@
 package jadex.adapter.standalone;
 
+import jadex.adapter.base.SElementExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
-import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IAgentFactory;
 import jadex.bridge.IAgentIdentifier;
-import jadex.bridge.IApplicationFactory;
-import jadex.bridge.IElementFactory;
-import jadex.bridge.IKernelAgent;
+import jadex.bridge.IElementExecutionService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.MessageType;
-import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.service.IServiceContainer;
 import jadex.service.PropertyServiceContainer;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
 
@@ -137,7 +131,8 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 
 			this.shuttingdown = true;
 
-			final IAMS ams = (IAMS)getService(IAMS.class);
+			final IAMS ams = getAMSService();
+			
 			ams.getAgentIdentifiers(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -150,7 +145,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 							// Do not kill ams and df agents immediately.
 							if(!daemonagents.contains(agents[i]))
 							{
-								ams.destroyAgent(agents[i], null);
+								ams.destroyElement(agents[i], null);
 								//System.out.println("Killing normal agent: "+agents[i]);
 							}
 						}
@@ -185,10 +180,10 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 				// Wait until agents have died.
 				// Hack!!! Should not poll AMS?
 				final boolean[] wait = new boolean[1];
-				IAMS ams = (IAMS)getService(IAMS.class);
+				
 				while(wait[0] && System.currentTimeMillis() < shutdown)
 				{
-					ams.getAgentCount(new IResultListener()
+					getAMSService().getAgentCount(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -217,7 +212,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 					{
 						//System.out.println("Killing system agent: "+sagents[i]);
 						final boolean[] finished = new boolean[1];
-						ams.destroyAgent(sagents[i], new IResultListener()
+						SElementExecutionService.destroyElement(AbstractPlatform.this, sagents[i], new IResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
@@ -255,7 +250,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 				wait[0] = true;
 				while(wait[0] && start + 1000 > System.currentTimeMillis())
 				{
-					ams.getAgentCount(new IResultListener()
+					getAMSService().getAgentCount(new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -317,17 +312,17 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 	/**
 	 *  Create an agent.
 	 */
-	protected void createAgent(String name, String model, String config, Map args, final boolean daemon)
+	protected void createElement(String name, String model, String config, Map args, final boolean daemon)
 	{
-		IAMS ams = (IAMS)getService(IAMS.class);
-		ams.createAgent(name, model, config, args, new IResultListener()
+//		IAMS ams = (IAMS)getService(IAMS.class);
+		SElementExecutionService.createElement(this, name, model, config, args, new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				AgentIdentifier agent = (AgentIdentifier)result;
 				if(daemon)
 					daemonagents.add(agent);
-				((IAMS)getService(IAMS.class)).startAgent(agent, null);
+				SElementExecutionService.startElement(AbstractPlatform.this, agent, null);
 			}
 
 			public void exceptionOccurred(Exception exception)
@@ -339,7 +334,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 	
 	/**
 	 *  Create an application.
-	 */
+	 * /
 	protected void createApplication(String name, String model, String config, Map args)
 	{
 		try
@@ -350,6 +345,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 				for(Iterator it=facts.iterator(); it.hasNext(); )
 				{
 					IElementFactory fac = (IElementFactory)it.next();
+					
 					if(it instanceof IApplicationFactory)
 					{
 						IApplicationFactory afac = (IApplicationFactory)fac;
@@ -368,6 +364,25 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 			System.err.println("Exception occurred while creating application: ");
 			e.printStackTrace();
 		}
+	}*/
+	
+	/**
+	 * 
+	 */
+	protected IAMS getAMSService()
+	{
+		IAMS ret = null;
+		Collection exes = getServices(IElementExecutionService.class);
+		if(exes!=null)
+		{
+			for(Iterator it=exes.iterator(); it.hasNext() && ret==null; )
+			{
+				IElementExecutionService es = (IElementExecutionService)it.next();
+				if(es instanceof IAMS)
+					ret = (IAMS)es;
+			}
+		}
+		return ret;
 	}
 	
 	//-------- static part --------

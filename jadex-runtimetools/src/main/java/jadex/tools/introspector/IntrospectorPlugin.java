@@ -2,7 +2,7 @@ package jadex.tools.introspector;
 
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.base.fipa.IAMSListener;
+import jadex.bridge.IElementListener;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -365,7 +365,7 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 			{
 			}
 		});
-		ams.addAMSListener(new IAMSListener()
+		ams.addAMSListener(new IElementListener()
 		{
 			public void agentRemoved(IAMSAgentDescription desc)
 			{

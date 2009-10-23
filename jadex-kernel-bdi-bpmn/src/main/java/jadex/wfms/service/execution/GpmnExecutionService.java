@@ -2,8 +2,8 @@ package jadex.wfms.service.execution;
 
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.base.fipa.IAMSListener;
 import jadex.adapter.standalone.Platform;
+import jadex.bridge.IElementListener;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IPlatform;
@@ -108,7 +108,7 @@ public class GpmnExecutionService implements IExecutionService
 		long startup = System.currentTimeMillis() - starttime;
 		((Platform)platform).getLogger().info("Platform startup time: " + startup + " ms.");
 		
-		((IAMS)platform.getService(IAMS.class)).addAMSListener(new IAMSListener()
+		((IAMS)platform.getService(IAMS.class)).addAMSListener(new IElementListener()
 		{
 			
 			public void agentRemoved(IAMSAgentDescription desc)

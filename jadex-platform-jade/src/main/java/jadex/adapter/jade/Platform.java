@@ -6,7 +6,8 @@ import jade.wrapper.AgentController;
 import jade.wrapper.PlatformController;
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.ISimulationService;
-import jadex.adapter.base.MetaAgentFactory;
+import jadex.adapter.base.SElementExecutionService;
+import jadex.adapter.base.SElementFactory;
 import jadex.adapter.base.SimulationService;
 import jadex.adapter.base.agr.MAGRSpaceType;
 import jadex.adapter.base.appdescriptor.ApplicationContextFactory;
@@ -25,6 +26,7 @@ import jadex.bridge.IApplicationContext;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
+import jadex.bridge.IElementExecutionService;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.MessageType;
@@ -190,6 +192,12 @@ public class Platform extends BasicServiceContainer implements IPlatform
 	 */
 	public void start()
 	{
+		for(Iterator it=services.keySet().iterator(); it.hasNext(); )
+		{
+			IService service = (IService)services.get(it.next());
+			service.start();
+		}
+		
 		// Start Jade platform with platform agent
 		// This agent make accessible the platform controller
 		new Boot(new String[]{"-gui", "platform:jadex.adapter.jade.PlatformAgent"});
@@ -206,20 +214,22 @@ public class Platform extends BasicServiceContainer implements IPlatform
 			}
 		}
 		
-		final IAMS ams = (IAMS)getService(IAMS.class);
-		ams.createAgent("jcc", "jadex/tools/jcc/JCC.agent.xml", null, null, new DefaultResultListener(getLogger())
+		SElementExecutionService.createElement(this, "jcc", "jadex/tools/jcc/JCC.agent.xml", 
+			null, null, new DefaultResultListener(getLogger())
 		{
 			public void resultAvailable(Object result)
 			{
-				ams.startAgent((IAgentIdentifier)result, null);
+				SElementExecutionService.startElement(platform, result, null);
 			}
 		}, null);
 		
-		for(Iterator it=services.keySet().iterator(); it.hasNext(); )
-		{
-			IService	service	= (IService) services.get(it.next());
-			service.start();
-		}
+//		ams.createAgent("jcc", "jadex/tools/jcc/JCC.agent.xml", null, null, new DefaultResultListener(getLogger())
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				ams.startAgent((IAgentIdentifier)result, null);
+//			}
+//		}, null);
 	}
 	
 	/**

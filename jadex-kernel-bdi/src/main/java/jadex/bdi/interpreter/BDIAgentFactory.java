@@ -1,7 +1,7 @@
 package jadex.bdi.interpreter;
 
 import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IAgentFactory;
+import jadex.bridge.IElementFactory;
 import jadex.bridge.IKernelAgent;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IPlatform;
@@ -22,7 +22,7 @@ import javax.swing.UIDefaults;
 /**
  *  Factory for creating Jadex V2 BDI agents.
  */
-public class BDIAgentFactory implements IAgentFactory
+public class BDIAgentFactory
 {
 	//-------- constants --------
 	
@@ -216,5 +216,14 @@ public class BDIAgentFactory implements IAgentFactory
 		return model.toLowerCase().endsWith(".agent.xml") ? FILETYPE_BDIAGENT
 			: model.toLowerCase().endsWith(".capability.xml") ? FILETYPE_BDICAPABILITY
 			: null;
+	}
+	
+	/**
+	 *  Get the element type.
+	 *  @return The element type (e.g. an agent, application or process).
+	 */
+	public String getElementType()
+	{
+		return IElementFactory.ELEMENT_TYPE_AGENT;
 	}
 }

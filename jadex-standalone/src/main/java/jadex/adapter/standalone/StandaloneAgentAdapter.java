@@ -1,6 +1,7 @@
 package jadex.adapter.standalone;
 
-import jadex.adapter.base.MetaAgentFactory;
+import jadex.adapter.base.SElementExecutionService;
+import jadex.adapter.base.SElementFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.standalone.ams.AMS;
@@ -54,7 +55,7 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	{
 		this.platform	= platform;
 		this.aid	= aid;
-		this.agent = MetaAgentFactory.createKernelAgent(platform, this, model, state, args);
+		this.agent = SElementFactory.createKernelAgent(platform, this, model, state, args);
 //		this.agent = platform.getAgentFactory().createKernelAgent(this, model, state, args);		
 	}
 
@@ -206,7 +207,8 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	 */
 	public void killAgent()
 	{
-		((IAMS)platform.getService(IAMS.class)).destroyAgent(aid, null);
+		SElementExecutionService.destroyElement(platform, aid, null);
+//		((IAMS)platform.getService(IAMS.class)).destroyAgent(aid, null);
 	}
 
 	/**
@@ -289,7 +291,8 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 			System.out.println("Fatal error, agent '"+aid+"' will be removed.");
 				
 			// Remove agent from platform.
-			((IAMS)platform.getService(IAMS.class)).destroyAgent(aid, null);				
+			SElementExecutionService.destroyElement(platform, aid, null);
+//			((IAMS)platform.getService(IAMS.class)).destroyAgent(aid, null);				
 		}
 		
 		return executed;

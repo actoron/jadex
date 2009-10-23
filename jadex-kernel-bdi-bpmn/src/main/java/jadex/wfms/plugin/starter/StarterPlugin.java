@@ -1,6 +1,6 @@
 package jadex.wfms.plugin.starter;
 
-import jadex.adapter.base.MetaAgentFactory;
+import jadex.adapter.base.SElementFactory;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bridge.ILoadableElementModel;
@@ -227,7 +227,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 					//  |  +- MyAgent.agent.xml
 
 					String model = ((FileNode)node).getRelativePath();
-					if(MetaAgentFactory.isLoadable(getJCC().getServiceContainer(), model))
+					if(SElementFactory.isLoadable(getJCC().getServiceContainer(), model))
 					{
 						loadModel(model);
 					}
@@ -248,7 +248,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 						{
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 							String type = ((FileNode)node).getFile().getAbsolutePath();
-							if(MetaAgentFactory.isStartable(getJCC().getServiceContainer(), type))
+							if(SElementFactory.isStartable(getJCC().getServiceContainer(), type))
 								((IExecutionService)getJCC().getServiceContainer().getService(IExecutionService.class)).startProcess(type, null, null, false);
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
@@ -681,11 +681,11 @@ public class StarterPlugin extends AbstractJCCPlugin
 				if(node instanceof FileNode)
 				{
 					final String type = ((FileNode)node).getFile().getAbsolutePath();
-					if(MetaAgentFactory.isStartable(jcc.getServiceContainer(), type))
+					if(SElementFactory.isStartable(jcc.getServiceContainer(), type))
 					{
 						try
 						{
-							ILoadableElementModel model = MetaAgentFactory.loadModel(jcc.getServiceContainer(), type);
+							ILoadableElementModel model = SElementFactory.loadModel(jcc.getServiceContainer(), type);
 							String[] inistates = model.getConfigurations();
 //							IMBDIAgent model = SXML.loadAgentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();

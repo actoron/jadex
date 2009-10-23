@@ -9,6 +9,19 @@ import javax.swing.Icon;
  */
 public interface IElementFactory extends IService
 {
+	//-------- constants --------
+
+	/** The element type application. */
+	public static final String ELEMENT_TYPE_APPLICATION = "application";
+	
+	/** The element type agent. */
+	public static final String ELEMENT_TYPE_AGENT = "agent";
+	
+	/** The element type process. */
+	public static final String ELEMENT_TYPE_PROCESS = "process";
+
+	//-------- methods --------
+	
 	/**
 	 *  Load a  model.
 	 *  @param model The model.
@@ -42,6 +55,13 @@ public interface IElementFactory extends IService
 
 	/**
 	 *  Get the file type of a model.
+	 *  @param model The model.
 	 */
 	public String getFileType(String model);
+	
+	/**
+	 *  Get the element type.
+	 *  @return The element type (e.g. an agent, application or process).
+	 */
+	public String getElementType();
 }

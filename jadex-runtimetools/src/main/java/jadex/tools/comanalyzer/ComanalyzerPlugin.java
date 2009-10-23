@@ -2,10 +2,10 @@ package jadex.tools.comanalyzer;
 
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.base.fipa.IAMSListener;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.impl.ElementFlyweight;
+import jadex.bridge.IElementListener;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;
@@ -475,7 +475,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 			{
 			}
 		});
-		ams.addAMSListener(new IAMSListener()
+		ams.addAMSListener(new IElementListener()
 		{
 			public void agentRemoved(IAMSAgentDescription desc)
 			{

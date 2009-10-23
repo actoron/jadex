@@ -2,12 +2,12 @@ package jadex.tools.convcenter;
 
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.base.fipa.IAMSListener;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.IParameterSet;
+import jadex.bridge.IElementListener;
 import jadex.bridge.IAgentIdentifier;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
@@ -160,7 +160,7 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 			{
 			}
 		});
-		ams.addAMSListener(new IAMSListener()
+		ams.addAMSListener(new IElementListener()
 		{
 			public void agentRemoved(IAMSAgentDescription desc)
 			{

@@ -1,6 +1,6 @@
 package jadex.tools.testcenter;
 
-import jadex.adapter.base.MetaAgentFactory;
+import jadex.adapter.base.SElementFactory;
 import jadex.bdi.planlib.test.Testcase;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IGoal;
@@ -134,7 +134,7 @@ public class TestCenterPanel extends JSplitPane
 			{
 				String name = f.getName();
 //				return f.isDirectory() || SXML.isAgentFilename(name);
-				return f.isDirectory() || MetaAgentFactory.isStartable(plugin.getJCC().getServiceContainer(), name);
+				return f.isDirectory() || SElementFactory.isStartable(plugin.getJCC().getServiceContainer(), name);
 			}
 		};
 		addchooser.addChoosableFileFilter(load_filter);

@@ -1,6 +1,6 @@
 package jadex.tools.starter;
 
-import jadex.adapter.base.MetaAgentFactory;
+import jadex.adapter.base.SElementFactory;
 import jadex.adapter.base.appdescriptor.ApplicationModel;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IArgument;
@@ -123,12 +123,6 @@ public class StarterPanel extends JPanel
 	/** The application specific panel. */
 	protected JPanel apppanel;
 	
-	/** The agent factory. */
-//	protected IAgentFactory agentfactory;
-	
-	/** The application factory. */
-//	protected IApplicationFactory appfactory;
-	
 	/** The starter plugin. */
 	protected StarterPlugin	starter;
 
@@ -155,8 +149,6 @@ public class StarterPanel extends JPanel
 		browse.setMargin(new Insets(0,0,0,0));
 		// Create the filechooser.
 		// Hack!!! might trhow exception in applet / webstart
-//		agentfactory = starter.getJCC().getAgent().getPlatform().getAgentFactory();
-//		appfactory = starter.getJCC().getAgent().getPlatform().getApplicationFactory();
 		try
 		{
 			filechooser = new JFileChooser(".");
@@ -173,7 +165,7 @@ public class StarterPanel extends JPanel
 					String name = f.getName();
 //					return f.isDirectory() || name.endsWith(SXML.FILE_EXTENSION_AGENT) || name.endsWith(SXML.FILE_EXTENSION_CAPABILITY);
 //					boolean	ret	= f.isDirectory() || agentfactory.isLoadable(name) || appfactory.isLoadable(name);
-					boolean	ret	= f.isDirectory() || MetaAgentFactory.isLoadable(starter.getJCC().getServiceContainer(), name);
+					boolean	ret	= f.isDirectory() || SElementFactory.isLoadable(starter.getJCC().getServiceContainer(), name);
 
 //					Thread.currentThread().setContextClassLoader(oldcl);
 
@@ -280,20 +272,23 @@ public class StarterPanel extends JPanel
 		appmodel = new DefaultComboBoxModel();
 		appmodel.addElement("");
 		IContextService cs = (IContextService)starter.getJCC().getServiceContainer().getService(IContextService.class);
-		cs.addContextListener(new IChangeListener()
+		if(cs!=null)
 		{
-			public void changeOccurred(jadex.commons.ChangeEvent event)
+			cs.addContextListener(new IChangeListener()
 			{
-				if(IContextService.EVENT_TYPE_CONTEXT_CREATED.equals(event.getType()))
+				public void changeOccurred(jadex.commons.ChangeEvent event)
 				{
-					appmodel.addElement(((IContext)event.getValue()).getName());
+					if(IContextService.EVENT_TYPE_CONTEXT_CREATED.equals(event.getType()))
+					{
+						appmodel.addElement(((IContext)event.getValue()).getName());
+					}
+					else if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()))
+					{
+						appmodel.removeElement(((IContext)event.getValue()).getName());
+					}
 				}
-				else if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()))
-				{
-					appmodel.removeElement(((IContext)event.getValue()).getName());
-				}
-			}
-		});
+			});
+		}
 		appname = new JComboBox();
 
 		// The generate flag for the agentname;
@@ -375,7 +370,7 @@ public class StarterPanel extends JPanel
 //							IApplicationFactory fac = starter.getJCC().getAgent().getPlatform().getApplicationFactory();
 							try
 							{
-								MetaAgentFactory.createApplication(starter.getJCC().getServiceContainer(), (String)appname.getSelectedItem(), filename.getText(), configname, args);
+								SElementFactory.createApplication(starter.getJCC().getServiceContainer(), (String)appname.getSelectedItem(), filename.getText(), configname, args);
 							}
 							catch(Exception e)
 							{
@@ -633,9 +628,9 @@ public class StarterPanel extends JPanel
 
 			try
 			{
-				if(MetaAgentFactory.isLoadable(starter.getJCC().getServiceContainer(), adf))
+				if(SElementFactory.isLoadable(starter.getJCC().getServiceContainer(), adf))
 				{
-					model = MetaAgentFactory.loadModel(starter.getJCC().getServiceContainer(), adf);
+					model = SElementFactory.loadModel(starter.getJCC().getServiceContainer(), adf);
 					SwingUtilities.invokeLater(new Runnable()
 					{
 						public void run()
@@ -660,7 +655,7 @@ public class StarterPanel extends JPanel
 						confl.setMinimumSize(appnamel.getMinimumSize());
 						confl.setPreferredSize(appname.getPreferredSize());
 					}
-					else if(MetaAgentFactory.isStartable(starter.getJCC().getServiceContainer(), adf))
+					else if(SElementFactory.isStartable(starter.getJCC().getServiceContainer(), adf))
 					{
 		//				System.out.println("Model loaded: "+adf);
 						

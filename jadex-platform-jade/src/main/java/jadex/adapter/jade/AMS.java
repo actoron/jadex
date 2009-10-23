@@ -13,14 +13,15 @@ import jade.util.Event;
 import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
 import jadex.adapter.base.DefaultResultListener;
-import jadex.adapter.base.MetaAgentFactory;
+import jadex.adapter.base.SElementFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.base.fipa.IAMSListener;
 import jadex.adapter.base.fipa.ISearchConstraints;
 import jadex.adapter.jade.fipaimpl.AMSAgentDescription;
 import jadex.adapter.jade.fipaimpl.AgentIdentifier;
 import jadex.adapter.jade.fipaimpl.SearchConstraints;
+import jadex.bridge.IElementFactory;
+import jadex.bridge.IElementListener;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.ILoadableElementModel;
@@ -80,6 +81,23 @@ public class AMS implements IAMS, IService
 
     //-------- IAMS interface methods --------
     
+    /**
+	 *  Test if the execution service can handle the element (or model).
+	 *  @param element The element (or its filename).
+	 */
+	public boolean isResponsible(Object element)
+	{
+		boolean ret = element instanceof IAgentIdentifier;
+		
+		if(!ret && element instanceof String)
+		{
+			ret = IElementFactory.ELEMENT_TYPE_AGENT.equals(
+				SElementFactory.getElementType(platform, (String)element));
+		}
+		
+		return ret;
+	}
+    
 	/**
 	 *  Create a new agent on the platform.
 	 *  Ensures (in non error case) that the aid of
@@ -89,7 +107,7 @@ public class AMS implements IAMS, IService
 	 *  @param confi The configuration.
 	 *  @param args The arguments map (name->value).
 	 */
-	public void	createAgent(String name, String model, String config, Map args, IResultListener lis, IAgentIdentifier creator)
+	public void	createElement(String name, String model, String config, Map args, IResultListener lis, Object creator)
 	{
 //		System.out.println("Create agent: "+name);
 		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
@@ -240,15 +258,15 @@ public class AMS implements IAMS, IService
 		
 //		System.out.println("added: "+agentdescs.size()+", "+aid);
 
-		IAMSListener[]	alisteners;
+		IElementListener[]	alisteners;
 		synchronized(listeners)
 		{
-			alisteners	= (IAMSListener[])listeners.toArray(new IAMSListener[listeners.size()]);
+			alisteners	= (IElementListener[])listeners.toArray(new IElementListener[listeners.size()]);
 		}
 		// todo: can be called after listener has (concurrently) deregistered
 		for(int i=0; i<alisteners.length; i++)
 		{
-			alisteners[i].agentAdded(ad);
+			alisteners[i].elementAdded(ad);
 		}
 		
 //		System.out.println("Created agent: "+aid);
@@ -259,7 +277,7 @@ public class AMS implements IAMS, IService
 	 *  Start a previously created agent on the platform.
 	 *  @param agent The id of the previously created agent.
 	 */
-	public void	startAgent(final IAgentIdentifier agent, IResultListener lis)
+	public void	startElement(final Object agent, IResultListener lis)
 	{
 		if(agent==null)
 			throw new IllegalArgumentException("Agent identifier must not null.");
@@ -353,7 +371,7 @@ public class AMS implements IAMS, IService
 				
 		try
 		{
-			AgentController ac = platform.getPlatformController().getAgent(agent.getLocalName());
+			AgentController ac = platform.getPlatformController().getAgent(((IAgentIdentifier)agent).getLocalName());
 			ac.start();
 			listener.resultAvailable(null);
 		}
@@ -367,7 +385,7 @@ public class AMS implements IAMS, IService
 	 *  Destroy (forcefully terminate) an agent on the platform.
 	 *  @param aid	The agent to destroy.
 	 */
-	public void destroyAgent(final IAgentIdentifier aid, IResultListener listener)
+	public void destroyElement(final Object aid, IResultListener listener)
 	{
 		if(aid==null)
 			throw new IllegalArgumentException("Agent identifier must not null.");
@@ -375,7 +393,7 @@ public class AMS implements IAMS, IService
 			listener = DefaultResultListener.getInstance();
 		
 		JadeAgentAdapter adapter = (JadeAgentAdapter)adapters.get(aid);
-		adapter.killAgent(new CleanupCommand(aid, listener));
+		adapter.killAgent(new CleanupCommand((IAgentIdentifier)aid, listener));
 		
 //		try
 //		{
@@ -396,7 +414,7 @@ public class AMS implements IAMS, IService
 	 *  // todo: make sure that agent is really suspended an does not execute
 	 *  an action currently.
 	 */
-	public void suspendAgent(final IAgentIdentifier aid, IResultListener lis)
+	public void suspendElement(final Object aid, IResultListener lis)
 	{
 		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
 		
@@ -474,7 +492,7 @@ public class AMS implements IAMS, IService
 	
 		try
 		{
-			AgentController ac = platform.getPlatformController().getAgent(aid.getLocalName());
+			AgentController ac = platform.getPlatformController().getAgent(((IAgentIdentifier)aid).getLocalName());
 			ac.suspend();
 			listener.resultAvailable(null);
 		}
@@ -488,14 +506,14 @@ public class AMS implements IAMS, IService
 	 *  Resume the execution of an agent.
 	 *  @param aid The agent identifier.
 	 */
-	public void resumeAgent(IAgentIdentifier aid, IResultListener listener)
+	public void resumeElement(Object aid, IResultListener listener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
 		try
 		{
-			AgentController ac = platform.getPlatformController().getAgent(aid.getLocalName());
+			AgentController ac = platform.getPlatformController().getAgent(((IAgentIdentifier)aid).getLocalName());
 			ac.activate();
 			listener.resultAvailable(null);
 		}
@@ -943,7 +961,7 @@ public class AMS implements IAMS, IService
      *  The listener is registered for ams changes.
      *  @param listener  The listener to be added.
      */
-    public void addAMSListener(IAMSListener listener)
+    public void addElementListener(IElementListener listener)
 	{
 		synchronized(listeners)
 		{
@@ -955,7 +973,7 @@ public class AMS implements IAMS, IService
      *  Remove an ams listener.
      *  @param listener  The listener to be removed.
      */
-    public void removeAMSListener(IAMSListener listener)
+    public void removeElementListener(IElementListener listener)
 	{
 		synchronized(listeners)
 		{
@@ -970,7 +988,7 @@ public class AMS implements IAMS, IService
 	 */
 	public String getShortName(String filename)
 	{
-		ILoadableElementModel model = MetaAgentFactory.loadModel(platform, filename);
+		ILoadableElementModel model = SElementFactory.loadModel(platform, filename);
 //		ILoadableElementModel	model	= platform.getAgentFactory().loadModel(filename);
 		return model.getName();
 	}
@@ -1002,17 +1020,17 @@ public class AMS implements IAMS, IService
 				adapter.cleanupAgent();
 			}
 			
-			IAMSListener[]	alisteners;
+			IElementListener[]	alisteners;
 			synchronized(listeners)
 			{
-				alisteners	= (IAMSListener[])listeners.toArray(new IAMSListener[listeners.size()]);
+				alisteners	= (IElementListener[])listeners.toArray(new IElementListener[listeners.size()]);
 			}
 			// todo: can be called after listener has (concurrently) deregistered
 			for(int i=0; i<alisteners.length; i++)
 			{
 				AMSAgentDescription ad = new AMSAgentDescription();
 				ad.setName(aid);
-				alisteners[i].agentRemoved(ad);
+				alisteners[i].elementRemoved(ad);
 			}
 			
 			if(listener!=null)

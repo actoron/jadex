@@ -2,10 +2,10 @@ package jadex.bdi.planlib.ams;
 
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.base.fipa.IAMSListener;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.AgentTerminatedException;
+import jadex.bridge.IElementListener;
 
 /**
  *  Update the belief set containing the local agents.
@@ -15,7 +15,7 @@ public class AMSLocalUpdateAgentsPlan extends Plan
 	//-------- attributes --------
 	
 	/** The listener. */
-	protected IAMSListener	listener;
+	protected IElementListener	listener;
 	
 	//-------- methods --------
 	
@@ -30,7 +30,7 @@ public class AMSLocalUpdateAgentsPlan extends Plan
 		final Object mon = new Object();
 		synchronized(mon)
 		{
-			this.listener	= new IAMSListener()
+			this.listener	= new IElementListener()
 			{
 				public void agentAdded(final IAMSAgentDescription desc)
 				{

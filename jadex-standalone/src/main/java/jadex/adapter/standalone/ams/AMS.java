@@ -1,17 +1,18 @@
 package jadex.adapter.standalone.ams;
 
 import jadex.adapter.base.DefaultResultListener;
-import jadex.adapter.base.MetaAgentFactory;
+import jadex.adapter.base.SElementFactory;
 import jadex.adapter.base.contextservice.BaseContext;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.base.fipa.IAMSListener;
 import jadex.adapter.base.fipa.ISearchConstraints;
 import jadex.adapter.standalone.AbstractPlatform;
 import jadex.adapter.standalone.StandaloneAgentAdapter;
 import jadex.adapter.standalone.fipaimpl.AMSAgentDescription;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.adapter.standalone.fipaimpl.SearchConstraints;
+import jadex.bridge.IElementFactory;
+import jadex.bridge.IElementListener;
 import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IContext;
@@ -75,6 +76,23 @@ public class AMS implements IAMS, IService
 
     //-------- IAMS interface methods --------
     
+    /**
+	 *  Test if the execution service can handle the element (or model).
+	 *  @param element The element (or its filename).
+	 */
+	public boolean isResponsible(Object element)
+	{
+		boolean ret = element instanceof IAgentIdentifier;
+		
+		if(!ret && element instanceof String)
+		{
+			ret = IElementFactory.ELEMENT_TYPE_AGENT.equals(
+				SElementFactory.getElementType(platform, (String)element));
+		}
+		
+		return ret;
+	}
+    
 	/**
 	 *  Create a new agent on the platform.
 	 *  Ensures (in non error case) that the aid of
@@ -84,7 +102,7 @@ public class AMS implements IAMS, IService
 	 *  @param confi The configuration.
 	 *  @param args The arguments map (name->value).
 	 */
-	public void	createAgent(String name, String model, String config, Map args, IResultListener listener, IAgentIdentifier creator)
+	public void	createElement(String name, String model, String config, Map args, IResultListener listener, Object creator)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
@@ -143,22 +161,22 @@ public class AMS implements IAMS, IService
 		IContextService	cs	= (IContextService)platform.getService(IContextService.class);
 		if(cs!=null)
 		{
-			IContext[]	contexts	= cs.getContexts(creator);
+			IContext[]	contexts	= cs.getContexts((IAgentIdentifier)creator);
 			for(int i=0; contexts!=null && i<contexts.length; i++)
 			{
-				((BaseContext)contexts[i]).agentCreated(creator, aid);
+				((BaseContext)contexts[i]).agentCreated((IAgentIdentifier)creator, aid);
 			}
 		}
 
-		IAMSListener[]	alisteners;
+		IElementListener[]	alisteners;
 		synchronized(listeners)
 		{
-			alisteners	= (IAMSListener[])listeners.toArray(new IAMSListener[listeners.size()]);
+			alisteners	= (IElementListener[])listeners.toArray(new IElementListener[listeners.size()]);
 		}
 		// todo: can be called after listener has (concurrently) deregistered
 		for(int i=0; i<alisteners.length; i++)
 		{
-			alisteners[i].agentAdded(ad);
+			alisteners[i].elementAdded(ad);
 		}
 		
 		listener.resultAvailable(aid.clone());
@@ -168,7 +186,7 @@ public class AMS implements IAMS, IService
 	 *  Start a previously created agent on the platform.
 	 *  @param agent The id of the previously created agent.
 	 */
-	public void	startAgent(IAgentIdentifier agent, IResultListener listener)
+	public void	startElement(Object agent, IResultListener listener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
@@ -215,7 +233,7 @@ public class AMS implements IAMS, IService
 	 *  Destroy (forcefully terminate) an agent on the platform.
 	 *  @param aid	The agent to destroy.
 	 */
-	public void destroyAgent(final IAgentIdentifier aid, IResultListener listener)
+	public void destroyElement(final Object aid, IResultListener listener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
@@ -243,7 +261,7 @@ public class AMS implements IAMS, IService
 				{
 					// Resume a suspended agent before killing it.
 					if(IAMSAgentDescription.STATE_SUSPENDED.equals(desc.getState()))
-						resumeAgent(aid, null);
+						resumeElement(aid, null);
 					
 					if(IAMSAgentDescription.STATE_ACTIVE.equals(desc.getState()))
 					//if(!AMSAgentDescription.STATE_TERMINATING.equals(desc.getState()))
@@ -253,7 +271,7 @@ public class AMS implements IAMS, IService
 //						if(listeners.get(aid)!=null)
 //							throw new RuntimeException("Multiple result listeners for agent: "+aid);
 //						listeners.put(aid, listener);
-						agent.killAgent(new CleanupCommand(aid, listener));
+						agent.killAgent(new CleanupCommand((IAgentIdentifier)aid, listener));
 					}
 					else
 					{
@@ -271,7 +289,7 @@ public class AMS implements IAMS, IService
 	 *  // todo: make sure that agent is really suspended an does not execute
 	 *  an action currently.
 	 */
-	public void suspendAgent(IAgentIdentifier aid, IResultListener listener)
+	public void suspendElement(Object aid, IResultListener listener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
@@ -306,7 +324,7 @@ public class AMS implements IAMS, IService
 	 *  Resume the execution of an agent.
 	 *  @param aid The agent identifier.
 	 */
-	public void resumeAgent(IAgentIdentifier aid, IResultListener listener)
+	public void resumeElement(Object aid, IResultListener listener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
@@ -663,7 +681,7 @@ public class AMS implements IAMS, IService
      *  The listener is registered for ams changes.
      *  @param listener  The listener to be added.
      */
-    public void addAMSListener(IAMSListener listener)
+    public void addElementListener(IElementListener listener)
 	{
 		synchronized(listeners)
 		{
@@ -675,7 +693,7 @@ public class AMS implements IAMS, IService
      *  Remove an ams listener.
      *  @param listener  The listener to be removed.
      */
-    public void removeAMSListener(IAMSListener listener)
+    public void removeElementListener(IElementListener listener)
 	{
 		synchronized(listeners)
 		{
@@ -691,7 +709,7 @@ public class AMS implements IAMS, IService
 	public String getShortName(String filename)
 	{
 //		ILoadableElementModel	model	= platform.getAgentFactory().loadModel(filename);
-		ILoadableElementModel	model	= MetaAgentFactory.loadModel(platform, filename);
+		ILoadableElementModel	model	= SElementFactory.loadModel(platform, filename);
 		return model.getName();
 	}
 
@@ -739,17 +757,17 @@ public class AMS implements IAMS, IService
 				}
 			}
 
-			IAMSListener[]	alisteners;
+			IElementListener[]	alisteners;
 			synchronized(listeners)
 			{
-				alisteners	= (IAMSListener[])listeners.toArray(new IAMSListener[listeners.size()]);
+				alisteners	= (IElementListener[])listeners.toArray(new IElementListener[listeners.size()]);
 			}
 			// todo: can be called after listener has (concurrently) deregistered
 			for(int i=0; i<alisteners.length; i++)
 			{
 				try
 				{
-					alisteners[i].agentRemoved(ad);
+					alisteners[i].elementRemoved(ad);
 				}
 				catch(Exception e)
 				{

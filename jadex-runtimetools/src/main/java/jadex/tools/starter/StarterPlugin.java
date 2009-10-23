@@ -1,13 +1,14 @@
 package jadex.tools.starter;
 
-import jadex.adapter.base.MetaAgentFactory;
+import jadex.adapter.base.SElementFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.base.fipa.IAMSListener;
+import jadex.bridge.IElementListener;
 import jadex.bridge.IAgentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
+import jadex.bridge.IElementExecutionService;
 import jadex.bridge.ILoadableElementModel;
 import jadex.bridge.IPlatform;
 import jadex.commons.ChangeEvent;
@@ -273,7 +274,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 
 					String model = ((FileNode)node).getRelativePath();
 //					if(getJCC().getAgent().getPlatform().getAgentFactory().isLoadable(model))
-					if(MetaAgentFactory.isLoadable(getJCC().getServiceContainer(), model))
+					if(SElementFactory.isLoadable(getJCC().getServiceContainer(), model))
 					{
 						loadModel(model);
 					}
@@ -299,7 +300,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 							String type = ((FileNode)node).getFile().getAbsolutePath();
 //							if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(type))
-							if(MetaAgentFactory.isStartable(getJCC().getServiceContainer(), type))
+							if(SElementFactory.isStartable(getJCC().getServiceContainer(), type))
 								createAgent(type, null, null, null);
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
@@ -412,7 +413,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 			{
 			}
 		});
-		ams.addAMSListener(new IAMSListener()
+		ams.addAMSListener(new IElementListener()
 		{
 			public void agentRemoved(IAMSAgentDescription desc)
 			{
@@ -822,12 +823,12 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 				if(node instanceof FileNode)
 				{
 					final String type = ((FileNode)node).getFile().getAbsolutePath();
-					if(MetaAgentFactory.isStartable(getJCC().getServiceContainer(), type))//&& ((FileNode)node).isValid())
+					if(SElementFactory.isStartable(getJCC().getServiceContainer(), type))//&& ((FileNode)node).isValid())
 					{
 						try
 						{
 //							IAgentFactory agentfactory = getJCC().getAgent().getPlatform().getAgentFactory();
-							ILoadableElementModel model = MetaAgentFactory.loadModel(getJCC().getServiceContainer(), type);
+							ILoadableElementModel model = SElementFactory.loadModel(getJCC().getServiceContainer(), type);
 							String[] inistates = model.getConfigurations();
 //							IMBDIAgent model = SXML.loadAgentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
@@ -967,6 +968,8 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	public void createAgent(String type, String name, String configname, Map arguments)
 	{
 		final IAMS	ams	= (IAMS)getJCC().getServiceContainer().getService(IAMS.class);
+		final IElementExecutionService es = (I)getJCC().getServiceContainer().getService(IAMS.class);
+		
 		ams.createAgent(name, type, configname, arguments, new IResultListener()
 		{
 			
