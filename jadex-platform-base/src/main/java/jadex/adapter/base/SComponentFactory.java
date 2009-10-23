@@ -3,6 +3,7 @@ package jadex.adapter.base;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentFactory;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SUtil;
@@ -250,10 +251,13 @@ public class SComponentFactory
 				}
 			}
 		}
-		ILoadableComponentModel	lmodel	= factory.loadModel(model);
-		IComponentInstance	instance	= factory.createComponentInstance(lmodel, config, args);
-		
 		IComponentExecutionService	ces	= (IComponentExecutionService)container.getService(IComponentExecutionService.class);
+		
+		ILoadableComponentModel	lmodel	= factory.loadModel(model);
+		
+		IComponentIdentifier ces.createComponentIdentifier(name, true, null);
+		IComponentInstance	instance = factory.createComponentInstance(lmodel, config, args);
+		
 		ces.registerComponent(name!=null ? name : lmodel.getName(), instance, listener, creator, name==null);
 	}
 }

@@ -9,6 +9,7 @@ import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.MessageType;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
@@ -111,7 +112,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  Get the agent platform.
 	 *  @return The agent platform. 
 	 */
-	public IPlatform getPlatform()
+	public IServiceContainer getPlatform()
 	{
 		return interpreter.getAgentAdapter().getServiceContainer();
 	}

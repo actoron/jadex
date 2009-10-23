@@ -1,6 +1,7 @@
 package jadex.bdi.interpreter;
 
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IPlatform;
@@ -21,7 +22,7 @@ import javax.swing.UIDefaults;
 /**
  *  Factory for creating Jadex V2 BDI agents.
  */
-public class BDIAgentFactory
+public class BDIAgentFactory implements IComponentFactory
 {
 	//-------- constants --------
 	
@@ -114,13 +115,34 @@ public class BDIAgentFactory
 	//-------- IAgentFactory interface --------
 	
 	/**
+	* Create a kernel agent.
+	* @param model The agent model file (i.e. the name of the XML file).
+	* @param config The name of the configuration (or null for default configuration) 
+	* @param arguments The arguments for the agent as name/value pairs.
+	* @return An instance of a kernel agent.
+	*/
+	public IComponentInstance createComponentInstance(ILoadableComponentModel model, String config, Map arguments)
+	{
+		init();
+		
+		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
+		OAVTypeModel	tmodel	= new OAVTypeModel(adapter.getComponentIdentifier().getLocalName()+"_typemodel", loaded.getTypeModel().getClassLoader());
+		tmodel.addTypeModel(loaded.getTypeModel());
+		tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
+		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
+		state.addSubstate(loaded.getState());
+		
+		return new BDIInterpreter(adapter, state, loaded, config, arguments, props);
+	}
+	
+	/**
 	 *  Create a kernel agent.
 	 *  @param adapter	The platform adapter for the agent. 
 	 *  @param model	The agent model file (i.e. the name of the XML file).
 	 *  @param config	The name of the configuration (or null for default configuration) 
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 *  @return	An instance of a kernel agent.
-	 */
+	 * /
 	public IComponentInstance	createKernelAgent(IComponentAdapter adapter, String model, String config, Map arguments)
 	{
 		init();
@@ -133,7 +155,7 @@ public class BDIAgentFactory
 		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 		state.addSubstate(loaded.getState());
 		return new BDIInterpreter(adapter, state, loaded, config, arguments, props);
-	}
+	}*/
 	
 	/**
 	 *  Load an agent model.
