@@ -11,7 +11,6 @@ import jadex.adapter.base.contextservice.BaseContext;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.standalone.AbstractPlatform;
 import jadex.adapter.standalone.StandaloneComponentAdapter;
-import jadex.adapter.standalone.ams.AMS.CleanupCommand;
 import jadex.adapter.standalone.fipaimpl.AMSAgentDescription;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.bridge.IComponentIdentifier;
@@ -276,7 +275,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
 				AMSAgentDescription ad = (AMSAgentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
-					listener.exceptionOccurred(new RuntimeException("Component identifier not registered in AMS: "+componentid));
+					listener.exceptionOccurred(new RuntimeException("Component identifier not registered: "+componentid));
 					//throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
 				if(!IAMSAgentDescription.STATE_ACTIVE.equals(ad.getState()))
 					listener.exceptionOccurred(new RuntimeException("Only active components can be suspended: "+componentid+" "+ad.getState()));
@@ -296,7 +295,34 @@ public class ComponentExecutionService implements IComponentExecutionService
 	 *  Resume the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public void resumeComponent(IComponentIdentifier componentid, IResultListener listener);
+	public void resumeComponent(IComponentIdentifier componentid, IResultListener listener)
+	{
+		if(listener==null)
+			listener = DefaultResultListener.getInstance();
+		
+		synchronized(adapters)
+		{
+			synchronized(descs)
+			{
+				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
+				AMSAgentDescription ad = (AMSAgentDescription)descs.get(componentid);
+				if(adapter==null || ad==null)
+					listener.exceptionOccurred(new RuntimeException("Component identifier not registered: "+componentid));
+					//throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
+				if(!IAMSAgentDescription.STATE_SUSPENDED.equals(ad.getState()))
+					listener.exceptionOccurred(new RuntimeException("Only active components can be suspended: "+componentid+" "+ad.getState()));
+					//throw new RuntimeException("Only suspended agents can be resumed: "+aid+" "+ad.getState());
+				
+				ad.setState(IAMSAgentDescription.STATE_ACTIVE);
+				adapter.setState(IAMSAgentDescription.STATE_ACTIVE);
+				IExecutionService exe = (IExecutionService)container.getService(IExecutionService.class);
+				exe.execute(adapter);
+			}
+		}
+//		pcs.firePropertyChange("agents", null, adapters);
+	
+		listener.resultAvailable(null);
+	}
 	
 	//-------- listener methods --------
 	
@@ -305,13 +331,25 @@ public class ComponentExecutionService implements IComponentExecutionService
      *  The listener is registered for component changes.
      *  @param listener  The listener to be added.
      */
-    public void addComponentListener(IComponentListener listener);
+    public void addComponentListener(IComponentListener listener)
+    {
+		synchronized(listeners)
+		{
+			listeners.add(listener);
+		}
+    }
     
     /**
      *  Remove a listener.
      *  @param listener  The listener to be removed.
      */
-    public void removeComponentListener(IComponentListener listener);
+    public void removeComponentListener(IComponentListener listener)
+    {
+		synchronized(listeners)
+		{
+			listeners.remove(listener);
+		}
+    }
     
     //-------- helper classes --------
 

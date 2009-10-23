@@ -54,14 +54,14 @@ public interface IAMS extends IComponentExecutionService
 	 *  @param adesc The agent description to search (null for any agent).
 	 *  @param con The search constraints restricting search and/or result size.
 	 *  @return An array of matching agent descriptions.
-	 */
+	 * /
 	public void searchAgents(IAMSAgentDescription adesc, ISearchConstraints con, IResultListener listener);
 	
 	/**
 	 *  Test if an agent is currently living on the platform.
 	 *  @param aid The agent identifier.
 	 *  @return True, if agent is hosted on platform.
-	 */
+	 * /
 	public void containsAgent(IComponentIdentifier aid, IResultListener listener);
 	
 //	/**
@@ -87,21 +87,21 @@ public interface IAMS extends IComponentExecutionService
 	/**
 	 *  Get the number of active agents.
 	 *  @param listener The result listener.
-	 */
+	 * /
 	public void getAgentCount(IResultListener listener);
 	
 	/**
 	 *  Get the agent adapter for an agent identifier.
 	 *  @param aid The agent identifier.
 	 *  @param listener The result listener.
-	 */
+	 * /
 	public void getAgentAdapter(IComponentIdentifier aid, IResultListener listener);
 	
 	/**
 	 *  Get the external access of an agent.
 	 *  @param aid The agent identifier.
 	 *  @param listener The result listener.
-	 */
+	 * /
 	public void getExternalAccess(IComponentIdentifier aid, IResultListener listener);
 	
 	//-------- create methods for ams objects --------
@@ -111,7 +111,7 @@ public interface IAMS extends IComponentExecutionService
 	 *  @param name The name.
 	 *  @param local True for local name.
 	 *  @return The new agent identifier.
-	 */
+	 * /
 	public IComponentIdentifier createAgentIdentifier(String name, boolean local);
 	
 	/**
@@ -121,7 +121,7 @@ public interface IAMS extends IComponentExecutionService
 	 *  @param addresses The addresses.
 	 *  @param resolvers The resolvers.
 	 *  @return The new agent identifier.
-	 */
+	 * /
 	public IComponentIdentifier createAgentIdentifier(String name, boolean local, String[] addresses);
 	
 	/**
@@ -129,14 +129,14 @@ public interface IAMS extends IComponentExecutionService
 	 *  @param maxresults The maximum number of results.
 	 *  @param maxdepth The maximal search depth.
 	 *  @return The search constraints.
-	 */
+	 * /
 	public ISearchConstraints createSearchConstraints(int maxresults, int maxdepth);
 
 	/**
 	 *  Create a ams agent description.
 	 *  @param agent The agent.
 	 *  @return The ams agent description.
-	 */
+	 * /
 	public IAMSAgentDescription createAMSAgentDescription(IComponentIdentifier agent);
 
 	/**
@@ -145,13 +145,13 @@ public interface IAMS extends IComponentExecutionService
 	 *  @param state The state.
 	 *  @param ownership The ownership.
 	 *  @return The ams agent description.
-	 */
+	 * /
 	public IAMSAgentDescription createAMSAgentDescription(IComponentIdentifier agent, String state, String ownership);
 
 	/**
 	 *  Shutdown the platform.
 	 *  @param listener The listener.
-	 */
+	 * /
 	public void shutdownPlatform(IResultListener listener);
 
 //	//-------- listener methods --------
