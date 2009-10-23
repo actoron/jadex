@@ -1,10 +1,10 @@
 package jadex.adapter.standalone;
 
 import jadex.adapter.base.DefaultResultListener;
-import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.ContentException;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IContentCodec;
 import jadex.bridge.IMessageService;
@@ -329,7 +329,7 @@ public class MessageService implements IMessageService
 		
 		for(int i = 0; i < receivers.length; i++)
 		{
-			((IAMS)platform.getService(IAMS.class)).getAgentAdapter(receivers[i], new IResultListener()
+			((IComponentExecutionService)platform.getService(IComponentExecutionService.class)).getComponentAdapter(receivers[i], new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{

@@ -7,6 +7,8 @@ import jadex.commons.concurrent.IResultListener;
  */
 public interface IComponentExecutionService
 {
+	//-------- management methods --------
+	
 	/**
 	 *  Create a new component on the platform.
 	 *  The component will not run before the {@link startComponent()}
@@ -52,10 +54,10 @@ public interface IComponentExecutionService
 	
 	/**
 	 *  Get the agent description of a single agent.
-	 *  @param aid The agent identifier.
+	 *  @param cid The agent identifier.
 	 *  @return The agent description of this agent.
 	 */
-	public void getComponentDescription(IComponentIdentifier aid, IResultListener listener);
+	public void getComponentDescription(IComponentIdentifier cid, IResultListener listener);
 	
 	/**
 	 *  Get all agent descriptions.
@@ -78,4 +80,20 @@ public interface IComponentExecutionService
      */
     public void removeComponentListener(IComponentListener listener);
 
+    //-------- internal methods --------
+    
+	/**
+	 *  Get the component adapter for a component identifier.
+	 *  @param aid The component identifier.
+	 *  @param listener The result listener.
+	 */
+    // Todo: Hack!!! remove?
+	public void getComponentAdapter(IComponentIdentifier cid, IResultListener listener);
+	
+	/**
+	 *  Get the external access of a component.
+	 *  @param cid The component identifier.
+	 *  @param listener The result listener.
+	 */
+	public void getExternalAccess(IComponentIdentifier cid, IResultListener listener);
 }

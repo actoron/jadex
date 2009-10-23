@@ -123,7 +123,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 	public void shutdown(final IResultListener listener)
 	{
 		//System.out.println("Shutting down the platform: "+getName());
-		// Hack !!! Should be sysnchronized with AMS.
+		// Hack !!! Should be synchronized with AMS.
 		synchronized(this)
 		{
 			if(shuttingdown)
@@ -131,8 +131,8 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 
 			this.shuttingdown = true;
 
+			/*
 			final IAMS ams = getAMSService();
-			
 			ams.getAgentIdentifiers(new IResultListener()
 			{
 				public void resultAvailable(Object result)
@@ -160,8 +160,9 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 				{
 				}
 			});
+		*/
 		}
-
+		/*
 		// Necessary because shutdown method should return
 		new Thread(new Runnable()
 		{
@@ -305,8 +306,8 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 				//				System.exit(0);
 
 //				ThreadPoolFactory.getThreadPool(getName()).dispose();
-			}
-		}).start();
+			/*}
+		}).start();*/
 	}
 	
 	/**
