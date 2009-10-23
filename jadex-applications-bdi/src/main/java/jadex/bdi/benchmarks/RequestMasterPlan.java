@@ -19,7 +19,7 @@ public class RequestMasterPlan extends Plan
 		args.put("max", getBeliefbase().getBelief("max").getFact());
 		args.put("receiver", getAgentIdentifier());
 		
-		IAMS	ams	= (IAMS) getScope().getPlatform().getService(IAMS.class);
+		IAMS	ams	= (IAMS) getScope().getServiceContainer().getService(IAMS.class);
 		SyncResultListener	srl	= new SyncResultListener();
 		ams.createAgent(null, "jadex/bdi/benchmarks/RequestPerformance.agent.xml", "default", args, srl, getAgentIdentifier());
 		IComponentIdentifier	slave	= (IComponentIdentifier)srl.waitForResult();

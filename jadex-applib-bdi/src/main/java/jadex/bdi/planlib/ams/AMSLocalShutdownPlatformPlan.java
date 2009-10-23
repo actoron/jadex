@@ -15,7 +15,7 @@ public class AMSLocalShutdownPlatformPlan extends Plan
 	public void body()
 	{
 		SyncResultListener lis = new SyncResultListener();
-		((IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE)).shutdownPlatform(lis);
+		((IAMS)getScope().getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE)).shutdownPlatform(lis);
 		lis.waitForResult();
 	}
 }

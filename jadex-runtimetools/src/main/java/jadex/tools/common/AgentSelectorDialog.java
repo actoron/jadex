@@ -1,6 +1,5 @@
 package jadex.tools.common;
 
-import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.BDIFailureException;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
@@ -194,7 +193,7 @@ public class AgentSelectorDialog
 		// Todo: fetch agent lists from added remote platforms.
 		try
 		{
-			IComponentExecutionService ces	= (IComponentExecutionService)agent.getPlatform().getService(IComponentExecutionService.class);
+			IComponentExecutionService ces	= (IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class);
 			IGoal	search	= agent.getGoalbase().createGoal("ams_search_agents");
 			search.getParameter("description").setValue(ces.createComponentDescription(null, null, null));
 			search.getParameter("constraints").setValue(ces.createSearchConstraints(-1, 0));
@@ -229,7 +228,7 @@ public class AgentSelectorDialog
 	protected void refreshSelectedTree()
 	{
 		// Create agent tree of selected agents.
-		IComponentExecutionService ams = (IComponentExecutionService)agent.getPlatform().getService(IComponentExecutionService.class);
+		IComponentExecutionService ams = (IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class);
 		int	row	= seltree.getTreetable().getSelectionModel().getMinSelectionIndex();
 		this.seltree.removeAgents();
 		for(int i=0; i<sellist.size(); i++)
@@ -289,11 +288,11 @@ public class AgentSelectorDialog
 		removeall.setEnabled(sellist.size()>0);
 		ok.setEnabled(!singleselection || sellist.size()>0);
 
-		IComponentExecutionService ces = (IComponentExecutionService)agent.getPlatform().getService(IComponentExecutionService.class);
-		this.tree	= new AgentTreeTable(agent.getPlatform().getName());
+		IComponentExecutionService ces = (IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class);
+		this.tree	= new AgentTreeTable(agent.getServiceContainer().getName());
 		this.tree.setPreferredSize(new Dimension(200, 100));
 		tree.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.seltree	= new AgentTreeTable(agent.getPlatform().getName());
+		this.seltree	= new AgentTreeTable(agent.getServiceContainer().getName());
 		this.seltree.setPreferredSize(new Dimension(200, 100));
 		seltree.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		seltree.getTreetable().getTree().setRootVisible(false);	// Don't show platform node.
@@ -376,7 +375,7 @@ public class AgentSelectorDialog
 						if(val instanceof IComponentDescription)
 						{
 							// Use clone to keep original aid unchanged.
-							IComponentExecutionService ces	= (IComponentExecutionService)agent.getPlatform().getService(IComponentExecutionService.class);
+							IComponentExecutionService ces	= (IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class);
 							IComponentIdentifier	id	= ((IComponentDescription)val).getName();
 							addSelectedAgent(ces.createComponentIdentifier(id.getName(), false, id.getAddresses()));
 						}
@@ -417,7 +416,7 @@ public class AgentSelectorDialog
 					if(val instanceof IComponentDescription)
 					{
 						// Use clone to keep original aid unchanged.
-						IComponentExecutionService ces= (IComponentExecutionService)agent.getPlatform().getService(IComponentExecutionService.class);
+						IComponentExecutionService ces= (IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class);
 						IComponentIdentifier	id	= ((IComponentDescription)val).getName();
 						addSelectedAgent(ces.createComponentIdentifier(id.getName(), false, id.getAddresses()));
 					}
@@ -428,7 +427,7 @@ public class AgentSelectorDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				IComponentExecutionService ces = (IComponentExecutionService)agent.getPlatform().getService(IComponentExecutionService.class);
+				IComponentExecutionService ces = (IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class);
 				addSelectedAgent(ces.createComponentIdentifier("", true, null));
 			}
 		});

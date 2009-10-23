@@ -1,7 +1,6 @@
 package jadex.bdi.interpreter;
 
 import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IPlatform;
@@ -221,9 +220,9 @@ public class BDIAgentFactory
 	/**
 	 *  Get the element type.
 	 *  @return The element type (e.g. an agent, application or process).
-	 */
+	 * /
 	public String getElementType()
 	{
 		return IComponentFactory.ELEMENT_TYPE_AGENT;
-	}
+	}*/
 }

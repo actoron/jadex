@@ -32,4 +32,10 @@ public interface IMessageService extends IService
 	// In the local case one could always omit the addresses and try out the services.
 	public String[] getAddresses();
 
+	/**
+	 *  Get the message type.
+	 *  @param type The type name.
+	 *  @return The message type.
+	 */
+	public MessageType getMessageType(String type);
 }

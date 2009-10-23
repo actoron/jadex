@@ -2,7 +2,7 @@ package jadex.bdi.runtime;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
-import jadex.bridge.IPlatform;
+import jadex.service.IServiceContainer;
 
 import java.util.logging.Logger;
 
@@ -99,10 +99,10 @@ public interface ICapability	extends IElement
 	public Object	getPlatformAgent();
 
 	/**
-	 *  Get the agent platform
-	 *  @return The agent platform.
+	 *  Get the container
+	 *  @return The container.
 	 */
-	public IPlatform	getPlatform();
+	public IServiceContainer	getServiceContainer();
 	
 	/**
 	 *  Get the current time.

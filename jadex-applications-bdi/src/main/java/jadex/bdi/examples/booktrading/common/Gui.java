@@ -328,7 +328,7 @@ public class Gui extends JFrame
 						int start = Integer.parseInt(dia.start.getText());
 						Date deadline = dformat.parse(dia.deadline.getText());
 						Order order = new Order(title, deadline, start, limit, buy, 
-							(IClockService)agent.getPlatform().getService(IClockService.class));
+							(IClockService)agent.getServiceContainer().getService(IClockService.class));
 						IGoal purchase = Gui.this.agent.createGoal(goalname);
 						purchase.getParameter("order").setValue(order);
 						Gui.this.agent.dispatchTopLevelGoal(purchase);
@@ -518,7 +518,7 @@ public class Gui extends JFrame
 
 			// Add some default entry for easy testing of the gui.
 			// This order are not added to the agent (see manager.agent.xml).
-			IClockService clock = (IClockService)agent.getPlatform().getService(IClockService.class);
+			IClockService clock = (IClockService)agent.getServiceContainer().getService(IClockService.class);
 			if(buy)
 			{
 				orders.addItem(new Order("All about agents", null, 100, 120, buy, clock));

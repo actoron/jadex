@@ -33,7 +33,7 @@ public class DFTestPlan extends Plan
 		num	= performInitialTests(num);
 		num = performTests(num, null); // test locally
 		
-		IAMS ams = (IAMS)getScope().getPlatform().getService(IAMS.class);
+		IAMS ams = (IAMS)getScope().getServiceContainer().getService(IAMS.class);
 		IComponentIdentifier da = ams.createAgentIdentifier(SFipa.DF_AGENT, true);
 		performTests(num, da); // test remotely
 	}
@@ -43,14 +43,14 @@ public class DFTestPlan extends Plan
 	 */
 	public int	performInitialTests(int num)
 	{
-		IDFAgentDescription desc = ((IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE))
+		IDFAgentDescription desc = ((IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE))
 			.createDFAgentDescription(null, new IDFServiceDescription[]
 			{
-				((IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE))
+				((IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE))
 					.createDFServiceDescription("service_a", "a", "a"),
-				((IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE))
+				((IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE))
 					.createDFServiceDescription("service_b", "b", "b"),
-				((IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE))
+				((IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE))
 					.createDFServiceDescription("service_c", "c", "c")
 			}, null, null, null, null);
 
@@ -114,21 +114,21 @@ public class DFTestPlan extends Plan
 	 */
 	public int performTests(int num, IComponentIdentifier df)
 	{
-		IDFAgentDescription desc = ((IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE))
+		IDFAgentDescription desc = ((IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE))
 			.createDFAgentDescription(null, new IDFServiceDescription[]
 			{
-				((IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE))
+				((IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE))
 					.createDFServiceDescription("service_a", "a", "a"),
-				((IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE))
+				((IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE))
 					.createDFServiceDescription("service_b", "b", "b"),
-				((IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE))
+				((IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE))
 					.createDFServiceDescription("service_c", "c", "c")
 			}, null, null, null, null);
 		
 		long olt = getTime()+2000;
 //		desc_clone.setLeaseTime(new Date(olt));
 		
-		IDF dfservice = (IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE);
+		IDF dfservice = (IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE);
 //		IDFAgentDescription desc_clone = SFipa.cloneDFAgentDescription(desc, dfservice);
 		// Hack! does not clone services
 		IDFAgentDescription desc_clone = dfservice.createDFAgentDescription(desc.getName(), desc.getServices(), desc.getLanguages(), desc.getOntologies(), desc.getProtocols(), new Date(olt));

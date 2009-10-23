@@ -63,7 +63,7 @@ public class AnalyseTargetPlanAGR extends Plan
 	{
 //		System.out.println("Calling some Production Agent...");
 
-		IContextService cs = (IContextService)getScope().getPlatform().getService(IContextService.class);
+		IContextService cs = (IContextService)getScope().getServiceContainer().getService(IContextService.class);
 		ApplicationContext ac = (ApplicationContext)cs.getContexts(getScope().getAgentIdentifier(), ApplicationContext.class)[0];
 		AGRSpace agrs = (AGRSpace)ac.getSpace("myagrspace");
 		Group group = agrs.getGroup("mymarsteam");

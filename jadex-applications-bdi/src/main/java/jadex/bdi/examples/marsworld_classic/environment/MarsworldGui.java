@@ -108,7 +108,7 @@ public class MarsworldGui	extends JFrame
 					catch(GoalFailureException gfe) {}
 				}*/
 //				agent.killAgent();
-				IContextService ics = (IContextService)agent.getPlatform().getService(IContextService.class);
+				IContextService ics = (IContextService)agent.getServiceContainer().getService(IContextService.class);
 				ics.deleteContext(agent.getApplicationContext(), null);
 			}
 		});

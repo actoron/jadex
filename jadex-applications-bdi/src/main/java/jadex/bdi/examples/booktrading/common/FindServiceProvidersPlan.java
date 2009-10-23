@@ -19,7 +19,7 @@ public class FindServiceProvidersPlan extends Plan
 	{
 		IDFAgentDescription dfadesc = (IDFAgentDescription)getParameter("description").getValue();
 		
-		IDF df = (IDF)getScope().getPlatform().getService(IDF.class);
+		IDF df = (IDF)getScope().getServiceContainer().getService(IDF.class);
 		ISearchConstraints constraints = df.createSearchConstraints(-1, 0);
 
 		// Use a subgoal to search at the df.

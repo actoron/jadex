@@ -16,8 +16,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
-import jadex.bridge.IPlatform;
 import jadex.rules.state.IOAVState;
+import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 
 import java.util.logging.Logger;
@@ -305,7 +305,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 *  Get the agent platform
 	 *  @return The agent platform.
 	 */
-	public IPlatform	getPlatform()
+	public IServiceContainer	getServiceContainer()
 	{
 		return adapter.getServiceContainer();
 	}

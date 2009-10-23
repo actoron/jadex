@@ -19,7 +19,7 @@ public class AMSLocalDestroyAgentPlan extends Plan
 	{	
 		IComponentIdentifier	aid	= (IComponentIdentifier)getParameter("agentidentifier").getValue();
 
-		final IPlatform plat	= getScope().getPlatform();
+		final IPlatform plat	= getScope().getServiceContainer();
 		try
 		{
 			SyncResultListener lis = new SyncResultListener();

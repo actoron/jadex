@@ -1,6 +1,5 @@
 package jadex.tools.ruleprofiler;
 
-import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.impl.ElementFlyweight;
@@ -78,7 +77,7 @@ public class RuleProfilerPanel	extends JPanel
 		this.observed	= observed;
 
         // Hack!?!?!
-		((IComponentExecutionService)agent.getPlatform().getService(IComponentExecutionService.class))
+		((IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class))
 			.getExternalAccess(observed, new IResultListener()
 		{
 			public void exceptionOccurred(Exception exception)

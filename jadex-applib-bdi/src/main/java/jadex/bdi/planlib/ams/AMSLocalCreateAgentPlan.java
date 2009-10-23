@@ -24,7 +24,7 @@ public class AMSLocalCreateAgentPlan extends Plan
 		String	config	= (String)getParameter("configuration").getValue();
 		Map	args	= (Map)getParameter("arguments").getValue();
 		boolean	start	= ((Boolean)getParameter("start").getValue()).booleanValue();
-		IPlatform plat	= getScope().getPlatform();
+		IPlatform plat	= getScope().getServiceContainer();
 
 		try
 		{

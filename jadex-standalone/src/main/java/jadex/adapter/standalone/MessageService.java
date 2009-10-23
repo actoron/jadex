@@ -58,6 +58,9 @@ public class MessageService implements IMessageService
 	/** All addresses of this platform. */
 	private String[] addresses;
 
+	/** The message types. */
+	protected Map messagetypes;
+	
 	/** The send message action executed by platform executor. */
 	protected SendMessage sendmsg;
 	
@@ -73,12 +76,13 @@ public class MessageService implements IMessageService
 	 *  Constructor for Outbox.
 	 *  @param platform
 	 */
-	public MessageService(AbstractPlatform platform, ITransport[] transports)
+	public MessageService(AbstractPlatform platform, ITransport[] transports, Map messagetypes)
 	{
 		this.platform = platform;
 		this.transports = SCollection.createArrayList();
 		for(int i=0; i<transports.length; i++)
 			this.transports.add(transports[i]);
+		this.messagetypes	= messagetypes;
 		this.sendmsg = new SendMessage();
 		this.delivermsg = new DeliverMessage();
 		this.logger = Logger.getLogger("MessageService" + this);
@@ -279,6 +283,16 @@ public class MessageService implements IMessageService
 		listener.resultAvailable(null);
 	}
 
+	/**
+	 *  Get the message type.
+	 *  @param type The type name.
+	 *  @return The message type.
+	 */
+	public MessageType getMessageType(String type)
+	{
+		return (MessageType)messagetypes.get(type);
+	}
+	
 	// -------- internal methods --------
 
 	/**
@@ -324,7 +338,7 @@ public class MessageService implements IMessageService
 	 */
 	protected void internalDeliverMessage(final Map msg, final String type, final IComponentIdentifier[] receivers)
 	{
-		final MessageType	messagetype	= platform.getMessageType(type);
+		final MessageType	messagetype	= getMessageType(type);
 		final Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
 		
 		for(int i = 0; i < receivers.length; i++)

@@ -1309,7 +1309,7 @@ public class MessageEventRules
 	{
 		String	mtype	= (String)state.getAttributeValue(mme, OAVBDIMetaModel.messageevent_has_type);
 		BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
-		MessageType ret	= bdii.getAgentAdapter().getServiceContainer().getMessageType(mtype);
+		MessageType ret	= ((IMessageService)bdii.getAgentAdapter().getServiceContainer().getService(IMessageService.class)).getMessageType(mtype);
 		return ret;
 	}
 }

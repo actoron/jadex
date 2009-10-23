@@ -22,7 +22,7 @@ public class DFLocalSearchPlan extends Plan
 		ISearchConstraints	con	= (ISearchConstraints)getParameter("constraints").getValue();
 		
 		SyncResultListener lis = new SyncResultListener();
-		((IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE)).search(desc, con, lis);
+		((IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE)).search(desc, con, lis);
 		IDFAgentDescription[]	result = (IDFAgentDescription[])lis.waitForResult();
 		
 		getParameterSet("result").addValues(result);

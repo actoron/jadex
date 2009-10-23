@@ -20,7 +20,7 @@ public class AMSLocalStartAgentPlan extends Plan
 		try
 		{
 			SyncResultListener lis = new SyncResultListener();
-			((IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE)).startAgent(agentidentifier, lis);
+			((IAMS)getScope().getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE)).startAgent(agentidentifier, lis);
 			lis.waitForResult();
 		}
 		catch(Exception e)

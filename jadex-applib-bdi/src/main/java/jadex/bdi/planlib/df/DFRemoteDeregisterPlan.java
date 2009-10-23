@@ -21,7 +21,7 @@ public class DFRemoteDeregisterPlan extends Plan
 		IDFAgentDescription desc = (IDFAgentDescription)getParameter("description").getValue();
 		if(desc==null || desc.getName()==null)
 		{
-			IDF df = (IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE);
+			IDF df = (IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE);
 			desc = df.createDFAgentDescription(getScope().getAgentIdentifier(), null);
 //			IAgentIdentifier	bid	= getScope().getAgentIdentifier();
 //			desc.setName(bid);

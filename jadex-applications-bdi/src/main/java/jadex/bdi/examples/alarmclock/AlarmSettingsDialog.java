@@ -320,7 +320,7 @@ public class AlarmSettingsDialog extends JDialog
 		{
 			alarm = new Alarm();
 			alarm.setTime(new Time(new Date(agent.getTime())));
-			alarm.setClock((IClockService)agent.getPlatform().getService(IClockService.class));
+			alarm.setClock((IClockService)agent.getServiceContainer().getService(IClockService.class));
 		}
 		else
 		{
@@ -368,7 +368,7 @@ public class AlarmSettingsDialog extends JDialog
 		if(alarm==null)
 		{
 			this.alarm = new Alarm();
-			alarm.setClock((IClockService)agent.getPlatform().getService(IClockService.class));
+			alarm.setClock((IClockService)agent.getServiceContainer().getService(IClockService.class));
 		}
 
 		alarm.setMode((String)mode.getSelectedItem());

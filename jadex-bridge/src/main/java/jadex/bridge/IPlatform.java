@@ -59,8 +59,8 @@ public interface IPlatform extends IServiceContainer
 	 *  Get the message type.
 	 *  @param type The type name.
 	 *  @return The message type.
-	 */
+	 * /
 	// Todo: move to message service?
-	public MessageType getMessageType(String type);
+	public MessageType getMessageType(String type);*/
 }
 

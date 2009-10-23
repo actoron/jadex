@@ -81,7 +81,7 @@ public class UpdateEnvironmentPlan extends Plan {
 			dynamicSettingsPanel.add(new JLabel("Simulation End Time: " + String.valueOf(longToDateString(System.currentTimeMillis()))), 1);
 			
 			//Stop Siumlation when target condition true.
-			IPlatform platform = getExternalAccess().getPlatform();
+			IPlatform platform = getExternalAccess().getServiceContainer();
 			ISimulationService simServ = (ISimulationService)platform.getService(ISimulationService.class);
 			simServ.pause();
 		}

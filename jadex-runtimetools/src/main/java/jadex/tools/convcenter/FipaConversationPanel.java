@@ -604,7 +604,7 @@ public class FipaConversationPanel extends JSplitPane
 	 */
 	public IMessageEvent	decodeMessage(String msg)
 	{
-		ClassLoader cl = ((ILibraryService)agent.getPlatform().getService(ILibraryService.class)).getClassLoader();
+		ClassLoader cl = ((ILibraryService)agent.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
 		Map	map	= (Map)Nuggets.objectFromXML(msg, cl);
 		IMessageEvent	message	= agent.createMessageEvent((String)map.get(ConversationPlugin.ENCODED_MESSAGE_TYPE));
 
@@ -672,7 +672,7 @@ public class FipaConversationPanel extends JSplitPane
 			{
 				map.put(paramsets[i].getName(), paramsets[i].getValues());
 			}
-			ClassLoader cl = ((ILibraryService)agent.getPlatform().getService(ILibraryService.class)).getClassLoader();
+			ClassLoader cl = ((ILibraryService)agent.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
 			String	msg	= Nuggets.objectToXML(map, cl);
 			return msg;
 		}

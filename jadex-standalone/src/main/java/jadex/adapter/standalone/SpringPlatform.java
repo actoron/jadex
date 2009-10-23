@@ -131,14 +131,14 @@ public class SpringPlatform extends AbstractPlatform
 		this.shutdowntime = shutdowntime;
 	}
 
-	/**
-	 *  Set the messagetypes.
-	 *  @param messagetypes The messagetypes to set.
-	 */
-	public void setMessageTypes(Map messagetypes)
-	{
-		this.messagetypes = messagetypes;
-	}
+//	/**
+//	 *  Set the messagetypes.
+//	 *  @param messagetypes The messagetypes to set.
+//	 */
+//	public void setMessageTypes(Map messagetypes)
+//	{
+//		this.messagetypes = messagetypes;
+//	}
 
 	/**
 	 *  Set the agent factories.

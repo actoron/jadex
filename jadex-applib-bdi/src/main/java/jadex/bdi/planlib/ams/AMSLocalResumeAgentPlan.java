@@ -19,7 +19,7 @@ public class AMSLocalResumeAgentPlan extends Plan
 		IComponentIdentifier	aid	= (IComponentIdentifier)getParameter("agentidentifier").getValue();
 		
 		SyncResultListener lis = new SyncResultListener();
-		((IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE)).resumeAgent(aid, lis);
+		((IAMS)getScope().getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE)).resumeAgent(aid, lis);
 		IComponentDescription desc =  (IComponentDescription)lis.waitForResult();
 		
 		getParameter("agentdescription").setValue(desc);

@@ -277,7 +277,7 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 		this.split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		agents = new AgentTreeTable(((AgentControlCenter)getJCC()).getAgent().getPlatform().getName());
+		agents = new AgentTreeTable(((AgentControlCenter)getJCC()).getAgent().getServiceContainer().getName());
 		agents.setMinimumSize(new Dimension(0, 0));
 		split.add(agents);
 		agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

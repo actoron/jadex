@@ -283,7 +283,7 @@ public class Settings implements Cloneable, Serializable
 		}
 		Alarm[]	alarms	= ret.getAlarms();
 		for(int i=0; i<alarms.length; i++)
-			alarms[i].setClock((IClockService)agent.getPlatform().getService(IClockService.class));
+			alarms[i].setClock((IClockService)agent.getServiceContainer().getService(IClockService.class));
 		return ret;
 	}
 }

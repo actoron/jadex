@@ -72,7 +72,7 @@ public class InformNewTargetPlan extends Plan
 
 		// Search for Production_Service
 		// Create a service description to search for.
-		IDF	df	= (IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE);
+		IDF	df	= (IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE);
 		IDFServiceDescription sd = df.createDFServiceDescription("service_sentry", null, null);
 		IDFAgentDescription dfadesc = df.createDFAgentDescription(null, sd);
 

@@ -65,7 +65,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //				agents.add(ca.getParameter("agentidentifier").getValue());
 				
 				SyncResultListener	listener	= new SyncResultListener();
-				IAMS ams = (IAMS)getScope().getPlatform().getService(IAMS.class);
+				IAMS ams = (IAMS)getScope().getServiceContainer().getService(IAMS.class);
 				ams.createAgent(null, type, config, args[i], listener, getAgentIdentifier());
 				IComponentIdentifier aid = (IComponentIdentifier)listener.waitForResult();
 				listener = new SyncResultListener();	// Hack!!! Allow reuse of result listener?
@@ -100,7 +100,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //				dispatchSubgoalAndWait(da);
 				
 				SyncResultListener	listener	= new SyncResultListener();
-				IAMS	ams	= (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+				IAMS	ams	= (IAMS)getScope().getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE);
 				ams.destroyAgent((IComponentIdentifier)agents.get(i), listener);
 				IComponentIdentifier	aid	= (IComponentIdentifier)listener.waitForResult();
 			}

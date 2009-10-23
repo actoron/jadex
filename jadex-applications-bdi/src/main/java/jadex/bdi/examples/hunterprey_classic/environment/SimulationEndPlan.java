@@ -43,7 +43,7 @@ public class SimulationEndPlan extends Plan {
 //		
 //		killAgent();
 
-		IContextService	cs	= (IContextService) getScope().getPlatform().getService(IContextService.class);
+		IContextService	cs	= (IContextService) getScope().getServiceContainer().getService(IContextService.class);
 		cs.deleteContext(getScope().getApplicationContext(), null);		
 	}
 }

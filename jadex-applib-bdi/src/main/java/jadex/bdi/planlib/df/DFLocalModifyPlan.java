@@ -26,7 +26,7 @@ public class DFLocalModifyPlan extends Plan
 		// When AID is ommited, enter self. Hack???
 		if(desc.getName()==null || lt!=null)
 		{
-			IDF	dfservice	= (IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE);
+			IDF	dfservice	= (IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE);
 			IComponentIdentifier	bid	= desc.getName()!=null ? desc.getName() : getScope().getAgentIdentifier();
 			Date	leasetime	= lt==null ? desc.getLeaseTime() : new Date(getTime()+lt.longValue());
 			desc	= dfservice.createDFAgentDescription(bid, desc.getServices(), desc.getLanguages(), desc.getOntologies(), desc.getProtocols(), leasetime);
@@ -38,7 +38,7 @@ public class DFLocalModifyPlan extends Plan
 		SyncResultListener lis = new SyncResultListener();
 		try
 		{
-			((IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE)).modify(desc, lis);
+			((IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE)).modify(desc, lis);
 			lis.waitForResult();
 		}
 		catch(Exception e)

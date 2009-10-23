@@ -43,7 +43,7 @@ public class InformNewTargetPlanAGR extends Plan
 	{
 		//System.out.println("Informing all sentry agents.");
 		
-		IContextService cs = (IContextService)getScope().getPlatform().getService(IContextService.class);
+		IContextService cs = (IContextService)getScope().getServiceContainer().getService(IContextService.class);
 		IApplicationContext ac = (IApplicationContext)cs.getContexts(getScope().getAgentIdentifier(), IApplicationContext.class)[0];
 		AGRSpace agrs = (AGRSpace)ac.getSpace("myagrspace");
 		Group group = agrs.getGroup("mymarsteam");

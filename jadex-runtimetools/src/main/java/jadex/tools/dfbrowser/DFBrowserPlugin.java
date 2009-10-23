@@ -160,7 +160,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 	 */
 	public JComponent createView()
 	{
-		df_agents = new AgentTreeTable(((AgentControlCenter)getJCC()).getAgent().getPlatform().getName());
+		df_agents = new AgentTreeTable(((AgentControlCenter)getJCC()).getAgent().getServiceContainer().getName());
 		df_agents.setMinimumSize(new Dimension(0, 0));
 		df_agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		df_agents.getNodeType(AgentTreeTable.NODE_AGENT).addPopupAction(REFRESH_DF);
@@ -441,7 +441,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 		
 		if(getSelectedDF() != null)
 		{
-			IDF	df	= (IDF)((AgentControlCenter)getJCC()).getAgent().getPlatform().getService(IDF.class);
+			IDF	df	= (IDF)((AgentControlCenter)getJCC()).getAgent().getServiceContainer().getService(IDF.class);
 
 			// Use a subgoal to search
 			IGoal ft = ((AgentControlCenter)getJCC()).getAgent().createGoal("df_search");

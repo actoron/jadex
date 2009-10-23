@@ -25,7 +25,7 @@ public class AMSTestPlan extends Plan
 	{
 		int num=1;
 		num = performTests(num, null); // test locally
-		IAMS ams = (IAMS)getScope().getPlatform().getService(IAMS.class);
+		IAMS ams = (IAMS)getScope().getServiceContainer().getService(IAMS.class);
 		IComponentIdentifier aa = ams.createAgentIdentifier(SFipa.AMS_AGENT, true);
 		performTests(num, aa); // test remotely
 	}
@@ -50,7 +50,7 @@ public class AMSTestPlan extends Plan
 		// Try to search the AMS.
 		TestReport tr = new TestReport("#"+num++, "Searching for all agents");
 		getLogger().info("\nSearching for all agents.");
-		IAMS amsservice = (IAMS)getScope().getPlatform().getService(IAMS.class);
+		IAMS amsservice = (IAMS)getScope().getServiceContainer().getService(IAMS.class);
 		IComponentDescription desc = amsservice.createAMSAgentDescription(null);
 		ISearchConstraints constraints = amsservice.createSearchConstraints(-1, 0);
 		/*AMSAgentDescription	desc	= new AMSAgentDescription();

@@ -1,17 +1,12 @@
 package jadex.adapter.standalone;
 
 import jadex.adapter.base.SComponentExecutionService;
-import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
-import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IPlatform;
-import jadex.bridge.MessageType;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.PropertyServiceContainer;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -48,7 +43,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 //	protected IApplicationFactory appfactory;
 
 	/** The message types. */
-	protected Map messagetypes;
+//	protected Map messagetypes;
 
 	/** The shutdown time. */
 	protected long shutdowntime;
@@ -62,11 +57,11 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 	 *  Get the message type.
 	 *  @param type The type name.
 	 *  @return The message type.
-	 */
+	 * /
 	public MessageType getMessageType(String type)
 	{
 		return (MessageType)messagetypes.get(type);
-	}
+	}*/
 
 	/**
 	 *  Get the agent factory.
@@ -356,7 +351,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 	
 	/**
 	 * 
-	 */
+	 * /
 	protected IAMS getAMSService()
 	{
 		IAMS ret = null;
@@ -371,7 +366,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 			}
 		}
 		return ret;
-	}
+	}*/
 	
 	//-------- static part --------
 

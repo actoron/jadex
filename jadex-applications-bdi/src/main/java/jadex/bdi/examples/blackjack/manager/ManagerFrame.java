@@ -121,14 +121,14 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		dealerpan = new JPanel();
 		dealerpan.setBorder(BorderFactory.createTitledBorder(" Dealer "));
 		dealerpan.setBackground(Color.WHITE);
-		final IAMS ams = (IAMS)access.getPlatform().getService(IAMS.class);
+		final IAMS ams = (IAMS)access.getServiceContainer().getService(IAMS.class);
 		dealeraid = ams.createAgentIdentifier(LOCAL_DEALER, true);
 		dealertf = new JTextField(20);
 		dealertf.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
-				IAMS ams = (IAMS)access.getPlatform().getService(IAMS.class);
+				IAMS ams = (IAMS)access.getServiceContainer().getService(IAMS.class);
 				dealeraid = ams.createAgentIdentifier(dealertf.getText(), false);
 //				dealeraid = new AgentIdentifier(dealertf.getText());
 				//dealertf.setText(dealeraid.getName());
@@ -300,7 +300,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			}
 			else
 			{
-				IApplicationContext ac = (ApplicationContext)((IContextService)agent.getPlatform().getService(IContextService.class)).getContexts(agent.getAgentIdentifier(), IApplicationContext.class)[0];
+				IApplicationContext ac = (ApplicationContext)((IContextService)agent.getServiceContainer().getService(IContextService.class)).getContexts(agent.getAgentIdentifier(), IApplicationContext.class)[0];
 				ac.setAgentMaster(agent.getAgentIdentifier(), false);
 				agent.killAgent();
 			}
@@ -385,7 +385,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		try
 		{
 			IGoal start = agent.getGoalbase().createGoal("ams_create_agent");
-			IContextService	cs	= (IContextService) agent.getPlatform().getService(IContextService.class);
+			IContextService	cs	= (IContextService) agent.getServiceContainer().getService(IContextService.class);
 			IContext[]	contexts	= cs.getContexts(agent.getAgentIdentifier(), IApplicationContext.class);
 			// Hack! remove cast to ApplicationContext
 			String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Dealer").getFilename();
@@ -595,7 +595,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			{
 				agent.getLogger().info("starting playerAgent: "+player.getName());
 				IGoal start = agent.getGoalbase().createGoal("ams_create_agent");
-				IContextService	cs	= (IContextService) agent.getPlatform().getService(IContextService.class);
+				IContextService	cs	= (IContextService) agent.getServiceContainer().getService(IContextService.class);
 				IContext[]	contexts	= cs.getContexts(agent.getAgentIdentifier(), IApplicationContext.class);
 				// Hack! remove cast to ApplicationContext
 				String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Player").getFilename();

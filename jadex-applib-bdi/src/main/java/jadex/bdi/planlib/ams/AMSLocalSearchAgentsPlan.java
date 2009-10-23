@@ -21,7 +21,7 @@ public class AMSLocalSearchAgentsPlan extends Plan
 		ISearchConstraints	constraints	= (ISearchConstraints)getParameter("constraints").getValue();
 		
 		SyncResultListener lis = new SyncResultListener();
-		((IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE)).searchAgents(desc, constraints, lis);
+		((IAMS)getScope().getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE)).searchAgents(desc, constraints, lis);
 		IComponentDescription[]	result =  (IComponentDescription[])lis.waitForResult();
 		for(int i=0; i<result.length; i++)
 			getParameterSet("result").addValue(result[i]);

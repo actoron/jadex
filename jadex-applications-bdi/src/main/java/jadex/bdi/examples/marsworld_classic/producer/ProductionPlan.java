@@ -84,7 +84,7 @@ public class ProductionPlan extends Plan
 	{
 		// Search for Carry_Service
 		// Create a service description to search for.
-		IDF	df	= (IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE);
+		IDF	df	= (IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE);
 		IDFServiceDescription sd = df.createDFServiceDescription("service_carry", null, null);
 		IDFAgentDescription dfadesc = df.createDFAgentDescription(null, sd);
 

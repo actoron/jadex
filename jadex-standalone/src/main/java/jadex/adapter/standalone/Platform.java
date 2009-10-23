@@ -4,7 +4,6 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
-import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.service.IService;
@@ -16,7 +15,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -42,8 +40,8 @@ public class Platform extends AbstractPlatform
 	/** The application factory. */
 	public static final String APPLICATION_FACTORY = "application_factory";
 	
-	/** The agent factory. */
-	public static final String MESSAGETYPE = "messagetype";
+//	/** The agent factory. */
+//	public static final String MESSAGETYPE = "messagetype";
 
 	/** A daemon agent. */
 	public static final String DAEMONAGENT = "daemonagent";
@@ -158,7 +156,7 @@ public class Platform extends AbstractPlatform
 		this.platconf = configuration.getSubproperty(PLATFORM);
 		
 //		this.services = new LinkedHashMap();
-		this.messagetypes = new LinkedHashMap();
+//		this.messagetypes = new LinkedHashMap();
 		this.shutdowntime = platconf.getLongProperty(PLATFORM_SHUTDOWN_TIME);
 		String	name = (String)((Property)platconf.getProperty(PLATFORMNAME)).getValue();
 		if(name == null)
@@ -180,12 +178,12 @@ public class Platform extends AbstractPlatform
 		fetcher.setValue("$platform", this);
 		fetcher.setValue("$platformname", name);
 		
-		// Initialize message types.
-		Property[] props = platconf.getProperties(MESSAGETYPE);
-		for(int i = 0; i < props.length; i++)
-		{
-			messagetypes.put(props[i].getName(), SJavaParser.evaluateExpression(props[i].getValue(), fetcher));
-		}
+//		// Initialize message types.
+//		Property[] props = platconf.getProperties(MESSAGETYPE);
+//		for(int i = 0; i < props.length; i++)
+//		{
+//			messagetypes.put(props[i].getName(), SJavaParser.evaluateExpression(props[i].getValue(), fetcher));
+//		}
 		
 		// Initialize services.
 //		props = platconf.getSubproperty(SERVICES).getProperties();
@@ -242,7 +240,7 @@ public class Platform extends AbstractPlatform
 		}
 		
 //		IAMS ams = (IAMS)getService(IAMS.class);
-		if(getAMSService()!=null)
+//		if(getAMSService()!=null)
 		{
 			/*
 			// Add ams listener if auto shutdown.

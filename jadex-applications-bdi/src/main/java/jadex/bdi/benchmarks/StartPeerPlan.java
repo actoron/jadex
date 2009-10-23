@@ -159,7 +159,7 @@ public class StartPeerPlan extends Plan
 	 */
 	protected IComponentIdentifier serviceCreateAgent(String name, Map args)
 	{
-		final IAMS ams = (IAMS)getScope().getPlatform().getService(IAMS.class);
+		final IAMS ams = (IAMS)getScope().getServiceContainer().getService(IAMS.class);
 		SyncResultListener lis = new SyncResultListener();
 		ams.createAgent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", null, args, lis, getAgentIdentifier());
 		IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
@@ -191,7 +191,7 @@ public class StartPeerPlan extends Plan
 	 */
 	protected void serviceDestroyAgent(String name)
 	{
-		final IAMS ams = (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+		final IAMS ams = (IAMS)getScope().getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE);
 		SyncResultListener lis = new SyncResultListener();
 		IComponentIdentifier aid = ams.createAgentIdentifier(name, true);
 		ams.destroyAgent(aid, lis);
@@ -205,7 +205,7 @@ public class StartPeerPlan extends Plan
 	 */
 	protected void capabilityDestroyAgent(String name)
 	{
-		final IAMS ams = (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+		final IAMS ams = (IAMS)getScope().getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE);
 		IComponentIdentifier aid = ams.createAgentIdentifier(name, true);
 		IGoal sp = createGoal("ams_destroy_agent");
 		sp.getParameter("agentidentifier").setValue(aid);
