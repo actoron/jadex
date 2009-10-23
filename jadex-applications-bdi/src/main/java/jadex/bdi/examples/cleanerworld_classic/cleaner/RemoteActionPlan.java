@@ -9,7 +9,7 @@ import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.PlanFailureException;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 
 /**
@@ -27,7 +27,7 @@ public abstract class RemoteActionPlan extends Plan
 		throws GoalFailureException
 	{
 		// Search and store the environment agent.
-		IAgentIdentifier	env	= searchEnvironmentAgent();
+		IComponentIdentifier	env	= searchEnvironmentAgent();
 		IGoal rg = createGoal("rp_initiate");
 		rg.getParameter("receiver").setValue(env);
 		rg.getParameter("action").setValue(action);
@@ -54,9 +54,9 @@ public abstract class RemoteActionPlan extends Plan
 	/**
 	 *  Search the environent agent and store its AID in the beliefbase.
 	 */
-	protected IAgentIdentifier	searchEnvironmentAgent()
+	protected IComponentIdentifier	searchEnvironmentAgent()
 	{
-		IAgentIdentifier	res	= (IAgentIdentifier)getBeliefbase().getBelief("environmentagent").getFact();
+		IComponentIdentifier	res	= (IComponentIdentifier)getBeliefbase().getBelief("environmentagent").getFact();
 
 		if(res==null)
 		{

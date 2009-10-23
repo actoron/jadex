@@ -5,7 +5,7 @@ import jadex.bdi.planlib.protocols.AbstractReceiverPlan;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Receive a request and answer it.
@@ -25,7 +25,7 @@ public class RPReceiverPlan extends AbstractReceiverPlan
 		try
 		{
 			Boolean res = decideRequest(me.getParameter(SFipa.CONTENT).getValue(), 
-				(IAgentIdentifier)me.getParameter(SFipa.SENDER).getValue());
+				(IComponentIdentifier)me.getParameter(SFipa.SENDER).getValue());
 
 			if(res!=null)
 			{
@@ -54,7 +54,7 @@ public class RPReceiverPlan extends AbstractReceiverPlan
 		try
 		{
 			Object res = executeRequest(me.getParameter(SFipa.CONTENT).getValue(), 
-				(IAgentIdentifier)me.getParameter(SFipa.SENDER).getValue());
+				(IComponentIdentifier)me.getParameter(SFipa.SENDER).getValue());
 			reply = getEventbase().createReply(me, "rp_inform");
 			reply.getParameter(SFipa.CONTENT).setValue(res);
 			getLogger().info("Receiver sent inform.");
@@ -76,7 +76,7 @@ public class RPReceiverPlan extends AbstractReceiverPlan
 	 *  @param initiator The requesting agent.
 	 *  @return True, if should send agree. False for sending refuse. Exception/null for sending nothing.
 	 */
-	public Boolean decideRequest(Object request, IAgentIdentifier initiator)
+	public Boolean decideRequest(Object request, IComponentIdentifier initiator)
 	{
 		IGoal decide_request = createGoal("rp_decide_request");
 		decide_request.getParameter("action").setValue(request);
@@ -91,7 +91,7 @@ public class RPReceiverPlan extends AbstractReceiverPlan
 	 *  @param initiator The requesting agent.
 	 *  @return The result.
 	 */
-	public Object executeRequest(Object request, IAgentIdentifier initiator)
+	public Object executeRequest(Object request, IComponentIdentifier initiator)
 	{
 		IGoal execute_request = createGoal("rp_execute_request");
 		execute_request.getParameter("action").setValue(request);

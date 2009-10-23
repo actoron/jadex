@@ -4,7 +4,7 @@ import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.adapter.standalone.transport.MessageEnvelope;
 import jadex.adapter.standalone.transport.codecs.CodecFactory;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatform;
 import jadex.commons.SUtil;
@@ -260,10 +260,10 @@ public class NIOTCPTransport implements ITransport
 	 *  @param message The message to send.
 	 */
 //	public AgentIdentifier[] sendMessage(IMessageEnvelope message)
-	public AgentIdentifier[] sendMessage(Map message, String msgtype, IAgentIdentifier[] receivers)
+	public AgentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] receivers)
 	{
 		// Fetch all receivers 
-		IAgentIdentifier[] recstodel = receivers;
+		IComponentIdentifier[] recstodel = receivers;
 //		IAgentIdentifier[] recstodel = message.getReceivers();
 		List undelivered = SUtil.arrayToList(recstodel);
 		

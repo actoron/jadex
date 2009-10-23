@@ -3,7 +3,7 @@ package jadex.bdi.planlib.ams;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IPlatform;
 
 /**
@@ -16,7 +16,7 @@ public class AMSLocalGetExternalAccessPlan extends Plan
 	 */
 	public void body()
 	{	
-		IAgentIdentifier aid = (IAgentIdentifier)getParameter("agentidentifier").getValue();
+		IComponentIdentifier aid = (IComponentIdentifier)getParameter("agentidentifier").getValue();
 
 		final IPlatform plat = getScope().getPlatform();
 		try

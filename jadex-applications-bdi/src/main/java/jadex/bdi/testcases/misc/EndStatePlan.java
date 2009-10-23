@@ -9,7 +9,7 @@ import jadex.bdi.planlib.test.TestReport;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.collection.SCollection;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class EndStatePlan extends Plan
 		args.put("testagent", getAgentIdentifier());
 		create.getParameter("arguments").setValue(args);
 		dispatchSubgoalAndWait(create);
-		IAgentIdentifier	worker	= (IAgentIdentifier)create.getParameter("agentidentifier").getValue();
+		IComponentIdentifier	worker	= (IComponentIdentifier)create.getParameter("agentidentifier").getValue();
 		
 		// Wait for reports from worker agent.
 		IMessageEvent	msg	= waitForMessageEvent("inform_reports");
@@ -70,7 +70,7 @@ public class EndStatePlan extends Plan
 		create	= createGoal("amscap.ams_create_agent");
 		create.getParameter("type").setValue("/jadex/bdi/testcases/misc/EndStateDeregister.agent.xml");
 		dispatchSubgoalAndWait(create);
-		IAgentIdentifier	deregister	= (IAgentIdentifier)create.getParameter("agentidentifier").getValue();
+		IComponentIdentifier	deregister	= (IComponentIdentifier)create.getParameter("agentidentifier").getValue();
 
 		// Check if deregister agent is registered.
 		waitFor(100);	// Hack!!! how to ensure that agent has time to register itself?

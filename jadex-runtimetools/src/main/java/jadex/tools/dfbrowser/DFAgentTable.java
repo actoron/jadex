@@ -2,7 +2,7 @@ package jadex.tools.dfbrowser;
 
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -57,7 +57,7 @@ public class DFAgentTable extends JTable
 		
 		sorter.setTableHeader(getTableHeader());
 		setPreferredScrollableViewportSize(new Dimension(800, 70));
-		setDefaultRenderer(IAgentIdentifier.class, new AgentIdentifierRenderer());
+		setDefaultRenderer(IComponentIdentifier.class, new AgentIdentifierRenderer());
 		setDefaultRenderer(String[].class, new StringArrayRenderer());
 		setDefaultRenderer(IDFServiceDescription[].class, new ServiceDescriptionArrayRenderer());
 		setDefaultRenderer(Date.class, new LeaseTimeRenderer());

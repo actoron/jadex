@@ -9,7 +9,7 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector2Int;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISpace;
 import jadex.commons.SimplePropertyObject;
 
@@ -46,7 +46,7 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 	 * @param space
 	 *            The space.
 	 */
-	public void agentAdded(IAgentIdentifier agent, ISpace space) {
+	public void agentAdded(IComponentIdentifier agent, ISpace space) {
 		// Only add agents of type "Ant"
 		if ("Ant".equals(((ApplicationContext) space.getContext()).getAgentType(agent))) {
 			if (agents == null)
@@ -63,7 +63,7 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 	 * @param space
 	 *            The space.
 	 */
-	public void agentRemoved(IAgentIdentifier agent, ISpace space) {
+	public void agentRemoved(IComponentIdentifier agent, ISpace space) {
 		agents.remove(agent);
 		if (agents.size() == 0)
 			agents = null;
@@ -94,7 +94,7 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 		// event.getSpaceObject().getType());
 		if (agents != null && "ant".equals(event.getSpaceObject().getType())) {
 			for (int i = 0; i < agents.size(); i++) {
-				IAgentIdentifier agent = (IAgentIdentifier) agents.get(i);				
+				IComponentIdentifier agent = (IComponentIdentifier) agents.get(i);				
 				if (EnvironmentEvent.OBJECT_POSITION_CHANGED.equals(event.getType())) {
 					IVector2 pos = (IVector2) event.getSpaceObject().getProperty(Space2D.PROPERTY_POSITION);
 					// IVector2 oldpos = (IVector2) event.getInfo();

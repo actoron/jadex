@@ -7,7 +7,7 @@ import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IChangeEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Inform the sentry agent about a new target.
@@ -26,7 +26,7 @@ public class InformNewTargetPlan extends Plan
 		
 		AGRSpace agrs = (AGRSpace)getScope().getApplicationContext().getSpace("myagrspace");
 		Group group = agrs.getGroup("mymarsteam");
-		IAgentIdentifier[]	sentries	= group.getAgentsForRole("sentry");
+		IComponentIdentifier[]	sentries	= group.getAgentsForRole("sentry");
 		
 		if(sentries!=null)
 		{

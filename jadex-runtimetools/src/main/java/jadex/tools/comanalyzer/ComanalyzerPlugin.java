@@ -6,7 +6,7 @@ import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.impl.ElementFlyweight;
 import jadex.bridge.IComponentListener;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;
 import jadex.commons.Properties;
@@ -589,7 +589,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 	 */
 	public void addAgentListener(final IAMSAgentDescription desc)
 	{
-		IAgentIdentifier aid = desc.getName();
+		IComponentIdentifier aid = desc.getName();
 		((IAMS)jcc.getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE))
 			.getExternalAccess(aid, new IResultListener()
 			{
@@ -619,7 +619,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 	 */
 	public void removeAgentListener(final IAMSAgentDescription desc, boolean cleanup)
 	{
-		IAgentIdentifier aid = desc.getName();
+		IComponentIdentifier aid = desc.getName();
 		((IAMS)jcc.getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE))
 			.getExternalAccess(aid, new IResultListener()
 			{
@@ -913,17 +913,17 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 			public void run()
 			{
 				final List messages_added = new ArrayList();
-				IAgentIdentifier sid;
+				IComponentIdentifier sid;
 
 				// processing every message map
 				MessageType mt = message.getMessageType();
 
-				sid = (IAgentIdentifier)message.getValue(mt.getSenderIdentifier());
+				sid = (IComponentIdentifier)message.getValue(mt.getSenderIdentifier());
 				Iterator rids = SReflect.getIterator(message.getValue(mt.getReceiverIdentifier()));
 
 				while(rids.hasNext())
 				{
-					IAgentIdentifier rid = (IAgentIdentifier)rids.next();
+					IComponentIdentifier rid = (IComponentIdentifier)rids.next();
 					if(!isDuplicate(message, rid))
 					{
 						Message msg = createMessage(message, sid, rid);
@@ -961,7 +961,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 	 * @param source The attribute map for the message.
 	 * @return <code>true</code> if the message is already in the messagelist.
 	 */
-	protected boolean isDuplicate(IMessageAdapter newmsg, IAgentIdentifier rec)
+	protected boolean isDuplicate(IMessageAdapter newmsg, IComponentIdentifier rec)
 	{
 		boolean ret = false;
 		Message[] messages = messagelist.getMessages();
@@ -971,7 +971,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 			Object xid2 = newmsg.getValue(Message.XID);
 			if(xid1!=null && xid2!=null && xid1.equals(xid2))
 			{
-				IAgentIdentifier oldrec = (IAgentIdentifier)messages[i].getParameter(Message.RECEIVER);
+				IComponentIdentifier oldrec = (IComponentIdentifier)messages[i].getParameter(Message.RECEIVER);
 				if(oldrec.equals(rec))
 				{
 					// set duration of existing message
@@ -1000,7 +1000,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 	 * @param rid The receivers agent id.
 	 * @return
 	 */
-	protected Message createMessage(IMessageAdapter msg, IAgentIdentifier sid, IAgentIdentifier rid)//, String direction)
+	protected Message createMessage(IMessageAdapter msg, IComponentIdentifier sid, IComponentIdentifier rid)//, String direction)
 	{
 		Message message = new Message(msg, messagenr++, rid);
 		message.applyFilter(messagefilter);

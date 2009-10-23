@@ -10,7 +10,7 @@ import jadex.adapter.base.fipa.IAMS;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IExternalAccess;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.ISpace;
 import jadex.commons.SUtil;
@@ -72,7 +72,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 	 *  @param agent The agent identifier.
 	 *  @param agent The avatar of the agent (if any).
 	 */
-	public void processPercept(final ISpace space, final String type, final Object percept, final IAgentIdentifier agent, final ISpaceObject avatar)
+	public void processPercept(final ISpace space, final String type, final Object percept, final IComponentIdentifier agent, final ISpaceObject avatar)
 	{
 		boolean	invoke	= false;
 		final String[][] metainfos = getMetaInfos(type);

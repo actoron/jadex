@@ -1,6 +1,6 @@
 package jadex.adapter.base.fipa;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.Date;
 
@@ -19,7 +19,7 @@ public interface IDFAgentDescription
 	 *  Get the agentidentifier of this AgentDescription.
 	 * @return agentidentifier
 	 */
-	public IAgentIdentifier getName();
+	public IComponentIdentifier getName();
 
 	/**
 	 *  Get the ontologies of this AgentDescription.

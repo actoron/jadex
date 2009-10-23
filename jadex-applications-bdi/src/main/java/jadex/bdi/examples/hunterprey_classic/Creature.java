@@ -1,6 +1,6 @@
 package jadex.bdi.examples.hunterprey_classic;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +31,7 @@ public abstract class Creature extends WorldObject
 	protected String name;
 
 	/** Agent identifier of the creature. */
-	protected transient IAgentIdentifier aid;
+	protected transient IComponentIdentifier aid;
 
 	/** The distance a creature is able to see. */
 	protected int visionrange;
@@ -118,7 +118,7 @@ public abstract class Creature extends WorldObject
 	 *  Agent identifier of the creature.
 	 * @return aid
 	 */
-	public IAgentIdentifier getAID()
+	public IComponentIdentifier getAID()
 	{
 		return this.aid;
 	}
@@ -128,7 +128,7 @@ public abstract class Creature extends WorldObject
 	 *  Agent identifier of the creature.
 	 * @param aid the value to be set
 	 */
-	public void setAID(IAgentIdentifier aid)
+	public void setAID(IComponentIdentifier aid)
 	{
 		this.aid = aid;
 	}

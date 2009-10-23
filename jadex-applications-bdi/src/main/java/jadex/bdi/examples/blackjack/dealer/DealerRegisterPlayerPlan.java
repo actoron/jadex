@@ -6,7 +6,7 @@ import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.RequestJoin;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Plan to handle join request of a player.
@@ -24,7 +24,7 @@ public class DealerRegisterPlayerPlan extends Plan
 		// the message-content should look like this: 'join:name:strategy:account:color'
 		RequestJoin rj = (RequestJoin)request.getParameter(SFipa.CONTENT).getValue();
 		Player player = rj.getPlayer();
-		player.setAgentID((IAgentIdentifier)request.getParameter("sender").getValue());
+		player.setAgentID((IComponentIdentifier)request.getParameter("sender").getValue());
 		getLogger().info("New player "+player);
 		if(!getBeliefbase().getBeliefSet("players").containsFact(player))
 		{

@@ -4,7 +4,7 @@ import jadex.adapter.base.fipa.AMSDestroyAgent;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Destroy an agent on a remote ams.
@@ -18,7 +18,7 @@ public class AMSRemoteDestroyAgentPlan extends Plan
 	public void body()
 	{
 		AMSDestroyAgent da = new AMSDestroyAgent();
-		da.setAgentIdentifier((IAgentIdentifier)getParameter("agentidentifier").getValue());
+		da.setAgentIdentifier((IComponentIdentifier)getParameter("agentidentifier").getValue());
 
 		IGoal req = createGoal("rp_initiate");
 		req.getParameter("receiver").setValue(getParameter("ams").getValue());

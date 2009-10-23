@@ -6,7 +6,7 @@ import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Test different cases of protocol cancellation.
@@ -33,7 +33,7 @@ public class CMTestPlan extends Plan
 		IGoal	ca	= createGoal("amscap.ams_create_agent");
 		ca.getParameter("type").setValue(agenttype);
 		dispatchSubgoalAndWait(ca);
-		IAgentIdentifier	receiver	= (IAgentIdentifier)ca.getParameter("agentidentifier").getValue();
+		IComponentIdentifier	receiver	= (IComponentIdentifier)ca.getParameter("agentidentifier").getValue();
 
 		// Dispatch request goal.
 		IGoal	request	= createGoal("procap.rp_initiate");
@@ -79,7 +79,7 @@ public class CMTestPlan extends Plan
 		IGoal	ca	= createGoal("amscap.ams_create_agent");
 		ca.getParameter("type").setValue(agenttype);
 		dispatchSubgoalAndWait(ca);
-		IAgentIdentifier	receiver	= (IAgentIdentifier)ca.getParameter("agentidentifier").getValue();
+		IComponentIdentifier	receiver	= (IComponentIdentifier)ca.getParameter("agentidentifier").getValue();
 
 		// Dispatch request goal.
 		IGoal	request	= createGoal("procap.rp_initiate");

@@ -25,7 +25,7 @@ import jadex.adapter.jade.fipaimpl.AgentIdentifier;
 import jadex.adapter.jade.fipaimpl.DFAgentDescription;
 import jadex.adapter.jade.fipaimpl.DFServiceDescription;
 import jadex.adapter.jade.fipaimpl.SearchConstraints;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
@@ -487,7 +487,7 @@ public class DF implements IDF, IService
 	 *  @param service The service.
 	 *  @return The df agent description.
 	 */
-	public IDFAgentDescription createDFAgentDescription(IAgentIdentifier agent, IDFServiceDescription service)
+	public IDFAgentDescription createDFAgentDescription(IComponentIdentifier agent, IDFServiceDescription service)
 	{
 		DFAgentDescription	ret	= new DFAgentDescription();
 		ret.setName(agent);
@@ -505,7 +505,7 @@ public class DF implements IDF, IService
 	 *  @param protocols The protocols.
 	 *  @return The agent description.
 	 */
-	public IDFAgentDescription	createDFAgentDescription(IAgentIdentifier agent, IDFServiceDescription[] services,
+	public IDFAgentDescription	createDFAgentDescription(IComponentIdentifier agent, IDFServiceDescription[] services,
 		String[] languages, String[] ontologies, String[] protocols, Date leasetime)
 	{
 		DFAgentDescription	ret	= new DFAgentDescription();
@@ -542,7 +542,7 @@ public class DF implements IDF, IService
 	 *  @param local True for local name ().
 	 *  @return The new agent identifier.
 	 */
-	public IAgentIdentifier createAgentIdentifier(String name, boolean local)
+	public IComponentIdentifier createAgentIdentifier(String name, boolean local)
 	{
 		if(local)
 			name = name + "@" + platform.getName();
@@ -555,7 +555,7 @@ public class DF implements IDF, IService
 	 *  @param local True for local name.
 	 *  @param addresses The addresses.
 	 */
-	public IAgentIdentifier createAgentIdentifier(String name, boolean local, String[] addresses)
+	public IComponentIdentifier createAgentIdentifier(String name, boolean local, String[] addresses)
 	{
 		if(local)
 			name = name + "@" + platform.getName();

@@ -14,7 +14,7 @@ import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.InterpreterTimedObjectAction;
 import jadex.bridge.AgentTerminatedException;
-import jadex.bridge.IAgentAdapter;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IToolAdapter;
@@ -74,7 +74,7 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 	protected RuleSystem rulesystem;
 	
 	/** The platform adapter for the agent. */
-	protected IAgentAdapter	adapter;
+	protected IComponentAdapter	adapter;
 	
 	/** The kernel properties. */
 	protected Map kernelprops;
@@ -154,7 +154,7 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 	 *  @param config	The name of the configuration (or null for default configuration) 
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 */
-	public BDIInterpreter(IAgentAdapter adapter, IOAVState state, OAVAgentModel model, 
+	public BDIInterpreter(IComponentAdapter adapter, IOAVState state, OAVAgentModel model, 
 		String config, Map arguments, Map kernelprops)
 	{
 		this.adapter = adapter;
@@ -198,8 +198,8 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 		
 		// Set up initial state of agent
 		ragent = state.createRootObject(OAVBDIRuntimeModel.agent_type);
-		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_name, adapter.getAgentIdentifier().getName());
-		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_localname, adapter.getAgentIdentifier().getLocalName());
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_name, adapter.getComponentIdentifier().getName());
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_localname, adapter.getComponentIdentifier().getLocalName());
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model, model.getHandle());
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_configuration, config);
 		if(arguments!=null && !arguments.isEmpty())
@@ -771,7 +771,7 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 	 *  Get the adapter agent.
 	 *  @return The adapter agent.
 	 */
-	public IAgentAdapter getAgentAdapter()
+	public IComponentAdapter getAgentAdapter()
 	{
 		return this.adapter;
 	}

@@ -8,7 +8,7 @@ import jadex.bdi.planlib.protocols.ParticipantProposal;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.Date;
 
@@ -47,7 +47,7 @@ public class PurchaseBookPlan extends Plan
 			fail();
 		}
 		
-		IAgentIdentifier[] sellers = new IAgentIdentifier[result.length];
+		IComponentIdentifier[] sellers = new IComponentIdentifier[result.length];
 		for(int i = 0; i < result.length; i++)
 			sellers[i] = result[i].getName();
 		//System.out.println("found: "+SUtil.arrayToString(sellers));

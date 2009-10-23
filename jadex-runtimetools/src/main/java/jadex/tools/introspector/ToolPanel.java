@@ -5,7 +5,7 @@ import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.impl.ElementFlyweight;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.concurrent.IResultListener;
 import jadex.rules.tools.reteviewer.RuleEnginePanel;
 
@@ -36,7 +36,7 @@ public class ToolPanel	extends JPanel
 	 *  @param agent	The agent access.
 	 *  @param active	Flags indicating which tools should be active.
 	 */
-	public ToolPanel(IExternalAccess agent, IAgentIdentifier observed)
+	public ToolPanel(IExternalAccess agent, IComponentIdentifier observed)
 	{
         // Hack!?!?!
 		((IAMS)agent.getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE))

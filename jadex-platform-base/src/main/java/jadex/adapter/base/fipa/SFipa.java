@@ -1,7 +1,7 @@
 package jadex.adapter.base.fipa;
 
 import jadex.adapter.base.NuggetsXMLContentCodec;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
@@ -195,9 +195,9 @@ public class SFipa
 	 *  @param source The source agent identifier.
 	 *  @param ams The ams service.
 	 */
-	public IAgentIdentifier cloneAgentIdentifier(IAgentIdentifier source, IAMS ams)
+	public IComponentIdentifier cloneAgentIdentifier(IComponentIdentifier source, IAMS ams)
 	{
-		IAgentIdentifier clone = ams.createAgentIdentifier(source.getName(), false, source.getAddresses());
+		IComponentIdentifier clone = ams.createAgentIdentifier(source.getName(), false, source.getAddresses());
 		
 		// Deep copy of resolvers.
 		/*AgentIdentifier[] res = getResolvers();
@@ -214,7 +214,7 @@ public class SFipa
 	 */
 	public static IAMSAgentDescription cloneAMSAgentDescription(IAMSAgentDescription source, IAMS ams)
 	{
-		 IAgentIdentifier id = source.getName();
+		 IComponentIdentifier id = source.getName();
 		 id	= ams.createAgentIdentifier(id.getName(), false, id.getAddresses());
 		 return ams.createAMSAgentDescription(id, source.getState(), source.getOwnership());
 	}
@@ -250,7 +250,7 @@ public class SFipa
 			}
 		}
 		
-		IAgentIdentifier id = source.getName();
+		IComponentIdentifier id = source.getName();
 		id	= df.createAgentIdentifier(id.getName(), false, id.getAddresses());
 		
 		return df.createDFAgentDescription(id, tds, source.getLanguages(), source.getOntologies(), source.getProtocols(), source.getLeaseTime());

@@ -7,7 +7,7 @@ import jadex.bdi.runtime.BDIFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.TimeoutException;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 
@@ -62,7 +62,7 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 		// Send calls for proposal until no more proposals are received.
 		boolean running = true;
 		Object winning_offer = null;
-		IAgentIdentifier winner = null;
+		IComponentIdentifier winner = null;
 		Object cfp = getParameter("cfp").getValue();
 		Object cfp_info = getParameter("cfp_info").getValue();
 		List history = SCollection.createArrayList();
@@ -78,7 +78,7 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 
 			// Wait for proposals.
 			// Removes receivers that do not offer.
-			IAgentIdentifier first = null;
+			IComponentIdentifier first = null;
 			first = waitForProposals(cfp, roundtimeout, receivers);
 			//System.out.println("first: "+first);
 			
@@ -171,12 +171,12 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 			if(removebidder.getType().equals("ea_not_understood"))
 			{
 				receivers.remove(removebidder.getParameter(SFipa.SENDER).getValue());
-				getLogger().info("Removed "+((IAgentIdentifier)removebidder.getParameter(SFipa.SENDER).getValue()).getName() + ".");
+				getLogger().info("Removed "+((IComponentIdentifier)removebidder.getParameter(SFipa.SENDER).getValue()).getName() + ".");
 			}
 			else
 			{
 				getLogger().warning("Could not handle message of type "+removebidder.getType() 
-					+" from "+((IAgentIdentifier)removebidder.getParameter(SFipa.SENDER).getValue()).getName()+".");
+					+" from "+((IComponentIdentifier)removebidder.getParameter(SFipa.SENDER).getValue()).getName()+".");
 			}
 			
 			timetowait =  auctiondesc.getStarttime() - getTime();
@@ -236,9 +236,9 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 	 *  @param receivers The receivers.
 	 *  @return The message of the winner.
 	 */
-	protected IAgentIdentifier waitForProposals(Object cfp, long roundtimeout, List receivers)
+	protected IComponentIdentifier waitForProposals(Object cfp, long roundtimeout, List receivers)
 	{
-		IAgentIdentifier first_proposal = null;
+		IComponentIdentifier first_proposal = null;
 	
 		//The first proposal is accepted, so wait until first the proposal is received.
 		long roundstart = getTime();
@@ -263,7 +263,7 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 						//accept.getParameter(SFipa.CONVERSATION_ID).setValue(convid);
 						accept.getParameter(SFipa.CONTENT).setValue(cfp);
 						sendMessage(accept);
-						first_proposal = (IAgentIdentifier)tmp.getParameter(SFipa.SENDER).getValue();
+						first_proposal = (IComponentIdentifier)tmp.getParameter(SFipa.SENDER).getValue();
 					}
 					else
 					{
@@ -308,7 +308,7 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 	 *  @param winning_offer The winning offer.
 	 */
 	protected void evaluateAuctionResults(AuctionDescription auctiondesc, Object cfp_info, 
-		Object[] history, IAgentIdentifier winner, Object winning_offer)
+		Object[] history, IComponentIdentifier winner, Object winning_offer)
 	{
 		boolean accept = winner!=null;
 		
@@ -369,7 +369,7 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 	 *  @param winning_offer The winning offer.
 	 *  @param winner The winner.
 	 */
-	protected void announceAuctionEnd(List receivers, String convid, Object winning_offer, IAgentIdentifier winner)
+	protected void announceAuctionEnd(List receivers, String convid, Object winning_offer, IComponentIdentifier winner)
 	{
 		// Send the inform_end_auction-message.
 		List losers = SCollection.createArrayList();

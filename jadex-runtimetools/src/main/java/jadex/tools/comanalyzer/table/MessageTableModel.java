@@ -1,6 +1,6 @@
 package jadex.tools.comanalyzer.table;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SortedList;
 import jadex.tools.comanalyzer.Message;
@@ -28,15 +28,15 @@ public class MessageTableModel extends AbstractTableModel
 		COLUMN_HEADERS = new ArrayList();
 
 		COLUMN_HEADERS.add(new ColumnHeader("#", Message.SEQ_NO, Long.class));
-		COLUMN_HEADERS.add(new ColumnHeader("Sender", Message.SENDER, IAgentIdentifier.class));
-		COLUMN_HEADERS.add(new ColumnHeader("Receiver", Message.RECEIVER, IAgentIdentifier.class));
+		COLUMN_HEADERS.add(new ColumnHeader("Sender", Message.SENDER, IComponentIdentifier.class));
+		COLUMN_HEADERS.add(new ColumnHeader("Receiver", Message.RECEIVER, IComponentIdentifier.class));
 		COLUMN_HEADERS.add(new ColumnHeader("Peformative", Message.PERFORMATIVE, String.class));
 		COLUMN_HEADERS.add(new ColumnHeader("Content", Message.CONTENT, Object.class));
 		COLUMN_HEADERS.add(new ColumnHeader("Conversation", Message.CONVERSATION_ID, String.class));
 		COLUMN_HEADERS.add(new ColumnHeader("Id", Message.XID, String.class));
 		COLUMN_HEADERS.add(new ColumnHeader("Ontology", Message.ONTOLOGY, String.class));
 		COLUMN_HEADERS.add(new ColumnHeader("Protocol", Message.PROTOCOL, String.class));
-		COLUMN_HEADERS.add(new ColumnHeader("Receivers", Message.RECEIVERS, IAgentIdentifier[].class));
+		COLUMN_HEADERS.add(new ColumnHeader("Receivers", Message.RECEIVERS, IComponentIdentifier[].class));
 
 		COLUMN_HEADERS.add(new ColumnHeader("Encoding", Message.ENCODING, String.class));
 		COLUMN_HEADERS.add(new ColumnHeader("Language", Message.LANGUAGE, String.class));

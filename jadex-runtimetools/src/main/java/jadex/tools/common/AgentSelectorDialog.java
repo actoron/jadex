@@ -6,7 +6,7 @@ import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.BDIFailureException;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.jtable.ResizeableTableHeader;
@@ -126,7 +126,7 @@ public class AgentSelectorDialog
 	 *  Open a modal dialog to select/enter an agent identifier.
 	 *  @return	The selected agent identifier or null, when dialog was aborted.
 	 */
-	public IAgentIdentifier selectAgent(final IAgentIdentifier def)
+	public IComponentIdentifier selectAgent(final IComponentIdentifier def)
 	{
 		this.singleselection	= true;
 
@@ -152,14 +152,14 @@ public class AgentSelectorDialog
 		dia.setVisible(true);
 		this.singleselection	= false;
 
-		return !aborted && sellist.size()>0 ? (IAgentIdentifier)sellist.get(0) : null;
+		return !aborted && sellist.size()>0 ? (IComponentIdentifier)sellist.get(0) : null;
 	}
 
 	/**
 	 *  Select/edit a list of agents.
 	 *  @return	The (possibly empty) list of agent identifiers or null, when dialog was aborted.
 	 */
-	public IAgentIdentifier[] selectAgents(IAgentIdentifier[] receivers)
+	public IComponentIdentifier[] selectAgents(IComponentIdentifier[] receivers)
 	{
 		// Pre-init list of selected agents.
 		sellist.clear();
@@ -180,7 +180,7 @@ public class AgentSelectorDialog
 		aborted	= false;
 		dia.setVisible(true);
 
-		return aborted ? null : (IAgentIdentifier[])sellist.toArray(new IAgentIdentifier[sellist.size()]);
+		return aborted ? null : (IComponentIdentifier[])sellist.toArray(new IComponentIdentifier[sellist.size()]);
 	}
 
 	//-------- helper methods --------
@@ -233,7 +233,7 @@ public class AgentSelectorDialog
 		int	row	= seltree.getTreetable().getSelectionModel().getMinSelectionIndex();
 		this.seltree.removeAgents();
 		for(int i=0; i<sellist.size(); i++)
-			seltree.addAgent(ams.createAMSAgentDescription((IAgentIdentifier)sellist.get(i)));
+			seltree.addAgent(ams.createAMSAgentDescription((IComponentIdentifier)sellist.get(i)));
 		// Force table repaint (hack???).
 		seltree.getTreetable().tableChanged(new TableModelEvent(seltree.getTreetable().getModel(), TableModelEvent.HEADER_ROW));
 		((ResizeableTableHeader)seltree.getTreetable().getTableHeader()).resizeAllColumns();
@@ -346,7 +346,7 @@ public class AgentSelectorDialog
 			{
 				if(!e.getValueIsAdjusting())
 				{
-					IAgentIdentifier	selected	= null;
+					IComponentIdentifier	selected	= null;
 					if(!seltree.getTreetable().getSelectionModel().isSelectionEmpty())
 					{
 						int	row	= seltree.getTreetable().getSelectionModel().getMinSelectionIndex();
@@ -377,7 +377,7 @@ public class AgentSelectorDialog
 						{
 							// Use clone to keep original aid unchanged.
 							IAMS	ams	= (IAMS)agent.getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
-							IAgentIdentifier	id	= ((IAMSAgentDescription)val).getName();
+							IComponentIdentifier	id	= ((IAMSAgentDescription)val).getName();
 							addSelectedAgent(ams.createAgentIdentifier(id.getName(), false, id.getAddresses()));
 						}
 					}
@@ -418,7 +418,7 @@ public class AgentSelectorDialog
 					{
 						// Use clone to keep original aid unchanged.
 						IAMS	ams	= (IAMS)agent.getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
-						IAgentIdentifier	id	= ((IAMSAgentDescription)val).getName();
+						IComponentIdentifier	id	= ((IAMSAgentDescription)val).getName();
 						addSelectedAgent(ams.createAgentIdentifier(id.getName(), false, id.getAddresses()));
 					}
 				}
@@ -539,7 +539,7 @@ public class AgentSelectorDialog
 	 *  Add an agent to the list of selected agents
 	 *  @param agent	The agent to add.
 	 */
-	protected void addSelectedAgent(IAgentIdentifier agent)
+	protected void addSelectedAgent(IComponentIdentifier agent)
 	{
 		removeall.setEnabled(true);
 		if(!singleselection || sellist.size()==0)

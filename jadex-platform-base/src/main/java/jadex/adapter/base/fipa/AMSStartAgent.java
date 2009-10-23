@@ -1,6 +1,6 @@
 package jadex.adapter.base.fipa;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 
 /**
@@ -11,7 +11,7 @@ public class AMSStartAgent implements IAgentAction
 	//-------- attributes ----------
 
 	/** Attribute for slot agentidentifier. */
-	protected IAgentIdentifier agentidentifier;
+	protected IComponentIdentifier agentidentifier;
 
 	//-------- constructors --------
 
@@ -29,7 +29,7 @@ public class AMSStartAgent implements IAgentAction
 	 *  Get the agentidentifier of this AMSStartAgent.
 	 * @return agentidentifier
 	 */
-	public IAgentIdentifier getAgentIdentifier()
+	public IComponentIdentifier getAgentIdentifier()
 	{
 		return this.agentidentifier;
 	}
@@ -38,7 +38,7 @@ public class AMSStartAgent implements IAgentAction
 	 *  Set the agentidentifier of this AMSStartAgent.
 	 * @param agentidentifier the value to be set
 	 */
-	public void setAgentIdentifier(IAgentIdentifier agentidentifier)
+	public void setAgentIdentifier(IComponentIdentifier agentidentifier)
 	{
 		this.agentidentifier = agentidentifier;
 	}

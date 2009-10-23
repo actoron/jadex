@@ -59,7 +59,7 @@ import jadex.bpmnbdi.handler.EventIntermediateMessageActivityHandler;
 import jadex.bpmnbdi.handler.EventIntermediateRuleActicityHandler;
 import jadex.bpmnbdi.handler.EventIntermediateSignalActivityHandler;
 import jadex.bpmnbdi.handler.EventIntermediateTimerActivityHandler;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -206,7 +206,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 		if(waittimes==null)
 			waittimes	= new HashMap();
 
-		IClockService	clock	= (IClockService)interpreter.getAgentAdapter().getPlatform().getService(IClockService.class);
+		IClockService	clock	= (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
 		waittimes.put(thread, new Long(clock.getTime()+duration));
 	}
 	
@@ -228,7 +228,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 	{
 		if(waittimes!=null)
 		{
-			IClockService	clock	= (IClockService)interpreter.getAgentAdapter().getPlatform().getService(IClockService.class);
+			IClockService	clock	= (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
 			
 			for(Iterator it=waittimes.keySet().iterator(); it.hasNext(); )
 			{
@@ -278,7 +278,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 			String lane	= getLane(getLastState());
 			if(!LANE_UNDEFINED.equals(lane))
 			{
-				IClockService	clock	= (IClockService)interpreter.getAgentAdapter().getPlatform().getService(IClockService.class);
+				IClockService	clock	= (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
 				for(Iterator it=waittimes.keySet().iterator(); it.hasNext(); )
 				{
 					ProcessThread	thread	= (ProcessThread) it.next();
@@ -638,9 +638,9 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 	 * Get the agent identifier.
 	 * @return The agent identifier.
 	 */
-	public IAgentIdentifier	getAgentIdentifier()
+	public IComponentIdentifier	getAgentIdentifier()
 	{
-		return interpreter.getAgentAdapter().getAgentIdentifier();
+		return interpreter.getAgentAdapter().getComponentIdentifier();
 	}
 
 	/**
@@ -739,7 +739,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 	 */
 	public IClockService getClock()
 	{
-		return (IClockService)interpreter.getAgentAdapter().getPlatform().getService(IClockService.class);
+		return (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
 	}
 
 	/**

@@ -1,6 +1,6 @@
 package jadex.tools.comanalyzer.table;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.awt.Component;
 
@@ -22,7 +22,7 @@ class AgentIdentifierRenderer extends DefaultTableCellRenderer
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
 	{
 		super.getTableCellRendererComponent(table, null, isSelected, hasFocus, row, column);
-		IAgentIdentifier aid = (IAgentIdentifier)value;
+		IComponentIdentifier aid = (IComponentIdentifier)value;
 		if(aid == null)
 			return this;
 		setText(aid.getName());

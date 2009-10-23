@@ -2,7 +2,7 @@ package jadex.bdi.examples.blackjack;
 
 import jadex.bdi.examples.blackjack.player.strategies.AbstractStrategy;
 import jadex.bdi.examples.blackjack.player.strategies.IStrategy;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyChangeSupport;
 
@@ -55,7 +55,7 @@ public class Player
 	protected IStrategy strategy;
 
 	/** The player's agent id. */
-	protected IAgentIdentifier aid;
+	protected IComponentIdentifier aid;
 
 	/** The player state. */
 	protected String state;
@@ -96,7 +96,7 @@ public class Player
 	/**
 	 *  Create a new Player.
 	 */
-	public Player(IAgentIdentifier aid, String name, int account, Color color, String strategyname)
+	public Player(IComponentIdentifier aid, String name, int account, Color color, String strategyname)
 	{
 		this.aid = aid;
 		this.name = name;
@@ -220,7 +220,7 @@ public class Player
 	/**
 	 *  Get the aid of the player.
 	 */
-	public IAgentIdentifier getAgentID()
+	public IComponentIdentifier getAgentID()
 	{
 		return aid;
 	}
@@ -228,7 +228,7 @@ public class Player
 	/**
 	 *  Set the aid of the player.
 	 */
-	public void setAgentID(IAgentIdentifier aid)
+	public void setAgentID(IComponentIdentifier aid)
 	{
 		this.aid = aid;
 	}

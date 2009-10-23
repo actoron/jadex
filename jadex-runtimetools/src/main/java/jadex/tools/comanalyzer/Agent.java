@@ -1,6 +1,6 @@
 package jadex.tools.comanalyzer;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IFilter;
 
 import java.util.ArrayList;
@@ -84,7 +84,7 @@ public class Agent extends ParameterElement
 	/**
 	 * Constructor for any named agent to be put on the Agent Canvas
 	 */
-	public Agent(IAgentIdentifier aid)
+	public Agent(IComponentIdentifier aid)
 	{
 		this.visible = true;
 
@@ -165,9 +165,9 @@ public class Agent extends ParameterElement
 	/**
 	 * @return The agent identifier.
 	 */
-	public IAgentIdentifier getAid()
+	public IComponentIdentifier getAid()
 	{
-		return (IAgentIdentifier)parameters.get(AID);
+		return (IComponentIdentifier)parameters.get(AID);
 	}
 
 	/**

@@ -1,6 +1,6 @@
 package jadex.bdi.planlib.watchdog;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 
 /**
@@ -11,7 +11,7 @@ public class ObservationDescription
 	//-------- attributes --------
 
 	/** The agent identifier of the agent to observe. */
-	protected IAgentIdentifier agent;
+	protected IComponentIdentifier agent;
 
 	/** The delay between pings. */
 	protected long pingdelay;
@@ -31,7 +31,7 @@ public class ObservationDescription
 	/**
 	 *  Create a new description.
 	 */
-	public ObservationDescription(IAgentIdentifier agent, long pingdelay, ContactData[] contact)
+	public ObservationDescription(IComponentIdentifier agent, long pingdelay, ContactData[] contact)
 	{
 		this.agent = agent;
 		this.pingdelay = pingdelay;
@@ -44,7 +44,7 @@ public class ObservationDescription
 	 *  Get the agent id.
 	 *  @return The agent id;
 	 */
-	public IAgentIdentifier getAgentIdentifier()
+	public IComponentIdentifier getAgentIdentifier()
 	{
 		return agent;
 	}
@@ -53,7 +53,7 @@ public class ObservationDescription
 	 *  Set the agent id.
 	 *  @param agent The agent id;
 	 */
-	public void setAgentIdentifier(IAgentIdentifier agent)
+	public void setAgentIdentifier(IComponentIdentifier agent)
 	{
 		this.agent = agent;
 	}

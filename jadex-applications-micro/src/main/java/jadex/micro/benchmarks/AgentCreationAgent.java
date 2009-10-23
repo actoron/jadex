@@ -3,7 +3,7 @@ package jadex.micro.benchmarks;
 import jadex.adapter.base.SComponentExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IArgument;
 import jadex.commons.concurrent.IResultListener;
 import jadex.microkernel.MicroAgent;
@@ -59,7 +59,7 @@ public class AgentCreationAgent extends MicroAgent
 			{
 				public void resultAvailable(Object result)
 				{
-					SComponentExecutionService.startComponent(getPlatform(), (IAgentIdentifier)result, null);
+					SComponentExecutionService.startComponent(getPlatform(), (IComponentIdentifier)result, null);
 				}
 				public void exceptionOccurred(Exception exception)
 				{
@@ -114,7 +114,7 @@ public class AgentCreationAgent extends MicroAgent
 		final String name = createPeerName(cnt);
 //		System.out.println("Destroying peer: "+name);
 //		final IAMS ams = (IAMS)getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
-		IAgentIdentifier aid = ams.createAgentIdentifier(name, true);
+		IComponentIdentifier aid = ams.createAgentIdentifier(name, true);
 		ams.destroyAgent(aid, createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)

@@ -2,7 +2,7 @@ package eis.jadex;
 
 import eis.EnvironmentInterfaceStandard;
 import eis.exceptions.AgentException;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContext;
 import jadex.bridge.ISpace;
@@ -61,7 +61,7 @@ public class EisSpace implements ISpace
 	 *  is newly added to the context.
 	 *  @param aid	The id of the added agent.
 	 */
-	public synchronized void agentAdded(IAgentIdentifier aid)
+	public synchronized void agentAdded(IComponentIdentifier aid)
 	{
 		try
 		{
@@ -77,7 +77,7 @@ public class EisSpace implements ISpace
 	 *  Called from application context, when an agent was removed.
 	 *  @param aid	The id of the removed agent.
 	 */
-	public void	agentRemoved(IAgentIdentifier aid)
+	public void	agentRemoved(IComponentIdentifier aid)
 	{
 		try
 		{

@@ -1,7 +1,7 @@
 package jadex.micro.benchmarks;
 
 import jadex.adapter.base.fipa.SFipa;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IArgument;
 import jadex.bridge.MessageType;
 import jadex.microkernel.MicroAgent;
@@ -31,7 +31,7 @@ public class MessagePerformanceAgent extends MicroAgent
 	public void executeBody()
 	{
 		int msgcnt = ((Integer)getArgument("max")).intValue();
-		IAgentIdentifier receiver = getAgentIdentifier();
+		IComponentIdentifier receiver = getAgentIdentifier();
 		starttime = getTime();
 		
 		System.out.println("Now sending " + msgcnt + " messages to " + receiver);
@@ -43,7 +43,7 @@ public class MessagePerformanceAgent extends MicroAgent
 		{
 			Map request = new HashMap();
 			request.put(SFipa.PERFORMATIVE, SFipa.INFORM);
-			request.put(SFipa.RECEIVERS, new IAgentIdentifier[]{receiver});
+			request.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
 			request.put(SFipa.REPLY_WITH, "some reply id");
 			
 			if(!usecodec)

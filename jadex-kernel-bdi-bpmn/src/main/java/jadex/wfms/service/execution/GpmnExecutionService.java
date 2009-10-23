@@ -4,7 +4,7 @@ import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.standalone.Platform;
 import jadex.bridge.IComponentListener;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IPlatform;
 import jadex.commons.Properties;
@@ -168,7 +168,7 @@ public class GpmnExecutionService implements IExecutionService
 			
 			public void resultAvailable(Object result)
 			{
-				ams.startAgent((IAgentIdentifier)result, null);
+				ams.startAgent((IComponentIdentifier)result, null);
 				processes.put(id, result);
 			}
 			

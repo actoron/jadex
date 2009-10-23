@@ -1,6 +1,6 @@
 package jadex.adapter.base.envsupport.environment;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISpace;
 import jadex.commons.IPropertyObject;
 
@@ -18,12 +18,12 @@ public interface IPerceptGenerator extends IEnvironmentListener, IPropertyObject
 	 *  @param agent The agent identifier.
 	 *  @param space The space.
 	 */
-	public void agentAdded(IAgentIdentifier agent, ISpace space);
+	public void agentAdded(IComponentIdentifier agent, ISpace space);
 	
 	/**
 	 *  Called when an agent was remove from the space.
 	 *  @param agent The agent identifier.
 	 *  @param space The space.
 	 */
-	public void agentRemoved(IAgentIdentifier agent, ISpace space);
+	public void agentRemoved(IComponentIdentifier agent, ISpace space);
 }

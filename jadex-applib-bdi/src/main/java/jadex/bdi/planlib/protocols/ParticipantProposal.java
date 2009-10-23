@@ -1,7 +1,7 @@
 package jadex.bdi.planlib.protocols;
 
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  An object containing information about
@@ -20,7 +20,7 @@ public class ParticipantProposal
 	//-------- attributes --------
 	
 	/** The participants agent identifier. */
-	protected IAgentIdentifier	participant;
+	protected IComponentIdentifier	participant;
 	
 	/** The proposal object. */
 	protected Object proposal;
@@ -41,7 +41,7 @@ public class ParticipantProposal
 	/**
 	 *  Create a participant proposal for a given participant.
 	 */
-	public ParticipantProposal(IAgentIdentifier participant)
+	public ParticipantProposal(IComponentIdentifier participant)
 	{
 		this.participant	= participant;
 	}
@@ -51,7 +51,7 @@ public class ParticipantProposal
 	/**
 	 *	Get the participants agent identifier.
 	 */
-	public IAgentIdentifier	getParticipant()
+	public IComponentIdentifier	getParticipant()
 	{
 		return participant;
 	}
@@ -60,7 +60,7 @@ public class ParticipantProposal
 	/**
 	 *	Set the participants agent identifier.
 	 */
-	public void	setParticipant(IAgentIdentifier participant)
+	public void	setParticipant(IComponentIdentifier participant)
 	{
 		this.participant	= participant;
 	}

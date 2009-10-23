@@ -1,6 +1,6 @@
 package jadex.bdi.examples.hunterprey_classic;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 
 /**
@@ -21,7 +21,7 @@ public class Observer extends Creature
 	/**
 	 *  Create a new Observer.
 	 */
-	public Observer(String name, IAgentIdentifier aid, Location location)
+	public Observer(String name, IComponentIdentifier aid, Location location)
 	{
 		// Constructor using required slots (change if desired).
 		setName(name);

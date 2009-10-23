@@ -5,7 +5,7 @@ import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.impl.ElementFlyweight;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SGUI;
 import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.IResultListener;
@@ -63,7 +63,7 @@ public class RuleProfilerPanel	extends JPanel
 	protected IExternalAccess	agent;
 	
 	/** The agent to observe. */
-	protected IAgentIdentifier	observed;
+	protected IComponentIdentifier	observed;
 	
 	//-------- constructors --------
 
@@ -72,7 +72,7 @@ public class RuleProfilerPanel	extends JPanel
 	 *  @param agent	The agent access.
 	 *  @param active	Flags indicating which tools should be active.
 	 */
-	public RuleProfilerPanel(IExternalAccess agent, IAgentIdentifier observed)
+	public RuleProfilerPanel(IExternalAccess agent, IComponentIdentifier observed)
 	{
 		this.agent	= agent;
 		this.observed	= observed;

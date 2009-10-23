@@ -12,7 +12,7 @@ import jadex.adapter.base.fipa.IAMS;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IExternalAccess;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IResultListener;
@@ -85,7 +85,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 					}
 					public void resultAvailable(Object result)
 					{
-						IAgentIdentifier truck = (IAgentIdentifier)result;
+						IComponentIdentifier truck = (IComponentIdentifier)result;
 						IAMS ams = (IAMS)app.getPlatform().getService(IAMS.class);
 						ams.getExternalAccess(truck, new IResultListener()
 						{

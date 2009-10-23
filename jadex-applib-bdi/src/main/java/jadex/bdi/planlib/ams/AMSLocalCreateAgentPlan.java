@@ -3,7 +3,7 @@ package jadex.bdi.planlib.ams;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IPlatform;
 
 import java.util.Map;
@@ -30,7 +30,7 @@ public class AMSLocalCreateAgentPlan extends Plan
 		{
 			SyncResultListener lis = new SyncResultListener();
 			((IAMS)plat.getService(IAMS.class, SFipa.AMS_SERVICE)).createAgent(name, type, config, args, lis, getAgentIdentifier());
-			IAgentIdentifier aid = (IAgentIdentifier)lis.waitForResult();
+			IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
 			
 			getParameter("agentidentifier").setValue(aid);
 			if(start)

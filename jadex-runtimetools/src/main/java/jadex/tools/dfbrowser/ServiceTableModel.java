@@ -3,7 +3,7 @@ package jadex.tools.dfbrowser;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.adapter.base.fipa.IProperty;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.ArrayList;
 
@@ -157,7 +157,7 @@ class ServiceTableModel extends AbstractTableModel
 			case 2:
 				return String.class;
 			case 3:
-				return IAgentIdentifier.class;
+				return IComponentIdentifier.class;
 			case 4:
 				return String[].class;
 			case 5:

@@ -7,7 +7,7 @@ import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Double;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.Map;
@@ -31,7 +31,7 @@ public class DropWasteAction extends SimplePropertyObject implements ISpaceActio
 				
 		Space2D env = (Space2D)space;
 		
-		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
+		IComponentIdentifier owner = (IComponentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
 		ISpaceObject wastebin = (ISpaceObject)parameters.get(ISpaceAction.OBJECT_ID);
 		ISpaceObject waste = (ISpaceObject)parameters.get("waste");
 		ISpaceObject avatar = env.getAvatar(owner);

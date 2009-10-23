@@ -2,7 +2,7 @@
 package jadex.adapter.base.envsupport.environment;
 
 import jadex.adapter.base.envsupport.dataview.IDataView;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISpace;
 import jadex.commons.IPropertyObject;
 import jadex.commons.concurrent.IResultListener;
@@ -212,19 +212,19 @@ public interface IEnvironmentSpace extends ISpace, IPropertyObject
 	 *  @param id The object id.
 	 *  @param owner The object owner.
 	 */
-	public void setOwner(Object id, IAgentIdentifier owner);
+	public void setOwner(Object id, IComponentIdentifier owner);
 	
 	/**
 	 *  Get the owned objects.
 	 *  @return The owned objects. 
 	 */
-	public ISpaceObject[] getAvatars(IAgentIdentifier owner);
+	public ISpaceObject[] getAvatars(IComponentIdentifier owner);
 	
 	/**
 	 *  Get the avatar.
 	 *  @return The avatar. 
 	 */
-	public ISpaceObject getAvatar(IAgentIdentifier owner);
+	public ISpaceObject getAvatar(IComponentIdentifier owner);
 	
 	/**
 	 * Adds a dataview to the space.

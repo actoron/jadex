@@ -4,7 +4,7 @@ import jadex.adapter.base.fipa.AMSCreateAgent;
 import jadex.adapter.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Create an agent.
@@ -26,7 +26,7 @@ public class AMSCreateAgentPlan extends Plan
 		cag.getParameter("arguments").setValue(ca.getArguments());
 		dispatchSubgoalAndWait(cag);
 
-		ca.setAgentIdentifier((IAgentIdentifier)cag.getParameter("agentidentifier").getValue());
+		ca.setAgentIdentifier((IComponentIdentifier)cag.getParameter("agentidentifier").getValue());
 		getParameter("result").setValue(new Done(ca));
 	}
 }

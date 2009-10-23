@@ -33,7 +33,7 @@ import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.ISearchConstraints;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bridge.ContentException;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IContentCodec;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
@@ -100,7 +100,7 @@ public class MessageService implements IMessageService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	public void sendMessage(Map message, MessageType type, IAgentIdentifier sender, ClassLoader cl)
+	public void sendMessage(Map message, MessageType type, IComponentIdentifier sender, ClassLoader cl)
 	{
 		if(sender==null)
 			throw new RuntimeException("Sender must not be null: "+message);
@@ -125,14 +125,14 @@ public class MessageService implements IMessageService
 				message.put(sd, ""+clock.getTime());
 		}
 		
-		IAgentIdentifier[] receivers = null;
+		IComponentIdentifier[] receivers = null;
 		Object tmp = message.get(type.getReceiverIdentifier());
 		if(tmp instanceof Collection)
-			receivers = (IAgentIdentifier[])((Collection)tmp).toArray(new IAgentIdentifier[0]);
+			receivers = (IComponentIdentifier[])((Collection)tmp).toArray(new IComponentIdentifier[0]);
 		else
-			receivers = (IAgentIdentifier[])tmp;
+			receivers = (IComponentIdentifier[])tmp;
 		
-		if(receivers==null || receivers==new IAgentIdentifier[0])
+		if(receivers==null || receivers==new IComponentIdentifier[0])
 		{
 			throw new RuntimeException("Receivers must not be empty: "+message);
 		}
@@ -210,7 +210,7 @@ public class MessageService implements IMessageService
 				}
 				else if(content instanceof AMSStartAgent)
 				{
-					IAgentIdentifier	amsaid	= ((AMSStartAgent)content).getAgentIdentifier();
+					IComponentIdentifier	amsaid	= ((AMSStartAgent)content).getAgentIdentifier();
 					Modify	start	= new Modify();
 					AMSAgentDescription	adesc	= new AMSAgentDescription();
 					adesc.setName(SJade.convertAIDtoJade(amsaid));
@@ -220,7 +220,7 @@ public class MessageService implements IMessageService
 				}
 				else if(content instanceof AMSDestroyAgent)
 				{
-					IAgentIdentifier	amsaid	= ((AMSDestroyAgent)content).getAgentIdentifier();
+					IComponentIdentifier	amsaid	= ((AMSDestroyAgent)content).getAgentIdentifier();
 					KillAgent	destroy	= new KillAgent();
 					destroy.setAgent(SJade.convertAIDtoJade(amsaid));
 					request	= destroy;
@@ -228,7 +228,7 @@ public class MessageService implements IMessageService
 				}
 				else if(content instanceof AMSSuspendAgent)
 				{
-					IAgentIdentifier	amsaid	= ((AMSSuspendAgent)content).getAgentIdentifier();
+					IComponentIdentifier	amsaid	= ((AMSSuspendAgent)content).getAgentIdentifier();
 					Modify	suspend	= new Modify();
 					AMSAgentDescription	adesc	= new AMSAgentDescription();
 					adesc.setName(SJade.convertAIDtoJade(amsaid));
@@ -238,7 +238,7 @@ public class MessageService implements IMessageService
 				}
 				else if(content instanceof AMSResumeAgent)
 				{
-					IAgentIdentifier	amsaid	= ((AMSResumeAgent)content).getAgentIdentifier();
+					IComponentIdentifier	amsaid	= ((AMSResumeAgent)content).getAgentIdentifier();
 					Modify	resume	= new Modify();
 					AMSAgentDescription	adesc	= new AMSAgentDescription();
 					adesc.setName(SJade.convertAIDtoJade(amsaid));
@@ -337,7 +337,7 @@ public class MessageService implements IMessageService
 	 *  @param message The native message. 
 	 *  (Synchronized because can be called from concurrently executing transports)
 	 */
-	public synchronized void deliverMessage(Map message, String msgtype, IAgentIdentifier[] receivers)
+	public synchronized void deliverMessage(Map message, String msgtype, IComponentIdentifier[] receivers)
 	{	
 		// Not necessary in JADE.
 		throw new UnsupportedOperationException();

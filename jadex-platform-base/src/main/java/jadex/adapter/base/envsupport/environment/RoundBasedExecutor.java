@@ -4,7 +4,7 @@ import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.environment.AgentActionList.ActionEntry;
 import jadex.adapter.base.envsupport.evaluation.ITableDataConsumer;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IContextService;
 import jadex.bridge.IPlatform;
 import jadex.commons.ChangeEvent;
@@ -106,13 +106,13 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 					
 					if(entries.length>0)
 					{
-						IAgentIdentifier	actor	= entry.parameters!=null ?
-							(IAgentIdentifier)entry.parameters.get(ISpaceAction.ACTOR_ID) : null;
+						IComponentIdentifier	actor	= entry.parameters!=null ?
+							(IComponentIdentifier)entry.parameters.get(ISpaceAction.ACTOR_ID) : null;
 						
 						for(int i=0; actor!=null && i<entries.length; i++)
 						{
-							IAgentIdentifier	actor2	= entries[i].parameters!=null ?
-								(IAgentIdentifier)entries[i].parameters.get(ISpaceAction.ACTOR_ID) : null;
+							IComponentIdentifier	actor2	= entries[i].parameters!=null ?
+								(IComponentIdentifier)entries[i].parameters.get(ISpaceAction.ACTOR_ID) : null;
 							if(actor.equals(actor2))
 							{
 //								System.out.println("Removing duplicate action: "+entries[i]);

@@ -5,7 +5,7 @@ import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.planlib.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.collection.SCollection;
 
 import java.util.List;
@@ -67,7 +67,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 				SyncResultListener	listener	= new SyncResultListener();
 				IAMS ams = (IAMS)getScope().getPlatform().getService(IAMS.class);
 				ams.createAgent(null, type, config, args[i], listener, getAgentIdentifier());
-				IAgentIdentifier aid = (IAgentIdentifier)listener.waitForResult();
+				IComponentIdentifier aid = (IComponentIdentifier)listener.waitForResult();
 				listener = new SyncResultListener();	// Hack!!! Allow reuse of result listener?
 				ams.startAgent(aid, listener);
 				listener.waitForResult();
@@ -101,8 +101,8 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 				
 				SyncResultListener	listener	= new SyncResultListener();
 				IAMS	ams	= (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
-				ams.destroyAgent((IAgentIdentifier)agents.get(i), listener);
-				IAgentIdentifier	aid	= (IAgentIdentifier)listener.waitForResult();
+				ams.destroyAgent((IComponentIdentifier)agents.get(i), listener);
+				IComponentIdentifier	aid	= (IComponentIdentifier)listener.waitForResult();
 			}
 			catch(GoalFailureException e)
 			{

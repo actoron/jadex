@@ -2,7 +2,7 @@ package jadex.tools.jcc;
 
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.tools.common.plugin.IAgentListListener;
 
 import java.util.Enumeration;
@@ -34,7 +34,7 @@ public class AgentList extends Vector
         		 if(!old.getState().equals(ad.getState()))
         		 {
         			 remove(ad);
-        			 IAgentIdentifier	id	= ad.getName();
+        			 IComponentIdentifier	id	= ad.getName();
         			 id	= ams.createAgentIdentifier(id.getName(), false, id.getAddresses());
         			 add(ams.createAMSAgentDescription(id, ad.getState(), ad.getOwnership()));
         			 fireAgentChanged(ad);
@@ -42,7 +42,7 @@ public class AgentList extends Vector
         	 }
         	 else
         	 {
-    			 IAgentIdentifier	id	= ad.getName();
+    			 IComponentIdentifier	id	= ad.getName();
     			 id	= ams.createAgentIdentifier(id.getName(), false, id.getAddresses());
     			 add(ams.createAMSAgentDescription(id, ad.getState(), ad.getOwnership()));
         		 fireNewAgentEvent(ad);

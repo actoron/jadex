@@ -1,7 +1,7 @@
 package jadex.microkernel;
 
 import jadex.bridge.AgentTerminatedException;
-import jadex.bridge.IAgentAdapter;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IMessageAdapter;
@@ -24,7 +24,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	//-------- attributes --------
 	
 	/** The platform adapter for the agent. */
-	protected IAgentAdapter	adapter;
+	protected IComponentAdapter	adapter;
 	
 	/** The micro agent model. */
 	protected MicroAgentModel model;
@@ -59,7 +59,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  @param adapter The adapter.
 	 *  @param microagent The microagent.
 	 */
-	public MicroAgentInterpreter(IAgentAdapter adapter, MicroAgentModel model, Map arguments, String config)
+	public MicroAgentInterpreter(IComponentAdapter adapter, MicroAgentModel model, Map arguments, String config)
 	{
 		this.adapter = adapter;
 		this.model = model;
@@ -207,7 +207,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 								microagent.timer = null;
 							}
 							microagent.agentKilled();
-							listener.resultAvailable(adapter.getAgentIdentifier());
+							listener.resultAvailable(adapter.getComponentIdentifier());
 						}
 					});
 					
@@ -376,7 +376,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 		// get logger with unique capability name
 		// todo: implement getDetailName()
 		//String name = getDetailName();
-		String name = adapter.getAgentIdentifier().getLocalName();
+		String name = adapter.getComponentIdentifier().getLocalName();
 		Logger ret = LogManager.getLogManager().getLogger(name);
 		
 		// if logger does not already exists, create it
@@ -404,7 +404,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  Get the agent adapter.
 	 *  @return The agent adapter.
 	 */
-	public IAgentAdapter getAgentAdapter()
+	public IComponentAdapter getAgentAdapter()
 	{
 		return adapter;
 	}

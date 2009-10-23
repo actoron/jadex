@@ -7,14 +7,14 @@ import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.ISearchConstraints;
 import jadex.adapter.standalone.AbstractPlatform;
-import jadex.adapter.standalone.StandaloneAgentAdapter;
+import jadex.adapter.standalone.StandaloneComponentAdapter;
 import jadex.adapter.standalone.fipaimpl.AMSAgentDescription;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.adapter.standalone.fipaimpl.SearchConstraints;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentListener;
-import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
 import jadex.bridge.ILoadableComponentModel;
@@ -122,7 +122,7 @@ public class AMS implements IAMS, IService
 		}
 
 		AgentIdentifier aid;
-		StandaloneAgentAdapter agent;
+		StandaloneComponentAdapter agent;
 		AMSAgentDescription	ad;
 		synchronized(adapters)
 		{
@@ -146,7 +146,7 @@ public class AMS implements IAMS, IService
 				}
 		
 				// Arguments must be isolated between agent instances.
-				agent = new StandaloneAgentAdapter(platform, aid, model, config, args==null? null: new HashMap(args));
+				agent = new StandaloneComponentAdapter(platform, aid, model, config, args==null? null: new HashMap(args));
 				adapters.put(aid, agent);
 				
 				ad	= new AMSAgentDescription(aid);
@@ -161,10 +161,10 @@ public class AMS implements IAMS, IService
 		IContextService	cs	= (IContextService)platform.getService(IContextService.class);
 		if(cs!=null)
 		{
-			IContext[]	contexts	= cs.getContexts((IAgentIdentifier)creator);
+			IContext[]	contexts	= cs.getContexts((IComponentIdentifier)creator);
 			for(int i=0; contexts!=null && i<contexts.length; i++)
 			{
-				((BaseContext)contexts[i]).agentCreated((IAgentIdentifier)creator, aid);
+				((BaseContext)contexts[i]).agentCreated((IComponentIdentifier)creator, aid);
 			}
 		}
 
@@ -198,7 +198,7 @@ public class AMS implements IAMS, IService
 				AMSAgentDescription	desc	= (AMSAgentDescription)agentdescs.get(agent);
 				if(desc!=null && IAMSAgentDescription.STATE_INITIATED.equals(desc.getState()))
 				{
-					StandaloneAgentAdapter	adapter	= (StandaloneAgentAdapter)adapters.get(agent);
+					StandaloneComponentAdapter	adapter	= (StandaloneComponentAdapter)adapters.get(agent);
 					if(adapter!=null)
 					{
 						// Todo: use result listener and set active state after agent has inited.
@@ -244,7 +244,7 @@ public class AMS implements IAMS, IService
 			{
 				//System.out.println("killing: "+aid);
 				
-				StandaloneAgentAdapter agent = (StandaloneAgentAdapter)adapters.get(aid);
+				StandaloneComponentAdapter agent = (StandaloneComponentAdapter)adapters.get(aid);
 				if(agent==null)
 				{
 					listener.exceptionOccurred(new RuntimeException("Agent "+aid+" does not exist."));
@@ -271,7 +271,7 @@ public class AMS implements IAMS, IService
 //						if(listeners.get(aid)!=null)
 //							throw new RuntimeException("Multiple result listeners for agent: "+aid);
 //						listeners.put(aid, listener);
-						agent.killAgent(new CleanupCommand((IAgentIdentifier)aid, listener));
+						agent.killAgent(new CleanupCommand((IComponentIdentifier)aid, listener));
 					}
 					else
 					{
@@ -298,7 +298,7 @@ public class AMS implements IAMS, IService
 		{
 			synchronized(agentdescs)
 			{
-				StandaloneAgentAdapter adapter = (StandaloneAgentAdapter)adapters.get(aid);
+				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(aid);
 				AMSAgentDescription ad = (AMSAgentDescription)agentdescs.get(aid);
 				if(adapter==null || ad==null)
 					listener.exceptionOccurred(new RuntimeException("Agent Identifier not registered in AMS: "+aid));
@@ -333,7 +333,7 @@ public class AMS implements IAMS, IService
 		{
 			synchronized(agentdescs)
 			{
-				StandaloneAgentAdapter adapter = (StandaloneAgentAdapter)adapters.get(aid);
+				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(aid);
 				AMSAgentDescription ad = (AMSAgentDescription)agentdescs.get(aid);
 				if(adapter==null || ad==null)
 					listener.exceptionOccurred(new RuntimeException("Agent Identifier not registered in AMS: "+aid));
@@ -410,7 +410,7 @@ public class AMS implements IAMS, IService
 	 *  @param aid The agent identifier.
 	 *  @return True, if agent is hosted on platform.
 	 */
-	public void containsAgent(IAgentIdentifier aid, IResultListener listener)
+	public void containsAgent(IComponentIdentifier aid, IResultListener listener)
 	{
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
@@ -423,7 +423,7 @@ public class AMS implements IAMS, IService
 	 *  @param aid The agent identifier.
 	 *  @return The agent description of this agent.
 	 */
-	public void getAgentDescription(IAgentIdentifier aid, IResultListener listener)
+	public void getAgentDescription(IComponentIdentifier aid, IResultListener listener)
 	{
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
@@ -459,11 +459,11 @@ public class AMS implements IAMS, IService
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
 		
-		IAgentIdentifier[] ret;
+		IComponentIdentifier[] ret;
 		
 		synchronized(adapters)
 		{
-			ret = (IAgentIdentifier[])adapters.keySet().toArray(new IAgentIdentifier[adapters.size()]);
+			ret = (IComponentIdentifier[])adapters.keySet().toArray(new IComponentIdentifier[adapters.size()]);
 			for(int i=0; i<ret.length; i++)
 				ret[i] = refreshAgentIdentifier(ret[i]); // Hack!
 		}
@@ -488,7 +488,7 @@ public class AMS implements IAMS, IService
 	 *  @param aid The agent identifier.
 	 *  @return The agent adapter.
 	 */
-	public void getAgentAdapter(IAgentIdentifier aid, IResultListener listener)
+	public void getAgentAdapter(IComponentIdentifier aid, IResultListener listener)
 	{
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
@@ -501,12 +501,12 @@ public class AMS implements IAMS, IService
 	 *  @param aid The agent identifier.
 	 *  @param listener The result listener.
 	 */
-	public void getExternalAccess(IAgentIdentifier aid, IResultListener listener)
+	public void getExternalAccess(IComponentIdentifier aid, IResultListener listener)
 	{
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
 		
-		StandaloneAgentAdapter adapter = (StandaloneAgentAdapter)adapters.get(aid);
+		StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(aid);
 		if(adapter==null)
 			listener.exceptionOccurred(new RuntimeException("No local agent found for agent identifier: "+aid));
 //		else if(!IAMSAgentDescription.STATE_ACTIVE.equals(adapter.getState()))
@@ -546,7 +546,7 @@ public class AMS implements IAMS, IService
 	 *  @param local True for local name.
 	 *  @return The new agent identifier.
 	 */
-	public IAgentIdentifier createAgentIdentifier(String name, boolean local)
+	public IComponentIdentifier createAgentIdentifier(String name, boolean local)
 	{
 		if(local)
 		{
@@ -563,7 +563,7 @@ public class AMS implements IAMS, IService
 	 *  @param local True for local name.
 	 *  @param addresses The addresses.
 	 */
-	public IAgentIdentifier createAgentIdentifier(String name, boolean local, String[] addresses)
+	public IComponentIdentifier createAgentIdentifier(String name, boolean local, String[] addresses)
 	{
 		if(local)
 			name = name + "@" + platform.getName();
@@ -589,7 +589,7 @@ public class AMS implements IAMS, IService
 	 *  @param agent The agent.
 	 *  @return The ams agent description.
 	 */
-	public IAMSAgentDescription createAMSAgentDescription(IAgentIdentifier agent)
+	public IAMSAgentDescription createAMSAgentDescription(IComponentIdentifier agent)
 	{
 		return new AMSAgentDescription(agent);
 	}
@@ -601,7 +601,7 @@ public class AMS implements IAMS, IService
 	 *  @param ownership The ownership.
 	 *  @return The ams agent description.
 	 */
-	public IAMSAgentDescription createAMSAgentDescription(IAgentIdentifier agent, String state, String ownership)
+	public IAMSAgentDescription createAMSAgentDescription(IComponentIdentifier agent, String state, String ownership)
 	{
 		AMSAgentDescription	ret	= new AMSAgentDescription(agent);
 		ret.setState(state);
@@ -624,11 +624,11 @@ public class AMS implements IAMS, IService
 	 *  Get the agent adapters.
 	 *  @return The agent adapters.
 	 */
-	public IAgentAdapter[] getAgentAdapters()
+	public IComponentAdapter[] getAgentAdapters()
 	{
 		synchronized(adapters)
 		{
-			return (IAgentAdapter[])adapters.values().toArray(new IAgentAdapter[adapters.size()]);
+			return (IComponentAdapter[])adapters.values().toArray(new IComponentAdapter[adapters.size()]);
 		}
 	}
 	
@@ -637,9 +637,9 @@ public class AMS implements IAMS, IService
 	 *  @param aid The agent identifier.
 	 *  @return The refreshed copy of the aid.
 	 */
-	public IAgentIdentifier refreshAgentIdentifier(IAgentIdentifier aid)
+	public IComponentIdentifier refreshAgentIdentifier(IComponentIdentifier aid)
 	{
-		IAgentIdentifier	ret	= (IAgentIdentifier)((AgentIdentifier)aid).clone();
+		IComponentIdentifier	ret	= (IComponentIdentifier)((AgentIdentifier)aid).clone();
 		if(adapters.containsKey(aid))
 		{
 			IMessageService	ms	= (IMessageService)platform.getService(IMessageService.class);
@@ -718,10 +718,10 @@ public class AMS implements IAMS, IService
 	 */
 	class CleanupCommand implements IResultListener
 	{
-		protected IAgentIdentifier aid;
+		protected IComponentIdentifier aid;
 		protected IResultListener listener;
 		
-		public CleanupCommand(IAgentIdentifier aid, IResultListener listener)
+		public CleanupCommand(IComponentIdentifier aid, IResultListener listener)
 		{
 			this.aid = aid;
 			this.listener = listener;
@@ -735,7 +735,7 @@ public class AMS implements IAMS, IService
 				synchronized(agentdescs)
 				{
 //					System.out.println("remove called for: "+aid);
-					StandaloneAgentAdapter	adapter	= (StandaloneAgentAdapter)adapters.remove(aid);
+					StandaloneComponentAdapter	adapter	= (StandaloneComponentAdapter)adapters.remove(aid);
 					if(adapter==null)
 						throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
 					adapter.setState(IAMSAgentDescription.STATE_TERMINATED);

@@ -2,7 +2,7 @@ package jadex.tools.dfbrowser;
 
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.Date;
 
@@ -110,7 +110,7 @@ class AgentTableModel extends AbstractTableModel
 		switch(columnIndex)
 		{
 			case 0:
-				return IAgentIdentifier.class;
+				return IComponentIdentifier.class;
 			case 1:
 				return Date.class;
 			case 2:

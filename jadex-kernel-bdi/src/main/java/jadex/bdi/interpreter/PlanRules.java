@@ -553,12 +553,12 @@ public class PlanRules
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
 //						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getAgentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
-						AgentRules.getLogger(state, rcapa).severe(ip.getAgentAdapter().getAgentIdentifier()+
+						AgentRules.getLogger(state, rcapa).severe(ip.getAgentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 					else
 					{
-						AgentRules.getLogger(state, rcapa).info(ip.getAgentAdapter().getAgentIdentifier()+
+						AgentRules.getLogger(state, rcapa).info(ip.getAgentAdapter().getComponentIdentifier()+
 								": Exception while executing: "+rplan+"\n"+sw);
 					}
 				}
@@ -637,12 +637,12 @@ public class PlanRules
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
 //						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getAgentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
-						AgentRules.getLogger(state, rcapa).severe(ip.getAgentAdapter().getAgentIdentifier()+
+						AgentRules.getLogger(state, rcapa).severe(ip.getAgentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 					else
 					{
-						AgentRules.getLogger(state, rcapa).info(ip.getAgentAdapter().getAgentIdentifier()+
+						AgentRules.getLogger(state, rcapa).info(ip.getAgentAdapter().getComponentIdentifier()+
 								": Exception while executing: "+rplan+"\n"+sw);
 					}
 				}
@@ -723,12 +723,12 @@ public class PlanRules
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
 //						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getAgentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
-						AgentRules.getLogger(state, rcapa).severe(ip.getAgentAdapter().getAgentIdentifier()+
+						AgentRules.getLogger(state, rcapa).severe(ip.getAgentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 					else
 					{
-						AgentRules.getLogger(state, rcapa).info(ip.getAgentAdapter().getAgentIdentifier()+
+						AgentRules.getLogger(state, rcapa).info(ip.getAgentAdapter().getComponentIdentifier()+
 								": Exception while executing: "+rplan+"\n"+sw);
 					}
 				}
@@ -808,12 +808,12 @@ public class PlanRules
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
 //						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getAgentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
-						AgentRules.getLogger(state, rcapa).severe(ip.getAgentAdapter().getAgentIdentifier()+
+						AgentRules.getLogger(state, rcapa).severe(ip.getAgentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 					else
 					{
-						AgentRules.getLogger(state, rcapa).info(ip.getAgentAdapter().getAgentIdentifier()+
+						AgentRules.getLogger(state, rcapa).info(ip.getAgentAdapter().getComponentIdentifier()+
 								": Exception while executing: "+rplan+"\n"+sw);
 					}
 				}
@@ -2092,7 +2092,7 @@ public class PlanRules
 				// todo: what happens when timer is immediately due?! can this lead to problems?
 				// timer runs on other thread.
 				final	ITimer[]	thetimer	= new ITimer[1];
-				ITimer timer = ((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getPlatform()
+				ITimer timer = ((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer()
 					.getService(IClockService.class)).createTimer(timeout, new InterpreterTimedObject(state, new InterpreterTimedObjectAction()
 				{
 					public boolean isValid()

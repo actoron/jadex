@@ -34,22 +34,22 @@ public interface IContext
 	/**
 	 *  Add an agent to a context.
 	 */
-	public void	addAgent(IAgentIdentifier agent);
+	public void	addAgent(IComponentIdentifier agent);
 	
 	/**
 	 *  Remove an agent from a context.
 	 */
-	public void	removeAgent(IAgentIdentifier agent);
+	public void	removeAgent(IComponentIdentifier agent);
 
 	/**
 	 *  Test if an agent is contained in a context.
 	 */
-	public boolean	containsAgent(IAgentIdentifier agent);
+	public boolean	containsAgent(IComponentIdentifier agent);
 
 	/**
 	 *  Get all agents directly contained in the context (if any).
 	 */
-	public IAgentIdentifier[]	getAgents();
+	public IComponentIdentifier[]	getAgents();
 	
 	/**
 	 *  Add a space to the context.
@@ -76,7 +76,7 @@ public interface IContext
 	 *  @param key The key.
 	 *  @param prop The property.
 	 */
-	public void addProperty(IAgentIdentifier agent, String key, Object prop);
+	public void addProperty(IComponentIdentifier agent, String key, Object prop);
 	
 	/**
 	 *  Get agent property. 
@@ -84,5 +84,5 @@ public interface IContext
 	 *  @param key The key.
 	 *  @return The property. 
 	 */
-	public Object getProperty(IAgentIdentifier agent, String key);
+	public Object getProperty(IComponentIdentifier agent, String key);
 }

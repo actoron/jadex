@@ -3,7 +3,7 @@ package jadex.bdi.planlib.ams;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Plan for starting a Jadex agent on the platform.
@@ -15,7 +15,7 @@ public class AMSLocalStartAgentPlan extends Plan
 	 */
 	public void body()
 	{
-		IAgentIdentifier	agentidentifier	= (IAgentIdentifier)getParameter("agentidentifier").getValue();
+		IComponentIdentifier	agentidentifier	= (IComponentIdentifier)getParameter("agentidentifier").getValue();
 
 		try
 		{

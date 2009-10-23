@@ -10,7 +10,7 @@ import jadex.bdi.examples.marsworld.RequestProduction;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  The main plan for the Producer Agent. <br>
@@ -66,7 +66,7 @@ public class ProducerPlan extends Plan
 	{
 		AGRSpace agrs = (AGRSpace)getScope().getApplicationContext().getSpace("myagrspace");
 		Group group = agrs.getGroup("mymarsteam");
-		IAgentIdentifier[]	carriers	= group.getAgentsForRole("carrier");
+		IComponentIdentifier[]	carriers	= group.getAgentsForRole("carrier");
 		
 		if(carriers!=null && carriers.length>0)
 		{

@@ -7,7 +7,7 @@ import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IPlatform;
 import jadex.bridge.ISpace;
@@ -506,7 +506,7 @@ public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 	 *  @param name The name.
 	 *  @return The agent identifier.
 	 */
-	protected IAgentIdentifier convertStringToAgentIdentifier(String name)
+	protected IComponentIdentifier convertStringToAgentIdentifier(String name)
 	{
 		IPlatform platform = ((IApplicationContext)space.getContext()).getPlatform();
 		IAMS ams = (IAMS)platform.getService(IAMS.class);

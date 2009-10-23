@@ -1,10 +1,7 @@
 package jadex.adapter.standalone;
 
-import jadex.adapter.base.SComponentFactory;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.bridge.IComponentListener;
-import jadex.bridge.IApplicationFactory;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
@@ -12,7 +9,6 @@ import jadex.service.IService;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -204,7 +200,6 @@ public class SpringPlatform extends AbstractPlatform
 		this.daemonagents = SCollection.createLinkedHashSet();
 		if(daemagents != null)
 		{
-			IAMS ams = (IAMS)getService(IAMS.class);
 			for(Iterator it = daemagents.keySet().iterator(); it.hasNext();)
 			{
 				String name = (String)it.next();
@@ -229,7 +224,6 @@ public class SpringPlatform extends AbstractPlatform
 		// Create application agents.
 		if(appagents != null)
 		{
-			IAMS ams = (IAMS)getService(IAMS.class);
 			for(Iterator it = appagents.keySet().iterator(); it.hasNext();)
 			{
 				String name = (String)it.next();

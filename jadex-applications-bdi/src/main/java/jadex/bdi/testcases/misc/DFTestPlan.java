@@ -11,7 +11,7 @@ import jadex.bdi.runtime.IEvent;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 
 import java.util.Date;
@@ -34,7 +34,7 @@ public class DFTestPlan extends Plan
 		num = performTests(num, null); // test locally
 		
 		IAMS ams = (IAMS)getScope().getPlatform().getService(IAMS.class);
-		IAgentIdentifier da = ams.createAgentIdentifier(SFipa.DF_AGENT, true);
+		IComponentIdentifier da = ams.createAgentIdentifier(SFipa.DF_AGENT, true);
 		performTests(num, da); // test remotely
 	}
 	
@@ -112,7 +112,7 @@ public class DFTestPlan extends Plan
 	/**
 	 *  Perform the tests.
 	 */
-	public int performTests(int num, IAgentIdentifier df)
+	public int performTests(int num, IComponentIdentifier df)
 	{
 		IDFAgentDescription desc = ((IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE))
 			.createDFAgentDescription(null, new IDFServiceDescription[]

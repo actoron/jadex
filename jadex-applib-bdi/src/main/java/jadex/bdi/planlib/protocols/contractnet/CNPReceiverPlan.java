@@ -4,7 +4,7 @@ import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.planlib.protocols.AbstractReceiverPlan;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.collection.SCollection;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public class CNPReceiverPlan extends AbstractReceiverPlan
 		}
 
 		IMessageEvent me = (IMessageEvent)getParameter("message").getValue();
-		IAgentIdentifier initiator = (IAgentIdentifier)me.getParameter(SFipa.SENDER).getValue();
+		IComponentIdentifier initiator = (IComponentIdentifier)me.getParameter(SFipa.SENDER).getValue();
 		Object cfp;
 		IMessageEvent reply;
 		List records = SCollection.createArrayList();
@@ -121,7 +121,7 @@ public class CNPReceiverPlan extends AbstractReceiverPlan
 	 *  @param cfp The cfp including the task to execute.
 	 *  @return The proposal for executing the task.
 	 */
-	public Object[] makeProposal(Object cfp, IAgentIdentifier initiator)
+	public Object[] makeProposal(Object cfp, IComponentIdentifier initiator)
 	{
 		IGoal make_proposal = createGoal(getShortProtocolName()+"_make_proposal");
 		make_proposal.getParameter("cfp").setValue(cfp);
@@ -137,7 +137,7 @@ public class CNPReceiverPlan extends AbstractReceiverPlan
 	 *  @param proposal_info The proposal info.
 	 *  @return The result of the task.
 	 */
-	public Object executeTask(Object proposal, Object proposal_info, IAgentIdentifier initiator)
+	public Object executeTask(Object proposal, Object proposal_info, IComponentIdentifier initiator)
 	{
 		IGoal execute_task = createGoal(getShortProtocolName()+"_execute_task");
 		execute_task.getParameter("proposal").setValue(proposal);

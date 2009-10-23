@@ -6,7 +6,7 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.commons.SimplePropertyObject;
 
@@ -35,7 +35,7 @@ public class EatAction extends SimplePropertyObject implements ISpaceAction
 //		System.out.println("eat action: "+parameters);
 		
 		Grid2D grid = (Grid2D)space;
-		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
+		IComponentIdentifier owner = (IComponentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
 		ISpaceObject avatar = grid.getAvatar(owner);
 		ISpaceObject target = (ISpaceObject)parameters.get(ISpaceAction.OBJECT_ID);
 		
@@ -70,7 +70,7 @@ public class EatAction extends SimplePropertyObject implements ISpaceAction
 		{
 //			System.err.println("Destroying: "+target.getProperty(ISpaceObject.PROPERTY_OWNER));
 			IAMS	ams	= (IAMS)((IApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);
-			ams.destroyAgent((IAgentIdentifier)target.getProperty(ISpaceObject.PROPERTY_OWNER), null);
+			ams.destroyAgent((IComponentIdentifier)target.getProperty(ISpaceObject.PROPERTY_OWNER), null);
 		}
 		
 		avatar.setProperty(PROPERTY_POINTS, points);

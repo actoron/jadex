@@ -3,7 +3,7 @@ package jadex.adapter.base.appdescriptor;
 import jadex.adapter.base.SComponentExecutionService;
 import jadex.adapter.base.contextservice.BaseContext;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
@@ -60,7 +60,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	 *  Add an agent to a context.
 	 */
 	// Cannot be synchronized due to deadlock with space (uses context.getAgentType()).
-	public /*synchronized*/ void	addAgent(IAgentIdentifier agent)
+	public /*synchronized*/ void	addAgent(IComponentIdentifier agent)
 	{
 		if(isTerminating())
 			throw new RuntimeException("Cannot add agent to terminating context: "+agent+", "+this);
@@ -82,7 +82,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	 *  @param creator	The creator of the new agent.
 	 *  @param newagent	The newly created agent.
 	 */
-	public void	agentCreated(IAgentIdentifier creator, IAgentIdentifier newagent)
+	public void	agentCreated(IComponentIdentifier creator, IComponentIdentifier newagent)
 	{
 		addAgent(newagent);
 	}
@@ -97,7 +97,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	public void	deleteContext(final IResultListener listener)
 	{
 		this.setTerminating(true);
-		final IAgentIdentifier[]	agents	= getAgents();
+		final IComponentIdentifier[]	agents	= getAgents();
 		if(agents!=null && agents.length>0)
 		{
 			// Create AMS result listener (l2), when listener is used.
@@ -185,7 +185,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	 */
 	public void createAgent(String name, final String type, String configuration,
 			Map arguments, final boolean start, final boolean master, 
-			final IResultListener listener, IAgentIdentifier creator)
+			final IResultListener listener, IComponentIdentifier creator)
 	{
 		MAgentType	at	= apptype.getMAgentType(type);
 		if(at==null)
@@ -201,7 +201,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 			}
 			public void resultAvailable(Object result)
 			{
-				IAgentIdentifier aid = (IAgentIdentifier)result;
+				IComponentIdentifier aid = (IComponentIdentifier)result;
 				synchronized(ApplicationContext.this)
 				{
 					if(agenttypes==null)
@@ -234,7 +234,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	 *  Remove an agent from a context.
 	 */
 	// Cannot be synchronized due to deadlock with space (uses context.getAgentType()).
-	public /*synchronized*/ void	removeAgent(IAgentIdentifier agent)
+	public /*synchronized*/ void	removeAgent(IComponentIdentifier agent)
 	{
 		boolean master = isAgentMaster(agent);
 			
@@ -270,7 +270,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	 *  @param agent The agent.
 	 *  @param master The master.
 	 */
-	public void setAgentMaster(IAgentIdentifier agent, boolean master)
+	public void setAgentMaster(IComponentIdentifier agent, boolean master)
 	{
 		addProperty(agent, PROPERTY_AGENT_MASTER, master? Boolean.TRUE: Boolean.FALSE);
 	}
@@ -280,7 +280,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	 *  @param agent The agent.
 	 *  @return True, if agent is master.
 	 */
-	public boolean isAgentMaster(IAgentIdentifier agent)
+	public boolean isAgentMaster(IComponentIdentifier agent)
 	{
 		Boolean ret = (Boolean)getProperty(agent, PROPERTY_AGENT_MASTER);
 		return ret==null? false: ret.booleanValue();
@@ -291,7 +291,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	 *  @param aid	The agent id.
 	 *  @return The agent type name.
 	 */
-	public synchronized String	getAgentType(IAgentIdentifier aid)
+	public synchronized String	getAgentType(IComponentIdentifier aid)
 	{
 		return agenttypes!=null ? (String)agenttypes.get(aid) : null;
 	}

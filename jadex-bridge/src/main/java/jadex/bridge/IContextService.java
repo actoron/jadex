@@ -31,12 +31,12 @@ public interface IContextService extends IService
 	/**
 	 *  Get all direct contexts of an agent (if any).
 	 */
-	public IContext[]	getContexts(IAgentIdentifier agent);
+	public IContext[]	getContexts(IComponentIdentifier agent);
 	
 	/**
 	 *  Get all direct contexts of an agent of a specific type (if any).
 	 */
-	public IContext[]	getContexts(IAgentIdentifier agent, Class type);
+	public IContext[]	getContexts(IComponentIdentifier agent, Class type);
 	
 	/**
 	 *  Get all contexts with a given type (if any).

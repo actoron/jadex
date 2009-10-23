@@ -1,6 +1,6 @@
 package jadex.adapter.base.contextservice;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
 import jadex.commons.ChangeEvent;
@@ -92,7 +92,7 @@ public class ContextService	implements IContextService
 	/**
 	 *  Get all direct contexts of an agent (if any).
 	 */
-	public synchronized IContext[]	getContexts(IAgentIdentifier agent)
+	public synchronized IContext[]	getContexts(IComponentIdentifier agent)
 	{
 		List	result	= null;
 		if(contexts!=null)
@@ -115,7 +115,7 @@ public class ContextService	implements IContextService
 	/**
 	 *  Get all direct contexts of an agent of a specific type (if any).
 	 */
-	public IContext[]	getContexts(IAgentIdentifier agent, Class type)
+	public IContext[]	getContexts(IComponentIdentifier agent, Class type)
 	{
 		List	result	= null;
 		if(contexts!=null)

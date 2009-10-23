@@ -5,7 +5,7 @@ import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.AgentTerminatedException;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 
@@ -34,7 +34,7 @@ public class ComanalyzerListener //implements IToolManagement
 	protected IExternalAccess agent;
 
 	/** The agent to observe. */
-	protected IAgentIdentifier observed;
+	protected IComponentIdentifier observed;
 
 	/** The currently registered listeners. */
 	protected Map listeners;
@@ -57,7 +57,7 @@ public class ComanalyzerListener //implements IToolManagement
 	 * @param observed The observed agent.
 	 * @param tool The tool panal.
 	 */
-	public ComanalyzerListener(IExternalAccess agent, IAgentIdentifier observed, ToolPanel tool)
+	public ComanalyzerListener(IExternalAccess agent, IComponentIdentifier observed, ToolPanel tool)
 	{
 		this.agent = agent;
 		this.observed = observed;

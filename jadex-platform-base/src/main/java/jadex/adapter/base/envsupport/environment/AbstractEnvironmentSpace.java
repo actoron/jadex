@@ -8,7 +8,7 @@ import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.evaluation.ITableDataConsumer;
 import jadex.adapter.base.envsupport.evaluation.ITableDataProvider;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IContext;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.IResultListener;
@@ -424,7 +424,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			// Store in owner objects.
 			if(properties!=null && properties.get(ISpaceObject.PROPERTY_OWNER)!=null)
 			{
-				IAgentIdentifier	owner	= (IAgentIdentifier)properties.get(ISpaceObject.PROPERTY_OWNER);
+				IComponentIdentifier	owner	= (IComponentIdentifier)properties.get(ISpaceObject.PROPERTY_OWNER);
 				List ownerobjects = (List)spaceobjectsbyowner.get(owner);
 				if(ownerobjects == null)
 				{
@@ -482,7 +482,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						
 						public void resultAvailable(Object result)
 						{
-							IAgentIdentifier	agent	= (IAgentIdentifier)result;
+							IComponentIdentifier	agent	= (IComponentIdentifier)result;
 							
 							setOwner(fid, agent);
 							
@@ -558,7 +558,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			String	objecttype	= obj.getType();
 			
 			// Possibly kill agent.
-			IAgentIdentifier agent = (IAgentIdentifier)obj.getProperty(ISpaceObject.PROPERTY_OWNER);
+			IComponentIdentifier agent = (IComponentIdentifier)obj.getProperty(ISpaceObject.PROPERTY_OWNER);
 			if(agent!=null)
 			{
 				String	agenttype = ((ApplicationContext)getContext()).getAgentType(agent);
@@ -759,7 +759,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  @param data	The content of the percept (if any).
 	 *  @param agent The agent that should receive the percept.
 	 */
-	public void createPercept(String typename, Object data, IAgentIdentifier agent, ISpaceObject avatar)
+	public void createPercept(String typename, Object data, IComponentIdentifier agent, ISpaceObject avatar)
 	{
 		synchronized(monitor)
 		{
@@ -817,14 +817,14 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  @param id The id.
 	 *  @return The owner.
 	 */
-	public IAgentIdentifier	getOwner(Object id)
+	public IComponentIdentifier	getOwner(Object id)
 	{
 		synchronized(monitor)
 		{
 			ISpaceObject obj = getSpaceObject(id); 
 			if(obj==null)
 				throw new RuntimeException("Space object not found: "+id);
-			return (IAgentIdentifier)obj.getProperty(ISpaceObject.PROPERTY_OWNER);
+			return (IComponentIdentifier)obj.getProperty(ISpaceObject.PROPERTY_OWNER);
 		}
 	}
 	
@@ -833,7 +833,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  @param id The object id.
 	 *  @param pos The object owner.
 	 */
-	public void setOwner(Object id, IAgentIdentifier owner)
+	public void setOwner(Object id, IComponentIdentifier owner)
 	{
 		synchronized(monitor)
 		{
@@ -866,7 +866,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  Get the avatar objects.
 	 *  @return The avatar objects. 
 	 */
-	public ISpaceObject[] getAvatars(IAgentIdentifier owner)
+	public ISpaceObject[] getAvatars(IComponentIdentifier owner)
 	{
 		synchronized(monitor)
 		{
@@ -879,11 +879,11 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  Get the avatar objects.
 	 *  @return The avatar objects. 
 	 */
-	public IAgentIdentifier[] getAgents()
+	public IComponentIdentifier[] getAgents()
 	{
 		synchronized(monitor)
 		{
-			return (IAgentIdentifier[])spaceobjectsbyowner.keySet().toArray(new IAgentIdentifier[spaceobjectsbyowner.keySet().size()]);
+			return (IComponentIdentifier[])spaceobjectsbyowner.keySet().toArray(new IComponentIdentifier[spaceobjectsbyowner.keySet().size()]);
 		}
 	}
 	
@@ -891,7 +891,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  Get the avatar object.
 	 *  @return The avatar object. 
 	 */
-	public ISpaceObject getAvatar(IAgentIdentifier owner)
+	public ISpaceObject getAvatar(IComponentIdentifier owner)
 	{
 		synchronized(monitor)
 		{
@@ -1104,7 +1104,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/**
 	 *  Called when an agent was added. 
 	 */
-	public void agentAdded(IAgentIdentifier aid)
+	public void agentAdded(IComponentIdentifier aid)
 	{
 		synchronized(monitor)
 		{
@@ -1151,7 +1151,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/**
 	 *  Called when an agent was removed.
 	 */
-	public void agentRemoved(IAgentIdentifier aid)
+	public void agentRemoved(IComponentIdentifier aid)
 	{
 		synchronized(monitor)
 		{
@@ -1371,7 +1371,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  @param type	The object type.
 	 *  @param props	The properties for the object (if any).
 	 */
-	public void addInitialAvatar(IAgentIdentifier ownerid, String type,	Map props)
+	public void addInitialAvatar(IComponentIdentifier ownerid, String type,	Map props)
 	{
 		synchronized(monitor)
 		{

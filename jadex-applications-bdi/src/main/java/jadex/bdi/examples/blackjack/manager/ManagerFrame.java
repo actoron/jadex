@@ -9,7 +9,7 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
@@ -63,7 +63,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 
 	protected JPanel dealerpan;
 	protected JTextField dealertf;
-	protected IAgentIdentifier dealeraid;
+	protected IComponentIdentifier dealeraid;
 
 	protected JButton exitButton;
 
@@ -393,7 +393,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 //			start.getParameter("type").setValue("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml");
 			start.getParameter("name").setValue("BlackjackDealer");
 			agent.dispatchTopLevelGoalAndWait(start);
-			IAgentIdentifier	dealer	= (IAgentIdentifier)start.getParameter("agentidentifier").getValue();
+			IComponentIdentifier	dealer	= (IComponentIdentifier)start.getParameter("agentidentifier").getValue();
 			agent.getLogger().info("local DealerAgent started: "+dealer);
 			//access.getBeliefbase().getBelief("localDealerAID").setFact(start.getResult());
 			agent.getBeliefbase().getBelief("localDealerAID").setFact(dealer);
@@ -409,7 +409,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	 */
 	protected void stopLocalDealer()
 	{
-		IAgentIdentifier dealer = (IAgentIdentifier)agent.getBeliefbase().getBelief("localDealerAID").getFact();
+		IComponentIdentifier dealer = (IComponentIdentifier)agent.getBeliefbase().getBelief("localDealerAID").getFact();
 		if(dealer!=null)
 		{
 			IGoal destroy = agent.getGoalbase().createGoal("ams_destroy_agent");
@@ -607,7 +607,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				args.put("dealer", dealeraid);
 				start.getParameter("arguments").setValue(args);
 				agent.dispatchTopLevelGoalAndWait(start);
-				IAgentIdentifier	playerid	= (IAgentIdentifier)start.getParameter("agentidentifier").getValue();
+				IComponentIdentifier	playerid	= (IComponentIdentifier)start.getParameter("agentidentifier").getValue();
 				player.setAgentID(playerid);
 			}
 			catch(Exception e)

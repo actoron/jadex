@@ -2,7 +2,7 @@ package jadex.adapter.jade.fipaimpl;
 
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	protected List languages;
 
 	/** Attribute for slot agentidentifier. */
-	protected IAgentIdentifier name;
+	protected IComponentIdentifier name;
 
 	/** Attribute for slot ontologies. */
 	protected List ontologies;
@@ -49,7 +49,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	 *  Create a new agent description.
 	 *  @param name The name.
 	 */
-	public DFAgentDescription(IAgentIdentifier name)
+	public DFAgentDescription(IComponentIdentifier name)
 	{
 		this(name, null, null, null, null, null);
 	}
@@ -62,7 +62,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	 *  @param ontologies The ontologies.
 	 *  @param languages The languages.
 	 */
-	public DFAgentDescription(IAgentIdentifier name, IDFServiceDescription[] services, 
+	public DFAgentDescription(IComponentIdentifier name, IDFServiceDescription[] services, 
 		String[] protocols, String[] ontologies, String[] languages, Date leasetime)
 	{
 		this.languages = new ArrayList();
@@ -152,7 +152,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	 *  Get the agentidentifier of this AgentDescription.
 	 * @return agentidentifier
 	 */
-	public IAgentIdentifier getName()
+	public IComponentIdentifier getName()
 	{
 		return this.name;
 	}
@@ -161,7 +161,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	 *  Set the agentidentifier of this AgentDescription.
 	 * @param name the value to be set
 	 */
-	public void setName(IAgentIdentifier name)
+	public void setName(IComponentIdentifier name)
 	{
 		this.name = name;
 	}

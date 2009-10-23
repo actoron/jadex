@@ -1,7 +1,7 @@
 package jadex.tools.comanalyzer;
 
 import jadex.adapter.base.fipa.SFipa;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;
 import jadex.commons.IFilter;
@@ -121,7 +121,7 @@ public class Message extends ParameterElement
 	 * @param arguments The parameters of the message.
 	 * @param sequence The sequence number of the message.
 	 */
-	public Message(IMessageAdapter msg, int sequence, IAgentIdentifier receiver)
+	public Message(IMessageAdapter msg, int sequence, IComponentIdentifier receiver)
 	{
 		assert receiver != null;
 
@@ -199,7 +199,7 @@ public class Message extends ParameterElement
 	 */
 	public boolean isMulticast()
 	{
-		IAgentIdentifier[] aids = (IAgentIdentifier[])getParameter(RECEIVERS);
+		IComponentIdentifier[] aids = (IComponentIdentifier[])getParameter(RECEIVERS);
 		return aids.length > 1;
 	}
 

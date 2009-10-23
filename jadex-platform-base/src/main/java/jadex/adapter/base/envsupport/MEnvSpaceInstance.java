@@ -21,7 +21,7 @@ import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContextService;
 import jadex.bridge.ISpace;
@@ -341,7 +341,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				String	owner	= (String)MEnvSpaceInstance.getProperty(mobj, "owner");
 				if(owner==null)
 					throw new RuntimeException("Attribute 'owner' required for avatar: "+mobj);
-				IAgentIdentifier	ownerid	= null;
+				IComponentIdentifier	ownerid	= null;
 				IAMS	ams	= ((IAMS)app.getPlatform().getService(IAMS.class));
 				if(owner.indexOf("@")!=-1)
 					ownerid	= ams.createAgentIdentifier((String)owner, false);

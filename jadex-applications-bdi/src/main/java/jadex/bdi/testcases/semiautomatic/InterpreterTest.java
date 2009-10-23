@@ -4,9 +4,9 @@ import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.OAVAgentModel;
 import jadex.bdi.interpreter.OAVBDIModelLoader;
-import jadex.bridge.IAgentAdapter;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IAgentFactory;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IPlatform;
@@ -71,7 +71,7 @@ public class InterpreterTest
 			clock.start();
 			final Executor exe = new Executor(ThreadPoolFactory.createThreadPool());
 			final BDIInterpreter[]	interpreters	= new BDIInterpreter[1];
-			final BDIInterpreter interpreter = new BDIInterpreter(new IAgentAdapter()
+			final BDIInterpreter interpreter = new BDIInterpreter(new IComponentAdapter()
 			{
 				public void	wakeup()
 				{
@@ -96,7 +96,7 @@ public class InterpreterTest
 					});
 				}
 	
-				public IPlatform getPlatform()
+				public IPlatform getServiceContainer()
 				{
 					return new IPlatform()
 					{
@@ -139,9 +139,9 @@ public class InterpreterTest
 					};
 				}
 	
-				public IAgentIdentifier getAgentIdentifier()
+				public IComponentIdentifier getComponentIdentifier()
 				{
-					return new IAgentIdentifier()
+					return new IComponentIdentifier()
 					{
 						public String getName()
 						{

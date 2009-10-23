@@ -6,7 +6,7 @@ import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.adapter.base.fipa.ISearchConstraints;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.Random;
 
@@ -55,7 +55,7 @@ public class PlayerSearchDealerPlan extends Plan
 			getLogger().info(result.length + " blackjack-dealer found");
 
 			// choose one dealer randomly out of all the dealer-agents
-			IAgentIdentifier dealer = result[new Random().nextInt(result.length)].getName();
+			IComponentIdentifier dealer = result[new Random().nextInt(result.length)].getName();
 			getBeliefbase().getBelief("dealer").setFact(dealer);
 		}
 

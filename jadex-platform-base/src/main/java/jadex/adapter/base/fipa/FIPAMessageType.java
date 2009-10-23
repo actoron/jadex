@@ -1,6 +1,6 @@
 package jadex.adapter.base.fipa;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageType;
 
 import java.util.Date;
@@ -27,8 +27,8 @@ public class FIPAMessageType extends MessageType
 		{
 			// Std. parameters
 			new MessageType.ParameterSpecification(SFipa.PERFORMATIVE, String.class, false),
-			new MessageType.ParameterSpecification(SFipa.SENDER, IAgentIdentifier.class, false),
-			new MessageType.ParameterSpecification(SFipa.REPLY_TO, IAgentIdentifier.class, false),
+			new MessageType.ParameterSpecification(SFipa.SENDER, IComponentIdentifier.class, false),
+			new MessageType.ParameterSpecification(SFipa.REPLY_TO, IComponentIdentifier.class, false),
 			new MessageType.ParameterSpecification(SFipa.CONTENT, Object.class, false),
 			new MessageType.ParameterSpecification(SFipa.LANGUAGE, String.class, SFipa.LANGUAGE, false, false),
 			new MessageType.ParameterSpecification(SFipa.ENCODING, String.class, SFipa.ENCODING, false, false),
@@ -46,7 +46,7 @@ public class FIPAMessageType extends MessageType
 		// Second parameter represents the parameter sets.
 		new MessageType.ParameterSpecification[]
 		{
-			new MessageType.ParameterSpecification(SFipa.RECEIVERS, IAgentIdentifier.class, SFipa.SENDER, false, true)
+			new MessageType.ParameterSpecification(SFipa.RECEIVERS, IComponentIdentifier.class, SFipa.SENDER, false, true)
 		});
 	}
 

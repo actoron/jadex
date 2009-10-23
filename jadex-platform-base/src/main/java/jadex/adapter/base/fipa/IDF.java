@@ -1,6 +1,6 @@
 package jadex.adapter.base.fipa;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.Date;
@@ -64,7 +64,7 @@ public interface IDF
 	 *  @param service The service.
 	 *  @return The df agent description.
 	 */
-	public IDFAgentDescription createDFAgentDescription(IAgentIdentifier agent, IDFServiceDescription service);
+	public IDFAgentDescription createDFAgentDescription(IComponentIdentifier agent, IDFServiceDescription service);
 
 	/**
 	 *  Create a new df agent description.
@@ -75,7 +75,7 @@ public interface IDF
 	 *  @param protocols The protocols.
 	 *  @return The agent description.
 	 */
-	public IDFAgentDescription	createDFAgentDescription(IAgentIdentifier agent, IDFServiceDescription[] services,
+	public IDFAgentDescription	createDFAgentDescription(IComponentIdentifier agent, IDFServiceDescription[] services,
 		String[] languages, String[] ontologies, String[] protocols, Date leasetime);
 
 	/**
@@ -92,7 +92,7 @@ public interface IDF
 	 *  @param local True for local name.
 	 *  @return The new agent identifier.
 	 */
-	public IAgentIdentifier createAgentIdentifier(String name, boolean local);
+	public IComponentIdentifier createAgentIdentifier(String name, boolean local);
 	
 	/**
 	 *  Create an agent identifier.
@@ -102,5 +102,5 @@ public interface IDF
 	 *  @param resolvers The resolvers.
 	 *  @return The new agent identifier.
 	 */
-	public IAgentIdentifier createAgentIdentifier(String name, boolean local, String[] addresses);
+	public IComponentIdentifier createAgentIdentifier(String name, boolean local, String[] addresses);
 }

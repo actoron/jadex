@@ -5,7 +5,7 @@ import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.AgentActionList.ActionEntry;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.Comparator;
 
@@ -43,9 +43,9 @@ public class CreatureActionComparator implements Comparator
 		
 		if(ret!=0)
 		{
-			IAgentIdentifier actor1 = (IAgentIdentifier)entry1.parameters.get(ISpaceAction.ACTOR_ID);
+			IComponentIdentifier actor1 = (IComponentIdentifier)entry1.parameters.get(ISpaceAction.ACTOR_ID);
 			ISpaceObject avatar1 = space.getAvatar(actor1);
-			IAgentIdentifier actor2 = (IAgentIdentifier)entry2.parameters.get(ISpaceAction.ACTOR_ID);
+			IComponentIdentifier actor2 = (IComponentIdentifier)entry2.parameters.get(ISpaceAction.ACTOR_ID);
 			ISpaceObject avatar2 = space.getAvatar(actor2);
 
 			if(ret>0 && avatar1.getType().equals("hunter") && avatar2.getType().equals("prey")

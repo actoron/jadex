@@ -1,7 +1,7 @@
 package jadex.bdi.planlib.protocols;
 
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 
 import java.util.List;
@@ -47,7 +47,7 @@ public interface IQueryNextroundInfo
 		/**
 		 *  Create a nextround info object.
 		 */
-		public NextroundInfo(Object cfp, Object cfp_info, IAgentIdentifier[] participants)
+		public NextroundInfo(Object cfp, Object cfp_info, IComponentIdentifier[] participants)
 		{
 			this.cfp	= cfp;
 			this.cfp_info	= cfp_info;
@@ -96,16 +96,16 @@ public interface IQueryNextroundInfo
 		 *  Get the participants.
 		 *  @return Returns the participants.
 		 */
-		public IAgentIdentifier[]	getParticipants()
+		public IComponentIdentifier[]	getParticipants()
 		{
-			return (IAgentIdentifier[])participants.toArray(new IAgentIdentifier[participants.size()]);
+			return (IComponentIdentifier[])participants.toArray(new IComponentIdentifier[participants.size()]);
 		}
 
 		/**
 		 *  Add a participant.
 		 *  @param participant The participants to add.
 		 */
-		public void addParticipant(IAgentIdentifier participant)
+		public void addParticipant(IComponentIdentifier participant)
 		{
 			participants.add(participant);
 		}
@@ -114,7 +114,7 @@ public interface IQueryNextroundInfo
 		 *  Remove a participant.
 		 *  @param participant The participants to remove.
 		 */
-		public void removeParticipant(IAgentIdentifier participant)
+		public void removeParticipant(IComponentIdentifier participant)
 		{
 			participants.remove(participant);
 		}

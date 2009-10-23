@@ -1,6 +1,6 @@
 package jadex.adapter.standalone.transport;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
@@ -69,15 +69,15 @@ public class MessageEnvelope
 	/**
 	 * Get the receivers.
 	 */
-	public IAgentIdentifier[] getReceivers()
+	public IComponentIdentifier[] getReceivers()
 	{
-		return receivers==null? new IAgentIdentifier[0]: (IAgentIdentifier[])receivers.toArray(new IAgentIdentifier[receivers.size()]);
+		return receivers==null? new IComponentIdentifier[0]: (IComponentIdentifier[])receivers.toArray(new IComponentIdentifier[receivers.size()]);
 	}
 	
 	/**
 	 * Get the receivers.
 	 */
-	public void setReceivers(IAgentIdentifier[] receivers)
+	public void setReceivers(IComponentIdentifier[] receivers)
 	{
 //		this.receivers = receivers;
 		this.receivers = new ArrayList();
@@ -93,7 +93,7 @@ public class MessageEnvelope
 	/**
 	 *  Add a receiver.
 	 */
-	public void addReceiver(IAgentIdentifier receiver)
+	public void addReceiver(IComponentIdentifier receiver)
 	{
 		if(receivers==null)
 			receivers = new ArrayList();

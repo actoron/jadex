@@ -24,13 +24,13 @@ public interface ISpace
 	 *  is newly added to the context.
 	 *  @param aid	The id of the added agent.
 	 */
-	public void	agentAdded(IAgentIdentifier aid);
+	public void	agentAdded(IComponentIdentifier aid);
 
 	/**
 	 *  Called from application context, when an agent was removed.
 	 *  @param aid	The id of the removed agent.
 	 */
-	public void	agentRemoved(IAgentIdentifier aid);
+	public void	agentRemoved(IComponentIdentifier aid);
 	
 	/**
 	 *  Terminate the space.

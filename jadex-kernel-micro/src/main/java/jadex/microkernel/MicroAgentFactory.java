@@ -1,6 +1,6 @@
 package jadex.microkernel;
 
-import jadex.bridge.IAgentAdapter;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.ILoadableComponentModel;
@@ -76,7 +76,7 @@ public class MicroAgentFactory implements IComponentFactory
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 *  @return	An instance of a kernel agent.
 	 */
-	public IComponentInstance	createComponentInstance(IAgentAdapter adapter, String model, String config, Map arguments)
+	public IComponentInstance	createComponentInstance(IComponentAdapter adapter, String model, String config, Map arguments)
 	{
 		MicroAgentModel lm = (MicroAgentModel)loadModel(model);
 		return new MicroAgentInterpreter(adapter, lm, arguments, config);

@@ -7,7 +7,7 @@ import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.TimeoutException;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.collection.SCollection;
 
 import java.util.List;
@@ -47,7 +47,7 @@ public class EAReceiverPlan extends AbstractReceiverPlan
 		}
 		
 		// Offer the possibility to decide not to participate in the auction
-		Object[] tmp = decideParticipation(auctiondesc, (IAgentIdentifier)me.getParameter(SFipa.SENDER).getValue());
+		Object[] tmp = decideParticipation(auctiondesc, (IComponentIdentifier)me.getParameter(SFipa.SENDER).getValue());
 		boolean participate = ((Boolean)tmp[0]).booleanValue();
 		Object auctioninfo = tmp[1];
 		
@@ -149,7 +149,7 @@ public class EAReceiverPlan extends AbstractReceiverPlan
 	 *  @param auctiondesc The auction description.
 	 *  @return The participation state (Boolean) and the local auction info (Object).
 	 */
-	protected Object[] decideParticipation(AuctionDescription auctiondesc, IAgentIdentifier initiator)
+	protected Object[] decideParticipation(AuctionDescription auctiondesc, IComponentIdentifier initiator)
 	{
 		Object[] ret = new Object[2];
 		ret[0] = Boolean.TRUE; // participate

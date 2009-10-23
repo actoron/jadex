@@ -5,7 +5,7 @@ import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.ContentException;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IContentCodec;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageFailureException;
@@ -90,7 +90,7 @@ public class MessageService implements IMessageService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	public void sendMessage(Map message, MessageType type, IAgentIdentifier sender, ClassLoader cl)
+	public void sendMessage(Map message, MessageType type, IComponentIdentifier sender, ClassLoader cl)
 	{
 		if(sender==null)
 			throw new RuntimeException("Sender must not be null: "+message);
@@ -115,14 +115,14 @@ public class MessageService implements IMessageService
 				message.put(sd, ""+clock.getTime());
 		}
 		
-		IAgentIdentifier[] receivers = null;
+		IComponentIdentifier[] receivers = null;
 		Object tmp = message.get(type.getReceiverIdentifier());
 		if(tmp instanceof Collection)
-			receivers = (IAgentIdentifier[])((Collection)tmp).toArray(new IAgentIdentifier[0]);
+			receivers = (IComponentIdentifier[])((Collection)tmp).toArray(new IComponentIdentifier[0]);
 		else
-			receivers = (IAgentIdentifier[])tmp;
+			receivers = (IComponentIdentifier[])tmp;
 		
-		if(receivers==null || receivers==new IAgentIdentifier[0])
+		if(receivers==null || receivers==new IComponentIdentifier[0])
 		{
 			throw new RuntimeException("Receivers must not be empty: "+message);
 		}
@@ -152,7 +152,7 @@ public class MessageService implements IMessageService
 	 *  @param message The native message. 
 	 *  (Synchronized because can be called from concurrently executing transports)
 	 */
-	public synchronized void deliverMessage(Map message, String msgtype, IAgentIdentifier[] receivers)
+	public synchronized void deliverMessage(Map message, String msgtype, IComponentIdentifier[] receivers)
 	{	
 //		internalDeliverMessage(message);
 		delivermsg.addMessage(message, msgtype, receivers);
@@ -285,7 +285,7 @@ public class MessageService implements IMessageService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	protected void internalSendMessage(Map msg, String type, IAgentIdentifier[] receivers)
+	protected void internalSendMessage(Map msg, String type, IComponentIdentifier[] receivers)
 	{
 //		IAgentIdentifier[] receivers = message.getReceivers();
 		if(receivers.length == 0)
@@ -322,7 +322,7 @@ public class MessageService implements IMessageService
 	/**
 	 *  Deliver a message to the receivers.
 	 */
-	protected void internalDeliverMessage(final Map msg, final String type, final IAgentIdentifier[] receivers)
+	protected void internalDeliverMessage(final Map msg, final String type, final IComponentIdentifier[] receivers)
 	{
 		final MessageType	messagetype	= platform.getMessageType(type);
 		final Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
@@ -333,7 +333,7 @@ public class MessageService implements IMessageService
 			{
 				public void resultAvailable(Object result)
 				{
-					StandaloneAgentAdapter agent = (StandaloneAgentAdapter)result;
+					StandaloneComponentAdapter agent = (StandaloneComponentAdapter)result;
 					if(agent != null)
 					{
 						ClassLoader cl = agent.getKernelAgent().getClassLoader();
@@ -426,7 +426,7 @@ public class MessageService implements IMessageService
 			if(!messages.isEmpty())
 			{
 				Object[] tmp = (Object[])messages.remove(0);
-				internalSendMessage((Map)tmp[0], (String)tmp[1], (IAgentIdentifier[])tmp[2]);
+				internalSendMessage((Map)tmp[0], (String)tmp[1], (IComponentIdentifier[])tmp[2]);
 			}
 			return !messages.isEmpty();
 		}
@@ -435,7 +435,7 @@ public class MessageService implements IMessageService
 		 *  Add a message to be sent.
 		 *  @param message The message.
 		 */
-		public synchronized void addMessage(Map message, String type, IAgentIdentifier[] receivers)
+		public synchronized void addMessage(Map message, String type, IComponentIdentifier[] receivers)
 		{
 			messages.add(new Object[]{message, type, receivers});
 			((IExecutionService)platform.getService(IExecutionService.class)).execute(this);
@@ -472,7 +472,7 @@ public class MessageService implements IMessageService
 			if(!messages.isEmpty())
 			{
 				Object[] tmp = (Object[])messages.remove(0);
-				internalDeliverMessage((Map)tmp[0], (String)tmp[1], (IAgentIdentifier[])tmp[2]);
+				internalDeliverMessage((Map)tmp[0], (String)tmp[1], (IComponentIdentifier[])tmp[2]);
 			}
 			return !messages.isEmpty();
 		}
@@ -480,7 +480,7 @@ public class MessageService implements IMessageService
 		/**
 		 *  Add a message to be delivered.
 		 */
-		public synchronized void addMessage(Map message, String type, IAgentIdentifier[] receivers)
+		public synchronized void addMessage(Map message, String type, IComponentIdentifier[] receivers)
 		{
 			messages.add(new Object[]{message, type, receivers});
 			((IExecutionService)platform.getService(IExecutionService.class)).execute(this);

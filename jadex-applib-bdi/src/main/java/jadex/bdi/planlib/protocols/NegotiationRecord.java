@@ -1,7 +1,7 @@
 package jadex.bdi.planlib.protocols;
 
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 
 import java.text.SimpleDateFormat;
@@ -40,7 +40,7 @@ public class NegotiationRecord
 	 *  @param cfp_info The cfp info (local meta information).
 	 *  @param participants	The participants agent identifiers.
 	 */
-	public NegotiationRecord(Object cfp, Object cfp_info, IAgentIdentifier[] participants, long starttime)
+	public NegotiationRecord(Object cfp, Object cfp_info, IComponentIdentifier[] participants, long starttime)
 	{
 		this.cfp = cfp;
 		this.cfp_info = cfp_info;
@@ -138,9 +138,9 @@ public class NegotiationRecord
 	 *  Get all participants.
 	 *  @return The participants.
 	 */
-	public IAgentIdentifier[] getParticipants()
+	public IComponentIdentifier[] getParticipants()
 	{
-		IAgentIdentifier[]	participants	= new IAgentIdentifier[proposals.length];
+		IComponentIdentifier[]	participants	= new IComponentIdentifier[proposals.length];
 		for(int i=0; i<participants.length; i++)
 			participants[i]	= proposals[i].getParticipant();
 
@@ -153,7 +153,7 @@ public class NegotiationRecord
 	 *  @return The participant proposal.
 	 */
 	// Todo: allow an agent to participate more than once?
-	public ParticipantProposal getProposal(IAgentIdentifier participant)
+	public ParticipantProposal getProposal(IComponentIdentifier participant)
 	{
 		ParticipantProposal	ret	= null;
 		for(int i=0; i<proposals.length; i++)

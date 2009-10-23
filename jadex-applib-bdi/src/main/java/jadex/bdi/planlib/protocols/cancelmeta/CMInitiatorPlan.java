@@ -5,7 +5,7 @@ import jadex.bdi.planlib.protocols.InteractionState;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 
 import java.util.List;
@@ -59,7 +59,7 @@ public class CMInitiatorPlan extends Plan
 					String	response	= "cm_inform".equals(reply.getType()) ? InteractionState.CANCELLATION_SUCCEEDED
 						: "cm_failure".equals(reply.getType()) ? InteractionState.CANCELLATION_FAILED
 						: InteractionState.CANCELLATION_UNKNOWN;
-					state.addCancelResponse((IAgentIdentifier)reply.getParameter(SFipa.SENDER).getValue(),
+					state.addCancelResponse((IComponentIdentifier)reply.getParameter(SFipa.SENDER).getValue(),
 						response, reply.getParameter(SFipa.CONTENT).getValue());
 				}
 			}
@@ -71,7 +71,7 @@ public class CMInitiatorPlan extends Plan
 			{
 				for(int i=0; i<rec.size(); i++)
 				{
-					state.addCancelResponse((IAgentIdentifier)rec.get(i),
+					state.addCancelResponse((IComponentIdentifier)rec.get(i),
 						InteractionState.CANCELLATION_UNKNOWN, null);
 				}
 			}		

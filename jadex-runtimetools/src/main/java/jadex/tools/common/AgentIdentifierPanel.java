@@ -1,7 +1,7 @@
 package jadex.tools.common;
 
 import jadex.adapter.base.fipa.IAMS;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -27,7 +27,7 @@ public class AgentIdentifierPanel extends JPanel
 	protected IAMS	ams;
 	
 	/** The agent identifier.*/
-	protected IAgentIdentifier	aid;
+	protected IComponentIdentifier	aid;
 
 	/** The name textfield. */
 	protected JTextField	tfname; 
@@ -51,7 +51,7 @@ public class AgentIdentifierPanel extends JPanel
 	 *  Create a new agent identifier panel.
 	 *  @param aid	The agent identifier (or null for new).
 	 */
-	public AgentIdentifierPanel(IAgentIdentifier aid, IAMS ams)
+	public AgentIdentifierPanel(IComponentIdentifier aid, IAMS ams)
 	{
 		this.ams	= ams;
 		this.aid	= aid!=null ? aid : ams.createAgentIdentifier(null, false);
@@ -113,7 +113,7 @@ public class AgentIdentifierPanel extends JPanel
 	/**
 	 *  Get the agent identifier.
 	 */
-	public IAgentIdentifier	getAgentIdentifier()
+	public IComponentIdentifier	getAgentIdentifier()
 	{
 		return this.aid;
 	}
@@ -121,7 +121,7 @@ public class AgentIdentifierPanel extends JPanel
 	/**
 	 *  Set the agent identifier.
 	 */
-	public void setAgentIdentifier(IAgentIdentifier aid)
+	public void setAgentIdentifier(IComponentIdentifier aid)
 	{
 		this.aid	= aid!=null ? aid : ams.createAgentIdentifier(null, false);
 		taddresses.setEntries(this.aid.getAddresses());

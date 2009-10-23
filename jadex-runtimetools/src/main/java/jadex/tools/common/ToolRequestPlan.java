@@ -3,7 +3,7 @@ package jadex.tools.common;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.tools.ontology.ToolRequest;
 
 
@@ -21,7 +21,7 @@ public class ToolRequestPlan extends Plan
 	{
 		// Extract parameter values.
 		IToolPanel	tool	= (IToolPanel)getParameter("tool").getValue();
-		IAgentIdentifier	agent	= (IAgentIdentifier)getParameter("agent").getValue();
+		IComponentIdentifier	agent	= (IComponentIdentifier)getParameter("agent").getValue();
 		ToolRequest	request	= (ToolRequest)getParameter("request").getValue();
 
 		// Create request message.

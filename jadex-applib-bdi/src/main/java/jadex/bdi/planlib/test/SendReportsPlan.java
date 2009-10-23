@@ -3,7 +3,7 @@ package jadex.bdi.planlib.test;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Send the reports to a test service.
@@ -19,7 +19,7 @@ public class SendReportsPlan extends Plan
 		// Compose results in test case.
 		TestReport[]	reports	= (TestReport[])getBeliefbase().getBeliefSet("reports").getFacts();
 		int cnt = ((Integer)getBeliefbase().getBelief("testcase_cnt").getFact()).intValue();
-		IAgentIdentifier	testcenter	= (IAgentIdentifier)getBeliefbase().getBelief("testcenter").getFact();
+		IComponentIdentifier	testcenter	= (IComponentIdentifier)getBeliefbase().getBelief("testcenter").getFact();
 		Testcase	testcase	= new Testcase(cnt, reports);
 		
 		// Send reports to the test service.

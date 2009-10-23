@@ -11,8 +11,8 @@ import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.ContentException;
-import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IPlatform;
 import jadex.bridge.MessageFailureException;
@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  *  able to execute Jadex agents without any 3rd party
  *  agent platform.
  */
-public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializable
+public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serializable
 {
 	//-------- attributes --------
 
@@ -109,7 +109,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 //		this.platform = (IPlatform)args[0];
 		this.platform = Platform.getPlatform();
 		AMS ams = (AMS)platform.getService(IAMS.class);
-		ams.getAgentAdapterMap().put(getAgentIdentifier(), this);
+		ams.getAgentAdapterMap().put(getComponentIdentifier(), this);
 		
 		// Initialize the agent from model.
 		if(args[0] instanceof String)
@@ -216,7 +216,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 		assert !IAMSAgentDescription.STATE_INITIATED.equals(state) : this;
 		
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(getAgentIdentifier().getName());
+			throw new AgentTerminatedException(getComponentIdentifier().getName());
 		
 		// Resume execution of the agent (when active).
 		//System.out.println("wakeup called: "+state);
@@ -293,19 +293,19 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	 *  Return an agent-identifier that allows to send
 	 *  messages to this agent.
 	 */
-	public IAgentIdentifier getAgentIdentifier()
+	public IComponentIdentifier getComponentIdentifier()
 	{
-		return SJade.convertAIDtoFipa(getAID(), (IAMS)getPlatform().getService(IAMS.class));
+		return SJade.convertAIDtoFipa(getAID(), (IAMS)getServiceContainer().getService(IAMS.class));
 	}
 	
 	/**
 	 *  Get the platform.
 	 *  @return the platform of this agent
 	 */
-	public IPlatform	getPlatform()
+	public IPlatform	getServiceContainer()
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(getAgentIdentifier().getName());
+			throw new AgentTerminatedException(getComponentIdentifier().getName());
 
 		return platform;
 	}
@@ -317,7 +317,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	public IClockService getClock()
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(getAgentIdentifier().getName());
+			throw new AgentTerminatedException(getComponentIdentifier().getName());
 
 //		return platform.getClock();
 		return (IClockService)platform.getService(IClockService.class);
@@ -341,7 +341,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	 */
 	public String toString()
 	{
-		return "JadeAgentAdapter("+getAgentIdentifier().getName()+")";
+		return "JadeAgentAdapter("+getComponentIdentifier().getName()+")";
 	}
 
 	//-------- methods called by the standalone platform --------
@@ -352,7 +352,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	 */
 	public void killAgent()
 	{
-		SComponentExecutionService.destroyComponent(platform, getAgentIdentifier(), null);
+		SComponentExecutionService.destroyComponent(platform, getComponentIdentifier(), null);
 //		((IAMS)platform.getService(IAMS.class)).destroyAgent(getAgentIdentifier(), null);
 	}
 
@@ -365,12 +365,12 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	public void killAgent(IResultListener listener)
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(getAgentIdentifier().getName());
+			throw new AgentTerminatedException(getComponentIdentifier().getName());
 
 		if(!fatalerror)
 			agent.killComponent(listener);
 		else if(listener!=null)
-			listener.resultAvailable(getAgentIdentifier());
+			listener.resultAvailable(getComponentIdentifier());
 			
 	}
 
@@ -397,7 +397,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	public void	setState(String state)
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(this.state))
-			throw new AgentTerminatedException(getAgentIdentifier().getName());
+			throw new AgentTerminatedException(getComponentIdentifier().getName());
 
 		this.state	= state;
 	}
@@ -448,7 +448,7 @@ public class JadeAgentAdapter extends Agent implements IAgentAdapter, Serializab
 	public IComponentInstance	getKernelAgent()
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state) || fatalerror)
-			throw new AgentTerminatedException(getAgentIdentifier().getName());
+			throw new AgentTerminatedException(getComponentIdentifier().getName());
 
 		return agent;
 	}

@@ -4,7 +4,7 @@ import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.adapter.standalone.transport.MessageEnvelope;
 import jadex.adapter.standalone.transport.codecs.CodecFactory;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatform;
 import jadex.commons.SUtil;
@@ -233,11 +233,11 @@ public class TCPTransport implements ITransport
 	 *  @param message The message to send.
 	 *  (todo: On which thread this should be done?)
 	 */
-	public AgentIdentifier[] sendMessage(Map msg, String type, IAgentIdentifier[] receivers)
+	public AgentIdentifier[] sendMessage(Map msg, String type, IComponentIdentifier[] receivers)
 	{
 		// Fetch all receivers 
 //		IAgentIdentifier[] recstodel = message.getReceivers();
-		IAgentIdentifier[] recstodel = receivers;
+		IComponentIdentifier[] recstodel = receivers;
 		List undelivered = SUtil.arrayToList(recstodel);
 		
 		// Find receivers with same address and send only once for 

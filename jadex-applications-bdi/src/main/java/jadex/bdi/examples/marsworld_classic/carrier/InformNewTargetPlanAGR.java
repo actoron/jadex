@@ -6,7 +6,7 @@ import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.examples.marsworld_classic.Target;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContextService;
 import jadex.commons.SUtil;
@@ -47,7 +47,7 @@ public class InformNewTargetPlanAGR extends Plan
 		IApplicationContext ac = (IApplicationContext)cs.getContexts(getScope().getAgentIdentifier(), IApplicationContext.class)[0];
 		AGRSpace agrs = (AGRSpace)ac.getSpace("myagrspace");
 		Group group = agrs.getGroup("mymarsteam");
-		IAgentIdentifier[]	sentries	= group.getAgentsForRole("sentry");
+		IComponentIdentifier[]	sentries	= group.getAgentsForRole("sentry");
 		
 		IMessageEvent mevent = createMessageEvent("inform_target");
 		for(int i=0; i<sentries.length; i++)

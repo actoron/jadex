@@ -4,7 +4,7 @@ import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bridge.AgentTerminatedException;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 
@@ -75,9 +75,9 @@ public class FipaMessagePanel extends JPanel
 	protected JFormattedTextField	replyby;
 	protected JTextArea	content;
 
-	protected IAgentIdentifier	sender;
-	protected IAgentIdentifier	replyto;
-	protected IAgentIdentifier[]	receivers;
+	protected IComponentIdentifier	sender;
+	protected IComponentIdentifier	replyto;
+	protected IComponentIdentifier[]	receivers;
 	
 	protected IExternalAccess agent;
 	
@@ -298,7 +298,7 @@ public class FipaMessagePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				IAgentIdentifier	aid	= agentselector.selectAgent(sender);
+				IComponentIdentifier	aid	= agentselector.selectAgent(sender);
 				if(aid!=null)
 				{
 					sender	= aid;
@@ -319,7 +319,7 @@ public class FipaMessagePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				IAgentIdentifier	aid	= agentselector.selectAgent(replyto);
+				IComponentIdentifier	aid	= agentselector.selectAgent(replyto);
 				if(aid!=null)
 				{
 					replyto	= aid;
@@ -340,7 +340,7 @@ public class FipaMessagePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				IAgentIdentifier[]	aids	= agentselector.selectAgents(receivers);
+				IComponentIdentifier[]	aids	= agentselector.selectAgents(receivers);
 				if(aids!=null)
 				{
 					if(aids.length>0)
@@ -404,15 +404,15 @@ public class FipaMessagePanel extends JPanel
 		replyby.setCaretPosition(0);
 		
 		// Extract sender / replyto
-		sender	= (IAgentIdentifier)message.getParameter(SFipa.SENDER).getValue();
-		replyto	= (IAgentIdentifier)message.getParameter(SFipa.REPLY_TO).getValue();
+		sender	= (IComponentIdentifier)message.getParameter(SFipa.SENDER).getValue();
+		replyto	= (IComponentIdentifier)message.getParameter(SFipa.REPLY_TO).getValue();
 
 		// Extract receivers.
 		/*Object[] tmp = message.getParameterSet(SFipa.RECEIVERS).getValues();
 		receivers = new AgentIdentifier[tmp.length];
 		for(int i=0; i<receivers.length; i++)
 			receivers[i] = (AgentIdentifier)tmp[i];*/
-		receivers  = (IAgentIdentifier[])message.getParameterSet(SFipa.RECEIVERS).getValues();
+		receivers  = (IComponentIdentifier[])message.getParameterSet(SFipa.RECEIVERS).getValues();
 		if(receivers.length>0)
 		{
 			tfreceivers.setText(SUtil.arrayToString(receivers));

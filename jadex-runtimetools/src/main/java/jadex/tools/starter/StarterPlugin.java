@@ -5,7 +5,7 @@ import jadex.adapter.base.SComponentFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.bridge.IComponentListener;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
@@ -973,7 +973,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		{
 			public void resultAvailable(Object result)
 			{
-				final IAgentIdentifier aid = (IAgentIdentifier)result;
+				final IComponentIdentifier aid = (IComponentIdentifier)result;
 				SComponentExecutionService.startComponent(getJCC().getServiceContainer(), aid, new IResultListener()
 				{
 					public void resultAvailable(Object result)

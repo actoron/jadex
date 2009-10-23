@@ -1,6 +1,6 @@
 package jadex.adapter.base.envsupport.environment;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISpace;
 import jadex.commons.IPropertyObject;
 
@@ -20,5 +20,5 @@ public interface IPerceptProcessor extends IPropertyObject
 	 *  @param agent The agent identifier.
 	 *  @param agent The avatar of the agent (if any).
 	 */
-	public void processPercept(ISpace space, String type, Object percept, IAgentIdentifier agent, ISpaceObject avatar);
+	public void processPercept(ISpace space, String type, Object percept, IComponentIdentifier agent, ISpaceObject avatar);
 }

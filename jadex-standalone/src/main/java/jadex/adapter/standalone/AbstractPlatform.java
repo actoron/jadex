@@ -3,7 +3,7 @@ package jadex.adapter.standalone;
 import jadex.adapter.base.SComponentExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.MessageType;
@@ -137,7 +137,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 			{
 				public void resultAvailable(Object result)
 				{
-					IAgentIdentifier[] agents = (IAgentIdentifier[])result;
+					IComponentIdentifier[] agents = (IComponentIdentifier[])result;
 					for(int i = 0; i < agents.length; i++)
 					{
 						try

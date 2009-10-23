@@ -21,7 +21,7 @@ import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bridge.IAgentFactory;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IContext;

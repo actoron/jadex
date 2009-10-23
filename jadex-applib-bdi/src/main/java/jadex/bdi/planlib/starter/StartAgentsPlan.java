@@ -3,7 +3,7 @@ package jadex.bdi.planlib.starter;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Plan for starting some Jadex agents.
@@ -32,7 +32,7 @@ public class StartAgentsPlan extends Plan
 				SyncResultListener	listener	= new SyncResultListener();
 				IAMS	ams	= (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
 				ams.createAgent(startinfos[i].getName(), startinfos[i].getType(), startinfos[i].getConfiguration(), startinfos[i].getArguments(), listener, getAgentIdentifier());
-				IAgentIdentifier	aid	= (IAgentIdentifier)listener.waitForResult();
+				IComponentIdentifier	aid	= (IComponentIdentifier)listener.waitForResult();
 				listener	= new SyncResultListener();	// Hack!!! Allow reuse of result listener?
 				ams.startAgent(aid, listener);
 				listener.waitForResult();

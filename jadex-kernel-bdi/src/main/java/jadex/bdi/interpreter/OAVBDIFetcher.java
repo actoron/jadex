@@ -14,7 +14,7 @@ import jadex.bdi.runtime.impl.MessageEventFlyweight;
 import jadex.bdi.runtime.impl.PlanFlyweight;
 import jadex.bdi.runtime.impl.PlanbaseFlyweight;
 import jadex.bdi.runtime.impl.PropertybaseFlyweight;
-import jadex.bridge.IAgentAdapter;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.MessageType;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.rules.state.IOAVState;
@@ -32,7 +32,7 @@ public class OAVBDIFetcher extends SimpleValueFetcher
 	protected IOAVState state;
 	
 	/** The agent adapter. */
-	protected IAgentAdapter adapter;
+	protected IComponentAdapter adapter;
 	
 	/** The capability. */
 	protected Object rcapa;

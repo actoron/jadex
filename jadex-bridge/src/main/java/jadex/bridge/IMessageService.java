@@ -14,12 +14,12 @@ public interface IMessageService extends IService
 	 *  Send a message.
 	 *  @param cl The class loader used by the sending agent (i.e. corresponding to classes of objects in the message map).
 	 */
-	public void sendMessage(Map message, MessageType msgtype, IAgentIdentifier sender, ClassLoader cl);
+	public void sendMessage(Map message, MessageType msgtype, IComponentIdentifier sender, ClassLoader cl);
 	
 	/**
 	 *  Deliver a message to some agents.
 	 */
-	public void deliverMessage(Map message, String msgtype, IAgentIdentifier[] receivers);
+	public void deliverMessage(Map message, String msgtype, IComponentIdentifier[] receivers);
 	
 	/**
 	 *  Get addresses of all transports.

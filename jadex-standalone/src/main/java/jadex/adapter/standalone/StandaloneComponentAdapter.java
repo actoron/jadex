@@ -1,18 +1,18 @@
 package jadex.adapter.standalone;
 
-import jadex.adapter.base.SComponentExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.standalone.ams.AMS;
 import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
-import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
-import jadex.bridge.IPlatform;
 import jadex.bridge.MessageType;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 import jadex.service.execution.IExecutionService;
 
@@ -20,56 +20,44 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- *  Agent adapter for built-in standalone platform. 
+ *  Component adapter for built-in standalone platform. 
  *  This platform is built for simplicity and for being
- *  able to execute Jadex agents without any 3rd party
- *  agent platform.
+ *  able to execute Jadex components without any 3rd party
+ *  execution platform.
  */
-public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Serializable
+public class StandaloneComponentAdapter implements IComponentAdapter, IExecutable, Serializable
 {
 	//-------- attributes --------
 
-	/** The platform. */
-	protected transient IPlatform	platform;
+	/** The container. */
+	protected transient IServiceContainer	container;
 
-	/** The agent identifier. */
-	protected IAgentIdentifier	aid;
+	/** The component identifier. */
+	protected IComponentIdentifier	cid;
 
-	/** The kernel agent. */
+	/** The component instance. */
 	protected IComponentInstance component;
 
-	/** The state of the agent (according to FIPA, managed by AMS). */
+	/** The execution state of the component (managed by component execution service). */
 	protected String	state;
 	
-	/** Flag to indicate a fatal error (agent termination will not be passed to kernel) */
+	/** Flag to indicate a fatal error (component termination will not be passed to instance) */
 	protected boolean	fatalerror;
 	
 	//-------- constructors --------
 
 	/**
-	 *  Create a new StandaloneAgentAdapter.
-	 *  Uses the thread pool for executing the jadex agent.
-	 * /
-	public StandaloneAgentAdapter(IPlatform platform, IAgentIdentifier aid, String model, String state, Map args)
-	{
-		this.platform	= platform;
-		this.aid	= aid;
-		this.agent = SComponentFactory.createKernelAgent(platform, this, model, state, args);
-//		this.agent = platform.getAgentFactory().createKernelAgent(this, model, state, args);		
-	}*/
-	
-	/**
-	 *  Create a new StandaloneAgentAdapter.
-	 *  Uses the thread pool for executing the jadex agent.
+	 *  Create a new component adapter.
+	 *  Uses the thread pool for executing the component.
 	 */
-	public StandaloneAgentAdapter(IPlatform platform, IAgentIdentifier aid, IComponentInstance component)
+	public StandaloneComponentAdapter(IServiceContainer container, IComponentIdentifier aid, IComponentInstance component)
 	{
-		this.platform = platform;
-		this.aid = aid;
+		this.container = container;
+		this.cid = aid;
 		this.component = component;
 	}
 
-	//-------- IAgentAdapter methods --------
+	//-------- IComponentAdapter methods --------
 	
 	/**
 	 *  Called by the agent when it probably awoke from an idle state.
@@ -90,7 +78,7 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 //		assert !IAMSAgentDescription.STATE_INITIATED.equals(state) : this;
 		
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(aid.getName());
+			throw new AgentTerminatedException(cid.getName());
 		
 		if(IAMSAgentDescription.STATE_ACTIVE.equals(state))
 		{
@@ -100,7 +88,7 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 			//	|| AMSAgentDescription.STATE_TERMINATING.equals(state))
 			{
 	//			platform.getExecutorService().execute(this);
-				((IExecutionService)platform.getService(IExecutionService.class)).execute(this);
+				((IExecutionService)container.getService(IExecutionService.class)).execute(this);
 			}
 		}
 	}
@@ -152,27 +140,27 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	 *  messages to this agent.
 	 *  Return a copy of the original.
 	 */
-	public IAgentIdentifier getAgentIdentifier()
+	public IComponentIdentifier getComponentIdentifier()
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(aid.getName());
+			throw new AgentTerminatedException(cid.getName());
 
 		// todo: remove cast, HACK!!!
-		IAMS ams = (IAMS)platform.getService(IAMS.class);
-		return ((AMS)ams).refreshAgentIdentifier(aid);
+		IAMS ams = (IAMS)container.getService(IAMS.class);
+		return ((AMS)ams).refreshAgentIdentifier(cid);
 		//return (AgentIdentifier)aid.clone();
 	}
 	
 	/**
-	 *  Get the platform.
-	 *  @return the platform of this agent
+	 *  Get the container.
+	 *  @return The container of this component.
 	 */
-	public IPlatform	getPlatform()
+	public IServiceContainer	getServiceContainer()
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(aid.getName());
+			throw new AgentTerminatedException(cid.getName());
 
-		return platform;
+		return container;
 	}
 	
 	/**
@@ -182,10 +170,10 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	public IClockService getClock()
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(aid.getName());
+			throw new AgentTerminatedException(cid.getName());
 
 //		return platform.getClock();
-		return (IClockService)platform.getService(IClockService.class);
+		return (IClockService)container.getService(IClockService.class);
 	}
 	
 	// Hack!!!! todo: remove
@@ -206,7 +194,7 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	 */
 	public String toString()
 	{
-		return "StandaloneAgentAdapter("+aid.getName()+")";
+		return "StandaloneAgentAdapter("+cid.getName()+")";
 	}
 
 	//-------- methods called by the standalone platform --------
@@ -217,8 +205,7 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	 */
 	public void killAgent()
 	{
-		SComponentExecutionService.destroyComponent(platform, aid, null);
-//		((IAMS)platform.getService(IAMS.class)).destroyAgent(aid, null);
+		((IComponentExecutionService)container.getService(IComponentExecutionService.class)).destroyComponent(cid, null);
 	}
 
 	/**
@@ -230,12 +217,12 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	public void killAgent(IResultListener listener)
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(aid.getName());
+			throw new AgentTerminatedException(cid.getName());
 
 		if(!fatalerror)
 			component.killComponent(listener);
 		else if(listener!=null)
-			listener.resultAvailable(getAgentIdentifier());
+			listener.resultAvailable(getComponentIdentifier());
 			
 	}
 
@@ -245,7 +232,7 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	public void	receiveMessage(Map message, MessageType type)
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state) || fatalerror)
-			throw new AgentTerminatedException(aid.getName());
+			throw new AgentTerminatedException(cid.getName());
 
 		// Add optional receival time.
 //		String rd = type.getReceiveDateIdentifier();
@@ -262,7 +249,7 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	public void	setState(String state)
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(this.state))
-			throw new AgentTerminatedException(aid.getName());
+			throw new AgentTerminatedException(cid.getName());
 
 		this.state	= state;
 	}
@@ -284,7 +271,7 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	public boolean	execute()
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state) || fatalerror)
-			throw new AgentTerminatedException(aid.getName());
+			throw new AgentTerminatedException(cid.getName());
 
 		boolean	executed	= false;
 		try
@@ -298,11 +285,10 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 			fatalerror	= true;
 			e.printStackTrace();
 			//agent.getLogger().severe("Fatal error, agent '"+aid+"' will be removed.");
-			System.out.println("Fatal error, agent '"+aid+"' will be removed.");
+			System.out.println("Fatal error, agent '"+cid+"' will be removed.");
 				
 			// Remove agent from platform.
-			SComponentExecutionService.destroyComponent(platform, aid, null);
-//			((IAMS)platform.getService(IAMS.class)).destroyAgent(aid, null);				
+			killAgent();
 		}
 		
 		return executed;
@@ -316,7 +302,7 @@ public class StandaloneAgentAdapter implements IAgentAdapter, IExecutable, Seria
 	public IComponentInstance	getKernelAgent()
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state) || fatalerror)
-			throw new AgentTerminatedException(aid.getName());
+			throw new AgentTerminatedException(cid.getName());
 
 		return component;
 	}

@@ -9,7 +9,7 @@ import jadex.adapter.base.envsupport.environment.PerceptType;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Double;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.ISpace;
 import jadex.commons.SimplePropertyObject;
@@ -69,7 +69,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 	 *  @param agent The agent identifier.
 	 *  @param space The space.
 	 */
-	public void agentAdded(IAgentIdentifier agent, ISpace space)
+	public void agentAdded(IComponentIdentifier agent, ISpace space)
 	{
 	}
 	
@@ -78,7 +78,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 	 *  @param agent The agent identifier.
 	 *  @param space The space.
 	 */
-	public void agentRemoved(IAgentIdentifier agent, ISpace space)
+	public void agentRemoved(IComponentIdentifier agent, ISpace space)
 	{
 	}
 	
@@ -94,7 +94,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 		IVector1 maxrange = getDefaultRange();
 		
 		IVector2 pos = (IVector2)event.getSpaceObject().getProperty(Space2D.PROPERTY_POSITION);
-		IAgentIdentifier eventowner	= (IAgentIdentifier)event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);
+		IComponentIdentifier eventowner	= (IComponentIdentifier)event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);
 
 		if(EnvironmentEvent.OBJECT_PROPERTY_CHANGED.equals(event.getType()) && Space2D.PROPERTY_POSITION.equals(event.getProperty()))
 		{
@@ -106,7 +106,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 			for(int i=0; i<objects.length; i++)
 			{
 				IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION);
-				IAgentIdentifier owner = (IAgentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
+				IComponentIdentifier owner = (IComponentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 
 				// Create event for agent that is seen by moving agent.
 				if(owner!=null)
@@ -148,7 +148,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 			// Objects, which were previously seen, but are no longer in range.
 			for(int i=0; i<oldobjects.length; i++)
 			{
-				IAgentIdentifier owner = (IAgentIdentifier)oldobjects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
+				IComponentIdentifier owner = (IComponentIdentifier)oldobjects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 				IVector2 objpos = (IVector2)oldobjects[i].getProperty(Space2D.PROPERTY_POSITION);
 
 				if(owner!=null)
@@ -183,7 +183,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 				// Post appearance for object itself (if agent) as well as all agents in vision range
 				for(int i=0; i<objects.length; i++)
 				{
-					IAgentIdentifier owner = (IAgentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
+					IComponentIdentifier owner = (IComponentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 					IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION);
 					if(owner!=null)
 					{
@@ -216,7 +216,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 				// Post disappearance for all agents in vision range
 				for(int i=0; i<objects.length; i++)
 				{
-					IAgentIdentifier owner = (IAgentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
+					IComponentIdentifier owner = (IComponentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 					if(owner!=null)
 					{
 						IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION);

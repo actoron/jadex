@@ -7,7 +7,7 @@ import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.TimeoutException;
 import jadex.bdi.testcases.AbstractMultipleAgentsPlan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class WatchdogTestPlan extends AbstractMultipleAgentsPlan
 		List agents = createAgents("/jadex/bdi/testcases/planlib/PingReceiver.agent.xml", args);	
 
 		ObservationDescription desc = new ObservationDescription();
-		desc.setAgentIdentifier((IAgentIdentifier)agents.get(0));
+		desc.setAgentIdentifier((IComponentIdentifier)agents.get(0));
 		desc.setContacts(new ContactData[]{new ContactData("Admin", "braubach@gmx.net", null, null)});
 		desc.setPingDelay(500);
 		

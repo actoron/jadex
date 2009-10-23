@@ -370,7 +370,7 @@ public class MessageEventRules
 				Object ragent = assignments.getVariableValue("?ragent");
 				Object rawmsg = assignments.getVariableValue("?rawmsg");
 
-				String agentname = BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName();
+				String agentname = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName();
 				AgentRules.getLogger(state, ragent).severe("Agent has received msg and has found no template: "+agentname+" "+rawmsg);
 			
 				state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_inbox, rawmsg);
@@ -491,7 +491,7 @@ public class MessageEventRules
 			{
 				Object ragent = assignments.getVariableValue("?ragent");
 				IMessageAdapter message = (IMessageAdapter)assignments.getVariableValue("?msg");
-				String agentname = BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName();
+				String agentname = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName();
 //				System.out.println("Agent has received msg: "+agentname+" "+message);
 				
 				// Find the event to which the message is a reply (if any).
@@ -707,9 +707,9 @@ public class MessageEventRules
 				IMessageAdapter msg = new DefaultMessageAdapter(message, mtype);
 				
 				BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
-				((IMessageService)interpreter.getAgentAdapter().getPlatform()
+				((IMessageService)interpreter.getAgentAdapter().getServiceContainer()
 					.getService(IMessageService.class)).sendMessage(msg.getParameterMap(),
-						msg.getMessageType(), interpreter.getAgentAdapter().getAgentIdentifier(), interpreter.getModel().getTypeModel().getClassLoader());
+						msg.getMessageType(), interpreter.getAgentAdapter().getComponentIdentifier(), interpreter.getModel().getTypeModel().getClassLoader());
 
 				state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_outbox, rme);
 				
@@ -1309,7 +1309,7 @@ public class MessageEventRules
 	{
 		String	mtype	= (String)state.getAttributeValue(mme, OAVBDIMetaModel.messageevent_has_type);
 		BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
-		MessageType ret	= bdii.getAgentAdapter().getPlatform().getMessageType(mtype);
+		MessageType ret	= bdii.getAgentAdapter().getServiceContainer().getMessageType(mtype);
 		return ret;
 	}
 }

@@ -11,8 +11,8 @@ import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
-import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
@@ -33,7 +33,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	protected Object agent;
 	
 	/** The agent adapter. */
-	protected IAgentAdapter adapter;
+	protected IComponentAdapter adapter;
 	
 	//-------- constructors --------
 	
@@ -247,7 +247,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public String getAgentName()
 	{
-		return adapter.getAgentIdentifier().getLocalName();
+		return adapter.getComponentIdentifier().getLocalName();
 	}
 
 	/**
@@ -263,7 +263,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 * Get the agent identifier.
 	 * @return The agent identifier.
 	 */
-	public IAgentIdentifier	getAgentIdentifier()
+	public IComponentIdentifier	getAgentIdentifier()
 	{
 		if(getInterpreter().isExternalThread())
 		{
@@ -271,14 +271,14 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					object = adapter.getAgentIdentifier();
+					object = adapter.getComponentIdentifier();
 				}
 			};
-			return (IAgentIdentifier)invoc.object;
+			return (IComponentIdentifier)invoc.object;
 		}
 		else
 		{
-			return adapter.getAgentIdentifier();
+			return adapter.getComponentIdentifier();
 		}
 	}
 
@@ -286,7 +286,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 *  Get the adapter agent.
 	 *  @return The adapter agent.
 	 */
-	public IAgentAdapter	getAgentAdapter()
+	public IComponentAdapter	getAgentAdapter()
 	{
 		return adapter;
 	}
@@ -307,7 +307,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IPlatform	getPlatform()
 	{
-		return adapter.getPlatform();
+		return adapter.getServiceContainer();
 	}
 	
 	/**
@@ -323,7 +323,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	{
 		// changed *.class to *.TYPE due to javaflow bug
 		//		return ((IClockService)getAgentAdapter().getPlatform().getService(IClockService.class)).getTime();
-		return ((IClockService)getAgentAdapter().getPlatform().getService(IClockService.TYPE)).getTime();
+		return ((IClockService)getAgentAdapter().getServiceContainer().getService(IClockService.TYPE)).getTime();
 	}
 
 	/**
@@ -426,7 +426,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					IContextService cs = (IContextService)adapter.getPlatform().getService(IContextService.class);
+					IContextService cs = (IContextService)adapter.getServiceContainer().getService(IContextService.class);
 					if(cs!=null)
 					{
 						IContext[] tmp = cs.getContexts(getAgentIdentifier(), IApplicationContext.class);
@@ -440,7 +440,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		else
 		{
 			IApplicationContext ret = null;
-			IContextService cs = (IContextService)adapter.getPlatform().getService(IContextService.class);
+			IContextService cs = (IContextService)adapter.getServiceContainer().getService(IContextService.class);
 			if(cs!=null)
 			{
 				IContext[] tmp = cs.getContexts(getAgentIdentifier(), IApplicationContext.class);

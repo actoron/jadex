@@ -1,6 +1,6 @@
 package jadex.adapter.base.envsupport.environment;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IFilter;
 
 import java.util.Comparator;
@@ -46,7 +46,7 @@ public class PerceptList
 	 *  @param avatar	The avatar of the agent (if any).
 	 *  @param processor	The percept processor.
 	 */
-	public void schedulePercept(String type, Object data, IAgentIdentifier agent, ISpaceObject avatar, IPerceptProcessor processor)
+	public void schedulePercept(String type, Object data, IComponentIdentifier agent, ISpaceObject avatar, IPerceptProcessor processor)
 	{
 		if(percepts==null)
 			percepts	= new LinkedHashSet();
@@ -122,7 +122,7 @@ public class PerceptList
 		public Object	data;
 		
 		/** The receiving agent. */
-		public IAgentIdentifier	agent;
+		public IComponentIdentifier	agent;
 		
 		/** The avatar of the agent (if any). */
 		public ISpaceObject	avatar;
@@ -135,7 +135,7 @@ public class PerceptList
 		/**
 		 *  Convenience constructor for inline entry creation.
 		 */
-		public PerceptEntry(String type, Object data, IAgentIdentifier agent, ISpaceObject avatar, IPerceptProcessor processor)
+		public PerceptEntry(String type, Object data, IComponentIdentifier agent, ISpaceObject avatar, IPerceptProcessor processor)
 		{
 			this.type	= type;
 			this.data	= data;

@@ -6,7 +6,7 @@ import jadex.bdi.planlib.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.testcases.AbstractMultipleAgentsPlan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 
@@ -49,7 +49,7 @@ public class EATestPlan extends AbstractMultipleAgentsPlan
 			try
 			{
 				IGoal ea = createGoal("eacap.ea_initiate");
-				ea.getParameterSet("receivers").addValues(agents.toArray(new IAgentIdentifier[agents.size()]));
+				ea.getParameterSet("receivers").addValues(agents.toArray(new IComponentIdentifier[agents.size()]));
 				ea.getParameter("cfp").setValue(new Double(110));
 				ea.getParameter("auction_description").setValue(new AuctionDescription(getTime()+1000,
 					roundtimeout, "Test auction 1"));
@@ -81,7 +81,7 @@ public class EATestPlan extends AbstractMultipleAgentsPlan
 			try
 			{
 				IGoal ea = createGoal("eacap.ea_initiate");
-				ea.getParameterSet("receivers").addValues(agents.toArray(new IAgentIdentifier[agents.size()]));
+				ea.getParameterSet("receivers").addValues(agents.toArray(new IComponentIdentifier[agents.size()]));
 					
 				ExponentialPriceCalculator pc = new ExponentialPriceCalculator(100, 10000, 1.1);
 			

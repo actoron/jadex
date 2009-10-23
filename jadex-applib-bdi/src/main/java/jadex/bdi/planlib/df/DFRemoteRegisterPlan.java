@@ -7,7 +7,7 @@ import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.Date;
 
@@ -30,7 +30,7 @@ public class DFRemoteRegisterPlan extends Plan
 		if(desc.getName()==null || lt!=null)
 		{
 			IDF	dfservice	= (IDF)getScope().getPlatform().getService(IDF.class, SFipa.DF_SERVICE);
-			IAgentIdentifier	bid	= desc.getName()!=null ? desc.getName() : getScope().getAgentIdentifier();
+			IComponentIdentifier	bid	= desc.getName()!=null ? desc.getName() : getScope().getAgentIdentifier();
 			Date	leasetime	= lt==null ? desc.getLeaseTime() : new Date(getTime()+lt.longValue());
 			desc	= dfservice.createDFAgentDescription(bid, desc.getServices(), desc.getLanguages(), desc.getOntologies(), desc.getProtocols(), leasetime);
 		}

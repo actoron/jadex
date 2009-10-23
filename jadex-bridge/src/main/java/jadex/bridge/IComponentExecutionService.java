@@ -22,25 +22,25 @@ public interface IComponentExecutionService
 	 *  Start a previously created component on the platform.
 	 *  @param componentid The id of the previously created component.
 	 */
-	public void	startComponent(Object componentid, IResultListener listener);
+	public void	startComponent(IComponentIdentifier componentid, IResultListener listener);
 	
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.
 	 *  @param componentid	The component to destroy.
 	 */
-	public void destroyComponent(Object componentid, IResultListener listener);
+	public void destroyComponent(IComponentIdentifier componentid, IResultListener listener);
 
 	/**
 	 *  Suspend the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public void suspendComponent(Object componentid, IResultListener listener);
+	public void suspendComponent(IComponentIdentifier componentid, IResultListener listener);
 	
 	/**
 	 *  Resume the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public void resumeComponent(Object componentid, IResultListener listener);
+	public void resumeComponent(IComponentIdentifier componentid, IResultListener listener);
 	
 	//-------- listener methods --------
 	

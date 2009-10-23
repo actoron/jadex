@@ -1,6 +1,6 @@
 package jadex.bdi.interpreter;
 
-import jadex.bridge.IAgentAdapter;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.ILoadableComponentModel;
@@ -122,13 +122,13 @@ public class BDIAgentFactory
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 *  @return	An instance of a kernel agent.
 	 */
-	public IComponentInstance	createKernelAgent(IAgentAdapter adapter, String model, String config, Map arguments)
+	public IComponentInstance	createKernelAgent(IComponentAdapter adapter, String model, String config, Map arguments)
 	{
 		init();
 		
 		OAVAgentModel	loaded 	= (OAVAgentModel)loadModel(model);
 		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
-		OAVTypeModel	tmodel	= new OAVTypeModel(adapter.getAgentIdentifier().getLocalName()+"_typemodel", loaded.getTypeModel().getClassLoader());
+		OAVTypeModel	tmodel	= new OAVTypeModel(adapter.getComponentIdentifier().getLocalName()+"_typemodel", loaded.getTypeModel().getClassLoader());
 		tmodel.addTypeModel(loaded.getTypeModel());
 		tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
 		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 

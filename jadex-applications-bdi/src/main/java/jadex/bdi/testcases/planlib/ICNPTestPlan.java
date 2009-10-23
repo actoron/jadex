@@ -10,7 +10,7 @@ import jadex.bdi.planlib.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.testcases.AbstractMultipleAgentsPlan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 
 import java.util.HashMap;
@@ -75,7 +75,7 @@ public class ICNPTestPlan extends AbstractMultipleAgentsPlan
 			try
 			{
 				IGoal cnpini = createGoal("cnpcap.icnp_initiate");
-				cnpini.getParameterSet("receivers").addValues(agents.toArray(new IAgentIdentifier[agents.size()]));
+				cnpini.getParameterSet("receivers").addValues(agents.toArray(new IComponentIdentifier[agents.size()]));
 				cnpini.getParameter("cfp").setValue("CFP for a task.");
 				cnpini.getParameter("cfp_info").setValue(cfp_info);
 				cnpini.getParameter("executeall").setValue(new Boolean(executeall));

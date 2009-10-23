@@ -1,7 +1,7 @@
 package jadex.microkernel;
 
-import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
@@ -102,7 +102,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  Get the agent adapter.
 	 *  @return The agent adapter.
 	 */
-	public IAgentAdapter getAgentAdapter()
+	public IComponentAdapter getAgentAdapter()
 	{
 		return interpreter.getAgentAdapter();
 	}
@@ -113,7 +113,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public IPlatform getPlatform()
 	{
-		return interpreter.getAgentAdapter().getPlatform();
+		return interpreter.getAgentAdapter().getServiceContainer();
 	}
 	
 	/**
@@ -273,9 +273,9 @@ public abstract class MicroAgent implements IMicroAgent
 	 * Get the agent identifier.
 	 * @return The agent identifier.
 	 */
-	public IAgentIdentifier	getAgentIdentifier()
+	public IComponentIdentifier	getAgentIdentifier()
 	{
-		return interpreter.getAgentAdapter().getAgentIdentifier();
+		return interpreter.getAgentAdapter().getComponentIdentifier();
 	}
 	
 	/**

@@ -70,7 +70,7 @@ public class InterpreterTimedObject implements ITimedObject
 		String	name	= null;
 		BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
 		if(bdii!=null)
-			name	= bdii.getAgentAdapter().getAgentIdentifier().getLocalName();
+			name	= bdii.getAgentAdapter().getComponentIdentifier().getLocalName();
 		return name + ": " + action; 
 	}
 }

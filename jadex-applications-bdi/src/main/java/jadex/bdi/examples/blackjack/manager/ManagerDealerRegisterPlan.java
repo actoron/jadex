@@ -1,7 +1,7 @@
 package jadex.bdi.examples.blackjack.manager;
 
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Register at dealer, when dealer belief has changed.
@@ -13,7 +13,7 @@ public class ManagerDealerRegisterPlan extends Plan
 	 */
 	public void body()
 	{		
-		final IAgentIdentifier dealerAID = (IAgentIdentifier)getBeliefbase().getBelief("localDealerAID").getFact();
+		final IComponentIdentifier dealerAID = (IComponentIdentifier)getBeliefbase().getBelief("localDealerAID").getFact();
 //		final ManagerFrame	gui	= (ManagerFrame)getBeliefbase().getBelief("gui").getFact();
 		getLogger().info("Dealer-AID has changed " + dealerAID);
 		

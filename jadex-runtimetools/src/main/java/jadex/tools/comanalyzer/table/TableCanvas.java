@@ -1,6 +1,6 @@
 package jadex.tools.comanalyzer.table;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.jtable.ResizeableTableHeader;
 import jadex.commons.jtable.TableSorter;
@@ -67,9 +67,9 @@ public class TableCanvas extends ToolCanvas
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.setBackground(UIManager.getColor("List.background"));
 		table.setPreferredScrollableViewportSize(new Dimension(800, 70));
-		table.setDefaultRenderer(IAgentIdentifier.class, new AgentIdentifierRenderer());
+		table.setDefaultRenderer(IComponentIdentifier.class, new AgentIdentifierRenderer());
 		// setDefaultRenderer(Object.class, new ContentRenderer());
-		table.setDefaultRenderer(IAgentIdentifier[].class, new AgentIdentifiersRenderer());
+		table.setDefaultRenderer(IComponentIdentifier[].class, new AgentIdentifiersRenderer());
 		table.setDefaultRenderer(Date.class, new DateTimeRenderer());
 		table.addMouseListener(new TableMouseListener(table));
 

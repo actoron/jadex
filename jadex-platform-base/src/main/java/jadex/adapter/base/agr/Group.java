@@ -1,6 +1,6 @@
 package jadex.adapter.base.agr;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -108,7 +108,7 @@ public class Group
 	 *  @param aid	The agent id.
 	 *  @param rolename	The role name.
 	 */
-	public synchronized void	assignRole(IAgentIdentifier aid, String rolename)
+	public synchronized void	assignRole(IComponentIdentifier aid, String rolename)
 	{
 		if(positions==null)
 			positions	= new HashMap();
@@ -129,7 +129,7 @@ public class Group
 	 *  @param aid	The agent id.
 	 *  @param rolename	The role name.
 	 */
-	public synchronized void	unassignRole(IAgentIdentifier aid, String rolename)
+	public synchronized void	unassignRole(IComponentIdentifier aid, String rolename)
 	{
 		if(positions!=null)
 		{
@@ -152,9 +152,9 @@ public class Group
 	 *  Get the agents with a given role.
 	 *  @param rolename	The role name.
 	 */
-	public synchronized IAgentIdentifier[]	getAgentsForRole(String rolename)
+	public synchronized IComponentIdentifier[]	getAgentsForRole(String rolename)
 	{
 		Set	ret	= positions!=null ? (Set)positions.get(rolename) : null;
-		return ret!=null ? (IAgentIdentifier[])ret.toArray(new IAgentIdentifier[ret.size()]) : null;
+		return ret!=null ? (IComponentIdentifier[])ret.toArray(new IComponentIdentifier[ret.size()]) : null;
 	}
 }

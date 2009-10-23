@@ -3,7 +3,7 @@ package jadex.tools.dfbrowser;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.adapter.base.fipa.IProperty;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -90,7 +90,7 @@ public class ServiceDescriptionPanel extends JPanel
 		
 		if(ad!=null)
 		{
-			String[] addrs = ((IAgentIdentifier)ad.getName()).getAddresses(); // Hack!!!
+			String[] addrs = ((IComponentIdentifier)ad.getName()).getAddresses(); // Hack!!!
 			String tooltip = "<html>" + ad.getName().getName();
 			for(int addr = 0; addr < addrs.length; addr++)
 				tooltip += "<br>" + addrs[addr];

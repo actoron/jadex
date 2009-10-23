@@ -3,7 +3,7 @@ package jadex.bdi.benchmarks;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Send a specified amount of messages.
@@ -18,7 +18,7 @@ public class MessageSenderPlan	extends Plan
 	public void body()
 	{
 		int msgcnt = ((Integer)getBeliefbase().getBelief("msg_cnt").getFact()).intValue();
-		IAgentIdentifier receiver = (IAgentIdentifier)getBeliefbase().getBelief("receiver").getFact();
+		IComponentIdentifier receiver = (IComponentIdentifier)getBeliefbase().getBelief("receiver").getFact();
 		
 		System.out.println("Now sending " + msgcnt + " messages to " + receiver);
 		

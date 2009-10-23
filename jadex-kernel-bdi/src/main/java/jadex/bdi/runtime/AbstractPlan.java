@@ -24,7 +24,7 @@ import jadex.bdi.runtime.impl.PlanFlyweight;
 import jadex.bdi.runtime.impl.PlanbaseFlyweight;
 import jadex.bdi.runtime.impl.PropertybaseFlyweight;
 import jadex.bdi.runtime.impl.WaitqueueFlyweight;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
 import jadex.javaparser.IExpressionParser;
@@ -399,9 +399,9 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 * Get the agent identifier.
 	 * @return The agent identifier.
 	 */
-	public IAgentIdentifier	getAgentIdentifier()
+	public IComponentIdentifier	getAgentIdentifier()
 	{
-		return interpreter.getAgentAdapter().getAgentIdentifier();
+		return interpreter.getAgentAdapter().getComponentIdentifier();
 	}
 
 	/**
@@ -500,7 +500,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public IClockService getClock()
 	{
-		return (IClockService)interpreter.getAgentAdapter().getPlatform().getService(IClockService.class);
+		return (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
 	}
 
 	/**

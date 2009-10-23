@@ -1,6 +1,6 @@
 package jadex.adapter.standalone.fipaimpl;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 
 import java.io.Serializable;
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * An agent identifier (AID), see FIPASC00023.
  */
-public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializable
+public class AgentIdentifier implements IComponentIdentifier, Cloneable, Serializable
 {
 	//-------- attributes ----------
 
@@ -60,7 +60,7 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 *  @param addresses A list of transport addresses.
 	 *  @param resolvers A list of resolvers, which may provide additional transport adresses.
 	 */
-	public AgentIdentifier(String name, String[] addresses, IAgentIdentifier[] resolvers)
+	public AgentIdentifier(String name, String[] addresses, IComponentIdentifier[] resolvers)
 	{
 		this.name = name;
 
@@ -224,7 +224,7 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 *  Add a resolver to this AgentIdentifier.
 	 *  @param resolver a value to be removed
 	 */
-	public void addResolver(IAgentIdentifier resolver)
+	public void addResolver(IComponentIdentifier resolver)
 	{
 		if(resolvers==null)
 			this.resolvers = new ArrayList();
@@ -236,7 +236,7 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	 *  @param resolver a value to be removed
 	 *  @return  True when the resolvers have changed.
 	 */
-	public boolean removeResolver(IAgentIdentifier resolver)
+	public boolean removeResolver(IComponentIdentifier resolver)
 	{
 		if(resolvers==null)
 			return this.resolvers.remove(resolver);
@@ -312,8 +312,8 @@ public class AgentIdentifier implements IAgentIdentifier, Cloneable, Serializabl
 	public boolean equals(Object obj)
 	{
 		return this==obj
-			|| obj instanceof IAgentIdentifier
-				&& SUtil.equals(name, ((IAgentIdentifier)obj).getName());
+			|| obj instanceof IComponentIdentifier
+				&& SUtil.equals(name, ((IComponentIdentifier)obj).getName());
 	}
 	
 	/**

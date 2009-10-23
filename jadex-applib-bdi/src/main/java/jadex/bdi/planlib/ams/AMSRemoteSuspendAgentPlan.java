@@ -4,7 +4,7 @@ import jadex.adapter.base.fipa.AMSSuspendAgent;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Suspend an agent on a remote ams.
@@ -18,7 +18,7 @@ public class AMSRemoteSuspendAgentPlan extends Plan
 	public void body()
 	{
 		AMSSuspendAgent sa = new AMSSuspendAgent();
-		sa.setAgentIdentifier((IAgentIdentifier)getParameter("agentidentifier").getValue());
+		sa.setAgentIdentifier((IComponentIdentifier)getParameter("agentidentifier").getValue());
 
 		IGoal req = createGoal("rp_initiate");
 		req.getParameter("receiver").setValue(getParameter("ams").getValue());

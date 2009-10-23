@@ -1,7 +1,7 @@
 package jadex.adapter.jade.fipaimpl;
 
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.io.Serializable;
 
@@ -18,7 +18,7 @@ public class AMSAgentDescription implements IAMSAgentDescription, Cloneable, Ser
 	protected String state;
 
 	/** Attribute for slot agentidentifier. */
-	protected IAgentIdentifier name;
+	protected IComponentIdentifier name;
 
 	/** Attribute for slot ownership. */
 	protected String ownership;
@@ -35,7 +35,7 @@ public class AMSAgentDescription implements IAMSAgentDescription, Cloneable, Ser
 	/**
 	 *  Create a new AMSAgentDescription.
 	 */
-	public AMSAgentDescription(IAgentIdentifier aid)
+	public AMSAgentDescription(IComponentIdentifier aid)
 	{
 		this();
 		setName(aid);
@@ -66,7 +66,7 @@ public class AMSAgentDescription implements IAMSAgentDescription, Cloneable, Ser
 	 *  Get the agentidentifier of this AMSAgentDescription.
 	 * @return agentidentifier
 	 */
-	public IAgentIdentifier getName()
+	public IComponentIdentifier getName()
 	{
 		return this.name;
 	}
@@ -75,7 +75,7 @@ public class AMSAgentDescription implements IAMSAgentDescription, Cloneable, Ser
 	 *  Set the agentidentifier of this AMSAgentDescription.
 	 * @param name the value to be set
 	 */
-	public void setName(IAgentIdentifier name)
+	public void setName(IComponentIdentifier name)
 	{
 		this.name = name;
 	}

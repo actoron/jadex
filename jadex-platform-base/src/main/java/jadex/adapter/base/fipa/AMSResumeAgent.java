@@ -1,6 +1,6 @@
 package jadex.adapter.base.fipa;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 
 /**
@@ -11,7 +11,7 @@ public class AMSResumeAgent implements IAgentAction
 	//-------- attributes ----------
 
 	/** Attribute for slot agentidentifier. */
-	protected IAgentIdentifier agentidentifier;
+	protected IComponentIdentifier agentidentifier;
 
 	//-------- constructors --------
 
@@ -26,7 +26,7 @@ public class AMSResumeAgent implements IAgentAction
 	/**
 	 *  Create a new <code>AMSSuspendAgent</code>.
 	 */
-	public AMSResumeAgent(IAgentIdentifier agentidentifier)
+	public AMSResumeAgent(IComponentIdentifier agentidentifier)
 	{
 		this.agentidentifier	= agentidentifier;
 	}
@@ -37,7 +37,7 @@ public class AMSResumeAgent implements IAgentAction
 	 *  Get the agentidentifier of this AMSResumeAgent.
 	 * @return agentidentifier
 	 */
-	public IAgentIdentifier getAgentIdentifier()
+	public IComponentIdentifier getAgentIdentifier()
 	{
 		return this.agentidentifier;
 	}
@@ -46,7 +46,7 @@ public class AMSResumeAgent implements IAgentAction
 	 *  Set the agentidentifier of this AMSResumeAgent.
 	 * @param agentidentifier the value to be set
 	 */
-	public void setAgentIdentifier(IAgentIdentifier agentidentifier)
+	public void setAgentIdentifier(IComponentIdentifier agentidentifier)
 	{
 		this.agentidentifier = agentidentifier;
 	}

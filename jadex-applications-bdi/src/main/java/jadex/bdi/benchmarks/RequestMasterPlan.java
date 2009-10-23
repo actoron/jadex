@@ -2,7 +2,7 @@ package jadex.bdi.benchmarks;
 
 import jadex.adapter.base.fipa.IAMS;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +22,7 @@ public class RequestMasterPlan extends Plan
 		IAMS	ams	= (IAMS) getScope().getPlatform().getService(IAMS.class);
 		SyncResultListener	srl	= new SyncResultListener();
 		ams.createAgent(null, "jadex/bdi/benchmarks/RequestPerformance.agent.xml", "default", args, srl, getAgentIdentifier());
-		IAgentIdentifier	slave	= (IAgentIdentifier)srl.waitForResult();
+		IComponentIdentifier	slave	= (IComponentIdentifier)srl.waitForResult();
 		ams.startAgent(slave, null);
 	}	
 }

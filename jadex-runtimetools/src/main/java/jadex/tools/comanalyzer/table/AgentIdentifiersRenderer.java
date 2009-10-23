@@ -1,6 +1,6 @@
 package jadex.tools.comanalyzer.table;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SReflect;
 
 import java.awt.Component;
@@ -25,7 +25,7 @@ class AgentIdentifiersRenderer extends DefaultTableCellRenderer
 		super.getTableCellRendererComponent(table, null, isSelected, hasFocus, row, column);
 		Iterator it = SReflect.getIterator(value);
 
-		IAgentIdentifier aid = (IAgentIdentifier)it.next();
+		IComponentIdentifier aid = (IComponentIdentifier)it.next();
 		String content = aid.getName();
 		String tooltip = "<b>" + aid.getName() + "</b>";
 		String[] addresses = aid.getAddresses();
@@ -36,7 +36,7 @@ class AgentIdentifiersRenderer extends DefaultTableCellRenderer
 		
 		while(it.hasNext())
 		{
-			aid = (IAgentIdentifier)it.next();
+			aid = (IComponentIdentifier)it.next();
 			content += ", " + aid.getName();
 			tooltip += "<br><b>" + aid.getName() + "</b>";
 			addresses = aid.getAddresses();

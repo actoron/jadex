@@ -5,7 +5,7 @@ import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.collection.SCollection;
 
 import java.util.Map;
@@ -29,7 +29,7 @@ public class ArgumentsPlan extends Plan
 			args.put("creator", getAgentIdentifier());
 			ca.getParameter("arguments").setValue(args);
 			dispatchSubgoalAndWait(ca);
-			IAgentIdentifier worker = (IAgentIdentifier)ca.getParameter("agentidentifier").getValue();
+			IComponentIdentifier worker = (IComponentIdentifier)ca.getParameter("agentidentifier").getValue();
 			waitForMessageEvent("inform_created", 1000);
 			tr.setSucceeded(true);
 		}

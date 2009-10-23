@@ -1,7 +1,7 @@
 package jadex.bdi.planlib.protocols;
 
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -105,7 +105,7 @@ public class InteractionState
 	/**
 	 *  Add a cancel response.
 	 */
-	public void	addCancelResponse(IAgentIdentifier responder, String response, Object content)
+	public void	addCancelResponse(IComponentIdentifier responder, String response, Object content)
 	{
 		if(cancel_responses==null)
 		{
@@ -121,9 +121,9 @@ public class InteractionState
 	/**
 	 *  Get all agents with a specific cancel response.
 	 */
-	public IAgentIdentifier[]	getCancelResponders(String response)
+	public IComponentIdentifier[]	getCancelResponders(String response)
 	{
-		IAgentIdentifier[]	ret;
+		IComponentIdentifier[]	ret;
 		if(cancel_responses!=null)
 		{
 			List	list	= new ArrayList();
@@ -135,11 +135,11 @@ public class InteractionState
 					list.add(agent);
 				}
 			}
-			ret	= (IAgentIdentifier[])list.toArray(new IAgentIdentifier[list.size()]);
+			ret	= (IComponentIdentifier[])list.toArray(new IComponentIdentifier[list.size()]);
 		}
 		else
 		{
-			ret	= new IAgentIdentifier[0];
+			ret	= new IComponentIdentifier[0];
 		}
 		return ret;
 	}
@@ -147,7 +147,7 @@ public class InteractionState
 	/**
 	 *  Get the cancel response of an agent.
 	 */
-	public String	getCancelResponse(IAgentIdentifier responder)
+	public String	getCancelResponse(IComponentIdentifier responder)
 	{
 		String	ret	= null;
 		if(cancel_responses!=null)
@@ -163,7 +163,7 @@ public class InteractionState
 	 *  This will be any information that the agent sent as content
 	 *  of the cancel response.
 	 */
-	public Object	getCancelResponseContent(IAgentIdentifier responder)
+	public Object	getCancelResponseContent(IComponentIdentifier responder)
 	{
 		Object	ret	= null;
 		if(cancel_response_contents!=null)

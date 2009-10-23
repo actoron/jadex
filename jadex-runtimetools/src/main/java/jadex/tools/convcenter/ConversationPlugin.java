@@ -8,7 +8,7 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.IParameterSet;
 import jadex.bridge.IComponentListener;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
@@ -93,7 +93,7 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 			IAMSAgentDescription desc = (IAMSAgentDescription)node.getUserObject();
 			// Use clone, as added agent id might be modified by user.
 			IAMS	ams	= (IAMS)jcc.getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE);
-			IAgentIdentifier	receiver	= desc.getName();
+			IComponentIdentifier	receiver	= desc.getName();
 			receiver	= ams.createAgentIdentifier(receiver.getName(), false, receiver.getAddresses());
 			IMessageEvent	message	= convcenter.getMessagePanel().getMessage();
 			IParameterSet rcvs = message.getParameterSet(SFipa.RECEIVERS);

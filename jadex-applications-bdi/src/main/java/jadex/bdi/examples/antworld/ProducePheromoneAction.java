@@ -6,7 +6,7 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.Collection;
@@ -43,7 +43,7 @@ public class ProducePheromoneAction extends SimplePropertyObject implements ISpa
 		
 		IVector2 position = (IVector2) parameters.get(POSITION);
 //		Object ownerAgentId = (Object) parameters.get(ISpaceAction.OBJECT_ID);
-		IAgentIdentifier owner = (IAgentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
+		IComponentIdentifier owner = (IComponentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
 		ISpaceObject so = grid.getAvatar(owner);
 		Integer strength = (Integer) parameters.get(STRENGTH);
 	

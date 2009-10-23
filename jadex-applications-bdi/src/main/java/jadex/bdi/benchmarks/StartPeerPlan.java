@@ -4,7 +4,7 @@ import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.collection.SCollection;
 
 import java.util.Map;
@@ -51,7 +51,7 @@ public class StartPeerPlan extends Plan
 				args.put("startmem", startmem);
 				args.put("parallel", new Boolean(parallel));
 				
-				IAgentIdentifier aid;
+				IComponentIdentifier aid;
 				if(service)
 					aid = serviceCreateAgent(createPeerName(newnum), args);
 				else
@@ -74,7 +74,7 @@ public class StartPeerPlan extends Plan
 					args.put("startmem", startmem);
 					args.put("parallel", new Boolean(parallel));
 					
-					IAgentIdentifier aid;
+					IComponentIdentifier aid;
 					if(service)
 						aid = serviceCreateAgent(createPeerName(newnum), args);
 					else
@@ -157,12 +157,12 @@ public class StartPeerPlan extends Plan
 	 *  @param name The agent instance name.
 	 *  @param args The arguments.
 	 */
-	protected IAgentIdentifier serviceCreateAgent(String name, Map args)
+	protected IComponentIdentifier serviceCreateAgent(String name, Map args)
 	{
 		final IAMS ams = (IAMS)getScope().getPlatform().getService(IAMS.class);
 		SyncResultListener lis = new SyncResultListener();
 		ams.createAgent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", null, args, lis, getAgentIdentifier());
-		IAgentIdentifier aid = (IAgentIdentifier)lis.waitForResult();
+		IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
 		ams.startAgent(aid, null);
 		return aid;
 	}
@@ -172,7 +172,7 @@ public class StartPeerPlan extends Plan
 	 *  @param name The agent instance name.
 	 *  @param args The arguments.
 	 */
-	protected IAgentIdentifier capabilityCreateAgent(String name, Map args)
+	protected IComponentIdentifier capabilityCreateAgent(String name, Map args)
 	{
 		IGoal sp = createGoal("ams_create_agent");
 		sp.getParameter("type").setValue("/jadex/bdi/benchmarks/AgentCreation.agent.xml");
@@ -181,7 +181,7 @@ public class StartPeerPlan extends Plan
 		sp.getParameter("name").setValue(name);
 		sp.getParameter("arguments").setValue(args);
 		dispatchSubgoalAndWait(sp);
-		return (IAgentIdentifier)sp.getParameter("agentidentifier").getValue();
+		return (IComponentIdentifier)sp.getParameter("agentidentifier").getValue();
 	}
 	
 	/**
@@ -193,7 +193,7 @@ public class StartPeerPlan extends Plan
 	{
 		final IAMS ams = (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
 		SyncResultListener lis = new SyncResultListener();
-		IAgentIdentifier aid = ams.createAgentIdentifier(name, true);
+		IComponentIdentifier aid = ams.createAgentIdentifier(name, true);
 		ams.destroyAgent(aid, lis);
 		lis.waitForResult();
 	}
@@ -206,7 +206,7 @@ public class StartPeerPlan extends Plan
 	protected void capabilityDestroyAgent(String name)
 	{
 		final IAMS ams = (IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
-		IAgentIdentifier aid = ams.createAgentIdentifier(name, true);
+		IComponentIdentifier aid = ams.createAgentIdentifier(name, true);
 		IGoal sp = createGoal("ams_destroy_agent");
 		sp.getParameter("agentidentifier").setValue(aid);
 		dispatchSubgoalAndWait(sp);

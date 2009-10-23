@@ -6,7 +6,7 @@ import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.RequestJoin;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *  Find a dealer and join the game.
@@ -32,7 +32,7 @@ public class PlayerJoinGamePlan extends Plan
 	public void body()
 	{
 		// Search for dealer.
-		IAgentIdentifier	dealer	= (IAgentIdentifier)getBeliefbase().getBelief("dealer").getFact();
+		IComponentIdentifier	dealer	= (IComponentIdentifier)getBeliefbase().getBelief("dealer").getFact();
 
 		Player	me	= (Player)getBeliefbase().getBelief("myself").getFact();
 

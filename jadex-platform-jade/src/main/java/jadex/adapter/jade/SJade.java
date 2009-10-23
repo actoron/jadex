@@ -10,7 +10,7 @@ import jade.lang.acl.ACLMessage;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.adapter.jade.fipaimpl.AgentIdentifier;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageType;
 import jadex.commons.collection.SCollection;
 
@@ -256,7 +256,7 @@ public class SJade
 	/**
 	 *  Convert a Fipa aid to a Jade AID.
 	 */
-	public static AID convertAIDtoJade(IAgentIdentifier aid)
+	public static AID convertAIDtoJade(IComponentIdentifier aid)
 	{
 		assert aid!=null;
 		AID ret = new AID(aid.getName(), AID.ISGUID);
@@ -272,11 +272,11 @@ public class SJade
 	/**
 	 *  Convert a Jade AID to a Fipa aid.
 	 */
-	public static IAgentIdentifier convertAIDtoFipa(AID aid, IAMS ams)
+	public static IComponentIdentifier convertAIDtoFipa(AID aid, IAMS ams)
 //	public static AgentIdentifier convertAIDtoFipa(AID aid)
 	{
 //		AgentIdentifier ret = new AgentIdentifier(aid.getName(), false);
-		IAgentIdentifier ret = ams.createAgentIdentifier(aid.getName(), false, aid.getAddressesArray());
+		IComponentIdentifier ret = ams.createAgentIdentifier(aid.getName(), false, aid.getAddressesArray());
 		
 //		String[] addresses = aid.getAddressesArray();
 //		for(int i=0; i<addresses.length; i++)
@@ -357,7 +357,7 @@ public class SJade
 	 */
 	public static jadex.adapter.jade.fipaimpl.DFAgentDescription convertAgentDescriptiontoFipa(DFAgentDescription desc, IAMS ams)
 	{
-		IAgentIdentifier	aid	= desc.getName()!=null ? SJade.convertAIDtoFipa(desc.getName(), ams) : null;
+		IComponentIdentifier	aid	= desc.getName()!=null ? SJade.convertAIDtoFipa(desc.getName(), ams) : null;
 		jadex.adapter.jade.fipaimpl.DFAgentDescription ret = new jadex.adapter.jade.fipaimpl.DFAgentDescription(aid);
 		Iterator it = desc.getAllLanguages();
 		while(it.hasNext())
@@ -490,12 +490,12 @@ public class SJade
 			throw new RuntimeException("Only message type FIPA supported using JADE infrastructure.");
 			
 		final ACLMessage msg = new ACLMessage(SJade.convertPerformativetoJade((String)message.get(SFipa.PERFORMATIVE)));
-		IAgentIdentifier[] receivers = null;
+		IComponentIdentifier[] receivers = null;
 		Object tmp = message.get(mt.getReceiverIdentifier());
 		if(tmp instanceof Collection)
-			receivers = (IAgentIdentifier[])((Collection)tmp).toArray(new IAgentIdentifier[0]);
+			receivers = (IComponentIdentifier[])((Collection)tmp).toArray(new IComponentIdentifier[0]);
 		else
-			receivers = (IAgentIdentifier[])tmp;
+			receivers = (IComponentIdentifier[])tmp;
 		for(int i=0; i<receivers.length; i++)
 		{
 			msg.addReceiver(SJade.convertAIDtoJade(receivers[i]));
@@ -507,7 +507,7 @@ public class SJade
 		msg.setLanguage((String)message.get(SFipa.LANGUAGE));
 		msg.setOntology((String)message.get(SFipa.ONTOLOGY));
 		msg.setProtocol((String)message.get(SFipa.PROTOCOL));
-		msg.setSender(SJade.convertAIDtoJade((IAgentIdentifier)message.get(SFipa.SENDER)));
+		msg.setSender(SJade.convertAIDtoJade((IComponentIdentifier)message.get(SFipa.SENDER)));
 		msg.setEncoding((String)message.get(SFipa.ENCODING));
 		Object date = message.get(SFipa.REPLY_BY);
 		if(date instanceof Long)

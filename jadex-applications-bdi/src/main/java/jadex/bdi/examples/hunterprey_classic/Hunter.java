@@ -1,6 +1,6 @@
 package jadex.bdi.examples.hunterprey_classic;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 
 /**
@@ -22,7 +22,7 @@ public class Hunter extends Creature implements java.io.Serializable
 	/**
 	 *  Create a new Hunter.
 	 */
-	public Hunter(String name, IAgentIdentifier aid, Location location)
+	public Hunter(String name, IComponentIdentifier aid, Location location)
 	{
 		// Constructor using required slots (change if desired).
 		setName(name);

@@ -1,6 +1,6 @@
 package jadex.adapter.base.fipa;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentExecutionService;
 import jadex.commons.concurrent.IResultListener;
 
@@ -62,7 +62,7 @@ public interface IAMS extends IComponentExecutionService
 	 *  @param aid The agent identifier.
 	 *  @return True, if agent is hosted on platform.
 	 */
-	public void containsAgent(IAgentIdentifier aid, IResultListener listener);
+	public void containsAgent(IComponentIdentifier aid, IResultListener listener);
 	
 	/**
 	 *  Get the agent adapters.
@@ -75,7 +75,7 @@ public interface IAMS extends IComponentExecutionService
 	 *  @param aid The agent identifier.
 	 *  @return The agent description of this agent.
 	 */
-	public void getAgentDescription(IAgentIdentifier aid, IResultListener listener);
+	public void getAgentDescription(IComponentIdentifier aid, IResultListener listener);
 	
 	/**
 	 *  Get all agent descriptions.
@@ -94,14 +94,14 @@ public interface IAMS extends IComponentExecutionService
 	 *  @param aid The agent identifier.
 	 *  @param listener The result listener.
 	 */
-	public void getAgentAdapter(IAgentIdentifier aid, IResultListener listener);
+	public void getAgentAdapter(IComponentIdentifier aid, IResultListener listener);
 	
 	/**
 	 *  Get the external access of an agent.
 	 *  @param aid The agent identifier.
 	 *  @param listener The result listener.
 	 */
-	public void getExternalAccess(IAgentIdentifier aid, IResultListener listener);
+	public void getExternalAccess(IComponentIdentifier aid, IResultListener listener);
 	
 	//-------- create methods for ams objects --------
 	
@@ -111,7 +111,7 @@ public interface IAMS extends IComponentExecutionService
 	 *  @param local True for local name.
 	 *  @return The new agent identifier.
 	 */
-	public IAgentIdentifier createAgentIdentifier(String name, boolean local);
+	public IComponentIdentifier createAgentIdentifier(String name, boolean local);
 	
 	/**
 	 *  Create an agent identifier.
@@ -121,7 +121,7 @@ public interface IAMS extends IComponentExecutionService
 	 *  @param resolvers The resolvers.
 	 *  @return The new agent identifier.
 	 */
-	public IAgentIdentifier createAgentIdentifier(String name, boolean local, String[] addresses);
+	public IComponentIdentifier createAgentIdentifier(String name, boolean local, String[] addresses);
 	
 	/**
 	 *  Create a search constraints object.
@@ -136,7 +136,7 @@ public interface IAMS extends IComponentExecutionService
 	 *  @param agent The agent.
 	 *  @return The ams agent description.
 	 */
-	public IAMSAgentDescription createAMSAgentDescription(IAgentIdentifier agent);
+	public IAMSAgentDescription createAMSAgentDescription(IComponentIdentifier agent);
 
 	/**
 	 *  Create a ams agent description.
@@ -145,7 +145,7 @@ public interface IAMS extends IComponentExecutionService
 	 *  @param ownership The ownership.
 	 *  @return The ams agent description.
 	 */
-	public IAMSAgentDescription createAMSAgentDescription(IAgentIdentifier agent, String state, String ownership);
+	public IAMSAgentDescription createAMSAgentDescription(IComponentIdentifier agent, String state, String ownership);
 
 	/**
 	 *  Shutdown the platform.

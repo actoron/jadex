@@ -2,7 +2,7 @@ package eis.jadex;
 
 import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISpace;
 import jadex.commons.SimplePropertyObject;
 
@@ -41,7 +41,7 @@ public class SpacePerceptProcessor extends SimplePropertyObject implements IPerc
 	 *  @param agent The agent identifier.
 	 *  @param agent The avatar of the agent (if any).
 	 */
-	public void processPercept(final ISpace space, final String type, final Object percept, final IAgentIdentifier agent, final ISpaceObject avatar)
+	public void processPercept(final ISpace space, final String type, final Object percept, final IComponentIdentifier agent, final ISpaceObject avatar)
 	{
 		AgentListener[] als = eis.getAgentListeners(agent.getName());
 		if(als!=null)

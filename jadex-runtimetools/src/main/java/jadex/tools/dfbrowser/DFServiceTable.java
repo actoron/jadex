@@ -2,7 +2,7 @@ package jadex.tools.dfbrowser;
 
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IProperty;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.jtable.TableSorter;
@@ -26,7 +26,7 @@ public class DFServiceTable extends JTable//JScrollPane
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		TableSorter sorter = (TableSorter)getModel();
 		sorter.setTableHeader(getTableHeader());
-		setDefaultRenderer(IAgentIdentifier.class, new AgentIdentifierRenderer());
+		setDefaultRenderer(IComponentIdentifier.class, new AgentIdentifierRenderer());
 		setDefaultRenderer(String[].class, new StringArrayRenderer());
 		setDefaultRenderer(IProperty[].class, new PropertyArrayRenderer());
 	}

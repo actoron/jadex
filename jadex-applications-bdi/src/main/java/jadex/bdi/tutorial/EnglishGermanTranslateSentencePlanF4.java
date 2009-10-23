@@ -8,7 +8,7 @@ import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 
 import java.util.StringTokenizer;
@@ -22,7 +22,7 @@ public class EnglishGermanTranslateSentencePlanF4 extends Plan
 	//-------- attributes --------
 
 	/** The translation agent. */
-	protected IAgentIdentifier ta;
+	protected IComponentIdentifier ta;
 
 	//-------- constructors --------
 

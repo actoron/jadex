@@ -2,7 +2,7 @@ package jadex.bdi.benchmarks;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 /**
  *	Handle requests and generate reply value.
@@ -12,7 +12,7 @@ public class RequestSenderPlan extends Plan
 	public void body()
 	{
 		int max	= ((Integer)getBeliefbase().getBelief("max").getFact()).intValue();
-		IAgentIdentifier	receiver	= (IAgentIdentifier) getBeliefbase().getBelief("receiver").getFact();
+		IComponentIdentifier	receiver	= (IComponentIdentifier) getBeliefbase().getBelief("receiver").getFact();
 		long	time	= System.currentTimeMillis();
 		long	lasttime	= System.currentTimeMillis();
 

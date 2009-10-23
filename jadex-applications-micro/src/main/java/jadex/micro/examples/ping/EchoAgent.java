@@ -1,7 +1,7 @@
 package jadex.micro.examples.ping;
 
 import jadex.adapter.base.fipa.SFipa;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageType;
 import jadex.microkernel.MicroAgent;
 
@@ -21,9 +21,9 @@ public class EchoAgent extends MicroAgent
 	public void messageArrived(Map msg, MessageType mt)
 	{
 		Map reply = new HashMap(msg);
-		IAgentIdentifier sender = (IAgentIdentifier)msg.get(SFipa.SENDER);
+		IComponentIdentifier sender = (IComponentIdentifier)msg.get(SFipa.SENDER);
 		reply.put(SFipa.SENDER, getAgentIdentifier());
-		reply.put(SFipa.RECEIVERS, new IAgentIdentifier[]{sender});
+		reply.put(SFipa.RECEIVERS, new IComponentIdentifier[]{sender});
 		
 		sendMessage(reply, mt);
 	}

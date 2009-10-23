@@ -5,7 +5,7 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.ISpace;
 import jadex.commons.SimplePropertyObject;
@@ -26,7 +26,7 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 	 *  @param agent The agent identifier.
 	 *  @param agent The avatar of the agent (if any).
 	 */
-	public void processPercept(final ISpace space, final String type, final Object percept, final IAgentIdentifier agent, final ISpaceObject avatar)
+	public void processPercept(final ISpace space, final String type, final Object percept, final IComponentIdentifier agent, final ISpaceObject avatar)
 	{
 		IAMS ams = (IAMS)((IApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);
 		ams.getExternalAccess(agent, new IResultListener()

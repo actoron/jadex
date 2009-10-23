@@ -8,7 +8,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +21,7 @@ public class PerformTestPlan extends Plan
 	//-------- attributes --------
 	
 	/** The created test agent. */
-	protected IAgentIdentifier	testagent;
+	protected IComponentIdentifier	testagent;
 	
 	//-------- methods --------
 	
@@ -50,7 +50,7 @@ public class PerformTestPlan extends Plan
 			create.getParameter("classloader").setValue(classloader);
 			create.getParameter("start").setValue(Boolean.FALSE);
 			dispatchSubgoalAndWait(create);
-			this.testagent	= (IAgentIdentifier)create.getParameter("agentidentifier").getValue();
+			this.testagent	= (IComponentIdentifier)create.getParameter("agentidentifier").getValue();
 
 			// Hack!!! convention agent2testcenter used for convid to allow matching.
 			IMessageEvent	dummy	= createMessageEvent("inform_reports");	// Hack??? Need some conversation message to wait for

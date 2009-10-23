@@ -1,6 +1,6 @@
 package jadex.adapter.base.contextservice;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IContext;
 import jadex.bridge.ISpace;
 import jadex.commons.SReflect;
@@ -113,7 +113,7 @@ public class BaseContext	implements IContext
 	 *  Add an agent to a context.
 	 */
 	// Cannot be synchronized due to deadlock with space (uses context.getAgentType()).
-	public /*synchronized*/ void	addAgent(IAgentIdentifier agent)
+	public /*synchronized*/ void	addAgent(IComponentIdentifier agent)
 	{
 		ISpace[]	aspaces	= null;
 		synchronized(this)
@@ -144,7 +144,7 @@ public class BaseContext	implements IContext
 	 *  Remove an agent from a context.
 	 */
 	// Cannot be synchronized due to deadlock with space (uses context.getAgentType()).
-	public /*synchronized*/ void	removeAgent(IAgentIdentifier agent)
+	public /*synchronized*/ void	removeAgent(IComponentIdentifier agent)
 	{
 		ISpace[]	aspaces	= null;
 		synchronized(this)
@@ -190,7 +190,7 @@ public class BaseContext	implements IContext
 		{
 			for(Iterator it=agents.iterator(); it.hasNext(); )
 			{
-				space.agentAdded((IAgentIdentifier)it.next());
+				space.agentAdded((IComponentIdentifier)it.next());
 			}
 		}
 		
@@ -228,7 +228,7 @@ public class BaseContext	implements IContext
 	/**
 	 *  Test if an agent is contained in a context.
 	 */
-	public synchronized boolean	containsAgent(IAgentIdentifier agent)
+	public synchronized boolean	containsAgent(IComponentIdentifier agent)
 	{
 		return agents!=null && agents.contains(agent);
 	}
@@ -236,10 +236,10 @@ public class BaseContext	implements IContext
 	/**
 	 *  Get all agents directly contained in the context (if any).
 	 */
-	public synchronized IAgentIdentifier[]	getAgents()
+	public synchronized IComponentIdentifier[]	getAgents()
 	{
 		return agents==null ? null :
-			(IAgentIdentifier[])agents.toArray(new IAgentIdentifier[agents.size()]);
+			(IComponentIdentifier[])agents.toArray(new IComponentIdentifier[agents.size()]);
 	}
 	
 	//-------- template methods --------
@@ -269,7 +269,7 @@ public class BaseContext	implements IContext
 	 *  @param creator	The creator of the new agent.
 	 *  @param newagent	The newly created agent.
 	 */
-	public void	agentCreated(IAgentIdentifier creator, IAgentIdentifier newagent)
+	public void	agentCreated(IComponentIdentifier creator, IComponentIdentifier newagent)
 	{
 	}
 
@@ -277,7 +277,7 @@ public class BaseContext	implements IContext
 	 *  Called by AMS when an agent has been created by another agent in this context.
 	 *  @param agent	The destroyed agent.
 	 */
-	public void	agentDestroyed(IAgentIdentifier agent)
+	public void	agentDestroyed(IComponentIdentifier agent)
 	{
 		removeAgent(agent);
 	}
@@ -288,7 +288,7 @@ public class BaseContext	implements IContext
 	 *  @param key The key.
 	 *  @param prop The property.
 	 */
-	public synchronized void addProperty(IAgentIdentifier agent, String key, Object prop)
+	public synchronized void addProperty(IComponentIdentifier agent, String key, Object prop)
 	{
 		if(!containsAgent(agent))
 			throw new RuntimeException("Agent not contained in context: "+agent+" "+this);
@@ -309,7 +309,7 @@ public class BaseContext	implements IContext
 	 *  @param key The key.
 	 *  @return The property. 
 	 */
-	public synchronized Object getProperty(IAgentIdentifier agent, String key)
+	public synchronized Object getProperty(IComponentIdentifier agent, String key)
 	{
 		Object ret = null;
 		
@@ -336,7 +336,7 @@ public class BaseContext	implements IContext
 		ret.append(getName());
 //		ret.append(", parent=");
 //		ret.append(getParentContext());
-		IAgentIdentifier[]	aids	= getAgents(); 
+		IComponentIdentifier[]	aids	= getAgents(); 
 		if(aids!=null)
 		{
 			ret.append(", agents=");

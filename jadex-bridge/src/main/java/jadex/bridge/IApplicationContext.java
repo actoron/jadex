@@ -31,7 +31,7 @@ public interface IApplicationContext extends IContext
 	 *  @param aid	The agent id.
 	 *  @return The agent type name.
 	 */
-	public String getAgentType(IAgentIdentifier aid);
+	public String getAgentType(IComponentIdentifier aid);
 	
 	/**
 	 *  Get the agent type for an agent filename.
@@ -51,14 +51,14 @@ public interface IApplicationContext extends IContext
 	 *  @param agent The agent.
 	 *  @param master The master.
 	 */
-	public void setAgentMaster(IAgentIdentifier agent, boolean master);
+	public void setAgentMaster(IComponentIdentifier agent, boolean master);
 	
 	/**
 	 *  Set an agent as master (causes context to be terminated on its deletion).
 	 *  @param agent The agent.
 	 *  @return True, if agent is master.
 	 */
-	public boolean isAgentMaster(IAgentIdentifier agent);
+	public boolean isAgentMaster(IComponentIdentifier agent);
 	
 	/**
 	 *  Get the platform.
@@ -79,5 +79,5 @@ public interface IApplicationContext extends IContext
 	 */
 	public void createAgent(String name, final String type, String configuration,
 		Map arguments, final boolean start, final boolean master, 
-		final IResultListener listener, IAgentIdentifier creator);
+		final IResultListener listener, IComponentIdentifier creator);
 }

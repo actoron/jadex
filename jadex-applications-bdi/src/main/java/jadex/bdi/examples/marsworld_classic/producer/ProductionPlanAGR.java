@@ -12,7 +12,7 @@ import jadex.bdi.examples.marsworld_classic.Target;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 
 /**
@@ -84,7 +84,7 @@ public class ProductionPlanAGR extends Plan
 		IApplicationContext ac = getScope().getApplicationContext();
 		AGRSpace agrspace = (AGRSpace)ac.getSpace("myagrspace");
 		Group group = agrspace.getGroup("mymarsteam");
-		IAgentIdentifier[]	carriers	= group.getAgentsForRole("carrier");
+		IComponentIdentifier[]	carriers	= group.getAgentsForRole("carrier");
 		
 		if(carriers.length>0)
 		{

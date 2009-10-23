@@ -6,7 +6,7 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IParameter;
 import jadex.bdi.runtime.IParameterSet;
 import jadex.bridge.ContentException;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -74,7 +74,7 @@ public class FipaConversationPanel extends JSplitPane
 	protected IExternalAccess	agent;
 
 	/** The default receiver (if any). */
-	protected IAgentIdentifier	receiver;
+	protected IComponentIdentifier	receiver;
 
 	/** The tabbed panel. */
 	protected JTabbedPane	tabs;
@@ -96,7 +96,7 @@ public class FipaConversationPanel extends JSplitPane
 	/**
 	 *  Create the gui.
 	 */
-	public FipaConversationPanel(final IExternalAccess agent, IAgentIdentifier default_receiver)
+	public FipaConversationPanel(final IExternalAccess agent, IComponentIdentifier default_receiver)
 	{
 		super(JSplitPane.HORIZONTAL_SPLIT, true);
 		setOneTouchExpandable(true);

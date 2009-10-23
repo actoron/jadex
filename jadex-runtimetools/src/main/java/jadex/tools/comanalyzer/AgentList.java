@@ -1,6 +1,6 @@
 package jadex.tools.comanalyzer;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 
 import java.io.Serializable;
@@ -105,7 +105,7 @@ public class AgentList implements Serializable
 	 * @return The agent or <code>null</code> if there is no agent with the
 	 * same identifier in the list.
 	 */
-	public Agent getAgent(IAgentIdentifier aid)
+	public Agent getAgent(IComponentIdentifier aid)
 	{
 		for(Iterator iter = elements.iterator(); iter.hasNext();)
 		{

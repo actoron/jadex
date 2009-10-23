@@ -12,7 +12,7 @@ import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,7 +70,7 @@ public class AnalyzeTargetPlan extends Plan
 
 		AGRSpace agrs = (AGRSpace)getScope().getApplicationContext().getSpace("myagrspace");
 		Group group = agrs.getGroup("mymarsteam");
-		IAgentIdentifier[]	producers	= group.getAgentsForRole("producer");
+		IComponentIdentifier[]	producers	= group.getAgentsForRole("producer");
 
 		if(producers!=null && producers.length>0)
 		{

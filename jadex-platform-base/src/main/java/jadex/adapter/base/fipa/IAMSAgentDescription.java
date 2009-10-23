@@ -1,6 +1,6 @@
 package jadex.adapter.base.fipa;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 /**
  * 
@@ -42,7 +42,7 @@ public interface IAMSAgentDescription
 	 *  Get the agentidentifier of this AMSAgentDescription.
 	 * @return agentidentifier
 	 */
-	public IAgentIdentifier getName();
+	public IComponentIdentifier getName();
 
 	/**
 	 *  Set the agentidentifier of this AMSAgentDescription.

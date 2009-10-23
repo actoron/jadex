@@ -1,6 +1,6 @@
 package jadex.bdi.runtime;
 
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IPlatform;
 
@@ -89,7 +89,7 @@ public interface ICapability	extends IElement
 	 * Get the agent identifier.
 	 * @return The agent identifier.
 	 */
-	public IAgentIdentifier	getAgentIdentifier();
+	public IComponentIdentifier	getAgentIdentifier();
 
 	/**
 	 *  Get the platform specific agent object.

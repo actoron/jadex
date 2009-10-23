@@ -8,7 +8,7 @@ import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.TimeoutException;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 
 import java.util.HashMap;
@@ -40,7 +40,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 		// Start negotiations.
 		String convid = SUtil.createUniqueId(getAgentName());
 		NegotiationRecord nr = new NegotiationRecord(getParameter("cfp").getValue(), 
-			getParameter("cfp_info").getValue(), (IAgentIdentifier[])getParameterSet("receivers").getValues(), getTime());
+			getParameter("cfp_info").getValue(), (IComponentIdentifier[])getParameterSet("receivers").getValues(), getTime());
 		getParameterSet("history").addValue(nr);
 
 		// Perform negotiation rounds.
@@ -190,7 +190,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 				getLogger().info(getAgentName()+" (I)CNPPlan: waiting: "+wait_time);
 
 				IMessageEvent reply = (IMessageEvent)waitForReply(me, wait_time);
-				IAgentIdentifier sender = (IAgentIdentifier)reply.getParameter(SFipa.SENDER).getValue();
+				IComponentIdentifier sender = (IComponentIdentifier)reply.getParameter(SFipa.SENDER).getValue();
 				rec.remove(sender);
 				
 				// Other messages than proposals will be ignored and
@@ -294,7 +294,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 			{
 				Object	cfp	= sel.getParameter("cfp").getValue();
 				Object	cfp_info	= sel.getParameter("cfp_info").getValue();
-				IAgentIdentifier[]	participants	= (IAgentIdentifier[])sel.getParameterSet("participants").getValues();
+				IComponentIdentifier[]	participants	= (IComponentIdentifier[])sel.getParameterSet("participants").getValues();
 				ret	= new NegotiationRecord(cfp, cfp_info, participants, getTime());
 				getParameterSet("history").addValue(ret);
 				getLogger().info("ICNP: perform further negotiation round");
@@ -319,7 +319,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 	 *  @param nr The current negotiation record.
 	 *  @param newparticipants The remaining participants of the next round, which should not be rejected.
 	 */
-	protected void rejectExcludedProposals(NegotiationRecord nr, IAgentIdentifier[] newparticipants, Map proposalmessages)
+	protected void rejectExcludedProposals(NegotiationRecord nr, IComponentIdentifier[] newparticipants, Map proposalmessages)
 	{
 		// Determine proposals to reject.
 		// Todo: allow for an agent to participate more than once?
@@ -376,7 +376,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 
 				// Wait for messages indicating the task execution state.
 				IMessageEvent reply = (IMessageEvent)waitForReply(me, wait_time);
-				IAgentIdentifier sender = (IAgentIdentifier)reply.getParameter(SFipa.SENDER).getValue();
+				IComponentIdentifier sender = (IComponentIdentifier)reply.getParameter(SFipa.SENDER).getValue();
 
 				// Todo: Also support inform-done?
 				if(reply.getType().equals(getShortProtocolName()+"_inform"))
@@ -404,7 +404,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 		}
 		
 		// Create result negotiation record containing only successfully executed proposals.
-		IAgentIdentifier[]	executed	= new IAgentIdentifier[results.size()];
+		IComponentIdentifier[]	executed	= new IComponentIdentifier[results.size()];
 		int	index	= 0;
 		for(int i=0; i<acceptables.length; i++)
 		{
@@ -430,7 +430,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 	 */
 	protected NegotiationRecord acceptOneProposal(NegotiationRecord nr, ParticipantProposal[] acceptables, Map proposalmessages)
 	{
-		IAgentIdentifier	executed	= null;
+		IComponentIdentifier	executed	= null;
 		Object	result	= null;
 		for(int i=0; i<acceptables.length; i++)
 		{
@@ -445,7 +445,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 					accept.getParameter(SFipa.CONTENT).setValue(acceptables[i].getProposal());
 					IMessageEvent	reply	= sendMessageAndWait(accept, getTimeout());
 			
-					IAgentIdentifier sender = (IAgentIdentifier)reply.getParameter(SFipa.SENDER).getValue();
+					IComponentIdentifier sender = (IComponentIdentifier)reply.getParameter(SFipa.SENDER).getValue();
 			
 					// Todo: Also support inform-done?
 					if(reply.getType().equals(getShortProtocolName()+"_inform"))
@@ -488,7 +488,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 		
 		// Create result negotiation record containing the successfully executed proposal (if any).
 		NegotiationRecord	ret	= new NegotiationRecord(nr.getCFP(), nr.getCFPInfo(), executed!=null ? 
-			new IAgentIdentifier[]{executed} : new IAgentIdentifier[0], getTime());
+			new IComponentIdentifier[]{executed} : new IComponentIdentifier[0], getTime());
 		getParameterSet("history").addValue(ret);
 		if(executed!=null)
 		{

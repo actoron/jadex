@@ -1,7 +1,7 @@
 package jadex.adapter.standalone.transport;
 
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
-import jadex.bridge.IAgentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.Map;
 
@@ -34,7 +34,7 @@ public interface ITransport
 	 *  message could not be delivered.
 	 */
 //	public AgentIdentifier[] sendMessage(IMessageEnvelope message);
-	public AgentIdentifier[] sendMessage(Map message, String msgtype, IAgentIdentifier[] receivers);
+	public AgentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] receivers);
 	
 	/**
 	 *  Returns the prefix of this transport
