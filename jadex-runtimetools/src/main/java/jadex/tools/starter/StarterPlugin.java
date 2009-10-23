@@ -1,6 +1,6 @@
 package jadex.tools.starter;
 
-import jadex.adapter.base.SElementFactory;
+import jadex.adapter.base.SComponentFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.bridge.IComponentListener;
@@ -274,7 +274,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 
 					String model = ((FileNode)node).getRelativePath();
 //					if(getJCC().getAgent().getPlatform().getAgentFactory().isLoadable(model))
-					if(SElementFactory.isLoadable(getJCC().getServiceContainer(), model))
+					if(SComponentFactory.isLoadable(getJCC().getServiceContainer(), model))
 					{
 						loadModel(model);
 					}
@@ -300,7 +300,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 							String type = ((FileNode)node).getFile().getAbsolutePath();
 //							if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(type))
-							if(SElementFactory.isStartable(getJCC().getServiceContainer(), type))
+							if(SComponentFactory.isStartable(getJCC().getServiceContainer(), type))
 								createAgent(type, null, null, null);
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
@@ -823,12 +823,12 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 				if(node instanceof FileNode)
 				{
 					final String type = ((FileNode)node).getFile().getAbsolutePath();
-					if(SElementFactory.isStartable(getJCC().getServiceContainer(), type))//&& ((FileNode)node).isValid())
+					if(SComponentFactory.isStartable(getJCC().getServiceContainer(), type))//&& ((FileNode)node).isValid())
 					{
 						try
 						{
 //							IAgentFactory agentfactory = getJCC().getAgent().getPlatform().getAgentFactory();
-							ILoadableComponentModel model = SElementFactory.loadModel(getJCC().getServiceContainer(), type);
+							ILoadableComponentModel model = SComponentFactory.loadModel(getJCC().getServiceContainer(), type);
 							String[] inistates = model.getConfigurations();
 //							IMBDIAgent model = SXML.loadAgentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();

@@ -1,6 +1,6 @@
 package jadex.tools.common.modeltree;
 
-import jadex.adapter.base.SElementFactory;
+import jadex.adapter.base.SComponentFactory;
 import jadex.bridge.IComponentFactory;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -698,7 +698,7 @@ public class ModelExplorer extends JTree
 						public boolean accept(File file)
 						{
 							return file.isDirectory() 
-								|| SElementFactory.isLoadable(container, file.getAbsolutePath());
+								|| SComponentFactory.isLoadable(container, file.getAbsolutePath());
 						}
 					};
 				}

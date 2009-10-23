@@ -1,6 +1,6 @@
 package jadex.adapter.standalone;
 
-import jadex.adapter.base.SElementFactory;
+import jadex.adapter.base.SComponentFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.bridge.IComponentListener;

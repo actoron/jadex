@@ -1,6 +1,6 @@
 package jadex.tools.testcenter;
 
-import jadex.adapter.base.SElementFactory;
+import jadex.adapter.base.SComponentFactory;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -234,7 +234,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 					{
 						String model = ((FileNode)node).getRelativePath();
 //						if(SXML.isAgentFilename(model))
-						if(SElementFactory.isStartable(getJCC().getServiceContainer(), model))
+						if(SComponentFactory.isStartable(getJCC().getServiceContainer(), model))
 						{
 							tcpanel.getTestList().addEntry(model);
 						}
@@ -338,7 +338,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 				if(n instanceof FileNode && !(n instanceof DirNode))
 				{
 					String model = ((FileNode)n).getRelativePath();
-					if(SElementFactory.isStartable(getJCC().getServiceContainer(), model)
+					if(SComponentFactory.isStartable(getJCC().getServiceContainer(), model)
 						&& nof.isTestcase((IExplorerTreeNode) n))
 					{
 						tcpanel.getTestList().addEntry(model);
@@ -350,7 +350,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		{
 			String model = ((FileNode)node).getRelativePath();
 //			if(SXML.isAgentFilename(model) && ((FileNode)node).isValid())
-			if(SElementFactory.isStartable(getJCC().getServiceContainer(), model)
+			if(SComponentFactory.isStartable(getJCC().getServiceContainer(), model)
 				&& nof.isTestcase((IExplorerTreeNode) node))
 			{
 				tcpanel.getTestList().addEntry(model);

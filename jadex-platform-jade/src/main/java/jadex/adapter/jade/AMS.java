@@ -13,7 +13,7 @@ import jade.util.Event;
 import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
 import jadex.adapter.base.DefaultResultListener;
-import jadex.adapter.base.SElementFactory;
+import jadex.adapter.base.SComponentFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.ISearchConstraints;
@@ -92,7 +92,7 @@ public class AMS implements IAMS, IService
 		if(!ret && element instanceof String)
 		{
 			ret = IComponentFactory.ELEMENT_TYPE_AGENT.equals(
-				SElementFactory.getElementType(platform, (String)element));
+				SComponentFactory.getElementType(platform, (String)element));
 		}
 		
 		return ret;
@@ -988,7 +988,7 @@ public class AMS implements IAMS, IService
 	 */
 	public String getShortName(String filename)
 	{
-		ILoadableComponentModel model = SElementFactory.loadModel(platform, filename);
+		ILoadableComponentModel model = SComponentFactory.loadModel(platform, filename);
 //		ILoadableElementModel	model	= platform.getAgentFactory().loadModel(filename);
 		return model.getName();
 	}

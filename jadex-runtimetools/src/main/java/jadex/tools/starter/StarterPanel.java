@@ -1,6 +1,6 @@
 package jadex.tools.starter;
 
-import jadex.adapter.base.SElementFactory;
+import jadex.adapter.base.SComponentFactory;
 import jadex.adapter.base.appdescriptor.ApplicationModel;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IArgument;
@@ -165,7 +165,7 @@ public class StarterPanel extends JPanel
 					String name = f.getName();
 //					return f.isDirectory() || name.endsWith(SXML.FILE_EXTENSION_AGENT) || name.endsWith(SXML.FILE_EXTENSION_CAPABILITY);
 //					boolean	ret	= f.isDirectory() || agentfactory.isLoadable(name) || appfactory.isLoadable(name);
-					boolean	ret	= f.isDirectory() || SElementFactory.isLoadable(starter.getJCC().getServiceContainer(), name);
+					boolean	ret	= f.isDirectory() || SComponentFactory.isLoadable(starter.getJCC().getServiceContainer(), name);
 
 //					Thread.currentThread().setContextClassLoader(oldcl);
 
@@ -370,7 +370,7 @@ public class StarterPanel extends JPanel
 //							IApplicationFactory fac = starter.getJCC().getAgent().getPlatform().getApplicationFactory();
 							try
 							{
-								SElementFactory.createApplication(starter.getJCC().getServiceContainer(), (String)appname.getSelectedItem(), filename.getText(), configname, args);
+								SComponentFactory.createApplication(starter.getJCC().getServiceContainer(), (String)appname.getSelectedItem(), filename.getText(), configname, args);
 							}
 							catch(Exception e)
 							{
@@ -628,9 +628,9 @@ public class StarterPanel extends JPanel
 
 			try
 			{
-				if(SElementFactory.isLoadable(starter.getJCC().getServiceContainer(), adf))
+				if(SComponentFactory.isLoadable(starter.getJCC().getServiceContainer(), adf))
 				{
-					model = SElementFactory.loadModel(starter.getJCC().getServiceContainer(), adf);
+					model = SComponentFactory.loadModel(starter.getJCC().getServiceContainer(), adf);
 					SwingUtilities.invokeLater(new Runnable()
 					{
 						public void run()
@@ -655,7 +655,7 @@ public class StarterPanel extends JPanel
 						confl.setMinimumSize(appnamel.getMinimumSize());
 						confl.setPreferredSize(appname.getPreferredSize());
 					}
-					else if(SElementFactory.isStartable(starter.getJCC().getServiceContainer(), adf))
+					else if(SComponentFactory.isStartable(starter.getJCC().getServiceContainer(), adf))
 					{
 		//				System.out.println("Model loaded: "+adf);
 						

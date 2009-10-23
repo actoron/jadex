@@ -1,6 +1,6 @@
 package jadex.tools.testcenter;
 
-import jadex.adapter.base.SElementFactory;
+import jadex.adapter.base.SComponentFactory;
 import jadex.bdi.interpreter.OAVAgentModel;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bridge.ILoadableComponentModel;
@@ -201,12 +201,12 @@ public class TestCenterNodeFunctionality extends DefaultNodeFunctionality
 				{
 					String	file	= fn.getFile().getAbsolutePath();
 //					if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
-					if(SElementFactory.isLoadable(jcc.getServiceContainer(), file))
+					if(SComponentFactory.isLoadable(jcc.getServiceContainer(), file))
 					{
 						try
 						{
 //							ILoadableElementModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
-							ILoadableComponentModel model = SElementFactory.loadModel(jcc.getServiceContainer(), file);
+							ILoadableComponentModel model = SComponentFactory.loadModel(jcc.getServiceContainer(), file);
 							
 							if(model!=null)
 							{

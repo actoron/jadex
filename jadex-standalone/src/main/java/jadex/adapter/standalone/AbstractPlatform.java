@@ -1,6 +1,6 @@
 package jadex.adapter.standalone;
 
-import jadex.adapter.base.SElementExecutionService;
+import jadex.adapter.base.SComponentExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.bridge.IAgentIdentifier;
@@ -212,7 +212,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 					{
 						//System.out.println("Killing system agent: "+sagents[i]);
 						final boolean[] finished = new boolean[1];
-						SElementExecutionService.destroyElement(AbstractPlatform.this, sagents[i], new IResultListener()
+						SComponentExecutionService.destroyComponent(AbstractPlatform.this, sagents[i], new IResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
@@ -315,14 +315,14 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 	protected void createElement(String name, String model, String config, Map args, final boolean daemon)
 	{
 //		IAMS ams = (IAMS)getService(IAMS.class);
-		SElementExecutionService.createElement(this, name, model, config, args, new IResultListener()
+		SComponentExecutionService.createComponent(this, name, model, config, args, new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				AgentIdentifier agent = (AgentIdentifier)result;
 				if(daemon)
 					daemonagents.add(agent);
-				SElementExecutionService.startElement(AbstractPlatform.this, agent, null);
+				SComponentExecutionService.startComponent(AbstractPlatform.this, agent, null);
 			}
 
 			public void exceptionOccurred(Exception exception)

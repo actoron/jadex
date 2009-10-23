@@ -1,6 +1,6 @@
 package jadex.tools.common.modeltree;
 
-import jadex.adapter.base.SElementFactory;
+import jadex.adapter.base.SComponentFactory;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IApplicationFactory;
 import jadex.commons.SGUI;
@@ -178,16 +178,16 @@ public class	DefaultNodeFunctionality
 				
 //				IAgentFactory agfac = jcc.getAgent().getPlatform().getAgentFactory();
 //				String	type = agfac.getFileType(fn.getFile().getAbsolutePath());
-				String type = SElementFactory.getFileType(jcc.getServiceContainer(), fn.getFile().getAbsolutePath());
+				String type = SComponentFactory.getFileType(jcc.getServiceContainer(), fn.getFile().getAbsolutePath());
 				if(type!=null)
-					icon = SElementFactory.getFileTypeIcon(jcc.getServiceContainer(), type);
+					icon = SComponentFactory.getFileTypeIcon(jcc.getServiceContainer(), type);
 				
 				if(icon==null)
 				{
 //					IApplicationFactory apfac = jcc.getAgent().getPlatform().getApplicationFactory();
-					type = SElementFactory.getFileType(jcc.getServiceContainer(), fn.getFile().getAbsolutePath());
+					type = SComponentFactory.getFileType(jcc.getServiceContainer(), fn.getFile().getAbsolutePath());
 					if(type!=null)
-						icon = SElementFactory.getFileTypeIcon(jcc.getServiceContainer(), type);
+						icon = SComponentFactory.getFileTypeIcon(jcc.getServiceContainer(), type);
 				}
 			}
 		}

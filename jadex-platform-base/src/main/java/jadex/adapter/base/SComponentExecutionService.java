@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * 
  */
-public class SElementExecutionService
+public class SComponentExecutionService
 {
 	/**
 	 *  Create a new element on the platform.
@@ -27,7 +27,7 @@ public class SElementExecutionService
 	 *  @param listener The result listener (if any).
 	 *  @param creator The creator (if any).
 	 */
-	public static void	createElement(IServiceContainer container, String name, String model, String config, Map args, IResultListener listener, Object creator)
+	public static void	createComponent(IServiceContainer container, String name, String model, String config, Map args, IResultListener listener, Object creator)
 	{
 		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
@@ -48,7 +48,7 @@ public class SElementExecutionService
 	 *  Start a previously created element on the platform.
 	 *  @param elementid The id of the previously created element.
 	 */
-	public static void	startElement(IServiceContainer container, Object elementid, IResultListener listener)
+	public static void	startComponent(IServiceContainer container, Object elementid, IResultListener listener)
 	{
 		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
@@ -69,7 +69,7 @@ public class SElementExecutionService
 	 *  Destroy (forcefully terminate) an element on the platform.
 	 *  @param elementid	The element to destroy.
 	 */
-	public static void destroyElement(IServiceContainer container, Object elementid, IResultListener listener)
+	public static void destroyComponent(IServiceContainer container, Object elementid, IResultListener listener)
 	{
 		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
@@ -90,7 +90,7 @@ public class SElementExecutionService
 	 *  Suspend the execution of an element.
 	 *  @param elementid The element identifier.
 	 */
-	public static void suspendElement(IServiceContainer container, Object elementid, IResultListener listener)
+	public static void suspendComponent(IServiceContainer container, Object elementid, IResultListener listener)
 	{
 		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
@@ -111,7 +111,7 @@ public class SElementExecutionService
 	 *  Resume the execution of an element.
 	 *  @param elementid The element identifier.
 	 */
-	public static void resumeElement(IServiceContainer container, Object elementid, IResultListener listener)
+	public static void resumeComponent(IServiceContainer container, Object elementid, IResultListener listener)
 	{
 		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)

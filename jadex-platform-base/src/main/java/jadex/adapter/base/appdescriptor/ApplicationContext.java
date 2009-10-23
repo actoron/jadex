@@ -1,6 +1,6 @@
 package jadex.adapter.base.appdescriptor;
 
-import jadex.adapter.base.SElementExecutionService;
+import jadex.adapter.base.SComponentExecutionService;
 import jadex.adapter.base.contextservice.BaseContext;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IAgentIdentifier;
@@ -140,7 +140,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 //			IAMS ams = (IAMS) platform.getService(IAMS.class);
 			for(int i=0; i<agents.length; i++)
 			{
-				SElementExecutionService.destroyElement(platform, agents[i], l2);
+				SComponentExecutionService.destroyComponent(platform, agents[i], l2);
 //				ams.destroyAgent(agents[i], l2);
 			}
 		}
@@ -192,7 +192,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 			throw new RuntimeException("Unknown agent type '"+type+"' in application: "+apptype);
 //		final IAMS	ams	= (IAMS) platform.getService(IAMS.class);
 		
-		SElementExecutionService.createElement(platform, name, at.getFilename(), configuration, arguments, new IResultListener()
+		SComponentExecutionService.createComponent(platform, name, at.getFilename(), configuration, arguments, new IResultListener()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
@@ -219,7 +219,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 				
 				if(start)
 				{
-					SElementExecutionService.startElement(platform, aid, listener);
+					SComponentExecutionService.startComponent(platform, aid, listener);
 				}
 				else
 				{

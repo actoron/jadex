@@ -1,11 +1,10 @@
 package jadex.adapter.base;
 
 import jadex.bridge.IAgentAdapter;
-import jadex.bridge.IAgentFactory;
 import jadex.bridge.IApplicationFactory;
-import jadex.bridge.IElementFactory;
-import jadex.bridge.IKernelAgent;
-import jadex.bridge.ILoadableElementModel;
+import jadex.bridge.IComponentFactory;
+import jadex.bridge.IComponentInstance;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SUtil;
 import jadex.service.IServiceContainer;
 
@@ -20,28 +19,28 @@ import javax.swing.Icon;
  *  factories and uses them according to their order
  *  and isLoadable() method.
  */
-public class SElementFactory
+public class SComponentFactory
 {
 	/**
 	 *  Get the element type.
 	 *  @return The element type (e.g. an agent, application or process).
-	 */
+	 * /
 	public static String getElementType(IServiceContainer container, String model)
 	{
 		String ret = null;
-		Collection facts = container.getServices(IElementFactory.class);
+		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
 		{
 			for(Iterator it=facts.iterator(); it.hasNext() && ret==null; )
 			{
-				IElementFactory fac = (IElementFactory)it.next();
+				IComponentFactory fac = (IComponentFactory)it.next();
 				if(fac.isLoadable(model))
 					ret = fac.getElementType();
 			}
 		}
 		
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Create a kernel agent.
@@ -51,21 +50,18 @@ public class SElementFactory
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 *  @return	An instance of a kernel agent.
 	 */
-	public static IKernelAgent createKernelAgent(IServiceContainer container, IAgentAdapter adapter, String model, String config, Map arguments)	
+	public static IComponentInstance createKernelAgent(IServiceContainer container, IAgentAdapter adapter, String model, String config, Map arguments)	
 	{
-		IKernelAgent ret = null;
-		Collection facts = container.getServices(IElementFactory.class);
+		IComponentInstance ret = null;
+		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
 		{
 			for(Iterator it=facts.iterator(); it.hasNext() && ret==null; )
 			{
-				IElementFactory fac = (IElementFactory)it.next();
-				if(fac instanceof IAgentFactory)
-				{
-					IAgentFactory afac = (IAgentFactory)fac;
-					if(afac.isLoadable(model))
-						ret = afac.createKernelAgent(adapter, model, config, arguments);
-				}
+				IComponentFactory fac = (IComponentFactory)it.next();
+				
+				if(fac.isLoadable(model))
+					ret = fac.createComponentInstance(adapter, model, config, arguments);
 			}
 		}
 		
@@ -77,15 +73,15 @@ public class SElementFactory
 	 *  @param model The model.
 	 *  @return The loaded model.
 	 */
-	public static ILoadableElementModel loadModel(IServiceContainer container, String model)
+	public static ILoadableComponentModel loadModel(IServiceContainer container, String model)
 	{
-		ILoadableElementModel ret = null;
-		Collection facts = container.getServices(IElementFactory.class);
+		ILoadableComponentModel ret = null;
+		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
 		{
 			for(Iterator it=facts.iterator(); it.hasNext() && ret==null; )
 			{
-				IElementFactory fac = (IElementFactory)it.next();
+				IComponentFactory fac = (IComponentFactory)it.next();
 				if(fac.isLoadable(model))
 					ret = fac.loadModel(model);
 			}
@@ -103,12 +99,12 @@ public class SElementFactory
 	{
 		boolean ret = false;
 		
-		Collection facts = container.getServices(IElementFactory.class);
+		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
 		{
 			for(Iterator it=facts.iterator(); !ret && it.hasNext();)
 			{
-				IElementFactory fac = (IElementFactory)it.next();
+				IComponentFactory fac = (IComponentFactory)it.next();
 				ret = fac.isLoadable(model);
 			}
 		}
@@ -123,12 +119,12 @@ public class SElementFactory
 	{
 		try
 		{
-			Collection facts = container.getServices(IElementFactory.class);
+			Collection facts = container.getServices(IComponentFactory.class);
 			if(facts!=null)
 			{
 				for(Iterator it=facts.iterator(); it.hasNext(); )
 				{
-					IElementFactory fac = (IElementFactory)it.next();
+					IComponentFactory fac = (IComponentFactory)it.next();
 					if(fac instanceof IApplicationFactory)
 					{
 						IApplicationFactory afac = (IApplicationFactory)fac;
@@ -158,12 +154,12 @@ public class SElementFactory
 	{
 		boolean ret = false;
 		
-		Collection facts = container.getServices(IElementFactory.class);
+		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
 		{
 			for(Iterator it=facts.iterator(); it.hasNext() && !ret; )
 			{
-				IElementFactory fac = (IElementFactory)it.next();
+				IComponentFactory fac = (IComponentFactory)it.next();
 				ret = fac.isStartable(model);
 			}
 		}
@@ -177,12 +173,12 @@ public class SElementFactory
 	public static String[] getFileTypes(IServiceContainer container)
 	{
 		String[]	ret	= new String[0];
-		Collection facts = container.getServices(IElementFactory.class);
+		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
 		{
 			for(Iterator it=facts.iterator(); it.hasNext(); )
 			{
-				IElementFactory fac = (IElementFactory)it.next();
+				IComponentFactory fac = (IComponentFactory)it.next();
 				ret	= (String[])SUtil.joinArrays(ret, fac.getFileTypes());
 			}
 		}
@@ -195,12 +191,12 @@ public class SElementFactory
 	public static Icon getFileTypeIcon(IServiceContainer container, String type)
 	{
 		Icon	ret = null;
-		Collection facts = container.getServices(IElementFactory.class);
+		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
 		{
 			for(Iterator it=facts.iterator(); it.hasNext() && ret==null; )
 			{
-				IElementFactory fac = (IElementFactory)it.next();
+				IComponentFactory fac = (IComponentFactory)it.next();
 				ret = fac.getFileTypeIcon(type);
 			}
 		}
@@ -214,12 +210,12 @@ public class SElementFactory
 	public static String getFileType(IServiceContainer container, String model)
 	{
 		String	ret = null;
-		Collection facts = container.getServices(IElementFactory.class);
+		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
 		{
 			for(Iterator it=facts.iterator(); it.hasNext() && ret==null; )
 			{
-				IElementFactory fac = (IElementFactory)it.next();
+				IComponentFactory fac = (IComponentFactory)it.next();
 				ret = fac.getFileType(model);
 			}
 		}
