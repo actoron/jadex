@@ -1,11 +1,10 @@
 package jadex.tools.dfbrowser;
 
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.bdi.runtime.IGoal;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentListener;
 import jadex.commons.Properties;
@@ -183,7 +182,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 		{
 			public void resultAvailable(Object result)
 			{
-				IAMSAgentDescription[] res = (IAMSAgentDescription[])result;
+				IComponentDescription[] res = (IComponentDescription[])result;
 				for(int i=0; i<res.length; i++)
 					agentBorn(res[i]);
 			}
@@ -196,12 +195,12 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 		{
 			public void componentRemoved(Object desc)
 			{
-				agentDied((IAMSAgentDescription)desc);
+				agentDied((IComponentDescription)desc);
 			}
 			
 			public void componentAdded(Object desc)
 			{
-				agentBorn((IAMSAgentDescription)desc);
+				agentBorn((IComponentDescription)desc);
 			}
 		});
 		
@@ -503,7 +502,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 	/**
 	 * @param ad
 	 */
-	public void agentDied(final IAMSAgentDescription ad)
+	public void agentDied(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		/*SwingUtilities.invokeLater(new Runnable()
@@ -519,7 +518,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 	/**
 	 * @param ad
 	 */
-	public void agentBorn(final IAMSAgentDescription ad)
+	public void agentBorn(final IComponentDescription ad)
 	{
 		//System.out.println("Agent born: "+ad.getName()+" "+Thread.currentThread());
 		
@@ -546,7 +545,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 								//System.out.println(SUtil.arrayToString(nodes));
 								for(int i=0; i<nodes.length; i++)
 								{
-									IAMSAgentDescription desc = (IAMSAgentDescription)nodes[i].getUserObject();
+									IComponentDescription desc = (IComponentDescription)nodes[i].getUserObject();
 									if(desc.getName().getName().startsWith("df@"))
 									{
 										TreePath path = new TreePath(nodes[i].getPath());
@@ -569,7 +568,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 	/**
 	 * @param ad
 	 */
-	public void agentChanged(final IAMSAgentDescription ad)
+	public void agentChanged(final IComponentDescription ad)
 	{
 		// nop?
 		// Update components on awt thread.
@@ -586,15 +585,15 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 	 *  Get the selected df.
 	 *  @return The selected DF.
 	 */
-	public IAMSAgentDescription getSelectedDF()
+	public IComponentDescription getSelectedDF()
 	{
-		IAMSAgentDescription ret = null;
+		IComponentDescription ret = null;
 		if(df_agents.getTreetable().getTree().getSelectionPath()!=null)
 		{
 			DefaultTreeTableNode node = (DefaultTreeTableNode)df_agents.getTreetable().getTree()
 				.getSelectionPath().getLastPathComponent();
-			if(node != null && node.getUserObject() instanceof IAMSAgentDescription)
-				ret = (IAMSAgentDescription)node.getUserObject();
+			if(node != null && node.getUserObject() instanceof IComponentDescription)
+				ret = (IComponentDescription)node.getUserObject();
 		}
 		return ret;
 	}

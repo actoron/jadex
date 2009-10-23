@@ -1,9 +1,9 @@
 package jadex.bdi.planlib.ams;
 
 import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 
 /**
@@ -20,7 +20,7 @@ public class AMSLocalResumeAgentPlan extends Plan
 		
 		SyncResultListener lis = new SyncResultListener();
 		((IAMS)getScope().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE)).resumeAgent(aid, lis);
-		IAMSAgentDescription desc =  (IAMSAgentDescription)lis.waitForResult();
+		IComponentDescription desc =  (IComponentDescription)lis.waitForResult();
 		
 		getParameter("agentdescription").setValue(desc);
 	}

@@ -1,6 +1,6 @@
 package jadex.tools.common.plugin;
 
-import jadex.adapter.base.fipa.IAMSAgentDescription;
+import jadex.bridge.IComponentDescription;
 
 
 /**
@@ -12,16 +12,16 @@ public interface IAgentListListener
    /** 
     * @param ad
     */
-   void agentDied(IAMSAgentDescription ad);
+   void agentDied(IComponentDescription ad);
 
    /** 
     * @param ad
     */
-   void agentBorn(IAMSAgentDescription ad);
+   void agentBorn(IComponentDescription ad);
    
    /** 
     * @param ad
     */
-   void agentChanged(IAMSAgentDescription ad);
+   void agentChanged(IComponentDescription ad);
 
 }

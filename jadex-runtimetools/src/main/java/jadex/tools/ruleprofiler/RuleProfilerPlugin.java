@@ -1,7 +1,7 @@
 package jadex.tools.ruleprofiler;
 
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
+import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
@@ -152,7 +152,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 			public Icon selectIcon(Object value)
 			{
 				Icon ret;
-				IAMSAgentDescription ad = (IAMSAgentDescription)((DefaultTreeTableNode)value).getUserObject();
+				IComponentDescription ad = (IComponentDescription)((DefaultTreeTableNode)value).getUserObject();
 				if(cards.getComponent(ad)!=null)
 				{
 					ret = RuleProfilerPlugin.icons.getIcon("agent_profiled");
@@ -204,17 +204,17 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 //		jcc.addAgentListListener(this);
 		// todo: ?! is this ok?
 		
-		IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
-		ams.addComponentListener(new IComponentListener()
+		IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
+		ces.addComponentListener(new IComponentListener()
 		{
 			public void componentRemoved(Object desc)
 			{
-				agentDied((IAMSAgentDescription)desc);
+				agentDied((IComponentDescription)desc);
 			}
 			
 			public void componentAdded(Object desc)
 			{
-				agentBorn((IAMSAgentDescription)desc);
+				agentBorn((IComponentDescription)desc);
 			}
 		});
 		
@@ -232,7 +232,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 	/**
 	 * @param ad
 	 */
-	public void agentDied(final IAMSAgentDescription ad)
+	public void agentDied(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -251,7 +251,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 	/**
 	 * @param ad
 	 */
-	public void agentBorn(final IAMSAgentDescription ad)
+	public void agentBorn(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -270,7 +270,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 	/**
 	 * @param ad
 	 */
-	public void agentChanged(final IAMSAgentDescription ad)
+	public void agentChanged(final IComponentDescription ad)
 	{
 		// nop?
 		// Update components on awt thread.
@@ -290,7 +290,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 			split.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable()
 				.getTree().getSelectionPath().getLastPathComponent();
-			IAMSAgentDescription desc = (IAMSAgentDescription)node.getUserObject();
+			IComponentDescription desc = (IComponentDescription)node.getUserObject();
 			RuleProfilerPanel	panel = new RuleProfilerPanel(((AgentControlCenter)getJCC()).getAgent(), desc.getName());
 			GuiProperties.setupHelp(panel, getHelpID());
 			detail.add(panel, node.getUserObject());
@@ -305,7 +305,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 			if(path!=null)
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)path.getLastPathComponent();
-				ret = node!=null && node.getUserObject() instanceof IAMSAgentDescription
+				ret = node!=null && node.getUserObject() instanceof IComponentDescription
 					&& cards.getComponent(node.getUserObject())==null;
 			}
 			return ret;
@@ -323,7 +323,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable().getTree().getSelectionPath().getLastPathComponent();
 			RuleProfilerPanel intro = (RuleProfilerPanel)cards.getComponent(node.getUserObject());			
 			detail.remove(intro);
-			agents.updateAgent((IAMSAgentDescription)node.getUserObject());
+			agents.updateAgent((IComponentDescription)node.getUserObject());
 			split.setCursor(Cursor.getDefaultCursor());
 		}
 
@@ -334,7 +334,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 			if(path!=null)
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)path.getLastPathComponent();
-				ret = node!=null && node.getUserObject() instanceof IAMSAgentDescription
+				ret = node!=null && node.getUserObject() instanceof IComponentDescription
 					&& cards.getComponent(node.getUserObject())!=null;
 			}
 			return ret;

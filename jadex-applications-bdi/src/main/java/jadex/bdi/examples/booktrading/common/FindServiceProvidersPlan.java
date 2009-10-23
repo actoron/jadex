@@ -2,9 +2,9 @@ package jadex.bdi.examples.booktrading.common;
 
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
-import jadex.adapter.base.fipa.ISearchConstraints;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.ISearchConstraints;
 
 /**
  *  Find the service providers.

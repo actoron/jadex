@@ -3,7 +3,6 @@ package jadex.bdi.examples.hunterprey_classic.creature.actsense;
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
-import jadex.adapter.base.fipa.ISearchConstraints;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IBelief;
@@ -11,6 +10,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.PlanFailureException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ISearchConstraints;
 
 
 /**

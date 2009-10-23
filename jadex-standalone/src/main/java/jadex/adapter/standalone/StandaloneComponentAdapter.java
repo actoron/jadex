@@ -1,9 +1,9 @@
 package jadex.adapter.standalone;
 
-import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
@@ -76,10 +76,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		// Verify that the agent is running.
 //		assert !IAMSAgentDescription.STATE_INITIATED.equals(state) : this;
 		
-		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
+		if(IComponentDescription.STATE_TERMINATED.equals(state))
 			throw new AgentTerminatedException(cid.getName());
 		
-		if(IAMSAgentDescription.STATE_ACTIVE.equals(state))
+		if(IComponentDescription.STATE_ACTIVE.equals(state))
 		{
 			// Resume execution of the agent (when active).
 			//System.out.println("wakeup called: "+state);
@@ -141,7 +141,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public IComponentIdentifier getComponentIdentifier()
 	{
-		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
+		if(IComponentDescription.STATE_TERMINATED.equals(state))
 			throw new AgentTerminatedException(cid.getName());
 
 		// todo: remove cast, HACK!!!
@@ -157,7 +157,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public IServiceContainer	getServiceContainer()
 	{
-		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
+		if(IComponentDescription.STATE_TERMINATED.equals(state))
 			throw new AgentTerminatedException(cid.getName());
 
 		return container;
@@ -169,7 +169,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public IClockService getClock()
 	{
-		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
+		if(IComponentDescription.STATE_TERMINATED.equals(state))
 			throw new AgentTerminatedException(cid.getName());
 
 //		return platform.getClock();
@@ -216,7 +216,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public void killAgent(IResultListener listener)
 	{
-		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
+		if(IComponentDescription.STATE_TERMINATED.equals(state))
 			throw new AgentTerminatedException(cid.getName());
 
 		if(!fatalerror)
@@ -231,7 +231,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public void	receiveMessage(Map message, MessageType type)
 	{
-		if(IAMSAgentDescription.STATE_TERMINATED.equals(state) || fatalerror)
+		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
 			throw new AgentTerminatedException(cid.getName());
 
 		// Add optional receival time.
@@ -248,7 +248,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public void	setState(String state)
 	{
-		if(IAMSAgentDescription.STATE_TERMINATED.equals(this.state))
+		if(IComponentDescription.STATE_TERMINATED.equals(this.state))
 			throw new AgentTerminatedException(cid.getName());
 
 		this.state	= state;
@@ -270,7 +270,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public boolean	execute()
 	{
-		if(IAMSAgentDescription.STATE_TERMINATED.equals(state) || fatalerror)
+		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
 			throw new AgentTerminatedException(cid.getName());
 
 		boolean	executed	= false;
@@ -301,7 +301,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public IComponentInstance	getComponentInstance()
 	{
-		if(IAMSAgentDescription.STATE_TERMINATED.equals(state) || fatalerror)
+		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
 			throw new AgentTerminatedException(cid.getName());
 
 		return component;

@@ -1,6 +1,6 @@
 package jadex.adapter.jade.fipaimpl;
 
-import jadex.adapter.base.fipa.IAMSAgentDescription;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 
 import java.io.Serializable;
@@ -10,7 +10,7 @@ import java.io.Serializable;
  *  Java class for concept AMSAgentDescription
  *  of beanynizer_beans_fipa_new ontology.
  */
-public class AMSAgentDescription implements IAMSAgentDescription, Cloneable, Serializable
+public class AMSAgentDescription implements IComponentDescription, Cloneable, Serializable
 {
 	//-------- attributes ----------
 
@@ -39,7 +39,7 @@ public class AMSAgentDescription implements IAMSAgentDescription, Cloneable, Ser
 	{
 		this();
 		setName(aid);
-		setState(IAMSAgentDescription.STATE_ACTIVE);
+		setState(IComponentDescription.STATE_ACTIVE);
 	}
 
 	//-------- accessor methods --------

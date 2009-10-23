@@ -15,17 +15,17 @@ import jade.wrapper.ControllerException;
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.SComponentFactory;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.base.fipa.ISearchConstraints;
 import jadex.adapter.jade.fipaimpl.AMSAgentDescription;
 import jadex.adapter.jade.fipaimpl.AgentIdentifier;
 import jadex.adapter.jade.fipaimpl.SearchConstraints;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageService;
+import jadex.bridge.ISearchConstraints;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
@@ -254,7 +254,7 @@ public class AMS implements IAMS, IService
 		}
 		
 		ad	= new AMSAgentDescription(aid);
-		ad.setState(IAMSAgentDescription.STATE_INITIATED);
+		ad.setState(IComponentDescription.STATE_INITIATED);
 		
 //		System.out.println("added: "+agentdescs.size()+", "+aid);
 
@@ -527,7 +527,7 @@ public class AMS implements IAMS, IService
 	 *  Search for agents matching the given description.
 	 *  @return An array of matching agent descriptions.
 	 */
-	public void	searchAgents(final IAMSAgentDescription adesc, final ISearchConstraints con, IResultListener lis)
+	public void	searchAgents(final IComponentDescription adesc, final ISearchConstraints con, IResultListener lis)
 	{
 		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
 		
@@ -553,7 +553,7 @@ public class AMS implements IAMS, IService
 							{
 								Result res = (Result)myAgent.getContentManager().extractContent(reply);
 								jade.util.leap.List descs = res.getItems();
-								IAMSAgentDescription[] ret = new IAMSAgentDescription[descs.size()];
+								IComponentDescription[] ret = new IComponentDescription[descs.size()];
 								for(int i=0; i<ret.length; i++)
 								{
 									ret[i] = SJade.convertAMSAgentDescriptiontoFipa(
@@ -655,7 +655,7 @@ public class AMS implements IAMS, IService
 		{
 			public void resultAvailable(Object result)
 			{
-				IAMSAgentDescription[] descs = (IAMSAgentDescription[])result;
+				IComponentDescription[] descs = (IComponentDescription[])result;
 				listener.resultAvailable(descs.length==1? descs[0]: null);
 			}
 			public void exceptionOccurred(Exception exception)
@@ -863,7 +863,7 @@ public class AMS implements IAMS, IService
 	 *  @param agent The agent.
 	 *  @return The ams agent description.
 	 */
-	public IAMSAgentDescription createAMSAgentDescription(IComponentIdentifier agent)
+	public IComponentDescription createAMSAgentDescription(IComponentIdentifier agent)
 	{
 		return new AMSAgentDescription(agent);
 	}
@@ -875,7 +875,7 @@ public class AMS implements IAMS, IService
 	 *  @param ownership The ownership.
 	 *  @return The ams agent description.
 	 */
-	public IAMSAgentDescription createAMSAgentDescription(IComponentIdentifier agent, String state, String ownership)
+	public IComponentDescription createAMSAgentDescription(IComponentIdentifier agent, String state, String ownership)
 	{
 		AMSAgentDescription	ret	= new AMSAgentDescription(agent);
 		ret.setState(state);
@@ -1014,7 +1014,7 @@ public class AMS implements IAMS, IService
 				JadeAgentAdapter adapter	= (JadeAgentAdapter)adapters.remove(aid);
 				if(adapter==null)
 					throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
-				adapter.setState(IAMSAgentDescription.STATE_TERMINATED);
+				adapter.setState(IComponentDescription.STATE_TERMINATED);
 				
 				// Stop execution of agent.
 				adapter.cleanupAgent();

@@ -310,7 +310,7 @@ public class SJade
 	/**
 	 *  Convert search constraints to Jade.
 	 */
-	public static SearchConstraints convertSearchConstraintstoJade(jadex.adapter.base.fipa.ISearchConstraints con)
+	public static SearchConstraints convertSearchConstraintstoJade(jadex.bridge.ISearchConstraints con)
 	{
 		SearchConstraints constraints = new SearchConstraints();
 		constraints.setMaxDepth(new Long(con.getMaxDepth()));
@@ -456,7 +456,7 @@ public class SJade
 	/**
 	 *  Convert an AMS AD to JADE.
 	 */
-	public static AMSAgentDescription convertAMSAgentDescriptiontoJade(jadex.adapter.base.fipa.IAMSAgentDescription desc)
+	public static AMSAgentDescription convertAMSAgentDescriptiontoJade(jadex.bridge.IComponentDescription desc)
 	{
 		AMSAgentDescription ret = new AMSAgentDescription();
 		if(desc.getName()!=null)

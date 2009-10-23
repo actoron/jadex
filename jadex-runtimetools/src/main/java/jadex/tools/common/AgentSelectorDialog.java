@@ -1,11 +1,11 @@
 package jadex.tools.common;
 
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.BDIFailureException;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
+import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
@@ -76,7 +76,7 @@ public class AgentSelectorDialog
 	protected AgentTreeTable	seltree;
 	
 	/** The agent identifier panel. */
-	protected AgentIdentifierPanel	aidpanel;
+	protected ComponentIdentifierPanel	aidpanel;
 	
 	/** Is the single selection dialog showing? */
 	protected boolean	singleselection;
@@ -194,13 +194,13 @@ public class AgentSelectorDialog
 		// Todo: fetch agent lists from added remote platforms.
 		try
 		{
-			IAMS	ams	= (IAMS)agent.getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+			IComponentExecutionService ces	= (IComponentExecutionService)agent.getPlatform().getService(IComponentExecutionService.class);
 			IGoal	search	= agent.getGoalbase().createGoal("ams_search_agents");
-			search.getParameter("description").setValue(ams.createAMSAgentDescription(null));
-			search.getParameter("constraints").setValue(ams.createSearchConstraints(-1, 0));
+			search.getParameter("description").setValue(ces.createComponentDescription(null, null, null));
+			search.getParameter("constraints").setValue(ces.createSearchConstraints(-1, 0));
 			agent.dispatchTopLevelGoalAndWait(search, 10000); // todo: use some default timeout
 			//agent.dispatchTopLevelGoalAndWait(search);
-			IAMSAgentDescription[]	descs	= (IAMSAgentDescription[])search.getParameterSet("result").getValues();
+			IComponentDescription[]	descs	= (IComponentDescription[])search.getParameterSet("result").getValues();
 			// Create agent tree of known agents.
 			this.tree.removeAgents();
 			for(int i=0; i<descs.length; i++)
@@ -229,11 +229,11 @@ public class AgentSelectorDialog
 	protected void refreshSelectedTree()
 	{
 		// Create agent tree of selected agents.
-		IAMS	ams	= (IAMS)agent.getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+		IComponentExecutionService ams = (IComponentExecutionService)agent.getPlatform().getService(IComponentExecutionService.class);
 		int	row	= seltree.getTreetable().getSelectionModel().getMinSelectionIndex();
 		this.seltree.removeAgents();
 		for(int i=0; i<sellist.size(); i++)
-			seltree.addAgent(ams.createAMSAgentDescription((IComponentIdentifier)sellist.get(i)));
+			seltree.addAgent(ams.createComponentDescription((IComponentIdentifier)sellist.get(i), null, null));
 		// Force table repaint (hack???).
 		seltree.getTreetable().tableChanged(new TableModelEvent(seltree.getTreetable().getModel(), TableModelEvent.HEADER_ROW));
 		((ResizeableTableHeader)seltree.getTreetable().getTableHeader()).resizeAllColumns();
@@ -289,7 +289,7 @@ public class AgentSelectorDialog
 		removeall.setEnabled(sellist.size()>0);
 		ok.setEnabled(!singleselection || sellist.size()>0);
 
-		IAMS	ams	= (IAMS)agent.getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
+		IComponentExecutionService ces = (IComponentExecutionService)agent.getPlatform().getService(IComponentExecutionService.class);
 		this.tree	= new AgentTreeTable(agent.getPlatform().getName());
 		this.tree.setPreferredSize(new Dimension(200, 100));
 		tree.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -297,7 +297,7 @@ public class AgentSelectorDialog
 		this.seltree.setPreferredSize(new Dimension(200, 100));
 		seltree.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		seltree.getTreetable().getTree().setRootVisible(false);	// Don't show platform node.
-		this.aidpanel	= new AgentIdentifierPanel(null, ams)
+		this.aidpanel	= new ComponentIdentifierPanel(null, ces)
 		{
 			protected void aidChanged()
 			{
@@ -330,7 +330,7 @@ public class AgentSelectorDialog
 					{
 						int	row	= tree.getTreetable().getSelectionModel().getMinSelectionIndex();
 						Object	val	= ((DefaultTreeTableNode)tree.getTreetable().getTree().getPathForRow(row).getLastPathComponent()).getUserObject();
-						if(val instanceof IAMSAgentDescription)
+						if(val instanceof IComponentDescription)
 						{
 							selectenabled	= !singleselection || sellist.size()==0;
 						}
@@ -351,9 +351,9 @@ public class AgentSelectorDialog
 					{
 						int	row	= seltree.getTreetable().getSelectionModel().getMinSelectionIndex();
 						Object	val	= ((DefaultTreeTableNode)seltree.getTreetable().getTree().getPathForRow(row).getLastPathComponent()).getUserObject();
-						if(val instanceof IAMSAgentDescription)
+						if(val instanceof IComponentDescription)
 						{
-							selected	= ((IAMSAgentDescription)val).getName();
+							selected	= ((IComponentDescription)val).getName();
 						}
 					}
 					aidpanel.setAgentIdentifier(selected);
@@ -373,12 +373,12 @@ public class AgentSelectorDialog
 					if(path!=null)
 					{
 						Object	val	= ((DefaultTreeTableNode)path.getLastPathComponent()).getUserObject();
-						if(val instanceof IAMSAgentDescription)
+						if(val instanceof IComponentDescription)
 						{
 							// Use clone to keep original aid unchanged.
-							IAMS	ams	= (IAMS)agent.getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
-							IComponentIdentifier	id	= ((IAMSAgentDescription)val).getName();
-							addSelectedAgent(ams.createAgentIdentifier(id.getName(), false, id.getAddresses()));
+							IComponentExecutionService ces	= (IComponentExecutionService)agent.getPlatform().getService(IComponentExecutionService.class);
+							IComponentIdentifier	id	= ((IComponentDescription)val).getName();
+							addSelectedAgent(ces.createComponentIdentifier(id.getName(), false, id.getAddresses()));
 						}
 					}
 				}
@@ -414,12 +414,12 @@ public class AgentSelectorDialog
 				if(!tree.getTreetable().getSelectionModel().isSelectionEmpty())
 				{
 					Object	val	= ((DefaultTreeTableNode)tree.getTreetable().getTree().getPathForRow(tree.getTreetable().getSelectionModel().getMinSelectionIndex()).getLastPathComponent()).getUserObject();
-					if(val instanceof IAMSAgentDescription)
+					if(val instanceof IComponentDescription)
 					{
 						// Use clone to keep original aid unchanged.
-						IAMS	ams	= (IAMS)agent.getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
-						IComponentIdentifier	id	= ((IAMSAgentDescription)val).getName();
-						addSelectedAgent(ams.createAgentIdentifier(id.getName(), false, id.getAddresses()));
+						IComponentExecutionService ces= (IComponentExecutionService)agent.getPlatform().getService(IComponentExecutionService.class);
+						IComponentIdentifier	id	= ((IComponentDescription)val).getName();
+						addSelectedAgent(ces.createComponentIdentifier(id.getName(), false, id.getAddresses()));
 					}
 				}
 			}
@@ -428,8 +428,8 @@ public class AgentSelectorDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				IAMS	ams	= (IAMS)agent.getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE);
-				addSelectedAgent(ams.createAgentIdentifier("", true));
+				IComponentExecutionService ces = (IComponentExecutionService)agent.getPlatform().getService(IComponentExecutionService.class);
+				addSelectedAgent(ces.createComponentIdentifier("", true, null));
 			}
 		});
 		remove.addActionListener(new ActionListener()
@@ -440,7 +440,7 @@ public class AgentSelectorDialog
 				{
 					int	row	= seltree.getTreetable().getSelectionModel().getMinSelectionIndex();
 					Object	val	= ((DefaultTreeTableNode)seltree.getTreetable().getTree().getPathForRow(row).getLastPathComponent()).getUserObject();
-					if(val instanceof IAMSAgentDescription)
+					if(val instanceof IComponentDescription)
 					{
 						sellist.remove(row);
 						refreshSelectedTree();

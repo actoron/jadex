@@ -1,6 +1,6 @@
 package jadex.tools.common;
 
-import jadex.adapter.base.fipa.IAMSAgentDescription;
+import jadex.bridge.IComponentDescription;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -139,7 +139,7 @@ public class AgentTreeTable extends JScrollPane
 	/**
 	 *  Add an agent.
 	 */
-	public void addAgent(IAMSAgentDescription description)
+	public void addAgent(IComponentDescription description)
 	{		
 		Map values = new HashMap();
 		values.put("name", description.getName().getName());
@@ -226,7 +226,7 @@ public class AgentTreeTable extends JScrollPane
 	/**
 	 *  Update an existing agent description.
 	 */
-	public void updateAgent(IAMSAgentDescription description)
+	public void updateAgent(IComponentDescription description)
 	{
 		Map values = new HashMap();
 		values.put("name", description.getName().getName());
@@ -250,7 +250,7 @@ public class AgentTreeTable extends JScrollPane
 	 *  Remove an agent.
 	 * @param description
 	 */
-	public void removeAgent(IAMSAgentDescription description)
+	public void removeAgent(IComponentDescription description)
 	{
 		DefaultTreeTableNode child = platform.getChild(description);
 		if(child != null)
@@ -281,7 +281,7 @@ public class AgentTreeTable extends JScrollPane
 		for(int i=0; i<children.size(); i++)
 		{
 			DefaultTreeTableNode node = (DefaultTreeTableNode)children.get(i);
-			if(node.getUserObject() instanceof IAMSAgentDescription)
+			if(node.getUserObject() instanceof IComponentDescription)
 				ret.add(node);
 		}
 		

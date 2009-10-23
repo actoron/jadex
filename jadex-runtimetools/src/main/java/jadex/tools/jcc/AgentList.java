@@ -1,7 +1,7 @@
 package jadex.tools.jcc;
 
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
+import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.tools.common.plugin.IAgentListListener;
 
@@ -19,32 +19,32 @@ public class AgentList extends Vector
     *  Plan body.
     * @param agents
     */
-   public void updateAgents(Object[] agents, IAMS ams)
+   public void updateAgents(Object[] agents, IComponentExecutionService ces)
    {
       Vector c = (Vector)clone();
       for(int i=0; i<agents.length; i++)
       {
-         IAMSAgentDescription ad = (IAMSAgentDescription)agents[i];
+         IComponentDescription ad = (IComponentDescription)agents[i];
          if(ad!=null)
          {
         	 int idx = c.indexOf(ad);
         	 if(idx!=-1)
         	 {
-        		 IAMSAgentDescription old = (IAMSAgentDescription)c.remove(idx);
+        		 IComponentDescription old = (IComponentDescription)c.remove(idx);
         		 if(!old.getState().equals(ad.getState()))
         		 {
         			 remove(ad);
         			 IComponentIdentifier	id	= ad.getName();
-        			 id	= ams.createAgentIdentifier(id.getName(), false, id.getAddresses());
-        			 add(ams.createAMSAgentDescription(id, ad.getState(), ad.getOwnership()));
+        			 id	= ces.createComponentIdentifier(id.getName(), false, id.getAddresses());
+        			 add(ces.createComponentDescription(id, ad.getState(), ad.getOwnership()));
         			 fireAgentChanged(ad);
         		 }
         	 }
         	 else
         	 {
     			 IComponentIdentifier	id	= ad.getName();
-    			 id	= ams.createAgentIdentifier(id.getName(), false, id.getAddresses());
-    			 add(ams.createAMSAgentDescription(id, ad.getState(), ad.getOwnership()));
+    			 id	= ces.createComponentIdentifier(id.getName(), false, id.getAddresses());
+    			 add(ces.createComponentDescription(id, ad.getState(), ad.getOwnership()));
         		 fireNewAgentEvent(ad);
         	 }
          }
@@ -53,7 +53,7 @@ public class AgentList extends Vector
       Enumeration e = c.elements();
       while(e.hasMoreElements())
       {
-         IAMSAgentDescription agent = (IAMSAgentDescription)e.nextElement();
+         IComponentDescription agent = (IComponentDescription)e.nextElement();
          remove(agent);
          fireAgentDied(agent);
       }
@@ -69,14 +69,14 @@ public class AgentList extends Vector
       {
          listeners.add(al);
          for(int i=0; i<size(); i++)
-            al.agentBorn((IAMSAgentDescription) get(i));
+            al.agentBorn((IComponentDescription) get(i));
       }
    }
 
    /** 
     * @param ad
     */
-   protected void fireAgentDied(IAMSAgentDescription ad)
+   protected void fireAgentDied(IComponentDescription ad)
    {
       if(ad!=null) 
       {
@@ -91,7 +91,7 @@ public class AgentList extends Vector
    /** 
     * @param ad
     */
-   protected void fireNewAgentEvent(IAMSAgentDescription ad)
+   protected void fireNewAgentEvent(IComponentDescription ad)
    {
       Enumeration e = listeners.elements();
       while (e.hasMoreElements())
@@ -103,7 +103,7 @@ public class AgentList extends Vector
    /** 
     * @param ad
     */
-   protected void fireAgentChanged(IAMSAgentDescription ad)
+   protected void fireAgentChanged(IComponentDescription ad)
    {
 	  //System.out.println("The agent state changed: "+ad);
       Enumeration e = listeners.elements();

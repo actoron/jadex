@@ -3,10 +3,10 @@ package jadex.bdi.planlib.df;
 import jadex.adapter.base.fipa.DFSearch;
 import jadex.adapter.base.fipa.Done;
 import jadex.adapter.base.fipa.IDFAgentDescription;
-import jadex.adapter.base.fipa.ISearchConstraints;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.ISearchConstraints;
 
 /**
  *  Search at a remote DF.

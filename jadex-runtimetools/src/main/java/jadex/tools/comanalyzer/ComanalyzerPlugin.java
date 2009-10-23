@@ -1,10 +1,9 @@
 package jadex.tools.comanalyzer;
 
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.impl.ElementFlyweight;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentIdentifier;
@@ -390,7 +389,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 			public Icon selectIcon(Object value)
 			{
 				Icon ret;
-				IAMSAgentDescription ad = (IAMSAgentDescription)((DefaultTreeTableNode)value).getUserObject();
+				IComponentDescription ad = (IComponentDescription)((DefaultTreeTableNode)value).getUserObject();
 				Agent agent = agentlist.getAgent(ad.getName());
 
 				if(agent.getState().equals(Agent.STATE_OBSERVED))
@@ -467,7 +466,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 		{
 			public void resultAvailable(Object result)
 			{
-				IAMSAgentDescription[] res = (IAMSAgentDescription[])result;
+				IComponentDescription[] res = (IComponentDescription[])result;
 				for(int i=0; i<res.length; i++)
 					agentBorn(res[i]);
 			}
@@ -480,12 +479,12 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 		{
 			public void componentRemoved(Object desc)
 			{
-				agentDied((IAMSAgentDescription)desc);
+				agentDied((IComponentDescription)desc);
 			}
 			
 			public void componentAdded(Object desc)
 			{
-				agentBorn((IAMSAgentDescription)desc);
+				agentBorn((IComponentDescription)desc);
 			}
 		});
 		
@@ -511,7 +510,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 	 * Remove listeners and set agent state.
 	 * @param ad The agent description of the agent that has died.
 	 */
-	public void agentDied(final IAMSAgentDescription ad)
+	public void agentDied(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -538,7 +537,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 	 * Add the agent to the agentlist
 	 * @param ad The agent description of the agent that was born.
 	 */
-	public void agentBorn(final IAMSAgentDescription ad)
+	public void agentBorn(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -577,7 +576,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 	/**
 	 * @param ad The agent description of the agent that has changed.
 	 */
-	public void agentChanged(final IAMSAgentDescription ad)
+	public void agentChanged(final IComponentDescription ad)
 	{
 		// NOP
 	}
@@ -588,10 +587,10 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 	 * Creates a listener for the agent to obtain internal agent events.
 	 * @param desc The agentdescription.
 	 */
-	public void addAgentListener(final IAMSAgentDescription desc)
+	public void addAgentListener(final IComponentDescription desc)
 	{
 		IComponentIdentifier aid = desc.getName();
-		((IAMS)jcc.getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE))
+		((IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class))
 			.getExternalAccess(aid, new IResultListener()
 			{
 				public void exceptionOccurred(Exception exception)
@@ -618,10 +617,10 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 	 * @param cleanup <code>true</code> if the listener should be removed from
 	 * the agent. (e.g. on agent death it isnt nessesary)
 	 */
-	public void removeAgentListener(final IAMSAgentDescription desc, boolean cleanup)
+	public void removeAgentListener(final IComponentDescription desc, boolean cleanup)
 	{
 		IComponentIdentifier aid = desc.getName();
-		((IAMS)jcc.getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE))
+		((IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class))
 			.getExternalAccess(aid, new IResultListener()
 			{
 				public void exceptionOccurred(Exception exception)
@@ -1020,8 +1019,9 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 			agentlist.addAgent(sender);
 
 			// add to agent tree table
-			IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
-			IAMSAgentDescription desc = ams.createAMSAgentDescription(sender.getAid());
+			IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer()
+				.getService(IComponentExecutionService.class);
+			IComponentDescription desc = ces.createComponentDescription(sender.getAid(), null, null);
 			agents.addAgent(desc);
 		}
 		else
@@ -1042,8 +1042,9 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 			agentlist.addAgent(receiver);
 
 			// add to agent tree table
-			IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
-			IAMSAgentDescription ad = ams.createAMSAgentDescription(receiver.getAid());
+			IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer()
+				.getService(IComponentExecutionService.class);
+			IComponentDescription ad = ces.createComponentDescription(receiver.getAid(), null, null);
 			agents.addAgent(ad);
 
 		}
@@ -1152,8 +1153,9 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 					agents[i].setState(Agent.STATE_IGNORED);
 					update.add(agents[i]);
 
-					IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
-					IAMSAgentDescription desc = ams.createAMSAgentDescription(agents[i].getAid());
+					IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer()
+						.getService(IComponentExecutionService.class);
+					IComponentDescription desc = ces.createComponentDescription(agents[i].getAid(), null, null);
 					removeAgentListener(desc, true);
 					ComanalyzerPlugin.this.agents.updateAgent(desc);
 				}
@@ -1178,8 +1180,9 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 					agents[i].setState(Agent.STATE_OBSERVED);
 					update.add(agents[i]);
 
-					IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
-					IAMSAgentDescription desc = ams.createAMSAgentDescription(agents[i].getAid());
+					IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer()
+						.getService(IComponentExecutionService.class);
+					IComponentDescription desc = ces.createComponentDescription(agents[i].getAid(), null, null);
 					addAgentListener(desc);
 					ComanalyzerPlugin.this.agents.updateAgent(desc);
 				}
@@ -1215,8 +1218,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 					// remove dead agent from agentlist
 					agentlist.removeAgent(agents[i]);
 					// remove dead agent from agentree
-					IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
-					IAMSAgentDescription desc = ams.createAMSAgentDescription(agents[i].getAid());
+					IComponentExecutionService ams = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
+					IComponentDescription desc = ams.createComponentDescription(agents[i].getAid(), null, null);
 					ComanalyzerPlugin.this.agents.removeAgent(desc);
 				}
 			}
@@ -1260,8 +1263,9 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 				if(agents[i].getState().equals(Agent.STATE_DEAD))
 				{
 					agentlist.removeAgent(agents[i]);
-					IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
-					IAMSAgentDescription desc = ams.createAMSAgentDescription(agents[i].getAid());
+					IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer()
+						.getService(IComponentExecutionService.class);
+					IComponentDescription desc = ces.createComponentDescription(agents[i].getAid(), null, null);
 					ComanalyzerPlugin.this.agents.removeAgent(desc);
 				}
 			}
@@ -1313,7 +1317,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 				return;
 			split.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable().getTree().getSelectionPath().getLastPathComponent();
-			final IAMSAgentDescription desc = (IAMSAgentDescription)node.getUserObject();
+			final IComponentDescription desc = (IComponentDescription)node.getUserObject();
 			addAgentListener(desc);
 			split.setCursor(Cursor.getDefaultCursor());
 
@@ -1345,9 +1349,9 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 				// ret = node != null && node.getUserObject() instanceof
 				// AMSAgentDescription &&
 				// !listeners.containsKey(node.getUserObject());
-				if(node != null && node.getUserObject() instanceof IAMSAgentDescription)
+				if(node != null && node.getUserObject() instanceof IComponentDescription)
 				{
-					IAMSAgentDescription desc = (IAMSAgentDescription)node.getUserObject();
+					IComponentDescription desc = (IComponentDescription)node.getUserObject();
 					Agent agent = agentlist.getAgent(desc.getName());
 					ret = agent.getState().equals(Agent.STATE_IGNORED);
 				}
@@ -1365,7 +1369,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 				return;
 			split.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable().getTree().getSelectionPath().getLastPathComponent();
-			final IAMSAgentDescription desc = (IAMSAgentDescription)node.getUserObject();
+			final IComponentDescription desc = (IComponentDescription)node.getUserObject();
 			removeAgentListener(desc, true);
 			split.setCursor(Cursor.getDefaultCursor());
 
@@ -1397,9 +1401,9 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 				// ret = node != null && node.getUserObject() instanceof
 				// AMSAgentDescription &&
 				// listeners.containsKey(node.getUserObject());
-				if(node != null && node.getUserObject() instanceof IAMSAgentDescription)
+				if(node != null && node.getUserObject() instanceof IComponentDescription)
 				{
-					IAMSAgentDescription desc = (IAMSAgentDescription)node.getUserObject();
+					IComponentDescription desc = (IComponentDescription)node.getUserObject();
 					Agent agent = agentlist.getAgent(desc.getName());
 					ret = agent.getState().equals(Agent.STATE_OBSERVED);
 				}

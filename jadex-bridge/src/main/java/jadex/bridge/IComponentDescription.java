@@ -1,11 +1,10 @@
-package jadex.adapter.base.fipa;
+package jadex.bridge;
 
-import jadex.bridge.IComponentIdentifier;
 
 /**
  * 
  */
-public interface IAMSAgentDescription
+public interface IComponentDescription
 {
 	//-------- constants --------
 	

@@ -1,8 +1,8 @@
 package jadex.wfms.plugin.starter;
 
 import jadex.adapter.base.SComponentFactory;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.bdi.runtime.GoalFailureException;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -271,8 +271,8 @@ public class StarterPlugin extends AbstractJCCPlugin
 			public Icon selectIcon(Object value)
 			{
 				Icon	ret;
-				IAMSAgentDescription ad = (IAMSAgentDescription)((DefaultTreeTableNode)value).getUserObject();
-				if(IAMSAgentDescription.STATE_SUSPENDED.equals(ad.getState()))
+				IComponentDescription ad = (IComponentDescription)((DefaultTreeTableNode)value).getUserObject();
+				if(IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
 				{
 					ret = StarterPlugin.icons.getIcon("agent_suspended");
 				}
@@ -495,7 +495,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 			for(int i=0; paths!=null && i<paths.length; i++) 
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-				if(node!=null && node.getUserObject() instanceof IAMSAgentDescription)
+				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
 					// todo: suspend process
 				}
@@ -509,10 +509,10 @@ public class StarterPlugin extends AbstractJCCPlugin
 			for(int i=0; ret && paths!=null && i<paths.length; i++) 
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-				if(node!=null && node.getUserObject() instanceof IAMSAgentDescription)
+				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
-					ret &= IAMSAgentDescription.STATE_ACTIVE.equals(
-						((IAMSAgentDescription)node.getUserObject()).getState());
+					ret &= IComponentDescription.STATE_ACTIVE.equals(
+						((IComponentDescription)node.getUserObject()).getState());
 				}
 			}
 			return ret;
@@ -530,7 +530,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-				if(node!=null && node.getUserObject() instanceof IAMSAgentDescription)
+				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
 //					jcc.resumeAgent(((IAMSAgentDescription)node.getUserObject()).getName());
 					
@@ -546,10 +546,10 @@ public class StarterPlugin extends AbstractJCCPlugin
 			for(int i=0; ret && paths!=null && i<paths.length; i++) 
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-				if(node!=null && node.getUserObject() instanceof IAMSAgentDescription)
+				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
-					ret &= IAMSAgentDescription.STATE_SUSPENDED.equals(
-						((IAMSAgentDescription)node.getUserObject()).getState());
+					ret &= IComponentDescription.STATE_SUSPENDED.equals(
+						((IComponentDescription)node.getUserObject()).getState());
 				}
 			}
 			return ret;
@@ -567,7 +567,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 			for(int i=0; paths!=null && i<paths.length; i++) 
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-				if(node!=null && node.getUserObject() instanceof IAMSAgentDescription)
+				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
 //					jcc.killAgent(((IAMSAgentDescription)node.getUserObject()).getName());
 //					((IExecutionService)jcc.getServiceContainer().getService(IExecutionService.class)).killProcess();
@@ -607,7 +607,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 	 *  Called when an agent has died.
 	 *  @param ad The agent description.
 	 */
-	public void agentDied(final IAMSAgentDescription ad)
+	public void agentDied(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -623,7 +623,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 	 *  Called when an agent is born.
 	 *  @param ad the agent description.
 	 */
-	public void agentBorn(final IAMSAgentDescription ad)
+	public void agentBorn(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -639,7 +639,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 	 *  Called when an agent changed.
 	 *  @param ad the agent description.
 	 */
-	public void agentChanged(final IAMSAgentDescription ad)
+	public void agentChanged(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()

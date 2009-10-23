@@ -1,6 +1,6 @@
 package jadex.adapter.jade.fipaimpl;
 
-import jadex.adapter.base.fipa.ISearchConstraints;
+import jadex.bridge.ISearchConstraints;
 
 import java.io.Serializable;
 

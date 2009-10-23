@@ -2,10 +2,10 @@ package jadex.adapter.standalone.service.componentexecution;
 
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.contextservice.BaseContext;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.standalone.StandaloneComponentAdapter;
 import jadex.adapter.standalone.fipaimpl.AMSAgentDescription;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
@@ -126,8 +126,8 @@ public class ComponentExecutionService implements IComponentExecutionService
 				adapters.put(aid, agent);
 				
 				ad	= new AMSAgentDescription(aid);
-				ad.setState(IAMSAgentDescription.STATE_INITIATED);
-				agent.setState(IAMSAgentDescription.STATE_INITIATED);
+				ad.setState(IComponentDescription.STATE_INITIATED);
+				agent.setState(IComponentDescription.STATE_INITIATED);
 				descs.put(aid, ad);
 			}
 		}
@@ -172,14 +172,14 @@ public class ComponentExecutionService implements IComponentExecutionService
 			synchronized(descs)
 			{
 				AMSAgentDescription	desc	= (AMSAgentDescription)descs.get(componentid);
-				if(desc!=null && IAMSAgentDescription.STATE_INITIATED.equals(desc.getState()))
+				if(desc!=null && IComponentDescription.STATE_INITIATED.equals(desc.getState()))
 				{
 					StandaloneComponentAdapter	adapter	= (StandaloneComponentAdapter)adapters.get(componentid);
 					if(adapter!=null)
 					{
 						// Todo: use result listener and set active state after agent has inited.
-						desc.setState(IAMSAgentDescription.STATE_ACTIVE);
-						adapter.setState(IAMSAgentDescription.STATE_ACTIVE);
+						desc.setState(IComponentDescription.STATE_ACTIVE);
+						adapter.setState(IComponentDescription.STATE_ACTIVE);
 						adapter.wakeup();
 					}
 					else
@@ -236,14 +236,14 @@ public class ComponentExecutionService implements IComponentExecutionService
 				if(desc!=null)
 				{
 					// Resume a suspended agent before killing it.
-					if(IAMSAgentDescription.STATE_SUSPENDED.equals(desc.getState()))
+					if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
 						resumeComponent(componentid, null);
 					
-					if(IAMSAgentDescription.STATE_ACTIVE.equals(desc.getState()))
+					if(IComponentDescription.STATE_ACTIVE.equals(desc.getState()))
 					//if(!AMSAgentDescription.STATE_TERMINATING.equals(desc.getState()))
 					{
-						agent.setState(IAMSAgentDescription.STATE_TERMINATING);
-						desc.setState(IAMSAgentDescription.STATE_TERMINATING);
+						agent.setState(IComponentDescription.STATE_TERMINATING);
+						desc.setState(IComponentDescription.STATE_TERMINATING);
 //						if(listeners.get(aid)!=null)
 //							throw new RuntimeException("Multiple result listeners for agent: "+aid);
 //						listeners.put(aid, listener);
@@ -277,14 +277,14 @@ public class ComponentExecutionService implements IComponentExecutionService
 				if(adapter==null || ad==null)
 					listener.exceptionOccurred(new RuntimeException("Component identifier not registered: "+componentid));
 					//throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
-				if(!IAMSAgentDescription.STATE_ACTIVE.equals(ad.getState()))
+				if(!IComponentDescription.STATE_ACTIVE.equals(ad.getState()))
 					listener.exceptionOccurred(new RuntimeException("Only active components can be suspended: "+componentid+" "+ad.getState()));
 					//throw new RuntimeException("Only active agents can be suspended: "+aid+" "+ad.getState());
 				
 				// todo: call listener when suspension has finished!!!
 				
-				ad.setState(IAMSAgentDescription.STATE_SUSPENDED);
-				adapter.setState(IAMSAgentDescription.STATE_SUSPENDED);
+				ad.setState(IComponentDescription.STATE_SUSPENDED);
+				adapter.setState(IComponentDescription.STATE_SUSPENDED);
 				IExecutionService exe = (IExecutionService)container.getService(IExecutionService.class);
 				exe.cancel(adapter, listener);
 			}
@@ -309,12 +309,12 @@ public class ComponentExecutionService implements IComponentExecutionService
 				if(adapter==null || ad==null)
 					listener.exceptionOccurred(new RuntimeException("Component identifier not registered: "+componentid));
 					//throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
-				if(!IAMSAgentDescription.STATE_SUSPENDED.equals(ad.getState()))
+				if(!IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
 					listener.exceptionOccurred(new RuntimeException("Only active components can be suspended: "+componentid+" "+ad.getState()));
 					//throw new RuntimeException("Only suspended agents can be resumed: "+aid+" "+ad.getState());
 				
-				ad.setState(IAMSAgentDescription.STATE_ACTIVE);
-				adapter.setState(IAMSAgentDescription.STATE_ACTIVE);
+				ad.setState(IComponentDescription.STATE_ACTIVE);
+				adapter.setState(IComponentDescription.STATE_ACTIVE);
 				IExecutionService exe = (IExecutionService)container.getService(IExecutionService.class);
 				exe.execute(adapter);
 			}
@@ -369,7 +369,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 		
 		public void resultAvailable(Object result)
 		{
-			IAMSAgentDescription ad = (IAMSAgentDescription)descs.get(cid);
+			IComponentDescription ad = (IComponentDescription)descs.get(cid);
 			synchronized(adapters)
 			{
 				synchronized(descs)
@@ -378,7 +378,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 					StandaloneComponentAdapter	adapter	= (StandaloneComponentAdapter)adapters.remove(cid);
 					if(adapter==null)
 						throw new RuntimeException("Component Identifier not registered: "+cid);
-					adapter.setState(IAMSAgentDescription.STATE_TERMINATED);
+					adapter.setState(IComponentDescription.STATE_TERMINATED);
 					descs.remove(cid);
 					
 					// Stop execution of agent.

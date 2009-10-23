@@ -1,7 +1,6 @@
 package jadex.tools.introspector;
 
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentListener;
 import jadex.commons.Properties;
@@ -301,7 +300,7 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 			public Icon selectIcon(Object value)
 			{
 				Icon ret;
-				IAMSAgentDescription ad = (IAMSAgentDescription)((DefaultTreeTableNode)value).getUserObject();
+				IComponentDescription ad = (IComponentDescription)((DefaultTreeTableNode)value).getUserObject();
 				if(cards.getComponent(ad)!=null)
 				{
 					ret = IntrospectorPlugin.icons.getIcon("agent_introspected");
@@ -357,7 +356,7 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 		{
 			public void resultAvailable(Object result)
 			{
-				IAMSAgentDescription[] res = (IAMSAgentDescription[])result;
+				IComponentDescription[] res = (IComponentDescription[])result;
 				for(int i=0; i<res.length; i++)
 					agentBorn(res[i]);
 			}
@@ -370,12 +369,12 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 		{
 			public void componentRemoved(Object desc)
 			{
-				agentDied((IAMSAgentDescription)desc);
+				agentDied((IComponentDescription)desc);
 			}
 			
 			public void componentAdded(Object desc)
 			{
-				agentBorn((IAMSAgentDescription)desc);
+				agentBorn((IComponentDescription)desc);
 			}
 		});
 		
@@ -393,14 +392,14 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 	/**
 	 *  Called when an agent has changed its state (e.g. suspended).
 	 */
-	public void agentChanged(IAMSAgentDescription ad)
+	public void agentChanged(IComponentDescription ad)
 	{
 	}
 	
 	/**
 	 * @param ad
 	 */
-	public void agentDied(final IAMSAgentDescription ad)
+	public void agentDied(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -422,7 +421,7 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 	/**
 	 * @param ad
 	 */
-	public void agentBorn(final IAMSAgentDescription ad)
+	public void agentBorn(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -448,7 +447,7 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 			split.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable()
 				.getTree().getSelectionPath().getLastPathComponent();
-			IAMSAgentDescription desc = (IAMSAgentDescription)node.getUserObject();
+			IComponentDescription desc = (IComponentDescription)node.getUserObject();
 			boolean[]	active	= new boolean[checkboxes.length];
 			for(int i=0; i<checkboxes.length; i++)
 				active[i]	= checkboxes[i].isSelected();
@@ -466,7 +465,7 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 			if(path!=null)
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)path.getLastPathComponent();
-				ret = node!=null && node.getUserObject() instanceof IAMSAgentDescription
+				ret = node!=null && node.getUserObject() instanceof IComponentDescription
 					&& cards.getComponent(node.getUserObject())==null;
 			}
 			return ret;
@@ -485,7 +484,7 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 			ToolPanel intro = (ToolPanel)cards.getComponent(node.getUserObject());
 			intro.dispose();
 			detail.remove(intro);
-			agents.updateAgent((IAMSAgentDescription)node.getUserObject());
+			agents.updateAgent((IComponentDescription)node.getUserObject());
 			split.setCursor(Cursor.getDefaultCursor());
 		}
 
@@ -496,7 +495,7 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 			if(path!=null)
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)path.getLastPathComponent();
-				ret = node!=null && node.getUserObject() instanceof IAMSAgentDescription
+				ret = node!=null && node.getUserObject() instanceof IComponentDescription
 					&& cards.getComponent(node.getUserObject())!=null;
 			}
 			return ret;

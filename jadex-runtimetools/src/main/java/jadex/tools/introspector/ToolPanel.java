@@ -1,10 +1,10 @@
 package jadex.tools.introspector;
 
-import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.impl.ElementFlyweight;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.concurrent.IResultListener;
 import jadex.rules.tools.reteviewer.RuleEnginePanel;
@@ -39,7 +39,7 @@ public class ToolPanel	extends JPanel
 	public ToolPanel(IExternalAccess agent, IComponentIdentifier observed)
 	{
         // Hack!?!?!
-		((IAMS)agent.getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE))
+		((IComponentExecutionService)agent.getPlatform().getService(IComponentExecutionService.class))
 			.getExternalAccess(observed, new IResultListener()
 		{
 			public void exceptionOccurred(Exception exception)

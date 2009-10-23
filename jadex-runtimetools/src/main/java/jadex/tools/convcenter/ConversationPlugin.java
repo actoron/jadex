@@ -1,15 +1,14 @@
 package jadex.tools.convcenter;
 
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.IParameterSet;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentListener;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
@@ -91,11 +90,11 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 		public void actionPerformed(ActionEvent e)
 		{
 			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable().getTree().getSelectionPath().getLastPathComponent();
-			IAMSAgentDescription desc = (IAMSAgentDescription)node.getUserObject();
+			IComponentDescription desc = (IComponentDescription)node.getUserObject();
 			// Use clone, as added agent id might be modified by user.
-			IAMS	ams	= (IAMS)jcc.getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE);
+			IComponentExecutionService ces  = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
 			IComponentIdentifier	receiver	= desc.getName();
-			receiver	= ams.createAgentIdentifier(receiver.getName(), false, receiver.getAddresses());
+			receiver = ces.createComponentIdentifier(receiver.getName(), false, receiver.getAddresses());
 			IMessageEvent	message	= convcenter.getMessagePanel().getMessage();
 			IParameterSet rcvs = message.getParameterSet(SFipa.RECEIVERS);
 			if(rcvs.containsValue(receiver))
@@ -152,7 +151,7 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 		{
 			public void resultAvailable(Object result)
 			{
-				IAMSAgentDescription[] res = (IAMSAgentDescription[])result;
+				IComponentDescription[] res = (IComponentDescription[])result;
 				for(int i=0; i<res.length; i++)
 					agentBorn(res[i]);
 			}
@@ -165,12 +164,12 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 		{
 			public void componentRemoved(Object desc)
 			{
-				agentDied((IAMSAgentDescription)desc);
+				agentDied((IComponentDescription)desc);
 			}
 			
 			public void componentAdded(Object desc)
 			{
-				agentBorn((IAMSAgentDescription)desc);
+				agentBorn((IComponentDescription)desc);
 			}
 		});
 		
@@ -255,7 +254,7 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 	/**
 	 * @param ad
 	 */
-	public void agentDied(final IAMSAgentDescription ad)
+	public void agentDied(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -270,7 +269,7 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 	/**
 	 * @param ad
 	 */
-	public void agentBorn(final IAMSAgentDescription ad)
+	public void agentBorn(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -285,7 +284,7 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 	/**
 	 * @param ad
 	 */
-	public void agentChanged(final IAMSAgentDescription ad)
+	public void agentChanged(final IComponentDescription ad)
 	{
 		// nop?
 		// Update components on awt thread.

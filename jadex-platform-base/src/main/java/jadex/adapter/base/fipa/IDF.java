@@ -1,6 +1,7 @@
 package jadex.adapter.base.fipa;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ISearchConstraints;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.Date;

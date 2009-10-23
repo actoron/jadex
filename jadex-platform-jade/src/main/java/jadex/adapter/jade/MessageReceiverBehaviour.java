@@ -31,10 +31,10 @@ import jadex.adapter.base.fipa.DFModify;
 import jadex.adapter.base.fipa.DFRegister;
 import jadex.adapter.base.fipa.DFSearch;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.IAgentAction;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.SFipa;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IContentCodec;
 import jadex.bridge.IComponentInstance;
 
@@ -215,7 +215,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 								{
 									if(msg.getSender().getLocalName().toLowerCase().indexOf("ams")!=-1)
 									{
-										IAMSAgentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription)((Modify)request).getDescription(), ams);
+										IComponentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription)((Modify)request).getDescription(), ams);
 										if(AMSAgentDescription.SUSPENDED.equals(amsadesc.getState()))
 											jadexaction	= new AMSSuspendAgent(amsadesc.getName());
 										else
@@ -256,9 +256,9 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 								{
 									if(msg.getSender().getLocalName().toLowerCase().indexOf("ams")!=-1)
 									{
-										IAMSAgentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription)((Search)request).getDescription(), ams);
+										IComponentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription)((Search)request).getDescription(), ams);
 										List	items	= ((Result)content).getItems();
-										IAMSAgentDescription[]	results	= new IAMSAgentDescription[items.size()];
+										IComponentDescription[]	results	= new IComponentDescription[items.size()];
 										for(int i=0; i<results.length; i++)
 											results[i]	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription) items.get(i), ams);
 										jadexaction	= new AMSSearchAgents(amsadesc, results);

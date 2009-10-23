@@ -1,6 +1,6 @@
 package jadex.tools.common;
 
-import jadex.adapter.base.fipa.IAMSAgentDescription;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IApplicationContext;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -268,7 +268,7 @@ public class ApplicationTreeTable extends JScrollPane
 		for(int i=0; i<children.size(); i++)
 		{
 			DefaultTreeTableNode node = (DefaultTreeTableNode)children.get(i);
-			if(node.getUserObject() instanceof IAMSAgentDescription)
+			if(node.getUserObject() instanceof IComponentDescription)
 				ret.add(node);
 		}
 		

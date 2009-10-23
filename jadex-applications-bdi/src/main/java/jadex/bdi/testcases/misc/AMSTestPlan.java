@@ -1,15 +1,15 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.base.fipa.ISearchConstraints;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.planlib.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.ISearchConstraints;
 
 /**
  *  Test the AMS plans.
@@ -51,7 +51,7 @@ public class AMSTestPlan extends Plan
 		TestReport tr = new TestReport("#"+num++, "Searching for all agents");
 		getLogger().info("\nSearching for all agents.");
 		IAMS amsservice = (IAMS)getScope().getPlatform().getService(IAMS.class);
-		IAMSAgentDescription desc = amsservice.createAMSAgentDescription(null);
+		IComponentDescription desc = amsservice.createAMSAgentDescription(null);
 		ISearchConstraints constraints = amsservice.createSearchConstraints(-1, 0);
 		/*AMSAgentDescription	desc	= new AMSAgentDescription();
 		SearchConstraints	constraints	= new SearchConstraints();
@@ -64,7 +64,7 @@ public class AMSTestPlan extends Plan
 		try
 		{
 			dispatchSubgoalAndWait(search);
-			IAMSAgentDescription[]	result	= (IAMSAgentDescription[])search
+			IComponentDescription[]	result	= (IComponentDescription[])search
 				.getParameterSet("result").getValues();
 			getLogger().info("Success! Found agents: "+result.length);
 			for(int i=0; i< result.length; i++)
@@ -122,7 +122,7 @@ public class AMSTestPlan extends Plan
 			try
 			{
 				dispatchSubgoalAndWait(search);
-				IAMSAgentDescription[] result	= (IAMSAgentDescription[])search.getParameterSet("result").getValues();
+				IComponentDescription[] result	= (IComponentDescription[])search.getParameterSet("result").getValues();
 				if(result.length==1)
 				{
 					getLogger().info("Success! Found agent:"+result[0].getName());
@@ -225,7 +225,7 @@ public class AMSTestPlan extends Plan
 			try
 			{
 				dispatchSubgoalAndWait(search);
-				IAMSAgentDescription[] result	= (IAMSAgentDescription[])search.getParameterSet("result").getValues();
+				IComponentDescription[] result	= (IComponentDescription[])search.getParameterSet("result").getValues();
 				if(result.length==0)
 				{
 					getLogger().info("Success! Found 0 agents.");

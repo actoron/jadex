@@ -2,9 +2,9 @@ package jadex.bdi.amsagent;
 
 import jadex.adapter.base.fipa.AMSSearchAgents;
 import jadex.adapter.base.fipa.Done;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentDescription;
 
 /**
  *  Search for agents.
@@ -24,7 +24,7 @@ public class AMSSearchAgentsPlan extends Plan
 		sag.getParameter("constraints").setValue(sa.getSearchConstraints());
 		dispatchSubgoalAndWait(sag);
 
-		sa.setAgentDescriptions((IAMSAgentDescription[])sag.getParameterSet("result").getValues());
+		sa.setAgentDescriptions((IComponentDescription[])sag.getParameterSet("result").getValues());
 		getParameter("result").setValue(new Done(sa));
 	}
 }

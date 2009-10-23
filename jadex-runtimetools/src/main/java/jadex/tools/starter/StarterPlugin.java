@@ -2,14 +2,13 @@ package jadex.tools.starter;
 
 import jadex.adapter.base.SComponentExecutionService;
 import jadex.adapter.base.SComponentFactory;
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.bridge.IComponentListener;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
+import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
-import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IPlatform;
 import jadex.commons.ChangeEvent;
@@ -322,8 +321,8 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 			public Icon selectIcon(Object value)
 			{
 				Icon	ret;
-				IAMSAgentDescription ad = (IAMSAgentDescription)((DefaultTreeTableNode)value).getUserObject();
-				if(IAMSAgentDescription.STATE_SUSPENDED.equals(ad.getState()))
+				IComponentDescription ad = (IComponentDescription)((DefaultTreeTableNode)value).getUserObject();
+				if(IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
 				{
 					ret = StarterPlugin.icons.getIcon("agent_suspended");
 				}
@@ -405,7 +404,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		{
 			public void resultAvailable(Object result)
 			{
-				IAMSAgentDescription[] res = (IAMSAgentDescription[])result;
+				IComponentDescription[] res = (IComponentDescription[])result;
 				for(int i=0; i<res.length; i++)
 					agentBorn(res[i]);
 			}
@@ -418,12 +417,12 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		{
 			public void componentRemoved(Object desc)
 			{
-				agentDied((IAMSAgentDescription)desc);
+				agentDied((IComponentDescription)desc);
 			}
 			
 			public void componentAdded(Object desc)
 			{
-				agentBorn((IAMSAgentDescription)desc);
+				agentBorn((IComponentDescription)desc);
 			}
 		});
 
@@ -573,10 +572,10 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 			for(int i=0; paths!=null && i<paths.length; i++) 
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-				if(node!=null && node.getUserObject() instanceof IAMSAgentDescription)
+				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
 					IComponentExecutionService ces = (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
-					ces.suspendComponent(((IAMSAgentDescription)node.getUserObject()).getName(), new IResultListener()
+					ces.suspendComponent(((IComponentDescription)node.getUserObject()).getName(), new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -598,10 +597,10 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 			for(int i=0; ret && paths!=null && i<paths.length; i++) 
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-				if(node!=null && node.getUserObject() instanceof IAMSAgentDescription)
+				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
-					ret &= IAMSAgentDescription.STATE_ACTIVE.equals(
-						((IAMSAgentDescription)node.getUserObject()).getState());
+					ret &= IComponentDescription.STATE_ACTIVE.equals(
+						((IComponentDescription)node.getUserObject()).getState());
 				}
 			}
 			return ret;
@@ -619,10 +618,10 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-				if(node!=null && node.getUserObject() instanceof IAMSAgentDescription)
+				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
 					IComponentExecutionService ces = (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
-					ces.resumeComponent(((IAMSAgentDescription)node.getUserObject()).getName(), new IResultListener()
+					ces.resumeComponent(((IComponentDescription)node.getUserObject()).getName(), new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -644,10 +643,10 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 			for(int i=0; ret && paths!=null && i<paths.length; i++) 
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-				if(node!=null && node.getUserObject() instanceof IAMSAgentDescription)
+				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
-					ret &= IAMSAgentDescription.STATE_SUSPENDED.equals(
-						((IAMSAgentDescription)node.getUserObject()).getState());
+					ret &= IComponentDescription.STATE_SUSPENDED.equals(
+						((IComponentDescription)node.getUserObject()).getState());
 				}
 			}
 			return ret;
@@ -665,10 +664,10 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 			for(int i=0; paths!=null && i<paths.length; i++) 
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-				if(node!=null && node.getUserObject() instanceof IAMSAgentDescription)
+				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
 					IComponentExecutionService ces = (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
-					ces.destroyComponent(((IAMSAgentDescription)node.getUserObject()).getName(), new IResultListener()
+					ces.destroyComponent(((IComponentDescription)node.getUserObject()).getName(), new IResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -732,8 +731,19 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			IAMS	ams	= (IAMS)getJCC().getServiceContainer().getService(IAMS.class);
-			ams.shutdownPlatform(new IResultListener()
+//			IComponentExecutionService ces = (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
+//			ces.shutdownPlatform(new IResultListener()
+//			{
+//				public void resultAvailable(Object result)
+//				{
+//				}						
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					getJCC().displayError("Platform Shutdown Problem", "Could not kill platform.", exception);
+//				}
+//			});
+			
+			getJCC().getServiceContainer().shutdown(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -750,7 +760,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	 *  Called when an agent has died.
 	 *  @param ad The agent description.
 	 */
-	public void agentDied(final IAMSAgentDescription ad)
+	public void agentDied(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -766,7 +776,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	 *  Called when an agent is born.
 	 *  @param ad the agent description.
 	 */
-	public void agentBorn(final IAMSAgentDescription ad)
+	public void agentBorn(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -782,7 +792,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	 *  Called when an agent changed.
 	 *  @param ad the agent description.
 	 */
-	public void agentChanged(final IAMSAgentDescription ad)
+	public void agentChanged(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()

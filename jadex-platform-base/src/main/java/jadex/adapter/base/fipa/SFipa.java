@@ -1,6 +1,8 @@
 package jadex.adapter.base.fipa;
 
 import jadex.adapter.base.NuggetsXMLContentCodec;
+import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
@@ -34,14 +36,14 @@ public class SFipa
 	/** The default df agent name. */
 	public static final String DF_AGENT = "df";
 	
-	/** The (standard) AMS service name. */
-	public static final String AMS_SERVICE = "ams_service";
-	
-	/** The (standard) DF service name. */
-	public static final String DF_SERVICE = "df_service";
-
-	/** The (standard) message service name. */
-	public static final String MESSAGE_SERVICE = "message_service";
+//	/** The (standard) AMS service name. */
+//	public static final String AMS_SERVICE = "ams_service";
+//	
+//	/** The (standard) DF service name. */
+//	public static final String DF_SERVICE = "df_service";
+//
+//	/** The (standard) message service name. */
+//	public static final String MESSAGE_SERVICE = "message_service";
 	
 	// Protocols
 	public static final String	PROTOCOL_REQUEST	= "fipa-request";
@@ -195,9 +197,9 @@ public class SFipa
 	 *  @param source The source agent identifier.
 	 *  @param ams The ams service.
 	 */
-	public IComponentIdentifier cloneAgentIdentifier(IComponentIdentifier source, IAMS ams)
+	public IComponentIdentifier cloneAgentIdentifier(IComponentIdentifier source, IComponentExecutionService ces)
 	{
-		IComponentIdentifier clone = ams.createAgentIdentifier(source.getName(), false, source.getAddresses());
+		IComponentIdentifier clone = ces.createAgentIdentifier(source.getName(), false, source.getAddresses());
 		
 		// Deep copy of resolvers.
 		/*AgentIdentifier[] res = getResolvers();
@@ -212,7 +214,7 @@ public class SFipa
 	 *  @param source The source ams agent description.
 	 *  @param ams The ams service.
 	 */
-	public static IAMSAgentDescription cloneAMSAgentDescription(IAMSAgentDescription source, IAMS ams)
+	public static IComponentDescription cloneAMSAgentDescription(IComponentDescription source, IComponentExecutionService ces)
 	{
 		 IComponentIdentifier id = source.getName();
 		 id	= ams.createAgentIdentifier(id.getName(), false, id.getAddresses());

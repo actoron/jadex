@@ -3,7 +3,6 @@ package jadex.bdi.examples.marsworld_classic.producer;
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
-import jadex.adapter.base.fipa.ISearchConstraints;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.examples.marsworld_classic.AgentInfo;
 import jadex.bdi.examples.marsworld_classic.Environment;
@@ -14,6 +13,7 @@ import jadex.bdi.examples.marsworld_classic.Target;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.ISearchConstraints;
 
 /**
  *  The main plan for the Production Agent. <br>

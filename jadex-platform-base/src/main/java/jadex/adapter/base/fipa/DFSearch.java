@@ -1,6 +1,8 @@
 package jadex.adapter.base.fipa;
 
 
+import jadex.bridge.ISearchConstraints;
+
 import java.util.ArrayList;
 import java.util.List;
 

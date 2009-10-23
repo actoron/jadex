@@ -1,6 +1,9 @@
 package jadex.adapter.base.fipa;
 
 
+import jadex.bridge.IComponentDescription;
+import jadex.bridge.ISearchConstraints;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +22,7 @@ public class AMSSearchAgents implements IAgentAction
 	protected List agentdescriptions;
 
 	/** Attribute for slot agentdescription. */
-	protected IAMSAgentDescription agentdescription;
+	protected IComponentDescription agentdescription;
 
 	//-------- constructors --------
 
@@ -35,7 +38,7 @@ public class AMSSearchAgents implements IAgentAction
 	/**
 	 * Create a new <code>DFSearch</code>.
 	 */
-	public AMSSearchAgents(IAMSAgentDescription agentdescription, IAMSAgentDescription[] results)
+	public AMSSearchAgents(IComponentDescription agentdescription, IComponentDescription[] results)
 	{
 		this();
 		this.agentdescription	= agentdescription;
@@ -66,16 +69,16 @@ public class AMSSearchAgents implements IAgentAction
 	 *  Get the agentdescriptions of this AMSSearchAgents.
 	 * @return agentdescriptions
 	 */
-	public IAMSAgentDescription[] getAgentDescriptions()
+	public IComponentDescription[] getAgentDescriptions()
 	{
-		return (IAMSAgentDescription[])agentdescriptions.toArray(new IAMSAgentDescription[agentdescriptions.size()]);
+		return (IComponentDescription[])agentdescriptions.toArray(new IComponentDescription[agentdescriptions.size()]);
 	}
 
 	/**
 	 *  Set the agentdescriptions of this AMSSearchAgents.
 	 * @param agentdescriptions the value to be set
 	 */
-	public void setAgentDescriptions(IAMSAgentDescription[] agentdescriptions)
+	public void setAgentDescriptions(IComponentDescription[] agentdescriptions)
 	{
 		this.agentdescriptions.clear();
 		for(int i = 0; i < agentdescriptions.length; i++)
@@ -87,9 +90,9 @@ public class AMSSearchAgents implements IAgentAction
 	 *  @param idx The index.
 	 *  @return agentdescriptions
 	 */
-	public IAMSAgentDescription getAgentdescription(int idx)
+	public IComponentDescription getAgentdescription(int idx)
 	{
-		return (IAMSAgentDescription)this.agentdescriptions.get(idx);
+		return (IComponentDescription)this.agentdescriptions.get(idx);
 	}
 
 	/**
@@ -97,7 +100,7 @@ public class AMSSearchAgents implements IAgentAction
 	 *  @param idx The index.
 	 *  @param agentdescription a value to be added
 	 */
-	public void setAgentdescription(int idx, IAMSAgentDescription agentdescription)
+	public void setAgentdescription(int idx, IComponentDescription agentdescription)
 	{
 		this.agentdescriptions.set(idx, agentdescription);
 	}
@@ -106,7 +109,7 @@ public class AMSSearchAgents implements IAgentAction
 	 *  Add a agentdescription to this AMSSearchAgents.
 	 *  @param agentdescription a value to be removed
 	 */
-	public void addAgentdescription(IAMSAgentDescription agentdescription)
+	public void addAgentdescription(IComponentDescription agentdescription)
 	{
 		this.agentdescriptions.add(agentdescription);
 	}
@@ -116,7 +119,7 @@ public class AMSSearchAgents implements IAgentAction
 	 *  @param agentdescription a value to be removed
 	 *  @return  True when the agentdescriptions have changed.
 	 */
-	public boolean removeAgentdescription(IAMSAgentDescription agentdescription)
+	public boolean removeAgentdescription(IComponentDescription agentdescription)
 	{
 		return this.agentdescriptions.remove(agentdescription);
 	}
@@ -126,7 +129,7 @@ public class AMSSearchAgents implements IAgentAction
 	 *  Get the agentdescription of this AMSSearchAgents.
 	 * @return agentdescription
 	 */
-	public IAMSAgentDescription getAgentDescription()
+	public IComponentDescription getAgentDescription()
 	{
 		return this.agentdescription;
 	}
@@ -135,7 +138,7 @@ public class AMSSearchAgents implements IAgentAction
 	 *  Set the agentdescription of this AMSSearchAgents.
 	 * @param agentdescription the value to be set
 	 */
-	public void setAgentDescription(IAMSAgentDescription agentdescription)
+	public void setAgentDescription(IComponentDescription agentdescription)
 	{
 		this.agentdescription = agentdescription;
 	}

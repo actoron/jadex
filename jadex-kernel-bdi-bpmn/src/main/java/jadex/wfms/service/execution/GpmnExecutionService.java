@@ -1,8 +1,8 @@
 package jadex.wfms.service.execution;
 
 import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.standalone.Platform;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ILoadableComponentModel;
@@ -111,7 +111,7 @@ public class GpmnExecutionService implements IExecutionService
 		((IAMS)platform.getService(IAMS.class)).addAMSListener(new IComponentListener()
 		{
 			
-			public void agentRemoved(IAMSAgentDescription desc)
+			public void agentRemoved(IComponentDescription desc)
 			{
 				synchronized(GpmnExecutionService.this)
 				{
@@ -119,7 +119,7 @@ public class GpmnExecutionService implements IExecutionService
 				}
 			}
 			
-			public void agentAdded(IAMSAgentDescription desc)
+			public void agentAdded(IComponentDescription desc)
 			{
 			}
 		});

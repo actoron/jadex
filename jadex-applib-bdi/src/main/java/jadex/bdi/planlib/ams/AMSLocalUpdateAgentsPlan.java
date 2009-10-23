@@ -1,10 +1,10 @@
 package jadex.bdi.planlib.ams;
 
 import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.AgentTerminatedException;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentListener;
 
 /**
@@ -32,7 +32,7 @@ public class AMSLocalUpdateAgentsPlan extends Plan
 		{
 			this.listener	= new IComponentListener()
 			{
-				public void agentAdded(final IAMSAgentDescription desc)
+				public void agentAdded(final IComponentDescription desc)
 				{
 					try
 					{
@@ -53,7 +53,7 @@ public class AMSLocalUpdateAgentsPlan extends Plan
 					}
 				}
 						
-				public void agentRemoved(final IAMSAgentDescription desc)
+				public void agentRemoved(final IComponentDescription desc)
 				{
 					try
 					{
@@ -79,7 +79,7 @@ public class AMSLocalUpdateAgentsPlan extends Plan
 			
 			SyncResultListener lis = new SyncResultListener();
 			ams.getAgentDescriptions(lis);
-			IAMSAgentDescription[] descs = (IAMSAgentDescription[])lis.waitForResult();
+			IComponentDescription[] descs = (IComponentDescription[])lis.waitForResult();
 			getBeliefbase().getBeliefSet("agents").addFacts(descs);
 		}
 		

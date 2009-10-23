@@ -1,4 +1,4 @@
-package jadex.adapter.base.fipa;
+package jadex.bridge;
 
 public interface ISearchConstraints
 {
