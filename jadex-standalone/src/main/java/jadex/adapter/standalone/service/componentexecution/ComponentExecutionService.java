@@ -11,6 +11,7 @@ import jadex.adapter.base.contextservice.BaseContext;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.standalone.AbstractPlatform;
 import jadex.adapter.standalone.StandaloneComponentAdapter;
+import jadex.adapter.standalone.ams.AMS.CleanupCommand;
 import jadex.adapter.standalone.fipaimpl.AMSAgentDescription;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.bridge.IComponentIdentifier;
@@ -23,6 +24,7 @@ import jadex.bridge.IMessageService;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
+import jadex.service.execution.IExecutionService;
 
 /**
  *  Standalone implementation of component execution service.
@@ -168,12 +170,12 @@ public class ComponentExecutionService implements IComponentExecutionService
 		
 		synchronized(adapters)
 		{
-			synchronized(agentdescs)
+			synchronized(descs)
 			{
-				AMSAgentDescription	desc	= (AMSAgentDescription)agentdescs.get(agent);
+				AMSAgentDescription	desc	= (AMSAgentDescription)descs.get(componentid);
 				if(desc!=null && IAMSAgentDescription.STATE_INITIATED.equals(desc.getState()))
 				{
-					StandaloneComponentAdapter	adapter	= (StandaloneComponentAdapter)adapters.get(agent);
+					StandaloneComponentAdapter	adapter	= (StandaloneComponentAdapter)adapters.get(componentid);
 					if(adapter!=null)
 					{
 						// Todo: use result listener and set active state after agent has inited.
@@ -184,37 +186,111 @@ public class ComponentExecutionService implements IComponentExecutionService
 					else
 					{
 						// Shouldn't happen?
-						listener.exceptionOccurred(new RuntimeException("Cannot start unknown agent: "+agent));
+						listener.exceptionOccurred(new RuntimeException("Cannot start unknown component: "+componentid));
 						return;
 					}
 				}
 				else if(desc!=null)
 				{
-					listener.exceptionOccurred(new RuntimeException("Cannot start agent "+agent+" in state: "+desc.getState()));
+					listener.exceptionOccurred(new RuntimeException("Cannot start component "+componentid+" in state: "+desc.getState()));
 					return;
 				}
 				else
 				{
-					listener.exceptionOccurred(new RuntimeException("Cannot start unknown agent: "+agent));
+					listener.exceptionOccurred(new RuntimeException("Cannot start unknown component: "+componentid));
 					return;
 				}
 			}
 		}
 		
-		listener.resultAvailable(agent);		
+		listener.resultAvailable(componentid);		
 	}
 	
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.
 	 *  @param componentid	The component to destroy.
 	 */
-	public void destroyComponent(IComponentIdentifier componentid, IResultListener listener);
+	public void destroyComponent(IComponentIdentifier componentid, IResultListener listener)
+	{
+		if(listener==null)
+			listener = DefaultResultListener.getInstance();
+		
+		synchronized(adapters)
+		{
+			synchronized(descs)
+			{
+				//System.out.println("killing: "+aid);
+				
+				StandaloneComponentAdapter agent = (StandaloneComponentAdapter)adapters.get(componentid);
+				if(agent==null)
+				{
+					listener.exceptionOccurred(new RuntimeException("Component "+componentid+" does not exist."));
+					return;
+
+					//System.out.println(agentdescs);
+					//throw new RuntimeException("Agent "+aid+" does not exist.");
+				}
+				
+				// todo: does not work always!!! A search could be issued before agents had enough time to kill itself!
+				// todo: killAgent should only be called once for each agent?
+				AMSAgentDescription	desc	= (AMSAgentDescription)descs.get(componentid);
+				if(desc!=null)
+				{
+					// Resume a suspended agent before killing it.
+					if(IAMSAgentDescription.STATE_SUSPENDED.equals(desc.getState()))
+						resumeComponent(componentid, null);
+					
+					if(IAMSAgentDescription.STATE_ACTIVE.equals(desc.getState()))
+					//if(!AMSAgentDescription.STATE_TERMINATING.equals(desc.getState()))
+					{
+						agent.setState(IAMSAgentDescription.STATE_TERMINATING);
+						desc.setState(IAMSAgentDescription.STATE_TERMINATING);
+//						if(listeners.get(aid)!=null)
+//							throw new RuntimeException("Multiple result listeners for agent: "+aid);
+//						listeners.put(aid, listener);
+						agent.killAgent(new CleanupCommand(componentid, listener));
+					}
+					else
+					{
+						listener.exceptionOccurred(new RuntimeException("Cannot kill "+componentid+" component: "+desc.getState()));
+						//throw new RuntimeException("Cannot kill "+aid+" agent: "+desc.getState());
+					}
+				}
+			}
+		}
+	}
 
 	/**
 	 *  Suspend the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public void suspendComponent(IComponentIdentifier componentid, IResultListener listener);
+	public void suspendComponent(IComponentIdentifier componentid, IResultListener listener)
+	{
+		if(listener==null)
+			listener = DefaultResultListener.getInstance();
+		
+		synchronized(adapters)
+		{
+			synchronized(descs)
+			{
+				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
+				AMSAgentDescription ad = (AMSAgentDescription)descs.get(componentid);
+				if(adapter==null || ad==null)
+					listener.exceptionOccurred(new RuntimeException("Component identifier not registered in AMS: "+componentid));
+					//throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
+				if(!IAMSAgentDescription.STATE_ACTIVE.equals(ad.getState()))
+					listener.exceptionOccurred(new RuntimeException("Only active components can be suspended: "+componentid+" "+ad.getState()));
+					//throw new RuntimeException("Only active agents can be suspended: "+aid+" "+ad.getState());
+				
+				// todo: call listener when suspension has finished!!!
+				
+				ad.setState(IAMSAgentDescription.STATE_SUSPENDED);
+				adapter.setState(IAMSAgentDescription.STATE_SUSPENDED);
+				IExecutionService exe = (IExecutionService)container.getService(IExecutionService.class);
+				exe.cancel(adapter, listener);
+			}
+		}
+	}
 	
 	/**
 	 *  Resume the execution of an component.
@@ -236,4 +312,78 @@ public class ComponentExecutionService implements IComponentExecutionService
      *  @param listener  The listener to be removed.
      */
     public void removeComponentListener(IComponentListener listener);
+    
+    //-------- helper classes --------
+
+	/**
+	 *  Command that is executed on agent cleanup.
+	 */
+	class CleanupCommand implements IResultListener
+	{
+		protected IComponentIdentifier cid;
+		protected IResultListener listener;
+		
+		public CleanupCommand(IComponentIdentifier cid, IResultListener listener)
+		{
+			this.cid = cid;
+			this.listener = listener;
+		}
+		
+		public void resultAvailable(Object result)
+		{
+			IAMSAgentDescription ad = (IAMSAgentDescription)descs.get(cid);
+			synchronized(adapters)
+			{
+				synchronized(descs)
+				{
+//					System.out.println("remove called for: "+aid);
+					StandaloneComponentAdapter	adapter	= (StandaloneComponentAdapter)adapters.remove(cid);
+					if(adapter==null)
+						throw new RuntimeException("Component Identifier not registered: "+cid);
+					adapter.setState(IAMSAgentDescription.STATE_TERMINATED);
+					descs.remove(cid);
+					
+					// Stop execution of agent.
+					((IExecutionService)container.getService(IExecutionService.class)).cancel(adapter, null);
+				}
+			}
+			
+			// Deregister killed agent at contexts.
+			IContextService	cs	= (IContextService)container.getService(IContextService.class);
+			if(cs!=null)
+			{
+				IContext[]	contexts	= cs.getContexts(cid);
+				for(int i=0; contexts!=null && i<contexts.length; i++)
+				{
+					((BaseContext)contexts[i]).agentDestroyed(cid);
+				}
+			}
+
+			IComponentListener[]	alisteners;
+			synchronized(listeners)
+			{
+				alisteners	= (IComponentListener[])listeners.toArray(new IComponentListener[listeners.size()]);
+			}
+			// todo: can be called after listener has (concurrently) deregistered
+			for(int i=0; i<alisteners.length; i++)
+			{
+				try
+				{
+					alisteners[i].componentRemoved(ad);
+				}
+				catch(Exception e)
+				{
+					System.out.println("WARNING: Exception when removing agent: "+ad+", "+e);
+				}
+			}
+			
+			if(listener!=null)
+				listener.resultAvailable(result);
+		}
+		
+		public void exceptionOccurred(Exception exception)
+		{
+			resultAvailable(cid);
+		}
+	}
 }
