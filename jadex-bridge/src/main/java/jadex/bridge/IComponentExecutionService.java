@@ -42,6 +42,27 @@ public interface IComponentExecutionService
 	 */
 	public void resumeComponent(IComponentIdentifier componentid, IResultListener listener);
 	
+	//-------- information methods --------
+	
+	/**
+	 *  Get the agent adapters.
+	 *  @return The agent adapters.
+	 */
+	public void getComponentIdentifiers(IResultListener listener);
+	
+	/**
+	 *  Get the agent description of a single agent.
+	 *  @param aid The agent identifier.
+	 *  @return The agent description of this agent.
+	 */
+	public void getComponentDescription(IComponentIdentifier aid, IResultListener listener);
+	
+	/**
+	 *  Get all agent descriptions.
+	 *  @return The agent descriptions of this agent.
+	 */
+	public void getComponentDescriptions(IResultListener listener);
+	
 	//-------- listener methods --------
 	
 	/**

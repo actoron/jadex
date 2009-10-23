@@ -64,24 +64,25 @@ public interface IAMS extends IComponentExecutionService
 	 */
 	public void containsAgent(IComponentIdentifier aid, IResultListener listener);
 	
-	/**
-	 *  Get the agent adapters.
-	 *  @return The agent adapters.
-	 */
-	public void getAgentIdentifiers(IResultListener listener);
+//	/**
+//	 *  Get the agent adapters.
+//	 *  @return The agent adapters.
+//	 */
+//	public void getAgentIdentifiers(IResultListener listener);
+//	
+//	/**
+//	 *  Get the agent description of a single agent.
+//	 *  @param aid The agent identifier.
+//	 *  @return The agent description of this agent.
+//	 */
+//	public void getAgentDescription(IAgentIdentifier aid, IResultListener listener);
+//	
+//	/**
+//	 *  Get all agent descriptions.
+//	 *  @return The agent descriptions of this agent.
+//	 */
+//	public void getAgentDescriptions(IResultListener listener);
 	
-	/**
-	 *  Get the agent description of a single agent.
-	 *  @param aid The agent identifier.
-	 *  @return The agent description of this agent.
-	 */
-	public void getAgentDescription(IComponentIdentifier aid, IResultListener listener);
-	
-	/**
-	 *  Get all agent descriptions.
-	 *  @return The agent descriptions of this agent.
-	 */
-	public void getAgentDescriptions(IResultListener listener);
 	
 	/**
 	 *  Get the number of active agents.

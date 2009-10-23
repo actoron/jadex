@@ -7,6 +7,7 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.IParameterSet;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Properties;
@@ -146,8 +147,8 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 			}
 		});
 
-		IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
-		ams.getAgentDescriptions(new IResultListener()
+		IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
+		ces.getComponentDescriptions(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -160,16 +161,16 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 			{
 			}
 		});
-		ams.addAMSListener(new IComponentListener()
+		ces.addComponentListener(new IComponentListener()
 		{
-			public void agentRemoved(IAMSAgentDescription desc)
+			public void componentRemoved(Object desc)
 			{
-				agentDied(desc);
+				agentDied((IAMSAgentDescription)desc);
 			}
 			
-			public void agentAdded(IAMSAgentDescription desc)
+			public void componentAdded(Object desc)
 			{
-				agentBorn(desc);
+				agentBorn((IAMSAgentDescription)desc);
 			}
 		});
 		

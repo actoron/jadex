@@ -400,8 +400,8 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		
 		// todo: ?! is this ok?
 		
-		IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
-		ams.getAgentDescriptions(new IResultListener()
+		IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
+		ces.getComponentDescriptions(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -414,8 +414,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 			{
 			}
 		});
-		
-		ams.addComponentListener(new IComponentListener()
+		ces.addComponentListener(new IComponentListener()
 		{
 			public void componentRemoved(Object desc)
 			{

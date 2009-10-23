@@ -5,6 +5,7 @@ import jadex.adapter.base.fipa.IAMSAgentDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.impl.ElementFlyweight;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageAdapter;
@@ -461,8 +462,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 
 //		jcc.addAgentListListener(this);
 		
-		IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
-		ams.getAgentDescriptions(new IResultListener()
+		IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
+		ces.getComponentDescriptions(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -475,16 +476,16 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 			{
 			}
 		});
-		ams.addAMSListener(new IComponentListener()
+		ces.addComponentListener(new IComponentListener()
 		{
-			public void agentRemoved(IAMSAgentDescription desc)
+			public void componentRemoved(Object desc)
 			{
-				agentDied(desc);
+				agentDied((IAMSAgentDescription)desc);
 			}
 			
-			public void agentAdded(IAMSAgentDescription desc)
+			public void componentAdded(Object desc)
 			{
-				agentBorn(desc);
+				agentBorn((IAMSAgentDescription)desc);
 			}
 		});
 		

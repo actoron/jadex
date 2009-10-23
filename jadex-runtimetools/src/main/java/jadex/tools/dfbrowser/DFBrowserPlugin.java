@@ -6,6 +6,7 @@ import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.bdi.runtime.IGoal;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentListener;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -177,8 +178,8 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 		// Listeners
 //		jcc.addAgentListListener(this);
 
-		IAMS ams = (IAMS)jcc.getServiceContainer().getService(IAMS.class);
-		ams.getAgentDescriptions(new IResultListener()
+		IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
+		ces.getComponentDescriptions(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -191,16 +192,16 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 			{
 			}
 		});
-		ams.addAMSListener(new IComponentListener()
+		ces.addComponentListener(new IComponentListener()
 		{
-			public void agentRemoved(IAMSAgentDescription desc)
+			public void componentRemoved(Object desc)
 			{
-				agentDied(desc);
+				agentDied((IAMSAgentDescription)desc);
 			}
 			
-			public void agentAdded(IAMSAgentDescription desc)
+			public void componentAdded(Object desc)
 			{
-				agentBorn(desc);
+				agentBorn((IAMSAgentDescription)desc);
 			}
 		});
 		
