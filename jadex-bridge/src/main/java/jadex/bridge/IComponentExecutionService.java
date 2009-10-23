@@ -72,23 +72,6 @@ public interface IComponentExecutionService
 	 */
 	public void searchAgents(IComponentDescription adesc, ISearchConstraints con, IResultListener listener);
 
-	/**
-	 * Create a ams agent description.
-	 * @param agent The agent.
-	 * @param state The state.
-	 * @param ownership The ownership.
-	 * @return The ams agent description.
-	 */
-	public IComponentDescription createComponentDescription(IComponentIdentifier agent, String state, String ownership);
-	
-	/**
-	* Create a search constraints object.
-	* @param maxresults The maximum number of results.
-	* @param maxdepth The maximal search depth.
-	* @return The search constraints.
-	*/
-	public ISearchConstraints createSearchConstraints(int maxresults, int maxdepth);
-	
 	//-------- listener methods --------
 	
 	/**
@@ -130,4 +113,22 @@ public interface IComponentExecutionService
 	 *  @return The new agent identifier.
 	 */
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] adresses);
+
+	/**
+	 * Create a ams agent description.
+	 * @param agent The agent.
+	 * @param state The state.
+	 * @param ownership The ownership.
+	 * @return The ams agent description.
+	 */
+	public IComponentDescription createComponentDescription(IComponentIdentifier agent, String state, String ownership);
+	
+	/**
+	* Create a search constraints object.
+	* @param maxresults The maximum number of results.
+	* @param maxdepth The maximal search depth.
+	* @return The search constraints.
+	*/
+	public ISearchConstraints createSearchConstraints(int maxresults, int maxdepth);
+	
 }
