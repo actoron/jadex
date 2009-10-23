@@ -5,6 +5,7 @@ import jadex.adapter.base.contextservice.BaseContext;
 import jadex.adapter.standalone.StandaloneComponentAdapter;
 import jadex.adapter.standalone.fipaimpl.AMSAgentDescription;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
+import jadex.adapter.standalone.fipaimpl.SearchConstraints;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
@@ -13,12 +14,15 @@ import jadex.bridge.IComponentListener;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
 import jadex.bridge.IMessageService;
+import jadex.bridge.ISearchConstraints;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.execution.IExecutionService;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -466,13 +470,40 @@ public class ComponentExecutionService implements IComponentExecutionService
 	 *  @param local True for local name.
 	 *  @return The new agent identifier.
 	 */
-	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
 		if(local)
 			name = name + "@" + container.getName();
-		return new AgentIdentifier(name);
+		return new AgentIdentifier(name, addresses);
 	}
 
+	/**
+	 *  Create a search constraints object.
+	 *  @param maxresults The maximum number of results.
+	 *  @param maxdepth The maximal search depth.
+	 *  @return The search constraints.
+	 */
+	public ISearchConstraints createSearchConstraints(int maxresults, int maxdepth)
+	{
+		SearchConstraints	ret	= new SearchConstraints();
+		ret.setMaxResults(maxresults);
+		ret.setMaxDepth(maxdepth);
+		return ret;
+	}
+	
+	/**
+	 *  Create a ams agent description.
+	 *  @param agent The agent.
+	 *  @return The ams agent description.
+	 */
+	public IComponentDescription createComponentDescription(IComponentIdentifier agent, String state, String ownership)
+	{
+		AMSAgentDescription	ret	= new AMSAgentDescription(agent);
+		ret.setState(state);
+		ret.setOwnership(ownership);
+		return ret;
+	}
+	
 	//--------- information methods --------
 	
 	/**
@@ -527,6 +558,59 @@ public class ComponentExecutionService implements IComponentExecutionService
 //				ret[i] = refreshAgentIdentifier(ret[i]); // Hack!
 		}
 		
+		listener.resultAvailable(ret);
+	}
+	
+	/**
+	 *  Search for agents matching the given description.
+	 *  @return An array of matching agent descriptions.
+	 */
+	public void	searchAgents(IComponentDescription adesc, ISearchConstraints con, IResultListener listener)
+	{
+		if(listener==null)
+			throw new RuntimeException("Result listener required.");
+		
+//		System.out.println("search: "+agents);
+		AMSAgentDescription[] ret;
+
+		// If name is supplied, just lookup description.
+		if(adesc!=null && adesc.getName()!=null)
+		{
+			AMSAgentDescription ad = (AMSAgentDescription)descs.get(adesc.getName());
+			if(ad!=null && ad.getName().equals(adesc.getName()))
+			{
+				// Todo: addresses reuqired for interplatform comm.
+//				ad.setName(refreshAgentIdentifier(ad.getName()));
+				AMSAgentDescription	desc	= (AMSAgentDescription)ad.clone();
+				ret = new AMSAgentDescription[]{desc};
+			}
+			else
+			{
+				ret	= new AMSAgentDescription[0];
+			}
+		}
+
+		// Otherwise search for matching descriptions.
+		else
+		{
+			List	tmp	= new ArrayList();
+			synchronized(descs)
+			{
+				for(Iterator it=descs.values().iterator(); it.hasNext(); )
+				{
+					AMSAgentDescription	test	= (AMSAgentDescription)it.next();
+					if(adesc==null ||
+						(adesc.getOwnership()==null || adesc.getOwnership().equals(test.getOwnership()))
+						&& (adesc.getState()==null || adesc.getState().equals(test.getState())))
+					{
+						tmp.add(test.clone());
+					}
+				}
+			}
+			ret	= (AMSAgentDescription[])tmp.toArray(new AMSAgentDescription[tmp.size()]);
+		}
+
+		//System.out.println("searched: "+ret);
 		listener.resultAvailable(ret);
 	}
 	
