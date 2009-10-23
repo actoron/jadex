@@ -11,6 +11,12 @@ import java.util.Collection;
 public interface IServiceContainer
 {
 	/**
+	 *  Get the name of the container
+	 *  @return The name of this container.
+	 */
+	public String getName();
+	
+	/**
 	 *  Get the first declared service of a given type.
 	 *  @param type The type.
 	 *  @return The corresponding service.

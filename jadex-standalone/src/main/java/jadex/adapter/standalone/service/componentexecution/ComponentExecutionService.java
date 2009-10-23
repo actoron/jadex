@@ -1,20 +1,13 @@
 package jadex.adapter.standalone.service.componentexecution;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.contextservice.BaseContext;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.standalone.AbstractPlatform;
 import jadex.adapter.standalone.StandaloneComponentAdapter;
 import jadex.adapter.standalone.fipaimpl.AMSAgentDescription;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IContext;
@@ -24,6 +17,11 @@ import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.execution.IExecutionService;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  *  Standalone implementation of component execution service.
@@ -78,7 +76,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 	 *  @param listener The result listener (if any). Will receive the id of the component as result.
 	 *  @param creator The creator (if any).
 	 */
-	public void	registerComponent(String name, IComponentInstance component, IResultListener listener, Object creator)
+	public void	registerComponent(String name, IComponentInstance component, IResultListener listener, Object creator, boolean generate)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
@@ -90,12 +88,14 @@ public class ComponentExecutionService implements IComponentExecutionService
 			//throw new RuntimeException("No '@' allowed in agent name.");
 		}
 		
+		/*
 		if(container.isShuttingDown())
 		{
 			listener.exceptionOccurred(new RuntimeException("No new agents may be created when platform is shutting down."));
 			return;
 			//throw new RuntimeException("No new agents may be created when platform is shutting down.");
 		}
+		*/
 
 		AgentIdentifier aid;
 		StandaloneComponentAdapter agent;
@@ -104,9 +104,9 @@ public class ComponentExecutionService implements IComponentExecutionService
 		{
 			synchronized(descs)
 			{
-				if(name==null)
+				if(generate)
 				{
-					aid = generateAgentIdentifier(getShortName(component));
+					aid = generateComponentIdentifier(name);
 				}
 				else
 				{
@@ -458,4 +458,100 @@ public class ComponentExecutionService implements IComponentExecutionService
 			adapter.getComponentInstance().getExternalAccess(listener);
 	}
 
+	//-------- create methods for cms objects --------
+	
+	/**
+	 *  Create a component identifier.
+	 *  @param name The name.
+	 *  @param local True for local name.
+	 *  @return The new agent identifier.
+	 */
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
+	{
+		if(local)
+			name = name + "@" + container.getName();
+		return new AgentIdentifier(name);
+	}
+
+	//--------- information methods --------
+	
+	/**
+	 *  Get the component description of a single component.
+	 *  @param cid The component identifier.
+	 *  @return The component description of this component.
+	 */
+	public void getComponentDescription(IComponentIdentifier cid, IResultListener listener)
+	{
+		if(listener==null)
+			throw new RuntimeException("Result listener required.");
+		
+		AMSAgentDescription ret = (AMSAgentDescription)descs.get(cid); // Hack!
+		if(ret!=null)
+		{
+			// Todo: addresses required for communication across platforms.
+//			ret.setName(refreshAgentIdentifier(aid));
+			ret	= (AMSAgentDescription)ret.clone();
+		}
+		
+		listener.resultAvailable(ret);
+	}
+	
+	/**
+	 *  Get the component descriptions.
+	 *  @return The component descriptions.
+	 */
+	public void getComponentDescriptions(IResultListener listener)
+	{
+		if(listener==null)
+			throw new RuntimeException("Result listener required.");
+		
+		listener.resultAvailable(descs.values().toArray(new AMSAgentDescription[0]));
+	}
+	
+	/**
+	 *  Get the component identifiers.
+	 *  @return The component identifiers.
+	 */
+	public void getComponentIdentifiers(IResultListener listener)
+	{
+		if(listener==null)
+			throw new RuntimeException("Result listener required.");
+		
+		IComponentIdentifier[] ret;
+		
+		synchronized(adapters)
+		{
+			ret = (IComponentIdentifier[])adapters.keySet().toArray(new IComponentIdentifier[adapters.size()]);
+			// Todo: addresses required for inter-platform comm.
+//			for(int i=0; i<ret.length; i++)
+//				ret[i] = refreshAgentIdentifier(ret[i]); // Hack!
+		}
+		
+		listener.resultAvailable(ret);
+	}
+	
+	/**
+	 *  Create a component identifier that is allowed on the platform.
+	 *  @param name The base name.
+	 *  @return The component identifier.
+	 */
+	protected AgentIdentifier generateComponentIdentifier(String name)
+	{
+		AgentIdentifier ret = null;
+
+		synchronized(adapters)
+		{
+			do
+			{
+				ret = new AgentIdentifier(name+(compcnt++)+"@"+container.getName()); // Hack?!
+			}
+			while(adapters.containsKey(ret));
+		}
+		
+		IMessageService	ms	= (IMessageService)container.getService(IMessageService.class);
+		if(ms!=null)
+			ret.setAddresses(ms.getAddresses());
+
+		return ret;
+	}
 }

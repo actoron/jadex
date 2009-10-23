@@ -1,8 +1,7 @@
 package jadex.adapter.standalone;
 
-import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAMSAgentDescription;
-import jadex.adapter.standalone.ams.AMS;
+import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IComponentAdapter;
@@ -146,9 +145,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			throw new AgentTerminatedException(cid.getName());
 
 		// todo: remove cast, HACK!!!
-		IAMS ams = (IAMS)container.getService(IAMS.class);
-		return ((AMS)ams).refreshAgentIdentifier(cid);
-		//return (AgentIdentifier)aid.clone();
+		// todo: add transport addresses for multi-platform communication.
+//		IAMS ams = (IAMS)container.getService(IAMS.class);
+//		return ((AMS)ams).refreshAgentIdentifier(cid);
+		return (IComponentIdentifier)((AgentIdentifier)cid).clone();
 	}
 	
 	/**

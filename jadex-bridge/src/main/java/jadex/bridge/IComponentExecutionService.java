@@ -13,12 +13,13 @@ public interface IComponentExecutionService
 	 *  Create a new component on the platform.
 	 *  The component will not run before the {@link startComponent()}
 	 *  method is called.
-	 *  @param name The component name (null for auto creation).
+	 *  @param name The component name.
 	 *  @param component The component instance.
 	 *  @param listener The result listener (if any). Will receive the id of the component as result.
 	 *  @param creator The creator (if any).
+	 *  @param generate Generate a unique name, if the given name is already taken.
 	 */
-	public void	registerComponent(String name, IComponentInstance component, IResultListener listener, Object creator);
+	public void	registerComponent(String name, IComponentInstance component, IResultListener listener, Object creator, boolean generate);
 	
 	/**
 	 *  Start a previously created component on the platform.
@@ -105,5 +106,5 @@ public interface IComponentExecutionService
 	 *  @param local True for local name.
 	 *  @return The new agent identifier.
 	 */
-	public IComponentIdentifier createAgentIdentifier(String name, boolean local);
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local);
 }

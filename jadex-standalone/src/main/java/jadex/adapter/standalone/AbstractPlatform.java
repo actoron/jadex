@@ -3,7 +3,6 @@ package jadex.adapter.standalone;
 import jadex.adapter.base.SComponentExecutionService;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.MessageType;
@@ -47,9 +46,6 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 
 	/** The application factory. */
 //	protected IApplicationFactory appfactory;
-	
-	/** The platform name. */
-	protected String platformname;
 
 	/** The message types. */
 	protected Map messagetypes;
@@ -62,15 +58,6 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 
 	//-------- methods --------
 	
-	/**
-	 *  Get the name of the platform
-	 *  @return The name of this platform.
-	 */
-	public String getName()
-	{
-		return platformname;
-	}
-
 	/**
 	 *  Get the message type.
 	 *  @param type The type name.

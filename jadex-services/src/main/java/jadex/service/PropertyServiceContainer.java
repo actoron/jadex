@@ -1,7 +1,5 @@
 package jadex.service;
 
-import java.util.Map;
-
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SReflect;

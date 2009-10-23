@@ -23,7 +23,19 @@ public class BasicServiceContainer implements IServiceContainer
 	/** The map of platform services. */
 	protected Map services;
 
+	/** The platform name. */
+	private String name;
+
 	//-------- interface methods --------
+		
+	/**
+	 *  Get the name of the platform
+	 *  @return The name of this platform.
+	 */
+	public String getName()
+	{
+		return name;
+	}
 	
 	/**
 	 *  Get a platform service.
@@ -129,6 +141,15 @@ public class BasicServiceContainer implements IServiceContainer
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Set the name.
+	 *  @param name The name to set.
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
+	}
 	
 	/**
 	 *  Add a service to the platform.

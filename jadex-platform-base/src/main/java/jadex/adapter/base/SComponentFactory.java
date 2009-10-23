@@ -254,6 +254,6 @@ public class SComponentFactory
 		IComponentInstance	instance	= factory.createComponentInstance(lmodel, config, args);
 		
 		IComponentExecutionService	ces	= (IComponentExecutionService)container.getService(IComponentExecutionService.class);
-		ces.registerComponent(name, instance, listener, creator);
+		ces.registerComponent(name!=null ? name : lmodel.getName(), instance, listener, creator, name==null);
 	}
 }

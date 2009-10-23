@@ -1,12 +1,9 @@
 package jadex.adapter.standalone;
 
-import jadex.adapter.base.fipa.IAMS;
-import jadex.bridge.IComponentListener;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -163,24 +160,25 @@ public class Platform extends AbstractPlatform
 //		this.services = new LinkedHashMap();
 		this.messagetypes = new LinkedHashMap();
 		this.shutdowntime = platconf.getLongProperty(PLATFORM_SHUTDOWN_TIME);
-		this.platformname = (String)((Property)platconf.getProperty(PLATFORMNAME)).getValue();
-		if(platformname == null)
+		String	name = (String)((Property)platconf.getProperty(PLATFORMNAME)).getValue();
+		if(name == null)
 		{
 			try
 			{
 				InetAddress iaddr = InetAddress.getLocalHost();
 				//ret = iaddr.getCanonicalHostName().toLowerCase(); // works for 1.4 only.
-				platformname = iaddr.getHostName().toLowerCase(); // todo: can this cause problems due to name conflicts?
+				name = iaddr.getHostName().toLowerCase(); // todo: can this cause problems due to name conflicts?
 			}
 			catch(UnknownHostException e)
 			{
-				platformname = "localhost";
+				name = "localhost";
 			}
 		}
+		setName(name);
 		
 		SimpleValueFetcher	fetcher	= new SimpleValueFetcher();
 		fetcher.setValue("$platform", this);
-		fetcher.setValue("$platformname", this.platformname);
+		fetcher.setValue("$platformname", name);
 		
 		// Initialize message types.
 		Property[] props = platconf.getProperties(MESSAGETYPE);

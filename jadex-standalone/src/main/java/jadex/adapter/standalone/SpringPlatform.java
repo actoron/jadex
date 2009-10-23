@@ -1,9 +1,7 @@
 package jadex.adapter.standalone;
 
-import jadex.adapter.base.fipa.IAMS;
 import jadex.bridge.IComponentListener;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 
 import java.net.InetAddress;
@@ -57,21 +55,22 @@ public class SpringPlatform extends AbstractPlatform
 	public void setPlatformName(String platformname)
 	{
 //		System.out.println("setPlatformName: "+platformname);
-		this.platformname = platformname;
+		String	name = platformname;
 
-		if(platformname == null)
+		if(name == null)
 		{
 			try
 			{
 				InetAddress iaddr = InetAddress.getLocalHost();
 				//ret = iaddr.getCanonicalHostName().toLowerCase(); // works for 1.4 only.
-				platformname = iaddr.getHostName().toLowerCase(); // todo: can this cause problems due to name conflicts?
+				name = iaddr.getHostName().toLowerCase(); // todo: can this cause problems due to name conflicts?
 			}
 			catch(UnknownHostException e)
 			{
-				platformname = "localhost";
+				name = "localhost";
 			}
 		}
+		setName(name);
 	}
 
 	/**
@@ -80,6 +79,7 @@ public class SpringPlatform extends AbstractPlatform
 	 */
 	public void setAutoshutDown(boolean autoshutdown)
 	{
+		/*
 		if(autoshutdown && !this.autoshutdown)
 		{
 			if(amslistener==null)
@@ -119,6 +119,7 @@ public class SpringPlatform extends AbstractPlatform
 		}
 		
 		this.autoshutdown = autoshutdown;
+		*/
 	}
 
 	/**
