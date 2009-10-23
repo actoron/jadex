@@ -336,7 +336,7 @@ public class MessageService implements IMessageService
 					StandaloneComponentAdapter agent = (StandaloneComponentAdapter)result;
 					if(agent != null)
 					{
-						ClassLoader cl = agent.getKernelAgent().getClassLoader();
+						ClassLoader cl = agent.getComponentInstance().getClassLoader();
 						Map	message	= (Map) decoded.get(cl);
 						if(message==null)
 						{

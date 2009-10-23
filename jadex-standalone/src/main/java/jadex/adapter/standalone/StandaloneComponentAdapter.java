@@ -299,7 +299,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	/**
 	 *  Make kernel agent available.
 	 */
-	public IComponentInstance	getKernelAgent()
+	public IComponentInstance	getComponentInstance()
 	{
 		if(IAMSAgentDescription.STATE_TERMINATED.equals(state) || fatalerror)
 			throw new AgentTerminatedException(cid.getName());

@@ -424,4 +424,38 @@ public class ComponentExecutionService implements IComponentExecutionService
 			resultAvailable(cid);
 		}
 	}
+	
+	//-------- internal methods --------
+    
+	/**
+	 *  Get the component adapter for a component identifier.
+	 *  @param aid The component identifier.
+	 *  @param listener The result listener.
+	 */
+    // Todo: Hack!!! remove?
+	public void getComponentAdapter(IComponentIdentifier cid, IResultListener listener)
+	{
+		if(listener==null)
+			throw new RuntimeException("Result listener required.");
+		
+		listener.resultAvailable(adapters.get(cid));
+	}
+	
+	/**
+	 *  Get the external access of a component.
+	 *  @param cid The component identifier.
+	 *  @param listener The result listener.
+	 */
+	public void getExternalAccess(IComponentIdentifier cid, IResultListener listener)
+	{
+		if(listener==null)
+			throw new RuntimeException("Result listener required.");
+	
+		StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(cid);
+		if(adapter==null)
+			listener.exceptionOccurred(new RuntimeException("No local component found for component identifier: "+cid));
+		else
+			adapter.getComponentInstance().getExternalAccess(listener);
+	}
+
 }

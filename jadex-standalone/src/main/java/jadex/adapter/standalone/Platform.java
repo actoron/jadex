@@ -246,6 +246,7 @@ public class Platform extends AbstractPlatform
 //		IAMS ams = (IAMS)getService(IAMS.class);
 		if(getAMSService()!=null)
 		{
+			/*
 			// Add ams listener if auto shutdown.
 			if(platconf.getBooleanProperty(AUTOSHUTDOWN))
 			{
@@ -273,6 +274,7 @@ public class Platform extends AbstractPlatform
 					}
 				});
 			}
+			*/
 	
 			// Create daemon agents.
 			this.daemonagents = SCollection.createLinkedHashSet();

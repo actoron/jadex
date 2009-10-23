@@ -96,4 +96,14 @@ public interface IComponentExecutionService
 	 *  @param listener The result listener.
 	 */
 	public void getExternalAccess(IComponentIdentifier cid, IResultListener listener);
+
+	//-------- create methods for cms objects --------
+	
+	/**
+	 *  Create a component identifier.
+	 *  @param name The name.
+	 *  @param local True for local name.
+	 *  @return The new agent identifier.
+	 */
+	public IComponentIdentifier createAgentIdentifier(String name, boolean local);
 }
