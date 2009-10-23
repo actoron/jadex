@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- *  Built-in standalone agent platform, with onyl basic features.
+ *  Built-in standalone agent platform.
  */
 public class Platform extends AbstractPlatform
 {
@@ -249,7 +249,7 @@ public class Platform extends AbstractPlatform
 			// Add ams listener if auto shutdown.
 			if(platconf.getBooleanProperty(AUTOSHUTDOWN))
 			{
-				getAMSService().addElementListener(new IComponentListener()
+				getAMSService().addComponentListener(new IComponentListener()
 				{
 					public void componentAdded(Object desc)
 					{

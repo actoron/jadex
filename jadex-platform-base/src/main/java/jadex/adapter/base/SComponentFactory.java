@@ -1,11 +1,12 @@
 package jadex.adapter.base;
 
-import jadex.bridge.IAgentAdapter;
 import jadex.bridge.IApplicationFactory;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 
 import java.util.Collection;
@@ -49,7 +50,7 @@ public class SComponentFactory
 	 *  @param config	The name of the configuration (or null for default configuration) 
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 *  @return	An instance of a kernel agent.
-	 */
+	 * /
 	public static IComponentInstance createKernelAgent(IServiceContainer container, IAgentAdapter adapter, String model, String config, Map arguments)	
 	{
 		IComponentInstance ret = null;
@@ -66,7 +67,6 @@ public class SComponentFactory
 		}
 		
 		return ret;
-	}
 	
 	/**
 	 *  Load an agent model.
@@ -220,5 +220,40 @@ public class SComponentFactory
 			}
 		}
 		return ret;
+	}
+
+	/**
+	 *  Create a new element on the platform.
+	 *  The element will not run before the {@link startElement()}
+	 *  method is called.
+	 *  Ensures (in non error case) that the aid of
+	 *  the new element is added to the AMS when call returns.
+	 *  @param name The element name (null for auto creation)
+	 *  @param model The model name.
+	 *  @param config The configuration.
+	 *  @param args The arguments map (name->value).
+	 *  @param listener The result listener (if any).
+	 *  @param creator The creator (if any).
+	 */
+	public static void	createComponent(IServiceContainer container, String name, String model, String config, Map args, IResultListener listener, Object creator)
+	{
+		IComponentFactory	factory	= null;
+		Collection facts = container.getServices(IComponentFactory.class);
+		if(facts!=null)
+		{
+			for(Iterator it=facts.iterator(); factory==null && it.hasNext(); )
+			{
+				IComponentFactory	cf	= (IComponentFactory)it.next();
+				if(cf.isLoadable(model))
+				{
+					factory	= cf;
+				}
+			}
+		}
+		ILoadableComponentModel	lmodel	= factory.loadModel(model);
+		IComponentInstance	instance	= factory.createComponentInstance(lmodel, config, args);
+		
+		IComponentExecutionService	ces	= (IComponentExecutionService)container.getService(IComponentExecutionService.class);
+		ces.registerComponent(name, instance, listener, creator);
 	}
 }

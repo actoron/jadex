@@ -114,12 +114,12 @@ public class SpringPlatform extends AbstractPlatform
 			}
 			
 			if(getAMSService() != null)
-				getAMSService().addElementListener(amslistener);
+				getAMSService().addComponentListener(amslistener);
 		}
 		else if(!autoshutdown && this.autoshutdown)
 		{
 			if(getAMSService() != null)
-				getAMSService().removeElementListener(amslistener);
+				getAMSService().removeComponentListener(amslistener);
 		}
 		
 		this.autoshutdown = autoshutdown;

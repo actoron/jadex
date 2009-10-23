@@ -79,7 +79,7 @@ public class AMS implements IAMS, IService
     /**
 	 *  Test if the execution service can handle the element (or model).
 	 *  @param element The element (or its filename).
-	 */
+	 * /
 	public boolean isResponsible(Object element)
 	{
 		boolean ret = element instanceof IAgentIdentifier;
@@ -91,7 +91,7 @@ public class AMS implements IAMS, IService
 		}
 		
 		return ret;
-	}
+	}*/
     
 	/**
 	 *  Create a new agent on the platform.
