@@ -1,6 +1,7 @@
 package jadex.adapter.base;
 
 import jadex.bridge.IApplicationFactory;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
@@ -238,7 +239,7 @@ public class SComponentFactory
 	 */
 	public static void	createComponent(IServiceContainer container, String name, String model, String config, Map args, IResultListener listener, Object creator)
 	{
-		IComponentFactory	factory	= null;
+		IComponentFactory factory = null;
 		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
 		{
@@ -251,13 +252,9 @@ public class SComponentFactory
 				}
 			}
 		}
+//		IComponentIdentifier cid = ces.createComponentIdentifier(name, true, null, true);
+
 		IComponentExecutionService	ces	= (IComponentExecutionService)container.getService(IComponentExecutionService.class);
-		
-		ILoadableComponentModel	lmodel	= factory.loadModel(model);
-		
-		IComponentIdentifier ces.createComponentIdentifier(name, true, null);
-		IComponentInstance	instance = factory.createComponentInstance(lmodel, config, args);
-		
-		ces.registerComponent(name!=null ? name : lmodel.getName(), instance, listener, creator, name==null);
+		ces.createComponent(container, name, model, config, args, listener, creator, factory);
 	}
 }

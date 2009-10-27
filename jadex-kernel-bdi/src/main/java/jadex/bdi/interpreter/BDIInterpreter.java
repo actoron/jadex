@@ -15,6 +15,8 @@ import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.InterpreterTimedObjectAction;
 import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IToolAdapter;
@@ -31,6 +33,7 @@ import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
+import jadex.service.IServiceContainer;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -154,10 +157,9 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 	 *  @param config	The name of the configuration (or null for default configuration) 
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 */
-	public BDIInterpreter(IComponentAdapter adapter, IOAVState state, OAVAgentModel model, 
+	public BDIInterpreter(IServiceContainer container, IOAVState state, OAVAgentModel model, 
 		String config, Map arguments, Map kernelprops)
 	{
-		this.adapter = adapter;
 		this.state = state;
 		this.model = model;
 		this.ext_entries = Collections.synchronizedList(new ArrayList());
@@ -253,9 +255,14 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 //			((RetePatternMatcherState)getRuleSystem().getMatcherState()).getReteMemory(), new Object());
 	}
 	
+	
+	
 	//-------- IKernelAgent interface --------
 	
-//	Lock lock = new ReentrantLock(); 
+
+
+
+	//	Lock lock = new ReentrantLock(); 
 	/**
 	 *  Main method to perform agent execution.
 	 *  Whenever this method is called, the agent executes.
@@ -1088,7 +1095,7 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 //		System.out.println("volcache: "+volcache.size());
 		return stacacheelems.contains(type)? stacache: volcache;
 	}
-
+	
 	//-------- helper methods --------
 	
 	/**

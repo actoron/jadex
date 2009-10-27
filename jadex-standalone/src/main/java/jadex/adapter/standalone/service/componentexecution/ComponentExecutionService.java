@@ -8,11 +8,13 @@ import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.adapter.standalone.fipaimpl.SearchConstraints;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageService;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.collection.SCollection;
@@ -71,7 +73,7 @@ public class ComponentExecutionService implements IComponentExecutionService
     
     //-------- IComponentExecutionService interface --------
 
-	/**
+    /**
 	 *  Create a new component on the platform.
 	 *  The component will not run before the {@link startComponent()}
 	 *  method is called.
@@ -80,8 +82,54 @@ public class ComponentExecutionService implements IComponentExecutionService
 	 *  @param listener The result listener (if any). Will receive the id of the component as result.
 	 *  @param creator The creator (if any).
 	 */
-	public void	registerComponent(String name, IComponentInstance component, IResultListener listener, Object creator, boolean generate)
+	public void	createComponent(String name, String model, String config, Map args, IResultListener listener, Object creator, IComponentFactory factory)
 	{
+		/*
+		if(container.isShuttingDown())
+		{
+			listener.exceptionOccurred(new RuntimeException("No new agents may be created when platform is shutting down."));
+			return;
+			//throw new RuntimeException("No new agents may be created when platform is shutting down.");
+		}
+		*/
+		
+		// Create id and adapter.
+		
+		AgentIdentifier cid;
+		StandaloneComponentAdapter adapter;
+		AMSAgentDescription	ad;
+		synchronized(adapters)
+		{
+			synchronized(descs)
+			{
+				if(generate)
+				{
+					cid = generateComponentIdentifier(name);
+				}
+				else
+				{
+					cid = new AgentIdentifier(name+"@"+container.getName()); // Hack?!
+					if(adapters.containsKey(cid))
+					{
+						listener.exceptionOccurred(new RuntimeException("Agent name already exists on agent platform."));
+						return;
+					}
+					IMessageService	ms	= (IMessageService)container.getService(IMessageService.class);
+					if(ms!=null)
+						cid.setAddresses(ms.getAddresses());
+				}
+		
+				// Arguments must be isolated between agent instances.
+				adapter = new StandaloneComponentAdapter(container, cid);
+				adapters.put(cid, adapter);
+				
+				ad	= new AMSAgentDescription(cid);
+				ad.setState(IComponentDescription.STATE_INITIATED);
+				adapter.setState(IComponentDescription.STATE_INITIATED);
+				descs.put(cid, ad);
+			}
+		}
+		
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
@@ -92,49 +140,12 @@ public class ComponentExecutionService implements IComponentExecutionService
 			//throw new RuntimeException("No '@' allowed in agent name.");
 		}
 		
-		/*
-		if(container.isShuttingDown())
-		{
-			listener.exceptionOccurred(new RuntimeException("No new agents may be created when platform is shutting down."));
-			return;
-			//throw new RuntimeException("No new agents may be created when platform is shutting down.");
-		}
-		*/
-
-		AgentIdentifier aid;
-		StandaloneComponentAdapter agent;
-		AMSAgentDescription	ad;
-		synchronized(adapters)
-		{
-			synchronized(descs)
-			{
-				if(generate)
-				{
-					aid = generateComponentIdentifier(name);
-				}
-				else
-				{
-					aid = new AgentIdentifier(name+"@"+container.getName()); // Hack?!
-					if(adapters.containsKey(aid))
-					{
-						listener.exceptionOccurred(new RuntimeException("Agent name already exists on agent platform."));
-						return;
-					}
-					IMessageService	ms	= (IMessageService)container.getService(IMessageService.class);
-					if(ms!=null)
-						aid.setAddresses(ms.getAddresses());
-				}
+		// Load the model and create the agent instance (interpreter and state).
 		
-				// Arguments must be isolated between agent instances.
-				agent = new StandaloneComponentAdapter(container, aid, component);
-				adapters.put(aid, agent);
-				
-				ad	= new AMSAgentDescription(aid);
-				ad.setState(IComponentDescription.STATE_INITIATED);
-				agent.setState(IComponentDescription.STATE_INITIATED);
-				descs.put(aid, ad);
-			}
-		}
+		ILoadableComponentModel lmodel = factory.loadModel(model);
+		IComponentInstance instance = factory.createComponentInstance(adapter, lmodel, config, args);
+		adapter.setComponent(instance);
+		
 //		System.out.println("added: "+agentdescs.size()+", "+aid);
 		
 		// Register new agent at contexts.
@@ -144,7 +155,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 			IContext[]	contexts	= cs.getContexts((IComponentIdentifier)creator);
 			for(int i=0; contexts!=null && i<contexts.length; i++)
 			{
-				((BaseContext)contexts[i]).agentCreated((IComponentIdentifier)creator, aid);
+				((BaseContext)contexts[i]).agentCreated((IComponentIdentifier)creator, cid);
 			}
 		}
 
@@ -159,9 +170,9 @@ public class ComponentExecutionService implements IComponentExecutionService
 			alisteners[i].componentAdded(ad);
 		}
 		
-		listener.resultAvailable(aid.clone());
+		listener.resultAvailable(cid.clone());
 	}
-	
+    
 	/**
 	 *  Start a previously created component on the platform.
 	 *  @param componentid The id of the previously created component.
@@ -460,21 +471,6 @@ public class ComponentExecutionService implements IComponentExecutionService
 			listener.exceptionOccurred(new RuntimeException("No local component found for component identifier: "+cid));
 		else
 			adapter.getComponentInstance().getExternalAccess(listener);
-	}
-
-	//-------- create methods for cms objects --------
-	
-	/**
-	 *  Create a component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @return The new agent identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
-	{
-		if(local)
-			name = name + "@" + container.getName();
-		return new AgentIdentifier(name, addresses);
 	}
 
 	/**

@@ -199,7 +199,7 @@ public class SFipa
 	 */
 	public IComponentIdentifier cloneAgentIdentifier(IComponentIdentifier source, IComponentExecutionService ces)
 	{
-		IComponentIdentifier clone = ces.createAgentIdentifier(source.getName(), false, source.getAddresses());
+		IComponentIdentifier clone = ces.createComponentIdentifier(source.getName(), false, source.getAddresses());
 		
 		// Deep copy of resolvers.
 		/*AgentIdentifier[] res = getResolvers();
@@ -217,8 +217,8 @@ public class SFipa
 	public static IComponentDescription cloneAMSAgentDescription(IComponentDescription source, IComponentExecutionService ces)
 	{
 		 IComponentIdentifier id = source.getName();
-		 id	= ams.createAgentIdentifier(id.getName(), false, id.getAddresses());
-		 return ams.createAMSAgentDescription(id, source.getState(), source.getOwnership());
+		 id	= ces.createComponentIdentifier(id.getName(), false, id.getAddresses());
+		 return ces.createComponentDescription(id, source.getState(), source.getOwnership());
 	}
 	
 	/**

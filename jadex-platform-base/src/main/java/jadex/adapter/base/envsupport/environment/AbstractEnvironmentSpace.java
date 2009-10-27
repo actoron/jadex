@@ -1,13 +1,12 @@
 package jadex.adapter.base.envsupport.environment;
 
-import jadex.adapter.base.SComponentExecutionService;
 import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.IObjectCreator;
 import jadex.adapter.base.envsupport.MEnvSpaceInstance;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.evaluation.ITableDataConsumer;
 import jadex.adapter.base.envsupport.evaluation.ITableDataProvider;
-import jadex.adapter.base.fipa.IAMS;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IContext;
 import jadex.commons.collection.MultiCollection;
@@ -486,8 +485,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 							
 							setOwner(fid, agent);
 							
-//							((IAMS)((ApplicationContext)getContext()).getPlatform().getService(IAMS.class)).startAgent(agent, null);
-							SComponentExecutionService.startComponent(((ApplicationContext)getContext()).getPlatform(), agent, null);
+							((IComponentExecutionService)((ApplicationContext)getContext()).getPlatform().getService(IComponentExecutionService.class)).startComponent(agent, null);
+//							SComponentExecutionService.startComponent(((ApplicationContext)getContext()).getPlatform(), agent, null);
 						}
 						
 						public void exceptionOccurred(Exception exception)
@@ -565,8 +564,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				AvatarMapping mapping = getAvatarMapping(agenttype, objecttype);
 				if(mapping.isKillAgent())
 				{
-//					IAMS ams = (IAMS)((ApplicationContext)getContext()).getPlatform().getService(IAMS.class);
-					SComponentExecutionService.destroyComponent(((ApplicationContext)getContext()).getPlatform(), agent, null);
+					IComponentExecutionService ces = (IComponentExecutionService)((ApplicationContext)getContext()).getPlatform().getService(IComponentExecutionService.class);
+					ces.destroyComponent(agent, null);
 				}
 			}
 			

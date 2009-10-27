@@ -3,6 +3,7 @@ package jadex.bridge;
 import java.util.Map;
 
 import jadex.service.IService;
+import jadex.service.IServiceContainer;
 
 import javax.swing.Icon;
 
@@ -74,5 +75,5 @@ public interface IComponentFactory extends IService
 	* @param arguments The arguments for the agent as name/value pairs.
 	* @return An instance of a kernel agent.
 	*/
-	public IComponentInstance createComponentInstance(ILoadableComponentModel model, String config, Map arguments);
+	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments);
 }

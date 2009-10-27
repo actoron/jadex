@@ -1,6 +1,9 @@
 package jadex.bridge;
 
+import java.util.Map;
+
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IServiceContainer;
 
 /**
  *  General interface for components that the container can execute.
@@ -19,7 +22,7 @@ public interface IComponentExecutionService
 	 *  @param creator The creator (if any).
 	 *  @param generate Generate a unique name, if the given name is already taken.
 	 */
-	public void	registerComponent(String name, IComponentInstance component, IResultListener listener, Object creator, boolean generate);
+	public void	registerComponent(IComponentIdentifier cid, IComponentInstance component, IResultListener listener, Object creator, boolean generate);
 	
 	/**
 	 *  Start a previously created component on the platform.
@@ -107,12 +110,9 @@ public interface IComponentExecutionService
 	//-------- create methods for cms objects --------
 	
 	/**
-	 *  Create a component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @return The new agent identifier.
+	 * 
 	 */
-	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] adresses);
+	public void	createComponent(IServiceContainer container, String name, String model, String config, Map args, IResultListener listener, Object creator, IComponentFactory factory);
 
 	/**
 	 * Create a ams agent description.

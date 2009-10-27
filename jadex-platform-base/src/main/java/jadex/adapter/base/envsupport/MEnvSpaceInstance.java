@@ -20,7 +20,7 @@ import jadex.adapter.base.envsupport.evaluation.SpaceObjectSource;
 import jadex.adapter.base.envsupport.math.Vector2Double;
 import jadex.adapter.base.envsupport.observer.gui.ObserverCenter;
 import jadex.adapter.base.envsupport.observer.perspective.IPerspective;
-import jadex.adapter.base.fipa.IAMS;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContextService;
@@ -342,11 +342,11 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				if(owner==null)
 					throw new RuntimeException("Attribute 'owner' required for avatar: "+mobj);
 				IComponentIdentifier	ownerid	= null;
-				IAMS	ams	= ((IAMS)app.getPlatform().getService(IAMS.class));
+				IComponentExecutionService ces = ((IComponentExecutionService)app.getPlatform().getService(IComponentExecutionService.class));
 				if(owner.indexOf("@")!=-1)
-					ownerid	= ams.createAgentIdentifier((String)owner, false);
+					ownerid	= ces.createComponentIdentifier((String)owner, false, null);
 				else
-					ownerid	= ams.createAgentIdentifier((String)owner, true);
+					ownerid	= ces.createComponentIdentifier((String)owner, true, null);
 				
 				Map props = convertProperties(mprops, fetcher);
 				ret.addInitialAvatar(ownerid, (String)MEnvSpaceInstance.getProperty(mobj, "type"), props);

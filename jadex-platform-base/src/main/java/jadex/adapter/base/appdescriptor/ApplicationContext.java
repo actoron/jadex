@@ -3,6 +3,7 @@ package jadex.adapter.base.appdescriptor;
 import jadex.adapter.base.SComponentExecutionService;
 import jadex.adapter.base.contextservice.BaseContext;
 import jadex.adapter.base.fipa.IAMS;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContext;
@@ -140,7 +141,8 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 //			IAMS ams = (IAMS) platform.getService(IAMS.class);
 			for(int i=0; i<agents.length; i++)
 			{
-				SComponentExecutionService.destroyComponent(platform, agents[i], l2);
+				IComponentExecutionService ces = (IComponentExecutionService)platform.getService(IComponentExecutionService.class);
+				ces.destroyComponent(agents[i], l2);
 //				ams.destroyAgent(agents[i], l2);
 			}
 		}
@@ -191,8 +193,10 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 		if(at==null)
 			throw new RuntimeException("Unknown agent type '"+type+"' in application: "+apptype);
 //		final IAMS	ams	= (IAMS) platform.getService(IAMS.class);
+		IComponentExecutionService ces = (IComponentExecutionService)platform.getService(IComponentExecutionService.class);
+
 		
-		SComponentExecutionService.createComponent(platform, name, at.getFilename(), configuration, arguments, new IResultListener()
+		ces.createComponent(name, at.getFilename(), configuration, arguments, new IResultListener()
 		{
 			public void exceptionOccurred(Exception exception)
 			{

@@ -49,15 +49,23 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  Create a new component adapter.
 	 *  Uses the thread pool for executing the component.
 	 */
-	public StandaloneComponentAdapter(IServiceContainer container, IComponentIdentifier aid, IComponentInstance component)
+	public StandaloneComponentAdapter(IServiceContainer container, IComponentIdentifier cid)
 	{
 		this.container = container;
-		this.cid = aid;
-		this.component = component;
+		this.cid = cid;
 	}
-
-	//-------- IComponentAdapter methods --------
 	
+	/**
+	 *  Set the component.
+	 *  @param component The component to set.
+	 */
+	public void setComponent(IComponentInstance component)
+	{
+		this.component = component;
+	}	
+	
+	//-------- IComponentAdapter methods --------
+
 	/**
 	 *  Called by the agent when it probably awoke from an idle state.
 	 *  The platform has to make sure that the agent will be executed
