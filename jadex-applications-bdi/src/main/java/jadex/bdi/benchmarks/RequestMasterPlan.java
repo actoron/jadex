@@ -1,7 +1,7 @@
 package jadex.bdi.benchmarks;
 
-import jadex.adapter.base.fipa.IAMS;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 
 import java.util.HashMap;
@@ -19,10 +19,10 @@ public class RequestMasterPlan extends Plan
 		args.put("max", getBeliefbase().getBelief("max").getFact());
 		args.put("receiver", getAgentIdentifier());
 		
-		IAMS	ams	= (IAMS) getScope().getServiceContainer().getService(IAMS.class);
+		IComponentExecutionService	ces	= (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
 		SyncResultListener	srl	= new SyncResultListener();
-		ams.createAgent(null, "jadex/bdi/benchmarks/RequestPerformance.agent.xml", "default", args, srl, getAgentIdentifier());
+		ces.createComponent(null, "jadex/bdi/benchmarks/RequestPerformance.agent.xml", "default", args, srl, getAgentIdentifier());
 		IComponentIdentifier	slave	= (IComponentIdentifier)srl.waitForResult();
-		ams.startAgent(slave, null);
+		ces.startComponent(slave, null);
 	}	
 }

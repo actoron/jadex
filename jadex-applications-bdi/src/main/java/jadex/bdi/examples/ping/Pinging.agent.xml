@@ -23,8 +23,8 @@
 	<beliefs>
 		<belief name="ping_receiver" class="IComponentIdentifier" exported="true">
 			<fact>
-				((IAMS)$scope.getServiceContainer().getService(IAMS.class))
-					.createAgentIdentifier("Ping", true)
+				((IComponentExecutionService)$scope.getServiceContainer().getService(IComponentExecutionService.class))
+					.createComponentIdentifier("Ping", true)
 			</fact>
 		</belief>
 		<beliefref name="ping_delay" exported="true">
@@ -39,8 +39,6 @@
 					<parameter ref="receiver">
 						<value>
 							$beliefbase.ping_receiver
-							// ((IAMS)$scope.getServiceContainer().getService(IAMS.class))
-							// .createAgentIdentifier("Ping", true)
 						</value>
 					</parameter>
 				</initialgoal>

@@ -132,14 +132,14 @@
 			
 				<entry>
 					<key>
-						<value type="java.lang.Class">jadex.adapter.base.fipa.IAMS</value>
+						<value type="java.lang.Class">jadex.bridge.IComponentExecutionService</value>
 					</key>
 					<map>
 						<entry>
 							<key>
 								<value type="java.lang.String">ams_service</value>
 							</key>
-							<bean class="jadex.adapter.standalone.ams.AMS">
+							<bean class="jadex.adapter.standalone.service.componentexecution.ComponentExecutionService">
 								<constructor-arg ref="platform"/>
 							</bean>
 						</entry>

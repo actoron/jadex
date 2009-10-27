@@ -66,12 +66,6 @@
 						((IDF) $scope.getServiceContainer().getService(IDF.class))
 							.createAgentIdentifier("df@lars", false, new String[]{"tcp-mtp://vsispool28:9876", "nio-mtp://vsispool28:8765"} )
 					</fact>
-					<!-- 
-					<fact>
-					new AgentIdentifier("df@lars",
-							new String[]{"nio-mtp://vsispool28:2102"})
-					</fact>
-					-->
 				</initialbelief>
 			</beliefs>
 		</configuration>
