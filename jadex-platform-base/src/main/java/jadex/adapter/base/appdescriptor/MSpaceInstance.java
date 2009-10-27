@@ -87,7 +87,7 @@ public abstract class MSpaceInstance
 	/**
 	 *  Create a space.
 	 */
-	public abstract ISpace	createSpace(IApplicationContext app) throws Exception;
+	public abstract ISpace createSpace(IApplicationContext app) throws Exception;
 	
 	/**
 	 *  Initialize a space.

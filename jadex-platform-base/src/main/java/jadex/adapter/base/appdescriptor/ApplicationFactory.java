@@ -2,9 +2,10 @@ package jadex.adapter.base.appdescriptor;
 
 import jadex.adapter.base.DefaultResultListener;
 import jadex.bridge.IApplicationContext;
-import jadex.bridge.IApplicationFactory;
-import jadex.bridge.IContextService;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;
+import jadex.bridge.IComponentInstance;
+import jadex.bridge.IContextService;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IPlatform;
 import jadex.bridge.ISpace;
@@ -33,7 +34,7 @@ import javax.swing.UIDefaults;
 /**
  *  Factory for creating agent applications.
  */
-public class ApplicationFactory implements IApplicationFactory
+public class ApplicationFactory implements IComponentFactory
 {
 	//-------- constants --------
 	
@@ -130,18 +131,28 @@ public class ApplicationFactory implements IApplicationFactory
 	
 	//-------- IAgentFactory interface --------
 	
+//	/**
+//	 *  Create a new agent application.
+//	 *  @param model	The agent model file (i.e. the name of the XML file).
+//	 *  @param config	The name of the configuration (or null for default configuration) 
+//	 *  @param arguments	The arguments for the agent as name/value pairs.
+//	 *  @return	An instance of the application.
+//	 */
+//	public IApplicationContext createApplication(String name, String model, String config, Map arguments) throws Exception
+
 	/**
-	 *  Create a new agent application.
-	 *  @param model	The agent model file (i.e. the name of the XML file).
-	 *  @param config	The name of the configuration (or null for default configuration) 
-	 *  @param arguments	The arguments for the agent as name/value pairs.
-	 *  @return	An instance of the application.
+	 * Create a component instance.
+	 * @param model The component model file (i.e. the name of the XML file).
+	 * @param config The name of the configuration (or null for default configuration) 
+	 * @param arguments The arguments for the agent as name/value pairs.
+	 * @return An instance of a kernel agent.
 	 */
-	public IApplicationContext createApplication(String name, String model, String config, Map arguments) throws Exception
+	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments)
 	{
+		String name = adapter!=null? adapter.getComponentIdentifier().getLocalName(): "no_name";
 		ApplicationContext	context = null;
 		
-		MApplicationType apptype = ((ApplicationModel)loadModel(model)).getApplicationType();
+		MApplicationType apptype = ((ApplicationModel)model).getApplicationType();
 		List apps = apptype.getMApplicationInstances();
 				
 		// Select application instance according to configuraion.
@@ -170,7 +181,7 @@ public class ApplicationFactory implements IApplicationFactory
 		else
 		{
 			Map	props	= new HashMap();
-			props.put(ApplicationContext.PROPERTY_APPLICATION_TYPE, apptype);
+			props.put(ApplicationContext.PROPERTY_APPLICATION_TYPE, model);
 			context	= (ApplicationContext)cs.createContext(name, IApplicationContext.class, props);
 		}
 		
@@ -186,12 +197,19 @@ public class ApplicationFactory implements IApplicationFactory
 			{
 				for(int i=0; i<spaces.size(); i++)
 				{
-//							System.out.println(spaces.get(i));
+//					System.out.println(spaces.get(i));
 					
 					MSpaceInstance si = (MSpaceInstance)spaces.get(i);
-					ISpace space = si.createSpace(context);
-					context.addSpace(space);
-					si.initSpace(space, context);
+					try
+					{
+						ISpace space = si.createSpace(context);
+						context.addSpace(space);
+						si.initSpace(space, context);
+					}
+					catch(Exception e)
+					{
+						System.out.println("Exception while creating space: "+si.getName());
+					}
 				}
 			}
 		}
@@ -246,7 +264,7 @@ public class ApplicationFactory implements IApplicationFactory
 				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
 				rinfo	= getResourceInfo(filename, FILE_EXTENSION_APPLICATION, null, cl);
 				apptype = (MApplicationType)reader.read(rinfo.getInputStream(), cl, null);
-				ret = new ApplicationModel(apptype, filename);
+				ret = new ApplicationModel(apptype, filename, cl);
 //				System.out.println("Loaded application type: "+apptype);
 			
 			}
@@ -371,12 +389,4 @@ public class ApplicationFactory implements IApplicationFactory
 		return ret;
 	}
 	
-	/**
-	 *  Get the element type.
-	 *  @return The element type (e.g. an agent, application or process).
-	 */
-	public String getElementType()
-	{
-		return IComponentFactory.ELEMENT_TYPE_AGENT;
-	}
 }

@@ -8,7 +8,7 @@ import java.util.Map;
  *  The application context for agents. Each agent is contained
  *  in exactly 0..1 applications. 
  */
-public interface IApplicationContext extends IContext
+public interface IApplicationContext extends IContext, IComponentInstance
 {
 	//-------- constants --------
 	

@@ -20,15 +20,19 @@ public class ApplicationModel implements ILoadableComponentModel
 	/** The filename. */
 	protected String filename;
 		
+	/** The classloader. */
+	protected ClassLoader classloader;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new application model. 
 	 */
-	public ApplicationModel(MApplicationType apptype, String filename)
+	public ApplicationModel(MApplicationType apptype, String filename, ClassLoader classloader)
 	{
 		this.apptype = apptype;
 		this.filename = filename;
+		this.classloader = classloader;
 	}
 	
 	//-------- methods --------
@@ -203,5 +207,14 @@ public class ApplicationModel implements ILoadableComponentModel
 	public String getFilename()
 	{
 		return filename;
+	}
+
+	/**
+	 *  Get the classloader.
+	 *  @return The classloader.
+	 */
+	public ClassLoader getClassLoader()
+	{
+		return this.classloader;
 	}
 }

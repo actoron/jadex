@@ -1,14 +1,8 @@
 package jadex.adapter.base;
 
-import jadex.bridge.IApplicationFactory;
-import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentFactory;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentInstance;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 
 import java.util.Collection;
@@ -127,14 +121,12 @@ public class SComponentFactory
 				for(Iterator it=facts.iterator(); it.hasNext(); )
 				{
 					IComponentFactory fac = (IComponentFactory)it.next();
-					if(fac instanceof IApplicationFactory)
+					if(fac.isLoadable(model))
 					{
-						IApplicationFactory afac = (IApplicationFactory)fac;
-						if(afac.isLoadable(model))
-						{
-							afac.createApplication(name, model, config, args);
-							break;
-						}
+						ILoadableComponentModel lmodel = fac.loadModel(model);
+						fac.createComponentInstance(null, lmodel, config, args);
+						//(name, model, config, args);
+						break;
 					}
 				}
 			}

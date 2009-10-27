@@ -1,13 +1,12 @@
 package jadex.adapter.base.appdescriptor;
 
-import jadex.adapter.base.SComponentExecutionService;
 import jadex.adapter.base.contextservice.BaseContext;
-import jadex.adapter.base.fipa.IAMS;
+import jadex.bridge.IApplicationContext;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
+import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IPlatform;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
@@ -32,7 +31,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	protected IPlatform	platform;
 	
 	/** The application type. */
-	protected MApplicationType	apptype;
+	protected ApplicationModel model;
 	
 	/** Flag to indicate that the context is about to be deleted
 	 * (no more agents can be added). */
@@ -49,9 +48,9 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	public ApplicationContext(String name, /*IContext parent,*/ Map properties, IPlatform platform)
 	{
 		super(name, /*parent,*/ properties);
-		this.platform	= platform;
-		this.apptype	= properties!=null ? (MApplicationType)properties.get(PROPERTY_APPLICATION_TYPE) : null;
-		if(apptype==null)
+		this.platform = platform;
+		this.model = properties!=null ? (ApplicationModel)properties.get(PROPERTY_APPLICATION_TYPE) : null;
+		if(model==null)
 			throw new RuntimeException("Property '"+PROPERTY_APPLICATION_TYPE+"' required.");
 	}
 
@@ -158,13 +157,22 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	//-------- methods --------
 	
 	/**
+	 *  Get the model.
+	 *  @return The model.
+	 */
+	public ApplicationModel getModel()
+	{
+		return this.model;
+	}
+	
+	/**
 	 *  Get the applicattion type.
 	 */
 	public MApplicationType	getApplicationType()
 	{
-		return apptype;
+		return model.getApplicationType();
 	}
-	
+
 	/**
 	 *  Get the platform.
 	 *  @return The platform.
@@ -189,9 +197,9 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 			Map arguments, final boolean start, final boolean master, 
 			final IResultListener listener, IComponentIdentifier creator)
 	{
-		MAgentType	at	= apptype.getMAgentType(type);
+		MAgentType	at	= model.getApplicationType().getMAgentType(type);
 		if(at==null)
-			throw new RuntimeException("Unknown agent type '"+type+"' in application: "+apptype);
+			throw new RuntimeException("Unknown agent type '"+type+"' in application: "+model);
 //		final IAMS	ams	= (IAMS) platform.getService(IAMS.class);
 		IComponentExecutionService ces = (IComponentExecutionService)platform.getService(IComponentExecutionService.class);
 
@@ -223,7 +231,8 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 				
 				if(start)
 				{
-					SComponentExecutionService.startComponent(platform, aid, listener);
+					IComponentExecutionService ces = (IComponentExecutionService)platform.getService(IComponentExecutionService.class);
+					ces.startComponent(aid, listener);
 				}
 				else
 				{
@@ -306,7 +315,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	 */
 	public String[] getAgentTypes()
 	{
-		List atypes = apptype.getMAgentTypes();
+		List atypes = model.getApplicationType().getMAgentTypes();
 		String[] ret = atypes!=null? new String[atypes.size()]: SUtil.EMPTY_STRING;
 		
 		for(int i=0; i<ret.length; i++)
@@ -328,7 +337,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 		String ret = null;
 		filename = filename.replace('\\', '/');
 		
-		List agenttypes = apptype.getMAgentTypes();
+		List agenttypes = model.getApplicationType().getMAgentTypes();
 		for(Iterator it=agenttypes.iterator(); it.hasNext(); )
 		{
 			MAgentType agenttype = (MAgentType)it.next();
@@ -345,6 +354,76 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	 */
 	public String[] getAllImports()
 	{
-		return apptype.getAllImports();
+		return model.getApplicationType().getAllImports();
+	}
+	
+	//-------- methods to be called by adapter --------
+
+	/**
+	 *  Can be called on the agent thread only.
+	 * 
+	 *  Main method to perform agent execution.
+	 *  Whenever this method is called, the agent performs
+	 *  one of its scheduled actions.
+	 *  The platform can provide different execution models for agents
+	 *  (e.g. thread based, or synchronous).
+	 *  To avoid idle waiting, the return value can be checked.
+	 *  The platform guarantees that executeAction() will not be called in parallel. 
+	 *  @return True, when there are more actions waiting to be executed. 
+	 */
+	public boolean executeStep()
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Can be called concurrently (also during executeAction()).
+	 *  
+	 *  Inform the agent that a message has arrived.
+	 *  Can be called concurrently (also during executeAction()).
+	 *  @param message The message that arrived.
+	 */
+	public void messageArrived(IMessageAdapter message)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Can be called concurrently (also during executeAction()).
+	 *   
+	 *  Request agent to kill itself.
+	 *  The agent might perform arbitrary cleanup activities during which executeAction()
+	 *  will still be called as usual.
+	 *  Can be called concurrently (also during executeAction()).
+	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
+	 */
+	public void killComponent(IResultListener listener)
+	{
+		
+	}
+	
+	/**
+	 *  Can be called concurrently (also during executeAction()).
+	 * 
+	 *  Get the external access for this agent.
+	 *  The specific external access interface is kernel specific
+	 *  and has to be casted to its corresponding incarnation.
+	 *  @param listener	External access is delivered via result listener.
+	 */
+	public void getExternalAccess(IResultListener listener)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 *  Get the class loader of the agent.
+	 *  The agent class loader is required to avoid incompatible class issues,
+	 *  when changing the platform class loader while agents are running. 
+	 *  This may occur e.g. when decoding messages and instantiating parameter values.
+	 *  @return	The agent class loader. 
+	 */
+	public ClassLoader getClassLoader()
+	{
+		return model.getClassLoader();
 	}
 }
