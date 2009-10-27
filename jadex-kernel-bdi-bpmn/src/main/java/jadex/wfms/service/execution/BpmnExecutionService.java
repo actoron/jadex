@@ -4,6 +4,10 @@ import jadex.bpmn.BpmnExecutor;
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentFactory;
+import jadex.bridge.IComponentInstance;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
@@ -20,13 +24,14 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.help.UnsupportedOperationException;
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
 
 /**
  * 
  */
-public class BpmnExecutionService implements IExecutionService
+public class BpmnExecutionService implements IComponentFactory
 {
 	//-------- constants --------
 	
@@ -202,4 +207,19 @@ public class BpmnExecutionService implements IExecutionService
 	{
 		return model.toLowerCase().endsWith("agent.class") ? FILETYPE_BPMNPROCESS: null;
 	}
+	
+	/**
+	 * Create a kernel agent.
+	 * @param model The agent model file (i.e. the name of the XML file).
+	 * @param config The name of the configuration (or null for default configuration) 
+	 * @param arguments The arguments for the agent as name/value pairs.
+	 * @return An instance of a kernel agent.
+	 */
+	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments)
+	{
+		// todo:
+		
+		throw new UnsupportedOperationException();
+	}
+
 }

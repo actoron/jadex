@@ -1,5 +1,6 @@
 package jadex.wfms.plugin.starter;
 
+import jadex.adapter.base.SComponentFactory;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.ILoadableComponentModel;
@@ -16,7 +17,6 @@ import jadex.tools.common.ElementPanel;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.JValidatorTextField;
 import jadex.tools.common.ParserValidator;
-import jadex.wfms.service.execution.IExecutionService;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -326,22 +326,22 @@ public class StarterPanel extends JPanel
 					}
 					else
 					{
-						String typename = filename.getText();
-						String an = genagentname.isSelected()?  null: agentname.getText();
-						if(an==null) // i.e. name auto generate
-						{
-							int max = ((Integer)numagents.getValue()).intValue();
-							for(int i=0; i<max; i++)
-							{
-								((IExecutionService)starter.getJCC().getServiceContainer().getService(IExecutionService.class))
-									.startProcess(typename, an, args, false);
-							}
-						}
-						else
-						{
-							((IExecutionService)starter.getJCC().getServiceContainer().getService(IExecutionService.class))
-								.startProcess(typename, an, args, false);
-						}
+//						String typename = filename.getText();
+//						String an = genagentname.isSelected()?  null: agentname.getText();
+//						if(an==null) // i.e. name auto generate
+//						{
+//							int max = ((Integer)numagents.getValue()).intValue();
+//							for(int i=0; i<max; i++)
+//							{
+//								((IExecutionService)starter.getJCC().getServiceContainer().getService(IExecutionService.class))
+//									.startProcess(typename, an, args, false);
+//							}
+//						}
+//						else
+//						{
+//							((IExecutionService)starter.getJCC().getServiceContainer().getService(IExecutionService.class))
+//								.startProcess(typename, an, args, false);
+//						}
 					}
 				}
 			}
@@ -532,12 +532,12 @@ public class StarterPanel extends JPanel
 
 			try
 			{
-				IExecutionService es = (IExecutionService)starter.getJCC().getServiceContainer().getService(IExecutionService.class);
+//				IExecutionService es = (IExecutionService)starter.getJCC().getServiceContainer().getService(IExecutionService.class);
 //				IModelRepositoryService ms = (IModelRepositoryService)starter.getJCC().getServiceContainer().getService(IModelRepositoryService.class);
 				
-				if(es.isLoadable(adf))
+				if(SComponentFactory.isLoadable(starter.getJCC().getServiceContainer(), adf))
 				{
-					model = es.loadModel(adf);
+					model = SComponentFactory.loadModel(starter.getJCC().getServiceContainer(), adf);
 					SwingUtilities.invokeLater(new Runnable()
 					{
 						public void run()

@@ -1,19 +1,15 @@
 package jadex.wfms.service.repository;
 
+import jadex.adapter.base.SComponentFactory;
+import jadex.commons.concurrent.IResultListener;
+import jadex.service.execution.IExecutionService;
+import jadex.wfms.IProcessModel;
+import jadex.wfms.IWfms;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-
-import jadex.bpmn.BpmnModelLoader;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.commons.concurrent.IResultListener;
-import jadex.wfms.IProcessModel;
-import jadex.wfms.IWfms;
-import jadex.wfms.client.IClient;
-import jadex.wfms.service.execution.IExecutionService;
 
 /**
  * Basic Model Repository Service implementation
@@ -178,8 +174,7 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 	{
 		// todo check access
 		
-		IExecutionService ex = (IExecutionService)wfms.getService(IExecutionService.class);
-		IProcessModel model = (IProcessModel)ex.loadModel(filename);
+		IProcessModel model = (IProcessModel)SComponentFactory.loadModel(wfms, filename);
 		String modelName = model.getName();
 		if (modelName == null)
 		{

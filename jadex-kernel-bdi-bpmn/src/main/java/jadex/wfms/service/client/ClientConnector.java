@@ -9,7 +9,6 @@ import jadex.wfms.client.IWorkitemListener;
 import jadex.wfms.client.Workitem;
 import jadex.wfms.client.WorkitemQueueChangeEvent;
 import jadex.wfms.service.definition.IProcessDefinitionService;
-import jadex.wfms.service.execution.IExecutionService;
 import jadex.wfms.service.repository.IModelRepositoryService;
 import jadex.wfms.service.security.IAAAService;
 
@@ -85,19 +84,22 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 	 * 
 	 * @param client the client
 	 * @param name name of the process
-	 */
+	 * /
 	public synchronized void startBpmnProcess(IClient client, String name)
 	{
 		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.START_BPMN_PROCESS))
 			throw new AccessControlException("Not allowed: "+client);
 		
-		IModelRepositoryService rs = (IModelRepositoryService)wfms.getService(IModelRepositoryService.class);
-		String filename = rs.getProcessModel(name).getFilename();
+		// todo:
+		throw new UnsupportedOperationException();
 		
-		IExecutionService bps = (IExecutionService)wfms.getService(IExecutionService.class);
-		Object id  = bps.startProcess(filename, null, null, false);
-		System.out.println("Started process instance " + id);
-	}
+//		IModelRepositoryService rs = (IModelRepositoryService)wfms.getService(IModelRepositoryService.class);
+//		String filename = rs.getProcessModel(name).getFilename();
+//		
+//		IExecutionService bps = (IExecutionService)wfms.getService(IExecutionService.class);
+//		Object id  = bps.startProcess(filename, null, null, false);
+//		System.out.println("Started process instance " + id);
+	}*/
 	
 	/**
 	 * Gets the names of all available BPMN-models
@@ -140,12 +142,15 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.START_BPMN_PROCESS))
 			throw new AccessControlException("Not allowed: "+client);
 		
-		IModelRepositoryService rs = (IModelRepositoryService)wfms.getService(IModelRepositoryService.class);
-		String filename = rs.getProcessModel(name).getFilename();
+		// todo:
+		throw new UnsupportedOperationException();
 		
-		IExecutionService bps = (IExecutionService)wfms.getService(IExecutionService.class);
-		Object id  = bps.startProcess(filename, null, null, false);
-		System.out.println("Started process instance " + id);
+//		IModelRepositoryService rs = (IModelRepositoryService)wfms.getService(IModelRepositoryService.class);
+//		String filename = rs.getProcessModel(name).getFilename();
+//		
+//		IExecutionService bps = (IExecutionService)wfms.getService(IExecutionService.class);
+//		Object id  = bps.startProcess(filename, null, null, false);
+//		System.out.println("Started process instance " + id);
 	}
 	
 	/**

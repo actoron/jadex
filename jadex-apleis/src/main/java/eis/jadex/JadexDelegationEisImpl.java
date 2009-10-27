@@ -7,8 +7,8 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IPlatform;
 import jadex.commons.collection.MultiCollection;
+import jadex.service.IServiceContainer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -502,8 +502,8 @@ public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 	 */
 	protected IComponentIdentifier convertStringToAgentIdentifier(String name)
 	{
-		IPlatform platform = ((IApplicationContext)space.getContext()).getServiceContainer();
-		IComponentExecutionService	ces	= (IComponentExecutionService)platform.getService(IComponentExecutionService.class);
+		IServiceContainer container = ((IApplicationContext)space.getContext()).getServiceContainer();
+		IComponentExecutionService	ces	= (IComponentExecutionService)container.getService(IComponentExecutionService.class);
 		return ces.createComponentIdentifier(name, name.contains("@")? false: true, null);
 	}
 	

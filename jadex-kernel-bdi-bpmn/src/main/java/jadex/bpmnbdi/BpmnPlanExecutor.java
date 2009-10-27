@@ -13,7 +13,7 @@ import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler.EventEndErrorException;
-import jadex.bridge.IPlatform;
+import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
 
@@ -39,10 +39,10 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 	/**
 	 *  Create a new BPMN plan executor.
 	 */
-	public BpmnPlanExecutor(IPlatform platform)
+	public BpmnPlanExecutor(IServiceContainer container)
 	{
 		this.loader = new BpmnModelLoader();
-		final ILibraryService libservice = (ILibraryService)platform.getService(ILibraryService.class);
+		final ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 		loader.setClassLoader(libservice.getClassLoader());
 		ILibraryServiceListener lsl = new ILibraryServiceListener()
 		{

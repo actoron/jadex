@@ -4,10 +4,10 @@ import jadex.bdi.interpreter.BDIAgentFactory;
 import jadex.bdi.interpreter.OAVAgentModel;
 import jadex.bdi.interpreter.OAVBDIXMLReader;
 import jadex.bridge.ILoadableComponentModel;
-import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
 import jadex.commons.xml.writer.Writer;
 import jadex.gpmn.model.MGpmnModel;
+import jadex.service.IServiceContainer;
 
 import java.io.FileOutputStream;
 import java.util.Map;
@@ -43,9 +43,9 @@ public class GpmnAgentFactory extends BDIAgentFactory
 	/**
 	 *  Create a new agent factory.
 	 */
-	public GpmnAgentFactory(Map props, IPlatform platform)
+	public GpmnAgentFactory(Map props, IServiceContainer container)
 	{
-		super(props, platform);
+		super(props, container);
 		converter = new GpmnBDIConverter(loader);
 	}
 	

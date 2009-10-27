@@ -1,36 +1,37 @@
 package jadex.wfms.service.execution;
 
-import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.standalone.Platform;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.ILoadableComponentModel;
-import jadex.bridge.IPlatform;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.gpmn.GpmnXMLReader;
-import jadex.gpmn.model.MGpmnModel;
 import jadex.microkernel.MicroAgentFactory;
+import jadex.service.IServiceContainer;
 import jadex.service.PropertiesXMLHelper;
 import jadex.service.library.ILibraryService;
 import jadex.wfms.IProcessModel;
 import jadex.wfms.IWfms;
-import jadex.wfms.client.IClient;
-import jadex.wfms.service.repository.IModelRepositoryService;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.help.UnsupportedOperationException;
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
 
 /**
  * 
  */
-public class GpmnExecutionService implements IExecutionService
+public class GpmnExecutionService implements IComponentFactory
 {
 	//-------- constants --------
 	
@@ -51,7 +52,7 @@ public class GpmnExecutionService implements IExecutionService
 	protected IWfms wfms;
 	
 	/** The platform */
-	protected IPlatform platform;
+	protected IServiceContainer container;
 
 	/** The created processes. (processid -> agentid) */
 	protected Map processes;
@@ -102,16 +103,16 @@ public class GpmnExecutionService implements IExecutionService
 		}
 		System.out.println(configuration);
 		
-		platform = new Platform(configuration, wfms);
-		((Platform)platform).start();
+		container = new Platform(configuration, wfms);
+		((Platform)container).start();
 		
 		long startup = System.currentTimeMillis() - starttime;
-		((Platform)platform).getLogger().info("Platform startup time: " + startup + " ms.");
+		((Platform)container).getLogger().info("Platform startup time: " + startup + " ms.");
 		
-		((IAMS)platform.getService(IAMS.class)).addAMSListener(new IComponentListener()
+		((IComponentExecutionService)container.getService(IComponentExecutionService.class)).addComponentListener(new IComponentListener()
 		{
 			
-			public void agentRemoved(IComponentDescription desc)
+			public void componentRemoved(IComponentDescription desc)
 			{
 				synchronized(GpmnExecutionService.this)
 				{
@@ -119,7 +120,7 @@ public class GpmnExecutionService implements IExecutionService
 				}
 			}
 			
-			public void agentAdded(IComponentDescription desc)
+			public void componentAdded(IComponentDescription desc)
 			{
 			}
 		});
@@ -162,13 +163,13 @@ public class GpmnExecutionService implements IExecutionService
 	public Object startProcess(String modelname, final Object id, Map arguments, boolean stepmode)
 	{
 		final String name = id.toString();
-		final IAMS ams = (IAMS)platform.getService(IAMS.class);
-		ams.createAgent(name, modelname, null, null, new IResultListener()
+		final IComponentExecutionService ces = (IComponentExecutionService)container.getService(IComponentExecutionService.class);
+		ces.createComponent(name, modelname, null, null, new IResultListener()
 		{
 			
 			public void resultAvailable(Object result)
 			{
-				ams.startAgent((IComponentIdentifier)result, null);
+				ces.startComponent((IComponentIdentifier)result, null);
 				processes.put(id, result);
 			}
 			
@@ -222,5 +223,20 @@ public class GpmnExecutionService implements IExecutionService
 	public String getFileType(String model)
 	{
 		return model.toLowerCase().endsWith("agent.class") ? FILETYPE_GPMNPROCESS: null;
+	}
+	
+
+	/**
+	 * Create a kernel agent.
+	 * @param model The agent model file (i.e. the name of the XML file).
+	 * @param config The name of the configuration (or null for default configuration) 
+	 * @param arguments The arguments for the agent as name/value pairs.
+	 * @return An instance of a kernel agent.
+	 */
+	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments)
+	{
+		// todo:
+		
+		throw new UnsupportedOperationException();
 	}
 }

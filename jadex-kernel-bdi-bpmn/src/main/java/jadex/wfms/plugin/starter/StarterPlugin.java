@@ -18,7 +18,6 @@ import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;
 import jadex.tools.common.modeltree.ModelExplorerTreeModel;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
-import jadex.wfms.service.execution.IExecutionService;
 
 import java.awt.Component;
 import java.awt.Cursor;
@@ -195,7 +194,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 		lsplit.setOneTouchExpandable(true);
 		lsplit.setResizeWeight(0.7);
 
-		mpanel = new ModelExplorer(getJCC().getServiceContainer(), new StarterNodeFunctionality(this));
+//		mpanel = new ModelExplorer(getJCC().getServiceContainer(), new StarterNodeFunctionality(this));
 //		mpanel.setAction(FileNode.class, new INodeAction()
 //		{
 //			public void validStateChanged(TreeNode node, boolean valid)
@@ -249,7 +248,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 							String type = ((FileNode)node).getFile().getAbsolutePath();
 							if(SComponentFactory.isStartable(getJCC().getServiceContainer(), type))
-								((IExecutionService)getJCC().getServiceContainer().getService(IExecutionService.class)).startProcess(type, null, null, false);
+//								((IExecutionService)getJCC().getServiceContainer().getService(IExecutionService.class)).startProcess(type, null, null, false);
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
 					}
@@ -703,7 +702,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 									{
 										public void actionPerformed(ActionEvent e)
 										{
-											((IExecutionService)getJCC().getServiceContainer().getService(IExecutionService.class)).startProcess(type, null, null, false);
+//											((IExecutionService)getJCC().getServiceContainer().getService(IExecutionService.class)).startProcess(type, null, null, false);
 										}
 									});
 									me.setToolTipText("Start in configuration: "+config);
@@ -729,7 +728,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 								{
 									public void actionPerformed(ActionEvent e)
 									{
-										((IExecutionService)getJCC().getServiceContainer().getService(IExecutionService.class)).startProcess(type, null, null, false);
+//										((IExecutionService)getJCC().getServiceContainer().getService(IExecutionService.class)).startProcess(type, null, null, false);
 									}
 								});
 							}
