@@ -1,6 +1,5 @@
 package jadex.tools.starter;
 
-import jadex.adapter.base.SComponentExecutionService;
 import jadex.adapter.base.SComponentFactory;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IComponentDescription;
@@ -978,12 +977,13 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	 */
 	public void createComponent(String type, String name, String configname, Map arguments)
 	{
-		SComponentExecutionService.createComponent(getJCC().getServiceContainer(), name, type, configname, arguments, new IResultListener()
+		final IComponentExecutionService	ces	= (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
+		ces.createComponent(name, type, configname, arguments, new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
 				final IComponentIdentifier aid = (IComponentIdentifier)result;
-				SComponentExecutionService.startComponent(getJCC().getServiceContainer(), aid, new IResultListener()
+				ces.startComponent(aid, new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{

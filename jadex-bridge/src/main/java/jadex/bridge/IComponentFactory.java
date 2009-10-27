@@ -1,9 +1,8 @@
 package jadex.bridge;
 
-import java.util.Map;
-
 import jadex.service.IService;
-import jadex.service.IServiceContainer;
+
+import java.util.Map;
 
 import javax.swing.Icon;
 

@@ -489,6 +489,20 @@ public class ComponentExecutionService implements IComponentExecutionService
 	}
 
 	/**
+	 *  Create component identifier.
+	 *  @param name The name.
+	 *  @param local True for local name.
+	 *  @param addresses The addresses.
+	 *  @return The new component identifier.
+	 */
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
+	{
+		if(local)
+			name = name + "@" + container.getName();
+		return new AgentIdentifier(name, addresses, null);		
+	}
+
+	/**
 	 *  Create a search constraints object.
 	 *  @param maxresults The maximum number of results.
 	 *  @param maxdepth The maximal search depth.
