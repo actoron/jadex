@@ -1,8 +1,7 @@
 package jadex.bdi.planlib.ams;
 
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 
 /**
@@ -20,7 +19,7 @@ public class AMSLocalStartAgentPlan extends Plan
 		try
 		{
 			SyncResultListener lis = new SyncResultListener();
-			((IAMS)getScope().getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE)).startAgent(agentidentifier, lis);
+			((IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class)).startComponent(agentidentifier, lis);
 			lis.waitForResult();
 		}
 		catch(Exception e)

@@ -1,10 +1,10 @@
 package jadex.bdi.planlib.ams;
 
-import jadex.adapter.base.fipa.IAMS;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentListener;
 
 /**
@@ -24,7 +24,6 @@ public class AMSLocalUpdateAgentsPlan extends Plan
 	 */
 	public void body()
 	{
-		IAMS ams = (IAMS)getBeliefbase().getBelief("ams").getFact();
 		final IBeliefSet agents = getExternalAccess().getBeliefbase().getBeliefSet("agents");
 		
 		final Object mon = new Object();
@@ -32,7 +31,7 @@ public class AMSLocalUpdateAgentsPlan extends Plan
 		{
 			this.listener	= new IComponentListener()
 			{
-				public void agentAdded(final IComponentDescription desc)
+				public void componentAdded(final IComponentDescription desc)
 				{
 					try
 					{
@@ -53,7 +52,7 @@ public class AMSLocalUpdateAgentsPlan extends Plan
 					}
 				}
 						
-				public void agentRemoved(final IComponentDescription desc)
+				public void componentRemoved(final IComponentDescription desc)
 				{
 					try
 					{
@@ -75,10 +74,11 @@ public class AMSLocalUpdateAgentsPlan extends Plan
 				}
 			};
 			
-			ams.addAMSListener(listener);
+			IComponentExecutionService	ces	= (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+			ces.addComponentListener(listener);
 			
 			SyncResultListener lis = new SyncResultListener();
-			ams.getAgentDescriptions(lis);
+			ces.getComponentDescriptions(lis);
 			IComponentDescription[] descs = (IComponentDescription[])lis.waitForResult();
 			getBeliefbase().getBeliefSet("agents").addFacts(descs);
 		}
@@ -89,7 +89,7 @@ public class AMSLocalUpdateAgentsPlan extends Plan
 	
 	public void aborted()
 	{
-		IAMS ams = (IAMS)getBeliefbase().getBelief("ams").getFact();
-		ams.removeAMSListener(listener);
+		IComponentExecutionService	ces	= (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+		ces.removeComponentListener(listener);
 	}
 }

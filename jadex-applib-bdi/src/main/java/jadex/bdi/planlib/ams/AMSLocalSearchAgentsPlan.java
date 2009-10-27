@@ -1,9 +1,8 @@
 package jadex.bdi.planlib.ams;
 
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.ISearchConstraints;
 
 
@@ -21,7 +20,7 @@ public class AMSLocalSearchAgentsPlan extends Plan
 		ISearchConstraints	constraints	= (ISearchConstraints)getParameter("constraints").getValue();
 		
 		SyncResultListener lis = new SyncResultListener();
-		((IAMS)getScope().getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE)).searchAgents(desc, constraints, lis);
+		((IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class)).searchComponents(desc, constraints, lis);
 		IComponentDescription[]	result =  (IComponentDescription[])lis.waitForResult();
 		for(int i=0; i<result.length; i++)
 			getParameterSet("result").addValue(result[i]);

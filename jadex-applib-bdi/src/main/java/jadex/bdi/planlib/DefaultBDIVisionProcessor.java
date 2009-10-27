@@ -6,12 +6,12 @@ import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector1;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Double;
-import jadex.adapter.base.fipa.IAMS;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IExternalAccess;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
+import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISpace;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
@@ -87,8 +87,8 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 		
 		if(invoke)
 		{
-			IAMS ams = (IAMS)((IApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);
-			ams.getExternalAccess(agent, new IResultListener()
+			IComponentExecutionService ces = (IComponentExecutionService)((IApplicationContext)space.getContext()).getPlatform().getService(IComponentExecutionService.class);
+			ces.getExternalAccess(agent, new IResultListener()
 			{
 				public void exceptionOccurred(Exception exception)
 				{

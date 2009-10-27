@@ -14,12 +14,6 @@
 		<import>jadex.service.clock.IClockService</import>
 	</imports>
 
-	<capabilities>
-		<!-- Include the StartAgents capability as startcap for starting agents. -->
-		<capability name="startercap" file="jadex.bdi.planlib.starter.StartAgents"/>
-		<capability name="amscap" file="jadex.bdi.planlib.ams.AMS"/>
-	</capabilities>
-
 	<beliefs>
 		<!-- The environment as singleton object. -->
 		<belief name="environment" class="Environment">

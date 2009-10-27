@@ -50,7 +50,7 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 		List receivers = SUtil.arrayToList(getParameterSet("receivers").getValues());
 		
 		// Initialize negotiations.
-		String convid = SFipa.createUniqueId(getAgentName());
+		String convid = SUtil.createUniqueId(getAgentName());
 		
 		// Announce the auction by sending information about it.
 		announceAuction(auctiondesc, receivers, convid);

@@ -33,7 +33,7 @@ public class CMInitiatorPlan extends Plan
 		cancel.getParameter(SFipa.LANGUAGE).setValue(message.getParameter(SFipa.LANGUAGE).getValue());
 		cancel.getParameter(SFipa.ONTOLOGY).setValue(message.getParameter(SFipa.ONTOLOGY).getValue());
 		// Use extra reply_with to avoid intermingling with other protocol messages.
-		cancel.getParameter(SFipa.REPLY_WITH).setValue(SFipa.createUniqueId(getAgentName()));
+		cancel.getParameter(SFipa.REPLY_WITH).setValue(SUtil.createUniqueId(getAgentName()));
 
 		// Send cancel message to participants.
 		long	timeout	= ((Number)getParameter("timeout").getValue()).longValue();

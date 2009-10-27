@@ -1,9 +1,8 @@
 package jadex.bdi.planlib.ams;
 
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 
 /**
@@ -19,7 +18,7 @@ public class AMSLocalSuspendAgentPlan extends Plan
 		IComponentIdentifier	aid	= (IComponentIdentifier)getParameter("agentidentifier").getValue();
 	
 		SyncResultListener lis = new SyncResultListener();
-		((IAMS)getScope().getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE)).suspendAgent(aid, lis);
+		((IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class)).suspendComponent(aid, lis);
 		IComponentDescription desc = (IComponentDescription)lis.waitForResult();
 		
 		getParameter("agentdescription").setValue(desc);

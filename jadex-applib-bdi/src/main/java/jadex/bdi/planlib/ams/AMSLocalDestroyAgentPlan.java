@@ -1,10 +1,9 @@
 package jadex.bdi.planlib.ams;
 
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IPlatform;
+import jadex.service.IServiceContainer;
 
 
 /**
@@ -19,11 +18,11 @@ public class AMSLocalDestroyAgentPlan extends Plan
 	{	
 		IComponentIdentifier	aid	= (IComponentIdentifier)getParameter("agentidentifier").getValue();
 
-		final IPlatform plat	= getScope().getServiceContainer();
+		final IServiceContainer plat	= getScope().getServiceContainer();
 		try
 		{
 			SyncResultListener lis = new SyncResultListener();
-			((IAMS)plat.getService(IAMS.class, SFipa.AMS_SERVICE)).destroyAgent(aid, lis);
+			((IComponentExecutionService)plat.getService(IComponentExecutionService.class)).destroyComponent(aid, lis);
 			lis.waitForResult();
 		}
 		catch(Exception e)

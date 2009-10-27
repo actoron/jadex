@@ -21,10 +21,6 @@
 	</capabilities>
 
 	<beliefs>
-		<!-- The ams service (stored to receive bean property changes). -->
-		<belief name="ams" class="IAMS">
-			<fact>$scope.getAgentAdapter().getPlatform().getService(IAMS.class, SFipa.AMS_SERVICE)</fact>
-		</belief>
 		<!-- The agents on this platform. todo: remove, offer only subscribe -->
 		<beliefset name="agents" class="IAMSAgentDescription" exported="true"/>
 		<!-- Timeout for messages. - ->
@@ -253,9 +249,6 @@
 		<!-- todo: remove, completely inefficient -->
 		<plan name="local_update_agents_plan">
 			<body class="AMSLocalUpdateAgentsPlan" />
-			<!-- <trigger>
-				<beliefchange ref="ams"/>
-			</trigger>-->
 		</plan>
 		
 		<plan name="local_get_externalaccess_plan">

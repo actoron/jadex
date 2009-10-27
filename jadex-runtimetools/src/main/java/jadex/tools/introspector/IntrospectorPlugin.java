@@ -367,14 +367,14 @@ public class IntrospectorPlugin extends AbstractJCCPlugin	 implements IAgentList
 		});
 		ces.addComponentListener(new IComponentListener()
 		{
-			public void componentRemoved(Object desc)
+			public void componentRemoved(IComponentDescription desc)
 			{
-				agentDied((IComponentDescription)desc);
+				agentDied(desc);
 			}
 			
-			public void componentAdded(Object desc)
+			public void componentAdded(IComponentDescription desc)
 			{
-				agentBorn((IComponentDescription)desc);
+				agentBorn(desc);
 			}
 		});
 		

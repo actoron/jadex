@@ -2,7 +2,6 @@ package jadex.bdi.planlib.df;
 
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
-import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 
@@ -26,7 +25,7 @@ public class DFLocalRegisterPlan extends Plan
 		// When AID is ommited, enter self. Hack???
 		if(desc.getName()==null || lt!=null)
 		{
-			IDF	dfservice	= (IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE);
+			IDF	dfservice	= (IDF)getScope().getServiceContainer().getService(IDF.class);
 			IComponentIdentifier	bid	= desc.getName()!=null ? desc.getName() : getScope().getAgentIdentifier();
 			Date	leasetime	= lt==null ? desc.getLeaseTime() : new Date(getTime()+lt.longValue());
 			desc	= dfservice.createDFAgentDescription(bid, desc.getServices(), desc.getLanguages(), desc.getOntologies(), desc.getProtocols(), leasetime);
@@ -35,7 +34,7 @@ public class DFLocalRegisterPlan extends Plan
 		getLogger().info("Trying to register: "+desc);
 
 		SyncResultListener lis = new SyncResultListener();
-		((IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE)).register(desc, lis);
+		((IDF)getScope().getServiceContainer().getService(IDF.class)).register(desc, lis);
 		// todo: supply return value or throw exception?
 		desc = (IDFAgentDescription)lis.waitForResult();
 

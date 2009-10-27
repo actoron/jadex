@@ -34,7 +34,9 @@ public class SendEmailPlan extends Plan
 		String[]	receivers	= (String[])getParameterSet("receivers").getValues();
 		String[]	ccs	= (String[])getParameterSet("ccs").getValues();
 		String[]	bccs	= (String[])getParameterSet("bccs").getValues();
-		Object[]	attachments	= getParameterSet("attachments").getValues(); // todo:
+		
+		// Todo: attachments?
+//		Object[]	attachments	= getParameterSet("attachments").getValues(); // todo:
 		
 		Properties props = new Properties();
 		props.setProperty("mail.smtp.auth","true");

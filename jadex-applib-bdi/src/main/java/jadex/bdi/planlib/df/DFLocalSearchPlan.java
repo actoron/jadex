@@ -2,7 +2,6 @@ package jadex.bdi.planlib.df;
 
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
-import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
 
@@ -22,7 +21,7 @@ public class DFLocalSearchPlan extends Plan
 		ISearchConstraints	con	= (ISearchConstraints)getParameter("constraints").getValue();
 		
 		SyncResultListener lis = new SyncResultListener();
-		((IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE)).search(desc, con, lis);
+		((IDF)getScope().getServiceContainer().getService(IDF.class)).search(desc, con, lis);
 		IDFAgentDescription[]	result = (IDFAgentDescription[])lis.waitForResult();
 		
 		getParameterSet("result").addValues(result);

@@ -2,7 +2,6 @@ package jadex.bdi.planlib.df;
 
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
-import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.Plan;
 
 
@@ -16,7 +15,7 @@ public class DFLocalDeregisterPlan extends Plan
 	 */
 	public void body()
 	{
-		IDF	dfservice	= (IDF)getScope().getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE);
+		IDF	dfservice	= (IDF)getScope().getServiceContainer().getService(IDF.class);
 		
 		// In case of a remote request the agent description is already
 		// set via the remote deregister plan.
