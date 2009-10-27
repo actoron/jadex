@@ -73,7 +73,7 @@ public interface IComponentExecutionService	extends IService
 	 * Search for agents matching the given description.
 	 * @return An array of matching agent descriptions.
 	 */
-	public void searchAgents(IComponentDescription adesc, ISearchConstraints con, IResultListener listener);
+	public void searchComponents(IComponentDescription adesc, ISearchConstraints con, IResultListener listener);
 
 	//-------- listener methods --------
 	

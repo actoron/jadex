@@ -1,12 +1,11 @@
 package jadex.bdi.planlib.ams;
 
-import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentExecutionService;
 
 /**
  *  Shutdown the platform.
  */
+// Todo: remove from AMS?
 public class AMSLocalShutdownPlatformPlan extends Plan
 {
 	/**
@@ -15,7 +14,7 @@ public class AMSLocalShutdownPlatformPlan extends Plan
 	public void body()
 	{
 		SyncResultListener lis = new SyncResultListener();
-		((IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class)).shutdownPlatform(lis);
+		getScope().getServiceContainer().shutdown(lis);
 		lis.waitForResult();
 	}
 }

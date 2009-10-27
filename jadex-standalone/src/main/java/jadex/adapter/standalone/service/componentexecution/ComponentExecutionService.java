@@ -590,7 +590,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 	 *  Search for agents matching the given description.
 	 *  @return An array of matching agent descriptions.
 	 */
-	public void	searchAgents(IComponentDescription adesc, ISearchConstraints con, IResultListener listener)
+	public void	searchComponents(IComponentDescription adesc, ISearchConstraints con, IResultListener listener)
 	{
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
