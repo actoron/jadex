@@ -236,25 +236,13 @@ public class SComponentFactory
 	 *  @param args The arguments map (name->value).
 	 *  @param listener The result listener (if any).
 	 *  @param creator The creator (if any).
-	 */
-	public static void	createComponent(IServiceContainer container, String name, String model, String config, Map args, IResultListener listener, Object creator)
+	 * /
+	public static void createComponent(IServiceContainer container, String name, String model, String config, Map args, IResultListener listener, Object creator)
 	{
-		IComponentFactory factory = null;
-		Collection facts = container.getServices(IComponentFactory.class);
-		if(facts!=null)
-		{
-			for(Iterator it=facts.iterator(); factory==null && it.hasNext(); )
-			{
-				IComponentFactory	cf	= (IComponentFactory)it.next();
-				if(cf.isLoadable(model))
-				{
-					factory	= cf;
-				}
-			}
-		}
+	
 //		IComponentIdentifier cid = ces.createComponentIdentifier(name, true, null, true);
 
 		IComponentExecutionService	ces	= (IComponentExecutionService)container.getService(IComponentExecutionService.class);
-		ces.createComponent(container, name, model, config, args, listener, creator, factory);
-	}
+		ces.createComponent(name, model, config, args, listener, creator);
+	}*/
 }

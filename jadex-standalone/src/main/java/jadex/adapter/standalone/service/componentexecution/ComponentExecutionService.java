@@ -23,6 +23,7 @@ import jadex.service.IServiceContainer;
 import jadex.service.execution.IExecutionService;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -82,7 +83,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 	 *  @param listener The result listener (if any). Will receive the id of the component as result.
 	 *  @param creator The creator (if any).
 	 */
-	public void	createComponent(String name, String model, String config, Map args, IResultListener listener, Object creator, IComponentFactory factory)
+	public void	createComponent(String name, String model, String config, Map args, IResultListener listener, Object creator)
 	{
 		/*
 		if(container.isShuttingDown())
@@ -93,6 +94,20 @@ public class ComponentExecutionService implements IComponentExecutionService
 		}
 		*/
 		
+		IComponentFactory factory = null;
+		Collection facts = container.getServices(IComponentFactory.class);
+		if(facts!=null)
+		{
+			for(Iterator it=facts.iterator(); factory==null && it.hasNext(); )
+			{
+				IComponentFactory	cf	= (IComponentFactory)it.next();
+				if(cf.isLoadable(model))
+				{
+					factory	= cf;
+				}
+			}
+		}
+		
 		// Create id and adapter.
 		
 		AgentIdentifier cid;
@@ -102,9 +117,9 @@ public class ComponentExecutionService implements IComponentExecutionService
 		{
 			synchronized(descs)
 			{
-				if(generate)
+				if(name==null)
 				{
-					cid = generateComponentIdentifier(name);
+					cid = generateComponentIdentifier(model);
 				}
 				else
 				{
