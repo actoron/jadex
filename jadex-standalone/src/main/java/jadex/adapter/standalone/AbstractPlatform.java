@@ -2,7 +2,6 @@ package jadex.adapter.standalone;
 
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IPlatform;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.PropertyServiceContainer;
@@ -15,7 +14,7 @@ import java.util.logging.Logger;
 /**
  *  Abstract base class for standalone platform.
  */
-public abstract class AbstractPlatform extends PropertyServiceContainer implements IPlatform
+public abstract class AbstractPlatform extends PropertyServiceContainer
 {
 	//-------- constants --------
 

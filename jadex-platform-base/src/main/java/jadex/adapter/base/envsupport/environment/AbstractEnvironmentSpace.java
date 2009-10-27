@@ -485,7 +485,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 							
 							setOwner(fid, agent);
 							
-							((IComponentExecutionService)((ApplicationContext)getContext()).getPlatform().getService(IComponentExecutionService.class)).startComponent(agent, null);
+							((IComponentExecutionService)((ApplicationContext)getContext()).getServiceContainer().getService(IComponentExecutionService.class)).startComponent(agent, null);
 //							SComponentExecutionService.startComponent(((ApplicationContext)getContext()).getPlatform(), agent, null);
 						}
 						
@@ -564,7 +564,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				AvatarMapping mapping = getAvatarMapping(agenttype, objecttype);
 				if(mapping.isKillAgent())
 				{
-					IComponentExecutionService ces = (IComponentExecutionService)((ApplicationContext)getContext()).getPlatform().getService(IComponentExecutionService.class);
+					IComponentExecutionService ces = (IComponentExecutionService)((ApplicationContext)getContext()).getServiceContainer().getService(IComponentExecutionService.class);
 					ces.destroyComponent(agent, null);
 				}
 			}

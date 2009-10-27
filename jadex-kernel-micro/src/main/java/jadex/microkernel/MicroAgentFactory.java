@@ -4,10 +4,10 @@ import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.ILoadableComponentModel;
-import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 
 import java.util.Map;
@@ -36,16 +36,16 @@ public class MicroAgentFactory implements IComponentFactory
 	//-------- attributes --------
 	
 	/** The platform. */
-	protected IPlatform platform;
+	protected IServiceContainer container;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new agent factory.
 	 */
-	public MicroAgentFactory(IPlatform platform)
+	public MicroAgentFactory(IServiceContainer container)
 	{
-		this.platform = platform;
+		this.container = container;
 	}
 	
 	/**
@@ -91,7 +91,7 @@ public class MicroAgentFactory implements IComponentFactory
 	{
 //		System.out.println("loading micro: "+model);
 		ILoadableComponentModel ret = null;
-		ILibraryService libservice = (ILibraryService)platform.getService(ILibraryService.class);
+		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 		
 		String clname = model;
 		

@@ -2,7 +2,7 @@ package jadex.adapter.base.appdescriptor;
 
 import jadex.adapter.base.contextservice.IContextFactory;
 import jadex.bridge.IContext;
-import jadex.bridge.IPlatform;
+import jadex.service.IServiceContainer;
 
 import java.util.Map;
 
@@ -15,7 +15,7 @@ public class ApplicationContextFactory	implements IContextFactory
 	//-------- attributes --------
 	
 	/** The platform. */
-	protected IPlatform	platform;
+	protected IServiceContainer	container;
 	
 	//-------- constructors --------
 	
@@ -23,9 +23,9 @@ public class ApplicationContextFactory	implements IContextFactory
 	 *  Create a new default context factory.
 	 *  @param platform	The platform.
 	 */
-	public ApplicationContextFactory(IPlatform platform)
+	public ApplicationContextFactory(IServiceContainer container)
 	{
-		this.platform	= platform;
+		this.container	= container;
 	}
 	
 	//-------- IContextFactory interface --------
@@ -38,6 +38,6 @@ public class ApplicationContextFactory	implements IContextFactory
 	 */
 	public IContext createContext(String name, /*IContext parent,*/ Map properties)
 	{
-		return new ApplicationContext(name, /*parent,*/ properties, platform);
+		return new ApplicationContext(name, /*parent,*/ properties, container);
 	}
 }

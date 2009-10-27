@@ -4,8 +4,8 @@ import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageService;
-import jadex.bridge.IPlatform;
 import jadex.commons.collection.SCollection;
+import jadex.service.IServiceContainer;
 
 import java.util.List;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class LocalTransport implements ITransport
 //	protected String platformname;
 	
 	/** The platform. */
-	protected IPlatform platform;
+	protected IServiceContainer container;
 	
 	//-------- constructors --------
 	
@@ -42,10 +42,10 @@ public class LocalTransport implements ITransport
 	 *  @param platform The platform.
 	 *  @param settings The settings.
 	 */
-	public LocalTransport(IPlatform platform)
+	public LocalTransport(IServiceContainer container)
 	{
 //		this.msgservice = (IMessageService)platform.getService(IMessageService.class, SFipa.MESSAGE_SERVICE);
-		this.platform = platform;
+		this.container = container;
 		this.addresses = new String[0];
 //		this.platformname = platform.getName();
 	}
@@ -84,14 +84,14 @@ public class LocalTransport implements ITransport
 		
 		for(int i=0; i<recs.length; i++)
 		{
-			if(recs[i].getPlatformName().equals(platform.getName()))
+			if(recs[i].getPlatformName().equals(container.getName()))
 				todeliver.add(recs[i]);
 			else
 				undelivered.add(recs[i]);
 		}
 		if(todeliver.size()>0)
 		{
-			((IMessageService)platform.getService(IMessageService.class)).deliverMessage(message, msgtype, (IComponentIdentifier[])todeliver
+			((IMessageService)container.getService(IMessageService.class)).deliverMessage(message, msgtype, (IComponentIdentifier[])todeliver
 				.toArray(new IComponentIdentifier[todeliver.size()]));
 		}
 		

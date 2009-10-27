@@ -6,13 +6,13 @@ import jadex.adapter.standalone.transport.MessageEnvelope;
 import jadex.adapter.standalone.transport.codecs.CodecFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageService;
-import jadex.bridge.IPlatform;
 import jadex.commons.SUtil;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
@@ -71,7 +71,7 @@ public class NIOTCPTransport implements ITransport
 	//-------- attributes --------
 	
 	/** The platform. */
-	protected IPlatform platform;
+	protected IServiceContainer container;
 	
 	/** The addresses. */
 	protected String[] addresses;
@@ -101,11 +101,11 @@ public class NIOTCPTransport implements ITransport
 	 *  @param platform The platform.
 	 *  @param settings The settings.
 	 */
-	public NIOTCPTransport(final IPlatform platform, int port)
+	public NIOTCPTransport(final IServiceContainer container, int port)
 	{
 		this.logger = Logger.getLogger("NIOTCPTransport" + this);
 		this.codecfac = new CodecFactory();
-		this.platform = platform;
+		this.container = container;
 		this.port = port;
 		
 		// Set up sending side.
@@ -160,7 +160,7 @@ public class NIOTCPTransport implements ITransport
 			addresses = (String[])addrs.toArray(new String[addrs.size()]);
 			
 			// Start receiver thread.
-			((IThreadPool)platform.getService(ThreadPoolService.class)).execute(new Runnable()
+			((IThreadPool)container.getService(ThreadPoolService.class)).execute(new Runnable()
 			{
 				public void run()
 				{
@@ -196,7 +196,7 @@ public class NIOTCPTransport implements ITransport
 									if(sc!=null) 
 									{
 										sc.configureBlocking(false);
-										ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
+										ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
 										sc.register(selector, SelectionKey.OP_READ, new NIOTCPInputConnection(sc, codecfac, cl));
 									}
 								}
@@ -214,7 +214,7 @@ public class NIOTCPTransport implements ITransport
 								{
 									for(MessageEnvelope msg=con.read(); msg!=null; msg=con.read())
 									{
-										((IMessageService)platform.getService(IMessageService.class))
+										((IMessageService)container.getService(IMessageService.class))
 										.deliverMessage(msg.getMessage(), msg.getTypeName(), msg.getReceivers());
 									}
 								}
@@ -447,7 +447,7 @@ public class NIOTCPTransport implements ITransport
 					iport = DEFAULT_PORT;
 				}
 			
-				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
+				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
 				ret = new NIOTCPOutputConnection(InetAddress.getByName(hostname), iport, codecfac, new Cleaner(address), cl);
 				connections.put(address, ret);
 			}
@@ -507,7 +507,7 @@ public class NIOTCPTransport implements ITransport
 			/*if(timer!=null)
 				timer.cancel();
 			timer = platform.getClock().createTimer(System.currentTimeMillis()+MAX_KEEPALIVE, this);*/
-			IClockService clock = (IClockService)platform.getService(IClockService.class);
+			IClockService clock = (IClockService)container.getService(IClockService.class);
 			long time = clock.getTime()+MAX_KEEPALIVE;
 			if(timer==null)
 				timer = clock.createTimer(time, this);

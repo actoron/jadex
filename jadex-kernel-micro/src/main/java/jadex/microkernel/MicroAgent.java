@@ -1,12 +1,11 @@
 package jadex.microkernel;
 
+import jadex.bridge.IApplicationContext;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
 import jadex.bridge.IMessageService;
-import jadex.bridge.IPlatform;
 import jadex.bridge.MessageType;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
@@ -112,7 +111,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  Get the agent platform.
 	 *  @return The agent platform. 
 	 */
-	public IServiceContainer getPlatform()
+	public IServiceContainer getServiceContainer()
 	{
 		return interpreter.getAgentAdapter().getServiceContainer();
 	}
@@ -160,7 +159,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public long getTime()
 	{
-		return ((IClockService)getPlatform().getService(IClockService.class)).getTime();
+		return ((IClockService)getServiceContainer().getService(IClockService.class)).getTime();
 	}
 	
 	/**
@@ -172,7 +171,7 @@ public abstract class MicroAgent implements IMicroAgent
 	{
 		if(timer!=null)
 			throw new RuntimeException("timer should be null");
-		this.timer = ((IClockService)getPlatform().getService(IClockService.class)).createTimer(time, new ITimedObject()
+		this.timer = ((IClockService)getServiceContainer().getService(IClockService.class)).createTimer(time, new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{
@@ -206,7 +205,7 @@ public abstract class MicroAgent implements IMicroAgent
 	{
 		if(timer!=null)
 			throw new RuntimeException("timer should be null");
-		this.timer = ((IClockService)getPlatform().getService(IClockService.class)).createTickTimer(new ITimedObject()
+		this.timer = ((IClockService)getServiceContainer().getService(IClockService.class)).createTickTimer(new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{
@@ -257,7 +256,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public void sendMessage(Map me, MessageType mt)
 	{
-		((IMessageService)getPlatform().getService(IMessageService.class)).
+		((IMessageService)getServiceContainer().getService(IMessageService.class)).
 			sendMessage(me, mt, getAgentIdentifier(), interpreter.getAgentModel().getClassLoader());
 	}
 	
@@ -328,7 +327,7 @@ public abstract class MicroAgent implements IMicroAgent
 	public IApplicationContext getApplicationContext()
 	{
 		IApplicationContext ret = null;
-		IContextService cs = (IContextService)getPlatform().getService(IContextService.class);
+		IContextService cs = (IContextService)getServiceContainer().getService(IContextService.class);
 		if(cs!=null)
 		{
 			IContext[] tmp = cs.getContexts(getAgentIdentifier(), IApplicationContext.class);

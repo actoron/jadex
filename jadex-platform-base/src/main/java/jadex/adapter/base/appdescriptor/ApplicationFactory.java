@@ -7,7 +7,6 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IContextService;
 import jadex.bridge.ILoadableComponentModel;
-import jadex.bridge.IPlatform;
 import jadex.bridge.ISpace;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
@@ -19,6 +18,7 @@ import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.bean.BeanAttributeInfo;
 import jadex.commons.xml.bean.BeanObjectReaderHandler;
 import jadex.commons.xml.reader.Reader;
+import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 
 import java.io.IOException;
@@ -55,7 +55,7 @@ public class ApplicationFactory implements IComponentFactory
 	//-------- attributes --------
 	
 	/** The platform. */
-	protected IPlatform platform;
+	protected IServiceContainer container;
 	
 	/** The xml reader. */
 	protected Reader reader;
@@ -67,9 +67,9 @@ public class ApplicationFactory implements IComponentFactory
 	 *  @param platform	The agent platform.
 	 *  @param mappings	The XML reader mappings (if any).
 	 */
-	public ApplicationFactory(IPlatform platform, Set[] mappings)// Set[] linkinfos)
+	public ApplicationFactory(IServiceContainer container, Set[] mappings)// Set[] linkinfos)
 	{
-		this.platform = platform;
+		this.container = container;
 		
 		Set types = new HashSet();
 		
@@ -172,7 +172,7 @@ public class ApplicationFactory implements IComponentFactory
 
 
 		// Create context for application.
-		IContextService	cs	= (IContextService)platform.getService(IContextService.class);
+		IContextService	cs	= (IContextService)container.getService(IContextService.class);
 		if(cs==null)
 		{
 			// Todo: use logger.
@@ -215,7 +215,7 @@ public class ApplicationFactory implements IComponentFactory
 		}
 		
 		List agents = app.getMAgentInstances();
-		ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
+		ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
 		for(int i=0; i<agents.size(); i++)
 		{
 			final MAgentInstance agent = (MAgentInstance)agents.get(i);
@@ -239,7 +239,7 @@ public class ApplicationFactory implements IComponentFactory
 //							}
 //						}, null);						
 				context.createAgent(agent.getName(), agent.getTypeName(),
-					agent.getConfiguration(), agent.getArguments(platform, apptype, cl), agent.isStart(), agent.isMaster(),
+					agent.getConfiguration(), agent.getArguments(container, apptype, cl), agent.isStart(), agent.isMaster(),
 					DefaultResultListener.getInstance(), null);	
 			}
 		}
@@ -261,7 +261,7 @@ public class ApplicationFactory implements IComponentFactory
 			ResourceInfo	rinfo	= null;
 			try
 			{
-				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
+				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
 				rinfo	= getResourceInfo(filename, FILE_EXTENSION_APPLICATION, null, cl);
 				apptype = (MApplicationType)reader.read(rinfo.getInputStream(), cl, null);
 				ret = new ApplicationModel(apptype, filename, cl);

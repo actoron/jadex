@@ -7,9 +7,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
 import jadex.bridge.IMessageAdapter;
-import jadex.bridge.IPlatform;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IServiceContainer;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,7 +28,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	//-------- attributes --------
 	
 	/** The platform. */
-	protected IPlatform	platform;
+	protected IServiceContainer	container;
 	
 	/** The application type. */
 	protected ApplicationModel model;
@@ -45,10 +45,10 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	/**
 	 *  Create a new context.
 	 */
-	public ApplicationContext(String name, /*IContext parent,*/ Map properties, IPlatform platform)
+	public ApplicationContext(String name, /*IContext parent,*/ Map properties, IServiceContainer container)
 	{
 		super(name, /*parent,*/ properties);
-		this.platform = platform;
+		this.container = container;
 		this.model = properties!=null ? (ApplicationModel)properties.get(PROPERTY_APPLICATION_TYPE) : null;
 		if(model==null)
 			throw new RuntimeException("Property '"+PROPERTY_APPLICATION_TYPE+"' required.");
@@ -67,7 +67,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 		
 		// Todo: when not synchronized, the check might not alwyas detect
 		// duplicate addition when race condition (do we care!?)
-		IContextService	cs	= (IContextService) platform.getService(IContextService.class);
+		IContextService	cs	= (IContextService)container.getService(IContextService.class);
 		IContext[]	appcontexts	= cs.getContexts(agent, ApplicationContext.class);
 		if(appcontexts!=null && appcontexts.length>0)
 			throw new RuntimeException("Cannot add agent to "+this+". Agent already belongs to "+appcontexts[0]);
@@ -140,7 +140,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 //			IAMS ams = (IAMS) platform.getService(IAMS.class);
 			for(int i=0; i<agents.length; i++)
 			{
-				IComponentExecutionService ces = (IComponentExecutionService)platform.getService(IComponentExecutionService.class);
+				IComponentExecutionService ces = (IComponentExecutionService)container.getService(IComponentExecutionService.class);
 				ces.destroyComponent(agents[i], l2);
 //				ams.destroyAgent(agents[i], l2);
 			}
@@ -177,9 +177,9 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	 *  Get the platform.
 	 *  @return The platform.
 	 */
-	public IPlatform getPlatform()
+	public IServiceContainer getServiceContainer()
 	{
-		return platform;
+		return container;
 	}	
 	
 	/**
@@ -201,7 +201,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 		if(at==null)
 			throw new RuntimeException("Unknown agent type '"+type+"' in application: "+model);
 //		final IAMS	ams	= (IAMS) platform.getService(IAMS.class);
-		IComponentExecutionService ces = (IComponentExecutionService)platform.getService(IComponentExecutionService.class);
+		IComponentExecutionService ces = (IComponentExecutionService)container.getService(IComponentExecutionService.class);
 
 		
 		ces.createComponent(name, at.getFilename(), configuration, arguments, new IResultListener()
@@ -231,7 +231,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 				
 				if(start)
 				{
-					IComponentExecutionService ces = (IComponentExecutionService)platform.getService(IComponentExecutionService.class);
+					IComponentExecutionService ces = (IComponentExecutionService)container.getService(IComponentExecutionService.class);
 					ces.startComponent(aid, listener);
 				}
 				else
@@ -254,7 +254,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 		super.removeAgent(agent);
 		
 		if(master)
-			((IContextService)platform.getService(IContextService.class)).deleteContext(this, null);
+			((IContextService)container.getService(IContextService.class)).deleteContext(this, null);
 	}
 
 	/**

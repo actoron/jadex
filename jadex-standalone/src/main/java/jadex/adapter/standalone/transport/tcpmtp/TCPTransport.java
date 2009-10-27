@@ -6,13 +6,13 @@ import jadex.adapter.standalone.transport.MessageEnvelope;
 import jadex.adapter.standalone.transport.codecs.CodecFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageService;
-import jadex.bridge.IPlatform;
 import jadex.commons.SUtil;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
@@ -72,7 +72,7 @@ public class TCPTransport implements ITransport
 	//-------- attributes --------
 	
 	/** The platform. */
-	protected IPlatform platform;
+	protected IServiceContainer container;
 	
 	/** The addresses. */
 	protected String[] addresses;
@@ -104,9 +104,9 @@ public class TCPTransport implements ITransport
 	 *  @param platform The platform.
 	 *  @param settings The settings.
 	 */
-	public TCPTransport(final IPlatform platform, int port)
+	public TCPTransport(final IServiceContainer container, int port)
 	{
-		this(platform, port, true);
+		this(container, port, true);
 	}
 
 	
@@ -115,12 +115,12 @@ public class TCPTransport implements ITransport
 	 *  @param platform The platform.
 	 *  @param settings The settings.
 	 */
-	public TCPTransport(final IPlatform platform, int port, final boolean async)
+	public TCPTransport(final IServiceContainer container, int port, final boolean async)
 	{
 		this.logger = Logger.getLogger("TCPTransport" + this);
 		this.codecfac = new CodecFactory();
 		
-		this.platform = platform;
+		this.container = container;
 		this.async = async;
 		this.port = port;
 		
@@ -172,7 +172,7 @@ public class TCPTransport implements ITransport
 			addresses = (String[])addrs.toArray(new String[addrs.size()]);
 			
 			// Start the receiver thread.
-			((IThreadPool)platform.getService(ThreadPoolService.class)).execute(new Runnable()
+			((IThreadPool)container.getService(ThreadPoolService.class)).execute(new Runnable()
 			{
 				public void run()
 				{
@@ -181,7 +181,7 @@ public class TCPTransport implements ITransport
 					{
 						try
 						{
-							ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
+							ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
 							final TCPInputConnection con = new TCPInputConnection(serversocket.accept(), codecfac, cl);
 							if(!async)
 							{
@@ -191,7 +191,7 @@ public class TCPTransport implements ITransport
 							{
 								// Each accepted incoming connection request is handled
 								// in a separate thread in async mode.
-								((IThreadPool)platform.getService(ThreadPoolService.class)).execute(new Runnable()
+								((IThreadPool)container.getService(ThreadPoolService.class)).execute(new Runnable()
 								{
 									public void run()
 									{
@@ -369,7 +369,7 @@ public class TCPTransport implements ITransport
 					iport = DEFAULT_PORT;
 				}
 
-				ClassLoader cl = ((ILibraryService)platform.getService(ILibraryService.class)).getClassLoader();
+				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
 				ret = new TCPOutputConnection(InetAddress.getByName(hostname), iport, codecfac, new Cleaner(address), cl);
 				connections.put(address, ret);
 			}
@@ -409,7 +409,7 @@ public class TCPTransport implements ITransport
 		{
 			for(MessageEnvelope msg=con.read(); msg!=null; msg=con.read())
 			{
-				((IMessageService)platform.getService(IMessageService.class))
+				((IMessageService)container.getService(IMessageService.class))
 				.deliverMessage(msg.getMessage(), msg.getTypeName(), msg.getReceivers());
 			}
 		}
@@ -466,7 +466,7 @@ public class TCPTransport implements ITransport
 			/*if(timer!=null)
 				timer.cancel();
 			timer = platform.getClock().createTimer(System.currentTimeMillis()+MAX_KEEPALIVE, this);*/
-			IClockService clock = (IClockService)platform.getService(IClockService.class);
+			IClockService clock = (IClockService)container.getService(IClockService.class);
 			long time = clock.getTime()+MAX_KEEPALIVE;
 			if(timer==null)
 				timer = clock.createTimer(time, this);

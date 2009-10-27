@@ -3,8 +3,8 @@ package jadex.tools.ruleprofiler;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentListener;
-import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
+import jadex.service.IServiceContainer;
 import jadex.tools.common.AgentTreeTable;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.ObjectCardLayout;
@@ -129,7 +129,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 		this.split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		agents = new AgentTreeTable(((IPlatform)getJCC().getServiceContainer()).getName());
+		agents = new AgentTreeTable(((IServiceContainer)getJCC().getServiceContainer()).getName());
 		agents.setMinimumSize(new Dimension(0, 0));
 		split.add(agents);
 		agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

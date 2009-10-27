@@ -1,12 +1,12 @@
 package jadex.adapter.base;
 
-import jadex.bridge.IPlatform;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.service.IServiceContainer;
 import jadex.service.clock.ClockService;
 import jadex.service.clock.IClock;
 import jadex.service.clock.IClockService;
@@ -25,7 +25,7 @@ public class SimulationService implements ISimulationService
 	//-------- attributes --------
 
 	/** The platform. */
-	protected IPlatform platform;
+	protected IServiceContainer container;
 	
 	/** The execution mode. */
 	protected String mode;
@@ -50,9 +50,9 @@ public class SimulationService implements ISimulationService
 	/**
 	 *  Create a new execution control.
 	 */
-	public SimulationService(IPlatform platform)
+	public SimulationService(IServiceContainer container)
 	{
-		this.platform = platform;
+		this.container = container;
 //		this.mode = mode;
 		this.mode = MODE_NORMAL;
 		this.listeners = SCollection.createArrayList();
@@ -280,7 +280,7 @@ public class SimulationService implements ISimulationService
 //			throw new RuntimeException("Change clock not allowed during execution.");
 		
 		
-		IClockService cs = (IClockService)platform.getService(IClockService.class);
+		IClockService cs = (IClockService)container.getService(IClockService.class);
 		String oldtype = cs.getClockType();
 		
 		if(!type.equals(oldtype))
@@ -367,7 +367,7 @@ public class SimulationService implements ISimulationService
 	 */
 	protected IClockService getClockService()
 	{
-		return (IClockService)platform.getService(IClockService.class);
+		return (IClockService)container.getService(IClockService.class);
 	}
 	
 	/**
@@ -376,6 +376,6 @@ public class SimulationService implements ISimulationService
 	 */
 	public IExecutionService getExecutorService()
 	{
-		return (IExecutionService)platform.getService(IExecutionService.class);
+		return (IExecutionService)container.getService(IExecutionService.class);
 	}
 }

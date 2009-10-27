@@ -4,12 +4,12 @@ import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.ILoadableComponentModel;
-import jadex.bridge.IPlatform;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
+import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
 
@@ -51,7 +51,7 @@ public class BDIAgentFactory implements IComponentFactory
 	protected OAVBDIModelLoader loader;
 	
 	/** The platform. */
-	protected IPlatform platform;
+	protected IServiceContainer container;
 	
 	/** The library service. */
 	protected ILibraryService libservice;
@@ -61,12 +61,12 @@ public class BDIAgentFactory implements IComponentFactory
 	/**
 	 *  Create a new agent factory.
 	 */
-	public BDIAgentFactory(Map props, IPlatform platform)
+	public BDIAgentFactory(Map props, IServiceContainer container)
 	{
 //		this.kernelprops = kernelprops;
 		this.props = props;
 		this.loader	= new OAVBDIModelLoader();
-		this.platform = platform;
+		this.container = container;
 	}
 	
 	/**
@@ -94,7 +94,7 @@ public class BDIAgentFactory implements IComponentFactory
 	{
 		if(libservice==null)
 		{
-			libservice = (ILibraryService)platform.getService(ILibraryService.class);
+			libservice = (ILibraryService)container.getService(ILibraryService.class);
 			loader.setClassLoader(libservice.getClassLoader());
 			ILibraryServiceListener lsl = new ILibraryServiceListener()
 			{

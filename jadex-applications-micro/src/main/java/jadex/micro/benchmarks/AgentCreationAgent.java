@@ -37,7 +37,7 @@ public class AgentCreationAgent extends MicroAgent
 			args.put("num", new Integer(1));
 //				args.put("max", new Integer(100000));
 			Long startmem = new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
-			Long starttime = new Long(((IClockService)getPlatform().getService(IClockService.class)).getTime());
+			Long starttime = new Long(((IClockService)getServiceContainer().getService(IClockService.class)).getTime());
 			args.put("startmem", startmem);
 			args.put("starttime", starttime);
 		}
@@ -52,7 +52,7 @@ public class AgentCreationAgent extends MicroAgent
 			args.put("num", new Integer(num+1));
 //				System.out.println("Args: "+num+" "+args);
 
-			final IComponentExecutionService ces = (IComponentExecutionService)getPlatform().getService(IComponentExecutionService.class);
+			final IComponentExecutionService ces = (IComponentExecutionService)getServiceContainer().getService(IComponentExecutionService.class);
 			ces.createComponent(createPeerName(num+1), getClass().getName()+".class", null, args, 
 				createResultListener(new IResultListener()
 			{
@@ -112,7 +112,7 @@ public class AgentCreationAgent extends MicroAgent
 	{
 		final String name = createPeerName(cnt);
 //		System.out.println("Destroying peer: "+name);
-		final IComponentExecutionService ces = (IComponentExecutionService)getPlatform().getService(IComponentExecutionService.class);
+		final IComponentExecutionService ces = (IComponentExecutionService)getServiceContainer().getService(IComponentExecutionService.class);
 		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
 		ces.destroyComponent(aid, createResultListener(new IResultListener()
 		{

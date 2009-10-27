@@ -87,7 +87,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 		
 		if(invoke)
 		{
-			IComponentExecutionService ces = (IComponentExecutionService)((IApplicationContext)space.getContext()).getPlatform().getService(IComponentExecutionService.class);
+			IComponentExecutionService ces = (IComponentExecutionService)((IApplicationContext)space.getContext()).getServiceContainer().getService(IComponentExecutionService.class);
 			ces.getExternalAccess(agent, new IResultListener()
 			{
 				public void exceptionOccurred(Exception exception)

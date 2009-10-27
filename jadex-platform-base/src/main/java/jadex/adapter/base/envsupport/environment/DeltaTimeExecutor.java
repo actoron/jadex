@@ -4,11 +4,11 @@ import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.dataview.IDataView;
 import jadex.adapter.base.envsupport.evaluation.ITableDataConsumer;
 import jadex.bridge.IContextService;
-import jadex.bridge.IPlatform;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IExecutable;
+import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
@@ -28,7 +28,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 	protected long timestamp;
 	
 	/** The platform. */
-	protected IPlatform platform;
+	protected IServiceContainer container;
 	
 	/** The clock listener. */
 	protected IChangeListener clocklistener;
@@ -72,9 +72,9 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
 		final boolean tick = getProperty("tick")!=null && ((Boolean)getProperty("tick")).booleanValue();
-		this.platform	= ((ApplicationContext)space.getContext()).getPlatform();
-		final IClockService clockservice = (IClockService)platform.getService(IClockService.class);
-		final IExecutionService exeservice = (IExecutionService)platform.getService(IExecutionService.class);
+		this.container	= ((ApplicationContext)space.getContext()).getServiceContainer();
+		final IClockService clockservice = (IClockService)container.getService(IClockService.class);
+		final IExecutionService exeservice = (IExecutionService)container.getService(IExecutionService.class);
 				
 		final IExecutable	executable	= new IExecutable()
 		{
@@ -173,7 +173,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 		}
 		
 		// Add the executor as context listener on the application.
-		IContextService cs = (IContextService)platform.getService(IContextService.class);
+		IContextService cs = (IContextService)container.getService(IContextService.class);
 		cs.addContextListener(new IChangeListener()
 		{
 			public void changeOccurred(ChangeEvent event)
@@ -192,7 +192,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 //	public synchronized void terminate()
 	public void terminate()
 	{
-		IClockService clockservice = (IClockService)platform.getService(IClockService.class);
+		IClockService clockservice = (IClockService)container.getService(IClockService.class);
 
 		if(clocklistener!=null)
 		{

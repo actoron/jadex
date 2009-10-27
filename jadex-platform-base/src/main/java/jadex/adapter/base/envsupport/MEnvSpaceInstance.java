@@ -97,7 +97,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 		
 		SimpleValueFetcher fetcher = new SimpleValueFetcher();
 		fetcher.setValue("$space", ret);
-		fetcher.setValue("$platform", app.getPlatform());
+		fetcher.setValue("$platform", app.getServiceContainer());
 		ret.setFetcher(fetcher);
 		
 		List mspaceprops = mspacetype.getPropertyList("properties");
@@ -342,7 +342,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 				if(owner==null)
 					throw new RuntimeException("Attribute 'owner' required for avatar: "+mobj);
 				IComponentIdentifier	ownerid	= null;
-				IComponentExecutionService ces = ((IComponentExecutionService)app.getPlatform().getService(IComponentExecutionService.class));
+				IComponentExecutionService ces = ((IComponentExecutionService)app.getServiceContainer().getService(IComponentExecutionService.class));
 				if(owner.indexOf("@")!=-1)
 					ownerid	= ces.createComponentIdentifier((String)owner, false, null);
 				else
@@ -507,9 +507,9 @@ public class MEnvSpaceInstance extends MSpaceInstance
 					}
 				}
 				
-				final ObserverCenter oc = new ObserverCenter(title, ret, (ILibraryService)app.getPlatform().getService(ILibraryService.class), plugins);
+				final ObserverCenter oc = new ObserverCenter(title, ret, (ILibraryService)app.getServiceContainer().getService(ILibraryService.class), plugins);
 							
-				final IContextService cs = (IContextService)app.getPlatform().getService(IContextService.class);
+				final IContextService cs = (IContextService)app.getServiceContainer().getService(IContextService.class);
 				if(cs!=null)
 				{
 					cs.addContextListener(new IChangeListener()

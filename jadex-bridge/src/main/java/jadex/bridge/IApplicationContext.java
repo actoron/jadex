@@ -1,6 +1,7 @@
 package jadex.bridge;
 
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IServiceContainer;
 
 import java.util.Map;
 
@@ -64,7 +65,7 @@ public interface IApplicationContext extends IContext, IComponentInstance
 	 *  Get the platform.
 	 *  @return The platform.
 	 */
-	public IPlatform getPlatform();
+	public IServiceContainer getServiceContainer();
 	
 	/**
 	 *  Create an agent in the context.

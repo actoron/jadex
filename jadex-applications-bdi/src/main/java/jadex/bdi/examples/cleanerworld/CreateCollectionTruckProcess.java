@@ -86,7 +86,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 					public void resultAvailable(Object result)
 					{
 						IComponentIdentifier truck = (IComponentIdentifier)result;
-						IComponentExecutionService ces = (IComponentExecutionService)app.getPlatform().getService(IComponentExecutionService.class);
+						IComponentExecutionService ces = (IComponentExecutionService)app.getServiceContainer().getService(IComponentExecutionService.class);
 						ces.getExternalAccess(truck, new IResultListener()
 						{
 							public void exceptionOccurred(Exception exception)

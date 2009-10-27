@@ -6,12 +6,12 @@ import jadex.adapter.base.envsupport.environment.AgentActionList.ActionEntry;
 import jadex.adapter.base.envsupport.evaluation.ITableDataConsumer;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IContextService;
-import jadex.bridge.IPlatform;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IExecutable;
+import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
@@ -86,9 +86,9 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 	public void start()
 	{
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace)getProperty("space");
-		IPlatform platform	= ((ApplicationContext)space.getContext()).getPlatform();
-		final IClockService clockservice = (IClockService)platform.getService(IClockService.class);
-		final IExecutionService exeservice = (IExecutionService)platform.getService(IExecutionService.class);
+		IServiceContainer container	= ((ApplicationContext)space.getContext()).getServiceContainer();
+		final IClockService clockservice = (IClockService)container.getService(IClockService.class);
+		final IExecutionService exeservice = (IExecutionService)container.getService(IExecutionService.class);
 
 		Comparator comp = (Comparator)getProperty("comparator");
 		if(comp!=null)
@@ -213,7 +213,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 		});
 		
 		// Add the executor as context listener on the application.
-		IContextService cs = (IContextService)platform.getService(IContextService.class);
+		IContextService cs = (IContextService)container.getService(IContextService.class);
 		cs.addContextListener(new IChangeListener()
 		{
 			public void changeOccurred(ChangeEvent event)

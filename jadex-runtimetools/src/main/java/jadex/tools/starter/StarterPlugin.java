@@ -9,7 +9,6 @@ import jadex.bridge.IComponentListener;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
 import jadex.bridge.ILoadableComponentModel;
-import jadex.bridge.IPlatform;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.Properties;
@@ -17,6 +16,7 @@ import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IServiceContainer;
 import jadex.tools.common.AgentTreeTable;
 import jadex.tools.common.ApplicationTreeTable;
 import jadex.tools.common.IMenuItemConstructor;
@@ -309,7 +309,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
   		};
   		mpanel.addMouseListener(ml);
 
-		agents = new AgentTreeTable(((IPlatform)getJCC().getServiceContainer()).getName());
+		agents = new AgentTreeTable(((IServiceContainer)getJCC().getServiceContainer()).getName());
 		agents.setMinimumSize(new Dimension(0, 0));
 		agents.getTreetable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		
@@ -339,7 +339,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		agents.getNodeType(AgentTreeTable.NODE_PLATFORM).addPopupAction(KILL_PLATFORM);
 		agents.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
 		
-		applications = new ApplicationTreeTable(((IPlatform)getJCC().getServiceContainer()).getName());
+		applications = new ApplicationTreeTable(((IServiceContainer)getJCC().getServiceContainer()).getName());
 		applications.setMinimumSize(new Dimension(0, 0));
 		applications.getTreetable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		

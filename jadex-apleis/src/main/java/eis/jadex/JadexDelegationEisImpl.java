@@ -502,7 +502,7 @@ public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 	 */
 	protected IComponentIdentifier convertStringToAgentIdentifier(String name)
 	{
-		IPlatform platform = ((IApplicationContext)space.getContext()).getPlatform();
+		IPlatform platform = ((IApplicationContext)space.getContext()).getServiceContainer();
 		IComponentExecutionService	ces	= (IComponentExecutionService)platform.getService(IComponentExecutionService.class);
 		return ces.createComponentIdentifier(name, name.contains("@")? false: true, null);
 	}

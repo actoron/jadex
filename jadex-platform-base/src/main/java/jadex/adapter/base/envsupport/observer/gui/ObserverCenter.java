@@ -611,18 +611,18 @@ public class ObserverCenter
 			if(delay==-1)
 			{
 				vptimer.stop();
-				IClockService	clock	= (IClockService)((ApplicationContext)space.getContext()).getPlatform().getService(IClockService.class);
+				IClockService	clock	= (IClockService)((ApplicationContext)space.getContext()).getServiceContainer().getService(IClockService.class);
 				clock.addChangeListener(clocklistener);
 			}
 			else if(delay==0)
 			{
 				vptimer.stop();
-				IClockService	clock	= (IClockService)((ApplicationContext)space.getContext()).getPlatform().getService(IClockService.class);
+				IClockService	clock	= (IClockService)((ApplicationContext)space.getContext()).getServiceContainer().getService(IClockService.class);
 				clock.removeChangeListener(clocklistener);
 			}
 			else
 			{
-				IClockService	clock	= (IClockService)((ApplicationContext)space.getContext()).getPlatform().getService(IClockService.class);
+				IClockService	clock	= (IClockService)((ApplicationContext)space.getContext()).getServiceContainer().getService(IClockService.class);
 				clock.removeChangeListener(clocklistener);
 				vptimer.setDelay(delay);
 				vptimer.start();
