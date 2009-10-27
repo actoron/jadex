@@ -232,10 +232,10 @@ public class ApplicationFactory implements IComponentFactory
 //							public void resultAvailable(Object result)
 //							{
 //								if(appcontext!=null)
-//									appcontext.addAgent((IAgentIdentifier) result);
+//									appcontext.addAgent((IComponentIdentifier) result);
 //								
 //								if(agent.isStart())
-//									ams.startAgent((IAgentIdentifier)result, null);
+//									ams.startAgent((IComponentIdentifier)result, null);
 //							}
 //						}, null);						
 				context.createAgent(agent.getName(), agent.getTypeName(),

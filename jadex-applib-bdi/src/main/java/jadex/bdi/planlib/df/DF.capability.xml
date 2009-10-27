@@ -12,6 +12,7 @@
 	<imports>
 		<import>jadex.adapter.base.fipa.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
+		<import>jadex.bridge.*</import>
 	</imports>
 
 	<capabilities>
@@ -26,14 +27,14 @@
 	<goals>
 		<achievegoal name="df_register" exported="true">
 			<parameter name="description" class="IDFAgentDescription"/>
-			<parameter name="df" class="jadex.bridge.IAgentIdentifier" optional="true"/>
+			<parameter name="df" class="jadex.bridge.IComponentIdentifier" optional="true"/>
 			<parameter name="leasetime" class="Long" optional="true"/>
 			<parameter name="result" class="IDFAgentDescription" direction="out"/>
 		</achievegoal>
 
 		<achievegoal name="df_modify" exported="true">
 			<parameter name="description" class="IDFAgentDescription"/>
-			<parameter name="df" class="jadex.bridge.IAgentIdentifier" optional="true"/>
+			<parameter name="df" class="jadex.bridge.IComponentIdentifier" optional="true"/>
 			<parameter name="leasetime" class="Long" optional="true"/>
 			<parameter name="result" class="IDFAgentDescription" direction="out"/>
 		</achievegoal>
@@ -41,7 +42,7 @@
 		<maintaingoal name="df_keep_registered" recurdelay="60000" exported="true">
 			<!-- Will contain the actually registered agent description. -->
 			<parameter name="description" class="IDFAgentDescription"/>
-			<parameter name="df" class="jadex.bridge.IAgentIdentifier" optional="true"/>
+			<parameter name="df" class="jadex.bridge.IComponentIdentifier" optional="true"/>
 			<parameter name="leasetime" class="Long" optional="true">
 				<!--<value>20000</value>-->
 			</parameter>
@@ -83,12 +84,12 @@
 			<!-- The agent description to deregister. Null for deregistering the
 				agent description of the dispatching agent. -->
 			<parameter name="description" class="IDFAgentDescription" optional="true"/>
-			<parameter name="df" class="jadex.bridge.IAgentIdentifier" optional="true"/>
+			<parameter name="df" class="jadex.bridge.IComponentIdentifier" optional="true"/>
 		</achievegoal>
 
 		<achievegoal name="df_search" exported="true">
 			<parameter name="description" class="IDFAgentDescription"/>
-			<parameter name="df" class="jadex.bridge.IAgentIdentifier" optional="true"/>
+			<parameter name="df" class="jadex.bridge.IComponentIdentifier" optional="true"/>
 			<parameter name="constraints" class="ISearchConstraints" optional="true"/>
 			<parameterset name="result" class="IDFAgentDescription" direction="out"/>
 		</achievegoal>
@@ -112,7 +113,7 @@
  				<goalmapping ref="df_register.leasetime"/>
  				<goalmapping ref="df_keep_registered.leasetime"/>
 			</parameter>
-			<parameter name="df" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="df" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="df_register.df"/>
  				<goalmapping ref="df_keep_registered.df"/>
 			</parameter>
@@ -136,7 +137,7 @@
  				<goalmapping ref="df_modify.leasetime"/>
  				<goalmapping ref="df_keep_registered.leasetime"/>
 			</parameter>
-			<parameter name="df" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="df" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="df_modify.df"/>
  				<goalmapping ref="df_keep_registered.df"/>
 			</parameter>
@@ -151,7 +152,7 @@
 			<parameter name="description" class="IDFAgentDescription">
  				<goalmapping ref="df_deregister.description"/>
 			</parameter>
-			<parameter name="df" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="df" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="df_deregister.df"/>
 			</parameter>
 			<body class="DFLocalDeregisterPlan" />
@@ -167,7 +168,7 @@
 			<parameter name="constraints" class="ISearchConstraints">
  				<goalmapping ref="df_search.constraints"/>
 			</parameter>
-			<parameter name="df" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="df" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="df_search.df"/>
 			</parameter>
 			<parameterset name="result" class="IDFAgentDescription" direction="out">
@@ -195,7 +196,7 @@
  				<goalmapping ref="df_register.leasetime"/>
  				<goalmapping ref="df_keep_registered.leasetime"/>
 			</parameter>
-			<parameter name="df" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="df" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="df_register.df"/>
  				<goalmapping ref="df_keep_registered.df"/>
 			</parameter>
@@ -219,7 +220,7 @@
  				<goalmapping ref="df_modify.leasetime"/>
  				<goalmapping ref="df_keep_registered.leasetime"/>
 			</parameter>
-			<parameter name="df" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="df" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="df_modify.df"/>
  				<goalmapping ref="df_keep_registered.df"/>
 			</parameter>
@@ -234,7 +235,7 @@
 			<parameter name="description" class="IDFAgentDescription">
  				<goalmapping ref="df_deregister.description"/>
 			</parameter>
-			<parameter name="df" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="df" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="df_deregister.df"/>
 			</parameter>
 			<body class="DFRemoteDeregisterPlan" />
@@ -250,7 +251,7 @@
 			<parameter name="constraints" class="ISearchConstraints">
  				<goalmapping ref="df_search.constraints"/>
 			</parameter>
-			<parameter name="df" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="df" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="df_search.df"/>
 			</parameter>
 			<parameterset name="result" class="IDFAgentDescription" direction="out">

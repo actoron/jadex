@@ -22,9 +22,9 @@
 	</capabilities>
 
 	<beliefs>
-		<belief name="ams" class="IAgentIdentifier">
+		<belief name="ams" class="IComponentIdentifier">
 			<!-- <fact>SFipa.AMS</fact> -->
-			<fact>((IAMS)$scope.getPlatform().getService(IAMS.class)).createAgentIdentifier("ams@horst", false, new String[]{"nio-mtp://134.100.11.203:8888"})</fact>
+			<fact>((IAMS)$scope.getServiceContainer().getService(IAMS.class)).createAgentIdentifier("ams@horst", false, new String[]{"nio-mtp://134.100.11.203:8888"})</fact>
 			<!--<fact>new AgentIdentifier("ams@vsisstaff0:1099/JADE", new String[]{"http://134.100.11.200:7778/acc"})</fact>-->
 		</belief>
 	</beliefs>

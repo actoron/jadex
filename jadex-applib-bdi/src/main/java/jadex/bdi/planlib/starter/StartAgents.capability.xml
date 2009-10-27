@@ -10,7 +10,7 @@
 
 	<imports>
 		<import>jadex.adapter.base.fipa.*</import>
-		<import>jadex.bridge.IAgentIdentifier</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
 	</imports>
 <!-- 
 	<capabilities>
@@ -20,7 +20,7 @@
 	<goals>
 		<achievegoal name="start_agents" exported="true">
 			<parameterset name="agentinfos" class="StartAgentInfo"/>
-			<parameterset name="agentidentifiers" class="IAgentIdentifier" direction="out"/>
+			<parameterset name="agentidentifiers" class="IComponentIdentifier" direction="out"/>
 		</achievegoal>
 <!-- 
 		<achievegoalref name="ams_create_agent">
@@ -33,7 +33,7 @@
 			<parameterset name="agentinfos" class="StartAgentInfo">
 				<goalmapping ref="start_agents.agentinfos"/>
 			</parameterset>
-			<parameterset name="agentidentifiers" class="IAgentIdentifier" direction="out">
+			<parameterset name="agentidentifiers" class="IComponentIdentifier" direction="out">
 				<goalmapping ref="start_agents.agentidentifiers"/>
 			</parameterset>
 			<body class="StartAgentsPlan" />

@@ -12,12 +12,7 @@
 		<property type="platform_shutdown_time">1000</property>
 		<property type="welcome">false</property>
 		<property type="autoshutdown">true</property>
-		<!-- Message types. -->
-		<property type="messagetype" name="fipa">new jadex.adapter.base.fipa.FIPAMessageType()</property>
-		
-		<!-- Kernels. -->
-		<!-- <propertiesref ref="kernel_v2_bdi"/>-->
-		
+
 		<property type="application_factory">
 			new jadex.adapter.base.appdescriptor.ApplicationFactory($platform, null)
 		</property>
@@ -48,6 +43,10 @@
 				new jadex.adapter.standalone.transport.ITransport[]
 				{
 					new jadex.adapter.standalone.transport.localmtp.LocalTransport($platform)
+				},
+				new jadex.bridge.MessageType[]
+				{
+					new jadex.adapter.base.fipa.FIPAMessageType()
 				})
 			</property>
 			

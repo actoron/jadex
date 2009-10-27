@@ -84,7 +84,7 @@
 			<parameter name="cfp_info" class="Object">
 				<goalmapping ref="eacap.ea_decide_acceptance.cfp_info"/>
 			</parameter>
-			<parameter name="winner" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="winner" class="jadex.bridge.IComponentIdentifier">
 				<goalmapping ref="eacap.ea_decide_acceptance.winner"/>
 			</parameter>
 			<parameter name="accept" class="Boolean" direction="out">

@@ -10,7 +10,7 @@
 
 	<imports>
 		<import>jadex.adapter.base.fipa.*</import>
-		<import>jadex.bridge.IAgentIdentifier</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
 		<import>jadex.tools.ontology.*</import>
 		<import>jadex.tools.introspector.*</import>
 	</imports>
@@ -28,7 +28,7 @@
 		<!-- Goal to issue a request to an observed agent. -->
 		<achievegoal name="tool_request" exported="true">
 			<parameter name="tool" class="IToolPanel"/>
-			<parameter name="agent" class="IAgentIdentifier"/>
+			<parameter name="agent" class="IComponentIdentifier"/>
 			<parameter name="request" class="ToolRequest"/>
 			<parameter name="result" class="Object" direction="out"/>
 		</achievegoal>
@@ -52,7 +52,7 @@
 			<parameter name="tool" class="IToolPanel">
 				<goalmapping ref="tool_request.tool"/>
 			</parameter>
-			<parameter name="agent" class="IAgentIdentifier">
+			<parameter name="agent" class="IComponentIdentifier">
 				<goalmapping ref="tool_request.agent"/>
 			</parameter>
 			<parameter name="request" class="ToolRequest">

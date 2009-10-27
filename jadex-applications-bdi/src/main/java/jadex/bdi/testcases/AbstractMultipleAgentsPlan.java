@@ -92,7 +92,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 		
 		for(int i=0; i<agents.size(); i++)
 		{
-//			System.out.println("Killing " + ((IAgentIdentifier)agents.get(i)).getName());
+//			System.out.println("Killing " + ((IComponentIdentifier)agents.get(i)).getName());
 			try
 			{
 //				IGoal da = createGoal("amscap.ams_destroy_agent");
@@ -109,7 +109,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 				e.printStackTrace();
 				getLogger().severe("Exception while destroying agent: "+agents.get(i));
 			}
-//			System.out.println("Killed " + ((IAgentIdentifier)agents.get(i)).getName());
+//			System.out.println("Killed " + ((IComponentIdentifier)agents.get(i)).getName());
 		}
 		agents = null;
 	}

@@ -82,7 +82,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		// todo: check this assert meaning!
 		
 		// Verify that the agent is running.
-//		assert !IAMSAgentDescription.STATE_INITIATED.equals(state) : this;
+//		assert !IComponentDescription.STATE_INITIATED.equals(state) : this;
 		
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
 			throw new AgentTerminatedException(cid.getName());
@@ -107,7 +107,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 * /
 	public void sendMessage(IMessageAdapter message)
 	{
-		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
+		if(IComponentDescription.STATE_TERMINATED.equals(state))
 			throw new AgentTerminatedException(aid.getName());
 
 		Map pmap = message.getParameterMap();
@@ -131,12 +131,12 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		if(senddate==null)
 			pmap.put(sd, ""+getClock().getTime());
 		
-		IAgentIdentifier[] recs = null;
+		IComponentIdentifier[] recs = null;
 		Object tmp = message.getValue(mt.getReceiverIdentifier());
 		if(tmp instanceof Collection)
-			recs = (IAgentIdentifier[])((Collection)tmp).toArray(new IAgentIdentifier[0]);
+			recs = (IComponentIdentifier[])((Collection)tmp).toArray(new IComponentIdentifier[0]);
 		else
-			recs = (IAgentIdentifier[])tmp;
+			recs = (IComponentIdentifier[])tmp;
 		
 		IMessageService msgservice = (IMessageService)platform.getService(IMessageService.class);
 		msgservice.sendMessage(pmap, mt, recs);

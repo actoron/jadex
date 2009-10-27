@@ -236,7 +236,7 @@ public class TCPTransport implements ITransport
 	public AgentIdentifier[] sendMessage(Map msg, String type, IComponentIdentifier[] receivers)
 	{
 		// Fetch all receivers 
-//		IAgentIdentifier[] recstodel = message.getReceivers();
+//		IComponentIdentifier[] recstodel = message.getReceivers();
 		IComponentIdentifier[] recstodel = receivers;
 		List undelivered = SUtil.arrayToList(recstodel);
 		

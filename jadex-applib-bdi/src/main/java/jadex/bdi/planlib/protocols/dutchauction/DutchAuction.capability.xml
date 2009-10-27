@@ -63,7 +63,7 @@
 				<value>new InteractionState()</value>
 			</parameter>
 			<!-- The initially participating bidder agents. -->
-			<parameterset name="receivers" class="jadex.bridge.IAgentIdentifier"/>
+			<parameterset name="receivers" class="jadex.bridge.IComponentIdentifier"/>
 		</achievegoal>
 		
 		<!-- (Initiator side) Decide if the next round should be executed and with which cfp. -->
@@ -93,7 +93,7 @@
 		<!-- (Participant side) Optional goal that offers a possibility to decide a participation. -->		
 		<achievegoal name="da_decide_participation" exported="true">
 			<!-- The initiator of the interaction. -->
-			<parameter name="initiator" class="jadex.bridge.IAgentIdentifier"/>
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- The auction description. -->
 			<parameter name="auction_description" class="AuctionDescription" direction="in"/>
 			<!-- Local auction info. -->
@@ -159,7 +159,7 @@
 			<parameter name="result" class="Object" direction="out">
 				<goalmapping ref="da_initiate.result"/>
 			</parameter>
-			<parameterset name="receivers" class="jadex.bridge.IAgentIdentifier">
+			<parameterset name="receivers" class="jadex.bridge.IComponentIdentifier">
 				<goalmapping ref="da_initiate.receivers"/>
 			</parameterset>
 			<body class="DAInitiatorPlan" />

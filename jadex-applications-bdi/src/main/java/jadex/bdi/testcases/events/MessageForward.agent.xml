@@ -46,7 +46,7 @@
 				<value>"Born message"</value>
 				<!--<bindingoptions>new String[]{"hello_1", "hello_2", "hello_3"}</bindingoptions>-->
 			</parameter>
-			<parameterset name="receivers" class="jadex.bridge.IAgentIdentifier" direction="inout">
+			<parameterset name="receivers" class="jadex.bridge.IComponentIdentifier" direction="inout">
 				<value>$scope.getAgentIdentifier()</value>
 			</parameterset>
 		</messageevent>

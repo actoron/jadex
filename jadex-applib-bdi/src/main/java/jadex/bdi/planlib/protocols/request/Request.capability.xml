@@ -46,7 +46,7 @@
 		<!-- (Initiator side) Initiate a conversation using the fipa-request protocol. -->
 		<achievegoal name="rp_initiate" exported="true">
 			<!-- The receiver of the request. -->
-			<parameter name="receiver" class="jadex.bridge.IAgentIdentifier"/>
+			<parameter name="receiver" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- The requested action. -->
 			<parameter name="action" class="Object"/>
 			<!-- Optional ontology for marshalling. -->
@@ -82,7 +82,7 @@
 			<!-- The requested action. -->
 			<parameter name="action" class="Object"/>
 			<!-- The requesting agent. -->
-			<parameter name="initiator" class="jadex.bridge.IAgentIdentifier"/>
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- True, if request should be done and agree message should be sent. -->
 			<parameter name="accept" class="Boolean" direction="out"/>
 		</querygoal>
@@ -92,7 +92,7 @@
 			<!-- The requested action. -->
 			<parameter name="action" class="Object"/>
 			<!-- The requesting agent. -->
-			<parameter name="initiator" class="jadex.bridge.IAgentIdentifier"/>
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- The result of the request. -->
 			<parameter name="result" class="Object" direction="out" optional="true"/>
 		</achievegoal>
@@ -119,7 +119,7 @@
 		<!-- FIPA Request Protocol Plans -->
 	
 		<plan name="rp_initiator_plan">
-			<parameter name="receiver" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="receiver" class="jadex.bridge.IComponentIdentifier">
 				<goalmapping ref="rp_initiate.receiver"/>
 			</parameter>
 			<parameter name="action" class="Object">

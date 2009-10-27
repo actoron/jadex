@@ -59,8 +59,8 @@
 				<initialgoal ref="df_keep_registered">
 					<parameter ref="description">
 						<value>
-							((IDF)$scope.getPlatform().getService(IDF.class, SFipa.DF_SERVICE))
-								.createDFAgentDescription(null, ((IDF)$scope.getPlatform().getService(IDF.class, SFipa.DF_SERVICE))
+							((IDF)$scope.getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE))
+								.createDFAgentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class, SFipa.DF_SERVICE))
 								.createDFServiceDescription("service_translate", "translate english_german", "University of Hamburg"))
  						</value>
 					</parameter>

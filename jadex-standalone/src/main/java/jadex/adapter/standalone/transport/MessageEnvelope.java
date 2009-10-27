@@ -20,7 +20,7 @@ public class MessageEnvelope
 	protected Map message;
 	
 	/** The receivers. */
-	//protected IAgentIdentifier[] receivers;
+	//protected IComponentIdentifier[] receivers;
 	protected Collection receivers;
 	
 	/** The message type. */

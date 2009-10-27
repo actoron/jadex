@@ -42,7 +42,7 @@
 -->		</beliefset>
 		
 		<!-- The id of a manually started local dealer. -->
-		<belief name="localDealerAID"  class="jadex.bridge.IAgentIdentifier" />
+		<belief name="localDealerAID"  class="jadex.bridge.IComponentIdentifier" />
 		
 		<!-- The gui object. -->
 		<belief name="gui" class="ManagerFrame">

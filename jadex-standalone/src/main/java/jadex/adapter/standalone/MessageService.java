@@ -76,13 +76,15 @@ public class MessageService implements IMessageService
 	 *  Constructor for Outbox.
 	 *  @param platform
 	 */
-	public MessageService(AbstractPlatform platform, ITransport[] transports, Map messagetypes)
+	public MessageService(AbstractPlatform platform, ITransport[] transports, MessageType[] messagetypes)
 	{
 		this.platform = platform;
 		this.transports = SCollection.createArrayList();
 		for(int i=0; i<transports.length; i++)
 			this.transports.add(transports[i]);
-		this.messagetypes	= messagetypes;
+		this.messagetypes	= SCollection.createHashMap();
+		for(int i=0; i<messagetypes.length; i++)
+			this.messagetypes.put(messagetypes[i].getName(), messagetypes[i]);		
 		this.sendmsg = new SendMessage();
 		this.delivermsg = new DeliverMessage();
 		this.logger = Logger.getLogger("MessageService" + this);
@@ -301,7 +303,7 @@ public class MessageService implements IMessageService
 	 */
 	protected void internalSendMessage(Map msg, String type, IComponentIdentifier[] receivers)
 	{
-//		IAgentIdentifier[] receivers = message.getReceivers();
+//		IComponentIdentifier[] receivers = message.getReceivers();
 		if(receivers.length == 0)
 			throw new MessageFailureException(msg, "No receiver specified");
 		for(int i=0; i<receivers.length; i++)

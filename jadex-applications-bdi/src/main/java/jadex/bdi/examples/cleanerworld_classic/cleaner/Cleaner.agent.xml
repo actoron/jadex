@@ -37,7 +37,7 @@
 		</belief>
 
 		<!-- The connection to the environment (agent). -->
-		<belief name="environmentagent" class="jadex.bridge.IAgentIdentifier"/>
+		<belief name="environmentagent" class="jadex.bridge.IComponentIdentifier"/>
 
 		<!-- The known wastes. -->
 		<beliefset name="wastes" class="Waste" />

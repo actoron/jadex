@@ -22,7 +22,7 @@
 
 	<beliefs>
 		<!-- The agents on this platform. todo: remove, offer only subscribe -->
-		<beliefset name="agents" class="IAMSAgentDescription" exported="true"/>
+		<beliefset name="agents" class="IComponentDescription" exported="true"/>
 		<!-- Timeout for messages. - ->
 		<beliefref name="timeout" exported="true">
 			<concrete ref="procap.timeout"/>
@@ -39,9 +39,9 @@
 			<!-- The initial agent configuration to use. -->
 			<parameter name="configuration" class="String" optional="true"/>
 			<!-- The AMS agent identifier (only needed for remote requests). -->
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier" optional="true"/> 
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier" optional="true"/> 
 			<!-- The identifier of the created agent. -->
-			<parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier" direction="out"/>
+			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier" direction="out"/>
 			<!-- The arguments for the new agent. -->
 			<!--<parameterset name="arguments" class="Object" optional="true"/>-->
 			<parameter name="arguments" class="Map" optional="true"/>
@@ -56,61 +56,61 @@
 		<!-- Start the given agent (only possible when it has previously been created with start=false). -->
 		<achievegoal name="ams_start_agent" exported="true">
 			<!-- The agent to destroy. -->
-			<parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier"/>
+			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- The AMS agent identifier (only needed for remote requests). -->
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier" optional="true"/> 
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier" optional="true"/> 
 		</achievegoal>
 
 		<!-- Destroy the given agent. -->
 		<achievegoal name="ams_destroy_agent" exported="true">
 			<!-- The agent to destroy. -->
-			<parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier"/>
+			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- The AMS agent identifier (only needed for remote requests). -->
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier" optional="true"/> 
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier" optional="true"/> 
 		</achievegoal>
 		
 		<!-- Suspend the given agent. -->
 		<achievegoal name="ams_suspend_agent" exported="true">
 			<!-- The agent to destroy. -->
-			<parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier"/>
+			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- The AMS agent identifier (only needed for remote requests). -->
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier" optional="true"/>
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier" optional="true"/>
 			<!-- The possibly changed ams agent description. -->
-			<parameter name="agentdescription" class="IAMSAgentDescription" direction="out"/>
+			<parameter name="agentdescription" class="IComponentDescription" direction="out"/>
 		</achievegoal>
 		
 		<!-- Resume the given agent. -->
 		<achievegoal name="ams_resume_agent" exported="true">
 			<!-- The agent to destroy. -->
-			<parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier"/>
+			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- The AMS agent identifier (only needed for remote requests). -->
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier" optional="true"/> 
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier" optional="true"/> 
 				<!-- The possibly changed ams agent description. -->
-			<parameter name="agentdescription" class="IAMSAgentDescription" direction="out"/>
+			<parameter name="agentdescription" class="IComponentDescription" direction="out"/>
 		</achievegoal>
 
 		<!-- Search for agents on the platform. -->
 		<achievegoal name="ams_search_agents" exported="true">
 			<!-- The template description to search for. -->
-			<parameter name="description" class="IAMSAgentDescription"/>
+			<parameter name="description" class="IComponentDescription"/>
 			<!-- The search constraints. -->
 			<parameter name="constraints" class="ISearchConstraints" optional="true"/>
 			<!-- The AMS agent identifier (only needed for remote requests). -->
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier" optional="true"/> 
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier" optional="true"/> 
 			<!-- The search results. -->
-			<parameterset name="result" class="IAMSAgentDescription" direction="out"/>
+			<parameterset name="result" class="IComponentDescription" direction="out"/>
 		</achievegoal>
 		
 		<!-- Shutdown the platform. -->
 		<achievegoal name="ams_shutdown_platform" exported="true">
  			<!-- The AMS agent identifier (only needed for remote requests). -->
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier" optional="true"/>
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier" optional="true"/>
 		</achievegoal>
 		
 		<!-- Get the external access of an agent. -->
 		<querygoal name="ams_get_externalaccess" exported="true">
 			<!-- The agent identifier. -->
-			<parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier"/>
+			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- The external access. -->
 			<parameter name="result" class="Object" direction="out"/> 
 		</querygoal>
@@ -131,10 +131,10 @@
 			<parameter name="configuration" class="String">
  				<goalmapping ref="ams_create_agent.configuration"/>
 			</parameter>
-			<parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier" direction="out">
+			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier" direction="out">
  				<goalmapping ref="ams_create_agent.agentidentifier"/>
 			</parameter>
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_create_agent.ams"/>
 			</parameter>
 			<parameter name="arguments" class="Map">
@@ -154,10 +154,10 @@
 		</plan>
 
 		<plan name="local_start_agent_plan">
-			<parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_start_agent.agentidentifier"/>
 			</parameter>
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_start_agent.ams"/>
 			</parameter>
 			<body class="AMSLocalStartAgentPlan" />
@@ -168,10 +168,10 @@
 		</plan>
 		
 		<plan name="local_destroy_agent_plan">
-			<parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_destroy_agent.agentidentifier"/>
 			</parameter>
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_destroy_agent.ams"/>
 			</parameter>
 			<body class="AMSLocalDestroyAgentPlan" />
@@ -182,13 +182,13 @@
 		</plan>
 		
 		<plan name="local_suspend_agent_plan">
-			<parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_suspend_agent.agentidentifier"/>
 			</parameter>
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_suspend_agent.ams"/>
 			</parameter>
-			<parameter name="agentdescription" class="IAMSAgentDescription" direction="out">
+			<parameter name="agentdescription" class="IComponentDescription" direction="out">
 				<goalmapping ref="ams_suspend_agent.agentdescription"/>
 			</parameter>
 			<body class="AMSLocalSuspendAgentPlan" />
@@ -199,13 +199,13 @@
 		</plan>
 		
 		<plan name="local_resume_agent_plan">
-			<parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_resume_agent.agentidentifier"/>
 			</parameter>
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_resume_agent.ams"/>
 			</parameter>
-			<parameter name="agentdescription" class="IAMSAgentDescription" direction="out">
+			<parameter name="agentdescription" class="IComponentDescription" direction="out">
 				<goalmapping ref="ams_resume_agent.agentdescription"/>
 			</parameter>
 			<body class="AMSLocalResumeAgentPlan" />
@@ -216,16 +216,16 @@
 		</plan>
 
 		<plan name="local_search_agents_plan">
-			<parameter name="description" class="IAMSAgentDescription">
+			<parameter name="description" class="IComponentDescription">
  				<goalmapping ref="ams_search_agents.description"/>
 			</parameter>
 			<parameter name="constraints" class="ISearchConstraints">
  				<goalmapping ref="ams_search_agents.constraints"/>
 			</parameter>
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_search_agents.ams"/>
 			</parameter>
-			<parameterset name="result" class="IAMSAgentDescription" direction="out">
+			<parameterset name="result" class="IComponentDescription" direction="out">
  				<goalmapping ref="ams_search_agents.result"/>
 			</parameterset>
 			<body class="AMSLocalSearchAgentsPlan" />
@@ -236,7 +236,7 @@
 		</plan>
 
 		<plan name="local_shutdown_platform_plan">
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_shutdown_platform.ams"/>
 			</parameter>
 			<body class="AMSLocalShutdownPlatformPlan" />
@@ -252,7 +252,7 @@
 		</plan>
 		
 		<plan name="local_get_externalaccess_plan">
-			<parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_get_externalaccess.agentidentifier"/>
 			</parameter>
 			<parameter name="result" class="Object" direction="out">
@@ -276,10 +276,10 @@
 			<parameter name="configuration" class="String">
  				<goalmapping ref="ams_create_agent.configuration"/>
 			</parameter>
-			<parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier" direction="out">
+			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier" direction="out">
  				<goalmapping ref="ams_create_agent.agentidentifier"/>
 			</parameter>
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_create_agent.ams"/>
 			</parameter>
 			<parameter name="arguments" class="Map">
@@ -296,10 +296,10 @@
 		</plan>
 
 		<plan name="remote_start_agent_plan">
-			<parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_start_agent.agentidentifier"/>
 			</parameter>
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_start_agent.ams"/>
 			</parameter>
 			<body class="AMSRemoteStartAgentPlan" />
@@ -310,10 +310,10 @@
 		</plan>
 		
 		<plan name="remote_destroy_agent_plan">
-			<parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_destroy_agent.agentidentifier"/>
 			</parameter>
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_destroy_agent.ams"/>
 			</parameter>
 			<body class="AMSRemoteDestroyAgentPlan" />
@@ -324,13 +324,13 @@
 		</plan>
 		
 		<plan name="remote_suspend_agent_plan">
-			<parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_suspend_agent.agentidentifier"/>
 			</parameter>
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_suspend_agent.ams"/>
 			</parameter>
-			<parameter name="agentdescription" class="IAMSAgentDescription" direction="out">
+			<parameter name="agentdescription" class="IComponentDescription" direction="out">
 				<goalmapping ref="ams_suspend_agent.agentdescription"/>
 			</parameter>
 			<body class="AMSRemoteSuspendAgentPlan" />
@@ -341,13 +341,13 @@
 		</plan>
 		
 		<plan name="remote_resume_agent_plan">
-			<parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_resume_agent.agentidentifier"/>
 			</parameter>
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_resume_agent.ams"/>
 			</parameter>
-			<parameter name="agentdescription" class="IAMSAgentDescription" direction="out">
+			<parameter name="agentdescription" class="IComponentDescription" direction="out">
 				<goalmapping ref="ams_resume_agent.agentdescription"/>
 			</parameter>
 			<body class="AMSRemoteResumeAgentPlan" />
@@ -358,16 +358,16 @@
 		</plan>
 
 		<plan name="remote_search_agents_plan">
-			<parameter name="description" class="IAMSAgentDescription">
+			<parameter name="description" class="IComponentDescription">
  				<goalmapping ref="ams_search_agents.description"/>
 			</parameter>
 			<parameter name="constraints" class="ISearchConstraints">
  				<goalmapping ref="ams_search_agents.constraints"/>
 			</parameter>
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_search_agents.ams"/>
 			</parameter>
-			<parameterset name="result" class="IAMSAgentDescription" direction="out">
+			<parameterset name="result" class="IComponentDescription" direction="out">
  				<goalmapping ref="ams_search_agents.result"/>
 			</parameterset>
 			<body class="AMSRemoteSearchAgentsPlan" />
@@ -378,7 +378,7 @@
 		</plan>
 
 		<plan name="remote_shutdown_platform_plan">
-			<parameter name="ams" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="ams" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_shutdown_platform.ams"/>
 			</parameter>
 			<body class="AMSRemoteShutdownPlatformPlan" />
@@ -392,7 +392,7 @@
 	<expressions>
 		<condition name="agent_removed">
 			!$beliefbase.ams.containsAgent(aid)
-			<parameter name="aid" class="jadex.bridge.IAgentIdentifier"/>
+			<parameter name="aid" class="jadex.bridge.IComponentIdentifier"/>
 		</condition>
 	</expressions> -->
 

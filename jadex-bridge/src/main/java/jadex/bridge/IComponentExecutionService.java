@@ -1,13 +1,14 @@
 package jadex.bridge;
 
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 
 import java.util.Map;
 
 /**
  *  General interface for components that the container can execute.
  */
-public interface IComponentExecutionService
+public interface IComponentExecutionService	extends IService
 {
 	//-------- management methods --------
 	

@@ -39,7 +39,7 @@
 		</belief>
 
 		<!-- The dealer where this player is currently playing. -->
-		<belief name="dealer" class="jadex.bridge.IAgentIdentifier" exported="true"/>
+		<belief name="dealer" class="jadex.bridge.IComponentIdentifier" exported="true"/>
 
 		<!-- The timeout used by the player. -->
 		<belief name="timeout" class="long"/>

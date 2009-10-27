@@ -17,7 +17,7 @@
 	
 	<imports>
 		<import>jadex.bdi.examples.garbagecollector.*</import>
-		<import>jadex.bridge.IAgentIdentifier</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
 		<import>jadex.adapter.base.envsupport.environment.*</import>
 		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
 		<import>jadex.adapter.base.envsupport.environment.RoundBasedExecutor</import>
@@ -60,13 +60,13 @@
 			<!-- Actions that can be performed in the environment. -->
 			<env:actiontypes>
 				<env:actiontype name="pickup" class="PickupWasteAction">
-					<env:property name="actor_id" class="IAgentIdentifier"/>
+					<env:property name="actor_id" class="IComponentIdentifier"/>
 				</env:actiontype>
 				<env:actiontype name="drop" class="DropWasteAction" >
-					<env:property name="actor_id" class="IAgentIdentifier"/>
+					<env:property name="actor_id" class="IComponentIdentifier"/>
 				</env:actiontype>
 				<env:actiontype name="burn" class="BurnWasteAction" >
-					<env:property name="actor_id" class="IAgentIdentifier"/>
+					<env:property name="actor_id" class="IComponentIdentifier"/>
 				</env:actiontype>
 				<env:actiontype name="go" class="GoAction" >
 					<env:property name="object_id" class="Object"/>

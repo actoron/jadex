@@ -16,7 +16,7 @@
 
 	<imports>
 		<import>jadex.adapter.base.fipa.*</import>
-		<import>jadex.bridge.IAgentIdentifier</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
 	</imports>
 
 	<capabilities>
@@ -75,7 +75,7 @@
 			<parameter name="content" class="String">
  				<value>"test-msg-content"</value>
 			</parameter>
-			<parameterset name="receivers" class="IAgentIdentifier">
+			<parameterset name="receivers" class="IComponentIdentifier">
 				<value>$scope.getAgentIdentifier()</value>
 			</parameterset>
 		</messageevent>

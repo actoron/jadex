@@ -30,7 +30,7 @@
 			<fact>1000</fact>
 		</belief>
 
-		<belief name="receiver" class="IAgentIdentifier" exported="true">
+		<belief name="receiver" class="IComponentIdentifier" exported="true">
 			<fact>$scope.getAgentIdentifier()</fact>
 		</belief>
 

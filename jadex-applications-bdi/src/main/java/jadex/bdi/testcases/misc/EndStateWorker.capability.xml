@@ -12,7 +12,7 @@
 	package="jadex.bdi.testcases.misc">
 	
 	<imports>
-		<import>jadex.bridge.IAgentIdentifier</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
 		<import>jadex.adapter.base.fipa.*</import>
 	</imports>
 	
@@ -37,7 +37,7 @@
 			<parameter name="content" class="String" direction="fixed">
 				<value>"capability end message event"</value>
 			</parameter>
-			<parameterset name="receivers" class="IAgentIdentifier">
+			<parameterset name="receivers" class="IComponentIdentifier">
 				<value>$scope.getAgentIdentifier()</value>
 			</parameterset>
 		</messageevent>

@@ -153,8 +153,8 @@
 	<properties>
 		<property name="service_seller">
 			<!-- SFipa.createAgentDescription(null, SFipa.createServiceDescription(null, "service_seller", null)) -->
-			((IDF)$scope.getPlatform().getService(IDF.class))
-				.createDFAgentDescription(null, ((IDF)$scope.getPlatform().getService(IDF.class))
+			((IDF)$scope.getServiceContainer().getService(IDF.class))
+				.createDFAgentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
 					.createDFServiceDescription(null, "service_seller", null))
 		</property>
 		<!-- <property name="logging.level">java.util.logging.Level.FINE</property> -->
@@ -173,7 +173,7 @@
 				<initialgoal ref="purchase_book">
 					<parameter ref="order">
 						<value>new Order("All about agents", new java.util.Date($scope.getTime()+60000),
-							75, 110, true, (IClockService)$scope.getPlatform().getService(IClockService.class))</value>
+							75, 110, true, (IClockService)$scope.getServiceContainer().getService(IClockService.class))</value>
 					</parameter>
 				</initialgoal>
 			</goals> -->

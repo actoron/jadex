@@ -264,7 +264,7 @@ public class NIOTCPTransport implements ITransport
 	{
 		// Fetch all receivers 
 		IComponentIdentifier[] recstodel = receivers;
-//		IAgentIdentifier[] recstodel = message.getReceivers();
+//		IComponentIdentifier[] recstodel = message.getReceivers();
 		List undelivered = SUtil.arrayToList(recstodel);
 		
 		// Find receivers with same address and send only once for 

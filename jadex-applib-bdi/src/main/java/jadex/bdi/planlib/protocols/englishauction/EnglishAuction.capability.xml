@@ -63,7 +63,7 @@
 				<value>new InteractionState()</value>
 			</parameter>
 			<!-- The initially participating bidder agents. -->
-			<parameterset name="receivers" class="jadex.bridge.IAgentIdentifier"/>
+			<parameterset name="receivers" class="jadex.bridge.IComponentIdentifier"/>
 		</achievegoal>
 		
 		<!-- (Initiator side) Decide if the next round should be executed and with which cfp. -->
@@ -85,7 +85,7 @@
 			<!-- The local cfp info -->
 			<parameter name="cfp_info" class="Object" optional="true"/>
 			<!-- The winning agent. -->
-			<parameter name="winner" class="jadex.bridge.IAgentIdentifier"/>
+			<parameter name="winner" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- The result. -->
 			<parameter name="accept" class="Boolean" direction="out"/>
 			<!-- The history of cfps. -->
@@ -109,7 +109,7 @@
 		<!-- (Participant side) Optional goal that offers a possibility to decide about participation. -->		
 		<achievegoal name="ea_decide_participation" exported="true">
 			<!-- The initiator of the interaction. -->
-			<parameter name="initiator" class="jadex.bridge.IAgentIdentifier"/>
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- The auction info describing the auction. -->
 			<parameter name="auction_description" class="AuctionDescription" direction="in"/>
 			<!-- Local auction info. -->
@@ -178,7 +178,7 @@
 			<parameter name="result" class="Object" direction="out">
 				<goalmapping ref="ea_initiate.result"/>
 			</parameter>
-			<parameterset name="receivers" class="jadex.bridge.IAgentIdentifier">
+			<parameterset name="receivers" class="jadex.bridge.IComponentIdentifier">
 				<goalmapping ref="ea_initiate.receivers"/>
 			</parameterset>
 			<body class="EAInitiatorPlan" />

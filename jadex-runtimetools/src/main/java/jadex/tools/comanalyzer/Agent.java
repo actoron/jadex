@@ -61,7 +61,7 @@ public class Agent extends ParameterElement
 	}
 
 	/** The agentidentifier */
-//	protected IAgentIdentifier aid;
+//	protected IComponentIdentifier aid;
 
 	/** The messages send or received by the agent */
 	protected List messages = new ArrayList();

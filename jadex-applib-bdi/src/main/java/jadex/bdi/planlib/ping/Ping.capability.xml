@@ -45,7 +45,7 @@
 			<parameter name="content" class="String">
 				<value>$beliefbase.ping_content</value>
 			</parameter>
-			<parameter name="receiver" class="jadex.bridge.IAgentIdentifier" />
+			<parameter name="receiver" class="jadex.bridge.IComponentIdentifier" />
 			<parameter name="ping_delay" class="long">
 				<value>$beliefbase.ping_delay</value>
 			</parameter>
@@ -75,7 +75,7 @@
 			<parameter name="content" class="String">
 				<value>$beliefbase.ping_content</value>
 			</parameter>
-			<parameter name="receiver" class="jadex.bridge.IAgentIdentifier" />
+			<parameter name="receiver" class="jadex.bridge.IComponentIdentifier" />
 		</achievegoal>
 		
 		<achievegoalref name="qp_execute_request">
@@ -92,7 +92,7 @@
 			<parameter name="timeout" class="long">
 				<goalmapping ref="ping.timeout"/>
 			</parameter>
-			<parameter name="receiver" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="receiver" class="jadex.bridge.IComponentIdentifier">
 				<goalmapping ref="ping.receiver"/>
 			</parameter>
 			<body class="DoPingPlan" />
@@ -110,10 +110,10 @@
 			<parameter name="timeout" class="long">
 				<goalmapping ref="pinging.timeout"/>
 			</parameter>
-			<parameter name="receiver" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="receiver" class="jadex.bridge.IComponentIdentifier">
 				<goalmapping ref="pinging.receiver"/>
 			</parameter>
-			<parameter name="ping_delay" class="jadex.bridge.IAgentIdentifier">
+			<parameter name="ping_delay" class="jadex.bridge.IComponentIdentifier">
 				<goalmapping ref="pinging.ping_delay"/>
 			</parameter>
 			<parameter name="missed_cnt" class="int" direction="inout">

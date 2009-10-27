@@ -11,7 +11,7 @@
 
 	<imports>
 		<import>jadex.bdi.testcases.*</import>
-		<import>jadex.bridge.IAgentIdentifier</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
 		<import>jadex.adapter.base.fipa.*</import>
 	</imports>
 	
@@ -20,7 +20,7 @@
 	</capabilities>
 	
 	<beliefs>
-		<belief name="testagent" class="IAgentIdentifier" exported="true"/>
+		<belief name="testagent" class="IComponentIdentifier" exported="true"/>
 	</beliefs>
 
 	<goals>
@@ -59,7 +59,7 @@
 			<parameter name="conversation_id" class="String" direction="fixed">
 				<value>"test converstaion"</value>
 			</parameter>
-			<parameterset name="receivers" class="IAgentIdentifier">
+			<parameterset name="receivers" class="IComponentIdentifier">
 				<value>$scope.getAgentIdentifier()</value>
 			</parameterset>
 		</messageevent>
@@ -70,7 +70,7 @@
 			<parameter name="language" class="String">
 				<value>SFipa.NUGGETS_XML</value>
 			</parameter>
-			<parameterset name="receivers" class="IAgentIdentifier">
+			<parameterset name="receivers" class="IComponentIdentifier">
 				<value>$beliefbase.testagent</value>
 			</parameterset>
 		</messageevent>

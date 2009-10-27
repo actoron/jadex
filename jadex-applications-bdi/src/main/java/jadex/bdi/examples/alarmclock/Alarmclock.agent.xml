@@ -166,11 +166,11 @@
 						((Settings)$beliefbase.settings).getAlarms():
 						//jadex.commons.SUtil.joinArrays(((Settings)$beliefbase.settings).getAlarms(),
 						new Alarm[]{new Alarm(Alarm.ONCE, new Time(new Date($scope.getTime()+10000)),
-							"jadex/bdi/examples/alarmclock/alarm.wav", "Built-in start alarm", true, (IClockService)$scope.getPlatform().getService(IClockService.class)),
+							"jadex/bdi/examples/alarmclock/alarm.wav", "Built-in start alarm", true, (IClockService)$scope.getServiceContainer().getService(IClockService.class)),
 						new Alarm(Alarm.HOURLY, new Time(0,0,0,0,0,0,0),
-							"jadex/bdi/examples/alarmclock/alarm.wav", "Chimes", true, (IClockService)$scope.getPlatform().getService(IClockService.class)),
+							"jadex/bdi/examples/alarmclock/alarm.wav", "Chimes", true, (IClockService)$scope.getServiceContainer().getService(IClockService.class)),
 						new Alarm(Alarm.HOURLY, new Time(0,15,0,0,0,0,0),
-							"jadex/bdi/examples/alarmclock/alarm.wav", "Chimes quartely", true, (IClockService)$scope.getPlatform().getService(IClockService.class))}//)
+							"jadex/bdi/examples/alarmclock/alarm.wav", "Chimes quartely", true, (IClockService)$scope.getServiceContainer().getService(IClockService.class))}//)
 					
 					</facts>
 					<!--<fact>

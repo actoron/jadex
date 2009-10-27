@@ -173,7 +173,7 @@
 			<beliefs>
 				<initialbelief ref="jcc">
 					<fact>
-						new AgentControlCenter($scope.getPlatform(),
+						new AgentControlCenter($scope.getServiceContainer(),
 						"jadex.tools.starter.StarterPlugin"
 						+" jadex.tools.dfbrowser.DFBrowserPlugin"
 						+" jadex.tools.convcenter.ConversationPlugin"

@@ -663,4 +663,23 @@ public class ComponentExecutionService implements IComponentExecutionService
 
 		return ret;
 	}
+	
+	//-------- IService interface --------
+	
+	/**
+	 *  Start the service.
+	 */
+	public void start()
+	{
+		
+	}
+
+	/**
+	 *  Shutdown the service.
+	 *  @param listener The listener.
+	 */
+	public void shutdown(IResultListener listener)
+	{
+		listener.resultAvailable(null);
+	}
 }

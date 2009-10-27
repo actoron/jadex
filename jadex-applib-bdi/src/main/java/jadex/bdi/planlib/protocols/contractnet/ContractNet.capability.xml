@@ -70,7 +70,7 @@
 				<value>new InteractionState()</value>
 			</parameter>
 			<!-- The (initial) negotiation participants. -->
-			<parameterset name="receivers" class="jadex.bridge.IAgentIdentifier"/>
+			<parameterset name="receivers" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- The tasks done by the winners. -->
 			<parameterset name="result" class="Object" direction="out"/>
 			<!-- The negotiation history. -->
@@ -165,7 +165,7 @@
 			<!-- The cfp describing the task to be done. -->
 			<parameter name="cfp" class="Object"/>
 			<!-- The initiator of the interaction. -->
-			<parameter name="initiator" class="jadex.bridge.IAgentIdentifier"/>
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- The proposal for doing the task. -->
 			<parameter name="proposal" class="Object" direction="out"/>
 			<!-- Optional information about the task that will be tranferred
@@ -181,7 +181,7 @@
 			preceding step (not sent to initiator).-->
 			<parameter name="proposal_info" class="Object" optional="true"/>
 			<!-- The initiator of the interaction. -->
-			<parameter name="initiator" class="jadex.bridge.IAgentIdentifier"/>
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- Information about the task execution. -->
 			<parameter name="result" class="Object" direction="out" optional="true"/>
 		</achievegoal>
@@ -209,7 +209,7 @@
 				<value>new InteractionState()</value>
 			</parameter>
 			<!-- The (initial) negotiation participants. -->
-			<parameterset name="receivers" class="jadex.bridge.IAgentIdentifier"/>
+			<parameterset name="receivers" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- The tasks done by the winners. -->
 			<parameterset name="result" class="Object" direction="out"/>
 			<!-- The negotiation history. -->
@@ -261,7 +261,7 @@
 			<!-- Flag indicating the decision to iterate (set to true or false to end goal). -->
 			<parameter name="iterate" class="Boolean" direction="out"/>
 			<!-- The participants (can be altered for next negotiation round). -->
-			<parameterset name="participants" class="jadex.bridge.IAgentIdentifier" direction="inout"/>
+			<parameterset name="participants" class="jadex.bridge.IComponentIdentifier" direction="inout"/>
 			<!-- The proposals, received from participants including evaluation (if any). -->
 			<parameterset name="proposals" class="ParticipantProposal"/>
 			<!-- The negotiation history. -->
@@ -287,7 +287,7 @@
 			<!-- The cfp describing the task to be done. -->
 			<parameter name="cfp" class="Object"/>
 			<!-- The initiator of the interaction. -->
-			<parameter name="initiator" class="jadex.bridge.IAgentIdentifier"/>
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- The proposal for doing the task. -->
 			<parameter name="proposal" class="Object" direction="out"/>
 			<!-- Optional information about the task that will be tranferred
@@ -303,7 +303,7 @@
 			preceding step (not sent to initiator).-->
 			<parameter name="proposal_info" class="Object" optional="true"/>
 			<!-- The initiator of the interaction. -->
-			<parameter name="initiator" class="jadex.bridge.IAgentIdentifier"/>
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- Information about the task execution. -->
 			<parameter name="result" class="Object" direction="out" optional="true"/>
 		</achievegoal>
@@ -354,7 +354,7 @@
 			<parameter name="interaction_state" class="InteractionState" direction="out">
 				<goalmapping ref="cnp_initiate.interaction_state"/>
 			</parameter>
-			<parameterset name="receivers" class="jadex.bridge.IAgentIdentifier">
+			<parameterset name="receivers" class="jadex.bridge.IComponentIdentifier">
 				<goalmapping ref="cnp_initiate.receivers"/>
 			</parameterset>
 			<parameterset name="result" class="Object" direction="out">
@@ -460,7 +460,7 @@
 			<parameter name="interaction_state" class="InteractionState" direction="out">
 				<goalmapping ref="icnp_initiate.interaction_state"/>
 			</parameter>
-			<parameterset name="receivers" class="jadex.bridge.IAgentIdentifier">
+			<parameterset name="receivers" class="jadex.bridge.IComponentIdentifier">
 				<goalmapping ref="icnp_initiate.receivers"/>
 			</parameterset>
 			<parameterset name="result" class="Object" direction="out">
@@ -510,7 +510,7 @@
 			<parameter name="iterate" class="Boolean" direction="out">
 				<goalmapping ref="icnp_nextround_info.iterate"/>
 			</parameter>			
-			<parameterset name="participants" class="jadex.bridge.IAgentIdentifier" direction="inout">
+			<parameterset name="participants" class="jadex.bridge.IComponentIdentifier" direction="inout">
 				<goalmapping ref="icnp_nextround_info.participants"/>
 			</parameterset>
 			<parameterset name="proposals" class="ParticipantProposal">

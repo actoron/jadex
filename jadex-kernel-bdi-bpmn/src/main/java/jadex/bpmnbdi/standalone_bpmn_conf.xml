@@ -13,9 +13,6 @@
 		<property type="welcome">false</property>
 		<property type="autoshutdown">true</property>
 		
-		<!-- Message types. -->
-		<property type="messagetype" name="fipa">new jadex.adapter.base.fipa.FIPAMessageType()</property>
-		
 		<!-- Platform services. -->
 		<properties type="services">
 			<!-- Library service. -->
@@ -44,6 +41,10 @@
 					new jadex.adapter.standalone.transport.localmtp.LocalTransport($platform),
 					new jadex.adapter.standalone.transport.tcpmtp.TCPTransport($platform, 9876),
 					new jadex.adapter.standalone.transport.niotcpmtp.NIOTCPTransport($platform, 8765)
+				},
+				new jadex.bridge.MessageType[]
+				{
+					new jadex.adapter.base.fipa.FIPAMessageType()
 				})
 			</property>
 			
@@ -86,7 +87,7 @@
 			
 			<!-- Element factories -->
 			
-			<property type="jadex.bridge.IElementFactory" name="application_factory">
+			<property type="jadex.bridge.IComponentFactory" name="application_factory">
 				new jadex.adapter.base.appdescriptor.ApplicationFactory($platform,
 					new java.util.Set[]
 					{
@@ -96,7 +97,7 @@
 				)		
 			</property>
 			
-			<property type="jadex.bridge.IElementFactory" name="bdi_factory">
+			<property type="jadex.bridge.IComponentFactory" name="bdi_factory">
 				new jadex.bdi.interpreter.BDIAgentFactory(
 					jadex.commons.SUtil.createHashMap(
 					new String[]
@@ -120,7 +121,7 @@
 				), $platform)
 			</property>
 			
-			<property type="jadex.bridge.IElementFactory" name="gpmn_factory">
+			<property type="jadex.bridge.IComponentFactory" name="gpmn_factory">
 				new jadex.gpmn.GpmnAgentFactory(
 				jadex.commons.SUtil.createHashMap(
 					new String[]
@@ -144,7 +145,7 @@
 				), $platform)
 			</property>
 			
-			<property type="jadex.bridge.IElementFactory" name="micro_factory">
+			<property type="jadex.bridge.IComponentFactory" name="micro_factory">
 				new jadex.microkernel.MicroAgentFactory($platform)
 			</property>
 		</properties>

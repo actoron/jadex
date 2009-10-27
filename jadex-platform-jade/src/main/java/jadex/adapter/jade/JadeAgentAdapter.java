@@ -47,7 +47,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	protected transient Platform	platform;
 
 	/** The agent identifier. */
-//	protected IAgentIdentifier	aid;
+//	protected IComponentIdentifier	aid;
 
 	/** The kernel agent. */
 	protected IComponentInstance	agent;
@@ -238,7 +238,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	 * /
 	public void sendMessage(IMessageAdapter message)
 	{
-		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
+		if(IComponentDescription.STATE_TERMINATED.equals(state))
 			throw new AgentTerminatedException(aid.getName());
 
 		Map pmap = message.getParameterMap();
@@ -262,12 +262,12 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		if(senddate==null)
 			pmap.put(sd, ""+getClock().getTime());
 		
-		IAgentIdentifier[] recs = null;
+		IComponentIdentifier[] recs = null;
 		Object tmp = message.getValue(mt.getReceiverIdentifier());
 		if(tmp instanceof Collection)
-			recs = (IAgentIdentifier[])((Collection)tmp).toArray(new IAgentIdentifier[0]);
+			recs = (IComponentIdentifier[])((Collection)tmp).toArray(new IComponentIdentifier[0]);
 		else
-			recs = (IAgentIdentifier[])tmp;
+			recs = (IComponentIdentifier[])tmp;
 		
 		IMessageService msgservice = (IMessageService)platform.getService(IMessageService.class);
 		msgservice.sendMessage(pmap, mt, recs);
@@ -278,9 +278,9 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	 *  messages to this agent.
 	 *  Return a copy of the original.
 	 * /
-	public IAgentIdentifier getAgentIdentifier()
+	public IComponentIdentifier getAgentIdentifier()
 	{
-		if(IAMSAgentDescription.STATE_TERMINATED.equals(state))
+		if(IComponentDescription.STATE_TERMINATED.equals(state))
 			throw new AgentTerminatedException(aid.getName());
 
 		// todo: remove cast, HACK!!!
@@ -379,7 +379,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	 * /
 	public void	receiveMessage(Map message, MessageType type)
 	{
-		if(IAMSAgentDescription.STATE_TERMINATED.equals(state) || fatalerror)
+		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
 			throw new AgentTerminatedException(getAgentIdentifier().getName());
 
 		// Add optional receival time.
@@ -416,7 +416,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	 * /
 	public boolean	execute()
 	{
-		if(IAMSAgentDescription.STATE_TERMINATED.equals(state) || fatalerror)
+		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
 			throw new AgentTerminatedException(aid.getName());
 
 		boolean	executed	= false;
@@ -552,7 +552,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	 *  Return an agent-identifier that allows to send
 	 *  messages to this agent.
 	 * /
-	public IAgentIdentifier getAgentIdentifier()
+	public IComponentIdentifier getAgentIdentifier()
 	{
 		return SJade.convertAIDtoFipa(getAID());
 	}*/

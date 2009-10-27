@@ -176,7 +176,7 @@ public class AMS implements IAMS, IService
 //							AID aid = (AID)myAgent.getAMS().clone();
 //							int idx = aid.getName().indexOf("@");
 //							aid.setName(name + aid.getName().substring(idx));
-//							IAgentIdentifier ret = SJade.convertAIDtoFipa(aid, (IAMS)platform.getService(IAMS.class));
+//							IComponentIdentifier ret = SJade.convertAIDtoFipa(aid, (IAMS)platform.getService(IAMS.class));
 //							
 //							listener.resultAvailable(ret);
 //						}
@@ -726,8 +726,8 @@ public class AMS implements IAMS, IService
 		{
 			public void resultAvailable(Object result)
 			{
-				IAMSAgentDescription[] descs = (IAMSAgentDescription[])result;
-				IAgentIdentifier[] ret = new IAgentIdentifier[descs.length];
+				IComponentDescription[] descs = (IComponentDescription[])result;
+				IComponentIdentifier[] ret = new IComponentIdentifier[descs.length];
 				for(int i=0; i<descs.length; i++)
 				{
 					ret[i] = descs[i].getName();
@@ -754,7 +754,7 @@ public class AMS implements IAMS, IService
 		{
 			public void resultAvailable(Object result)
 			{
-				listener.resultAvailable(((IAMSAgentDescription[])result).length);
+				listener.resultAvailable(((IComponentDescription[])result).length);
 			}
 			public void exceptionOccurred(Exception exception)
 			{

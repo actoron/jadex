@@ -227,7 +227,7 @@ public class Platform extends BasicServiceContainer implements IPlatform
 //		{
 //			public void resultAvailable(Object result)
 //			{
-//				ams.startAgent((IAgentIdentifier)result, null);
+//				ams.startAgent((IComponentIdentifier)result, null);
 //			}
 //		}, null);
 	}

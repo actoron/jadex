@@ -31,7 +31,7 @@
 		</belief>
 	
 		<!-- If the receiver is non-null, this agent is the sender. -->
-		<belief name="receiver" class="IAgentIdentifier" exported="true" />
+		<belief name="receiver" class="IComponentIdentifier" exported="true" />
 
 		<!-- The number of conversations to perform. -->
 		<belief name="max" class="int" exported="true">

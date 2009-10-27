@@ -96,7 +96,7 @@ public class MarsworldGui	extends JFrame
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				/*IAgentIdentifier[] as = (IAgentIdentifier[])agent.getBeliefbase().getBeliefSet("startedagents").getFacts();
+				/*IComponentIdentifier[] as = (IComponentIdentifier[])agent.getBeliefbase().getBeliefSet("startedagents").getFacts();
 				for(int i=0; i<as.length; i++)
 				{
 					try

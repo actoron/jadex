@@ -63,7 +63,7 @@
 				</initialbelief>
 				<initialbelief ref="df">
 					<fact>
-						((IDF) $scope.getPlatform().getService(IDF.class))
+						((IDF) $scope.getServiceContainer().getService(IDF.class))
 							.createAgentIdentifier("df@lars", false, new String[]{"tcp-mtp://vsispool28:9876", "nio-mtp://vsispool28:8765"} )
 					</fact>
 					<!-- 

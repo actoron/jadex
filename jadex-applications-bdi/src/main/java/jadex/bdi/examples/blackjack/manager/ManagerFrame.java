@@ -144,7 +144,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				IAgentIdentifier tst = new AgentSelectorDialog(ManagerFrame.this, agent).selectAgent(LOCAL_DEALER);
+				IComponentIdentifier tst = new AgentSelectorDialog(ManagerFrame.this, agent).selectAgent(LOCAL_DEALER);
 				if(tst!=null)
 				{
 					dealeraid = tst;

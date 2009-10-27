@@ -39,7 +39,7 @@
 				))
 			</property>
 			
-			<property type="jadex.bridge.IElementFactory" name="execution_service">
+			<property type="jadex.bridge.IComponentFactory" name="execution_service">
 				new jadex.wfms.service.execution.MetaExecutionService($wfms, jadex.commons.SUtil.createArrayList(new Object[]{
 					new jadex.wfms.service.execution.BpmnExecutionService($wfms), 
 					new jadex.wfms.service.execution.GpmnExecutionService($wfms)

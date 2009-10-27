@@ -13,7 +13,7 @@
 	
 	<imports>
 		<import>jadex.adapter.base.fipa.*</import>
-		<import>jadex.bridge.IAgentIdentifier</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
 		<import>jadex.bdi.planlib.test.TestReport</import>
 		<import>jadex.bdi.testcases.ResultPlan</import>
 		<import>java.util.*</import>
@@ -24,7 +24,7 @@
 	</capabilities>
 	
 	<beliefs>
-		<belief name="testagent" class="IAgentIdentifier" exported="true"/>
+		<belief name="testagent" class="IComponentIdentifier" exported="true"/>
 		<belief name="trigger" class="boolean">
 			<fact>false</fact>
 		</belief>
@@ -116,7 +116,7 @@
 			<parameter name="content" class="String" direction="fixed">
 				<value>"end message event"</value>
 			</parameter>
-			<parameterset name="receivers" class="IAgentIdentifier">
+			<parameterset name="receivers" class="IComponentIdentifier">
 				<value>$scope.getAgentIdentifier()</value>
 			</parameterset>
 		</messageevent>
@@ -127,7 +127,7 @@
 			<parameter name="language" class="String">
 				<value>SFipa.NUGGETS_XML</value>
 			</parameter>
-			<parameterset name="receivers" class="IAgentIdentifier">
+			<parameterset name="receivers" class="IComponentIdentifier">
 				<value>$beliefbase.testagent</value>
 			</parameterset>
 		</messageevent>

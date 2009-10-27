@@ -62,7 +62,7 @@
 		<!-- Destroy the Environment Agent. -->
 		<achievegoal name="end_agent">
 			<!-- The agent to destroy. -->
-			<!-- <parameter name="agentidentifier" class="jadex.bridge.IAgentIdentifier"/> -->
+			<!-- <parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier"/> -->
 		</achievegoal>
 	</goals>
 
@@ -282,8 +282,8 @@
 				<initialgoal ref="df_register">
 					<parameter ref="description">
 						<value>
-							((IDF)$scope.getPlatform().getService(IDF.class))
-								.createDFAgentDescription(null, ((IDF)$scope.getPlatform().getService(IDF.class))
+							((IDF)$scope.getServiceContainer().getService(IDF.class))
+								.createDFAgentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
 									.createDFServiceDescription("environment-service", "hunter-prey environment", "University of Hamburg",
 										new String[]{"nuggets_xml"}, new String[]{"hunterprey"}, new String[]{"fipa-request"}, null))
 						</value>

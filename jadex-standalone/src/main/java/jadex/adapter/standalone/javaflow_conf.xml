@@ -18,9 +18,6 @@
 				new java.util.Map[]{jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping()})
 		</property>
 		
-		<!-- Message types. -->
-		<property type="messagetype" name="fipa">new jadex.adapter.base.fipa.FIPAMessageType()</property>
-		
 		<!-- Kernels. -->
 		<propertiesref ref="kernel_v2_bdi"/>
 	 	<propertiesref ref="kernel_v2_micro"/>
@@ -53,6 +50,10 @@
 					new jadex.adapter.standalone.transport.localmtp.LocalTransport($platform),
 					new jadex.adapter.standalone.transport.tcpmtp.TCPTransport($platform, 9876),
 					new jadex.adapter.standalone.transport.niotcpmtp.NIOTCPTransport($platform, 8765)
+				},
+				new jadex.bridge.MessageType[]
+				{
+					new jadex.adapter.base.fipa.FIPAMessageType()
 				})
 			</property>
 			

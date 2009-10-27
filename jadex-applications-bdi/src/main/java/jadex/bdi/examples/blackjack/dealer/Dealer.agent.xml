@@ -87,7 +87,7 @@
 			want to track their players during the game, therefor a beliefset containing 
 			all manager-AIDs is needed.
 		 -->
-		<beliefset name="tracker" class="jadex.bridge.IAgentIdentifier"/>
+		<beliefset name="tracker" class="jadex.bridge.IComponentIdentifier"/>
 
 	</beliefs>
 	
@@ -526,8 +526,8 @@
 							     (see service description below).	-->
 							<!-- SFipa.createAgentDescription(null,
 								SFipa.createServiceDescription("dealing", "blackjack", "University of Hamburg"))-->
-							((IDF)$scope.getPlatform().getService(IDF.class))
-								.createDFAgentDescription(null, ((IDF)$scope.getPlatform().getService(IDF.class))
+							((IDF)$scope.getServiceContainer().getService(IDF.class))
+								.createDFAgentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
 								.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"))
 	
 						</value>

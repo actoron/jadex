@@ -71,7 +71,7 @@
 			<parameter name="iterate" class="Boolean" direction="out">
 				<goalmapping ref="cnpcap.icnp_nextround_info.iterate"/>
 			</parameter>
-			<parameterset name="participants" class="jadex.bridge.IAgentIdentifier" direction="inout">
+			<parameterset name="participants" class="jadex.bridge.IComponentIdentifier" direction="inout">
 				<goalmapping ref="cnpcap.icnp_nextround_info.participants"/>
 			</parameterset>
 			<parameterset name="proposals" class="ParticipantProposal">

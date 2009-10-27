@@ -21,9 +21,9 @@
 	</capabilities>
 
 	<beliefs>
-		<belief name="ping_receiver" class="IAgentIdentifier" exported="true">
+		<belief name="ping_receiver" class="IComponentIdentifier" exported="true">
 			<fact>
-				((IAMS)$scope.getPlatform().getService(IAMS.class))
+				((IAMS)$scope.getServiceContainer().getService(IAMS.class))
 					.createAgentIdentifier("Ping", true)
 			</fact>
 		</belief>
@@ -39,7 +39,7 @@
 					<parameter ref="receiver">
 						<value>
 							$beliefbase.ping_receiver
-							// ((IAMS)$scope.getPlatform().getService(IAMS.class))
+							// ((IAMS)$scope.getServiceContainer().getService(IAMS.class))
 							// .createAgentIdentifier("Ping", true)
 						</value>
 					</parameter>

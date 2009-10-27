@@ -79,7 +79,7 @@ public class LocalTransport implements ITransport
 		List todeliver = SCollection.createArrayList();
 		List undelivered = SCollection.createArrayList();
 		
-//		IAgentIdentifier[] recs = message.getReceivers();
+//		IComponentIdentifier[] recs = message.getReceivers();
 //		String hap = Configuration.getConfiguration().getProperty(Configuration.PLATFORMNAME);
 		
 		for(int i=0; i<recs.length; i++)

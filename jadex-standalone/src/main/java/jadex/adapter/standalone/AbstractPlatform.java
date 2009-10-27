@@ -322,12 +322,12 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 	{
 		try
 		{
-			Collection facts = getServices(IElementFactory.class);
+			Collection facts = getServices(IComponentFactory.class);
 			if(facts!=null)
 			{
 				for(Iterator it=facts.iterator(); it.hasNext(); )
 				{
-					IElementFactory fac = (IElementFactory)it.next();
+					IComponentFactory fac = (IComponentFactory)it.next();
 					
 					if(it instanceof IApplicationFactory)
 					{

@@ -349,7 +349,7 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 		
 		if(accept)
 		{
-			//IAgentIdentifier wina = (IAgentIdentifier)winner.getParameter(SFipa.SENDER).getValue();
+			//IComponentIdentifier wina = (IComponentIdentifier)winner.getParameter(SFipa.SENDER).getValue();
 			getLogger().info(getAgentName() + ": auction finished (winner: "
 				+winner.getName()+" - price: "+winning_offer+")");
 			

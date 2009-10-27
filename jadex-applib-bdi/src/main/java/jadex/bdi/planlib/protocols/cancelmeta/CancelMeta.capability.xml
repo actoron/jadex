@@ -62,7 +62,7 @@
 			<!-- The protocol of the interaction to be cancelled. -->
 			<parameter name="protocol" class="String"/>
 			<!-- The initiator agent for the cancel request. -->
-			<parameter name="initiator" class="jadex.bridge.IAgentIdentifier"/>
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier"/>
 			<!-- True, if the cancellation is ok. -->
 			<parameter name="result" class="Boolean" direction="out"/>
 			<!-- A failure reason when cancellation is not ok. -->

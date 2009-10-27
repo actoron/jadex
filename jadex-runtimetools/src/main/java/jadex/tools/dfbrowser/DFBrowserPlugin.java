@@ -276,7 +276,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 						//System.out.println(SUtil.arrayToString(nodes));
 						for(int i=0; i<nodes.length; i++)
 						{
-							IAMSAgentDescription desc = (IAMSAgentDescription)nodes[i].getUserObject();
+							IComponentDescription desc = (IComponentDescription)nodes[i].getUserObject();
 							if(desc.getName().getName().startsWith("df@"))
 							{
 								TreePath path = new TreePath(nodes[i].getPath());

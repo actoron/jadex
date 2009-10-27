@@ -13,7 +13,7 @@
 		<import>jadex.bdi.planlib.protocols.*</import>
 		<import>jadex.bdi.testcases.*</import>
 		<import>jadex.adapter.base.fipa.*</import>
-		<import>jadex.bridge.IAgentIdentifier</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
 		<import>jadex.commons.IFilter</import>
 	</imports>
 
@@ -30,7 +30,7 @@
 
 	<plans>
 		<plan name="decide_participation_plan">
-			<parameter name="initiator" class="IAgentIdentifier">
+			<parameter name="initiator" class="IComponentIdentifier">
 				<goalmapping ref="dacap.decide_participation.initiator" />
 			</parameter>
 			<parameter name="participate" class="Boolean" direction="out">

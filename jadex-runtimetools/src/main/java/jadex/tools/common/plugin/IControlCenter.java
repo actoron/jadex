@@ -42,19 +42,19 @@ public interface IControlCenter
 //	 *  Kill an agent on the platform.
 //	 *  Any errors will be displayed in a dialog to the user.
 //	 */
-//	public void killAgent(IAgentIdentifier name);
+//	public void killAgent(IComponentIdentifier name);
 //	
 //	/**
 //	 *  Suspend an agent on the platform.
 //	 *  Any errors will be displayed in a dialog to the user.
 //	 */
-//	public void suspendAgent(IAgentIdentifier name);
+//	public void suspendAgent(IComponentIdentifier name);
 //	
 //	/**
 //	 *  Resume an agent on the platform.
 //	 *  Any errors will be displayed in a dialog to the user.
 //	 */
-//	public void resumeAgent(IAgentIdentifier name);
+//	public void resumeAgent(IComponentIdentifier name);
 	
 	/**
 	 *  Set a text to be displayed in the status bar.

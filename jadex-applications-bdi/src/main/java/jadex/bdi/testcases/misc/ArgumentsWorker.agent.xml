@@ -11,12 +11,12 @@
 
 	<imports>
 		<import>jadex.bdi.testcases.*</import>
-		<import>jadex.bridge.IAgentIdentifier</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
 		<import>jadex.adapter.base.fipa.*</import>
 	</imports>
 
 	<beliefs>
-		<belief name="creator" class="IAgentIdentifier" exported="true"/>
+		<belief name="creator" class="IComponentIdentifier" exported="true"/>
 	</beliefs>
 
 	<plans>
@@ -37,7 +37,7 @@
 			<parameter name="reply_with" class="String">
 				<value>SFipa.createUniqueId($scope.getAgentName())</value>
 			</parameter>
-			<parameterset name="receivers" class="IAgentIdentifier">
+			<parameterset name="receivers" class="IComponentIdentifier">
 				<value>$beliefbase.creator</value>
 			</parameterset>
 		</messageevent>

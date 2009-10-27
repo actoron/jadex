@@ -130,12 +130,12 @@
 		<property name="fipa.servicedescription.service_dispatch_vision">
 			<!-- SFipa.createServiceDescription("service_dispatch_vision",
  				"dispatch vision", "University of Hamburg") -->
- 			((IDF)$scope.getPlatform().getService(IDF.class))
+ 			((IDF)$scope.getServiceContainer().getService(IDF.class))
 				.createDFServiceDescription("dispatch vision", "dispatch vision", "University of Hamburg")
 		</property>
 
 		<property name="fipa.agentdescription.environment">
-			((IDF)$scope.getPlatform().getService(IDF.class))
+			((IDF)$scope.getServiceContainer().getService(IDF.class))
 				.createDFAgentDescription(null, (IDFServiceDescription)$propertybase.getProperty("fipa.servicedescription.service_dispatch_vision"))
 		<!-- SFipa.createAgentDescription(null, (ServiceDescription)$propertybase.getProperty("fipa.servicedescription.service_dispatch_vision"))  -->	
 		</property>

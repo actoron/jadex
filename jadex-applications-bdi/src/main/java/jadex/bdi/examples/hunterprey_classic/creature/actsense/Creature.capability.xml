@@ -22,10 +22,10 @@
 
 	<beliefs>
 		<!-- The environment. -->
-		<belief name="environmentagent" class="jadex.bridge.IAgentIdentifier"/>
+		<belief name="environmentagent" class="jadex.bridge.IComponentIdentifier"/>
 
 		<!-- The df to search for the environment. -->
-		<belief name="df" class="jadex.bridge.IAgentIdentifier" exported="true">
+		<belief name="df" class="jadex.bridge.IComponentIdentifier" exported="true">
 		</belief>
 
 		<!-- The current vision. -->

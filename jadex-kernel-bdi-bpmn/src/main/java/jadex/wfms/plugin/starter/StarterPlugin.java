@@ -532,7 +532,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
 				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
-//					jcc.resumeAgent(((IAMSAgentDescription)node.getUserObject()).getName());
+//					jcc.resumeAgent(((IComponentDescription)node.getUserObject()).getName());
 					
 					// todo: resume process
 				}
@@ -569,7 +569,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
 				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
-//					jcc.killAgent(((IAMSAgentDescription)node.getUserObject()).getName());
+//					jcc.killAgent(((IComponentDescription)node.getUserObject()).getName());
 //					((IExecutionService)jcc.getServiceContainer().getService(IExecutionService.class)).killProcess();
 				
 					// todo: implement me
