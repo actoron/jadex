@@ -1,22 +1,16 @@
 package eis.jadex;
 
-import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.adapter.base.envsupport.environment.IEnvironmentListener;
-import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
 import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.fipa.IAMS;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
+import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IPlatform;
-import jadex.bridge.ISpace;
-import jadex.commons.SUtil;
-import jadex.commons.SimplePropertyObject;
 import jadex.commons.collection.MultiCollection;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -509,8 +503,8 @@ public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 	protected IComponentIdentifier convertStringToAgentIdentifier(String name)
 	{
 		IPlatform platform = ((IApplicationContext)space.getContext()).getPlatform();
-		IAMS ams = (IAMS)platform.getService(IAMS.class);
-		return ams.createAgentIdentifier(name, name.contains("@")? false: true);
+		IComponentExecutionService	ces	= (IComponentExecutionService)platform.getService(IComponentExecutionService.class);
+		return ces.createComponentIdentifier(name, name.contains("@")? false: true, null);
 	}
 	
 
