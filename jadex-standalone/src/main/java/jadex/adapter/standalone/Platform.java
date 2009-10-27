@@ -277,7 +277,7 @@ public class Platform extends AbstractPlatform
 			Property[] props = platconf.getProperties(DAEMONAGENT);
 			for(int i = 0; i < props.length; i++)
 			{
-				createElement(props[i].getName(), props[i].getValue(), null, null, true);
+				createComponent(props[i].getName(), props[i].getValue(), null, null, true);
 			}
 			Properties[] subprops = platconf.getSubproperties(DAEMONAGENT);
 			for(int i = 0; i < subprops.length; i++)
@@ -285,14 +285,14 @@ public class Platform extends AbstractPlatform
 				Map args = getArguments(subprops[i]);
 				Property model = subprops[i].getProperty(MODEL);
 				Property config = subprops[i].getProperty(CONFIG);
-				createElement(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, true);
+				createComponent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, true);
 			}
 	
 			// Create application agents.
 			props = platconf.getProperties(AGENT);
 			for(int i = 0; i < props.length; i++)
 			{
-				createElement(props[i].getName(), props[i].getValue(), null, null, false);
+				createComponent(props[i].getName(), props[i].getValue(), null, null, false);
 			}
 			subprops = platconf.getSubproperties(AGENT);
 			for(int i = 0; i < subprops.length; i++)
@@ -300,14 +300,14 @@ public class Platform extends AbstractPlatform
 				Map args = getArguments(subprops[i]);
 				Property model = subprops[i].getProperty(MODEL);
 				Property config = subprops[i].getProperty(CONFIG);
-				createElement(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, false);
+				createComponent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, false);
 			}
 			
 			// Create applications.
 			props = platconf.getProperties(APPLICATION);
 			for(int i = 0; i < props.length; i++)
 			{
-				createElement(props[i].getName(), props[i].getValue(), null, null, false);
+				createComponent(props[i].getName(), props[i].getValue(), null, null, false);
 			}
 			subprops = platconf.getSubproperties(APPLICATION);
 			for(int i = 0; i < subprops.length; i++)
@@ -315,7 +315,7 @@ public class Platform extends AbstractPlatform
 				Map args = getArguments(subprops[i]);
 				Property model = subprops[i].getProperty(MODEL);
 				Property config = subprops[i].getProperty(CONFIG);
-				createElement(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, false);
+				createComponent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, false);
 			}
 		}
 		

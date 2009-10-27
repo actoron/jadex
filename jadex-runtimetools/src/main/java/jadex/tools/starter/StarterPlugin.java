@@ -1002,7 +1002,5 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 				getJCC().displayError("Problem Starting Agent", "Agent could not be started.", exception);
 			}
 		}, null);
-		
-			
 	}
 }

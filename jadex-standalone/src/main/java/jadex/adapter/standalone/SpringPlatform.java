@@ -218,7 +218,7 @@ public class SpringPlatform extends AbstractPlatform
 					model = (String)args.remove("model");
 					config = (String)args.remove("config");
 				}
-				createElement(name, model, config, args, true);
+				createComponent(name, model, config, args, true);
 			}
 		}
 		
@@ -242,7 +242,7 @@ public class SpringPlatform extends AbstractPlatform
 					model = (String)args.remove("model");
 					config = (String)args.remove("config");
 				}
-				createElement(name, model, config, args, false);
+				createComponent(name, model, config, args, false);
 			}
 		}
 	}

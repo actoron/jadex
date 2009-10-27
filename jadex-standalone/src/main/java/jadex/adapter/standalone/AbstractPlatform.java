@@ -1,7 +1,7 @@
 package jadex.adapter.standalone;
 
-import jadex.adapter.base.SComponentExecutionService;
-import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
+import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IPlatform;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
@@ -295,19 +295,19 @@ public abstract class AbstractPlatform extends PropertyServiceContainer implemen
 	/**
 	 *  Create an agent.
 	 */
-	protected void createElement(String name, String model, String config, Map args, final boolean daemon)
+	protected void createComponent(String name, String model, String config, Map args, final boolean daemon)
 	{
-//		IAMS ams = (IAMS)getService(IAMS.class);
-		SComponentExecutionService.createComponent(this, name, model, config, args, new IResultListener()
+		final IComponentExecutionService	ces	= (IComponentExecutionService)getService(IComponentExecutionService.class);
+		ces.createComponent(name, model, config, args, new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
-				AgentIdentifier agent = (AgentIdentifier)result;
+				final IComponentIdentifier aid = (IComponentIdentifier)result;
 				if(daemon)
-					daemonagents.add(agent);
-				SComponentExecutionService.startComponent(AbstractPlatform.this, agent, null);
+					daemonagents.add(aid);
+				ces.startComponent(aid, null);
 			}
-
+			
 			public void exceptionOccurred(Exception exception)
 			{
 				System.err.println("Exception occurred: " + exception);
