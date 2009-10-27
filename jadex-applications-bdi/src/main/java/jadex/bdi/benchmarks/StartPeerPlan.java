@@ -1,9 +1,9 @@
 package jadex.bdi.benchmarks;
 
-import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.collection.SCollection;
 
@@ -159,11 +159,11 @@ public class StartPeerPlan extends Plan
 	 */
 	protected IComponentIdentifier serviceCreateAgent(String name, Map args)
 	{
-		final IAMS ams = (IAMS)getScope().getServiceContainer().getService(IAMS.class);
+		final IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
 		SyncResultListener lis = new SyncResultListener();
-		ams.createAgent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", null, args, lis, getAgentIdentifier());
+		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", null, args, lis, getAgentIdentifier());
 		IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
-		ams.startAgent(aid, null);
+		ces.startComponent(aid, null);
 		return aid;
 	}
 	
@@ -191,10 +191,10 @@ public class StartPeerPlan extends Plan
 	 */
 	protected void serviceDestroyAgent(String name)
 	{
-		final IAMS ams = (IAMS)getScope().getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE);
+		final IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
 		SyncResultListener lis = new SyncResultListener();
-		IComponentIdentifier aid = ams.createAgentIdentifier(name, true);
-		ams.destroyAgent(aid, lis);
+		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
+		ces.destroyComponent(aid, lis);
 		lis.waitForResult();
 	}
 	
@@ -205,8 +205,8 @@ public class StartPeerPlan extends Plan
 	 */
 	protected void capabilityDestroyAgent(String name)
 	{
-		final IAMS ams = (IAMS)getScope().getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE);
-		IComponentIdentifier aid = ams.createAgentIdentifier(name, true);
+		final IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
 		IGoal sp = createGoal("ams_destroy_agent");
 		sp.getParameter("agentidentifier").setValue(aid);
 		dispatchSubgoalAndWait(sp);

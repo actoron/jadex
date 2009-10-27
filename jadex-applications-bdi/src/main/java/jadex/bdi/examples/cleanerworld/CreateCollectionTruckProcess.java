@@ -1,22 +1,22 @@
 package jadex.bdi.examples.cleanerworld;
 
+import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
+import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.adapter.base.envsupport.environment.ISpaceProcess;
+import jadex.bdi.runtime.AgentEvent;
+import jadex.bdi.runtime.IAgentListener;
+import jadex.bdi.runtime.IExternalAccess;
+import jadex.bridge.IApplicationContext;
+import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentIdentifier;
+import jadex.commons.SimplePropertyObject;
+import jadex.commons.concurrent.IResultListener;
+import jadex.service.clock.IClockService;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.ISpaceProcess;
-import jadex.adapter.base.fipa.IAMS;
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IAgentListener;
-import jadex.bdi.runtime.IExternalAccess;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IApplicationContext;
-import jadex.commons.SimplePropertyObject;
-import jadex.commons.concurrent.IResultListener;
-import jadex.service.clock.IClockService;
 
 /**
  *  Process responsible for creating truck agents in response to full wastebins.
@@ -86,8 +86,8 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 					public void resultAvailable(Object result)
 					{
 						IComponentIdentifier truck = (IComponentIdentifier)result;
-						IAMS ams = (IAMS)app.getPlatform().getService(IAMS.class);
-						ams.getExternalAccess(truck, new IResultListener()
+						IComponentExecutionService ces = (IComponentExecutionService)app.getPlatform().getService(IComponentExecutionService.class);
+						ces.getExternalAccess(truck, new IResultListener()
 						{
 							public void exceptionOccurred(Exception exception)
 							{

@@ -95,7 +95,7 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 		if (agents != null && "ant".equals(event.getSpaceObject().getType())) {
 			for (int i = 0; i < agents.size(); i++) {
 				IComponentIdentifier agent = (IComponentIdentifier) agents.get(i);				
-				if (EnvironmentEvent.OBJECT_POSITION_CHANGED.equals(event.getType())) {
+				if(EnvironmentEvent.OBJECT_PROPERTY_CHANGED.equals(event.getType()) && Space2D.PROPERTY_POSITION.equals(event.getProperty())) {
 					IVector2 pos = (IVector2) event.getSpaceObject().getProperty(Space2D.PROPERTY_POSITION);
 					// IVector2 oldpos = (IVector2) event.getInfo();
 					ISpaceObject agentobj = event.getSpace().getAvatar(agent);

@@ -1,7 +1,6 @@
 package jadex.bdi.examples.blackjack.manager;
 
 import jadex.adapter.base.appdescriptor.ApplicationContext;
-import jadex.adapter.base.fipa.IAMS;
 import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.player.strategies.AbstractStrategy;
@@ -9,8 +8,9 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
+import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
 import jadex.commons.SGUI;
@@ -121,15 +121,15 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		dealerpan = new JPanel();
 		dealerpan.setBorder(BorderFactory.createTitledBorder(" Dealer "));
 		dealerpan.setBackground(Color.WHITE);
-		final IAMS ams = (IAMS)access.getServiceContainer().getService(IAMS.class);
-		dealeraid = ams.createAgentIdentifier(LOCAL_DEALER, true);
+		final IComponentExecutionService ces = (IComponentExecutionService)access.getServiceContainer().getService(IComponentExecutionService.class);
+		dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, true, null);
 		dealertf = new JTextField(20);
 		dealertf.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
-				IAMS ams = (IAMS)access.getServiceContainer().getService(IAMS.class);
-				dealeraid = ams.createAgentIdentifier(dealertf.getText(), false);
+				IComponentExecutionService ces = (IComponentExecutionService)access.getServiceContainer().getService(IComponentExecutionService.class);
+				dealeraid = ces.createComponentIdentifier(dealertf.getText(), false, null);
 //				dealeraid = new AgentIdentifier(dealertf.getText());
 				//dealertf.setText(dealeraid.getName());
 			}

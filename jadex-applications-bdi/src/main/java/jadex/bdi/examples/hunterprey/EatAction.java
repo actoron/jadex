@@ -1,13 +1,13 @@
 package jadex.bdi.examples.hunterprey;
 
-import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
+import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.fipa.IAMS;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
+import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.Map;
@@ -69,8 +69,8 @@ public class EatAction extends SimplePropertyObject implements ISpaceAction
 		if(target.getProperty(ISpaceObject.PROPERTY_OWNER)!=null)
 		{
 //			System.err.println("Destroying: "+target.getProperty(ISpaceObject.PROPERTY_OWNER));
-			IAMS	ams	= (IAMS)((IApplicationContext)space.getContext()).getPlatform().getService(IAMS.class);
-			ams.destroyAgent((IComponentIdentifier)target.getProperty(ISpaceObject.PROPERTY_OWNER), null);
+			IComponentExecutionService ces = (IComponentExecutionService)((IApplicationContext)space.getContext()).getPlatform().getService(IComponentExecutionService.class);
+			ces.destroyComponent((IComponentIdentifier)target.getProperty(ISpaceObject.PROPERTY_OWNER), null);
 		}
 		
 		avatar.setProperty(PROPERTY_POINTS, points);

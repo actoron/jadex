@@ -1,11 +1,11 @@
 package jadex.bdi.examples.garbagecollector_classic;
 
-import jadex.adapter.base.fipa.IAMS;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
+import jadex.bridge.IComponentExecutionService;
 import jadex.commons.SGUI;
 
 import java.awt.event.WindowAdapter;
@@ -50,8 +50,8 @@ public class EnvironmentGui	extends JFrame
 						try
 						{
 							IGoal kill = agent.createGoal("ams_destroy_agent");
-							IAMS ams = (IAMS)agent.getServiceContainer().getService(IAMS.class);
-							kill.getParameter("agentidentifier").setValue(ams.createAgentIdentifier(wobs[i].getName(), true));
+							IComponentExecutionService ces = (IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class);
+							kill.getParameter("agentidentifier").setValue(ces.createComponentIdentifier(wobs[i].getName(), true, null));
 //							kill.getParameter("agentidentifier").setValue(new AgentIdentifier(wobs[i].getName(), true));
 							agent.dispatchTopLevelGoalAndWait(kill);
 						}

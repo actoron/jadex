@@ -4,7 +4,7 @@ import jadex.adapter.base.ISimulationService;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IPlatform;
+import jadex.service.IServiceContainer;
 
 import java.awt.Color;
 import java.awt.GridLayout;
@@ -14,7 +14,6 @@ import java.util.Calendar;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 /**
  * This Plan is used to update the environment. Right now it is used as an observer to show observed values of agents / the application. 
@@ -81,8 +80,8 @@ public class UpdateEnvironmentPlan extends Plan {
 			dynamicSettingsPanel.add(new JLabel("Simulation End Time: " + String.valueOf(longToDateString(System.currentTimeMillis()))), 1);
 			
 			//Stop Siumlation when target condition true.
-			IPlatform platform = getExternalAccess().getServiceContainer();
-			ISimulationService simServ = (ISimulationService)platform.getService(ISimulationService.class);
+			IServiceContainer container = getExternalAccess().getServiceContainer();
+			ISimulationService simServ = (ISimulationService)container.getService(ISimulationService.class);
 			simServ.pause();
 		}
 
