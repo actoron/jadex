@@ -1,6 +1,5 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
@@ -9,6 +8,7 @@ import jadex.bdi.planlib.test.TestReport;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.collection.SCollection;
 
@@ -45,8 +45,9 @@ public class EndStatePlan extends Plan
 		// Check if worker agent has been correctly removed.
 		waitFor(1000);	// Hack!!! how to ensure that agent has time to remove itself?
 		IGoal	search	= createGoal("amscap.ams_search_agents");
-		IAMS ams = (IAMS)getScope().getServiceContainer().getService(IAMS.class);
-		search.getParameter("description").setValue(ams.createAMSAgentDescription(worker));
+		IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer()
+			.getService(IComponentExecutionService.class);
+		search.getParameter("description").setValue(ces.createComponentDescription(worker, null, null));
 		dispatchSubgoalAndWait(search);
 		TestReport	report	= new TestReport("termination", "Test if the worker agent has been terminated");
 		if(search.getParameterSet("result").getValues().length==0)
@@ -104,8 +105,8 @@ public class EndStatePlan extends Plan
 			else
 			{
 				// Check if deregister agent has been correctly removed.
-				search	= createGoal("amscap.ams_search_agents");
-				search.getParameter("description").setValue(ams.createAMSAgentDescription(deregister));
+				search = createGoal("amscap.ams_search_agents");
+				search.getParameter("description").setValue(ces.createComponentDescription(deregister, null, null));
 				dispatchSubgoalAndWait(search);
 				if(search.getParameterSet("result").getValues().length!=0)
 				{

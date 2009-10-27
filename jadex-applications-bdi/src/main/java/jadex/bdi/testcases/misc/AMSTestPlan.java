@@ -1,6 +1,5 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.planlib.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
@@ -8,6 +7,7 @@ import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
 
@@ -25,8 +25,8 @@ public class AMSTestPlan extends Plan
 	{
 		int num=1;
 		num = performTests(num, null); // test locally
-		IAMS ams = (IAMS)getScope().getServiceContainer().getService(IAMS.class);
-		IComponentIdentifier aa = ams.createAgentIdentifier(SFipa.AMS_AGENT, true);
+		IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+		IComponentIdentifier aa = ces.createComponentIdentifier(SFipa.AMS_AGENT, true, null);
 		performTests(num, aa); // test remotely
 	}
 
@@ -50,8 +50,8 @@ public class AMSTestPlan extends Plan
 		// Try to search the AMS.
 		TestReport tr = new TestReport("#"+num++, "Searching for all agents");
 		getLogger().info("\nSearching for all agents.");
-		IAMS amsservice = (IAMS)getScope().getServiceContainer().getService(IAMS.class);
-		IComponentDescription desc = amsservice.createAMSAgentDescription(null);
+		IComponentExecutionService amsservice = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+		IComponentDescription desc = amsservice.createComponentDescription(null, null, null);
 		ISearchConstraints constraints = amsservice.createSearchConstraints(-1, 0);
 		/*AMSAgentDescription	desc	= new AMSAgentDescription();
 		SearchConstraints	constraints	= new SearchConstraints();
@@ -106,7 +106,7 @@ public class AMSTestPlan extends Plan
 		{
 			getLogger().info("\nSearching for agent.");
 			
-			desc = amsservice.createAMSAgentDescription((IComponentIdentifier)create.getParameter("agentidentifier").getValue());
+			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("agentidentifier").getValue(), null, null);
 			constraints = amsservice.createSearchConstraints(-1, 0);
 		
 			/*desc	= new AMSAgentDescription();
@@ -209,7 +209,7 @@ public class AMSTestPlan extends Plan
 		{
 			getLogger().info("\nSearching for agent again.");
 			
-			desc = amsservice.createAMSAgentDescription((IComponentIdentifier)create.getParameter("agentidentifier").getValue());
+			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("agentidentifier").getValue(), null, null);
 			constraints = amsservice.createSearchConstraints(-1, 0);
 	
 			/*desc	= new AMSAgentDescription();

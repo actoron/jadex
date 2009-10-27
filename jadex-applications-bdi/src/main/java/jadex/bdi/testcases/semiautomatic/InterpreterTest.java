@@ -5,9 +5,7 @@ import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.OAVAgentModel;
 import jadex.bdi.interpreter.OAVBDIModelLoader;
 import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IAgentFactory;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IPlatform;
 import jadex.bridge.MessageType;
@@ -15,6 +13,8 @@ import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.ThreadPoolFactory;
+import jadex.service.BasicServiceContainer;
+import jadex.service.IServiceContainer;
 import jadex.service.clock.ClockService;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.SystemClock;
@@ -71,6 +71,10 @@ public class InterpreterTest
 			clock.start();
 			final Executor exe = new Executor(ThreadPoolFactory.createThreadPool());
 			final BDIInterpreter[]	interpreters	= new BDIInterpreter[1];
+			
+			final BasicServiceContainer container = new BasicServiceContainer();
+			container.addService(IClockService.class, "clock_service", clock);
+			
 			final BDIInterpreter interpreter = new BDIInterpreter(new IComponentAdapter()
 			{
 				public void	wakeup()
@@ -95,48 +99,10 @@ public class InterpreterTest
 						}
 					});
 				}
-	
-				public IPlatform getServiceContainer()
+				
+				public IServiceContainer getServiceContainer()
 				{
-					return new IPlatform()
-					{
-						public IApplicationFactory getApplicationFactory()
-						{
-							// TODO Auto-generated method stub
-							return null;
-						}
-						
-						public IAgentFactory getAgentFactory()
-						{
-							// TODO Auto-generated method stub
-							return null;
-						}
-						
-						public String getName()
-						{
-							return "test";
-						}
-						
-						public Collection getServices(Class type)
-						{
-							return type==IClockService.class ? Collections.singleton(clock) : null;
-						}
-						
-						public Object getService(Class type, String name)
-						{
-							return type==IClockService.class ? clock : null;
-						}
-						
-						public Object getService(Class type)
-						{
-							return type==IClockService.class ? clock : null;
-						}
-						
-						public MessageType getMessageType(String type)
-						{
-							return SFipa.FIPA_MESSAGE_TYPE.getName().equals(type)? SFipa.FIPA_MESSAGE_TYPE: null;
-						}
-					};
+					return container;
 				}
 	
 				public IComponentIdentifier getComponentIdentifier()

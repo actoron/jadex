@@ -1,10 +1,9 @@
 package jadex.bdi.testcases;
 
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.planlib.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.collection.SCollection;
 
@@ -65,11 +64,11 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //				agents.add(ca.getParameter("agentidentifier").getValue());
 				
 				SyncResultListener	listener	= new SyncResultListener();
-				IAMS ams = (IAMS)getScope().getServiceContainer().getService(IAMS.class);
-				ams.createAgent(null, type, config, args[i], listener, getAgentIdentifier());
+				IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+				ces.createComponent(null, type, config, args[i], listener, getAgentIdentifier());
 				IComponentIdentifier aid = (IComponentIdentifier)listener.waitForResult();
 				listener = new SyncResultListener();	// Hack!!! Allow reuse of result listener?
-				ams.startAgent(aid, listener);
+				ces.startComponent(aid, listener);
 				listener.waitForResult();
 				agents.add(aid);
 			}
@@ -100,8 +99,8 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //				dispatchSubgoalAndWait(da);
 				
 				SyncResultListener	listener	= new SyncResultListener();
-				IAMS	ams	= (IAMS)getScope().getServiceContainer().getService(IAMS.class, SFipa.AMS_SERVICE);
-				ams.destroyAgent((IComponentIdentifier)agents.get(i), listener);
+				IComponentExecutionService ces	= (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+				ces.destroyComponent((IComponentIdentifier)agents.get(i), listener);
 				IComponentIdentifier	aid	= (IComponentIdentifier)listener.waitForResult();
 			}
 			catch(GoalFailureException e)

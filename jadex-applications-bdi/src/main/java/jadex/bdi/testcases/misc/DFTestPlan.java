@@ -1,6 +1,5 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
@@ -11,6 +10,7 @@ import jadex.bdi.runtime.IEvent;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 
@@ -33,8 +33,8 @@ public class DFTestPlan extends Plan
 		num	= performInitialTests(num);
 		num = performTests(num, null); // test locally
 		
-		IAMS ams = (IAMS)getScope().getServiceContainer().getService(IAMS.class);
-		IComponentIdentifier da = ams.createAgentIdentifier(SFipa.DF_AGENT, true);
+		IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+		IComponentIdentifier da = ces.createComponentIdentifier(SFipa.DF_AGENT, true, null);
 		performTests(num, da); // test remotely
 	}
 	
