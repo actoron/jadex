@@ -24,7 +24,7 @@
 		<belief name="ping_receiver" class="IComponentIdentifier" exported="true">
 			<fact>
 				((IComponentExecutionService)$scope.getServiceContainer().getService(IComponentExecutionService.class))
-					.createComponentIdentifier("Ping", true)
+					.createComponentIdentifier("Ping", true, null)
 			</fact>
 		</belief>
 		<beliefref name="ping_delay" exported="true">
