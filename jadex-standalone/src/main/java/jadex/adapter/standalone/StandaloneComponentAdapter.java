@@ -220,7 +220,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public void killAgent(IResultListener listener)
 	{
-		System.out.println("killAgent: "+listener);
+//		System.out.println("killAgent: "+listener);
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
 			throw new AgentTerminatedException(cid.getName());
 

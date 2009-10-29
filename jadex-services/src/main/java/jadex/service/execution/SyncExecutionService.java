@@ -168,7 +168,7 @@ public class SyncExecutionService	implements	IExecutionService
 		synchronized(this)
 		{
 //			System.out.println("Task added: "+task);
-//			Thread.dumpStack();
+//			new RuntimeException().printStackTrace(System.out);
 			added = queue.add(task);
 		}
 		

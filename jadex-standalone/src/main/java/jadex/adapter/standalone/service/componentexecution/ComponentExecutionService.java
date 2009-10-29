@@ -250,7 +250,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 		{
 			synchronized(descs)
 			{
-				System.out.println("killing: "+cid);
+//				System.out.println("killing: "+cid);
 				
 				StandaloneComponentAdapter agent = (StandaloneComponentAdapter)adapters.get(cid);
 				if(agent==null)
@@ -279,14 +279,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 //						if(listeners.get(aid)!=null)
 //							throw new RuntimeException("Multiple result listeners for agent: "+aid);
 //						listeners.put(aid, listener);
-						try
-						{
-							agent.killAgent(new CleanupCommand(cid, listener));
-						}
-						catch(Throwable t)
-						{
-							t.printStackTrace();
-						}
+						agent.killAgent(new CleanupCommand(cid, listener));
 					}
 					else
 					{
@@ -402,20 +395,20 @@ public class ComponentExecutionService implements IComponentExecutionService
 		
 		public CleanupCommand(IComponentIdentifier cid, IResultListener listener)
 		{
-			System.out.println("CleanupCommand created");
+//			System.out.println("CleanupCommand created");
 			this.cid = cid;
 			this.listener = listener;
 		}
 		
 		public void resultAvailable(Object result)
 		{
-			System.out.println("CleanupCommand: "+result);
+//			System.out.println("CleanupCommand: "+result);
 			IComponentDescription ad = (IComponentDescription)descs.get(cid);
 			synchronized(adapters)
 			{
 				synchronized(descs)
 				{
-					System.out.println("remove called for: "+cid);
+//					System.out.println("remove called for: "+cid);
 					StandaloneComponentAdapter	adapter	= (StandaloneComponentAdapter)adapters.remove(cid);
 					if(adapter==null)
 						throw new RuntimeException("Component Identifier not registered: "+cid);
@@ -456,7 +449,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 				}
 			}
 			
-			System.out.println("CleanupCommand end.");
+//			System.out.println("CleanupCommand end.");
 			
 			if(listener!=null)
 				listener.resultAvailable(result);

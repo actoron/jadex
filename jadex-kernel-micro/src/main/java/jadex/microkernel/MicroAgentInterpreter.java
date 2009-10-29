@@ -212,11 +212,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 					});
 					
 					ext_forbidden = true;
-					adapter.wakeup();
 				}
 			}
 		});
-		adapter.wakeup();
 	}
 	
 	/**
