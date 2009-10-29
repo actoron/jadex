@@ -27,7 +27,7 @@ public class MoveToLocationPlan extends Plan
 		SyncResultListener	res	= new SyncResultListener();
 		Map props = new HashMap();
 		props.put(MoveTask.PROPERTY_DESTINATION, dest);
-		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(this));
+		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 		Object	taskid = space.createObjectTask(MoveTask.PROPERTY_TYPENAME, props, myself.getId());
 		space.addTaskListener(taskid, myself.getId(), res);
 		

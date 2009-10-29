@@ -15,7 +15,6 @@ import jadex.wfms.service.definition.IProcessDefinitionService;
 import jadex.wfms.service.definition.ProcessDefinitionConnector;
 import jadex.wfms.service.execution.BpmnExecutionService;
 import jadex.wfms.service.execution.GpmnExecutionService;
-import jadex.wfms.service.execution.IExecutionService;
 import jadex.wfms.service.execution.MetaExecutionService;
 import jadex.wfms.service.repository.BasicModelRepositoryService;
 import jadex.wfms.service.repository.IModelRepositoryService;

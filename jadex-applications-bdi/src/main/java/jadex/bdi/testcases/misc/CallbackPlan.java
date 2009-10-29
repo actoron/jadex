@@ -334,7 +334,7 @@ public class CallbackPlan extends Plan
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr15);
 		
 		final TestReport tr14 = new TestReport("#14", "Test if plan removed (on this plan) can be observed in a listener.");
-		addPlanListener(new IPlanListener()
+		getPlanElement().addPlanListener(new IPlanListener()
 		{
 			public void planAdded(AgentEvent ae)
 			{
@@ -345,7 +345,7 @@ public class CallbackPlan extends Plan
 				getExternalAccess().getLogger().info("Plan removed");
 				tr14.setSucceeded(true);
 				getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(tr14);
-				CallbackPlan.this.removePlanListener(this);
+				getPlanElement().removePlanListener(this);
 			}
 		});
 			

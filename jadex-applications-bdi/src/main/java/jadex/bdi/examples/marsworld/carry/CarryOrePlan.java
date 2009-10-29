@@ -43,7 +43,7 @@ public class CarryOrePlan extends Plan
 			Map props = new HashMap();
 			props.put(LoadOreTask.PROPERTY_TARGET, target);
 			props.put(LoadOreTask.PROPERTY_LOAD, Boolean.TRUE);
-			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(this));
+			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 			Object	taskid	= env.createObjectTask(LoadOreTask.PROPERTY_TYPENAME, props, myself.getId());
 			env.addTaskListener(taskid, myself.getId(), res);
 			
@@ -65,7 +65,7 @@ public class CarryOrePlan extends Plan
 			props = new HashMap();
 			props.put(LoadOreTask.PROPERTY_TARGET, homebase);
 			props.put(LoadOreTask.PROPERTY_LOAD, Boolean.FALSE);
-			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(this));
+			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 			taskid	= env.createObjectTask(LoadOreTask.PROPERTY_TYPENAME, props, myself.getId());
 			env.addTaskListener(taskid, myself.getId(), res);
 //			myself.addTask(new LoadOreTask(homebase, false, res));

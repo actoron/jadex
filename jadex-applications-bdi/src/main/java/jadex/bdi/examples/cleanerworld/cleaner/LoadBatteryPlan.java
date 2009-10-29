@@ -46,7 +46,7 @@ public class LoadBatteryPlan extends Plan
 			SyncResultListener	res	= new SyncResultListener();
 			Map props = new HashMap();
 			props.put(LoadBatteryTask.PROPERTY_TARGET, station);
-			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(this));
+			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
 			ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 			Object taskid = space.createObjectTask(LoadBatteryTask.PROPERTY_TYPENAME, props, myself.getId());

@@ -131,23 +131,13 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	}
 	
 	/**
-	 *  Add a goal listener.
-	 *  @param listener The goal listener.
+	 *  Get the plan element (i.e. an object implementing the IPlan interface
+	 *  that may be accessed from outside the plan body as well).
+	 *  @return	The plan element.
 	 */
-	public void addPlanListener(IPlanListener listener)
+	public IPlan	getPlanElement()
 	{
-		IPlan plan = PlanFlyweight.getPlanFlyweight(getState(), getRCapability(), getRPlan());
-		plan.addPlanListener(listener);		
-	}
-	
-	/**
-	 *  Remove a goal listener.
-	 *  @param listener The goal listener.
-	 */
-	public void removePlanListener(IPlanListener listener)
-	{
-		IPlan plan = PlanFlyweight.getPlanFlyweight(getState(), getRCapability(), getRPlan());
-		plan.removePlanListener(listener);		
+		return PlanFlyweight.getPlanFlyweight(getState(), getRCapability(), getRPlan());
 	}
 	
 	/**
@@ -879,7 +869,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 *  @return The plan instance info.
 	 */
 	// todo: make package access
-	public Object getRPlan()
+	protected Object getRPlan()
 	{
 		return rplan;
 	}

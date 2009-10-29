@@ -26,7 +26,7 @@ public class MoveToLocationPlan extends Plan
 		Map props = new HashMap();
 		props.put(MoveTask.PROPERTY_DESTINATION, dest);
 		props.put(MoveTask.PROPERTY_SCOPE, getScope().getExternalAccess());
-		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(this));
+		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 		IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
 		Object taskid = space.createObjectTask(MoveTask.PROPERTY_TYPENAME, props, myself.getId());
 //		move	= new MoveTask(dest, res, getExternalAccess());
