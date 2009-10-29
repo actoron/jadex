@@ -17,8 +17,7 @@ import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
-import jadex.tools.common.AgentTreeTable;
-import jadex.tools.common.ApplicationTreeTable;
+import jadex.tools.common.ComponentTreeTable;
 import jadex.tools.common.IMenuItemConstructor;
 import jadex.tools.common.PopupBuilder;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
@@ -28,7 +27,6 @@ import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;
 import jadex.tools.common.modeltree.ModelExplorerTreeModel;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
-import jadex.tools.common.plugin.IAgentListListener;
 
 import java.awt.Component;
 import java.awt.Cursor;
@@ -63,7 +61,7 @@ import javax.swing.tree.TreePath;
 /**
  *  The starter plugin.
  */
-public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListener
+public class StarterPlugin extends AbstractJCCPlugin
 {
 	//-------- constants --------
 
@@ -72,50 +70,16 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	 */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"resume_agent", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_big.png"),
-		"suspend_agent", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_szzz_big.png"),
-		"kill_agent", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_killagent.png"),
+		"resume_component", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_big.png"),
+		"suspend_component", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_szzz_big.png"),
+		"kill_component", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_killagent.png"),
 		"kill_platform", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_killplatform.png"),
 		"starter", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_starter.png"),
 		"starter_sel", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_starter_sel.png"),
-		"start_agent",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/start.png"),
-		"agent_suspended", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_szzz.png"),
+		"start_component",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/start.png"),
+		"component_suspended", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_szzz.png"),
 		"checking_menu",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_broken.png")
 	});
-
-	/*
-	protected static final java.io.FileFilter ADF_FILTER = new FileFilter()
-	{
-		public boolean accept(File pathname)
-		{
-			return pathname.isDirectory() || isJadexFilename(pathname.getName());
-		}
-	};
-	
-	protected static final java.io.FileFilter AGENT_FILTER = new FileFilter()
-	{
-		public boolean accept(File pathname)
-		{
-			return pathname.isDirectory() || isAgentFilename(pathname.getName());
-		}
-	};
-	
-	protected static final java.io.FileFilter CAPABILITY_FILTER = new FileFilter()
-	{
-		public boolean accept(File pathname)
-		{
-			return pathname.isDirectory() || isCapabilityFilename(pathname.getName());
-		}
-	};
-	
-	protected static final java.io.FileFilter JAVAAGENT_FILTER = new FileFilter()
-	{
-		public boolean accept(File pathname)
-		{
-			return pathname.isDirectory() || pathname.getName().endsWith("Agent.class");
-		}
-	};
-	*/
 
 	//-------- attributes --------
 
@@ -125,14 +89,14 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	/** The panel showing the classpath models. */
 	private ModelExplorer mpanel;
 
-	/** The menu item for enabling/disabling agent model checking. */
+	/** The menu item for enabling/disabling component model checking. */
 	private JCheckBoxMenuItem	checkingmenu;
 	
-	/** The agent instances in a tree. */
-	private AgentTreeTable agents;
+	/** The component instances in a tree. */
+	private ComponentTreeTable components;
 	
 	/** The application instances in a tree. */
-	private ApplicationTreeTable applications;
+	private ComponentTreeTable applications;
 
 	/** A split panel. */
 	private JSplitPane lsplit;
@@ -197,7 +161,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		separator.setOrientation(JSeparator.VERTICAL);
 		bar.add(separator);*/
 		
-		b = new JButton(KILL_AGENT);
+		b = new JButton(KILL_COMPONENT);
 		b.setBorder(null);
 		b.setToolTipText(b.getText());
 		b.setText(null);
@@ -254,7 +218,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 //				}
 //			}
 //		});
-		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{new StartAgentMenuItemConstructor(), mpanel.ADD_PATH,
+		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{new StartComponentMenuItemConstructor(), mpanel.ADD_PATH,
 			mpanel.REMOVE_PATH, mpanel.REFRESH}));
 		mpanel.addTreeSelectionListener(new TreeSelectionListener()
 		{
@@ -267,9 +231,9 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 					// An example to facilitate understanding:
 					// root
 					//  +-classes1
-					//  |  +- MyAgent.agent.xml
+					//  |  +- MyAgent.component.xml
 					//  +-classes2
-					//  |  +- MyAgent.agent.xml
+					//  |  +- MyAgent.component.xml
 
 					String model = ((FileNode)node).getRelativePath();
 //					if(getJCC().getAgent().getPlatform().getAgentFactory().isLoadable(model))
@@ -309,12 +273,12 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
   		};
   		mpanel.addMouseListener(ml);
 
-		agents = new AgentTreeTable(((IServiceContainer)getJCC().getServiceContainer()).getName());
-		agents.setMinimumSize(new Dimension(0, 0));
-		agents.getTreetable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		components = new ComponentTreeTable(((IServiceContainer)getJCC().getServiceContainer()).getName());
+		components.setMinimumSize(new Dimension(0, 0));
+		components.getTreetable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		
-		// Change agent node type to enable suspended icon for agents. 
-		agents.addNodeType(new TreeTableNodeType(AgentTreeTable.NODE_AGENT, 
+		// Change component node type to enable suspended icon for components. 
+		components.addNodeType(new TreeTableNodeType(ComponentTreeTable.NODE_COMPONENT, 
 			new Icon[0], new String[]{"name", "address"}, new String[]{"Name", "Address"})
 		{
 			public Icon selectIcon(Object value)
@@ -323,28 +287,28 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 				IComponentDescription ad = (IComponentDescription)((DefaultTreeTableNode)value).getUserObject();
 				if(IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
 				{
-					ret = StarterPlugin.icons.getIcon("agent_suspended");
+					ret = StarterPlugin.icons.getIcon("component_suspended");
 				}
 				else
 				{
-					ret	= AgentTreeTable.icons.getIcon(AgentTreeTable.NODE_AGENT);
+					ret	= ComponentTreeTable.icons.getIcon(ComponentTreeTable.NODE_COMPONENT);
 				}
 				//System.out.println(value+" "+ad.getState());
 				return ret;
 			}
 		});
-		agents.getNodeType(AgentTreeTable.NODE_AGENT).addPopupAction(KILL_AGENT);
-		agents.getNodeType(AgentTreeTable.NODE_AGENT).addPopupAction(SUSPEND_AGENT);
-		agents.getNodeType(AgentTreeTable.NODE_AGENT).addPopupAction(RESUME_AGENT);
-		agents.getNodeType(AgentTreeTable.NODE_PLATFORM).addPopupAction(KILL_PLATFORM);
-		agents.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
+		components.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(KILL_COMPONENT);
+		components.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(SUSPEND_COMPONENT);
+		components.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(RESUME_COMPONENT);
+		components.getNodeType(ComponentTreeTable.NODE_CONTAINER).addPopupAction(KILL_PLATFORM);
+		components.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
 		
-		applications = new ApplicationTreeTable(((IServiceContainer)getJCC().getServiceContainer()).getName());
+		applications = new ComponentTreeTable(((IServiceContainer)getJCC().getServiceContainer()).getName());
 		applications.setMinimumSize(new Dimension(0, 0));
 		applications.getTreetable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		
-		applications.getNodeType(ApplicationTreeTable.NODE_APPLICATION).addPopupAction(KILL_APPLICATION);
-		applications.getNodeType(AgentTreeTable.NODE_PLATFORM).addPopupAction(KILL_PLATFORM);
+		applications.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(KILL_APPLICATION);
+		applications.getNodeType(ComponentTreeTable.NODE_CONTAINER).addPopupAction(KILL_PLATFORM);
 		applications.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
 		applications.setColumnWidths(new int[]{200});
 		
@@ -361,7 +325,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 						{
 							public void run()
 							{
-								applications.addApplication((IApplicationContext)event.getValue());
+								applications.addComponent((IApplicationContext)event.getValue());
 							}
 						});
 					}
@@ -372,7 +336,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 							public void run()
 							{
 	//							System.out.println("Remove elem: "+event.getValue());
-								applications.removeApplication((IApplicationContext)event.getValue());
+								applications.removeComponent((IApplicationContext)event.getValue());
 							}
 						});
 					}
@@ -381,7 +345,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		}
 		
 		JTabbedPane tp = new JTabbedPane();
-		tp.addTab("agents", agents);
+		tp.addTab("components", components);
 		tp.addTab("applications", applications);
 		
 		lsplit.add(new JScrollPane(mpanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -405,7 +369,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 			{
 				IComponentDescription[] res = (IComponentDescription[])result;
 				for(int i=0; i<res.length; i++)
-					agentBorn(res[i]);
+					componentBorn(res[i]);
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -416,12 +380,12 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		{
 			public void componentRemoved(IComponentDescription desc)
 			{
-				agentDied(desc);
+				componentDied(desc);
 			}
 			
 			public void componentAdded(IComponentDescription desc)
 			{
-				agentBorn(desc);
+				componentBorn(desc);
 			}
 		});
 
@@ -429,7 +393,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 //		{
 //			public void run()
 //			{
-//				agents.adjustColumnWidths();
+//				components.adjustColumnWidths();
 //			}
 //		});
 
@@ -464,9 +428,9 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 
 		checkingmenu.setSelected(props.getBooleanProperty("checking"));
 		
-		Properties ps = props.getSubproperty("agents");
+		Properties ps = props.getSubproperty("components");
 		if(ps!=null)
-			agents.setProperties(ps);
+			components.setProperties(ps);
 	}
 
 	/**
@@ -485,7 +449,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		
 		props.addProperty(new Property("checking", ""+checkingmenu.isSelected()));
 
-		addSubproperties(props, "agents", agents.getProperties());
+		addSubproperties(props, "components", components.getProperties());
 		
 		return props;
 	}
@@ -553,7 +517,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	}
 
 	/**
-	 *  Called when the agent is closed.
+	 *  Called when the component is closed.
 	 */
 	public void	shutdown()
 	{
@@ -561,13 +525,13 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	}
 
 	/**
-	 *  Action for suspending an agent.
+	 *  Action for suspending an component.
 	 */
-	final AbstractAction SUSPEND_AGENT = new AbstractAction("Suspend agent", icons.getIcon("suspend_agent"))
+	final AbstractAction SUSPEND_COMPONENT = new AbstractAction("Suspend component", icons.getIcon("suspend_component"))
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			TreePath[] paths = agents.getTreetable().getTree().getSelectionPaths();
+			TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
 			for(int i=0; paths!=null && i<paths.length; i++) 
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
@@ -578,11 +542,11 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 					{
 						public void resultAvailable(Object result)
 						{
-							getJCC().setStatusText("Suspended agent: " + result);
+							getJCC().setStatusText("Suspended component: " + result);
 						}						
 						public void exceptionOccurred(Exception exception)
 						{
-							getJCC().displayError("Problem Suspending Agent", "Agent could not be suspended.", exception);
+							getJCC().displayError("Problem Suspending Component", "Component could not be suspended.", exception);
 						}
 					});
 				}
@@ -591,7 +555,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 
 		public boolean isEnabled()
 		{
-			TreePath[] paths = agents.getTreetable().getTree().getSelectionPaths();
+			TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
 			boolean ret = paths!=null;
 			for(int i=0; ret && paths!=null && i<paths.length; i++) 
 			{
@@ -607,13 +571,13 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	};
 	
 	/**
-	 *  Action for resuming an agent.
+	 *  Action for resuming an component.
 	 */
-	final AbstractAction RESUME_AGENT = new AbstractAction("Resume agent", icons.getIcon("resume_agent"))
+	final AbstractAction RESUME_COMPONENT = new AbstractAction("Resume component", icons.getIcon("resume_component"))
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			TreePath[] paths = agents.getTreetable().getTree().getSelectionPaths();
+			TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
 			for(int i=0; paths!=null && i<paths.length; i++)
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
@@ -624,11 +588,11 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 					{
 						public void resultAvailable(Object result)
 						{
-							getJCC().setStatusText("Resumed agent: " + result);
+							getJCC().setStatusText("Resumed component: " + result);
 						}						
 						public void exceptionOccurred(Exception exception)
 						{
-							getJCC().displayError("Problem Resuming Agent", "Agent could not be resumed.", exception);
+							getJCC().displayError("Problem Resuming Component", "Component could not be resumed.", exception);
 						}
 					});
 				}
@@ -637,7 +601,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 		
 		public boolean isEnabled()
 		{
-			TreePath[] paths = agents.getTreetable().getTree().getSelectionPaths();
+			TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
 			boolean ret = paths!=null;
 			for(int i=0; ret && paths!=null && i<paths.length; i++) 
 			{
@@ -653,13 +617,13 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	};
 	
 	/**
-	 *  Action for killing an agent.
+	 *  Action for killing an component.
 	 */
-	final AbstractAction KILL_AGENT = new AbstractAction("Kill agent", icons.getIcon("kill_agent"))
+	final AbstractAction KILL_COMPONENT = new AbstractAction("Kill component", icons.getIcon("kill_component"))
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			TreePath[] paths = agents.getTreetable().getTree().getSelectionPaths();
+			TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
 			for(int i=0; paths!=null && i<paths.length; i++) 
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
@@ -670,11 +634,11 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 					{
 						public void resultAvailable(Object result)
 						{
-							getJCC().setStatusText("Killed agent: " + result);
+							getJCC().setStatusText("Killed component: " + result);
 						}						
 						public void exceptionOccurred(Exception exception)
 						{
-							getJCC().displayError("Problem Killing Agent", "Agent could not be killed.", exception);
+							getJCC().displayError("Problem Killing Component", "Component could not be killed.", exception);
 						}
 					});
 				}
@@ -685,7 +649,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	/**
 	 *  Action for killing an application.
 	 */
-	final AbstractAction KILL_APPLICATION = new AbstractAction("Kill application", icons.getIcon("kill_agent"))
+	final AbstractAction KILL_APPLICATION = new AbstractAction("Kill application", icons.getIcon("kill_component"))
 	{
 		public void actionPerformed(ActionEvent e)
 		{
@@ -756,49 +720,49 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	};
 
 	/**
-	 *  Called when an agent has died.
-	 *  @param ad The agent description.
+	 *  Called when an component has died.
+	 *  @param ad The component description.
 	 */
-	public void agentDied(final IComponentDescription ad)
+	public void componentDied(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				agents.removeAgent(ad);
+				components.removeComponent(ad);
 			}
 		});
 	}
 
 	/**
-	 *  Called when an agent is born.
-	 *  @param ad the agent description.
+	 *  Called when an component is born.
+	 *  @param ad the component description.
 	 */
-	public void agentBorn(final IComponentDescription ad)
+	public void componentBorn(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				agents.addAgent(ad);
+				components.addComponent(ad);
 			}
 		});
 	}
 	
 	/**
-	 *  Called when an agent changed.
-	 *  @param ad the agent description.
+	 *  Called when an component changed.
+	 *  @param ad the component description.
 	 */
-	public void agentChanged(final IComponentDescription ad)
+	public void componentChanged(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				agents.updateAgent(ad);
+				components.updateComponent(ad);
 			}
 		});
 	}
@@ -815,9 +779,9 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	//-------- starter specific tree actions --------
 
 	/**
-	 *  Dynamically create a new menu item structure for starting agents.
+	 *  Dynamically create a new menu item structure for starting components.
 	 */
-	class StartAgentMenuItemConstructor implements IMenuItemConstructor
+	class StartComponentMenuItemConstructor implements IMenuItemConstructor
 	{
 		/**
 		 *  Get or create a new menu item (struture).
@@ -837,7 +801,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 					{
 						try
 						{
-//							IAgentFactory agentfactory = getJCC().getAgent().getPlatform().getAgentFactory();
+//							IAgentFactory componentfactory = getJCC().getAgent().getPlatform().getAgentFactory();
 							ILoadableComponentModel model = SComponentFactory.loadModel(getJCC().getServiceContainer(), type);
 							String[] inistates = model.getConfigurations();
 //							IMBDIAgent model = SXML.loadAgentModel(type, null);
@@ -845,8 +809,8 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 							
 							if(inistates.length>1)
 							{
-								JMenu re = new JMenu("Start Agent");
-								re.setIcon(icons.getIcon("start_agent"));
+								JMenu re = new JMenu("Start Component");
+								re.setIcon(icons.getIcon("start_component"));
 								for(int i=0; i<inistates.length; i++)
 								{
 									final String config = inistates[i];
@@ -863,21 +827,21 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 
 								}
 								ret = re;
-								ret.setToolTipText("Start agent in selectable configuration");
+								ret.setToolTipText("Start component in selectable configuration");
 							}
 							else
 							{
 								if(inistates.length==1)
 								{
-									ret = new JMenuItem("Start Agent ("+inistates[0]+")");
-									ret.setToolTipText("Start agent in configuration:"+inistates[0]);
+									ret = new JMenuItem("Start Component ("+inistates[0]+")");
+									ret.setToolTipText("Start component in configuration:"+inistates[0]);
 								}
 								else
 								{
-									ret = new JMenuItem("Start Agent");
-									ret.setToolTipText("Start agent without explicit initial state");
+									ret = new JMenuItem("Start Component");
+									ret.setToolTipText("Start component without explicit initial state");
 								}
-								ret.setIcon(icons.getIcon("start_agent"));
+								ret.setIcon(icons.getIcon("start_component"));
 								ret.addActionListener(new ActionListener()
 								{
 									public void actionPerformed(ActionEvent e)
@@ -910,7 +874,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 			{
 				String type = ((FileNode)node).getFile().getAbsolutePath();
 				// todo: fix me
-				if(type.endsWith(".agent.xml"))
+				if(type.endsWith(".component.xml"))
 //				if(SXML.isAgentFilename(type))
 					ret = true;
 			}
@@ -932,8 +896,8 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	
 	//-------- constants --------
 
-	/** The Jadex agent extension. * /
-	public static final String FILE_EXTENSION_AGENT = ".agent.xml";
+	/** The Jadex component extension. * /
+	public static final String FILE_EXTENSION_COMPONENT = ".component.xml";
 
 	/** The Jadex capability extension. * /
 	public static final String FILE_EXTENSION_CAPABILITY = ".capability.xml";
@@ -945,19 +909,19 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 	 * /
 	public static boolean isJadexFilename(String filename)
 	{
-		return filename!=null && (filename.toLowerCase().endsWith(FILE_EXTENSION_AGENT)
+		return filename!=null && (filename.toLowerCase().endsWith(FILE_EXTENSION_COMPONENT)
 			|| filename.toLowerCase().endsWith(FILE_EXTENSION_CAPABILITY)
-			|| filename.toLowerCase().endsWith("agent.class"));
+			|| filename.toLowerCase().endsWith("component.class"));
 	}
 
 	/**
-	 *  Test if a file is an agent file.
+	 *  Test if a file is an component file.
 	 *  @param filename The filename.
-	 *  @return True, if it is an agent file.
+	 *  @return True, if it is an component file.
 	 * /
 	public static boolean isAgentFilename(String filename)
 	{
-		return filename!=null && filename.toLowerCase().endsWith(FILE_EXTENSION_AGENT);
+		return filename!=null && filename.toLowerCase().endsWith(FILE_EXTENSION_COMPONENT);
 	}
 
 	/**
@@ -972,7 +936,7 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 
 
 	/**
-	 *  Create a new agent on the platform.
+	 *  Create a new component on the platform.
 	 *  Any errors will be displayed in a dialog to the user.
 	 */
 	public void createComponent(String type, String name, String configname, Map arguments)
@@ -987,19 +951,19 @@ public class StarterPlugin extends AbstractJCCPlugin implements  IAgentListListe
 				{
 					public void resultAvailable(Object result)
 					{
-						getJCC().setStatusText("Started agent: " + aid.getLocalName());
+						getJCC().setStatusText("Started component: " + aid.getLocalName());
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						getJCC().displayError("Problem Starting Agent", "Agent could not be started.", exception);
+						getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
 					}
 				});
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				getJCC().displayError("Problem Starting Agent", "Agent could not be started.", exception);
+				getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
 			}
 		}, null);
 	}

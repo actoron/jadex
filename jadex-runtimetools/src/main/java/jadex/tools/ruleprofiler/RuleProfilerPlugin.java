@@ -5,13 +5,12 @@ import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentListener;
 import jadex.commons.SGUI;
 import jadex.service.IServiceContainer;
-import jadex.tools.common.AgentTreeTable;
+import jadex.tools.common.ComponentTreeTable;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.ObjectCardLayout;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.jtreetable.TreeTableNodeType;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
-import jadex.tools.common.plugin.IAgentListListener;
 import jadex.tools.jcc.AgentControlCenter;
 
 import java.awt.Cursor;
@@ -40,7 +39,7 @@ import javax.swing.tree.TreePath;
  *  The rule profiler allows to browse through
  *  profiling information gathered in the rule system.
  */
-public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListListener
+public class RuleProfilerPlugin extends AbstractJCCPlugin
 {
 	// -------- constants --------
 
@@ -62,7 +61,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 	protected JSplitPane	split;
 
 	/** The agent tree table. */
-	protected AgentTreeTable	agents;
+	protected ComponentTreeTable	agents;
 
 	/** The detail panel. */
 	protected JPanel	detail;
@@ -129,7 +128,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 		this.split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		agents = new AgentTreeTable(((IServiceContainer)getJCC().getServiceContainer()).getName());
+		agents = new ComponentTreeTable(((IServiceContainer)getJCC().getServiceContainer()).getName());
 		agents.setMinimumSize(new Dimension(0, 0));
 		split.add(agents);
 		agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -146,7 +145,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 			}
 		});
 		// Change agent node type to enable profiled icon for agents.
-		agents.addNodeType(new TreeTableNodeType(AgentTreeTable.NODE_AGENT,
+		agents.addNodeType(new TreeTableNodeType(ComponentTreeTable.NODE_COMPONENT,
 			new Icon[0], new String[]{"name", "address"}, new String[]{"Name", "Address"})
 		{
 			public Icon selectIcon(Object value)
@@ -159,13 +158,13 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 				}
 				else
 				{
-					ret = AgentTreeTable.icons.getIcon(AgentTreeTable.NODE_AGENT);
+					ret = ComponentTreeTable.icons.getIcon(ComponentTreeTable.NODE_COMPONENT);
 				}
 				return ret;
 			}
 		});
-		agents.getNodeType(AgentTreeTable.NODE_AGENT).addPopupAction(START_PROFILER);
-		agents.getNodeType(AgentTreeTable.NODE_AGENT).addPopupAction(STOP_PROFILER);
+		agents.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(START_PROFILER);
+		agents.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(STOP_PROFILER);
 
 		JLabel	emptylabel	= new JLabel("Select agents to activate the profiler",
 			icons.getIcon("profiler_empty"), JLabel.CENTER);
@@ -239,7 +238,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 		{
 			public void run()
 			{
-				agents.removeAgent(ad);
+				agents.removeComponent(ad);
 				if(cards.isAvailable(ad))
 				{
 					detail.remove(cards.getComponent(ad));
@@ -261,7 +260,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 				// hack dont introspect the agent
 				// if(!jcc.getAgent().getAgentIdentifier().equals(ad.getName()))
 				// {
-				agents.addAgent(ad);
+				agents.addComponent(ad);
 				// }
 			}
 		});
@@ -294,7 +293,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 			RuleProfilerPanel	panel = new RuleProfilerPanel(((AgentControlCenter)getJCC()).getAgent(), desc.getName());
 			GuiProperties.setupHelp(panel, getHelpID());
 			detail.add(panel, node.getUserObject());
-			agents.updateAgent(desc);
+			agents.updateComponent(desc);
 			split.setCursor(Cursor.getDefaultCursor());
 		}
 
@@ -323,7 +322,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin implements IAgentListL
 			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable().getTree().getSelectionPath().getLastPathComponent();
 			RuleProfilerPanel intro = (RuleProfilerPanel)cards.getComponent(node.getUserObject());			
 			detail.remove(intro);
-			agents.updateAgent((IComponentDescription)node.getUserObject());
+			agents.updateComponent((IComponentDescription)node.getUserObject());
 			split.setCursor(Cursor.getDefaultCursor());
 		}
 

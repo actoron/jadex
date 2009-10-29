@@ -19,7 +19,7 @@ import jadex.tools.comanalyzer.chart.ChartPanel;
 import jadex.tools.comanalyzer.diagram.DiagramPanel;
 import jadex.tools.comanalyzer.graph.GraphPanel;
 import jadex.tools.comanalyzer.table.TablePanel;
-import jadex.tools.common.AgentTreeTable;
+import jadex.tools.common.ComponentTreeTable;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.jtreetable.TreeTableNodeType;
@@ -69,7 +69,7 @@ import nuggets.Nuggets;
 /**
  * The comanalyzer plugin.
  */
-public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.common.plugin.IAgentListListener
+public class ComanalyzerPlugin extends AbstractJCCPlugin
 {
 	//-------- constants --------
 
@@ -122,7 +122,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 	protected JSplitPane split;
 
 	/** The agent tree table. */
-	protected AgentTreeTable agents;
+	protected ComponentTreeTable agents;
 
 	/** The checkbox items for selecting default values. */
 	protected JCheckBoxMenuItem[] checkboxes;
@@ -378,13 +378,13 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		agents = new AgentTreeTable(null);
+		agents = new ComponentTreeTable(null);
 		agents.setMinimumSize(new Dimension(0, 0));
 		split.add(agents);
 		agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		// Change agent node type to enable introspected icon for agents.
-		agents.addNodeType(new TreeTableNodeType(AgentTreeTable.NODE_AGENT, new Icon[0], new String[]{"name", "address"}, new String[]{"Name", "Address"})
+		agents.addNodeType(new TreeTableNodeType(ComponentTreeTable.NODE_COMPONENT, new Icon[0], new String[]{"name", "address"}, new String[]{"Name", "Address"})
 		{
 			public Icon selectIcon(Object value)
 			{
@@ -415,14 +415,14 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 				else
 				{
 					// default
-					ret = AgentTreeTable.icons.getIcon(AgentTreeTable.NODE_AGENT);
+					ret = ComponentTreeTable.icons.getIcon(ComponentTreeTable.NODE_COMPONENT);
 				}
 
 				return ret;
 			}
 		});
-		agents.getNodeType(AgentTreeTable.NODE_AGENT).addPopupAction(START_OBSERVING);
-		agents.getNodeType(AgentTreeTable.NODE_AGENT).addPopupAction(STOP_OBSERVING);
+		agents.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(START_OBSERVING);
+		agents.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(STOP_OBSERVING);
 		agents.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
 		split.setDividerLocation(150);
 
@@ -528,7 +528,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 				agent.setState(Agent.STATE_DEAD);
 				applyAgentFilter(agent);
 				// update agenttree
-				agents.updateAgent(ad);
+				agents.updateComponent(ad);
 			}
 		});
 	}
@@ -561,13 +561,13 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 				if(updateAgent)
 				{
 					applyAgentFilter(agent);
-					agents.updateAgent(ad);
+					agents.updateComponent(ad);
 				}
 				else
 				{
 					applyAgentFilter(agent);
 					agentlist.addAgent(agent);
-					agents.addAgent(ad);
+					agents.addComponent(ad);
 				}
 			}
 		});
@@ -1022,7 +1022,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 			IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer()
 				.getService(IComponentExecutionService.class);
 			IComponentDescription desc = ces.createComponentDescription(sender.getAid(), null, null);
-			agents.addAgent(desc);
+			agents.addComponent(desc);
 		}
 		else
 		{
@@ -1045,7 +1045,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 			IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer()
 				.getService(IComponentExecutionService.class);
 			IComponentDescription ad = ces.createComponentDescription(receiver.getAid(), null, null);
-			agents.addAgent(ad);
+			agents.addComponent(ad);
 
 		}
 		else
@@ -1157,7 +1157,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 						.getService(IComponentExecutionService.class);
 					IComponentDescription desc = ces.createComponentDescription(agents[i].getAid(), null, null);
 					removeAgentListener(desc, true);
-					ComanalyzerPlugin.this.agents.updateAgent(desc);
+					ComanalyzerPlugin.this.agents.updateComponent(desc);
 				}
 			}
 
@@ -1184,7 +1184,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 						.getService(IComponentExecutionService.class);
 					IComponentDescription desc = ces.createComponentDescription(agents[i].getAid(), null, null);
 					addAgentListener(desc);
-					ComanalyzerPlugin.this.agents.updateAgent(desc);
+					ComanalyzerPlugin.this.agents.updateComponent(desc);
 				}
 			}
 //			applyAgentFilter((Agent[])update.toArray(new Agent[update.size()]));
@@ -1220,7 +1220,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 					// remove dead agent from agentree
 					IComponentExecutionService ams = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
 					IComponentDescription desc = ams.createComponentDescription(agents[i].getAid(), null, null);
-					ComanalyzerPlugin.this.agents.removeAgent(desc);
+					ComanalyzerPlugin.this.agents.removeComponent(desc);
 				}
 			}
 		}
@@ -1266,7 +1266,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 					IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer()
 						.getService(IComponentExecutionService.class);
 					IComponentDescription desc = ces.createComponentDescription(agents[i].getAid(), null, null);
-					ComanalyzerPlugin.this.agents.removeAgent(desc);
+					ComanalyzerPlugin.this.agents.removeComponent(desc);
 				}
 			}
 		}
@@ -1331,7 +1331,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 					agent.setState(Agent.STATE_OBSERVED);
 					applyAgentFilter(agent);
 
-					agents.updateAgent(desc);
+					agents.updateComponent(desc);
 
 					split.setCursor(Cursor.getDefaultCursor());
 //				}
@@ -1383,7 +1383,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements jadex.tools.
 					agent.setState(Agent.STATE_IGNORED);
 					applyAgentFilter(agent);
 
-					agents.updateAgent(desc);
+					agents.updateComponent(desc);
 
 					split.setCursor(Cursor.getDefaultCursor());
 				}

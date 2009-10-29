@@ -8,7 +8,6 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.tools.common.AgentTreeTable;
 import jadex.tools.common.IMenuItemConstructor;
 import jadex.tools.common.PopupBuilder;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
@@ -269,7 +268,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 		{
 			public Icon selectIcon(Object value)
 			{
-				Icon	ret;
+				Icon	ret = null;
 				IComponentDescription ad = (IComponentDescription)((DefaultTreeTableNode)value).getUserObject();
 				if(IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
 				{
@@ -277,7 +276,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 				}
 				else
 				{
-					ret	= AgentTreeTable.icons.getIcon(AgentTreeTable.NODE_AGENT);
+//					ret	= AgentTreeTable.icons.getIcon(AgentTreeTable.NODE_AGENT);
 				}
 				//System.out.println(value+" "+ad.getState());
 				return ret;

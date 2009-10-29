@@ -12,12 +12,10 @@ import jadex.bridge.IComponentListener;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
-import jadex.tools.common.AgentTreeTable;
+import jadex.tools.common.ComponentTreeTable;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
-import jadex.tools.common.plugin.IAgentListListener;
-import jadex.tools.common.plugin.IMessageListener;
 import jadex.tools.jcc.AgentControlCenter;
 import jadex.tools.starter.StarterPlugin;
 
@@ -37,7 +35,7 @@ import javax.swing.UIDefaults;
 /**
  *  The conversation plugin
  */
-public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListListener, IMessageListener
+public class ConversationPlugin extends AbstractJCCPlugin
 {
 	//-------- constants --------
 	
@@ -61,7 +59,7 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 	//-------- attributes --------
 	
 	/** The agent tree table. */
-	protected AgentTreeTable agents;
+	protected ComponentTreeTable agents;
 
 	/** The conversation center panel. */
 	protected FipaConversationPanel convcenter;
@@ -118,11 +116,11 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		agents = new AgentTreeTable(((AgentControlCenter)getJCC()).getAgent().getServiceContainer().getName());
+		agents = new ComponentTreeTable(((AgentControlCenter)getJCC()).getAgent().getServiceContainer().getName());
 		agents.setMinimumSize(new Dimension(0, 0));
 		split.add(agents);
 		agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		agents.getNodeType(AgentTreeTable.NODE_AGENT).addPopupAction(SEND_MESSAGE);
+		agents.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(SEND_MESSAGE);
 
 		split.add(convcenter = new FipaConversationPanel(((AgentControlCenter)getJCC()).getAgent(), null));
 
@@ -261,7 +259,7 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 		{
 			public void run()
 			{
-				agents.removeAgent(ad);
+				agents.removeComponent(ad);
 			}
 		});
 	}
@@ -276,7 +274,7 @@ public class ConversationPlugin extends AbstractJCCPlugin implements IAgentListL
 		{
 			public void run()
 			{
-				agents.addAgent(ad);
+				agents.addComponent(ad);
 			}
 		});
 	}

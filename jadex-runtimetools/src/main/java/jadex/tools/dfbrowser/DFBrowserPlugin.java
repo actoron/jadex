@@ -12,11 +12,10 @@ import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
-import jadex.tools.common.AgentTreeTable;
+import jadex.tools.common.ComponentTreeTable;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
-import jadex.tools.common.plugin.IAgentListListener;
 import jadex.tools.jcc.AgentControlCenter;
 
 import java.awt.BorderLayout;
@@ -47,7 +46,7 @@ import javax.swing.tree.TreePath;
 /**
  *  DFBrowserPlugin
  */
-public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListListener
+public class DFBrowserPlugin extends AbstractJCCPlugin
 {
 	//-------- constants --------
 	
@@ -76,7 +75,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 	//-------- attributes --------
 	
 	/** The agent table (showing platform DFs). */
-	protected AgentTreeTable df_agents;
+	protected ComponentTreeTable df_agents;
 
 	/** The agent table. */
 	protected DFAgentTable agent_table;
@@ -160,10 +159,10 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 	 */
 	public JComponent createView()
 	{
-		df_agents = new AgentTreeTable(((AgentControlCenter)getJCC()).getAgent().getServiceContainer().getName());
+		df_agents = new ComponentTreeTable(((AgentControlCenter)getJCC()).getAgent().getServiceContainer().getName());
 		df_agents.setMinimumSize(new Dimension(0, 0));
 		df_agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		df_agents.getNodeType(AgentTreeTable.NODE_AGENT).addPopupAction(REFRESH_DF);
+		df_agents.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(REFRESH_DF);
 
 		service_panel = new ServiceDescriptionPanel();
 		service_table = new DFServiceTable();
@@ -509,7 +508,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 		{
 			public void run()
 			{*/
-				df_agents.removeAgent(ad);
+				df_agents.removeComponent(ad);
 				//refresh();
 			/*}
 		});*/
@@ -531,9 +530,9 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 				// todo: other agents could be the df and not be named df?)
 				if(ad.getName().getName().startsWith("df@"))
 				{
-					df_agents.addAgent(ad);
+					df_agents.addComponent(ad);
 					// Added first df -> select it.
-					if(df_agents.getAllAgents().length==1)
+					if(df_agents.getAllComponents().length==1)
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -541,7 +540,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin implements IAgentListList
 							{
 //								df_agents.adjustColumnWidths();
 								
-								DefaultTreeTableNode[] nodes = df_agents.getAllAgents();
+								DefaultTreeTableNode[] nodes = df_agents.getAllComponents();
 								//System.out.println(SUtil.arrayToString(nodes));
 								for(int i=0; i<nodes.length; i++)
 								{

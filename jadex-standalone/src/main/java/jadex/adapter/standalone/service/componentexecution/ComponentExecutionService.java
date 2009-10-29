@@ -93,6 +93,8 @@ public class ComponentExecutionService implements IComponentExecutionService
 			//throw new RuntimeException("No new agents may be created when platform is shutting down.");
 		}
 		*/
+			
+		// Load the model with fitting factory.
 		
 		IComponentFactory factory = null;
 		Collection facts = container.getServices(IComponentFactory.class);
@@ -107,7 +109,8 @@ public class ComponentExecutionService implements IComponentExecutionService
 				}
 			}
 		}
-		
+		ILoadableComponentModel lmodel = factory.loadModel(model);
+
 		// Create id and adapter.
 		
 		AgentIdentifier cid;
@@ -119,7 +122,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 			{
 				if(name==null)
 				{
-					cid = generateComponentIdentifier(model);
+					cid = generateComponentIdentifier(lmodel.getName());
 				}
 				else
 				{
@@ -155,9 +158,8 @@ public class ComponentExecutionService implements IComponentExecutionService
 			//throw new RuntimeException("No '@' allowed in agent name.");
 		}
 		
-		// Load the model and create the agent instance (interpreter and state).
+		// Create the agent instance (interpreter and state).
 		
-		ILoadableComponentModel lmodel = factory.loadModel(model);
 		IComponentInstance instance = factory.createComponentInstance(adapter, lmodel, config, args);
 		adapter.setComponent(instance);
 		
@@ -404,7 +406,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 			{
 				synchronized(descs)
 				{
-//					System.out.println("remove called for: "+aid);
+					System.out.println("remove called for: "+cid);
 					StandaloneComponentAdapter	adapter	= (StandaloneComponentAdapter)adapters.remove(cid);
 					if(adapter==null)
 						throw new RuntimeException("Component Identifier not registered: "+cid);

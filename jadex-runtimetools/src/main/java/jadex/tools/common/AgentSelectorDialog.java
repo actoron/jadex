@@ -68,11 +68,11 @@ public class AgentSelectorDialog
 	/** The agent access. */
 	protected IExternalAccess	agent;
 
-	/** The agent tree table. */
-	protected AgentTreeTable	tree;
+	/** The element tree table. */
+	protected ComponentTreeTable	tree;
 	
 	/** The agent tree table of selected agents. */
-	protected AgentTreeTable	seltree;
+	protected ComponentTreeTable	seltree;
 	
 	/** The agent identifier panel. */
 	protected ComponentIdentifierPanel	aidpanel;
@@ -201,9 +201,9 @@ public class AgentSelectorDialog
 			//agent.dispatchTopLevelGoalAndWait(search);
 			IComponentDescription[]	descs	= (IComponentDescription[])search.getParameterSet("result").getValues();
 			// Create agent tree of known agents.
-			this.tree.removeAgents();
+			this.tree.removeComponents();
 			for(int i=0; i<descs.length; i++)
-				tree.addAgent(descs[i]);
+				tree.addComponent(descs[i]);
 			((ResizeableTableHeader)tree.getTreetable().getTableHeader()).resizeAllColumns();
 			Dimension	pref	= tree.getTreetable().getPreferredSize();
 			tree.getTreetable().setPreferredScrollableViewportSize(new Dimension(Math.min(pref.width, 400), Math.max(100, (int)Math.min(pref.height*1.25, 300))));
@@ -230,9 +230,9 @@ public class AgentSelectorDialog
 		// Create agent tree of selected agents.
 		IComponentExecutionService ams = (IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class);
 		int	row	= seltree.getTreetable().getSelectionModel().getMinSelectionIndex();
-		this.seltree.removeAgents();
+		this.seltree.removeComponents();
 		for(int i=0; i<sellist.size(); i++)
-			seltree.addAgent(ams.createComponentDescription((IComponentIdentifier)sellist.get(i), null, null));
+			seltree.addComponent(ams.createComponentDescription((IComponentIdentifier)sellist.get(i), null, null));
 		// Force table repaint (hack???).
 		seltree.getTreetable().tableChanged(new TableModelEvent(seltree.getTreetable().getModel(), TableModelEvent.HEADER_ROW));
 		((ResizeableTableHeader)seltree.getTreetable().getTableHeader()).resizeAllColumns();
@@ -289,10 +289,10 @@ public class AgentSelectorDialog
 		ok.setEnabled(!singleselection || sellist.size()>0);
 
 		IComponentExecutionService ces = (IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class);
-		this.tree	= new AgentTreeTable(agent.getServiceContainer().getName());
+		this.tree	= new ComponentTreeTable(agent.getServiceContainer().getName());
 		this.tree.setPreferredSize(new Dimension(200, 100));
 		tree.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.seltree	= new AgentTreeTable(agent.getServiceContainer().getName());
+		this.seltree	= new ComponentTreeTable(agent.getServiceContainer().getName());
 		this.seltree.setPreferredSize(new Dimension(200, 100));
 		seltree.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		seltree.getTreetable().getTree().setRootVisible(false);	// Don't show platform node.

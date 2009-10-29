@@ -45,7 +45,7 @@ public abstract class AbstractChartDataConsumer extends SimplePropertyObject imp
 		DataTable data = provider.getTableData(currenttime, tick);
 		List rows = data.getRows();
 		
-		if(rows!=null)
+		if(rows!=null && rows.size()>0)
 		{
 			SimpleValueFetcher fetcher = new SimpleValueFetcher();
 			fetcher.setValue("$object", data);
