@@ -693,6 +693,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 	 */
 	public void shutdown(IResultListener listener)
 	{
-		listener.resultAvailable(null);
+		if(listener!=null)
+			listener.resultAvailable(null);
 	}
 }
