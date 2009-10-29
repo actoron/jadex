@@ -239,9 +239,9 @@ public class ComponentExecutionService implements IComponentExecutionService
 	
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.
-	 *  @param componentid	The component to destroy.
+	 *  @param cid	The component to destroy.
 	 */
-	public void destroyComponent(IComponentIdentifier componentid, IResultListener listener)
+	public void destroyComponent(IComponentIdentifier cid, IResultListener listener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
@@ -250,12 +250,12 @@ public class ComponentExecutionService implements IComponentExecutionService
 		{
 			synchronized(descs)
 			{
-				//System.out.println("killing: "+aid);
+				System.out.println("killing: "+cid);
 				
-				StandaloneComponentAdapter agent = (StandaloneComponentAdapter)adapters.get(componentid);
+				StandaloneComponentAdapter agent = (StandaloneComponentAdapter)adapters.get(cid);
 				if(agent==null)
 				{
-					listener.exceptionOccurred(new RuntimeException("Component "+componentid+" does not exist."));
+					listener.exceptionOccurred(new RuntimeException("Component "+cid+" does not exist."));
 					return;
 
 					//System.out.println(agentdescs);
@@ -264,12 +264,12 @@ public class ComponentExecutionService implements IComponentExecutionService
 				
 				// todo: does not work always!!! A search could be issued before agents had enough time to kill itself!
 				// todo: killAgent should only be called once for each agent?
-				AMSAgentDescription	desc	= (AMSAgentDescription)descs.get(componentid);
+				AMSAgentDescription	desc	= (AMSAgentDescription)descs.get(cid);
 				if(desc!=null)
 				{
 					// Resume a suspended agent before killing it.
 					if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
-						resumeComponent(componentid, null);
+						resumeComponent(cid, null);
 					
 					if(IComponentDescription.STATE_ACTIVE.equals(desc.getState()))
 					//if(!AMSAgentDescription.STATE_TERMINATING.equals(desc.getState()))
@@ -279,11 +279,11 @@ public class ComponentExecutionService implements IComponentExecutionService
 //						if(listeners.get(aid)!=null)
 //							throw new RuntimeException("Multiple result listeners for agent: "+aid);
 //						listeners.put(aid, listener);
-						agent.killAgent(new CleanupCommand(componentid, listener));
+						agent.killAgent(new CleanupCommand(cid, listener));
 					}
 					else
 					{
-						listener.exceptionOccurred(new RuntimeException("Cannot kill "+componentid+" component: "+desc.getState()));
+						listener.exceptionOccurred(new RuntimeException("Cannot kill "+cid+" component: "+desc.getState()));
 						//throw new RuntimeException("Cannot kill "+aid+" agent: "+desc.getState());
 					}
 				}
