@@ -87,16 +87,12 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
 			throw new AgentTerminatedException(cid.getName());
 		
-		if(IComponentDescription.STATE_ACTIVE.equals(state))
+		// Resume execution of the agent (when active or terminating).
+		if(IComponentDescription.STATE_ACTIVE.equals(state)
+			|| IComponentDescription.STATE_TERMINATING.equals(state))
 		{
-			// Resume execution of the agent (when active).
 			//System.out.println("wakeup called: "+state);
-			//if(AMSAgentDescription.STATE_ACTIVE.equals(state)
-			//	|| AMSAgentDescription.STATE_TERMINATING.equals(state))
-			{
-	//			platform.getExecutorService().execute(this);
-				((IExecutionService)container.getService(IExecutionService.class)).execute(this);
-			}
+			((IExecutionService)container.getService(IExecutionService.class)).execute(this);
 		}
 	}
 
@@ -224,6 +220,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public void killAgent(IResultListener listener)
 	{
+		System.out.println("killAgent: "+listener);
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
 			throw new AgentTerminatedException(cid.getName());
 

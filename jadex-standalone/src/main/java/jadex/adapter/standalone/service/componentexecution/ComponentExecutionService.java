@@ -279,7 +279,14 @@ public class ComponentExecutionService implements IComponentExecutionService
 //						if(listeners.get(aid)!=null)
 //							throw new RuntimeException("Multiple result listeners for agent: "+aid);
 //						listeners.put(aid, listener);
-						agent.killAgent(new CleanupCommand(cid, listener));
+						try
+						{
+							agent.killAgent(new CleanupCommand(cid, listener));
+						}
+						catch(Throwable t)
+						{
+							t.printStackTrace();
+						}
 					}
 					else
 					{
@@ -395,12 +402,14 @@ public class ComponentExecutionService implements IComponentExecutionService
 		
 		public CleanupCommand(IComponentIdentifier cid, IResultListener listener)
 		{
+			System.out.println("CleanupCommand created");
 			this.cid = cid;
 			this.listener = listener;
 		}
 		
 		public void resultAvailable(Object result)
 		{
+			System.out.println("CleanupCommand: "+result);
 			IComponentDescription ad = (IComponentDescription)descs.get(cid);
 			synchronized(adapters)
 			{
@@ -446,6 +455,8 @@ public class ComponentExecutionService implements IComponentExecutionService
 					System.out.println("WARNING: Exception when removing agent: "+ad+", "+e);
 				}
 			}
+			
+			System.out.println("CleanupCommand end.");
 			
 			if(listener!=null)
 				listener.resultAvailable(result);
