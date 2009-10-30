@@ -94,6 +94,15 @@ public class MicroAgentModel implements ILoadableComponentModel
 	}
 	
 	/**
+	 *  Get the package name.
+	 *  @return The package name.
+	 */
+	public String getPackage()
+	{
+		return microagent.getPackage().getName();
+	}
+	
+	/**
 	 *  Get the model description.
 	 *  @return The model description.
 	 */

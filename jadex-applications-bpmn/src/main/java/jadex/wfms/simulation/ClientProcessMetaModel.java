@@ -4,14 +4,12 @@ import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
-import jadex.bpmn.runtime.task.ShowClientInfoTask;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.collection.Tree;
 import jadex.commons.collection.TreeNode;
 import jadex.gpmn.model.MGpmnModel;
 import jadex.gpmn.model.MPlan;
-import jadex.gpmn.model.MProcess;
 import jadex.javaparser.javaccimpl.ReflectNode;
-import jadex.wfms.IProcessModel;
 import jadex.wfms.client.task.FetchDataTask;
 import jadex.wfms.simulation.stateholder.ActivityStateController;
 import jadex.wfms.simulation.stateholder.IParameterStateSet;
@@ -52,7 +50,7 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 		bpmnLoader = new BpmnModelLoader();
 	}
 	
-	public void setRootModel(IProcessModel model) throws Exception
+	public void setRootModel(ILoadableComponentModel model) throws Exception
 	{
 		processes = new HashMap();
 		tasks = new ArrayList();
@@ -63,7 +61,7 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 		root.setData(tmpRoot.getData());
 	}
 	
-	public TreeNode buildTree(IProcessModel processModel) throws Exception
+	public TreeNode buildTree(ILoadableComponentModel processModel) throws Exception
 	{
 		TreeNode node = new ModelTreeNode();
 		node.setData(processModel);
@@ -72,7 +70,7 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 		// Remove subprocesses that are already known
 		for (Iterator it = subProcesses.iterator(); it.hasNext(); )
 		{
-			IProcessModel subModel = (IProcessModel) it.next();
+			ILoadableComponentModel subModel = (ILoadableComponentModel) it.next();
 			if (processes.containsKey(resolveProcessName(subModel)))
 			{
 				it.remove();
@@ -86,7 +84,7 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 		// Add subprocesses
 		for (Iterator it = subProcesses.iterator(); it.hasNext(); )
 		{
-			IProcessModel subModel = (IProcessModel) it.next();
+			ILoadableComponentModel subModel = (ILoadableComponentModel) it.next();
 			ModelTreeNode tmpNode = new ModelTreeNode();
 			processes.put(resolveProcessName(subModel), tmpNode);
 			TreeNode subTree = buildTree(subModel);
@@ -147,7 +145,7 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 		return node;
 	}
 	
-	private List getSubProcessModels(IProcessModel processModel) throws Exception
+	private List getSubProcessModels(ILoadableComponentModel processModel) throws Exception
 	{
 		List ret = new LinkedList();
 		//ret.add(processModel);
@@ -244,7 +242,7 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 	{
 	}
 	
-	public static final String resolveProcessName(IProcessModel model)
+	public static final String resolveProcessName(ILoadableComponentModel model)
 	{
 		String ret = model.getName();
 		if (ret == null)

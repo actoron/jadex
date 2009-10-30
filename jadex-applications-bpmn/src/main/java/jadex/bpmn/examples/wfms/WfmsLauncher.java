@@ -3,34 +3,24 @@ package jadex.bpmn.examples.wfms;
 import jadex.adapter.standalone.Platform;
 import jadex.commons.Properties;
 import jadex.commons.SUtil;
+import jadex.service.IServiceContainer;
 import jadex.service.PropertiesXMLHelper;
 import jadex.wfms.BasicWfms;
-import jadex.wfms.IWfms;
 import jadex.wfms.client.GuiClient;
 import jadex.wfms.client.ProcessStarterClient;
-import jadex.wfms.service.client.ClientConnector;
 import jadex.wfms.service.client.IClientService;
-import jadex.wfms.service.client.IWorkitemQueueService;
-import jadex.wfms.service.definition.IProcessDefinitionService;
-import jadex.wfms.service.definition.ProcessDefinitionConnector;
-import jadex.wfms.service.execution.BpmnExecutionService;
-import jadex.wfms.service.execution.GpmnExecutionService;
-import jadex.wfms.service.execution.MetaExecutionService;
 import jadex.wfms.service.repository.BasicModelRepositoryService;
 import jadex.wfms.service.repository.IModelRepositoryService;
 import jadex.wfms.service.security.BasicAAAService;
 import jadex.wfms.service.security.IAAAService;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 
 public class WfmsLauncher
 {
-	private IWfms wfms;
+	private IServiceContainer container;
 	
 	/**
 	 * @throws Exception 
@@ -44,9 +34,9 @@ public class WfmsLauncher
 		launcher.launchProcessStarter();
 	}
 	
-	public IWfms getWfms()
+	public IServiceContainer getWfms()
 	{
-		return wfms;
+		return container;
 	}
 	
 	public void launchBasicWfms(String[] args) throws Exception
@@ -66,11 +56,11 @@ public class WfmsLauncher
 		// Hack as long as no loader is present.
 		ClassLoader cl = Platform.class.getClassLoader();
 		Properties configuration = (Properties)PropertiesXMLHelper.getPropertyReader().read(SUtil.getResource(conffile, cl), cl, null);
-		wfms = new BasicWfms(configuration);
-		wfms.start();
+		container = new BasicWfms(configuration);
+		container.start();
 		
 		long startup = System.currentTimeMillis() - starttime;
-		((BasicWfms) wfms).getLogger().info("Wfms startup time: " + startup + " ms.");
+		((BasicWfms) container).getLogger().info("Wfms startup time: " + startup + " ms.");
 		
 		/*String[] imports = {"jadex.wfms.*", "jadex.bpmn.examples.dipp.*" };
 		BasicModelRepositoryService mr = new BasicModelRepositoryService(wfms, imports);
@@ -84,16 +74,16 @@ public class WfmsLauncher
 		//mr.addBpmnModel("Ladungstraeger absichern", "jadex/wfms/DiPP1_LOG_Ladungstraeger_absichern.bpmn");
 		//mr.addBpmnModel("User Interaction", "jadex/wfms/UserInteraction.bpmn");
 		//mr.addProcessModel("jadex/bpmn/examples/helloworld/HelloWorldProcess.bpmn");
-		BasicModelRepositoryService mr = (BasicModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		BasicModelRepositoryService mr = (BasicModelRepositoryService) container.getService(IModelRepositoryService.class);
 		mr.addProcessModel("jadex/bpmn/examples/dipp/dipp.gpmn");
 		mr.addProcessModel("jadex/bpmn/examples/helloworld/UserInteraction2.bpmn");
 		//wfms.addService(IModelRepositoryService.class, "repo_service", mr);
 		
-		BasicAAAService as = (BasicAAAService) wfms.getService(IAAAService.class);
+		BasicAAAService as = (BasicAAAService) container.getService(IAAAService.class);
 		Set roles = new HashSet();
 		roles.add("all");
 		as.addUser("TestUser", roles);
-		((BasicWfms) wfms).addService(IAAAService.class, "auth_service", as);
+		((BasicWfms) container).addService(IAAAService.class, "auth_service", as);
 			
 		/*ClientConnector cc = new ClientConnector(wfms);
 		wfms.addService(IClientService.class, "client_service", cc);
@@ -104,7 +94,7 @@ public class WfmsLauncher
 	
 	public IClientService getClientService()
 	{
-		return (IClientService) wfms.getService(IClientService.class);
+		return (IClientService) container.getService(IClientService.class);
 	}
 	
 	public void launchGuiClient()

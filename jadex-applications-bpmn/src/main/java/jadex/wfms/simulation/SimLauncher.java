@@ -1,10 +1,8 @@
 package jadex.wfms.simulation;
 
-import java.awt.EventQueue;
-
 import jadex.bpmn.examples.wfms.WfmsLauncher;
-import jadex.wfms.IWfms;
-import jadex.wfms.service.client.IClientService;
+
+import java.awt.EventQueue;
 
 public class SimLauncher
 {

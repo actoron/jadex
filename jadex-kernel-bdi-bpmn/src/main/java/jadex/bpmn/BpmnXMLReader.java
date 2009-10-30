@@ -26,6 +26,7 @@ import jadex.commons.xml.reader.Reader;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,6 +73,12 @@ public class BpmnXMLReader
 		MBpmnModel ret = (MBpmnModel)reader.read(rinfo.getInputStream(), classloader, null);
 		ret.setFilename(rinfo.getFilename());
 		ret.setLastModified(rinfo.getLastModified());
+		ret.setFilename(rinfo.getFilename());
+		ret.setLastModified(rinfo.getLastModified());
+		String name = new File(rinfo.getFilename()).getName();
+		name = name.substring(0, name.length()-5);
+		ret.setName(name);
+		rinfo.getInputStream().close();
 		return ret;
 	}
 	

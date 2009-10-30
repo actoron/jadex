@@ -1,27 +1,24 @@
 package jadex.wfms.service.definition;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import jadex.bpmn.model.MBpmnModel;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.concurrent.IResultListener;
-import jadex.gpmn.model.MGpmnModel;
-import jadex.service.execution.IExecutionService;
-import jadex.wfms.IProcessModel;
-import jadex.wfms.IWfms;
+import jadex.service.IServiceContainer;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.repository.BasicModelRepositoryService;
 import jadex.wfms.service.repository.IModelRepositoryService;
 import jadex.wfms.service.security.IAAAService;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class ProcessDefinitionConnector implements IProcessDefinitionService
 {
 	/** The WFMS */
-	private IWfms wfms;
+	private IServiceContainer container;
 	
-	public ProcessDefinitionConnector(IWfms wfms)
+	public ProcessDefinitionConnector(IServiceContainer container)
 	{
-		this.wfms = wfms;
+		this.container = container;
 	}
 	
 	/**
@@ -47,9 +44,9 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	 */
 	public void addProcessModel(IClient client, String path)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_PROCESS_MODEL))
+		if (!((IAAAService) container.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_PROCESS_MODEL))
 			return;
-		BasicModelRepositoryService mr = (BasicModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		BasicModelRepositoryService mr = (BasicModelRepositoryService)container.getService(IModelRepositoryService.class);
 		mr.addProcessModel(path);
 	}
 	
@@ -58,11 +55,11 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	 * @param name name of the model
 	 * @return the model
 	 */
-	public IProcessModel getProcessModel(IClient client, String name)
+	public ILoadableComponentModel getProcessModel(IClient client, String name)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_PROCESS_MODEL))
+		if (!((IAAAService)container.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_PROCESS_MODEL))
 			return null;
-		IModelRepositoryService mr = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		IModelRepositoryService mr = (IModelRepositoryService)container.getService(IModelRepositoryService.class);
 		
 		return mr.getProcessModel(name);
 	}
@@ -75,9 +72,9 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	 */
 	public Set getProcessModelNames(IClient client)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_MODEL_NAMES))
+		if (!((IAAAService)container.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_MODEL_NAMES))
 			return null;
-		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		IModelRepositoryService rs = (IModelRepositoryService)container.getService(IModelRepositoryService.class);
 		return new HashSet(rs.getModelNames());
 	}
 }

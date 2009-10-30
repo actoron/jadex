@@ -123,7 +123,19 @@
 				), $platform)
 			</property>
 			
+			<property type="jadex.bridge.IComponentFactory" name="micro_factory">
+				new jadex.microkernel.MicroAgentFactory($platform)
+			</property>
+			
+			<property type="jadex.bridge.IComponentFactory" name="bpmn_factory">
+				new jadex.wfms.service.loader.BpmnFactory($platform)
+			</property>
+			
 			<property type="jadex.bridge.IComponentFactory" name="gpmn_factory">
+				new jadex.wfms.service.loader.GpmnFactory($platform)
+			</property>
+			
+			<!-- <property type="jadex.bridge.IComponentFactory" name="gpmn_factory">
 				new jadex.gpmn.GpmnAgentFactory(
 				jadex.commons.SUtil.createHashMap(
 					new String[]
@@ -145,17 +157,13 @@
 						new jadex.bpmnbdi.BpmnPlanExecutor($platform)
 					}
 				), $platform)
-			</property>
-			
-			<property type="jadex.bridge.IComponentFactory" name="micro_factory">
-				new jadex.microkernel.MicroAgentFactory($platform)
-			</property>
+			</property> -->
 		</properties>
 						
 		<!-- Agents. -->
   		<property type="daemonagent" name="ams">jadex/bdi/amsagent/AMS.agent.xml</property>
 		<property type="daemonagent" name="df">jadex/bdi/dfagent/DF.agent.xml</property>
- 		<!-- <property type="agent" name="jcc">jadex/tools/jcc/JCC.agent.xml</property> -->
+ 		<property type="agent" name="jcc">jadex/tools/jcc/JCC.agent.xml</property>
 	</properties>
 	
 </properties>

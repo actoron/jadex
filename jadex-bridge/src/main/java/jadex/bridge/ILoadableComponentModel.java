@@ -18,6 +18,12 @@ public interface ILoadableComponentModel
 	public String getName();
 	
 	/**
+	 *  Get the package name.
+	 *  @return The package name.
+	 */
+	public String getPackage();
+	
+	/**
 	 *  Get the model description.
 	 *  @return The model description.
 	 */

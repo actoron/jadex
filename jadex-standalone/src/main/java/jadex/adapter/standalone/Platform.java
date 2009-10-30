@@ -224,17 +224,20 @@ public class Platform extends AbstractPlatform
 	public void start()
 	{
 		// Start the services.
-		for(Iterator it=services.keySet().iterator(); it.hasNext(); )
+		if(services!=null)
 		{
-			Object key = it.next();
-			Map tmp = (Map)services.get(key);
-			if(tmp!=null)
+			for(Iterator it=services.keySet().iterator(); it.hasNext(); )
 			{
-				for(Iterator it2=tmp.keySet().iterator(); it2.hasNext(); )
+				Object key = it.next();
+				Map tmp = (Map)services.get(key);
+				if(tmp!=null)
 				{
-					Object key2 = it2.next();
-					IService service = (IService)tmp.get(key2);
-					service.start();
+					for(Iterator it2=tmp.keySet().iterator(); it2.hasNext(); )
+					{
+						Object key2 = it2.next();
+						IService service = (IService)tmp.get(key2);
+						service.start();
+					}
 				}
 			}
 		}

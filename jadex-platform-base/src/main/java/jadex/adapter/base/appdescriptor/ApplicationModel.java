@@ -57,6 +57,15 @@ public class ApplicationModel implements ILoadableComponentModel
 	}
 	
 	/**
+	 *  Get the package name.
+	 *  @return The package name.
+	 */
+	public String getPackage()
+	{
+		return apptype.getPackage();
+	}
+	
+	/**
 	 *  Get the model description.
 	 *  @return The model description.
 	 */

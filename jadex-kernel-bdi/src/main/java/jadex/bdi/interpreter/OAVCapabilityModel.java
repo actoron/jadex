@@ -82,6 +82,15 @@ public class OAVCapabilityModel implements ILoadableComponentModel, ICacheableMo
 	}
 	
 	/**
+	 *  Get the package name.
+	 *  @return The package name.
+	 */
+	public String getPackage()
+	{
+		return (String)state.getAttributeValue(handle, OAVBDIMetaModel.capability_has_package);
+	}
+	
+	/**
 	 *  Get the model description.
 	 *  @return The model description.
 	 */

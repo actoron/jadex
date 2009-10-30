@@ -1,12 +1,12 @@
 package jadex.bpmn.model;
 
 import jadex.bridge.IArgument;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IReport;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.IParsedExpression;
-import jadex.wfms.IProcessModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
 /**
  *  Java representation of a bpmn model for xml description.
  */
-public class MBpmnModel extends MIdElement implements ICacheableModel, IProcessModel
+public class MBpmnModel extends MIdElement implements ICacheableModel, ILoadableComponentModel
 {
 	//-------- constants --------
 	
@@ -119,6 +119,9 @@ public class MBpmnModel extends MIdElement implements ICacheableModel, IProcessM
 	
 	/** The last check date. */
 	protected long lastchecked;
+	
+	/** The classloader. */
+	protected ClassLoader classloader;
 	
 	//-------- methods --------
 
@@ -550,7 +553,7 @@ public class MBpmnModel extends MIdElement implements ICacheableModel, IProcessM
 	 */
 	public void	setName(String name)
 	{
-		this.name	= name;
+		this.name = name;
 	}
 	
 	/**
@@ -846,5 +849,22 @@ public class MBpmnModel extends MIdElement implements ICacheableModel, IProcessM
 				return "";
 			}
 		};
+	}
+	
+	/**
+	 *  Return the class loader corresponding to the micro agent class.
+	 */
+	public ClassLoader getClassLoader()
+	{
+		return classloader;
+	}
+
+	/**
+	 *  Set the classloader.
+	 *  @param classloader The classloader to set.
+	 */
+	public void setClassloader(ClassLoader classloader)
+	{
+		this.classloader = classloader;
 	}
 }

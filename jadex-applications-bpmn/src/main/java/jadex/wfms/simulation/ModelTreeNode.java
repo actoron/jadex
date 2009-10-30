@@ -1,13 +1,13 @@
 package jadex.wfms.simulation;
 
+import jadex.bpmn.model.MActivity;
+import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.collection.TreeNode;
+import jadex.wfms.simulation.stateholder.IParameterStateSet;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import jadex.bpmn.model.MActivity;
-import jadex.commons.collection.TreeNode;
-import jadex.wfms.IProcessModel;
-import jadex.wfms.simulation.stateholder.IParameterStateSet;
 
 public class ModelTreeNode extends TreeNode
 {
@@ -52,9 +52,9 @@ public class ModelTreeNode extends TreeNode
 	
 	public String toString()
 	{
-		if (data instanceof IProcessModel)
+		if (data instanceof ILoadableComponentModel)
 		{
-			IProcessModel model = ((IProcessModel) data);
+			ILoadableComponentModel model = ((ILoadableComponentModel)data);
 			String ret = model.getName();
 			if (ret == null)
 			{

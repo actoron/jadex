@@ -4,7 +4,7 @@ import jadex.bpmn.runtime.BpmnInstance;
 import jadex.bpmn.runtime.IProcessInstance;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.concurrent.IResultListener;
-import jadex.wfms.IWfms;
+import jadex.service.IServiceContainer;
 import jadex.wfms.client.Workitem;
 import jadex.wfms.service.client.IWorkitemQueueService;
 
@@ -18,7 +18,7 @@ public class FetchDataTask extends AbstractClientTask
 	 */
 	public void execute(ITaskContext context, IProcessInstance instance, IResultListener listener)
 	{
-		IWfms wfms = ((BpmnInstance) instance).getWfms();
+		IServiceContainer wfms = ((BpmnInstance)instance).getWfms();
 		IWorkitemQueueService wiq = (IWorkitemQueueService) wfms.getService(IWorkitemQueueService.class);
 		wiq.queueWorkitem(createWorkitem(Workitem.DATA_FETCH_WORKITEM_TYPE, context, listener));
 	}

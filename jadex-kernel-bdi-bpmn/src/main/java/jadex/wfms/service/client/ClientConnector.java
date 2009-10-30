@@ -1,7 +1,7 @@
 package jadex.wfms.service.client;
 
 import jadex.commons.concurrent.IResultListener;
-import jadex.wfms.IWfms;
+import jadex.service.IServiceContainer;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
@@ -25,15 +25,15 @@ import java.util.Set;
 public class ClientConnector implements IClientService, IWorkitemQueueService
 {
 	
-	private IWfms wfms;
+	private IServiceContainer container;
 	
 	private Map workitemQueues;
 	
 	private Set workitemListeners;
 	
-	public ClientConnector(IWfms wfms)
+	public ClientConnector(IServiceContainer container)
 	{
-		this.wfms = wfms;
+		this.container = container;
 		workitemQueues = new HashMap();
 		workitemListeners = new HashSet();
 	}
@@ -73,10 +73,10 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 	 */
 	public IProcessDefinitionService getProcessDefinitionService(IClient client)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_PD_SERVICE))
+		if (!((IAAAService) container.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_PD_SERVICE))
 			return null;
 		
-		return (IProcessDefinitionService) wfms.getService(IProcessDefinitionService.class);
+		return (IProcessDefinitionService) container.getService(IProcessDefinitionService.class);
 	}
 	
 	/**
@@ -109,10 +109,10 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 	 */
 	public Set getBpmnModelNames(IClient client)
 	{
-		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_MODEL_NAMES))
+		if(!((IAAAService) container.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_MODEL_NAMES))
 			throw new AccessControlException("Not allowed: "+client);
 		
-		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		IModelRepositoryService rs = (IModelRepositoryService) container.getService(IModelRepositoryService.class);
 		return new HashSet(rs.getModelNames());
 	}
 	
@@ -124,10 +124,10 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 	 */
 	public Set getModelNames(IClient client)
 	{
-		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_MODEL_NAMES))
+		if(!((IAAAService) container.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_MODEL_NAMES))
 			throw new AccessControlException("Not allowed: "+client);
 		
-		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		IModelRepositoryService rs = (IModelRepositoryService) container.getService(IModelRepositoryService.class);
 		return new HashSet(rs.getModelNames());
 	}
 	
@@ -139,7 +139,7 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 	 */
 	public synchronized void startProcess(IClient client, String name)
 	{
-		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.START_BPMN_PROCESS))
+		if(!((IAAAService) container.getService(IAAAService.class)).accessAction(client, IAAAService.START_BPMN_PROCESS))
 			throw new AccessControlException("Not allowed: "+client);
 		
 		// todo:
@@ -160,7 +160,7 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 	 */
 	public synchronized void finishActivity(IClient client, IClientActivity activity)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.COMMIT_WORKITEM))
+		if (!((IAAAService) container.getService(IAAAService.class)).accessAction(client, IAAAService.COMMIT_WORKITEM))
 			return;
 		((Workitem) activity).getListener().resultAvailable(null);
 	}
@@ -173,7 +173,7 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 	 */
 	public synchronized IClientActivity beginActivity(IClient client, IWorkitem workitem)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ACQUIRE_WORKITEM))
+		if (!((IAAAService) container.getService(IAAAService.class)).accessAction(client, IAAAService.ACQUIRE_WORKITEM))
 			return null;
 		Set workitems = (Set) workitemQueues.get(workitem.getRole());
 		if (workitems.remove(workitem))
@@ -191,16 +191,16 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 	 */
 	public void cancelActivity(IClient client, IClientActivity activity)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.RELEASE_WORKITEM))
+		if (!((IAAAService) container.getService(IAAAService.class)).accessAction(client, IAAAService.RELEASE_WORKITEM))
 			return;
 		queueWorkitem((IWorkitem) activity);
 	}
 	
 	public synchronized Set getAvailableWorkitems(IClient client)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_AVAILABLE_WORKITEMS))
+		if (!((IAAAService) container.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_AVAILABLE_WORKITEMS))
 			return null;
-		IAAAService roleService = (IAAAService) wfms.getService(IAAAService.class);
+		IAAAService roleService = (IAAAService) container.getService(IAAAService.class);
 		Set roles = roleService.getRoles(client);
 		Set workitems = new HashSet();
 		if (roles.contains(IAAAService.ALL_ROLES))
@@ -240,7 +240,7 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 	
 	private synchronized void fireWorkitemAddedEvent(IWorkitem workitem)
 	{
-		IAAAService as = (IAAAService) wfms.getService(IAAAService.class);
+		IAAAService as = (IAAAService) container.getService(IAAAService.class);
 		for (Iterator it = workitemListeners.iterator(); it.hasNext(); )
 		{
 			IWorkitemListener listener = (IWorkitemListener) it.next();
@@ -256,7 +256,7 @@ public class ClientConnector implements IClientService, IWorkitemQueueService
 		for (Iterator it = workitemListeners.iterator(); it.hasNext(); )
 		{
 			IWorkitemListener listener = (IWorkitemListener) it.next();
-			IAAAService as = (IAAAService) wfms.getService(IAAAService.class);
+			IAAAService as = (IAAAService) container.getService(IAAAService.class);
 			WorkitemQueueChangeEvent evt = new WorkitemQueueChangeEvent(workitem);
 			if (as.accessEvent(listener.getClient(), evt))
 				listener.workitemRemoved(evt);

@@ -1,12 +1,10 @@
 package jadex.wfms.service.definition;
 
-import java.util.Set;
-
-import jadex.bpmn.model.MBpmnModel;
-import jadex.gpmn.model.MGpmnModel;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.service.IService;
-import jadex.wfms.IProcessModel;
 import jadex.wfms.client.IClient;
+
+import java.util.Set;
 
 /**
  * Administrative service interface
@@ -27,7 +25,7 @@ public interface IProcessDefinitionService extends IService
 	 * @param name name of the model
 	 * @return the model
 	 */
-	public IProcessModel getProcessModel(IClient client, String name);
+	public ILoadableComponentModel getProcessModel(IClient client, String name);
 	
 	/**
 	 * Gets the names of all available process models

@@ -1,10 +1,9 @@
 package jadex.wfms.service.repository;
 
 import jadex.adapter.base.SComponentFactory;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.execution.IExecutionService;
-import jadex.wfms.IProcessModel;
-import jadex.wfms.IWfms;
+import jadex.service.IServiceContainer;
 
 import java.io.File;
 import java.util.Collection;
@@ -18,7 +17,7 @@ import java.util.Map;
 public class BasicModelRepositoryService implements IModelRepositoryService
 {
 	/** The wfms. */
-	protected IWfms wfms;
+	protected IServiceContainer container;
 	
 	/** The imports */
 	private String[] imports;
@@ -36,9 +35,9 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 //	private BpmnModelLoader loader;
 	
 	
-	public BasicModelRepositoryService(IWfms wfms, String[] imports)
+	public BasicModelRepositoryService(IServiceContainer container, String[] imports)
 	{
-		this.wfms = wfms;
+		this.container = container;
 		this.imports = imports;
 		this.models = new HashMap();
 //		this.loader = new BpmnModelLoader();
@@ -174,7 +173,7 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 	{
 		// todo check access
 		
-		IProcessModel model = (IProcessModel)SComponentFactory.loadModel(wfms, filename);
+		ILoadableComponentModel model = SComponentFactory.loadModel(container, filename);
 		String modelName = model.getName();
 		if (modelName == null)
 		{
@@ -189,9 +188,9 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 	 *  @param name The model name.
 	 *  @return The process model.
 	 */
-	public IProcessModel getProcessModel(String name)
+	public ILoadableComponentModel getProcessModel(String name)
 	{
-		return (IProcessModel)models.get(name);
+		return (ILoadableComponentModel)models.get(name);
 	}
 	
 	/**

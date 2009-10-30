@@ -1,8 +1,6 @@
 package jadex.wfms.client;
 
-import jadex.wfms.IWfms;
 import jadex.wfms.service.client.IClientService;
-import jadex.wfms.service.definition.IProcessDefinitionService;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -15,7 +13,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.ListModel;
 
 public class ProcessStarterClient extends JFrame implements IClient
 {

@@ -138,28 +138,6 @@ public class BDIAgentFactory implements IComponentFactory
 	}
 	
 	/**
-	 *  Create a kernel agent.
-	 *  @param adapter	The platform adapter for the agent. 
-	 *  @param model	The agent model file (i.e. the name of the XML file).
-	 *  @param config	The name of the configuration (or null for default configuration) 
-	 *  @param arguments	The arguments for the agent as name/value pairs.
-	 *  @return	An instance of a kernel agent.
-	 * /
-	public IComponentInstance	createKernelAgent(IComponentAdapter adapter, String model, String config, Map arguments)
-	{
-		init();
-		
-		OAVAgentModel	loaded 	= (OAVAgentModel)loadModel(model);
-		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
-		OAVTypeModel	tmodel	= new OAVTypeModel(adapter.getComponentIdentifier().getLocalName()+"_typemodel", loaded.getTypeModel().getClassLoader());
-		tmodel.addTypeModel(loaded.getTypeModel());
-		tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
-		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
-		state.addSubstate(loaded.getState());
-		return new BDIInterpreter(adapter, state, loaded, config, arguments, props);
-	}*/
-	
-	/**
 	 *  Load an agent model.
 	 *  @param filename The filename.
 	 */
@@ -240,13 +218,4 @@ public class BDIAgentFactory implements IComponentFactory
 			: model.toLowerCase().endsWith(".capability.xml") ? FILETYPE_BDICAPABILITY
 			: null;
 	}
-	
-	/**
-	 *  Get the element type.
-	 *  @return The element type (e.g. an agent, application or process).
-	 * /
-	public String getElementType()
-	{
-		return IComponentFactory.ELEMENT_TYPE_AGENT;
-	}*/
 }

@@ -1,11 +1,11 @@
 package jadex.gpmn.model;
 
 import jadex.bridge.IArgument;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IReport;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.wfms.IProcessModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  *  Java representation of a bpmn model for xml description.
  */
-public class MGpmnModel extends MProcess implements ICacheableModel, IProcessModel
+public class MGpmnModel extends MProcess implements ICacheableModel, ILoadableComponentModel
 {
 	//-------- attributes --------
 	
@@ -54,6 +54,9 @@ public class MGpmnModel extends MProcess implements ICacheableModel, IProcessMod
 	
 	/** The last check date. */
 	protected long lastchecked;
+	
+	/** The classloader. */
+	protected ClassLoader classloader;
 	
 	//-------- methods --------
 
@@ -363,4 +366,20 @@ public class MGpmnModel extends MProcess implements ICacheableModel, IProcessMod
 		};
 	}
 	
+	/**
+	 *  Return the class loader corresponding to the micro agent class.
+	 */
+	public ClassLoader getClassLoader()
+	{
+		return classloader;
+	}
+
+	/**
+	 *  Set the classloader.
+	 *  @param classloader The classloader to set.
+	 */
+	public void setClassloader(ClassLoader classloader)
+	{
+		this.classloader = classloader;
+	}
 }

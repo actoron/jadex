@@ -16,7 +16,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.SReflect;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
-import jadex.wfms.IWfms;
+import jadex.service.IServiceContainer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,7 +79,7 @@ public class BpmnInstance	implements IProcessInstance
 	protected List history;
 	
 	/** The WFMS. */
-	protected IWfms wfms;
+	protected IServiceContainer wfms;
 	
 	/** The change listeners. */
 	protected List listeners;
@@ -313,7 +313,7 @@ public class BpmnInstance	implements IProcessInstance
 	 *  Get the WFMS.
 	 *  @return The WFMS.
 	 */
-	public IWfms getWfms()
+	public IServiceContainer getWfms()
 	{
 		return this.wfms;
 	}
@@ -322,7 +322,7 @@ public class BpmnInstance	implements IProcessInstance
 	 *  Set the WFMS.
 	 *  @param wfms The WFMS.
 	 */
-	public void setWfms(IWfms wfms)
+	public void setWfms(IServiceContainer wfms)
 	{
 		this.wfms = wfms;
 	}

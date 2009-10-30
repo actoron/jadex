@@ -13,7 +13,7 @@ import jadex.service.PropertyServiceContainer;
 /**
  *  Basic wfms implementation.
  */
-public class BasicWfms extends PropertyServiceContainer implements IWfms
+public class BasicWfms extends PropertyServiceContainer
 {
 	//-------- constants --------
 	

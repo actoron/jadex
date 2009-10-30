@@ -1,5 +1,6 @@
 package jadex.gpmn;
 
+import jadex.bpmn.model.MBpmnModel;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
@@ -46,6 +47,23 @@ public class GpmnXMLReader
 	static
 	{
 		reader = new Reader(new BeanObjectReaderHandler(getXMLMapping()));
+	}
+	
+	/**
+	 *  Read properties from xml.
+	 *  @param info	The resource info.
+	 *  @param classloader The classloader.
+ 	 */
+	protected static MGpmnModel read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
+	{
+		MGpmnModel ret = (MGpmnModel)reader.read(rinfo.getInputStream(), classloader, null);
+		ret.setFilename(rinfo.getFilename());
+		ret.setLastModified(rinfo.getLastModified());
+		String name = new File(rinfo.getFilename()).getName();
+		name = name.substring(0, name.length()-5);
+		ret.setName(name);
+		rinfo.getInputStream().close();
+		return ret;
 	}
 	
 	/**
