@@ -182,6 +182,7 @@
 					//	+" jadex.tools.jadexdoc.JadexdocPlugin"
 						+" jadex.tools.simcenter.SimCenterPlugin"
 						+" jadex.tools.introspector.IntrospectorPlugin"
+						+" jadex.tools.debugger.DebuggerPlugin"
 						+" jadex.tools.ruleprofiler.RuleProfilerPlugin"
 						+" jadex.tools.libtool.LibraryPlugin",
 						$scope.getExternalAccess())
