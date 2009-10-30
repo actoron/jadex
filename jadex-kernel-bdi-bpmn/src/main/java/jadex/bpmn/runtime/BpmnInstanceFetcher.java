@@ -11,7 +11,7 @@ public class BpmnInstanceFetcher implements IValueFetcher
 	//-------- attributes --------
 	
 	/** The BPMN process instance. */
-	protected BpmnInstance	instance;
+	protected BpmnInterpreter	interpreter;
 	
 	/** The superordinated value fetcher (if any). */
 	protected IValueFetcher	fetcher;
@@ -21,9 +21,9 @@ public class BpmnInstanceFetcher implements IValueFetcher
 	/**
 	 *  Create a BPMN instance value fetcher.
 	 */
-	public BpmnInstanceFetcher(BpmnInstance instance, IValueFetcher fetcher)
+	public BpmnInstanceFetcher(BpmnInterpreter interpreter, IValueFetcher fetcher)
 	{
-		this.instance	= instance;
+		this.interpreter	= interpreter;
 		this.fetcher	= fetcher;
 	}
 	
@@ -48,9 +48,9 @@ public class BpmnInstanceFetcher implements IValueFetcher
 	public Object fetchValue(String name)
 	{
 		Object	ret;
-		if(instance.hasContextVariable(name))
+		if(interpreter.hasContextVariable(name))
 		{
-			ret	= instance.getContextVariable(name);
+			ret	= interpreter.getContextVariable(name);
 		}
 		else if(fetcher!=null)
 		{

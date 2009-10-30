@@ -1,7 +1,7 @@
 package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 
 /**
@@ -12,7 +12,7 @@ public class EventEndErrorActivityHandler extends DefaultActivityHandler
 	/**
 	 *  Execute the activity.
 	 */
-	protected void doExecute(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	protected void doExecute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 		thread.setException(new EventEndErrorException(activity.getDescription()));
 		step(activity, instance, thread, null);

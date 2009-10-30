@@ -2,7 +2,7 @@ package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
-import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
 
@@ -23,7 +23,7 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 		List	incoming	= activity.getIncomingSequenceEdges();
 		List	outgoing	= activity.getOutgoingSequenceEdges();

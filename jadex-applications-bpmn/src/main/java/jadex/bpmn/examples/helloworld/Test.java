@@ -4,7 +4,7 @@ import jadex.bpmn.BpmnExecutor;
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.BpmnXMLReader;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.tools.ExecutionControlPanel;
 
 public class Test
@@ -30,10 +30,10 @@ public class Test
 //			String filename = "jadex/bpmn/examples/helloworld/ForLoop.bpmn";
 //			String filename = "jadex/bpmn/examples/helloworld/Scopes.bpmn";
 			
-			MBpmnModel model = new BpmnModelLoader().loadBpmnModel(filename, null);
-			BpmnInstance instance = new BpmnInstance(model);
-			BpmnExecutor exe = new BpmnExecutor(instance, true);
-			ExecutionControlPanel.createBpmnFrame("test", instance, exe);
+//			MBpmnModel model = new BpmnModelLoader().loadBpmnModel(filename, null);
+//			BpmnInterpreter instance = new BpmnInterpreter(model);
+//			BpmnExecutor exe = new BpmnExecutor(instance, true);
+//			ExecutionControlPanel.createBpmnFrame("test", instance, exe);
 		}
 		catch(Exception e)
 		{

@@ -4,7 +4,7 @@ import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.bpmnbdi.BpmnPlanBodyInstance;
@@ -42,7 +42,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(final MActivity activity, final BpmnInstance instance, final ProcessThread thread)
+	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
 		if(thread.hasPropertyValue(PROPERTY_MODE) && MODE_SEND.equals(thread.getPropertyValue(PROPERTY_MODE)))
 		{

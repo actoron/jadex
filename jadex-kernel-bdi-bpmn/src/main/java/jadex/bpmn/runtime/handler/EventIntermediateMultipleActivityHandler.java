@@ -2,7 +2,7 @@ package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSequenceEdge;
-import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmnbdi.BpmnPlanBodyInstance;
 import jadex.commons.IFilter;
@@ -20,7 +20,7 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 		System.out.println("Executed: "+activity+", "+instance);
 		
@@ -57,7 +57,7 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 	 *  @param thread	The process thread.
 	 *  @param context	The thread context.
 	 */
-	public void step(MActivity activity, BpmnInstance instance, ProcessThread thread, Object event)
+	public void step(MActivity activity, BpmnInterpreter instance, ProcessThread thread, Object event)
 	{
 		MSequenceEdge next	= null;
 		

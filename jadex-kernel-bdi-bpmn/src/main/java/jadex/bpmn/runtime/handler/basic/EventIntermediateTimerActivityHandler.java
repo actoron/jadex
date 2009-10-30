@@ -1,7 +1,7 @@
 package jadex.bpmn.runtime.handler.basic;
 
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.AbstractEventIntermediateTimerActivityHandler;
 
@@ -21,7 +21,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	 *  @param thread	The process thread.
 	 *  @param duration	The duration to wait.
 	 */
-	public void doWait(final MActivity activity, final BpmnInstance instance, final ProcessThread thread, long duration)
+	public void doWait(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, long duration)
 	{
 		final Timer	timer	= new Timer();
 		timer.schedule(new TimerTask()

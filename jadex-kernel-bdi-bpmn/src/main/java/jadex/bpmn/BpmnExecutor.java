@@ -1,7 +1,6 @@
 package jadex.bpmn;
 
-import jadex.bpmn.runtime.BpmnInstance;
-import jadex.bpmn.runtime.IBpmnExecutor;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
 import jadex.commons.ICommand;
@@ -18,7 +17,7 @@ import java.util.Set;
 /**
  *  A bpmn process executor can execute a bpmn instance on a separate thread.
  */
-public class BpmnExecutor	implements IBpmnExecutor, ISteppable
+public class BpmnExecutor	//implements IBpmnExecutor, ISteppable
 {
 	//-------- attributes --------
 
@@ -29,7 +28,7 @@ public class BpmnExecutor	implements IBpmnExecutor, ISteppable
 	protected boolean dostep;
 	
 	/** The bpmn instance. */
-	protected BpmnInstance instance;
+	protected BpmnInterpreter instance;
 	
 	/** The executor. */
 	protected Executor executor;
@@ -46,7 +45,7 @@ public class BpmnExecutor	implements IBpmnExecutor, ISteppable
 	/**
 	 *  Executor for bpmn instances.
 	 */
-	public BpmnExecutor(final BpmnInstance instance, boolean stepmode)
+	public BpmnExecutor(final BpmnInterpreter instance, boolean stepmode)
 	{
 		this(instance, stepmode, null);
 	}
@@ -54,7 +53,7 @@ public class BpmnExecutor	implements IBpmnExecutor, ISteppable
 	/**
 	 *  Executor for bpmn instances.
 	 */
-	public BpmnExecutor(final BpmnInstance bpmninstance, boolean stepmode, IThreadPool threadpool)
+	public BpmnExecutor(final BpmnInterpreter bpmninstance, boolean stepmode, IThreadPool threadpool)
 	{
 		this.instance = bpmninstance;
 		final IThreadPool pool = threadpool!=null? threadpool: ThreadPoolFactory.createThreadPool();
@@ -113,7 +112,8 @@ public class BpmnExecutor	implements IBpmnExecutor, ISteppable
 			}
 		);
 		
-		instance.setExecutor(this);
+		//todo:
+//		instance.setAdapter(this);
 				
 		setStepmode(stepmode);
 	}
@@ -211,7 +211,7 @@ public class BpmnExecutor	implements IBpmnExecutor, ISteppable
 	 *  Get the bpmn instance.
 	 *  @return The bpmn instance. 
 	 */
-	public BpmnInstance getBpmnInstance()
+	public BpmnInterpreter getBpmnInstance()
 	{
 		return this.instance;
 	}

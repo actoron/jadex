@@ -1,6 +1,6 @@
 package jadex.bpmn.tools;
 
-import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.commons.ICommand;
 import jadex.commons.ISteppable;
 
@@ -95,7 +95,7 @@ public class ExecutionControlPanel extends JPanel
 	 *  @param rs	The rule system.
 	 *  @return	The frame.
 	 */
-	public static JFrame createBpmnFrame(String title, BpmnInstance instance, ISteppable steppable)
+	public static JFrame createBpmnFrame(String title, BpmnInterpreter instance, ISteppable steppable)
 	{
 		JFrame f = new JFrame(title);
 		f.getContentPane().setLayout(new BorderLayout());

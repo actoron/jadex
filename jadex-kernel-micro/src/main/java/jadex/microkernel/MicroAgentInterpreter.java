@@ -6,6 +6,7 @@ import jadex.bridge.IArgument;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.concurrent.IResultListener;
+import jadex.javaparser.IValueFetcher;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +38,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 	
 	/** The arguments. */
 	protected Map arguments;
+	
+	/** The activity handlers. */
+	protected Map	handlers;
 	
 	// todo: ensure that entries are empty when saving
 	/** The entries added from external threads. */

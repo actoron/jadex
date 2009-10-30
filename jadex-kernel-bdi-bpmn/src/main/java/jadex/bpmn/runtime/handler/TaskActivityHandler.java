@@ -1,7 +1,7 @@
 package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.commons.concurrent.IResultListener;
@@ -17,7 +17,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(final MActivity activity, final BpmnInstance instance, final ProcessThread thread)
+	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
 //		Class taskimpl = (Class)getPropertyValue(activity, instance, thread, "class");
 		Class taskimpl = (Class)thread.getPropertyValue("class");

@@ -2,7 +2,7 @@ package jadex.bpmnbdi.handler;
 
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.bpmnbdi.BpmnPlanBodyInstance;
@@ -20,7 +20,7 @@ public class EventIntermediateRuleActicityHandler	extends DefaultActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(final MActivity activity, final BpmnInstance instance, final ProcessThread thread)
+	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
 		// Just set thread to waiting.
 		String type	= (String)thread.getPropertyValue("type", activity);

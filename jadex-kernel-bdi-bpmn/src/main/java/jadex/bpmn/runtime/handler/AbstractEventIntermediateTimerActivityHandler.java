@@ -1,7 +1,7 @@
 package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 
 /**
@@ -16,7 +16,7 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 //		Number dur = (Number)getPropertyValue(activity, instance, thread, "duration");
 		Number dur = (Number)thread.getPropertyValue("duration", activity);
@@ -33,5 +33,5 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 	 *  @param thread	The process thread.
 	 *  @param duration	The duration to wait.
 	 */
-	public abstract void doWait(MActivity activity, BpmnInstance instance, ProcessThread thread, long duration);
+	public abstract void doWait(MActivity activity, BpmnInterpreter instance, ProcessThread thread, long duration);
 }

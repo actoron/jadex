@@ -3,7 +3,7 @@ package jadex.bpmn.runtime.handler;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MNamedIdElement;
 import jadex.bpmn.model.MSequenceEdge;
-import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
@@ -23,7 +23,7 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 		doExecute(activity, instance, thread);
 		step(activity, instance, thread, null);
@@ -35,7 +35,7 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	protected void doExecute(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	protected void doExecute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 		System.out.println("Executed: "+activity+", "+instance);
 	}
@@ -46,7 +46,7 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void step(MActivity activity, BpmnInstance instance, ProcessThread thread, Object event)
+	public void step(MActivity activity, BpmnInterpreter instance, ProcessThread thread, Object event)
 	{
 		MNamedIdElement	next	= null;
 		Exception	ex	= thread.getException();
@@ -162,7 +162,7 @@ public class DefaultActivityHandler implements IActivityHandler
 	 *  @param thread	The process thread.
 	 *  @param event	The event that has occurred, if any.
 	 */
-	public void	notify(final MActivity activity, final BpmnInstance instance, final ProcessThread thread, final Object event)
+	public void	notify(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, final Object event)
 	{
 		instance.invokeLater(new Runnable()
 		{

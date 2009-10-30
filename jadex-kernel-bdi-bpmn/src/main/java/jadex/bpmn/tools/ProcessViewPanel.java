@@ -3,7 +3,7 @@ package jadex.bpmn.tools;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
-import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.HistoryEntry;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
@@ -40,7 +40,7 @@ public class ProcessViewPanel extends JPanel
 	//------- attributes --------
 	
 	/** The agenda. */
-	protected BpmnInstance instance;
+	protected BpmnInterpreter instance;
 	
 	/** The change listener. */
 	protected IChangeListener listener;
@@ -71,7 +71,7 @@ public class ProcessViewPanel extends JPanel
 	/**
 	 *  Create an agenda panel.
 	 */
-	public ProcessViewPanel(final BpmnInstance instance)
+	public ProcessViewPanel(final BpmnInterpreter instance)
 	{
 		this.instance = instance;
 		this.ptmodel = new ProcessThreadModel();

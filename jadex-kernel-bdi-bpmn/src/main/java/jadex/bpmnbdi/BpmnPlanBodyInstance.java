@@ -51,14 +51,14 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
-import jadex.bpmn.runtime.BpmnInstance;
-import jadex.bpmn.runtime.IBpmnExecutor;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.bpmnbdi.handler.EventIntermediateMessageActivityHandler;
 import jadex.bpmnbdi.handler.EventIntermediateRuleActicityHandler;
 import jadex.bpmnbdi.handler.EventIntermediateSignalActivityHandler;
 import jadex.bpmnbdi.handler.EventIntermediateTimerActivityHandler;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
@@ -78,7 +78,7 @@ import java.util.logging.Logger;
 /**
  *  A BPMN instance that is executed as a plan body.
  */
-public class BpmnPlanBodyInstance extends BpmnInstance
+public class BpmnPlanBodyInstance extends BpmnInterpreter
 {
 	//-------- static part --------
 	
@@ -90,7 +90,7 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 	
 	static
 	{
-		Map	defhandlers	= new HashMap(BpmnInstance.DEFAULT_HANDLERS);
+		Map	defhandlers	= new HashMap(BpmnInterpreter.DEFAULT_HANDLERS);
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE, new EventIntermediateMessageActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new EventIntermediateRuleActicityHandler());
@@ -126,51 +126,53 @@ public class BpmnPlanBodyInstance extends BpmnInstance
 	 */
 	public BpmnPlanBodyInstance(MBpmnModel model, final BDIInterpreter interpreter, final Object rcapa, final Object rplan)
 	{
-		super(model, DEFAULT_HANDLERS, new OAVBDIFetcher(interpreter.getState(), rcapa, rplan));
+		super(interpreter.getAgentAdapter(), model, null, null, DEFAULT_HANDLERS, new OAVBDIFetcher(interpreter.getState(), rcapa, rplan));
 		this.interpreter	= interpreter;
 		this.state = interpreter.getState();
 		this.rcapa = rcapa;
 		this.rplan = rplan;
 		
-		this.setExecutor(new IBpmnExecutor()
-		{
-			public void wakeUp()
-			{
-				if(interpreter.isExternalThread())
-				{
-//					Thread.dumpStack();
-					interpreter.invokeLater(new Runnable()
-					{
-						public void run()
-						{
-							if(state.containsObject(rplan) && !OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED.equals(state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate)))
-							{
-								String lane	= getLane(getLastState());
-								if(!LANE_UNDEFINED.equals(lane) && isReady(null, lane))
-								{
-									// todo: event?!
-									EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
-//									state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
-								}
-							}
-						}
-					});
-				}
-				else
-				{
-					if(state.containsObject(rplan) && !OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED.equals(state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate)))
-					{
-						String lane	= getLane(getLastState());
-						if(!LANE_UNDEFINED.equals(lane) && isReady(null, lane))
-						{
-							// todo: event?!
-							EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
-//							state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
-						}
-					}
-				}
-			}
-		});
+		// todo:
+		
+//		this.setAdapter(new IBpmnExecutor()
+//		{
+//			public void wakeUp()
+//			{
+//				if(interpreter.isExternalThread())
+//				{
+////					Thread.dumpStack();
+//					interpreter.invokeLater(new Runnable()
+//					{
+//						public void run()
+//						{
+//							if(state.containsObject(rplan) && !OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED.equals(state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate)))
+//							{
+//								String lane	= getLane(getLastState());
+//								if(!LANE_UNDEFINED.equals(lane) && isReady(null, lane))
+//								{
+//									// todo: event?!
+//									EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
+////									state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+//								}
+//							}
+//						}
+//					});
+//				}
+//				else
+//				{
+//					if(state.containsObject(rplan) && !OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED.equals(state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate)))
+//					{
+//						String lane	= getLane(getLastState());
+//						if(!LANE_UNDEFINED.equals(lane) && isReady(null, lane))
+//						{
+//							// todo: event?!
+//							EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
+////							state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+//						}
+//					}
+//				}
+//			}
+//		});
 	}
 	
 	//-------- methods --------

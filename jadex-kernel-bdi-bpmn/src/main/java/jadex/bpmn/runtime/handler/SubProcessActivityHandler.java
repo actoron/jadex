@@ -2,7 +2,7 @@ package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MSubProcess;
-import jadex.bpmn.runtime.BpmnInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
 
@@ -19,7 +19,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(MActivity activity, BpmnInstance instance, ProcessThread thread)
+	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 		MSubProcess	proc	= (MSubProcess) activity;
 //		thread.setWaitingState(ProcessThread.WAITING_FOR_SUBPROCESS);

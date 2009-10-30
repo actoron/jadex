@@ -68,7 +68,7 @@ public class ProcessThread	implements ITaskContext
 	protected ThreadContext	context;
 	
 	/** The Bpmn instance. */
-	protected BpmnInstance instance;
+	protected BpmnInterpreter instance;
 	
 	/** The exception that has just occurred in the process (if any). */
 	protected Exception	exception;
@@ -92,7 +92,7 @@ public class ProcessThread	implements ITaskContext
 	 *  Create a new process instance.
 	 *  @param activity	The current activity.
 	 */
-	public ProcessThread(MActivity activity, ThreadContext context, BpmnInstance instance)
+	public ProcessThread(MActivity activity, ThreadContext context, BpmnInterpreter instance)
 	{
 		synchronized(ProcessThread.class)
 		{
@@ -407,7 +407,7 @@ public class ProcessThread	implements ITaskContext
 	 *  Update parameters based on edge inscriptions and initial values.
 	 *  @param instance	The calling BPMN instance.
 	 */
-	protected  void updateParameters(BpmnInstance instance)
+	protected  void updateParameters(BpmnInterpreter instance)
 	{
 		if(MBpmnModel.TASK.equals(getActivity().getActivityType())
 			|| getActivity() instanceof MSubProcess)
