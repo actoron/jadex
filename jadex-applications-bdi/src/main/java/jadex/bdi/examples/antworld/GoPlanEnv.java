@@ -4,7 +4,9 @@ import jadex.adapter.base.envsupport.environment.ISpaceAction;
 import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.bdi.examples.garbagecollector.GoAction;
 import jadex.bdi.runtime.Plan;
+import jadex.bdi.runtime.Plan.SyncResultListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,9 +32,10 @@ import java.util.Map;
 		params.put(UpdateDestinationAction.DESTINATION, target);
 //		params.put(GravitationListener.FEELS_GRAVITATION, hasGravitation);
 		// params.put("owner", myself.getId());
-		SyncResultListener srl = new SyncResultListener();
-		env.performSpaceAction("updateDestination", params, srl);
-		srl.waitForResult();
+//		SyncResultListener srl = new SyncResultListener();
+//		env.performSpaceAction("updateDestination", params, srl);
+		env.performSpaceAction("updateDestination", params);
+//		srl.waitForResult();
 
 		while (!target.equals(myself.getProperty(Space2D.PROPERTY_POSITION))) {
 			IVector2 mypos = (IVector2) myself.getProperty(Space2D.PROPERTY_POSITION);
@@ -61,19 +64,26 @@ import java.util.Map;
 				params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
 				params.put(ProducePheromoneAction.POSITION, mypos);
 				params.put(ProducePheromoneAction.STRENGTH, new Integer(10));
-				srl = new SyncResultListener();
-				env.performSpaceAction("producePheromone", params, srl);
-				srl.waitForResult();
+//				SyncResultListener	srl = new SyncResultListener();
+				env.performSpaceAction("producePheromone", params);
+				
+//				srl = new SyncResultListener();
+//				env.performSpaceAction("producePheromone", params, srl);
+//				srl.waitForResult();
 			}
 			
 			// go to next position
 			params = new HashMap();
 			params.put(GoAction.DIRECTION, dir);
-			params.put(ISpaceAction.OBJECT_ID, env.getAvatars(getAgentIdentifier())[0].getId());
-			srl = new SyncResultListener();
+//			params.put(ISpaceAction.OBJECT_ID, env.getAvatars(getAgentIdentifier())[0].getId());
+			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getAgentIdentifier()).getId());
+			SyncResultListener srl = new SyncResultListener();
 			env.performSpaceAction("go", params, srl);
 			srl.waitForResult();
 
+			
+															
+			
 			ISpaceObject[] objects = null;
 			objects = (ISpaceObject[]) getBeliefbase().getBeliefSet("pheromones").getFacts();
 //			System.out.println("#GoPlanEnv# Number of pheromones." + objects.length);
