@@ -1,19 +1,29 @@
 package jadex.wfms.service.loader;
 
+import jadex.bdi.interpreter.BDIInterpreter;
+import jadex.bdi.interpreter.OAVAgentModel;
+import jadex.bdi.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.interpreter.OAVBDIXMLReader;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.xml.writer.Writer;
+import jadex.gpmn.GpmnBDIConverter;
 import jadex.gpmn.GpmnModelLoader;
 import jadex.gpmn.GpmnXMLReader;
 import jadex.gpmn.model.MGpmnModel;
 import jadex.microkernel.MicroAgentFactory;
+import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVTypeModel;
+import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
 
+import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.Map;
 
@@ -232,8 +242,16 @@ public class GpmnFactory implements IComponentFactory
 	 */
 	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments)
 	{
-		// todo:
+		return null;
 		
-		throw new UnsupportedOperationException();
+//		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
+//		GpmnBDIConverter converter = new GpmnBDIConverter(loader);
+//		MGpmnModel gmodel = (MGpmnModel)model;
+//		OAVAgentModel agent	= converter.convertGpmnModelToBDIAgents(gpmn, libservice.getClassLoader());
+//
+//		FileOutputStream os = new FileOutputStream("wurst.xml");
+//		Writer writer = OAVBDIXMLReader.getWriter();
+//		writer.write(agent.getState().getRootObjects().next(), os, libservice.getClassLoader(), agent.getState());
+//		os.close();
 	}
 }
