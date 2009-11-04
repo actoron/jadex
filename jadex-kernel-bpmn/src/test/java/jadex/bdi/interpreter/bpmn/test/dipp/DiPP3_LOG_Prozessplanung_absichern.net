@@ -1,0 +1,113 @@
+<net configuration="bpmn" version="1.1" revision="1_3" encoding="UTF-8">
+  <node type="StartLink" id="s1" label="start" xposition="-195" yposition="0" >
+    <attribute name="Link" value="" />
+    <description>StartLink-1</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="Optimieren_Logistikprozesse" tail="s1" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="Optimieren_Logistikprozesse" label="Optimieren_Logistikprozesse" xposition="-87" yposition="0" >
+    <attribute name="MsgImplementation" value="show text at GUI" />
+    <attribute name="Role" value="" />
+    <attribute name="ExplanationText" value="&#60;HTML&#62;&#60;CENTER&#62; &#60;H1&#62; DiPP3 - Absicherung Prozessplanung &#60;/H1&#62; &#60;br&#62; &#60;H2&#62;Logistikprozessplanung optimieren &#38; absichern &#60;/H2&#62;&#60;/CENTER&#62;&#60;/HTML&#62;" />
+    <table name="TaskProperties">
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+    </table>
+    <description>Logistikprozessplanung optimieren &#38; absichern</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="Durchfuehren_Materialflusssimulation" tail="Optimieren_Logistikprozesse" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="Durchfuehren_Materialflusssimulation" label="Durchfuehren_Materialflusssimulation" xposition="113" yposition="2" >
+    <attribute name="MsgImplementation" value="get input from user via parameterized GUI" />
+    <attribute name="Role" value="" />
+    <attribute name="ExplanationText" value="&#60;HTML&#62;&#60;CENTER&#62; &#60;H1&#62; DiPP3 - Absicherung Prozessplanung &#60;/H1&#62; &#60;br&#62; &#60;H2&#62; Absicherung  Prozesskette, Perlenkette incl. Sortierpuffer durch Materialflusssimulation &#60;br&#62; &#60;img src=&#34;/images/Materialflusssimulation.jpg&#34;&#62; &#60;/B&#62;&#60;/H2&#62;&#60;/CENTER&#62;&#60;/HTML&#62;" />
+    <table name="TaskProperties">
+      <tr>
+        <td>Simulation_ok</td>
+        <td>Simulationsergebnisse ok? </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>true</td>
+      </tr>
+    </table>
+    <description>Task-3</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="Sim_Ergebnisse" tail="Durchfuehren_Materialflusssimulation" >
+    <description></description>
+  </edge>
+
+  <node type="EndNode" id="e2" label="end" xposition="508" yposition="11" >
+    <description>EndNode-4</description>
+  </node>
+
+  <node type="XOR Gateway" id="Sim_Ergebnisse" label="Sim_Ergebnisse" xposition="279" yposition="-2" >
+    <description>XOR Gateway-1</description>
+  </node>
+
+  <edge type="conditional_flow" label="ok" connector="straight" head="setzen_Kontext" tail="Sim_Ergebnisse" >
+    <description></description>
+    <attribute name="ConditionExpression" value="Simulation_ok = TRUE" />
+  </edge>
+
+  <edge type="conditional_flow" label="not ok" connector="straight" head="setzen_Kontext_repeat" tail="Sim_Ergebnisse" >
+    <description></description>
+    <attribute name="ConditionExpression" value="Simulation_ok = FALSE" />
+  </edge>
+
+  <node type="Task" id="setzen_Kontext" label="setzen Kontext" xposition="387" yposition="-66" >
+    <attribute name="MsgImplementation" value="write Context" />
+    <attribute name="Role" value="" />
+    <attribute name="ExplanationText" value="" />
+    <table name="TaskProperties">
+      <tr>
+        <td>Simulation_Ergebnis</td>
+        <td>&#34;OK&#34;</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+    </table>
+    <description>Task-2</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="e2" tail="setzen_Kontext" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="setzen_Kontext_repeat" label="setzen Kontext REPEAT" xposition="385" yposition="65" >
+    <attribute name="MsgImplementation" value="write Context" />
+    <attribute name="Role" value="" />
+    <attribute name="ExplanationText" value="" />
+    <table name="TaskProperties">
+      <tr>
+        <td>Simulation_Ergebnis</td>
+        <td>&#34;Failure&#34;</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+    </table>
+    <description>Task-3</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="e2" tail="setzen_Kontext_repeat" >
+    <description></description>
+  </edge>
+
+</net>

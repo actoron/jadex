@@ -36,7 +36,7 @@ public class BpmnFactory implements IComponentFactory
 	 */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"bpmn_process",	SGUI.makeIcon(MicroAgentFactory.class, "/jadex/microkernel/images/micro_agent.png"),
+		"bpmn_process",	SGUI.makeIcon(MicroAgentFactory.class, "/jadex/bpmn/images/bpmn_process.png"),
 	});
 	
 	//-------- attributes --------

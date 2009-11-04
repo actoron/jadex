@@ -32,7 +32,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 	//-------- attributes --------
 	
 	/** Model loader (todo: classpath issues?) */
-	protected BpmnModelLoader	loader;
+	protected BpmnModelLoader loader;
 
 	//-------- constructor --------
 

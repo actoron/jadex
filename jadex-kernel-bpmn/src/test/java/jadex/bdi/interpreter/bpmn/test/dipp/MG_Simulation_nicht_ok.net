@@ -1,0 +1,87 @@
+<net configuration="bpmn" version="1.1" revision="1_3" encoding="UTF-8">
+  <node type="StartLink" id="start" label="start" xposition="-233" yposition="0" >
+    <attribute name="Link" value="" />
+    <description>StartLink-1</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="Informieren_Planer" tail="start" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="Informieren_Planer" label="Informieren_Planer" xposition="-143" yposition="1" >
+    <attribute name="MsgImplementation" value="show text at GUI" />
+    <attribute name="Role" value="ProzessPlaner" />
+    <attribute name="ExplanationText" value="&#60;HTML&#62;&#60;CENTER&#62; &#60;H1&#62; &#60;font color=red&#62; DiPP - Simulation hat Fehler aufgedeckt &#60;/H1&#62; &#60;BR&#62; &#60;H2&#62; Bei der Durchführung der DiPP 3 Simulation wurden Fehler aufgedeckt. &#60;br&#62; Bitte notwendige Änderungen veranlassen und die DiPP-3 Simulation wiederholen. &#60;/H2&#62;&#60;/CENTER&#62;&#60;/HTML&#62;" />
+    <table name="TaskProperties">
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+    </table>
+    <description>Task-3</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="Ruecksetzen_Kontext" tail="Informieren_Planer" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="Ruecksetzen_Kontext" label="Ruecksetzen_Kontext" xposition="-14" yposition="0" >
+    <attribute name="MsgImplementation" value="write Context" />
+    <attribute name="Role" value="" />
+    <attribute name="ExplanationText" value="" />
+    <table name="TaskProperties">
+      <tr>
+        <td>Simulation_ok</td>
+        <td>TRUE</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+      <tr>
+        <td>Simulation_Ergebnis</td>
+        <td>&#34;Repeat&#34;</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+    </table>
+    <description>Task-5</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="reaktivieren_Simulation" tail="Ruecksetzen_Kontext" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="reaktivieren_Simulation" label="Reaktivieren_Simulation" xposition="127" yposition="0" >
+    <attribute name="MsgImplementation" value="activate goals" />
+    <attribute name="Role" value="" />
+    <attribute name="ExplanationText" value="" />
+    <table name="TaskProperties">
+      <tr>
+        <td>DiPP3_LOG_Logistik_intern_abgesichert</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+    </table>
+    <description>Re-Aktivieren:
+DiPP3_LOG_Logistik_intern_abgesichert</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="end" tail="reaktivieren_Simulation" >
+    <description></description>
+  </edge>
+
+  <node type="EndNode" id="end" label="end" xposition="231" yposition="0" >
+    <description>EndNode-2</description>
+  </node>
+
+</net>

@@ -44,7 +44,6 @@ public class BDIAgentFactory implements IComponentFactory
 	//-------- attributes --------
 	
 	/** The factory properties. */
-//	protected Properties kernelprops;
 	protected Map props;
 	
 	/** The model loader. */
@@ -63,7 +62,6 @@ public class BDIAgentFactory implements IComponentFactory
 	 */
 	public BDIAgentFactory(Map props, IServiceContainer container)
 	{
-//		this.kernelprops = kernelprops;
 		this.props = props;
 		this.loader	= new OAVBDIModelLoader();
 		this.container = container;

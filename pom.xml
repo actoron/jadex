@@ -82,6 +82,9 @@
 			<!-- <module>jadex-xwiki</module> -->
 			<!-- <module>jadex-kernel-bdi-continuations</module> -->
 			<module>jadex-kernel-bdi-bpmn</module>
+			<module>jadex-kernel-bpmn</module>
+			<module>jadex-kernel-gpmn</module>
+			<!-- <module>jadex-platform-wfms</module> -->
 		</modules>
   	</profile>
   	<profile>

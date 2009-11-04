@@ -1,0 +1,238 @@
+<net configuration="bpmn" version="1.1" revision="1_3" encoding="UTF-8">
+  <node type="StartLink" id="StartLink1" label="start" xposition="-385" yposition="-110" >
+    <attribute name="Link" value="" />
+    <description>StartLink-1</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="DiPP1_LOG_Abgleichen_Planungspraemissen" tail="StartLink1" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="DiPP1_LOG_Abgleichen_Planungspraemissen" label="DiPP1_LOG_Abgleichen_Planungspraemissen" xposition="-382" yposition="-4" >
+    <attribute name="MsgImplementation" value="get input from user via parameterized GUI" />
+    <attribute name="Role" value="ProzessPlaner" />
+    <attribute name="ExplanationText" value="&#60;HTML&#62;&#60;CENTER&#62; &#60;H1&#62; DiPP1 - Absicherung Prämissen &#60;/H1&#62; &#60;br&#62; &#60;H2&#62; Abgleichen der Logistik-Planungsprämissen &#60;/H2&#62;&#60;/CENTER&#62;&#60;/HTML&#62;" />
+    <table name="TaskProperties">
+      <tr>
+        <td>Produktmodell</td>
+        <td>Digitales Produktmodell liegt vor</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>true</td>
+      </tr>
+      <tr>
+        <td>Vertriebsprognosen</td>
+        <td>Vertriebsprognosen liegen vor</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>true</td>
+      </tr>
+      <tr>
+        <td>GS_Konzept</td>
+        <td>Gebietsspeditionskonzept liegt vor</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>true</td>
+      </tr>
+      <tr>
+        <td>MOLOG_Praemissen</td>
+        <td>Prämissen mit Montage abgeglichen</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>true</td>
+      </tr>
+    </table>
+    <description>Task-2</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="Gate1" tail="DiPP1_LOG_Abgleichen_Planungspraemissen" >
+    <description></description>
+  </edge>
+
+  <node type="EndNode" id="EndNode1" label="end" xposition="455" yposition="521" >
+    <description>EndNode-3</description>
+  </node>
+
+  <node type="XOR Gateway" id="Gate1" label="Praemissen vorhanden" xposition="-378" yposition="127" >
+    <description>XOR Gateway-1</description>
+  </node>
+
+  <edge type="conditional_flow" label="Produktmodell " connector="straight" head="Produktmodell_fehlt" tail="Gate1" >
+    <description></description>
+    <attribute name="ConditionExpression" value="Produktmodell = FALSE" />
+  </edge>
+
+  <edge type="conditional_flow" label="alle Praemissen ok" connector="arc" arcangle="0.7509700944998847" arcgamma="-3.141592653589793" head="EndNode1" tail="Gate1" >
+    <description></description>
+    <attribute name="ConditionExpression" value="(Produktmodell = TRUE) AND (Vertriebsprognosen = TRUE) AND (GS_Konzept = TRUE) AND (MOLOG_Praemissen = TRUE)" />
+  </edge>
+
+  <edge type="conditional_flow" label="ok" connector="straight" head="VP" tail="Gate1" >
+    <description></description>
+    <attribute name="ConditionExpression" value="Produktmodell = TRUE" />
+  </edge>
+
+  <node type="Task" id="Produktmodell_fehlt" label="Produktmodell_fehlt" xposition="-201" yposition="86" >
+    <attribute name="MsgImplementation" value="write Context" />
+    <attribute name="Role" value="System" />
+    <attribute name="ExplanationText" value="" />
+    <table name="TaskProperties">
+      <tr>
+        <td>Praemissen_ok</td>
+        <td>FALSE</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+      <tr>
+        <td>Praemissen_fehlend</td>
+        <td>add(&#34;Produktmodell&#34;)</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+    </table>
+    <description>Produktmodell fehlt oder nicht vollständig;
+entspr. Kontextvariable setzen (für maintain goal)</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="VP" tail="Produktmodell_fehlt" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="Verbtriebsprognosen_fehlen" label="Verbtriebsprognosen_fehlen" xposition="3" yposition="190" >
+    <attribute name="MsgImplementation" value="write Context" />
+    <attribute name="Role" value="" />
+    <attribute name="ExplanationText" value="" />
+    <table name="TaskProperties">
+      <tr>
+        <td>Praemissen_ok</td>
+        <td>FALSE</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+      <tr>
+        <td>Praemissen_fehlend</td>
+        <td>add(&#34;Vertriebsprognosen&#34;)</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+    </table>
+    <description>Task-2</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="GS" tail="Verbtriebsprognosen_fehlen" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="GS_Konzept_fehlt" label="GS_Konzept_fehlt" xposition="157" yposition="283" >
+    <attribute name="MsgImplementation" value="write Context" />
+    <attribute name="Role" value="" />
+    <attribute name="ExplanationText" value="" />
+    <table name="TaskProperties">
+      <tr>
+        <td>Praemissen_ok</td>
+        <td>FALSE</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+      <tr>
+        <td>Praemissen_fehlend</td>
+        <td>add(&#34;GS_Konzept&#34;)</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+    </table>
+    <description>Task-2</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="MOLOG" tail="GS_Konzept_fehlt" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="MOLOG_Praemissen_fehlen" label="MOLOG_Praemissen_fehlen" xposition="325" yposition="375" >
+    <attribute name="MsgImplementation" value="write Context" />
+    <attribute name="Role" value="" />
+    <attribute name="ExplanationText" value="" />
+    <table name="TaskProperties">
+      <tr>
+        <td>Praemissen_ok</td>
+        <td>FALSE</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+      <tr>
+        <td>Praemissen_fehlend</td>
+        <td>add(&#34;MOLOG_Praemissen&#34;)</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>false</td>
+      </tr>
+    </table>
+    <description>Task-2</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="EndNode1" tail="MOLOG_Praemissen_fehlen" >
+    <description></description>
+  </edge>
+
+  <node type="XOR Gateway" id="VP" label="Vertriebsprognosen" xposition="-196" yposition="189" >
+    <description>XOR Gateway-1</description>
+  </node>
+
+  <edge type="conditional_flow" label="Vertr_Prognosen_fehlen" connector="straight" head="Verbtriebsprognosen_fehlen" tail="VP" >
+    <description></description>
+    <attribute name="ConditionExpression" value="Vertriebsprognosen = FALSE" />
+  </edge>
+
+  <edge type="conditional_flow" label="ok" connector="straight" head="GS" tail="VP" >
+    <description></description>
+    <attribute name="ConditionExpression" value="Vertriebsprognosen = TRUE" />
+  </edge>
+
+  <node type="XOR Gateway" id="GS" label="GS_Konzept" xposition="-14" yposition="286" >
+    <description>XOR Gateway-2</description>
+  </node>
+
+  <edge type="conditional_flow" label="GS_Konzept_fehlt" connector="straight" head="GS_Konzept_fehlt" tail="GS" >
+    <description></description>
+    <attribute name="ConditionExpression" value="GS_Konzept = FALSE" />
+  </edge>
+
+  <edge type="conditional_flow" label="ok" connector="straight" head="MOLOG" tail="GS" >
+    <description></description>
+    <attribute name="ConditionExpression" value="GS_Konzept = TRUE" />
+  </edge>
+
+  <node type="XOR Gateway" id="MOLOG" label="MOLOG" xposition="129" yposition="372" >
+    <description>XOR Gateway-3</description>
+  </node>
+
+  <edge type="conditional_flow" label="MOLOG_Praemissen" connector="straight" head="MOLOG_Praemissen_fehlen" tail="MOLOG" >
+    <description></description>
+    <attribute name="ConditionExpression" value="MOLOG_Praemissen = FALSE" />
+  </edge>
+
+  <edge type="conditional_flow" label="" connector="straight" head="EndNode1" tail="MOLOG" >
+    <description></description>
+    <attribute name="ConditionExpression" value="MOLOG_Praemissen = TRUE" />
+  </edge>
+
+</net>

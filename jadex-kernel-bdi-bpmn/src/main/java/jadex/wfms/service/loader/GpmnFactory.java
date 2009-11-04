@@ -1,33 +1,26 @@
 package jadex.wfms.service.loader;
 
-import jadex.bdi.interpreter.BDIInterpreter;
+import jadex.bdi.interpreter.BDIAgentFactory;
 import jadex.bdi.interpreter.OAVAgentModel;
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
-import jadex.bdi.interpreter.OAVBDIXMLReader;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.xml.writer.Writer;
 import jadex.gpmn.GpmnBDIConverter;
 import jadex.gpmn.GpmnModelLoader;
 import jadex.gpmn.GpmnXMLReader;
 import jadex.gpmn.model.MGpmnModel;
 import jadex.microkernel.MicroAgentFactory;
-import jadex.rules.state.IOAVState;
-import jadex.rules.state.OAVTypeModel;
-import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
 
-import java.io.FileOutputStream;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.Map;
 
-import javax.help.UnsupportedOperationException;
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
 
@@ -46,7 +39,7 @@ public class GpmnFactory implements IComponentFactory
 	 */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"gpmn_process",	SGUI.makeIcon(MicroAgentFactory.class, "/jadex/microkernel/images/micro_agent.png"),
+		"gpmn_process",	SGUI.makeIcon(MicroAgentFactory.class, "/jadex/gpmn/images/gpmn.png"),
 	});
 	
 	//-------- attributes --------
@@ -54,11 +47,14 @@ public class GpmnFactory implements IComponentFactory
 	/** The platform */
 	protected IServiceContainer container;
 
-	/** The created processes. (processid -> agentid) */
-//	protected Map processes;
-	
-	/** The loader. */
+	/** The gpmn loader. */
 	protected GpmnModelLoader loader;
+
+	/** The gpmn 2 bdiagent converter. */
+	protected GpmnBDIConverter converter;
+	
+	/** The bdi agent factory. */
+	protected BDIAgentFactory factory;
 	
 	//-------- constructors --------
 	
@@ -69,7 +65,17 @@ public class GpmnFactory implements IComponentFactory
 	{
 		this.container = container;
 		this.loader = new GpmnModelLoader();
-//		this.processes = new HashMap();
+		this.converter = new GpmnBDIConverter();
+		
+		for(Iterator it=container.getServices(IComponentFactory.class).iterator(); 
+			it.hasNext() && factory==null; )
+		{
+			IComponentFactory tmp = (IComponentFactory)it.next();
+			if(tmp instanceof BDIAgentFactory)
+				this.factory = (BDIAgentFactory)tmp;
+		}
+		if(factory == null)
+			throw new RuntimeException("No bdi agent factory found.");
 	}
 	
 	//-------- methods --------
@@ -232,7 +238,6 @@ public class GpmnFactory implements IComponentFactory
 		return model.toLowerCase().endsWith(".gpmn") ? FILETYPE_GPMNPROCESS: null;
 	}
 	
-
 	/**
 	 * Create a kernel agent.
 	 * @param model The agent model file (i.e. the name of the XML file).
@@ -242,16 +247,23 @@ public class GpmnFactory implements IComponentFactory
 	 */
 	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments)
 	{
-		return null;
+		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 		
-//		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
-//		GpmnBDIConverter converter = new GpmnBDIConverter(loader);
-//		MGpmnModel gmodel = (MGpmnModel)model;
-//		OAVAgentModel agent	= converter.convertGpmnModelToBDIAgents(gpmn, libservice.getClassLoader());
-//
-//		FileOutputStream os = new FileOutputStream("wurst.xml");
-//		Writer writer = OAVBDIXMLReader.getWriter();
-//		writer.write(agent.getState().getRootObjects().next(), os, libservice.getClassLoader(), agent.getState());
-//		os.close();
+		MGpmnModel gmodel = (MGpmnModel)model;
+		OAVAgentModel amodel	= converter.convertGpmnModelToBDIAgents(gmodel, libservice.getClassLoader());
+
+		return factory.createComponentInstance(adapter, amodel, config, arguments);
+		
+//		try
+//		{
+//			FileOutputStream os = new FileOutputStream("wurst.xml");
+//			Writer writer = OAVBDIXMLReader.getWriter();
+//			writer.write(agent.getState().getRootObjects().next(), os, libservice.getClassLoader(), agent.getState());
+//			os.close();
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 	}
 }

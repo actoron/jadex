@@ -1,0 +1,44 @@
+<net configuration="bpmn" version="1.1" revision="1_3" encoding="UTF-8">
+  <node type="StartLink" id="start2" label="start" xposition="-127" yposition="-1" >
+    <attribute name="Link" value="" />
+    <description>StartLink-1</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="DiPP1_LOG_Absichern_LT" tail="start2" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="DiPP1_LOG_Absichern_LT" label="DiPP1_LOG_Absichern_LT" xposition="47" yposition="-2" >
+    <attribute name="MsgImplementation" value="get input from user via parameterized GUI" />
+    <attribute name="Role" value="LT_Planer" />
+    <attribute name="ExplanationText" value="&#60;HTML&#62;&#60;CENTER&#62; &#60;H1&#62; DiPP1 - Absicherung Ladungsträger &#60;/H1&#62; &#60;br&#62; &#60;H2&#62;LT-Geometrie und Packungsdichte SLT für kritische Teile abgesichert?  &#60;/H2&#62;&#60;/CENTER&#62;&#60;/HTML&#62;" />
+    <table name="TaskProperties">
+      <tr>
+        <td>LT_Geometrie_liegt_vor</td>
+        <td>Ladungsträger-Geometriel liegt vor</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>true</td>
+      </tr>
+      <tr>
+        <td>LT_Packungsdichte_betrachtet</td>
+        <td>Packungsdichte ok?</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>true</td>
+      </tr>
+    </table>
+    <description>Task-2</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="end2" tail="DiPP1_LOG_Absichern_LT" >
+    <description></description>
+  </edge>
+
+  <node type="EndNode" id="end2" label="end" xposition="229" yposition="1" >
+    <description>EndNode-3</description>
+  </node>
+
+</net>

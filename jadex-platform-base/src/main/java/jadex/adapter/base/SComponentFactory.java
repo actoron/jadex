@@ -17,53 +17,7 @@ import javax.swing.Icon;
  *  and isLoadable() method.
  */
 public class SComponentFactory
-{
-	/**
-	 *  Get the element type.
-	 *  @return The element type (e.g. an agent, application or process).
-	 * /
-	public static String getElementType(IServiceContainer container, String model)
-	{
-		String ret = null;
-		Collection facts = container.getServices(IComponentFactory.class);
-		if(facts!=null)
-		{
-			for(Iterator it=facts.iterator(); it.hasNext() && ret==null; )
-			{
-				IComponentFactory fac = (IComponentFactory)it.next();
-				if(fac.isLoadable(model))
-					ret = fac.getElementType();
-			}
-		}
-		
-		return ret;
-	}*/
-	
-	/**
-	 *  Create a kernel agent.
-	 *  @param adapter	The platform adapter for the agent. 
-	 *  @param model	The agent model file (i.e. the name of the XML file).
-	 *  @param config	The name of the configuration (or null for default configuration) 
-	 *  @param arguments	The arguments for the agent as name/value pairs.
-	 *  @return	An instance of a kernel agent.
-	 * /
-	public static IComponentInstance createKernelAgent(IServiceContainer container, IAgentAdapter adapter, String model, String config, Map arguments)	
-	{
-		IComponentInstance ret = null;
-		Collection facts = container.getServices(IComponentFactory.class);
-		if(facts!=null)
-		{
-			for(Iterator it=facts.iterator(); it.hasNext() && ret==null; )
-			{
-				IComponentFactory fac = (IComponentFactory)it.next();
-				
-				if(fac.isLoadable(model))
-					ret = fac.createComponentInstance(adapter, model, config, arguments);
-			}
-		}
-		
-		return ret;
-	
+{	
 	/**
 	 *  Load an agent model.
 	 *  @param model The model.
@@ -216,25 +170,4 @@ public class SComponentFactory
 		return ret;
 	}
 
-	/**
-	 *  Create a new element on the platform.
-	 *  The element will not run before the {@link startElement()}
-	 *  method is called.
-	 *  Ensures (in non error case) that the aid of
-	 *  the new element is added to the AMS when call returns.
-	 *  @param name The element name (null for auto creation)
-	 *  @param model The model name.
-	 *  @param config The configuration.
-	 *  @param args The arguments map (name->value).
-	 *  @param listener The result listener (if any).
-	 *  @param creator The creator (if any).
-	 * /
-	public static void createComponent(IServiceContainer container, String name, String model, String config, Map args, IResultListener listener, Object creator)
-	{
-	
-//		IComponentIdentifier cid = ces.createComponentIdentifier(name, true, null, true);
-
-		IComponentExecutionService	ces	= (IComponentExecutionService)container.getService(IComponentExecutionService.class);
-		ces.createComponent(name, model, config, args, listener, creator);
-	}*/
 }

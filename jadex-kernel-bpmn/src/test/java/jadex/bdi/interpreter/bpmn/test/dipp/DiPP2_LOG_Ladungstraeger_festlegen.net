@@ -1,0 +1,44 @@
+<net configuration="bpmn" version="1.1" revision="1_3" encoding="UTF-8">
+  <node type="StartLink" id="start2" label="start" xposition="-197" yposition="-1" >
+    <attribute name="Link" value="" />
+    <description>StartLink-1</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="DiPP2_LOG_Festlegen_LT" tail="start2" >
+    <description></description>
+  </edge>
+
+  <node type="Task" id="DiPP2_LOG_Festlegen_LT" label="DiPP2_LOG_Festlegen_LT" xposition="-23" yposition="-2" >
+    <attribute name="MsgImplementation" value="get input from user via parameterized GUI" />
+    <attribute name="Role" value="" />
+    <attribute name="ExplanationText" value="&#60;HTML&#62;&#60;CENTER&#62; &#60;H1&#62; DiPP2 - Absicherung Ladunsträger &#60;/H1&#62; &#60;br&#62; &#60;H2&#62;Ladungsträger SLT-Vorentwicklung abgeschlossen und 100% ULT festgelegt &#60;/H2&#62;&#60;/CENTER&#62;&#60;/HTML&#62;" />
+    <table name="TaskProperties">
+      <tr>
+        <td>SLT_Vorentwicklung</td>
+        <td>Sonder-Ladungsträger Vorentwicklung abgeschlossen?</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>true</td>
+      </tr>
+      <tr>
+        <td>ULT_Festlegung</td>
+        <td>100&#38; Universal-Ladungsträger festgelegt</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>true</td>
+      </tr>
+    </table>
+    <description>Task-2</description>
+  </node>
+
+  <edge type="sequence_flow" label="" connector="straight" head="end2" tail="DiPP2_LOG_Festlegen_LT" >
+    <description></description>
+  </edge>
+
+  <node type="EndNode" id="end2" label="end" xposition="159" yposition="1" >
+    <description>EndNode-3</description>
+  </node>
+
+</net>

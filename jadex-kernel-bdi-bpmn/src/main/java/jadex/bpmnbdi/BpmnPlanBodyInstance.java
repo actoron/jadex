@@ -2,7 +2,6 @@ package jadex.bpmnbdi;
 
 import jadex.bdi.interpreter.AgentRules;
 import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.interpreter.EventProcessingRules;
 import jadex.bdi.interpreter.GoalLifecycleRules;
 import jadex.bdi.interpreter.InternalEventRules;
 import jadex.bdi.interpreter.MessageEventRules;
@@ -58,7 +57,6 @@ import jadex.bpmnbdi.handler.EventIntermediateMessageActivityHandler;
 import jadex.bpmnbdi.handler.EventIntermediateRuleActicityHandler;
 import jadex.bpmnbdi.handler.EventIntermediateSignalActivityHandler;
 import jadex.bpmnbdi.handler.EventIntermediateTimerActivityHandler;
-import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;

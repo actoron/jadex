@@ -6,7 +6,6 @@ import jadex.bdi.interpreter.OAVBDIModelLoader;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.interpreter.OAVBDIXMLReader;
 import jadex.bdi.interpreter.Report;
-import jadex.commons.SReflect;
 import jadex.commons.xml.IPostProcessor;
 import jadex.gpmn.model.MAchieveGoal;
 import jadex.gpmn.model.MArtifact;
@@ -40,7 +39,7 @@ public class GpmnBDIConverter
 {
 	//-------- attributes --------
 	
-	/** The loader. */
+	/** The bdi agent loader. */
 	protected OAVBDIModelLoader loader;
 	
 	//-------- constructors --------
@@ -48,9 +47,9 @@ public class GpmnBDIConverter
 	/**
 	 *  Create a new converter.
 	 */
-	public GpmnBDIConverter(OAVBDIModelLoader loader)
+	public GpmnBDIConverter()
 	{
-		this.loader = loader;
+		this.loader = new OAVBDIModelLoader();
 	}
 	
 	//-------- methods --------
