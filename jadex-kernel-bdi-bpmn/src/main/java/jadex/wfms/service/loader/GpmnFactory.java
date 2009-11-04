@@ -39,7 +39,7 @@ public class GpmnFactory implements IComponentFactory
 	 */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"gpmn_process",	SGUI.makeIcon(MicroAgentFactory.class, "/jadex/gpmn/images/gpmn.png"),
+		"gpmn_process",	SGUI.makeIcon(MicroAgentFactory.class, "/jadex/gpmn/images/gpmn_process.png"),
 	});
 	
 	//-------- attributes --------
