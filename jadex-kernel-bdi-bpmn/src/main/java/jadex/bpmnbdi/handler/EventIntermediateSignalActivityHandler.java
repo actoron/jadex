@@ -11,7 +11,7 @@ import jadex.commons.IFilter;
 import jadex.rules.state.IOAVState;
 
 /**
- *  Handler for internal events.
+ *  Handler for signal (internal) events.
  */
 public class EventIntermediateSignalActivityHandler	extends DefaultActivityHandler
 {
