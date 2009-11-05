@@ -1,6 +1,7 @@
 package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
@@ -35,6 +36,8 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 		{
 			MSequenceEdge next	= (MSequenceEdge)outgoing.get(i);
 			MActivity act = next.getTarget();
+			if(MBpmnModel.EVENT_INTERMEDIATE_TIMER.equals(act.getActivityType()))
+				System.out.println("hhhh");
 			instance.getActivityHandler(act).execute(act, instance, thread);
 			filters[i] = thread.getWaitFilter();
 			waitinfos[i] = thread.getWaitInfo();

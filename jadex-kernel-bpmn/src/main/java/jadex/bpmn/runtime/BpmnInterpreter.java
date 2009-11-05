@@ -45,23 +45,23 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 
 	static
 	{
-	Map defhandlers = new HashMap();
-
-	defhandlers.put(MBpmnModel.TASK, new TaskActivityHandler());
-	defhandlers.put(MBpmnModel.SUBPROCESS, new SubProcessActivityHandler());
-
-	defhandlers.put(MBpmnModel.GATEWAY_PARALLEL, new GatewayParallelActivityHandler());
-	defhandlers.put(MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE, new GatewayXORActivityHandler());
-
-	defhandlers.put(MBpmnModel.EVENT_START_EMPTY, new DefaultActivityHandler());
-	defhandlers.put(MBpmnModel.EVENT_END_EMPTY, new DefaultActivityHandler());
-	defhandlers.put(MBpmnModel.EVENT_END_ERROR, new EventEndErrorActivityHandler());
-	defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_ERROR, new DefaultActivityHandler());
-	defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new UserInteractionActivityHandler());
-	defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());
-	defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE, new EventIntermediateMultipleActivityHandler());
-
-	DEFAULT_HANDLERS = Collections.unmodifiableMap(defhandlers);
+		Map defhandlers = new HashMap();
+	
+		defhandlers.put(MBpmnModel.TASK, new TaskActivityHandler());
+		defhandlers.put(MBpmnModel.SUBPROCESS, new SubProcessActivityHandler());
+	
+		defhandlers.put(MBpmnModel.GATEWAY_PARALLEL, new GatewayParallelActivityHandler());
+		defhandlers.put(MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE, new GatewayXORActivityHandler());
+	
+		defhandlers.put(MBpmnModel.EVENT_START_EMPTY, new DefaultActivityHandler());
+		defhandlers.put(MBpmnModel.EVENT_END_EMPTY, new DefaultActivityHandler());
+		defhandlers.put(MBpmnModel.EVENT_END_ERROR, new EventEndErrorActivityHandler());
+		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_ERROR, new DefaultActivityHandler());
+		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new UserInteractionActivityHandler());
+		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());
+		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE, new EventIntermediateMultipleActivityHandler());
+	
+		DEFAULT_HANDLERS = Collections.unmodifiableMap(defhandlers);
 	}
 	
 	//-------- attributes --------
