@@ -84,7 +84,7 @@
 			<module>jadex-kernel-bdi-bpmn</module>
 			<module>jadex-kernel-bpmn</module>
 			<module>jadex-kernel-gpmn</module>
-			<!-- <module>jadex-platform-wfms</module> -->
+			<module>jadex-platform-wfms</module>
 		</modules>
   	</profile>
   	<profile>
