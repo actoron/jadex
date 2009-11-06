@@ -1,11 +1,5 @@
 package com.daimler.client.gui.test;
 
-import jadex.bpmn.BpmnExecutor;
-import jadex.bpmn.BpmnModelLoader;
-import jadex.bpmn.BpmnXMLReader;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.tools.ExecutionControlPanel;
 
 public class DaimlerGuiTest
 {

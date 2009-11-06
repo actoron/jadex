@@ -100,5 +100,6 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 		{
 			throw new RuntimeException("Invalid mode: "+thread.getPropertyValue(PROPERTY_MODE)+", "+thread);
 		}
+		
 	}
 }

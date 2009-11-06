@@ -202,6 +202,8 @@ public class ProcessThread	implements ITaskContext
 //		System.out.println("Thread: "+this+" "+waiting);
 	}*/
 	
+	// todo: refactor/simplify the waiting stuff.
+	
 	/**
 	 *  Set the process waiting info. 
 	 *  @param waiting	The waiting info.

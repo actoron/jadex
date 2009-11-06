@@ -350,7 +350,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	 *  Gracefully terminate the agent.
 	 *  This method is called from the reasoning engine and delegated to the ams.
 	 */
-	public void killAgent()
+	public void killComponent()
 	{
 		SComponentExecutionService.destroyComponent(platform, getComponentIdentifier(), null);
 //		((IAMS)platform.getService(IAMS.class)).destroyAgent(getAgentIdentifier(), null);

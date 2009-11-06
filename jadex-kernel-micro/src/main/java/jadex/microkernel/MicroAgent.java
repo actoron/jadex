@@ -246,7 +246,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public void killAgent()
 	{
-		interpreter.getAgentAdapter().killAgent();
+		interpreter.getAgentAdapter().killComponent();
 	}
 		
 	/**

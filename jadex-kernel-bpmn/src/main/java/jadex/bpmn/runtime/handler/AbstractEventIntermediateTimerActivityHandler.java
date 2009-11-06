@@ -23,7 +23,8 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 		long duration = dur==null? -1: dur.longValue(); 
 //		thread.setWaitingState(ProcessThread.WAITING_FOR_TIME);
 		thread.setWaiting(true);
-		doWait(activity, instance, thread, duration);
+		Object handle = doWait(activity, instance, thread, duration);
+		thread.setWaitInfo(handle);
 	}
 	
 	/**
@@ -33,5 +34,5 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 	 *  @param thread	The process thread.
 	 *  @param duration	The duration to wait.
 	 */
-	public abstract void doWait(MActivity activity, BpmnInterpreter instance, ProcessThread thread, long duration);
+	public abstract Object doWait(MActivity activity, BpmnInterpreter instance, ProcessThread thread, long duration);
 }

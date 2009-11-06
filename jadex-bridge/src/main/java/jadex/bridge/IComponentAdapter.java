@@ -27,7 +27,7 @@ public interface IComponentAdapter
 	 *  IKernelAgent.killAgent(IResultListener) will be
 	 *  called in turn.
 	 */
-	public void killAgent()	throws AgentTerminatedException;
+	public void killComponent()	throws AgentTerminatedException;
 
 	/**
 	 *  Get the agent platform.

@@ -77,7 +77,7 @@ public class InterpreterTest
 					exe.execute();
 				}
 	
-				public void killAgent()
+				public void killComponent()
 				{
 					System.out.println("clean");
 					interpreters[0].killComponent(new IResultListener()

@@ -1,7 +1,6 @@
 package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
@@ -23,6 +22,7 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 		System.out.println("Executed: "+activity+", "+instance);
+		Object ret = null;
 		
 		// Call all connected intermediate event handlers.
 		List outgoing = activity.getOutgoingSequenceEdges();
@@ -32,13 +32,14 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 		// Execute all connected activities.
 		final IFilter[] filters = new IFilter[outgoing.size()];
 		Object[] waitinfos = new Object[outgoing.size()];
+		
 		for(int i=0; i<outgoing.size(); i++)
 		{
 			MSequenceEdge next	= (MSequenceEdge)outgoing.get(i);
 			MActivity act = next.getTarget();
-			if(MBpmnModel.EVENT_INTERMEDIATE_TIMER.equals(act.getActivityType()))
-				
 			instance.getActivityHandler(act).execute(act, instance, thread);
+			
+			// Remember wait setting and delete them in the thread.
 			filters[i] = thread.getWaitFilter();
 			waitinfos[i] = thread.getWaitInfo();
 			thread.setWaitFilter(null);
@@ -66,16 +67,22 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 		List outgoing = activity.getOutgoingSequenceEdges();
 		OrFilter filter = (OrFilter)thread.getWaitFilter();
 		IFilter[] filters = filter.getFilters();
+		Object[] waitinfos = (Object[])thread.getWaitInfo();
 		
 		// Remove the timer entry.
 		// todo: how to remove timer generically
-		System.out.println("todo: fix me");
-//		((BpmnPlanBodyInstance)instance).removeTimer(thread);
 		
 		for(int i=0; i<outgoing.size() && next==null; i++)
 		{
 			// Timeout edge has event=null and filter=null.
-			if((event==null && filters[i]==null) || (filters[i]!=null && filters[i].filter(event)))
+			if((event==null && filters[i]==null))
+			{
+				next = (MSequenceEdge)outgoing.get(i);
+				MActivity act = next.getTarget();
+				thread.setWaitInfo(waitinfos[i]);
+				instance.getActivityHandler(act).cancel(act, instance, thread);
+			}
+			else if(filters[i]!=null && filters[i].filter(event))
 			{
 				next = (MSequenceEdge)outgoing.get(i);
 			}

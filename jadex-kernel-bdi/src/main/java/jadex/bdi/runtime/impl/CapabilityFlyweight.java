@@ -350,7 +350,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING.equals(cs) 
 						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 					{
-						getInterpreter().getAgentAdapter().killAgent();
+						getInterpreter().getAgentAdapter().killComponent();
 					}
 				}
 			};
@@ -363,7 +363,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				//	System.out.println("set to terminating");
 				getInterpreter().startMonitorConsequences();
-				getInterpreter().getAgentAdapter().killAgent();
+				getInterpreter().getAgentAdapter().killComponent();
 				getInterpreter().endMonitorConsequences();
 			}
 		}

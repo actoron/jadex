@@ -20,10 +20,10 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	 *  @param thread	The process thread.
 	 *  @param duration	The duration to wait.
 	 */
-	public void doWait(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, long duration)
+	public Object doWait(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, long duration)
 	{
 		IClockService cs = (IClockService)instance.getComponentAdapter().getServiceContainer().getService(IClockService.class);
-		cs.createTimer(duration, new ITimedObject()
+		Object ret = cs.createTimer(duration, new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{
@@ -36,6 +36,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 				});
 			}
 		});
+		return ret;
 	}
 	
 	/**

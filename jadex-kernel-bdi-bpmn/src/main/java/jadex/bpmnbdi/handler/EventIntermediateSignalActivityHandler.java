@@ -47,5 +47,6 @@ public class EventIntermediateSignalActivityHandler	extends DefaultActivityHandl
 				return ret; 
 			}
 		});
+		
 	}
 }

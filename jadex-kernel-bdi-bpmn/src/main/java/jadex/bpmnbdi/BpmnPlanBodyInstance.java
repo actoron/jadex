@@ -198,7 +198,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 *  @param thread	The process thread that should wait.
 	 *  @param duration	The duration to wait for.
 	 */
-	public void	addTimer(ProcessThread thread, long duration)
+	public void addTimer(ProcessThread thread, long duration)
 	{
 		if(duration<0)
 			System.out.println("here");
@@ -207,7 +207,8 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 			waittimes	= new HashMap();
 
 		IClockService	clock	= (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
-		waittimes.put(thread, new Long(clock.getTime()+duration));
+		Long ret = new Long(clock.getTime()+duration);
+		waittimes.put(thread, ret);
 	}
 	
 	/**
@@ -673,7 +674,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 //		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, 
 //			OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATING);
 		interpreter.startMonitorConsequences();
-		getInterpreter().getAgentAdapter().killAgent();
+		getInterpreter().getAgentAdapter().killComponent();
 		interpreter.endMonitorConsequences();
 	}
 

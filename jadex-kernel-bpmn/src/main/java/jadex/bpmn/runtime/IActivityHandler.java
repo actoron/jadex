@@ -14,4 +14,14 @@ public interface IActivityHandler
 	 *  @param thread	The process thread.
 	 */
 	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread);
+
+	/**
+	 *  Execute an activity.
+	 *  @param activity	The activity to execute.
+	 *  @param instance	The process instance.
+	 *  @param thread The process thread.
+	 *  @param info The info object.
+	 */
+	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread);
+
 }

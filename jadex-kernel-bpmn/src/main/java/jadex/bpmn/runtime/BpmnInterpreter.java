@@ -14,6 +14,7 @@ import jadex.bpmn.runtime.handler.basic.UserInteractionActivityHandler;
 import jadex.bridge.AgentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.ChangeEvent;
@@ -110,6 +111,9 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 	
 	/** The context variables. */
 	protected Map variables;
+	
+	/** The finishing flag marker. */
+	protected boolean finishing;
 	
 	//-------- constructors --------
 	
@@ -218,9 +222,16 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 				}
 			}
 	
-			executeStep(null, null);
+			if(!isFinished(null, null))
+				executeStep(null, null);
 			
 			this.thread = null;
+			
+			if(!finishing && isFinished(null, null))
+			{
+				getComponentAdapter().killComponent();
+				finishing = true;
+			}
 			
 			return !isFinished(null, null) && isReady(null, null);
 		}

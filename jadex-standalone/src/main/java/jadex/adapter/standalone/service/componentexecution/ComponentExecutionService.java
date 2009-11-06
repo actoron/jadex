@@ -279,7 +279,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 //						if(listeners.get(aid)!=null)
 //							throw new RuntimeException("Multiple result listeners for agent: "+aid);
 //						listeners.put(aid, listener);
-						agent.killAgent(new CleanupCommand(cid, listener));
+						agent.killComponent(new CleanupCommand(cid, listener));
 					}
 					else
 					{

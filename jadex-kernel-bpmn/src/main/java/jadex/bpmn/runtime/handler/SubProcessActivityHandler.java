@@ -33,5 +33,6 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			ProcessThread	newthread	= new ProcessThread((MActivity)start.get(i), subcontext, instance);
 			subcontext.addThread(newthread);
 		}
+		
 	}
 }

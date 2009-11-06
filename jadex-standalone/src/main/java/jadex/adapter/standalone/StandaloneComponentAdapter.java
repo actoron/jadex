@@ -207,7 +207,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  Gracefully terminate the agent.
 	 *  This method is called from the reasoning engine and delegated to the ams.
 	 */
-	public void killAgent()
+	public void killComponent()
 	{
 		((IComponentExecutionService)container.getService(IComponentExecutionService.class)).destroyComponent(cid, null);
 	}
@@ -218,7 +218,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  which might perform arbitrary cleanup actions, goals, etc.
 	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
 	 */
-	public void killAgent(IResultListener listener)
+	public void killComponent(IResultListener listener)
 	{
 //		System.out.println("killAgent: "+listener);
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
@@ -293,7 +293,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			System.out.println("Fatal error, agent '"+cid+"' will be removed.");
 				
 			// Remove agent from platform.
-			killAgent();
+			killComponent();
 		}
 		
 		return executed;

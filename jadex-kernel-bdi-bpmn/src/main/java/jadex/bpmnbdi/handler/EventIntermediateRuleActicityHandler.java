@@ -46,5 +46,6 @@ public class EventIntermediateRuleActicityHandler	extends DefaultActivityHandler
 				return ret;
 			}
 		});
+		
 	}
 }
