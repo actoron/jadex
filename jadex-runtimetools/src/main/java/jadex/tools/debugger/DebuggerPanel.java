@@ -1,13 +1,20 @@
 package jadex.tools.debugger;
 
-import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.ICommand;
+import jadex.commons.ISteppable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 
-import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -19,7 +26,13 @@ public class DebuggerPanel extends JPanel
 	//-------- attributes --------
 	
 	/** The component adapter. */
-	protected IComponentAdapter	adapter;
+	protected ISteppable	adapter;
+	
+	/** The step button. */
+	protected JButton	step;
+	
+	/** The stepmode checkbox. */
+	protected JCheckBox	stepmode;
 	
 	//-------- constructors --------
 	
@@ -30,49 +43,34 @@ public class DebuggerPanel extends JPanel
 	 */
 	public DebuggerPanel(IServiceContainer container, IComponentIdentifier comp)
 	{
-//		// The step action
-//		setLayout(new GridBagLayout());
-//		final JButton step = new JButton("Step");
-//		step.addActionListener(new ActionListener()
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				steppable.doStep();
-//			}
-//		});
-//		step.setEnabled(steppable.isStepmode());		
-//		
-//		final JCheckBox	stepmode = new JCheckBox("Step Mode", steppable.isStepmode());
-//		stepmode.addActionListener(new ActionListener()
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				steppable.setStepmode(stepmode.isSelected());
-//				step.setEnabled(steppable.isStepmode());		
-//			}
-//		});
-//		
-//		steppable.addBreakpointCommand(new ICommand()
-//		{
-//			public void execute(Object args)
-//			{
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//						stepmode.setSelected(steppable.isStepmode());
-//						step.setEnabled(steppable.isStepmode());		
-//					}
-//				});
-//			}
-//		});
-//		
-//		int row	= 0;
-//		int	col	= 0;
-//		add(stepmode, new GridBagConstraints(col++, row, 1, 1,
-//			1,0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
-//		add(step, new GridBagConstraints(col, row++, GridBagConstraints.REMAINDER, 1,
-//			0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
+		// The step action
+		setLayout(new GridBagLayout());
+		this.step = new JButton("Step");
+		step.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(adapter!=null)
+					adapter.doStep();
+			}
+		});
+		
+		this.stepmode = new JCheckBox("Step Mode");
+		stepmode.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				adapter.setStepmode(stepmode.isSelected());
+				step.setEnabled(adapter.isStepmode());		
+			}
+		});
+				
+		int row	= 0;
+		int	col	= 0;
+		add(stepmode, new GridBagConstraints(col++, row, 1, 1,
+			1,0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
+		add(step, new GridBagConstraints(col, row++, GridBagConstraints.REMAINDER, 1,
+			0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
 
 		
 		((IComponentExecutionService)container.getService(IComponentExecutionService.class))
@@ -85,20 +83,17 @@ public class DebuggerPanel extends JPanel
 			
 			public void resultAvailable(Object result)
 			{
-				DebuggerPanel.this.adapter	= (IComponentAdapter)result;
+				DebuggerPanel.this.adapter	= (ISteppable)result;
 				
-//				final JPanel	panel	= new ExecutionControlPanel(...);
-				SwingUtilities.invokeLater(new Runnable()
+				adapter.addBreakpointCommand(new ICommand()
 				{
-					public void run()
+					public void execute(Object args)
 					{
-						setLayout(new BorderLayout());
-//						add("Center", panel);
-						
-						doLayout();
-						repaint();
+						updatePanel();
 					}
 				});
+
+				updatePanel();
 			}
 		});
 	}
@@ -108,5 +103,17 @@ public class DebuggerPanel extends JPanel
 	 */
 	public void dispose()
 	{
+	}
+
+	protected void updatePanel()
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				stepmode.setSelected(adapter.isStepmode());
+				step.setEnabled(adapter.isStepmode());		
+			}
+		});
 	}
 }

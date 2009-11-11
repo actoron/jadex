@@ -14,22 +14,16 @@ public interface IComponentExecutionService	extends IService
 	
 	/**
 	 *  Create a new component on the platform.
-	 *  The component will not run before the {@link startComponent()}
-	 *  method is called.
 	 *  @param name The component name.
-	 *  @param component The component instance.
+	 *  @param model The model identifier (e.g. file name).
+	 *  @param config The configuration to use for initializing the component (null for default).
+	 *  @param args The arguments for the component (if any).
+	 *  @param suspend Create the component in suspended mode (i.e. do not run until resum() is called).
 	 *  @param listener The result listener (if any). Will receive the id of the component as result.
 	 *  @param creator The creator (if any).
-	 *  @param generate Generate a unique name, if the given name is already taken.
 	 */
-	public void	createComponent(String name, String model, String config, Map args, IResultListener listener, Object creator);
-	
-	/**
-	 *  Start a previously created component on the platform.
-	 *  @param componentid The id of the previously created component.
-	 */
-	public void	startComponent(IComponentIdentifier componentid, IResultListener listener);
-	
+	public void	createComponent(String name, String model, String config, Map args, boolean suspend, IResultListener listener, Object creator);
+		
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.
 	 *  @param componentid	The component to destroy.
@@ -47,6 +41,12 @@ public interface IComponentExecutionService	extends IService
 	 *  @param componentid The component identifier.
 	 */
 	public void resumeComponent(IComponentIdentifier componentid, IResultListener listener);
+	
+	/**
+	 *  Execute a step of a suspended component.
+	 *  @param componentid The component identifier.
+	 */
+	public void stepComponent(IComponentIdentifier componentid, IResultListener listener);
 	
 	//-------- information methods --------
 	

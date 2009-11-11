@@ -207,7 +207,7 @@ public class GpmnFactory implements IComponentFactory
 	 */
 	public boolean isStartable(String model)
 	{
-		return true;
+		return model.endsWith(".gpmn");
 	}
 	
 	/**

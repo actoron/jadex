@@ -91,6 +91,9 @@ public class StarterPanel extends JPanel
 	/** The configuration. */
 	protected JComboBox config;
 
+	/** The suspend mode. */
+	protected JCheckBox suspend;
+
 	/** The agent type. */
 	protected JTextField componentname;
 	protected JLabel componentnamel;
@@ -265,6 +268,10 @@ public class StarterPanel extends JPanel
 			}
 		});
 
+		// The suspend mode.
+		suspend = new JCheckBox("Start suspended");
+		suspend.setToolTipText("Start in suspended mode");
+
 		// The agent name.
 		componentname = new JTextField();
 		
@@ -408,11 +415,11 @@ public class StarterPanel extends JPanel
 									{
 										if(ac!=null)
 										{
-											ac.createAgent(an, typename, configname, args, true, false, null, null);
+											ac.createAgent(an, typename, configname, args, suspend.isSelected(), false, null, null);
 										}
 										else
 										{
-											starter.createComponent(typename, an, configname, args);
+											starter.createComponent(typename, an, configname, args, suspend.isSelected());
 										}
 									}
 								}
@@ -420,11 +427,11 @@ public class StarterPanel extends JPanel
 								{
 									if(ac!=null)
 									{
-										ac.createAgent(an, typename, configname, args, true, false, null, null);
+										ac.createAgent(an, typename, configname, args, suspend.isSelected(), false, null, null);
 									}
 									else
 									{
-										starter.createComponent(typename, an, configname, args);
+										starter.createComponent(typename, an, configname, args, suspend.isSelected());
 									}
 								}
 							}
@@ -506,7 +513,9 @@ public class StarterPanel extends JPanel
 		confl = new JLabel("Configuration");
 		upper.add(confl, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-		upper.add(config, new GridBagConstraints(1, y, 4, 1, 1, 0, GridBagConstraints.WEST,
+		upper.add(config, new GridBagConstraints(1, y, 1, 1, 1, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+		upper.add(suspend, new GridBagConstraints(2, y, 3, 1, 0, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 		y++;
 		upper.add(componentpanel, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,

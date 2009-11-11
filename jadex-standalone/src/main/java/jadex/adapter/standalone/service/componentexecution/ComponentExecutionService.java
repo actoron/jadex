@@ -74,16 +74,17 @@ public class ComponentExecutionService implements IComponentExecutionService
     
     //-------- IComponentExecutionService interface --------
 
-    /**
+	/**
 	 *  Create a new component on the platform.
-	 *  The component will not run before the {@link startComponent()}
-	 *  method is called.
-	 *  @param name The component name (null for auto creation).
-	 *  @param component The component instance.
+	 *  @param name The component name.
+	 *  @param model The model identifier (e.g. file name).
+	 *  @param config The configuration to use for initializing the component (null for default).
+	 *  @param args The arguments for the component (if any).
+	 *  @param suspend Create the component in suspended mode (i.e. do not run until resum() is called).
 	 *  @param listener The result listener (if any). Will receive the id of the component as result.
 	 *  @param creator The creator (if any).
 	 */
-	public void	createComponent(String name, String model, String config, Map args, IResultListener listener, Object creator)
+	public void	createComponent(String name, String model, String config, Map args, boolean suspend, IResultListener listener, Object creator)
 	{
 		/*
 		if(container.isShuttingDown())
@@ -142,8 +143,16 @@ public class ComponentExecutionService implements IComponentExecutionService
 				adapters.put(cid, adapter);
 				
 				ad	= new AMSAgentDescription(cid);
-				ad.setState(IComponentDescription.STATE_INITIATED);
-				adapter.setState(IComponentDescription.STATE_INITIATED);
+				if(suspend)
+				{
+					ad.setState(IComponentDescription.STATE_SUSPENDED);
+					adapter.setState(IComponentDescription.STATE_SUSPENDED);
+				}
+				else
+				{
+					ad.setState(IComponentDescription.STATE_ACTIVE);
+					adapter.setState(IComponentDescription.STATE_ACTIVE);
+				}
 				descs.put(cid, ad);
 			}
 		}
@@ -188,53 +197,11 @@ public class ComponentExecutionService implements IComponentExecutionService
 		}
 		
 		listener.resultAvailable(cid.clone());
-	}
-    
-	/**
-	 *  Start a previously created component on the platform.
-	 *  @param componentid The id of the previously created component.
-	 */
-	public void	startComponent(IComponentIdentifier componentid, IResultListener listener)
-	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
 		
-		synchronized(adapters)
+		if(!suspend)
 		{
-			synchronized(descs)
-			{
-				AMSAgentDescription	desc	= (AMSAgentDescription)descs.get(componentid);
-				if(desc!=null && IComponentDescription.STATE_INITIATED.equals(desc.getState()))
-				{
-					StandaloneComponentAdapter	adapter	= (StandaloneComponentAdapter)adapters.get(componentid);
-					if(adapter!=null)
-					{
-						// Todo: use result listener and set active state after agent has inited.
-						desc.setState(IComponentDescription.STATE_ACTIVE);
-						adapter.setState(IComponentDescription.STATE_ACTIVE);
-						adapter.wakeup();
-					}
-					else
-					{
-						// Shouldn't happen?
-						listener.exceptionOccurred(new RuntimeException("Cannot start unknown component: "+componentid));
-						return;
-					}
-				}
-				else if(desc!=null)
-				{
-					listener.exceptionOccurred(new RuntimeException("Cannot start component "+componentid+" in state: "+desc.getState()));
-					return;
-				}
-				else
-				{
-					listener.exceptionOccurred(new RuntimeException("Cannot start unknown component: "+componentid));
-					return;
-				}
-			}
+			adapter.wakeup();			
 		}
-		
-		listener.resultAvailable(componentid);		
 	}
 	
 	/**
@@ -342,13 +309,12 @@ public class ComponentExecutionService implements IComponentExecutionService
 					listener.exceptionOccurred(new RuntimeException("Component identifier not registered: "+componentid));
 					//throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
 				if(!IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
-					listener.exceptionOccurred(new RuntimeException("Only active components can be suspended: "+componentid+" "+ad.getState()));
+					listener.exceptionOccurred(new RuntimeException("Only suspended components can be resumed: "+componentid+" "+ad.getState()));
 					//throw new RuntimeException("Only suspended agents can be resumed: "+aid+" "+ad.getState());
 				
 				ad.setState(IComponentDescription.STATE_ACTIVE);
 				adapter.setState(IComponentDescription.STATE_ACTIVE);
-				IExecutionService exe = (IExecutionService)container.getService(IExecutionService.class);
-				exe.execute(adapter);
+				adapter.wakeup();
 			}
 		}
 //		pcs.firePropertyChange("agents", null, adapters);
@@ -356,6 +322,36 @@ public class ComponentExecutionService implements IComponentExecutionService
 		listener.resultAvailable(null);
 	}
 	
+	/**
+	 *  Execute a step of a suspended component.
+	 *  @param componentid The component identifier.
+	 */
+	public void stepComponent(IComponentIdentifier componentid, IResultListener listener)
+	{
+		if(listener==null)
+			listener = DefaultResultListener.getInstance();
+		
+		synchronized(adapters)
+		{
+			synchronized(descs)
+			{
+				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
+				AMSAgentDescription ad = (AMSAgentDescription)descs.get(componentid);
+				if(adapter==null || ad==null)
+					listener.exceptionOccurred(new RuntimeException("Component identifier not registered: "+componentid));
+					//throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
+				if(!IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
+					listener.exceptionOccurred(new RuntimeException("Only suspended components can be stepped: "+componentid+" "+ad.getState()));
+					//throw new RuntimeException("Only suspended agents can be resumed: "+aid+" "+ad.getState());
+				
+				adapter.doStep(listener);
+				IExecutionService exe = (IExecutionService)container.getService(IExecutionService.class);
+				exe.execute(adapter);
+			}
+		}
+//		pcs.firePropertyChange("agents", null, adapters);	
+	}
+
 	//-------- listener methods --------
 	
 	/**

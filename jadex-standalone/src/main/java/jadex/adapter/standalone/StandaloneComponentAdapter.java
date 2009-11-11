@@ -12,6 +12,7 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IToolAdapter;
 import jadex.bridge.MessageType;
+import jadex.commons.ICommand;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
@@ -19,7 +20,9 @@ import jadex.service.clock.IClockService;
 import jadex.service.execution.IExecutionService;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Component adapter for built-in standalone platform. 
@@ -46,10 +49,24 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	/** Flag to indicate a fatal error (component termination will not be passed to instance) */
 	protected boolean	fatalerror;
 	
+	//-------- steppable attributes --------
+	
+	/** The flag for a scheduled step (true when a step is allowed in stepwise execution). */
+	protected boolean	dostep;
+	
+	/** The listener to be informed, when the requested step is finished. */
+	protected IResultListener	steplistener;
+	
+	/** The selected breakpoints (component will change to step mode, when a breakpoint is reached). */
+	protected Set	breakpoints;
+	
+	/** The breakpoint commands (executed, when a breakpoint triggers). */
+	protected ICommand[]	breakpointcommands;
+	
 	// todo: close tools when saving (restore on load!?)
 	/** The tool adapters. */
 	protected IToolAdapter[] tooladapters;
-	
+
 	//-------- constructors --------
 
 	/**
@@ -337,7 +354,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
 			throw new ComponentTerminatedException(cid.getName());
 
+		assert IComponentDescription.STATE_ACTIVE.equals(state)
+			||  IComponentDescription.STATE_SUSPENDED.equals(state) && dostep;
 		boolean	executed	= false;
+
 		try
 		{
 			//System.out.println("Executing: "+agent);
@@ -354,6 +374,12 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			// Remove agent from platform.
 			killComponent();
 		}
+		if(dostep)
+		{
+			if(steplistener!=null)
+				steplistener.resultAvailable(null);
+			dostep	= false;
+		}
 		
 		return executed;
 	}
@@ -369,6 +395,64 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			throw new ComponentTerminatedException(cid.getName());
 
 		return component;
+	}
+
+	//-------- step handling --------
+	
+	/**
+	 *  Set the step mode.
+	 */
+	public void	doStep(IResultListener listener)
+	{
+		if(dostep)
+			listener.exceptionOccurred(new RuntimeException("Only one step allowed at a time."));
+			
+		this.dostep	= true;
+	}
+		
+	/**
+	 *  Add a breakpoint to the interpreter.
+	 */
+	public void	addBreakpoint(Object rule)
+	{
+		if(breakpoints==null)
+			breakpoints	= new HashSet();
+		breakpoints.add(rule);
+	}
+	
+	/**
+	 *  Remove a breakpoint from the interpreter.
+	 */
+	public void	removeBreakpoint(Object rule)
+	{
+		if(breakpoints.remove(rule) && breakpoints.isEmpty())
+			breakpoints	= null;
+	}
+	
+	/**
+	 *  Check if a rule is a breakpoint for the interpreter.
+	 */
+	public boolean	isBreakpoint(Object rule)
+	{
+		return breakpoints!=null && breakpoints.contains(rule);
+	}
+	
+	/**
+	 *  Add a command to be executed, when a breakpoint is reached.
+	 */
+	public void	addBreakpointCommand(ICommand command)
+	{
+		if(breakpointcommands==null)
+		{
+			breakpointcommands	= new ICommand[]{command};
+		}
+		else
+		{
+			ICommand[]	newarray	= new ICommand[breakpointcommands.length+1];
+			System.arraycopy(breakpointcommands, 0, newarray, 0, breakpointcommands.length);
+			newarray[breakpointcommands.length]	= command;
+			breakpointcommands	= newarray;
+		}
 	}
 	
 	//-------- tool adapter handling --------

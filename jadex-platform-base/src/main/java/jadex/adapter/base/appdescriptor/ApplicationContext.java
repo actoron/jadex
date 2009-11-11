@@ -204,7 +204,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 		IComponentExecutionService ces = (IComponentExecutionService)container.getService(IComponentExecutionService.class);
 
 		
-		ces.createComponent(name, at.getFilename(), configuration, arguments, new IResultListener()
+		ces.createComponent(name, at.getFilename(), configuration, arguments, true, new IResultListener()
 		{
 			public void exceptionOccurred(Exception exception)
 			{
@@ -232,7 +232,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 				if(start)
 				{
 					IComponentExecutionService ces = (IComponentExecutionService)container.getService(IComponentExecutionService.class);
-					ces.startComponent(aid, listener);
+					ces.resumeComponent(aid, listener);
 				}
 				else
 				{

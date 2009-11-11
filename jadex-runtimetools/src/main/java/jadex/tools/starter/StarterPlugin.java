@@ -264,7 +264,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 							String type = ((FileNode)node).getFile().getAbsolutePath();
 //							if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(type))
 							if(SComponentFactory.isStartable(getJCC().getServiceContainer(), type))
-								createComponent(type, null, null, null);
+								createComponent(type, null, null, null, false);
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
 					}
@@ -820,7 +820,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 									{
 										public void actionPerformed(ActionEvent e)
 										{
-											createComponent(type, null, config, null);
+											createComponent(type, null, config, null, false);
 										}
 									});
 									me.setToolTipText("Start in configuration: "+config);
@@ -846,7 +846,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 								{
 									public void actionPerformed(ActionEvent e)
 									{
-										createComponent(type, null, null, null);
+										createComponent(type, null, null, null, false);
 									}
 								});
 							}
@@ -939,26 +939,14 @@ public class StarterPlugin extends AbstractJCCPlugin
 	 *  Create a new component on the platform.
 	 *  Any errors will be displayed in a dialog to the user.
 	 */
-	public void createComponent(String type, String name, String configname, Map arguments)
+	public void createComponent(String type, String name, String configname, Map arguments, boolean suspend)
 	{
 		final IComponentExecutionService	ces	= (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
-		ces.createComponent(name, type, configname, arguments, new IResultListener()
+		ces.createComponent(name, type, configname, arguments, suspend, new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
-				final IComponentIdentifier aid = (IComponentIdentifier)result;
-				ces.startComponent(aid, new IResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-						getJCC().setStatusText("Started component: " + aid.getLocalName());
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
-					}
-				});
+				getJCC().setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
 			}
 			
 			public void exceptionOccurred(Exception exception)

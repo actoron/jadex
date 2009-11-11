@@ -176,7 +176,7 @@ public class BpmnFactory implements IComponentFactory
 	 */
 	public boolean isStartable(String model)
 	{
-		return true;
+		return model.endsWith(".bpmn");
 	}
 	
 	/**
