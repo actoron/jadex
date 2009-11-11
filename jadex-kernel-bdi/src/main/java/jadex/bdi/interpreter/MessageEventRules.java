@@ -4,7 +4,6 @@ import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IContentCodec;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
-import jadex.bridge.IToolAdapter;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
 import jadex.bridge.MessageType.ParameterSpecification;
@@ -704,14 +703,14 @@ public class MessageEventRules
 					}
 				}
 				
-//				IMessageAdapter msg = new DefaultMessageAdapter(message, mtype);
-//				
+				IMessageAdapter msg = new DefaultMessageAdapter(message, mtype);
+				
 				BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
-//				((IMessageService)interpreter.getComponentAdapter().getServiceContainer()
-//					.getService(IMessageService.class)).sendMessage(msg.getParameterMap(),
-//						msg.getMessageType(), interpreter.getComponentAdapter().getComponentIdentifier(), interpreter.getModel().getTypeModel().getClassLoader());
+				((IMessageService)interpreter.getComponentAdapter().getServiceContainer()
+					.getService(IMessageService.class)).sendMessage(msg.getParameterMap(),
+						msg.getMessageType(), interpreter.getComponentAdapter().getComponentIdentifier(), interpreter.getModel().getTypeModel().getClassLoader());
 
-				interpreter.getComponentAdapter().sendMessage(message, mtype);
+//				interpreter.getComponentAdapter().sendMessage(message, mtype);
 				
 				state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_outbox, rme);
 				

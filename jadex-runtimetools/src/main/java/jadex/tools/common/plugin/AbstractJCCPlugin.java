@@ -32,7 +32,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	 */
 	public void init(IControlCenter jcc)
 	{
-		this.jcc	= jcc;
+		this.jcc = jcc;
 		this.main_panel = createView();
 		this.menu_bar = createMenuBar();
 		this.tool_bar = createToolBar();

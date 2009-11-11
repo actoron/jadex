@@ -1,14 +1,12 @@
 package jadex.tools.comanalyzer;
 
-import jadex.adapter.base.fipa.SFipa;
-import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.runtime.impl.ElementFlyweight;
-import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.IMessageListener;
+import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -40,9 +38,11 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -70,7 +70,7 @@ import nuggets.Nuggets;
 /**
  * The comanalyzer plugin.
  */
-public class ComanalyzerPlugin extends AbstractJCCPlugin
+public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageListener
 {
 	//-------- constants --------
 
@@ -167,10 +167,10 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	/** The map of shared colors for message and agent representation.. */
 	protected PaintMaps paintmaps;
 	
-	/** The map of registered agent adapters. */
-	protected Map adapters;
+	/** The set of registered agent adapters. */
+	protected Set observed;
 	
-	// -------- constructors --------
+	//-------- constructors --------
 
 	/**
 	 * Create a new comanalyzer plugin.
@@ -184,11 +184,20 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		this.messagelist = new MessageList();
 		this.messagefilter = new MessageFilter[]{MessageFilter.EMPTY};
 		this.timer = new Timer(true);
-		this.adapters = new HashMap();
+		this.observed = new HashSet();
 		this.paintmaps = new PaintMaps();
 	}
+	
+	/** 
+	 *  Shutdown the plugin.
+	 */
+	public void shutdown()
+	{
+		IMessageService ms = (IMessageService)getJCC().getServiceContainer().getService(IMessageService.class);
+		ms.removeMessageListener(this);
+	}
 
-	// -------- IControlCenterPlugin interface --------
+	//-------- IControlCenterPlugin interface --------
 
 	/**
 	 * Get plugin properties to be saved in a project.
@@ -501,7 +510,11 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		Agent dummy = Agent.DUMMY_AGENT;
 		applyAgentFilter(dummy);
 		agentlist.addAgent(dummy);
+		
 
+		IMessageService ms = (IMessageService)getJCC().getServiceContainer().getService(IMessageService.class);
+		ms.addMessageListener(this);
+		
 		return split;
 	}
 
@@ -520,10 +533,10 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 			{
 
 				// remove listener if agent is observed
-				if(listeners.containsKey(ad))
-				{
-					removeAgentListener(ad, false);
-				}
+//				if(listeners.containsKey(ad))
+//				{
+//					removeAgentListener(ad, false);
+//				}
 				// set agent state and update agent
 				Agent agent = (Agent)agentlist.getAgent(ad.getName());
 				agent.setState(Agent.STATE_DEAD);
@@ -545,10 +558,10 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		{
 			public void run()
 			{
-				if(observe_all_new)
-				{
-					addAgentListener(ad);
-				}
+//				if(observe_all_new)
+//				{
+//					addAgentListener(ad);
+//				}
 
 				boolean updateAgent = true;
 				Agent agent = agentlist.getAgent(ad.getName());
@@ -582,12 +595,12 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		// NOP
 	}
 
-	// -------- methods --------
+	//-------- methods --------
 
 	/**
 	 * Creates a listener for the agent to obtain internal agent events.
 	 * @param desc The agentdescription.
-	 */
+	 * /
 	public void addAgentListener(final IComponentDescription desc)
 	{
 		IComponentIdentifier aid = desc.getName();
@@ -611,7 +624,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 					adapter.addTool(ComanalyzerPlugin.this);
 				}
 			});
-	}
+	}*/
 
 	/**
 	 * Removes the listener for the agent.
@@ -619,7 +632,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	 * @param desc The agentdiscriotion.
 	 * @param cleanup <code>true</code> if the listener should be removed from
 	 * the agent. (e.g. on agent death it isnt nessesary)
-	 */
+	 * /
 	public void removeAgentListener(final IComponentDescription desc, boolean cleanup)
 	{
 		IComponentIdentifier aid = desc.getName();
@@ -642,7 +655,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 					adapter.removeTool(ComanalyzerPlugin.this);
 				}
 			});
-	}
+	}*/
 
 	/**
 	 * @return The messagefilter.
@@ -1160,7 +1173,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 					IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer()
 						.getService(IComponentExecutionService.class);
 					IComponentDescription desc = ces.createComponentDescription(agents[i].getAid(), null, null);
-					removeAgentListener(desc, true);
+//					removeAgentListener(desc, true);
+					observed.remove(desc.getName());
 					ComanalyzerPlugin.this.agents.updateComponent(desc);
 				}
 			}
@@ -1187,7 +1201,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 					IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer()
 						.getService(IComponentExecutionService.class);
 					IComponentDescription desc = ces.createComponentDescription(agents[i].getAid(), null, null);
-					addAgentListener(desc);
+//					addAgentListener(desc);
+					observed.add(desc.getName());
 					ComanalyzerPlugin.this.agents.updateComponent(desc);
 				}
 			}
@@ -1322,7 +1337,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 			split.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable().getTree().getSelectionPath().getLastPathComponent();
 			final IComponentDescription desc = (IComponentDescription)node.getUserObject();
-			addAgentListener(desc);
+			observed.add(desc.getName());
+//			addAgentListener(desc);
 			split.setCursor(Cursor.getDefaultCursor());
 
 //			SwingUtilities.invokeLater(new Runnable()
@@ -1374,7 +1390,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 			split.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable().getTree().getSelectionPath().getLastPathComponent();
 			final IComponentDescription desc = (IComponentDescription)node.getUserObject();
-			removeAgentListener(desc, true);
+//			removeAgentListener(desc, true);
+			observed.remove(desc.getName());
 			split.setCursor(Cursor.getDefaultCursor());
 
 			SwingUtilities.invokeLater(new Runnable()
@@ -1612,6 +1629,58 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 		}
 	};
 
+	/**
+	 *  Invoked when a message event has been received.
+	 *  @param msg The message adapter.
+	 */
+	public void messageReceived(IMessageAdapter msg)
+	{
+		if(isAddMessage(msg))
+			addMessage(msg);
+	}
+	
+	/**
+	 *  Invoked when a message event has been sent.
+	 *  @param msg The message adapter.
+	 */
+	public void messageSent(IMessageAdapter msg)
+	{
+		if(isAddMessage(msg))
+			addMessage(msg);
+	}
+	
+	/**
+	 *  Invoked when a message event has been received.
+	 *  @param msg The message adapter.
+	 */
+	public boolean isAddMessage(IMessageAdapter msg)
+	{
+		MessageType mt = msg.getMessageType();
+		String si = mt.getSenderIdentifier();
+		IComponentIdentifier s = (IComponentIdentifier)msg.getValue(si);
+		
+		boolean add = false;
+		if(observe_all_new || observed.contains(s))
+		{
+			add = true;
+		}
+		else
+		{
+			String ris = mt.getReceiverIdentifier();
+			Object rs = msg.getValue(ris);
+			if(rs!=null)
+			{
+				for(Iterator it=SReflect.getIterator(rs); it.hasNext() && !add; )
+				{
+					if(observed.contains(it.next()))
+						add = true;
+				}
+			}
+		}
+		
+		return add;
+	}
+	
 	//-------- inner classes --------
 
 	/**

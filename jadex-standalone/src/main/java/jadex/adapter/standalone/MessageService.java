@@ -4,9 +4,12 @@ import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
+import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IContentCodec;
+import jadex.bridge.IMessageAdapter;
+import jadex.bridge.IMessageListener;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
@@ -69,6 +72,9 @@ public class MessageService implements IMessageService
 	
 	/** The logger. */
 	protected Logger logger;
+	
+	/** The listeners. */
+	protected List listeners;
 
 	//-------- constructors --------
 
@@ -150,6 +156,17 @@ public class MessageService implements IMessageService
 			}
 		}
 
+		if(listeners!=null)
+		{
+			// Hack?!
+			IMessageAdapter msg = new DefaultMessageAdapter(message, type);
+			for(int i=0; i<listeners.size(); i++)
+			{
+				IMessageListener lis = (IMessageListener)listeners.get(i);
+				lis.messageSent(msg);
+			}
+		}
+		
 		sendmsg.addMessage(message, type.getName(), receivers);
 	}
 
@@ -161,6 +178,18 @@ public class MessageService implements IMessageService
 	public synchronized void deliverMessage(Map message, String msgtype, IComponentIdentifier[] receivers)
 	{	
 //		internalDeliverMessage(message);
+		
+		if(listeners!=null)
+		{
+			// Hack?!
+			IMessageAdapter msg = new DefaultMessageAdapter(message, getMessageType(msgtype));
+			for(int i=0; i<listeners.size(); i++)
+			{
+				IMessageListener lis = (IMessageListener)listeners.get(i);
+				lis.messageReceived(msg);
+			}
+		}
+		
 		delivermsg.addMessage(message, msgtype, receivers);
 	}
 
@@ -295,7 +324,27 @@ public class MessageService implements IMessageService
 		return (MessageType)messagetypes.get(type);
 	}
 	
-	// -------- internal methods --------
+	/**
+	 *  Add a message listener.
+	 *  @param listener The change listener.
+	 */
+	public synchronized void addMessageListener(IMessageListener listener)
+	{
+		if(listeners==null)
+			listeners = new ArrayList();
+		listeners.add(listener);
+	}
+	
+	/**
+	 *  Remove a message listener.
+	 *  @param listener The change listener.
+	 */
+	public synchronized void removeMessageListener(IMessageListener listener)
+	{
+		listeners.remove(listener);
+	}
+	
+	//-------- internal methods --------
 
 	/**
 	 *  Send a message.

@@ -43,27 +43,5 @@ public interface IComponentAdapter
 	 */
 	public IComponentIdentifier getComponentIdentifier() throws ComponentTerminatedException;
 	
-	/**
-	 *  Send a message.
-	 *  @param message The message.
-	 *  @param type The type.
-	 */
-	public void sendMessage(Map message, MessageType type) throws ComponentTerminatedException;
-	
-	// Hack! remove.
-	/**
-	 *  Get a tooladapter of the given class.
-	 *  If it does not exist, it will be created.
-	 */
-	// Todo: remove on-demand creation? -> does not work for message based tools.
-	public IToolAdapter	getToolAdapter(Class clazz);
-	
-	// Hack! remove.
-	/**
-	 *  Remove a tool adapter
-	 */
-	// Todo: should be supported at runtime?
-	public void	removeToolAdapter(IToolAdapter adapter);
-	
 }
 

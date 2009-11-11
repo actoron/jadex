@@ -9,8 +9,6 @@ import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IMessageAdapter;
-import jadex.bridge.IMessageService;
-import jadex.bridge.IToolAdapter;
 import jadex.bridge.MessageType;
 import jadex.commons.ICommand;
 import jadex.commons.concurrent.IExecutable;
@@ -63,10 +61,6 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	/** The breakpoint commands (executed, when a breakpoint triggers). */
 	protected ICommand[]	breakpointcommands;
 	
-	// todo: close tools when saving (restore on load!?)
-	/** The tool adapters. */
-	protected IToolAdapter[] tooladapters;
-
 	//-------- constructors --------
 
 	/**
@@ -77,31 +71,6 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	{
 		this.container = container;
 		this.cid = cid;
-		
-		// Initialize tool adapters.
-		this.tooladapters	= new IToolAdapter[0];
-
-//		if(kernelprops!=null)
-//		{
-//			for(Iterator it=kernelprops.keySet().iterator(); it.hasNext(); )
-//			{
-//				Object	key	= (String)it.next();
-//				if(key.toString().startsWith("tooladapter."))
-//				{
-//					try
-//					{
-//						Class	adapterclass	= (Class)kernelprops.get(key);
-//						IToolAdapter	tooladapter	= (IToolAdapter)adapterclass.newInstance();
-//						tooladapter.init(getComponentInstance());
-//						addToolAdapter(tooladapter);
-//					}
-//					catch(Exception e)
-//					{
-//						throw new RuntimeException("Error evaluating kernel property: "+key+", "+kernelprops.get(key), e);
-//					}
-//				}
-//			}
-//		}
 	}
 	
 	/**
@@ -297,19 +266,13 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 //			message.put(rd, new Long(getClock().getTime()));
 		
 		IMessageAdapter msg = new DefaultMessageAdapter(message, type);
-		
-		boolean	toolmsg	= false;
-		for(int i=0; !toolmsg && i<tooladapters.length; i++)
-			toolmsg	= tooladapters[i].messageReceived(msg);
-		
-		if(!toolmsg)
-			component.messageArrived(msg);
+		component.messageArrived(msg);
 	}
 	
 	/**
 	 *  Called when a message needs to be sent.
 	 *  (Called from component instance).
-	 */
+	 * /
 	public void	sendMessage(Map message, MessageType type)
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
@@ -322,7 +285,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 
 		for(int i=0; i<tooladapters.length; i++)
 			tooladapters[i].messageSent(msg);
-	}
+	}*/
 	
 	/**
 	 *  Set the state of the agent.
@@ -354,9 +317,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
 			throw new ComponentTerminatedException(cid.getName());
 
-		assert IComponentDescription.STATE_ACTIVE.equals(state)
-			||  IComponentDescription.STATE_SUSPENDED.equals(state) && dostep;
-		boolean	executed	= false;
+		assert IComponentDescription.STATE_ACTIVE.equals(state) || IComponentDescription.STATE_TERMINATING.equals(state)
+			||  IComponentDescription.STATE_SUSPENDED.equals(state) && dostep: state+" "+dostep;
+		
+		boolean	executed = false;
 
 		try
 		{
@@ -453,66 +417,5 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			newarray[breakpointcommands.length]	= command;
 			breakpointcommands	= newarray;
 		}
-	}
-	
-	//-------- tool adapter handling --------
-	
-	/**
-	 *  Add a tool adapter
-	 */
-	// Todo: should be supported at runtime?
-	public void	addToolAdapter(IToolAdapter adapter)
-	{
-		IToolAdapter[]	newarray	= new IToolAdapter[tooladapters.length+1];
-		System.arraycopy(tooladapters, 0, newarray, 0, tooladapters.length);
-		newarray[tooladapters.length]	= adapter;
-		tooladapters	= newarray;
-	}
-	
-	/**
-	 *  Remove a tool adapter
-	 */
-	// Todo: should be supported at runtime?
-	public void	removeToolAdapter(IToolAdapter adapter)
-	{
-		IToolAdapter[]	newarray = new IToolAdapter[tooladapters.length-1];
-		int cnt=0;
-		for(int i=0; i<tooladapters.length; i++)
-		{
-			if(tooladapters[i]!=adapter)
-				newarray[cnt++] = tooladapters[i]; 
-		}	
-		tooladapters	= newarray;
-	}
-	
-	/**
-	 *  Get a tooladapter of the given class.
-	 *  If it does not exist, it will be created.
-	 */
-	// Todo: remove on-demand creation? -> does not work for message based tools.
-	public IToolAdapter	getToolAdapter(Class clazz)
-	{
-		IToolAdapter	ret	= null;
-		for(int i=0; ret==null && i<tooladapters.length; i++)
-		{
-			if(clazz.isAssignableFrom(tooladapters[i].getClass()))
-				ret	= tooladapters[i];
-		}
-		
-		if(ret==null)
-		{
-			try
-			{
-				ret	= (IToolAdapter)clazz.newInstance();
-				ret.init(getComponentInstance());
-				addToolAdapter(ret);
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException("Error creating tool adapter: "+clazz, e);
-			}
-		}
-		 
-		return ret;
 	}
 }

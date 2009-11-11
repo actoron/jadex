@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.commons.IChangeListener;
 import jadex.service.IService;
 
 import java.util.Map;
@@ -38,4 +39,17 @@ public interface IMessageService extends IService
 	 *  @return The message type.
 	 */
 	public MessageType getMessageType(String type);
+	
+	/**
+	 *  Add a message listener.
+	 *  @param listener The change listener.
+	 */
+	public void addMessageListener(IMessageListener listener);
+	
+	/**
+	 *  Remove a message listener.
+	 *  @param listener The change listener.
+	 */
+	public void removeMessageListener(IMessageListener listener);
+
 }
