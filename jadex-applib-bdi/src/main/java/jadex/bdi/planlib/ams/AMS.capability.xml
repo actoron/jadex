@@ -53,14 +53,6 @@
 			</parameter>
 		</achievegoal>
 
-		<!-- Start the given agent (only possible when it has previously been created with start=false). -->
-		<achievegoal name="ams_start_agent" exported="true">
-			<!-- The agent to destroy. -->
-			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier"/>
-			<!-- The AMS agent identifier (only needed for remote requests). -->
-			<parameter name="ams" class="jadex.bridge.IComponentIdentifier" optional="true"/> 
-		</achievegoal>
-
 		<!-- Destroy the given agent. -->
 		<achievegoal name="ams_destroy_agent" exported="true">
 			<!-- The agent to destroy. -->
@@ -153,20 +145,6 @@
 			<precondition>$goal.ams==null</precondition>
 		</plan>
 
-		<plan name="local_start_agent_plan">
-			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier">
- 				<goalmapping ref="ams_start_agent.agentidentifier"/>
-			</parameter>
-			<parameter name="ams" class="jadex.bridge.IComponentIdentifier">
- 				<goalmapping ref="ams_start_agent.ams"/>
-			</parameter>
-			<body class="AMSLocalStartAgentPlan" />
-			<trigger>
-				<goal ref="ams_start_agent"/>
-			</trigger>
-			<precondition>$goal.ams==null</precondition>
-		</plan>
-		
 		<plan name="local_destroy_agent_plan">
 			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_destroy_agent.agentidentifier"/>
@@ -295,20 +273,6 @@
 			<precondition>$goal.ams!=null</precondition>
 		</plan>
 
-		<plan name="remote_start_agent_plan">
-			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier">
- 				<goalmapping ref="ams_start_agent.agentidentifier"/>
-			</parameter>
-			<parameter name="ams" class="jadex.bridge.IComponentIdentifier">
- 				<goalmapping ref="ams_start_agent.ams"/>
-			</parameter>
-			<body class="AMSRemoteStartAgentPlan" />
-			<trigger>
-				<goal ref="ams_start_agent"/>
-			</trigger>
-			<precondition>$goal.ams!=null</precondition>
-		</plan>
-		
 		<plan name="remote_destroy_agent_plan">
 			<parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="ams_destroy_agent.agentidentifier"/>

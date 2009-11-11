@@ -2,7 +2,6 @@ package jadex.bdi.benchmarks;
 
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentExecutionService;
-import jadex.bridge.IComponentIdentifier;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,9 +19,6 @@ public class RequestMasterPlan extends Plan
 		args.put("receiver", getAgentIdentifier());
 		
 		IComponentExecutionService	ces	= (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
-		SyncResultListener	srl	= new SyncResultListener();
-		ces.createComponent(null, "jadex/bdi/benchmarks/RequestPerformance.agent.xml", "default", args, srl, getAgentIdentifier());
-		IComponentIdentifier	slave	= (IComponentIdentifier)srl.waitForResult();
-		ces.startComponent(slave, null);
+		ces.createComponent(null, "jadex/bdi/benchmarks/RequestPerformance.agent.xml", "default", args, false, null, getAgentIdentifier());
 	}	
 }

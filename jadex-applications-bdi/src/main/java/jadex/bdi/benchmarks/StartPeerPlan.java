@@ -160,9 +160,8 @@ public class StartPeerPlan extends Plan
 	{
 		final IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
 		SyncResultListener lis = new SyncResultListener();
-		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", null, args, lis, getAgentIdentifier());
+		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", null, args, false, lis, getAgentIdentifier());
 		IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
-		ces.startComponent(aid, null);
 		return aid;
 	}
 	
