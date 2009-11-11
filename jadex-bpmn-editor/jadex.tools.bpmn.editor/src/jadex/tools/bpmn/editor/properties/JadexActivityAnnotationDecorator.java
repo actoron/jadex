@@ -13,7 +13,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 
-public class JadexAnnotationDecorator extends BpmnEAnnotationDecoratorProvider implements IEAnnotationDecorator 
+public class JadexActivityAnnotationDecorator extends BpmnEAnnotationDecoratorProvider implements IEAnnotationDecorator 
 {
 
 	@Override
@@ -47,8 +47,8 @@ public class JadexAnnotationDecorator extends BpmnEAnnotationDecoratorProvider i
         if (annotation != null) {
             Label label = new Label();
             label.setText(
-            		"class="+annotation.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_IMPL)
-            		+"\nparameter="+annotation.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_PARAMETER));
+            		"class="+annotation.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_TASK_CLASS)
+            		+"\nparameter="+annotation.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_TASK_PARAMETER_LIST));
             return label;
         }
         return null;

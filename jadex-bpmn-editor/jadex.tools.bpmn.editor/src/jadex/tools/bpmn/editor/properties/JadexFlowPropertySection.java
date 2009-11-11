@@ -21,6 +21,7 @@ import org.eclipse.gmf.runtime.emf.commands.core.command.AbstractTransactionalCo
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.stp.bpmn.Activity;
+import org.eclipse.stp.bpmn.SequenceEdge;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -37,19 +38,19 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * 
  * @author Claas Altschaffel
  */
-public class JadexPropertySection extends AbstractPropertySection
+public class JadexFlowPropertySection extends AbstractPropertySection
 {
 
 	// ---- attributes ----
 
 	/** The text for the implementing class */
-	private Text implText;
+	private Text someText;
 
 	/** The text for the role */
-	private Text parameterText;
+	private Text someOtherText;
 
 	/** The activity (task) that holds impl and role, may be null. */
-	private Activity activity;
+	private SequenceEdge edge;
 
 	// ---- methods ----
 
@@ -66,15 +67,15 @@ public class JadexPropertySection extends AbstractPropertySection
 		GridData gd = new GridData(SWT.FILL);
 		gd.minimumWidth = 500;
 		gd.widthHint = 500;
-		getWidgetFactory().createCLabel(parent, "class");
-		implText = getWidgetFactory().createText(parent, "");
-		implText.setLayoutData(gd);
-		getWidgetFactory().createCLabel(parent, "parameter");
-		parameterText = getWidgetFactory().createText(parent, "");
-		parameterText.setLayoutData(gd);
+		getWidgetFactory().createCLabel(parent, "some flow value");
+		someText = getWidgetFactory().createText(parent, "");
+		someText.setLayoutData(gd);
+		getWidgetFactory().createCLabel(parent, "other flow value");
+		someOtherText = getWidgetFactory().createText(parent, "");
+		someOtherText.setLayoutData(gd);
 
-		implText.addModifyListener(new ModifyJadexInformation(JadexProptertyConstants.JADEX_ACTIVITY_IMPL, implText));
-		parameterText.addModifyListener(new ModifyJadexInformation(JadexProptertyConstants.JADEX_ACTIVITY_PARAMETER, parameterText));
+		someText.addModifyListener(new ModifyJadexInformation(JadexProptertyConstants.JADEX_FLOW_EXAMPLE_ANNOTATION, someText));
+		someOtherText.addModifyListener(new ModifyJadexInformation(JadexProptertyConstants.JADEX_FLOW_PARAMETER_MAPPING_LIST, someOtherText));
 
 	}
 
@@ -97,38 +98,25 @@ public class JadexPropertySection extends AbstractPropertySection
 			if (unknownInput instanceof Activity)
 			{
 				Activity elt = (Activity) unknownInput;
-				EAnnotation ea = elt.getEAnnotation(JadexProptertyConstants.JADEX_ACTIVITY_ANNOTATION);
+				EAnnotation ea = elt.getEAnnotation(JadexProptertyConstants.JADEX_FLOW_ANNOTATION);
 				if (ea != null)
 				{
-					implText.setText((String) ea.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_IMPL));
-					parameterText.setText((String) ea.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_PARAMETER));
+					someText.setText((String) ea.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_TASK_CLASS));
+					someOtherText.setText((String) ea.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_TASK_PARAMETER_LIST));
 				}
-				activity = (Activity) elt;
-				implText.setEnabled(true);
-				parameterText.setEnabled(true);
+				edge = (SequenceEdge) elt;
+				someText.setEnabled(true);
+				someOtherText.setEnabled(true);
 				return;
 			}
 		}
-		activity = null;
-		implText.setText("");
-		parameterText.setText("");
-		implText.setEnabled(false);
-		parameterText.setEnabled(false);
+		edge = null;
+		someText.setText("");
+		someOtherText.setText("");
+		someText.setEnabled(false);
+		someOtherText.setEnabled(false);
 	}
 	
-	/**
-	 * Utility class that finds the files and the editing domain easily,
-	 */
-	private abstract class ModifyJadexEAnnotationCommand extends
-			AbstractTransactionalCommand
-	{
-
-		public ModifyJadexEAnnotationCommand(Activity ann, String label)
-		{
-			super((TransactionalEditingDomain) AdapterFactoryEditingDomain
-					.getEditingDomainFor(ann), label, getWorkspaceFiles(ann));
-		}
-	}
 
 	/**
 	 * Tracks the change occurring on the text field.
@@ -146,13 +134,13 @@ public class JadexPropertySection extends AbstractPropertySection
 
 		public void modifyText(ModifyEvent e)
 		{
-			if (activity == null)
+			if (edge == null)
 			{ 
 				// the value was just initialized
 				return;
 			}
 			ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
-					activity, "Modifying participant")
+					edge, "Modifying participant")
 			{
 
 				@Override
@@ -160,14 +148,14 @@ public class JadexPropertySection extends AbstractPropertySection
 						IProgressMonitor arg0, IAdaptable arg1)
 						throws ExecutionException
 				{
-					EAnnotation annotation = activity.getEAnnotation(JadexProptertyConstants.JADEX_ACTIVITY_ANNOTATION);
+					EAnnotation annotation = edge.getEAnnotation(JadexProptertyConstants.JADEX_ACTIVITY_ANNOTATION);
 					if (annotation == null)
 					{
 						annotation = EcoreFactory.eINSTANCE.createEAnnotation();
 						annotation.setSource(JadexProptertyConstants.JADEX_ACTIVITY_ANNOTATION);
-						annotation.setEModelElement(activity);
-						annotation.getDetails().put(JadexProptertyConstants.JADEX_ACTIVITY_IMPL, "");
-						annotation.getDetails().put(JadexProptertyConstants.JADEX_ACTIVITY_PARAMETER, "");
+						annotation.setEModelElement(edge);
+						annotation.getDetails().put(JadexProptertyConstants.JADEX_ACTIVITY_TASK_CLASS, "");
+						annotation.getDetails().put(JadexProptertyConstants.JADEX_ACTIVITY_TASK_PARAMETER_LIST, "");
 					}
 					annotation.getDetails().put(key, field.getText());
 

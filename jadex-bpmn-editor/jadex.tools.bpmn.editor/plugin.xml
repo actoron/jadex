@@ -5,9 +5,9 @@
          point="org.eclipse.ui.editors">
       <editor
             class="jadex.tools.bpmn.editor.JadexBpmnEditor"
-            contributorClass="org.eclipse.stp.bpmn.sample.bugeditor.JadexBpmnEditorContributor"
+            contributorClass="jadex.tools.bpmn.editor.JadexBpmnEditorContributor"
             extensions="bpmn_diagram"
-            icon="icons/jadex_bpmn_editor.gif"
+            icon="icons/plan.png"
             id="jadex.tools.bpmn.editor.JadexBpmnEditorID"
             name="Jadex BPMN Editor">
       </editor>
@@ -17,7 +17,8 @@
    <extension
         point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
      <propertyContributor
-           contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+           contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID"
+           typeMapper="jadex.tools.bpmn.editor.properties.EModelTypeMapper">
         <propertyCategory category="Jadex"/>
      </propertyContributor>
   </extension>
@@ -32,24 +33,49 @@
               label="Jadex"/>
      </propertyTabs>
    </extension>
+   
+    <!-- the jadex common property section - ->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexPropertySection"
+              class="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection"
+              id="JadexSection"
+              tab="Jadex">
+           <input type="org.eclipse.stp.bpmn.Identifiable"/>
+        </propertySection>
+     </propertySections>
+   </extension> -->
+   
+   <!-- the jadex activity property section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertySection
+              class="jadex.tools.bpmn.editor.properties.JadexActivityPropertySection"
               id="JadexSection"
               tab="Jadex">
            <input type="org.eclipse.stp.bpmn.Activity"/>
-           <input type="java.lang.Object"/>
         </propertySection>
      </propertySections>
    </extension>
+   
+   <!-- the jadex flow property section - ->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertySection
+              class="jadex.tools.bpmn.editor.properties.JadexFlowPropertySection"
+              id="JadexSection"
+              tab="Jadex">
+           <input type="org.eclipse.stp.bpmn.SequenceEdge"/>
+        </propertySection>
+     </propertySections>
+   </extension> -->
    
    <!-- annotation decorator in diagram -->
 	<extension
         point="org.eclipse.stp.bpmn.diagram.EAnnotationDecorator">
      <decorator
-           class="jadex.tools.bpmn.editor.properties.JadexAnnotationDecorator"
-           source="jadex"/>
+           class="jadex.tools.bpmn.editor.properties.JadexActivityAnnotationDecorator"
+           source="task"/>
   </extension>
 	
 	
@@ -171,5 +197,39 @@
        </propertyCategory>
     </propertyContributor>
  </extension>
+ 
+ <!-- the Annotations property tab from BPMN Modeler - this is a modified copy from BPMN plugin.xml-->
+ <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+      <propertyContributor
+            contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID"
+            typeMapper="org.eclipse.stp.bpmn.properties.EAnnotationsTypeMapper">
+         <propertyCategory category="Annotations"/>
+      </propertyContributor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <propertyTabs contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+         <propertyTab
+               category="Annotations"
+               id="Annotations"
+               indented="false"
+               label="Annotations"/>
+               <!-- label="%propertyTab_label"/> -->
+      </propertyTabs>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+         <propertySection
+               class="org.eclipse.stp.bpmn.properties.EAnnotationsMapSection"
+               id="Annotations Map"
+               tab="Annotations">
+            <input type="org.eclipse.stp.bpmn.Identifiable"/>
+            <input type="org.eclipse.emf.ecore.EObject"/>
+            <!-- <input type="java.lang.Object"/> -->
+         </propertySection>
+      </propertySections>
+   </extension>
  
 </plugin>
