@@ -1,6 +1,6 @@
 package jadex.microkernel;
 
-import jadex.bridge.AgentTerminatedException;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentInstance;
@@ -158,7 +158,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 			this.agentthread = null;
 			return false;
 		}
-		catch(AgentTerminatedException ate)
+		catch(ComponentTerminatedException ate)
 		{
 			// Todo: fix microkernel bug.
 			return false; 
@@ -267,7 +267,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 		synchronized(ext_entries)
 		{
 			if(ext_forbidden)
-				throw new AgentTerminatedException("External actions cannot be accepted " +
+				throw new ComponentTerminatedException("External actions cannot be accepted " +
 					"due to terminated agent state: "+this);
 			{
 				ext_entries.add(action);

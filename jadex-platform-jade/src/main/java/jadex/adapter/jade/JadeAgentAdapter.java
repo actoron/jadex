@@ -8,7 +8,7 @@ import jadex.adapter.base.SComponentExecutionService;
 import jadex.adapter.base.SComponentFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
-import jadex.bridge.AgentTerminatedException;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentAdapter;
@@ -216,7 +216,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		assert !IComponentDescription.STATE_INITIATED.equals(state) : this;
 		
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(getComponentIdentifier().getName());
+			throw new ComponentTerminatedException(getComponentIdentifier().getName());
 		
 		// Resume execution of the agent (when active).
 		//System.out.println("wakeup called: "+state);
@@ -305,7 +305,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	public IPlatform	getServiceContainer()
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(getComponentIdentifier().getName());
+			throw new ComponentTerminatedException(getComponentIdentifier().getName());
 
 		return platform;
 	}
@@ -317,7 +317,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	public IClockService getClock()
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(getComponentIdentifier().getName());
+			throw new ComponentTerminatedException(getComponentIdentifier().getName());
 
 //		return platform.getClock();
 		return (IClockService)platform.getService(IClockService.class);
@@ -365,7 +365,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	public void killAgent(IResultListener listener)
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(getComponentIdentifier().getName());
+			throw new ComponentTerminatedException(getComponentIdentifier().getName());
 
 		if(!fatalerror)
 			agent.killComponent(listener);
@@ -397,7 +397,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	public void	setState(String state)
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(this.state))
-			throw new AgentTerminatedException(getComponentIdentifier().getName());
+			throw new ComponentTerminatedException(getComponentIdentifier().getName());
 
 		this.state	= state;
 	}
@@ -448,7 +448,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	public IComponentInstance	getKernelAgent()
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
-			throw new AgentTerminatedException(getComponentIdentifier().getName());
+			throw new ComponentTerminatedException(getComponentIdentifier().getName());
 
 		return agent;
 	}

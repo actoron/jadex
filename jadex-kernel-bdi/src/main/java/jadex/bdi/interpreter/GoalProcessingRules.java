@@ -1082,7 +1082,7 @@ public class GoalProcessingRules
 			if(retrydelay>0)
 			{
 //				// changed *.class to *.TYPE due to javaflow bug
-				IClockService clock = (IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter()
+				IClockService clock = (IClockService)BDIInterpreter.getInterpreter(state).getComponentAdapter()
 					.getServiceContainer().getService(IClockService.TYPE);
 				state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_retrytimer, clock.createTimer(retrydelay, 
 					new InterpreterTimedObject(state, new InterpreterTimedObjectAction()
@@ -1333,7 +1333,7 @@ public class GoalProcessingRules
 				{
 //					// changed *.class to *.TYPE due to javaflow bug
 //					IClockService clock = (IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getPlatform().getService(IClockService.class);
-					IClockService clock = (IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer().getService(IClockService.TYPE);
+					IClockService clock = (IClockService)BDIInterpreter.getInterpreter(state).getComponentAdapter().getServiceContainer().getService(IClockService.TYPE);
 					state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_recurtimer, clock.createTimer(recurdelay, 
 						new InterpreterTimedObject(state, new InterpreterTimedObjectAction()
 					{

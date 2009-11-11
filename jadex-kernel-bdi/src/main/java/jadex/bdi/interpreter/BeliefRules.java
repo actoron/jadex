@@ -312,7 +312,7 @@ public class BeliefRules
 //			// todo: provide activation resp. variable bindings
 //			state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, null);
 			
-			BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();
+			BDIInterpreter.getInterpreter(state).getComponentAdapter().wakeup();
 		}
 	};
 	
@@ -428,13 +428,13 @@ public class BeliefRules
 						}
 						catch(Exception e)
 						{
-							String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
+							String name = BDIInterpreter.getInterpreter(state).getComponentAdapter().getComponentIdentifier().getName();
 							AgentRules.getLogger(state, rcapa).severe("Could not evaluate parameter expression: "+name
 								+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content));
 						}
 		//					// changed *.class to *.TYPE due to javaflow bug
 						state.setAttributeValue(rparam, OAVBDIRuntimeModel.typedelement_has_timer, 
-							((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer()
+							((IClockService)BDIInterpreter.getInterpreter(state).getComponentAdapter().getServiceContainer()
 							.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
 					}
 					
@@ -447,7 +447,7 @@ public class BeliefRules
 				
 		//			// changed *.class to *.TYPE due to javaflow bug
 				state.setAttributeValue(rparam, OAVBDIRuntimeModel.typedelement_has_timer, 
-					((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer()
+					((IClockService)BDIInterpreter.getInterpreter(state).getComponentAdapter().getServiceContainer()
 					.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
 			}
 		}
@@ -503,19 +503,19 @@ public class BeliefRules
 						}
 						catch(Exception e)
 						{
-							String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
+							String name = BDIInterpreter.getInterpreter(state).getComponentAdapter().getComponentIdentifier().getName();
 							AgentRules.getLogger(state, rcapa).severe("Could not evaluate parameterset expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content));
 						}
 						// changed *.class to *.TYPE due to javaflow bug
 						state.setAttributeValue(rparamset, OAVBDIRuntimeModel.typedelement_has_timer, 
-							((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer()
+							((IClockService)BDIInterpreter.getInterpreter(state).getComponentAdapter().getServiceContainer()
 							.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
 					}
 				});
 				
 				// changed *.class to *.TYPE due to javaflow bug
 				state.setAttributeValue(rparamset, OAVBDIRuntimeModel.typedelement_has_timer, 
-					((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer()
+					((IClockService)BDIInterpreter.getInterpreter(state).getComponentAdapter().getServiceContainer()
 					.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
 			}
 		}

@@ -11,7 +11,7 @@ import jadex.bpmn.runtime.handler.GatewayXORActivityHandler;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
 import jadex.bpmn.runtime.handler.TaskActivityHandler;
 import jadex.bpmn.runtime.handler.basic.UserInteractionActivityHandler;
-import jadex.bridge.AgentTerminatedException;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentExecutionService;
@@ -235,7 +235,7 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 			
 			return !isFinished(null, null) && isReady(null, null);
 		}
-		catch(AgentTerminatedException ate)
+		catch(ComponentTerminatedException ate)
 		{
 			// Todo: fix microkernel bug.
 			return false; 
@@ -351,7 +351,7 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 		synchronized(ext_entries)
 		{
 			if(ext_forbidden)
-				throw new AgentTerminatedException("External actions cannot be accepted " +
+				throw new ComponentTerminatedException("External actions cannot be accepted " +
 					"due to terminated agent state: "+this);
 			{
 				ext_entries.add(action);

@@ -2,7 +2,7 @@ package jadex.bdi.planlib.ams;
 
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.AgentTerminatedException;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentListener;
@@ -47,7 +47,7 @@ public class AMSLocalUpdateAgentsPlan extends Plan
 							}
 						});
 					}
-					catch(AgentTerminatedException ate)
+					catch(ComponentTerminatedException ate)
 					{
 					}
 				}
@@ -68,7 +68,7 @@ public class AMSLocalUpdateAgentsPlan extends Plan
 							}
 						});
 					}
-					catch(AgentTerminatedException ate)
+					catch(ComponentTerminatedException ate)
 					{
 					}
 				}

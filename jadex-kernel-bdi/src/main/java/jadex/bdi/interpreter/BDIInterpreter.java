@@ -13,11 +13,10 @@ import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
 import jadex.bdi.runtime.impl.InterpreterTimedObjectAction;
-import jadex.bridge.AgentTerminatedException;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IMessageAdapter;
-import jadex.bridge.IToolAdapter;
 import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.ISynchronizator;
@@ -114,11 +113,7 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 	
 	/** The flag for microplansteps. */
 	protected transient boolean microplansteps; 
-	
-	// todo: close tools when saving (restore on load!?)
-	/** The tool adapters. */
-	protected IToolAdapter[] tooladapters;
-	
+		
 	/** The map of flyweights (original element -> flyweight). */
 	protected Map volcache;
 	protected Map stacache;
@@ -221,27 +216,27 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 //		}
 
 		// Initialize tool adapters.
-		this.tooladapters	= new IToolAdapter[0];
+//		this.tooladapters	= new IToolAdapter[0];
 		if(kernelprops!=null)
 		{
-			for(Iterator it=kernelprops.keySet().iterator(); it.hasNext(); )
-			{
-				Object	key	= (String)it.next();
-				if(key.toString().startsWith("tooladapter."))
-				{
-					try
-					{
-						Class	adapterclass	= (Class)kernelprops.get(key);
-						IToolAdapter	tooladapter	= (IToolAdapter)adapterclass.newInstance();
-						tooladapter.init(this);
-						addToolAdapter(tooladapter);
-					}
-					catch(Exception e)
-					{
-						throw new RuntimeException("Error evaluating kernel property: "+key+", "+kernelprops.get(key), e);
-					}
-				}
-			}
+//			for(Iterator it=kernelprops.keySet().iterator(); it.hasNext(); )
+//			{
+//				Object	key	= (String)it.next();
+//				if(key.toString().startsWith("tooladapter."))
+//				{
+//					try
+//					{
+//						Class	adapterclass	= (Class)kernelprops.get(key);
+//						IToolAdapter	tooladapter	= (IToolAdapter)adapterclass.newInstance();
+//						tooladapter.init(this);
+//						addToolAdapter(tooladapter);
+//					}
+//					catch(Exception e)
+//					{
+//						throw new RuntimeException("Error evaluating kernel property: "+key+", "+kernelprops.get(key), e);
+//					}
+//				}
+//			}
 			
 			Boolean mps = (Boolean)kernelprops.get("microplansteps");
 			if(mps!=null)
@@ -353,8 +348,12 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 			if(!extexecuted)
 			{
 				// Notify/ask tools that we are about to execute an action.
-				for(int i=0; execute && i<tooladapters.length; i++)
-					execute	= tooladapters[i].executeAction();
+				
+				// todo!!!
+
+//				for(int i=0; execute && i<tooladapters.length; i++)
+//					execute	= tooladapters[i].executeAction();
+				
 				if(execute)
 				{
 					// Execute rules.
@@ -539,13 +538,13 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 	{
 //		System.out.println("messageArrived: "+getAgentAdapter().getAgentIdentifier().getLocalName()+", "+message);
 		// Notify/ask tools that we are about to receive a message.
-		boolean	toolmsg	= false;
-		for(int i=0; !toolmsg && i<tooladapters.length; i++)
-			toolmsg	= tooladapters[i].messageReceived(message);
+//		boolean	toolmsg	= false;
+//		for(int i=0; !toolmsg && i<tooladapters.length; i++)
+//			toolmsg	= tooladapters[i].messageReceived(message);
 
 		// Handle normal messages.
-		if(!toolmsg)
-		{
+//		if(!toolmsg)
+//		{
 			invokeLater(new Runnable()
 			{
 				public void run()
@@ -555,7 +554,7 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 //						+"("+state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)+")"+", "+message);
 				}
 			});
-		}
+//		}
 	}
 
 	/**
@@ -617,66 +616,7 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 		BDIInterpreter.interpreters.remove(state);
 //		System.out.println(BDIInterpreter.interpreters.size());
 	}
-	
-	/**
-	 *  Add a tool adapter
-	 */
-	// Todo: should be supported at runtime?
-	public void	addToolAdapter(IToolAdapter adapter)
-	{
-		IToolAdapter[]	newarray	= new IToolAdapter[tooladapters.length+1];
-		System.arraycopy(tooladapters, 0, newarray, 0, tooladapters.length);
-		newarray[tooladapters.length]	= adapter;
-		tooladapters	= newarray;
-	}
-	
-	/**
-	 *  Remove a tool adapter
-	 */
-	// Todo: should be supported at runtime?
-	public void	removeToolAdapter(IToolAdapter adapter)
-	{
-		IToolAdapter[]	newarray = new IToolAdapter[tooladapters.length-1];
-		int cnt=0;
-		for(int i=0; i<tooladapters.length; i++)
-		{
-			if(tooladapters[i]!=adapter)
-				newarray[cnt++] = tooladapters[i]; 
-		}	
-		tooladapters	= newarray;
-	}
-	
-	/**
-	 *  Get a tooladapter of the given class.
-	 *  If it does not exist, it will be created.
-	 */
-	// Todo: remove on-demand creation? -> does not work for message based tools.
-	public IToolAdapter	getToolAdapter(Class clazz)
-	{
-		IToolAdapter	ret	= null;
-		for(int i=0; ret==null && i<tooladapters.length; i++)
-		{
-			if(clazz.isAssignableFrom(tooladapters[i].getClass()))
-				ret	= tooladapters[i];
-		}
 		
-		if(ret==null)
-		{
-			try
-			{
-				ret	= (IToolAdapter)clazz.newInstance();
-				ret.init(this);
-				addToolAdapter(ret);
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException("Error creating tool adapter: "+clazz, e);
-			}
-		}
-		 
-		return ret;
-	}
-	
 	//-------- other methods --------
 	
 	/**
@@ -776,7 +716,7 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 	 *  Get the adapter agent.
 	 *  @return The adapter agent.
 	 */
-	public IComponentAdapter getAgentAdapter()
+	public IComponentAdapter getComponentAdapter()
 	{
 		return this.adapter;
 	}
@@ -890,7 +830,7 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 		{
 			if(ext_forbidden)
 			{
-				throw new AgentTerminatedException("External actions cannot be accepted " +
+				throw new ComponentTerminatedException("External actions cannot be accepted " +
 					"due to terminated agent state: "+ragent);
 			}
 			ext_entries.add(action);
@@ -1077,11 +1017,11 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 	/**
 	 *  Get the tool adapters.
 	 *  @return The tool adapters.
-	 */
+	 * /
 	public IToolAdapter[] getToolAdapters()
 	{
 		return tooladapters;
-	}
+	}*/
 	
 	/**
 	 *  Get the flyweight cache.

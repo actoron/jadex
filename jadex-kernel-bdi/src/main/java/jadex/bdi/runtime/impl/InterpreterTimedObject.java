@@ -1,7 +1,7 @@
 package jadex.bdi.runtime.impl;
 
 import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bridge.AgentTerminatedException;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.rules.state.IOAVState;
 import jadex.service.clock.ITimedObject;
 
@@ -46,7 +46,7 @@ public class InterpreterTimedObject implements ITimedObject
 			{
 				interpreter.invokeLater(action);
 			}
-			catch(AgentTerminatedException e)
+			catch(ComponentTerminatedException e)
 			{
 			}
 		}
@@ -70,7 +70,7 @@ public class InterpreterTimedObject implements ITimedObject
 		String	name	= null;
 		BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
 		if(bdii!=null)
-			name	= bdii.getAgentAdapter().getComponentIdentifier().getLocalName();
+			name	= bdii.getComponentAdapter().getComponentIdentifier().getLocalName();
 		return name + ": " + action; 
 	}
 }

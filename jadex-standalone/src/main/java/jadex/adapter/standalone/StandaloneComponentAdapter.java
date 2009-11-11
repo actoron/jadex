@@ -1,13 +1,16 @@
 package jadex.adapter.standalone;
 
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
-import jadex.bridge.AgentTerminatedException;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IMessageAdapter;
+import jadex.bridge.IMessageService;
+import jadex.bridge.IToolAdapter;
 import jadex.bridge.MessageType;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
@@ -43,6 +46,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	/** Flag to indicate a fatal error (component termination will not be passed to instance) */
 	protected boolean	fatalerror;
 	
+	// todo: close tools when saving (restore on load!?)
+	/** The tool adapters. */
+	protected IToolAdapter[] tooladapters;
+	
 	//-------- constructors --------
 
 	/**
@@ -53,6 +60,31 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	{
 		this.container = container;
 		this.cid = cid;
+		
+		// Initialize tool adapters.
+		this.tooladapters	= new IToolAdapter[0];
+
+//		if(kernelprops!=null)
+//		{
+//			for(Iterator it=kernelprops.keySet().iterator(); it.hasNext(); )
+//			{
+//				Object	key	= (String)it.next();
+//				if(key.toString().startsWith("tooladapter."))
+//				{
+//					try
+//					{
+//						Class	adapterclass	= (Class)kernelprops.get(key);
+//						IToolAdapter	tooladapter	= (IToolAdapter)adapterclass.newInstance();
+//						tooladapter.init(getComponentInstance());
+//						addToolAdapter(tooladapter);
+//					}
+//					catch(Exception e)
+//					{
+//						throw new RuntimeException("Error evaluating kernel property: "+key+", "+kernelprops.get(key), e);
+//					}
+//				}
+//			}
+//		}
 	}
 	
 	/**
@@ -85,7 +117,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 //		assert !IComponentDescription.STATE_INITIATED.equals(state) : this;
 		
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(cid.getName());
+			throw new ComponentTerminatedException(cid.getName());
 		
 		// Resume execution of the agent (when active or terminating).
 		if(IComponentDescription.STATE_ACTIVE.equals(state)
@@ -146,7 +178,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	public IComponentIdentifier getComponentIdentifier()
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(cid.getName());
+			throw new ComponentTerminatedException(cid.getName());
 
 		// todo: remove cast, HACK!!!
 		// todo: add transport addresses for multi-platform communication.
@@ -162,7 +194,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	public IServiceContainer	getServiceContainer()
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(cid.getName());
+			throw new ComponentTerminatedException(cid.getName());
 
 		return container;
 	}
@@ -174,7 +206,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	public IClockService getClock()
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(cid.getName());
+			throw new ComponentTerminatedException(cid.getName());
 
 //		return platform.getClock();
 		return (IClockService)container.getService(IClockService.class);
@@ -222,7 +254,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	{
 //		System.out.println("killAgent: "+listener);
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(cid.getName());
+			throw new ComponentTerminatedException(cid.getName());
 
 		if(!fatalerror)
 			component.killComponent(listener);
@@ -233,11 +265,13 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 
 	/**
 	 *  Called when a message was sent to the agent.
+	 *  (Called from message transport).
+	 *  (Is it ok to call on external thread?).
 	 */
 	public void	receiveMessage(Map message, MessageType type)
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
-			throw new AgentTerminatedException(cid.getName());
+			throw new ComponentTerminatedException(cid.getName());
 
 		// Add optional receival time.
 //		String rd = type.getReceiveDateIdentifier();
@@ -245,7 +279,32 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 //		if(recdate==null)
 //			message.put(rd, new Long(getClock().getTime()));
 		
-		component.messageArrived(new DefaultMessageAdapter(message, type));
+		IMessageAdapter msg = new DefaultMessageAdapter(message, type);
+		
+		boolean	toolmsg	= false;
+		for(int i=0; !toolmsg && i<tooladapters.length; i++)
+			toolmsg	= tooladapters[i].messageReceived(msg);
+		
+		if(!toolmsg)
+			component.messageArrived(msg);
+	}
+	
+	/**
+	 *  Called when a message needs to be sent.
+	 *  (Called from component instance).
+	 */
+	public void	sendMessage(Map message, MessageType type)
+	{
+		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
+			throw new ComponentTerminatedException(cid.getName());
+
+		IMessageAdapter msg = new DefaultMessageAdapter(message, type);
+		
+		((IMessageService)getServiceContainer().getService(IMessageService.class)).sendMessage(msg.getParameterMap(),
+			msg.getMessageType(), getComponentIdentifier(), getComponentInstance().getClassLoader());
+
+		for(int i=0; i<tooladapters.length; i++)
+			tooladapters[i].messageSent(msg);
 	}
 	
 	/**
@@ -254,7 +313,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	public void	setState(String state)
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(this.state))
-			throw new AgentTerminatedException(cid.getName());
+			throw new ComponentTerminatedException(cid.getName());
 
 		this.state	= state;
 	}
@@ -276,7 +335,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	public boolean	execute()
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
-			throw new AgentTerminatedException(cid.getName());
+			throw new ComponentTerminatedException(cid.getName());
 
 		boolean	executed	= false;
 		try
@@ -307,8 +366,69 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	public IComponentInstance	getComponentInstance()
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
-			throw new AgentTerminatedException(cid.getName());
+			throw new ComponentTerminatedException(cid.getName());
 
 		return component;
+	}
+	
+	//-------- tool adapter handling --------
+	
+	/**
+	 *  Add a tool adapter
+	 */
+	// Todo: should be supported at runtime?
+	public void	addToolAdapter(IToolAdapter adapter)
+	{
+		IToolAdapter[]	newarray	= new IToolAdapter[tooladapters.length+1];
+		System.arraycopy(tooladapters, 0, newarray, 0, tooladapters.length);
+		newarray[tooladapters.length]	= adapter;
+		tooladapters	= newarray;
+	}
+	
+	/**
+	 *  Remove a tool adapter
+	 */
+	// Todo: should be supported at runtime?
+	public void	removeToolAdapter(IToolAdapter adapter)
+	{
+		IToolAdapter[]	newarray = new IToolAdapter[tooladapters.length-1];
+		int cnt=0;
+		for(int i=0; i<tooladapters.length; i++)
+		{
+			if(tooladapters[i]!=adapter)
+				newarray[cnt++] = tooladapters[i]; 
+		}	
+		tooladapters	= newarray;
+	}
+	
+	/**
+	 *  Get a tooladapter of the given class.
+	 *  If it does not exist, it will be created.
+	 */
+	// Todo: remove on-demand creation? -> does not work for message based tools.
+	public IToolAdapter	getToolAdapter(Class clazz)
+	{
+		IToolAdapter	ret	= null;
+		for(int i=0; ret==null && i<tooladapters.length; i++)
+		{
+			if(clazz.isAssignableFrom(tooladapters[i].getClass()))
+				ret	= tooladapters[i];
+		}
+		
+		if(ret==null)
+		{
+			try
+			{
+				ret	= (IToolAdapter)clazz.newInstance();
+				ret.init(getComponentInstance());
+				addToolAdapter(ret);
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException("Error creating tool adapter: "+clazz, e);
+			}
+		}
+		 
+		return ret;
 	}
 }

@@ -3,7 +3,7 @@ package jadex.tools.common;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IMessageEvent;
-import jadex.bridge.AgentTerminatedException;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
@@ -533,7 +533,7 @@ public class FipaMessagePanel extends JPanel
 		{
 			message.getParameter(name).setValue(oval);
 		}
-		catch(AgentTerminatedException e)
+		catch(ComponentTerminatedException e)
 		{
 			// Hack!!! If agent has died, external access no longer works.
 			// Write into message directly.
@@ -555,7 +555,7 @@ public class FipaMessagePanel extends JPanel
 			for(int i=0; values!=null && i<values.length; i++)
 				message.getParameterSet(name).addValue(values[i]);	
 		}
-		catch(AgentTerminatedException e)
+		catch(ComponentTerminatedException e)
 		{
 			// Hack!!! If agent has died, external access no longer works.
 			// Write into message directly.

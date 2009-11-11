@@ -79,7 +79,7 @@ public class IntrospectorAdapter implements IToolAdapter, ISteppable
 		if(!step)
 		{
 			dostep	= false;
-			agent.getAgentAdapter().wakeup();
+			agent.getComponentAdapter().wakeup();
 		}
 	}
 	
@@ -91,7 +91,7 @@ public class IntrospectorAdapter implements IToolAdapter, ISteppable
 		if(!step)
 			throw new RuntimeException("Only possible in step mode.");
 		this.dostep	= true;
-		agent.getAgentAdapter().wakeup();
+		agent.getComponentAdapter().wakeup();
 	}
 	
 	/**

@@ -124,7 +124,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public BpmnPlanBodyInstance(MBpmnModel model, final BDIInterpreter interpreter, final Object rcapa, final Object rplan)
 	{
-		super(interpreter.getAgentAdapter(), model, null, null, DEFAULT_HANDLERS, new OAVBDIFetcher(interpreter.getState(), rcapa, rplan));
+		super(interpreter.getComponentAdapter(), model, null, null, DEFAULT_HANDLERS, new OAVBDIFetcher(interpreter.getState(), rcapa, rplan));
 		this.interpreter	= interpreter;
 		this.state = interpreter.getState();
 		this.rcapa = rcapa;
@@ -206,7 +206,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 		if(waittimes==null)
 			waittimes	= new HashMap();
 
-		IClockService	clock	= (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
+		IClockService	clock	= (IClockService)interpreter.getComponentAdapter().getServiceContainer().getService(IClockService.class);
 		Long ret = new Long(clock.getTime()+duration);
 		waittimes.put(thread, ret);
 	}
@@ -229,7 +229,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	{
 		if(waittimes!=null)
 		{
-			IClockService	clock	= (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
+			IClockService	clock	= (IClockService)interpreter.getComponentAdapter().getServiceContainer().getService(IClockService.class);
 			
 			for(Iterator it=waittimes.keySet().iterator(); it.hasNext(); )
 			{
@@ -279,7 +279,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 			String lane	= getLane(getLastState());
 			if(!LANE_UNDEFINED.equals(lane))
 			{
-				IClockService	clock	= (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
+				IClockService	clock	= (IClockService)interpreter.getComponentAdapter().getServiceContainer().getService(IClockService.class);
 				for(Iterator it=waittimes.keySet().iterator(); it.hasNext(); )
 				{
 					ProcessThread	thread	= (ProcessThread) it.next();
@@ -641,7 +641,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public IComponentIdentifier	getAgentIdentifier()
 	{
-		return interpreter.getAgentAdapter().getComponentIdentifier();
+		return interpreter.getComponentAdapter().getComponentIdentifier();
 	}
 
 	/**
@@ -674,7 +674,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 //		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, 
 //			OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATING);
 		interpreter.startMonitorConsequences();
-		getInterpreter().getAgentAdapter().killComponent();
+		getInterpreter().getComponentAdapter().killComponent();
 		interpreter.endMonitorConsequences();
 	}
 
@@ -740,7 +740,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public IClockService getClock()
 	{
-		return (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
+		return (IClockService)interpreter.getComponentAdapter().getServiceContainer().getService(IClockService.class);
 	}
 
 	/**

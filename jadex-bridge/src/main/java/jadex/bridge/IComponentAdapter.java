@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import java.util.Map;
+
 import jadex.service.IServiceContainer;
 
 
@@ -20,25 +22,48 @@ public interface IComponentAdapter
 	 *  Also proper synchronization has to be made sure, as this method
 	 *  can be called concurrently from different threads.
 	 */
-	public void	wakeup()	throws AgentTerminatedException;
+	public void	wakeup()	throws ComponentTerminatedException;
 
 	/**
 	 *  Cause termination of the agent.
 	 *  IKernelAgent.killAgent(IResultListener) will be
 	 *  called in turn.
 	 */
-	public void killComponent()	throws AgentTerminatedException;
+	public void killComponent()	throws ComponentTerminatedException;
 
 	/**
 	 *  Get the agent platform.
 	 *  @return The agent platform.
 	 */
-	public IServiceContainer getServiceContainer()	throws AgentTerminatedException;
+	public IServiceContainer getServiceContainer()	throws ComponentTerminatedException;
 
 	/**
 	 *  Return the native agent-identifier that allows to send
 	 *  messages to this agent.
 	 */
-	public IComponentIdentifier getComponentIdentifier() throws AgentTerminatedException;
+	public IComponentIdentifier getComponentIdentifier() throws ComponentTerminatedException;
+	
+	/**
+	 *  Send a message.
+	 *  @param message The message.
+	 *  @param type The type.
+	 */
+	public void sendMessage(Map message, MessageType type) throws ComponentTerminatedException;
+	
+	// Hack! remove.
+	/**
+	 *  Get a tooladapter of the given class.
+	 *  If it does not exist, it will be created.
+	 */
+	// Todo: remove on-demand creation? -> does not work for message based tools.
+	public IToolAdapter	getToolAdapter(Class clazz);
+	
+	// Hack! remove.
+	/**
+	 *  Remove a tool adapter
+	 */
+	// Todo: should be supported at runtime?
+	public void	removeToolAdapter(IToolAdapter adapter);
+	
 }
 

@@ -757,7 +757,7 @@ public class ExternalAccessFlyweight extends CapabilityFlyweight implements IExt
 					
 //					System.out.println("Timer created: "+start);
 					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer, ((IClockService)getInterpreter()
-						.getAgentAdapter().getServiceContainer().getService(IClockService.class)).createTimer(timeout, new InterpreterTimedObject(getState(), wakeup)));
+						.getComponentAdapter().getServiceContainer().getService(IClockService.class)).createTimer(timeout, new InterpreterTimedObject(getState(), wakeup)));
 				}
 			
 				object = ea;

@@ -64,4 +64,5 @@ public interface IComponentInstance
 	 *  @return	The agent class loader. 
 	 */
 	public ClassLoader getClassLoader();
+	
 }

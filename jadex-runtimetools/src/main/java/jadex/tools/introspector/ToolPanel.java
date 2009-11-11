@@ -55,7 +55,9 @@ public class ToolPanel	extends JPanel
 				{
 					public void run()
 					{
-						final IntrospectorAdapter	tooladapter	= (IntrospectorAdapter)bdii.getToolAdapter(IntrospectorAdapter.class);
+//						final IntrospectorAdapter	tooladapter	= (IntrospectorAdapter)bdii.getToolAdapter(IntrospectorAdapter.class);
+						// Hack! remove
+						final IntrospectorAdapter	tooladapter	= (IntrospectorAdapter)bdii.getComponentAdapter().getToolAdapter(IntrospectorAdapter.class);
 						ToolPanel.this.panel	= new RuleEnginePanel(bdii.getRuleSystem(), tooladapter);
 						SwingUtilities.invokeLater(new Runnable()
 						{

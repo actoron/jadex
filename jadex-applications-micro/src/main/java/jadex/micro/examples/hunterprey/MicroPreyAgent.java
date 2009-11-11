@@ -6,7 +6,7 @@ import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
 import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bdi.examples.hunterprey.MoveAction;
-import jadex.bridge.AgentTerminatedException;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.commons.concurrent.IResultListener;
 import jadex.microkernel.MicroAgent;
 
@@ -72,7 +72,7 @@ public class MicroPreyAgent extends MicroAgent
 						}
 					});
 				}
-				catch(AgentTerminatedException ate)
+				catch(ComponentTerminatedException ate)
 				{
 				}
 			}

@@ -48,7 +48,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	{
 		super(state, scope, scope);
 		this.agent = getInterpreter().getAgent();
-		this.adapter = getInterpreter().getAgentAdapter();
+		this.adapter = getInterpreter().getComponentAdapter();
 	}
 	
 	//-------- methods concerning beliefs --------
@@ -350,7 +350,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING.equals(cs) 
 						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 					{
-						getInterpreter().getAgentAdapter().killComponent();
+						getInterpreter().getComponentAdapter().killComponent();
 					}
 				}
 			};
@@ -363,7 +363,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				//	System.out.println("set to terminating");
 				getInterpreter().startMonitorConsequences();
-				getInterpreter().getAgentAdapter().killComponent();
+				getInterpreter().getComponentAdapter().killComponent();
 				getInterpreter().endMonitorConsequences();
 			}
 		}

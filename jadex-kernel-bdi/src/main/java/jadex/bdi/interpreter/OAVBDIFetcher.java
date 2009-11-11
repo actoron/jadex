@@ -57,7 +57,7 @@ public class OAVBDIFetcher extends SimpleValueFetcher
 	public OAVBDIFetcher(IOAVState state, Object rcapa)
 	{
 		this.state = state;
-		this.adapter = BDIInterpreter.getInterpreter(state).getAgentAdapter();
+		this.adapter = BDIInterpreter.getInterpreter(state).getComponentAdapter();
 		this.rcapa = rcapa;
 	}
 	

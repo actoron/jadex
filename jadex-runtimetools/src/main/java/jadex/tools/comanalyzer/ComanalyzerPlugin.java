@@ -3,6 +3,7 @@ package jadex.tools.comanalyzer;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.impl.ElementFlyweight;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentListener;
@@ -591,7 +592,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	{
 		IComponentIdentifier aid = desc.getName();
 		((IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class))
-			.getExternalAccess(aid, new IResultListener()
+			.getComponentAdapter(aid, new IResultListener()
 			{
 				public void exceptionOccurred(Exception exception)
 				{
@@ -601,9 +602,11 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 				{
 					// HACK!!!
 					// Hack!!!
-					final BDIInterpreter ip = ((ElementFlyweight)result).getInterpreter();
+//					final BDIInterpreter ip = ((ElementFlyweight)result).getInterpreter();
 //					BDIInterpreter ip = (BDIInterpreter)((IAgentAdapter)result).getJadexAgent();
-					ComanalyzerAdapter adapter	= (ComanalyzerAdapter)((BDIInterpreter)ip).getToolAdapter(ComanalyzerAdapter.class);
+//					ComanalyzerAdapter adapter	= (ComanalyzerAdapter)((BDIInterpreter)ip).getToolAdapter(ComanalyzerAdapter.class);
+					
+					ComanalyzerAdapter adapter = (ComanalyzerAdapter)((IComponentAdapter)result).getToolAdapter(ComanalyzerAdapter.class);
 					adapters.put(desc, adapter);
 					adapter.addTool(ComanalyzerPlugin.this);
 				}
@@ -621,7 +624,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	{
 		IComponentIdentifier aid = desc.getName();
 		((IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class))
-			.getExternalAccess(aid, new IResultListener()
+			.getComponentAdapter(aid, new IResultListener()
 			{
 				public void exceptionOccurred(Exception exception)
 				{
@@ -631,10 +634,11 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 				{
 					// HACK!!!
 					// Hack!!!
-					final BDIInterpreter ip = ((ElementFlyweight)result).getInterpreter();
+//					final BDIInterpreter ip = ((ElementFlyweight)result).getInterpreter();
 //					BDIInterpreter ip = (BDIInterpreter)((StandaloneAgentAdapter)result).getJadexAgent();
+					
 					ComanalyzerAdapter adapter = (ComanalyzerAdapter)adapters.remove(desc);
-					ip.removeToolAdapter(adapter);
+					((IComponentAdapter)result).removeToolAdapter(adapter);
 					adapter.removeTool(ComanalyzerPlugin.this);
 				}
 			});

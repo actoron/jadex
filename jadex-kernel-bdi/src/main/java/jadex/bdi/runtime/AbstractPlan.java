@@ -391,7 +391,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public IComponentIdentifier	getAgentIdentifier()
 	{
-		return interpreter.getAgentAdapter().getComponentIdentifier();
+		return interpreter.getComponentAdapter().getComponentIdentifier();
 	}
 
 	/**
@@ -424,7 +424,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 //		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, 
 //			OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATING);
 		interpreter.startMonitorConsequences();
-		getInterpreter().getAgentAdapter().killComponent();
+		getInterpreter().getComponentAdapter().killComponent();
 		interpreter.endMonitorConsequences();
 	}
 
@@ -490,7 +490,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public IClockService getClock()
 	{
-		return (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
+		return (IClockService)interpreter.getComponentAdapter().getServiceContainer().getService(IClockService.class);
 	}
 
 	/**

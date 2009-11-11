@@ -2,7 +2,7 @@ package jadex.adapter.standalone;
 
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.standalone.transport.ITransport;
-import jadex.bridge.AgentTerminatedException;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
@@ -384,7 +384,7 @@ public class MessageService implements IMessageService
 						{
 							agent.receiveMessage(message, messagetype);
 						}
-						catch(AgentTerminatedException ate)
+						catch(ComponentTerminatedException ate)
 						{
 							logger.warning("Message could not be delivered to receiver(s): " + message);
 

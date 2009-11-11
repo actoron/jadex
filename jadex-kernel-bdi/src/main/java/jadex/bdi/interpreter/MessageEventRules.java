@@ -109,7 +109,7 @@ public class MessageEventRules
 		state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_outbox, rmessageevent);
 		
 		// Hack!!! Only needed for external access!
-		BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();
+		BDIInterpreter.getInterpreter(state).getComponentAdapter().wakeup();
 	}
 	
 	/**
@@ -370,7 +370,7 @@ public class MessageEventRules
 				Object ragent = assignments.getVariableValue("?ragent");
 				Object rawmsg = assignments.getVariableValue("?rawmsg");
 
-				String agentname = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName();
+				String agentname = BDIInterpreter.getInterpreter(state).getComponentAdapter().getComponentIdentifier().getLocalName();
 				AgentRules.getLogger(state, ragent).severe("Agent has received msg and has found no template: "+agentname+" "+rawmsg);
 			
 				state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_inbox, rawmsg);
@@ -491,7 +491,7 @@ public class MessageEventRules
 			{
 				Object ragent = assignments.getVariableValue("?ragent");
 				IMessageAdapter message = (IMessageAdapter)assignments.getVariableValue("?msg");
-				String agentname = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName();
+				String agentname = BDIInterpreter.getInterpreter(state).getComponentAdapter().getComponentIdentifier().getLocalName();
 //				System.out.println("Agent has received msg: "+agentname+" "+message);
 				
 				// Find the event to which the message is a reply (if any).
@@ -704,18 +704,20 @@ public class MessageEventRules
 					}
 				}
 				
-				IMessageAdapter msg = new DefaultMessageAdapter(message, mtype);
-				
+//				IMessageAdapter msg = new DefaultMessageAdapter(message, mtype);
+//				
 				BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
-				((IMessageService)interpreter.getAgentAdapter().getServiceContainer()
-					.getService(IMessageService.class)).sendMessage(msg.getParameterMap(),
-						msg.getMessageType(), interpreter.getAgentAdapter().getComponentIdentifier(), interpreter.getModel().getTypeModel().getClassLoader());
+//				((IMessageService)interpreter.getComponentAdapter().getServiceContainer()
+//					.getService(IMessageService.class)).sendMessage(msg.getParameterMap(),
+//						msg.getMessageType(), interpreter.getComponentAdapter().getComponentIdentifier(), interpreter.getModel().getTypeModel().getClassLoader());
 
+				interpreter.getComponentAdapter().sendMessage(message, mtype);
+				
 				state.removeAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_outbox, rme);
 				
-				IToolAdapter[] tas = interpreter.getToolAdapters();
-				for(int i=0; i<tas.length; i++)
-					tas[i].messageSent(msg);
+//				IToolAdapter[] tas = interpreter.getToolAdapters();
+//				for(int i=0; i<tas.length; i++)
+//					tas[i].messageSent(msg);
 				
 //				System.out.println("Send message: "+rme);
 			}
@@ -1309,7 +1311,7 @@ public class MessageEventRules
 	{
 		String	mtype	= (String)state.getAttributeValue(mme, OAVBDIMetaModel.messageevent_has_type);
 		BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
-		MessageType ret	= ((IMessageService)bdii.getAgentAdapter().getServiceContainer().getService(IMessageService.class)).getMessageType(mtype);
+		MessageType ret	= ((IMessageService)bdii.getComponentAdapter().getServiceContainer().getService(IMessageService.class)).getMessageType(mtype);
 		return ret;
 	}
 }

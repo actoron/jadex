@@ -4,7 +4,7 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
-import jadex.bridge.AgentTerminatedException;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
@@ -300,7 +300,7 @@ public class ComanalyzerListener //implements IToolManagement
 			// cleanupRegistration();
 			isactive = false;
 		}
-		catch(AgentTerminatedException e)
+		catch(ComponentTerminatedException e)
 		{
 			e.printStackTrace();
 		}

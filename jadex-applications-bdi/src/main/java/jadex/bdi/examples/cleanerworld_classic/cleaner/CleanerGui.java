@@ -11,7 +11,7 @@ import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.IExternalAccess;
 import jadex.bdi.runtime.IGoal;
-import jadex.bridge.AgentTerminatedException;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.commons.SGUI;
 
 import java.awt.BorderLayout;
@@ -183,7 +183,7 @@ public class CleanerGui	extends JFrame
 						g.drawLine(p.x, p.y-7, p.x, p.y+7);
 					}
 				}
-				catch(AgentTerminatedException e) 
+				catch(ComponentTerminatedException e) 
 				{
 				}
 				catch(Exception e)

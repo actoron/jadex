@@ -138,8 +138,7 @@ public class ComanalyzerAdapter implements IToolAdapter//, ISystemEventListener,
 	 *    i.e. not blocked.
 	 */
 	public boolean executeAction()
-	{
-				
+	{	
 		return true;
 	}
 	

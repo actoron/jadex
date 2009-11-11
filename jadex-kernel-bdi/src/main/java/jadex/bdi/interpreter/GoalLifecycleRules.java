@@ -96,7 +96,7 @@ public class GoalLifecycleRules
 		state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_goals, rgoal);
 		
 		// Hack!!! Only needed for external access!
-		BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();
+		BDIInterpreter.getInterpreter(state).getComponentAdapter().wakeup();
 	}
 	
 	/**
