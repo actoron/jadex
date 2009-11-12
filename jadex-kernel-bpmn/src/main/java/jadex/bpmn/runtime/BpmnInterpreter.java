@@ -18,6 +18,7 @@ import jadex.bridge.IComponentInstance;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
+import jadex.commons.IFilter;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
@@ -254,9 +255,18 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 		{
 			public void run()
 			{
-				// todo:
-				throw new UnsupportedOperationException();
-//				microagent.messageArrived(Collections.unmodifiableMap(message.getParameterMap()), message.getMessageType());
+				// Iterate through process threads and dispatch message to first
+				// waiting and fitting one (filter check).
+				for(Iterator it=context.getAllThreads().iterator(); it.hasNext(); )
+				{
+					ProcessThread pt = (ProcessThread)it.next();
+					if(pt.isWaiting())
+					{
+						IFilter filter = pt.getWaitFilter();
+						if(filter!=null && filter.filter(message))
+							((DefaultActivityHandler)getActivityHandler(pt.getActivity())).notify(pt.getActivity(), BpmnInterpreter.this, pt, message);
+					}
+				}
 			}
 		});
 	}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_Q4lTQc-aEd6NWbZHdUI2WQ" iD="_Q4lTQM-aEd6NWbZHdUI2WQ">
+  <pools xmi:type="bpmn:Pool" xmi:id="_Q5erIc-aEd6NWbZHdUI2WQ" iD="_Q5erIM-aEd6NWbZHdUI2WQ" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Q5erI8-aEd6NWbZHdUI2WQ" iD="_Q5erIs-aEd6NWbZHdUI2WQ" outgoingEdges="_bjpHwc-aEd6NWbZHdUI2WQ" name="PreMessage" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_bjf90c-aEd6NWbZHdUI2WQ" iD="_bjf90M-aEd6NWbZHdUI2WQ" outgoingEdges="_ZD05kc-eEd6NWbZHdUI2WQ" incomingEdges="_bjpHwc-aEd6NWbZHdUI2WQ" name="Wait for Message&#xD;&#xA;filter = new IFilter(){public boolean filter(){return true;}}" activityType="EventIntermediateMessage"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ZDrIkc-eEd6NWbZHdUI2WQ" iD="_ZDrIkM-eEd6NWbZHdUI2WQ" outgoingEdges="_TXxgQc-fEd6NWbZHdUI2WQ" incomingEdges="_ZD05kc-eEd6NWbZHdUI2WQ" name="MessageReceived" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_TXd-Qc-fEd6NWbZHdUI2WQ" iD="_TXd-QM-fEd6NWbZHdUI2WQ" incomingEdges="_TXxgQc-fEd6NWbZHdUI2WQ" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_bjpHwc-aEd6NWbZHdUI2WQ" iD="_bjpHwM-aEd6NWbZHdUI2WQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ZD05kc-eEd6NWbZHdUI2WQ" iD="_ZD05kM-eEd6NWbZHdUI2WQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_TXxgQc-fEd6NWbZHdUI2WQ" iD="_TXxgQM-fEd6NWbZHdUI2WQ"/>
+  </pools>
+</bpmn:BpmnDiagram>
