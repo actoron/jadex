@@ -215,6 +215,10 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin
 			{
 				agentBorn(desc);
 			}
+
+			public void componentChanged(IComponentDescription desc)
+			{
+			}
 		});
 		
 //		SwingUtilities.invokeLater(new Runnable()

@@ -201,6 +201,10 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 			{
 				agentBorn(desc);
 			}
+
+			public void componentChanged(IComponentDescription desc)
+			{
+			}
 		});
 		
 		df_agents.getTreetable().getSelectionModel().addListSelectionListener(

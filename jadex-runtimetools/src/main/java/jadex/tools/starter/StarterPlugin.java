@@ -387,6 +387,10 @@ public class StarterPlugin extends AbstractJCCPlugin
 			{
 				componentBorn(desc);
 			}
+
+			public void componentChanged(IComponentDescription desc)
+			{
+			}
 		});
 
 //		SwingUtilities.invokeLater(new Runnable()

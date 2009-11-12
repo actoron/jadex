@@ -496,6 +496,10 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			{
 				agentBorn(desc);
 			}
+
+			public void componentChanged(IComponentDescription desc)
+			{
+			}
 		});
 		
 //		SwingUtilities.invokeLater(new Runnable()

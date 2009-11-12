@@ -72,6 +72,10 @@ public class AMSLocalUpdateAgentsPlan extends Plan
 					{
 					}
 				}
+
+				public void componentChanged(IComponentDescription desc)
+				{
+				}
 			};
 			
 			IComponentExecutionService	ces	= (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
