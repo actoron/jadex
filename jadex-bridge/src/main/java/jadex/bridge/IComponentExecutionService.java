@@ -80,15 +80,17 @@ public interface IComponentExecutionService	extends IService
 	/**
      *  Add an component listener.
      *  The listener is registered for component changes.
+     *  @param comp  The component to be listened on (or null for listening on all components).
      *  @param listener  The listener to be added.
      */
-    public void addComponentListener(IComponentListener listener);
+    public void addComponentListener(IComponentIdentifier comp, IComponentListener listener);
     
     /**
      *  Remove a listener.
+     *  @param comp  The component to be listened on (or null for listening on all components).
      *  @param listener  The listener to be removed.
      */
-    public void removeComponentListener(IComponentListener listener);
+    public void removeComponentListener(IComponentIdentifier comp, IComponentListener listener);
 
     //-------- internal methods --------
     

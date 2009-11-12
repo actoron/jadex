@@ -317,8 +317,12 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
 			throw new ComponentTerminatedException(cid.getName());
 
+		if(!( IComponentDescription.STATE_ACTIVE.equals(state) || IComponentDescription.STATE_TERMINATING.equals(state)
+				||  IComponentDescription.STATE_SUSPENDED.equals(state) && dostep))
+			System.out.println(state+" "+dostep);
+
 		assert IComponentDescription.STATE_ACTIVE.equals(state) || IComponentDescription.STATE_TERMINATING.equals(state)
-			||  IComponentDescription.STATE_SUSPENDED.equals(state) && dostep: state+" "+dostep;
+		||  IComponentDescription.STATE_SUSPENDED.equals(state) && dostep: state+" "+dostep;
 		
 		boolean	executed = false;
 
@@ -340,9 +344,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		}
 		if(dostep)
 		{
+			dostep	= false;
 			if(steplistener!=null)
 				steplistener.resultAvailable(null);
-			dostep	= false;
+			executed	= executed && IComponentDescription.STATE_ACTIVE.equals(state);
 		}
 		
 		return executed;
@@ -372,6 +377,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			listener.exceptionOccurred(new RuntimeException("Only one step allowed at a time."));
 			
 		this.dostep	= true;
+		this.steplistener	= listener;
 	}
 		
 	/**

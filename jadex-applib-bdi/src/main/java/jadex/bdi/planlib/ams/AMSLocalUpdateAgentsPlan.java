@@ -75,7 +75,7 @@ public class AMSLocalUpdateAgentsPlan extends Plan
 			};
 			
 			IComponentExecutionService	ces	= (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
-			ces.addComponentListener(listener);
+			ces.addComponentListener(null, listener);
 			
 			SyncResultListener lis = new SyncResultListener();
 			ces.getComponentDescriptions(lis);
@@ -90,6 +90,6 @@ public class AMSLocalUpdateAgentsPlan extends Plan
 	public void aborted()
 	{
 		IComponentExecutionService	ces	= (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
-		ces.removeComponentListener(listener);
+		ces.removeComponentListener(null, listener);
 	}
 }

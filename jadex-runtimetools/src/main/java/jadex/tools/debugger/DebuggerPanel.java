@@ -1,9 +1,8 @@
 package jadex.tools.debugger;
 
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.ICommand;
-import jadex.commons.ISteppable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 
@@ -25,8 +24,11 @@ public class DebuggerPanel extends JPanel
 {
 	//-------- attributes --------
 	
-	/** The component adapter. */
-	protected ISteppable	adapter;
+	/** The service container. */
+	protected IServiceContainer	container;
+	
+	/** The component identifier. */
+	protected IComponentIdentifier	comp;
 	
 	/** The step button. */
 	protected JButton	step;
@@ -43,6 +45,9 @@ public class DebuggerPanel extends JPanel
 	 */
 	public DebuggerPanel(IServiceContainer container, IComponentIdentifier comp)
 	{
+		this.container	= container;
+		this.comp	= comp;
+		
 		// The step action
 		setLayout(new GridBagLayout());
 		this.step = new JButton("Step");
@@ -50,8 +55,33 @@ public class DebuggerPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if(adapter!=null)
-					adapter.doStep();
+				IComponentExecutionService	ces	= (IComponentExecutionService)
+					DebuggerPanel.this.container.getService(IComponentExecutionService.class);
+				ces.stepComponent(DebuggerPanel.this.comp, new IResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								step.setEnabled(true);
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								step.setEnabled(true);
+							}
+						});
+					}
+				});
+				step.setEnabled(false);
 			}
 		});
 		
@@ -60,8 +90,17 @@ public class DebuggerPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				adapter.setStepmode(stepmode.isSelected());
-				step.setEnabled(adapter.isStepmode());		
+				IComponentExecutionService	ces	= (IComponentExecutionService)
+					DebuggerPanel.this.container.getService(IComponentExecutionService.class);
+				if(stepmode.isSelected())
+				{
+					ces.suspendComponent(DebuggerPanel.this.comp, null);
+				}
+				else
+				{
+					ces.resumeComponent(DebuggerPanel.this.comp, null);
+				}
+				step.setEnabled(stepmode.isSelected());		
 			}
 		});
 				
@@ -73,29 +112,8 @@ public class DebuggerPanel extends JPanel
 			0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
 
 		
-		((IComponentExecutionService)container.getService(IComponentExecutionService.class))
-			.getComponentAdapter(comp, new IResultListener()
-		{
-			public void exceptionOccurred(Exception exception)
-			{
-				exception.printStackTrace();
-			}
-			
-			public void resultAvailable(Object result)
-			{
-				DebuggerPanel.this.adapter	= (ISteppable)result;
-				
-				adapter.addBreakpointCommand(new ICommand()
-				{
-					public void execute(Object args)
-					{
-						updatePanel();
-					}
-				});
-
-				updatePanel();
-			}
-		});
+		// Todo add listener to component state changes.
+		updatePanel();
 	}
 
 	/**
@@ -107,12 +125,25 @@ public class DebuggerPanel extends JPanel
 
 	protected void updatePanel()
 	{
-		SwingUtilities.invokeLater(new Runnable()
+		((IComponentExecutionService)container.getService(IComponentExecutionService.class))
+			.getComponentDescription(comp, new IResultListener()
 		{
-			public void run()
+			public void exceptionOccurred(Exception exception)
 			{
-				stepmode.setSelected(adapter.isStepmode());
-				step.setEnabled(adapter.isStepmode());		
+				exception.printStackTrace();
+			}
+			
+			public void resultAvailable(final Object result)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						boolean	isstep	= IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)result).getState());
+						stepmode.setSelected(isstep);
+						step.setEnabled(isstep);		
+					}
+				});
 			}
 		});
 	}

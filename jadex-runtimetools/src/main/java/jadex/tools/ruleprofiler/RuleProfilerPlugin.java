@@ -204,7 +204,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin
 		// todo: ?! is this ok?
 		
 		IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
-		ces.addComponentListener(new IComponentListener()
+		ces.addComponentListener(null, new IComponentListener()
 		{
 			public void componentRemoved(IComponentDescription desc)
 			{

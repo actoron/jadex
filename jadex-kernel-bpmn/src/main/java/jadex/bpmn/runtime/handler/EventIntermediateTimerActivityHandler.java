@@ -3,6 +3,7 @@ package jadex.bpmn.runtime.handler;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 
@@ -27,13 +28,20 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 		{
 			public void timeEventOccurred(long currenttime)
 			{
-				instance.invokeLater(new Runnable()
+				try
 				{
-					public void run()
+					instance.invokeLater(new Runnable()
 					{
-						EventIntermediateTimerActivityHandler.this.notify(activity, instance, thread, null);
-					}
-				});
+						public void run()
+						{
+							EventIntermediateTimerActivityHandler.this.notify(activity, instance, thread, null);
+						}
+					});
+				}
+				catch(ComponentTerminatedException e)
+				{
+					// Ignore: Exception occurs in case of fatal error in component execution.
+				}
 			}
 		});
 		return ret;

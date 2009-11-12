@@ -485,7 +485,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			{
 			}
 		});
-		ces.addComponentListener(new IComponentListener()
+		ces.addComponentListener(null, new IComponentListener()
 		{
 			public void componentRemoved(IComponentDescription desc)
 			{

@@ -14,7 +14,6 @@ import jadex.bpmn.runtime.handler.basic.UserInteractionActivityHandler;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.ChangeEvent;

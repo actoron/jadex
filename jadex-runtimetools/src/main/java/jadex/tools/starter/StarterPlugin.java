@@ -376,7 +376,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 			{
 			}
 		});
-		ces.addComponentListener(new IComponentListener()
+		ces.addComponentListener(null, new IComponentListener()
 		{
 			public void componentRemoved(IComponentDescription desc)
 			{

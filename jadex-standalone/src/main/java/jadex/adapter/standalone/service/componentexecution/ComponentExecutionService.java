@@ -17,6 +17,7 @@ import jadex.bridge.IContextService;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageService;
 import jadex.bridge.ISearchConstraints;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
@@ -25,9 +26,11 @@ import jadex.service.execution.IExecutionService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -55,7 +58,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 	protected Logger logger;
 
 	/** The listeners. */
-	protected List listeners;
+	protected MultiCollection listeners;
 	
     //-------- constructors --------
 
@@ -69,7 +72,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 		this.adapters = Collections.synchronizedMap(SCollection.createHashMap());
 		this.descs = Collections.synchronizedMap(SCollection.createHashMap());
 		this.logger = Logger.getLogger(container.getName()+".cms");
-		this.listeners = SCollection.createArrayList();
+		this.listeners = SCollection.createMultiCollection();
     }
     
     //-------- IComponentExecutionService interface --------
@@ -188,7 +191,9 @@ public class ComponentExecutionService implements IComponentExecutionService
 		IComponentListener[]	alisteners;
 		synchronized(listeners)
 		{
-			alisteners	= (IComponentListener[])listeners.toArray(new IComponentListener[listeners.size()]);
+			Set	slisteners	= new HashSet(listeners.getCollection(null));
+			slisteners.add(listeners.getCollection(cid));
+			alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[listeners.size()]);
 		}
 		// todo: can be called after listener has (concurrently) deregistered
 		for(int i=0; i<alisteners.length; i++)
@@ -357,25 +362,27 @@ public class ComponentExecutionService implements IComponentExecutionService
 	/**
      *  Add an component listener.
      *  The listener is registered for component changes.
+     *  @param comp  The component to be listened on (or null for listening on all components).
      *  @param listener  The listener to be added.
      */
-    public void addComponentListener(IComponentListener listener)
+    public void addComponentListener(IComponentIdentifier comp, IComponentListener listener)
     {
 		synchronized(listeners)
 		{
-			listeners.add(listener);
+			listeners.put(comp, listener);
 		}
     }
     
     /**
      *  Remove a listener.
+     *  @param comp  The component to be listened on (or null for listening on all components).
      *  @param listener  The listener to be removed.
      */
-    public void removeComponentListener(IComponentListener listener)
+    public void removeComponentListener(IComponentIdentifier comp, IComponentListener listener)
     {
 		synchronized(listeners)
 		{
-			listeners.remove(listener);
+			listeners.remove(comp, listener);
 		}
     }
     
@@ -430,7 +437,9 @@ public class ComponentExecutionService implements IComponentExecutionService
 			IComponentListener[]	alisteners;
 			synchronized(listeners)
 			{
-				alisteners	= (IComponentListener[])listeners.toArray(new IComponentListener[listeners.size()]);
+				Set	slisteners	= new HashSet(listeners.getCollection(null));
+				slisteners.add(listeners.getCollection(cid));
+				alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[listeners.size()]);
 			}
 			// todo: can be called after listener has (concurrently) deregistered
 			for(int i=0; i<alisteners.length; i++)

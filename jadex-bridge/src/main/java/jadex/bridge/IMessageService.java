@@ -1,6 +1,5 @@
 package jadex.bridge;
 
-import jadex.commons.IChangeListener;
 import jadex.service.IService;
 
 import java.util.Map;
