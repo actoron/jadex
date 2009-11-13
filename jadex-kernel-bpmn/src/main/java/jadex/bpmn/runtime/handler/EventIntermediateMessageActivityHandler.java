@@ -60,7 +60,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	 */
 	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
-		if(thread.hasPropertyValue(PROPERTY_MODE) && MODE_SEND.equals(thread.getPropertyValue(PROPERTY_MODE)))
+		if(MODE_SEND.equals(thread.getPropertyValue(PROPERTY_MODE)))
 		{
 			sendMessage(activity, instance, thread);
 		}

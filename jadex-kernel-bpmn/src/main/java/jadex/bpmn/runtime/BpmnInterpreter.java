@@ -106,7 +106,7 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 	protected List history;
 	
 	/** The change listeners. */
-	protected List listeners;
+//	protected List listeners;
 	
 	/** The step number. */
 	protected int stepnumber;
@@ -116,6 +116,9 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 	
 	/** The finishing flag marker. */
 	protected boolean finishing;
+	
+	/** The messages waitqueue. */
+	protected List messages;
 	
 	//-------- constructors --------
 	
@@ -134,6 +137,7 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 		this.handlers = handlers!=null? handlers: DEFAULT_HANDLERS;
 		this.fetcher = fetcher!=null? fetcher: new BpmnInstanceFetcher(this, fetcher);
 		this.context = new ThreadContext(model);
+		this.messages = new ArrayList();
 		
 		// Init the arguments with default values.
 		IArgument[] args = model.getArguments();
@@ -224,7 +228,7 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 				}
 			}
 	
-			if(!isFinished(null, null))
+			if(!isFinished(null, null) && isReady(null, null))
 				executeStep(null, null);
 			
 			this.thread = null;
@@ -259,15 +263,25 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 			{
 				// Iterate through process threads and dispatch message to first
 				// waiting and fitting one (filter check).
-				for(Iterator it=context.getAllThreads().iterator(); it.hasNext(); )
+				boolean processed = false;
+				for(Iterator it=context.getAllThreads().iterator(); it.hasNext() && !processed; )
 				{
 					ProcessThread pt = (ProcessThread)it.next();
 					if(pt.isWaiting())
 					{
 						IFilter filter = pt.getWaitFilter();
 						if(filter!=null && filter.filter(message))
+						{
 							((DefaultActivityHandler)getActivityHandler(pt.getActivity())).notify(pt.getActivity(), BpmnInterpreter.this, pt, message);
+							processed = true;
+						}
 					}
+				}
+				
+				if(!processed)
+				{
+					messages.add(message);
+					System.out.println("Dispatched to waitqueue: "+message);
 				}
 			}
 		});
@@ -651,7 +665,27 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 			if(history!=null)
 				history.add(new HistoryEntry(stepnumber++, thread.getId(), thread.getActivity()));
 			
-			notifyListeners(new ChangeEvent(this, "step_executed"));
+			// Check if thread now waits for a message and there is at least one in the message queue.
+			if(thread.isWaiting() && messages.size()>0 && MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(thread.getActivity().getActivityType()) 
+				&& (thread.getPropertyValue(EventIntermediateMessageActivityHandler.PROPERTY_MODE)==null 
+					|| EventIntermediateMessageActivityHandler.MODE_RECEIVE.equals(thread.getPropertyValue(EventIntermediateMessageActivityHandler.PROPERTY_MODE))))
+			{
+				boolean processed = false;
+				for(int i=0; i<messages.size() && !processed; i++)
+				{
+					Object message = messages.get(i);
+					IFilter filter = thread.getWaitFilter();
+					if(filter!=null && filter.filter(message))
+					{
+						((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), BpmnInterpreter.this, thread, message);
+						processed = true;
+						messages.remove(i);
+						System.out.println("Dispatched from waitqueue: "+messages.size()+" "+message);
+					}
+				}
+			}
+			
+//			notifyListeners(new ChangeEvent(this, "step_executed"));
 		}
 	}
 
@@ -738,27 +772,27 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 	/**
 	 *  Add a change listener.
 	 *  @param listener The listener.
-	 */
+	 * /
 	public void addChangeListener(IChangeListener listener)
 	{
 		if(listeners==null)
 			listeners = new ArrayList();
 		listeners.add(listener);
-	}
+	}*/
 	
 	/**
 	 *  Remove a change listener.
 	 *  @param listener The listener.
-	 */
+	 * /
 	public void removeChangeListener(IChangeListener listener)
 	{
 		if(listeners!=null)
 			listeners.remove(listener);
-	}
+	}*/
 	
 	/**
 	 *  Notify the change listeners.
-	 */
+	 * /
 	public void notifyListeners(ChangeEvent event)
 	{
 		if(listeners!=null)
@@ -768,7 +802,7 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 				((IChangeListener)listeners.get(i)).changeOccurred(event);
 			}
 		}
-	}
+	}*/
 	
 	/**
 	 *  Test if the given context variable is declared.

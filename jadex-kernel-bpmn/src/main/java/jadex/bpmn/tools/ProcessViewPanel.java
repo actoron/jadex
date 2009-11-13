@@ -139,7 +139,7 @@ public class ProcessViewPanel extends JPanel
 				}
 			}
 		};
-		instance.addChangeListener(listener);
+//		instance.addChangeListener(listener);
 
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -206,7 +206,7 @@ public class ProcessViewPanel extends JPanel
 	 */
 	public void	dispose()
 	{
-		instance.removeChangeListener(listener);
+//		instance.removeChangeListener(listener);
 	}
 	
 	//-------- helper methods --------
