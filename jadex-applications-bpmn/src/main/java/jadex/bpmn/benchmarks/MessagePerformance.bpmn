@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_yQl4kdCREd6MVLxz8V9N3w" iD="_yQl4kNCREd6MVLxz8V9N3w">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_RLAlgdCWEd6MVLxz8V9N3w" iD="_RLAlgNCWEd6MVLxz8V9N3w" name="package jadex.bpmn.benchmarks;&#xD;&#xA;&#xD;&#xA;import jadex.commons.*&#xD;&#xA;import jadex.bridge.*&#xD;&#xA;import jadex.bpmn.runtime.task.*&#xD;&#xA;&#xD;&#xA;long starttime = $clock.getTime()">
+    <associations xmi:type="bpmn:Association" xmi:id="_Sqn-INCWEd6MVLxz8V9N3w"/>
+  </artifacts>
+  <pools xmi:type="bpmn:Pool" xmi:id="_ySq8MdCREd6MVLxz8V9N3w" iD="_ySq8MNCREd6MVLxz8V9N3w" associations="_Sqn-INCWEd6MVLxz8V9N3w" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_yTuFEdCREd6MVLxz8V9N3w" iD="_yTuFENCREd6MVLxz8V9N3w" outgoingEdges="_7XGUodCSEd6MVLxz8V9N3w" incomingEdges="_DtIWAdCUEd6MVLxz8V9N3w _23xCkdCSEd6MVLxz8V9N3w" name="PreSend&#xD;&#xA;inout int i = 0" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_1qc64dCSEd6MVLxz8V9N3w" iD="_1qc64NCSEd6MVLxz8V9N3w" outgoingEdges="_SHgU4dCUEd6MVLxz8V9N3w" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_7W3rIdCSEd6MVLxz8V9N3w" iD="_7W3rINCSEd6MVLxz8V9N3w" outgoingEdges="_b9-qwdCUEd6MVLxz8V9N3w" incomingEdges="_7XGUodCSEd6MVLxz8V9N3w" name="Send Message&#xD;&#xA;mode = &quot;send&quot;&#xD;&#xA;messagetype = &quot;fipa&quot;&#xD;&#xA;performative = &quot;inform&quot;&#xD;&#xA;receivers = new String[]{&quot;MessagePerformance&quot;}&#xD;&#xA;content = &quot;message&quot;+i" activityType="EventIntermediateMessage"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_SHVVwdCUEd6MVLxz8V9N3w" iD="_SHVVwNCUEd6MVLxz8V9N3w" outgoingEdges="_JRsVUdCVEd6MVLxz8V9N3w" incomingEdges="_Wzz2gNCVEd6MVLxz8V9N3w _wuf24dCVEd6MVLxz8V9N3w" name="PreReceive&#xD;&#xA;inout int i = 0" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Xyx1odCUEd6MVLxz8V9N3w" iD="_Xyx1oNCUEd6MVLxz8V9N3w" outgoingEdges="_DtIWAdCUEd6MVLxz8V9N3w _cZ5VQNCVEd6MVLxz8V9N3w" incomingEdges="_b9-qwdCUEd6MVLxz8V9N3w" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_rfIrgdCUEd6MVLxz8V9N3w" iD="_rfIrgNCUEd6MVLxz8V9N3w" incomingEdges="_sPP50dCUEd6MVLxz8V9N3w" activityType="EventEndEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_JRgIEdCVEd6MVLxz8V9N3w" iD="_JRgIENCVEd6MVLxz8V9N3w" outgoingEdges="_kaUIcdCVEd6MVLxz8V9N3w" incomingEdges="_JRsVUdCVEd6MVLxz8V9N3w" name="Wait for Message&#xD;&#xA;filter = IFilter.ALWAYS" activityType="EventIntermediateMessage"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_TVZO4dCVEd6MVLxz8V9N3w" iD="_TVZO4NCVEd6MVLxz8V9N3w" outgoingEdges="_23xCkdCSEd6MVLxz8V9N3w _Wzz2gNCVEd6MVLxz8V9N3w" incomingEdges="_SHgU4dCUEd6MVLxz8V9N3w" activityType="GatewayParallel"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ZpfDIdCVEd6MVLxz8V9N3w" iD="_ZpfDINCVEd6MVLxz8V9N3w" outgoingEdges="_sPP50dCUEd6MVLxz8V9N3w" incomingEdges="_cZ5VQNCVEd6MVLxz8V9N3w _XNtAYNCZEd6MVLxz8V9N3w" activityType="GatewayParallel"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_jeq_kdCVEd6MVLxz8V9N3w" iD="_jeq_kNCVEd6MVLxz8V9N3w" outgoingEdges="_wuf24dCVEd6MVLxz8V9N3w _H6HXAdCYEd6MVLxz8V9N3w" incomingEdges="_kaUIcdCVEd6MVLxz8V9N3w" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_HR6ukdCYEd6MVLxz8V9N3w" iD="_HR6ukNCYEd6MVLxz8V9N3w" outgoingEdges="_XNtAYNCZEd6MVLxz8V9N3w" incomingEdges="_H6HXAdCYEd6MVLxz8V9N3w" name="Compute Time&#xD;&#xA;class=PrintTask.class&#xD;&#xA;in String text = &quot;Needed: &quot;+($clock.getTime() - starttime)&#xD;&#xA;"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_23xCkdCSEd6MVLxz8V9N3w" iD="_23xCkNCSEd6MVLxz8V9N3w"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_7XGUodCSEd6MVLxz8V9N3w" iD="_7XGUoNCSEd6MVLxz8V9N3w"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_DtIWAdCUEd6MVLxz8V9N3w" iD="_DtIWANCUEd6MVLxz8V9N3w" name="i+1 &lt; 1000&#xD;&#xA;i = i+1&#x9;"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_SHgU4dCUEd6MVLxz8V9N3w" iD="_SHgU4NCUEd6MVLxz8V9N3w"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_b9-qwdCUEd6MVLxz8V9N3w" iD="_b9-qwNCUEd6MVLxz8V9N3w"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_sPP50dCUEd6MVLxz8V9N3w" iD="_sPP50NCUEd6MVLxz8V9N3w"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_JRsVUdCVEd6MVLxz8V9N3w" iD="_JRsVUNCVEd6MVLxz8V9N3w"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Wzz2gNCVEd6MVLxz8V9N3w" iD="_WzzPcNCVEd6MVLxz8V9N3w"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_cZ5VQNCVEd6MVLxz8V9N3w" iD="_cZ4uMNCVEd6MVLxz8V9N3w"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_kaUIcdCVEd6MVLxz8V9N3w" iD="_kaUIcNCVEd6MVLxz8V9N3w"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_wuf24dCVEd6MVLxz8V9N3w" iD="_wuf24NCVEd6MVLxz8V9N3w" name="i+1 &lt; 1000&#xD;&#xA;i = i+1&#x9;"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_H6HXAdCYEd6MVLxz8V9N3w" iD="_H6HXANCYEd6MVLxz8V9N3w"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_XNtAYNCZEd6MVLxz8V9N3w" iD="_XNsZUNCZEd6MVLxz8V9N3w"/>
+  </pools>
+</bpmn:BpmnDiagram>

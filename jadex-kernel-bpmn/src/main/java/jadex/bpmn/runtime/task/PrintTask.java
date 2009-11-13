@@ -9,7 +9,7 @@ import jadex.bpmn.runtime.ITaskContext;
 public class PrintTask extends AbstractTask
 {
 	/**
-	 * 
+	 *  Execute the task.
 	 */
 	public void doExecute(ITaskContext context, IProcessInstance instance)
 	{

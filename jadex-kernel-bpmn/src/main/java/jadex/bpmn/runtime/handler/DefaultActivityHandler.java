@@ -17,6 +17,9 @@ import java.util.List;
  */
 public class DefaultActivityHandler implements IActivityHandler
 {	
+	/** Debug flag for printing. */
+	public static final boolean DEBUG = false;
+	
 	/**
 	 *  Execute an activity.
 	 *  @param activity	The activity to execute.
@@ -48,7 +51,8 @@ public class DefaultActivityHandler implements IActivityHandler
 	 */
 	protected void doExecute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
-		System.out.println("Executed: "+activity+", "+instance);
+		if(DEBUG)
+			System.out.println("Executed: "+activity+", "+instance);
 	}
 	
 	/**

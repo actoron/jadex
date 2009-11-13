@@ -155,6 +155,6 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 		IFilter filter = (IFilter)thread.getPropertyValue(PROPERTY_FILTER, activity);
 		thread.setWaitFilter(filter);
 		
-		System.out.println("Waiting for message: "+filter);
+//		System.out.println("Waiting for message: "+filter);
 	}
 }

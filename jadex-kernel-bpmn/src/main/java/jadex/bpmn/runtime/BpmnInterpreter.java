@@ -23,6 +23,7 @@ import jadex.commons.IFilter;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
+import jadex.service.clock.IClockService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -156,6 +157,11 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 		}
 		
 		// Initialize context variables.
+//		if(variables==null)
+		variables	= new HashMap();
+		variables.put("$platform", getComponentAdapter().getServiceContainer());
+		variables.put("$clock", getComponentAdapter().getServiceContainer().getService(IClockService.class));
+		
 		Set	vars	= model.getContextVariables();
 		for(Iterator it=vars.iterator(); it.hasNext(); )
 		{
@@ -164,13 +170,11 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 			IParsedExpression	exp	= model.getContextVariableExpression(name);
 			if(exp!=null)
 			{
-				value	= exp.getValue(fetcher);
+				value	= exp.getValue(this.fetcher);
 			}
-			if(variables==null)
-				variables	= new HashMap();
 			variables.put(name, value);
 		}
-		
+				
 		// Create initial thread(s). 
 		List	startevents	= model.getStartActivities();
 		for(int i=0; startevents!=null && i<startevents.size(); i++)
@@ -281,7 +285,7 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 				if(!processed)
 				{
 					messages.add(message);
-					System.out.println("Dispatched to waitqueue: "+message);
+//					System.out.println("Dispatched to waitqueue: "+message);
 				}
 			}
 		});
@@ -680,7 +684,7 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 						((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), BpmnInterpreter.this, thread, message);
 						processed = true;
 						messages.remove(i);
-						System.out.println("Dispatched from waitqueue: "+messages.size()+" "+message);
+//						System.out.println("Dispatched from waitqueue: "+messages.size()+" "+message);
 					}
 				}
 			}

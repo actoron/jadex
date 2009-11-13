@@ -21,7 +21,7 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 	 */
 	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
-		System.out.println("Executed: "+activity+", "+instance);
+//		System.out.println("Executed: "+activity+", "+instance);
 		
 		// Call all connected intermediate event handlers.
 		List outgoing = activity.getOutgoingSequenceEdges();
