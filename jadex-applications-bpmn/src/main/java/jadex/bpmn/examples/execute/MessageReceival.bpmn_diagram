@@ -48,7 +48,16 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_Q57XE8-aEd6NWbZHdUI2WQ" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_Q57XFM-aEd6NWbZHdUI2WQ" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="MessageReceival.bpmn#_Q5erIc-aEd6NWbZHdUI2WQ"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Q6FIFc-aEd6NWbZHdUI2WQ" x="16" y="16" width="865" height="200"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Q6FIFc-aEd6NWbZHdUI2WQ" x="16" y="16" width="865" height="170"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_JCqlcM_SEd6XfIe3Wh_uzQ" type="1002">
+    <children xmi:type="notation:Node" xmi:id="_JCrzkM_SEd6XfIe3Wh_uzQ" type="4009"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_JCqlcc_SEd6XfIe3Wh_uzQ" fontName="Arial"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_JCqlcs_SEd6XfIe3Wh_uzQ"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_JCqlc8_SEd6XfIe3Wh_uzQ"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_JCqldM_SEd6XfIe3Wh_uzQ" lineColor="0"/>
+    <element xmi:type="bpmn:TextAnnotation" href="MessageReceival.bpmn#_JCpXUM_SEd6XfIe3Wh_uzQ"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_JCqldc_SEd6XfIe3Wh_uzQ" x="16" y="215"/>
   </children>
   <styles xmi:type="notation:PageStyle" xmi:id="_Q4vEQc-aEd6NWbZHdUI2WQ"/>
   <styles xmi:type="notation:GuideStyle" xmi:id="_Q4vEQs-aEd6NWbZHdUI2WQ"/>
@@ -89,5 +98,13 @@
     <styles xmi:type="notation:LineStyle" xmi:id="_TXxgRc-fEd6NWbZHdUI2WQ" lineColor="0"/>
     <element xmi:type="bpmn:SequenceEdge" href="MessageReceival.bpmn#_TXxgQc-fEd6NWbZHdUI2WQ"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_TXxgRs-fEd6NWbZHdUI2WQ" points="[-59, -11, 529, 89]$[-586, -100, 2, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_QSwH4M_SEd6XfIe3Wh_uzQ" type="3003" source="_JCqlcM_SEd6XfIe3Wh_uzQ" target="_Q57XEM-aEd6NWbZHdUI2WQ">
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_QSwH4c_SEd6XfIe3Wh_uzQ"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_QSwH4s_SEd6XfIe3Wh_uzQ" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_QSwH48_SEd6XfIe3Wh_uzQ" lineColor="0"/>
+    <element xmi:type="bpmn:Association" href="MessageReceival.bpmn#_QSrPYM_SEd6XfIe3Wh_uzQ"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_QSwH5M_SEd6XfIe3Wh_uzQ" points="[0, -27, 0, 58]$[0, -85, 0, 0]"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_QS4DsM_SEd6XfIe3Wh_uzQ" id="(0.15953757225433526,1.0)"/>
   </edges>
 </notation:Diagram>
