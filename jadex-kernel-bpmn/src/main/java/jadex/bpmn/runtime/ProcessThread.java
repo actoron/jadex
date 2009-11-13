@@ -13,6 +13,7 @@ import jadex.javaparser.IValueFetcher;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -415,7 +416,7 @@ public class ProcessThread	implements ITaskContext
 			|| getActivity() instanceof MSubProcess)
 		{
 			// Handle parameter passing in edge inscriptions.
-			Map	passedparams	= null;
+			Map	passedparams = null;
 			Set	indexparams	= null;
 			if(getLastEdge()!=null && getLastEdge().getParameterMappings()!=null)
 			{
@@ -496,13 +497,12 @@ public class ProcessThread	implements ITaskContext
 					}
 				}
 			}
-			
-			// Remove old data.
-			this.data	= null;
-			
+						
 			// todo: parameter direction / class
 			
 			Map params = getActivity().getParameters();
+			Set before = params!=null? new HashSet(params.keySet()): Collections.EMPTY_SET;
+			
 			if(params!=null)
 			{	
 				IValueFetcher fetcher = new ProcessThreadValueFetcher(this, true, instance.getValueFetcher());
@@ -524,13 +524,22 @@ public class ProcessThread	implements ITaskContext
 						else
 						{
 							setParameterValue(param.getName(), passedparams.get(param.getName()));
+							before.remove(param.getName());
 						}
 					}
 					else
 					{
 						setParameterValue(param.getName(), param.getInitialValue()==null? null: param.getInitialValue().getValue(fetcher));
+						before.remove(param.getName());
 					}
 				}
+			}
+			
+			// Remove old data (all values that have not been renewed).
+//			this.data	= null;
+			for(Iterator it=before.iterator(); it.hasNext(); )
+			{
+				params.remove(it.next());
 			}
 		}
 	}
