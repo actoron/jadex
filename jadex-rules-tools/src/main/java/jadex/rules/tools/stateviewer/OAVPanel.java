@@ -16,7 +16,7 @@ import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
 /**
- *  A panel diplaying an OAV state.
+ *  A panel displaying an OAV state.
  */
 public class OAVPanel extends JPanel
 {

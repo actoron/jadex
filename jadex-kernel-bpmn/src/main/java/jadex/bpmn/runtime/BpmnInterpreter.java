@@ -329,9 +329,8 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 			public void run()
 			{
 				// todo: develop external access
-				
-//				Object exta = microagent.getExternalAccess();
-				listener.resultAvailable(null);
+				// Hack!!! Shouldn't return instance directly.
+				listener.resultAvailable(BpmnInterpreter.this);
 			}
 		});
 	}

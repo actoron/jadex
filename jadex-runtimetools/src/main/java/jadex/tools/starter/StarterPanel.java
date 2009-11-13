@@ -31,7 +31,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
@@ -44,7 +43,6 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -85,8 +83,8 @@ public class StarterPanel extends JPanel
 	/** The filename. */
 	protected JTextField filename;
 
-	/** The file chooser. */
-	protected JFileChooser filechooser;
+//	/** The file chooser. */
+//	protected JFileChooser filechooser;
 
 	/** The configuration. */
 	protected JComboBox config;
@@ -147,107 +145,107 @@ public class StarterPanel extends JPanel
 
 	   	// The browse button.
 		//final JButton browse = new JButton("browse...");
-		final JButton browse = new JButton(icons.getIcon("Browse"));
-		browse.setToolTipText("Browse via file requester to locate a model");
-		browse.setMargin(new Insets(0,0,0,0));
-		// Create the filechooser.
-		// Hack!!! might trhow exception in applet / webstart
-		try
-		{
-			filechooser = new JFileChooser(".");
-			filechooser.setAcceptAllFileFilterUsed(true);
-			javax.swing.filechooser.FileFilter filter = new javax.swing.filechooser.FileFilter()
-			{
-				public String getDescription()
-				{
-					return "Active components";
-				}
-
-				public boolean accept(File f)
-				{
-					String name = f.getName();
-//					return f.isDirectory() || name.endsWith(SXML.FILE_EXTENSION_AGENT) || name.endsWith(SXML.FILE_EXTENSION_CAPABILITY);
-//					boolean	ret	= f.isDirectory() || agentfactory.isLoadable(name) || appfactory.isLoadable(name);
-					boolean	ret	= f.isDirectory() || SComponentFactory.isLoadable(starter.getJCC().getServiceContainer(), name);
-
-//					Thread.currentThread().setContextClassLoader(oldcl);
-
-					return ret;
-				}
-			};
-			filechooser.addChoosableFileFilter(filter);
-		}
-		catch(SecurityException e)
-		{
-			browse.setEnabled(false);
-		}
-		browse.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent ae)
-			{
-				if(filechooser.showDialog(SGUI.getWindowParent(StarterPanel.this)
-					, "Load")==JFileChooser.APPROVE_OPTION)
-				{
-					File file = filechooser.getSelectedFile();
-					String	model	= file!=null ? ""+file : null;
-
-//					if(file!=null && file.getName().endsWith(".jar"))
-//					{
-//						// Start looking into the jar-file for description-files
-//						try
-//						{
-//							DynamicURLClassLoader.addURLToInstance(new URL("file", "", file.toString()));
+//		final JButton browse = new JButton(icons.getIcon("Browse"));
+//		browse.setToolTipText("Browse via file requester to locate a model");
+//		browse.setMargin(new Insets(0,0,0,0));
+//		// Create the filechooser.
+//		// Hack!!! might trhow exception in applet / webstart
+//		try
+//		{
+//			filechooser = new JFileChooser(".");
+//			filechooser.setAcceptAllFileFilterUsed(true);
+//			javax.swing.filechooser.FileFilter filter = new javax.swing.filechooser.FileFilter()
+//			{
+//				public String getDescription()
+//				{
+//					return "Active components";
+//				}
 //
-//							JarFile jarFile = new JarFile(file);
-//							Enumeration e = jarFile.entries();
-//							java.util.List	models	= new ArrayList();
-//							while (e.hasMoreElements())
-//							{
-//								ZipEntry jarFileEntry = (ZipEntry) e.nextElement();
-//								if(SXML.isJadexFilename(jarFileEntry.getName()))
-//								{
-//									models.add(jarFileEntry.getName());
-//								}
-//							}
-//							jarFile.close();
+//				public boolean accept(File f)
+//				{
+//					String name = f.getName();
+////					return f.isDirectory() || name.endsWith(SXML.FILE_EXTENSION_AGENT) || name.endsWith(SXML.FILE_EXTENSION_CAPABILITY);
+////					boolean	ret	= f.isDirectory() || agentfactory.isLoadable(name) || appfactory.isLoadable(name);
+//					boolean	ret	= f.isDirectory() || SComponentFactory.isLoadable(starter.getJCC().getServiceContainer(), name);
 //
-//							if(models.size()>1)
-//							{
-//								Object[]	choices	= models.toArray(new String[models.size()]);
-//								JTreeDialog td = new JTreeDialog(
-//									null,
-////									(Frame)StarterGui.this.getParent(),
-//									"Select Model", true,
-//									"Select an model to load:",
-//									(String[])choices, (String)choices[0]);
-//								td.setVisible(true);
-//								model = td.getResult();
-//							}
-//							else if(models.size()==1)
-//							{
-//								model	= (String)models.get(0);
-//							}
-//							else
-//							{
-//								model	= null;
-//							}
-//						}
-//						catch(Exception e)
-//						{
-//							//e.printStackTrace();
-//						}
-//					}
-
-					//System.out.println("... load model: "+model);
-//					lastfile	= model;
-					loadModel(model);
-				}
-			}
-		});
+////					Thread.currentThread().setContextClassLoader(oldcl);
+//
+//					return ret;
+//				}
+//			};
+//			filechooser.addChoosableFileFilter(filter);
+//		}
+//		catch(SecurityException e)
+//		{
+//			browse.setEnabled(false);
+//		}
+//		browse.addActionListener(new ActionListener()
+//		{
+//			public void actionPerformed(ActionEvent ae)
+//			{
+//				if(filechooser.showDialog(SGUI.getWindowParent(StarterPanel.this)
+//					, "Load")==JFileChooser.APPROVE_OPTION)
+//				{
+//					File file = filechooser.getSelectedFile();
+//					String	model	= file!=null ? ""+file : null;
+//
+////					if(file!=null && file.getName().endsWith(".jar"))
+////					{
+////						// Start looking into the jar-file for description-files
+////						try
+////						{
+////							DynamicURLClassLoader.addURLToInstance(new URL("file", "", file.toString()));
+////
+////							JarFile jarFile = new JarFile(file);
+////							Enumeration e = jarFile.entries();
+////							java.util.List	models	= new ArrayList();
+////							while (e.hasMoreElements())
+////							{
+////								ZipEntry jarFileEntry = (ZipEntry) e.nextElement();
+////								if(SXML.isJadexFilename(jarFileEntry.getName()))
+////								{
+////									models.add(jarFileEntry.getName());
+////								}
+////							}
+////							jarFile.close();
+////
+////							if(models.size()>1)
+////							{
+////								Object[]	choices	= models.toArray(new String[models.size()]);
+////								JTreeDialog td = new JTreeDialog(
+////									null,
+//////									(Frame)StarterGui.this.getParent(),
+////									"Select Model", true,
+////									"Select an model to load:",
+////									(String[])choices, (String)choices[0]);
+////								td.setVisible(true);
+////								model = td.getResult();
+////							}
+////							else if(models.size()==1)
+////							{
+////								model	= (String)models.get(0);
+////							}
+////							else
+////							{
+////								model	= null;
+////							}
+////						}
+////						catch(Exception e)
+////						{
+////							//e.printStackTrace();
+////						}
+////					}
+//
+//					//System.out.println("... load model: "+model);
+////					lastfile	= model;
+//					loadModel(model);
+//				}
+//			}
+//		});
 
 		// Create the filename combo box.
 		filename = new JTextField();
-		filename.setEditable(true);
+		filename.setEditable(false);
 		ActionListener filelistener = new ActionListener()
 		{
 			public void actionPerformed(ActionEvent ae)
@@ -505,10 +503,10 @@ public class StarterPanel extends JPanel
 		filenamel = new JLabel("Filename");
 		upper.add(filenamel, new GridBagConstraints(0, y, 1, 1, 0, 0,
 			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
-		upper.add(filename, new GridBagConstraints(1, y, 3, 1, 1, 0,
+		upper.add(filename, new GridBagConstraints(1, y, 4, 1, 1, 0,
 			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
-		upper.add(browse, new GridBagConstraints(4, y, 1, 1, 0, 0,
-			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
+//		upper.add(browse, new GridBagConstraints(4, y, 1, 1, 0, 0,
+//			GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(2,2,2,2), 0, 0));
 		y++;
 		confl = new JLabel("Configuration");
 		upper.add(confl, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.WEST,
@@ -877,6 +875,8 @@ public class StarterPanel extends JPanel
 		String c = (String)config.getSelectedItem();
 		if(c!=null) props.addProperty(new Property("config", c));
 
+		props.addProperty(new Property("startsuspended", ""+suspend.isSelected()));
+
 		props.addProperty(new Property("autogenerate", ""+genname.isSelected()));
 		
 		props.addProperty(new Property("name", componentname.getText()));
@@ -895,12 +895,16 @@ public class StarterPanel extends JPanel
 	 */
 	protected void setProperties(Properties props)
 	{
+		// Settings are invoke later'd due to getting overridden otherwise.!?
+		
 		String mo = props.getStringProperty("model");
 		if(mo!=null)
 		{
 			loadModel(mo);
 			selectConfiguration(props.getStringProperty("config"));
 		}
+		setStartSuspended(props.getBooleanProperty("startsuspended"));
+
 		Property[]	aargs	= props.getProperties("argument");
 		String[] argvals = new String[aargs.length];
 		for(int i=0; i<aargs.length; i++)
@@ -1148,6 +1152,21 @@ public class StarterPanel extends JPanel
 				genname.setSelected(autogen);
 				componentname.setEditable(!autogen);
 				numagents.setEnabled(autogen);
+			}
+		});
+	}
+
+	/**
+	 *  Set the start suspended flag in gui.
+	 *  @param startsuspended The start suspended flag property.
+	 */
+	protected void setStartSuspended(final boolean startsuspended)
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				suspend.setSelected(startsuspended);
 			}
 		});
 	}

@@ -96,11 +96,19 @@ public interface IComponentExecutionService	extends IService
     
 	/**
 	 *  Get the component adapter for a component identifier.
-	 *  @param aid The component identifier.
+	 *  @param cid The component identifier.
 	 *  @param listener The result listener.
 	 */
     // Todo: Hack!!! remove?
 	public void getComponentAdapter(IComponentIdentifier cid, IResultListener listener);
+	
+	/**
+	 *  Get the component instance object for a component identifier.
+	 *  @param cid The component identifier.
+	 *  @param listener The result listener.
+	 * /
+    // Todo: Hack!!! remove? use getExternalAcces instead.
+	public void getComponentInstance(IComponentIdentifier cid, IResultListener listener);*/
 	
 	/**
 	 *  Get the external access of a component.

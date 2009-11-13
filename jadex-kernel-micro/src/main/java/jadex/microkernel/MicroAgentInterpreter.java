@@ -1,12 +1,11 @@
 package jadex.microkernel;
 
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IArgument;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.concurrent.IResultListener;
-import jadex.javaparser.IValueFetcher;
 
 import java.util.ArrayList;
 import java.util.Collections;

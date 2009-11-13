@@ -330,7 +330,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 			DefaultTreeTableNode node = (DefaultTreeTableNode)components.getTreetable()
 				.getTree().getSelectionPath().getLastPathComponent();
 			IComponentDescription desc = (IComponentDescription)node.getUserObject();
-			DebuggerPanel	panel = new DebuggerPanel(getJCC().getServiceContainer(), desc.getName());
+			DebuggerPanel	panel = new DebuggerPanel(getJCC(), desc.getName());
 			GuiProperties.setupHelp(panel, "tools.debugger");
 			detail.add(panel, node.getUserObject());
 			components.updateComponent(desc);
