@@ -35,8 +35,8 @@
 			<achievegoalref name="ams_create_agent">
 				<concrete ref="amscap.ams_create_agent"/>
 			</achievegoalref>
-			<achievegoalref name="ams_start_agent">
-				<concrete ref="amscap.ams_start_agent"/>
+			<achievegoalref name="ams_resume_agent">
+				<concrete ref="amscap.ams_resume_agent"/>
 			</achievegoalref>
 			<achievegoalref name="ams_destroy_agent">
 				<concrete ref="amscap.ams_destroy_agent"/>

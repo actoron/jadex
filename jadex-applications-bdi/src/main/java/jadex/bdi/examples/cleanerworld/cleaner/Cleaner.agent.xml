@@ -34,7 +34,7 @@
  		</belief>
  		
  		<belief name="myself" class="ISpaceObject" exported="true">
- 			<fact>$beliefbase.environment.getAvatar($scope.getAgentIdentifier())</fact>
+ 			<fact>$beliefbase.environment.getAvatar($scope.getComponentIdentifier())</fact>
  		</belief>
 
 		<beliefset name="wastes" class="ISpaceObject" />

@@ -24,7 +24,7 @@
  		
  		<!-- Myself. -->
  		<belief name="myself" class="ISpaceObject" exported="true">
- 			<fact>$beliefbase.environment.getAvatar($scope.getAgentIdentifier())</fact>
+ 			<fact>$beliefbase.environment.getAvatar($scope.getComponentIdentifier())</fact>
  		</belief>
 
 		<!-- Is the mission finished? -->

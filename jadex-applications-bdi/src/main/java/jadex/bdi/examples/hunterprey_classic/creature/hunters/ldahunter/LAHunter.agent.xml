@@ -119,7 +119,7 @@
 		<configuration name="default">
 			<beliefs>
 				<initialbelief ref="my_self">
-					<fact>new Hunter($scope.getAgentName(), $scope.getAgentIdentifier(), new Location(10,10))</fact>
+					<fact>new Hunter($scope.getAgentName(), $scope.getComponentIdentifier(), new Location(10,10))</fact>
 				</initialbelief>
 			</beliefs>
 			<goals>

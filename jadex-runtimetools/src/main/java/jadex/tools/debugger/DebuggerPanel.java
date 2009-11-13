@@ -3,6 +3,7 @@ package jadex.tools.debugger;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 
@@ -111,9 +112,34 @@ public class DebuggerPanel extends JPanel
 		add(step, new GridBagConstraints(col, row++, GridBagConstraints.REMAINDER, 1,
 			0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
 
-		
-		// Todo add listener to component state changes.
-		updatePanel();
+		((IComponentExecutionService)container.getService(IComponentExecutionService.class))
+			.getComponentDescription(comp, new IResultListener()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+			
+			public void resultAvailable(Object result)
+			{
+				updatePanel((IComponentDescription)result);
+			}
+		});
+
+		((IComponentExecutionService)container.getService(IComponentExecutionService.class))
+			.addComponentListener(comp, new IComponentListener()
+		{			
+			public void componentChanged(IComponentDescription desc)
+			{
+				updatePanel(desc);
+			}
+			public void componentRemoved(IComponentDescription desc)
+			{
+			}			
+			public void componentAdded(IComponentDescription desc)
+			{
+			}
+		});		
 	}
 
 	/**
@@ -123,27 +149,15 @@ public class DebuggerPanel extends JPanel
 	{
 	}
 
-	protected void updatePanel()
+	protected void updatePanel(final IComponentDescription desc)
 	{
-		((IComponentExecutionService)container.getService(IComponentExecutionService.class))
-			.getComponentDescription(comp, new IResultListener()
+		SwingUtilities.invokeLater(new Runnable()
 		{
-			public void exceptionOccurred(Exception exception)
+			public void run()
 			{
-				exception.printStackTrace();
-			}
-			
-			public void resultAvailable(final Object result)
-			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						boolean	isstep	= IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)result).getState());
-						stepmode.setSelected(isstep);
-						step.setEnabled(isstep);		
-					}
-				});
+				stepmode.setSelected(IComponentDescription.STATE_SUSPENDED.equals((desc).getState())
+					|| IComponentDescription.STATE_WAITING.equals((desc).getState()));
+				step.setEnabled(IComponentDescription.STATE_SUSPENDED.equals((desc).getState()));		
 			}
 		});
 	}

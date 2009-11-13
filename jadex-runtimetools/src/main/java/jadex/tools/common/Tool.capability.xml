@@ -65,7 +65,7 @@
 			<trigger>
 				<goal ref="tool_request"/>
 			</trigger>
-			<!-- <precondition>!$goal.agent.equals($agent.getAgentIdentifier())</precondition>-->
+			<!-- <precondition>!$goal.agent.equals($scope.getComponentIdentifier())</precondition>-->
 			<!--<precondition>jadex.tools.introspector.ToolPanel.check((jadex.adapter.fipa.AgentIdentifier)$goal.agent, (jadex.adapter.fipa.AgentIdentifier)$agent.getAgentIdentifier())</precondition>-->
 		</plan>
 	</plans>

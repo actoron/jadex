@@ -1,6 +1,8 @@
 package jadex.adapter.standalone;
 
+import jadex.adapter.standalone.fipaimpl.AMSAgentDescription;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
+import jadex.adapter.standalone.service.componentexecution.ComponentExecutionService;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IComponentAdapter;
@@ -14,11 +16,9 @@ import jadex.commons.ICommand;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
-import jadex.service.clock.IClockService;
 import jadex.service.execution.IExecutionService;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,8 +41,9 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	/** The component instance. */
 	protected IComponentInstance component;
 
-	/** The execution state of the component (managed by component execution service). */
-	protected String	state;
+	/** The description holding the execution state of the component
+	 *  (read only! managed by component execution service). */
+	protected AMSAgentDescription	desc;
 	
 	/** Flag to indicate a fatal error (component termination will not be passed to instance) */
 	protected boolean	fatalerror;
@@ -67,10 +68,11 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  Create a new component adapter.
 	 *  Uses the thread pool for executing the component.
 	 */
-	public StandaloneComponentAdapter(IServiceContainer container, IComponentIdentifier cid)
+	public StandaloneComponentAdapter(IServiceContainer container, AMSAgentDescription desc)
 	{
 		this.container = container;
-		this.cid = cid;
+		this.desc	= desc;
+		this.cid	= desc.getName();
 	}
 	
 	/**
@@ -102,12 +104,19 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		// Verify that the agent is running.
 //		assert !IComponentDescription.STATE_INITIATED.equals(state) : this;
 		
-		if(IComponentDescription.STATE_TERMINATED.equals(state))
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 			throw new ComponentTerminatedException(cid.getName());
 		
+		// Change back to suspended, when previously waiting.
+		if(IComponentDescription.STATE_WAITING.equals(desc.getState()))
+		{
+			ComponentExecutionService	ces	= (ComponentExecutionService)container.getService(IComponentExecutionService.class);
+			ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
+		}
+
 		// Resume execution of the agent (when active or terminating).
-		if(IComponentDescription.STATE_ACTIVE.equals(state)
-			|| IComponentDescription.STATE_TERMINATING.equals(state))
+		if(IComponentDescription.STATE_ACTIVE.equals(desc.getState())
+			|| IComponentDescription.STATE_TERMINATING.equals(desc.getState()))
 		{
 			//System.out.println("wakeup called: "+state);
 			((IExecutionService)container.getService(IExecutionService.class)).execute(this);
@@ -163,7 +172,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public IComponentIdentifier getComponentIdentifier()
 	{
-		if(IComponentDescription.STATE_TERMINATED.equals(state))
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 			throw new ComponentTerminatedException(cid.getName());
 
 		// todo: remove cast, HACK!!!
@@ -179,7 +188,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public IServiceContainer	getServiceContainer()
 	{
-		if(IComponentDescription.STATE_TERMINATED.equals(state))
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 			throw new ComponentTerminatedException(cid.getName());
 
 		return container;
@@ -188,15 +197,15 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	/**
 	 *  Get the clock.
 	 *  @return The clock.
-	 */
+	 * /
 	public IClockService getClock()
 	{
-		if(IComponentDescription.STATE_TERMINATED.equals(state))
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 			throw new ComponentTerminatedException(cid.getName());
 
 //		return platform.getClock();
 		return (IClockService)container.getService(IClockService.class);
-	}
+	}*/
 	
 	// Hack!!!! todo: remove
 	/**
@@ -239,7 +248,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	public void killComponent(IResultListener listener)
 	{
 //		System.out.println("killAgent: "+listener);
-		if(IComponentDescription.STATE_TERMINATED.equals(state))
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 			throw new ComponentTerminatedException(cid.getName());
 
 		if(!fatalerror)
@@ -256,7 +265,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public void	receiveMessage(Map message, MessageType type)
 	{
-		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
 			throw new ComponentTerminatedException(cid.getName());
 
 		// Add optional receival time.
@@ -287,25 +296,6 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			tooladapters[i].messageSent(msg);
 	}*/
 	
-	/**
-	 *  Set the state of the agent.
-	 */
-	public void	setState(String state)
-	{
-		if(IComponentDescription.STATE_TERMINATED.equals(this.state))
-			throw new ComponentTerminatedException(cid.getName());
-
-		this.state	= state;
-	}
-	
-	/**
-	 *  Get the state of the agent.
-	 */
-	public String	getState()
-	{
-		return  state;
-	}
-	
 	//-------- IExecutable interface --------
 
 	/**
@@ -314,22 +304,19 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public boolean	execute()
 	{
-		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
 			throw new ComponentTerminatedException(cid.getName());
 
-		if(!( IComponentDescription.STATE_ACTIVE.equals(state) || IComponentDescription.STATE_TERMINATING.equals(state)
-				||  IComponentDescription.STATE_SUSPENDED.equals(state) && dostep))
-			System.out.println(state+" "+dostep);
-
-		assert IComponentDescription.STATE_ACTIVE.equals(state) || IComponentDescription.STATE_TERMINATING.equals(state)
-		||  IComponentDescription.STATE_SUSPENDED.equals(state) && dostep: state+" "+dostep;
+		assert IComponentDescription.STATE_ACTIVE.equals(desc.getState()) || IComponentDescription.STATE_TERMINATING.equals(desc.getState())
+		||  IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) && dostep: desc.getState()+" "+dostep;
 		
-		boolean	executed = false;
+		// Should the component be executed again?
+		boolean	again = false;
 
 		try
 		{
 			//System.out.println("Executing: "+agent);
-			executed	= component.executeStep();
+			again	= component.executeStep();
 		}
 		catch(Throwable e)
 		{
@@ -347,10 +334,16 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			dostep	= false;
 			if(steplistener!=null)
 				steplistener.resultAvailable(null);
-			executed	= executed && IComponentDescription.STATE_ACTIVE.equals(state);
+			
+			if(!again && IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+			{
+				ComponentExecutionService	ces	= (ComponentExecutionService)container.getService(IComponentExecutionService.class);
+				ces.setComponentState(cid, IComponentDescription.STATE_WAITING);	// I hope this doesn't cause any deadlocks :-/
+			}
+			again	= again && IComponentDescription.STATE_ACTIVE.equals(desc.getState());
 		}
 		
-		return executed;
+		return again;
 	}
 	
 	//-------- test methods --------
@@ -360,7 +353,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public IComponentInstance	getComponentInstance()
 	{
-		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
 			throw new ComponentTerminatedException(cid.getName());
 
 		return component;
@@ -379,49 +372,49 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		this.dostep	= true;
 		this.steplistener	= listener;
 	}
-		
-	/**
-	 *  Add a breakpoint to the interpreter.
-	 */
-	public void	addBreakpoint(Object rule)
-	{
-		if(breakpoints==null)
-			breakpoints	= new HashSet();
-		breakpoints.add(rule);
-	}
-	
-	/**
-	 *  Remove a breakpoint from the interpreter.
-	 */
-	public void	removeBreakpoint(Object rule)
-	{
-		if(breakpoints.remove(rule) && breakpoints.isEmpty())
-			breakpoints	= null;
-	}
-	
-	/**
-	 *  Check if a rule is a breakpoint for the interpreter.
-	 */
-	public boolean	isBreakpoint(Object rule)
-	{
-		return breakpoints!=null && breakpoints.contains(rule);
-	}
-	
-	/**
-	 *  Add a command to be executed, when a breakpoint is reached.
-	 */
-	public void	addBreakpointCommand(ICommand command)
-	{
-		if(breakpointcommands==null)
-		{
-			breakpointcommands	= new ICommand[]{command};
-		}
-		else
-		{
-			ICommand[]	newarray	= new ICommand[breakpointcommands.length+1];
-			System.arraycopy(breakpointcommands, 0, newarray, 0, breakpointcommands.length);
-			newarray[breakpointcommands.length]	= command;
-			breakpointcommands	= newarray;
-		}
-	}
+//		
+//	/**
+//	 *  Add a breakpoint to the interpreter.
+//	 */
+//	public void	addBreakpoint(Object rule)
+//	{
+//		if(breakpoints==null)
+//			breakpoints	= new HashSet();
+//		breakpoints.add(rule);
+//	}
+//	
+//	/**
+//	 *  Remove a breakpoint from the interpreter.
+//	 */
+//	public void	removeBreakpoint(Object rule)
+//	{
+//		if(breakpoints.remove(rule) && breakpoints.isEmpty())
+//			breakpoints	= null;
+//	}
+//	
+//	/**
+//	 *  Check if a rule is a breakpoint for the interpreter.
+//	 */
+//	public boolean	isBreakpoint(Object rule)
+//	{
+//		return breakpoints!=null && breakpoints.contains(rule);
+//	}
+//	
+//	/**
+//	 *  Add a command to be executed, when a breakpoint is reached.
+//	 */
+//	public void	addBreakpointCommand(ICommand command)
+//	{
+//		if(breakpointcommands==null)
+//		{
+//			breakpointcommands	= new ICommand[]{command};
+//		}
+//		else
+//		{
+//			ICommand[]	newarray	= new ICommand[breakpointcommands.length+1];
+//			System.arraycopy(breakpointcommands, 0, newarray, 0, breakpointcommands.length);
+//			newarray[breakpointcommands.length]	= command;
+//			breakpointcommands	= newarray;
+//		}
+//	}
 }

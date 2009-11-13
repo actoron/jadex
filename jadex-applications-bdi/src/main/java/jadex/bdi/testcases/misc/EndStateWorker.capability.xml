@@ -38,7 +38,7 @@
 				<value>"capability end message event"</value>
 			</parameter>
 			<parameterset name="receivers" class="IComponentIdentifier">
-				<value>$scope.getAgentIdentifier()</value>
+				<value>$scope.getComponentIdentifier()</value>
 			</parameterset>
 		</messageevent>
 	</events>

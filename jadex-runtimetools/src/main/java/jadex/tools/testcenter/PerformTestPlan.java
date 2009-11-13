@@ -57,7 +57,7 @@ public class PerformTestPlan extends Plan
 			dummy.getParameter(SFipa.CONVERSATION_ID).setValue(testagent.getLocalName()+"2"+getComponentIdentifier().getLocalName());
 			getWaitqueue().addReply(dummy);
 			
-			IGoal start = createGoal("ams_start_agent");
+			IGoal start = createGoal("ams_resume_agent");
 			start.getParameter("agentidentifier").setValue(testagent);
 			dispatchSubgoalAndWait(start);
 			

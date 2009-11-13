@@ -26,7 +26,7 @@
  		
  		<!-- Myself. -->
  		<belief name="myself" class="ISpaceObject">
- 			<fact>$beliefbase.env.getAvatar($scope.getAgentIdentifier())</fact>
+ 			<fact>$beliefbase.env.getAvatar($scope.getComponentIdentifier())</fact>
  		</belief>
 
  		<!-- The nearest known prey. -->

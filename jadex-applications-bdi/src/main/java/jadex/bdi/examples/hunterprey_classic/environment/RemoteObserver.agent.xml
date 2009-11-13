@@ -59,7 +59,7 @@
 		<configuration name="default">
 			<beliefs>
 				<initialbelief ref="my_self">
-					<fact>new Observer($scope.getAgentName(), $scope.getAgentIdentifier(), new Location(0,0))</fact>
+					<fact>new Observer($scope.getAgentName(), $scope.getComponentIdentifier(), new Location(0,0))</fact>
 				</initialbelief>
 				<initialbelief ref="df">
 					<fact>

@@ -33,7 +33,7 @@
 				<value>"capability test conversation"</value>
 			</parameter>
 			<parameterset name="receivers" class="IComponentIdentifier">
-				<value>$scope.getAgentIdentifier()</value>
+				<value>$scope.getComponentIdentifier()</value>
 			</parameterset>
 		</messageevent>
 	</events>

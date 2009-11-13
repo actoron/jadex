@@ -14,8 +14,8 @@ public interface IComponentDescription
 	public static String  STATE_ACTIVE  = "active";
 	/** Predefined value "suspended" for slot state. */
 	public static String  STATE_SUSPENDED  = "suspended";
-//	/** Predefined value "waiting" for slot state. */
-//	public static String  STATE_WAITING  = "waiting";
+	/** Predefined value "waiting" for slot state. */
+	public static String  STATE_WAITING  = "waiting";
 //	/** Predefined value "transit" for slot state. */
 //	public static String  STATE_TRANSIT  = "transit";
 	/** Predefined value "terminating" for slot state. */

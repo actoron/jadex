@@ -67,7 +67,7 @@
 				<value>"default value"</value>
 			</parameter>
 			<parameterset name="receivers" class="jadex.bridge.IComponentIdentifier">
-				<value>$scope.getAgentIdentifier()</value>
+				<value>$scope.getComponentIdentifier()</value>
 			</parameterset>
 		</messageevent>
 

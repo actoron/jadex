@@ -31,7 +31,7 @@
 		</belief>
 
 		<belief name="receiver" class="IComponentIdentifier" exported="true">
-			<fact>$scope.getAgentIdentifier()</fact>
+			<fact>$scope.getComponentIdentifier()</fact>
 		</belief>
 
 		<belief name="starttime" class="long"></belief>
@@ -81,7 +81,7 @@
 		<configuration name="local">
 			<beliefs>
 				<initialbelief ref="receiver">
-					<fact>$scope.getAgentIdentifier()</fact>
+					<fact>$scope.getComponentIdentifier()</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>

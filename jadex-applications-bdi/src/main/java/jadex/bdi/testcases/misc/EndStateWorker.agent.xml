@@ -117,7 +117,7 @@
 				<value>"end message event"</value>
 			</parameter>
 			<parameterset name="receivers" class="IComponentIdentifier">
-				<value>$scope.getAgentIdentifier()</value>
+				<value>$scope.getComponentIdentifier()</value>
 			</parameterset>
 		</messageevent>
 		<messageevent name="inform_reports" type="fipa" direction="send">

@@ -141,22 +141,19 @@ public class ComponentExecutionService implements IComponentExecutionService
 						cid.setAddresses(ms.getAddresses());
 				}
 		
-				// Arguments must be isolated between agent instances.
-				adapter = new StandaloneComponentAdapter(container, cid);
-				adapters.put(cid, adapter);
-				
 				ad	= new AMSAgentDescription(cid);
 				if(suspend)
 				{
 					ad.setState(IComponentDescription.STATE_SUSPENDED);
-					adapter.setState(IComponentDescription.STATE_SUSPENDED);
 				}
 				else
 				{
 					ad.setState(IComponentDescription.STATE_ACTIVE);
-					adapter.setState(IComponentDescription.STATE_ACTIVE);
 				}
 				descs.put(cid, ad);
+
+				adapter = new StandaloneComponentAdapter(container, ad);
+				adapters.put(cid, adapter);
 			}
 		}
 		
@@ -246,7 +243,6 @@ public class ComponentExecutionService implements IComponentExecutionService
 					if(IComponentDescription.STATE_ACTIVE.equals(desc.getState()))
 					//if(!AMSAgentDescription.STATE_TERMINATING.equals(desc.getState()))
 					{
-						agent.setState(IComponentDescription.STATE_TERMINATING);
 						desc.setState(IComponentDescription.STATE_TERMINATING);
 //						if(listeners.get(aid)!=null)
 //							throw new RuntimeException("Multiple result listeners for agent: "+aid);
@@ -288,7 +284,6 @@ public class ComponentExecutionService implements IComponentExecutionService
 				// todo: call listener when suspension has finished!!!
 				
 				ad.setState(IComponentDescription.STATE_SUSPENDED);
-				adapter.setState(IComponentDescription.STATE_SUSPENDED);
 				IExecutionService exe = (IExecutionService)container.getService(IExecutionService.class);
 				exe.cancel(adapter, listener);
 			}
@@ -318,7 +313,6 @@ public class ComponentExecutionService implements IComponentExecutionService
 					//throw new RuntimeException("Only suspended agents can be resumed: "+aid+" "+ad.getState());
 				
 				ad.setState(IComponentDescription.STATE_ACTIVE);
-				adapter.setState(IComponentDescription.STATE_ACTIVE);
 				adapter.wakeup();
 			}
 		}
@@ -415,7 +409,8 @@ public class ComponentExecutionService implements IComponentExecutionService
 					StandaloneComponentAdapter	adapter	= (StandaloneComponentAdapter)adapters.remove(cid);
 					if(adapter==null)
 						throw new RuntimeException("Component Identifier not registered: "+cid);
-					adapter.setState(IComponentDescription.STATE_TERMINATED);
+					AMSAgentDescription	desc	= (AMSAgentDescription)descs.get(cid);
+					desc.setState(IComponentDescription.STATE_TERMINATED);
 					descs.remove(cid);
 					
 					// Stop execution of agent.
@@ -673,6 +668,44 @@ public class ComponentExecutionService implements IComponentExecutionService
 			ret.setAddresses(ms.getAddresses());
 
 		return ret;
+	}
+	
+	/**
+	 *  Set the state of a component (i.e. update the component description).
+	 *  Currently only switching between suspended/waiting is allowed.
+	 */
+	// hack???
+	public void	setComponentState(IComponentIdentifier comp, String state)
+	{
+		assert IComponentDescription.STATE_SUSPENDED.equals(state)
+			|| IComponentDescription.STATE_WAITING.equals(state) : "wrong state: "+comp+", "+state;
+		
+		AMSAgentDescription	desc	= null;
+		synchronized(descs)
+		{
+			desc	= (AMSAgentDescription)descs.get(comp);
+			desc.setState(state);			
+		}
+		
+		IComponentListener[]	alisteners;
+		synchronized(listeners)
+		{
+			Set	slisteners	= new HashSet(listeners.getCollection(null));
+			slisteners.addAll(listeners.getCollection(comp));
+			alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+		}
+		// todo: can be called after listener has (concurrently) deregistered
+		for(int i=0; i<alisteners.length; i++)
+		{
+			try
+			{
+				alisteners[i].componentChanged(desc);
+			}
+			catch(Exception e)
+			{
+				System.out.println("WARNING: Exception when changing component state: "+desc+", "+e);
+			}
+		}
 	}
 	
 	//-------- IService interface --------
