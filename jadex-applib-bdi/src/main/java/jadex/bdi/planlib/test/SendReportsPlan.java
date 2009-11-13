@@ -26,11 +26,11 @@ public class SendReportsPlan extends Plan
 		IMessageEvent me = createMessageEvent("inform_reports");
 		me.getParameter(SFipa.CONTENT).setValue(testcase);
 		// Hack!!! convention agent2testcenter used for convid to allow matching.
-		me.getParameter(SFipa.CONVERSATION_ID).setValue(getAgentIdentifier().getLocalName()+"2"+testcenter.getLocalName());
+		me.getParameter(SFipa.CONVERSATION_ID).setValue(getComponentIdentifier().getLocalName()+"2"+testcenter.getLocalName());
 		me.getParameterSet(SFipa.RECEIVERS).addValue(testcenter);
 		sendMessage(me);
 
 		if(!((Boolean)getBeliefbase().getBelief("keepalive").getFact()).booleanValue())
-			killAgent();
+			killComponent();
 	}
 }

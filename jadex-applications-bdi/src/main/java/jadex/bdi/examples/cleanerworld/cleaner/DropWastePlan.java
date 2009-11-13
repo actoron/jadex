@@ -44,7 +44,7 @@ public class DropWastePlan extends Plan
 		// Drop waste to waste-bin.
 		IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
 		Map params = new HashMap();
-		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+		params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
 		params.put(ISpaceAction.OBJECT_ID, getParameter("wastebin").getValue());
 		params.put("waste", getParameter("waste").getValue());
 		SyncResultListener srl	= new SyncResultListener();

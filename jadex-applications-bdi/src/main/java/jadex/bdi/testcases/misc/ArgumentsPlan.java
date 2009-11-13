@@ -26,7 +26,7 @@ public class ArgumentsPlan extends Plan
 			IGoal ca = createGoal("amscap.ams_create_agent");
 			ca.getParameter("type").setValue("/jadex/bdi/testcases/misc/ArgumentsWorker.agent.xml");
 			Map args = SCollection.createHashMap();
-			args.put("creator", getAgentIdentifier());
+			args.put("creator", getComponentIdentifier());
 			ca.getParameter("arguments").setValue(args);
 			dispatchSubgoalAndWait(ca);
 			IComponentIdentifier worker = (IComponentIdentifier)ca.getParameter("agentidentifier").getValue();

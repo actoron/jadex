@@ -68,7 +68,7 @@ public class FoodMiningPlan extends Plan
 		
 		//Take a piece of food.				
 		Map params = new HashMap();
-		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+		params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
 		SyncResultListener srl	= new SyncResultListener();
 		env.performSpaceAction("pickup", params, srl);
 //		System.out.println("#FoodMiningPlan# trying ot pick up food.");
@@ -104,7 +104,7 @@ public class FoodMiningPlan extends Plan
 //		getBeliefbase().getBeliefSet("carriedFood").removeFacts();
 		//Drop the piece of food in the nest.				
 		params = new HashMap();
-		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+		params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
 		srl	= new SyncResultListener();
 		env.performSpaceAction("drop", params, srl);		
 		srl.waitForResult();

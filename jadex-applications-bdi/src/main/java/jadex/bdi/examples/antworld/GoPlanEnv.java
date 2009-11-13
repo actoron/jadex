@@ -28,7 +28,7 @@ import java.util.Map;
 		//		System.out.println("#GoPlanEnv# Plan started to walk from " + myself.getProperty(Space2D.PROPERTY_POSITION) + " to " + target + " for ant: " + myself.getId());		
 		// Update destination and gravitationSensor of ant on space
 		Map params = new HashMap();
-		params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getAgentIdentifier()).getId());
+		params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getComponentIdentifier()).getId());
 		params.put(UpdateDestinationAction.DESTINATION, target);
 //		params.put(GravitationListener.FEELS_GRAVITATION, hasGravitation);
 		// params.put("owner", myself.getId());
@@ -61,7 +61,7 @@ import java.util.Map;
 			// Produce new pheromone, if ant carries food.
 			if (getBeliefbase().getBelief("carriedFood").getFact() != null) {
 				params = new HashMap();
-				params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+				params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
 				params.put(ProducePheromoneAction.POSITION, mypos);
 				params.put(ProducePheromoneAction.STRENGTH, new Integer(10));
 //				SyncResultListener	srl = new SyncResultListener();
@@ -76,7 +76,7 @@ import java.util.Map;
 			params = new HashMap();
 			params.put(GoAction.DIRECTION, dir);
 //			params.put(ISpaceAction.OBJECT_ID, env.getAvatars(getAgentIdentifier())[0].getId());
-			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getAgentIdentifier()).getId());
+			params.put(ISpaceAction.OBJECT_ID, env.getAvatar(getComponentIdentifier()).getId());
 			SyncResultListener srl = new SyncResultListener();
 			env.performSpaceAction("go", params, srl);
 			srl.waitForResult();

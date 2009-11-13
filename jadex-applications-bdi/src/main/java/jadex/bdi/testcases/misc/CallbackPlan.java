@@ -207,8 +207,8 @@ public class CallbackPlan extends Plan
 		final TestReport tr9 = new TestReport("#9", "Test if message event sent can be observed in a listener.");
 		
 		final IMessageEvent mevent = createMessageEvent("message_event");
-		mevent.getParameterSet(SFipa.RECEIVERS).addValue(getAgentIdentifier());
-		mevent.getParameter(SFipa.SENDER).setValue(getAgentIdentifier());
+		mevent.getParameterSet(SFipa.RECEIVERS).addValue(getComponentIdentifier());
+		mevent.getParameter(SFipa.SENDER).setValue(getComponentIdentifier());
 		
 		IMessageEventListener mel = new IMessageEventListener()
 		{

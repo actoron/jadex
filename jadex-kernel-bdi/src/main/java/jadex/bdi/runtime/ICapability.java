@@ -89,20 +89,20 @@ public interface ICapability	extends IElement
 	 * Get the agent identifier.
 	 * @return The agent identifier.
 	 */
-	public IComponentIdentifier	getAgentIdentifier();
+	public IComponentIdentifier	getComponentIdentifier();
 
 	/**
 	 *  Get the platform specific agent object.
 	 *  Allows to do platform specific things.
 	 *  @return The agent object.
 	 */
-	public Object	getPlatformAgent();
+	public Object	getPlatformComponent();
 
 	/**
 	 *  Get the container
 	 *  @return The container.
 	 */
-	public IServiceContainer	getServiceContainer();
+	public IServiceContainer getServiceContainer();
 	
 	/**
 	 *  Get the current time.

@@ -21,7 +21,7 @@ public class SendAndWaitPlan	extends Plan
 
 		// Create request (send to self for testing).
 		IMessageEvent	request	= createMessageEvent("rp_initiate");
-		request.getParameterSet(SFipa.RECEIVERS).addValue(getScope().getAgentIdentifier());
+		request.getParameterSet(SFipa.RECEIVERS).addValue(getScope().getComponentIdentifier());
 
 		// Send message and wait for answer. Note that the acl message
 		// should have ReplyWith or ConversationId to catch any answer messages!

@@ -380,16 +380,16 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 *  Get the agent name.
 	 *  @return The agent name.
 	 */
-	public String getAgentName()
+	public String getComponentName()
 	{
-		return getAgentIdentifier().getLocalName();
+		return getComponentIdentifier().getLocalName();
 	}
 	
 	/**
 	 * Get the agent identifier.
 	 * @return The agent identifier.
 	 */
-	public IComponentIdentifier	getAgentIdentifier()
+	public IComponentIdentifier	getComponentIdentifier()
 	{
 		return interpreter.getComponentAdapter().getComponentIdentifier();
 	}
@@ -417,7 +417,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	/**
 	 *  Kill this agent.
 	 */
-	public void killAgent()
+	public void killComponent()
 	{
 //		capability.killAgent();
 		// Problem: duplicate functionality here and in capability flyweight :-(

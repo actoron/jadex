@@ -79,7 +79,7 @@ public class HuntPlan extends Plan {
 //					System.out.println("Eating: "+getScope().getAgentName()+", "+prey);
 					SyncResultListener srl	= new SyncResultListener();
 					Map params = new HashMap();
-					params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+					params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
 					params.put(ISpaceAction.OBJECT_ID, prey);
 					env.performSpaceAction("eat", params, srl);
 					srl.waitForResult();
@@ -135,7 +135,7 @@ public class HuntPlan extends Plan {
 //		System.out.println("Moving: "+myself);
 		SyncResultListener srl	= new SyncResultListener();
 		Map params = new HashMap();
-		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+		params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
 		params.put(MoveAction.PARAMETER_DIRECTION, dir);
 		env.performSpaceAction("move", params, srl);
 		srl.waitForResult();

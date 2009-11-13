@@ -52,7 +52,7 @@ public class MoveToLocationPlan extends Plan
 			myloc = new Location(myloc.getX()+rx, myloc.getY()+ry);
 			getBeliefbase().getBelief("my_location").setFact(myloc);
 
-			env.setAgentInfo(new AgentInfo(getAgentName(),
+			env.setAgentInfo(new AgentInfo(getComponentName(),
 				(String)getBeliefbase().getBelief("my_type").getFact(), myloc,
 				((Double)getBeliefbase().getBelief("my_vision").getFact()).doubleValue()));
 

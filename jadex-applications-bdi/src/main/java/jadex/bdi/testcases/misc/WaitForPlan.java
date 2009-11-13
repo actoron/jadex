@@ -149,7 +149,7 @@ public class WaitForPlan extends Plan	implements Runnable
 		
 		report	= new TestReport("message", "Waiting for a message reply.");
 		IMessageEvent me = createMessageEvent("default_query_ping");
-		me.getParameterSet(SFipa.RECEIVERS).addValue(getScope().getAgentIdentifier());
+		me.getParameterSet(SFipa.RECEIVERS).addValue(getScope().getComponentIdentifier());
 		try
 		{
 			sendMessageAndWait(me, 2000);
@@ -313,7 +313,7 @@ public class WaitForPlan extends Plan	implements Runnable
 
 		report	= new TestReport("x-message", "Waiting for a message reply.");
 		IMessageEvent me = getExternalAccess().createMessageEvent("default_query_ping");
-		me.getParameterSet(SFipa.RECEIVERS).addValue(getExternalAccess().getAgentIdentifier());
+		me.getParameterSet(SFipa.RECEIVERS).addValue(getExternalAccess().getComponentIdentifier());
 		try
 		{
 			getExternalAccess().sendMessageAndWait(me, 1000);

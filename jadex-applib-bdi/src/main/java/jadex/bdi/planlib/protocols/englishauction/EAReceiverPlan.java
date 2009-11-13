@@ -37,12 +37,12 @@ public class EAReceiverPlan extends AbstractReceiverPlan
 		
 		AuctionDescription auctiondesc = (AuctionDescription)me.getParameter(SFipa.CONTENT).getValue();
 		
-		getLogger().info(getAgentName()+": Received inform_start_auction message with auction description " +
+		getLogger().info(getComponentName()+": Received inform_start_auction message with auction description " +
 			"start time: "+auctiondesc.getStarttime()+" Round time "+auctiondesc.getRoundTimeout()
 			+" topic: "+auctiondesc.getTopic());
 		if(auctiondesc.getRoundTimeout()<=0)
 		{
-			getLogger().warning(getAgentName()+"No round timeout specified");
+			getLogger().warning(getComponentName()+"No round timeout specified");
 			fail();
 		}
 		
@@ -69,9 +69,9 @@ public class EAReceiverPlan extends AbstractReceiverPlan
 			try
 			{
 				//System.out.println(getAgentName()+" waiting for: "+(firsttimeout==-1? buftimeout: firsttimeout));
-				getLogger().info(getAgentName()+" waiting for: "+(firsttimeout==-1? buftimeout: firsttimeout));
+				getLogger().info(getComponentName()+" waiting for: "+(firsttimeout==-1? buftimeout: firsttimeout));
 				IMessageEvent msg = (IMessageEvent)waitForReply(dummy, firsttimeout==-1? buftimeout: firsttimeout);
-				getLogger().info(getAgentName()+" received msg: "+msg.getType());
+				getLogger().info(getComponentName()+" received msg: "+msg.getType());
 				missing_cnt = 0; // Reset missing_cnt as auction continues
 				firsttimeout=-1;
 				//System.out.println(getAgentName()+" received msg: "+msg.getType());
@@ -86,7 +86,7 @@ public class EAReceiverPlan extends AbstractReceiverPlan
 					if(winning_offer!=null)
 					{
 						//System.out.println(getAgentName()+" sitting out: "+msg.getContent());
-						getLogger().info(getAgentName()+" sitting out: "+msg.getParameter(SFipa.CONTENT).getValue());
+						getLogger().info(getComponentName()+" sitting out: "+msg.getParameter(SFipa.CONTENT).getValue());
 						winning_offer = null;
 					}
 					else
@@ -97,7 +97,7 @@ public class EAReceiverPlan extends AbstractReceiverPlan
 				else if(msg.getType().equals("ea_accept_proposal"))
 				{
 					winning_offer = msg.getParameter(SFipa.CONTENT).getValue();
-					getLogger().info(getAgentName()+" is currently winner for "+winning_offer);
+					getLogger().info(getComponentName()+" is currently winner for "+winning_offer);
 					//System.out.println(getAgentName()+" is currently winner for "+winning_offer);
 				}
 				else if(msg.getType().equals("ea_reject_proposal"))
@@ -117,17 +117,17 @@ public class EAReceiverPlan extends AbstractReceiverPlan
 				}
 				else
 				{
-					getLogger().warning((getAgentName()+" could not understand: "+msg));
+					getLogger().warning((getComponentName()+" could not understand: "+msg));
 				}
 			}
 			catch(TimeoutException e)
 			{
-				getLogger().info(getAgentName()+" "+e.getMessage());
+				getLogger().info(getComponentName()+" "+e.getMessage());
 				// Exit when no offers are received any more (for 3 times).
 				//System.out.println(getAgentName()+" missed cfp: "+missing_cnt);
 				if(++missing_cnt==3)
 				{
-					getLogger().info(getAgentName()+" leaving auction due to 3 missed cfps");
+					getLogger().info(getComponentName()+" leaving auction due to 3 missed cfps");
 					//System.out.println(getAgentName()+" leaving auction due to 3 missed cfps");
 					running = false;
 				}
@@ -135,7 +135,7 @@ public class EAReceiverPlan extends AbstractReceiverPlan
 		}
 		
 		//System.out.println(getAgentName()+" end");
-		getLogger().info(getAgentName()+" auction end");
+		getLogger().info(getComponentName()+" auction end");
 			
 		if(!running)
 			getParameter("result").setValue(new Object[]{winning_offer, auction_wo});
@@ -202,14 +202,14 @@ public class EAReceiverPlan extends AbstractReceiverPlan
 		}
 		catch(TimeoutException e)
 		{
-			getLogger().info(getAgentName() + e.getMessage());
+			getLogger().info(getComponentName() + e.getMessage());
 		}
 		ret[1] = mp.getParameter("auction_info").getValue();
 		Boolean leave = (Boolean)mp.getParameter("leave").getValue();
 		Boolean accept = (Boolean)mp.getParameter("accept").getValue();
 		if(leave!=null && leave.booleanValue())
 		{
-			getLogger().info(getAgentName() + " informs the initiator of the auction "
+			getLogger().info(getComponentName() + " informs the initiator of the auction "
 				+auctiondesc.getTopic()+" that it doesn't want to participate.");
 		
 			sendMessage(getEventbase().createReply(cfp, "ea_not_understood"));
@@ -220,7 +220,7 @@ public class EAReceiverPlan extends AbstractReceiverPlan
 		else if(accept!=null && accept.booleanValue())
 		{
 			//System.out.println(getAgentName()+" sending proposal: "+offer);
-			getLogger().info(getAgentName()+" sending proposal: "+offer);
+			getLogger().info(getComponentName()+" sending proposal: "+offer);
 			// Send propsal.
 			sendMessage(getEventbase().createReply(cfp, "ea_propose"));
 		}

@@ -40,7 +40,7 @@ public class TakePlanEnv extends Plan
 		// Put down the garbarge.
 //		System.out.println("Calling drop: "+getAgentName());
 		Map params = new HashMap();
-		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+		params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
 		SyncResultListener srl	= new SyncResultListener();
 		grid.performSpaceAction("drop", params, srl);
 		srl.waitForResult();

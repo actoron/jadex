@@ -26,7 +26,7 @@ public class WaitqueueTestPlan	extends Plan
 
 		// Create request (send to self for testing).
 		IMessageEvent	request	= createMessageEvent("rp_initiate");
-		request.getParameterSet(SFipa.RECEIVERS).addValue(getScope().getAgentIdentifier());
+		request.getParameterSet(SFipa.RECEIVERS).addValue(getScope().getComponentIdentifier());
 		request.getParameter(SFipa.REPLY_WITH).setValue("some reply id");
 
 		// Let all answers be stored in the waitqueue.
@@ -70,7 +70,7 @@ public class WaitqueueTestPlan	extends Plan
 
 		// Create request (send to self for testing).
 		request	= createMessageEvent("rp_initiate");
-		request.getParameterSet(SFipa.RECEIVERS).addValue(getScope().getAgentIdentifier());
+		request.getParameterSet(SFipa.RECEIVERS).addValue(getScope().getComponentIdentifier());
 		request.getParameter(SFipa.REPLY_WITH).setValue("some other reply id");
 
 		// Let all answers be stored in the waitqueue.

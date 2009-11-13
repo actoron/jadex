@@ -21,7 +21,7 @@ public class RemoteGetVisionActionPlan extends RemoteActionPlan
 	 */
 	public void body()
 	{
-		Cleaner cl = new Cleaner((Location)getBeliefbase().getBelief("my_location").getFact(), getAgentName(),
+		Cleaner cl = new Cleaner((Location)getBeliefbase().getBelief("my_location").getFact(), getComponentName(),
 			(Waste)getBeliefbase().getBelief("carriedwaste").getFact(),
 			((Number)getBeliefbase().getBelief("my_vision").getFact()).doubleValue(),
 			((Number)getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue());

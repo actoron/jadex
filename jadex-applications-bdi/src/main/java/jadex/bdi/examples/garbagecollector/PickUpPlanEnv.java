@@ -23,7 +23,7 @@ public class PickUpPlanEnv extends Plan
 		// todo: garbage as parameter?
 		
 		Map params = new HashMap();
-		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+		params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
 		SyncResultListener srl	= new SyncResultListener();
 		env.performSpaceAction("pickup", params, srl); // todo: garbage as parameter?
 		if(!((Boolean)srl.waitForResult()).booleanValue()) 

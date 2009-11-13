@@ -39,7 +39,7 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 		AuctionDescription auctiondesc = (AuctionDescription)getParameter("auction_description").getValue();
 		if(auctiondesc.getRoundTimeout()<=0)
 		{
-			getLogger().warning(getAgentName()+"No round timeout specified");
+			getLogger().warning(getComponentName()+"No round timeout specified");
 			fail();
 		}
 		
@@ -50,7 +50,7 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 		List receivers = SUtil.arrayToList(getParameterSet("receivers").getValues());
 		
 		// Initialize negotiations.
-		String convid = SUtil.createUniqueId(getAgentName());
+		String convid = SUtil.createUniqueId(getComponentName());
 		
 		// Announce the auction by sending information about it.
 		announceAuction(auctiondesc, receivers, convid);
@@ -134,7 +134,7 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 		start.getParameterSet(SFipa.RECEIVERS).addValues(receivers.toArray());
 		start.getParameter(SFipa.CONTENT).setValue(auctiondesc);
 		start.getParameter(SFipa.CONVERSATION_ID).setValue(convid);
-		getLogger().info(getAgentName() + ":\tinform_start_auction");
+		getLogger().info(getComponentName() + ":\tinform_start_auction");
 		getWaitqueue().addReply(start);
 		
 		sendMessage(start);
@@ -196,7 +196,7 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 		cfpm.getParameterSet(SFipa.RECEIVERS).addValues(receivers.toArray());
 		cfpm.getParameter(SFipa.CONTENT).setValue(cfp);
 		cfpm.getParameter(SFipa.CONVERSATION_ID).setValue(convid);
-		getLogger().info(getAgentName() + ": cfp(" + cfp + ")");
+		getLogger().info(getComponentName() + ": cfp(" + cfp + ")");
 		sendMessage(cfpm);
 	}
 	
@@ -242,21 +242,21 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 	
 		//The first proposal is accepted, so wait until first the proposal is received.
 		long roundstart = getTime();
-		getLogger().info(getAgentName()+" Waiting for proposals at "+new Date(roundstart));
+		getLogger().info(getComponentName()+" Waiting for proposals at "+new Date(roundstart));
 		try
 		{
 			long	elapsed	= getTime() - roundstart;
 			while(elapsed < roundtimeout)
 			{
 				//System.out.println(getAgentName()+" waiting for accepts for: "+offer);
-				getLogger().info(getAgentName()+" Waiting for "+(roundtimeout - elapsed)+" ms");
+				getLogger().info(getComponentName()+" Waiting for "+(roundtimeout - elapsed)+" ms");
 				IMessageEvent tmp = (IMessageEvent)waitForReply(start, roundtimeout - elapsed );
 				
 				if(tmp.getType().equals("ea_propose"))
 				{
 					if(first_proposal==null)
 					{
-						getLogger().info(getAgentName()+" got first accept for: "
+						getLogger().info(getComponentName()+" got first accept for: "
 							+cfp+" from: "+tmp.getParameter(SFipa.SENDER).getValue());
 						// Send the accept_proposal-message to the agent with the first proposal.
 						IMessageEvent accept = getEventbase().createReply(tmp, "ea_accept_proposal");
@@ -267,7 +267,7 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 					}
 					else
 					{
-						getLogger().info(getAgentName()+" got too late accept for: "
+						getLogger().info(getComponentName()+" got too late accept for: "
 							+cfp+" from: "+tmp.getParameter(SFipa.SENDER).getValue());
 						// Send reject_proposal-message.
 						IMessageEvent reject = getEventbase().createReply(tmp, "ea_reject_proposal");
@@ -279,13 +279,13 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 				{
 					// Remove agent from the list of receivers on any other of
 					// message. So you can use e.g. a not_understood_message to exit the auction.
-					getLogger().info(getAgentName()+" removing agent "
+					getLogger().info(getComponentName()+" removing agent "
 						+tmp.getParameter(SFipa.SENDER).getValue());
 					receivers.remove(tmp.getParameter(SFipa.SENDER).getValue());
 				}
 
 				elapsed	= getTime() - roundstart;
-				getLogger().info(getAgentName()+" elapsed: "+elapsed+" ms");
+				getLogger().info(getComponentName()+" elapsed: "+elapsed+" ms");
 			}
 		}
 		catch(TimeoutException e)
@@ -350,14 +350,14 @@ public class EAInitiatorPlan extends AbstractInitiatorPlan
 		if(accept)
 		{
 			//IComponentIdentifier wina = (IComponentIdentifier)winner.getParameter(SFipa.SENDER).getValue();
-			getLogger().info(getAgentName() + ": auction finished (winner: "
+			getLogger().info(getComponentName() + ": auction finished (winner: "
 				+winner.getName()+" - price: "+winning_offer+")");
 			
 			getParameter("result").setValue(new Object[]{winner, winning_offer});
 		}
 		else
 		{ 	
-			getLogger().info(getAgentName()+ ": auction finished "+
+			getLogger().info(getComponentName()+ ": auction finished "+
 				"(no winner - initiator didn't receive any proposals)");
 		}
 	}

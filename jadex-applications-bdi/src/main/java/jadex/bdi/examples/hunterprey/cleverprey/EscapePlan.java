@@ -31,7 +31,7 @@ public class EscapePlan extends Plan
 			(IVector2)myself.getProperty(Space2D.PROPERTY_POSITION), hunters);
 		SyncResultListener srl	= new SyncResultListener();
 		Map params = new HashMap();
-		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+		params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
 		params.put(MoveAction.PARAMETER_DIRECTION, move);
 		env.performSpaceAction("move", params, srl);
 		try

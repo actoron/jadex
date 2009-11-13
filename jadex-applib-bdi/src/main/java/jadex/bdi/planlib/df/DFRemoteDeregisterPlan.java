@@ -22,7 +22,7 @@ public class DFRemoteDeregisterPlan extends Plan
 		if(desc==null || desc.getName()==null)
 		{
 			IDF df = (IDF)getScope().getServiceContainer().getService(IDF.class);
-			desc = df.createDFAgentDescription(getScope().getAgentIdentifier(), null);
+			desc = df.createDFAgentDescription(getScope().getComponentIdentifier(), null);
 //			IComponentIdentifier	bid	= getScope().getAgentIdentifier();
 //			desc.setName(bid);
 		}

@@ -39,7 +39,7 @@ public class ProductionPlan extends Plan
 		this.visited = 0;
 
 		Environment env = ((Environment)getBeliefbase().getBelief("move.environment").getFact());
-		env.setAgentInfo(new AgentInfo(getAgentName(),
+		env.setAgentInfo(new AgentInfo(getComponentName(),
 			(String)getBeliefbase().getBelief("move.my_type").getFact(), (Location)getBeliefbase()
 			.getBelief("move.my_home").getFact(),((Number)getBeliefbase().getBelief("move.my_vision").getFact()).doubleValue()));
 	}

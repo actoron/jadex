@@ -41,7 +41,7 @@ public class DAInitiatorPlan extends AbstractInitiatorPlan
 		AuctionDescription auctiondesc = (AuctionDescription)getParameter("auction_description").getValue();
 		if(auctiondesc.getRoundTimeout()<=0)
 		{
-			getLogger().warning(getAgentName()+"No round timeout specified");
+			getLogger().warning(getComponentName()+"No round timeout specified");
 			fail();
 		}
 		
@@ -52,7 +52,7 @@ public class DAInitiatorPlan extends AbstractInitiatorPlan
 		List receivers = SUtil.arrayToList(getParameterSet("receivers").getValues());
 		
 		// Initialize negotiations.
-		String convid = SUtil.createUniqueId(getAgentName());
+		String convid = SUtil.createUniqueId(getComponentName());
 		
 		// Announce the auction by sending information about it.
 		announceAuction(auctiondesc, receivers, convid);
@@ -135,7 +135,7 @@ public class DAInitiatorPlan extends AbstractInitiatorPlan
 		start.getParameterSet(SFipa.RECEIVERS).addValues(receivers.toArray());
 		start.getParameter(SFipa.CONTENT).setValue(auctiondesc);
 		start.getParameter(SFipa.CONVERSATION_ID).setValue(convid);
-		getLogger().info(getAgentName() + ": inform_start_auction");
+		getLogger().info(getComponentName() + ": inform_start_auction");
 		getWaitqueue().addReply(start);
 		
 		sendMessage(start);
@@ -198,7 +198,7 @@ public class DAInitiatorPlan extends AbstractInitiatorPlan
 		cfpm.getParameterSet(SFipa.RECEIVERS).addValues(receivers.toArray());
 		cfpm.getParameter(SFipa.CONTENT).setValue(cfp);
 		cfpm.getParameter(SFipa.CONVERSATION_ID).setValue(convid);
-		getLogger().info(getAgentName() + ": cfp(" + cfp + ")");
+		getLogger().info(getComponentName() + ": cfp(" + cfp + ")");
 		sendMessage(cfpm);
 	}
 	
@@ -221,7 +221,7 @@ public class DAInitiatorPlan extends AbstractInitiatorPlan
 			ret[0] = di.getParameter("cfp").getValue();
 			ret[1] = di.getParameter("cfp_info").getValue();
 			
-			getLogger().info(getAgentName() + "calculated new cfp: "+ret[0]);
+			getLogger().info(getComponentName() + "calculated new cfp: "+ret[0]);
 		}
 		catch(BDIFailureException e)
 		{
@@ -258,7 +258,7 @@ public class DAInitiatorPlan extends AbstractInitiatorPlan
 					{
 						// Send the accept_proposal-message to the agent with the first proposal.
 						sendMessage(getEventbase().createReply(tmp, "da_accept_proposal"));
-						getLogger().info(getAgentName() + " found winner: "+tmp.getParameter(SFipa.SENDER).getValue());
+						getLogger().info(getComponentName() + " found winner: "+tmp.getParameter(SFipa.SENDER).getValue());
 												
 						// Set the parameter "winner" to the AgentIdentifier of the
 						// winning agent.
@@ -269,7 +269,7 @@ public class DAInitiatorPlan extends AbstractInitiatorPlan
 					{
 						// Send reject_proposal-message.
 						sendMessage(getEventbase().createReply(tmp, "da_reject_proposal"));
-						getLogger().info(getAgentName() + ": rejected proposal");
+						getLogger().info(getComponentName() + ": rejected proposal");
 					}
 				}
 				else
@@ -300,11 +300,11 @@ public class DAInitiatorPlan extends AbstractInitiatorPlan
 	{
 		if(winner == null)
 		{
-			getLogger().info(getAgentName() + ": auction finished (no winner)");
+			getLogger().info(getComponentName() + ": auction finished (no winner)");
 		}
 		else
 		{
-			getLogger().info(getAgentName() + ": auction finished (winner: " 
+			getLogger().info(getComponentName() + ": auction finished (winner: " 
 				+winner.getName() + " - winning offer: " + winning_offer + ")");
 		
 			getParameter("result").setValue(new Object[]{winner, winning_offer});

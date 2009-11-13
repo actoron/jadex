@@ -72,7 +72,7 @@ public class CNPReceiverPlan extends AbstractReceiverPlan
 
 		if(me.getType().equals(getShortProtocolName()+"_accept"))
 		{
-			getLogger().info(getAgentName()+" excuting the cnp task.");
+			getLogger().info(getComponentName()+" excuting the cnp task.");
 			try
 			{
 				Object result = executeTask(proposal[0], proposal[1], initiator);

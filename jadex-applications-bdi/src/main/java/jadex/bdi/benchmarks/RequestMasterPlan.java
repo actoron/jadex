@@ -16,9 +16,9 @@ public class RequestMasterPlan extends Plan
 		Map	args	= new HashMap();
 		args.put("master", Boolean.FALSE);
 		args.put("max", getBeliefbase().getBelief("max").getFact());
-		args.put("receiver", getAgentIdentifier());
+		args.put("receiver", getComponentIdentifier());
 		
 		IComponentExecutionService	ces	= (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
-		ces.createComponent(null, "jadex/bdi/benchmarks/RequestPerformance.agent.xml", "default", args, false, null, getAgentIdentifier());
+		ces.createComponent(null, "jadex/bdi/benchmarks/RequestPerformance.agent.xml", "default", args, false, null, getComponentIdentifier());
 	}	
 }

@@ -45,7 +45,7 @@ public class PerformTestPlan extends Plan
 			create.getParameter("type").setValue(testcase.getType());
 			Map	args	= new HashMap();
 			args.put("timeout", timeout);
-			args.put("testcenter", this.getAgentIdentifier());
+			args.put("testcenter", this.getComponentIdentifier());
 			create.getParameter("arguments").setValue(args);
 			create.getParameter("classloader").setValue(classloader);
 			create.getParameter("start").setValue(Boolean.FALSE);
@@ -54,7 +54,7 @@ public class PerformTestPlan extends Plan
 
 			// Hack!!! convention agent2testcenter used for convid to allow matching.
 			IMessageEvent	dummy	= createMessageEvent("inform_reports");	// Hack??? Need some conversation message to wait for
-			dummy.getParameter(SFipa.CONVERSATION_ID).setValue(testagent.getLocalName()+"2"+getAgentIdentifier().getLocalName());
+			dummy.getParameter(SFipa.CONVERSATION_ID).setValue(testagent.getLocalName()+"2"+getComponentIdentifier().getLocalName());
 			getWaitqueue().addReply(dummy);
 			
 			IGoal start = createGoal("ams_start_agent");

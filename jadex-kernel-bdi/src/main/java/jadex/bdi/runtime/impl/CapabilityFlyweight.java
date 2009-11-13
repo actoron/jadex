@@ -263,7 +263,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 * Get the agent identifier.
 	 * @return The agent identifier.
 	 */
-	public IComponentIdentifier	getAgentIdentifier()
+	public IComponentIdentifier	getComponentIdentifier()
 	{
 		if(getInterpreter().isExternalThread())
 		{
@@ -296,7 +296,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 *  Allows to do platform specific things.
 	 *  @return The agent object.
 	 */
-	public Object	getPlatformAgent()
+	public Object	getPlatformComponent()
 	{
 		return adapter;
 	}
@@ -429,7 +429,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 					IContextService cs = (IContextService)adapter.getServiceContainer().getService(IContextService.class);
 					if(cs!=null)
 					{
-						IContext[] tmp = cs.getContexts(getAgentIdentifier(), IApplicationContext.class);
+						IContext[] tmp = cs.getContexts(getComponentIdentifier(), IApplicationContext.class);
 						if(tmp!=null && tmp.length==1)
 							object = tmp[0];
 					}
@@ -443,7 +443,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			IContextService cs = (IContextService)adapter.getServiceContainer().getService(IContextService.class);
 			if(cs!=null)
 			{
-				IContext[] tmp = cs.getContexts(getAgentIdentifier(), IApplicationContext.class);
+				IContext[] tmp = cs.getContexts(getComponentIdentifier(), IApplicationContext.class);
 				if(tmp!=null && tmp.length==1)
 					ret = (IApplicationContext)tmp[0];
 			}

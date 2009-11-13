@@ -129,7 +129,7 @@ public class StartPeerPlan extends Plan
 			System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 			System.out.println("Still used memory: "+stillused+"kB.");
 
-			killAgent();
+			killComponent();
 		}
 	}
 
@@ -160,7 +160,7 @@ public class StartPeerPlan extends Plan
 	{
 		final IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
 		SyncResultListener lis = new SyncResultListener();
-		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", null, args, false, lis, getAgentIdentifier());
+		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", null, args, false, lis, getComponentIdentifier());
 		IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
 		return aid;
 	}

@@ -10,7 +10,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_RYESac-fEd6NWbZHdUI2WQ"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_RYESas-fEd6NWbZHdUI2WQ" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="MessageSending.bpmn#_RYESWc-fEd6NWbZHdUI2WQ"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_RYESbc-fEd6NWbZHdUI2WQ" x="55" y="70" width="111" height="61"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_RYESbc-fEd6NWbZHdUI2WQ" x="16" y="64" width="111" height="61"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_cD3tss-fEd6NWbZHdUI2WQ" type="2001">
         <children xmi:type="notation:Node" xmi:id="_cD3tuM-fEd6NWbZHdUI2WQ" type="4001"/>
@@ -19,7 +19,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_cD3ttc-fEd6NWbZHdUI2WQ"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_cD3tts-fEd6NWbZHdUI2WQ" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="MessageSending.bpmn#_cD3tsc-fEd6NWbZHdUI2WQ"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_cD3tt8-fEd6NWbZHdUI2WQ" x="205" y="84"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_cD3tt8-fEd6NWbZHdUI2WQ" x="126" y="78"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_0Gs0ks-fEd6NWbZHdUI2WQ" type="2001">
         <children xmi:type="notation:Node" xmi:id="_0Gs0mM-fEd6NWbZHdUI2WQ" type="4001"/>
@@ -28,7 +28,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_0Gs0lc-fEd6NWbZHdUI2WQ"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_0Gs0ls-fEd6NWbZHdUI2WQ" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="MessageSending.bpmn#_0Gs0kc-fEd6NWbZHdUI2WQ"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_0Gs0l8-fEd6NWbZHdUI2WQ" x="389" y="70"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_0Gs0l8-fEd6NWbZHdUI2WQ" x="340" y="64"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_HDo_ss-gEd6NWbZHdUI2WQ" type="2001">
         <children xmi:type="notation:Node" xmi:id="_HDo_uM-gEd6NWbZHdUI2WQ" type="4001"/>
@@ -37,7 +37,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_HDo_tc-gEd6NWbZHdUI2WQ"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_HDo_ts-gEd6NWbZHdUI2WQ" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="MessageSending.bpmn#_HDo_sc-gEd6NWbZHdUI2WQ"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HDo_t8-gEd6NWbZHdUI2WQ" x="552" y="84"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HDo_t8-gEd6NWbZHdUI2WQ" x="498" y="78"/>
       </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_RYESYs-fEd6NWbZHdUI2WQ"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_RYESY8-fEd6NWbZHdUI2WQ"/>
@@ -48,7 +48,16 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_RYESXc-fEd6NWbZHdUI2WQ" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_RYESXs-fEd6NWbZHdUI2WQ" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="MessageSending.bpmn#_RYESV8-fEd6NWbZHdUI2WQ"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_RYESZc-fEd6NWbZHdUI2WQ" x="16" y="16" width="1500" height="200"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_RYESZc-fEd6NWbZHdUI2WQ" x="16" y="16" width="586" height="232"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_hmK7ktBCEd6NWbZHdUI2WQ" type="1002">
+    <children xmi:type="notation:Node" xmi:id="_hmK7mNBCEd6NWbZHdUI2WQ" type="4009"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_hmK7k9BCEd6NWbZHdUI2WQ" fontName="Arial"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_hmK7lNBCEd6NWbZHdUI2WQ"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_hmK7ldBCEd6NWbZHdUI2WQ"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_hmK7ltBCEd6NWbZHdUI2WQ" lineColor="0"/>
+    <element xmi:type="bpmn:TextAnnotation" href="MessageSending.bpmn#_hmK7kdBCEd6NWbZHdUI2WQ"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_hmK7l9BCEd6NWbZHdUI2WQ" x="16" y="268"/>
   </children>
   <styles xmi:type="notation:PageStyle" xmi:id="_RYESU8-fEd6NWbZHdUI2WQ"/>
   <styles xmi:type="notation:GuideStyle" xmi:id="_RYESVM-fEd6NWbZHdUI2WQ"/>

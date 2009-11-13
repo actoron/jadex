@@ -23,6 +23,6 @@ public class BurnPlan extends Plan
 
 		// Burn the waste.
 		waitFor(100);
-		env.burn(getAgentName());
+		env.burn(getComponentName());
 	}
 }

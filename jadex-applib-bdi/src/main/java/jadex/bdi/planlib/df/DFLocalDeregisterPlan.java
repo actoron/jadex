@@ -22,11 +22,11 @@ public class DFLocalDeregisterPlan extends Plan
 		IDFAgentDescription desc = (IDFAgentDescription)getParameter("description").getValue();
 		if(desc==null)
 		{
-			desc = dfservice.createDFAgentDescription(getScope().getAgentIdentifier(), null);
+			desc = dfservice.createDFAgentDescription(getScope().getComponentIdentifier(), null);
 		}
 		else if(desc.getName()==null)
 		{
-			desc = dfservice.createDFAgentDescription(getScope().getAgentIdentifier(), desc.getServices(), desc.getLanguages(), 
+			desc = dfservice.createDFAgentDescription(getScope().getComponentIdentifier(), desc.getServices(), desc.getLanguages(), 
 				desc.getOntologies(), desc.getProtocols(), desc.getLeaseTime());
 		}
 

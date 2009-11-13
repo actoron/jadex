@@ -300,8 +300,8 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			}
 			else
 			{
-				IApplicationContext ac = (ApplicationContext)((IContextService)agent.getServiceContainer().getService(IContextService.class)).getContexts(agent.getAgentIdentifier(), IApplicationContext.class)[0];
-				ac.setAgentMaster(agent.getAgentIdentifier(), false);
+				IApplicationContext ac = (ApplicationContext)((IContextService)agent.getServiceContainer().getService(IContextService.class)).getContexts(agent.getComponentIdentifier(), IApplicationContext.class)[0];
+				ac.setAgentMaster(agent.getComponentIdentifier(), false);
 				agent.killAgent();
 			}
 
@@ -386,7 +386,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			IGoal start = agent.getGoalbase().createGoal("ams_create_agent");
 			IContextService	cs	= (IContextService) agent.getServiceContainer().getService(IContextService.class);
-			IContext[]	contexts	= cs.getContexts(agent.getAgentIdentifier(), IApplicationContext.class);
+			IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
 			// Hack! remove cast to ApplicationContext
 			String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Dealer").getFilename();
 			start.getParameter("type").setValue(type);
@@ -596,7 +596,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				agent.getLogger().info("starting playerAgent: "+player.getName());
 				IGoal start = agent.getGoalbase().createGoal("ams_create_agent");
 				IContextService	cs	= (IContextService) agent.getServiceContainer().getService(IContextService.class);
-				IContext[]	contexts	= cs.getContexts(agent.getAgentIdentifier(), IApplicationContext.class);
+				IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
 				// Hack! remove cast to ApplicationContext
 				String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Player").getFilename();
 				start.getParameter("type").setValue(type);

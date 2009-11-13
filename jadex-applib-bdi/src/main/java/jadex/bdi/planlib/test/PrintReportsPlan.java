@@ -20,7 +20,7 @@ public class PrintReportsPlan extends Plan
 			if(!reports[i].isSucceeded())
 				failed++;
 
-		System.out.println("Printing out test results of agent: "+getAgentName());
+		System.out.println("Printing out test results of agent: "+getComponentName());
 		if(cnt==1 && reports.length==0)
 			System.out.println("Failure: the test was not completed.");
 		else if(cnt==reports.length+1)
@@ -46,6 +46,6 @@ public class PrintReportsPlan extends Plan
 			System.out.println(reports[i]);
 
 		if(!((Boolean)getBeliefbase().getBelief("keepalive").getFact()).booleanValue())
-			killAgent();
+			killComponent();
 	}
 }

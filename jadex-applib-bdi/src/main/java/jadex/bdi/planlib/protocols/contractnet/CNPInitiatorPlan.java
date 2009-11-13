@@ -38,7 +38,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 	public void body()
 	{
 		// Start negotiations.
-		String convid = SUtil.createUniqueId(getAgentName());
+		String convid = SUtil.createUniqueId(getComponentName());
 		NegotiationRecord nr = new NegotiationRecord(getParameter("cfp").getValue(), 
 			getParameter("cfp_info").getValue(), (IComponentIdentifier[])getParameterSet("receivers").getValues(), getTime());
 		getParameterSet("history").addValue(nr);
@@ -116,7 +116,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 			}
 		}
 		getParameter("cfp_info").setValue(nr.getCFPInfo());
-		getLogger().info(getAgentName()+"(I)CNPPlan finished: "+convid);
+		getLogger().info(getComponentName()+"(I)CNPPlan finished: "+convid);
 	}
 	
 	/**
@@ -164,7 +164,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 		getWaitqueue().addReply(me);
 		endAtomic();
 		
-		getLogger().info(getAgentName()+" (I)CNPPlan initiated: "+convid);
+		getLogger().info(getComponentName()+" (I)CNPPlan initiated: "+convid);
 		sendMessage(me);
 	}
 
@@ -187,7 +187,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 				if(wait_time <= 0)
 					break;
 
-				getLogger().info(getAgentName()+" (I)CNPPlan: waiting: "+wait_time);
+				getLogger().info(getComponentName()+" (I)CNPPlan: waiting: "+wait_time);
 
 				IMessageEvent reply = (IMessageEvent)waitForReply(me, wait_time);
 				IComponentIdentifier sender = (IComponentIdentifier)reply.getParameter(SFipa.SENDER).getValue();
@@ -199,7 +199,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 				// on the handling of the query icnp_nextround_info goal. 
 				if(reply.getType().equals(getShortProtocolName()+"_propose"))
 				{
-					getLogger().info(getAgentName()+" (I)CNPPlan received a proposal reply: "+reply.getParameter(SFipa.CONTENT).getValue());
+					getLogger().info(getComponentName()+" (I)CNPPlan received a proposal reply: "+reply.getParameter(SFipa.CONTENT).getValue());
 					ParticipantProposal	proposal	= nr.getProposal(sender);
 					if(proposal!=null && proposal.getProposal()==null)
 					{
@@ -208,7 +208,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 					}
 					else
 					{
-						getLogger().warning(getAgentName()+" (I)CNPPlan received an unexpected proposal reply: "+reply);
+						getLogger().warning(getComponentName()+" (I)CNPPlan received an unexpected proposal reply: "+reply);
 					}
 				}
 			}
@@ -253,7 +253,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 					dispatchSubgoalAndWait(sel);
 					acceptables	= (ParticipantProposal[])sel.getParameterSet("acceptables").getValues();
 					nr.setCFPInfo(sel.getParameter("cfp_info").getValue());
-					getLogger().info(getAgentName()+" (I)CNPPlan determined acceptables: "+SUtil.arrayToString(acceptables));
+					getLogger().info(getComponentName()+" (I)CNPPlan determined acceptables: "+SUtil.arrayToString(acceptables));
 				}
 				catch(GoalFailureException e)
 				{
@@ -385,16 +385,16 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 					if(proposal!=null && results.get(sender)==null)
 					{
 						results.put(sender, reply.getParameter(SFipa.CONTENT).getValue());
-						getLogger().info("Task was executed: "+this+" "+getAgentName()+" "+sender);
+						getLogger().info("Task was executed: "+this+" "+getComponentName()+" "+sender);
 					}
 					else
 					{
-						getLogger().warning(getAgentName()+" (I)CNPPlan received an unexpected acceptance reply: "+reply);
+						getLogger().warning(getComponentName()+" (I)CNPPlan received an unexpected acceptance reply: "+reply);
 					}
 				}
 				else
 				{
-					getLogger().info("One task was possibly not executed: "+this+" "+getAgentName()+" "+sender);
+					getLogger().info("One task was possibly not executed: "+this+" "+getComponentName()+" "+sender);
 				}
 			}
 		}
@@ -454,21 +454,21 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 						{
 							executed	= sender;
 							result	= reply.getParameter(SFipa.CONTENT).getValue();
-							getLogger().info("Task was executed: "+this+" "+getAgentName()+" "+sender);
+							getLogger().info("Task was executed: "+this+" "+getComponentName()+" "+sender);
 						}
 						else
 						{
-							getLogger().warning(getAgentName()+" (I)CNPPlan received an unexpected acceptance reply: "+reply);
+							getLogger().warning(getComponentName()+" (I)CNPPlan received an unexpected acceptance reply: "+reply);
 						}
 					}
 					else
 					{
-						getLogger().info("One task was possibly not executed: "+this+" "+getAgentName()+" "+sender);
+						getLogger().info("One task was possibly not executed: "+this+" "+getComponentName()+" "+sender);
 					}
 				}
 				catch(TimeoutException e)
 				{
-					getLogger().info("One task was possibly not executed: "+this+" "+getAgentName()+" "+acceptables[i].getParticipant());
+					getLogger().info("One task was possibly not executed: "+this+" "+getComponentName()+" "+acceptables[i].getParticipant());
 				}
 			}
 			
@@ -513,7 +513,7 @@ public class CNPInitiatorPlan extends AbstractInitiatorPlan
 
 		if(nr.getProposals().length==0 || (executeall && nr.getProposals().length!=acceptables.length))
 		{
-			getLogger().info(getAgentName()+" (I)CNPPlan failed: ");//+convid);
+			getLogger().info(getComponentName()+" (I)CNPPlan failed: ");//+convid);
 			fail();
 		}
 	}

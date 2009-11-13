@@ -31,18 +31,18 @@ public class CMHandlerPlan extends Plan
 		canceldummy.getParameter(SFipa.CONVERSATION_ID).setValue(inimsg.getParameter(SFipa.CONVERSATION_ID).getValue());
 		getWaitqueue().addReply(canceldummy);
 		cancel_msg	= waitForReply(canceldummy);	// Todo: wait only for specific event type "cm_cancel".
-		getLogger().info("Receiver received cancel: "+getAgentName());
+		getLogger().info("Receiver received cancel: "+getComponentName());
 
 		try
 		{
-			getLogger().info("Receiver approving cancel: "+getAgentName());
+			getLogger().info("Receiver approving cancel: "+getComponentName());
 			// Post approve cancel goal to inform domain layer about cancellation.
 			IGoal	approve_cancel	= createGoal("cm_approve_cancel");
 			approve_cancel.getParameter(SFipa.CONVERSATION_ID).setValue(cancel_msg.getParameter(SFipa.CONVERSATION_ID).getValue());
 			approve_cancel.getParameter(SFipa.PROTOCOL).setValue(inimsg.getParameter(SFipa.PROTOCOL).getValue());
 			approve_cancel.getParameter("initiator").setValue(cancel_msg.getParameter(SFipa.SENDER).getValue());
 			dispatchSubgoalAndWait(approve_cancel);
-			getLogger().info("Receiver approved cancel: "+getAgentName());
+			getLogger().info("Receiver approved cancel: "+getComponentName());
 			
 			// If cancel is not approved, store failure reason.
 			// Cancel anyways, as interaction is already aborted on initiator side.
@@ -63,7 +63,7 @@ public class CMHandlerPlan extends Plan
 				state.setInteractionState(InteractionState.INTERACTION_CANCELLED);
 			}
 		
-			getLogger().info("Receiver dropping interaction: "+getAgentName()+", "+interaction_goal);
+			getLogger().info("Receiver dropping interaction: "+getComponentName()+", "+interaction_goal);
 			interaction_goal.drop();
 			try
 			{
@@ -83,7 +83,7 @@ public class CMHandlerPlan extends Plan
 			// Use user defined language/ontology (hack???, may not support string content?).
 			reply.getParameter(SFipa.CONTENT).setValue(failure_reason);
 			sendMessage(reply);
-			getLogger().info("Receiver sent reply: "+getAgentName());
+			getLogger().info("Receiver sent reply: "+getComponentName());
 		}
 	}
 
@@ -94,7 +94,7 @@ public class CMHandlerPlan extends Plan
 	 */
 	public void aborted()
 	{
-		getLogger().info("Receiver aborting: "+getAgentName());
+		getLogger().info("Receiver aborting: "+getComponentName());
 		IGoal	interaction_goal	= (IGoal)getParameter("interaction_goal").getValue();
 		InteractionState	state	= (InteractionState)interaction_goal.getParameter("interaction_state").getValue();
 
@@ -116,19 +116,19 @@ public class CMHandlerPlan extends Plan
 				reply.getParameter(SFipa.CONTENT).setValue(failure_reason);
 			}
 			sendMessage(reply);
-			getLogger().info("Receiver sent reply: "+getAgentName());
+			getLogger().info("Receiver sent reply: "+getComponentName());
 		}
 		else if(InteractionState.INTERACTION_RUNNING.equals(state.getInteractionState()))
 		{
-			getLogger().info("Receiver cancelling: "+getAgentName());
+			getLogger().info("Receiver cancelling: "+getComponentName());
 			state.setInteractionState(InteractionState.INTERACTION_CANCELLED);
 			
 			// Inform initator side about dropped out participant using "not-understood" message.
 			IMessageEvent	inimsg	= (IMessageEvent)interaction_goal.getParameter("message").getValue();
 			IMessageEvent	reply	= getEventbase().createReply(inimsg, "cm_not_understood");
 			sendMessage(reply);
-			getLogger().info("Receiver cancelled: "+getAgentName());
+			getLogger().info("Receiver cancelled: "+getComponentName());
 		}
-		getLogger().info("Receiver aborted: "+getAgentName());
+		getLogger().info("Receiver aborted: "+getComponentName());
 	}	
 }

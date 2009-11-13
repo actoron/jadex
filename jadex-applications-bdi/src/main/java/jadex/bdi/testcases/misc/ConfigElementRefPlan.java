@@ -26,7 +26,7 @@ public class ConfigElementRefPlan extends Plan
 		IGoal	create	= createGoal("amscap.ams_create_agent");
 		create.getParameter("type").setValue("/jadex/bdi/testcases/misc/ConfigElementRefWorker.agent.xml");
 		Map args = SCollection.createHashMap();
-		args.put("testagent", getAgentIdentifier());
+		args.put("testagent", getComponentIdentifier());
 		create.getParameter("arguments").setValue(args);
 		dispatchSubgoalAndWait(create);
 		

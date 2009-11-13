@@ -32,7 +32,7 @@ public class RPQPInitiatorPlan extends AbstractInitiatorPlan
 	public void body()
 	{
 		//getLogger().info(getScope().getName() + ": Request initiator action called: " + this);
-		getLogger().info("Request/Query initiator action called: " + this+" "+getAgentName());
+		getLogger().info("Request/Query initiator action called: " + this+" "+getComponentName());
 
 		// Prepare message event.
 		request = createMessageEvent(getShortProtocolName()+"_request");
@@ -134,7 +134,7 @@ public class RPQPInitiatorPlan extends AbstractInitiatorPlan
 	 */
 	protected void requestFinished(boolean success, Object result)
 	{
-		getLogger().info(getShortProtocolName()+" finished with: "+success+" "+ SUtil.arrayToString(result)+" "+this+" "+getAgentName());
+		getLogger().info(getShortProtocolName()+" finished with: "+success+" "+ SUtil.arrayToString(result)+" "+this+" "+getComponentName());
 
 		getParameter("result").setValue(result);
 

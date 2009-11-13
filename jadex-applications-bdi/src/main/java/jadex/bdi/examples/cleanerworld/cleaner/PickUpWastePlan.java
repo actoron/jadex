@@ -36,7 +36,7 @@ public class PickUpWastePlan extends Plan
 
 		IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
 		Map params = new HashMap();
-		params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+		params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
 		params.put(ISpaceAction.OBJECT_ID, getParameter("waste").getValue());
 		SyncResultListener srl	= new SyncResultListener();
 		env.performSpaceAction("pickup_waste", params, srl);

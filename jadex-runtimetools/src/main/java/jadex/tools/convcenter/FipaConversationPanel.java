@@ -107,7 +107,7 @@ public class FipaConversationPanel extends JSplitPane
 		
 		// Right side starts with initial send panel only.
 		IMessageEvent	msg	= agent.getEventbase().createMessageEvent("fipamsg");
-		msg.getParameter(SFipa.SENDER).setValue(agent.getAgentIdentifier());
+		msg.getParameter(SFipa.SENDER).setValue(agent.getComponentIdentifier());
 		if(default_receiver!=null)
 			msg.getParameterSet(SFipa.RECEIVERS).addValue(default_receiver);
 		this.sendpanel	= new FipaMessagePanel(msg, agent);
@@ -299,7 +299,7 @@ public class FipaConversationPanel extends JSplitPane
 							{
 								IMessageEvent reply = agent.getEventbase().createReply(msg, "fipamsg");
 //								IMessageEvent reply = msg.createReply("fipamsg");
-								reply.getParameter(SFipa.SENDER).setValue(agent.getAgentIdentifier());
+								reply.getParameter(SFipa.SENDER).setValue(agent.getComponentIdentifier());
 								sendpanel.setMessage(reply);
 								tabs.setSelectedComponent(sendtab);
 							}
@@ -440,7 +440,7 @@ public class FipaConversationPanel extends JSplitPane
 	public void	resetMessage()
 	{
 		IMessageEvent	msg	= agent.getEventbase().createMessageEvent("fipamsg");
-		msg.getParameter(SFipa.SENDER).setValue(agent.getAgentIdentifier());
+		msg.getParameter(SFipa.SENDER).setValue(agent.getComponentIdentifier());
 		if(receiver!=null)
 			msg.getParameterSet(SFipa.RECEIVERS).addValue(receiver);
 		sendpanel.setMessage(msg);		
@@ -548,7 +548,7 @@ public class FipaConversationPanel extends JSplitPane
 			{
 				message	= decodeMessage(msg);
 				// Update sender.
-				message.getParameter(SFipa.SENDER).setValue(agent.getAgentIdentifier());
+				message.getParameter(SFipa.SENDER).setValue(agent.getComponentIdentifier());
 			}
 			catch(Exception e)
 			{
@@ -581,7 +581,7 @@ public class FipaConversationPanel extends JSplitPane
 			{
 				message	= decodeMessage(sents[i].getValue());
 				// Update sender.
-				message.getParameter(SFipa.SENDER).setValue(agent.getAgentIdentifier());
+				message.getParameter(SFipa.SENDER).setValue(agent.getComponentIdentifier());
 				sentmsgs.add(0, message);	// Re-revert order
 			}
 			catch(Exception e)

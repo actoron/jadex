@@ -194,7 +194,7 @@ public class ConfigElementRefWorkerPlan extends Plan
 		reports.add(report);
 		
 		// Kill agent to activate end state.
-		killAgent();
+		killComponent();
 		
 		waitForEver(); // Hack!!! Unnecessary, when microplansteps work!
 	}

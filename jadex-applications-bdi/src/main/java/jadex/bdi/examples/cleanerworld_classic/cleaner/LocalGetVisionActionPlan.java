@@ -22,7 +22,7 @@ public class LocalGetVisionActionPlan extends	Plan
 	{
 		IEnvironment	environment	= (IEnvironment)getBeliefbase().getBelief("environment").getFact();
 		Cleaner cl = new Cleaner((Location)getBeliefbase().getBelief("my_location").getFact(),
-			getAgentName(),
+			getComponentName(),
 			(Waste)getBeliefbase().getBelief("carriedwaste").getFact(),
 			((Number)getBeliefbase().getBelief("my_vision").getFact()).doubleValue(),
 			((Number)getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue());

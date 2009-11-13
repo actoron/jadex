@@ -32,7 +32,7 @@ public class MakeProposalPlan extends Plan
 			double elapsed_time = getTime() - order.getStartTime();
 			double price_span = order.getLimit() - order.getStartPrice();
 			int acceptable_price =  (int)(price_span * elapsed_time / time_span) + order.getStartPrice();
-			getLogger().info(getAgentName()+" proposed: " + acceptable_price);
+			getLogger().info(getComponentName()+" proposed: " + acceptable_price);
 			
 			// Store proposal data in plan parameters.
 			getParameter("proposal").setValue(new Integer(acceptable_price));

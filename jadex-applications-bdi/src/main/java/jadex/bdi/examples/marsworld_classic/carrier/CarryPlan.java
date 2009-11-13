@@ -27,7 +27,7 @@ public class CarryPlan extends Plan
 	{
 		getLogger().info("Created: "+this);
 		Environment env = ((Environment)getBeliefbase().getBelief("move.environment").getFact());
-		env.setAgentInfo(new AgentInfo(getAgentName(),
+		env.setAgentInfo(new AgentInfo(getComponentName(),
 			(String)getBeliefbase().getBelief("move.my_type").getFact(), (Location)getBeliefbase()
 			.getBelief("move.my_home").getFact(), ((Double)getBeliefbase().getBelief("move.my_vision")
 			.getFact()).doubleValue()));

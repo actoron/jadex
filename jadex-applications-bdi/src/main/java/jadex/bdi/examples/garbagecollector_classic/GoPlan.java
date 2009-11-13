@@ -17,9 +17,9 @@ public class GoPlan extends Plan
 		int size = env.getGridSize();
 		Position target = (Position)getParameter("pos").getValue();
 
-		while(!target.equals(env.getPosition(getAgentName())))
+		while(!target.equals(env.getPosition(getComponentName())))
 		{
-			Position mypos = env.getPosition(getAgentName());
+			Position mypos = env.getPosition(getComponentName());
 			String dir = null;
 			int mx = mypos.getX();
 			int tx = target.getX();
@@ -46,7 +46,7 @@ public class GoPlan extends Plan
 			//System.out.println("Wants to go: "+dir);
 			waitFor(100);
 			//System.out.println(getAgentName()+" "+getName());
-			env.go(getAgentName(), dir);
+			env.go(getComponentName(), dir);
 		}
 	}
 }

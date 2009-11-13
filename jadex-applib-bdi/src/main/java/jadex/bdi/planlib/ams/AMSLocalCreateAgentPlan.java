@@ -28,7 +28,7 @@ public class AMSLocalCreateAgentPlan extends Plan
 		try
 		{
 			SyncResultListener lis = new SyncResultListener();
-			((IComponentExecutionService)plat.getService(IComponentExecutionService.class)).createComponent(name, type, config, args, !start, lis, getAgentIdentifier());
+			((IComponentExecutionService)plat.getService(IComponentExecutionService.class)).createComponent(name, type, config, args, !start, lis, getComponentIdentifier());
 			IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
 			getParameter("agentidentifier").setValue(aid);
 		}

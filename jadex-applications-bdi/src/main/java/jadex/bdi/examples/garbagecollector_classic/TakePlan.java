@@ -20,14 +20,14 @@ public class TakePlan extends Plan
 		dispatchSubgoalAndWait(pickup);
 
 		// Go to the burner.
-		Position oldpos = env.getPosition(getAgentName());
+		Position oldpos = env.getPosition(getComponentName());
 		IGoal go = createGoal("go");
 		go.getParameter("pos").setValue(env.getBurnerPosition());
 		dispatchSubgoalAndWait(go);
 
 		// Put down the garbarge.
 		//System.out.println("Calling drop: "+getAgentName()+" "+getRootGoal());
-		env.drop(getAgentName());
+		env.drop(getComponentName());
 
 		// Go back.
 		IGoal goback = createGoal("go");

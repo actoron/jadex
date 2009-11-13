@@ -80,7 +80,7 @@ public class MoveToLocationPlan extends Plan
 		
 		// Create a representation of myself.
 		Cleaner cl = new Cleaner((Location)getBeliefbase().getBelief("my_location").getFact(),
-			getAgentName(),
+			getComponentName(),
 			(Waste)getBeliefbase().getBelief("carriedwaste").getFact(),
 			((Number)getBeliefbase().getBelief("my_vision").getFact()).doubleValue(),
 			((Number)getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue());
@@ -207,7 +207,7 @@ public class MoveToLocationPlan extends Plan
 		else
 		{
 			//System.out.println("Error when updating vision! "+event.getGoal());
-			System.out.println(getAgentName()+" Error when updating vision! ");
+			System.out.println(getComponentName()+" Error when updating vision! ");
 		}
 		
 //		System.out.println("update vision: "+(System.currentTimeMillis()-start));

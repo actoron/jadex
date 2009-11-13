@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_RYESUc-fEd6NWbZHdUI2WQ" iD="_RYESUM-fEd6NWbZHdUI2WQ">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_hmK7kdBCEd6NWbZHdUI2WQ" iD="_hmK7kNBCEd6NWbZHdUI2WQ" name="package jadex.bpmn.examples.execute&#xD;&#xA;&#xD;&#xA;import jadex.commons.*;&#xD;&#xA;import jadex.bridge.*;"/>
   <pools xmi:type="bpmn:Pool" xmi:id="_RYESV8-fEd6NWbZHdUI2WQ" iD="_RYESVs-fEd6NWbZHdUI2WQ" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_RYESWc-fEd6NWbZHdUI2WQ" iD="_RYESWM-fEd6NWbZHdUI2WQ" outgoingEdges="_cEBesc-fEd6NWbZHdUI2WQ" name="PreMessage" activityType="Task"/>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_cD3tsc-fEd6NWbZHdUI2WQ" iD="_cD3tsM-fEd6NWbZHdUI2WQ" outgoingEdges="_0G1-gc-fEd6NWbZHdUI2WQ" incomingEdges="_cEBesc-fEd6NWbZHdUI2WQ" name="Send Message&#xD;&#xA;mode = &quot;send&quot;&#xD;&#xA;message = createMessage()" activityType="EventIntermediateMessage"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_cD3tsc-fEd6NWbZHdUI2WQ" iD="_cD3tsM-fEd6NWbZHdUI2WQ" outgoingEdges="_0G1-gc-fEd6NWbZHdUI2WQ" incomingEdges="_cEBesc-fEd6NWbZHdUI2WQ" name="Send Message&#xD;&#xA;mode = &quot;send&quot;&#xD;&#xA;messagetype = &quot;fipa&quot;&#xD;&#xA;performative = &quot;inform&quot;&#xD;&#xA;receivers = new String[]{&quot;MessageReceival&quot;}&#xD;&#xA;content = &quot;hello&quot;" activityType="EventIntermediateMessage"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_0Gs0kc-fEd6NWbZHdUI2WQ" iD="_0Gs0kM-fEd6NWbZHdUI2WQ" outgoingEdges="_HDyJoc-gEd6NWbZHdUI2WQ" incomingEdges="_0G1-gc-fEd6NWbZHdUI2WQ" name="Message Sent" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_HDo_sc-gEd6NWbZHdUI2WQ" iD="_HDo_sM-gEd6NWbZHdUI2WQ" incomingEdges="_HDyJoc-gEd6NWbZHdUI2WQ" activityType="EventEndEmpty"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_cEBesc-fEd6NWbZHdUI2WQ" iD="_cEBesM-fEd6NWbZHdUI2WQ"/>

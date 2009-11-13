@@ -33,7 +33,7 @@ public class RPInitiatorPlan extends AbstractInitiatorPlan
 	public void body()
 	{
 		//getLogger().info(getScope().getName() + ": Request initiator action called: " + this);
-		getLogger().info("Request initiator action called: " + this+" "+getAgentName());
+		getLogger().info("Request initiator action called: " + this+" "+getComponentName());
 
 		// Prepare message event.
 		request = createMessageEvent("rp_request");
@@ -135,7 +135,7 @@ public class RPInitiatorPlan extends AbstractInitiatorPlan
 	 */
 	protected void requestFinished(boolean success, Object result)
 	{
-		getLogger().info("Request finished with: "+success+" "+ SUtil.arrayToString(result)+" "+this+" "+getAgentName());
+		getLogger().info("Request finished with: "+success+" "+ SUtil.arrayToString(result)+" "+this+" "+getComponentName());
 
 		getParameter("result").setValue(result);
 
