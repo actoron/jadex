@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -849,6 +850,18 @@ public class MBpmnModel extends MIdElement implements ICacheableModel, ILoadable
 				return "";
 			}
 		};
+	}
+
+	/**
+	 *  Get the properties.
+	 *  Arbitrary properties that can e.g. be used to
+	 *  define kernel-specific settings to configure tools. 
+	 *  @return The properties.
+	 */
+	public Properties	getProperties()
+	{
+		// Todo: implement me.
+		return new Properties();
 	}
 	
 	/**

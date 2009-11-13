@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  *  Java representation of a bpmn model for xml description.
@@ -364,6 +365,18 @@ public class MGpmnModel extends MProcess implements ICacheableModel, ILoadableCo
 				return "";
 			}
 		};
+	}
+
+	/**
+	 *  Get the properties.
+	 *  Arbitrary properties that can e.g. be used to
+	 *  define kernel-specific settings to configure tools. 
+	 *  @return The properties.
+	 */
+	public Properties	getProperties()
+	{
+		// Todo: implement me.
+		return new Properties();
 	}
 	
 	/**

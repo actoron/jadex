@@ -1,6 +1,7 @@
 package jadex.adapter.standalone;
 
 import jadex.adapter.base.DefaultResultListener;
+import jadex.adapter.standalone.service.componentexecution.ComponentExecutionService;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
@@ -394,7 +395,7 @@ public class MessageService implements IMessageService
 		
 		for(int i = 0; i < receivers.length; i++)
 		{
-			((IComponentExecutionService)platform.getService(IComponentExecutionService.class)).getComponentAdapter(receivers[i], new IResultListener()
+			((ComponentExecutionService)platform.getService(IComponentExecutionService.class)).getComponentAdapter(receivers[i], new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{

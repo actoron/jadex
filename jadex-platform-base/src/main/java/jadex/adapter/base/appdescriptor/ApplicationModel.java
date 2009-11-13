@@ -6,6 +6,7 @@ import jadex.bridge.IReport;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  *  Model representation of an application.
@@ -218,6 +219,18 @@ public class ApplicationModel implements ILoadableComponentModel
 		return filename;
 	}
 
+	/**
+	 *  Get the properties.
+	 *  Arbitrary properties that can e.g. be used to
+	 *  define kernel-specific settings to configure tools. 
+	 *  @return The properties.
+	 */
+	public Properties	getProperties()
+	{
+		// Todo: implement me.
+		return new Properties();
+	}
+	
 	/**
 	 *  Get the classloader.
 	 *  @return The classloader.

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -229,6 +230,18 @@ public class OAVCapabilityModel implements ILoadableComponentModel, ICacheableMo
 	public void	setLastChecked(long lastcheck)
 	{
 		this.lastcheck	= lastcheck;
+	}
+
+	/**
+	 *  Get the properties.
+	 *  Arbitrary properties that can e.g. be used to
+	 *  define kernel-specific settings to configure tools. 
+	 *  @return The properties.
+	 */
+	public Properties	getProperties()
+	{
+		// Todo: implement me.
+		return new Properties();
 	}
 	
 	/**

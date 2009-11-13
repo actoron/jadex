@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import java.util.Properties;
+
 
 /**
  *  This model interface to be used (invoked) by tools and adapters.
@@ -64,4 +66,12 @@ public interface ILoadableComponentModel
 	 *  @return The filename.
 	 */
 	public String getFilename();
+
+	/**
+	 *  Get the properties.
+	 *  Arbitrary properties that can e.g. be used to
+	 *  define kernel-specific settings to configure tools. 
+	 *  @return The properties.
+	 */
+	public Properties	getProperties();
 }
