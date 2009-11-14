@@ -58,6 +58,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbenchPart;
@@ -113,6 +114,12 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 	
 	/** The viewer/editor for parameter */ 
 	private TableViewer tableViewer;
+	
+	/** The table add element button */
+	private Button addButton;
+	
+	/** The table delete element button */
+	private Button delButton;
 
 	/** The activity (task) that holds task implementation class and parameters, may be null. */
 	private Activity activity;
@@ -176,7 +183,9 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 		classImplCombo.setText("");
 		classImplCombo.setEnabled(false);
 		
-		
+		tableViewer.setInput(null);
+		addButton.setEnabled(false);
+		delButton.setEnabled(false);
 	}
 
 	/**
@@ -209,9 +218,14 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 			}
 			
 			classImplCombo.select(0);
+			tableViewer.setInput(act);
 			
 		}
+		
 		classImplCombo.setEnabled(true);
+		addButton.setEnabled(true);
+		delButton.setEnabled(true);
+		
 	}
 	
 	/**
@@ -221,9 +235,16 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 	 */
 	private void updateActivtyEAnnotation(final String key, final String value)
 	{
+		// we can only update an activity
+		if(activity == null)
+		{
+			return;
+		}
+		
+		
 		// create the TransactionalCommand
 		ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
-				activity, "Modifying " + JadexProptertyConstants.JADEX_ACTIVITY_ANNOTATION)
+				activity, JadexBpmnDiagramMessages.ActivityParamterListSection_update_eannotation_command_name)
 		{
 			@Override
 			protected CommandResult doExecuteWithResult(
@@ -241,7 +262,7 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 				}
 				
 				annotation.getDetails().put(key, value);
-
+				
 				return CommandResult.newOKCommandResult();
 			}
 		};
@@ -290,15 +311,16 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 		GridLayout layout = new GridLayout(1, false);
 		taskComposite.setLayout(layout);
 		
-		getWidgetFactory().createCLabel(taskComposite, "Implementation class");
+		getWidgetFactory().createCLabel(taskComposite, JadexBpmnDiagramMessages.ActivityParameterListSection_ImplementationClass_label);
 
 		final CCombo combo = getWidgetFactory().createCCombo(taskComposite, SWT.NONE);
 		
 		GridData data = new GridData(SWT.FILL);
-		data.minimumWidth = 500;
-		data.widthHint = 500;
+		data.minimumWidth = 400;
+		data.widthHint = 400;
 		combo.setLayoutData(data);
 		
+		// FIXME: use real class names or get from runtime!
 		combo.setItems(new String[] { 
 				"Test.class", 
 				"SomeTask.class", 
@@ -376,6 +398,8 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 				| GridData.HORIZONTAL_ALIGN_FILL);
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
+		gridData.minimumHeight = 200;
+		gridData.heightHint = 200;
 		tableComposite.setLayoutData(gridData);
 		
 		GridData tableLayoutData = new GridData(GridData.FILL_BOTH);
@@ -384,7 +408,7 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 		tableLayoutData.horizontalSpan = 3;
 
 		// create the table
-		getWidgetFactory().createLabel(tableComposite, "Some Table Label Text");
+		getWidgetFactory().createLabel(tableComposite, JadexBpmnDiagramMessages.ActivityParameterListSection_ParameterTable_label);
 		TableViewer viewer = createTable(tableComposite, tableLayoutData);
 
 		// create cell modifier command
@@ -552,24 +576,27 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 										IAdaptable info)
 										throws ExecutionException
 								{
+									
+									List params = getTaskParameterList();
+									TaskParameter paramToChange = (TaskParameter) params.get(params.indexOf(param));
 
 									if (NAME_COLUMN.equals(fproperty))
 									{
-										param.setName((String) value);
+										paramToChange.setName((String) value);
 									}
 									else if (TYPE_COLUMN.equals(fproperty))
 									{
-										param.setType((String) value);
+										paramToChange.setType((String) value);
 									}
 									else if (VALUE_COLUMN.equals(fproperty))
 									{
-										param.setValue((String) value);
+										paramToChange.setValue((String) value);
 									}
 									else if (DIRECTION_COLUMN.equals(fproperty))
 									{
 										if (value instanceof Integer)
 										{
-											param
+											paramToChange
 													.setDirection(DIRECTION_VALUES[((Integer) value)
 																	.intValue()]);
 										}
@@ -580,8 +607,7 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 												"Invalid edit column");
 									}
 
-									
-									// XXX: implement EAnnotation Update!
+									updateTaskParameterList(params);
 									
 									return CommandResult.newOKCommandResult();
 								}
@@ -672,6 +698,7 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 				}
 			}
 		});
+		addButton = add;
 
 		// Create and configure the "Delete" button
 		Button delete = new Button(parent, SWT.PUSH | SWT.CENTER);
@@ -723,6 +750,7 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 				}
 			}
 		});
+		delButton = delete;
 	}
 	
 	// ---- converter and help methods ----
@@ -742,8 +770,21 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 				{
 					if (selElt instanceof EditPart)
 					{
-						((EditPart) selElt).refresh();
+						final EditPart part = (EditPart) selElt;
+						Display.getCurrent().asyncExec(new Runnable()
+						{
+							@Override
+							public void run()
+							{
+								part.refresh();
+							}
+						});
 					}
+					
+					//if (selElt instanceof EditPart)
+					//{
+					//	((EditPart) selElt).refresh();
+					//}
 				}
 		}
 	}
@@ -772,6 +813,17 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 	private void updateTaskParameterList(List<TaskParameter> params)
 	{
 		updateActivtyEAnnotation(JadexProptertyConstants.JADEX_ACTIVITY_TASK_PARAMETER_LIST, convertTaskParameterList(params));
+		
+		// HACK? Should use notification?
+		Display.getCurrent().asyncExec(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				tableViewer.refresh();
+			}
+		});
+		
 	}
 	
 	
@@ -782,20 +834,28 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 	 */
 	protected List<TaskParameter> convertTaskParameterString(String stringToConvert)
 	{
-		StringTokenizer listTokens = new StringTokenizer(stringToConvert, TaskParameter.LIST_ELEMENT_DELEMITER);
+		StringTokenizer listTokens = new StringTokenizer(stringToConvert, TaskParameter.LIST_ELEMENT_DELIMITER);
 		List<TaskParameter> params = new ArrayList<TaskParameter>(listTokens.countTokens());
 		int i = 0;
 		while (listTokens.hasMoreTokens())
 		{
-			StringTokenizer paramTokens = new StringTokenizer(listTokens.nextToken());
+			String paramElement = listTokens.nextToken();
+			StringTokenizer paramTokens = new StringTokenizer(paramElement,TaskParameter.PARAMETER_ELEMENT_DELIMITER);
 			// require 4 tokens: name, type, value, direction
 			if(paramTokens.countTokens() == 4)
 			{
-				String name = paramTokens.nextToken(TaskParameter.PARAMETER_ELEMENT_DELEMITER);
-				String type = paramTokens.nextToken(TaskParameter.PARAMETER_ELEMENT_DELEMITER);
-				String value = paramTokens.nextToken(TaskParameter.PARAMETER_ELEMENT_DELEMITER);
-				String direction = paramTokens.nextToken(TaskParameter.PARAMETER_ELEMENT_DELEMITER);
+				String name = paramTokens.nextToken();
+				String type = paramTokens.nextToken();
+				String value = paramTokens.nextToken();
+				String direction = paramTokens.nextToken();
 				params.add(new TaskParameter(name, type, value, direction));
+			}
+			else
+			{
+				BpmnDiagramEditorPlugin.getInstance().getLog().log(
+						new Status(IStatus.ERROR,
+								JadexBpmnEditor.ID, IStatus.ERROR,
+								JadexBpmnDiagramMessages.ActivityParameterListSection_WrongElementDelimiter_message + " \""+paramElement+"\"", null));
 			}
 			// update token index
 			i++;
@@ -815,15 +875,15 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 		{
 			if (buffer.length() != 0)
 			{
-				buffer.append(TaskParameter.LIST_ELEMENT_DELEMITER);
+				buffer.append(TaskParameter.LIST_ELEMENT_DELIMITER);
 			}
 			//buffer.append(TaskParameter.PARAMETER_ELEMENT_DELEMITER);
 			buffer.append(taskParameter.getName());
-			buffer.append(TaskParameter.PARAMETER_ELEMENT_DELEMITER);
+			buffer.append(TaskParameter.PARAMETER_ELEMENT_DELIMITER);
 			buffer.append(taskParameter.getType());
-			buffer.append(TaskParameter.PARAMETER_ELEMENT_DELEMITER);
+			buffer.append(TaskParameter.PARAMETER_ELEMENT_DELIMITER);
 			buffer.append(taskParameter.getValue());
-			buffer.append(TaskParameter.PARAMETER_ELEMENT_DELEMITER);
+			buffer.append(TaskParameter.PARAMETER_ELEMENT_DELIMITER);
 			buffer.append(taskParameter.getDirection());
 		}
 
@@ -846,6 +906,12 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 		 */
 		public Object[] getElements(Object inputElement)
 		{
+			if (inputElement instanceof Activity)
+			{
+				EAnnotation ea = ((Activity)inputElement).getEAnnotation(JadexProptertyConstants.JADEX_ACTIVITY_ANNOTATION);
+				inputElement = ea;
+			}
+			
 			if (inputElement instanceof EAnnotation)
 			{
 				String parameterListString = ((EAnnotation) inputElement).getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_TASK_PARAMETER_LIST);
@@ -926,9 +992,9 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 		
 		// ---- constants ----
 		
-		public static final String LIST_ELEMENT_DELEMITER = ",";
+		public static final String LIST_ELEMENT_DELIMITER = ",";
 		
-		public static final String PARAMETER_ELEMENT_DELEMITER = " ";
+		public static final String PARAMETER_ELEMENT_DELIMITER = "|";
 		
 		// ---- attributes ----
 		
@@ -993,9 +1059,9 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 		@Override
 		public String toString()
 		{
-			return name + PARAMETER_ELEMENT_DELEMITER + type
-					+ PARAMETER_ELEMENT_DELEMITER + value
-					+ PARAMETER_ELEMENT_DELEMITER + direction;
+			return name + PARAMETER_ELEMENT_DELIMITER + type
+					+ PARAMETER_ELEMENT_DELIMITER + value
+					+ PARAMETER_ELEMENT_DELIMITER + direction;
 		}
 		
 		// ---- getter / setter ----

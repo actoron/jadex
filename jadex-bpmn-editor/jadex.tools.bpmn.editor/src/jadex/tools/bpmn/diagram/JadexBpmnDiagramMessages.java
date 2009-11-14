@@ -46,4 +46,25 @@ public class JadexBpmnDiagramMessages extends NLS
 	 */
 	public static String ActivityParamterListSection_delete_command_name;
 	
+	/**
+	 * @generated NOT
+	 */
+	public static String ActivityParamterListSection_update_eannotation_command_name;
+	
+	/**
+	 * @generated NOT
+	 */
+	public static String ActivityParameterListSection_ParameterTable_label;
+	
+	/**
+	 * @generated NOT
+	 */
+	public static String ActivityParameterListSection_ImplementationClass_label;
+
+	/**
+	 * @generated NOT
+	 */
+	public static String ActivityParameterListSection_WrongElementDelimiter_message;
+	
+	
 }
