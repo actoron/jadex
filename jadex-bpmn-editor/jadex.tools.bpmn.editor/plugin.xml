@@ -34,25 +34,30 @@
      </propertyTabs>
    </extension>
    
-    <!-- the jadex common property section - ->
+    <!-- the jadex common property section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
               class="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection"
-              id="JadexSection"
+              id="jadex.tools.bpmn.editor.propertySection.Common"
               tab="Jadex">
+              
            <input type="org.eclipse.stp.bpmn.Identifiable"/>
+           <!-- use all EModelElements as input -->
+           <input type="org.eclipse.emf.ecore.EModelElement"/>
+           
         </propertySection>
      </propertySections>
-   </extension> -->
+   </extension>
    
    <!-- the jadex activity property section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
               class="jadex.tools.bpmn.editor.properties.JadexActivityPropertySection"
-              id="JadexSection"
-              tab="Jadex">
+              id="jadex.tools.bpmn.editor.propertySection.Activity"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.propertySection.Common">
            <input type="org.eclipse.stp.bpmn.Activity"/>
         </propertySection>
      </propertySections>
@@ -63,8 +68,9 @@
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
               class="jadex.tools.bpmn.editor.properties.JadexFlowPropertySection"
-              id="JadexSection"
-              tab="Jadex">
+              id="jadex.tools.bpmn.editor.propertySection.Flow"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.propertySection.Common">
            <input type="org.eclipse.stp.bpmn.SequenceEdge"/>
         </propertySection>
      </propertySections>

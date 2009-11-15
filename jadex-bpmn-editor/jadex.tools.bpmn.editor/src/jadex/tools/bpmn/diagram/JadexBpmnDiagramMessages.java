@@ -34,6 +34,16 @@ public class JadexBpmnDiagramMessages extends NLS
 	/**
 	 * @generated NOT
 	 */
+	public static String CommonSection_label_text;
+	
+	/**
+	 * @generated NOT
+	 */
+	public static String CommonSection_update_command_name;
+	
+	/**
+	 * @generated NOT
+	 */
 	public static String ActivityParamterListSection_update_command_name;
 	
 	/**
