@@ -1,7 +1,7 @@
 package jadex.bpmnbdi.task;
 
 import jadex.bdi.runtime.IInternalEvent;
-import jadex.bpmn.runtime.IProcessInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmnbdi.BpmnPlanBodyInstance;
@@ -18,7 +18,7 @@ public class InternalEventTask	implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public void execute(final ITaskContext context, IProcessInstance instance, final IResultListener listener)
+	public void execute(final ITaskContext context, BpmnInterpreter instance, final IResultListener listener)
 	{
 		try
 		{

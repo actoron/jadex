@@ -110,6 +110,9 @@ public class MBpmnModel extends MIdElement implements ICacheableModel, ILoadable
 	/** The context variables (name -> [class, initexpression]). */
 	protected Map	variables;
 	
+	/** The arguments. */
+	protected List arguments;
+	
 	//-------- model management --------
 	
 	/** The filename. */
@@ -814,15 +817,23 @@ public class MBpmnModel extends MIdElement implements ICacheableModel, ILoadable
 	}
 	
 	/**
+	 *  Add an argument.
+	 *  @param argument The argument.
+	 */
+	public void addArgument(IArgument argument)
+	{
+		if(arguments==null)
+			arguments = new ArrayList();
+		arguments.add(argument);
+	}
+	
+	/**
 	 *  Get the arguments.
 	 *  @return The arguments.
 	 */
 	public IArgument[] getArguments()
 	{		
-		// todo: 
-		
-		IArgument[] ret = new IArgument[0];
-		return ret;
+		return arguments==null? new IArgument[0]: (IArgument[])arguments.toArray(new IArgument[arguments.size()]);
 	}
 	
 	/**

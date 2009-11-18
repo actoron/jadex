@@ -1,6 +1,6 @@
 package jadex.bpmn.runtime.task;
 
-import jadex.bpmn.runtime.IProcessInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.concurrent.IResultListener;
@@ -16,7 +16,7 @@ public abstract class AbstractTask implements ITask
 	 *  @param instance	The process instance executing the task.
 	 *  @param listener	To be notified, when the task has completed.
 	 */
-	public void	execute(ITaskContext context, IProcessInstance instance, IResultListener listener)
+	public void	execute(ITaskContext context, BpmnInterpreter instance, IResultListener listener)
 	{
 		try
 		{
@@ -37,5 +37,5 @@ public abstract class AbstractTask implements ITask
 	 *  @param instance	The process instance executing the task.
 	 *  @throws	Exception When task execution fails.
 	 */
-	public abstract void	doExecute(ITaskContext context, IProcessInstance instance)	throws Exception;
+	public abstract void	doExecute(ITaskContext context, BpmnInterpreter instance)	throws Exception;
 }

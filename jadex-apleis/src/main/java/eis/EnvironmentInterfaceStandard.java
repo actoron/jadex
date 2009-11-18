@@ -394,7 +394,6 @@ public abstract class EnvironmentInterfaceStandard {
 		
 		// finally remove from registered list
 		registeredAgents.remove(agent);
-
 	}
 
 	

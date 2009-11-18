@@ -1,6 +1,6 @@
 package jadex.bpmn.examples.helloworld;
 
-import jadex.bpmn.runtime.IProcessInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
 
@@ -9,7 +9,7 @@ import jadex.bpmn.runtime.task.AbstractTask;
  */
 public class ExceptionTask extends AbstractTask
 {
-	public void doExecute(ITaskContext context, IProcessInstance instance)
+	public void doExecute(ITaskContext context, BpmnInterpreter instance)
 	{
 		throw new RuntimeException("Exception occurred.");
 	}

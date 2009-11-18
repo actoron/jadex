@@ -1,7 +1,7 @@
 package jadex.bpmn.examples.puzzle;
 
 import jadex.bdi.runtime.ICandidateInfo;
-import jadex.bpmn.runtime.IProcessInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
 import jadex.commons.SUtil;
@@ -16,7 +16,7 @@ public class ChooseMoveTask extends AbstractTask
 {
 	//-------- methods --------
 	
-	public void doExecute(ITaskContext context, IProcessInstance instance) throws Exception
+	public void doExecute(ITaskContext context, BpmnInterpreter instance) throws Exception
 	{
 		//System.out.println("Meta");
 		ICandidateInfo[] apps = (ICandidateInfo[])context.getParameterValue("applicables");

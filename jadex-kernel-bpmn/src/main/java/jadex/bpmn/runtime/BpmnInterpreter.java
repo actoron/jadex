@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  *  The micro agent interpreter is the connection between the agent platform 
  *  and a user-written micro agent. 
  */
-public class BpmnInterpreter implements IComponentInstance, IProcessInstance
+public class BpmnInterpreter implements IComponentInstance
 {
 	//-------- static part --------
 
@@ -161,6 +161,7 @@ public class BpmnInterpreter implements IComponentInstance, IProcessInstance
 		variables	= new HashMap();
 		variables.put("$platform", getComponentAdapter().getServiceContainer());
 		variables.put("$clock", getComponentAdapter().getServiceContainer().getService(IClockService.class));
+		variables.put("$args", this.arguments);
 		
 		Set	vars	= model.getContextVariables();
 		for(Iterator it=vars.iterator(); it.hasNext(); )

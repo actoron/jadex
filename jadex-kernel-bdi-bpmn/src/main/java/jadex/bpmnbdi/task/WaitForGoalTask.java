@@ -4,7 +4,7 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
-import jadex.bpmn.runtime.IProcessInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.concurrent.IResultListener;
@@ -17,7 +17,7 @@ public class WaitForGoalTask	implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public void execute(final ITaskContext context, IProcessInstance instance, final IResultListener listener)
+	public void execute(final ITaskContext context, BpmnInterpreter instance, final IResultListener listener)
 	{
 		try
 		{

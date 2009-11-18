@@ -12,6 +12,7 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bridge.IArgument;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
@@ -681,6 +682,15 @@ public class BpmnXMLReader
 					{
 						String imp = prop.substring(prop.indexOf("imports")+7).trim();
 						imports.add(imp);
+					}
+					else if(prop.startsWith("argument"))
+					{
+						String argstr = prop.substring(prop.indexOf("argument")+8).trim();
+						
+						String[]	imps	= (String[])imports.toArray(new String[imports.size()]);
+						IArgument arg = (IArgument)parser.parseExpression(argstr, imps, null, classloader).getValue(null);
+						
+						model.addArgument(arg);
 					}
 					else
 					{

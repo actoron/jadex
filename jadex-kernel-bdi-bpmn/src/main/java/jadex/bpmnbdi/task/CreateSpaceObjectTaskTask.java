@@ -1,7 +1,7 @@
 package jadex.bpmnbdi.task;
 
 import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.bpmn.runtime.IProcessInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.concurrent.IResultListener;
@@ -16,7 +16,7 @@ public class CreateSpaceObjectTaskTask	implements	ITask
 	/**
 	 *  Execute the task.
 	 */
-	public void execute(ITaskContext context, IProcessInstance instance, IResultListener listener)
+	public void execute(ITaskContext context, BpmnInterpreter instance, IResultListener listener)
 	{
 		try
 		{

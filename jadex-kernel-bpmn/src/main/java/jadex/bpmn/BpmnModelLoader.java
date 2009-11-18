@@ -48,4 +48,15 @@ public class BpmnModelLoader extends AbstractModelLoader
 	{
 		return (ICacheableModel)BpmnXMLReader.read(info, classloader);
 	}
+	
+	/**
+	 *  Set the class loader.
+	 *  @param classloader The class loader.
+	 */
+//	public synchronized void setClassLoader(ClassLoader classloader)
+//	{
+//		System.out.println("Classloader set: "+this+" "+classloader);
+//		this.classloader = classloader;
+//		modelcache.clear();
+//	}
 }

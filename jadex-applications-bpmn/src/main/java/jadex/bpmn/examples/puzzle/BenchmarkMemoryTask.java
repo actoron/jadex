@@ -1,6 +1,6 @@
 package jadex.bpmn.examples.puzzle;
 
-import jadex.bpmn.runtime.IProcessInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
 import jadex.bpmnbdi.BpmnPlanBodyInstance;
@@ -14,7 +14,7 @@ public class BenchmarkMemoryTask extends AbstractTask
 	/**
 	 * 	Execute the task.
 	 */
-	public void doExecute(ITaskContext context, IProcessInstance instance)
+	public void doExecute(ITaskContext context, BpmnInterpreter instance)
 	{
 		BpmnPlanBodyInstance	inst	= (BpmnPlanBodyInstance)instance;
 		if(inst.getBeliefbase().containsBelief("endmem"))

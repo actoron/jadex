@@ -145,7 +145,7 @@ public class BDIAgentFactory implements IComponentFactory
 		
 		try
 		{
-//			System.out.println("loading: "+filename);
+			System.out.println("loading bdi: "+filename);
 			OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, null);
 			return loaded;
 		}

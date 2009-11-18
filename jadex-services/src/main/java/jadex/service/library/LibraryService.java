@@ -380,6 +380,7 @@ public class LibraryService implements IService, ILibraryService
 	 */
 	private synchronized void fireURLAdded(URL url)
 	{
+		System.out.println("listeners: "+listeners);
 		for(Iterator it = listeners.iterator(); it.hasNext();)
 		{
 			ILibraryServiceListener listener = (ILibraryServiceListener)it.next();

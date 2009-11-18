@@ -1,6 +1,6 @@
 package jadex.bpmn.runtime.task;
 
-import jadex.bpmn.runtime.IProcessInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 
 /**
@@ -11,7 +11,7 @@ public class PrintTask extends AbstractTask
 	/**
 	 *  Execute the task.
 	 */
-	public void doExecute(ITaskContext context, IProcessInstance instance)
+	public void doExecute(ITaskContext context, BpmnInterpreter instance)
 	{
 		String text = (String)context.getParameterValue("text");
 		System.out.println(text);

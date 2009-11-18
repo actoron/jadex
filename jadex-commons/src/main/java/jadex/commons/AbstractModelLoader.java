@@ -150,6 +150,7 @@ public abstract class AbstractModelLoader
 	 */
 	public synchronized void setClassLoader(ClassLoader classloader)
 	{
+//		System.out.println("Classloader set: "+this+" "+classloader);
 		this.classloader = classloader;
 		modelcache.clear();
 	}

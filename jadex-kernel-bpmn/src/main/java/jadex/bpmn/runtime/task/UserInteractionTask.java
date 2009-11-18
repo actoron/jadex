@@ -2,7 +2,7 @@ package jadex.bpmn.runtime.task;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
-import jadex.bpmn.runtime.IProcessInstance;
+import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.SReflect;
@@ -47,7 +47,7 @@ public class UserInteractionTask implements ITask
 	 *  @param instance	The process instance executing the task.
 	 *  @listener	To be notified, when the task has completed.
 	 */
-	public void execute(final ITaskContext context, IProcessInstance instance, final IResultListener listener)
+	public void execute(final ITaskContext context, BpmnInterpreter instance, final IResultListener listener)
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
