@@ -1,6 +1,5 @@
 package com.daimler.client.gui.event;
 
-import jadex.wfms.client.GuiClient;
 import jadex.wfms.client.IWorkitem;
 
 import java.io.InputStream;
@@ -13,6 +12,8 @@ import javax.swing.JEditorPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.ChangedCharSetException;
 import javax.swing.text.html.HTMLEditorKit;
+
+import com.daimler.client.GuiClient;
 
 public class ShowInfoTaskSelectAction extends AbstractTaskSelectAction{
 

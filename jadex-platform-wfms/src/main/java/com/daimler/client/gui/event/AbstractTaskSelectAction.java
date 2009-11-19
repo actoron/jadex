@@ -1,6 +1,5 @@
 package com.daimler.client.gui.event;
 
-import jadex.wfms.client.GuiClient;
 import jadex.wfms.client.IWorkitem;
 
 import java.awt.Component;
@@ -11,6 +10,8 @@ import java.awt.event.ActionListener;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+
+import com.daimler.client.GuiClient;
 
 public abstract class AbstractTaskSelectAction extends AbstractAction
 {

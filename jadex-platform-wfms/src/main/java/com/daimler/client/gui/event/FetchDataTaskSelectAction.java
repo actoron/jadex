@@ -2,7 +2,6 @@ package com.daimler.client.gui.event;
 
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.ITaskContext;
-import jadex.wfms.client.GuiClient;
 import jadex.wfms.client.IWorkitem;
 
 import java.util.ArrayList;
@@ -13,6 +12,7 @@ import java.util.Map;
 
 import javax.swing.Action;
 
+import com.daimler.client.GuiClient;
 import com.daimler.client.gui.components.GuiDataScrollPanel;
 
 public class FetchDataTaskSelectAction extends AbstractTaskSelectAction{
