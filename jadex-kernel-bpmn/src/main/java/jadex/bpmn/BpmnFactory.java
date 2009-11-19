@@ -101,7 +101,7 @@ public class BpmnFactory implements IComponentFactory
 	public ILoadableComponentModel loadModel(String filename)
 	{
 		MBpmnModel ret = null;
-		System.out.println("filename: "+filename);
+//		System.out.println("filename: "+filename);
 		try
 		{
 			ret = loader.loadBpmnModel(filename, null);

@@ -378,9 +378,9 @@ public class LibraryService implements IService, ILibraryService
 	 *  Fires the class-path-added event
 	 *  @param path the new class path
 	 */
-	private synchronized void fireURLAdded(URL url)
+	protected synchronized void fireURLAdded(URL url)
 	{
-		System.out.println("listeners: "+listeners);
+//		System.out.println("listeners: "+listeners);
 		for(Iterator it = listeners.iterator(); it.hasNext();)
 		{
 			ILibraryServiceListener listener = (ILibraryServiceListener)it.next();
@@ -392,7 +392,7 @@ public class LibraryService implements IService, ILibraryService
 	 *  Fires the class-path-removed event
 	 *  @param path the removed class path
 	 */
-	private synchronized void fireURLRemoved(URL url)
+	protected synchronized void fireURLRemoved(URL url)
 	{
 		for(Iterator it = listeners.iterator(); it.hasNext();)
 		{

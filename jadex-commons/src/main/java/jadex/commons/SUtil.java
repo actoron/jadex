@@ -1045,6 +1045,10 @@ public class SUtil
 		if(ret==null)
 		{
 			URL url = classloader.getResource(name.startsWith("/") ? name.substring(1) : name);
+//			System.out.println("Classloader: "+classloader+" "+name+" "+url+" "+classloader.getParent());
+//			if(classloader instanceof URLClassLoader)
+//				System.out.println("URLs: "+SUtil.arrayToString(((URLClassLoader)classloader).getURLs()));
+				
 			if(url!=null)
 			{
 				// Local file from classpath.

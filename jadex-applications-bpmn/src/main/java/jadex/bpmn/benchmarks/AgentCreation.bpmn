@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_D9mhodQbEd6ZgonVFJzeWg" iD="_D9mhoNQbEd6ZgonVFJzeWg">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_ohj-EdQsEd6ZgonVFJzeWg" iD="_ohj-ENQsEd6ZgonVFJzeWg" name="package jadex.bpmn.benchmarks;&#xD;&#xA;&#xD;&#xA;import jadex.commons.*&#xD;&#xA;import jadex.bridge.*&#xD;&#xA;import jadex.bpmn.runtime.task.*&#xD;&#xA;import jadex.bpmn.model.*&#xD;&#xA;&#xD;&#xA;argument new Argument(&quot;max&quot;, &quot;The maximum numbers of agents to create.&quot;, &quot;int&quot;, new Integer(1000)) ">
+    <associations xmi:type="bpmn:Association" xmi:id="_r-Bd4NQsEd6ZgonVFJzeWg"/>
+  </artifacts>
+  <pools xmi:type="bpmn:Pool" xmi:id="_EA9-sdQbEd6ZgonVFJzeWg" iD="_EA9-sNQbEd6ZgonVFJzeWg" associations="_r-Bd4NQsEd6ZgonVFJzeWg" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_nFusgdQcEd6ZgonVFJzeWg" iD="_nFusgNQcEd6ZgonVFJzeWg" outgoingEdges="_WJi0AdQjEd6ZgonVFJzeWg" incomingEdges="_2jKY8dQeEd6ZgonVFJzeWg" name="Fetch and prepare arguments&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;out Integer num =  $args.get(&quot;num&quot;)!=null? (Integer)$args.get(&quot;num&quot;): new Integer(1)&#xD;&#xA;out Long startmem = $args.get(&quot;startmem&quot;)!=null? (Long)$args.get(&quot;startmem&quot;): new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())&#xD;&#xA;out Long starttime = $args.get(&quot;starttime&quot;)!=null? (Long)$args.get(&quot;starttime&quot;): new Long($clock.getTime())&#xD;&#xA;out int max = ((Integer)$args.get(&quot;max&quot;)).intValue()&#xD;&#xA;&#xD;&#xA;" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_185DIdQeEd6ZgonVFJzeWg" iD="_185DINQeEd6ZgonVFJzeWg" outgoingEdges="_2jKY8dQeEd6ZgonVFJzeWg" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_WJZDAdQjEd6ZgonVFJzeWg" iD="_WJZDANQjEd6ZgonVFJzeWg" outgoingEdges="_ZB1PwdQjEd6ZgonVFJzeWg _PYI8MdQkEd6ZgonVFJzeWg" incomingEdges="_WJi0AdQjEd6ZgonVFJzeWg" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ZBsF0dQjEd6ZgonVFJzeWg" iD="_ZBsF0NQjEd6ZgonVFJzeWg" outgoingEdges="_j5RMAdQmEd6ZgonVFJzeWg" incomingEdges="_ZB1PwdQjEd6ZgonVFJzeWg" name="Dispatch Subprocess and Wait For Result&#xD;&#xA;&#xD;&#xA;class=CreateComponentTask.class&#xD;&#xA;in String model = &quot;/jadex/bpmn/benchmarks/AgentCreation.bpmn&quot;&#xD;&#xA;" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_PX_yQdQkEd6ZgonVFJzeWg" iD="_PX_yQNQkEd6ZgonVFJzeWg" outgoingEdges="_D9m9IdQlEd6ZgonVFJzeWg" incomingEdges="_PYI8MdQkEd6ZgonVFJzeWg" name="Print Results Task" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_D9dzMdQlEd6ZgonVFJzeWg" iD="_D9dzMNQlEd6ZgonVFJzeWg" outgoingEdges="_i5jbcdQmEd6ZgonVFJzeWg" incomingEdges="_D9m9IdQlEd6ZgonVFJzeWg" name="Delete Peers" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_i5aRgdQmEd6ZgonVFJzeWg" iD="_i5aRgNQmEd6ZgonVFJzeWg" incomingEdges="_i5jbcdQmEd6ZgonVFJzeWg _j5RMAdQmEd6ZgonVFJzeWg" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_2jKY8dQeEd6ZgonVFJzeWg" iD="_2jKY8NQeEd6ZgonVFJzeWg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_WJi0AdQjEd6ZgonVFJzeWg" iD="_WJi0ANQjEd6ZgonVFJzeWg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ZB1PwdQjEd6ZgonVFJzeWg" iD="_ZB1PwNQjEd6ZgonVFJzeWg" name="num.intValue()&lt;max"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_PYI8MdQkEd6ZgonVFJzeWg" iD="_PYI8MNQkEd6ZgonVFJzeWg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_D9m9IdQlEd6ZgonVFJzeWg" iD="_D9m9INQlEd6ZgonVFJzeWg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_i5jbcdQmEd6ZgonVFJzeWg" iD="_i5jbcNQmEd6ZgonVFJzeWg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_j5RMAdQmEd6ZgonVFJzeWg" iD="_j5RMANQmEd6ZgonVFJzeWg"/>
+  </pools>
+</bpmn:BpmnDiagram>
