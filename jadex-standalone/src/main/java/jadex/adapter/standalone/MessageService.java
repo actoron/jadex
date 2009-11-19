@@ -103,33 +103,35 @@ public class MessageService implements IMessageService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	public void sendMessage(Map message, MessageType type, IComponentIdentifier sender, ClassLoader cl)
+	public void sendMessage(Map msg, MessageType type, IComponentIdentifier sender, ClassLoader cl)
 	{
 		if(sender==null)
-			throw new RuntimeException("Sender must not be null: "+message);
+			throw new RuntimeException("Sender must not be null: "+msg);
+	
+		Map msgcopy = new HashMap(msg);
 		
 		// Automatically add optional meta information.
 		String senid = type.getSenderIdentifier();
-		Object sen = message.get(senid);
+		Object sen = msgcopy.get(senid);
 		if(sen==null)
-			message.put(senid, sender);
+			msgcopy.put(senid, sender);
 		
 		String idid = type.getIdIdentifier();
-		Object id = message.get(idid);
+		Object id = msgcopy.get(idid);
 		if(id==null)
-			message.put(idid, SUtil.createUniqueId(sender.getLocalName()));
+			msgcopy.put(idid, SUtil.createUniqueId(sender.getLocalName()));
 
 		String sd = type.getTimestampIdentifier();
-		Object senddate = message.get(sd);
+		Object senddate = msgcopy.get(sd);
 		if(senddate==null)
 		{
 			IClockService	clock	= (IClockService) platform.getService(IClockService.class);
 			if(clock!=null)
-				message.put(sd, ""+clock.getTime());
+				msgcopy.put(sd, ""+clock.getTime());
 		}
 		
 		IComponentIdentifier[] receivers = null;
-		Object tmp = message.get(type.getReceiverIdentifier());
+		Object tmp = msgcopy.get(type.getReceiverIdentifier());
 		if(tmp instanceof Collection)
 			receivers = (IComponentIdentifier[])((Collection)tmp).toArray(new IComponentIdentifier[0]);
 		else
@@ -137,38 +139,38 @@ public class MessageService implements IMessageService
 		
 		if(receivers==null || receivers==new IComponentIdentifier[0])
 		{
-			throw new RuntimeException("Receivers must not be empty: "+message);
+			throw new RuntimeException("Receivers must not be empty: "+msgcopy);
 		}
 
 		// Conversion via platform specific codecs
-		for(Iterator it=message.keySet().iterator(); it.hasNext(); )
+		for(Iterator it=msgcopy.keySet().iterator(); it.hasNext(); )
 		{
 			String	name	= (String)it.next();
-			Object	value	= message.get(name);
-			IContentCodec	codec	= type.findContentCodec(DEFCODECS, message, name);
+			Object	value	= msgcopy.get(name);
+			IContentCodec	codec	= type.findContentCodec(DEFCODECS, msgcopy, name);
 			if(codec!=null)
 			{
-				message.put(name, codec.encode(value, cl));
+				msgcopy.put(name, codec.encode(value, cl));
 			}
 			else if(value!=null && !(value instanceof String) 
 				&& !(name.equals(type.getSenderIdentifier()) || name.equals(type.getReceiverIdentifier())))
 			{	
-				throw new ContentException("No content codec found for: "+name+", "+message);
+				throw new ContentException("No content codec found for: "+name+", "+msgcopy);
 			}
 		}
 
 		if(listeners!=null)
 		{
 			// Hack?!
-			IMessageAdapter msg = new DefaultMessageAdapter(message, type);
+			IMessageAdapter msgadapter = new DefaultMessageAdapter(msgcopy, type);
 			for(int i=0; i<listeners.size(); i++)
 			{
 				IMessageListener lis = (IMessageListener)listeners.get(i);
-				lis.messageSent(msg);
+				lis.messageSent(msgadapter);
 			}
 		}
 		
-		sendmsg.addMessage(message, type.getName(), receivers);
+		sendmsg.addMessage(msgcopy, type.getName(), receivers);
 	}
 
 	/**
