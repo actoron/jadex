@@ -77,13 +77,14 @@
    </extension> -->
    
    <!-- annotation decorator in diagram -->
+	<!--
 	<extension
         point="org.eclipse.stp.bpmn.diagram.EAnnotationDecorator">
      <decorator
            class="jadex.tools.bpmn.editor.properties.JadexActivityAnnotationDecorator"
            source="task"/>
   </extension>
-	
+	-->
 	
 	<!-- the default palette -->
    <extension point="org.eclipse.gmf.runtime.diagram.ui.paletteProviders">
