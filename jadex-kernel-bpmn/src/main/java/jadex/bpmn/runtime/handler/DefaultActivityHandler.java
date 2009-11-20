@@ -18,7 +18,7 @@ import java.util.List;
 public class DefaultActivityHandler implements IActivityHandler
 {	
 	/** Debug flag for printing. */
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 	
 	/**
 	 *  Execute an activity.

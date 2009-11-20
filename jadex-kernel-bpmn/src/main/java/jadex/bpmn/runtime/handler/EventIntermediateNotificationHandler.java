@@ -47,9 +47,9 @@ public class EventIntermediateNotificationHandler extends DefaultActivityHandler
 		IExternalNotifier ext = (IExternalNotifier)thread.getPropertyValue(PROPERTY_EXTERNALNOTIFIER);
 		if(ext!=null)
 			ext.activateWait(props, new Notifier(this, activity, instance, thread));
-		else
-			System.out.println("Warning, thread is waiting forever, no external notification system specified.");
+//		else
+//			System.out.println("Warning, thread is waiting forever, no external notification system specified.");
 		
-		System.out.println("Waiting for notification.");
+//		System.out.println("Waiting for notification.");
 	}
 }
