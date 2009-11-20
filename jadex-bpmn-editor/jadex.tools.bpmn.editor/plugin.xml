@@ -54,7 +54,8 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexActivityPropertySection"
+              class="jadex.tools.bpmn.editor.properties.JadexUserTaskActivityPropertySection"
+              filter="jadex.tools.bpmn.editor.properties.JadexUserTaskActivityFilter"
               id="jadex.tools.bpmn.editor.propertySection.Activity"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.propertySection.Common">

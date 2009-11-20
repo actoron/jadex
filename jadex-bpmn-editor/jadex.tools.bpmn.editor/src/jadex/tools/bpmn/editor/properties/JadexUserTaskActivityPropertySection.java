@@ -70,7 +70,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * 
  * @author Claas Altschaffel
  */
-public class JadexActivityPropertySection extends AbstractPropertySection
+public class JadexUserTaskActivityPropertySection extends AbstractPropertySection
 {
 
 	// ---- constants ----
@@ -287,13 +287,13 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 	 */
 	protected Composite createEmptyComposite(Composite parent)
 	{
-		Composite newComposite = getWidgetFactory().createComposite(parent, SWT.BORDER);
+		Composite newComposite = getWidgetFactory().createComposite(parent/*, SWT.BORDER*/);
 		
 		// The layout of the composite
 		GridLayout layout = new GridLayout(1, false);
 		newComposite.setLayout(layout);
 		
-		getWidgetFactory().createCLabel(newComposite, "---- empty composite ----");
+		//getWidgetFactory().createCLabel(newComposite, "---- empty composite ----");
 		
 		return newComposite;
 	}
@@ -305,7 +305,7 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 	 */
 	protected Composite createTaskClassComposite(Composite parent)
 	{
-		Composite taskComposite = getWidgetFactory().createComposite(parent, SWT.BORDER);
+		Composite taskComposite = getWidgetFactory().createComposite(parent/*, SWT.BORDER*/);
 		
 		// The layout of the task composite
 		GridLayout layout = new GridLayout(1, false);
@@ -387,7 +387,7 @@ public class JadexActivityPropertySection extends AbstractPropertySection
 	 */
 	protected TableViewer createParameterTableComposite(Composite parent)
 	{
-		Composite tableComposite = getWidgetFactory().createComposite(parent, SWT.BORDER);
+		Composite tableComposite = getWidgetFactory().createComposite(parent/*, SWT.BORDER*/);
 
 		// The layout of the table composite
 		GridLayout layout = new GridLayout(3, false);
