@@ -1,7 +1,6 @@
 package jadex.wfms.client.task;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.IProcessInstance;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
