@@ -1,5 +1,7 @@
 package jadex.bpmn.model;
 
+import jadex.commons.SUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -88,5 +90,14 @@ public class MNamedIdElement extends MIdElement
 	public boolean	hasPropertyValue(String name)
 	{
 		return properties!=null && properties.containsKey(name);
+	}
+	
+	/**
+	 *  Get all property names.
+	 *  @return All property names.
+	 */
+	public String[] getPropertyNames()
+	{
+		return properties!=null? (String[])properties.keySet().toArray(new String[properties.size()]): SUtil.EMPTY_STRING;
 	}
 }

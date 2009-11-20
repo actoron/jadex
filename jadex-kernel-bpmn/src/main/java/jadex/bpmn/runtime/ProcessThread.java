@@ -277,7 +277,7 @@ public class ProcessThread	implements ITaskContext
 	 *  Get the model element.
 	 *  @return	The model of the task.
 	 */
-	public MActivity	getModelElement()
+	public MActivity getModelElement()
 	{
 		return activity;
 	}
@@ -300,7 +300,7 @@ public class ProcessThread	implements ITaskContext
 	public void	setParameterValue(String name, Object value)
 	{
 		if(data==null)
-			data	= new HashMap();
+			data = new HashMap();
 			
 		data.put(name, value);
 	}
@@ -323,7 +323,7 @@ public class ProcessThread	implements ITaskContext
 	 *  @param name	The property name. 
 	 *  @return	The property value. 
 	 */
-	public Object	getPropertyValue(String name)
+	public Object getPropertyValue(String name)
 	{
 		return getPropertyValue(name, activity);
 	}
@@ -335,7 +335,7 @@ public class ProcessThread	implements ITaskContext
 	 *  @param name	The property name. 
 	 *  @return	The property value. 
 	 */
-	public Object	getPropertyValue(String name, MActivity activity)
+	public Object getPropertyValue(String name, MActivity activity)
 	{
 		assert activity!=null;
 		Object ret	= activity.getPropertyValue(name);
@@ -355,7 +355,7 @@ public class ProcessThread	implements ITaskContext
 	{
 		return activity.hasPropertyValue(name);
 	}
-
+	
 	/**
 	 *  Get the exception (if any).
 	 *  @return	The exception (if any).

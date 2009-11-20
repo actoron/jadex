@@ -23,17 +23,17 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	//-------- constants --------
 	
 	/** The type property message type identifies the meta type (e.g. fipa). */
-	// Hack!!! Required, because eclipse STP does not distinguish send/receive intermediate events.
 	public static final String	PROPERTY_MESSAGETYPE	= "messagetype";
 	
 	/** The type property identifies the application level type. */
-	// Hack!!! Required, because eclipse STP does not distinguish send/receive intermediate events.
 	public static final String	PROPERTY_TYPE	= "type";
 	
 	/** The filter property describes the filter for receiving a message. */
-	// Hack!!! Required, because eclipse STP does not distinguish send/receive intermediate events.
 	public static final String	PROPERTY_FILTER	= "filter";
 	
+	/** The property message is the message to be sent. */
+	public static final String	PROPERTY_MESSAGE = "message";
+
 	/** The mode property name (distinguishes send/receive events). */
 	// Hack!!! Required, because eclipse STP does not distinguish send/receive intermediate events.
 	public static final String	PROPERTY_MODE	= "mode";
@@ -46,11 +46,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	// Hack!!! Required, because eclipse STP does not distinguish send/receive intermediate events.
 	public static final String	MODE_RECEIVE	= "receive";
 	
-	/** The property message is the message to be sent. */
-	// Hack!!! Required, because eclipse STP does not distinguish send/receive intermediate events.
-	public static final String	PROPERTY_MESSAGE = "message";
-
-	
+	//-------- methods --------
 	
 	/**
 	 *  Execute an activity.

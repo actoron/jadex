@@ -6,6 +6,7 @@ import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMessageActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMultipleActivityHandler;
+import jadex.bpmn.runtime.handler.EventIntermediateNotificationHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateTimerActivityHandler;
 import jadex.bpmn.runtime.handler.GatewayParallelActivityHandler;
 import jadex.bpmn.runtime.handler.GatewayXORActivityHandler;
@@ -60,11 +61,13 @@ public class BpmnInterpreter implements IComponentInstance
 		defhandlers.put(MBpmnModel.EVENT_END_EMPTY, new DefaultActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_END_ERROR, new EventEndErrorActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_ERROR, new DefaultActivityHandler());
-		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new UserInteractionActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE, new EventIntermediateMessageActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE, new EventIntermediateMultipleActivityHandler());
-	
+		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL, new EventIntermediateNotificationHandler());
+//		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new UserInteractionActivityHandler());
+		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new EventIntermediateNotificationHandler());
+		
 		DEFAULT_HANDLERS = Collections.unmodifiableMap(defhandlers);
 	}
 	

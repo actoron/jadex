@@ -28,20 +28,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 		{
 			public void timeEventOccurred(long currenttime)
 			{
-				try
-				{
-					instance.invokeLater(new Runnable()
-					{
-						public void run()
-						{
-							EventIntermediateTimerActivityHandler.this.notify(activity, instance, thread, null);
-						}
-					});
-				}
-				catch(ComponentTerminatedException e)
-				{
-					// Ignore: Exception occurs in case of fatal error in component execution.
-				}
+				EventIntermediateTimerActivityHandler.this.notify(activity, instance, thread, null);
 			}
 		});
 		return ret;
