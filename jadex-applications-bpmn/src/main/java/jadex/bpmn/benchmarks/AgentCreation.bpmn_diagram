@@ -93,7 +93,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_ohtIA9QsEd6ZgonVFJzeWg"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_ohtIBNQsEd6ZgonVFJzeWg" lineColor="0"/>
     <element xmi:type="bpmn:TextAnnotation" href="AgentCreation.bpmn#_ohj-EdQsEd6ZgonVFJzeWg"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ohtIBdQsEd6ZgonVFJzeWg" x="16" y="550" width="588"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ohtIBdQsEd6ZgonVFJzeWg" x="37" y="578" width="588"/>
   </children>
   <styles xmi:type="notation:PageStyle" xmi:id="_D_NEIdQbEd6ZgonVFJzeWg"/>
   <styles xmi:type="notation:GuideStyle" xmi:id="_D_NEItQbEd6ZgonVFJzeWg"/>
