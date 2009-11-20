@@ -194,6 +194,10 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 	 */
 	protected void updateControls(Activity act)
 	{
+		// update the class values
+		String[] predefinedItems = getClassCompositeItemsForActivity(act);
+		classImplCombo.setItems(predefinedItems);
+		
 		EAnnotation ea = act.getEAnnotation(JadexProptertyConstants.JADEX_ACTIVITY_ANNOTATION);
 		if (ea != null)
 		{
@@ -320,12 +324,9 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 		data.widthHint = 400;
 		combo.setLayoutData(data);
 		
-		// FIXME: use real class names or get from runtime!
-		combo.setItems(new String[] { 
-				"Test.class", 
-				"SomeTask.class", 
-				"MessageTask.class", 
-				"OneMoreTestTask.class" });
+		
+		String[] items = getClassCompositeItemsForActivity(activity);
+		combo.setItems(items);
 		combo.setText(combo.getItem(0));
 		combo.addVerifyListener(new VerifyListener()
 		{
@@ -375,6 +376,21 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 		});
 		
 		return classImplCombo = combo;
+	}
+	
+	/**
+	 * Create the string array for class composite
+	 * @param act
+	 * @return
+	 */
+	protected String[] getClassCompositeItemsForActivity(Activity act)
+	{
+		// FIXME: use real class names or get from runtime!
+		return new String[] { 
+				"Test.class", 
+				"SomeTask.class", 
+				"MessageTask.class", 
+				"OneMoreTestTask.class" };
 	}
 	
 	/**
@@ -992,9 +1008,9 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 		
 		// ---- constants ----
 		
-		public static final String LIST_ELEMENT_DELIMITER = ",";
+		public static final String LIST_ELEMENT_DELIMITER = "<*>";
 		
-		public static final String PARAMETER_ELEMENT_DELIMITER = "|";
+		public static final String PARAMETER_ELEMENT_DELIMITER = "#|#";
 		
 		// ---- attributes ----
 		
