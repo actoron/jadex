@@ -20,6 +20,7 @@ public class SimLaunchService implements IService
 			{
 				BasicModelRepositoryService mr = (BasicModelRepositoryService) wfms.getService(IModelRepositoryService.class);
 				mr.addProcessModel("jadex/wfms/simulation/testflow/Credit_Workflow.bpmn");
+				mr.addProcessModel("jadex/wfms/simulation/testflow/testflow.gpmn");
 				new ClientSimulator((IClientService) wfms.getService(IClientService.class));
 			}
 		});

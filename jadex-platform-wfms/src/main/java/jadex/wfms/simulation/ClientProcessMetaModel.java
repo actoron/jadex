@@ -165,14 +165,10 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 			MGpmnModel gpmnModel = (MGpmnModel) processModel;
 			for (Iterator it = gpmnModel.getPlans().iterator(); it.hasNext(); )
 			{
-				MProcess proc = (MProcess) it.next();
-				for(Iterator it2 = proc.getPlans().iterator(); it2.hasNext(); )
-				{
-					MPlan plan = (MPlan) it2.next();
-					MBpmnModel bpmnModel = bpmnLoader.loadBpmnModel(plan.getBpmnPlan(), gpmnModel.getImports());
-					if (bpmnModel != null)
-						ret.add(bpmnModel);
-				}
+				MPlan plan = (MPlan) it.next();
+				MBpmnModel bpmnModel = bpmnLoader.loadBpmnModel(plan.getBpmnPlan(), gpmnModel.getImports());
+				if (bpmnModel != null)
+					ret.add(bpmnModel);
 			}
 		}
 		else if (processModel instanceof MBpmnModel)
