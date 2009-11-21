@@ -2,20 +2,16 @@ package jadex.wfms.service.impl;
 
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IChangeListener;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.concurrent.IResultListener;
-import jadex.wfms.IProcessModel;
-import jadex.wfms.IWfms;
-import jadex.wfms.client.IClient;
-import jadex.wfms.service.IClientService;
+import jadex.service.IServiceContainer;
 import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
+import jadex.wfms.service.IMonitoringService;
 import jadex.wfms.service.IWfmsClientService;
 
 import java.util.HashMap;
@@ -30,7 +26,7 @@ public class BpmnProcessService implements IExecutionService
 	//-------- attributes --------
 	
 	/** The WFMS */
-	protected IWfms wfms;
+	protected IServiceContainer wfms;
 	
 	/** Running process instances */
 	protected Map processes;
@@ -43,7 +39,7 @@ public class BpmnProcessService implements IExecutionService
 	/**
 	 *  Create a new BpmnProcessService.
 	 */
-	public BpmnProcessService(IWfms wfms)
+	public BpmnProcessService(IServiceContainer wfms)
 	{
 		this.wfms = wfms;
 		this.processes = new HashMap();
@@ -72,13 +68,13 @@ public class BpmnProcessService implements IExecutionService
 	 *  @param filename The file name.
 	 *  @return The process model.
 	 */
-	public IProcessModel loadModel(String filename, String[] imports)
+	public ILoadableComponentModel loadModel(String filename, String[] imports)
 	{
-		IProcessModel ret = null;
+		ILoadableComponentModel ret = null;
 		
 		try
 		{
-			ret = (IProcessModel) loader.loadBpmnModel(filename, imports);
+			ret = (ILoadableComponentModel) loader.loadBpmnModel(filename, imports);
 		}
 		catch(Exception e)
 		{
@@ -102,7 +98,7 @@ public class BpmnProcessService implements IExecutionService
 //			String path = mr.getProcessModelPath(modelname);
 			final MBpmnModel model = loader.loadBpmnModel(modelname, mr.getImports());
 			
-			wfms.getLogger().log(Level.INFO, "Starting BPMN process " + id.toString());
+			((IMonitoringService) wfms.getService(IMonitoringService.class)).getLogger().log(Level.INFO, "Starting BPMN process " + id.toString());
 			//final BpmnInterpreter instance = new BpmnInterpreter(adapter, model, arguments, config, handlers, fetcher);
 			final IComponentExecutionService ces = (IComponentExecutionService)wfms.getService(IComponentExecutionService.class);
 			//instance.setWfms(wfms);
@@ -120,7 +116,7 @@ public class BpmnProcessService implements IExecutionService
 							{
 								processes.remove(id);
 								
-								wfms.getLogger().log(Level.INFO, "Finished BPMN process " + id.toString());
+								((IMonitoringService) wfms.getService(IMonitoringService.class)).getLogger().log(Level.INFO, "Finished BPMN process " + id.toString());
 								((IWfmsClientService) wfms.getService(IWfmsClientService.class)).fireProcessFinished(id.toString());
 							}
 						}
@@ -138,7 +134,7 @@ public class BpmnProcessService implements IExecutionService
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					wfms.getLogger().log(Level.SEVERE, "Failed to start model: " + model.getFilename());
+					((IMonitoringService) wfms.getService(IMonitoringService.class)).getLogger().log(Level.SEVERE, "Failed to start model: " + model.getFilename());
 				}
 			}, null);
 		}

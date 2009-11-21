@@ -1,7 +1,7 @@
 package jadex.wfms.service;
 
+import jadex.bridge.ILoadableComponentModel;
 import jadex.service.IService;
-import jadex.wfms.IProcessModel;
 
 import java.util.Map;
 
@@ -16,7 +16,7 @@ public interface IExecutionService extends IService
 	 *  @param imports The imports.
 	 *  @return The process model.
 	 */
-	public IProcessModel loadModel(String filename, String[] imports);
+	public ILoadableComponentModel loadModel(String filename, String[] imports);
 	
 	/**
 	 *  Create a new process.

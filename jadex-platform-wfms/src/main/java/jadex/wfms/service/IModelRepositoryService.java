@@ -1,7 +1,7 @@
 package jadex.wfms.service;
 
+import jadex.bridge.ILoadableComponentModel;
 import jadex.service.IService;
-import jadex.wfms.IProcessModel;
 
 import java.util.Collection;
 /**
@@ -67,7 +67,7 @@ public interface IModelRepositoryService extends IService
 	 *  @param name The model name.
 	 *  @return The process model.
 	 */
-	public IProcessModel getProcessModel(String name);
+	public ILoadableComponentModel getProcessModel(String name);
 	
 	/**
 	 *  Get the imports.

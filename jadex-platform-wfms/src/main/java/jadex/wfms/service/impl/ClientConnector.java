@@ -1,11 +1,11 @@
 package jadex.wfms.service.impl;
 
 import jadex.commons.concurrent.IResultListener;
-import jadex.wfms.IWfms;
+import jadex.service.IServiceContainer;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
-import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.IWfmsListener;
+import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.ProcessFinishedEvent;
 import jadex.wfms.client.Workitem;
 import jadex.wfms.client.WorkitemQueueChangeEvent;
@@ -30,13 +30,13 @@ import java.util.Set;
 public class ClientConnector implements IClientService, IWfmsClientService
 {
 	
-	private IWfms wfms;
+	private IServiceContainer wfms;
 	
 	private Map workitemQueues;
 	
 	private Set wfmsListeners;
 	
-	public ClientConnector(IWfms wfms)
+	public ClientConnector(IServiceContainer wfms)
 	{
 		this.wfms = wfms;
 		workitemQueues = new HashMap();

@@ -1,11 +1,14 @@
 package jadex.wfms.service.impl;
 
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IServiceContainer;
 import jadex.wfms.IProcess;
-import jadex.wfms.IProcessModel;
-import jadex.wfms.IWfms;
+import jadex.wfms.service.IBpmnProcessService;
 import jadex.wfms.service.IExecutionService;
+import jadex.wfms.service.IGpmnProcessService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +21,7 @@ public class MetaExecutionService implements IExecutionService
 	//-------- attributes --------
 	
 	/** The WFMS */
-	protected IWfms wfms;
+	protected IServiceContainer wfms;
 	
 	/** The execution services. */
 	protected List exeservices;
@@ -26,7 +29,7 @@ public class MetaExecutionService implements IExecutionService
 	/** Running process instances (id -> IProcess) */
 	protected Map processes;
 	
-	/** Counter for instances of processes (IProcessModel -> num)*/
+	/** Counter for instances of processes (ILoadableComponentModel -> num)*/
 	protected Map instancecnt;
 	
 	//-------- constructors --------
@@ -34,14 +37,19 @@ public class MetaExecutionService implements IExecutionService
 	/**
 	 *  Create a new execution service.
 	 */
-	public MetaExecutionService(IWfms wfms, List exeservices)
+	public MetaExecutionService(IServiceContainer wfms)
 	{
 		this.processes = new HashMap();
 		this.wfms = wfms;
 		
-		if(exeservices==null || exeservices.size()==0)
-			throw new RuntimeException("Meta execution service needs at least one sub service.");
-		this.exeservices = exeservices;
+		//TODO: hack!
+		this.exeservices = new ArrayList();
+		this.exeservices.add(wfms.getService(IBpmnProcessService.class));
+		this.exeservices.add(wfms.getService(IGpmnProcessService.class));
+		
+		//if(exeservices==null || exeservices.size()==0)
+			//throw new RuntimeException("Meta execution service needs at least one sub service.");
+		//this.exeservices = exeservices;
 	}
 	
 	//-------- methods --------
@@ -66,9 +74,9 @@ public class MetaExecutionService implements IExecutionService
 	 *  @param filename The file name.
 	 *  @return The process model.
 	 */
-	public IProcessModel loadModel(String filename, String[] imports)
+	public ILoadableComponentModel loadModel(String filename, String[] imports)
 	{
-		IProcessModel ret = null;
+		ILoadableComponentModel ret = null;
 		
 		for(int i=0; ret==null && i<exeservices.size(); i++)
 		{

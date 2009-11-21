@@ -1,25 +1,23 @@
 package jadex.wfms.service.impl;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import jadex.bpmn.model.MBpmnModel;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.concurrent.IResultListener;
-import jadex.gpmn.model.MGpmnModel;
-import jadex.wfms.IProcessModel;
-import jadex.wfms.IWfms;
+import jadex.service.IServiceContainer;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IAAAService;
 import jadex.wfms.service.IExecutionService;
-import jadex.wfms.service.IProcessDefinitionService;
 import jadex.wfms.service.IModelRepositoryService;
+import jadex.wfms.service.IProcessDefinitionService;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ProcessDefinitionConnector implements IProcessDefinitionService
 {
 	/** The WFMS */
-	private IWfms wfms;
+	private IServiceContainer wfms;
 	
-	public ProcessDefinitionConnector(IWfms wfms)
+	public ProcessDefinitionConnector(IServiceContainer wfms)
 	{
 		this.wfms = wfms;
 	}
@@ -58,7 +56,7 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	 * @param name name of the model
 	 * @return the model
 	 */
-	public IProcessModel getProcessModel(IClient client, String name)
+	public ILoadableComponentModel getProcessModel(IClient client, String name)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_PROCESS_MODEL))
 			return null;
@@ -72,7 +70,7 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	 * @param path path of the model
 	 * @return the model
 	 */
-	public IProcessModel loadProcessModel(IClient client, String path, String[] imports)
+	public ILoadableComponentModel loadProcessModel(IClient client, String path, String[] imports)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_PROCESS_MODEL))
 			return null;

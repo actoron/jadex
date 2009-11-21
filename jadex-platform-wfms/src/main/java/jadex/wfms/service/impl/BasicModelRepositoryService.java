@@ -1,20 +1,15 @@
 package jadex.wfms.service.impl;
 
+import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.concurrent.IResultListener;
+import jadex.service.IServiceContainer;
+import jadex.wfms.service.IExecutionService;
+import jadex.wfms.service.IModelRepositoryService;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-
-import jadex.bpmn.BpmnModelLoader;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.commons.concurrent.IResultListener;
-import jadex.wfms.IProcessModel;
-import jadex.wfms.IWfms;
-import jadex.wfms.client.IClient;
-import jadex.wfms.service.IExecutionService;
-import jadex.wfms.service.IModelRepositoryService;
 
 /**
  * Basic Model Repository Service implementation
@@ -23,7 +18,7 @@ import jadex.wfms.service.IModelRepositoryService;
 public class BasicModelRepositoryService implements IModelRepositoryService
 {
 	/** The wfms. */
-	protected IWfms wfms;
+	protected IServiceContainer wfms;
 	
 	/** The imports */
 	private String[] imports;
@@ -41,10 +36,11 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 //	private BpmnModelLoader loader;
 	
 	
-	public BasicModelRepositoryService(IWfms wfms, String[] imports)
+	public BasicModelRepositoryService(IServiceContainer wfms)
 	{
 		this.wfms = wfms;
-		this.imports = imports;
+		// TODO: Hack! Needs proper imports...
+		this.imports = new String[0];
 		this.models = new HashMap();
 //		this.loader = new BpmnModelLoader();
 //		bpmnModels = new HashMap();
@@ -180,7 +176,7 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 		// todo check access
 		
 		IExecutionService ex = (IExecutionService)wfms.getService(IExecutionService.class);
-		IProcessModel model = ex.loadModel(filename, imports);
+		ILoadableComponentModel model = ex.loadModel(filename, imports);
 		String modelName = model.getName();
 		if (modelName == null)
 		{
@@ -195,9 +191,9 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 	 *  @param name The model name.
 	 *  @return The process model.
 	 */
-	public IProcessModel getProcessModel(String name)
+	public ILoadableComponentModel getProcessModel(String name)
 	{
-		return (IProcessModel)models.get(name);
+		return (ILoadableComponentModel)models.get(name);
 	}
 	
 	/**

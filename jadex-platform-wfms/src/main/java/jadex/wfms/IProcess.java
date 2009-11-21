@@ -1,5 +1,7 @@
 package jadex.wfms;
 
+import jadex.bridge.ILoadableComponentModel;
+
 /**
  *  Interface for process instances.
  */
@@ -15,5 +17,5 @@ public interface IProcess
 	 *  Get the process model.
 	 *  @return The process model.
 	 */
-	public IProcessModel getModel();
+	public ILoadableComponentModel getModel();
 }

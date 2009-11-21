@@ -126,11 +126,53 @@
 			</property>
 			
 			<property type="jadex.bridge.IComponentFactory" name="bpmn_factory">
-				new jadex.wfms.service.loader.BpmnFactory($platform)
+				new jadex.bpmn.BpmnFactory($platform)
 			</property>
 			
 			<property type="jadex.bridge.IComponentFactory" name="gpmn_factory">
-				new jadex.wfms.service.loader.GpmnFactory($platform)
+				new jadex.gpmn.GpmnFactory($platform)
+			</property>
+			
+			<!-- WFMS Services -->
+			
+			<property type="jadex.wfms.service.IModelRepositoryService" name="wfms_model_repository">
+				new jadex.wfms.service.impl.BasicModelRepositoryService($platform)
+			</property>
+			
+			<property type="jadex.wfms.service.IAAAService" name="wfms_AAA_service">
+				jadex.wfms.service.impl.BasicAAAService.getTestService()
+			</property>
+			
+			<property type="jadex.wfms.service.IBpmnProcessService" name="wfms_bpmn_service">
+				new jadex.wfms.service.impl.BpmnProcessService($platform)
+			</property>
+			
+			<property type="jadex.wfms.service.IGpmnProcessService" name="wfms_gpmn_service">
+				new jadex.wfms.service.impl.GpmnProcessService($platform)
+			</property>
+			
+			<property type="jadex.wfms.service.IExecutionService" name="wfms_execution_service">
+				new jadex.wfms.service.impl.MetaExecutionService($platform)
+			</property>
+			
+			<property type="jadex.wfms.service.IMonitoringService" name="wfms_monitoring_service">
+				new jadex.wfms.service.impl.MonitoringService($platform)
+			</property>
+			
+			<property type="jadex.wfms.service.IProcessDefinitionService" name="wfms_process_definition">
+				new jadex.wfms.service.impl.ProcessDefinitionConnector($platform)
+			</property>
+			
+			<property type="jadex.wfms.service.IClientService" name="wfms_client_service">
+				new jadex.wfms.service.impl.ClientConnector($platform)
+			</property>
+			
+			<property type="jadex.wfms.service.IWfmsClientService" name="wfms_wfmsclient_service">
+				$platform.getService(jadex.wfms.service.IClientService.class)
+			</property>
+			
+			<property type="jadex.wfms.service.impl.SimLaunchService" name="wfms_simlaunch">
+				new jadex.wfms.service.impl.SimLaunchService($platform)
 			</property>
 			
 			<!-- <property type="jadex.bridge.IComponentFactory" name="gpmn_factory">

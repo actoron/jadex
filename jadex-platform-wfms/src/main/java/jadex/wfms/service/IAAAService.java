@@ -2,8 +2,6 @@ package jadex.wfms.service;
 
 import jadex.service.IService;
 import jadex.wfms.client.IClient;
-import jadex.wfms.client.IWorkitem;
-import jadex.wfms.client.IWfmsListener;
 
 import java.util.Set;
 

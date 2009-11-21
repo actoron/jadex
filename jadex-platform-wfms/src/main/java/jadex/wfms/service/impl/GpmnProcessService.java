@@ -4,12 +4,13 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.concurrent.IResultListener;
 import jadex.gpmn.GpmnXMLReader;
+import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
-import jadex.wfms.IProcessModel;
-import jadex.wfms.IWfms;
 import jadex.wfms.service.IExecutionService;
+import jadex.wfms.service.IMonitoringService;
 import jadex.wfms.service.IWfmsClientService;
 
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public class GpmnProcessService implements IExecutionService
 	//-------- attributes --------
 	
 	/** The WFMS */
-	protected IWfms wfms;
+	protected IServiceContainer wfms;
 
 	/** The created processes. (processid -> agentid) */
 	protected Map processes;
@@ -34,7 +35,7 @@ public class GpmnProcessService implements IExecutionService
 	/**
 	 *  Create a new GpmnProcessService.
 	 */
-	public GpmnProcessService(IWfms wfms)
+	public GpmnProcessService(IServiceContainer wfms)
 	{
 		this.wfms = wfms;
 		this.processes = new HashMap();
@@ -114,12 +115,12 @@ public class GpmnProcessService implements IExecutionService
 	 *  @param filename The file name.
 	 *  @return The process model.
 	 */
-	public IProcessModel loadModel(String filename, String[] imports)
+	public ILoadableComponentModel loadModel(String filename, String[] imports)
 	{
-		IProcessModel ret = null;
+		ILoadableComponentModel ret = null;
 		try
 		{
-			ret = (IProcessModel) GpmnXMLReader.read(filename, ((ILibraryService)wfms.getService(ILibraryService.class)).getClassLoader(), null);
+			ret = (ILoadableComponentModel) GpmnXMLReader.read(filename, ((ILibraryService)wfms.getService(ILibraryService.class)).getClassLoader(), null);
 		}
 		catch(Exception e)
 		{
@@ -152,7 +153,7 @@ public class GpmnProcessService implements IExecutionService
 						{
 							processes.remove(id);
 							
-							wfms.getLogger().log(Level.INFO, "Finished GPMN process " + id.toString());
+							((IMonitoringService) wfms.getService(IMonitoringService.class)).getLogger().log(Level.INFO, "Finished GPMN process " + id.toString());
 							((IWfmsClientService) wfms.getService(IWfmsClientService.class)).fireProcessFinished(id.toString());
 						}
 					}
@@ -170,7 +171,7 @@ public class GpmnProcessService implements IExecutionService
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				wfms.getLogger().log(Level.SEVERE, "Failed to start model: " + name);
+				((IMonitoringService) wfms.getService(IMonitoringService.class)).getLogger().log(Level.SEVERE, "Failed to start model: " + name);
 			}
 		}, null);
 		

@@ -1,12 +1,19 @@
 package jadex.wfms.service;
 
 import java.util.logging.Handler;
+import java.util.logging.Logger;
 
 import jadex.service.IService;
 import jadex.wfms.client.IClient;
 
 public interface IMonitoringService extends IService
 {
+	/**
+	 * Returns the logger.
+	 * @return the logger
+	 */
+	public Logger getLogger();
+	
 	/**
 	 * Adds a log handler to the workflow management system.
 	 * 

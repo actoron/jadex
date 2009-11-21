@@ -1,21 +1,24 @@
 package jadex.wfms.service.impl;
 
 import jadex.commons.concurrent.IResultListener;
-import jadex.wfms.IWfms;
+import jadex.service.IServiceContainer;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IAAAService;
 import jadex.wfms.service.IMonitoringService;
 
 import java.security.AccessControlException;
 import java.util.logging.Handler;
+import java.util.logging.Logger;
 
 public class MonitoringService implements IMonitoringService
 {
-	private IWfms wfms;
+	private IServiceContainer wfms;
+	private Logger logger;
 	
-	public MonitoringService(IWfms wfms)
+	public MonitoringService(IServiceContainer wfms)
 	{
 		this.wfms = wfms;
+		this.logger = Logger.getLogger("Wfms");
 	}
 	
 	/**
@@ -34,6 +37,15 @@ public class MonitoringService implements IMonitoringService
 	}
 	
 	/**
+	 * Returns the logger.
+	 * @return the logger
+	 */
+	public Logger getLogger()
+	{
+		return logger;
+	}
+	
+	/**
 	 * Adds a log handler to the workflow management system.
 	 * 
 	 * @param client the client
@@ -43,7 +55,7 @@ public class MonitoringService implements IMonitoringService
 	{
 		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_LOG_HANDLER))
 			throw new AccessControlException("Not allowed: "+client);
-		wfms.getLogger().addHandler(handler);
+		logger.addHandler(handler);
 	}
 	
 	/**
@@ -56,6 +68,6 @@ public class MonitoringService implements IMonitoringService
 	{
 		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REMOVE_LOG_HANDLER))
 			throw new AccessControlException("Not allowed: "+client);
-		wfms.getLogger().removeHandler(handler);
+		logger.removeHandler(handler);
 	}
 }
