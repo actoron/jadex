@@ -93,13 +93,15 @@ public class StringTextField extends JFormattedTextField implements
 		{
 			obj = getText();
 		}
-		try
+		//TODO: HACK!
+		//try
 		{
-			value = format.parseObject((String) obj.toString());
-		} catch (ParseException e)
+			//value = format.parseObject((String) obj.toString());
+			value = String.valueOf(obj);
+		}/* catch (ParseException e)
 		{
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	public void removeUpdate(DocumentEvent evt)

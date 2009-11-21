@@ -70,6 +70,7 @@ public class GuiClient implements IClient
 		taskMapping = new HashMap();
 		helpBrowser = new GuiHelpBrowser();
 		initMainFrame();
+		clientService.authenticate(this);
 		clientService.addWfmsListener(new ConnectorController());
 		synchronized (clientService)
 		{
@@ -123,6 +124,8 @@ public class GuiClient implements IClient
 					if (workitem.equals(currentActivity))
 						return;
 					IClientActivity oldActive = currentActivity;
+					//TODO:HACK!!
+					currentActivity = (IClientActivity) workitem;
 					currentActivity = clientService.beginActivity(GuiClient.this, workitem);
 					if (currentActivity == null)
 					{
@@ -286,11 +289,11 @@ public class GuiClient implements IClient
 		taskMapping.put(workitem, taskAction);
 		taskPanel.repaint();
 		taskPanel.updateUI();
-		if (emptyLabel.equals(scrollPane.getViewport().getView()))
+		/*if (emptyLabel.equals(scrollPane.getViewport().getView()))
 		{
 			ActionEvent a = new ActionEvent(this, 0, "");
 			taskAction.actionPerformed(a);
-		}
+		}*/
 	}
 	
 	private void removeWorkitem(IWorkitem workitem)

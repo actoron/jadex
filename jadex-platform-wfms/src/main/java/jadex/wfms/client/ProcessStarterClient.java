@@ -25,7 +25,7 @@ public class ProcessStarterClient extends JFrame implements IClient
 		setLayout(new GridBagLayout());
 		setTitle("Process Starter");
 		this.clientService = clntService;
-		
+		clientService.authenticate(this);
 		processList = new JList(new DefaultListModel());
 		for (Iterator it = clientService.getProcessDefinitionService(this).getProcessModelNames(this).iterator(); it.hasNext(); )
 			((DefaultListModel) processList.getModel()).addElement(it.next());
