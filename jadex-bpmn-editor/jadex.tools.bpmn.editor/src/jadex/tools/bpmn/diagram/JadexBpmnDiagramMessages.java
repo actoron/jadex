@@ -21,7 +21,7 @@ public class JadexBpmnDiagramMessages extends NLS
 	 */
 	static
 	{
-		NLS.initializeMessages("jadexdiagrammessages", JadexBpmnDiagramMessages.class); //$NON-NLS-1$
+		NLS.initializeMessages("JadexBpmnDiagramMessages", JadexBpmnDiagramMessages.class); //$NON-NLS-1$
 	}
 
 	/**
@@ -44,22 +44,22 @@ public class JadexBpmnDiagramMessages extends NLS
 	/**
 	 * @generated NOT
 	 */
-	public static String ActivityParamterListSection_update_command_name;
+	public static String JadexUserTaskActivityPropertySection_update_command_name;
 	
 	/**
 	 * @generated NOT
 	 */
-	public static String ActivityParamterListSection_add_command_name;
+	public static String JadexUserTaskActivityPropertySection_add_command_name;
 	
 	/**
 	 * @generated NOT
 	 */
-	public static String ActivityParamterListSection_delete_command_name;
+	public static String JadexUserTaskActivityPropertySection_delete_command_name;
 	
 	/**
 	 * @generated NOT
 	 */
-	public static String ActivityParamterListSection_update_eannotation_command_name;
+	public static String JadexUserTaskActivityPropertySection_update_eannotation_command_name;
 	
 	/**
 	 * @generated NOT
