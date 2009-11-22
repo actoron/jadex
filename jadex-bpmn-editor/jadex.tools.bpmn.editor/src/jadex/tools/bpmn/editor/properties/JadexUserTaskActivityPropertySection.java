@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EAnnotation;
-import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression;
 import org.eclipse.gef.EditPart;
@@ -921,19 +920,13 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 			{
 				EAnnotation ea = ((Activity)inputElement).getEAnnotation(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
 				inputElement = ea;
-				System.out.println("Updated input element with "+inputElement);
 			}
 			
 			if (inputElement instanceof EAnnotation)
 			{
 				String parameterListString = ((EAnnotation) inputElement).getDetails().get(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL);
-				
-				System.out.println("parameterListString= "+parameterListString);
-				
 				return convertTaskParameterString(parameterListString).toArray();
 			}
-			
-			System.out.println("return null object[]= ");
 			
 			return new Object[] {};
 			//return new Object[] { new TaskParameter("name", "type", "value", "inout") };
