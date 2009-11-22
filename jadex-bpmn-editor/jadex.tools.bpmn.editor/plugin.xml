@@ -68,7 +68,7 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexGeneralParameterTablePropertySection"
+              class="jadex.tools.bpmn.editor.properties.JadexIntermediateEventsParameterSection"
               filter="jadex.tools.bpmn.editor.properties.JadexIntermediateEventsFilter"
               id="jadex.tools.bpmn.editor.propertySection.GatewayActivity"
               tab="Jadex"
@@ -78,18 +78,18 @@
      </propertySections>
    </extension>
    
-   <!-- the jadex flow property section - ->
+   <!-- the jadex sequence property section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexFlowPropertySection"
-              id="jadex.tools.bpmn.editor.propertySection.Flow"
+              class="jadex.tools.bpmn.editor.properties.JadexSequenceMappingSection"
+              id="jadex.tools.bpmn.editor.propertySection.Sequence"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.propertySection.Common">
            <input type="org.eclipse.stp.bpmn.SequenceEdge"/>
         </propertySection>
      </propertySections>
-   </extension> -->
+   </extension>
    
    <!-- annotation decorator in diagram -->
 	<!--

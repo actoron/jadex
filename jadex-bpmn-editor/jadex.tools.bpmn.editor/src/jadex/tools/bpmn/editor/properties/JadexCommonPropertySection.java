@@ -159,60 +159,7 @@ public class JadexCommonPropertySection extends AbstractPropertySection
 	
 	// ---- common helper methods ----
 	
-	/**
-	 * Update 
-	 * @param key
-	 * @param value
-	 */
-	protected static boolean updateJadexEAnnotation(final EModelElement element, final String key, final String value)
-	{
-		// we can only update an activity
-		if(element == null)
-		{
-			return false;
-		}
-		
-		
-		// create the TransactionalCommand
-		ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
-				element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
-		{
-			@Override
-			protected CommandResult doExecuteWithResult(
-					IProgressMonitor arg0, IAdaptable arg1)
-					throws ExecutionException
-			{
-				EAnnotation annotation = element.getEAnnotation(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
-				if (annotation == null)
-				{
-					annotation = EcoreFactory.eINSTANCE.createEAnnotation();
-					annotation.setSource(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
-					annotation.setEModelElement(element);
-					annotation.getDetails().put(JadexCommonPropertySection.JADEX_ACTIVITY_CLASS_DETAIL, ""); //$NON-NLS-1$
-					annotation.getDetails().put(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL, ""); //$NON-NLS-1$
-				}
-				
-				annotation.getDetails().put(key, value);
-				
-				return CommandResult.newOKCommandResult();
-			}
-		};
-		// execute command
-		try
-		{
-			IStatus status = command.execute(new NullProgressMonitor(), null);
-			return status.isOK();
-		}
-		catch (ExecutionException exception)
-		{
-			JadexBpmnPlugin.getDefault().getLog().log(
-					new Status(IStatus.ERROR, JadexBpmnPlugin.PLUGIN_ID,
-							IStatus.ERROR, exception.getMessage(),
-							exception));
-			
-			return false;
-		}
-	}
+	
 	
 	/**
 	 * Dummy method for empty composites

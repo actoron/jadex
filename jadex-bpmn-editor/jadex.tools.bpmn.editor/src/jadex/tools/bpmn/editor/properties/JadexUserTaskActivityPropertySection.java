@@ -5,7 +5,8 @@ package jadex.tools.bpmn.editor.properties;
 
 import jadex.tools.bpmn.diagram.Messages;
 import jadex.tools.bpmn.editor.JadexBpmnEditor;
-import jadex.tools.bpmn.editor.properties.JadexGeneralParameterTablePropertySection.GeneralParameter;
+import jadex.tools.bpmn.editor.JadexBpmnPlugin;
+import jadex.tools.bpmn.editor.properties.JadexAbstractParameterTablePropertySection.GeneralParameter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +16,11 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EAnnotation;
+import org.eclipse.emf.ecore.EModelElement;
+import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
@@ -241,15 +245,54 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 	 * @param key
 	 * @param value
 	 */
-	private void updateActivtyEAnnotation(final String key, final String value)
+	protected boolean updateJadexEAnnotation(final String key, final String value)
 	{
 		// we can only update an activity
 		if(activity == null)
 		{
-			return;
+			return false;
 		}
 		
-		JadexCommonPropertySection.updateJadexEAnnotation(activity, key, value);
+		
+		// create the TransactionalCommand
+		ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
+				activity, Messages.JadexCommonPropertySection_update_eannotation_command_name)
+		{
+			@Override
+			protected CommandResult doExecuteWithResult(
+					IProgressMonitor arg0, IAdaptable arg1)
+					throws ExecutionException
+			{
+				EAnnotation annotation = activity.getEAnnotation(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
+				if (annotation == null)
+				{
+					annotation = EcoreFactory.eINSTANCE.createEAnnotation();
+					annotation.setSource(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
+					annotation.setEModelElement(activity);
+					annotation.getDetails().put(JadexCommonPropertySection.JADEX_ACTIVITY_CLASS_DETAIL, ""); //$NON-NLS-1$
+					annotation.getDetails().put(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL, ""); //$NON-NLS-1$
+				}
+				
+				annotation.getDetails().put(key, value);
+				
+				return CommandResult.newOKCommandResult();
+			}
+		};
+		// execute command
+		try
+		{
+			IStatus status = command.execute(new NullProgressMonitor(), null);
+			return status.isOK();
+		}
+		catch (ExecutionException exception)
+		{
+			JadexBpmnPlugin.getDefault().getLog().log(
+					new Status(IStatus.ERROR, JadexBpmnPlugin.PLUGIN_ID,
+							IStatus.ERROR, exception.getMessage(),
+							exception));
+			
+			return false;
+		}
 	}
 
 	// ---- control creation methods ----
@@ -323,7 +366,7 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 			@Override
 			public void modifyText(ModifyEvent e)
 			{
-				updateActivtyEAnnotation(JadexCommonPropertySection.JADEX_ACTIVITY_CLASS_DETAIL, combo.getText());
+				updateJadexEAnnotation(JadexCommonPropertySection.JADEX_ACTIVITY_CLASS_DETAIL, combo.getText());
 			}
 		});
 		
@@ -780,7 +823,7 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 	 */
 	private void updateTaskParameterList(List<TaskParameter> params)
 	{
-		updateActivtyEAnnotation(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL, convertTaskParameterList(params));
+		updateJadexEAnnotation(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL, convertTaskParameterList(params));
 		
 		// HACK? Should use notification?
 		Display.getCurrent().asyncExec(new Runnable()

@@ -5,6 +5,7 @@ package jadex.tools.bpmn.editor.properties;
 
 import jadex.tools.bpmn.diagram.Messages;
 import jadex.tools.bpmn.editor.JadexBpmnEditor;
+import jadex.tools.bpmn.editor.JadexBpmnPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +15,11 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EModelElement;
+import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.gmf.runtime.common.ui.services.util.CommonLabelProvider;
@@ -57,7 +60,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * 
  * @author Claas Altschaffel
  */
-public class JadexGeneralParameterTablePropertySection extends AbstractPropertySection
+public abstract class JadexAbstractParameterTablePropertySection extends AbstractPropertySection
 {
 
 	// ---- constants ----
@@ -89,6 +92,29 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 
 	/** The modelElement (task) that holds task implementation class and parameters, may be null. */
 	private EModelElement modelElement;
+
+	/* JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION */
+	/** The EAnnotations name that contains the table information as detail */
+	private String containerEAnnotationName;
+	
+	/* Messages.JadexCommonParameterListSection_ParameterTable_Label */
+	/** The label string for the tableViewer */
+	private String tableViewerLabel;
+	
+	
+	// ---- constructor ----
+	
+	/**
+	 * Protected constructor for subclasses
+	 * @param containerEAnnotationName the {@link EAnnotation} that holds this parameter table
+	 */
+	protected JadexAbstractParameterTablePropertySection(String containerEAnnotationName, String tableLabel)
+	{
+		super();
+		this.containerEAnnotationName = containerEAnnotationName;
+		this.tableViewerLabel = tableLabel;
+	}
+
 
 	// ---- methods ----
 
@@ -156,15 +182,53 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 	 * @param key
 	 * @param value
 	 */
-	private void updateJadexEAnnotation(final String key, final String value)
+	protected boolean updateJadexEAnnotation(final String key, final String value)
 	{
-		// we can only update an modelElement
+		// we can only update an activity
 		if(modelElement == null)
 		{
-			return;
+			return false;
 		}
 		
-		JadexCommonPropertySection.updateJadexEAnnotation(modelElement, key, value);
+		
+		// create the TransactionalCommand
+		ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
+				modelElement, Messages.JadexCommonPropertySection_update_eannotation_command_name)
+		{
+			@Override
+			protected CommandResult doExecuteWithResult(
+					IProgressMonitor arg0, IAdaptable arg1)
+					throws ExecutionException
+			{
+				EAnnotation annotation = modelElement.getEAnnotation(containerEAnnotationName);
+				if (annotation == null)
+				{
+					annotation = EcoreFactory.eINSTANCE.createEAnnotation();
+					annotation.setSource(containerEAnnotationName);
+					annotation.setEModelElement(modelElement);
+					annotation.getDetails().put(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL, ""); //$NON-NLS-1$
+				}
+				
+				annotation.getDetails().put(key, value);
+				
+				return CommandResult.newOKCommandResult();
+			}
+		};
+		// execute command
+		try
+		{
+			IStatus status = command.execute(new NullProgressMonitor(), null);
+			return status.isOK();
+		}
+		catch (ExecutionException exception)
+		{
+			JadexBpmnPlugin.getDefault().getLog().log(
+					new Status(IStatus.ERROR, JadexBpmnPlugin.PLUGIN_ID,
+							IStatus.ERROR, exception.getMessage(),
+							exception));
+			
+			return false;
+		}
 	}
 
 	// ---- control creation methods ----
@@ -200,7 +264,7 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 		tableLayoutData.horizontalSpan = 3;
 
 		// create the table
-		getWidgetFactory().createLabel(tableComposite, Messages.JadexCommonParameterListSection_ParameterTable_Label);
+		getWidgetFactory().createLabel(tableComposite, tableViewerLabel);
 		TableViewer viewer = createTable(tableComposite, tableLayoutData);
 
 		// create cell modifier command
@@ -543,7 +607,7 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 	 */
 	private List<GeneralParameter> getParameterList()
 	{
-		EAnnotation ea = modelElement.getEAnnotation(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
+		EAnnotation ea = modelElement.getEAnnotation(containerEAnnotationName);
 		if (ea != null)
 		{
 			String value = (String) ea.getDetails().get(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL);
@@ -650,7 +714,7 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 		{
 			if (inputElement instanceof EModelElement)
 			{
-				EAnnotation ea = ((EModelElement)inputElement).getEAnnotation(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
+				EAnnotation ea = ((EModelElement)inputElement).getEAnnotation(containerEAnnotationName);
 				inputElement = ea;
 			}
 			
