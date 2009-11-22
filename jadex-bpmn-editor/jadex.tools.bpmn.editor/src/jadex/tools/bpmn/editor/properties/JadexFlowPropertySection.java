@@ -75,7 +75,7 @@ public class JadexFlowPropertySection extends AbstractPropertySection
 		someOtherText.setLayoutData(gd);
 
 		someText.addModifyListener(new ModifyJadexInformation(JadexCommonPropertySection.JADEX_FLOW_EXAMPLE_ANNOTATION, someText));
-		someOtherText.addModifyListener(new ModifyJadexInformation(JadexCommonPropertySection.JADEX_FLOW_PARAMETER_MAPPING_LIST, someOtherText));
+		someOtherText.addModifyListener(new ModifyJadexInformation(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL, someOtherText));
 
 	}
 
@@ -98,7 +98,7 @@ public class JadexFlowPropertySection extends AbstractPropertySection
 			if (unknownInput instanceof Activity)
 			{
 				Activity elt = (Activity) unknownInput;
-				EAnnotation ea = elt.getEAnnotation(JadexCommonPropertySection.JADEX_FLOW_ANNOTATION);
+				EAnnotation ea = elt.getEAnnotation(JadexCommonPropertySection.JADEX_SEQUENCE_ANNOTATION);
 				if (ea != null)
 				{
 					someText.setText((String) ea.getDetails().get(JadexCommonPropertySection.JADEX_ACTIVITY_CLASS_DETAIL));

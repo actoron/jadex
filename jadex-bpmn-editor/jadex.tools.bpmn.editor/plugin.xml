@@ -64,7 +64,7 @@
      </propertySections>
    </extension>
    
-   <!-- the jadex gateway activity property section -->
+   <!-- the jadex intermediate events activity property section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection

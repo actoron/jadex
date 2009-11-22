@@ -106,6 +106,9 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 	
 	
 	// ---- attributes ----
+	
+	/** The composite that holds the section parts */
+	private Composite sectionComposite;
 
 	/** The Combo for implementing class */
 	private CCombo classImplCombo;
@@ -132,17 +135,20 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 			TabbedPropertySheetPage aTabbedPropertySheetPage)
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
+		
+		sectionComposite = getWidgetFactory().createComposite(parent);
+		
 		GridLayout layout = new GridLayout(2, true);
-		parent.setLayout(layout);
-
+		sectionComposite.setLayout(layout);
 		
-		createTaskClassComposite(parent);
-
-		JadexCommonPropertySection.createEmptyComposite(parent, this);
-
-		createParameterTableComposite(parent);
 		
-		JadexCommonPropertySection.createEmptyComposite(parent, this);
+		createTaskClassComposite(sectionComposite);
+
+		JadexCommonPropertySection.createEmptyComposite(sectionComposite, this);
+
+		createParameterTableComposite(sectionComposite);
+		
+		JadexCommonPropertySection.createEmptyComposite(sectionComposite, this);
 
 	}
 
@@ -219,10 +225,11 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 			}
 			
 			classImplCombo.select(0);
-			tableViewer.setInput(act);
+			
 			
 		}
 		
+		tableViewer.setInput(act);
 		classImplCombo.setEnabled(true);
 		addButton.setEnabled(true);
 		delButton.setEnabled(true);
@@ -871,14 +878,22 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 			{
 				EAnnotation ea = ((Activity)inputElement).getEAnnotation(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
 				inputElement = ea;
+				System.out.println("Updated input element with "+inputElement);
 			}
 			
 			if (inputElement instanceof EAnnotation)
 			{
 				String parameterListString = ((EAnnotation) inputElement).getDetails().get(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL);
+				
+				System.out.println("parameterListString= "+parameterListString);
+				
 				return convertTaskParameterString(parameterListString).toArray();
 			}
-			return new Object[] { null };
+			
+			System.out.println("return null object[]= ");
+			
+			return new Object[] {};
+			//return new Object[] { new TaskParameter("name", "type", "value", "inout") };
 		}
 
 		/**

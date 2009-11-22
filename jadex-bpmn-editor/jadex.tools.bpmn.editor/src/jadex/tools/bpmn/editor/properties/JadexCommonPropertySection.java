@@ -40,11 +40,14 @@ public class JadexCommonPropertySection extends AbstractPropertySection
 
 	// ---- constants ----
 	
-	/** Key for the common annotations of all shapes. */
+	/** Key for the common annotations of all shapes. NOT USED? */
 	public static final String JADEX_COMMON_ANNOTATION = "common";
 	
 	/** Key for the annotation from the activity shape. */
-	public static final String JADEX_ACTIVITY_ANNOTATION = "task";
+	public static final String JADEX_ACTIVITY_ANNOTATION = "activity";
+	
+	/** Key for the annotation from the flow connector. */
+	public static final String JADEX_SEQUENCE_ANNOTATION = "sequence";
 	
 	
 	/** Key for the implementing class of a task. */
@@ -52,13 +55,7 @@ public class JadexCommonPropertySection extends AbstractPropertySection
 	
 	/** Key for the parameter map of a task. */
 	public static final String JADEX_PARAMETER_LIST_DETAIL = "prameter";
-	
-	
-	/** Key for the annotation from the flow connector. */
-	public static final String JADEX_FLOW_ANNOTATION = "flow";
 
-	/** Key for the parameter map of a task. */
-	public static final String JADEX_FLOW_PARAMETER_MAPPING_LIST = "parameter";
 	
 	/** Key for the parameter map of a task. */
 	public static final String JADEX_FLOW_EXAMPLE_ANNOTATION = "example";

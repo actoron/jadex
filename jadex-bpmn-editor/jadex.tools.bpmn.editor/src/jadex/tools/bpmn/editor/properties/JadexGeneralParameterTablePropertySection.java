@@ -75,6 +75,9 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 	
 	// ---- attributes ----
 
+	/** The composite that holds the section parts */
+	private Composite sectionComposite;
+	
 	/** The viewer/editor for parameter */ 
 	private TableViewer tableViewer;
 	
@@ -98,7 +101,12 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
 		
-		createParameterTableComposite(parent);
+		sectionComposite = getWidgetFactory().createComposite(parent);
+		
+		GridLayout layout = new GridLayout(2, true);
+		sectionComposite.setLayout(layout);
+		
+		createParameterTableComposite(sectionComposite);
 	}
 
 	
@@ -122,10 +130,10 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 			}
 			if (unknownInput instanceof EModelElement)
 			{
-				EModelElement act = (EModelElement) unknownInput;
-				modelElement = (EModelElement) act;
+				EModelElement elm = (EModelElement) unknownInput;
+				modelElement = (EModelElement) elm;
 				
-				tableViewer.setInput(act);
+				tableViewer.setInput(elm);
 				addButton.setEnabled(true);
 				delButton.setEnabled(true);
 				
@@ -221,7 +229,6 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 
 		viewer.getTable().setLinesVisible(true);
 		viewer.getTable().setHeaderVisible(true);
-
 		viewer.getTable().setLayoutData(tableLayoutData);
 
 		Font tableFont = viewer.getTable().getFont();
@@ -334,7 +341,7 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 										throws ExecutionException
 								{
 									
-									List params = getTaskParameterList();
+									List params = getParameterList();
 									GeneralParameter paramToChange = (GeneralParameter) params.get(params.indexOf(param));
 
 									if (NAME_COLUMN.equals(fproperty))
@@ -352,7 +359,7 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 												Messages.JadexCommonPropertySection_InvalidEditColumn_Message);
 									}
 
-									updateGeneralParameterList(params);
+									updateParameterList(params);
 									
 									return CommandResult.newOKCommandResult();
 								}
@@ -421,9 +428,9 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 					{
 						GeneralParameter newElement = new GeneralParameter("name", "expression");
 
-						List params = getTaskParameterList();
+						List params = getParameterList();
 						params.add(newElement);
-						updateGeneralParameterList(params);
+						updateParameterList(params);
 						
 						return CommandResult.newOKCommandResult(newElement);
 					}
@@ -473,9 +480,9 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 						GeneralParameter element = (GeneralParameter) ((IStructuredSelection) tableViewer
 								.getSelection()).getFirstElement();
 						
-						List params = getTaskParameterList();
+						List params = getParameterList();
 						params.remove(element);
-						updateGeneralParameterList(params);
+						updateParameterList(params);
 						
 						return CommandResult.newOKCommandResult(null);
 					}
@@ -534,13 +541,13 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 	 * @param act
 	 * @return
 	 */
-	private List<GeneralParameter> getTaskParameterList()
+	private List<GeneralParameter> getParameterList()
 	{
 		EAnnotation ea = modelElement.getEAnnotation(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
 		if (ea != null)
 		{
 			String value = (String) ea.getDetails().get(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL);
-			return convertGeneralParameterString(value);
+			return convertParameterString(value);
 		}
 		
 		return new ArrayList<GeneralParameter>(0);
@@ -550,9 +557,9 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 	 * Updates the EAnnotation for the modelElement task parameter list
 	 * @param params
 	 */
-	private void updateGeneralParameterList(List<GeneralParameter> params)
+	private void updateParameterList(List<GeneralParameter> params)
 	{
-		updateJadexEAnnotation(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL, convertTaskParameterList(params));
+		updateJadexEAnnotation(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL, convertParameterList(params));
 		
 		// HACK? Should use notification?
 		Display.getCurrent().asyncExec(new Runnable()
@@ -572,7 +579,7 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 	 * @param stringToConvert
 	 * @return
 	 */
-	protected List<GeneralParameter> convertGeneralParameterString(String stringToConvert)
+	protected List<GeneralParameter> convertParameterString(String stringToConvert)
 	{
 		StringTokenizer listTokens = new StringTokenizer(stringToConvert, JadexCommonPropertySection.LIST_ELEMENT_DELIMITER);
 		List<GeneralParameter> params = new ArrayList<GeneralParameter>(listTokens.countTokens());
@@ -581,7 +588,7 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 		{
 			String paramElement = listTokens.nextToken();
 			StringTokenizer paramTokens = new StringTokenizer(paramElement,JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-			// require 4 tokens: name, type, value, direction
+			// require 2 tokens: name, value
 			if(paramTokens.countTokens() == 2)
 			{
 				String name = paramTokens.nextToken();
@@ -606,7 +613,7 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 	 * @param arrayToConvert
 	 * @return
 	 */
-	protected String convertTaskParameterList(List<GeneralParameter> params)
+	protected String convertParameterList(List<GeneralParameter> params)
 	{
 		StringBuffer buffer = new StringBuffer();
 		for (GeneralParameter generalParameter : params)
@@ -650,9 +657,11 @@ public class JadexGeneralParameterTablePropertySection extends AbstractPropertyS
 			if (inputElement instanceof EAnnotation)
 			{
 				String parameterListString = ((EAnnotation) inputElement).getDetails().get(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL);
-				return convertGeneralParameterString(parameterListString).toArray();
+				return convertParameterString(parameterListString).toArray();
 			}
-			return new Object[] { null };
+			
+			return new Object[] {};
+			//return new Object[] { new GeneralParameter("name", "expression") };
 		}
 
 		/**
