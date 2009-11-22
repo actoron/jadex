@@ -4,18 +4,9 @@
 package jadex.tools.bpmn.editor.properties;
 
 import jadex.tools.bpmn.diagram.Messages;
-import jadex.tools.bpmn.editor.JadexBpmnPlugin;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EModelElement;
-import org.eclipse.emf.ecore.EcoreFactory;
-import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -40,6 +31,9 @@ public class JadexCommonPropertySection extends AbstractPropertySection
 
 	// ---- constants ----
 	
+	/** Key for the global package/import annotations of the BPMN diagram. */
+	public static final String JADEX_GLOBAL_ANNOTATION = null;
+	
 	/** Key for the common annotations of all shapes. NOT USED? */
 	public static final String JADEX_COMMON_ANNOTATION = "common";
 	
@@ -50,12 +44,19 @@ public class JadexCommonPropertySection extends AbstractPropertySection
 	public static final String JADEX_SEQUENCE_ANNOTATION = "sequence";
 	
 	
+	/** Key for the imports of a BPMN diagram. */
+	public static final String JADEX_IMPORT_LIST_DETAIL = "imports";
+	
 	/** Key for the implementing class of a task. */
 	public static final String JADEX_ACTIVITY_CLASS_DETAIL = "class";
 	
-	/** Key for the parameter map of a task. */
+	/** Key for the parameter map of a activity. */
 	public static final String JADEX_PARAMETER_LIST_DETAIL = "prameter";
 
+	/** Key for the mapping map of a sequence edge. */
+	public static final String JADEX_MAPPING_LIST_DETAIL = "mapping";
+	
+	
 	
 	/** Key for the parameter map of a task. */
 	public static final String JADEX_FLOW_EXAMPLE_ANNOTATION = "example";
@@ -67,6 +68,10 @@ public class JadexCommonPropertySection extends AbstractPropertySection
 	
 	/** String delimiter for element attributes */
 	public static final String LIST_ELEMENT_ATTRIBUTE_DELIMITER = "#|#";
+
+	
+
+	
 
 	
 	
@@ -151,6 +156,7 @@ public class JadexCommonPropertySection extends AbstractPropertySection
 			}
 		}
 		selectedElement = null;
+		
 		//implText.setText("");
 		//parameterText.setText("");
 		//implText.setEnabled(false);

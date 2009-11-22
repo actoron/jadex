@@ -60,20 +60,15 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * 
  * @author Claas Altschaffel
  */
-public abstract class JadexAbstractParameterTablePropertySection extends AbstractPropertySection
+public abstract class JadexAbstract1ColumnTablePropertySection extends AbstractPropertySection
 {
 
 	// ---- constants ----
 	
 	/**
-	 * the name column label
-	 */
-	private final static String NAME_COLUMN = "Name"; // //$NON-NLS-1$
-	
-	/**
 	 * the value column label
 	 */
-	private final static String VALUE_COLUMN = "Expression"; // //$NON-NLS-1$
+	private final static String VALUE_COLUMN = "Value"; // //$NON-NLS-1$
 
 	
 	// ---- attributes ----
@@ -97,6 +92,10 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 	/** The EAnnotations name that contains the table information as detail */
 	private String containerEAnnotationName;
 	
+	/* JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL */
+	/** The EAnnotations detail that contains the information */
+	private String annotationDetailName;
+	
 	/* Messages.JadexCommonParameterListSection_ParameterTable_Label */
 	/** The label string for the tableViewer */
 	private String tableViewerLabel;
@@ -108,10 +107,11 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 	 * Protected constructor for subclasses
 	 * @param containerEAnnotationName the {@link EAnnotation} that holds this parameter table
 	 */
-	protected JadexAbstractParameterTablePropertySection(String containerEAnnotationName, String tableLabel)
+	protected JadexAbstract1ColumnTablePropertySection(String containerEAnnotationName, String annotationDetailName, String tableLabel)
 	{
 		super();
 		this.containerEAnnotationName = containerEAnnotationName;
+		this.annotationDetailName = annotationDetailName;
 		this.tableViewerLabel = tableLabel;
 	}
 
@@ -129,7 +129,7 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 		
 		sectionComposite = getWidgetFactory().createComposite(parent);
 		
-		GridLayout layout = new GridLayout(2, true);
+		GridLayout layout = new GridLayout();
 		sectionComposite.setLayout(layout);
 		
 		createParameterTableComposite(sectionComposite);
@@ -206,7 +206,7 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 					annotation = EcoreFactory.eINSTANCE.createEAnnotation();
 					annotation.setSource(containerEAnnotationName);
 					annotation.setEModelElement(modelElement);
-					annotation.getDetails().put(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL, ""); //$NON-NLS-1$
+					annotation.getDetails().put(annotationDetailName, ""); //$NON-NLS-1$
 				}
 				
 				annotation.getDetails().put(key, value);
@@ -284,8 +284,8 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 	 */
 	private TableViewer createTable(Composite parent, GridData tableLayoutData)
 	{
-		String[] columns = new String[] { NAME_COLUMN, VALUE_COLUMN };
-		int[] columnWeight = new int[] { 1, 3 };
+		String[] columns = new String[] { VALUE_COLUMN };
+		int[] columnWeight = new int[] { 1 };
 
 		// the displayed table
 		TableViewer viewer = new TableViewer(getWidgetFactory().createTable(parent,
@@ -328,7 +328,6 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 
 		// Create the cell editors
 		CellEditor[] editors = new CellEditor[] {
-				new TextCellEditor(viewer.getTable()), // name (text)
 				new TextCellEditor(viewer.getTable()) // value
 		};
 		viewer.setCellEditors(editors);
@@ -359,10 +358,6 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 				if (element instanceof GeneralParameter)
 				{
 					GeneralParameter param = (GeneralParameter) element;
-					if (NAME_COLUMN.equals(property))
-					{
-						return param.getName();
-					}
 
 					if (VALUE_COLUMN.equals(property))
 					{
@@ -408,12 +403,7 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 									List params = getParameterList();
 									GeneralParameter paramToChange = (GeneralParameter) params.get(params.indexOf(param));
 
-									if (NAME_COLUMN.equals(fproperty))
-									{
-										paramToChange.setName((String) value);
-									}
-									
-									else if (VALUE_COLUMN.equals(fproperty))
+									if (VALUE_COLUMN.equals(fproperty))
 									{
 										paramToChange.setValue((String) value);
 									}
@@ -490,7 +480,7 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 							IProgressMonitor monitor, IAdaptable info)
 							throws ExecutionException
 					{
-						GeneralParameter newElement = new GeneralParameter("name", "expression");
+						GeneralParameter newElement = new GeneralParameter("new value");
 
 						List params = getParameterList();
 						params.add(newElement);
@@ -610,7 +600,7 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 		EAnnotation ea = modelElement.getEAnnotation(containerEAnnotationName);
 		if (ea != null)
 		{
-			String value = (String) ea.getDetails().get(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL);
+			String value = (String) ea.getDetails().get(annotationDetailName);
 			return convertParameterString(value);
 		}
 		
@@ -623,7 +613,7 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 	 */
 	private void updateParameterList(List<GeneralParameter> params)
 	{
-		updateJadexEAnnotation(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL, convertParameterList(params));
+		updateJadexEAnnotation(annotationDetailName, convertParameterList(params));
 		
 		// HACK? Should use notification?
 		Display.getCurrent().asyncExec(new Runnable()
@@ -651,21 +641,8 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 		while (listTokens.hasMoreTokens())
 		{
 			String paramElement = listTokens.nextToken();
-			StringTokenizer paramTokens = new StringTokenizer(paramElement,JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-			// require 2 tokens: name, value
-			if(paramTokens.countTokens() == 2)
-			{
-				String name = paramTokens.nextToken();
-				String value = paramTokens.nextToken();
-				params.add(new GeneralParameter(name, value));
-			}
-			else
-			{
-				BpmnDiagramEditorPlugin.getInstance().getLog().log(
-						new Status(IStatus.ERROR,
-								JadexBpmnEditor.ID, IStatus.ERROR,
-								Messages.ActivityParameterListSection_WrongElementDelimiter_message + " \""+paramElement+"\"", null)); // //$NON-NLS-1$ //$NON-NLS-2$
-			}
+			params.add(new GeneralParameter(paramElement));
+			
 			// update token index
 			i++;
 		}
@@ -687,8 +664,6 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 				buffer.append(JadexCommonPropertySection.LIST_ELEMENT_DELIMITER);
 			}
 
-			buffer.append(generalParameter.getName());
-			buffer.append(JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER);
 			buffer.append(generalParameter.getValue());
 
 		}
@@ -720,7 +695,7 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 			
 			if (inputElement instanceof EAnnotation)
 			{
-				String parameterListString = ((EAnnotation) inputElement).getDetails().get(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL);
+				String parameterListString = ((EAnnotation) inputElement).getDetails().get(annotationDetailName);
 				return convertParameterString(parameterListString).toArray();
 			}
 			
@@ -774,8 +749,6 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 				switch (columnIndex)
 				{
 				case 0:
-					return param.getName();
-				case 1:
 					return param.getValue();
 				
 				default:
@@ -796,20 +769,17 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 		
 		// ---- attributes ----
 		
-		private String name;
 		private String value;
 		
 		// ---- constructors ----
 		
 		/** default constructor */
-		public GeneralParameter(String name,String value)
+		public GeneralParameter(String value)
 		{
 			super();
 			
-			assert name != null;
 			assert value != null;
 			
-			this.name = name;
 			this.value = value;
 		}
 
@@ -826,8 +796,7 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 				return false;
 			}
 			
-			return name.equals(((GeneralParameter) obj).getName())
-					&& value.equals(((GeneralParameter) obj).getValue());
+			return value.equals(((GeneralParameter) obj).getValue());
 		}
 
 		/**
@@ -836,8 +805,7 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 		@Override
 		public int hashCode()
 		{
-			return name.hashCode() * 31
-					+ value.hashCode() * 31;
+			return value.hashCode();
 		}
 
 		/**
@@ -846,26 +814,10 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 		@Override
 		public String toString()
 		{
-			return name + JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER + value;
+			return value;
 		}
 		
 		// ---- getter / setter ----
-
-		/**
-		 * @return the name
-		 */
-		public String getName()
-		{
-			return name;
-		}
-
-		/**
-		 * @param name the name to set
-		 */
-		public void setName(String name)
-		{
-			this.name = name;
-		}
 
 		/**
 		 * @return the value
@@ -884,9 +836,7 @@ public abstract class JadexAbstractParameterTablePropertySection extends Abstrac
 		}
 
 	}
-	
-	
-	
+
 }
 
 

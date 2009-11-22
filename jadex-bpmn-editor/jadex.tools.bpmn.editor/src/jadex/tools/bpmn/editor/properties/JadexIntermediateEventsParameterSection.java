@@ -10,7 +10,7 @@ import jadex.tools.bpmn.diagram.Messages;
  * 
  */
 public class JadexIntermediateEventsParameterSection extends
-		JadexAbstractParameterTablePropertySection
+		JadexAbstract2ColumnTablePropertySection
 {
 
 	/**
@@ -18,7 +18,7 @@ public class JadexIntermediateEventsParameterSection extends
 	 */
 	public JadexIntermediateEventsParameterSection()
 	{
-		super(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION,
+		super(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION, JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL,
 				Messages.JadexCommonParameterListSection_ParameterTable_Label);
 	}
 

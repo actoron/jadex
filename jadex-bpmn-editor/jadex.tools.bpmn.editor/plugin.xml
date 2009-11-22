@@ -91,6 +91,19 @@
      </propertySections>
    </extension>
    
+    <!-- the jadex sequence property section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertySection
+              class="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramSection"
+              id="jadex.tools.bpmn.editor.propertySection.JadexGlobalDiagramSection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.propertySection.Common">
+           <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
+        </propertySection>
+     </propertySections>
+   </extension>
+   
    <!-- annotation decorator in diagram -->
 	<!--
 	<extension

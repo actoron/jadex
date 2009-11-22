@@ -10,16 +10,16 @@ import jadex.tools.bpmn.diagram.Messages;
  * @author Claas Altschaffel
  * 
  */
-public class JadexSequenceMappingSection extends
-		JadexAbstract2ColumnTablePropertySection
+public class JadexGlobalDiagramSection extends
+		JadexAbstract1ColumnTablePropertySection
 {
 
 	/**
 	 * Default constructor, initializes super class
 	 */
-	public JadexSequenceMappingSection()
+	public JadexGlobalDiagramSection()
 	{
-		super(JadexCommonPropertySection.JADEX_SEQUENCE_ANNOTATION, JadexCommonPropertySection.JADEX_MAPPING_LIST_DETAIL,
+		super(JadexCommonPropertySection.JADEX_GLOBAL_ANNOTATION, JadexCommonPropertySection.JADEX_IMPORT_LIST_DETAIL,
 				Messages.JadexSequenceMappingSection_MappingTable_Label);
 	}
 
