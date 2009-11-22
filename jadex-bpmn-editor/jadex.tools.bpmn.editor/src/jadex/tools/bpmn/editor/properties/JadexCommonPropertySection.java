@@ -3,7 +3,7 @@
  */
 package jadex.tools.bpmn.editor.properties;
 
-import jadex.tools.bpmn.diagram.JadexBpmnDiagramMessages;
+import jadex.tools.bpmn.diagram.Messages;
 import jadex.tools.bpmn.editor.JadexBpmnPlugin;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -20,13 +20,10 @@ import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -41,6 +38,42 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 public class JadexCommonPropertySection extends AbstractPropertySection
 {
 
+	// ---- constants ----
+	
+	/** Key for the common annotations of all shapes. */
+	public static final String JADEX_COMMON_ANNOTATION = "common";
+	
+	/** Key for the annotation from the activity shape. */
+	public static final String JADEX_ACTIVITY_ANNOTATION = "task";
+	
+	
+	/** Key for the implementing class of a task. */
+	public static final String JADEX_ACTIVITY_CLASS_DETAIL = "class";
+	
+	/** Key for the parameter map of a task. */
+	public static final String JADEX_PARAMETER_LIST_DETAIL = "prameter";
+	
+	
+	/** Key for the annotation from the flow connector. */
+	public static final String JADEX_FLOW_ANNOTATION = "flow";
+
+	/** Key for the parameter map of a task. */
+	public static final String JADEX_FLOW_PARAMETER_MAPPING_LIST = "parameter";
+	
+	/** Key for the parameter map of a task. */
+	public static final String JADEX_FLOW_EXAMPLE_ANNOTATION = "example";
+	
+	
+	
+	/** String delimiter for list elements */
+	public static final String LIST_ELEMENT_DELIMITER = "<*>";
+	
+	/** String delimiter for element attributes */
+	public static final String LIST_ELEMENT_ATTRIBUTE_DELIMITER = "#|#";
+
+	
+	
+	
 	// ---- attributes ----
 
 	/** The text for the implementing class */
@@ -52,13 +85,17 @@ public class JadexCommonPropertySection extends AbstractPropertySection
 	/** The activity (task) that holds impl and role, may be null. */
 	private EModelElement selectedElement;
 
+	
+	
+	
+
 	// ---- methods ----
 
 	/**
 	 * Creates the UI of the section.
 	 */
 	@Override
-	public void createControls(Composite parent,TabbedPropertySheetPage aTabbedPropertySheetPage)
+	public void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage)
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
 		
@@ -70,7 +107,7 @@ public class JadexCommonPropertySection extends AbstractPropertySection
 		//gd.minimumWidth = 500;
 		//gd.widthHint = 500;
 		
-		Label commonLabel = getWidgetFactory().createLabel(sectionPartComposite, JadexBpmnDiagramMessages.CommonSection_label_text);
+		Label commonLabel = getWidgetFactory().createLabel(sectionPartComposite, Messages.CommonSection_label_text);
 		commonLabel.setLayoutData(gd);
 		
 		//getWidgetFactory().createCLabel(parent, "class");
@@ -80,8 +117,8 @@ public class JadexCommonPropertySection extends AbstractPropertySection
 		//parameterText = getWidgetFactory().createText(parent, "");
 		//parameterText.setLayoutData(gd);
 
-		//implText.addModifyListener(new ModifyJadexInformation(JadexProptertyConstants.JADEX_ACTIVITY_TASK_CLASS, implText));
-		//parameterText.addModifyListener(new ModifyJadexInformation(JadexProptertyConstants.JADEX_ACTIVITY_TASK_PARAMETER_LIST, parameterText));
+		//implText.addModifyListener(new ModifyJadexInformation(JadexProptertyConstants.JADEX_ACTIVITY_CLASS, implText));
+		//parameterText.addModifyListener(new ModifyJadexInformation(JadexProptertyConstants.JADEX_PARAMETER_LIST, parameterText));
 
 	}
 
@@ -104,11 +141,11 @@ public class JadexCommonPropertySection extends AbstractPropertySection
 			if (unknownInput instanceof EModelElement)
 			{
 				EModelElement elt = (EModelElement) unknownInput;
-				EAnnotation ea = elt.getEAnnotation(JadexProptertyConstants.JADEX_COMMON_ANNOTATION);
+				EAnnotation ea = elt.getEAnnotation(JadexCommonPropertySection.JADEX_COMMON_ANNOTATION);
 				if (ea != null)
 				{
-					//implText.setText((String) ea.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_TASK_CLASS));
-					//parameterText.setText((String) ea.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_TASK_PARAMETER_LIST));
+					//implText.setText((String) ea.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_CLASS));
+					//parameterText.setText((String) ea.getDetails().get(JadexProptertyConstants.JADEX_PARAMETER_LIST));
 				}
 				selectedElement = (EModelElement) elt;
 				//implText.setEnabled(true);
@@ -122,82 +159,78 @@ public class JadexCommonPropertySection extends AbstractPropertySection
 		//implText.setEnabled(false);
 		//parameterText.setEnabled(false);
 	}
-
 	
-//	/**
-//	 * Utility class that finds the files and the editing domain easily,
-//	 *
-//	 * Maybe we need this internally only
-//	 */
-//	private abstract class ModifyJadexEAnnotationCommand extends
-//			AbstractTransactionalCommand
-//	{
-//
-//		public ModifyJadexEAnnotationCommand(Activity ann, String label)
-//		{
-//			super((TransactionalEditingDomain) AdapterFactoryEditingDomain
-//					.getEditingDomainFor(ann), label, getWorkspaceFiles(ann));
-//		}
-//	}
-
+	// ---- common helper methods ----
+	
 	/**
-	 * Tracks the change occurring on the text field.
+	 * Update 
+	 * @param key
+	 * @param value
 	 */
-	private class ModifyJadexInformation implements ModifyListener
+	protected static boolean updateJadexEAnnotation(final EModelElement element, final String key, final String value)
 	{
-		private String key;
-		private Text field;
-
-		public ModifyJadexInformation(String k, Text field)
+		// we can only update an activity
+		if(element == null)
 		{
-			key = k;
-			this.field = field;
+			return false;
 		}
-
-		public void modifyText(ModifyEvent e)
+		
+		
+		// create the TransactionalCommand
+		ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
+				element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
 		{
-			if (selectedElement == null)
-			{ 
-				// the value was just initialized
-				return;
-			}
-			ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
-					selectedElement, JadexBpmnDiagramMessages.CommonSection_update_command_name)
+			@Override
+			protected CommandResult doExecuteWithResult(
+					IProgressMonitor arg0, IAdaptable arg1)
+					throws ExecutionException
 			{
-
-				@Override
-				protected CommandResult doExecuteWithResult(
-						IProgressMonitor arg0, IAdaptable arg1)
-						throws ExecutionException
+				EAnnotation annotation = element.getEAnnotation(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
+				if (annotation == null)
 				{
-					EAnnotation annotation = selectedElement.getEAnnotation(JadexProptertyConstants.JADEX_ACTIVITY_ANNOTATION);
-					if (annotation == null)
-					{
-						// create the complete initial EAnnotation here! 
-						annotation = EcoreFactory.eINSTANCE.createEAnnotation();
-						annotation.setSource(JadexProptertyConstants.JADEX_ACTIVITY_ANNOTATION);
-						annotation.setEModelElement(selectedElement);
-						annotation.getDetails().put(JadexProptertyConstants.JADEX_ACTIVITY_TASK_CLASS, "");
-						annotation.getDetails().put(JadexProptertyConstants.JADEX_ACTIVITY_TASK_PARAMETER_LIST, "");
-					}
-					// add the annotation details
-					annotation.getDetails().put(key, field.getText());
-
-					return CommandResult.newOKCommandResult();
+					annotation = EcoreFactory.eINSTANCE.createEAnnotation();
+					annotation.setSource(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
+					annotation.setEModelElement(element);
+					annotation.getDetails().put(JadexCommonPropertySection.JADEX_ACTIVITY_CLASS_DETAIL, ""); //$NON-NLS-1$
+					annotation.getDetails().put(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL, ""); //$NON-NLS-1$
 				}
-			};
-			try
-			{
-				command.execute(new NullProgressMonitor(), null);
+				
+				annotation.getDetails().put(key, value);
+				
+				return CommandResult.newOKCommandResult();
 			}
-			catch (ExecutionException exception)
-			{
-				JadexBpmnPlugin.getDefault().getLog().log(
-						new Status(IStatus.ERROR,
-								JadexBpmnPlugin.PLUGIN_ID, IStatus.ERROR,
-								exception.getMessage(), exception));
-			}
+		};
+		// execute command
+		try
+		{
+			IStatus status = command.execute(new NullProgressMonitor(), null);
+			return status.isOK();
 		}
+		catch (ExecutionException exception)
+		{
+			JadexBpmnPlugin.getDefault().getLog().log(
+					new Status(IStatus.ERROR, JadexBpmnPlugin.PLUGIN_ID,
+							IStatus.ERROR, exception.getMessage(),
+							exception));
+			
+			return false;
+		}
+	}
+	
+	/**
+	 * Dummy method for empty composites
+	 */
+	protected static Composite createEmptyComposite(Composite parent, AbstractPropertySection section)
+	{
+		Composite newComposite = section.getWidgetFactory().createComposite(parent/*, SWT.BORDER*/);
+		
+		// The layout of the composite
+		GridLayout layout = new GridLayout(1, false);
+		newComposite.setLayout(layout);
+		
+		//section.getWidgetFactory().createCLabel(newComposite, "---- empty composite ----");
+		
+		return newComposite;
 	}
 
 }

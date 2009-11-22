@@ -5,7 +5,6 @@ package jadex.tools.bpmn.editor.properties;
 
 import jadex.tools.bpmn.diagram.Messages;
 import jadex.tools.bpmn.editor.JadexBpmnEditor;
-import jadex.tools.bpmn.editor.properties.JadexGeneralParameterTablePropertySection.GeneralParameter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EAnnotation;
-import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression;
+import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.gmf.runtime.common.ui.services.util.CommonLabelProvider;
@@ -26,7 +25,6 @@ import org.eclipse.gmf.runtime.draw2d.ui.figures.FigureUtilities;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -37,21 +35,12 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.stp.bpmn.Activity;
 import org.eclipse.stp.bpmn.diagram.part.BpmnDiagramEditorPlugin;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -68,7 +57,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * 
  * @author Claas Altschaffel
  */
-public class JadexUserTaskActivityPropertySection extends AbstractPropertySection
+public class JadexGeneralParameterTablePropertySection extends AbstractPropertySection
 {
 
 	// ---- constants ----
@@ -76,40 +65,16 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 	/**
 	 * the name column label
 	 */
-	private final static String NAME_COLUMN = "Name"; //$NON-NLS-1$
-	
-	/**
-	 * the type column label
-	 */
-	private final static String TYPE_COLUMN = "Type"; //$NON-NLS-1$
+	private final static String NAME_COLUMN = "Name"; // //$NON-NLS-1$
 	
 	/**
 	 * the value column label
 	 */
-	private final static String VALUE_COLUMN = "Value"; //$NON-NLS-1$
-	
-	/**
-	 * the direction column label
-	 */
-	private final static String DIRECTION_COLUMN = "Direction"; //$NON-NLS-1$
-	
-	/**
-	 * parameter direction values 
-	 */
-	public final static String[] DIRECTION_VALUES = new String[] {"inout", "in", "out"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	
-	/**
-	 * default parameter direction
-	 */
-	public final static String DIRECTION_DEFAULT = "inout"; //$NON-NLS-1$
-	
-	
+	private final static String VALUE_COLUMN = "Expression"; // //$NON-NLS-1$
+
 	
 	// ---- attributes ----
 
-	/** The Combo for implementing class */
-	private CCombo classImplCombo;
-	
 	/** The viewer/editor for parameter */ 
 	private TableViewer tableViewer;
 	
@@ -119,8 +84,8 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 	/** The table delete element button */
 	private Button delButton;
 
-	/** The activity (task) that holds task implementation class and parameters, may be null. */
-	private Activity activity;
+	/** The modelElement (task) that holds task implementation class and parameters, may be null. */
+	private EModelElement modelElement;
 
 	// ---- methods ----
 
@@ -132,18 +97,8 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 			TabbedPropertySheetPage aTabbedPropertySheetPage)
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
-		GridLayout layout = new GridLayout(2, true);
-		parent.setLayout(layout);
-
 		
-		createTaskClassComposite(parent);
-
-		JadexCommonPropertySection.createEmptyComposite(parent, this);
-
 		createParameterTableComposite(parent);
-		
-		JadexCommonPropertySection.createEmptyComposite(parent, this);
-
 	}
 
 	
@@ -165,179 +120,47 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 				unknownInput = ((IGraphicalEditPart) unknownInput)
 						.resolveSemanticElement();
 			}
-			if (unknownInput instanceof Activity)
+			if (unknownInput instanceof EModelElement)
 			{
-				Activity act = (Activity) unknownInput;
-				updateControls(act);
+				EModelElement act = (EModelElement) unknownInput;
+				modelElement = (EModelElement) act;
 				
-				activity = (Activity) act;
+				tableViewer.setInput(act);
+				addButton.setEnabled(true);
+				delButton.setEnabled(true);
+				
 				return;
 			}
 		}
 		
 		// fall through
-		activity = null;
-		classImplCombo.setText(""); //$NON-NLS-1$
-		classImplCombo.setEnabled(false);
+		modelElement = null;
 		
 		tableViewer.setInput(null);
 		addButton.setEnabled(false);
 		delButton.setEnabled(false);
 	}
 
-	/**
-	 * Update the controls for this property section with values from {@link EAnnotation}
-	 * @param act
-	 */
-	protected void updateControls(Activity act)
-	{
-		// update the class values
-		String[] predefinedItems = getClassCompositeItemsForActivity(act);
-		classImplCombo.setItems(predefinedItems);
-		
-		EAnnotation ea = act.getEAnnotation(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
-		if (ea != null)
-		{
-			String value = (String) ea.getDetails().get(JadexCommonPropertySection.JADEX_ACTIVITY_CLASS_DETAIL);
-			int valueIndex = -1;
-			
-			// search value in items
-			String[] items = classImplCombo.getItems();
-			for (int i = 0; i < items.length; i++)
-			{
-				if(items[i].equals(value))
-				{
-					valueIndex = i;
-				}
-			}
-			
-			// add the value to the items list
-			if (valueIndex == -1 )
-			{
-				classImplCombo.add(value, 0);
-				valueIndex = 0;
-			}
-			
-			classImplCombo.select(0);
-			tableViewer.setInput(act);
-			
-		}
-		
-		classImplCombo.setEnabled(true);
-		addButton.setEnabled(true);
-		delButton.setEnabled(true);
-		
-	}
+	
 	
 	/**
 	 * Update 
 	 * @param key
 	 * @param value
 	 */
-	private void updateActivtyEAnnotation(final String key, final String value)
+	private void updateJadexEAnnotation(final String key, final String value)
 	{
-		// we can only update an activity
-		if(activity == null)
+		// we can only update an modelElement
+		if(modelElement == null)
 		{
 			return;
 		}
 		
-		JadexCommonPropertySection.updateJadexEAnnotation(activity, key, value);
+		JadexCommonPropertySection.updateJadexEAnnotation(modelElement, key, value);
 	}
 
 	// ---- control creation methods ----
-	
-	/**
-	 * Create a combo for task class selection in parent
-	 *  
-	 * @param parent
-	 */
-	protected Composite createTaskClassComposite(Composite parent)
-	{
-		Composite taskComposite = getWidgetFactory().createComposite(parent/*, SWT.BORDER*/);
-		
-		// The layout of the task composite
-		GridLayout layout = new GridLayout(1, false);
-		taskComposite.setLayout(layout);
-		
-		getWidgetFactory().createCLabel(taskComposite, Messages.ActivityParameterListSection_ImplementationClass_label);
 
-		final CCombo combo = getWidgetFactory().createCCombo(taskComposite, SWT.NONE);
-		
-		GridData data = new GridData(SWT.FILL);
-		data.minimumWidth = 400;
-		data.widthHint = 400;
-		combo.setLayoutData(data);
-		
-		
-		String[] items = getClassCompositeItemsForActivity(activity);
-		combo.setItems(items);
-		combo.setText(combo.getItem(0));
-		combo.addVerifyListener(new VerifyListener()
-		{
-			public void verifyText(VerifyEvent e)
-			{
-				String text = combo.getText();
-				String newText = text.substring(0, e.start) + e.text
-						+ text.substring(e.end);
-				
-				// don't allow non word characters
-				RegularExpression re = new RegularExpression("\\w*"); //$NON-NLS-1$
-				if (!re.matches(newText))
-				{
-					e.doit = false;
-				}
-			}
-		});
-		combo.addTraverseListener(new TraverseListener()
-		{
-			public void keyTraversed(TraverseEvent e)
-			{
-				if (e.detail == SWT.TRAVERSE_RETURN)
-				{
-					e.doit = false;
-					e.detail = SWT.TRAVERSE_NONE;
-					String newText = combo.getText();
-
-					// check if we have a valid class name
-					if (newText.endsWith(".class")) //$NON-NLS-1$
-					{
-						combo.add(newText);
-						combo.setSelection(new Point(0, newText
-								.length()));
-					}
-
-				}
-			}
-		});
-		
-		combo.addModifyListener(new ModifyListener()
-		{
-			@Override
-			public void modifyText(ModifyEvent e)
-			{
-				updateActivtyEAnnotation(JadexCommonPropertySection.JADEX_ACTIVITY_CLASS_DETAIL, combo.getText());
-			}
-		});
-		
-		return classImplCombo = combo;
-	}
-	
-	/**
-	 * Create the string array for class composite
-	 * @param act
-	 * @return
-	 */
-	protected String[] getClassCompositeItemsForActivity(Activity act)
-	{
-		// FIXME: use real class names or get from runtime!
-		return new String[] { 
-				"Test.class", //$NON-NLS-1$
-				"SomeTask.class", //$NON-NLS-1$
-				"MessageTask.class", //$NON-NLS-1$
-				"OneMoreTestTask.class" }; //$NON-NLS-1$
-	}
-	
 	/**
 	 * Creates the controls of the Parameter page section. Creates a table
 	 * containing all Parameter of the selected {@link ParameterizedVertex}.
@@ -389,9 +212,8 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 	 */
 	private TableViewer createTable(Composite parent, GridData tableLayoutData)
 	{
-		String[] columns = new String[] { NAME_COLUMN, TYPE_COLUMN,
-				VALUE_COLUMN, DIRECTION_COLUMN };
-		int[] columnWeight = new int[] { 2, 2, 4, 1 };
+		String[] columns = new String[] { NAME_COLUMN, VALUE_COLUMN };
+		int[] columnWeight = new int[] { 1, 3 };
 
 		// the displayed table
 		TableViewer viewer = new TableViewer(getWidgetFactory().createTable(parent,
@@ -415,8 +237,8 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 		}
 		viewer.getTable().setLayout(tableLayout);
 
-		viewer.setContentProvider(new ParameterListContentProvider());
-		viewer.setLabelProvider(new ParameterListLabelProvider());
+		viewer.setContentProvider(new GeneralParameterListContentProvider());
+		viewer.setLabelProvider(new GeneralParameterListLabelProvider());
 		viewer.setColumnProperties(columns);
 
 		return viewer;
@@ -436,12 +258,7 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 		// Create the cell editors
 		CellEditor[] editors = new CellEditor[] {
 				new TextCellEditor(viewer.getTable()), // name (text)
-				new TextCellEditor(viewer.getTable()), // type
-				new TextCellEditor(viewer.getTable()), // value
-				new ComboBoxCellEditor(
-						viewer.getTable(),
-						DIRECTION_VALUES, 
-						SWT.READ_ONLY) // direction
+				new TextCellEditor(viewer.getTable()) // value
 		};
 		viewer.setCellEditors(editors);
 
@@ -455,7 +272,7 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 			 */
 			public boolean canModify(Object element, String property)
 			{
-				if (element instanceof TaskParameter)
+				if (element instanceof GeneralParameter)
 				{
 					return true;
 				}
@@ -468,39 +285,18 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 			 */
 			public Object getValue(Object element, String property)
 			{
-				if (element instanceof TaskParameter)
+				if (element instanceof GeneralParameter)
 				{
-					TaskParameter param = (TaskParameter) element;
+					GeneralParameter param = (GeneralParameter) element;
 					if (NAME_COLUMN.equals(property))
 					{
 						return param.getName();
-					}
-
-					if (TYPE_COLUMN.equals(property))
-					{
-						return param.getType();
 					}
 
 					if (VALUE_COLUMN.equals(property))
 					{
 						return param.getValue();
 					}
-
-					if (DIRECTION_COLUMN.equals(property))
-					{
-						String value = param.getDirection();
-						for (int i = 0; i < DIRECTION_VALUES.length; i++)
-						{
-							if (DIRECTION_VALUES[i].equals(value))
-							{
-								return new Integer(i);
-							}
-						}
-						
-						// fall through
-						return new Integer(0);
-					}
-
 				}
 				// fall through
 				return null;
@@ -517,9 +313,9 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 				if (element instanceof TableItem)
 				{
 
-					if ((((TableItem) element).getData()) instanceof TaskParameter)
+					if ((((TableItem) element).getData()) instanceof GeneralParameter)
 					{
-						final TaskParameter param = (TaskParameter) ((TableItem) element)
+						final GeneralParameter param = (GeneralParameter) ((TableItem) element)
 								.getData();
 						final String fproperty = property;
 
@@ -528,8 +324,8 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 						{
 							// modify the Parameter
 							ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
-									activity,
-									Messages.JadexUserTaskActivityPropertySection_update_command_name)
+									modelElement,
+									"Update EModelElement parameter list")
 							{
 								@Override
 								protected CommandResult doExecuteWithResult(
@@ -539,28 +335,16 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 								{
 									
 									List params = getTaskParameterList();
-									TaskParameter paramToChange = (TaskParameter) params.get(params.indexOf(param));
+									GeneralParameter paramToChange = (GeneralParameter) params.get(params.indexOf(param));
 
 									if (NAME_COLUMN.equals(fproperty))
 									{
 										paramToChange.setName((String) value);
 									}
-									else if (TYPE_COLUMN.equals(fproperty))
-									{
-										paramToChange.setType((String) value);
-									}
+									
 									else if (VALUE_COLUMN.equals(fproperty))
 									{
 										paramToChange.setValue((String) value);
-									}
-									else if (DIRECTION_COLUMN.equals(fproperty))
-									{
-										if (value instanceof Integer)
-										{
-											paramToChange
-													.setDirection(DIRECTION_VALUES[((Integer) value)
-																	.intValue()]);
-										}
 									}
 									else
 									{
@@ -568,7 +352,7 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 												Messages.JadexCommonPropertySection_InvalidEditColumn_Message);
 									}
 
-									updateTaskParameterList(params);
+									updateGeneralParameterList(params);
 									
 									return CommandResult.newOKCommandResult();
 								}
@@ -625,21 +409,21 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				// modify the Activity annotation
+				// modify the EModelElement annotation
 				ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
-						activity,
-						Messages.JadexUserTaskActivityPropertySection_add_command_name)
+						modelElement,
+						"Add EModelElement parameter element")
 				{
 					@Override
 					protected CommandResult doExecuteWithResult(
 							IProgressMonitor monitor, IAdaptable info)
 							throws ExecutionException
 					{
-						TaskParameter newElement = new TaskParameter(Messages.JadexUserTaskActivityPropertySection_NewParameterName_Value, "Object", "null", DIRECTION_DEFAULT); //$NON-NLS-2$ //$NON-NLS-3$
+						GeneralParameter newElement = new GeneralParameter("name", "expression");
 
 						List params = getTaskParameterList();
 						params.add(newElement);
-						updateTaskParameterList(params);
+						updateGeneralParameterList(params);
 						
 						return CommandResult.newOKCommandResult(newElement);
 					}
@@ -676,22 +460,22 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				// modify the Activity annotation
+				// modify the EModelElement annotation
 				ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
-						activity,
-						Messages.JadexUserTaskActivityPropertySection_delete_command_name)
+						modelElement,
+						"Delete EModelElement parameter element")
 				{
 					@Override
 					protected CommandResult doExecuteWithResult(
 							IProgressMonitor monitor, IAdaptable info)
 							throws ExecutionException
 					{
-						TaskParameter element = (TaskParameter) ((IStructuredSelection) tableViewer
+						GeneralParameter element = (GeneralParameter) ((IStructuredSelection) tableViewer
 								.getSelection()).getFirstElement();
 						
 						List params = getTaskParameterList();
 						params.remove(element);
-						updateTaskParameterList(params);
+						updateGeneralParameterList(params);
 						
 						return CommandResult.newOKCommandResult(null);
 					}
@@ -741,39 +525,34 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 							}
 						});
 					}
-					
-					//if (selElt instanceof EditPart)
-					//{
-					//	((EditPart) selElt).refresh();
-					//}
 				}
 		}
 	}
 	
 	/**
-	 * Retrieve the EAnnotation from the activity and converts it to a {@link GeneralParameter} list
+	 * Retrieve the EAnnotation from the modelElement and converts it to a {@link GeneralParameter} list
 	 * @param act
 	 * @return
 	 */
-	private List<TaskParameter> getTaskParameterList()
+	private List<GeneralParameter> getTaskParameterList()
 	{
-		EAnnotation ea = activity.getEAnnotation(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
+		EAnnotation ea = modelElement.getEAnnotation(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
 		if (ea != null)
 		{
 			String value = (String) ea.getDetails().get(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL);
-			return convertTaskParameterString(value);
+			return convertGeneralParameterString(value);
 		}
 		
-		return new ArrayList<TaskParameter>(0);
+		return new ArrayList<GeneralParameter>(0);
 	}
 	
 	/**
-	 * Updates the EAnnotation for the activity task parameter list
+	 * Updates the EAnnotation for the modelElement task parameter list
 	 * @param params
 	 */
-	private void updateTaskParameterList(List<TaskParameter> params)
+	private void updateGeneralParameterList(List<GeneralParameter> params)
 	{
-		updateActivtyEAnnotation(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL, convertTaskParameterList(params));
+		updateJadexEAnnotation(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL, convertTaskParameterList(params));
 		
 		// HACK? Should use notification?
 		Display.getCurrent().asyncExec(new Runnable()
@@ -793,30 +572,28 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 	 * @param stringToConvert
 	 * @return
 	 */
-	protected List<TaskParameter> convertTaskParameterString(String stringToConvert)
+	protected List<GeneralParameter> convertGeneralParameterString(String stringToConvert)
 	{
 		StringTokenizer listTokens = new StringTokenizer(stringToConvert, JadexCommonPropertySection.LIST_ELEMENT_DELIMITER);
-		List<TaskParameter> params = new ArrayList<TaskParameter>(listTokens.countTokens());
+		List<GeneralParameter> params = new ArrayList<GeneralParameter>(listTokens.countTokens());
 		int i = 0;
 		while (listTokens.hasMoreTokens())
 		{
 			String paramElement = listTokens.nextToken();
 			StringTokenizer paramTokens = new StringTokenizer(paramElement,JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER);
 			// require 4 tokens: name, type, value, direction
-			if(paramTokens.countTokens() == 4)
+			if(paramTokens.countTokens() == 2)
 			{
 				String name = paramTokens.nextToken();
-				String type = paramTokens.nextToken();
 				String value = paramTokens.nextToken();
-				String direction = paramTokens.nextToken();
-				params.add(new TaskParameter(name, type, value, direction));
+				params.add(new GeneralParameter(name, value));
 			}
 			else
 			{
 				BpmnDiagramEditorPlugin.getInstance().getLog().log(
 						new Status(IStatus.ERROR,
 								JadexBpmnEditor.ID, IStatus.ERROR,
-								Messages.ActivityParameterListSection_WrongElementDelimiter_message + " \""+paramElement+"\"", null)); //$NON-NLS-1$ //$NON-NLS-2$
+								Messages.ActivityParameterListSection_WrongElementDelimiter_message + " \""+paramElement+"\"", null)); // //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			// update token index
 			i++;
@@ -829,35 +606,32 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 	 * @param arrayToConvert
 	 * @return
 	 */
-	protected String convertTaskParameterList(List<TaskParameter> params)
+	protected String convertTaskParameterList(List<GeneralParameter> params)
 	{
 		StringBuffer buffer = new StringBuffer();
-		for (TaskParameter taskParameter : params)
+		for (GeneralParameter generalParameter : params)
 		{
 			if (buffer.length() != 0)
 			{
 				buffer.append(JadexCommonPropertySection.LIST_ELEMENT_DELIMITER);
 			}
-			//buffer.append(JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-			buffer.append(taskParameter.getName());
+
+			buffer.append(generalParameter.getName());
 			buffer.append(JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-			buffer.append(taskParameter.getType());
-			buffer.append(JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-			buffer.append(taskParameter.getValue());
-			buffer.append(JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-			buffer.append(taskParameter.getDirection());
+			buffer.append(generalParameter.getValue());
+
 		}
 
 		return buffer.toString();
 	}
 	
-	// ---- internal used classes ----
+	// ---- internal used model classes ----
 	
 	/**
 	 * Simple content provider that reflects the ContextElemnts 
 	 * of an Context given as an input. Marked as dynamic / static.
 	 */
-	private class ParameterListContentProvider implements IStructuredContentProvider {
+	protected class GeneralParameterListContentProvider implements IStructuredContentProvider {
 
 		/**
 		 * Generate the content for the table.
@@ -867,16 +641,16 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 		 */
 		public Object[] getElements(Object inputElement)
 		{
-			if (inputElement instanceof Activity)
+			if (inputElement instanceof EModelElement)
 			{
-				EAnnotation ea = ((Activity)inputElement).getEAnnotation(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
+				EAnnotation ea = ((EModelElement)inputElement).getEAnnotation(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
 				inputElement = ea;
 			}
 			
 			if (inputElement instanceof EAnnotation)
 			{
 				String parameterListString = ((EAnnotation) inputElement).getDetails().get(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL);
-				return convertTaskParameterString(parameterListString).toArray();
+				return convertGeneralParameterString(parameterListString).toArray();
 			}
 			return new Object[] { null };
 		}
@@ -904,7 +678,7 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 	 * Label provider in charge of rendering the keys and values of the annotation
 	 * attached to the object. Currently based on CommonLabelProvider.
 	 */
-	protected class ParameterListLabelProvider extends CommonLabelProvider
+	protected class GeneralParameterListLabelProvider extends CommonLabelProvider
 			implements ITableLabelProvider
 	{
 
@@ -921,19 +695,15 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 		 */
 		public String getColumnText(Object element, int columnIndex)
 		{
-			if (element instanceof TaskParameter)
+			if (element instanceof GeneralParameter)
 			{
-				TaskParameter param = (TaskParameter) element;
+				GeneralParameter param = (GeneralParameter) element;
 				switch (columnIndex)
 				{
 				case 0:
 					return param.getName();
 				case 1:
-					return param.getType();
-				case 2:
 					return param.getValue();
-				case 3:
-					return param.getDirection();
 				
 				default:
 					return super.getText(param);
@@ -949,32 +719,25 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 	 * 
 	 * @author Claas Altschaffel
 	 */
-	protected class TaskParameter {
+	protected class GeneralParameter {
 		
 		// ---- attributes ----
 		
 		private String name;
-		private String type;
 		private String value;
-		private String direction;
 		
 		// ---- constructors ----
 		
 		/** default constructor */
-		public TaskParameter(String name, String type, String value,
-				String direction)
+		public GeneralParameter(String name,String value)
 		{
 			super();
 			
 			assert name != null;
-			assert type != null;
 			assert value != null;
-			assert direction != null;
 			
 			this.name = name;
-			this.type = type;
 			this.value = value;
-			this.direction = direction;
 		}
 
 		// ---- overrides ----
@@ -985,15 +748,13 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 		@Override
 		public boolean equals(Object obj)
 		{
-			if (!(obj instanceof TaskParameter))
+			if (!(obj instanceof GeneralParameter))
 			{
 				return false;
 			}
 			
-			return name.equals(((TaskParameter) obj).getName())
-					&& type.equals(((TaskParameter) obj).getType())
-					&& value.equals(((TaskParameter) obj).getValue())
-					&& direction.equals(((TaskParameter) obj).getDirection());
+			return name.equals(((GeneralParameter) obj).getName())
+					&& value.equals(((GeneralParameter) obj).getValue());
 		}
 
 		/**
@@ -1003,9 +764,7 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 		public int hashCode()
 		{
 			return name.hashCode() * 31
-					+ type.hashCode() * 31
-					+ value.hashCode() * 31
-					+ direction.hashCode() * 31;
+					+ value.hashCode() * 31;
 		}
 
 		/**
@@ -1014,9 +773,7 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 		@Override
 		public String toString()
 		{
-			return name + JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER + type
-					+ JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER + value
-					+ JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER + direction;
+			return name + JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER + value;
 		}
 		
 		// ---- getter / setter ----
@@ -1029,30 +786,12 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 			return name;
 		}
 
-		
-
 		/**
 		 * @param name the name to set
 		 */
 		public void setName(String name)
 		{
 			this.name = name;
-		}
-
-		/**
-		 * @return the type
-		 */
-		public String getType()
-		{
-			return type;
-		}
-
-		/**
-		 * @param type the type to set
-		 */
-		public void setType(String type)
-		{
-			this.type = type;
 		}
 
 		/**
@@ -1069,22 +808,6 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 		public void setValue(String value)
 		{
 			this.value = value;
-		}
-
-		/**
-		 * @return the direction
-		 */
-		public String getDirection()
-		{
-			return direction;
-		}
-
-		/**
-		 * @param direction the direction to set
-		 */
-		public void setDirection(String direction)
-		{
-			this.direction = direction;
 		}
 
 	}

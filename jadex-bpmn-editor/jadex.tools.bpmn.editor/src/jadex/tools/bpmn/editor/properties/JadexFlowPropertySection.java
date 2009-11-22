@@ -74,8 +74,8 @@ public class JadexFlowPropertySection extends AbstractPropertySection
 		someOtherText = getWidgetFactory().createText(parent, "");
 		someOtherText.setLayoutData(gd);
 
-		someText.addModifyListener(new ModifyJadexInformation(JadexProptertyConstants.JADEX_FLOW_EXAMPLE_ANNOTATION, someText));
-		someOtherText.addModifyListener(new ModifyJadexInformation(JadexProptertyConstants.JADEX_FLOW_PARAMETER_MAPPING_LIST, someOtherText));
+		someText.addModifyListener(new ModifyJadexInformation(JadexCommonPropertySection.JADEX_FLOW_EXAMPLE_ANNOTATION, someText));
+		someOtherText.addModifyListener(new ModifyJadexInformation(JadexCommonPropertySection.JADEX_FLOW_PARAMETER_MAPPING_LIST, someOtherText));
 
 	}
 
@@ -98,11 +98,11 @@ public class JadexFlowPropertySection extends AbstractPropertySection
 			if (unknownInput instanceof Activity)
 			{
 				Activity elt = (Activity) unknownInput;
-				EAnnotation ea = elt.getEAnnotation(JadexProptertyConstants.JADEX_FLOW_ANNOTATION);
+				EAnnotation ea = elt.getEAnnotation(JadexCommonPropertySection.JADEX_FLOW_ANNOTATION);
 				if (ea != null)
 				{
-					someText.setText((String) ea.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_TASK_CLASS));
-					someOtherText.setText((String) ea.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_TASK_PARAMETER_LIST));
+					someText.setText((String) ea.getDetails().get(JadexCommonPropertySection.JADEX_ACTIVITY_CLASS_DETAIL));
+					someOtherText.setText((String) ea.getDetails().get(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL));
 				}
 				edge = (SequenceEdge) elt;
 				someText.setEnabled(true);
@@ -148,14 +148,14 @@ public class JadexFlowPropertySection extends AbstractPropertySection
 						IProgressMonitor arg0, IAdaptable arg1)
 						throws ExecutionException
 				{
-					EAnnotation annotation = edge.getEAnnotation(JadexProptertyConstants.JADEX_ACTIVITY_ANNOTATION);
+					EAnnotation annotation = edge.getEAnnotation(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
 					if (annotation == null)
 					{
 						annotation = EcoreFactory.eINSTANCE.createEAnnotation();
-						annotation.setSource(JadexProptertyConstants.JADEX_ACTIVITY_ANNOTATION);
+						annotation.setSource(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION);
 						annotation.setEModelElement(edge);
-						annotation.getDetails().put(JadexProptertyConstants.JADEX_ACTIVITY_TASK_CLASS, "");
-						annotation.getDetails().put(JadexProptertyConstants.JADEX_ACTIVITY_TASK_PARAMETER_LIST, "");
+						annotation.getDetails().put(JadexCommonPropertySection.JADEX_ACTIVITY_CLASS_DETAIL, "");
+						annotation.getDetails().put(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL, "");
 					}
 					annotation.getDetails().put(key, field.getText());
 

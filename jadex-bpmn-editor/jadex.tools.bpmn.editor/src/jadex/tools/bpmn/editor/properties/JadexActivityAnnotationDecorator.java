@@ -1,5 +1,7 @@
 package jadex.tools.bpmn.editor.properties;
 
+import jadex.tools.bpmn.diagram.Messages;
+
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.emf.ecore.EAnnotation;
@@ -19,7 +21,7 @@ public class JadexActivityAnnotationDecorator extends BpmnEAnnotationDecoratorPr
 	@Override
 	public String getAssociatedAnnotationSource() 
 	{
-		return JadexProptertyConstants.JADEX_ACTIVITY_ANNOTATION;
+		return JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION;
 	}
 
 	@Override
@@ -47,8 +49,14 @@ public class JadexActivityAnnotationDecorator extends BpmnEAnnotationDecoratorPr
         if (annotation != null) {
             Label label = new Label();
             label.setText(
-            		"class="+annotation.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_TASK_CLASS)
-            		+"\nparameter="+annotation.getDetails().get(JadexProptertyConstants.JADEX_ACTIVITY_TASK_PARAMETER_LIST));
+            		
+            		Messages.JadexActivityAnnotationDecorator_Class_Label
+            		+"=" //$NON-NLS-1$
+            		+annotation.getDetails().get(JadexCommonPropertySection.JADEX_ACTIVITY_CLASS_DETAIL)
+            		+"\n" //$NON-NLS-1$
+            		+Messages.JadexActivityAnnotationDecorator_Parameter_Label
+            		+"=" //$NON-NLS-1$
+            		+annotation.getDetails().get(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL));
             return label;
         }
         return null;
