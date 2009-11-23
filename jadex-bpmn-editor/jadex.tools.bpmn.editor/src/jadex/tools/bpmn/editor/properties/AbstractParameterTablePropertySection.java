@@ -40,11 +40,13 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbenchPart;
@@ -151,7 +153,10 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 			TabbedPropertySheetPage aTabbedPropertySheetPage)
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
-		createParameterTableComposite(sectionComposite);
+		
+		Group sectionGroup = getWidgetFactory().createGroup(sectionComposite, Messages.JadexCommonParameterListSection_ParameterTable_Label);
+		sectionGroup.setLayout(new FillLayout(SWT.VERTICAL));
+		createParameterTableComposite(sectionGroup);
 	}
 
 	
@@ -194,30 +199,23 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 		
 		// The layout of the table composite
 		GridLayout layout = new GridLayout(3, false);
-		sectionComposite.setLayout(layout);
-		
-		GridData gridData = new GridData(GridData.FILL_BOTH
-				| GridData.HORIZONTAL_ALIGN_FILL);
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.grabExcessVerticalSpace = true;
-		gridData.minimumHeight = 200;
-		gridData.heightHint = 200;
-		sectionComposite.setLayoutData(gridData);
-		
+		parent.setLayout(layout);
+
 		GridData tableLayoutData = new GridData(GridData.FILL_BOTH);
 		tableLayoutData.grabExcessHorizontalSpace = true;
 		tableLayoutData.grabExcessVerticalSpace = true;
+		tableLayoutData.minimumHeight = 150;
+		tableLayoutData.heightHint = 150;
 		tableLayoutData.horizontalSpan = 3;
 
 		// create the table
-		getWidgetFactory().createLabel(sectionComposite, Messages.JadexCommonParameterListSection_ParameterTable_Label);
-		TableViewer viewer = createTable(sectionComposite, tableLayoutData);
+		TableViewer viewer = createTable(parent, tableLayoutData);
 
 		// create cell modifier command
 		createCellModifier(viewer);
 
 		// create buttons
-		createButtons(sectionComposite);
+		createButtons(parent);
 		
 		return tableViewer = viewer;
 

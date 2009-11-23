@@ -5,7 +5,6 @@ package jadex.tools.bpmn.editor.properties;
 
 import jadex.tools.bpmn.diagram.Messages;
 import jadex.tools.bpmn.editor.JadexBpmnEditor;
-import jadex.tools.bpmn.editor.JadexBpmnPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,15 +14,11 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EModelElement;
-import org.eclipse.emf.ecore.EcoreFactory;
-import org.eclipse.gef.EditPart;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.gmf.runtime.common.ui.services.util.CommonLabelProvider;
-import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.FigureUtilities;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
@@ -44,15 +39,16 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -60,7 +56,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * 
  * @author Claas Altschaffel
  */
-public abstract class Abstract1ColumnTablePropertySection extends AbstractPropertySection
+public abstract class Abstract1ColumnTablePropertySection extends AbstractJadexPropertySection
 {
 
 	// ---- constants ----
@@ -74,9 +70,6 @@ public abstract class Abstract1ColumnTablePropertySection extends AbstractProper
 	
 	// ---- attributes ----
 
-	/** The composite that holds the section parts */
-	private Composite sectionComposite;
-	
 	/** The viewer/editor for parameter */ 
 	private TableViewer tableViewer;
 	
@@ -85,22 +78,11 @@ public abstract class Abstract1ColumnTablePropertySection extends AbstractProper
 	
 	/** The table delete element button */
 	private Button delButton;
-
-	/** The modelElement (task) that holds task implementation class and parameters, may be null. */
-	protected EModelElement modelElement;
-
-	/* JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION */
-	/** The EAnnotations name that contains the table information as detail */
-	protected String containerEAnnotationName;
 	
-	/* JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL */
-	/** The EAnnotations detail that contains the information */
-	private String annotationDetailName;
-	
-	/* Messages.JadexCommonParameterListSection_ParameterTable_Label */
 	/** The label string for the tableViewer */
 	private String tableViewerLabel;
 	
+	/** The name for the column */
 	private String tableColumnName; 
 
 	
@@ -112,11 +94,7 @@ public abstract class Abstract1ColumnTablePropertySection extends AbstractProper
 	 */
 	protected Abstract1ColumnTablePropertySection(String containerEAnnotationName, String annotationDetailName, String tableLabel, String tableColumnName)
 	{
-		// TODO: assertions
-		
-		super();
-		this.containerEAnnotationName = containerEAnnotationName;
-		this.annotationDetailName = annotationDetailName;
+		super(containerEAnnotationName, annotationDetailName);
 		this.tableViewerLabel = tableLabel;
 		this.tableColumnName = tableColumnName != null ? tableColumnName : DEFAULT_COLUMN;
 	}
@@ -133,12 +111,9 @@ public abstract class Abstract1ColumnTablePropertySection extends AbstractProper
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
 		
-		sectionComposite = getWidgetFactory().createComposite(parent);
-		
-		GridLayout layout = new GridLayout(1, false);
-		sectionComposite.setLayout(layout);
-		
-		createParameterTableComposite(sectionComposite);
+		Group sectionGroup = getWidgetFactory().createGroup(sectionComposite, tableViewerLabel);
+		sectionGroup.setLayout(new FillLayout(SWT.VERTICAL));
+		createParameterTableComposite(sectionGroup);
 	}
 
 	
@@ -149,32 +124,15 @@ public abstract class Abstract1ColumnTablePropertySection extends AbstractProper
 	public void setInput(IWorkbenchPart part, ISelection selection)
 	{
 		super.setInput(part, selection);
-		if (selection instanceof IStructuredSelection)
-		{
-			Object unknownInput = ((IStructuredSelection) selection)
-					.getFirstElement();
-			if (unknownInput instanceof IGraphicalEditPart
-					&& (((IGraphicalEditPart) unknownInput)
-							.resolveSemanticElement() != null))
-			{
-				unknownInput = ((IGraphicalEditPart) unknownInput)
-						.resolveSemanticElement();
-			}
-			if (unknownInput instanceof EModelElement)
-			{
-				EModelElement elm = (EModelElement) unknownInput;
-				modelElement = (EModelElement) elm;
-				
-				tableViewer.setInput(elm);
-				addButton.setEnabled(true);
-				delButton.setEnabled(true);
-				
-				return;
-			}
-		}
 		
-		// fall through
-		modelElement = null;
+		if (modelElement != null)
+		{
+			tableViewer.setInput(modelElement);
+			addButton.setEnabled(true);
+			delButton.setEnabled(true);
+
+			return;
+		}
 		
 		tableViewer.setInput(null);
 		addButton.setEnabled(false);
@@ -182,60 +140,6 @@ public abstract class Abstract1ColumnTablePropertySection extends AbstractProper
 	}
 
 	
-	
-	/**
-	 * Update 
-	 * @param key
-	 * @param value
-	 */
-	protected boolean updateJadexEAnnotation(final String key, final String value)
-	{
-		// we can only update an activity
-		if(modelElement == null)
-		{
-			return false;
-		}
-		
-		
-		// create the TransactionalCommand
-		ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
-				modelElement, Messages.JadexCommonPropertySection_update_eannotation_command_name)
-		{
-			@Override
-			protected CommandResult doExecuteWithResult(
-					IProgressMonitor arg0, IAdaptable arg1)
-					throws ExecutionException
-			{
-				EAnnotation annotation = modelElement.getEAnnotation(containerEAnnotationName);
-				if (annotation == null)
-				{
-					annotation = EcoreFactory.eINSTANCE.createEAnnotation();
-					annotation.setSource(containerEAnnotationName);
-					annotation.setEModelElement(modelElement);
-					annotation.getDetails().put(annotationDetailName, ""); //$NON-NLS-1$
-				}
-				
-				annotation.getDetails().put(key, value);
-				
-				return CommandResult.newOKCommandResult();
-			}
-		};
-		// execute command
-		try
-		{
-			IStatus status = command.execute(new NullProgressMonitor(), null);
-			return status.isOK();
-		}
-		catch (ExecutionException exception)
-		{
-			JadexBpmnPlugin.getDefault().getLog().log(
-					new Status(IStatus.ERROR, JadexBpmnPlugin.PLUGIN_ID,
-							IStatus.ERROR, exception.getMessage(),
-							exception));
-			
-			return false;
-		}
-	}
 
 	// ---- control creation methods ----
 
@@ -243,45 +147,33 @@ public abstract class Abstract1ColumnTablePropertySection extends AbstractProper
 	 * Creates the controls of the Parameter page section. Creates a table
 	 * containing all Parameter of the selected {@link ParameterizedVertex}.
 	 * 
-	 * We use our own layout
-	 * 
 	 * @generated NOT
 	 */
 	protected TableViewer createParameterTableComposite(Composite parent)
 	{
-		Composite tableSectionComposite = getWidgetFactory().createComposite(parent/*, SWT.BORDER*/);
+		Composite tableComposite = getWidgetFactory().createComposite(parent/*, SWT.BORDER*/);
 
 		// The layout of the table composite
 		GridLayout compositeLayout = new GridLayout(3, false);
-		compositeLayout.marginWidth = 5;
-		
-		// The layout data of the table composite
-		GridData compositeGridData = new GridData(GridData.FILL_BOTH
-				| GridData.HORIZONTAL_ALIGN_FILL);
-		compositeGridData.grabExcessHorizontalSpace = true;
-		compositeGridData.grabExcessVerticalSpace = true;
-		compositeGridData.minimumHeight = 200;
-		compositeGridData.heightHint = 200;
-		
-		// apply layout and data
-		tableSectionComposite.setLayout(compositeLayout);
-		tableSectionComposite.setLayoutData(compositeGridData);
-		
-		
+		tableComposite.setLayout(compositeLayout);
+
+		// the layout of the table in table composite
 		GridData tableLayoutData = new GridData(GridData.FILL_BOTH);
 		tableLayoutData.grabExcessHorizontalSpace = true;
 		tableLayoutData.grabExcessVerticalSpace = true;
+		tableLayoutData.minimumHeight = 150;
+		tableLayoutData.heightHint = 150;
 		tableLayoutData.horizontalSpan = 3;
 
 		// create the table
-		getWidgetFactory().createLabel(tableSectionComposite, tableViewerLabel);
-		TableViewer viewer = createTable(tableSectionComposite, tableLayoutData);
+		//getWidgetFactory().createLabel(tableComposite, tableViewerLabel);
+		TableViewer viewer = createTable(tableComposite, tableLayoutData);
 
 		// create cell modifier command
 		createCellModifier(viewer);
 
 		// create buttons
-		createButtons(tableSectionComposite);
+		createButtons(tableComposite);
 		
 		return tableViewer = viewer;
 
@@ -572,35 +464,6 @@ public abstract class Abstract1ColumnTablePropertySection extends AbstractProper
 	// ---- converter and help methods ----
 	
 	/**
-	 * Refreshes the graphical selection after a modify operation.
-	 * 
-	 * @generated NOT
-	 */
-	private void refreshSelection()
-	{
-		if (getSelection() instanceof IStructuredSelection)
-		{
-			IStructuredSelection sel = (IStructuredSelection) getSelection();
-			if (null != sel)
-				for (Object selElt : sel.toList())
-				{
-					if (selElt instanceof EditPart)
-					{
-						final EditPart part = (EditPart) selElt;
-						Display.getCurrent().asyncExec(new Runnable()
-						{
-							@Override
-							public void run()
-							{
-								part.refresh();
-							}
-						});
-					}
-				}
-		}
-	}
-	
-	/**
 	 * Retrieve the EAnnotation from the modelElement and converts it to a {@link GeneralParameter} list
 	 * @param act
 	 * @return
@@ -710,7 +573,6 @@ public abstract class Abstract1ColumnTablePropertySection extends AbstractProper
 			}
 			
 			return new Object[] {};
-			//return new Object[] { new GeneralParameter("name", "expression") };
 		}
 
 		/**
