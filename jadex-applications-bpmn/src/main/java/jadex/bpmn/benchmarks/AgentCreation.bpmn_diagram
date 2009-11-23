@@ -37,7 +37,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_ZBsF1dQjEd6ZgonVFJzeWg"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_ZBsF1tQjEd6ZgonVFJzeWg" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="AgentCreation.bpmn#_ZBsF0dQjEd6ZgonVFJzeWg"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ZBsF19QjEd6ZgonVFJzeWg" x="898" y="27" width="504" height="168"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ZBsF19QjEd6ZgonVFJzeWg" x="898" y="18" width="504" height="177"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_PX_yQtQkEd6ZgonVFJzeWg" type="2001">
         <children xmi:type="notation:Node" xmi:id="_PX_ySNQkEd6ZgonVFJzeWg" type="4001"/>
