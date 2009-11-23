@@ -328,6 +328,7 @@ public class BpmnInterpreter implements IComponentInstance
 							
 							// todo: initiate kill process?!
 							
+							System.out.println("CC");
 							listener.resultAvailable(adapter.getComponentIdentifier());
 						}
 					});

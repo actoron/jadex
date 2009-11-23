@@ -167,9 +167,9 @@ public class SyncExecutionService	implements	IExecutionService
 		boolean	added;
 		synchronized(this)
 		{
-//			System.out.println("Task added: "+task);
 //			new RuntimeException().printStackTrace(System.out);
 			added = queue.add(task);
+			System.out.println("Task added: "+queue);
 		}
 		
 		// On change, wake up the main executor for executing tasks
