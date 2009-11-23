@@ -247,6 +247,8 @@ public class BpmnInterpreter implements IComponentInstance
 				finishing = true;
 			}
 			
+			System.out.println("Process wants: "+this.getComponentAdapter().getComponentIdentifier().getLocalName()+" "+!isFinished(null, null)+" "+isReady(null, null));
+			
 			return !isFinished(null, null) && isReady(null, null);
 		}
 		catch(ComponentTerminatedException ate)

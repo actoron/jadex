@@ -163,7 +163,7 @@ public class SyncExecutionService	implements	IExecutionService
 		if(shutdown)
 			return;
 
-		//System.out.println("execute called: "+task);
+		System.out.println("execute called: "+task);
 		boolean	added;
 		synchronized(this)
 		{

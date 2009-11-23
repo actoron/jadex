@@ -23,6 +23,7 @@ public class DestroyComponentTask extends AbstractTask
 			cid = ces.createComponentIdentifier(name, true, null);
 		}
 		
+//		System.out.println("Destroy component: "+cid.getName());
 		ces.destroyComponent(cid, null);
 	}
 }

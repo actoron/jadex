@@ -219,7 +219,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 		{
 			synchronized(descs)
 			{
-//				System.out.println("killing: "+cid);
+				System.out.println("killing: "+cid);
 				
 				StandaloneComponentAdapter agent = (StandaloneComponentAdapter)adapters.get(cid);
 				if(agent==null)
@@ -405,7 +405,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 			{
 				synchronized(descs)
 				{
-//					System.out.println("remove called for: "+cid);
+					System.out.println("CleanupCommand remove called for: "+cid);
 					StandaloneComponentAdapter	adapter	= (StandaloneComponentAdapter)adapters.remove(cid);
 					if(adapter==null)
 						throw new RuntimeException("Component Identifier not registered: "+cid);
@@ -449,7 +449,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 				}
 			}
 			
-//			System.out.println("CleanupCommand end.");
+			System.out.println("CleanupCommand end.");
 			
 			if(listener!=null)
 				listener.resultAvailable(result);
