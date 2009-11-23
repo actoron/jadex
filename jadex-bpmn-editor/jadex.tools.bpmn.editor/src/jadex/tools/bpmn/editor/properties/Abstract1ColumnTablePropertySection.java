@@ -60,7 +60,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * 
  * @author Claas Altschaffel
  */
-public abstract class JadexAbstract1ColumnTablePropertySection extends AbstractPropertySection
+public abstract class Abstract1ColumnTablePropertySection extends AbstractPropertySection
 {
 
 	// ---- constants ----
@@ -68,7 +68,8 @@ public abstract class JadexAbstract1ColumnTablePropertySection extends AbstractP
 	/**
 	 * the value column label
 	 */
-	private final static String VALUE_COLUMN = "Value"; // //$NON-NLS-1$
+	private final static String DEFAULT_COLUMN = "Value"; // //$NON-NLS-1$
+	
 
 	
 	// ---- attributes ----
@@ -86,11 +87,11 @@ public abstract class JadexAbstract1ColumnTablePropertySection extends AbstractP
 	private Button delButton;
 
 	/** The modelElement (task) that holds task implementation class and parameters, may be null. */
-	private EModelElement modelElement;
+	protected EModelElement modelElement;
 
 	/* JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION */
 	/** The EAnnotations name that contains the table information as detail */
-	private String containerEAnnotationName;
+	protected String containerEAnnotationName;
 	
 	/* JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL */
 	/** The EAnnotations detail that contains the information */
@@ -100,6 +101,8 @@ public abstract class JadexAbstract1ColumnTablePropertySection extends AbstractP
 	/** The label string for the tableViewer */
 	private String tableViewerLabel;
 	
+	private String tableColumnName; 
+
 	
 	// ---- constructor ----
 	
@@ -107,12 +110,15 @@ public abstract class JadexAbstract1ColumnTablePropertySection extends AbstractP
 	 * Protected constructor for subclasses
 	 * @param containerEAnnotationName the {@link EAnnotation} that holds this parameter table
 	 */
-	protected JadexAbstract1ColumnTablePropertySection(String containerEAnnotationName, String annotationDetailName, String tableLabel)
+	protected Abstract1ColumnTablePropertySection(String containerEAnnotationName, String annotationDetailName, String tableLabel, String tableColumnName)
 	{
+		// TODO: assertions
+		
 		super();
 		this.containerEAnnotationName = containerEAnnotationName;
 		this.annotationDetailName = annotationDetailName;
 		this.tableViewerLabel = tableLabel;
+		this.tableColumnName = tableColumnName != null ? tableColumnName : DEFAULT_COLUMN;
 	}
 
 
@@ -129,7 +135,7 @@ public abstract class JadexAbstract1ColumnTablePropertySection extends AbstractP
 		
 		sectionComposite = getWidgetFactory().createComposite(parent);
 		
-		GridLayout layout = new GridLayout();
+		GridLayout layout = new GridLayout(1, false);
 		sectionComposite.setLayout(layout);
 		
 		createParameterTableComposite(sectionComposite);
@@ -243,20 +249,24 @@ public abstract class JadexAbstract1ColumnTablePropertySection extends AbstractP
 	 */
 	protected TableViewer createParameterTableComposite(Composite parent)
 	{
-		Composite tableComposite = getWidgetFactory().createComposite(parent/*, SWT.BORDER*/);
+		Composite tableSectionComposite = getWidgetFactory().createComposite(parent/*, SWT.BORDER*/);
 
 		// The layout of the table composite
-		GridLayout layout = new GridLayout(3, false);
-		layout.marginWidth = 5;
-		tableComposite.setLayout(layout);
+		GridLayout compositeLayout = new GridLayout(3, false);
+		compositeLayout.marginWidth = 5;
 		
-		GridData gridData = new GridData(GridData.FILL_BOTH
+		// The layout data of the table composite
+		GridData compositeGridData = new GridData(GridData.FILL_BOTH
 				| GridData.HORIZONTAL_ALIGN_FILL);
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.grabExcessVerticalSpace = true;
-		gridData.minimumHeight = 200;
-		gridData.heightHint = 200;
-		tableComposite.setLayoutData(gridData);
+		compositeGridData.grabExcessHorizontalSpace = true;
+		compositeGridData.grabExcessVerticalSpace = true;
+		compositeGridData.minimumHeight = 200;
+		compositeGridData.heightHint = 200;
+		
+		// apply layout and data
+		tableSectionComposite.setLayout(compositeLayout);
+		tableSectionComposite.setLayoutData(compositeGridData);
+		
 		
 		GridData tableLayoutData = new GridData(GridData.FILL_BOTH);
 		tableLayoutData.grabExcessHorizontalSpace = true;
@@ -264,14 +274,14 @@ public abstract class JadexAbstract1ColumnTablePropertySection extends AbstractP
 		tableLayoutData.horizontalSpan = 3;
 
 		// create the table
-		getWidgetFactory().createLabel(tableComposite, tableViewerLabel);
-		TableViewer viewer = createTable(tableComposite, tableLayoutData);
+		getWidgetFactory().createLabel(tableSectionComposite, tableViewerLabel);
+		TableViewer viewer = createTable(tableSectionComposite, tableLayoutData);
 
 		// create cell modifier command
 		createCellModifier(viewer);
 
 		// create buttons
-		createButtons(tableComposite);
+		createButtons(tableSectionComposite);
 		
 		return tableViewer = viewer;
 
@@ -284,7 +294,7 @@ public abstract class JadexAbstract1ColumnTablePropertySection extends AbstractP
 	 */
 	private TableViewer createTable(Composite parent, GridData tableLayoutData)
 	{
-		String[] columns = new String[] { VALUE_COLUMN };
+		String[] columns = new String[] { tableColumnName };
 		int[] columnWeight = new int[] { 1 };
 
 		// the displayed table
@@ -359,7 +369,7 @@ public abstract class JadexAbstract1ColumnTablePropertySection extends AbstractP
 				{
 					GeneralParameter param = (GeneralParameter) element;
 
-					if (VALUE_COLUMN.equals(property))
+					if (tableColumnName.equals(property))
 					{
 						return param.getValue();
 					}
@@ -403,7 +413,7 @@ public abstract class JadexAbstract1ColumnTablePropertySection extends AbstractP
 									List params = getParameterList();
 									GeneralParameter paramToChange = (GeneralParameter) params.get(params.indexOf(param));
 
-									if (VALUE_COLUMN.equals(fproperty))
+									if (tableColumnName.equals(fproperty))
 									{
 										paramToChange.setValue((String) value);
 									}

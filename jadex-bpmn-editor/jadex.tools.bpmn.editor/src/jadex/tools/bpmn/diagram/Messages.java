@@ -23,6 +23,10 @@ public class Messages extends NLS
 	public static String JadexCommonPropertySection_update_eannotation_command_name;
 	public static String JadexCommonParameterListSection_ParameterTable_Label;
 
+	public static String JadexGlobalDiagramSection_Imports_Label;
+
+	public static String JadexGlobalDiagramSection_Package_Label;
+
 	public static String JadexSequenceMappingSection_MappingTable_Label;
 	public static String ActivityParameterListSection_ImplementationClass_label;
 	public static String ActivityParameterListSection_WrongElementDelimiter_message;

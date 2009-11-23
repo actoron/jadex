@@ -60,7 +60,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * 
  * @author Claas Altschaffel
  */
-public abstract class JadexAbstract2ColumnTablePropertySection extends AbstractPropertySection
+public abstract class Abstract2ColumnTablePropertySection extends AbstractPropertySection
 {
 
 	// ---- constants ----
@@ -68,12 +68,12 @@ public abstract class JadexAbstract2ColumnTablePropertySection extends AbstractP
 	/**
 	 * the name column label
 	 */
-	private final static String NAME_COLUMN = "Name"; // //$NON-NLS-1$
+	private final static String DEFAULT_FIRST_COLUMN = "Name"; // //$NON-NLS-1$
 	
 	/**
 	 * the value column label
 	 */
-	private final static String VALUE_COLUMN = "Expression"; // //$NON-NLS-1$
+	private final static String DEFAULT_SECOND_COLUMN = "Expression"; // //$NON-NLS-1$
 
 	
 	// ---- attributes ----
@@ -105,6 +105,14 @@ public abstract class JadexAbstract2ColumnTablePropertySection extends AbstractP
 	/** The label string for the tableViewer */
 	private String tableViewerLabel;
 	
+	/** the first column label */
+	private String firstColumn; 
+	
+	/** the second column label */
+	private String secondColumn; 
+	
+	/** the columns weight */
+	private int[] columsWeight;
 	
 	// ---- constructor ----
 	
@@ -112,12 +120,26 @@ public abstract class JadexAbstract2ColumnTablePropertySection extends AbstractP
 	 * Protected constructor for subclasses
 	 * @param containerEAnnotationName the {@link EAnnotation} that holds this parameter table
 	 */
-	protected JadexAbstract2ColumnTablePropertySection(String containerEAnnotationName, String annotationDetailName, String tableLabel)
+	protected Abstract2ColumnTablePropertySection(String containerEAnnotationName, String annotationDetailName, String tableLabel, String[] columns, int[] columnsWeight)
 	{
 		super();
 		this.containerEAnnotationName = containerEAnnotationName;
 		this.annotationDetailName = annotationDetailName;
 		this.tableViewerLabel = tableLabel;
+		
+		if (columns != null && columnsWeight != null)
+		{
+			assert (columns.length == 2) && (columnsWeight.length == 2);
+			this.firstColumn = columns[0];
+			this.secondColumn = columns[1];
+			this.columsWeight = columnsWeight;
+		}
+		else
+		{
+			this.firstColumn = DEFAULT_FIRST_COLUMN;
+			this.secondColumn = DEFAULT_SECOND_COLUMN;
+			this.columsWeight = new int[] {1, 6};
+		}
 	}
 
 
@@ -289,8 +311,8 @@ public abstract class JadexAbstract2ColumnTablePropertySection extends AbstractP
 	 */
 	private TableViewer createTable(Composite parent, GridData tableLayoutData)
 	{
-		String[] columns = new String[] { NAME_COLUMN, VALUE_COLUMN };
-		int[] columnWeight = new int[] { 1, 3 };
+		String[] columns = new String[] { firstColumn, secondColumn };
+		int[] weight = columsWeight;
 
 		// the displayed table
 		TableViewer viewer = new TableViewer(getWidgetFactory().createTable(parent,
@@ -308,7 +330,7 @@ public abstract class JadexAbstract2ColumnTablePropertySection extends AbstractP
 					SWT.LEFT);
 			column.setText(columns[i]);
 
-			tableLayout.addColumnData(new ColumnWeightData(columnWeight[i],
+			tableLayout.addColumnData(new ColumnWeightData(weight[i],
 					FigureUtilities.getTextWidth(columns[i], tableFont), true));
 		}
 		viewer.getTable().setLayout(tableLayout);
@@ -364,12 +386,12 @@ public abstract class JadexAbstract2ColumnTablePropertySection extends AbstractP
 				if (element instanceof GeneralParameter)
 				{
 					GeneralParameter param = (GeneralParameter) element;
-					if (NAME_COLUMN.equals(property))
+					if (firstColumn.equals(property))
 					{
 						return param.getName();
 					}
 
-					if (VALUE_COLUMN.equals(property))
+					if (secondColumn.equals(property))
 					{
 						return param.getValue();
 					}
@@ -413,12 +435,12 @@ public abstract class JadexAbstract2ColumnTablePropertySection extends AbstractP
 									List params = getParameterList();
 									GeneralParameter paramToChange = (GeneralParameter) params.get(params.indexOf(param));
 
-									if (NAME_COLUMN.equals(fproperty))
+									if (firstColumn.equals(fproperty))
 									{
 										paramToChange.setName((String) value);
 									}
 									
-									else if (VALUE_COLUMN.equals(fproperty))
+									else if (secondColumn.equals(fproperty))
 									{
 										paramToChange.setValue((String) value);
 									}

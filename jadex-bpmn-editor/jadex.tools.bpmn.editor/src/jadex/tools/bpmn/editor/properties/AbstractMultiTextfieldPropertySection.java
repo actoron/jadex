@@ -3,8 +3,6 @@
  */
 package jadex.tools.bpmn.editor.properties;
 
-import jadex.tools.bpmn.diagram.Messages;
-
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.events.ModifyEvent;
@@ -22,33 +20,35 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * @author Claas Altschaffel
  * 
  */
-public class JadexGlobalDiagramSection extends
-		Abstract1ColumnTablePropertySection
+public abstract class AbstractMultiTextfieldPropertySection extends
+		AbstractJadexPropertySection
 {
-
+	// ---- constants ----
+	
+	protected static final String[] DEFAULT_NAMES = new String[] { "Default_1", "Default_2", "Default_3" };
+	
 	// ---- attributes ----
 
-	/** The composite that holds the section parts */
-	private Composite sectionComposite;
+	private String[] textFieldNames;
 	
-	/** The package label */
-	private Label packageLabel;
-	
-	/** The text for the implementing class */
-	private Text packageText;
-	
-	// HACK!
-	private String[] textFieldNames = new String[] { "test1", "test2", "test3" };
 	private Text[] textFields;
 	
+	// ---- constructor ----
+	
 	/**
-	 * Default constructor, initializes super class
+	 * Default Constructor
+	 * 
+	 * @param textFieldNames
+	 * @param textFields
 	 */
-	public JadexGlobalDiagramSection()
+	protected AbstractMultiTextfieldPropertySection(
+			String containerEAnnotationName, String annotationDetailName,
+			String[] textFieldNames)
 	{
-		super(JadexCommonPropertySection.JADEX_GLOBAL_ANNOTATION, JadexCommonPropertySection.JADEX_IMPORT_LIST_DETAIL,
-				Messages.JadexGlobalDiagramSection_Imports_Label, "import");
+		super(containerEAnnotationName, annotationDetailName);
+		this.textFieldNames = textFieldNames != null ? textFieldNames : DEFAULT_NAMES;
 	}
+
 
 	// ---- methods ----
 
@@ -59,42 +59,26 @@ public class JadexGlobalDiagramSection extends
 	public void createControls(Composite parent,
 			TabbedPropertySheetPage aTabbedPropertySheetPage)
 	{
-		// create imports table from super class
 		super.createControls(parent, aTabbedPropertySheetPage);
 		
-		// we append the package text to the imports table
-		sectionComposite = getWidgetFactory().createComposite(parent);
-		GridLayout sectionLayout = new GridLayout();
+		GridLayout sectionLayout = new GridLayout(2, true);
 		sectionComposite.setLayout(sectionLayout);
 		
-		packageLabel = getWidgetFactory().createLabel(sectionComposite, Messages.JadexGlobalDiagramSection_Package_Label);
-		packageText = getWidgetFactory().createText(sectionComposite, ""); // //$NON-NLS-1$
-		packageText.addModifyListener(new ModifyJadexEAnnotation(JadexCommonPropertySection.JADEX_PACKAGE_DETAIL, packageText));
-		
-		
-		
-		GridData gd = new GridData();
-		gd.minimumWidth = 500;
-		gd.widthHint = 500;
-		
-		packageLabel.setLayoutData(gd);
-		packageText.setLayoutData(gd);
-		
+		GridData gridData = new GridData();
+		gridData.minimumWidth = 500;
+		gridData.widthHint = 500;
 
-		
-		// HACK - FIXME: move
 		textFields = new Text[textFieldNames.length];
 		for (int i = 0; i < textFieldNames.length; i++)
 		{
-			Label tmpLabel = getWidgetFactory().createLabel(sectionComposite, textFieldNames[i]);
-			Text tmpText = getWidgetFactory().createText(sectionComposite, textFieldNames[i]); // //$NON-NLS-1$
-			textFields[i] = tmpText;
-			tmpText.addModifyListener(new ModifyJadexEAnnotation(textFieldNames[i], tmpText));
-			tmpLabel.setLayoutData(gd);
-			tmpText.setLayoutData(gd);
+			Label cLabel = getWidgetFactory().createLabel(sectionComposite, textFieldNames[i]);
+			Text cTextfield = getWidgetFactory().createText(sectionComposite, textFieldNames[i]);
+			textFields[i] = cTextfield;
+			cTextfield.addModifyListener(new ModifyJadexEAnnotation(textFieldNames[i], cTextfield));
+			cLabel.setLayoutData(gridData);
+			cTextfield.setLayoutData(gridData);
 		}
 
-		
 	}
 
 	
@@ -110,11 +94,6 @@ public class JadexGlobalDiagramSection extends
 			EAnnotation ea = modelElement.getEAnnotation(containerEAnnotationName);
 			if (ea != null)
 			{
-				String packageValue = (String) ea.getDetails().get(JadexCommonPropertySection.JADEX_PACKAGE_DETAIL);
-				packageText.setText(packageValue != null ? packageValue : "");
-				
-				
-				// HACK!! - FIXME: move
 				for (int i = 0; i < textFieldNames.length; i++)
 				{
 					String tmpName = textFieldNames[i];
@@ -123,19 +102,13 @@ public class JadexGlobalDiagramSection extends
 					tmpField.setText(tmpValue != null ? tmpValue : "");
 					tmpField.setEnabled(true);
 				}
-				
 
 			}
 			
-			packageText.setEnabled(true);
 			return;
 		}
 		
 		// fall through
-		packageText.setEnabled(false);
-		
-		
-		// HACK!! - FIXME: move
 		for (int i = 0; i < textFieldNames.length; i++)
 		{
 			Text tmpField = textFields[i];

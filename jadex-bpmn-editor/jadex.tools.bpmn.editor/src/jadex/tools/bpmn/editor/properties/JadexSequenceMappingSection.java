@@ -11,16 +11,19 @@ import jadex.tools.bpmn.diagram.Messages;
  * 
  */
 public class JadexSequenceMappingSection extends
-		JadexAbstract2ColumnTablePropertySection
+		Abstract2ColumnTablePropertySection
 {
 
+	private static final String[] COLUMN_NAMES = new String[]{"Name", "Value"};
+	private static final  int[] COLUMN_WEIGHTS = new int[]{1 ,6};
+	
 	/**
 	 * Default constructor, initializes super class
 	 */
 	public JadexSequenceMappingSection()
 	{
 		super(JadexCommonPropertySection.JADEX_SEQUENCE_ANNOTATION, JadexCommonPropertySection.JADEX_MAPPING_LIST_DETAIL,
-				Messages.JadexSequenceMappingSection_MappingTable_Label);
+				Messages.JadexSequenceMappingSection_MappingTable_Label, COLUMN_NAMES, COLUMN_WEIGHTS);
 	}
 
 }

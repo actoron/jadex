@@ -39,13 +39,11 @@
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
               class="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection"
-              id="jadex.tools.bpmn.editor.propertySection.Common"
+              id="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection"
               tab="Jadex">
-              
            <input type="org.eclipse.stp.bpmn.Identifiable"/>
            <!-- use all EModelElements as input -->
            <input type="org.eclipse.emf.ecore.EModelElement"/>
-           
         </propertySection>
      </propertySections>
    </extension>
@@ -58,7 +56,7 @@
               filter="jadex.tools.bpmn.editor.properties.JadexUserTaskActivityFilter"
               id="jadex.tools.bpmn.editor.propertySection.UserTaskActivity"
               tab="Jadex"
-              afterSection="jadex.tools.bpmn.editor.propertySection.Common">
+              afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
            <input type="org.eclipse.stp.bpmn.Activity"/>
         </propertySection>
      </propertySections>
@@ -72,7 +70,7 @@
               filter="jadex.tools.bpmn.editor.properties.JadexIntermediateEventsFilter"
               id="jadex.tools.bpmn.editor.propertySection.GatewayActivity"
               tab="Jadex"
-              afterSection="jadex.tools.bpmn.editor.propertySection.Common">
+              afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
            <input type="org.eclipse.stp.bpmn.Activity"/>
         </propertySection>
      </propertySections>
@@ -85,7 +83,7 @@
               class="jadex.tools.bpmn.editor.properties.JadexSequenceMappingSection"
               id="jadex.tools.bpmn.editor.propertySection.Sequence"
               tab="Jadex"
-              afterSection="jadex.tools.bpmn.editor.propertySection.Common">
+              afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
            <input type="org.eclipse.stp.bpmn.SequenceEdge"/>
         </propertySection>
      </propertySections>
@@ -98,7 +96,7 @@
               class="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramSection"
               id="jadex.tools.bpmn.editor.propertySection.JadexGlobalDiagramSection"
               tab="Jadex"
-              afterSection="jadex.tools.bpmn.editor.propertySection.Common">
+              afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
            <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
         </propertySection>
      </propertySections>
