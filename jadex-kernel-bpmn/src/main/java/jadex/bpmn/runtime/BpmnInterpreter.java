@@ -12,14 +12,11 @@ import jadex.bpmn.runtime.handler.GatewayParallelActivityHandler;
 import jadex.bpmn.runtime.handler.GatewayXORActivityHandler;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
 import jadex.bpmn.runtime.handler.TaskActivityHandler;
-import jadex.bpmn.runtime.handler.basic.UserInteractionActivityHandler;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IMessageAdapter;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IChangeListener;
 import jadex.commons.IFilter;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
@@ -247,7 +244,7 @@ public class BpmnInterpreter implements IComponentInstance
 				finishing = true;
 			}
 			
-			System.out.println("Process wants: "+this.getComponentAdapter().getComponentIdentifier().getLocalName()+" "+!isFinished(null, null)+" "+isReady(null, null));
+//			System.out.println("Process wants: "+this.getComponentAdapter().getComponentIdentifier().getLocalName()+" "+!isFinished(null, null)+" "+isReady(null, null));
 			
 			return !isFinished(null, null) && isReady(null, null);
 		}
@@ -328,7 +325,7 @@ public class BpmnInterpreter implements IComponentInstance
 							
 							// todo: initiate kill process?!
 							
-							System.out.println("CC");
+//							System.out.println("CC: "+adapter);
 							listener.resultAvailable(adapter.getComponentIdentifier());
 						}
 					});
@@ -643,22 +640,6 @@ public class BpmnInterpreter implements IComponentInstance
 		
 		if(!isReady(pool, lane))
 			throw new UnsupportedOperationException("Cannot execute a process with only waiting threads: "+this);
-		
-		// Todo: execute only external entries belonging to pool/lane
-		Runnable[]	exta	= null;
-		synchronized(ext_entries)
-		{
-			if(!ext_entries.isEmpty())
-			{
-				exta = (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
-				ext_entries.clear();
-			}
-		}
-		if(exta!=null)
-		{
-			for(int i=0; i<exta.length; i++)
-				exta[i].run();
-		}
 		
 		ProcessThread	thread	= context.getExecutableThread(pool, lane);
 		

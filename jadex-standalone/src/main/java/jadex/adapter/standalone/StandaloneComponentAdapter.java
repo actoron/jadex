@@ -247,7 +247,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public void killComponent(IResultListener listener)
 	{
-		System.out.println("killComponent: "+listener);
+//		System.out.println("killComponent: "+listener);
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 			throw new ComponentTerminatedException(cid.getName());
 

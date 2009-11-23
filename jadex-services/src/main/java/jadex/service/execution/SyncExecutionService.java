@@ -163,13 +163,13 @@ public class SyncExecutionService	implements	IExecutionService
 		if(shutdown)
 			return;
 
-		System.out.println("execute called: "+task);
+//		System.out.println("execute called: "+task);
 		boolean	added;
 		synchronized(this)
 		{
 //			new RuntimeException().printStackTrace(System.out);
 			added = queue.add(task);
-			System.out.println("Task added: "+queue);
+//			System.out.println("Task added: "+queue);
 		}
 		
 		// On change, wake up the main executor for executing tasks
