@@ -8,16 +8,21 @@ import jadex.bridge.IComponentIdentifier;
 /**
  *  Task for destroying a component.
  */
-public class DestroyComponentTask
+public class DestroyComponentTask extends AbstractTask
 {
 	/**
 	 *  Execute the task.
 	 */
 	public void doExecute(ITaskContext context, BpmnInterpreter instance)
 	{
-		IComponentIdentifier cid = (IComponentIdentifier)context.getParameterValue("componentid");
-		
 		IComponentExecutionService ces = (IComponentExecutionService)instance.getComponentAdapter().getServiceContainer().getService(IComponentExecutionService.class);
+		IComponentIdentifier cid = (IComponentIdentifier)context.getParameterValue("componentid");
+		if(cid==null)
+		{
+			String name = (String)context.getParameterValue("name");
+			cid = ces.createComponentIdentifier(name, true, null);
+		}
+		
 		ces.destroyComponent(cid, null);
 	}
 }
