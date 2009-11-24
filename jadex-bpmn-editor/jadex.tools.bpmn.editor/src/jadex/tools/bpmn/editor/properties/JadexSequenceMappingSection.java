@@ -22,7 +22,7 @@ public class JadexSequenceMappingSection extends
 	 */
 	public JadexSequenceMappingSection()
 	{
-		super(JadexCommonPropertySection.JADEX_SEQUENCE_ANNOTATION, JadexCommonPropertySection.JADEX_MAPPING_LIST_DETAIL,
+		super(JADEX_SEQUENCE_ANNOTATION, JADEX_MAPPING_LIST_DETAIL,
 				Messages.JadexSequenceMappingSection_MappingTable_Label, COLUMN_NAMES, COLUMN_WEIGHTS);
 	}
 

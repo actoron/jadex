@@ -676,14 +676,14 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 				// modify the Activity annotation
 				ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
 						activity,
-						Messages.JadexUserTaskActivityPropertySection_add_command_name)
+						Messages.AbstractParameterTablePropertySection_add_command_name)
 				{
 					@Override
 					protected CommandResult doExecuteWithResult(
 							IProgressMonitor monitor, IAdaptable info)
 							throws ExecutionException
 					{
-						TaskParameter newElement = new TaskParameter(Messages.JadexUserTaskActivityPropertySection_NewParameterName_Value, "Object", "null", DIRECTION_DEFAULT); //$NON-NLS-2$ //$NON-NLS-3$
+						TaskParameter newElement = new TaskParameter(Messages.AbstractParameterTablePropertySection_NewParameterName_Value, "Object", "null", DIRECTION_DEFAULT); //$NON-NLS-2$ //$NON-NLS-3$
 
 						List params = getTaskParameterList();
 						params.add(newElement);
@@ -727,7 +727,7 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 				// modify the Activity annotation
 				ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
 						activity,
-						Messages.JadexUserTaskActivityPropertySection_delete_command_name)
+						Messages.AbstractParameterTablePropertySection_delete_command_name)
 				{
 					@Override
 					protected CommandResult doExecuteWithResult(
@@ -777,23 +777,24 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 			if (null != sel)
 				for (Object selElt : sel.toList())
 				{
+//					if (selElt instanceof EditPart)
+//					{
+//						final EditPart part = (EditPart) selElt;
+//						Display.getCurrent().asyncExec(new Runnable()
+//						{
+//							@Override
+//							public void run()
+//							{
+//								part.refresh();
+//							}
+//						});
+//					}
+					
 					if (selElt instanceof EditPart)
 					{
-						final EditPart part = (EditPart) selElt;
-						Display.getCurrent().asyncExec(new Runnable()
-						{
-							@Override
-							public void run()
-							{
-								part.refresh();
-							}
-						});
+						((EditPart) selElt).refresh();
 					}
 					
-					//if (selElt instanceof EditPart)
-					//{
-					//	((EditPart) selElt).refresh();
-					//}
 				}
 		}
 	}

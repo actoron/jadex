@@ -28,7 +28,7 @@ public class JadexGlobalDiagramPropertiesSection extends
 	 */
 	public JadexGlobalDiagramPropertiesSection()
 	{
-		super(JadexCommonPropertySection.JADEX_GLOBAL_ANNOTATION, JadexCommonPropertySection.JADEX_IMPORT_LIST_DETAIL,
+		super(JADEX_GLOBAL_ANNOTATION, JADEX_IMPORT_LIST_DETAIL,
 				textFieldNames);
 	}
 

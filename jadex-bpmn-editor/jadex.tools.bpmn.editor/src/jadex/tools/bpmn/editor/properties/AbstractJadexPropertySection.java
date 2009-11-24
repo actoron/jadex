@@ -71,12 +71,18 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	public static final String JADEX_FLOW_EXAMPLE_ANNOTATION = "example";
 	
 	
+	/** 
+	 * String delimiter for list elements <p>
+	 * <p><code>0x241F</code>	(9247)	SYMBOL FOR UNIT SEPARATOR</p>
+	 */
+	public static final String LIST_ELEMENT_DELIMITER = "\u241F"; // "<*>";
 	
-	/** String delimiter for list elements */
-	public static final String LIST_ELEMENT_DELIMITER = "<*>";
 	
-	/** String delimiter for element attributes */
-	public static final String LIST_ELEMENT_ATTRIBUTE_DELIMITER = "#|#";
+	/** 
+	 * String delimiter for element attributes  <p>
+	 * <p><code>0x240B</code>	(9227)	SYMBOL FOR VERTICAL TABULATION</p>
+	 */
+	public static final String LIST_ELEMENT_ATTRIBUTE_DELIMITER = "\u240B"; //"#|#";
 
 	
 	// ---- attributes ----
@@ -238,6 +244,12 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 							}
 						});
 					}
+					
+//					if (selElt instanceof EditPart)
+//					{
+//						((EditPart) selElt).refresh();
+//					}
+					
 				}
 		}
 	}

@@ -19,7 +19,7 @@ public class JadexGlobalDiagramImportsSection extends
 	 */
 	public JadexGlobalDiagramImportsSection()
 	{
-		super(JadexCommonPropertySection.JADEX_GLOBAL_ANNOTATION, JadexCommonPropertySection.JADEX_IMPORT_LIST_DETAIL,
+		super(JADEX_GLOBAL_ANNOTATION, JADEX_IMPORT_LIST_DETAIL,
 				Messages.JadexGlobalDiagramSection_Imports_Label, "import");
 	}
 

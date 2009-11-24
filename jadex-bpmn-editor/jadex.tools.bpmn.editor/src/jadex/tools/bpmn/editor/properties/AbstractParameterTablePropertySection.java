@@ -7,6 +7,8 @@ import jadex.tools.bpmn.diagram.Messages;
 import jadex.tools.bpmn.editor.JadexBpmnEditor;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -16,6 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EAnnotation;
+import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.gmf.runtime.common.ui.services.util.CommonLabelProvider;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.FigureUtilities;
@@ -96,9 +99,9 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 	
 	
 	protected final static String[] DEFAULT_COLUMN_NAMES
-		= new String[] { NAME_COLUMN, TYPE_COLUMN, VALUE_COLUMN, DIRECTION_COLUMN };
+		= new String[] { DIRECTION_COLUMN, NAME_COLUMN, TYPE_COLUMN, VALUE_COLUMN  };
 	
-	protected final static int[] DEFAULT_COLUMN_WEIGHT = new int[] { 1, 1, 4, 1 };
+	protected final static int[] DEFAULT_COLUMN_WEIGHT = new int[] { 1, 1, 1, 8 };
 	
 	
 	// ---- attributes ----
@@ -164,6 +167,7 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 	public void setInput(IWorkbenchPart part, ISelection selection)
 	{
 		super.setInput(part, selection);
+		
 		if (modelElement != null)
 		{
 			tableViewer.setInput(modelElement);
@@ -270,13 +274,13 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 
 		// Create the cell editors
 		CellEditor[] editors = new CellEditor[] {
-				new TextCellEditor(viewer.getTable()), // name (text)
-				new TextCellEditor(viewer.getTable()), // type
-				new TextCellEditor(viewer.getTable()), // value
 				new ComboBoxCellEditor(
 						viewer.getTable(),
 						DIRECTION_VALUES, 
-						SWT.READ_ONLY) // direction
+						SWT.READ_ONLY), // direction
+				new TextCellEditor(viewer.getTable()), // name (text)
+				new TextCellEditor(viewer.getTable()), // type
+				new TextCellEditor(viewer.getTable()) // value
 		};
 		viewer.setCellEditors(editors);
 
@@ -306,21 +310,7 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 				if (element instanceof Parameter)
 				{
 					Parameter param = (Parameter) element;
-					if (NAME_COLUMN.equals(property))
-					{
-						return param.getName();
-					}
-
-					if (TYPE_COLUMN.equals(property))
-					{
-						return param.getType();
-					}
-
-					if (VALUE_COLUMN.equals(property))
-					{
-						return param.getValue();
-					}
-
+					
 					if (DIRECTION_COLUMN.equals(property))
 					{
 						String value = param.getDirection();
@@ -335,7 +325,22 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 						// fall through
 						return new Integer(0);
 					}
+					
+					if (NAME_COLUMN.equals(property))
+					{
+						return param.getName();
+					}
 
+					if (TYPE_COLUMN.equals(property))
+					{
+						return param.getType();
+					}
+
+					if (VALUE_COLUMN.equals(property))
+					{
+						return param.getValue();
+					}
+					
 				}
 				// fall through
 				return null;
@@ -463,14 +468,14 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 				// modify the Activity annotation
 				ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
 						modelElement,
-						Messages.JadexUserTaskActivityPropertySection_add_command_name)
+						Messages.AbstractParameterTablePropertySection_add_command_name)
 				{
 					@Override
 					protected CommandResult doExecuteWithResult(
 							IProgressMonitor monitor, IAdaptable info)
 							throws ExecutionException
 					{
-						Parameter newElement = new Parameter(Messages.JadexUserTaskActivityPropertySection_NewParameterName_Value, "Object", "null", DEFAULT_DIRECTION); //$NON-NLS-2$ //$NON-NLS-3$
+						Parameter newElement = new Parameter(Messages.AbstractParameterTablePropertySection_NewParameterName_Value, "Object", "null", DEFAULT_DIRECTION); //$NON-NLS-2$ //$NON-NLS-3$
 
 						List params = getTaskParameterList();
 						params.add(newElement);
@@ -514,7 +519,7 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 				// modify the Activity annotation
 				ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
 						modelElement,
-						Messages.JadexUserTaskActivityPropertySection_delete_command_name)
+						Messages.AbstractParameterTablePropertySection_delete_command_name)
 				{
 					@Override
 					protected CommandResult doExecuteWithResult(
@@ -576,6 +581,8 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 	{
 		updateJadexEAnnotation(annotationDetailName, convertTaskParameterList(params));
 		
+		//tableViewer.refresh();
+		
 		// HACK? Should use notification?
 		Display.getCurrent().asyncExec(new Runnable()
 		{
@@ -596,31 +603,119 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 	 */
 	protected List<Parameter> convertTaskParameterString(String stringToConvert)
 	{
-		StringTokenizer listTokens = new StringTokenizer(stringToConvert, JadexCommonPropertySection.LIST_ELEMENT_DELIMITER);
-		List<Parameter> params = new ArrayList<Parameter>(listTokens.countTokens());
-		int i = 0;
+		List<Parameter> params = new ArrayList<Parameter>();
+		if(stringToConvert == null)
+		{
+			return params;
+		}
+		
+		StringTokenizer listTokens = new StringTokenizer(stringToConvert, LIST_ELEMENT_DELIMITER);
 		while (listTokens.hasMoreTokens())
 		{
 			String paramElement = listTokens.nextToken();
-			StringTokenizer paramTokens = new StringTokenizer(paramElement,JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-			// require 4 tokens: name, type, value, direction
-			if(paramTokens.countTokens() == 4)
+			StringTokenizer paramTokens = new StringTokenizer(paramElement, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+			
+			String name = null;
+			String value = null;
+			String type = null;
+			String direction = null;
+			
+			int count = 1;
+			String lastToken = null;
+			while (paramTokens.hasMoreTokens())
 			{
-				String name = paramTokens.nextToken();
-				String type = paramTokens.nextToken();
-				String value = paramTokens.nextToken();
-				String direction = paramTokens.nextToken();
-				params.add(new Parameter(name, type, value, direction));
-			}
-			else
-			{
-				BpmnDiagramEditorPlugin.getInstance().getLog().log(
-						new Status(IStatus.ERROR,
-								JadexBpmnEditor.ID, IStatus.ERROR,
-								Messages.ActivityParameterListSection_WrongElementDelimiter_message + " \""+paramElement+"\"", null)); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			// update token index
-			i++;
+				String token = paramTokens.nextToken();
+				
+				if (!token.equals(LIST_ELEMENT_ATTRIBUTE_DELIMITER))
+				{
+					switch (count)
+					{
+						case 1:
+							direction = token;
+							break;
+						case 2:
+							name = token;
+							break;
+						case 3:
+							type = token;
+							break;
+						case 4:
+							value = token;
+							break;
+						
+
+						default:
+							break;
+					}
+					
+					count++;
+				}
+				// we found a delim
+				else
+				{
+					
+					if (lastToken == null)
+					{
+						// we found a delim at the first position, count up.
+						count++;
+					}
+					
+					else if (token.equals(lastToken))
+					{
+						// we found two delims without any content between them, add empty string
+						switch (count)
+						{
+							case 1:
+								direction = DEFAULT_DIRECTION;
+								break;
+							case 2:
+								name = "";
+								break;
+							case 3:
+								type = "";
+								break;
+							case 4:
+								value = "";
+								break;
+								
+							default:
+								break;
+						}
+						count++;
+					}
+
+				}
+				
+				// remember last token 
+				lastToken = token;
+				
+			} // end while
+			
+			direction = direction != null ? direction : DEFAULT_DIRECTION;
+			name = name != null ? name : "";
+			value = value != null ? value : "";
+			type = type != null ? type : "";
+
+			params.add(new Parameter(name, type, value, direction));
+			
+//			// require 4 tokens: name, type, value, direction
+//			if(paramTokens.countTokens() == 4)
+//			{
+//				String direction = paramTokens.nextToken();
+//				String name = paramTokens.nextToken();
+//				String type = paramTokens.nextToken();
+//				String value = paramTokens.nextToken();
+//				
+//				params.add(new Parameter(name, type, value, direction));
+//			}
+//			else
+//			{
+//				BpmnDiagramEditorPlugin.getInstance().getLog().log(
+//						new Status(IStatus.ERROR,
+//								JadexBpmnEditor.ID, IStatus.ERROR,
+//								Messages.ActivityParameterListSection_WrongElementDelimiter_message + " \""+paramElement+"\"", null)); //$NON-NLS-1$ //$NON-NLS-2$
+//			}
+
 		}
 		return params;
 	}
@@ -637,16 +732,17 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 		{
 			if (buffer.length() != 0)
 			{
-				buffer.append(JadexCommonPropertySection.LIST_ELEMENT_DELIMITER);
+				buffer.append(LIST_ELEMENT_DELIMITER);
 			}
-			//buffer.append(JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-			buffer.append(parameter.getName());
-			buffer.append(JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-			buffer.append(parameter.getType());
-			buffer.append(JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-			buffer.append(parameter.getValue());
-			buffer.append(JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+
 			buffer.append(parameter.getDirection());
+			buffer.append(LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+			buffer.append(parameter.getName());
+			buffer.append(LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+			buffer.append(parameter.getType());
+			buffer.append(LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+			buffer.append(parameter.getValue());
+			
 		}
 
 		return buffer.toString();
@@ -668,9 +764,9 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 		 */
 		public Object[] getElements(Object inputElement)
 		{
-			if (inputElement instanceof Activity)
+			if (inputElement instanceof EModelElement)
 			{
-				EAnnotation ea = ((Activity)inputElement).getEAnnotation(containerEAnnotationName);
+				EAnnotation ea = ((EModelElement)inputElement).getEAnnotation(containerEAnnotationName);
 				inputElement = ea;
 			}
 			
@@ -728,14 +824,14 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 				Parameter param = (Parameter) element;
 				switch (columnIndex)
 				{
-				case 0:
-					return param.getName();
-				case 1:
-					return param.getType();
-				case 2:
-					return param.getValue();
-				case 3:
-					return param.getDirection();
+					case 0:
+						return param.getDirection();
+					case 1:
+						return param.getName();
+					case 2:
+						return param.getType();
+					case 3:
+						return param.getValue();
 				
 				default:
 					return super.getText(param);
@@ -816,9 +912,10 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 		@Override
 		public String toString()
 		{
-			return name + JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER + type
-					+ JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER + value
-					+ JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER + direction;
+			return direction 
+					+ LIST_ELEMENT_ATTRIBUTE_DELIMITER + name
+					+ LIST_ELEMENT_ATTRIBUTE_DELIMITER + type
+					+ LIST_ELEMENT_ATTRIBUTE_DELIMITER + value;
 		}
 		
 		// ---- getter / setter ----

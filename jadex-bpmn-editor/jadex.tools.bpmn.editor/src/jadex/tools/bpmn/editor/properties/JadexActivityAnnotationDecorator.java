@@ -21,7 +21,7 @@ public class JadexActivityAnnotationDecorator extends BpmnEAnnotationDecoratorPr
 	@Override
 	public String getAssociatedAnnotationSource() 
 	{
-		return JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION;
+		return AbstractJadexPropertySection.JADEX_ACTIVITY_ANNOTATION;
 	}
 
 	@Override
@@ -52,11 +52,11 @@ public class JadexActivityAnnotationDecorator extends BpmnEAnnotationDecoratorPr
             		
             		Messages.JadexActivityAnnotationDecorator_Class_Label
             		+"=" //$NON-NLS-1$
-            		+annotation.getDetails().get(JadexCommonPropertySection.JADEX_ACTIVITY_CLASS_DETAIL)
+            		+annotation.getDetails().get(AbstractJadexPropertySection.JADEX_ACTIVITY_CLASS_DETAIL)
             		+"\n" //$NON-NLS-1$
             		+Messages.JadexActivityAnnotationDecorator_Parameter_Label
             		+"=" //$NON-NLS-1$
-            		+annotation.getDetails().get(JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL));
+            		+annotation.getDetails().get(AbstractJadexPropertySection.JADEX_PARAMETER_LIST_DETAIL));
             return label;
         }
         return null;

@@ -10,16 +10,16 @@ public class Messages extends NLS
 	public static String JadexActivityAnnotationDecorator_Parameter_Label;
 	public static String CommonSection_label_text;
 	public static String JadexUserTaskActivityPropertySection_update_command_name;
-	public static String JadexUserTaskActivityPropertySection_add_command_name;
+	public static String AbstractParameterTablePropertySection_add_command_name;
 
 	public static String JadexCommonPropertySection_ButtonAdd_Label;
 	public static String JadexCommonPropertySection_ButtonDelete_Label;
 	
-	public static String JadexUserTaskActivityPropertySection_delete_command_name;
+	public static String AbstractParameterTablePropertySection_delete_command_name;
 
 	public static String JadexCommonPropertySection_InvalidEditColumn_Message;
 
-	public static String JadexUserTaskActivityPropertySection_NewParameterName_Value;
+	public static String AbstractParameterTablePropertySection_NewParameterName_Value;
 	public static String JadexCommonPropertySection_update_eannotation_command_name;
 	public static String JadexCommonParameterListSection_ParameterTable_Label;
 

@@ -18,8 +18,8 @@ public class JadexGlobalDiagramParameterSection extends
 	 */
 	public JadexGlobalDiagramParameterSection()
 	{
-		super(JadexCommonPropertySection.JADEX_GLOBAL_ANNOTATION, JadexCommonPropertySection.JADEX_IMPORT_LIST_DETAIL,
-				new int[]{1,1,4,1});
+		super(JADEX_GLOBAL_ANNOTATION, JADEX_PARAMETER_LIST_DETAIL,
+				new int[]{1,1,1,8});
 	}
 
 }

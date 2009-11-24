@@ -21,7 +21,7 @@ public class JadexIntermediateEventsParameterSection extends
 	 */
 	public JadexIntermediateEventsParameterSection()
 	{
-		super(JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION, JadexCommonPropertySection.JADEX_PARAMETER_LIST_DETAIL,
+		super(JADEX_ACTIVITY_ANNOTATION, JADEX_PARAMETER_LIST_DETAIL,
 				Messages.JadexCommonParameterListSection_ParameterTable_Label, COLUMN_NAMES, COLUMN_WEIGHTS );
 	}
 

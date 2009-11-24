@@ -546,27 +546,93 @@ public abstract class Abstract2ColumnTablePropertySection extends AbstractJadexP
 	{
 		StringTokenizer listTokens = new StringTokenizer(stringToConvert, JadexCommonPropertySection.LIST_ELEMENT_DELIMITER);
 		List<GeneralParameter> params = new ArrayList<GeneralParameter>(listTokens.countTokens());
-		int i = 0;
 		while (listTokens.hasMoreTokens())
 		{
 			String paramElement = listTokens.nextToken();
-			StringTokenizer paramTokens = new StringTokenizer(paramElement,JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-			// require 2 tokens: name, value
-			if(paramTokens.countTokens() == 2)
+			StringTokenizer paramTokens = new StringTokenizer(paramElement,JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER, true);
+			
+			String name = null;
+			String value = null;
+			
+			int count = 1;
+			String lastToken = null;
+			while (paramTokens.hasMoreTokens())
 			{
-				String name = paramTokens.nextToken();
-				String value = paramTokens.nextToken();
-				params.add(new GeneralParameter(name, value));
-			}
-			else
-			{
-				BpmnDiagramEditorPlugin.getInstance().getLog().log(
-						new Status(IStatus.ERROR,
-								JadexBpmnEditor.ID, IStatus.ERROR,
-								Messages.ActivityParameterListSection_WrongElementDelimiter_message + " \""+paramElement+"\"", null)); // //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			// update token index
-			i++;
+				String token = paramTokens.nextToken();
+				
+				if (!token.equals(LIST_ELEMENT_ATTRIBUTE_DELIMITER))
+				{
+					switch (count)
+					{
+						case 1:
+							name = token;
+							break;
+							
+						case 2:
+							value = token;
+							break;
+							
+						default:
+							break;
+					}
+					
+					count++;
+				}
+				// we found a delim
+				else
+				{
+					
+					if (lastToken == null)
+					{
+						// we found a delim at the first position, count up.
+						count++;
+					}
+					
+					else if (token.equals(lastToken))
+					{
+						// we found two delims without any content between them, add empty string
+						switch (count)
+						{
+							case 1:
+								name = "";
+								break;
+								
+							case 2:
+								value = "";
+								break;
+								
+							default:
+								break;
+						}
+						count++;
+					}
+
+				}
+				
+				// remember last token 
+				lastToken = token;
+				
+			} // end while
+			
+			name = name != null ? name : "";
+			value = value != null ? value : "";
+			params.add(new GeneralParameter(name, value));
+			
+//			// require 2 tokens: name, value
+//			if(paramTokens.countTokens() == 2)
+//			{
+//				String name = paramTokens.nextToken();
+//				String value = paramTokens.nextToken();
+//				params.add(new GeneralParameter(name, value));
+//			}
+//			else
+//			{
+//				BpmnDiagramEditorPlugin.getInstance().getLog().log(
+//						new Status(IStatus.ERROR,
+//								JadexBpmnEditor.ID, IStatus.ERROR,
+//								Messages.ActivityParameterListSection_WrongElementDelimiter_message + " \""+paramElement+"\"", null)); // //$NON-NLS-1$ //$NON-NLS-2$
+//			}
+
 		}
 		return params;
 	}
@@ -583,11 +649,11 @@ public abstract class Abstract2ColumnTablePropertySection extends AbstractJadexP
 		{
 			if (buffer.length() != 0)
 			{
-				buffer.append(JadexCommonPropertySection.LIST_ELEMENT_DELIMITER);
+				buffer.append(LIST_ELEMENT_DELIMITER);
 			}
 
 			buffer.append(generalParameter.getName());
-			buffer.append(JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+			buffer.append(LIST_ELEMENT_ATTRIBUTE_DELIMITER);
 			buffer.append(generalParameter.getValue());
 
 		}
@@ -744,7 +810,7 @@ public abstract class Abstract2ColumnTablePropertySection extends AbstractJadexP
 		@Override
 		public String toString()
 		{
-			return name + JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER + value;
+			return name + LIST_ELEMENT_ATTRIBUTE_DELIMITER + value;
 		}
 		
 		// ---- getter / setter ----

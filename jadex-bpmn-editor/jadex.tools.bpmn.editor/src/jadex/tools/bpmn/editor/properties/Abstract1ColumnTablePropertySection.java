@@ -508,7 +508,7 @@ public abstract class Abstract1ColumnTablePropertySection extends AbstractJadexP
 	 */
 	protected List<GeneralParameter> convertParameterString(String stringToConvert)
 	{
-		StringTokenizer listTokens = new StringTokenizer(stringToConvert, JadexCommonPropertySection.LIST_ELEMENT_DELIMITER);
+		StringTokenizer listTokens = new StringTokenizer(stringToConvert, LIST_ELEMENT_DELIMITER);
 		List<GeneralParameter> params = new ArrayList<GeneralParameter>(listTokens.countTokens());
 		int i = 0;
 		while (listTokens.hasMoreTokens())
@@ -534,7 +534,7 @@ public abstract class Abstract1ColumnTablePropertySection extends AbstractJadexP
 		{
 			if (buffer.length() != 0)
 			{
-				buffer.append(JadexCommonPropertySection.LIST_ELEMENT_DELIMITER);
+				buffer.append(LIST_ELEMENT_DELIMITER);
 			}
 
 			buffer.append(generalParameter.getValue());
