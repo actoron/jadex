@@ -102,9 +102,6 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 	
 	
 	// ---- attributes ----
-	
-	/** The composite that holds the section parts */
-	private Composite sectionComposite;
 
 	/** The viewer/editor for parameter */ 
 	private TableViewer tableViewer;
@@ -216,7 +213,7 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 
 		// create buttons
 		createButtons(parent);
-		
+
 		return tableViewer = viewer;
 
 	}

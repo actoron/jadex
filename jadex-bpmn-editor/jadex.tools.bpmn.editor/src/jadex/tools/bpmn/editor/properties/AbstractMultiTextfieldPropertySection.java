@@ -5,8 +5,10 @@ package jadex.tools.bpmn.editor.properties;
 
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -71,8 +73,12 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 		textFields = new Text[textFieldNames.length];
 		for (int i = 0; i < textFieldNames.length; i++)
 		{
-			Label cLabel = getWidgetFactory().createLabel(sectionComposite, textFieldNames[i]);
-			Text cTextfield = getWidgetFactory().createText(sectionComposite, textFieldNames[i]);
+			// TODO: use group?
+			Composite cComposite = getWidgetFactory().createComposite(sectionComposite);
+			cComposite.setLayout(new GridLayout(1, true));
+			
+			Label cLabel = getWidgetFactory().createLabel(cComposite, textFieldNames[i]);
+			Text cTextfield = getWidgetFactory().createText(cComposite, textFieldNames[i]);
 			textFields[i] = cTextfield;
 			cTextfield.addModifyListener(new ModifyJadexEAnnotation(textFieldNames[i], cTextfield));
 			cLabel.setLayoutData(gridData);
