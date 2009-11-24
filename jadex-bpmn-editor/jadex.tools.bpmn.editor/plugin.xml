@@ -89,14 +89,40 @@
      </propertySections>
    </extension>
    
-    <!-- the jadex sequence property section -->
+    <!-- the jadex global property section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramSection"
-              id="jadex.tools.bpmn.editor.propertySection.JadexGlobalDiagramSection"
+              class="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramPropertiesSection"
+              id="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramPropertiesSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
+           <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
+        </propertySection>
+     </propertySections>
+   </extension>
+   
+    <!-- the jadex global import section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertySection
+              class="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramImportsSection"
+              id="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramImportsSection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramPropertiesSectionn">
+           <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
+        </propertySection>
+     </propertySections>
+   </extension>
+   
+    <!-- the jadex global import section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertySection
+              class="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramParameterSection"
+              id="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramParameterSection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramImportsSectionn">
            <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
         </propertySection>
      </propertySections>
