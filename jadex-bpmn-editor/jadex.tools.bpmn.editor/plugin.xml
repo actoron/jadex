@@ -7,7 +7,7 @@
             class="jadex.tools.bpmn.editor.JadexBpmnEditor"
             contributorClass="jadex.tools.bpmn.editor.JadexBpmnEditorContributor"
             extensions="bpmn_diagram"
-            icon="icons/plan.png"
+            icon="icons/bpmn.png"
             id="jadex.tools.bpmn.editor.JadexBpmnEditorID"
             name="Jadex BPMN Editor">
       </editor>
