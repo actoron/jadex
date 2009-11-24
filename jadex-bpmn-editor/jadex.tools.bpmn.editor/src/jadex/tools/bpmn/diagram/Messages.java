@@ -28,7 +28,7 @@ public class Messages extends NLS
 	public static String JadexGlobalDiagramSection_Package_Label;
 
 	public static String JadexSequenceMappingSection_MappingTable_Label;
-	public static String ActivityParameterListSection_ImplementationClass_label;
+	public static String JadexUserTaskImplComboSection_ImplementationClass_label;
 	public static String ActivityParameterListSection_WrongElementDelimiter_message;
 	
 	static

@@ -3,19 +3,15 @@
  */
 package jadex.tools.bpmn.editor.properties;
 
-import jadex.tools.bpmn.diagram.Messages;
-
 import org.eclipse.emf.ecore.EAnnotation;
-import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -37,10 +33,10 @@ public abstract class AbstractComboPropertySection extends AbstractJadexProperty
 	// ---- constants ----
 	
 	private static final String[] DEFAULT_COMBO_ITEMS = new String[] {
-			"Some", //$NON-NLS-1$
-			"Combo", //$NON-NLS-1$
-			"Field", //$NON-NLS-1$
-			"Defaults" //$NON-NLS-1$
+			"Default_1 in AbstractComboPropertySection", //$NON-NLS-1$
+			"Default_2 in AbstractComboPropertySection", //$NON-NLS-1$
+			"Default_3 in AbstractComboPropertySection", //$NON-NLS-1$
+			"Default_4 in AbstractComboPropertySection" //$NON-NLS-1$
 	};
 	
 	// ---- attributes ----
@@ -49,6 +45,8 @@ public abstract class AbstractComboPropertySection extends AbstractJadexProperty
 	protected CCombo cCombo;
 	
 	protected String[] cComboItems;
+
+	protected String cComboLabel;
 
 	// ---- constructor ----
 	
@@ -63,19 +61,29 @@ public abstract class AbstractComboPropertySection extends AbstractJadexProperty
 	}
 
 	/**
-	 * @param containerEAnnotationName
-	 * @param annotationDetailName
-	 * @param cComboItems
-	 * @param verifyListener
-	 * @param traverseLListener
 	 */
 	protected AbstractComboPropertySection(String containerEAnnotationName,
 			String annotationDetailName, String[] comboItems)
 	{
+		this(containerEAnnotationName, annotationDetailName, comboItems, annotationDetailName);
+	}
+	
+	/**
+	 */
+	protected AbstractComboPropertySection(String containerEAnnotationName,
+			String annotationDetailName, String[] comboItems, String comboLabel)
+	{
 		super(containerEAnnotationName, annotationDetailName);
 
 		assert comboItems != null;
+		
+		if (comboLabel == null)
+		{
+			comboLabel = annotationDetailName;
+		}
+		
 		this.cComboItems = comboItems;
+		this.cComboLabel = comboLabel;
 	}
 
 	// ---- methods ----
@@ -158,38 +166,26 @@ public abstract class AbstractComboPropertySection extends AbstractJadexProperty
 	{
 		
 		// The layout of the section composite
-		GridLayout layout = new GridLayout(1, false);
+		GridLayout layout = new GridLayout(2, false);
 		sectionComposite.setLayout(layout);
-		
-		getWidgetFactory().createCLabel(sectionComposite, Messages.ActivityParameterListSection_ImplementationClass_label);
 
+		GridData comboGridData = new GridData(SWT.FILL);
+		comboGridData.minimumWidth = 500;
+		comboGridData.widthHint = 500;
+		
+		GridData labelGridData = new GridData();
+		labelGridData.minimumWidth = 60;
+		labelGridData.widthHint = 60;
+		
+		CLabel cLabel = getWidgetFactory().createCLabel(sectionComposite, cComboLabel+":"); // //$NON-NLS-1$
+		cLabel.setLayoutData(labelGridData);
+		
 		final CCombo combo = getWidgetFactory().createCCombo(sectionComposite, SWT.NONE);
-		
-		GridData gridData = new GridData(SWT.FILL);
-		gridData.minimumWidth = 500;
-		gridData.widthHint = 500;
-		combo.setLayoutData(gridData);
-		
+		combo.setLayoutData(comboGridData);
 		
 		String[] items = this.cComboItems;
 		combo.setItems(items);
 		combo.setText(combo.getItem(0));
-		combo.addVerifyListener(new VerifyListener()
-		{
-			public void verifyText(VerifyEvent e)
-			{
-				String text = combo.getText();
-				String newText = text.substring(0, e.start) + e.text
-						+ text.substring(e.end);
-				
-				// don't allow non word characters
-				RegularExpression re = new RegularExpression("\\w*"); //$NON-NLS-1$
-				if (!re.matches(newText))
-				{
-					e.doit = false;
-				}
-			}
-		});
 		
 		combo.addTraverseListener(new TraverseListener()
 		{
@@ -200,14 +196,10 @@ public abstract class AbstractComboPropertySection extends AbstractJadexProperty
 					e.doit = false;
 					e.detail = SWT.TRAVERSE_NONE;
 					String newText = combo.getText();
-
-					// check if we have a valid class name
-					if (newText.endsWith(".class")) //$NON-NLS-1$
-					{
-						combo.add(newText);
-						combo.setSelection(new Point(0, newText
-								.length()));
-					}
+					
+					combo.add(newText);
+					combo.setSelection(new Point(0, newText
+							.length()));
 
 				}
 			}

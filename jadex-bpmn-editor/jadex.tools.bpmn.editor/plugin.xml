@@ -48,7 +48,7 @@
      </propertySections>
    </extension>
    
-   <!-- the jadex user task activity property section -->
+   <!-- the jadex user task activity property section - ->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
@@ -57,6 +57,34 @@
               id="jadex.tools.bpmn.editor.propertySection.UserTaskActivity"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
+           <input type="org.eclipse.stp.bpmn.Activity"/>
+        </propertySection>
+     </propertySections>
+   </extension> -->
+   
+   <!-- the jadex user task activity class implementation property section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertySection
+              class="jadex.tools.bpmn.editor.properties.JadexUserTaskImplComboSection"
+              filter="jadex.tools.bpmn.editor.properties.JadexUserTaskActivityFilter"
+              id="jadex.tools.bpmn.editor.properties.JadexUserTaskImplComboSection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
+           <input type="org.eclipse.stp.bpmn.Activity"/>
+        </propertySection>
+     </propertySections>
+   </extension>
+   
+   <!-- the jadex user task activity parameter property section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertySection
+              class="jadex.tools.bpmn.editor.properties.JadexCommonDiagramParameterSection"
+              filter="jadex.tools.bpmn.editor.properties.JadexUserTaskActivityFilter"
+              id="jadex.tools.bpmn.editor.properties.JadexCommonDiagramParameterSection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexUserTaskImplComboSection">
            <input type="org.eclipse.stp.bpmn.Activity"/>
         </propertySection>
      </propertySections>
@@ -76,14 +104,27 @@
      </propertySections>
    </extension>
    
+    <!-- the jadex sequence property section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertySection
+              class="jadex.tools.bpmn.editor.properties.JadexSequencePropertiesSection"
+              id="jadex.tools.bpmn.editor.properties.JadexSequencePropertiesSection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
+           <input type="org.eclipse.stp.bpmn.SequenceEdge"/>
+        </propertySection>
+     </propertySections>
+   </extension>
+   
    <!-- the jadex sequence property section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
               class="jadex.tools.bpmn.editor.properties.JadexSequenceMappingSection"
-              id="jadex.tools.bpmn.editor.propertySection.Sequence"
+              id="jadex.tools.bpmn.editor.properties.JadexSequenceMappingSection"
               tab="Jadex"
-              afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
+              afterSection="jadex.tools.bpmn.editor.properties.JadexSequencePropertiesSection">
            <input type="org.eclipse.stp.bpmn.SequenceEdge"/>
         </propertySection>
      </propertySections>
@@ -93,7 +134,7 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramPropertiesSection"
+              class="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesSection"
               id="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramPropertiesSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
@@ -106,7 +147,7 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramImportsSection"
+              class="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramImportsSection"
               id="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramImportsSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramPropertiesSectionn">
@@ -119,7 +160,7 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramParameterSection"
+              class="jadex.tools.bpmn.editor.properties.JadexCommonDiagramParameterSection"
               id="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramParameterSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramImportsSectionn">

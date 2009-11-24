@@ -5,10 +5,8 @@ package jadex.tools.bpmn.editor.properties;
 
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -66,23 +64,27 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 		GridLayout sectionLayout = new GridLayout(2, true);
 		sectionComposite.setLayout(sectionLayout);
 		
-		GridData gridData = new GridData();
-		gridData.minimumWidth = 500;
-		gridData.widthHint = 500;
+		GridData textGridData = new GridData();
+		textGridData.minimumWidth = 500;
+		textGridData.widthHint = 500;
+		
+		GridData labelGridData = new GridData();
+		labelGridData.minimumWidth = 60;
+		labelGridData.widthHint = 60;
 
 		textFields = new Text[textFieldNames.length];
 		for (int i = 0; i < textFieldNames.length; i++)
 		{
 			// TODO: use group?
 			Composite cComposite = getWidgetFactory().createComposite(sectionComposite);
-			cComposite.setLayout(new GridLayout(1, true));
+			cComposite.setLayout(new GridLayout(2, false));
 			
-			Label cLabel = getWidgetFactory().createLabel(cComposite, textFieldNames[i]);
+			Label cLabel = getWidgetFactory().createLabel(cComposite, textFieldNames[i]+":"); // //$NON-NLS-1$
 			Text cTextfield = getWidgetFactory().createText(cComposite, textFieldNames[i]);
 			textFields[i] = cTextfield;
 			cTextfield.addModifyListener(new ModifyJadexEAnnotation(textFieldNames[i], cTextfield));
-			cLabel.setLayoutData(gridData);
-			cTextfield.setLayoutData(gridData);
+			cLabel.setLayoutData(labelGridData);
+			cTextfield.setLayoutData(textGridData);
 		}
 
 	}

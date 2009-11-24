@@ -69,6 +69,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * Property section Tab to enable Jadex specific properties
  * 
  * @author Claas Altschaffel
+ * @deprecated subclass abstract sections instead. 
  */
 public class JadexUserTaskActivityPropertySection extends AbstractPropertySection
 {
@@ -308,7 +309,7 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 		GridLayout layout = new GridLayout(1, false);
 		taskComposite.setLayout(layout);
 		
-		getWidgetFactory().createCLabel(taskComposite, Messages.ActivityParameterListSection_ImplementationClass_label);
+		getWidgetFactory().createCLabel(taskComposite, Messages.JadexUserTaskImplComboSection_ImplementationClass_label);
 
 		final CCombo combo = getWidgetFactory().createCCombo(taskComposite, SWT.NONE);
 		

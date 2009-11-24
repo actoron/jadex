@@ -111,6 +111,10 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 			String annotationDetailName)
 	{
 		super();
+		
+		assert containerEAnnotationName != null && !containerEAnnotationName.isEmpty();
+		assert annotationDetailName != null && !annotationDetailName.isEmpty();
+		
 		this.containerEAnnotationName = containerEAnnotationName;
 		this.annotationDetailName = annotationDetailName;
 	}

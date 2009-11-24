@@ -10,7 +10,7 @@ import jadex.tools.bpmn.diagram.Messages;
  * @author Claas Altschaffel
  * 
  */
-public class JadexGlobalDiagramPropertiesSection extends
+public class JadexBpmnDiagramPropertiesSection extends
 		AbstractMultiTextfieldPropertySection
 {
 
@@ -26,7 +26,7 @@ public class JadexGlobalDiagramPropertiesSection extends
 	/**
 	 * Default constructor, initializes super class
 	 */
-	public JadexGlobalDiagramPropertiesSection()
+	public JadexBpmnDiagramPropertiesSection()
 	{
 		super(JADEX_GLOBAL_ANNOTATION, JADEX_IMPORT_LIST_DETAIL,
 				textFieldNames);
