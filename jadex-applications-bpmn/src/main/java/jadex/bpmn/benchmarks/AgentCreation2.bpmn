@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_fYvDQdkMEd6KRaQAf_IpCg" iD="_fYvDQNkMEd6KRaQAf_IpCg">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_t_U5MNkMEd6KRaQAf_IpCg" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_t_U5MdkMEd6KRaQAf_IpCg" key="imports" value="jadex.commons.&lt;*>jadex.bridge.&lt;*>jadex.bpmn.runtime.task.&lt;*>jadex.bpmn.model.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_t_U5MtkMEd6KRaQAf_IpCg" key="Package" value="jadex.bpmn.benchmarks"/>
+  </eAnnotations>
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_o4sWkdkMEd6KRaQAf_IpCg" iD="_o4sWkNkMEd6KRaQAf_IpCg" name="&#xD;&#xA;argument new Argument(&quot;max&quot;, &quot;The maximum numbers of agents to create.&quot;, &quot;int&quot;, new Integer(2)) ">
+    <associations xmi:type="bpmn:Association" xmi:id="_qjr4wNkMEd6KRaQAf_IpCg"/>
+  </artifacts>
+  <pools xmi:type="bpmn:Pool" xmi:id="_fZ7WEdkMEd6KRaQAf_IpCg" iD="_fZ7WENkMEd6KRaQAf_IpCg" associations="_qjr4wNkMEd6KRaQAf_IpCg" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_fZ7WE9kMEd6KRaQAf_IpCg" iD="_fZ7WEtkMEd6KRaQAf_IpCg" outgoingEdges="_6dcU2tkOEd6KRaQAf_IpCg" name="Fetch and prepare arguments" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-qQI8NkNEd6KRaQAf_IpCg" source="activity">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-qQI8dkNEd6KRaQAf_IpCg" key="class" value="PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-qQI8tkNEd6KRaQAf_IpCg" key="prameter" value="text#|#String#|#&quot;Created peer: &quot;+($args.get(&quot;num&quot;)!=null? (Integer)$args.get(&quot;num&quot;): new Integer(1))#|#in&lt;*>num#|#Integer#|#$args.get(&quot;num&quot;)!=null? (Integer)$args.get(&quot;num&quot;): new Integer(1)#|#out&lt;*>startmem#|#Long#|#$args.get(&quot;startmem&quot;)!=null? (Long)$args.get(&quot;startmem&quot;): new Long(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())#|#out&lt;*>starttime#|#Long#|#$args.get(&quot;starttime&quot;)!=null? (Long)$args.get(&quot;starttime&quot;): new Long($clock.getTime())#|#out"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_6dcU0dkOEd6KRaQAf_IpCg" iD="_6dcU0NkOEd6KRaQAf_IpCg" outgoingEdges="_7yYHcdkOEd6KRaQAf_IpCg _TQs9otkQEd6KRaQAf_IpCg" incomingEdges="_6dcU2tkOEd6KRaQAf_IpCg" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_7yOWcdkOEd6KRaQAf_IpCg" iD="_7yOWcNkOEd6KRaQAf_IpCg" outgoingEdges="_Ue8niNkSEd6KRaQAf_IpCg" incomingEdges="_7yYHcdkOEd6KRaQAf_IpCg" name="Create Process" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-hKo8NkOEd6KRaQAf_IpCg" source="activity">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-hKo8dkOEd6KRaQAf_IpCg" key="class" value="CreateComponentTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-hKo8tkOEd6KRaQAf_IpCg" key="prameter" value="model#|#String#|#&quot;/jadex/bpmn/benchmarks/AgentCreation.bpmn&quot;#|#in&lt;*>name#|#String#|#&quot;AgentCreation_&quot;+(num+1)#|#in&lt;*>num#|#Integer#|#new Integer(num +1)#|#in&lt;*>startmem#|#Long#|#startmem#|#in&lt;*>starttime#|#Long#|#starttime#|#in"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_TQjzsdkQEd6KRaQAf_IpCg" iD="_TQjzsNkQEd6KRaQAf_IpCg" outgoingEdges="_YrA_WtkSEd6KRaQAf_IpCg" incomingEdges="_TQs9otkQEd6KRaQAf_IpCg" name="Print Creation Results Task" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_n10AcNkQEd6KRaQAf_IpCg" source="activity">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_n10AcdkQEd6KRaQAf_IpCg" key="class" value="CreateComponentTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_n10ActkQEd6KRaQAf_IpCg" key="prameter" value="startmem#|#Long#|#(Long)$args.get(&quot;startmem&quot;)#|#in&lt;*>starttime#|#Long#|#(Long)$args.get(&quot;starttime&quot;)#|#in&lt;*>used#|#long#|#Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory()#|#in&lt;*>omem#|#long#|#(used-startmem.longValue())/1024#|#in&lt;*>upera#|#double#|#((long)(1000++(used-startmem.longValue())/max/1024))/1000.0#|#in&lt;*>end#|#long#|#$clock.getTime()#|#in&lt;*>dur#|#double#|#((double)end-starttime.longValue())/1000.0#|#in&lt;*>text#|#String#|#&quot;Overall memory usage: &quot;+omem+&quot;kB. Per process: &quot;+upera+&quot; kB. Last peer created. &quot;+max+&quot; processes started. Needed: &quot;+dur+&quot; secs. Per process: &quot;+pera+&quot; sec. Corresponds to &quot;+(1/pera)+&quot; processes per sec.&quot;#|#in"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Uey2gdkSEd6KRaQAf_IpCg" iD="_Uey2gNkSEd6KRaQAf_IpCg" incomingEdges="_Ue8niNkSEd6KRaQAf_IpCg" name="Wait For Ever" activityType="EventIntermediateSignal"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_YrA_UdkSEd6KRaQAf_IpCg" iD="_YrA_UNkSEd6KRaQAf_IpCg" outgoingEdges="_cVaNcdkSEd6KRaQAf_IpCg" incomingEdges="_YrA_WtkSEd6KRaQAf_IpCg _ecaWMdkSEd6KRaQAf_IpCg" name="Delete Processes" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hoQnINkSEd6KRaQAf_IpCg" source="activity">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hoQnIdkSEd6KRaQAf_IpCg" key="class" value="PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hoQnItkSEd6KRaQAf_IpCg" key="prameter" value="i#|#int#|#max-1#|#inout&lt;*>name#|#String#|#i==1? &quot;AgentCreation&quot;: &quot;AgentCreation_&quot;+i#|#in"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_cVQccdkSEd6KRaQAf_IpCg" iD="_cVQccNkSEd6KRaQAf_IpCg" outgoingEdges="_ecaWMdkSEd6KRaQAf_IpCg _Zokh0dkUEd6KRaQAf_IpCg" incomingEdges="_cVaNcdkSEd6KRaQAf_IpCg" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ZoQ_0dkUEd6KRaQAf_IpCg" iD="_ZoQ_0NkUEd6KRaQAf_IpCg" outgoingEdges="_j7yeEdkUEd6KRaQAf_IpCg" incomingEdges="_Zokh0dkUEd6KRaQAf_IpCg" name="Print Kill Results Task" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_mC8X0NkUEd6KRaQAf_IpCg" source="activity">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mC8X0dkUEd6KRaQAf_IpCg" key="class" value="CreateComponentTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mC8X0tkUEd6KRaQAf_IpCg" key="prameter" value="killdur#|#double#|#((double)$clock.getTime()-killstarttime)/1000.0#|#in&lt;*>killpera#|#double#|#killdur/(max-1)#|#in&lt;*>stillused#|#long#|#(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024#|#in&lt;*>text#|#Object#|# &quot;Last peer destroyed. &quot;+(max-1)+&quot; agents killed. \nCumulated results: Creation needed: &quot;+dur+&quot; secs. Per agent: &quot;+pera+&quot; sec. Corresponds to &quot;+(1/pera)+&quot; agents per sec. Killing needed:  &quot;+killdur+&quot; secs. Per process: &quot;+killpera+&quot; sec. Corresponds to &quot;+(1/killpera)+&quot; agents per sec. Overall memory usage: &quot;+omem+&quot;kB. Per process: &quot;+upera+&quot; kB. Still used memory: &quot;+stillused+&quot;kB.&quot;#|#inout"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_j7pUIdkUEd6KRaQAf_IpCg" iD="_j7pUINkUEd6KRaQAf_IpCg" incomingEdges="_j7yeEdkUEd6KRaQAf_IpCg" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_6dcU2tkOEd6KRaQAf_IpCg" iD="_6dcU2dkOEd6KRaQAf_IpCg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_7yYHcdkOEd6KRaQAf_IpCg" iD="_7yYHcNkOEd6KRaQAf_IpCg" name="num.intValue()&lt;max"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_TQs9otkQEd6KRaQAf_IpCg" iD="_TQs9odkQEd6KRaQAf_IpCg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Ue8niNkSEd6KRaQAf_IpCg" iD="_Ue8nh9kSEd6KRaQAf_IpCg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_YrA_WtkSEd6KRaQAf_IpCg" iD="_YrA_WdkSEd6KRaQAf_IpCg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_cVaNcdkSEd6KRaQAf_IpCg" iD="_cVaNcNkSEd6KRaQAf_IpCg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ecaWMdkSEd6KRaQAf_IpCg" iD="_ecaWMNkSEd6KRaQAf_IpCg" name="i > 1&#xD;&#xA;i = i-1"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Zokh0dkUEd6KRaQAf_IpCg" iD="_Zokh0NkUEd6KRaQAf_IpCg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_j7yeEdkUEd6KRaQAf_IpCg" iD="_j7yeENkUEd6KRaQAf_IpCg"/>
+  </pools>
+</bpmn:BpmnDiagram>

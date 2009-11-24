@@ -1,7 +1,5 @@
 package jadex.tools.bpmn.editor;
 
-import jadex.tools.bpmn.editor.properties.JadexProptertyConstants;
-
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.emf.ecore.EObject;
@@ -39,7 +37,7 @@ public class JadexImplEditPolicy extends PropertyHandlerEditPolicy implements Ed
 				if (object instanceof EModelElement)
 				{
 					EAnnotation ann = ((EModelElement) object)
-							.getEAnnotation(JadexProptertyConstants.JADEX_ACTIVITY_ANNOTATION);
+							.getEAnnotation("test" /*JadexProptertyConstants.JADEX_ACTIVITY_ANNOTATION*/);
 					if (ann == null)
 					{
 						System.out.println("Line 44: ann == null " );
