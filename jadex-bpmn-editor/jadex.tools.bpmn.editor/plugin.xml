@@ -169,6 +169,19 @@
      </propertySections>
    </extension>
    
+    <!-- the jadex bpmndiagram arguments section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertySection
+              class="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramArgumentsSection"
+              id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramArgumentsSection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramParameterSection">
+           <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
+        </propertySection>
+     </propertySections>
+   </extension>
+   
    <!-- annotation decorator in diagram -->
 	<!--
 	<extension
