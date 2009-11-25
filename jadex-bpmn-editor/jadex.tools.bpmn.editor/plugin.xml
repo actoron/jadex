@@ -130,7 +130,7 @@
      </propertySections>
    </extension>
    
-    <!-- the jadex global property section -->
+    <!-- the jadex bpmndiagram property section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
@@ -143,27 +143,27 @@
      </propertySections>
    </extension>
    
-    <!-- the jadex global import section -->
+    <!-- the jadex bpmndiagram import section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
               class="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramImportsSection"
               id="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramImportsSection"
               tab="Jadex"
-              afterSection="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramPropertiesSectionn">
+              afterSection="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramPropertiesSection">
            <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
         </propertySection>
      </propertySections>
    </extension>
    
-    <!-- the jadex global import section -->
+    <!-- the jadex bpmndiagram parameter section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
               class="jadex.tools.bpmn.editor.properties.JadexCommonDiagramParameterSection"
               id="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramParameterSection"
               tab="Jadex"
-              afterSection="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramImportsSectionn">
+              afterSection="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramImportsSection">
            <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
         </propertySection>
      </propertySections>
