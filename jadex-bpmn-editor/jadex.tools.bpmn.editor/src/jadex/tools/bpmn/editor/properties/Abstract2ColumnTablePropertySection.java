@@ -510,7 +510,8 @@ public abstract class Abstract2ColumnTablePropertySection extends AbstractJadexP
 		if (ea != null)
 		{
 			String value = (String) ea.getDetails().get(annotationDetailName);
-			return convertParameterString(value);
+			if (value != null)
+				return convertParameterString(value);
 		}
 		
 		return new ArrayList<GeneralParameter>(0);
