@@ -120,26 +120,34 @@ public abstract class AbstractComboPropertySection extends AbstractJadexProperty
 			if (ea != null)
 			{
 				String value = (String) ea.getDetails().get(annotationDetailName);
-				int valueIndex = -1;
 				
-				// search value in items
-				String[] items = cCombo.getItems();
-				for (int i = 0; i < items.length; i++)
+				if (value != null)
 				{
-					if(items[i].equals(value))
+					int valueIndex = -1;
+					// search value in items
+					String[] items = cCombo.getItems();
+					for (int i = 0; i < items.length; i++)
 					{
-						valueIndex = i;
+						if (items[i].equals(value))
+						{
+							valueIndex = i;
+						}
 					}
+					
+					// add the value to the items list
+					if (valueIndex == -1)
+					{
+						cCombo.add(value, 0);
+						valueIndex = 0;
+					}
+					cCombo.select(valueIndex);
 				}
-				
-				// add the value to the items list
-				if (valueIndex == -1 )
+				else
 				{
-					cCombo.add(value, 0);
-					valueIndex = 0;
+					// add empty value
+					cCombo.add("", 0); // //$NON-NLS-1$
+					cCombo.select(0);
 				}
-				cCombo.select(0);
-				
 			}
 			
 			cCombo.setEnabled(true);

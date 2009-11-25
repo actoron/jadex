@@ -564,7 +564,8 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 		if (ea != null)
 		{
 			String value = (String) ea.getDetails().get(annotationDetailName);
-			return convertTaskParameterString(value);
+			if (value != null)
+				return convertTaskParameterString(value);
 		}
 		
 		return new ArrayList<Parameter>(0);
@@ -773,7 +774,8 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 			if (inputElement instanceof EAnnotation)
 			{
 				String parameterListString = ((EAnnotation) inputElement).getDetails().get(annotationDetailName);
-				return convertTaskParameterString(parameterListString).toArray();
+				if (parameterListString != null)
+					return convertTaskParameterString(parameterListString).toArray();
 			}
 			
 			return new Object[] {};
