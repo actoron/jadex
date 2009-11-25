@@ -148,7 +148,7 @@
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
               class="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramImportsSection"
-              id="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramImportsSection"
+              id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramImportsSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesSection">
            <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>

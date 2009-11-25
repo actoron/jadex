@@ -566,10 +566,11 @@ public abstract class Abstract4ColumnTablePropertySection extends AbstractJadexP
 	private List<General4Parameter> getParameterList()
 	{
 		EAnnotation ea = modelElement.getEAnnotation(containerEAnnotationName);
-		if (ea != null)
+		if(ea != null)
 		{
 			String value = (String) ea.getDetails().get(annotationDetailName);
-			return convertParameterString(value);
+			if(value!=null)
+				return convertParameterString(value);
 		}
 		
 		return new ArrayList<General4Parameter>(0);
@@ -608,7 +609,7 @@ public abstract class Abstract4ColumnTablePropertySection extends AbstractJadexP
 	{
 		StringTokenizer listTokens = new StringTokenizer(stringToConvert, JadexCommonPropertySection.LIST_ELEMENT_DELIMITER);
 		List<General4Parameter> params = new ArrayList<General4Parameter>(listTokens.countTokens());
-		while (listTokens.hasMoreTokens())
+		while(listTokens.hasMoreTokens())
 		{
 			String paramElement = listTokens.nextToken();
 			StringTokenizer paramTokens = new StringTokenizer(paramElement,JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER, true);
@@ -757,7 +758,8 @@ public abstract class Abstract4ColumnTablePropertySection extends AbstractJadexP
 			if (inputElement instanceof EAnnotation)
 			{
 				String parameterListString = ((EAnnotation) inputElement).getDetails().get(annotationDetailName);
-				return convertParameterString(parameterListString).toArray();
+				if(parameterListString!=null)
+					return convertParameterString(parameterListString).toArray();
 			}
 			
 			return new Object[] {};

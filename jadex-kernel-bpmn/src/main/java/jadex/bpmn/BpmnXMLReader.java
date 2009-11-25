@@ -658,6 +658,8 @@ public class BpmnXMLReader
 			MBpmnModel model = (MBpmnModel)root;
 			JavaCCExpressionParser parser = new JavaCCExpressionParser();
 
+			// Read information from artifact text (normal stp modeller)
+			
 			List arts = model.getArtifacts();
 			if(arts!=null)
 			{
@@ -725,6 +727,8 @@ public class BpmnXMLReader
 				if(model.getPackage()!=null)
 					imports.add(model.getPackage()+".*");
 				model.setImports((String[])imports.toArray(new String[imports.size()]));
+				
+				// 
 			}
 			
 			return null;
