@@ -494,7 +494,10 @@ public abstract class Abstract1ColumnTablePropertySection extends AbstractJadexP
 			@Override
 			public void run()
 			{
-				tableViewer.refresh();
+				if (tableViewer != null && modelElement != null)				
+				{
+					tableViewer.refresh();
+				}
 			}
 		});
 		

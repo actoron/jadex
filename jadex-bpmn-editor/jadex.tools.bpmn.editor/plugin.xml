@@ -135,7 +135,7 @@
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
               class="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesSection"
-              id="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramPropertiesSection"
+              id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
            <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
@@ -150,7 +150,7 @@
               class="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramImportsSection"
               id="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramImportsSection"
               tab="Jadex"
-              afterSection="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramPropertiesSection">
+              afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesSection">
            <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
         </propertySection>
      </propertySections>

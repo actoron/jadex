@@ -586,7 +586,10 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 			@Override
 			public void run()
 			{
-				tableViewer.refresh();
+				if (tableViewer != null && modelElement != null)				
+				{
+					tableViewer.refresh();
+				}
 			}
 		});
 		

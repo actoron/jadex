@@ -831,7 +831,10 @@ public class JadexUserTaskActivityPropertySection extends AbstractPropertySectio
 			@Override
 			public void run()
 			{
-				tableViewer.refresh();
+				if (tableViewer != null && activity != null)				
+				{
+					tableViewer.refresh();
+				}
 			}
 		});
 		
