@@ -21,7 +21,7 @@ import java.util.StringTokenizer;
 /**
  *  Java representation of a bpmn model for xml description.
  */
-public class MBpmnModel extends MIdElement implements ICacheableModel, ILoadableComponentModel
+public class MBpmnModel extends MAnnotationElement implements ICacheableModel, ILoadableComponentModel
 {
 	//-------- constants --------
 	

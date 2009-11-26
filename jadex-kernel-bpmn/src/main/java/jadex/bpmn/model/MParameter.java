@@ -5,7 +5,7 @@ import jadex.javaparser.IParsedExpression;
 /**
  *  A parameter model element.
  */
-public class MParameter extends MIdElement
+public class MParameter extends MAnnotationElement
 {
 	//-------- constants --------
 	

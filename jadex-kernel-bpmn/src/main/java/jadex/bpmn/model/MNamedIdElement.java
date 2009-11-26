@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  *  Base class for named id elements.
  */
-public class MNamedIdElement extends MIdElement
+public class MNamedIdElement extends MAnnotationElement
 {
 	//-------- attributes --------
 	

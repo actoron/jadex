@@ -4,7 +4,7 @@ package jadex.bpmn.model;
  *  An association is a connection between an 
  *  artifact and some other thing.
  */
-public class MAssociation extends MIdElement
+public class MAssociation extends MAnnotationElement
 {
 	//-------- attributes --------
 	
