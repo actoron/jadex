@@ -1,6 +1,6 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.service.clock.IClockService;
 
 import java.io.FileInputStream;
@@ -265,7 +265,7 @@ public class Settings implements Cloneable, Serializable
 	 *  @param settings_loc The settings location.
 	 *  @return The loaded settings.
 	 */
-	public static Settings loadSettings(String settings_loc, IExternalAccess agent)
+	public static Settings loadSettings(String settings_loc, IBDIExternalAccess agent)
 	{
 		Settings ret = null;
 		try

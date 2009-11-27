@@ -8,7 +8,7 @@ import jadex.bdi.examples.cleanerworld_classic.Waste;
 import jadex.bdi.examples.cleanerworld_classic.Wastebin;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
 
 import java.awt.BorderLayout;
@@ -76,7 +76,7 @@ public class EnvironmentGui	extends JFrame
 	/**
 	 *  Create a new gui plan.
 	 */
-	public EnvironmentGui(final IExternalAccess agent)
+	public EnvironmentGui(final IBDIExternalAccess agent)
 	{
 		super(agent.getAgentName());
 

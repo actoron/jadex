@@ -7,66 +7,66 @@ import java.util.Map;
 import javax.swing.Icon;
 
 /**
- * 
+ *  A factory is responsible for one or more component types
+ *  and is capable of loading component models from files
+ *  as well as instantiating components.
  */
 public interface IComponentFactory extends IService
 {
-	//-------- constants --------
-
-//	/** The component type application. */
-//	public static final String COMPONENT_TYPE_APPLICATION = "application";
-//	
-//	/** The component type agent. */
-//	public static final String COMPONENT_TYPE_AGENT = "agent";
-//	
-//	/** The component type process. */
-//	public static final String COMPONENT_TYPE_PROCESS = "process";
-
 	//-------- methods --------
 	
 	/**
 	 *  Load a  model.
-	 *  @param model The model.
+	 *  @param model The model (e.g. file name).
 	 *  @return The loaded model.
 	 */
 	public ILoadableComponentModel loadModel(String model);
 
 	/**
 	 *  Test if a model can be loaded by the factory.
-	 *  @param model The model.
+	 *  @param model The model (e.g. file name).
 	 *  @return True, if model can be loaded.
 	 */
 	public boolean isLoadable(String model);
 	
 	/**
 	 *  Test if a model is startable (e.g. an agent).
-	 *  @param model The model.
+	 *  @param model The model (e.g. file name).
 	 *  @return True, if startable (and loadable).
 	 */
 	public boolean isStartable(String model);
 
 	/**
-	 *  Get the names of ADF file types supported by this factory.
+	 *  Get the names of component types supported by this factory.
 	 */
-	public String[] getFileTypes();
+	public String[] getComponentTypes();
 
 	/**
-	 *  Get a default icon for a file type.
+	 *  Get a default icon for a component type.
 	 */
-	public Icon getFileTypeIcon(String type);
+	public Icon getComponentTypeIcon(String type);
 
 	/**
-	 *  Get the file type of a model.
-	 *  @param model The model.
+	 *  Get the component type of a model.
+	 *  @param model The model (e.g. file name).
 	 */
-	public String getFileType(String model);
+	public String getComponentType(String model);
 	
 	/**
-	 * Create a kernel agent.
-	 * @param model The agent model file (i.e. the name of the XML file).
+	 * Create a component instance.
+	 * @param model The component model file (i.e. the name of the XML file).
 	 * @param config The name of the configuration (or null for default configuration) 
 	 * @param arguments The arguments for the agent as name/value pairs.
-	 * @return An instance of a kernel agent.
+	 * @return An instance of a component.
 	 */
 	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments);
+
+	/**
+	 *  Get the properties (name/value pairs).
+	 *  Arbitrary properties that can e.g. be used to
+	 *  define kernel-specific settings to configure tools.
+	 *  @param type	The component type. 
+	 *  @return The properties or null, if the component type is not supported by this factory.
+	 */
+	public Map	getProperties(String type);
 }

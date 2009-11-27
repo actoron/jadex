@@ -126,7 +126,7 @@
 			</property>
 			
 			<property type="jadex.bridge.IComponentFactory" name="bpmn_factory">
-				new jadex.wfms.service.loader.BpmnFactory($platform)
+				new jadex.wfms.service.loader.BpmnFactory($platform, null)
 			</property>
 			
 			<property type="jadex.bridge.IComponentFactory" name="gpmn_factory">

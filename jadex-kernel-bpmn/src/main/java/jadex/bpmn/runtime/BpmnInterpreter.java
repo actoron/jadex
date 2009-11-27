@@ -16,7 +16,11 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
 import jadex.commons.IFilter;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
@@ -37,7 +41,7 @@ import java.util.logging.Logger;
  *  The micro agent interpreter is the connection between the agent platform 
  *  and a user-written micro agent. 
  */
-public class BpmnInterpreter implements IComponentInstance
+public class BpmnInterpreter implements IComponentInstance, IExternalAccess // Hack!!!
 {
 	//-------- static part --------
 
@@ -107,7 +111,7 @@ public class BpmnInterpreter implements IComponentInstance
 	protected List history;
 	
 	/** The change listeners. */
-//	protected List listeners;
+	protected List listeners;
 	
 	/** The step number. */
 	protected int stepnumber;
@@ -531,7 +535,7 @@ public class BpmnInterpreter implements IComponentInstance
 	 *  Get the agent model.
 	 *  @return The model.
 	 */
-	public MBpmnModel getComponentModel()
+	public ILoadableComponentModel getModel()
 	{
 		return model;
 	}
@@ -677,7 +681,7 @@ public class BpmnInterpreter implements IComponentInstance
 				}
 			}
 			
-//			notifyListeners(new ChangeEvent(this, "step_executed"));
+			notifyListeners(new ChangeEvent(this, "step_executed"));
 		}
 	}
 
@@ -764,27 +768,27 @@ public class BpmnInterpreter implements IComponentInstance
 	/**
 	 *  Add a change listener.
 	 *  @param listener The listener.
-	 * /
+	 */
 	public void addChangeListener(IChangeListener listener)
 	{
 		if(listeners==null)
 			listeners = new ArrayList();
 		listeners.add(listener);
-	}*/
+	}
 	
 	/**
 	 *  Remove a change listener.
 	 *  @param listener The listener.
-	 * /
+	 */
 	public void removeChangeListener(IChangeListener listener)
 	{
 		if(listeners!=null)
 			listeners.remove(listener);
-	}*/
+	}
 	
 	/**
 	 *  Notify the change listeners.
-	 * /
+	 */
 	public void notifyListeners(ChangeEvent event)
 	{
 		if(listeners!=null)
@@ -794,7 +798,7 @@ public class BpmnInterpreter implements IComponentInstance
 				((IChangeListener)listeners.get(i)).changeOccurred(event);
 			}
 		}
-	}*/
+	}
 	
 	/**
 	 *  Test if the given context variable is declared.

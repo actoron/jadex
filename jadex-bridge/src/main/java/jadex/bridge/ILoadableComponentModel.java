@@ -1,6 +1,6 @@
 package jadex.bridge;
 
-import java.util.Properties;
+import java.util.Map;
 
 
 /**
@@ -70,8 +70,8 @@ public interface ILoadableComponentModel
 	/**
 	 *  Get the properties.
 	 *  Arbitrary properties that can e.g. be used to
-	 *  define kernel-specific settings to configure tools. 
+	 *  define model-specific settings to configure tools. 
 	 *  @return The properties.
 	 */
-	public Properties	getProperties();
+	public Map	getProperties();
 }

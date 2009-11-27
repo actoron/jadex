@@ -101,6 +101,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 		// Load the model with fitting factory.
 		
 		IComponentFactory factory = null;
+		String	type	= null;
 		Collection facts = container.getServices(IComponentFactory.class);
 		if(facts!=null)
 		{
@@ -110,6 +111,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 				if(cf.isLoadable(model))
 				{
 					factory	= cf;
+					type	= factory.getComponentType(model);
 				}
 			}
 		}
@@ -141,7 +143,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 						cid.setAddresses(ms.getAddresses());
 				}
 		
-				ad	= new AMSAgentDescription(cid);
+				ad	= new AMSAgentDescription(cid, type);
 				if(suspend)
 				{
 					ad.setState(IComponentDescription.STATE_SUSPENDED);
@@ -523,13 +525,15 @@ public class ComponentExecutionService implements IComponentExecutionService
 	}
 	
 	/**
-	 *  Create a ams agent description.
-	 *  @param agent The agent.
-	 *  @return The ams agent description.
+	 * Create a ams agent description.
+	 * @param id The component identifier.
+	 * @param state The state.
+	 * @param ownership The ownership.
+	 * @return The ams agent description.
 	 */
-	public IComponentDescription createComponentDescription(IComponentIdentifier agent, String state, String ownership)
+	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type)
 	{
-		AMSAgentDescription	ret	= new AMSAgentDescription(agent);
+		AMSAgentDescription	ret	= new AMSAgentDescription(id, type);
 		ret.setState(state);
 		ret.setOwnership(ownership);
 		return ret;

@@ -1,9 +1,15 @@
 package jadex.bdi.interpreter;
 
 import jadex.rules.rulesystem.IPatternMatcherFunctionality;
+import jadex.rules.rulesystem.IRule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVTypeModel;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -17,6 +23,9 @@ public class OAVAgentModel	extends OAVCapabilityModel
 
 	/** The compiled rulebase of the agent (including additional capability rules). */
 	protected IPatternMatcherFunctionality matcherfunc;
+	
+	/** The properties (e.g. rule break points). */
+	protected Map	properties;
 	
 	//-------- constructors --------
 
@@ -69,6 +78,26 @@ public class OAVAgentModel	extends OAVCapabilityModel
 		this.matcherfunc	= matcherfunc;
 	}
 	
+	/**
+	 *  Get the properties.
+	 *  Arbitrary properties that can e.g. be used to
+	 *  define kernel-specific settings to configure tools. 
+	 *  @return The properties.
+	 */
+	public Map	getProperties()
+	{
+		if(properties==null)
+		{
+			Map props	= new HashMap();
+			List	names	= new ArrayList();
+			for(Iterator it=matcherfunc.getRulebase().getRules().iterator(); it.hasNext(); )
+				names.add(((IRule)it.next()).getName());
+			props.put("debugger.breakpoints", names);
+			this.properties	= props;
+		}
+		return properties;
+	}
+
 	/**
 	 *  Copy content from another capability model.
 	 * /

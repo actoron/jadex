@@ -7,7 +7,7 @@ import jadex.adapter.base.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.bdi.runtime.IBeliefSet;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.service.clock.IClockService;
 
 import java.util.Iterator;
@@ -47,7 +47,7 @@ public class MoveTask extends AbstractTask
 	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
 		IVector2 destination = (IVector2)getProperty(PROPERTY_DESTINATION);
-		final IExternalAccess scope = (IExternalAccess)getProperty(PROPERTY_SCOPE);
+		final IBDIExternalAccess scope = (IBDIExternalAccess)getProperty(PROPERTY_SCOPE);
 
 		double	speed	= ((Number)obj.getProperty(PROPERTY_SPEED)).doubleValue();
 		double	maxdist	= progress*speed*0.001;

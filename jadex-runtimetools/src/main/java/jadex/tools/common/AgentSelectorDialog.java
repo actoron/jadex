@@ -1,7 +1,7 @@
 package jadex.tools.common;
 
 import jadex.bdi.runtime.BDIFailureException;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
@@ -66,7 +66,7 @@ public class AgentSelectorDialog
 	protected Component	parent;
 	
 	/** The agent access. */
-	protected IExternalAccess	agent;
+	protected IBDIExternalAccess	agent;
 
 	/** The element tree table. */
 	protected ComponentTreeTable	tree;
@@ -112,7 +112,7 @@ public class AgentSelectorDialog
 	 *  @param agent
 	 *  @throws java.awt.HeadlessException
 	 */
-	public AgentSelectorDialog(Component parent, IExternalAccess agent)
+	public AgentSelectorDialog(Component parent, IBDIExternalAccess agent)
 	{
 		this.parent	= parent;
 		this.agent	= agent;
@@ -195,7 +195,7 @@ public class AgentSelectorDialog
 		{
 			IComponentExecutionService ces	= (IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class);
 			IGoal	search	= agent.getGoalbase().createGoal("ams_search_agents");
-			search.getParameter("description").setValue(ces.createComponentDescription(null, null, null));
+			search.getParameter("description").setValue(ces.createComponentDescription(null, null, null, null));
 			search.getParameter("constraints").setValue(ces.createSearchConstraints(-1, 0));
 			agent.dispatchTopLevelGoalAndWait(search, 10000); // todo: use some default timeout
 			//agent.dispatchTopLevelGoalAndWait(search);
@@ -232,7 +232,7 @@ public class AgentSelectorDialog
 		int	row	= seltree.getTreetable().getSelectionModel().getMinSelectionIndex();
 		this.seltree.removeComponents();
 		for(int i=0; i<sellist.size(); i++)
-			seltree.addComponent(ams.createComponentDescription((IComponentIdentifier)sellist.get(i), null, null));
+			seltree.addComponent(ams.createComponentDescription((IComponentIdentifier)sellist.get(i), null, null, null));
 		// Force table repaint (hack???).
 		seltree.getTreetable().tableChanged(new TableModelEvent(seltree.getTreetable().getModel(), TableModelEvent.HEADER_ROW));
 		((ResizeableTableHeader)seltree.getTreetable().getTableHeader()).resizeAllColumns();

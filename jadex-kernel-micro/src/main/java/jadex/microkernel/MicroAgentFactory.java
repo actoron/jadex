@@ -10,6 +10,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 
+import java.util.Collections;
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -149,7 +150,7 @@ public class MicroAgentFactory implements IComponentFactory
 	/**
 	 *  Get the names of ADF file types supported by this factory.
 	 */
-	public String[] getFileTypes()
+	public String[] getComponentTypes()
 	{
 		return new String[]{FILETYPE_MICROAGENT};
 	}
@@ -157,7 +158,7 @@ public class MicroAgentFactory implements IComponentFactory
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	public Icon getFileTypeIcon(String type)
+	public Icon getComponentTypeIcon(String type)
 	{
 		return type.equals(FILETYPE_MICROAGENT) ? icons.getIcon("micro_agent") : null;
 	}
@@ -165,7 +166,7 @@ public class MicroAgentFactory implements IComponentFactory
 	/**
 	 *  Get the file type of a model.
 	 */
-	public String getFileType(String model)
+	public String getComponentType(String model)
 	{
 		return model.toLowerCase().endsWith("agent.class") ? FILETYPE_MICROAGENT
 			: null;
@@ -191,4 +192,17 @@ public class MicroAgentFactory implements IComponentFactory
 	{
 		return IComponentFactory.ELEMENT_TYPE_AGENT;
 	}*/
+	
+	/**
+	 *  Get the properties.
+	 *  Arbitrary properties that can e.g. be used to
+	 *  define kernel-specific settings to configure tools.
+	 *  @param type	The component type. 
+	 *  @return The properties or null, if the component type is not supported by this factory.
+	 */
+	public Map	getProperties(String type)
+	{
+		return FILETYPE_MICROAGENT.equals(type)
+		? Collections.EMPTY_MAP : null;
+	}
 }

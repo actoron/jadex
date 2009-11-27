@@ -2,7 +2,7 @@ package jadex.bdi.examples.alarmclock;
 
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
 
 import java.awt.AWTException;
@@ -51,7 +51,7 @@ public class ClockFrame extends JFrame
 	protected JLabel	time;
 
 	/** The external access. */
-	protected IExternalAccess agent;
+	protected IBDIExternalAccess agent;
 
 	/** The timer. */
 	protected Timer timer;
@@ -79,7 +79,7 @@ public class ClockFrame extends JFrame
 	/**
 	 *  Create a new clock frame.
 	 */
-	public ClockFrame(IExternalAccess agent)
+	public ClockFrame(IBDIExternalAccess agent)
 	{
 		this.agent = agent;
 		format = new SimpleDateFormat();

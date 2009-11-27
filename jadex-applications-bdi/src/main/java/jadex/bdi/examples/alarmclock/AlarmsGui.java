@@ -1,6 +1,6 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.jtable.ObjectTableModel;
 
 import java.awt.Color;
@@ -36,7 +36,7 @@ public class AlarmsGui extends JFrame
 	protected JTable alarms;
 
 	/** The agent. */
-	protected IExternalAccess agent;
+	protected IBDIExternalAccess agent;
 
 	/** The property change listener. */
 	protected PropertyChangeListener plis;
@@ -46,7 +46,7 @@ public class AlarmsGui extends JFrame
 	/**
 	 *  Create a new test center panel.
 	 */
-	public AlarmsGui(final IExternalAccess agent)
+	public AlarmsGui(final IBDIExternalAccess agent)
 	{
 		super("Alarms");
 		this.agent = agent;
@@ -187,7 +187,7 @@ public class AlarmsGui extends JFrame
 	 *  @param sel The selected row.
 	 *  @param agent The agent.
 	 */
-	protected void handleEdit(JTable alarms, int sel, IExternalAccess agent)
+	protected void handleEdit(JTable alarms, int sel, IBDIExternalAccess agent)
 	{
 		if(sel==-1)
 			return;

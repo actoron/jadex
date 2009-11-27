@@ -6,7 +6,7 @@ import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
 import jadex.rules.state.IOAVState;
-import jadex.tools.common.modeltree.CombiIcon;
+import jadex.tools.common.CombiIcon;
 import jadex.tools.common.modeltree.DefaultNodeFunctionality;
 import jadex.tools.common.modeltree.DirNode;
 import jadex.tools.common.modeltree.FileNode;

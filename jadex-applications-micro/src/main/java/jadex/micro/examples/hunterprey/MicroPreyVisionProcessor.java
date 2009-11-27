@@ -10,7 +10,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISpace;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IResultListener;
-import jadex.microkernel.IExternalAccess;
+import jadex.microkernel.IMicroExternalAccess;
 
 /**
  *  Dumb prey vision processer.
@@ -39,7 +39,7 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 			public void resultAvailable(Object result)
 			{
 				final Space2D	space2d	= (Space2D)space;
-				final IExternalAccess	exta	= (IExternalAccess)result;
+				final IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
 				exta.invokeLater(new Runnable()
 				{
 					public void run()

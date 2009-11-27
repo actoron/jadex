@@ -1,7 +1,5 @@
 package jadex.bpmn.runtime;
 
-import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IComponentInstance;
 import jadex.commons.concurrent.IResultListener;
 
 /**

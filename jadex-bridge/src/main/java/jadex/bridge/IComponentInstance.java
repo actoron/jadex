@@ -50,6 +50,7 @@ public interface IComponentInstance
 	 *  Can be called concurrently (also during executeAction()).
 	 * 
 	 *  Get the external access for this agent.
+	 *  External access objects must implement the IExternalAccess interface. 
 	 *  The specific external access interface is kernel specific
 	 *  and has to be casted to its corresponding incarnation.
 	 *  @param listener	External access is delivered via result listener.

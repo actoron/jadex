@@ -3,7 +3,7 @@ package jadex.bdi.testcases.misc;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.planlib.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentDescription;
@@ -51,7 +51,7 @@ public class AMSTestPlan extends Plan
 		TestReport tr = new TestReport("#"+num++, "Searching for all agents");
 		getLogger().info("\nSearching for all agents.");
 		IComponentExecutionService amsservice = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
-		IComponentDescription desc = amsservice.createComponentDescription(null, null, null);
+		IComponentDescription desc = amsservice.createComponentDescription(null, null, null, null);
 		ISearchConstraints constraints = amsservice.createSearchConstraints(-1, 0);
 		/*AMSAgentDescription	desc	= new AMSAgentDescription();
 		SearchConstraints	constraints	= new SearchConstraints();
@@ -106,7 +106,7 @@ public class AMSTestPlan extends Plan
 		{
 			getLogger().info("\nSearching for agent.");
 			
-			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("agentidentifier").getValue(), null, null);
+			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("agentidentifier").getValue(), null, null, null);
 			constraints = amsservice.createSearchConstraints(-1, 0);
 		
 			/*desc	= new AMSAgentDescription();
@@ -160,7 +160,7 @@ public class AMSTestPlan extends Plan
 				try
 				{
 					dispatchSubgoalAndWait(gext);
-					IExternalAccess ext = (IExternalAccess)gext.getParameter("result").getValue();
+					IBDIExternalAccess ext = (IBDIExternalAccess)gext.getParameter("result").getValue();
 					if(ext!=null)
 						tr.setSucceeded(true);
 				}
@@ -209,7 +209,7 @@ public class AMSTestPlan extends Plan
 		{
 			getLogger().info("\nSearching for agent again.");
 			
-			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("agentidentifier").getValue(), null, null);
+			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("agentidentifier").getValue(), null, null, null);
 			constraints = amsservice.createSearchConstraints(-1, 0);
 	
 			/*desc	= new AMSAgentDescription();

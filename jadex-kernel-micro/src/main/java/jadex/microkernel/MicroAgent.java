@@ -93,7 +93,7 @@ public abstract class MicroAgent implements IMicroAgent
 	/**
 	 *  Get the external access for this agent.
 	 */
-	public IExternalAccess	getExternalAccess()
+	public IMicroExternalAccess	getExternalAccess()
 	{
 		return new ExternalAccess(this, interpreter);
 	}

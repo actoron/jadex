@@ -3,7 +3,7 @@ package jadex.tools.starter;
 import jadex.adapter.base.SComponentFactory;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
-import jadex.tools.common.modeltree.CombiIcon;
+import jadex.tools.common.CombiIcon;
 import jadex.tools.common.modeltree.DefaultNodeFunctionality;
 import jadex.tools.common.modeltree.DirNode;
 import jadex.tools.common.modeltree.FileNode;

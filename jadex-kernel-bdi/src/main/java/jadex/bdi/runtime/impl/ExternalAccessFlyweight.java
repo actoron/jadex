@@ -4,11 +4,12 @@ import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.interpreter.PlanRules;
 import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.TimeoutException;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVObjectType;
 import jadex.service.clock.IClockService;
@@ -20,7 +21,7 @@ import java.util.List;
 /**
  *  External access interface.
  */
-public class ExternalAccessFlyweight extends CapabilityFlyweight implements IExternalAccess
+public class ExternalAccessFlyweight extends CapabilityFlyweight implements IBDIExternalAccess
 {
 	//-------- constructors --------
 	
@@ -902,5 +903,13 @@ public class ExternalAccessFlyweight extends CapabilityFlyweight implements IExt
 	public void invokeLater(Runnable runnable)
 	{
 		getInterpreter().invokeLater(runnable);
+	}
+
+	/**
+	 *  Get the model of the component.
+	 */
+	public ILoadableComponentModel	getModel()
+	{
+		return getInterpreter().getModel();
 	}
 }

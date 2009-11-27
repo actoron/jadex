@@ -1,7 +1,7 @@
 package jadex.tools.convcenter;
 
 import jadex.adapter.base.fipa.SFipa;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IParameter;
 import jadex.bdi.runtime.IParameterSet;
@@ -71,7 +71,7 @@ public class FipaConversationPanel extends JSplitPane
 	//-------- attributes --------
 	
 	/** The agent to dispatch events to. */
-	protected IExternalAccess	agent;
+	protected IBDIExternalAccess	agent;
 
 	/** The default receiver (if any). */
 	protected IComponentIdentifier	receiver;
@@ -96,7 +96,7 @@ public class FipaConversationPanel extends JSplitPane
 	/**
 	 *  Create the gui.
 	 */
-	public FipaConversationPanel(final IExternalAccess agent, IComponentIdentifier default_receiver)
+	public FipaConversationPanel(final IBDIExternalAccess agent, IComponentIdentifier default_receiver)
 	{
 		super(JSplitPane.HORIZONTAL_SPLIT, true);
 		setOneTouchExpandable(true);

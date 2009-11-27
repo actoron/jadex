@@ -23,6 +23,9 @@ public class AMSAgentDescription implements IComponentDescription, Cloneable, Se
 	/** Attribute for slot ownership. */
 	protected String ownership;
 
+	/** The component type. */
+	protected String type;
+
 	//-------- constructors --------
 
 	/**
@@ -35,10 +38,11 @@ public class AMSAgentDescription implements IComponentDescription, Cloneable, Se
 	/**
 	 *  Create a new AMSAgentDescription.
 	 */
-	public AMSAgentDescription(IComponentIdentifier aid)
+	public AMSAgentDescription(IComponentIdentifier aid, String type)
 	{
 		this();
 		setName(aid);
+		setType(type);
 		setState(IComponentDescription.STATE_ACTIVE);
 	}
 
@@ -98,6 +102,24 @@ public class AMSAgentDescription implements IComponentDescription, Cloneable, Se
 		this.ownership = ownership;
 	}
 
+	/**
+	 *  Get the component type.
+	 *  @return The component type name (e.g. 'BDI Agent').
+	 */
+	public String getType()
+	{
+		return type;
+	}
+	
+	/**
+	 *  Set the component type.
+	 *  @param type	The component type name (e.g. 'BDI Agent').
+	 */
+	public void setType(String type)
+	{
+		this.type	= type;
+	}
+		
 	//-------- methods --------
 
 	/**

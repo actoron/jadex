@@ -6,7 +6,7 @@ import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IExpression;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.commons.SGUI;
@@ -38,7 +38,7 @@ public class CleanerGui	extends JFrame
 	/**
 	 *  Shows the gui, and updates it when beliefs change.
 	 */
-	public CleanerGui(final IExternalAccess agent)
+	public CleanerGui(final IBDIExternalAccess agent)
 	{
 		super(agent.getAgentName());
 		final JPanel map = new JPanel()

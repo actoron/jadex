@@ -105,7 +105,7 @@ public interface IComponentExecutionService	extends IService
 	/**
 	 *  Get the external access of a component.
 	 *  @param cid The component identifier.
-	 *  @param listener The result listener.
+	 *  @param listener The result listener (recieves an IExternalAccess object).
 	 */
 	public void getExternalAccess(IComponentIdentifier cid, IResultListener listener);
 
@@ -122,12 +122,12 @@ public interface IComponentExecutionService	extends IService
 	
 	/**
 	 * Create a ams agent description.
-	 * @param agent The agent.
+	 * @param id The component identifier.
 	 * @param state The state.
 	 * @param ownership The ownership.
 	 * @return The ams agent description.
 	 */
-	public IComponentDescription createComponentDescription(IComponentIdentifier agent, String state, String ownership);
+	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type);
 	
 	/**
 	* Create a search constraints object.

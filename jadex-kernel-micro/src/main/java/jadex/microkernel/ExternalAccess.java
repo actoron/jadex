@@ -1,5 +1,6 @@
 package jadex.microkernel;
 
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.MessageType;
 
 import java.util.Map;
@@ -7,7 +8,7 @@ import java.util.Map;
 /**
  * External access interface.
  */
-public class ExternalAccess implements IExternalAccess 
+public class ExternalAccess implements IMicroExternalAccess 
 {
 	// -------- attributes --------
 
@@ -67,5 +68,13 @@ public class ExternalAccess implements IExternalAccess
 	public IMicroAgent	getAgent()
 	{
 		return agent;
+	}
+	
+	/**
+	 *  Get the model of the component.
+	 */
+	public ILoadableComponentModel getModel()
+	{
+		return interpreter.getAgentModel();
 	}
 }

@@ -17,11 +17,12 @@ import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
+import jadex.tools.common.CombiIcon;
 import jadex.tools.common.ComponentTreeTable;
+import jadex.tools.common.ComponentTreeTableNodeType;
 import jadex.tools.common.IMenuItemConstructor;
 import jadex.tools.common.PopupBuilder;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
-import jadex.tools.common.jtreetable.TreeTableNodeType;
 import jadex.tools.common.modeltree.FileNode;
 import jadex.tools.common.modeltree.IExplorerTreeNode;
 import jadex.tools.common.modeltree.ModelExplorer;
@@ -77,7 +78,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 		"starter", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_starter.png"),
 		"starter_sel", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_starter_sel.png"),
 		"start_component",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/start.png"),
-		"component_suspended", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_szzz.png"),
+		"component_suspended", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/overlay_szzz.png"),
 		"checking_menu",	SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/new_agent_broken.png")
 	});
 
@@ -273,27 +274,33 @@ public class StarterPlugin extends AbstractJCCPlugin
   		};
   		mpanel.addMouseListener(ml);
 
-		components = new ComponentTreeTable(((IServiceContainer)getJCC().getServiceContainer()).getName());
+		components = new ComponentTreeTable(getJCC().getServiceContainer().getName());
 		components.setMinimumSize(new Dimension(0, 0));
 		components.getTreetable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		
 		// Change component node type to enable suspended icon for components. 
-		components.addNodeType(new TreeTableNodeType(ComponentTreeTable.NODE_COMPONENT, 
-			new Icon[0], new String[]{"name", "address"}, new String[]{"Name", "Address"})
+		components.addNodeType(new ComponentTreeTableNodeType(getJCC().getServiceContainer())
 		{
 			public Icon selectIcon(Object value)
 			{
-				Icon	ret;
+				Icon ret	= super.selectIcon(value);
+
+				Icon	overlay	= null;
 				IComponentDescription ad = (IComponentDescription)((DefaultTreeTableNode)value).getUserObject();
 				if(IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
 				{
-					ret = StarterPlugin.icons.getIcon("component_suspended");
+					overlay = StarterPlugin.icons.getIcon("component_suspended");
 				}
-				else
+				
+				if(ret!=null && overlay!=null)
 				{
-					ret	= ComponentTreeTable.icons.getIcon(ComponentTreeTable.NODE_COMPONENT);
+					ret	= new CombiIcon(new Icon[]{ret, overlay});
 				}
-				//System.out.println(value+" "+ad.getState());
+				else if(overlay!=null)
+				{
+					ret	= overlay;
+				}
+
 				return ret;
 			}
 		});

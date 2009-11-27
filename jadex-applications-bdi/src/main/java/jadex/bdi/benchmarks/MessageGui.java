@@ -3,7 +3,7 @@ package jadex.bdi.benchmarks;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBeliefListener;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
 
 import java.awt.GridLayout;
@@ -17,7 +17,7 @@ public class MessageGui extends JFrame
 	/**
 	 *  Create a new message gui.
 	 */
-	public MessageGui(IExternalAccess agent)
+	public MessageGui(IBDIExternalAccess agent)
 	{
 		final JLabel sent = new JLabel("Sent: [0]");
 		final JLabel rec = new JLabel("Received: [0]");

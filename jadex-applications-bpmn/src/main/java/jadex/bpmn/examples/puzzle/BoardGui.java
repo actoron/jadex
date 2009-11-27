@@ -2,7 +2,7 @@ package jadex.bpmn.examples.puzzle;
 
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
 
 import java.awt.event.WindowAdapter;
@@ -28,7 +28,7 @@ public class BoardGui extends JFrame
 	/**
 	 *  Create a new board gui.
 	 */
-	public BoardGui(IExternalAccess agent, final IBoard board)
+	public BoardGui(IBDIExternalAccess agent, final IBoard board)
 	{
 		this(agent, board, false);
 	}
@@ -36,7 +36,7 @@ public class BoardGui extends JFrame
 	/**
 	 *  Create a new board gui.
 	 */
-	public BoardGui(final IExternalAccess agent, final IBoard board, boolean controls)
+	public BoardGui(final IBDIExternalAccess agent, final IBoard board, boolean controls)
 	{
 		this.board = board;
 		final BoardPanel bp = new BoardPanel(board);

@@ -1,7 +1,7 @@
 package jadex.tools.common;
 
 import jadex.adapter.base.fipa.SFipa;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
@@ -79,14 +79,14 @@ public class FipaMessagePanel extends JPanel
 	protected IComponentIdentifier	replyto;
 	protected IComponentIdentifier[]	receivers;
 	
-	protected IExternalAccess agent;
+	protected IBDIExternalAccess agent;
 	
 	//-------- constructors --------
 
 	/**
 	 *  Create the panel with an initial message.
 	 */
-	public FipaMessagePanel(IMessageEvent message, IExternalAccess agent)
+	public FipaMessagePanel(IMessageEvent message, IBDIExternalAccess agent)
 	{
 		super(new GridBagLayout());
 		this.editable	= true;

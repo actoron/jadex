@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -81,6 +80,9 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	
 	/** The description. */
 	protected String description;
+	
+	/** The properties. */
+	protected Map properties;
 	
 	//-------- init structures --------
 	
@@ -869,10 +871,18 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	 *  define kernel-specific settings to configure tools. 
 	 *  @return The properties.
 	 */
-	public Properties	getProperties()
+	public Map	getProperties()
 	{
-		// Todo: implement me.
-		return new Properties();
+		if(properties==null)
+		{
+			Map	props	= new HashMap();
+			List	names	= new ArrayList();
+			for(Iterator it=getAllActivities().values().iterator(); it.hasNext(); )
+				names.add(((MActivity)it.next()).getName());
+			props.put("debugger.breakpoints", names);
+			this.properties	= props;
+		}
+		return this.properties;
 	}
 	
 	/**

@@ -2,7 +2,7 @@ package jadex.tools.jcc;
 
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.service.IServiceContainer;
 
 import javax.swing.SwingUtilities;
@@ -15,14 +15,14 @@ public class AgentControlCenter extends ControlCenter
 	//-------- attributes --------
 	
 	/** The external access. */
-	protected IExternalAccess agent;
+	protected IBDIExternalAccess agent;
 
 	//-------- constructors --------
 
 	/**
 	 * Create a control center.
 	 */
-	public AgentControlCenter(IServiceContainer container, String plugins_prop, final IExternalAccess agent)
+	public AgentControlCenter(IServiceContainer container, String plugins_prop, final IBDIExternalAccess agent)
 	{
 		super(container, plugins_prop);
 		
@@ -58,7 +58,7 @@ public class AgentControlCenter extends ControlCenter
 	 *  Get the agent.
 	 *  @return The agent.
 	 */
-	public IExternalAccess getAgent()
+	public IBDIExternalAccess getAgent()
 	{
 		return this.agent;
 	}

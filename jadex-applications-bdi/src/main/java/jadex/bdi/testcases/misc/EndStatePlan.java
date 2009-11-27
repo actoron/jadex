@@ -47,7 +47,7 @@ public class EndStatePlan extends Plan
 		IGoal	search	= createGoal("amscap.ams_search_agents");
 		IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer()
 			.getService(IComponentExecutionService.class);
-		search.getParameter("description").setValue(ces.createComponentDescription(worker, null, null));
+		search.getParameter("description").setValue(ces.createComponentDescription(worker, null, null, null));
 		dispatchSubgoalAndWait(search);
 		TestReport	report	= new TestReport("termination", "Test if the worker agent has been terminated");
 		if(search.getParameterSet("result").getValues().length==0)
@@ -106,7 +106,7 @@ public class EndStatePlan extends Plan
 			{
 				// Check if deregister agent has been correctly removed.
 				search = createGoal("amscap.ams_search_agents");
-				search.getParameter("description").setValue(ces.createComponentDescription(deregister, null, null));
+				search.getParameter("description").setValue(ces.createComponentDescription(deregister, null, null, null));
 				dispatchSubgoalAndWait(search);
 				if(search.getParameterSet("result").getValues().length!=0)
 				{

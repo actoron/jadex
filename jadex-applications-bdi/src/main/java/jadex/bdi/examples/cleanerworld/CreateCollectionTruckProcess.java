@@ -5,7 +5,7 @@ import jadex.adapter.base.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.envsupport.environment.ISpaceProcess;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
@@ -94,7 +94,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 							}
 							public void resultAvailable(Object result)
 							{
-								IExternalAccess ex = (IExternalAccess)result;
+								IBDIExternalAccess ex = (IBDIExternalAccess)result;
 								ex.addAgentListener(new IAgentListener()
 								{
 									public void agentTerminated(AgentEvent ae)

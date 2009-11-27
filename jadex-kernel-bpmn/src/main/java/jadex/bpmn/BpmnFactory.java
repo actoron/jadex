@@ -1,6 +1,5 @@
 package jadex.bpmn;
 
-import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.IComponentAdapter;
@@ -49,16 +48,20 @@ public class BpmnFactory implements IComponentFactory
 	/** The model loader */
 	protected BpmnModelLoader loader;
 	
+	/** The properties. */
+	protected Map properties;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new BpmnProcessService.
 	 */
-	public BpmnFactory(IServiceContainer container)
+	public BpmnFactory(IServiceContainer container, Map properties)
 	{
 		this.container = container;
 		this.processes = new HashMap();
 		this.loader = new BpmnModelLoader();
+		this.properties	= properties;
 	}
 	
 	//-------- methods --------
@@ -182,7 +185,7 @@ public class BpmnFactory implements IComponentFactory
 	/**
 	 *  Get the names of ADF file types supported by this factory.
 	 */
-	public String[] getFileTypes()
+	public String[] getComponentTypes()
 	{
 		return new String[]{FILETYPE_BPMNPROCESS};
 	}
@@ -190,7 +193,7 @@ public class BpmnFactory implements IComponentFactory
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	public Icon getFileTypeIcon(String type)
+	public Icon getComponentTypeIcon(String type)
 	{
 		return type.equals(FILETYPE_BPMNPROCESS)? icons.getIcon("bpmn_process") : null;
 	}
@@ -198,7 +201,7 @@ public class BpmnFactory implements IComponentFactory
 	/**
 	 *  Get the file type of a model.
 	 */
-	public String getFileType(String model)
+	public String getComponentType(String model)
 	{
 		return model.toLowerCase().endsWith(".bpmn") ? FILETYPE_BPMNPROCESS: null;
 	}
@@ -214,5 +217,17 @@ public class BpmnFactory implements IComponentFactory
 	{
 		return new BpmnInterpreter(adapter, (MBpmnModel)model, arguments, config, null, null);
 	}
-
+	
+	/**
+	 *  Get the properties.
+	 *  Arbitrary properties that can e.g. be used to
+	 *  define kernel-specific settings to configure tools.
+	 *  @param type	The component type. 
+	 *  @return The properties or null, if the component type is not supported by this factory.
+	 */
+	public Map	getProperties(String type)
+	{
+		return FILETYPE_BPMNPROCESS.equals(type)
+		? properties : null;
+	}
 }

@@ -5,7 +5,7 @@ import jadex.bdi.examples.hunterprey_classic.CurrentVision;
 import jadex.bdi.examples.hunterprey_classic.Vision;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBeliefListener;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SUtil;
 
 import java.awt.GridBagConstraints;
@@ -44,7 +44,7 @@ public class ObserverGui	extends EnvironmentGui
 	/**
 	 *  Create a new gui plan.
 	 */
-	public ObserverGui(IExternalAccess agent)
+	public ObserverGui(IBDIExternalAccess agent)
 	{
 		super(agent);
 	}
@@ -54,7 +54,7 @@ public class ObserverGui	extends EnvironmentGui
 	/**
 	 *  Create the options panel.
 	 */
-	protected JPanel	createOptionsPanel(final IExternalAccess agent)
+	protected JPanel	createOptionsPanel(final IBDIExternalAccess agent)
 	{
 		JPanel	options	= new JPanel(new GridBagLayout());
 		options.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Observer Control"));
@@ -91,7 +91,7 @@ public class ObserverGui	extends EnvironmentGui
 	/**
 	 *  Refresh the highscore.
 	 */
-	protected void	refreshHighscore(IExternalAccess agent)
+	protected void	refreshHighscore(IBDIExternalAccess agent)
 	{
 		// Read highscore list from resource.
 		BufferedReader reader = null;
@@ -138,7 +138,7 @@ public class ObserverGui	extends EnvironmentGui
 	/**
 	 *  Ensure that the gui is updated on changes in the environment.
 	 */
-	protected void	enableGuiUpdate(final IExternalAccess agent)
+	protected void	enableGuiUpdate(final IBDIExternalAccess agent)
 	{
 		agent.getBeliefbase().getBelief("vision").addBeliefListener(new IBeliefListener()
 		{

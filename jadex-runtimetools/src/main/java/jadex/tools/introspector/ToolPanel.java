@@ -1,7 +1,7 @@
 package jadex.tools.introspector;
 
 import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.impl.ElementFlyweight;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
@@ -35,7 +35,7 @@ public class ToolPanel	extends JPanel
 	 *  @param agent	The agent access.
 	 *  @param active	Flags indicating which tools should be active.
 	 */
-	public ToolPanel(IExternalAccess agent, IComponentIdentifier observed)
+	public ToolPanel(IBDIExternalAccess agent, IComponentIdentifier observed)
 	{
         // Hack!?!?!
 		((IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class))

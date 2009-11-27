@@ -8,7 +8,7 @@ import jadex.adapter.base.envsupport.math.IVector2;
 import jadex.adapter.base.envsupport.math.Vector1Double;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
@@ -96,7 +96,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 				}
 				public void resultAvailable(Object result)
 				{
-					final IExternalAccess exta = (IExternalAccess)result;
+					final IBDIExternalAccess exta = (IBDIExternalAccess)result;
 					exta.invokeLater(new Runnable()
 					{
 						public void run()

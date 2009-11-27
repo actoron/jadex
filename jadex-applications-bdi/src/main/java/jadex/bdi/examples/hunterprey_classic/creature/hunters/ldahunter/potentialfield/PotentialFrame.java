@@ -9,7 +9,7 @@ package jadex.bdi.examples.hunterprey_classic.creature.hunters.ldahunter.potenti
 import jadex.bdi.examples.hunterprey_classic.Location;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
 
 import java.awt.Color;
@@ -36,7 +36,7 @@ public class PotentialFrame extends JFrame
 	/**
 	 *  Create the LA hunter frame.
 	 */
-	public PotentialFrame(final IExternalAccess agent, String title) throws HeadlessException
+	public PotentialFrame(final IBDIExternalAccess agent, String title) throws HeadlessException
 	{
 		super(title);
 

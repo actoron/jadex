@@ -2,7 +2,8 @@ package jadex.bridge;
 
 
 /**
- * 
+ *  A description of a component, i.e. information
+ *  about the execution state, component type, etc.
  */
 public interface IComponentDescription
 {
@@ -26,38 +27,26 @@ public interface IComponentDescription
 	//-------- methods --------
 
 	/**
-	 *  Get the state of this AMSAgentDescription.
-	 * @return state
+	 *  Get the execution state of the component.
+	 *  @return The state.
 	 */
 	public String getState();
 
 	/**
-	 *  Set the state of this AMSAgentDescription.
-	 * @param state the value to be set
-	 */
-//	public void setState(String state);
-
-	/**
-	 *  Get the agentidentifier of this AMSAgentDescription.
-	 * @return agentidentifier
+	 *  Get the identifier of the component.
+	 *  @return The component identifier.
 	 */
 	public IComponentIdentifier getName();
 
 	/**
-	 *  Set the agentidentifier of this AMSAgentDescription.
-	 * @param name the value to be set
-	 */
-//	public void setName(IFIPAAgentIdentifier name);
-
-	/**
-	 *  Get the ownership of this AMSAgentDescription.
-	 * @return ownership
+	 *  Get the ownership string of the component.
+	 *  @return The ownership string.
 	 */
 	public String getOwnership();
 
 	/**
-	 *  Set the ownership of this AMSAgentDescription.
-	 * @param ownership the value to be set
+	 *  Get the component type.
+	 *  @return The component type name (e.g. 'BDI Agent').
 	 */
-//	public void setOwnership(String ownership);
+	public String getType();
 }

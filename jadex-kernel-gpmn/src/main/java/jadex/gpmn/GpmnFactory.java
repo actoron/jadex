@@ -14,6 +14,7 @@ import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -213,7 +214,7 @@ public class GpmnFactory implements IComponentFactory
 	/**
 	 *  Get the names of ADF file types supported by this factory.
 	 */
-	public String[] getFileTypes()
+	public String[] getComponentTypes()
 	{
 		return new String[]{FILETYPE_GPMNPROCESS};
 	}
@@ -221,7 +222,7 @@ public class GpmnFactory implements IComponentFactory
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	public Icon getFileTypeIcon(String type)
+	public Icon getComponentTypeIcon(String type)
 	{
 		return type.equals(FILETYPE_GPMNPROCESS) ? icons.getIcon("gpmn_process") : null;
 	}
@@ -229,7 +230,7 @@ public class GpmnFactory implements IComponentFactory
 	/**
 	 *  Get the file type of a model.
 	 */
-	public String getFileType(String model)
+	public String getComponentType(String model)
 	{
 		return model.toLowerCase().endsWith(".gpmn") ? FILETYPE_GPMNPROCESS: null;
 	}
@@ -261,5 +262,18 @@ public class GpmnFactory implements IComponentFactory
 //		{
 //			e.printStackTrace();
 //		}
+	}
+	
+	/**
+	 *  Get the properties.
+	 *  Arbitrary properties that can e.g. be used to
+	 *  define kernel-specific settings to configure tools.
+	 *  @param type	The component type. 
+	 *  @return The properties or null, if the component type is not supported by this factory.
+	 */
+	public Map	getProperties(String type)
+	{
+		return FILETYPE_GPMNPROCESS.equals(type)
+		? Collections.EMPTY_MAP : null;
 	}
 }

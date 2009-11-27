@@ -4,7 +4,7 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBeliefSetListener;
 import jadex.bdi.runtime.IExpression;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.commons.SGUI;
 import jadex.service.clock.IClockService;
@@ -62,7 +62,7 @@ public class Gui extends JFrame
 	private String itemlabel;
 	private String goalname;
 	private String addorderlabel;
-	private IExternalAccess agent;
+	private IBDIExternalAccess agent;
 	private List orders = new ArrayList();
 	private JTable table;
 	private DefaultTableModel detailsdm; 
@@ -149,7 +149,7 @@ public class Gui extends JFrame
 	/**
 	 *  Shows the gui, and updates it when beliefs change.
 	 */
-	public Gui(final IExternalAccess agent, final boolean buy)
+	public Gui(final IBDIExternalAccess agent, final boolean buy)
 	{
 		super((buy? "Buyer: ": "Seller: ")+agent.getAgentName());
 		this.agent = agent;

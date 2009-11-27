@@ -248,7 +248,7 @@ public class ConsolePanel extends JPanel
 	 */
 	public static void main(String[] args)
 	{
-		Logger.global.info("aaa");
+		Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).info("aaa");
 		
 		JFrame f = new JFrame();
 		ConsolePanel cp = new ConsolePanel();
@@ -260,8 +260,8 @@ public class ConsolePanel extends JPanel
 		{
 			System.out.println(i);
 			System.err.println(i);
-			Logger.global.info(""+i);
-			try{Thread.currentThread().sleep(1000);}
+			Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).info(""+i);
+			try{Thread.sleep(1000);}
 			catch(InterruptedException e){e.printStackTrace();}
 		}
 	}

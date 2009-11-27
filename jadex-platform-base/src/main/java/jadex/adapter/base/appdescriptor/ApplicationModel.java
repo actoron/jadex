@@ -4,9 +4,9 @@ import jadex.bridge.IArgument;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IReport;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  *  Model representation of an application.
@@ -225,10 +225,10 @@ public class ApplicationModel implements ILoadableComponentModel
 	 *  define kernel-specific settings to configure tools. 
 	 *  @return The properties.
 	 */
-	public Properties	getProperties()
+	public Map	getProperties()
 	{
 		// Todo: implement me.
-		return new Properties();
+		return Collections.EMPTY_MAP;
 	}
 	
 	/**

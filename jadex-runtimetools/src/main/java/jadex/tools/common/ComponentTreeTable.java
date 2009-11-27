@@ -54,7 +54,7 @@ public class ComponentTreeTable extends JScrollPane
 
 	//-------- attributes --------
 
-	/** The tree table node typess. */
+	/** The tree table node types. */
 	protected Map nodetypes;
 
 	/** The platform node containing the agents. */
@@ -144,6 +144,7 @@ public class ComponentTreeTable extends JScrollPane
 		{
 			IComponentDescription desc = (IComponentDescription)description;
 			values.put("name", desc.getName().getName());
+			values.put("type", desc.getType());
 			values.put("state", desc.getState());
 			//		values.put("ownership", description.getOwnership());
 			String[] addresses = desc.getName().getAddresses();
@@ -174,6 +175,7 @@ public class ComponentTreeTable extends JScrollPane
 		{
 			IComponentDescription desc = (IComponentDescription)description;
 			values.put("name", desc.getName().getName());
+			values.put("type", desc.getType());
 			values.put("state", desc.getState());
 			//values.put("ownership", description.getOwnership());
 			String[] addresses = desc.getName().getAddresses();

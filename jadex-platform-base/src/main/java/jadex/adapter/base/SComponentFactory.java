@@ -127,7 +127,7 @@ public class SComponentFactory
 			for(Iterator it=facts.iterator(); it.hasNext(); )
 			{
 				IComponentFactory fac = (IComponentFactory)it.next();
-				ret	= (String[])SUtil.joinArrays(ret, fac.getFileTypes());
+				ret	= (String[])SUtil.joinArrays(ret, fac.getComponentTypes());
 			}
 		}
 		return ret;
@@ -145,13 +145,30 @@ public class SComponentFactory
 			for(Iterator it=facts.iterator(); it.hasNext() && ret==null; )
 			{
 				IComponentFactory fac = (IComponentFactory)it.next();
-				ret = fac.getFileTypeIcon(type);
+				ret = fac.getComponentTypeIcon(type);
 			}
 		}
 		return ret;
 	}
 
-
+	/**
+	 *  Get a default icon for a file type.
+	 */
+	public static Map	getProperties(IServiceContainer container, String type)
+	{
+		Map	ret = null;
+		Collection facts = container.getServices(IComponentFactory.class);
+		if(facts!=null)
+		{
+			for(Iterator it=facts.iterator(); it.hasNext() && ret==null; )
+			{
+				IComponentFactory fac = (IComponentFactory)it.next();
+				ret = fac.getProperties(type);
+			}
+		}
+		return ret;
+	}
+	
 	/**
 	 *  Get the file type of a model.
 	 */
@@ -164,7 +181,7 @@ public class SComponentFactory
 			for(Iterator it=facts.iterator(); it.hasNext() && ret==null; )
 			{
 				IComponentFactory fac = (IComponentFactory)it.next();
-				ret = fac.getFileType(model);
+				ret = fac.getComponentType(model);
 			}
 		}
 		return ret;

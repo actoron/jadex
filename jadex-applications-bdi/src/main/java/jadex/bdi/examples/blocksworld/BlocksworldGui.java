@@ -2,7 +2,7 @@ package jadex.bdi.examples.blocksworld;
 
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.commons.SGUI;
 
@@ -52,7 +52,7 @@ public class BlocksworldGui	extends JFrame
 	/**
 	 *  Create the blocksworld gui.
 	 */
-	public BlocksworldGui(final IExternalAccess agent)
+	public BlocksworldGui(final IBDIExternalAccess agent)
 	{
 		super();
 		
@@ -69,7 +69,7 @@ public class BlocksworldGui	extends JFrame
 	 *  Init the gui.
 	 *  Method runs on AWT thread.
 	 */
-	protected void	initGui(final IExternalAccess agent)
+	protected void	initGui(final IBDIExternalAccess agent)
 	{
 		// HACK!! ensure that agent is inited
 		try

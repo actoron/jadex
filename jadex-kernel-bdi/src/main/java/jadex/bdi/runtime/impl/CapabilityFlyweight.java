@@ -7,7 +7,7 @@ import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.ICapability;
 import jadex.bdi.runtime.IEventbase;
 import jadex.bdi.runtime.IExpressionbase;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
@@ -57,7 +57,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 *  Get the scope.
 	 *  @return The scope.
 	 */
-	public IExternalAccess getExternalAccess()
+	public IBDIExternalAccess getExternalAccess()
 	{
 		return new ExternalAccessFlyweight(getState(), getScope());
 	}

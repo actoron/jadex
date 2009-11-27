@@ -17,7 +17,7 @@ public interface ICapability	extends IElement
 	 *  Get the scope.
 	 *  @return The scope.
 	 */
-	public IExternalAccess getExternalAccess();
+	public IBDIExternalAccess getExternalAccess();
 
 	/**
 	 *  Get the belief base.

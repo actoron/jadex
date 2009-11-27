@@ -6,7 +6,7 @@ import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.ICapability;
 import jadex.bdi.runtime.IEventbase;
 import jadex.bdi.runtime.IExpressionbase;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.IPlanbase;
@@ -130,7 +130,7 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 		stacacheelems.add(IExpressionbase.class);
 		stacacheelems.add(IPropertybase.class);
 		stacacheelems.add(ICapability.class);
-		stacacheelems.add(IExternalAccess.class);
+		stacacheelems.add(IBDIExternalAccess.class);
 		stacacheelems.add(IBelief.class);
 		stacacheelems.add(IBeliefSet.class);
 	}

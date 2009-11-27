@@ -8,10 +8,10 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  *  Java representation of a bpmn model for xml description.
@@ -373,10 +373,10 @@ public class MGpmnModel extends MProcess implements ICacheableModel, ILoadableCo
 	 *  define kernel-specific settings to configure tools. 
 	 *  @return The properties.
 	 */
-	public Properties	getProperties()
+	public Map	getProperties()
 	{
 		// Todo: implement me.
-		return new Properties();
+		return Collections.EMPTY_MAP;
 	}
 	
 	/**

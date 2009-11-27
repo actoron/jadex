@@ -12,9 +12,10 @@ import jadex.rules.state.OAVTypeModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -238,10 +239,10 @@ public class OAVCapabilityModel implements ILoadableComponentModel, ICacheableMo
 	 *  define kernel-specific settings to configure tools. 
 	 *  @return The properties.
 	 */
-	public Properties	getProperties()
+	public Map	getProperties()
 	{
 		// Todo: implement me.
-		return new Properties();
+		return Collections.EMPTY_MAP;
 	}
 	
 	/**

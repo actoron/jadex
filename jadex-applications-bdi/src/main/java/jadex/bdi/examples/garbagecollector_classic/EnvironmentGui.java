@@ -3,7 +3,7 @@ package jadex.bdi.examples.garbagecollector_classic;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IAgentListener;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentExecutionService;
 import jadex.commons.SGUI;
@@ -24,7 +24,7 @@ public class EnvironmentGui	extends JFrame
 	/**
 	 *  Create a new gui.
 	 */
-	public EnvironmentGui(final IExternalAccess agent)
+	public EnvironmentGui(final IBDIExternalAccess agent)
 	{
 		super("Garbage Collector Environment");
 

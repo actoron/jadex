@@ -193,7 +193,7 @@ public class BDIAgentFactory implements IComponentFactory
 	/**
 	 *  Get the names of ADF file types supported by this factory.
 	 */
-	public String[] getFileTypes()
+	public String[] getComponentTypes()
 	{
 		return new String[]{FILETYPE_BDIAGENT, FILETYPE_BDICAPABILITY};
 	}
@@ -201,7 +201,7 @@ public class BDIAgentFactory implements IComponentFactory
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	public Icon getFileTypeIcon(String type)
+	public Icon getComponentTypeIcon(String type)
 	{
 		return type.equals(FILETYPE_BDIAGENT) ? icons.getIcon("bdi_agent")
 			: type.equals(FILETYPE_BDICAPABILITY) ? icons.getIcon("bdi_capability") : null;
@@ -210,10 +210,23 @@ public class BDIAgentFactory implements IComponentFactory
 	/**
 	 *  Get the file type of a model.
 	 */
-	public String getFileType(String model)
+	public String getComponentType(String model)
 	{
 		return model.toLowerCase().endsWith(".agent.xml") ? FILETYPE_BDIAGENT
 			: model.toLowerCase().endsWith(".capability.xml") ? FILETYPE_BDICAPABILITY
 			: null;
+	}
+	
+	/**
+	 *  Get the properties.
+	 *  Arbitrary properties that can e.g. be used to
+	 *  define kernel-specific settings to configure tools.
+	 *  @param type	The component type. 
+	 *  @return The properties or null, if the component type is not supported by this factory.
+	 */
+	public Map	getProperties(String type)
+	{
+		return FILETYPE_BDIAGENT.equals(type) || FILETYPE_BDICAPABILITY.equals(type)
+			? props : null;
 	}
 }

@@ -5,11 +5,12 @@ import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentListener;
 import jadex.commons.SGUI;
 import jadex.service.IServiceContainer;
+import jadex.tools.common.CombiIcon;
 import jadex.tools.common.ComponentTreeTable;
+import jadex.tools.common.ComponentTreeTableNodeType;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.ObjectCardLayout;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
-import jadex.tools.common.jtreetable.TreeTableNodeType;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.jcc.AgentControlCenter;
 
@@ -51,7 +52,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin
 		"profiler_sel", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/ruleprofiler_sel.png"),
 		"profile_agent", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/new_introspector.png"),
 		"close_profiler", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/close_introspector.png"),
-		"agent_profiled", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/new_agent_introspected.png"),
+		"agent_profiled", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/overlay_introspected.png"),
 		"profiler_empty", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/introspector_empty.png"),
 	});
 
@@ -145,21 +146,28 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin
 			}
 		});
 		// Change agent node type to enable profiled icon for agents.
-		agents.addNodeType(new TreeTableNodeType(ComponentTreeTable.NODE_COMPONENT,
-			new Icon[0], new String[]{"name", "address"}, new String[]{"Name", "Address"})
+		agents.addNodeType(new ComponentTreeTableNodeType(getJCC().getServiceContainer())
 		{
 			public Icon selectIcon(Object value)
 			{
-				Icon ret;
+				Icon ret	= super.selectIcon(value);
+
+				Icon	overlay	= null;
 				IComponentDescription ad = (IComponentDescription)((DefaultTreeTableNode)value).getUserObject();
 				if(cards.getComponent(ad)!=null)
 				{
-					ret = RuleProfilerPlugin.icons.getIcon("agent_profiled");
+					overlay = RuleProfilerPlugin.icons.getIcon("agent_profiled");
 				}
-				else
+				
+				if(ret!=null && overlay!=null)
 				{
-					ret = ComponentTreeTable.icons.getIcon(ComponentTreeTable.NODE_COMPONENT);
+					ret	= new CombiIcon(new Icon[]{ret, overlay});
 				}
+				else if(overlay!=null)
+				{
+					ret	= overlay;
+				}
+
 				return ret;
 			}
 		});

@@ -1,6 +1,6 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
 
 import java.awt.BorderLayout;
@@ -47,14 +47,14 @@ public class OptionDialog extends JDialog
 	//-------- attributes --------
 
 	/** The agent. */
-	protected IExternalAccess agent;
+	protected IBDIExternalAccess agent;
 
 	//-------- constructors --------
 
 	/**
 	 *  Create a new test center panel.
 	 */
-	public OptionDialog(final JFrame parent, final IExternalAccess agent)
+	public OptionDialog(final JFrame parent, final IBDIExternalAccess agent)
 	{
 		super(parent, true);
 		this.agent = agent;

@@ -599,7 +599,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 *  Get the scope.
 	 *  @return The scope.
 	 */
-	public IExternalAccess getExternalAccess()
+	public IBDIExternalAccess getExternalAccess()
 	{
 		return new ExternalAccessFlyweight(state, rcapa);
 	}

@@ -6,7 +6,7 @@ import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.gui.GameStateFrame;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
 
 import java.awt.Window;
@@ -33,7 +33,7 @@ public class DealerFrame extends GameStateFrame
 	//-------- attributes --------
 
 	/** The agent access object. */
-	protected IExternalAccess	agent;
+	protected IBDIExternalAccess	agent;
 	
 	/** child windows (e.g. statistics). */
 	protected Set	children;
@@ -45,7 +45,7 @@ public class DealerFrame extends GameStateFrame
 	 * Here, the GUI is build up for the first time, all
 	 * panels are instantiated and shown on the screen.
 	 */
-	public DealerFrame(final Dealer me, final IExternalAccess agent)
+	public DealerFrame(final Dealer me, final IBDIExternalAccess agent)
 	{
 		super(null, null);
 		this.agent	= agent;

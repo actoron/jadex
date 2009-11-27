@@ -1,7 +1,6 @@
 package jadex.adapter.base.fipa;
 
 import jadex.adapter.base.NuggetsXMLContentCodec;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageType;
@@ -213,13 +212,13 @@ public class SFipa
 	 *  Clone the ams agent description.
 	 *  @param source The source ams agent description.
 	 *  @param ams The ams service.
-	 */
-	public static IComponentDescription cloneAMSAgentDescription(IComponentDescription source, IComponentExecutionService ces)
+	 * /
+	public static IComponentDescription cloneComponentDescription(IComponentDescription source, IComponentExecutionService ces)
 	{
 		 IComponentIdentifier id = source.getName();
 		 id	= ces.createComponentIdentifier(id.getName(), false, id.getAddresses());
-		 return ces.createComponentDescription(id, source.getState(), source.getOwnership());
-	}
+		 return ces.createComponentDescription(id, source.getState(), source.getOwnership(), source.getType());
+	}*/
 	
 	/**
 	 *  Clone the df service description.

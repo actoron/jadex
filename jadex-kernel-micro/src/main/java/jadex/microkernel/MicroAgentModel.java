@@ -7,8 +7,8 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  *  The agent model contains a loaded micro agent model (class)
@@ -187,10 +187,10 @@ public class MicroAgentModel implements ILoadableComponentModel
 	 *  define kernel-specific settings to configure tools. 
 	 *  @return The properties.
 	 */
-	public Properties	getProperties()
+	public Map	getProperties()
 	{
 		// Todo: implement me.
-		return new Properties();
+		return Collections.EMPTY_MAP;
 	}
 	
 	//-------- methods --------

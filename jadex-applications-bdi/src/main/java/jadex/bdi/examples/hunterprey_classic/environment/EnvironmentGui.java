@@ -6,7 +6,7 @@ import jadex.bdi.examples.hunterprey_classic.Prey;
 import jadex.bdi.examples.hunterprey_classic.Vision;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.commons.SGUI;
@@ -66,7 +66,7 @@ public class EnvironmentGui	extends JFrame
 	/**
 	 *  Create a new gui plan.
 	 */
-	public EnvironmentGui(final IExternalAccess agent)
+	public EnvironmentGui(final IBDIExternalAccess agent)
 	{
 		super(agent.getAgentName());
 		
@@ -158,7 +158,7 @@ public class EnvironmentGui	extends JFrame
 	/**
 	 *  Create a panel for the options area.
 	 */
-	protected JPanel createOptionsPanel(final IExternalAccess agent)
+	protected JPanel createOptionsPanel(final IBDIExternalAccess agent)
 	{
 		final Environment	env	= (Environment)agent.getBeliefbase().getBelief("environment").getFact();
 
@@ -228,7 +228,7 @@ public class EnvironmentGui	extends JFrame
 	/**
 	 *  Ensure that the gui is updated on changes in the environment.
 	 */
-	protected void	enableGuiUpdate(IExternalAccess agent)
+	protected void	enableGuiUpdate(IBDIExternalAccess agent)
 	{
 		final Environment	env	= (Environment)agent.getBeliefbase().getBelief("environment").getFact();
 		env.addPropertyChangeListener(new PropertyChangeListener()

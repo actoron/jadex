@@ -14,7 +14,7 @@ import jadex.bdi.runtime.IElement;
 import jadex.bdi.runtime.IEventbase;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.IExpressionbase;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IInternalEvent;
@@ -849,7 +849,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 *  Get the scope.
 	 *  @return The scope.
 	 */
-	public IExternalAccess getExternalAccess()
+	public IBDIExternalAccess getExternalAccess()
 	{
 		return new ExternalAccessFlyweight(state, rcapa);
 	}

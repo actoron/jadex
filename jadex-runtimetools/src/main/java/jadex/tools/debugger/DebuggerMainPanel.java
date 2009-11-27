@@ -1,16 +1,13 @@
 package jadex.tools.debugger;
 
+import jadex.adapter.base.SComponentFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
-import jadex.commons.SGUI;
+import jadex.bridge.IExternalAccess;
+import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
-import jadex.rules.state.IOAVState;
-import jadex.rules.state.OAVJavaType;
-import jadex.rules.state.javaimpl.OAVStateFactory;
-import jadex.rules.tools.stateviewer.OAVPanel;
-import jadex.tools.common.GuiProperties;
+import jadex.service.library.ILibraryService;
 import jadex.tools.common.plugin.IControlCenter;
 
 import java.awt.GridBagConstraints;
@@ -18,6 +15,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -25,29 +25,29 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 
 /**
  *  Show details of a debugged agent.
  */
-public class DebuggerPanel extends JSplitPane
+public class DebuggerMainPanel extends JSplitPane
 {
 	//-------- constants --------
+	
+	/** The factory properties key for debugger panels
+	 * (value is a comma separated list of fully
+	 * qualified class names implementing IDebuggerPanel). */
+	public static String	KEY_DEBUGGER_PANELS	= "debugger.panels";
 
-	/**
-	 * The image icons.
-	 */
-	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
-		"contents", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/bug_small.png")
-	});
+	/** The model properties key for breakpoints (should contain a java.util.Collection object). */
+	public static String	KEY_DEBUGGER_BREAKPOINTS	= "debugger.breakpoints";
 
 	//-------- attributes --------
 	
 	/** The control center. */
 	protected IControlCenter	jcc;
 	
-	/** The component identifier. */
-	protected IComponentIdentifier	comp;
+	/** The component description. */
+	protected IComponentDescription	desc;
 	
 	/** The step button. */
 	protected JButton	step;
@@ -62,10 +62,10 @@ public class DebuggerPanel extends JSplitPane
 	 *  @param container	The service container.
 	 *  @param comp	The identifier of the component to be debugged.
 	 */
-	public DebuggerPanel(IControlCenter jcc, IComponentIdentifier comp)
+	public DebuggerMainPanel(IControlCenter jcc, IComponentDescription desc)
 	{
 		this.jcc	= jcc;
-		this.comp	= comp;
+		this.desc	= desc;
 		this.setOneTouchExpandable(true);
 		
 		IComponentExecutionService	ces	= ((IComponentExecutionService)
@@ -76,28 +76,61 @@ public class DebuggerPanel extends JSplitPane
 		this.setRightComponent(rightpanel);
 		rightpanel.setLayout(new GridBagLayout());
 		
-		final JTabbedPane	tabs	= new JTabbedPane();
-		
-		// Add OAV Viewer as default introspector (hack???).
-		ces.getExternalAccess(comp, new IResultListener()
+		final JTabbedPane	tabs	= new JTabbedPane();		
+		ces.getExternalAccess(desc.getName(), new IResultListener()
 		{			
-			public void resultAvailable(Object result)
+			public void resultAvailable(final Object result)
 			{
-				IOAVState	dummystate	= OAVStateFactory.createOAVState(OAVJavaType.java_type_model);
-				dummystate.addJavaRootObject(result);
-				final OAVPanel	oavpanel	= new OAVPanel(dummystate);
+				// The left panel (breakpoints)
 				SwingUtilities.invokeLater(new Runnable()
 				{
+					
 					public void run()
 					{
-						tabs.addTab("Object", icons.getIcon("contents"), oavpanel, "Show the object contents");
+						Map	props	= ((IExternalAccess)result).getModel().getProperties();
+						if(props!=null && props.containsKey(KEY_DEBUGGER_BREAKPOINTS))
+						{
+							Collection	breakpoints	= (Collection)props.get(KEY_DEBUGGER_BREAKPOINTS);
+							BreakpointPanel	leftpanel	= new BreakpointPanel(breakpoints);
+							DebuggerMainPanel.this.setLeftComponent(leftpanel);
+							DebuggerMainPanel.this.setDividerLocation(150);	// Hack???
+						}
 					}
 				});
+				
+				// Sub panels of right panel.
+				final Map	props	= SComponentFactory.getProperties(DebuggerMainPanel.this.jcc.getServiceContainer(), DebuggerMainPanel.this.desc.getType());
+				if(props!=null && props.containsKey(KEY_DEBUGGER_PANELS))
+				{
+					final ILibraryService	libservice	= (ILibraryService)DebuggerMainPanel.this.jcc.getServiceContainer().getService(ILibraryService.class);
+					String	panels	= (String)props.get(KEY_DEBUGGER_PANELS);
+					StringTokenizer	stok	= new StringTokenizer(panels, ", \t\n\r\f");
+					while(stok.hasMoreTokens())
+					{
+						final String classname	= stok.nextToken();
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								try
+								{
+									Class	clazz	= SReflect.classForName(classname, libservice.getClassLoader());
+									IDebuggerPanel	panel	= (IDebuggerPanel)clazz.newInstance();
+									panel.init(DebuggerMainPanel.this.jcc, DebuggerMainPanel.this.desc.getName(), result);
+									tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
+								}
+								catch(Exception e)
+								{
+									DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panel.", "Debugger panel class: "+classname, e);
+								}
+							}							
+						});
+					}
+				}
 			}
-			
 			public void exceptionOccurred(Exception exception)
 			{
-				DebuggerPanel.this.jcc.displayError("Error showing object contents", null, exception);
+				DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panels.", null, exception);
 			}
 		});
 		
@@ -107,8 +140,8 @@ public class DebuggerPanel extends JSplitPane
 			public void actionPerformed(ActionEvent e)
 			{
 				IComponentExecutionService	ces	= (IComponentExecutionService)
-					DebuggerPanel.this.jcc.getServiceContainer().getService(IComponentExecutionService.class);
-				ces.stepComponent(DebuggerPanel.this.comp, new IResultListener()
+					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentExecutionService.class);
+				ces.stepComponent(DebuggerMainPanel.this.desc.getName(), new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -142,14 +175,14 @@ public class DebuggerPanel extends JSplitPane
 			public void actionPerformed(ActionEvent e)
 			{
 				IComponentExecutionService	ces	= (IComponentExecutionService)
-					DebuggerPanel.this.jcc.getServiceContainer().getService(IComponentExecutionService.class);
+					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentExecutionService.class);
 				if(stepmode.isSelected())
 				{
-					ces.suspendComponent(DebuggerPanel.this.comp, null);
+					ces.suspendComponent(DebuggerMainPanel.this.desc.getName(), null);
 				}
 				else
 				{
-					ces.resumeComponent(DebuggerPanel.this.comp, null);
+					ces.resumeComponent(DebuggerMainPanel.this.desc.getName(), null);
 				}
 				step.setEnabled(stepmode.isSelected());		
 			}
@@ -167,20 +200,9 @@ public class DebuggerPanel extends JSplitPane
 			0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
 
 		
-		ces.getComponentDescription(comp, new IResultListener()
-		{
-			public void exceptionOccurred(Exception exception)
-			{
-				exception.printStackTrace();
-			}
-			
-			public void resultAvailable(Object result)
-			{
-				updatePanel((IComponentDescription)result);
-			}
-		});
+		updatePanel((IComponentDescription)desc);
 
-		ces.addComponentListener(comp, new IComponentListener()
+		ces.addComponentListener(desc.getName(), new IComponentListener()
 		{			
 			public void componentChanged(IComponentDescription desc)
 			{

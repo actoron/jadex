@@ -1,7 +1,7 @@
 package jadex.tools.ruleprofiler;
 
 import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.runtime.IExternalAccess;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.impl.ElementFlyweight;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
@@ -59,7 +59,7 @@ public class RuleProfilerPanel	extends JPanel
 	//-------- attributes --------
 
 	/** The agent access. */
-	protected IExternalAccess	agent;
+	protected IBDIExternalAccess	agent;
 	
 	/** The agent to observe. */
 	protected IComponentIdentifier	observed;
@@ -71,7 +71,7 @@ public class RuleProfilerPanel	extends JPanel
 	 *  @param agent	The agent access.
 	 *  @param active	Flags indicating which tools should be active.
 	 */
-	public RuleProfilerPanel(IExternalAccess agent, IComponentIdentifier observed)
+	public RuleProfilerPanel(IBDIExternalAccess agent, IComponentIdentifier observed)
 	{
 		this.agent	= agent;
 		this.observed	= observed;
