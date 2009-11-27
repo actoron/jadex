@@ -15,7 +15,7 @@ public class JadexSequencePropertiesSection extends
 
 	// ---- constants ----
 	
-	private static final String[] textFieldNames = new String[] {"condition"};
+	private static final String[] textFieldNames = new String[]{AbstractJadexPropertySection.JADEX_CONDITION_DETAIL};
 	
 	// ---- attributes ----
 

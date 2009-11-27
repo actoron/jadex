@@ -1,5 +1,6 @@
 package jadex.bpmn;
 
+import jadex.bpmn.model.Argument;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MAnnotation;
 import jadex.bpmn.model.MAnnotationDetail;
@@ -443,6 +444,63 @@ public class BpmnXMLReader
 				}
 			}
 			
+			// Read annotations from Jadex bpmn tool.
+			
+			List annos = act.getAnnotations();
+			if(annos!=null)
+			{
+				JavaCCExpressionParser parser = new JavaCCExpressionParser();
+				for(int i=0; i<annos.size(); i++)
+				{
+					MAnnotation anno = (MAnnotation)annos.get(i);
+					List details = anno.getDetails();
+					if(details!=null)
+					{
+						for(int j=0; j<details.size(); j++)
+						{
+							MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
+							
+							String key = detail.getKey();
+							String value = detail.getValue();
+							
+							if("parameters".equals(key))
+							{
+								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
+								while(stok.hasMoreTokens())
+								{
+									String paramtext = stok.nextToken();
+									StringTokenizer stok2 = new StringTokenizer(paramtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+									String dir = stok2.nextToken();
+									String name = stok2.nextToken();
+									String clazzname = stok2.nextToken();
+									String val = stok2.nextToken();
+									
+									// context variable
+									Class clazz = SReflect.findClass0(clazzname, dia.getAllImports(), classloader);
+									if(clazz!=null)
+									{
+										IParsedExpression exp = null;
+										if(val!=null)
+										{
+											exp = parser.parseExpression(val, dia.getAllImports(), null, classloader);
+										}
+										MParameter param = new MParameter(dir, clazz, name, exp);
+										act.addParameter(param);
+										System.out.println("Parameter: "+param);
+									}
+								}
+							}
+							else // property
+							{
+								IParsedExpression propval = parser.parseExpression(value, dia.getAllImports(), null, classloader);
+								act.setPropertyValue(key, propval);
+								System.out.println("Property: "+key+" "+value);
+							}
+						}
+					}
+				}
+			}
+			
 			return null;
 		}
 		
@@ -590,7 +648,6 @@ public class BpmnXMLReader
 				String linetwo = null;
 				while(stok.hasMoreTokens())
 				{
-					
 					String prop = stok.nextToken();
 					int	idx	= prop.indexOf("=");
 					boolean	comp	= idx>0 && (prop.charAt(idx-1)=='!' || prop.charAt(idx-1)=='<' || prop.charAt(idx-1)=='>');
@@ -632,6 +689,59 @@ public class BpmnXMLReader
 				{
 					IParsedExpression cond = parser.parseExpression(lineone, dia.getAllImports(), null, classloader);
 					edge.setCondition(cond);
+				}
+			}
+			
+			// Read annotations from Jadex bpmn tool.
+			
+			List annos = edge.getAnnotations();
+			if(annos!=null)
+			{
+				for(int i=0; i<annos.size(); i++)
+				{
+					MAnnotation anno = (MAnnotation)annos.get(i);
+					List details = anno.getDetails();
+					if(details!=null)
+					{
+						for(int j=0; j<details.size(); j++)
+						{
+							MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
+							
+							String key = detail.getKey();
+							String value = detail.getValue();
+							
+							if("mappings".equals(key))
+							{
+								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
+								while(stok.hasMoreTokens())
+								{
+									String maptext = stok.nextToken();
+									
+									StringTokenizer stok2 = new StringTokenizer(maptext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+									String propname = stok2.nextToken();
+									String proptext = stok2.nextToken();
+									
+									IParsedExpression exp = parser.parseExpression(proptext, dia.getAllImports(), null, classloader);
+									IParsedExpression iexp	= null;
+
+									if(propname.endsWith("]") && propname.indexOf("[")!=-1)
+									{
+										String	itext	= propname.substring(propname.indexOf("[")+1, propname.length()-1);
+										propname	= propname.substring(0, propname.indexOf("["));
+										iexp	= parser.parseExpression(itext, dia.getAllImports(), null, classloader);
+									}
+
+									edge.addParameterMapping(propname, exp, iexp);
+								}
+							}
+							else if("condition".equals(key) && value!=null && value.length()>0)
+							{
+								IParsedExpression cond = parser.parseExpression(value, dia.getAllImports(), null, classloader);
+								edge.setCondition(cond);
+								System.out.println("Condition: "+key+" "+value);
+							}
+						}
+					}
 				}
 			}
 			
@@ -800,7 +910,7 @@ public class BpmnXMLReader
 					List details = anno.getDetails();
 					if(details!=null)
 					{
-						for(int j=0; j<annos.size(); j++)
+						for(int j=0; j<details.size(); j++)
 						{
 							MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
 							
@@ -809,14 +919,66 @@ public class BpmnXMLReader
 							
 							if("imports".equals(key))
 							{
-								StringTokenizer stok2 = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
-								String[] imps = new String[stok2.countTokens()];
-								for(int k=0; stok2.hasMoreElements(); k++)
+								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
+								String[] imps = new String[stok.countTokens()];
+								for(int k=0; stok.hasMoreElements(); k++)
 								{
-									imps[k] = stok2.nextToken();
+									imps[k] = stok.nextToken();
 								}
 								model.setImports(imps);
 								System.out.println("Imports: "+SUtil.arrayToString(imps));
+							}
+							else if("package".equals(key))
+							{
+								model.setPackage(value);
+								System.out.println("Package: "+value);
+							}
+							else if("parameters".equals(key))
+							{
+								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
+								while(stok.hasMoreTokens())
+								{
+									String paramtext = stok.nextToken();
+									StringTokenizer stok2 = new StringTokenizer(paramtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+									String dir = stok2.nextToken();
+									String name = stok2.nextToken();
+									String clazzname = stok2.nextToken();
+									String val = stok2.nextToken();
+									
+									// context variable
+									Class clazz = SReflect.findClass0(clazzname, model.getAllImports(), classloader);
+									if(clazz!=null)
+									{
+										IParsedExpression exp = null;
+										if(val!=null)
+										{
+											exp = parser.parseExpression(val, model.getAllImports(), null, classloader);
+										}
+										model.addContextVariable(name, clazz, exp);
+										System.out.println("Context variable: "+name);
+									}
+								}
+							}
+							else if("arguments".equals(key))
+							{
+								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
+								while(stok.hasMoreTokens())
+								{
+									String argtext = stok.nextToken();
+									StringTokenizer stok2 = new StringTokenizer(argtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+									String name = stok2.nextToken();
+									String desc = stok2.nextToken();
+									String typename = stok2.nextToken();
+									String valtext = stok2.nextToken();
+									
+									Object val = null;
+									if(valtext!=null)
+										val = parser.parseExpression(valtext, model.getAllImports(), null, classloader).getValue(null);
+									IArgument arg = new Argument(name, desc, typename, val);
+									
+									model.addArgument(arg);
+									System.out.println("Argument: "+arg);
+								}
 							}
 						}
 					}
@@ -835,40 +997,4 @@ public class BpmnXMLReader
 			return 1;
 		}
 	}
-	
-	/**
-	 *  Annotation detail post processor.
-	 *  Converts the value expression.
-	 * /
-	static class AnnotationDetailPostProcessor implements IPostProcessor
-	{
-		//-------- IPostProcessor interface --------
-		
-		/**
-		 *  Establish element connections.
-		 * /
-		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
-		{
-			MBpmnModel dia = (MBpmnModel)root;
-			MAnnotationDetail ad = (MAnnotationDetail)object;
-			JavaCCExpressionParser parser = new JavaCCExpressionParser();
-
-			if(ad.getValueText()!=null)
-			{
-				IParsedExpression exp = parser.parseExpression(ad.getValueText(), dia.getAllImports(), null, classloader);		
-				ad.setValue(exp);
-			}
-			
-			return null;
-		}
-		
-		/**
-		 *  Get the pass number.
-		 *  @return The pass number.
-		 * /
-		public int getPass()
-		{
-			return 2;
-		}
-	}*/
 }

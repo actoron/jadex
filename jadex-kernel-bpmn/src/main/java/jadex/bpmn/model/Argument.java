@@ -101,4 +101,15 @@ public class Argument implements IArgument
 		
 		return true;
 	}
+
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		return "Argument(defaultvalue=" + this.defaultvalue + ", description="
+			+ this.description + ", name=" + this.name + ", typename="
+			+ this.typename + ")";
+	}
 }

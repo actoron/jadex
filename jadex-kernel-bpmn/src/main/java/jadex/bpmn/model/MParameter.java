@@ -130,6 +130,16 @@ public class MParameter extends MAnnotationElement
 	public void setInitialValue(IParsedExpression initialval)
 	{
 		this.initialval = initialval;
+	}
+
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		return "MParameter(clazz=" + this.clazz + ", direction="
+			+ this.direction + ", initialval=" + this.initialval
+			+ ", name=" + this.name + ")";
 	}	
-	
 }

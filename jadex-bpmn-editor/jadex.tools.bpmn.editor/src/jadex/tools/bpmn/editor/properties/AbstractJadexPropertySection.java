@@ -63,12 +63,15 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	public static final String JADEX_ACTIVITY_CLASS_DETAIL = "class";
 	
 	/** Key for the parameter map of a activity. */
-	public static final String JADEX_PARAMETER_LIST_DETAIL = "prameter";
+	public static final String JADEX_PARAMETER_LIST_DETAIL = "parameters";
 
+	
 	/** Key for the mapping map of a sequence edge. */
-	public static final String JADEX_MAPPING_LIST_DETAIL = "mapping";
+	public static final String JADEX_MAPPING_LIST_DETAIL = "mappings";
 	
-	
+	/** Key for the condition of a sequence edge. */
+	public static final String JADEX_CONDITION_DETAIL = "condition";
+
 	
 	/** Key for the parameter map of a task. */
 	public static final String JADEX_FLOW_EXAMPLE_ANNOTATION = "example";
