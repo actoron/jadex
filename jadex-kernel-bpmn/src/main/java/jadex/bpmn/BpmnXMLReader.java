@@ -45,6 +45,24 @@ import jadex.commons.xml.QName;
  */
 public class BpmnXMLReader
 {
+	//-------- constants --------
+	
+	// Copied from jadex.tools.bpmn.editor.properties.AbstractJadexPropertySection
+	
+	/** 
+	 * String delimiter for list elements <p>
+	 * <p><code>0x241F</code> (9247) SYMBOL FOR UNIT SEPARATOR</p>
+	 */
+	public static final String LIST_ELEMENT_DELIMITER = "\u241F"; // "<*>";
+	
+	
+	/** 
+	 * String delimiter for element attributes  <p>
+	 * <p><code>0x240B</code> (9227) SYMBOL FOR VERTICAL TABULATION</p>
+	 */
+	public static final String LIST_ELEMENT_ATTRIBUTE_DELIMITER = "\u240B"; //"#|#";
+
+	
 	//-------- attributes --------
 	
 	/** The singleton reader instance. */
@@ -769,8 +787,40 @@ public class BpmnXMLReader
 				if(model.getPackage()!=null)
 					imports.add(model.getPackage()+".*");
 				model.setImports((String[])imports.toArray(new String[imports.size()]));
-				
-				// 
+			}	
+			
+			// Handle the annotations of the model.
+			
+			List annos = model.getAnnotations();
+			if(annos!=null)
+			{
+				for(int i=0; i<annos.size(); i++)
+				{
+					MAnnotation anno = (MAnnotation)annos.get(i);
+					List details = anno.getDetails();
+					if(details!=null)
+					{
+						for(int j=0; j<annos.size(); j++)
+						{
+							MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
+							
+							String key = detail.getKey();
+							String value = detail.getValue();
+							
+							if("imports".equals(key))
+							{
+								StringTokenizer stok2 = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
+								String[] imps = new String[stok2.countTokens()];
+								for(int k=0; stok2.hasMoreElements(); k++)
+								{
+									imps[k] = stok2.nextToken();
+								}
+								model.setImports(imps);
+								System.out.println("Imports: "+SUtil.arrayToString(imps));
+							}
+						}
+					}
+				}
 			}
 			
 			return null;
