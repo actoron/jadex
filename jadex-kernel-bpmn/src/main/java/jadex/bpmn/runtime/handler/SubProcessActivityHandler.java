@@ -27,7 +27,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 		ThreadContext	subcontext	= new ThreadContext(proc, thread);
 		thread.getThreadContext().addSubcontext(subcontext);
 		
-		List	start	= proc.getStartActivities();
+		List start = proc.getStartActivities();
 		for(int i=0; i<start.size(); i++)
 		{
 			ProcessThread	newthread	= new ProcessThread((MActivity)start.get(i), subcontext, instance);

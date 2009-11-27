@@ -24,12 +24,11 @@ public class JadexUserTaskImplComboSection extends
 
 	// ---- constants ----
 	
-	private static final String[] comboItems = new String[] {
-		"LARS:replace_value_in_AbstractComboPropertySection.class",
-		"LARS:replace_value_in_AbstractComboPropertySection.class",
-		"LARS:replace_value_in_AbstractComboPropertySection.class",
-		"LARS:replace_value_in_AbstractComboPropertySection.class",
-		"LARS:replace_value_in_AbstractComboPropertySection.class"
+	protected static final String[] comboItems = new String[] {
+		"jadex.bpmn.runtime.task.PrintTask.class",
+		"jadex.bpmn.runtime.task.CreateComponentTask.class",
+		"jadex.bpmn.runtime.task.DestroyComponentTask.class",
+		"jadex.bpmn.runtime.task.UserInteractionTask.class",
 	};
 	
 	// ---- attributes ----
@@ -86,7 +85,7 @@ public class JadexUserTaskImplComboSection extends
 					String newText = cCombo.getText();
 
 					// check if we have a valid class name
-					if (newText.endsWith(".class")) //$NON-NLS-1$
+					if(newText.endsWith(".class")) //$NON-NLS-1$
 					{
 						cCombo.add(newText);
 						cCombo.setSelection(new Point(0, newText

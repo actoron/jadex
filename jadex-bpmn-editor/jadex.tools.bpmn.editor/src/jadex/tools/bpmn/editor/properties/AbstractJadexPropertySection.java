@@ -73,6 +73,14 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	public static final String JADEX_CONDITION_DETAIL = "condition";
 
 	
+	/** Key for the implementing duration of a timer. */
+	public static final String JADEX_EVENT_TIMER_DETAIL = "timer";
+	
+	/** Key for the implementing rule. */
+	public static final String JADEX_EVENT_RULE_DETAIL = "rule";
+
+	
+	
 	/** Key for the parameter map of a task. */
 	public static final String JADEX_FLOW_EXAMPLE_ANNOTATION = "example";
 	

@@ -80,7 +80,8 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 			cComposite.setLayout(new GridLayout(2, false));
 			
 			Label cLabel = getWidgetFactory().createLabel(cComposite, textFieldNames[i]+":"); // //$NON-NLS-1$
-			Text cTextfield = getWidgetFactory().createText(cComposite, textFieldNames[i]);
+//			Text cTextfield = getWidgetFactory().createText(cComposite, textFieldNames[i]);
+			Text cTextfield = getWidgetFactory().createText(cComposite, "");
 			textFields[i] = cTextfield;
 			cTextfield.addModifyListener(new ModifyJadexEAnnotation(textFieldNames[i], cTextfield));
 			cLabel.setLayoutData(labelGridData);

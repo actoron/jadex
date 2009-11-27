@@ -486,7 +486,7 @@ public class BpmnXMLReader
 										}
 										MParameter param = new MParameter(dir, clazz, name, exp);
 										act.addParameter(param);
-										System.out.println("Parameter: "+param);
+//										System.out.println("Parameter: "+param);
 									}
 								}
 							}
@@ -494,7 +494,7 @@ public class BpmnXMLReader
 							{
 								IParsedExpression propval = parser.parseExpression(value, dia.getAllImports(), null, classloader);
 								act.setPropertyValue(key, propval);
-								System.out.println("Property: "+key+" "+value);
+//								System.out.println("Property: "+key+" "+value);
 							}
 						}
 					}
@@ -637,7 +637,67 @@ public class BpmnXMLReader
 			MSequenceEdge edge = (MSequenceEdge)object;
 			JavaCCExpressionParser parser = new JavaCCExpressionParser();
 
-			if(edge.getDescription()!=null)
+			// Read annotations from Jadex bpmn tool.
+			
+			List annos = edge.getAnnotations();
+			if(annos!=null)
+			{
+				for(int i=0; i<annos.size(); i++)
+				{
+					MAnnotation anno = (MAnnotation)annos.get(i);
+					List details = anno.getDetails();
+					if(details!=null)
+					{
+						for(int j=0; j<details.size(); j++)
+						{
+							MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
+							
+							String key = detail.getKey();
+							String value = detail.getValue();
+							
+							// todo: enhance mappings with index?
+							
+							if("mappings".equals(key))
+							{
+								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
+								while(stok.hasMoreTokens())
+								{
+									String maptext = stok.nextToken();
+									
+									StringTokenizer stok2 = new StringTokenizer(maptext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+									String propname = stok2.nextToken();
+									String proptext = stok2.nextToken();
+									
+									IParsedExpression exp = parser.parseExpression(proptext, dia.getAllImports(), null, classloader);
+									IParsedExpression iexp	= null;
+
+									if(propname.endsWith("]") && propname.indexOf("[")!=-1)
+									{
+										String	itext	= propname.substring(propname.indexOf("[")+1, propname.length()-1);
+										propname	= propname.substring(0, propname.indexOf("["));
+										iexp	= parser.parseExpression(itext, dia.getAllImports(), null, classloader);
+									}
+
+									edge.addParameterMapping(propname, exp, iexp);
+									
+//									System.out.println("Mapping: "+propname+" "+exp);
+								}
+							}
+							else if("condition".equals(key) && value!=null && value.length()>0)
+							{
+								IParsedExpression cond = parser.parseExpression(value, dia.getAllImports(), null, classloader);
+								edge.setCondition(cond);
+								
+//								System.out.println("Condition: "+key+" "+value);
+							}
+						}
+					}
+				}
+			}
+			
+			// Only interpret description when no annotations were found.
+			
+			else if(edge.getDescription()!=null)
 			{
 				// first line: name
 				// second line: condition
@@ -689,59 +749,6 @@ public class BpmnXMLReader
 				{
 					IParsedExpression cond = parser.parseExpression(lineone, dia.getAllImports(), null, classloader);
 					edge.setCondition(cond);
-				}
-			}
-			
-			// Read annotations from Jadex bpmn tool.
-			
-			List annos = edge.getAnnotations();
-			if(annos!=null)
-			{
-				for(int i=0; i<annos.size(); i++)
-				{
-					MAnnotation anno = (MAnnotation)annos.get(i);
-					List details = anno.getDetails();
-					if(details!=null)
-					{
-						for(int j=0; j<details.size(); j++)
-						{
-							MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
-							
-							String key = detail.getKey();
-							String value = detail.getValue();
-							
-							if("mappings".equals(key))
-							{
-								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
-								while(stok.hasMoreTokens())
-								{
-									String maptext = stok.nextToken();
-									
-									StringTokenizer stok2 = new StringTokenizer(maptext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-									String propname = stok2.nextToken();
-									String proptext = stok2.nextToken();
-									
-									IParsedExpression exp = parser.parseExpression(proptext, dia.getAllImports(), null, classloader);
-									IParsedExpression iexp	= null;
-
-									if(propname.endsWith("]") && propname.indexOf("[")!=-1)
-									{
-										String	itext	= propname.substring(propname.indexOf("[")+1, propname.length()-1);
-										propname	= propname.substring(0, propname.indexOf("["));
-										iexp	= parser.parseExpression(itext, dia.getAllImports(), null, classloader);
-									}
-
-									edge.addParameterMapping(propname, exp, iexp);
-								}
-							}
-							else if("condition".equals(key) && value!=null && value.length()>0)
-							{
-								IParsedExpression cond = parser.parseExpression(value, dia.getAllImports(), null, classloader);
-								edge.setCondition(cond);
-								System.out.println("Condition: "+key+" "+value);
-							}
-						}
-					}
 				}
 			}
 			
@@ -926,12 +933,12 @@ public class BpmnXMLReader
 									imps[k] = stok.nextToken();
 								}
 								model.setImports(imps);
-								System.out.println("Imports: "+SUtil.arrayToString(imps));
+//								System.out.println("Imports: "+SUtil.arrayToString(imps));
 							}
 							else if("package".equals(key))
 							{
 								model.setPackage(value);
-								System.out.println("Package: "+value);
+//								System.out.println("Package: "+value);
 							}
 							else if("parameters".equals(key))
 							{
@@ -955,7 +962,7 @@ public class BpmnXMLReader
 											exp = parser.parseExpression(val, model.getAllImports(), null, classloader);
 										}
 										model.addContextVariable(name, clazz, exp);
-										System.out.println("Context variable: "+name);
+//										System.out.println("Context variable: "+name);
 									}
 								}
 							}
@@ -977,7 +984,7 @@ public class BpmnXMLReader
 									IArgument arg = new Argument(name, desc, typename, val);
 									
 									model.addArgument(arg);
-									System.out.println("Argument: "+arg);
+//									System.out.println("Argument: "+arg);
 								}
 							}
 						}
