@@ -110,6 +110,8 @@
    <!-- the jadex timer events activity property section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <!-- CHECK: filter="jadex.tools.bpmn.editor.properties.JadexTimerEventFilter" ??? -->
+        <!-- CHECK:  id="jadex.tools.bpmn.editor.propertySection.GatewayActivity" ??? -->
         <propertySection
               class="jadex.tools.bpmn.editor.properties.JadexIntermediateEventsParameterSection"
               filter="jadex.tools.bpmn.editor.properties.JadexTimerEventFilter"
@@ -140,6 +142,8 @@
    <!-- the jadex timer rule events activity property section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+      	<!-- CHECK: id="jadex.tools.bpmn.editor.propertySection.GatewayActivity" ??? -->
+      	<!-- CHECK: filter="jadex.tools.bpmn.editor.properties.JadexRuleEventFilter" ??? -->
         <propertySection
               class="jadex.tools.bpmn.editor.properties.JadexIntermediateEventsParameterSection"
               filter="jadex.tools.bpmn.editor.properties.JadexRuleEventFilter"
