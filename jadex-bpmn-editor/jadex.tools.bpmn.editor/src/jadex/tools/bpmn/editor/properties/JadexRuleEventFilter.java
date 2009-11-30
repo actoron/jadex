@@ -1,8 +1,8 @@
 package jadex.tools.bpmn.editor.properties;
 
-import javax.swing.text.View;
 
 import org.eclipse.gef.EditPart;
+import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.jface.viewers.IFilter;
 import org.eclipse.stp.bpmn.Activity;
 import org.eclipse.stp.bpmn.ActivityType;
