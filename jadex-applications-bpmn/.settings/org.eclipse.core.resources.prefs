@@ -1,4 +1,4 @@
-#Fri Nov 27 17:13:07 CET 2009
+#Tue Dec 01 17:20:42 CET 2009
 eclipse.preferences.version=1
 encoding//src/main/java/jadex/bpmn/benchmarks/AgentCreation.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/benchmarks/AgentCreation.bpmn_diagram=UTF-8
@@ -6,16 +6,6 @@ encoding//src/main/java/jadex/bpmn/benchmarks/AgentCreation2.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/benchmarks/AgentCreation2.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/benchmarks/default.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/benchmarks/default.bpmn_diagram=UTF-8
-encoding//src/main/java/jadex/bpmn/examples/dipp/DiPP1_LOG_Ladungstraeger_absichern.bpmn=UTF-8
-encoding//src/main/java/jadex/bpmn/examples/dipp/DiPP1_LOG_Ladungstraeger_absichern.bpmn_diagram=UTF-8
-encoding//src/main/java/jadex/bpmn/examples/dipp/DiPP1_LOG_Lieferantenstandort_pruefen.bpmn=UTF-8
-encoding//src/main/java/jadex/bpmn/examples/dipp/DiPP1_LOG_Lieferantenstandort_pruefen.bpmn_diagram=UTF-8
-encoding//src/main/java/jadex/bpmn/examples/dipp/DiPP1_LOG_Planungspraemissen_abgleichen.bpmn=UTF-8
-encoding//src/main/java/jadex/bpmn/examples/dipp/DiPP1_LOG_Planungspraemissen_abgleichen.bpmn_diagram=UTF-8
-encoding//src/main/java/jadex/bpmn/examples/dipp/DiPP1_LOG_Prozessplanung_durchfuehren.bpmn=UTF-8
-encoding//src/main/java/jadex/bpmn/examples/dipp/DiPP1_LOG_Prozessplanung_durchfuehren.bpmn_diagram=UTF-8
-encoding//src/main/java/jadex/bpmn/examples/dipp/MG_Praemissen_fehlen.bpmn=UTF-8
-encoding//src/main/java/jadex/bpmn/examples/dipp/MG_Praemissen_fehlen.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/execute/Notification.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/execute/Notification.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/marsworld/AddTargetPlan.bpmn=UTF-8

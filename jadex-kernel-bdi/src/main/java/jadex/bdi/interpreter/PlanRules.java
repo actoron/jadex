@@ -542,7 +542,7 @@ public class PlanRules
 				catch(Exception e)
 				{
 					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_exception, e);
-					StringWriter	sw	= new StringWriter();
+					StringWriter sw	= new StringWriter();
 					e.printStackTrace(new PrintWriter(sw));
 					//System.out.println(cap.getAgent().getName()+": Exception while executing: "+this);
 					//e.printStackTrace();
@@ -554,7 +554,7 @@ public class PlanRules
 //						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getAgentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
 						AgentRules.getLogger(state, rcapa).severe(ip.getComponentAdapter().getComponentIdentifier()+
-							": Exception while executing: "+rplan+"\n"+sw);
+							": Exception while executing: "+rplan+" "+state.getAttributeValue(state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)+"\n"+sw);
 					}
 					else
 					{

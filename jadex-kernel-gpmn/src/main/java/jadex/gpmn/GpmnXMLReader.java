@@ -86,7 +86,7 @@ public class GpmnXMLReader
 		
 		rinfo.getInputStream().close();
 		
-		System.out.println("Loaded model: "+ret);
+//		System.out.println("Loaded model: "+ret);
 		return ret;
 	}
 	
@@ -202,7 +202,7 @@ public class GpmnXMLReader
 			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"),
 			new BeanAttributeInfo("associations", "associationsDescription")}, null));
 		
-		types.add(new TypeInfo(null, "staticElements", MParameter.class, null, null,
+		types.add(new TypeInfo(null, "elements", MParameter.class, null, null,
 			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"),
 			new BeanAttributeInfo("type", "className"),
 			new BeanAttributeInfo("initialValue", "initialValueDescription")}, null));
@@ -235,7 +235,7 @@ public class GpmnXMLReader
 				}
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("staticElements", "parameter"))
+			new SubobjectInfo(new BeanAttributeInfo("elements", "parameter"))
 			}
 		));
 		
@@ -332,8 +332,6 @@ public class GpmnXMLReader
 				{
 					String edgeid = (String)outdescs.get(i); 
 					MSequenceEdge edge = (MSequenceEdge)edges.get(edgeid);
-					if(edge==null)
-						System.out.println("asd");
 					pe.addOutgoingSequenceEdge(edge);
 					edge.setSource(pe);
 				}
