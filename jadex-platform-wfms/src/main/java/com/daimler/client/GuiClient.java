@@ -13,6 +13,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -167,7 +168,15 @@ public class GuiClient implements IClient
 		activateComponent(emptyLabel);
 		getHelpBrowser().setVisible(false);
 		removeWorkitem(workitem);
-		clientService.finishActivity(this, currentActivity);
+		//clientService.finishActivity(this, currentActivity);
+		//TODO: Hack!!
+		EventQueue.invokeLater(new Runnable() {
+			
+			public void run()
+			{
+				clientService.finishActivity(GuiClient.this, currentActivity);
+			}
+		});
 	}
 	
 	public AbstractTaskSelectAction showText(IWorkitem workitem)
@@ -346,31 +355,44 @@ public class GuiClient implements IClient
 	
 	private class ConnectorController implements IWfmsListener
 	{
-		public void workitemAdded(WorkitemQueueChangeEvent event)
+		public void workitemAdded(final WorkitemQueueChangeEvent event)
 		{
-			int type = event.getWorkitem().getType();
-			switch (type)
-			{
-				case IWorkitem.TEXT_INFO_WORKITEM_TYPE:
-					showText(event.getWorkitem());
-					break;
-					
-				case IWorkitem.DATA_FETCH_WORKITEM_TYPE:
-					fetchData(event.getWorkitem());
-					break;
-					
-				default:
-					throw new RuntimeException("Unknown Workitem type: " + String.valueOf(type));
-			}
+			final int type = event.getWorkitem().getType();
+			EventQueue.invokeLater(new Runnable() {
+				
+				public void run()
+				{
+					switch (type)
+					{
+						case IWorkitem.TEXT_INFO_WORKITEM_TYPE:
+							showText(event.getWorkitem());
+							break;
+							
+						case IWorkitem.DATA_FETCH_WORKITEM_TYPE:
+							fetchData(event.getWorkitem());
+							break;
+							
+						default:
+							throw new RuntimeException("Unknown Workitem type: " + String.valueOf(type));
+					}
+				}
+			});
 		}
 		
-		public void workitemRemoved(WorkitemQueueChangeEvent event)
+		public void workitemRemoved(final WorkitemQueueChangeEvent event)
 		{
-			if (!event.getWorkitem().equals(currentActivity))
+			EventQueue.invokeLater(new Runnable()
 			{
-				removeWorkitem(event.getWorkitem());
-				currentActivity = null;
-			}
+				
+				public void run()
+				{
+					if (!event.getWorkitem().equals(currentActivity))
+					{
+						removeWorkitem(event.getWorkitem());
+						currentActivity = null;
+					}
+				}
+			});
 		}
 		
 		public void processFinished(ProcessFinishedEvent event)

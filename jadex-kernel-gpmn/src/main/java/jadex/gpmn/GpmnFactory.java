@@ -53,13 +53,17 @@ public class GpmnFactory implements IComponentFactory
 	/** The bdi agent factory. */
 	protected BDIAgentFactory factory;
 	
+	/** The properties. */
+	protected Map properties;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new GpmnProcessService.
 	 */
-	public GpmnFactory(IServiceContainer container)
+	public GpmnFactory(IServiceContainer container, Map properties)
 	{
+		this.properties	= properties;
 		this.container = container;
 		this.loader = new GpmnModelLoader();
 		this.converter = new GpmnBDIConverter();
@@ -274,6 +278,6 @@ public class GpmnFactory implements IComponentFactory
 	public Map	getProperties(String type)
 	{
 		return FILETYPE_GPMNPROCESS.equals(type)
-		? Collections.EMPTY_MAP : null;
+		? properties : null;
 	}
 }

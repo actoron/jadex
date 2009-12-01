@@ -55,6 +55,7 @@ public abstract class AbstractClientTask implements ITask
 						context.setParameterValue((String) paramEntry.getKey(), paramEntry.getValue());
 					}
 				}
+				//System.out.println(listener.getClass().getName());
 				listener.resultAvailable(result);
 			}
 			

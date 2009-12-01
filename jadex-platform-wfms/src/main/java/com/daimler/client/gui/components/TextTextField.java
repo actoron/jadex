@@ -63,6 +63,7 @@ public class TextTextField extends JScrollPane implements IInputComponent,
 		try
 		{
 			sText = e.getDocument().getText(0, e.getDocument().getLength());
+			value = sText;
 		} catch (BadLocationException err)
 		{
 		}
@@ -74,6 +75,7 @@ public class TextTextField extends JScrollPane implements IInputComponent,
 		try
 		{
 			sText = e.getDocument().getText(0, e.getDocument().getLength());
+			value = sText;
 		} catch (BadLocationException err)
 		{
 		}

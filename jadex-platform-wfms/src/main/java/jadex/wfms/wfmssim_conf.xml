@@ -108,7 +108,8 @@
 						"planexecutor_standard", 
 						"standard.timeout", 
 						"microplansteps",
-						"planexecutor_bpmn"
+						"planexecutor_bpmn",
+						"debugger.panels"
 					},
 					new Object[]
 					{
@@ -116,7 +117,8 @@
 						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class)),
 						new java.lang.Long(10000),
 						Boolean.TRUE,
-						new jadex.bpmnbdi.BpmnPlanExecutor($platform)
+						new jadex.bpmnbdi.BpmnPlanExecutor($platform),
+						"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
 					}
 				), $platform)
 			</property>
@@ -126,11 +128,29 @@
 			</property>
 			
 			<property type="jadex.bridge.IComponentFactory" name="bpmn_factory">
-				new jadex.bpmn.BpmnFactory($platform, null)
+				new jadex.bpmn.BpmnFactory($platform, jadex.commons.SUtil.createHashMap(
+					new String[]
+					{
+						"debugger.panels"
+					},
+					new Object[]
+					{
+						"jadex.tools.debugger.bpmn.BpmnDebuggerPanel, jadex.tools.debugger.common.ObjectInspectorDebuggerPanel"
+					})
+				)
 			</property>
 			
 			<property type="jadex.bridge.IComponentFactory" name="gpmn_factory">
-				new jadex.gpmn.GpmnFactory($platform)
+				new jadex.gpmn.GpmnFactory($platform, jadex.commons.SUtil.createHashMap(
+					new String[]
+					{
+						"debugger.panels"
+					},
+					new Object[]
+					{
+						"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
+					})
+				)
 			</property>
 			
 			<!-- WFMS Services -->
@@ -203,7 +223,7 @@
 		<!-- Agents. -->
   		<property type="daemonagent" name="ams">jadex/bdi/amsagent/AMS.agent.xml</property>
 		<property type="daemonagent" name="df">jadex/bdi/dfagent/DF.agent.xml</property>
- 		<!-- <property type="agent" name="jcc">jadex/tools/jcc/JCC.agent.xml</property> -->
+ 		<property type="agent" name="jcc">jadex/tools/jcc/JCC.agent.xml</property>
 	</properties>
 	
 </properties>
