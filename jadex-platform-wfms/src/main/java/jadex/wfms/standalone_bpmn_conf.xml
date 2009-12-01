@@ -141,7 +141,16 @@
 			</property>
 			
 			<property type="jadex.bridge.IComponentFactory" name="gpmn_factory">
-				new jadex.gpmn.GpmnFactory($platform)
+				new jadex.gpmn.GpmnFactory($platform, jadex.commons.SUtil.createHashMap(
+					new String[]
+					{
+						"debugger.panels"
+					},
+					new Object[]
+					{
+						"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
+					})
+				)
 			</property>
 			
 			<!-- <property type="jadex.bridge.IComponentFactory" name="gpmn_factory">

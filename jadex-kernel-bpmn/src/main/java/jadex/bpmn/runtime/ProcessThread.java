@@ -257,7 +257,7 @@ public class ProcessThread	implements ITaskContext
 	{
 		ProcessThread	ret	= new ProcessThread(activity, context, instance);
 		ret.edge	= edge;
-		ret.data	= data;
+		ret.data	= new HashMap(data);
 		return ret;
 	}
 	
@@ -500,46 +500,41 @@ public class ProcessThread	implements ITaskContext
 						
 			// todo: parameter direction / class
 			
+			Set before = data!=null? new HashSet(data.keySet()): Collections.EMPTY_SET;
+			IValueFetcher fetcher = new ProcessThreadValueFetcher(this, true, instance.getValueFetcher());
 			Map params = getActivity().getParameters();
-			Set before = params!=null? new HashSet(params.keySet()): Collections.EMPTY_SET;
-			
-			if(params!=null)
-			{	
-				IValueFetcher fetcher = new ProcessThreadValueFetcher(this, true, instance.getValueFetcher());
-				for(Iterator it=params.values().iterator(); it.hasNext(); )
+			for(Iterator it=params.values().iterator(); it.hasNext(); )
+			{
+				MParameter param = (MParameter)it.next();
+				if(passedparams!=null && passedparams.containsKey(param.getName()))
 				{
-					MParameter param = (MParameter)it.next();
-					if(passedparams!=null && passedparams.containsKey(param.getName()))
+					if(indexparams!=null && indexparams.contains(param.getName()))
 					{
-						if(indexparams!=null && indexparams.contains(param.getName()))
+						Object	array	= getParameterValue(param.getName());
+						List	values	= (List)passedparams.get(param.getName());
+						for(int i=0; i<values.size(); i++)
 						{
-							Object	array	= getParameterValue(param.getName());
-							List	values	= (List)passedparams.get(param.getName());
-							for(int i=0; i<values.size(); i++)
-							{
-								Object[]	entry	= (Object[])values.get(i);
-								Array.set(array, ((Number)entry[0]).intValue(), entry[1]);
-							}
-						}
-						else
-						{
-							setParameterValue(param.getName(), passedparams.get(param.getName()));
-							before.remove(param.getName());
+							Object[]	entry	= (Object[])values.get(i);
+							Array.set(array, ((Number)entry[0]).intValue(), entry[1]);
 						}
 					}
 					else
 					{
-						setParameterValue(param.getName(), param.getInitialValue()==null? null: param.getInitialValue().getValue(fetcher));
+						setParameterValue(param.getName(), passedparams.get(param.getName()));
 						before.remove(param.getName());
 					}
+				}
+				else
+				{
+					setParameterValue(param.getName(), param.getInitialValue()==null? null: param.getInitialValue().getValue(fetcher));
+					before.remove(param.getName());
 				}
 			}
 			
 			// Remove old data (all values that have not been renewed).
-//			this.data	= null;
 			for(Iterator it=before.iterator(); it.hasNext(); )
 			{
-				params.remove(it.next());
+				data.remove(it.next());
 			}
 		}
 	}

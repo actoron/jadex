@@ -1319,17 +1319,23 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	/**
 	 *  Delegate synchronization to agent.
 	 */
-	public void invokeLater(Runnable action)
+	public void invokeLater(final Runnable action)
 	{
-		interpreter.invokeLater(action);
-	}
-	
-	/**
-	 *  Delegate synchronization to agent.
-	 */
-	public void invokeSynchronized(Runnable code)
-	{
-		interpreter.invokeSynchronized(code);
+		// Called from outside (e.g. workflow client)
+		// when task is finished
+		// Check if plan should be set to ready (Hack!!!)
+		interpreter.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				action.run();
+				String lane = getLane(getLastState());
+				if(isReady(null, lane))
+				{
+					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+				}
+			}	
+		});
 	}
 	
 	/**

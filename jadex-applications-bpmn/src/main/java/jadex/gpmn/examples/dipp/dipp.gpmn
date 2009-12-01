@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gpmn:GpmnDiagram xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" id="_AznrkLmFEd6y6pbFUAB2Hw">
   <artifacts xsi:type="gpmn:Context" id="__6xbwN6WEd62vdy0afypXQ">
-    <elements id="_NJwlkN6XEd62vdy0afypXQ" initialValue="true" name="Praemissen_ok" set="false" type="boolean"/>
+    <elements id="_NJwlkN6XEd62vdy0afypXQ" initialValue="true" name="praemissen_ok" set="false" type="boolean"/>
     <elements id="_TKgAAN6XEd62vdy0afypXQ" name="produktmodell" type="boolean"/>
     <elements id="_WbHcMN6XEd62vdy0afypXQ" name="vertriebsprognosen" type="boolean"/>
     <elements id="_YjxKwN6XEd62vdy0afypXQ" name="gs_konzept" type="boolean"/>
