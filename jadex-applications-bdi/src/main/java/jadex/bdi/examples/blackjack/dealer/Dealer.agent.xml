@@ -78,7 +78,7 @@
 		</belief>
 		
 		<belief name="gui" class="jadex.bdi.planlib.GuiCreator">
-			<fact>new jadex.bdi.planlib.GuiCreator(DealerFrame.class, new Class[]{Dealer.class, jadex.bdi.runtime.IExternalAccess.class}, 
+			<fact>new jadex.bdi.planlib.GuiCreator(DealerFrame.class, new Class[]{Dealer.class, jadex.bdi.runtime.IBDIExternalAccess.class}, 
 				new Object[]{$beliefbase.myself, $scope.getExternalAccess()})</fact>
 		</belief>
 

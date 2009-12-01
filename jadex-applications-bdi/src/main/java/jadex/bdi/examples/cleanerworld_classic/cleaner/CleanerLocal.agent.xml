@@ -100,7 +100,7 @@
 		
 		<belief name="gui" class="jadex.bdi.planlib.GuiCreator">
 			<!-- <fact>new CleanerGui($scope.getExternalAccess())</fact> -->
-			<fact>new jadex.bdi.planlib.GuiCreator(CleanerGui.class, new Class[]{jadex.bdi.runtime.IExternalAccess.class}, 
+			<fact>new jadex.bdi.planlib.GuiCreator(CleanerGui.class, new Class[]{jadex.bdi.runtime.IBDIExternalAccess.class}, 
 				new Object[]{$scope.getExternalAccess()})</fact>
 		</belief>
 	</beliefs>

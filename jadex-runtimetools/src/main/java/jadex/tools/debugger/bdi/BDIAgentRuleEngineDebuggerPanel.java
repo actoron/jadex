@@ -3,8 +3,6 @@ package jadex.tools.debugger.bdi;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.impl.ElementFlyweight;
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.ICommand;
-import jadex.commons.ISteppable;
 import jadex.commons.SGUI;
 import jadex.rules.tools.reteviewer.RetePanel;
 import jadex.tools.common.GuiProperties;
@@ -46,51 +44,7 @@ public class BDIAgentRuleEngineDebuggerPanel	implements IDebuggerPanel
 	public void init(IControlCenter jcc, IComponentIdentifier name, Object access)
 	{
 		BDIInterpreter bdii = ((ElementFlyweight)access).getInterpreter();
-		this.retepanel = new RetePanel(bdii.getRuleSystem(), new ISteppable()
-		{
-			
-			public void setStepmode(boolean stepmode)
-			{
-				// TODO Auto-generated method stub
-				
-			}
-			
-			public void removeBreakpoint(Object markerobj)
-			{
-				// TODO Auto-generated method stub
-				
-			}
-			
-			public boolean isStepmode()
-			{
-				// TODO Auto-generated method stub
-				return false;
-			}
-			
-			public boolean isBreakpoint(Object markerobj)
-			{
-				// TODO Auto-generated method stub
-				return false;
-			}
-			
-			public void doStep()
-			{
-				// TODO Auto-generated method stub
-				
-			}
-			
-			public void addBreakpointCommand(ICommand command)
-			{
-				// TODO Auto-generated method stub
-				
-			}
-			
-			public void addBreakpoint(Object markerobj)
-			{
-				// TODO Auto-generated method stub
-				
-			}
-		});
+		this.retepanel = new RetePanel(bdii.getRuleSystem(), null);
 	}
 
 	/**

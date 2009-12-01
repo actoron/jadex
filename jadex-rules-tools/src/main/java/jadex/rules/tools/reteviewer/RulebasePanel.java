@@ -238,7 +238,7 @@ public class RulebasePanel extends JPanel
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int rowIndex, int column)
 		{
 			TableSorter sorter = (TableSorter)list.getModel();
-			boolean	selected	= steppable.isBreakpoint((IRule)rules.get(sorter.modelIndex(rowIndex)));
+			boolean	selected	= steppable!=null && steppable.isBreakpoint((IRule)rules.get(sorter.modelIndex(rowIndex)));
 			JPanel	ret	= new JPanel(new BorderLayout());
 			JCheckBox	but	= new JCheckBox((String)null, selected);
 			ret.add(but, BorderLayout.CENTER);
@@ -249,7 +249,7 @@ public class RulebasePanel extends JPanel
 		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, final int rowIndex, int column)
 		{
 			final TableSorter sorter = (TableSorter)list.getModel();
-			boolean	selected	= steppable.isBreakpoint((IRule)rules.get(sorter.modelIndex(rowIndex)));
+			boolean	selected	= steppable!=null && steppable.isBreakpoint((IRule)rules.get(sorter.modelIndex(rowIndex)));
 			JPanel	ret	= new JPanel(new BorderLayout());
 			final JCheckBox	but	= new JCheckBox((String)null, selected);
 			ret.add(but, BorderLayout.CENTER);
@@ -258,11 +258,11 @@ public class RulebasePanel extends JPanel
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
 				{
-					if(but.isSelected())
+					if(but.isSelected() && steppable!=null)
 					{
 						steppable.addBreakpoint((IRule) rules.get(sorter.modelIndex(rowIndex)));
 					}
-					else
+					else if(steppable!=null)
 					{
 						steppable.removeBreakpoint((IRule) rules.get(sorter.modelIndex(rowIndex)));
 					}

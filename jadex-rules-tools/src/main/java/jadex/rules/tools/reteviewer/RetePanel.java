@@ -117,6 +117,7 @@ public class RetePanel extends JPanel
 	
 	/**
 	 *  Create a new rete panel.
+	 *  Set steppable to null for panel without breakpoints and step mode.
 	 */
 	public RetePanel(final RuleSystem system, final ISteppable steppable)
 	{
@@ -339,49 +340,52 @@ public class RetePanel extends JPanel
 //		tmp3.add(followact, BorderLayout.SOUTH);
 		
 		// The step action
-		JPanel tmp4 = new JPanel(new GridBagLayout());
 		final JButton	step	= new JButton("Step");
-		step.addActionListener(new ActionListener()
+		if(steppable!=null)
 		{
-			public void actionPerformed(ActionEvent e)
+			JPanel tmp4 = new JPanel(new GridBagLayout());
+			step.addActionListener(new ActionListener()
 			{
-				steppable.doStep();
-			}
-		});
-		step.setEnabled(steppable.isStepmode() && !system.getAgenda().isEmpty());		
-		final JCheckBox	stepmode = new JCheckBox("Step Mode", steppable.isStepmode());
-		stepmode.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				steppable.setStepmode(stepmode.isSelected());
-				step.setEnabled(steppable.isStepmode() && !system.getAgenda().isEmpty());		
-			}
-		});
-		steppable.addBreakpointCommand(new ICommand()
-		{
-			public void execute(Object args)
-			{
-				SwingUtilities.invokeLater(new Runnable()
+				public void actionPerformed(ActionEvent e)
 				{
-					public void run()
+					steppable.doStep();
+				}
+			});
+			step.setEnabled(steppable.isStepmode() && !system.getAgenda().isEmpty());		
+			final JCheckBox	stepmode = new JCheckBox("Step Mode", steppable.isStepmode());
+			stepmode.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					steppable.setStepmode(stepmode.isSelected());
+					step.setEnabled(steppable.isStepmode() && !system.getAgenda().isEmpty());		
+				}
+			});
+			steppable.addBreakpointCommand(new ICommand()
+			{
+				public void execute(Object args)
+				{
+					SwingUtilities.invokeLater(new Runnable()
 					{
-						stepmode.setSelected(steppable.isStepmode());
-						step.setEnabled(steppable.isStepmode() && !system.getAgenda().isEmpty());		
-					}
-				});
-			}
-		});
-		int row	= 0;
-		int	col	= 0;
-		tmp4.add(followact, new GridBagConstraints(col, row++, 2, 1,
-			1,0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
-		tmp4.add(stepmode, new GridBagConstraints(col++, row, 1, 1,
-			1,0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
-		tmp4.add(step, new GridBagConstraints(col, row++, GridBagConstraints.REMAINDER, 1,
-			0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
-		
-		tmp3.add(tmp4, BorderLayout.SOUTH);	
+						public void run()
+						{
+							stepmode.setSelected(steppable.isStepmode());
+							step.setEnabled(steppable.isStepmode() && !system.getAgenda().isEmpty());		
+						}
+					});
+				}
+			});
+			int row	= 0;
+			int	col	= 0;
+			tmp4.add(followact, new GridBagConstraints(col, row++, 2, 1,
+				1,0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
+			tmp4.add(stepmode, new GridBagConstraints(col++, row, 1, 1,
+				1,0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
+			tmp4.add(step, new GridBagConstraints(col, row++, GridBagConstraints.REMAINDER, 1,
+				0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
+			
+			tmp3.add(tmp4, BorderLayout.SOUTH);
+		}
 		
 		addInfoPanel(NODE_DETAILS_NAME, tmp);
 		addInfoPanel(AGENDA_NAME, tmp3);
@@ -393,15 +397,32 @@ public class RetePanel extends JPanel
 		sp2.add(vv);
 		sp2.add(infopanels);
 		
-		JSplitPane sp1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		sp1.setOneTouchExpandable(true);
-		sp1.add(rulebasepanel);
-		sp1.add(sp2);
-		sp1.setDividerLocation(150);
-		
-		this.setLayout(new BorderLayout());
-		this.add(sp1, BorderLayout.CENTER);
-		//this.add(buts, BorderLayout.SOUTH);	
+		if(steppable!=null)
+		{
+			JSplitPane sp1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+			sp1.setOneTouchExpandable(true);
+			sp1.add(rulebasepanel);
+			sp1.add(sp2);
+			sp1.setDividerLocation(150);
+			
+			this.setLayout(new BorderLayout());
+			this.add(sp1, BorderLayout.CENTER);
+			//this.add(buts, BorderLayout.SOUTH);
+		}
+		else
+		{
+//			this.add(sp2, BorderLayout.CENTER);
+
+			JSplitPane sp1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+			sp1.setOneTouchExpandable(true);
+			sp1.add(rulebasepanel);
+			sp1.add(sp2);
+			sp1.setDividerLocation(0);
+			
+			this.setLayout(new BorderLayout());
+			this.add(sp1, BorderLayout.CENTER);
+			//this.add(buts, BorderLayout.SOUTH);
+		}
 		
 		vv.addComponentListener(new ComponentAdapter()
 		{
@@ -482,7 +503,10 @@ public class RetePanel extends JPanel
 									rulebasepanel.selectRule(rule);
 								}
 							}
-							step.setEnabled(steppable.isStepmode() && !system.getAgenda().isEmpty());		
+							if(steppable!=null)
+							{
+								step.setEnabled(steppable.isStepmode() && !system.getAgenda().isEmpty());
+							}
 						}
 					});
 				}
@@ -736,11 +760,11 @@ public class RetePanel extends JPanel
 	
 	/**
 	 *  Get the rulebase panel.
-	 */
+	 * /
 	public RulebasePanel	getRulebasePanel()
 	{
 		return rulebasepanel;
-	}
+	}*/
 	
 	/**
 	 *  Main for testing.
