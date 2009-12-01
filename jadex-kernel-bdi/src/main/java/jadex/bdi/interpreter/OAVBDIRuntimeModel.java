@@ -93,7 +93,7 @@ public class OAVBDIRuntimeModel
 	/** The plan ready state. */
 	public static final String	PLANPROCESSINGTATE_READY	= "ready";
 	
-	/** The plan ready state. */
+	/** The plan running state. */
 	public static final String	PLANPROCESSINGTATE_RUNNING	= "running";
 	
 	/** The plan waiting state. */

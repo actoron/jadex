@@ -1315,4 +1315,36 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 
 		interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueuewa, wa);
 	}
+
+	/**
+	 *  Delegate synchronization to agent.
+	 */
+	public void invokeLater(Runnable action)
+	{
+		interpreter.invokeLater(action);
+	}
+	
+	/**
+	 *  Delegate synchronization to agent.
+	 */
+	public void invokeSynchronized(Runnable code)
+	{
+		interpreter.invokeSynchronized(code);
+	}
+	
+	/**
+	 *  Delegate synchronization to agent.
+	 */
+	public boolean isAgentThread()
+	{
+		return interpreter.isAgentThread();
+	}
+	
+	/**
+	 *  Delegate synchronization to agent.
+	 */
+	public boolean isExternalThread()
+	{
+		return interpreter.isExternalThread();
+	}
 }
