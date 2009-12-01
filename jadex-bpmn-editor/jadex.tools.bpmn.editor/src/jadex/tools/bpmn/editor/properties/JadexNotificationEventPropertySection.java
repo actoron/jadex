@@ -8,7 +8,7 @@ public class JadexNotificationEventPropertySection extends AbstractMultiTextfiel
 {
 	// ---- constants ----
 	
-	private static final String[] textFieldNames = new String[]{"externalnotifier"};
+	private static final String[] textFieldNames = new String[]{"notifier"};
 	
 	// ---- constructor ----
 	

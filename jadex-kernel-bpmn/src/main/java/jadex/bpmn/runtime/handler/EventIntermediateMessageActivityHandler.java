@@ -38,9 +38,6 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	/** The type property message type identifies the meta type (e.g. fipa). */
 	public static final String	PROPERTY_MESSAGETYPE	= "messagetype";
 	
-	/** The type property identifies the application level type. */
-	public static final String	PROPERTY_TYPE	= "type";
-	
 	/** The filter property describes the filter for receiving a message. */
 	public static final String	PROPERTY_FILTER	= "filter";
 	

@@ -93,7 +93,7 @@
    
    
    
-    <!-- the jadex user task event timer implementation property section -->
+    <!-- timer event property section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
@@ -107,15 +107,13 @@
      </propertySections>
    </extension>
    
-   <!-- the jadex timer events activity property section -->
+   <!-- timer event parameter section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
-        <!-- CHECK: filter="jadex.tools.bpmn.editor.properties.JadexTimerEventFilter" ??? -->
-        <!-- CHECK:  id="jadex.tools.bpmn.editor.propertySection.GatewayActivity" ??? -->
         <propertySection
               class="jadex.tools.bpmn.editor.properties.JadexIntermediateEventsParameterSection"
               filter="jadex.tools.bpmn.editor.properties.JadexTimerEventFilter"
-              id="jadex.tools.bpmn.editor.propertySection.GatewayActivity"
+              id="jadex.tools.bpmn.editor.propertySection.JadexTimerParameterSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexTimerEventPropertySection">
            <input type="org.eclipse.stp.bpmn.Activity"/>
@@ -125,7 +123,7 @@
    
    
    
-    <!-- the jadex user task event rule implementation property section -->
+	<!-- rule event property section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
@@ -139,15 +137,13 @@
      </propertySections>
    </extension>
    
-   <!-- the jadex timer rule events activity property section -->
+   <!-- rule event parameter section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
-      	<!-- CHECK: id="jadex.tools.bpmn.editor.propertySection.GatewayActivity" ??? -->
-      	<!-- CHECK: filter="jadex.tools.bpmn.editor.properties.JadexRuleEventFilter" ??? -->
         <propertySection
               class="jadex.tools.bpmn.editor.properties.JadexIntermediateEventsParameterSection"
               filter="jadex.tools.bpmn.editor.properties.JadexRuleEventFilter"
-              id="jadex.tools.bpmn.editor.propertySection.GatewayActivity"
+              id="jadex.tools.bpmn.editor.propertySection.JadexRuleParameterSection"
               tab="Jadex"
               afterSection="jadex.tools.bpmn.editor.properties.JadexRuleEventPropertySection">
            <input type="org.eclipse.stp.bpmn.Activity"/>
@@ -155,6 +151,63 @@
      </propertySections>
    </extension>
    
+   
+   <!-- signal event property section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertySection
+              class="jadex.tools.bpmn.editor.properties.JadexNotificationEventPropertySection"
+              filter="jadex.tools.bpmn.editor.properties.JadexSignalEventFilter"
+              id="jadex.tools.bpmn.editor.properties.JadexSignalEventPropertySection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
+           <input type="org.eclipse.stp.bpmn.Activity"/>
+        </propertySection>
+     </propertySections>
+   </extension>
+   
+   <!-- signal event parameter section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertySection
+              class="jadex.tools.bpmn.editor.properties.JadexIntermediateEventsParameterSection"
+              filter="jadex.tools.bpmn.editor.properties.JadexSignalEventFilter"
+              id="jadex.tools.bpmn.editor.propertySection.JadexSignalEventParameterSection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexSignalEventPropertySection">
+           <input type="org.eclipse.stp.bpmn.Activity"/>
+        </propertySection>
+     </propertySections>
+   </extension>
+   
+   
+    <!-- message event property section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertySection
+              class="jadex.tools.bpmn.editor.properties.JadexMessageEventPropertySection"
+              filter="jadex.tools.bpmn.editor.properties.JadexMessageEventFilter"
+              id="jadex.tools.bpmn.editor.properties.JadexMessageEventPropertySection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
+           <input type="org.eclipse.stp.bpmn.Activity"/>
+        </propertySection>
+     </propertySections>
+   </extension>
+   
+   <!-- message event parameter section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertySection
+              class="jadex.tools.bpmn.editor.properties.JadexIntermediateEventsParameterSection"
+              filter="jadex.tools.bpmn.editor.properties.JadexMessageEventFilter"
+              id="jadex.tools.bpmn.editor.propertySection.JadexMessageEventParameterSection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexMessageEventPropertySection">
+           <input type="org.eclipse.stp.bpmn.Activity"/>
+        </propertySection>
+     </propertySections>
+   </extension>
    
    
     <!-- the jadex sequence property section -->

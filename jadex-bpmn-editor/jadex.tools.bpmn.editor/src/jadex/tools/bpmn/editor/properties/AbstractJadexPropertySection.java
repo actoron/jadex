@@ -79,6 +79,8 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	/** Key for the implementing rule. */
 	public static final String JADEX_EVENT_RULE_DETAIL = "rule";
 
+	/** Key for the implementing message. */
+	public static final String JADEX_EVENT_MESSAGE_DETAIL = "message";
 	
 	
 	/** Key for the parameter map of a task. */
