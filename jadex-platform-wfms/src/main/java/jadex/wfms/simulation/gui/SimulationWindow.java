@@ -147,10 +147,10 @@ public class SimulationWindow extends JFrame
 					{
 						setIcon(PARAM_ICON);
 						if (((IParameterStateSet) data).getStateCount() == 0)
-							setForeground(Color.LIGHT_GRAY);
+							setForeground(new Color(128,128,128));
 					}
 					else if (data instanceof TreeNode)
-						setForeground(Color.LIGHT_GRAY);
+						setForeground(new Color(128,128,128));
 				}
 				
 				return this;
