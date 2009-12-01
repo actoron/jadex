@@ -3,24 +3,22 @@ package jadex.tools.debugger.bdi;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.impl.ElementFlyweight;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.ICommand;
+import jadex.commons.ISteppable;
 import jadex.commons.SGUI;
-import jadex.rules.tools.stateviewer.OAVPanel;
+import jadex.rules.tools.reteviewer.RetePanel;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.debugger.IDebuggerPanel;
 
-import java.awt.BorderLayout;
-
 import javax.swing.Icon;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 
 /**
- *  Show the state of a BDI agent.
+ *  Show the rule engine of a BDI agent.
  */
-public class BDIAgentInspectorDebuggerPanel	implements IDebuggerPanel
+public class BDIAgentRuleEngineDebuggerPanel	implements IDebuggerPanel
 {
 	//-------- constants --------
 
@@ -28,13 +26,13 @@ public class BDIAgentInspectorDebuggerPanel	implements IDebuggerPanel
 	 * The image icons.
 	 */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]{
-		"contents", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/bug_small.png")
+		"show_rete", SGUI.makeIcon(GuiProperties.class, "/jadex/tools/common/images/bug_small.png")
 	});
 
 	//-------- IDebuggerPanel methods --------
 	
 	/** The gui component. */
-	protected JComponent	oavpanel;
+	protected JComponent	retepanel;
 
 	//-------- IDebuggerPanel methods --------
 
@@ -47,26 +45,50 @@ public class BDIAgentInspectorDebuggerPanel	implements IDebuggerPanel
 	 */
 	public void init(IControlCenter jcc, IComponentIdentifier name, Object access)
 	{
-		this.oavpanel	= new JPanel(new BorderLayout());
-		
-		// Hack!!!
-		final BDIInterpreter bdii = ((ElementFlyweight)access).getInterpreter();
-		// Open tool on introspected agent thread as required for copy state constructor (hack!!!)
-		bdii.invokeLater(new Runnable()
+		BDIInterpreter bdii = ((ElementFlyweight)access).getInterpreter();
+		this.retepanel = new RetePanel(bdii.getRuleSystem(), new ISteppable()
 		{
-			public void run()
+			
+			public void setStepmode(boolean stepmode)
 			{
-				final	JPanel	tmp	= new OAVPanel(bdii.getRuleSystem().getState());
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						oavpanel.add(BorderLayout.CENTER, tmp);
-						oavpanel.invalidate();
-						oavpanel.doLayout();
-						oavpanel.repaint();
-					}
-				});
+				// TODO Auto-generated method stub
+				
+			}
+			
+			public void removeBreakpoint(Object markerobj)
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			
+			public boolean isStepmode()
+			{
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+			public boolean isBreakpoint(Object markerobj)
+			{
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+			public void doStep()
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			
+			public void addBreakpointCommand(ICommand command)
+			{
+				// TODO Auto-generated method stub
+				
+			}
+			
+			public void addBreakpoint(Object markerobj)
+			{
+				// TODO Auto-generated method stub
+				
 			}
 		});
 	}
@@ -77,7 +99,7 @@ public class BDIAgentInspectorDebuggerPanel	implements IDebuggerPanel
 	 */
 	public String getTitle()
 	{
-		return "Agent Inspector";
+		return "Rule Engine";
 	}
 
 	/**
@@ -86,7 +108,7 @@ public class BDIAgentInspectorDebuggerPanel	implements IDebuggerPanel
 	 */
 	public Icon getIcon()
 	{
-		return icons.getIcon("contents");
+		return icons.getIcon("show_rete");
 	}
 
 	/**
@@ -95,7 +117,7 @@ public class BDIAgentInspectorDebuggerPanel	implements IDebuggerPanel
 	 */
 	public JComponent getComponent()
 	{
-		return oavpanel;
+		return retepanel;
 	}
 	
 	/**
@@ -104,7 +126,7 @@ public class BDIAgentInspectorDebuggerPanel	implements IDebuggerPanel
 	 */
 	public String getTooltipText()
 	{
-		return "Show the agent state.";
+		return "Show the rule engine.";
 	}
 
 }
