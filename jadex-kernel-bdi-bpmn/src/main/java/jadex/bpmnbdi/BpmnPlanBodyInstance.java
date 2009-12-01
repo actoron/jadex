@@ -200,8 +200,6 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public void addTimer(ProcessThread thread, long duration)
 	{
-		if(duration<0)
-			System.out.println("here");
 		assert duration>=0;
 		if(waittimes==null)
 			waittimes	= new HashMap();

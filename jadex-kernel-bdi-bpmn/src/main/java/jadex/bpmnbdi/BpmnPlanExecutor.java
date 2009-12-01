@@ -176,7 +176,10 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 					// Set processing state to "running"
 					interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
 					bodyinstance.setLastState(steptype);
-					bodyinstance.executeStep(null, lane);
+					
+					// todo:?
+//					bodyinstance.executeStep(null, lane);
+					bodyinstance.executeStep();
 				}
 				else if(/*steptype.equals(bodyinstance.getLastState()) ||*/ !bodyinstance.isFinished(null, lane))
 				{
