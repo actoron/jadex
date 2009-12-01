@@ -181,6 +181,8 @@ public class Reader
 							QName attrname = parser.getAttributePrefix(i)==null || parser.getAttributePrefix(i)==SXML.DEFAULT_NS_PREFIX? new QName(parser.getAttributeLocalName(i))
 								: new QName(parser.getAttributeNamespace(i), parser.getAttributeLocalName(i), parser.getAttributePrefix(i));
 
+//							System.out.println("here: "+attrname);
+							
 							if(!attrname.getLocalPart().equals(SXML.ID))
 							{	
 								String attrval = parser.getAttributeValue(i);

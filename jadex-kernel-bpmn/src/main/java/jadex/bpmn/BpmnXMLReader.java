@@ -112,6 +112,7 @@ public class BpmnXMLReader
 		Set types = new HashSet();
 		
 		String uri = "http://stp.eclipse.org/bpmn";
+		String xmiuri = "http://www.omg.org/XMI";
 		
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "BpmnDiagram")}, MBpmnModel.class, null, null, 
 			new BeanAttributeInfo[]{
@@ -257,7 +258,7 @@ public class BpmnXMLReader
 		
 		types.add(new TypeInfo(null, "incomingMessages", HashMap.class, null, null, 
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("type", null, null, null, null, ""),
+			new BeanAttributeInfo(new QName(xmiuri, "type"), null, null, null, null, ""),
 			new BeanAttributeInfo("href", null, null, null, null, ""),
 			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE),
 			}, null, null,
@@ -267,7 +268,7 @@ public class BpmnXMLReader
 
 		types.add(new TypeInfo(null, "outgoingMessages", HashMap.class, null, null, 
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("type", null, null, null, null, ""),
+			new BeanAttributeInfo(new QName(xmiuri, "type"), null, null, null, null, ""),
 			new BeanAttributeInfo("href", null, null, null, null, ""),
 			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE),
 			}, null, null,
@@ -565,6 +566,7 @@ public class BpmnXMLReader
 			{
 				MBpmnModel dia = (MBpmnModel)root;
 				Map	activities	= dia.getAllActivities();
+				
 				StringTokenizer stok = new StringTokenizer(actdesc);
 				while(stok.hasMoreElements())
 				{

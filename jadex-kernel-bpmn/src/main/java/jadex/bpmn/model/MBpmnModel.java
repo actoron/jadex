@@ -305,7 +305,12 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 					{
 						for(int j=0; j<acts.size(); j++)
 						{
-							allactivities.put(((MActivity)acts.get(j)).getId(), acts.get(j));
+							MActivity mact = (MActivity)acts.get(j);
+							allactivities.put(mact.getId(), acts.get(j));
+							if(mact instanceof MSubProcess)
+							{
+								addAllSubActivities((MSubProcess)mact, allactivities);
+							}
 						}
 					}
 				}
@@ -313,6 +318,26 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 		}
 		
 		return allactivities;
+	}
+	
+	/**
+	 *  Add all subactivities.
+	 */
+	public void addAllSubActivities(MSubProcess proc, Map activities)
+	{
+		List acts = proc.getActivities();
+		if(acts!=null)
+		{
+			for(int i=0; i<acts.size(); i++)
+			{
+				MActivity mact = (MActivity)acts.get(i);
+				allactivities.put(mact.getId(), acts.get(i));
+				if(mact instanceof MSubProcess)
+				{
+					addAllSubActivities((MSubProcess)mact, activities);
+				}
+			}
+		}
 	}
 	
 	/**

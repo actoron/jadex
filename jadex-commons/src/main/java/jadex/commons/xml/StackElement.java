@@ -122,4 +122,14 @@ public class StackElement
 		else
 			this.content	+= content;
 	}
+
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
+	public String toString()
+	{
+		return "StackElement(tag="+this.tag+", object=" + this.object + ")";
+	}
+	
 }
