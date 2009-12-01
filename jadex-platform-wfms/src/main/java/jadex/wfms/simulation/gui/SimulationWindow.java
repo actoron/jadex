@@ -9,6 +9,7 @@ import jadex.wfms.simulation.ClientProcessMetaModel;
 import jadex.wfms.simulation.ModelTreeNode;
 import jadex.wfms.simulation.SimLauncher;
 import jadex.wfms.simulation.stateholder.IParameterStateSet;
+import jadex.wfms.simulation.stateholder.gui.IStatePanel;
 import jadex.wfms.simulation.stateholder.gui.StatePanelFactory;
 
 import java.awt.BorderLayout;
@@ -18,9 +19,13 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
@@ -53,13 +58,15 @@ public class SimulationWindow extends JFrame
 {
 	private static final String PROCESS_MENU_NAME = "Process";
 	private static final String SIMULATION_MENU_NAME = "Simulation";
+	private static final String TEST_MENU_NAME = "Test";
 	
-	private static final String OPEN_MENU_ITEM_NAME = "Open...";
-	private static final String CLOSE_MENU_ITEM_NAME = "Close";
-	private static final String EXIT_MENU_ITEM_NAME = "Exit";
+	public static final String OPEN_MENU_ITEM_NAME = "Open...";
+	public static final String AUTO_FILL_MENU_ITEM_NAME = "Autofill States";
+	public static final String CLOSE_MENU_ITEM_NAME = "Close";
+	public static final String EXIT_MENU_ITEM_NAME = "Exit";
 	
-	private static final String START_MENU_ITEM_NAME = "Start";
-	private static final String STOP_MENU_ITEM_NAME = "Stop";
+	public static final String START_MENU_ITEM_NAME = "Start";
+	public static final String STOP_MENU_ITEM_NAME = "Stop";
 	
 	private static final String IMAGE_PATH = "/" + SimulationWindow.class.getPackage().getName().replaceAll("\\.", "/") + "/images/";
 	private static final ImageIcon GPMN_ICON = createImageIcon(IMAGE_PATH + "gpmnicon.png");
@@ -79,20 +86,25 @@ public class SimulationWindow extends JFrame
 	
 	private JLabel statusBar;
 	
-	private JMenuItem startMenuItem;
-	
-	private JMenuItem stopMenuItem;
+	private Map menuItems;
 	
 	private JTree processModelTree;
 	
 	private JMenuBar menuBar;
 	
-	private JMenuItem openMenuItem;
-	private JMenuItem closeMenuItem;
-	
 	public SimulationWindow()
 	{
 		super("Process Simulator");
+		
+		menuItems = new HashMap();
+		
+		addWindowListener(new WindowAdapter()
+		{
+			public void windowClosing(WindowEvent e)
+			{
+				System.exit(0);
+			}
+		});
 		
 		JSplitPane logPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		logPane.setOneTouchExpandable(true);
@@ -132,7 +144,11 @@ public class SimulationWindow extends JFrame
 					else if (data instanceof MActivity)
 						setIcon(TASK_ICON);
 					else if (data instanceof IParameterStateSet)
+					{
 						setIcon(PARAM_ICON);
+						if (((IParameterStateSet) data).getStateCount() == 0)
+							setForeground(Color.LIGHT_GRAY);
+					}
 					else if (data instanceof TreeNode)
 						setForeground(Color.LIGHT_GRAY);
 				}
@@ -143,11 +159,10 @@ public class SimulationWindow extends JFrame
 		processModelTree.addTreeSelectionListener(new TreeSelectionListener() {
 		    public void valueChanged(TreeSelectionEvent e)
 		    {
-		    	
-		        TreeNode node = (TreeNode) processModelTree.getLastSelectedPathComponent();
-		        
-		        if (node == null)
-		        	return;
+		    	Object selection = processModelTree.getLastSelectedPathComponent();
+		    	if ((selection == null) || !(selection instanceof TreeNode))
+		    		return;
+		        TreeNode node = (TreeNode) selection;
 		        if (node.getData() instanceof ModelTreeNode)
 		        {
 		        	ModelTreeNode mNode = (ModelTreeNode) node.getData();
@@ -201,31 +216,19 @@ public class SimulationWindow extends JFrame
 		processMenu.setMnemonic(KeyEvent.VK_P);
 		menuBar.add(processMenu);
 		
-		openMenuItem = new JMenuItem();
-		openMenuItem.setAction(new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				System.out.println("Open undefined!");
-			}
-		});
+		JMenuItem openMenuItem = new JMenuItem();
 		openMenuItem.setText(OPEN_MENU_ITEM_NAME);
 		openMenuItem.setMnemonic(KeyEvent.VK_O);
 		openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 		processMenu.add(openMenuItem);
+		menuItems.put(OPEN_MENU_ITEM_NAME, openMenuItem);
 		
-		closeMenuItem = new JMenuItem();
-		closeMenuItem.setAction(new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				System.out.println("Close undefined!");
-			}
-		});
+		JMenuItem closeMenuItem = new JMenuItem();
 		closeMenuItem.setText(CLOSE_MENU_ITEM_NAME);
 		closeMenuItem.setMnemonic(KeyEvent.VK_C);
 		closeMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK));
 		processMenu.add(closeMenuItem);
+		menuItems.put(CLOSE_MENU_ITEM_NAME, closeMenuItem);
 		
 		processMenu.addSeparator();
 		
@@ -241,27 +244,22 @@ public class SimulationWindow extends JFrame
 		exitMenuItem.setMnemonic(KeyEvent.VK_X);
 		exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
 		processMenu.add(exitMenuItem);
+		menuItems.put(EXIT_MENU_ITEM_NAME, exitMenuItem);
 		
 		
 		JMenu simMenu = new JMenu(SIMULATION_MENU_NAME);
 		simMenu.setMnemonic(KeyEvent.VK_S);
 		menuBar.add(simMenu);
 		
-		startMenuItem = new JMenuItem();
-		startMenuItem.setAction(new AbstractAction()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				System.out.println("Start undefined!");
-			}
-		});
+		JMenuItem startMenuItem = new JMenuItem();
 		startMenuItem.setText(START_MENU_ITEM_NAME);
 		startMenuItem.setMnemonic(KeyEvent.VK_S);
 		startMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
 		startMenuItem.setEnabled(false);
 		simMenu.add(startMenuItem);
+		menuItems.put(START_MENU_ITEM_NAME, startMenuItem);
 		
-		stopMenuItem = new JMenuItem();
+		JMenuItem stopMenuItem = new JMenuItem();
 		stopMenuItem.setAction(new AbstractAction()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -274,6 +272,23 @@ public class SimulationWindow extends JFrame
 		stopMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
 		stopMenuItem.setEnabled(false);
 		simMenu.add(stopMenuItem);
+		menuItems.put(STOP_MENU_ITEM_NAME, stopMenuItem);
+		
+		JMenu testMenu = new JMenu(TEST_MENU_NAME);
+		testMenu.setMnemonic(KeyEvent.VK_T);
+		menuBar.add(testMenu);
+		
+		JMenuItem quickFillMenuItem = new JMenuItem();
+		quickFillMenuItem.setAction(new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				System.out.println("Auto Fill undefined!");
+			}
+		});
+		quickFillMenuItem.setText(AUTO_FILL_MENU_ITEM_NAME);
+		testMenu.add(quickFillMenuItem);
+		menuItems.put(AUTO_FILL_MENU_ITEM_NAME, quickFillMenuItem);
 	}
 	
 	public String showProcessPickerDialog(Set modelNames)
@@ -292,19 +307,11 @@ public class SimulationWindow extends JFrame
 		JOptionPane.showMessageDialog(this, text, title, type);
 	}
 	
-	public void setOpenAction(Action action)
+	public void setMenuItemAction(String name, Action action)
 	{
-		setMenuAction(openMenuItem, action);
-	}
-	
-	public void setCloseAction(Action action)
-	{
-		setMenuAction(closeMenuItem, action);
-	}
-	
-	public void setStartAction(Action action)
-	{
-		setMenuAction(startMenuItem, action);
+		JMenuItem item = (JMenuItem) menuItems.get(name);
+		if (item != null)
+			setMenuItemAction(item, action);
 	}
 	
 	public void addLogMessage(String msg)
@@ -317,14 +324,19 @@ public class SimulationWindow extends JFrame
 		statusBar.setText(msg);
 	}
 	
-	public void enableStart(boolean enable)
+	public void refreshStatePanel()
 	{
-		startMenuItem.setEnabled(enable);
+		Object panel = mainPane.getRightComponent();
+		if (panel instanceof IStatePanel)
+			((IStatePanel) panel).refreshPanel();
+		processModelTree.repaint();
 	}
 	
-	public void enableStop(boolean enable)
+	public void enableMenuItem(String name, boolean enable)
 	{
-		stopMenuItem.setEnabled(enable);
+		JMenuItem item = (JMenuItem) menuItems.get(name);
+		if (item != null)
+			item.setEnabled(enable);
 	}
 	
 	public void setProcessTreeModel(TreeModel model)
@@ -344,7 +356,7 @@ public class SimulationWindow extends JFrame
 		processModelTree.repaint();
 	}
 	
-	private void setMenuAction(JMenuItem menuItem, Action action)
+	private void setMenuItemAction(JMenuItem menuItem, Action action)
 	{
 		int mnemonic = menuItem.getMnemonic();
 		KeyStroke accelerator = menuItem.getAccelerator();

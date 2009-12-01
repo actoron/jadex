@@ -8,39 +8,53 @@ import javax.swing.JPanel;
 
 import jadex.wfms.simulation.stateholder.BooleanStateSet;
 
-public class BooleanStatePanel extends JPanel
+public class BooleanStatePanel extends JPanel implements IStatePanel
 {
-	public BooleanStatePanel(final BooleanStateSet stateHolder)
+	private JCheckBox falseBox;
+	private JCheckBox trueBox;
+	
+	private BooleanStateSet stateSet;
+	
+	public BooleanStatePanel(final BooleanStateSet stateSet)
 	{
-		JCheckBox falseBox = new JCheckBox();
-		falseBox.setSelected(stateHolder.hasState(Boolean.FALSE));
+		this.stateSet = stateSet;
+		falseBox = new JCheckBox();
+		falseBox.setSelected(stateSet.hasState(Boolean.FALSE));
 		falseBox.setAction(new AbstractAction("Include \"False\" state")
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 				if (((JCheckBox) e.getSource()).isSelected())
-					stateHolder.addState(Boolean.FALSE);
+					stateSet.addState(Boolean.FALSE);
 				else
-					stateHolder.removeState(Boolean.FALSE);
+					stateSet.removeState(Boolean.FALSE);
 			}
 		});
 		
 		add(falseBox);
 		
-		JCheckBox trueBox = new JCheckBox();
-		trueBox.setSelected(stateHolder.hasState(Boolean.TRUE));
+		trueBox = new JCheckBox();
+		trueBox.setSelected(stateSet.hasState(Boolean.TRUE));
 		trueBox.setAction(new AbstractAction("Include \"True\" state")
 		{
 			
 			public void actionPerformed(ActionEvent e)
 			{
 				if (((JCheckBox) e.getSource()).isSelected())
-					stateHolder.addState(Boolean.TRUE);
+					stateSet.addState(Boolean.TRUE);
 				else
-					stateHolder.removeState(Boolean.TRUE);
+					stateSet.removeState(Boolean.TRUE);
 			}
 		});
 		add(trueBox);
 	}
 	
+	/**
+	 * Refreshes the contents of the state panel.
+	 */
+	public void refreshPanel()
+	{
+		falseBox.setSelected(stateSet.hasState(Boolean.FALSE));
+		trueBox.setSelected(stateSet.hasState(Boolean.TRUE));
+	}
 }

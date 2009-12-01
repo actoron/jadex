@@ -111,13 +111,13 @@ public class StringTextField extends JFormattedTextField implements
 		{
 			obj = getText();
 		}
-		try
+		/*try
 		{
 			value = format.parseObject((String) obj.toString());
 		} catch (ParseException e)
 		{
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	public int getTheHeight()

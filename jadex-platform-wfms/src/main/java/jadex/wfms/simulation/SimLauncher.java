@@ -8,7 +8,7 @@ public class SimLauncher
 {
 	public static void main(String[] args) throws Exception
 	{
-		final WfmsLauncher launcher = new WfmsLauncher();
+		/*final WfmsLauncher launcher = new WfmsLauncher();
 		launcher.launchBasicWfms(args);
 		EventQueue.invokeLater(new Runnable()
 		{
@@ -17,7 +17,10 @@ public class SimLauncher
 			{
 				new ClientSimulator(launcher.getClientService());
 			}
-		});
+		});*/
+		args = new String[2];
+		args[0] = "-conf";
+		args[1] = "jadex/wfms/wfmssim_conf.xml";
 	}
 
 }

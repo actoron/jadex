@@ -15,7 +15,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class StringPanel extends JPanel
+public class StringPanel extends JPanel implements IStatePanel
 {
 	private StringStateSet stateHolder;
 	
@@ -37,7 +37,7 @@ public class StringPanel extends JPanel
 		c.fill = GridBagConstraints.BOTH;
 		add(stringList, c);
 		
-		refreshList();
+		refreshPanel();
 		
 		JButton addButton = new JButton(new AbstractAction("Add String...")
 		{
@@ -57,7 +57,7 @@ public class StringPanel extends JPanel
 				StringStateSet stateHolder = StringPanel.this.stateHolder;
 				stateHolder.addString(inputString);
 				
-				refreshList();
+				refreshPanel();
 			}
 		});
 		c = new GridBagConstraints();
@@ -75,7 +75,7 @@ public class StringPanel extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				StringPanel.this.stateHolder.removeString((String) stringList.getSelectedValue());
-				refreshList();
+				refreshPanel();
 			}
 		});
 		c = new GridBagConstraints();
@@ -88,7 +88,10 @@ public class StringPanel extends JPanel
 		add(removeButton, c);
 	}
 	
-	private void refreshList()
+	/**
+	 * Refreshes the contents of the state panel.
+	 */
+	public void refreshPanel()
 	{
 		((DefaultListModel) stringList.getModel()).clear();
 		List strings = stateHolder.getStrings();

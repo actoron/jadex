@@ -299,6 +299,8 @@ public class GuiClient implements IClient
 	private void removeWorkitem(IWorkitem workitem)
 	{
 		AbstractTaskSelectAction action = (AbstractTaskSelectAction) taskMapping.get(workitem);
+		if (action == null)
+			return;
 		Component comp = action.getTaskListComponent();
         JXTaskPane tpgTemp;
         for (int i = 0; i < taskPanel.getItemCount(); ++i)

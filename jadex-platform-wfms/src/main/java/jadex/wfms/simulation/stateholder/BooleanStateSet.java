@@ -13,6 +13,15 @@ public class BooleanStateSet extends AbstractParameterStateSet
 		states = new ArrayList();
 	}
 	
+	/** Returns the parameter type.
+	 *  
+	 *  @return parameter type
+	 */
+	public Class getParameterType()
+	{
+		return Boolean.class;
+	}
+	
 	/**
 	 * Adds a new state to the set.
 	 * @param state new state

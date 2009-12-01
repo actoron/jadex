@@ -10,6 +10,15 @@ public class IntegerStateSet extends AbstractNumericStateSet
 		super(parameterName, Integer.MIN_VALUE, Integer.MAX_VALUE);
 	}
 	
+	/** Returns the parameter type.
+	 *  
+	 *  @return parameter type
+	 */
+	public Class getParameterType()
+	{
+		return Integer.class;
+	}
+	
 	/**
 	 * Returns a specific state.
 	 * @param index index of the state

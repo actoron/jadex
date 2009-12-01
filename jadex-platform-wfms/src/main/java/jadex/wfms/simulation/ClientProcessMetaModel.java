@@ -41,7 +41,7 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 		DATA_TASKS.add(FetchDataTask.class);
 	}
 	
-	private String mainProcessName; 
+	private String mainProcessName;
 	
 	private BpmnModelLoader bpmnLoader;
 	
@@ -138,6 +138,26 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 		}
 		
 		return pController;
+	}
+	
+	public List getParameterSets()
+	{
+		List pSets = new ArrayList();
+		for (Iterator it = tasks.iterator(); it.hasNext(); )
+		{
+			ModelTreeNode taskNode = (ModelTreeNode) it.next();
+			if (taskNode.getNumberOfChildren() > 0)
+			{
+				MActivity task = (MActivity) taskNode.getData();
+				List parameterNodes = taskNode.getChildren();
+				for (Iterator it2 = parameterNodes.iterator(); it2.hasNext(); )
+				{
+					ModelTreeNode paramNode = (ModelTreeNode) it2.next();
+					pSets.add((IParameterStateSet) paramNode.getData());
+				}
+			}
+		}
+		return pSets;
 	}
 	
 	private TreeNode getTaskNode(MActivity task)

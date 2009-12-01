@@ -14,6 +14,15 @@ public class StringStateSet extends AbstractParameterStateSet
 		strings = new ArrayList();
 	}
 	
+	/** Returns the parameter type.
+	 *  
+	 *  @return parameter type
+	 */
+	public Class getParameterType()
+	{
+		return String.class;
+	}
+	
 	/**
 	 * Adds a new String to the set.
 	 * @param string the new String

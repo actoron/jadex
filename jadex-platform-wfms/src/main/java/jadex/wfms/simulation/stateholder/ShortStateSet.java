@@ -10,6 +10,15 @@ public class ShortStateSet extends AbstractNumericStateSet
 		super(parameterName, Short.MIN_VALUE, Short.MAX_VALUE);
 	}
 	
+	/** Returns the parameter type.
+	 *  
+	 *  @return parameter type
+	 */
+	public Class getParameterType()
+	{
+		return Short.class;
+	}
+	
 	/**
 	 * Returns a specific state.
 	 * @param index index of the state

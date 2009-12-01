@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import jadex.wfms.simulation.stateholder.AbstractNumericStateSet;
 import jadex.wfms.simulation.stateholder.NumberRange;
 
-public class NumericPanel extends JPanel
+public class NumericPanel extends JPanel implements IStatePanel
 {
 	private static final Pattern RANGE_PATTERN = Pattern.compile("-?[0-9]+( *- *-?[0-9]+)?");
 	
@@ -42,7 +42,7 @@ public class NumericPanel extends JPanel
 		c.fill = GridBagConstraints.BOTH;
 		add(rangeList, c);
 		
-		refreshList();
+		refreshPanel();
 		
 		JButton addButton = new JButton(new AbstractAction("Add Range...")
 		{
@@ -75,7 +75,7 @@ public class NumericPanel extends JPanel
 												  "Type Range Exceeded",
 												  JOptionPane.ERROR_MESSAGE);
 				}
-				refreshList();
+				refreshPanel();
 			}
 		});
 		c = new GridBagConstraints();
@@ -93,7 +93,7 @@ public class NumericPanel extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				NumericPanel.this.stateHolder.removeRange(rangeList.getSelectedIndex());
-				refreshList();
+				refreshPanel();
 			}
 		});
 		c = new GridBagConstraints();
@@ -106,7 +106,10 @@ public class NumericPanel extends JPanel
 		add(removeButton, c);
 	}
 	
-	private void refreshList()
+	/**
+	 * Refreshes the contents of the state panel.
+	 */
+	public void refreshPanel()
 	{
 		((DefaultListModel) rangeList.getModel()).clear();
 		List ranges = stateHolder.getRanges();

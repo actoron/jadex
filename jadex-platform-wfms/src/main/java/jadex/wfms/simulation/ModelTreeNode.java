@@ -66,7 +66,7 @@ public class ModelTreeNode extends TreeNode
 		else if (data instanceof MActivity)
 			return ((MActivity) data).getName();
 		else if (data instanceof IParameterStateSet)
-			return ((IParameterStateSet) data).getParameterName();
+			return ((IParameterStateSet) data).getParameterName() + " (" + ((IParameterStateSet) data).getParameterType().getSimpleName() + ")";
 		else
 			return String.valueOf(data);
 	}

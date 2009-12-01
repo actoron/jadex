@@ -109,13 +109,13 @@ public class TextInputPanel extends AbstractInputPanel
 
 	public void markError()
 	{
-		border.setTitleColor(Color.RED);
+		//border.setTitleColor(Color.RED);
 		mainPanel.repaint();
 	}
 
 	public void markOK()
 	{
-		border.setTitleColor(Color.BLACK);
+		//border.setTitleColor(Color.BLACK);
 		mainPanel.repaint();
 	}
 

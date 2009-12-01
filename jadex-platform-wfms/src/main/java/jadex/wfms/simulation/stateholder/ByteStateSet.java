@@ -10,6 +10,15 @@ public class ByteStateSet extends AbstractNumericStateSet
 		super(parameterName, Byte.MIN_VALUE, Byte.MAX_VALUE);
 	}
 	
+	/** Returns the parameter type.
+	 *  
+	 *  @return parameter type
+	 */
+	public Class getParameterType()
+	{
+		return Byte.class;
+	}
+	
 	/**
 	 * Returns a specific state.
 	 * @param index index of the state

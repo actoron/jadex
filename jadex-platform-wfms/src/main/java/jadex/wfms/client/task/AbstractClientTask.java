@@ -63,7 +63,6 @@ public abstract class AbstractClientTask implements ITask
 				listener.exceptionOccurred(exception);
 			}
 		};
-		System.out.println(context.getModelElement().getLane());
 		return new Workitem(context.getModelElement().getName(), type, "NoRole", parameterTypes, parameterValues, readOnlyParameters, redirListener);
 	}
 }

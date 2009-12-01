@@ -169,7 +169,9 @@ public class MetaExecutionService implements IExecutionService
 		}
 		else
 		{
-			ret = new Integer(((Integer)instancecnt.get(modelname)).intValue()+1);
+			Integer modInt = (Integer) instancecnt.get(modelname);
+			if (modInt != null)
+				ret = new Integer(modInt.intValue()+1);
 		}
 		
 		instancecnt.put(modelname, ret);

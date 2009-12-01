@@ -10,6 +10,12 @@ public interface IParameterStateSet
 	 */
 	public String getParameterName();
 	
+	/** Returns the parameter type.
+	 *  
+	 *  @return parameter type
+	 */
+	public Class getParameterType();
+	
 	/**
 	 * Returns the number of states in this state set.
 	 * @return number of states
