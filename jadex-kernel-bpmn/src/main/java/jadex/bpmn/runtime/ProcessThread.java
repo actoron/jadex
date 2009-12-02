@@ -257,7 +257,7 @@ public class ProcessThread	implements ITaskContext
 	{
 		ProcessThread	ret	= new ProcessThread(activity, context, instance);
 		ret.edge	= edge;
-		ret.data	= new HashMap(data);
+		ret.data	= data!=null? new HashMap(data): null;
 		return ret;
 	}
 	
@@ -503,31 +503,34 @@ public class ProcessThread	implements ITaskContext
 			Set before = data!=null? new HashSet(data.keySet()): Collections.EMPTY_SET;
 			IValueFetcher fetcher = new ProcessThreadValueFetcher(this, true, instance.getValueFetcher());
 			Map params = getActivity().getParameters();
-			for(Iterator it=params.values().iterator(); it.hasNext(); )
+			if(params!=null)
 			{
-				MParameter param = (MParameter)it.next();
-				if(passedparams!=null && passedparams.containsKey(param.getName()))
+				for(Iterator it=params.values().iterator(); it.hasNext(); )
 				{
-					if(indexparams!=null && indexparams.contains(param.getName()))
+					MParameter param = (MParameter)it.next();
+					if(passedparams!=null && passedparams.containsKey(param.getName()))
 					{
-						Object	array	= getParameterValue(param.getName());
-						List	values	= (List)passedparams.get(param.getName());
-						for(int i=0; i<values.size(); i++)
+						if(indexparams!=null && indexparams.contains(param.getName()))
 						{
-							Object[]	entry	= (Object[])values.get(i);
-							Array.set(array, ((Number)entry[0]).intValue(), entry[1]);
+							Object	array	= getParameterValue(param.getName());
+							List	values	= (List)passedparams.get(param.getName());
+							for(int i=0; i<values.size(); i++)
+							{
+								Object[]	entry	= (Object[])values.get(i);
+								Array.set(array, ((Number)entry[0]).intValue(), entry[1]);
+							}
+						}
+						else
+						{
+							setParameterValue(param.getName(), passedparams.get(param.getName()));
+							before.remove(param.getName());
 						}
 					}
 					else
 					{
-						setParameterValue(param.getName(), passedparams.get(param.getName()));
+						setParameterValue(param.getName(), param.getInitialValue()==null? null: param.getInitialValue().getValue(fetcher));
 						before.remove(param.getName());
 					}
-				}
-				else
-				{
-					setParameterValue(param.getName(), param.getInitialValue()==null? null: param.getInitialValue().getValue(fetcher));
-					before.remove(param.getName());
 				}
 			}
 			
