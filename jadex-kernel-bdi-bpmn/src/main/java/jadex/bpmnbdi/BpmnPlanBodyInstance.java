@@ -1330,7 +1330,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 			{
 				action.run();
 				String lane = getLane(getLastState());
-				if(isReady(null, lane))
+//				if(isReady(null, lane))
 				{
 					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
 				}

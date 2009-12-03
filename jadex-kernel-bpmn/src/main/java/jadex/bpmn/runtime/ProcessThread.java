@@ -169,6 +169,7 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public void setWaiting(boolean waiting)
 	{
+//		System.out.println("Set waiting thread: "+getId()+" "+waiting);
 		this.waiting = waiting;
 	}
 	
@@ -181,7 +182,7 @@ public class ProcessThread	implements ITaskContext
 		this.waiting = false;
 		this.waitinfo = null;
 		this.waitfilter = null;
-//		System.out.println("Thread: "+this+" "+waiting);
+//		System.out.println("Thread: "+getId()+" "+waiting);
 	}
 	
 	/**

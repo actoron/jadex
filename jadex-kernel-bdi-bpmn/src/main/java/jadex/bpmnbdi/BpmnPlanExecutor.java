@@ -140,7 +140,9 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		
 		// Find lane to execute.
 		String lane = bodyinstance.getLane(steptype);
-//		System.out.println("Executing plan step: "+rplan+", "+lane+", "+bodyinstance);
+		String planname = (String)interpreter.getState().getAttributeValue(interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name);
+		System.out.println("Executing plan step: "+planname+", "+lane+", "+bodyinstance);
+
 		Throwable throwable = null;
 		try
 		{
@@ -165,10 +167,6 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 				}
 			}
 			
-			// Find lane to execute.
-			String planname = (String)interpreter.getState().getAttributeValue(interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name);
-			System.out.println("Executing plan step: "+planname+", "+lane+", "+bodyinstance);
-			
 			// Execute a step.
 			if(!BpmnPlanBodyInstance.LANE_UNDEFINED.equals(lane))
 			{
@@ -180,10 +178,13 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 					
 					bodyinstance.executeStep(null, lane);
 				}
-				else if(/*steptype.equals(bodyinstance.getLastState()) ||*/ !bodyinstance.isFinished(null, lane))
-				{
-					throw new RuntimeException("Invalid plan step: BPMN process instance is not ready: "+bodyinstance);
-				}
+				
+				// When the bodyinstance is not ready, it means that a task
+				// has completed and notified the handler to continue.
+//				else if(/*steptype.equals(bodyinstance.getLastState()) ||*/ !bodyinstance.isFinished(null, lane))
+//				{
+//					throw new RuntimeException("Invalid plan step: BPMN process instance is not ready: "+bodyinstance);
+//				}
 			}
 		}
 		catch(Throwable t)
@@ -191,6 +192,8 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			// Throwable in body task will be thrown later
 			throwable = t;
 		}
+		
+		// Perform 
 		
 		// check for errors / exception / final state
 		if(throwable==null && !BpmnPlanBodyInstance.LANE_UNDEFINED.equals(lane) && !bodyinstance.isFinished(null, lane))
@@ -249,7 +252,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			}
 			if(throwable instanceof Exception)
 			{
-	    		throw (Exception) throwable;
+	    		throw (Exception)throwable;
 			}
 	    	else if(throwable!=null)
 	    	{
@@ -259,7 +262,6 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 
 		// return false, step is not interruptible
     	return false;
-    	
 	}
 
 	/**
