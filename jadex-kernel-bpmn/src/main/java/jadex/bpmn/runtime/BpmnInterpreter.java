@@ -637,7 +637,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	 *  @param pool	The pool to be executed or null for any.
 	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
 	 */
-	protected void executeStep(String pool, String lane)
+	public void executeStep(String pool, String lane)
 	{
 		if(isFinished(pool, lane))
 			throw new UnsupportedOperationException("Cannot execute a finished process: "+this);

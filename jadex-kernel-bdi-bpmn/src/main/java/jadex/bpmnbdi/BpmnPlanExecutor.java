@@ -166,7 +166,8 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			}
 			
 			// Find lane to execute.
-//			System.out.println("Executing plan step: "+rplan+", "+lane+", "+bodyinstance);
+			String planname = (String)interpreter.getState().getAttributeValue(interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name);
+			System.out.println("Executing plan step: "+planname+", "+lane+", "+bodyinstance);
 			
 			// Execute a step.
 			if(!BpmnPlanBodyInstance.LANE_UNDEFINED.equals(lane))
@@ -177,9 +178,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 					interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
 					bodyinstance.setLastState(steptype);
 					
-					// todo:?
-//					bodyinstance.executeStep(null, lane);
-					bodyinstance.executeStep();
+					bodyinstance.executeStep(null, lane);
 				}
 				else if(/*steptype.equals(bodyinstance.getLastState()) ||*/ !bodyinstance.isFinished(null, lane))
 				{
