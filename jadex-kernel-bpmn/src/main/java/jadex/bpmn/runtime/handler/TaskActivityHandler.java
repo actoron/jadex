@@ -4,7 +4,6 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bridge.IComponentAdapter;
 import jadex.commons.concurrent.IResultListener;
 
 /**

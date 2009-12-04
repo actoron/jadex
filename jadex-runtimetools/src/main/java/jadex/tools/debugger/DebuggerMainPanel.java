@@ -139,23 +139,19 @@ public class DebuggerMainPanel extends JSplitPane
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				step.setEnabled(false);
 				IComponentExecutionService	ces	= (IComponentExecutionService)
 					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentExecutionService.class);
 				ces.stepComponent(DebuggerMainPanel.this.desc.getName(), new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								step.setEnabled(true);
-							}
-						});
+						updatePanel((IComponentDescription)result);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						// Hack!!! keep tool reactive in case of error!?
 						SwingUtilities.invokeLater(new Runnable()
 						{
 							public void run()
@@ -165,7 +161,6 @@ public class DebuggerMainPanel extends JSplitPane
 						});
 					}
 				});
-				step.setEnabled(false);
 			}
 		});
 		

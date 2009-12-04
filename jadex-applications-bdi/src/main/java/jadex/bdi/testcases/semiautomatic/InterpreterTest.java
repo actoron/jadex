@@ -5,10 +5,8 @@ import jadex.bdi.interpreter.OAVAgentModel;
 import jadex.bdi.interpreter.OAVBDIModelLoader;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IMessageAdapter;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.ThreadPoolFactory;
 import jadex.service.BasicServiceContainer;
 import jadex.service.IServiceContainer;
@@ -76,23 +74,11 @@ public class InterpreterTest
 				{
 					exe.execute();
 				}
-	
-				public void killComponent()
+				
+				public void invokeLater(Runnable action)
 				{
-					System.out.println("clean");
-					interpreters[0].killComponent(new IResultListener()
-					{
-						public void resultAvailable(Object result)
-						{
-							clock.shutdown(null);
-							exe.shutdown(null);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							exception.printStackTrace();
-						}
-					});
+					// TODO Auto-generated method stub
+					throw new UnsupportedOperationException();
 				}
 				
 				public IServiceContainer getServiceContainer()
@@ -125,15 +111,6 @@ public class InterpreterTest
 						}
 					};
 				}
-				
-				public void sendMessage(IMessageAdapter msg)
-				{
-				}
-				
-//				public IClock getClock()
-//				{
-//					return clock;
-//				}
 			}, loaded.getState(), loaded, null, null, config);
 			
 			exe.setExecutable(new IExecutable()

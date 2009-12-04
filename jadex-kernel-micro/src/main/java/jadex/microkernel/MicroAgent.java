@@ -2,6 +2,7 @@ package jadex.microkernel;
 
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
@@ -179,7 +180,7 @@ public abstract class MicroAgent implements IMicroAgent
 				{
 					if(!interpreter.ext_forbidden)
 					{
-						interpreter.invokeLater(new Runnable()
+						interpreter.getAgentAdapter().invokeLater(new Runnable()
 						{
 							public void run()
 							{
@@ -214,7 +215,7 @@ public abstract class MicroAgent implements IMicroAgent
 				{
 					if(!interpreter.ext_forbidden)
 					{
-						interpreter.invokeLater(new Runnable()
+						interpreter.getAgentAdapter().invokeLater(new Runnable()
 						{
 							public void run()
 							{
@@ -246,7 +247,9 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public void killAgent()
 	{
-		interpreter.getAgentAdapter().killComponent();
+		((IComponentExecutionService)interpreter.getAgentAdapter().getServiceContainer()
+			.getService(IComponentExecutionService.class))
+			.destroyComponent(interpreter.getAgentAdapter().getComponentIdentifier(), null);
 	}
 		
 	/**
@@ -343,6 +346,6 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public void invokeLater(Runnable run)
 	{
-		interpreter.invokeLater(run);
+		interpreter.getAgentAdapter().invokeLater(run);
 	}
 }

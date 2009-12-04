@@ -140,7 +140,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		
 		// Find lane to execute.
 		String lane = bodyinstance.getLane(steptype);
-		String planname = (String)interpreter.getState().getAttributeValue(interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name);
+//		String planname = (String)interpreter.getState().getAttributeValue(interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name);
 //		System.out.println("Executing plan step: "+planname+", "+lane+", "+bodyinstance);
 
 		Throwable throwable = null;

@@ -1,4 +1,4 @@
-package jadex.bdi.runtime.impl;
+package jadex.bridge;
 
 /**
  *  Can be used as external action, which will only be executed when
@@ -10,7 +10,7 @@ package jadex.bdi.runtime.impl;
  *  	run();
  *  cleanup();
  */
-public abstract class InterpreterTimedObjectAction implements Runnable
+public abstract class CheckedAction implements Runnable
 {
 	//-------- attributes --------
 	
@@ -22,7 +22,7 @@ public abstract class InterpreterTimedObjectAction implements Runnable
 	/**
 	 *  Create a new action.
 	 */
-	public InterpreterTimedObjectAction()
+	public CheckedAction()
 	{
 		valid = true;
 	}

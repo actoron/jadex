@@ -21,13 +21,29 @@ public interface IComponentAdapter
 	 *  can be called concurrently from different threads.
 	 */
 	public void	wakeup()	throws ComponentTerminatedException;
+	
+	/**
+	 *  Execute an action on the component thread.
+	 *  May be safely called from any (internal or external) thread.
+	 *  The contract of this method is as follows:
+	 *  The component adapter ensures the execution of the external action, otherwise
+	 *  the method will throw a terminated exception.
+	 *  @param action The action to be executed on the component thread.
+	 */
+	public void invokeLater(Runnable action);
+	
+	/**
+	 *  Check if the external thread is accessing.
+	 *  @return True, if called from an external (i.e. non-synchronized) thread.
+	 */
+	public boolean isExternalThread();
 
 	/**
 	 *  Cause termination of the agent.
 	 *  IKernelAgent.killAgent(IResultListener) will be
 	 *  called in turn.
-	 */
-	public void killComponent()	throws ComponentTerminatedException;
+	 * /
+	public void killComponent()	throws ComponentTerminatedException;*/
 
 	/**
 	 *  Get the agent platform.
@@ -40,6 +56,5 @@ public interface IComponentAdapter
 	 *  messages to this agent.
 	 */
 	public IComponentIdentifier getComponentIdentifier() throws ComponentTerminatedException;
-	
 }
 

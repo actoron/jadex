@@ -74,4 +74,10 @@ public interface ILoadableComponentModel
 	 *  @return The properties.
 	 */
 	public Map	getProperties();
+
+	/**
+	 *  Return the class loader corresponding to the model.
+	 *  @return The class loader corresponding to the model.
+	 */
+	public ClassLoader getClassLoader();
 }

@@ -902,7 +902,7 @@ public class ExternalAccessFlyweight extends CapabilityFlyweight implements IBDI
 	 */
 	public void invokeLater(Runnable runnable)
 	{
-		getInterpreter().invokeLater(runnable);
+		getInterpreter().getComponentAdapter().invokeLater(runnable);
 	}
 
 	/**

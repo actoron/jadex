@@ -214,6 +214,15 @@ public class OAVCapabilityModel implements ILoadableComponentModel, ICacheableMo
 		return this.lastmod;
 	}
 	
+	/**
+	 *  Return the class loader corresponding to the model.
+	 *  @return The class loader corresponding to the model.
+	 */
+	public ClassLoader getClassLoader()
+	{
+		return getTypeModel().getClassLoader();
+	}
+
 	//-------- methods --------
 
 	/**

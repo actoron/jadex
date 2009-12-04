@@ -173,7 +173,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public void messageArrived(final IMessageAdapter message)
 	{
-		invokeLater(new Runnable()
+		getAgentAdapter().invokeLater(new Runnable()
 		{
 			public void run()
 			{
@@ -193,14 +193,14 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public void killComponent(final IResultListener listener)
 	{
-		invokeLater(new Runnable()
+		getAgentAdapter().invokeLater(new Runnable()
 		{
 			public void run()
 			{	
 				// must synchronize to avoid other thread calling invokeLater at the same time
 				synchronized(ext_entries)
 				{
-					invokeLater(new Runnable()
+					getAgentAdapter().invokeLater(new Runnable()
 					{
 						public void run()
 						{
@@ -230,7 +230,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public void getExternalAccess(final IResultListener listener)
 	{
-		invokeLater(new Runnable()
+		getAgentAdapter().invokeLater(new Runnable()
 		{
 			public void run()
 			{
@@ -260,7 +260,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  The agent ensures the execution of the external action, otherwise
 	 *  the method will throw a agent terminated sexception.
 	 *  @param action The action.
-	 */
+	 * /
 	public void invokeLater(Runnable action)
 	{
 		synchronized(ext_entries)
@@ -273,7 +273,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 			}
 		}
 		adapter.wakeup();
-	}
+	}*/
 	
 	/**
 	 *  Invoke some code with agent behaviour synchronized on the agent.
@@ -297,7 +297,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 			
 			// Add external will throw exception if action execution cannot be done.
 //			System.err.println("invokeSynchonized("+code+"): adding");
-			invokeLater(new Runnable()
+			getAgentAdapter().invokeLater(new Runnable()
 			{
 				public void run()
 				{
@@ -356,16 +356,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */ 
 	public boolean isExternalThread()
 	{
-		return !isAgentThread();
-	}
-	
-	/**
-	 *  Check if the agent thread is accessing.
-	 *  @return True, if access is ok.
-	 */ 
-	public boolean isAgentThread()
-	{
-		return agentthread==Thread.currentThread();
+		return adapter.isExternalThread();
 	}
 	
 	/**
@@ -461,7 +452,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 		
 		public void resultAvailable(final Object result)
 		{
-			invokeLater(new Runnable()
+			getAgentAdapter().invokeLater(new Runnable()
 			{
 				public void run()
 				{
@@ -471,7 +462,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 		}
 		public void exceptionOccurred(final Exception exception)
 		{
-			invokeLater(new Runnable()
+			getAgentAdapter().invokeLater(new Runnable()
 			{
 				public void run()
 				{

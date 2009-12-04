@@ -179,7 +179,7 @@ public class DefaultActivityHandler implements IActivityHandler
 	 */
 	public void	notify(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, final Object event)
 	{
-		instance.invokeLater(new Runnable()
+		instance.getComponentAdapter().invokeLater(new Runnable()
 		{
 			public void run()
 			{

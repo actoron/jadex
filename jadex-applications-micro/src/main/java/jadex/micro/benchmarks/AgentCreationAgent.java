@@ -158,7 +158,7 @@ public class AgentCreationAgent extends MicroAgent
 		System.out.println("Still used memory: "+stillused+"kB.");
 
 		// Todo: killAgent()
-		getAgentAdapter().killComponent();
+		killAgent();
 	}
 	
 	/**

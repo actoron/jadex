@@ -672,7 +672,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 //		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, 
 //			OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATING);
 		interpreter.startMonitorConsequences();
-		getInterpreter().getComponentAdapter().killComponent();
+		getInterpreter().killComponent();
 		interpreter.endMonitorConsequences();
 	}
 
@@ -1318,7 +1318,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 
 	/**
 	 *  Delegate synchronization to agent.
-	 */
+	 * /
 	public void invokeLater(final Runnable action)
 	{
 		// Called from outside (e.g. workflow client)
@@ -1351,7 +1351,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 //				}
 			}	
 		});
-	}
+	}*/
 	
 	/**
 	 *  Delegate synchronization to agent.

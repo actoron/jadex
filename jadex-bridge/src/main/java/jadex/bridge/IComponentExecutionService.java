@@ -45,6 +45,7 @@ public interface IComponentExecutionService	extends IService
 	/**
 	 *  Execute a step of a suspended component.
 	 *  @param componentid The component identifier.
+	 *  @param listener Called when the step is finished (result will be the component description).
 	 */
 	public void stepComponent(IComponentIdentifier componentid, IResultListener listener);
 	

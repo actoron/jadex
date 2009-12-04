@@ -172,7 +172,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 		// Create the agent instance (interpreter and state).
 		
 		IComponentInstance instance = factory.createComponentInstance(adapter, lmodel, config, args);
-		adapter.setComponent(instance);
+		adapter.setComponent(instance, lmodel);
 		
 //		System.out.println("added: "+agentdescs.size()+", "+aid);
 		

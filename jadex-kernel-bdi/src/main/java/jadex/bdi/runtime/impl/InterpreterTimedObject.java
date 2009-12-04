@@ -2,6 +2,7 @@ package jadex.bdi.runtime.impl;
 
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.CheckedAction;
 import jadex.rules.state.IOAVState;
 import jadex.service.clock.ITimedObject;
 
@@ -17,14 +18,14 @@ public class InterpreterTimedObject implements ITimedObject
 	protected IOAVState state;
 	
 	/** The runnable. */
-	protected InterpreterTimedObjectAction action;
+	protected CheckedAction action;
 		
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new timed object.
 	 */
-	public InterpreterTimedObject(IOAVState state, InterpreterTimedObjectAction runnable)
+	public InterpreterTimedObject(IOAVState state, CheckedAction runnable)
 	{
 		this.state = state;
 		this.action = runnable;
@@ -44,7 +45,7 @@ public class InterpreterTimedObject implements ITimedObject
 		{
 			try
 			{
-				interpreter.invokeLater(action);
+				interpreter.getComponentAdapter().invokeLater(action);
 			}
 			catch(ComponentTerminatedException e)
 			{
@@ -57,7 +58,7 @@ public class InterpreterTimedObject implements ITimedObject
 	 *  Get the action.
 	 *  @return The action.
 	 */
-	public InterpreterTimedObjectAction getAction()
+	public CheckedAction getAction()
 	{
 		return action;
 	}

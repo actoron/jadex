@@ -3,6 +3,7 @@ package jadex.adapter.standalone;
 import jadex.adapter.standalone.fipaimpl.AMSAgentDescription;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
 import jadex.adapter.standalone.service.componentexecution.ComponentExecutionService;
+import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IComponentAdapter;
@@ -10,6 +11,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;
 import jadex.commons.ICommand;
@@ -18,7 +20,12 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.execution.IExecutionService;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,6 +47,9 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 
 	/** The component instance. */
 	protected IComponentInstance component;
+	
+	/** The component model. */
+	protected ILoadableComponentModel model;
 
 	/** The description holding the execution state of the component
 	 *  (read only! managed by component execution service). */
@@ -62,6 +72,19 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	/** The breakpoint commands (executed, when a breakpoint triggers). */
 	protected ICommand[]	breakpointcommands;
 	
+	//-------- external actions --------
+
+	/** The thread executing the agent (null for none). */
+	// Todo: need not be transient, because agent should only be serialized when no action is running?
+	protected transient Thread componentthread;
+
+	// todo: ensure that entries are empty when saving
+	/** The entries added from external threads. */
+	protected List	ext_entries;
+
+	/** The flag if external entries are forbidden. */
+	protected boolean ext_forbidden;
+	
 	//-------- constructors --------
 
 	/**
@@ -73,15 +96,17 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		this.container = container;
 		this.desc	= desc;
 		this.cid	= desc.getName();
+		this.ext_entries = Collections.synchronizedList(new ArrayList());
 	}
 	
 	/**
 	 *  Set the component.
 	 *  @param component The component to set.
 	 */
-	public void setComponent(IComponentInstance component)
+	public void setComponent(IComponentInstance component, ILoadableComponentModel model)
 	{
 		this.component = component;
+		this.model = model;
 	}	
 	
 	//-------- IComponentAdapter methods --------
@@ -116,7 +141,8 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 
 		// Resume execution of the agent (when active or terminating).
 		if(IComponentDescription.STATE_ACTIVE.equals(desc.getState())
-			|| IComponentDescription.STATE_TERMINATING.equals(desc.getState()))
+			|| IComponentDescription.STATE_TERMINATING.equals(desc.getState())
+			|| IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))	// Hack!!! external entries must also be executed in suspended state.
 		{
 			//System.out.println("wakeup called: "+state);
 			((IExecutionService)container.getService(IExecutionService.class)).execute(this);
@@ -233,11 +259,11 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	/**
 	 *  Gracefully terminate the agent.
 	 *  This method is called from the reasoning engine and delegated to the ams.
-	 */
+	 * /
 	public void killComponent()
 	{
 		((IComponentExecutionService)container.getService(IComponentExecutionService.class)).destroyComponent(cid, null);
-	}
+	}*/
 
 	/**
 	 *  Gracefully terminate the agent.
@@ -304,46 +330,154 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public boolean	execute()
 	{
+		// Remember execution thread.
+		this.componentthread	= Thread.currentThread();
+		ClassLoader	cl	= componentthread.getContextClassLoader();
+		componentthread.setContextClassLoader(model.getClassLoader());
+
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
 			throw new ComponentTerminatedException(cid.getName());
 
 		assert IComponentDescription.STATE_ACTIVE.equals(desc.getState()) || IComponentDescription.STATE_TERMINATING.equals(desc.getState())
-		||  IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) && dostep: desc.getState()+" "+dostep;
+		||  IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) ||  IComponentDescription.STATE_WAITING.equals(desc.getState()) : desc.getState();
 		
+		// Copy actions from external threads into the state.
+		// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
+		boolean	extexecuted	= false;
+		Runnable[]	entries	= null;
+		synchronized(ext_entries)
+		{
+			if(!(ext_entries.isEmpty()))
+			{
+				entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
+//				for(int i=0; i<ext_entries.size(); i++)
+//					state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, ext_entries.get(i));
+				ext_entries.clear();
+				
+				extexecuted	= true;
+			}
+//			String agentstate = (String)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
+//			if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED.equals(agentstate))
+//				ext_forbidden = true;
+		}
+		for(int i=0; entries!=null && i<entries.length; i++)
+		{
+			if(entries[i] instanceof CheckedAction)
+			{
+				if(((CheckedAction)entries[i]).isValid())
+				{
+					try
+					{
+						entries[i].run();
+					}
+					catch(Exception e)
+					{
+						StringWriter	sw	= new StringWriter();
+						e.printStackTrace(new PrintWriter(sw));
+						System.err.println("Execution of action led to exeception: "+sw);
+//						AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
+					}
+				}
+				try
+				{
+					((CheckedAction)entries[i]).cleanup();
+				}
+				catch(Exception e)
+				{
+					StringWriter	sw	= new StringWriter();
+					e.printStackTrace(new PrintWriter(sw));
+					System.err.println("Execution of action led to exeception: "+sw);
+//					AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
+				}
+			}
+			else //if(entries[i] instanceof Runnable)
+			{
+				try
+				{
+					entries[i].run();
+				}
+				catch(Exception e)
+				{
+					StringWriter	sw	= new StringWriter();
+					e.printStackTrace(new PrintWriter(sw));
+					System.err.println("Execution of action led to exeception: "+sw);
+//					AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
+				}
+			}
+		}
+
 		// Should the component be executed again?
 		boolean	again = false;
-
-		try
+		if(!extexecuted && (!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) || dostep))
 		{
-			//System.out.println("Executing: "+agent);
-			again	= component.executeStep();
-		}
-		catch(Throwable e)
-		{
-			// Fatal error!
-			fatalerror	= true;
-			e.printStackTrace();
-			//agent.getLogger().severe("Fatal error, agent '"+aid+"' will be removed.");
-			System.out.println("Fatal error, agent '"+cid+"' will be removed.");
-				
-			// Remove agent from platform.
-			killComponent();
-		}
-		if(dostep)
-		{
-			dostep	= false;
-			if(steplistener!=null)
-				steplistener.resultAvailable(null);
-			
-			if(!again && IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+			try
 			{
-				ComponentExecutionService	ces	= (ComponentExecutionService)container.getService(IComponentExecutionService.class);
-				ces.setComponentState(cid, IComponentDescription.STATE_WAITING);	// I hope this doesn't cause any deadlocks :-/
+				//System.out.println("Executing: "+agent);
+				again	= component.executeStep();
 			}
-			again	= again && IComponentDescription.STATE_ACTIVE.equals(desc.getState());
+			catch(Throwable e)
+			{
+				// Fatal error!
+				fatalerror	= true;
+				e.printStackTrace();
+				//agent.getLogger().severe("Fatal error, agent '"+aid+"' will be removed.");
+				System.out.println("Fatal error, agent '"+cid+"' will be removed.");
+					
+				// Remove agent from platform.
+				((IComponentExecutionService)container.getService(IComponentExecutionService.class)).destroyComponent(cid, null);
+			}
+			if(dostep)
+			{
+				dostep	= false;
+				if(!again && IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+				{
+					ComponentExecutionService	ces	= (ComponentExecutionService)container.getService(IComponentExecutionService.class);
+					ces.setComponentState(cid, IComponentDescription.STATE_WAITING);	// I hope this doesn't cause any deadlocks :-/
+				}
+				again	= again && IComponentDescription.STATE_ACTIVE.equals(desc.getState());
+				if(steplistener!=null)
+					steplistener.resultAvailable(desc.clone());
+			}
 		}
+
+		// Reset execution thread.
+		componentthread.setContextClassLoader(cl);
+		this.componentthread = null;
 		
-		return again;
+		return again || extexecuted;
+	}
+	
+	/**
+	 *  Check if the external thread is accessing.
+	 *  @return True, if called from an external (i.e. non-synchronized) thread.
+	 */
+	public boolean isExternalThread()
+	{
+		return Thread.currentThread()!=componentthread;
+	}
+	
+	//-------- external access --------
+	
+	/**
+	 *  Execute an action on the component thread.
+	 *  May be safely called from any (internal or external) thread.
+	 *  The contract of this method is as follows:
+	 *  The component adapter ensures the execution of the external action, otherwise
+	 *  the method will throw a terminated exception.
+	 *  @param action The action to be executed on the component thread.
+	 */
+	public void invokeLater(Runnable action)
+	{
+		synchronized(ext_entries)
+		{
+			if(ext_forbidden)
+				throw new ComponentTerminatedException("External actions cannot be accepted " +
+					"due to terminated component state: "+this);
+			{
+				ext_entries.add(action);
+			}
+		}
+		wakeup();
 	}
 	
 	//-------- test methods --------

@@ -39,7 +39,7 @@ public class ExternalAccess implements IMicroExternalAccess
 	 */
 	public void sendMessage(final Map me, final MessageType mt)
 	{
-		interpreter.invokeLater(new Runnable()
+		invokeLater(new Runnable()
 		{
 			public void run()
 			{
@@ -56,7 +56,7 @@ public class ExternalAccess implements IMicroExternalAccess
 	 */
 	public void invokeLater(Runnable runnable)
 	{
-		interpreter.invokeLater(runnable);
+		interpreter.getAgentAdapter().invokeLater(runnable);
 	}
 
 

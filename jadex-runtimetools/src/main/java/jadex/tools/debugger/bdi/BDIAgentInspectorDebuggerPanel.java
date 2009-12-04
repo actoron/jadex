@@ -52,7 +52,7 @@ public class BDIAgentInspectorDebuggerPanel	implements IDebuggerPanel
 		// Hack!!!
 		final BDIInterpreter bdii = ((ElementFlyweight)access).getInterpreter();
 		// Open tool on introspected agent thread as required for copy state constructor (hack!!!)
-		bdii.invokeLater(new Runnable()
+		bdii.getComponentAdapter().invokeLater(new Runnable()
 		{
 			public void run()
 			{

@@ -15,6 +15,7 @@ import jadex.bpmn.runtime.handler.TaskActivityHandler;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
@@ -244,7 +245,9 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			
 			if(!finishing && isFinished(null, null))
 			{
-				getComponentAdapter().killComponent();
+				((IComponentExecutionService)adapter.getServiceContainer()
+					.getService(IComponentExecutionService.class))
+					.destroyComponent(adapter.getComponentIdentifier(), null);
 				finishing = true;
 			}
 			
@@ -268,7 +271,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	 */
 	public void messageArrived(final IMessageAdapter message)
 	{
-		invokeLater(new Runnable()
+		adapter.invokeLater(new Runnable()
 		{
 			public void run()
 			{
@@ -309,14 +312,14 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	 */
 	public void killComponent(final IResultListener listener)
 	{
-		invokeLater(new Runnable()
+		adapter.invokeLater(new Runnable()
 		{
 			public void run()
 			{	
 				// must synchronize to avoid other thread calling invokeLater at the same time
 				synchronized(ext_entries)
 				{
-					invokeLater(new Runnable()
+					adapter.invokeLater(new Runnable()
 					{
 						public void run()
 						{
@@ -350,7 +353,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	 */
 	public void getExternalAccess(final IResultListener listener)
 	{
-		invokeLater(new Runnable()
+		adapter.invokeLater(new Runnable()
 		{
 			public void run()
 			{
@@ -381,7 +384,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	 *  The agent ensures the execution of the external action, otherwise
 	 *  the method will throw a agent terminated sexception.
 	 *  @param action The action.
-	 */
+	 * /
 	public void invokeLater(Runnable action)
 	{
 		synchronized(ext_entries)
@@ -394,7 +397,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			}
 		}
 		adapter.wakeup();
-	}
+	}*/
 	
 	/**
 	 *  Invoke some code with agent behaviour synchronized on the agent.
@@ -418,7 +421,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			
 			// Add external will throw exception if action execution cannot be done.
 //			System.err.println("invokeSynchonized("+code+"): adding");
-			invokeLater(new Runnable()
+			adapter.invokeLater(new Runnable()
 			{
 				public void run()
 				{
@@ -477,16 +480,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	 */ 
 	public boolean isExternalThread()
 	{
-		return !isAgentThread();
-	}
-	
-	/**
-	 *  Check if the agent thread is accessing.
-	 *  @return True, if access is ok.
-	 */ 
-	public boolean isAgentThread()
-	{
-		return thread==Thread.currentThread();
+		return adapter.isExternalThread();
 	}
 	
 	/**

@@ -1,9 +1,11 @@
 package jadex.bdi.runtime.impl;
 
+import jadex.bridge.CheckedAction;
+
 /**
  *  The action class for continuing the external thread.
  */
-public class WakeupAction extends InterpreterTimedObjectAction
+public class WakeupAction extends CheckedAction
 {
 	//-------- attributes --------
 	

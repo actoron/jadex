@@ -424,7 +424,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 //		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, 
 //			OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATING);
 		interpreter.startMonitorConsequences();
-		getInterpreter().getComponentAdapter().killComponent();
+		getInterpreter().killComponent();
 		interpreter.endMonitorConsequences();
 	}
 

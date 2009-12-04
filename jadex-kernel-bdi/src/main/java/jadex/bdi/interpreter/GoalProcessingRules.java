@@ -1,7 +1,7 @@
 package jadex.bdi.interpreter;
 
 import jadex.bdi.runtime.impl.InterpreterTimedObject;
-import jadex.bdi.runtime.impl.InterpreterTimedObjectAction;
+import jadex.bridge.CheckedAction;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
@@ -1085,7 +1085,7 @@ public class GoalProcessingRules
 				IClockService clock = (IClockService)BDIInterpreter.getInterpreter(state).getComponentAdapter()
 					.getServiceContainer().getService(IClockService.TYPE);
 				state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_retrytimer, clock.createTimer(retrydelay, 
-					new InterpreterTimedObject(state, new InterpreterTimedObjectAction()
+					new InterpreterTimedObject(state, new CheckedAction()
 				{
 					public void run()
 					{
@@ -1335,7 +1335,7 @@ public class GoalProcessingRules
 //					IClockService clock = (IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getPlatform().getService(IClockService.class);
 					IClockService clock = (IClockService)BDIInterpreter.getInterpreter(state).getComponentAdapter().getServiceContainer().getService(IClockService.TYPE);
 					state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_recurtimer, clock.createTimer(recurdelay, 
-						new InterpreterTimedObject(state, new InterpreterTimedObjectAction()
+						new InterpreterTimedObject(state, new CheckedAction()
 					{
 						public void run()
 						{

@@ -1,20 +1,19 @@
 package jadex.bdi.interpreter;
 
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.ICapability;
 import jadex.bdi.runtime.IEventbase;
 import jadex.bdi.runtime.IExpressionbase;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
-import jadex.bdi.runtime.impl.InterpreterTimedObjectAction;
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.collection.LRU;
@@ -31,14 +30,10 @@ import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,7 +43,7 @@ import java.util.Set;
  *  and performing the agent execution when
  *  being called from the platform.
  */
-public class BDIInterpreter implements IComponentInstance, ISynchronizator
+public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 {
 	//-------- static part --------
 	
@@ -78,8 +73,8 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 	/** The kernel properties. */
 	protected Map kernelprops;
 	
-	/** The flag indicating if it is not allowed to add external entries. */
-	protected boolean ext_forbidden;
+//	/** The flag indicating if it is not allowed to add external entries. */
+//	protected boolean ext_forbidden;
 	
 	//-------- recreate on init (no state) --------
 	
@@ -88,9 +83,9 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 	
 	//-------- null on init --------
 	
-	/** The thread executing the agent (null for none). */
-	// Todo: need not be transient, because agent should only be serialized when no action is running?
-	protected transient Thread agentthread;
+//	/** The thread executing the agent (null for none). */
+//	// Todo: need not be transient, because agent should only be serialized when no action is running?
+//	protected transient Thread agentthread;
 	
 	/** The plan thread currently executing (null for none). */
 	protected transient Thread planthread;
@@ -107,9 +102,9 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 	/** The agenda state when monitoring was started. */
 	protected transient int agenda_state;
 	
-	// todo: ensure that entries are empty when saving
-	/** The entries added from external threads. */
-	protected transient final List ext_entries;
+//	// todo: ensure that entries are empty when saving
+//	/** The entries added from external threads. */
+//	protected transient final List ext_entries;
 	
 	/** The flag for microplansteps. */
 	protected transient boolean microplansteps; 
@@ -155,14 +150,31 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 		this.adapter = adapter;
 		this.state = state;
 		this.model = model;
-		this.ext_entries = Collections.synchronizedList(new ArrayList());
+//		this.ext_entries = Collections.synchronizedList(new ArrayList());
 		this.kernelprops = kernelprops;
 		this.planexecutors = new HashMap();
 		this.volcache = new LRU(0);	// 50
 		this.stacache = new LRU(20);
 		this.microplansteps = true;
 
-		state.setSynchronizator(this);
+		state.setSynchronizator(new ISynchronizator()
+		{
+			
+			public boolean isExternalThread()
+			{
+				return BDIInterpreter.this.isExternalThread();
+			}
+			
+			public void invokeSynchronized(Runnable code)
+			{
+				BDIInterpreter.this.invokeSynchronized(code);
+			}
+			
+			public void invokeLater(Runnable action)
+			{
+				getComponentAdapter().invokeLater(action);
+			}
+		});
 				
 		// Hack! todo:
 		interpreters.put(state, this);
@@ -266,86 +278,86 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 	 */
 	public boolean executeStep()
 	{
-		// Remember execution thread.
-		this.agentthread	= Thread.currentThread();
-		ClassLoader	cl	= agentthread.getContextClassLoader();
-		agentthread.setContextClassLoader(model.getTypeModel().getClassLoader());
+//		// Remember execution thread.
+//		this.agentthread	= Thread.currentThread();
+//		ClassLoader	cl	= agentthread.getContextClassLoader();
+//		agentthread.setContextClassLoader(model.getTypeModel().getClassLoader());
 
 		try
 		{
 //			if(!lock.tryLock())
 //				throw new RuntimeException("Internal execution error.");
 						
-			// Copy actions from external threads into the state.
-			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
-			boolean	extexecuted	= false;
-			Runnable[]	entries	= null;
-			synchronized(ext_entries)
-			{
-				if(!(ext_entries.isEmpty()))
-				{
-					entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
-//					for(int i=0; i<ext_entries.size(); i++)
-//						state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, ext_entries.get(i));
-					ext_entries.clear();
-					
-					extexecuted	= true;
-				}
-				String agentstate = (String)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
-				if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED.equals(agentstate))
-					ext_forbidden = true;
-			}
-			for(int i=0; entries!=null && i<entries.length; i++)
-			{
-				if(entries[i] instanceof InterpreterTimedObjectAction)
-				{
-					if(((InterpreterTimedObjectAction)entries[i]).isValid())
-					{
-						try
-						{
-							entries[i].run();
-						}
-						catch(Exception e)
-						{
-							StringWriter	sw	= new StringWriter();
-							e.printStackTrace(new PrintWriter(sw));
-							AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
-						}
-					}
-					try
-					{
-						((InterpreterTimedObjectAction)entries[i]).cleanup();
-					}
-					catch(Exception e)
-					{
-						StringWriter	sw	= new StringWriter();
-						e.printStackTrace(new PrintWriter(sw));
-						AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
-					}
-				}
-				else //if(entries[i] instanceof Runnable)
-				{
-					try
-					{
-						entries[i].run();
-					}
-					catch(Exception e)
-					{
-						StringWriter	sw	= new StringWriter();
-						e.printStackTrace(new PrintWriter(sw));
-						AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
-					}
-				}
-
-//				// Assert for testing state consistency (slow -> comment out for release!)
-//				assert rulesystem.getState().getUnreferencedObjects().isEmpty()
-//					: getAgentAdapter().getAgentIdentifier().getLocalName()
-//					+ ", " + entries[i]
-//					+ ", " + rulesystem.getState().getUnreferencedObjects();
-			}
+//			// Copy actions from external threads into the state.
+//			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
+//			boolean	extexecuted	= false;
+//			Runnable[]	entries	= null;
+//			synchronized(ext_entries)
+//			{
+//				if(!(ext_entries.isEmpty()))
+//				{
+//					entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
+////					for(int i=0; i<ext_entries.size(); i++)
+////						state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, ext_entries.get(i));
+//					ext_entries.clear();
+//					
+//					extexecuted	= true;
+//				}
+//				String agentstate = (String)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
+//				if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED.equals(agentstate))
+//					ext_forbidden = true;
+//			}
+//			for(int i=0; entries!=null && i<entries.length; i++)
+//			{
+//				if(entries[i] instanceof InterpreterTimedObjectAction)
+//				{
+//					if(((InterpreterTimedObjectAction)entries[i]).isValid())
+//					{
+//						try
+//						{
+//							entries[i].run();
+//						}
+//						catch(Exception e)
+//						{
+//							StringWriter	sw	= new StringWriter();
+//							e.printStackTrace(new PrintWriter(sw));
+//							AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
+//						}
+//					}
+//					try
+//					{
+//						((InterpreterTimedObjectAction)entries[i]).cleanup();
+//					}
+//					catch(Exception e)
+//					{
+//						StringWriter	sw	= new StringWriter();
+//						e.printStackTrace(new PrintWriter(sw));
+//						AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
+//					}
+//				}
+//				else //if(entries[i] instanceof Runnable)
+//				{
+//					try
+//					{
+//						entries[i].run();
+//					}
+//					catch(Exception e)
+//					{
+//						StringWriter	sw	= new StringWriter();
+//						e.printStackTrace(new PrintWriter(sw));
+//						AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
+//					}
+//				}
+//
+////				// Assert for testing state consistency (slow -> comment out for release!)
+////				assert rulesystem.getState().getUnreferencedObjects().isEmpty()
+////					: getAgentAdapter().getAgentIdentifier().getLocalName()
+////					+ ", " + entries[i]
+////					+ ", " + rulesystem.getState().getUnreferencedObjects();
+//			}
 
 			boolean	execute	= true;
-			if(!extexecuted)
+//			if(!extexecuted)
 			{
 				// Notify/ask tools that we are about to execute an action.
 				
@@ -503,7 +515,8 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 			
 //			lock.unlock();
 			
-			return execute && !rulesystem.getAgenda().isEmpty(); 
+			return !rulesystem.getAgenda().isEmpty(); 
+//			return execute && !rulesystem.getAgenda().isEmpty(); 
 	//			&& !OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED.equals(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state));
 		}
 		catch(Throwable e)
@@ -519,9 +532,9 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 		}
 		finally
 		{
-			// Reset execution thread.
-			agentthread.setContextClassLoader(cl);
-			this.agentthread = null;
+//			// Reset execution thread.
+//			agentthread.setContextClassLoader(cl);
+//			this.agentthread = null;
 		}
 	}
 	
@@ -545,7 +558,7 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 		// Handle normal messages.
 //		if(!toolmsg)
 //		{
-			invokeLater(new Runnable()
+			getComponentAdapter().invokeLater(new Runnable()
 			{
 				public void run()
 				{
@@ -562,7 +575,7 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 	 */
 	public void killComponent(final IResultListener listener)
 	{
-		invokeLater(new Runnable()
+		getComponentAdapter().invokeLater(new Runnable()
 		{
 			public void run()
 			{
@@ -586,7 +599,7 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 	 */
 	public void getExternalAccess(final IResultListener listener)
 	{
-		invokeLater(new Runnable()
+		getComponentAdapter().invokeLater(new Runnable()
 		{
 			public void run()
 			{
@@ -722,6 +735,15 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 	}
 	
 	/**
+	 *  Kill the component.
+	 */
+	public void	killComponent()
+	{
+		((IComponentExecutionService)adapter.getServiceContainer()
+			.getService(IComponentExecutionService.class))
+			.destroyComponent(adapter.getComponentIdentifier(), null);
+	}
+	/**
 	 *  Get the agent state.
 	 *  @return The agent state.
 	 */
@@ -752,7 +774,7 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 			
 			// Add external will throw exception if action execution cannot be done.
 //			System.err.println("invokeSynchonized("+code+"): adding");
-			invokeLater(new Runnable()
+			getComponentAdapter().invokeLater(new Runnable()
 			{
 				public void run()
 				{
@@ -823,7 +845,7 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 	 *  The agent ensures the execution of the external action, otherwise
 	 *  the method will throw a agent terminated exception.
 	 *  @param action The action.
-	 */
+	 * /
 	public void invokeLater(Runnable action)
 	{
 		synchronized(ext_entries)
@@ -836,7 +858,7 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 			ext_entries.add(action);
 		}
 		adapter.wakeup();
-	}
+	}*/
 	
 	/**
 	 *  Set the current plan thread.
@@ -853,7 +875,7 @@ public class BDIInterpreter implements IComponentInstance, ISynchronizator
 	 */ 
 	public boolean isAgentThread()
 	{
-		return agentthread==Thread.currentThread();
+		return !adapter.isExternalThread();
 	}
 	
 	/**
