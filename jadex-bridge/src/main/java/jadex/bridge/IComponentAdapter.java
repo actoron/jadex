@@ -20,7 +20,7 @@ public interface IComponentAdapter
 	 *  Also proper synchronization has to be made sure, as this method
 	 *  can be called concurrently from different threads.
 	 */
-	public void	wakeup()	throws ComponentTerminatedException;
+	public void	wakeup() throws ComponentTerminatedException;
 	
 	/**
 	 *  Execute an action on the component thread.

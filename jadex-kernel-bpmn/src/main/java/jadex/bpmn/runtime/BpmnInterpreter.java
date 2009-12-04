@@ -727,7 +727,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	{
 		if(isExternalThread())
 		{
-			invokeLater(new Runnable()
+			getComponentAdapter().invokeLater(new Runnable()
 			{
 				public void run()
 				{

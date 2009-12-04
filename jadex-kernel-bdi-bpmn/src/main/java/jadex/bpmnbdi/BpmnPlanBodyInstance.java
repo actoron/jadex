@@ -1368,7 +1368,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	{
 		if(isExternalThread())
 		{
-			invokeLater(new Runnable()
+			getComponentAdapter().invokeLater(new Runnable()
 			{
 				public void run()
 				{
@@ -1416,7 +1416,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 				System.out.println("Nop, due to outdated notify: "+thread+" "+activity);
 			}
 		}
-	}*/
+	}
 	
 	/**
 	 *  Delegate synchronization to agent.

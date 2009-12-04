@@ -109,7 +109,13 @@ public class InterpreterTest
 						{
 							return new String[0];
 						}
+						
 					};
+				}
+				
+				public boolean isExternalThread()
+				{
+					return false;
 				}
 			}, loaded.getState(), loaded, null, null, config);
 			
