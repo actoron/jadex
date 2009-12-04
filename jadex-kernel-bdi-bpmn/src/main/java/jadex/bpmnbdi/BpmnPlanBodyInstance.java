@@ -1328,12 +1328,27 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 		{
 			public void run()
 			{
-				action.run();
-				String lane = getLane(getLastState());
-//				if(isReady(null, lane))
+				// The DefaultActivityHandler.step() may rethrow an exception that
+				// occurred within task execution.
+				// It is catched an stored in the plan to be rethrown from the
+				// BPMNPlanExecutor.executeStep() method.
+				// The plan must always be set to ready to transfer the state
+				// of the process thread to the plan.
+				try
 				{
-					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+					action.run();
 				}
+				catch(Throwable t)
+				{
+					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_exception, t);
+				}
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+				
+//				String lane = getLane(getLastState());
+//				if(isReady(null, lane))
+//				{
+//					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+//				}
 			}	
 		});
 	}
