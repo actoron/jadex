@@ -215,7 +215,7 @@ public class BpmnFactory implements IComponentFactory
 	 */
 	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments)
 	{
-		return new BpmnInterpreter(adapter, (MBpmnModel)model, arguments, config, null, null);
+		return new BpmnInterpreter(adapter, (MBpmnModel)model, arguments, config, null, null, null);
 	}
 	
 	/**

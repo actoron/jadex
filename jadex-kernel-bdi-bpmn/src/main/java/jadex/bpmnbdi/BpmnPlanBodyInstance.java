@@ -84,16 +84,16 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	protected static String	LANE_UNDEFINED	= "undefined-lane";
 	
 	/** The activity execution handlers (activity type -> handler). */
-	public static final Map	DEFAULT_HANDLERS;
+	public static final Map	PLAN_ACTIVITY_HANDLERS;
 	
 	static
 	{
-		Map	defhandlers	= new HashMap(BpmnInterpreter.DEFAULT_HANDLERS);
+		Map	defhandlers	= new HashMap(BpmnInterpreter.DEFAULT_ACTIVITY_HANDLERS);
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE, new EventIntermediateMessageActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new EventIntermediateRuleActicityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL, new EventIntermediateSignalActivityHandler());
-		DEFAULT_HANDLERS	= Collections.unmodifiableMap(defhandlers);
+		PLAN_ACTIVITY_HANDLERS	= Collections.unmodifiableMap(defhandlers);
 	}
 	
 	//-------- attributes --------
@@ -124,7 +124,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public BpmnPlanBodyInstance(MBpmnModel model, final BDIInterpreter interpreter, final Object rcapa, final Object rplan)
 	{
-		super(interpreter.getComponentAdapter(), model, null, null, DEFAULT_HANDLERS, new OAVBDIFetcher(interpreter.getState(), rcapa, rplan));
+		super(interpreter.getComponentAdapter(), model, null, null, PLAN_ACTIVITY_HANDLERS, null, new OAVBDIFetcher(interpreter.getState(), rcapa, rplan));
 		this.interpreter	= interpreter;
 		this.state = interpreter.getState();
 		this.rcapa = rcapa;
@@ -236,7 +236,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 				{
 					it.remove();
 					assert thread.isWaiting();
-					((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), this, thread, null);
+					BpmnPlanBodyInstance.this.notify(thread.getActivity(), thread, null);
 				}
 			}
 		}
@@ -253,7 +253,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 				{
 					if(thread.isWaiting() && thread.getWaitFilter().filter(dispelem))
 					{
-						((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), this, thread, getFlyweight(dispelem));
+						BpmnPlanBodyInstance.this.notify(thread.getActivity(), thread, getFlyweight(dispelem));
 					}
 				}
 				catch(Exception e)
@@ -1321,36 +1321,101 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 * /
 	public void invokeLater(final Runnable action)
 	{
+		// Redirect to component instance.
+		interpreter.invokeLater(action);
+		
 		// Called from outside (e.g. workflow client)
 		// when task is finished
 		// Check if plan should be set to ready (Hack!!!)
-		interpreter.invokeLater(new Runnable()
+//		interpreter.invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
+//				// The DefaultActivityHandler.step() may rethrow an exception that
+//				// occurred within task execution.
+//				// It is catched an stored in the plan to be rethrown from the
+//				// BPMNPlanExecutor.executeStep() method.
+//				// The plan must always be set to ready to transfer the state
+//				// of the process thread to the plan.
+//				try
+//				{
+//					action.run();
+//				}
+//				catch(Throwable t)
+//				{
+//					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_exception, t);
+//				}
+//				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+//				
+////				String lane = getLane(getLastState());
+////				if(isReady(null, lane))
+////				{
+////					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+////				}
+//			}	
+//		});
+	}
+	
+	/**
+	 *  Method that should be called, when an activity is finished and the following activity should be scheduled.
+	 *  Can safely be called from external threads.
+	 *  @param activity	The timing event activity.
+	 *  @param instance	The process instance.
+	 *  @param thread	The process thread.
+	 *  @param event	The event that has occurred, if any.
+	 */
+	public void	notify(final MActivity activity, final ProcessThread thread, final Object event)
+	{
+		if(isExternalThread())
 		{
-			public void run()
+			invokeLater(new Runnable()
 			{
-				// The DefaultActivityHandler.step() may rethrow an exception that
-				// occurred within task execution.
-				// It is catched an stored in the plan to be rethrown from the
-				// BPMNPlanExecutor.executeStep() method.
-				// The plan must always be set to ready to transfer the state
-				// of the process thread to the plan.
+				public void run()
+				{
+					if(thread.getActivity().equals(activity))
+					{
+						try
+						{
+							getStepHandler(activity).step(activity, BpmnPlanBodyInstance.this, thread, event);
+						}
+						catch(Throwable t)
+						{
+							if(state.containsObject(rplan))
+								state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_exception, t);
+						}
+						thread.setNonWaiting();
+						if(state.containsObject(rplan))
+							state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+					}
+					else
+					{
+						System.out.println("Nop, due to outdated notify: "+thread+" "+activity);
+					}
+				}
+			});
+		}
+		else
+		{
+			if(thread.getActivity().equals(activity))
+			{
 				try
 				{
-					action.run();
+					getStepHandler(activity).step(activity, BpmnPlanBodyInstance.this, thread, event);
 				}
 				catch(Throwable t)
 				{
-					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_exception, t);
+					if(state.containsObject(rplan))
+						state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_exception, t);
 				}
-				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
-				
-//				String lane = getLane(getLastState());
-//				if(isReady(null, lane))
-//				{
-//					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
-//				}
-			}	
-		});
+				thread.setNonWaiting();
+				if(state.containsObject(rplan))
+					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+			}
+			else
+			{
+				System.out.println("Nop, due to outdated notify: "+thread+" "+activity);
+			}
+		}
 	}*/
 	
 	/**

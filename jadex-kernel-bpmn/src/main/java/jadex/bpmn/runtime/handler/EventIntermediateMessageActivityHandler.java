@@ -1,11 +1,5 @@
 package jadex.bpmn.runtime.handler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
@@ -14,6 +8,12 @@ import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  *  Handler for message events.
@@ -133,7 +133,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 		}
 		
 		ms.sendMessage(msg, mt, instance.getComponentAdapter().getComponentIdentifier(), instance.getClassLoader());
-		step(activity, instance, thread, null);
+		instance.getStepHandler(activity).step(activity, instance, thread, null);
 	}
 	
 	/**

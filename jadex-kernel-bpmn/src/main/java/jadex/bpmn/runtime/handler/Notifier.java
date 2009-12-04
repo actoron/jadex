@@ -45,6 +45,6 @@ public class Notifier
 	 */
 	public void notify(final Object event)
 	{
-		handler.notify(activity, instance, thread, event);
+		instance.notify(activity, thread, event);
 	}
 }

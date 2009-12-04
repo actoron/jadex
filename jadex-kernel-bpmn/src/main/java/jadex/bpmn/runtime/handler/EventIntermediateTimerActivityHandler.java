@@ -27,7 +27,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 		{
 			public void timeEventOccurred(long currenttime)
 			{
-				EventIntermediateTimerActivityHandler.this.notify(activity, instance, thread, null);
+				instance.notify(activity, thread, null);
 			}
 		});
 		return ret;

@@ -15,7 +15,7 @@ public class EventEndErrorActivityHandler extends DefaultActivityHandler
 	protected void doExecute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
 		thread.setException(new EventEndErrorException(activity.getDescription()));
-		step(activity, instance, thread, null);
+		instance.getStepHandler(activity).step(activity, instance, thread, null);
 	}
 	
 	/**

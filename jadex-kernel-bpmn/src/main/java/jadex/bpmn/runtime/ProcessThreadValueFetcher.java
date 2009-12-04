@@ -63,6 +63,7 @@ public class ProcessThreadValueFetcher implements IValueFetcher
 		boolean	found	= false;
 		Object	value	= null;
 		
+		// Check for parameter value.
 		for(ProcessThread t=thread; t!=null && !found; t=t.getThreadContext().getInitiator() )
 		{
 			if(t.hasParameterValue(name))
@@ -72,6 +73,17 @@ public class ProcessThreadValueFetcher implements IValueFetcher
 			}
 		}
 		
+		// Check for process instance variable.
+		if(!found)
+		{
+			if(thread.getInstance().hasContextVariable(name))
+			{
+				value = thread.getInstance().getContextVariable(name);
+				found = true;
+			}
+		}
+		
+		// Ask contained fetcher.
 		if(!found && fetcher!=null)
 		{
 			value	= fetcher.fetchValue(name);

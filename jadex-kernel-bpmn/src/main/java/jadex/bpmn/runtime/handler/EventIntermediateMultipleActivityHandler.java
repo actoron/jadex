@@ -58,7 +58,7 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 *  @param context	The thread context.
-	 */
+	 * /
 	public void step(MActivity activity, BpmnInterpreter instance, ProcessThread thread, Object event)
 	{
 		MSequenceEdge next	= null;
@@ -91,7 +91,7 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 			throw new RuntimeException("Could not determine next edge: "+this);
 		
 		super.step(next.getTarget(), instance, thread, event);
-	}
+	}*/
 }
 
 /**

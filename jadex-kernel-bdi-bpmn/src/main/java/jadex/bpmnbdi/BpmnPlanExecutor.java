@@ -141,7 +141,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		// Find lane to execute.
 		String lane = bodyinstance.getLane(steptype);
 //		String planname = (String)interpreter.getState().getAttributeValue(interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name);
-//		System.out.println("Executing plan step: "+planname+", "+lane+", "+bodyinstance);
+//		System.out.println("Executing plan step: "+rplan+" "+planname+", "+lane+", "+bodyinstance);
 
 		Throwable throwable = null;
 		try
@@ -195,7 +195,8 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		// If exception has occurred during step() in notify() of task finishing then exception 
 		// is remembered and set here to determine the further plan state.
 		Throwable t = (Throwable)interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_exception);
-		if(t!=null)
+		if(OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY.equals(interpreter.getState()
+			.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate)) && t!=null)
 		{
 			throwable = t;
 		}

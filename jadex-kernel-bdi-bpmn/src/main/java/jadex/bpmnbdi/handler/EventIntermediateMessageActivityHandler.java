@@ -67,7 +67,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 				}
 			}
 			inst.sendMessage(me);
-			step(activity, instance, thread, null);
+			instance.getStepHandler(activity).step(activity, instance, thread, null);
 		}
 		else if(!thread.hasPropertyValue(PROPERTY_MODE) || MODE_RECEIVE.equals(thread.getPropertyValue(PROPERTY_MODE)))
 		{
@@ -76,7 +76,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 			final String	type	= (String)thread.getPropertyValue("type", activity);
 			thread.setWaiting(true);
 			thread.setWaitInfo(type);
-			System.out.println("Waiting for message: "+type);
+//			System.out.println("Waiting for message: "+type);
 			
 			// Does currently only match message type name.
 			thread.setWaitFilter(new IFilter()

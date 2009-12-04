@@ -129,7 +129,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_KQZA_XFYEd63xqPyP8ks8A" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_KQZA_nFYEd63xqPyP8ks8A" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="MovePlan.bpmn#_KQZA93FYEd63xqPyP8ks8A"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_KQZBBXFYEd63xqPyP8ks8A" x="16" y="16" width="1572" height="341"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_KQZBBXFYEd63xqPyP8ks8A" x="16" y="16" width="1410" height="341"/>
   </children>
   <children xmi:type="notation:Node" xmi:id="_LwzDwHFYEd63xqPyP8ks8A" type="1002">
     <children xmi:type="notation:Node" xmi:id="_LwzDxnFYEd63xqPyP8ks8A" type="4009"/>

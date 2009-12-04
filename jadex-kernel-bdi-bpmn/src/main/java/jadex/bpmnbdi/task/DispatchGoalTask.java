@@ -36,6 +36,8 @@ public class DispatchGoalTask	implements ITask
 			boolean	wait	= context.hasParameterValue("wait")
 				? ((Boolean)context.getParameterValue("wait")).booleanValue() : true;
 
+//			System.out.println("Create goal task: "+type+" "+params);
+				
 			final IGoal	goal	= plan.createGoal(type);
 			if(params!=null)
 			{

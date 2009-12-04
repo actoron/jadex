@@ -32,20 +32,20 @@ public class TaskActivityHandler extends DefaultActivityHandler
 				{
 					public void resultAvailable(Object result)
 					{
-						TaskActivityHandler.this.notify(activity, instance, thread, null);
+						instance.notify(activity, thread, null);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
 						thread.setException(exception);
-						TaskActivityHandler.this.notify(activity, instance, thread, null);
+						instance.notify(activity, thread, null);
 					}
 				});
 			}
 			catch(Exception e)
 			{
 				thread.setException(e);
-				TaskActivityHandler.this.notify(activity, instance, thread, null);
+				instance.notify(activity, thread, null);
 			}
 		}
 		else

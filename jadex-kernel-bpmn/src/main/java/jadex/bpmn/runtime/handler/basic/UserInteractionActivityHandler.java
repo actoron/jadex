@@ -39,7 +39,7 @@ public class UserInteractionActivityHandler extends DefaultActivityHandler
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				UserInteractionActivityHandler.this.notify(activity, instance, thread, null);
+				instance.notify(activity, thread, null);
 				frame.dispose();
 			}
 		});
@@ -50,7 +50,7 @@ public class UserInteractionActivityHandler extends DefaultActivityHandler
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				UserInteractionActivityHandler.this.notify(activity, instance, thread, null);
+				instance.notify(activity, thread, null);
 				System.exit(0);
 			}
 		});

@@ -3,11 +3,13 @@ package jadex.bpmn.runtime;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
+import jadex.bpmn.runtime.handler.DefaultStepHandler;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMessageActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMultipleActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateNotificationHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateTimerActivityHandler;
+import jadex.bpmn.runtime.handler.EventMultipleStepHandler;
 import jadex.bpmn.runtime.handler.GatewayParallelActivityHandler;
 import jadex.bpmn.runtime.handler.GatewayXORActivityHandler;
 import jadex.bpmn.runtime.handler.SubProcessActivityHandler;
@@ -43,34 +45,45 @@ import java.util.logging.Logger;
  *  and a user-written micro agent. 
  */
 public class BpmnInterpreter implements IComponentInstance, IExternalAccess // Hack!!!
-{
+{	
 	//-------- static part --------
 
 	/** The activity execution handlers (activity type -> handler). */
-	public static final Map DEFAULT_HANDLERS;
+	public static final Map DEFAULT_ACTIVITY_HANDLERS;
+	
+	/** The step execution handlers (activity type -> handler). */
+	public static final Map DEFAULT_STEP_HANDLERS;
+
 
 	static
 	{
-		Map defhandlers = new HashMap();
-	
-		defhandlers.put(MBpmnModel.TASK, new TaskActivityHandler());
-		defhandlers.put(MBpmnModel.SUBPROCESS, new SubProcessActivityHandler());
-	
-		defhandlers.put(MBpmnModel.GATEWAY_PARALLEL, new GatewayParallelActivityHandler());
-		defhandlers.put(MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE, new GatewayXORActivityHandler());
-	
-		defhandlers.put(MBpmnModel.EVENT_START_EMPTY, new DefaultActivityHandler());
-		defhandlers.put(MBpmnModel.EVENT_END_EMPTY, new DefaultActivityHandler());
-		defhandlers.put(MBpmnModel.EVENT_END_ERROR, new EventEndErrorActivityHandler());
-		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_ERROR, new DefaultActivityHandler());
-		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());
-		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE, new EventIntermediateMessageActivityHandler());
-		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE, new EventIntermediateMultipleActivityHandler());
-		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL, new EventIntermediateNotificationHandler());
-//		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new UserInteractionActivityHandler());
-		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new EventIntermediateNotificationHandler());
+		Map stephandlers = new HashMap();
 		
-		DEFAULT_HANDLERS = Collections.unmodifiableMap(defhandlers);
+		stephandlers.put(IStepHandler.STEP_HANDLER, new DefaultStepHandler());
+		stephandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE, new EventMultipleStepHandler());
+		
+		DEFAULT_STEP_HANDLERS = Collections.unmodifiableMap(stephandlers);
+		
+		Map activityhandlers = new HashMap();
+		
+		activityhandlers.put(MBpmnModel.TASK, new TaskActivityHandler());
+		activityhandlers.put(MBpmnModel.SUBPROCESS, new SubProcessActivityHandler());
+	
+		activityhandlers.put(MBpmnModel.GATEWAY_PARALLEL, new GatewayParallelActivityHandler());
+		activityhandlers.put(MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE, new GatewayXORActivityHandler());
+	
+		activityhandlers.put(MBpmnModel.EVENT_START_EMPTY, new DefaultActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_END_EMPTY, new DefaultActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_END_ERROR, new EventEndErrorActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_ERROR, new DefaultActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE, new EventIntermediateMessageActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE, new EventIntermediateMultipleActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL, new EventIntermediateNotificationHandler());
+//		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new UserInteractionActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new EventIntermediateNotificationHandler());
+		
+		DEFAULT_ACTIVITY_HANDLERS = Collections.unmodifiableMap(activityhandlers);
 	}
 	
 	//-------- attributes --------
@@ -100,7 +113,10 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	
 	
 	/** The activity handlers. */
-	protected Map	handlers;
+	protected Map activityhandlers;
+	
+	/** The step handlers. */
+	protected Map stephandlers;
 
 	/** The global value fetcher. */
 	protected IValueFetcher	fetcher;
@@ -133,14 +149,15 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	 *  @param adapter The adapter.
 	 */
 	public BpmnInterpreter(IComponentAdapter adapter, MBpmnModel model, Map arguments, 
-		String config, Map handlers, IValueFetcher fetcher)
+		String config, Map activityhandlers, Map stephandlers, IValueFetcher fetcher)
 	{
 		this.adapter = adapter;
 		this.model = model;
 		this.config = config;
 		this.arguments = arguments;
 		this.ext_entries = Collections.synchronizedList(new ArrayList());
-		this.handlers = handlers!=null? handlers: DEFAULT_HANDLERS;
+		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
+		this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
 		this.fetcher = fetcher!=null? fetcher: new BpmnInstanceFetcher(this, fetcher);
 		this.context = new ThreadContext(model);
 		this.messages = new ArrayList();
@@ -286,7 +303,8 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 						IFilter filter = pt.getWaitFilter();
 						if(filter!=null && filter.filter(message))
 						{
-							((DefaultActivityHandler)getActivityHandler(pt.getActivity())).notify(pt.getActivity(), BpmnInterpreter.this, pt, message);
+							BpmnInterpreter.this.notify(pt.getActivity(), pt, message);
+//							((DefaultActivityHandler)getActivityHandler(pt.getActivity())).notify(pt.getActivity(), BpmnInterpreter.this, pt, message);
 							processed = true;
 						}
 					}
@@ -648,7 +666,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			thread.updateParameters(this);
 			
 			// Find handler and execute activity.
-			IActivityHandler handler = (IActivityHandler)handlers.get(thread.getActivity().getActivityType());
+			IActivityHandler handler = (IActivityHandler)activityhandlers.get(thread.getActivity().getActivityType());
 			if(handler==null)
 				throw new UnsupportedOperationException("No handler for activity: "+thread);
 			handler.execute(thread.getActivity(), this, thread);
@@ -667,7 +685,8 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 					IFilter filter = thread.getWaitFilter();
 					if(filter!=null && filter.filter(message))
 					{
-						((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), BpmnInterpreter.this, thread, message);
+						notify(thread.getActivity(), thread, message);
+//						((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), BpmnInterpreter.this, thread, message);
 						processed = true;
 						messages.remove(i);
 //						System.out.println("Dispatched from waitqueue: "+messages.size()+" "+message);
@@ -697,6 +716,48 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	}
 	
 	/**
+	 *  Method that should be called, when an activity is finished and the following activity should be scheduled.
+	 *  Can safely be called from external threads.
+	 *  @param activity	The timing event activity.
+	 *  @param instance	The process instance.
+	 *  @param thread	The process thread.
+	 *  @param event	The event that has occurred, if any.
+	 */
+	public void	notify(final MActivity activity, final ProcessThread thread, final Object event)
+	{
+		if(isExternalThread())
+		{
+			invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					if(thread.getActivity().equals(activity))
+					{
+						getStepHandler(activity).step(activity, BpmnInterpreter.this, thread, event);
+						thread.setNonWaiting();
+					}
+					else
+					{
+						System.out.println("Nop, due to outdated notify: "+thread+" "+activity);
+					}
+				}
+			});
+		}
+		else
+		{
+			if(thread.getActivity().equals(activity))
+			{
+				getStepHandler(activity).step(activity, BpmnInterpreter.this, thread, event);
+				thread.setNonWaiting();
+			}
+			else
+			{
+				System.out.println("Nop, due to outdated notify: "+thread+" "+activity);
+			}
+		}
+	}
+	
+	/**
 	 *  Add an external entry to be invoked during the next executeStep.
 	 *  This method may be called from external threads.
 	 *  @param code	The external code. 
@@ -718,7 +779,17 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	 */
 	public IActivityHandler getActivityHandler(MActivity activity)
 	{
-		return (IActivityHandler)handlers.get(activity.getActivityType());
+		return (IActivityHandler)activityhandlers.get(activity.getActivityType());
+	}
+	
+	/**
+	 *  Get the step handler.
+	 *  @return The step handler.
+	 */
+	public IStepHandler getStepHandler(MActivity activity)
+	{
+		IStepHandler ret = (IStepHandler)stephandlers.get(activity.getActivityType());
+		return ret!=null? ret: (IStepHandler)stephandlers.get(IStepHandler.STEP_HANDLER);
 	}
 
 	/**

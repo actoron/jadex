@@ -376,6 +376,15 @@ public class ProcessThread	implements ITaskContext
 	}
 	
 	/**
+	 *  Get the instance.
+	 *  @return The instance.
+	 */
+	public BpmnInterpreter getInstance()
+	{
+		return this.instance;
+	}
+
+	/**
 	 *  Test if the thread belongs to the given pool and/or lane.
 	 *  @param pool	The pool to be executed or null for any.
 	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
