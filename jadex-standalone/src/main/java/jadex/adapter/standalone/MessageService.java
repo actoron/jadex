@@ -22,6 +22,7 @@ import jadex.service.clock.IClockService;
 import jadex.service.execution.IExecutionService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -134,8 +135,10 @@ public class MessageService implements IMessageService
 		Object tmp = msgcopy.get(type.getReceiverIdentifier());
 		if(tmp instanceof Collection)
 			receivers = (IComponentIdentifier[])((Collection)tmp).toArray(new IComponentIdentifier[0]);
-		else
+		else if(tmp.getClass().isArray())
 			receivers = (IComponentIdentifier[])tmp;
+		else if(tmp instanceof IComponentIdentifier)
+			receivers = new IComponentIdentifier[]{(IComponentIdentifier)tmp};
 		
 		if(receivers==null || receivers==new IComponentIdentifier[0])
 		{
