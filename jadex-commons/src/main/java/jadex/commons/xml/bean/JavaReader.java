@@ -80,7 +80,7 @@ public class JavaReader extends Reader
 			TypeInfo ti_list = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "List")}, List.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS,
-					null, null, null, null, null, null, ArrayList.class.getMethod("add", new Class[]{Object.class})))
+					null, null, null, null, null, null, List.class.getMethod("add", new Class[]{Object.class})))
 			});
 			typeinfos.add(ti_list);
 			
@@ -89,7 +89,7 @@ public class JavaReader extends Reader
 			TypeInfo ti_set = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Set")}, Set.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS,
-					null, null, null, null, null, null, HashSet.class.getMethod("add", new Class[]{Object.class})))
+					null, null, null, null, null, null, Set.class.getMethod("add", new Class[]{Object.class})))
 			});
 			typeinfos.add(ti_set);
 			
