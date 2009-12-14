@@ -324,7 +324,7 @@ public class SimulationWindow extends JFrame
 		statusBar.setText(msg);
 	}
 	
-	public void refreshStatePanel()
+	public void refreshParameterStates()
 	{
 		Object panel = mainPane.getRightComponent();
 		if (panel instanceof IStatePanel)

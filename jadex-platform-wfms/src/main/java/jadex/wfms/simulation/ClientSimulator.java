@@ -158,7 +158,7 @@ public class ClientSimulator implements IClient
 		return userName;
 	}
 	
-	private void updateStatusBar()
+	private void updateGui()
 	{
 		if (clientProcessMetaModel != null)
 		{
@@ -171,7 +171,7 @@ public class ClientSimulator implements IClient
 		}
 		else
 			simWindow.setStatusBar(" ");
-		simWindow.refreshStatePanel();
+		simWindow.refreshParameterStates();
 	}
 	
 	private void setupActions()
@@ -195,11 +195,11 @@ public class ClientSimulator implements IClient
 					{
 						public void stateChanged(ChangeEvent e)
 						{
-							updateStatusBar();
+							updateGui();
 						}
 					});
 					clientProcessMetaModel = model;
-					updateStatusBar();
+					updateGui();
 				}
 				catch (Exception e1)
 				{
