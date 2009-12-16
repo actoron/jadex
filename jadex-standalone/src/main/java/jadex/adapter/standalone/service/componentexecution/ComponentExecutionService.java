@@ -412,12 +412,13 @@ public class ComponentExecutionService implements IComponentExecutionService
 //			System.out.println("CleanupCommand: "+result);
 			IComponentDescription ad = (IComponentDescription)descs.get(cid);
 			Map results = null;
+			StandaloneComponentAdapter	adapter;
 			synchronized(adapters)
 			{
 				synchronized(descs)
 				{
 //					System.out.println("CleanupCommand remove called for: "+cid);
-					StandaloneComponentAdapter	adapter	= (StandaloneComponentAdapter)adapters.remove(cid);
+					adapter = (StandaloneComponentAdapter)adapters.remove(cid);
 					if(adapter==null)
 						throw new RuntimeException("Component Identifier not registered: "+cid);
 					

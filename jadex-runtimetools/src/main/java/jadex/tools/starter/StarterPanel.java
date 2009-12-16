@@ -4,6 +4,7 @@ import jadex.adapter.base.SComponentFactory;
 import jadex.adapter.base.appdescriptor.ApplicationModel;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IArgument;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
 import jadex.bridge.ILoadableComponentModel;
@@ -410,7 +411,8 @@ public class StarterPanel extends JPanel
 									ac = (IApplicationContext)cs.getContext(apn);
 								}
 							}	
-							final String typename = ac!=null? ac.getAgentType(filename.getText()): filename.getText();
+							String typename = ac!=null? ac.getAgentType(filename.getText()): filename.getText();
+							final String fullname = model.getPackage()+"."+model.getName();
 							if(typename==null)
 							{
 								JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), "Could not resolve agent type: "
@@ -420,6 +422,7 @@ public class StarterPanel extends JPanel
 							else
 							{
 								IResultListener killlistener = null;
+								final ILoadableComponentModel mymodel = model;
 								if(storeresults!=null && storeresults.isSelected())
 								{
 									killlistener = new IResultListener()
@@ -430,9 +433,10 @@ public class StarterPanel extends JPanel
 											{
 												public void run()
 												{
-													System.out.println("typename: "+typename+" "+model.getFilename());
-													resultsets.put(typename, new Object[]{source, result});
-													if(model!=null && typename.equals(model.getFilename()))
+//													System.out.println("fullname: "+fullname+" "+model.getFilename());
+													String tmp = (String)mymodel.getPackage()+"."+mymodel.getName();
+													resultsets.put(tmp, new Object[]{source, result});
+													if(model!=null && fullname.equals(model.getPackage()+"."+model.getName()))
 													{
 														selectavail.addItem(source);
 														refreshResults();
@@ -1079,7 +1083,7 @@ public class StarterPanel extends JPanel
 //		System.out.println("Selected index: "+sel+selectavail.getSelectedItem().hashCode());
 		if(sel>0)
 		{
-			List rs = (List)resultsets.get(model.getFilename());
+			List rs = (List)resultsets.get(model.getPackage()+"."+model.getName());
 			Object[] r = (Object[])rs.get(sel-1);
 			mres = (Map)r[1];
 		}
@@ -1152,7 +1156,7 @@ public class StarterPanel extends JPanel
 				}
 			});
 			
-			List rs = (List)resultsets.get(model.getFilename());
+			List rs = (List)resultsets.get(model.getPackage()+"."+model.getName());
 			if(rs!=null)
 			{
 				for(int i=0; i<rs.size(); i++)
