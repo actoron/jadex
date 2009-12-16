@@ -264,8 +264,9 @@ public class StarterPlugin extends AbstractJCCPlugin
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 							String type = ((FileNode)node).getFile().getAbsolutePath();
 //							if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(type))
+							// todo: resultcollect = false?
 							if(SComponentFactory.isStartable(getJCC().getServiceContainer(), type))
-								createComponent(type, null, null, null, false);
+								createComponent(type, null, null, null, false, null);
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
 					}
@@ -372,20 +373,20 @@ public class StarterPlugin extends AbstractJCCPlugin
 		IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
 		ces.getComponentDescriptions(new IResultListener()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Object source, Object result)
 			{
 				IComponentDescription[] res = (IComponentDescription[])result;
 				for(int i=0; i<res.length; i++)
 					componentBorn(res[i]);
 			}
 			
-			public void exceptionOccurred(Exception exception)
+			public void exceptionOccurred(Object source, Exception exception)
 			{
 			}
 		});
 		ces.addComponentListener(null, new IComponentListener()
 		{
-			public void componentRemoved(IComponentDescription desc)
+			public void componentRemoved(IComponentDescription desc, Map results)
 			{
 				componentDied(desc);
 			}
@@ -551,11 +552,11 @@ public class StarterPlugin extends AbstractJCCPlugin
 					IComponentExecutionService ces = (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
 					ces.suspendComponent(((IComponentDescription)node.getUserObject()).getName(), new IResultListener()
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(Object source, Object result)
 						{
 							getJCC().setStatusText("Suspended component: " + result);
 						}						
-						public void exceptionOccurred(Exception exception)
+						public void exceptionOccurred(Object source, Exception exception)
 						{
 							getJCC().displayError("Problem Suspending Component", "Component could not be suspended.", exception);
 						}
@@ -597,11 +598,11 @@ public class StarterPlugin extends AbstractJCCPlugin
 					IComponentExecutionService ces = (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
 					ces.resumeComponent(((IComponentDescription)node.getUserObject()).getName(), new IResultListener()
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(Object source, Object result)
 						{
 							getJCC().setStatusText("Resumed component: " + result);
 						}						
-						public void exceptionOccurred(Exception exception)
+						public void exceptionOccurred(Object source, Exception exception)
 						{
 							getJCC().displayError("Problem Resuming Component", "Component could not be resumed.", exception);
 						}
@@ -643,11 +644,11 @@ public class StarterPlugin extends AbstractJCCPlugin
 					IComponentExecutionService ces = (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
 					ces.destroyComponent(((IComponentDescription)node.getUserObject()).getName(), new IResultListener()
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(Object source, Object result)
 						{
 							getJCC().setStatusText("Killed component: " + result);
 						}						
-						public void exceptionOccurred(Exception exception)
+						public void exceptionOccurred(Object source, Exception exception)
 						{
 							getJCC().displayError("Problem Killing Component", "Component could not be killed.", exception);
 						}
@@ -676,7 +677,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 						final IContext context = (IContext)node.getUserObject();
 						cs.deleteContext(context, new IResultListener()
 						{
-							public void exceptionOccurred(Exception exception)
+							public void exceptionOccurred(Object source, Exception exception)
 							{
 								SwingUtilities.invokeLater(new Runnable()
 								{
@@ -687,7 +688,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 									}
 								});
 							}
-							public void resultAvailable(Object result)
+							public void resultAvailable(Object source, Object result)
 							{
 								jcc.setStatusText("Killed application: "+context.getName());
 							}
@@ -719,10 +720,10 @@ public class StarterPlugin extends AbstractJCCPlugin
 			
 			getJCC().getServiceContainer().shutdown(new IResultListener()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(Object source, Object result)
 				{
 				}						
-				public void exceptionOccurred(Exception exception)
+				public void exceptionOccurred(Object source,Exception exception)
 				{
 					getJCC().displayError("Platform Shutdown Problem", "Could not kill platform.", exception);
 				}
@@ -831,7 +832,8 @@ public class StarterPlugin extends AbstractJCCPlugin
 									{
 										public void actionPerformed(ActionEvent e)
 										{
-											createComponent(type, null, config, null, false);
+											// todo: collectresults = false?
+											createComponent(type, null, config, null, false, null);
 										}
 									});
 									me.setToolTipText("Start in configuration: "+config);
@@ -857,7 +859,8 @@ public class StarterPlugin extends AbstractJCCPlugin
 								{
 									public void actionPerformed(ActionEvent e)
 									{
-										createComponent(type, null, null, null, false);
+										// todo: collectresults = false?
+										createComponent(type, null, null, null, false, null);
 									}
 								});
 							}
@@ -950,20 +953,20 @@ public class StarterPlugin extends AbstractJCCPlugin
 	 *  Create a new component on the platform.
 	 *  Any errors will be displayed in a dialog to the user.
 	 */
-	public void createComponent(String type, String name, String configname, Map arguments, boolean suspend)
+	public void createComponent(String type, String name, String configname, Map arguments, boolean suspend, IResultListener killlistener)
 	{
 		final IComponentExecutionService	ces	= (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
 		ces.createComponent(name, type, configname, arguments, suspend, new IResultListener()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Object source, Object result)
 			{
 				getJCC().setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
 			}
 			
-			public void exceptionOccurred(Exception exception)
+			public void exceptionOccurred(Object source, Exception exception)
 			{
 				getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
 			}
-		}, null);
+		}, null, killlistener);
 	}
 }

@@ -280,7 +280,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		if(!fatalerror)
 			component.killComponent(listener);
 		else if(listener!=null)
-			listener.resultAvailable(getComponentIdentifier());
+			listener.resultAvailable(this, getComponentIdentifier());
 			
 	}
 
@@ -436,7 +436,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 				}
 				again	= again && IComponentDescription.STATE_ACTIVE.equals(desc.getState());
 				if(steplistener!=null)
-					steplistener.resultAvailable(desc.clone());
+					steplistener.resultAvailable(this, desc.clone());
 			}
 		}
 
@@ -501,7 +501,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	public void	doStep(IResultListener listener)
 	{
 		if(dostep)
-			listener.exceptionOccurred(new RuntimeException("Only one step allowed at a time."));
+			listener.exceptionOccurred(this, new RuntimeException("Only one step allowed at a time."));
 			
 		this.dostep	= true;
 		this.steplistener	= listener;

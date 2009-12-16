@@ -172,6 +172,20 @@ public class MicroAgentModel implements ILoadableComponentModel
 	}
 	
 	/**
+	 *  Get the results.
+	 *  @return The results.
+	 */
+	public IArgument[] getResults()
+	{		
+		IArgument[] ret;
+		if(metainfo!=null)
+			ret = metainfo.getResults();
+		else
+			ret = new IArgument[0];
+		return ret;
+	}
+	
+	/**
 	 *  Get the filename.
 	 *  @return The filename.
 	 */

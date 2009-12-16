@@ -45,7 +45,7 @@ public abstract class AbstractClientTask implements ITask
 		IResultListener redirListener = new IResultListener()
 		{
 			
-			public void resultAvailable(Object result)
+			public void resultAvailable(Object source, Object result)
 			{
 				for (Iterator it = parameterValues.entrySet().iterator(); it.hasNext(); )
 				{
@@ -56,12 +56,12 @@ public abstract class AbstractClientTask implements ITask
 					}
 				}
 				//System.out.println(listener.getClass().getName());
-				listener.resultAvailable(result);
+				listener.resultAvailable(source, result);
 			}
 			
-			public void exceptionOccurred(Exception exception)
+			public void exceptionOccurred(Object source, Exception exception)
 			{
-				listener.exceptionOccurred(exception);
+				listener.exceptionOccurred(source, exception);
 			}
 		};
 		return new Workitem(context.getModelElement().getName(), type, "NoRole", parameterTypes, parameterValues, readOnlyParameters, redirListener);

@@ -103,7 +103,7 @@ public class SimulationService implements ISimulationService
 	{
 		pause();
 		if(listener!=null)
-			listener.resultAvailable(null);
+			listener.resultAvailable(this, null);
 	}
 	
 	//-------- methods --------

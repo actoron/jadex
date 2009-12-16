@@ -358,6 +358,36 @@ public class ProcessThread	implements ITaskContext
 	}
 	
 	/**
+	 *  Check if the value of a result is set.
+	 *  @param name	The result name. 
+	 *  @return	True, if the result is set to some value. 
+	 */
+	public boolean hasResultValue(String name)
+	{
+		return instance.hasResultValue(name);
+	}
+
+	/**
+	 *  Get the value of a result.
+	 *  @param name	The result name. 
+	 *  @return	The result value. 
+	 */
+	public Object getResultValue(String name)
+	{
+		return instance.getResultValue(name);
+	}
+	
+	/**
+	 *  Set the value of a result.
+	 *  @param name	The result name. 
+	 *  @param value The result value. 
+	 */
+	public void	setResultValue(String name, Object value)
+	{
+		instance.setResultValue(name, value);
+	}
+	
+	/**
 	 *  Get the exception (if any).
 	 *  @return	The exception (if any).
 	 */

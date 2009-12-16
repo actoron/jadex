@@ -52,7 +52,7 @@ public class AMSLocalUpdateAgentsPlan extends Plan
 					}
 				}
 						
-				public void componentRemoved(final IComponentDescription desc)
+				public void componentRemoved(final IComponentDescription desc, java.util.Map results)
 				{
 					try
 					{

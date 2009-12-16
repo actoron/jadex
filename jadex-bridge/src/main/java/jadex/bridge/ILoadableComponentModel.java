@@ -50,6 +50,12 @@ public interface ILoadableComponentModel
 	public IArgument[] getArguments();
 	
 	/**
+	 *  Get the results.
+	 *  @return The results.
+	 */
+	public IArgument[] getResults();
+	
+	/**
 	 *  Is the model startable.
 	 *  @return True, if startable.
 	 */

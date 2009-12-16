@@ -159,11 +159,11 @@ public class UserInteractionTask implements ITask
 			                {
 								Exception	e	= new RuntimeException("Task not completed");
 								e.fillInStackTrace();
-								listener.exceptionOccurred(e);		                	
+								listener.exceptionOccurred(UserInteractionTask.this, e);		                	
 			                }
 			                else
 			                {
-								listener.resultAvailable(null);
+								listener.resultAvailable(UserInteractionTask.this, null);
 			                }
 		            	}
 		            }

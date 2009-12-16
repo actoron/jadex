@@ -153,7 +153,7 @@ public class AgentActionList
 							{
 								if(wakeup)
 								{
-									entry.listener.resultAvailable(ret);
+									entry.listener.resultAvailable(this, ret);
 								}
 								else
 								{
@@ -170,7 +170,7 @@ public class AgentActionList
 							{
 								if(wakeup)
 								{
-									entry.listener.exceptionOccurred(e);
+									entry.listener.exceptionOccurred(this, e);
 								}
 								else
 								{
@@ -211,11 +211,11 @@ public class AgentActionList
 						it.remove();
 						if(entry.exception==null)
 						{
-							entry.listener.resultAvailable(entry.result);
+							entry.listener.resultAvailable(this, entry.result);
 						}
 						else
 						{
-							entry.listener.exceptionOccurred(entry.exception);
+							entry.listener.exceptionOccurred(this, entry.exception);
 						}
 					}
 				}

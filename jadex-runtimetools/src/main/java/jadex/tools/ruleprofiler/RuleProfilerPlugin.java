@@ -19,6 +19,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
@@ -214,7 +215,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin
 		IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
 		ces.addComponentListener(null, new IComponentListener()
 		{
-			public void componentRemoved(IComponentDescription desc)
+			public void componentRemoved(IComponentDescription desc, Map results)
 			{
 				agentDied(desc);
 			}

@@ -223,7 +223,7 @@ public class AgentRules
 				{
 					for(Iterator it=killlisteners.iterator(); it.hasNext(); )
 					{
-						((IResultListener)it.next()).resultAvailable(interpreter.getComponentAdapter().getComponentIdentifier());
+						((IResultListener)it.next()).resultAvailable(interpreter.getComponentAdapter().getComponentIdentifier(), interpreter.getComponentAdapter().getComponentIdentifier());
 					}
 				}
 				

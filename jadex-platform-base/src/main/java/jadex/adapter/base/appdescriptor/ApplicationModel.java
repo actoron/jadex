@@ -192,6 +192,16 @@ public class ApplicationModel implements ILoadableComponentModel
 	}
 	
 	/**
+	 *  Get the results.
+	 *  @return The results.
+	 */
+	public IArgument[] getResults()
+	{
+		// todo
+		return new IArgument[0];
+	}
+	
+	/**
 	 *  Is the model startable.
 	 *  @return True, if startable.
 	 */

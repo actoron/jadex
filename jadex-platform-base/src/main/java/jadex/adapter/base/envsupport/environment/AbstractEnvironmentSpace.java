@@ -479,7 +479,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					// todo: what about arguments etc.?
 					((ApplicationContext)getContext()).createAgent(name, agenttype, null, null, false, false, new IResultListener() {
 						
-						public void resultAvailable(Object result)
+						public void resultAvailable(Object source, Object result)
 						{
 							IComponentIdentifier	agent	= (IComponentIdentifier)result;
 							
@@ -489,7 +489,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //							SComponentExecutionService.startComponent(((ApplicationContext)getContext()).getPlatform(), agent, null);
 						}
 						
-						public void exceptionOccurred(Exception exception)
+						public void exceptionOccurred(Object source, Exception exception)
 						{
 							exception.printStackTrace();
 						}

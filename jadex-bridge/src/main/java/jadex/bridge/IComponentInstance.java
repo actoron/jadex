@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import java.util.Map;
+
 import jadex.commons.concurrent.IResultListener;
 
 /**
@@ -66,4 +68,9 @@ public interface IComponentInstance
 	 */
 	public ClassLoader getClassLoader();
 	
+	/**
+	 *  Get the results of the component (considering it as a functionality).
+	 *  @return The results map (name -> value). 
+	 */
+	public Map getResults();
 }

@@ -44,7 +44,7 @@ public class InternalEventTask	implements ITask
 		}
 		catch(Exception e)
 		{
-			listener.exceptionOccurred(e);
+			listener.exceptionOccurred(this, e);
 		}
 	}
 }

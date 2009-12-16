@@ -79,11 +79,11 @@ public class DF implements IDF, IService
 //				System.out.println("registered: "+clone.getName());
 			}
 			
-			listener.resultAvailable(clone);
+			listener.resultAvailable(this, clone);
 		}
 		else
 		{
-			listener.exceptionOccurred(new RuntimeException("Agent not registered: "+clone.getName()));
+			listener.exceptionOccurred(this, new RuntimeException("Agent not registered: "+clone.getName()));
 			
 //			System.out.println("not registered: "+clone.getName());			
 		}
@@ -105,14 +105,14 @@ public class DF implements IDF, IService
 			if(!agents.containsKey(adesc.getName()))
 			{
 				//throw new RuntimeException("Agent not registered: "+adesc.getName());
-				listener.exceptionOccurred(new RuntimeException("Agent not registered: "+adesc.getName()));
+				listener.exceptionOccurred(this, new RuntimeException("Agent not registered: "+adesc.getName()));
 				return;
 			}
 			agents.removeKey(adesc.getName());
 			//System.out.println("deregistered: "+adesc.getName());
 		}
 		
-		listener.resultAvailable(null);
+		listener.resultAvailable(this, null);
 	}
 
 	/**
@@ -137,12 +137,12 @@ public class DF implements IDF, IService
 				agents.replace(clone.getName(), clone);
 			}
 			//System.out.println("modified: "+clone.getName());
-			listener.resultAvailable(clone);
+			listener.resultAvailable(this, clone);
 		}
 		else
 		{
 			//throw new RuntimeException("Invalid lease time: "+clone.getLeaseTime());
-			listener.exceptionOccurred(new RuntimeException("Invalid lease time: "+clone.getLeaseTime()));
+			listener.exceptionOccurred(this, new RuntimeException("Invalid lease time: "+clone.getLeaseTime()));
 		}
 	}
 
@@ -206,7 +206,7 @@ public class DF implements IDF, IService
 		//System.out.println("Searched: "+ret);
 		//return (AgentDescription[])ret.toArray(new AgentDescription[ret.size()]);
 		
-		listener.resultAvailable(ret.toArray(new DFAgentDescription[ret.size()]));
+		listener.resultAvailable(this, ret.toArray(new DFAgentDescription[ret.size()]));
 	}
 
 	/**
@@ -347,7 +347,7 @@ public class DF implements IDF, IService
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
-		listener.resultAvailable(null);
+		listener.resultAvailable(this, null);
 	}
 
 	//-------- helper methods --------

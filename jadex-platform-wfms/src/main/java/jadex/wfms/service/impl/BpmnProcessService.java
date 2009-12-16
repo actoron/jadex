@@ -105,12 +105,12 @@ public class BpmnProcessService implements IExecutionService
 			//BpmnExecutor executor = new BpmnExecutor(instance, true);
 			ces.createComponent(String.valueOf(id), modelname, null, arguments, true, new IResultListener()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(Object source, Object result)
 				{
 					processes.put(id, result);
-					ces.addComponentListener((IComponentIdentifier) result, new IComponentListener() {
-						
-						public void componentRemoved(IComponentDescription desc)
+					ces.addComponentListener((IComponentIdentifier) result, new IComponentListener() 
+					{
+						public void componentRemoved(IComponentDescription desc, Map results)
 						{
 							synchronized (BpmnProcessService.this)
 							{
@@ -132,11 +132,11 @@ public class BpmnProcessService implements IExecutionService
 					ces.resumeComponent((IComponentIdentifier) result, null);
 				}
 				
-				public void exceptionOccurred(Exception exception)
+				public void exceptionOccurred(Object source, Exception exception)
 				{
 					((IMonitoringService) wfms.getService(IMonitoringService.class)).getLogger().log(Level.SEVERE, "Failed to start model: " + model.getFilename());
 				}
-			}, null);
+			}, null, null);
 		}
 		catch(Exception e)
 		{

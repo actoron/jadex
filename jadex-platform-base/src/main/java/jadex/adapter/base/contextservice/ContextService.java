@@ -194,15 +194,15 @@ public class ContextService	implements IContextService
 		{
 			((BaseContext)context).deleteContext(new IResultListener()
 			{
-				public void exceptionOccurred(Exception exception)
+				public void exceptionOccurred(Object source, Exception exception)
 				{
 					if(listener!=null)
-						listener.exceptionOccurred(exception);
+						listener.exceptionOccurred(source, exception);
 				}
-				public void resultAvailable(Object result)
+				public void resultAvailable(Object source, Object result)
 				{
 					if(listener!=null)
-						listener.resultAvailable(result);
+						listener.resultAvailable(source, result);
 					notifyListeners(new ChangeEvent(this, EVENT_TYPE_CONTEXT_DELETED, context));
 				}
 			});
@@ -302,15 +302,15 @@ public class ContextService	implements IContextService
 				{
 					int finished	= 0;
 					Exception	exception	= null;
-					public void exceptionOccurred(Exception exception)
+					public void exceptionOccurred(Object source, Exception exception)
 					{
-						finished(exception);
+						finished(source, exception);
 					}
-					public void resultAvailable(Object result)
+					public void resultAvailable(Object source, Object result)
 					{
-						finished(null);
+						finished(source, null);
 					}
-					protected synchronized void finished(Exception e)
+					protected synchronized void finished(Object source, Exception e)
 					{
 						if(exception==null && e!=null)
 							exception	= e;
@@ -318,9 +318,9 @@ public class ContextService	implements IContextService
 						if(finished==cs.length)
 						{
 							if(exception==null)
-								listener.resultAvailable(null);
+								listener.resultAvailable(source, null);
 							else
-								listener.exceptionOccurred(exception);
+								listener.exceptionOccurred(source, exception);
 						}
 					}
 				};

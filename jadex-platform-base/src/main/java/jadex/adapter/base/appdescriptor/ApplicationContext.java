@@ -107,12 +107,12 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 				int tokill	= agents.length;
 				Exception	exception;
 				
-				public void resultAvailable(Object result)
+				public void resultAvailable(Object source, Object result)
 				{
 					result();
 				}
 				
-				public void exceptionOccurred(Exception exception)
+				public void exceptionOccurred(Object source, Exception exception)
 				{
 					if(this.exception==null)	// Only return first exception.
 						this.exception	= exception;
@@ -129,9 +129,9 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 					if(tokill==0)
 					{
 						if(exception!=null)
-							listener.exceptionOccurred(exception);
+							listener.exceptionOccurred(this, exception);
 						else
-							listener.resultAvailable(ApplicationContext.this);
+							listener.resultAvailable(this, ApplicationContext.this);
 					}
 				}
 			} : null;
@@ -148,7 +148,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 		else
 		{
 			if(listener!=null)
-				listener.resultAvailable(this);
+				listener.resultAvailable(this, this);
 		}
 
 //		System.out.println("Deleted: "+this);
@@ -206,12 +206,12 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 		
 		ces.createComponent(name, at.getFilename(), configuration, arguments, true, new IResultListener()
 		{
-			public void exceptionOccurred(Exception exception)
+			public void exceptionOccurred(Object source, Exception exception)
 			{
 				if(listener!=null)
-					listener.exceptionOccurred(exception);
+					listener.exceptionOccurred(source, exception);
 			}
-			public void resultAvailable(Object result)
+			public void resultAvailable(Object source, Object result)
 			{
 				IComponentIdentifier aid = (IComponentIdentifier)result;
 				synchronized(ApplicationContext.this)
@@ -237,10 +237,10 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 				else
 				{
 					if(listener!=null)
-						listener.resultAvailable(result);
+						listener.resultAvailable(source, result);
 				}
 			}
-		}, creator);
+		}, creator, null);
 	}
 	
 	/**
@@ -425,5 +425,17 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	public ClassLoader getClassLoader()
 	{
 		return model.getClassLoader();
+	}
+	
+
+	/**
+	 *  Get the results of the component (considering it as a functionality).
+	 *  @return The results map (name -> value). 
+	 */
+	public Map getResults()
+	{
+		// todo!
+		
+		throw new UnsupportedOperationException();
 	}
 }

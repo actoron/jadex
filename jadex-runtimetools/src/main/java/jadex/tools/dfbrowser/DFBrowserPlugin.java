@@ -22,6 +22,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
+import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
@@ -179,20 +180,20 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 		IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
 		ces.getComponentDescriptions(new IResultListener()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Object source, Object result)
 			{
 				IComponentDescription[] res = (IComponentDescription[])result;
 				for(int i=0; i<res.length; i++)
 					agentBorn(res[i]);
 			}
 			
-			public void exceptionOccurred(Exception exception)
+			public void exceptionOccurred(Object source, Exception exception)
 			{
 			}
 		});
 		ces.addComponentListener(null, new IComponentListener()
 		{
-			public void componentRemoved(IComponentDescription desc)
+			public void componentRemoved(IComponentDescription desc, Map results)
 			{
 				agentDied(desc);
 			}

@@ -32,13 +32,13 @@ public class WaitForGoalTask	implements ITask
 						goal.removeGoalListener(this);
 						if(goal.isSucceeded())
 						{
-							listener.resultAvailable(null);
+							listener.resultAvailable(WaitForGoalTask.this, null);
 						}
 						else
 						{
 							Exception	e	= new GoalFailureException();
 							e.fillInStackTrace();
-							listener.exceptionOccurred(e);
+							listener.exceptionOccurred(WaitForGoalTask.this, e);
 						}
 					}
 					
@@ -49,18 +49,18 @@ public class WaitForGoalTask	implements ITask
 			}
 			else if(goal.isSucceeded())
 			{
-				listener.resultAvailable(null);
+				listener.resultAvailable(this, null);
 			}
 			else
 			{
 				Exception	e	= new GoalFailureException();
 				e.fillInStackTrace();
-				listener.exceptionOccurred(e);
+				listener.exceptionOccurred(this, e);
 			}
 		}
 		catch(Exception e)
 		{
-			listener.exceptionOccurred(e);
+			listener.exceptionOccurred(this, e);
 		}
 	}
 }

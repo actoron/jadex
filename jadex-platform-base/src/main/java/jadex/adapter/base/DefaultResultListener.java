@@ -47,7 +47,7 @@ public class DefaultResultListener implements IResultListener
 	 *  Called when the result is available.
 	 *  @param result The result.
 	 */
-	public void resultAvailable(Object result)
+	public void resultAvailable(Object source, Object result)
 	{
 		//logger.info(""+result);
 	}
@@ -56,9 +56,9 @@ public class DefaultResultListener implements IResultListener
 	 *  Called when an exception occurred.
 	 *  @param exception The exception.
 	 */
-	public void exceptionOccurred(Exception exception)
+	public void exceptionOccurred(Object source, Exception exception)
 	{
 		exception.printStackTrace();
-		logger.severe("Exception occurred: "+exception);
+		logger.severe(source+" exception occurred: "+exception);
 	}
 }

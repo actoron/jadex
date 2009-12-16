@@ -100,6 +100,9 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	/** The arguments. */
 	protected Map arguments;
 	
+	/** The results. */
+	protected Map results;
+	
 	// todo: ensure that entries are empty when saving
 	/** The entries added from external threads. */
 	protected transient final List ext_entries;
@@ -155,6 +158,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 		this.model = model;
 		this.config = config;
 		this.arguments = arguments;
+		this.results = new HashMap();
 		this.ext_entries = Collections.synchronizedList(new ArrayList());
 		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
 		this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
@@ -178,12 +182,23 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			}
 		}
 		
+		// Init the results with default values.
+		IArgument[] res = model.getResults();
+		for(int i=0; i<res.length; i++)
+		{
+			if(res[i].getDefaultValue(config)!=null)
+			{
+				this.results.put(res[i].getName(), res[i].getDefaultValue(config));
+			}
+		}
+		
 		// Initialize context variables.
 //		if(variables==null)
 		variables	= new HashMap();
 		variables.put("$platform", getComponentAdapter().getServiceContainer());
 		variables.put("$clock", getComponentAdapter().getServiceContainer().getService(IClockService.class));
 		variables.put("$args", this.arguments);
+		variables.put("$results", this.results);
 		
 		Set	vars	= model.getContextVariables();
 		for(Iterator it=vars.iterator(); it.hasNext(); )
@@ -351,7 +366,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 							// todo: initiate kill process?!
 							
 //							System.out.println("CC: "+adapter);
-							listener.resultAvailable(adapter.getComponentIdentifier());
+							listener.resultAvailable(BpmnInterpreter.this, adapter.getComponentIdentifier());
 						}
 					});
 					
@@ -377,7 +392,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			{
 				// todo: develop external access
 				// Hack!!! Shouldn't return instance directly.
-				listener.resultAvailable(BpmnInterpreter.this);
+				listener.resultAvailable(BpmnInterpreter.this, BpmnInterpreter.this);
 			}
 		});
 	}
@@ -392,6 +407,45 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	public ClassLoader getClassLoader()
 	{
 		return model.getClassLoader();
+	}
+	
+	/**
+	 *  Get the results of the component (considering it as a functionality).
+	 *  @return The results map (name -> value). 
+	 */
+	public Map getResults()
+	{
+		return results;
+	}
+	
+	/**
+	 *  Check if the value of a result is set.
+	 *  @param name	The result name. 
+	 *  @return	True, if the result is set to some value. 
+	 */
+	public boolean hasResultValue(String name)
+	{
+		return results.containsKey(name);
+	}
+
+	/**
+	 *  Get the value of a result.
+	 *  @param name	The result name. 
+	 *  @return	The result value. 
+	 */
+	public Object getResultValue(String name)
+	{
+		return results.get(name);
+	}
+	
+	/**
+	 *  Set the value of a result.
+	 *  @param name	The result name. 
+	 *  @param value The result value. 
+	 */
+	public void	setResultValue(String name, Object value)
+	{
+		results.put(name, value);
 	}
 	
 	//-------- helpers --------

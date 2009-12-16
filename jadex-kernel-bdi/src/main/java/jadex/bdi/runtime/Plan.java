@@ -541,7 +541,7 @@ public abstract class Plan extends AbstractPlan
 		 *  Called when the result is available.
 		 *  @param result The result.
 		 */
-		public void resultAvailable(Object result)
+		public void resultAvailable(Object source, Object result)
 		{
 //			System.out.println("resultAvailable: "+this+", "+result);
 			SyncResultListener.this.result = result;
@@ -553,7 +553,7 @@ public abstract class Plan extends AbstractPlan
 		 *  Called when an exception occurred.
 		 *  @param exception The exception.
 		 */
-		public void exceptionOccurred(Exception exception)
+		public void exceptionOccurred(Object source, Exception exception)
 		{
 //			System.out.println("exeception: "+this+", "+exception);
 //			exception.printStackTrace();

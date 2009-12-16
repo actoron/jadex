@@ -114,7 +114,7 @@ public class Executor implements Runnable
 				if(shutdownlisteners!=null)
 				{
 					for(int i=0; i<shutdownlisteners.size(); i++)
-						((IResultListener)shutdownlisteners.get(i)).resultAvailable(null);
+						((IResultListener)shutdownlisteners.get(i)).resultAvailable(null, null);
 					shutdownlisteners.clear();
 				}
 				shutdowned = true;
@@ -171,7 +171,7 @@ public class Executor implements Runnable
 				}
 				else
 				{
-					listener.resultAvailable(null);
+					listener.resultAvailable(null, null);
 				}
 			}
 		}

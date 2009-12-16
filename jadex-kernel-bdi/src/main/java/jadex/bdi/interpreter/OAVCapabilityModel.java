@@ -178,6 +178,16 @@ public class OAVCapabilityModel implements ILoadableComponentModel, ICacheableMo
 	}
 	
 	/**
+	 *  Get the results.
+	 *  @return The results.
+	 */
+	public IArgument[] getResults()
+	{
+		// todo
+		return new IArgument[0];
+	}
+	
+	/**
 	 *  Is the model startable.
 	 *  @return True, if startable.
 	 */

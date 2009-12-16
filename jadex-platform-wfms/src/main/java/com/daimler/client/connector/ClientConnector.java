@@ -63,7 +63,7 @@ public class ClientConnector
 					context.setParameterValue((String) parameter.getKey(), parameter.getValue());
 				}
 			}
-			notification.getListener().resultAvailable(null);
+			notification.getListener().resultAvailable(ClientConnector.this, null);
 		}
 		else
 		{

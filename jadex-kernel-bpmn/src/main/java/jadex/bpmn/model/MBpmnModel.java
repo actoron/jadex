@@ -115,6 +115,9 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	/** The arguments. */
 	protected List arguments;
 	
+	/** The results. */
+	protected List results;
+	
 	//-------- model management --------
 	
 	/** The filename. */
@@ -916,6 +919,26 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	public ClassLoader getClassLoader()
 	{
 		return classloader;
+	}
+	
+	/**
+	 *  Add a result.
+	 *  @param result The result.
+	 */
+	public void addResult(IArgument result)
+	{
+		if(results==null)
+			results = new ArrayList();
+		results.add(result);
+	}
+	
+	/**
+	 *  Get the results.
+	 *  @return The results.
+	 */
+	public IArgument[] getResults()
+	{
+		return results==null? new IArgument[0]: (IArgument[])results.toArray(new IArgument[results.size()]);
 	}
 
 	/**

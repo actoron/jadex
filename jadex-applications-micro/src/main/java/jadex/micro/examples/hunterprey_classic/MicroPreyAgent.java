@@ -141,7 +141,7 @@ public class MicroPreyAgent extends MicroAgent
 		// Search for the environment agent
 		df.search(ad, cons, createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Object source, Object result)
 			{
 				IDFAgentDescription[] tas = (IDFAgentDescription[])result;
 				if(tas.length!=0)
@@ -164,7 +164,7 @@ public class MicroPreyAgent extends MicroAgent
 				// Register creature.
 				requestAction(new RequestVision(myself));
 			}
-			public void exceptionOccurred(Exception e)
+			public void exceptionOccurred(Object source, Exception e)
 			{
 				e.printStackTrace();
 			}

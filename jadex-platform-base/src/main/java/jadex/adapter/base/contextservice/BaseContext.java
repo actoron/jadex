@@ -261,7 +261,7 @@ public class BaseContext	implements IContext
 		}
 		
 		if(listener!=null)
-			listener.resultAvailable(this);
+			listener.resultAvailable(this, this);
 	}
 
 	/**

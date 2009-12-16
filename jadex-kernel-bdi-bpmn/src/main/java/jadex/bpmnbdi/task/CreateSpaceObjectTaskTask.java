@@ -39,12 +39,12 @@ public class CreateSpaceObjectTaskTask	implements	ITask
 			}
 			else
 			{
-				listener.resultAvailable(null);
+				listener.resultAvailable(this, null);
 			}
 		}
 		catch(Exception e)
 		{
-			listener.exceptionOccurred(e);
+			listener.exceptionOccurred(this, e);
 		}
 	}
 }

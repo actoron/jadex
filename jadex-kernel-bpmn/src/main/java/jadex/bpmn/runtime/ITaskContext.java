@@ -12,7 +12,7 @@ public interface ITaskContext
 	 *  Get the model element.
 	 *  @return	The model of the task.
 	 */
-	public MActivity	getModelElement();
+	public MActivity getModelElement();
 
 	/**
 	 *  Get the activity.
@@ -46,5 +46,26 @@ public interface ITaskContext
 	 *  @param name	The property name. 
 	 *  @return	The property value. 
 	 */
-	public Object	getPropertyValue(String name);
+	public Object getPropertyValue(String name);
+	
+	/**
+	 *  Check if the value of a result is set.
+	 *  @param name	The result name. 
+	 *  @return	True, if the result is set to some value. 
+	 */
+	public boolean	hasResultValue(String name);
+
+	/**
+	 *  Get the value of a result.
+	 *  @param name	The result name. 
+	 *  @return	The result value. 
+	 */
+	public Object getResultValue(String name);
+	
+	/**
+	 *  Set the value of a result.
+	 *  @param name	The result name. 
+	 *  @param value The result value. 
+	 */
+	public void	setResultValue(String name, Object value);
 }

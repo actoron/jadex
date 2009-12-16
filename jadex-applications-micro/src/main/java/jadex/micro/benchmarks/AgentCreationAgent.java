@@ -53,7 +53,7 @@ public class AgentCreationAgent extends MicroAgent
 //				System.out.println("Args: "+num+" "+args);
 
 			final IComponentExecutionService ces = (IComponentExecutionService)getServiceContainer().getService(IComponentExecutionService.class);
-			ces.createComponent(createPeerName(num+1), getClass().getName()+".class", null, args, false, null, null);
+			ces.createComponent(createPeerName(num+1), getClass().getName()+".class", null, args, false, null, null, null);
 //				createResultListener(new IResultListener()
 //			{
 //				public void resultAvailable(Object result)
@@ -116,7 +116,7 @@ public class AgentCreationAgent extends MicroAgent
 		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
 		ces.destroyComponent(aid, createResultListener(new IResultListener()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Object source, Object result)
 			{
 				System.out.println("Successfully destroyed peer: "+name);
 				
@@ -129,7 +129,7 @@ public class AgentCreationAgent extends MicroAgent
 					killLastPeer(killstarttime, dur, pera, omem, upera);
 				}	
 			}
-			public void exceptionOccurred(Exception exception)
+			public void exceptionOccurred(Object source, Exception exception)
 			{
 				exception.printStackTrace();
 			}
@@ -198,6 +198,6 @@ public class AgentCreationAgent extends MicroAgent
 				}
 				return ret;
 			}
-		}});
+		}}, null);
 	}
 }

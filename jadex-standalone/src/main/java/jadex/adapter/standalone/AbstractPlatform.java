@@ -299,7 +299,6 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 	protected void createComponent(String name, String model, String config, Map args, final boolean daemon)
 	{
 		ILoadableComponentModel lmodel = SComponentFactory.loadModel(this, model);
-//		
 		if(lmodel instanceof ApplicationModel)
 		{
 			SComponentFactory.createApplication(this, name, model, config, args);
@@ -307,7 +306,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 		else
 		{
 			final IComponentExecutionService	ces	= (IComponentExecutionService)getService(IComponentExecutionService.class);
-			ces.createComponent(name, model, config, args, false, null, null); //new IResultListener()
+			ces.createComponent(name, model, config, args, false, null, null, null); //new IResultListener()
 		}
 		
 //		{

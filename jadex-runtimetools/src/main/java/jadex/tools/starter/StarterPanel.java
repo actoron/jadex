@@ -8,13 +8,16 @@ import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IReport;
+import jadex.commons.FixedJComboBox;
 import jadex.commons.IChangeListener;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.ElementPanel;
@@ -108,9 +111,16 @@ public class StarterPanel extends JPanel
 	/** The agent name generator flag. */
 	protected JCheckBox genname;
 
-	/** The agent type. */
+	/** The agent arguments. */
 	protected JPanel arguments;
 	protected List argelems;
+	
+	/** The agent results. */
+	protected JPanel results;
+	protected List reselems;
+	protected JCheckBox storeresults;
+	protected JComboBox selectavail;
+	protected MultiCollection resultsets;
 
 	/** The start button. */
 	protected JButton start;
@@ -140,7 +150,8 @@ public class StarterPanel extends JPanel
 	{
 		super(new BorderLayout());
 		this.starter	= starter;
-
+		this.resultsets = new MultiCollection();
+		
 		JPanel content = new JPanel(new GridBagLayout());
 
 	   	// The browse button.
@@ -313,6 +324,9 @@ public class StarterPanel extends JPanel
 		
 		// The arguments.
 		arguments = new JPanel(new GridBagLayout());
+		
+		// The results.
+		results = new JPanel(new GridBagLayout());
 
 		// The reload button.
 		final JButton reload = new JButton("Reload");
@@ -396,7 +410,7 @@ public class StarterPanel extends JPanel
 									ac = (IApplicationContext)cs.getContext(apn);
 								}
 							}	
-							String typename = ac!=null? ac.getAgentType(filename.getText()): filename.getText();
+							final String typename = ac!=null? ac.getAgentType(filename.getText()): filename.getText();
 							if(typename==null)
 							{
 								JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), "Could not resolve agent type: "
@@ -405,6 +419,36 @@ public class StarterPanel extends JPanel
 							}
 							else
 							{
+								IResultListener killlistener = null;
+								if(storeresults!=null && storeresults.isSelected())
+								{
+									killlistener = new IResultListener()
+									{
+										public void resultAvailable(final Object source, final Object result)
+										{
+											SwingUtilities.invokeLater(new Runnable()
+											{
+												public void run()
+												{
+													System.out.println("typename: "+typename+" "+model.getFilename());
+													resultsets.put(typename, new Object[]{source, result});
+													if(model!=null && typename.equals(model.getFilename()))
+													{
+														selectavail.addItem(source);
+														refreshResults();
+													}
+												}
+											});
+										}
+										
+										public void exceptionOccurred(Object source, Exception exception)
+										{
+											// todo?!
+//											resultsets.put(typename, exception);
+										}
+									};
+								}
+								
 								String an = genname.isSelected()?  null: componentname.getText();
 								if(an==null) // i.e. name auto generate
 								{
@@ -417,7 +461,7 @@ public class StarterPanel extends JPanel
 										}
 										else
 										{
-											starter.createComponent(typename, an, configname, args, suspend.isSelected());
+											starter.createComponent(typename, an, configname, args, suspend.isSelected(), killlistener);
 										}
 									}
 								}
@@ -429,7 +473,7 @@ public class StarterPanel extends JPanel
 									}
 									else
 									{
-										starter.createComponent(typename, an, configname, args, suspend.isSelected());
+										starter.createComponent(typename, an, configname, args, suspend.isSelected(), killlistener);
 									}
 								}
 							}
@@ -527,6 +571,9 @@ public class StarterPanel extends JPanel
 			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		y++;
 		content.add(arguments, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		y++;
+		content.add(results, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
 		componentnamel.setMinimumSize(confl.getMinimumSize());
@@ -638,22 +685,16 @@ public class StarterPanel extends JPanel
 				if(SComponentFactory.isLoadable(starter.getJCC().getServiceContainer(), adf))
 				{
 					model = SComponentFactory.loadModel(starter.getJCC().getServiceContainer(), adf);
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
-							updateGuiForNewModel(adf);
-						}
-					});
+					updateGuiForNewModel(adf);
 					
-	//				if(appfactory.isLoadable(adf))
 					if(model instanceof ApplicationModel)
 					{
-	//					System.out.println("Model loaded: "+adf);
+//						System.out.println("Model loaded: "+adf);
 						
 						createArguments();
-						arguments.setVisible(false);
-						apppanel.setVisible(true);
+						createResults();
+						arguments.setVisible(true);
+						results.setVisible(true);
 						componentpanel.setVisible(false);
 						start.setVisible(true);
 						
@@ -664,14 +705,15 @@ public class StarterPanel extends JPanel
 					}
 					else if(SComponentFactory.isStartable(starter.getJCC().getServiceContainer(), adf))
 					{
-		//				System.out.println("Model loaded: "+adf);
+//						System.out.println("Model loaded: "+adf);
 						
 						createArguments();
-						apppanel.setVisible(true);
+						createResults();
 						arguments.setVisible(true);
+						results.setVisible(true);
+						apppanel.setVisible(true);
 						componentpanel.setVisible(true);
 						start.setVisible(true);
-						
 						filenamel.setMinimumSize(confdummy.getMinimumSize());
 						filenamel.setPreferredSize(confdummy.getPreferredSize());
 						confl.setMinimumSize(confdummy.getMinimumSize());
@@ -681,6 +723,7 @@ public class StarterPanel extends JPanel
 					{
 						apppanel.setVisible(false);
 						arguments.setVisible(false);
+						results.setVisible(false);
 						componentpanel.setVisible(false);
 						start.setVisible(false);
 						
@@ -717,6 +760,7 @@ public class StarterPanel extends JPanel
 			start.setEnabled(false);
 			config.removeAllItems();
 			clearArguments();
+			clearResults();
 			setAgentName("");
 			clearApplicationName();
 			filename.setText("");
@@ -819,15 +863,15 @@ public class StarterPanel extends JPanel
 				catch(final Exception e)
 				{
 					//e.printStackTrace();
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
+//					SwingUtilities.invokeLater(new Runnable()
+//					{
+//						public void run()
+//						{
 							String text = SUtil.wrapText("Could not display HTML content: "+e.getMessage());
 							JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), text, "Display Problem", JOptionPane.INFORMATION_MESSAGE);
 							modeldesc.addTextContent(model.getName(), icon, report.toString(), adf);
-						}
-					});
+//						}
+//					});
 				}
 			}
 			else
@@ -839,15 +883,15 @@ public class StarterPanel extends JPanel
 				}
 				catch(final Exception e)
 				{
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
+//					SwingUtilities.invokeLater(new Runnable()
+//					{
+//						public void run()
+//						{
 							String text = SUtil.wrapText("Could not display HTML content: "+e.getMessage());
 							JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), text, "Display Problem", JOptionPane.INFORMATION_MESSAGE);
 							modeldesc.addTextContent(model.getName(), icon, model.getDescription(), adf);
-						}
-					});
+//						}
+//					});
 				}
 			}
 
@@ -928,6 +972,7 @@ public class StarterPanel extends JPanel
 		loadModel(null);
 		config.removeAllItems();
 		clearArguments();
+		clearResults();
 		setAgentName("");
 		//model = null;
 		//start.setEnabled(false);
@@ -941,14 +986,8 @@ public class StarterPanel extends JPanel
 	{
 		if(conf!=null)
 		{
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					//System.out.println("selecting: "+conf+" "+config.getModel().getSize());
-					config.getModel().setSelectedItem(conf);
-				}
-			});
+			//System.out.println("selecting: "+conf+" "+config.getModel().getSize());
+			config.getModel().setSelectedItem(conf);
 		}
 	}
 
@@ -960,20 +999,14 @@ public class StarterPanel extends JPanel
 	{
 		if(args!=null && args.length>0)
 		{
-			SwingUtilities.invokeLater(new Runnable()
+			if(arguments==null || argelems==null || arguments.getComponentCount()!=4*argelems.size())
+				return;
+			
+			for(int i=0; i<args.length; i++)
 			{
-				public void run()
-				{
-					if(arguments==null || argelems==null || arguments.getComponentCount()!=4*argelems.size())
-						return;
-					
-					for(int i=0; i<args.length; i++)
-					{
-						JTextField valt = (JTextField)arguments.getComponent(i*4+3);
-						valt.setText(args[i]);
-					}
-				}
-			});
+				JTextField valt = (JTextField)arguments.getComponent(i*4+3);
+				valt.setText(args[i]);
+			}
 		}
 	}
 	
@@ -984,15 +1017,13 @@ public class StarterPanel extends JPanel
 	protected void refreshArguments()
 	{
 		// Assert that all argument components are there.
-		if(arguments==null || argelems==null || arguments.getComponentCount()!=4*argelems.size())
+		if(arguments==null || argelems==null)
 			return;
 		
 		for(int i=0; argelems!=null && i<argelems.size(); i++)
 		{
 			JTextField valt = (JTextField)arguments.getComponent(i*4+2);
-//			String val  = findValue((IMReferenceableElement)argelems.get(i), (String)config.getSelectedItem());
 			valt.setText(""+((IArgument)argelems.get(i)).getDefaultValue((String)config.getSelectedItem()));
-			//valt.setMinimumSize(new Dimension(valt.getPreferredSize().width/4, valt.getPreferredSize().height/4));
 		}
 	}
 	
@@ -1001,21 +1032,15 @@ public class StarterPanel extends JPanel
 	 */
 	protected void clearArguments()
 	{
-		SwingUtilities.invokeLater(new Runnable()
+		// Assert that all argument components are there.
+		if(arguments==null || argelems==null)
+			return;
+		
+		for(int i=0; i<argelems.size(); i++)
 		{
-			public void run()
-			{
-				// Assert that all argument components are there.
-				if(arguments==null || argelems==null || arguments.getComponentCount()!=4*argelems.size())
-					return;
-				
-				for(int i=0; i<argelems.size(); i++)
-				{
-					JTextField valt = (JTextField)arguments.getComponent(i*4+3);
-					valt.setText("");
-				}
-			}
-		});
+			JTextField valt = (JTextField)arguments.getComponent(i*4+3);
+			valt.setText("");
+		}
 	}
 	
 	/**
@@ -1023,26 +1048,151 @@ public class StarterPanel extends JPanel
 	 */
 	protected void createArguments()
 	{
-		SwingUtilities.invokeLater(new Runnable()
+		argelems = SCollection.createArrayList();
+		arguments.removeAll();
+		arguments.setBorder(null);
+		
+		IArgument[] args = model.getArguments();
+		
+		for(int i=0; i<args.length; i++)
 		{
-			public void run()
+			argelems.add(args[i]);
+			createArgumentGui(args[i], i);
+		}
+		
+		if(args.length>0)
+			arguments.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Arguments "));
+	}
+	
+	/**
+	 *  Refresh the result values.
+	 */
+	protected void refreshResults()
+	{
+		// Assert that all argument components are there.
+		if(results==null || reselems==null)
+			return;
+		
+		// Find results of specific instance.
+		Map mres = null;
+		int sel = selectavail.getSelectedIndex();
+//		System.out.println("Selected index: "+sel+selectavail.getSelectedItem().hashCode());
+		if(sel>0)
+		{
+			List rs = (List)resultsets.get(model.getFilename());
+			Object[] r = (Object[])rs.get(sel-1);
+			mres = (Map)r[1];
+		}
+		
+		for(int i=0; reselems!=null && i<reselems.size(); i++)
+		{
+			IArgument arg = ((IArgument)reselems.get(i));
+//			Object value = mres!=null? mres.get(arg.getName()): arg.getDefaultValue((String)config.getSelectedItem());
+			Object value = mres!=null? mres.get(arg.getName()): "";
+			JTextField valt = (JTextField)results.getComponent(i*4+3);
+			valt.setText(""+value);
+		}
+	}
+	
+	/**
+	 *  Clear the result values.
+	 */
+	protected void clearResults()
+	{
+		// Assert that all argument components are there.
+		if(results==null || reselems==null)
+			return;
+		
+		for(int i=0; i<reselems.size(); i++)
+		{
+			JTextField valt = (JTextField)results.getComponent(i*4+3);
+			valt.setText("");
+		}
+	}
+	
+	/**
+	 *  Create the results panel.
+	 */
+	protected void createResults()
+	{
+		reselems = SCollection.createArrayList();
+		results.removeAll();
+		results.setBorder(null);
+		
+		final IArgument[] res = model.getResults();
+		
+		for(int i=0; i<res.length; i++)
+		{
+			reselems.add(res[i]);
+			createResultGui(res[i], i);
+		}
+		
+		if(res.length>0)
+		{
+			results.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Results "));
+			
+			JLabel sr = new JLabel("Store results");
+			storeresults = new JCheckBox();
+			
+			JButton cr = new JButton("Clear results");
+			
+			JLabel sa = new JLabel("Select agent instance");
+			selectavail= new FixedJComboBox();
+			
+			selectavail.addItem("- no instance selected -");
+			
+			cr.addActionListener(new ActionListener()
 			{
-				argelems = SCollection.createArrayList();
-				arguments.removeAll();
-				arguments.setBorder(null);
-				
-				IArgument[] args = model.getArguments();
-				
-				for(int i=0; i<args.length; i++)
+				public void actionPerformed(ActionEvent e)
 				{
-					argelems.add(args[i]);
-					createArgumentGui(args[i], i);
+					storeresults.removeAll();
+					selectavail.removeAllItems();
+					selectavail.addItem("- no instance selected -");
+					clearResults();
 				}
-				
-				if(args.length>0)
-					arguments.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Arguments "));
+			});
+			
+			List rs = (List)resultsets.get(model.getFilename());
+			if(rs!=null)
+			{
+				for(int i=0; i<rs.size(); i++)
+				{
+					Object[] r = (Object[])rs.get(i);
+					selectavail.addItem(r[0]);
+				}
+				selectavail.setSelectedIndex(0);
 			}
-		});
+			
+//					selectavail.addItemListener(new ItemListener()
+//					{
+//						public void itemStateChanged(ItemEvent e)
+//						{
+//							System.out.println("here: "+resultsets);
+//							refreshResults();
+//						}
+//					});
+			selectavail.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					refreshResults();
+				}
+			});
+			
+			int y = res.length;
+			
+			results.add(sr, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.EAST,
+				GridBagConstraints.BOTH, new Insets(2, 2, 2, 0), 0, 0));
+			results.add(storeresults, new GridBagConstraints(1, y, 2, 1, 0, 0, GridBagConstraints.WEST,
+				GridBagConstraints.BOTH, new Insets(2, 0, 2, 2), 0, 0));
+			results.add(cr, new GridBagConstraints(3, y, 1, 1, 0, 0, GridBagConstraints.EAST,
+				GridBagConstraints.NONE, new Insets(2, 0, 2, 2), 0, 0));
+			y++;
+			results.add(sa, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.EAST,
+				GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+			results.add(selectavail, new GridBagConstraints(1, y, 3, 1, 0, 0, GridBagConstraints.WEST,
+				GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+		}
 	}
 	
 	/**
@@ -1065,24 +1215,6 @@ public class StarterPanel extends JPanel
 		//mvalt.setMinimumSize(new Dimension(mvalt.getPreferredSize().width/4, mvalt.getPreferredSize().height/4));
 		mvalt.setEditable(false);
 		
-		/*Class	clazz = null;
-		String	description	= null;
-		IMReferenceableElement	myelem	= arg;
-		while((clazz==null || description==null) && myelem instanceof IMBeliefReference)
-		{
-			IMBeliefReference	mbelref	= (IMBeliefReference)myelem;
-			clazz	= clazz!=null ? clazz : mbelref.getClazz();
-			description	= description!=null ? description : mbelref.getDescription();
-			myelem	= ((IMBeliefReference)myelem).getReferencedElement();
-		}
-		if((clazz==null || description==null) && myelem instanceof IMBelief)
-		{
-			IMBelief	mbel	= (IMBelief)myelem;
-			clazz	= clazz!=null ? clazz : mbel.getClazz();
-			description	= description!=null ? description : mbel.getDescription();
-		}*/
-		
-//		JLabel typel = new JLabel(clazz!=null ? SReflect.getInnerClassName(clazz) : "undefined");
 		JLabel typel = new JLabel(arg.getTypename()!=null? arg.getTypename(): "undefined");
 		
 		String description = arg.getDescription();
@@ -1107,6 +1239,46 @@ public class StarterPanel extends JPanel
 	}
 	
 	/**
+	 *  Create the gui for one argument. 
+	 *  @param arg The belief or belief reference.
+	 *  @param y The row number where to add.
+	 */
+	protected void createResultGui(final IArgument arg, int y)
+	{
+		JLabel namel = new JLabel(arg.getName());
+		final JTextField valt = new JTextField();
+		valt.setEditable(false);
+		
+		String configname = (String)config.getSelectedItem();
+		JTextField mvalt = new JTextField(""+arg.getDefaultValue(configname));
+		// Java JTextField bug: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4247013
+		//mvalt.setMinimumSize(new Dimension(mvalt.getPreferredSize().width/4, mvalt.getPreferredSize().height/4));
+		mvalt.setEditable(false);
+		
+		JLabel typel = new JLabel(arg.getTypename()!=null? arg.getTypename(): "undefined");
+		
+		String description = arg.getDescription();
+		if(description!=null)
+		{
+			namel.setToolTipText(description);
+			valt.setToolTipText(description);
+			mvalt.setToolTipText(description);
+//			typel.setToolTipText(description);
+		}
+		
+		int x = 0;
+		results.add(typel, new GridBagConstraints(x++, y, 1, 1, 0, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+		results.add(namel, new GridBagConstraints(x++, y, 1, 1, 0, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+		results.add(mvalt, new GridBagConstraints(x++, y, 1, 1, 1, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+		results.add(valt, new GridBagConstraints(x++, y, 1, 1, 1, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+		y++;
+	}
+	
+	/**
 	 *  Set the agent name.
 	 *  @param name The name.
 	 */
@@ -1114,13 +1286,7 @@ public class StarterPanel extends JPanel
 	{
 		if(name!=null)
 		{
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					componentname.setText(name);
-				}
-			});
+			componentname.setText(name);
 		}
 	}
 	
@@ -1130,13 +1296,7 @@ public class StarterPanel extends JPanel
 	 */
 	protected void clearApplicationName()
 	{
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				appname.removeAll();
-			}
-		});
+		appname.removeAll();
 	}
 
 	/**
@@ -1145,15 +1305,9 @@ public class StarterPanel extends JPanel
 	 */
 	protected void setAutoGenerate(final boolean autogen)
 	{
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				genname.setSelected(autogen);
-				componentname.setEditable(!autogen);
-				numagents.setEnabled(autogen);
-			}
-		});
+		genname.setSelected(autogen);
+		componentname.setEditable(!autogen);
+		numagents.setEnabled(autogen);
 	}
 
 	/**
@@ -1162,13 +1316,7 @@ public class StarterPanel extends JPanel
 	 */
 	protected void setStartSuspended(final boolean startsuspended)
 	{
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				suspend.setSelected(startsuspended);
-			}
-		});
+		suspend.setSelected(startsuspended);
 	}
 	
 	/**

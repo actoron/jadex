@@ -80,12 +80,12 @@ public class RuleProfilerPanel	extends JPanel
 		((IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class))
 			.getExternalAccess(observed, new IResultListener()
 		{
-			public void exceptionOccurred(Exception exception)
+			public void exceptionOccurred(Object source, Exception exception)
 			{
 				exception.printStackTrace();
 			}
 			
-			public void resultAvailable(final Object result)
+			public void resultAvailable(Object source, final Object result)
 			{
 				SwingUtilities.invokeLater(new Runnable()
 				{

@@ -10,6 +10,7 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bridge.IComponentExecutionService;
+import jadex.commons.concurrent.IResultListener;
 
 /**
  *  Task for creating a component.
@@ -38,6 +39,7 @@ public class CreateComponentTask extends AbstractTask
 		String config = (String)context.getParameterValue("configuration");
 		boolean suspend = context.getParameterValue("suspend")!=null? ((Boolean)context.getParameterValue("suspend")).booleanValue(): false;
 		Object creator = context.getParameterValue("creator");
+		IResultListener resultlistener = (IResultListener)context.getParameterValue("resultlistener");
 		
 		Map args = (Map)context.getParameterValue("arguments");
 		if(args==null)
@@ -57,6 +59,6 @@ public class CreateComponentTask extends AbstractTask
 //		System.out.println("args: "+args);
 
 		IComponentExecutionService ces = (IComponentExecutionService)instance.getComponentAdapter().getServiceContainer().getService(IComponentExecutionService.class);
-		ces.createComponent(name, model, config, args, suspend, null, creator);
+		ces.createComponent(name, model, config, args, suspend, null, creator, resultlistener);
 	}
 }

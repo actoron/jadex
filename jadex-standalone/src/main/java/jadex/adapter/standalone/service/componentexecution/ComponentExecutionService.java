@@ -60,6 +60,9 @@ public class ComponentExecutionService implements IComponentExecutionService
 	/** The listeners. */
 	protected MultiCollection listeners;
 	
+	/** The result (kill listeners). */
+	protected Map killresultlisteners;
+	
     //-------- constructors --------
 
     /**
@@ -73,6 +76,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 		this.descs = Collections.synchronizedMap(SCollection.createHashMap());
 		this.logger = Logger.getLogger(container.getName()+".cms");
 		this.listeners = SCollection.createMultiCollection();
+		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());
     }
     
     //-------- IComponentExecutionService interface --------
@@ -87,7 +91,8 @@ public class ComponentExecutionService implements IComponentExecutionService
 	 *  @param listener The result listener (if any). Will receive the id of the component as result.
 	 *  @param creator The creator (if any).
 	 */
-	public void	createComponent(String name, String model, String config, Map args, boolean suspend, IResultListener listener, Object creator)
+	public void	createComponent(String name, String model, String config, Map args, boolean suspend, 
+		IResultListener listener, Object creator, final IResultListener resultlistener)
 	{
 		/*
 		if(container.isShuttingDown())
@@ -119,7 +124,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 
 		// Create id and adapter.
 		
-		AgentIdentifier cid;
+		final AgentIdentifier cid;
 		StandaloneComponentAdapter adapter;
 		AMSAgentDescription	ad;
 		synchronized(adapters)
@@ -135,7 +140,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 					cid = new AgentIdentifier(name+"@"+container.getName()); // Hack?!
 					if(adapters.containsKey(cid))
 					{
-						listener.exceptionOccurred(new RuntimeException("Agent name already exists on agent platform."));
+						listener.exceptionOccurred(this, new RuntimeException("Agent name already exists on agent platform."));
 						return;
 					}
 					IMessageService	ms	= (IMessageService)container.getService(IMessageService.class);
@@ -164,7 +169,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 		
 		if(name!=null && name.indexOf('@')!=-1)
 		{
-			listener.exceptionOccurred(new RuntimeException("No '@' allowed in agent name."));
+			listener.exceptionOccurred(this, new RuntimeException("No '@' allowed in agent name."));
 			return;
 			//throw new RuntimeException("No '@' allowed in agent name.");
 		}
@@ -200,7 +205,10 @@ public class ComponentExecutionService implements IComponentExecutionService
 			alisteners[i].componentAdded(ad);
 		}
 		
-		listener.resultAvailable(cid.clone());
+		if(resultlistener!=null)
+			killresultlisteners.put(cid, resultlistener);
+		
+		listener.resultAvailable(this, cid.clone());
 		
 		if(!suspend)
 		{
@@ -226,7 +234,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 				StandaloneComponentAdapter agent = (StandaloneComponentAdapter)adapters.get(cid);
 				if(agent==null)
 				{
-					listener.exceptionOccurred(new RuntimeException("Component "+cid+" does not exist."));
+					listener.exceptionOccurred(this, new RuntimeException("Component "+cid+" does not exist."));
 					return;
 
 					//System.out.println(agentdescs);
@@ -253,7 +261,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 					}
 					else
 					{
-						listener.exceptionOccurred(new RuntimeException("Cannot kill "+cid+" component: "+desc.getState()));
+						listener.exceptionOccurred(this, new RuntimeException("Cannot kill "+cid+" component: "+desc.getState()));
 						//throw new RuntimeException("Cannot kill "+aid+" agent: "+desc.getState());
 					}
 				}
@@ -277,10 +285,10 @@ public class ComponentExecutionService implements IComponentExecutionService
 				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
 				AMSAgentDescription ad = (AMSAgentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
-					listener.exceptionOccurred(new RuntimeException("Component identifier not registered: "+componentid));
+					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
 					//throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
 				if(!IComponentDescription.STATE_ACTIVE.equals(ad.getState()))
-					listener.exceptionOccurred(new RuntimeException("Only active components can be suspended: "+componentid+" "+ad.getState()));
+					listener.exceptionOccurred(this, new RuntimeException("Only active components can be suspended: "+componentid+" "+ad.getState()));
 					//throw new RuntimeException("Only active agents can be suspended: "+aid+" "+ad.getState());
 				
 				// todo: call listener when suspension has finished!!!
@@ -308,10 +316,10 @@ public class ComponentExecutionService implements IComponentExecutionService
 				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
 				AMSAgentDescription ad = (AMSAgentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
-					listener.exceptionOccurred(new RuntimeException("Component identifier not registered: "+componentid));
+					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
 					//throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
 				if(!IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
-					listener.exceptionOccurred(new RuntimeException("Only suspended components can be resumed: "+componentid+" "+ad.getState()));
+					listener.exceptionOccurred(this, new RuntimeException("Only suspended components can be resumed: "+componentid+" "+ad.getState()));
 					//throw new RuntimeException("Only suspended agents can be resumed: "+aid+" "+ad.getState());
 				
 				ad.setState(IComponentDescription.STATE_ACTIVE);
@@ -320,7 +328,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 		}
 //		pcs.firePropertyChange("agents", null, adapters);
 	
-		listener.resultAvailable(null);
+		listener.resultAvailable(this, null);
 	}
 	
 	/**
@@ -339,10 +347,10 @@ public class ComponentExecutionService implements IComponentExecutionService
 				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
 				AMSAgentDescription ad = (AMSAgentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
-					listener.exceptionOccurred(new RuntimeException("Component identifier not registered: "+componentid));
+					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
 					//throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
 				if(!IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
-					listener.exceptionOccurred(new RuntimeException("Only suspended components can be stepped: "+componentid+" "+ad.getState()));
+					listener.exceptionOccurred(this, new RuntimeException("Only suspended components can be stepped: "+componentid+" "+ad.getState()));
 					//throw new RuntimeException("Only suspended agents can be resumed: "+aid+" "+ad.getState());
 				
 				adapter.doStep(listener);
@@ -385,7 +393,7 @@ public class ComponentExecutionService implements IComponentExecutionService
     //-------- helper classes --------
 
 	/**
-	 *  Command that is executed on agent cleanup.
+	 *  Command that is executed on component cleanup.
 	 */
 	class CleanupCommand implements IResultListener
 	{
@@ -399,10 +407,11 @@ public class ComponentExecutionService implements IComponentExecutionService
 			this.listener = listener;
 		}
 		
-		public void resultAvailable(Object result)
+		public void resultAvailable(Object source, Object result)
 		{
 //			System.out.println("CleanupCommand: "+result);
 			IComponentDescription ad = (IComponentDescription)descs.get(cid);
+			Map results = null;
 			synchronized(adapters)
 			{
 				synchronized(descs)
@@ -411,6 +420,9 @@ public class ComponentExecutionService implements IComponentExecutionService
 					StandaloneComponentAdapter	adapter	= (StandaloneComponentAdapter)adapters.remove(cid);
 					if(adapter==null)
 						throw new RuntimeException("Component Identifier not registered: "+cid);
+					
+					results = adapter.getComponentInstance().getResults();
+					
 					AMSAgentDescription	desc	= (AMSAgentDescription)descs.get(cid);
 					desc.setState(IComponentDescription.STATE_TERMINATED);
 					descs.remove(cid);
@@ -431,19 +443,25 @@ public class ComponentExecutionService implements IComponentExecutionService
 				}
 			}
 
-			IComponentListener[]	alisteners;
+			IComponentListener[] alisteners;
 			synchronized(listeners)
 			{
 				Set	slisteners	= new HashSet(listeners.getCollection(null));
 				slisteners.addAll(listeners.getCollection(cid));
 				alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
 			}
+			
+			// Notify the component result listener.
+			IResultListener reslis = (IResultListener)killresultlisteners.remove(cid);
+			if(reslis!=null)
+				reslis.resultAvailable(cid, results);
+			
 			// todo: can be called after listener has (concurrently) deregistered
 			for(int i=0; i<alisteners.length; i++)
 			{
 				try
 				{
-					alisteners[i].componentRemoved(ad);
+					alisteners[i].componentRemoved(ad, results);
 				}
 				catch(Exception e)
 				{
@@ -454,12 +472,12 @@ public class ComponentExecutionService implements IComponentExecutionService
 //			System.out.println("CleanupCommand end.");
 			
 			if(listener!=null)
-				listener.resultAvailable(result);
+				listener.resultAvailable(source, result);
 		}
 		
-		public void exceptionOccurred(Exception exception)
+		public void exceptionOccurred(Object source, Exception exception)
 		{
-			resultAvailable(cid);
+			resultAvailable(source, cid);
 		}
 	}
 	
@@ -476,7 +494,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
 		
-		listener.resultAvailable(adapters.get(cid));
+		listener.resultAvailable(this, adapters.get(cid));
 	}
 	
 	/**
@@ -491,7 +509,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 	
 		StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(cid);
 		if(adapter==null)
-			listener.exceptionOccurred(new RuntimeException("No local component found for component identifier: "+cid));
+			listener.exceptionOccurred(this, new RuntimeException("No local component found for component identifier: "+cid));
 		else
 			adapter.getComponentInstance().getExternalAccess(listener);
 	}
@@ -559,7 +577,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 			ret	= (AMSAgentDescription)ret.clone();
 		}
 		
-		listener.resultAvailable(ret);
+		listener.resultAvailable(this, ret);
 	}
 	
 	/**
@@ -571,7 +589,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
 		
-		listener.resultAvailable(descs.values().toArray(new AMSAgentDescription[0]));
+		listener.resultAvailable(this, descs.values().toArray(new AMSAgentDescription[0]));
 	}
 	
 	/**
@@ -593,7 +611,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 //				ret[i] = refreshAgentIdentifier(ret[i]); // Hack!
 		}
 		
-		listener.resultAvailable(ret);
+		listener.resultAvailable(this, ret);
 	}
 	
 	/**
@@ -646,7 +664,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 		}
 
 		//System.out.println("searched: "+ret);
-		listener.resultAvailable(ret);
+		listener.resultAvailable(this, ret);
 	}
 	
 	/**
@@ -729,6 +747,6 @@ public class ComponentExecutionService implements IComponentExecutionService
 	public void shutdown(IResultListener listener)
 	{
 		if(listener!=null)
-			listener.resultAvailable(null);
+			listener.resultAvailable(this, null);
 	}
 }

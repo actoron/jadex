@@ -38,12 +38,12 @@ class CounterListener implements IResultListener
 	 *  Called when the result is available.
 	 *  @param result The result.
 	 */
-	public synchronized void resultAvailable(Object result)
+	public synchronized void resultAvailable(Object source, Object result)
 	{
 		if(++cnt==num)
 		{
 			// todo: what about aggregated result?
-			listener.resultAvailable(result);
+			listener.resultAvailable(source, result);
 		}
 	}
 	
@@ -51,9 +51,9 @@ class CounterListener implements IResultListener
 	 *  Called when an exception occurred.
 	 *  @param exception The exception.
 	 */
-	public synchronized void exceptionOccurred(Exception exception)
+	public synchronized void exceptionOccurred(Object source, Exception exception)
 	{
 		// On first exception transfer exception.
-		listener.exceptionOccurred(exception);
+		listener.exceptionOccurred(source, exception);
 	}
 }

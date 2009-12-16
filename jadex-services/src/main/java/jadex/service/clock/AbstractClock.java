@@ -461,7 +461,7 @@ public abstract class AbstractClock implements IClock
 	{
 		stop();
 		if(listener!=null)
-			listener.resultAvailable(null);
+			listener.resultAvailable(this, null);
 	}
 }
 

@@ -386,6 +386,16 @@ public class MGpmnModel extends MProcess implements ICacheableModel, ILoadableCo
 	{
 		return classloader;
 	}
+	
+	/**
+	 *  Get the results.
+	 *  @return The results.
+	 */
+	public IArgument[] getResults()
+	{
+		// todo:
+		return new IArgument[0];
+	}
 
 	/**
 	 *  Set the classloader.

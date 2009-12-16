@@ -46,7 +46,7 @@ public class MicroPreyAgent extends MicroAgent
 		this.myself	= env.getAvatar(getAgentIdentifier());
 		this.listener	= new IResultListener()
 		{
-			public void exceptionOccurred(Exception e)
+			public void exceptionOccurred(Object source, Exception e)
 			{
 //				e.printStackTrace();
 				try
@@ -77,7 +77,7 @@ public class MicroPreyAgent extends MicroAgent
 				}
 			}
 			
-			public void resultAvailable(Object result)
+			public void resultAvailable(Object source, Object result)
 			{
 				getExternalAccess().invokeLater(new Runnable()
 				{

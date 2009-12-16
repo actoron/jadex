@@ -1,6 +1,7 @@
 package jadex.microkernel;
 
 import jadex.bridge.IArgument;
+import jadex.commons.SUtil;
 
 /**
  *  Meta info for micro agents.
@@ -21,17 +22,21 @@ public class MicroAgentMetaInfo
 	/** The arguments. */
 	protected IArgument[] args;
 	
+	/** The results. */
+	protected IArgument[] results;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new meta info.
 	 */
-	public MicroAgentMetaInfo(String description, String[] configs, IArgument[] args)
+	public MicroAgentMetaInfo(String description, String[] configs, IArgument[] args, IArgument[] results)
 	{
 //		this.name = name;
 		this.description = description;
-		this.configs = configs;
-		this.args = args;
+		this.configs = configs == null? SUtil.EMPTY_STRING: configs;
+		this.args = args == null? new IArgument[0]: args;
+		this.results = results == null? new IArgument[0]: results;
 	}
 
 	//-------- methods --------
@@ -52,6 +57,15 @@ public class MicroAgentMetaInfo
 	public IArgument[] getArguments()
 	{
 		return args;
+	}
+	
+	/**
+	 *  Get the results.
+	 *  @return The results.
+	 */
+	public IArgument[] getResults()
+	{
+		return results;
 	}
 
 	/**

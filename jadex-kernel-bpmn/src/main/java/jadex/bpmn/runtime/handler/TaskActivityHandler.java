@@ -30,12 +30,12 @@ public class TaskActivityHandler extends DefaultActivityHandler
 				ITask task = (ITask)taskimpl.newInstance();
 				task.execute(thread, instance, new IResultListener()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(Object source, Object result)
 					{
 						instance.notify(activity, thread, null);
 					}
 					
-					public void exceptionOccurred(Exception exception)
+					public void exceptionOccurred(Object source, Exception exception)
 					{
 						thread.setException(exception);
 						instance.notify(activity, thread, null);

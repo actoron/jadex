@@ -84,6 +84,7 @@ public abstract class MicroAgent implements IMicroAgent
 
 	/**
 	 *  Called just before the agent is removed from the platform.
+	 *  @return The result of the component.
 	 */
 	public void agentKilled()
 	{
@@ -124,6 +125,16 @@ public abstract class MicroAgent implements IMicroAgent
 	public Map getArguments()
 	{
 		return interpreter.getArguments();
+	}
+	
+	/**
+	 *  Set a result value.
+	 *  @param name The result name.
+	 *  @param value The result value.
+	 */
+	public void setResultValue(String name, Object value)
+	{	
+		interpreter.setResultValue(name, value);
 	}
 	
 	/**

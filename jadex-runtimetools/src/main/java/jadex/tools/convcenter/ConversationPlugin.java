@@ -147,20 +147,20 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
 		ces.getComponentDescriptions(new IResultListener()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Object source, Object result)
 			{
 				IComponentDescription[] res = (IComponentDescription[])result;
 				for(int i=0; i<res.length; i++)
 					agentBorn(res[i]);
 			}
 			
-			public void exceptionOccurred(Exception exception)
+			public void exceptionOccurred(Object source, Exception exception)
 			{
 			}
 		});
 		ces.addComponentListener(null, new IComponentListener()
 		{
-			public void componentRemoved(IComponentDescription desc)
+			public void componentRemoved(IComponentDescription desc, java.util.Map results)
 			{
 				agentDied(desc);
 			}

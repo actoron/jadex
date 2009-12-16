@@ -44,11 +44,11 @@ public class StartAndMonitorProcessPlan extends Plan
 				{
 					goalcnt++;
 					if(goalcnt==agoalnames.length)
-						lis.resultAvailable(null);
+						lis.resultAvailable(StartAndMonitorProcessPlan.this, null);
 				}
 				else
 				{
-					lis.exceptionOccurred(goal.getException());
+					lis.exceptionOccurred(StartAndMonitorProcessPlan.this, goal.getException());
 				}
 			}
 			

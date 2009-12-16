@@ -604,7 +604,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			public void run()
 			{
 				if(listener!=null)
-					listener.resultAvailable(new ExternalAccessFlyweight(state, ragent));
+					listener.resultAvailable(getComponentAdapter().getComponentIdentifier(), new ExternalAccessFlyweight(state, ragent));
 			}
 		});
 	}
@@ -619,6 +619,16 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	public ClassLoader getClassLoader()
 	{
 		return getModel().getTypeModel().getClassLoader();
+	}
+	
+	/**
+	 *  Get the results of the component (considering it as a functionality).
+	 *  @return The results map (name -> value). 
+	 */
+	public Map getResults()
+	{
+		// todo
+		return null;
 	}
 
 	/**

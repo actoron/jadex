@@ -79,7 +79,7 @@ public class DebuggerMainPanel extends JSplitPane
 		final JTabbedPane	tabs	= new JTabbedPane();		
 		ces.getExternalAccess(desc.getName(), new IResultListener()
 		{			
-			public void resultAvailable(final Object result)
+			public void resultAvailable(Object source, final Object result)
 			{
 				// The left panel (breakpoints)
 				SwingUtilities.invokeLater(new Runnable()
@@ -128,7 +128,7 @@ public class DebuggerMainPanel extends JSplitPane
 					}
 				}
 			}
-			public void exceptionOccurred(Exception exception)
+			public void exceptionOccurred(Object source, Exception exception)
 			{
 				DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panels.", null, exception);
 			}
@@ -144,12 +144,12 @@ public class DebuggerMainPanel extends JSplitPane
 					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentExecutionService.class);
 				ces.stepComponent(DebuggerMainPanel.this.desc.getName(), new IResultListener()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(Object source, Object result)
 					{
 						updatePanel((IComponentDescription)result);
 					}
 					
-					public void exceptionOccurred(Exception exception)
+					public void exceptionOccurred(Object source, Exception exception)
 					{
 						// Hack!!! keep tool reactive in case of error!?
 						SwingUtilities.invokeLater(new Runnable()
@@ -203,7 +203,7 @@ public class DebuggerMainPanel extends JSplitPane
 			{
 				updatePanel(desc);
 			}
-			public void componentRemoved(IComponentDescription desc)
+			public void componentRemoved(IComponentDescription desc, Map results)
 			{
 			}			
 			public void componentAdded(IComponentDescription desc)

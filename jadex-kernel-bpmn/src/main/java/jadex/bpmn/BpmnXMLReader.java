@@ -868,10 +868,19 @@ public class BpmnXMLReader
 					{
 						String argstr = prop.substring(prop.indexOf("argument")+8).trim();
 						
-						String[]	imps	= (String[])imports.toArray(new String[imports.size()]);
+						String[] imps = (String[])imports.toArray(new String[imports.size()]);
 						IArgument arg = (IArgument)parser.parseExpression(argstr, imps, null, classloader).getValue(null);
 						
 						model.addArgument(arg);
+					}
+					else if(prop.startsWith("result"))
+					{
+						String resstr = prop.substring(prop.indexOf("result")+6).trim();
+						
+						String[] imps = (String[])imports.toArray(new String[imports.size()]);
+						IArgument res = (IArgument)parser.parseExpression(resstr, imps, null, classloader).getValue(null);
+						
+						model.addResult(res);
 					}
 					else
 					{
@@ -986,6 +995,27 @@ public class BpmnXMLReader
 									IArgument arg = new Argument(name, desc, typename, val);
 									
 									model.addArgument(arg);
+//									System.out.println("Argument: "+arg);
+								}
+							}
+							else if("results".equals(key))
+							{
+								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
+								while(stok.hasMoreTokens())
+								{
+									String argtext = stok.nextToken();
+									StringTokenizer stok2 = new StringTokenizer(argtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+									String name = stok2.nextToken();
+									String desc = stok2.nextToken();
+									String typename = stok2.nextToken();
+									String valtext = stok2.nextToken();
+									
+									Object val = null;
+									if(valtext!=null)
+										val = parser.parseExpression(valtext, model.getAllImports(), null, classloader).getValue(null);
+									IArgument res = new Argument(name, desc, typename, val);
+									
+									model.addResult(res);
 //									System.out.println("Argument: "+arg);
 								}
 							}

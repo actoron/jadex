@@ -317,7 +317,7 @@ public class MessageService implements IMessageService
 			((ITransport)transports.get(i)).shutdown();
 		}
 		
-		listener.resultAvailable(null);
+		listener.resultAvailable(this, null);
 	}
 
 	/**
@@ -402,7 +402,7 @@ public class MessageService implements IMessageService
 		{
 			((ComponentExecutionService)platform.getService(IComponentExecutionService.class)).getComponentAdapter(receivers[i], new IResultListener()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(Object source, Object result)
 				{
 					StandaloneComponentAdapter agent = (StandaloneComponentAdapter)result;
 					if(agent != null)
@@ -458,7 +458,7 @@ public class MessageService implements IMessageService
 					}
 				}
 
-				public void exceptionOccurred(Exception exception)
+				public void exceptionOccurred(Object source, Exception exception)
 				{
 					logger.severe("Exception occurred: "+exception);
 				}

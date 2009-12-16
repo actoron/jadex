@@ -185,7 +185,7 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.COMMIT_WORKITEM))
 			return;
-		((Workitem) activity).getListener().resultAvailable(null);
+		((Workitem) activity).getListener().resultAvailable(this, null);
 	}
 	
 	/**

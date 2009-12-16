@@ -103,7 +103,7 @@ public class SyncExecutionService	implements	IExecutionService
 						{
 							removedtask = null;
 							for(int i=0; i<removedlisteners.size(); i++)
-								((IResultListener)removedlisteners.get(i)).resultAvailable(null);
+								((IResultListener)removedlisteners.get(i)).resultAvailable(this, null);
 							removedlisteners.clear();
 						}
 						else
@@ -141,7 +141,7 @@ public class SyncExecutionService	implements	IExecutionService
 					// todo: extract call from synchronized block
 					if(stoplistener!=null)
 					{
-						stoplistener.resultAvailable(null);
+						stoplistener.resultAvailable(this, null);
 						stoplistener = null;
 					}
 					
@@ -189,7 +189,7 @@ public class SyncExecutionService	implements	IExecutionService
 	{
 		if(shutdown)
 		{
-			listener.exceptionOccurred(new RuntimeException("Shutting down."));
+			listener.exceptionOccurred(this, new RuntimeException("Shutting down."));
 			return;
 		}
 		
@@ -207,7 +207,7 @@ public class SyncExecutionService	implements	IExecutionService
 			{
 				queue.remove(task);
 				if(listener!=null)
-					listener.resultAvailable(null);
+					listener.resultAvailable(this, null);
 			}
 		}
 	}
@@ -235,7 +235,7 @@ public class SyncExecutionService	implements	IExecutionService
 	{
 		if(!running || shutdown)
 		{
-			listener.exceptionOccurred(new RuntimeException("Not running."));
+			listener.exceptionOccurred(this, new RuntimeException("Not running."));
 			return;
 		}
 		
@@ -250,7 +250,7 @@ public class SyncExecutionService	implements	IExecutionService
 	{
 		if(!running || shutdown)
 		{
-			listener.exceptionOccurred(new RuntimeException("Not running."));
+			listener.exceptionOccurred(this, new RuntimeException("Not running."));
 			return;
 		}
 		

@@ -142,12 +142,12 @@ public class GpmnProcessService implements IExecutionService
 		final IComponentExecutionService ces = (IComponentExecutionService)wfms.getService(IComponentExecutionService.class);
 		ces.createComponent(String.valueOf(id), modelname, null, arguments, true, new IResultListener()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Object source, Object result)
 			{
 				processes.put(id, result);
-				ces.addComponentListener((IComponentIdentifier) result, new IComponentListener() {
-					
-					public void componentRemoved(IComponentDescription desc)
+				ces.addComponentListener((IComponentIdentifier) result, new IComponentListener() 
+				{
+					public void componentRemoved(IComponentDescription desc, Map results)
 					{
 						synchronized (GpmnProcessService.this)
 						{
@@ -169,11 +169,11 @@ public class GpmnProcessService implements IExecutionService
 				ces.resumeComponent((IComponentIdentifier) result, null);
 			}
 			
-			public void exceptionOccurred(Exception exception)
+			public void exceptionOccurred(Object source, Exception exception)
 			{
 				((IMonitoringService) wfms.getService(IMonitoringService.class)).getLogger().log(Level.SEVERE, "Failed to start model: " + name);
 			}
-		}, null);
+		}, null, null);
 		
 		
 		/*ams.createAgent(name, modelname, null, null, new IResultListener()

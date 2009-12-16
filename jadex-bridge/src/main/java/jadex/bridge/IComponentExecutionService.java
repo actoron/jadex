@@ -22,7 +22,8 @@ public interface IComponentExecutionService	extends IService
 	 *  @param listener The result listener (if any). Will receive the id of the component as result.
 	 *  @param creator The creator (if any).
 	 */
-	public void	createComponent(String name, String model, String config, Map args, boolean suspend, IResultListener listener, Object creator);
+	public void	createComponent(String name, String model, String config, Map args, boolean suspend, 
+		IResultListener listener, Object creator, IResultListener killlistener);
 		
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.

@@ -60,13 +60,13 @@ public class DispatchGoalTask	implements ITask
 						goal.removeGoalListener(this);
 						if(goal.isSucceeded())
 						{
-							listener.resultAvailable(null);
+							listener.resultAvailable(DispatchGoalTask.this, null);
 						}
 						else
 						{
 							Exception	e	= new GoalFailureException();
 							e.fillInStackTrace();
-							listener.exceptionOccurred(e);
+							listener.exceptionOccurred(DispatchGoalTask.this, e);
 						}
 					}
 					
@@ -82,11 +82,11 @@ public class DispatchGoalTask	implements ITask
 				plan.dispatchTopLevelGoal(goal);
 			
 			if(!wait)
-				listener.resultAvailable(null);
+				listener.resultAvailable(this, null);
 		}
 		catch(Exception e)
 		{
-			listener.exceptionOccurred(e);
+			listener.exceptionOccurred(this, e);
 		}
 	}
 }

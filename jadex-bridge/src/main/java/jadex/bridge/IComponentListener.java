@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import java.util.Map;
+
 
 /**
  *  Interface for locally listening to element changes.
@@ -22,5 +24,5 @@ public interface IComponentListener
 	 *  Called when a new element has been removed.
 	 *  @param id The identifier.
 	 */
-	public void componentRemoved(IComponentDescription desc);
+	public void componentRemoved(IComponentDescription desc, Map results);
 }

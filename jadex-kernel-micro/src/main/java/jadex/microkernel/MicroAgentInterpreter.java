@@ -3,6 +3,7 @@ package jadex.microkernel;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.concurrent.IResultListener;
@@ -38,8 +39,11 @@ public class MicroAgentInterpreter implements IComponentInstance
 	/** The arguments. */
 	protected Map arguments;
 	
+	/** The results. */
+	protected Map results;
+	
 	/** The activity handlers. */
-	protected Map	handlers;
+	protected Map handlers;
 	
 	// todo: ensure that entries are empty when saving
 	/** The entries added from external threads. */
@@ -83,6 +87,19 @@ public class MicroAgentInterpreter implements IComponentInstance
 				{
 					this.arguments.put(args[i].getName(), args[i].getDefaultValue(config));
 				}
+			}
+		}
+		
+		// Init the results with default values.
+		IArgument[] res = model.getResults();
+		for(int i=0; i<res.length; i++)
+		{
+			if(res[i].getDefaultValue(config)!=null)
+			{
+				if(this.results==null)
+					this.results = new HashMap();
+			
+				this.results.put(res[i].getName(), res[i].getDefaultValue(config));
 			}
 		}
 
@@ -210,7 +227,8 @@ public class MicroAgentInterpreter implements IComponentInstance
 								microagent.timer = null;
 							}
 							microagent.agentKilled();
-							listener.resultAvailable(adapter.getComponentIdentifier());
+							IComponentIdentifier cid = adapter.getComponentIdentifier();
+							listener.resultAvailable(cid, cid);
 						}
 					});
 					
@@ -235,7 +253,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 			public void run()
 			{
 				Object exta = microagent.getExternalAccess();
-				listener.resultAvailable(exta);
+				listener.resultAvailable(getAgentAdapter().getComponentIdentifier(), exta);
 			}
 		});
 	}
@@ -250,6 +268,15 @@ public class MicroAgentInterpreter implements IComponentInstance
 	public ClassLoader getClassLoader()
 	{
 		return model.getClassLoader();
+	}
+	
+	/**
+	 *  Get the results.
+	 *  @return The results map.
+	 */
+	public Map getResults()
+	{
+		return results;
 	}
 	
 	//-------- helpers --------
@@ -420,6 +447,19 @@ public class MicroAgentInterpreter implements IComponentInstance
 	}
 	
 	/**
+	 *  Set a result value.
+	 *  @param name The result name.
+	 *  @param value The result value.
+	 */
+	public void setResultValue(String name, Object value)
+	{	
+		if(results==null)
+			results = new HashMap();
+		results.put(name, value);
+	}
+	
+	
+	/**
 	 *  Get the configuration.
 	 *  @return The configuration.
 	 */
@@ -450,23 +490,23 @@ public class MicroAgentInterpreter implements IComponentInstance
 			this.listener = listener;
 		}
 		
-		public void resultAvailable(final Object result)
+		public void resultAvailable(final Object source, final Object result)
 		{
 			getAgentAdapter().invokeLater(new Runnable()
 			{
 				public void run()
 				{
-					listener.resultAvailable(result);
+					listener.resultAvailable(source, result);
 				}
 			});
 		}
-		public void exceptionOccurred(final Exception exception)
+		public void exceptionOccurred(final Object source, final Exception exception)
 		{
 			getAgentAdapter().invokeLater(new Runnable()
 			{
 				public void run()
 				{
-					listener.resultAvailable(exception);
+					listener.resultAvailable(source, exception);
 				}
 			});
 		}

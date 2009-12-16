@@ -333,7 +333,7 @@ public class LibraryService implements IService, ILibraryService
 
 		if(listener != null)
 		{
-			listener.resultAvailable(null);
+			listener.resultAvailable(this, null);
 		}
 	}
 

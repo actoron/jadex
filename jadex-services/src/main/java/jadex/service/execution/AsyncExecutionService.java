@@ -151,7 +151,7 @@ public class AsyncExecutionService	implements IExecutionService
 		if(shutdown)
 		{
 			if(listener!=null)
-				listener.exceptionOccurred(new RuntimeException("Shutting down."));
+				listener.exceptionOccurred(this, new RuntimeException("Shutting down."));
 			return;
 		}
 		
@@ -160,22 +160,24 @@ public class AsyncExecutionService	implements IExecutionService
 		{
 			IResultListener lis = new IResultListener()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(Object source, Object result)
 				{
+					// todo: do not call listener with holding lock
 					synchronized(AsyncExecutionService.this)
 					{
 						if(listener!=null)
-							listener.resultAvailable(result);
+							listener.resultAvailable(source, result);
 						executors.remove(task);
 					}
 				}
 
-				public void exceptionOccurred(Exception exception)
+				public void exceptionOccurred(Object source, Exception exception)
 				{
+					// todo: do not call listener with holding lock
 					synchronized(AsyncExecutionService.this)
 					{
 						if(listener!=null)
-							listener.exceptionOccurred(exception);
+							listener.exceptionOccurred(source, exception);
 						executors.remove(task);
 					}
 				}
@@ -186,7 +188,7 @@ public class AsyncExecutionService	implements IExecutionService
 		else
 		{
 			if(listener!=null)
-				listener.resultAvailable(null);
+				listener.resultAvailable(this, null);
 		}
 	}
 	
@@ -200,7 +202,7 @@ public class AsyncExecutionService	implements IExecutionService
 	{
 		if(!running || shutdown)
 		{
-			listener.exceptionOccurred(new RuntimeException("Not running."));
+			listener.exceptionOccurred(this, new RuntimeException("Not running."));
 			return;
 		}
 		
@@ -261,7 +263,7 @@ public class AsyncExecutionService	implements IExecutionService
 		if(shutdown)
 		{
 			if(listener!=null)
-				listener.exceptionOccurred(new RuntimeException("Already shutdowned."));
+				listener.exceptionOccurred(this, new RuntimeException("Already shutdowned."));
 			return;
 		}
 		
@@ -285,7 +287,7 @@ public class AsyncExecutionService	implements IExecutionService
 		else
 		{
 			if(listener!=null)
-				listener.resultAvailable(null);
+				listener.resultAvailable(this, null);
 		}
 				
 		executors = null;

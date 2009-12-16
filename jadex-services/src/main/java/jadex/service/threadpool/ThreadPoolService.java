@@ -51,7 +51,7 @@ public class ThreadPoolService implements IThreadPool, IService
 	{
 		threadpool.dispose();
 		if(listener!=null)
-			listener.resultAvailable(null);
+			listener.resultAvailable(this, null);
 	}
 	
 	/**

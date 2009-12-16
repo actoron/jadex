@@ -82,7 +82,7 @@ public class BDIAgentFactory implements IComponentFactory
 	public void shutdown(IResultListener listener)
 	{
 		if(listener!=null)
-			listener.resultAvailable(null);
+			listener.resultAvailable(this, null);
 	}
 	
 	/**
