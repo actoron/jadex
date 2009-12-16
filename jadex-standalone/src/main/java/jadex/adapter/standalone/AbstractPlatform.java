@@ -1,6 +1,9 @@
 package jadex.adapter.standalone;
 
+import jadex.adapter.base.SComponentFactory;
+import jadex.adapter.base.appdescriptor.ApplicationModel;
 import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.PropertyServiceContainer;
@@ -295,8 +298,18 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 	 */
 	protected void createComponent(String name, String model, String config, Map args, final boolean daemon)
 	{
-		final IComponentExecutionService	ces	= (IComponentExecutionService)getService(IComponentExecutionService.class);
-		ces.createComponent(name, model, config, args, false, null, null); //new IResultListener()
+		ILoadableComponentModel lmodel = SComponentFactory.loadModel(this, model);
+//		
+		if(lmodel instanceof ApplicationModel)
+		{
+			SComponentFactory.createApplication(this, name, model, config, args);
+		}
+		else
+		{
+			final IComponentExecutionService	ces	= (IComponentExecutionService)getService(IComponentExecutionService.class);
+			ces.createComponent(name, model, config, args, false, null, null); //new IResultListener()
+		}
+		
 //		{
 //			public void resultAvailable(Object result)
 //			{
