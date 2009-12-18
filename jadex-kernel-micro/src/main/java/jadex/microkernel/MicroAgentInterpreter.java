@@ -276,7 +276,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public Map getResults()
 	{
-		return results;
+		return Collections.unmodifiableMap(results);
 	}
 	
 	//-------- helpers --------

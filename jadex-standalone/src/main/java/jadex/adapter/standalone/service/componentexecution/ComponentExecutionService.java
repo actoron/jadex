@@ -452,11 +452,6 @@ public class ComponentExecutionService implements IComponentExecutionService
 				alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
 			}
 			
-			// Notify the component result listener.
-			IResultListener reslis = (IResultListener)killresultlisteners.remove(cid);
-			if(reslis!=null)
-				reslis.resultAvailable(cid, results);
-			
 			// todo: can be called after listener has (concurrently) deregistered
 			for(int i=0; i<alisteners.length; i++)
 			{
@@ -468,6 +463,13 @@ public class ComponentExecutionService implements IComponentExecutionService
 				{
 					System.out.println("WARNING: Exception when removing agent: "+ad+", "+e);
 				}
+			}
+			
+			IResultListener reslis = (IResultListener)killresultlisteners.remove(cid);
+			if(reslis!=null)
+			{
+//				System.out.println("result: "+cid+" "+results);
+				reslis.resultAvailable(cid, results);
 			}
 			
 //			System.out.println("CleanupCommand end.");

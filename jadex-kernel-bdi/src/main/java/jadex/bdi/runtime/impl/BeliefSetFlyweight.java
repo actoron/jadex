@@ -194,7 +194,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 	 *  Get a value equal to the given object.
 	 *  @param oldval The old value.
 	 */
-	public Object	getFact(final Object oldval)
+	public Object getFact(final Object oldval)
 	{
 		if(getInterpreter().isExternalThread())
 		{
@@ -319,14 +319,7 @@ public class BeliefSetFlyweight extends ElementFlyweight implements IBeliefSet
 			ret	= (Object[])Array.newInstance(SReflect.getWrappedType(clazz), facts!=null ? facts.size() : 0);
 			if(facts!=null)
 			{
-			try
-			{
 				ret = facts.toArray(ret);
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
 			}
 			return ret;
 		}

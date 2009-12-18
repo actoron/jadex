@@ -12,6 +12,7 @@ import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
+import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentInstance;
@@ -159,7 +160,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 
 		state.setSynchronizator(new ISynchronizator()
 		{
-			
 			public boolean isExternalThread()
 			{
 				return BDIInterpreter.this.isExternalThread();
@@ -627,8 +627,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 */
 	public Map getResults()
 	{
-		// todo
-		return null;
+		return Collections.unmodifiableMap((Map)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_results));
 	}
 
 	/**

@@ -1,0 +1,36 @@
+<!--
+	<H3>Agent for testing agent results.</H3>
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="Results"
+	package="jadex.bdi.testcases.misc">
+
+	<imports>
+		<import>jadex.bdi.testcases.*</import>
+		<import>jadex.adapter.base.fipa.*</import>
+	</imports>
+
+	<beliefs>
+		<belief name="arg" class="String" exported="true" result="true">
+			<fact>"default"</fact>
+		</belief>
+	</beliefs>
+	
+	<plans>
+		<plan name="write_results_plan">
+			<body class="WriteResultsPlan"/>
+		</plan>
+	</plans>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="write_results_plan"/>
+			</plans>
+		</configuration>
+	</configurations>
+</agent>
+

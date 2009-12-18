@@ -1,5 +1,7 @@
 package jadex.bdi.interpreter;
 
+import jadex.bdi.runtime.IBelief;
+import jadex.bdi.runtime.impl.BeliefFlyweight;
 import jadex.bdi.runtime.impl.InterpreterTimedObject;
 import jadex.bridge.CheckedAction;
 import jadex.commons.SReflect;
@@ -188,11 +190,8 @@ public class BeliefRules
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefs, rbelief, IOperator.CONTAINS));
 
-		return new Object[]{
-			new AndCondition(new ICondition[]{belcon, capcon}),
-			DYNAMIC_BELIEF_CHANGED,
-			null,
-			ret};
+		return new Object[]{new AndCondition(new ICondition[]{belcon, capcon}),
+			DYNAMIC_BELIEF_CHANGED,null,ret};
 	}
 	
 	/**
@@ -233,9 +232,7 @@ public class BeliefRules
 
 		return new Object[]{
 			new AndCondition(new ICondition[]{belsetcon, capcon}), 
-			DYNAMIC_BELIEFSET_CHANGED,
-			null,
-			ret};
+			DYNAMIC_BELIEFSET_CHANGED, null, ret};
 	}
 	
 	/**

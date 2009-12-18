@@ -80,19 +80,20 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 				ongoing.addAll(todo);
 				app.createAgent(null, "Truck", null, params, true, false, new IResultListener()
 				{
-					public void exceptionOccurred(Exception exception)
+					public void exceptionOccurred(Object source, Exception exception)
 					{
 					}
-					public void resultAvailable(Object result)
+					public void resultAvailable(Object source, Object result)
 					{
 						IComponentIdentifier truck = (IComponentIdentifier)result;
-						IComponentExecutionService ces = (IComponentExecutionService)app.getServiceContainer().getService(IComponentExecutionService.class);
+						IComponentExecutionService ces = (IComponentExecutionService)app.getServiceContainer()
+							.getService(IComponentExecutionService.class);
 						ces.getExternalAccess(truck, new IResultListener()
 						{
-							public void exceptionOccurred(Exception exception)
+							public void exceptionOccurred(Object source, Exception exception)
 							{
 							}
-							public void resultAvailable(Object result)
+							public void resultAvailable(Object source, Object result)
 							{
 								IBDIExternalAccess ex = (IBDIExternalAccess)result;
 								ex.addAgentListener(new IAgentListener()

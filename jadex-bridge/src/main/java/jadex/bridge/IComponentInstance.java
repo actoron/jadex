@@ -70,6 +70,9 @@ public interface IComponentInstance
 	
 	/**
 	 *  Get the results of the component (considering it as a functionality).
+	 *  Note: The method cannot make use of the asynchrnonous result listener
+	 *  mechanism, because the it is called when the component is already
+	 *  terminated (i.e. no invokerLater can be used).
 	 *  @return The results map (name -> value). 
 	 */
 	public Map getResults();

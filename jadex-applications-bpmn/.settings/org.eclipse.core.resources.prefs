@@ -1,11 +1,9 @@
-#Wed Dec 16 17:23:42 CET 2009
+#Wed Dec 16 18:57:34 CET 2009
 eclipse.preferences.version=1
 encoding//src/main/java/jadex/bpmn/benchmarks/AgentCreation.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/benchmarks/AgentCreation.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/benchmarks/AgentCreation2.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/benchmarks/AgentCreation2.bpmn_diagram=UTF-8
-encoding//src/main/java/jadex/bpmn/benchmarks/default.bpmn=UTF-8
-encoding//src/main/java/jadex/bpmn/benchmarks/default.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/execute/Notification.bpmn=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/execute/Notification.bpmn_diagram=UTF-8
 encoding//src/main/java/jadex/bpmn/examples/execute/Result.bpmn=UTF-8

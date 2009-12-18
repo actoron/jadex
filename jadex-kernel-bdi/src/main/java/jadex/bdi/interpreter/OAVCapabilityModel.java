@@ -156,7 +156,9 @@ public class OAVCapabilityModel implements ILoadableComponentModel, ICacheableMo
 				Object bel = it.next();
 				String exported = (String)state.getAttributeValue(bel, 
 					OAVBDIMetaModel.referenceableelement_has_exported);
-				if(!OAVBDIMetaModel.EXPORTED_FALSE.equals(exported))
+				Boolean argu = (Boolean)state.getAttributeValue(bel, 
+					OAVBDIMetaModel.belief_has_argument);
+				if(!OAVBDIMetaModel.EXPORTED_FALSE.equals(exported) || Boolean.TRUE.equals(argu))
 					ret.add(new MBeliefArgument(state, handle, bel));
 			}
 		}
@@ -166,11 +168,43 @@ public class OAVCapabilityModel implements ILoadableComponentModel, ICacheableMo
 		{
 			for(Iterator it=belrefs.iterator(); it.hasNext(); )
 			{
-				Object bel = it.next();
-				String exported = (String)state.getAttributeValue(bel, 
+				Object belref = it.next();
+				String exported = (String)state.getAttributeValue(belref, 
 					OAVBDIMetaModel.referenceableelement_has_exported);
-				if(!OAVBDIMetaModel.EXPORTED_FALSE.equals(exported))
-					ret.add(new MBeliefReferenceArgument(state, handle, bel));
+				Boolean argu = (Boolean)state.getAttributeValue(belref, 
+					OAVBDIMetaModel.beliefreference_has_argument);
+				if(!OAVBDIMetaModel.EXPORTED_FALSE.equals(exported) || Boolean.TRUE.equals(argu))
+					ret.add(new MBeliefArgument(state, handle, belref));
+			}
+		}
+		
+		Collection belsets = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsets);
+		if(belsets!=null)
+		{
+			for(Iterator it=belsets.iterator(); it.hasNext(); )
+			{
+				Object belset = it.next();
+				String exported = (String)state.getAttributeValue(belset, 
+					OAVBDIMetaModel.referenceableelement_has_exported);
+				Boolean argu = (Boolean)state.getAttributeValue(belset, 
+					OAVBDIMetaModel.beliefset_has_argument);
+				if(!OAVBDIMetaModel.EXPORTED_FALSE.equals(exported) || Boolean.TRUE.equals(argu))
+					ret.add(new MBeliefSetArgument(state, handle, belset));
+			}
+		}
+		
+		Collection belsetrefs = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsetrefs);
+		if(belsetrefs!=null)
+		{
+			for(Iterator it=belsetrefs.iterator(); it.hasNext(); )
+			{
+				Object belsetref = it.next();
+				String exported = (String)state.getAttributeValue(belsetref, 
+					OAVBDIMetaModel.referenceableelement_has_exported);
+				Boolean argu = (Boolean)state.getAttributeValue(belsetref, 
+					OAVBDIMetaModel.beliefsetreference_has_argument);
+				if(!OAVBDIMetaModel.EXPORTED_FALSE.equals(exported) || Boolean.TRUE.equals(argu))
+					ret.add(new MBeliefSetArgument(state, handle, belsetref));
 			}
 		}
 		
@@ -183,8 +217,61 @@ public class OAVCapabilityModel implements ILoadableComponentModel, ICacheableMo
 	 */
 	public IArgument[] getResults()
 	{
-		// todo
-		return new IArgument[0];
+		List ret = new ArrayList();
+		
+		Collection bels = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefs);
+		if(bels!=null)
+		{
+			for(Iterator it=bels.iterator(); it.hasNext(); )
+			{
+				Object bel = it.next();
+				Boolean result = (Boolean)state.getAttributeValue(bel, 
+					OAVBDIMetaModel.belief_has_result);
+				if(Boolean.TRUE.equals(result))
+					ret.add(new MBeliefArgument(state, handle, bel));
+			}
+		}
+		
+		Collection belrefs = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefrefs);
+		if(belrefs!=null)
+		{
+			for(Iterator it=belrefs.iterator(); it.hasNext(); )
+			{
+				Object belref = it.next();
+				Boolean result = (Boolean)state.getAttributeValue(belref, 
+					OAVBDIMetaModel.beliefreference_has_result);
+				if(Boolean.TRUE.equals(result))
+					ret.add(new MBeliefArgument(state, handle, belref));
+			}
+		}
+		
+		Collection belsets = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsets);
+		if(belsets!=null)
+		{
+			for(Iterator it=belsets.iterator(); it.hasNext(); )
+			{
+				Object belset = it.next();
+				Boolean result = (Boolean)state.getAttributeValue(belset, 
+					OAVBDIMetaModel.beliefset_has_result);
+				if(Boolean.TRUE.equals(result))
+					ret.add(new MBeliefSetArgument(state, handle, belset));
+			}
+		}
+		
+		Collection belsetrefs = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_beliefsetrefs);
+		if(belsetrefs!=null)
+		{
+			for(Iterator it=belsetrefs.iterator(); it.hasNext(); )
+			{
+				Object belsetref = it.next();
+				Boolean result = (Boolean)state.getAttributeValue(belsetref, 
+					OAVBDIMetaModel.beliefsetreference_has_result);
+				if(Boolean.TRUE.equals(result))
+					ret.add(new MBeliefSetArgument(state, handle, belsetref));
+			}
+		}
+		
+		return (IArgument[])ret.toArray(new IArgument[ret.size()]);
 	}
 	
 	/**

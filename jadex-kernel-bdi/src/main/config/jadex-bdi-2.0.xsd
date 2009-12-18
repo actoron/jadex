@@ -780,38 +780,65 @@
 	</xs:complexType>
 	<xs:complexType name="MBelief" mixed="true">
 		<xs:annotation>
-			<xs:documentation>A belief represents a single-valued piece of information.</xs:documentation>
+			<xs:documentation>
+				A belief represents a single-valued piece of
+				information.
+			</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
 			<xs:extension base="MTypedElement">
 				<xs:sequence>
-					<xs:element name="fact" type="MInternalExpression" minOccurs="0">
+					<xs:element name="fact" type="MInternalExpression"
+						minOccurs="0">
 						<xs:annotation>
-							<xs:documentation>An expression that represents the default value. Per default it is static, i.e. it is only evalued only once on creation. </xs:documentation>
+							<xs:documentation>
+								An expression that represents the
+								default value. Per default it is static,
+								i.e. it is only evalued only once on
+								creation.
+							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
 				</xs:sequence>
+				<xs:attribute name="argument" type="xs:boolean"></xs:attribute>
+				<xs:attribute name="result" type="xs:boolean"></xs:attribute>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="MBeliefSet" mixed="true">
 		<xs:annotation>
-			<xs:documentation>A belief represents a multi-valued piece of information.</xs:documentation>
+			<xs:documentation>
+				A belief represents a multi-valued piece of information.
+			</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
 			<xs:extension base="MTypedElementSet">
 				<xs:choice>
-					<xs:element name="fact" type="MStaticValue" minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="fact" type="MStaticValue"
+						minOccurs="0" maxOccurs="unbounded">
 						<xs:annotation>
-							<xs:documentation>An expression that evaluated to a default value. Only static values are allowed, i.e. it is only evaluated once on creation.</xs:documentation>
+							<xs:documentation>
+								An expression that evaluated to a
+								default value. Only static values are
+								allowed, i.e. it is only evaluated once
+								on creation.
+							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="facts" type="MInternalExpression" minOccurs="0">
+					<xs:element name="facts" type="MInternalExpression"
+						minOccurs="0">
 						<xs:annotation>
-							<xs:documentation>An expression that is evaluated to a set of default values. Per default it is static, i.e. it is only evalued only once on creation. </xs:documentation>
+							<xs:documentation>
+								An expression that is evaluated to a set
+								of default values. Per default it is
+								static, i.e. it is only evalued only
+								once on creation.
+							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
 				</xs:choice>
+				<xs:attribute name="argument" type="xs:boolean"></xs:attribute>
+				<xs:attribute name="result" type="xs:boolean"></xs:attribute>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -1375,15 +1402,23 @@
 			<xs:documentation>Reference to a belief.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:extension base="MTypedElementReference"/>
+			<xs:extension base="MTypedElementReference">
+				<xs:attribute name="argument" type="xs:boolean"></xs:attribute>
+				<xs:attribute name="result" type="xs:boolean"></xs:attribute>
+			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="MBeliefSetReference" mixed="true">
 		<xs:annotation>
-			<xs:documentation>Reference to a belief set.</xs:documentation>
+			<xs:documentation>
+				Reference to a belief set.
+			</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:extension base="MTypedElementSetReference"/>
+			<xs:extension base="MTypedElementSetReference">
+				<xs:attribute name="argument" type="xs:boolean"></xs:attribute>
+				<xs:attribute name="result" type="xs:boolean"></xs:attribute>
+			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="MParameterElementReference" abstract="true" mixed="true">

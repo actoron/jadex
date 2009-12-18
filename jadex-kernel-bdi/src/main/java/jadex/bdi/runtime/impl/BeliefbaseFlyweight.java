@@ -62,7 +62,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 			{
 				public void run()
 				{
-					Object[] scope = AgentRules.resolveCapability((String) arg, OAVBDIMetaModel.belief_type, getScope(), getState());
+					Object[] scope = AgentRules.resolveCapability((String)arg, OAVBDIMetaModel.belief_type, getScope(), getState());
 
 					Object mscope = getState().getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
 					Object mbel = getState().getAttributeValue(mscope, OAVBDIMetaModel.capability_has_beliefs, scope[0]);

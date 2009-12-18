@@ -17,6 +17,6 @@ public class SyncResultListenerTriggerPlan extends Plan
 
 		// Set result of listener.
 		SyncResultListener	listener	= (SyncResultListener)getBeliefbase().getBelief("listener").getFact();
-		listener.resultAvailable("success");
+		listener.resultAvailable(this, "success");
 	}
 }

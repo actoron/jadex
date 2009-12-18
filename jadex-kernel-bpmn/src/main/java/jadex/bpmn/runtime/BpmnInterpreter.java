@@ -415,7 +415,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	 */
 	public Map getResults()
 	{
-		return results;
+		return Collections.unmodifiableMap(results);
 	}
 	
 	/**

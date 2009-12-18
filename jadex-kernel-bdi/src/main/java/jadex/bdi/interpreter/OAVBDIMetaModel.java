@@ -455,10 +455,22 @@ public class OAVBDIMetaModel
 	/** Belief has default value attribute. */
 	public static OAVAttributeType belief_has_fact;
 	
+	/** Belief has is argument flag. */
+	public static OAVAttributeType belief_has_argument;
+	
+	/** Belief has is result flag. */
+	public static OAVAttributeType belief_has_result;
+	
 	//-------- belief reference --------
 	
 	/** The belief reference type. */
 	public static OAVObjectType beliefreference_type;
+	
+	/** Belief has is argument flag. */
+	public static OAVAttributeType beliefreference_has_argument;
+	
+	/** Belief has is result flag. */
+	public static OAVAttributeType beliefreference_has_result;
 		
 	//-------- belief set --------
 	
@@ -474,11 +486,23 @@ public class OAVBDIMetaModel
 	/** Beliefset has default facts expression attribute. */
 	public static OAVAttributeType beliefset_has_factsexpression;
 	
+	/** Belief has is argument flag. */
+	public static OAVAttributeType beliefset_has_argument;
+	
+	/** Belief has is result flag. */
+	public static OAVAttributeType beliefset_has_result;
+	
 	//-------- belief set reference --------
 	
 	/** The belief set reference type. */
 	public static OAVObjectType beliefsetreference_type;
 
+	/** Belief has is argument flag. */
+	public static OAVAttributeType beliefsetreference_has_argument;
+	
+	/** Belief has is result flag. */
+	public static OAVAttributeType beliefsetreference_has_result;
+	
 	//-------- perform goal --------
 	
 	/** The perform goal type. */
@@ -966,13 +990,25 @@ public class OAVBDIMetaModel
 		// belief
 //		belief_has_dynamic = belief_type.createAttributeType("belief_has_dynamic", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
 		belief_has_fact = belief_type.createAttributeType("mbelief_has_fact", expression_type);
+		belief_has_argument = belief_type.createAttributeType("mbelief_has_argument", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		belief_has_result = belief_type.createAttributeType("mbelief_has_result", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
 		
 		// belief set
 		// todo: make configurable belief store type (list, set, ...)
 //		beliefset_has_dynamic = beliefset_type.createAttributeType("beliefset_has_dynamic", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
 		beliefset_has_facts = beliefset_type.createAttributeType("mbeliefset_has_facts", expression_type, OAVAttributeType.LIST);
 		beliefset_has_factsexpression = beliefset_type.createAttributeType("mbeliefset_has_factsexpression", expression_type);
+		beliefset_has_argument = beliefset_type.createAttributeType("mbeliefset_has_argument", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		beliefset_has_result = beliefset_type.createAttributeType("mbeliefset_has_result", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
 		
+		// belief ref
+		beliefreference_has_argument = beliefreference_type.createAttributeType("mbeliefref_has_argument", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		beliefreference_has_result = beliefreference_type.createAttributeType("mbeliefref_has_result", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+
+		// beliefset ref
+		beliefsetreference_has_argument = beliefsetreference_type.createAttributeType("mbeliefsetref_has_argument", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		beliefsetreference_has_result = beliefsetreference_type.createAttributeType("mbeliefsetref_has_result", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+
 		// inhibit
 		inhibits_has_ref = inhibits_type.createAttributeType("minhibits_has_ref", OAVJavaType.java_string_type);
 		inhibits_has_inhibit = inhibits_type.createAttributeType("minhibits_has_inhibit", OAVJavaType.java_string_type, OAVAttributeType.NONE, INHIBITS_WHEN_ACTIVE);

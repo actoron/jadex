@@ -1,8 +1,11 @@
 package jadex.bdi.interpreter;
 
+import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IPlanExecutor;
+import jadex.bdi.runtime.impl.BeliefFlyweight;
 import jadex.bdi.runtime.impl.InterpreterTimedObject;
 import jadex.bridge.CheckedAction;
+import jadex.bridge.IArgument;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
@@ -27,8 +30,10 @@ import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -207,9 +212,115 @@ public class AgentRules
 
 				// Todo: no more rules should trigger -> No dropping of agent object!? 
 				Object ragent = assignments.getVariableValue("?ragent");
+				Object magent = state.getAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model);
 //				state.dropObject(ragent);
 
 //				System.out.println("terminated: "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
+				
+				// Collect results for agent.
+				
+				IArgument[] results = interpreter.getModel().getResults();
+				Map res = new HashMap();
+				
+				for(int i=0; i<results.length; i++)
+				{
+					boolean found = false; 
+					String resname = results[i].getName();
+					
+					// belief
+					{
+						Object mbel = state.getAttributeValue(magent, OAVBDIMetaModel.capability_has_beliefs, resname);
+						if(mbel!=null)
+						{
+							Object rbel = state.getAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_beliefs, mbel);
+							Object val = BeliefRules.getBeliefValue(state, rbel, ragent);
+							res.put(resname, val);
+							found = true;
+						}
+					}
+					
+					// belief reference
+					if(!found)
+					{
+						Object mbelref = state.getAttributeValue(magent, OAVBDIMetaModel.capability_has_beliefrefs, resname);
+						if(mbelref!=null)
+						{
+							Object[] scope = AgentRules.resolveCapability(resname, OAVBDIMetaModel.belief_type, ragent, state);
+						
+							Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+							Object mbel = state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_beliefs, scope[0]);
+							if(mbel!=null)
+							{
+								// Init on demand.
+								if(!state.containsKey(scope[1], OAVBDIRuntimeModel.capability_has_beliefs, mbel))
+								{
+									AgentRules.initBelief(state, scope[1], mbel, null);
+								}
+								Object rbel = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_beliefs, mbel);	
+								Object val = BeliefRules.getBeliefValue(state, rbel, ragent);
+								res.put(resname, val);
+								found = true;
+							}
+						}
+					}
+					
+					if(!found)
+					{
+						Object mbelset = state.getAttributeValue(magent, OAVBDIMetaModel.capability_has_beliefsets, resname);
+						Object rbelset = state.getAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_beliefsets, mbelset);
+						if(rbelset!=null)
+						{
+							Collection coll = state.getAttributeValues(rbelset, OAVBDIRuntimeModel.beliefset_has_facts);
+							Class clazz	= (Class)state.getAttributeValue(mbelset, OAVBDIMetaModel.typedelement_has_class);
+							Object[] vals = (Object[])Array.newInstance(SReflect.getWrappedType(clazz), coll!=null ? coll.size() : 0);
+							if(coll!=null)
+							{
+								vals = coll.toArray(vals);
+							}
+							res.put(resname, vals);
+							found = true;
+						}
+					}
+						
+					if(!found)
+					{
+						Object mbelsetref = state.getAttributeValue(magent, OAVBDIMetaModel.capability_has_beliefsetrefs, resname);
+						if(mbelsetref!=null)
+						{
+							Object[] scope = AgentRules.resolveCapability(resname, OAVBDIMetaModel.beliefset_type, ragent, state);
+						
+							Object mscope = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.element_has_model);
+							Object mbelset = state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_beliefsets, scope[0]);
+							if(mbelset!=null)
+							{
+								// Init on demand.
+								if(!state.containsKey(scope[1], OAVBDIRuntimeModel.capability_has_beliefsets, mbelset))
+								{
+									AgentRules.initBelief(state, scope[1], mbelset, null);
+								}
+								Object rbelset = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_beliefsets, mbelset);	
+								if(rbelset!=null)
+								{
+									Collection coll = state.getAttributeValues(rbelset, OAVBDIRuntimeModel.beliefset_has_facts);
+									Class clazz	= (Class)state.getAttributeValue(mbelset, OAVBDIMetaModel.typedelement_has_class);
+									Object[] vals = (Object[])Array.newInstance(SReflect.getWrappedType(clazz), coll!=null ? coll.size() : 0);
+									if(coll!=null)
+									{
+										vals = coll.toArray(vals);
+									}
+									
+									res.put(resname, vals);
+									found = true;
+								}
+							}
+						}
+					}
+					
+					if(!found)
+						throw new RuntimeException("Could not resolve result belief/set: "+resname);
+				}
+				
+				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_results, res);
 				
 				// Cleanup timers.
 				cleanupCapability(state, ragent);
