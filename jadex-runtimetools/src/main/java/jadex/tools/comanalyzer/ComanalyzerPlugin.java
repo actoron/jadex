@@ -946,16 +946,30 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				MessageType mt = message.getMessageType();
 
 				sid = (IComponentIdentifier)message.getValue(mt.getSenderIdentifier());
-				Iterator rids = SReflect.getIterator(message.getValue(mt.getReceiverIdentifier()));
-
-				while(rids.hasNext())
+				Object recs = message.getValue(mt.getReceiverIdentifier());
+				
+				if(recs instanceof IComponentIdentifier)
 				{
-					IComponentIdentifier rid = (IComponentIdentifier)rids.next();
+					IComponentIdentifier rid = (IComponentIdentifier)recs;
 					if(!isDuplicate(message, rid))
 					{
 						Message msg = createMessage(message, sid, rid);
 //						System.out.println("Added: "+msg);
 						messages_added.add(msg);
+					}
+				}
+				else
+				{
+					Iterator rids = SReflect.getIterator(recs);
+					while(rids.hasNext())
+					{
+						IComponentIdentifier rid = (IComponentIdentifier)rids.next();
+						if(!isDuplicate(message, rid))
+						{
+							Message msg = createMessage(message, sid, rid);
+	//						System.out.println("Added: "+msg);
+							messages_added.add(msg);
+						}
 					}
 				}
 				
@@ -1678,7 +1692,12 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		{
 			String ris = mt.getReceiverIdentifier();
 			Object rs = msg.getValue(ris);
-			if(rs!=null)
+			if(rs instanceof IComponentIdentifier)
+			{
+				if(observed.contains(rs))
+					add = true;
+			}
+			else if(rs!=null)
 			{
 				for(Iterator it=SReflect.getIterator(rs); it.hasNext() && !add; )
 				{
