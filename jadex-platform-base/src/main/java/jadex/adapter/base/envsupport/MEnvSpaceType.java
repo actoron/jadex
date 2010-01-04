@@ -190,7 +190,7 @@ public class MEnvSpaceType	extends MSpaceType
 			}));
 		
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "name")}, null, null,
-			new BeanAttributeInfo(null, AttributeInfo.THIS, null, expconv, null),
+			new BeanAttributeInfo((String)null, AttributeInfo.THIS, null, expconv, null),
 			null, null, null, null, false));
 
 		/*
