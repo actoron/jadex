@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +72,7 @@ public class Writer
  	 */
 	public void write(Object object, OutputStream out, ClassLoader classloader, final Object context) throws Exception
 	{
-		Map writtenobs = new HashMap();
+		Map writtenobs = new IdentityHashMap();
 		List stack = new ArrayList();
 		
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
