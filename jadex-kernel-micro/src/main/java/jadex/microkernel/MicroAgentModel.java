@@ -100,7 +100,7 @@ public class MicroAgentModel implements ILoadableComponentModel
 	 */
 	public String getPackage()
 	{
-		return microagent.getPackage().getName();
+		return microagent.getPackage()!=null? microagent.getPackage().getName(): null;
 	}
 	
 	/**
