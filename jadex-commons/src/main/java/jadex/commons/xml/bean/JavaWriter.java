@@ -106,7 +106,7 @@ public class JavaWriter extends Writer
 			// java.util.Color
 			
 			TypeInfo ti_color = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.awt", "Color")}, Color.class, null, 
-				new BeanAttributeInfo(null, AttributeInfo.THIS, null, null, new ITypeConverter()
+				new BeanAttributeInfo((String)null, AttributeInfo.THIS, null, null, new ITypeConverter()
 				{
 					public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 					{
@@ -131,6 +131,21 @@ public class JavaWriter extends Writer
 				null
 			);
 			typeinfos.add(ti_date);
+			
+			// java.lang.Class
+			
+			TypeInfo ti_class = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Class")}, Class.class, null, null, 
+				new AttributeInfo[]{
+				new BeanAttributeInfo("classname", AttributeInfo.THIS, null, null, new ITypeConverter()
+				{
+					public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
+					{
+						return ""+((Class)val).getName();
+					}
+				})},
+				null
+			);
+			typeinfos.add(ti_class);
 		}
 		catch(Exception e)
 		{

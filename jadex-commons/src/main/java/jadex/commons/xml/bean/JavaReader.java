@@ -1,5 +1,6 @@
 package jadex.commons.xml.bean;
 
+import jadex.commons.SReflect;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.ITypeConverter;
 import jadex.commons.xml.QName;
@@ -96,7 +97,7 @@ public class JavaReader extends Reader
 			// java.util.Color
 			
 			TypeInfo ti_color = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.awt", "Color")}, null, null, 
-				new BeanAttributeInfo(null, AttributeInfo.THIS, null, new ITypeConverter()
+				new BeanAttributeInfo((String)null, AttributeInfo.THIS, null, new ITypeConverter()
 				{
 					public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 					{
@@ -105,6 +106,17 @@ public class JavaReader extends Reader
 				}, null),
 			null, null, null, null, false);
 			typeinfos.add(ti_color);
+			
+			TypeInfo ti_class = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Class")}, new IBeanObjectCreator()
+			{
+				public Object createObject(Object context, Map rawattributes,
+					ClassLoader classloader) throws Exception
+				{
+					return SReflect.findClass((String)rawattributes.get("classname"), null, classloader);
+				}
+			}, null, null, new AttributeInfo[]{new BeanAttributeInfo("classname", null, AttributeInfo.IGNORE_READWRITE)},
+				null, null, null, false);
+			typeinfos.add(ti_class);
 			
 			// java.util.Date
 			

@@ -225,6 +225,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			ret = ((IBeanObjectCreator)type).createObject(context, rawattributes, classloader);
 		}
 		
+		
 		return ret;
 	}
 	

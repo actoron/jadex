@@ -125,6 +125,13 @@ public class BeanAttributeInfo extends AttributeInfo
 		this(xmlattributename, attributename, ignore, null, null, null);
 	}
 	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public BeanAttributeInfo(String xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite)
+	{
+		this(xmlattributename, attributename, ignore, converterread, converterwrite, null);
+	}
 	
 	/**
 	 *  Create a new bean attribute info. 

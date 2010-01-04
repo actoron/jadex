@@ -32,6 +32,7 @@ public class Test //extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
+				t.testClass();
 				t.testDate();
 				t.testColor();
 				t.testArray();
@@ -78,6 +79,14 @@ public class Test //extends TestCase
 			System.out.println("Not equal: "+wo.getClass()+" \n"+ro.getClass());
 		
 //		assertEquals("Written and read objects should be equal:", wo, ro);
+	}
+	
+	/**
+	 *  Test if class transfer works.
+	 */
+	public void testClass() throws Exception
+	{
+		doWriteAndRead(boolean.class);
 	}
 	
 	/**
