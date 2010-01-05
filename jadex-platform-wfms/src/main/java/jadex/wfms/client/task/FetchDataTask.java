@@ -19,6 +19,6 @@ public class FetchDataTask extends AbstractClientTask
 	{
 		IServiceContainer wfms = (IServiceContainer) process.getComponentAdapter().getServiceContainer(); 
 		IWfmsClientService wiq = (IWfmsClientService) wfms.getService(IWfmsClientService.class);
-		wiq.queueWorkitem(createWorkitem(Workitem.DATA_FETCH_WORKITEM_TYPE, context, listener));
+		wiq.queueWorkitem(createWorkitem(Workitem.DATA_FETCH_WORKITEM_TYPE, context), createRedirListener(context, listener));
 	}
 }

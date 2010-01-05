@@ -1,0 +1,169 @@
+<!--
+	Basic Capability for WFMS client applications.
+-->
+<capability xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	package="jadex.bdi.wfms.client.cap"
+	name="wfmsclient">
+	
+	<imports>
+		<import>java.util.*</import>
+		<import>jadex.bdi.wfms.*</import>
+		<import>jadex.bdi.wfms.ontology.*</import>
+		<import>jadex.wfms.client.*</import>
+	</imports>
+	
+	<capabilities>
+		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
+		<capability name="reqcap" file="jadex.bdi.planlib.protocols.request.Request"/>
+		<capability name="subcap" file="jadex.bdi.planlib.protocols.subscribe.Subscribe"/>
+	</capabilities>
+	
+	<beliefs>
+		<beliefref name="rp_filter">
+			<concrete ref="reqcap.rp_filter"/>
+		</beliefref>
+	</beliefs>
+	
+	<goals>
+		<achievegoal name="connect" exported="true">
+			<parameter name="user_name" class="String" />
+			<parameter name="auth_token" class="Object" />
+		</achievegoal>
+		
+		<achievegoal name="request_model_names" exported="true">
+			<parameter name="model_names" class="Set" direction="out" />
+		</achievegoal>
+		
+		<achievegoal name="start_process" exported="true">
+			<parameter name="process_name" class="String" />
+		</achievegoal>
+		
+		<achievegoal name="add_process" exported="true">
+			<parameter name="process_path" class="String" />
+		</achievegoal>
+		
+		<achievegoal name="request_workitem_list" exported="true">
+			<parameter name="workitem_list" class="Set" direction="out" />
+		</achievegoal>
+		
+		<achievegoal name="begin_activity" exported="true">
+			<parameter name="workitem" class="IWorkitem" />
+			<parameter name="activity" class="IClientActivity" direction="out" />
+		</achievegoal>
+		
+		<achievegoal name="start_workitem_subscription" exported="true">
+		</achievegoal>
+	</goals>
+	
+	<plans>
+		<plan name="connect_plan">
+			<parameter name="user_name" class="String">
+				<goalmapping ref="connect.user_name"/>
+			</parameter>
+			<parameter name="auth_token" class="Object">
+				<goalmapping ref="connect.auth_token"/>
+			</parameter>
+			<body class="ConnectPlan" />
+			<trigger>
+				<goal ref="connect" />
+			</trigger>
+		</plan>
+		
+		<plan name="request_model_names_plan">
+			<parameter name="model_names" class="Set" direction="out">
+				<goalmapping ref="request_model_names.model_names"/>
+			</parameter>
+			<body class="ModelNamesPlan" />
+			<trigger>
+				<goal ref="request_model_names" />
+			</trigger>
+		</plan>
+		
+		<plan name="start_process_plan">
+			<parameter name="process_name" class="String">
+				<goalmapping ref="start_process.process_name"/>
+			</parameter>
+			<body class="StartProcessPlan" />
+			<trigger>
+				<goal ref="start_process" />
+			</trigger>
+		</plan>
+		
+		<plan name="add_process_plan">
+			<parameter name="process_path" class="String">
+				<goalmapping ref="add_process.process_path"/>
+			</parameter>
+			<body class="AddProcessPlan" />
+			<trigger>
+				<goal ref="add_process" />
+			</trigger>
+		</plan>
+		
+		<plan name="request_workitem_list_plan">
+			<parameter name="workitem_list" class="Set" direction="out">
+				<goalmapping ref="request_workitem_list.workitem_list"/>
+			</parameter>
+			<body class="WorkitemListPlan" />
+			<trigger>
+				<goal ref="request_workitem_list" />
+			</trigger>
+		</plan>
+		
+		<plan name="begin_activity_plan">
+			<parameter name="workitem" class="IWorkitem">
+				<goalmapping ref="begin_activity.workitem"/>
+			</parameter>
+			<parameter name="activity" class="IClientActivity" direction="out">
+				<goalmapping ref="begin_activity.activity"/>
+			</parameter>
+			<body class="BeginActivityPlan" />
+			<trigger>
+				<goal ref="begin_activity" />
+			</trigger>
+		</plan>
+		
+		<plan name="start_workitem_subscription_plan">
+			<body class="WorkitemSubscriptionPlan" />
+			<trigger>
+				<goal ref="start_workitem_subscription" />
+			</trigger>
+		</plan>
+		
+		<plan name="subscription_update_plan">
+			<parameter name="update" class="Object">
+				<goalmapping ref="subcap.sp_handle_update.update"/>
+			</parameter>
+			<parameter name="subscription_id" class="Object">
+				<goalmapping ref="subcap.sp_handle_update.subscription_id"/>
+			</parameter>
+			<body class="SubscriptionUpdatePlan" />
+			<trigger>
+				<goal ref="subcap.sp_handle_update" />
+			</trigger>
+		</plan>
+	</plans>
+	
+	<events>
+		<internalevent name="workitem_added" exported="true">
+			<parameter name="workitem" class="IWorkitem"/>
+		</internalevent>
+		
+		<internalevent name="workitem_removed" exported="true">
+			<parameter name="workitem" class="IWorkitem"/>
+		</internalevent>
+	</events>
+	
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="rp_filter">
+					<fact>jadex.commons.IFilter.ALWAYS</fact>
+				</initialbelief>
+			</beliefs>
+		</configuration>
+	</configurations>
+	
+</capability>

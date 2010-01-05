@@ -19,6 +19,6 @@ public class ShowClientInfoTask extends AbstractClientTask
 	{
 		IServiceContainer wfms = (IServiceContainer) process.getComponentAdapter().getServiceContainer();
 		IWfmsClientService wiq = (IWfmsClientService) wfms.getService(IWfmsClientService.class);
-		wiq.queueWorkitem(createWorkitem(Workitem.TEXT_INFO_WORKITEM_TYPE, context, listener));
+		wiq.queueWorkitem(createWorkitem(Workitem.TEXT_INFO_WORKITEM_TYPE, context), createRedirListener(context, listener));
 	}
 }

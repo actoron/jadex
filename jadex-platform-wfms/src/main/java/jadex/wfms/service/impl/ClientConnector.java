@@ -34,11 +34,14 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	
 	private Map workitemQueues;
 	
+	private Map workitemListeners;
+	
 	private Set wfmsListeners;
 	
 	public ClientConnector(IServiceContainer wfms)
 	{
 		this.wfms = wfms;
+		workitemListeners = new HashMap();
 		workitemQueues = new HashMap();
 		wfmsListeners = new HashSet();
 	}
@@ -58,7 +61,7 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	{
 	}
 	
-	public synchronized void queueWorkitem(IWorkitem workitem)
+	public synchronized void queueWorkitem(IWorkitem workitem, IResultListener listener)
 	{
 		Set workitems = (Set) workitemQueues.get(workitem.getRole());
 		if (workitems == null)
@@ -67,6 +70,8 @@ public class ClientConnector implements IClientService, IWfmsClientService
 			workitemQueues.put(workitem.getRole(), workitems);
 		}
 		workitems.add(workitem);
+		if (listener != null)
+			workitemListeners.put(workitem, listener);
 		fireWorkitemAddedEvent(workitem);
 	}
 	
@@ -184,8 +189,9 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	public synchronized void finishActivity(IClient client, IClientActivity activity)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.COMMIT_WORKITEM))
-			return;
-		((Workitem) activity).getListener().resultAvailable(this, null);
+			throw new AccessControlException("Not allowed: "+client);
+		IResultListener listener = (IResultListener) workitemListeners.remove(activity);
+		listener.resultAvailable(null);
 	}
 	
 	/**
@@ -197,7 +203,7 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	public synchronized IClientActivity beginActivity(IClient client, IWorkitem workitem)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ACQUIRE_WORKITEM))
-			return null;
+			throw new AccessControlException("Not allowed: "+client);
 		Set workitems = (Set) workitemQueues.get(workitem.getRole());
 		if (workitems.remove(workitem))
 		{
@@ -215,14 +221,14 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	public void cancelActivity(IClient client, IClientActivity activity)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.RELEASE_WORKITEM))
-			return;
-		queueWorkitem((IWorkitem) activity);
+			throw new AccessControlException("Not allowed: "+client);
+		queueWorkitem((IWorkitem) activity, null);
 	}
 	
 	public synchronized Set getAvailableWorkitems(IClient client)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_AVAILABLE_WORKITEMS))
-			return null;
+			throw new AccessControlException("Not allowed: "+client);
 		IAAAService roleService = (IAAAService) wfms.getService(IAAAService.class);
 		Set roles = roleService.getRoles(client);
 		Set workitems = new HashSet();

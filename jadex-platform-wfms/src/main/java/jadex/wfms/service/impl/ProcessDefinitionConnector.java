@@ -9,6 +9,7 @@ import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
 import jadex.wfms.service.IProcessDefinitionService;
 
+import java.security.AccessControlException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,7 +47,7 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	public void addProcessModel(IClient client, String path)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_PROCESS_MODEL))
-			return;
+			throw new AccessControlException("Not allowed: "+client);
 		BasicModelRepositoryService mr = (BasicModelRepositoryService) wfms.getService(IModelRepositoryService.class);
 		mr.addProcessModel(path);
 	}
@@ -59,7 +60,7 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	public ILoadableComponentModel getProcessModel(IClient client, String name)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_PROCESS_MODEL))
-			return null;
+			throw new AccessControlException("Not allowed: "+client);
 		IModelRepositoryService mr = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
 		
 		return mr.getProcessModel(name);
@@ -73,7 +74,7 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	public ILoadableComponentModel loadProcessModel(IClient client, String path, String[] imports)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_PROCESS_MODEL))
-			return null;
+			throw new AccessControlException("Not allowed: "+client);
 		IExecutionService es = (IExecutionService) wfms.getService(IExecutionService.class);
 		
 		
@@ -89,7 +90,7 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	public Set getProcessModelNames(IClient client)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_MODEL_NAMES))
-			return null;
+			throw new AccessControlException("Not allowed: "+client);
 		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
 		return new HashSet(rs.getModelNames());
 	}

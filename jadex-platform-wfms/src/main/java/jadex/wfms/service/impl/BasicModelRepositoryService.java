@@ -173,8 +173,6 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 	 */
 	public void addProcessModel(String filename)
 	{
-		// todo check access
-		
 		IExecutionService ex = (IExecutionService)wfms.getService(IExecutionService.class);
 		ILoadableComponentModel model = ex.loadModel(filename, imports);
 		String modelName = model.getName();

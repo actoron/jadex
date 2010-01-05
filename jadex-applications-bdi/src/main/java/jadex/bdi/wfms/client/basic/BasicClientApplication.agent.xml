@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Basic Workflow Management Application.</H3>
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	   name="BasicClientAgent"
+	   package="jadex.bdi.wfms.client.basic">
+
+	<imports>
+		<import>jadex.bdi.wfms.*</import>
+		<import>jadex.bdi.wfms.ontology.*</import>
+		<import>jadex.wfms.client.IWorkitem</import>
+	</imports>
+
+	<capabilities>
+		<capability name="clientcap" file="jadex.bdi.wfms.client.cap.WfmsClientApp"/>
+	</capabilities>
+
+	<beliefs>
+		<belief name="client_gui" class="BasicClientApplication">
+			<fact>new BasicClientApplication($scope.getExternalAccess())</fact>
+		</belief>
+		<belief name="add_workitem_controller" class="javax.swing.Action" />
+		<belief name="remove_workitem_controller" class="javax.swing.Action" />
+	</beliefs>
+
+	<goals>
+	</goals>
+
+	<plans>
+		<plan name="add_workitem_plan">
+			<parameter name="workitem" class="IWorkitem">
+				<internaleventmapping ref="clientcap.workitem_added.workitem"/>
+			</parameter>
+			<body class="AddWorkitemPlan" />
+			<trigger>
+				<internalevent ref="clientcap.workitem_added" />
+			</trigger>
+		</plan>
+		
+		<plan name="remove_workitem_plan">
+			<parameter name="workitem" class="IWorkitem">
+				<internaleventmapping ref="clientcap.workitem_removed.workitem"/>
+			</parameter>
+			<body class="RemoveWorkitemPlan" />
+			<trigger>
+				<internalevent ref="clientcap.workitem_removed" />
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+	</events>
+
+	<expressions>
+	</expressions>
+
+	<properties>
+		<!-- <property name="debugging">false</property> -->
+	</properties>
+
+</agent>

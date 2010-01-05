@@ -4,7 +4,7 @@ import java.util.Map;
 
 /** An activity being performed by a client
  */
-public interface IClientActivity
+public interface IClientActivity extends IWorkitem
 {
 	/**
 	 * Gets the name of the activity.
@@ -28,5 +28,5 @@ public interface IClientActivity
 	 * @param parameters the parameters
 	 * @throws IllegalArgumentException if the parameter is read-only
 	 */
-	public void setParameterValues(Map parameters);
+	public void setAllParameterValues(Map parameters);
 }

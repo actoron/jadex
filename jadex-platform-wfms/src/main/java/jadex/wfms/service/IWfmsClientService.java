@@ -1,5 +1,6 @@
 package jadex.wfms.service;
 
+import jadex.commons.concurrent.IResultListener;
 import jadex.wfms.client.IWorkitem;
 
 /**
@@ -10,8 +11,9 @@ public interface IWfmsClientService
 	/**
 	 * Queues a new workitem.
 	 * @param workitem new workitem
+	 * @param listener listener used when the workitem has been performed
 	 */
-	public void queueWorkitem(IWorkitem workitem);
+	public void queueWorkitem(IWorkitem workitem, IResultListener listener);
 	
 	/**
 	 * Fires a process finished event.

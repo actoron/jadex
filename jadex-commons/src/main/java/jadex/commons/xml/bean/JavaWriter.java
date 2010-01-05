@@ -140,7 +140,7 @@ public class JavaWriter extends Writer
 				{
 					public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 					{
-						return ""+((Class)val).getName();
+						return ""+((Class)val).getCanonicalName();
 					}
 				})},
 				null

@@ -1,0 +1,200 @@
+<!--
+	<H3>WFMS Client Application Interface Agent.</H3>
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	   name="WfmsClientInterface"
+	   package="jadex.bdi.wfms.clientinterface">
+
+	<imports>
+		<import>jadex.adapter.base.fipa.SFipa</import>
+		<import>java.util.*</import>
+		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.bdi.wfms.*</import>
+		<import>jadex.bdi.wfms.ontology.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
+		<capability name="reqcap" file="jadex.bdi.planlib.protocols.request.Request"/>
+		<capability name="subcap" file="jadex.bdi.planlib.protocols.subscribe.Subscribe"/>
+	</capabilities>
+
+	<beliefs>
+		<!-- The filter for deciding which request messages are handled in this capability. -->
+		<beliefref name="rp_filter">
+			<concrete ref="reqcap.rp_filter"/>
+		</beliefref>
+		
+		<!-- Mapping of agent IDs to client proxies. -->
+		<belief name="client_proxies" class="Map">
+			<fact>Collections.synchronizedMap(new HashMap())</fact>
+		</belief>
+	</beliefs>
+
+	<goals>
+		<querygoalref name="rp_decide_request">
+			<concrete ref="reqcap.rp_decide_request"/>
+		</querygoalref>
+		<achievegoalref name="rp_execute_request">
+			<concrete ref="reqcap.rp_execute_request"/>
+		</achievegoalref>
+	</goals>
+
+	<plans>
+		<!-- Handle authentication requests. -->
+		<plan name="auth_request_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<!-- The requesting agent. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="rp_execute_request.initiator"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="RequestAuthPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestAuth</match>
+				</goal>
+			</trigger>
+		</plan>
+		
+		<!-- Handle process start requests. -->
+		<plan name="process_start_request_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<!-- The requesting agent. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="rp_execute_request.initiator"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="RequestProcessStartPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestProcessStart</match>
+				</goal>
+			</trigger>
+		</plan>
+		
+		<!-- Handle workitem list requests. -->
+		<plan name="workitem_list_request_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<!-- The requesting agent. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="rp_execute_request.initiator"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="RequestWorkitemListPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestWorkitemList</match>
+				</goal>
+			</trigger>
+		</plan>
+		
+		<!-- Handle begin activity requests. -->
+		<plan name="begin_activity_request_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<!-- The requesting agent. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="rp_execute_request.initiator"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="RequestBeginActivityPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestBeginActivity</match>
+				</goal>
+			</trigger>
+		</plan>
+		
+		<!-- Handle event subscription requests. -->
+		<plan name="start_subscription_plan">
+			<!-- The requesting agent. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="sp_start_subscription.initiator"/>
+			</parameter>
+			<parameter name="subscription_id" class="Object">
+				<goalmapping ref="sp_start_subscription.subscription_id"/>
+			</parameter>
+			<body class="StartWorkitemSubscriptionPlan" />
+			<trigger>
+				<goal ref="subcap.sp_start_subscription">
+					<match>$goal.getParameter("subscription").getValue() instanceof SubscribeWorkitemEvents</match>
+				</goal>
+			</trigger>
+		</plan>
+		
+		
+		<!-- Handle proxy requests. -->
+		<plan name="proxy_request_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="RequestProxyPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestProxy</match>
+				</goal>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+	</events>
+
+	<expressions>
+	</expressions>
+
+	<properties>
+		<property name="servicedescription">
+ 			((IDF)$scope.getServiceContainer().getService(IDF.class))
+				.createDFServiceDescription(SWfms.SERVICE_NAME_CLIENT_INTERFACE, SWfms.SERVICE_TYPE_EXTERNAL, "")
+		</property>
+
+		<property name="agentdescription">
+			((IDF)$scope.getServiceContainer().getService(IDF.class))
+				.createDFAgentDescription(null, (IDFServiceDescription)$propertybase.getProperty("servicedescription"))	
+		</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="rp_filter">
+					<fact>jadex.commons.IFilter.ALWAYS</fact>
+				</initialbelief>
+			</beliefs>
+			<goals>
+				<initialgoal ref="dfcap.df_keep_registered">
+					<parameter ref="description">
+						<value>
+							(IDFAgentDescription)$propertybase.getProperty("agentdescription")
+						</value>
+					</parameter>
+				</initialgoal>
+			</goals>
+		</configuration>
+	</configurations>
+
+</agent>
+

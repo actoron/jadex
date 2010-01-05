@@ -1,0 +1,124 @@
+<!--
+	<H3>WFMS Process Definition Interface Agent.</H3>
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	   name="WfmsPdInterface"
+	   package="jadex.bdi.wfms.pdinterface">
+
+	<imports>
+		<import>jadex.adapter.base.fipa.SFipa</import>
+		<import>java.util.*</import>
+		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.bdi.wfms.*</import>
+		<import>jadex.wfms.client.IClient</import>
+		<import>jadex.bdi.wfms.ontology.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
+		<capability name="reqcap" file="jadex.bdi.planlib.protocols.request.Request"/>
+	</capabilities>
+
+	<beliefs>
+		<!-- The filter for deciding which request messages are handled in this capability. -->
+		<beliefref name="rp_filter">
+			<concrete ref="reqcap.rp_filter"/>
+		</beliefref>
+	</beliefs>
+
+	<goals>
+		<querygoalref name="rp_decide_request">
+			<concrete ref="reqcap.rp_decide_request"/>
+		</querygoalref>
+		<achievegoalref name="rp_execute_request">
+			<concrete ref="reqcap.rp_execute_request"/>
+		</achievegoalref>
+		<achievegoalref name="rp_initiate">
+			<concrete ref="reqcap.rp_initiate"/>
+		</achievegoalref>
+	</goals>
+
+	<plans>
+		<!-- Handle model names requests. -->
+		<plan name="request_model_names_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<!-- The requesting agent. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="rp_execute_request.initiator"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="RequestModelNamesPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestModelNames</match>
+				</goal>
+			</trigger>
+		</plan>
+		
+		<!-- Handle model addition requests. -->
+		<plan name="request_add_process_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<!-- The requesting agent. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="rp_execute_request.initiator"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="RequestAddProcessPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestAddProcess</match>
+				</goal>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+	</events>
+
+	<expressions>
+	</expressions>
+
+	<properties>
+		<property name="servicedescription">
+ 			((IDF)$scope.getServiceContainer().getService(IDF.class))
+				.createDFServiceDescription(SWfms.SERVICE_NAME_PD_INTERFACE, SWfms.SERVICE_TYPE_EXTERNAL, "")
+		</property>
+
+		<property name="agentdescription">
+			((IDF)$scope.getServiceContainer().getService(IDF.class))
+				.createDFAgentDescription(null, (IDFServiceDescription)$propertybase.getProperty("servicedescription"))	
+		</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="rp_filter">
+					<fact>jadex.commons.IFilter.ALWAYS</fact>
+				</initialbelief>
+			</beliefs>
+			<goals>
+				<initialgoal ref="dfcap.df_keep_registered">
+					<parameter ref="description">
+						<value>
+							(IDFAgentDescription)$propertybase.getProperty("agentdescription")
+						</value>
+					</parameter>
+				</initialgoal>
+			</goals>
+		</configuration>
+	</configurations>
+
+</agent>
+

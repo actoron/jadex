@@ -1,8 +1,11 @@
 package jadex.wfms.client;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import jadex.commons.concurrent.IResultListener;
 
@@ -18,6 +21,9 @@ public class Workitem implements IWorkitem, IClientActivity
 	/** Type of the workitem */
 	private int type;
 	
+	/** Unique ID */
+	private String id;
+	
 	/** Role that is handling this workitem. */
 	private String role;
 	
@@ -30,18 +36,26 @@ public class Workitem implements IWorkitem, IClientActivity
 	/** Read-only parameters */
 	private Set readOnlyParameters;
 	
-	/** Result Listener when the workitem has been processed. */
-	private IResultListener listener;
-	
-	public Workitem(String name, int type, String role, Map parameterTypes, Map parameterValues, Set readOnlyParameters, IResultListener listener)
+	public Workitem()
 	{
+	}
+	
+	public Workitem(String name, int type, String role, Map parameterTypes, Map parameterValues, Set readOnlyParameters)
+	{
+		this.id = String.valueOf(System.identityHashCode(this));
 		this.name = name;
 		this.type = type;
 		this.role = role;
+		/*this.parameterTypes = new HashMap();
+		for (Iterator it = parameterTypes.entrySet().iterator(); it.hasNext(); )
+		{
+			Map.Entry entry = (Map.Entry) it.next();
+			Class clazz = (Class) entry.getValue();
+			this.parameterTypes.put(entry.getKey(), clazz.getCanonicalName());
+		}*/
 		this.parameterTypes = parameterTypes;
-		this.parameterValues = parameterValues;
+		this.parameterValues = parameterValues!=null ? parameterValues:new HashMap();
 		this.readOnlyParameters = readOnlyParameters;
-		this.listener = listener;
 	}
 	
 	/**
@@ -115,7 +129,7 @@ public class Workitem implements IWorkitem, IClientActivity
 	 * @param parameters the parameters
 	 * @throws IllegalArgumentException if the parameter is read-only
 	 */
-	public void setParameterValues(Map parameters)
+	public void setAllParameterValues(Map parameters)
 	{
 		if ((new HashSet(readOnlyParameters)).removeAll(parameters.keySet()))
 			throw new IllegalArgumentException("Some parameter are read-only.");
@@ -144,8 +158,67 @@ public class Workitem implements IWorkitem, IClientActivity
 		return readOnlyParameters.contains(parameterName);
 	}
 	
-	public IResultListener getListener()
+	// ====================== BEAN ===============================
+	
+	public Map getParameterTypes() {
+		return parameterTypes;
+	}
+	
+	public Map getParameterValues() {
+		return parameterValues;
+	}
+	
+	public Set getReadOnlyParameters() {
+		return readOnlyParameters;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public void setRole(String role) {
+		this.role = role;
+	}
+	
+	public String getId() {
+		return id;
+	}
+	
+	public void setParameterTypes(Map parameterTypes) {
+		this.parameterTypes = parameterTypes;
+	}
+	
+	public void setParameterValues(Map parameterValues)
 	{
-		return listener;
+		this.parameterValues = parameterValues;
+	}
+	
+	public void setReadOnlyParameters(Set readOnlyParameters) {
+		this.readOnlyParameters = readOnlyParameters;
+	}
+	
+	public void setType(int type) {
+		this.type = type;
+	}
+	
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	// --------------------------- Comparison -------------------------
+	
+	public int hashCode()
+	{
+		/*if (id == null)
+			return 0;*/
+		return id.hashCode();
+	}
+	
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof Workitem)
+			return (id.equals(((Workitem) obj).getId()));
+		
+		return false;
 	}
 }

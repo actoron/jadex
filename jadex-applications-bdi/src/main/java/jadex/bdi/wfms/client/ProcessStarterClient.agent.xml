@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>WFMS Process Definition Interface Agent.</H3>
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	   name="ProcessStarterClientAgent"
+	   package="jadex.bdi.wfms.client">
+
+	<imports>
+		<import>jadex.bdi.wfms.*</import>
+		<import>jadex.bdi.wfms.ontology.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="clientcap" file="jadex.bdi.wfms.client.cap.WfmsClientApp"/>
+	</capabilities>
+
+	<beliefs>
+		<belief name="client_gui" class="ProcessStarterClient">
+			<fact>new ProcessStarterClient($scope.getExternalAccess())</fact>
+		</belief>
+	</beliefs>
+
+	<goals>
+	</goals>
+
+	<plans>
+		
+	</plans>
+
+	<events>
+	</events>
+
+	<expressions>
+	</expressions>
+
+	<properties>
+		<!-- <property name="debugging">false</property> -->
+	</properties>
+
+</agent>

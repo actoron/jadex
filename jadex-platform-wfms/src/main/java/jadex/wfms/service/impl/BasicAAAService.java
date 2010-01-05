@@ -118,7 +118,10 @@ public class BasicAAAService implements IAAAService
 		String userName = client.getUserName();
 		Set roles = (Set) userroles.get(userName);
 		if (roles == null)
+		{
 			roles = new HashSet();
+			roles.add(IAAAService.ALL_ROLES);
+		}
 		return roles;
 	}
 }
