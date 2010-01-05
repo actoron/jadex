@@ -1,20 +1,13 @@
 package jadex.bdi.wfms.clientinterface;
 
-import java.security.AccessControlException;
-import java.util.Map;
-
-import com.sun.servicetag.UnauthorizedAccessException;
-
 import jadex.adapter.base.fipa.Done;
-import jadex.adapter.base.fipa.SFipa;
-import jadex.bdi.examples.cleanerworld_classic.RequestCompleteVision;
-import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.wfms.ontology.RequestProcessStart;
-import jadex.bdi.wfms.ontology.RequestProxy;
-import jadex.bridge.IComponentIdentifier;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IClientService;
+
+import java.security.AccessControlException;
+import java.util.Map;
 
 public class RequestProcessStartPlan extends Plan
 {
