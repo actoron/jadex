@@ -1,14 +1,11 @@
 package jadex.bdi.wfms.clientinterface;
 
-import java.util.Map;
-
 import jadex.adapter.base.fipa.Done;
-import jadex.adapter.base.fipa.SFipa;
-import jadex.bdi.examples.cleanerworld_classic.RequestCompleteVision;
-import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.wfms.ontology.RequestProxy;
 import jadex.wfms.client.IClient;
+
+import java.util.Map;
 
 public class RequestProxyPlan extends Plan
 {
