@@ -21,7 +21,7 @@ import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 
 public class WorkitemListComponent extends JPanel
 {
-	private static final String WORKITEM_LIST_COLUMN_NAME = "Workitems";
+	private static final Object[] WORKITEM_LIST_COLUMN_NAMES = {"Workitem", "Role"};
 	
 	private static final String BEGIN_ACTIVITY_BUTTON_LABEL = "Begin Activity";
 	
@@ -39,7 +39,7 @@ public class WorkitemListComponent extends JPanel
 		super(new GridBagLayout());
 		
 		workitemTableModel = new DefaultTableModel();
-		workitemTableModel.setColumnIdentifiers(new Object[] {WORKITEM_LIST_COLUMN_NAME});
+		workitemTableModel.setColumnIdentifiers(WORKITEM_LIST_COLUMN_NAMES);
 		
 		workitemTable = new JTable(workitemTableModel)
 		{
@@ -57,7 +57,7 @@ public class WorkitemListComponent extends JPanel
 					int row, int column)
 			{
 				if (value instanceof IWorkitem)
-					return super.getTableCellRendererComponent(table, ((IWorkitem) value).getName() + " [" + ((IWorkitem) value).getRole() + "]", isSelected, hasFocus, row, column);
+					return super.getTableCellRendererComponent(table, ((IWorkitem) value).getName(), isSelected, hasFocus, row, column);
 				return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 			}
 		});
@@ -107,7 +107,7 @@ public class WorkitemListComponent extends JPanel
 				return;
 			
 		}
-		workitemTableModel.addRow(new Object[] {wi});
+		workitemTableModel.addRow(new Object[] {wi, wi.getRole()});
 	}
 	
 	/**
@@ -135,6 +135,9 @@ public class WorkitemListComponent extends JPanel
 			workitemTableModel.removeRow(0);
 		
 		for (Iterator it = workitems.iterator(); it.hasNext(); )
-			workitemTableModel.addRow(new Object[] {it.next()});
+		{
+			IWorkitem wi = (IWorkitem) it.next();
+			workitemTableModel.addRow(new Object[] {wi, wi.getRole()});
+		}
 	}
 }
