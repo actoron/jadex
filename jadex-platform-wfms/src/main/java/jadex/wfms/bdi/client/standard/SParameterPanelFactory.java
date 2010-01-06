@@ -1,4 +1,4 @@
-package jadex.wfms.bdi.client.generic;
+package jadex.wfms.bdi.client.standard;
 
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;

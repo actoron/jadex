@@ -1,4 +1,4 @@
-package jadex.wfms.bdi.client.generic;
+package jadex.wfms.bdi.client.standard;
 
 import java.awt.Frame;
 import java.awt.GridBagConstraints;

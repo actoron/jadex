@@ -1,4 +1,4 @@
-package jadex.wfms.bdi.client.generic;
+package jadex.wfms.bdi.client.standard;
 
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
