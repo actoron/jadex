@@ -17,6 +17,7 @@ import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -346,23 +347,6 @@ public class SUtil
 		}
 		return ret;
 	}
-	
-	/**
-	 *  Get the dimension of an array.
-	 *  @param array
-	 *  @return The array dimension.
-	 * /
-	public static int getArrayDimension(Object array) 
-	{ 
-		int dim = 0; 
-		Class cls = array.getClass(); 
-		while(cls.isArray()) 
-		{ 
-			dim++; 
-			cls = cls.getComponentType(); 
-		} 
-		return dim; 
-	}*/
 	
 	/**
 	 *  Get the dimension of an array.

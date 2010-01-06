@@ -7,10 +7,25 @@
 	                    http://jadex.sourceforge.net/configuration.xsd"
 	name="standalone_conf">
 	
-	<properties type="platform_standalone" name="lars">
-  		<properties type="agent" name="creation">
-			<property type="model">jadex.bpmn.benchmarks.AgentCreation.bpmn</property>
-			<property type="argument" name="max">100</property>
+	<properties type="platform_standalone">
+  		<properties type="services">
+  			<property type="jadex.bridge.IComponentFactory" name="bpmn_factory">
+				new jadex.bpmn.BpmnFactory($platform, jadex.commons.SUtil.createHashMap(
+					new String[]
+					{
+						"debugger.panels"
+					},
+					new Object[]
+					{
+						"jadex.tools.debugger.bpmn.BpmnDebuggerPanel, jadex.tools.debugger.common.ObjectInspectorDebuggerPanel"
+					})
+				)
+			</property>
+  		</properties>
+  		
+  		<properties type="agent" name="AgentCreation">
+			<property type="model">jadex/bpmn/benchmarks/AgentCreation.bpmn</property>
+			<property type="argument" name="max">10000</property>
 		</properties>
 	</properties>
 	

@@ -77,7 +77,7 @@ public class Test //extends TestCase
 //		System.out.println("Read: "+ro+" / class="+ro.getClass());
 		
 //		System.out.println("equals: "+wo.equals(ro));
-		if(!wo.equals(ro) && !(wo.getClass().isArray() && Arrays.equals((Object[])wo, (Object[])ro)))
+		if(!wo.equals(ro) && !(wo.getClass().isArray() && Arrays.deepEquals((Object[])wo, (Object[])ro)))
 			System.out.println("Not equal: "+wo.getClass()+" \n"+ro.getClass());
 		
 //		assertEquals("Written and read objects should be equal:", wo, ro);

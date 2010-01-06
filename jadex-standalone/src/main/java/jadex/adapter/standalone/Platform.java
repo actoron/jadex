@@ -195,7 +195,7 @@ public class Platform extends AbstractPlatform
 		
 		// Initialize services.
 //		props = platconf.getSubproperty(SERVICES).getProperties();
-		init(conf.getSubproperty(SERVICES), fetcher, parent);
+		init(conf.getSubproperties(SERVICES), fetcher, parent);
 		
 //		for(int i = 0; i < props.length; i++)
 //		{

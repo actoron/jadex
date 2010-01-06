@@ -42,7 +42,7 @@ public class BasicWfms extends PropertyServiceContainer
 	{
 		SimpleValueFetcher fetcher = new SimpleValueFetcher();
 		fetcher.setValue("$wfms", this);
-		init(props!=null? props.getSubproperty(WFMS).getSubproperty(SERVICES): null, fetcher, null);
+		init(props!=null? props.getSubproperty(WFMS).getSubproperties(SERVICES): null, fetcher, null);
 	}
 	
 	//-------- methods --------
