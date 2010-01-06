@@ -1,5 +1,6 @@
 package jadex.wfms.bdi.client.standard.parametergui;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.HashMap;
@@ -29,7 +30,15 @@ public class StringParameterPanel extends AbstractParameterPanel
 	public boolean isParameterValueValid()
 	{
 		if (parameterField.getText().isEmpty())
+		{
+			parameterField.setBackground(Color.RED);
 			return false;
+		}
+		return true;
+	}
+	
+	public boolean requiresLabel()
+	{
 		return true;
 	}
 	

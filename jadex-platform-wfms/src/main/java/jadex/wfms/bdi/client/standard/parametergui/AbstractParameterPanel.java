@@ -43,6 +43,12 @@ public abstract class AbstractParameterPanel extends JPanel
 	}
 	
 	/**
+	 * Returns whether the panel requires a label.
+	 * @return true if the panel requires a label, false otherwise
+	 */
+	public abstract boolean requiresLabel();
+	
+	/**
 	 * Returns the current parameter value.
 	 * @return the parameter value
 	 */

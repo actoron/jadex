@@ -49,7 +49,6 @@ public abstract class AbstractClientTask implements ITask
 		
 		Workitem wi = new Workitem(context.getModelElement().getName(), type, "NoRole", parameterTypes, parameterValues, readOnlyParameters);
 		wi.setId(context.getModelElement().getName() + "_" + String.valueOf(System.identityHashCode(wi)));
-		System.out.println("WI ID: " + wi.getId());
 		return wi;
 	}
 	
@@ -63,14 +62,12 @@ public abstract class AbstractClientTask implements ITask
 				Workitem wi = (Workitem) result;
 				Map parameterValues = wi.getParameterValues();
 				Set readOnlyParameters = wi.getReadOnlyParameters();
-				System.out.println("GASDGDSAGSDGDGAGD");
 				for (Iterator it = parameterValues.entrySet().iterator(); it.hasNext(); )
 				{
 					Map.Entry paramEntry = (Map.Entry) it.next();
 					if (!readOnlyParameters.contains(paramEntry.getKey()))
 					{
 						context.setParameterValue((String) paramEntry.getKey(), paramEntry.getValue());
-						System.out.println(String.valueOf(paramEntry.getKey()) + " " + String.valueOf(paramEntry.getValue()));
 					}
 				}
 				//System.out.println(listener.getClass().getName());

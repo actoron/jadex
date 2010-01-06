@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.wfms.bdi.client.standard.SParameterPanelFactory;
 import jadex.wfms.client.IClientActivity;
 
 import javax.swing.Action;
@@ -135,19 +134,29 @@ public class ActivityComponent extends JScrollPane
 		{
 			String name = (String) it.next();
 			
-			JLabel parameterLabel = new JLabel(name);
-			parameterLabel.setBorder(new EmptyBorder(0, 0, 0, 20));
-			GridBagConstraints g = new GridBagConstraints();
-			g.gridx = 0;
-			g.gridy = y;
-			g.fill = GridBagConstraints.NONE;
-			g.weighty = 1;
-			g.anchor = GridBagConstraints.NORTH;
-			parameterPanel.add(parameterLabel, g);
-			
 			AbstractParameterPanel panel = SParameterPanelFactory.createParameterPanel(name, activity.getParameterType(name), activity.getParameterValue(name), activity.isReadOnly(name));
-			g = new GridBagConstraints();
-			g.gridx = 1;
+			
+			if (panel.requiresLabel())
+			{
+				JLabel parameterLabel = new JLabel(name);
+				parameterLabel.setBorder(new EmptyBorder(0, 0, 0, 20));
+				GridBagConstraints g = new GridBagConstraints();
+				g.gridx = 0;
+				g.gridy = y;
+				g.fill = GridBagConstraints.NONE;
+				g.weighty = 1;
+				g.anchor = GridBagConstraints.NORTH;
+				parameterPanel.add(parameterLabel, g);
+			}
+			
+			GridBagConstraints g = new GridBagConstraints();
+			if (!panel.requiresLabel())
+			{
+				g.gridx = 0;
+				g.gridwidth = 2;
+			}
+			else
+				g.gridx = 1;
 			g.gridy = y;
 			g.fill = GridBagConstraints.HORIZONTAL;
 			g.weightx = 1;

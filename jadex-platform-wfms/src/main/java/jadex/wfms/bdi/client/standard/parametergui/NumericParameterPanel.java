@@ -44,6 +44,11 @@ public class NumericParameterPanel extends AbstractParameterPanel
 		return true;
 	}
 	
+	public boolean requiresLabel()
+	{
+		return true;
+	}
+	
 	public Object getParameterValue()
 	{
 		return SNumberUtils.parseNumber(parameterType, parameterField.getText());
