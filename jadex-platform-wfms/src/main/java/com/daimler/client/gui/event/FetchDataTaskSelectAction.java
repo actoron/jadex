@@ -58,7 +58,7 @@ public class FetchDataTaskSelectAction extends AbstractTaskSelectAction{
             }
             
             Map data = theDataPanel.getTheData();
-            client.getCurrentActivity().setAllParameterValues(data);
+            client.getCurrentActivity().setMultipleParameterValues(data);
             client.finishActivity(getWorkitem());
             
             /*ArrayList<IdentifierValueTuple> fetchedData = theDataPanel.getTheData();

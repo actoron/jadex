@@ -55,19 +55,22 @@ public abstract class AbstractClientTask implements ITask
 	
 	protected static IResultListener createRedirListener(final ITaskContext context, final IResultListener listener)
 	{
-		final Map parameterValues = new HashMap();
-		final Set readOnlyParameters = new HashSet();
 		IResultListener redirListener = new IResultListener()
 		{
 			
 			public void resultAvailable(Object source, Object result)
 			{
+				Workitem wi = (Workitem) result;
+				Map parameterValues = wi.getParameterValues();
+				Set readOnlyParameters = wi.getReadOnlyParameters();
+				System.out.println("GASDGDSAGSDGDGAGD");
 				for (Iterator it = parameterValues.entrySet().iterator(); it.hasNext(); )
 				{
 					Map.Entry paramEntry = (Map.Entry) it.next();
 					if (!readOnlyParameters.contains(paramEntry.getKey()))
 					{
 						context.setParameterValue((String) paramEntry.getKey(), paramEntry.getValue());
+						System.out.println(String.valueOf(paramEntry.getKey()) + " " + String.valueOf(paramEntry.getValue()));
 					}
 				}
 				//System.out.println(listener.getClass().getName());

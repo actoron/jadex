@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -20,6 +21,7 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.SGUI;
+import jadex.wfms.bdi.client.standard.parametergui.ActivityComponent;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 
@@ -66,7 +68,7 @@ public class StandardClientApplication
 				mainSplitPane = new JSplitPane();
 				mainSplitPane.setOneTouchExpandable(true);
 				mainFrame.getContentPane().add(mainSplitPane);
-				mainSplitPane.setRightComponent(EMPTY_PANEL);
+				mainSplitPane.setRightComponent(new JTabbedPane());
 				
 				JTabbedPane leftTabPane = new JTabbedPane();
 				mainSplitPane.setLeftComponent(leftTabPane);
@@ -152,11 +154,28 @@ public class StandardClientApplication
 						JOptionPane.showMessageDialog(mainFrame, "Start of activity failed.");
 					}
 					
+					if (mainSplitPane.getRightComponent() instanceof ActivityComponent)
+					{
+						ActivityComponent currentAc = (ActivityComponent) mainSplitPane.getRightComponent();
+						//TODO: Cancel activity
+						mainSplitPane.setRightComponent(EMPTY_PANEL);
+					}
+					
 					IClientActivity activity = (IClientActivity) beginActivity.getParameter("activity").getValue();
+					ActivityComponent ac = createActivityComponent(activity);
 					
-					ActivityComponent ac = new ActivityComponent(activity);
+					if (mainSplitPane.getRightComponent().equals(EMPTY_PANEL))
+					{
+						mainSplitPane.setRightComponent(ac);
+					}
+					else if (mainSplitPane.getRightComponent() instanceof JTabbedPane)
+					{
+						JTabbedPane tabPane = (JTabbedPane) mainSplitPane.getRightComponent();
+						tabPane.add(ac, ac.getActivity().getName());
+						tabPane.setSelectedComponent(ac);
+					}
 					
-					mainSplitPane.setRightComponent(ac);
+					
 				}
 			}
 		});
@@ -210,6 +229,87 @@ public class StandardClientApplication
 		agent.dispatchTopLevelGoalAndWait(modelNameGoal);
 		Set modelNames = (Set) modelNameGoal.getParameter("model_names").getValue();
 		pmComponent.setProcessModelNames(modelNames);
+	}
+	
+	private ActivityComponent createActivityComponent(IClientActivity activity)
+	{
+		final ActivityComponent ac = new ActivityComponent(activity);
+		ac.setCancelAction(new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				cancelActivity(ac);
+			}
+		});
+		
+		ac.setFinishAction(new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (!ac.isReadyForFinish())
+					return;
+				
+				IGoal finishGoal = agent.createGoal("clientcap.finish_activity");
+				IClientActivity activity = ac.getActivity();
+				
+				activity.setMultipleParameterValues(ac.getParameterValues());
+				
+				finishGoal.getParameter("activity").setValue(activity);
+				
+				try
+				{
+					agent.dispatchTopLevelGoalAndWait(finishGoal);
+				}
+				catch (GoalFailureException e1)
+				{
+					JOptionPane.showMessageDialog(mainFrame, "Failed finishing activity.");
+					return;
+				}
+				
+				removeActivityComponent(ac);
+			}
+		});
+		
+		return ac;
+	}
+	
+	private boolean cancelActivity(ActivityComponent ac)
+	{
+		IGoal cancelGoal = agent.createGoal("clientcap.cancel_activity");
+		IClientActivity activity = ac.getActivity();
+		
+		// Save correct values
+		Map parameterValues = ac.getParameterValues();
+		activity.setMultipleParameterValues(parameterValues);
+		
+		cancelGoal.getParameter("activity").setValue(activity);
+		
+		try
+		{
+			agent.dispatchTopLevelGoalAndWait(cancelGoal);
+		}
+		catch (GoalFailureException e)
+		{
+			JOptionPane.showMessageDialog(mainFrame, "Activity cancelation failed.");
+			return false;
+		}
+		
+		removeActivityComponent(ac);
+		
+		return true;
+	}
+	
+	private void removeActivityComponent(ActivityComponent ac)
+	{
+		if (mainSplitPane.getRightComponent() instanceof ActivityComponent)
+		{
+			mainSplitPane.setRightComponent(EMPTY_PANEL);
+		}
+		else
+		{
+			JTabbedPane tabPane = (JTabbedPane) mainSplitPane.getRightComponent();
+			tabPane.remove(ac);
+		}
 	}
 }
 

@@ -106,7 +106,7 @@ public class ClientSimulator implements IClient
 				else if (type == IWorkitem.DATA_FETCH_WORKITEM_TYPE)
 				{
 					Map parameterStates = activeStateController.getActivityState(activity.getName());
-					activity.setAllParameterValues(parameterStates);
+					activity.setMultipleParameterValues(parameterStates);
 				}
 				
 				clientService.finishActivity(ClientSimulator.this, activity);

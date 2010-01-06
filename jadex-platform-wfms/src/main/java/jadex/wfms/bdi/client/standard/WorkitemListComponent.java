@@ -6,6 +6,11 @@ import jadex.wfms.client.Workitem;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -15,6 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;
@@ -27,6 +33,9 @@ public class WorkitemListComponent extends JPanel
 	
 	/** Table listing available workitems */
 	private JTable workitemTable;
+	
+	/** Current workitem table mouse listener */
+	private MouseListener workitemMouseListener;
 	
 	/** Model of table listing available workitems */
 	private DefaultTableModel workitemTableModel;
@@ -72,26 +81,43 @@ public class WorkitemListComponent extends JPanel
 		
 		beginActivityButton = new JButton(BEGIN_ACTIVITY_BUTTON_LABEL);
 		gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.fill = GridBagConstraints.NONE;
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		gbc.weightx = 1.0;
-		gbc.weighty = 0.0;
+		gbc.weightx = 0;
+		gbc.weighty = 0;
+		gbc.insets = new Insets(5, 5, 5, 5);
+		gbc.anchor = GridBagConstraints.SOUTHEAST;
 		add(beginActivityButton, gbc);
 	}
 	
-	public void setBeginActivityAction(Action action)
+	public void setBeginActivityAction(final Action action)
 	{
 		beginActivityButton.setAction(action);
 		beginActivityButton.setText(BEGIN_ACTIVITY_BUTTON_LABEL);
+		
+		if (workitemMouseListener != null)
+			workitemTable.removeMouseListener(workitemMouseListener);
+		
+		workitemMouseListener = new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent e)
+			{
+				if (e.getClickCount() == 2)
+				{
+					action.actionPerformed(new ActionEvent(e, e.getID(), null));
+				}
+			}
+		};
+		
+		workitemTable.addMouseListener(workitemMouseListener);
 	}
 	
 	public IWorkitem getSelectedWorkitem()
 	{
 		int row = workitemTable.getSelectedRow();
-		int column = workitemTable.getSelectedColumn();
-		if ((row >= 0) && (column >= 0))
-			return (IWorkitem) workitemTableModel.getValueAt(row, column);
+		if (row >= 0)
+			return (IWorkitem) workitemTableModel.getValueAt(row, 0);
 		return null;
 	}
 	

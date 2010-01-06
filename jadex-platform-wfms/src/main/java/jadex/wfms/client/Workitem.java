@@ -129,7 +129,7 @@ public class Workitem implements IWorkitem, IClientActivity
 	 * @param parameters the parameters
 	 * @throws IllegalArgumentException if the parameter is read-only
 	 */
-	public void setAllParameterValues(Map parameters)
+	public void setMultipleParameterValues(Map parameters)
 	{
 		if ((new HashSet(readOnlyParameters)).removeAll(parameters.keySet()))
 			throw new IllegalArgumentException("Some parameter are read-only.");

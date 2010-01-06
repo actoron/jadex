@@ -28,5 +28,5 @@ public interface IClientActivity extends IWorkitem
 	 * @param parameters the parameters
 	 * @throws IllegalArgumentException if the parameter is read-only
 	 */
-	public void setAllParameterValues(Map parameters);
+	public void setMultipleParameterValues(Map parameters);
 }

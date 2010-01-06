@@ -191,7 +191,7 @@ public class ClientConnector implements IClientService, IWfmsClientService
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.COMMIT_WORKITEM))
 			throw new AccessControlException("Not allowed: "+client);
 		IResultListener listener = (IResultListener) workitemListeners.remove(activity);
-		listener.resultAvailable(this, null);
+		listener.resultAvailable(this, activity);
 	}
 	
 	/**

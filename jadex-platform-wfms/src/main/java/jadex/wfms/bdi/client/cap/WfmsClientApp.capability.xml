@@ -54,6 +54,14 @@
 			<parameter name="activity" class="IClientActivity" direction="out" />
 		</achievegoal>
 		
+		<achievegoal name="cancel_activity" exported="true">
+			<parameter name="activity" class="IClientActivity" />
+		</achievegoal>
+		
+		<achievegoal name="finish_activity" exported="true">
+			<parameter name="activity" class="IClientActivity" />
+		</achievegoal>
+		
 		<achievegoal name="start_workitem_subscription" exported="true">
 		</achievegoal>
 	</goals>
@@ -122,6 +130,26 @@
 			<body class="BeginActivityPlan" />
 			<trigger>
 				<goal ref="begin_activity" />
+			</trigger>
+		</plan>
+		
+		<plan name="cancel_activity_plan">
+			<parameter name="activity" class="IClientActivity">
+				<goalmapping ref="begin_activity.activity"/>
+			</parameter>
+			<body class="CancelActivityPlan" />
+			<trigger>
+				<goal ref="cancel_activity" />
+			</trigger>
+		</plan>
+		
+		<plan name="finish_activity_plan">
+			<parameter name="activity" class="IClientActivity">
+				<goalmapping ref="finish_activity.activity"/>
+			</parameter>
+			<body class="FinishActivityPlan" />
+			<trigger>
+				<goal ref="finish_activity" />
 			</trigger>
 		</plan>
 		
