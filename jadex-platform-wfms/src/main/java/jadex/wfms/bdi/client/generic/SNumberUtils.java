@@ -1,4 +1,4 @@
-package jadex.wfms.bdi.client.basic;
+package jadex.wfms.bdi.client.generic;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

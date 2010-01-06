@@ -1,4 +1,4 @@
-package jadex.wfms.bdi.client.basic;
+package jadex.wfms.bdi.client.generic;
 
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.Workitem;
