@@ -31,8 +31,8 @@ public class SimLaunchService implements IService
 				as.addUser("TestUser", roles);
 				//new ClientSimulator((IClientService) wfms.getService(IClientService.class));
 				IComponentExecutionService ex = (IComponentExecutionService) wfms.getService(IComponentExecutionService.class);
-				ex.createComponent(null, "jadex/bdi/wfms/clientinterface/WfmsClientInterface.agent.xml", null, null, false, null, null, null);
-				ex.createComponent(null, "jadex/bdi/wfms/pdinterface/WfmsPdInterface.agent.xml", null, null, false, null, null, null);
+				ex.createComponent(null, "jadex/wfms/bdi/clientinterface/WfmsClientInterface.agent.xml", null, null, false, null, null, null);
+				ex.createComponent(null, "jadex/wfms/bdi/pdinterface/WfmsPdInterface.agent.xml", null, null, false, null, null, null);
 			}
 		});
 	}

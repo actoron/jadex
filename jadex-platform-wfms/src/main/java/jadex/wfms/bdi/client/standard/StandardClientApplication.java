@@ -23,7 +23,7 @@ import jadex.commons.SGUI;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 
-public class BasicClientApplication
+public class StandardClientApplication
 {
 	private static final String WINDOW_TITLE = "Workflow Client Application";
 	
@@ -43,7 +43,7 @@ public class BasicClientApplication
 	
 	private ProcessModelComponent pmComponent;
 	
-	public BasicClientApplication(IExternalAccess appAgent)
+	public StandardClientApplication(IExternalAccess appAgent)
 	{
 		this.agent = (IBDIExternalAccess) appAgent;
 		

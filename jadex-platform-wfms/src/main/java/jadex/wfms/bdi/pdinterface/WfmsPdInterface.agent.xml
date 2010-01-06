@@ -6,15 +6,15 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	   name="WfmsPdInterface"
-	   package="jadex.bdi.wfms.pdinterface">
+	   package="jadex.wfms.bdi.pdinterface">
 
 	<imports>
 		<import>jadex.adapter.base.fipa.SFipa</import>
 		<import>java.util.*</import>
 		<import>jadex.adapter.base.fipa.*</import>
-		<import>jadex.bdi.wfms.*</import>
+		<import>jadex.wfms.bdi.*</import>
 		<import>jadex.wfms.client.IClient</import>
-		<import>jadex.bdi.wfms.ontology.*</import>
+		<import>jadex.wfms.bdi.ontology.*</import>
 	</imports>
 
 	<capabilities>

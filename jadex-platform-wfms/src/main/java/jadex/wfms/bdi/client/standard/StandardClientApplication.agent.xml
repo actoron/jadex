@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	<H3>Basic Workflow Management Application.</H3>
+	<H3>The Standard Workflow Management Application.</H3>
 -->
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
-	   name="BasicClientAgent"
-	   package="jadex.bdi.wfms.client.basic">
+	   name="StandardClientApplication"
+	   package="jadex.wfms.bdi.client.standard">
 
 	<imports>
-		<import>jadex.bdi.wfms.*</import>
-		<import>jadex.bdi.wfms.ontology.*</import>
+		<import>jadex.wfms.bdi.*</import>
+		<import>jadex.wfms.bdi.ontology.*</import>
 		<import>jadex.wfms.client.IWorkitem</import>
 	</imports>
 
 	<capabilities>
-		<capability name="clientcap" file="jadex.bdi.wfms.client.cap.WfmsClientApp"/>
+		<capability name="clientcap" file="jadex.wfms.bdi.client.cap.WfmsClientApp"/>
 	</capabilities>
 
 	<beliefs>
-		<belief name="client_gui" class="BasicClientApplication">
-			<fact>new BasicClientApplication($scope.getExternalAccess())</fact>
+		<belief name="client_gui" class="StandardClientApplication">
+			<fact>new StandardClientApplication($scope.getExternalAccess())</fact>
 		</belief>
 		<belief name="add_workitem_controller" class="javax.swing.Action" />
 		<belief name="remove_workitem_controller" class="javax.swing.Action" />
