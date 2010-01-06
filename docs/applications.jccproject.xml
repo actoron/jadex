@@ -11,8 +11,8 @@
 		<property type="jccexit">shutdown</property>
 	</properties>
 	<properties type="Starter">
-		<property type="leftsplit.location">300</property>
-		<property type="mainsplit.location">180</property>
+		<property type="leftsplit_location">300</property>
+		<property type="mainsplit_location">180</property>
 		<property type="checking">true</property>
 		<properties type="mpanel">
 			<property type="tree"><![CDATA[<n:root xmlns:n="nuggets_xml_encoder"  xmlns:r="reference_ids" xmlns="jadex.tools.common.modeltree">

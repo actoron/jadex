@@ -94,6 +94,9 @@ public class ComponentExecutionService implements IComponentExecutionService
 	public void	createComponent(String name, String model, String config, Map args, boolean suspend, 
 		IResultListener listener, Object creator, final IResultListener resultlistener)
 	{
+		if(listener==null)
+			listener = DefaultResultListener.getInstance();
+		
 		/*
 		if(container.isShuttingDown())
 		{
@@ -120,6 +123,8 @@ public class ComponentExecutionService implements IComponentExecutionService
 				}
 			}
 		}
+		if(factory==null)
+			throw new RuntimeException("No factory found for component: "+model);
 		ILoadableComponentModel lmodel = factory.loadModel(model);
 
 		// Create id and adapter.
@@ -140,7 +145,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 					cid = new AgentIdentifier(name+"@"+container.getName()); // Hack?!
 					if(adapters.containsKey(cid))
 					{
-						listener.exceptionOccurred(this, new RuntimeException("Agent name already exists on agent platform."));
+						listener.exceptionOccurred(this, new RuntimeException("Agent name already exists on agent platform: "+cid));
 						return;
 					}
 					IMessageService	ms	= (IMessageService)container.getService(IMessageService.class);

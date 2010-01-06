@@ -120,48 +120,12 @@
 				new jadex.microkernel.MicroAgentFactory($platform)
 			</property>
 			
-			<!-- Element execution factories -->
-			
 			<!-- AMS service. -->
 			<property type="jadex.bridge.IComponentExecutionService" name="ams_service">
 				new jadex.adapter.standalone.service.componentexecution.ComponentExecutionService($platform)
 			</property> 
 			
 		</properties>
-		
-		<!-- Agents. -->
-  		<property type="daemonagent" name="ams">jadex/bdi/amsagent/AMS.agent.xml</property>
-		<property type="daemonagent" name="df">jadex/bdi/dfagent/DF.agent.xml</property>
- 		<property type="agent" name="jcc">jadex/tools/jcc/JCC.agent.xml</property>
-	
-		<!--  <properties type="kernel" id="kernel_v2_bdi">
-			<property type="agent_factory">new jadex.bdi.interpreter.BDIAgentFactory(
-				jadex.commons.SUtil.createHashMap(
-					new String[]
-					{
-						"messagetype_fipa", 
-						"planexecutor_standard", 
-						"standard.timeout", 
-						"tooladapter.introspector",
-						"microplansteps" //,
-						//"planexecutor_bpmn"
-					},
-					new Object[]
-					{
-						new jadex.adapter.base.fipa.FIPAMessageType(), 
-						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class)),
-						new java.lang.Long(10000),
-						jadex.tools.introspector.IntrospectorAdapter.class,
-						Boolean.TRUE //,
-						//new jadex.bdi.runtime.BpmnPlanExecutor()
-					}
-				), $platform)
-			</property>
-		</properties>
-	
-		<properties type="kernel" id="kernel_v2_micro">
-			<property type="agent_factory">new jadex.microkernel.MicroAgentFactory($platform)</property>
-		</properties> -->
 	</properties>
 	
 </properties>

@@ -1,6 +1,7 @@
 package jadex.commons.xml.bean;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
 import jadex.commons.xml.Namespace;
@@ -156,19 +157,24 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		{
 			Class clazz = object.getClass();
 			String clazzname = SReflect.getClassName(clazz);
-			Namespace ns;
 			int idx = clazzname.lastIndexOf(".");
 			pck = SXML.PROTOCOL_TYPEINFO+clazzname.substring(0, idx);
 			tag = clazzname.substring(idx+1);
 			
-			// Special case array length
-			
 			if(clazz.isArray())
-				tag = tag.substring(0, tag.length()-2)+"__"+Array.getLength(object);
-			
-			int cnt;
-			
-			
+			{
+				if(clazz.isArray())
+				{
+					int[] lens = SUtil.getArrayLengths(object);
+					tag = tag.substring(0, tag.indexOf("["))+"__";
+					for(int i=0; i<lens.length; i++)
+					{
+						tag += lens[i];
+						if(i+1<lens.length)
+							tag += "_";
+					}
+				}
+			}
 		}
 		else
 		{

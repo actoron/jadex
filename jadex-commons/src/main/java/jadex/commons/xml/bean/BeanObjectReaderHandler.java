@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.WeakHashMap;
 
 /**
@@ -176,19 +177,26 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				// Special case array
 				int length = -1;
 				int idx = clazzname.indexOf("__");
+				int[] lens = null;
 				if(idx!=-1)
 				{
-					length = Integer.parseInt(clazzname.substring(idx+2));
+					String strlens = clazzname.substring(idx+2);
 					clazzname = clazzname.substring(0, idx);
+					StringTokenizer stok = new StringTokenizer(strlens, "_");
+					lens =  new int[stok.countTokens()];
+					for(int i=0; stok.hasMoreTokens(); i++)
+					{
+						lens[i] = Integer.parseInt(stok.nextToken());
+					}
 				}
 				
 				Class clazz = SReflect.classForName0(clazzname, classloader);
 				
 				if(clazz!=null)
 				{
-					if(length!=-1)
+					if(lens!=null)
 					{
-						ret = Array.newInstance(clazz, length);
+						ret = Array.newInstance(clazz, lens);
 					}
 					else if(!BasicTypeConverter.isBuiltInType(clazz))
 					{

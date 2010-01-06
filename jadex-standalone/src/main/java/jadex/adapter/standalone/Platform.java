@@ -25,32 +25,38 @@ public class Platform extends AbstractPlatform
 {
 	//-------- constants --------
 
+	/** The separator. */
+	public static final String SEPARATOR = ".";
+	
 	/** The platform type identifier. */
 	public static final String PLATFORM = "platform_standalone";
 
 	/** The platform service(s). */
-	public static final String SERVICES = "services";
+	public static final String SERVICES = PLATFORM+SEPARATOR+"services";
+	
+	/** The platform agent(s). */
+//	public static final String AGENTS = PLATFORM+SEPARATOR+"agents";
 
-	/** The platform kernel(s). */
-	public static final String KERNEL = "kernel";
+//	/** The platform kernel(s). */
+//	public static final String KERNEL = "platform_standalone.kernel";
 
-	/** The agent factory. */
-	public static final String AGENT_FACTORY = "agent_factory";
+//	/** The agent factory. */
+//	public static final String AGENT_FACTORY = "agent_factory";
 
-	/** The application factory. */
-	public static final String APPLICATION_FACTORY = "application_factory";
+//	/** The application factory. */
+//	public static final String APPLICATION_FACTORY = "application_factory";
 	
 //	/** The agent factory. */
 //	public static final String MESSAGETYPE = "messagetype";
 
 	/** A daemon agent. */
-	public static final String DAEMONAGENT = "daemonagent";
+	public static final String DAEMONAGENT = PLATFORM+SEPARATOR+"daemonagent";
 
 	/** An application agent. */
-	public static final String AGENT = "agent";
+	public static final String AGENT = PLATFORM+SEPARATOR+"agent";
 
 	/** An application agent. */
-	public static final String APPLICATION = "application";
+	public static final String APPLICATION = PLATFORM+SEPARATOR+"application";
 	
 	/** An agent argument. */
 	public static final String ARGUMENT = "argument";
@@ -64,47 +70,20 @@ public class Platform extends AbstractPlatform
 	/** An agent config. */
 	public static final String CONFIG = "config";
 	
-//	/** The allowed command-line options. */
-//	public static final Set COMMAND_LINE_OPTIONS;
-
-	/** The configuration file. */
-	public static final String TRANSPORT = "transport";
-
-//	/** Starting with antother df class. */
-//	public static final String DF = "df";
-
-//	/** The allowed command-line flags. */
-//	public static final Set COMMAND_LINE_FLAGS;
-
-//	/** Starting without gui. */
-//	public static final String NOGUI = "nogui";
-
-	/** Flag for creating no ams agent. */
-	//	public static final String NOAMSAGENT = "noamsagent";
-	/** Flag for creating no df agent. */
-	//	public static final String NODFAGENT = "nodfagent";
-	/** The ams agent file. */
-	//	public static final String AMSAGENTFILE = "amsagentfile";
-	/** The df agent file. */
-	//	public static final String DFAGENTFILE = "dfagentfile";
-	/** Start the platform without transport mechanism. */
-	//public static final String NOTRANSPORT = "notransport";
-
 	/** Shut down the platform, when the last agent is killed. */
-	public static final String AUTOSHUTDOWN = "autoshutdown";
+	public static final String AUTOSHUTDOWN = PLATFORM+SEPARATOR+"autoshutdown";
 
 	/** The platform name. */
-	public static final String PLATFORMNAME = "platformname";
+	public static final String PLATFORMNAME = PLATFORM+SEPARATOR+"platformname";
+
+	/** Configuration entry for platform shutdown delay (time for agents to terminate gracefully). */
+	public static String PLATFORM_SHUTDOWN_TIME = PLATFORM+SEPARATOR+"platform_shutdown_time";
 
 	/** The fallback configuration. */
 	public static final String FALLBACK_CONFIGURATION = "jadex/adapter/standalone/standalone_conf.xml";
 
-	/** Configuration entry for platform shutdown delay (time for agents to terminate gracefully). */
-	public static String PLATFORM_SHUTDOWN_TIME = "platform_shutdown_time";
-
-
-	/** The platform config. */
-	protected Properties platconf;
+	/** The configuration. */
+	protected Properties conf;
 
 	//-------- attributes --------
 
@@ -113,8 +92,37 @@ public class Platform extends AbstractPlatform
 	 */
 	public Platform(String conffile, ClassLoader classloader) throws Exception
 	{
-		this((Properties)PropertiesXMLHelper.getPropertyReader().read(
-			SUtil.getResource(conffile, classloader), classloader, null), null);
+		this(new String[]{conffile}, classloader);
+	}
+	
+	/**
+	 *  Create a new Platform.
+	 */
+	public Platform(String[] conffiles, ClassLoader classloader) throws Exception
+	{
+		this(readProperties(conffiles, classloader));
+	}
+	
+	/**
+	 *  Read several property files and merge them.
+	 */
+	protected static Properties readProperties(String[] conffiles, ClassLoader classloader) throws Exception
+	{
+		Properties[] props = new Properties[conffiles.length];
+		for(int i=0; i<props.length; i++)
+		{
+			props[i] = (Properties)PropertiesXMLHelper.getPropertyReader()
+				.read(SUtil.getResource(conffiles[i], classloader), classloader, null);
+		}
+		
+		// Unify properties
+		Properties ret = props[0];
+		for(int i=1; i<props.length; i++)
+		{
+			ret.addProperties(props[i]);
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -153,12 +161,12 @@ public class Platform extends AbstractPlatform
 		// Save start time.
 		//    	Configuration.getConfiguration().setProperty(Configuration.STARTTIME, ""+starttime);
 
-		this.platconf = configuration.getSubproperty(PLATFORM);
+		this.conf = configuration;//;.getSubproperty(PLATFORM);
 		
 //		this.services = new LinkedHashMap();
 //		this.messagetypes = new LinkedHashMap();
-		this.shutdowntime = platconf.getLongProperty(PLATFORM_SHUTDOWN_TIME);
-		String	name = (String)((Property)platconf.getProperty(PLATFORMNAME)).getValue();
+		this.shutdowntime = conf.getLongProperty(PLATFORM_SHUTDOWN_TIME);
+		String	name = (String)((Property)conf.getProperty(PLATFORMNAME)).getValue();
 		if(name == null)
 		{
 			try
@@ -187,7 +195,7 @@ public class Platform extends AbstractPlatform
 		
 		// Initialize services.
 //		props = platconf.getSubproperty(SERVICES).getProperties();
-		init(platconf.getSubproperty(SERVICES), fetcher, parent);
+		init(conf.getSubproperty(SERVICES), fetcher, parent);
 		
 //		for(int i = 0; i < props.length; i++)
 //		{
@@ -277,12 +285,14 @@ public class Platform extends AbstractPlatform
 	
 			// Create daemon agents.
 			this.daemonagents = SCollection.createLinkedHashSet();
-			Property[] props = platconf.getProperties(DAEMONAGENT);
+			Property[] props = conf.getProperties(DAEMONAGENT);
+//			System.out.println("starting: "+props.length);
 			for(int i = 0; i < props.length; i++)
 			{
+//				System.out.println("starting: "+props[i].getName());
 				createComponent(props[i].getName(), props[i].getValue(), null, null, true);
 			}
-			Properties[] subprops = platconf.getSubproperties(DAEMONAGENT);
+			Properties[] subprops = conf.getSubproperties(DAEMONAGENT);
 			for(int i = 0; i < subprops.length; i++)
 			{
 				Map args = getArguments(subprops[i]);
@@ -292,12 +302,12 @@ public class Platform extends AbstractPlatform
 			}
 	
 			// Create application agents.
-			props = platconf.getProperties(AGENT);
+			props = conf.getProperties(AGENT);
 			for(int i = 0; i < props.length; i++)
 			{
 				createComponent(props[i].getName(), props[i].getValue(), null, null, false);
 			}
-			subprops = platconf.getSubproperties(AGENT);
+			subprops = conf.getSubproperties(AGENT);
 			for(int i = 0; i < subprops.length; i++)
 			{
 				Map args = getArguments(subprops[i]);
@@ -307,12 +317,12 @@ public class Platform extends AbstractPlatform
 			}
 			
 			// Create applications.
-			props = platconf.getProperties(APPLICATION);
+			props = conf.getProperties(APPLICATION);
 			for(int i = 0; i < props.length; i++)
 			{
 				createComponent(props[i].getName(), props[i].getValue(), null, null, false);
 			}
-			subprops = platconf.getSubproperties(APPLICATION);
+			subprops = conf.getSubproperties(APPLICATION);
 			for(int i = 0; i < subprops.length; i++)
 			{
 				Map args = getArguments(subprops[i]);
@@ -322,38 +332,8 @@ public class Platform extends AbstractPlatform
 			}
 		}
 		
-		platconf = null;
+		conf = null;
 	}
-	
-	/**
-	 *  Create the agent factory.
-	 * /
-	public IAgentFactory createAgentFactory(Properties platconf, SimpleValueFetcher fetcher)
-	{
-		Properties[] kernel_props = platconf.getSubproperties(KERNEL);
-
-		List factories = new ArrayList();
-		for(int i=0; i<kernel_props.length; i++)
-		{
-			Property af = kernel_props[i].getProperty(AGENT_FACTORY);
-			if(af == null)
-				throw new RuntimeException("Agent factory property not configured for kernel.");
-			fetcher.setValue("$props", kernel_props[i]);
-			IAgentFactory fac = (IAgentFactory)SJavaParser.evaluateExpression(af.getValue(), fetcher);
-			factories.add(fac);
-		}
-		return new MetaAgentFactory(factories);
-	}*/
-	
-	/**
-	 *  Create the application factory.
-	 * /
-	public IApplicationFactory createApplicationFactory(Properties platconf, SimpleValueFetcher fetcher)
-	{
-		Property af = platconf.getProperty(APPLICATION_FACTORY);
-		IApplicationFactory ret = (IApplicationFactory)SJavaParser.evaluateExpression(af.getValue(), fetcher);
-		return ret;
-	}*/
 	
 	/**
 	 *  Get an agent's arguments.
@@ -418,18 +398,25 @@ public class Platform extends AbstractPlatform
 		long starttime = System.currentTimeMillis();
 		
 		// Initialize platform configuration from args.
-		String conffile = FALLBACK_CONFIGURATION;
-		if(args.length>0 && args[0].equals("-"+CONFIGURATION))
+		String[] conffiles;
+		if(args[0].equals("-"+CONFIGURATION))
 		{
-			conffile = args[1];
-			String[] tmp= new String[args.length-2];
-			System.arraycopy(args, 2, tmp, 0, args.length-2);
-			args = tmp;
+			conffiles = new String[args.length-1];
+			System.arraycopy(args, 1, conffiles, 0, args.length-1);
 		}
+		else if(args.length>0)
+		{
+			conffiles = args;
+		}
+		else
+		{
+			conffiles = new String[]{FALLBACK_CONFIGURATION};
+		}
+		
 		// Create an instance of the platform.
 		// Hack as long as no loader is present.
 		ClassLoader cl = Platform.class.getClassLoader();
-		platform = createPlatform(conffile, cl);
+		platform = new Platform(conffiles, cl);
 		platform.start();
 		
 		long startup = System.currentTimeMillis() - starttime;
@@ -454,22 +441,6 @@ public class Platform extends AbstractPlatform
 //		});
 //		gc.setDaemon(true);
 //		gc.start();
-	}
-
-	/**
-	 *  Create a platform for a configuration file.
-	 *  @param conffile The configuration file.
-	 *  @return The platform.
-	 */
-	public static Platform createPlatform(String conffile, ClassLoader classloader) throws Exception
-	{
-		// Create an instance of the platform.
-		// Hack as long as no loader is present.
-		Properties configuration = (Properties)PropertiesXMLHelper.getPropertyReader().read(
-			SUtil.getResource(conffile, classloader), classloader, null);
-		Platform platform = new Platform(configuration);
-//		platform.start();
-		return platform;
 	}
 }
 

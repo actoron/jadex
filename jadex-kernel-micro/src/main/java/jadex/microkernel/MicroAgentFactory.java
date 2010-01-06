@@ -110,7 +110,7 @@ public class MicroAgentFactory implements IComponentFactory
 		{
 			clname	= clname.substring(idx+1);
 			cma = SReflect.findClass0(clname, null, cl);
-//			System.out.println(clname+" "+cma+" "+ret);
+			System.out.println(clname+" "+cma+" "+ret);
 		}
 		if(cma==null)// || !cma.isAssignableFrom(IMicroAgent.class))
 			throw new RuntimeException("No micro agent file: "+model);

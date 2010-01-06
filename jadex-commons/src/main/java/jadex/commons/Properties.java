@@ -1,7 +1,11 @@
 package jadex.commons;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  *  The configuration properties.
@@ -24,6 +28,7 @@ public class Properties
 	
 	/** The subproperties. */
 	protected List subproperties;
+//	protected Map subproperties;
 	
 	/** todo: the property refs. */
 //	protected List propertyrefs;
@@ -48,6 +53,7 @@ public class Properties
 		this.id = id;
 		this.properties = new ArrayList();
 		this.subproperties = new ArrayList();
+//		this.subproperties = new HashMap();
 	}
 
 	//-------- methods --------
@@ -109,14 +115,30 @@ public class Properties
 	 */
 	public Property getProperty(String type)
 	{
-		Property ret = null;
-		for(int i=0; ret==null && i<properties.size(); i++)
-		{
-			Property prop = (Property)properties.get(i);
-			if(type.equals(prop.getType()))
-				ret = prop;
-		}
-		return ret;
+		Property[] props = getProperties(type);
+		if(props.length>1)
+			throw new RuntimeException("More than one property of type: "+type+" "+SUtil.arrayToString(props));
+		return props.length==1? props[0]: null;
+		
+//		Property ret = null;
+//		for(int i=0; ret==null && i<properties.size(); i++)
+//		{
+//			Property prop = (Property)properties.get(i);
+//			if(type.equals(prop.getType()))
+//				ret = prop;
+//		}
+//		return ret;
+	}
+	
+	/**
+	 *  Get the latest property by type.
+	 *  @param type The type name. 
+	 */
+	public Property getLatestProperty(String type)
+	{
+		Property[] props = getProperties(type);
+//		System.out.println("here: "+type+" "+SUtil.arrayToString(props));
+		return props.length>0? props[props.length-1]: null;
 	}
 	
 	/**
@@ -134,11 +156,28 @@ public class Properties
 	public Property[]	getProperties(String type)
 	{
 		List ret = new ArrayList();
-		for(int i=0; i<properties.size(); i++)
+		int idx = type.indexOf(".");
+		if(idx!=-1)
 		{
-			Property prop = (Property)properties.get(i);
-			if(type.equals(prop.getType()))
-				ret.add(prop);
+			String first = type.substring(0, idx);
+			String last = type.substring(idx+1);
+			
+			Properties[] subprops = getSubproperties(first);
+			for(int i=0; i<subprops.length; i++)
+			{
+				Property[] ps = subprops[i].getProperties(last);
+				for(int j=0; j<ps.length; j++)
+					ret.add(ps[j]);
+			}
+		}
+		else
+		{
+			for(int i=0; i<properties.size(); i++)
+			{
+				Property prop = (Property)properties.get(i);
+				if(type.equals(prop.getType()))
+					ret.add(prop);
+			}
 		}
 		return (Property[])ret.toArray(new Property[ret.size()]);
 	}
@@ -158,14 +197,19 @@ public class Properties
 	 */
 	public Properties getSubproperty(String type)
 	{
-		Properties ret = null;
-		for(int i=0; ret==null && i<subproperties.size(); i++)
-		{
-			Properties props = (Properties)subproperties.get(i);
-			if(type.equals(props.getType()))
-				ret = props;
-		}
-		return ret;
+		Properties[] props = getSubproperties(type);
+		if(props.length>1)
+			throw new RuntimeException("More than one property of type: "+type+" "+SUtil.arrayToString(props));
+		return props.length==1? props[0]: null;
+		
+//		Properties ret = null;
+//		for(Iterator it=subproperties.values().iterator(); it.hasNext();)
+//		{
+//			Properties props = (Properties)it.next();
+//			if(SUtil.equals(type, props.getType()))
+//				ret = props;
+//		}
+//		return ret;
 	}
 	
 	/**
@@ -192,11 +236,28 @@ public class Properties
 	public Properties[] getSubproperties(String type)
 	{
 		List ret = new ArrayList();
-		for(int i=0; i<subproperties.size(); i++)
+		int idx = type.indexOf(".");
+		if(idx!=-1)
 		{
-			Properties props = (Properties)subproperties.get(i);
-			if(type.equals(props.getType()))
-				ret.add(props);
+			String first = type.substring(0, idx);
+			String last = type.substring(idx+1);
+			
+			Properties[] subprops = getSubproperties(first);
+			for(int i=0; i<subprops.length; i++)
+			{
+				Properties[] ps = subprops[i].getSubproperties(last);
+				for(int j=0; j<ps.length; j++)
+					ret.add(ps[j]);
+			}
+		}
+		else
+		{
+			for(int i=0; i<subproperties.size(); i++)
+			{
+				Properties props = (Properties)subproperties.get(i);
+				if(type.equals(props.getType()))
+					ret.add(props);
+			}
 		}
 		return (Properties[])ret.toArray(new Properties[ret.size()]);
 	}
@@ -208,6 +269,10 @@ public class Properties
 	 */
 	public void	addSubproperties(Properties props)
 	{
+//		if(subproperties.containsKey(props.getType()))
+//			throw new RuntimeException("Subproperties already contained: "+props);
+		
+//		subproperties.put(props.getType(), props);
 		subproperties.add(props);
 	}
 	
@@ -216,6 +281,7 @@ public class Properties
 	 */
 	public void	addProperty(Property prop)
 	{
+//		System.out.println("adding: "+prop);
 		properties.add(prop);
 	}
 	
@@ -228,7 +294,7 @@ public class Properties
 	 */
 	public boolean	getBooleanProperty(String type)
 	{
-		Property	prop	= getProperty(type);
+		Property	prop	= getLatestProperty(type);
 		//return prop!=null && Boolean.parseBoolean(prop.getValue());
 		return prop!=null && Boolean.valueOf(prop.getValue()).booleanValue();
 	}
@@ -240,7 +306,7 @@ public class Properties
 	 */
 	public long getLongProperty(String type)
 	{
-		Property	prop	= getProperty(type);
+		Property	prop	= getLatestProperty(type);
 		return prop==null? 0: Long.parseLong(prop.getValue());
 	}
 	
@@ -251,7 +317,7 @@ public class Properties
 	 */
 	public int getIntProperty(String type)
 	{
-		Property	prop	= getProperty(type);
+		Property	prop	= getLatestProperty(type);
 		return prop==null? 0: Integer.parseInt(prop.getValue());
 	}
 	
@@ -262,8 +328,34 @@ public class Properties
 	 */
 	public String	getStringProperty(String type)
 	{
-		Property	prop	= getProperty(type);
+		Property	prop	= getLatestProperty(type);
 		return prop==null? null: prop.getValue();
+	}
+	
+	/** 
+	 *  Add the complete content of another properties. 
+	 */
+	public void addProperties(Properties toadd)
+	{
+		Property[] subprops = toadd.getProperties();
+		for(int j=0; j<subprops.length; j++)
+		{
+			addProperty(subprops[j]);
+		}
+		
+		Properties[] subpropis = toadd.getSubproperties();
+		for(int i=0; i<subpropis.length; i++)
+		{
+//			Properties tmp = getSubproperty(subpropis[i].getType());
+//			if(tmp!=null)
+//			{
+//				tmp.addProperties(subpropis[i]);
+//			}
+//			else
+			{
+				addSubproperties(subpropis[i]);
+			}
+		}
 	}
 	
 	/**

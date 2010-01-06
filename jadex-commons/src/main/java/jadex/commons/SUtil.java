@@ -346,6 +346,47 @@ public class SUtil
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Get the dimension of an array.
+	 *  @param array
+	 *  @return The array dimension.
+	 * /
+	public static int getArrayDimension(Object array) 
+	{ 
+		int dim = 0; 
+		Class cls = array.getClass(); 
+		while(cls.isArray()) 
+		{ 
+			dim++; 
+			cls = cls.getComponentType(); 
+		} 
+		return dim; 
+	}*/
+	
+	/**
+	 *  Get the dimension of an array.
+	 *  @param array
+	 *  @return The array dimension.
+	 */
+	public static int[] getArrayLengths(Object array) 
+	{ 
+		List lens = new ArrayList(); 
+		Class cls = array.getClass(); 
+		
+		Object tmp = array;
+		while(cls.isArray()) 
+		{ 
+			lens.add(new Integer(Array.getLength(array)));
+			cls = cls.getComponentType(); 
+		} 
+		
+		int[] ret = new int[lens.size()];
+		for(int i=0; i<lens.size(); i++)
+			ret[i] = ((Integer)lens.get(i)).intValue();
+		
+		return ret;
+	} 
 
 	/*
 	 *  Test if two values are equal or both null.

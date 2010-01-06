@@ -435,8 +435,8 @@ public class StarterPlugin extends AbstractJCCPlugin
 		if(spanelprops!=null)
 			spanel.setProperties(spanelprops);
 
-		lsplit.setDividerLocation(props.getIntProperty("leftsplit.location"));
-		csplit.setDividerLocation(props.getIntProperty("mainsplit.location"));
+		lsplit.setDividerLocation(props.getIntProperty("leftsplit_location"));
+		csplit.setDividerLocation(props.getIntProperty("mainsplit_location"));
 
 		checkingmenu.setSelected(props.getBooleanProperty("checking"));
 		

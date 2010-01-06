@@ -32,15 +32,16 @@ public class Test //extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
+				t.testMultiArray();
 				t.testVectorModel();
-//				t.testClass();
-//				t.testDate();
-//				t.testColor();
-//				t.testArray();
-//				t.testBean();
-//				t.testList();
-//				t.testSet();
-//				t.testMap();
+				t.testClass();
+				t.testDate();
+				t.testColor();
+				t.testArray();
+				t.testBean();
+				t.testList();
+				t.testSet();
+				t.testMap();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -61,7 +62,7 @@ public class Test //extends TestCase
 	{
 		String xml = JavaWriter.objectToXML(wo, null);
 		
-		System.out.println("xml is:"+xml);
+//		System.out.println("xml is:"+xml);
 		
 		Object ro = JavaReader.objectFromXML(xml, null);
 		
@@ -75,11 +76,23 @@ public class Test //extends TestCase
 //		fis.close();
 //		System.out.println("Read: "+ro+" / class="+ro.getClass());
 		
-		System.out.println("equals: "+wo.equals(ro));
+//		System.out.println("equals: "+wo.equals(ro));
 		if(!wo.equals(ro) && !(wo.getClass().isArray() && Arrays.equals((Object[])wo, (Object[])ro)))
 			System.out.println("Not equal: "+wo.getClass()+" \n"+ro.getClass());
 		
 //		assertEquals("Written and read objects should be equal:", wo, ro);
+	}
+	
+	/**
+	 *  Test if multi array transfer works.
+	 */
+	public void testMultiArray() throws Exception
+	{
+		String[][] array = new String[3][2]; 
+		array[0][0] = "a";
+		array[1][0] = "b";
+		array[2][0] = "c";
+		doWriteAndRead(array);
 	}
 	
 	/**
