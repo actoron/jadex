@@ -49,6 +49,7 @@
 		    <module>jadex-rules</module>
 		    <module>jadex-rules-applications</module>
 		    <module>jadex-rules-tools</module>
+		    <module>jadex-kernel-application</module>
 		    <module>jadex-standalone</module>
 		    <module>jadex-launch</module>
 		    <module>jadex-apleis</module>
@@ -75,6 +76,7 @@
 		    <module>jadex-rules</module>
 		    <module>jadex-rules-applications</module>
 		    <module>jadex-rules-tools</module>
+		    <module>jadex-kernel-application</module>
 		    <module>jadex-standalone</module>
 		    <module>jadex-launch</module>
 		    <module>jadex-jade-launch</module>
@@ -118,6 +120,7 @@
 		    <module>jadex-rules</module>
 		    <module>jadex-rules-applications</module>
 		    <module>jadex-rules-tools</module>
+		    <module>jadex-kernel-application</module>
 		    <module>jadex-jade-launch</module>
 			<module>jadex-platform-jade</module>
 		</modules>

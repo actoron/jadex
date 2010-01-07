@@ -1,7 +1,5 @@
 package jadex.bdi.interpreter;
 
-import jadex.bdi.runtime.IBelief;
-import jadex.bdi.runtime.impl.BeliefFlyweight;
 import jadex.bdi.runtime.impl.InterpreterTimedObject;
 import jadex.bridge.CheckedAction;
 import jadex.commons.SReflect;

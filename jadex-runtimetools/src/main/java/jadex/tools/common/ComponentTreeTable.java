@@ -60,6 +60,9 @@ public class ComponentTreeTable extends JScrollPane
 	/** The platform node containing the agents. */
 	protected DefaultTreeTableNode	platform;
 
+	/** The tree table nodes (cid->node). */
+	protected Map nodes;
+
 	/** The tree table. */
 	protected JTreeTable treetable;
 	
@@ -78,6 +81,7 @@ public class ComponentTreeTable extends JScrollPane
 		addNodeType(new TreeTableNodeType(NODE_CONTAINER, new Icon[]{icons.getIcon(NODE_CONTAINER)}, new String[]{"name"}, new String[]{"Name"}));
 		addNodeType(new TreeTableNodeType(NODE_COMPONENT, new Icon[]{icons.getIcon(NODE_COMPONENT)}, new String[]{"name", "address"}, new String[]{"Name", "Address"}));
 
+		this.nodes = new HashMap();
 		this.getViewport().setBackground(UIManager.getColor("List.background"));
 
 		// Use custom font (larger).
@@ -137,59 +141,49 @@ public class ComponentTreeTable extends JScrollPane
 	/**
 	 *  Add an agent.
 	 */
-	public void addComponent(Object description)
-	{		
-		Map values = new HashMap();
-		if(description instanceof IComponentDescription)
-		{
-			IComponentDescription desc = (IComponentDescription)description;
-			values.put("name", desc.getName().getName());
-			values.put("type", desc.getType());
-			values.put("state", desc.getState());
-			//		values.put("ownership", description.getOwnership());
-			String[] addresses = desc.getName().getAddresses();
-			if(addresses.length > 0)
-				values.put("address", addresses[0]);
-		}
-		else
-		{
-			values.put("name", ""+description);
-		}
+	public void addComponent(IComponentDescription desc)
+	{
+		DefaultTreeTableNode	parent	= (DefaultTreeTableNode)(desc.getParent()!=null ? nodes.get(desc.getParent()) : platform);
 		
-		platform.add(new DefaultTreeTableNode(getNodeType(NODE_COMPONENT), description, values));
+		Map values = new HashMap();
+		values.put("name", desc.getName().getName());
+		values.put("type", desc.getType());
+		values.put("state", desc.getState());
+		//		values.put("ownership", description.getOwnership());
+		String[] addresses = desc.getName().getAddresses();
+		if(addresses.length > 0)
+			values.put("address", addresses[0]);
+	
+		DefaultTreeTableNode	node	= new DefaultTreeTableNode(getNodeType(NODE_COMPONENT), desc, values);
+		nodes.put(desc.getName(), node);
+		parent.add(node);
 
-		// Expand platform on first add. (hack???)
-		if(platform.getChildCount() == 1)
+		// Expand node on first add. (hack???)
+		if(parent.getChildCount() == 1)
 		{
-			this.treetable.getTree().expandPath(new TreePath(platform.getPath()));
+			this.treetable.getTree().expandPath(new TreePath(parent.getPath()));
 		}
 	}
 	
 	/**
 	 *  Update an existing agent description.
 	 */
-	public void updateComponent(Object description)
+	public void updateComponent(IComponentDescription desc)
 	{
+		DefaultTreeTableNode	parent	= (DefaultTreeTableNode)(desc.getParent()!=null ? nodes.get(desc.getParent()) : platform);
+
 		Map values = new HashMap();
-		if(description instanceof IComponentDescription)
-		{
-			IComponentDescription desc = (IComponentDescription)description;
-			values.put("name", desc.getName().getName());
-			values.put("type", desc.getType());
-			values.put("state", desc.getState());
-			//values.put("ownership", description.getOwnership());
-			String[] addresses = desc.getName().getAddresses();
-			if(addresses.length > 0)
-				values.put("address", addresses[0]);
-		}
-		else
-		{
-			values.put("name", ""+description);
-		}
+		values.put("name", desc.getName().getName());
+		values.put("type", desc.getType());
+		values.put("state", desc.getState());
+		//values.put("ownership", description.getOwnership());
+		String[] addresses = desc.getName().getAddresses();
+		if(addresses.length > 0)
+			values.put("address", addresses[0]);
 		
-		DefaultTreeTableNode node = platform.getChild(description);
+		DefaultTreeTableNode node = parent.getChild(desc);
 		node.setValues(values);
-		node.setUserObject(description);
+		node.setUserObject(desc);
 		
 		//System.out.println("update for: "+node);
 		
@@ -201,12 +195,15 @@ public class ComponentTreeTable extends JScrollPane
 	 *  Remove an agent.
 	 *  @param description
 	 */
-	public void removeComponent(Object description)
+	public void removeComponent(IComponentDescription description)
 	{
-		DefaultTreeTableNode child = platform.getChild(description);
+		DefaultTreeTableNode	parent	= (DefaultTreeTableNode)(description.getParent()!=null ? nodes.get(description.getParent()) : platform);
+
+		DefaultTreeTableNode child = parent.getChild(description);
 		if(child != null)
 		{
-			platform.remove(platform.getIndex(child));
+			nodes.remove(description.getName());
+			parent.remove(parent.getIndex(child));
 		}
 	}
 	

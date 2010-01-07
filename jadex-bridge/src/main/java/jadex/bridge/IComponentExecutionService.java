@@ -20,10 +20,10 @@ public interface IComponentExecutionService	extends IService
 	 *  @param args The arguments for the component (if any).
 	 *  @param suspend Create the component in suspended mode (i.e. do not run until resum() is called).
 	 *  @param listener The result listener (if any). Will receive the id of the component as result.
-	 *  @param creator The creator (if any).
+	 *  @param parent The parent component (if any).
 	 */
 	public void	createComponent(String name, String model, String config, Map args, boolean suspend, 
-		IResultListener listener, Object creator, IResultListener killlistener);
+		IResultListener listener, IComponentIdentifier parent, IResultListener killlistener);
 		
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.

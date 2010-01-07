@@ -373,12 +373,12 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 	{
 //		System.out.println("Set props called: "+props);
 		
-		if(props.getProperty("split1.location")!=null)
-			split1.setDividerLocation(props.getIntProperty("split1.location"));
-		if(props.getProperty("split2.location")!=null)
-			split2.setDividerLocation(props.getIntProperty("split2.location"));
-		if(props.getProperty("split3.location")!=null)
-			split3.setDividerLocation(props.getIntProperty("split3.location"));
+		if(props.getProperty("split1_location")!=null)
+			split1.setDividerLocation(props.getIntProperty("split1_location"));
+		if(props.getProperty("split2_location")!=null)
+			split2.setDividerLocation(props.getIntProperty("split2_location"));
+		if(props.getProperty("split3_location")!=null)
+			split3.setDividerLocation(props.getIntProperty("split3_location"));
 
 		Properties	agenttableprops	= props.getSubproperty("agenttable");
 		if(agenttableprops!=null)
@@ -408,9 +408,9 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 	public Properties	getProperties()
 	{
 		Properties	props	= new Properties();
-		props.addProperty(new Property("split1.location", Integer.toString(split1.getDividerLocation())));
-		props.addProperty(new Property("split2.location", Integer.toString(split2.getDividerLocation())));
-		props.addProperty(new Property("split3.location", Integer.toString(split3.getDividerLocation())));
+		props.addProperty(new Property("split1_location", Integer.toString(split1.getDividerLocation())));
+		props.addProperty(new Property("split2_location", Integer.toString(split2.getDividerLocation())));
+		props.addProperty(new Property("split3_location", Integer.toString(split3.getDividerLocation())));
 		if(refresh0.isSelected())
 			props.addProperty(new Property("sleep", Long.toString(REFRESH0)));
 		else if(refresh1.isSelected())

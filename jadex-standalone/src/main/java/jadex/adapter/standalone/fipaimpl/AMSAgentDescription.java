@@ -20,6 +20,9 @@ public class AMSAgentDescription implements IComponentDescription, Cloneable, Se
 	/** Attribute for slot agentidentifier. */
 	protected IComponentIdentifier name;
 
+	/** Attribute for slot parent. */
+	protected IComponentIdentifier parent;
+
 	/** Attribute for slot ownership. */
 	protected String ownership;
 
@@ -38,11 +41,12 @@ public class AMSAgentDescription implements IComponentDescription, Cloneable, Se
 	/**
 	 *  Create a new AMSAgentDescription.
 	 */
-	public AMSAgentDescription(IComponentIdentifier aid, String type)
+	public AMSAgentDescription(IComponentIdentifier aid, String type, IComponentIdentifier parent)
 	{
 		this();
 		setName(aid);
 		setType(type);
+		setParent(parent);
 		setState(IComponentDescription.STATE_ACTIVE);
 	}
 
@@ -84,6 +88,24 @@ public class AMSAgentDescription implements IComponentDescription, Cloneable, Se
 		this.name = name;
 	}
 
+	/**
+	 *  Get the identifier of the parent component (if any).
+	 *  @return The parent component identifier.
+	 */
+	public IComponentIdentifier getParent()
+	{
+		return this.parent;
+	}
+	
+	/**
+	 *  Set the parent of this component description.
+	 * @param parent the value to be set
+	 */
+	public void setParent(IComponentIdentifier parent)
+	{
+		this.parent = parent;
+	}
+	
 	/**
 	 *  Get the ownership of this AMSAgentDescription.
 	 * @return ownership

@@ -1,11 +1,8 @@
 package jadex.microkernel;
 
-import jadex.bridge.IApplicationContext;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IContext;
-import jadex.bridge.IContextService;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
 import jadex.commons.concurrent.IResultListener;
@@ -334,22 +331,22 @@ public abstract class MicroAgent implements IMicroAgent
 		return reply;
 	}
 	
-	/**
-	 *  Get the application context.
-	 *  @return The application context (or null).
-	 */
-	public IApplicationContext getApplicationContext()
-	{
-		IApplicationContext ret = null;
-		IContextService cs = (IContextService)getServiceContainer().getService(IContextService.class);
-		if(cs!=null)
-		{
-			IContext[] tmp = cs.getContexts(getAgentIdentifier(), IApplicationContext.class);
-			if(tmp.length==1)
-				ret = (IApplicationContext)tmp[0];
-		}
-		return ret;
-	}
+//	/**
+//	 *  Get the application context.
+//	 *  @return The application context (or null).
+//	 */
+//	public IApplicationContext getApplicationContext()
+//	{
+//		IApplicationContext ret = null;
+//		IContextService cs = (IContextService)getServiceContainer().getService(IContextService.class);
+//		if(cs!=null)
+//		{
+//			IContext[] tmp = cs.getContexts(getAgentIdentifier(), IApplicationContext.class);
+//			if(tmp.length==1)
+//				ret = (IApplicationContext)tmp[0];
+//		}
+//		return ret;
+//	}
 	
 	/**
 	 *  Invoke a runnable later that is guaranteed 

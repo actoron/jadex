@@ -1,16 +1,15 @@
 package jadex.bdi.examples.marsworld_classic.sentry;
 
-import jadex.adapter.base.agr.AGRSpace;
-import jadex.adapter.base.agr.Group;
-import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.adapter.base.fipa.SFipa;
+import jadex.application.runtime.IApplicationExternalAccess;
+import jadex.application.space.agr.AGRSpace;
+import jadex.application.space.agr.Group;
 import jadex.bdi.examples.marsworld_classic.RequestProduction;
 import jadex.bdi.examples.marsworld_classic.Target;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IContextService;
 
 
 /**
@@ -63,9 +62,8 @@ public class AnalyseTargetPlanAGR extends Plan
 	{
 //		System.out.println("Calling some Production Agent...");
 
-		IContextService cs = (IContextService)getScope().getServiceContainer().getService(IContextService.class);
-		ApplicationContext ac = (ApplicationContext)cs.getContexts(getScope().getComponentIdentifier(), ApplicationContext.class)[0];
-		AGRSpace agrs = (AGRSpace)ac.getSpace("myagrspace");
+		IApplicationExternalAccess app = (IApplicationExternalAccess)getParentComponent();
+		AGRSpace agrs = (AGRSpace)app.getSpace("myagrspace");
 		Group group = agrs.getGroup("mymarsteam");
 		IComponentIdentifier[]	producers	= group.getAgentsForRole("producer");
 

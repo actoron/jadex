@@ -25,7 +25,7 @@ public class CreateComponentTask extends AbstractTask
 		reserved.add("model");
 		reserved.add("configuration");
 		reserved.add("suspend");
-		reserved.add("creator");
+		reserved.add("subcomponent");
 		reserved.add("arguments");
 	}
 	
@@ -38,7 +38,7 @@ public class CreateComponentTask extends AbstractTask
 		String model = (String)context.getParameterValue("model");
 		String config = (String)context.getParameterValue("configuration");
 		boolean suspend = context.getParameterValue("suspend")!=null? ((Boolean)context.getParameterValue("suspend")).booleanValue(): false;
-		Object creator = context.getParameterValue("creator");
+		boolean sub = context.getParameterValue("subcomponent")!=null? ((Boolean)context.getParameterValue("subcomponent")).booleanValue(): false;
 		IResultListener resultlistener = (IResultListener)context.getParameterValue("resultlistener");
 		
 		Map args = (Map)context.getParameterValue("arguments");
@@ -59,6 +59,6 @@ public class CreateComponentTask extends AbstractTask
 //		System.out.println("args: "+args);
 
 		IComponentExecutionService ces = (IComponentExecutionService)instance.getComponentAdapter().getServiceContainer().getService(IComponentExecutionService.class);
-		ces.createComponent(name, model, config, args, suspend, null, creator, resultlistener);
+		ces.createComponent(name, model, config, args, suspend, null, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, resultlistener);
 	}
 }

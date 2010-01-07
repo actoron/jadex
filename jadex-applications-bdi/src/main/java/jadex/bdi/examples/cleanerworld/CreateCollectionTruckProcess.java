@@ -110,7 +110,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 						});
 						
 					}
-				}, null);
+				});
 			}
 		}
 	}

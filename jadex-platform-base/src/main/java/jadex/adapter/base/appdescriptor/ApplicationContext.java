@@ -195,7 +195,7 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	 */
 	public void createAgent(String name, final String type, String configuration,
 			Map arguments, final boolean start, final boolean master, 
-			final IResultListener listener, IComponentIdentifier creator)
+			final IResultListener listener)
 	{
 		MAgentType	at	= model.getApplicationType().getMAgentType(type);
 		if(at==null)
@@ -373,7 +373,8 @@ public class ApplicationContext	extends BaseContext implements IApplicationConte
 	 */
 	public boolean executeStep()
 	{
-		throw new UnsupportedOperationException();
+		return false;
+//		throw new UnsupportedOperationException();
 	}
 
 	/**

@@ -3,19 +3,16 @@ package jadex.bdi.runtime.impl;
 import jadex.bdi.interpreter.AgentRules;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.IAgentListener;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.ICapability;
 import jadex.bdi.runtime.IEventbase;
 import jadex.bdi.runtime.IExpressionbase;
-import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IApplicationContext;
-import jadex.bridge.IContext;
-import jadex.bridge.IContextService;
 import jadex.rules.state.IOAVState;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
@@ -414,42 +411,42 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		}
 	}
 	
-	/**
-	 *  Get the application context.
-	 *  @return The application context (or null).
-	 */
-	public IApplicationContext getApplicationContext()
-	{
-		if(getInterpreter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					IContextService cs = (IContextService)adapter.getServiceContainer().getService(IContextService.class);
-					if(cs!=null)
-					{
-						IContext[] tmp = cs.getContexts(getComponentIdentifier(), IApplicationContext.class);
-						if(tmp!=null && tmp.length==1)
-							object = tmp[0];
-					}
-				}
-			};
-			return (IApplicationContext)invoc.object;
-		}
-		else
-		{
-			IApplicationContext ret = null;
-			IContextService cs = (IContextService)adapter.getServiceContainer().getService(IContextService.class);
-			if(cs!=null)
-			{
-				IContext[] tmp = cs.getContexts(getComponentIdentifier(), IApplicationContext.class);
-				if(tmp!=null && tmp.length==1)
-					ret = (IApplicationContext)tmp[0];
-			}
-			return ret;
-		}
-	}
+//	/**
+//	 *  Get the application context.
+//	 *  @return The application context (or null).
+//	 */
+//	public IApplicationContext getApplicationContext()
+//	{
+//		if(getInterpreter().isExternalThread())
+//		{
+//			AgentInvocation invoc = new AgentInvocation()
+//			{
+//				public void run()
+//				{
+//					IContextService cs = (IContextService)adapter.getServiceContainer().getService(IContextService.class);
+//					if(cs!=null)
+//					{
+//						IContext[] tmp = cs.getContexts(getComponentIdentifier(), IApplicationContext.class);
+//						if(tmp!=null && tmp.length==1)
+//							object = tmp[0];
+//					}
+//				}
+//			};
+//			return (IApplicationContext)invoc.object;
+//		}
+//		else
+//		{
+//			IApplicationContext ret = null;
+//			IContextService cs = (IContextService)adapter.getServiceContainer().getService(IContextService.class);
+//			if(cs!=null)
+//			{
+//				IContext[] tmp = cs.getContexts(getComponentIdentifier(), IApplicationContext.class);
+//				if(tmp!=null && tmp.length==1)
+//					ret = (IApplicationContext)tmp[0];
+//			}
+//			return ret;
+//		}
+//	}
 	
 	//-------- element methods --------
 	

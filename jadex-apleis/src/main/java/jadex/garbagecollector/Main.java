@@ -1,19 +1,15 @@
 package jadex.garbagecollector;
 
+import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.adapter.standalone.Platform;
+import jadex.bridge.IApplicationContext;
+import jadex.bridge.IContextService;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import eis.jadex.JadexDelegationEisImpl;
 import eis.jadex.SpacePerceptProcessor;
-import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.standalone.Platform;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IApplicationContext;
-import jadex.bridge.IContextService;
-import jadex.bridge.ISpace;
 
 /**
  * 
@@ -50,7 +46,7 @@ public class Main
 		// automatically avatars (entities) are created.
 		Map params = new HashMap();
 		params.put("eis", eis);
-		app.createAgent("ma1", "Collector", null, params, true, false, null, null);
+		app.createAgent("ma1", "Collector", null, params, true, false, null);
 		
 	}
 }

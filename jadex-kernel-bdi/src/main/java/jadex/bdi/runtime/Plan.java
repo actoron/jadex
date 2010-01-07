@@ -5,6 +5,9 @@ import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.interpreter.PlanRules;
 import jadex.bdi.runtime.impl.ElementFlyweight;
 import jadex.bdi.runtime.impl.WaitAbstractionFlyweight;
+import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.concurrent.IResultListener;
 
 import java.beans.PropertyChangeListener;
@@ -475,6 +478,21 @@ public abstract class Plan extends AbstractPlan
 		return ret;
 	}
 	
+	/**
+	 *  Get the external access of the parent component.
+	 */
+	public IExternalAccess getParentComponent()
+	{
+		// Get parent component (application).
+		IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+		SyncResultListener	res	= new SyncResultListener();
+		ces.getComponentDescription(getComponentIdentifier(), res);
+		IComponentDescription	desc	= (IComponentDescription)res.waitForResult();		
+		res	= new SyncResultListener();
+		ces.getExternalAccess(desc.getParent(), res);
+		return (IExternalAccess)res.waitForResult();
+	}
+
 	//-------- deprecated methods --------
 
 	/**

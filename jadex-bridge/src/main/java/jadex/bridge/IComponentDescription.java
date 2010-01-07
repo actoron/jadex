@@ -39,6 +39,12 @@ public interface IComponentDescription
 	public IComponentIdentifier getName();
 
 	/**
+	 *  Get the identifier of the parent component (if any).
+	 *  @return The parent component identifier.
+	 */
+	public IComponentIdentifier getParent();
+
+	/**
 	 *  Get the ownership string of the component.
 	 *  @return The ownership string.
 	 */

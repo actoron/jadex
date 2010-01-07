@@ -56,5 +56,11 @@ public interface IComponentAdapter
 	 *  messages to this agent.
 	 */
 	public IComponentIdentifier getComponentIdentifier() throws ComponentTerminatedException;
+	
+//	/**
+//	 *  Get the subcomponents of this component.
+//	 *  @return The current subcomponents of this component.
+//	 */
+//	public IComponentIdentifier[]	getSubcomponents(); 
 }
 

@@ -38,6 +38,23 @@ public interface IComponentInstance
 	public void messageArrived(IMessageAdapter message);
 
 	/**
+	 *  Called when a component has been created as a subcomponent of this component.
+	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
+	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
+	 *  @param comp	The newly created component.
+	 */
+	// todo: Use parent->child creation config information instead of model (e.g. role in AGR!?)
+	public void	componentCreated(IComponentIdentifier comp, ILoadableComponentModel model);
+
+	/**
+	 *  Called when a subcomponent of this component has been destroyed.
+	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
+	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
+	 *  @param comp	The destroyed component.
+	 */
+	public void	componentDestroyed(IComponentIdentifier comp);
+
+	/**
 	 *  Can be called concurrently (also during executeAction()).
 	 *   
 	 *  Request agent to kill itself.

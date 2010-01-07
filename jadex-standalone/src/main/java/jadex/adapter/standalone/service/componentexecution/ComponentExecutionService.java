@@ -1,7 +1,6 @@
 package jadex.adapter.standalone.service.componentexecution;
 
 import jadex.adapter.base.DefaultResultListener;
-import jadex.adapter.base.contextservice.BaseContext;
 import jadex.adapter.standalone.StandaloneComponentAdapter;
 import jadex.adapter.standalone.fipaimpl.AMSAgentDescription;
 import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
@@ -12,8 +11,6 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
-import jadex.bridge.IContext;
-import jadex.bridge.IContextService;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageService;
 import jadex.bridge.ISearchConstraints;
@@ -87,12 +84,12 @@ public class ComponentExecutionService implements IComponentExecutionService
 	 *  @param model The model identifier (e.g. file name).
 	 *  @param config The configuration to use for initializing the component (null for default).
 	 *  @param args The arguments for the component (if any).
-	 *  @param suspend Create the component in suspended mode (i.e. do not run until resum() is called).
+	 *  @param suspend Create the component in suspended mode (i.e. do not run until resume() is called).
 	 *  @param listener The result listener (if any). Will receive the id of the component as result.
-	 *  @param creator The creator (if any).
+	 *  @param parent The parent (if any).
 	 */
 	public void	createComponent(String name, String model, String config, Map args, boolean suspend, 
-		IResultListener listener, Object creator, final IResultListener resultlistener)
+		IResultListener listener, IComponentIdentifier parent, final IResultListener resultlistener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
@@ -153,7 +150,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 						cid.setAddresses(ms.getAddresses());
 				}
 		
-				ad	= new AMSAgentDescription(cid, type);
+				ad	= new AMSAgentDescription(cid, type, parent);
 				if(suspend)
 				{
 					ad.setState(IComponentDescription.STATE_SUSPENDED);
@@ -179,21 +176,19 @@ public class ComponentExecutionService implements IComponentExecutionService
 			//throw new RuntimeException("No '@' allowed in agent name.");
 		}
 		
-		// Create the agent instance (interpreter and state).
-		
+		// Create the component instance.
 		IComponentInstance instance = factory.createComponentInstance(adapter, lmodel, config, args);
 		adapter.setComponent(instance, lmodel);
 		
 //		System.out.println("added: "+agentdescs.size()+", "+aid);
 		
-		// Register new agent at contexts.
-		IContextService	cs	= (IContextService)container.getService(IContextService.class);
-		if(cs!=null)
+		// Register component at parent.
+		if(parent!=null)
 		{
-			IContext[]	contexts	= cs.getContexts((IComponentIdentifier)creator);
-			for(int i=0; contexts!=null && i<contexts.length; i++)
+			synchronized(adapters)
 			{
-				((BaseContext)contexts[i]).agentCreated((IComponentIdentifier)creator, cid);
+				StandaloneComponentAdapter	pad	= (StandaloneComponentAdapter)adapters.get(parent);
+				pad.getComponentInstance().componentCreated(cid, lmodel);
 			}
 		}
 
@@ -435,19 +430,28 @@ public class ComponentExecutionService implements IComponentExecutionService
 					
 					// Stop execution of agent.
 					((IExecutionService)container.getService(IExecutionService.class)).cancel(adapter, null);
+					
+					// Deregister destroyed component at parent.
+					if(desc.getParent()!=null)
+					{
+						StandaloneComponentAdapter	pad	= (StandaloneComponentAdapter)adapters.get(desc.getParent());
+						if(pad==null)
+							throw new RuntimeException("No adapter for parent: "+cid+", "+desc.getParent());
+						pad.getComponentInstance().componentDestroyed(cid);
+					}
 				}
 			}
 			
-			// Deregister killed agent at contexts.
-			IContextService	cs	= (IContextService)container.getService(IContextService.class);
-			if(cs!=null)
-			{
-				IContext[]	contexts	= cs.getContexts(cid);
-				for(int i=0; contexts!=null && i<contexts.length; i++)
-				{
-					((BaseContext)contexts[i]).agentDestroyed(cid);
-				}
-			}
+//			// Deregister killed agent at contexts.
+//			IContextService	cs	= (IContextService)container.getService(IContextService.class);
+//			if(cs!=null)
+//			{
+//				IContext[]	contexts	= cs.getContexts(cid);
+//				for(int i=0; contexts!=null && i<contexts.length; i++)
+//				{
+//					((BaseContext)contexts[i]).agentDestroyed(cid);
+//				}
+//			}
 
 			IComponentListener[] alisteners;
 			synchronized(listeners)
@@ -559,7 +563,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 	 */
 	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type)
 	{
-		AMSAgentDescription	ret	= new AMSAgentDescription(id, type);
+		AMSAgentDescription	ret	= new AMSAgentDescription(id, type, null);
 		ret.setState(state);
 		ret.setOwnership(ownership);
 		return ret;

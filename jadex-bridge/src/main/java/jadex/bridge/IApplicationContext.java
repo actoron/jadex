@@ -76,9 +76,8 @@ public interface IApplicationContext extends IContext, IComponentInstance
 	 *  @param start	Should the new agent be started?
 	 *  
 	 *  @param istener	A listener to be notified, when the agent is created (if any).
-	 *  @param creator	The agent that wants to create a new agent (if any).	
 	 */
 	public void createAgent(String name, final String type, String configuration,
 		Map arguments, final boolean start, final boolean master, 
-		final IResultListener listener, IComponentIdentifier creator);
+		final IResultListener listener);
 }

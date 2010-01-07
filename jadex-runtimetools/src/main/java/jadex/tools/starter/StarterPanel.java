@@ -1,16 +1,10 @@
 package jadex.tools.starter;
 
 import jadex.adapter.base.SComponentFactory;
-import jadex.adapter.base.appdescriptor.ApplicationModel;
-import jadex.bridge.IApplicationContext;
 import jadex.bridge.IArgument;
-import jadex.bridge.IComponentExecutionService;
-import jadex.bridge.IContext;
-import jadex.bridge.IContextService;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IReport;
 import jadex.commons.FixedJComboBox;
-import jadex.commons.IChangeListener;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -100,10 +94,10 @@ public class StarterPanel extends JPanel
 	protected JTextField componentname;
 	protected JLabel componentnamel;
 
-	/** The application name. */
-	protected JComboBox appname;
-	protected JLabel appnamel;
-	protected DefaultComboBoxModel appmodel;
+//	/** The application name. */
+//	protected JComboBox appname;
+//	protected JLabel appnamel;
+//	protected DefaultComboBoxModel appmodel;
 	
 	protected JLabel confl;
 	protected JLabel confdummy = new JLabel("Configuration"); // Hack! only for reading sizes
@@ -132,8 +126,8 @@ public class StarterPanel extends JPanel
 	/** The agent specific panel. */
 	protected JPanel componentpanel;
 	
-	/** The application specific panel. */
-	protected JPanel apppanel;
+//	/** The application specific panel. */
+//	protected JPanel apppanel;
 	
 	/** The starter plugin. */
 	protected StarterPlugin	starter;
@@ -285,28 +279,28 @@ public class StarterPanel extends JPanel
 		// The agent name.
 		componentname = new JTextField();
 		
-		// The application name.
-		appmodel = new DefaultComboBoxModel();
-		appmodel.addElement("");
-		IContextService cs = (IContextService)starter.getJCC().getServiceContainer().getService(IContextService.class);
-		if(cs!=null)
-		{
-			cs.addContextListener(new IChangeListener()
-			{
-				public void changeOccurred(jadex.commons.ChangeEvent event)
-				{
-					if(IContextService.EVENT_TYPE_CONTEXT_CREATED.equals(event.getType()))
-					{
-						appmodel.addElement(((IContext)event.getValue()).getName());
-					}
-					else if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()))
-					{
-						appmodel.removeElement(((IContext)event.getValue()).getName());
-					}
-				}
-			});
-		}
-		appname = new JComboBox();
+//		// The application name.
+//		appmodel = new DefaultComboBoxModel();
+//		appmodel.addElement("");
+//		IContextService cs = (IContextService)starter.getJCC().getServiceContainer().getService(IContextService.class);
+//		if(cs!=null)
+//		{
+//			cs.addContextListener(new IChangeListener()
+//			{
+//				public void changeOccurred(jadex.commons.ChangeEvent event)
+//				{
+//					if(IContextService.EVENT_TYPE_CONTEXT_CREATED.equals(event.getType()))
+//					{
+//						appmodel.addElement(((IContext)event.getValue()).getName());
+//					}
+//					else if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()))
+//					{
+//						appmodel.removeElement(((IContext)event.getValue()).getName());
+//					}
+//				}
+//			});
+//		}
+//		appname = new JComboBox();
 
 		// The generate flag for the agentname;
 		genname = new JCheckBox("Auto generate", false);
@@ -385,41 +379,41 @@ public class StarterPanel extends JPanel
 					}
 					else
 					{
-						if(model instanceof ApplicationModel)
+//						if(model instanceof ApplicationModel)
+//						{
+////							IApplicationFactory fac = starter.getJCC().getAgent().getPlatform().getApplicationFactory();
+//							try
+//							{
+//								SComponentFactory.createApplication(starter.getJCC().getServiceContainer(), (String)appname.getSelectedItem(), filename.getText(), configname, args);
+//							}
+//							catch(Exception e)
+//							{
+//								e.printStackTrace();
+//								JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), "Could not start application: "+e, 
+//									"Application Problem", JOptionPane.INFORMATION_MESSAGE);
+//							}
+//						}
+//						else
 						{
-//							IApplicationFactory fac = starter.getJCC().getAgent().getPlatform().getApplicationFactory();
-							try
-							{
-								SComponentFactory.createApplication(starter.getJCC().getServiceContainer(), (String)appname.getSelectedItem(), filename.getText(), configname, args);
-							}
-							catch(Exception e)
-							{
-								e.printStackTrace();
-								JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), "Could not start application: "+e, 
-									"Application Problem", JOptionPane.INFORMATION_MESSAGE);
-							}
-						}
-						else
-						{
-							IApplicationContext ac = null;
-							final String apn = (String)appname.getSelectedItem();
-							if(apn!=null && apn.length()>0)
-							{
-								IContextService cs = (IContextService)starter.getJCC().getServiceContainer().getService(IContextService.class);
-								if(cs!=null)
-								{
-									ac = (IApplicationContext)cs.getContext(apn);
-								}
-							}	
-							String typename = ac!=null? ac.getAgentType(filename.getText()): filename.getText();
+//							IApplicationContext ac = null;
+//							final String apn = (String)appname.getSelectedItem();
+//							if(apn!=null && apn.length()>0)
+//							{
+//								IContextService cs = (IContextService)starter.getJCC().getServiceContainer().getService(IContextService.class);
+//								if(cs!=null)
+//								{
+//									ac = (IApplicationContext)cs.getContext(apn);
+//								}
+//							}	
+							String typename = /*ac!=null? ac.getAgentType(filename.getText()):*/ filename.getText();
 							final String fullname = model.getPackage()+"."+model.getName();
-							if(typename==null)
-							{
-								JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), "Could not resolve agent type: "
-									+filename.getText()+"\n in application: "+ac.getName(), 
-									"Agent Type Problem", JOptionPane.INFORMATION_MESSAGE);
-							}
-							else
+//							if(typename==null)
+//							{
+//								JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), "Could not resolve agent type: "
+//									+filename.getText()+"\n in application: "+ac.getName(), 
+//									"Agent Type Problem", JOptionPane.INFORMATION_MESSAGE);
+//							}
+//							else
 							{
 								IResultListener killlistener = null;
 								final ILoadableComponentModel mymodel = model;
@@ -459,11 +453,11 @@ public class StarterPanel extends JPanel
 									int max = ((Integer)numagents.getValue()).intValue();
 									for(int i=0; i<max; i++)
 									{
-										if(ac!=null)
-										{
-											ac.createAgent(an, typename, configname, args, suspend.isSelected(), false, null, null);
-										}
-										else
+//										if(ac!=null)
+//										{
+//											ac.createAgent(an, typename, configname, args, suspend.isSelected(), false, null, null);
+//										}
+//										else
 										{
 											starter.createComponent(typename, an, configname, args, suspend.isSelected(), killlistener);
 										}
@@ -471,11 +465,11 @@ public class StarterPanel extends JPanel
 								}
 								else
 								{
-									if(ac!=null)
-									{
-										ac.createAgent(an, typename, configname, args, suspend.isSelected(), false, null, null);
-									}
-									else
+//									if(ac!=null)
+//									{
+//										ac.createAgent(an, typename, configname, args, suspend.isSelected(), false, null, null);
+//									}
+//									else
 									{
 										starter.createComponent(typename, an, configname, args, suspend.isSelected(), killlistener);
 									}
@@ -539,12 +533,12 @@ public class StarterPanel extends JPanel
 		componentpanel.add(tmp, new GridBagConstraints(1, 0, 4, 1, 1, 0, GridBagConstraints.EAST,
 			GridBagConstraints.BOTH, new Insets(0, 2, 0, 2), 0, 0));
 		
-		apppanel = new JPanel(new GridBagLayout());
-		appnamel = new JLabel("Application name");
-		apppanel.add(appnamel, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.WEST,
-			GridBagConstraints.BOTH, new Insets(0, 0, 0, 2), 0, 0));
-		apppanel.add(appname, new GridBagConstraints(1, 0, 4, 1, 1, 0, GridBagConstraints.EAST,
-			GridBagConstraints.BOTH, new Insets(0, 2, 0, 2), 0, 0));
+//		apppanel = new JPanel(new GridBagLayout());
+//		appnamel = new JLabel("Application name");
+//		apppanel.add(appnamel, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.WEST,
+//			GridBagConstraints.BOTH, new Insets(0, 0, 0, 2), 0, 0));
+//		apppanel.add(appname, new GridBagConstraints(1, 0, 4, 1, 1, 0, GridBagConstraints.EAST,
+//			GridBagConstraints.BOTH, new Insets(0, 2, 0, 2), 0, 0));
 		
 		JPanel upper = new JPanel(new GridBagLayout());
 		upper.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Settings "));
@@ -567,8 +561,8 @@ public class StarterPanel extends JPanel
 		upper.add(componentpanel, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 		y++;
-		upper.add(apppanel, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
-			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+//		upper.add(apppanel, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
+//			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 
 		y = 0;
 		content.add(upper, new GridBagConstraints(0, y, 5, 1, 1, 0, GridBagConstraints.WEST,
@@ -691,7 +685,23 @@ public class StarterPanel extends JPanel
 					model = SComponentFactory.loadModel(starter.getJCC().getServiceContainer(), adf);
 					updateGuiForNewModel(adf);
 					
-					if(model instanceof ApplicationModel)
+//					if(model instanceof ApplicationModel)
+//					{
+////						System.out.println("Model loaded: "+adf);
+//						
+//						createArguments();
+//						createResults();
+//						arguments.setVisible(true);
+//						results.setVisible(true);
+//						componentpanel.setVisible(false);
+//						start.setVisible(true);
+//						
+//						filenamel.setMinimumSize(appnamel.getMinimumSize());
+//						filenamel.setPreferredSize(appnamel.getPreferredSize());
+//						confl.setMinimumSize(appnamel.getMinimumSize());
+//						confl.setPreferredSize(appname.getPreferredSize());
+//					}
+					/*else*/ if(SComponentFactory.isStartable(starter.getJCC().getServiceContainer(), adf))
 					{
 //						System.out.println("Model loaded: "+adf);
 						
@@ -699,23 +709,7 @@ public class StarterPanel extends JPanel
 						createResults();
 						arguments.setVisible(true);
 						results.setVisible(true);
-						componentpanel.setVisible(false);
-						start.setVisible(true);
-						
-						filenamel.setMinimumSize(appnamel.getMinimumSize());
-						filenamel.setPreferredSize(appnamel.getPreferredSize());
-						confl.setMinimumSize(appnamel.getMinimumSize());
-						confl.setPreferredSize(appname.getPreferredSize());
-					}
-					else if(SComponentFactory.isStartable(starter.getJCC().getServiceContainer(), adf))
-					{
-//						System.out.println("Model loaded: "+adf);
-						
-						createArguments();
-						createResults();
-						arguments.setVisible(true);
-						results.setVisible(true);
-						apppanel.setVisible(true);
+//						apppanel.setVisible(true);
 						componentpanel.setVisible(true);
 						start.setVisible(true);
 						filenamel.setMinimumSize(confdummy.getMinimumSize());
@@ -725,7 +719,7 @@ public class StarterPanel extends JPanel
 					}
 					else //if(agentfactory.isLoadable(adf))
 					{
-						apppanel.setVisible(false);
+//						apppanel.setVisible(false);
 						arguments.setVisible(false);
 						results.setVisible(false);
 						componentpanel.setVisible(false);
@@ -793,14 +787,14 @@ public class StarterPanel extends JPanel
 		filename.setText(adf);
 
 //		if(model.getName()!=null && SXML.isAgentFilename(adf))
-		if(model.getName()!=null && model instanceof ApplicationModel)
+		/*if(model.getName()!=null && model instanceof ApplicationModel)
 		{
 			appname.setModel(new DefaultComboBoxModel(new String[]{model.getName()}));
 			appname.setEditable(true);
 		}
-		else if(model.isStartable())
+		else*/ if(model.isStartable())
 		{
-			appname.setModel(appmodel);
+//			appname.setModel(appmodel);
 			componentname.setText(model.getName());
 //			appname.removeAllItems();
 //			appname.addItem("");
@@ -814,12 +808,12 @@ public class StarterPanel extends JPanel
 //					appname.addItem(contexts[i].getName());
 //				}
 //			}
-			appname.setEditable(false);
+//			appname.setEditable(false);
 		}
 		else
 		{
 			componentname.setText("");
-			appname.setEditable(true);
+//			appname.setEditable(true);
 		}
 		
 		lastfile = model.getFilename();
@@ -1300,7 +1294,7 @@ public class StarterPanel extends JPanel
 	 */
 	protected void clearApplicationName()
 	{
-		appname.removeAll();
+//		appname.removeAll();
 	}
 
 	/**

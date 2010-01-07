@@ -282,10 +282,10 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		if(tcpanelprops!=null)
 			tcpanel.setProperties(tcpanelprops);
 
-		if(props.getProperty("mainsplit.location")!=null);
-			((JSplitPane)getView()).setDividerLocation(props.getIntProperty("mainsplit.location"));
-		if(props.getProperty("tcsplit.location")!=null);
-			tcpanel.setDividerLocation(props.getIntProperty("tcsplit.location"));
+		if(props.getProperty("mainsplit_location")!=null);
+			((JSplitPane)getView()).setDividerLocation(props.getIntProperty("mainsplit_location"));
+		if(props.getProperty("tcsplit_location")!=null);
+			tcpanel.setDividerLocation(props.getIntProperty("tcsplit_location"));
 
 		checkingmenu.setSelected(props.getBooleanProperty("checking"));
 	}
@@ -300,8 +300,8 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		addSubproperties(props, "modelpanel", mpanel.getProperties());
 		addSubproperties(props, "testspanel", tcpanel.getProperties());
 
-		props.addProperty(new Property("mainsplit.location", Integer.toString(((JSplitPane)getView()).getDividerLocation())));
-		props.addProperty(new Property("tcsplit.location", Integer.toString(tcpanel.getDividerLocation())));
+		props.addProperty(new Property("mainsplit_location", Integer.toString(((JSplitPane)getView()).getDividerLocation())));
+		props.addProperty(new Property("tcsplit_location", Integer.toString(tcpanel.getDividerLocation())));
 		
 		props.addProperty(new Property("checking", ""+checkingmenu.isSelected()));
 

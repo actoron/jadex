@@ -1,11 +1,7 @@
 package jadex.micro.examples;
 
-import java.util.Random;
-
 import jadex.bridge.IArgument;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
-import jadex.bridge.IComponentListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.microkernel.MicroAgent;
 import jadex.microkernel.MicroAgentMetaInfo;
@@ -34,7 +30,7 @@ public class ResultAgent extends MicroAgent
 			IComponentExecutionService ces = (IComponentExecutionService)getServiceContainer()
 				.getService(IComponentExecutionService.class);
 			
-			ces.createComponent(null, getClass().getName()+".class", null, null, false, null, null, createResultListener(new IResultListener()
+			ces.createComponent(null, getClass().getName()+".class", null, null, false, null, getAgentIdentifier(), createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{

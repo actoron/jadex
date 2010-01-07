@@ -1,8 +1,6 @@
 package jadex.bdi.interpreter;
 
-import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IPlanExecutor;
-import jadex.bdi.runtime.impl.BeliefFlyweight;
 import jadex.bdi.runtime.impl.InterpreterTimedObject;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.IArgument;
@@ -33,7 +31,6 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;

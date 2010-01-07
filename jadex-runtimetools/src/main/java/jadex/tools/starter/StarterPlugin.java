@@ -1,22 +1,15 @@
 package jadex.tools.starter;
 
 import jadex.adapter.base.SComponentFactory;
-import jadex.bridge.IApplicationContext;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
-import jadex.bridge.IContext;
-import jadex.bridge.IContextService;
 import jadex.bridge.ILoadableComponentModel;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IChangeListener;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
-import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IServiceContainer;
 import jadex.tools.common.CombiIcon;
 import jadex.tools.common.ComponentTreeTable;
 import jadex.tools.common.ComponentTreeTableNodeType;
@@ -46,11 +39,9 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -96,8 +87,8 @@ public class StarterPlugin extends AbstractJCCPlugin
 	/** The component instances in a tree. */
 	private ComponentTreeTable components;
 	
-	/** The application instances in a tree. */
-	private ComponentTreeTable applications;
+//	/** The application instances in a tree. */
+//	private ComponentTreeTable applications;
 
 	/** A split panel. */
 	private JSplitPane lsplit;
@@ -311,54 +302,55 @@ public class StarterPlugin extends AbstractJCCPlugin
 		components.getNodeType(ComponentTreeTable.NODE_CONTAINER).addPopupAction(KILL_PLATFORM);
 		components.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
 		
-		applications = new ComponentTreeTable(((IServiceContainer)getJCC().getServiceContainer()).getName());
-		applications.setMinimumSize(new Dimension(0, 0));
-		applications.getTreetable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+//		applications = new ComponentTreeTable(((IServiceContainer)getJCC().getServiceContainer()).getName());
+//		applications.setMinimumSize(new Dimension(0, 0));
+//		applications.getTreetable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+//		
+//		applications.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(KILL_APPLICATION);
+//		applications.getNodeType(ComponentTreeTable.NODE_CONTAINER).addPopupAction(KILL_PLATFORM);
+//		applications.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
+//		applications.setColumnWidths(new int[]{200});
 		
-		applications.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(KILL_APPLICATION);
-		applications.getNodeType(ComponentTreeTable.NODE_CONTAINER).addPopupAction(KILL_PLATFORM);
-		applications.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
-		applications.setColumnWidths(new int[]{200});
+//		IContextService cs = (IContextService)jcc.getServiceContainer().getService(IContextService.class);
+//		if(cs!=null)
+//		{
+//			cs.addContextListener(new IChangeListener()
+//			{
+//				public void changeOccurred(final ChangeEvent event)
+//				{
+//					if(IContextService.EVENT_TYPE_CONTEXT_CREATED.equals(event.getType()))
+//					{
+//						SwingUtilities.invokeLater(new Runnable()
+//						{
+//							public void run()
+//							{
+//								applications.addComponent((IApplicationContext)event.getValue());
+//							}
+//						});
+//					}
+//					else if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()))
+//					{
+//						SwingUtilities.invokeLater(new Runnable()
+//						{
+//							public void run()
+//							{
+//	//							System.out.println("Remove elem: "+event.getValue());
+//								applications.removeComponent((IApplicationContext)event.getValue());
+//							}
+//						});
+//					}
+//				}	
+//			});
+//		}
 		
-		IContextService cs = (IContextService)jcc.getServiceContainer().getService(IContextService.class);
-		if(cs!=null)
-		{
-			cs.addContextListener(new IChangeListener()
-			{
-				public void changeOccurred(final ChangeEvent event)
-				{
-					if(IContextService.EVENT_TYPE_CONTEXT_CREATED.equals(event.getType()))
-					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								applications.addComponent((IApplicationContext)event.getValue());
-							}
-						});
-					}
-					else if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()))
-					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-	//							System.out.println("Remove elem: "+event.getValue());
-								applications.removeComponent((IApplicationContext)event.getValue());
-							}
-						});
-					}
-				}	
-			});
-		}
-		
-		JTabbedPane tp = new JTabbedPane();
-		tp.addTab("components", components);
-		tp.addTab("applications", applications);
+//		JTabbedPane tp = new JTabbedPane();
+//		tp.addTab("components", components);
+//		tp.addTab("applications", applications);
 		
 		lsplit.add(new JScrollPane(mpanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
-		lsplit.add(tp);
+//		lsplit.add(tp);
+		lsplit.add(components);
 		lsplit.setDividerLocation(300);
 
 		csplit.add(lsplit);
@@ -456,8 +448,8 @@ public class StarterPlugin extends AbstractJCCPlugin
 		addSubproperties(props, "mpanel", mpanel.getProperties());
 		addSubproperties(props, "spanel", spanel.getProperties());
 		
-		props.addProperty(new Property("leftsplit.location", ""+lsplit.getDividerLocation()));
-		props.addProperty(new Property("mainsplit.location", ""+csplit.getDividerLocation()));
+		props.addProperty(new Property("leftsplit_location", ""+lsplit.getDividerLocation()));
+		props.addProperty(new Property("mainsplit_location", ""+csplit.getDividerLocation()));
 		
 		props.addProperty(new Property("checking", ""+checkingmenu.isSelected()));
 
@@ -658,46 +650,46 @@ public class StarterPlugin extends AbstractJCCPlugin
 		}
 	};
 
-	/**
-	 *  Action for killing an application.
-	 */
-	final AbstractAction KILL_APPLICATION = new AbstractAction("Kill application", icons.getIcon("kill_component"))
-	{
-		public void actionPerformed(ActionEvent e)
-		{
-			IContextService cs = (IContextService)jcc.getServiceContainer().getService(IContextService.class);
-			if(cs!=null)
-			{
-				TreePath[] paths = applications.getTreetable().getTree().getSelectionPaths();
-				for(int i=0; paths!=null && i<paths.length; i++) 
-				{
-					DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-					if(node!=null && node.getUserObject() instanceof IContext)
-					{
-						final IContext context = (IContext)node.getUserObject();
-						cs.deleteContext(context, new IResultListener()
-						{
-							public void exceptionOccurred(Object source, Exception exception)
-							{
-								SwingUtilities.invokeLater(new Runnable()
-								{
-									public void run()
-									{
-										String text = SUtil.wrapText("Could not kill application: "+context.getName());
-										JOptionPane.showMessageDialog(SGUI.getWindowParent(spanel), text, "Kill Application Problem", JOptionPane.INFORMATION_MESSAGE);
-									}
-								});
-							}
-							public void resultAvailable(Object source, Object result)
-							{
-								jcc.setStatusText("Killed application: "+context.getName());
-							}
-						});
-					}
-				}
-			}
-		}
-	};
+//	/**
+//	 *  Action for killing an application.
+//	 */
+//	final AbstractAction KILL_APPLICATION = new AbstractAction("Kill application", icons.getIcon("kill_component"))
+//	{
+//		public void actionPerformed(ActionEvent e)
+//		{
+//			IContextService cs = (IContextService)jcc.getServiceContainer().getService(IContextService.class);
+//			if(cs!=null)
+//			{
+//				TreePath[] paths = applications.getTreetable().getTree().getSelectionPaths();
+//				for(int i=0; paths!=null && i<paths.length; i++) 
+//				{
+//					DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
+//					if(node!=null && node.getUserObject() instanceof IContext)
+//					{
+//						final IContext context = (IContext)node.getUserObject();
+//						cs.deleteContext(context, new IResultListener()
+//						{
+//							public void exceptionOccurred(Object source, Exception exception)
+//							{
+//								SwingUtilities.invokeLater(new Runnable()
+//								{
+//									public void run()
+//									{
+//										String text = SUtil.wrapText("Could not kill application: "+context.getName());
+//										JOptionPane.showMessageDialog(SGUI.getWindowParent(spanel), text, "Kill Application Problem", JOptionPane.INFORMATION_MESSAGE);
+//									}
+//								});
+//							}
+//							public void resultAvailable(Object source, Object result)
+//							{
+//								jcc.setStatusText("Killed application: "+context.getName());
+//							}
+//						});
+//					}
+//				}
+//			}
+//		}
+//	};
 	
 	/**
 	 *  Action for killing the platform.

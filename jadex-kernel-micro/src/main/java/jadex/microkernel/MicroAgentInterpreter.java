@@ -5,6 +5,7 @@ import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.concurrent.IResultListener;
 
@@ -279,6 +280,26 @@ public class MicroAgentInterpreter implements IComponentInstance
 		return results!=null? Collections.unmodifiableMap(results): Collections.EMPTY_MAP;
 	}
 	
+	/**
+	 *  Called when a component has been created as a subcomponent of this component.
+	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
+	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
+	 *  @param comp	The newly created component.
+	 */
+	public void	componentCreated(IComponentIdentifier comp, ILoadableComponentModel model)
+	{
+	}
+	
+	/**
+	 *  Called when a subcomponent of this component has been destroyed.
+	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
+	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
+	 *  @param comp	The destroyed component.
+	 */
+	public void	componentDestroyed(IComponentIdentifier comp)
+	{
+	}
+		
 	//-------- helpers --------
 	
 	/**

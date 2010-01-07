@@ -1,11 +1,7 @@
 package jadex.commons;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
 
 /**
  *  The configuration properties.
@@ -281,6 +277,8 @@ public class Properties
 	 */
 	public void	addProperty(Property prop)
 	{
+//		if(prop.getType().indexOf('.')!=-1)
+//			System.out.println("No '.' allowed in property type: "+prop.getType());
 //		System.out.println("adding: "+prop);
 		properties.add(prop);
 	}

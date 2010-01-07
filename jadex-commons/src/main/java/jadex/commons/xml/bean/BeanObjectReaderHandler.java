@@ -175,7 +175,6 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				String clazzname = pck+"."+tag.getLocalPart();
 				
 				// Special case array
-				int length = -1;
 				int idx = clazzname.indexOf("__");
 				int[] lens = null;
 				if(idx!=-1)
@@ -436,6 +435,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					}
 					catch(Exception e)
 					{
+						e.printStackTrace();
 					}
 				}
 				else
@@ -456,6 +456,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					}
 					catch(Exception e)
 					{
+						e.printStackTrace();
 					}
 				}
 				else
@@ -480,6 +481,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 								}
 								catch(Exception e)
 								{
+									e.printStackTrace();
 								}
 							}
 						}
@@ -553,6 +555,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 				}
 			}
 			

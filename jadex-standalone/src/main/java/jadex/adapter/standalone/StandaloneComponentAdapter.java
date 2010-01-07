@@ -53,7 +53,11 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 
 	/** The description holding the execution state of the component
 	 *  (read only! managed by component execution service). */
-	protected AMSAgentDescription	desc;
+	protected IComponentDescription	desc;
+	
+	/** The list of subcomponents. */
+	// Todo: should be managed by CES?
+	protected List	subcomponents;
 	
 	/** Flag to indicate a fatal error (component termination will not be passed to instance) */
 	protected boolean	fatalerror;
@@ -436,7 +440,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 				}
 				again	= again && IComponentDescription.STATE_ACTIVE.equals(desc.getState());
 				if(steplistener!=null)
-					steplistener.resultAvailable(this, desc.clone());
+					steplistener.resultAvailable(this, ((AMSAgentDescription)desc).clone());
 			}
 		}
 
@@ -503,8 +507,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		if(dostep)
 			listener.exceptionOccurred(this, new RuntimeException("Only one step allowed at a time."));
 			
-		this.dostep	= true;
-		this.steplistener	= listener;
+		this.dostep	= true;		this.steplistener	= listener;
 	}
 //		
 //	/**
