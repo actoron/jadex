@@ -27,6 +27,12 @@ public interface ILibraryService extends IService
 	public void addURL(URL url);
 	
 	/**
+	 *  Add a path.
+	 *  @param path The path.
+	 */
+	public void addPath(String path);
+	
+	/**
 	 *  Remove a url.
 	 *  @param url The url.
 	 */

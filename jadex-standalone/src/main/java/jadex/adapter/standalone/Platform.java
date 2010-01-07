@@ -4,6 +4,9 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.IValueFetcher;
+import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.service.IService;
@@ -12,6 +15,7 @@ import jadex.service.PropertiesXMLHelper;
 import jadex.service.library.ILibraryService;
 
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,6 +53,9 @@ public class Platform extends AbstractPlatform
 //	/** The agent factory. */
 //	public static final String MESSAGETYPE = "messagetype";
 
+	/** A lib path. */
+	public static final String LIBPATH = PLATFORM+SEPARATOR+"libpath";
+	
 	/** A daemon agent. */
 	public static final String DAEMONAGENT = PLATFORM+SEPARATOR+"daemonagent";
 
@@ -246,6 +253,37 @@ public class Platform extends AbstractPlatform
 						IService service = (IService)tmp.get(key2);
 						service.start();
 					}
+				}
+			}
+		}
+		
+		// Initialize the lib service with extra paths
+		Property[] libpaths = conf.getProperties(LIBPATH);
+		if(libpaths.length>0)
+		{
+			ILibraryService ls = (ILibraryService)getService(ILibraryService.class);
+			if(ls==null)
+				throw new RuntimeException("No library service available for setting lib paths.");
+
+			SimpleValueFetcher	fetcher	= new SimpleValueFetcher();
+			fetcher.setValue("$platform", this);
+			fetcher.setValue("$platformname", getName());
+			
+			for(int i=0; i<libpaths.length; i++)
+			{
+				Object entry = SJavaParser.evaluateExpression(libpaths[i].getValue(), fetcher);
+				System.out.println("Adding: "+entry);
+				try
+				{
+					if(entry instanceof URL)
+						ls.addURL((URL)entry);
+					else //if(entry instanceof String)
+						ls.addPath((String)entry);
+				}
+				catch(Exception e)
+				{
+					System.out.println("Could not add lib path: "+entry);
+					e.printStackTrace();
 				}
 			}
 		}

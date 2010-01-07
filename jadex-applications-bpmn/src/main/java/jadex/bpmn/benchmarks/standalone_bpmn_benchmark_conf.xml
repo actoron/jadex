@@ -8,6 +8,8 @@
 	name="standalone_conf">
 	
 	<properties type="platform_standalone">
+  		<property type="libpath">"../jadex-applications-bpmn/target/classes"</property>
+  		
   		<properties type="services">
   			<property type="jadex.bridge.IComponentFactory" name="bpmn_factory">
 				new jadex.bpmn.BpmnFactory($platform, jadex.commons.SUtil.createHashMap(

@@ -67,13 +67,22 @@ public class LibraryService implements IService, ILibraryService
 			}
 		}
 	}
+	
+	/**
+	 *  Add a path.
+	 *  @param path The path.
+	 */
+	public void addPath(String path)
+	{
+		addURL(toURL(path));
+	}
 
 	//-------- methods --------
 	
 	/**
 	 *  Convert a file/string/url.
 	 */
-	private URL toURL(Object url)
+	public static URL toURL(Object url)
 	{
 		URL	ret	= null;
 		if(url instanceof String)
