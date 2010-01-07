@@ -1,9 +1,10 @@
 package jadex.bdi.examples.marsworld.producer;
 
-import jadex.adapter.base.agr.AGRSpace;
-import jadex.adapter.base.agr.Group;
-import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.fipa.SFipa;
+import jadex.application.runtime.IApplicationExternalAccess;
+import jadex.application.space.agr.AGRSpace;
+import jadex.application.space.agr.Group;
+import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.runtime.IChangeEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
@@ -24,7 +25,7 @@ public class InformNewTargetPlan extends Plan
 		IChangeEvent	reason	= (IChangeEvent)getReason();
 		ISpaceObject	target	= (ISpaceObject)reason.getValue();
 		
-		AGRSpace agrs = (AGRSpace)getScope().getApplicationContext().getSpace("myagrspace");
+		AGRSpace agrs = (AGRSpace)((IApplicationExternalAccess)getScope().getParent()).getSpace("myagrspace");
 		Group group = agrs.getGroup("mymarsteam");
 		IComponentIdentifier[]	sentries	= group.getAgentsForRole("sentry");
 		

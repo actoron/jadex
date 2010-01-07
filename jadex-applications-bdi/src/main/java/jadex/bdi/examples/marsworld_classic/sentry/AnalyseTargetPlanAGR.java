@@ -62,7 +62,7 @@ public class AnalyseTargetPlanAGR extends Plan
 	{
 //		System.out.println("Calling some Production Agent...");
 
-		IApplicationExternalAccess app = (IApplicationExternalAccess)getParentComponent();
+		IApplicationExternalAccess app = (IApplicationExternalAccess)getScope().getParent();		
 		AGRSpace agrs = (AGRSpace)app.getSpace("myagrspace");
 		Group group = agrs.getGroup("mymarsteam");
 		IComponentIdentifier[]	producers	= group.getAgentsForRole("producer");

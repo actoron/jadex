@@ -42,7 +42,7 @@ public class InformNewTargetPlanAGR extends Plan
 	{
 		//System.out.println("Informing all sentry agents.");
 		
-		IApplicationExternalAccess app = (IApplicationExternalAccess)getParentComponent();
+		IApplicationExternalAccess app = (IApplicationExternalAccess)getScope().getParent();		
 		AGRSpace agrs = (AGRSpace)app.getSpace("myagrspace");
 		Group group = agrs.getGroup("mymarsteam");
 		IComponentIdentifier[]	sentries	= group.getAgentsForRole("sentry");

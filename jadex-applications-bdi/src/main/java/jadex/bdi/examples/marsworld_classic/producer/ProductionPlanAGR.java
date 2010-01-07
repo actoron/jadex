@@ -81,7 +81,7 @@ public class ProductionPlanAGR extends Plan
 	 */
 	private void callCarryAgent(Target target)
 	{
-		IApplicationExternalAccess app = (IApplicationExternalAccess)getParentComponent();
+		IApplicationExternalAccess app = (IApplicationExternalAccess)getScope().getParent();		
 		AGRSpace agrspace = (AGRSpace)app.getSpace("myagrspace");
 		Group group = agrspace.getGroup("mymarsteam");
 		IComponentIdentifier[]	carriers	= group.getAgentsForRole("carrier");
