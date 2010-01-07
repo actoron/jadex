@@ -1,5 +1,6 @@
 package jadex.micro.examples.hunterprey;
 
+import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.envsupport.environment.ISpaceAction;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Grid2D;
@@ -42,7 +43,7 @@ public class MicroPreyAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		this.env	= (Grid2D)getApplicationContext().getSpace("my2dspace");
+		this.env	= (Grid2D)((IApplicationExternalAccess)getParent()).getSpace("my2dspace");
 		this.myself	= env.getAvatar(getAgentIdentifier());
 		this.listener	= new IResultListener()
 		{

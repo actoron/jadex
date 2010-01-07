@@ -5,6 +5,7 @@ import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.concurrent.IResultListener;
@@ -43,8 +44,8 @@ public class MicroAgentInterpreter implements IComponentInstance
 	/** The results. */
 	protected Map results;
 	
-	/** The activity handlers. */
-	protected Map handlers;
+	/** The parent. */
+	protected IExternalAccess parent;
 	
 	// todo: ensure that entries are empty when saving
 	/** The entries added from external threads. */
@@ -67,12 +68,13 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 *  @param adapter The adapter.
 	 *  @param microagent The microagent.
 	 */
-	public MicroAgentInterpreter(IComponentAdapter adapter, MicroAgentModel model, Map arguments, String config)
+	public MicroAgentInterpreter(IComponentAdapter adapter, MicroAgentModel model, Map arguments, String config, IExternalAccess parent)
 	{
 		this.adapter = adapter;
 		this.model = model;
 		this.config = config;
 		this.arguments = arguments;
+		this.parent = parent;
 		this.ext_entries = Collections.synchronizedList(new ArrayList());
 		
 		// Init the arguments with default values.
@@ -479,7 +481,15 @@ public class MicroAgentInterpreter implements IComponentInstance
 		results.put(name, value);
 	}
 	
-	
+	/**
+	 *  Get the parent component.
+	 *  @return The parent (if any).
+	 */
+	public IExternalAccess getParent()
+	{
+		return parent;
+	}
+
 	/**
 	 *  Get the configuration.
 	 *  @return The configuration.

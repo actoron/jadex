@@ -3,6 +3,7 @@ package jadex.microkernel;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
 import jadex.commons.concurrent.IResultListener;
@@ -97,6 +98,15 @@ public abstract class MicroAgent implements IMicroAgent
 		return new ExternalAccess(this, interpreter);
 	}
 
+	/**
+	 *  Get the parent component.
+	 *  @return The parent (if any).
+	 */
+	public IExternalAccess getParent()
+	{
+		return interpreter.getParent();
+	}
+	
 	/**
 	 *  Get the agent adapter.
 	 *  @return The agent adapter.

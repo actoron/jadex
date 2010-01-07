@@ -1,12 +1,12 @@
 package jadex.micro.examples.heatbugs;
 
+import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.envsupport.environment.ISpaceAction;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Int;
-import jadex.bridge.IApplicationContext;
 import jadex.bridge.IArgument;
 import jadex.microkernel.MicroAgent;
 import jadex.microkernel.MicroAgentMetaInfo;
@@ -27,7 +27,7 @@ public class HeatbugAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		IApplicationContext app = getApplicationContext();
+		IApplicationExternalAccess	app	= (IApplicationExternalAccess)getParent();
 		final Grid2D grid = (Grid2D)app.getSpace("mygc2dspace");
 		ISpaceObject avatar = grid.getAvatar(getAgentIdentifier());
 		

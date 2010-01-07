@@ -5,6 +5,7 @@ import jadex.bdi.interpreter.OAVAgentModel;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
@@ -239,20 +240,22 @@ public class GpmnFactory implements IComponentFactory
 	}
 	
 	/**
-	 * Create a kernel agent.
-	 * @param model The agent model file (i.e. the name of the XML file).
+	 * Create a component instance.
+	 * @param adapter The component adapter.
+	 * @param model The component model.
 	 * @param config The name of the configuration (or null for default configuration) 
 	 * @param arguments The arguments for the agent as name/value pairs.
-	 * @return An instance of a kernel agent.
+	 * @param parent The parent component (if any).
+	 * @return An instance of a component.
 	 */
-	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments)
+	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
 	{
 		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 		
 		MGpmnModel gmodel = (MGpmnModel)model;
 		OAVAgentModel amodel	= converter.convertGpmnModelToBDIAgents(gmodel, libservice.getClassLoader());
 
-		return factory.createComponentInstance(adapter, amodel, config, arguments);
+		return factory.createComponentInstance(adapter, amodel, config, arguments, parent);
 		
 //		try
 //		{

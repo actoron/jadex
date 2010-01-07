@@ -1,13 +1,12 @@
 package jadex.micro.examples.hunterprey;
 
+import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.IPerceptProcessor;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
-import jadex.bridge.IApplicationContext;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ISpace;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IResultListener;
 import jadex.microkernel.IMicroExternalAccess;
@@ -26,9 +25,9 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 	 *  @param agent The agent identifier.
 	 *  @param agent The avatar of the agent (if any).
 	 */
-	public void processPercept(final ISpace space, final String type, final Object percept, final IComponentIdentifier agent, final ISpaceObject avatar)
+	public void processPercept(final IEnvironmentSpace space, final String type, final Object percept, final IComponentIdentifier agent, final ISpaceObject avatar)
 	{
-		IComponentExecutionService ces = (IComponentExecutionService)((IApplicationContext)space.getContext()).getServiceContainer().getService(IComponentExecutionService.class);
+		IComponentExecutionService ces = (IComponentExecutionService)space.getContext().getServiceContainer().getService(IComponentExecutionService.class);
 		ces.getExternalAccess(agent, new IResultListener()
 		{
 			public void exceptionOccurred(Object source, Exception exception)

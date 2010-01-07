@@ -104,6 +104,9 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	/** The results. */
 	protected Map results;
 	
+	/** The parent. */
+	protected IExternalAccess	parent;
+	
 	// todo: ensure that entries are empty when saving
 	/** The entries added from external threads. */
 	protected transient final List ext_entries;
@@ -153,13 +156,14 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	 *  @param adapter The adapter.
 	 */
 	public BpmnInterpreter(IComponentAdapter adapter, MBpmnModel model, Map arguments, 
-		String config, Map activityhandlers, Map stephandlers, IValueFetcher fetcher)
+		String config, IExternalAccess parent, Map activityhandlers, Map stephandlers, IValueFetcher fetcher)
 	{
 		this.adapter = adapter;
 		this.model = model;
 		this.config = config;
 		this.arguments = arguments;
 		this.results = new HashMap();
+		this.parent	= parent;
 		this.ext_entries = Collections.synchronizedList(new ArrayList());
 		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
 		this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;

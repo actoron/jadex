@@ -5,6 +5,7 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
@@ -207,15 +208,17 @@ public class BpmnFactory implements IComponentFactory
 	}
 	
 	/**
-	 * Create a kernel agent.
-	 * @param model The agent model file (i.e. the name of the XML file).
+	 * Create a component instance.
+	 * @param adapter The component adapter.
+	 * @param model The component model.
 	 * @param config The name of the configuration (or null for default configuration) 
 	 * @param arguments The arguments for the agent as name/value pairs.
-	 * @return An instance of a kernel agent.
+	 * @param parent The parent component (if any).
+	 * @return An instance of a component.
 	 */
-	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments)
+	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
 	{
-		return new BpmnInterpreter(adapter, (MBpmnModel)model, arguments, config, null, null, null);
+		return new BpmnInterpreter(adapter, (MBpmnModel)model, arguments, config, parent, null, null, null);
 	}
 	
 	/**
