@@ -64,32 +64,15 @@
 				new jadex.service.execution.SyncExecutionService(
 					$platform.getService(jadex.service.threadpool.ThreadPoolService.class))
 			</property>
-
-			<!-- Context service. -->
-			<property type="jadex.bridge.IContextService" name="context_service">
-				new jadex.adapter.base.contextservice.ContextService(
-					new Class[]
-					{
-						jadex.bridge.IContext.class,
-						jadex.adapter.base.contextservice.BaseContext.class,
-						jadex.bridge.IApplicationContext.class
-					},
-					new jadex.adapter.base.contextservice.IContextFactory[]
-					{
-						new jadex.adapter.base.contextservice.DefaultContextFactory(),
-						new jadex.adapter.base.contextservice.DefaultContextFactory(),
-						new jadex.adapter.base.appdescriptor.ApplicationContextFactory($platform)
-					})
-			</property>
 			
 			<!-- Element factories -->
 			
 			<property type="jadex.bridge.IComponentFactory" name="application_factory">
-				new jadex.adapter.base.appdescriptor.ApplicationFactory($platform,
+				new jadex.application.ApplicationComponentFactory($platform,
 					new java.util.Set[]
 					{
-						jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping(),
-						jadex.adapter.base.envsupport.MEnvSpaceType.getXMLMapping()
+//						jadex.application.space.envsupport.MEnvSpaceType.getXMLMapping(),
+						jadex.application.space.agr.MAGRSpaceType.getXMLMapping()
 					}
 				)		
 			</property>
