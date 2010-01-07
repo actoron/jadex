@@ -3,9 +3,10 @@ package jadex.application.space.envsupport.environment;
 import jadex.application.space.envsupport.dataview.IDataView;
 import jadex.application.space.envsupport.environment.AgentActionList.ActionEntry;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
+import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IChangeListener;
+import jadex.bridge.IComponentListener;
 import jadex.commons.ICommand;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IExecutable;
@@ -17,6 +18,7 @@ import jadex.service.execution.IExecutionService;
 
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  *  Synchronized execution of all actions in rounds based on clock ticks.
@@ -211,16 +213,21 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 		});
 		
 		// Add the executor as context listener on the application.
-		IContextService cs = (IContextService)container.getService(IContextService.class);
-		cs.addContextListener(new IChangeListener()
+		IComponentExecutionService	ces	= (IComponentExecutionService)container.getService(IComponentExecutionService.class);
+		ces.addComponentListener(space.getContext().getComponentIdentifier(), new IComponentListener()
 		{
-			public void changeOccurred(ChangeEvent event)
+			
+			public void componentRemoved(IComponentDescription desc, Map results)
 			{
-				System.out.println("Received event: "+event);
-				if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()))
-				{
-					terminate();
-				}
+				terminate();
+			}
+			
+			public void componentChanged(IComponentDescription desc)
+			{
+			}
+			
+			public void componentAdded(IComponentDescription desc)
+			{
 			}
 		});
 	}

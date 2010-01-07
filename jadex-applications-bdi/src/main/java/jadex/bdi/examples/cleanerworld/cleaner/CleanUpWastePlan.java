@@ -1,6 +1,6 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 

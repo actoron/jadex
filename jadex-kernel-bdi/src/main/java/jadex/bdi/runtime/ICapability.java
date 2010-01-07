@@ -1,6 +1,7 @@
 package jadex.bdi.runtime;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.service.IServiceContainer;
 
 import java.util.logging.Logger;
@@ -17,6 +18,12 @@ public interface ICapability	extends IElement
 	 *  @return The scope.
 	 */
 	public IBDIExternalAccess getExternalAccess();
+
+	/**
+	 *  Get the parent (if any).
+	 *  @return The parent.
+	 */
+	public IExternalAccess getParent();
 
 	/**
 	 *  Get the belief base.

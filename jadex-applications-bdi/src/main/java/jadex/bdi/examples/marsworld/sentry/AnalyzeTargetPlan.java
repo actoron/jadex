@@ -2,10 +2,10 @@ package jadex.bdi.examples.marsworld.sentry;
 
 import jadex.adapter.base.agr.AGRSpace;
 import jadex.adapter.base.agr.Group;
-import jadex.adapter.base.envsupport.environment.AbstractTask;
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.application.space.envsupport.environment.AbstractTask;
+import jadex.application.space.envsupport.environment.IEnvironmentSpace;
+import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.examples.marsworld.RequestProduction;
 import jadex.bdi.planlib.PlanFinishedTaskCondition;

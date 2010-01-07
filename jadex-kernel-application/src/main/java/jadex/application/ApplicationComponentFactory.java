@@ -12,6 +12,7 @@ import jadex.application.runtime.Application;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
@@ -139,12 +140,14 @@ public class ApplicationComponentFactory	implements IComponentFactory
 	
 	/**
 	 * Create a component instance.
-	 * @param model The component model file (i.e. the name of the XML file).
+	 * @param adapter The component adapter.
+	 * @param model The component model.
 	 * @param config The name of the configuration (or null for default configuration) 
 	 * @param arguments The arguments for the agent as name/value pairs.
-	 * @return An instance of a kernel agent.
+	 * @param parent The parent component (if any).
+	 * @return An instance of a component.
 	 */
-	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments)
+	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
 	{
 		String name = adapter!=null? adapter.getComponentIdentifier().getLocalName(): "no_name";
 		Application	context = null;
@@ -169,7 +172,7 @@ public class ApplicationComponentFactory	implements IComponentFactory
 
 
 		// Create context for application.
-		context	= new Application(name, (ApplicationModel)model, app, adapter);
+		context	= new Application(name, (ApplicationModel)model, app, adapter, parent);
 		
 		// todo: result listener?
 		

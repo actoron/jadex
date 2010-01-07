@@ -94,7 +94,7 @@
 					new java.util.Set[]
 					{
 						jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping(),
-						jadex.adapter.base.envsupport.MEnvSpaceType.getXMLMapping()
+						jadex.application.space.envsupport.MEnvSpaceType.getXMLMapping()
 					}
 				)		
 			</property>

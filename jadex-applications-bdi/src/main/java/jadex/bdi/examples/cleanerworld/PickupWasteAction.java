@@ -1,12 +1,12 @@
 package jadex.bdi.examples.cleanerworld;
 
-import jadex.adapter.base.envsupport.environment.ISpaceAction;
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.math.IVector1;
-import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector1Double;
+import jadex.application.space.envsupport.environment.IEnvironmentSpace;
+import jadex.application.space.envsupport.environment.ISpaceAction;
+import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.space2d.Space2D;
+import jadex.application.space.envsupport.math.IVector1;
+import jadex.application.space.envsupport.math.IVector2;
+import jadex.application.space.envsupport.math.Vector1Double;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SimplePropertyObject;
 

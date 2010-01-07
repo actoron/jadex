@@ -1,8 +1,8 @@
 package jadex.bdi.examples.antworld.environment;
 
 import jadex.adapter.base.ISimulationService;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.bdi.runtime.Plan;
 import jadex.service.IServiceContainer;
 

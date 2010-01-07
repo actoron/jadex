@@ -1,12 +1,12 @@
 package jadex.bdi.examples.gameoflife;
 
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.ISpaceProcess;
-import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.math.Vector1Int;
-import jadex.adapter.base.envsupport.math.Vector2Int;
+import jadex.application.space.envsupport.environment.IEnvironmentSpace;
+import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.ISpaceProcess;
+import jadex.application.space.envsupport.environment.space2d.Grid2D;
+import jadex.application.space.envsupport.environment.space2d.Space2D;
+import jadex.application.space.envsupport.math.Vector1Int;
+import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.commons.SimplePropertyObject;
 import jadex.service.clock.IClockService;
 

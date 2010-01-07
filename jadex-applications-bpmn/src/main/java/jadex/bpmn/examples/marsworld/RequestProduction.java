@@ -4,7 +4,7 @@
  */
 package jadex.bpmn.examples.marsworld;
 
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.fipa.IAgentAction;
 
 

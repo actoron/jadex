@@ -1,9 +1,9 @@
 package jadex.bdi.examples.marsworld.movement;
 
-import jadex.adapter.base.envsupport.environment.AbstractTask;
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.application.space.envsupport.environment.AbstractTask;
+import jadex.application.space.envsupport.environment.IEnvironmentSpace;
+import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.math.IVector2;
 import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.Plan;
 

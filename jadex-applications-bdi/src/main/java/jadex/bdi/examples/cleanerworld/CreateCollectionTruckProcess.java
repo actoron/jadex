@@ -1,12 +1,12 @@
 package jadex.bdi.examples.cleanerworld;
 
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.ISpaceProcess;
+import jadex.application.runtime.Application;
+import jadex.application.space.envsupport.environment.IEnvironmentSpace;
+import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.ISpaceProcess;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bridge.IApplicationContext;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SimplePropertyObject;
@@ -74,11 +74,11 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 			if(todo.size()>0)
 			{
 //				System.out.println("Creating garbage collection truck.");
-				final IApplicationContext app = (IApplicationContext)space.getContext();
+				final Application app = space.getContext();
 				Map params = new HashMap();
 				params.put("wastebins", todo.toArray());
 				ongoing.addAll(todo);
-				app.createAgent(null, "Truck", null, params, true, false, new IResultListener()
+				app.createComponent(null, "Truck", null, params, false, new IResultListener()
 				{
 					public void exceptionOccurred(Object source, Exception exception)
 					{
@@ -110,7 +110,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 						});
 						
 					}
-				});
+				}, null, null);
 			}
 		}
 	}

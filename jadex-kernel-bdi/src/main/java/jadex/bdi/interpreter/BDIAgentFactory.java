@@ -3,6 +3,7 @@ package jadex.bdi.interpreter;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
@@ -113,13 +114,15 @@ public class BDIAgentFactory implements IComponentFactory
 	//-------- IAgentFactory interface --------
 	
 	/**
-	* Create a kernel agent.
-	* @param model The agent model file (i.e. the name of the XML file).
-	* @param config The name of the configuration (or null for default configuration) 
-	* @param arguments The arguments for the agent as name/value pairs.
-	* @return An instance of a kernel agent.
-	*/
-	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments)
+	 * Create a component instance.
+	 * @param adapter The component adapter.
+	 * @param model The component model.
+	 * @param config The name of the configuration (or null for default configuration) 
+	 * @param arguments The arguments for the agent as name/value pairs.
+	 * @param parent The parent component (if any).
+	 * @return An instance of a component.
+	 */
+	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
 	{
 		init();
 		
@@ -132,7 +135,7 @@ public class BDIAgentFactory implements IComponentFactory
 		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 		state.addSubstate(amodel.getState());
 		
-		return new BDIInterpreter(adapter, state, amodel, config, arguments, props);
+		return new BDIInterpreter(adapter, state, amodel, config, arguments, parent, props);
 	}
 	
 	/**

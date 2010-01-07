@@ -1,6 +1,5 @@
 package jadex.bdi.examples.blackjack.manager;
 
-import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.player.strategies.AbstractStrategy;
@@ -8,12 +7,11 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
-import jadex.bridge.IApplicationContext;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IContext;
-import jadex.bridge.IContextService;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.IResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -295,13 +293,22 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			if(n==JOptionPane.YES_OPTION)
 			{
-				agent.killAgent();
-//				stopAllAgents();
+				final IComponentExecutionService	ces	= (IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class);
+				ces.getComponentDescription(dealeraid, new IResultListener()
+				{
+					
+					public void resultAvailable(Object source, Object result)
+					{
+						ces.destroyComponent(((IComponentDescription)result).getParent(), null);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+					}
+				});
 			}
 			else
 			{
-				IApplicationContext ac = (ApplicationContext)((IContextService)agent.getServiceContainer().getService(IContextService.class)).getContexts(agent.getComponentIdentifier(), IApplicationContext.class)[0];
-				ac.setAgentMaster(agent.getComponentIdentifier(), false);
 				agent.killAgent();
 			}
 
@@ -385,12 +392,12 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		try
 		{
 			IGoal start = agent.getGoalbase().createGoal("ams_create_agent");
-			IContextService	cs	= (IContextService) agent.getServiceContainer().getService(IContextService.class);
-			IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
-			// Hack! remove cast to ApplicationContext
-			String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Dealer").getFilename();
-			start.getParameter("type").setValue(type);
-//			start.getParameter("type").setValue("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml");
+//			IContextService	cs	= (IContextService) agent.getServiceContainer().getService(IContextService.class);
+//			IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
+//			// Hack! remove cast to ApplicationContext
+//			String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Dealer").getFilename();
+//			start.getParameter("type").setValue(type);
+			start.getParameter("type").setValue("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml");
 			start.getParameter("name").setValue("BlackjackDealer");
 			agent.dispatchTopLevelGoalAndWait(start);
 			IComponentIdentifier	dealer	= (IComponentIdentifier)start.getParameter("agentidentifier").getValue();
@@ -595,12 +602,12 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			{
 				agent.getLogger().info("starting playerAgent: "+player.getName());
 				IGoal start = agent.getGoalbase().createGoal("ams_create_agent");
-				IContextService	cs	= (IContextService) agent.getServiceContainer().getService(IContextService.class);
-				IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
-				// Hack! remove cast to ApplicationContext
-				String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Player").getFilename();
-				start.getParameter("type").setValue(type);
-//				start.getParameter("type").setValue("jadex/bdi/examples/blackjack/player/Player.agent.xml");
+//				IContextService	cs	= (IContextService) agent.getServiceContainer().getService(IContextService.class);
+//				IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
+//				// Hack! remove cast to ApplicationContext
+//				String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Player").getFilename();
+//				start.getParameter("type").setValue(type);
+				start.getParameter("type").setValue("jadex/bdi/examples/blackjack/player/Player.agent.xml");
 				start.getParameter("name").setValue(player.getName());
 				Map args = new HashMap();
 				args.put("myself", player);

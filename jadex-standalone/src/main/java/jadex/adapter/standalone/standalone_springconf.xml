@@ -43,7 +43,7 @@
 				<constructor-arg>
 					<list>
 						<bean class="jadex.adapter.base.agr.MAGRSpaceType" factory-method="getXMLMapping"/>
-						<bean class="jadex.adapter.base.envsupport.MEnvSpaceType" factory-method="getXMLMapping"/>
+						<bean class="jadex.application.space.envsupport.MEnvSpaceType" factory-method="getXMLMapping"/>
 					</list>
 				</constructor-arg>
 			</bean>

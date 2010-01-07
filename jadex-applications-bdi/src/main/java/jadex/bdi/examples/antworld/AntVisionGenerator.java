@@ -1,14 +1,14 @@
 package jadex.bdi.examples.antworld;
 
 import jadex.adapter.base.appdescriptor.ApplicationContext;
-import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.EnvironmentEvent;
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.IPerceptGenerator;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector2Int;
+import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.application.space.envsupport.environment.EnvironmentEvent;
+import jadex.application.space.envsupport.environment.IEnvironmentSpace;
+import jadex.application.space.envsupport.environment.IPerceptGenerator;
+import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.space2d.Space2D;
+import jadex.application.space.envsupport.math.IVector2;
+import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISpace;
 import jadex.commons.SimplePropertyObject;
@@ -48,7 +48,7 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 	 */
 	public void agentAdded(IComponentIdentifier agent, ISpace space) {
 		// Only add agents of type "Ant"
-		if ("Ant".equals(((ApplicationContext) space.getContext()).getAgentType(agent))) {
+		if ("Ant".equals(((ApplicationContext) space.getContext()).getComponentType(agent))) {
 			if (agents == null)
 				agents = new ArrayList();
 			agents.add(agent);

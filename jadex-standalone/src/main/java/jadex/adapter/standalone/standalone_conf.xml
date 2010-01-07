@@ -71,7 +71,7 @@
 				new jadex.application.ApplicationComponentFactory($platform,
 					new java.util.Set[]
 					{
-//						jadex.application.space.envsupport.MEnvSpaceType.getXMLMapping(),
+						jadex.application.space.envsupport.MEnvSpaceType.getXMLMapping(),
 						jadex.application.space.agr.MAGRSpaceType.getXMLMapping()
 					}
 				)		

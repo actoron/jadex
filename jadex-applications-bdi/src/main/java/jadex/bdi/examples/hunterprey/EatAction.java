@@ -1,10 +1,10 @@
 package jadex.bdi.examples.hunterprey;
 
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceAction;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.application.space.envsupport.environment.IEnvironmentSpace;
+import jadex.application.space.envsupport.environment.ISpaceAction;
+import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.space2d.Grid2D;
+import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;

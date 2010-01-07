@@ -1221,7 +1221,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			
 //			System.out.println("New percept: "+typename+", "+data+", "+agent);
 			
-			String	agenttype = context.getAgentType(agent);
+			String	agenttype = context.getComponentType(agent);
 			List procs	= (List)perceptprocessors.get(agenttype);
 			IPerceptProcessor proc = null;
 			if(procs!=null)
@@ -1550,7 +1550,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			}
 			else
 			{
-				String	agenttype	= context.getAgentType(aid);
+				String	agenttype	= context.getComponentType(aid);
 				if(agenttype!=null && avatarmappings.getCollection(agenttype)!=null)
 				{
 					for(Iterator it=avatarmappings.getCollection(agenttype).iterator(); it.hasNext(); )
@@ -1584,7 +1584,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	{
 		synchronized(monitor)
 		{
-			String	agenttype	= context.getAgentType(aid);
+			String	agenttype	= context.getComponentType(aid);
 			
 			// Possibly kill avatars of that agent.
 			if(agenttype!=null && avatarmappings.getCollection(agenttype)!=null)

@@ -16,6 +16,7 @@ import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.collection.LRU;
@@ -71,6 +72,9 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	
 	/** The platform adapter for the agent. */
 	protected IComponentAdapter	adapter;
+	
+	/** The parent of the agent (if any). */
+	protected IExternalAccess	parent;
 	
 	/** The kernel properties. */
 	protected Map kernelprops;
@@ -147,11 +151,12 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 */
 	public BDIInterpreter(IComponentAdapter adapter, IOAVState state, OAVAgentModel model, 
-		String config, Map arguments, Map kernelprops)
+		String config, Map arguments, IExternalAccess parent, Map kernelprops)
 	{
 		this.adapter = adapter;
 		this.state = state;
 		this.model = model;
+		this.parent	= parent;
 //		this.ext_entries = Collections.synchronizedList(new ArrayList());
 		this.kernelprops = kernelprops;
 		this.planexecutors = new HashMap();
@@ -1084,6 +1089,14 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 //		System.out.println("stacache: "+stacache.size());
 //		System.out.println("volcache: "+volcache.size());
 		return stacacheelems.contains(type)? stacache: volcache;
+	}
+	
+	/**
+	 *  Get the parent of the agent.
+	 */
+	public IExternalAccess getParent()
+	{
+		return parent;
 	}
 	
 	//-------- helper methods --------

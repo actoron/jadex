@@ -1,18 +1,17 @@
 package jadex.bdi.planlib;
 
-import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.math.IVector1;
-import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector1Double;
+import jadex.application.space.envsupport.environment.IEnvironmentSpace;
+import jadex.application.space.envsupport.environment.IPerceptProcessor;
+import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.space2d.Space2D;
+import jadex.application.space.envsupport.math.IVector1;
+import jadex.application.space.envsupport.math.IVector2;
+import jadex.application.space.envsupport.math.Vector1Double;
+import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
-import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bridge.IApplicationContext;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ISpace;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IResultListener;
@@ -72,7 +71,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 	 *  @param agent The agent identifier.
 	 *  @param agent The avatar of the agent (if any).
 	 */
-	public void processPercept(final ISpace space, final String type, final Object percept, final IComponentIdentifier agent, final ISpaceObject avatar)
+	public void processPercept(final IEnvironmentSpace space, final String type, final Object percept, final IComponentIdentifier agent, final ISpaceObject avatar)
 	{
 		boolean	invoke	= false;
 		final String[][] metainfos = getMetaInfos(type);
@@ -87,7 +86,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 		
 		if(invoke)
 		{
-			IComponentExecutionService ces = (IComponentExecutionService)((IApplicationContext)space.getContext()).getServiceContainer().getService(IComponentExecutionService.class);
+			IComponentExecutionService ces = (IComponentExecutionService)space.getContext().getServiceContainer().getService(IComponentExecutionService.class);
 			ces.getExternalAccess(agent, new IResultListener()
 			{
 				public void exceptionOccurred(Object source, Exception exception)

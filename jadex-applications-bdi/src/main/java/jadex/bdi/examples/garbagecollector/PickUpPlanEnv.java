@@ -1,7 +1,7 @@
 package jadex.bdi.examples.garbagecollector;
 
-import jadex.adapter.base.envsupport.environment.ISpaceAction;
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
+import jadex.application.space.envsupport.environment.ISpaceAction;
+import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.bdi.runtime.Plan;
 
 import java.util.HashMap;

@@ -3,12 +3,12 @@ package jadex.bdi.examples.antworld;
 import java.util.HashMap;
 import java.util.Map;
 
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.ISpaceProcess;
-import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.math.Vector2Int;
+import jadex.application.space.envsupport.environment.IEnvironmentSpace;
+import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.ISpaceProcess;
+import jadex.application.space.envsupport.environment.space2d.Grid2D;
+import jadex.application.space.envsupport.environment.space2d.Space2D;
+import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.service.clock.IClockService;
 import jadex.commons.SimplePropertyObject;
 

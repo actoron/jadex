@@ -1,7 +1,7 @@
 package jadex.bdi.examples.antworld;
 
-import jadex.adapter.base.envsupport.environment.ObjectEvent;
-import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.application.space.envsupport.environment.ObjectEvent;
+import jadex.application.space.envsupport.math.IVector2;
 
 public class FeelGravitationEvent extends ObjectEvent{
 

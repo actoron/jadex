@@ -64,7 +64,7 @@ public class SComponentFactory
 	
 	/**
 	 *  Create an application.
-	 */
+	 * /
 	public static void createApplication(IServiceContainer container, String name, String model, String config, Map args)
 	{
 		try
@@ -91,7 +91,7 @@ public class SComponentFactory
 			System.err.println("Exception occurred while creating application: ");
 			e.printStackTrace();
 		}
-	}
+	}*/
 	
 	/**
 	 *  Test if a model is startable (e.g. an agent).

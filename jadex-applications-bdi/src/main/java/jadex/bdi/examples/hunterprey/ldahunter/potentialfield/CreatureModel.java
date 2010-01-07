@@ -3,7 +3,7 @@
  */
 package jadex.bdi.examples.hunterprey.ldahunter.potentialfield;
 
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.ISpaceObject;
 
 
 /**

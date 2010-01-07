@@ -1,9 +1,9 @@
 package eis.jadex;
 
-import jadex.adapter.base.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.IEnvironmentListener;
-import jadex.adapter.base.envsupport.environment.ISpaceAction;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.application.space.envsupport.environment.IEnvironmentListener;
+import jadex.application.space.envsupport.environment.ISpaceAction;
+import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
@@ -90,13 +90,13 @@ public class JadexDelegationEisImpl extends EnvironmentInterfaceStandard
 		IEnvironmentListener lis = new IEnvironmentListener()
 		{
 			public void dispatchEnvironmentEvent(
-				jadex.adapter.base.envsupport.environment.EnvironmentEvent event)
+				jadex.application.space.envsupport.environment.EnvironmentEvent event)
 			{
-				if(jadex.adapter.base.envsupport.environment.EnvironmentEvent.OBJECT_CREATED.equals(event.getType()))
+				if(jadex.application.space.envsupport.environment.EnvironmentEvent.OBJECT_CREATED.equals(event.getType()))
 				{
 					listener.handleNewEntity((String)event.getSpaceObject().getId());
 				}
-				else if(jadex.adapter.base.envsupport.environment.EnvironmentEvent.OBJECT_DESTROYED.equals(event.getType()))
+				else if(jadex.application.space.envsupport.environment.EnvironmentEvent.OBJECT_DESTROYED.equals(event.getType()))
 				{
 					listener.handleDeletedEntity((String)event.getSpaceObject().getId());
 				}

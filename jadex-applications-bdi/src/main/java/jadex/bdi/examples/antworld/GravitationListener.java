@@ -1,6 +1,6 @@
 package jadex.bdi.examples.antworld;
 
-import jadex.adapter.base.envsupport.environment.ObjectEvent;
+import jadex.application.space.envsupport.environment.ObjectEvent;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

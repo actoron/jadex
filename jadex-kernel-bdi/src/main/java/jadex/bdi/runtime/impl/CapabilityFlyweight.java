@@ -13,6 +13,7 @@ import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.rules.state.IOAVState;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
@@ -57,6 +58,29 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	public IBDIExternalAccess getExternalAccess()
 	{
 		return new ExternalAccessFlyweight(getState(), getScope());
+	}
+
+	/**
+	 *  Get the parent (if any).
+	 *  @return The parent.
+	 */
+	public IExternalAccess getParent()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = getInterpreter().getParent();
+				}
+			};
+			return (IExternalAccess)invoc.object;
+		}
+		else
+		{
+			return getInterpreter().getParent();
+		}
 	}
 
 	/**

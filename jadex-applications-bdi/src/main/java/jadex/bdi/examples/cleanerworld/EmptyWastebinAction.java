@@ -1,11 +1,11 @@
 package jadex.bdi.examples.cleanerworld;
 
-import java.util.Map;
-
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceAction;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.IEnvironmentSpace;
+import jadex.application.space.envsupport.environment.ISpaceAction;
+import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.commons.SimplePropertyObject;
+
+import java.util.Map;
 
 /**
  * 

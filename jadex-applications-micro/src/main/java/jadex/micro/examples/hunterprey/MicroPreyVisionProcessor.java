@@ -1,9 +1,9 @@
 package jadex.micro.examples.hunterprey;
 
-import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.application.space.envsupport.environment.IPerceptProcessor;
+import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.space2d.Space2D;
+import jadex.application.space.envsupport.math.IVector2;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;

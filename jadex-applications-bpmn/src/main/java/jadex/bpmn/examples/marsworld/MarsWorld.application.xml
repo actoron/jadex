@@ -25,14 +25,14 @@
 	name="MarsWorld" package="jadex.bpmn.examples.marsworld">
 		
 	<imports>
-		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
-		<import>jadex.adapter.base.envsupport.environment.DeltaTimeExecutor</import>
-		<import>jadex.adapter.base.envsupport.math.*</import>
+		<import>jadex.application.space.envsupport.environment.space2d.*</import>
+		<import>jadex.application.space.envsupport.environment.DeltaTimeExecutor</import>
+		<import>jadex.application.space.envsupport.math.*</import>
 		<import>jadex.service.clock.IClockService</import>
-		<import>jadex.adapter.base.envsupport.dataview.*</import>
+		<import>jadex.application.space.envsupport.dataview.*</import>
 		<import>java.text.SimpleDateFormat</import>
 		<import>java.util.Date</import>
-		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
+		<import>jadex.application.space.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.examples.marsworld.*</import>
 		<import>jadex.bdi.examples.marsworld.carry.*</import>
 		<import>jadex.bdi.examples.marsworld.producer.*</import>

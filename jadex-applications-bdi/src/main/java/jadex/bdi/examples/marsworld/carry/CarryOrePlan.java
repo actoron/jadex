@@ -3,10 +3,10 @@ package jadex.bdi.examples.marsworld.carry;
 import java.util.HashMap;
 import java.util.Map;
 
-import jadex.adapter.base.envsupport.environment.AbstractTask;
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
+import jadex.application.space.envsupport.environment.AbstractTask;
+import jadex.application.space.envsupport.environment.IEnvironmentSpace;
+import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.bdi.examples.marsworld.producer.ProduceOreTask;
 import jadex.bdi.examples.marsworld.sentry.AnalyzeTargetTask;
 import jadex.bdi.planlib.PlanFinishedTaskCondition;

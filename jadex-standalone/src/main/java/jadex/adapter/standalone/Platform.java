@@ -4,8 +4,6 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
-import jadex.javaparser.IParsedExpression;
-import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;

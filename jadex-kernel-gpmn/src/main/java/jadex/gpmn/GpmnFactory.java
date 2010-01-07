@@ -14,7 +14,6 @@ import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
 
 import java.net.URL;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 

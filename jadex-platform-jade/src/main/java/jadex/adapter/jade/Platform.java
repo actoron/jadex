@@ -16,7 +16,7 @@ import jadex.adapter.base.contextservice.BaseContext;
 import jadex.adapter.base.contextservice.ContextService;
 import jadex.adapter.base.contextservice.DefaultContextFactory;
 import jadex.adapter.base.contextservice.IContextFactory;
-import jadex.adapter.base.envsupport.MEnvSpaceType;
+import jadex.application.space.envsupport.MEnvSpaceType;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.SFipa;

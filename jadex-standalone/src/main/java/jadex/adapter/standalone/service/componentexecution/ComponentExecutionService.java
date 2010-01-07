@@ -11,6 +11,7 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageService;
 import jadex.bridge.ISearchConstraints;
@@ -88,12 +89,19 @@ public class ComponentExecutionService implements IComponentExecutionService
 	 *  @param listener The result listener (if any). Will receive the id of the component as result.
 	 *  @param parent The parent (if any).
 	 */
-	public void	createComponent(String name, String model, String config, Map args, boolean suspend, 
+	public void	createComponent(String name, String model, final String config, final Map args, final boolean suspend, 
 		IResultListener listener, IComponentIdentifier parent, final IResultListener resultlistener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
+		if(name!=null && name.indexOf('@')!=-1)
+		{
+			listener.exceptionOccurred(this, new RuntimeException("No '@' allowed in agent name."));
+			return;
+			//throw new RuntimeException("No '@' allowed in agent name.");
+		}
+
 		/*
 		if(container.isShuttingDown())
 		{
@@ -122,13 +130,13 @@ public class ComponentExecutionService implements IComponentExecutionService
 		}
 		if(factory==null)
 			throw new RuntimeException("No factory found for component: "+model);
-		ILoadableComponentModel lmodel = factory.loadModel(model);
+		final ILoadableComponentModel lmodel = factory.loadModel(model);
 
 		// Create id and adapter.
 		
 		final AgentIdentifier cid;
-		StandaloneComponentAdapter adapter;
-		AMSAgentDescription	ad;
+		final StandaloneComponentAdapter adapter;
+		final AMSAgentDescription	ad;
 		synchronized(adapters)
 		{
 			synchronized(descs)
@@ -160,36 +168,59 @@ public class ComponentExecutionService implements IComponentExecutionService
 					ad.setState(IComponentDescription.STATE_ACTIVE);
 				}
 				descs.put(cid, ad);
-
-				adapter = new StandaloneComponentAdapter(container, ad);
-				adapters.put(cid, adapter);
 			}
-		}
-		
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
-		
-		if(name!=null && name.indexOf('@')!=-1)
-		{
-			listener.exceptionOccurred(this, new RuntimeException("No '@' allowed in agent name."));
-			return;
-			//throw new RuntimeException("No '@' allowed in agent name.");
-		}
-		
+
+			adapter = new StandaloneComponentAdapter(container, ad);
+			adapters.put(cid, adapter);
+
+			if(parent!=null)
+			{
+				final IResultListener	rl	= listener;
+				final IComponentFactory	cf	= factory;
+				final StandaloneComponentAdapter pad	= (StandaloneComponentAdapter)adapters.get(parent);
+				pad.getComponentInstance().getExternalAccess(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						createComponentInstance(config, args, suspend, rl,
+								resultlistener, cf, lmodel, cid, adapter, pad, ad, (IExternalAccess)result);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						rl.exceptionOccurred(source, exception);
+					}
+				});
+			}
+			else
+			{
+				createComponentInstance(config, args, suspend, listener,
+						resultlistener, factory, lmodel, cid, adapter, null, ad, null);
+				
+			}
+		}				
+	}
+
+	/**
+	 *  Create an instance of a component (step 2 of creation process).
+	 */
+	protected void createComponentInstance(String config, Map args,
+			boolean suspend, IResultListener listener,
+			final IResultListener resultlistener, IComponentFactory factory,
+			ILoadableComponentModel lmodel, final AgentIdentifier cid,
+			StandaloneComponentAdapter adapter, StandaloneComponentAdapter pad,
+			AMSAgentDescription ad, IExternalAccess parent)
+	{
 		// Create the component instance.
-		IComponentInstance instance = factory.createComponentInstance(adapter, lmodel, config, args);
+		IComponentInstance instance = factory.createComponentInstance(adapter, lmodel, config, args, parent);
 		adapter.setComponent(instance, lmodel);
 		
 //		System.out.println("added: "+agentdescs.size()+", "+aid);
 		
 		// Register component at parent.
-		if(parent!=null)
+		if(pad!=null)
 		{
-			synchronized(adapters)
-			{
-				StandaloneComponentAdapter	pad	= (StandaloneComponentAdapter)adapters.get(parent);
-				pad.getComponentInstance().componentCreated(cid, lmodel);
-			}
+			pad.getComponentInstance().componentCreated(cid, lmodel);
 		}
 
 		IComponentListener[]	alisteners;

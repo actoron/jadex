@@ -11,10 +11,10 @@ import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
@@ -52,6 +52,9 @@ public class Application	implements IComponentInstance
 	/** The application type. */
 	protected ApplicationModel model;
 	
+	/** The parent component. */
+	protected IExternalAccess parent;
+	
 	/** Flag to indicate that the application is already inited. */
 	protected boolean	inited;
 	
@@ -67,12 +70,13 @@ public class Application	implements IComponentInstance
 	/**
 	 *  Create a new context.
 	 */
-	public Application(String name, ApplicationModel model, MApplicationInstance config, IComponentAdapter adapter)
+	public Application(String name, ApplicationModel model, MApplicationInstance config, IComponentAdapter adapter, IExternalAccess parent)
 	{
 		this.name	= name;
 		this.config	= config;
 		this.adapter = adapter;
 		this.model = model;
+		this.parent = parent;
 	}
 
 	//-------- IContext interface --------
@@ -400,6 +404,14 @@ public class Application	implements IComponentInstance
 	}
 	
 	/**
+	 *  Get the component identifier.
+	 */
+	public IComponentIdentifier	getComponentIdentifier()
+	{
+		return adapter.getComponentIdentifier();
+	}
+	
+	/**
 	 *  Create an agent in the context.
 	 *  @param name	The name of the newly created agent.
 	 *  @param type	The agent type as defined in the application type.
@@ -529,7 +541,7 @@ public class Application	implements IComponentInstance
 	/**
 	 *  Get the agent types.
 	 *  @return The agent types.
-	 */
+	 * /
 	public String[] getAgentTypes()
 	{
 		List atypes = model.getApplicationType().getMAgentTypes();
@@ -548,7 +560,7 @@ public class Application	implements IComponentInstance
 	 *  Get the agent type for an agent filename.
 	 *  @param aid	The agent filename.
 	 *  @return The agent type name.
-	 */
+	 * /
 	public String getAgentType(String filename)
 	{
 		String ret = null;
@@ -563,7 +575,7 @@ public class Application	implements IComponentInstance
 		}
 		
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Get the imports.
@@ -718,8 +730,35 @@ public class Application	implements IComponentInstance
 	 *  Get the logical component type for a given component id.
 	 */
 	// todo: rename getComponentType
-	public String getAgentType(IComponentIdentifier cid)
+	public String getComponentType(IComponentIdentifier cid)
 	{
 		return (String)ctypes.get(cid);
+	}
+
+	/**
+	 *  Create a new component in the application.
+	 *  @param name The component name.
+	 *  @param type	The logical type name.
+	 *  @param config The configuration to use for initializing the component (null for default).
+	 *  @param args The arguments for the component (if any).
+	 *  @param suspend Create the component in suspended mode (i.e. do not run until resume() is called).
+	 *  @param listener The result listener (if any). Will receive the id of the component as result.
+	 *  @param parent The parent component (application is default).
+	 */
+	public void	createComponent(String name, String type, String config, Map args, boolean suspend, 
+		IResultListener listener, IComponentIdentifier parent, IResultListener killlistener)
+	{
+		if(model.getApplicationType().getMAgentType(type)==null)
+		{
+			if(listener!=null)
+				listener.exceptionOccurred(this, new RuntimeException("No such component: "+type));
+			else
+				throw new RuntimeException("No such component: "+type);
+		}
+		else
+		{
+			IComponentExecutionService	ces	= (IComponentExecutionService)adapter.getServiceContainer().getService(IComponentExecutionService.class);
+			ces.createComponent(name, model.getApplicationType().getMAgentType(type).getFilename(), config, args, suspend, listener, parent==null ? adapter.getComponentIdentifier() : parent, killlistener);
+		}
 	}
 }

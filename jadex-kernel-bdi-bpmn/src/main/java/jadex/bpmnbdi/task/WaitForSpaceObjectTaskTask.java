@@ -1,6 +1,6 @@
 package jadex.bpmnbdi.task;
 
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
+import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;

@@ -1,6 +1,7 @@
 package jadex.application.space.envsupport;
 
 import jadex.application.model.MApplicationType;
+import jadex.application.model.MSpaceInstance;
 import jadex.application.model.MSpaceType;
 import jadex.application.space.envsupport.dataview.IDataView;
 import jadex.application.space.envsupport.environment.AvatarMapping;
@@ -27,6 +28,7 @@ import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.xml.AttributeInfo;
 import jadex.commons.xml.BasicTypeConverter;
+import jadex.commons.xml.IPostProcessor;
 import jadex.commons.xml.ITypeConverter;
 import jadex.commons.xml.QName;
 import jadex.commons.xml.SubobjectInfo;
@@ -981,7 +983,31 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo("depth", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, "property"),
 			new BeanAttributeInfo("border", null, null, null, null, "property"),
 			new BeanAttributeInfo("neighborhood", null, null, null, null, "property")
-			}, null, null,
+			}, new IPostProcessor()
+			{
+				public Object postProcess(Object context, Object object, Object root,
+						ClassLoader classloader)
+				{
+					MSpaceInstance	si	= (MSpaceInstance)object;
+					MApplicationType	apptype	= (MApplicationType)root;
+					List spacetypes = apptype.getMSpaceTypes();
+					for(int i=0; i<spacetypes.size(); i++)
+					{
+						MSpaceType st = (MSpaceType)spacetypes.get(i);
+						if(st.getName().equals(si.getTypeName()))
+						{
+							si.setType(st);
+							break;
+						}
+					}
+					return null;
+				}
+				
+				public int getPass()
+				{
+					return 1;
+				}
+			}, null,
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "property"), "properties", null, null, null, "property")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "object"), "objects", null, null, null, "property")),

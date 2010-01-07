@@ -1,6 +1,6 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
-import jadex.adapter.base.envsupport.math.Vector2Double;
+import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 

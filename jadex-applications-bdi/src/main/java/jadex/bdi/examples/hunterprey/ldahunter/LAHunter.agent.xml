@@ -13,9 +13,9 @@
 	<imports>
 		<import>jadex.bdi.examples.hunterprey.*</import>
 		<import>jadex.bdi.examples.hunterprey.ldahunter.potentialfield.*</import>
-		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
-		<import>jadex.adapter.base.envsupport.environment.*</import>
-		<import>jadex.adapter.base.envsupport.math.*</import>
+		<import>jadex.application.space.envsupport.environment.space2d.*</import>
+		<import>jadex.application.space.envsupport.environment.*</import>
+		<import>jadex.application.space.envsupport.math.*</import>
 	</imports>
 
 	<beliefs>

@@ -2,6 +2,9 @@ package jadex.application.space.envsupport.environment;
 
 import jadex.application.space.envsupport.dataview.IDataView;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
+import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentListener;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SimplePropertyObject;
@@ -13,6 +16,7 @@ import jadex.service.clock.ITimer;
 import jadex.service.execution.IExecutionService;
 
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Space executor that connects to a clock service and reacts on time deltas.
@@ -171,15 +175,21 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 		}
 		
 		// Add the executor as context listener on the application.
-		IContextService cs = (IContextService)container.getService(IContextService.class);
-		cs.addContextListener(new IChangeListener()
+		IComponentExecutionService	ces	= (IComponentExecutionService)container.getService(IComponentExecutionService.class);
+		ces.addComponentListener(space.getContext().getComponentIdentifier(), new IComponentListener()
 		{
-			public void changeOccurred(ChangeEvent event)
+			
+			public void componentRemoved(IComponentDescription desc, Map results)
 			{
-				if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()))
-				{
-					terminate();
-				}
+				terminate();
+			}
+			
+			public void componentChanged(IComponentDescription desc)
+			{
+			}
+			
+			public void componentAdded(IComponentDescription desc)
+			{
 			}
 		});
 	}

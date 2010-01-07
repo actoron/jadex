@@ -1,8 +1,8 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
-import jadex.adapter.base.envsupport.environment.space2d.Space2D;
-import jadex.adapter.base.envsupport.math.IVector1;
-import jadex.adapter.base.envsupport.math.IVector2;
+import jadex.application.space.envsupport.environment.space2d.Space2D;
+import jadex.application.space.envsupport.math.IVector1;
+import jadex.application.space.envsupport.math.IVector2;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 

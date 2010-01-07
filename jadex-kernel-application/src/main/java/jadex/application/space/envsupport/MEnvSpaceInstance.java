@@ -20,6 +20,11 @@ public class MEnvSpaceInstance extends MSpaceInstance
 	/** The properties. */
 	protected Map properties;
 	
+	
+	public MEnvSpaceInstance()
+	{
+		// TODO Auto-generated constructor stub
+	}
 	//-------- methods --------
 	
 	/**

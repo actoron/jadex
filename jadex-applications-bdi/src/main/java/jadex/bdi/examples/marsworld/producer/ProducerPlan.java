@@ -2,8 +2,8 @@ package jadex.bdi.examples.marsworld.producer;
 
 import jadex.adapter.base.agr.AGRSpace;
 import jadex.adapter.base.agr.Group;
-import jadex.adapter.base.envsupport.environment.IEnvironmentSpace;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.IEnvironmentSpace;
+import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.examples.marsworld.RequestCarry;
 import jadex.bdi.examples.marsworld.RequestProduction;

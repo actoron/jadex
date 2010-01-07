@@ -1,7 +1,7 @@
 package jadex.bdi.examples.hunterprey.cleverprey;
 
-import jadex.adapter.base.envsupport.environment.ISpaceAction;
-import jadex.adapter.base.envsupport.environment.space2d.Grid2D;
+import jadex.application.space.envsupport.environment.ISpaceAction;
+import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.bdi.examples.hunterprey.MoveAction;
 import jadex.bdi.runtime.Plan;
 

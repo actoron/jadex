@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_ZpCBEYJ-Ed6rVea0-FiZ3Q" iD="_ZpCBEIJ-Ed6rVea0-FiZ3Q">
-  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_eASVMYJ-Ed6rVea0-FiZ3Q" iD="_eASVMIJ-Ed6rVea0-FiZ3Q" name="package jadex.bpmn.examples.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.adapter.base.envsupport.environment.*;&#xD;&#xA;import jadex.bpmnbdi.task.*;&#xD;&#xA;&#xD;&#xA;ISpaceObject target = $beliefbase.environment.getSpaceObject($plan.getReason().content.getId());">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_eASVMYJ-Ed6rVea0-FiZ3Q" iD="_eASVMIJ-Ed6rVea0-FiZ3Q" name="package jadex.bpmn.examples.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.application.space.envsupport.environment.*;&#xD;&#xA;import jadex.bpmnbdi.task.*;&#xD;&#xA;&#xD;&#xA;ISpaceObject target = $beliefbase.environment.getSpaceObject($plan.getReason().content.getId());">
     <associations xmi:type="bpmn:Association" xmi:id="_eAbfIIJ-Ed6rVea0-FiZ3Q"/>
   </artifacts>
   <pools xmi:type="bpmn:Pool" xmi:id="_ZpetAYJ-Ed6rVea0-FiZ3Q" iD="_ZpetAIJ-Ed6rVea0-FiZ3Q" associations="_eAbfIIJ-Ed6rVea0-FiZ3Q" name="Pool">

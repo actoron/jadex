@@ -1,6 +1,6 @@
 package jadex.bdi.examples.antworld;
 
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.ISpaceObject;
 
 import java.util.Comparator;
 

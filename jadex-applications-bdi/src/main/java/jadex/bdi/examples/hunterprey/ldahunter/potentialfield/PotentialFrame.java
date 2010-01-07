@@ -6,9 +6,9 @@
  */
 package jadex.bdi.examples.hunterprey.ldahunter.potentialfield;
 
-import jadex.adapter.base.envsupport.math.IVector2;
-import jadex.adapter.base.envsupport.math.Vector1Int;
-import jadex.adapter.base.envsupport.math.Vector2Int;
+import jadex.application.space.envsupport.math.IVector2;
+import jadex.application.space.envsupport.math.Vector1Int;
+import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;

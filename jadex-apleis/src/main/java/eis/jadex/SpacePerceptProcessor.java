@@ -1,7 +1,7 @@
 package eis.jadex;
 
-import jadex.adapter.base.envsupport.environment.IPerceptProcessor;
-import jadex.adapter.base.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.IPerceptProcessor;
+import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISpace;
 import jadex.commons.SimplePropertyObject;

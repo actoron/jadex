@@ -22,15 +22,16 @@
 		<import>java.util.logging.*</import>
 		<import>jadex.commons.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
-		<import>jadex.adapter.base.envsupport.environment.*</import>
-		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
-		<import>jadex.adapter.base.envsupport.math.*</import>
+		<import>jadex.application.runtime.*</import>
+		<import>jadex.application.space.envsupport.environment.*</import>
+		<import>jadex.application.space.envsupport.environment.space2d.*</import>
+		<import>jadex.application.space.envsupport.math.*</import>
 		<import>jadex.bdi.examples.cleanerworld.*</import>
 	</imports>
 
 	<beliefs>
 		<belief name="environment" class="ContinuousSpace2D">
- 			<fact>(ContinuousSpace2D)$scope.getApplicationContext().getSpace("my2dspace")</fact>
+ 			<fact>(ContinuousSpace2D)((IApplicationExternalAccess)$scope.getParent()).getSpace("my2dspace")</fact>
  		</belief>
  		
  		<belief name="myself" class="ISpaceObject" exported="true">
