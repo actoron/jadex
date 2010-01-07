@@ -694,6 +694,11 @@ public class Application	implements IComponentInstance
 				return model;
 			}
 			
+			public IComponentIdentifier getComponentIdentifier()
+			{
+				return adapter.getComponentIdentifier();
+			}
+			
 			public Object getSpace(String name)
 			{
 				return Application.this.getSpace(name);

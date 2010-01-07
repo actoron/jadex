@@ -19,7 +19,7 @@
 	<beliefs>
 		<!-- Environment. -->
 		<belief name="environment" class="ContinuousSpace2D">
- 			<fact>(ContinuousSpace2D)$scope.getApplicationContext().getSpace("my2dspace")</fact>
+ 			<fact>(ContinuousSpace2D)((IApplicationExternalAccess)$scope.getParent()).getSpace("my2dspace")</fact>
  		</belief>
  		
  		<!-- Myself. -->

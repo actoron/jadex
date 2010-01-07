@@ -117,7 +117,7 @@ public class InterpreterTest
 				{
 					return false;
 				}
-			}, loaded.getState(), loaded, null, null, config);
+			}, loaded.getState(), loaded, null, null, null, config);
 			
 			exe.setExecutable(new IExecutable()
 			{

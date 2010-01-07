@@ -11,4 +11,10 @@ public interface IExternalAccess
 	 *  @return	The model.
 	 */
 	public ILoadableComponentModel	getModel();
+
+	/**
+	 *  Get the id of the component.
+	 *  @return	The component id.
+	 */
+	public IComponentIdentifier	getComponentIdentifier();
 }

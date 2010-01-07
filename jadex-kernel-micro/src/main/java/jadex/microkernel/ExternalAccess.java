@@ -1,5 +1,6 @@
 package jadex.microkernel;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.MessageType;
 
@@ -76,5 +77,14 @@ public class ExternalAccess implements IMicroExternalAccess
 	public ILoadableComponentModel getModel()
 	{
 		return interpreter.getAgentModel();
+	}
+	
+	/**
+	 *  Get the id of the component.
+	 *  @return	The component id.
+	 */
+	public IComponentIdentifier	getComponentIdentifier()
+	{
+		return interpreter.getAgentAdapter().getComponentIdentifier();
 	}
 }

@@ -612,6 +612,15 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	}
 	
 	/**
+	 *  Get the id of the component.
+	 *  @return	The component id.
+	 */
+	public IComponentIdentifier	getComponentIdentifier()
+	{
+		return adapter.getComponentIdentifier();
+	}
+	
+	/**
 	 *  Get the arguments.
 	 *  @return The arguments.
 	 */

@@ -75,6 +75,7 @@ public abstract class RemoteActionPlan extends Plan
 			// Use a subgoal to search for a translation agent
 			IGoal ft = createGoal("df_search");
 			ft.getParameter("description").setValue(ad);
+			ft.getParameter("constraints").setValue(cons);
 			IBelief bel = getBeliefbase().getBelief("df");
 			ft.getParameter("df").setValue(bel.getFact());
 			dispatchSubgoalAndWait(ft);
