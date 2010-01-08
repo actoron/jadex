@@ -78,7 +78,8 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 				Map params = new HashMap();
 				params.put("wastebins", todo.toArray());
 				ongoing.addAll(todo);
-				app.createComponent(null, "Truck", null, params, false, new IResultListener()
+				IComponentExecutionService	ces	= (IComponentExecutionService)app.getServiceContainer().getService(IComponentExecutionService.class);
+				ces.createComponent(null, app.getComponentFilename("Truck"), null, params, false, new IResultListener()
 				{
 					public void exceptionOccurred(Object source, Exception exception)
 					{
@@ -110,7 +111,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 						});
 						
 					}
-				}, null, null);
+				}, app.getComponentIdentifier(), null);
 			}
 		}
 	}
