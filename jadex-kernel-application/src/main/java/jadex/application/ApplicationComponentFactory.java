@@ -18,14 +18,13 @@ import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.xml.AttributeInfo;
-import jadex.commons.xml.QName;
-import jadex.commons.xml.TypeInfo;
-import jadex.commons.xml.bean.BeanAttributeInfo;
-import jadex.commons.xml.bean.BeanObjectReaderHandler;
-import jadex.commons.xml.reader.Reader;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
+import jadex.xml.AttributeInfo;
+import jadex.xml.TypeInfo;
+import jadex.xml.bean.BeanAttributeInfo;
+import jadex.xml.bean.BeanObjectReaderHandler;
+import jadex.xml.reader.Reader;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -36,6 +35,7 @@ import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
+import javax.xml.namespace.QName;
 
 /**
  *  Factory for default contexts.

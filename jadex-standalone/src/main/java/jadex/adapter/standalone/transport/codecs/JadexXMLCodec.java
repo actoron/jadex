@@ -1,7 +1,7 @@
 package jadex.adapter.standalone.transport.codecs;
 
-import jadex.commons.xml.bean.JavaReader;
-import jadex.commons.xml.bean.JavaWriter;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
 import java.io.IOException;
 

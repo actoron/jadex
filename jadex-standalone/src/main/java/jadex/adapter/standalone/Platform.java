@@ -271,7 +271,7 @@ public class Platform extends AbstractPlatform
 			for(int i=0; i<libpaths.length; i++)
 			{
 				Object entry = SJavaParser.evaluateExpression(libpaths[i].getValue(), fetcher);
-				System.out.println("Adding: "+entry);
+//				System.out.println("Adding: "+entry);
 				try
 				{
 					if(entry instanceof URL)

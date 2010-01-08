@@ -1,19 +1,19 @@
 package jadex.rules.state.io.xml;
 
 import jadex.commons.SReflect;
-import jadex.commons.xml.AttributeInfo;
-import jadex.commons.xml.BasicTypeConverter;
-import jadex.commons.xml.ITypeConverter;
-import jadex.commons.xml.SXML;
-import jadex.commons.xml.TypeInfo;
-import jadex.commons.xml.TypeInfoPathManager;
-import jadex.commons.xml.TypeInfoTypeManager;
-import jadex.commons.xml.bean.IBeanObjectCreator;
-import jadex.commons.xml.reader.IObjectReaderHandler;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
+import jadex.xml.AttributeInfo;
+import jadex.xml.BasicTypeConverter;
+import jadex.xml.ITypeConverter;
+import jadex.xml.SXML;
+import jadex.xml.TypeInfo;
+import jadex.xml.TypeInfoPathManager;
+import jadex.xml.TypeInfoTypeManager;
+import jadex.xml.bean.IBeanObjectCreator;
+import jadex.xml.reader.IObjectReaderHandler;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,7 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.commons.xml.QName;
+import javax.xml.namespace.QName;
+
 
 /**
  *  Handler for reading XML into OAV objects.

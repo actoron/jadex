@@ -1,8 +1,8 @@
 package jadex.adapter.base;
 
 import jadex.bridge.IContentCodec;
-import jadex.commons.xml.bean.JavaReader;
-import jadex.commons.xml.bean.JavaWriter;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
 import java.io.Serializable;
 import java.util.Properties;

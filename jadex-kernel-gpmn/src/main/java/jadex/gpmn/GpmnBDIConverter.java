@@ -6,7 +6,7 @@ import jadex.bdi.interpreter.OAVBDIModelLoader;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.interpreter.OAVBDIXMLReader;
 import jadex.bdi.interpreter.Report;
-import jadex.commons.xml.IPostProcessor;
+import jadex.xml.IPostProcessor;
 import jadex.gpmn.model.MAchieveGoal;
 import jadex.gpmn.model.MArtifact;
 import jadex.gpmn.model.MContext;

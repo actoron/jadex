@@ -2,18 +2,19 @@ package jadex.service;
 
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.xml.AttributeInfo;
-import jadex.commons.xml.QName;
-import jadex.commons.xml.SubobjectInfo;
-import jadex.commons.xml.TypeInfo;
-import jadex.commons.xml.bean.BeanAttributeInfo;
-import jadex.commons.xml.bean.BeanObjectReaderHandler;
-import jadex.commons.xml.bean.BeanObjectWriterHandler;
-import jadex.commons.xml.reader.Reader;
-import jadex.commons.xml.writer.Writer;
+import jadex.xml.AttributeInfo;
+import jadex.xml.SubobjectInfo;
+import jadex.xml.TypeInfo;
+import jadex.xml.bean.BeanAttributeInfo;
+import jadex.xml.bean.BeanObjectReaderHandler;
+import jadex.xml.bean.BeanObjectWriterHandler;
+import jadex.xml.reader.Reader;
+import jadex.xml.writer.Writer;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 /**
  *  A simple static helper class for reading and writing jadex.commons.Properties.
@@ -58,7 +59,7 @@ public class PropertiesXMLHelper
 	public static Writer getPropertyWriter()
 	{
 		if(writer==null)
-			writer = new jadex.commons.xml.writer.Writer(new BeanObjectWriterHandler(typeinfos));
+			writer = new jadex.xml.writer.Writer(new BeanObjectWriterHandler(typeinfos));
 		return writer;
 	}
 	
@@ -69,7 +70,7 @@ public class PropertiesXMLHelper
 	public static Reader getPropertyReader()
 	{
 		if(reader==null)
-			reader = new jadex.commons.xml.reader.Reader(new BeanObjectReaderHandler(typeinfos));
+			reader = new jadex.xml.reader.Reader(new BeanObjectReaderHandler(typeinfos));
 		return reader;
 	}
 }

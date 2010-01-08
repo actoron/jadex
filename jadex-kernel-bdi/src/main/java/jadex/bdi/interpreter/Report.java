@@ -5,7 +5,7 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
-import jadex.commons.xml.StackElement;
+import jadex.xml.StackElement;
 
 import java.util.ArrayList;
 import java.util.Collection;

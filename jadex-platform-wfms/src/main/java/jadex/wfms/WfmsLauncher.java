@@ -6,22 +6,11 @@ import jadex.service.PropertiesXMLHelper;
 import jadex.wfms.client.ProcessStarterClient;
 import jadex.wfms.service.IAAAService;
 import jadex.wfms.service.IClientService;
-import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
-import jadex.wfms.service.IProcessDefinitionService;
-import jadex.wfms.service.IWfmsClientService;
 import jadex.wfms.service.impl.BasicAAAService;
 import jadex.wfms.service.impl.BasicModelRepositoryService;
-import jadex.wfms.service.impl.BpmnProcessService;
-import jadex.wfms.service.impl.ClientConnector;
-import jadex.wfms.service.impl.GpmnProcessService;
-import jadex.wfms.service.impl.MetaExecutionService;
-import jadex.wfms.service.impl.ProcessDefinitionConnector;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import com.daimler.client.GuiClient;
@@ -33,7 +22,6 @@ public class WfmsLauncher
 	
 	/**
 	 * @throws Exception 
-	 * 
 	 */
 	public static void main(String[] args) throws Exception
 	{

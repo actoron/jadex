@@ -26,19 +26,18 @@ import jadex.application.space.envsupport.observer.perspective.IPerspective;
 import jadex.application.space.envsupport.observer.perspective.Perspective2D;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
-import jadex.commons.xml.AttributeInfo;
-import jadex.commons.xml.BasicTypeConverter;
-import jadex.commons.xml.IPostProcessor;
-import jadex.commons.xml.ITypeConverter;
-import jadex.commons.xml.QName;
-import jadex.commons.xml.SubobjectInfo;
-import jadex.commons.xml.TypeInfo;
-import jadex.commons.xml.bean.BeanAttributeInfo;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.xml.AttributeInfo;
+import jadex.xml.BasicTypeConverter;
+import jadex.xml.IPostProcessor;
+import jadex.xml.ITypeConverter;
+import jadex.xml.SubobjectInfo;
+import jadex.xml.TypeInfo;
+import jadex.xml.bean.BeanAttributeInfo;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -50,6 +49,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.text.html.StyleSheet;
+import javax.xml.namespace.QName;
 
 /**
  *  Java representation of environment space type for xml description.

@@ -1,14 +1,6 @@
 package jadex.bdi.interpreter;
 
 import jadex.commons.SReflect;
-import jadex.commons.xml.AttributeInfo;
-import jadex.commons.xml.IPostProcessor;
-import jadex.commons.xml.ITypeConverter;
-import jadex.commons.xml.SubobjectInfo;
-import jadex.commons.xml.TypeInfo;
-import jadex.commons.xml.bean.IBeanObjectCreator;
-import jadex.commons.xml.reader.Reader;
-import jadex.commons.xml.writer.Writer;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -17,6 +9,14 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.io.xml.OAVObjectReaderHandler;
 import jadex.rules.state.io.xml.OAVObjectWriterHandler;
+import jadex.xml.AttributeInfo;
+import jadex.xml.IPostProcessor;
+import jadex.xml.ITypeConverter;
+import jadex.xml.SubobjectInfo;
+import jadex.xml.TypeInfo;
+import jadex.xml.bean.IBeanObjectCreator;
+import jadex.xml.reader.Reader;
+import jadex.xml.writer.Writer;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,7 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.commons.xml.QName;
+import javax.xml.namespace.QName;
+
 
 /**
  *  Reader for loading BDI XML models into OAV states.

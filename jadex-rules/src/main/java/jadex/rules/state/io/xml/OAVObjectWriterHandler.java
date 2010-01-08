@@ -1,17 +1,16 @@
 package jadex.rules.state.io.xml;
 
 import jadex.commons.SReflect;
-import jadex.commons.xml.AttributeInfo;
-import jadex.commons.xml.BasicTypeConverter;
-import jadex.commons.xml.Namespace;
-import jadex.commons.xml.SXML;
-import jadex.commons.xml.TypeInfo;
-import jadex.commons.xml.bean.BeanProperty;
-import jadex.commons.xml.writer.AbstractObjectWriterHandler;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
+import jadex.xml.AttributeInfo;
+import jadex.xml.BasicTypeConverter;
+import jadex.xml.Namespace;
+import jadex.xml.SXML;
+import jadex.xml.TypeInfo;
+import jadex.xml.writer.AbstractObjectWriterHandler;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,7 +18,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.commons.xml.QName;
+import javax.xml.namespace.QName;
+
 
 /**
  *  OAV version for fetching write info for an object. 

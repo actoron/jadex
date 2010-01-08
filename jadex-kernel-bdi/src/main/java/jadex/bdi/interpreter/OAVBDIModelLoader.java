@@ -3,9 +3,6 @@ package jadex.bdi.interpreter;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
-import jadex.commons.xml.QName;
-import jadex.commons.xml.StackElement;
-import jadex.commons.xml.reader.Reader;
 import jadex.rules.parser.conditions.ParserHelper;
 import jadex.rules.parser.conditions.javagrammar.IParserHelper;
 import jadex.rules.rulesystem.IAction;
@@ -28,6 +25,8 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
+import jadex.xml.StackElement;
+import jadex.xml.reader.Reader;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +34,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 /**
  *  Loader for reading agent XMLs into OAV representation.

@@ -20,15 +20,15 @@ import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.xml.AttributeInfo;
-import jadex.commons.xml.IPostProcessor;
-import jadex.commons.xml.SubobjectInfo;
-import jadex.commons.xml.TypeInfo;
-import jadex.commons.xml.bean.BeanAttributeInfo;
-import jadex.commons.xml.bean.BeanObjectReaderHandler;
-import jadex.commons.xml.reader.Reader;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.xml.AttributeInfo;
+import jadex.xml.IPostProcessor;
+import jadex.xml.SubobjectInfo;
+import jadex.xml.TypeInfo;
+import jadex.xml.bean.BeanAttributeInfo;
+import jadex.xml.bean.BeanObjectReaderHandler;
+import jadex.xml.reader.Reader;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import jadex.commons.xml.QName;
+import javax.xml.namespace.QName;
 
 /**
  *  Reader for loading Bpmn XML models into a Java representation states.

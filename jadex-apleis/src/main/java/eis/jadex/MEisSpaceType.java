@@ -7,15 +7,10 @@ import java.util.Set;
 import jadex.adapter.base.appdescriptor.MApplicationType;
 import jadex.adapter.base.appdescriptor.MSpaceType;
 import jadex.commons.SReflect;
-import jadex.commons.xml.AttributeInfo;
-import jadex.commons.xml.ITypeConverter;
-import jadex.commons.xml.QName;
-import jadex.commons.xml.TypeInfo;
-import jadex.commons.xml.bean.BeanAttributeInfo;
-
-/**
- * 
- */
+import jadex.xmlteInfo;
+import jadex.xmjadex.xml
+import jadex.xml.QName;jadex.xmll.TypeInfo;
+impjadex.xmln.BeanAttributeInfojadex.xml/
 public class MEisSpaceType extends MSpaceType
 {
 	//-------- attributes --------

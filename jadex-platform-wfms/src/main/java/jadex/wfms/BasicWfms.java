@@ -1,12 +1,14 @@
 package jadex.wfms;
 
-import java.util.logging.Logger;
-
 import jadex.commons.Properties;
 import jadex.commons.SUtil;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.service.PropertiesXMLHelper;
 import jadex.service.PropertyServiceContainer;
+import jadex.xml.reader.Reader;
+
+import java.util.logging.Logger;
+
 
 
 /**

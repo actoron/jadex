@@ -4,16 +4,17 @@ import jadex.application.model.MApplicationType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.model.MSpaceType;
 import jadex.commons.SReflect;
-import jadex.commons.xml.AttributeInfo;
-import jadex.commons.xml.IPostProcessor;
-import jadex.commons.xml.QName;
-import jadex.commons.xml.TypeInfo;
-import jadex.commons.xml.bean.BeanAttributeInfo;
+import jadex.xml.AttributeInfo;
+import jadex.xml.IPostProcessor;
+import jadex.xml.TypeInfo;
+import jadex.xml.bean.BeanAttributeInfo;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 /**
  * An AGR space description.

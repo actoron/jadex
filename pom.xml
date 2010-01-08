@@ -24,8 +24,9 @@
 		    </plugins>
   		</build>
 		<modules>
-			<module>jadex-services</module>
+				<module>jadex-services</module>
 		    <module>jadex-commons</module>
+		    <module>jadex-xml</module>
 		    <module>jadex-rules</module>
 		    <module>jadex-rules-applications</module>
 		    <module>jadex-rules-tools</module>
@@ -34,8 +35,9 @@
   	<profile>
   		<id>jadex-full-dist</id>
 		<modules>
-		 	<module>jadex-services</module>
+		 		<module>jadex-services</module>
 		    <module>jadex-commons</module>
+		    <module>jadex-xml</module>
 		    <module>jadex-javaparser</module>
 		    <module>jadex-bridge</module>
 		    <module>jadex-platform-base</module>
@@ -62,6 +64,7 @@
     	</activation>
 		  <modules>
 		    <module>jadex-commons</module>
+		    <module>jadex-xml</module>
 		    <module>jadex-javaparser</module>
 		    <module>jadex-bridge</module>
 		    <module>jadex-platform-base</module>
@@ -80,13 +83,13 @@
 		    <module>jadex-standalone</module>
 		    <module>jadex-launch</module>
 		    <module>jadex-jade-launch</module>
-			<module>jadex-platform-jade</module>
-			<!-- <module>jadex-xwiki</module> -->
-			<!-- <module>jadex-kernel-bdi-continuations</module> -->
-			<module>jadex-kernel-bdi-bpmn</module>
-			<module>jadex-kernel-bpmn</module>
-			<module>jadex-kernel-gpmn</module>
-			<module>jadex-platform-wfms</module>
+				<module>jadex-platform-jade</module>
+				<!-- <module>jadex-xwiki</module> -->
+				<!-- <module>jadex-kernel-bdi-continuations</module> -->
+				<module>jadex-kernel-bdi-bpmn</module>
+				<module>jadex-kernel-bpmn</module>
+				<module>jadex-kernel-gpmn</module>
+				<module>jadex-platform-wfms</module>
 		</modules>
   	</profile>
   	<profile>
@@ -107,6 +110,7 @@
   		</build>
 		<modules>
 		    <module>jadex-commons</module>
+		    <module>jadex-xml</module>
 		    <module>jadex-javaparser</module>
 		    <module>jadex-bridge</module>
 		    <module>jadex-platform-base</module>
@@ -122,7 +126,7 @@
 		    <module>jadex-rules-tools</module>
 		    <module>jadex-kernel-application</module>
 		    <module>jadex-jade-launch</module>
-			<module>jadex-platform-jade</module>
+				<module>jadex-platform-jade</module>
 		</modules>
   	</profile>
   </profiles>

@@ -21,6 +21,11 @@
   	</dependency>
   	<dependency>
   		<groupId>jadex</groupId>
+  		<artifactId>jadex-xml</artifactId>
+  		<version>2.0-beta4</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>jadex</groupId>
   		<artifactId>jadex-javaparser</artifactId>
   		<version>2.0-beta4</version>
   	</dependency>
