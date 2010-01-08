@@ -984,11 +984,14 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				if(!properties.containsKey(propname))
 				{
 					IParsedExpression exp = (IParsedExpression)prop.get("value");
-					boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
-					if(dyn)
-						properties.put(propname, exp);
-					else
-						properties.put(propname, exp==null? null: exp.getValue(fetcher));
+					if(exp!=null)
+					{
+						boolean dyn = ((Boolean)prop.get("dynamic")).booleanValue();
+						if(dyn)
+							properties.put(propname, exp);
+						else
+							properties.put(propname, exp.getValue(fetcher));
+					}
 				}
 			}
 		}
@@ -1013,14 +1016,13 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			IComponentIdentifier agent = (IComponentIdentifier)obj.getProperty(ISpaceObject.PROPERTY_OWNER);
 			if(agent!=null)
 			{
-				throw new UnsupportedOperationException();
-//				String	agenttype = ((ApplicationContext)getContext()).getAgentType(agent);
-//				AvatarMapping mapping = getAvatarMapping(agenttype, objecttype);
-//				if(mapping.isKillAgent())
-//				{
-//					IComponentExecutionService ces = (IComponentExecutionService)((ApplicationContext)getContext()).getServiceContainer().getService(IComponentExecutionService.class);
-//					ces.destroyComponent(agent, null);
-//				}
+				String	agenttype = getContext().getComponentType(agent);
+				AvatarMapping mapping = getAvatarMapping(agenttype, objecttype);
+				if(mapping.isKillAgent())
+				{
+					IComponentExecutionService ces = (IComponentExecutionService)getContext().getServiceContainer().getService(IComponentExecutionService.class);
+					ces.destroyComponent(agent, null);
+				}
 			}
 			
 			// shutdown and jettison tasks

@@ -1,6 +1,5 @@
 package jadex.bdi.examples.antworld;
 
-import jadex.adapter.base.appdescriptor.ApplicationContext;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.application.space.envsupport.environment.EnvironmentEvent;
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
@@ -10,7 +9,6 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.ISpace;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.ArrayList;
@@ -46,9 +44,9 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 	 * @param space
 	 *            The space.
 	 */
-	public void agentAdded(IComponentIdentifier agent, ISpace space) {
+	public void agentAdded(IComponentIdentifier agent, IEnvironmentSpace space) {
 		// Only add agents of type "Ant"
-		if ("Ant".equals(((ApplicationContext) space.getContext()).getComponentType(agent))) {
+		if ("Ant".equals((space.getContext()).getComponentType(agent))) {
 			if (agents == null)
 				agents = new ArrayList();
 			agents.add(agent);
@@ -63,7 +61,7 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 	 * @param space
 	 *            The space.
 	 */
-	public void agentRemoved(IComponentIdentifier agent, ISpace space) {
+	public void agentRemoved(IComponentIdentifier agent, IEnvironmentSpace space) {
 		agents.remove(agent);
 		if (agents.size() == 0)
 			agents = null;

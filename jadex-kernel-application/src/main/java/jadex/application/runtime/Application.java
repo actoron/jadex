@@ -286,11 +286,6 @@ public class Application	implements IComponentInstance
 		ISpace[]	aspaces	= null;
 		synchronized(this)
 		{
-			if(ctypes!=null)
-			{
-				ctypes.remove(comp);
-			}
-
 			if(spaces!=null)
 			{
 				aspaces	= (ISpace[])spaces.values().toArray(new ISpace[spaces.size()]);
@@ -302,6 +297,14 @@ public class Application	implements IComponentInstance
 			for(int i=0; i<aspaces.length; i++)
 			{
 				aspaces[i].componentRemoved(comp);
+			}
+		}
+		
+		synchronized(this)
+		{
+			if(ctypes!=null)
+			{
+				ctypes.remove(comp);
 			}
 		}
 	}

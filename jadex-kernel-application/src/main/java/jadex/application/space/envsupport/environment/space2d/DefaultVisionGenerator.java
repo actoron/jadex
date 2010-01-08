@@ -1,6 +1,5 @@
 package jadex.application.space.envsupport.environment.space2d;
 
-import jadex.application.runtime.ISpace;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.application.space.envsupport.environment.EnvironmentEvent;
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
@@ -68,7 +67,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 	 *  @param agent The agent identifier.
 	 *  @param space The space.
 	 */
-	public void agentAdded(IComponentIdentifier agent, ISpace space)
+	public void agentAdded(IComponentIdentifier agent, IEnvironmentSpace space)
 	{
 	}
 	
@@ -77,7 +76,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 	 *  @param agent The agent identifier.
 	 *  @param space The space.
 	 */
-	public void agentRemoved(IComponentIdentifier agent, ISpace space)
+	public void agentRemoved(IComponentIdentifier agent, IEnvironmentSpace space)
 	{
 	}
 	
