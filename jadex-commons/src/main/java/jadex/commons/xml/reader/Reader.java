@@ -143,7 +143,7 @@ public class Reader
 					String id = rawattrs!=null? (String)rawattrs.get(SXML.ID): null;
 					if(id!=null && object!=null)
 					{
-//						System.out.println("ID: "+id+", "+object.getClass());
+						System.out.println("ID: "+id+", "+object.getClass());
 						readobjects.put(id, object);
 					}
 					
@@ -263,7 +263,7 @@ public class Reader
 					String id = topse.getRawAttributes()!=null? (String)topse.getRawAttributes().get(SXML.ID): null;
 					if(id!=null && val!=null)
 					{
-//						System.out.println("ID: "+id+", "+val.getClass());
+						System.out.println("ID: "+id+", "+val.getClass());
 						readobjects.put(id, val);
 					}	
 				}

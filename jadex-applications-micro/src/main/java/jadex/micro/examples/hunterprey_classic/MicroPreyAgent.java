@@ -50,8 +50,8 @@ public class MicroPreyAgent extends MicroAgent
 	public void executeBody()
 	{
 		// Todo: getAgentName()
-		myself	= new Prey(getAgentAdapter().getComponentIdentifier().getLocalName(),
-			getAgentAdapter().getComponentIdentifier(), new Location(10,10));
+		myself	= new Prey(getAgentIdentifier().getLocalName(),
+			getAgentIdentifier(), new Location(10,10));
 
 		this.rand	= new Random(hashCode());
 		
@@ -183,7 +183,7 @@ public class MicroPreyAgent extends MicroAgent
 		msg.put(SFipa.CONTENT, action);
 		msg.put(SFipa.LANGUAGE, SFipa.NUGGETS_XML);
 		msg.put(SFipa.RECEIVERS, Collections.singletonList(environment));
-		msg.put(SFipa.SENDER, getAgentAdapter().getComponentIdentifier());
+		msg.put(SFipa.SENDER, getAgentIdentifier());
 		// Todo: message service shouldn't allow sending anonymous messages (i.e. w/o sender)
 		sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE);
 	}	

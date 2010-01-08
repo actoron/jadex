@@ -10,9 +10,6 @@ public class MicroAgentMetaInfo
 {
 	//-------- attributes --------
 	
-//	/** The name. */
-//	protected String name;
-	
 	/** The description. */
 	protected String description;
 	
@@ -68,15 +65,6 @@ public class MicroAgentMetaInfo
 		return results;
 	}
 
-	/**
-	 *  Get the agent type name. 
-	 *  @return The type name.
-	 * /
-	public String getName()
-	{
-		return name;
-	}*/
-	
 	/**
 	 *  Get the description.
 	 *  @return The description.

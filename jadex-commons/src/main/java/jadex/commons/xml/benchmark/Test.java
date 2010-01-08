@@ -32,8 +32,8 @@ public class Test //extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
-				t.testArrayOrder();
-//				t.testMultiArray();
+//				t.testArrayOrder();
+				t.testMultiArray();
 //				t.testVectorModel();
 //				t.testClass();
 //				t.testDate();
@@ -109,11 +109,23 @@ public class Test //extends TestCase
 	 */
 	public void testMultiArray() throws Exception
 	{
-		String[][] array = new String[3][2]; 
-		array[0][0] = "a";
-		array[1][0] = "b";
-		array[2][0] = "c";
-		doWriteAndRead(array);
+//		String[][] array = new String[3][2]; 
+//		array[0][0] = "a";
+//		array[1][0] = "b";
+//		array[2][0] = "c";
+		
+		Object[][] data = new Object[1][8];
+
+		data[0][0] = new Long(1);
+		data[0][1] = "Hallo";
+		data[0][2] = "";
+		data[0][3] = "";
+		data[0][4] = "Moin";
+		data[0][5] = null;
+		data[0][6] = "";
+		data[0][7] = new Long(2);
+		
+		doWriteAndRead(data);
 	}
 	
 	/**
