@@ -6,6 +6,7 @@ import jadex.application.model.MAgentType;
 import jadex.application.model.MApplicationInstance;
 import jadex.application.model.MApplicationType;
 import jadex.application.model.MSpaceInstance;
+import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentFactory;
@@ -65,18 +66,50 @@ public class Application	implements IComponentInstance
 	/** Component type mapping (cid -> logical type name). */
 	protected Map	ctypes;
 	
+	/** The arguments. */
+	protected Map arguments;
+	
+	/** The arguments. */
+	protected Map results;
+
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new context.
 	 */
-	public Application(String name, ApplicationModel model, MApplicationInstance config, IComponentAdapter adapter, IExternalAccess parent)
+	public Application(String name, ApplicationModel model, MApplicationInstance config, IComponentAdapter adapter, IExternalAccess parent, Map arguments)
 	{
 		this.name	= name;
 		this.config	= config;
 		this.adapter = adapter;
 		this.model = model;
 		this.parent = parent;
+		this.arguments = arguments;
+		this.results = new HashMap();
+		
+		// Init the arguments with default values.
+		String configname = config!=null? config.getName(): null;
+		IArgument[] args = getModel().getArguments();
+		for(int i=0; i<args.length; i++)
+		{
+			if(args[i].getDefaultValue(configname)!=null)
+			{
+				if(this.arguments.get(args[i].getName())==null)
+				{
+					this.arguments.put(args[i].getName(), args[i].getDefaultValue(configname));
+				}
+			}
+		}
+		
+		// Init the results with default values.
+		IArgument[] res = model.getResults();
+		for(int i=0; i<res.length; i++)
+		{
+			if(res[i].getDefaultValue(configname)!=null)
+			{
+				this.results.put(res[i].getName(), res[i].getDefaultValue(configname));
+			}
+		}
 	}
 
 	//-------- IContext interface --------
@@ -721,6 +754,24 @@ public class Application	implements IComponentInstance
 		return model.getClassLoader();
 	}
 
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public Map getArguments()
+	{
+		return arguments;
+	}
+	
+	/**
+	 *  Set a result value.
+	 *  @param name The result name.
+	 *  @param value The result value.
+	 */
+	public void setResultValue(String name, Object value)
+	{	
+		results.put(name, value);
+	}
 	
 	/**
 	 *  Get the results of the component (considering it as a functionality).
@@ -731,7 +782,7 @@ public class Application	implements IComponentInstance
 	 */
 	public Map getResults()
 	{
-		return Collections.EMPTY_MAP;
+		return results;
 	}
 
 	/**

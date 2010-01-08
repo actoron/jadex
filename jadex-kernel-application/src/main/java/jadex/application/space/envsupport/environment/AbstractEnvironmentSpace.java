@@ -16,6 +16,7 @@ import jadex.application.space.envsupport.evaluation.SpaceObjectSource;
 import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.observer.gui.ObserverCenter;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
+import jadex.bridge.IArgument;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IPropertyObject;
@@ -160,6 +161,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		SimpleValueFetcher fetcher = new SimpleValueFetcher();
 		fetcher.setValue("$space", this);
 		fetcher.setValue("$platform", context.getServiceContainer());
+		fetcher.setValue("$args", context.getArguments());
+		fetcher.setValue("$results", context.getResults());
 		this.setFetcher(fetcher);
 		
 		List mspaceprops = mspacetype.getPropertyList("properties");

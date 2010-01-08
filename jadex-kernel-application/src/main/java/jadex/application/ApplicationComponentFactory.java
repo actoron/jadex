@@ -9,6 +9,7 @@ import jadex.application.model.MArgument;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.model.MSpaceType;
 import jadex.application.runtime.Application;
+import jadex.bridge.Argument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
@@ -18,9 +19,12 @@ import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
+import jadex.javaparser.SJavaParser;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.xml.AttributeInfo;
+import jadex.xml.ITypeConverter;
+import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.bean.BeanAttributeInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
@@ -80,14 +84,28 @@ public class ApplicationComponentFactory	implements IComponentFactory
 		
 		Set types = new HashSet();
 		
+		ITypeConverter exconv = new ITypeConverter()
+		{
+			public Object convertObject(Object val, Object root,
+				ClassLoader classloader, Object context)
+			{
+				return SJavaParser.evaluateExpression((String)val, null);
+			}
+		};
+		
 		types.add(new TypeInfo(null, "applicationtype", MApplicationType.class, "description", null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE)}, null));
+			new BeanAttributeInfo[]{new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE)}, 
+			null, null, new SubobjectInfo[]{
+			new SubobjectInfo("arguments", new AttributeInfo("argument", "argument")),
+			new SubobjectInfo("arguments", new AttributeInfo("result", "result"))
+			}));
 		types.add(new TypeInfo(null, "spacetype", MSpaceType.class));
 		types.add(new TypeInfo(null, "agenttype", MAgentType.class));
 		types.add(new TypeInfo(null, "application", MApplicationInstance.class, null, null, new BeanAttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null));
 		types.add(new TypeInfo(null, "space", MSpaceInstance.class));
 		types.add(new TypeInfo(null, "agent", MAgentInstance.class, null, null, new BeanAttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null));
-		types.add(new TypeInfo(null, "argument", MArgument.class, null, "value"));
+		types.add(new TypeInfo(null, "agent/arguments/argument", MArgument.class, null, "value"));
+		types.add(new TypeInfo(null, "applicationtype/arguments/argument", Argument.class, "description", new BeanAttributeInfo((String)null, "defaultValue", null, exconv, null)));
 		types.add(new TypeInfo(null, "import", String.class));
 
 //		String uri = "http://jadex.sourceforge.net/jadex-envspace";
@@ -172,7 +190,7 @@ public class ApplicationComponentFactory	implements IComponentFactory
 
 
 		// Create context for application.
-		context	= new Application(name, (ApplicationModel)model, app, adapter, parent);
+		context	= new Application(name, (ApplicationModel)model, app, adapter, parent, arguments);
 		
 		// todo: result listener?
 		

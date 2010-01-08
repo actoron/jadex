@@ -187,8 +187,7 @@ public class ApplicationModel implements ILoadableComponentModel
 	 */
 	public IArgument[] getArguments()
 	{
-		// todo
-		return new IArgument[0];
+		return (IArgument[])apptype.getArguments().toArray(new IArgument[0]);
 	}
 	
 	/**
@@ -197,8 +196,7 @@ public class ApplicationModel implements ILoadableComponentModel
 	 */
 	public IArgument[] getResults()
 	{
-		// todo
-		return new IArgument[0];
+		return (IArgument[])apptype.getResults().toArray(new IArgument[0]);
 	}
 	
 	/**
@@ -209,16 +207,6 @@ public class ApplicationModel implements ILoadableComponentModel
 	{
 		return true;
 	}
-	
-	/**
-	 *  Get the model type.
-	 *  @return The model type (kernel specific).
-	 * /
-	public String getType()
-	{
-		// todo:
-		return "application";
-	}*/
 	
 	/**
 	 *  Get the filename.

@@ -90,8 +90,6 @@ public class SubobjectInfo extends AbstractInfo
 		this(path, linkinfo, null, null, false);
 	}
 	
-	
-	
 	/**
 	 *  Create a link info. 
 	 *  @param xmlpath The xmlpath.

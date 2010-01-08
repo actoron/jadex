@@ -28,6 +28,16 @@ public class Argument implements IArgument
 	 * @param typename
 	 * @param defaultvalue
 	 */
+	public Argument()
+	{
+	}
+	
+	/**
+	 * @param name
+	 * @param description
+	 * @param typename
+	 * @param defaultvalue
+	 */
 	public Argument(String name, String description, String typename)
 	{
 		this.name = name;
@@ -59,6 +69,15 @@ public class Argument implements IArgument
 	{
 		return name;
 	}
+	
+	/**
+	 *  Set the name.
+	 *  @param name The name to set.
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
+	}
 
 	/**
 	 *  Get the description.
@@ -70,12 +89,30 @@ public class Argument implements IArgument
 	}
 	
 	/**
+	 *  Set the description.
+	 *  @param description The description to set.
+	 */
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+	
+	/**
 	 *  Get the typename.
 	 *  @return The typename. 
 	 */
 	public String getTypename()
 	{
 		return typename;
+	}
+	
+	/**
+	 *  Set the typename.
+	 *  @param typename The typename to set.
+	 */
+	public void setTypename(String typename)
+	{
+		this.typename = typename;
 	}
 	
 	/**
@@ -90,6 +127,15 @@ public class Argument implements IArgument
 	}
 	
 	/**
+	 *  Set the defaultvalue.
+	 *  @param defaultvalue The defaultvalue to set.
+	 */
+	public void setDefaultValue(Object defaultvalue)
+	{
+		this.defaultvalue = defaultvalue;
+	}
+
+	/**
 	 *  Check the validity of an input.
 	 *  @param input The input.
 	 *  @return True, if valid.
@@ -97,7 +143,6 @@ public class Argument implements IArgument
 	public boolean validate(String input)
 	{
 		// todo: support validation
-		
 		return true;
 	}
 

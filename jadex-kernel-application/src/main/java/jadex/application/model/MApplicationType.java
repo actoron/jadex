@@ -1,5 +1,6 @@
 package jadex.application.model;
 
+import jadex.bridge.Argument;
 import jadex.commons.SUtil;
 
 import java.util.ArrayList;
@@ -33,6 +34,12 @@ public class MApplicationType
 	/** The description. */
 	protected String description;
 	
+	/** The arguments. */
+	protected List arguments;
+	
+	/** The results. */
+	protected List results;
+	
 	//-------- constructors --------
 	
 	/**
@@ -44,6 +51,8 @@ public class MApplicationType
 		this.spacetypes = new ArrayList();
 		this.agenttypes = new ArrayList();
 		this.applications = new ArrayList();
+		this.arguments = new ArrayList();
+		this.results = new ArrayList();
 	}
 	
 	//-------- methods --------
@@ -136,6 +145,42 @@ public class MApplicationType
 	public void addMApplicationInstance(MApplicationInstance application)
 	{
 		this.applications.add(application);
+	}
+
+	/**
+	 *  Add an argument.
+	 *  @param argument The argument.
+	 */
+	public void addArgument(Argument argument)
+	{
+		this.arguments.add(argument);
+	}
+	
+	/**
+	 *  Add a result.
+	 *  @param result The result.
+	 */
+	public void addResult(Argument result)
+	{
+		this.results.add(result);
+	}
+	
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public List getArguments()
+	{
+		return this.arguments;
+	}
+
+	/**
+	 *  Get the results.
+	 *  @return The results.
+	 */
+	public List getResults()
+	{
+		return this.results;
 	}
 
 	/**

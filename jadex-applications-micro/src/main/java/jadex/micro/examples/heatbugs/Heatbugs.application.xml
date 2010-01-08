@@ -25,6 +25,13 @@
 		<import>jadex.application.space.envsupport.observer.gui.plugin.*</import>
 	</imports>
 	
+	<arguments>
+		<!-- The diffusion rate for heat distribution. -->
+		<argument name="diffusion_rate" typename="Double">0.2</argument>
+		<!-- The evaporation rate for heat cooling. -->
+		<argument name="evaporation_rate" typename="Double">0.03</argument>
+	</arguments>
+	
 	<spacetypes>
 		<env:envspacetype name="gc2dspace" width="20" height="20" class="Grid2D">
 			<env:property name="neighborhood">Grid2D.NEIGHBORHOOD_MOORE</env:property>
@@ -36,8 +43,8 @@
 			<env:property name="max_output_heat">25.0</env:property>
 			<!-- <env:property name="min_output_heat">0</env:property> -->
 			<!-- <env:property name="max_output_heat">100</env:property> -->
-			<env:property name="diffusion_rate">0.2</env:property>
-			<env:property name="evaporation_rate">0.03</env:property>
+			<env:property name="diffusion_rate">$args.diffusion_rate</env:property>
+			<env:property name="evaporation_rate">$args.evaporation_rate</env:property>
 			<env:property name="random_move_chance">0.1</env:property>
 			
 			<env:objecttypes>
