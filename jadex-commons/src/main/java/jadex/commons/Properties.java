@@ -324,7 +324,7 @@ public class Properties
 	 *  @param type The type.
 	 *  @returns Returns the string value or null if not set.
 	 */
-	public String	getStringProperty(String type)
+	public String getStringProperty(String type)
 	{
 		Property	prop	= getLatestProperty(type);
 		return prop==null? null: prop.getValue();
@@ -354,6 +354,100 @@ public class Properties
 				addSubproperties(subpropis[i]);
 			}
 		}
+	}
+	
+	//-------- static helpers --------
+	
+	/**
+	 *  Get a boolean property.
+	 *  @param type The type.
+	 *  @returns Returns false if the property is not set.
+	 */
+	public static boolean getBooleanProperty(Properties[] props, String type)
+	{
+		Property prop = getLatestProperty(props, type);
+		return prop!=null && Boolean.valueOf(prop.getValue()).booleanValue();
+	}
+	
+	/**
+	 *  Get a long property.
+	 *  @param type The type.
+	 *  @returns Returns the parsed long value, 0 if not set.
+	 */
+	public static long getLongProperty(Properties[] props, String type)
+	{
+		Property prop = getLatestProperty(props, type);
+		return prop==null? 0: Long.parseLong(prop.getValue());
+	}
+	
+	/**
+	 *  Get an int  property.
+	 *  @param type The type.
+	 *  @returns Returns the parsed int value, 0 if not set.
+	 */
+	public static int getIntProperty(Properties[] props, String type)
+	{
+		Property prop = getLatestProperty(props, type);
+		return prop==null? 0: Integer.parseInt(prop.getValue());
+	}
+	
+	/**
+	 *  Get a string  property.
+	 *  @param type The type.
+	 *  @returns Returns the string value or null if not set.
+	 */
+	public static String getStringProperty(Properties[] props, String type)
+	{
+		Property prop = getLatestProperty(props, type);
+		return prop==null? null: prop.getValue();
+	}
+	
+	/**
+	 *  Get the latest property by type.
+	 *  @param type The type name. 
+	 */
+	public static Property getLatestProperty(Properties[] props, String type)
+	{
+		Property ret = null;
+		for(int i=props.length-1; i>-1 && ret==null; i--)
+		{
+			Property[] tmp = props[i].getProperties(type);
+			if(tmp.length>0)
+				ret = tmp[tmp.length-1];
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get subproperties by type. 
+	 *  @param type The type.
+	 */
+	public static Properties[] getSubproperties(Properties[] props, String type)
+	{
+		List ret = new ArrayList();
+		for(int i=0; i<props.length; i++)
+		{
+			Properties[] tmp = props[i].getSubproperties(type);
+			for(int j=0; j<tmp.length; j++)
+				ret.add(tmp[j]);
+		}
+		return (Properties[])ret.toArray(new Properties[ret.size()]);
+	}
+	
+	/**
+	 *  Get properties by type. 
+	 *  @param type The type.
+	 */
+	public static Property[] getProperties(Properties[] props, String type)
+	{
+		List ret = new ArrayList();
+		for(int i=0; i<props.length; i++)
+		{
+			Property[] tmp = props[i].getProperties(type);
+			for(int j=0; j<tmp.length; j++)
+				ret.add(tmp[j]);
+		}
+		return (Property[])ret.toArray(new Property[ret.size()]);
 	}
 	
 	/**

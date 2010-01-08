@@ -11,6 +11,7 @@ import jadex.commons.xml.TypeInfo;
 import jadex.commons.xml.TypeInfoPathManager;
 import jadex.commons.xml.TypeInfoTypeManager;
 import jadex.commons.xml.reader.IObjectReaderHandler;
+import jadex.commons.xml.reader.Reader;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
@@ -201,6 +202,10 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					{
 						// Must have empty constructor.
 						ret = clazz.newInstance();
+					}
+					else if(String.class.equals(clazz))
+					{
+						ret = Reader.STRING_MARKER;
 					}
 				}
 			}

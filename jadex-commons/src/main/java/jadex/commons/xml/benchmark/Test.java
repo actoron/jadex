@@ -32,17 +32,17 @@ public class Test //extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
-//				t.testArrayOrder();
+				t.testArrayOrder();
 				t.testMultiArray();
-//				t.testVectorModel();
-//				t.testClass();
-//				t.testDate();
-//				t.testColor();
-//				t.testArray();
-//				t.testBean();
-//				t.testList();
-//				t.testSet();
-//				t.testMap();
+				t.testVectorModel();
+				t.testClass();
+				t.testDate();
+				t.testColor();
+				t.testArray();
+				t.testBean();
+				t.testList();
+				t.testSet();
+				t.testMap();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -63,7 +63,7 @@ public class Test //extends TestCase
 	{
 		String xml = JavaWriter.objectToXML(wo, null);
 		
-		System.out.println("xml is:"+xml);
+//		System.out.println("xml is:"+xml);
 		
 		Object ro = JavaReader.objectFromXML(xml, null);
 		
@@ -92,10 +92,10 @@ public class Test //extends TestCase
 		Object[][] data = new Object[1][8];
 
 		data[0][0] = new Long(1);
-		data[0][1] = "Hallo";
+		data[0][1] = "A";
 		data[0][2] = "";
 		data[0][3] = "";
-		data[0][4] = "Moin";
+		data[0][4] = "B";
 		data[0][5] = null;
 		data[0][6] = "";
 		data[0][7] = new Long(2);

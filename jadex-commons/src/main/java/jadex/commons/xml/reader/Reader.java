@@ -29,10 +29,14 @@ import javax.xml.stream.XMLStreamReader;
  */
 public class Reader
 {
-	//-------- static part --------
+	//-------- constants --------
 	
 	/** The debug flag. */
 	public static boolean DEBUG = false;
+	
+	/** The string marker object. */
+	public static final Object STRING_MARKER = new String();
+
 	
 	//-------- attributes --------
 	
@@ -143,7 +147,7 @@ public class Reader
 					String id = rawattrs!=null? (String)rawattrs.get(SXML.ID): null;
 					if(id!=null && object!=null)
 					{
-						System.out.println("ID: "+id+", "+object.getClass());
+//						System.out.println("ID: "+id+", "+object.getClass());
 						readobjects.put(id, object);
 					}
 					
@@ -234,10 +238,10 @@ public class Reader
 				final TypeInfo typeinfo = handler.getTypeInfo(localname, fullpath, topse.getRawAttributes());
 
 				// Hack. Change object to content when it is element of its own.
-				if(topse.getContent()!=null && topse.getContent().trim().length()>0 && topse.getObject()==null)
+				if((topse.getObject()==null && topse.getContent()!=null && topse.getContent().trim().length()>0) || topse.getObject()==STRING_MARKER)
 				{
 					// Handle possible content type conversion.
-					Object val = topse.getContent();
+					Object val = topse.getContent()!=null? topse.getContent(): topse.getObject();
 					if(typeinfo!=null && typeinfo.getContentInfo()!=null)
 					{
 						Object coninfo = typeinfo.getContentInfo();
@@ -263,7 +267,7 @@ public class Reader
 					String id = topse.getRawAttributes()!=null? (String)topse.getRawAttributes().get(SXML.ID): null;
 					if(id!=null && val!=null)
 					{
-						System.out.println("ID: "+id+", "+val.getClass());
+//						System.out.println("ID: "+id+", "+val.getClass());
 						readobjects.put(id, val);
 					}	
 				}

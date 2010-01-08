@@ -88,7 +88,7 @@ public class Platform extends AbstractPlatform
 	public static final String FALLBACK_CONFIGURATION = "jadex/adapter/standalone/standalone_conf.xml";
 
 	/** The configuration. */
-	protected Properties conf;
+	protected Properties[] configurations;
 
 	//-------- attributes --------
 
@@ -111,7 +111,7 @@ public class Platform extends AbstractPlatform
 	/**
 	 *  Read several property files and merge them.
 	 */
-	protected static Properties readProperties(String[] conffiles, ClassLoader classloader) throws Exception
+	protected static Properties[] readProperties(String[] conffiles, ClassLoader classloader) throws Exception
 	{
 		Properties[] props = new Properties[conffiles.length];
 		for(int i=0; i<props.length; i++)
@@ -121,27 +121,27 @@ public class Platform extends AbstractPlatform
 		}
 		
 		// Unify properties
-		Properties ret = props[0];
-		for(int i=1; i<props.length; i++)
-		{
-			ret.addProperties(props[i]);
-		}
+//		Properties ret = props[0];
+//		for(int i=1; i<props.length; i++)
+//		{
+//			ret.addProperties(props[i]);
+//		}
 		
-		return ret;
+		return props;
 	}
 	
 	/**
 	 *  Create a new Platform.
 	 */
-	public Platform(Properties configuration)
+	public Platform(Properties[] configurations)
 	{
-		this(configuration, null);
+		this(configurations, null);
 	}
 	
 	/**
 	 *  Create a new Platform.
 	 */
-	public Platform(Properties configuration, IServiceContainer parent)
+	public Platform(Properties[] configurations, IServiceContainer parent)
 	{
 		//    	long freeStartupMemory = Runtime.getRuntime().freeMemory();
 		//    	long startupTime = System.currentTimeMillis();
@@ -166,12 +166,13 @@ public class Platform extends AbstractPlatform
 		// Save start time.
 		//    	Configuration.getConfiguration().setProperty(Configuration.STARTTIME, ""+starttime);
 
-		this.conf = configuration;//;.getSubproperty(PLATFORM);
+		this.configurations = configurations;
 		
 //		this.services = new LinkedHashMap();
 //		this.messagetypes = new LinkedHashMap();
-		this.shutdowntime = conf.getLongProperty(PLATFORM_SHUTDOWN_TIME);
-		String	name = (String)((Property)conf.getProperty(PLATFORMNAME)).getValue();
+		this.shutdowntime = Properties.getLongProperty(configurations, PLATFORM_SHUTDOWN_TIME);
+		Property pname = (Property)Properties.getLatestProperty(configurations, PLATFORMNAME);
+		String	name = pname!=null? pname.getValue(): null;
 		if(name == null)
 		{
 			try
@@ -200,7 +201,7 @@ public class Platform extends AbstractPlatform
 		
 		// Initialize services.
 //		props = platconf.getSubproperty(SERVICES).getProperties();
-		init(conf.getSubproperties(SERVICES), fetcher, parent);
+		init(Properties.getSubproperties(configurations, SERVICES), fetcher, parent);
 		
 //		for(int i = 0; i < props.length; i++)
 //		{
@@ -256,7 +257,7 @@ public class Platform extends AbstractPlatform
 		}
 		
 		// Initialize the lib service with extra paths
-		Property[] libpaths = conf.getProperties(LIBPATH);
+		Property[] libpaths = Properties.getProperties(configurations, LIBPATH);
 		if(libpaths.length>0)
 		{
 			ILibraryService ls = (ILibraryService)getService(ILibraryService.class);
@@ -321,14 +322,14 @@ public class Platform extends AbstractPlatform
 	
 			// Create daemon agents.
 			this.daemonagents = SCollection.createLinkedHashSet();
-			Property[] props = conf.getProperties(DAEMONAGENT);
+			Property[] props = Properties.getProperties(configurations, DAEMONAGENT);
 //			System.out.println("starting: "+props.length);
 			for(int i = 0; i < props.length; i++)
 			{
 //				System.out.println("starting: "+props[i].getName());
 				createComponent(props[i].getName(), props[i].getValue(), null, null, true);
 			}
-			Properties[] subprops = conf.getSubproperties(DAEMONAGENT);
+			Properties[] subprops = Properties.getSubproperties(configurations, DAEMONAGENT);
 			for(int i = 0; i < subprops.length; i++)
 			{
 				Map args = getArguments(subprops[i]);
@@ -338,12 +339,12 @@ public class Platform extends AbstractPlatform
 			}
 	
 			// Create application agents.
-			props = conf.getProperties(AGENT);
+			props = Properties.getProperties(configurations, AGENT);
 			for(int i = 0; i < props.length; i++)
 			{
 				createComponent(props[i].getName(), props[i].getValue(), null, null, false);
 			}
-			subprops = conf.getSubproperties(AGENT);
+			subprops = Properties.getSubproperties(configurations, AGENT);
 			for(int i = 0; i < subprops.length; i++)
 			{
 				Map args = getArguments(subprops[i]);
@@ -353,12 +354,12 @@ public class Platform extends AbstractPlatform
 			}
 			
 			// Create applications.
-			props = conf.getProperties(APPLICATION);
+			props = Properties.getProperties(configurations, APPLICATION);
 			for(int i = 0; i < props.length; i++)
 			{
 				createComponent(props[i].getName(), props[i].getValue(), null, null, false);
 			}
-			subprops = conf.getSubproperties(APPLICATION);
+			subprops = Properties.getSubproperties(configurations, APPLICATION);
 			for(int i = 0; i < subprops.length; i++)
 			{
 				Map args = getArguments(subprops[i]);
@@ -368,7 +369,7 @@ public class Platform extends AbstractPlatform
 			}
 		}
 		
-		conf = null;
+		configurations = null;
 	}
 	
 	/**
