@@ -1,6 +1,5 @@
 package jadex.bpmn;
 
-import jadex.bpmn.model.Argument;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MAnnotation;
 import jadex.bpmn.model.MAnnotationDetail;
@@ -15,6 +14,7 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bridge.Argument;
 import jadex.bridge.IArgument;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;

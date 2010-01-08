@@ -1,6 +1,5 @@
-package jadex.bpmn.model;
+package jadex.bridge;
 
-import jadex.bridge.IArgument;
 
 /**
  *  Simple default implementation for an argument.
