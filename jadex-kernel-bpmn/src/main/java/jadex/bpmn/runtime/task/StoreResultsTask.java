@@ -16,7 +16,7 @@ public class StoreResultsTask extends AbstractTask
 		if(context.hasParameterValue("name"))
 		{
 			String name = (String)context.getParameterValue("name");
-			String val = (String)context.getParameterValue("value");
+			Object val = context.getParameterValue("value");
 			context.setResultValue(name, val);
 		}
 		
@@ -25,7 +25,7 @@ public class StoreResultsTask extends AbstractTask
 			if(context.hasParameterValue("name"+i))
 			{
 				String name = (String)context.getParameterValue("name"+i);
-				String val = (String)context.getParameterValue("value"+i);
+				Object val = context.getParameterValue("value"+i);
 				context.setResultValue(name, val);
 			}
 			else

@@ -143,7 +143,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		
 		JPanel movePanel = new JPanel(new GridBagLayout());
 		//String[] moveButtonNames = {"Up", "Right", "Down", "Left"};
-		String baseImgLoc = "/jadex/adapter/base/envsupport/observer/images/";
+		String baseImgLoc = "/jadex/application/space/envsupport/observer/images/";
 		String[] moveImgNames = {"arrow_up.png", "arrow_right.png", "arrow_down.png", "arrow_left.png", "x_small.png"};
 		int[] moveButtonPos = {1, 2, 1, 0};
 		for (int i = 0; i < 5; ++i)

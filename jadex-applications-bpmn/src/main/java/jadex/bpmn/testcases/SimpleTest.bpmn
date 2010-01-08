@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_Kpd_YfxtEd6BS97d4w8Gew" iD="_Kpd_YPxtEd6BS97d4w8Gew">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_MdPqIfxtEd6BS97d4w8Gew" iD="_MdPqIPxtEd6BS97d4w8Gew" name="package jadex.bpmn.testcases&#xD;&#xA;&#xD;&#xA;import jadex.bpmn.runtime.task.*&#xD;&#xA;import jadex.adapter.base.test.*&#xD;&#xA;import jadex.bridge.*&#xD;&#xA;&#xD;&#xA;result new Argument(&quot;testresults&quot;, &quot;Test result.&quot;, &quot;Testcase&quot;)">
+    <associations xmi:type="bpmn:Association" xmi:id="_MdZbIPxtEd6BS97d4w8Gew"/>
+  </artifacts>
+  <pools xmi:type="bpmn:Pool" xmi:id="_Kp6EQfxtEd6BS97d4w8Gew" iD="_Kp6EQPxtEd6BS97d4w8Gew" associations="_MdZbIPxtEd6BS97d4w8Gew" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_aZp6qfxtEd6BS97d4w8Gew" iD="_aZp6ofxtEd6BS97d4w8Gew" name="Save result&#xD;&#xA;class = StoreResultsTask.class&#xD;&#xA;in String name = &quot;testresults&quot;&#xD;&#xA;in Object value = new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Simple BPMN testcase.&quot;, true, null)})" activityType="Task"/>
+  </pools>
+</bpmn:BpmnDiagram>
