@@ -186,25 +186,24 @@ public class StartSimulationExperimentsPlan extends Plan {
 	}
 
 	private void startApplication(String experimentID) {
-//		IApplicationExternalAccess app = (IApplicationExternalAccess)getScope().getServiceContainer()		
-//		AGRSpace agrs = (AGRSpace)app.getSpace("myagrspace");
-		
-//		IServiceContainer container = getExternalAccess()
-//				.getApplicationContext().getServiceContainer();
-//		IServiceContainer container = (IServiceContainer)getScope().getServiceContainer(); 
-		String appName = "MarsWorld4SimulationExperiments#" + experimentID; // change Name here!
+ 
+		String appName = "MarsWorld4SimulationExperiments#" + experimentID;
+//		adex.micro.examples.heatbugs
+//		String fileName = "..\\jadex-applications-micro\\target\\classes\\jadex\\micro\\examples\\heatbugs\\Heatbugs.application.xml";
 		String fileName = "..\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml";
 		String configName = "1 Sentry / 2 Producers / 3 Carries";
+//		String configName = "20x20 and 10 bugs";
 		Map args = new HashMap();
+//		args.put(new String("evaporation_rat2e"), new Double(0.45));
+		args.put(new String("tmp_mission_time"), new String("Antisa"));
+//		<argument name="evaporation_rate" typename="Double">0.03</argument>
 
 		try {			
 			IComponentExecutionService executionService =  (IComponentExecutionService) getScope().getServiceContainer().getService(IComponentExecutionService.class);
 			
-//			SComponentFactory.createApplication(container, appName, fileName,
-//					configName, args);
+
 			executionService.createComponent(appName, fileName, configName, args, false, null, null, null);
-//			createApplication(container, appName, fileName,
-//					configName, args);
+
 		} catch (Exception e) {
 			// JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this),
 			// "Could not start application: "+e,
