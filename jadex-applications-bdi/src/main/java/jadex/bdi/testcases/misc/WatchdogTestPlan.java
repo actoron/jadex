@@ -1,6 +1,6 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.bdi.planlib.test.TestReport;
+import jadex.adapter.base.test.TestReport;
 import jadex.bdi.planlib.watchdog.ContactData;
 import jadex.bdi.planlib.watchdog.ObservationDescription;
 import jadex.bdi.runtime.GoalFailureException;

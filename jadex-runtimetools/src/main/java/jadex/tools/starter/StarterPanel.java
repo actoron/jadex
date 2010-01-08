@@ -757,8 +757,8 @@ public class StarterPanel extends JPanel
 		{
 			start.setEnabled(false);
 			config.removeAllItems();
-			clearArguments();
-			clearResults();
+//			clearArguments();
+//			clearResults();
 			setAgentName("");
 			clearApplicationName();
 			filename.setText("");
@@ -1015,7 +1015,7 @@ public class StarterPanel extends JPanel
 	protected void refreshArguments()
 	{
 		// Assert that all argument components are there.
-		if(arguments==null || argelems==null)
+		if(model==null || arguments==null || argelems==null)
 			return;
 		
 		for(int i=0; argelems!=null && i<argelems.size(); i++)
@@ -1068,7 +1068,7 @@ public class StarterPanel extends JPanel
 	protected void refreshResults()
 	{
 		// Assert that all argument components are there.
-		if(results==null || reselems==null)
+		if(model==null || results==null || reselems==null)
 			return;
 		
 		// Find results of specific instance.

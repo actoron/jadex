@@ -1002,8 +1002,8 @@ public class OAVBDIMetaModel
 		beliefset_has_result = beliefset_type.createAttributeType("mbeliefset_has_result", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
 		
 		// belief ref
-		beliefreference_has_argument = beliefreference_type.createAttributeType("mbeliefref_has_argument", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
-		beliefreference_has_result = beliefreference_type.createAttributeType("mbeliefref_has_result", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		beliefreference_has_argument = beliefreference_type.createAttributeType("mbeliefreference_has_argument", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
+		beliefreference_has_result = beliefreference_type.createAttributeType("mbeliefreference_has_result", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);
 
 		// beliefset ref
 		beliefsetreference_has_argument = beliefsetreference_type.createAttributeType("mbeliefsetref_has_argument", OAVJavaType.java_boolean_type, OAVAttributeType.NONE, Boolean.FALSE);

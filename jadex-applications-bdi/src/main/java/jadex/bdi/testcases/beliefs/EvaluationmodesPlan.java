@@ -1,6 +1,6 @@
 package jadex.bdi.testcases.beliefs;
 
-import jadex.bdi.planlib.test.TestReport;
+import jadex.adapter.base.test.TestReport;
 import jadex.bdi.runtime.Plan;
 
 import java.util.Date;

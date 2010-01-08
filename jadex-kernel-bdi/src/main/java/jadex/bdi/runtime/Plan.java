@@ -570,13 +570,24 @@ public abstract class Plan extends AbstractPlan
 		 */
 		public Object waitForResult()
 		{
+			return waitForResult(-1);
+		}
+		
+		/**
+		 *  Wait for the result.
+		 *  @param timeout	The timeout.
+		 *  @return The result.
+		 *  @throws	TimeoutException when result is not available in specified time frame.
+		 */
+		public Object waitForResult(long timeout)
+		{
 			if(!getInterpreter().isPlanThread())
 				throw new RuntimeException("SyncResultListener may only be used from plan thread.");
 			
 			if(!alreadyresumed)
 			{
 				this.alreadysuspended	= true;
-				waitForExternalCondition(this);
+				waitForExternalCondition(this, timeout);
 			}
 			
 			// Reset to allow listener being reused

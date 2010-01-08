@@ -95,6 +95,7 @@ public class TupleExtractor implements IValueExtractor
 	 */
 	public boolean isAffected(int tupleindex, OAVAttributeType attr)
 	{
+		// todo: this.tupleindex?
 		return tupleindex==tupleindex && SUtil.equals(this.attr, attr);
 	}
 	

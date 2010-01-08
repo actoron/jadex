@@ -254,7 +254,7 @@ public class AgentRules
 									AgentRules.initBelief(state, scope[1], mbel, null);
 								}
 								Object rbel = state.getAttributeValue(scope[1], OAVBDIRuntimeModel.capability_has_beliefs, mbel);	
-								Object val = BeliefRules.getBeliefValue(state, rbel, ragent);
+								Object val = BeliefRules.getBeliefValue(state, rbel, scope[1]);
 								res.put(resname, val);
 								found = true;
 							}

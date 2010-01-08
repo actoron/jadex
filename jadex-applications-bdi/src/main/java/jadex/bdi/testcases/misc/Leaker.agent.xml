@@ -29,14 +29,11 @@
 			<!-- Todo: support old (v1) number of runs. -->
 			<!-- <fact>10000</fact> -->
 		</belief>
-		<beliefref name="keepalive" exported="true">
-			<concrete ref="testcap.keepalive"/>
-		</beliefref>
 		<beliefref name="timeout"  exported="true">
 			<concrete ref="testcap.timeout"/>
 		</beliefref>
-		<beliefref name="testcenter"  exported="true">
-			<concrete ref="testcap.testcenter"/>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
 		</beliefref>
 		<belief name="test" class="int" exported="true"
 			description="The test to run (1=goals, 2=conditions, 3=internal events, 4=message events, 0=all tests).">

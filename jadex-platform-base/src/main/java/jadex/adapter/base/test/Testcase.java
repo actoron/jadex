@@ -1,4 +1,4 @@
-package jadex.bdi.planlib.test;
+package jadex.adapter.base.test;
 
 import jadex.commons.SUtil;
 

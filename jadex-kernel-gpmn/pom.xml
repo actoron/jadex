@@ -10,7 +10,18 @@
     <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
   </parent>
   <build>
-  <resources>
+   <plugins>
+      <!-- Java 1.6 javax.xml.stream.* -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+    </plugins>
+    <resources>
       <resource>
       	<directory>src/test/java</directory>
         <excludes>
@@ -18,7 +29,7 @@
         </excludes>
       </resource>
     </resources>
-    </build>
+  </build>
   <dependencies>
   	<dependency>
 	    <groupId>junit</groupId>

@@ -14,7 +14,7 @@
 	<imports>
 		<import>jadex.adapter.base.fipa.*</import>
 		<import>jadex.bridge.IComponentIdentifier</import>
-		<import>jadex.bdi.planlib.test.TestReport</import>
+		<import>jadex.adapter.base.test.TestReport</import>
 		<import>jadex.bdi.testcases.ResultPlan</import>
 		<import>java.util.*</import>
 	</imports>

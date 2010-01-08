@@ -12,7 +12,7 @@
 	package="jadex.bdi.testcases.misc">
 	
 	<imports>
-		<import>jadex.bdi.planlib.test.TestReport</import>
+		<import>jadex.adapter.base.test.*</import>
 		<import>jadex.bdi.testcases.ResultPlan</import>
 		<import>jadex.adapter.base.fipa.*</import>
 	</imports>
@@ -27,8 +27,8 @@
 		<beliefref name="timeout"  exported="true">
 			<concrete ref="testcap.timeout"/>
 		</beliefref>
-		<beliefref name="testcenter"  exported="true">
-			<concrete ref="testcap.testcenter"/>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
 		</beliefref>
 	</beliefs>
 	

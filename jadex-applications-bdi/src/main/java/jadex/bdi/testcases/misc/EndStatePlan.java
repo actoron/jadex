@@ -4,7 +4,7 @@ import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.adapter.base.fipa.SFipa;
-import jadex.bdi.planlib.test.TestReport;
+import jadex.adapter.base.test.TestReport;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;

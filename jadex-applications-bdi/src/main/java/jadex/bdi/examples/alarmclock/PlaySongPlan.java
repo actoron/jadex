@@ -79,7 +79,7 @@ public class PlaySongPlan extends Plan
 					{
 						try
 						{
-							lis.resultAvailable(null);
+							lis.resultAvailable(this, null);
 						}
 						catch(Exception e) {}
 					}

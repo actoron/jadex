@@ -1,10 +1,10 @@
 package jadex.bdi.testcases.planlib;
 
+import jadex.adapter.base.test.TestReport;
 import jadex.bdi.planlib.protocols.IProposalEvaluator;
 import jadex.bdi.planlib.protocols.NegotiationRecord;
 import jadex.bdi.planlib.protocols.ParticipantProposal;
 import jadex.bdi.planlib.protocols.ProposalEvaluator;
-import jadex.bdi.planlib.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.testcases.AbstractMultipleAgentsPlan;

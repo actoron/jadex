@@ -14,7 +14,7 @@
 
 		<imports>
 			<import>jadex.adapter.base.fipa.*</import>
-			<import>jadex.bdi.planlib.test.*</import>
+			<import>jadex.adapter.base.test.*</import>
 		</imports>
 
 		<capabilities>
@@ -67,7 +67,7 @@
 				<parameter name="language" class="String" direction="fixed">
 					<value>SFipa.NUGGETS_XML</value>
 				 </parameter>
-				 <match>$content instanceof jadex.bdi.planlib.test.Testcase</match>
+				 <match>$content instanceof Testcase</match>
 			</messageevent>
 		</events>
 

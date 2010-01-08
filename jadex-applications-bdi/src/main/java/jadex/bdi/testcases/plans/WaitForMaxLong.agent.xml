@@ -13,7 +13,7 @@
 	package="jadex.bdi.testcases.plans">
 
 	<imports>
-		<import>jadex.bdi.planlib.test.TestReport</import>
+		<import>jadex.adapter.base.test.*</import>
 	</imports>
 
 	<capabilities>
@@ -24,8 +24,8 @@
 		<beliefref name="timeout"  exported="true">
 			<concrete ref="testcap.timeout"/>
 		</beliefref>
-		<beliefref name="testcenter"  exported="true">
-			<concrete ref="testcap.testcenter"/>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
 		</beliefref>
 		<belief name="cnt" class="int">
 			<fact>0</fact>

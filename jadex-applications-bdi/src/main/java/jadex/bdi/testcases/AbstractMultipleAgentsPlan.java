@@ -1,6 +1,6 @@
 package jadex.bdi.testcases;
 
-import jadex.bdi.planlib.test.TestReport;
+import jadex.adapter.base.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentExecutionService;
@@ -98,7 +98,8 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 				SyncResultListener	listener	= new SyncResultListener();
 				IComponentExecutionService ces	= (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
 				ces.destroyComponent((IComponentIdentifier)agents.get(i), listener);
-				IComponentIdentifier	aid	= (IComponentIdentifier)listener.waitForResult();
+//				IComponentIdentifier	aid	= (IComponentIdentifier)
+					listener.waitForResult();
 			}
 			catch(GoalFailureException e)
 			{

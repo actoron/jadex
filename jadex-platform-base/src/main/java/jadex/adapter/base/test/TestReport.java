@@ -1,4 +1,4 @@
-package jadex.bdi.planlib.test;
+package jadex.adapter.base.test;
 
 /**
  *  A test report captures the description and results of a test.

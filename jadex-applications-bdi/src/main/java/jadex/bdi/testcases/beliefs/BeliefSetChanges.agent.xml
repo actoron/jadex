@@ -38,8 +38,8 @@ Test 7: Test if '$removedfact' can be accessed within body expression.
 		<beliefref name="timeout"  exported="true">
 			<concrete ref="testcap.timeout"/>
 		</beliefref>
-		<beliefref name="testcenter"  exported="true">
-			<concrete ref="testcap.testcenter"/>
+		<beliefref name="testresults" result="true">
+			<concrete ref="testcap.testresults"/>
 		</beliefref>
 
 		<beliefset name="belset_a" class="String">

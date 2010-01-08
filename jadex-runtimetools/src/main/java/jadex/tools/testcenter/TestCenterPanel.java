@@ -1,7 +1,7 @@
 package jadex.tools.testcenter;
 
 import jadex.adapter.base.SComponentFactory;
-import jadex.bdi.planlib.test.Testcase;
+import jadex.adapter.base.test.Testcase;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
@@ -1042,7 +1042,6 @@ public class TestCenterPanel extends JSplitPane
 					testcases[i]	= new Testcase(names[i]);
 					IGoal pt = ((AgentControlCenter)plugin.getJCC()).getAgent().createGoal("perform_test");
 					pt.getParameter("testcase").setValue(testcases[i]);
-//					pt.getParameter("classloader").setValue(plugin.getModelExplorer().getClassLoader());
 					pt.addGoalListener(this);
 					goals.add(pt);
 					((AgentControlCenter)plugin.getJCC()).getAgent().dispatchTopLevelGoal(pt);

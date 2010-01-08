@@ -11,8 +11,7 @@
 	name="Test">
 
 	<imports>
-		<import>jadex.bridge.IComponentIdentifier</import>
-		<import>jadex.adapter.base.fipa.SFipa</import>
+		<import>jadex.adapter.base.test.*</import>
 	</imports>
 
 	<beliefs>
@@ -27,12 +26,9 @@
 			<!-- <fact>20000</fact> -->
 		</belief>
 
-		<!-- The test center identifier (null when the agent was not started from the test center). -->
-		<belief name="testcenter" class="IComponentIdentifier" exported="true"/>
-
-		<!-- Keep the agent alive after their tests have been performed. -->
-		<belief name="keepalive" class="boolean" exported="true">
-			<fact>false</fact>
+		<!-- The results have to be published by the agent. -->
+		<belief name="testresults" class="Testcase" exported="true" evaluationmode="pull">
+			<fact>new Testcase($beliefbase.testcase_cnt, $beliefbase.reports)</fact>
 		</belief>
 
 		<!-- The off flag. -->
@@ -84,40 +80,15 @@
 	</goals>
 
 	<plans>
-		<!-- Send results to test center. -->
-		<plan name="send_reports">
-			<body class="SendReportsPlan" />
-			<trigger>
-				<goal ref="tests_finished"/>
-				<goal ref="test_timeout"/>
-			</trigger>
-			<precondition>$beliefbase.getBelief("testcenter").getFact()!=null</precondition>
-		</plan>
-
-		<!-- Print results to console. -->
-		<plan name="print_reports">
-			<body class="PrintReportsPlan" />
+		<!-- Stop the test agent. -->
+		<plan name="finished_plan">
+			<body class="FinishedPlan" />
 			<trigger>
 				<goal ref="tests_finished"/>
 				<goal ref="test_timeout"/>
 			</trigger>
 		</plan>
 	</plans>
-
-	<events>
-		<!--  The inform reports message event. -->
-		<messageevent name="inform_reports" type="fipa" direction="send">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.INFORM</value>
-			</parameter>
-			<parameter name="reply_with" class="String">
-				<value>SFipa.createUniqueId($scope.getAgentName())</value>
-			</parameter>
-			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
- 			</parameter>
-		</messageevent>
-	</events>
 
 	<configurations>
 		<configuration name="default" />

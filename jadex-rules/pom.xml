@@ -14,6 +14,17 @@
     <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
   </parent>
   <build>
+   <plugins>
+      <!-- Java 1.6 javax.xml.stream.* -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+    </plugins>
     <resources>
       <resource>
       	<directory>src/main/java</directory>

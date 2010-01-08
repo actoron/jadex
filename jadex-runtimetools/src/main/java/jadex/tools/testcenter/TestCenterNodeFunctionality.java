@@ -1,11 +1,9 @@
 package jadex.tools.testcenter;
 
 import jadex.adapter.base.SComponentFactory;
-import jadex.bdi.interpreter.OAVAgentModel;
-import jadex.bdi.interpreter.OAVBDIMetaModel;
+import jadex.bridge.IArgument;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
-import jadex.rules.state.IOAVState;
 import jadex.tools.common.CombiIcon;
 import jadex.tools.common.modeltree.DefaultNodeFunctionality;
 import jadex.tools.common.modeltree.DirNode;
@@ -15,9 +13,7 @@ import jadex.tools.common.modeltree.ModelExplorer;
 import jadex.tools.common.modeltree.ModelExplorerTreeModel;
 import jadex.tools.common.modeltree.NodeTask;
 
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.Icon;
@@ -200,35 +196,21 @@ public class TestCenterNodeFunctionality extends DefaultNodeFunctionality
 				else
 				{
 					String	file	= fn.getFile().getAbsolutePath();
-//					if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
 					if(SComponentFactory.isLoadable(jcc.getServiceContainer(), file))
 					{
 						try
 						{
-//							ILoadableElementModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
 							ILoadableComponentModel model = SComponentFactory.loadModel(jcc.getServiceContainer(), file);
 							
-							if(model!=null)
+							if(model!=null && model.getReport().isEmpty())
 							{
-								boolean ok	= model.getReport().isEmpty();
-
-								// HACK!!!
-								if(ok && model instanceof OAVAgentModel)
+								IArgument[]	results	= model.getResults();
+								for(int i=0; !newtest && i<results.length; i++)
 								{
-									IOAVState	state	= ((OAVAgentModel)model).getState();
-									Object	magent	= ((OAVAgentModel)model).getHandle();
-									Collection	caparefs	= state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_capabilityrefs);
-									if(caparefs!=null)
-									{
-										for(Iterator it=caparefs.iterator(); !newtest && it.hasNext(); )
-										{
-											Object	name	= state.getAttributeValue(it.next(), OAVBDIMetaModel.capabilityref_has_file);
-											newtest = "jadex.bdi.planlib.test.Test".equals(name);
-										}
-									}
+									if(results[i].getName().equals("testresults") && results[i].getTypename().equals("Testcase"))
+										newtest	= true;
 								}
 							}
-							// else unknown jadex file type -> ignore.
 						}
 						catch(Exception e)
 						{

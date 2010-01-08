@@ -66,8 +66,7 @@ public class MBeliefArgument	implements IArgument
 	 */
 	public String getTypename()
 	{
-		return SReflect.getInnerClassName((Class)state.getAttributeValue(
-			handle, OAVBDIMetaModel.typedelement_has_class));
+		return SReflect.getInnerClassName(findType(scope, handle));
 	}
 	
 	/**
@@ -183,6 +182,43 @@ public class MBeliefArgument	implements IArgument
 				
 				ret = findDefaultValue(subcapa, belref, subconfigname);
 			}
+		}
+		
+		return ret;
+	}
+
+	/**
+	 *  Find the belief/ref type.
+	 */
+	protected Class	findType(Object scope, Object handle)
+	{
+		Class	ret	= null;
+		
+		if(OAVBDIMetaModel.belief_type.equals(state.getType(handle)))
+		{
+			ret	= (Class)state.getAttributeValue(handle, OAVBDIMetaModel.typedelement_has_class);
+		}
+		else
+		{
+			String name = (String)state.getAttributeValue(handle, OAVBDIMetaModel.elementreference_has_concrete);
+			Object belref;
+			int idx = name.indexOf(".");
+			if(idx==-1)
+			{
+				belref = state.getAttributeValue(scope, OAVBDIMetaModel.capability_has_beliefrefs, name);
+				name = (String)state.getAttributeValue(belref, OAVBDIMetaModel.elementreference_has_concrete);
+			}
+			String capaname = name.substring(0, idx);
+			String belname = name.substring(idx+1);
+			
+			Object subcaparef = state.getAttributeValue(scope, OAVBDIMetaModel.capability_has_capabilityrefs, capaname);
+			Object subcapa  = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
+			
+			belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefs, belname);
+			if(belref==null)
+				belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefrefs, belname);
+			
+			ret = findType(subcapa, belref);
 		}
 		
 		return ret;
