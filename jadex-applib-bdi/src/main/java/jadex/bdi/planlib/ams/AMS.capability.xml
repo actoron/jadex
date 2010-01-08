@@ -51,6 +51,11 @@
 			<parameter name="start" class="boolean">
 				<value>true</value>
 			</parameter>
+			<!-- Context the agent should be started in (defaults to starting agent's parent). -->
+			<parameter name="parent" class="jadex.bridge.IComponentIdentifier">
+				<value>$scope.getParent().getComponentIdentifier()</value>
+			</parameter>
+			
 		</achievegoal>
 
 		<!-- Destroy the given agent. -->
@@ -137,6 +142,9 @@
 			</parameter>
 			<parameter name="start" class="boolean">
  				<goalmapping ref="ams_create_agent.start"/>
+			</parameter>
+			<parameter name="parent" class="jadex.bridge.IComponentIdentifier">
+ 				<goalmapping ref="ams_create_agent.parent"/>
 			</parameter>
 			<body class="AMSLocalCreateAgentPlan" />
 			<trigger>
@@ -265,6 +273,9 @@
 			</parameter>
 			<parameter name="start" class="boolean">
  				<goalmapping ref="ams_create_agent.start"/>
+			</parameter>
+			<parameter name="parent" class="jadex.bridge.IComponentIdentifier">
+ 				<goalmapping ref="ams_create_agent.parent"/>
 			</parameter>
 			<body class="AMSRemoteCreateAgentPlan" />
 			<trigger>

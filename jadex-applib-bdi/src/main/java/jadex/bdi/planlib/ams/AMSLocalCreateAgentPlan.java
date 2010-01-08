@@ -24,11 +24,12 @@ public class AMSLocalCreateAgentPlan extends Plan
 		Map	args	= (Map)getParameter("arguments").getValue();
 		boolean	start	= ((Boolean)getParameter("start").getValue()).booleanValue();
 		IServiceContainer plat	= getScope().getServiceContainer();
+		IComponentIdentifier	parent	= (IComponentIdentifier)getParameter("parent").getValue();
 
 		try
 		{
 			SyncResultListener lis = new SyncResultListener();
-			((IComponentExecutionService)plat.getService(IComponentExecutionService.class)).createComponent(name, type, config, args, !start, lis, getComponentIdentifier(), null);
+			((IComponentExecutionService)plat.getService(IComponentExecutionService.class)).createComponent(name, type, config, args, !start, lis, parent, null);
 			IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
 			getParameter("agentidentifier").setValue(aid);
 		}

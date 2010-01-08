@@ -5,6 +5,7 @@ import jadex.adapter.base.fipa.Done;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentIdentifier;
 
 import java.util.Map;
 
@@ -25,6 +26,7 @@ public class AMSRemoteCreateAgentPlan extends Plan
 		ca.setConfiguration((String)getParameter("configuration").getValue());
 		ca.setArguments((Map)getParameter("arguments").getValue());
 		ca.setStart(((Boolean)getParameter("start").getValue()).booleanValue());
+		ca.setParent((IComponentIdentifier)getParameter("parent").getValue());
 
 		IGoal req = createGoal("rp_initiate");
 		req.getParameter("receiver").setValue(getParameter("ams").getValue());

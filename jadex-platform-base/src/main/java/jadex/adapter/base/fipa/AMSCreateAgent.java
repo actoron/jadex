@@ -28,6 +28,9 @@ public class AMSCreateAgent implements IAgentAction
 	/** Attribute for slot start. */
 	protected boolean start = true;
 
+	/** Attribute for slot parent. */
+	protected IComponentIdentifier parent;
+
 	//-------- constructors --------
 
 	/**
@@ -100,6 +103,24 @@ public class AMSCreateAgent implements IAgentAction
 	public void setAgentIdentifier(IComponentIdentifier agentidentifier)
 	{
 		this.agentidentifier = agentidentifier;
+	}
+
+	/**
+	 *  Get the parent of this AMSCreateAgent.
+	 * @return parent
+	 */
+	public IComponentIdentifier getParent()
+	{
+		return this.parent;
+	}
+
+	/**
+	 *  Set the parent of this AMSCreateAgent.
+	 * @param parent the value to be set
+	 */
+	public void setParent(IComponentIdentifier parent)
+	{
+		this.parent = parent;
 	}
 
 	/**

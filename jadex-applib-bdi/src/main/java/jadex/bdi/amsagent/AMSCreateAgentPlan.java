@@ -24,6 +24,7 @@ public class AMSCreateAgentPlan extends Plan
 		cag.getParameter("type").setValue(ca.getType());
 		cag.getParameter("configuration").setValue(ca.getConfiguration());
 		cag.getParameter("arguments").setValue(ca.getArguments());
+		cag.getParameter("parent").setValue(ca.getParent());
 		dispatchSubgoalAndWait(cag);
 
 		ca.setAgentIdentifier((IComponentIdentifier)cag.getParameter("agentidentifier").getValue());
