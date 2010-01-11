@@ -21,7 +21,6 @@ import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -795,29 +794,10 @@ public class Application	implements IComponentInstance
 	}
 
 	/**
-	 *  Create a new component in the application.
-	 *  @param name The component name.
-	 *  @param type	The logical type name.
-	 *  @param config The configuration to use for initializing the component (null for default).
-	 *  @param args The arguments for the component (if any).
-	 *  @param suspend Create the component in suspended mode (i.e. do not run until resume() is called).
-	 *  @param listener The result listener (if any). Will receive the id of the component as result.
-	 *  @param parent The parent component (application is default).
+	 *  Get the file name for a logical type name of a subcomponent of this application.
 	 */
-	public void	createComponent(String name, String type, String config, Map args, boolean suspend, 
-		IResultListener listener, IComponentIdentifier parent, IResultListener killlistener)
+	public String	getComponentFilename(String type)
 	{
-		if(model.getApplicationType().getMAgentType(type)==null)
-		{
-			if(listener!=null)
-				listener.exceptionOccurred(this, new RuntimeException("No such component: "+type));
-			else
-				throw new RuntimeException("No such component: "+type);
-		}
-		else
-		{
-			IComponentExecutionService	ces	= (IComponentExecutionService)adapter.getServiceContainer().getService(IComponentExecutionService.class);
-			ces.createComponent(name, model.getApplicationType().getMAgentType(type).getFilename(), config, args, suspend, listener, parent==null ? adapter.getComponentIdentifier() : parent, killlistener);
-		}
+		return model.getApplicationType().getMAgentType(type).getFilename();
 	}
 }
