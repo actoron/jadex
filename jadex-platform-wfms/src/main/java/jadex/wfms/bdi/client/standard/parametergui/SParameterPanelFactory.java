@@ -1,9 +1,7 @@
 package jadex.wfms.bdi.client.standard.parametergui;
 
-import jadex.commons.SGUI;
 import jadex.commons.SReflect;
-
-import javax.swing.JPanel;
+import jadex.wfms.parametertypes.Document;
 
 public class SParameterPanelFactory
 {
@@ -22,6 +20,10 @@ public class SParameterPanelFactory
 		else if (parameterType.equals(Boolean.class))
 		{
 			return new BooleanParameterPanel(parameterName, (Boolean) parameterValue, readOnly);
+		}
+		else if (parameterType.equals(Document.class))
+		{
+			return new DocumentParameterPanel(parameterName, (Document) parameterValue, readOnly);
 		}
 		
 		throw new RuntimeException("Unknown Parameter Type: " + parameterType.getCanonicalName());

@@ -10,7 +10,6 @@ import jadex.adapter.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.commons.SReflect;
 import jadex.service.library.ILibraryService;
-import jadex.wfms.bdi.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.RequestWorkitemList;
 import jadex.wfms.client.Workitem;
 

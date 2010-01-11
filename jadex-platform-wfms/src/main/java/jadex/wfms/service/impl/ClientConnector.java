@@ -4,7 +4,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
-import jadex.wfms.client.IWfmsListener;
+import jadex.wfms.client.IWorkitemListener;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.ProcessFinishedEvent;
 import jadex.wfms.client.Workitem;
@@ -34,16 +34,19 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	
 	private Map workitemQueues;
 	
+	private Map clientActivities;
+	
 	private Map workitemListeners;
 	
-	private Set wfmsListeners;
+	private Map wfmsListeners;
 	
 	public ClientConnector(IServiceContainer wfms)
 	{
 		this.wfms = wfms;
 		workitemListeners = new HashMap();
 		workitemQueues = new HashMap();
-		wfmsListeners = new HashSet();
+		clientActivities = new HashMap();
+		wfmsListeners = new HashMap();
 	}
 	
 	/**
@@ -107,10 +110,27 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	 * @param client the new client
 	 * @return true, if the client has been successfully authenticated.
 	 */
-	public boolean authenticate(IClient client)
+	public synchronized boolean authenticate(IClient client)
 	{
 		IAAAService aaaService = (IAAAService) wfms.getService(IAAAService.class);
-		return aaaService.authenticate(client);
+		boolean ret = aaaService.authenticate(client);
+		if (ret)
+			clientActivities.put(client, new HashSet());
+		return ret;
+	}
+	
+	/**
+	 * Deauthenticate a client.
+	 * @param client the client
+	 */
+	public synchronized void deauthenticate(IClient client)
+	{
+		IAAAService aaaService = (IAAAService) wfms.getService(IAAAService.class);
+		HashSet activities = (HashSet) clientActivities.get(client);
+		for (Iterator it = activities.iterator(); it.hasNext(); )
+			cancelActivity(client, (IClientActivity) it.next());
+		wfmsListeners.remove(client);
+		aaaService.deauthenticate(client);
 	}
 	
 	/**
@@ -138,7 +158,7 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	 * @param client the client
 	 * @return the names of all available BPMN-models
 	 */
-	public Set getBpmnModelNames(IClient client)
+	public synchronized Set getBpmnModelNames(IClient client)
 	{
 		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_MODEL_NAMES))
 			throw new AccessControlException("Not allowed: "+client);
@@ -153,7 +173,7 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	 * @param client the client
 	 * @return the names of all available BPMN-models
 	 */
-	public Set getModelNames(IClient client)
+	public synchronized Set getModelNames(IClient client)
 	{
 		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_MODEL_NAMES))
 			throw new AccessControlException("Not allowed: "+client);
@@ -192,6 +212,7 @@ public class ClientConnector implements IClientService, IWfmsClientService
 			throw new AccessControlException("Not allowed: "+client);
 		IResultListener listener = (IResultListener) workitemListeners.remove(activity);
 		listener.resultAvailable(this, activity);
+		((HashSet) clientActivities.get(client)).remove(activity);
 	}
 	
 	/**
@@ -208,6 +229,7 @@ public class ClientConnector implements IClientService, IWfmsClientService
 		if (workitems.remove(workitem))
 		{
 			fireWorkitemRemovedEvent(workitem);
+			((HashSet) clientActivities.get(client)).add(workitem);
 			return (IClientActivity) workitem;
 		}
 		return null;
@@ -222,6 +244,7 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.RELEASE_WORKITEM))
 			throw new AccessControlException("Not allowed: "+client);
+		((HashSet) clientActivities.get(client)).add(activity);
 		queueWorkitem((IWorkitem) activity, null);
 	}
 	
@@ -256,9 +279,9 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	 *  Adds a listener for workitem queue changes and other WFMS changes.
 	 *  @param listener a new WFMS listener
 	 */
-	public void addWfmsListener(IWfmsListener listener)
+	public synchronized void addWfmsListener(IWorkitemListener listener)
 	{
-		wfmsListeners.add(listener);
+		wfmsListeners.put(listener.getClient(), listener);
 		Set workitems = getAvailableWorkitems(listener.getClient());
 		if (workitems != null)
 		{
@@ -273,17 +296,17 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	 *  Removes a listener for workitem queue changes and other WFMS changes.
 	 *  @param listener a new WFMS listener
 	 */
-	public void removeWfmsListener(IWfmsListener listener)
+	public synchronized void removeWfmsListener(IWorkitemListener listener)
 	{
-		wfmsListeners.remove(listener);
+		wfmsListeners.remove(listener.getClient());
 	}
 	
 	private synchronized void fireWorkitemAddedEvent(IWorkitem workitem)
 	{
 		IAAAService as = (IAAAService) wfms.getService(IAAAService.class);
-		for (Iterator it = wfmsListeners.iterator(); it.hasNext(); )
+		for (Iterator it = wfmsListeners.values().iterator(); it.hasNext(); )
 		{
-			IWfmsListener listener = (IWfmsListener) it.next();
+			IWorkitemListener listener = (IWorkitemListener) it.next();
 			WorkitemQueueChangeEvent evt = new WorkitemQueueChangeEvent(workitem);
 			
 			if (as.accessEvent(listener.getClient(), evt))
@@ -293,25 +316,13 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	
 	private synchronized void fireWorkitemRemovedEvent(IWorkitem workitem)
 	{
-		for (Iterator it = wfmsListeners.iterator(); it.hasNext(); )
+		for (Iterator it = wfmsListeners.values().iterator(); it.hasNext(); )
 		{
-			IWfmsListener listener = (IWfmsListener) it.next();
+			IWorkitemListener listener = (IWorkitemListener) it.next();
 			IAAAService as = (IAAAService) wfms.getService(IAAAService.class);
 			WorkitemQueueChangeEvent evt = new WorkitemQueueChangeEvent(workitem);
 			if (as.accessEvent(listener.getClient(), evt))
 				listener.workitemRemoved(evt);
-		}
-	}
-	
-	public synchronized void fireProcessFinished(Object id)
-	{
-		for (Iterator it = wfmsListeners.iterator(); it.hasNext(); )
-		{
-			IWfmsListener listener = (IWfmsListener) it.next();
-			IAAAService as = (IAAAService) wfms.getService(IAAAService.class);
-			ProcessFinishedEvent evt = new ProcessFinishedEvent(String.valueOf(id));
-			if (as.accessEvent(listener.getClient(), evt))
-				listener.processFinished(evt);
 		}
 	}
 }

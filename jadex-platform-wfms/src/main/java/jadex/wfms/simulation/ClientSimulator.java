@@ -2,8 +2,10 @@ package jadex.wfms.simulation;
 
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
-import jadex.wfms.client.IWfmsListener;
+import jadex.wfms.client.IMonitoringListener;
+import jadex.wfms.client.IWorkitemListener;
 import jadex.wfms.client.IWorkitem;
+import jadex.wfms.client.LogEvent;
 import jadex.wfms.client.ProcessFinishedEvent;
 import jadex.wfms.client.WorkitemQueueChangeEvent;
 import jadex.wfms.service.IClientService;
@@ -58,13 +60,12 @@ public class ClientSimulator implements IClient
 		
 		setupActions();
 		
-		this.clientService.getMonitoringService(this).addLogHandler(this, new Handler()
+		this.clientService.getMonitoringService(this).addListener(this, new IMonitoringListener()
 		{
-			
-			public void publish(final LogRecord record)
+			public void logMessage(final LogEvent event)
 			{
 				if (EventQueue.isDispatchThread())
-					simWindow.addLogMessage(record.getMessage());
+					simWindow.addLogMessage(event.getMessage());
 				else
 				{
 					EventQueue.invokeLater(new Runnable()
@@ -72,44 +73,10 @@ public class ClientSimulator implements IClient
 					
 						public void run()
 						{
-							simWindow.addLogMessage(record.getMessage());
+							simWindow.addLogMessage(event.getMessage());
 						}
 					});
 				}
-			}
-			
-			public void flush()
-			{
-			}
-			
-			public void close() throws SecurityException
-			{
-			}
-		});
-		
-		clientService.addWfmsListener(new IWfmsListener()
-		{
-			
-			public void workitemRemoved(WorkitemQueueChangeEvent event)
-			{
-			}
-			
-			public void workitemAdded(WorkitemQueueChangeEvent event)
-			{
-				System.out.println("New workitem: " + event.getWorkitem().getName());
-				int type = event.getWorkitem().getType();
-				IClientActivity activity = clientService.beginActivity(ClientSimulator.this, event.getWorkitem());
-				if (type == IWorkitem.TEXT_INFO_WORKITEM_TYPE)
-				{
-					simWindow.addLogMessage("Processing Info Activity: " + activity.getName());
-				}
-				else if (type == IWorkitem.DATA_FETCH_WORKITEM_TYPE)
-				{
-					Map parameterStates = activeStateController.getActivityState(activity.getName());
-					activity.setMultipleParameterValues(parameterStates);
-				}
-				
-				clientService.finishActivity(ClientSimulator.this, activity);
 			}
 			
 			public void processFinished(ProcessFinishedEvent event)
@@ -139,6 +106,32 @@ public class ClientSimulator implements IClient
 						}
 					});
 				}
+			}
+		});
+		
+		clientService.addWfmsListener(new IWorkitemListener()
+		{
+			
+			public void workitemRemoved(WorkitemQueueChangeEvent event)
+			{
+			}
+			
+			public void workitemAdded(WorkitemQueueChangeEvent event)
+			{
+				System.out.println("New workitem: " + event.getWorkitem().getName());
+				int type = event.getWorkitem().getType();
+				IClientActivity activity = clientService.beginActivity(ClientSimulator.this, event.getWorkitem());
+				if (type == IWorkitem.TEXT_INFO_WORKITEM_TYPE)
+				{
+					simWindow.addLogMessage("Processing Info Activity: " + activity.getName());
+				}
+				else if (type == IWorkitem.DATA_FETCH_WORKITEM_TYPE)
+				{
+					Map parameterStates = activeStateController.getActivityState(activity.getName());
+					activity.setMultipleParameterValues(parameterStates);
+				}
+				
+				clientService.finishActivity(ClientSimulator.this, activity);
 			}
 			
 			public IClient getClient()

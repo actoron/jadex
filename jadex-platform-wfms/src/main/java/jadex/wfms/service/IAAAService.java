@@ -29,11 +29,17 @@ public interface IAAAService extends IService
 	public static final int REMOVE_LOG_HANDLER			= 501;
 	
 	/**
-	 * Authenticated a new client.
+	 * Authenticate a new client.
 	 * @param client the new client
 	 * @return true, if the client has been successfully authenticated.
 	 */
 	public boolean authenticate(IClient client);
+	
+	/**
+	 * Deauthenticate a client.
+	 * @param client the client
+	 */
+	public void deauthenticate(IClient client);
 	
 	/**
 	 * Checks if a client can access an action

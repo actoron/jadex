@@ -3,7 +3,6 @@ package jadex.wfms.bdi.client.cap;
 import jadex.adapter.base.fipa.Done;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
-import jadex.wfms.bdi.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.RequestAddProcess;
 import jadex.wfms.bdi.ontology.RequestModelNames;
 import jadex.wfms.bdi.ontology.RequestProcessStart;

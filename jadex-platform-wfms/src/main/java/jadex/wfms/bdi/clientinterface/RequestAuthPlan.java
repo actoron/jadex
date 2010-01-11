@@ -25,6 +25,8 @@ public class RequestAuthPlan extends Plan
 		{
 			Map clientProxies = (Map) getBeliefbase().getBelief("client_proxies").getFact();
 			clientProxies.put(proxy.getComponentIdentifier(), proxy);
+			Map heartbeatTimers = (Map) getBeliefbase().getBelief("heartbeat_timers").getFact();
+			heartbeatTimers.put(proxy.getComponentIdentifier(), new Long(System.currentTimeMillis()));
 			Done done = new Done();
 			done.setAction(ra);
 			getParameter("result").setValue(done);

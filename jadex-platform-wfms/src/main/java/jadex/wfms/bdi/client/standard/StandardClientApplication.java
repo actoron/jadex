@@ -4,6 +4,9 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,7 +19,9 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.WindowConstants;
 
+import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.GoalFailureException;
+import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IExternalAccess;
@@ -24,6 +29,7 @@ import jadex.commons.SGUI;
 import jadex.wfms.bdi.client.standard.parametergui.ActivityComponent;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
+import jadex.wfms.parametertypes.Document;
 
 public class StandardClientApplication
 {
@@ -31,7 +37,7 @@ public class StandardClientApplication
 	
 	private static final String WORKITEM_LIST_TAB_NAME = "Workitem List";
 	
-	private static final String PROCESS_MODEL_TAB_NAME = "Process Model Center";
+	private static final String PROCESS_MODEL_TAB_NAME = "Process Models";
 	
 	private static final JPanel EMPTY_PANEL = new JPanel();
 	
@@ -45,9 +51,31 @@ public class StandardClientApplication
 	
 	private ProcessModelComponent pmComponent;
 	
+	boolean connected;
+	
 	public StandardClientApplication(IExternalAccess appAgent)
 	{
+		connected = false;
 		this.agent = (IBDIExternalAccess) appAgent;
+		
+		agent.addAgentListener(new IAgentListener()
+		{
+			public void agentTerminating(AgentEvent ae)
+			{
+			}
+			
+			public void agentTerminated(AgentEvent ae)
+			{
+				EventQueue.invokeLater(new Runnable()
+				{
+					
+					public void run()
+					{
+						mainFrame.dispose();
+					}
+				});
+			}
+		});
 		
 		EventQueue.invokeLater(new Runnable()
 		{
@@ -60,6 +88,8 @@ public class StandardClientApplication
 				{
 					public void windowClosing(WindowEvent e)
 					{
+						if (connected)
+							disconnect();
 						agent.killAgent();
 						mainFrame.dispose();
 					}
@@ -87,20 +117,18 @@ public class StandardClientApplication
 				
 				setAgentActions();
 				
-				boolean connected = false;
 				while (!connected)
 				{
 					LoginDialog loginDialog = new LoginDialog(mainFrame);
 					loginDialog.setLocation(SGUI.calculateMiddlePosition(loginDialog));
 					loginDialog.setVisible(true);
-					connected = true;
 					try
 					{
 						connect(loginDialog.getUserName(), loginDialog.getPassword());
+						connected = true;
 					}
 					catch (GoalFailureException e)
 					{
-						connected = false;
 					}
 				}
 				
@@ -212,6 +240,18 @@ public class StandardClientApplication
 		agent.dispatchTopLevelGoalAndWait(connect);
 	}
 	
+	private void disconnect()
+	{
+		try
+		{
+			IGoal disconnect = agent.createGoal("clientcap.disconnect");
+			agent.dispatchTopLevelGoalAndWait(disconnect);
+		}
+		catch (GoalFailureException e)
+		{
+		}
+	}
+	
 	private void initializeWorkitemList()
 	{
 		IGoal subscribe = agent.createGoal("clientcap.start_workitem_subscription");
@@ -239,6 +279,14 @@ public class StandardClientApplication
 			public void actionPerformed(ActionEvent e)
 			{
 				cancelActivity(ac);
+			}
+		});
+		
+		ac.setSuspendAction(new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				suspendActivity(ac);
 			}
 		});
 		
@@ -273,15 +321,19 @@ public class StandardClientApplication
 		return ac;
 	}
 	
+	private boolean suspendActivity(ActivityComponent ac)
+	{
+		IClientActivity activity = ac.getActivity();
+		Map parameterValues = ac.getParameterValues();
+		activity.setMultipleParameterValues(parameterValues);
+		
+		return cancelActivity(ac);
+	}
+	
 	private boolean cancelActivity(ActivityComponent ac)
 	{
 		IGoal cancelGoal = agent.createGoal("clientcap.cancel_activity");
 		IClientActivity activity = ac.getActivity();
-		
-		// Save correct values
-		Map parameterValues = ac.getParameterValues();
-		activity.setMultipleParameterValues(parameterValues);
-		
 		cancelGoal.getParameter("activity").setValue(activity);
 		
 		try

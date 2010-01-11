@@ -32,6 +32,16 @@
 		<belief name="client_proxies" class="Map">
 			<fact>Collections.synchronizedMap(new HashMap())</fact>
 		</belief>
+		
+		<!-- Connection heartbeat timers. -->
+		<belief name="heartbeat_timers" class="Map">
+			<fact>Collections.synchronizedMap(new HashMap())</fact>
+		</belief>
+		
+		<!-- Timeout for connected clients (in ms) -->
+		<belief name="client_timeout" class="Long">
+			<fact>new Long(5000)</fact>
+		</belief>
 	</beliefs>
 
 	<goals>
@@ -41,6 +51,8 @@
 		<achievegoalref name="rp_execute_request">
 			<concrete ref="reqcap.rp_execute_request"/>
 		</achievegoalref>
+		
+		<performgoal name="purge_silent_clients" retry="true" retrydelay="1000" exclude="never" />
 	</goals>
 
 	<plans>
@@ -60,6 +72,26 @@
 			<trigger>
 				<goal ref="rp_execute_request">
 					<match>$goal.getParameter("action").getValue() instanceof RequestAuth</match>
+				</goal>
+			</trigger>
+		</plan>
+		
+		<!-- Handle deauthentication requests. -->
+		<plan name="deauth_request_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<!-- The requesting agent. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="rp_execute_request.initiator"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="RequestDeAuthPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestDeAuth</match>
 				</goal>
 			</trigger>
 		</plan>
@@ -182,6 +214,29 @@
 		</plan>
 		
 		
+		
+		<!-- Handle Heartbeat requests. -->
+		<plan name="perform_heartbeat_request_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<!-- The requesting agent. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="rp_execute_request.initiator"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="RequestPerformHeartbeatPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof PerformHeartbeat</match>
+				</goal>
+			</trigger>
+		</plan>
+		
+		
+		
 		<!-- Handle proxy requests. -->
 		<plan name="proxy_request_plan">
 			<parameter name="action" class="Object">
@@ -195,6 +250,15 @@
 				<goal ref="rp_execute_request">
 					<match>$goal.getParameter("action").getValue() instanceof RequestProxy</match>
 				</goal>
+			</trigger>
+		</plan>
+		
+		
+		<!-- Purge clients that fail to send heartbeats. -->
+		<plan name="purge_silent_clients_plan">
+			<body class="PurgeSilentClientsPlan" />
+			<trigger>
+				<goal ref="purge_silent_clients"/>
 			</trigger>
 		</plan>
 	</plans>
@@ -225,6 +289,7 @@
 				</initialbelief>
 			</beliefs>
 			<goals>
+				<initialgoal ref="purge_silent_clients" />
 				<initialgoal ref="dfcap.df_keep_registered">
 					<parameter ref="description">
 						<value>

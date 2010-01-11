@@ -5,28 +5,23 @@ import java.util.logging.Logger;
 
 import jadex.service.IService;
 import jadex.wfms.client.IClient;
+import jadex.wfms.client.IMonitoringListener;
 
 public interface IMonitoringService extends IService
 {
 	/**
-	 * Returns the logger.
-	 * @return the logger
-	 */
-	public Logger getLogger();
-	
-	/**
-	 * Adds a log handler to the workflow management system.
+	 * Adds a monitoring listener to the workflow management system.
 	 * 
 	 * @param client the client
-	 * @param handler the log handler
+	 * @param listener the listener
 	 */
-	public void addLogHandler(IClient client, Handler handler);
+	public void addListener(IClient client, IMonitoringListener listener);
 	
 	/**
-	 * Removes a log handler from the workflow management system.
+	 * Removes a monitoring listener from the workflow management system.
 	 * 
 	 * @param client the client
-	 * @param handler the log handler
+	 * @param listener the listener
 	 */
-	public void removeLogHandler(IClient client, Handler handler);
+	public void removeListener(IClient client, IMonitoringListener listener);
 }

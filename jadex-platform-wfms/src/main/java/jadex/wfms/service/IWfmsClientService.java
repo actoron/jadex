@@ -14,10 +14,4 @@ public interface IWfmsClientService
 	 * @param listener listener used when the workitem has been performed
 	 */
 	public void queueWorkitem(IWorkitem workitem, IResultListener listener);
-	
-	/**
-	 * Fires a process finished event.
-	 * @param instanceId ID 
-	 */
-	public void fireProcessFinished(Object instanceId);
 }

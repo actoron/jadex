@@ -17,6 +17,7 @@ import jadex.wfms.service.IWfmsClientService;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 
@@ -98,7 +99,7 @@ public class BpmnProcessService implements IExecutionService
 //			String path = mr.getProcessModelPath(modelname);
 			final MBpmnModel model = loader.loadBpmnModel(modelname, mr.getImports());
 			
-			((IMonitoringService) wfms.getService(IMonitoringService.class)).getLogger().log(Level.INFO, "Starting BPMN process " + id.toString());
+			Logger.getLogger("Wfms").log(Level.INFO, "Starting BPMN process " + id.toString());
 			//final BpmnInterpreter instance = new BpmnInterpreter(adapter, model, arguments, config, handlers, fetcher);
 			final IComponentExecutionService ces = (IComponentExecutionService)wfms.getService(IComponentExecutionService.class);
 			//instance.setWfms(wfms);
@@ -116,8 +117,8 @@ public class BpmnProcessService implements IExecutionService
 							{
 								processes.remove(id);
 								
-								((IMonitoringService) wfms.getService(IMonitoringService.class)).getLogger().log(Level.INFO, "Finished BPMN process " + id.toString());
-								((IWfmsClientService) wfms.getService(IWfmsClientService.class)).fireProcessFinished(id.toString());
+								Logger.getLogger("Wfms").log(Level.INFO, "Finished BPMN process " + id.toString());
+								((MonitoringService) wfms.getService(IMonitoringService.class)).fireProcessFinished(id.toString());
 							}
 						}
 						
@@ -134,7 +135,7 @@ public class BpmnProcessService implements IExecutionService
 				
 				public void exceptionOccurred(Object source, Exception exception)
 				{
-					((IMonitoringService) wfms.getService(IMonitoringService.class)).getLogger().log(Level.SEVERE, "Failed to start model: " + model.getFilename());
+					Logger.getLogger("Wfms").log(Level.SEVERE, "Failed to start model: " + model.getFilename());
 				}
 			}, null, null);
 		}

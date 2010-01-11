@@ -1,7 +1,6 @@
 package jadex.wfms.bdi.client.cap;
 
 import jadex.bdi.runtime.IGoal;
-import jadex.wfms.bdi.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.RequestCancelActivity;
 import jadex.wfms.client.IClientActivity;
 

@@ -1,4 +1,4 @@
-package jadex.wfms.bdi;
+package jadex.wfms.bdi.client.cap;
 
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFAgentDescription;

@@ -1,5 +1,6 @@
 package jadex.wfms.bdi.client.standard.parametergui;
 
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -23,8 +24,9 @@ import javax.swing.border.TitledBorder;
 
 public class ActivityComponent extends JScrollPane
 {
-	private static final String FINISH_BUTTON_LABEL = "Finish";
-	private static final String CANCEL_BUTTON_LABEL = "Cancel";
+	private static final String FINISH_BUTTON_LABEL  = "Finish";
+	private static final String SUSPEND_BUTTON_LABEL = "Suspend";
+	private static final String CANCEL_BUTTON_LABEL  = "Cancel";
 	
 	private JPanel parameterPanel;
 	
@@ -33,6 +35,8 @@ public class ActivityComponent extends JScrollPane
 	private IClientActivity activity;
 	
 	private JButton cancelButton;
+	
+	private JButton suspendButton;
 	
 	private JButton finishButton;
 	
@@ -53,7 +57,7 @@ public class ActivityComponent extends JScrollPane
 		g.weighty = 1;
 		g.gridx = 0;
 		g.gridy = 0;
-		g.anchor = GridBagConstraints.CENTER;
+		g.anchor = GridBagConstraints.NORTH;
 		mainPanel.add(parameterPanel, g);
 		
 		buttonPanel = new JPanel(new GridBagLayout());
@@ -81,6 +85,12 @@ public class ActivityComponent extends JScrollPane
 	{
 		cancelButton.setAction(action);
 		cancelButton.setText(CANCEL_BUTTON_LABEL);
+	}
+	
+	public void setSuspendAction(Action action)
+	{
+		suspendButton.setAction(action);
+		suspendButton.setText(SUSPEND_BUTTON_LABEL);
 	}
 	
 	public void setFinishAction(Action action)
@@ -125,7 +135,7 @@ public class ActivityComponent extends JScrollPane
 		return ret;
 	}
 	
-	private int addParameterPanels()
+	private void addParameterPanels()
 	{
 		
 		int y = 0;
@@ -143,9 +153,9 @@ public class ActivityComponent extends JScrollPane
 				GridBagConstraints g = new GridBagConstraints();
 				g.gridx = 0;
 				g.gridy = y;
+				g.insets = new Insets(5, 0 , 5, 0);
 				g.fill = GridBagConstraints.NONE;
-				g.weighty = 1;
-				g.anchor = GridBagConstraints.NORTH;
+				g.anchor = GridBagConstraints.NORTHWEST;
 				parameterPanel.add(parameterLabel, g);
 			}
 			
@@ -160,7 +170,7 @@ public class ActivityComponent extends JScrollPane
 			g.gridy = y;
 			g.fill = GridBagConstraints.HORIZONTAL;
 			g.weightx = 1;
-			g.weighty = 1;
+			g.insets = new Insets(5, 0 , 5, 0);
 			g.anchor = GridBagConstraints.NORTH;
 			parameterPanel.add(panel, g);
 			
@@ -168,7 +178,14 @@ public class ActivityComponent extends JScrollPane
 			
 			++y;
 		}
-		return y;
+		
+		JPanel filler = new JPanel();
+		GridBagConstraints g = new GridBagConstraints();
+		g.gridy = y;
+		g.gridwidth = 2;
+		g.weighty = 1;
+		g.anchor = GridBagConstraints.SOUTH;
+		parameterPanel.add(filler, g);
 	}
 	
 	private void addButtons()
@@ -182,9 +199,18 @@ public class ActivityComponent extends JScrollPane
 		g.anchor = GridBagConstraints.SOUTHEAST;
 		buttonPanel.add(cancelButton, g);
 		
-		finishButton = new JButton(FINISH_BUTTON_LABEL);
+		suspendButton = new JButton(SUSPEND_BUTTON_LABEL);
 		g = new GridBagConstraints();
 		g.gridx = 1;
+		g.gridy = 0;
+		g.fill = GridBagConstraints.NONE;
+		g.insets = new Insets(0, 5, 0, 5);
+		g.anchor = GridBagConstraints.SOUTHEAST;
+		buttonPanel.add(suspendButton, g);
+		
+		finishButton = new JButton(FINISH_BUTTON_LABEL);
+		g = new GridBagConstraints();
+		g.gridx = 2;
 		g.gridy = 0;
 		g.fill = GridBagConstraints.NONE;
 		g.insets = new Insets(0, 5, 0, 5);

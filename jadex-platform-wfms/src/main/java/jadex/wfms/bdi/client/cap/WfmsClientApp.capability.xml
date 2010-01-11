@@ -33,6 +33,10 @@
 			<parameter name="auth_token" class="Object" />
 		</achievegoal>
 		
+		<achievegoal name="disconnect" exported="true">
+			<parameter name="user_name" class="String" />
+		</achievegoal>
+		
 		<achievegoal name="request_model_names" exported="true">
 			<parameter name="model_names" class="Set" direction="out" />
 		</achievegoal>
@@ -62,8 +66,11 @@
 			<parameter name="activity" class="IClientActivity" />
 		</achievegoal>
 		
-		<achievegoal name="start_workitem_subscription" exported="true">
-		</achievegoal>
+		<achievegoal name="start_workitem_subscription" exported="true" />
+		
+		<achievegoal name="recover_lost_connection" exported="true" />
+		
+		<performgoal name="keep_sending_heartbeats" retry="true" retrydelay="2000" exclude="never"/>
 	</goals>
 	
 	<plans>
@@ -77,6 +84,16 @@
 			<body class="ConnectPlan" />
 			<trigger>
 				<goal ref="connect" />
+			</trigger>
+		</plan>
+		
+		<plan name="disconnect_plan">
+			<parameter name="user_name" class="String">
+				<goalmapping ref="disconnect.user_name"/>
+			</parameter>
+			<body class="DisconnectPlan" />
+			<trigger>
+				<goal ref="disconnect" />
 			</trigger>
 		</plan>
 		
@@ -157,6 +174,13 @@
 			<body class="WorkitemSubscriptionPlan" />
 			<trigger>
 				<goal ref="start_workitem_subscription" />
+			</trigger>
+		</plan>
+		
+		<plan name="keep_sending_heartbeats_plan">
+			<body class="SendHeartbeatPlan"/>
+			<trigger>
+				<goal ref="keep_sending_heartbeats"/>
 			</trigger>
 		</plan>
 		

@@ -4,6 +4,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IAAAService;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class BasicAAAService implements IAAAService
 	public BasicAAAService(Map userroles)
 	{
 		this.userroles = userroles!=null? userroles: new HashMap();
-		authenticatedClients = new HashSet();
+		authenticatedClients = Collections.synchronizedSet(new HashSet());
 	}
 	
 	/**
@@ -50,7 +51,7 @@ public class BasicAAAService implements IAAAService
 	}
 	
 	/**
-	 * Authenticated a new client.
+	 * Authenticate a new client.
 	 * @param client the new client
 	 * @return true, if the client has been successfully authenticated.
 	 */
@@ -58,6 +59,15 @@ public class BasicAAAService implements IAAAService
 	{
 		authenticatedClients.add(client);
 		return true;
+	}
+	
+	/**
+	 * Deauthenticate a client.
+	 * @param client the client
+	 */
+	public void deauthenticate(IClient client)
+	{
+		authenticatedClients.remove(client);
 	}
 	
 	/**
@@ -82,6 +92,7 @@ public class BasicAAAService implements IAAAService
 	public boolean accessEvent(IClient client, Object event)
 	{
 		return true;
+		//TODO: FIXME
 		/*if (!authenticatedClients.contains(client))
 			return false;
 		if (event instanceof WorkitemQueueChangeEvent)

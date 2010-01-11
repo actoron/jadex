@@ -1,7 +1,6 @@
 package jadex.wfms.bdi.client.cap;
 
 import jadex.bdi.runtime.IGoal;
-import jadex.wfms.bdi.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.RequestAuth;
 
 public class ConnectPlan extends AbstractWfmsPlan
@@ -14,5 +13,9 @@ public class ConnectPlan extends AbstractWfmsPlan
 		authGoal.getParameter("action").setValue(reqAuth);
 		authGoal.getParameter("receiver").setValue(getClientInterface());
 		dispatchSubgoalAndWait(authGoal);
+		
+		IGoal hbGoal = createGoal("keep_sending_heartbeats");
+		dispatchTopLevelGoal(hbGoal);
+		System.out.println("Goal Active: " + String.valueOf(hbGoal.isActive()));
 	}
 }

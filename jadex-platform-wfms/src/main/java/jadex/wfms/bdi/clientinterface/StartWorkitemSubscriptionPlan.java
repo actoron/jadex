@@ -5,10 +5,11 @@ import java.util.Map;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.wfms.bdi.ontology.ComponentClientProxy;
 import jadex.wfms.bdi.ontology.InformWorkitemAdded;
 import jadex.wfms.bdi.ontology.InformWorkitemRemoved;
 import jadex.wfms.client.IClient;
-import jadex.wfms.client.IWfmsListener;
+import jadex.wfms.client.IWorkitemListener;
 import jadex.wfms.client.ProcessFinishedEvent;
 import jadex.wfms.client.WorkitemQueueChangeEvent;
 import jadex.wfms.service.IClientService;
@@ -20,13 +21,13 @@ public class StartWorkitemSubscriptionPlan extends Plan
 		final Object subId = getParameter("subscription_id").getValue();
 		
 		Map clientProxies = (Map) getBeliefbase().getBelief("client_proxies").getFact();
-		final IClient proxy = (IClient) clientProxies.get(getParameter("initiator").getValue());
+		final ComponentClientProxy proxy = (ComponentClientProxy) clientProxies.get(getParameter("initiator").getValue());
 		if (proxy == null)
 			fail();
 		
 		final IBDIExternalAccess agent = getExternalAccess();
 		IClientService cs = (IClientService) getScope().getServiceContainer().getService(IClientService.class);
-		cs.addWfmsListener(new IWfmsListener()
+		IWorkitemListener listener = new IWorkitemListener()
 		{
 			public void workitemRemoved(WorkitemQueueChangeEvent event)
 			{
@@ -70,6 +71,8 @@ public class StartWorkitemSubscriptionPlan extends Plan
 			{
 				return proxy;
 			}
-		});
+		};
+		
+		cs.addWfmsListener(listener);
 	}
 }

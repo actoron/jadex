@@ -4,7 +4,7 @@ import jadex.service.IService;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
-import jadex.wfms.client.IWfmsListener;
+import jadex.wfms.client.IWorkitemListener;
 
 import java.util.Set;
 
@@ -30,11 +30,17 @@ public interface IClientService extends IService
 	public IMonitoringService getMonitoringService(IClient client);
 	
 	/**
-	 * Authenticated a new client.
+	 * Authenticate a new client.
 	 * @param client the new client
 	 * @return true, if the client has been successfully authenticated.
 	 */
 	public boolean authenticate(IClient client);
+	
+	/**
+	 * Deauthenticate a client.
+	 * @param client the client
+	 */
+	public void deauthenticate(IClient client);
 	
 	/**
 	 *  Starts a new process
@@ -83,11 +89,11 @@ public interface IClientService extends IService
 	 *  Adds a listener for workitem queue changes and other WFMS changes.
 	 *  @param listener a new WFMS listener
 	 */
-	public void addWfmsListener(IWfmsListener listener);
+	public void addWfmsListener(IWorkitemListener listener);
 	
 	/**
 	 *  Removes a listener for workitem queue changes and other WFMS changes.
 	 *  @param listener a new WFMS listener
 	 */
-	public void removeWfmsListener(IWfmsListener listener);
+	public void removeWfmsListener(IWorkitemListener listener);
 }

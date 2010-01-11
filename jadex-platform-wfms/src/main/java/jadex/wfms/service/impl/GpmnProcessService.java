@@ -16,6 +16,7 @@ import jadex.wfms.service.IWfmsClientService;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 
@@ -153,8 +154,8 @@ public class GpmnProcessService implements IExecutionService
 						{
 							processes.remove(id);
 							
-							((IMonitoringService) wfms.getService(IMonitoringService.class)).getLogger().log(Level.INFO, "Finished GPMN process " + id.toString());
-							((IWfmsClientService) wfms.getService(IWfmsClientService.class)).fireProcessFinished(id.toString());
+							Logger.getLogger("Wfms").log(Level.INFO, "Finished GPMN process " + id.toString());
+							((MonitoringService) wfms.getService(IMonitoringService.class)).fireProcessFinished(id.toString());
 						}
 					}
 					
@@ -171,7 +172,7 @@ public class GpmnProcessService implements IExecutionService
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
-				((IMonitoringService) wfms.getService(IMonitoringService.class)).getLogger().log(Level.SEVERE, "Failed to start model: " + name);
+				Logger.getLogger("Wfms").log(Level.SEVERE, "Failed to start model: " + name);
 			}
 		}, null, null);
 		

@@ -3,7 +3,7 @@ package com.daimler.client;
 import jadex.commons.SGUI;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
-import jadex.wfms.client.IWfmsListener;
+import jadex.wfms.client.IWorkitemListener;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.ProcessFinishedEvent;
 import jadex.wfms.client.WorkitemQueueChangeEvent;
@@ -353,7 +353,7 @@ public class GuiClient implements IClient
         taskPanel.updateUI();
 	}
 	
-	private class ConnectorController implements IWfmsListener
+	private class ConnectorController implements IWorkitemListener
 	{
 		public void workitemAdded(final WorkitemQueueChangeEvent event)
 		{
