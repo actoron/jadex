@@ -103,7 +103,11 @@ public class ApplicationComponentFactory	implements IComponentFactory
 		types.add(new TypeInfo(null, "agenttype", MAgentType.class));
 		types.add(new TypeInfo(null, "application", MApplicationInstance.class, null, null, new BeanAttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null));
 		types.add(new TypeInfo(null, "space", MSpaceInstance.class));
-		types.add(new TypeInfo(null, "agent", MAgentInstance.class, null, null, new BeanAttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null));
+		types.add(new TypeInfo(null, "agent", MAgentInstance.class, null, null, 
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("type", "typeName"),
+			new BeanAttributeInfo("number", "numberText")}
+		, null));
 		types.add(new TypeInfo(null, "agent/arguments/argument", MArgument.class, null, "value"));
 		types.add(new TypeInfo(null, "applicationtype/arguments/argument", Argument.class, "description", new BeanAttributeInfo((String)null, "defaultValue", null, exconv, null)));
 		types.add(new TypeInfo(null, "import", String.class));

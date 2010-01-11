@@ -1,10 +1,8 @@
 package jadex.application.model;
 
 import jadex.application.runtime.Application;
-import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-import jadex.service.IServiceContainer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +29,8 @@ public class MAgentInstance
 	protected boolean start;
 	
 	/** The number of agents. */
-	protected int number;
+//	protected int number;
+	protected String numbertext;
 	
 	/** The master flag. */
 	protected boolean master;
@@ -51,7 +50,7 @@ public class MAgentInstance
 	{
 		this.arguments = new ArrayList();
 		this.start = true;
-		this.number = 1;
+//		this.number = 1;
 	}
 	
 	//-------- methods --------
@@ -147,22 +146,59 @@ public class MAgentInstance
 	}
 	
 	/**
+	 *  Set the number text.
+	 *  @param numbertext The number text.
+	 */
+	public void setNumberText(String numbertext)
+	{
+		this.numbertext = numbertext;
+	}
+	
+	/**
+	 * 
+	 */
+	public String getNumberText()
+	{
+		return this.numbertext;
+	}
+	
+	/**
 	 *  Get the number of agents to start.
 	 *  @return The number.
 	 */
+	public int getNumber(Application context, ClassLoader classloader)
+	{
+		SimpleValueFetcher fetcher = new SimpleValueFetcher();
+		fetcher.setValue("$platform", context.getServiceContainer());
+		fetcher.setValue("$args", context.getArguments());
+		fetcher.setValue("$results", context.getResults());
+
+		String[] imports = context.getApplicationType().getAllImports();
+		if(parser==null)
+			parser = new JavaCCExpressionParser();
+			
+		Object val = numbertext!=null? parser.parseExpression(numbertext, imports, null, classloader).getValue(fetcher): null;
+		
+		return val instanceof Integer? ((Integer)val).intValue(): 1;
+	}
+	
+	/**
+	 *  Get the number of agents to start.
+	 *  @return The number.
+	 * /
 	public int getNumber()
 	{
 		return this.number;
-	}
+	}*/
 
 	/**
 	 *  Set the number of agents.
 	 *  @param number The number to set.
-	 */
+	 * /
 	public void setNumber(int number)
 	{
-		this.number = number;
-	}
+//		this.number = number;
+	}*/
 
 	/**
 	 *  Add an argument.
@@ -186,22 +222,20 @@ public class MAgentInstance
 	 *  Get the arguments.
 	 *  @return The arguments as a map of name-value pairs.
 	 */
-	public Map getArguments(Application context, MApplicationType apptype, ClassLoader classloader)
+	public Map getArguments(Application context, ClassLoader classloader)
 	{
 		Map ret = null;
 
 		if(arguments!=null)
 		{
 			ret = new HashMap();
-//			SimpleValueFetcher fetcher = new SimpleValueFetcher();
-//			fetcher.setValue("$platform", container);
-			
+
 			SimpleValueFetcher fetcher = new SimpleValueFetcher();
 			fetcher.setValue("$platform", context.getServiceContainer());
 			fetcher.setValue("$args", context.getArguments());
 			fetcher.setValue("$results", context.getResults());
 
-			String[] imports = apptype.getAllImports();
+			String[] imports = context.getApplicationType().getAllImports();
 			for(int i=0; i<arguments.size(); i++)
 			{
 				MArgument p = (MArgument)arguments.get(i);

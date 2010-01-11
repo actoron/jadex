@@ -667,11 +667,11 @@ public class Application	implements IComponentInstance
 				final MAgentInstance agent = (MAgentInstance)agents.get(i);
 				
 	//			System.out.println("Create: "+agent.getName()+" "+agent.getTypeName()+" "+agent.getConfiguration());
-				int num = agent.getNumber();
+				int num = agent.getNumber(this, cl);
 				for(int j=0; j<num; j++)
 				{
 					IComponentExecutionService	ces	= (IComponentExecutionService)adapter.getServiceContainer().getService(IComponentExecutionService.class);
-					ces.createComponent(agent.getName(), agent.getType(model.getApplicationType()).getFilename(), agent.getConfiguration(), agent.getArguments(this, model.getApplicationType(), cl), false, null, adapter.getComponentIdentifier(), null);					
+					ces.createComponent(agent.getName(), agent.getType(model.getApplicationType()).getFilename(), agent.getConfiguration(), agent.getArguments(this, cl), false, null, adapter.getComponentIdentifier(), null);					
 	//				context.createAgent(agent.getName(), agent.getTypeName(),
 	//					agent.getConfiguration(), agent.getArguments(container, apptype, cl), agent.isStart(), agent.isMaster(),
 	//					DefaultResultListener.getInstance(), null);	
