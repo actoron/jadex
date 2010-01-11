@@ -16,7 +16,7 @@ import java.util.Set;
  */
 public class BasicAAAService implements IAAAService
 {
-	private Set authenticatedClients;
+	private Map userClients;
 	
 	private Map userroles;
 	
@@ -32,7 +32,7 @@ public class BasicAAAService implements IAAAService
 	public BasicAAAService(Map userroles)
 	{
 		this.userroles = userroles!=null? userroles: new HashMap();
-		authenticatedClients = Collections.synchronizedSet(new HashSet());
+		userClients = Collections.synchronizedMap(new HashMap());
 	}
 	
 	/**
@@ -57,7 +57,9 @@ public class BasicAAAService implements IAAAService
 	 */
 	public boolean authenticate(IClient client)
 	{
-		authenticatedClients.add(client);
+		if (!userClients.containsKey(client.getUserName()))
+			userClients.put(client.getUserName(), Collections.synchronizedSet(new HashSet()));
+		((Set) userClients.get(client.getUserName())).add(client);
 		return true;
 	}
 	
@@ -67,7 +69,22 @@ public class BasicAAAService implements IAAAService
 	 */
 	public void deauthenticate(IClient client)
 	{
-		authenticatedClients.remove(client);
+		((Set) userClients.get(client.getUserName())).remove(client);
+	}
+	
+	/**
+	 * Returns the authenticated clients for a specific user name
+	 * @parameter userName the user name
+	 * @return Set of connected clients
+	 */
+	public Set getAuthenticatedClients(String userName)
+	{
+		Set clients = (Set) userClients.get(userName);
+		synchronized(clients)
+		{
+			clients = new HashSet(clients);
+		}
+		return clients;
 	}
 	
 	/**
@@ -78,7 +95,7 @@ public class BasicAAAService implements IAAAService
 	 */
 	public boolean accessAction(IClient client, int action)
 	{
-		if (authenticatedClients.contains(client))
+		if (((Set) userClients.get(client.getUserName())).contains(client))
 			return true;
 		return false;
 	}

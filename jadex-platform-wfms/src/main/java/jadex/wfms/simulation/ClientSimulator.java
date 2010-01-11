@@ -1,5 +1,6 @@
 package jadex.wfms.simulation;
 
+import jadex.wfms.client.ActivityEvent;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IMonitoringListener;
@@ -7,7 +8,7 @@ import jadex.wfms.client.IWorkitemListener;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.LogEvent;
 import jadex.wfms.client.ProcessFinishedEvent;
-import jadex.wfms.client.WorkitemQueueChangeEvent;
+import jadex.wfms.client.WorkitemEvent;
 import jadex.wfms.service.IClientService;
 import jadex.wfms.simulation.gui.SimulationWindow;
 import jadex.wfms.simulation.stateholder.AbstractNumericStateSet;
@@ -112,26 +113,35 @@ public class ClientSimulator implements IClient
 		clientService.addWfmsListener(new IWorkitemListener()
 		{
 			
-			public void workitemRemoved(WorkitemQueueChangeEvent event)
+			public void workitemRemoved(WorkitemEvent event)
 			{
 			}
 			
-			public void workitemAdded(WorkitemQueueChangeEvent event)
+			public void workitemAdded(WorkitemEvent event)
 			{
 				System.out.println("New workitem: " + event.getWorkitem().getName());
 				int type = event.getWorkitem().getType();
-				IClientActivity activity = clientService.beginActivity(ClientSimulator.this, event.getWorkitem());
-				if (type == IWorkitem.TEXT_INFO_WORKITEM_TYPE)
+				clientService.beginActivity(ClientSimulator.this, event.getWorkitem());
+			}
+			
+			public void activityAdded(ActivityEvent event)
+			{
+				IClientActivity activity = event.getActivity();
+				if (activity.getType() == IWorkitem.TEXT_INFO_WORKITEM_TYPE)
 				{
 					simWindow.addLogMessage("Processing Info Activity: " + activity.getName());
 				}
-				else if (type == IWorkitem.DATA_FETCH_WORKITEM_TYPE)
+				else if (activity.getType() == IWorkitem.DATA_FETCH_WORKITEM_TYPE)
 				{
 					Map parameterStates = activeStateController.getActivityState(activity.getName());
 					activity.setMultipleParameterValues(parameterStates);
 				}
 				
 				clientService.finishActivity(ClientSimulator.this, activity);
+			}
+			
+			public void activityRemoved(ActivityEvent event)
+			{
 			}
 			
 			public IClient getClient()

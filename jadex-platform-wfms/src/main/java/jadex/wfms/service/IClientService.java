@@ -67,9 +67,8 @@ public interface IClientService extends IService
 	 *  Begins an activity for a client.
 	 *  @param client the client
 	 *  @param workitem the workitem being requested for the activity
-	 *  @return the corresponding activity, if the acquisition was successful, null otherwise
 	 */
-	public IClientActivity beginActivity(IClient client, IWorkitem workitem);
+	public void beginActivity(IClient client, IWorkitem workitem);
 	
 	/**
 	 *  Cancel an activity.
@@ -84,6 +83,13 @@ public interface IClientService extends IService
 	 *  @return a set of workitems that are available for acquisition by this client
 	 */
 	public Set getAvailableWorkitems(IClient client);
+	
+	/**
+	 *  Returns all activities available to a client.
+	 *  @param client the client
+	 *  @return a set of activities that are available for this client
+	 */
+	public Set getAvailableActivities(IClient client);
 	
 	/**
 	 *  Adds a listener for workitem queue changes and other WFMS changes.

@@ -1,10 +1,10 @@
 package jadex.wfms.client;
 
-public class WorkitemQueueChangeEvent
+public class WorkitemEvent
 {
 	private IWorkitem workitem;
 	
-	public WorkitemQueueChangeEvent(IWorkitem workitem)
+	public WorkitemEvent(IWorkitem workitem)
 	{
 		this.workitem = workitem;
 	}

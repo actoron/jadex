@@ -16,8 +16,6 @@ public class RequestPerformHeartbeatPlan extends Plan
 {
 	public void body()
 	{
-		System.out.println("Performing HB");
-		
 		PerformHeartbeat phb = (PerformHeartbeat) getParameter("action").getValue();
 		phb.setPerformed(true);
 		

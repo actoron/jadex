@@ -6,27 +6,15 @@ import jadex.wfms.client.IWorkitem;
 
 public class RequestBeginActivity implements IAgentAction
 {
-	private IClientActivity activity;
-	
 	private IWorkitem workitem;
 	
 	public RequestBeginActivity()
 	{
 	}
 	
-	public IClientActivity getActivity()
-	{
-		return activity;
-	}
-	
 	public IWorkitem getWorkitem()
 	{
 		return workitem;
-	}
-	
-	public void setActivity(IClientActivity activity)
-	{
-		this.activity = activity;
 	}
 	
 	public void setWorkitem(IWorkitem workitem)

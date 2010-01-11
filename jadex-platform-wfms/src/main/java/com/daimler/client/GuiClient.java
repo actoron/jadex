@@ -1,12 +1,13 @@
 package com.daimler.client;
 
 import jadex.commons.SGUI;
+import jadex.wfms.client.ActivityEvent;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitemListener;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.ProcessFinishedEvent;
-import jadex.wfms.client.WorkitemQueueChangeEvent;
+import jadex.wfms.client.WorkitemEvent;
 import jadex.wfms.service.IClientService;
 
 import java.awt.BorderLayout;
@@ -127,12 +128,12 @@ public class GuiClient implements IClient
 					IClientActivity oldActive = currentActivity;
 					//TODO:HACK!!
 					currentActivity = (IClientActivity) workitem;
-					currentActivity = clientService.beginActivity(GuiClient.this, workitem);
-					if (currentActivity == null)
+					clientService.beginActivity(GuiClient.this, workitem);
+					/*if (currentActivity == null)
 					{
 						currentActivity = oldActive;
 						return;
-					}
+					}*/
 				}
 				scrollPane.getViewport().setView(comp);
 				if (comp.equals(emptyLabel))
@@ -355,7 +356,7 @@ public class GuiClient implements IClient
 	
 	private class ConnectorController implements IWorkitemListener
 	{
-		public void workitemAdded(final WorkitemQueueChangeEvent event)
+		public void workitemAdded(final WorkitemEvent event)
 		{
 			final int type = event.getWorkitem().getType();
 			EventQueue.invokeLater(new Runnable() {
@@ -379,7 +380,7 @@ public class GuiClient implements IClient
 			});
 		}
 		
-		public void workitemRemoved(final WorkitemQueueChangeEvent event)
+		public void workitemRemoved(final WorkitemEvent event)
 		{
 			EventQueue.invokeLater(new Runnable()
 			{
@@ -395,8 +396,15 @@ public class GuiClient implements IClient
 			});
 		}
 		
-		public void processFinished(ProcessFinishedEvent event)
+		public void activityAdded(ActivityEvent event)
 		{
+			// TODO Auto-generated method stub
+			
+		}
+		
+		public void activityRemoved(ActivityEvent event)
+		{
+			// TODO Auto-generated method stub
 			
 		}
 		

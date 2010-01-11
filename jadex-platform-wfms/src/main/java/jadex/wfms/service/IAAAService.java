@@ -14,19 +14,20 @@ public interface IAAAService extends IService
 	public static final String ALL_ROLES = "all";
 	
 	// Actions
-	public static final int REQUEST_PD_SERVICE	 	 	= 0;
-	public static final int REQUEST_MONITORING_SERVICE	= 1;
-	public static final int ADD_PROCESS_MODEL 	 		= 50;
-	public static final int REQUEST_PROCESS_MODEL		= 51;
-	public static final int START_BPMN_PROCESS 		 	= 100;
-	public static final int START_GPMN_PROCESS 		 	= 101;
-	public static final int REQUEST_MODEL_NAMES 		= 102;
-	public static final int REQUEST_AVAILABLE_WORKITEMS = 103;
-	public static final int COMMIT_WORKITEM			 	= 104;
-	public static final int ACQUIRE_WORKITEM		 	= 105;
-	public static final int RELEASE_WORKITEM		 	= 106;
-	public static final int ADD_LOG_HANDLER				= 500;
-	public static final int REMOVE_LOG_HANDLER			= 501;
+	public static final int REQUEST_PD_SERVICE	 	 	 = 0;
+	public static final int REQUEST_MONITORING_SERVICE	 = 1;
+	public static final int ADD_PROCESS_MODEL 	 		 = 50;
+	public static final int REQUEST_PROCESS_MODEL		 = 51;
+	public static final int START_BPMN_PROCESS 		 	 = 100;
+	public static final int START_GPMN_PROCESS 		 	 = 101;
+	public static final int REQUEST_MODEL_NAMES 		 = 102;
+	public static final int REQUEST_AVAILABLE_WORKITEMS  = 103;
+	public static final int REQUEST_AVAILABLE_ACTIVITIES = 104;
+	public static final int COMMIT_WORKITEM			 	 = 105;
+	public static final int ACQUIRE_WORKITEM		 	 = 106;
+	public static final int RELEASE_WORKITEM		 	 = 107;
+	public static final int ADD_MONITORING_LISTENER		 = 500;
+	public static final int REMOVE_MONITORING_LISTENER	 = 501;
 	
 	/**
 	 * Authenticate a new client.
@@ -40,6 +41,13 @@ public interface IAAAService extends IService
 	 * @param client the client
 	 */
 	public void deauthenticate(IClient client);
+	
+	/**
+	 * Returns the authenticated clients for a specific user name
+	 * @parameter userName the user name
+	 * @return Set of connected clients
+	 */
+	public Set getAuthenticatedClients(String userName);
 	
 	/**
 	 * Checks if a client can access an action

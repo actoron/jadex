@@ -7,6 +7,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -133,6 +134,7 @@ public class StandardClientApplication
 				}
 				
 				initializeWorkitemList();
+				initializeActivities();
 				updateProcessModels();
 				setActions();
 			}
@@ -181,29 +183,6 @@ public class StandardClientApplication
 					{
 						JOptionPane.showMessageDialog(mainFrame, "Start of activity failed.");
 					}
-					
-					if (mainSplitPane.getRightComponent() instanceof ActivityComponent)
-					{
-						ActivityComponent currentAc = (ActivityComponent) mainSplitPane.getRightComponent();
-						//TODO: Cancel activity
-						mainSplitPane.setRightComponent(EMPTY_PANEL);
-					}
-					
-					IClientActivity activity = (IClientActivity) beginActivity.getParameter("activity").getValue();
-					ActivityComponent ac = createActivityComponent(activity);
-					
-					if (mainSplitPane.getRightComponent().equals(EMPTY_PANEL))
-					{
-						mainSplitPane.setRightComponent(ac);
-					}
-					else if (mainSplitPane.getRightComponent() instanceof JTabbedPane)
-					{
-						JTabbedPane tabPane = (JTabbedPane) mainSplitPane.getRightComponent();
-						tabPane.add(ac, ac.getActivity().getName());
-						tabPane.setSelectedComponent(ac);
-					}
-					
-					
 				}
 			}
 		});
@@ -230,6 +209,63 @@ public class StandardClientApplication
 			}
 		};
 		agent.getBeliefbase().getBelief("remove_workitem_controller").setFact(wiRemoved);
+		
+		Action acAdded = new AbstractAction()
+		{
+			public void actionPerformed(final ActionEvent e)
+			{
+				if (mainSplitPane.getRightComponent() instanceof ActivityComponent)
+				{
+					ActivityComponent currentAc = (ActivityComponent) mainSplitPane.getRightComponent();
+					cancelActivity(currentAc);
+					mainSplitPane.setRightComponent(EMPTY_PANEL);
+				}
+				
+				IClientActivity activity = (IClientActivity) e.getSource();
+				ActivityComponent ac = createActivityComponent(activity);
+				
+				if (mainSplitPane.getRightComponent().equals(EMPTY_PANEL))
+				{
+					mainSplitPane.setRightComponent(ac);
+				}
+				else if (mainSplitPane.getRightComponent() instanceof JTabbedPane)
+				{
+					JTabbedPane tabPane = (JTabbedPane) mainSplitPane.getRightComponent();
+					tabPane.add(ac, ac.getActivity().getName());
+					tabPane.setSelectedComponent(ac);
+				}
+			}
+		};
+		agent.getBeliefbase().getBelief("add_activity_controller").setFact(acAdded);
+		
+		Action acRemoved = new AbstractAction()
+		{
+			public void actionPerformed(final ActionEvent e)
+			{
+				IClientActivity activity = (IClientActivity) e.getSource();
+				
+				if (mainSplitPane.getRightComponent() instanceof ActivityComponent)
+				{
+					ActivityComponent ac = (ActivityComponent) mainSplitPane.getRightComponent();
+					if (activity.equals(ac.getActivity()))
+						mainSplitPane.setRightComponent(EMPTY_PANEL);
+				}
+				else if (mainSplitPane.getRightComponent() instanceof JTabbedPane)
+				{
+					JTabbedPane tabPane = (JTabbedPane) mainSplitPane.getRightComponent();
+					for (int i = 0; i < tabPane.getTabCount(); ++i)
+					{
+						ActivityComponent ac = (ActivityComponent) tabPane.getComponent(i);
+						if (ac.getActivity().equals(activity))
+						{
+							tabPane.remove(i);
+							return;
+						}
+					}
+				}
+			}
+		};
+		agent.getBeliefbase().getBelief("remove_activity_controller").setFact(acRemoved);
 	}
 	
 	private void connect(String userName, Object authToken)
@@ -261,6 +297,34 @@ public class StandardClientApplication
 		agent.dispatchTopLevelGoalAndWait(requestListGoal);
 		Set workitemList = (Set) requestListGoal.getParameter("workitem_list").getValue();
 		wlComponent.setWorkitems(workitemList);
+	}
+	
+	private void initializeActivities()
+	{
+		IGoal requestListGoal = agent.createGoal("clientcap.request_activity_list");
+		agent.dispatchTopLevelGoalAndWait(requestListGoal);
+		Set activityList = (Set) requestListGoal.getParameter("activity_list").getValue();
+		
+		for (Iterator it = activityList.iterator(); it.hasNext(); )
+		{
+			IClientActivity act = (IClientActivity) it.next();
+			if (mainSplitPane.getRightComponent() instanceof JTabbedPane)
+			{
+				JTabbedPane tabPane = (JTabbedPane) mainSplitPane.getRightComponent();
+				ActivityComponent ac = createActivityComponent(act);
+				tabPane.add(ac, ac.getActivity().getName());
+				tabPane.setSelectedComponent(ac);
+			}
+			else if (mainSplitPane.getRightComponent() instanceof ActivityComponent)
+			{
+				cancelActivity(act);
+			}
+			else
+			{
+				ActivityComponent ac = createActivityComponent(act);
+				mainSplitPane.setRightComponent(ac);
+			}
+		}
 	}
 	
 	private void updateProcessModels()
@@ -313,27 +377,29 @@ public class StandardClientApplication
 					JOptionPane.showMessageDialog(mainFrame, "Failed finishing activity.");
 					return;
 				}
-				
-				removeActivityComponent(ac);
 			}
 		});
 		
 		return ac;
 	}
 	
-	private boolean suspendActivity(ActivityComponent ac)
+	private void suspendActivity(ActivityComponent ac)
 	{
 		IClientActivity activity = ac.getActivity();
 		Map parameterValues = ac.getParameterValues();
 		activity.setMultipleParameterValues(parameterValues);
 		
-		return cancelActivity(ac);
+		cancelActivity(ac);
 	}
 	
-	private boolean cancelActivity(ActivityComponent ac)
+	private void cancelActivity(ActivityComponent ac)
+	{
+		cancelActivity(ac.getActivity());
+	}
+	
+	private void cancelActivity(IClientActivity activity)
 	{
 		IGoal cancelGoal = agent.createGoal("clientcap.cancel_activity");
-		IClientActivity activity = ac.getActivity();
 		cancelGoal.getParameter("activity").setValue(activity);
 		
 		try
@@ -343,24 +409,6 @@ public class StandardClientApplication
 		catch (GoalFailureException e)
 		{
 			JOptionPane.showMessageDialog(mainFrame, "Activity cancelation failed.");
-			return false;
-		}
-		
-		removeActivityComponent(ac);
-		
-		return true;
-	}
-	
-	private void removeActivityComponent(ActivityComponent ac)
-	{
-		if (mainSplitPane.getRightComponent() instanceof ActivityComponent)
-		{
-			mainSplitPane.setRightComponent(EMPTY_PANEL);
-		}
-		else
-		{
-			JTabbedPane tabPane = (JTabbedPane) mainSplitPane.getRightComponent();
-			tabPane.remove(ac);
 		}
 	}
 }

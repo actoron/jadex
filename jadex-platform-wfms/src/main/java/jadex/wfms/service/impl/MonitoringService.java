@@ -77,7 +77,7 @@ public class MonitoringService implements IMonitoringService
 	 */
 	public void addListener(IClient client, IMonitoringListener listener)
 	{
-		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_LOG_HANDLER))
+		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_MONITORING_LISTENER))
 			throw new AccessControlException("Not allowed: "+client);
 		listeners.put(client, listener);
 	}
@@ -90,7 +90,7 @@ public class MonitoringService implements IMonitoringService
 	 */
 	public void removeListener(IClient client, IMonitoringListener listener)
 	{
-		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REMOVE_LOG_HANDLER))
+		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REMOVE_MONITORING_LISTENER))
 			throw new AccessControlException("Not allowed: "+client);
 		listeners.remove(client);
 	}

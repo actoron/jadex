@@ -23,33 +23,24 @@
 		<belief name="client_gui" class="StandardClientApplication">
 			<fact>new StandardClientApplication($scope.getExternalAccess())</fact>
 		</belief>
-		<belief name="add_workitem_controller" class="javax.swing.Action" />
-		<belief name="remove_workitem_controller" class="javax.swing.Action" />
+		<beliefref name="add_workitem_controller" class="javax.swing.Action">
+			<concrete ref="clientcap.add_workitem_controller"/>
+		</beliefref>
+		<beliefref name="remove_workitem_controller" class="javax.swing.Action">
+			<concrete ref="clientcap.remove_workitem_controller"/>
+		</beliefref>
+		<beliefref name="add_activity_controller" class="javax.swing.Action">
+			<concrete ref="clientcap.add_activity_controller"/>
+		</beliefref>
+		<beliefref name="remove_activity_controller" class="javax.swing.Action">
+			<concrete ref="clientcap.remove_activity_controller"/>
+		</beliefref>
 	</beliefs>
 
 	<goals>
 	</goals>
 
 	<plans>
-		<plan name="add_workitem_plan">
-			<parameter name="workitem" class="IWorkitem">
-				<internaleventmapping ref="clientcap.workitem_added.workitem"/>
-			</parameter>
-			<body class="AddWorkitemPlan" />
-			<trigger>
-				<internalevent ref="clientcap.workitem_added" />
-			</trigger>
-		</plan>
-		
-		<plan name="remove_workitem_plan">
-			<parameter name="workitem" class="IWorkitem">
-				<internaleventmapping ref="clientcap.workitem_removed.workitem"/>
-			</parameter>
-			<body class="RemoveWorkitemPlan" />
-			<trigger>
-				<internalevent ref="clientcap.workitem_removed" />
-			</trigger>
-		</plan>
 	</plans>
 
 	<events>

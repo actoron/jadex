@@ -28,10 +28,6 @@ public class BeginActivityPlan extends AbstractWfmsPlan
 		baRequestGoal.getParameter("receiver").setValue(getClientInterface());
 		
 		dispatchSubgoalAndWait(baRequestGoal);
-		
-		Done done = (Done) baRequestGoal.getParameter("result").getValue();
-		IClientActivity activity = ((RequestBeginActivity) done.getAction()).getActivity();
-		getParameter("activity").setValue(activity);
 	}
 
 }

@@ -25,6 +25,10 @@
 		<beliefref name="rp_filter">
 			<concrete ref="reqcap.rp_filter"/>
 		</beliefref>
+		<belief name="add_workitem_controller" class="javax.swing.Action" />
+		<belief name="remove_workitem_controller" class="javax.swing.Action" />
+		<belief name="add_activity_controller" class="javax.swing.Action" />
+		<belief name="remove_activity_controller" class="javax.swing.Action" />
 	</beliefs>
 	
 	<goals>
@@ -53,6 +57,10 @@
 			<parameter name="workitem_list" class="Set" direction="out" />
 		</achievegoal>
 		
+		<achievegoal name="request_activity_list" exported="true">
+			<parameter name="activity_list" class="Set" direction="out" />
+		</achievegoal>
+		
 		<achievegoal name="begin_activity" exported="true">
 			<parameter name="workitem" class="IWorkitem" />
 			<parameter name="activity" class="IClientActivity" direction="out" />
@@ -66,8 +74,27 @@
 			<parameter name="activity" class="IClientActivity" />
 		</achievegoal>
 		
+		
 		<achievegoal name="start_workitem_subscription" exported="true" />
 		
+		<!-- ================= Subscription Events ==================== -->
+		<achievegoal name="add_workitem" exported="true">
+			<parameter name="workitem" class="IWorkitem" exported="true" />
+		</achievegoal>
+		
+		<achievegoal name="remove_workitem" exported="true">
+			<parameter name="workitem" class="IWorkitem" exported="true"/>
+		</achievegoal>
+		
+		<achievegoal name="add_activity" exported="true">
+			<parameter name="activity" class="IClientActivity" exported="true" />
+		</achievegoal>
+		
+		<achievegoal name="remove_activity" exported="true">
+			<parameter name="activity" class="IClientActivity" exported="true"/>
+		</achievegoal>
+		
+		<!-- ================= Heartbeat/Keepalive goals ==================== -->
 		<achievegoal name="recover_lost_connection" exported="true" />
 		
 		<performgoal name="keep_sending_heartbeats" retry="true" retrydelay="2000" exclude="never"/>
@@ -137,6 +164,16 @@
 			</trigger>
 		</plan>
 		
+		<plan name="request_activity_list_plan">
+			<parameter name="activity_list" class="Set" direction="out">
+				<goalmapping ref="request_activity_list.activity_list"/>
+			</parameter>
+			<body class="ActivityListPlan" />
+			<trigger>
+				<goal ref="request_activity_list" />
+			</trigger>
+		</plan>
+		
 		<plan name="begin_activity_plan">
 			<parameter name="workitem" class="IWorkitem">
 				<goalmapping ref="begin_activity.workitem"/>
@@ -196,16 +233,49 @@
 				<goal ref="subcap.sp_handle_update" />
 			</trigger>
 		</plan>
+		
+		<plan name="add_workitem_plan" priority="-1">
+			<parameter name="workitem" class="IWorkitem">
+				<goalmapping ref="add_workitem.workitem"/>
+			</parameter>
+			<body class="AddWorkitemPlan" />
+			<trigger>
+				<goal ref="add_workitem" />
+			</trigger>
+		</plan>
+		
+		<plan name="remove_workitem_plan" priority="-1">
+			<parameter name="workitem" class="IWorkitem">
+				<goalmapping ref="remove_workitem.workitem"/>
+			</parameter>
+			<body class="RemoveWorkitemPlan" />
+			<trigger>
+				<goal ref="remove_workitem" />
+			</trigger>
+		</plan>
+		
+		<plan name="add_activity_plan" priority="-1">
+			<parameter name="activity" class="IClientActivity">
+				<goalmapping ref="add_activity.activity"/>
+			</parameter>
+			<body class="AddActivityPlan" />
+			<trigger>
+				<goal ref="add_activity" />
+			</trigger>
+		</plan>
+		
+		<plan name="remove_activity_plan" priority="-1">
+			<parameter name="activity" class="IClientActivity">
+				<goalmapping ref="remove_activity.activity"/>
+			</parameter>
+			<body class="RemoveActivityPlan" />
+			<trigger>
+				<goal ref="remove_activity" />
+			</trigger>
+		</plan>
 	</plans>
 	
 	<events>
-		<internalevent name="workitem_added" exported="true">
-			<parameter name="workitem" class="IWorkitem"/>
-		</internalevent>
-		
-		<internalevent name="workitem_removed" exported="true">
-			<parameter name="workitem" class="IWorkitem"/>
-		</internalevent>
 	</events>
 	
 	<configurations>
