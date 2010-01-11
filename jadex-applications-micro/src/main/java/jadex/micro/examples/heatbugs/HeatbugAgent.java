@@ -34,7 +34,8 @@ public class HeatbugAgent extends MicroAgent
 //		unhappiness = Math.abs(ideal_temp - temp);
 		final double randomchance = ((Number)avatar.getProperty("random_move_chance")).doubleValue();
 		final double ideal_temp = ((Number)avatar.getProperty("ideal_temp")).doubleValue();
-	
+//		System.out.println("ideal_temp: "+ideal_temp+" "+getArgument("ideal_temp"));
+		
 		Runnable runnable = new Runnable()
 		{
 			public void run()
@@ -121,6 +122,8 @@ public class HeatbugAgent extends MicroAgent
 	 */
 	public static Object getMetaInfo()
 	{
+		// todo: remove arguments, the values are directly taken 
+		// from the avatar.
 		return new MicroAgentMetaInfo("A heat bug emits heat and " +
 			"moves towards a point with ideal temperature.", 
 			new String[0], new IArgument[]{

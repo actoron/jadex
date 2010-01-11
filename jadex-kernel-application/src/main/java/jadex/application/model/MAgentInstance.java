@@ -1,5 +1,7 @@
 package jadex.application.model;
 
+import jadex.application.runtime.Application;
+import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.service.IServiceContainer;
@@ -184,15 +186,20 @@ public class MAgentInstance
 	 *  Get the arguments.
 	 *  @return The arguments as a map of name-value pairs.
 	 */
-	public Map getArguments(IServiceContainer container, MApplicationType apptype, ClassLoader classloader)
+	public Map getArguments(Application context, MApplicationType apptype, ClassLoader classloader)
 	{
 		Map ret = null;
 
 		if(arguments!=null)
 		{
 			ret = new HashMap();
+//			SimpleValueFetcher fetcher = new SimpleValueFetcher();
+//			fetcher.setValue("$platform", container);
+			
 			SimpleValueFetcher fetcher = new SimpleValueFetcher();
-			fetcher.setValue("$platform", container);
+			fetcher.setValue("$platform", context.getServiceContainer());
+			fetcher.setValue("$args", context.getArguments());
+			fetcher.setValue("$results", context.getResults());
 
 			String[] imports = apptype.getAllImports();
 			for(int i=0; i<arguments.size(); i++)

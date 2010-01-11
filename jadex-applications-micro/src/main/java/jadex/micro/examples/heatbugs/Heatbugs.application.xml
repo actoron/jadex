@@ -30,6 +30,8 @@
 		<argument name="diffusion_rate" typename="Double">0.2</argument>
 		<!-- The evaporation rate for heat cooling. -->
 		<argument name="evaporation_rate" typename="Double">0.03</argument>
+		<!-- The heatbug ideal temperature. -->
+		<argument name="ideal_temp" typename="Double">0.3</argument>
 	</arguments>
 	
 	<spacetypes>
@@ -216,6 +218,11 @@
 
 			<agents>
 				<agent type="Heatbug" number="10"/>
+				<!-- <agent type="Heatbug">
+					<arguments>
+						<argument name="ideal_temp">$args.ideal_temp</argument>
+					</arguments>
+				</agent> -->
 			</agents>
 		</application>
 		
