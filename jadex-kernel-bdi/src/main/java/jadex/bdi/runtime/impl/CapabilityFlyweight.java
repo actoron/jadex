@@ -286,18 +286,18 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IComponentIdentifier	getComponentIdentifier()
 	{
-		if(getInterpreter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = adapter.getComponentIdentifier();
-				}
-			};
-			return (IComponentIdentifier)invoc.object;
-		}
-		else
+//		if(getInterpreter().isExternalThread())
+//		{
+//			AgentInvocation invoc = new AgentInvocation()
+//			{
+//				public void run()
+//				{
+//					object = adapter.getComponentIdentifier();
+//				}
+//			};
+//			return (IComponentIdentifier)invoc.object;
+//		}
+//		else
 		{
 			return adapter.getComponentIdentifier();
 		}
