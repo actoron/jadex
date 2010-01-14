@@ -62,7 +62,7 @@ public class DebuggerMainPanel extends JSplitPane
 	 *  @param container	The service container.
 	 *  @param comp	The identifier of the component to be debugged.
 	 */
-	public DebuggerMainPanel(IControlCenter jcc, IComponentDescription desc)
+	public DebuggerMainPanel(final IControlCenter jcc, final IComponentDescription desc)
 	{
 		this.jcc	= jcc;
 		this.desc	= desc;
@@ -81,52 +81,46 @@ public class DebuggerMainPanel extends JSplitPane
 		{			
 			public void resultAvailable(Object source, final Object result)
 			{
-				// The left panel (breakpoints)
 				SwingUtilities.invokeLater(new Runnable()
 				{
-					
 					public void run()
 					{
+						// The left panel (breakpoints)
+						BreakpointPanel	leftpanel	= null;
 						Map	props	= ((IExternalAccess)result).getModel().getProperties();
 						if(props!=null && props.containsKey(KEY_DEBUGGER_BREAKPOINTS))
 						{
 							Collection	breakpoints	= (Collection)props.get(KEY_DEBUGGER_BREAKPOINTS);
-							BreakpointPanel	leftpanel	= new BreakpointPanel(breakpoints);
+							leftpanel	= new BreakpointPanel(breakpoints, desc, jcc.getServiceContainer());
 							DebuggerMainPanel.this.setLeftComponent(leftpanel);
 							DebuggerMainPanel.this.setDividerLocation(150);	// Hack???
 						}
-					}
-				});
-				
-				// Sub panels of right panel.
-				final Map	props	= SComponentFactory.getProperties(DebuggerMainPanel.this.jcc.getServiceContainer(), DebuggerMainPanel.this.desc.getType());
-				if(props!=null && props.containsKey(KEY_DEBUGGER_PANELS))
-				{
-					final ILibraryService	libservice	= (ILibraryService)DebuggerMainPanel.this.jcc.getServiceContainer().getService(ILibraryService.class);
-					String	panels	= (String)props.get(KEY_DEBUGGER_PANELS);
-					StringTokenizer	stok	= new StringTokenizer(panels, ", \t\n\r\f");
-					while(stok.hasMoreTokens())
-					{
-						final String classname	= stok.nextToken();
-						SwingUtilities.invokeLater(new Runnable()
+						
+						// Sub panels of right panel.
+						props	= SComponentFactory.getProperties(DebuggerMainPanel.this.jcc.getServiceContainer(), DebuggerMainPanel.this.desc.getType());
+						if(props!=null && props.containsKey(KEY_DEBUGGER_PANELS))
 						{
-							public void run()
+							final ILibraryService	libservice	= (ILibraryService)DebuggerMainPanel.this.jcc.getServiceContainer().getService(ILibraryService.class);
+							String	panels	= (String)props.get(KEY_DEBUGGER_PANELS);
+							StringTokenizer	stok	= new StringTokenizer(panels, ", \t\n\r\f");
+							while(stok.hasMoreTokens())
 							{
+								String classname	= stok.nextToken();
 								try
 								{
 									Class	clazz	= SReflect.classForName(classname, libservice.getClassLoader());
 									IDebuggerPanel	panel	= (IDebuggerPanel)clazz.newInstance();
-									panel.init(DebuggerMainPanel.this.jcc, DebuggerMainPanel.this.desc.getName(), result);
+									panel.init(DebuggerMainPanel.this.jcc, leftpanel, DebuggerMainPanel.this.desc.getName(), result);
 									tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
 								}
 								catch(Exception e)
 								{
 									DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panel.", "Debugger panel class: "+classname, e);
 								}
-							}							
-						});
+							}
+						}
 					}
-				}
+				});				
 			}
 			public void exceptionOccurred(Object source, Exception exception)
 			{

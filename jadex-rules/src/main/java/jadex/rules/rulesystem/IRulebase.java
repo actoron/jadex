@@ -26,6 +26,13 @@ public interface IRulebase extends Cloneable
 	 */
 	public Collection getRules();
 	
+	/**
+	 *  Get a rule with a given name.
+	 *  @param name	The rule name.
+	 *  @return The rule.
+	 */
+	public IRule getRule(String string);
+	
 	//-------- state observers --------
 	
 	/**
@@ -46,6 +53,5 @@ public interface IRulebase extends Cloneable
 	 *  Clone this object.
 	 *  @return A clone of this object.
 	 */
-	public Object clone();
-	
+	public Object clone();	
 }

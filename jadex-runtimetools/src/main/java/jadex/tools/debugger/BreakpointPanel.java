@@ -1,7 +1,15 @@
 package jadex.tools.debugger;
 
+import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentListener;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IBreakpointPanel;
+import jadex.commons.IChangeListener;
 import jadex.commons.SGUI;
+import jadex.commons.SUtil;
 import jadex.rules.tools.common.TableSorter;
+import jadex.service.IServiceContainer;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -10,6 +18,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.JCheckBox;
@@ -20,8 +29,6 @@ import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
@@ -33,7 +40,7 @@ import javax.swing.table.TableModel;
 /**
  *  A panel for viewing the breakpoints.
  */
-public class BreakpointPanel extends JPanel
+public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 {
 	//-------- static part --------
 
@@ -48,20 +55,28 @@ public class BreakpointPanel extends JPanel
 	/** The breakpoints. */
 	protected List	breakpoints;
 	
+	/** The component description. */
+	protected IComponentDescription	description;
+	
+	/** The service container. */
+	protected IServiceContainer	container;
+	
 	/** The list. */
 	protected JTable list;
 	
 	/** The listeners (if any). */
 	protected List	listeners;
-	
+		
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new rulebase panel.
 	 */
-	public BreakpointPanel(Collection breakpoints)
+	public BreakpointPanel(Collection breakpoints, IComponentDescription description, IServiceContainer container)
 	{
 		this.breakpoints = new ArrayList(breakpoints);
+		this.description	= description;
+		this.container	= container;
 		
 		TableModel lm = new AbstractTableModel()
 		{
@@ -124,12 +139,30 @@ public class BreakpointPanel extends JPanel
 			{
 				 if(!e.getValueIsAdjusting() && listeners!=null)
 				 {
-					 ChangeEvent	ce	= new ChangeEvent(this);
+					 ChangeEvent	ce	= new ChangeEvent(this, EVENT_TYPE_SELECTED);
 					 for(int i=0; i<listeners.size(); i++)
 					 {
-						 ((ChangeListener)listeners.get(i)).stateChanged(ce);
+						 ((IChangeListener)listeners.get(i)).changeOccurred(ce);
 					 }
 				 }
+			}
+		});
+		
+		IComponentExecutionService	ces	= (IComponentExecutionService)container.getService(IComponentExecutionService.class);
+		ces.addComponentListener(description.getName(), new IComponentListener()
+		{
+			public void componentRemoved(IComponentDescription desc, Map results)
+			{
+			}
+			
+			public void componentChanged(IComponentDescription desc)
+			{
+				BreakpointPanel.this.description	= desc;
+				// Todo: update gui?
+			}
+			
+			public void componentAdded(IComponentDescription desc)
+			{
 			}
 		});
 	}
@@ -144,17 +177,9 @@ public class BreakpointPanel extends JPanel
 	}
 	
 	/**
-	 *  Clear the selection in the gui.
-	 */
-	public void clearSelectedBreakpoints()
-	{
-		list.clearSelection();
-	}
-
-	/**
 	 *  Get the currently selected breakpoints.
 	 */
-	public Object[] getSelectedBreakpoints()
+	public String[] getSelectedBreakpoints()
 	{
 		 List	selected	= new ArrayList();
 		 TableSorter sorter = (TableSorter)list.getModel();
@@ -163,23 +188,27 @@ public class BreakpointPanel extends JPanel
 			 if(list.isRowSelected(i))
 				 selected.add(breakpoints.get(sorter.modelIndex(i)));
 		}
-		return selected.toArray();
+		return (String[])selected.toArray(new String[selected.size()]);
 	}
 
 	/**
-	 *  Select a breakpoint.
+	 *  Set the currently selected breakpoints.
 	 */
-	public void selectBreakpoints(Object breakpoint)
+	public void setSelectedBreakpoints(String[] breakpoints)
 	{
-		int	index	= breakpoints.indexOf(breakpoints);
-		if(index!=-1)
-			list.getSelectionModel().addSelectionInterval(index, index);
+		list.clearSelection();
+		for(int i=0; i<breakpoints.length; i++)
+		{
+			int	index	= this.breakpoints.indexOf(breakpoints[i]);
+			if(index!=-1)
+				list.getSelectionModel().addSelectionInterval(index, index);
+		}
 	}
 
 	/**
 	 *  Add a change listener to be notified of rule selection changes.
 	 */
-	public void addRuleSelectionListener(ChangeListener listener)
+	public void addBreakpointListener(IChangeListener listener)
 	{
 		if(listeners==null)
 			listeners	= new ArrayList();
@@ -190,7 +219,7 @@ public class BreakpointPanel extends JPanel
 	/**
 	 *  Remove a change listener.
 	 */
-	public void removeRuleSelectionListener(ChangeListener listener)
+	public void removeBreakpointListener(IChangeListener listener)
 	{
 		listeners.remove(listener);
 
@@ -205,8 +234,8 @@ public class BreakpointPanel extends JPanel
 	{
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int rowIndex, int column)
 		{
-//			TableSorter sorter = (TableSorter)list.getModel();
-			boolean	selected	= false; //steppable.isBreakpoint((IRule)breakpoints.get(sorter.modelIndex(rowIndex)));
+			TableSorter sorter = (TableSorter)list.getModel();
+			boolean	selected	= SUtil.arrayContains(description.getBreakpoints(), breakpoints.get(sorter.modelIndex(rowIndex)));
 			JPanel	ret	= new JPanel(new BorderLayout());
 			JCheckBox	but	= new JCheckBox((String)null, selected);
 			ret.add(but, BorderLayout.CENTER);
@@ -216,8 +245,8 @@ public class BreakpointPanel extends JPanel
 
 		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, final int rowIndex, int column)
 		{
-//			final TableSorter sorter = (TableSorter)list.getModel();
-			boolean	selected	= false; //steppable.isBreakpoint((IRule)breakpoints.get(sorter.modelIndex(rowIndex)));
+			final TableSorter sorter = (TableSorter)list.getModel();
+			boolean	selected	= SUtil.arrayContains(description.getBreakpoints(), breakpoints.get(sorter.modelIndex(rowIndex)));
 			JPanel	ret	= new JPanel(new BorderLayout());
 			final JCheckBox	but	= new JCheckBox((String)null, selected);
 			ret.add(but, BorderLayout.CENTER);
@@ -226,14 +255,15 @@ public class BreakpointPanel extends JPanel
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
 				{
-					if(but.isSelected())
-					{
-//						steppable.addBreakpoint((IRule) breakpoints.get(sorter.modelIndex(rowIndex)));
-					}
-					else
-					{
-//						steppable.removeBreakpoint((IRule) breakpoints.get(sorter.modelIndex(rowIndex)));
-					}
+					// Todo: update breakpoints using component execution service.
+//					if(but.isSelected())
+//					{
+//						selecteds.add(breakpoints.get(sorter.modelIndex(rowIndex)));
+//					}
+//					else
+//					{
+//						selecteds.remove(breakpoints.get(sorter.modelIndex(rowIndex)));
+//					}
 				}
 			});
 			return	ret;

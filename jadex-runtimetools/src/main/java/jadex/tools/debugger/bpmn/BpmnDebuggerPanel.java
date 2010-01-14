@@ -3,6 +3,7 @@ package jadex.tools.debugger.bpmn;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.tools.ProcessViewPanel;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.IBreakpointPanel;
 import jadex.commons.SGUI;
 import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.debugger.IDebuggerPanel;
@@ -37,10 +38,11 @@ public class BpmnDebuggerPanel	implements IDebuggerPanel
 	 *  Called to initialize the panel.
 	 *  Called on the swing thread.
 	 *  @param jcc	The jcc.
+	 *  @param bpp	The breakpoint panel.
 	 * 	@param id	The component identifier.
 	 * 	@param access	The external access of the component.
 	 */
-	public void init(IControlCenter jcc, IComponentIdentifier name, Object access)
+	public void init(IControlCenter jcc, IBreakpointPanel bpp, IComponentIdentifier name, Object access)
 	{
 		this.processpanel	= new ProcessViewPanel((BpmnInterpreter)access);
 	}

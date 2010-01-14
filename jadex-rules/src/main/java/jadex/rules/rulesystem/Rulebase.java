@@ -4,6 +4,7 @@ import jadex.rules.rulesystem.rules.Rule;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -68,6 +69,25 @@ public class Rulebase implements IRulebase
 	public Collection getRules()
 	{
 		return rules;
+	}
+	
+	/**
+	 *  Get a rule with a given name.
+	 *  @param name	The rule name.
+	 *  @return The rule.
+	 */
+	public IRule getRule(String name)
+	{
+		IRule	ret	= null;
+		for(Iterator it=rules.iterator(); ret==null && it.hasNext(); )
+		{
+			IRule	rule	= (IRule)it.next();
+			if(name.equals(rule.getName()))
+				ret	= rule;
+		}
+		if(ret==null)
+			throw new RuntimeException("Unknown rule: "+name);
+		return ret;
 	}
 	
 	//-------- rulebase observers --------

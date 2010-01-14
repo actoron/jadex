@@ -286,6 +286,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IComponentIdentifier	getComponentIdentifier()
 	{
+		// Todo: synchronization across components?
 //		if(getInterpreter().isExternalThread())
 //		{
 //			AgentInvocation invoc = new AgentInvocation()

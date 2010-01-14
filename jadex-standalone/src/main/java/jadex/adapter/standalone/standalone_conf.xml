@@ -85,16 +85,18 @@
 						"messagetype_fipa", 
 						"planexecutor_standard", 
 						"standard.timeout", 
-						"microplansteps" //,
-						//"planexecutor_bpmn"
+						"microplansteps",
+						//"planexecutor_bpmn",
+						"debugger.panels"
 					},
 					new Object[]
 					{
 						new jadex.adapter.base.fipa.FIPAMessageType(), 
 						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class)),
 						new java.lang.Long(10000),
-						Boolean.TRUE //,
-						//new jadex.bdi.runtime.BpmnPlanExecutor()
+						Boolean.TRUE,
+						//new jadex.bdi.runtime.BpmnPlanExecutor(),
+						"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
 					}
 				), $platform)
 			</property>

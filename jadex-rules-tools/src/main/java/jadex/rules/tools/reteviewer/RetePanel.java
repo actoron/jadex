@@ -1,5 +1,8 @@
 package jadex.rules.tools.reteviewer;
 
+import jadex.commons.ChangeEvent;
+import jadex.commons.IBreakpointPanel;
+import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
 import jadex.commons.ISteppable;
 import jadex.rules.rulesystem.Activation;
@@ -52,8 +55,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.apache.commons.collections15.Transformer;
 import org.apache.commons.collections15.functors.ConstantTransformer;
@@ -86,7 +87,7 @@ public class RetePanel extends JPanel
 	protected boolean showtxt;
 	
 	/** The rulebase panel. */
-	protected RulebasePanel rulebasepanel;
+	protected IBreakpointPanel rulebasepanel;
 
 	/** The agenda panel. */
 	protected AgendaPanel ap;
@@ -119,9 +120,9 @@ public class RetePanel extends JPanel
 	 *  Create a new rete panel.
 	 *  Set steppable to null for panel without breakpoints and step mode.
 	 */
-	public RetePanel(final RuleSystem system, final ISteppable steppable)
+	public RetePanel(final RuleSystem system, final ISteppable steppable, final IBreakpointPanel rulebasepanel)
 	{
-		this.rulebasepanel = new RulebasePanel(system.getRulebase(), steppable);
+		this.rulebasepanel = rulebasepanel;
 		this.infopanels = new JTabbedPane();
 		this.system	= system;
 		
@@ -396,33 +397,8 @@ public class RetePanel extends JPanel
 		sp2.setDividerLocation(500);
 		sp2.add(vv);
 		sp2.add(infopanels);
-		
-		if(steppable!=null)
-		{
-			JSplitPane sp1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-			sp1.setOneTouchExpandable(true);
-			sp1.add(rulebasepanel);
-			sp1.add(sp2);
-			sp1.setDividerLocation(150);
-			
-			this.setLayout(new BorderLayout());
-			this.add(sp1, BorderLayout.CENTER);
-			//this.add(buts, BorderLayout.SOUTH);
-		}
-		else
-		{
-//			this.add(sp2, BorderLayout.CENTER);
-
-			JSplitPane sp1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-			sp1.setOneTouchExpandable(true);
-			sp1.add(rulebasepanel);
-			sp1.add(sp2);
-			sp1.setDividerLocation(0);
-			
-			this.setLayout(new BorderLayout());
-			this.add(sp1, BorderLayout.CENTER);
-			//this.add(buts, BorderLayout.SOUTH);
-		}
+		this.setLayout(new BorderLayout());
+		this.add(sp2, BorderLayout.CENTER);
 		
 		vv.addComponentListener(new ComponentAdapter()
 		{
@@ -432,11 +408,11 @@ public class RetePanel extends JPanel
 			}
 		});
 		
-		rulebasepanel.addRuleSelectionListener(new ChangeListener()
+		rulebasepanel.addBreakpointListener(new IChangeListener()
 		{
-			 public void stateChanged(ChangeEvent e)
+			 public void changeOccurred(ChangeEvent e)
 			 {
-				 IRule[] rules = rulebasepanel.getSelectedRules();
+				 String[] rules = (String[])rulebasepanel.getSelectedBreakpoints();
 //				 System.out.println("Selected: "+SUtil.arrayToString(rules)+" "+e);
 				 
 				 if(rules!=null && rules.length>0)
@@ -449,7 +425,7 @@ public class RetePanel extends JPanel
 					 Set subgraph = new HashSet();
 					 for(int i=0; i<rules.length; i++)
 					 {
-						 INode node = root.getTerminalNode(rules[i]);
+						 INode node = root.getTerminalNode(system.getRulebase().getRule(rules[i]));
 						 subgraph.add(node);
 					 }
 					 
@@ -457,7 +433,7 @@ public class RetePanel extends JPanel
 					 hideMarkedNodes(subgraph);
 					 
 					 if(np.getNode()==null || !subgraph.contains(np.getNode()))
-						 np.setNode(root.getTerminalNode(rules[0]));
+						 np.setNode(root.getTerminalNode(system.getRulebase().getRule(rules[0])));
 				 }
 				 
 				 // Show no nodes at all.
@@ -492,7 +468,6 @@ public class RetePanel extends JPanel
 //							System.out.println("Next activation: "+act);
 							if(followact.isSelected())
 							{
-								rulebasepanel.clearSelectedRules();
 								IRule	rule;
 								synchronized(RetePanel.this)
 								{
@@ -500,7 +475,11 @@ public class RetePanel extends JPanel
 								}
 								if(rule!=null)
 								{
-									rulebasepanel.selectRule(rule);
+									rulebasepanel.setSelectedBreakpoints(new String[]{rule.getName()});
+								}
+								else
+								{
+									rulebasepanel.setSelectedBreakpoints(new String[0]);
 								}
 							}
 							if(steppable!=null)
@@ -522,12 +501,12 @@ public class RetePanel extends JPanel
 					Activation act = system.getAgenda().getNextActivation();
 					if(act!=null && followact.isSelected())
 					{
-						rulebasepanel.selectRule(act.getRule());
+						rulebasepanel.setSelectedBreakpoints(new String[]{act.getRule().getName()});
 					}
 				}
 				else
 				{
-					rulebasepanel.clearSelectedRules();
+					rulebasepanel.setSelectedBreakpoints(new String[0]);
 				}
 			}
 		});
@@ -536,7 +515,7 @@ public class RetePanel extends JPanel
 			Activation act = system.getAgenda().getNextActivation();
 			if(act!=null && followact.isSelected())
 			{
-				rulebasepanel.selectRule(act.getRule());
+				rulebasepanel.setSelectedBreakpoints(new String[]{act.getRule().getName()});
 			}
 		}
 		/*ap.getActivationsList().addListSelectionListener(new ListSelectionListener()

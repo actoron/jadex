@@ -1,6 +1,7 @@
 package jadex.tools.debugger;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.IBreakpointPanel;
 import jadex.tools.common.plugin.IControlCenter;
 
 import javax.swing.Icon;
@@ -18,10 +19,11 @@ public interface IDebuggerPanel
 	 *  Called to initialize the panel.
 	 *  Called on the swing thread.
 	 *  @param jcc	The jcc.
+	 *  @param bpp	The breakpoint panel.
 	 * 	@param id	The component identifier.
 	 * 	@param access	The external access of the component.
 	 */
-	public void init(IControlCenter jcc, IComponentIdentifier name, Object access);
+	public void init(IControlCenter jcc, IBreakpointPanel bpp, IComponentIdentifier name, Object access);
 
 	/**
 	 *  The title of the panel (name of the tab).

@@ -29,6 +29,9 @@ public class AMSAgentDescription implements IComponentDescription, Cloneable, Se
 	/** The component type. */
 	protected String type;
 
+	/** The breakpoints. */
+	protected String[] breakpoints;
+
 	//-------- constructors --------
 
 	/**
@@ -140,6 +143,24 @@ public class AMSAgentDescription implements IComponentDescription, Cloneable, Se
 	public void setType(String type)
 	{
 		this.type	= type;
+	}
+
+	/**
+	 *  Get the enabled breakpoints (if any).
+	 *  @return The enabled breakpoints.
+	 */
+	public String[]	getBreakpoints()
+	{
+		return breakpoints!=null ? breakpoints : new String[0];
+	}
+
+	/**
+	 *  Set the enabled breakpoints (if any).
+	 *  @param breakpoints The enabled breakpoints.
+	 */
+	public void	setBreakpoints(String[] breakpoints)
+	{
+		this.breakpoints	= breakpoints;
 	}
 		
 	//-------- methods --------

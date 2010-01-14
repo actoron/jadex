@@ -64,7 +64,7 @@ public class RuleSystemExecutor implements ISteppable
 					while(it.hasNext())
 					{
 						IRule	rule	= ((Activation)it.next()).getRule();
-						if(breakpoints.contains(rule))
+						if(breakpoints.contains(rule.getName()))
 						{
 							setStepmode(true);
 							

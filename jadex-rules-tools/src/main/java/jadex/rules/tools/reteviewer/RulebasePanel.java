@@ -1,5 +1,8 @@
 package jadex.rules.tools.reteviewer;
 
+import jadex.commons.ChangeEvent;
+import jadex.commons.IBreakpointPanel;
+import jadex.commons.IChangeListener;
 import jadex.commons.ISteppable;
 import jadex.commons.SGUI;
 import jadex.rules.rulesystem.IRule;
@@ -24,8 +27,6 @@ import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
@@ -37,7 +38,7 @@ import javax.swing.table.TableModel;
 /**
  *  A panel for viewing the content of the rulebase.
  */
-public class RulebasePanel extends JPanel
+public class RulebasePanel extends JPanel	implements IBreakpointPanel
 {
 	//-------- static part --------
 
@@ -78,7 +79,7 @@ public class RulebasePanel extends JPanel
 		this.rulebase	= rulebase;
 		this.rules = new ArrayList();
 		for(Iterator it=rulebase.getRules().iterator(); it.hasNext(); )
-			rules.add(it.next());
+			rules.add(((IRule)it.next()).getName());
 		
 		TableModel lm = new AbstractTableModel()
 		{
@@ -92,7 +93,7 @@ public class RulebasePanel extends JPanel
 			}
 			public Object getValueAt(int row, int column)
 			{
-				return column==1 ? ((IRule)rules.get(row)).getName() : null;
+				return column==1 ? rules.get(row) : null;
 			}
 			public boolean isCellEditable(int row, int column)
 			{
@@ -108,12 +109,12 @@ public class RulebasePanel extends JPanel
 		{
 			public void ruleAdded(IRule rule)
 			{
-				rules.add(rule);
+				rules.add(rule.getName());
 			}
 			
 			public void ruleRemoved(IRule rule)
 			{
-				rules.remove(rule);
+				rules.remove(rule.getName());
 			}
 		};
 		rulebase.addRulebaseListener(listener);
@@ -155,10 +156,10 @@ public class RulebasePanel extends JPanel
 			{
 				 if(!e.getValueIsAdjusting() && listeners!=null)
 				 {
-					 ChangeEvent	ce	= new ChangeEvent(this);
+					 ChangeEvent	ce	= new ChangeEvent(this, EVENT_TYPE_SELECTED);
 					 for(int i=0; i<listeners.size(); i++)
 					 {
-						 ((ChangeListener)listeners.get(i)).stateChanged(ce);
+						 ((IChangeListener)listeners.get(i)).changeOccurred(ce);
 					 }
 				 }
 			}
@@ -176,17 +177,9 @@ public class RulebasePanel extends JPanel
 	}
 	
 	/**
-	 *  Clear the selection in the gui.
+	 *  Get the currently selected breakpoints.
 	 */
-	public void clearSelectedRules()
-	{
-		list.clearSelection();
-	}
-
-	/**
-	 *  Get the currently selected rules.
-	 */
-	public IRule[] getSelectedRules()
+	public String[] getSelectedBreakpoints()
 	{
 		 List	selected	= new ArrayList();
 		 TableSorter sorter = (TableSorter)list.getModel();
@@ -195,23 +188,27 @@ public class RulebasePanel extends JPanel
 			 if(list.isRowSelected(i))
 				 selected.add(rules.get(sorter.modelIndex(i)));
 		}
-		return (IRule[]) selected.toArray(new IRule[selected.size()]);
+		return (String[]) selected.toArray(new String[selected.size()]);
 	}
 
 	/**
-	 *  Select a rule.
+	 *  Set the currently selected breakpoints.
 	 */
-	public void selectRule(IRule rule)
+	public void setSelectedBreakpoints(String[] breakpoints)
 	{
-		int	index	= rules.indexOf(rule);
-		if(index!=-1)
-			list.getSelectionModel().addSelectionInterval(index, index);
+		list.clearSelection();
+		for(int i=0; i<breakpoints.length; i++)
+		{
+			int	index	= rules.indexOf(breakpoints[i]);
+			if(index!=-1)
+				list.getSelectionModel().addSelectionInterval(index, index);
+		}
 	}
 
 	/**
 	 *  Add a change listener to be notified of rule selection changes.
 	 */
-	public void addRuleSelectionListener(ChangeListener listener)
+	public void addBreakpointListener(IChangeListener listener)
 	{
 		if(listeners==null)
 			listeners	= new ArrayList();
@@ -222,7 +219,7 @@ public class RulebasePanel extends JPanel
 	/**
 	 *  Remove a change listener.
 	 */
-	public void removeRuleSelectionListener(ChangeListener listener)
+	public void removeBreakpointListener(IChangeListener listener)
 	{
 		listeners.remove(listener);
 
@@ -238,7 +235,7 @@ public class RulebasePanel extends JPanel
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int rowIndex, int column)
 		{
 			TableSorter sorter = (TableSorter)list.getModel();
-			boolean	selected	= steppable!=null && steppable.isBreakpoint((IRule)rules.get(sorter.modelIndex(rowIndex)));
+			boolean	selected	= steppable!=null && steppable.isBreakpoint(rules.get(sorter.modelIndex(rowIndex)));
 			JPanel	ret	= new JPanel(new BorderLayout());
 			JCheckBox	but	= new JCheckBox((String)null, selected);
 			ret.add(but, BorderLayout.CENTER);
@@ -249,7 +246,7 @@ public class RulebasePanel extends JPanel
 		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, final int rowIndex, int column)
 		{
 			final TableSorter sorter = (TableSorter)list.getModel();
-			boolean	selected	= steppable!=null && steppable.isBreakpoint((IRule)rules.get(sorter.modelIndex(rowIndex)));
+			boolean	selected	= steppable!=null && steppable.isBreakpoint(rules.get(sorter.modelIndex(rowIndex)));
 			JPanel	ret	= new JPanel(new BorderLayout());
 			final JCheckBox	but	= new JCheckBox((String)null, selected);
 			ret.add(but, BorderLayout.CENTER);
@@ -260,11 +257,11 @@ public class RulebasePanel extends JPanel
 				{
 					if(but.isSelected() && steppable!=null)
 					{
-						steppable.addBreakpoint((IRule) rules.get(sorter.modelIndex(rowIndex)));
+						steppable.addBreakpoint(rules.get(sorter.modelIndex(rowIndex)));
 					}
 					else if(steppable!=null)
 					{
-						steppable.removeBreakpoint((IRule) rules.get(sorter.modelIndex(rowIndex)));
+						steppable.removeBreakpoint(rules.get(sorter.modelIndex(rowIndex)));
 					}
 				}
 			});

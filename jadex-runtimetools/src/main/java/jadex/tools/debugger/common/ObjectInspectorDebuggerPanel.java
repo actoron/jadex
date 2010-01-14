@@ -1,6 +1,7 @@
 package jadex.tools.debugger.common;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.IBreakpointPanel;
 import jadex.commons.SGUI;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVJavaType;
@@ -40,10 +41,11 @@ public class ObjectInspectorDebuggerPanel	implements IDebuggerPanel
 	 *  Called to initialize the panel.
 	 *  Called on the swing thread.
 	 *  @param jcc	The jcc.
+	 *  @param bpp	The breakpoint panel.
 	 * 	@param id	The component identifier.
 	 * 	@param access	The external access of the component.
 	 */
-	public void init(IControlCenter jcc, IComponentIdentifier name, Object access)
+	public void init(IControlCenter jcc, IBreakpointPanel bpp, IComponentIdentifier name, Object access)
 	{
 		IOAVState	dummystate	= OAVStateFactory.createOAVState(OAVJavaType.java_type_model);
 		dummystate.addJavaRootObject(access);

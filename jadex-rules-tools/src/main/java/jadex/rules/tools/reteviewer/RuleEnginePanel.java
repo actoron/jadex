@@ -12,6 +12,7 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.UIDefaults;
 
@@ -39,6 +40,9 @@ public class RuleEnginePanel extends JTabbedPane
 	/** The Rete panel. */
 	protected RetePanel	retepanel;
 	
+	/** The Rule base panel. */
+	protected RulebasePanel	rulebasepanel;
+	
 	//-------- constructors -------
 	
 	/**
@@ -47,10 +51,17 @@ public class RuleEnginePanel extends JTabbedPane
 	public RuleEnginePanel(final RuleSystem rulesystem, final ISteppable steppable)
 	{
 		this.oavpanel	= new OAVPanel(rulesystem.getState());
-		this.retepanel = new RetePanel(rulesystem, steppable);
+		this.rulebasepanel = new RulebasePanel(rulesystem.getRulebase(), steppable);
+		this.retepanel = new RetePanel(rulesystem, steppable, rulebasepanel);
+		
+		JSplitPane sp1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		sp1.setOneTouchExpandable(true);
+		sp1.add(rulebasepanel);
+		sp1.add(retepanel);
+		sp1.setDividerLocation(150);
 		
 		this.addTab("Working Memory", icons.getIcon("show_state"), oavpanel);
-		this.addTab("Rule Engine", icons.getIcon("show_rete"), retepanel);
+		this.addTab("Rule Engine", icons.getIcon("show_rete"), sp1);
 		this.setSelectedIndex(0);
 	}
 	
@@ -64,6 +75,7 @@ public class RuleEnginePanel extends JTabbedPane
 	{
 		oavpanel.dispose();
 		retepanel.dispose();
+		rulebasepanel.dispose();
 	}
 	
 	//-------- static methods --------
