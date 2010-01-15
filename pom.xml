@@ -45,6 +45,7 @@
 		    <module>jadex-kernel-bdi</module>
 		    <module>jadex-applib-bdi</module>
 		    <module>jadex-applications-bdi</module>
+		    <module>jadex-applib-simulation</module>
 		    <module>jadex-runtimetools</module>
 		    <module>jadex-kernel-micro</module>
 		    <module>jadex-applications-micro</module>
@@ -71,6 +72,7 @@
 		    <module>jadex-nuggets</module>
 		    <module>jadex-kernel-bdi</module>
 		    <module>jadex-applib-bdi</module>
+		    <module>jadex-applib-simulation</module>
 		    <module>jadex-applications-bdi</module>
 		    <module>jadex-applications-bpmn</module>
 		    <module>jadex-runtimetools</module>
