@@ -1,4 +1,4 @@
-package jadex.commons;
+package jadex.simulation;
 
 import java.io.IOException;
 import java.util.HashMap;
