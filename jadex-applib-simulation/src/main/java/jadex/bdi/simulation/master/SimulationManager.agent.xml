@@ -1,0 +1,185 @@
+
+	<!--
+		<H3>Environment / Observer Agent</H3> Used to maintain the GUI /
+		Observer.
+	-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="SimulationManager" package="jadex.bdi.simulation.master">
+
+	<imports>
+		<import>jadex.adapter.base.contextservice.*</import>
+		<import>jadex.adapter.base.appdescriptor.*</import>
+		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
+		<import>jadex.adapter.base.envsupport.environment.*</import>
+		<import>jadex.adapter.base.envsupport.math.*</import>
+		<!-- <import>jadex.commons.*</import> -->
+		<import>jadex.adapter.base.fipa.*</import>
+		<import>java.util.Map</import>
+		<import>java.util.HashMap</import>
+		<import>jadex.bdi.simulation.model.*</import>
+	</imports>
+
+
+	<capabilities>
+		<!--
+			this capability provides easy access to "out-of-the-box"-plans
+			allowing - for example - to register at the DF.
+		-->
+		<capability name="dfcap" file="jadex.bdi.planlib.df.DF" />
+		<!-- Capability to start other agents. -->
+		<capability name="amscap" file="jadex.bdi.planlib.ams.AMS" />
+	</capabilities>
+
+	<beliefs>
+
+		<!-- Number of currently running experiments.-->
+		<belief name="runningSimulations" class="int">
+			<fact>0</fact>
+		</belief>
+
+		<!-- Number of started runs till yet: Increment.-->
+		<belief name="numberOfRuns" class="int">
+			<fact>0</fact>
+		</belief>
+
+		<!--
+			Contains general facts about the Simulation that are the same for all
+			simulation experiments.
+		-->
+		<belief name="generalSimulationFacts" class="Map">
+			<fact>new HashMap()</fact>
+		</belief>
+		
+		<!--  The parsed simulation configuration xml file. -->
+		<belief name="simulationConf" class="SimulationConfiguration"/>					
+
+	</beliefs>
+
+	<goals>
+		<!-- Predefined Goals.-->
+		<!-- Used to find other agents. -->
+		<achievegoalref name="ams_search_agents">
+			<concrete ref="amscap.ams_search_agents" />
+		</achievegoalref>
+		<!-- Used to search for the dealer. -->
+		<achievegoalref name="df_search">
+			<concrete ref="dfcap.df_search" />
+		</achievegoalref>
+		<!-- Used to start other agents. -->
+		<achievegoalref name="ams_create_agent">
+			<concrete ref="amscap.ams_create_agent" />
+		</achievegoalref>
+		<!-- Used to stop other agents. -->
+		<achievegoalref name="ams_destroy_agent">
+			<concrete ref="amscap.ams_destroy_agent" />
+		</achievegoalref>
+		<!-- Keep agent services registered at DF. -->
+		<maintaingoalref name="df_keep_registered">
+			<concrete ref="dfcap.df_keep_registered" />
+		</maintaingoalref>
+
+<!--  Start a new round of experiments. -->
+		<achievegoal name="StartSimulationExperiments">
+			<!-- <parameter name="location" class="Location" />
+			<targetcondition>
+				$beliefbase.my_location.isNear($goal.location)
+</targetcondition>-->
+		</achievegoal>
+	</goals>
+
+	<plans>
+
+		<!-- Init the Simulation.-->
+		<plan name="init_simulation">
+			<body class="InitSimulationPlan" />			
+		</plan>
+		
+		<!-- Start Simulation Experiments.-->
+		<plan name="start_sim_experiments">
+			<body class="StartSimulationExperimentsPlan" />
+			<trigger>
+				<goal ref="StartSimulationExperiments"/>
+			</trigger>
+		</plan>
+
+		<!--
+			Compute / Evaluate the result of one single simulation experiment.
+		-->
+		<plan name="computeSingleResults">
+			<body class="ComputeSingleResultPlan" />
+			<trigger>
+				<messageevent ref="inform_simulation_master" />
+			</trigger>
+		</plan>
+		
+		<!--
+			Compute / Evaluate the results of one simulation experiment ROW.
+		-->
+		<plan name="computeExperimentRowResults">
+			<body class="ComputeExperimentRowResultsPlan" />
+			<trigger>
+				<internalevent ref="triggerExperimentRowEvaluation" />
+			</trigger>			
+		</plan>
+	</plans>
+
+	<events>
+		<!--
+			Message sent by simulation client to inform the manager about the
+			outcome of the simulation.
+		-->
+		<messageevent name="inform_simulation_master" direction="receive"
+			type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+		</messageevent>
+		
+		<!-- Event to trigger a new simulation experiment. -->
+		<internalevent name="triggerNewExperiment"/>
+		
+		<!-- Event to trigger the evaluation of a simulation row. -->
+		<internalevent name="triggerExperimentRowEvaluation"/>
+		
+	</events>
+
+
+	<properties>
+		<!--
+			The environment may throw exceptions when executing property
+			listeners and these listeners are not valid any longer. This leads to
+			normal plan failure and can therefore be ignored.
+		-->
+		<property name="logging.level">java.util.logging.Level.WARNING</property>
+		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<goals>
+				<initialgoal ref="df_keep_registered">
+					<parameter ref="description">
+						<value>
+							((IDF)$scope.getServiceContainer().getService(IDF.class))
+							.createDFAgentDescription(null,
+							((IDF)$scope.getServiceContainer().getService(IDF.class))
+							.createDFServiceDescription("master_simulation_agent",
+							"receive_simulation_run_results", "University of Hamburg"))
+						</value>
+					</parameter>
+					<parameter ref="leasetime">
+						<value>20000</value>
+					</parameter>
+				</initialgoal>
+			</goals>
+			<plans>
+				<!-- <initialplan ref="start_sim_experiments" />-->
+				<initialplan ref="init_simulation" />
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
