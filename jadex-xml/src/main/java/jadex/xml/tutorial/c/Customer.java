@@ -1,4 +1,4 @@
-package jadex.xml.tutorial.b;
+package jadex.xml.tutorial.c;
 
 /**
  *  Customer example class.
@@ -8,8 +8,14 @@ public class Customer
 {
 	//-------- attributes --------
 	
-	/** The person subobject. */
-	public Person person;
+	/** The customer number. */
+	public int customernumber;
+	
+	/** The first name. */
+    public String firstname;
+    
+    /** The last name. */
+    public String lastname;
 	
 	/** The street name. */
     public String street;
@@ -32,9 +38,11 @@ public class Customer
      *  Get the string representation.
      *  @return The string representation.
      */
-    public String toString()
+	public String toString()
 	{
-		return "Customer(city="+city+", person="+person+", phone="
-			+ phone+", state="+state+", street="+street+", zip="+zip+")";
-	} 
+		return "Customer(city=" + city + ", customernumber=" + customernumber
+			+ ", firstname=" + firstname + ", lastname=" + lastname
+			+ ", phone=" + phone + ", state=" + state + ", street="
+			+ street + ", zip=" + zip + ")";
+	}   
 }
