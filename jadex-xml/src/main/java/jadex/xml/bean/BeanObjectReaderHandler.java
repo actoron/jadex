@@ -13,6 +13,7 @@ import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.Reader;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -286,9 +287,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	{
 		// Hack!
 		if(attrval!=null)
-			setAttributeValue(attrinfo, xmlattrname, object, attrval, root, classloader);
+			setAttributeValue(attrinfo, xmlattrname, object, attrval, root, classloader, context);
 		else if(attrinfo instanceof BeanAttributeInfo && ((BeanAttributeInfo)attrinfo).getDefaultValue()!=null)
-			setAttributeValue(attrinfo, xmlattrname, object, ((BeanAttributeInfo)attrinfo).getDefaultValue(), root, classloader);
+			setAttributeValue(attrinfo, xmlattrname, object, ((BeanAttributeInfo)attrinfo).getDefaultValue(), root, classloader, context);
 	}
 		
 	// Hack!!!
@@ -311,7 +312,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		
 		if(linkinfo!=null)
 		{
-			setAttributeValue(linkinfo, tag, parent, object, root, classloader);
+			setAttributeValue(linkinfo, tag, parent, object, root, classloader, context);
 			linked = true;
 		}
 		
@@ -345,11 +346,20 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			String[] plunames = new String[pathname.length];
 			String[] sinnames = new String[pathname.length];
+			String[] fieldnames = new String[pathname.length];
 			for(int i=0; i<pathname.length; i++)
 			{
 				String name = pathname[i].getLocalPart().substring(0, 1).toUpperCase()+pathname[i].getLocalPart().substring(1);
 				plunames[i] = name;
 				sinnames[i] = SUtil.getSingular(name);
+				fieldnames[i] = pathname[i].getLocalPart();
+			}
+			
+			// Try via fieldname
+			
+			for(int i=0; i<fieldnames.length && !linked; i++)
+			{
+				linked = setField(fieldnames[i], parent, object, null, classloader, context, root);
 			}
 			
 			// Try name guessing via class/superclass/interface names of object to add
@@ -363,11 +373,14 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					if(!linked)
 					{
 						linked = internalLinkObjects(clazz, "add"+sinnames[i], object, parent, root, classloader);
-						if(!linked && sinnames[i].equals(plunames[i]))
+						if(!linked && !sinnames[i].equals(plunames[i]))
+						{	
 							linked = internalLinkObjects(clazz, "add"+plunames[i], object, parent, root, classloader);
+						}
 					}
 				}
 				
+				// Try classname of object to add
 				if(!linked && !BasicTypeConverter.isBuiltInType(clazz))
 				{
 					String name = SReflect.getInnerClassName(clazz);
@@ -404,6 +417,38 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	//-------- helper methods --------
 	
 	/**
+	 *  Directly access a field for setting/(adding) the object.
+	 */
+	protected boolean setField(String fieldname, Object parent, Object object, ITypeConverter converter, ClassLoader classloader, Object context, Object root)
+	{
+		boolean set = false;
+		try
+		{
+			Field field = parent.getClass().getField(fieldname);
+			Class type = field.getType();
+			
+			object = convertAttributeValue(object, type, converter, root, classloader);
+			
+			if(SReflect.isSupertype(type, object.getClass()))
+			{
+				field.set(parent, object);
+				set = true;
+			}
+			
+			// todo: do we want direct field access with creation 
+			// of underlying collections like Set, List (what about array?)
+	//		else if(Set.class.isAssignableFrom(type))
+	//		{
+	//		}
+		}
+		catch(Exception e)
+		{
+		}
+		
+		return set;
+	}
+	
+	/**
 	 *  Set an attribute value.
 	 *  Similar to handleAttributValue but allows objects as attribute values (for linking).
 	 *  @param attrinfo The attribute info.
@@ -414,7 +459,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param classloader The classloader.
 	 */
 	protected void setAttributeValue(Object attrinfo, QName xmlattrname, Object object, 
-		Object attrval, Object root, ClassLoader classloader)
+		Object attrval, Object root, ClassLoader classloader, Object context)
 	{
 		if(NULL.equals(attrval))
 			return;
@@ -467,8 +512,6 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				}
 				else
 				{
-					
-					
 					String[] prefixes = new String[]{"put", "set", "add"};
 					for(int i=0; i<prefixes.length && !set; i++)
 					{
@@ -522,23 +565,28 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		if(!set && attrinfo instanceof AttributeInfo)
 		{
 			AttributeInfo ai = (AttributeInfo)attrinfo;
+			ITypeConverter converter = ai instanceof BeanAttributeInfo? ((BeanAttributeInfo)ai).getConverterRead(): null;
 			
-			String postfix = ai.getAttributeIdentifier()!=null? ((String)ai.getAttributeIdentifier())
-				.substring(0,1).toUpperCase()+((String)ai.getAttributeIdentifier()).substring(1)
-				: xmlattrname.getLocalPart().substring(0,1).toUpperCase()+xmlattrname.getLocalPart().substring(1);
-				
-			set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, 
-				ai instanceof BeanAttributeInfo? ((BeanAttributeInfo)ai).getConverterRead(): null);
-		
+			String fieldname = ai.getAttributeIdentifier()!=null? ((String)ai.getAttributeIdentifier()): xmlattrname.getLocalPart();
+			set = setField(fieldname, object, attrval, converter, classloader, context, root);
+
 			if(!set)
 			{
-				String oldpostfix = postfix;
-				postfix = SUtil.getSingular(postfix);
-				if(!postfix.equals(oldpostfix))
+				String postfix = ai.getAttributeIdentifier()!=null? ((String)ai.getAttributeIdentifier())
+					.substring(0,1).toUpperCase()+((String)ai.getAttributeIdentifier()).substring(1)
+					: xmlattrname.getLocalPart().substring(0,1).toUpperCase()+xmlattrname.getLocalPart().substring(1);
+					
+				set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, converter);
+			
+				if(!set)
 				{
-					// First try add, as set might also be there and used for a non-multi attribute.
-					set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, 
-						ai instanceof BeanAttributeInfo? ((BeanAttributeInfo)ai).getConverterRead(): null);
+					String oldpostfix = postfix;
+					postfix = SUtil.getSingular(postfix);
+					if(!postfix.equals(oldpostfix))
+					{
+						// First try add, as set might also be there and used for a non-multi attribute.
+						set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, converter);
+					}
 				}
 			}
 		}
@@ -567,6 +615,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			if(!set)
 			{
+				String fieldname = attrinfo instanceof String? (String)attrinfo: xmlattrname.getLocalPart();
+				set = setField(fieldname, object, attrval, null, classloader, context, root);
+				
 				String postfix = attrinfo instanceof String? ((String)attrinfo).substring(0,1).toUpperCase()+((String)attrinfo).substring(1)
 					: xmlattrname.getLocalPart().substring(0,1).toUpperCase()+xmlattrname.getLocalPart().substring(1);
 				set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, null);
@@ -629,7 +680,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	protected boolean setDirectValue(String[] prefixes, String postfix, Object attrval, Object object, Object root, ClassLoader classloader, ITypeConverter converter)
 	{
 		boolean set = false;
-		
+				
 		for(int i=0; i<prefixes.length && !set; i++)
 		{
 			try
