@@ -25,7 +25,10 @@ public class Main
 	 */
 	public static void main(String[] args) throws Exception
 	{
-		// Create minimal type infos for both types that need to be mapped
+		// Create Type infos for both types that need to be mapped
+		// The person type has 3 subobjects that are mapped to different
+		// object attributes. They are considered as subobjectinfos here
+		// and not as attributeinfos, because they are subtags in they xml.
 		Set typeinfos = new HashSet();
 		typeinfos.add(new TypeInfo(null, "customer", Customer.class));
 		typeinfos.add(new TypeInfo(null, "person", Person.class, null, null, null, null, null,
