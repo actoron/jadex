@@ -4,6 +4,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IAAAService;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,7 +25,7 @@ public class BasicAAAService implements IAAAService
 	{
 		Map userroles = new HashMap();
 		Set roles = new HashSet();
-		roles.add("All");
+		roles.add(IAAAService.ALL_ROLES);
 		userroles.put("TestUser", roles);
 		return new BasicAAAService(userroles);
 	}
@@ -32,7 +33,17 @@ public class BasicAAAService implements IAAAService
 	public BasicAAAService(Map userroles)
 	{
 		this.userroles = userroles!=null? userroles: new HashMap();
-		userClients = Collections.synchronizedMap(new HashMap());
+		userClients = new HashMap();
+	}
+	
+	public BasicAAAService(String[] userNames, String[][] roles)
+	{
+		int min = Math.min(userNames.length, roles.length);
+		userroles = new HashMap();
+		for (int i = 0; i < min; ++i)
+		{
+			userroles.put(userNames[i], new HashSet(Arrays.asList(roles[i])));
+		}
 	}
 	
 	/**
@@ -55,8 +66,10 @@ public class BasicAAAService implements IAAAService
 	 * @param client the new client
 	 * @return true, if the client has been successfully authenticated.
 	 */
-	public boolean authenticate(IClient client)
+	public synchronized boolean authenticate(IClient client)
 	{
+		if (!userroles.containsKey(client.getUserName()))
+			return false;
 		if (!userClients.containsKey(client.getUserName()))
 			userClients.put(client.getUserName(), Collections.synchronizedSet(new HashSet()));
 		((Set) userClients.get(client.getUserName())).add(client);
@@ -67,7 +80,7 @@ public class BasicAAAService implements IAAAService
 	 * Deauthenticate a client.
 	 * @param client the client
 	 */
-	public void deauthenticate(IClient client)
+	public synchronized void deauthenticate(IClient client)
 	{
 		((Set) userClients.get(client.getUserName())).remove(client);
 	}
@@ -77,7 +90,7 @@ public class BasicAAAService implements IAAAService
 	 * @parameter userName the user name
 	 * @return Set of connected clients
 	 */
-	public Set getAuthenticatedClients(String userName)
+	public synchronized Set getAuthenticatedClients(String userName)
 	{
 		Set clients = (Set) userClients.get(userName);
 		synchronized(clients)
@@ -93,7 +106,7 @@ public class BasicAAAService implements IAAAService
 	 * @param action the action the client is requesting
 	 * @return true, if the client is authorized to perform the action, false otherwise
 	 */
-	public boolean accessAction(IClient client, int action)
+	public synchronized boolean accessAction(IClient client, int action)
 	{
 		if (((Set) userClients.get(client.getUserName())).contains(client))
 			return true;
@@ -106,7 +119,7 @@ public class BasicAAAService implements IAAAService
 	 * @param event the event
 	 * @return true, if the client is authorized to perform the action, false otherwise
 	 */
-	public boolean accessEvent(IClient client, Object event)
+	public synchronized boolean accessEvent(IClient client, Object event)
 	{
 		return true;
 		//TODO: FIXME
@@ -141,7 +154,7 @@ public class BasicAAAService implements IAAAService
 		userroles.remove(userName);
 	}
 	
-	public Set getRoles(IClient client)
+	public synchronized Set getRoles(IClient client)
 	{
 		String userName = client.getUserName();
 		Set roles = (Set) userroles.get(userName);

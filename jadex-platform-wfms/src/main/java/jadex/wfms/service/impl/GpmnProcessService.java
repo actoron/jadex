@@ -10,7 +10,7 @@ import jadex.gpmn.GpmnXMLReader;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.wfms.service.IExecutionService;
-import jadex.wfms.service.IMonitoringService;
+import jadex.wfms.service.IAdministrationService;
 import jadex.wfms.service.IWfmsClientService;
 
 import java.util.HashMap;
@@ -155,7 +155,7 @@ public class GpmnProcessService implements IExecutionService
 							processes.remove(id);
 							
 							Logger.getLogger("Wfms").log(Level.INFO, "Finished GPMN process " + id.toString());
-							((MonitoringService) wfms.getService(IMonitoringService.class)).fireProcessFinished(id.toString());
+							((AdministrationService) wfms.getService(IAdministrationService.class)).fireProcessFinished(id.toString());
 						}
 					}
 					

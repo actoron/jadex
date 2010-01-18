@@ -1,0 +1,53 @@
+package jadex.wfms.bdi.client.standard.parametergui;
+
+import jadex.wfms.parametertypes.ListChoice;
+
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
+
+public class ListChoiceParameterPanel extends AbstractParameterPanel
+{
+	private JComboBox parameterBox;
+	
+	private ListChoice parameterValue;
+	
+	public ListChoiceParameterPanel(String parameterName, ListChoice initialValue, boolean readOnly)
+	{
+		super(parameterName, readOnly);
+		if (initialValue == null)
+			throw new RuntimeException("Unitialized ListChoice: " + parameterName);
+		
+		parameterValue = initialValue;
+		parameterBox = new JComboBox(parameterValue.getChoices());
+		parameterBox.setEditable(false);
+		
+		GridBagConstraints g = new GridBagConstraints();
+		g.gridx = 0;
+		g.fill = GridBagConstraints.HORIZONTAL;
+		g.weightx = 1;
+		add(parameterBox, g);
+	}
+	
+	public boolean isParameterValueValid()
+	{
+		if (parameterBox.getSelectedItem() == null)
+		{
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean requiresLabel()
+	{
+		return true;
+	}
+	
+	public Object getParameterValue()
+	{
+		parameterValue.setSelection((String) parameterBox.getSelectedItem());
+		return parameterValue;
+	}
+}

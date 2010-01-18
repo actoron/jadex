@@ -6,7 +6,7 @@ import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitemListener;
 import jadex.wfms.client.IWorkitem;
-import jadex.wfms.client.ProcessFinishedEvent;
+import jadex.wfms.client.ProcessEvent;
 import jadex.wfms.client.WorkitemEvent;
 import jadex.wfms.service.IClientService;
 

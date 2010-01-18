@@ -166,4 +166,13 @@ public class WorkitemListComponent extends JPanel
 			workitemTableModel.addRow(new Object[] {wi, wi.getRole()});
 		}
 	}
+	
+	/**
+	 * Clears the workitem list
+	 */
+	public void clear()
+	{
+		while (workitemTableModel.getRowCount() > 0)
+			workitemTableModel.removeRow(0);
+	}
 }

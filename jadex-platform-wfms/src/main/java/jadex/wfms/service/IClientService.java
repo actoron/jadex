@@ -27,7 +27,7 @@ public interface IClientService extends IService
 	 * @param client the client
 	 * @return the process definition service
 	 */
-	public IMonitoringService getMonitoringService(IClient client);
+	public IAdministrationService getMonitoringService(IClient client);
 	
 	/**
 	 * Authenticate a new client.

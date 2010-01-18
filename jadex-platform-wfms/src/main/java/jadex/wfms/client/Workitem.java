@@ -33,6 +33,9 @@ public class Workitem implements IWorkitem, IClientActivity
 	/** Values of the parameters */
 	private Map parameterValues;
 	
+	/** GUI properties for parameters */
+	private Map guiProperties;
+	
 	/** Read-only parameters */
 	private Set readOnlyParameters;
 	
@@ -40,7 +43,7 @@ public class Workitem implements IWorkitem, IClientActivity
 	{
 	}
 	
-	public Workitem(String name, int type, String role, Map parameterTypes, Map parameterValues, Set readOnlyParameters)
+	public Workitem(String name, int type, String role, Map parameterTypes, Map parameterValues, Map guiProperties, Set readOnlyParameters)
 	{
 		this.id = String.valueOf(System.identityHashCode(this));
 		this.name = name;
@@ -55,6 +58,7 @@ public class Workitem implements IWorkitem, IClientActivity
 		}*/
 		this.parameterTypes = parameterTypes;
 		this.parameterValues = parameterValues!=null ? parameterValues:new HashMap();
+		this.guiProperties = guiProperties;
 		this.readOnlyParameters = readOnlyParameters;
 	}
 	
@@ -107,6 +111,19 @@ public class Workitem implements IWorkitem, IClientActivity
 	public Object getParameterValue(String parameterName)
 	{
 		return parameterValues.get(parameterName);
+	}
+	
+	/**
+	 * Returns the GUI-properties of a parameter
+	 * @param parameterName name of the parameter
+	 * @return the GUI-properties
+	 */
+	public Map getParameterGuiProperties(String parameterName)
+	{
+		Map propertyMap = (Map) guiProperties.get(parameterName);
+		if (propertyMap == null)
+			propertyMap = new HashMap();
+		return propertyMap;
 	}
 	
 	/**
@@ -203,6 +220,16 @@ public class Workitem implements IWorkitem, IClientActivity
 	
 	public void setId(String id) {
 		this.id = id;
+	}
+	
+	public Map getGuiProperties()
+	{
+		return guiProperties;
+	}
+	
+	public void setGuiProperties(Map guiProperties)
+	{
+		this.guiProperties = guiProperties;
 	}
 	
 	// --------------------------- Comparison -------------------------

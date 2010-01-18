@@ -26,8 +26,30 @@ public interface IAAAService extends IService
 	public static final int COMMIT_WORKITEM			 	 = 105;
 	public static final int ACQUIRE_WORKITEM		 	 = 106;
 	public static final int RELEASE_WORKITEM		 	 = 107;
-	public static final int ADD_MONITORING_LISTENER		 = 500;
-	public static final int REMOVE_MONITORING_LISTENER	 = 501;
+	public static final int REQUEST_ALL_ACTIVITIES		 = 401;
+	public static final int ADD_LOG_LISTENER			 = 500;
+	public static final int REMOVE_LOG_LISTENER			 = 501;
+	public static final int ADD_PROCESS_LISTENER		 = 502;
+	public static final int REMOVE_PROCESS_LISTENER		 = 503;
+	
+	/** All capabilities */
+	public static final int[] CAPABILITIES = { REQUEST_PD_SERVICE,
+											   REQUEST_MONITORING_SERVICE,
+											   ADD_PROCESS_MODEL,
+											   REQUEST_PROCESS_MODEL,
+											   START_BPMN_PROCESS,
+											   START_GPMN_PROCESS,
+											   REQUEST_MODEL_NAMES,
+											   REQUEST_AVAILABLE_WORKITEMS,
+											   REQUEST_AVAILABLE_ACTIVITIES,
+											   COMMIT_WORKITEM,
+											   ACQUIRE_WORKITEM,
+											   RELEASE_WORKITEM,
+											   REQUEST_ALL_ACTIVITIES,
+											   ADD_LOG_LISTENER,
+											   REMOVE_LOG_LISTENER,
+											   ADD_PROCESS_LISTENER,
+											   REMOVE_PROCESS_LISTENER };
 	
 	/**
 	 * Authenticate a new client.

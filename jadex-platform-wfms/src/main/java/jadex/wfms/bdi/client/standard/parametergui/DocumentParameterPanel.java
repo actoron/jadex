@@ -4,8 +4,12 @@ import jadex.wfms.parametertypes.Document;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,13 +17,17 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 
 public class DocumentParameterPanel extends AbstractParameterPanel
 {
@@ -31,9 +39,13 @@ public class DocumentParameterPanel extends AbstractParameterPanel
 	
 	private static final Set IMAGE_EXTENSIONS = new HashSet(Arrays.asList(new Object[] {"jpg", "jpeg", "gif", "png", "bmp", "tiff"}));
 	
+	private static final int MAX_IMAGE_PREVIEW_SIZE = 256;
+	
 	private Component docView;
 	
 	private Document document;
+	
+	private JPanel mainPanel;
 	
 	public DocumentParameterPanel(String parameterName, Document initialValue, boolean readOnly)
 	{
@@ -41,7 +53,21 @@ public class DocumentParameterPanel extends AbstractParameterPanel
 		
 		document = initialValue;
 		
+		mainPanel = new JPanel(new GridBagLayout());
+		TitledBorder border = new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED));
+		border.setTitle(parameterName);
+		mainPanel.setBorder(border);
+		GridBagConstraints g = new GridBagConstraints();
+		g.gridx = 0;
+		g.gridy = 0;
+		g.weightx = 1;
+		g.fill = GridBagConstraints.HORIZONTAL;
+		g.anchor = GridBagConstraints.CENTER;
+		add(mainPanel, g);
+		
 		setDocView();
+		
+		int x = 0;
 		
 		final JLabel fileLabel = new JLabel();
 		if (document == null)
@@ -49,16 +75,19 @@ public class DocumentParameterPanel extends AbstractParameterPanel
 		else
 			fileLabel.setText(document.getFileName());
 		fileLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		GridBagConstraints g = new GridBagConstraints();
-		g.gridx = 0;
+		g = new GridBagConstraints();
+		g.gridx = x++;
 		g.gridy = 1;
-		//g.gridwidth = 2;
+		g.anchor = GridBagConstraints.WEST;
+		mainPanel.add(fileLabel, g);
+		
+		JPanel filler = new JPanel();
+		g.gridx = x++;
+		g.gridy = 1;
 		g.weightx = 1;
 		g.fill = GridBagConstraints.HORIZONTAL;
-		g.anchor = GridBagConstraints.WEST;
-		add(fileLabel, g);
-		
-		int x = 1;
+		g.anchor = GridBagConstraints.CENTER;
+		mainPanel.add(filler, g);
 		
 		if ((readOnly) || (initialValue != null))
 		{
@@ -68,6 +97,7 @@ public class DocumentParameterPanel extends AbstractParameterPanel
 				public void actionPerformed(ActionEvent e)
 				{
 					JFileChooser fc = new JFileChooser();
+					fc.setSelectedFile(new File(document.getFileName()));
 					if (fc.showSaveDialog(DocumentParameterPanel.this) == JFileChooser.APPROVE_OPTION)
 					{
 						File docFile = fc.getSelectedFile();
@@ -91,8 +121,8 @@ public class DocumentParameterPanel extends AbstractParameterPanel
 			g.gridy = 1;
 			g.fill = GridBagConstraints.NONE;
 			g.insets = new Insets(5, 5, 5, 5);
-			g.anchor = GridBagConstraints.WEST;
-			add(saveButton, g);
+			g.anchor = GridBagConstraints.EAST;
+			mainPanel.add(saveButton, g);
 		}
 		
 		if (!readOnly)
@@ -127,8 +157,8 @@ public class DocumentParameterPanel extends AbstractParameterPanel
 			g.gridy = 1;
 			g.fill = GridBagConstraints.NONE;
 			g.insets = new Insets(0, 5, 0, 5);
-			g.anchor = GridBagConstraints.WEST;
-			add(attachButton, g);
+			g.anchor = GridBagConstraints.EAST;
+			mainPanel.add(attachButton, g);
 		}
 		
 	}
@@ -140,7 +170,7 @@ public class DocumentParameterPanel extends AbstractParameterPanel
 	
 	public boolean requiresLabel()
 	{
-		return true;
+		return false;
 	}
 	
 	public Object getParameterValue()
@@ -152,24 +182,51 @@ public class DocumentParameterPanel extends AbstractParameterPanel
 	{
 		if (document != null)
 		{
+			if (docView != null)
+				mainPanel.remove(docView);
 			GridBagConstraints g = new GridBagConstraints();
 			g.gridx = 0;
 			g.gridy = 0;
 			g.gridwidth = GridBagConstraints.REMAINDER;
 			g.weightx = 1;
+			g.insets = new Insets(5, 5, 5, 5);
 			g.anchor = GridBagConstraints.CENTER;
 			
 			String fn = document.getFileName();
+			
 			if (IMAGE_EXTENSIONS.contains(fn.substring(fn.length() - 3)) ||
 				IMAGE_EXTENSIONS.contains(fn.substring(fn.length() - 4)))
 			{
 				if (docView != null)
 					remove(docView);
 				JLabel imageLabel = new JLabel();
-				ImageIcon icon = new ImageIcon(document.retrieveContent());
+				
+				BufferedImage tmpImage = null;
+				try
+				{
+					tmpImage = ImageIO.read(new ByteArrayInputStream(document.retrieveContent()));
+				}
+				catch (IOException e)
+				{
+				}
+				if (tmpImage == null)
+					return;
+				Image image = tmpImage;
+				if (Math.max(tmpImage.getWidth(), tmpImage.getHeight()) > MAX_IMAGE_PREVIEW_SIZE)
+				{
+					double factor = MAX_IMAGE_PREVIEW_SIZE;
+					if (tmpImage.getWidth() > tmpImage.getHeight())
+						factor /= tmpImage.getWidth();
+					else
+						factor /= tmpImage.getHeight();
+					image = tmpImage.getScaledInstance((int) (tmpImage.getWidth() * factor), (int) (tmpImage.getHeight() * factor), Image.SCALE_SMOOTH); 
+				}
+				tmpImage = null;
+				
+				ImageIcon icon = new ImageIcon(image);
 				imageLabel.setIcon(icon);
 				docView = imageLabel;
-				add(docView, g);
+				mainPanel.add(docView, g);
 			}
 		}
 	}

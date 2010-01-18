@@ -20,9 +20,13 @@ public class SendHeartbeatPlan extends AbstractWfmsPlan
 		}
 		catch (GoalFailureException e)
 		{
-			e.printStackTrace();
+		}
+		
+		if (!hbGoal.isSucceeded())
+		{
 			IGoal recoverGoal = createGoal("recover_lost_connection");
 			dispatchTopLevelGoal(recoverGoal);
+			((IGoal) getReason()).drop();
 		}
 	}
 }

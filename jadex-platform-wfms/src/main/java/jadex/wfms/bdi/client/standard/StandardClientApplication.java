@@ -1,25 +1,5 @@
 package jadex.wfms.bdi.client.standard;
 
-import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.WindowConstants;
-
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IAgentListener;
@@ -30,7 +10,27 @@ import jadex.commons.SGUI;
 import jadex.wfms.bdi.client.standard.parametergui.ActivityComponent;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
-import jadex.wfms.parametertypes.Document;
+
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 
 public class StandardClientApplication
 {
@@ -42,9 +42,15 @@ public class StandardClientApplication
 	
 	private static final JPanel EMPTY_PANEL = new JPanel();
 	
+	private static final String CONNECT_ICON_NAME = "Connection";
+	private static final String CONNECT_OFF_ICON_PATH = StandardClientApplication.class.getPackage().getName().replaceAll("\\.", "/").concat("/images/connection_off_small.png");
+	private static final String CONNECT_ON_ICON_PATH = StandardClientApplication.class.getPackage().getName().replaceAll("\\.", "/").concat("/images/connection_on_small.png");
+	
 	private IBDIExternalAccess agent;
 	
 	private JFrame mainFrame;
+	
+	private StatusBar statusBar;
 	
 	private JSplitPane mainSplitPane;
 	
@@ -52,7 +58,7 @@ public class StandardClientApplication
 	
 	private ProcessModelComponent pmComponent;
 	
-	boolean connected;
+	private boolean connected;
 	
 	public StandardClientApplication(IExternalAccess appAgent)
 	{
@@ -83,7 +89,6 @@ public class StandardClientApplication
 			
 			public void run()
 			{
-				
 				mainFrame = new JFrame(WINDOW_TITLE);
 				mainFrame.addWindowListener(new WindowAdapter()
 				{
@@ -98,7 +103,25 @@ public class StandardClientApplication
 				
 				mainSplitPane = new JSplitPane();
 				mainSplitPane.setOneTouchExpandable(true);
-				mainFrame.getContentPane().add(mainSplitPane);
+				mainFrame.getContentPane().setLayout(new GridBagLayout());
+				GridBagConstraints g = new GridBagConstraints();
+				g.weightx = 1.0;
+				g.weighty = 1.0;
+				g.fill = GridBagConstraints.BOTH;
+				g.anchor = GridBagConstraints.CENTER;
+				mainFrame.getContentPane().add(mainSplitPane, g);
+				
+				statusBar = new StatusBar();
+				statusBar.addIcon(CONNECT_ICON_NAME, CONNECT_OFF_ICON_PATH);
+				statusBar.setText("Ready.");
+				statusBar.setPreferredSize(new Dimension(100, 24));
+				
+				g = new GridBagConstraints();
+				g.gridy = 1;
+				g.weightx = 1.0;
+				g.fill = GridBagConstraints.HORIZONTAL;
+				mainFrame.getContentPane().add(statusBar, g);
+				
 				mainSplitPane.setRightComponent(new JTabbedPane());
 				
 				JTabbedPane leftTabPane = new JTabbedPane();
@@ -118,20 +141,7 @@ public class StandardClientApplication
 				
 				setAgentActions();
 				
-				while (!connected)
-				{
-					LoginDialog loginDialog = new LoginDialog(mainFrame);
-					loginDialog.setLocation(SGUI.calculateMiddlePosition(loginDialog));
-					loginDialog.setVisible(true);
-					try
-					{
-						connect(loginDialog.getUserName(), loginDialog.getPassword());
-						connected = true;
-					}
-					catch (GoalFailureException e)
-					{
-					}
-				}
+				showConnectDialog();
 				
 				initializeWorkitemList();
 				initializeActivities();
@@ -266,6 +276,49 @@ public class StandardClientApplication
 			}
 		};
 		agent.getBeliefbase().getBelief("remove_activity_controller").setFact(acRemoved);
+		
+		Action lcAction = new AbstractAction()
+		{
+			public void actionPerformed(final ActionEvent e)
+			{
+				connected = false;
+				statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_OFF_ICON_PATH);
+				cleanUp();
+				showConnectDialog();
+			}
+		};
+		agent.getBeliefbase().getBelief("lost_connection_controller").setFact(lcAction);
+	}
+	
+	private void cleanUp()
+	{
+		pmComponent.clear();
+		wlComponent.clear();
+		
+		if (mainSplitPane.getRightComponent() instanceof JTabbedPane)
+			mainSplitPane.setRightComponent(new JTabbedPane());
+		else
+			mainSplitPane.setRightComponent(EMPTY_PANEL);
+	}
+	
+	private void showConnectDialog()
+	{
+		while (!connected)
+		{
+			LoginDialog loginDialog = new LoginDialog(mainFrame);
+			loginDialog.setLocation(SGUI.calculateMiddlePosition(loginDialog));
+			loginDialog.setVisible(true);
+			try
+			{
+				connect(loginDialog.getUserName(), loginDialog.getPassword());
+				connected = true;
+				statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_ON_ICON_PATH);
+				statusBar.setText("Connected.");
+			}
+			catch (GoalFailureException e)
+			{
+			}
+		}
 	}
 	
 	private void connect(String userName, Object authToken)

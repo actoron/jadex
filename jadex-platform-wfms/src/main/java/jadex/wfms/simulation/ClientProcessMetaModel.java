@@ -9,9 +9,7 @@ import jadex.commons.collection.Tree;
 import jadex.commons.collection.TreeNode;
 import jadex.gpmn.model.MGpmnModel;
 import jadex.gpmn.model.MPlan;
-import jadex.gpmn.model.MProcess;
 import jadex.javaparser.javaccimpl.ReflectNode;
-import jadex.wfms.client.task.FetchDataTask;
 import jadex.wfms.simulation.stateholder.ActivityStateController;
 import jadex.wfms.simulation.stateholder.IParameterStateSet;
 import jadex.wfms.simulation.stateholder.ParameterStateSetFactory;
@@ -35,12 +33,6 @@ import javax.swing.tree.TreePath;
 
 public class ClientProcessMetaModel extends Tree implements TreeModel
 {
-	private static final Set DATA_TASKS = new HashSet();
-	static
-	{
-		DATA_TASKS.add(FetchDataTask.class);
-	}
-	
 	private String mainProcessName;
 	
 	private BpmnModelLoader bpmnLoader;
@@ -148,7 +140,6 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 			ModelTreeNode taskNode = (ModelTreeNode) it.next();
 			if (taskNode.getNumberOfChildren() > 0)
 			{
-				MActivity task = (MActivity) taskNode.getData();
 				List parameterNodes = taskNode.getChildren();
 				for (Iterator it2 = parameterNodes.iterator(); it2.hasNext(); )
 				{
@@ -214,9 +205,8 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 				ReflectNode classNode = ((ReflectNode) activity.getPropertyValue("class"));
 				if (classNode != null)
 				{
-					Class activityClass = (Class) classNode.getConstantValue();
-					System.out.println(activityClass);
-					if (DATA_TASKS.contains(activityClass))
+					// TODO: Check for "in"-only parameters
+					if (activity.getParameters().size() > 0)
 						ret.add(activity);
 				}
 			}

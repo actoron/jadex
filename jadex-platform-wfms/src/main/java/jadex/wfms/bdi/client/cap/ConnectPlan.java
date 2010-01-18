@@ -16,6 +16,5 @@ public class ConnectPlan extends AbstractWfmsPlan
 		
 		IGoal hbGoal = createGoal("keep_sending_heartbeats");
 		dispatchTopLevelGoal(hbGoal);
-		System.out.println("Goal Active: " + String.valueOf(hbGoal.isActive()));
 	}
 }

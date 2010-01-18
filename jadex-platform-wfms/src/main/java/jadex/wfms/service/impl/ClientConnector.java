@@ -7,14 +7,14 @@ import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitemListener;
 import jadex.wfms.client.IWorkitem;
-import jadex.wfms.client.ProcessFinishedEvent;
+import jadex.wfms.client.ProcessEvent;
 import jadex.wfms.client.Workitem;
 import jadex.wfms.client.WorkitemEvent;
 import jadex.wfms.service.IAAAService;
 import jadex.wfms.service.IClientService;
 import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
-import jadex.wfms.service.IMonitoringService;
+import jadex.wfms.service.IAdministrationService;
 import jadex.wfms.service.IProcessDefinitionService;
 import jadex.wfms.service.IWfmsClientService;
 
@@ -80,6 +80,24 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	}
 	
 	/**
+	 * Returns the current activities for all users
+	 * 
+	 * @return current activities for all users
+	 */
+	public synchronized Map getUserActivities()
+	{
+		Map ret = new HashMap();
+		for (Iterator it = userActivities.entrySet().iterator(); it.hasNext(); )
+		{
+			Map.Entry userEntry = (Map.Entry) it.next();
+			Set activities = (Set) userEntry.getValue();
+			ret.put(userEntry.getKey(), new HashSet(activities));
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 * Requests the Process Definition Service
 	 * 
 	 * @param client the client
@@ -99,11 +117,11 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	 * @param client the client
 	 * @return the process definition service
 	 */
-	public synchronized IMonitoringService getMonitoringService(IClient client)
+	public synchronized IAdministrationService getMonitoringService(IClient client)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_MONITORING_SERVICE))
 			return null;
-		return (IMonitoringService) wfms.getService(IMonitoringService.class);
+		return (IAdministrationService) wfms.getService(IAdministrationService.class);
 	}
 	
 	/**
@@ -196,7 +214,6 @@ public class ClientConnector implements IClientService, IWfmsClientService
 		
 		IExecutionService bps = (IExecutionService)wfms.getService(IExecutionService.class);
 		Object id  = bps.startProcess(filename, null, null, false);
-		System.out.println("Started process instance " + id);
 	}
 	
 	/**

@@ -1,17 +1,18 @@
 package jadex.wfms.bdi.client.standard.parametergui;
 
-import java.awt.BorderLayout;
+import jadex.wfms.client.IClientActivity;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import jadex.wfms.client.IClientActivity;
 
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -19,8 +20,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
 
 public class ActivityComponent extends JScrollPane
 {
@@ -31,6 +30,8 @@ public class ActivityComponent extends JScrollPane
 	private JPanel parameterPanel;
 	
 	private JPanel buttonPanel;
+	
+	private Map categoryPanels;
 	
 	private IClientActivity activity;
 	
@@ -47,10 +48,11 @@ public class ActivityComponent extends JScrollPane
 		JPanel mainPanel = new JPanel(new GridBagLayout());
 		setViewportView(mainPanel);
 		this.activity = activity;
+		categoryPanels = new HashMap();
 		parameterPanels = new ArrayList();
 		
 		parameterPanel = new JPanel(new GridBagLayout());
-		parameterPanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), activity.getName()));
+		//parameterPanel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), activity.getName()));
 		GridBagConstraints g = new GridBagConstraints();
 		g.fill = GridBagConstraints.BOTH;
 		g.weightx = 1;
@@ -74,6 +76,11 @@ public class ActivityComponent extends JScrollPane
 		addParameterPanels();
 		
 		addButtons();
+	}
+	
+	public static String beautifyParameterName(String parameterName)
+	{
+		return parameterName.replaceAll("_", " ");
 	}
 	
 	public IClientActivity getActivity()
@@ -137,26 +144,32 @@ public class ActivityComponent extends JScrollPane
 	
 	private void addParameterPanels()
 	{
+		List parameterNames = new LinkedList(activity.getParameterNames());
+		Collections.sort(parameterNames, new Comparator()
+		{
+			public int compare(Object arg0, Object arg1)
+			{
+				Integer order0 = (Integer) activity.getParameterGuiProperties((String) arg0).get("order");
+				Integer order1 = (Integer) activity.getParameterGuiProperties((String) arg1).get("order");
+				int ret = order0 != null? order0.intValue():0;
+				ret -= order1 != null? order1.intValue():0;
+				return ret;
+			}
+		});
 		
 		int y = 0;
-		Set parameterNames = activity.getParameterNames();
+		//Set parameterNames = activity.getParameterNames();
 		for (Iterator it = parameterNames.iterator(); it.hasNext(); )
 		{
 			String name = (String) it.next();
 			
-			AbstractParameterPanel panel = SParameterPanelFactory.createParameterPanel(name, activity.getParameterType(name), activity.getParameterValue(name), activity.isReadOnly(name));
+			AbstractParameterPanel panel = SParameterPanelFactory.createParameterPanel(name, activity.getParameterType(name), activity.getParameterValue(name), activity.getParameterGuiProperties(name), activity.isReadOnly(name));
 			
+			JLabel parameterLabel = null;
 			if (panel.requiresLabel())
 			{
-				JLabel parameterLabel = new JLabel(name);
-				parameterLabel.setBorder(new EmptyBorder(0, 0, 0, 20));
-				GridBagConstraints g = new GridBagConstraints();
-				g.gridx = 0;
-				g.gridy = y;
-				g.insets = new Insets(5, 0 , 5, 0);
-				g.fill = GridBagConstraints.NONE;
-				g.anchor = GridBagConstraints.NORTHWEST;
-				parameterPanel.add(parameterLabel, g);
+				parameterLabel = new JLabel(beautifyParameterName(name));
+				parameterLabel.setBorder(new EmptyBorder(new Insets(0, 0, 0, 20)));
 			}
 			
 			GridBagConstraints g = new GridBagConstraints();
@@ -170,9 +183,36 @@ public class ActivityComponent extends JScrollPane
 			g.gridy = y;
 			g.fill = GridBagConstraints.HORIZONTAL;
 			g.weightx = 1;
-			g.insets = new Insets(5, 0 , 5, 0);
+			g.insets = new Insets(5, 5 , 5, 5);
 			g.anchor = GridBagConstraints.NORTH;
-			parameterPanel.add(panel, g);
+			
+			if (activity.getParameterGuiProperties(name).containsKey("category"))
+			{
+				String category = (String) activity.getParameterGuiProperties(name).get("category");
+				CategoryPanel catPanel = (CategoryPanel) categoryPanels.get(category);
+				if (catPanel == null)
+				{
+					catPanel = new CategoryPanel(category);
+					categoryPanels.put(category, catPanel);
+					parameterPanel.add(catPanel, g);
+				}
+				
+				catPanel.addParameterPanel(parameterLabel, panel);
+			}
+			else
+			{
+				if (parameterLabel != null)
+				{
+					GridBagConstraints lg = new GridBagConstraints();
+					lg.gridx = 0;
+					lg.gridy = y;
+					lg.insets = new Insets(5, 5 , 5, 5);
+					lg.fill = GridBagConstraints.NONE;
+					lg.anchor = GridBagConstraints.NORTHWEST;
+					parameterPanel.add(parameterLabel, lg);
+				}
+				parameterPanel.add(panel, g);
+			}
 			
 			parameterPanels.add(panel);
 			

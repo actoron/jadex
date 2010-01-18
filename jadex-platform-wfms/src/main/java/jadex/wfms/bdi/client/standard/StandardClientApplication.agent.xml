@@ -35,6 +35,9 @@
 		<beliefref name="remove_activity_controller" class="javax.swing.Action">
 			<concrete ref="clientcap.remove_activity_controller"/>
 		</beliefref>
+		<beliefref name="lost_connection_controller" class="javax.swing.Action">
+			<concrete ref="clientcap.lost_connection_controller"/>
+		</beliefref>
 	</beliefs>
 
 	<goals>

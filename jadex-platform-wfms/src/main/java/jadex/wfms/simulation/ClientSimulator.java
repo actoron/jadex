@@ -3,11 +3,12 @@ package jadex.wfms.simulation;
 import jadex.wfms.client.ActivityEvent;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
-import jadex.wfms.client.IMonitoringListener;
-import jadex.wfms.client.IWorkitemListener;
+import jadex.wfms.client.ILogListener;
+import jadex.wfms.client.IProcessListener;
 import jadex.wfms.client.IWorkitem;
+import jadex.wfms.client.IWorkitemListener;
 import jadex.wfms.client.LogEvent;
-import jadex.wfms.client.ProcessFinishedEvent;
+import jadex.wfms.client.ProcessEvent;
 import jadex.wfms.client.WorkitemEvent;
 import jadex.wfms.service.IClientService;
 import jadex.wfms.simulation.gui.SimulationWindow;
@@ -25,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
@@ -61,7 +60,7 @@ public class ClientSimulator implements IClient
 		
 		setupActions();
 		
-		this.clientService.getMonitoringService(this).addListener(this, new IMonitoringListener()
+		this.clientService.getMonitoringService(this).addLogListener(this, new ILogListener()
 		{
 			public void logMessage(final LogEvent event)
 			{
@@ -80,7 +79,12 @@ public class ClientSimulator implements IClient
 				}
 			}
 			
-			public void processFinished(ProcessFinishedEvent event)
+			
+		});
+		
+		this.clientService.getMonitoringService(this).addProcessListener(this, new IProcessListener()
+		{
+			public void processFinished(ProcessEvent event)
 			{
 				if ((activeStateController == null) || (activeStateController.finalState()))
 				{

@@ -3,6 +3,7 @@ package jadex.wfms.service.impl;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
+import jadex.service.PropertyServiceContainer;
 import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
 
@@ -35,8 +36,12 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 	/** The model loader */
 //	private BpmnModelLoader loader;
 	
-	
 	public BasicModelRepositoryService(IServiceContainer wfms)
+	{
+		this(wfms, null);
+	}
+	
+	public BasicModelRepositoryService(IServiceContainer wfms, String[] models)
 	{
 		this.wfms = wfms;
 		// TODO: Hack! Needs proper imports...
@@ -45,6 +50,14 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 //		this.loader = new BpmnModelLoader();
 //		bpmnModels = new HashMap();
 //		gpmnModels = new HashMap();
+		
+		if (models != null)
+		{
+			for (int i = 0; i < models.length; ++i)
+			{
+				addProcessModel(models[i]);
+			}
+		}
 	}
 	
 	/**

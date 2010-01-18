@@ -25,10 +25,14 @@
 		<beliefref name="rp_filter">
 			<concrete ref="reqcap.rp_filter"/>
 		</beliefref>
+		<beliefref name="rp_timeout">
+			<concrete ref="reqcap.timeout"/>
+		</beliefref>
 		<belief name="add_workitem_controller" class="javax.swing.Action" />
 		<belief name="remove_workitem_controller" class="javax.swing.Action" />
 		<belief name="add_activity_controller" class="javax.swing.Action" />
 		<belief name="remove_activity_controller" class="javax.swing.Action" />
+		<belief name="lost_connection_controller" class="javax.swing.Action" />
 	</beliefs>
 	
 	<goals>
@@ -76,6 +80,13 @@
 		
 		
 		<achievegoal name="start_workitem_subscription" exported="true" />
+		
+		
+		<!--======================= Administration =====================-->
+		
+		<achievegoal name="request_user_activities" exported="true">
+			<parameter name="user_activities" class="Set" direction="out" />
+		</achievegoal>
 		
 		<!-- ================= Subscription Events ==================== -->
 		<achievegoal name="add_workitem" exported="true">
@@ -207,6 +218,16 @@
 			</trigger>
 		</plan>
 		
+		<plan name="request_user_activities_plan">
+			<parameter name="user_activities" class="Set" direction="out">
+				<goalmapping ref="request_user_activities.user_activities"/>
+			</parameter>
+			<body class="UserActivitiesPlan" />
+			<trigger>
+				<goal ref="request_user_activities" />
+			</trigger>
+		</plan>
+		
 		<plan name="start_workitem_subscription_plan">
 			<body class="WorkitemSubscriptionPlan" />
 			<trigger>
@@ -273,6 +294,13 @@
 				<goal ref="remove_activity" />
 			</trigger>
 		</plan>
+		
+		<plan name="lost_connection_plan" priority="-1">
+			<body class="LostConnectionPlan" />
+			<trigger>
+				<goal ref="recover_lost_connection" />
+			</trigger>
+		</plan>
 	</plans>
 	
 	<events>
@@ -283,6 +311,9 @@
 			<beliefs>
 				<initialbelief ref="rp_filter">
 					<fact>jadex.commons.IFilter.ALWAYS</fact>
+				</initialbelief>
+				<initialbelief ref="rp_timeout">
+					<fact>2000L</fact>
 				</initialbelief>
 			</beliefs>
 		</configuration>

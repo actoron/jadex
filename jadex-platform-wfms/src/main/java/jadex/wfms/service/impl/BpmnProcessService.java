@@ -11,7 +11,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
-import jadex.wfms.service.IMonitoringService;
+import jadex.wfms.service.IAdministrationService;
 import jadex.wfms.service.IWfmsClientService;
 
 import java.util.HashMap;
@@ -118,7 +118,7 @@ public class BpmnProcessService implements IExecutionService
 								processes.remove(id);
 								
 								Logger.getLogger("Wfms").log(Level.INFO, "Finished BPMN process " + id.toString());
-								((MonitoringService) wfms.getService(IMonitoringService.class)).fireProcessFinished(id.toString());
+								((AdministrationService) wfms.getService(IAdministrationService.class)).fireProcessFinished(id.toString());
 							}
 						}
 						

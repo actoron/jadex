@@ -15,11 +15,11 @@ import java.nio.channels.FileChannel.MapMode;
  */
 public class Document
 {
+	/** File name of the document */
 	private String fileName;
 	
+	/** String with encoded content */
 	private String contString;
-	
-	private int docType;
 	
 	public Document()
 	{

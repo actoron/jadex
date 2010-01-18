@@ -118,4 +118,13 @@ public class ProcessModelComponent extends JPanel
 		
 		processTable.addMouseListener(processMouseListener);
 	}
+	
+	/**
+	 * Clears the model list
+	 */
+	public void clear()
+	{
+		while (processTableModel.getRowCount() > 0)
+			processTableModel.removeRow(0);
+	}
 }

@@ -9,8 +9,9 @@ import java.util.Set;
  */
 public interface IWorkitem
 {
-	public static final int TEXT_INFO_WORKITEM_TYPE = 0;
-	public static final int DATA_FETCH_WORKITEM_TYPE = 1;
+	public static final int GENERIC_WORKITEM_TYPE = 0;
+	public static final int TEXT_INFO_WORKITEM_TYPE = 1;
+	public static final int DATA_FETCH_WORKITEM_TYPE = 2;
 	
 	/**
 	 * Gets the name of the workitem.
@@ -55,6 +56,13 @@ public interface IWorkitem
 	 * @return type of the parameter
 	 */
 	public Class getParameterType(String parameterName);
+	
+	/**
+	 * Returns the GUI-properties of a parameter
+	 * @param parameterName name of the parameter
+	 * @return the GUI-properties
+	 */
+	public Map getParameterGuiProperties(String parameterName);
 	
 	/**
 	 * Returns whether a parameter is read-only.

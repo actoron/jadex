@@ -1,67 +1,89 @@
 <!--
-  Wfms properties.
+  Standalone platform properties.
 -->
 <properties xmlns="http://jadex.sourceforge.net/jadexconf"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadexconf 
 	                    http://jadex.sourceforge.net/configuration.xsd"
-	name="wfms_conf">
+	name="standalone_conf">
 	
-	<properties type="wfms">
+	<properties type="platform_standalone" name="lars">
+		<property type="platformname">lars</property>
+		<property type="platform_shutdown_time">1000</property>
+		<property type="welcome">false</property>
+		<property type="autoshutdown">true</property>
+		
+		<property type="agent" name="WfmsClientInterfaceAgent">jadex/wfms/bdi/interfaces/client/WfmsClientInterface.agent.xml</property>
+		<property type="agent" name="WfmsPdInterfaceAgent">jadex/wfms/bdi/interfaces/processdefinition/WfmsPdInterface.agent.xml</property>
+		
+		<!-- Platform services. -->
 		<properties type="services">
-			<property type="jadex.service.library.ILibraryService" name="library_service">
-				new jadex.service.library.LibraryService()
+			
+			<property type="jadex.bridge.IComponentFactory" name="bpmn_factory">
+				new jadex.bpmn.BpmnFactory($platform, jadex.commons.SUtil.createHashMap(
+					new String[]
+					{
+						"debugger.panels"
+					},
+					new Object[]
+					{
+						"jadex.tools.debugger.bpmn.BpmnDebuggerPanel, jadex.tools.debugger.common.ObjectInspectorDebuggerPanel"
+					})
+				)
 			</property>
 			
-			<property type="jadex.service.threadpool.ThreadPoolService" name="threadpool_service">
-				new jadex.service.threadpool.ThreadPoolService(
-					//new jadex.commons.concurrent.java5.JavaThreadPool()
-					new jadex.commons.concurrent.ThreadPool(
-						new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
+			<property type="jadex.bridge.IComponentFactory" name="gpmn_factory">
+				new jadex.gpmn.GpmnFactory($platform, jadex.commons.SUtil.createHashMap(
+					new String[]
+					{
+						"debugger.panels"
+					},
+					new Object[]
+					{
+						"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
+					})
+				)
 			</property>
 			
-			<property type="jadex.service.clock.IClockService" name="clock_service">
-				new jadex.service.clock.ClockService(
-					new jadex.service.clock.SystemClock("system_clock", 100,
-					$wfms.getService(jadex.service.threadpool.ThreadPoolService.class)))
-//				new jadex.adapter.base.clock.SimulationEventClock("simulation_clock",
-//					System.currentTimeMillis(), 200))
+			<!-- WFMS Services -->
+			<property type="jadex.wfms.service.IAAAService" name="wfms_AAA_service">
+				jadex.wfms.service.impl.BasicAAAService.getTestService()
 			</property>
 			
-			<property type="jadex.wfms.service.repository.IModelRepositoryService" name="repository_service">
-				new jadex.wfms.service.repository.BasicModelRepositoryService($wfms, new String[]{"jadex.wfms.*", "jadex.bpmn.examples.dipp.*" })
+			<property type="jadex.wfms.service.IBpmnProcessService" name="wfms_bpmn_service">
+				new jadex.wfms.service.impl.BpmnProcessService($platform)
 			</property>
 			
-			<property type="jadex.wfms.service.security.IAAAService" name="authentication_service">
-				new jadex.wfms.service.security.BasicAAAService(jadex.commons.SUtil.createHashMap(
-					new Object[]{"TestUser"},
-					new Object[]{jadex.commons.SUtil.createHashSet(new Object[]{"all"})}
-				))
+			<property type="jadex.wfms.service.IGpmnProcessService" name="wfms_gpmn_service">
+				new jadex.wfms.service.impl.GpmnProcessService($platform)
 			</property>
 			
-			<property type="jadex.bridge.IComponentFactory" name="execution_service">
-				new jadex.wfms.service.execution.MetaExecutionService($wfms, jadex.commons.SUtil.createArrayList(new Object[]{
-					new jadex.wfms.service.execution.BpmnExecutionService($wfms), 
-					new jadex.wfms.service.execution.GpmnExecutionService($wfms)
-				}))
+			<property type="jadex.wfms.service.IExecutionService" name="wfms_execution_service">
+				new jadex.wfms.service.impl.MetaExecutionService($platform)
 			</property>
 			
-			<property type="jadex.wfms.service.client.IClientService" name="client_service">
-				new jadex.wfms.service.client.ClientConnector($wfms)
+			<property type="jadex.wfms.service.IModelRepositoryService" name="wfms_model_repository">
+				new jadex.wfms.service.impl.BasicModelRepositoryService($platform, new String[] {"jadex/wfms/simulation/testflow/Credit_Workflow.bpmn",
+							  																	 "jadex/wfms/simulation/testflow/Document_Test.bpmn",
+							  																	 "jadex/wfms/simulation/testflow/Text_Test.bpmn",
+							  																	 "jadex/wfms/simulation/testflow/ListChoice_Test.bpmn",
+							  																	 "jadex/wfms/simulation/testflow/testflow.gpmn"})
 			</property>
 			
-			<property type="jadex.wfms.service.client.IWorkitemQueueService" name="workitem_service">
-				$wfms.getService(jadex.wfms.service.client.IClientService.class)
+			<property type="jadex.wfms.service.IAdministrationService" name="wfms_administration_service">
+				new jadex.wfms.service.impl.AdministrationService($platform)
 			</property>
 			
-			<property type="jadex.wfms.service.definition.IProcessDefinitionService" name="processdef_service">
-				new jadex.wfms.service.definition.ProcessDefinitionConnector($wfms)
+			<property type="jadex.wfms.service.IProcessDefinitionService" name="wfms_process_definition">
+				new jadex.wfms.service.impl.ProcessDefinitionConnector($platform)
 			</property>
 			
-			<property type="jadex.wfms.service.admin.AdminGui" name="admnin_service">
-				new jadex.wfms.service.admin.AdminGui($wfms, 
-					"jadex.wfms.plugin.starter.StarterPlugin"
-					)
+			<property type="jadex.wfms.service.IClientService" name="wfms_client_service">
+				new jadex.wfms.service.impl.ClientConnector($platform)
+			</property>
+			
+			<property type="jadex.wfms.service.IWfmsClientService" name="wfms_wfmsclient_service">
+				$platform.getService(jadex.wfms.service.IClientService.class)
 			</property>
 		</properties>
 	</properties>
