@@ -1,0 +1,24 @@
+<!--
+	<H3>BlackJack application descriptor</H3>
+-->
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
+	name="AutomatedSimulationCenter" package="jadex.simulation">
+	
+	<agenttypes>		
+		<agenttype name="SimulationManager" filename="jadex/simulation/master/SimulationManager.agent.xml"/>
+	</agenttypes>
+	
+	<applications>
+		<application name="First Configuration">
+			<agents>
+				<agent type="SimulationManager" master="false">
+				<!-- <argument name="diffusion">§.property.name</argument>-->
+				</agent>
+			</agents>
+		</application>
+	</applications>
+
+</applicationtype>

@@ -1,0 +1,155 @@
+
+	<!--
+		<H3>Environment / Observer Agent</H3> Used to maintain the GUI /
+		Observer.
+	-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="ClientSimulator" package="jadex.simulation.client">
+
+	<imports>
+		<import>jadex.adapter.base.contextservice.*</import>
+		<import>jadex.adapter.base.appdescriptor.*</import>
+		<import>jadex.adapter.base.envsupport.environment.space2d.*</import>
+		<import>jadex.adapter.base.envsupport.environment.*</import>
+		<import>jadex.adapter.base.envsupport.math.*</import>
+		<import>jadex.adapter.base.fipa.*</import>
+		<import>java.util.*</import>
+		<import>jadex.bdi.simulation.model.Observer</import>
+	</imports>
+
+
+	<capabilities>
+		<!--
+			this capability provides easy access to "out-of-the-box"-plans
+			allowing - for example - to register at the DF.
+		-->
+		<capability name="dfcap" file="jadex.bdi.planlib.df.DF" />
+	</capabilities>
+
+	<beliefs>
+		<!-- Map contains all facts related to this simulation run.-->
+		<belief name="simulationFacts" class="Map">
+			<fact>new HashMap()</fact>
+		</belief>
+
+		<belief name="msg" class="String" exported="true">
+			<fact>"Welcome to Jadex."</fact>
+		</belief>
+
+		<belief name="observedEvents" class="List">
+			<fact>new ArrayList()</fact>
+		</belief>
+
+	</beliefs>
+
+	<goals>
+		<!-- Used to search for the masters simulation agent. -->
+		<achievegoalref name="df_search">
+			<concrete ref="dfcap.df_search" />
+		</achievegoalref>
+
+		<!--
+			Dispatch Goal that creates observers that execute the observation
+			periodically
+		-->
+		<achievegoal name="InitPeriodicalObservers">
+			<parameter name="periodicalObserversList" class="List" />
+		</achievegoal>
+
+		<!-- Dispatch Goal that registers listeners for the objects -->
+		<achievegoal name="InitOnChangeObservers">
+			<parameter name="onChangeObserversList" class="List" />
+		</achievegoal>
+
+	</goals>
+
+	<plans>		<!--			Responsible for all aspects related to the run of the simulation,			especially to monitor the terminate condition.		-->
+		<plan name="runtime_manager">
+			<body class="RuntimeManagerPlan" />
+		</plan>
+
+		<!-- Init the Observer.-->
+		<plan name="init_observers">
+			<body class="InitApplicationObserverPlan" />
+		</plan>
+
+		<!-- Init the periodical observers. -->
+		<plan name="init_periodical_observers">
+			<parameter name="periodicalObserversList" class="List">
+				<goalmapping ref="InitPeriodicalObservers.periodicalObserversList" />
+			</parameter>
+			<body class="InitPeriodicalObserversPlan" />
+			<trigger>
+				<goal ref="InitPeriodicalObservers" />
+			</trigger>
+		</plan>
+
+		<!-- Init the onChange observers. -->
+		<plan name="init_on_change_observers">
+			<parameter name="onChangeObserversList" class="List">
+				<goalmapping ref="InitonChangeObservers.onChangeObserversList" />
+			</parameter>
+			<body class="InitOnChangeObserversPlan" />
+			<trigger>
+				<goal ref="InitOnChangeObservers" />
+			</trigger>
+		</plan>
+		
+		<!-- Init the periodical observers. -->
+		<plan name="start_periodical_observer">
+			<!-- <parameter name="periodicalObserversList" class="List">
+				<goalmapping ref="InitPeriodicalObservers.periodicalObserversList" />
+			</parameter> -->
+			<body class="StartPeriodicalObserverPlan" />
+			<trigger>
+				<internalevent ref="StartPeriodicalObserverEvent" />
+			</trigger>
+		</plan>
+		
+	</plans>
+
+	<events>
+		<!--  Send result of simulation to master agent. -->
+		<messageevent name="inform_master_agent" type="fipa"
+			direction="send">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+			<parameter name="language" class="String" direction="fixed">
+				<value>SFipa.NUGGETS_XML</value>
+			</parameter>
+		</messageevent>
+
+		<!-- Event to trigger the start of a periodical observer-->
+		<internalevent name="StartPeriodicalObserverEvent">
+			<parameter name="observer" class="Observer" />
+		</internalevent>
+	</events>
+
+
+	<properties>
+		<!--
+			The environment may throw exceptions when executing property
+			listeners and these listeners are not valid any longer. This leads to
+			normal plan failure and can therefore be ignored.
+		-->
+		<property name="logging.level">java.util.logging.Level.WARNING</property>
+		<property name="debugging">false</property>
+	</properties>
+
+	<configurations>
+		<configuration name="default">
+			<goals>
+				<!--  <initialgoal ref="updateEnv" />-->
+			</goals>
+			<plans>
+				<initialplan ref="runtime_manager" />
+				<initialplan ref="init_observers" />
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>
