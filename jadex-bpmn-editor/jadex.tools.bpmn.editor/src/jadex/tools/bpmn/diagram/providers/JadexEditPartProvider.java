@@ -1,4 +1,6 @@
-package jadex.tools.bpmn.editor;
+package jadex.tools.bpmn.diagram.providers;
+
+import jadex.tools.bpmn.diagram.edit.parts.JadexEditPartFactory;
 
 import org.eclipse.stp.bpmn.diagram.providers.BpmnEditPartProvider;
 

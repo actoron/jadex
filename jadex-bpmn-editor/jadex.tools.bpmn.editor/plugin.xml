@@ -13,6 +13,13 @@
       </editor>
    </extension>
    
+   <!-- custom edit part provider -->
+   <extension point="org.eclipse.gmf.runtime.diagram.ui.editpartProviders">
+      <editpartProvider class="jadex.tools.bpmn.diagram.providers.JadexEditPartProvider">
+         <Priority name="Highest"/>
+      </editpartProvider>
+   </extension>
+   
    <!-- add a jadex property tab to the editor-->
    <extension
         point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
