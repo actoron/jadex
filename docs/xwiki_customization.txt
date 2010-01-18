@@ -1,11 +1,14 @@
-templates/global.vm
-	- Change "Main.WebHome" to "About.Overview" in companylogo link
+Installation
+------------
 
 templates/htmlheader.vm
 	- Add "#if($isGuest) guestuser#end" to 'class' attribute of last body tag
 
-WEB-INF/web.xml
-	- Set homePage parameter of redirectHome servlet to "bin/view/About/Overview"
+Adjust WebHome start page of wiki
+	- WEB-INF/web.xml
+		- Set homePage parameter of redirectHome servlet to "bin/view/About/Overview"
+	- templates/global.vm
+		- Change "Main.WebHome" to "About.Overview" in companylogo link
 
 WEB-INF/xwiki.cfg
 	- Set xwiki.store.attachment.versioning=0 to save memory when uploading attachments
@@ -22,4 +25,66 @@ MySQL
 	
 XWiki
 	- Import lightbox plugin (.xar)
-	- Do not remove 'Admin' user as this causes watchlist problems: http://lists.xwiki.org/pipermail/users/2008-October/014116.html  
+	- Do not remove 'Admin' user as this causes watchlist problems: http://lists.xwiki.org/pipermail/users/2008-October/014116.html 
+	
+change upload limit (http://madplanet.com/xwiki/bin/view/Madplanet/Increasing+Maximum+Upload)
+- edit the XWiki.XWikiPreferences object!!! and specify the desired maximum attachment size (in bytes) 
+http://localhost/xwiki/bin/edit/XWiki/XWikiPreferences?editor=object
+	
+	
+	
+Upgrade
+-------
+
+xwiki XWiki Enterprise (Manager) war  
+	- unzip and place in webservers webapps dir
+	
+database 	
+	- add mysql-connector-java-5.1.7-bin.jar to WEB-INF/lib
+	- modify the hibernate.cfg.xml, important the last line is not on the xwiki site but prevents specific errors
+	<property name="connection.url">jdbc:mysql://localhost/xwiki?useServerPrepStmts=false&amp;sessionVariables=sql_mode=''</property> 
+	<property name="connection.username">xwiki</property> 
+	<property name="connection.password">xwiki</property> 
+	<property name="connection.driver_class">com.mysql.jdbc.Driver</property> 
+	<property name="dialect">org.hibernate.dialect.MySQLDialect</property> 
+	<property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property> 
+	<property name="connection.pool_size">2</property> 
+	<property name="statement_cache.size">2</property> 
+	<mapping resource="xwiki.hbm.xml"/> 
+	<mapping resource="feeds.hbm.xml"/> 
+	<mapping resource="activitystream.hbm.xml"/>
+
+plugins
+	- entries in xwiki.cfg
+	com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin,\ 
+	com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin,\
+	jadex.xwiki.OnlineUsersPlugin
+	- jars to WEB-INF/lib
+	xwiki-plugin-wiki-manager-1.16.jar 
+	xwiki-plugin-application-manager-1.11.jar
+	jadex-xwiki-2.0-beta2.jar
+	
+	(+ lightbox installation/import)
+	
+skins 
+	- copy new skin directories to skins dir
+	
+make server virtual
+	- in xwiki.cfg 
+	xwiki.virtual=1
+	- the server cannot be reached from the outside, so locally serve to
+	the following address and modify the server and home page entry
+	http://localhost/bin/edit/XWiki/XWikiServerXwiki?editor=object
+
+for importing existing wiki in fresh db
+	- create fresh database (grant rights)
+	- edit xwiki.db=<dbname>
+	- edit hibernate file
+	- turn on virtual=0 !
+	- import standard empty xar
+	- change upload size
+	- import wiki
+	
+ 
+	
+	
