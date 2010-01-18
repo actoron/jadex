@@ -9,6 +9,7 @@ import jadex.wfms.bdi.ontology.InformActivityRemoved;
 import jadex.wfms.bdi.ontology.InformWorkitemAdded;
 import jadex.wfms.bdi.ontology.InformWorkitemRemoved;
 import jadex.wfms.client.ActivityEvent;
+import jadex.wfms.client.IActivityListener;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IWorkitemListener;
 import jadex.wfms.client.WorkitemEvent;
@@ -16,7 +17,7 @@ import jadex.wfms.service.IClientService;
 
 import java.util.Map;
 
-public class StartWorkitemSubscriptionPlan extends Plan
+public class StartActivitySubscriptionPlan extends Plan
 {
 	public void body()
 	{
@@ -29,43 +30,43 @@ public class StartWorkitemSubscriptionPlan extends Plan
 		
 		final IBDIExternalAccess agent = getExternalAccess();
 		IClientService cs = (IClientService) getScope().getServiceContainer().getService(IClientService.class);
-		IWorkitemListener listener = new IWorkitemListener()
+		IActivityListener listener = new IActivityListener()
 		{
-			public void workitemRemoved(WorkitemEvent event)
+			public void activityAdded(ActivityEvent event)
 			{
-				final InformWorkitemRemoved update = new InformWorkitemRemoved();
-				update.setWorkitem(event.getWorkitem());
+				final InformActivityAdded update = new InformActivityAdded();
+				update.setActivity(event.getActivity());
 				
 				agent.invokeLater(new Runnable()
 				{
 					public void run()
 					{
-						IGoal wiRemoved = agent.createGoal("subcap.sp_submit_update");
-						wiRemoved.getParameter("update").setValue(update);
-						wiRemoved.getParameter("subscription_id").setValue(subId);
-						agent.dispatchTopLevelGoal(wiRemoved);
+						IGoal acAdded = agent.createGoal("subcap.sp_submit_update");
+						acAdded.getParameter("update").setValue(update);
+						acAdded.getParameter("subscription_id").setValue(subId);
+						agent.dispatchTopLevelGoal(acAdded);
 					}
 				});
 			}
 			
-			public void workitemAdded(WorkitemEvent event)
+			public void activityRemoved(ActivityEvent event)
 			{
-				final InformWorkitemAdded update = new InformWorkitemAdded();
-				update.setWorkitem(event.getWorkitem());
+				final InformActivityRemoved update = new InformActivityRemoved();
+				update.setActivity(event.getActivity());
 				
 				agent.invokeLater(new Runnable()
 				{
 					public void run()
 					{
-						IGoal wiAdded = agent.createGoal("subcap.sp_submit_update");
-						wiAdded.getParameter("update").setValue(update);
-						wiAdded.getParameter("subscription_id").setValue(subId);
-						agent.dispatchTopLevelGoal(wiAdded);
+						IGoal acAdded = agent.createGoal("subcap.sp_submit_update");
+						acAdded.getParameter("update").setValue(update);
+						acAdded.getParameter("subscription_id").setValue(subId);
+						agent.dispatchTopLevelGoal(acAdded);
 					}
 				});
 			}
 		};
 		
-		cs.addWorkitemListener(proxy, listener);
+		cs.addActivityListener(proxy, listener);
 	}
 }

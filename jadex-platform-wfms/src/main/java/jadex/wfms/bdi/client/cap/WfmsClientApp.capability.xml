@@ -32,6 +32,8 @@
 		<belief name="remove_workitem_controller" class="javax.swing.Action" />
 		<belief name="add_activity_controller" class="javax.swing.Action" />
 		<belief name="remove_activity_controller" class="javax.swing.Action" />
+		<belief name="add_user_activity_controller" class="javax.swing.Action" />
+		<belief name="remove_user_activity_controller" class="javax.swing.Action" />
 		<belief name="lost_connection_controller" class="javax.swing.Action" />
 	</beliefs>
 	
@@ -81,12 +83,16 @@
 		
 		<achievegoal name="start_workitem_subscription" exported="true" />
 		
+		<achievegoal name="start_activity_subscription" exported="true" />
+		
 		
 		<!--======================= Administration =====================-->
 		
 		<achievegoal name="request_user_activities" exported="true">
 			<parameter name="user_activities" class="Set" direction="out" />
 		</achievegoal>
+		
+		<achievegoal name="start_user_activities_subscription" exported="true" />
 		
 		<!-- ================= Subscription Events ==================== -->
 		<achievegoal name="add_workitem" exported="true">
@@ -102,6 +108,16 @@
 		</achievegoal>
 		
 		<achievegoal name="remove_activity" exported="true">
+			<parameter name="activity" class="IClientActivity" exported="true"/>
+		</achievegoal>
+		
+		<achievegoal name="add_user_activity" exported="true">
+			<parameter name="user_name" class="String" exported="true" />
+			<parameter name="activity" class="IClientActivity" exported="true" />
+		</achievegoal>
+		
+		<achievegoal name="remove_user_activity" exported="true">
+			<parameter name="user_name" class="String" exported="true" />
 			<parameter name="activity" class="IClientActivity" exported="true"/>
 		</achievegoal>
 		
@@ -228,10 +244,25 @@
 			</trigger>
 		</plan>
 		
+		<plan name="start_user_activities_subscription_plan">
+			<body class="UserActivitiesSubscriptionPlan" />
+			<trigger>
+				<goal ref="start_user_activities_subscription" />
+			</trigger>
+		</plan>
+		
+		
 		<plan name="start_workitem_subscription_plan">
 			<body class="WorkitemSubscriptionPlan" />
 			<trigger>
 				<goal ref="start_workitem_subscription" />
+			</trigger>
+		</plan>
+		
+		<plan name="start_activity_subscription_plan">
+			<body class="ActivitySubscriptionPlan" />
+			<trigger>
+				<goal ref="start_activity_subscription" />
 			</trigger>
 		</plan>
 		
@@ -292,6 +323,32 @@
 			<body class="RemoveActivityPlan" />
 			<trigger>
 				<goal ref="remove_activity" />
+			</trigger>
+		</plan>
+		
+		<plan name="add_user_activity_plan" priority="-1">
+			<parameter name="user_name" class="String">
+				<goalmapping ref="add_user_activity.user_name"/>
+			</parameter>
+			<parameter name="activity" class="IClientActivity">
+				<goalmapping ref="add_activity.activity"/>
+			</parameter>
+			<body class="AddUserActivityPlan" />
+			<trigger>
+				<goal ref="add_user_activity" />
+			</trigger>
+		</plan>
+		
+		<plan name="remove_user_activity_plan" priority="-1">
+			<parameter name="user_name" class="String">
+				<goalmapping ref="remove_user_activity.user_name"/>
+			</parameter>
+			<parameter name="activity" class="IClientActivity">
+				<goalmapping ref="remove_activity.activity"/>
+			</parameter>
+			<body class="RemoveUserActivityPlan" />
+			<trigger>
+				<goal ref="remove_user_activity" />
 			</trigger>
 		</plan>
 		

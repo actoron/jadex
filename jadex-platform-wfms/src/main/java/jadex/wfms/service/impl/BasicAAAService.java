@@ -3,11 +3,13 @@ package jadex.wfms.service.impl;
 import jadex.commons.concurrent.IResultListener;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IAAAService;
+import jadex.wfms.service.IAuthenticationListener;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,6 +23,8 @@ public class BasicAAAService implements IAAAService
 	
 	private Map userroles;
 	
+	private Set authenticationListeners;
+	
 	public static IAAAService getTestService()
 	{
 		Map userroles = new HashMap();
@@ -32,12 +36,14 @@ public class BasicAAAService implements IAAAService
 	
 	public BasicAAAService(Map userroles)
 	{
+		this.authenticationListeners = new HashSet();
 		this.userroles = userroles!=null? userroles: new HashMap();
 		userClients = new HashMap();
 	}
 	
 	public BasicAAAService(String[] userNames, String[][] roles)
 	{
+		this.authenticationListeners = new HashSet();
 		int min = Math.min(userNames.length, roles.length);
 		userroles = new HashMap();
 		for (int i = 0; i < min; ++i)
@@ -73,6 +79,7 @@ public class BasicAAAService implements IAAAService
 		if (!userClients.containsKey(client.getUserName()))
 			userClients.put(client.getUserName(), Collections.synchronizedSet(new HashSet()));
 		((Set) userClients.get(client.getUserName())).add(client);
+		fireAuthenticationEvent(client);
 		return true;
 	}
 	
@@ -83,6 +90,7 @@ public class BasicAAAService implements IAAAService
 	public synchronized void deauthenticate(IClient client)
 	{
 		((Set) userClients.get(client.getUserName())).remove(client);
+		fireDeauthenticationEvent(client);
 	}
 	
 	/**
@@ -164,5 +172,38 @@ public class BasicAAAService implements IAAAService
 			roles.add(IAAAService.ALL_ROLES);
 		}
 		return roles;
+	}
+	
+	/**
+	 * Adds an authentication listener which triggers on
+	 * authentications and deauthentications.
+	 * 
+	 * @param listener the listener
+	 */
+	public synchronized void addAuthenticationListener(IAuthenticationListener listener)
+	{
+		authenticationListeners.add(listener);
+	}
+	
+	/**
+	 * Removes an authentication listener.
+	 * 
+	 * @param listener the listener
+	 */
+	public synchronized void removeAuthenticationListener(IAuthenticationListener listener)
+	{
+		authenticationListeners.remove(listener);
+	}
+	
+	private void fireAuthenticationEvent(IClient client)
+	{
+		for (Iterator it = authenticationListeners.iterator(); it.hasNext(); )
+			((IAuthenticationListener) it.next()).authenticated(client);
+	}
+	
+	private void fireDeauthenticationEvent(IClient client)
+	{
+		for (Iterator it = authenticationListeners.iterator(); it.hasNext(); )
+			((IAuthenticationListener) it.next()).deauthenticated(client);
 	}
 }

@@ -216,8 +216,8 @@
 			</trigger>
 		</plan>
 		
-		<!-- Handle event subscription requests. -->
-		<plan name="start_subscription_plan">
+		<!-- Handle workitem event subscription requests. -->
+		<plan name="start_workitem_subscription_plan">
 			<!-- The requesting agent. -->
 			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier">
 				<goalmapping ref="sp_start_subscription.initiator"/>
@@ -233,6 +233,22 @@
 			</trigger>
 		</plan>
 		
+		<!-- Handle activity event subscription requests. -->
+		<plan name="start_activity_subscription_plan">
+			<!-- The requesting agent. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="sp_start_subscription.initiator"/>
+			</parameter>
+			<parameter name="subscription_id" class="Object">
+				<goalmapping ref="sp_start_subscription.subscription_id"/>
+			</parameter>
+			<body class="StartActivitySubscriptionPlan" />
+			<trigger>
+				<goal ref="subcap.sp_start_subscription">
+					<match>$goal.getParameter("subscription").getValue() instanceof SubscribeActivityEvents</match>
+				</goal>
+			</trigger>
+		</plan>
 		
 		
 		<!-- Handle Heartbeat requests. -->

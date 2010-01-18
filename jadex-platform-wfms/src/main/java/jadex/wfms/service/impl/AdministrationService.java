@@ -2,6 +2,7 @@ package jadex.wfms.service.impl;
 
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
+import jadex.wfms.client.IActivityListener;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.ILogListener;
 import jadex.wfms.client.IProcessListener;
@@ -9,6 +10,7 @@ import jadex.wfms.client.LogEvent;
 import jadex.wfms.client.ProcessEvent;
 import jadex.wfms.service.IAAAService;
 import jadex.wfms.service.IAdministrationService;
+import jadex.wfms.service.IAuthenticationListener;
 import jadex.wfms.service.IWfmsClientService;
 
 import java.security.AccessControlException;
@@ -29,11 +31,15 @@ public class AdministrationService implements IAdministrationService
 	/** The process listeners */
 	private Map processListeners;
 	
+	/** The user activities listeners */
+	private Map activitiesListeners;
+	
 	public AdministrationService(final IServiceContainer wfms)
 	{
 		this.wfms = wfms;
 		this.logListeners = new HashMap();
 		this.processListeners = new HashMap();
+		this.activitiesListeners = new HashMap();
 		
 		Logger.getLogger("Wfms").addHandler(new Handler()
 		{
@@ -56,6 +62,24 @@ public class AdministrationService implements IAdministrationService
 			}
 			
 			public void close() throws SecurityException
+			{
+			}
+		});
+		
+		IAAAService as = (IAAAService) wfms.getService(IAAAService.class);
+		as.addAuthenticationListener(new IAuthenticationListener()
+		{
+			
+			public void deauthenticated(IClient client)
+			{
+				System.out.println("Removing");
+				IWfmsClientService wcs = (IWfmsClientService) wfms.getService(IWfmsClientService.class);
+				IActivityListener listener = (IActivityListener) activitiesListeners.get(client);
+				if (listener != null)
+					wcs.removeActivityListener(listener);
+			}
+			
+			public void authenticated(IClient client)
 			{
 			}
 		});
@@ -84,9 +108,40 @@ public class AdministrationService implements IAdministrationService
 	 */
 	public Map getUserActivities(IClient client)
 	{
-		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_LOG_LISTENER))
+		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_ADD_LOG_LISTENER))
 			throw new AccessControlException("Not allowed: "+client);
 		return ((IWfmsClientService) wfms.getService(IWfmsClientService.class)).getUserActivities();
+	}
+	
+	/**
+	 * Adds a user activities listener which will trigger for
+	 * any activity event, even activities unrelated to the client.
+	 * 
+	 * @param client the client
+	 * @param listener the listener
+	 */
+	public void addActivitiesListener(IClient client, IActivityListener listener)
+	{
+		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_ADD_ACTIVITIES_LISTENER))
+			throw new AccessControlException("Not allowed: "+client);
+		IWfmsClientService wcs = (IWfmsClientService) wfms.getService(IWfmsClientService.class);
+		wcs.addActivityListener(listener);
+		activitiesListeners.put(client, listener);
+	}
+	
+	/**
+	 * Removes a user activities listener.
+	 * 
+	 * @param client the client
+	 * @param listener the listener
+	 */
+	public void removeActivitiesListener(IClient client, IActivityListener listener)
+	{
+		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_REMOVE_ACTIVITIES_LISTENER))
+			throw new AccessControlException("Not allowed: "+client);
+		IWfmsClientService wcs = (IWfmsClientService) wfms.getService(IWfmsClientService.class);
+		wcs.removeActivityListener(listener);
+		activitiesListeners.remove(client);
 	}
 	
 	/**
@@ -97,7 +152,7 @@ public class AdministrationService implements IAdministrationService
 	 */
 	public void addLogListener(IClient client, ILogListener listener)
 	{
-		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_LOG_LISTENER))
+		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_ADD_LOG_LISTENER))
 			throw new AccessControlException("Not allowed: "+client);
 		logListeners.put(client, listener);
 	}
@@ -110,7 +165,7 @@ public class AdministrationService implements IAdministrationService
 	 */
 	public void removeLogListener(IClient client, ILogListener listener)
 	{
-		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REMOVE_LOG_LISTENER))
+		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_REMOVE_LOG_LISTENER))
 			throw new AccessControlException("Not allowed: "+client);
 		logListeners.remove(client);
 	}
@@ -123,7 +178,7 @@ public class AdministrationService implements IAdministrationService
 	 */
 	public void addProcessListener(IClient client, IProcessListener listener)
 	{
-		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_PROCESS_LISTENER))
+		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_ADD_PROCESS_LISTENER))
 			throw new AccessControlException("Not allowed: "+client);
 		processListeners.put(client, listener);
 	}
@@ -136,7 +191,7 @@ public class AdministrationService implements IAdministrationService
 	 */
 	public void removeProcessListener(IClient client, IProcessListener listener)
 	{
-		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REMOVE_PROCESS_LISTENER))
+		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_REMOVE_PROCESS_LISTENER))
 			throw new AccessControlException("Not allowed: "+client);
 		processListeners.remove(client);
 	}

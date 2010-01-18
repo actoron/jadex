@@ -14,23 +14,25 @@ public interface IAAAService extends IService
 	public static final String ALL_ROLES = "all";
 	
 	// Actions
-	public static final int REQUEST_PD_SERVICE	 	 	 = 0;
-	public static final int REQUEST_MONITORING_SERVICE	 = 1;
-	public static final int ADD_PROCESS_MODEL 	 		 = 50;
-	public static final int REQUEST_PROCESS_MODEL		 = 51;
-	public static final int START_BPMN_PROCESS 		 	 = 100;
-	public static final int START_GPMN_PROCESS 		 	 = 101;
-	public static final int REQUEST_MODEL_NAMES 		 = 102;
-	public static final int REQUEST_AVAILABLE_WORKITEMS  = 103;
-	public static final int REQUEST_AVAILABLE_ACTIVITIES = 104;
-	public static final int COMMIT_WORKITEM			 	 = 105;
-	public static final int ACQUIRE_WORKITEM		 	 = 106;
-	public static final int RELEASE_WORKITEM		 	 = 107;
-	public static final int REQUEST_ALL_ACTIVITIES		 = 401;
-	public static final int ADD_LOG_LISTENER			 = 500;
-	public static final int REMOVE_LOG_LISTENER			 = 501;
-	public static final int ADD_PROCESS_LISTENER		 = 502;
-	public static final int REMOVE_PROCESS_LISTENER		 = 503;
+	public static final int REQUEST_PD_SERVICE				 = 0;
+	public static final int REQUEST_MONITORING_SERVICE		 = 1;
+	public static final int ADD_PROCESS_MODEL				 = 50;
+	public static final int REQUEST_PROCESS_MODEL			 = 51;
+	public static final int START_BPMN_PROCESS				 = 100;
+	public static final int START_GPMN_PROCESS				 = 101;
+	public static final int REQUEST_MODEL_NAMES				 = 102;
+	public static final int REQUEST_AVAILABLE_WORKITEMS		 = 103;
+	public static final int REQUEST_AVAILABLE_ACTIVITIES	 = 104;
+	public static final int COMMIT_WORKITEM					 = 105;
+	public static final int ACQUIRE_WORKITEM				 = 106;
+	public static final int RELEASE_WORKITEM		 		 = 107;
+	public static final int ADMIN_REQUEST_ALL_ACTIVITIES	 = 401;
+	public static final int ADMIN_ADD_ACTIVITIES_LISTENER	 = 500;
+	public static final int ADMIN_REMOVE_ACTIVITIES_LISTENER = 501;
+	public static final int ADMIN_ADD_LOG_LISTENER			 = 502;
+	public static final int ADMIN_REMOVE_LOG_LISTENER		 = 503;
+	public static final int ADMIN_ADD_PROCESS_LISTENER		 = 504;
+	public static final int ADMIN_REMOVE_PROCESS_LISTENER	 = 505;
 	
 	/** All capabilities */
 	public static final int[] CAPABILITIES = { REQUEST_PD_SERVICE,
@@ -45,11 +47,13 @@ public interface IAAAService extends IService
 											   COMMIT_WORKITEM,
 											   ACQUIRE_WORKITEM,
 											   RELEASE_WORKITEM,
-											   REQUEST_ALL_ACTIVITIES,
-											   ADD_LOG_LISTENER,
-											   REMOVE_LOG_LISTENER,
-											   ADD_PROCESS_LISTENER,
-											   REMOVE_PROCESS_LISTENER };
+											   ADMIN_REQUEST_ALL_ACTIVITIES,
+											   ADMIN_ADD_ACTIVITIES_LISTENER,
+											   ADMIN_REMOVE_ACTIVITIES_LISTENER,
+											   ADMIN_ADD_LOG_LISTENER,
+											   ADMIN_REMOVE_LOG_LISTENER,
+											   ADMIN_ADD_PROCESS_LISTENER,
+											   ADMIN_REMOVE_PROCESS_LISTENER };
 	
 	/**
 	 * Authenticate a new client.
@@ -93,4 +97,19 @@ public interface IAAAService extends IService
 	 * @return the roles of the client
 	 */
 	public Set getRoles(IClient client);
+	
+	/**
+	 * Adds an authentication listener which triggers on
+	 * authentications and deauthentications.
+	 * 
+	 * @param listener the listener
+	 */
+	public void addAuthenticationListener(IAuthenticationListener listener);
+	
+	/**
+	 * Removes an authentication listener.
+	 * 
+	 * @param listener the listener
+	 */
+	public void removeAuthenticationListener(IAuthenticationListener listener);
 }

@@ -1,6 +1,7 @@
 package jadex.wfms.service;
 
 import jadex.service.IService;
+import jadex.wfms.client.IActivityListener;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
@@ -92,14 +93,30 @@ public interface IClientService extends IService
 	public Set getAvailableActivities(IClient client);
 	
 	/**
-	 *  Adds a listener for workitem queue changes and other WFMS changes.
+	 *  Adds a listener for workitem queue changes relevant to the client.
+	 *  @param client the client
 	 *  @param listener a new WFMS listener
 	 */
-	public void addWfmsListener(IWorkitemListener listener);
+	public void addWorkitemListener(IClient client, IWorkitemListener listener);
 	
 	/**
-	 *  Removes a listener for workitem queue changes and other WFMS changes.
+	 *  Removes a listener for workitem queue changes relevant to the client.
+	 *  @param client the client
 	 *  @param listener a new WFMS listener
 	 */
-	public void removeWfmsListener(IWorkitemListener listener);
+	public void removeWorkitemListener(IClient client, IWorkitemListener listener);
+	
+	/**
+	 *  Adds a listener for activity changes of the client.
+	 *  @param client the client
+	 *  @param listener a new activity listener
+	 */
+	public void addActivityListener(IClient client, IActivityListener listener);
+	
+	/**
+	 *  Removes a listener for activity changes of the client.
+	 *  @param client the client
+	 *  @param listener a new activity listener
+	 */
+	public void removeActivityListener(IClient client, IActivityListener listener);
 }

@@ -232,6 +232,11 @@ public class Workitem implements IWorkitem, IClientActivity
 		this.guiProperties = guiProperties;
 	}
 	
+	public String toString()
+	{
+		return id.concat(" [").concat(role).concat("]");
+	}
+	
 	// --------------------------- Comparison -------------------------
 	
 	public int hashCode()

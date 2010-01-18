@@ -1,6 +1,7 @@
 package jadex.wfms.simulation;
 
 import jadex.wfms.client.ActivityEvent;
+import jadex.wfms.client.IActivityListener;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.ILogListener;
@@ -114,7 +115,7 @@ public class ClientSimulator implements IClient
 			}
 		});
 		
-		clientService.addWfmsListener(new IWorkitemListener()
+		clientService.addWorkitemListener(this, new IWorkitemListener()
 		{
 			
 			public void workitemRemoved(WorkitemEvent event)
@@ -127,7 +128,10 @@ public class ClientSimulator implements IClient
 				int type = event.getWorkitem().getType();
 				clientService.beginActivity(ClientSimulator.this, event.getWorkitem());
 			}
-			
+		});
+		
+		clientService.addActivityListener(this, new IActivityListener()
+		{
 			public void activityAdded(ActivityEvent event)
 			{
 				IClientActivity activity = event.getActivity();
@@ -146,11 +150,6 @@ public class ClientSimulator implements IClient
 			
 			public void activityRemoved(ActivityEvent event)
 			{
-			}
-			
-			public IClient getClient()
-			{
-				return null;
 			}
 		});
 	}

@@ -40,6 +40,8 @@ public class StandardClientApplication
 	
 	private static final String PROCESS_MODEL_TAB_NAME = "Process Models";
 	
+	private static final String ADMIN_ACTIVITIES_TAB_NAME = "Activities";
+	
 	private static final JPanel EMPTY_PANEL = new JPanel();
 	
 	private static final String CONNECT_ICON_NAME = "Connection";
@@ -57,6 +59,8 @@ public class StandardClientApplication
 	private WorkitemListComponent wlComponent;
 	
 	private ProcessModelComponent pmComponent;
+	
+	private AdminActivitiesComponent aaComponent;
 	
 	private boolean connected;
 	
@@ -133,18 +137,24 @@ public class StandardClientApplication
 				pmComponent = new ProcessModelComponent();
 				leftTabPane.add(PROCESS_MODEL_TAB_NAME, pmComponent);
 				
+				aaComponent = new AdminActivitiesComponent();
+				leftTabPane.add("Activities", aaComponent);
+				
 				mainFrame.pack();
 				mainFrame.setSize(800, 550);
 				mainFrame.setLocation(SGUI.calculateMiddlePosition(mainFrame));
 				mainFrame.setVisible(true);
-				mainSplitPane.setDividerLocation(0.4);
+				mainSplitPane.setDividerLocation(0.45);
 				
 				setAgentActions();
 				
 				showConnectDialog();
 				
-				initializeWorkitemList();
-				initializeActivities();
+				subscribeWorkitems();
+				subscribeActivities();
+				IGoal subscribe = agent.createGoal("clientcap.start_user_activities_subscription");
+				agent.dispatchTopLevelGoalAndWait(subscribe);
+				
 				updateProcessModels();
 				setActions();
 			}
@@ -277,6 +287,24 @@ public class StandardClientApplication
 		};
 		agent.getBeliefbase().getBelief("remove_activity_controller").setFact(acRemoved);
 		
+		Action uacAdded = new AbstractAction()
+		{
+			public void actionPerformed(final ActionEvent e)
+			{
+				aaComponent.addUserActivity(e.getActionCommand(), (IClientActivity) e.getSource());
+			}
+		};
+		agent.getBeliefbase().getBelief("clientcap.add_user_activity_controller").setFact(uacAdded);
+		
+		Action uacRemoved = new AbstractAction()
+		{
+			public void actionPerformed(final ActionEvent e)
+			{
+				aaComponent.removeUserActivity(e.getActionCommand(), (IClientActivity) e.getSource());
+			}
+		};
+		agent.getBeliefbase().getBelief("clientcap.remove_user_activity_controller").setFact(uacRemoved);
+		
 		Action lcAction = new AbstractAction()
 		{
 			public void actionPerformed(final ActionEvent e)
@@ -341,43 +369,24 @@ public class StandardClientApplication
 		}
 	}
 	
-	private void initializeWorkitemList()
+	private void subscribeWorkitems()
 	{
 		IGoal subscribe = agent.createGoal("clientcap.start_workitem_subscription");
 		agent.dispatchTopLevelGoalAndWait(subscribe);
-		
-		IGoal requestListGoal = agent.createGoal("clientcap.request_workitem_list");
-		agent.dispatchTopLevelGoalAndWait(requestListGoal);
-		Set workitemList = (Set) requestListGoal.getParameter("workitem_list").getValue();
-		wlComponent.setWorkitems(workitemList);
 	}
 	
-	private void initializeActivities()
+	private void subscribeActivities()
 	{
-		IGoal requestListGoal = agent.createGoal("clientcap.request_activity_list");
-		agent.dispatchTopLevelGoalAndWait(requestListGoal);
-		Set activityList = (Set) requestListGoal.getParameter("activity_list").getValue();
-		
-		for (Iterator it = activityList.iterator(); it.hasNext(); )
-		{
-			IClientActivity act = (IClientActivity) it.next();
-			if (mainSplitPane.getRightComponent() instanceof JTabbedPane)
-			{
-				JTabbedPane tabPane = (JTabbedPane) mainSplitPane.getRightComponent();
-				ActivityComponent ac = createActivityComponent(act);
-				tabPane.add(ac, ac.getActivity().getName());
-				tabPane.setSelectedComponent(ac);
-			}
-			else if (mainSplitPane.getRightComponent() instanceof ActivityComponent)
-			{
-				cancelActivity(act);
-			}
-			else
-			{
-				ActivityComponent ac = createActivityComponent(act);
-				mainSplitPane.setRightComponent(ac);
-			}
-		}
+		IGoal subscribe = agent.createGoal("clientcap.start_activity_subscription");
+		agent.dispatchTopLevelGoalAndWait(subscribe);
+	}
+	
+	private void initializeAdminActivities()
+	{
+		IGoal rua = agent.createGoal("clientcap.request_user_activities");
+		agent.dispatchTopLevelGoalAndWait(rua);
+		Map userActivities = (Map) rua.getParameter("user_activities").getValue();
+		aaComponent.setUserActivities(userActivities);
 	}
 	
 	private void updateProcessModels()

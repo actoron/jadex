@@ -15,6 +15,7 @@
 		
 		<property type="agent" name="WfmsClientInterfaceAgent">jadex/wfms/bdi/interfaces/client/WfmsClientInterface.agent.xml</property>
 		<property type="agent" name="WfmsPdInterfaceAgent">jadex/wfms/bdi/interfaces/processdefinition/WfmsPdInterface.agent.xml</property>
+		<property type="agent" name="WfmsAdminInterfaceAgent">jadex/wfms/bdi/interfaces/admin/WfmsAdminInterface.agent.xml</property>
 		
 		<!-- Platform services. -->
 		<properties type="services">

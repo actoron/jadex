@@ -62,7 +62,7 @@ public abstract class AbstractClientTask implements ITask
 			}
 		}
 		Workitem wi = new Workitem(context.getModelElement().getName(), type, "NoRole", parameterTypes, parameterValues, guiProperties, readOnlyParameters);
-		wi.setId(context.getModelElement().getName() + "_" + String.valueOf(System.identityHashCode(wi)));
+		wi.setId(context.getModelElement().getName() + "_" + String.valueOf(Integer.toHexString(System.identityHashCode(wi))));
 		return wi;
 	}
 	

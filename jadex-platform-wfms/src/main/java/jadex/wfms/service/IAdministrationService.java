@@ -1,6 +1,7 @@
 package jadex.wfms.service;
 
 import jadex.service.IService;
+import jadex.wfms.client.IActivityListener;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.ILogListener;
 import jadex.wfms.client.IProcessListener;
@@ -16,6 +17,23 @@ public interface IAdministrationService extends IService
 	 * @return current activities for all users
 	 */
 	public Map getUserActivities(IClient client);
+	
+	/**
+	 * Adds a user activities listener which will trigger for
+	 * any activity event, even activities unrelated to the client.
+	 * 
+	 * @param client the client
+	 * @param listener the listener
+	 */
+	public void addActivitiesListener(IClient client, IActivityListener listener);
+	
+	/**
+	 * Removes a user activities listener.
+	 * 
+	 * @param client the client
+	 * @param listener the listener
+	 */
+	public void removeActivitiesListener(IClient client, IActivityListener listener);
 	
 	/**
 	 * Adds a log listener to the workflow management system.

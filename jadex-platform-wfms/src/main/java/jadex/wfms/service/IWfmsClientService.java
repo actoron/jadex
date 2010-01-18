@@ -3,6 +3,7 @@ package jadex.wfms.service;
 import java.util.Map;
 
 import jadex.commons.concurrent.IResultListener;
+import jadex.wfms.client.IActivityListener;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IWorkitem;
 
@@ -24,4 +25,16 @@ public interface IWfmsClientService
 	 * @return current activities for all users
 	 */
 	public Map getUserActivities();
+	
+	/**
+	 *  Adds a listener for activity changes.
+	 *  @param listener a new activity listener
+	 */
+	public void addActivityListener(IActivityListener listener);
+	
+	/**
+	 *  Removes a listener for activity changes.
+	 *  @param listener activity listener
+	 */
+	public void removeActivityListener(IActivityListener listener);
 }

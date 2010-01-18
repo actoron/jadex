@@ -25,6 +25,14 @@ public abstract class AbstractWfmsPlan extends Plan
 		return getWfmsService(adesc);
 	}
 	
+	protected IComponentIdentifier getAdminInterface()
+	{
+		IDF df = (IDF) getScope().getServiceContainer().getService(IDF.class);
+		IDFAgentDescription adesc = df.createDFAgentDescription(null, df.createDFServiceDescription(SWfms.SERVICE_NAME_ADMIN_INTERFACE, SWfms.SERVICE_TYPE_EXTERNAL, null));
+		
+		return getWfmsService(adesc);
+	}
+	
 	private IComponentIdentifier getWfmsService(IDFAgentDescription adesc)
 	{
 		IGoal dfGoal = createGoal("dfcap.df_search");

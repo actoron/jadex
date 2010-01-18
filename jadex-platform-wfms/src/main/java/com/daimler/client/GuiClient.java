@@ -2,6 +2,7 @@ package com.daimler.client;
 
 import jadex.commons.SGUI;
 import jadex.wfms.client.ActivityEvent;
+import jadex.wfms.client.IActivityListener;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitemListener;
@@ -73,7 +74,9 @@ public class GuiClient implements IClient
 		helpBrowser = new GuiHelpBrowser();
 		initMainFrame();
 		clientService.authenticate(this);
-		clientService.addWfmsListener(new ConnectorController());
+		ConnectorController ccontroller = new ConnectorController();
+		clientService.addWorkitemListener(this, ccontroller);
+		clientService.addActivityListener(this, ccontroller);
 		synchronized (clientService)
 		{
 			Set workitems = clientService.getAvailableWorkitems(this);
@@ -354,7 +357,7 @@ public class GuiClient implements IClient
         taskPanel.updateUI();
 	}
 	
-	private class ConnectorController implements IWorkitemListener
+	private class ConnectorController implements IWorkitemListener, IActivityListener
 	{
 		public void workitemAdded(final WorkitemEvent event)
 		{
@@ -407,51 +410,5 @@ public class GuiClient implements IClient
 			// TODO Auto-generated method stub
 			
 		}
-		
-		public IClient getClient()
-		{
-			return GuiClient.this;
-		}
-		
-		/*public void notificationAdded(UserNotificationStateChangeEvent event)
-		{
-			int type = event.getNotification().getType();
-			switch (type)
-			{
-				case UserNotification.TEXT_INFO_NOTIFICATION_TYPE:
-					showText(event.getNotification());
-					break;
-					
-				case UserNotification.DATA_FETCH_NOTIFICATION_TYPE:
-					fetchData(event.getNotification());
-					break;
-					
-				default:
-					throw new RuntimeException("Unknown Notification type: " + String.valueOf(type));
-			}
-		}
-		
-		public void notificationRemoved(UserNotificationStateChangeEvent event)
-		{
-			if (event.getNotification().equals(activeNotification))
-			{
-				removeNotification(event.getNotification());
-				activeNotification = null;
-			}
-		}
-		
-		public void notificationClaimed(UserNotificationStateChangeEvent event)
-		{
-			if (!event.getNotification().equals(activeNotification))
-			{
-				removeNotification(event.getNotification());
-			}
-		}
-		
-		public void notificationReleased(UserNotificationStateChangeEvent event)
-		{
-			if (!taskMapping.containsKey(event.getNotification()))
-				notificationAdded(event);
-		}*/
 	}
 }
