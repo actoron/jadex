@@ -3,7 +3,9 @@
  */
 package jadex.tools.bpmn.diagram.edit.parts;
 
+import org.eclipse.draw2d.BendpointLocator;
 import org.eclipse.draw2d.Connection;
+import org.eclipse.draw2d.ConnectionLocator;
 import org.eclipse.draw2d.MidpointLocator;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.LabelEditPart;
@@ -38,32 +40,32 @@ public class SequenceEdgeEditPartWithCondition extends SequenceEdgeEditPart
 		return new EdgeFigureWithCondition();
 	}
 	
-	/**
-	 * @generated NOT
-	 */
-	protected boolean addFixedChildGen(EditPart childEditPart)
-	{
-		if (childEditPart instanceof WrappingLabelEditPart)
-		{
-			((WrappingLabelEditPart) childEditPart).setLabel(((EdgeFigureWithCondition)getConnectionFigure())
-					.getFigureSequenceEdgeConditionFigure());
-			return true;
-		}
-		return false;
-	}
-	
-
-	/**
-	 * @generated NOT
-	 */
-	protected boolean removeFixedChild(EditPart childEditPart)
-	{
-		if (childEditPart instanceof WrappingLabelEditPart)
-		{
-			return true;
-		}
-		return false;
-	}
+//	/**
+//	 * @generated NOT
+//	 */
+//	protected boolean addFixedChildGen(EditPart childEditPart)
+//	{
+//		if (childEditPart instanceof WrappingLabelEditPart)
+//		{
+//			((WrappingLabelEditPart) childEditPart).setLabel(((EdgeFigureWithCondition)getConnectionFigure())
+//					.getFigureSequenceEdgeConditionFigure());
+//			return true;
+//		}
+//		return false;
+//	}
+//	
+//
+//	/**
+//	 * @generated NOT
+//	 */
+//	protected boolean removeFixedChild(EditPart childEditPart)
+//	{
+//		if (childEditPart instanceof WrappingLabelEditPart)
+//		{
+//			return true;
+//		}
+//		return false;
+//	}
 
 	
 	
@@ -100,8 +102,9 @@ public class SequenceEdgeEditPartWithCondition extends SequenceEdgeEditPart
 			fFigureSequenceEdgeConditionFigure = new WrappingLabel();
 			fFigureSequenceEdgeConditionFigure.setText("SOME TEXT");
 
-			// FIXME: use locator?
-			this.add(fFigureSequenceEdgeConditionFigure, new MidpointLocator(this, 0));
+			//new BendpointLocator(this, 0);
+			//new MidpointLocator(this, 0)
+			this.add(fFigureSequenceEdgeConditionFigure, new ConnectionLocator(this, ConnectionLocator.SOURCE));
 
 		}
 
