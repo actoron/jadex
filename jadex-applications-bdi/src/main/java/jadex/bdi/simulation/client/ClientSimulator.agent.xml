@@ -17,6 +17,7 @@
 		<import>jadex.adapter.base.envsupport.math.*</import>
 		<import>jadex.adapter.base.fipa.*</import>
 		<import>java.util.*</import>
+		<import>jadex.bdi.simulation.model.Observer</import>
 	</imports>
 
 
@@ -30,14 +31,18 @@
 
 	<beliefs>
 		<!-- Map contains all facts related to this simulation run.-->
-		<belief name="simulationResults" class="Map">
+		<belief name="simulationFacts" class="Map">
 			<fact>new HashMap()</fact>
 		</belief>
-		
+
 		<belief name="msg" class="String" exported="true">
-			 <fact>"Welcome to Jadex."</fact> 
+			<fact>"Welcome to Jadex."</fact>
 		</belief>
-		
+
+		<belief name="observedEvents" class="List">
+			<fact>new ArrayList()</fact>
+		</belief>
+
 	</beliefs>
 
 	<goals>
@@ -45,17 +50,65 @@
 		<achievegoalref name="df_search">
 			<concrete ref="dfcap.df_search" />
 		</achievegoalref>
+
+		<!--
+			Dispatch Goal that creates observers that execute the observation
+			periodically
+		-->
+		<achievegoal name="InitPeriodicalObservers">
+			<parameter name="periodicalObserversList" class="List" />
+		</achievegoal>
+
+		<!-- Dispatch Goal that registers listeners for the objects -->
+		<achievegoal name="InitOnChangeObservers">
+			<parameter name="onChangeObserversList" class="List" />
+		</achievegoal>
+
 	</goals>
 
-	<plans>				<!-- Responsible for all aspects related to the run of the simulation, especially to monitor the terminate condition.-->
+	<plans>		<!--			Responsible for all aspects related to the run of the simulation,			especially to monitor the terminate condition.		-->
 		<plan name="runtime_manager">
 			<body class="RuntimeManagerPlan" />
 		</plan>
 
-		<!-- Start the Observer.-->
-		<plan name="observe_application">
-			<body class="ObserveApplicationPlan" />
+		<!-- Init the Observer.-->
+		<plan name="init_observers">
+			<body class="InitApplicationObserverPlan" />
 		</plan>
+
+		<!-- Init the periodical observers. -->
+		<plan name="init_periodical_observers">
+			<parameter name="periodicalObserversList" class="List">
+				<goalmapping ref="InitPeriodicalObservers.periodicalObserversList" />
+			</parameter>
+			<body class="InitPeriodicalObserversPlan" />
+			<trigger>
+				<goal ref="InitPeriodicalObservers" />
+			</trigger>
+		</plan>
+
+		<!-- Init the onChange observers. -->
+		<plan name="init_on_change_observers">
+			<parameter name="onChangeObserversList" class="List">
+				<goalmapping ref="InitonChangeObservers.onChangeObserversList" />
+			</parameter>
+			<body class="InitOnChangeObserversPlan" />
+			<trigger>
+				<goal ref="InitOnChangeObservers" />
+			</trigger>
+		</plan>
+		
+		<!-- Init the periodical observers. -->
+		<plan name="start_periodical_observer">
+			<!-- <parameter name="periodicalObserversList" class="List">
+				<goalmapping ref="InitPeriodicalObservers.periodicalObserversList" />
+			</parameter> -->
+			<body class="StartPeriodicalObserverPlan" />
+			<trigger>
+				<internalevent ref="StartPeriodicalObserverEvent" />
+			</trigger>
+		</plan>
+		
 	</plans>
 
 	<events>
@@ -69,6 +122,11 @@
 				<value>SFipa.NUGGETS_XML</value>
 			</parameter>
 		</messageevent>
+
+		<!-- Event to trigger the start of a periodical observer-->
+		<internalevent name="StartPeriodicalObserverEvent">
+			<parameter name="observer" class="Observer" />
+		</internalevent>
 	</events>
 
 
@@ -89,7 +147,7 @@
 			</goals>
 			<plans>
 				<initialplan ref="runtime_manager" />
-				<initialplan ref="observe_application" />
+				<initialplan ref="init_observers" />
 			</plans>
 		</configuration>
 	</configurations>
