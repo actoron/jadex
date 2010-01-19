@@ -1,17 +1,30 @@
+Server Names
+------------
+
+jadex           IN A     134.100.9.116
+go4flex         IN CNAME jadex.informatik.uni-hamburg.de.
+jadex-ac        IN CNAME jadex.informatik.uni-hamburg.de.
+jadex-activecomponents  IN CNAME jadex.informatik.uni-hamburg.de.
+jadex-agents    IN CNAME jadex.informatik.uni-hamburg.de.
+jadex-bdi       IN CNAME jadex.informatik.uni-hamburg.de.
+jadex-bpm       IN CNAME jadex.informatik.uni-hamburg.de.
+jadex-processes IN CNAME jadex.informatik.uni-hamburg.de.
+jadex-project   IN CNAME jadex.informatik.uni-hamburg.de.
+jadex-rules     IN CNAME jadex.informatik.uni-hamburg.de.
+jadex-software  IN CNAME jadex.informatik.uni-hamburg.de.
+jadex-xml       IN CNAME jadex.informatik.uni-hamburg.de.
+
+
+
 Installation
 ------------
 
 templates/htmlheader.vm
-	- Add "#if($isGuest) guestuser#end" to 'class' attribute of last body tag
-
-Adjust WebHome start page of wiki
-	- WEB-INF/web.xml
-		- Set homePage parameter of redirectHome servlet to "bin/view/About/Overview"
-	- templates/global.vm
-		- Change "Main.WebHome" to "About.Overview" in companylogo link
+	- Add "#if($isGuest) guestuser#end" to 'class' attribute of last body tag (required for onlineusers plugin)
 
 WEB-INF/xwiki.cfg
 	- Set xwiki.store.attachment.versioning=0 to save memory when uploading attachments
+	- Set storage.attachment.recyclebin=0 to save memory when deleting attachments
 	- Add edu.uci.ics.mondego.wiki.plugin.map.MapPlugin to xwiki.plugins
 	  (also add googlemapplugin-1.0.jar to WEB-INF/lib)
 	- Enable/disable super admin by setting/unsetting xwiki.superadminpassword as required.
@@ -31,7 +44,29 @@ change upload limit (http://madplanet.com/xwiki/bin/view/Madplanet/Increasing+Ma
 - edit the XWiki.XWikiPreferences object!!! and specify the desired maximum attachment size (in bytes) 
 http://localhost/xwiki/bin/edit/XWiki/XWikiPreferences?editor=object
 	
-	
+
+Appearance
+----------
+
+- customize / edit skin as desired. (preferences/presentation)
+- attach logo to xwiki/bin/view/XWiki/DefaultSkin and edit to refer to logo (make sure to remove leading/trailing spaces around file name)
+- attach go.png image to xwiki/bin/view/XWiki/DefaultSkin to alter search button (if desired)
+- Adapt layout (preferences/panels)
+- change class="globalsearch" to id="globalsearch" in search panel for css backwards compatibility
+- change copyright notice (preferences/presentation) to: Copyright (C) 2002-2010 Lars Braubach, Alexander Pokahr - University of Hamburg
+- edit /xwiki/bin/edit/Main/WebHome?&editor=wiki and replace text with redirect as needed
+    e.g. $response.sendRedirect($xwiki.getURL('About.Overview')), requires XWiki 1.0 syntax!
+    Old: Adjust WebHome start page of wiki
+	- WEB-INF/web.xml
+		- Set homePage parameter of redirectHome servlet to "bin/view/About/Overview"
+	- templates/global.vm
+		- Change "Main.WebHome" to "About.Overview" in companylogo link
+- Add hidden spaces in navigation panel
+	#set ($hiddenSpaces = ["XWiki", "Admin", "Panels", "Main", "Blog", "Stats", "Scheduler", "Sandbox", "Photos", "Add Ons", "WikiCode", "XApp", "XAppCode", "XAppResources", "XAppSheets", "WikiResources", "XAppManager", "XAppClasses", "XAppTemplates", "WikiManager"])
+- Quick Links:     * Download Jadex Rules    * Read Latest News    * Get Involved    * SourceForge.net Page
+
+
+
 	
 Upgrade
 -------
@@ -84,7 +119,24 @@ for importing existing wiki in fresh db
 	- import standard empty xar
 	- change upload size
 	- import wiki
-	
+
  
+Import from old XAR
+-------------------
+
+- create new wiki
+- login to new wiki as Admin/admin
+- import xxx-backup.xar
+	- to alter max upload size edit some page
+	- choose edit class XWikiPreferences
+	- change max upload size from 5 to 10 (is only number of digits allowed for value)
+	- save then switch to objects editor (if not possible directly, just edit url: xwiki/bin/edit/XWiki/XWikiPreferences?editor=object)
+	- alter Maximum Upload Size to 500000000
+- import xwiki-enterprise-wiki-xxx.xar
+- add required imported users to admin group (Alex, Lars, etc.)
+- set rights for all users (view, register), disable rights for (comment, edit, delete, admin)
+- set rights for approved users (view, comment, edit), disable rights for (delete, admin)
+- edit and save (unchanged) currently online users panel, to make it visible in panel wizard
+- change class="globalsearch" to id="globalsearch" in search panel for css backwards compatibility
 	
 	
