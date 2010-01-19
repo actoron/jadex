@@ -17,7 +17,7 @@
 		<import>jadex.adapter.base.envsupport.math.*</import>
 		<import>jadex.adapter.base.fipa.*</import>
 		<import>java.util.*</import>
-		<import>jadex.bdi.simulation.model.Observer</import>
+		<import>jadex.simulation.model.Observer</import>
 	</imports>
 
 

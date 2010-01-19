@@ -19,7 +19,7 @@
 		<import>jadex.adapter.base.fipa.*</import>
 		<import>java.util.Map</import>
 		<import>java.util.HashMap</import>
-		<import>jadex.bdi.simulation.model.*</import>
+		<import>jadex.simulation.model.*</import>
 	</imports>
 
 
