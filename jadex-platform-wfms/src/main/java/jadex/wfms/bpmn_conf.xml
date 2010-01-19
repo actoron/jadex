@@ -9,11 +9,107 @@
 	
 	<properties type="platform_standalone">
 		
-		<!-- Platform services. -->
+				<!-- Platform services. -->
 		<properties type="services">
+			<!-- Library service. -->
+			<property type="jadex.service.library.ILibraryService" name="library_service">
+				new jadex.service.library.LibraryService()
+			</property>
+			
+			<!-- Threadpool service. -->
+			<property type="jadex.service.threadpool.ThreadPoolService" name="threadpool_service">
+				new jadex.service.threadpool.ThreadPoolService(
+					//new jadex.commons.concurrent.java5.JavaThreadPool()
+					new jadex.commons.concurrent.ThreadPool(
+						new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
+			</property>
+						
+			<!-- DF service. -->
+			<property type="jadex.adapter.base.fipa.IDF" name="df_service">new jadex.adapter.standalone.df.DF($platform)</property>
+			
+			<!-- Message service. -->
+			<property type="jadex.bridge.IMessageService" name="message_service">new jadex.adapter.standalone.MessageService($platform, 
+				new jadex.adapter.standalone.transport.ITransport[]
+				{
+					new jadex.adapter.standalone.transport.localmtp.LocalTransport($platform),
+					new jadex.adapter.standalone.transport.tcpmtp.TCPTransport($platform, 9876),
+					new jadex.adapter.standalone.transport.niotcpmtp.NIOTCPTransport($platform, 8765)
+				},
+				new jadex.bridge.MessageType[]
+				{
+					new jadex.adapter.base.fipa.FIPAMessageType()
+				})
+			</property>
+			
+			<!-- Clock service. -->
+			<property type="jadex.service.clock.IClockService" name="clock_service">
+				new jadex.service.clock.ClockService(
+					new jadex.service.clock.SystemClock("system_clock", 100,
+					$platform.getService(jadex.service.threadpool.ThreadPoolService.class)))
+//				new jadex.adapter.base.clock.SimulationEventClock("simulation_clock",
+//					System.currentTimeMillis(), 200))
+			</property>
 
+			<!-- Simulation service. -->
+			<property type="jadex.adapter.base.ISimulationService" name="simulation_service">
+				new jadex.adapter.base.SimulationService($platform)
+			</property>
+		
+			<!-- Execution service. -->
+			<property type="jadex.service.execution.IExecutionService" name="execution_service">
+				new jadex.service.execution.SyncExecutionService(
+					$platform.getService(jadex.service.threadpool.ThreadPoolService.class))
+			</property>
+			
+			<!-- Element factories -->
+			
+			<property type="jadex.bridge.IComponentFactory" name="application_factory">
+				new jadex.application.ApplicationComponentFactory($platform,
+					new java.util.Set[]
+					{
+						jadex.application.space.envsupport.MEnvSpaceType.getXMLMapping(),
+						jadex.application.space.agr.MAGRSpaceType.getXMLMapping()
+					}
+				)		
+			</property>
+			
 			<!-- Element factories -->
 						
+			
+			
+			<property type="jadex.bridge.IComponentFactory" name="bdi_factory">
+				new jadex.bdi.interpreter.BDIAgentFactory(
+					jadex.commons.SUtil.createHashMap(
+					new String[]
+					{
+						"messagetype_fipa", 
+						"planexecutor_standard", 
+						"standard.timeout", 
+						"microplansteps",
+						"planexecutor_bpmn",
+						"debugger.panels"
+					},
+					new Object[]
+					{
+						new jadex.adapter.base.fipa.FIPAMessageType(), 
+						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class)),
+						new java.lang.Long(10000),
+						Boolean.TRUE,
+						new jadex.bpmnbdi.BpmnPlanExecutor($platform),
+						"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
+					}
+				), $platform)
+			</property>
+			
+			<property type="jadex.bridge.IComponentFactory" name="micro_factory">
+				new jadex.microkernel.MicroAgentFactory($platform)
+			</property>
+			
+			<!-- AMS service. -->
+			<property type="jadex.bridge.IComponentExecutionService" name="ams_service">
+				new jadex.adapter.standalone.service.componentexecution.ComponentExecutionService($platform)
+			</property> 
+			
 			<property type="jadex.bridge.IComponentFactory" name="bpmn_factory">
 				new jadex.bpmn.BpmnFactory($platform, jadex.commons.SUtil.createHashMap(
 					new String[]
@@ -39,9 +135,7 @@
 					})
 				)
 			</property>
-			
 		</properties>
-						
 	</properties>
-	
+		
 </properties>
