@@ -1687,7 +1687,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  Get the space objects.
 	 */
 	// Hack!!! getSpaceObjecs() implemented in Space2D???
-	protected Collection	getSpaceObjectsCollection()
+	public Collection	getSpaceObjectsCollection()
 	{
 		return spaceobjects.values();
 	}
@@ -1695,7 +1695,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/**
 	 *  Get the processes.
 	 */
-	protected Collection	getProcesses()
+	public Collection	getProcesses()
 	{
 		return processes.values();
 	}
@@ -1711,7 +1711,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/**
 	 *  Get the list of scheduled percepts.
 	 */
-	protected PerceptList	getPerceptList()
+	public PerceptList	getPerceptList()
 	{
 		return perceptlist;
 	}
@@ -1719,7 +1719,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/**
 	 *  Get the views.
 	 */
-	protected Collection	getViews()
+	public Collection	getViews()
 	{
 		return views.values();
 	}
