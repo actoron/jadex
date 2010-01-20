@@ -34,7 +34,7 @@
 		<import>jadex.bdi.examples.marsworld.sentry.*</import>
 		<import>jadex.bdi.examples.marsworld.movement.*</import>
 		<import>java.text.SimpleDateFormat</import>		
-		<import>jadex.simulation.*</import>
+		<import>jadex.simulation.environment.DeltaTimeExecutor4Simulation</import>
 	</imports>
 
 	<arguments>

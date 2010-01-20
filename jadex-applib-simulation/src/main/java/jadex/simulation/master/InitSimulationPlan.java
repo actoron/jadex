@@ -12,8 +12,8 @@ public class InitSimulationPlan extends Plan{
 
 	public void body() {
 		System.out.println("#InitSim# Init Master Simulation Agent.");		
-		
-		SimulationConfiguration simConf = (SimulationConfiguration) XMLHandler.parseXML("../jadex-applib-simulation/src/main/java/jadex/simulation/persist/TestXML.xml", SimulationConfiguration.class);
+		String simulationDescription = (String) getBeliefbase().getBelief("simulationDescriptionFile").getFact();
+		SimulationConfiguration simConf = (SimulationConfiguration) XMLHandler.parseXML(simulationDescription, SimulationConfiguration.class);
 		initSettings(simConf);
 		
 		IGoal goal = createGoal("StartSimulationExperiments");

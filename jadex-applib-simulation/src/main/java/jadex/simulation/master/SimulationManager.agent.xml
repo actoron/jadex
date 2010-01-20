@@ -52,9 +52,14 @@
 		<belief name="generalSimulationFacts" class="Map">
 			<fact>new HashMap()</fact>
 		</belief>
-		
+
 		<!--  The parsed simulation configuration xml file. -->
-		<belief name="simulationConf" class="SimulationConfiguration"/>					
+		<belief name="simulationConf" class="SimulationConfiguration" />
+
+		<!--  Reference to the XML file that contains the simulation description. This file is parsed on agent start. -->
+		<belief name="simulationDescriptionFile" class="String">
+			<fact>"../jadex-applib-simulation/src/main/java/jadex/simulation/persist/TestXML.xml"</fact>
+		</belief>
 
 	</beliefs>
 
@@ -81,12 +86,12 @@
 			<concrete ref="dfcap.df_keep_registered" />
 		</maintaingoalref>
 
-<!--  Start a new round of experiments. -->
+		<!--  Start a new round of experiments. -->
 		<achievegoal name="StartSimulationExperiments">
-			<!-- <parameter name="location" class="Location" />
-			<targetcondition>
-				$beliefbase.my_location.isNear($goal.location)
-</targetcondition>-->
+			<!--
+				<parameter name="location" class="Location" /> <targetcondition>
+				$beliefbase.my_location.isNear($goal.location) </targetcondition>
+			-->
 		</achievegoal>
 	</goals>
 
@@ -94,14 +99,14 @@
 
 		<!-- Init the Simulation.-->
 		<plan name="init_simulation">
-			<body class="InitSimulationPlan" />			
+			<body class="InitSimulationPlan" />
 		</plan>
-		
+
 		<!-- Start Simulation Experiments.-->
 		<plan name="start_sim_experiments">
 			<body class="StartSimulationExperimentsPlan" />
 			<trigger>
-				<goal ref="StartSimulationExperiments"/>
+				<goal ref="StartSimulationExperiments" />
 			</trigger>
 		</plan>
 
@@ -114,7 +119,7 @@
 				<messageevent ref="inform_simulation_master" />
 			</trigger>
 		</plan>
-		
+
 		<!--
 			Compute / Evaluate the results of one simulation experiment ROW.
 		-->
@@ -122,7 +127,7 @@
 			<body class="ComputeExperimentRowResultsPlan" />
 			<trigger>
 				<internalevent ref="triggerExperimentRowEvaluation" />
-			</trigger>			
+			</trigger>
 		</plan>
 	</plans>
 
@@ -137,13 +142,13 @@
 				<value>SFipa.INFORM</value>
 			</parameter>
 		</messageevent>
-		
+
 		<!-- Event to trigger a new simulation experiment. -->
-		<internalevent name="triggerNewExperiment"/>
-		
+		<internalevent name="triggerNewExperiment" />
+
 		<!-- Event to trigger the evaluation of a simulation row. -->
-		<internalevent name="triggerExperimentRowEvaluation"/>
-		
+		<internalevent name="triggerExperimentRowEvaluation" />
+
 	</events>
 
 

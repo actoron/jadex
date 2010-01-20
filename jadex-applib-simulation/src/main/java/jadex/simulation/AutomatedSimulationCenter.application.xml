@@ -14,7 +14,7 @@
 	<applications>
 		<application name="First Configuration">
 			<agents>
-				<agent type="SimulationManager" master="false">
+				<agent type="SimulationManager" master="true">
 				<!-- <argument name="diffusion">§.property.name</argument>-->
 				</agent>
 			</agents>
