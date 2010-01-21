@@ -906,13 +906,15 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 			Map	props	= new HashMap();
 			List	names	= new ArrayList();
 			for(Iterator it=getAllActivities().values().iterator(); it.hasNext(); )
-				names.add(((MActivity)it.next()).getName());
+			{
+				names.add(((MActivity)it.next()).getBreakpointId());
+			}
 			props.put("debugger.breakpoints", names);
 			this.properties	= props;
 		}
 		return this.properties;
 	}
-	
+
 	/**
 	 *  Return the class loader corresponding to the micro agent class.
 	 */

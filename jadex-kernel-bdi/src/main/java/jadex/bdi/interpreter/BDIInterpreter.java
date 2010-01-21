@@ -25,6 +25,7 @@ import jadex.commons.concurrent.ISynchronizator;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.rulesystem.Activation;
+import jadex.rules.rulesystem.IRule;
 import jadex.rules.rulesystem.IRulebase;
 import jadex.rules.rulesystem.PriorityAgenda;
 import jadex.rules.rulesystem.RuleSystem;
@@ -33,6 +34,7 @@ import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -663,8 +665,29 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 */
 	public void	componentDestroyed(IComponentIdentifier comp)
 	{
-	}
+	}	
+	
+	/**
+	 *  Test if the component's execution is currently at one of the
+	 *  given breakpoints. If yes, the component will be suspended by
+	 *  the platform.
+	 *  @param breakpoints	An array of breakpoints.
+	 *  @return True, when some breakpoint is triggered.
+	 */
+	public boolean isAtBreakpoint(String[] breakpoints)
+	{
+		boolean	isatbreakpoint	= false;
+		Set	bps	= new HashSet(Arrays.asList(breakpoints));	// Todo: cache set across invocations for speed?
+		Iterator	it	= getRuleSystem().getAgenda().getActivations().iterator();
+		while(!isatbreakpoint && it.hasNext())
+		{
+			IRule	rule	= ((Activation)it.next()).getRule();
+			isatbreakpoint	= bps.contains(rule.getName());
+		}
 		
+		return isatbreakpoint;
+	}
+
 	//-------- other methods --------
 	
 	/**

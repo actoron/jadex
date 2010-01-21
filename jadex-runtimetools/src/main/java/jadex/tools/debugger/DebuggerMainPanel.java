@@ -51,7 +51,10 @@ public class DebuggerMainPanel extends JSplitPane
 	
 	/** The step button. */
 	protected JButton	step;
-	
+
+	/** The step button. */
+	protected JButton	run;
+
 	/** The stepmode checkbox. */
 	protected JCheckBox	stepmode;
 	
@@ -134,6 +137,7 @@ public class DebuggerMainPanel extends JSplitPane
 			public void actionPerformed(ActionEvent e)
 			{
 				step.setEnabled(false);
+				run.setEnabled(false);
 				IComponentExecutionService	ces	= (IComponentExecutionService)
 					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentExecutionService.class);
 				ces.stepComponent(DebuggerMainPanel.this.desc.getName(), new IResultListener()
@@ -151,6 +155,60 @@ public class DebuggerMainPanel extends JSplitPane
 							public void run()
 							{
 								step.setEnabled(true);
+								run.setEnabled(true);
+							}
+						});
+					}
+				});
+			}
+		});
+		
+		this.run = new JButton("Run");
+		run.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				step.setEnabled(false);
+				run.setEnabled(false);
+				stepmode.setSelected(false);
+				final IComponentExecutionService	ces	= (IComponentExecutionService)
+					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentExecutionService.class);
+				ces.stepComponent(DebuggerMainPanel.this.desc.getName(), new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						ces.resumeComponent(DebuggerMainPanel.this.desc.getName(), new IResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								updatePanel((IComponentDescription)result);
+							}
+							
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								// Hack!!! keep tool reactive in case of error!?
+								SwingUtilities.invokeLater(new Runnable()
+								{
+									public void run()
+									{
+										step.setEnabled(true);
+										run.setEnabled(true);
+										stepmode.setSelected(true);
+									}
+								});
+							}
+						});					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						// Hack!!! keep tool reactive in case of error!?
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								step.setEnabled(true);
+								run.setEnabled(true);
+								stepmode.setSelected(true);
 							}
 						});
 					}
@@ -174,6 +232,7 @@ public class DebuggerMainPanel extends JSplitPane
 					ces.resumeComponent(DebuggerMainPanel.this.desc.getName(), null);
 				}
 				step.setEnabled(stepmode.isSelected());		
+				run.setEnabled(stepmode.isSelected());		
 			}
 		});
 				
@@ -185,8 +244,10 @@ public class DebuggerMainPanel extends JSplitPane
 		col	= 0;
 		rightpanel.add(stepmode, new GridBagConstraints(col++, row, 1, 1,
 			1,0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
-		rightpanel.add(step, new GridBagConstraints(col, row++, GridBagConstraints.REMAINDER, 1,
-			0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
+		rightpanel.add(step, new GridBagConstraints(col++, row, 1, 1,
+				0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
+		rightpanel.add(run, new GridBagConstraints(col, row++, GridBagConstraints.REMAINDER, 1,
+				0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
 
 		
 		updatePanel((IComponentDescription)desc);
@@ -219,9 +280,10 @@ public class DebuggerMainPanel extends JSplitPane
 		{
 			public void run()
 			{
-				stepmode.setSelected(IComponentDescription.STATE_SUSPENDED.equals((desc).getState())
-					|| IComponentDescription.STATE_WAITING.equals((desc).getState()));
-				step.setEnabled(IComponentDescription.STATE_SUSPENDED.equals((desc).getState()));		
+				stepmode.setSelected(IComponentDescription.STATE_SUSPENDED.equals(desc.getState())
+					|| IComponentDescription.STATE_WAITING.equals(desc.getState()));
+				step.setEnabled(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));		
+				run.setEnabled(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));		
 			}
 		});
 	}

@@ -90,7 +90,7 @@ public class ExecutionControlPanel extends JPanel
 	}
 	
 	/**
-	 *  Create a frame for a rete structure.
+	 *  Create a frame for a bpmn structure.
 	 *  @param title	The title for the frame.
 	 *  @param rs	The rule system.
 	 *  @return	The frame.
@@ -99,7 +99,7 @@ public class ExecutionControlPanel extends JPanel
 	{
 		JFrame f = new JFrame(title);
 		f.getContentPane().setLayout(new BorderLayout());
-		ProcessViewPanel vp = new ProcessViewPanel(instance);
+		ProcessViewPanel vp = new ProcessViewPanel(instance, null);
 		ExecutionControlPanel ep = new ExecutionControlPanel(steppable);
 		ActivityPanel ap = new ActivityPanel(instance.getModelElement(), steppable);
 		JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);

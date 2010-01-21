@@ -340,12 +340,14 @@ public class ComponentExecutionService implements IComponentExecutionService
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
+		AMSAgentDescription ad;
+		
 		synchronized(adapters)
 		{
 			synchronized(descs)
 			{
 				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
-				AMSAgentDescription ad = (AMSAgentDescription)descs.get(componentid);
+				ad = (AMSAgentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
 					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
 					//throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
@@ -359,7 +361,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 		}
 //		pcs.firePropertyChange("agents", null, adapters);
 	
-		listener.resultAvailable(this, null);
+		listener.resultAvailable(this, ad);
 	}
 	
 	/**
@@ -390,6 +392,36 @@ public class ComponentExecutionService implements IComponentExecutionService
 			}
 		}
 //		pcs.firePropertyChange("agents", null, adapters);	
+	}
+
+	/**
+	 *  Set breakpoints for a component.
+	 *  Replaces existing breakpoints.
+	 *  To add/remove breakpoints, use current breakpoints from component description as a base.
+	 *  @param componentid The component identifier.
+	 *  @param breakpoints The new breakpoints (if any).
+	 */
+	public void setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints)
+	{
+		AMSAgentDescription ad;
+		synchronized(descs)
+		{
+			ad = (AMSAgentDescription)descs.get(componentid);
+			ad.setBreakpoints(breakpoints);
+		}
+		
+		IComponentListener[]	alisteners;
+		synchronized(listeners)
+		{
+			Set	slisteners	= new HashSet(listeners.getCollection(null));
+			slisteners.addAll(listeners.getCollection(componentid));
+			alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+		}
+		// todo: can be called after listener has (concurrently) deregistered
+		for(int i=0; i<alisteners.length; i++)
+		{
+			alisteners[i].componentChanged(ad);
+		}
 	}
 
 	//-------- listener methods --------

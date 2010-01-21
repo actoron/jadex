@@ -22,18 +22,22 @@ public class MicroAgentMetaInfo
 	/** The results. */
 	protected IArgument[] results;
 	
+	/** The breakpoints. */
+	protected String[] breakpoints;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new meta info.
 	 */
-	public MicroAgentMetaInfo(String description, String[] configs, IArgument[] args, IArgument[] results)
+	public MicroAgentMetaInfo(String description, String[] configs, IArgument[] args, IArgument[] results, String[] breakpoints)
 	{
 //		this.name = name;
 		this.description = description;
 		this.configs = configs == null? SUtil.EMPTY_STRING: configs;
 		this.args = args == null? new IArgument[0]: args;
 		this.results = results == null? new IArgument[0]: results;
+		this.breakpoints = breakpoints == null? new String[0]: breakpoints;
 	}
 
 	//-------- methods --------
@@ -72,5 +76,14 @@ public class MicroAgentMetaInfo
 	public String getDescription()
 	{
 		return description;
+	}
+	
+	/**
+	 *  Get the breakpoints.
+	 *  @return The breakpoints.
+	 */
+	public String[] getBreakpoints()
+	{
+		return breakpoints;
 	}
 }

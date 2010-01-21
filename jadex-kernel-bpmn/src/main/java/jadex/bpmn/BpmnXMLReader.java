@@ -958,7 +958,7 @@ public class BpmnXMLReader
 								{
 									String paramtext = stok.nextToken();
 									StringTokenizer stok2 = new StringTokenizer(paramtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-									String dir = stok2.nextToken();
+									/*String dir =*/ stok2.nextToken();	// Todo: consider direction.
 									String name = stok2.nextToken();
 									String clazzname = stok2.nextToken();
 									String val = stok2.nextToken();

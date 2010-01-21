@@ -214,7 +214,7 @@
     <styles xmi:type="notation:FontStyle" xmi:id="_eUfiMm1XEd6B3oAuT8wltw" fontName="Arial"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_eUfiM21XEd6B3oAuT8wltw" lineColor="0"/>
     <element xmi:type="bpmn:SequenceEdge" href="SubProcess.bpmn#_eUVxMW1XEd6B3oAuT8wltw"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_eUfiNG1XEd6B3oAuT8wltw" points="[15, -2, -86, -1]$[48, -11, -53, -10]"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_eUfiNG1XEd6B3oAuT8wltw" points="[0, -1, -40, 0]$[40, -1, 0, 0]"/>
   </edges>
   <edges xmi:type="notation:Edge" xmi:id="_fEnGoG-_Ed6gyNniPBNmMQ" type="3001" source="_S4sNQm1XEd6B3oAuT8wltw" target="_fEdVoG-_Ed6gyNniPBNmMQ">
     <children xmi:type="notation:Node" xmi:id="_fEnGpW-_Ed6gyNniPBNmMQ" type="4012">

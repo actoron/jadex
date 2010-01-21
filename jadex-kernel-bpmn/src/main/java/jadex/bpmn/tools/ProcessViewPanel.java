@@ -8,6 +8,7 @@ import jadex.bpmn.runtime.HistoryEntry;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
 import jadex.commons.ChangeEvent;
+import jadex.commons.IBreakpointPanel;
 import jadex.commons.IChangeListener;
 import jadex.commons.jtable.ResizeableTableHeader;
 import jadex.commons.jtable.TableSorter;
@@ -46,7 +47,7 @@ public class ProcessViewPanel extends JPanel
 	protected IChangeListener listener;
 	
 	/** Local copy of activations. */
-	protected Object[] threads_clone;
+	protected ProcessThreadInfo[] threads_clone;
 	
 	/** Local copy of agenda history. */
 	protected Object[] history_clone;
@@ -65,22 +66,26 @@ public class ProcessViewPanel extends JPanel
 	
 	/** The list for the history. */
 	protected JTable history;
+	
+	/** The breakpoint panel. */
+	protected IBreakpointPanel	bpp;
 
 	//------- constructors --------
 	
 	/**
 	 *  Create an agenda panel.
 	 */
-	public ProcessViewPanel(final BpmnInterpreter instance)
+	public ProcessViewPanel(final BpmnInterpreter instance, IBreakpointPanel bpp)
 	{
 		this.instance = instance;
+		this.bpp	= bpp;
 		this.ptmodel = new ProcessThreadModel();
 		this.hmodel	= new HistoryModel();
 
 		// todo: problem should be called on process execution thread!
 		instance.setHistoryEnabled(true);	// Todo: Disable history on close?
 		
-		threads_clone = getThreadInfos().toArray();
+		threads_clone = getThreadInfos();
 		history_clone = instance.getHistory().toArray();
 		
 		TableSorter sorter = new TableSorter(ptmodel);
@@ -105,7 +110,7 @@ public class ProcessViewPanel extends JPanel
 			
 		this.listener	= new IChangeListener()
 		{
-			Object[] threads_clone;
+			ProcessThreadInfo[] threads_clone;
 			Object[] history_clone;
 			Object	next;
 			boolean	invoked;
@@ -115,7 +120,7 @@ public class ProcessViewPanel extends JPanel
 				synchronized(ProcessViewPanel.this)
 				{
 					List his = instance.getHistory();
-					threads_clone	= getThreadInfos().toArray();
+					threads_clone	= getThreadInfos();
 					history_clone	= his!=null? his.toArray(): new Object[0];
 //					next	= instance.getNextActivation();
 				}
@@ -133,7 +138,7 @@ public class ProcessViewPanel extends JPanel
 								ProcessViewPanel.this.history_clone	= history_clone;
 								ProcessViewPanel.this.next	= next;
 							}
-							updateList();
+							updateViews();
 						}
 					});
 				}
@@ -145,7 +150,7 @@ public class ProcessViewPanel extends JPanel
 		{
 			public void run()
 			{
-				updateList();
+				updateViews();
 			}
 		});
 		
@@ -212,9 +217,9 @@ public class ProcessViewPanel extends JPanel
 	//-------- helper methods --------
 	
 	/**
-	 *  Update list view.
+	 *  Update views.
 	 */
-	protected void	updateList()
+	protected void	updateViews()
 	{
 		ptmodel.fireTableDataChanged();
 		hmodel.fireTableDataChanged();
@@ -224,13 +229,24 @@ public class ProcessViewPanel extends JPanel
 //			((ResizeableTableHeader)history.getTableHeader()).resizeAllColumns();
 		threads.repaint();
 		history.repaint();
+		
+		if(bpp!=null)
+		{
+			List	sel_bps	= new ArrayList();
+			for(int i=0; i<threads_clone.length; i++)
+			{
+				if(threads_clone[i].getActivity()!=null)
+					sel_bps.add(threads_clone[i].getActivity().getBreakpointId());
+			}
+			bpp.setSelectedBreakpoints((String[])sel_bps.toArray(new String[sel_bps.size()]));
+		}
 	}
 	
 	/**
 	 *  Must be called on process execution thread!
 	 *  Gets infos about the current threads.
 	 */
-	protected List getThreadInfos()
+	protected ProcessThreadInfo[] getThreadInfos()
 	{
 		List ret = null;
 		ThreadContext tc = instance.getThreadContext();
@@ -245,7 +261,7 @@ public class ProcessViewPanel extends JPanel
 					pt.getException(), pt.isWaiting()));
 			}
 		}
-		return ret;
+		return (ProcessThreadInfo[])ret.toArray(new ProcessThreadInfo[ret.size()]);
 	}
 	
 	//-------- helper classes --------
@@ -282,7 +298,7 @@ public class ProcessViewPanel extends JPanel
 			}
 			else if(column==1)
 			{
-				ret = pti.getActivity().getName();
+				ret = pti.getActivity().getBreakpointId();
 			}
 			else if(column==2)
 			{
@@ -344,7 +360,7 @@ public class ProcessViewPanel extends JPanel
 			}
 			else if(column==2)
 			{
-				ret = he.getActivity().getName();
+				ret = he.getActivity().getBreakpointId();
 			}
 			else if(column==3)
 			{

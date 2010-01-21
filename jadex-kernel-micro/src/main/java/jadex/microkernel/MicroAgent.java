@@ -88,6 +88,20 @@ public abstract class MicroAgent implements IMicroAgent
 	{
 	}
 
+	/**
+	 *  Test if the agent's execution is currently at one of the
+	 *  given breakpoints. If yes, the agent will be suspended by
+	 *  the platform.
+	 *  Available breakpoints can be specified in the
+	 *  micro agent meta info.
+	 *  @param breakpoints	An array of breakpoints.
+	 *  @return True, when some breakpoint is triggered.
+	 */
+	public boolean isAtBreakpoint(String[] breakpoints)
+	{
+		return false;
+	}
+	
 	//-------- methods --------
 	
 	/**
@@ -164,8 +178,8 @@ public abstract class MicroAgent implements IMicroAgent
 	}
 	
 	/**
-	 *  Create a result listener that is called on the agent thread.
-	 *  @param listener The listener to be called on the agent thread.
+	 *  Create a result listener that is executed as an agent step.
+	 *  @param listener The listener to be executed as an agent step.
 	 */
 	public IResultListener createResultListener(IResultListener listener)
 	{
@@ -194,24 +208,14 @@ public abstract class MicroAgent implements IMicroAgent
 		{
 			public void timeEventOccurred(long currenttime)
 			{
-				synchronized(interpreter.ext_entries)
+				interpreter.scheduleStep(new Runnable()
 				{
-					if(!interpreter.ext_forbidden)
+					public void run()
 					{
-						interpreter.getAgentAdapter().invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								timer = null;
-								run.run();
-							}
-						});
+						timer = null;
+						run.run();
 					}
-//					else
-//					{
-//						System.out.println("not: "+run);
-//					}
-				}
+				});
 			}
 		});
 	}
@@ -228,25 +232,14 @@ public abstract class MicroAgent implements IMicroAgent
 		{
 			public void timeEventOccurred(long currenttime)
 			{
-//				interpreter.invokeLater(run);
-				synchronized(interpreter.ext_entries)
+				interpreter.scheduleStep(new Runnable()
 				{
-					if(!interpreter.ext_forbidden)
+					public void run()
 					{
-						interpreter.getAgentAdapter().invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								timer = null;
-								run.run();
-							}
-						});
+						timer = null;
+						run.run();
 					}
-//					else
-//					{
-//						System.out.println("not: "+run);
-//					}
-				}
+				});
 			}
 		});
 	}
@@ -359,11 +352,23 @@ public abstract class MicroAgent implements IMicroAgent
 //	}
 	
 	/**
+	 *  Schedule a step of the agent.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the agent.
+	 */
+	public void	scheduleStep(Runnable step)
+	{
+		interpreter.scheduleStep(step);
+	}
+	
+	/**
 	 *  Invoke a runnable later that is guaranteed 
 	 *  to be executed on agent thread.
-	 */
+	 * /
+	// Use getExternalAccess().invokeLater() instead ->
+	 * will not be executed as step of agent but as external entry.
 	public void invokeLater(Runnable run)
 	{
 		interpreter.getAgentAdapter().invokeLater(run);
-	}
+	}*/
 }

@@ -32,8 +32,10 @@ import jadex.javaparser.IValueFetcher;
 import jadex.service.clock.IClockService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -107,16 +109,16 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	/** The parent. */
 	protected IExternalAccess	parent;
 	
-	// todo: ensure that entries are empty when saving
-	/** The entries added from external threads. */
-	protected transient final List ext_entries;
+//	// todo: ensure that entries are empty when saving
+//	/** The entries added from external threads. */
+//	protected transient final List ext_entries;
 	
 	/** The thread executing the component (null for none). */
 	// Todo: need not be transient, because agent should only be serialized when no action is running?
 	protected transient Thread thread;
 	
-	/** The flag if external entries are forbidden. */
-	protected boolean ext_forbidden;
+//	/** The flag if external entries are forbidden. */
+//	protected boolean ext_forbidden;
 	
 	
 	/** The activity handlers. */
@@ -164,7 +166,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 		this.arguments = arguments;
 		this.results = new HashMap();
 		this.parent	= parent;
-		this.ext_entries = Collections.synchronizedList(new ArrayList());
+//		this.ext_entries = Collections.synchronizedList(new ArrayList());
 		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
 		this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
 		this.fetcher = fetcher!=null? fetcher: new BpmnInstanceFetcher(this, fetcher);
@@ -249,31 +251,31 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			// Copy actions from external threads into the state.
 			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
 	//		boolean	extexecuted	= false;
-			Runnable[]	entries	= null;
-			synchronized(ext_entries)
-			{
-				if(!(ext_entries.isEmpty()))
-				{
-					entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
-	//				for(int i=0; i<ext_entries.size(); i++)
-	//					state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, ext_entries.get(i));
-					ext_entries.clear();
-					
-	//				extexecuted	= true;
-				}
-			}
-			for(int i=0; entries!=null && i<entries.length; i++)
-			{
-				try
-				{
-					entries[i].run();
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-					getLogger().severe("Execution of agent led to exeception: "+e);
-				}
-			}
+//			Runnable[]	entries	= null;
+//			synchronized(ext_entries)
+//			{
+//				if(!(ext_entries.isEmpty()))
+//				{
+//					entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
+//	//				for(int i=0; i<ext_entries.size(); i++)
+//	//					state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, ext_entries.get(i));
+//					ext_entries.clear();
+//					
+//	//				extexecuted	= true;
+//				}
+//			}
+//			for(int i=0; entries!=null && i<entries.length; i++)
+//			{
+//				try
+//				{
+//					entries[i].run();
+//				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
+//					getLogger().severe("Execution of agent led to exeception: "+e);
+//				}
+//			}
 	
 			if(!isFinished(null, null) && isReady(null, null))
 				executeStep(null, null);
@@ -350,33 +352,35 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	 */
 	public void killComponent(final IResultListener listener)
 	{
+		// Todo: cleanup required???
+		
 		adapter.invokeLater(new Runnable()
 		{
 			public void run()
 			{	
-				// must synchronize to avoid other thread calling invokeLater at the same time
-				synchronized(ext_entries)
-				{
-					adapter.invokeLater(new Runnable()
-					{
-						public void run()
-						{
-//							if(microagent.timer!=null)
-//							{
-//								microagent.timer.cancel();
-//								microagent.timer = null;
-//							}
-//							microagent.agentKilled();
-							
-							// todo: initiate kill process?!
-							
-//							System.out.println("CC: "+adapter);
+//				// must synchronize to avoid other thread calling invokeLater at the same time
+//				synchronized(ext_entries)
+//				{
+//					adapter.invokeLater(new Runnable()
+//					{
+//						public void run()
+//						{
+////							if(microagent.timer!=null)
+////							{
+////								microagent.timer.cancel();
+////								microagent.timer = null;
+////							}
+////							microagent.agentKilled();
+//							
+//							// todo: initiate kill process?!
+//							
+////							System.out.println("CC: "+adapter);
 							listener.resultAvailable(BpmnInterpreter.this, adapter.getComponentIdentifier());
-						}
-					});
-					
-					ext_forbidden = true;
-				}
+//						}
+//					});
+//					
+//					ext_forbidden = true;
+//				}
 			}
 		});
 	}
@@ -421,6 +425,25 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	public Map getResults()
 	{
 		return Collections.unmodifiableMap(results);
+	}
+	
+	/**
+	 *  Test if the component's execution is currently at one of the
+	 *  given breakpoints. If yes, the component will be suspended by
+	 *  the platform.
+	 *  @param breakpoints	An array of breakpoints.
+	 *  @return True, when some breakpoint is triggered.
+	 */
+	public boolean isAtBreakpoint(String[] breakpoints)
+	{
+		boolean	isatbreakpoint	= false;
+		Set	bps	= new HashSet(Arrays.asList(breakpoints));	// Todo: cache set across invocations for speed?
+		for(Iterator it=context.getAllThreads().iterator(); !isatbreakpoint && it.hasNext(); )
+		{
+			ProcessThread	pt	= (ProcessThread)it.next();
+			isatbreakpoint	= bps.contains(pt.getActivity().getBreakpointId());
+		}
+		return isatbreakpoint;
 	}
 	
 	/**
@@ -737,9 +760,9 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			IActivityHandler handler = (IActivityHandler)activityhandlers.get(thread.getActivity().getActivityType());
 			if(handler==null)
 				throw new UnsupportedOperationException("No handler for activity: "+thread);
-			handler.execute(thread.getActivity(), this, thread);
 			if(history!=null)
 				history.add(new HistoryEntry(stepnumber++, thread.getId(), thread.getActivity()));
+			handler.execute(thread.getActivity(), this, thread);
 			
 			// Check if thread now waits for a message and there is at least one in the message queue.
 			if(thread.isWaiting() && messages.size()>0 && MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(thread.getActivity().getActivityType()) 
@@ -774,12 +797,12 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	public boolean	isReady(String pool, String lane)
 	{
 		boolean	ready;
-		// Todo: consider only external entries belonging to pool/lane
-		synchronized(ext_entries)
-		{
-			ready	= !ext_entries.isEmpty();
-		}
-		ready	= ready || context.getExecutableThread(pool, lane)!=null;
+//		// Todo: consider only external entries belonging to pool/lane
+//		synchronized(ext_entries)
+//		{
+//			ready	= !ext_entries.isEmpty();
+//		}
+		ready	= context.getExecutableThread(pool, lane)!=null;
 		return ready;
 	}
 	
@@ -803,6 +826,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 					{
 						getStepHandler(activity).step(activity, BpmnInterpreter.this, thread, event);
 						thread.setNonWaiting();
+						notifyListeners(new ChangeEvent(this, "notify"));
 					}
 					else
 					{
@@ -817,6 +841,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			{
 				getStepHandler(activity).step(activity, BpmnInterpreter.this, thread, event);
 				thread.setNonWaiting();
+				notifyListeners(new ChangeEvent(this, "notify"));
 			}
 			else
 			{

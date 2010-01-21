@@ -410,6 +410,16 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			}
 		}
 
+		// Suspend when breakpoint is triggered.
+		if(!dostep && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+		{
+			if(component.isAtBreakpoint(desc.getBreakpoints()))
+			{
+				ComponentExecutionService	ces	= (ComponentExecutionService)container.getService(IComponentExecutionService.class);
+				ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
+			}
+		}
+		
 		// Should the component be executed again?
 		boolean	again = false;
 		if(!extexecuted && (!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) || dostep))
@@ -441,6 +451,16 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 				again	= again && IComponentDescription.STATE_ACTIVE.equals(desc.getState());
 				if(steplistener!=null)
 					steplistener.resultAvailable(this, ((AMSAgentDescription)desc).clone());
+			}
+		}
+
+		// Suspend when breakpoint is triggered.
+		if(!dostep && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+		{
+			if(component.isAtBreakpoint(desc.getBreakpoints()))
+			{
+				ComponentExecutionService	ces	= (ComponentExecutionService)container.getService(IComponentExecutionService.class);
+				ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
 			}
 		}
 

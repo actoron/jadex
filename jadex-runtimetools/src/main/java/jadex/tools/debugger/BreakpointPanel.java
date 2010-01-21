@@ -16,6 +16,7 @@ import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -255,15 +256,17 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 			{
 				public void actionPerformed(java.awt.event.ActionEvent e)
 				{
-					// Todo: update breakpoints using component execution service.
-//					if(but.isSelected())
-//					{
-//						selecteds.add(breakpoints.get(sorter.modelIndex(rowIndex)));
-//					}
-//					else
-//					{
-//						selecteds.remove(breakpoints.get(sorter.modelIndex(rowIndex)));
-//					}
+					List	bps	= new ArrayList(Arrays.asList(description.getBreakpoints()));
+					if(but.isSelected())
+					{
+						bps.add(breakpoints.get(sorter.modelIndex(rowIndex)));
+					}
+					else
+					{
+						bps.remove(breakpoints.get(sorter.modelIndex(rowIndex)));
+					}
+					((IComponentExecutionService)container.getService(IComponentExecutionService.class))
+						.setComponentBreakpoints(description.getName(), (String[])bps.toArray(new String[bps.size()]));
 				}
 			});
 			return	ret;

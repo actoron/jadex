@@ -38,7 +38,12 @@ MySQL
 	
 XWiki
 	- Import lightbox plugin (.xar)
-	- Do not remove 'Admin' user as this causes watchlist problems: http://lists.xwiki.org/pipermail/users/2008-October/014116.html 
+	- Do not remove 'Admin' user as this causes watchlist problems: http://lists.xwiki.org/pipermail/users/2008-October/014116.html
+	- New user registration / email confirmation: By default (xwiki 2.1.1) activation key is stored as a hash in the database,
+	  although it is expected to be plain text in the code. This means that the XWikiUsers class must be changed
+	  (xwiki/bin/edit/XWiki/XWikiUsers?editor=class) so that the Validation Key property has PlainText storage type.
+	  http://lists.xwiki.org/pipermail/users/2009-December/018742.html
+	 
 	
 change upload limit (http://madplanet.com/xwiki/bin/view/Madplanet/Increasing+Maximum+Upload)
 - edit the XWiki.XWikiPreferences object!!! and specify the desired maximum attachment size (in bytes) 

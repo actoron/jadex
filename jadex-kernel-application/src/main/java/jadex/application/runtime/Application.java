@@ -754,6 +754,19 @@ public class Application	implements IComponentInstance
 	}
 
 	/**
+	 *  Test if the component's execution is currently at one of the
+	 *  given breakpoints. If yes, the component will be suspended by
+	 *  the platform.
+	 *  @param breakpoints	An array of breakpoints.
+	 *  @return True, when some breakpoint is triggered.
+	 */
+	public boolean isAtBreakpoint(String[] breakpoints)
+	{
+		// Todo: application breakpoints!?
+		return false;
+	}
+	
+	/**
 	 *  Get the arguments.
 	 *  @return The arguments.
 	 */

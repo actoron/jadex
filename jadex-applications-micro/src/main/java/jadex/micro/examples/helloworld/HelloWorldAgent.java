@@ -57,6 +57,6 @@ public class HelloWorldAgent extends MicroAgent
 			{
 				return true;
 			}
-		}}, null);
+		}}, null, null);
 	}
 }

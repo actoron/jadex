@@ -7,7 +7,9 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,6 +31,9 @@ public class MicroAgentModel implements ILoadableComponentModel
 	
 	/** The meta information .*/
 	protected MicroAgentMetaInfo metainfo;
+	
+	/** The properties (e.g. break points). */
+	protected Map	properties;
 	
 	//-------- constructors --------
 	
@@ -203,8 +208,16 @@ public class MicroAgentModel implements ILoadableComponentModel
 	 */
 	public Map	getProperties()
 	{
-		// Todo: implement me.
-		return Collections.EMPTY_MAP;
+		if(properties==null)
+		{
+			Map props	= new HashMap();
+			List	names	= new ArrayList();
+			for(int i=0; metainfo!=null && i<metainfo.getBreakpoints().length; i++)
+				names.add(metainfo.getBreakpoints()[i]);
+			props.put("debugger.breakpoints", names);
+			this.properties	= props;
+		}
+		return properties;
 	}
 	
 	//-------- methods --------

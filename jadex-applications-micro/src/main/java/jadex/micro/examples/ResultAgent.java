@@ -79,6 +79,6 @@ public class ResultAgent extends MicroAgent
 					return true;
 				}
 			}
-		});
+		}, null);
 	}
 }

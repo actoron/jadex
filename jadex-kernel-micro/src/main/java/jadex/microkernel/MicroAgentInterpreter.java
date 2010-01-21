@@ -10,11 +10,11 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.concurrent.IResultListener;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -47,19 +47,19 @@ public class MicroAgentInterpreter implements IComponentInstance
 	/** The parent. */
 	protected IExternalAccess parent;
 	
-	// todo: ensure that entries are empty when saving
-	/** The entries added from external threads. */
-	protected transient final List ext_entries;
-	
+//	// todo: ensure that entries are empty when saving
+//	/** The entries added from external threads. */
+//	protected transient final List ext_entries;
+//	
 	/** The thread executing the agent (null for none). */
 	// Todo: need not be transient, because agent should only be serialized when no action is running?
 	protected transient Thread agentthread;
 	
-	/** Flag that indicates if the agent has been started. */
-	protected boolean started;
+//	/** The flag if external entries are forbidden. */
+//	protected boolean ext_forbidden;
 	
-	/** The flag if external entries are forbidden. */
-	protected boolean ext_forbidden;
+	/** The scheduled steps of the agent. */
+	protected Set	steps;
 	
 	//-------- constructors --------
 	
@@ -75,7 +75,9 @@ public class MicroAgentInterpreter implements IComponentInstance
 		this.config = config;
 		this.arguments = arguments;
 		this.parent = parent;
-		this.ext_entries = Collections.synchronizedList(new ArrayList());
+		this.steps	= new LinkedHashSet();
+		
+//		this.ext_entries = Collections.synchronizedList(new ArrayList());
 		
 		// Init the arguments with default values.
 		IArgument[] args = model.getArguments();
@@ -105,6 +107,16 @@ public class MicroAgentInterpreter implements IComponentInstance
 				this.results.put(res[i].getName(), res[i].getDefaultValue(config));
 			}
 		}
+		
+		// Schedule initial step.
+		steps.add(new Runnable()
+		{
+			
+			public void run()
+			{
+				microagent.executeBody();
+			}
+		});
 
 		try
 		{
@@ -142,44 +154,46 @@ public class MicroAgentInterpreter implements IComponentInstance
 			// Copy actions from external threads into the state.
 			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
 	//		boolean	extexecuted	= false;
-			Runnable[]	entries	= null;
-			synchronized(ext_entries)
+//			Runnable[]	entries	= null;
+//			synchronized(ext_entries)
+//			{
+//				if(!(ext_entries.isEmpty()))
+//				{
+//					entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
+//	//				for(int i=0; i<ext_entries.size(); i++)
+//	//					state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, ext_entries.get(i));
+//					ext_entries.clear();
+//					
+//	//				extexecuted	= true;
+//				}
+//			}
+//			for(int i=0; entries!=null && i<entries.length; i++)
+//			{
+//				try
+//				{
+//					entries[i].run();
+//				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
+//					getLogger().severe("Execution of agent led to exeception: "+e);
+//				}
+//			}
+			
+			if(!steps.isEmpty())
 			{
-				if(!(ext_entries.isEmpty()))
-				{
-					entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
-	//				for(int i=0; i<ext_entries.size(); i++)
-	//					state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, ext_entries.get(i));
-					ext_entries.clear();
-					
-	//				extexecuted	= true;
-				}
-			}
-			for(int i=0; entries!=null && i<entries.length; i++)
-			{
-				try
-				{
-					entries[i].run();
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-					getLogger().severe("Execution of agent led to exeception: "+e);
-				}
+				Runnable	step	= (Runnable)steps.iterator().next();
+				steps.remove(step);
+				step.run();
 			}
 	
-			if(!started)
-			{
-				microagent.executeBody();
-				started = true;
-			}
-			
 			this.agentthread = null;
 			return false;
 		}
 		catch(ComponentTerminatedException ate)
 		{
 			// Todo: fix microkernel bug.
+			ate.printStackTrace();
 			return false; 
 		}
 	}
@@ -193,7 +207,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public void messageArrived(final IMessageAdapter message)
 	{
-		getAgentAdapter().invokeLater(new Runnable()
+		scheduleStep(new Runnable()
 		{
 			public void run()
 			{
@@ -217,13 +231,13 @@ public class MicroAgentInterpreter implements IComponentInstance
 		{
 			public void run()
 			{	
-				// must synchronize to avoid other thread calling invokeLater at the same time
-				synchronized(ext_entries)
-				{
-					getAgentAdapter().invokeLater(new Runnable()
-					{
-						public void run()
-						{
+//				// must synchronize to avoid other thread calling invokeLater at the same time
+//				synchronized(ext_entries)
+//				{
+//					getAgentAdapter().invokeLater(new Runnable()
+//					{
+//						public void run()
+//						{
 							if(microagent.timer!=null)
 							{
 								microagent.timer.cancel();
@@ -232,11 +246,11 @@ public class MicroAgentInterpreter implements IComponentInstance
 							microagent.agentKilled();
 							IComponentIdentifier cid = adapter.getComponentIdentifier();
 							listener.resultAvailable(cid, cid);
-						}
-					});
-					
-					ext_forbidden = true;
-				}
+//						}
+//					});
+//					
+//					ext_forbidden = true;
+//				}
 			}
 		});
 	}
@@ -301,9 +315,37 @@ public class MicroAgentInterpreter implements IComponentInstance
 	public void	componentDestroyed(IComponentIdentifier comp)
 	{
 	}
-		
+	
+	/**
+	 *  Test if the component's execution is currently at one of the
+	 *  given breakpoints. If yes, the component will be suspended by
+	 *  the platform.
+	 *  @param breakpoints	An array of breakpoints.
+	 *  @return True, when some breakpoint is triggered.
+	 */
+	public boolean isAtBreakpoint(String[] breakpoints)
+	{
+		return microagent.isAtBreakpoint(breakpoints);
+	}
+	
 	//-------- helpers --------
 	
+	/**
+	 *  Schedule a step of the agent.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the agent.
+	 */
+	public void	scheduleStep(final Runnable step)
+	{
+		adapter.invokeLater(new Runnable()
+		{			
+			public void run()
+			{
+				steps.add(step);
+			}
+		});
+	}
+
 	/**
 	 *  Add an action from external thread.
 	 *  The contract of this method is as follows:
@@ -500,7 +542,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	}
 
 	/**
-	 *  Create a result listener which is called on agent thread.
+	 *  Create a result listener which is executed as an agent step.
 	 *  @param The original listener to be called.
 	 *  @return The listener.
 	 */
@@ -510,7 +552,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 	}
 	
 	/**
-	 *  The micro listener for redirecting listener invocations to the agent thread.
+	 *  The micro listener for executing listener invocations as an agent step.
 	 */
 	class MicroListener implements IResultListener
 	{
@@ -523,7 +565,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 		
 		public void resultAvailable(final Object source, final Object result)
 		{
-			getAgentAdapter().invokeLater(new Runnable()
+			scheduleStep(new Runnable()
 			{
 				public void run()
 				{
@@ -533,7 +575,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 		}
 		public void exceptionOccurred(final Object source, final Exception exception)
 		{
-			getAgentAdapter().invokeLater(new Runnable()
+			scheduleStep(new Runnable()
 			{
 				public void run()
 				{

@@ -43,12 +43,23 @@ public interface IComponentExecutionService	extends IService
 	 */
 	public void resumeComponent(IComponentIdentifier componentid, IResultListener listener);
 	
+	//-------- debugging methods --------
+	
 	/**
 	 *  Execute a step of a suspended component.
 	 *  @param componentid The component identifier.
 	 *  @param listener Called when the step is finished (result will be the component description).
 	 */
 	public void stepComponent(IComponentIdentifier componentid, IResultListener listener);
+	
+	/**
+	 *  Set breakpoints for a component.
+	 *  Replaces existing breakpoints.
+	 *  To add/remove breakpoints, use current breakpoints from component description as a base.
+	 *  @param componentid The component identifier.
+	 *  @param breakpoints The new breakpoints (if any).
+	 */
+	public void setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints);
 	
 	//-------- information methods --------
 	

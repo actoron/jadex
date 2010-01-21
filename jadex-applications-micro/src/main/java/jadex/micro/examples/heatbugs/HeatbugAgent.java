@@ -173,6 +173,6 @@ public class HeatbugAgent extends MicroAgent
 					return true;
 				}
 			}
-		}, null);
+		}, null, null);
 	}
 }
