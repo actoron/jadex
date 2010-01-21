@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_JerAoXz_Ed6Ya8z0CnMcMA" iD="_JerAoHz_Ed6Ya8z0CnMcMA">
-  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_jVa_YX0DEd6Ya8z0CnMcMA" iD="_jVa_YH0DEd6Ya8z0CnMcMA" name="package jadex.bpmn.examples.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.bpmnbdi.task.*;&#xD;&#xA;import jadex.application.space.envsupport.environment.*;&#xD;&#xA;import java.util.Map;&#xD;&#xA;import jadex.commons.SUtil;&#xD;&#xA;import jadex.bdi.planlib.*;&#xD;&#xA;&#xD;&#xA;Object _taskid;">
-    <associations xmi:type="bpmn:Association" xmi:id="_jVa_aX0DEd6Ya8z0CnMcMA"/>
-  </artifacts>
-  <pools xmi:type="bpmn:Pool" xmi:id="_Je0xoXz_Ed6Ya8z0CnMcMA" iD="_Je0xoHz_Ed6Ya8z0CnMcMA" associations="_jVa_aX0DEd6Ya8z0CnMcMA" name="Pool">
-    <vertices xmi:type="bpmn:Activity" xmi:id="_Je0xo3z_Ed6Ya8z0CnMcMA" iD="_Je0xonz_Ed6Ya8z0CnMcMA" name="Create Move Task&#xD;&#xA;&#xD;&#xA;class = CreateSpaceObjectTaskTask.class&#xD;&#xA;in IEnvironmentSpace space = $beliefbase.environment&#xD;&#xA;in String type = MoveTask.PROPERTY_TYPENAME&#xD;&#xA;in Object objectid = $beliefbase.myself.getId()&#xD;&#xA;in Map properties = SUtil.createHashMap(new String[]{MoveTask.PROPERTY_DESTINATION, MoveTask.PROPERTY_SCOPE, MoveTask.PROPERTY_CONDITION}, new Object[]{$plan.destination, $scope.getExternalAccess(), new PlanFinishedTaskCondition($plan)})&#xD;&#xA;" activityType="Task"/>
-  </pools>
-</bpmn:BpmnDiagram>

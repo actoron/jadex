@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_ZpCBEYJ-Ed6rVea0-FiZ3Q" iD="_ZpCBEIJ-Ed6rVea0-FiZ3Q">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_eASVMYJ-Ed6rVea0-FiZ3Q" iD="_eASVMIJ-Ed6rVea0-FiZ3Q" name="package jadex.bdibpmn.examples.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.application.space.envsupport.environment.*;&#xD;&#xA;import jadex.bpmnbdi.task.*;&#xD;&#xA;&#xD;&#xA;ISpaceObject target = $beliefbase.environment.getSpaceObject($plan.getReason().content.getId());">
+    <associations xmi:type="bpmn:Association" xmi:id="_eAbfIIJ-Ed6rVea0-FiZ3Q"/>
+  </artifacts>
+  <pools xmi:type="bpmn:Pool" xmi:id="_ZpetAYJ-Ed6rVea0-FiZ3Q" iD="_ZpetAIJ-Ed6rVea0-FiZ3Q" associations="_eAbfIIJ-Ed6rVea0-FiZ3Q" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ZpetA4J-Ed6rVea0-FiZ3Q" iD="_ZpetAoJ-Ed6rVea0-FiZ3Q" outgoingEdges="_9bCr4YJ-Ed6rVea0-FiZ3Q" incomingEdges="_w1VvoYJ-Ed6rVea0-FiZ3Q" name="Add Target&#xD;&#xA;&#xD;&#xA;class = WriteBeliefTask.class&#xD;&#xA;in String beliefsetname = &quot;my_targets&quot;&#xD;&#xA;in Object value = target" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_apZ48YJ-Ed6rVea0-FiZ3Q" iD="_apZ48IJ-Ed6rVea0-FiZ3Q" outgoingEdges="_wb24qoJ-Ed6rVea0-FiZ3Q" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_wb24oYJ-Ed6rVea0-FiZ3Q" iD="_wb24oIJ-Ed6rVea0-FiZ3Q" outgoingEdges="_w1VvoYJ-Ed6rVea0-FiZ3Q __XUyYYJ-Ed6rVea0-FiZ3Q" incomingEdges="_wb24qoJ-Ed6rVea0-FiZ3Q" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_1DfyIYJ-Ed6rVea0-FiZ3Q" iD="_1DfyIIJ-Ed6rVea0-FiZ3Q" incomingEdges="_9bCr4YJ-Ed6rVea0-FiZ3Q __XUyYYJ-Ed6rVea0-FiZ3Q" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_wb24qoJ-Ed6rVea0-FiZ3Q" iD="_wb24qYJ-Ed6rVea0-FiZ3Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_w1VvoYJ-Ed6rVea0-FiZ3Q" iD="_w1VvoIJ-Ed6rVea0-FiZ3Q" name="!$beliefbase.getBeliefSet(&quot;my_targets&quot;).containsFact(target)"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_9bCr4YJ-Ed6rVea0-FiZ3Q" iD="_9bCr4IJ-Ed6rVea0-FiZ3Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="__XUyYYJ-Ed6rVea0-FiZ3Q" iD="__XUyYIJ-Ed6rVea0-FiZ3Q"/>
+  </pools>
+</bpmn:BpmnDiagram>
