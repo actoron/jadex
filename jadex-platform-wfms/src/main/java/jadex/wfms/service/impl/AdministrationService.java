@@ -4,6 +4,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.wfms.client.IActivityListener;
 import jadex.wfms.client.IClient;
+import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.ILogListener;
 import jadex.wfms.client.IProcessListener;
 import jadex.wfms.client.LogEvent;
@@ -52,8 +53,8 @@ public class AdministrationService implements IAdministrationService
 					ILogListener listener = (ILogListener) entry.getValue();
 					IAAAService as = (IAAAService) wfms.getService(IAAAService.class);
 					LogEvent evt = new LogEvent(String.valueOf(record.getMessage()));
-					if (as.accessEvent((IClient) entry.getKey(), evt))
-						listener.logMessage(evt);
+					//if (as.accessEvent((IClient) entry.getKey(), evt))
+					listener.logMessage(evt);
 				}
 			}
 			
@@ -72,7 +73,6 @@ public class AdministrationService implements IAdministrationService
 			
 			public void deauthenticated(IClient client)
 			{
-				System.out.println("Removing");
 				IWfmsClientService wcs = (IWfmsClientService) wfms.getService(IWfmsClientService.class);
 				IActivityListener listener = (IActivityListener) activitiesListeners.get(client);
 				if (listener != null)
@@ -108,9 +108,22 @@ public class AdministrationService implements IAdministrationService
 	 */
 	public Map getUserActivities(IClient client)
 	{
-		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_ADD_LOG_LISTENER))
+		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_REQUEST_ALL_ACTIVITIES))
 			throw new AccessControlException("Not allowed: "+client);
 		return ((IWfmsClientService) wfms.getService(IWfmsClientService.class)).getUserActivities();
+	}
+	
+	/**
+	 * Terminates the activity of a user.
+	 * 
+	 * @param client the client issuing the termination request
+	 * @param activity the activity
+	 */
+	public void terminateActivity(IClient client, IClientActivity activity)
+	{
+		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADMIN_TERMINATE_ACTIVITY))
+			throw new AccessControlException("Not allowed: "+client);
+		((IWfmsClientService) wfms.getService(IWfmsClientService.class)).terminateActivity(activity);
 	}
 	
 	/**
@@ -204,8 +217,8 @@ public class AdministrationService implements IAdministrationService
 			IProcessListener listener = (IProcessListener) entry.getValue();
 			IAAAService as = (IAAAService) wfms.getService(IAAAService.class);
 			ProcessEvent evt = new ProcessEvent(String.valueOf(id));
-			if (as.accessEvent((IClient) entry.getKey(), evt))
-				listener.processFinished(evt);
+			//if (as.accessEvent((IClient) entry.getKey(), evt))
+			listener.processFinished(evt);
 		}
 	}
 }

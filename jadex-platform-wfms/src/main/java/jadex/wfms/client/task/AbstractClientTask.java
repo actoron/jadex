@@ -1,20 +1,20 @@
 package jadex.wfms.client.task;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
+import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
-import jadex.commons.collection.FastHashMap;
 import jadex.commons.concurrent.IResultListener;
 import jadex.wfms.client.IWorkitem;
 import jadex.wfms.client.Workitem;
 import jadex.wfms.parametertypes.GuiProperty;
+import jadex.wfms.service.IAAAService;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Abstract class for client interactions.
@@ -61,7 +61,13 @@ public abstract class AbstractClientTask implements ITask
 				}
 			}
 		}
-		Workitem wi = new Workitem(context.getModelElement().getName(), type, "NoRole", parameterTypes, parameterValues, guiProperties, readOnlyParameters);
+		MLane lane = context.getModelElement().getLane();
+		String role = null;
+		if (lane != null)
+			role = context.getModelElement().getLane().getName();
+		if (role == null)
+			role = IAAAService.ANY_ROLE;
+		Workitem wi = new Workitem(context.getModelElement().getName(), type, role, parameterTypes, parameterValues, guiProperties, readOnlyParameters);
 		wi.setId(context.getModelElement().getName() + "_" + String.valueOf(Integer.toHexString(System.identityHashCode(wi))));
 		return wi;
 	}

@@ -43,7 +43,7 @@
 	</goals>
 
 	<plans>
-		<!-- Handle model names requests. -->
+		<!-- Handle user activities requests. -->
 		<plan name="request_user_activities_plan">
 			<parameter name="action" class="Object">
 				<goalmapping ref="rp_execute_request.action"/>
@@ -59,6 +59,26 @@
 			<trigger>
 				<goal ref="rp_execute_request">
 					<match>$goal.getParameter("action").getValue() instanceof RequestUserActivities</match>
+				</goal>
+			</trigger>
+		</plan>
+		
+		<!-- Handle activity termination requests. -->
+		<plan name="request_terminate_activity_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<!-- The requesting agent. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="rp_execute_request.initiator"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="RequestTerminateActivityPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestTerminateActivity</match>
 				</goal>
 			</trigger>
 		</plan>

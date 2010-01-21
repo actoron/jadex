@@ -23,10 +23,10 @@ public class SimLaunchService implements IService
 				//mr.addProcessModel("jadex/wfms/simulation/testflow/Credit_Workflow.bpmn");
 				//mr.addProcessModel("jadex/wfms/simulation/testflow/Document_Test.bpmn");
 				//mr.addProcessModel("jadex/wfms/simulation/testflow/testflow.gpmn");
-				BasicAAAService as = (BasicAAAService) wfms.getService(IAAAService.class);
-				Set roles = new HashSet();
-				roles.add(IAAAService.ALL_ROLES);
-				as.addUser("TestUser", roles);
+				//BasicAAAService as = (BasicAAAService) wfms.getService(IAAAService.class);
+				//Set roles = new HashSet();
+				//roles.add(IAAAService.ALL_ROLES);
+				//as.addUser("TestUser", roles);
 				//new ClientSimulator((IClientService) wfms.getService(IClientService.class));
 				//IComponentExecutionService ex = (IComponentExecutionService) wfms.getService(IComponentExecutionService.class);
 				//ex.createComponent(null, "jadex/wfms/bdi/clientinterface/WfmsClientInterface.agent.xml", null, null, false, null, null, null);

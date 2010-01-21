@@ -20,7 +20,7 @@ public class LoginDialog extends JDialog
 	
 	private static final String LOGIN_BUTTON_TEXT = "Login";
 	
-	private static final String INITIAL_USERNAME_TEXT = "TestUser";
+	private static final String INITIAL_USERNAME_TEXT = "TestAdmin";
 	
 	private JTextField userNameField;
 	

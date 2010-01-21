@@ -1,0 +1,34 @@
+package jadex.wfms.bdi.client.standard;
+
+import jadex.wfms.service.IAAAService;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+public class SCapReqs
+{
+	public static Set ACTIVITY_HANDLING = new HashSet(Arrays.asList(
+			new Integer[] {
+					IAAAService.COMMIT_WORKITEM,
+					IAAAService.RELEASE_WORKITEM,
+					IAAAService.ADD_ACTIVITY_LISTENER,
+					IAAAService.REMOVE_ACTIVITY_LISTENER}));
+	
+	public static Set WORKITEM_LIST = new HashSet(Arrays.asList(
+			new Integer[] {
+					IAAAService.ACQUIRE_WORKITEM,
+					IAAAService.ADD_WORKITEM_LISTENER,
+					IAAAService.REMOVE_WORKITEM_LISTENER}));
+	
+	public static Set PROCESS_LIST = new HashSet(Arrays.asList(
+			new Integer[] {
+					IAAAService.REQUEST_MODEL_NAMES,
+					IAAAService.START_PROCESS}));
+	
+	public static Set ADMIN_ACTIVITIES = new HashSet(Arrays.asList(
+			new Integer[] {
+					IAAAService.ADMIN_ADD_ACTIVITIES_LISTENER,
+					IAAAService.ADMIN_REMOVE_ACTIVITIES_LISTENER,
+					IAAAService.ADMIN_TERMINATE_ACTIVITY}));
+}

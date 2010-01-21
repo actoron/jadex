@@ -81,7 +81,7 @@ public class WfmsLauncher
 		BasicAAAService as = (BasicAAAService) wfms.getService(IAAAService.class);
 		Set roles = new HashSet();
 		roles.add("all");
-		as.addUser("TestUser", roles);
+		//as.addUser("TestUser", roles);
 		((BasicWfms) wfms).addService(IAAAService.class, "auth_service", as);
 			
 		/*ClientConnector cc = new ClientConnector(wfms);

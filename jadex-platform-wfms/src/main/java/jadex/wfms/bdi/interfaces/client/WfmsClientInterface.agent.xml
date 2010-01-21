@@ -96,6 +96,26 @@
 			</trigger>
 		</plan>
 		
+		<!-- Handle capabilities requests. -->
+		<plan name="capabilities_request_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<!-- The requesting agent. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="rp_execute_request.initiator"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="RequestCapabilitiesPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestCapabilities</match>
+				</goal>
+			</trigger>
+		</plan>
+		
 		<!-- Handle process start requests. -->
 		<plan name="process_start_request_plan">
 			<parameter name="action" class="Object">

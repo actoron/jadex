@@ -1,7 +1,11 @@
 package jadex.wfms.bdi.client.cap;
 
+import java.util.Set;
+
+import jadex.adapter.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.wfms.bdi.ontology.RequestAuth;
+import jadex.wfms.bdi.ontology.RequestCapabilities;
 
 public class ConnectPlan extends AbstractWfmsPlan
 {
@@ -16,5 +20,15 @@ public class ConnectPlan extends AbstractWfmsPlan
 		
 		IGoal hbGoal = createGoal("keep_sending_heartbeats");
 		dispatchTopLevelGoal(hbGoal);
+		
+		RequestCapabilities rc = new RequestCapabilities();
+		
+		IGoal capGoal = createGoal("reqcap.rp_initiate");
+		capGoal.getParameter("action").setValue(rc);
+		capGoal.getParameter("receiver").setValue(getClientInterface());
+		dispatchSubgoalAndWait(capGoal);
+		Done done = (Done) capGoal.getParameter("result").getValue();
+		Set capabilities = ((RequestCapabilities) done.getAction()).getCapabilities();
+		getParameter("capabilities").setValue(capabilities);
 	}
 }

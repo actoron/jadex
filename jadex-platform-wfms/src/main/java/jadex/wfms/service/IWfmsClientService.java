@@ -5,6 +5,7 @@ import java.util.Map;
 import jadex.commons.concurrent.IResultListener;
 import jadex.wfms.client.IActivityListener;
 import jadex.wfms.client.IClient;
+import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 
 /**
@@ -25,6 +26,13 @@ public interface IWfmsClientService
 	 * @return current activities for all users
 	 */
 	public Map getUserActivities();
+	
+	/**
+	 * Terminates the activity of a user.
+	 * 
+	 * @param activity the activity
+	 */
+	public void terminateActivity(IClientActivity activity);
 	
 	/**
 	 *  Adds a listener for activity changes.

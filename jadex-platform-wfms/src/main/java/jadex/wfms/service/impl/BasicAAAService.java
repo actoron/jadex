@@ -1,11 +1,11 @@
 package jadex.wfms.service.impl;
 
 import jadex.commons.concurrent.IResultListener;
+import jadex.wfms.bdi.client.standard.SCapReqs;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IAAAService;
 import jadex.wfms.service.IAuthenticationListener;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,35 +21,41 @@ public class BasicAAAService implements IAAAService
 {
 	private Map userClients;
 	
-	private Map userroles;
+	private Map users;
+	
+	private Map secRoleCaps;
 	
 	private Set authenticationListeners;
 	
 	public static IAAAService getTestService()
 	{
-		Map userroles = new HashMap();
-		Set roles = new HashSet();
-		roles.add(IAAAService.ALL_ROLES);
-		userroles.put("TestUser", roles);
-		return new BasicAAAService(userroles);
+		Map secRoles = new HashMap();
+		Set userNoStartCaps = new HashSet();
+		userNoStartCaps.addAll(SCapReqs.ACTIVITY_HANDLING);
+		userNoStartCaps.addAll(SCapReqs.WORKITEM_LIST);
+		Set userCaps = new HashSet(userNoStartCaps);
+		userCaps.addAll(SCapReqs.PROCESS_LIST);
+		secRoles.put("User", userCaps);
+		secRoles.put("User_No_Start", userNoStartCaps);
+		UserAAAEntry userNoStart = new UserAAAEntry("TestUserNoStart", new String[] {IAAAService.ALL_ROLES}, new String[] {"User_No_Start"});
+		UserAAAEntry user = new UserAAAEntry("TestUser", new String[] {IAAAService.ALL_ROLES}, new String[] {"User"});
+		UserAAAEntry admin = new UserAAAEntry("TestAdmin", new String[] {IAAAService.ALL_ROLES}, new String[] {"Administrator"});
+		UserAAAEntry bankTeller = new UserAAAEntry("BankTellerUser", new String[] {"Bank Teller"}, new String[] {"User"});
+		return new BasicAAAService(new UserAAAEntry[] { admin, user, userNoStart, bankTeller }, secRoles);
 	}
 	
-	public BasicAAAService(Map userroles)
+	public BasicAAAService(UserAAAEntry[] users, Map secrolecaps)
 	{
 		this.authenticationListeners = new HashSet();
-		this.userroles = userroles!=null? userroles: new HashMap();
+		this.users = new HashMap();
+		for (int i = 0; i < users.length; ++i)
+			this.users.put(users[i].getUserName(), users[i]);
+		
+		this.secRoleCaps = secrolecaps!=null? secrolecaps: new HashMap();
+		secRoleCaps.put(IAAAService.SEC_ROLE_NONE, new HashSet());
+		secRoleCaps.put(IAAAService.SEC_ROLE_ADMIN, new HashSet(IAAAService.CAPABILITIES));
+		
 		userClients = new HashMap();
-	}
-	
-	public BasicAAAService(String[] userNames, String[][] roles)
-	{
-		this.authenticationListeners = new HashSet();
-		int min = Math.min(userNames.length, roles.length);
-		userroles = new HashMap();
-		for (int i = 0; i < min; ++i)
-		{
-			userroles.put(userNames[i], new HashSet(Arrays.asList(roles[i])));
-		}
 	}
 	
 	/**
@@ -74,7 +80,7 @@ public class BasicAAAService implements IAAAService
 	 */
 	public synchronized boolean authenticate(IClient client)
 	{
-		if (!userroles.containsKey(client.getUserName()))
+		if (!users.containsKey(client.getUserName()))
 			return false;
 		if (!userClients.containsKey(client.getUserName()))
 			userClients.put(client.getUserName(), Collections.synchronizedSet(new HashSet()));
@@ -114,10 +120,13 @@ public class BasicAAAService implements IAAAService
 	 * @param action the action the client is requesting
 	 * @return true, if the client is authorized to perform the action, false otherwise
 	 */
-	public synchronized boolean accessAction(IClient client, int action)
+	public synchronized boolean accessAction(IClient client, Integer action)
 	{
 		if (((Set) userClients.get(client.getUserName())).contains(client))
-			return true;
+		{
+			if (getCapabilities(((UserAAAEntry) users.get(client.getUserName())).getSecRoles()).contains(action))
+				return true;
+		}
 		return false;
 	}
 	
@@ -145,12 +154,11 @@ public class BasicAAAService implements IAAAService
 	
 	/**
 	 * Adds a new user to the service.
-	 * @param userName user name of the new user
-	 * @param roles roles of the user
+	 * @param user the new user entry
 	 */
-	public synchronized void addUser(String userName, Set roles)
+	public synchronized void addUser(UserAAAEntry user)
 	{
-		userroles.put(userName, roles);
+		users.put(user.getUserName(), user);
 	}
 	
 	/**
@@ -159,19 +167,52 @@ public class BasicAAAService implements IAAAService
 	 */
 	public synchronized void removeUser(String userName)
 	{
-		userroles.remove(userName);
+		users.remove(userName);
 	}
 	
-	public synchronized Set getRoles(IClient client)
+	/**
+	 * Returns the roles of a particular user
+	 * @param userName the user name
+	 * @return the roles of the client
+	 */
+	public synchronized Set getRoles(String userName)
 	{
-		String userName = client.getUserName();
-		Set roles = (Set) userroles.get(userName);
-		if (roles == null)
-		{
-			roles = new HashSet();
-			roles.add(IAAAService.ALL_ROLES);
-		}
+		Set roles = ((UserAAAEntry) users.get(userName)).getRoles();
 		return roles;
+	}
+	
+	/**
+	 * Returns the security roles of the user
+	 * @param userName the user name
+	 * @return the security roles
+	 */
+	public synchronized Set getSecurityRole(String userName)
+	{
+		return new HashSet(((UserAAAEntry) users.get(userName)).getSecRoles());
+	}
+	
+	/**
+	 * Returns the capabilities of a security role
+	 * @param secRole the security role
+	 * @return the capabilities of the security role
+	 */
+	public synchronized Set getCapabilities(String secRole)
+	{
+		return new HashSet((Set) secRoleCaps.get(secRole));
+	}
+	
+	/**
+	 * Returns the capabilities a set of security roles
+	 * @param secRoles the security roles
+	 * @return the combined capabilities of the security roles
+	 */
+	public synchronized Set getCapabilities(Set secRoles)
+	{
+		HashSet caps = new HashSet();
+		for (Iterator it = secRoles.iterator(); it.hasNext(); )
+			caps.addAll((Set) secRoleCaps.get(it.next()));
+		
+		return caps;
 	}
 	
 	/**

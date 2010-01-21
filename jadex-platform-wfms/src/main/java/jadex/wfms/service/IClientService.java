@@ -44,6 +44,13 @@ public interface IClientService extends IService
 	public void deauthenticate(IClient client);
 	
 	/**
+	 * Returns the capabilities of the client
+	 * @param client the client
+	 * @return set of capabilities
+	 */
+	public Set getCapabilities(IClient client);
+	
+	/**
 	 *  Starts a new process
 	 *  @param client the client
 	 *  @param name name of the process

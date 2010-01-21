@@ -3,6 +3,7 @@ package jadex.wfms.service;
 import jadex.service.IService;
 import jadex.wfms.client.IActivityListener;
 import jadex.wfms.client.IClient;
+import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.ILogListener;
 import jadex.wfms.client.IProcessListener;
 
@@ -17,6 +18,14 @@ public interface IAdministrationService extends IService
 	 * @return current activities for all users
 	 */
 	public Map getUserActivities(IClient client);
+	
+	/**
+	 * Terminates the activity of a user.
+	 * 
+	 * @param client the client issuing the termination request
+	 * @param activity the activity
+	 */
+	public void terminateActivity(IClient client, IClientActivity activity);
 	
 	/**
 	 * Adds a user activities listener which will trigger for

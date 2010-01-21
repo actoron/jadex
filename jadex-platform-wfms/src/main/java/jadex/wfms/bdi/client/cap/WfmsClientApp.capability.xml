@@ -41,6 +41,7 @@
 		<achievegoal name="connect" exported="true">
 			<parameter name="user_name" class="String" />
 			<parameter name="auth_token" class="Object" />
+			<parameter name="capabilities" class="Set" direction="out" />
 		</achievegoal>
 		
 		<achievegoal name="disconnect" exported="true">
@@ -92,6 +93,10 @@
 			<parameter name="user_activities" class="Set" direction="out" />
 		</achievegoal>
 		
+		<achievegoal name="terminate_activity" exported="true">
+			<parameter name="activity" class="IClientActivity" direction="in" />
+		</achievegoal>
+		
 		<achievegoal name="start_user_activities_subscription" exported="true" />
 		
 		<!-- ================= Subscription Events ==================== -->
@@ -134,6 +139,9 @@
 			</parameter>
 			<parameter name="auth_token" class="Object">
 				<goalmapping ref="connect.auth_token"/>
+			</parameter>
+			<parameter name="capabilities" class="Set" direction="out">
+				<goalmapping ref="connect.capabilities"/>
 			</parameter>
 			<body class="ConnectPlan" />
 			<trigger>
@@ -241,6 +249,16 @@
 			<body class="UserActivitiesPlan" />
 			<trigger>
 				<goal ref="request_user_activities" />
+			</trigger>
+		</plan>
+		
+		<plan name="terminate_activity_plan">
+			<parameter name="activity" class="IClientActivity">
+				<goalmapping ref="terminate_activity.activity"/>
+			</parameter>
+			<body class="TerminateActivityPlan" />
+			<trigger>
+				<goal ref="terminate_activity" />
 			</trigger>
 		</plan>
 		

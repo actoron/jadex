@@ -103,6 +103,32 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	}
 	
 	/**
+	 * Terminates the activity of a user.
+	 * 
+	 * @param activity the activity
+	 */
+	public synchronized void terminateActivity(IClientActivity activity)
+	{
+		String userName = null;
+		for (Iterator it = userActivities.entrySet().iterator(); it.hasNext(); )
+		{
+			Map.Entry entry = (Map.Entry) it.next();
+			Set activities = (Set) entry.getValue();
+			if (activities.contains(activity))
+			{
+				userName = (String) entry.getKey();
+				break;
+			}
+		}
+		if (userName != null)
+		{
+			((Set) userActivities.get(userName)).remove(activity);
+			fireActivityRemovedEvent(userName, activity);
+			queueWorkitem((IWorkitem) activity, null);
+		}
+	}
+	
+	/**
 	 * Requests the Process Definition Service
 	 * 
 	 * @param client the client
@@ -156,12 +182,23 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	}
 	
 	/**
+	 * Returns the capabilities of the client
+	 * @param client the client
+	 * @return set of capabilities
+	 */
+	public Set getCapabilities(IClient client)
+	{
+		IAAAService aaaService = (IAAAService) wfms.getService(IAAAService.class);
+		return aaaService.getCapabilities(aaaService.getSecurityRole(client.getUserName()));
+	}
+	
+	/**
 	 * Starts a new BPMN-process
 	 * 
 	 * @param client the client
 	 * @param name name of the process
 	 */
-	public synchronized void startBpmnProcess(IClient client, String name)
+	/*public synchronized void startBpmnProcess(IClient client, String name)
 	{
 		if(!((IAAAService)wfms.getService(IAAAService.class)).accessAction(client, IAAAService.START_BPMN_PROCESS))
 			throw new AccessControlException("Not allowed: "+client);
@@ -172,7 +209,7 @@ public class ClientConnector implements IClientService, IWfmsClientService
 		IExecutionService bps = (IExecutionService)wfms.getService(IExecutionService.class);
 		Object id  = bps.startProcess(filename, null, null, false);
 		System.out.println("Started process instance " + id);
-	}
+	}*/
 	
 	/**
 	 * Gets the names of all available BPMN-models
@@ -180,20 +217,20 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	 * @param client the client
 	 * @return the names of all available BPMN-models
 	 */
-	public synchronized Set getBpmnModelNames(IClient client)
+	/*public synchronized Set getBpmnModelNames(IClient client)
 	{
 		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_MODEL_NAMES))
 			throw new AccessControlException("Not allowed: "+client);
 		
 		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
 		return new HashSet(rs.getModelNames());
-	}
+	}*/
 	
 	/**
-	 * Gets the names of all available BPMN-models
+	 * Gets the names of all available process models
 	 * 
 	 * @param client the client
-	 * @return the names of all available BPMN-models
+	 * @return the names of all available process models
 	 */
 	public synchronized Set getModelNames(IClient client)
 	{
@@ -205,14 +242,14 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	}
 	
 	/**
-	 * Starts a new GPMN-process
+	 * Starts a new process
 	 * 
 	 * @param client the client
 	 * @param name name of the process
 	 */
 	public synchronized void startProcess(IClient client, String name)
 	{
-		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.START_BPMN_PROCESS))
+		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.START_PROCESS))
 			throw new AccessControlException("Not allowed: "+client);
 		
 		IModelRepositoryService rs = (IModelRepositoryService)wfms.getService(IModelRepositoryService.class);
@@ -233,7 +270,7 @@ public class ClientConnector implements IClientService, IWfmsClientService
 			throw new AccessControlException("Not allowed: "+client);
 		IResultListener listener = (IResultListener) processWorkitemListeners.remove(activity);
 		((HashSet) userActivities.get(client.getUserName())).remove(activity);
-		fireActivityRemovedEvent(client, activity);
+		fireActivityRemovedEvent(client.getUserName(), activity);
 		listener.resultAvailable(this, activity);
 	}
 	
@@ -251,7 +288,7 @@ public class ClientConnector implements IClientService, IWfmsClientService
 		{
 			fireWorkitemRemovedEvent(workitem);
 			((HashSet) userActivities.get(client.getUserName())).add(workitem);
-			fireActivityAddedEvent(client, (IClientActivity) workitem);
+			fireActivityAddedEvent(client.getUserName(), (IClientActivity) workitem);
 		}
 	}
 	
@@ -265,16 +302,19 @@ public class ClientConnector implements IClientService, IWfmsClientService
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.RELEASE_WORKITEM))
 			throw new AccessControlException("Not allowed: "+client);
 		((HashSet) userActivities.get(client.getUserName())).remove(activity);
-		fireActivityRemovedEvent(client, activity);
+		fireActivityRemovedEvent(client.getUserName(), activity);
 		queueWorkitem((IWorkitem) activity, null);
 	}
 	
 	public synchronized Set getAvailableWorkitems(IClient client)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_AVAILABLE_WORKITEMS))
+		IAAAService as = (IAAAService) wfms.getService(IAAAService.class);
+		if ((!as.accessAction(client, IAAAService.REQUEST_AVAILABLE_WORKITEMS)) &&
+			(!as.accessAction(client, IAAAService.ADD_WORKITEM_LISTENER)))
 			throw new AccessControlException("Not allowed: "+client);
+		
 		IAAAService roleService = (IAAAService) wfms.getService(IAAAService.class);
-		Set roles = roleService.getRoles(client);
+		Set roles = roleService.getRoles(client.getUserName());
 		Set workitems = new HashSet();
 		if (roles.contains(IAAAService.ALL_ROLES))
 		{
@@ -315,6 +355,8 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	 */
 	public synchronized void addWorkitemListener(IClient client, IWorkitemListener listener)
 	{
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_WORKITEM_LISTENER))
+			throw new AccessControlException("Not allowed: "+client);
 		Set listeners = (Set) workitemQueueListeners.get(client);
 		if (listeners == null)
 		{
@@ -339,6 +381,8 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	 */
 	public synchronized void removeWorkitemListener(IClient client, IWorkitemListener listener)
 	{
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REMOVE_WORKITEM_LISTENER))
+			throw new AccessControlException("Not allowed: "+client);
 		Set listeners = (Set) workitemQueueListeners.get(client);
 		if (listeners != null)
 			listeners.remove(listener);
@@ -378,6 +422,8 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	 */
 	public synchronized void addActivityListener(IClient client, IActivityListener listener)
 	{
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_ACTIVITY_LISTENER))
+			throw new AccessControlException("Not allowed: "+client);
 		Set listeners = (Set) activityListeners.get(client);
 		if (listeners == null)
 		{
@@ -402,6 +448,8 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	 */
 	public synchronized void removeActivityListener(IClient client, IActivityListener listener)
 	{
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REMOVE_ACTIVITY_LISTENER))
+			throw new AccessControlException("Not allowed: "+client);
 		Set listeners = (Set) activityListeners.get(client);
 		if (listeners != null)
 			listeners.remove(listener);
@@ -416,9 +464,11 @@ public class ClientConnector implements IClientService, IWfmsClientService
 			IClient client = (IClient) entry.getKey();
 			Set listeners = (Set) entry.getValue();
 			
-			WorkitemEvent evt = new WorkitemEvent(workitem);
-			if (as.accessEvent(client, evt))
+			if (as.getRoles(client.getUserName()).contains(workitem.getRole()) ||
+				workitem.getRole().equals(IAAAService.ANY_ROLE) ||
+				as.getRoles(client.getUserName()).contains(IAAAService.ALL_ROLES))
 			{
+				WorkitemEvent evt = new WorkitemEvent(workitem);
 				for (Iterator it2 = listeners.iterator(); it2.hasNext(); )
 					((IWorkitemListener) it2.next()).workitemAdded(evt);
 			}
@@ -434,20 +484,21 @@ public class ClientConnector implements IClientService, IWfmsClientService
 			IClient client = (IClient) entry.getKey();
 			Set listeners = (Set) entry.getValue();
 			
-			WorkitemEvent evt = new WorkitemEvent(workitem);
-			if (as.accessEvent(client, evt))
+			if (as.getRoles(client.getUserName()).contains(workitem.getRole()) ||
+				workitem.getRole().equals(IAAAService.ANY_ROLE) ||
+				as.getRoles(client.getUserName()).contains(IAAAService.ALL_ROLES))
 			{
+				WorkitemEvent evt = new WorkitemEvent(workitem);
 				for (Iterator it2 = listeners.iterator(); it2.hasNext(); )
 					((IWorkitemListener) it2.next()).workitemRemoved(evt);
 			}
 		}
 	}
 	
-	private void fireActivityAddedEvent(IClient client, IClientActivity activity)
+	private void fireActivityAddedEvent(String userName, IClientActivity activity)
 	{
 		IAAAService as = (IAAAService) wfms.getService(IAAAService.class);
-		Set clients = as.getAuthenticatedClients(client.getUserName());
-		String userName = client.getUserName();
+		Set clients = as.getAuthenticatedClients(userName);
 		
 		for (Iterator it = clients.iterator(); it.hasNext(); )
 		{
@@ -459,8 +510,7 @@ public class ClientConnector implements IClientService, IWfmsClientService
 			{
 				IActivityListener listener = (IActivityListener) it2.next();
 				ActivityEvent evt = new ActivityEvent(userName, activity);
-				if (as.accessEvent(currentClient, evt))
-					listener.activityAdded(evt);
+				listener.activityAdded(evt);
 			}
 		}
 		
@@ -468,11 +518,10 @@ public class ClientConnector implements IClientService, IWfmsClientService
 			((IActivityListener) it.next()).activityAdded(new ActivityEvent(userName, activity));
 	}
 	
-	private void fireActivityRemovedEvent(IClient client, IClientActivity activity)
+	private void fireActivityRemovedEvent(String userName, IClientActivity activity)
 	{
 		IAAAService as = (IAAAService) wfms.getService(IAAAService.class);
-		Set clients = as.getAuthenticatedClients(client.getUserName());
-		String userName = client.getUserName();
+		Set clients = as.getAuthenticatedClients(userName);
 		
 		for (Iterator it = clients.iterator(); it.hasNext(); )
 		{
@@ -484,8 +533,7 @@ public class ClientConnector implements IClientService, IWfmsClientService
 			{
 				IActivityListener listener = (IActivityListener) it2.next();
 				ActivityEvent evt = new ActivityEvent(userName, activity);
-				if (as.accessEvent(currentClient, evt))
-					listener.activityRemoved(evt);
+				listener.activityRemoved(evt);
 			}
 		}
 		

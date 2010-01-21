@@ -23,21 +23,6 @@
 		<belief name="client_gui" class="StandardClientApplication">
 			<fact>new StandardClientApplication($scope.getExternalAccess())</fact>
 		</belief>
-		<beliefref name="add_workitem_controller" class="javax.swing.Action">
-			<concrete ref="clientcap.add_workitem_controller"/>
-		</beliefref>
-		<beliefref name="remove_workitem_controller" class="javax.swing.Action">
-			<concrete ref="clientcap.remove_workitem_controller"/>
-		</beliefref>
-		<beliefref name="add_activity_controller" class="javax.swing.Action">
-			<concrete ref="clientcap.add_activity_controller"/>
-		</beliefref>
-		<beliefref name="remove_activity_controller" class="javax.swing.Action">
-			<concrete ref="clientcap.remove_activity_controller"/>
-		</beliefref>
-		<beliefref name="lost_connection_controller" class="javax.swing.Action">
-			<concrete ref="clientcap.lost_connection_controller"/>
-		</beliefref>
 	</beliefs>
 
 	<goals>
