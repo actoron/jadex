@@ -23,7 +23,7 @@ public class SCapReqs
 	
 	public static Set PROCESS_LIST = new HashSet(Arrays.asList(
 			new Integer[] {
-					IAAAService.REQUEST_MODEL_NAMES,
+					IAAAService.PD_ADD_REPOSITORY_LISTENER,
 					IAAAService.START_PROCESS}));
 	
 	public static Set ADMIN_ACTIVITIES = new HashSet(Arrays.asList(

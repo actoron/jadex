@@ -4,13 +4,18 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.wfms.client.IClient;
+import jadex.wfms.listeners.IProcessRepositoryListener;
 import jadex.wfms.service.IAAAService;
+import jadex.wfms.service.IAuthenticationListener;
 import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
 import jadex.wfms.service.IProcessDefinitionService;
 
 import java.security.AccessControlException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 public class ProcessDefinitionConnector implements IProcessDefinitionService
@@ -18,9 +23,13 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	/** The WFMS */
 	private IServiceContainer wfms;
 	
+	/** Model repository listeners */
+	private Map repositoryListeners;
+	
 	public ProcessDefinitionConnector(IServiceContainer wfms)
 	{
 		this.wfms = wfms;
+		this.repositoryListeners = new HashMap();
 	}
 	
 	/**
@@ -41,15 +50,27 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	/**
 	 * Adds a process model to the repository
 	 * @param client the client
-	 * @param name name of the model
 	 * @param path path to the model
 	 */
-	public void addProcessModel(IClient client, String path)
+	public synchronized void addProcessModel(IClient client, String path)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.ADD_PROCESS_MODEL))
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.PD_ADD_PROCESS_MODEL))
 			throw new AccessControlException("Not allowed: "+client);
 		BasicModelRepositoryService mr = (BasicModelRepositoryService) wfms.getService(IModelRepositoryService.class);
 		mr.addProcessModel(path);
+	}
+	
+	/**
+	 * Removes a process model from the repository
+	 * @param client the client
+	 * @param name name of the model
+	 */
+	public synchronized void removeProcessModel(IClient client, String name)
+	{
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.PD_REMOVE_PROCESS_MODEL))
+			throw new AccessControlException("Not allowed: "+client);
+		BasicModelRepositoryService mr = (BasicModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		mr.removeProcessModel(name);
 	}
 	
 	/**
@@ -57,9 +78,9 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	 * @param name name of the model
 	 * @return the model
 	 */
-	public ILoadableComponentModel getProcessModel(IClient client, String name)
+	public synchronized ILoadableComponentModel getProcessModel(IClient client, String name)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_PROCESS_MODEL))
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.PD_REQUEST_PROCESS_MODEL))
 			throw new AccessControlException("Not allowed: "+client);
 		IModelRepositoryService mr = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
 		
@@ -71,9 +92,9 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	 * @param path path of the model
 	 * @return the model
 	 */
-	public ILoadableComponentModel loadProcessModel(IClient client, String path, String[] imports)
+	public synchronized ILoadableComponentModel loadProcessModel(IClient client, String path, String[] imports)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_PROCESS_MODEL))
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.PD_REQUEST_PROCESS_MODEL))
 			throw new AccessControlException("Not allowed: "+client);
 		IExecutionService es = (IExecutionService) wfms.getService(IExecutionService.class);
 		
@@ -87,11 +108,70 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	 * @param client the client
 	 * @return the names of all available process models
 	 */
-	public Set getProcessModelNames(IClient client)
+	public synchronized Set getProcessModelNames(IClient client)
 	{
-		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_MODEL_NAMES))
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.PD_REQUEST_MODEL_NAMES))
 			throw new AccessControlException("Not allowed: "+client);
 		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
 		return new HashSet(rs.getModelNames());
+	}
+	
+	/**
+	 * Adds a process repository listener.
+	 * 
+	 * @param client the client
+	 * @param listener the listener
+	 */
+	public synchronized void addProcessRepositoryListener(IClient client, IProcessRepositoryListener listener)
+	{
+		IAAAService as = ((IAAAService) wfms.getService(IAAAService.class));
+		if (!as.accessAction(client, IAAAService.PD_ADD_REPOSITORY_LISTENER))
+			throw new AccessControlException("Not allowed: "+client);
+		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		rs.addProcessRepositoryListener(listener);
+		
+		Set listeners = (Set) repositoryListeners.get(client);
+		if(listeners == null)
+		{
+			listeners = new HashSet();
+			repositoryListeners.put(client, listeners);
+		}
+		listeners.add(listener);
+		
+		as.addAuthenticationListener(new IAuthenticationListener()
+		{
+			public void deauthenticated(IClient client)
+			{
+				 Set listeners = (Set) repositoryListeners.get(client);
+				 if (listeners != null)
+				 {
+					 for (Iterator it = listeners.iterator(); it.hasNext(); )
+					 {
+						 IProcessRepositoryListener l = (IProcessRepositoryListener) it.next();
+						 ((IModelRepositoryService) wfms.getService(IModelRepositoryService.class)).removeProcessRepositoryListener(l);
+					 }
+				 }
+			}
+			
+			public void authenticated(IClient client)
+			{
+			}
+		});
+	}
+	
+	/**
+	 * Removes a process repository listener.
+	 * 
+	 * @param client the client
+	 * @param listener the listener
+	 */
+	public synchronized void removeProcessRepositoryListener(IClient client, IProcessRepositoryListener listener)
+	{
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.PD_REMOVE_REPOSITORY_LISTENER))
+			throw new AccessControlException("Not allowed: "+client);
+		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		rs.removeProcessRepositoryListener(listener);
+		
+		((Set) repositoryListeners.get(client)).remove(listener);
 	}
 }

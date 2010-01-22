@@ -3,6 +3,7 @@ package jadex.wfms.service;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.service.IService;
 import jadex.wfms.client.IClient;
+import jadex.wfms.listeners.IProcessRepositoryListener;
 
 import java.util.Set;
 
@@ -18,6 +19,13 @@ public interface IProcessDefinitionService extends IService
 	 * @param path path to the model
 	 */
 	public void addProcessModel(IClient client, String path);
+	
+	/**
+	 * Removes a process model from the repository
+	 * @param client the client
+	 * @param name name of the model
+	 */
+	public void removeProcessModel(IClient client, String name);
 	
 	/**
 	 * Gets a process model.
@@ -44,25 +52,18 @@ public interface IProcessDefinitionService extends IService
 	public Set getProcessModelNames(IClient client);
 	
 	/**
-	 * Adds a GPMN model to the repository
-	 * @param client the client
-	 * @param name name of the model
-	 * @param path path to the model
-	 */
-	//public void addGpmnModel(IClient client, String path);
-	
-	/**
-	 * Gets a GPMN model.
-	 * @param name name of the model
-	 * @return the model
-	 */
-	//public MGpmnModel getGpmnModel(IClient client, String name);
-	
-	/**
-	 * Gets the names of all available GPMN-models
+	 * Adds a process repository listener.
 	 * 
 	 * @param client the client
-	 * @return the names of all available GPMN-models
+	 * @param listener the listener
 	 */
-	//public Set getGpmnModelNames(IClient client);
+	public void addProcessRepositoryListener(IClient client, IProcessRepositoryListener listener);
+	
+	/**
+	 * Removes a process repository listener.
+	 * 
+	 * @param client the client
+	 * @param listener the listener
+	 */
+	public void removeProcessRepositoryListener(IClient client, IProcessRepositoryListener listener);
 }

@@ -3,10 +3,10 @@ package jadex.wfms.service;
 import java.util.Map;
 
 import jadex.commons.concurrent.IResultListener;
-import jadex.wfms.client.IActivityListener;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
+import jadex.wfms.listeners.IActivityListener;
 
 /**
  * Service for accessing the workitem queue and client event handling.

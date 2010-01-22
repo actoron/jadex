@@ -1,11 +1,11 @@
 package jadex.wfms.service;
 
 import jadex.service.IService;
-import jadex.wfms.client.IActivityListener;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
-import jadex.wfms.client.ILogListener;
-import jadex.wfms.client.IProcessListener;
+import jadex.wfms.listeners.IActivityListener;
+import jadex.wfms.listeners.ILogListener;
+import jadex.wfms.listeners.IProcessListener;
 
 import java.util.Map;
 

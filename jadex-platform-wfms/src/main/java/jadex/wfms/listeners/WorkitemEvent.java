@@ -1,4 +1,6 @@
-package jadex.wfms.client;
+package jadex.wfms.listeners;
+
+import jadex.wfms.client.IWorkitem;
 
 public class WorkitemEvent
 {

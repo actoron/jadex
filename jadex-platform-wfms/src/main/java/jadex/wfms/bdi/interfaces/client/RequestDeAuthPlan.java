@@ -4,7 +4,7 @@ import jadex.adapter.base.fipa.Done;
 import jadex.bdi.runtime.Plan;
 import jadex.wfms.bdi.ontology.RequestDeAuth;
 import jadex.wfms.client.IClient;
-import jadex.wfms.client.IWorkitemListener;
+import jadex.wfms.listeners.IWorkitemListener;
 import jadex.wfms.service.IClientService;
 
 import java.util.Map;

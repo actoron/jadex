@@ -8,10 +8,10 @@ import jadex.wfms.bdi.ontology.InformActivityAdded;
 import jadex.wfms.bdi.ontology.InformActivityRemoved;
 import jadex.wfms.bdi.ontology.InformWorkitemAdded;
 import jadex.wfms.bdi.ontology.InformWorkitemRemoved;
-import jadex.wfms.client.ActivityEvent;
 import jadex.wfms.client.IClient;
-import jadex.wfms.client.IWorkitemListener;
-import jadex.wfms.client.WorkitemEvent;
+import jadex.wfms.listeners.ActivityEvent;
+import jadex.wfms.listeners.IWorkitemListener;
+import jadex.wfms.listeners.WorkitemEvent;
 import jadex.wfms.service.IClientService;
 
 import java.util.Map;

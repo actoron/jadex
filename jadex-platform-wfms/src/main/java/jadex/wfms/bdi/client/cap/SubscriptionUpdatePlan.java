@@ -4,6 +4,8 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.wfms.bdi.ontology.InformActivityAdded;
 import jadex.wfms.bdi.ontology.InformActivityRemoved;
+import jadex.wfms.bdi.ontology.InformProcessModelAdded;
+import jadex.wfms.bdi.ontology.InformProcessModelRemoved;
 import jadex.wfms.bdi.ontology.InformUserActivityAdded;
 import jadex.wfms.bdi.ontology.InformUserActivityRemoved;
 import jadex.wfms.bdi.ontology.InformWorkitemAdded;
@@ -53,11 +55,25 @@ public class SubscriptionUpdatePlan extends Plan
 		}
 		else if (update instanceof InformUserActivityRemoved)
 		{
-			InformUserActivityRemoved uacAdded = (InformUserActivityRemoved) update;
+			InformUserActivityRemoved uacRemoved = (InformUserActivityRemoved) update;
 			IGoal uacRemovedGoal = createGoal("remove_user_activity");
-			uacRemovedGoal.getParameter("user_name").setValue(uacAdded.getUserName());
-			uacRemovedGoal.getParameter("activity").setValue(uacAdded.getActivity());
+			uacRemovedGoal.getParameter("user_name").setValue(uacRemoved.getUserName());
+			uacRemovedGoal.getParameter("activity").setValue(uacRemoved.getActivity());
 			dispatchSubgoalAndWait(uacRemovedGoal);
+		}
+		else if (update instanceof InformProcessModelAdded)
+		{
+			InformProcessModelAdded pmAdded = (InformProcessModelAdded) update;
+			IGoal pmAddedGoal = createGoal("add_process_model");
+			pmAddedGoal.getParameter("model_name").setValue(pmAdded.getModelName());
+			dispatchSubgoalAndWait(pmAddedGoal);
+		}
+		else if (update instanceof InformProcessModelRemoved)
+		{
+			InformProcessModelRemoved pmRemoved = (InformProcessModelRemoved) update;
+			IGoal pmRemovedGoal = createGoal("remove_process_model");
+			pmRemovedGoal.getParameter("model_name").setValue(pmRemoved.getModelName());
+			dispatchSubgoalAndWait(pmRemovedGoal);
 		}
 	}
 }

@@ -2,13 +2,13 @@ package jadex.wfms.service.impl;
 
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
-import jadex.wfms.client.ActivityEvent;
-import jadex.wfms.client.IActivityListener;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
-import jadex.wfms.client.IWorkitemListener;
-import jadex.wfms.client.WorkitemEvent;
+import jadex.wfms.listeners.ActivityEvent;
+import jadex.wfms.listeners.IActivityListener;
+import jadex.wfms.listeners.IWorkitemListener;
+import jadex.wfms.listeners.WorkitemEvent;
 import jadex.wfms.service.IAAAService;
 import jadex.wfms.service.IAdministrationService;
 import jadex.wfms.service.IClientService;
@@ -234,7 +234,7 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	 */
 	public synchronized Set getModelNames(IClient client)
 	{
-		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.REQUEST_MODEL_NAMES))
+		if(!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.PD_REQUEST_MODEL_NAMES))
 			throw new AccessControlException("Not allowed: "+client);
 		
 		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);

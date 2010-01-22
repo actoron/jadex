@@ -164,6 +164,8 @@ public class StandardClientApplication
 			mainSplitPane.setRightComponent(new JTabbedPane());
 		else
 			mainSplitPane.setRightComponent(EMPTY_PANEL);
+		
+		mainSplitPane.setDividerLocation(0.45);
 	}
 	
 	private void showConnectDialog()
@@ -182,6 +184,8 @@ public class StandardClientApplication
 			}
 			catch (GoalFailureException e)
 			{
+				e.printStackTrace();
+				cleanUp();
 			}
 		}
 	}
@@ -211,7 +215,10 @@ public class StandardClientApplication
 		}
 		
 		if (capabilities.containsAll(SCapReqs.ADMIN_ACTIVITIES))
+		{
 			toolPane.add(ADMIN_ACTIVITIES_TAB_NAME, aaComponent);
+			setupAdminActivitiesComponent();
+		}
 	}
 	
 	private void disconnect()
@@ -353,10 +360,28 @@ public class StandardClientApplication
 	
 	private void setupProcessModelComponent()
 	{
-		IGoal modelNameGoal = agent.createGoal("clientcap.request_model_names");
-		agent.dispatchTopLevelGoalAndWait(modelNameGoal);
-		Set modelNames = (Set) modelNameGoal.getParameter("model_names").getValue();
-		pmComponent.setProcessModelNames(modelNames);
+		Action pmAdded = new AbstractAction()
+		{
+			public void actionPerformed(final ActionEvent e)
+			{
+				String modelName = (String) e.getSource();
+				pmComponent.addProcessModelName(modelName);
+			}
+		};
+		agent.getBeliefbase().getBelief("clientcap.add_process_model_controller").setFact(pmAdded);
+		
+		Action pmRemoved = new AbstractAction()
+		{
+			public void actionPerformed(final ActionEvent e)
+			{
+				String modelName = (String) e.getSource();
+				pmComponent.removeProcessModelName(modelName);
+			}
+		};
+		agent.getBeliefbase().getBelief("clientcap.remove_process_model_controller").setFact(pmRemoved);
+		
+		IGoal subscribe = agent.createGoal("clientcap.start_model_repository_subscription");
+		agent.dispatchTopLevelGoalAndWait(subscribe);
 		
 		pmComponent.setStartAction(new AbstractAction()
 		{
@@ -374,6 +399,50 @@ public class StandardClientApplication
 					catch (GoalFailureException e1)
 					{
 						JOptionPane.showMessageDialog(mainFrame, "Process Start failed.");
+					}
+				}
+			}
+		});
+		
+		pmComponent.setAddProcessAction(new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String path = (String)JOptionPane.showInputDialog(mainFrame,
+																  "Enter new process path:",
+	                    										  "Add Process",
+	                    										  JOptionPane.PLAIN_MESSAGE,
+	                    										  null, null, null);
+				IGoal addGoal = agent.createGoal("clientcap.add_process");
+				addGoal.getParameter("process_path").setValue(path);
+				try
+				{
+					agent.dispatchTopLevelGoalAndWait(addGoal);
+				}
+				catch (GoalFailureException e1)
+				{
+					JOptionPane.showMessageDialog(mainFrame, "Adding process failed.");
+				}
+			}
+		});
+		
+		pmComponent.setRemoveProcessAction(new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String name = pmComponent.getSelectedModelName();
+				if (name != null)
+				{
+					IGoal removeGoal = agent.createGoal("clientcap.remove_process");
+					removeGoal.getParameter("process_name").setValue(name);
+					
+					try
+					{
+						agent.dispatchTopLevelGoalAndWait(removeGoal);
+					}
+					catch (GoalFailureException e1)
+					{
+						JOptionPane.showMessageDialog(mainFrame, "Removing process failed.");
 					}
 				}
 			}
@@ -515,10 +584,12 @@ public class StandardClientApplication
 		pmComponent.setStartAction(emptyAction);
 		aaComponent.setTerminateAction(emptyAction);
 		
-		agent.getBeliefbase().getBelief("add_workitem_controller").setFact(null);
-		agent.getBeliefbase().getBelief("remove_workitem_controller").setFact(null);
+		agent.getBeliefbase().getBelief("clientcap.add_workitem_controller").setFact(null);
+		agent.getBeliefbase().getBelief("clientcap.remove_workitem_controller").setFact(null);
 		agent.getBeliefbase().getBelief("clientcap.add_user_activity_controller").setFact(null);
 		agent.getBeliefbase().getBelief("clientcap.remove_user_activity_controller").setFact(null);
+		agent.getBeliefbase().getBelief("clientcap.add_process_model_controller").setFact(null);
+		agent.getBeliefbase().getBelief("clientcap.remove_process_model_controller").setFact(null);
 	}
 }
 

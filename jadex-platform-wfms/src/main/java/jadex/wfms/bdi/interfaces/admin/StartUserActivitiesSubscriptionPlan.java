@@ -8,9 +8,9 @@ import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.InformUserActivityAdded;
 import jadex.wfms.bdi.ontology.InformUserActivityRemoved;
 import jadex.wfms.bdi.ontology.RequestProxy;
-import jadex.wfms.client.ActivityEvent;
-import jadex.wfms.client.IActivityListener;
 import jadex.wfms.client.IClient;
+import jadex.wfms.listeners.ActivityEvent;
+import jadex.wfms.listeners.IActivityListener;
 import jadex.wfms.service.IAdministrationService;
 
 public class StartUserActivitiesSubscriptionPlan extends AbstractWfmsPlan

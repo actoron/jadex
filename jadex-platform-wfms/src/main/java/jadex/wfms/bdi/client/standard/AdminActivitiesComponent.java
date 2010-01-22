@@ -96,12 +96,14 @@ public class AdminActivitiesComponent extends JPanel
 			model.nodeStructureChanged(root);
 		}
 		
-		boolean expanded = activitiesTree.isExpanded(new TreePath(model.getPathToRoot(userNode)));
+		boolean expand = activitiesTree.isExpanded(new TreePath(model.getPathToRoot(userNode)));
+		if (userNode.getChildCount() == 0)
+			expand = true;
 		
 		userNode.add(new DefaultMutableTreeNode(activity));
 		model.nodeStructureChanged(userNode);
 		
-		if (expanded)
+		if (expand)
 			activitiesTree.expandPath(new TreePath(model.getPathToRoot(userNode)));
 	}
 	

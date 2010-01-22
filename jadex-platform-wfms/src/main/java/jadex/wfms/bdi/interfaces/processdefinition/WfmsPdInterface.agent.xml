@@ -20,6 +20,7 @@
 	<capabilities>
 		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 		<capability name="reqcap" file="jadex.bdi.planlib.protocols.request.Request"/>
+		<capability name="subcap" file="jadex.bdi.planlib.protocols.subscribe.Subscribe"/>
 	</capabilities>
 
 	<beliefs>
@@ -78,6 +79,43 @@
 			<trigger>
 				<goal ref="rp_execute_request">
 					<match>$goal.getParameter("action").getValue() instanceof RequestAddProcess</match>
+				</goal>
+			</trigger>
+		</plan>
+		
+		<!-- Handle model removal requests. -->
+		<plan name="request_remove_process_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<!-- The requesting agent. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="rp_execute_request.initiator"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="RequestRemoveProcessPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestRemoveProcess</match>
+				</goal>
+			</trigger>
+		</plan>
+		
+		<!-- Handle process repository event subscription requests. -->
+		<plan name="start_process_repository_subscription_plan">
+			<!-- The requesting agent. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="sp_start_subscription.initiator"/>
+			</parameter>
+			<parameter name="subscription_id" class="Object">
+				<goalmapping ref="sp_start_subscription.subscription_id"/>
+			</parameter>
+			<body class="StartProcessRepositorySubscriptionPlan" />
+			<trigger>
+				<goal ref="subcap.sp_start_subscription">
+					<match>$goal.getParameter("subscription").getValue() instanceof SubscribeModelRepositoryEvents</match>
 				</goal>
 			</trigger>
 		</plan>

@@ -1,14 +1,14 @@
 package com.daimler.client;
 
 import jadex.commons.SGUI;
-import jadex.wfms.client.ActivityEvent;
-import jadex.wfms.client.IActivityListener;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
-import jadex.wfms.client.IWorkitemListener;
 import jadex.wfms.client.IWorkitem;
-import jadex.wfms.client.ProcessEvent;
-import jadex.wfms.client.WorkitemEvent;
+import jadex.wfms.listeners.ActivityEvent;
+import jadex.wfms.listeners.IActivityListener;
+import jadex.wfms.listeners.IWorkitemListener;
+import jadex.wfms.listeners.ProcessEvent;
+import jadex.wfms.listeners.WorkitemEvent;
 import jadex.wfms.service.IClientService;
 
 import java.awt.BorderLayout;

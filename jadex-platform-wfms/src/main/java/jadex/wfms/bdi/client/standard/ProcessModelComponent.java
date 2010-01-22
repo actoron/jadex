@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 public class ProcessModelComponent extends JPanel
@@ -22,6 +23,10 @@ public class ProcessModelComponent extends JPanel
 	private static final String PROCESS_MODEL_COLUMN_NAME = "Process Models";
 	
 	private static final String START_BUTTON_LABEL = "Start Process";
+	
+	private static final String ADD_PROCESS_BUTTON_LABEL = "Add Process...";
+	
+	private static final String REMOVE_PROCESS_BUTTON_LABEL = "Remove Process";
 	
 	/** Table listing the process model names */
 	private JTable processTable;
@@ -34,6 +39,12 @@ public class ProcessModelComponent extends JPanel
 	
 	/** Start process button */
 	private JButton startButton;
+	
+	/** Add process button */
+	private JButton addProcessButton;
+	
+	/** Remove process button */
+	private JButton removeProcessButton;
 	
 	public ProcessModelComponent()
 	{
@@ -48,23 +59,51 @@ public class ProcessModelComponent extends JPanel
 				return false;
 			}
 		};
+		processTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		JScrollPane processScrollPane = new JScrollPane(processTable);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.gridy = 0;
+		gbc.gridwidth = 3;
 		gbc.weightx = 1.0;
 		gbc.weighty = 1.0;
 		add(processScrollPane, gbc);
 		
+		JPanel buttonPanel = new JPanel(new GridBagLayout());
+		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridy = 1;
+		gbc.weightx = 1;
+		gbc.anchor = GridBagConstraints.SOUTH;
+		add(buttonPanel, gbc);
+		
+		addProcessButton = new JButton(ADD_PROCESS_BUTTON_LABEL);
+		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = 0;
+		gbc.weightx = 1;
+		gbc.insets = new Insets(5, 5, 5, 5);
+		gbc.anchor = GridBagConstraints.CENTER;
+		buttonPanel.add(addProcessButton, gbc);
+		
+		removeProcessButton = new JButton(REMOVE_PROCESS_BUTTON_LABEL);
+		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = 1;
+		gbc.weightx = 1;
+		gbc.insets = new Insets(5, 5, 5, 5);
+		gbc.anchor = GridBagConstraints.CENTER;
+		buttonPanel.add(removeProcessButton, gbc);
+		
 		startButton = new JButton(START_BUTTON_LABEL);
 		gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.NONE;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridy = 1;
-		gbc.weightx = 0;
-		gbc.weighty = 0;
+		gbc.gridwidth = 2;
+		gbc.weightx = 1;
 		gbc.insets = new Insets(5, 5, 5, 5);
-		gbc.anchor = GridBagConstraints.SOUTHEAST;
-		add(startButton, gbc);
+		gbc.anchor = GridBagConstraints.CENTER;
+		buttonPanel.add(startButton, gbc);
 	}
 	
 	/**
@@ -78,6 +117,25 @@ public class ProcessModelComponent extends JPanel
 		
 		for (Iterator it = processModelNames.iterator(); it.hasNext(); )
 			processTableModel.addRow(new Object[] {it.next()});
+	}
+	
+	public void addProcessModelName(String name)
+	{
+		processTableModel.addRow(new Object[] {name});
+	}
+	
+	public void removeProcessModelName(String name)
+	{
+		int row = 0;
+		while (row < processTableModel.getRowCount())
+		{
+			if (name.equals(processTableModel.getValueAt(row, 0)))
+			{
+				processTableModel.removeRow(row);
+				return;
+			}
+			++row;
+		}
 	}
 	
 	/**
@@ -117,6 +175,26 @@ public class ProcessModelComponent extends JPanel
 		};
 		
 		processTable.addMouseListener(processMouseListener);
+	}
+	
+	/**
+	 * Sets the action for the add process button.
+	 * @param action action for the add process button
+	 */
+	public void setAddProcessAction(final Action action)
+	{
+		addProcessButton.setAction(action);
+		addProcessButton.setText(ADD_PROCESS_BUTTON_LABEL);
+	}
+	
+	/**
+	 * Sets the action for the remove process button.
+	 * @param action action for the remove process button
+	 */
+	public void setRemoveProcessAction(final Action action)
+	{
+		removeProcessButton.setAction(action);
+		removeProcessButton.setText(REMOVE_PROCESS_BUTTON_LABEL);
 	}
 	
 	/**

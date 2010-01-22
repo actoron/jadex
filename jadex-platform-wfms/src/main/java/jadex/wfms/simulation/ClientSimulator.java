@@ -1,16 +1,16 @@
 package jadex.wfms.simulation;
 
-import jadex.wfms.client.ActivityEvent;
-import jadex.wfms.client.IActivityListener;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
-import jadex.wfms.client.ILogListener;
-import jadex.wfms.client.IProcessListener;
 import jadex.wfms.client.IWorkitem;
-import jadex.wfms.client.IWorkitemListener;
-import jadex.wfms.client.LogEvent;
-import jadex.wfms.client.ProcessEvent;
-import jadex.wfms.client.WorkitemEvent;
+import jadex.wfms.listeners.ActivityEvent;
+import jadex.wfms.listeners.IActivityListener;
+import jadex.wfms.listeners.ILogListener;
+import jadex.wfms.listeners.IProcessListener;
+import jadex.wfms.listeners.IWorkitemListener;
+import jadex.wfms.listeners.LogEvent;
+import jadex.wfms.listeners.ProcessEvent;
+import jadex.wfms.listeners.WorkitemEvent;
 import jadex.wfms.service.IClientService;
 import jadex.wfms.simulation.gui.SimulationWindow;
 import jadex.wfms.simulation.stateholder.AbstractNumericStateSet;

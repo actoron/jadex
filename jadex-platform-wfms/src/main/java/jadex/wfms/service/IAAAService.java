@@ -27,20 +27,17 @@ public interface IAAAService extends IService
 	// Actions
 	public static final Integer REQUEST_PD_SERVICE				 = new Integer(0);
 	public static final Integer REQUEST_MONITORING_SERVICE		 = new Integer(1);
-	public static final Integer ADD_PROCESS_MODEL				 = new Integer(50);
-	public static final Integer REQUEST_PROCESS_MODEL			 = new Integer(51);
-	public static final Integer START_PROCESS					 = new Integer(100);
-	public static final Integer REQUEST_MODEL_NAMES				 = new Integer(101);
-	public static final Integer REQUEST_AVAILABLE_WORKITEMS		 = new Integer(102);
-	public static final Integer REQUEST_AVAILABLE_ACTIVITIES	 = new Integer(103);
-	public static final Integer COMMIT_WORKITEM					 = new Integer(104);
-	public static final Integer ACQUIRE_WORKITEM				 = new Integer(105);
-	public static final Integer RELEASE_WORKITEM		 		 = new Integer(106);
+	public static final Integer START_PROCESS					 = new Integer(200);
+	public static final Integer REQUEST_AVAILABLE_WORKITEMS		 = new Integer(201);
+	public static final Integer REQUEST_AVAILABLE_ACTIVITIES	 = new Integer(202);
+	public static final Integer COMMIT_WORKITEM					 = new Integer(203);
+	public static final Integer ACQUIRE_WORKITEM				 = new Integer(204);
+	public static final Integer RELEASE_WORKITEM		 		 = new Integer(205);
 	
-	public static final Integer ADD_WORKITEM_LISTENER			 = new Integer(200);
-	public static final Integer REMOVE_WORKITEM_LISTENER		 = new Integer(201);
-	public static final Integer ADD_ACTIVITY_LISTENER			 = new Integer(202);
-	public static final Integer REMOVE_ACTIVITY_LISTENER		 = new Integer(203);
+	public static final Integer ADD_WORKITEM_LISTENER			 = new Integer(300);
+	public static final Integer REMOVE_WORKITEM_LISTENER		 = new Integer(301);
+	public static final Integer ADD_ACTIVITY_LISTENER			 = new Integer(302);
+	public static final Integer REMOVE_ACTIVITY_LISTENER		 = new Integer(303);
 	
 	public static final Integer ADMIN_REQUEST_ALL_ACTIVITIES	 = new Integer(400);
 	public static final Integer ADMIN_TERMINATE_ACTIVITY		 = new Integer(401);
@@ -52,15 +49,20 @@ public interface IAAAService extends IService
 	public static final Integer ADMIN_ADD_PROCESS_LISTENER		 = new Integer(504);
 	public static final Integer ADMIN_REMOVE_PROCESS_LISTENER	 = new Integer(505);
 	
+	public static final Integer PD_REQUEST_MODEL_NAMES			 = new Integer(600);
+	public static final Integer PD_ADD_PROCESS_MODEL			 = new Integer(601);
+	public static final Integer PD_REMOVE_PROCESS_MODEL			 = new Integer(602);
+	public static final Integer PD_REQUEST_PROCESS_MODEL		 = new Integer(603);
+	
+	public static final Integer PD_ADD_REPOSITORY_LISTENER		 = new Integer(700);
+	public static final Integer PD_REMOVE_REPOSITORY_LISTENER	 = new Integer(701);
+	
 	/** All capabilities */
 	public static final Set CAPABILITIES = new HashSet(Arrays.asList(
 											   new Object[] {
 											   REQUEST_PD_SERVICE,
 											   REQUEST_MONITORING_SERVICE,
-											   ADD_PROCESS_MODEL,
-											   REQUEST_PROCESS_MODEL,
 											   START_PROCESS,
-											   REQUEST_MODEL_NAMES,
 											   REQUEST_AVAILABLE_WORKITEMS,
 											   REQUEST_AVAILABLE_ACTIVITIES,
 											   COMMIT_WORKITEM,
@@ -70,6 +72,12 @@ public interface IAAAService extends IService
 											   REMOVE_WORKITEM_LISTENER,
 											   ADD_ACTIVITY_LISTENER,
 											   REMOVE_ACTIVITY_LISTENER,
+											   PD_ADD_PROCESS_MODEL,
+											   PD_REMOVE_PROCESS_MODEL,
+											   PD_REQUEST_PROCESS_MODEL,
+											   PD_REQUEST_MODEL_NAMES,
+											   PD_ADD_REPOSITORY_LISTENER,
+											   PD_REMOVE_REPOSITORY_LISTENER,
 											   ADMIN_REQUEST_ALL_ACTIVITIES,
 											   ADMIN_TERMINATE_ACTIVITY,
 											   ADMIN_ADD_ACTIVITIES_LISTENER,

@@ -1,4 +1,4 @@
-package jadex.wfms.client;
+package jadex.wfms.listeners;
 
 public class LogEvent
 {
