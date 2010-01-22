@@ -44,6 +44,18 @@ public class Constants {
 	//List that contains observed events, e.g. produced by the observers
 	public static final String OBSERVED_EVENTS_LIST = "observedEvents";
 	
+	//Map that contains lists with observed events, e.g. produced by the observers. a list is associated with a timestamp when the events where observed. 
+	public static final String OBSERVED_EVENTS_MAP = "observedEventsMap";
+												      
+	//BDI_Agent
+	public static final String BDI_AGENT= "BDI_Agent";
+	
+	//ISpace_Object
+	public static final String ISPACE_OBJECT  = "ISpaceObject";		
+	
+	// The name/type of the client simulation agent
+	public static final String CLIENT_SIMULATION_AGENT = "ClientSimulator";
+	
 	
 	
 	

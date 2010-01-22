@@ -14,6 +14,8 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
+import jadex.service.execution.IExecutionService;
+import jadex.simulation.environment.DeltaTimeExecutor4Simulation;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.TimeConverter;
 import jadex.simulation.model.SimulationConfiguration;
@@ -27,13 +29,10 @@ import java.util.Map;
 public class RuntimeManagerPlan extends Plan {
 
 	public void body() {
-		HashMap simFacts = (HashMap) getBeliefbase().getBelief(
-				"simulationFacts").getFact();
-		SimulationConfiguration simConf = (SimulationConfiguration) simFacts
-				.get(Constants.SIMULATION_FACTS_FOR_CLIENT);
+		HashMap simFacts = (HashMap) getBeliefbase().getBelief("simulationFacts").getFact();
+		SimulationConfiguration simConf = (SimulationConfiguration) simFacts.get(Constants.SIMULATION_FACTS_FOR_CLIENT);
 		String experimentID = (String) simFacts.get(Constants.EXPERIMENT_ID);
-		int tmpCurrentValue = simConf.getOptimization().getParameterSweeping()
-				.getCurrentValue();
+		int tmpCurrentValue = simConf.getOptimization().getParameterSweeping().getCurrentValue();
 
 		// Map simFacts = new HashMap();
 		// simFacts.put(Constants.SIMULATION_FACTS_FOR_CLIENT, simConf);
@@ -43,9 +42,7 @@ public class RuntimeManagerPlan extends Plan {
 		// args.put(Constants.EXPERIMENT_ID, experimentID);
 		// args.put(Constants.SIMULATION_FACTS_FOR_CLIENT, simFacts);
 
-		System.out.println("#Client# Started CLIENT Simulation run....: "
-				+ simConf.getName() + " - " + experimentID + ", currentVal: "
-				+ tmpCurrentValue);
+		System.out.println("#Client# Started CLIENT Simulation run....: " + simConf.getName() + " - " + experimentID + ", currentVal: " + tmpCurrentValue);
 		// String msg = (String) getBeliefbase().getBelief("msg").getFact();
 
 		// System.out.println("*******************: " + msg + " - " +
@@ -54,66 +51,68 @@ public class RuntimeManagerPlan extends Plan {
 		// startApp();
 
 		// Init Arguments like StartTime
+		
+		
+		//TEST
+		ContinuousSpace2D spaceTMP = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope()
+				.getParent()).getSpace("my2dspace");
+//		IExecutionService exeservice = (IExecutionService) space.getContext().getServiceContainer().getService(IExecutionService.class);
+		IServiceContainer exeservice =  spaceTMP.getContext().getServiceContainer();
+//		DeltaTimeExecutor4Simulation exeservice = (DeltaTimeExecutor4Simulation) spaceTMP.getContext().getServiceContainer().getService(DeltaTimeExecutor4Simulation.class);
+//		System.out.println(exeservice.getName());
+		
+		
+		
 		init();
 
 		// Determine terminate condition
 		// Time determines termination
-		if (simConf.getRunConfiguration().getRows().getTerminateCondition()
-				.getTime() != null) {
+		if (simConf.getRunConfiguration().getRows().getTerminateCondition().getTime() != null) {
 
-			Time time = simConf.getRunConfiguration().getRows()
-					.getTerminateCondition().getTime();
+			Time time = simConf.getRunConfiguration().getRows().getTerminateCondition().getTime();
 			Long terminationTime = new Long(-1);
 
 			if (time.getType().equals(Constants.RELATIVE_TIME_EXPRESSION)) {
 				terminationTime = getTerminationTime(0, time.getValue());
-			} else if (time.getType()
-					.equals(Constants.ABSOLUTE_TIME_EXPRESSION)) {
+			} else if (time.getType().equals(Constants.ABSOLUTE_TIME_EXPRESSION)) {
 				terminationTime = getTerminationTime(1, time.getValue());
 			} else {
-				System.err.println("#RunTimeManagerPlan# Time type missing "
-						+ simConf);
+				System.err.println("#RunTimeManagerPlan# Time type missing " + simConf);
 			}
 
 			if (terminationTime.longValue() > -1) {
 				waitFor(terminationTime);
 			} else {
-				System.err
-						.println("#RunTimeManagerPlan# Error on setting termination time "
-								+ simConf);
+				System.err.println("#RunTimeManagerPlan# Error on setting termination time " + simConf);
 			}
 			// Application semantic determines termination, e.g.
 			// $homebase.NumberOfOre > 100
-		} else if (simConf.getRunConfiguration().getRows()
-				.getTerminateCondition().getTargetFunction() != null) {
+		} else if (simConf.getRunConfiguration().getRows().getTerminateCondition().getTargetFunction() != null) {
 
-			TargetFunction targetFunct = simConf.getRunConfiguration()
-					.getRows().getTerminateCondition().getTargetFunction();
+			TargetFunction targetFunct = simConf.getRunConfiguration().getRows().getTerminateCondition().getTargetFunction();
 
 			// HACK
 			while (true) {
 				waitFor(1000);
-				ContinuousSpace2D space = (ContinuousSpace2D)((IApplicationExternalAccess)getScope().getParent()).getSpace("my2dspace");
-//				ContinuousSpace2D space = (ContinuousSpace2D) getExternalAccess()
-//						.getApplicationContext().getSpace("my2dspace");
+				ContinuousSpace2D space = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace");
+				// ContinuousSpace2D space = (ContinuousSpace2D) getExternalAccess()
+				// .getApplicationContext().getSpace("my2dspace");
 				ISpaceObject object = space.getSpaceObjectsByType("homebase")[0];
-				Integer ore = (Integer) object.getProperty("ore");				
-				if(ore.intValue() == 55){
-					//Experiment has reached Target Function. Terminate
+				Integer ore = (Integer) object.getProperty("ore");
+				if (ore.intValue() == 55) {
+					// Experiment has reached Target Function. Terminate
 					break;
 				}
-//				long currentTime = System.currentTimeMillis();
-//				Long.valueOf(currentTime);
-//				if (missiontime.compareTo(Long.valueOf(currentTime)) <= 0) {
-//					Long missiontime = (Long) object.getProperty("missiontime");
-//					break;
-//				}
+				// long currentTime = System.currentTimeMillis();
+				// Long.valueOf(currentTime);
+				// if (missiontime.compareTo(Long.valueOf(currentTime)) <= 0) {
+				// Long missiontime = (Long) object.getProperty("missiontime");
+				// break;
+				// }
 			}
 
 		} else {
-			System.err
-					.println("#RunTimeManagerPlan# Terminate Condition missing "
-							+ simConf);
+			System.err.println("#RunTimeManagerPlan# Terminate Condition missing " + simConf);
 		}
 
 		// waitFor(3000);
@@ -142,8 +141,7 @@ public class RuntimeManagerPlan extends Plan {
 		IServiceContainer container = getExternalAccess().getServiceContainer();
 		// IExecutionService exeServ = (IExecutionService) container
 		// .getService(IExecutionService.class);
-		ISimulationService simServ = (ISimulationService) container
-				.getService(ISimulationService.class);
+		ISimulationService simServ = (ISimulationService) container.getService(ISimulationService.class);
 		// waitFor(5000);
 		// simServ.pause();
 
@@ -182,10 +180,14 @@ public class RuntimeManagerPlan extends Plan {
 	// }
 
 	private void sendResult() {
-		Map facts = (Map) getBeliefbase().getBelief("simulationFacts")
-				.getFact();
-		facts.put(Constants.EXPERIMENT_END_TIME, new Long(System
-				.currentTimeMillis()));
+		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
+		facts.put(Constants.EXPERIMENT_END_TIME, new Long(System.currentTimeMillis()));
+		
+		//Get the map of observed events from the beliefbase
+		HashMap observedEvents = (HashMap) getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).getFact();
+		facts.put(Constants.OBSERVED_EVENTS_MAP, observedEvents);
+						
+		
 
 		IComponentIdentifier[] receivers = new IComponentIdentifier[1];
 		receivers[0] = getMasterAgent();
@@ -200,8 +202,7 @@ public class RuntimeManagerPlan extends Plan {
 		try {
 			sendMessage(inform);
 		} catch (Exception e) {
-			System.out
-					.println("#RuntimeManagerPlan# Error on sending result message to Master Simulation Manager");
+			System.out.println("#RuntimeManagerPlan# Error on sending result message to Master Simulation Manager");
 		}
 
 		// IMessageEvent mevent = createMessageEvent("inform_target");
@@ -214,8 +215,7 @@ public class RuntimeManagerPlan extends Plan {
 		// System.out.println("Searching dealer...");
 		// Create a service description to search for.
 		IDF df = (IDF) getScope().getServiceContainer().getService(IDF.class);
-		IDFServiceDescription sd = df.createDFServiceDescription(
-				"master_simulation_agent", null, null);
+		IDFServiceDescription sd = df.createDFServiceDescription("master_simulation_agent", null, null);
 		IDFAgentDescription ad = df.createDFAgentDescription(null, sd);
 		// ISearchConstraints sc = df.createSearchConstraints(-1, 0);
 
@@ -224,8 +224,7 @@ public class RuntimeManagerPlan extends Plan {
 		ft.getParameter("description").setValue(ad);
 		// ft.getParameter("constraints").setValue(sc);
 		dispatchSubgoalAndWait(ft);
-		IDFAgentDescription[] result = (IDFAgentDescription[]) ft
-				.getParameterSet("result").getValues();
+		IDFAgentDescription[] result = (IDFAgentDescription[]) ft.getParameterSet("result").getValues();
 
 		if (result == null || result.length == 0) {
 			getLogger().warning("No master simulation agent found.");
@@ -249,29 +248,24 @@ public class RuntimeManagerPlan extends Plan {
 	 * Save initial facts of this simulation run.
 	 */
 	private void init() {
-		
-//		final IClockService clockservice = (IClockService)container.getService(IClockService.class);
-		
-		ContinuousSpace2D space = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope()
-				.getParent()).getSpace("my2dspace");
+
+		// final IClockService clockservice = (IClockService)container.getService(IClockService.class);
+
+//		ContinuousSpace2D space = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace");		
 		
 		IClockService clockservice = (IClockService) getScope().getServiceContainer().getService(IClockService.class);
 		long clockService = clockservice.getTime();
-		long systemTime = new Long(System
-				.currentTimeMillis());
+		long systemTime = new Long(System.currentTimeMillis());
 
 		System.out.println("***********************************************************" + clockService + " - " + systemTime);
-		
-		Map facts = (Map) getBeliefbase().getBelief("simulationFacts")
-				.getFact();
-		facts.put(Constants.EXPERIMENT_START_TIME, new Long(System
-				.currentTimeMillis()));
+
+		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
+		facts.put(Constants.EXPERIMENT_START_TIME, new Long(System.currentTimeMillis()));
 		getBeliefbase().getBelief("simulationFacts").setFact(facts);
 	}
 
 	/**
-	 * Compute Termination: Input: Mode=0 ->relative Time; Mode=1 ->absolute
-	 * Time
+	 * Compute Termination: Input: Mode=0 ->relative Time; Mode=1 ->absolute Time
 	 * 
 	 * @return the termination time
 	 */
@@ -280,22 +274,15 @@ public class RuntimeManagerPlan extends Plan {
 			// Long relativeTime = new Long(10000);
 			Long currentTime = new Long(System.currentTimeMillis());
 			Long tmp = new Long(value + currentTime.longValue());
-			System.out.println("StartTime: "
-					+ TimeConverter.longTime2DateString(currentTime)
-					+ "TerminationTime: "
-					+ TimeConverter.longTime2DateString(tmp));
+			System.out.println("StartTime: " + TimeConverter.longTime2DateString(currentTime) + "TerminationTime: " + TimeConverter.longTime2DateString(tmp));
 			return new Long(value);
 		} else {// TODO: There might be a problem with Day Light Savings Time!
 			Calendar cal = Calendar.getInstance();
 			// Date terminationTime = cal.getTime();
 			Long currentTime = new Long(System.currentTimeMillis());
 			Long res = new Long(value - currentTime.longValue());
-			System.out.println("StartTime: "
-					+ TimeConverter.longTime2DateString(currentTime)
-					+ "TerminationTime: "
-					+ TimeConverter.longTime2DateString(new Long(cal
-							.getTimeInMillis())) + ", Duration: "
-					+ res.longValue());
+			System.out.println("StartTime: " + TimeConverter.longTime2DateString(currentTime) + "TerminationTime: " + TimeConverter.longTime2DateString(new Long(cal.getTimeInMillis()))
+					+ ", Duration: " + res.longValue());
 			return res;
 		}
 	}

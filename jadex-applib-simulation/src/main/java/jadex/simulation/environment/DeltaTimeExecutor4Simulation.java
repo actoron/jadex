@@ -6,6 +6,7 @@ import jadex.application.space.envsupport.environment.ISpaceExecutor;
 import jadex.application.space.envsupport.environment.ISpaceProcess;
 import jadex.application.space.envsupport.environment.SpaceObject;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
+import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
@@ -14,27 +15,22 @@ import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IExecutable;
+import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
 import jadex.service.execution.IExecutionService;
 import jadex.simulation.helper.Constants;
-import jadex.simulation.helper.ObserveBDIAgentThread;
-import jadex.simulation.helper.ObserverCallable;
-import jadex.simulation.helper.ObserverHelper;
-import jadex.simulation.helper.SynchObject;
 import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.Observer;
 import jadex.simulation.model.SimulationConfiguration;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Space executor that connects to a clock service and reacts on time deltas. It is specially designed for the automated simulation execution, since it observes and collects data according to the simulation configuration.
@@ -54,16 +50,21 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 
 	/** The tick timer. */
 	protected ITimer timer;
-	
-	/** Dilation counter .*/
-	protected int dilationCounter = 0;
 
 	/** The flag indicating that the executor is terminated. */
 	protected boolean terminated;
 
-//	/** Thread Pool to observe agents.*/
-//	protected ExecutorService executor = Executors.newCachedThreadPool();
-	
+	// ---Variables need for simulation evaluation
+
+	/** Dilation counter . */
+	protected int dilationCounter = 0;
+
+	/** The IComponentIdentifier of the clientSimulationAgent. **/
+	protected IComponentIdentifier clientSimulationAgent;
+
+	// /** Thread Pool to observe agents.*/
+	// protected ExecutorService executor = Executors.newCachedThreadPool();
+
 	// -------- constructors--------
 
 	/**
@@ -112,7 +113,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 			public boolean execute() {
 				long currenttime = clockservice.getTime();
 				long progress = currenttime - timestamp;
-				timestamp = currenttime;				
+				timestamp = currenttime;
 
 				// System.out.println("step: "+timestamp+" "+progress);
 
@@ -145,108 +146,79 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 						ITableDataConsumer consumer = (ITableDataConsumer) it.next();
 						consumer.consumeData(currenttime, clockservice.getTick());
 					}
-					
+
 					dilationCounter += progress;
-					
-					if(dilationCounter >= 1000){						
-					// Test for automated Simulation Testing
-					double myTick = clockservice.getTick();
-					long myTime = clockservice.getTime();
-					long mySystemTime = System.currentTimeMillis();
-					String experimentID = (String) space.getSpaceObjectsByType("experimentID")[0].getProperty("experimentID");
-					// Calendar myCal = Calendar.getInstance();
 
-					// myCal.get
-					String tmpName = (String) space.getContext().getArguments().get("Experiment_id");
-					System.out.println("#Executor# counter: " + dilationCounter +" - "+ tmpName + ":  Tick: " + myTick + " - myTime: " + DateFormat.getDateTimeInstance().format(new Date(myTime)) + " Diff: " + +progress);
-					
-					ArrayList<ObservedEvent> observedEvents = new ArrayList<ObservedEvent>();					
+					if (dilationCounter >= 1000) {
+						final String experimentId = (String) space.getContext().getArguments().get(Constants.EXPERIMENT_ID);
+						final String appName = space.getContext().getName();
+						final ArrayList<ObservedEvent> observedEvents = new ArrayList<ObservedEvent>();
 
-					// Observe elements: ISpaceObjects, BDI-Agents, MicroAgents
-					
-					//Handle BDI-Agents separate due asyn call
-//					observedEvents = ObserverHelper.observeComponent(space, myTime, executor, observerList, space.getAgents());
-					
-					
-					
-					
-					
-					for(Observer obs : observerList){
-					
-					
-					
-					if (obs.getData().getObjectSource().getType().equals(Constants.BDI_AGENT)) {
-						String agentType = obs.getData().getObjectSource().getName();
-						
-//						for(IComponentIdentifier agentIdentifier : space.getAgents()){
-						for(IComponentIdentifier agentIdentifier : space.getAgents()){
-							if(space.getContext().getComponentType(agentIdentifier).equals(agentType)){
-								//TODO: Apply / Check if filter has been set on this observer data
-								System.out.println("#DeltaTime4Exec# Starting Get rersult object. ");
-								
-								
-								ObserveBDIAgentThread thread = new ObserveBDIAgentThread(space,  agentIdentifier,  Constants.BDI_AGENT,  timestamp, null, null);
-								thread.start();
-//								thread.run();
-								
-								
-//								observedEvents.add(ObserverHelper.observeComponent(space, agentIdentifier, Constants.BDI_AGENT,  myTime, executor));
-//								String tmpRes = ObserverHelper.observeComponent(space, agentIdentifier, Constants.BDI_AGENT,  clockservice.getTime());
-//								System.out.println("#DeltaTime4Exec# received result from ObserverHelper.");
-							}
-								
-						}
-						
-					}
-					
-					
-					
-					}
-					
-					
-					
-					
-					
-					
-					
-					
-//					if (obs.getData().getObjectSource().getType().equals(Constants.BDI_AGENT)) {
-//						String agentType = obs.getData().getObjectSource().getName();
-//						
-//						for(IComponentIdentifier agentIdentifier : space.getAgents()){
-//							if(space.getContext().getComponentType(agentIdentifier).equals(agentType)){
-//								//TODO: Apply / Check if filter has been set on this observer data
-//								System.out.println("#DeltaTime4Exec# Starting ObserverHelper.");
-//								
-////								String tmpRes = ObserverHelper.observeComponent(space, agentIdentifier, Constants.BDI_AGENT,  clockservice.getTime());
-//								System.out.println("#DeltaTime4Exec# received result from ObserverHelper.");
-//							}
-//								
-//						}
-//						
-//					}
-					
-					for (Observer obs : observerList) {						
+						space.getProperties();
+
+						System.out.println("#Executor# ID: " + appName + " - Dilation: " + dilationCounter + " timestamp: " + timestamp);
+
+						// Observe elements: ISpaceObjects, BDI-Agents, MicroAgents
+						// Handle BDI-Agents separate due asyn call
 						// TODO: Differentiate between periodical and onChange Evaluation
-						if (obs.getData().getObjectSource().getName().equals("ISpaceObject")) {
 
-						} else {
-							System.err.println("#DeltaTimeExecutor4Simulation# Error on setting type of ObjectSource " + simConf);
+						for (final Observer obs : observerList) {
+
+							if (obs.getData().getObjectSource().getType().equals(Constants.BDI_AGENT)) {
+								String agentType = obs.getData().getObjectSource().getName();
+
+								// for(IComponentIdentifier agentIdentifier : space.getAgents()){
+								// for (IComponentIdentifier agentIdentifier : space.getAgents()) {
+								// if (space.getContext().getComponentType(agentIdentifier).equals(agentType)) {
+								IComponentIdentifier agentIdentifier = getIComponentIdentifier(space, agentType);
+								// if (agentIdentifier != null) {
+								// TODO: Apply / Check if filter has been set on this observer data
+								System.out.println("#DeltaTime4Exec# Starting get result for BDIAgent.");
+
+								((IComponentExecutionService) space.getContext().getServiceContainer().getService(IComponentExecutionService.class)).getExternalAccess(agentIdentifier,
+										new IResultListener() {
+
+											@Override
+											public void resultAvailable(Object source, Object result) {
+												ExternalAccessFlyweight exta = (ExternalAccessFlyweight) result;
+												System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + timestamp);
+												observedEvents.add(new ObservedEvent(appName, experimentId, timestamp, obs.getData(), exta.getAgentName()));
+											}
+
+											@Override
+											public void exceptionOccurred(Object source, Exception exception) {
+												// TODO Auto-generated method stub
+											}
+										});
+								// }
+								// }
+								// } else {
+								// System.err.println("#DeltaTimeExecutor4Simulation# Error on finding IComponentIdentifier for agentType " + agentType);
+								// }
+								// Observe ISpaceObject
+							} else if (obs.getData().getObjectSource().getName().equals("ISpaceObject")) {
+
+							} else {
+								System.err.println("#DeltaTimeExecutor4Simulation# Error on setting type of ObjectSource " + simConf);
+							}
+
 						}
 
+						// write result to beliefbase of client simulation agent
+						 addToBeliefBase(space, observedEvents, timestamp);
+//						addToSpace(space, observedEvents, timestamp);
+
+						// reset dilationCounter
+						dilationCounter = 0;
 					}
-					
-					//reset dilationCounter
-					dilationCounter = 0;
 
 					// Send the percepts to the agents.
-					space.getPerceptList().processPercepts(null);					
+					space.getPerceptList().processPercepts(null);
+					return false;
 				}
-				return false;
-			}
 			}
 		};
-		
+
 		this.timestamp = clockservice.getTime();
 
 		// Start the processes.
@@ -312,5 +284,67 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 			if (timer != null)
 				timer.cancel();
 		}
+	}
+
+	private void addToBeliefBase(final AbstractEnvironmentSpace space, final ArrayList<ObservedEvent> observedEvents, final long timestamp) {
+		if (clientSimulationAgent == null) {
+			clientSimulationAgent = getIComponentIdentifier(space, Constants.CLIENT_SIMULATION_AGENT);
+		}
+
+		// final ArrayList<ObservedEvent> observedEventsCopy = new ArrayList<ObservedEvent>();
+		// Collections.copy(observedEvents, observedEventsCopy);
+
+		((IComponentExecutionService) space.getContext().getServiceContainer().getService(IComponentExecutionService.class)).getExternalAccess(clientSimulationAgent, new IResultListener() {
+
+			@Override
+			public void resultAvailable(Object source, Object result) {
+				ExternalAccessFlyweight exta = (ExternalAccessFlyweight) result;
+				// System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + timestamp);
+				HashMap resultsMap = (HashMap) exta.getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).getFact();
+				resultsMap.put(timestamp, observedEvents);
+				System.out.println("TMP: " + observedEvents.size());
+				exta.getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).setFact(resultsMap);
+				// ((Map) space.getContext().getArguments()).put(Constants.OBSERVED_EVENTS_MAP, resultsMap);
+				//				
+				//				
+				//				
+				// observedEvents.add(new ObservedEvent(appName, experimentId, timestamp, obs.getData(), exta.getAgentName()));
+			}
+
+			@Override
+			public void exceptionOccurred(Object source, Exception exception) {
+				// TODO Auto-generated method stub
+			}
+		});
+	}
+
+	private void addToSpace(AbstractEnvironmentSpace space, ArrayList<ObservedEvent> observedEvents, long timestamp) {
+		HashMap<Long, ArrayList<ObservedEvent>> results;
+
+		if (space.getProperty(Constants.OBSERVED_EVENTS_MAP) == null) {
+			results = new HashMap<Long, ArrayList<ObservedEvent>>();
+		} else {
+			results = (HashMap<Long, ArrayList<ObservedEvent>>) space.getProperty(Constants.OBSERVED_EVENTS_MAP);
+		}
+		results.put(new Long(timestamp), observedEvents);
+		space.setProperty(Constants.OBSERVED_EVENTS_MAP, results);
+	}
+
+	/**
+	 * Returns the IComponentIdentifier for a agentType.
+	 * 
+	 * @param space
+	 * @param agentType
+	 * @return
+	 */
+	private IComponentIdentifier getIComponentIdentifier(AbstractEnvironmentSpace space, String agentType) {
+
+		for (IComponentIdentifier agentIdentifier : space.getAgents()) {
+			if (space.getContext().getComponentType(agentIdentifier).equals(agentType)) {
+				return agentIdentifier;
+			}
+		}
+		System.err.println("#DeltaTimeExecutor4Simulation# Error on finding IComponentIdentifier for " + agentType);
+		return null;
 	}
 }

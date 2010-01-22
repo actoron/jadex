@@ -39,8 +39,8 @@
 			<fact>"Welcome to Jadex."</fact>
 		</belief>
 
-		<belief name="observedEvents" class="List">
-			<fact>new ArrayList()</fact>
+		<belief name="observedEventsMap" class="HashMap">
+			<fact>new HashMap()</fact>
 		</belief>
 
 	</beliefs>
@@ -147,7 +147,7 @@
 			</goals>
 			<plans>
 				<initialplan ref="runtime_manager" />
-				<initialplan ref="init_observers" />
+				<!-- <initialplan ref="init_observers" /> -->
 			</plans>
 		</configuration>
 	</configurations>
