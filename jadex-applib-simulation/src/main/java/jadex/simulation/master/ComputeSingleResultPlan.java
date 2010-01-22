@@ -9,9 +9,13 @@ import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.SimulationConfiguration;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import org.jfree.ui.ArrowPanel;
 
 /**
  * Responsible for dealing with the resul of one single simulation experiment.
@@ -52,6 +56,12 @@ public class ComputeSingleResultPlan extends Plan {
 		
 		System.out.println("Map of Observed Events: ");
 		HashMap<Long, ArrayList<ObservedEvent>> observedEventsMap = (HashMap<Long, ArrayList<ObservedEvent>>) content.get(Constants.OBSERVED_EVENTS_MAP);
+		ArrayList arrayList = new ArrayList(observedEventsMap.keySet());
+		Collections.sort(arrayList);
+		
+		for(Object o : arrayList){
+			System.out.println("ooo: "  + o.toString());
+		}
 		
 		for (Iterator it = observedEventsMap.keySet().iterator(); it.hasNext();) {
 			Object key = it.next();

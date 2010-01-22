@@ -21,13 +21,13 @@
             <Evaluation mode="periodical" value="1000"/><!--If perdiocal, all have to have the same value -->
             <Filter mode="all"/><!-- All / one / subset of objects-JavaCondLanguage -->
         </Observer>
-        <Observer>
-            <Data name="AntWalkedCarriedFood"><!-- TODO: How to deal with Strings, Lists? -->
-                <ObjectSource type="BDI_Agent" name="Producer"/>
+        <!-- <Observer>-->
+        <!--    <Data name="AntWalkedCarriedFood">--><!-- TODO: How to deal with Strings, Lists? -->
+                <!-- <ObjectSource type="BDI_Agent" name="Sentry"/>
                 <ElementSource type="BDI_BELIEF" name="carriedFood" class="Int"/>                
             </Data>
             <Evaluation mode="onChange"/>
-        </Observer>
+        </Observer> -->
     </Observers>
 
     <DataVisualization>
