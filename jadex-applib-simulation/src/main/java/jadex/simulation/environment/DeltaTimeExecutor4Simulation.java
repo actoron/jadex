@@ -3,6 +3,7 @@ package jadex.simulation.environment;
 import jadex.application.space.envsupport.dataview.IDataView;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceExecutor;
+import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.ISpaceProcess;
 import jadex.application.space.envsupport.environment.SpaceObject;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
@@ -27,7 +28,6 @@ import jadex.simulation.model.Observer;
 import jadex.simulation.model.SimulationConfiguration;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -181,8 +181,11 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 											@Override
 											public void resultAvailable(Object source, Object result) {
 												ExternalAccessFlyweight exta = (ExternalAccessFlyweight) result;
-												System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + timestamp);
-												observedEvents.add(new ObservedEvent(appName, experimentId, timestamp, obs.getData(), exta.getAgentName()));
+												System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + timestamp);																								
+												ISpaceObject myself = (ISpaceObject) exta.getBeliefbase().getBelief("myself").getFact();											
+												
+												
+												observedEvents.add(new ObservedEvent(appName, experimentId, timestamp, obs.getData(), myself.getProperty("position")));
 											}
 
 											@Override
@@ -300,6 +303,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 			public void resultAvailable(Object source, Object result) {
 				ExternalAccessFlyweight exta = (ExternalAccessFlyweight) result;
 				// System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + timestamp);
+				System.out.println("bels: "+exta.getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP));
 				HashMap resultsMap = (HashMap) exta.getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).getFact();
 				resultsMap.put(timestamp, observedEvents);
 				System.out.println("TMP: " + observedEvents.size());
@@ -309,6 +313,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 				//				
 				//				
 				// observedEvents.add(new ObservedEvent(appName, experimentId, timestamp, obs.getData(), exta.getAgentName()));
+				
 			}
 
 			@Override
