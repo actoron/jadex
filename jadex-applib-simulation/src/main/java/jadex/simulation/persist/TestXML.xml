@@ -3,7 +3,7 @@
 <!--
     Document   : AutomatedSimulation.xml
     Created on : 17. Dezember 2009, 17:25
-    Updated on: 11-1-10, 15h
+    Updated on: 15-1-10, 19h
     Author     : vilenica
     Description:
         Purpose of the document follows.
@@ -15,17 +15,16 @@
     <Observers>
         <Observer>
             <Data name="AntWalkedSteps">
-                <ObjectSource type="BDI_Agent" name="Ant"/>
+                <ObjectSource type="BDI_Agent" name="Sentry"/>
                 <ElementSource type="BDI_BELIEF" name="walkedSteps" class="Int"/><!-- Add type of element: String, long, int etc.? -->
             </Data>
-            <Evaluation mode="periodical" value="1000"/>
+            <Evaluation mode="periodical" value="1000"/><!--If perdiocal, all have to have the same value -->
             <Filter mode="all"/><!-- All / one / subset of objects-JavaCondLanguage -->
         </Observer>
         <Observer>
             <Data name="AntWalkedCarriedFood"><!-- TODO: How to deal with Strings, Lists? -->
-                <ObjectSource type="BDI_Agent" name="Ant"/>
-                <ElementSource type="BDI_BELIEF" name="carriedFood" class="Int"/>
-                <Function name="MeanValue" aggregate="all"/><!-- All / one / subset of objects-JavaCondLanguage -->
+                <ObjectSource type="BDI_Agent" name="Producer"/>
+                <ElementSource type="BDI_BELIEF" name="carriedFood" class="Int"/>                
             </Data>
             <Evaluation mode="onChange"/>
         </Observer>
@@ -73,8 +72,8 @@
         </General>
         <Rows experiments="3">
             <TerminateCondition>
-                <!--Time value="120000" type="absolute"/>-->
-                <TargetFunction function="$object.money &gt; 5"/>
+                <Time value="5000" type="relative"/>
+                <!--<TargetFunction function="$object.money &gt; 5"/>-->
             </TerminateCondition>
         </Rows>
     </RunConfiguration>

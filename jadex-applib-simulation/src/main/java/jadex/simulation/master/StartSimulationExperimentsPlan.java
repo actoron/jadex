@@ -9,10 +9,12 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentExecutionService;
 import jadex.service.IServiceContainer;
 import jadex.simulation.helper.Constants;
+import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.Optimization;
 import jadex.simulation.model.SimulationConfiguration;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,28 +22,16 @@ import java.util.Map;
 public class StartSimulationExperimentsPlan extends Plan {
 
 	public void body() {
-		System.out
-				.println("#StartSimulationExpPlan# Start Simulation Experiments at Master.");
+		System.out.println("#StartSimulationExpPlan# Start Simulation Experiments at Master.");
 
-		HashMap beliefbasFacts = (HashMap) getBeliefbase().getBelief(
-				"generalSimulationFacts").getFact();
-		SimulationConfiguration simConf = (SimulationConfiguration) getBeliefbase()
-				.getBelief("simulationConf").getFact();
+		HashMap beliefbasFacts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
+		SimulationConfiguration simConf = (SimulationConfiguration) getBeliefbase().getBelief("simulationConf").getFact();
 
-		long experimentsPerRowToMake = ((Long) beliefbasFacts
-				.get(Constants.EXPERIMENTS_PER_ROW_TO_DO)).longValue();// how
-																		// many
-																		// experiments
-																		// to do
-																		// within
-																		// this
-																		// row
-		int totalRuns = ((Integer) beliefbasFacts
-				.get(Constants.TOTAL_EXPERIMENT_COUNTER)).intValue();
-		int expInRow = ((Integer) beliefbasFacts
-				.get(Constants.ROW_EXPERIMENT_COUNTER)).intValue();
-		int rowCounter = ((Integer) beliefbasFacts
-				.get(Constants.EXPERIMENT_ROW_COUNTER)).intValue();
+		// how many experiments to do within this row
+		long experimentsPerRowToMake = ((Long) beliefbasFacts.get(Constants.EXPERIMENTS_PER_ROW_TO_DO)).longValue();
+		int totalRuns = ((Integer) beliefbasFacts.get(Constants.TOTAL_EXPERIMENT_COUNTER)).intValue();
+		int expInRow = ((Integer) beliefbasFacts.get(Constants.ROW_EXPERIMENT_COUNTER)).intValue();
+		int rowCounter = ((Integer) beliefbasFacts.get(Constants.EXPERIMENT_ROW_COUNTER)).intValue();
 
 		// Prepare values for the experiments of this row
 		String fileName = simConf.getApplicationReference();
@@ -53,10 +43,16 @@ public class StartSimulationExperimentsPlan extends Plan {
 		simFacts.put(Constants.SIMULATION_FACTS_FOR_CLIENT, simConf);
 		// simFacts.put(Constants.EXPERIMENT_ID, experimentID);
 
+		
+		//Create Map that contains ObservedEvents, produced by the Executor
+		HashMap<Long, ArrayList<ObservedEvent>> observedEvents = new HashMap<Long, ArrayList<ObservedEvent>>();
+		
+		
 		// Put args into application. This args are passed to the
 		// application.xml to parameterize application.
 		Map args = new HashMap();
 		args.put(Constants.SIMULATION_FACTS_FOR_CLIENT, simFacts);
+		args.put(Constants.OBSERVED_EVENTS_MAP, observedEvents);
 
 		// check, whether parameters have to be swept
 		if (simConf.getOptimization().getParameterSweeping() != null) {
@@ -69,8 +65,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 			String appName = simConf.getName() + experimentID;
 
 			args.put(Constants.EXPERIMENT_ID, experimentID);
-			((HashMap) args.get(Constants.SIMULATION_FACTS_FOR_CLIENT)).put(
-					Constants.EXPERIMENT_ID, experimentID);
+			((HashMap) args.get(Constants.SIMULATION_FACTS_FOR_CLIENT)).put(Constants.EXPERIMENT_ID, experimentID);
 
 			startApplication(appName, fileName, configName, args);
 			// waitFor(2000);
@@ -78,9 +73,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 
 			// int runs = ((Integer) getBeliefbase().getBelief("numberOfRuns")
 			// .getFact()).intValue();
-			System.out
-					.println("#StartSimulationExpPlan# Started new Simulation Experiment. Nr.:"
-							+ experimentID + "(" + totalRuns + ")");
+			System.out.println("#StartSimulationExpPlan# Started new Simulation Experiment. Nr.:" + experimentID + "(" + totalRuns + ")");
 			totalRuns++;
 			expInRow++;
 			// getBeliefbase().getBelief("numberOfRuns").setFact(new
@@ -93,26 +86,20 @@ public class StartSimulationExperimentsPlan extends Plan {
 			// new Integer(runs));
 			// waitFor(5000);
 			waitForInternalEvent("triggerNewExperiment");
-			System.out
-					.println("#StartSimulationExpPlan# Received Results of Client!!!!");
+			System.out.println("#StartSimulationExpPlan# Received Results of Client!!!!");
 			// HACK: Ein warten scheint notwendig zu sein..., damit Ausführung
 			// korrekt läuft.
 			waitFor(2000);
 			// System.out.println("2Received Results!!!!");
-			beliefbasFacts.put(Constants.TOTAL_EXPERIMENT_COUNTER, new Integer(
-					totalRuns));
-			beliefbasFacts.put(Constants.ROW_EXPERIMENT_COUNTER, new Integer(
-					expInRow));
-			getBeliefbase().getBelief("generalSimulationFacts").setFact(
-					beliefbasFacts);
+			beliefbasFacts.put(Constants.TOTAL_EXPERIMENT_COUNTER, new Integer(totalRuns));
+			beliefbasFacts.put(Constants.ROW_EXPERIMENT_COUNTER, new Integer(expInRow));
+			getBeliefbase().getBelief("generalSimulationFacts").setFact(beliefbasFacts);
 		}
 
 		// Increment row counter
 		rowCounter++;
-		beliefbasFacts.put(Constants.EXPERIMENT_ROW_COUNTER, new Integer(
-				rowCounter));
-		getBeliefbase().getBelief("generalSimulationFacts").setFact(
-				beliefbasFacts);
+		beliefbasFacts.put(Constants.EXPERIMENT_ROW_COUNTER, new Integer(rowCounter));
+		getBeliefbase().getBelief("generalSimulationFacts").setFact(beliefbasFacts);
 		dispatchInternalEvent(createInternalEvent("triggerExperimentRowEvaluation"));
 		//
 
@@ -184,8 +171,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 		dispatchSubgoalAndWait(ca);
 	}
 
-	private void startApplication(String appName, String fileName,
-			String configName, Map args) {
+	private void startApplication(String appName, String fileName, String configName, Map args) {
 		// private void startApplication(String experimentID) {
 
 		// SimulationConfiguration simConf = (SimulationConfiguration)
@@ -218,12 +204,9 @@ public class StartSimulationExperimentsPlan extends Plan {
 		// <argument name="evaporation_rate" typename="Double">0.03</argument>
 
 		try {
-			IComponentExecutionService executionService = (IComponentExecutionService) getScope()
-					.getServiceContainer().getService(
-							IComponentExecutionService.class);
+			IComponentExecutionService executionService = (IComponentExecutionService) getScope().getServiceContainer().getService(IComponentExecutionService.class);
 
-			executionService.createComponent(appName, fileName, configName,
-					args, false, null, null, null);
+			executionService.createComponent(appName, fileName, configName, args, false, null, null, null);
 
 		} catch (Exception e) {
 			// JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this),
@@ -252,7 +235,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 			int currentVal = opt.getParameterSweeping().getCurrentValue();
 			val = currentVal + step;
 		}
-		
+
 		// update SimulationConf to be up to date
 		opt.getParameterSweeping().setCurrentValue(val);
 		opt.getParameterSweeping().incrementParameterSweepCounter();

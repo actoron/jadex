@@ -97,6 +97,9 @@
 				<env:objecttype name="experimentID">
 					<env:property name="experimentID">$args.Experiment_id</env:property>					
 				</env:objecttype>
+				<!-- TMP_HACK: Needed in order to able to find the IComponentIdentifier for this agent from the space. Used within the DeltaTimeExecutor4Simulation. -->
+				<env:objecttype name="clientSimulator"/>					
+				
 			</env:objecttypes>
 
 			<env:avatarmappings>
@@ -104,6 +107,7 @@
 				<env:avatarmapping agenttype="Producer"
 					objecttype="producer" />
 				<env:avatarmapping agenttype="Carry" objecttype="carry" />
+				<env:avatarmapping agenttype="ClientSimulator" objecttype="clientSimulator" />
 			</env:avatarmappings>
 
 			<env:tasktypes>
@@ -252,7 +256,7 @@
 			filename="jadex/bdi/examples/marsworld/producer/Producer.agent.xml" />
 		<agenttype name="Carry"
 			filename="jadex/bdi/examples/marsworld/carry/Carry.agent.xml" />
-		<agenttype name="SimulationClient"
+		<agenttype name="ClientSimulator"
 			filename="jadex/simulation/client/ClientSimulator.agent.xml" />
 	</agenttypes>
 
@@ -330,7 +334,7 @@
 				<agent type="Sentry" number="1" />
 				<agent type="Producer" number="$args.ProducerNumber" />
 				<agent type="Carry" number="1" />
-				<agent type="SimulationClient" master="true">
+				<agent type="ClientSimulator" master="true">
 					<arguments>
 						<!-- The mission time. -->
 						<!-- <argument name="msg">new String("really-true-tte")</argument>

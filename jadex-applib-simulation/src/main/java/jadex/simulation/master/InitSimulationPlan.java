@@ -36,7 +36,6 @@ public class InitSimulationPlan extends Plan{
 		facts.put(Constants.EXPERIMENT_ROW_COUNTER, new Integer(0));
 		facts.put(Constants.EXPERIMENTS_PER_ROW_TO_DO, new Long(simConf.getRunConfiguration().getRows().getExperiments()));
 		facts.put(Constants.ROWS_TO_DO, new Integer(simConf.getRunConfiguration().getGeneral().getRows()));
-//		facts.put(new String("HSV"), new Integer(1887));
 		
 		getBeliefbase().getBelief("generalSimulationFacts").setFact(facts);
 		getBeliefbase().getBelief("simulationConf").setFact(simConf);

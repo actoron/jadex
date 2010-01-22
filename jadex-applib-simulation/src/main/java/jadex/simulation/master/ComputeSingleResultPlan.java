@@ -1,15 +1,14 @@
 package jadex.simulation.master;
 
-import jadex.adapter.base.SComponentFactory;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.service.IServiceContainer;
 import jadex.simulation.helper.Constants;
-import jadex.simulation.helper.ResClass;
 import jadex.simulation.model.ExperimentResult;
+import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.SimulationConfiguration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -49,8 +48,27 @@ public class ComputeSingleResultPlan extends Plan {
 		int experimentRow = ((Integer) facts.get(Constants.EXPERIMENT_ROW_COUNTER)).intValue();
 		int expInRow = ((Integer) facts.get(Constants.ROW_EXPERIMENT_COUNTER)).intValue();
 		int totalRuns = ((Integer) facts.get(Constants.TOTAL_EXPERIMENT_COUNTER)).intValue();
-		String res = "ID: " + experimentRow + "." + expInRow + "("   + totalRuns  + ") ***********************************";
+
 		
+		System.out.println("Map of Observed Events: ");
+		HashMap<Long, ArrayList<ObservedEvent>> observedEventsMap = (HashMap<Long, ArrayList<ObservedEvent>>) content.get(Constants.OBSERVED_EVENTS_MAP);
+		
+		for (Iterator it = observedEventsMap.keySet().iterator(); it.hasNext();) {
+			Object key = it.next();
+			ArrayList<ObservedEvent> values = (ArrayList<ObservedEvent>) observedEventsMap.get(key);
+			String tmp = null;
+			
+			for(ObservedEvent event : values){
+				tmp += " - " + event.toString();
+			}
+			System.out.println(key.toString()  + " : " + tmp);
+//						
+//			System.out.println(key.toString() + "-->" + value.toString());
+		}
+		
+		
+		
+		String res = "ID: " + experimentRow + "." + expInRow + "("   + totalRuns  + ") ***********************************";
 		System.out.println(res);
 //		for (Iterator it = content.keySet().iterator(); it.hasNext();) {
 //			Object key = it.next();
