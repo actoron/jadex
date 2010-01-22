@@ -9,6 +9,7 @@ import jadex.xml.SXML;
 import jadex.xml.TypeInfo;
 import jadex.xml.writer.AbstractObjectWriterHandler;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,9 +28,9 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 {
 	//-------- attributes --------
 	
-	/** The bean introspector. */
-//	protected IBeanIntrospector introspector = new BeanReflectionIntrospector();
-	protected IBeanIntrospector introspector = new BeanInfoIntrospector();
+	/** The bean introspector (also scans for public fields). */
+	protected IBeanIntrospector introspector = new BeanReflectionIntrospector();
+//	protected IBeanIntrospector introspector = new BeanInfoIntrospector();
 	
 	/** The namespaces by package. */
 	protected Map namespacebypackage = new HashMap();
@@ -223,6 +224,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		Object value = null;
 		
 		Method method;
+		Field field = null;
 		
 		BeanAttributeInfo binfo = null;
 		if(info instanceof BeanAttributeInfo)
@@ -235,10 +237,24 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		else if(attr instanceof BeanProperty)
 		{
 			method = ((BeanProperty)attr).getGetter();
+			if(method==null)
+			{
+				field = ((BeanProperty)attr).getField();
+			}
 		}
 		else if(attr instanceof String)
 		{
 			method = findGetMethod(object, (String)attr, new String[]{"get", "is"});
+			if(method==null)
+			{
+				try
+				{
+					field = object.getClass().getField((String)attr);
+				}
+				catch(Exception e)
+				{
+				}
+			}
 		}
 //		else if(attr instanceof QName)
 //		{
@@ -256,13 +272,31 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 //			binfo.setReadMethod(method);
 //		}
 		
-		try
-		{	
-			value = method.invoke(object, new Object[0]);
-		}
-		catch(Exception e)
+		if(method!=null)
 		{
-			e.printStackTrace();
+			try
+			{	
+				value = method.invoke(object, new Object[0]);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		else if(field!=null)
+		{
+			try
+			{	
+				value = field.get(object);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			throw new RuntimeException("Could not fetch value: "+object+" "+attr);
 		}
 		
 		return value;
@@ -314,9 +348,9 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Get the properties of an object. 
 	 */
-	protected Collection getProperties(Object object, Object context)
+	protected Collection getProperties(Object object, Object context, boolean includefields)
 	{
-		return introspector.getBeanProperties(object.getClass()).values();
+		return introspector.getBeanProperties(object.getClass(), includefields).values();
 	}
 
 	/**
@@ -340,8 +374,8 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				// nop
 			}
 		}
-		if(method==null)
-			throw new RuntimeException("No getter found for: "+name);
+//		if(method==null)
+//			throw new RuntimeException("No getter found for: "+name);
 		
 		return method;
 	}

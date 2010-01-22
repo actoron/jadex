@@ -71,7 +71,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 	{
 		this.container = container;
 		this.adapters = Collections.synchronizedMap(SCollection.createHashMap());
-		this.descs = Collections.synchronizedMap(SCollection.createHashMap());
+		this.descs = Collections.synchronizedMap(SCollection.createLinkedHashMap());
 		this.logger = Logger.getLogger(container.getName()+".cms");
 		this.listeners = SCollection.createMultiCollection();
 		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());

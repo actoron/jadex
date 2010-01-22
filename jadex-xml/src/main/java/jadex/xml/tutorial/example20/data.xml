@@ -1,0 +1,12 @@
+<customer>
+  <person cust-num="123456789">
+    <first-name>John</first-name>
+    <last-name>Smith</last-name>
+  </person>
+  <street>12345 Happy Lane</street>
+  <city>Plunk</city>
+  <state>WA</state>
+  <zip>98059</zip>
+  <total>818.42</total>
+  <orders>2393901 3119013 3221010 4390901 6501931</orders>
+</customer>

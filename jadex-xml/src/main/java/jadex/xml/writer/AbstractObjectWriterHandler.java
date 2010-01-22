@@ -134,16 +134,17 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 							if(value!=null)
 							{
 								Object defval = getDefaultValue(info);
-								
 								if(!value.equals(defval))
 								{
+									value = convertValue(info, value, classloader, context);
+									
+									// Do we want sometimes to write default values?
 									String xmlattrname = null;
 									if(info instanceof AttributeInfo)
 										xmlattrname = ((AttributeInfo)info).getXMLAttributeName().getLocalPart();
 									if(xmlattrname==null)
 										xmlattrname = getPropertyName(property);
 									
-									value = convertValue(info, value, classloader, context);
 									wi.addAttribute(xmlattrname, value.toString());
 								}
 							}
@@ -211,7 +212,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 			
 		// Get properties from type inspection.
 		
-		Collection props = getProperties(object, context);
+		Collection props = getProperties(object, context, typeinfo!=null? typeinfo.isIncludeFields(): false);
 		if(props!=null)
 		{
 			for(Iterator it=props.iterator(); it.hasNext(); )
@@ -343,7 +344,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	/**
 	 *  Get the properties of an object. 
 	 */
-	protected abstract Collection getProperties(Object object, Object context);
+	protected abstract Collection getProperties(Object object, Object context, boolean includefields);
 
 	/**
 	 *  Test is a value is a basic type (and can be mapped to an attribute).

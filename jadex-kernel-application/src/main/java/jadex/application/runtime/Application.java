@@ -670,7 +670,7 @@ public class Application	implements IComponentInstance
 				for(int j=0; j<num; j++)
 				{
 					IComponentExecutionService	ces	= (IComponentExecutionService)adapter.getServiceContainer().getService(IComponentExecutionService.class);
-					ces.createComponent(agent.getName(), agent.getType(model.getApplicationType()).getFilename(), agent.getConfiguration(), agent.getArguments(this, cl), false, null, adapter.getComponentIdentifier(), null);					
+					ces.createComponent(agent.getName(), agent.getType(model.getApplicationType()).getFilename(), agent.getConfiguration(), agent.getArguments(this, cl), agent.isSuspended(), null, adapter.getComponentIdentifier(), null);					
 	//				context.createAgent(agent.getName(), agent.getTypeName(),
 	//					agent.getConfiguration(), agent.getArguments(container, apptype, cl), agent.isStart(), agent.isMaster(),
 	//					DefaultResultListener.getInstance(), null);	

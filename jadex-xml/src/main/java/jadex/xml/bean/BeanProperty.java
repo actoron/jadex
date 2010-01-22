@@ -1,5 +1,6 @@
 package jadex.xml.bean;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
@@ -20,10 +21,14 @@ public class BeanProperty
 
 	/** The setter. */
 	protected Method setter;
-
+	
 	/** The setter type. */
 	protected Class	settertype;
 
+	/** The field. */
+	protected Field field;
+
+	
 	//-------- constructors --------
 	
 	/**
@@ -43,6 +48,17 @@ public class BeanProperty
 		this.getter = getter;
 		this.setter = setter;
 		this.settertype = settertype;
+	}
+	
+	/**
+	 *  Create a new bean property.
+	 */
+	public BeanProperty(String name, Field field)
+	{
+		this.name = name;
+		this.type = field.getType();
+		this.settertype = type;
+		this.field = field;
 	}
 
 	//-------- methods --------
@@ -135,6 +151,24 @@ public class BeanProperty
 	public void setSetterType(Class settertype)
 	{
 		this.settertype = settertype;
+	}
+
+	/**
+	 *  Get the field.
+	 *  @return The field.
+	 */
+	public Field getField()
+	{
+		return this.field;
+	}
+
+	/**
+	 *  Set the field.
+	 *  @param field The field to set.
+	 */
+	public void setField(Field field)
+	{
+		this.field = field;
 	}
 
 }

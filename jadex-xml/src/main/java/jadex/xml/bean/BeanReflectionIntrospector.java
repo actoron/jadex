@@ -3,6 +3,7 @@ package jadex.xml.bean;
 
 import jadex.commons.collection.LRU;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 	
 	/** The cache for saving time for multiple lookups. */
 	protected LRU beaninfos;
-	
+
 	//-------- constructors --------
 	
 	/**
@@ -43,7 +44,7 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 	/**
 	 *  Get the bean properties for a specific clazz.
 	 */
-	public Map getBeanProperties(Class clazz)
+	public Map getBeanProperties(Class clazz, boolean includefields)
 	{
 //		Map ret = (Map)(beaninfos!=null? beaninfos.get(clazz): null);
 		Map ret = (Map)beaninfos.get(clazz);
@@ -86,6 +87,20 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 					ret.put(property_java_name, new BeanProperty(property_java_name, getter.getReturnType(), getter, setter, setter_param_type[0]));
 				}
 			}
+            
+            // Get all public fields.
+            if(includefields)
+            {
+	            Field[] fields = clazz.getFields();
+	            for(int i=0; i<fields.length; i++)
+	            {
+	            	String property_java_name = fields[i].getName();
+	            	if(!ret.containsKey(property_java_name))
+	            	{
+	            		ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
+	            	}
+	            }
+            }
             
 //            if(beaninfos==null)
 //            	beaninfos = new LRU(200);

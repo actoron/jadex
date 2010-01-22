@@ -1,0 +1,12 @@
+<customer phone="888.555.1234"
+  xmlns="http://www.sosnoski.com/ns1">
+  <ns2:person ns2:cust-num="123456789"
+    xmlns:ns2="http://www.sosnoski.com/ns2">
+    <ns2:first-name>John</ns2:first-name>
+    <ns2:last-name>Smith</ns2:last-name>
+  </ns2:person>
+  <street>12345 Happy Lane</street>
+  <city>Plunk</city>
+  <state>WA</state>
+  <zip>98059</zip>
+</customer>

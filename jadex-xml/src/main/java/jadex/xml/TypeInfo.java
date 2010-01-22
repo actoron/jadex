@@ -41,8 +41,8 @@ public class TypeInfo	extends AbstractInfo
 	/** The attributes info (xmlname -> attrinfo). */
 	protected Map attributeinfos;
 	
-	/** The namespace. */
-//	protected Namespace namespace;
+	/** The include fields flag. */
+	protected boolean includefields;
 	
 	// read
 	
@@ -129,7 +129,7 @@ public class TypeInfo	extends AbstractInfo
 		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
 		SubobjectInfo[] subobjectinfos)
 	{
-		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributeinfos, postproc, filter, subobjectinfos, true);
+		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributeinfos, postproc, filter, subobjectinfos, true, false);
 	}
 	
 	/**
@@ -143,7 +143,7 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public TypeInfo(TypeInfo supertype, String xmlpath, Object typeinfo, Object commentinfo, 
 		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
-		SubobjectInfo[] subobjectinfos, boolean createfromtag)
+		SubobjectInfo[] subobjectinfos, boolean createfromtag, boolean includefields)
 	{
 		super(xmlpath, filter);
 		this.supertype = supertype;
@@ -152,6 +152,7 @@ public class TypeInfo	extends AbstractInfo
 		this.contentinfo = contentinfo;
 		this.postproc = postproc;
 		this.createfromtag = createfromtag;
+		this.includefields = includefields;
 		
 		if(attributeinfos!=null)
 			this.attributeinfos = createAttributeInfos(attributeinfos);
@@ -299,6 +300,15 @@ public class TypeInfo	extends AbstractInfo
 	}
 	
 	/**
+	 *  Get the includefields.
+	 *  @return The includefields.
+	 */
+	public boolean isIncludeFields()
+	{
+		return this.includefields;
+	}
+	
+	/**
 	 *  Get the namespace.
 	 *  @return The namespace.
 	 * /
@@ -331,7 +341,7 @@ public class TypeInfo	extends AbstractInfo
 			ret = supertype.getAttributeInfo(xmlname);
 		return ret;
 	}*/
-	
+
 	/**
 	 *  Get the attribute info.
 	 *  @param xmlname The xml name of the attribute.

@@ -596,7 +596,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			// Try to find bean class information
 			
-			Map props = introspector.getBeanProperties(object.getClass());
+			Map props = introspector.getBeanProperties(object.getClass(), true);
 			BeanProperty prop = (BeanProperty)props.get(attrinfo instanceof String? attrinfo: xmlattrname.getLocalPart());
 			if(prop!=null)
 			{
@@ -604,7 +604,10 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 
 				try
 				{
-					prop.getSetter().invoke(object, new Object[]{arg});
+					if(prop.getSetter()!=null)
+						prop.getSetter().invoke(object, new Object[]{arg});
+					else
+						prop.getField().set(object, arg);
 					set = true;
 				}
 				catch(Exception e)
@@ -615,9 +618,6 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			if(!set)
 			{
-				String fieldname = attrinfo instanceof String? (String)attrinfo: xmlattrname.getLocalPart();
-				set = setField(fieldname, object, attrval, null, classloader, context, root);
-				
 				String postfix = attrinfo instanceof String? ((String)attrinfo).substring(0,1).toUpperCase()+((String)attrinfo).substring(1)
 					: xmlattrname.getLocalPart().substring(0,1).toUpperCase()+xmlattrname.getLocalPart().substring(1);
 				set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, null);
@@ -742,6 +742,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					}
 					catch(Exception e)
 					{
+//						e.printStackTrace();
 					}
 				}
 				else if(object instanceof String)

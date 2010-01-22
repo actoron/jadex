@@ -86,13 +86,13 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]{"comanalyzer", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "new_comanalyzer.png"), "comanalyzer_sel",
-			SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "new_comanalyzer_sel.png"), "agent_ignored", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "new_agent.gif"),
-			"introspect_agent", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "new_comanalyzer.png"), "close_comanalyzer",
-			SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "close_comanalyzer.png"), "agent_introspected",
-			SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "new_agent_introspected.gif"), "agent_dead", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "new_agent_gray.gif"),
-			"agent_unknown", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "agent_unknown.png"), "agent_dummy",
-			SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "agent_dummy.png"), "load", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "load.png"), "save",
-			SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "save2.png"), "clear", SGUI.makeIcon(ToolTab.class, COMMON_IMAGES + "litter2.png"),});
+		SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "new_comanalyzer_sel.png"), "agent_ignored", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "new_agent.gif"),
+		"introspect_agent", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "new_comanalyzer.png"), "close_comanalyzer",
+		SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "close_comanalyzer.png"), "agent_introspected",
+		SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "new_agent_introspected.gif"), "agent_dead", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "new_agent_gray.gif"),
+		"agent_unknown", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "agent_unknown.png"), "agent_dummy",
+		SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "agent_dummy.png"), "load", SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "load.png"), "save",
+		SGUI.makeIcon(ComanalyzerPlugin.class, COMANALYZER_IMAGES + "save2.png"), "clear", SGUI.makeIcon(ToolTab.class, COMMON_IMAGES + "litter2.png"),});
 
 	/** Refresh immediately. */
 	protected static final long REFRESHI = Long.MIN_VALUE;
@@ -1062,8 +1062,24 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			// add to agent tree table
 			IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer()
 				.getService(IComponentExecutionService.class);
-			IComponentDescription desc = ces.createComponentDescription(sender.getAid(), null, null, null);
-			agents.addComponent(desc);
+			ces.getComponentDescription(sender.getAid(), new IResultListener()
+			{
+				public void resultAvailable(Object source, final Object result)
+				{
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							if(result!=null)
+								agents.addComponent((IComponentDescription)result);
+						}
+					});
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+				}
+			});
 		}
 		else
 		{
@@ -1076,6 +1092,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		Agent receiver = agentlist.getAgent(rid);
 		if(receiver == null)
 		{
+			System.out.println("test: "+rid+" "+agentlist);
 			receiver = new Agent(rid);
 			receiver.setState(Agent.STATE_DEAD);
 			receiver.addMessage(message);
@@ -1085,9 +1102,25 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			// add to agent tree table
 			IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer()
 				.getService(IComponentExecutionService.class);
-			IComponentDescription ad = ces.createComponentDescription(receiver.getAid(), null, null, null);
-			agents.addComponent(ad);
-
+			
+			ces.getComponentDescription(rid, new IResultListener()
+			{
+				public void resultAvailable(Object source, final Object result)
+				{
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							if(result!=null)
+								agents.addComponent((IComponentDescription)result);
+						}
+					});
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+				}
+			});
 		}
 		else
 		{

@@ -190,7 +190,7 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Get the properties of an object. 
 	 */
-	protected Collection getProperties(Object object, Object context)
+	protected Collection getProperties(Object object, Object context, boolean includefields)
 	{
 		Collection ret = new LinkedHashSet();
 		IOAVState state = (IOAVState)context;

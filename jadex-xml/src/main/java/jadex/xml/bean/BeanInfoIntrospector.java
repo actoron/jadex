@@ -6,6 +6,7 @@ import jadex.commons.collection.LRU;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class BeanInfoIntrospector implements IBeanIntrospector
 	/**
 	 *  Get the bean properties for a specific clazz.
 	 */
-	public Map getBeanProperties(Class clazz)
+	public Map getBeanProperties(Class clazz, boolean includefields)
 	{
 		Map ret = (Map)beaninfos.get(clazz);
 		
@@ -54,7 +55,7 @@ public class BeanInfoIntrospector implements IBeanIntrospector
 			{
 				BeanInfo bi = Introspector.getBeanInfo(clazz);
 				PropertyDescriptor[] pds = bi.getPropertyDescriptors();
-				HashMap props = new HashMap();
+				ret = new HashMap();
 	            for(int k=0; k<pds.length; k++) 
 	            {
 					PropertyDescriptor pd = pds[k];
@@ -65,16 +66,30 @@ public class BeanInfoIntrospector implements IBeanIntrospector
 						Class[] setter_param_type = setter.getParameterTypes();
 						if (setter_param_type.length==1) 
 						{
-							props.put(pd.getName(), new BeanProperty(pd.getName(), pd.getPropertyType(), getter, setter, setter_param_type[0]));
+							ret.put(pd.getName(), new BeanProperty(pd.getName(), pd.getPropertyType(), getter, setter, setter_param_type[0]));
 						}
 					}
 				}
 				
+	            // Get all public fields.
+	            if(includefields)
+	            {
+		            Field[] fields = clazz.getFields();
+		            for(int i=0; i<fields.length; i++)
+		            {
+		            	String property_java_name = fields[i].getName();
+		            	if(!ret.containsKey(property_java_name))
+		            	{
+		            		ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
+		            	}
+		            }
+	            }
+	            
 	            beaninfos.put(clazz, ret);
-				ret = props;
 			}
 			catch(Exception e)
 			{	
+				e.printStackTrace();
 				throw new RuntimeException(e);
 			}
 		}

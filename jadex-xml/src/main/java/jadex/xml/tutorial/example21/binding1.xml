@@ -1,0 +1,22 @@
+<!-- This is a namespaced example binding for using the hashmap custom
+  marshaller/unmarshaller. As in binding0.xml, the custom
+  marshaller/unmarshaller is defined as the default for all instances of
+  java.util.HashMap (by the first <mapping> element within the binding). -->
+<binding>
+  <namespace uri="http://www.sosnoski.com" prefix="dms" default="all"/>
+  <mapping class="java.util.HashMap" name="map"
+      marshaller="example21.HashMapper" unmarshaller="example21.HashMapper"/>
+  <mapping name="directory" class="example21.Directory">
+    <structure field="customerMap"/>
+  </mapping>
+  <mapping name="customer" class="example21.Customer" value-style="attribute">
+    <structure name="name" field="name">
+      <value name="first-name" field="firstName"/>
+      <value name="last-name" field="lastName"/>
+    </structure>
+    <value name="street" field="street" style="element"/>
+    <value name="city" field="city" style="element"/>
+    <value name="state" field="state"/>
+    <value name="zip" field="zip"/>
+  </mapping>
+</binding>

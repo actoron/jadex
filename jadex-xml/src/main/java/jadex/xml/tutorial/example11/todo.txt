@@ -1,0 +1,44 @@
+Objective:
+
+Using object references in the XML.
+
+Changes in Jadex XML:
+
+Same as in example08 
+  
+- todo: support also setAirports(Object[] airports). This requires to change
+the linking process for bulk links.
+
+Original Jibx config and result:
+
+<binding>
+  <mapping name="timetable" class="example11.TimeTable">
+    <collection name="carriers" field="carriers"/>
+    <collection name="airports" field="airports"/>
+    <collection name="routes" field="routes">
+      <structure name="route" value-style="attribute" type="example11.Route">
+        <value name="from" field="from" ident="ref"/>
+        <value name="to" field="to" ident="ref"/>
+        <collection field="flights">
+          <structure name="flight" type="example11.Flight">
+            <value name="carrier" field="carrier" ident="ref"/>
+            <value name="number" field="number"/>
+            <value name="depart" field="departure"/>
+            <value name="arrive" field="arrival"/>
+          </structure>
+        </collection>
+      </structure>
+    </collection>
+  </mapping>
+  <mapping name="carrier" class="example11.Carrier">
+    <value style="attribute" name="code" field="code" ident="def"/>
+    <value style="attribute" name="rating" field="rating"/>
+    <value name="url" field="url"/>
+    <value name="name" field="name"/>
+  </mapping>
+  <mapping name="airport" class="example11.Airport">
+    <value style="attribute" name="code" field="code" ident="def"/>
+    <value name="location" field="location"/>
+    <value name="name" field="name"/>
+  </mapping>
+</binding>

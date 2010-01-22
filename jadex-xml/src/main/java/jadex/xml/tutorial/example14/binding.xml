@@ -1,0 +1,22 @@
+<binding>
+  <mapping name="customer" class="example14.Customer">
+    <structure name="person" value-style="attribute">
+      <value name="cust-num" field="customerNumber"/>
+      <value name="first-name" field="firstName"/>
+      <value style="text" field="lastName"/>
+    </structure>
+    <structure name="ship-address" field="shipAddress"/>
+    <structure name="bill-address" field="billAddress" usage="optional"/>
+    <value name="phone" field="phone"/>
+  </mapping>
+  <mapping name="subscriber" class="example14.Subscriber">
+    <value name="name" field="name"/>
+    <structure field="mailAddress"/>
+  </mapping>
+  <mapping class="example14.Address" abstract="true">
+    <value name="street" field="street"/>
+    <value name="city" field="city"/>
+    <value name="state" field="state"/>
+    <value name="zip" style="attribute" field="zip"/>
+  </mapping>
+</binding>

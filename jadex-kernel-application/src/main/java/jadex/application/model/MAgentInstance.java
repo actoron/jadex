@@ -35,6 +35,9 @@ public class MAgentInstance
 	/** The master flag. */
 	protected boolean master;
 	
+	/** The suspended flag. */
+	protected boolean suspended;
+	
 	/** The list of contained arguments. */
 	protected List arguments;
 	
@@ -146,6 +149,24 @@ public class MAgentInstance
 	}
 	
 	/**
+	 *  Get the suspended.
+	 *  @return The suspended.
+	 */
+	public boolean isSuspended()
+	{
+		return this.suspended;
+	}
+
+	/**
+	 *  Set the suspended.
+	 *  @param suspended The suspended to set.
+	 */
+	public void setSuspended(boolean suspended)
+	{
+		this.suspended = suspended;
+	}
+
+	/**
 	 *  Set the number text.
 	 *  @param numbertext The number text.
 	 */
@@ -155,7 +176,8 @@ public class MAgentInstance
 	}
 	
 	/**
-	 * 
+	 *  Get the number text (expression).
+	 *  @return The number text.
 	 */
 	public String getNumberText()
 	{

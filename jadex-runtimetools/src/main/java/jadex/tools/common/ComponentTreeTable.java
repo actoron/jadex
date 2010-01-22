@@ -143,7 +143,7 @@ public class ComponentTreeTable extends JScrollPane
 	 */
 	public void addComponent(IComponentDescription desc)
 	{
-		DefaultTreeTableNode	parent	= (DefaultTreeTableNode)(desc.getParent()!=null ? nodes.get(desc.getParent()) : platform);
+		DefaultTreeTableNode parent	= (DefaultTreeTableNode)(desc.getParent()!=null ? nodes.get(desc.getParent()) : platform);
 		
 		Map values = new HashMap();
 		values.put("name", desc.getName().getName());

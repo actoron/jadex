@@ -1,0 +1,25 @@
+Objective:
+
+- Using collections
+
+Changes in Jadex XML:
+
+Original Jibx config and result:
+
+<binding>
+  <mapping name="timetable" class="example10.TimeTable">
+    <collection field="carriers" item-type="example10.Carrier"/>
+    <collection field="airports"/>
+  </mapping>
+  <mapping name="carrier" class="example10.Carrier">
+    <value style="attribute" name="code" field="code"/>
+    <value style="attribute" name="rating" field="rating"/>
+    <value name="url" field="url"/>
+    <value name="name" field="name"/>
+  </mapping>
+  <mapping name="airport" class="example10.Airport">
+    <value style="attribute" name="code" field="code"/>
+    <value name="location" field="location"/>
+    <value name="name" field="name"/>
+  </mapping>
+</binding>

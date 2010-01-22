@@ -1,0 +1,19 @@
+<binding>
+  <format type="int[]" serializer="example20.Conversion.serializeIntArray"
+    deserializer="example20.Conversion.deserializeIntArray"/>
+  <mapping name="customer" class="example20.Customer">
+    <structure name="person">
+      <value name="cust-num" style="attribute" field="customerNumber"/>
+      <value name="first-name" field="firstName"/>
+      <value name="last-name" field="lastName"/>
+    </structure>
+    <value name="street" field="street"/>
+    <value name="city" field="city"/>
+    <value name="state" field="state"/>
+    <value name="zip" field="zip"/>
+    <value name="total" field="total"
+      serializer="example20.Conversion.serializeDollarsCents"
+      deserializer="example20.Conversion.deserializeDollarsCents"/>
+    <value name="orders" field="orders"/>
+  </mapping>
+</binding>

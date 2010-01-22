@@ -9,10 +9,13 @@ public class AttributeInfo
 {
 	//-------- constants --------
 	
+	/** Constant for identifying this. */
 	public static final String THIS = "__this"; 
 
+	/** Constant for identifying content. */
 	public static final String CONTENT = "__content"; 
 	
+	/** Constant for identifying comment. */
 	public static final String COMMENT = "__comment"; 
 	
 	/** Ignore when reading. */
@@ -81,6 +84,14 @@ public class AttributeInfo
 	 */
 	public AttributeInfo(QName xmlattributename, Object attributeidentifier, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, Object defaultvalue)
 	{
+		this(xmlattributename, attributeidentifier, ignore, converterread, converterwrite, null, false);
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public AttributeInfo(QName xmlattributename, Object attributeidentifier, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, Object defaultvalue, boolean writeastag)
+	{
 		this.xmlattributename = xmlattributename;
 		this.attributeidentifier = attributeidentifier;
 		this.ignore = ignore;
@@ -120,6 +131,7 @@ public class AttributeInfo
 	{
 		this(xmlattributename==null? null: QName.valueOf(xmlattributename), attributeidentifier, ignore, converterread, converterwrite, defaultvalue);
 	}
+	
 
 	//-------- methods --------
 	
@@ -185,4 +197,5 @@ public class AttributeInfo
 	{
 		return this.defaultvalue;
 	}
+
 }

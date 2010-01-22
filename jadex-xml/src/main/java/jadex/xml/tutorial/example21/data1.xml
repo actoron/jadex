@@ -1,0 +1,32 @@
+<dms:directory xmlns:dms="http://www.sosnoski.com">
+  <dms:map dms:size="4">
+    <dms:entry dms:key="38193">
+      <dms:customer dms:state="WA" dms:zip="98059">
+        <dms:name dms:first-name="John" dms:last-name="Smith"/>
+        <dms:street>12345 Happy Lane</dms:street>
+        <dms:city>Plunk</dms:city>
+      </dms:customer>
+    </dms:entry>
+    <dms:entry dms:key="39122">
+      <dms:customer dms:state="WA" dms:zip="98094">
+        <dms:name dms:first-name="Sally" dms:last-name="Port"/>
+        <dms:street>932 Easy Street</dms:street>
+        <dms:city>Fort Lewis</dms:city>
+      </dms:customer>
+    </dms:entry>
+    <dms:entry dms:key="83132">
+      <dms:customer dms:state="WA" dms:zip="98059">
+        <dms:name dms:first-name="Mary" dms:last-name="Smith"/>
+        <dms:street>12345 Happy Lane</dms:street>
+        <dms:city>Plunk</dms:city>
+      </dms:customer>
+    </dms:entry>
+    <dms:entry dms:key="12958">
+      <dms:customer dms:state="WA" dms:zip="98095">
+        <dms:name dms:first-name="Adam" dms:last-name="Jones"/>
+        <dms:street>12345 Plunket Lane</dms:street>
+        <dms:city>Happy</dms:city>
+      </dms:customer>
+    </dms:entry>
+  </dms:map>
+</dms:directory>

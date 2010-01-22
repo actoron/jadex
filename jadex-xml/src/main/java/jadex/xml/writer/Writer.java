@@ -57,9 +57,18 @@ public class Writer
 	 */
 	public Writer(IObjectWriterHandler handler)
 	{
+		this(handler, true, true);
+	}
+	
+	/**
+	 *  Create a new reader.
+	 *  @param handler The handler.
+	 */
+	public Writer(IObjectWriterHandler handler, boolean genids, boolean indent)
+	{
 		this.handler = handler;
-		this.genids = true;
-		this.indent = true;
+		this.genids = genids;
+		this.indent = indent;
 	}
 	
 	//-------- methods --------

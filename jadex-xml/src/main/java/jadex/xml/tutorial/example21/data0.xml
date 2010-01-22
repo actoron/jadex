@@ -1,0 +1,32 @@
+<directory>
+  <map size="4">
+    <entry key="38193">
+      <customer state="WA" zip="98059">
+        <name first-name="John" last-name="Smith"/>
+        <street>12345 Happy Lane</street>
+        <city>Plunk</city>
+      </customer>
+    </entry>
+    <entry key="39122">
+      <customer state="WA" zip="98094">
+        <name first-name="Sally" last-name="Port"/>
+        <street>932 Easy Street</street>
+        <city>Fort Lewis</city>
+      </customer>
+    </entry>
+    <entry key="83132">
+      <customer state="WA" zip="98059">
+        <name first-name="Mary" last-name="Smith"/>
+        <street>12345 Happy Lane</street>
+        <city>Plunk</city>
+      </customer>
+    </entry>
+    <entry key="12958">
+      <customer state="WA" zip="98095">
+        <name first-name="Adam" last-name="Jones"/>
+        <street>12345 Plunket Lane</street>
+        <city>Happy</city>
+      </customer>
+    </entry>
+  </map>
+</directory>

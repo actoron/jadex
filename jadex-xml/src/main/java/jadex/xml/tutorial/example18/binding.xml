@@ -1,0 +1,20 @@
+<binding>
+  <mapping name="customer" class="example18.Customer">
+    <namespace uri="http://www.sosnoski.com/ns1"
+      default="elements"/>
+    <structure field="person"/>
+    <value name="street" field="street"/>
+    <value name="city" field="city"/>
+    <value name="state" field="state"/>
+    <value name="zip" field="zip"/>
+    <value name="phone" style="attribute" field="phone"/>
+  </mapping>
+  <mapping name="person" class="example18.Person">
+    <namespace prefix="ns2"
+      uri="http://www.sosnoski.com/ns2" default="all"/>
+    <value name="cust-num" style="attribute"
+      field="customerNumber"/>
+    <value name="first-name" field="firstName"/>
+    <value name="last-name" field="lastName"/>
+  </mapping>
+</binding>

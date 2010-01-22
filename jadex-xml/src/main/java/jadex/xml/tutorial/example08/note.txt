@@ -1,0 +1,38 @@
+Objective:
+
+- Using collections
+
+Changes in Jadex XML:
+
+- Jadex XML cannot access private (and protected fields).
+  - Generated getters and setters for Airport and Carrier classes 
+- Jadex XML does currently not work on list/set elements without methods
+  - Added 'add' methods to TimeTable class (for linking)
+  
+- todo: support also setNotes(String[] notes). This requires to change
+the linking process for bulk links.
+
+Original Jibx config and result:
+
+<binding>
+  <mapping name="timetable" class="example8.TimeTable">
+    <collection field="carriers">
+      <structure name="carrier" type="example8.Carrier">
+        <value style="attribute" name="code" field="code"/>
+        <value style="attribute" name="rating" field="rating"/>
+        <value name="url" field="url"/>
+        <value name="name" field="name"/>
+      </structure>
+    </collection>
+    <collection field="airports">
+      <structure name="airport" type="example8.Airport">
+        <value style="attribute" name="code" field="code"/>
+        <value name="location" field="location"/>
+        <value name="name" field="name"/>
+      </structure>
+    </collection>
+    <collection field="notes">
+      <value name="note"/>
+    </collection>
+  </mapping>
+</binding>
