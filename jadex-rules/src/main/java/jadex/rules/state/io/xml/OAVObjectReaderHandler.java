@@ -239,8 +239,10 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 */
 	public void handleAttributeValue(Object object, QName xmlattrname, List attrpath, String attrval, 
-		Object attrinfo, Object context, ClassLoader classloader, Object root) throws Exception
+		Object attrinfo, Object context, ClassLoader classloader, Object root, Map readobjects) throws Exception
 	{
+		// todo: implement idref!
+		
 		// If attrval==null only set if default value available.
 		if(attrval==null && !(attrinfo instanceof AttributeInfo && ((AttributeInfo)attrinfo).getDefaultValue()!=null))
 			return;

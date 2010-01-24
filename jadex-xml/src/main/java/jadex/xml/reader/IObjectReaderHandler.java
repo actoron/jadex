@@ -45,7 +45,7 @@ public interface IObjectReaderHandler
 	 *  @param context The context.
 	 */
 	public void handleAttributeValue(Object object, QName xmlattrname, List attrpath, String attrval, 
-		Object attrinfo, Object context, ClassLoader classloader, Object root) throws Exception;
+		Object attrinfo, Object context, ClassLoader classloader, Object root, Map readobjects) throws Exception;
 	
 	/**
 	 *  Link an object to its parent.

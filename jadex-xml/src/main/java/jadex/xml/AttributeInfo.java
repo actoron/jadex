@@ -26,6 +26,13 @@ public class AttributeInfo
 
 	/** Ignore when reading and writing. */
 	public static final String IGNORE_READWRITE = "ignore_readwrite";
+
+	/** The value of this attribute is used as id. */
+	public static final String ID = "id";
+
+	/** The value of this attribute is used as idref. */
+	public static final String IDREF = "idref";
+
 	
 	//-------- attributes --------
 	
@@ -47,6 +54,9 @@ public class AttributeInfo
 	
 	/** The attribute value converter for reading. */
 	protected ITypeConverter converterread;
+	
+	/** Is this attribute used as id or idref. */
+	protected String id;
 	
 	// write
 	
@@ -92,12 +102,21 @@ public class AttributeInfo
 	 */
 	public AttributeInfo(QName xmlattributename, Object attributeidentifier, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, Object defaultvalue, boolean writeastag)
 	{
+		this(xmlattributename, attributeidentifier, ignore, converterread, converterwrite, null, false, null);
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public AttributeInfo(QName xmlattributename, Object attributeidentifier, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, Object defaultvalue, boolean writeastag, String id)
+	{
 		this.xmlattributename = xmlattributename;
 		this.attributeidentifier = attributeidentifier;
 		this.ignore = ignore;
 		this.converterread = converterread;
 		this.converterwrite = converterwrite;
 		this.defaultvalue = defaultvalue;
+		this.id = id;
 	}
 	
 	/**
@@ -132,6 +151,21 @@ public class AttributeInfo
 		this(xmlattributename==null? null: QName.valueOf(xmlattributename), attributeidentifier, ignore, converterread, converterwrite, defaultvalue);
 	}
 	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public AttributeInfo(String xmlattributename, Object attributeidentifier, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, Object defaultvalue, boolean writeastag)
+	{
+		this(xmlattributename==null? null: QName.valueOf(xmlattributename), attributeidentifier, ignore, converterread, converterwrite, defaultvalue, writeastag);
+	}
+	
+	/**
+	 *  Create a new bean attribute info. 
+	 */
+	public AttributeInfo(String xmlattributename, Object attributeidentifier, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, Object defaultvalue, boolean writeastag, String id)
+	{
+		this(xmlattributename==null? null: QName.valueOf(xmlattributename), attributeidentifier, ignore, converterread, converterwrite, defaultvalue, writeastag, id);
+	}
 
 	//-------- methods --------
 	
@@ -198,4 +232,22 @@ public class AttributeInfo
 		return this.defaultvalue;
 	}
 
+	/**
+	 *  Get the id.
+	 *  @return The id.
+	 */
+	public String getId()
+	{
+		return id;
+	}
+
+	/**
+	 *  Set the id.
+	 *  @param id The id to set.
+	 */
+	public void setId(String id)
+	{
+		this.id = id;
+	}
+	
 }

@@ -154,7 +154,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 */
 	public BDIInterpreter(IComponentAdapter adapter, IOAVState state, OAVAgentModel model, 
 		String config, Map arguments, IExternalAccess parent, Map kernelprops)
-	{
+	{	
 		this.adapter = adapter;
 		this.state = state;
 		this.model = model;
@@ -268,28 +268,29 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 //			((RetePatternMatcherState)getRuleSystem().getMatcherState()).getReteMemory(), new Object());
 	
 	
+		// agent start action - cannot be done here because agent adapter is not completely initialized!
 		// Get map of arguments for initial beliefs values.
 //		Map	arguments	= (Map)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments);
-		Map	argcopy	= null;
-		if(arguments!=null)
-		{
-			argcopy	= new HashMap();
-			argcopy.putAll(arguments);
-		}
-//		initializeCapabilityInstance(state, ragent, argcopy);	// Only supply copy as map is modified.
-		Map parents = new HashMap(); 
-		AgentRules.createCapabilityInstance(state, ragent, parents);
-		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
-		AgentRules.initializeCapabilityInstance(state, ragent);
-		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
-		
-		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE);
-		// Remove arguments from state.
-		if(arguments!=null) 
-			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
-		
-		state.expungeStaleObjects();
-		state.notifyEventListeners();
+//		Map	argcopy	= null;
+//		if(arguments!=null)
+//		{
+//			argcopy	= new HashMap();
+//			argcopy.putAll(arguments);
+//		}
+////		initializeCapabilityInstance(state, ragent, argcopy);	// Only supply copy as map is modified.
+//		Map parents = new HashMap(); 
+//		AgentRules.createCapabilityInstance(state, ragent, parents);
+//		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
+//		AgentRules.initializeCapabilityInstance(state, ragent);
+//		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
+//		
+//		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE);
+//		// Remove arguments from state.
+//		if(arguments!=null) 
+//			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
+//		
+//		state.expungeStaleObjects();
+//		state.notifyEventListeners();
 	}
 	
 	
@@ -1166,7 +1167,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		RULEBASE = new Rulebase();
 		
 		// Agent rules.
-//		RULEBASE.addRule(AgentRules.createStartAgentRule());
+		RULEBASE.addRule(AgentRules.createStartAgentRule());
 		RULEBASE.addRule(AgentRules.createTerminatingEndAgentRule());
 		RULEBASE.addRule(AgentRules.createTerminateAgentRule());
 		RULEBASE.addRule(AgentRules.createRemoveChangeEventRule());

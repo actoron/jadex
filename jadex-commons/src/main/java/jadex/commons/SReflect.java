@@ -854,6 +854,20 @@ public class SReflect
 			|| obj!=null && obj.getClass().isArray();
 	}
 	
+	/**
+	 *  Test if class is some kind of collection.
+	 *  @param class The class.
+	 *  @return True if is iterable.
+	 */
+	public static boolean isIterableClass(Class clazz)
+	{
+		return Iterator.class.isAssignableFrom(clazz)
+			|| Enumeration.class.isAssignableFrom(clazz)
+			|| Collection.class.isAssignableFrom(clazz) 
+			|| Map.class.isAssignableFrom(clazz)
+			|| clazz.isArray();
+	}
+	
 	protected static Object[] EMPTY_ARRAY = new Object[0];
 	/**
 	 *  Get an array for an arbitrary collection object.

@@ -128,6 +128,9 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public void wakeup()
 	{
+//		System.err.println("wakeup: "+getComponentIdentifier());
+//		Thread.dumpStack();
+		
 		// todo: check this assert meaning!
 		
 		// Verify that the agent is running.
@@ -336,6 +339,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	{
 		// Remember execution thread.
 		this.componentthread	= Thread.currentThread();
+		
 		ClassLoader	cl	= componentthread.getContextClassLoader();
 		componentthread.setContextClassLoader(model.getClassLoader());
 

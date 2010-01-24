@@ -283,13 +283,13 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 */
 	public void handleAttributeValue(Object object, QName xmlattrname, List attrpath, String attrval, 
-		Object attrinfo, Object context, ClassLoader classloader, Object root) throws Exception
+		Object attrinfo, Object context, ClassLoader classloader, Object root, Map readobjects) throws Exception
 	{
 		// Hack!
 		if(attrval!=null)
-			setAttributeValue(attrinfo, xmlattrname, object, attrval, root, classloader, context);
+			setAttributeValue(attrinfo, xmlattrname, object, attrval, root, classloader, context, readobjects);
 		else if(attrinfo instanceof BeanAttributeInfo && ((BeanAttributeInfo)attrinfo).getDefaultValue()!=null)
-			setAttributeValue(attrinfo, xmlattrname, object, ((BeanAttributeInfo)attrinfo).getDefaultValue(), root, classloader, context);
+			setAttributeValue(attrinfo, xmlattrname, object, ((BeanAttributeInfo)attrinfo).getDefaultValue(), root, classloader, context, readobjects);
 	}
 		
 	// Hack!!!
@@ -312,7 +312,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		
 		if(linkinfo!=null)
 		{
-			setAttributeValue(linkinfo, tag, parent, object, root, classloader, context);
+			setAttributeValue(linkinfo, tag, parent, object, root, classloader, context, null);
 			linked = true;
 		}
 		
@@ -359,7 +359,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			for(int i=0; i<fieldnames.length && !linked; i++)
 			{
-				linked = setField(fieldnames[i], parent, object, null, classloader, context, root);
+				linked = setField(fieldnames[i], parent, object, null, classloader, context, root, null, null);
 			}
 			
 			// Try name guessing via class/superclass/interface names of object to add
@@ -419,7 +419,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	/**
 	 *  Directly access a field for setting/(adding) the object.
 	 */
-	protected boolean setField(String fieldname, Object parent, Object object, ITypeConverter converter, ClassLoader classloader, Object context, Object root)
+	protected boolean setField(String fieldname, Object parent, Object object, ITypeConverter converter,
+		ClassLoader classloader, Object context, Object root, String idref, Map readobjects)
 	{
 		boolean set = false;
 		try
@@ -427,7 +428,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			Field field = parent.getClass().getField(fieldname);
 			Class type = field.getType();
 			
-			object = convertAttributeValue(object, type, converter, root, classloader);
+			object = convertAttributeValue(object, type, converter, root, classloader, idref, readobjects);
 			
 			if(SReflect.isSupertype(type, object.getClass()))
 			{
@@ -459,7 +460,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param classloader The classloader.
 	 */
 	protected void setAttributeValue(Object attrinfo, QName xmlattrname, Object object, 
-		Object attrval, Object root, ClassLoader classloader, Object context)
+		Object attrval, Object root, ClassLoader classloader, Object context, Map readobjects)
 	{
 		if(NULL.equals(attrval))
 			return;
@@ -498,7 +499,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				{
 					Method m = bai.getReadMethod();
 					Class[] ps = m.getParameterTypes();
-					Object arg = convertAttributeValue(attrval, ps[1], bai.getConverterRead(), root, classloader);
+					Object arg = convertAttributeValue(attrval, ps[1], bai.getConverterRead(), root, classloader, bai.getId(), readobjects);
 					
 					try
 					{
@@ -521,7 +522,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 							Class[] ps = ms[j].getParameterTypes();
 							if(ps.length==2)
 							{
-								Object arg = convertAttributeValue(attrval, ps[1], bai.getConverterRead(), root, classloader);
+								Object arg = convertAttributeValue(attrval, ps[1], bai.getConverterRead(), root, classloader, bai.getId(), readobjects);
 								
 								try
 								{
@@ -543,7 +544,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				Class[] ps = m.getParameterTypes();
 				if(ps.length==1)
 				{
-					Object arg = convertAttributeValue(attrval, ps[0], bai.getConverterRead(), root, classloader);
+					Object arg = convertAttributeValue(attrval, ps[0], bai.getConverterRead(), root, classloader, bai.getId(), readobjects);
 					
 					try
 					{
@@ -568,7 +569,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			ITypeConverter converter = ai instanceof BeanAttributeInfo? ((BeanAttributeInfo)ai).getConverterRead(): null;
 			
 			String fieldname = ai.getAttributeIdentifier()!=null? ((String)ai.getAttributeIdentifier()): xmlattrname.getLocalPart();
-			set = setField(fieldname, object, attrval, converter, classloader, context, root);
+			set = setField(fieldname, object, attrval, converter, classloader, context, root, ai.getId(), readobjects);
 
 			if(!set)
 			{
@@ -576,7 +577,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					.substring(0,1).toUpperCase()+((String)ai.getAttributeIdentifier()).substring(1)
 					: xmlattrname.getLocalPart().substring(0,1).toUpperCase()+xmlattrname.getLocalPart().substring(1);
 					
-				set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, converter);
+				set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, converter, ai.getId(), readobjects);
 			
 				if(!set)
 				{
@@ -585,12 +586,12 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					if(!postfix.equals(oldpostfix))
 					{
 						// First try add, as set might also be there and used for a non-multi attribute.
-						set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, converter);
+						set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, converter, ai.getId(), readobjects);
 					}
 				}
 			}
 		}
-		else if(!set)
+		else if(!set) // attribute info is null or string
 		{
 			// Write as normal bean attribute.
 			
@@ -600,7 +601,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			BeanProperty prop = (BeanProperty)props.get(attrinfo instanceof String? attrinfo: xmlattrname.getLocalPart());
 			if(prop!=null)
 			{
-				Object arg = convertAttributeValue(attrval, prop.getSetterType(), null, root, classloader);
+				Object arg = convertAttributeValue(attrval, prop.getSetterType(), null, root, classloader, null, null);
 
 				try
 				{
@@ -620,7 +621,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			{
 				String postfix = attrinfo instanceof String? ((String)attrinfo).substring(0,1).toUpperCase()+((String)attrinfo).substring(1)
 					: xmlattrname.getLocalPart().substring(0,1).toUpperCase()+xmlattrname.getLocalPart().substring(1);
-				set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, null);
+				set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, null, null, null);
 			
 				if(!set)
 				{
@@ -628,7 +629,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					postfix = SUtil.getSingular(postfix);
 					if(!postfix.equals(oldpostfix))
 					{
-						set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, null);
+						set = setDirectValue(new String[]{"set", "add"}, postfix, attrval, object, root, classloader, null, null, null);
 					}
 				}
 			}
@@ -646,7 +647,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param root The root.
 	 *  @param classloader The classloader.
 	 */
-	protected Object convertAttributeValue(Object attrval, Class targetclass, ITypeConverter converter, Object root, ClassLoader classloader)
+	protected Object convertAttributeValue(Object attrval, Class targetclass, ITypeConverter converter, 
+		Object root, ClassLoader classloader, String id, Map readobjects)
 	{
 		Object ret = attrval;
 
@@ -659,9 +661,16 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		}
 		else if(!String.class.isAssignableFrom(targetclass))
 		{
-			ITypeConverter conv = BasicTypeConverter.getBasicConverter(targetclass);
-			if(conv!=null)// && conv.acceptsInputType(attrval.getClass()))
-				ret = conv.convertObject(attrval, root, classloader, null);
+			if(AttributeInfo.IDREF.equals(id))
+			{
+				ret = readobjects.get(attrval);
+			}
+			else
+			{
+				ITypeConverter conv = BasicTypeConverter.getBasicConverter(targetclass);
+				if(conv!=null)// && conv.acceptsInputType(attrval.getClass()))
+					ret = conv.convertObject(attrval, root, classloader, null);
+			}
 		}
 			
 		return ret;
@@ -677,7 +686,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param classloader The classloader.
 	 *  @param converter The converter.
 	 */
-	protected boolean setDirectValue(String[] prefixes, String postfix, Object attrval, Object object, Object root, ClassLoader classloader, ITypeConverter converter)
+	protected boolean setDirectValue(String[] prefixes, String postfix, Object attrval, Object object, 
+		Object root, ClassLoader classloader, ITypeConverter converter, String idref, Map readobjects)
 	{
 		boolean set = false;
 				
@@ -692,7 +702,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				Class[] ps = ms[j].getParameterTypes();
 				if(ps.length==1)
 				{
-					Object arg = convertAttributeValue(attrval, ps[0], converter, root, classloader);
+					Object arg = convertAttributeValue(attrval, ps[0], converter, root, classloader, idref, readobjects);
 					
 					try
 					{

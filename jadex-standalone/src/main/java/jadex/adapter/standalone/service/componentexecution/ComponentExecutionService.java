@@ -183,7 +183,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 					public void resultAvailable(Object source, Object result)
 					{
 						createComponentInstance(config, args, suspend, rl,
-								resultlistener, cf, lmodel, cid, adapter, pad, ad, (IExternalAccess)result);
+							resultlistener, cf, lmodel, cid, adapter, pad, ad, (IExternalAccess)result);
 					}
 					
 					public void exceptionOccurred(Object source, Exception exception)

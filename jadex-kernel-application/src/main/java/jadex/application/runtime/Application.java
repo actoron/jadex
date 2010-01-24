@@ -679,10 +679,11 @@ public class Application	implements IComponentInstance
 			
 			inited	= true;
 		}
-		else
-		{
-			throw new UnsupportedOperationException();
-		}
+		// todo: is this necessary? can we ensure that this is not called?
+//		else
+//		{
+//			throw new UnsupportedOperationException();
+//		}
 		return false;
 	}
 

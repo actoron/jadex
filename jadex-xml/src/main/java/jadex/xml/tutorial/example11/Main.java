@@ -39,9 +39,25 @@ public class Main
 			new SubobjectInfo[]{
 			//new SubobjectInfo(new BeanAttributeInfo("phone", "phone")),
 		}, true, true));
-		typeinfos.add(new TypeInfo(null, "carrier", Carrier.class));
-		typeinfos.add(new TypeInfo(null, "airport", Airport.class));
-		typeinfos.add(new TypeInfo(null, "route", Route.class));
+		typeinfos.add(new TypeInfo(null, "carrier", Carrier.class, null, null, 
+			new AttributeInfo[]{
+			new AttributeInfo("code", "code", null, null, null, null, false, AttributeInfo.ID)
+		}, null));
+		typeinfos.add(new TypeInfo(null, "airport", Airport.class, null, null, 
+			new AttributeInfo[]{
+			new AttributeInfo("code", "code", null, null, null, null, false, AttributeInfo.ID)
+		}, null));
+		typeinfos.add(new TypeInfo(null, "route", Route.class, null, null, 
+			new AttributeInfo[]{
+			new AttributeInfo("from", "from", null, null, null, null, false, AttributeInfo.IDREF),
+			new AttributeInfo("to", "to", null, null, null, null, false, AttributeInfo.IDREF)
+		}, null));
+		typeinfos.add(new TypeInfo(null, "flight", Flight.class, null, null, 
+			new AttributeInfo[]{
+			new AttributeInfo("carrier", "carrier", null, null, null, null, false, AttributeInfo.IDREF),
+			new AttributeInfo("depart", "departure"),
+			new AttributeInfo("arrive", "arrival"),
+		}, null));
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos

@@ -62,7 +62,7 @@ public class AgentRules
 
 	/**
 	 *  Create the start agent rule.
-	 * /
+	 */
 	protected static Rule createStartAgentRule()
 	{
 		ObjectCondition	ragentcon	= new ObjectCondition(OAVBDIRuntimeModel.agent_type);
@@ -96,7 +96,7 @@ public class AgentRules
 		};
 		Rule rule = new Rule("agent_start", ragentcon, action);
 		return rule;
-	}*/
+	}
 
 	/**
 	 *  Terminating start agent rule. Exits running and e
