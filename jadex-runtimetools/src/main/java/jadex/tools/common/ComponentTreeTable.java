@@ -198,13 +198,16 @@ public class ComponentTreeTable extends JScrollPane
 	public void removeComponent(IComponentDescription description)
 	{
 		DefaultTreeTableNode	parent	= (DefaultTreeTableNode)(description.getParent()!=null ? nodes.get(description.getParent()) : platform);
-
-		DefaultTreeTableNode child = parent.getChild(description);
-		if(child != null)
-		{
-			nodes.remove(description.getName());
-			parent.remove(parent.getIndex(child));
+		if(parent!=null)
+		{	
+			DefaultTreeTableNode child = parent.getChild(description);
+			if(child != null)
+			{
+				nodes.remove(description.getName());
+				parent.remove(parent.getIndex(child));
+			}
 		}
+		// else event for already removed parent.
 	}
 	
 	/**

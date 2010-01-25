@@ -710,7 +710,8 @@ public class Application	implements IComponentInstance
 	 */
 	public void killComponent(IResultListener listener)
 	{
-		
+		// Todo: application cleanup?
+		listener.resultAvailable(this, listener);
 	}
 	
 	/**

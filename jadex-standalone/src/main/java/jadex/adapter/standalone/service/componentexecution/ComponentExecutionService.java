@@ -260,6 +260,16 @@ public class ComponentExecutionService implements IComponentExecutionService
 		{
 			synchronized(descs)
 			{
+				// Kill subcomponents
+				for(Iterator it=descs.values().iterator(); it.hasNext(); )
+				{
+					IComponentDescription	desc	= (IComponentDescription)it.next();
+					if(cid.equals(desc.getParent()))
+					{
+						destroyComponent(desc.getName(), null);	// todo: cascading delete with wait.
+					}
+				}
+				
 //				System.out.println("killing: "+cid);
 				
 				StandaloneComponentAdapter agent = (StandaloneComponentAdapter)adapters.get(cid);
@@ -498,9 +508,9 @@ public class ComponentExecutionService implements IComponentExecutionService
 					if(desc.getParent()!=null)
 					{
 						StandaloneComponentAdapter	pad	= (StandaloneComponentAdapter)adapters.get(desc.getParent());
-						if(pad==null)
-							throw new RuntimeException("No adapter for parent: "+cid+", "+desc.getParent());
-						pad.getComponentInstance().componentDestroyed(cid);
+						if(pad!=null)
+							pad.getComponentInstance().componentDestroyed(cid);
+						// else parent has just been killed.
 					}
 				}
 			}

@@ -55,10 +55,6 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  (read only! managed by component execution service). */
 	protected IComponentDescription	desc;
 	
-	/** The list of subcomponents. */
-	// Todo: should be managed by CES?
-	protected List	subcomponents;
-	
 	/** Flag to indicate a fatal error (component termination will not be passed to instance) */
 	protected boolean	fatalerror;
 	
@@ -278,16 +274,31 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  which might perform arbitrary cleanup actions, goals, etc.
 	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
 	 */
-	public void killComponent(IResultListener listener)
+	public void killComponent(final IResultListener listener)
 	{
 //		System.out.println("killComponent: "+listener);
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 			throw new ComponentTerminatedException(cid.getName());
 
 		if(!fatalerror)
-			component.killComponent(listener);
+		{
+			component.killComponent(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					listener.resultAvailable(this, getComponentIdentifier());
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					listener.resultAvailable(this, getComponentIdentifier());
+				}
+			});
+		}
 		else if(listener!=null)
+		{
 			listener.resultAvailable(this, getComponentIdentifier());
+		}
 			
 	}
 
