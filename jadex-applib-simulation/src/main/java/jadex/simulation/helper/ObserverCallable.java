@@ -1,6 +1,7 @@
 package jadex.simulation.helper;
 
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.bdi.examples.cleanerworld.MoveTask;
 import jadex.bridge.IComponentIdentifier;
 import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.Observer;
@@ -70,7 +71,7 @@ public class ObserverCallable implements Callable<ArrayList> {
 					
 //					observedEvents.add(ObserverHelper.observeComponent(space, agentIdentifier, Constants.BDI_AGENT,  myTime, executor));
 //					String tmpRes = ObserverHelper.observeComponent(space, agentIdentifier, Constants.BDI_AGENT,  clockservice.getTime());
-//					System.out.println("#DeltaTime4Exec# received result from ObserverHelper.");
+//					System.out.println("#DeltaTime4Exec# received result from ObserverHelper.");					
 				}
 					
 			}

@@ -18,8 +18,8 @@
 	                    http://jadex.sourceforge.net/jadex-agrspace-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
-	name="MarsWorld4SimulationExperiments" package="jadex.simulation.marsworld">
-
+	name="MarsWorld4SimulationExperiments" package="jadex.simulation.examples.marsworld">
+										   
 	<imports>
 		<import>jadex.application.space.envsupport.environment.space2d.*</import>
 		<import>jadex.application.space.envsupport.environment.DeltaTimeExecutor</import>
@@ -31,7 +31,7 @@
 		<import>jadex.application.space.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.examples.marsworld.carry.*</import>
 		<import>jadex.bdi.examples.marsworld.producer.*</import>
-		<import>jadex.bdi.examples.marsworld.sentry.*</import>
+		<import>jadex.bdi.examples.marsworld.sentry.*</import>		
 		<import>jadex.bdi.examples.marsworld.movement.*</import>
 		<import>java.text.SimpleDateFormat</import>		
 		<import>jadex.simulation.environment.DeltaTimeExecutor4Simulation</import>
@@ -251,7 +251,7 @@
 
 	<agenttypes>
 		<agenttype name="Sentry"
-			filename="jadex/bdi/examples/marsworld/sentry/Sentry.agent.xml" />
+			filename="jadex/simulation/examples/marsworld/Sentry.agent.xml" />
 		<agenttype name="Producer"
 			filename="jadex/bdi/examples/marsworld/producer/Producer.agent.xml" />
 		<agenttype name="Carry"

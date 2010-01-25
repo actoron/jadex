@@ -1,7 +1,7 @@
 <!--
 	<H3>Sentry agent for finding ore..</H3>
 
-	This agent move to positons to check for minerals.
+	This agent move to positions to check for minerals.
 	Then calls the Production Agent to produce the ore.
 	After all locations have been visited the Agent moves home.
 -->
@@ -10,7 +10,7 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	name="Sentry"
-	package="jadex.simulation.examples.marsworld">
+	package="jadex.simulation.examples.marsworld">	         
 
 	<imports>
 		<import>java.util.*</import>
@@ -20,12 +20,15 @@
 		<import>jadex.application.space.envsupport.math.*</import>
 		<import>jadex.bdi.examples.marsworld.*</import>
 		<import>jadex.bdi.examples.marsworld.movement.*</import>
+		<!-- <import>jadex.bdi.examples.marsworld.movement.MoveTask</import> -->
 		<import>jadex.bdi.examples.marsworld.sentry.*</import>
+		<!-- <import>jadex.bdi.examples.marsworld.sentry.AnalyzeTargetTask</import> -->
 	</imports>
 
 	<capabilities>
 		<!-- Include the move capability as move for basic movement. -->
 		<capability name="move" file="Movement" />
+		<!-- <capability name="transcap" file="jadex/bdi/tutorial/TranslationD1.capability.xml"/> -->
 	</capabilities>
 
 	<beliefs>

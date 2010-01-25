@@ -182,9 +182,9 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 											@Override
 											public void resultAvailable(Object source, Object result) {
 												ExternalAccessFlyweight exta = (ExternalAccessFlyweight) result;
-//												System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + " " +  timestamp + " - " + exta.getBeliefbase().getBelief("myPos").getFact());
-//												ISpaceObject myself = (ISpaceObject) exta.getBeliefbase().getBelief("myself").getFact();
-//												System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + " " +  timestamp + " - " + exta.getBeliefbase().getBelief("myPos").getFact() + "<->" +  myself.getProperty("position"));
+												System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + " " +  timestamp + " - " + exta.getBeliefbase().getBelief("myPos").getFact());
+												ISpaceObject myself = (ISpaceObject) exta.getBeliefbase().getBelief("myself").getFact();
+												System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + " " +  timestamp + " - " + exta.getBeliefbase().getBelief("myPos").getFact() + "<->" +  myself.getProperty("position"));
 												
 												//Get Fact from Beliefbase
 												//TODO: Not only for Strings meaning: read the right class from the data-field!

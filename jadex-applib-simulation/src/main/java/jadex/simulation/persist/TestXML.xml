@@ -11,7 +11,8 @@
 
 
 
-<SimulationConfiguration name="MarsWorldExperiments" applicationReference="..\\jadex-applib-simulation\\target\\classes\\jadex\\simulation\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml" applicationConfiguration="1 Sentry / 2 Producers / 3 Carries">
+<!--  <SimulationConfiguration name="MarsWorldExperiments" applicationReference="..\\jadex-applib-simulation\\target\\classes\\jadex\\simulation\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml" applicationConfiguration="1 Sentry / 2 Producers / 3 Carries">-->
+<SimulationConfiguration name="MarsWorldExperiments" applicationReference="..\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml" applicationConfiguration="1 Sentry / 2 Producers / 3 Carries">
     <Observers>
         <Observer>
             <Data name="StepLogger">
