@@ -14,6 +14,7 @@ import jadex.xml.TypeInfoPathManager;
 import jadex.xml.TypeInfoTypeManager;
 import jadex.xml.bean.IBeanObjectCreator;
 import jadex.xml.reader.IObjectReaderHandler;
+import jadex.xml.reader.LinkData;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -379,6 +380,27 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		
 		if(!linked)
 			throw new RuntimeException("Could not link: "+elem+" "+parent);
+	}
+	
+	/**
+	 *  Bulk link an object to its parent.
+	 *  @param parent The parent object.
+	 *  @param children The children objects (link datas).
+	 *  @param context The context.
+	 *  @param classloader The classloader.
+	 *  @param root The root object.
+	 */
+	public void bulkLinkObjects(Object parent, List children, Object context, 
+		ClassLoader classloader, Object root) throws Exception
+	{
+//		System.out.println("bulk link for: "+parent+" "+children);
+		for(int i=0; i<children.size(); i++)
+		{
+			LinkData linkdata = (LinkData)children.get(i);
+			
+			linkObject(linkdata.getChild(), parent, linkdata.getLinkinfo(), 
+				linkdata.getPathname(), context, classloader, root);
+		}
 	}
 	
 	//-------- helper methods --------

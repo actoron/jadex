@@ -1,6 +1,7 @@
 package jadex.xml.reader;
 
 import jadex.commons.SUtil;
+import jadex.commons.collection.MultiCollection;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IPostProcessor;
 import jadex.xml.ITypeConverter;
@@ -42,6 +43,12 @@ public class Reader
 	
 	/** The object creator. */
 	protected IObjectReaderHandler handler;
+	
+	/** The link mode. */
+	protected boolean bulklink;
+	
+	/** The map of objects to link in bulk mode (object -> map of tags -> objects per tag). */
+	protected MultiCollection children;
 		
 	//-------- constructors --------
 
@@ -51,7 +58,19 @@ public class Reader
 	 */
 	public Reader(IObjectReaderHandler handler)
 	{
+		this(handler, false);
+	}
+	
+	/**
+	 *  Create a new reader.
+	 *  @param handler The handler.
+	 */
+	public Reader(IObjectReaderHandler handler, boolean bulklink)
+	{
 		this.handler = handler;
+		this.bulklink = bulklink;
+		if(bulklink)
+			this.children = new MultiCollection();
 	}
 	
 	//-------- methods --------
@@ -436,9 +455,18 @@ public class Reader
 				}
 	
 				// Handle linking
+				if(stack.size()>0 && bulklink)
+				{
+					// Invoke bulk link for the finished object (as parent).
+					List childs = (List)children.get(topse.getObject());
+					if(childs!=null)
+					{
+						handler.bulkLinkObjects(topse.getObject(), childs, readcontext.getCallContext(), 
+							readcontext.getClassLoader(), readcontext.getRoot());
+					}
+				}
 				if(stack.size()>1)
 				{
-	//				Object[] tmp = getLastStackElementWithObject(stack, localname);
 					StackElement pse = (StackElement)stack.get(stack.size()-2);
 					List pathname = new ArrayList();
 					pathname.add(localname);
@@ -456,17 +484,22 @@ public class Reader
 					TypeInfo patypeinfo = pse.getTypeInfo();
 					SubobjectInfo linkinfo = getSubobjectInfoRead(localname, fullpath, patypeinfo, topse.getRawAttributes());
 					
-					handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), 
-						(QName[])pathname.toArray(new QName[pathname.size()]), 
-						readcontext.getCallContext(), readcontext.getClassLoader(), readcontext.getRoot());
+					if(!bulklink)
+					{
+						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), 
+							(QName[])pathname.toArray(new QName[pathname.size()]), 
+							readcontext.getCallContext(), readcontext.getClassLoader(), readcontext.getRoot());
+					}
+					else
+					{
+						// Save the finished object as child for its parent.
+						children.put(pse.getObject(), new LinkData(topse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), 
+							(QName[])pathname.toArray(new QName[pathname.size()])));
+					}
 				}
 			}
 			
 			stack.remove(stack.size()-1);
-			if(stack.size()>0)
-				topse = (StackElement)stack.get(stack.size()-1);
-			else
-				topse = null;
 		}
 		else
 		{

@@ -568,11 +568,11 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					// Copy values to player object.
 					player.setState(Player.STATE_UNREGISTERED);
 					player.setName(name.getText());
-					player.setColor(colorButton.getBackground());
+					player.setColorValue(colorButton.getBackground().getRGB());
 					player.setAccount(Integer.parseInt(initialAccount.getText()));
 					player.setBet(0);
 					player.setStrategyName((String)strategy.getSelectedItem());
-					player.setStrategy(null);
+//					player.setStrategy(null);
 
 					startPlayer(player);
 					// this.remove(localRemote); (used in next Jadex-Release)

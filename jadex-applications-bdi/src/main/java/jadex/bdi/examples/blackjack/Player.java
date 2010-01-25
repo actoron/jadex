@@ -46,7 +46,7 @@ public class Player
 	protected Color color;
 
 	/** Hack, necessary because in Java Color is not a bean. */
-	protected int colorvalue;
+	protected Integer colorvalue;
 
 	/** The strategyname. */
 	protected String strategyname;
@@ -73,7 +73,7 @@ public class Player
 	protected int games;
 
 	/** The helper object for bean events. */
-	public SimplePropertyChangeSupport pcs;
+	protected SimplePropertyChangeSupport pcs;
 
 	//-------- constructors --------
 
@@ -101,7 +101,7 @@ public class Player
 		this.aid = aid;
 		this.name = name;
 		this.account = account;
-		setColor(color);
+		this.color = color;
 		this.strategyname = strategyname;
 		//if(strategyname!=null)
 		//	this.strategy	= AbstractStrategy.getStrategy(strategyname);
@@ -155,13 +155,13 @@ public class Player
 
 	/**
 	 *  Set the color of the player.
-	 */
+	 * /
 	public void setColor(Color color)
 	{
 		this.color = color;
 		if(color != null)
 			colorvalue = color.getRGB();
-	}
+	}*/
 
 	/**
 	 *  Get the color value.
@@ -169,7 +169,7 @@ public class Player
 	 */
 	public int getColorValue()
 	{
-		return colorvalue;
+		return colorvalue!=null? colorvalue.intValue(): color.getRGB();
 	}
 
 	/**
@@ -178,7 +178,7 @@ public class Player
 	 */
 	public void setColorValue(int colorvalue)
 	{
-		this.colorvalue = colorvalue;
+		this.colorvalue = new Integer(colorvalue);
 	}
 
 	/**
@@ -193,11 +193,11 @@ public class Player
 
 	/**
 	 *  Set the strategy of the player.
-	 */
+	 * /
 	public void setStrategy(IStrategy strategy)
 	{
 		this.strategy = strategy;
-	}
+	}*/
 
 	/**
 	 *  Get the strategy name.

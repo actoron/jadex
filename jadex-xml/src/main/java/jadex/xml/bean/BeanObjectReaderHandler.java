@@ -10,6 +10,7 @@ import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
 import jadex.xml.TypeInfoTypeManager;
 import jadex.xml.reader.IObjectReaderHandler;
+import jadex.xml.reader.LinkData;
 import jadex.xml.reader.Reader;
 
 import java.lang.reflect.Array;
@@ -17,6 +18,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -412,6 +414,27 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		
 		if(!linked)
 			throw new RuntimeException("Could not link: "+object+" "+parent);
+	}
+	
+	/**
+	 *  Bulk link an object to its parent.
+	 *  @param parent The parent object.
+	 *  @param children The children objects (link datas).
+	 *  @param context The context.
+	 *  @param classloader The classloader.
+	 *  @param root The root object.
+	 */
+	public void bulkLinkObjects(Object parent, List children, Object context, 
+		ClassLoader classloader, Object root) throws Exception
+	{
+//		System.out.println("bulk link for: "+parent+" "+children);
+		for(int i=0; i<children.size(); i++)
+		{
+			LinkData linkdata = (LinkData)children.get(i);
+			
+			linkObject(linkdata.getChild(), parent, linkdata.getLinkinfo(), 
+				linkdata.getPathname(), context, classloader, root);
+		}
 	}
 	
 	//-------- helper methods --------

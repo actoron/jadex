@@ -1,4 +1,4 @@
-package jadex.xml.tutorial.example07;
+package jadex.xml.tutorial.example12;
 
 import jadex.commons.SUtil;
 import jadex.xml.AttributeInfo;
@@ -17,7 +17,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- *  Main class to execute tutorial lesson.
+ *  Main class to execute tutorial lesson c (taken from Jibx website).
+ *  
+ *  Topic: reading a simple XML file in Java objects.
+ *  The xml and Java structures differ substantially.
+ *  In Java only one object is used.
  */
 public class Main
 {
@@ -31,28 +35,15 @@ public class Main
 		// object attributes. They are considered as subobjectinfos here
 		// and not as attributeinfos, because they are subtags in they xml.
 		Set typeinfos = new HashSet();
-		typeinfos.add(new TypeInfo(null, "customer", Customer.class, null, null, null, null, null,
-			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("street", "street")),
-			new SubobjectInfo(new BeanAttributeInfo("city", "city")),
-			new SubobjectInfo(new BeanAttributeInfo("state", "state")),
-			new SubobjectInfo(new BeanAttributeInfo("zip", "zip")),
-			new SubobjectInfo(new BeanAttributeInfo("instructions", "instructions", AttributeInfo.IGNORE_READWRITE)),
-			new SubobjectInfo(new BeanAttributeInfo("phone", "phone")),
-		}, true, true));
+		typeinfos.add(new TypeInfo(null, "customer", Customer.class));
+		typeinfos.add(new TypeInfo(null, "address", Address.class));
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos
 		Reader xmlreader = new Reader(new BeanObjectReaderHandler(typeinfos));
-		InputStream is = SUtil.getResource("jadex/xml/tutorial/example07/data.xml", null);
+		InputStream is = SUtil.getResource("jadex/xml/tutorial/example12/data.xml", null);
 		Object object = xmlreader.read(is, null, null);
 		is.close();
-		
-		// Write the xml to the output file.
-		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(typeinfos), false, true);
-		OutputStream os = new FileOutputStream("out.xml");
-		xmlwriter.write(object, os, null, null);
-		os.close();
 		
 		// And print out the result.
 		System.out.println("Read object: "+object);

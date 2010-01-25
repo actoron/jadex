@@ -2,6 +2,12 @@ Objective:
 
 Using object references in the XML.
 
+In Jadex XML an AttributeInfo can be configured to represent
+an ID or an IDREF. In case of an ID the object will be stored
+under this ID and can be fetched later in the xml via an IDREF
+attribute. In this case the value of this attribute is changed
+to the stored object.
+
 Original Jibx config and result:
 
 <binding>

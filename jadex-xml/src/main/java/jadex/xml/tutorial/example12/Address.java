@@ -6,4 +6,10 @@ public class Address {
     public String city;
     public String state;
     public Integer zip;
+
+    public String toString()
+	{
+		return "Address(city=" + this.city + ", state=" + this.state
+			+ ", street=" + this.street + ", zip=" + this.zip + ")";
+	}
 }

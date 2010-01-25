@@ -59,6 +59,17 @@ public interface IObjectReaderHandler
 		Object context, ClassLoader classloader, Object root) throws Exception;
 	
 	/**
+	 *  Bulk link an object to its parent.
+	 *  @param parent The parent object.
+	 *  @param children The children objects (link datas).
+	 *  @param context The context.
+	 *  @param classloader The classloader.
+	 *  @param root The root object.
+	 */
+	public void bulkLinkObjects(Object parent, List children, Object context, 
+		ClassLoader classloader, Object root) throws Exception;
+	
+	/**
 	 *  Get the most specific mapping info.
 	 *  @param tag The tag.
 	 *  @param fullpath The full path.

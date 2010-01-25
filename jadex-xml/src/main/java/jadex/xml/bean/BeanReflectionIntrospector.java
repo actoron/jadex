@@ -104,6 +104,7 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
             
 //            if(beaninfos==null)
 //            	beaninfos = new LRU(200);
+            
             beaninfos.put(clazz, ret);
 		}
             

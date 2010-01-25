@@ -34,7 +34,7 @@ public class PlayerJoinGamePlan extends Plan
 		// Search for dealer.
 		IComponentIdentifier	dealer	= (IComponentIdentifier)getBeliefbase().getBelief("dealer").getFact();
 
-		Player	me	= (Player)getBeliefbase().getBelief("myself").getFact();
+		Player me = (Player)getBeliefbase().getBelief("myself").getFact();
 
 		// create the join-message
 		IMessageEvent	msg	= createMessageEvent("request_join");

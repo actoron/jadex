@@ -1,5 +1,3 @@
-DOES NOT WORK!
-
 Objective:
 
 - Use an xml with mixed element tags, i.e.
@@ -8,7 +6,11 @@ Objective:
 -> start object2 - end object2
 -> end object1
 
-todo: Not supported in Jadex XML.
+todo: This is basically supported, but currently no specific 
+mappings can be defined for an xml inner object that is not 
+explicitly mapped to a Java object but to its parent.
+(As firstname and lastname of person in this example).
+
 
 Original Jibx config and result:
 
