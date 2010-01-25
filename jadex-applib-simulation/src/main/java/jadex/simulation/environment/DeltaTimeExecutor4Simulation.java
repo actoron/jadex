@@ -7,6 +7,7 @@ import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.ISpaceProcess;
 import jadex.application.space.envsupport.environment.SpaceObject;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
+import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
@@ -156,7 +157,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 
 						space.getProperties();
 
-						System.out.println("#Executor# ID: " + appName + " - Dilation: " + dilationCounter + " timestamp: " + timestamp);
+					//	System.out.println("#Executor# ID: " + appName + " - Dilation: " + dilationCounter + " timestamp: " + timestamp);
 
 						// Observe elements: ISpaceObjects, BDI-Agents, MicroAgents
 						// Handle BDI-Agents separate due asyn call
@@ -173,7 +174,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 								IComponentIdentifier agentIdentifier = getIComponentIdentifier(space, agentType);
 								// if (agentIdentifier != null) {
 								// TODO: Apply / Check if filter has been set on this observer data
-								System.out.println("#DeltaTime4Exec# Starting get result for BDIAgent.");
+//								System.out.println("#DeltaTime4Exec# Starting get result for BDIAgent.");
 
 								((IComponentExecutionService) space.getContext().getServiceContainer().getService(IComponentExecutionService.class)).getExternalAccess(agentIdentifier,
 										new IResultListener() {
@@ -181,11 +182,14 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 											@Override
 											public void resultAvailable(Object source, Object result) {
 												ExternalAccessFlyweight exta = (ExternalAccessFlyweight) result;
-												System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + timestamp);																								
-												ISpaceObject myself = (ISpaceObject) exta.getBeliefbase().getBelief("myself").getFact();											
+//												System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + " " +  timestamp + " - " + exta.getBeliefbase().getBelief("myPos").getFact());
+//												ISpaceObject myself = (ISpaceObject) exta.getBeliefbase().getBelief("myself").getFact();
+//												System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + " " +  timestamp + " - " + exta.getBeliefbase().getBelief("myPos").getFact() + "<->" +  myself.getProperty("position"));
 												
-												
-												observedEvents.add(new ObservedEvent(appName, experimentId, timestamp, obs.getData(), myself.getProperty("position")));
+												//Get Fact from Beliefbase
+												//TODO: Not only for Strings meaning: read the right class from the data-field!
+												Vector2Double currentValue = (Vector2Double) exta.getBeliefbase().getBelief(obs.getData().getElementSource().getName()).getFact(); 
+												observedEvents.add(new ObservedEvent(appName, experimentId, timestamp, obs.getData(), currentValue.toString()));
 											}
 
 											@Override
@@ -199,8 +203,11 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 								// System.err.println("#DeltaTimeExecutor4Simulation# Error on finding IComponentIdentifier for agentType " + agentType);
 								// }
 								// Observe ISpaceObject
-							} else if (obs.getData().getObjectSource().getName().equals("ISpaceObject")) {
-
+							} else if (obs.getData().getObjectSource().getType().equals(Constants.ISPACE_OBJECT)) {
+								ISpaceObject[] targets  = space.getSpaceObjectsByType(obs.getData().getObjectSource().getName());
+								//TODO: Handle multiple occurrences of that ISpaceObject
+								Integer currentValue  = (Integer) targets[0].getProperty(obs.getData().getElementSource().getName());								
+								observedEvents.add(new ObservedEvent(appName, experimentId, timestamp, obs.getData(), currentValue));
 							} else {
 								System.err.println("#DeltaTimeExecutor4Simulation# Error on setting type of ObjectSource " + simConf);
 							}
@@ -303,10 +310,10 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 			public void resultAvailable(Object source, Object result) {
 				ExternalAccessFlyweight exta = (ExternalAccessFlyweight) result;
 				// System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + timestamp);
-				System.out.println("bels: "+exta.getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP));
+//				System.out.println("bels: "+exta.getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP));
 				HashMap resultsMap = (HashMap) exta.getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).getFact();
 				resultsMap.put(timestamp, observedEvents);
-				System.out.println("TMP: " + observedEvents.size());
+//				System.out.println("TMP: " + observedEvents.size());
 				exta.getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).setFact(resultsMap);
 				// ((Map) space.getContext().getArguments()).put(Constants.OBSERVED_EVENTS_MAP, resultsMap);
 				//				
@@ -323,17 +330,17 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 		});
 	}
 
-	private void addToSpace(AbstractEnvironmentSpace space, ArrayList<ObservedEvent> observedEvents, long timestamp) {
-		HashMap<Long, ArrayList<ObservedEvent>> results;
-
-		if (space.getProperty(Constants.OBSERVED_EVENTS_MAP) == null) {
-			results = new HashMap<Long, ArrayList<ObservedEvent>>();
-		} else {
-			results = (HashMap<Long, ArrayList<ObservedEvent>>) space.getProperty(Constants.OBSERVED_EVENTS_MAP);
-		}
-		results.put(new Long(timestamp), observedEvents);
-		space.setProperty(Constants.OBSERVED_EVENTS_MAP, results);
-	}
+//	private void addToSpace(AbstractEnvironmentSpace space, ArrayList<ObservedEvent> observedEvents, long timestamp) {
+//		HashMap<Long, ArrayList<ObservedEvent>> results;
+//
+//		if (space.getProperty(Constants.OBSERVED_EVENTS_MAP) == null) {
+//			results = new HashMap<Long, ArrayList<ObservedEvent>>();
+//		} else {
+//			results = (HashMap<Long, ArrayList<ObservedEvent>>) space.getProperty(Constants.OBSERVED_EVENTS_MAP);
+//		}
+//		results.put(new Long(timestamp), observedEvents);
+//		space.setProperty(Constants.OBSERVED_EVENTS_MAP, results);
+//	}
 
 	/**
 	 * Returns the IComponentIdentifier for a agentType.

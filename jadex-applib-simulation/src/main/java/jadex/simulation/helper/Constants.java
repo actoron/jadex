@@ -53,6 +53,9 @@ public class Constants {
 	//ISpace_Object
 	public static final String ISPACE_OBJECT  = "ISpaceObject";		
 	
+	//Property of an ISpace_Object
+	public static final String PROPERTY  = "Property";
+	
 	// The name/type of the client simulation agent
 	public static final String CLIENT_SIMULATION_AGENT = "ClientSimulator";
 	

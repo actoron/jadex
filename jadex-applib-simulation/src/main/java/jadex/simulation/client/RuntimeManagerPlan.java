@@ -181,7 +181,7 @@ public class RuntimeManagerPlan extends Plan {
 
 	private void sendResult() {
 		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
-		facts.put(Constants.EXPERIMENT_END_TIME, new Long(System.currentTimeMillis()));
+		facts.put(Constants.EXPERIMENT_END_TIME, new Long(getCurrentTime()));
 		
 		//Get the map of observed events from the beliefbase
 		HashMap observedEvents = (HashMap) getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).getFact();
@@ -254,37 +254,46 @@ public class RuntimeManagerPlan extends Plan {
 //		ContinuousSpace2D space = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace");		
 		
 		IClockService clockservice = (IClockService) getScope().getServiceContainer().getService(IClockService.class);
-		long clockService = clockservice.getTime();
-		long systemTime = new Long(System.currentTimeMillis());
+//		long clockService = clockservice.getTime();
+//		long systemTime = new Long(System.currentTimeMillis());
 
-		System.out.println("***********************************************************" + clockService + " - " + systemTime);
+//		System.out.println("***********************************************************" + clockService + " - " + systemTime);
+		
 
 		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
-		facts.put(Constants.EXPERIMENT_START_TIME, new Long(System.currentTimeMillis()));
+		facts.put(Constants.EXPERIMENT_START_TIME, new Long(clockservice.getTime()));
 		getBeliefbase().getBelief("simulationFacts").setFact(facts);
 	}
 
 	/**
 	 * Compute Termination: Input: Mode=0 ->relative Time; Mode=1 ->absolute Time
 	 * 
-	 * @return the termination time
+	 * @return the termination time as relative time, e.g. the time the simulation has to run.
 	 */
 	private Long getTerminationTime(int mode, long value) {
+		Long currentTime = new Long(getCurrentTime());
+		
 		if (mode == 0) {
-			// Long relativeTime = new Long(10000);
-			Long currentTime = new Long(System.currentTimeMillis());
-			Long tmp = new Long(value + currentTime.longValue());
-			System.out.println("StartTime: " + TimeConverter.longTime2DateString(currentTime) + "TerminationTime: " + TimeConverter.longTime2DateString(tmp));
+			// Long relativeTime = new Long(10000);	
+			Long terminationTime = new Long(value + currentTime.longValue());
+			System.out.println("StartTime: " + TimeConverter.longTime2DateString(currentTime) + "TerminationTime: " + TimeConverter.longTime2DateString(terminationTime));
 			return new Long(value);
 		} else {// TODO: There might be a problem with Day Light Savings Time!
 			Calendar cal = Calendar.getInstance();
-			// Date terminationTime = cal.getTime();
-			Long currentTime = new Long(System.currentTimeMillis());
-			Long res = new Long(value - currentTime.longValue());
-			System.out.println("StartTime: " + TimeConverter.longTime2DateString(currentTime) + "TerminationTime: " + TimeConverter.longTime2DateString(new Long(cal.getTimeInMillis()))
-					+ ", Duration: " + res.longValue());
-			return res;
+			// Date terminationTime = cal.getTime();			
+			Long duration = new Long(value - currentTime.longValue());
+			System.out.println("StartTime: " + TimeConverter.longTime2DateString(currentTime) + "TerminationTime: " + TimeConverter.longTime2DateString(new Long(value))
+					+ ", Duration: " + duration.longValue());
+			return duration;
 		}
 	}
 
+	/**
+	 * Returns current Time using the IClockService
+	 * @return
+	 */
+	private long getCurrentTime(){
+		IClockService clockservice = (IClockService) getScope().getServiceContainer().getService(IClockService.class);
+		return clockservice.getTime();
+	}
 }

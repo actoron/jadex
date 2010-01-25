@@ -11,23 +11,24 @@
 
 
 
-<SimulationConfiguration name="MarsWorldExperiments" applicationReference="..\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml" applicationConfiguration="1 Sentry / 2 Producers / 3 Carries">
+<SimulationConfiguration name="MarsWorldExperiments" applicationReference="..\\jadex-applib-simulation\\target\\classes\\jadex\\simulation\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml" applicationConfiguration="1 Sentry / 2 Producers / 3 Carries">
     <Observers>
         <Observer>
-            <Data name="AntWalkedSteps">
+            <Data name="StepLogger">
                 <ObjectSource type="BDI_Agent" name="Sentry"/>
-                <ElementSource type="BDI_BELIEF" name="walkedSteps" class="Int"/><!-- Add type of element: String, long, int etc.? -->
+                <ElementSource type="BDI_BELIEF" name="myPos" class="String"/><!-- Add type of element: String, long, int etc.? -->
             </Data>
             <Evaluation mode="periodical" value="1000"/><!--If perdiocal, all have to have the same value -->
             <Filter mode="all"/><!-- All / one / subset of objects-JavaCondLanguage -->
         </Observer>
-        <!-- <Observer>-->
-        <!--    <Data name="AntWalkedCarriedFood">--><!-- TODO: How to deal with Strings, Lists? -->
-                <!-- <ObjectSource type="BDI_Agent" name="Sentry"/>
-                <ElementSource type="BDI_BELIEF" name="carriedFood" class="Int"/>                
+        <Observer>
+            <Data name="HomebaseLogger"><!-- TODO: How to deal with Strings, Lists? -->
+                <ObjectSource type="ISpaceObject" name="homebase"/>
+                <ElementSource type="Property" name="ore" class="String"/><!-- Add type of element: String, long, int etc.? -->
             </Data>
-            <Evaluation mode="onChange"/>
-        </Observer> -->
+            <Evaluation mode="onChange"/><!--If perdiocal, all have to have the same value -->
+            <Filter mode="all"/><!-- All / one / subset of objects-JavaCondLanguage -->
+        </Observer>        
     </Observers>
 
     <DataVisualization>
@@ -72,7 +73,7 @@
         </General>
         <Rows experiments="3">
             <TerminateCondition>
-                <Time value="5000" type="relative"/>
+                <Time value="10000" type="relative"/>
                 <!--<TargetFunction function="$object.money &gt; 5"/>-->
             </TerminateCondition>
         </Rows>

@@ -46,7 +46,7 @@ public class ComputeSingleResultPlan extends Plan {
 //				+ content.get("EXPERIMENT_NUMBER"));
 //		System.out.println("#Master# Lenght of Content: " + content.size());
 
-		System.out.println("#Master# Results of Simulation Run: ");
+		//System.out.println("#Master# Results of Simulation Run: ");
 		
 		HashMap facts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
 		int experimentRow = ((Integer) facts.get(Constants.EXPERIMENT_ROW_COUNTER)).intValue();
@@ -54,31 +54,26 @@ public class ComputeSingleResultPlan extends Plan {
 		int totalRuns = ((Integer) facts.get(Constants.TOTAL_EXPERIMENT_COUNTER)).intValue();
 
 		
-		System.out.println("Map of Observed Events: ");
+	//	System.out.println("Map of Observed Events: ");
 		HashMap<Long, ArrayList<ObservedEvent>> observedEventsMap = (HashMap<Long, ArrayList<ObservedEvent>>) content.get(Constants.OBSERVED_EVENTS_MAP);
-		ArrayList arrayList = new ArrayList(observedEventsMap.keySet());
-		Collections.sort(arrayList);
+		ArrayList sortedResultList = new ArrayList(observedEventsMap.keySet());
+		Collections.sort(sortedResultList);
 		
-		for(Object o : arrayList){
-			System.out.println("ooo: "  + o.toString());
-		}
-		
-		for (Iterator it = observedEventsMap.keySet().iterator(); it.hasNext();) {
-			Object key = it.next();
+	
+		//Sorted output of results
+		for (Object key  : sortedResultList) {			
 			ArrayList<ObservedEvent> values = (ArrayList<ObservedEvent>) observedEventsMap.get(key);
-			String tmp = null;
+			String tmp = "";
 			
 			for(ObservedEvent event : values){
 				tmp += " - " + event.toString();
 			}
 			System.out.println(key.toString()  + " : " + tmp);
-//						
-//			System.out.println(key.toString() + "-->" + value.toString());
 		}
 		
 		
 		
-		String res = "ID: " + experimentRow + "." + expInRow + "("   + totalRuns  + ") ***********************************";
+		String res = "ID: " + experimentRow + "." + expInRow + " - Total #"   + totalRuns  + " (Size of ObservedEvents: " + sortedResultList.size() + ") ***********************************";
 		System.out.println(res);
 //		for (Iterator it = content.keySet().iterator(); it.hasNext();) {
 //			Object key = it.next();
