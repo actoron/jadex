@@ -230,9 +230,9 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		if(info instanceof BeanAttributeInfo)
 			binfo = (BeanAttributeInfo)info;
 		
-		if(binfo!=null && binfo.getReadMethod()!=null)
+		if(binfo!=null && binfo.getWriteMethod()!=null)
 		{
-			method = ((BeanAttributeInfo)info).getReadMethod();
+			method = ((BeanAttributeInfo)info).getWriteMethod();
 		}
 		else if(attr instanceof BeanProperty)
 		{
@@ -264,13 +264,6 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		{
 			throw new RuntimeException("Unknown attribute type: "+attr);
 		}
-		
-		// Cache the read method.
-//		if(binfo!=null && binfo.getReadMethod()==null)
-//		{
-//			System.out.println("Remembered: "+method.getName());
-//			binfo.setReadMethod(method);
-//		}
 		
 		if(method!=null)
 		{

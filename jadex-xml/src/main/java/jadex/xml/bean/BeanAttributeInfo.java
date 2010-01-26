@@ -17,29 +17,20 @@ public class BeanAttributeInfo extends AttributeInfo
 	
 	// read + write
 	
-	/** The default value. */
-	protected Object defaultvalue;
-	
 	/** The map name (if it should be put in map). */
 	protected String mapname; // todo: exploit also for writing?!
 	
-	// read
+	// reading from xml
 	
-	/** The attribute value converter for reading. */
-	protected ITypeConverter converterread;
-	
-	/** The read method. */
+	/** The method for the read process for writing a value. */
 	protected Method readmethod;
 	
-	/** The getter method for the key of a map (if not supplied the attributename will be used). */
+	/** The getter method for getting the key for a map access (if not supplied the attributename will be used). */
 	protected Method readmapkeymethod;
 	
-	// write
+	// writing to xml
 	
-	/** The attribute value converter for write. */
-	protected ITypeConverter converterwrite;
-	
-	/** The write method. */
+	/** The write method for reading a Java value. */
 	protected Method writemethod;
 	
 	//-------- constructors --------
@@ -99,8 +90,7 @@ public class BeanAttributeInfo extends AttributeInfo
 	public BeanAttributeInfo(QName xmlattributename, String attributename, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, 
 		String mapname, Object defaultvalue, Method readmethod, Method writemethod, Method readmapkeymethod)
 	{
-		super(xmlattributename, attributename!=null || xmlattributename==null? attributename: xmlattributename.getLocalPart(), ignore);
-		
+		super(xmlattributename, attributename!=null || xmlattributename==null? attributename: xmlattributename.getLocalPart(), ignore);		
 		this.converterread = converterread;
 		this.converterwrite = converterwrite;
 		this.mapname = mapname;

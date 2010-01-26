@@ -495,6 +495,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		{	
 			BeanAttributeInfo bai = (BeanAttributeInfo)attrinfo;
 			
+			// Fetch value from map 1) fetch key 2) fetch value from map
 			if(bai.getMapName()!=null)
 			{
 				String mapname = bai.getMapName().length()==0? bai.getMapName(): bai.getMapName().substring(0,1).toUpperCase()+bai.getMapName().substring(1);
@@ -518,6 +519,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					key =  bai.getAttributeIdentifier()!=null? bai.getAttributeIdentifier(): xmlattrname;
 				}
 				
+				// Fetch map value with predefined read method.
 				if(bai.getReadMethod()!=null)
 				{
 					Method m = bai.getReadMethod();
@@ -534,6 +536,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						e.printStackTrace();
 					}
 				}
+				// Fetch map value with guessing method name.
 				else
 				{
 					String[] prefixes = new String[]{"put", "set", "add"};
@@ -561,9 +564,11 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					}
 				}
 			}
-			else if(bai.getWriteMethod()!=null)
+			
+			// Fetch value using predefined read method.
+			else if(bai.getReadMethod()!=null)
 			{
-				Method m = bai.getWriteMethod();
+				Method m = bai.getReadMethod();
 				Class[] ps = m.getParameterTypes();
 				if(ps.length==1)
 				{
@@ -586,6 +591,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			}
 		}
 	
+		// Try 
 		if(!set && attrinfo instanceof AttributeInfo)
 		{
 			AttributeInfo ai = (AttributeInfo)attrinfo;

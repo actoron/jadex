@@ -63,16 +63,16 @@ public class JavaReader extends Reader
 			TypeInfo ti_map = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Map")}, Map.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo(new QName("entry"), null, 
-					null, new MapEntryConverter(), null, "", null, null, Map.class.getMethod("put", new Class[]{Object.class, Object.class}), MapEntry.class.getMethod("getKey", new Class[0])))
+					null, new MapEntryConverter(), null, "", null, Map.class.getMethod("put", new Class[]{Object.class, Object.class}), null, MapEntry.class.getMethod("getKey", new Class[0])))
 			});
 			typeinfos.add(ti_map);
 			
 			TypeInfo ti_mapentry = new TypeInfo(null, "entry", MapEntry.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo(new QName("key"), "key", 
-					null, null, null, null, null, Map.Entry.class.getMethod("getKey", new Class[0]), null)),
+					null, null, null, null, Map.Entry.class.getMethod("getKey", new Class[0]), null, null)),
 				new SubobjectInfo(new BeanAttributeInfo(new QName("value"), "value", 
-					null, null, null, null, null, Map.Entry.class.getMethod("getValue", new Class[0]), null))
+					null, null, null, null, Map.Entry.class.getMethod("getValue", new Class[0]), null, null))
 			});
 			typeinfos.add(ti_mapentry);
 			
@@ -81,7 +81,7 @@ public class JavaReader extends Reader
 			TypeInfo ti_list = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "List")}, List.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS,
-					null, null, null, null, null, null, List.class.getMethod("add", new Class[]{Object.class})))
+					null, null, null, null, null, List.class.getMethod("add", new Class[]{Object.class}), null))
 			});
 			typeinfos.add(ti_list);
 			
@@ -90,7 +90,7 @@ public class JavaReader extends Reader
 			TypeInfo ti_set = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Set")}, Set.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS,
-					null, null, null, null, null, null, Set.class.getMethod("add", new Class[]{Object.class})))
+					null, null, null, null, null, Set.class.getMethod("add", new Class[]{Object.class}), null))
 			});
 			typeinfos.add(ti_set);
 			

@@ -66,7 +66,7 @@ public class JavaWriter extends Writer
 			TypeInfo ti_map = new TypeInfo(null, (String)null, Map.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), "entrySet", 
-					null, null, null, null, null, Map.class.getMethod("entrySet", new Class[0]), null), null, null, true)
+					null, null, null, null, null, null, Map.class.getMethod("entrySet", new Class[0])), null, null, true)
 			});
 			typeinfos.add(ti_map);
 			
@@ -74,9 +74,9 @@ public class JavaWriter extends Writer
 			TypeInfo ti_mapentry = new TypeInfo(null, "entry", Map.Entry.class, null, null, null, null, null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo(new QName("key"), "key", 
-					null, null, null, null, null, Map.Entry.class.getMethod("getKey", new Class[0]), null)),
+					null, null, null, null, null, null, Map.Entry.class.getMethod("getKey", new Class[0]))),
 				new SubobjectInfo(new BeanAttributeInfo(new QName("value"), "value", 
-					null, null, null, null, null, Map.Entry.class.getMethod("getValue", new Class[0]), null))
+					null, null, null, null, null, null, Map.Entry.class.getMethod("getValue", new Class[0])))
 			});
 			typeinfos.add(ti_mapentry);
 			
