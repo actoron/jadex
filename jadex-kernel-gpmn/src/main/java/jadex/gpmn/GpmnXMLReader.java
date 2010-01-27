@@ -112,7 +112,8 @@ public class GpmnXMLReader
 				public boolean filter(Object obj)
 				{
 					String type = (String)((Map)obj).get("type");
-					return type.endsWith("Goal");
+					boolean ret = type!=null?type.endsWith("Goal"):false;
+					return ret;
 				}
 			}),
 			new SubobjectInfo(new BeanAttributeInfo("vertices", "plan"),
@@ -121,7 +122,8 @@ public class GpmnXMLReader
 				public boolean filter(Object obj)
 				{
 					String type = (String)((Map)obj).get("type");
-					return type.endsWith("Plan");
+					boolean ret = type!=null?type.endsWith("Plan"):false;
+					return ret;
 				}
 			})
 		});	
