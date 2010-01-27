@@ -250,8 +250,10 @@
 	</spacetypes>
 
 	<agenttypes>
-		<agenttype name="Sentry"
-			filename="jadex/simulation/examples/marsworld/Sentry.agent.xml" />
+		<!-- <agenttype name="Sentry"
+			filename="jadex/simulation/examples/marsworld/Sentry.agent.xml" />-->
+			<agenttype name="Sentry"
+			filename="jadex/bdi/examples/marsworld/sentry/Sentry.agent.xml" />
 		<agenttype name="Producer"
 			filename="jadex/bdi/examples/marsworld/producer/Producer.agent.xml" />
 		<agenttype name="Carry"

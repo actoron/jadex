@@ -1,6 +1,7 @@
 package jadex.simulation.persist;
 
 import jadex.simulation.helper.XMLHandler;
+import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.SimulationConfiguration;
 
 import java.io.FileInputStream;
@@ -25,8 +26,12 @@ public class Main {
 		System.out.println("adad2: " + cal.getTime().toGMTString() + " - " + Calendar.getInstance().getTimeZone().getDisplayName());
 		System.out.println("adad3: " + Calendar.getInstance().getTimeZone().getDSTSavings());
 		System.out.println("Here we go....Read");
-		SimulationConfiguration simConf = (SimulationConfiguration) XMLHandler.parseXML("../jadex-applications-bdi/src/main/java/jadex/bdi/simulation/persist/TestXML.xml", SimulationConfiguration.class);
-		XMLHandler.writeXML(simConf, "test.xml", SimulationConfiguration.class);
+		SimulationConfiguration simConf = (SimulationConfiguration) XMLHandler.parseXML("../jadex-applib-simulation/src/main/java/jadex/simulation/persist/TestXML.xml", SimulationConfiguration.class);
+		
+		HelpElement event = new HelpElement();
+		event.setApplicationName("Wow1");
+		XMLHandler.writeXML(event, "test.xml", HelpElement.class);
+//		XMLHandler.writeXML(simConf, "test.xml", SimulationConfiguration.class);
 //		
 		
 //		SimulationConfiguration conf = null;

@@ -69,7 +69,7 @@ public class ComputeSingleResultPlan extends Plan {
 			
 			for(ObservedEvent event : values){
 				tmp += " - " + event.toString();
-				//Persist value
+				//Persist value				
 				XMLHandler.writeXML(event, "abcresult.xml", ObservedEvent.class);
 			}
 			System.out.println(key.toString()  + " : " + tmp);

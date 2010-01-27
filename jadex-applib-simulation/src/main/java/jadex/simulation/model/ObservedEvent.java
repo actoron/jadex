@@ -16,7 +16,7 @@ public class ObservedEvent {
 	
 	private Data dataReference;
 	private long timestamp;
-	private Object value;
+	private String value;
 	private String experimentId;
 	private String applicationName;
 	
@@ -31,7 +31,7 @@ public class ObservedEvent {
 		
 	}
 	
-	public ObservedEvent(String applicationName, String experimentId, long timestamp, Data dataReference, Object value){
+	public ObservedEvent(String applicationName, String experimentId, long timestamp, Data dataReference, String value){
 		this.applicationName = applicationName;
 		this.experimentId = experimentId;
 		this.timestamp = timestamp;
@@ -70,11 +70,11 @@ public class ObservedEvent {
 	 * @return
 	 */
 	@XmlAttribute(name="value")
-	public Object getValue() {
+	public String getValue() {
 		return value;
 	}
 	
-	public void setValue(Object value) {
+	public void setValue(String value) {
 		this.value = value;
 	}
 	

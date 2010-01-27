@@ -26,7 +26,9 @@ public class StartSimulationExperimentsPlan extends Plan {
 
 		HashMap beliefbasFacts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
 		SimulationConfiguration simConf = (SimulationConfiguration) getBeliefbase().getBelief("simulationConf").getFact();
-
+		
+		System.out.println("#StartSimulationExpPlan# Path: " + simConf.getApplicationReference());
+		
 		// how many experiments to do within this row
 		long experimentsPerRowToMake = ((Long) beliefbasFacts.get(Constants.EXPERIMENTS_PER_ROW_TO_DO)).longValue();
 		int totalRuns = ((Integer) beliefbasFacts.get(Constants.TOTAL_EXPERIMENT_COUNTER)).intValue();

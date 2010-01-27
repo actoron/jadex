@@ -1,5 +1,7 @@
 package jadex.simulation.helper;
 
+import jadex.simulation.model.ObservedEvent;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -16,7 +18,7 @@ public class XMLHandler {
 	
 	public static Object parseXML(String filename, Class classname){
 		Object obj;
-		
+		ObservedEvent j = new ObservedEvent();
 		try {						
 			// configure input:
 			JAXBContext ctx = JAXBContext.newInstance(classname);
