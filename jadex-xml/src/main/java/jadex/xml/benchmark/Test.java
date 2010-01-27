@@ -32,17 +32,17 @@ public class Test //extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
-				t.testBean();
-				t.testArrayOrder();
-				t.testMultiArray();
-				t.testVectorModel();
-				t.testClass();
-				t.testDate();
-				t.testColor();
+//				t.testBean();
+//				t.testArrayOrder();
+//				t.testMultiArray();
+//				t.testVectorModel();
+//				t.testClass();
+//				t.testDate();
+//				t.testColor();
 				t.testArray();
-				t.testList();
-				t.testSet();
-				t.testMap();
+//				t.testList();
+//				t.testSet();
+//				t.testMap();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -63,7 +63,7 @@ public class Test //extends TestCase
 	{
 		String xml = JavaWriter.objectToXML(wo, null);
 		
-//		System.out.println("xml is:"+xml);
+		System.out.println("xml is:"+xml);
 		
 		Object ro = JavaReader.objectFromXML(xml, null);
 		
@@ -167,10 +167,13 @@ public class Test //extends TestCase
 	 */
 	public void testArray() throws Exception
 	{
-		Object[] array = new Object[3]; 
+		Object[] array = new Object[6]; 
 		array[0] = new Integer(0);
 //		array[1] = new Integer(1);
 		array[2] = new Integer(2);
+		array[3] = new Integer(3);
+		array[4] = new Integer(4);
+		array[5] = new Integer(5);
 		
 		doWriteAndRead(array);
 	}

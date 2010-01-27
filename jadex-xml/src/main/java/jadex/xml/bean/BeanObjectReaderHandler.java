@@ -18,7 +18,9 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -533,7 +535,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 *  @param classloader The classloader.
 	 *  @param root The root object.
-	 */
+	 * /
 	public void bulkLinkObjects(Object parent, List children, Object context, 
 		ClassLoader classloader, Object root) throws Exception
 	{
@@ -545,7 +547,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			linkObject(linkdata.getChild(), parent, linkdata.getLinkinfo(), 
 				linkdata.getPathname(), context, classloader, root);
 		}
-	}
+	}*/
 	
 	/**
 	 *  Bulk link chilren to its parent.
@@ -554,29 +556,52 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 *  @param classloader The classloader.
 	 *  @param root The root object.
-	 * /
+	 */
 	public void bulkLinkObjects(Object parent, List children, Object context, 
 		ClassLoader classloader, Object root) throws Exception
 	{
-//		System.out.println("bulk link for: "+parent+" "+children);
+		System.out.println("bulk link for: "+parent+" "+children);
 		
 		// Search for equal tags/path and handle them as bulks
-		MultiCollection groups = new MultiCollection(new LinkedHashMap(), ArrayList.class);
-		for(int i=0; i<children.size(); i++)
-		{
-			LinkData linkdata = (LinkData)children.get(i);
-			QName[] pathname = linkdata.getPathname();
-			groups.put(pathname, linkdata);
-		}
+		Map linkinfos = new HashMap();
 		
-		for(Iterator it=groups.keySet().iterator(); it.hasNext(); )
+		LinkData linkdata = (LinkData)children.get(0);
+		List childs = new ArrayList();
+		childs.add(linkdata.getChild());
+		QName[] pathname = linkdata.getPathname();
+		for(int i=1; i<children.size(); i++)
 		{
-			QName[] path = (QName[])it.next();
-			List childs = (List)groups.get(path);
-			
+			LinkData ld = (LinkData)children.get(i);
+			QName[] pn = ld.getPathname();
+			if(!Arrays.equals(pathname, pn))
+			{
+				if(childs.size()>1)
+				{
+					bulkLinkObjects(childs, parent, linkdata.getLinkinfo(), 
+						pathname, context, classloader, root);
+				}
+				else
+				{
+					linkObject(childs.get(0), parent, linkdata.getLinkinfo(), 
+						pathname, context, classloader, root);
+				}
+				pathname = pn;
+				linkdata = ld;
+				childs.clear();
+			}
+			childs.add(ld.getChild());
 		}
-		
-	}*/
+		if(childs.size()>1)
+		{
+			bulkLinkObjects(childs, parent, linkdata.getLinkinfo(), 
+				pathname, context, classloader, root);
+		}
+		else
+		{
+			linkObject(childs.get(0), parent, linkdata.getLinkinfo(), 
+				pathname, context, classloader, root);
+		}
+	}
 	
 	//-------- helper methods --------
 	

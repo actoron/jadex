@@ -57,7 +57,7 @@ public class TypeInfo	extends AbstractInfo
 	protected Object linker;
 	
 	/** The link mode (determined by the linker if present). */
-	protected boolean bulklink = true;
+	protected boolean bulklink = false;
 	
 	// todo: IPreWriter for doing sth with the object before writing?
 	
