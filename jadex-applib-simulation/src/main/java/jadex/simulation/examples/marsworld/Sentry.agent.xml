@@ -38,9 +38,9 @@
 		</beliefref>
 		
 		<!--  Test for evaluation! -->
-		<belief name="myPos" class="String" evaluationmode="push">
+		<belief name="myPos" class="Vector2Double" evaluationmode="push">
 			<fact language="jcl">$beliefbase.myself.position</fact>
-		</belief>
+		</belief>		
 				
 		<!-- The seen targets. -->
 		<beliefsetref name="my_targets">

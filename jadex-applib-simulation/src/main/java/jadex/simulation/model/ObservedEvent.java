@@ -1,5 +1,9 @@
 package jadex.simulation.model;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import jadex.simulation.helper.TimeConverter;
 
 /**
@@ -7,6 +11,7 @@ import jadex.simulation.helper.TimeConverter;
  * @author Vilenica
  *
  */
+@XmlRootElement(name="ObservedEvent")
 public class ObservedEvent {
 	
 	private Data dataReference;
@@ -14,11 +19,12 @@ public class ObservedEvent {
 	private Object value;
 	private String experimentId;
 	private String applicationName;
+	
 
 	public ObservedEvent(){
 		
 	}
-	
+			
 	public ObservedEvent(String experimentId){
 		this.experimentId = experimentId;
 		this.timestamp = System.currentTimeMillis();
@@ -50,6 +56,7 @@ public class ObservedEvent {
 	 * Timestamp of the observed event
 	 * @return
 	 */
+	@XmlAttribute(name="timestamp")
 	public long getTimestamp() {
 		return timestamp;
 	}
@@ -62,6 +69,7 @@ public class ObservedEvent {
 	 * The observed value
 	 * @return
 	 */
+	@XmlAttribute(name="value")
 	public Object getValue() {
 		return value;
 	}
@@ -74,6 +82,7 @@ public class ObservedEvent {
 	 * The ID of the Experiment where the event occurred.
 	 * @return
 	 */
+	@XmlAttribute(name="ExperimentId")
 	public String getExperimentId() {
 		return experimentId;
 	}
@@ -85,7 +94,7 @@ public class ObservedEvent {
 	 * The name of the application (on the jadex plattform)
 	 * @return
 	 */
-	
+	@XmlAttribute(name="ApplicationName")
 	public String getApplicationName() {
 		return applicationName;
 	}
@@ -94,6 +103,17 @@ public class ObservedEvent {
 		this.applicationName = applicationName;
 	}
 
+	
+	/**
+	 * Hack!
+	 * Returns the name of the data reference 
+	 * @return
+	 */
+	@XmlAttribute(name="DataName")
+	public String getNameOfObservedData() {
+		return this.getDataReference().getName();
+	}
+	
 	public String toString(){
 		StringBuffer buffer = new StringBuffer();
 		

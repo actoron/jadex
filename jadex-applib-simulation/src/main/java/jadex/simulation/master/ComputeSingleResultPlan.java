@@ -4,6 +4,7 @@ import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.simulation.helper.Constants;
+import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.ExperimentResult;
 import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.SimulationConfiguration;
@@ -57,6 +58,7 @@ public class ComputeSingleResultPlan extends Plan {
 	//	System.out.println("Map of Observed Events: ");
 		HashMap<Long, ArrayList<ObservedEvent>> observedEventsMap = (HashMap<Long, ArrayList<ObservedEvent>>) content.get(Constants.OBSERVED_EVENTS_MAP);
 		ArrayList sortedResultList = new ArrayList(observedEventsMap.keySet());
+		//Sort by timestamp
 		Collections.sort(sortedResultList);
 		
 	
@@ -67,6 +69,8 @@ public class ComputeSingleResultPlan extends Plan {
 			
 			for(ObservedEvent event : values){
 				tmp += " - " + event.toString();
+				//Persist value
+				XMLHandler.writeXML(event, "abcresult.xml", ObservedEvent.class);
 			}
 			System.out.println(key.toString()  + " : " + tmp);
 		}
@@ -83,6 +87,8 @@ public class ComputeSingleResultPlan extends Plan {
 //		}
 //		System.out.println(res);
 
+		
+		
 		//trigger the start of the next experiment
 		dispatchInternalEvent(createInternalEvent("triggerNewExperiment"));
 		

@@ -182,14 +182,16 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 											@Override
 											public void resultAvailable(Object source, Object result) {
 												ExternalAccessFlyweight exta = (ExternalAccessFlyweight) result;
-												System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + " " +  timestamp + " - " + exta.getBeliefbase().getBelief("myPos").getFact());
-												ISpaceObject myself = (ISpaceObject) exta.getBeliefbase().getBelief("myself").getFact();
-												System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + " " +  timestamp + " - " + exta.getBeliefbase().getBelief("myPos").getFact() + "<->" +  myself.getProperty("position"));
+//												System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + " " +  timestamp   + " - " + exta.getComponentIdentifier().getPlatformName());
+//												System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + " " +  timestamp + " - " + exta.getBeliefbase().getBelief("bel1").getFact());
+//												ISpaceObject myself = (ISpaceObject) exta.getBeliefbase().getBelief("myself").getFact();
+//												System.out.println("#ObserveBDIAgentThread# Got exta ---> " + exta.getAgentName() + " " +  timestamp + " - " + exta.getBeliefbase().getBelief("myPos").getFact() + "<->" +  myself.getProperty("position"));
 												
 												//Get Fact from Beliefbase
 												//TODO: Not only for Strings meaning: read the right class from the data-field!
-												Vector2Double currentValue = (Vector2Double) exta.getBeliefbase().getBelief(obs.getData().getElementSource().getName()).getFact(); 
-												observedEvents.add(new ObservedEvent(appName, experimentId, timestamp, obs.getData(), currentValue.toString()));
+												String currentValue = exta.getBeliefbase().getBelief(obs.getData().getElementSource().getName()).getFact().toString();
+//												System.out.println("MayValue: " + currentValue);
+												observedEvents.add(new ObservedEvent(appName, experimentId, timestamp, obs.getData(), currentValue));
 											}
 
 											@Override
@@ -206,7 +208,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 							} else if (obs.getData().getObjectSource().getType().equals(Constants.ISPACE_OBJECT)) {
 								ISpaceObject[] targets  = space.getSpaceObjectsByType(obs.getData().getObjectSource().getName());
 								//TODO: Handle multiple occurrences of that ISpaceObject
-								Integer currentValue  = (Integer) targets[0].getProperty(obs.getData().getElementSource().getName());								
+								String currentValue  = targets[0].getProperty(obs.getData().getElementSource().getName()).toString();								
 								observedEvents.add(new ObservedEvent(appName, experimentId, timestamp, obs.getData(), currentValue));
 							} else {
 								System.err.println("#DeltaTimeExecutor4Simulation# Error on setting type of ObjectSource " + simConf);
