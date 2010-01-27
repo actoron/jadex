@@ -68,9 +68,8 @@ public class Reader
 	public Reader(IObjectReaderHandler handler, boolean bulklink)
 	{
 		this.handler = handler;
+		this.children = new MultiCollection();
 		this.bulklink = bulklink;
-		if(bulklink)
-			this.children = new MultiCollection();
 	}
 	
 	//-------- methods --------
@@ -455,13 +454,16 @@ public class Reader
 				}
 	
 				// Handle linking
+				boolean bulklink = typeinfo!=null? typeinfo.isBulkLink(): this.bulklink;
+				
 				if(stack.size()>0 && bulklink)
 				{
 					// Invoke bulk link for the finished object (as parent).
-					List childs = (List)children.get(topse.getObject());
+					List childs = (List)children.remove(topse.getObject());
 					if(childs!=null)
 					{
-						handler.bulkLinkObjects(topse.getObject(), childs, readcontext.getCallContext(), 
+						IBulkObjectLinker linker = (IBulkObjectLinker)(typeinfo!=null && typeinfo.getLinker()!=null? typeinfo.getLinker(): handler);
+						linker.bulkLinkObjects(topse.getObject(), childs, readcontext.getCallContext(), 
 							readcontext.getClassLoader(), readcontext.getRoot());
 					}
 				}
@@ -486,7 +488,8 @@ public class Reader
 					
 					if(!bulklink)
 					{
-						handler.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), 
+						IObjectLinker linker = (IObjectLinker)(typeinfo!=null && typeinfo.getLinker()!=null? typeinfo.getLinker(): handler);
+						linker.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), 
 							(QName[])pathname.toArray(new QName[pathname.size()]), 
 							readcontext.getCallContext(), readcontext.getClassLoader(), readcontext.getRoot());
 					}
@@ -494,7 +497,7 @@ public class Reader
 					{
 						// Save the finished object as child for its parent.
 						children.put(pse.getObject(), new LinkData(topse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), 
-							(QName[])pathname.toArray(new QName[pathname.size()])));
+							(QName[])pathname.toArray(new QName[pathname.size()])));	
 					}
 				}
 			}

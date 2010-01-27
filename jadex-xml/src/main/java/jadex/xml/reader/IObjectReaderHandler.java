@@ -13,7 +13,7 @@ import javax.xml.namespace.QName;
  *  Is called when a tag start is found and an object could be created.
  *  Is called when an end tag is found and an object could be linked to its parent.
  */
-public interface IObjectReaderHandler
+public interface IObjectReaderHandler extends IObjectLinker, IBulkObjectLinker
 {
 	/**
 	 *  Create an object for the current tag.
@@ -54,9 +54,9 @@ public interface IObjectReaderHandler
 	 *  @param linkinfo The link info.
 	 *  @param tagname The current tagname (for name guessing).
 	 *  @param context The context.
-	 */
+	 * /
 	public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, 
-		Object context, ClassLoader classloader, Object root) throws Exception;
+		Object context, ClassLoader classloader, Object root) throws Exception;*/
 	
 	/**
 	 *  Bulk link an object to its parent.
@@ -65,9 +65,9 @@ public interface IObjectReaderHandler
 	 *  @param context The context.
 	 *  @param classloader The classloader.
 	 *  @param root The root object.
-	 */
+	 * /
 	public void bulkLinkObjects(Object parent, List children, Object context, 
-		ClassLoader classloader, Object root) throws Exception;
+		ClassLoader classloader, Object root) throws Exception;*/
 	
 	/**
 	 *  Get the most specific mapping info.

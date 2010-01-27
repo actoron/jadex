@@ -1,6 +1,7 @@
 package jadex.xml;
 
 import jadex.commons.IFilter;
+import jadex.xml.reader.IBulkObjectLinker;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -51,6 +52,12 @@ public class TypeInfo	extends AbstractInfo
 	
 	/** Create from tag flag. */
 	protected boolean createfromtag;
+	
+	/** The linker. */
+	protected Object linker;
+	
+	/** The link mode (determined by the linker if present). */
+	protected boolean bulklink = true;
 	
 	// todo: IPreWriter for doing sth with the object before writing?
 	
@@ -145,6 +152,22 @@ public class TypeInfo	extends AbstractInfo
 		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
 		SubobjectInfo[] subobjectinfos, boolean createfromtag, boolean includefields)
 	{
+		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributeinfos, postproc, filter, subobjectinfos, true, false, null);
+	}
+	
+	/**
+	 *  Create a new type info.
+	 * @param xmlpath The path or tag.
+	 * @param typeinfo The type of object to create.
+	 * @param commentinfo The commnent.
+	 * @param contentinfo The content.
+	 * @param attributeinfos The attributes map.
+	 * @param postproc The post processor. 
+	 */
+	public TypeInfo(TypeInfo supertype, String xmlpath, Object typeinfo, Object commentinfo, 
+		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
+		SubobjectInfo[] subobjectinfos, boolean createfromtag, boolean includefields, Object linker)
+	{
 		super(xmlpath, filter);
 		this.supertype = supertype;
 		this.typeinfo = typeinfo;
@@ -153,6 +176,7 @@ public class TypeInfo	extends AbstractInfo
 		this.postproc = postproc;
 		this.createfromtag = createfromtag;
 		this.includefields = includefields;
+		this.linker = linker;
 		
 		if(attributeinfos!=null)
 			this.attributeinfos = createAttributeInfos(attributeinfos);
@@ -481,6 +505,32 @@ public class TypeInfo	extends AbstractInfo
 	public boolean isCreateFromTag()
 	{
 		return createfromtag;
+	}
+	
+	/**
+	 *  Get the linker.
+	 *  @return The linker.
+	 */
+	public Object getLinker()
+	{
+		return this.linker;
+	}
+
+	/**
+	 *  Set the linker.
+	 *  @param linker The linker to set.
+	 */
+	public void setLinker(Object linker)
+	{
+		this.linker = linker;
+	}
+
+	/**
+	 *  Test if the object should be bulk linked. 
+	 */
+	public boolean isBulkLink()
+	{
+		return bulklink || linker instanceof IBulkObjectLinker;
 	}
 	
 	/**

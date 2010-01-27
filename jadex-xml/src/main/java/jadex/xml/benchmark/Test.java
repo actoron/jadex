@@ -32,6 +32,7 @@ public class Test //extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
+				t.testBean();
 				t.testArrayOrder();
 				t.testMultiArray();
 				t.testVectorModel();
@@ -39,7 +40,6 @@ public class Test //extends TestCase
 				t.testDate();
 				t.testColor();
 				t.testArray();
-				t.testBean();
 				t.testList();
 				t.testSet();
 				t.testMap();
