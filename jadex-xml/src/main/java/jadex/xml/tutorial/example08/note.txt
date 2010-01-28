@@ -8,9 +8,8 @@ Changes in Jadex XML:
   - Generated getters and setters for Airport and Carrier classes 
 - Jadex XML does currently not work on list/set elements without methods
   - Added 'add' methods to TimeTable class (for linking)
+  - or added 'set' methods to TimeTable class (only in bulk mode) 
   
-- todo: support also setNotes(String[] notes). This requires to change
-the linking process for bulk links.
 
 Original Jibx config and result:
 

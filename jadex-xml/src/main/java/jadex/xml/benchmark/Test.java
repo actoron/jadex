@@ -39,10 +39,10 @@ public class Test //extends TestCase
 //				t.testClass();
 //				t.testDate();
 //				t.testColor();
-				t.testArray();
+//				t.testArray();
 //				t.testList();
 //				t.testSet();
-//				t.testMap();
+				t.testMap();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -63,7 +63,7 @@ public class Test //extends TestCase
 	{
 		String xml = JavaWriter.objectToXML(wo, null);
 		
-		System.out.println("xml is:"+xml);
+//		System.out.println("xml is:"+xml);
 		
 		Object ro = JavaReader.objectFromXML(xml, null);
 		
@@ -79,7 +79,7 @@ public class Test //extends TestCase
 		
 //		System.out.println("equals: "+wo.equals(ro));
 		if(!wo.equals(ro) && !(wo.getClass().isArray() && Arrays.deepEquals((Object[])wo, (Object[])ro)))
-			System.out.println("Not equal: "+wo.getClass()+" \n"+ro.getClass());
+			System.out.println("Not equal: "+wo.getClass()+" \n"+ro.getClass()+" \n"+xml);
 		
 //		assertEquals("Written and read objects should be equal:", wo, ro);
 	}

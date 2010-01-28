@@ -2,10 +2,10 @@
 package jadex.xml.tutorial.example14;
 
 public class Customer {
-    public int customerNumber;
-    public String firstName;
-    public String lastName;
-    public Address shipAddress;
-    public Address billAddress;
+    public int customernumber;
+    public String firstname;
+    public String lastname;
+    public Address shipaddress;
+    public Address billaddress;
     public String phone;
 }

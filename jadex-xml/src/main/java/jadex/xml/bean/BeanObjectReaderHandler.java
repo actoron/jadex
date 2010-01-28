@@ -479,19 +479,28 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			List classes	= new LinkedList();
 			classes.add(childs.get(0).getClass());
 			
+			String[] orignames = new String[pathname.length];
 			String[] plunames = new String[pathname.length];
-			String[] fieldnames = new String[pathname.length];
+			String[] origfieldnames = new String[pathname.length];
+			String[] plufieldnames = new String[pathname.length];
 			for(int i=0; i<pathname.length; i++)
 			{
-				plunames[i] = pathname[i].getLocalPart().substring(0, 1).toUpperCase()+pathname[i].getLocalPart().substring(1);
-				fieldnames[i] = pathname[i].getLocalPart();
+				String origname = pathname[i].getLocalPart();
+				String pluname =  SUtil.getPlural(pathname[i].getLocalPart());
+				plunames[i] = pluname.substring(0, 1).toUpperCase()+pluname.substring(1);
+				orignames[i] = origname.substring(0, 1).toUpperCase()+origname.substring(1);
+				plufieldnames[i] = pluname;
+				origfieldnames[i] = origname;
 			}
 			
 			// Try via fieldname
-			
-			for(int i=0; i<fieldnames.length && !linked; i++)
+			for(int i=0; i<plufieldnames.length && !linked; i++)
 			{
-				linked = setBulkField(fieldnames[i], parent, childs, null, classloader, context, root, null, null);
+				linked = setBulkField(plufieldnames[i], parent, childs, null, classloader, context, root, null, null);
+				if(!linked && !origfieldnames[i].equals(plufieldnames[i]))
+				{
+					linked = setBulkField(origfieldnames[i], parent, childs, null, classloader, context, root, null, null);
+				}
 			}
 			
 			// Try name guessing via class/superclass/interface names of object to add
@@ -502,6 +511,10 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				for(int i=0; i<plunames.length && !linked; i++)
 				{
 					linked = internalBulkLinkObjects(clazz, "set"+plunames[i], childs, parent, root, classloader);
+					if(!linked && !orignames[i].equals(plunames[i]))
+					{
+						linked = internalBulkLinkObjects(clazz, "set"+orignames[i], childs, parent, root, classloader);
+					}
 				}
 				
 				// Try classname of object to add
@@ -562,43 +575,62 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	{
 		System.out.println("bulk link for: "+parent+" "+children);
 		
-		// Search for equal tags/path and handle them as bulks
-		Map linkinfos = new HashMap();
-		
+		// The default bulk strategy is as follows:
+		// Linear scan the subpaths(tags) of the parent
+		// As long as the path is the same remember as bulk
+		// Whenever a new path/tag is used the last bulk is considered finished
+
 		LinkData linkdata = (LinkData)children.get(0);
 		List childs = new ArrayList();
 		childs.add(linkdata.getChild());
 		QName[] pathname = linkdata.getPathname();
+		int startidx = 0;
 		for(int i=1; i<children.size(); i++)
 		{
 			LinkData ld = (LinkData)children.get(i);
 			QName[] pn = ld.getPathname();
 			if(!Arrays.equals(pathname, pn))
 			{
-				if(childs.size()>1)
-				{
-					bulkLinkObjects(childs, parent, linkdata.getLinkinfo(), 
-						pathname, context, classloader, root);
-				}
-				else
-				{
-					linkObject(childs.get(0), parent, linkdata.getLinkinfo(), 
-						pathname, context, classloader, root);
-				}
+				handleBulkLinking(childs, parent, context, classloader, root, pathname, children, startidx);
+				
 				pathname = pn;
 				linkdata = ld;
 				childs.clear();
+				startidx = i;
 			}
 			childs.add(ld.getChild());
 		}
+		handleBulkLinking(childs, parent, context, classloader, root, pathname, children, startidx);
+		
+	}
+	
+	/**
+	 *  Initiate the bulk link calls.
+	 */
+	protected void handleBulkLinking(List childs, Object parent, Object context, ClassLoader classloader, 
+		Object root, QName[] pathname, List linkdatas, int startidx) throws Exception
+	{
 		if(childs.size()>1)
 		{
-			bulkLinkObjects(childs, parent, linkdata.getLinkinfo(), 
-				pathname, context, classloader, root);
+			try
+			{
+				bulkLinkObjects(childs, parent, ((LinkData)linkdatas.get(startidx)).getLinkinfo(), 
+					pathname, context, classloader, root);
+			}
+			catch(Exception e)
+			{
+				System.out.println("Warning. Bulk link initiated but not successful: "+childs+" "+parent+" "+e);
+			
+				for(int i=0; i<childs.size(); i++)
+				{
+					linkObject(childs.get(i), parent, ((LinkData)linkdatas.get(startidx+i)).getLinkinfo(), 
+						pathname, context, classloader, root);
+				}
+			}
 		}
 		else
 		{
-			linkObject(childs.get(0), parent, linkdata.getLinkinfo(), 
+			linkObject(childs.get(0), parent, ((LinkData)linkdatas.get(startidx)).getLinkinfo(), 
 				pathname, context, classloader, root);
 		}
 	}
@@ -628,7 +660,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		{	
 			BeanAttributeInfo bai = (BeanAttributeInfo)attrinfo;
 			
-			// Fetch value from map 1) fetch key 2) set value in map
+			// Put value in map 1) fetch key 2) set value in map
 			if(bai.getMapName()!=null)
 			{
 				String mapname = bai.getMapName().length()==0? bai.getMapName(): bai.getMapName().substring(0,1).toUpperCase()+bai.getMapName().substring(1);
@@ -728,7 +760,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		if(!set && attrinfo instanceof AttributeInfo)
 		{
 			AttributeInfo ai = (AttributeInfo)attrinfo;
-			ITypeConverter converter = ai instanceof BeanAttributeInfo? ((BeanAttributeInfo)ai).getConverterRead(): null;
+			ITypeConverter converter = ai.getConverterRead();
 			
 			String fieldname = ai.getAttributeIdentifier()!=null? ((String)ai.getAttributeIdentifier()): xmlattrname.getLocalPart();
 			set = setField(fieldname, object, val, converter, classloader, context, root, ai.getId(), readobjects);
@@ -1181,7 +1213,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	}
 	
 	/**
-	 * 
+	 *  Convert a list of values into the target format (list, set, collection, array).
 	 */
 	protected Object convertBulkValues(List vals, Class targetclass, ITypeConverter converter, 
 		Object root, ClassLoader classloader, String id, Map readobjects)

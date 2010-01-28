@@ -2,13 +2,13 @@
 package jadex.xml.tutorial.example20;
 
 public class Customer {
-    private int customerNumber;
-    private String firstName;
-    private String lastName;
-    private String street;
-    private String city;
-    private String state;
-    private Integer zip;
-    private int total;
-    private int[] orders;
+    public int customernumber;
+    public String firstname;
+    public String lastname;
+    public String street;
+    public String city;
+    public String state;
+    public Integer zip;
+    public int total;
+    public int[] orders;
 }

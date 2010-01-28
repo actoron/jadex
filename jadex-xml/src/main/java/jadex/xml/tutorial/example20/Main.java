@@ -1,18 +1,14 @@
-package jadex.xml.tutorial.example08;
+package jadex.xml.tutorial.example20;
 
 import jadex.commons.SUtil;
 import jadex.xml.AttributeInfo;
+import jadex.xml.ITypeConverter;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
-import jadex.xml.bean.BeanAttributeInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
-import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.reader.Reader;
-import jadex.xml.writer.Writer;
 
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,17 +31,35 @@ public class Main
 		// object attributes. They are considered as subobjectinfos here
 		// and not as attributeinfos, because they are subtags in they xml.
 		Set typeinfos = new HashSet();
-		typeinfos.add(new TypeInfo(null, "timetable", TimeTable.class, null, null, null, null, null,
-			new SubobjectInfo[]{
-			//new SubobjectInfo(new BeanAttributeInfo("phone", "phone")),
-		}, true, true, null, true));
-		typeinfos.add(new TypeInfo(null, "carrier", Carrier.class));
-		typeinfos.add(new TypeInfo(null, "airport", Airport.class));
+		
+		ITypeConverter totalconv = new ITypeConverter()
+		{
+			public Object convertObject(Object val, Object root,
+				ClassLoader classloader, Object context)
+			{
+				return Conversion.deserializeDollarsCents((String)val);
+			}
+		};
+		
+		ITypeConverter ordersconv = new ITypeConverter()
+		{
+			public Object convertObject(Object val, Object root,
+				ClassLoader classloader, Object context)
+			{
+				return Conversion.deserializeIntArray((String)val);
+			}
+		};
+		
+		typeinfos.add(new TypeInfo(null, "customer", Customer.class, null, null,
+			null, null, null, new SubobjectInfo[]{
+			new SubobjectInfo(new AttributeInfo("total", null, null, totalconv, null)),
+			new SubobjectInfo(new AttributeInfo("orders", null, null, ordersconv, null))
+		}));
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos
 		Reader xmlreader = new Reader(new BeanObjectReaderHandler(typeinfos));
-		InputStream is = SUtil.getResource("jadex/xml/tutorial/example08/data.xml", null);
+		InputStream is = SUtil.getResource("jadex/xml/tutorial/example20/data.xml", null);
 		Object object = xmlreader.read(is, null, null);
 		is.close();
 		

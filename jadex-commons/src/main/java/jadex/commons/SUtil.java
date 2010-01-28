@@ -496,6 +496,10 @@ public class SUtil
 		{
 			plu = s.substring(0, s.length()-1)+"ies";
 		}
+		else if(s.endsWith("s"))
+		{
+			plu	= s+"es";
+		}
 		else
 		{
 			plu	= s+"s";

@@ -455,7 +455,6 @@ public class Reader
 	
 				// Handle linking
 				boolean bulklink = typeinfo!=null? typeinfo.isBulkLink(): this.bulklink;
-				
 				if(stack.size()>0 && bulklink)
 				{
 					// Invoke bulk link for the finished object (as parent).
@@ -485,6 +484,7 @@ public class Reader
 					
 					TypeInfo patypeinfo = pse.getTypeInfo();
 					SubobjectInfo linkinfo = getSubobjectInfoRead(localname, fullpath, patypeinfo, topse.getRawAttributes());
+					bulklink = patypeinfo!=null? patypeinfo.isBulkLink(): this.bulklink;
 					
 					if(!bulklink)
 					{

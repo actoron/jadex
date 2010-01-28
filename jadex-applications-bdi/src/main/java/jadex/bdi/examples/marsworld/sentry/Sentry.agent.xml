@@ -27,7 +27,7 @@
 	</capabilities>
 
 	<beliefs>
-		<!-- The agent's avatar  in the environment. -->
+		<!-- The agent's avatar in the environment. -->
 		<beliefref name="myself">
 			<concrete ref="move.myself"/>
 		</beliefref>

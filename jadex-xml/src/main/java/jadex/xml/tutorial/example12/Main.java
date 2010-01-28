@@ -1,27 +1,16 @@
 package jadex.xml.tutorial.example12;
 
 import jadex.commons.SUtil;
-import jadex.xml.AttributeInfo;
-import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
-import jadex.xml.bean.BeanAttributeInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
-import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.reader.Reader;
-import jadex.xml.writer.Writer;
 
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  *  Main class to execute tutorial lesson c (taken from Jibx website).
- *  
- *  Topic: reading a simple XML file in Java objects.
- *  The xml and Java structures differ substantially.
- *  In Java only one object is used.
  */
 public class Main
 {
