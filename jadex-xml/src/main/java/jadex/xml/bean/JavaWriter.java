@@ -1,7 +1,10 @@
 package jadex.xml.bean;
 
 import jadex.xml.AttributeInfo;
+import jadex.xml.ObjectInfo;
 import jadex.xml.ITypeConverter;
+import jadex.xml.XMLInfo;
+import jadex.xml.MappingInfo;
 import jadex.xml.SXML;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
@@ -63,66 +66,99 @@ public class JavaWriter extends Writer
 		{
 			// java.util.Map
 			
-			TypeInfo ti_map = new TypeInfo(null, (String)null, Map.class, null, null, null, null, null,
-				new SubobjectInfo[]{
+			TypeInfo ti_map = new TypeInfo(null, new ObjectInfo(Map.class),
+				new MappingInfo(null, new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), "entrySet", 
-					null, null, null, null, null, null, Map.class.getMethod("entrySet", new Class[0])), null, null, true)
-			});
+				null, null, null, null, null, null, Map.class.getMethod("entrySet", new Class[0])), null, null, true)}
+			));
+//			TypeInfo ti_map = new TypeInfo(null, (String)null, Map.class, null, null, null, null, null,
+//				new SubobjectInfo[]{
+//				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), "entrySet", 
+//					null, null, null, null, null, null, Map.class.getMethod("entrySet", new Class[0])), null, null, true)
+//			});
 			typeinfos.add(ti_map);
 			
 			// Cannot let xmltag be null, because class name then contains $ which is not allowed in a tag
-			TypeInfo ti_mapentry = new TypeInfo(null, "entry", Map.Entry.class, null, null, null, null, null,
-				new SubobjectInfo[]{
+			// Note: XMLinfo is necessary because it cannot be written as 'Map$Entry'
+			TypeInfo ti_mapentry = new TypeInfo(new XMLInfo("entry"),
+				new ObjectInfo(Map.Entry.class), new MappingInfo(null, new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo(new QName("key"), "key", 
-					null, null, null, null, null, null, Map.Entry.class.getMethod("getKey", new Class[0]))),
+				null, null, null, null, null, null, Map.Entry.class.getMethod("getKey", new Class[0]))),
 				new SubobjectInfo(new BeanAttributeInfo(new QName("value"), "value", 
-					null, null, null, null, null, null, Map.Entry.class.getMethod("getValue", new Class[0])))
-			});
+				null, null, null, null, null, null, Map.Entry.class.getMethod("getValue", new Class[0])))}
+			));
+//			TypeInfo ti_mapentry = new TypeInfo(null, "entry", Map.Entry.class, null, null, null, null, null,
+//				new SubobjectInfo[]{
+//				new SubobjectInfo(new BeanAttributeInfo(new QName("key"), "key", 
+//					null, null, null, null, null, null, Map.Entry.class.getMethod("getKey", new Class[0]))),
+//				new SubobjectInfo(new BeanAttributeInfo(new QName("value"), "value", 
+//					null, null, null, null, null, null, Map.Entry.class.getMethod("getValue", new Class[0])))
+//			});
 			typeinfos.add(ti_mapentry);
 			
 			// java.util.List
 			
-			TypeInfo ti_list = new TypeInfo(null, (String)null, List.class, null, null, null, null, null,
+			TypeInfo ti_list = new TypeInfo(null, new ObjectInfo(List.class), new MappingInfo(null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS), null, null, true)
-			});
+			}));
+//			TypeInfo ti_list = new TypeInfo(null, (String)null, List.class, null, null, null, null, null,
+//				new SubobjectInfo[]{
+//				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS), null, null, true)
+//			});
 			typeinfos.add(ti_list);
 			
 			// java.util.Set
 			
-			TypeInfo ti_set = new TypeInfo(null, (String)null, Set.class, null, null, null, null, null,
+			TypeInfo ti_set = new TypeInfo(null, new ObjectInfo(Set.class), new MappingInfo(null,
 				new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS), null, null, true)
-			});
+			}));
+//			TypeInfo ti_set = new TypeInfo(null, (String)null, Set.class, null, null, null, null, null,
+//				new SubobjectInfo[]{
+//				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS), null, null, true)
+//			});
 			typeinfos.add(ti_set);
 			
 			// Array
 			
-			TypeInfo ti_array = new TypeInfo(null, (String)null, Object[].class, null, null, null, null, null,
-				new SubobjectInfo[]{
+			TypeInfo ti_array = new TypeInfo(null, new ObjectInfo(Object[].class),
+				new MappingInfo(null, new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS), null, null, true)
-			});
+			}));
+//			TypeInfo ti_array = new TypeInfo(null, (String)null, Object[].class, null, null, null, null, null,
+//				new SubobjectInfo[]{
+//				new SubobjectInfo(new BeanAttributeInfo(new QName("entries"), AttributeInfo.THIS), null, null, true)
+//			});
 			typeinfos.add(ti_array);
 			
 			// java.util.Color
 			
-			TypeInfo ti_color = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.awt", "Color")}, Color.class, null, 
+			TypeInfo ti_color = new TypeInfo(null, new ObjectInfo(Color.class), new MappingInfo(null, null,
 				new BeanAttributeInfo((String)null, AttributeInfo.THIS, null, null, new ITypeConverter()
 				{
 					public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
 					{
 						return ""+((Color)val).getRGB();
 					}
-				})
-			);
+			})));
+//			TypeInfo ti_color = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.awt", "Color")}, Color.class, null, 
+//				new BeanAttributeInfo((String)null, AttributeInfo.THIS, null, null, new ITypeConverter()
+//				{
+//					public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
+//					{
+//						return ""+((Color)val).getRGB();
+//					}
+//				})
+//			);
 			typeinfos.add(ti_color);
 			
 			// java.util.Date
 			
 			// Ignores several redundant bean attributes for performance reasons.
 			
-			TypeInfo ti_date = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Date")}, Date.class, null, null, 
-				new AttributeInfo[]{
+			TypeInfo ti_date = new TypeInfo(null, new ObjectInfo(Date.class), 
+				new MappingInfo(null, new AttributeInfo[]{
 				new BeanAttributeInfo("hours", null, AttributeInfo.IGNORE_READWRITE),
 				new BeanAttributeInfo("minutes", null, AttributeInfo.IGNORE_READWRITE),
 				new BeanAttributeInfo("seconds", null, AttributeInfo.IGNORE_READWRITE),
@@ -130,13 +166,22 @@ public class JavaWriter extends Writer
 				new BeanAttributeInfo("year", null, AttributeInfo.IGNORE_READWRITE),
 				new BeanAttributeInfo("date", null, AttributeInfo.IGNORE_READWRITE)},
 				null
-			);
+			));
+//			TypeInfo ti_date = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Date")}, Date.class, null, null, 
+//				new AttributeInfo[]{
+//				new BeanAttributeInfo("hours", null, AttributeInfo.IGNORE_READWRITE),
+//				new BeanAttributeInfo("minutes", null, AttributeInfo.IGNORE_READWRITE),
+//				new BeanAttributeInfo("seconds", null, AttributeInfo.IGNORE_READWRITE),
+//				new BeanAttributeInfo("month", null, AttributeInfo.IGNORE_READWRITE),
+//				new BeanAttributeInfo("year", null, AttributeInfo.IGNORE_READWRITE),
+//				new BeanAttributeInfo("date", null, AttributeInfo.IGNORE_READWRITE)},
+//				null
+//			);
 			typeinfos.add(ti_date);
 			
 			// java.lang.Class
 			
-			TypeInfo ti_class = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Class")}, Class.class, null, null, 
-				new AttributeInfo[]{
+			TypeInfo ti_class = new TypeInfo(null, new ObjectInfo(Class.class), new MappingInfo(null, new AttributeInfo[]{
 				new BeanAttributeInfo("classname", AttributeInfo.THIS, null, null, new ITypeConverter()
 				{
 					public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
@@ -145,7 +190,19 @@ public class JavaWriter extends Writer
 					}
 				})},
 				null
-			);
+			));
+			
+//			TypeInfo ti_class = new TypeInfo(null, new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Class")}, Class.class, null, null, 
+//				new AttributeInfo[]{
+//				new BeanAttributeInfo("classname", AttributeInfo.THIS, null, null, new ITypeConverter()
+//				{
+//					public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
+//					{
+//						return ""+((Class)val).getCanonicalName();
+//					}
+//				})},
+//				null
+//			);
 			typeinfos.add(ti_class);
 		}
 		catch(Exception e)

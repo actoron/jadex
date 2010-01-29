@@ -2,6 +2,9 @@ package jadex.xml.tutorial.example08;
 
 import jadex.commons.SUtil;
 import jadex.xml.AttributeInfo;
+import jadex.xml.ObjectInfo;
+import jadex.xml.XMLInfo;
+import jadex.xml.MappingInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.bean.BeanAttributeInfo;
@@ -17,11 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- *  Main class to execute tutorial lesson c (taken from Jibx website).
- *  
- *  Topic: reading a simple XML file in Java objects.
- *  The xml and Java structures differ substantially.
- *  In Java only one object is used.
+ *  Main class to execute tutorial lesson.
  */
 public class Main
 {
@@ -35,12 +34,9 @@ public class Main
 		// object attributes. They are considered as subobjectinfos here
 		// and not as attributeinfos, because they are subtags in they xml.
 		Set typeinfos = new HashSet();
-		typeinfos.add(new TypeInfo(null, "timetable", TimeTable.class, null, null, null, null, null,
-			new SubobjectInfo[]{
-			//new SubobjectInfo(new BeanAttributeInfo("phone", "phone")),
-		}, true, true, null, true));
-		typeinfos.add(new TypeInfo(null, "carrier", Carrier.class));
-		typeinfos.add(new TypeInfo(null, "airport", Airport.class));
+		typeinfos.add(new TypeInfo(new XMLInfo("timetable"), new ObjectInfo(TimeTable.class)));
+		typeinfos.add(new TypeInfo(new XMLInfo("carrier"), new ObjectInfo(Carrier.class)));
+		typeinfos.add(new TypeInfo(new XMLInfo("airport"), new ObjectInfo(Airport.class)));
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos

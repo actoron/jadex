@@ -2,7 +2,10 @@ package jadex.xml.tutorial.example20;
 
 import jadex.commons.SUtil;
 import jadex.xml.AttributeInfo;
+import jadex.xml.ObjectInfo;
 import jadex.xml.ITypeConverter;
+import jadex.xml.XMLInfo;
+import jadex.xml.MappingInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
@@ -50,11 +53,17 @@ public class Main
 			}
 		};
 		
-		typeinfos.add(new TypeInfo(null, "customer", Customer.class, null, null,
-			null, null, null, new SubobjectInfo[]{
+		typeinfos.add(new TypeInfo(new XMLInfo("customer"), new ObjectInfo(Customer.class),
+			new MappingInfo(null, new SubobjectInfo[]{
 			new SubobjectInfo(new AttributeInfo("total", null, null, totalconv, null)),
 			new SubobjectInfo(new AttributeInfo("orders", null, null, ordersconv, null))
-		}));
+		})));
+		
+//		typeinfos.add(new TypeInfo(null, "customer", Customer.class, null, null,
+//			null, null, null, new SubobjectInfo[]{
+//			new SubobjectInfo(new AttributeInfo("total", null, null, totalconv, null)),
+//			new SubobjectInfo(new AttributeInfo("orders", null, null, ordersconv, null))
+//		}));
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos

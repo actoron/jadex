@@ -32,16 +32,16 @@ public class Test //extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
-//				t.testBean();
-//				t.testArrayOrder();
-//				t.testMultiArray();
-//				t.testVectorModel();
-//				t.testClass();
-//				t.testDate();
-//				t.testColor();
-//				t.testArray();
-//				t.testList();
-//				t.testSet();
+				t.testBean();
+				t.testArrayOrder();
+				t.testMultiArray();
+				t.testVectorModel();
+				t.testClass();
+				t.testDate();
+				t.testColor();
+				t.testArray();
+				t.testList();
+				t.testSet();
 				t.testMap();
 			}
 			long dur = System.currentTimeMillis()-start;

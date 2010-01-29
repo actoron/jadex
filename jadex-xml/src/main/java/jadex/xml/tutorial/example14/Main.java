@@ -2,6 +2,9 @@ package jadex.xml.tutorial.example14;
 
 import jadex.commons.SUtil;
 import jadex.xml.AttributeInfo;
+import jadex.xml.ObjectInfo;
+import jadex.xml.XMLInfo;
+import jadex.xml.MappingInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
@@ -26,14 +29,25 @@ public class Main
 		// object attributes. They are considered as subobjectinfos here
 		// and not as attributeinfos, because they are subtags in they xml.
 		Set typeinfos = new HashSet();
-		typeinfos.add(new TypeInfo(null, "customer", Customer.class, null, null,
-			null, null, null, new SubobjectInfo[]{
+		
+		typeinfos.add(new TypeInfo(new XMLInfo("customer"), new ObjectInfo(Customer.class), 
+			new MappingInfo(null, new SubobjectInfo[]{
 			new SubobjectInfo(new AttributeInfo("ship-address", "shipaddress")),
-			new SubobjectInfo(new AttributeInfo("bill-address", "billaddress"))
-		}));
-		typeinfos.add(new TypeInfo(null, "ship-address", Address.class));
-		typeinfos.add(new TypeInfo(null, "bill-address", Address.class));
-		typeinfos.add(new TypeInfo(null, "subscriber", Subscriber.class));
+			new SubobjectInfo(new AttributeInfo("bill-address", "billaddress"))}
+		)));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo("ship-address"), new ObjectInfo(Address.class)));
+		typeinfos.add(new TypeInfo(new XMLInfo("bill-address"), new ObjectInfo(Address.class)));
+		typeinfos.add(new TypeInfo(new XMLInfo("subscriber"), new ObjectInfo(Subscriber.class)));
+		
+//		typeinfos.add(new TypeInfo(null, "customer", Customer.class, null, null,
+//			null, null, null, new SubobjectInfo[]{
+//			new SubobjectInfo(new AttributeInfo("ship-address", "shipaddress")),
+//			new SubobjectInfo(new AttributeInfo("bill-address", "billaddress"))
+//		}));
+//		typeinfos.add(new TypeInfo(null, "ship-address", Address.class));
+//		typeinfos.add(new TypeInfo(null, "bill-address", Address.class));
+//		typeinfos.add(new TypeInfo(null, "subscriber", Subscriber.class));
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos

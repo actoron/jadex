@@ -25,20 +25,68 @@ public class AbstractInfo
 	/** The xml path elements without tag. */
 	protected QName[] xmlpathelementswithouttag;
 	
-	/** The procedural filter. */
-	protected IFilter filter;
-	
 	/** The info id. */
 	protected int id;
 	
 	/** The id cnt. */
 	protected static int idcnt;
+
+	protected XMLInfo idinfo;
+
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create an abstract OAV info.
 	 */
+	public AbstractInfo(XMLInfo idinfo)
+	{
+		this.idinfo = idinfo;
+			
+		if(idinfo!=null)
+		{
+			if(idinfo.getXmlPath()!=null)
+			{
+				this.xmlpath = idinfo.getXmlPath();
+	
+				StringTokenizer stok = new StringTokenizer(xmlpath, "/");
+				this.xmlpathelements = new QName[stok.countTokens()];
+				this.xmlpathelementswithouttag = new QName[stok.countTokens()-1];
+				for(int i=0; stok.hasMoreTokens(); i++)
+				{
+					xmlpathelements[i] = QName.valueOf(stok.nextToken());//convertStringToQName(stok.nextToken());
+					if(i<xmlpathelementswithouttag.length)
+						xmlpathelementswithouttag[i] = xmlpathelements[i];
+				}
+			}
+			else
+			{
+				// Only use local part
+				StringBuffer buf = new StringBuffer();
+				for(int i=0; i<idinfo.getXmlPathElements().length; i++)
+				{
+					if(i>0)
+						buf.append("/");
+					buf.append(idinfo.getXmlPathElements()[i].getLocalPart());
+				}
+				this.xmlpath = buf.toString();
+				this.xmlpathelements = idinfo.getXmlPathElements();
+				this.xmlpathelementswithouttag = new QName[xmlpathelements.length-1];
+				System.arraycopy(xmlpathelements, 0, xmlpathelementswithouttag, 0, xmlpathelementswithouttag.length);
+		
+			}	
+		}
+		
+		synchronized(AbstractInfo.class)
+		{
+			this.id = idcnt++;
+		}
+	}
+
+	
+	/**
+	 *  Create an abstract OAV info.
+	 * /
 	public AbstractInfo(String xmlpath, IFilter filter)
 	{
 		this.xmlpath = xmlpath;
@@ -60,11 +108,11 @@ public class AbstractInfo
 		{
 			this.id = idcnt++;
 		}
-	}
+	}*/
 	
 	/**
 	 *  Create an abstract OAV info.
-	 */
+	 * /
 	public AbstractInfo(QName[] xmlpath, IFilter filter)
 	{
 		if(xmlpath!=null)
@@ -88,10 +136,19 @@ public class AbstractInfo
 		{
 			this.id = idcnt++;
 		}
-	}
+	}*/
 	
 	//-------- methods --------
 
+	/**
+	 *  Get the idinfo.
+	 *  @return The idinfo.
+	 */
+	public XMLInfo getIdentificationInfo()
+	{
+		return idinfo;
+	}
+	
 	/**
 	 *  Get the xmlpath
 	 */
@@ -99,7 +156,7 @@ public class AbstractInfo
 	{
 		return this.xmlpath;
 	}
-	
+
 	/**
 	 *  Get the xml tag
 	 */
@@ -155,7 +212,7 @@ public class AbstractInfo
 	 */
 	public IFilter getFilter()
 	{
-		return this.filter;
+		return idinfo.getFilter();
 	}
 
 	/**
@@ -208,9 +265,9 @@ public class AbstractInfo
 			if(ret==0)
 				ret = m2.getXMLPath().compareTo(m1.getXMLPath());
 			if(ret==0)
-				ret = m1.filter!=null && m2.filter==null? 1: 
-					m1.filter==null && m2.filter!=null? -1: 
-					m1.filter!=null && m2.filter!=null? m1.getId()-m2.getId()
+				ret = m1.getFilter()!=null && m2.getFilter()==null? 1: 
+					m1.getFilter()==null && m2.getFilter()!=null? -1: 
+					m1.getFilter()!=null && m2.getFilter()!=null? m1.getId()-m2.getId()
 					: 0;
 			if(ret==0)
 				throw new RuntimeException("Info should differ: "+m1+" "+m2);

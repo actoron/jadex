@@ -74,7 +74,7 @@ public class SubobjectInfo extends AbstractInfo
 	 */
 	public SubobjectInfo(QName[] path, AttributeInfo linkinfo, IFilter filter, TypeInfo typeinfo, boolean multi)
 	{
-		super(createFullpath(path, linkinfo.getXMLAttributeName()), filter);
+		super(new XMLInfo(createFullpath(path, linkinfo.getXMLAttributeName()), filter));
 		this.linkinfo = linkinfo;
 		this.typeinfo = typeinfo;
 		this.multi = multi;

@@ -1,6 +1,8 @@
 package jadex.xml.tutorial.example12;
 
 import jadex.commons.SUtil;
+import jadex.xml.ObjectInfo;
+import jadex.xml.XMLInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
@@ -24,8 +26,8 @@ public class Main
 		// object attributes. They are considered as subobjectinfos here
 		// and not as attributeinfos, because they are subtags in they xml.
 		Set typeinfos = new HashSet();
-		typeinfos.add(new TypeInfo(null, "customer", Customer.class));
-		typeinfos.add(new TypeInfo(null, "address", Address.class));
+		typeinfos.add(new TypeInfo(new XMLInfo("customer"), new ObjectInfo(Customer.class)));
+		typeinfos.add(new TypeInfo(new XMLInfo("address"), new ObjectInfo(Address.class)));
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos

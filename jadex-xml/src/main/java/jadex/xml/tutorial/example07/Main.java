@@ -2,6 +2,9 @@ package jadex.xml.tutorial.example07;
 
 import jadex.commons.SUtil;
 import jadex.xml.AttributeInfo;
+import jadex.xml.ObjectInfo;
+import jadex.xml.XMLInfo;
+import jadex.xml.MappingInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.bean.BeanAttributeInfo;
@@ -31,15 +34,15 @@ public class Main
 		// object attributes. They are considered as subobjectinfos here
 		// and not as attributeinfos, because they are subtags in they xml.
 		Set typeinfos = new HashSet();
-		typeinfos.add(new TypeInfo(null, "customer", Customer.class, null, null, null, null, null,
-			new SubobjectInfo[]{
+		typeinfos.add(new TypeInfo(new XMLInfo("customer"), new ObjectInfo(Customer.class),
+			new MappingInfo(null, new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo("street", "street")),
 			new SubobjectInfo(new BeanAttributeInfo("city", "city")),
 			new SubobjectInfo(new BeanAttributeInfo("state", "state")),
 			new SubobjectInfo(new BeanAttributeInfo("zip", "zip")),
 			new SubobjectInfo(new BeanAttributeInfo("instructions", "instructions", AttributeInfo.IGNORE_READWRITE)),
-			new SubobjectInfo(new BeanAttributeInfo("phone", "phone")),
-		}, true, true));
+			new SubobjectInfo(new BeanAttributeInfo("phone", "phone"))
+		})));
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos

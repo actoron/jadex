@@ -2,6 +2,8 @@ package jadex.xml.tutorial.example21;
 
 import jadex.commons.SUtil;
 import jadex.xml.AttributeInfo;
+import jadex.xml.ObjectInfo;
+import jadex.xml.XMLInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.bean.BeanAttributeInfo;
@@ -22,16 +24,15 @@ public class Main
 	 */
 	public static void main(String[] args) throws Exception
 	{
-		// Create Type infos for both types that need to be mapped
-		// The person type has 3 subobjects that are mapped to different
-		// object attributes. They are considered as subobjectinfos here
-		// and not as attributeinfos, because they are subtags in they xml.
 		Set typeinfos = new HashSet();
-		typeinfos.add(new TypeInfo(null, "customer", Customer.class));
-		typeinfos.add(new TypeInfo(null, "directory", Directory.class, null, null,
-			new AttributeInfo[]{
-			new BeanAttributeInfo("key", null, null, null, null, "customerMap", null, null, null, null)
-		}, null));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo("customer"), new ObjectInfo(Customer.class)));
+		
+//		typeinfos.add(new TypeInfo(null, "customer", Customer.class));
+//		typeinfos.add(new TypeInfo(null, "directory", Directory.class, null, null,
+//			new AttributeInfo[]{
+//			new BeanAttributeInfo("key", null, null, null, null, "customerMap", null, null, null, null)
+//		}, null));
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos
