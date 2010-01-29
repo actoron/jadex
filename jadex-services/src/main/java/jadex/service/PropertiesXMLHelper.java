@@ -3,8 +3,11 @@ package jadex.service;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.xml.AttributeInfo;
+import jadex.xml.MappingInfo;
+import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAttributeInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.BeanObjectWriterHandler;
@@ -39,17 +42,18 @@ public class PropertiesXMLHelper
 		typeinfos = new HashSet();
 		
 //		typeinfos.add(new TypeInfo(null, new QName[]{new QName("http://jadex.sourceforge.net/jadexconf", "properties")}, Properties.class, null, null, 
-		typeinfos.add(new TypeInfo(null, new QName[]{new QName("properties")}, Properties.class, null, null, 
-			new BeanAttributeInfo[]{new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE)}, null, null,
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName("properties")}), new ObjectInfo(Properties.class), 
+			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE)}, null, null,
 			new SubobjectInfo[]
 			{
 				new SubobjectInfo(new BeanAttributeInfo("property", "properties"), null, null, true), 
 				new SubobjectInfo(new BeanAttributeInfo("properties", "subproperties"), null, null, true)
 			}
-		));
+		)));
 		
 //		typeinfos.add(new TypeInfo(null, new QName[]{new QName("http://jadex.sourceforge.net/jadexconf", "property")}, Property.class, null, new BeanAttributeInfo(null, "value")));
-		typeinfos.add(new TypeInfo(null, new QName[]{new QName("property")}, Property.class, null, new BeanAttributeInfo((String)null, "value")));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName("property")}), 
+			new ObjectInfo(Property.class), new MappingInfo(null, null, new BeanAttributeInfo((String)null, "value"))));
 	}
 	
 	/**

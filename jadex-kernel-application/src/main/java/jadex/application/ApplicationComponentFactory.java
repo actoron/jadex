@@ -24,8 +24,11 @@ import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.xml.AttributeInfo;
 import jadex.xml.ITypeConverter;
+import jadex.xml.MappingInfo;
+import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAttributeInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
@@ -93,25 +96,50 @@ public class ApplicationComponentFactory	implements IComponentFactory
 			}
 		};
 		
-		types.add(new TypeInfo(null, "applicationtype", MApplicationType.class, "description", null,
+		types.add(new TypeInfo(new XMLInfo("applicationtype"), new ObjectInfo(MApplicationType.class), 
+			new MappingInfo(null, "description", null,
 			new BeanAttributeInfo[]{new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE)}, 
-			null, null, new SubobjectInfo[]{
+			new SubobjectInfo[]{
 			new SubobjectInfo("arguments", new AttributeInfo("argument", "argument")),
 			new SubobjectInfo("arguments", new AttributeInfo("result", "result"))
-			}));
-		types.add(new TypeInfo(null, "spacetype", MSpaceType.class));
-		types.add(new TypeInfo(null, "agenttype", MAgentType.class));
-		types.add(new TypeInfo(null, "application", MApplicationInstance.class, null, null, new BeanAttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null));
-		types.add(new TypeInfo(null, "space", MSpaceInstance.class));
-		types.add(new TypeInfo(null, "agent", MAgentInstance.class, null, null, 
-			new BeanAttributeInfo[]{
+			})));
+		types.add(new TypeInfo(new XMLInfo("spacetype"), new ObjectInfo(MSpaceType.class)));
+		types.add(new TypeInfo(new XMLInfo("agenttype"), new ObjectInfo(MAgentType.class)));
+		types.add(new TypeInfo(new XMLInfo("application"), new ObjectInfo(MApplicationInstance.class), 
+			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null)));
+		types.add(new TypeInfo(new XMLInfo("space"), new ObjectInfo(MSpaceInstance.class)));
+		types.add(new TypeInfo(new XMLInfo("agent"), new ObjectInfo(MAgentInstance.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("type", "typeName"),
 			new BeanAttributeInfo("number", "numberText")}
-		, null));
-		types.add(new TypeInfo(null, "agent/arguments/argument", MArgument.class, null, "value"));
-		types.add(new TypeInfo(null, "applicationtype/arguments/argument", Argument.class, "description", new BeanAttributeInfo((String)null, "defaultValue", null, exconv, null)));
-		types.add(new TypeInfo(null, "import", String.class));
+		, null)));
+		types.add(new TypeInfo(new XMLInfo("agent/arguments/argument"), new ObjectInfo(MArgument.class), 
+			new MappingInfo(null, null, "value")));
+		types.add(new TypeInfo(new XMLInfo("applicationtype/arguments/argument"), new ObjectInfo(Argument.class), 
+			new MappingInfo(null, "description", new BeanAttributeInfo((String)null, "defaultValue", null, exconv, null))));
+		types.add(new TypeInfo(new XMLInfo("import"), new ObjectInfo(String.class)));
+		
+//		types.add(new TypeInfo(null, "applicationtype", MApplicationType.class, "description", null,
+//			new BeanAttributeInfo[]{new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE)}, 
+//			null, null, new SubobjectInfo[]{
+//			new SubobjectInfo("arguments", new AttributeInfo("argument", "argument")),
+//			new SubobjectInfo("arguments", new AttributeInfo("result", "result"))
+//			}));
+//		types.add(new TypeInfo(null, "spacetype", MSpaceType.class));
+//		types.add(new TypeInfo(null, "agenttype", MAgentType.class));
+//		types.add(new TypeInfo(null, "application", MApplicationInstance.class, null, null, new BeanAttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null));
+//		types.add(new TypeInfo(null, "space", MSpaceInstance.class));
+//		types.add(new TypeInfo(null, "agent", MAgentInstance.class, null, null, 
+//			new BeanAttributeInfo[]{
+//			new BeanAttributeInfo("type", "typeName"),
+//			new BeanAttributeInfo("number", "numberText")}
+//		, null));
+//		types.add(new TypeInfo(null, "agent/arguments/argument", MArgument.class, null, "value"));
+//		types.add(new TypeInfo(null, "applicationtype/arguments/argument", Argument.class, "description", new BeanAttributeInfo((String)null, "defaultValue", null, exconv, null)));
+//		types.add(new TypeInfo(null, "import", String.class));
 
+		
+		
 //		String uri = "http://jadex.sourceforge.net/jadex-envspace";
 //		types.add(new TypeInfo(null, new QName[]{new QName(uri, "applicationtype")}, MApplicationType.class, "description", null,
 //			new BeanAttributeInfo[]{new BeanAttributeInfo("schemaLocation", null, AttributeInfo.IGNORE_READWRITE)}, null));

@@ -8,6 +8,7 @@ import jadex.rules.state.OAVObjectType;
 import jadex.xml.AttributeInfo;
 import jadex.xml.BasicTypeConverter;
 import jadex.xml.ITypeConverter;
+import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
@@ -123,10 +124,16 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 				// Add concrete class for same info if it is used
 				if(ret!=null)
 				{
-					TypeInfo ti = new TypeInfo(ret.getSupertype(), ret.getXMLPath(), 
-						type, ret.getCommentInfo(), ret.getContentInfo(), 
-						ret.getDeclaredAttributeInfos(), ret.getPostProcessor(), ret.getFilter(), 
-						ret.getDeclaredSubobjectInfos());
+					ObjectInfo cri =ret.getCreationInfo();
+					ObjectInfo cricpy = cri!=null? new ObjectInfo(type, cri.getPostProcessor(), cri.isCreateFromTag()): new ObjectInfo(type);
+					
+					TypeInfo ti = new TypeInfo(ret.getIdentificationInfo(),
+						cricpy, ret.getMappingInfo(), ret.getLinkInfo());
+					
+//					TypeInfo ti = new TypeInfo(ret.getSupertype(), ret.getXMLPath(), 
+//						type, ret.getCommentInfo(), ret.getContentInfo(), 
+//						ret.getDeclaredAttributeInfos(), ret.getPostProcessor(), ret.getFilter(), 
+//						ret.getDeclaredSubobjectInfos());
 					
 					titmanager.addTypeInfo(ti);
 				}
