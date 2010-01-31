@@ -35,8 +35,11 @@ import jadex.xml.AttributeInfo;
 import jadex.xml.BasicTypeConverter;
 import jadex.xml.IPostProcessor;
 import jadex.xml.ITypeConverter;
+import jadex.xml.MappingInfo;
+import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAttributeInfo;
 
 import java.awt.Color;
@@ -146,8 +149,7 @@ public class MEnvSpaceType	extends MSpaceType
 		TypeInfo ti_po = new TypeInfo(new XMLInfo("abstract_propertyobject"), new ObjectInfo(MultiCollection.class), 
 			new MappingInfo(null, new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "property"), "properties", null, null, null, ""))
-			})
-		);
+			}));		
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "objecttype")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new BeanAttributeInfo[]{new BeanAttributeInfo(new QName("name"), "name", null, null, null, "")}, null)));
@@ -160,7 +162,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo("depth", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, "property"),
 			new BeanAttributeInfo("border", null, null, null, null, "property"),
 			new BeanAttributeInfo("neighborhood", null, null, null, null, "property")
-			}, null, null,
+			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "property"), "properties", null, null, null, "property")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "objecttype"), "objecttypes", null, null, null, "property")),
@@ -176,7 +178,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "percepttype"), "percepttypes", null, null, null, "property")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "data"), "dataproviders", null, null, null, "property")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "dataconsumer"), "dataconsumers", null, null, null, "property"))
-		})));
+			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "avatarmapping")}), new ObjectInfo(AvatarMapping.class), 
 			new MappingInfo(null, new BeanAttributeInfo[]{
@@ -192,10 +194,9 @@ public class MEnvSpaceType	extends MSpaceType
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "name")}), null, 
-			new MappingInfo(null, new BeanAttributeInfo((String)null, AttributeInfo.THIS, null, expconv, null),
-			null, null, null, null, false)));
+			new MappingInfo(null, null, new BeanAttributeInfo((String)null, AttributeInfo.THIS, null, expconv, null))));
 
-		/*
+/*
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "createagent")}, MultiCollection.class, null, null,
 			null, null, null,
 			new SubobjectInfo[]{
@@ -221,7 +222,7 @@ public class MEnvSpaceType	extends MSpaceType
 //			new SubobjectInfo("percepttype/agenttypes/agenttype", new BeanAttributeInfo("percepttype", "agenttypes", new ITypeConverter()
 			new SubobjectInfo(new QName[]{new QName(uri, "objecttypes")}, new BeanAttributeInfo(new QName(uri, "objecttype"), "objecttypes", null, null, null, "")),
 			new SubobjectInfo(new QName[]{new QName(uri, "agenttypes")}, new BeanAttributeInfo(new QName(uri, "agenttype"), "agenttypes", null, nameconv, null, ""))
-		})));
+			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "actiontype")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new BeanAttributeInfo[]{
@@ -230,7 +231,7 @@ public class MEnvSpaceType	extends MSpaceType
 			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "parameter"), "parameters", null, null, null, ""))
-		})));
+			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "parameter")}), new ObjectInfo(HashMap.class), 
 			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
@@ -250,17 +251,17 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo("name", null, null, null, null, "")
 			})));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri,"perceptgenerator")}), new ObjectInfo(MultiCollection.class), null, null,
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri,"perceptgenerator")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("name", null, null, null, null, "")
 			})));
 
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri,"perceptprocessor")}), new ObjectInfo(MultiCollection.class), null, null,
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri,"perceptprocessor")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new BeanAttributeInfo[]{	
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("agenttype", null, null, null, null, "")
-			}, null, null,
+			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "percepttype"), "percepttypes", null, nameconv, null, "")),
 			})));
@@ -295,7 +296,7 @@ public class MEnvSpaceType	extends MSpaceType
 					ret.init(space, props);
 					return ret;
 				}
-			}),
+			})
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "perspective")}), new ObjectInfo(MultiCollection.class),
@@ -520,8 +521,8 @@ public class MEnvSpaceType	extends MSpaceType
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "drawcondition"), null, null, expconv, null, ""))
 			})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "triangle")}, MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "triangle")}), new ObjectInfo(MultiCollection.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("rotatex", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
@@ -570,13 +571,13 @@ public class MEnvSpaceType	extends MSpaceType
 					return new Triangle(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
 				}
 			})
-			}, null, null,
+			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "drawcondition"), null, null, expconv, null, ""))
-			}));
+			})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "rectangle")}, MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "rectangle")}), new ObjectInfo(MultiCollection.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("rotatex", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
@@ -624,13 +625,13 @@ public class MEnvSpaceType	extends MSpaceType
 					return new Rectangle(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
 				}
 			})
-			}, null, null,
+			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "drawcondition"), null, null, expconv, null, ""))
-			}));
+			})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "regularpolygon")}, MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "regularpolygon")}), new ObjectInfo(MultiCollection.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("rotatex", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
@@ -683,13 +684,13 @@ public class MEnvSpaceType	extends MSpaceType
 					return new RegularPolygon(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), vertices, exp);
 				}
 			})
-			}, null, null,
+			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "drawcondition"), null, null, expconv, null, ""))
-			}));
+			})));
 	
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "ellipse")}, MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "ellipse")}), new ObjectInfo(MultiCollection.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("rotatex", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
@@ -738,13 +739,13 @@ public class MEnvSpaceType	extends MSpaceType
 					return new Ellipse(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
 				}
 			})
-			}, null, null,
+			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "drawcondition"), null, null, expconv, null, ""))
-			}));
+			})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "text")}, MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "text")}), new ObjectInfo(MultiCollection.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("x", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("y", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("position", null, null, null, null, ""),
@@ -806,13 +807,13 @@ public class MEnvSpaceType	extends MSpaceType
 					return new Text(position, font, (Color)MEnvSpaceInstance.getProperty(args, "color"), text, align, absFlags, exp);
 				}
 			})
-			}, null, null,
+			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "drawcondition"), null, null, expconv, null, ""))
-			}));
+			})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "gridlayer")}, MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "gridlayer")}), new ObjectInfo(MultiCollection.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("color", null, null, tcolorconv, null, ""),
 			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("height", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
@@ -826,10 +827,10 @@ public class MEnvSpaceType	extends MSpaceType
 					return new GridLayer(size, MEnvSpaceInstance.getProperty(args, "color"));
 				}
 			})
-			}, null));
+			})));
 
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "tiledlayer")}, MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "tiledlayer")}), new ObjectInfo(MultiCollection.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("imagepath", null, null, null, null, ""),
 			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
 			new BeanAttributeInfo("height", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, ""),
@@ -844,10 +845,10 @@ public class MEnvSpaceType	extends MSpaceType
 					return new TiledLayer(size, MEnvSpaceInstance.getProperty(args, "color"), (String)MEnvSpaceInstance.getProperty(args, "imagepath"));
 				}
 			})
-			}, null));
+			})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "colorlayer")}, MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "colorlayer")}), new ObjectInfo(MultiCollection.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("color", null, null, tcolorconv, null, ""),
 			new BeanAttributeInfo("type", null, null, null, null, "", "colorlayer"),
 			new BeanAttributeInfo("creator", null, null, null, null, "", new IObjectCreator()
@@ -857,134 +858,143 @@ public class MEnvSpaceType	extends MSpaceType
 					return new ColorLayer(MEnvSpaceInstance.getProperty(args, "color"));
 				}
 			})
-			}, null));
+			})));
 		
-		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "spaceexecutor")}, MultiCollection.class, null, 
-			new BeanAttributeInfo("expression", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "spaceexecutor")}), new ObjectInfo(MultiCollection.class), 
+			new MappingInfo(ti_po, null, new BeanAttributeInfo("expression", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, "")
-			}, null));
+			})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "envspacetype"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "envspacetype"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)
-			}, null));
+			})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "envspace"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "envspace"), new QName(uri, "property")}), new ObjectInfo(HashMap.class),
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
-			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "processtype"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "processtype"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
-			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)})));
 
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "tasktype"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "tasktype"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
-			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "actiontype"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "actiontype"), new QName(uri, "property")}), new ObjectInfo(HashMap.class),
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
-			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)})));
 
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "percepttype"), new QName(uri, "agenttypes"), new QName(uri, "agenttype")}, HashMap.class, null, null,
-			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, null, null, "")}, null));
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "percepttype"), new QName(uri, "agenttypes"), new QName(uri, "agenttype")}), new ObjectInfo(HashMap.class),			
+			new MappingInfo(null, new BeanAttributeInfo[]{
+			new BeanAttributeInfo("name", null, null, null, null, "")})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "perceptgenerator"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
-			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, null, null, ""),
-			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
-			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
-		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "perceptprocessor"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "perceptgenerator"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
-			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "view"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "perceptprocessor"), new QName(uri, "property")}), new ObjectInfo(HashMap.class),
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+			new BeanAttributeInfo[]{
+			new BeanAttributeInfo("name", null, null, null, null, ""),
+			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "view"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""), 
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
-			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "perspective"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "perspective"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
-			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "object"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "object"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
-			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)})));
 
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "avatar"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "avatar"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),			
-			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)})));
 
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "process"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "process"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
-			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)})));
 
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "objecttype"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "objecttype"), new QName(uri, "property")}), new ObjectInfo(HashMap.class),
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE),
-			new BeanAttributeInfo("event", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("event", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)})));
 
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "drawable"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "drawable"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
-			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)})));
 
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "spaceexecutor"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "spaceexecutor"), new QName(uri, "property")}), new ObjectInfo(HashMap.class),
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
-			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "dataconsumer"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "dataconsumer"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
-			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "plugin"), new QName(uri, "property")}, HashMap.class, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "plugin"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
-			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
+			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)})));
 
-		
 		// type instance declarations.
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "envspace")}, MEnvSpaceInstance.class, null, null,
-			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("type", "typeName"),
-			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, "property"),
-			new BeanAttributeInfo("height", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, "property"),
-			new BeanAttributeInfo("depth", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, "property"),
-			new BeanAttributeInfo("border", null, null, null, null, "property"),
-			new BeanAttributeInfo("neighborhood", null, null, null, null, "property")
-			}, new IPostProcessor()
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "envspace")}), 
+			new ObjectInfo(MEnvSpaceInstance.class, new IPostProcessor()
 			{
 				public Object postProcess(Object context, Object object, Object root,
 						ClassLoader classloader)
@@ -1008,7 +1018,15 @@ public class MEnvSpaceType	extends MSpaceType
 				{
 					return 1;
 				}
-			}, null,
+			}),
+			new MappingInfo(null, new BeanAttributeInfo[]{
+			new BeanAttributeInfo("type", "typeName"),
+			new BeanAttributeInfo("width", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, "property"),
+			new BeanAttributeInfo("height", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, "property"),
+			new BeanAttributeInfo("depth", null, null, BasicTypeConverter.DOUBLE_CONVERTER, null, "property"),
+			new BeanAttributeInfo("border", null, null, null, null, "property"),
+			new BeanAttributeInfo("neighborhood", null, null, null, null, "property")
+			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "property"), "properties", null, null, null, "property")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "object"), "objects", null, null, null, "property")),
@@ -1018,86 +1036,86 @@ public class MEnvSpaceType	extends MSpaceType
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "data"), "dataproviders", null, null, null, "property")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "dataconsumer"), "dataconsumers", null, null, null, "property")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "observer"), "observers", null, null, null, "property"))			
-		}));
+			})));
 		
-		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "object")}, MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "object")}), new ObjectInfo(MultiCollection.class),
+			new MappingInfo(ti_po, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("type", null, null, null, null, ""),
 			new BeanAttributeInfo("number", null, null, BasicTypeConverter.INTEGER_CONVERTER, null, "")
-			}, null));
+			})));
 			
-		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "avatar")}, MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "avatar")}), new ObjectInfo(MultiCollection.class),
+			new MappingInfo(ti_po, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("type", null, null, null, null, ""),
 			new BeanAttributeInfo("owner", null, null, null, null, "")
-			}, null));
+			})));
 			
-		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "process")}, MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "process")}), new ObjectInfo(MultiCollection.class),
+			new MappingInfo(ti_po, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("type", null, null, null, null, ""),
-			}, null));
+			})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "spaceaction")}, MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "spaceaction")}), new ObjectInfo(MultiCollection.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("type", null, null, null, null, "")
-			}, null, null,
+			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "parameter"), "parameters", null, null, null, ""))
-			}));
+			})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "spaceaction"), new QName(uri, "parameter")}, HashMap.class, null,
-			new BeanAttributeInfo("value", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "spaceaction"), new QName(uri, "parameter")}), new ObjectInfo(HashMap.class),
+			new MappingInfo(null, null, new BeanAttributeInfo("value", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", null, null, null, null, "")}, null));
+			new BeanAttributeInfo("name", null, null, null, null, "")})));
 
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "observer")}, MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "observer")}), new ObjectInfo(MultiCollection.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("view", null, null, null, null, ""),
 			new BeanAttributeInfo("perspective", null, null, null, null, ""),
-			}, null, null,
+			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "plugin"), "plugins", null, null, null, "")),
-		}));
+			})));
 			
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "plugin")}, MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "plugin")}), new ObjectInfo(MultiCollection.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", null, null, typeconv, null, ""),
-			}, null, null,
+			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "property"), "properties", null, null, null, "")),
-		}));
+			})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "data")}, MultiCollection.class, null, 
-			new BeanAttributeInfo((String)null, "content", null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "data")}), new ObjectInfo(MultiCollection.class), 
+			new MappingInfo(null, null, new BeanAttributeInfo((String)null, "content", null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, "")
-			}, null, null,
+			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "source"), "source", null, null, null, "")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "data"), "subdata", null, null, null, ""))
-			}));
+			})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "source")}, HashMap.class, null, 
-			new BeanAttributeInfo("content", null, null, expconv, null, ""),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "source")}), new ObjectInfo(HashMap.class), 
+			new MappingInfo(null, null, new BeanAttributeInfo("content", null, null, expconv, null, ""),
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("objecttype", null, null, null, null, ""),
 			new BeanAttributeInfo("aggregate", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "")
-			}, null));
+			})));
 		
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "dataconsumer")}, MultiCollection.class, null, null,
-			new BeanAttributeInfo[]{
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "dataconsumer")}), new ObjectInfo(MultiCollection.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("class", null, null, typeconv, null, "")
-			}, null, null,
+			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "property"), "properties", null, null, null, ""))
-			}));
+			})));
 		
 		return types;
 	}
@@ -1185,7 +1203,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "name"), "name", null, null, null, "")),
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "argument"), "arguments", null, null, null, ""))
 			}));
-*/
+* /
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "percepttype")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),

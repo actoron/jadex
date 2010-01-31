@@ -43,13 +43,13 @@ public class PropertiesXMLHelper
 		
 //		typeinfos.add(new TypeInfo(null, new QName[]{new QName("http://jadex.sourceforge.net/jadexconf", "properties")}, Properties.class, null, null, 
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName("properties")}), new ObjectInfo(Properties.class), 
-			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE)}, null, null,
-			new SubobjectInfo[]
-			{
+			new MappingInfo(null, 
+			new BeanAttributeInfo[]{
+				new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE)},
+			new SubobjectInfo[]{
 				new SubobjectInfo(new BeanAttributeInfo("property", "properties"), null, null, true), 
 				new SubobjectInfo(new BeanAttributeInfo("properties", "subproperties"), null, null, true)
-			}
-		)));
+			})));
 		
 //		typeinfos.add(new TypeInfo(null, new QName[]{new QName("http://jadex.sourceforge.net/jadexconf", "property")}, Property.class, null, new BeanAttributeInfo(null, "value")));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName("property")}), 

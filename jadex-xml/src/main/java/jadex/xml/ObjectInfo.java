@@ -14,9 +14,6 @@ public class ObjectInfo
 	/** The post processor (if any). */
 	protected IPostProcessor postproc;
 
-	/** Create from tag flag. */
-	protected boolean createfromtag;
-
 	
 	/**
 	 * @param typeinfo
@@ -31,21 +28,10 @@ public class ObjectInfo
 	 */
 	public ObjectInfo(Object typeinfo, IPostProcessor postproc)
 	{
-		this(typeinfo, postproc, false);
-	}
-	
-	/**
-	 * @param typeinfo
-	 * @param postproc
-	 * @param createfromtag
-	 */
-	public ObjectInfo(Object typeinfo, IPostProcessor postproc, boolean createfromtag)
-	{
 		this.typeinfo = typeinfo;
 		this.postproc = postproc;
-		this.createfromtag = createfromtag;
 	}
-
+	
 	/**
 	 *  Get the typeinfo.
 	 *  @return The typeinfo.
@@ -82,23 +68,4 @@ public class ObjectInfo
 		this.postproc = postproc;
 	}
 
-	/**
-	 *  Get the createfromtag.
-	 *  @return The createfromtag.
-	 */
-	public boolean isCreateFromTag()
-	{
-		return createfromtag;
-	}
-
-	/**
-	 *  Set the createfromtag.
-	 *  @param createfromtag The createfromtag to set.
-	 */
-	public void setCreateFromTag(boolean createfromtag)
-	{
-		this.createfromtag = createfromtag;
-	}
-
-	
 }

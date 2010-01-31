@@ -58,7 +58,7 @@ public class TypeInfo	extends AbstractInfo
 	/** The attributes info (xmlname -> attrinfo). */
 	protected Map attributeinfos;
 	
-	protected ObjectInfo createinfo;
+	protected ObjectInfo objectinfo;
 	
 	protected MappingInfo mapinfo;
 	
@@ -96,17 +96,16 @@ public class TypeInfo	extends AbstractInfo
 	public TypeInfo(XMLInfo idinfo, ObjectInfo createinfo, MappingInfo mapinfo, LinkingInfo linkinfo)
 	{
 		super(idinfo);
-		this.createinfo = createinfo;
+		this.objectinfo = createinfo;
 		this.mapinfo = mapinfo;
 		this.linkinfo = linkinfo;
 		
-		if(mapinfo.getAttributeInfos()!=null)
+		if(mapinfo!=null && mapinfo.getAttributeInfos()!=null)
 			this.attributeinfos = createAttributeInfos(mapinfo.getAttributeInfos());
 		
-		if(mapinfo.getSubobjectInfos()!=null)
+		if(mapinfo!=null && mapinfo.getSubobjectInfos()!=null)
 			this.subobjectinfoswrite = createSubobjectInfosWrite(mapinfo.getSubobjectInfos());
-		this.subobjectinfosread = createSubobjectInfosRead(mapinfo.getSubobjectInfos());
-
+		this.subobjectinfosread = createSubobjectInfosRead(mapinfo==null? null: mapinfo.getSubobjectInfos());
 	}
 	
 //	/**
@@ -350,16 +349,16 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public Object getTypeInfo()
 	{
-		return createinfo!=null? createinfo.getTypeInfo(): null;
+		return objectinfo!=null? objectinfo.getTypeInfo(): null;
 	}
 
 	/**
-	 *  Get the createinfo.
-	 *  @return The createinfo.
+	 *  Get the objectinfo.
+	 *  @return The objectinfo.
 	 */
-	public ObjectInfo getCreationInfo()
+	public ObjectInfo getObjectInfo()
 	{
-		return createinfo;
+		return objectinfo;
 	}
 
 	/**
@@ -511,7 +510,7 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public IPostProcessor getPostProcessor()
 	{
-		IPostProcessor ret = createinfo!=null? createinfo.getPostProcessor(): null;
+		IPostProcessor ret = objectinfo!=null? objectinfo.getPostProcessor(): null;
 		return ret!=null? ret: getSupertype()!=null? getSupertype().getPostProcessor(): null;
 	}
 
@@ -591,7 +590,7 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public boolean isCreateFromTag()
 	{
-		return createinfo!=null? createinfo.isCreateFromTag(): false;
+		return xmlinfo!=null? xmlinfo.isCreateFromTag(): false;
 	}
 	
 	/**

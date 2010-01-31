@@ -1,5 +1,6 @@
 package jadex.xml;
 
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -24,6 +25,16 @@ public class MappingInfo
 	
 	/** The include fields flag. */
 	protected boolean includefields;
+
+	
+	
+	/**
+	 * @param supertype
+	 */
+	public MappingInfo(TypeInfo supertype)
+	{
+		this.supertype = supertype;
+	}
 
 	/**
 	 * @param supertype
@@ -52,10 +63,13 @@ public class MappingInfo
 	 */
 	public MappingInfo(TypeInfo supertype, Object commentinfo,
 		Object contentinfo)
-	{
+	{		
 		this.supertype = supertype;
 		this.commentinfo = commentinfo;
 		this.contentinfo = contentinfo;
+	
+		if((commentinfo instanceof AttributeInfo[]) || (contentinfo instanceof AttributeInfo[]))
+			System.out.println("here: "+this);
 	}
 
 	/**
@@ -79,11 +93,14 @@ public class MappingInfo
 	 */
 	public MappingInfo(TypeInfo supertype, Object commentinfo,
 		Object contentinfo, AttributeInfo[] attributeinfos)
-	{
+	{		
 		this.supertype = supertype;
 		this.commentinfo = commentinfo;
 		this.contentinfo = contentinfo;
 		this.attributeinfos = attributeinfos;
+
+		if((commentinfo instanceof AttributeInfo[]) || (contentinfo instanceof AttributeInfo[]))
+			System.out.println("here: "+this);
 	}
 
 	/**
@@ -102,6 +119,9 @@ public class MappingInfo
 		this.contentinfo = contentinfo;
 		this.attributeinfos = attributeinfos;
 		this.subobjectinfos = subobjectinfos;
+	
+		if((commentinfo instanceof AttributeInfo[]) || (contentinfo instanceof AttributeInfo[]))
+			System.out.println("here: "+this);
 	}
 
 	/**
@@ -122,6 +142,9 @@ public class MappingInfo
 		this.attributeinfos = attributeinfos;
 		this.subobjectinfos = subobjectinfos;
 		this.includefields = includefields;
+	
+		if((commentinfo instanceof AttributeInfo[]) || (contentinfo instanceof AttributeInfo[]))
+			System.out.println("here: "+this);
 	}
 
 	/**
@@ -231,5 +254,13 @@ public class MappingInfo
 	{
 		this.includefields = includefields;
 	}
-	
+
+	public String toString()
+	{
+		return "MappingInfo [attributeinfos=" + Arrays.toString(attributeinfos)
+			+ ", commentinfo=" + commentinfo + ", contentinfo="
+			+ contentinfo + ", includefields=" + includefields
+			+ ", subobjectinfos=" + Arrays.toString(subobjectinfos)
+			+ ", supertype=" + supertype + "]";
+	}
 }

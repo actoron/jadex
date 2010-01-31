@@ -16,8 +16,11 @@ import jadex.gpmn.model.MProcessElement;
 import jadex.gpmn.model.MSequenceEdge;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IPostProcessor;
+import jadex.xml.MappingInfo;
+import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAttributeInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
@@ -100,8 +103,8 @@ public class GpmnXMLReader
 		
 		String uri = "http://jadex.sourceforge.net/gpmn";
 		
-		TypeInfo ti_proc = new TypeInfo(null, "processes", MProcess.class, null, null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")}, null, null,
+		TypeInfo ti_proc = new TypeInfo(new XMLInfo("processes"), new ObjectInfo(MProcess.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")}, null, null,
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge")),
 			new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
@@ -126,32 +129,31 @@ public class GpmnXMLReader
 					return ret;
 				}
 			})
-		});	
+		}));	
 		
-		types.add(new TypeInfo(ti_proc, new QName[]{new QName(uri, "GpmnDiagram")}, MGpmnModel.class, null, null,
-			new BeanAttributeInfo[]{
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "GpmnDiagram")}), new ObjectInfo(MGpmnModel.class),
+			new MappingInfo(ti_proc, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("ID", "Id"),
 			new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE),
 			new BeanAttributeInfo("version", null, AttributeInfo.IGNORE_READWRITE),
 			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
-			}, null));//, null, null,
+			}, null)));//, null, null,
 //			new SubobjectInfo[]{
 //			new SubobjectInfo(new BeanAttributeInfo("processes", "process"))
 //		}));
 		
-		types.add(new TypeInfo(null, "associations", MAssociation.class));
+		types.add(new TypeInfo(new XMLInfo("associations"), new ObjectInfo(MAssociation.class)));
 		
-		types.add(new TypeInfo(null, "vertices", MAchieveGoal.class, null, null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"), new BeanAttributeInfo("exclude", "excludeMode")},
-			new ProcessElementPostProcessor(),
-			new IFilter()
+		types.add(new TypeInfo(new XMLInfo("vertices", new IFilter()
 			{
 				public boolean filter(Object obj)
 				{
 					String type = (String)((Map)obj).get("type");
 					return type.endsWith("AchieveGoal");
 				}
-			}, 
+			}),  
+			new ObjectInfo(MAchieveGoal.class, new ProcessElementPostProcessor()), 
+			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"), new BeanAttributeInfo("exclude", "excludeMode")},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo("creationcondition", "creationCondition")),
 			new SubobjectInfo(new BeanAttributeInfo("contextcondition", "contextCondition")),
@@ -160,20 +162,19 @@ public class GpmnXMLReader
 //			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge"))
 			new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
 			new SubobjectInfo(new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")),
-		}));
+		})));
 		
 		
-		types.add(new TypeInfo(null, "vertices", MMaintainGoal.class, null, null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"), new BeanAttributeInfo("exclude", "excludeMode")},
-			new ProcessElementPostProcessor(),
-			new IFilter()
+		types.add(new TypeInfo(new XMLInfo("vertices", new IFilter()
 			{
 				public boolean filter(Object obj)
 				{
 					String type = (String)((Map)obj).get("type");
 					return type.endsWith("MaintainGoal");
 				}
-			}, 
+			}), 
+			new ObjectInfo(MMaintainGoal.class, new ProcessElementPostProcessor()),
+			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"), new BeanAttributeInfo("exclude", "excludeMode")},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo("creationcondition", "creationCondition")),
 			new SubobjectInfo(new BeanAttributeInfo("contextcondition", "contextCondition")),
@@ -182,11 +183,9 @@ public class GpmnXMLReader
 //			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge"))
 			new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
 			new SubobjectInfo(new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")),
-			}));
+			})));
 		
-		types.add(new TypeInfo(null, "vertices", MPlan.class, null, null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")},
-			new ProcessElementPostProcessor(),
+		types.add(new TypeInfo(new XMLInfo("vertices", 
 			new IFilter()
 			{
 				public boolean filter(Object obj)
@@ -194,53 +193,51 @@ public class GpmnXMLReader
 					String type = (String)((Map)obj).get("type");
 					return type.endsWith("Plan");
 				}
-			},
+			}),
+			new ObjectInfo(MPlan.class, new ProcessElementPostProcessor()),
+			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")},
 			new SubobjectInfo[]{
 //			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge")),
 			new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
 			new SubobjectInfo(new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")),
-			}));	
+			})));	
 		
-		types.add(new TypeInfo(null, "sequenceEdges", MSequenceEdge.class, null, null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"),
-			new BeanAttributeInfo("associations", "associationsDescription")}, null));
+		types.add(new TypeInfo(new XMLInfo("sequenceEdges"), new ObjectInfo(MSequenceEdge.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"),
+			new BeanAttributeInfo("associations", "associationsDescription")}, null)));
 		
-		types.add(new TypeInfo(null, "elements", MParameter.class, null, null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"),
+		types.add(new TypeInfo(new XMLInfo("elements"), new ObjectInfo(MParameter.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"),
 			new BeanAttributeInfo("type", "className"),
-			new BeanAttributeInfo("initialValue", "initialValueDescription")}, null));
+			new BeanAttributeInfo("initialValue", "initialValueDescription")}, null)));
 		
-		types.add(new TypeInfo(null, "artifacts", MArtifact.class, null, null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")},
-			null,
-			new IFilter()
+		types.add(new TypeInfo(new XMLInfo("artifacts", new IFilter()
 			{
 				public boolean filter(Object obj)
 				{
 					String type = (String)((Map)obj).get("type");
 					return !type.endsWith("Context");
 				}
-			},
+			}), 
+			new ObjectInfo(MArtifact.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo("associations", "association"))
-			}	
-		));
+			})));
 		
-		types.add(new TypeInfo(null, "artifacts", MContext.class, null, null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")},
-			null,
-			new IFilter()
+		types.add(new TypeInfo(new XMLInfo("artifacts", new IFilter()
 			{
 				public boolean filter(Object obj)
 				{
 					String type = (String)((Map)obj).get("type");
 					return type.endsWith("Context");
 				}
-			},
+			}), 
+			new ObjectInfo(MContext.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo("elements", "parameter"))
-			}
-		));
+			})));
 		
 		return types;
 	}

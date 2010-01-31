@@ -115,32 +115,31 @@ public class MAGRSpaceType	extends MSpaceType
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "agrspacetype")}), new ObjectInfo(MAGRSpaceType.class)));
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "grouptype")}), new ObjectInfo(MGroupType.class)));
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "role")}), new ObjectInfo(MRoleType.class)));
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "agrspace")}), new ObjectInfo(MAGRSpaceInstance.class),
-			new MappingInfo(null, new AttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, new IPostProcessor()
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "agrspace")}), 
+			new ObjectInfo(MAGRSpaceInstance.class, new IPostProcessor() {
+			public Object postProcess(Object context, Object object, Object root,
+					ClassLoader classloader)
 			{
-				public Object postProcess(Object context, Object object, Object root,
-						ClassLoader classloader)
+				MSpaceInstance	si	= (MSpaceInstance)object;
+				MApplicationType	apptype	= (MApplicationType)root;
+				List spacetypes = apptype.getMSpaceTypes();
+				for(int i=0; i<spacetypes.size(); i++)
 				{
-					MSpaceInstance	si	= (MSpaceInstance)object;
-					MApplicationType	apptype	= (MApplicationType)root;
-					List spacetypes = apptype.getMSpaceTypes();
-					for(int i=0; i<spacetypes.size(); i++)
+					MSpaceType st = (MSpaceType)spacetypes.get(i);
+					if(st.getName().equals(si.getTypeName()))
 					{
-						MSpaceType st = (MSpaceType)spacetypes.get(i);
-						if(st.getName().equals(si.getTypeName()))
-						{
-							si.setType(st);
-							break;
-						}
+						si.setType(st);
+						break;
 					}
-					return null;
 				}
-				
-				public int getPass()
-				{
-					return 1;
-				}
-			})));	
+				return null;
+			}
+			
+			public int getPass()
+			{
+				return 1;
+			}}),
+			new MappingInfo(null, new AttributeInfo[]{new BeanAttributeInfo("type", "typeName")})));	
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "group")}), new ObjectInfo(MGroupInstance.class),
 			new MappingInfo(null, new AttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null)));
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "position")}), new ObjectInfo(MPosition.class),

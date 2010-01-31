@@ -145,10 +145,10 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				// Add concrete class for same info if it is used
 				if(ret!=null)
 				{
-					ObjectInfo cri =ret.getCreationInfo();
-					ObjectInfo cricpy = cri!=null? new ObjectInfo(type, cri.getPostProcessor(), cri.isCreateFromTag()): new ObjectInfo(type);
+					ObjectInfo cri =ret.getObjectInfo();
+					ObjectInfo cricpy = cri!=null? new ObjectInfo(type, cri.getPostProcessor()): new ObjectInfo(type);
 					
-					TypeInfo ti = new TypeInfo(ret.getIdentificationInfo(),
+					TypeInfo ti = new TypeInfo(ret.getXMLInfo(),
 						cricpy, ret.getMappingInfo(), ret.getLinkInfo());
 					
 //					TypeInfo ti = new TypeInfo(ret.getSupertype(), ret.getXMLPath(), 

@@ -31,7 +31,7 @@ public class AbstractInfo
 	/** The id cnt. */
 	protected static int idcnt;
 
-	protected XMLInfo idinfo;
+	protected XMLInfo xmlinfo;
 
 	
 	//-------- constructors --------
@@ -39,15 +39,15 @@ public class AbstractInfo
 	/**
 	 *  Create an abstract OAV info.
 	 */
-	public AbstractInfo(XMLInfo idinfo)
+	public AbstractInfo(XMLInfo xmlinfo)
 	{
-		this.idinfo = idinfo;
+		this.xmlinfo = xmlinfo;
 			
-		if(idinfo!=null)
+		if(xmlinfo!=null)
 		{
-			if(idinfo.getXmlPath()!=null)
+			if(xmlinfo.getXmlPath()!=null)
 			{
-				this.xmlpath = idinfo.getXmlPath();
+				this.xmlpath = xmlinfo.getXmlPath();
 	
 				StringTokenizer stok = new StringTokenizer(xmlpath, "/");
 				this.xmlpathelements = new QName[stok.countTokens()];
@@ -63,14 +63,14 @@ public class AbstractInfo
 			{
 				// Only use local part
 				StringBuffer buf = new StringBuffer();
-				for(int i=0; i<idinfo.getXmlPathElements().length; i++)
+				for(int i=0; i<xmlinfo.getXmlPathElements().length; i++)
 				{
 					if(i>0)
 						buf.append("/");
-					buf.append(idinfo.getXmlPathElements()[i].getLocalPart());
+					buf.append(xmlinfo.getXmlPathElements()[i].getLocalPart());
 				}
 				this.xmlpath = buf.toString();
-				this.xmlpathelements = idinfo.getXmlPathElements();
+				this.xmlpathelements = xmlinfo.getXmlPathElements();
 				this.xmlpathelementswithouttag = new QName[xmlpathelements.length-1];
 				System.arraycopy(xmlpathelements, 0, xmlpathelementswithouttag, 0, xmlpathelementswithouttag.length);
 		
@@ -141,12 +141,12 @@ public class AbstractInfo
 	//-------- methods --------
 
 	/**
-	 *  Get the idinfo.
-	 *  @return The idinfo.
+	 *  Get the xmlinfo.
+	 *  @return The xmlinfo.
 	 */
-	public XMLInfo getIdentificationInfo()
+	public XMLInfo getXMLInfo()
 	{
-		return idinfo;
+		return xmlinfo;
 	}
 	
 	/**
@@ -212,7 +212,7 @@ public class AbstractInfo
 	 */
 	public IFilter getFilter()
 	{
-		return idinfo.getFilter();
+		return xmlinfo.getFilter();
 	}
 
 	/**
