@@ -8,10 +8,14 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentExecutionService;
 import jadex.service.IServiceContainer;
+import jadex.service.clock.IClockService;
 import jadex.simulation.helper.Constants;
+import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.Optimization;
 import jadex.simulation.model.SimulationConfiguration;
+import jadex.simulation.model.result.RowResult;
+import jadex.simulation.model.result.SimulationResult;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -24,21 +28,29 @@ public class StartSimulationExperimentsPlan extends Plan {
 	public void body() {
 		System.out.println("#StartSimulationExpPlan# Start Simulation Experiments at Master.");
 
-		HashMap beliefbasFacts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
+		HashMap beliefbaseFacts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();		
 		SimulationConfiguration simConf = (SimulationConfiguration) getBeliefbase().getBelief("simulationConf").getFact();
 		
 		System.out.println("#StartSimulationExpPlan# Path: " + simConf.getApplicationReference());
 		
+
 		// how many experiments to do within this row
-		long experimentsPerRowToMake = ((Long) beliefbasFacts.get(Constants.EXPERIMENTS_PER_ROW_TO_DO)).longValue();
-		int totalRuns = ((Integer) beliefbasFacts.get(Constants.TOTAL_EXPERIMENT_COUNTER)).intValue();
-		int expInRow = ((Integer) beliefbasFacts.get(Constants.ROW_EXPERIMENT_COUNTER)).intValue();
-		int rowCounter = ((Integer) beliefbasFacts.get(Constants.EXPERIMENT_ROW_COUNTER)).intValue();
+		long experimentsPerRowToMake = ((Long) beliefbaseFacts.get(Constants.EXPERIMENTS_PER_ROW_TO_DO)).longValue();
+		int totalRuns = ((Integer) beliefbaseFacts.get(Constants.TOTAL_EXPERIMENT_COUNTER)).intValue();
+		int expInRow = ((Integer) beliefbaseFacts.get(Constants.ROW_EXPERIMENT_COUNTER)).intValue();
+		int rowCounter = ((Integer) beliefbaseFacts.get(Constants.EXPERIMENT_ROW_COUNTER)).intValue();
 
 		// Prepare values for the experiments of this row
 		String fileName = simConf.getApplicationReference();
 		String configName = simConf.getApplicationConfiguration();
 
+		
+		//prepare object that handles the result
+		RowResult rowResult = new RowResult();
+		rowResult.setStarttime(getClock().getTime());
+		rowResult.setId(String.valueOf(rowCounter));
+				
+		
 		// Put SimulationConfiguration into the application.xml as parameter for
 		// the SimulationClient.
 		Map simFacts = new HashMap();
@@ -93,15 +105,33 @@ public class StartSimulationExperimentsPlan extends Plan {
 			// korrekt läuft.
 			waitFor(2000);
 			// System.out.println("2Received Results!!!!");
-			beliefbasFacts.put(Constants.TOTAL_EXPERIMENT_COUNTER, new Integer(totalRuns));
-			beliefbasFacts.put(Constants.ROW_EXPERIMENT_COUNTER, new Integer(expInRow));
-			getBeliefbase().getBelief("generalSimulationFacts").setFact(beliefbasFacts);
+			beliefbaseFacts.put(Constants.TOTAL_EXPERIMENT_COUNTER, new Integer(totalRuns));
+			beliefbaseFacts.put(Constants.ROW_EXPERIMENT_COUNTER, new Integer(expInRow));
+			getBeliefbase().getBelief("generalSimulationFacts").setFact(beliefbaseFacts);
 		}
 
 		// Increment row counter
 		rowCounter++;
-		beliefbasFacts.put(Constants.EXPERIMENT_ROW_COUNTER, new Integer(rowCounter));
-		getBeliefbase().getBelief("generalSimulationFacts").setFact(beliefbasFacts);
+		beliefbaseFacts.put(Constants.EXPERIMENT_ROW_COUNTER, new Integer(rowCounter));
+		getBeliefbase().getBelief("generalSimulationFacts").setFact(beliefbaseFacts);
+		
+		
+		//store results of row
+		HashMap experimentResults = (HashMap) getBeliefbase().getBelief("experimentResults").getFact();//contains the results of the experiments done in this row
+		HashMap rowResults = (HashMap) getBeliefbase().getBelief("rowResults").getFact();
+		
+		rowResult.setExperimentsResults(new ArrayList(experimentResults.values()));
+		rowResult.setEndtime(getClock().getTime());
+		
+		rowResults.put(rowResult.getId(), rowResult);
+		
+		getBeliefbase().getBelief("experimentResults").setFact(new HashMap());
+		getBeliefbase().getBelief("rowResults").setFact(rowResults);
+		
+		
+		XMLHandler.writeXML(rowResult, "rowRes.xml", RowResult.class);
+		
+		//evaluate row
 		dispatchInternalEvent(createInternalEvent("triggerExperimentRowEvaluation"));
 		//
 

@@ -42,6 +42,7 @@
 			<fact language="jcl">$beliefbase.myself.position</fact>
 		</belief>		
 				
+		
 		<!-- The seen targets. -->
 		<beliefsetref name="my_targets">
 			<concrete ref="move.my_targets"/>

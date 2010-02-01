@@ -5,9 +5,9 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.XMLHandler;
-import jadex.simulation.model.ExperimentResult;
 import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.SimulationConfiguration;
+import jadex.simulation.model.result.ExperimentResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,9 +37,7 @@ public class ComputeSingleResultPlan extends Plan {
 		// " - " + content.getBb()
 		// );
 
-		ExperimentResult exRes = toExperimentResult(content);
-		
-		System.out.println("#Master#************************* Received message:\n " + exRes.toString());
+
 		
 		
 //		System.out.println("#Master# Received message: "
@@ -57,15 +55,20 @@ public class ComputeSingleResultPlan extends Plan {
 		
 	//	System.out.println("Map of Observed Events: ");
 		HashMap<Long, ArrayList<ObservedEvent>> observedEventsMap = (HashMap<Long, ArrayList<ObservedEvent>>) content.get(Constants.OBSERVED_EVENTS_MAP);
-		ArrayList sortedResultList = new ArrayList(observedEventsMap.keySet());
+		ArrayList sortedResultList = new ArrayList(observedEventsMap.keySet());  
 		//Sort by timestamp
 		Collections.sort(sortedResultList);
 		
-	
+		
+		ExperimentResult exRes = toExperimentResult(content, new ArrayList(observedEventsMap.values()));
+		
+		System.out.println("#Master#************************* Received message:\n " + exRes.toString());
+		
 		//Sorted output of results
 		for (Object key  : sortedResultList) {			
 			ArrayList<ObservedEvent> values = (ArrayList<ObservedEvent>) observedEventsMap.get(key);
 			String tmp = "";
+						
 			
 			for(ObservedEvent event : values){
 				tmp += " - " + event.toString();
@@ -87,6 +90,11 @@ public class ComputeSingleResultPlan extends Plan {
 //		}
 //		System.out.println(res);
 
+		
+		//store result
+		HashMap experimentResults = (HashMap) getBeliefbase().getBelief("experimentResults").getFact();
+		experimentResults.put(totalRuns, exRes);
+		getBeliefbase().getBelief("experimentResults").setFact(experimentResults);
 		
 		
 		//trigger the start of the next experiment
@@ -151,14 +159,14 @@ public class ComputeSingleResultPlan extends Plan {
 //		}
 //	}
 	
-	private ExperimentResult toExperimentResult(Map content){
+	private ExperimentResult toExperimentResult(Map content, ArrayList<ObservedEvent> events){
 		SimulationConfiguration simConf = (SimulationConfiguration) content.get(Constants.SIMULATION_FACTS_FOR_CLIENT);
 		
 		long startTime = ((Long) content.get(Constants.EXPERIMENT_START_TIME)).longValue();
 		long endTime = ((Long) content.get(Constants.EXPERIMENT_END_TIME)).longValue();
 		String experimentId = (String) content.get(Constants.EXPERIMENT_ID);
 //		), endTime, experimentID, name, optimizationValue, optimizationParameterName
-		return new ExperimentResult(startTime, endTime, experimentId, simConf.getName(), String.valueOf(simConf.getOptimization().getParameterSweeping().getCurrentValue()), simConf.getOptimization().getData().getName());
+		return new ExperimentResult(startTime, endTime, experimentId, simConf.getName(), String.valueOf(simConf.getOptimization().getParameterSweeping().getCurrentValue()), simConf.getOptimization().getData().getName(), events);
 		
 	}
 }

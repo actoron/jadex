@@ -52,6 +52,16 @@
 		<belief name="generalSimulationFacts" class="Map">
 			<fact>new HashMap()</fact>
 		</belief>
+		
+		<!--  Contains the results of the experiments of one row. -->
+		<belief name="experimentResults" class="Map">
+			<fact>new HashMap()</fact>
+		</belief>
+		
+		<!--  Contains the results of the rows.-->
+		<belief name="rowResults" class="Map">
+			<fact>new HashMap()</fact>
+		</belief>
 
 		<!--  The parsed simulation configuration xml file. -->
 		<belief name="simulationConf" class="SimulationConfiguration" />

@@ -59,7 +59,8 @@ public class Constants {
 	// The name/type of the client simulation agent
 	public static final String CLIENT_SIMULATION_AGENT = "ClientSimulator";
 	
-	
+	// Map that contains the results (= observed events) of the simulation experiments of one row
+//	public static final String RESULTS_OF_ROW = "ResultsOfRow";
 	
 	
 	

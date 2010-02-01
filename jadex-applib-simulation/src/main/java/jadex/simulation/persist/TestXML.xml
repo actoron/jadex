@@ -11,8 +11,8 @@
 
 
 
-<!--<SimulationConfiguration name="MarsWorldExperiments" applicationReference="..\\jadex-applib-simulation\\target\\classes\\jadex\\simulation\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml" applicationConfiguration="1 Sentry / 2 Producers / 3 Carries">-->
-<SimulationConfiguration name="MarsWorldExperiments" applicationReference="..\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml" applicationConfiguration="1 Sentry / 2 Producers / 3 Carries">
+<SimulationConfiguration name="MarsWorldExperiments" applicationReference="..\\jadex-applib-simulation\\target\\classes\\jadex\\simulation\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml" applicationConfiguration="1 Sentry / 2 Producers / 3 Carries">
+<!--<SimulationConfiguration name="MarsWorldExperiments" applicationReference="..\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml" applicationConfiguration="1 Sentry / 2 Producers / 3 Carries">-->
     <Observers>
         <Observer>
             <Data name="StepLogger">
@@ -65,16 +65,16 @@
     </Optimization>
 
     <RunConfiguration>
-        <General rows="3" parallelRuns="2" delta="true"><!-- For all runs.-->
+        <General rows="4" parallelRuns="2" delta="true"><!-- For all runs.-->
             <StartTime value="113000" type="relative"/><!-- Absolute or relative-->
          <!-- delta=um bei paralleler Ausführung zu Verhindern, dass Seeds von Randoms gleich sind.-->
             <TerminateCondition>
                 <Time value="120000" type="absolute"/>
             </TerminateCondition>
         </General>
-        <Rows experiments="3">
+        <Rows experiments="2">
             <TerminateCondition>
-                <Time value="7000" type="relative"/>
+                <Time value="4000" type="relative"/>
                 <!--<TargetFunction function="$object.money &gt; 5"/>-->
             </TerminateCondition>
         </Rows>

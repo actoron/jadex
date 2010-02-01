@@ -29,7 +29,7 @@ public class InitSimulationPlan extends Plan{
 	private void initSettings(SimulationConfiguration simConf){		
 	
 		HashMap facts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
-		facts.put(Constants.SIMULATION_START_TIME, new Long(System.currentTimeMillis()));
+		facts.put(Constants.SIMULATION_START_TIME, getClock().getTime());
 		facts.put(Constants.SIMULATION_NAME, simConf.getName());
 		facts.put(Constants.TOTAL_EXPERIMENT_COUNTER, new Integer(0));
 		facts.put(Constants.ROW_EXPERIMENT_COUNTER, new Integer(0));
