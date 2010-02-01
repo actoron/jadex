@@ -9,7 +9,7 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	name="MessagReceival"
-	package="jadex.bpmn.examples.helloworld">
+	package="jadex.bdibpmn.examples.execute">
 	
 	<imports>
 		<import>jadex.adapter.base.fipa.*</import>
@@ -22,7 +22,9 @@
 	<plans>
 		<!-- Plan which waits for a message. -->
 		<plan name="message_receival">
-			<body type="bpmn" impl="jadex/bpmn/examples/helloworld/MessageReceival3.bpmn"/>
+			<!-- <body type="bpmn" impl="jadex/bdibpmn/examples/execute/MessageReceival1.bpmn"/> -->
+			<!-- <body type="bpmn" impl="jadex/bdibpmn/examples/execute/MessageReceival2.bpmn"/> -->
+			<body type="bpmn" impl="jadex/bdibpmn/examples/execute/MessageReceival3.bpmn"/>
 		</plan>
 	</plans>
 	

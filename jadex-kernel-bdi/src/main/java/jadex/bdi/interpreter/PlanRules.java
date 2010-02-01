@@ -2048,6 +2048,9 @@ public class PlanRules
 	{	
 		Object ret = null;
 
+		if(state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitabstraction)!=null)
+			System.out.println("driss");
+		
 		assert state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitabstraction)==null;
 		
 		// Clear dispatched element.

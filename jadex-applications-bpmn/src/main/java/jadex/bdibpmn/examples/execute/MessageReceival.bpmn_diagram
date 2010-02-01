@@ -50,6 +50,15 @@
     <element xmi:type="bpmn:Pool" href="MessageReceival.bpmn#_LgfxUW_AEd6gyNniPBNmMQ"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_LgfxX2_AEd6gyNniPBNmMQ" x="16" y="16" width="610" height="200"/>
   </children>
+  <children xmi:type="notation:Node" xmi:id="_ULUYEA9QEd-ftJFULQcY2w" type="1002">
+    <children xmi:type="notation:Node" xmi:id="_ULUYFg9QEd-ftJFULQcY2w" type="4009"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_ULUYEQ9QEd-ftJFULQcY2w" fontName="Arial"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_ULUYEg9QEd-ftJFULQcY2w"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_ULUYEw9QEd-ftJFULQcY2w"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_ULUYFA9QEd-ftJFULQcY2w" lineColor="0"/>
+    <element xmi:type="bpmn:TextAnnotation" href="MessageReceival.bpmn#_ULKnEQ9QEd-ftJFULQcY2w"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ULUYFQ9QEd-ftJFULQcY2w" x="16" y="251"/>
+  </children>
   <styles xmi:type="notation:PageStyle" xmi:id="_LgDFYW_AEd6gyNniPBNmMQ"/>
   <styles xmi:type="notation:GuideStyle" xmi:id="_LgDFYm_AEd6gyNniPBNmMQ"/>
   <styles xmi:type="notation:DescriptionStyle" xmi:id="_LgDFY2_AEd6gyNniPBNmMQ"/>
@@ -89,5 +98,13 @@
     <styles xmi:type="notation:LineStyle" xmi:id="_KP0cdXCYEd6dTLJP0bYxrQ" lineColor="0"/>
     <element xmi:type="bpmn:SequenceEdge" href="MessageReceival.bpmn#_KP0ccXCYEd6dTLJP0bYxrQ"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_KP0cdnCYEd6dTLJP0bYxrQ" points="[-58, -15, 340, 85]$[-396, -100, 2, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_VSGZ8A9QEd-ftJFULQcY2w" type="3003" source="_ULUYEA9QEd-ftJFULQcY2w" target="_LgfxVG_AEd6gyNniPBNmMQ">
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_VSGZ8Q9QEd-ftJFULQcY2w"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_VSGZ8g9QEd-ftJFULQcY2w" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_VSGZ8w9QEd-ftJFULQcY2w" lineColor="0"/>
+    <element xmi:type="bpmn:Association" href="MessageReceival.bpmn#_VR8o8A9QEd-ftJFULQcY2w"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_VSGZ9A9QEd-ftJFULQcY2w" points="[130, 7, 77, 62]$[53, -55, 0, 0]"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_VSGZ9Q9QEd-ftJFULQcY2w" id="(0.3,1.0)"/>
   </edges>
 </notation:Diagram>

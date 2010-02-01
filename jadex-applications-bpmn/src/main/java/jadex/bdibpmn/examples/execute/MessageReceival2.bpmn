@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_BKjykXEQEd6dTLJP0bYxrQ" iD="_BKjykHEQEd6dTLJP0bYxrQ">
-  <pools xmi:type="bpmn:Pool" xmi:id="_BKjyl3EQEd6dTLJP0bYxrQ" iD="_BKjylnEQEd6dTLJP0bYxrQ" name="Pool">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_RV0xoQ9QEd-ftJFULQcY2w" iD="_RV0xoA9QEd-ftJFULQcY2w" name="package jadex.bdibpmn.examples.execute;">
+    <associations xmi:type="bpmn:Association" xmi:id="_SptbYA9QEd-ftJFULQcY2w"/>
+  </artifacts>
+  <pools xmi:type="bpmn:Pool" xmi:id="_BKjyl3EQEd6dTLJP0bYxrQ" iD="_BKjylnEQEd6dTLJP0bYxrQ" associations="_SptbYA9QEd-ftJFULQcY2w" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_BKjymXEQEd6dTLJP0bYxrQ" iD="_BKjymHEQEd6dTLJP0bYxrQ" outgoingEdges="_Zyz6sXEQEd6dTLJP0bYxrQ" name="Pre Message 1" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_ZyqJsXEQEd6dTLJP0bYxrQ" iD="_ZyqJsHEQEd6dTLJP0bYxrQ" outgoingEdges="_c6F0uHEQEd6dTLJP0bYxrQ" incomingEdges="_Zyz6sXEQEd6dTLJP0bYxrQ" name="Wait for Message 1&#xD;&#xA;type= &quot;test_message&quot;" activityType="EventIntermediateMessage"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_c58qwXEQEd6dTLJP0bYxrQ" iD="_c58qwHEQEd6dTLJP0bYxrQ" incomingEdges="_c6F0uHEQEd6dTLJP0bYxrQ" name="After Message 1" activityType="Task"/>

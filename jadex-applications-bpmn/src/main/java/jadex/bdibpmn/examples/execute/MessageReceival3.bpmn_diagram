@@ -156,7 +156,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_seRsnXEWEd6dTLJP0bYxrQ" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_seRsnnEWEd6dTLJP0bYxrQ" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="MessageReceival3.bpmn#_seRsl3EWEd6dTLJP0bYxrQ"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_seRspXEWEd6dTLJP0bYxrQ" x="16" y="16" width="871" height="693"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_seRspXEWEd6dTLJP0bYxrQ" x="16" y="16" width="871" height="645"/>
   </children>
   <children xmi:type="notation:Node" xmi:id="_JeIQknHnEd6dTLJP0bYxrQ" type="1002">
     <children xmi:type="notation:Node" xmi:id="_JeSBkHHnEd6dTLJP0bYxrQ" type="4009"/>

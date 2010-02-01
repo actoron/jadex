@@ -104,7 +104,7 @@ public class GpmnXMLReader
 		String uri = "http://jadex.sourceforge.net/gpmn";
 		
 		TypeInfo ti_proc = new TypeInfo(new XMLInfo("processes"), new ObjectInfo(MProcess.class),
-			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")}, null, null,
+			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge")),
 			new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
