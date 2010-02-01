@@ -63,6 +63,9 @@ public class AttributeInfo
 	/** The attribute value converter for write. */
 	protected ITypeConverter converterwrite;
 	
+	/** Flag for writing attribute as tag. */
+	protected boolean writeastag;
+	
 	//-------- constructors --------
 		
 	/**

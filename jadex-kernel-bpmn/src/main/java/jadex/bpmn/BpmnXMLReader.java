@@ -117,12 +117,12 @@ public class BpmnXMLReader
 		String uri = "http://stp.eclipse.org/bpmn";
 		String xmiuri = "http://www.omg.org/XMI";
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "BpmnDiagram")}), new ObjectInfo(MBpmnModel.class), 
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "BpmnDiagram")}), new ObjectInfo(MBpmnModel.class, new BpmnModelPostProcessor()), 
 			new MappingInfo(null, new BeanAttributeInfo[]{
 			new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE),
 			new BeanAttributeInfo(new QName("http://www.omg.org/XMI", "version"), null, AttributeInfo.IGNORE_READWRITE),
 			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
-			}, new BpmnModelPostProcessor(), null,
+			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo("pools", "pool")),
 			new SubobjectInfo(new BeanAttributeInfo("artifacts", "artifact")),
@@ -132,7 +132,7 @@ public class BpmnXMLReader
 		
 		types.add(new TypeInfo(new XMLInfo("eAnnotations"), new ObjectInfo(MAnnotation.class), 
 			new MappingInfo(null, new BeanAttributeInfo[]{
-			}, null, null,
+			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo("details", "detail")),
 			})));

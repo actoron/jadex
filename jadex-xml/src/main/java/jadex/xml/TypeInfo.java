@@ -1,8 +1,5 @@
 package jadex.xml;
 
-import jadex.commons.IFilter;
-import jadex.xml.reader.IBulkObjectLinker;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -77,26 +74,26 @@ public class TypeInfo	extends AbstractInfo
 	/**
 	 *  Create a new type info.
 	 */
-	public TypeInfo(XMLInfo idinfo, ObjectInfo createinfo)
+	public TypeInfo(XMLInfo xmlinfo, ObjectInfo objectinfo)
 	{
-		this(idinfo, createinfo, null);
+		this(xmlinfo, objectinfo, null);
 	}
 	
 	/**
 	 *  Create a new type info.
 	 */
-	public TypeInfo(XMLInfo idinfo, ObjectInfo createinfo, MappingInfo mapinfo)
+	public TypeInfo(XMLInfo xmlinfo, ObjectInfo objectinfo, MappingInfo mapinfo)
 	{
-		this(idinfo, createinfo, mapinfo, null);
+		this(xmlinfo, objectinfo, mapinfo, null);
 	}
 	
 	/**
 	 *  Create a new type info.
 	 */
-	public TypeInfo(XMLInfo idinfo, ObjectInfo createinfo, MappingInfo mapinfo, LinkingInfo linkinfo)
+	public TypeInfo(XMLInfo xmlinfo, ObjectInfo objectinfo, MappingInfo mapinfo, LinkingInfo linkinfo)
 	{
-		super(idinfo);
-		this.objectinfo = createinfo;
+		super(xmlinfo);
+		this.objectinfo = objectinfo;
 		this.mapinfo = mapinfo;
 		this.linkinfo = linkinfo;
 		
