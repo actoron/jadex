@@ -17,7 +17,7 @@ import jade.wrapper.AgentController;
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.adapter.base.fipa.IProperty;
 import jadex.adapter.jade.fipaimpl.AgentIdentifier;
@@ -64,7 +64,7 @@ public class DF implements IDF, IService
 	 *  Register an agent description.
 	 *  @throws RuntimeException when the agent is already registered.
 	 */
-	public void	register(final IDFAgentDescription adesc, IResultListener lis)
+	public void	register(final IDFComponentDescription adesc, IResultListener lis)
 	{
 		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
 		
@@ -159,7 +159,7 @@ public class DF implements IDF, IService
 	 *  Deregister an agent description.
 	 *  @throws RuntimeException when the agent is not registered.
 	 */
-	public void	deregister(final IDFAgentDescription adesc, IResultListener lis)
+	public void	deregister(final IDFComponentDescription adesc, IResultListener lis)
 	{
 		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
 		
@@ -250,7 +250,7 @@ public class DF implements IDF, IService
 	 *  Modify an agent description.
 	 *  @throws RuntimeException when the agent is not registered.
 	 */
-	public void	modify(final IDFAgentDescription adesc, IResultListener lis)
+	public void	modify(final IDFComponentDescription adesc, IResultListener lis)
 	{
 		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
 		
@@ -345,7 +345,7 @@ public class DF implements IDF, IService
 	 *  Search for agents matching the given description.
 	 *  @return An array of matching agent descriptions. 
 	 */
-	public void	search(final IDFAgentDescription adesc, final ISearchConstraints con, IResultListener lis)
+	public void	search(final IDFComponentDescription adesc, final ISearchConstraints con, IResultListener lis)
 	{
 		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
 		
@@ -372,7 +372,7 @@ public class DF implements IDF, IService
 							{
 								Result res = (Result)myAgent.getContentManager().extractContent(reply);
 								jade.util.leap.List descs = res.getItems();
-								IDFAgentDescription[] ret = new IDFAgentDescription[descs.size()];
+								IDFComponentDescription[] ret = new IDFComponentDescription[descs.size()];
 								IAMS ams = (IAMS)platform.getService(IAMS.class);
 								for(int i=0; i<ret.length; i++)
 								{
@@ -487,7 +487,7 @@ public class DF implements IDF, IService
 	 *  @param service The service.
 	 *  @return The df agent description.
 	 */
-	public IDFAgentDescription createDFAgentDescription(IComponentIdentifier agent, IDFServiceDescription service)
+	public IDFComponentDescription createDFComponentDescription(IComponentIdentifier agent, IDFServiceDescription service)
 	{
 		DFAgentDescription	ret	= new DFAgentDescription();
 		ret.setName(agent);
@@ -505,7 +505,7 @@ public class DF implements IDF, IService
 	 *  @param protocols The protocols.
 	 *  @return The agent description.
 	 */
-	public IDFAgentDescription	createDFAgentDescription(IComponentIdentifier agent, IDFServiceDescription[] services,
+	public IDFComponentDescription	createDFComponentDescription(IComponentIdentifier agent, IDFServiceDescription[] services,
 		String[] languages, String[] ontologies, String[] protocols, Date leasetime)
 	{
 		DFAgentDescription	ret	= new DFAgentDescription();
@@ -542,7 +542,7 @@ public class DF implements IDF, IService
 	 *  @param local True for local name ().
 	 *  @return The new agent identifier.
 	 */
-	public IComponentIdentifier createAgentIdentifier(String name, boolean local)
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
 	{
 		if(local)
 			name = name + "@" + platform.getName();
@@ -555,7 +555,7 @@ public class DF implements IDF, IService
 	 *  @param local True for local name.
 	 *  @param addresses The addresses.
 	 */
-	public IComponentIdentifier createAgentIdentifier(String name, boolean local, String[] addresses)
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
 		if(local)
 			name = name + "@" + platform.getName();
@@ -589,7 +589,7 @@ public class DF implements IDF, IService
 	/**
 	 *  Test if an agent description matches a given template.
 	 */
-	protected boolean	match(IDFAgentDescription desc, IDFAgentDescription template)
+	protected boolean	match(IDFComponentDescription desc, IDFComponentDescription template)
 	{
 		boolean	ret	= true;
 

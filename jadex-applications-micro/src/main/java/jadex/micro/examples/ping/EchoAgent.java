@@ -22,7 +22,7 @@ public class EchoAgent extends MicroAgent
 	{
 		Map reply = new HashMap(msg);
 		IComponentIdentifier sender = (IComponentIdentifier)msg.get(SFipa.SENDER);
-		reply.put(SFipa.SENDER, getAgentIdentifier());
+		reply.put(SFipa.SENDER, getComponentIdentifier());
 		reply.put(SFipa.RECEIVERS, new IComponentIdentifier[]{sender});
 		
 		sendMessage(reply, mt);

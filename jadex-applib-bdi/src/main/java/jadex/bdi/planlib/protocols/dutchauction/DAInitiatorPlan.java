@@ -260,7 +260,7 @@ public class DAInitiatorPlan extends AbstractInitiatorPlan
 						sendMessage(getEventbase().createReply(tmp, "da_accept_proposal"));
 						getLogger().info(getComponentName() + " found winner: "+tmp.getParameter(SFipa.SENDER).getValue());
 												
-						// Set the parameter "winner" to the AgentIdentifier of the
+						// Set the parameter "winner" to the identifier of the
 						// winning agent.
 						winner = (IComponentIdentifier)tmp.getParameter(SFipa.SENDER).getValue();
 					}

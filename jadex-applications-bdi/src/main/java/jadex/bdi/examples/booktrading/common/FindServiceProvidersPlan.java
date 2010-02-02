@@ -1,7 +1,7 @@
 package jadex.bdi.examples.booktrading.common;
 
 import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ISearchConstraints;
@@ -17,7 +17,7 @@ public class FindServiceProvidersPlan extends Plan
 	 */
 	public void body()
 	{
-		IDFAgentDescription dfadesc = (IDFAgentDescription)getParameter("description").getValue();
+		IDFComponentDescription dfadesc = (IDFComponentDescription)getParameter("description").getValue();
 		
 		IDF df = (IDF)getScope().getServiceContainer().getService(IDF.class);
 		ISearchConstraints constraints = df.createSearchConstraints(-1, 0);
@@ -28,7 +28,7 @@ public class FindServiceProvidersPlan extends Plan
 		ft.getParameter("constraints").setValue(constraints);
 		dispatchSubgoalAndWait(ft);
 
-		IDFAgentDescription[]	result = (IDFAgentDescription[])ft.getParameterSet("result").getValues();
+		IDFComponentDescription[]	result = (IDFComponentDescription[])ft.getParameterSet("result").getValues();
 		if(result.length > 0)
 		{
 			for(int i = 0; i < result.length; i++)

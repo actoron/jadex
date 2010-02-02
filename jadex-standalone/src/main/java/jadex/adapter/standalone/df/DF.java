@@ -2,13 +2,13 @@ package jadex.adapter.standalone.df;
 
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.adapter.base.fipa.IProperty;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.adapter.standalone.AbstractPlatform;
-import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
-import jadex.adapter.standalone.fipaimpl.DFAgentDescription;
+import jadex.adapter.standalone.fipaimpl.ComponentIdentifier;
+import jadex.adapter.standalone.fipaimpl.DFComponentDescription;
 import jadex.adapter.standalone.fipaimpl.DFServiceDescription;
 import jadex.adapter.standalone.fipaimpl.SearchConstraints;
 import jadex.bridge.IComponentIdentifier;
@@ -55,16 +55,16 @@ public class DF implements IDF, IService
 	//-------- IDF interface methods --------
 
 	/**
-	 *  Register an agent description.
+	 *  Register a component description.
 	 *  @throws RuntimeException when the agent is already registered.
 	 */
-	public void	register(IDFAgentDescription adesc, IResultListener listener)
+	public void	register(IDFComponentDescription adesc, IResultListener listener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
 		//System.out.println("Registered: "+adesc.getName()+" "+adesc.getLeaseTime());
-		IDFAgentDescription clone = SFipa.cloneDFAgentDescription(adesc, this);
+		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(adesc, this);
 
 		// Add description, when valid.
 		IClockService clock = (IClockService)platform.getService(IClockService.class);
@@ -74,7 +74,7 @@ public class DF implements IDF, IService
 			{
 				// Automatically throws exception, when key exists.
 				if(agents.containsKey(clone.getName()))
-					throw new RuntimeException("Agent already registered: "+adesc.getName());
+					throw new RuntimeException("Componentomponent already registered: "+adesc.getName());
 				agents.add(clone.getName(), clone);
 //				System.out.println("registered: "+clone.getName());
 			}
@@ -83,7 +83,7 @@ public class DF implements IDF, IService
 		}
 		else
 		{
-			listener.exceptionOccurred(this, new RuntimeException("Agent not registered: "+clone.getName()));
+			listener.exceptionOccurred(this, new RuntimeException("Componentomponent not registered: "+clone.getName()));
 			
 //			System.out.println("not registered: "+clone.getName());			
 		}
@@ -92,10 +92,10 @@ public class DF implements IDF, IService
 	}
 
 	/**
-	 *  Deregister an agent description.
+	 *  Deregister a component description.
 	 *  @throws RuntimeException when the agent is not registered.
 	 */
-	public void	deregister(IDFAgentDescription adesc, IResultListener listener)
+	public void	deregister(IDFComponentDescription adesc, IResultListener listener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
@@ -104,8 +104,8 @@ public class DF implements IDF, IService
 		{
 			if(!agents.containsKey(adesc.getName()))
 			{
-				//throw new RuntimeException("Agent not registered: "+adesc.getName());
-				listener.exceptionOccurred(this, new RuntimeException("Agent not registered: "+adesc.getName()));
+				//throw new RuntimeException("Component not registered: "+adesc.getName());
+				listener.exceptionOccurred(this, new RuntimeException("Component not registered: "+adesc.getName()));
 				return;
 			}
 			agents.removeKey(adesc.getName());
@@ -116,16 +116,16 @@ public class DF implements IDF, IService
 	}
 
 	/**
-	 *  Modify an agent description.
+	 *  Modify a component description.
 	 *  @throws RuntimeException when the agent is not registered.
 	 */
-	public void	modify(IDFAgentDescription adesc, IResultListener listener)
+	public void	modify(IDFComponentDescription adesc, IResultListener listener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
 		// Use clone to avoid caller manipulating object after insertion.
-		IDFAgentDescription clone = SFipa.cloneDFAgentDescription(adesc, this);
+		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(adesc, this);
 
 		// Change description, when valid.
 		IClockService clock = (IClockService)platform.getService(IClockService.class);
@@ -150,7 +150,7 @@ public class DF implements IDF, IService
 	 *  Search for agents matching the given description.
 	 *  @return An array of matching agent descriptions. 
 	 */
-	public void	search(IDFAgentDescription adesc, ISearchConstraints con, IResultListener listener)
+	public void	search(IDFComponentDescription adesc, ISearchConstraints con, IResultListener listener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
@@ -166,7 +166,7 @@ public class DF implements IDF, IService
 			{
 				if(agents.containsKey(adesc.getName()))
 				{
-					DFAgentDescription ad = (DFAgentDescription)agents.get(adesc.getName());
+					DFComponentDescription ad = (DFComponentDescription)agents.get(adesc.getName());
 					// Remove description when invalid.
 					IClockService clock = (IClockService)platform.getService(IClockService.class);
 					if(ad.getLeaseTime()!=null && ad.getLeaseTime().getTime()<clock.getTime())
@@ -182,7 +182,7 @@ public class DF implements IDF, IService
 		{
 			synchronized(agents)
 			{
-				DFAgentDescription[]	descs	= (DFAgentDescription[])agents.toArray(new DFAgentDescription[agents.size()]);
+				DFComponentDescription[]	descs	= (DFComponentDescription[])agents.toArray(new DFComponentDescription[agents.size()]);
 				for(int i=0; (con==null || con.getMaxResults()==-1 || ret.size()<con.getMaxResults()) && i<descs.length; i++)
 				{
 					// Remove description when invalid.
@@ -204,9 +204,9 @@ public class DF implements IDF, IService
 		}
 
 		//System.out.println("Searched: "+ret);
-		//return (AgentDescription[])ret.toArray(new AgentDescription[ret.size()]);
+		//return (ComponentDescription[])ret.toArray(new ComponentDescription[ret.size()]);
 		
-		listener.resultAvailable(this, ret.toArray(new DFAgentDescription[ret.size()]));
+		listener.resultAvailable(this, ret.toArray(new DFComponentDescription[ret.size()]));
 	}
 
 	/**
@@ -253,9 +253,9 @@ public class DF implements IDF, IService
 	 *  @param service The service.
 	 *  @return The df agent description.
 	 */
-	public IDFAgentDescription createDFAgentDescription(IComponentIdentifier agent, IDFServiceDescription service)
+	public IDFComponentDescription createDFComponentDescription(IComponentIdentifier agent, IDFServiceDescription service)
 	{
-		DFAgentDescription	ret	= new DFAgentDescription();
+		DFComponentDescription	ret	= new DFComponentDescription();
 		ret.setName(agent);
 		if(service!=null)
 			ret.addService(service);
@@ -271,10 +271,10 @@ public class DF implements IDF, IService
 	 *  @param protocols The protocols.
 	 *  @return The agent description.
 	 */
-	public IDFAgentDescription	createDFAgentDescription(IComponentIdentifier agent, IDFServiceDescription[] services,
+	public IDFComponentDescription	createDFComponentDescription(IComponentIdentifier agent, IDFServiceDescription[] services,
 		String[] languages, String[] ontologies, String[] protocols, Date leasetime)
 	{
-		DFAgentDescription	ret	= new DFAgentDescription();
+		DFComponentDescription	ret	= new DFComponentDescription();
 		ret.setName(agent);
 		ret.setLeaseTime(leasetime);
 		for(int i=0; services!=null && i<services.length; i++)
@@ -303,29 +303,29 @@ public class DF implements IDF, IService
 	}
 
 	/**
-	 *  Create an agent identifier.
+	 *  Create a component identifier.
 	 *  @param name The name.
 	 *  @param local True for local name ().
 	 *  @return The new agent identifier.
 	 */
-	public IComponentIdentifier createAgentIdentifier(String name, boolean local)
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
 	{
 		if(local)
 			name = name + "@" + platform.getName();
-		return new AgentIdentifier(name);
+		return new ComponentIdentifier(name);
 	}
 	
 	/**
-	 *  Create an agent identifier.
+	 *  Create a component identifier.
 	 *  @param name The name.
 	 *  @param local True for local name.
 	 *  @param addresses The addresses.
 	 */
-	public IComponentIdentifier createAgentIdentifier(String name, boolean local, String[] addresses)
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
 		if(local)
 			name = name + "@" + platform.getName();
-		return new AgentIdentifier(name, addresses, null);
+		return new ComponentIdentifier(name, addresses, null);
 	}
 
 	//-------- IPlatformService interface methods --------
@@ -353,9 +353,9 @@ public class DF implements IDF, IService
 	//-------- helper methods --------
 
 	/**
-	 *  Test if an agent description matches a given template.
+	 *  Test if a component description matches a given template.
 	 */
-	protected boolean	match(IDFAgentDescription desc, IDFAgentDescription template)
+	protected boolean	match(IDFComponentDescription desc, IDFComponentDescription template)
 	{
 		boolean	ret	= true;
 

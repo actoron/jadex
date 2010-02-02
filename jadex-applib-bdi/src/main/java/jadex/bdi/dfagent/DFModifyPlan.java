@@ -2,7 +2,7 @@ package jadex.bdi.dfagent;
 
 import jadex.adapter.base.fipa.DFModify;
 import jadex.adapter.base.fipa.Done;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
@@ -21,10 +21,10 @@ public class DFModifyPlan extends Plan
 		DFModify mo = (DFModify)getParameter("action").getValue();
 
 		IGoal reg = createGoal("df_modify");
-		reg.getParameter("description").setValue(mo.getAgentDescription());
+		reg.getParameter("description").setValue(mo.getComponentDescription());
 		dispatchSubgoalAndWait(reg);
 
-		mo.setResult((IDFAgentDescription)reg.getParameter("result").getValue());
+		mo.setResult((IDFComponentDescription)reg.getParameter("result").getValue());
 		getParameter("result").setValue(new Done(mo));
 	}
 }

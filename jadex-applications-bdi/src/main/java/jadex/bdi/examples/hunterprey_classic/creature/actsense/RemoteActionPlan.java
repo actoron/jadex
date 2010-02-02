@@ -1,7 +1,7 @@
 package jadex.bdi.examples.hunterprey_classic.creature.actsense;
 
 import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IBelief;
@@ -63,15 +63,9 @@ public abstract class RemoteActionPlan extends Plan
 		{
 			IDF df = (IDF)getScope().getServiceContainer().getService(IDF.class);
 			IDFServiceDescription sd = df.createDFServiceDescription(null, "hunter-prey environment", null);
-			IDFAgentDescription ad = df.createDFAgentDescription(null, sd);
+			IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 			ISearchConstraints	cons = df.createSearchConstraints(-1, 0);
 			
-			// Create a service description to search for.
-			/*ServiceDescription sd = new ServiceDescription();
-			sd.setType("hunter-prey environment");
-			AgentDescription dfadesc = new AgentDescription();
-			dfadesc.addService(sd);*/
-	
 			// Use a subgoal to search for a translation agent
 			IGoal ft = createGoal("df_search");
 			ft.getParameter("description").setValue(ad);
@@ -80,7 +74,7 @@ public abstract class RemoteActionPlan extends Plan
 			ft.getParameter("df").setValue(bel.getFact());
 			dispatchSubgoalAndWait(ft);
 			//Object result = ft.getResult();
-			IDFAgentDescription[] tas = (IDFAgentDescription[])ft.getParameterSet("result").getValues();
+			IDFComponentDescription[] tas = (IDFComponentDescription[])ft.getParameterSet("result").getValues();
 
 			if(tas.length!=0)
 			{

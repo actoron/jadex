@@ -1,7 +1,7 @@
 package jadex.bdi.planlib.df;
 
 import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 
@@ -20,7 +20,7 @@ public class DFLocalRegisterPlan extends Plan
 	{
 		// Todo: support other parameters!?
 		Number lt = (Number)getParameter("leasetime").getValue();
-		IDFAgentDescription desc = (IDFAgentDescription)getParameter("description").getValue();
+		IDFComponentDescription desc = (IDFComponentDescription)getParameter("description").getValue();
 
 		// When AID is ommited, enter self. Hack???
 		if(desc.getName()==null || lt!=null)
@@ -28,7 +28,7 @@ public class DFLocalRegisterPlan extends Plan
 			IDF	dfservice	= (IDF)getScope().getServiceContainer().getService(IDF.class);
 			IComponentIdentifier	bid	= desc.getName()!=null ? desc.getName() : getScope().getComponentIdentifier();
 			Date	leasetime	= lt==null ? desc.getLeaseTime() : new Date(getTime()+lt.longValue());
-			desc	= dfservice.createDFAgentDescription(bid, desc.getServices(), desc.getLanguages(), desc.getOntologies(), desc.getProtocols(), leasetime);
+			desc	= dfservice.createDFComponentDescription(bid, desc.getServices(), desc.getLanguages(), desc.getOntologies(), desc.getProtocols(), leasetime);
 		}
 
 		getLogger().info("Trying to register: "+desc);
@@ -36,7 +36,7 @@ public class DFLocalRegisterPlan extends Plan
 		SyncResultListener lis = new SyncResultListener();
 		((IDF)getScope().getServiceContainer().getService(IDF.class)).register(desc, lis);
 		// todo: supply return value or throw exception?
-		desc = (IDFAgentDescription)lis.waitForResult();
+		desc = (IDFComponentDescription)lis.waitForResult();
 
 		getParameter("result").setValue(desc);
 	}

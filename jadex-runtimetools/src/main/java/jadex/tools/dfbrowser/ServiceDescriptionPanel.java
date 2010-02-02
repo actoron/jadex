@@ -1,6 +1,6 @@
 package jadex.tools.dfbrowser;
 
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.adapter.base.fipa.IProperty;
 import jadex.bridge.IComponentIdentifier;
@@ -78,7 +78,7 @@ public class ServiceDescriptionPanel extends JPanel
 	 *  @param ad The agent description.
 	 *  @param sd The service description.
 	 */
-	void setService(IDFAgentDescription ad, IDFServiceDescription sd)
+	void setService(IDFComponentDescription ad, IDFServiceDescription sd)
 	{
 		name.setText(sd==null? "": sd.getName());
 		name.setToolTipText(sd==null? "": sd.getName());

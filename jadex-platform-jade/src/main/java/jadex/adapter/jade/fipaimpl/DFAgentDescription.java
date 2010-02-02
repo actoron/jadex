@@ -1,6 +1,6 @@
 package jadex.adapter.jade.fipaimpl;
 
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.bridge.IComponentIdentifier;
 
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  *  An agent description.
  */
-public class DFAgentDescription implements IDFAgentDescription, Serializable
+public class DFAgentDescription implements IDFComponentDescription, Serializable
 {
 	//-------- attributes ----------
 

@@ -366,6 +366,8 @@ public class CallbackPlan extends Plan
 				getExternalAccess().getLogger().info("Agent terminated invoked");
 			}
 		});
+		
+		killComponent();
 	}
 	
 	/**

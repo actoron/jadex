@@ -55,8 +55,12 @@ public class PerformTestPlan extends Plan
 		}
 		catch(Exception cause)
 		{
-			ces.destroyComponent(testagent, null);
-			testagent	= null;
+//			cause.printStackTrace();
+			if(testagent!=null)
+			{
+				ces.destroyComponent(testagent, null);
+				testagent	= null;
+			}
 			testcase.setReports(new TestReport[]{new TestReport("creation", "Test center report", 
 				false, "Test agent could not be created: "+cause)});
 		}

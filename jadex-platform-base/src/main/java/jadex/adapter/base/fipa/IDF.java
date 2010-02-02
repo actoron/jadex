@@ -16,25 +16,25 @@ public interface IDF
 	 *  Register an agent description.
 	 *  @throws RuntimeException when the agent is already registered.
 	 */
-	public void	register(IDFAgentDescription adesc, IResultListener listener);
+	public void	register(IDFComponentDescription adesc, IResultListener listener);
 	
 	/**
 	 *  Deregister an agent description.
 	 *  @throws RuntimeException when the agent is not registered.
 	 */
-	public void	deregister(IDFAgentDescription adesc, IResultListener listener);
+	public void	deregister(IDFComponentDescription adesc, IResultListener listener);
 	
 	/**
 	 *  Modify an agent description.
 	 *  @throws RuntimeException when the agent is not registered.
 	 */
-	public void	modify(IDFAgentDescription adesc, IResultListener listener);
+	public void	modify(IDFComponentDescription adesc, IResultListener listener);
 	
 	/**
 	 *  Search for agents matching the given description.
 	 *  @return An array of matching agent descriptions. 
 	 */
-	public void search(IDFAgentDescription adesc, ISearchConstraints con, IResultListener listener);
+	public void search(IDFComponentDescription adesc, ISearchConstraints con, IResultListener listener);
 
 	/**
 	 *  Create a df service description.
@@ -65,7 +65,7 @@ public interface IDF
 	 *  @param service The service.
 	 *  @return The df agent description.
 	 */
-	public IDFAgentDescription createDFAgentDescription(IComponentIdentifier agent, IDFServiceDescription service);
+	public IDFComponentDescription createDFComponentDescription(IComponentIdentifier agent, IDFServiceDescription service);
 
 	/**
 	 *  Create a new df agent description.
@@ -76,7 +76,7 @@ public interface IDF
 	 *  @param protocols The protocols.
 	 *  @return The agent description.
 	 */
-	public IDFAgentDescription	createDFAgentDescription(IComponentIdentifier agent, IDFServiceDescription[] services,
+	public IDFComponentDescription	createDFComponentDescription(IComponentIdentifier agent, IDFServiceDescription[] services,
 		String[] languages, String[] ontologies, String[] protocols, Date leasetime);
 
 	/**
@@ -93,7 +93,7 @@ public interface IDF
 	 *  @param local True for local name.
 	 *  @return The new agent identifier.
 	 */
-	public IComponentIdentifier createAgentIdentifier(String name, boolean local);
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local);
 	
 	/**
 	 *  Create an agent identifier.
@@ -103,5 +103,5 @@ public interface IDF
 	 *  @param resolvers The resolvers.
 	 *  @return The new agent identifier.
 	 */
-	public IComponentIdentifier createAgentIdentifier(String name, boolean local, String[] addresses);
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses);
 }

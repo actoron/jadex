@@ -194,7 +194,7 @@ public class MessageEventRules
 				IMessageAdapter rawmsg = (IMessageAdapter)assignments.getVariableValue("?rawmsg");
 				Object mevent = assignments.getVariableValue("?mevent");
 				
-//				String agentname = BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName();
+//				String agentname = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName();
 //				System.out.println("Agent has received msg: "+agentname+" "+rawmsg+" "+mevent);
 					
 				Object revent = createReceivedMessageEvent(state, mevent, rawmsg, rcapa, null);
@@ -316,7 +316,7 @@ public class MessageEventRules
 				// todo: fetch value from rete, currently not possible because rete does not cache function call results.
 				Object original = getInReplyMessageEvent(state, rawmsg, rcapa);
 				
-//				String agentname = BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName();
+//				String agentname = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName();
 //				System.out.println("Agent has received conversation msg: "+agentname+" "+rawmsg+" "+mevent);
 					
 				Object revent = createReceivedMessageEvent(state, mevent, rawmsg, rcapa, original);
@@ -1043,7 +1043,7 @@ public class MessageEventRules
 			state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_sentmessageevents, rmevent);
 			coll = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_sentmessageevents);
 //			System.out.println("+++"+BDIInterpreter.getInterpreter(state).getAgentAdapter()
-//				.getAgentIdentifier()+" has open conversations: "+coll.size()+" "+coll);
+//				.getComponentIdentifier()+" has open conversations: "+coll.size()+" "+coll);
 //			Thread.dumpStack();
 		}
 	}
@@ -1061,7 +1061,7 @@ public class MessageEventRules
 //			throw new RuntimeException("Registration of message event not found: "+rmevent+" "+rscope);
 			
 //		System.out.println("+++"+BDIInterpreter.getInterpreter(state).getAgentAdapter()
-//			.getAgentIdentifier()+" has open conversations: "+coll.size()+" "+coll);
+//			.getComponentIdentifier()+" has open conversations: "+coll.size()+" "+coll);
 	}
 	
 	/**
@@ -1096,7 +1096,7 @@ public class MessageEventRules
 			return null;
 		
 //		System.out.println("+++"+BDIInterpreter.getInterpreter(state).getAgentAdapter()
-//			.getAgentIdentifier()+" has open conversations: "+coll.size()+" "+coll);	
+//			.getComponentIdentifier()+" has open conversations: "+coll.size()+" "+coll);	
 		
 		// Prefer the newest messages for finding replies.
 		// todo: conversations should be better supported

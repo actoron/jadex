@@ -1,7 +1,6 @@
 package jadex.adapter.base.fipa;
 
 import jadex.adapter.base.NuggetsXMLContentCodec;
-import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
@@ -195,18 +194,18 @@ public class SFipa
 	 *  Clone the agent identifier.
 	 *  @param source The source agent identifier.
 	 *  @param ams The ams service.
-	 */
+	 * /
 	public IComponentIdentifier cloneAgentIdentifier(IComponentIdentifier source, IComponentExecutionService ces)
 	{
 		IComponentIdentifier clone = ces.createComponentIdentifier(source.getName(), false, source.getAddresses());
 		
 		// Deep copy of resolvers.
-		/*AgentIdentifier[] res = getResolvers();
-		for(int i = 0; i < res.length; i++)
-			clone.addResolver((AgentIdentifier)res[i].clone());*/
+//		AgentIdentifier[] res = getResolvers();
+//		for(int i = 0; i < res.length; i++)
+//			clone.addResolver((AgentIdentifier)res[i].clone());
 
 		return clone;
-	}
+	}*/
 	
 	/**
 	 *  Clone the ams agent description.
@@ -238,7 +237,7 @@ public class SFipa
 	 *  @param source The source df agent description.
 	 *  @param df The df service.
 	 */
-	public static IDFAgentDescription cloneDFAgentDescription(IDFAgentDescription source, IDF df)
+	public static IDFComponentDescription cloneDFComponentDescription(IDFComponentDescription source, IDF df)
 	{
 		IDFServiceDescription[] sds = source.getServices();
 		IDFServiceDescription[] tds = null;
@@ -252,9 +251,9 @@ public class SFipa
 		}
 		
 		IComponentIdentifier id = source.getName();
-		id	= df.createAgentIdentifier(id.getName(), false, id.getAddresses());
+		id	= df.createComponentIdentifier(id.getName(), false, id.getAddresses());
 		
-		return df.createDFAgentDescription(id, tds, source.getLanguages(), source.getOntologies(), source.getProtocols(), source.getLeaseTime());
+		return df.createDFComponentDescription(id, tds, source.getLanguages(), source.getOntologies(), source.getProtocols(), source.getLeaseTime());
 	}
 	
 	/**
@@ -293,43 +292,6 @@ public class SFipa
 		return ret;
 	}*/
 
-	/**
-	 *  Create an agent description.
-	 *  @param agent	The agent id.
-	 *  @param service	The agent service.
-	 * /
-	public static IDFAgentDescription	createAgentDescription(AgentIdentifier agent, ServiceDescription service)
-	{
-		IDFAgentDescription	ret	= new AgentDescription();
-		ret.setName(agent);
-		if(service!=null)
-			ret.addService(service);
-		return ret;
-	}*/
-
-	/**
-	 *  Create an agent description.
-	 *  @param agent	The agent id.
-	 *  @param services	The agent service.
-	 *  @param languages	The languages understood by the service.
-	 *  @param ontologies	The ontologies known by the service.
-	 *  @param protocols	The protocols used by the service.
-	 * /
-	public static IDFAgentDescription	createAgentDescription(AgentIdentifier agent, ServiceDescription[] services,
-		String[] languages, String[] ontologies, String[] protocols)
-	{
-		IDFAgentDescription	ret	= new AgentDescription();
-		ret.setName(agent);
-		for(int i=0; services!=null && i<services.length; i++)
-			ret.addService(services[i]);
-		for(int i=0; languages!=null && i<languages.length; i++)
-			ret.addLanguage(languages[i]);
-		for(int i=0; ontologies!=null && i<ontologies.length; i++)
-			ret.addOntology(ontologies[i]);
-		for(int i=0; protocols!=null && i<protocols.length; i++)
-			ret.addProtocol(protocols[i]);
-		return ret;
-	}*/
 
 	/** The counter for conversation ids. */
 	protected static int	convidcnt;

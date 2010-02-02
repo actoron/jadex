@@ -211,7 +211,7 @@ public class EventReificator implements IOAVStateListener
 //							unrefs.add(fid);
 //							BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
 //							if(bdii!=null)
-//								System.out.println("+ext.referenced plans("+bdii.getAgentAdapter().getAgentIdentifier().getLocalName()+"): "+unrefs);
+//								System.out.println("+ext.referenced plans("+bdii.getAgentAdapter().getComponentIdentifier().getLocalName()+"): "+unrefs);
 //						}
 //						while(state.getReferencingObjects(fid)!=null
 //							&& !state.getReferencingObjects(fid).isEmpty())
@@ -229,7 +229,7 @@ public class EventReificator implements IOAVStateListener
 //							unrefs.remove(fid);
 //							BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
 //							if(bdii!=null)
-//								System.out.println("-ext.referenced plans("+bdii.getAgentAdapter().getAgentIdentifier().getLocalName()+"): "+unrefs);
+//								System.out.println("-ext.referenced plans("+bdii.getAgentAdapter().getComponentIdentifier().getLocalName()+"): "+unrefs);
 //						}
 //					}
 //				}).start();

@@ -2,7 +2,7 @@ package jadex.bdi.examples.cleanerworld_classic.environment;
 
 import jadex.adapter.base.fipa.Done;
 import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.bdi.examples.cleanerworld_classic.Chargingstation;
 import jadex.bdi.examples.cleanerworld_classic.Cleaner;
@@ -94,13 +94,7 @@ public class UpdateEnvironmentPlan extends Plan
 	{
 		IDF df = (IDF)getScope().getServiceContainer().getService(IDF.class);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "dispatch vision", null);
-		IDFAgentDescription ad = df.createDFAgentDescription(null, sd);
-
-		// Create a service description to search for.
-		/*ServiceDescription sd = new ServiceDescription();
-		sd.setType("dispatch vision");
-		AgentDescription ad = new AgentDescription();
-		dfadesc.addService(sd);*/
+		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 
 		// Use a subgoal to search for a translation agent
 		IGoal ft = createGoal("df_search");
@@ -113,9 +107,9 @@ public class UpdateEnvironmentPlan extends Plan
 			//Object result = ft.getResult();
 			Object result = ft.getParameterSet("result").getValues();
 
-			if(result instanceof IDFAgentDescription[])
+			if(result instanceof IDFComponentDescription[])
 			{
-				IDFAgentDescription[] tas = (IDFAgentDescription[])result;
+				IDFComponentDescription[] tas = (IDFComponentDescription[])result;
 	
 				if(tas.length!=0)
 				{

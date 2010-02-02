@@ -933,7 +933,7 @@ public class EventProcessingRules
 				List cands = reason(state, rpe, apl);
 				
 //				System.out.println("createSelectCandidatesForGoalRule: schedulePlanInstance: "
-//						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
+//						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName());
 
 				// Check if candidates are still valid.
 				// Uses optimistic scheme, i.e. apl may hold invalid entries.
@@ -941,7 +941,7 @@ public class EventProcessingRules
 				Object cand = checkCandidates(state, rpe, apl, cands);
 				if(cand!=null)
 				{
-//					System.out.println("Check candidates failed: "+cand+", "+rpe+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
+//					System.out.println("Check candidates failed: "+cand+", "+rpe+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName());
 
 					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_state, OAVBDIRuntimeModel.PROCESSABLEELEMENT_UNPROCESSED);
 					boolean rebuild = ((Boolean)state.getAttributeValue(mpe, OAVBDIMetaModel.goal_has_rebuild)).booleanValue();
@@ -1055,7 +1055,7 @@ public class EventProcessingRules
 				List cands = reason(state, rpe, apl);
 				
 //				System.out.println("createSelectCandidatesForInternalEventRule: schedulePlanInstance: "
-//						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
+//						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName());
 
 				// Check if candidates are still valid.
 				// Uses optimistic scheme, i.e. apl may hold invalid entries.
@@ -1064,7 +1064,7 @@ public class EventProcessingRules
 				Object cand = checkCandidates(state, rpe, apl, cands);
 				if(cand!=null)
 				{
-//					System.out.println("Check candidates failed: "+cand+", "+rpe+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
+//					System.out.println("Check candidates failed: "+cand+", "+rpe+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName());
 
 					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_state, OAVBDIRuntimeModel.PROCESSABLEELEMENT_UNPROCESSED);
 					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, null);
@@ -1147,7 +1147,7 @@ public class EventProcessingRules
 				List cands = reason(state, rpe, apl);
 				
 //				System.out.println("createSelectCandidatesForMessageEventRule: schedulePlanInstance: "
-//						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
+//						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName());
 
 				// Check if candidates are still valid.
 				// Uses optimistic scheme, i.e. apl may hold invalid entries.
@@ -1156,7 +1156,7 @@ public class EventProcessingRules
 				Object cand = checkCandidates(state, rpe, apl, cands);
 				if(cand!=null)
 				{
-//					System.out.println("Check candidates failed: "+cand+", "+rpe+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
+//					System.out.println("Check candidates failed: "+cand+", "+rpe+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName());
 
 					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_state, OAVBDIRuntimeModel.PROCESSABLEELEMENT_UNPROCESSED);
 					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_apl, null);
@@ -1518,7 +1518,7 @@ public class EventProcessingRules
 			state.removeAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements, rpe);
 			
 //			System.out.println("DISPATCH_WAITQUEUE_ELEMENT_ACTION: schedulePlanInstance: "
-//				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //				+", "+rplan+", "+rpe);
 		}
 	};
@@ -2039,7 +2039,7 @@ public class EventProcessingRules
 	public static void schedulePlanInstanceCandidate(IOAVState state, Object dispelem, Object rplan, Object rcapa)//Object cand)
 	{
 //		System.out.println("schedulePlanInstanceCandidate: Setting plan to ready: "
-//			+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//			+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //			+", "+rplan);
 		
 //		Object	rplan	= state.getAttributeValue(cand, OAVBDIRuntimeModel.plancandidate_has_plan);

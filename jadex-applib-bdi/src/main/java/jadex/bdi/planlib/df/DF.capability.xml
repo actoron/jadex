@@ -26,22 +26,22 @@
 
 	<goals>
 		<achievegoal name="df_register" exported="true">
-			<parameter name="description" class="IDFAgentDescription"/>
+			<parameter name="description" class="IDFComponentDescription"/>
 			<parameter name="df" class="jadex.bridge.IComponentIdentifier" optional="true"/>
 			<parameter name="leasetime" class="Long" optional="true"/>
-			<parameter name="result" class="IDFAgentDescription" direction="out"/>
+			<parameter name="result" class="IDFComponentDescription" direction="out"/>
 		</achievegoal>
 
 		<achievegoal name="df_modify" exported="true">
-			<parameter name="description" class="IDFAgentDescription"/>
+			<parameter name="description" class="IDFComponentDescription"/>
 			<parameter name="df" class="jadex.bridge.IComponentIdentifier" optional="true"/>
 			<parameter name="leasetime" class="Long" optional="true"/>
-			<parameter name="result" class="IDFAgentDescription" direction="out"/>
+			<parameter name="result" class="IDFComponentDescription" direction="out"/>
 		</achievegoal>
 
 		<maintaingoal name="df_keep_registered" recurdelay="60000" exported="true">
 			<!-- Will contain the actually registered agent description. -->
-			<parameter name="description" class="IDFAgentDescription"/>
+			<parameter name="description" class="IDFComponentDescription"/>
 			<parameter name="df" class="jadex.bridge.IComponentIdentifier" optional="true"/>
 			<parameter name="leasetime" class="Long" optional="true">
 				<!--<value>20000</value>-->
@@ -52,7 +52,7 @@
 			<parameter name="current_time"  class="long" updaterate="1000">
 				<value>$scope.getTime()</value>
 			</parameter>
-			<parameter name="result" class="IDFAgentDescription" direction="out"/>
+			<parameter name="result" class="IDFComponentDescription" direction="out"/>
 			<maintaincondition language="jcl">
 				$goal.result != null
 				&amp;&amp;
@@ -60,7 +60,7 @@
  					|| $goal.result.getLeaseTime().getTime()
 						- $goal.current_time - $goal.buffertime &gt; 0)
 
-				<!--($goal.result instanceof AgentDescription) Janino bug.-->
+				<!--($goal.result instanceof ComponentDescription) Janino bug.-->
 				// ($goal.result != null)
 				// &amp;&amp;
 				// ($goal.result.getLeaseTime() == null?
@@ -74,7 +74,7 @@
 				// ?rgoal	= (goal (parameterelement_has_parameters contains ?param_result)
 				// 				(parameterelement_has_parameters contains ?param_curtime)
 				// 				(parameterelement_has_parameters contains ?param_buftime))
-				// ?result	= (IDFAgentDescription (leaseTime ?leasedate)
+				// ?result	= (IDFComponentDescription (leaseTime ?leasedate)
 				// 	((MethodCallFunction "java.util.Date" "getTime" ?leasedate) ?leastime))
 				// (test (> (Sub ?leastime ?curtime ?buftime) 0))
 			</maintaincondition>
@@ -83,15 +83,15 @@
 		<achievegoal name="df_deregister" exported="true">
 			<!-- The agent description to deregister. Null for deregistering the
 				agent description of the dispatching agent. -->
-			<parameter name="description" class="IDFAgentDescription" optional="true"/>
+			<parameter name="description" class="IDFComponentDescription" optional="true"/>
 			<parameter name="df" class="jadex.bridge.IComponentIdentifier" optional="true"/>
 		</achievegoal>
 
 		<achievegoal name="df_search" exported="true">
-			<parameter name="description" class="IDFAgentDescription"/>
+			<parameter name="description" class="IDFComponentDescription"/>
 			<parameter name="df" class="jadex.bridge.IComponentIdentifier" optional="true"/>
 			<parameter name="constraints" class="ISearchConstraints" optional="true"/>
-			<parameterset name="result" class="IDFAgentDescription" direction="out"/>
+			<parameterset name="result" class="IDFComponentDescription" direction="out"/>
 		</achievegoal>
 		
 		<achievegoalref name="rp_initiate">
@@ -101,11 +101,11 @@
 	
 	<plans>
 		<plan name="local_register">
-			<parameter name="description" class="IDFAgentDescription">
+			<parameter name="description" class="IDFComponentDescription">
  				<goalmapping ref="df_register.description"/>
  				<goalmapping ref="df_keep_registered.description"/>
 			</parameter>
-			<parameter name="result" class="IDFAgentDescription" direction="out">
+			<parameter name="result" class="IDFComponentDescription" direction="out">
  				<goalmapping ref="df_register.result"/>
  				<goalmapping ref="df_keep_registered.result"/>
 			</parameter>
@@ -125,11 +125,11 @@
 			<precondition>$goal.df==null</precondition>
 		</plan>
 		<plan name="local_modify" priority="1"> <!-- higher priority to precede register plan -->
-			<parameter name="description" class="IDFAgentDescription">
+			<parameter name="description" class="IDFComponentDescription">
  				<goalmapping ref="df_modify.description"/>
  				<goalmapping ref="df_keep_registered.description"/>
 			</parameter>
-			<parameter name="result" class="IDFAgentDescription" direction="out">
+			<parameter name="result" class="IDFComponentDescription" direction="out">
  				<goalmapping ref="df_modify.result"/>
  				<goalmapping ref="df_keep_registered.result"/>
 			</parameter>
@@ -149,7 +149,7 @@
 			<precondition>$goal.df==null</precondition>
 		</plan>
 		<plan name="local_deregister">
-			<parameter name="description" class="IDFAgentDescription">
+			<parameter name="description" class="IDFComponentDescription">
  				<goalmapping ref="df_deregister.description"/>
 			</parameter>
 			<parameter name="df" class="jadex.bridge.IComponentIdentifier">
@@ -162,7 +162,7 @@
 			<precondition>$goal.df==null</precondition>
 		</plan>
 		<plan name="local_search">
-			<parameter name="description" class="IDFAgentDescription">
+			<parameter name="description" class="IDFComponentDescription">
  				<goalmapping ref="df_search.description"/>
 			</parameter>
 			<parameter name="constraints" class="ISearchConstraints">
@@ -171,7 +171,7 @@
 			<parameter name="df" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="df_search.df"/>
 			</parameter>
-			<parameterset name="result" class="IDFAgentDescription" direction="out">
+			<parameterset name="result" class="IDFComponentDescription" direction="out">
  				<goalmapping ref="df_search.result"/>
 			</parameterset>
 			<body class="DFLocalSearchPlan" />
@@ -184,11 +184,11 @@
 		<!-- remote plans -->
 
 		<plan name="remote_register">
-			<parameter name="description" class="IDFAgentDescription">
+			<parameter name="description" class="IDFComponentDescription">
  				<goalmapping ref="df_register.description"/>
  				<goalmapping ref="df_keep_registered.description"/>
 			</parameter>
-			<parameter name="result" class="IDFAgentDescription" direction="out">
+			<parameter name="result" class="IDFComponentDescription" direction="out">
  				<goalmapping ref="df_register.result"/>
  				<goalmapping ref="df_keep_registered.result"/>
 			</parameter>
@@ -208,11 +208,11 @@
 			<precondition>$goal.df!=null</precondition>
 		</plan>
 		<plan name="remote_modify" priority="1"> <!-- higher priority to precede register plan -->
-			<parameter name="description" class="IDFAgentDescription">
+			<parameter name="description" class="IDFComponentDescription">
  				<goalmapping ref="df_modify.description"/>
  				<goalmapping ref="df_keep_registered.description"/>
 			</parameter>
-			<parameter name="result" class="IDFAgentDescription" direction="out">
+			<parameter name="result" class="IDFComponentDescription" direction="out">
  				<goalmapping ref="df_modify.result"/>
  				<goalmapping ref="df_keep_registered.result"/>
 			</parameter>
@@ -232,7 +232,7 @@
 			<precondition>$goal.df!=null</precondition>
 		</plan>
 		<plan name="remote_deregister">
-			<parameter name="description" class="IDFAgentDescription">
+			<parameter name="description" class="IDFComponentDescription">
  				<goalmapping ref="df_deregister.description"/>
 			</parameter>
 			<parameter name="df" class="jadex.bridge.IComponentIdentifier">
@@ -245,7 +245,7 @@
 			<precondition>$goal.df!=null</precondition>
 		</plan>
 		<plan name="remote_search">
-			<parameter name="description" class="IDFAgentDescription">
+			<parameter name="description" class="IDFComponentDescription">
  				<goalmapping ref="df_search.description"/>
 			</parameter>
 			<parameter name="constraints" class="ISearchConstraints">
@@ -254,7 +254,7 @@
 			<parameter name="df" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="df_search.df"/>
 			</parameter>
-			<parameterset name="result" class="IDFAgentDescription" direction="out">
+			<parameterset name="result" class="IDFComponentDescription" direction="out">
  				<goalmapping ref="df_search.result"/>
 			</parameterset>
 			<body class="DFRemoteSearchPlan" />

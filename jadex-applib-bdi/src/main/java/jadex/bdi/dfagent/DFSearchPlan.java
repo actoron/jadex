@@ -2,7 +2,7 @@ package jadex.bdi.dfagent;
 
 import jadex.adapter.base.fipa.DFSearch;
 import jadex.adapter.base.fipa.Done;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
@@ -21,11 +21,11 @@ public class DFSearchPlan extends Plan
 		DFSearch sa = (DFSearch)getParameter("action").getValue();
 
 		IGoal sag = createGoal("df_search");
-		sag.getParameter("description").setValue(sa.getAgentDescription());
+		sag.getParameter("description").setValue(sa.getComponentDescription());
 		sag.getParameter("constraints").setValue(sa.getSearchConstraints());
 		dispatchSubgoalAndWait(sag);
 
-		sa.setResults((IDFAgentDescription[])sag.getParameterSet("result").getValues());
+		sa.setResults((IDFComponentDescription[])sag.getParameterSet("result").getValues());
 		getParameter("result").setValue(new Done(sa));
 	}
 }

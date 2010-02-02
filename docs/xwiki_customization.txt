@@ -1,3 +1,6 @@
+To access main Wiki (e.g. Wiki Manager), user IP directly:
+http://134.100.9.116/xwiki/bin/view/WikiManager/
+
 Server Names
 ------------
 

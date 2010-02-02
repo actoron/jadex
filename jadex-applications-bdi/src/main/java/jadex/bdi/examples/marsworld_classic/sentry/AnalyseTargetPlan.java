@@ -1,7 +1,7 @@
 package jadex.bdi.examples.marsworld_classic.sentry;
 
 import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.examples.marsworld_classic.RequestProduction;
@@ -65,7 +65,7 @@ public class AnalyseTargetPlan extends Plan
 		// Create a service description to search for.
 		IDF	df	= (IDF)getScope().getServiceContainer().getService(IDF.class);
 		IDFServiceDescription sd = df.createDFServiceDescription("service_produce", null, null);
-		IDFAgentDescription dfadesc = df.createDFAgentDescription(null, sd);
+		IDFComponentDescription dfadesc = df.createDFComponentDescription(null, sd);
 
 		// A hack - default is 2! to reach more Agents, we have
 		// to increase the number of possible results.
@@ -78,7 +78,7 @@ public class AnalyseTargetPlan extends Plan
 
 		dispatchSubgoalAndWait(ft);
 		//Object result = ft.getResult();
-		IDFAgentDescription[] producers = (IDFAgentDescription[])ft.getParameterSet("result").getValues();
+		IDFComponentDescription[] producers = (IDFComponentDescription[])ft.getParameterSet("result").getValues();
 
 		if(producers.length>0)
 		{

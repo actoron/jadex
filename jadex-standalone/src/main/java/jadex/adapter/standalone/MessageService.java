@@ -247,7 +247,7 @@ public class MessageService implements IMessageService
 	}
 
 	/**
-	 *  Get the adresses of an agent.
+	 *  Get the adresses of a component.
 	 *  @return The addresses of this agent.
 	 */
 	public String[] getAddresses()

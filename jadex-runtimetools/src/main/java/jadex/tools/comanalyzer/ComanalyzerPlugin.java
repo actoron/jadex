@@ -1229,7 +1229,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 
 					IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer()
 						.getService(IComponentExecutionService.class);
-					IComponentDescription desc = ces.createComponentDescription(agents[i].getAid(), null, null, null);
+					IComponentDescription desc = ces.createComponentDescription(agents[i].getAid(), null, null, null, null);
 //					removeAgentListener(desc, true);
 					observed.remove(desc.getName());
 					ComanalyzerPlugin.this.agents.updateComponent(desc);
@@ -1257,7 +1257,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 
 					IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer()
 						.getService(IComponentExecutionService.class);
-					IComponentDescription desc = ces.createComponentDescription(agents[i].getAid(), null, null, null);
+					IComponentDescription desc = ces.createComponentDescription(agents[i].getAid(), null, null, null, null);
 //					addAgentListener(desc);
 					observed.add(desc.getName());
 					ComanalyzerPlugin.this.agents.updateComponent(desc);
@@ -1295,7 +1295,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 					agentlist.removeAgent(agents[i]);
 					// remove dead agent from agentree
 					IComponentExecutionService ams = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
-					IComponentDescription desc = ams.createComponentDescription(agents[i].getAid(), null, null, null);
+					IComponentDescription desc = ams.createComponentDescription(agents[i].getAid(), null, null, null, null);
 					ComanalyzerPlugin.this.agents.removeComponent(desc);
 				}
 			}
@@ -1341,7 +1341,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 					agentlist.removeAgent(agents[i]);
 					IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer()
 						.getService(IComponentExecutionService.class);
-					IComponentDescription desc = ces.createComponentDescription(agents[i].getAid(), null, null, null);
+					IComponentDescription desc = ces.createComponentDescription(agents[i].getAid(), null, null, null, null);
 					ComanalyzerPlugin.this.agents.removeComponent(desc);
 				}
 			}
@@ -1423,9 +1423,6 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			if(path != null)
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)path.getLastPathComponent();
-				// ret = node != null && node.getUserObject() instanceof
-				// AMSAgentDescription &&
-				// !listeners.containsKey(node.getUserObject());
 				if(node != null && node.getUserObject() instanceof IComponentDescription)
 				{
 					IComponentDescription desc = (IComponentDescription)node.getUserObject();
@@ -1476,9 +1473,6 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			if(path != null)
 			{
 				DefaultTreeTableNode node = (DefaultTreeTableNode)path.getLastPathComponent();
-				// ret = node != null && node.getUserObject() instanceof
-				// AMSAgentDescription &&
-				// listeners.containsKey(node.getUserObject());
 				if(node != null && node.getUserObject() instanceof IComponentDescription)
 				{
 					IComponentDescription desc = (IComponentDescription)node.getUserObject();

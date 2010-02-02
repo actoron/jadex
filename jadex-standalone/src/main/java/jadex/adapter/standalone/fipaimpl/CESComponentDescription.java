@@ -7,10 +7,10 @@ import java.io.Serializable;
 
 
 /**
- *  Java class for concept AMSAgentDescription
+ *  Java class for concept CESComponentDescription
  *  of beanynizer_beans_fipa_new ontology.
  */
-public class AMSAgentDescription implements IComponentDescription, Cloneable, Serializable
+public class CESComponentDescription implements IComponentDescription, Cloneable, Serializable
 {
 	//-------- attributes ----------
 
@@ -35,16 +35,16 @@ public class AMSAgentDescription implements IComponentDescription, Cloneable, Se
 	//-------- constructors --------
 
 	/**
-	 *  Create a new AMSAgentDescription.
+	 *  Create a new CESComponentDescription.
 	 */
-	public AMSAgentDescription()
+	public CESComponentDescription()
 	{
 	}
 
 	/**
-	 *  Create a new AMSAgentDescription.
+	 *  Create a new CESComponentDescription.
 	 */
-	public AMSAgentDescription(IComponentIdentifier aid, String type, IComponentIdentifier parent)
+	public CESComponentDescription(IComponentIdentifier aid, String type, IComponentIdentifier parent)
 	{
 		this();
 		setName(aid);
@@ -56,7 +56,7 @@ public class AMSAgentDescription implements IComponentDescription, Cloneable, Se
 	//-------- accessor methods --------
 
 	/**
-	 *  Get the state of this AMSAgentDescription.
+	 *  Get the state of this CESComponentDescription.
 	 * @return state
 	 */
 	public String getState()
@@ -65,7 +65,7 @@ public class AMSAgentDescription implements IComponentDescription, Cloneable, Se
 	}
 
 	/**
-	 *  Set the state of this AMSAgentDescription.
+	 *  Set the state of this CESComponentDescription.
 	 * @param state the value to be set
 	 */
 	public void setState(String state)
@@ -74,7 +74,7 @@ public class AMSAgentDescription implements IComponentDescription, Cloneable, Se
 	}
 
 	/**
-	 *  Get the agentidentifier of this AMSAgentDescription.
+	 *  Get the agentidentifier of this CESComponentDescription.
 	 * @return agentidentifier
 	 */
 	public IComponentIdentifier getName()
@@ -83,7 +83,7 @@ public class AMSAgentDescription implements IComponentDescription, Cloneable, Se
 	}
 
 	/**
-	 *  Set the agentidentifier of this AMSAgentDescription.
+	 *  Set the agentidentifier of this CESComponentDescription.
 	 * @param name the value to be set
 	 */
 	public void setName(IComponentIdentifier name)
@@ -110,7 +110,7 @@ public class AMSAgentDescription implements IComponentDescription, Cloneable, Se
 	}
 	
 	/**
-	 *  Get the ownership of this AMSAgentDescription.
+	 *  Get the ownership of this CESComponentDescription.
 	 * @return ownership
 	 */
 	public String getOwnership()
@@ -119,7 +119,7 @@ public class AMSAgentDescription implements IComponentDescription, Cloneable, Se
 	}
 
 	/**
-	 *  Set the ownership of this AMSAgentDescription.
+	 *  Set the ownership of this CESComponentDescription.
 	 * @param ownership the value to be set
 	 */
 	public void setOwnership(String ownership)
@@ -170,7 +170,7 @@ public class AMSAgentDescription implements IComponentDescription, Cloneable, Se
 	 */
 	public boolean equals(Object o)
 	{
-		return o == this || o instanceof AMSAgentDescription && getName() != null && getName().equals(((AMSAgentDescription)o).getName());
+		return o == this || o instanceof CESComponentDescription && getName() != null && getName().equals(((CESComponentDescription)o).getName());
 	}
 
 	/**
@@ -186,18 +186,18 @@ public class AMSAgentDescription implements IComponentDescription, Cloneable, Se
 	 */
 	public String toString()
 	{
-		return "AMSAgentDescription(name=" + getName() + ", state=" + getState() + ", ownership=" + getOwnership() + ")";
+		return "CESComponentDescription(name=" + getName() + ", state=" + getState() + ", ownership=" + getOwnership() + ")";
 	}
 
 	/**
-	 *  Clone an agent description.
+	 *  Clone a component description.
 	 */
 	public Object clone()
 	{
 		try
 		{
-			AMSAgentDescription ret = (AMSAgentDescription)super.clone();
-			ret.setName((AgentIdentifier)((AgentIdentifier)name).clone());
+			CESComponentDescription ret = (CESComponentDescription)super.clone();
+			ret.setName((ComponentIdentifier)((ComponentIdentifier)name).clone());
 			return ret;
 		}
 		catch(CloneNotSupportedException e)

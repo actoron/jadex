@@ -1,6 +1,6 @@
 package jadex.adapter.standalone.transport.niotcpmtp;
 
-import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
+import jadex.adapter.standalone.fipaimpl.ComponentIdentifier;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.adapter.standalone.transport.MessageEnvelope;
 import jadex.adapter.standalone.transport.codecs.CodecFactory;
@@ -259,8 +259,8 @@ public class NIOTCPTransport implements ITransport
 	 *  Send a message.
 	 *  @param message The message to send.
 	 */
-//	public AgentIdentifier[] sendMessage(IMessageEnvelope message)
-	public AgentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] receivers)
+//	public ComponentIdentifier[] sendMessage(IMessageEnvelope message)
+	public ComponentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] receivers)
 	{
 		// Fetch all receivers 
 		IComponentIdentifier[] recstodel = receivers;
@@ -301,7 +301,7 @@ public class NIOTCPTransport implements ITransport
 				{
 					Set aidset = (Set)adrsets.get(addrs[i]);
 					aidset.retainAll(undelivered);
-//					AgentIdentifier[] aids = (AgentIdentifier[])aidset.toArray(new AgentIdentifier[aidset.size()]);
+//					ComponentIdentifier[] aids = (ComponentIdentifier[])aidset.toArray(new ComponentIdentifier[aidset.size()]);
 //					message.setReceivers(aids);
 					
 					// The send process must be performed once or twice
@@ -341,7 +341,7 @@ public class NIOTCPTransport implements ITransport
 			}
 		}
 		
-		return (AgentIdentifier[])undelivered.toArray(new AgentIdentifier[undelivered.size()]);
+		return (ComponentIdentifier[])undelivered.toArray(new ComponentIdentifier[undelivered.size()]);
 	}
 	
 	/**

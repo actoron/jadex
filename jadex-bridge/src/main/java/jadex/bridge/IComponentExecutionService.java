@@ -134,13 +134,15 @@ public interface IComponentExecutionService	extends IService
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses);
 	
 	/**
-	 * Create a ams agent description.
+	 * Create a component description.
 	 * @param id The component identifier.
 	 * @param state The state.
 	 * @param ownership The ownership.
-	 * @return The ams agent description.
+	 * @param type The component type.
+	 * @param parent The parent.
+	 * @return The component description.
 	 */
-	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type);
+	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, IComponentIdentifier parent);
 	
 	/**
 	* Create a search constraints object.

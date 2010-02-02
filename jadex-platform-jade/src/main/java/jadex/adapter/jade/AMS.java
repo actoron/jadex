@@ -824,7 +824,7 @@ public class AMS implements IAMS, IService
 	 *  @param local True for local name.
 	 *  @return The new agent identifier.
 	 */
-	public IComponentIdentifier createAgentIdentifier(String name, boolean local)
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
 	{
 		if(local)
 			name = name + "@" + platform.getName();
@@ -837,7 +837,7 @@ public class AMS implements IAMS, IService
 	 *  @param local True for local name.
 	 *  @param addresses The addresses.
 	 */
-	public IComponentIdentifier createAgentIdentifier(String name, boolean local, String[] addresses)
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
 		if(local)
 			name = name + "@" + platform.getName();

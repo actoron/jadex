@@ -10,10 +10,10 @@ public class DFModify implements IAgentAction
 	//-------- attributes ----------
 
 	/** Attribute for slot result. */
-	protected IDFAgentDescription result;
+	protected IDFComponentDescription result;
 
 	/** Attribute for slot dfagentdescription. */
-	protected IDFAgentDescription dfagentdescription;
+	protected IDFComponentDescription dfagentdescription;
 
 	//-------- constructors --------
 
@@ -28,7 +28,7 @@ public class DFModify implements IAgentAction
 	/**
 	 * Create a new <code>DFModify</code>.
 	 */
-	public DFModify(IDFAgentDescription dfagentdescription, IDFAgentDescription result)
+	public DFModify(IDFComponentDescription dfagentdescription, IDFComponentDescription result)
 	{
 		this.dfagentdescription	= dfagentdescription;
 		this.result	= result;
@@ -40,7 +40,7 @@ public class DFModify implements IAgentAction
 	 *  Get the result of this DFModify.
 	 * @return result
 	 */
-	public IDFAgentDescription getResult()
+	public IDFComponentDescription getResult()
 	{
 		return this.result;
 	}
@@ -49,7 +49,7 @@ public class DFModify implements IAgentAction
 	 *  Set the result of this DFModify.
 	 * @param result the value to be set
 	 */
-	public void setResult(IDFAgentDescription result)
+	public void setResult(IDFComponentDescription result)
 	{
 		this.result = result;
 	}
@@ -58,7 +58,7 @@ public class DFModify implements IAgentAction
 	 *  Get the dfagentdescription of this DFModify.
 	 * @return dfagentdescription
 	 */
-	public IDFAgentDescription getAgentDescription()
+	public IDFComponentDescription getComponentDescription()
 	{
 		return this.dfagentdescription;
 	}
@@ -67,7 +67,7 @@ public class DFModify implements IAgentAction
 	 *  Set the dfagentdescription of this DFModify.
 	 * @param dfagentdescription the value to be set
 	 */
-	public void setAgentDescription(IDFAgentDescription dfagentdescription)
+	public void setComponentDescription(IDFComponentDescription dfagentdescription)
 	{
 		this.dfagentdescription = dfagentdescription;
 	}

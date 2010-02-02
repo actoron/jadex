@@ -373,7 +373,7 @@ public class Platform extends AbstractPlatform
 	}
 	
 	/**
-	 *  Get an agent's arguments.
+	 *  Get a component's arguments.
 	 *  @param props The argument properties.
 	 *  @return The map of arguments.
 	 */

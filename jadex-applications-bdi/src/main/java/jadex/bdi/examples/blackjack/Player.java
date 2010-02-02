@@ -149,7 +149,7 @@ public class Player
 	public Color getColor()
 	{
 		if(color == null)
-			color = new Color(colorvalue);
+			color = new Color(colorvalue.intValue());
 		return color;
 	}
 

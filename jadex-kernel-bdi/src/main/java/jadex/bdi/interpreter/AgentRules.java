@@ -205,14 +205,14 @@ public class AgentRules
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
 				BDIInterpreter	interpreter	= BDIInterpreter.getInterpreter(state);
-//				System.out.println("Terminated agent: "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
+//				System.out.println("Terminated agent: "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName());
 
 				// Todo: no more rules should trigger -> No dropping of agent object!? 
 				Object ragent = assignments.getVariableValue("?ragent");
 				Object magent = state.getAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model);
 //				state.dropObject(ragent);
 
-//				System.out.println("terminated: "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName());
+//				System.out.println("terminated: "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName());
 				
 				// Collect results for agent.
 				
@@ -501,7 +501,7 @@ public class AgentRules
 				Object changeevent = assignments.getVariableValue("?changeevent");
 				Object ragent = assignments.getVariableValue("?ragent");
 				state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_changeevents, changeevent);
-//				System.err.println("removing: "+changeevent+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier());
+//				System.err.println("removing: "+changeevent+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier());
 			}
 		};
 		

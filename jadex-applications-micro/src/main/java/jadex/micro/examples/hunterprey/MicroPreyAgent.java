@@ -44,7 +44,7 @@ public class MicroPreyAgent extends MicroAgent
 	public void executeBody()
 	{
 		this.env	= (Grid2D)((IApplicationExternalAccess)getParent()).getSpace("my2dspace");
-		this.myself	= env.getAvatar(getAgentIdentifier());
+		this.myself	= env.getAvatar(getComponentIdentifier());
 		this.listener	= new IResultListener()
 		{
 			public void exceptionOccurred(Object source, Exception e)
@@ -109,7 +109,7 @@ public class MicroPreyAgent extends MicroAgent
 		{
 			// Perform eat action.
 			Map params = new HashMap();
-			params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+			params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
 			params.put(ISpaceAction.OBJECT_ID, food);
 			env.performSpaceAction("eat", params, listener);
 		}
@@ -146,7 +146,7 @@ public class MicroPreyAgent extends MicroAgent
 			
 			// Perform move action.
 			Map params = new HashMap();
-			params.put(ISpaceAction.ACTOR_ID, getAgentIdentifier());
+			params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
 			params.put(MoveAction.PARAMETER_DIRECTION, lastdir);
 			env.performSpaceAction("move", params, listener);
 		}

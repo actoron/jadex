@@ -2,7 +2,7 @@ package jadex.bdi.planlib.df;
 
 import jadex.adapter.base.fipa.DFSearch;
 import jadex.adapter.base.fipa.Done;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
@@ -20,7 +20,7 @@ public class DFRemoteSearchPlan extends Plan
 	public void body()
 	{
 		DFSearch se = new DFSearch();
-		se.setAgentDescription((IDFAgentDescription)getParameter("description").getValue());
+		se.setComponentDescription((IDFComponentDescription)getParameter("description").getValue());
 		se.setSearchConstraints((ISearchConstraints)getParameter("constraints").getValue());
 
 		IGoal req = createGoal("rp_initiate");

@@ -56,7 +56,7 @@
 					<parameter ref="description">
 						<value>
 							((IDF)$scope.getServiceContainer().getService(IDF.class))
-								.createDFAgentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
+								.createDFComponentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
 								.createDFServiceDescription("service_translate", "translate english_german", "University of Hamburg"))
  						</value>
 					</parameter>
@@ -69,7 +69,7 @@
 				<initialgoal ref="df_register">
 					<parameter ref="description">
 						<value>
- 							SFipa.createAgentDescription(null,
+ 							SFipa.createComponentDescription(null,
 							SFipa.createServiceDescription("service_translate",
 			 				"translate english_german", "University of Hamburg"))
  						</value>

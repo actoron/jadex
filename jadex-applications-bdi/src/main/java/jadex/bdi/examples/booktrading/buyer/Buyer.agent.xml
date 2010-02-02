@@ -152,9 +152,8 @@
 
 	<properties>
 		<property name="service_seller">
-			<!-- SFipa.createAgentDescription(null, SFipa.createServiceDescription(null, "service_seller", null)) -->
 			((IDF)$scope.getServiceContainer().getService(IDF.class))
-				.createDFAgentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
+				.createDFComponentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
 					.createDFServiceDescription(null, "service_seller", null))
 		</property>
 		<!-- <property name="logging.level">java.util.logging.Level.FINE</property> -->

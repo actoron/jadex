@@ -1,6 +1,6 @@
 package jadex.tools.dfbrowser;
 
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.adapter.base.fipa.IProperty;
 import jadex.bridge.IComponentIdentifier;
@@ -14,7 +14,7 @@ import javax.swing.table.AbstractTableModel;
  */
 class ServiceTableModel extends AbstractTableModel
 {
-	IDFAgentDescription[] ad;
+	IDFComponentDescription[] ad;
 
 	IDFServiceDescription[] sd;
 
@@ -30,14 +30,14 @@ class ServiceTableModel extends AbstractTableModel
 	/**
 	 * @param ads
 	 */
-	public void setAgentDescriptions(IDFAgentDescription[] ads)
+	public void setAgentDescriptions(IDFComponentDescription[] ads)
 	{
 		ArrayList ad_list = new ArrayList();
 		ArrayList svd_list = new ArrayList();
 
 		for(int a = 0; a < ads.length; a++)
 		{
-			IDFAgentDescription ad = ads[a];
+			IDFComponentDescription ad = ads[a];
 			IDFServiceDescription[] sd = ads[a].getServices();
 			for(int s = 0; s < sd.length; s++)
 			{
@@ -45,7 +45,7 @@ class ServiceTableModel extends AbstractTableModel
 				svd_list.add(sd[s]);
 			}
 		}
-		this.ad = (IDFAgentDescription[])ad_list.toArray(new IDFAgentDescription[ad_list.size()]);
+		this.ad = (IDFComponentDescription[])ad_list.toArray(new IDFComponentDescription[ad_list.size()]);
 		this.sd = (IDFServiceDescription[])svd_list.toArray(new IDFServiceDescription[svd_list.size()]);
 
 		fireTableDataChanged();
@@ -54,10 +54,10 @@ class ServiceTableModel extends AbstractTableModel
 	/**
 	 * @param ad
 	 */
-	public void setAgentDescription(IDFAgentDescription ad)
+	public void setAgentDescription(IDFComponentDescription ad)
 	{
 		IDFServiceDescription[] sd = ad.getServices();
-		IDFAgentDescription[] aid = new IDFAgentDescription[sd.length];
+		IDFComponentDescription[] aid = new IDFComponentDescription[sd.length];
 		for(int s = 0; s < sd.length; s++)
 		{
 			aid[s] = ad;
@@ -183,7 +183,7 @@ class ServiceTableModel extends AbstractTableModel
 	 * @param i
 	 * @return the aid of the service at row i
 	 */
-	public IDFAgentDescription getAgentDescription(int i)
+	public IDFComponentDescription getAgentDescription(int i)
 	{
 		return ad == null || i < 0 || i >= ad.length ? null : ad[i];
 	}

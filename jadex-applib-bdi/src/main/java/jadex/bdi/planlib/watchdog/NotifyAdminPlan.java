@@ -28,7 +28,7 @@ public class NotifyAdminPlan extends Plan
 				{
 					IGoal sendemail = createGoal("send_email");
 					sendemail.getParameter("subject").setValue("Watchdog warning message.");
-					sendemail.getParameter("content").setValue("Application problem with: "+desc.getAgentIdentifier());
+					sendemail.getParameter("content").setValue("Application problem with: "+desc.getComponentIdentifier());
 					sendemail.getParameterSet("receivers").addValue(contacts[i].getEmail());
 					dispatchSubgoalAndWait(sendemail);
 					success = true;
@@ -44,7 +44,7 @@ public class NotifyAdminPlan extends Plan
 				try
 				{
 					IGoal sendim = createGoal("send_im");
-					sendim.getParameter("content").setValue("Application problem with: " + desc.getAgentIdentifier());
+					sendim.getParameter("content").setValue("Application problem with: " + desc.getComponentIdentifier());
 					sendim.getParameterSet("receivers").addValue(contacts[i].getIcq());
 					dispatchSubgoalAndWait(sendim);
 					success = true;
@@ -60,7 +60,7 @@ public class NotifyAdminPlan extends Plan
 				try
 				{
 					IGoal sendsms = createGoal("send_sms");
-					sendsms.getParameter("content").setValue("Application problem with: "+desc.getAgentIdentifier());
+					sendsms.getParameter("content").setValue("Application problem with: "+desc.getComponentIdentifier());
 					sendsms.getParameterSet("receivers").addValue(contacts[i].getPhone());
 					dispatchSubgoalAndWait(sendsms);
 					success = true;

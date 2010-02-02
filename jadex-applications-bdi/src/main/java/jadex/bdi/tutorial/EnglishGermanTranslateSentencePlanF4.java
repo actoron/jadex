@@ -1,7 +1,7 @@
 package jadex.bdi.tutorial;
 
 import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.GoalFailureException;
@@ -65,7 +65,7 @@ public class EnglishGermanTranslateSentencePlanF4 extends Plan
 				
 				// Create a service description to search for.
 				IDFServiceDescription sd = dfservice.createDFServiceDescription(null, "translate english_german", null);
-				IDFAgentDescription ad = dfservice.createDFAgentDescription(null, sd);
+				IDFComponentDescription ad = dfservice.createDFComponentDescription(null, sd);
 
 				// Use a subgoal to search for a translation agent
 				IGoal ft = createGoal("df_search");
@@ -73,7 +73,7 @@ public class EnglishGermanTranslateSentencePlanF4 extends Plan
 
 				dispatchSubgoalAndWait(ft);
                 //Object result = ft.getResult();
-                IDFAgentDescription[]	result = (IDFAgentDescription[])ft.getParameterSet("result").getValues();
+                IDFComponentDescription[]	result = (IDFComponentDescription[])ft.getParameterSet("result").getValues();
 
 				if(result.length>0)
 				{

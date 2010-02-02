@@ -29,7 +29,7 @@ import jadex.adapter.base.fipa.DFModify;
 import jadex.adapter.base.fipa.DFRegister;
 import jadex.adapter.base.fipa.DFSearch;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bridge.ContentException;
 import jadex.bridge.IComponentIdentifier;
@@ -148,21 +148,21 @@ public class MessageService implements IMessageService
 				
 				if(content instanceof DFRegister)
 				{
-					IDFAgentDescription	dfadesc	= ((DFRegister)content).getAgentDescription();
+					IDFComponentDescription	dfadesc	= ((DFRegister)content).getComponentDescription();
 					Register	register	= new Register();
 					register.setDescription(SJade.convertAgentDescriptiontoJade(dfadesc));
 					request	= register;
 				}
 				else if(content instanceof DFModify)
 				{
-					IDFAgentDescription	dfadesc	= ((DFModify)content).getAgentDescription();
+					IDFComponentDescription	dfadesc	= ((DFModify)content).getComponentDescription();
 					Modify	modify	= new Modify();
 					modify.setDescription(SJade.convertAgentDescriptiontoJade(dfadesc));
 					request	= modify;
 				}
 				else if(content instanceof DFSearch)
 				{
-					IDFAgentDescription	dfadesc	= ((DFSearch)content).getAgentDescription();
+					IDFComponentDescription	dfadesc	= ((DFSearch)content).getComponentDescription();
 					Search	search	= new Search();
 					search.setDescription(SJade.convertAgentDescriptiontoJade(dfadesc));
 					ISearchConstraints	cons	= ((DFSearch)content).getSearchConstraints();
@@ -180,7 +180,7 @@ public class MessageService implements IMessageService
 				}
 				else if(content instanceof DFDeregister)
 				{
-					IDFAgentDescription	dfadesc	= ((DFDeregister)content).getAgentDescription();
+					IDFComponentDescription	dfadesc	= ((DFDeregister)content).getComponentDescription();
 					Deregister	deregister	= new Deregister();
 					deregister.setDescription(SJade.convertAgentDescriptiontoJade(dfadesc));
 					request	= deregister;

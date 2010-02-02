@@ -52,7 +52,6 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	//-------- constants --------
 
 	/** The dealer default adf. */
-//	protected static AgentIdentifier LOCAL_DEALER = new AgentIdentifier("BlackjackDealer", true);
 	protected static String LOCAL_DEALER = "BlackjackDealer";
 
 	//-------- attributes --------
@@ -128,8 +127,6 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			{
 				IComponentExecutionService ces = (IComponentExecutionService)access.getServiceContainer().getService(IComponentExecutionService.class);
 				dealeraid = ces.createComponentIdentifier(dealertf.getText(), false, null);
-//				dealeraid = new AgentIdentifier(dealertf.getText());
-				//dealertf.setText(dealeraid.getName());
 			}
 		});
 		
@@ -359,12 +356,12 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	/**
 	 *  Search for a dealer.
 	 * /
-	 protected AgentDescription	searchLocalDealer()
+	 protected ComponentIdentifier	searchLocalDealer()
 	 {
 	 // Create a service description to search for.
 	 ServiceDescription sd = new ServiceDescription();
 	 sd.setType("blackjack");
-	 AgentDescription dfadesc = new AgentDescription();
+	 ComponentIdentifier dfadesc = new ComponentIdentifier();
 	 dfadesc.addService(sd);
 
 	 // Use a subgoal to search for a translation agent
@@ -374,9 +371,9 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	 IEvent event = dispatchSubgoalAndWait(ft);
 	 Object result = ft.getResult();
 
-	 if((result != null) && (result instanceof AgentDescription[]))
+	 if((result != null) && (result instanceof ComponentIdentifier[]))
 	 {
-	 AgentDescription[] desc = (AgentDescription[])result;
+	 ComponentIdentifier[] desc = (ComponentIdentifier[])result;
 	 if(desc.length > 0)
 	 return desc[0];
 	 }

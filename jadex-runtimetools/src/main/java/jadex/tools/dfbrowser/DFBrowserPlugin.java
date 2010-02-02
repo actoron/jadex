@@ -1,7 +1,7 @@
 package jadex.tools.dfbrowser;
 
 import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentDescription;
@@ -115,7 +115,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 	protected JRadioButtonMenuItem refresh30;
 
 	/** The old agent descriptions. */
-	protected IDFAgentDescription[] old_ads;
+	protected IDFComponentDescription[] old_ads;
 
 	//-------- methods --------
 	
@@ -232,7 +232,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 			public void valueChanged(ListSelectionEvent e)
 			{
 				//updateServices(old_ads);
-				IDFAgentDescription[] selagents = agent_table.getSelectedAgents();
+				IDFComponentDescription[] selagents = agent_table.getSelectedAgents();
 				service_table.setAgentDescriptions(selagents);
 			}
 		});
@@ -441,7 +441,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 	protected void refresh()
 	{
 //		System.out.println("refresh: "+getSelectedDF());
-		IDFAgentDescription[] ads = new IDFAgentDescription[0];
+		IDFComponentDescription[] ads = new IDFComponentDescription[0];
 		
 		if(getSelectedDF() != null)
 		{
@@ -449,14 +449,14 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 
 			// Use a subgoal to search
 			IGoal ft = ((AgentControlCenter)getJCC()).getAgent().createGoal("df_search");
-			ft.getParameter("description").setValue(df.createDFAgentDescription(null, null));
+			ft.getParameter("description").setValue(df.createDFComponentDescription(null, null));
 			ft.getParameter("constraints").setValue(df.createSearchConstraints(-1, 0));
 			ft.getParameter("df").setValue(getSelectedDF().getName());
 
 			try
 			{
 				((AgentControlCenter)getJCC()).getAgent().dispatchTopLevelGoalAndWait(ft);
-				ads = (IDFAgentDescription[])ft.getParameterSet("result").getValues();
+				ads = (IDFComponentDescription[])ft.getParameterSet("result").getValues();
 //				System.out.println("Found: "+SUtil.arrayToString(ads));
 			}
 			catch(Exception e)
@@ -486,9 +486,9 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 	 *  Update the services panel.
 	 *  @param ads The agent descriptions.
 	 */
-	public void updateServices(IDFAgentDescription[] ads)
+	public void updateServices(IDFComponentDescription[] ads)
 	{
-		IDFAgentDescription[] selagents = agent_table.getSelectedAgents();
+		IDFComponentDescription[] selagents = agent_table.getSelectedAgents();
 		if(selagents.length==0)
 			service_table.setAgentDescriptions(ads);
 	}
@@ -499,7 +499,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 	public void updateDetailedService()
 	{
 		Object[] sdescs = service_table.getSelectedServices();
-		service_panel.setService((IDFAgentDescription)sdescs[1], 
+		service_panel.setService((IDFComponentDescription)sdescs[1], 
 			(IDFServiceDescription)sdescs[0]);
 	}
 	
@@ -662,7 +662,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 	/**
 	 * @param description
 	 */
-	protected void removeAgentRegistration(IDFAgentDescription description)
+	protected void removeAgentRegistration(IDFComponentDescription description)
 	{
 		try
 		{
@@ -704,7 +704,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 			boolean rem = false;
 			if(getSelectedDF() != null)
 			{
-				IDFAgentDescription[] as = agent_table.getSelectedAgents();
+				IDFComponentDescription[] as = agent_table.getSelectedAgents();
 				for(int i = 0; i < as.length; i++)
 				{
 					removeAgentRegistration(as[i]);

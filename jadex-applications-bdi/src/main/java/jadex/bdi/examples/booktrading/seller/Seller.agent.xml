@@ -185,9 +185,8 @@
 				<initialgoal ref="df_register">
 					<parameter ref="description">
 						<value>
-							<!-- SFipa.createAgentDescription(null, SFipa.createServiceDescription("sell", "service_seller", "UniHH")) -->
 							((IDF)$scope.getServiceContainer().getService(IDF.class))
-								.createDFAgentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
+								.createDFComponentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
 									.createDFServiceDescription("sell", "service_seller", "UniHH"))
 						</value>
 					</parameter>

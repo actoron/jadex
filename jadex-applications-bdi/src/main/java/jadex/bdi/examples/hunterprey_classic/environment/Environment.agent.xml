@@ -283,7 +283,7 @@
 					<parameter ref="description">
 						<value>
 							((IDF)$scope.getServiceContainer().getService(IDF.class))
-								.createDFAgentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
+								.createDFComponentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
 									.createDFServiceDescription("environment-service", "hunter-prey environment", "University of Hamburg",
 										new String[]{"nuggets_xml"}, new String[]{"hunterprey"}, new String[]{"fipa-request"}, null))
 						</value>

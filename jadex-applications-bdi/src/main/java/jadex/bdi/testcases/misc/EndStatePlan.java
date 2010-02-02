@@ -1,7 +1,7 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.adapter.base.test.TestReport;
@@ -47,7 +47,7 @@ public class EndStatePlan extends Plan
 		IGoal	search	= createGoal("amscap.ams_search_agents");
 		IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer()
 			.getService(IComponentExecutionService.class);
-		search.getParameter("description").setValue(ces.createComponentDescription(worker, null, null, null));
+		search.getParameter("description").setValue(ces.createComponentDescription(worker, null, null, null, null));
 		dispatchSubgoalAndWait(search);
 		TestReport	report	= new TestReport("termination", "Test if the worker agent has been terminated");
 		if(search.getParameterSet("result").getValues().length==0)
@@ -77,7 +77,7 @@ public class EndStatePlan extends Plan
 		waitFor(100);	// Hack!!! how to ensure that agent has time to register itself?
 		IDF df = (IDF)getScope().getServiceContainer().getService(IDF.class);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "endstate_testservice", null);
-		IDFAgentDescription ad = df.createDFAgentDescription(null, sd);
+		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 		
 		IGoal	dfsearch	= createGoal("dfcap.df_search");
 		dfsearch.getParameter("description").setValue(ad);
@@ -106,7 +106,7 @@ public class EndStatePlan extends Plan
 			{
 				// Check if deregister agent has been correctly removed.
 				search = createGoal("amscap.ams_search_agents");
-				search.getParameter("description").setValue(ces.createComponentDescription(deregister, null, null, null));
+				search.getParameter("description").setValue(ces.createComponentDescription(deregister, null, null, null, null));
 				dispatchSubgoalAndWait(search);
 				if(search.getParameterSet("result").getValues().length!=0)
 				{

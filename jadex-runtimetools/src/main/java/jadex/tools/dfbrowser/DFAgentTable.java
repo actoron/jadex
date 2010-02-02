@@ -1,6 +1,6 @@
 package jadex.tools.dfbrowser;
 
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Properties;
@@ -28,7 +28,7 @@ import javax.swing.table.TableColumnModel;
  */
 public class DFAgentTable extends JTable
 {
-	static final IDFAgentDescription[] EMPTY = new IDFAgentDescription[0];
+	static final IDFComponentDescription[] EMPTY = new IDFComponentDescription[0];
 	
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
@@ -133,9 +133,9 @@ public class DFAgentTable extends JTable
 	 *  Get the selected agents.
 	 *  @return the descriptions of selected agents
 	 */
-	public IDFAgentDescription[] getSelectedAgents()
+	public IDFComponentDescription[] getSelectedAgents()
 	{
-		IDFAgentDescription[] ret = EMPTY;
+		IDFComponentDescription[] ret = EMPTY;
 		
 		int count = getSelectedRowCount();
 		if(count>0)
@@ -149,7 +149,7 @@ public class DFAgentTable extends JTable
 			{
 				sa.add(model.getAgentDescription(sorter.modelIndex(rows[i])));
 			}
-			ret = (IDFAgentDescription[])sa.toArray(new IDFAgentDescription[sa.size()]);
+			ret = (IDFComponentDescription[])sa.toArray(new IDFComponentDescription[sa.size()]);
 		}
 
 		return ret;
@@ -159,7 +159,7 @@ public class DFAgentTable extends JTable
 	 *  Sets Agent descriptions for this element.
 	 *  @param ad The agent description.
 	 */
-	public void setAgentDescriptions(IDFAgentDescription[] ad)
+	public void setAgentDescriptions(IDFComponentDescription[] ad)
 	{
 		TableSorter sorter = (TableSorter)getModel();
 		AgentTableModel model = (AgentTableModel)sorter.getTableModel();

@@ -136,8 +136,7 @@
 
 		<property name="fipa.agentdescription.environment">
 			((IDF)$scope.getServiceContainer().getService(IDF.class))
-				.createDFAgentDescription(null, (IDFServiceDescription)$propertybase.getProperty("fipa.servicedescription.service_dispatch_vision"))
-		<!-- SFipa.createAgentDescription(null, (ServiceDescription)$propertybase.getProperty("fipa.servicedescription.service_dispatch_vision"))  -->	
+				.createDFComponentDescription(null, (IDFServiceDescription)$propertybase.getProperty("fipa.servicedescription.service_dispatch_vision"))
 		</property>
 
 <!--		<property name="logging.level">Level.INFO</property>-->
@@ -156,7 +155,7 @@
 						<value>new AgentIdentifier("df@vsispro3:1099/JADE", new String[]{"http://134.100.11.53:7778/acc"})</value>
 					</parameter>
 -->					<parameter ref="description">
-						<value>(IDFAgentDescription)$propertybase.getProperty("fipa.agentdescription.environment")</value>
+						<value>(IDFComponentDescription)$propertybase.getProperty("fipa.agentdescription.environment")</value>
 					</parameter>
 				</initialgoal>	
 				<endgoal ref="df_deregister"/>

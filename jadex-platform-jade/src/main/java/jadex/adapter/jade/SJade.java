@@ -276,7 +276,7 @@ public class SJade
 //	public static AgentIdentifier convertAIDtoFipa(AID aid)
 	{
 //		AgentIdentifier ret = new AgentIdentifier(aid.getName(), false);
-		IComponentIdentifier ret = ams.createAgentIdentifier(aid.getName(), false, aid.getAddressesArray());
+		IComponentIdentifier ret = ams.createComponentIdentifier(aid.getName(), false, aid.getAddressesArray());
 		
 //		String[] addresses = aid.getAddressesArray();
 //		for(int i=0; i<addresses.length; i++)
@@ -379,7 +379,7 @@ public class SJade
 	/**
 	 *  Convert a Jade AID to a Fipa aid.
 	 */
-	public static DFAgentDescription convertAgentDescriptiontoJade(jadex.adapter.base.fipa.IDFAgentDescription desc)
+	public static DFAgentDescription convertAgentDescriptiontoJade(jadex.adapter.base.fipa.IDFComponentDescription desc)
 	{
 		DFAgentDescription ret = new DFAgentDescription();
 		if(desc.getName()!=null)

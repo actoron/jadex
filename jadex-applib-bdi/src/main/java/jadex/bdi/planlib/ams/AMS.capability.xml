@@ -53,7 +53,7 @@
 			</parameter>
 			<!-- Context the agent should be started in (defaults to starting agent's parent). -->
 			<parameter name="parent" class="jadex.bridge.IComponentIdentifier">
-				<value>$scope.getParent().getComponentIdentifier()</value>
+				<value>$scope.getParent()!=null ? $scope.getParent().getComponentIdentifier() : null</value>
 			</parameter>
 			
 		</achievegoal>

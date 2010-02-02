@@ -10,8 +10,8 @@ public class ObservationDescription
 {
 	//-------- attributes --------
 
-	/** The agent identifier of the agent to observe. */
-	protected IComponentIdentifier agent;
+	/** The identifier of the component to observe. */
+	protected IComponentIdentifier cid;
 
 	/** The delay between pings. */
 	protected long pingdelay;
@@ -31,9 +31,9 @@ public class ObservationDescription
 	/**
 	 *  Create a new description.
 	 */
-	public ObservationDescription(IComponentIdentifier agent, long pingdelay, ContactData[] contact)
+	public ObservationDescription(IComponentIdentifier cid, long pingdelay, ContactData[] contact)
 	{
-		this.agent = agent;
+		this.cid = cid;
 		this.pingdelay = pingdelay;
 		this.contacts = (ContactData[])contact.clone();
 	}
@@ -41,21 +41,21 @@ public class ObservationDescription
 	//-------- methods --------
 
 	/**
-	 *  Get the agent id.
-	 *  @return The agent id;
+	 *  Get the component id.
+	 *  @return The component id;
 	 */
-	public IComponentIdentifier getAgentIdentifier()
+	public IComponentIdentifier getComponentIdentifier()
 	{
-		return agent;
+		return cid;
 	}
 
 	/**
-	 *  Set the agent id.
-	 *  @param agent The agent id;
+	 *  Set the component id.
+	 *  @param cid The component id;
 	 */
-	public void setAgentIdentifier(IComponentIdentifier agent)
+	public void setComponentIdentifier(IComponentIdentifier cid)
 	{
-		this.agent = agent;
+		this.cid = cid;
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class ObservationDescription
 		StringBuffer sb = new StringBuffer();
 		sb.append(getClass());
 		sb.append("(");
-		sb.append(agent);
+		sb.append(cid);
 		sb.append(", ");
 		sb.append(pingdelay);
 		sb.append(", ");

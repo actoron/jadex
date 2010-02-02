@@ -53,7 +53,7 @@ import javax.swing.tree.TreePath;
 /**
  *  The starter plugin.
  */
-public class StarterPlugin extends AbstractJCCPlugin
+public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListener
 {
 	//-------- constants --------
 
@@ -369,29 +369,14 @@ public class StarterPlugin extends AbstractJCCPlugin
 			{
 				IComponentDescription[] res = (IComponentDescription[])result;
 				for(int i=0; i<res.length; i++)
-					componentBorn(res[i]);
+					componentAdded(res[i]);
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
 			}
 		});
-		ces.addComponentListener(null, new IComponentListener()
-		{
-			public void componentRemoved(IComponentDescription desc, Map results)
-			{
-				componentDied(desc);
-			}
-			
-			public void componentAdded(IComponentDescription desc)
-			{
-				componentBorn(desc);
-			}
-
-			public void componentChanged(IComponentDescription desc)
-			{
-			}
-		});
+		ces.addComponentListener(null, this);
 
 //		SwingUtilities.invokeLater(new Runnable()
 //		{
@@ -727,7 +712,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 	 *  Called when an component has died.
 	 *  @param ad The component description.
 	 */
-	public void componentDied(final IComponentDescription ad)
+	public void componentRemoved(final IComponentDescription ad, Map results)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -743,7 +728,7 @@ public class StarterPlugin extends AbstractJCCPlugin
 	 *  Called when an component is born.
 	 *  @param ad the component description.
 	 */
-	public void componentBorn(final IComponentDescription ad)
+	public void componentAdded(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()

@@ -2,7 +2,7 @@ package jadex.bdi.planlib.df;
 
 import jadex.adapter.base.fipa.DFDeregister;
 import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
@@ -18,17 +18,15 @@ public class DFRemoteDeregisterPlan extends Plan
 	 */
 	public void body()
 	{
-		IDFAgentDescription desc = (IDFAgentDescription)getParameter("description").getValue();
+		IDFComponentDescription desc = (IDFComponentDescription)getParameter("description").getValue();
 		if(desc==null || desc.getName()==null)
 		{
 			IDF df = (IDF)getScope().getServiceContainer().getService(IDF.class);
-			desc = df.createDFAgentDescription(getScope().getComponentIdentifier(), null);
-//			IComponentIdentifier	bid	= getScope().getAgentIdentifier();
-//			desc.setName(bid);
+			desc = df.createDFComponentDescription(getScope().getComponentIdentifier(), null);
 		}
 
 		DFDeregister dre = new DFDeregister();
-		dre.setAgentDescription(desc);
+		dre.setComponentDescription(desc);
 		IGoal req = createGoal("rp_initiate");
 		req.getParameter("receiver").setValue(getParameter("df").getValue());
 		req.getParameter("action").setValue(dre);

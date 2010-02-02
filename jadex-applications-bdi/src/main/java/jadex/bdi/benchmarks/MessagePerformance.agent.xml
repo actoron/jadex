@@ -87,41 +87,7 @@
 			<plans>
 				<initialplan ref="send_plan"/>
 			</plans>
-		</configuration>
-<!-- 
-		<configuration name="remote(alex)">
-			<beliefs>
-				<initialbelief ref="receiver">
-					<fact>new jadex.adapter.base.fipa.AgentIdentifier("Echo@alex", new String[]{"nio-mtp://vsisstaff0:5678"})</fact>
-				</initialbelief>
-			</beliefs>
-			<plans>
-				<initialplan ref="send_plan"/>
-			</plans>
-		</configuration>
-		
-		<configuration name="remote(horst-nio)">
-			<beliefs>
-				<initialbelief ref="receiver">
-					<fact>new jadex.adapter.base.fipa.AgentIdentifier("Echo@horst", new String[]{"nio-mtp://vsisstaff3:8888"})</fact>
-				</initialbelief>
-			</beliefs>
-			<plans>
-				<initialplan ref="send_plan"/>
-			</plans>
-		</configuration>
-		
-		<configuration name="remote(horst-tcp)">
-			<beliefs>
-				<initialbelief ref="receiver">
-					<fact>new jadex.adapter.base.fipa.AgentIdentifier("Echo@horst", new String[]{"tcp-mtp://vsisstaff3:8888"})</fact>
-				</initialbelief>
-			</beliefs>
-			<plans>
-				<initialplan ref="send_plan"/>
-			</plans>
-		</configuration>
--->		
+		</configuration>	
 	</configurations>
 </agent>
 

@@ -18,7 +18,7 @@ public class DFSearch implements IAgentAction
 	protected ISearchConstraints searchconstraints;
 
 	/** Attribute for slot dfagentdescription. */
-	protected IDFAgentDescription dfagentdescription;
+	protected IDFComponentDescription dfagentdescription;
 
 	/** Attribute for slot results. */
 	protected List results;
@@ -37,7 +37,7 @@ public class DFSearch implements IAgentAction
 	/**
 	 * Create a new <code>DFSearch</code>.
 	 */
-	public DFSearch(IDFAgentDescription dfagentdescription, IDFAgentDescription[] results)
+	public DFSearch(IDFComponentDescription dfagentdescription, IDFComponentDescription[] results)
 	{
 		this();
 		this.dfagentdescription	= dfagentdescription;
@@ -68,7 +68,7 @@ public class DFSearch implements IAgentAction
 	 *  Get the dfagentdescription of this DFSearch.
 	 * @return dfagentdescription
 	 */
-	public IDFAgentDescription getAgentDescription()
+	public IDFComponentDescription getComponentDescription()
 	{
 		return this.dfagentdescription;
 	}
@@ -77,7 +77,7 @@ public class DFSearch implements IAgentAction
 	 *  Set the dfagentdescription of this DFSearch.
 	 * @param dfagentdescription the value to be set
 	 */
-	public void setAgentDescription(IDFAgentDescription dfagentdescription)
+	public void setComponentDescription(IDFComponentDescription dfagentdescription)
 	{
 		this.dfagentdescription = dfagentdescription;
 	}
@@ -86,16 +86,16 @@ public class DFSearch implements IAgentAction
 	 *  Get the results of this DFSearch.
 	 * @return results
 	 */
-	public IDFAgentDescription[] getResults()
+	public IDFComponentDescription[] getResults()
 	{
-		return (IDFAgentDescription[])results.toArray(new IDFAgentDescription[results.size()]);
+		return (IDFComponentDescription[])results.toArray(new IDFComponentDescription[results.size()]);
 	}
 
 	/**
 	 *  Set the results of this DFSearch.
 	 * @param results the value to be set
 	 */
-	public void setResults(IDFAgentDescription[] results)
+	public void setResults(IDFComponentDescription[] results)
 	{
 		this.results.clear();
 		for(int i = 0; i < results.length; i++)
@@ -107,9 +107,9 @@ public class DFSearch implements IAgentAction
 	 *  @param idx The index.
 	 *  @return results
 	 */
-	public IDFAgentDescription getResult(int idx)
+	public IDFComponentDescription getResult(int idx)
 	{
-		return (IDFAgentDescription)this.results.get(idx);
+		return (IDFComponentDescription)this.results.get(idx);
 	}
 
 	/**
@@ -117,7 +117,7 @@ public class DFSearch implements IAgentAction
 	 *  @param idx The index.
 	 *  @param result a value to be added
 	 */
-	public void setResult(int idx, IDFAgentDescription result)
+	public void setResult(int idx, IDFComponentDescription result)
 	{
 		this.results.set(idx, result);
 	}
@@ -126,7 +126,7 @@ public class DFSearch implements IAgentAction
 	 *  Add a result to this DFSearch.
 	 *  @param result a value to be removed
 	 */
-	public void addResult(IDFAgentDescription result)
+	public void addResult(IDFComponentDescription result)
 	{
 		this.results.add(result);
 	}
@@ -136,7 +136,7 @@ public class DFSearch implements IAgentAction
 	 *  @param result a value to be removed
 	 *  @return  True when the results have changed.
 	 */
-	public boolean removeResult(IDFAgentDescription result)
+	public boolean removeResult(IDFComponentDescription result)
 	{
 		return this.results.remove(result);
 	}

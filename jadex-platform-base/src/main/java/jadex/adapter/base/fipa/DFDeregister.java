@@ -10,7 +10,7 @@ public class DFDeregister implements IAgentAction
 	//-------- attributes ----------
 
 	/** Attribute for slot dfagentdescription. */
-	protected IDFAgentDescription dfagentdescription;
+	protected IDFComponentDescription dfagentdescription;
 
 	//-------- constructors --------
 
@@ -25,7 +25,7 @@ public class DFDeregister implements IAgentAction
 	/**
 	 * Create a new <code>DFDeregister</code>.
 	 */
-	public DFDeregister(IDFAgentDescription dfagentdescription)
+	public DFDeregister(IDFComponentDescription dfagentdescription)
 	{
 		this.dfagentdescription	= dfagentdescription;
 	}
@@ -36,7 +36,7 @@ public class DFDeregister implements IAgentAction
 	 *  Get the dfagentdescription of this DFDeregister.
 	 * @return dfagentdescription
 	 */
-	public IDFAgentDescription getAgentDescription()
+	public IDFComponentDescription getComponentDescription()
 	{
 		return this.dfagentdescription;
 	}
@@ -45,7 +45,7 @@ public class DFDeregister implements IAgentAction
 	 *  Set the dfagentdescription of this DFDeregister.
 	 * @param dfagentdescription the value to be set
 	 */
-	public void setAgentDescription(IDFAgentDescription dfagentdescription)
+	public void setComponentDescription(IDFComponentDescription dfagentdescription)
 	{
 		this.dfagentdescription = dfagentdescription;
 	}

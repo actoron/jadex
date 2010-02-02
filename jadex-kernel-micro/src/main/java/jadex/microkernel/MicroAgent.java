@@ -271,7 +271,7 @@ public abstract class MicroAgent implements IMicroAgent
 	public void sendMessage(Map me, MessageType mt)
 	{
 		((IMessageService)getServiceContainer().getService(IMessageService.class)).
-			sendMessage(me, mt, getAgentIdentifier(), interpreter.getAgentModel().getClassLoader());
+			sendMessage(me, mt, getComponentIdentifier(), interpreter.getAgentModel().getClassLoader());
 	}
 	
 	/**
@@ -280,14 +280,14 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public String getAgentName()
 	{
-		return getAgentIdentifier().getLocalName();
+		return getComponentIdentifier().getLocalName();
 	}
 	
 	/**
 	 * Get the agent identifier.
 	 * @return The agent identifier.
 	 */
-	public IComponentIdentifier	getAgentIdentifier()
+	public IComponentIdentifier	getComponentIdentifier()
 	{
 		return interpreter.getAgentAdapter().getComponentIdentifier();
 	}
@@ -333,23 +333,6 @@ public abstract class MicroAgent implements IMicroAgent
 		
 		return reply;
 	}
-	
-//	/**
-//	 *  Get the application context.
-//	 *  @return The application context (or null).
-//	 */
-//	public IApplicationContext getApplicationContext()
-//	{
-//		IApplicationContext ret = null;
-//		IContextService cs = (IContextService)getServiceContainer().getService(IContextService.class);
-//		if(cs!=null)
-//		{
-//			IContext[] tmp = cs.getContexts(getAgentIdentifier(), IApplicationContext.class);
-//			if(tmp.length==1)
-//				ret = (IApplicationContext)tmp[0];
-//		}
-//		return ret;
-//	}
 	
 	/**
 	 *  Schedule a step of the agent.

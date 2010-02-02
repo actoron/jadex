@@ -35,13 +35,6 @@ public class SimulationEndPlan extends Plan {
 		}
 		
 //		// kill via gui		
-//		// TO DO: How to suicide?
-//		
-//		IGoal kg = createGoal("ams_destroy_agent");
-//		kg.getParameter("agentidentifier").setValue(getAgentIdentifier());
-//		dispatchTopLevelGoal(kg);
-//		
-//		killAgent();
 
 		IComponentExecutionService	ces	= (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
 		ces.destroyComponent(getScope().getParent().getComponentIdentifier(), null);

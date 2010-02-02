@@ -1,6 +1,6 @@
 package jadex.adapter.standalone.transport.localmtp;
 
-import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
+import jadex.adapter.standalone.fipaimpl.ComponentIdentifier;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageService;
@@ -74,7 +74,7 @@ public class LocalTransport implements ITransport
 	 *  @return The agent identifiers of the agents 
 	 *  the message could not be sent to.
 	 */
-	public AgentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] recs)
+	public ComponentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] recs)
 	{
 		List todeliver = SCollection.createArrayList();
 		List undelivered = SCollection.createArrayList();
@@ -95,7 +95,7 @@ public class LocalTransport implements ITransport
 				.toArray(new IComponentIdentifier[todeliver.size()]));
 		}
 		
-		return (AgentIdentifier[])undelivered.toArray(new AgentIdentifier[undelivered.size()]);
+		return (ComponentIdentifier[])undelivered.toArray(new ComponentIdentifier[undelivered.size()]);
 	}
 	
 	/**

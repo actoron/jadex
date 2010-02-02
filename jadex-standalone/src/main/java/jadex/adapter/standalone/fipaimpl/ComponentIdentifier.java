@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * An agent identifier (AID), see FIPASC00023.
  */
-public class AgentIdentifier implements IComponentIdentifier, Cloneable, Serializable
+public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Serializable
 {
 	//-------- attributes ----------
 
@@ -30,7 +30,7 @@ public class AgentIdentifier implements IComponentIdentifier, Cloneable, Seriali
 	 *  Create a new agent identifier.
 	 *  Bean constructor
 	 */
-	public AgentIdentifier()
+	public ComponentIdentifier()
 	{
 		this(null, null, null);
 	}
@@ -39,7 +39,7 @@ public class AgentIdentifier implements IComponentIdentifier, Cloneable, Seriali
 	 *  Create a new agent identifier with a given global name.
 	 *  @param name A global name (e.g. "ams@lars").
 	 */
-	public AgentIdentifier(String name)
+	public ComponentIdentifier(String name)
 	{
 		this(name, null, null);
 	}
@@ -49,7 +49,7 @@ public class AgentIdentifier implements IComponentIdentifier, Cloneable, Seriali
 	 *  @param name A global name (e.g. "ams@lars").
 	 *  @param addresses A list of transport addresses.
 	 */
-	public AgentIdentifier(String name, String[] addresses)
+	public ComponentIdentifier(String name, String[] addresses)
 	{
 		this(name, addresses, null);
 	}
@@ -60,7 +60,7 @@ public class AgentIdentifier implements IComponentIdentifier, Cloneable, Seriali
 	 *  @param addresses A list of transport addresses.
 	 *  @param resolvers A list of resolvers, which may provide additional transport adresses.
 	 */
-	public AgentIdentifier(String name, String[] addresses, IComponentIdentifier[] resolvers)
+	public ComponentIdentifier(String name, String[] addresses, IComponentIdentifier[] resolvers)
 	{
 		this.name = name;
 
@@ -90,7 +90,7 @@ public class AgentIdentifier implements IComponentIdentifier, Cloneable, Seriali
 	}
 	
 	/**
-	 *  Get the addresses of this AgentIdentifier.
+	 *  Get the addresses of this ComponentIdentifier.
 	 * @return addresses
 	 */
 	public String[] getAddresses()
@@ -102,7 +102,7 @@ public class AgentIdentifier implements IComponentIdentifier, Cloneable, Seriali
 	}
 
 	/**
-	 *  Set the addresses of this AgentIdentifier.
+	 *  Set the addresses of this ComponentIdentifier.
 	 * @param addresses the value to be set
 	 */
 	public void setAddresses(String[] addresses)
@@ -117,7 +117,7 @@ public class AgentIdentifier implements IComponentIdentifier, Cloneable, Seriali
 	}
 
 	/**
-	 *  Get an addresses of this AgentIdentifier.
+	 *  Get an addresses of this ComponentIdentifier.
 	 *  @param idx The index.
 	 *  @return addresses
 	 */
@@ -130,7 +130,7 @@ public class AgentIdentifier implements IComponentIdentifier, Cloneable, Seriali
 	}
 
 	/**
-	 *  Set a address to this AgentIdentifier.
+	 *  Set a address to this ComponentIdentifier.
 	 *  @param idx The index.
 	 *  @param address a value to be added
 	 */
@@ -143,7 +143,7 @@ public class AgentIdentifier implements IComponentIdentifier, Cloneable, Seriali
 	}
 
 	/**
-	 *  Add a address to this AgentIdentifier.
+	 *  Add a address to this ComponentIdentifier.
 	 *  @param address a value to be removed
 	 */
 	public void addAddress(String address)
@@ -154,7 +154,7 @@ public class AgentIdentifier implements IComponentIdentifier, Cloneable, Seriali
 	}
 
 	/**
-	 *  Remove a address from this AgentIdentifier.
+	 *  Remove a address from this ComponentIdentifier.
 	 *  @param address a value to be removed
 	 *  @return  True when the addresses have changed.
 	 */
@@ -168,22 +168,22 @@ public class AgentIdentifier implements IComponentIdentifier, Cloneable, Seriali
 
 
 	/**
-	 *  Get the resolvers of this AgentIdentifier.
+	 *  Get the resolvers of this ComponentIdentifier.
 	 * @return resolvers
 	 */
-	public AgentIdentifier[] getResolvers()
+	public ComponentIdentifier[] getResolvers()
 	{
 		if(resolvers!=null)
-			return (AgentIdentifier[])resolvers.toArray(new AgentIdentifier[resolvers.size()]);
+			return (ComponentIdentifier[])resolvers.toArray(new ComponentIdentifier[resolvers.size()]);
 		else
-			return new AgentIdentifier[0];
+			return new ComponentIdentifier[0];
 	}
 
 	/**
-	 *  Set the resolvers of this AgentIdentifier.
+	 *  Set the resolvers of this ComponentIdentifier.
 	 * @param resolvers the value to be set
 	 */
-	public void setResolvers(AgentIdentifier[] resolvers)
+	public void setResolvers(ComponentIdentifier[] resolvers)
 	{
 		if(this.resolvers!=null)
 			this.resolvers.clear();
@@ -195,24 +195,24 @@ public class AgentIdentifier implements IComponentIdentifier, Cloneable, Seriali
 	}
 
 	/**
-	 *  Get an resolvers of this AgentIdentifier.
+	 *  Get an resolvers of this ComponentIdentifier.
 	 *  @param idx The index.
 	 *  @return resolvers
 	 */
-	public AgentIdentifier getResolver(int idx)
+	public ComponentIdentifier getResolver(int idx)
 	{
 		if(resolvers!=null)
-			return (AgentIdentifier)this.resolvers.get(idx);
+			return (ComponentIdentifier)this.resolvers.get(idx);
 		else
 			throw new ArrayIndexOutOfBoundsException(idx);
 	}
 
 	/**
-	 *  Set a resolver to this AgentIdentifier.
+	 *  Set a resolver to this ComponentIdentifier.
 	 *  @param idx The index.
 	 *  @param resolver a value to be added
 	 */
-	public void setResolver(int idx, AgentIdentifier resolver)
+	public void setResolver(int idx, ComponentIdentifier resolver)
 	{
 		if(resolvers!=null)
 			this.resolvers.set(idx, resolver);
@@ -221,7 +221,7 @@ public class AgentIdentifier implements IComponentIdentifier, Cloneable, Seriali
 	}
 
 	/**
-	 *  Add a resolver to this AgentIdentifier.
+	 *  Add a resolver to this ComponentIdentifier.
 	 *  @param resolver a value to be removed
 	 */
 	public void addResolver(IComponentIdentifier resolver)
@@ -232,7 +232,7 @@ public class AgentIdentifier implements IComponentIdentifier, Cloneable, Seriali
 	}
 
 	/**
-	 *  Remove a resolver from this AgentIdentifier.
+	 *  Remove a resolver from this ComponentIdentifier.
 	 *  @param resolver a value to be removed
 	 *  @return  True when the resolvers have changed.
 	 */
@@ -252,12 +252,12 @@ public class AgentIdentifier implements IComponentIdentifier, Cloneable, Seriali
 	 */
 	public Object clone()
 	{
-		AgentIdentifier clone = new AgentIdentifier(getName(), getAddresses(), null);
+		ComponentIdentifier clone = new ComponentIdentifier(getName(), getAddresses(), null);
 
 		// Deep copy of resolvers.
-		AgentIdentifier[] res = getResolvers();
+		ComponentIdentifier[] res = getResolvers();
 		for(int i = 0; i < res.length; i++)
-			clone.addResolver((AgentIdentifier)res[i].clone());
+			clone.addResolver((ComponentIdentifier)res[i].clone());
 
 		return clone;
 	}
@@ -277,7 +277,7 @@ public class AgentIdentifier implements IComponentIdentifier, Cloneable, Seriali
 	}
 
 	/**
-	 * @return the local name of an agent
+	 * @return the local name of a component
 	 */
 	public String getLocalName()
 	{

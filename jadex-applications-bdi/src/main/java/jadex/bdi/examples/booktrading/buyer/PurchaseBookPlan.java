@@ -1,6 +1,6 @@
 package jadex.bdi.examples.booktrading.buyer;
 
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.bdi.examples.booktrading.common.NegotiationReport;
 import jadex.bdi.examples.booktrading.common.Order;
 import jadex.bdi.planlib.protocols.NegotiationRecord;
@@ -39,7 +39,7 @@ public class PurchaseBookPlan extends Plan
 		IGoal df_search = createGoal("df_search");
 		df_search.getParameter("description").setValue(getPropertybase().getProperty("service_seller"));
 		dispatchSubgoalAndWait(df_search);
-		IDFAgentDescription[] result = (IDFAgentDescription[])df_search
+		IDFComponentDescription[] result = (IDFComponentDescription[])df_search
 			.getParameterSet("result").getValues();
 		if(result.length == 0)
 		{

@@ -29,7 +29,7 @@ public class HeatbugAgent extends MicroAgent
 	{
 		IApplicationExternalAccess	app	= (IApplicationExternalAccess)getParent();
 		final Grid2D grid = (Grid2D)app.getSpace("mygc2dspace");
-		ISpaceObject avatar = grid.getAvatar(getAgentIdentifier());
+		ISpaceObject avatar = grid.getAvatar(getComponentIdentifier());
 		
 //		unhappiness = Math.abs(ideal_temp - temp);
 		final double randomchance = ((Number)avatar.getProperty("random_move_chance")).doubleValue();
@@ -40,7 +40,7 @@ public class HeatbugAgent extends MicroAgent
 		{
 			public void run()
 			{
-				ISpaceObject avatar = grid.getAvatar(getAgentIdentifier());
+				ISpaceObject avatar = grid.getAvatar(getComponentIdentifier());
 				IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
 				ISpaceObject patch = (ISpaceObject)grid.getSpaceObjectsByGridPosition(mypos, "patch").iterator().next();
 				double mytemp = ((Number)patch.getProperty("heat")).doubleValue();

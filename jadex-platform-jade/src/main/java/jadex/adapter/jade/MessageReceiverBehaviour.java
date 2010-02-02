@@ -32,7 +32,7 @@ import jadex.adapter.base.fipa.DFRegister;
 import jadex.adapter.base.fipa.DFSearch;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.IAgentAction;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IContentCodec;
@@ -203,12 +203,12 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 								IAgentAction	jadexaction	= null;
 								if(request instanceof Register)
 								{
-									IDFAgentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Register)request).getDescription(), ams);
+									IDFComponentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Register)request).getDescription(), ams);
 									jadexaction	= new DFRegister(dfadesc, dfadesc);
 								}
 								else if(request instanceof Deregister)
 								{
-									IDFAgentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Deregister)request).getDescription(), ams);
+									IDFComponentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Deregister)request).getDescription(), ams);
 									jadexaction	= new DFDeregister(dfadesc);
 								}
 								else if(request instanceof Modify)
@@ -224,7 +224,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 									}
 									else
 									{
-										IDFAgentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Modify)request).getDescription(), ams);
+										IDFComponentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Modify)request).getDescription(), ams);
 										jadexaction	= new DFModify(dfadesc, dfadesc);
 									}
 								}
@@ -265,9 +265,9 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 									}
 									else
 									{
-										IDFAgentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Search)request).getDescription(), ams);
+										IDFComponentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Search)request).getDescription(), ams);
 										List	items	= ((Result)content).getItems();
-										IDFAgentDescription[]	results	= new IDFAgentDescription[items.size()];
+										IDFComponentDescription[]	results	= new IDFComponentDescription[items.size()];
 										for(int i=0; i<results.length; i++)
 											results[i]	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) items.get(i), ams);
 										jadexaction	= new DFSearch(dfadesc, results);

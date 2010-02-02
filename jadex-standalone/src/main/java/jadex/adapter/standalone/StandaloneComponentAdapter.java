@@ -1,7 +1,6 @@
 package jadex.adapter.standalone;
 
-import jadex.adapter.standalone.fipaimpl.AMSAgentDescription;
-import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
+import jadex.adapter.standalone.fipaimpl.ComponentIdentifier;
 import jadex.adapter.standalone.service.componentexecution.ComponentExecutionService;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentTerminatedException;
@@ -91,7 +90,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  Create a new component adapter.
 	 *  Uses the thread pool for executing the component.
 	 */
-	public StandaloneComponentAdapter(IServiceContainer container, AMSAgentDescription desc)
+	public StandaloneComponentAdapter(IServiceContainer container, IComponentDescription desc)
 	{
 		this.container = container;
 		this.desc	= desc;
@@ -171,12 +170,12 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		String sen = mt.getSenderIdentifier();
 		Object sender = message.getValue(sen);
 		if(sender==null)
-			pmap.put(sen, getAgentIdentifier());
+			pmap.put(sen, getComponentIdentifier());
 		
 		String idid = mt.getIdIdentifier();
 		Object id = message.getValue(idid);
 		if(id==null)
-			pmap.put(idid, SUtil.createUniqueId(getAgentIdentifier().getLocalName()));
+			pmap.put(idid, SUtil.createUniqueId(getComponentIdentifier().getLocalName()));
 
 		String sd = mt.getTimestampIdentifier();
 		Object senddate = message.getValue(sd);
@@ -195,7 +194,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	}*/
 
 	/**
-	 *  Return an agent-identifier that allows to send
+	 *  Return a component-identifier that allows to send
 	 *  messages to this agent.
 	 *  Return a copy of the original.
 	 */
@@ -206,9 +205,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 
 		// todo: remove cast, HACK!!!
 		// todo: add transport addresses for multi-platform communication.
-//		IAMS ams = (IAMS)container.getService(IAMS.class);
-//		return ((AMS)ams).refreshAgentIdentifier(cid);
-		return (IComponentIdentifier)((AgentIdentifier)cid).clone();
+		return (IComponentIdentifier)((ComponentIdentifier)cid).clone();
 	}
 	
 	/**
@@ -234,19 +231,6 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 
 //		return platform.getClock();
 		return (IClockService)container.getService(IClockService.class);
-	}*/
-	
-	// Hack!!!! todo: remove
-	/**
-	 *  Get the execution control.
-	 *  @return The execution control.
-	 * /
-	public ExecutionContext getExecutionControl()
-	{
-		if(AMSAgentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(aid.getName());
-
-		return platform.getExecutionControl();
 	}*/
 	
 	/**
@@ -465,7 +449,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 				}
 				again	= again && IComponentDescription.STATE_ACTIVE.equals(desc.getState());
 				if(steplistener!=null)
-					steplistener.resultAvailable(this, ((AMSAgentDescription)desc).clone());
+					steplistener.resultAvailable(this, desc);
 			}
 		}
 

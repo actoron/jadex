@@ -79,7 +79,7 @@ public class PlanRules
 	public static void adoptPlan(IOAVState state, Object rcapa, Object rplan)
 	{
 //		System.out.println("adoptPlan: Setting plan to ready: "
-//				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //				+", "+rplan);
 		state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_plans, rplan);
 		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
@@ -110,7 +110,7 @@ public class PlanRules
 		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, reason);
 //		state.addAttributeValue(rcap, OAVBDIRuntimeModel.capability_has_plans, rplan);
 //		System.out.println("instantiatePlan: Setting plan to ready: "
-//				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //				+", "+rplan);
 //		
 		if(fetcher==null)
@@ -349,7 +349,7 @@ public class PlanRules
 	public static void abortPlan(IOAVState state, Object rcapa, Object rplan)
 	{
 //		System.out.println("abortPlan: Setting plan to ready: "
-//				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//				+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //				+", "+rplan);
 		String ps = (String)state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate);
 		state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate, OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED);
@@ -551,7 +551,7 @@ public class PlanRules
 					if(!(e instanceof BDIFailureException))
 					{
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
-//						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getAgentIdentifier()+
+//						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
 						AgentRules.getLogger(state, rcapa).severe(ip.getComponentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+" "+state.getAttributeValue(state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)+"\n"+sw);
@@ -567,7 +567,7 @@ public class PlanRules
 				if(interrupted)
 				{
 //					System.out.println("createPlanBodyExecutionRule: Setting plan to ready: "
-//							+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//							+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //							+", "+rplan);
 					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
 						OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
@@ -635,7 +635,7 @@ public class PlanRules
 					if(!(e instanceof BDIFailureException))
 					{
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
-//						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getAgentIdentifier()+
+//						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
 						AgentRules.getLogger(state, rcapa).severe(ip.getComponentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
@@ -651,7 +651,7 @@ public class PlanRules
 				if(interrupted)
 				{
 //					System.out.println("createPlanPassedExecutionRule: Setting plan to ready: "
-//							+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//							+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //							+", "+rplan);
 					assert !OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED
 						.equals(state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate));
@@ -721,7 +721,7 @@ public class PlanRules
 					if(!(e instanceof BDIFailureException))
 					{
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
-//						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getAgentIdentifier()+
+//						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
 						AgentRules.getLogger(state, rcapa).severe(ip.getComponentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
@@ -737,7 +737,7 @@ public class PlanRules
 				if(interrupted)
 				{
 //					System.out.println("createPlanFailedExecutionRule: Setting plan to ready: "
-//							+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//							+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //							+", "+rplan);
 					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
 						OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
@@ -806,7 +806,7 @@ public class PlanRules
 					if(!(e instanceof BDIFailureException))
 					{
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
-//						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getAgentIdentifier()+
+//						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
 						AgentRules.getLogger(state, rcapa).severe(ip.getComponentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
@@ -822,7 +822,7 @@ public class PlanRules
 				if(interrupted)
 				{
 //					System.out.println("createPlanAbortedExecutionRule: Setting plan to ready: "
-//							+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//							+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //							+", "+rplan);
 					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
 						OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
@@ -905,7 +905,7 @@ public class PlanRules
 				Object	rcapa	= assignments.getVariableValue("?rcapa");
 				Object	rgoal	= assignments.getVariableValue("?rgoal");
 //				System.out.println("createPlanInstanceGoalFinishedRule: Setting plan to ready: "
-//						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //						+", "+rplan);
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, rgoal);
@@ -1047,7 +1047,7 @@ public class PlanRules
 				Object	rcapa	= assignments.getVariableValue("?rcapa");
 				Object	rgoal	= assignments.getVariableValue("?rgoal");
 //				System.out.println("createPlanInstanceMaintainGoalFinishedRule: Setting plan to ready: "
-//						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//						+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //						+", "+rplan);
 //				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
 //				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_dispatchedelement, rgoal);
@@ -1963,7 +1963,7 @@ public class PlanRules
 			EventProcessingRules.schedulePlanInstanceCandidate(state, change, rplan, rcapa);
 			
 //			System.out.println("PLAN_CHANGEWAIT: Setting plan to ready: "
-//					+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//					+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //					+", "+rplan);
 		}
 	};
@@ -2012,7 +2012,7 @@ public class PlanRules
 				OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
 
 //			System.out.println("PLAN_EXTERNALCONDITIONWAIT: Setting plan to ready: "
-//					+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//					+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //					+", "+rplan);
 			
 //			System.out.println("Plan reactivated from external condition: "+rplan);
@@ -2114,7 +2114,7 @@ public class PlanRules
 //						state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
 //							OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
 //						System.out.println("initializeWait: Setting plan to ready: "
-//								+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier().getLocalName()
+//								+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
 //								+", "+rplan);
 //						state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer, null);
 //						cleanupPlanWait(state, rcapa, rplan, false);

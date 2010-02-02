@@ -1,6 +1,6 @@
 package jadex.adapter.standalone.transport.tcpmtp;
 
-import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
+import jadex.adapter.standalone.fipaimpl.ComponentIdentifier;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.adapter.standalone.transport.MessageEnvelope;
 import jadex.adapter.standalone.transport.codecs.CodecFactory;
@@ -233,7 +233,7 @@ public class TCPTransport implements ITransport
 	 *  @param message The message to send.
 	 *  (todo: On which thread this should be done?)
 	 */
-	public AgentIdentifier[] sendMessage(Map msg, String type, IComponentIdentifier[] receivers)
+	public ComponentIdentifier[] sendMessage(Map msg, String type, IComponentIdentifier[] receivers)
 	{
 		// Fetch all receivers 
 //		IComponentIdentifier[] recstodel = message.getReceivers();
@@ -263,13 +263,12 @@ public class TCPTransport implements ITransport
 			{
 				Set aidset = (Set)adrsets.get(addrs[i]);
 				aidset.retainAll(undelivered);
-//				AgentIdentifier[] aids = (AgentIdentifier[])aidset.toArray(new AgentIdentifier[aidset.size()]);
 				if(con.send(new MessageEnvelope(msg, aidset, type)))
 					undelivered.removeAll(aidset);
 			}
 		}
 		
-		return (AgentIdentifier[])undelivered.toArray(new AgentIdentifier[undelivered.size()]);
+		return (ComponentIdentifier[])undelivered.toArray(new ComponentIdentifier[undelivered.size()]);
 	}
 	
 	/**

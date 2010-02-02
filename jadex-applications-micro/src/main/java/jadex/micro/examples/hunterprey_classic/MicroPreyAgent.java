@@ -1,7 +1,7 @@
 package jadex.micro.examples.hunterprey_classic;
 
 import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.examples.hunterprey_classic.Creature;
@@ -50,8 +50,8 @@ public class MicroPreyAgent extends MicroAgent
 	public void executeBody()
 	{
 		// Todo: getAgentName()
-		myself	= new Prey(getAgentIdentifier().getLocalName(),
-			getAgentIdentifier(), new Location(10,10));
+		myself	= new Prey(getComponentIdentifier().getLocalName(),
+			getComponentIdentifier(), new Location(10,10));
 
 		this.rand	= new Random(hashCode());
 		
@@ -135,7 +135,7 @@ public class MicroPreyAgent extends MicroAgent
 		// Create a service description to search for.
 		IDF df = (IDF)getServiceContainer().getService(IDF.class);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "hunter-prey environment", null);
-		IDFAgentDescription ad = df.createDFAgentDescription(null, sd);
+		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 		ISearchConstraints	cons = df.createSearchConstraints(-1, 0);
 		
 		// Search for the environment agent
@@ -143,7 +143,7 @@ public class MicroPreyAgent extends MicroAgent
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				IDFAgentDescription[] tas = (IDFAgentDescription[])result;
+				IDFComponentDescription[] tas = (IDFComponentDescription[])result;
 				if(tas.length!=0)
 				{
 					// Found.
@@ -183,7 +183,7 @@ public class MicroPreyAgent extends MicroAgent
 		msg.put(SFipa.CONTENT, action);
 		msg.put(SFipa.LANGUAGE, SFipa.NUGGETS_XML);
 		msg.put(SFipa.RECEIVERS, Collections.singletonList(environment));
-		msg.put(SFipa.SENDER, getAgentIdentifier());
+		msg.put(SFipa.SENDER, getComponentIdentifier());
 		// Todo: message service shouldn't allow sending anonymous messages (i.e. w/o sender)
 		sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE);
 	}	

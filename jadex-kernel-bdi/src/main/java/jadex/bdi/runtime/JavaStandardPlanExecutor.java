@@ -275,7 +275,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 //		assert task.getExecutionThread()==Thread.currentThread() : rplan+", "+Thread.currentThread();
 		task.giveBackControl(PlanExecutionTask.STATE_INTERRUPTED, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
 //		System.out.println("interruptPlanStep: Setting plan to ready: "
-//				+task.interpreter.getAgentAdapter().getAgentIdentifier().getLocalName()
+//				+task.interpreter.getAgentAdapter().getComponentIdentifier().getLocalName()
 //				+", "+rplan);
 	}
 
@@ -521,7 +521,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 //			if(rcapability==null)
 //			{
 //				System.out.println("plan already finished: "
-//					+interpreter.getAgentAdapter().getAgentIdentifier().getLocalName()
+//					+interpreter.getAgentAdapter().getComponentIdentifier().getLocalName()
 //					+", "+rplan);
 //			}
 			assert rcapability!=null;
@@ -606,7 +606,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 //						throwable.printStackTrace();
 					giveBackControl(STATE_WAITING, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
 //					System.out.println("PlanExecutionTask.STATE_WAITING: Setting plan to ready: "
-//							+interpreter.getAgentAdapter().getAgentIdentifier().getLocalName()
+//							+interpreter.getAgentAdapter().getComponentIdentifier().getLocalName()
 //							+", "+rplan);
 				}
 				

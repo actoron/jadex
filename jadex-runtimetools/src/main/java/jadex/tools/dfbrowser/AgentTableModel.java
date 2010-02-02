@@ -1,6 +1,6 @@
 package jadex.tools.dfbrowser;
 
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.bridge.IComponentIdentifier;
 
@@ -13,7 +13,7 @@ import javax.swing.table.AbstractTableModel;
  */
 class AgentTableModel extends AbstractTableModel
 {
-	protected IDFAgentDescription[] ads;
+	protected IDFComponentDescription[] ads;
 
 
 	/**
@@ -28,7 +28,7 @@ class AgentTableModel extends AbstractTableModel
 	/**
 	 * @param ad
 	 */
-	public void setAgentDescriptions(IDFAgentDescription[] ad)
+	public void setAgentDescriptions(IDFComponentDescription[] ad)
 	{
 		ads = ad;
 		fireTableDataChanged();
@@ -55,7 +55,7 @@ class AgentTableModel extends AbstractTableModel
 		{
 			return null;
 		}
-		IDFAgentDescription ad = ads[rowIndex];
+		IDFComponentDescription ad = ads[rowIndex];
 		switch(columnIndex)
 		{
 			case 0:
@@ -129,7 +129,7 @@ class AgentTableModel extends AbstractTableModel
 	 * @param i
 	 * @return the agent description at row i
 	 */
-	public IDFAgentDescription getAgentDescription(int i)
+	public IDFComponentDescription getAgentDescription(int i)
 	{
 		return ads == null || i < 0 || i >= ads.length ? null : ads[i];
 	}

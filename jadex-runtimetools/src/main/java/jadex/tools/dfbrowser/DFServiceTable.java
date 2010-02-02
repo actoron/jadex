@@ -1,6 +1,6 @@
 package jadex.tools.dfbrowser;
 
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IProperty;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Properties;
@@ -53,7 +53,7 @@ public class DFServiceTable extends JTable//JScrollPane
 	 * Sets Agent descriptions for this element
 	 * @param ad
 	 */
-	public void setAgentDescriptions(IDFAgentDescription[] ad)
+	public void setAgentDescriptions(IDFComponentDescription[] ad)
 	{
 		TableSorter sorter = (TableSorter)getModel();
 		ServiceTableModel model = (ServiceTableModel)sorter.getTableModel();
@@ -63,7 +63,7 @@ public class DFServiceTable extends JTable//JScrollPane
 	/**
 	 * @param agentDescription
 	 */
-	public void setAgentDescription(IDFAgentDescription ad)
+	public void setAgentDescription(IDFComponentDescription ad)
 	{
 		TableSorter sorter = (TableSorter)getModel();
 		ServiceTableModel model = (ServiceTableModel)sorter.getTableModel();

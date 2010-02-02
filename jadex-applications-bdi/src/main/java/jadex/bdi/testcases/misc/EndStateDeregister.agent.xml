@@ -26,7 +26,7 @@
 					<parameter ref="description">
 						<value>
 							((IDF)$scope.getServiceContainer().getService(IDF.class))
-								.createDFAgentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
+								.createDFComponentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
 									.createDFServiceDescription("endstate_testservice", "endstate_testservice", "EndStateDeregister"))
 						</value>
 					</parameter>

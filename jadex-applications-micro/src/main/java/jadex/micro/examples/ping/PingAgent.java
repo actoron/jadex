@@ -26,7 +26,7 @@ public class PingAgent extends MicroAgent
 	
 			reply.put(SFipa.CONTENT, "alive");
 			reply.put(SFipa.PERFORMATIVE, SFipa.INFORM);
-			reply.put(SFipa.SENDER, getAgentIdentifier());
+			reply.put(SFipa.SENDER, getComponentIdentifier());
 			sendMessage(reply, mt);
 		}
 		else

@@ -52,7 +52,6 @@ public class EnvironmentGui	extends JFrame
 							IGoal kill = agent.createGoal("ams_destroy_agent");
 							IComponentExecutionService ces = (IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class);
 							kill.getParameter("agentidentifier").setValue(ces.createComponentIdentifier(wobs[i].getName(), true, null));
-//							kill.getParameter("agentidentifier").setValue(new AgentIdentifier(wobs[i].getName(), true));
 							agent.dispatchTopLevelGoalAndWait(kill);
 						}
 						catch(GoalFailureException gfe) {}

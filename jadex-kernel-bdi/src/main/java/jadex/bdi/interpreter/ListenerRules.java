@@ -492,7 +492,7 @@ public class ListenerRules
 					}					
 				}
 				
-//				System.err.println("listener_goal rule: "+rgoal+", "+lis+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getAgentIdentifier());
+//				System.err.println("listener_goal rule: "+rgoal+", "+lis+", "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier());
 			}
 		};
 		

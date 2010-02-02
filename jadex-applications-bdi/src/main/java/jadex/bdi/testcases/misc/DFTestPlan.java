@@ -1,7 +1,7 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.adapter.base.test.TestReport;
@@ -43,8 +43,8 @@ public class DFTestPlan extends Plan
 	 */
 	public int	performInitialTests(int num)
 	{
-		IDFAgentDescription desc = ((IDF)getScope().getServiceContainer().getService(IDF.class))
-			.createDFAgentDescription(null, new IDFServiceDescription[]
+		IDFComponentDescription desc = ((IDF)getScope().getServiceContainer().getService(IDF.class))
+			.createDFComponentDescription(null, new IDFServiceDescription[]
 			{
 				((IDF)getScope().getServiceContainer().getService(IDF.class))
 					.createDFServiceDescription("service_a", "a", "a"),
@@ -114,8 +114,8 @@ public class DFTestPlan extends Plan
 	 */
 	public int performTests(int num, IComponentIdentifier df)
 	{
-		IDFAgentDescription desc = ((IDF)getScope().getServiceContainer().getService(IDF.class))
-			.createDFAgentDescription(null, new IDFServiceDescription[]
+		IDFComponentDescription desc = ((IDF)getScope().getServiceContainer().getService(IDF.class))
+			.createDFComponentDescription(null, new IDFServiceDescription[]
 			{
 				((IDF)getScope().getServiceContainer().getService(IDF.class))
 					.createDFServiceDescription("service_a", "a", "a"),
@@ -129,9 +129,8 @@ public class DFTestPlan extends Plan
 //		desc_clone.setLeaseTime(new Date(olt));
 		
 		IDF dfservice = (IDF)getScope().getServiceContainer().getService(IDF.class);
-//		IDFAgentDescription desc_clone = SFipa.cloneDFAgentDescription(desc, dfservice);
 		// Hack! does not clone services
-		IDFAgentDescription desc_clone = dfservice.createDFAgentDescription(desc.getName(), desc.getServices(), desc.getLanguages(), desc.getOntologies(), desc.getProtocols(), new Date(olt));
+		IDFComponentDescription desc_clone = dfservice.createDFComponentDescription(desc.getName(), desc.getServices(), desc.getLanguages(), desc.getOntologies(), desc.getProtocols(), new Date(olt));
 
 		// Try to register by the df for some lease time.
 		TestReport tr = new TestReport("#"+num++, "Test of lease time.");
@@ -154,7 +153,6 @@ public class DFTestPlan extends Plan
 			dispatchSubgoalAndWait(search);
 			if(search.getParameterSet("result").getValues().length>0)
 			{
-				//System.out.println(((AgentDescription)search.getParameterSet("result").getValues()[0]).getLeaseTime().getTime());
 				getLogger().info(" lease time test failed. "+search.getParameterSet("result").getValues());
 				tr.setReason("Lease time test failed. "+search.getParameterSet("result").getValues());
 			}

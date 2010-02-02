@@ -383,7 +383,7 @@ public class DFServiceDescription implements IDFServiceDescription, Serializable
 	}
 
 	/**
-	 *  Clone an agent description.
+	 *  Clone a component description.
 	 */
 	public Object clone()
 	{

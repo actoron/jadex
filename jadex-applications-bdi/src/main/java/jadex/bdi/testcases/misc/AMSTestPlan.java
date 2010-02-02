@@ -51,11 +51,8 @@ public class AMSTestPlan extends Plan
 		TestReport tr = new TestReport("#"+num++, "Searching for all agents");
 		getLogger().info("\nSearching for all agents.");
 		IComponentExecutionService amsservice = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
-		IComponentDescription desc = amsservice.createComponentDescription(null, null, null, null);
+		IComponentDescription desc = amsservice.createComponentDescription(null, null, null, null, null);
 		ISearchConstraints constraints = amsservice.createSearchConstraints(-1, 0);
-		/*AMSAgentDescription	desc	= new AMSAgentDescription();
-		SearchConstraints	constraints	= new SearchConstraints();
-		constraints.setMaxResults(-1);*/
 		
 		IGoal	search	= createGoal("amscap.ams_search_agents");
 		search.getParameter("description").setValue(desc);
@@ -106,15 +103,9 @@ public class AMSTestPlan extends Plan
 		{
 			getLogger().info("\nSearching for agent.");
 			
-			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("agentidentifier").getValue(), null, null, null);
+			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("agentidentifier").getValue(), null, null, null, null);
 			constraints = amsservice.createSearchConstraints(-1, 0);
 		
-			/*desc	= new AMSAgentDescription();
-			//desc.setName((AgentIdentifier)create.getResult());
-			desc.setName((AgentIdentifier)create.getParameter("agentidentifier").getValue());
-			constraints	= new SearchConstraints();
-			constraints.setMaxResults(-1);*/
-			
 			search	= createGoal("amscap.ams_search_agents");
 			search.getParameter("description").setValue(desc);
 			search.getParameter("constraints").setValue(constraints);
@@ -209,15 +200,9 @@ public class AMSTestPlan extends Plan
 		{
 			getLogger().info("\nSearching for agent again.");
 			
-			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("agentidentifier").getValue(), null, null, null);
+			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("agentidentifier").getValue(), null, null, null, null);
 			constraints = amsservice.createSearchConstraints(-1, 0);
 	
-			/*desc	= new AMSAgentDescription();
-			//desc.setName((AgentIdentifier)create.getResult());
-			desc.setName((AgentIdentifier)create.getParameter("agentidentifier").getValue());
-			constraints	= new SearchConstraints();
-			constraints.setMaxResults(-1);*/
-			
 			search	= createGoal("amscap.ams_search_agents");
 			search.getParameter("description").setValue(desc);
 			search.getParameter("constraints").setValue(constraints);

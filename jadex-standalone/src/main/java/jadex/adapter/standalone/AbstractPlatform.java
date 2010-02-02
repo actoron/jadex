@@ -113,7 +113,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 
 			/*
 			final IAMS ams = getAMSService();
-			ams.getAgentIdentifiers(new IResultListener()
+			ams.getComponentIdentifiers(new IResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
@@ -186,7 +186,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 
 				// Hack!! Should not need to rely on preconfigured system agents. 
 				// Should instead use agent types? 
-				AgentIdentifier[] sagents = (AgentIdentifier[])daemonagents.toArray(new AgentIdentifier[daemonagents.size()]);
+				ComponentIdentifier[] sagents = (ComponentIdentifier[])daemonagents.toArray(new ComponentIdentifier[daemonagents.size()]);
 				for(int i = 0; i < sagents.length; i++)
 				{
 					try
@@ -291,7 +291,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 	}
 	
 	/**
-	 *  Create an agent.
+	 *  Create a component.
 	 */
 	protected void createComponent(String name, String model, String config, Map args, final boolean daemon)
 	{
@@ -446,7 +446,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 						{
 							public void resultAvailable(Object result)
 							{
-								AgentIdentifier aid = (AgentIdentifier)result;
+								ComponentIdentifier aid = (ComponentIdentifier)result;
 								IAMS ams = (IAMS)platform.getService(IAMS.class);
 								ams.startAgent(aid, null);
 							}

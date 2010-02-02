@@ -524,10 +524,8 @@
 							     the dealers is registered at the directory facilitator.
 							     Note, that the dealer only offers one service, that is 'dealing'
 							     (see service description below).	-->
-							<!-- SFipa.createAgentDescription(null,
-								SFipa.createServiceDescription("dealing", "blackjack", "University of Hamburg"))-->
 							((IDF)$scope.getServiceContainer().getService(IDF.class))
-								.createDFAgentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
+								.createDFComponentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
 								.createDFServiceDescription("dealing", "blackjack", "University of Hamburg"))
 	
 						</value>

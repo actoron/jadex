@@ -1,6 +1,6 @@
 package jadex.adapter.standalone.fipaimpl;
 
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.bridge.IComponentIdentifier;
 
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  *  An agent description.
  */
-public class DFAgentDescription implements IDFAgentDescription, Serializable
+public class DFComponentDescription implements IDFComponentDescription, Serializable
 {
 	//-------- attributes ----------
 
@@ -40,7 +40,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	/**
 	 *  Create a new agent description.
 	 */
-	public DFAgentDescription()
+	public DFComponentDescription()
 	{
 		this(null);
 	}
@@ -49,7 +49,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	 *  Create a new agent description.
 	 *  @param name The name.
 	 */
-	public DFAgentDescription(IComponentIdentifier name)
+	public DFComponentDescription(IComponentIdentifier name)
 	{
 		this(name, null, null, null, null, null);
 	}
@@ -62,7 +62,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	 *  @param ontologies The ontologies.
 	 *  @param languages The languages.
 	 */
-	public DFAgentDescription(IComponentIdentifier name, IDFServiceDescription[] services, 
+	public DFComponentDescription(IComponentIdentifier name, IDFServiceDescription[] services, 
 		String[] protocols, String[] ontologies, String[] languages, Date leasetime)
 	{
 		this.languages = new ArrayList();
@@ -89,7 +89,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	//-------- accessor methods --------
 	
 	/**
-	 *  Get the languages of this AgentDescription.
+	 *  Get the languages of this ComponentDescription.
 	 *  @return languages
 	 */
 	public String[] getLanguages()
@@ -98,7 +98,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Set the languages of this AgentDescription.
+	 *  Set the languages of this ComponentDescription.
 	 * @param languages the value to be set
 	 */
 	public void setLanguages(String[] languages)
@@ -109,7 +109,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Get an languages of this AgentDescription.
+	 *  Get an languages of this ComponentDescription.
 	 *  @param idx The index.
 	 *  @return languages
 	 */
@@ -119,7 +119,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Set a language to this AgentDescription.
+	 *  Set a language to this ComponentDescription.
 	 *  @param idx The index.
 	 *  @param language a value to be added
 	 */
@@ -129,7 +129,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Add a language to this AgentDescription.
+	 *  Add a language to this ComponentDescription.
 	 *  @param language a value to be removed
 	 */
 	public void addLanguage(String language)
@@ -138,7 +138,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Remove a language from this AgentDescription.
+	 *  Remove a language from this ComponentDescription.
 	 *  @param language a value to be removed
 	 *  @return  True when the languages have changed.
 	 */
@@ -149,7 +149,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 
 
 	/**
-	 *  Get the agentidentifier of this AgentDescription.
+	 *  Get the agentidentifier of this ComponentDescription.
 	 * @return agentidentifier
 	 */
 	public IComponentIdentifier getName()
@@ -158,7 +158,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Set the agentidentifier of this AgentDescription.
+	 *  Set the agentidentifier of this ComponentDescription.
 	 * @param name the value to be set
 	 */
 	public void setName(IComponentIdentifier name)
@@ -167,7 +167,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Get the ontologies of this AgentDescription.
+	 *  Get the ontologies of this ComponentDescription.
 	 * @return ontologies
 	 */
 	public String[] getOntologies()
@@ -176,7 +176,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Set the ontologies of this AgentDescription.
+	 *  Set the ontologies of this ComponentDescription.
 	 * @param ontologies the value to be set
 	 */
 	public void setOntologies(String[] ontologies)
@@ -187,7 +187,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Get an ontologies of this AgentDescription.
+	 *  Get an ontologies of this ComponentDescription.
 	 *  @param idx The index.
 	 *  @return ontologies
 	 */
@@ -197,7 +197,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Set a ontology to this AgentDescription.
+	 *  Set a ontology to this ComponentDescription.
 	 *  @param idx The index.
 	 *  @param ontology a value to be added
 	 */
@@ -207,7 +207,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Add a ontology to this AgentDescription.
+	 *  Add a ontology to this ComponentDescription.
 	 *  @param ontology a value to be removed
 	 */
 	public void addOntology(String ontology)
@@ -216,7 +216,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Remove a ontology from this AgentDescription.
+	 *  Remove a ontology from this ComponentDescription.
 	 *  @param ontology a value to be removed
 	 *  @return  True when the ontologies have changed.
 	 */
@@ -226,7 +226,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Get the services of this AgentDescription.
+	 *  Get the services of this ComponentDescription.
 	 * @return services
 	 */
 	public IDFServiceDescription[] getServices()
@@ -235,7 +235,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Set the services of this AgentDescription.
+	 *  Set the services of this ComponentDescription.
 	 * @param services the value to be set
 	 */
 	public void setServices(IDFServiceDescription[] services)
@@ -246,7 +246,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Get an services of this AgentDescription.
+	 *  Get an services of this ComponentDescription.
 	 *  @param idx The index.
 	 *  @return services
 	 */
@@ -256,7 +256,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Set a service to this AgentDescription.
+	 *  Set a service to this ComponentDescription.
 	 *  @param idx The index.
 	 *  @param service a value to be added
 	 */
@@ -266,7 +266,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Add a service to this AgentDescription.
+	 *  Add a service to this ComponentDescription.
 	 *  @param service a value to be removed
 	 */
 	public void addService(IDFServiceDescription service)
@@ -275,7 +275,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Remove a service from this AgentDescription.
+	 *  Remove a service from this ComponentDescription.
 	 *  @param service a value to be removed
 	 *  @return  True when the services have changed.
 	 */
@@ -285,7 +285,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Get the lease-time of this AgentDescription.
+	 *  Get the lease-time of this ComponentDescription.
 	 * @return lease-time
 	 */
 	public java.util.Date getLeaseTime()
@@ -294,7 +294,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Set the lease-time of this AgentDescription.
+	 *  Set the lease-time of this ComponentDescription.
 	 * @param leasetime the value to be set
 	 */
 	public void setLeaseTime(java.util.Date leasetime)
@@ -303,7 +303,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Get the protocols of this AgentDescription.
+	 *  Get the protocols of this ComponentDescription.
 	 * @return protocols
 	 */
 	public String[] getProtocols()
@@ -312,7 +312,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Set the protocols of this AgentDescription.
+	 *  Set the protocols of this ComponentDescription.
 	 * @param protocols the value to be set
 	 */
 	public void setProtocols(String[] protocols)
@@ -323,7 +323,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Get an protocols of this AgentDescription.
+	 *  Get an protocols of this ComponentDescription.
 	 *  @param idx The index.
 	 *  @return protocols
 	 */
@@ -333,7 +333,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Set a protocol to this AgentDescription.
+	 *  Set a protocol to this ComponentDescription.
 	 *  @param idx The index.
 	 *  @param protocol a value to be added
 	 */
@@ -343,7 +343,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Add a protocol to this AgentDescription.
+	 *  Add a protocol to this ComponentDescription.
 	 *  @param protocol a value to be removed
 	 */
 	public void addProtocol(String protocol)
@@ -352,7 +352,7 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Remove a protocol from this AgentDescription.
+	 *  Remove a protocol from this ComponentDescription.
 	 *  @param protocol a value to be removed
 	 *  @return  True when the protocols have changed.
 	 */
@@ -363,14 +363,14 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 
 	/** 
 	 * @param obj
-	 * @return true if obj is an AgentDescription and both are equal
+	 * @return true if obj is an ComponentDescription and both are equal
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object obj)
 	{
-		if(!(obj instanceof DFAgentDescription))
+		if(!(obj instanceof DFComponentDescription))
 			return false;
-		DFAgentDescription ad = (DFAgentDescription)obj;
+		DFComponentDescription ad = (DFComponentDescription)obj;
 
 		return eq(ad.name, name) && eq(ad.leasetime, leasetime) && eq(ad.languages, languages) && eq(ad.ontologies, ontologies) && eq(ad.protocols, protocols) && eq(ad.services, services);
 	}
@@ -386,13 +386,13 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 	}
 
 	/**
-	 *  Clone an agent description.
+	 *  Clone a component description.
 	 */
 	public Object clone()
 	{
 		try
 		{
-			DFAgentDescription ret = (DFAgentDescription)super.clone();
+			DFComponentDescription ret = (DFComponentDescription)super.clone();
 			ret.services = new ArrayList();
 			ret.protocols = (List)((ArrayList)protocols).clone();
 			ret.languages = (List)((ArrayList)languages).clone();
@@ -411,11 +411,11 @@ public class DFAgentDescription implements IDFAgentDescription, Serializable
 
 
 	/**
-	 *  Get a string representation of this AgentDescription.
+	 *  Get a string representation of this ComponentDescription.
 	 *  @return The string representation.
 	 */
 	public String toString()
 	{
-		return "AgentDescription(" + getName() + (leasetime!=null ? ", "+leasetime.getTime()+")" : ")");
+		return "ComponentDescription(" + getName() + (leasetime!=null ? ", "+leasetime.getTime()+")" : ")");
 	}
 }

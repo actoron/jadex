@@ -111,7 +111,9 @@ public class OnlineUsersPlugin implements XWikiPluginInterface
 			// Add users from end of list (i.e. newest first)
 			for(int i=users.size()-1; i>=0 && (result.size()<max || max==-1); i--)
 			{
-				result.add(users.get(i));
+				String	user	= (String)users.get(i);
+				if(user.startsWith(context.getDatabase()+":"))
+					result.add(user.substring(context.getDatabase().length()+1));
 			}
 		}
 //		System.out.println("getOnlineUsers: "+result);
@@ -218,7 +220,7 @@ public class OnlineUsersPlugin implements XWikiPluginInterface
 					guests.remove(sessionuser);
 				}
 				
-				sessionuser	= contextuser;
+				sessionuser	= context.getDatabase()+":"+contextuser;
 				session.setAttribute(USERID, sessionuser);
 				users.remove(sessionuser);	// Hack!!! linear complexity.
 				users.add(sessionuser);				
@@ -227,6 +229,8 @@ public class OnlineUsersPlugin implements XWikiPluginInterface
 			userdates.put(sessionuser, new Long(System.currentTimeMillis()));
 		}
 //		System.out.println("user: "+sessionuser);
+//		System.out.println("users: "+users);
+//		System.out.println("guests: "+guests);
 	}
 	
 	/**

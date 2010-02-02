@@ -2,7 +2,7 @@ package jadex.bdi.examples.cleanerworld_classic.cleaner;
 
 import jadex.adapter.base.fipa.IAgentAction;
 import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
@@ -61,14 +61,8 @@ public abstract class RemoteActionPlan extends Plan
 		{
 			IDF df = (IDF)getScope().getServiceContainer().getService(IDF.class);
 			IDFServiceDescription sd = df.createDFServiceDescription(null, "dispatch vision", null);
-			IDFAgentDescription ad = df.createDFAgentDescription(null, sd);
-			
-			// Create a service description to search for.
-			/*ServiceDescription sd = new ServiceDescription();
-			sd.setType("dispatch vision");
-			AgentDescription dfadesc = new AgentDescription();
-			dfadesc.addService(sd);*/
-	
+			IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
+				
 			// Use a subgoal to search for a translation agent
 			IGoal ft = createGoal("df_search");
 			ft.getParameter("description").setValue(ad);
@@ -76,7 +70,7 @@ public abstract class RemoteActionPlan extends Plan
 				ft.getParameter("df").setValue(getBeliefbase().getBelief("df").getFact());
 			dispatchSubgoalAndWait(ft);
 			//Object result = ft.getResult();
-			IDFAgentDescription[] tas = (IDFAgentDescription[])ft.getParameterSet("result").getValues();
+			IDFComponentDescription[] tas = (IDFComponentDescription[])ft.getParameterSet("result").getValues();
 
 			if(tas.length!=0)
 			{

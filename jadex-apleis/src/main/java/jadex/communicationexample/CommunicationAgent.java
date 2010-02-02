@@ -52,13 +52,13 @@ public class CommunicationAgent extends MicroAgent implements AgentListener
 
 		try
 		{
-			String myname = getAgentIdentifier().getLocalName();
+			String myname = getComponentIdentifier().getLocalName();
 			eis.registerAgent(myname);
 
 			String myentityname = "en"+myname.substring(myname.length()-1);
 			eis.associateEntity(myname, myentityname);
 			
-			eis.attachAgentListener(getAgentIdentifier().getLocalName(), this);
+			eis.attachAgentListener(getComponentIdentifier().getLocalName(), this);
 		}
 		catch(Exception e)
 		{
@@ -72,7 +72,7 @@ public class CommunicationAgent extends MicroAgent implements AgentListener
 				try
 				{
 					String tell = (String)getArgument("tell")==null? "huhu" : (String)getArgument("tell");
-					eis.performAction(getAgentIdentifier().getLocalName(), 
+					eis.performAction(getComponentIdentifier().getLocalName(), 
 						new Action("tellall", new Identifier(tell)));
 				}
 				catch(Exception e)

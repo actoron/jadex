@@ -232,7 +232,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 //		{
 //			Boolean	profile	= (Boolean)AgentRules.evaluateExpression(state, mprofiling, new OAVBDIFetcher(state, ragent));
 //			if(profile!=null && profile.booleanValue())
-//				state.setProfiler(new Profiler("./"+getAgentAdapter().getAgentIdentifier().getLocalName()+".profile.ser"));
+//				state.setProfiler(new Profiler("./"+getAgentAdapter().getComponentIdentifier().getLocalName()+".profile.ser"));
 //		}
 
 		// Initialize tool adapters.
@@ -384,7 +384,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 //
 ////				// Assert for testing state consistency (slow -> comment out for release!)
 ////				assert rulesystem.getState().getUnreferencedObjects().isEmpty()
-////					: getAgentAdapter().getAgentIdentifier().getLocalName()
+////					: getAgentAdapter().getComponentIdentifier().getLocalName()
 ////					+ ", " + entries[i]
 ////					+ ", " + rulesystem.getState().getUnreferencedObjects();
 //			}
@@ -445,7 +445,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 					
 //					// Assert for testing state consistency (slow -> comment out for release!)
 //					assert rulesystem.getState().getUnreferencedObjects().isEmpty()
-//						: getAgentAdapter().getAgentIdentifier().getLocalName()
+//						: getAgentAdapter().getComponentIdentifier().getLocalName()
 //						+ ", " + rulesystem.getAgenda().getLastActivation()
 //						+ ", " + rulesystem.getState().getUnreferencedObjects();
 
@@ -479,7 +479,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 					lastmin	= state.getSize();
 					StringBuffer	buf	= new StringBuffer();
 					buf.append("OAVState objects: ");
-					buf.append(getAgentAdapter().getAgentIdentifier().getLocalName());
+					buf.append(getAgentAdapter().getComponentIdentifier().getLocalName());
 					buf.append(", ");
 					buf.append(state.getSize());
 					buf.append("\n");
@@ -582,7 +582,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 */
 	public void messageArrived(final IMessageAdapter message)
 	{
-//		System.out.println("messageArrived: "+getAgentAdapter().getAgentIdentifier().getLocalName()+", "+message);
+//		System.out.println("messageArrived: "+getAgentAdapter().getComponentIdentifier().getLocalName()+", "+message);
 		// Notify/ask tools that we are about to receive a message.
 //		boolean	toolmsg	= false;
 //		for(int i=0; !toolmsg && i<tooladapters.length; i++)
@@ -596,7 +596,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				public void run()
 				{
 					state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_inbox, message);
-//					System.out.println("message moved to inbox: "+getAgentAdapter().getAgentIdentifier().getLocalName()
+//					System.out.println("message moved to inbox: "+getAgentAdapter().getComponentIdentifier().getLocalName()
 //						+"("+state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)+")"+", "+message);
 				}
 			});
@@ -867,7 +867,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 
 //						// Assert for testing state consistency (slow -> comment out for release!)
 //						assert rulesystem.getState().getUnreferencedObjects().isEmpty()
-//							: getAgentAdapter().getAgentIdentifier().getLocalName()
+//							: getAgentAdapter().getComponentIdentifier().getLocalName()
 //							+ ", " + code
 //							+ ", " + rulesystem.getState().getUnreferencedObjects();
 					}

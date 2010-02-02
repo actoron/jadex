@@ -2,8 +2,8 @@ package jadex.adapter.standalone.service.componentexecution;
 
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.standalone.StandaloneComponentAdapter;
-import jadex.adapter.standalone.fipaimpl.AMSAgentDescription;
-import jadex.adapter.standalone.fipaimpl.AgentIdentifier;
+import jadex.adapter.standalone.fipaimpl.CESComponentDescription;
+import jadex.adapter.standalone.fipaimpl.ComponentIdentifier;
 import jadex.adapter.standalone.fipaimpl.SearchConstraints;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
@@ -52,6 +52,9 @@ public class ComponentExecutionService implements IComponentExecutionService
 	/** The component descriptions (id -> component description). */
 	protected Map descs;
 	
+	/** The cleanup commands for the components (component id -> cleanup command). */
+	protected Map ccs;
+	
 	/** The logger. */
 	protected Logger logger;
 
@@ -72,6 +75,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 		this.container = container;
 		this.adapters = Collections.synchronizedMap(SCollection.createHashMap());
 		this.descs = Collections.synchronizedMap(SCollection.createLinkedHashMap());
+		this.ccs = SCollection.createLinkedHashMap();
 		this.logger = Logger.getLogger(container.getName()+".cms");
 		this.listeners = SCollection.createMultiCollection();
 		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());
@@ -134,9 +138,9 @@ public class ComponentExecutionService implements IComponentExecutionService
 
 		// Create id and adapter.
 		
-		final AgentIdentifier cid;
+		final ComponentIdentifier cid;
 		final StandaloneComponentAdapter adapter;
-		final AMSAgentDescription	ad;
+		final CESComponentDescription	ad;
 		synchronized(adapters)
 		{
 			synchronized(descs)
@@ -147,7 +151,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 				}
 				else
 				{
-					cid = new AgentIdentifier(name+"@"+container.getName()); // Hack?!
+					cid = new ComponentIdentifier(name+"@"+container.getName()); // Hack?!
 					if(adapters.containsKey(cid))
 					{
 						listener.exceptionOccurred(this, new RuntimeException("Agent name already exists on agent platform: "+cid));
@@ -158,7 +162,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 						cid.setAddresses(ms.getAddresses());
 				}
 		
-				ad	= new AMSAgentDescription(cid, type, parent);
+				ad	= new CESComponentDescription(cid, type, parent);
 				if(suspend)
 				{
 					ad.setState(IComponentDescription.STATE_SUSPENDED);
@@ -207,9 +211,9 @@ public class ComponentExecutionService implements IComponentExecutionService
 	protected void createComponentInstance(String config, Map args,
 			boolean suspend, IResultListener listener,
 			final IResultListener resultlistener, IComponentFactory factory,
-			ILoadableComponentModel lmodel, final AgentIdentifier cid,
+			ILoadableComponentModel lmodel, final ComponentIdentifier cid,
 			StandaloneComponentAdapter adapter, StandaloneComponentAdapter pad,
-			AMSAgentDescription ad, IExternalAccess parent)
+			CESComponentDescription ad, IExternalAccess parent)
 	{
 		// Create the component instance.
 		IComponentInstance instance = factory.createComponentInstance(adapter, lmodel, config, args, parent);
@@ -256,17 +260,18 @@ public class ComponentExecutionService implements IComponentExecutionService
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
+		CESComponentDescription	desc;
 		synchronized(adapters)
 		{
 			synchronized(descs)
 			{
-				// Kill subcomponents
+				// Kill subcomponents: todo store subcomponents for speed (multicollection)
 				for(Iterator it=descs.values().iterator(); it.hasNext(); )
 				{
-					IComponentDescription	desc	= (IComponentDescription)it.next();
-					if(cid.equals(desc.getParent()))
+					IComponentDescription	sub	= (IComponentDescription)it.next();
+					if(cid.equals(sub.getParent()))
 					{
-						destroyComponent(desc.getName(), null);	// todo: cascading delete with wait.
+						destroyComponent(sub.getName(), null);	// todo: cascading delete with wait.
 					}
 				}
 				
@@ -284,7 +289,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 				
 				// todo: does not work always!!! A search could be issued before agents had enough time to kill itself!
 				// todo: killAgent should only be called once for each agent?
-				AMSAgentDescription	desc	= (AMSAgentDescription)descs.get(cid);
+				desc	= (CESComponentDescription)descs.get(cid);
 				if(desc!=null)
 				{
 					// Resume a suspended agent before killing it.
@@ -292,13 +297,23 @@ public class ComponentExecutionService implements IComponentExecutionService
 						resumeComponent(cid, null);
 					
 					if(IComponentDescription.STATE_ACTIVE.equals(desc.getState()))
-					//if(!AMSAgentDescription.STATE_TERMINATING.equals(desc.getState()))
 					{
 						desc.setState(IComponentDescription.STATE_TERMINATING);
-//						if(listeners.get(aid)!=null)
-//							throw new RuntimeException("Multiple result listeners for agent: "+aid);
-//						listeners.put(aid, listener);
-						agent.killComponent(new CleanupCommand(cid, listener));
+						CleanupCommand	cc	= new CleanupCommand(cid);
+						ccs.put(cid, cc);
+						if(listener!=null)
+							cc.addKillListener(listener);
+						agent.killComponent(cc);						
+					}
+					else if(IComponentDescription.STATE_TERMINATING.equals(desc.getState()))
+					{
+						if(listener!=null)
+						{
+							CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
+							if(cc==null)
+								listener.exceptionOccurred(this, new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
+							cc.addKillListener(listener);
+						}
 					}
 					else
 					{
@@ -307,6 +322,19 @@ public class ComponentExecutionService implements IComponentExecutionService
 					}
 				}
 			}
+		}
+
+		IComponentListener[]	alisteners;
+		synchronized(listeners)
+		{
+			Set	slisteners	= new HashSet(listeners.getCollection(null));
+			slisteners.addAll(listeners.getCollection(cid));
+			alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+		}
+		// todo: can be called after listener has (concurrently) deregistered
+		for(int i=0; i<alisteners.length; i++)
+		{
+			alisteners[i].componentChanged(desc);
 		}
 	}
 
@@ -319,25 +347,52 @@ public class ComponentExecutionService implements IComponentExecutionService
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
+		CESComponentDescription ad;
 		synchronized(adapters)
 		{
 			synchronized(descs)
 			{
+				// Suspend subcomponents
+				for(Iterator it=descs.values().iterator(); it.hasNext(); )
+				{
+					IComponentDescription	sub	= (IComponentDescription)it.next();
+					if(componentid.equals(sub.getParent())
+						&& (IComponentDescription.STATE_ACTIVE.equals(sub.getState())
+							|| IComponentDescription.STATE_TERMINATING.equals(sub.getState())))
+					{
+						suspendComponent(sub.getName(), null);	// todo: cascading suspend with wait?
+					}
+				}
+
 				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
-				AMSAgentDescription ad = (AMSAgentDescription)descs.get(componentid);
+				ad = (CESComponentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
 					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
 					//throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
-				if(!IComponentDescription.STATE_ACTIVE.equals(ad.getState()))
+				if(!IComponentDescription.STATE_ACTIVE.equals(ad.getState())
+					&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState()))
+				{
 					listener.exceptionOccurred(this, new RuntimeException("Only active components can be suspended: "+componentid+" "+ad.getState()));
 					//throw new RuntimeException("Only active agents can be suspended: "+aid+" "+ad.getState());
-				
-				// todo: call listener when suspension has finished!!!
+				}
 				
 				ad.setState(IComponentDescription.STATE_SUSPENDED);
 				IExecutionService exe = (IExecutionService)container.getService(IExecutionService.class);
 				exe.cancel(adapter, listener);
 			}
+		}
+		
+		IComponentListener[]	alisteners;
+		synchronized(listeners)
+		{
+			Set	slisteners	= new HashSet(listeners.getCollection(null));
+			slisteners.addAll(listeners.getCollection(componentid));
+			alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+		}
+		// todo: can be called after listener has (concurrently) deregistered
+		for(int i=0; i<alisteners.length; i++)
+		{
+			alisteners[i].componentChanged(ad);
 		}
 	}
 	
@@ -350,14 +405,24 @@ public class ComponentExecutionService implements IComponentExecutionService
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
-		AMSAgentDescription ad;
+		CESComponentDescription ad;
 		
 		synchronized(adapters)
 		{
 			synchronized(descs)
 			{
+				// Resume subcomponents
+				for(Iterator it=descs.values().iterator(); it.hasNext(); )
+				{
+					IComponentDescription	sub	= (IComponentDescription)it.next();
+					if(componentid.equals(sub.getParent()) && IComponentDescription.STATE_SUSPENDED.equals(sub.getState()))
+					{
+						resumeComponent(sub.getName(), null);	// todo: cascading resume with wait?
+					}
+				}
+
 				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
-				ad = (AMSAgentDescription)descs.get(componentid);
+				ad = (CESComponentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
 					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
 					//throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
@@ -369,7 +434,19 @@ public class ComponentExecutionService implements IComponentExecutionService
 				adapter.wakeup();
 			}
 		}
-//		pcs.firePropertyChange("agents", null, adapters);
+		
+		IComponentListener[]	alisteners;
+		synchronized(listeners)
+		{
+			Set	slisteners	= new HashSet(listeners.getCollection(null));
+			slisteners.addAll(listeners.getCollection(componentid));
+			alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+		}
+		// todo: can be called after listener has (concurrently) deregistered
+		for(int i=0; i<alisteners.length; i++)
+		{
+			alisteners[i].componentChanged(ad);
+		}
 	
 		listener.resultAvailable(this, ad);
 	}
@@ -388,12 +465,12 @@ public class ComponentExecutionService implements IComponentExecutionService
 			synchronized(descs)
 			{
 				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
-				AMSAgentDescription ad = (AMSAgentDescription)descs.get(componentid);
-				if(adapter==null || ad==null)
+				IComponentDescription cd = (IComponentDescription)descs.get(componentid);
+				if(adapter==null || cd==null)
 					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
 					//throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
-				if(!IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
-					listener.exceptionOccurred(this, new RuntimeException("Only suspended components can be stepped: "+componentid+" "+ad.getState()));
+				if(!IComponentDescription.STATE_SUSPENDED.equals(cd.getState()))
+					listener.exceptionOccurred(this, new RuntimeException("Only suspended components can be stepped: "+componentid+" "+cd.getState()));
 					//throw new RuntimeException("Only suspended agents can be resumed: "+aid+" "+ad.getState());
 				
 				adapter.doStep(listener);
@@ -401,7 +478,6 @@ public class ComponentExecutionService implements IComponentExecutionService
 				exe.execute(adapter);
 			}
 		}
-//		pcs.firePropertyChange("agents", null, adapters);	
 	}
 
 	/**
@@ -413,10 +489,10 @@ public class ComponentExecutionService implements IComponentExecutionService
 	 */
 	public void setComponentBreakpoints(IComponentIdentifier componentid, String[] breakpoints)
 	{
-		AMSAgentDescription ad;
+		CESComponentDescription ad;
 		synchronized(descs)
 		{
-			ad = (AMSAgentDescription)descs.get(componentid);
+			ad = (CESComponentDescription)descs.get(componentid);
 			ad.setBreakpoints(breakpoints);
 		}
 		
@@ -471,13 +547,12 @@ public class ComponentExecutionService implements IComponentExecutionService
 	class CleanupCommand implements IResultListener
 	{
 		protected IComponentIdentifier cid;
-		protected IResultListener listener;
+		protected List killlisteners;
 		
-		public CleanupCommand(IComponentIdentifier cid, IResultListener listener)
+		public CleanupCommand(IComponentIdentifier cid)
 		{
 //			System.out.println("CleanupCommand created");
 			this.cid = cid;
-			this.listener = listener;
 		}
 		
 		public void resultAvailable(Object source, Object result)
@@ -497,7 +572,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 					
 					results = adapter.getComponentInstance().getResults();
 					
-					AMSAgentDescription	desc	= (AMSAgentDescription)descs.get(cid);
+					CESComponentDescription	desc	= (CESComponentDescription)descs.get(cid);
 					desc.setState(IComponentDescription.STATE_TERMINATED);
 					descs.remove(cid);
 					
@@ -556,13 +631,29 @@ public class ComponentExecutionService implements IComponentExecutionService
 			
 //			System.out.println("CleanupCommand end.");
 			
-			if(listener!=null)
-				listener.resultAvailable(source, result);
+			if(killlisteners!=null)
+			{
+				for(int i=0; i<killlisteners.size(); i++)
+				{
+					((IResultListener)killlisteners.get(i)).resultAvailable(source, result);
+				}
+			}
 		}
 		
 		public void exceptionOccurred(Object source, Exception exception)
 		{
 			resultAvailable(source, cid);
+		}
+		
+		/**
+		 *  Add a listener to be informed, when the component has terminated.
+		 * @param listener
+		 */
+		public void	addKillListener(IResultListener listener)
+		{
+			if(killlisteners==null)
+				killlisteners	= new ArrayList();
+			killlisteners.add(listener);
 		}
 	}
 	
@@ -610,7 +701,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 	{
 		if(local)
 			name = name + "@" + container.getName();
-		return new AgentIdentifier(name, addresses, null);		
+		return new ComponentIdentifier(name, addresses, null);		
 	}
 
 	/**
@@ -628,15 +719,17 @@ public class ComponentExecutionService implements IComponentExecutionService
 	}
 	
 	/**
-	 * Create a ams agent description.
+	 * Create a component description.
 	 * @param id The component identifier.
 	 * @param state The state.
 	 * @param ownership The ownership.
-	 * @return The ams agent description.
+	 * @param type The component type.
+	 * @param parent The parent.
+	 * @return The component description.
 	 */
-	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type)
+	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, IComponentIdentifier parent)
 	{
-		AMSAgentDescription	ret	= new AMSAgentDescription(id, type, null);
+		CESComponentDescription	ret	= new CESComponentDescription(id, type, parent);
 		ret.setState(state);
 		ret.setOwnership(ownership);
 		return ret;
@@ -654,13 +747,13 @@ public class ComponentExecutionService implements IComponentExecutionService
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
 		
-		AMSAgentDescription ret = (AMSAgentDescription)descs.get(cid); // Hack!
-		if(ret!=null)
-		{
-			// Todo: addresses required for communication across platforms.
-//			ret.setName(refreshAgentIdentifier(aid));
-			ret	= (AMSAgentDescription)ret.clone();
-		}
+		IComponentDescription	ret = (IComponentDescription)descs.get(cid);	// Todo: synchronize?
+//			if(ret!=null)
+//			{
+//				// Todo: addresses required for communication across platforms.
+////				ret.setName(refreshComponentIdentifier(aid));
+//				ret	= (IComponentDescription)ret.clone();
+//			}
 		
 		listener.resultAvailable(this, ret);
 	}
@@ -674,7 +767,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
 		
-		listener.resultAvailable(this, descs.values().toArray(new AMSAgentDescription[0]));
+		listener.resultAvailable(this, descs.values().toArray(new IComponentDescription[0]));	// Todo: synchronize?
 	}
 	
 	/**
@@ -693,7 +786,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 			ret = (IComponentIdentifier[])adapters.keySet().toArray(new IComponentIdentifier[adapters.size()]);
 			// Todo: addresses required for inter-platform comm.
 //			for(int i=0; i<ret.length; i++)
-//				ret[i] = refreshAgentIdentifier(ret[i]); // Hack!
+//				ret[i] = refreshComponentIdentifier(ret[i]); // Hack!
 		}
 		
 		listener.resultAvailable(this, ret);
@@ -709,22 +802,22 @@ public class ComponentExecutionService implements IComponentExecutionService
 			throw new RuntimeException("Result listener required.");
 		
 //		System.out.println("search: "+agents);
-		AMSAgentDescription[] ret;
+		CESComponentDescription[] ret;
 
 		// If name is supplied, just lookup description.
 		if(adesc!=null && adesc.getName()!=null)
 		{
-			AMSAgentDescription ad = (AMSAgentDescription)descs.get(adesc.getName());
+			CESComponentDescription ad = (CESComponentDescription)descs.get(adesc.getName());
 			if(ad!=null && ad.getName().equals(adesc.getName()))
 			{
 				// Todo: addresses reuqired for interplatform comm.
-//				ad.setName(refreshAgentIdentifier(ad.getName()));
-				AMSAgentDescription	desc	= (AMSAgentDescription)ad.clone();
-				ret = new AMSAgentDescription[]{desc};
+//				ad.setName(refreshComponentIdentifier(ad.getName()));
+				CESComponentDescription	desc	= (CESComponentDescription)ad.clone();
+				ret = new CESComponentDescription[]{desc};
 			}
 			else
 			{
-				ret	= new AMSAgentDescription[0];
+				ret	= new CESComponentDescription[0];
 			}
 		}
 
@@ -736,16 +829,18 @@ public class ComponentExecutionService implements IComponentExecutionService
 			{
 				for(Iterator it=descs.values().iterator(); it.hasNext(); )
 				{
-					AMSAgentDescription	test	= (AMSAgentDescription)it.next();
+					CESComponentDescription	test	= (CESComponentDescription)it.next();
 					if(adesc==null ||
 						(adesc.getOwnership()==null || adesc.getOwnership().equals(test.getOwnership()))
-						&& (adesc.getState()==null || adesc.getState().equals(test.getState())))
+						&& (adesc.getParent()==null || adesc.getParent().equals(test.getParent()))
+						&& (adesc.getType()==null || adesc.getType().equals(test.getType()))
+						&& (adesc.getState()==null || adesc.getState().equals(test.getState())))					
 					{
-						tmp.add(test.clone());
+						tmp.add(test);
 					}
 				}
 			}
-			ret	= (AMSAgentDescription[])tmp.toArray(new AMSAgentDescription[tmp.size()]);
+			ret	= (CESComponentDescription[])tmp.toArray(new CESComponentDescription[tmp.size()]);
 		}
 
 		//System.out.println("searched: "+ret);
@@ -757,15 +852,15 @@ public class ComponentExecutionService implements IComponentExecutionService
 	 *  @param name The base name.
 	 *  @return The component identifier.
 	 */
-	protected AgentIdentifier generateComponentIdentifier(String name)
+	protected ComponentIdentifier generateComponentIdentifier(String name)
 	{
-		AgentIdentifier ret = null;
+		ComponentIdentifier ret = null;
 
 		synchronized(adapters)
 		{
 			do
 			{
-				ret = new AgentIdentifier(name+(compcnt++)+"@"+container.getName()); // Hack?!
+				ret = new ComponentIdentifier(name+(compcnt++)+"@"+container.getName()); // Hack?!
 			}
 			while(adapters.containsKey(ret));
 		}
@@ -787,10 +882,10 @@ public class ComponentExecutionService implements IComponentExecutionService
 		assert IComponentDescription.STATE_SUSPENDED.equals(state)
 			|| IComponentDescription.STATE_WAITING.equals(state) : "wrong state: "+comp+", "+state;
 		
-		AMSAgentDescription	desc	= null;
+		CESComponentDescription	desc	= null;
 		synchronized(descs)
 		{
-			desc	= (AMSAgentDescription)descs.get(comp);
+			desc	= (CESComponentDescription)descs.get(comp);
 			desc.setState(state);			
 		}
 		

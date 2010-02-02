@@ -7,10 +7,10 @@ public class DFRegister implements IAgentAction {
 	// -------- attributes ----------
 
 	/** Attribute for slot result. */
-	protected IDFAgentDescription result;
+	protected IDFComponentDescription result;
 
 	/** Attribute for slot dfagentdescription. */
-	protected IDFAgentDescription dfagentdescription;
+	protected IDFComponentDescription dfagentdescription;
 
 	// -------- constructors --------
 
@@ -24,7 +24,7 @@ public class DFRegister implements IAgentAction {
 	/**
 	 * Create a new <code>DFRegister</code>.
 	 */
-	public DFRegister(IDFAgentDescription dfagentdescription, IDFAgentDescription result)
+	public DFRegister(IDFComponentDescription dfagentdescription, IDFComponentDescription result)
 	{
 		this.dfagentdescription	= dfagentdescription;
 		this.result	= result;
@@ -37,7 +37,7 @@ public class DFRegister implements IAgentAction {
 	 * 
 	 * @return result
 	 */
-	public IDFAgentDescription getResult() {
+	public IDFComponentDescription getResult() {
 		return this.result;
 	}
 
@@ -47,7 +47,7 @@ public class DFRegister implements IAgentAction {
 	 * @param result
 	 *            the value to be set
 	 */
-	public void setResult(IDFAgentDescription result) {
+	public void setResult(IDFComponentDescription result) {
 		this.result = result;
 	}
 
@@ -56,7 +56,7 @@ public class DFRegister implements IAgentAction {
 	 * 
 	 * @return dfagentdescription
 	 */
-	public IDFAgentDescription getAgentDescription() {
+	public IDFComponentDescription getComponentDescription() {
 		return this.dfagentdescription;
 	}
 
@@ -66,7 +66,7 @@ public class DFRegister implements IAgentAction {
 	 * @param dfagentdescription
 	 *            the value to be set
 	 */
-	public void setAgentDescription(IDFAgentDescription dfagentdescription) {
+	public void setComponentDescription(IDFComponentDescription dfagentdescription) {
 		this.dfagentdescription = dfagentdescription;
 	}
 

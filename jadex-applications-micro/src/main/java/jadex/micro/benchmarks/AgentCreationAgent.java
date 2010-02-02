@@ -53,18 +53,7 @@ public class AgentCreationAgent extends MicroAgent
 //				System.out.println("Args: "+num+" "+args);
 
 			final IComponentExecutionService ces = (IComponentExecutionService)getServiceContainer().getService(IComponentExecutionService.class);
-			ces.createComponent(createPeerName(num+1), getClass().getName()+".class", null, args, false, null, null, null);
-//				createResultListener(new IResultListener()
-//			{
-//				public void resultAvailable(Object result)
-//				{
-//					ces.startComponent((IComponentIdentifier)result, null);
-//				}
-//				public void exceptionOccurred(Exception exception)
-//				{
-//					exception.printStackTrace();
-//				}
-//			}), getAgentIdentifier());				
+			ces.createComponent(createPeerName(num+1), getClass().getName()+".class", null, args, false, null, null, null);		
 		}
 		else
 		{
@@ -91,7 +80,7 @@ public class AgentCreationAgent extends MicroAgent
 	 */
 	protected String createPeerName(int num)
 	{
-		String	name = getAgentIdentifier().getLocalName();
+		String	name = getComponentIdentifier().getLocalName();
 		int	index	= name.indexOf("Peer_#");
 		if(index!=-1)
 		{

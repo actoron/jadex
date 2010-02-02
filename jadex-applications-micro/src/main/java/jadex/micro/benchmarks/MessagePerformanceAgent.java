@@ -31,7 +31,7 @@ public class MessagePerformanceAgent extends MicroAgent
 	public void executeBody()
 	{
 		int msgcnt = ((Integer)getArgument("max")).intValue();
-		IComponentIdentifier receiver = getAgentIdentifier();
+		IComponentIdentifier receiver = getComponentIdentifier();
 		starttime = getTime();
 		
 		System.out.println("Now sending " + msgcnt + " messages to " + receiver);

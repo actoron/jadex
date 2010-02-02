@@ -27,7 +27,7 @@ public class WatchdogTestPlan extends AbstractMultipleAgentsPlan
 		List agents = createAgents("/jadex/bdi/testcases/planlib/PingReceiver.agent.xml", args);	
 
 		ObservationDescription desc = new ObservationDescription();
-		desc.setAgentIdentifier((IComponentIdentifier)agents.get(0));
+		desc.setComponentIdentifier((IComponentIdentifier)agents.get(0));
 		desc.setContacts(new ContactData[]{new ContactData("Admin", "braubach@gmx.net", null, null)});
 		desc.setPingDelay(500);
 		

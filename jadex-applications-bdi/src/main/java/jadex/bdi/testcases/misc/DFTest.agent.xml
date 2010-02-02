@@ -53,7 +53,7 @@
 					<parameter ref="description">
 						<value>
 							((IDF)$scope.getServiceContainer().getService(IDF.class))
-								.createDFAgentDescription(null, new IDFServiceDescription[]
+								.createDFComponentDescription(null, new IDFServiceDescription[]
 								{
 									((IDF)$scope.getServiceContainer().getService(IDF.class))
 										.createDFServiceDescription("service_a", "a", "a"),

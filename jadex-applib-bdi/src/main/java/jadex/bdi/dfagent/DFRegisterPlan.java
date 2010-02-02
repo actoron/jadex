@@ -2,7 +2,7 @@ package jadex.bdi.dfagent;
 
 import jadex.adapter.base.fipa.DFRegister;
 import jadex.adapter.base.fipa.Done;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
@@ -21,10 +21,10 @@ public class DFRegisterPlan extends Plan
 		DFRegister re = (DFRegister)getParameter("action").getValue();
 
 		IGoal reg = createGoal("df_register");
-		reg.getParameter("description").setValue(re.getAgentDescription());
+		reg.getParameter("description").setValue(re.getComponentDescription());
 		dispatchSubgoalAndWait(reg);
 
-		re.setResult((IDFAgentDescription)reg.getParameter("result").getValue());
+		re.setResult((IDFComponentDescription)reg.getParameter("result").getValue());
 		getParameter("result").setValue(new Done(re));
 	}
 }

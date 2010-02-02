@@ -2,7 +2,7 @@ package jadex.simulation.client;
 
 import jadex.adapter.base.ISimulationService;
 import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFAgentDescription;
+import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.application.runtime.IApplicationExternalAccess;
@@ -218,7 +218,7 @@ public class RuntimeManagerPlan extends Plan {
 		// Create a service description to search for.
 		IDF df = (IDF) getScope().getServiceContainer().getService(IDF.class);
 		IDFServiceDescription sd = df.createDFServiceDescription("master_simulation_agent", null, null);
-		IDFAgentDescription ad = df.createDFAgentDescription(null, sd);
+		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 		// ISearchConstraints sc = df.createSearchConstraints(-1, 0);
 
 		// Use a subgoal to search for a dealer-agent
@@ -226,13 +226,13 @@ public class RuntimeManagerPlan extends Plan {
 		ft.getParameter("description").setValue(ad);
 		// ft.getParameter("constraints").setValue(sc);
 		dispatchSubgoalAndWait(ft);
-		IDFAgentDescription[] result = (IDFAgentDescription[]) ft.getParameterSet("result").getValues();
+		IDFComponentDescription[] result = (IDFComponentDescription[]) ft.getParameterSet("result").getValues();
 
 		if (result == null || result.length == 0) {
 			getLogger().warning("No master simulation agent found.");
 			fail();
 		} else {
-			// at least one matching AgentDescription found,
+			// at least one matching component found,
 			getLogger().info(result.length + " master simulation agent found");
 
 			// choose one dealer randomly out of all the dealer-agents

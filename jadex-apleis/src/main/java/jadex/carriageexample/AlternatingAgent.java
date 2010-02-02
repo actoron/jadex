@@ -52,7 +52,7 @@ public class AlternatingAgent extends MicroAgent
 
 		try
 		{
-			eis.associateEntity(getAgentIdentifier().getName(), (String)eis.getFreeEntities().get(0));
+			eis.associateEntity(getComponentIdentifier().getName(), (String)eis.getFreeEntities().get(0));
 		}
 		catch(RelationException e)
 		{
@@ -67,18 +67,18 @@ public class AlternatingAgent extends MicroAgent
 				{
 					// perceive
 					List percepts = null;
-					percepts = eis.getAllPercepts(getAgentIdentifier().getName(), SUtil.EMPTY_STRING);
+					percepts = eis.getAllPercepts(getComponentIdentifier().getName(), SUtil.EMPTY_STRING);
 					say("I believe the carriage is at " + percepts);
 
 					// act
-					eis.performAction(getAgentIdentifier().getName(), new Action("push", new Parameter[0]), SUtil.EMPTY_STRING);
+					eis.performAction(getComponentIdentifier().getName(), new Action("push", new Parameter[0]), SUtil.EMPTY_STRING);
 
 					// perceive
-					percepts = eis.getAllPercepts(getAgentIdentifier().getName(), SUtil.EMPTY_STRING);
+					percepts = eis.getAllPercepts(getComponentIdentifier().getName(), SUtil.EMPTY_STRING);
 					say("I believe the carriage is at " + percepts);
 
 					// act
-					eis.performAction(getAgentIdentifier().getName(), new Action("wait", new Parameter[0]), SUtil.EMPTY_STRING);
+					eis.performAction(getComponentIdentifier().getName(), new Action("wait", new Parameter[0]), SUtil.EMPTY_STRING);
 
 					waitFor(950, this);
 				}
@@ -97,7 +97,7 @@ public class AlternatingAgent extends MicroAgent
 	 */
 	protected void say(String msg) 
 	{
-		System.out.println(getAgentIdentifier() + " says: " + msg);
+		System.out.println(getComponentIdentifier() + " says: " + msg);
 	}
 	
 }
