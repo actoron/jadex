@@ -31,6 +31,7 @@ import java.util.Set;
  */
 public class BasicModelRepositoryService implements IModelRepositoryService
 {
+	private static final String LIBRARY_STATE_PATH = System.getProperty("java.io.tmpdir").concat(File.separator).concat("wfms_lib_state.db");
 	private static final String REPOSITORY_PATH = System.getProperty("java.io.tmpdir").concat(File.separator).concat("wfms_repository.db");
 	
 	/** The wfms. */
@@ -279,27 +280,70 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 	
 	private void readRepository() throws IOException
 	{
+		try
+		{
+			File file = new File(LIBRARY_STATE_PATH);
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			String line = reader.readLine();
+			while (line != null)
+			{
+				try
+				{
+					((ILibraryService) wfms.getService(ILibraryService.class)).addPath(line);
+				}
+				catch (Exception e)
+				{
+				}
+				line = reader.readLine();
+			}
+			
+			reader.close();
+		}
+		catch (Exception e)
+		{
+		}
+		
 		File file = new File(REPOSITORY_PATH);
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		
-		String filename = reader.readLine();
-		while (filename != null)
+		String line = reader.readLine();
+		while (line != null)
 		{
 			try
 			{
-				loadProcessModel(filename);
+				loadProcessModel(line);
 			}
 			catch (Exception e)
 			{
 			}
-			filename = reader.readLine();
+			line = reader.readLine();
 		}
+		reader.close();
 		
 		writeRepository();
 	}
 	
 	private void writeRepository()
 	{
+		try
+		{
+			File tmpFile = File.createTempFile("wfms_lib_state", null);
+			PrintWriter writer = new PrintWriter(tmpFile);
+			
+			List urls = ((ILibraryService) wfms.getService(ILibraryService.class)).getURLs();
+			for (Iterator it = urls.iterator(); it.hasNext(); )
+			{
+				URL url = (URL) it.next();
+				if ((new File(url.getPath()).isDirectory()))
+					writer.println(url.getPath());
+			}
+			writer.close();
+			tmpFile.renameTo(new File(LIBRARY_STATE_PATH));
+		}
+		catch (IOException e)
+		{
+		}
+		
 		boolean done = false;
 		while (!done)
 		{

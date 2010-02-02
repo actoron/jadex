@@ -63,10 +63,6 @@
 				new jadex.wfms.service.impl.MetaExecutionService($platform)
 			</property>
 			
-			<property type="jadex.wfms.service.IModelRepositoryService" name="wfms_model_repository">
-				new jadex.wfms.service.impl.BasicModelRepositoryService($platform)
-			</property>
-			
 			<property type="jadex.wfms.service.IAdministrationService" name="wfms_administration_service">
 				new jadex.wfms.service.impl.AdministrationService($platform)
 			</property>
@@ -81,6 +77,10 @@
 			
 			<property type="jadex.wfms.service.IWfmsClientService" name="wfms_wfmsclient_service">
 				$platform.getService(jadex.wfms.service.IClientService.class)
+			</property>
+			
+			<property type="jadex.wfms.service.IModelRepositoryService" name="wfms_model_repository">
+				new jadex.wfms.service.impl.BasicModelRepositoryService($platform)
 			</property>
 		</properties>
 	</properties>
