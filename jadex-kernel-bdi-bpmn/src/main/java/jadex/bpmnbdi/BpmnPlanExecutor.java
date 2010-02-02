@@ -130,6 +130,8 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		BpmnPlanBodyInstance bodyinstance = (BpmnPlanBodyInstance)interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body);
 		if(bodyinstance==null)
 		{
+//			System.out.println("Creating plan body for rplan: "+rplan+" "
+//				+interpreter.getState().getAttributeValue(interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
 			bodyinstance = (BpmnPlanBodyInstance)createPlanBody(interpreter, rcapa, rplan);
 			interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body, bodyinstance);
 		}
@@ -220,6 +222,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			{
 				// Reset waitqueue of plan.
 				bodyinstance.updateWaitqueue(null);
+				PlanRules.cleanupPlanWait(interpreter.getState(), rcapa, rplan, false);
 
 				PlanRules.initializeWait(wa, timeout, interpreter.getState(), rcapa, rplan);
 				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING);

@@ -27,7 +27,7 @@ public class EventIntermediateRuleActicityHandler	extends DefaultActivityHandler
 //		thread.setWaitingState(ProcessThread.WAITING_FOR_RULE);
 		thread.setWaiting(true);
 		thread.setWaitInfo(type);
-		System.out.println("Waiting for rule: "+type);
+//		System.out.println("Waiting for rule: "+type);
 		
 		// Does currently only match message type name.
 		thread.setWaitFilter(new IFilter()

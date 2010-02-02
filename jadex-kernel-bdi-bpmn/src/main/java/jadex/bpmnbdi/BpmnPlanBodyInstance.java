@@ -221,12 +221,13 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	
 	/**
 	 *  Update the waiting threads according to the wakeup reason (dispatched element).
+	 *  The corresponding waiting activity/thread is notified. 
 	 */
 	public void updateWaitingThreads()
 	{
 		if(waittimes!=null)
 		{
-			IClockService	clock	= (IClockService)interpreter.getComponentAdapter().getServiceContainer().getService(IClockService.class);
+			IClockService clock = (IClockService)interpreter.getComponentAdapter().getServiceContainer().getService(IClockService.class);
 			
 			for(Iterator it=waittimes.keySet().iterator(); it.hasNext(); )
 			{
@@ -1384,7 +1385,10 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 						}
 						thread.setNonWaiting();
 						if(state.containsObject(rplan))
+						{
+//							System.out.println("Ready: "+activity+" "+thread);
 							state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+						}
 					}
 					else
 					{
@@ -1408,7 +1412,10 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 				}
 				thread.setNonWaiting();
 				if(state.containsObject(rplan))
+				{
+//					System.out.println("Ready: "+activity+" "+thread);
 					state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+				}
 			}
 			else
 			{

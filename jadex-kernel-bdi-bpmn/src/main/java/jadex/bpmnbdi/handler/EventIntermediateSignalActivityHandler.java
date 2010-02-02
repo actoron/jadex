@@ -2,6 +2,8 @@ package jadex.bpmnbdi.handler;
 
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.runtime.IInternalEvent;
+import jadex.bdi.runtime.impl.InternalEventFlyweight;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
@@ -28,7 +30,7 @@ public class EventIntermediateSignalActivityHandler	extends DefaultActivityHandl
 		final String type = (String)thread.getPropertyValue("type", activity);
 		thread.setWaiting(true);
 		thread.setWaitInfo(type);
-		System.out.println("Waiting for internal event: "+type);
+//		System.out.println("Waiting for internal event: "+type);
 		
 		// Does currently only match message type name.
 		thread.setWaitFilter(new IFilter()
@@ -38,6 +40,9 @@ public class EventIntermediateSignalActivityHandler	extends DefaultActivityHandl
 				boolean ret = false;
 				BpmnPlanBodyInstance inst = (BpmnPlanBodyInstance)instance;
 				IOAVState state = inst.getState();
+				// Hack?!
+				if(event instanceof IInternalEvent)
+					event = ((InternalEventFlyweight)event).getHandle();
 				if(OAVBDIRuntimeModel.internalevent_type.equals(state.getType(event)))
 				{
 					Object mmsg = state.getAttributeValue(event, OAVBDIRuntimeModel.element_has_model);

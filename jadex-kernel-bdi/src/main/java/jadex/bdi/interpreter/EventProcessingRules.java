@@ -182,9 +182,9 @@ public class EventProcessingRules
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new OrConstraint(new IConstraint[]
   		{
-  				new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rpe, IOperator.CONTAINS),
-  				new BoundConstraint(OAVBDIRuntimeModel.capability_has_internalevents, rpe, IOperator.CONTAINS),
-  				new BoundConstraint(OAVBDIRuntimeModel.capability_has_messageevents, rpe, IOperator.CONTAINS)
+  			new BoundConstraint(OAVBDIRuntimeModel.capability_has_goals, rpe, IOperator.CONTAINS),
+  			new BoundConstraint(OAVBDIRuntimeModel.capability_has_internalevents, rpe, IOperator.CONTAINS),
+  			new BoundConstraint(OAVBDIRuntimeModel.capability_has_messageevents, rpe, IOperator.CONTAINS)
   		}));
 
 //		ObjectCondition	wacon	= new ObjectCondition(wa.getType());
@@ -205,10 +205,10 @@ public class EventProcessingRules
 			OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING));
 		planconwa.addConstraint(new OrConstraint(new IConstraint[]
  		{
- 				// RPlan waiting for (new) goal not allowed, only goalfinished, which is handled elsewhere.
- 				new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_messageevents}, org, IOperator.CONTAINS),
- 				new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes}, mpe, IOperator.CONTAINS),
- 				new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes}, mpe, IOperator.CONTAINS),
+ 			// RPlan waiting for (new) goal not allowed, only goalfinished, which is handled elsewhere.
+ 			new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_messageevents}, org, IOperator.CONTAINS),
+ 			new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_internaleventtypes}, mpe, IOperator.CONTAINS),
+ 			new BoundConstraint(new OAVAttributeType[]{OAVBDIRuntimeModel.plan_has_waitabstraction, OAVBDIRuntimeModel.waitabstraction_has_messageeventtypes}, mpe, IOperator.CONTAINS),
  		}));
 		
 		ObjectCondition	candconpi	= new ObjectCondition(candpi.getType());
