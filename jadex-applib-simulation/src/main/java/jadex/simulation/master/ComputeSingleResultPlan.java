@@ -99,38 +99,7 @@ public class ComputeSingleResultPlan extends Plan {
 		
 		//trigger the start of the next experiment
 		dispatchInternalEvent(createInternalEvent("triggerNewExperiment"));
-		
-		
-//		int runs = ((Integer) getBeliefbase().getBelief("runningSimulations")
-//				.getFact()).intValue();
-//		runs -= 1;
-//		getBeliefbase().getBelief("runningSimulations").setFact(
-//				new Integer(runs));
-//
-//		// Check, to start second round!
-//		int receivedResults = ((Integer) getBeliefbase().getBelief(
-//				"runningSimulations").getFact()).intValue();
-//		System.out.println("***********************Checking for Restart! -->"
-//				+ receivedResults);
-//
-//		if (receivedResults == 0) {
-//			for (int i = 0; i < 3; i++) {
-//				startApplication();
-//				runs = ((Integer) getBeliefbase().getBelief(
-//						"runningSimulations").getFact()).intValue();
-//				runs += 1;
-//				getBeliefbase().getBelief("runningSimulations").setFact(
-//						new Integer(runs));
-//
-//				runs = ((Integer) getBeliefbase().getBelief(
-//						"numberOfRuns").getFact()).intValue();
-//				runs += 1;
-//				getBeliefbase().getBelief("numberOfRuns").setFact(
-//						new Integer(runs));
-//
-//				waitFor(5000);
-//			}
-//		}
+				
 	}
 
 //	/**
@@ -165,21 +134,16 @@ public class ComputeSingleResultPlan extends Plan {
 		long startTime = ((Long) content.get(Constants.EXPERIMENT_START_TIME)).longValue();
 		long endTime = ((Long) content.get(Constants.EXPERIMENT_END_TIME)).longValue();
 		String experimentId = (String) content.get(Constants.EXPERIMENT_ID);
-//		), endTime, experimentID, name, optimizationValue, optimizationParameterName
-		//transform events list
-		ArrayList<ObservedEvent> res = new ArrayList<ObservedEvent>();
-		for(ArrayList<ObservedEvent> target : events){
-//			for(ArrayList<ObservedEvent> tmpList : obj){
-//				
-//			}
-			
-			
-				for(ObservedEvent myEvent : target){
-					res.add(myEvent);	
-				}				
-			
-		}
-		return new ExperimentResult(startTime, endTime, experimentId, simConf.getName(), String.valueOf(simConf.getOptimization().getParameterSweeping().getCurrentValue()), simConf.getOptimization().getData().getName(), res);
+
+		//transform events list, little hack...
+		ArrayList<ObservedEvent> result = new ArrayList<ObservedEvent>();
 		
+		for(ArrayList<ObservedEvent> target : events){			
+				for(ObservedEvent myEvent : target){
+					result.add(myEvent);	
+				}				
+		}
+
+		return new ExperimentResult(startTime, endTime, experimentId, simConf.getName(), String.valueOf(simConf.getOptimization().getParameterSweeping().getCurrentValue()), simConf.getOptimization().getData().getName(), result);		
 	}
 }

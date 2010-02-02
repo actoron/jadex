@@ -6,9 +6,12 @@ import java.util.HashMap;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.simulation.helper.Constants;
+import jadex.simulation.helper.TimeConverter;
 import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.ObservedEvent;
+import jadex.simulation.model.result.RowResult;
 import jadex.simulation.model.result.SimulationResult;
+import jadex.simulation.persist.HelpElement;
 
 /**
  * Compute the results of one row of simulation experiments, e.g. experiments with the same setting but still different cause of non-determinism.
@@ -39,7 +42,8 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 			result.setName("missing");
 			result.setRowsResults(new ArrayList(rowResults.values()));
 			
-			XMLHandler.writeXML(result, "SimRes.xml", SimulationResult.class);
+			System.out.println("Write Res of Simulation to XML");			
+			XMLHandler.writeXML(result, "SimRes" + result.getStarttime() + ".xml", SimulationResult.class);
 			
 		} else {
 

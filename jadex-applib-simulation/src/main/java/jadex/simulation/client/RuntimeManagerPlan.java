@@ -12,6 +12,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 import jadex.service.execution.IExecutionService;
@@ -55,7 +56,7 @@ public class RuntimeManagerPlan extends Plan {
 		
 		//TEST
 		ContinuousSpace2D spaceTMP = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope()
-				.getParent()).getSpace("my2dspace");
+				.getParent()).getSpace("my2dspace");								        
 //		IExecutionService exeservice = (IExecutionService) space.getContext().getServiceContainer().getService(IExecutionService.class);
 		IServiceContainer exeservice =  spaceTMP.getContext().getServiceContainer();
 //		DeltaTimeExecutor4Simulation exeservice = (DeltaTimeExecutor4Simulation) spaceTMP.getContext().getServiceContainer().getService(DeltaTimeExecutor4Simulation.class);
@@ -155,8 +156,21 @@ public class RuntimeManagerPlan extends Plan {
 		// waitFor(2000);
 		// simServ.shutdown(null);
 		System.out.println("Trying to kill component....");
-		getExternalAccess().killAgent();
-		spaceTMP.getContext().killComponent(null);
+//		getExternalAccess().killAgent();
+		spaceTMP.getContext().killComponent(new IResultListener() {
+			
+			@Override
+			public void resultAvailable(Object source, Object result) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void exceptionOccurred(Object source, Exception exception) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 //		 getExternalAccess().getApplicationContext().killComponent(null);
 
 	}
