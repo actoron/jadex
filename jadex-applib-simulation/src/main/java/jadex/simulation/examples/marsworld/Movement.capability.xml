@@ -7,7 +7,7 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	name="Movement"
-	package="jadex.simulation.examples.marsworld">
+	package="jadex.bdi.examples.marsworld.movement">
 
 	<imports>
 		<import>jadex.application.runtime.*</import>

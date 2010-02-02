@@ -33,6 +33,7 @@
 		<import>jadex.bdi.examples.marsworld.producer.*</import>
 		<import>jadex.bdi.examples.marsworld.sentry.*</import>		
 		<import>jadex.bdi.examples.marsworld.movement.*</import>
+		<import>jadex.bdi.examples.marsworld.movement.MoveTask</import>
 		<import>java.text.SimpleDateFormat</import>		
 		<import>jadex.simulation.environment.DeltaTimeExecutor4Simulation</import>
 	</imports>
@@ -123,7 +124,7 @@
 
 			<env:perspectives>
 				<env:perspective name="icons" class="Perspective2D"
-					opengl="true">
+					opengl="false">
 
 					<!-- Target -->
 					<env:drawable objecttype="target" width="0.1" height="0.1">
@@ -250,10 +251,10 @@
 	</spacetypes>
 
 	<agenttypes>
-		<!-- <agenttype name="Sentry"
-			filename="jadex/simulation/examples/marsworld/Sentry.agent.xml" />-->
-			<agenttype name="Sentry"
-			filename="jadex/bdi/examples/marsworld/sentry/Sentry.agent.xml" />
+		 <agenttype name="Sentry"
+			filename="jadex/simulation/examples/marsworld/Sentry.agent.xml" />
+			<!--<agenttype name="Sentry"
+			filename="jadex/bdi/examples/marsworld/sentry/Sentry.agent.xml" />-->
 		<agenttype name="Producer"
 			filename="jadex/bdi/examples/marsworld/producer/Producer.agent.xml" />
 		<agenttype name="Carry"

@@ -73,7 +73,7 @@ public class ComputeSingleResultPlan extends Plan {
 			for(ObservedEvent event : values){
 				tmp += " - " + event.toString();
 				//Persist value				
-				XMLHandler.writeXML(event, "abcresult.xml", ObservedEvent.class);
+//				XMLHandler.writeXML(event, "abcresult.xml", ObservedEvent.class);
 			}
 			System.out.println(key.toString()  + " : " + tmp);
 		}
@@ -159,14 +159,27 @@ public class ComputeSingleResultPlan extends Plan {
 //		}
 //	}
 	
-	private ExperimentResult toExperimentResult(Map content, ArrayList<ObservedEvent> events){
+	private ExperimentResult toExperimentResult(Map content, ArrayList<ArrayList<ObservedEvent>> events){
 		SimulationConfiguration simConf = (SimulationConfiguration) content.get(Constants.SIMULATION_FACTS_FOR_CLIENT);
 		
 		long startTime = ((Long) content.get(Constants.EXPERIMENT_START_TIME)).longValue();
 		long endTime = ((Long) content.get(Constants.EXPERIMENT_END_TIME)).longValue();
 		String experimentId = (String) content.get(Constants.EXPERIMENT_ID);
 //		), endTime, experimentID, name, optimizationValue, optimizationParameterName
-		return new ExperimentResult(startTime, endTime, experimentId, simConf.getName(), String.valueOf(simConf.getOptimization().getParameterSweeping().getCurrentValue()), simConf.getOptimization().getData().getName(), events);
+		//transform events list
+		ArrayList<ObservedEvent> res = new ArrayList<ObservedEvent>();
+		for(ArrayList<ObservedEvent> target : events){
+//			for(ArrayList<ObservedEvent> tmpList : obj){
+//				
+//			}
+			
+			
+				for(ObservedEvent myEvent : target){
+					res.add(myEvent);	
+				}				
+			
+		}
+		return new ExperimentResult(startTime, endTime, experimentId, simConf.getName(), String.valueOf(simConf.getOptimization().getParameterSweeping().getCurrentValue()), simConf.getOptimization().getData().getName(), res);
 		
 	}
 }

@@ -14,6 +14,7 @@ import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.Optimization;
 import jadex.simulation.model.SimulationConfiguration;
+import jadex.simulation.model.result.ExperimentResult;
 import jadex.simulation.model.result.RowResult;
 import jadex.simulation.model.result.SimulationResult;
 
@@ -117,19 +118,29 @@ public class StartSimulationExperimentsPlan extends Plan {
 		
 		
 		//store results of row
-		HashMap experimentResults = (HashMap) getBeliefbase().getBelief("experimentResults").getFact();//contains the results of the experiments done in this row
+		HashMap<Integer, ExperimentResult> experimentResults = (HashMap<Integer, ExperimentResult>) getBeliefbase().getBelief("experimentResults").getFact();//contains the results of the experiments done in this row
 		HashMap rowResults = (HashMap) getBeliefbase().getBelief("rowResults").getFact();
 		
-		rowResult.setExperimentsResults(new ArrayList(experimentResults.values()));
+		
+//		System.out.println("#StartSimEx# tttttttttttttttttttttttttt.");
+//		for(ExperimentResult ttt : experimentResults.values()){
+//			System.out.println("#StartSimEx# ttt " + ttt.toString());
+//			XMLHandler.writeXML(ttt, "rowRes.xml", ExperimentResult.class);	
+//		}
+//		
+		
+		rowResult.setExperimentsResults(new ArrayList<ExperimentResult>(experimentResults.values()));
 		rowResult.setEndtime(getClock().getTime());
+		rowResult.setName("Tmp-Test");
 		
 		rowResults.put(rowResult.getId(), rowResult);
 		
 		getBeliefbase().getBelief("experimentResults").setFact(new HashMap());
 		getBeliefbase().getBelief("rowResults").setFact(rowResults);
 		
+//		System.out.println("#StartSimEx# Try to write RowResult to XML-File.");
 		
-		XMLHandler.writeXML(rowResult, "rowRes.xml", RowResult.class);
+//		XMLHandler.writeXML(rowResult, "rowRes.xml", RowResult.class);
 		
 		//evaluate row
 		dispatchInternalEvent(createInternalEvent("triggerExperimentRowEvaluation"));

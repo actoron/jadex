@@ -154,9 +154,10 @@ public class RuntimeManagerPlan extends Plan {
 		// simServ.start();
 		// waitFor(2000);
 		// simServ.shutdown(null);
+		System.out.println("Trying to kill component....");
 		getExternalAccess().killAgent();
 		spaceTMP.getContext().killComponent(null);
-		// getExternalAccess().getApplicationContext().killComponent(null);
+//		 getExternalAccess().getApplicationContext().killComponent(null);
 
 	}
 

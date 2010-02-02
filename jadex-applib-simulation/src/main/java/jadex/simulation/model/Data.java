@@ -7,9 +7,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name="Data")
 public class Data {
 
-	private String name;
-	private ObjectSource objectSource;
-	private ElementSource elementSource;
+	private String name = null;
+	private ObjectSource objectSource = null;
+	private ElementSource elementSource = null;
 	
 	
 	@XmlElement(name="ObjectSource")

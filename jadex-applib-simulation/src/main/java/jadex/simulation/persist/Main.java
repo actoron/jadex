@@ -1,8 +1,12 @@
 package jadex.simulation.persist;
 
 import jadex.simulation.helper.XMLHandler;
+import jadex.simulation.model.Data;
 import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.SimulationConfiguration;
+import jadex.simulation.model.result.ExperimentResult;
+import jadex.simulation.model.result.RowResult;
+import jadex.simulation.model.result.SimulationResult;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,6 +21,8 @@ import javax.xml.bind.Unmarshaller;
 public class Main {
 
 	public static void main(String[] args) {
+		
+		testXMLOutput();
 //		Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("Europe/Berlin"));
 		Calendar cal = GregorianCalendar.getInstance();
 		cal.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
@@ -30,7 +36,7 @@ public class Main {
 		
 		HelpElement event = new HelpElement();
 		event.setApplicationName("Wow1");
-		XMLHandler.writeXML(event, "test.xml", HelpElement.class);
+//		XMLHandler.writeXML(event, "test.xml", HelpElement.class);
 //		XMLHandler.writeXML(simConf, "test.xml", SimulationConfiguration.class);
 //		
 		
@@ -124,6 +130,51 @@ public class Main {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	private static void testXMLOutput(){
+		
+		SimulationResult simRes = new SimulationResult();
+		simRes.setEndtime(2198);
+		simRes.setId("wow1");
+		simRes.setName("MyName");
+		simRes.setStarttime(1457);
+		
+		
+		
+		RowResult rowRes  = new RowResult();
+		rowRes.setId("row1");
+		rowRes.setName("myRow1");
+		
+		ExperimentResult exRes = new ExperimentResult();
+		exRes.setId("ExResId1");
+		exRes.setName("NameExRes");
+		
+		ObservedEvent event = new ObservedEvent();
+		event.setValue("123");
+		event.setApplicationName("EventId1");
+		event.setDataReference(new Data());
+		
+		ObservedEvent event2 = new ObservedEvent();
+		event2.setValue("12345");
+		event2.setApplicationName("EventId2");
+		event2.setDataReference(new Data());
+		
+		
+		exRes.addEvent(event);
+		exRes.addEvent(event2);
+		rowRes.addExperimentsResults(exRes);		
+		simRes.addRowsResults(rowRes);
+		
+//		rowRes  = new RowResult();
+//		rowRes.setId("row2");
+//		rowRes.setName("myRow2");
+//				
+//		simRes.addRowsResults(rowRes);
+		
+//		XMLHandler.writeXML(simRes, "abc.xml", SimulationResult.class);
+		XMLHandler.writeXML(exRes, "abc.xml", ExperimentResult.class);
+		
 	}
 
 }
