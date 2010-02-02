@@ -64,11 +64,7 @@
 			</property>
 			
 			<property type="jadex.wfms.service.IModelRepositoryService" name="wfms_model_repository">
-				new jadex.wfms.service.impl.BasicModelRepositoryService($platform, new String[] {"jadex/wfms/simulation/testflow/Credit_Workflow.bpmn",
-							  																	 "jadex/wfms/simulation/testflow/Document_Test.bpmn",
-							  																	 "jadex/wfms/simulation/testflow/Text_Test.bpmn",
-							  																	 "jadex/wfms/simulation/testflow/ListChoice_Test.bpmn",
-							  																	 "jadex/wfms/simulation/testflow/testflow.gpmn"})
+				new jadex.wfms.service.impl.BasicModelRepositoryService($platform)
 			</property>
 			
 			<property type="jadex.wfms.service.IAdministrationService" name="wfms_administration_service">

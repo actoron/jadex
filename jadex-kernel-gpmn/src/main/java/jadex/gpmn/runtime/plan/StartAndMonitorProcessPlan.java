@@ -79,9 +79,12 @@ public class StartAndMonitorProcessPlan extends Plan
 			if(mviolated!=null)
 			{
 				waitForGoal(mviolated);
+				mviolated = null;
 			}
 		}
 		while(mviolated!=null);
+		
+		killComponent();
 	}
 	
 	public void passed()

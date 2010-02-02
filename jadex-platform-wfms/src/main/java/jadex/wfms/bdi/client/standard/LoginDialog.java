@@ -3,12 +3,14 @@ package jadex.wfms.bdi.client.standard;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class LoginDialog extends JDialog
@@ -35,6 +37,13 @@ public class LoginDialog extends JDialog
 		addUserNameField();
 		addPasswordField();
 		
+		JPanel buttonFiller = new JPanel();
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridy = 4;
+		gbc.weightx = 1;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		getContentPane().add(buttonFiller, gbc);
+		
 		JButton loginButton = new JButton();
 		loginButton.setAction(new AbstractAction()
 		{
@@ -44,17 +53,15 @@ public class LoginDialog extends JDialog
 			}
 		});
 		loginButton.setText(LOGIN_BUTTON_TEXT);
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		//gbc.gridwidth = 2;
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
 		gbc.gridy = 4;
-		gbc.anchor = GridBagConstraints.SOUTH;
+		gbc.insets = new Insets(5, 5, 5, 5);
+		gbc.anchor = GridBagConstraints.EAST;
 		getContentPane().add(loginButton, gbc);
 		
 		pack();
-		setSize(400, 150);
+		setSize(400, 130);
 	}
 	
 	public String getUserName()
@@ -72,6 +79,7 @@ public class LoginDialog extends JDialog
 		JLabel userNameLabel = new JLabel(USER_NAME_LABEL);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridwidth = 2;
 		gbc.weightx = 1;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -81,6 +89,7 @@ public class LoginDialog extends JDialog
 		userNameField.setText(INITIAL_USERNAME_TEXT);
 		gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridwidth = 2;
 		gbc.weightx = 2;
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -93,6 +102,7 @@ public class LoginDialog extends JDialog
 		JLabel passwordLabel = new JLabel(PASSWORD_LABEL);
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridwidth = 2;
 		gbc.weightx = 1;
 		gbc.gridx = 0;
 		gbc.gridy = 2;
@@ -101,6 +111,7 @@ public class LoginDialog extends JDialog
 		passwordField = new JTextField();
 		gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridwidth = 2;
 		gbc.weightx = 2;
 		gbc.gridx = 0;
 		gbc.gridy = 3;

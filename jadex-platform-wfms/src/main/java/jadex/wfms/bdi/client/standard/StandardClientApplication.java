@@ -408,11 +408,17 @@ public class StandardClientApplication
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				String path = (String)JOptionPane.showInputDialog(mainFrame,
-																  "Enter new process path:",
-	                    										  "Add Process",
-	                    										  JOptionPane.PLAIN_MESSAGE,
-	                    										  null, null, null);
+				IGoal modelGoal = agent.createGoal("clientcap.request_loadable_model_paths");
+				agent.dispatchTopLevelGoalAndWait(modelGoal);
+				Set modelSet = (Set) modelGoal.getParameter("loadable_model_paths").getValue();
+				AddProcessModelDialog dialog = new AddProcessModelDialog(mainFrame, modelSet);
+				dialog.setLocation(SGUI.calculateMiddlePosition(dialog));
+				dialog.setVisible(true);
+				
+				String path = dialog.getProcessPath();
+				if (path == null)
+					return;
+				
 				IGoal addGoal = agent.createGoal("clientcap.add_process");
 				addGoal.getParameter("process_path").setValue(path);
 				try

@@ -25,8 +25,8 @@
     <incomingEdges>_eGXR0KaKEd6kg8fxk-W9OA</incomingEdges>
   </vertices>
   <vertices xsi:type="gpmn:AchieveGoal" id="_IDvvMKaKEd6kg8fxk-W9OA" name="Install Interior">
-    <outgoingEdges>_eGXR0KaKEd6kg8fxk-W9OA</outgoingEdges>
     <outgoingEdges>_dxi4YKaKEd6kg8fxk-W9OA</outgoingEdges>
+    <outgoingEdges>_eGXR0KaKEd6kg8fxk-W9OA</outgoingEdges>
     <incomingEdges>_Lqy7MAUNEd-Ctc2JUze7Kw</incomingEdges>
   </vertices>
   <vertices xsi:type="gpmn:AchieveGoal" id="_KtlfQKaKEd6kg8fxk-W9OA" name="Produce Engine">
@@ -42,14 +42,14 @@
     <incomingEdges>_cJjm4KaKEd6kg8fxk-W9OA</incomingEdges>
   </vertices>
   <vertices xsi:type="gpmn:AchieveGoal" id="_Uj9ugKaKEd6kg8fxk-W9OA" name="Produce Chassis">
-    <outgoingEdges>_cJjm4KaKEd6kg8fxk-W9OA</outgoingEdges>
-    <outgoingEdges>_bryFwKaKEd6kg8fxk-W9OA</outgoingEdges>
     <outgoingEdges>_bQXVEKaKEd6kg8fxk-W9OA</outgoingEdges>
+    <outgoingEdges>_bryFwKaKEd6kg8fxk-W9OA</outgoingEdges>
+    <outgoingEdges>_cJjm4KaKEd6kg8fxk-W9OA</outgoingEdges>
     <incomingEdges>_MUXcoAUNEd-Ctc2JUze7Kw</incomingEdges>
   </vertices>
   <vertices xsi:type="gpmn:AchieveGoal" id="_X4mIAKaKEd6kg8fxk-W9OA" name="Produce Car">
-    <outgoingEdges>_MUXcoAUNEd-Ctc2JUze7Kw</outgoingEdges>
     <outgoingEdges>_Lqy7MAUNEd-Ctc2JUze7Kw</outgoingEdges>
+    <outgoingEdges>_MUXcoAUNEd-Ctc2JUze7Kw</outgoingEdges>
     <contextcondition></contextcondition>
   </vertices>
   <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_bQXVEKaKEd6kg8fxk-W9OA"/>

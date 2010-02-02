@@ -117,6 +117,19 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	}
 	
 	/**
+	 * Returns a potentially incomplete set of loadable model paths
+	 * 
+	 * @return set of model paths
+	 */
+	public Set getLoadableModelPaths(IClient client)
+	{
+		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.PD_REQUEST_MODEL_PATHS))
+			throw new AccessControlException("Not allowed: "+client);
+		IModelRepositoryService rs = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		return rs.getLoadableModels();
+	}
+	
+	/**
 	 * Adds a process repository listener.
 	 * 
 	 * @param client the client

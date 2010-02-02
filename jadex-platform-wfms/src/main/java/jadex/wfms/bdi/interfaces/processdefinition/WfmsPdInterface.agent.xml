@@ -63,6 +63,26 @@
 			</trigger>
 		</plan>
 		
+		<!-- Handle model names requests. -->
+		<plan name="request_loadable_model_paths_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="rp_execute_request.action"/>
+			</parameter>
+			<!-- The requesting agent. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="rp_execute_request.initiator"/>
+			</parameter>
+			<parameter name="result" class="Object" direction="out">
+				<goalmapping ref="rp_execute_request.result"/>
+			</parameter>
+			<body class="RequestLoadableModelPathsPlan" />
+			<trigger>
+				<goal ref="rp_execute_request">
+					<match>$goal.getParameter("action").getValue() instanceof RequestLoadableModelPaths</match>
+				</goal>
+			</trigger>
+		</plan>
+		
 		<!-- Handle model addition requests. -->
 		<plan name="request_add_process_plan">
 			<parameter name="action" class="Object">

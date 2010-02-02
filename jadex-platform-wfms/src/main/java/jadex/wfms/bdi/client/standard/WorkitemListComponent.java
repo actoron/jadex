@@ -80,6 +80,7 @@ public class WorkitemListComponent extends JPanel
 		add(workitemScrollPane, gbc);
 		
 		beginActivityButton = new JButton(BEGIN_ACTIVITY_BUTTON_LABEL);
+		beginActivityButton.setMargin(new Insets(1, 1, 1, 1));
 		gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.NONE;
 		gbc.gridx = 0;

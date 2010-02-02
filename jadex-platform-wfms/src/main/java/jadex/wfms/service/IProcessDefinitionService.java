@@ -52,6 +52,13 @@ public interface IProcessDefinitionService extends IService
 	public Set getProcessModelNames(IClient client);
 	
 	/**
+	 * Returns a potentially incomplete set of loadable model paths
+	 * 
+	 * @return set of model paths
+	 */
+	public Set getLoadableModelPaths(IClient client);
+	
+	/**
 	 * Adds a process repository listener.
 	 * 
 	 * @param client the client

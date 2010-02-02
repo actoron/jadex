@@ -104,6 +104,10 @@
 			<parameter name="model_names" class="Set" direction="out" />
 		</achievegoal>
 		
+		<achievegoal name="request_loadable_model_paths" exported="true">
+			<parameter name="loadable_model_paths" class="Set" direction="out" />
+		</achievegoal>
+		
 		<achievegoal name="add_process" exported="true">
 			<parameter name="process_path" class="String" />
 		</achievegoal>
@@ -307,6 +311,16 @@
 			<body class="ModelNamesPlan" />
 			<trigger>
 				<goal ref="request_model_names" />
+			</trigger>
+		</plan>
+		
+		<plan name="request_loadable_model_paths_plan">
+			<parameter name="loadable_model_paths" class="Set" direction="out">
+				<goalmapping ref="request_loadable_model_paths.loadable_model_paths"/>
+			</parameter>
+			<body class="LoadableModelPathsPlan" />
+			<trigger>
+				<goal ref="request_loadable_model_paths" />
 			</trigger>
 		</plan>
 		

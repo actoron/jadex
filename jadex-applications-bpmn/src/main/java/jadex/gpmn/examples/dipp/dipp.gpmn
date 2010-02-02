@@ -10,6 +10,7 @@
   </artifacts>
   <vertices xsi:type="gpmn:MaintainGoal" id="_ELbU4LmFEd6y6pbFUAB2Hw" name="Prämissen_ok">
     <outgoingEdges>_NewhcLmFEd6y6pbFUAB2Hw</outgoingEdges>
+    <maintaincondition>$beliefbase.praemissen_ok</maintaincondition>
   </vertices>
   <vertices xsi:type="gpmn:Plan" id="_H_rpoLmFEd6y6pbFUAB2Hw" description="" name="Info_Prämissen_fehlen" bpmnPlan="jadex/gpmn/examples/dipp/MG_Praemissen_fehlen.bpmn">
     <incomingEdges>_NewhcLmFEd6y6pbFUAB2Hw</incomingEdges>

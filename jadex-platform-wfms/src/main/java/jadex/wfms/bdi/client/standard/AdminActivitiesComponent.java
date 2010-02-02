@@ -42,9 +42,18 @@ public class AdminActivitiesComponent extends JPanel
 			public void mouseClicked(MouseEvent e)
 			{
 				if ((e.getButton() == MouseEvent.BUTTON3) &&
-					(e.getClickCount() == 1) &&
-					(getSelectedActivity() != null))
+					(e.getClickCount() == 1))
 				{
+					TreePath path = activitiesTree.getPathForLocation(e.getX(), e.getY());
+					
+					if (path == null)
+						return;
+					
+					activitiesTree.setSelectionPath(path);
+					
+					if (!(((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject() instanceof IClientActivity))
+						return;
+					
 					contextMenu.show(activitiesTree, e.getX(), e.getY());
 				}
 			}

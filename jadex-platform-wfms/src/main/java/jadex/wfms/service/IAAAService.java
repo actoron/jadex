@@ -50,9 +50,10 @@ public interface IAAAService extends IService
 	public static final Integer ADMIN_REMOVE_PROCESS_LISTENER	 = new Integer(505);
 	
 	public static final Integer PD_REQUEST_MODEL_NAMES			 = new Integer(600);
-	public static final Integer PD_ADD_PROCESS_MODEL			 = new Integer(601);
-	public static final Integer PD_REMOVE_PROCESS_MODEL			 = new Integer(602);
-	public static final Integer PD_REQUEST_PROCESS_MODEL		 = new Integer(603);
+	public static final Integer PD_REQUEST_MODEL_PATHS			 = new Integer(601);
+	public static final Integer PD_ADD_PROCESS_MODEL			 = new Integer(602);
+	public static final Integer PD_REMOVE_PROCESS_MODEL			 = new Integer(603);
+	public static final Integer PD_REQUEST_PROCESS_MODEL		 = new Integer(604);
 	
 	public static final Integer PD_ADD_REPOSITORY_LISTENER		 = new Integer(700);
 	public static final Integer PD_REMOVE_REPOSITORY_LISTENER	 = new Integer(701);
@@ -76,6 +77,7 @@ public interface IAAAService extends IService
 											   PD_REMOVE_PROCESS_MODEL,
 											   PD_REQUEST_PROCESS_MODEL,
 											   PD_REQUEST_MODEL_NAMES,
+											   PD_REQUEST_MODEL_PATHS,
 											   PD_ADD_REPOSITORY_LISTENER,
 											   PD_REMOVE_REPOSITORY_LISTENER,
 											   ADMIN_REQUEST_ALL_ACTIVITIES,

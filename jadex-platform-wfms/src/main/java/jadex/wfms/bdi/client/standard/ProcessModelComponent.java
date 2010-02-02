@@ -3,6 +3,7 @@ package jadex.wfms.bdi.client.standard;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -12,7 +13,10 @@ import java.util.Set;
 
 import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -22,11 +26,11 @@ public class ProcessModelComponent extends JPanel
 {
 	private static final String PROCESS_MODEL_COLUMN_NAME = "Process Models";
 	
-	private static final String START_BUTTON_LABEL = "Start Process";
+	private static final String START_BUTTON_LABEL = "Start";
 	
-	private static final String ADD_PROCESS_BUTTON_LABEL = "Add Process...";
+	private static final String ADD_PROCESS_BUTTON_LABEL = "Add...";
 	
-	private static final String REMOVE_PROCESS_BUTTON_LABEL = "Remove Process";
+	private static final String REMOVE_PROCESS_BUTTON_LABEL = "Remove";
 	
 	/** Table listing the process model names */
 	private JTable processTable;
@@ -45,6 +49,18 @@ public class ProcessModelComponent extends JPanel
 	
 	/** Remove process button */
 	private JButton removeProcessButton;
+	
+	/** Add Menu item for the full menu */
+	private JMenuItem addMenu;
+	
+	/** Remove Menu item for the full menu */
+	private JMenuItem removeMenu;
+	
+	/** Start Menu item for the full menu */
+	private JMenuItem startMenu;
+	
+	/** Add Menu item for the reduced menu */
+	private JMenuItem reducedAddMenu;
 	
 	public ProcessModelComponent()
 	{
@@ -69,6 +85,8 @@ public class ProcessModelComponent extends JPanel
 		gbc.weighty = 1.0;
 		add(processScrollPane, gbc);
 		
+		createMenus();
+		
 		JPanel buttonPanel = new JPanel(new GridBagLayout());
 		gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -77,32 +95,34 @@ public class ProcessModelComponent extends JPanel
 		gbc.anchor = GridBagConstraints.SOUTH;
 		add(buttonPanel, gbc);
 		
-		addProcessButton = new JButton(ADD_PROCESS_BUTTON_LABEL);
+		JPanel buttonFiller = new JPanel();
 		gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridx = 0;
 		gbc.weightx = 1;
+		buttonPanel.add(buttonFiller, gbc);
+		
+		addProcessButton = new JButton(ADD_PROCESS_BUTTON_LABEL);
+		addProcessButton.setMargin(new Insets(1, 1, 1, 1));
+		gbc = new GridBagConstraints();
+		gbc.gridx = 1;
 		gbc.insets = new Insets(5, 5, 5, 5);
-		gbc.anchor = GridBagConstraints.CENTER;
+		gbc.anchor = GridBagConstraints.EAST;
 		buttonPanel.add(addProcessButton, gbc);
 		
 		removeProcessButton = new JButton(REMOVE_PROCESS_BUTTON_LABEL);
+		removeProcessButton.setMargin(new Insets(1, 1, 1, 1));
 		gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridx = 1;
-		gbc.weightx = 1;
+		gbc.gridx = 2;
 		gbc.insets = new Insets(5, 5, 5, 5);
-		gbc.anchor = GridBagConstraints.CENTER;
+		gbc.anchor = GridBagConstraints.EAST;
 		buttonPanel.add(removeProcessButton, gbc);
 		
 		startButton = new JButton(START_BUTTON_LABEL);
+		startButton.setMargin(new Insets(1, 1, 1, 1));
 		gbc = new GridBagConstraints();
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridy = 1;
-		gbc.gridwidth = 2;
-		gbc.weightx = 1;
+		gbc.gridx = 3;
 		gbc.insets = new Insets(5, 5, 5, 5);
-		gbc.anchor = GridBagConstraints.CENTER;
+		gbc.anchor = GridBagConstraints.EAST;
 		buttonPanel.add(startButton, gbc);
 	}
 	
@@ -157,8 +177,8 @@ public class ProcessModelComponent extends JPanel
 	 */
 	public void setStartAction(final Action action)
 	{
+		action.putValue(Action.NAME, START_BUTTON_LABEL);
 		startButton.setAction(action);
-		startButton.setText(START_BUTTON_LABEL);
 		
 		if (processMouseListener != null)
 			processTable.removeMouseListener(processMouseListener);
@@ -175,6 +195,8 @@ public class ProcessModelComponent extends JPanel
 		};
 		
 		processTable.addMouseListener(processMouseListener);
+		
+		startMenu.setAction(action);
 	}
 	
 	/**
@@ -183,8 +205,10 @@ public class ProcessModelComponent extends JPanel
 	 */
 	public void setAddProcessAction(final Action action)
 	{
+		action.putValue(Action.NAME, ADD_PROCESS_BUTTON_LABEL);
 		addProcessButton.setAction(action);
-		addProcessButton.setText(ADD_PROCESS_BUTTON_LABEL);
+		addMenu.setAction(action);
+		reducedAddMenu.setAction(action);
 	}
 	
 	/**
@@ -193,8 +217,9 @@ public class ProcessModelComponent extends JPanel
 	 */
 	public void setRemoveProcessAction(final Action action)
 	{
+		action.putValue(Action.NAME, REMOVE_PROCESS_BUTTON_LABEL);
 		removeProcessButton.setAction(action);
-		removeProcessButton.setText(REMOVE_PROCESS_BUTTON_LABEL);
+		removeMenu.setAction(action);
 	}
 	
 	/**
@@ -204,5 +229,40 @@ public class ProcessModelComponent extends JPanel
 	{
 		while (processTableModel.getRowCount() > 0)
 			processTableModel.removeRow(0);
+	}
+	
+	private void createMenus()
+	{
+		final JPopupMenu reducedMenu = new JPopupMenu();
+		reducedAddMenu = new JMenuItem(ADD_PROCESS_BUTTON_LABEL);
+		reducedMenu.add(reducedAddMenu);
+		
+		final JPopupMenu fullMenu = new JPopupMenu();
+		startMenu = new JMenuItem(START_BUTTON_LABEL);
+		addMenu = new JMenuItem(ADD_PROCESS_BUTTON_LABEL);
+		removeMenu = new JMenuItem(REMOVE_PROCESS_BUTTON_LABEL);
+		fullMenu.add(startMenu);
+		fullMenu.add(addMenu);
+		fullMenu.add(removeMenu);
+		
+		processTable.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent e)
+			{
+				if ((e.getButton() == MouseEvent.BUTTON3) &&
+					(e.getClickCount() == 1))
+				{
+					int row = processTable.rowAtPoint(new Point(e.getX(), e.getY()));
+					
+					if (row < 0)
+						reducedMenu.show(processTable, e.getX(), e.getY());
+					else
+					{
+						processTable.changeSelection(row, 0, false, false);
+						fullMenu.show(processTable, e.getX(), e.getY());
+					}
+				}
+			}
+		});
 	}
 }

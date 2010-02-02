@@ -5,6 +5,7 @@ import jadex.service.IService;
 import jadex.wfms.listeners.IProcessRepositoryListener;
 
 import java.util.Collection;
+import java.util.Set;
 /**
  * Repository service for accessing process models.
  */
@@ -21,6 +22,13 @@ public interface IModelRepositoryService extends IService
 	 * @return names of all models
 	 */
 	public Collection getModelNames();
+	
+	/**
+	 * Returns a potentially incomplete set of loadable models
+	 * 
+	 * @return set of model paths
+	 */
+	public Set getLoadableModels();
 	
 	/**
 	 *  Remove a process model.

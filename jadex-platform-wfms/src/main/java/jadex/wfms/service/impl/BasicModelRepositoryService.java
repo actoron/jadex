@@ -3,19 +3,25 @@ package jadex.wfms.service.impl;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
-import jadex.service.PropertyServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.wfms.listeners.IProcessRepositoryListener;
 import jadex.wfms.listeners.ProcessRepositoryEvent;
 import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URL;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,6 +31,8 @@ import java.util.Set;
  */
 public class BasicModelRepositoryService implements IModelRepositoryService
 {
+	private static final String REPOSITORY_PATH = System.getProperty("java.io.tmpdir").concat(File.separator).concat("wfms_repository.db");
+	
 	/** The wfms. */
 	protected IServiceContainer wfms;
 	
@@ -32,30 +40,30 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 	private String[] imports;
 	
 	/** The models. */
-	protected Map models;
+	private Map models;
+	
+	/** The model paths */
+	private Map modelPaths;
 	
 	/** The process repository listeners */
 	private Set listeners;
 	
 	public BasicModelRepositoryService(IServiceContainer wfms)
 	{
-		this(wfms, null);
-	}
-	
-	public BasicModelRepositoryService(IServiceContainer wfms, String[] models)
-	{
 		this.wfms = wfms;
 		// TODO: Hack! Needs proper imports...
 		this.imports = new String[0];
 		this.listeners = Collections.synchronizedSet(new HashSet());
 		this.models = Collections.synchronizedMap(new HashMap());
+		this.modelPaths = Collections.synchronizedMap(new HashMap());
 		
-		if (models != null)
+		try
 		{
-			for (int i = 0; i < models.length; ++i)
-			{
-				addProcessModel(models[i]);
-			}
+			readRepository();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
 		}
 	}
 	
@@ -82,19 +90,12 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 	 */
 	public void addProcessModel(String filename)
 	{
-		IExecutionService ex = (IExecutionService)wfms.getService(IExecutionService.class);
-		ILoadableComponentModel model = ex.loadModel(filename, imports);
-		String modelName = model.getName();
-		if (modelName == null)
-		{
-			modelName = model.getFilename();
-			modelName = modelName.substring(Math.max(modelName.lastIndexOf('/'), modelName.lastIndexOf(File.separator)) + 1);
-		}
+		String modelName = loadProcessModel(filename);
 		synchronized (models)
 		{
-			if (!models.containsKey(modelName))
+			if (modelName != null)
 			{
-				models.put(modelName, model);
+				writeRepository();
 				fireModelAddedEvent(modelName);
 			}
 		}
@@ -111,8 +112,34 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 			if (models.containsKey(name))
 			{
 				models.remove(name);
+				modelPaths.remove(name);
+				writeRepository();
 				fireModelRemovedEvent(name);
 			}
+		}
+	}
+	
+	/**
+	 * Returns a potentially incomplete set of loadable models
+	 * 
+	 * @return set of model paths
+	 */
+	public Set getLoadableModels()
+	{
+		synchronized (models)
+		{
+			Set knownPaths = new HashSet(modelPaths.values());
+			Set modelSet = new HashSet();
+			List urls = ((ILibraryService) wfms.getService(ILibraryService.class)).getURLs();
+			for (Iterator it = urls.iterator(); it.hasNext(); )
+			{
+				URL url = (URL) it.next();
+				File dir = new File(url.getFile());
+				if (dir.isDirectory())
+					modelSet.addAll(searchDirectory(dir, false));
+			}
+			modelSet.removeAll(knownPaths);
+			return modelSet;
 		}
 	}
 	
@@ -137,14 +164,6 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 			return new HashSet(models.keySet());
 		}
 	}
-	
-	/**
-	 *  Remove a process model.
-	 *  @param client The client.
-	 *  @param name The name of the model.
-	 *  @param path The path to the model.
-	 */
-//	public void removeProcessModel(IClient client, String name);
 	
 	/**
 	 *  Get the imports.
@@ -203,6 +222,106 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 			{
 				IProcessRepositoryListener listener = (IProcessRepositoryListener) it.next();
 				listener.processModelRemoved(new ProcessRepositoryEvent(modelName));
+			}
+		}
+	}
+	
+	private String loadProcessModel(String filename)
+	{
+		IExecutionService ex = (IExecutionService)wfms.getService(IExecutionService.class);
+		ILoadableComponentModel model = ex.loadModel(filename, imports);
+		String modelName = model.getName();
+		if (modelName == null)
+		{
+			modelName = model.getFilename();
+			modelName = modelName.substring(Math.max(modelName.lastIndexOf('/'), modelName.lastIndexOf(File.separator)) + 1);
+		}
+		synchronized (models)
+		{
+			if (!models.containsKey(modelName))
+			{
+				models.put(modelName, model);
+				modelPaths.put(modelName, filename);
+				return modelName;
+			}
+		}
+		return null;
+	}
+	
+	private Set searchDirectory(File dir, boolean prependDir)
+	{
+		HashSet ret = new HashSet();
+		File[] content = dir.listFiles();
+		for (int i = 0; i < content.length; ++i)
+		{
+			if (content[i].isDirectory())
+			{
+				Set subSet = searchDirectory(content[i], true);
+				for (Iterator it = subSet.iterator(); it.hasNext(); )
+				{
+					if (prependDir)
+						ret.add(dir.getName().concat(File.separator).concat((String) it.next()));
+					else
+						ret.add(it.next());
+				}
+			}
+			else if ((content[i].getName().endsWith(".bpmn")) || (content[i].getName().endsWith(".gpmn")))
+			{
+				if (prependDir)
+					ret.add(dir.getName().concat(File.separator).concat(content[i].getName()));
+				else
+					ret.add(content[i].getName());
+			}
+		}
+		
+		return ret;
+	}
+	
+	private void readRepository() throws IOException
+	{
+		File file = new File(REPOSITORY_PATH);
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		
+		String filename = reader.readLine();
+		while (filename != null)
+		{
+			try
+			{
+				loadProcessModel(filename);
+			}
+			catch (Exception e)
+			{
+			}
+			filename = reader.readLine();
+		}
+		
+		writeRepository();
+	}
+	
+	private void writeRepository()
+	{
+		boolean done = false;
+		while (!done)
+		{
+			try
+			{
+				File tmpFile = File.createTempFile("wfms_repository", null);
+				PrintWriter writer = new PrintWriter(tmpFile);
+				synchronized(models)
+				{
+					for (Iterator it = modelPaths.values().iterator(); it.hasNext(); )
+					{
+						String path = (String) it.next();
+						writer.println(path);
+					}
+				}
+				writer.close();
+				File file = new File(REPOSITORY_PATH);
+				tmpFile.renameTo(file);
+				done = true;
+			}
+			catch (IOException e)
+			{
 			}
 		}
 	}
