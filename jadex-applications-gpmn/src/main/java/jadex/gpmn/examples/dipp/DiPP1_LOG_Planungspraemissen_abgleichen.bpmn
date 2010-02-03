@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_c_1ssXd5Ed6uv6EsxGS0Yg" iD="_c_1ssHd5Ed6uv6EsxGS0Yg">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_GXkigXd9Ed6uv6EsxGS0Yg" iD="_GXkigHd9Ed6uv6EsxGS0Yg" name="package jadex.gpmn.examples.dipp&#xD;&#xA;&#xD;&#xA;import jadex.wfms.client.task.WorkitemTask&#xD;&#xA;import jadex.bpmnbdi.task.*">
+    <associations xmi:type="bpmn:Association" xmi:id="_GXuTgHd9Ed6uv6EsxGS0Yg"/>
+  </artifacts>
+  <pools xmi:type="bpmn:Pool" xmi:id="_c__dsXd5Ed6uv6EsxGS0Yg" iD="_c__dsHd5Ed6uv6EsxGS0Yg" associations="_GXuTgHd9Ed6uv6EsxGS0Yg" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_lc5_oXd5Ed6uv6EsxGS0Yg" iD="_lc5_oHd5Ed6uv6EsxGS0Yg" outgoingEdges="_mHqz6nd5Ed6uv6EsxGS0Yg" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_mHqz4Xd5Ed6uv6EsxGS0Yg" iD="_mHqz4Hd5Ed6uv6EsxGS0Yg" outgoingEdges="_IW42R3d6Ed6uv6EsxGS0Yg" incomingEdges="_mHqz6nd5Ed6uv6EsxGS0Yg" name="DiPP1_LOG_Abgleichen_Planungspraemissen&#xD;&#xA;class = WorkitemTask.class&#xD;&#xA;inout boolean Digitales_Produktmodell_liegt_vor = $beliefbase.produktmodell&#xD;&#xA;inout boolean Vertriebsprognosen_liegen_vor = $beliefbase.vertriebsprognosen&#xD;&#xA;inout boolean Gebietsspeditionskonzept_liegt_vor = $beliefbase.gs_konzept&#xD;&#xA;inout boolean Praemissen_mit_Montage_abgeglichen = $beliefbase.molog_praemissen" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_IWvFQXd6Ed6uv6EsxGS0Yg" iD="_IWvFQHd6Ed6uv6EsxGS0Yg" outgoingEdges="_KZ3aqnd6Ed6uv6EsxGS0Yg _c1S0IXd6Ed6uv6EsxGS0Yg _oD1JIXd6Ed6uv6EsxGS0Yg _oan4gXd6Ed6uv6EsxGS0Yg" incomingEdges="_IW42R3d6Ed6uv6EsxGS0Yg" activityType="GatewayParallel"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_KZ3aoXd6Ed6uv6EsxGS0Yg" iD="_KZ3aoHd6Ed6uv6EsxGS0Yg" outgoingEdges="_wbq90Xd6Ed6uv6EsxGS0Yg" incomingEdges="_KZ3aqnd6Ed6uv6EsxGS0Yg" name="class = WriteBeliefTask.class&#xD;&#xA;in String beliefname = &quot;produktmodell&quot;&#xD;&#xA;in Object value" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_XhZRnHd6Ed6uv6EsxGS0Yg" iD="_XhZRlHd6Ed6uv6EsxGS0Yg" outgoingEdges="_wuvq0Xd6Ed6uv6EsxGS0Yg" incomingEdges="_c1S0IXd6Ed6uv6EsxGS0Yg" name="class = WriteBeliefTask.class&#xD;&#xA;in String beliefname = &quot;vertriebsprognosen&quot;&#xD;&#xA;in Object value" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_fyiobHd6Ed6uv6EsxGS0Yg" iD="_fyioZHd6Ed6uv6EsxGS0Yg" outgoingEdges="_xCa0wXd6Ed6uv6EsxGS0Yg" incomingEdges="_oD1JIXd6Ed6uv6EsxGS0Yg" name="class = WriteBeliefTask.class&#xD;&#xA;in String beliefname = &quot;gs_konzept&quot;&#xD;&#xA;in Object value" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_gKhqnHd6Ed6uv6EsxGS0Yg" iD="_gKhqlHd6Ed6uv6EsxGS0Yg" outgoingEdges="_xYUzUXd6Ed6uv6EsxGS0Yg" incomingEdges="_oan4gXd6Ed6uv6EsxGS0Yg" name="class = WriteBeliefTask.class&#xD;&#xA;in String beliefname = &quot;molog_praemissen&quot;&#xD;&#xA;in Object value" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_wbhz4Xd6Ed6uv6EsxGS0Yg" iD="_wbhz4Hd6Ed6uv6EsxGS0Yg" outgoingEdges="_C9WwWnd7Ed6uv6EsxGS0Yg" incomingEdges="_wbq90Xd6Ed6uv6EsxGS0Yg _wuvq0Xd6Ed6uv6EsxGS0Yg _xCa0wXd6Ed6uv6EsxGS0Yg _xYUzUXd6Ed6uv6EsxGS0Yg" activityType="GatewayParallel"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_C9WwUXd7Ed6uv6EsxGS0Yg" iD="_C9WwUHd7Ed6uv6EsxGS0Yg" outgoingEdges="_MiZX-nd7Ed6uv6EsxGS0Yg _h3EaAXd8Ed6uv6EsxGS0Yg" incomingEdges="_C9WwWnd7Ed6uv6EsxGS0Yg" name="" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_MiZX8Xd7Ed6uv6EsxGS0Yg" iD="_MiZX8Hd7Ed6uv6EsxGS0Yg" outgoingEdges="_L6vZsXeJEd6uv6EsxGS0Yg" incomingEdges="_MiZX-nd7Ed6uv6EsxGS0Yg" name="class = WriteBeliefTask.class&#xD;&#xA;in String beliefsetname = &quot;praemissen_fehlend&quot;&#xD;&#xA;in Object value = &quot;Produktmodell&quot;" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_b554GHd8Ed6uv6EsxGS0Yg" iD="_b554AHd8Ed6uv6EsxGS0Yg" outgoingEdges="_b554HHd8Ed6uv6EsxGS0Yg _p7Zc0Xd8Ed6uv6EsxGS0Yg" incomingEdges="_h3EaAXd8Ed6uv6EsxGS0Yg _L6vZsXeJEd6uv6EsxGS0Yg" name="" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_b554GXd8Ed6uv6EsxGS0Yg" iD="_b554CHd8Ed6uv6EsxGS0Yg" outgoingEdges="_MU93kXeJEd6uv6EsxGS0Yg" incomingEdges="_b554HHd8Ed6uv6EsxGS0Yg" name="class = WriteBeliefTask.class&#xD;&#xA;in String beliefsetname = &quot;praemissen_fehlend&quot;&#xD;&#xA;in Object value = &quot;Vertriebsprognosen&quot;" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_k76rJ3d8Ed6uv6EsxGS0Yg" iD="_k7w6HXd8Ed6uv6EsxGS0Yg" outgoingEdges="_k76rK3d8Ed6uv6EsxGS0Yg _qMraEXd8Ed6uv6EsxGS0Yg" incomingEdges="_p7Zc0Xd8Ed6uv6EsxGS0Yg _MU93kXeJEd6uv6EsxGS0Yg" name="" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_k76rKHd8Ed6uv6EsxGS0Yg" iD="_k76rF3d8Ed6uv6EsxGS0Yg" outgoingEdges="_MtaMwXeJEd6uv6EsxGS0Yg" incomingEdges="_k76rK3d8Ed6uv6EsxGS0Yg" name="class = WriteBeliefTask.class&#xD;&#xA;in String beliefsetname = &quot;praemissen_fehlend&quot;&#xD;&#xA;in Object value = &quot;Gebietsspeditionskonzept&quot;" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_l4HNtXd8Ed6uv6EsxGS0Yg" iD="_l4HNnXd8Ed6uv6EsxGS0Yg" outgoingEdges="_l4Q-knd8Ed6uv6EsxGS0Yg _UNWwEXq-Ed6bIMHDkFj0cg" incomingEdges="_qMraEXd8Ed6uv6EsxGS0Yg _MtaMwXeJEd6uv6EsxGS0Yg" name="" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_l4HNtnd8Ed6uv6EsxGS0Yg" iD="_l4HNpXd8Ed6uv6EsxGS0Yg" outgoingEdges="_T1XG0Xq-Ed6bIMHDkFj0cg" incomingEdges="_l4Q-knd8Ed6uv6EsxGS0Yg" name="class = WriteBeliefTask.class&#xD;&#xA;in String beliefsetname = &quot;praemissen_fehlend&quot;&#xD;&#xA;in Object value = &quot;Praemissen_mit_Montage_abgeglichen&quot;" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_6FGEQXd8Ed6uv6EsxGS0Yg" iD="_6FGEQHd8Ed6uv6EsxGS0Yg" incomingEdges="_Q6f4MXq-Ed6bIMHDkFj0cg" activityType="EventEndEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_QhBBMXq-Ed6bIMHDkFj0cg" iD="_QhBBMHq-Ed6bIMHDkFj0cg" outgoingEdges="_Q6f4MXq-Ed6bIMHDkFj0cg _fo4iynq_Ed6bIMHDkFj0cg" incomingEdges="_T1XG0Xq-Ed6bIMHDkFj0cg _UNWwEXq-Ed6bIMHDkFj0cg" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_YD91QXq-Ed6bIMHDkFj0cg" iD="_YD91QHq-Ed6bIMHDkFj0cg" incomingEdges="_iEmXQXq_Ed6bIMHDkFj0cg" activityType="EventEndError"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_fo4iwXq_Ed6bIMHDkFj0cg" iD="_fo4iwHq_Ed6bIMHDkFj0cg" outgoingEdges="_iEmXQXq_Ed6bIMHDkFj0cg" incomingEdges="_fo4iynq_Ed6bIMHDkFj0cg" name="class = WriteBeliefTask.class&#xD;&#xA;in String beliefname = &quot;praemissen_ok&quot;&#xD;&#xA;in Object value = false" activityType="Task"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_mHqz6nd5Ed6uv6EsxGS0Yg" iD="_mHqz6Xd5Ed6uv6EsxGS0Yg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_IW42R3d6Ed6uv6EsxGS0Yg" iD="_IW42Rnd6Ed6uv6EsxGS0Yg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_KZ3aqnd6Ed6uv6EsxGS0Yg" iD="_KZ3aqXd6Ed6uv6EsxGS0Yg" name="value = Digitales_Produktmodell_liegt_vor"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_c1S0IXd6Ed6uv6EsxGS0Yg" iD="_c1S0IHd6Ed6uv6EsxGS0Yg" name="value = Vertriebsprognosen_liegen_vor"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_oD1JIXd6Ed6uv6EsxGS0Yg" iD="_oD1JIHd6Ed6uv6EsxGS0Yg" name="value = Gebietsspeditionskonzept_liegt_vor"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_oan4gXd6Ed6uv6EsxGS0Yg" iD="_oan4gHd6Ed6uv6EsxGS0Yg" name="value = Praemissen_mit_Montage_abgeglichen"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_wbq90Xd6Ed6uv6EsxGS0Yg" iD="_wbq90Hd6Ed6uv6EsxGS0Yg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_wuvq0Xd6Ed6uv6EsxGS0Yg" iD="_wuvq0Hd6Ed6uv6EsxGS0Yg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_xCa0wXd6Ed6uv6EsxGS0Yg" iD="_xCa0wHd6Ed6uv6EsxGS0Yg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_xYUzUXd6Ed6uv6EsxGS0Yg" iD="_xYUzUHd6Ed6uv6EsxGS0Yg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_C9WwWnd7Ed6uv6EsxGS0Yg" iD="_C9WwWXd7Ed6uv6EsxGS0Yg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_MiZX-nd7Ed6uv6EsxGS0Yg" iD="_MiZX-Xd7Ed6uv6EsxGS0Yg" name="! $beliefbase.produktmodell"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_b554HHd8Ed6uv6EsxGS0Yg" iD="_b554G3d8Ed6uv6EsxGS0Yg" name="! $beliefbase.vertriebsprognosen"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_h3EaAXd8Ed6uv6EsxGS0Yg" iD="_h3EaAHd8Ed6uv6EsxGS0Yg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_k76rK3d8Ed6uv6EsxGS0Yg" iD="_k76rKnd8Ed6uv6EsxGS0Yg" name="! $beliefbase.gs_konzept"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_l4Q-knd8Ed6uv6EsxGS0Yg" iD="_l4Q-kXd8Ed6uv6EsxGS0Yg" name="! $beliefbase.molog_praemissen"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_p7Zc0Xd8Ed6uv6EsxGS0Yg" iD="_p7Zc0Hd8Ed6uv6EsxGS0Yg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_qMraEXd8Ed6uv6EsxGS0Yg" iD="_qMraEHd8Ed6uv6EsxGS0Yg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_L6vZsXeJEd6uv6EsxGS0Yg" iD="_L6vZsHeJEd6uv6EsxGS0Yg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_MU93kXeJEd6uv6EsxGS0Yg" iD="_MU93kHeJEd6uv6EsxGS0Yg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_MtaMwXeJEd6uv6EsxGS0Yg" iD="_MtaMwHeJEd6uv6EsxGS0Yg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Q6f4MXq-Ed6bIMHDkFj0cg" iD="_Q6f4MHq-Ed6bIMHDkFj0cg" name="$beliefbase.produktmodell &amp;&amp; $beliefbase.vertriebsprognosen &amp;&amp; $beliefbase.gs_konzept &amp;&amp; $beliefbase.molog_praemissen"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_T1XG0Xq-Ed6bIMHDkFj0cg" iD="_T1XG0Hq-Ed6bIMHDkFj0cg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_UNWwEXq-Ed6bIMHDkFj0cg" iD="_UNWwEHq-Ed6bIMHDkFj0cg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_fo4iynq_Ed6bIMHDkFj0cg" iD="_fo4iyXq_Ed6bIMHDkFj0cg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_iEmXQXq_Ed6bIMHDkFj0cg" iD="_iEmXQHq_Ed6bIMHDkFj0cg"/>
+  </pools>
+</bpmn:BpmnDiagram>
