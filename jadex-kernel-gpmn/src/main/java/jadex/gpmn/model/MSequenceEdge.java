@@ -21,6 +21,9 @@ public class MSequenceEdge extends MNamedIdElement//MAssociationTarget
 	/** The associations. */
 	protected List associations;
 	
+	/** The sequential order */
+	protected Integer sequentialorder;
+	
 	//-------- methods --------
 
 	/**
@@ -77,4 +80,23 @@ public class MSequenceEdge extends MNamedIdElement//MAssociationTarget
 		this.type = type;
 	}
 
+	/**
+	 *  Get the sequentialorder.
+	 *  @return The sequentialorder.
+	 */
+	public Integer getSequentialOrder()
+	{
+		return sequentialorder;
+	}
+
+	/**
+	 *  Set the sequentialorder.
+	 *  @param sequentialorder The sequentialorder to set.
+	 */
+	public void setSequentialOrder(Integer sequentialorder)
+	{
+		this.sequentialorder = sequentialorder;
+	}
+	
+	
 }

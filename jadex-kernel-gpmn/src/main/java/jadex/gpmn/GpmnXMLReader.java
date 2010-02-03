@@ -153,7 +153,9 @@ public class GpmnXMLReader
 				}
 			}),  
 			new ObjectInfo(MAchieveGoal.class, new ProcessElementPostProcessor()), 
-			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"), new BeanAttributeInfo("exclude", "excludeMode")},
+			new MappingInfo(null, new BeanAttributeInfo[]{
+			new BeanAttributeInfo("ID", "Id"), 
+			new BeanAttributeInfo("exclude", "excludeMode")},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo("creationcondition", "creationCondition")),
 			new SubobjectInfo(new BeanAttributeInfo("contextcondition", "contextCondition")),

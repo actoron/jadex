@@ -27,6 +27,8 @@ import jadex.rules.state.javaimpl.OAVStateFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -229,10 +231,30 @@ public class GpmnBDIConverter
 				{
 					// todo: parameters
 					
-					List outgoals = new ArrayList();
-					for(int j=0; j<outedges.size(); j++)
+					boolean par = goal.getSequential() == null? true: !goal.getSequential().booleanValue();
+					List sortededges = new ArrayList(outedges);
+					if(!par)
 					{
-						MSequenceEdge outedge = (MSequenceEdge)outedges.get(j);
+						Collections.sort(sortededges, new Comparator()
+						{
+							public int compare(Object o1, Object o2)
+							{
+								Integer si1 = ((MSequenceEdge)o1).getSequentialOrder();
+								Integer si2 = ((MSequenceEdge)o2).getSequentialOrder();
+								
+								// Hack!
+								si1 = si1 != null? si1: new Integer(0);
+								si2 = si2 != null? si2: new Integer(0);
+								
+								return si1.intValue() - si2.intValue();
+							}
+						});
+					}
+					
+					List outgoals = new ArrayList();
+					for(int j=0; j<sortededges.size(); j++)
+					{
+						MSequenceEdge outedge = (MSequenceEdge)sortededges.get(j);
 						MProcessElement elem = outedge.getTarget();
 						if(elem instanceof MGoal)
 						{
@@ -243,9 +265,10 @@ public class GpmnBDIConverter
 					if(outgoals.size()>0)
 					{
 						// Create plan with body and name
-						Object planhandle = goal.getName().endsWith("par")
+						Object planhandle = par
 							? createPlan(scopehandle, state, "implicit_"+goal.getName(), "jadex.gpmn.runtime.plan.ParallelGoalExecutionPlan", "bpmn")
 							: createPlan(scopehandle, state, "implicit_"+goal.getName(), "jadex.gpmn.runtime.plan.SequentialGoalExecutionPlan", "bpmn");
+						
 						
 						// Create trigger
 						createPlanTrigger(planhandle, state, new String[]{goal.getName()}, null, null);

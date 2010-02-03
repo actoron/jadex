@@ -15,9 +15,10 @@
   <vertices xsi:type="gpmn:Plan" id="_H_rpoLmFEd6y6pbFUAB2Hw" description="" name="Info_Prämissen_fehlen" bpmnPlan="jadex/gpmn/examples/dipp/MG_Praemissen_fehlen.bpmn">
     <incomingEdges>_NewhcLmFEd6y6pbFUAB2Hw</incomingEdges>
   </vertices>
-  <vertices xsi:type="gpmn:AchieveGoal" id="_sRsqMLmFEd6y6pbFUAB2Hw" name="Dipp1_Logistik_abgesichert_seq">
-    <outgoingEdges>_7XAccLmFEd6y6pbFUAB2Hw</outgoingEdges>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_sRsqMLmFEd6y6pbFUAB2Hw" name="Dipp1_Logistik_abgesichert_seq" sequential="true">
     <outgoingEdges>_eQmRgLmGEd6y6pbFUAB2Hw</outgoingEdges>
+    <outgoingEdges>_7XAccLmFEd6y6pbFUAB2Hw</outgoingEdges>
+    <targetcondition></targetcondition>
   </vertices>
   <vertices xsi:type="gpmn:AchieveGoal" id="_xyyUMLmFEd6y6pbFUAB2Hw" name="Dipp1_LOG_Planunspämissen_abgeglichen">
     <outgoingEdges>_6Q-ogLmFEd6y6pbFUAB2Hw</outgoingEdges>
@@ -27,9 +28,9 @@
     <incomingEdges>_6Q-ogLmFEd6y6pbFUAB2Hw</incomingEdges>
   </vertices>
   <vertices xsi:type="gpmn:AchieveGoal" id="_-gn4wLmFEd6y6pbFUAB2Hw" name="Dipp1_Logistik_abgesichert_par">
-    <outgoingEdges>_jAjZgLmGEd6y6pbFUAB2Hw</outgoingEdges>
-    <outgoingEdges>_tscUcLmGEd6y6pbFUAB2Hw</outgoingEdges>
     <outgoingEdges>_0YYA8LmGEd6y6pbFUAB2Hw</outgoingEdges>
+    <outgoingEdges>_tscUcLmGEd6y6pbFUAB2Hw</outgoingEdges>
+    <outgoingEdges>_jAjZgLmGEd6y6pbFUAB2Hw</outgoingEdges>
     <incomingEdges>_eQmRgLmGEd6y6pbFUAB2Hw</incomingEdges>
   </vertices>
   <vertices xsi:type="gpmn:AchieveGoal" id="_TR5IQLmGEd6y6pbFUAB2Hw" name="Dipp1_LOG_Ladungsträger_abgesichert">
@@ -56,7 +57,7 @@
   <sequenceEdges xsi:type="gpmn:PlanEdge" id="_NewhcLmFEd6y6pbFUAB2Hw"/>
   <sequenceEdges xsi:type="gpmn:PlanEdge" id="_6Q-ogLmFEd6y6pbFUAB2Hw"/>
   <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_7XAccLmFEd6y6pbFUAB2Hw"/>
-  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_eQmRgLmGEd6y6pbFUAB2Hw"/>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_eQmRgLmGEd6y6pbFUAB2Hw" sequentialOrder="1"/>
   <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_jAjZgLmGEd6y6pbFUAB2Hw"/>
   <sequenceEdges xsi:type="gpmn:PlanEdge" id="_nU91ALmGEd6y6pbFUAB2Hw"/>
   <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_tscUcLmGEd6y6pbFUAB2Hw"/>

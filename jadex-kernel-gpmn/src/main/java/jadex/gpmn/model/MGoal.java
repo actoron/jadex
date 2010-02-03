@@ -41,6 +41,9 @@ public class MGoal extends MProcessElement
 	/** The unique flag. */
 	protected Boolean unique;
 	
+	/** The sequential flag. */
+	protected Boolean sequential;
+	
 	//-------- methods --------
 	
 	/**
@@ -223,5 +226,23 @@ public class MGoal extends MProcessElement
 	public void setUnique(Boolean unique)
 	{
 		this.unique = unique;
+	}
+
+	/**
+	 *  Get the sequential.
+	 *  @return The sequential.
+	 */
+	public Boolean getSequential()
+	{
+		return sequential;
+	}
+
+	/**
+	 *  Set the sequential.
+	 *  @param sequential The sequential to set.
+	 */
+	public void setSequential(Boolean sequential)
+	{
+		this.sequential = sequential;
 	}
 }
