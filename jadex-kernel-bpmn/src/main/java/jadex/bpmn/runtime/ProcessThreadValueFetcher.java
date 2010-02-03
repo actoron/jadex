@@ -45,12 +45,17 @@ public class ProcessThreadValueFetcher implements IValueFetcher
 	 */
 	public Object fetchValue(String name, Object object)
 	{
+		Object ret;
 		if(object instanceof Map && ((Map)object).containsKey(name))
-			return ((Map)object).get(name);
+			ret = ((Map)object).get(name);
+		else if("$thread".equals(name))
+			ret = thread;
 		else if(fetcher!=null)
-			return fetcher.fetchValue(name, object);
+			ret = fetcher.fetchValue(name, object);
 		else
 			throw new UnsupportedOperationException();
+	
+		return ret;
 	}
 	
 	/**
@@ -79,6 +84,15 @@ public class ProcessThreadValueFetcher implements IValueFetcher
 			if(thread.getInstance().hasContextVariable(name))
 			{
 				value = thread.getInstance().getContextVariable(name);
+				found = true;
+			}
+		}
+		
+		if(!found)
+		{
+			if("$thread".equals(name))
+			{
+				value = thread;
 				found = true;
 			}
 		}
