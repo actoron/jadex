@@ -102,7 +102,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_tI-13YKCEd6rVea0-FiZ3Q" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_tI-13oKCEd6rVea0-FiZ3Q" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="AnalyzeTargetPlan.bpmn#_tI-114KCEd6rVea0-FiZ3Q"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tI-15YKCEd6rVea0-FiZ3Q" x="16" y="16" width="2688" height="505"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tI-15YKCEd6rVea0-FiZ3Q" x="16" y="16" width="2676" height="344"/>
   </children>
   <children xmi:type="notation:Node" xmi:id="_Wh9wMoKDEd6rVea0-FiZ3Q" type="1002">
     <children xmi:type="notation:Node" xmi:id="_Wh9wOIKDEd6rVea0-FiZ3Q" type="4009"/>
@@ -111,7 +111,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_Wh9wNYKDEd6rVea0-FiZ3Q"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_Wh9wNoKDEd6rVea0-FiZ3Q" lineColor="0"/>
     <element xmi:type="bpmn:TextAnnotation" href="AnalyzeTargetPlan.bpmn#_Wh9wMYKDEd6rVea0-FiZ3Q"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Wh9wN4KDEd6rVea0-FiZ3Q" x="16" y="325"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Wh9wN4KDEd6rVea0-FiZ3Q" x="16" y="377"/>
   </children>
   <styles xmi:type="notation:PageStyle" xmi:id="_tI-104KCEd6rVea0-FiZ3Q"/>
   <styles xmi:type="notation:GuideStyle" xmi:id="_tI-11IKCEd6rVea0-FiZ3Q"/>

@@ -991,7 +991,7 @@ public class BpmnXMLReader
 									String name = stok2.nextToken();
 									String desc = stok2.nextToken();
 									String typename = stok2.nextToken();
-									String valtext = stok2.nextToken();
+									String valtext = stok2.hasMoreTokens()? stok2.nextToken(): null;
 									
 									Object val = null;
 									if(valtext!=null)
@@ -1012,7 +1012,7 @@ public class BpmnXMLReader
 									String name = stok2.nextToken();
 									String desc = stok2.nextToken();
 									String typename = stok2.nextToken();
-									String valtext = stok2.nextToken();
+									String valtext = stok2.hasMoreTokens()? stok2.nextToken(): null;
 									
 									Object val = null;
 									if(valtext!=null)

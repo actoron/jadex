@@ -55,7 +55,7 @@ public class PerformTestPlan extends Plan
 		}
 		catch(Exception cause)
 		{
-//			cause.printStackTrace();
+			cause.printStackTrace();
 			if(testagent!=null)
 			{
 				ces.destroyComponent(testagent, null);

@@ -824,7 +824,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 				{
 					if(thread.getActivity().equals(activity))
 					{
-						System.out.println("Notify: "+activity+" "+thread+" "+event);
+//						System.out.println("Notify: "+activity+" "+thread+" "+event);
 						getStepHandler(activity).step(activity, BpmnInterpreter.this, thread, event);
 						thread.setNonWaiting();
 						notifyListeners(new ChangeEvent(this, "notify"));
@@ -840,7 +840,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 		{
 			if(thread.getActivity().equals(activity))
 			{
-				System.out.println("Notify: "+activity+" "+thread+" "+event);
+//				System.out.println("Notify: "+activity+" "+thread+" "+event);
 				getStepHandler(activity).step(activity, BpmnInterpreter.this, thread, event);
 				thread.setNonWaiting();
 				notifyListeners(new ChangeEvent(this, "notify"));

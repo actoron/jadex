@@ -15,8 +15,8 @@
 		<import>java.util.*</import>
 		<import>java.util.logging.*</import>
 		<import>jadex.adapter.base.fipa.*</import>
-		<import>jadex.application.space.envsupport.environment.*</import>
-		<import>jadex.bdibpmn.examples.marsworld.carry.*</import>
+		<import>jadex.application.space.envsupport.environment.space2d.*</import> 
+		<import>jadex.application.space.envsupport.environment.*</import> 
 	</imports>
 
 	<capabilities>

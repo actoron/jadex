@@ -59,6 +59,9 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	/** Key for the arguments of a BPMN diagram. */
 	public static final String JADEX_ARGUMENTS_LIST_DETAIL = "arguments";
 	
+	/** Key for the arguments of a BPMN diagram. */
+	public static final String JADEX_RESULTS_LIST_DETAIL = "results";
+	
 	/** Key for the implementing class of a task. */
 	public static final String JADEX_ACTIVITY_CLASS_DETAIL = "class";
 	

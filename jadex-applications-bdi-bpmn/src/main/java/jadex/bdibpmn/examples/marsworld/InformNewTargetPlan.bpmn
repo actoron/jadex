@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="__dlOkYAREd6N8dR31QwQkg" iD="__dlOkIAREd6N8dR31QwQkg">
-  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_em8d0YATEd6N8dR31QwQkg" iD="_em8d0IATEd6N8dR31QwQkg" name="package jadex.bdibpmn.examples.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.bridge.IComponentIdentifier;&#xD;&#xA;import jadex.adapter.base.agr.AGRSpace;">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_em8d0YATEd6N8dR31QwQkg" iD="_em8d0IATEd6N8dR31QwQkg" name="package jadex.bdibpmn.examples.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.bridge.IComponentIdentifier;&#xD;&#xA;import jadex.application.space.agr.AGRSpace;&#xD;&#xA;import jadex.application.runtime.*;">
     <associations xmi:type="bpmn:Association" xmi:id="_em8d2YATEd6N8dR31QwQkg"/>
   </artifacts>
   <pools xmi:type="bpmn:Pool" xmi:id="__d4JgYAREd6N8dR31QwQkg" iD="__d4JgIAREd6N8dR31QwQkg" associations="_em8d2YATEd6N8dR31QwQkg" name="Pool">
