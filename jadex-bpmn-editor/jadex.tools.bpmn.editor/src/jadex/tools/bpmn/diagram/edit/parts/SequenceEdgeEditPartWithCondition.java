@@ -100,7 +100,7 @@ public class SequenceEdgeEditPartWithCondition extends SequenceEdgeEditPart
 		{
 
 			fFigureSequenceEdgeConditionFigure = new WrappingLabel();
-			fFigureSequenceEdgeConditionFigure.setText("SOME TEXT");
+//			fFigureSequenceEdgeConditionFigure.setText("SOME TEXT");
 
 			//new BendpointLocator(this, 0);
 			//new MidpointLocator(this, 0)
