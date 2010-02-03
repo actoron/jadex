@@ -333,7 +333,7 @@
 
 		<property name="agentdescription">
 			((IDF)$scope.getServiceContainer().getService(IDF.class))
-				.createDFAgentDescription(null, (IDFServiceDescription)$propertybase.getProperty("servicedescription"))	
+				.createDFComponentDescription(null, (IDFServiceDescription)$propertybase.getProperty("servicedescription"))	
 		</property>
 	</properties>
 
@@ -349,7 +349,7 @@
 				<initialgoal ref="dfcap.df_keep_registered">
 					<parameter ref="description">
 						<value>
-							(IDFAgentDescription)$propertybase.getProperty("agentdescription")
+							(IDFComponentDescription)$propertybase.getProperty("agentdescription")
 						</value>
 					</parameter>
 				</initialgoal>
