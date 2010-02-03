@@ -331,8 +331,8 @@
 				</env:envspace>
 			</spaces>
 			<agents>
-				<agent type="Sentry" number="1" />
-				<agent type="Producer" number="$args.ProducerNumber" />
+				<agent type="Sentry" number="$args.NumberOfSentries" />
+				<agent type="Producer" number="1" />
 				<agent type="Carry" number="1" />
 				<agent type="ClientSimulator" master="true">
 					<arguments>

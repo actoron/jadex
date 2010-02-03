@@ -15,7 +15,8 @@ import jadex.simulation.helper.TimeConverter;
 public class ObservedEvent {
 	
 	private Data dataReference;
-	private long timestamp;
+	private long absoluteTimestamp;
+	private long relativeTimestamp;
 	private String value;
 	private String experimentId;
 	private String applicationName;
@@ -27,14 +28,14 @@ public class ObservedEvent {
 			
 	public ObservedEvent(String experimentId){
 		this.experimentId = experimentId;
-		this.timestamp = System.currentTimeMillis();
+		this.absoluteTimestamp = System.currentTimeMillis();
 		
 	}
 	
-	public ObservedEvent(String applicationName, String experimentId, long timestamp, Data dataReference, String value){
+	public ObservedEvent(String applicationName, String experimentId, long absoluteTimestamp, Data dataReference, String value){
 		this.applicationName = applicationName;
 		this.experimentId = experimentId;
-		this.timestamp = timestamp;
+		this.absoluteTimestamp = absoluteTimestamp;
 		this.dataReference = dataReference;
 		this.value = value;
 	}
@@ -53,16 +54,16 @@ public class ObservedEvent {
 	}
 	
 	/**
-	 * Timestamp of the observed event
+	 * Timestamp of the observed event. The timestamp is absolute.
 	 * @return
 	 */
-	@XmlAttribute(name="timestamp")
-	public long getTimestamp() {
-		return timestamp;
+	@XmlAttribute(name="absoluteTimestamp")
+	public long getAbsoluteTimestamp() {
+		return absoluteTimestamp;
 	}
 	
-	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
+	public void setAbsoluteTimestamp(long timestamp) {
+		this.absoluteTimestamp = timestamp;
 	}
 	
 	/**
@@ -103,6 +104,19 @@ public class ObservedEvent {
 		this.applicationName = applicationName;
 	}
 
+	/**
+	 * Timestamp of the observed event. In relation to the starttime of the experiment.
+	 * @return
+	 */
+	@XmlAttribute(name="relativeTimestamp")
+	public long getRelativeTimestamp() {
+		return relativeTimestamp;
+	}
+
+	public void setRelativeTimestamp(long relativeTimestamp) {
+		this.relativeTimestamp = relativeTimestamp;
+	}
+	
 	
 	/**
 	 * Hack!
@@ -122,10 +136,13 @@ public class ObservedEvent {
 		buffer.append(" - ");
 		buffer.append(getExperimentId());
 		buffer.append("\n");
-		buffer.append("Timestamp: ");
-		buffer.append(TimeConverter.longTime2DateString(getTimestamp()));
+		buffer.append("Absolute Timestamp: ");
+		buffer.append(TimeConverter.longTime2DateString(getAbsoluteTimestamp()));
 		buffer.append(" - ");
-		buffer.append(getTimestamp());
+		buffer.append(getAbsoluteTimestamp());
+		buffer.append("\n");
+		buffer.append("Relative Timestamp: ");
+		buffer.append(getRelativeTimestamp());
 		buffer.append("\n");
 		buffer.append("DataName: ");
 		buffer.append(getDataReference().getName());
@@ -136,4 +153,6 @@ public class ObservedEvent {
 		
 		return buffer.toString();
 	}
+
+	
 }

@@ -140,6 +140,8 @@ public class ComputeSingleResultPlan extends Plan {
 		
 		for(ArrayList<ObservedEvent> target : events){			
 				for(ObservedEvent myEvent : target){
+					long relativeTimestamp =  myEvent.getAbsoluteTimestamp() - startTime;
+					myEvent.setRelativeTimestamp(relativeTimestamp);
 					result.add(myEvent);	
 				}				
 		}

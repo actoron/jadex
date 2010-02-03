@@ -33,7 +33,8 @@ public class RuntimeManagerPlan extends Plan {
 		HashMap simFacts = (HashMap) getBeliefbase().getBelief("simulationFacts").getFact();
 		SimulationConfiguration simConf = (SimulationConfiguration) simFacts.get(Constants.SIMULATION_FACTS_FOR_CLIENT);
 		String experimentID = (String) simFacts.get(Constants.EXPERIMENT_ID);
-		int tmpCurrentValue = simConf.getOptimization().getParameterSweeping().getCurrentValue();
+		int parameterSweepValue = simConf.getOptimization().getParameterSweeping().getCurrentValue();
+		String parameterSweepName = simConf.getOptimization().getData().getName();
 
 		// Map simFacts = new HashMap();
 		// simFacts.put(Constants.SIMULATION_FACTS_FOR_CLIENT, simConf);
@@ -41,9 +42,9 @@ public class RuntimeManagerPlan extends Plan {
 
 		// Map args = new HashMap();
 		// args.put(Constants.EXPERIMENT_ID, experimentID);
-		// args.put(Constants.SIMULATION_FACTS_FOR_CLIENT, simFacts);
+		// args.put(Constants.SIMULATION_FACTS_FOR_CLIENT, simFacts);		
 
-		System.out.println("#Client# Started CLIENT Simulation run....: " + simConf.getName() + " - " + experimentID + ", currentVal: " + tmpCurrentValue);
+		System.out.println("#Client# Started CLIENT Simulation run....: " + simConf.getName() + " - " + experimentID + ", currentVal: " + parameterSweepValue);
 		// String msg = (String) getBeliefbase().getBelief("msg").getFact();
 
 		// System.out.println("*******************: " + msg + " - " +

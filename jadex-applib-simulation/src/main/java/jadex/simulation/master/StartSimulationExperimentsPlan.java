@@ -83,23 +83,13 @@ public class StartSimulationExperimentsPlan extends Plan {
 			((HashMap) args.get(Constants.SIMULATION_FACTS_FOR_CLIENT)).put(Constants.EXPERIMENT_ID, experimentID);
 
 			startApplication(appName, fileName, configName, args);
-			// waitFor(2000);
-			// startApplication();
-
-			// int runs = ((Integer) getBeliefbase().getBelief("numberOfRuns")
-			// .getFact()).intValue();
-			System.out.println("#StartSimulationExpPlan# Started new Simulation Experiment. Nr.:" + experimentID + "(" + totalRuns + ")");
+			
+			
+			System.out.println("#StartSimulationExpPlan# Started new Simulation Experiment. Nr.:" + experimentID + "(" + totalRuns + ") with Optimization Values: " + simConf.getOptimization().getData().getName()  + " = " + simConf.getOptimization().getParameterSweeping().getCurrentValue());
 			totalRuns++;
 			expInRow++;
-			// getBeliefbase().getBelief("numberOfRuns").setFact(new
-			// Integer(runs));
 
-			// int runs = ((Integer) getBeliefbase().getBelief(
-			// "runningSimulations").getFact()).intValue();
-			// runs += 1;
-			// getBeliefbase().getBelief("runningSimulations").setFact(
-			// new Integer(runs));
-			// waitFor(5000);
+			
 			waitForInternalEvent("triggerNewExperiment");
 			System.out.println("#StartSimulationExpPlan# Received Results of Client!!!!");
 			// HACK: Ein warten scheint notwendig zu sein..., damit Ausführung
@@ -128,10 +118,12 @@ public class StartSimulationExperimentsPlan extends Plan {
 //			XMLHandler.writeXML(ttt, "rowRes.xml", ExperimentResult.class);	
 //		}
 //		
-		
-		rowResult.setExperimentsResults(new ArrayList<ExperimentResult>(experimentResults.values()));
+		ArrayList<ExperimentResult> experimentList = new ArrayList<ExperimentResult>(experimentResults.values());
+		rowResult.setExperimentsResults(experimentList);
 		rowResult.setEndtime(getClock().getTime());
 		rowResult.setName("Tmp-Test");
+		rowResult.setOptimizationName(experimentList.get(0).getOptimizationParameterName());
+		rowResult.setOptimizationValue(experimentList.get(0).getOptimizationValue());
 		
 		rowResults.put(rowResult.getId(), rowResult);
 		
@@ -145,45 +137,6 @@ public class StartSimulationExperimentsPlan extends Plan {
 		
 		//evaluate row
 		dispatchInternalEvent(createInternalEvent("triggerExperimentRowEvaluation"));
-		//
-
-		// IServiceContainer container =
-		// getExternalAccess().getApplicationContext().getServiceContainer();
-		// getExternalAccess().
-		// IServiceContainer cc = (IServiceContainer)
-		// getExternalAccess().getPlatformComponent();
-		// IApplicationContext context =
-		// getExternalAccess().getApplicationContext();
-		// IServiceContainer container =
-		// ((ApplicationContext)context).getServiceContainer();
-
-		// String appName = "CleanerWorldSpace";
-		// String fileName =
-		// "..\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld\\CleanerWorld.application.xml";
-		// String configName = "One cleaner";
-		// Map args = new HashMap();
-		//	
-		try {
-			// SComponentFactory.createApplication(container, appName, fileName,
-			// configName, args);
-			// waitFor(5000);
-			// SComponentFactory.createApplication(container, appName, fileName,
-			// configName, args);
-
-			// TODO: Stop execution of experiment
-			// Stop Siumlation when target condition true.
-			// IServiceContainer container =
-			// getExternalAccess().getServiceContainer();
-			// ISimulationService simServ =
-			// (ISimulationService)container.getService(ISimulationService.class);
-			// simServ.pause();
-		} catch (Exception e) {
-			// JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this),
-			// "Could not start application: "+e,
-			// "Application Problem", JOptionPane.INFORMATION_MESSAGE);
-			System.out.println("Could not start application...." + e);
-		}
-		// System.out.println("Started AGENT Simulation Client!!!!!!!!");
 	}
 
 	private void startClientSimulators() {

@@ -13,6 +13,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class RowResult extends IResult {
 
 	private ArrayList<ExperimentResult> experimentResults = new ArrayList<ExperimentResult>();
+	private String optimizationName;
+	private String optimizationValue;
 	
 
 	@XmlElementWrapper(name="Experiments")
@@ -29,7 +31,22 @@ public class RowResult extends IResult {
 		this.experimentResults.add(experimentResult);
 	}
 	
+	public String getOptimizationName() {
+		return optimizationName;
+	}
 
+	public void setOptimizationName(String optimizationName) {
+		this.optimizationName = optimizationName;
+	}
+
+	public String getOptimizationValue() {
+		return optimizationValue;
+	}
+
+	public void setOptimizationValue(String optimizationValue) {
+		this.optimizationValue = optimizationValue;
+	}
+	
 	
 	/**
 	 * Returns the duration of the row
@@ -49,5 +66,28 @@ public class RowResult extends IResult {
 	public String getName() {
 		return name;
 	}
+	
+	
+	public String toStringShort(){
+		
+		StringBuffer buffer = new StringBuffer();		
+		buffer.append("Row Number: ");
+		buffer.append(getId());			
+		buffer.append("\n");
+		buffer.append("Optimization: Parameter Name and Value: ");
+		buffer.append(getOptimizationName());
+		buffer.append(" - ");
+		buffer.append(getOptimizationValue());
+		buffer.append("\n");
+		buffer.append("Results of Experiment: ");			
+		buffer.append("\n");
+					
+		for(ExperimentResult experiment : getExperimentsResults()){				
+			buffer.append(experiment.toStringShort());			
+			buffer.append("\n");	
+		}
+		
+		return buffer.toString();				
+}
 	
 }

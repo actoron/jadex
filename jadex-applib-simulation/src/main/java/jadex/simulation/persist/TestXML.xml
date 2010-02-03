@@ -14,14 +14,14 @@
 <SimulationConfiguration name="MarsWorldExperiments" applicationReference="..\\jadex-applib-simulation\\target\\classes\\jadex\\simulation\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml" applicationConfiguration="1 Sentry / 2 Producers / 3 Carries">
 <!--<SimulationConfiguration name="MarsWorldExperiments" applicationReference="..\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml" applicationConfiguration="1 Sentry / 2 Producers / 3 Carries">-->
     <Observers>
-        <Observer>
+        <!-- <Observer>
             <Data name="StepLogger">
                 <ObjectSource type="BDI_Agent" name="Sentry"/>
-                <ElementSource type="BDI_BELIEF" name="myPos" class="String"/><!-- Add type of element: String, long, int etc.? -->
-            </Data>
-            <Evaluation mode="periodical" value="1000"/><!--If perdiocal, all have to have the same value -->
-            <Filter mode="all"/><!-- All / one / subset of objects-JavaCondLanguage -->
-        </Observer>
+                <ElementSource type="BDI_BELIEF" name="myPos" class="String"/>--><!-- Add type of element: String, long, int etc.? --> 
+            <!-- </Data>
+            <Evaluation mode="periodical" value="1000"/> --><!--If perdiocal, all have to have the same value -->
+            <!-- <Filter mode="all"/> --><!-- All / one / subset of objects-JavaCondLanguage -->
+        <!-- </Observer> -->
         <Observer>
             <Data name="HomebaseLogger"><!-- TODO: How to deal with Strings, Lists? -->
                 <ObjectSource type="ISpaceObject" name="homebase"/>
@@ -29,7 +29,7 @@
             </Data>
             <Evaluation mode="onChange"/><!--If perdiocal, all have to have the same value -->
             <Filter mode="all"/><!-- All / one / subset of objects-JavaCondLanguage -->
-        </Observer>        
+        </Observer>
     </Observers>
 
     <DataVisualization>
@@ -49,7 +49,7 @@
             <!--<ObjectSource type="ISpaceObject" name="Pheromone"/>
             <ElementSource type="Property" name="Diffusion" class="Int"/>--><!-- Add type of element: String, long, int etc.? -->
         <!--</Data>-->
-        <Data name="ProducerNumber"> <!-- Referenz to $args.value in application.xml -->
+        <Data name="NumberOfSentries"> <!-- Referenz to $args.value in application.xml -->
             <ObjectSource type="BDI_Agent" name="Sentry"/>
             <ElementSource type="AgentNumber" name="AgentNumber" class="Int"/><!-- Add type of element: String, long, int etc.? -->
         </Data>
@@ -72,10 +72,10 @@
                 <Time value="120000" type="absolute"/>
             </TerminateCondition>
         </General>
-        <Rows experiments="1">
+        <Rows experiments="2">
             <TerminateCondition>
-                <Time value="4000" type="relative"/>
-                <!--<TargetFunction function="$object.money &gt; 5"/>-->
+                <!--<Time value="7000" type="relative"/>-->
+                <TargetFunction function="$object.money &gt; 5"/>
             </TerminateCondition>
         </Rows>
     </RunConfiguration>
