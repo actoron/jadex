@@ -1,7 +1,7 @@
 
 package jadex.application.space.envsupport.environment;
 
-import jadex.application.runtime.Application;
+import jadex.application.runtime.IApplication;
 import jadex.application.space.envsupport.dataview.IDataView;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IPropertyObject;
@@ -25,7 +25,7 @@ public interface IEnvironmentSpace extends IPropertyObject
 	 *  Get the context of the space.
 	 */
 	// hack???
-	public Application	getContext();
+	public IApplication	getContext();
 	
 	/**
 	 *  Add a space percept type.

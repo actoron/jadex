@@ -199,7 +199,6 @@ public class ApplicationComponentFactory	implements IComponentFactory
 	 */
 	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
 	{
-		String name = adapter!=null? adapter.getComponentIdentifier().getLocalName(): "no_name";
 		Application	context = null;
 		
 		MApplicationType apptype = ((ApplicationModel)model).getApplicationType();
@@ -222,7 +221,7 @@ public class ApplicationComponentFactory	implements IComponentFactory
 
 
 		// Create context for application.
-		context	= new Application(name, (ApplicationModel)model, app, adapter, parent, arguments);
+		context	= new Application((ApplicationModel)model, app, adapter, parent, arguments);
 		
 		// todo: result listener?
 		

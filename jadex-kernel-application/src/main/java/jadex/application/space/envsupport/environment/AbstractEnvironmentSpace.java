@@ -2,6 +2,7 @@ package jadex.application.space.envsupport.environment;
 
 import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.Application;
+import jadex.application.runtime.IApplication;
 import jadex.application.runtime.ISpace;
 import jadex.application.space.envsupport.IObjectCreator;
 import jadex.application.space.envsupport.MEnvSpaceInstance;
@@ -1626,8 +1627,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  Get the context.
 	 *  @return The context.
 	 */
-	// Hack!!! Shouldn't expose application (use interface?)
-	public Application getContext()
+	public IApplication getContext()
 	{
 		return context;
 	}

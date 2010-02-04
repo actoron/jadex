@@ -1,6 +1,6 @@
 package jadex.bdi.examples.cleanerworld;
 
-import jadex.application.runtime.Application;
+import jadex.application.runtime.IApplication;
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.ISpaceProcess;
@@ -74,7 +74,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 			if(todo.size()>0)
 			{
 //				System.out.println("Creating garbage collection truck.");
-				final Application app = space.getContext();
+				final IApplication app = space.getContext();
 				Map params = new HashMap();
 				params.put("wastebins", todo.toArray());
 				ongoing.addAll(todo);

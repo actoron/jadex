@@ -33,13 +33,10 @@ import java.util.Map;
  *  When the context is deleted all agents will be destroyed.
  *  An agent must only be in one application context.
  */
-public class Application	implements IComponentInstance
+public class Application	implements IApplication, IComponentInstance
 {
 	//-------- attributes --------
 	
-	/** The name of the context. */
-	protected String	name;
-
 	/** The application configuration. */
 	protected MApplicationInstance	config;
 	
@@ -76,9 +73,8 @@ public class Application	implements IComponentInstance
 	/**
 	 *  Create a new context.
 	 */
-	public Application(String name, ApplicationModel model, MApplicationInstance config, IComponentAdapter adapter, IExternalAccess parent, Map arguments)
+	public Application(ApplicationModel model, MApplicationInstance config, IComponentAdapter adapter, IExternalAccess parent, Map arguments)
 	{
-		this.name	= name;
 		this.config	= config;
 		this.adapter = adapter;
 		this.model = model;
@@ -111,15 +107,7 @@ public class Application	implements IComponentInstance
 		}
 	}
 
-	//-------- IContext interface --------
-		
-	/**
-	 *  Get the name of the context.
-	 */
-	public String	getName()
-	{
-		return name;
-	}
+	//-------- space handling --------
 		
 	/**
 	 *  Add a space to the context.
@@ -385,6 +373,15 @@ public class Application	implements IComponentInstance
 	//-------- methods --------
 
 	/**
+	 *  Get the name.
+	 */
+	// todo: remove.
+	public String	getName()
+	{
+		return adapter.getComponentIdentifier().getLocalName();		
+	}
+	
+	/**
 	 *  Get a string representation of the context.
 	 */
 	public String	toString()
@@ -392,7 +389,7 @@ public class Application	implements IComponentInstance
 		StringBuffer	ret	= new StringBuffer();
 		ret.append(SReflect.getInnerClassName(getClass()));
 		ret.append("(name=");
-		ret.append(getName());
+		ret.append(adapter.getComponentIdentifier().getLocalName());
 //		ret.append(", parent=");
 //		ret.append(getParentContext());
 //		IComponentIdentifier[]	aids	= getAgents(); 
@@ -802,7 +799,6 @@ public class Application	implements IComponentInstance
 	/**
 	 *  Get the logical component type for a given component id.
 	 */
-	// todo: rename getComponentType
 	public String getComponentType(IComponentIdentifier cid)
 	{
 		return (String)ctypes.get(cid);
