@@ -3,6 +3,7 @@ package jadex.bpmn.runtime.handler;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.runtime.handler.EventIntermediateErrorActivityHandler.EventIntermediateErrorException;
 
 /**
  *  On error end propagate an exception.
@@ -14,7 +15,10 @@ public class EventEndErrorActivityHandler extends DefaultActivityHandler
 	 */
 	protected void doExecute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
-		thread.setException(new EventEndErrorException(activity.getDescription()));
+		Exception ex = (Exception)thread.getPropertyValue("exception", activity);
+		if(ex==null)
+			ex = new EventIntermediateErrorException(activity.getDescription());
+		thread.setException(ex);
 		instance.getStepHandler(activity).step(activity, instance, thread, null);
 	}
 	

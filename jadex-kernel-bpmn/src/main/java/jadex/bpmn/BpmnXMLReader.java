@@ -181,6 +181,7 @@ public class BpmnXMLReader
 		
 		types.add(new TypeInfo(new XMLInfo("eventHandlers"), new ObjectInfo(MActivity.class, new ActivityPostProcessor()),
 			new MappingInfo(null, new BeanAttributeInfo[]{
+			new BeanAttributeInfo("name", "description"),
 			new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription"),
 			new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription"),
 			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE),
@@ -199,7 +200,8 @@ public class BpmnXMLReader
 				}
 			}), 
 			new ObjectInfo(MActivity.class, new ActivityPostProcessor()),
-			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("name", "description"),
+			new MappingInfo(null, new BeanAttributeInfo[]{
+			new BeanAttributeInfo("name", "description"),
 			new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription"),
 			new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription"),
 			new BeanAttributeInfo("lanes", "laneDescription"),
@@ -337,6 +339,8 @@ public class BpmnXMLReader
 		{
 			MBpmnModel dia = (MBpmnModel)root;
 			MActivity act = (MActivity)object;
+			
+//			System.out.println("Act: "+act.getName()+" "+act.getDescription());
 
 			// Make edge connections.
 			Map edges = dia.getAllSequenceEdges();
@@ -413,6 +417,7 @@ public class BpmnXMLReader
 				while(stok.hasMoreTokens())
 				{
 					String prop = stok.nextToken().trim();
+//					System.out.println("prop: "+prop);
 					int	idx	= prop.indexOf("=");
 					if(prop.startsWith("in") || prop.startsWith("out"))
 					{
@@ -889,6 +894,7 @@ public class BpmnXMLReader
 					else
 					{
 						// context variable
+						
 						String	init	= null;
 						int	idx	= prop.indexOf("=");
 						if(idx!=-1)

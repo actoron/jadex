@@ -5,6 +5,7 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.bpmn.runtime.handler.DefaultStepHandler;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler;
+import jadex.bpmn.runtime.handler.EventIntermediateErrorActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMessageActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateMultipleActivityHandler;
 import jadex.bpmn.runtime.handler.EventIntermediateNotificationHandler;
@@ -78,7 +79,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 		activityhandlers.put(MBpmnModel.EVENT_START_EMPTY, new DefaultActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_END_EMPTY, new DefaultActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_END_ERROR, new EventEndErrorActivityHandler());
-		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_ERROR, new DefaultActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_ERROR, new EventIntermediateErrorActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE, new EventIntermediateMessageActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE, new EventIntermediateMultipleActivityHandler());
@@ -762,6 +763,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 				throw new UnsupportedOperationException("No handler for activity: "+thread);
 			if(history!=null)
 				history.add(new HistoryEntry(stepnumber++, thread.getId(), thread.getActivity()));
+			System.out.println("Step: "+thread.getActivity()+" "+thread);
 			handler.execute(thread.getActivity(), this, thread);
 			
 			// Check if thread now waits for a message and there is at least one in the message queue.
