@@ -188,7 +188,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 			}
 	
 			this.agentthread = null;
-			return false;
+			return !steps.isEmpty();
 		}
 		catch(ComponentTerminatedException ate)
 		{
@@ -212,6 +212,11 @@ public class MicroAgentInterpreter implements IComponentInstance
 			public void run()
 			{
 				microagent.messageArrived(Collections.unmodifiableMap(message.getParameterMap()), message.getMessageType());
+			}
+			
+			public String toString()
+			{
+				return "MessageArrived("+message+")";
 			}
 		});
 	}

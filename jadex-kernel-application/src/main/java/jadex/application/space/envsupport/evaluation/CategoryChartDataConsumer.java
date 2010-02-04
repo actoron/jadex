@@ -57,7 +57,7 @@ public class CategoryChartDataConsumer extends AbstractChartDataConsumer
 			{
 				IApplication app = getSpace().getContext();
 				ClassLoader cl = ((ILibraryService)app.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
-				ResourceInfo rinfo = getResourceInfo(bgimagefn, app.getAllImports(), cl);
+				ResourceInfo rinfo = getResourceInfo(bgimagefn, app.getApplicationType().getAllImports(), cl);
 				Image image = ImageIO.read(rinfo.getInputStream());
 				rinfo.getInputStream().close();
 				

@@ -20,7 +20,7 @@ public interface ISpace
 	 *  Initialize a space.
 	 *  Called once, when the space is created.
 	 */
-	public void	initSpace(Application context, MSpaceInstance config) throws Exception;
+	public void	initSpace(IApplication context, MSpaceInstance config) throws Exception;
 
 	/**
 	 *  Get the context.

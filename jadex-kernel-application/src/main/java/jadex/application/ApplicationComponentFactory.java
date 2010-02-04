@@ -8,7 +8,7 @@ import jadex.application.model.MApplicationType;
 import jadex.application.model.MArgument;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.model.MSpaceType;
-import jadex.application.runtime.Application;
+import jadex.application.runtime.impl.Application;
 import jadex.bridge.Argument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;

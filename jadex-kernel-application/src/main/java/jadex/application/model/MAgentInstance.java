@@ -1,6 +1,6 @@
 package jadex.application.model;
 
-import jadex.application.runtime.Application;
+import jadex.application.runtime.IApplication;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 
@@ -188,7 +188,7 @@ public class MAgentInstance
 	 *  Get the number of agents to start.
 	 *  @return The number.
 	 */
-	public int getNumber(Application context, ClassLoader classloader)
+	public int getNumber(IApplication context, ClassLoader classloader)
 	{
 		SimpleValueFetcher fetcher = new SimpleValueFetcher();
 		fetcher.setValue("$platform", context.getServiceContainer());
@@ -244,7 +244,7 @@ public class MAgentInstance
 	 *  Get the arguments.
 	 *  @return The arguments as a map of name-value pairs.
 	 */
-	public Map getArguments(Application context, ClassLoader classloader)
+	public Map getArguments(IApplication context, ClassLoader classloader)
 	{
 		Map ret = null;
 

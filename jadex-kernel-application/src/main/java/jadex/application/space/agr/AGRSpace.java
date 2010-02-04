@@ -1,7 +1,7 @@
 package jadex.application.space.agr;
 
 import jadex.application.model.MSpaceInstance;
-import jadex.application.runtime.Application;
+import jadex.application.runtime.IApplication;
 import jadex.application.runtime.ISpace;
 import jadex.bridge.IComponentIdentifier;
 
@@ -15,9 +15,6 @@ import java.util.Map;
 public class AGRSpace implements ISpace
 {
 	//-------- attributes --------
-	
-	/** The application. */
-	protected Application	context;
 	
 	/** The groups. */
 	protected Map groups;
@@ -83,11 +80,8 @@ public class AGRSpace implements ISpace
 		// nothing to do.
 	}
 	
-	public void initSpace(Application context, MSpaceInstance config) throws Exception
+	public void initSpace(IApplication context, MSpaceInstance config) throws Exception
 	{
-//		AGRSpace	ret	= new AGRSpace(getName(), app);
-//		this.name	= name;
-//		this.context	= context;
 		MGroupInstance[]	mgroups	= ((MAGRSpaceInstance)config).getMGroupInstances();
 		for(int g=0; g<mgroups.length; g++)
 		{

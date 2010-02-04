@@ -87,9 +87,6 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	/** The component instances in a tree. */
 	private ComponentTreeTable components;
 	
-//	/** The application instances in a tree. */
-//	private ComponentTreeTable applications;
-
 	/** A split panel. */
 	private JSplitPane lsplit;
 
@@ -301,47 +298,6 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		components.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(RESUME_COMPONENT);
 		components.getNodeType(ComponentTreeTable.NODE_CONTAINER).addPopupAction(KILL_PLATFORM);
 		components.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
-		
-//		applications = new ComponentTreeTable(((IServiceContainer)getJCC().getServiceContainer()).getName());
-//		applications.setMinimumSize(new Dimension(0, 0));
-//		applications.getTreetable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-//		
-//		applications.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(KILL_APPLICATION);
-//		applications.getNodeType(ComponentTreeTable.NODE_CONTAINER).addPopupAction(KILL_PLATFORM);
-//		applications.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
-//		applications.setColumnWidths(new int[]{200});
-		
-//		IContextService cs = (IContextService)jcc.getServiceContainer().getService(IContextService.class);
-//		if(cs!=null)
-//		{
-//			cs.addContextListener(new IChangeListener()
-//			{
-//				public void changeOccurred(final ChangeEvent event)
-//				{
-//					if(IContextService.EVENT_TYPE_CONTEXT_CREATED.equals(event.getType()))
-//					{
-//						SwingUtilities.invokeLater(new Runnable()
-//						{
-//							public void run()
-//							{
-//								applications.addComponent((IApplicationContext)event.getValue());
-//							}
-//						});
-//					}
-//					else if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()))
-//					{
-//						SwingUtilities.invokeLater(new Runnable()
-//						{
-//							public void run()
-//							{
-//	//							System.out.println("Remove elem: "+event.getValue());
-//								applications.removeComponent((IApplicationContext)event.getValue());
-//							}
-//						});
-//					}
-//				}	
-//			});
-//		}
 		
 //		JTabbedPane tp = new JTabbedPane();
 //		tp.addTab("components", components);

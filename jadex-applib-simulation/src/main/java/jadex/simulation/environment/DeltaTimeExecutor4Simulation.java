@@ -152,7 +152,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 
 					if (dilationCounter >= 1000) {
 						final String experimentId = (String) space.getContext().getArguments().get(Constants.EXPERIMENT_ID);
-						final String appName = space.getContext().getName();
+						final String appName = space.getContext().getComponentIdentifier().getLocalName();
 						final ArrayList<ObservedEvent> observedEvents = new ArrayList<ObservedEvent>();
 
 						space.getProperties();

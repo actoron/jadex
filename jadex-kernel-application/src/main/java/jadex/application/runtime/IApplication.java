@@ -1,5 +1,6 @@
 package jadex.application.runtime;
 
+import jadex.application.model.MApplicationType;
 import jadex.bridge.IComponentIdentifier;
 import jadex.service.IServiceContainer;
 
@@ -45,20 +46,29 @@ public interface IApplication
 	 *  Get the imports.
 	 *  @return The imports.
 	 */
-	// Todo: remove?
+	// todo: remove?
 	public String[] getAllImports();
 	
 	/**
 	 *  Get the arguments.
 	 *  @return The arguments.
-	 *  @deprecated
 	 */
+	// todo: remove?
 	public Map getArguments();
 
 	/**
-	 *  Get the name.
-	 *  @deprecated Use getComponentIdentifier().getLocalName() instead.
+	 *  Get the results of the component (considering it as a functionality).
+	 *  Note: The method cannot make use of the asynchrnonous result listener
+	 *  mechanism, because the it is called when the component is already
+	 *  terminated (i.e. no invokerLater can be used).
+	 *  @return The results map (name -> value). 
 	 */
-	// todo: remove.
-	public String	getName();
+	// todo: remove?
+	public Map getResults();
+	
+	/**
+	 *  Get the application type.
+	 */
+	// todo: remove? replace with getModel()?
+	public MApplicationType	getApplicationType();
 }

@@ -152,7 +152,7 @@ public class ControlCenter implements IControlCenter
 					{
 					}
 
-					if(proj != null)
+					if(proj != null && proj.length()>0)
 					{
 						try
 						{
@@ -168,7 +168,7 @@ public class ControlCenter implements IControlCenter
 						}
 					}
 
-					if(proj == null)
+					else
 					{
 						// Use default title, location and plugin
 						setCurrentProject(null);
@@ -234,6 +234,7 @@ public class ControlCenter implements IControlCenter
 	public void setCurrentProject(File file)
 	{
 		this.project = file;
+		saveLastProject(project);
 		if(file != null)
 		{
 			String fname = file.getName();
@@ -426,29 +427,32 @@ public class ControlCenter implements IControlCenter
 				// e2.printStackTrace();
 			}
 		}
+	}
 
-		if(project != null)
+	/**
+	 *  Write the name of the last opened project to './jcc.project' file.
+	 */
+	protected void saveLastProject(File project)
+	{
+		try
 		{
-			try
+			Writer w = new FileWriter(JCC_PROJECT);
+			w.write(project!=null ? project.getAbsolutePath() : "");
+			w.close();
+		}
+		catch(IOException e)
+		{
+			final String failed = SUtil.wrapText("Could not save last project\n\n" + e);
+			SwingUtilities.invokeLater(new Runnable()
 			{
-				Writer w = new FileWriter(JCC_PROJECT);
-				w.write(project.getAbsolutePath());
-				w.close();
-			}
-			catch(IOException e)
-			{
-				final String failed = SUtil.wrapText("Could not save last project\n\n" + e);
-				SwingUtilities.invokeLater(new Runnable()
+				public void run()
 				{
-					public void run()
-					{
-						JOptionPane.showMessageDialog(window, failed, "Settings Error",
-							JOptionPane.ERROR_MESSAGE);
-					}
-				});
-				
-				// e1.printStackTrace();
-			}
+					JOptionPane.showMessageDialog(window, failed, "Settings Error",
+						JOptionPane.ERROR_MESSAGE);
+				}
+			});
+			
+			// e1.printStackTrace();
 		}
 	}
 

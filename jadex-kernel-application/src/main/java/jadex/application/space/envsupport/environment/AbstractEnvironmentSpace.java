@@ -1,7 +1,6 @@
 package jadex.application.space.envsupport.environment;
 
 import jadex.application.model.MSpaceInstance;
-import jadex.application.runtime.Application;
 import jadex.application.runtime.IApplication;
 import jadex.application.runtime.ISpace;
 import jadex.application.space.envsupport.IObjectCreator;
@@ -17,8 +16,10 @@ import jadex.application.space.envsupport.evaluation.SpaceObjectSource;
 import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.observer.gui.ObserverCenter;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentListener;
 import jadex.commons.IPropertyObject;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.IResultListener;
@@ -47,7 +48,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	protected String name;
 	
 	/** The context. */
-	protected Application context;
+	protected IApplication context;
 	
 	/** The space object types. */
 	protected Map objecttypes;
@@ -153,7 +154,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/**
 	 *  Create a space.
 	 */
-	public void	initSpace(Application context, MSpaceInstance config) throws Exception
+	public void	initSpace(IApplication context, MSpaceInstance config) throws Exception
 	{
 		MEnvSpaceInstance	si	= (MEnvSpaceInstance)config;
 		MEnvSpaceType	mspacetype	= (MEnvSpaceType)config.getType();
@@ -540,21 +541,22 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				
 				final ObserverCenter oc = new ObserverCenter(title, this, (ILibraryService)context.getServiceContainer().getService(ILibraryService.class), plugins);
 							
-//				final IContextService cs = (IContextService)app.getServiceContainer().getService(IContextService.class);
-//				if(cs!=null)
-//				{
-//					cs.addContextListener(new IChangeListener()
-//					{
-//						public void changeOccurred(ChangeEvent event)
-//						{
-//							if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()) && app.equals(event.getValue()))
-//							{
-//								oc.dispose();
-//								cs.removeContextListener(this);
-//							}
-//						}
-//					});
-//				}
+				IComponentExecutionService cs = (IComponentExecutionService)context.getServiceContainer().getService(IComponentExecutionService.class);
+				cs.addComponentListener(context.getComponentIdentifier(), new IComponentListener()
+				{
+					public void componentRemoved(IComponentDescription desc, Map results)
+					{
+						oc.dispose();
+					}
+					
+					public void componentChanged(IComponentDescription desc)
+					{
+					}
+					
+					public void componentAdded(IComponentDescription desc)
+					{
+					}
+				});
 				
 				List perspectives = mspacetype.getPropertyList("perspectives");
 				for(int j=0; j<perspectives.size(); j++)

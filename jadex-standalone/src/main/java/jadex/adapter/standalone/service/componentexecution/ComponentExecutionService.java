@@ -313,19 +313,6 @@ public class ComponentExecutionService implements IComponentExecutionService
 				}
 			}
 		}
-
-		IComponentListener[]	alisteners;
-		synchronized(listeners)
-		{
-			Set	slisteners	= new HashSet(listeners.getCollection(null));
-			slisteners.addAll(listeners.getCollection(cid));
-			alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
-		}
-		// todo: can be called after listener has (concurrently) deregistered
-		for(int i=0; i<alisteners.length; i++)
-		{
-			alisteners[i].componentChanged(desc);
-		}
 	}
 
 	/**
