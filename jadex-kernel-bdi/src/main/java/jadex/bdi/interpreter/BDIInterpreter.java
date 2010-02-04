@@ -389,6 +389,14 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 ////					+ ", " + rulesystem.getState().getUnreferencedObjects();
 //			}
 
+			// Hack!!! platform should inform about ext entries to update agenda.
+			Activation	act	= rulesystem.getAgenda().getLastActivation();
+//			System.out.println("here: "+act);
+			state.getProfiler().start(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
+			state.expungeStaleObjects();
+			state.notifyEventListeners();
+			state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
+
 			boolean	execute	= true;
 //			if(!extexecuted)
 			{
@@ -454,7 +462,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			}
 			// Necessary because in step mode state changes may happen and 
 			// event listeners need to be notified!
-			Activation	act	= rulesystem.getAgenda().getLastActivation();
+			/*Activation*/	act	= rulesystem.getAgenda().getLastActivation();
 //			System.out.println("here: "+act);
 			state.getProfiler().start(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
 			state.expungeStaleObjects();

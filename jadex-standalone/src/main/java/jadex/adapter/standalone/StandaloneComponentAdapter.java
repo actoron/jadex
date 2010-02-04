@@ -143,7 +143,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 
 		// Resume execution of the agent (when active or terminating).
 		if(IComponentDescription.STATE_ACTIVE.equals(desc.getState())
-			|| IComponentDescription.STATE_TERMINATING.equals(desc.getState())
+			/*|| IComponentDescription.STATE_TERMINATING.equals(desc.getState())*/
 			|| IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))	// Hack!!! external entries must also be executed in suspended state.
 		{
 			//System.out.println("wakeup called: "+state);
@@ -341,7 +341,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
 			throw new ComponentTerminatedException(cid.getName());
 
-		assert IComponentDescription.STATE_ACTIVE.equals(desc.getState()) || IComponentDescription.STATE_TERMINATING.equals(desc.getState())
+		assert IComponentDescription.STATE_ACTIVE.equals(desc.getState()) /*|| IComponentDescription.STATE_TERMINATING.equals(desc.getState())*/
 		||  IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) ||  IComponentDescription.STATE_WAITING.equals(desc.getState()) : desc.getState();
 		
 		// Copy actions from external threads into the state.

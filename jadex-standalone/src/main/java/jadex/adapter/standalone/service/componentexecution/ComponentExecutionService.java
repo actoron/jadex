@@ -292,20 +292,15 @@ public class ComponentExecutionService implements IComponentExecutionService
 				desc	= (CESComponentDescription)descs.get(cid);
 				if(desc!=null)
 				{
-					// Resume a suspended agent before killing it.
-					if(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
-						resumeComponent(cid, null);
-					
-					if(IComponentDescription.STATE_ACTIVE.equals(desc.getState()))
+					if(!ccs.containsKey(cid))
 					{
-						desc.setState(IComponentDescription.STATE_TERMINATING);
 						CleanupCommand	cc	= new CleanupCommand(cid);
 						ccs.put(cid, cc);
 						if(listener!=null)
 							cc.addKillListener(listener);
 						agent.killComponent(cc);						
 					}
-					else if(IComponentDescription.STATE_TERMINATING.equals(desc.getState()))
+					else
 					{
 						if(listener!=null)
 						{
@@ -314,11 +309,6 @@ public class ComponentExecutionService implements IComponentExecutionService
 								listener.exceptionOccurred(this, new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
 							cc.addKillListener(listener);
 						}
-					}
-					else
-					{
-						listener.exceptionOccurred(this, new RuntimeException("Cannot kill "+cid+" component: "+desc.getState()));
-						//throw new RuntimeException("Cannot kill "+aid+" agent: "+desc.getState());
 					}
 				}
 			}
@@ -358,7 +348,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 					IComponentDescription	sub	= (IComponentDescription)it.next();
 					if(componentid.equals(sub.getParent())
 						&& (IComponentDescription.STATE_ACTIVE.equals(sub.getState())
-							|| IComponentDescription.STATE_TERMINATING.equals(sub.getState())))
+							/*|| IComponentDescription.STATE_TERMINATING.equals(sub.getState())*/))
 					{
 						suspendComponent(sub.getName(), null);	// todo: cascading suspend with wait?
 					}
@@ -370,7 +360,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
 					//throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
 				if(!IComponentDescription.STATE_ACTIVE.equals(ad.getState())
-					&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState()))
+					/*&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState())*/)
 				{
 					listener.exceptionOccurred(this, new RuntimeException("Only active components can be suspended: "+componentid+" "+ad.getState()));
 					//throw new RuntimeException("Only active agents can be suspended: "+aid+" "+ad.getState());
