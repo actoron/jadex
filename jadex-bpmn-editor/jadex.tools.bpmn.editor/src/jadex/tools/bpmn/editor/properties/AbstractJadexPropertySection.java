@@ -85,6 +85,10 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	/** Key for the implementing message. */
 	public static final String JADEX_EVENT_MESSAGE_DETAIL = "message";
 	
+	/** Key for the implementing error. */
+	public static final String JADEX_EVENT_ERROR_DETAIL = "error";
+
+	
 	
 	/** Key for the parameter map of a task. */
 	public static final String JADEX_FLOW_EXAMPLE_ANNOTATION = "example";

@@ -216,6 +216,20 @@
      </propertySections>
    </extension>
    
+   <!-- error event property section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertySection
+              class="jadex.tools.bpmn.editor.properties.JadexErrorEventPropertySection"
+              filter="jadex.tools.bpmn.editor.properties.JadexErrorEventFilter"
+              id="jadex.tools.bpmn.editor.properties.JadexErrorEventPropertySection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
+           <input type="org.eclipse.stp.bpmn.Activity"/>
+        </propertySection>
+     </propertySections>
+   </extension>
+   
    
     <!-- the jadex sequence property section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
