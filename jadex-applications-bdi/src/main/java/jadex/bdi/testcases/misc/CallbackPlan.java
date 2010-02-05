@@ -367,7 +367,7 @@ public class CallbackPlan extends Plan
 			}
 		});
 		
-		killComponent();
+		killAgent();
 	}
 	
 	/**

@@ -54,6 +54,6 @@ public class EmptyPlan extends Plan
 //		ISpaceObject myself = (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 //		env.destroySpaceObject(myself.getId());
 		
-		killComponent();
+		killAgent();
 	}
 }

@@ -2,6 +2,7 @@ package jadex.bdi.benchmarks;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 
 /**
@@ -48,5 +49,9 @@ public class RequestSenderPlan extends Plan
 		
 		time	= System.currentTimeMillis() - time;
 		System.out.println("Issued "+max+" protocols in "+time+" millis.");
-	}	
+		
+		// Kill the receiver (i.e. the request performance master agent.
+		IComponentExecutionService	ces	= (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+		ces.destroyComponent(receiver, null);
+	}
 }

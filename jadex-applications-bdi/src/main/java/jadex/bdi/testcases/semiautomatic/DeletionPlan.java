@@ -29,7 +29,7 @@ public class DeletionPlan extends Plan
 		getLogger().info("When no more output test has failed.");
 
 		startAtomic();
-		killComponent();
+		killAgent();
 		getLogger().info("Alive while plan is running (When no more outputs, test succeeded).");
 		endAtomic();
 

@@ -417,14 +417,14 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	/**
 	 *  Kill this agent.
 	 */
-	public void killComponent()
+	public void killAgent()
 	{
 //		capability.killAgent();
 		// Problem: duplicate functionality here and in capability flyweight :-(
 //		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, 
 //			OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATING);
 		interpreter.startMonitorConsequences();
-		getInterpreter().killComponent();
+		getInterpreter().killAgent();
 		interpreter.endMonitorConsequences();
 	}
 

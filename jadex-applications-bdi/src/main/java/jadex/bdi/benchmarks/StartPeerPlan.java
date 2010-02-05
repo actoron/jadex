@@ -129,7 +129,7 @@ public class StartPeerPlan extends Plan
 			System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 			System.out.println("Still used memory: "+stillused+"kB.");
 
-			killComponent();
+			killAgent();
 		}
 	}
 

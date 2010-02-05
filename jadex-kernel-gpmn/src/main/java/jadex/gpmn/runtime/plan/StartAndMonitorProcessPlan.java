@@ -84,7 +84,7 @@ public class StartAndMonitorProcessPlan extends Plan
 		}
 		while(mviolated!=null);
 		
-		killComponent();
+		killAgent();
 	}
 	
 	public void passed()

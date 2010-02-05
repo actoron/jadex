@@ -37,6 +37,6 @@ public class RemoverPlan extends Plan
 			getLogger().info("Failure! Plan with invalid context still alive.");
 		}
 
-		killComponent();
+		killAgent();
 	}
 }

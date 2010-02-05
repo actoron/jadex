@@ -23,7 +23,7 @@ public class MessageReceiverPlan extends Plan
 			long starttime = ((Long)getBeliefbase().getBelief("starttime").getFact()).longValue();
 			long dur = getTime() - starttime;
 			System.out.println("Sending/receiving " + msgcnt + " messages took: " + dur + " milliseconds.");
-			killComponent();
+			killAgent();
 		}
 	}
 }

@@ -14,6 +14,6 @@ public class WriteResultsPlan extends Plan
 	{
 		String arg = (String)getBeliefbase().getBelief("arg").getFact();
 		getBeliefbase().getBelief("arg").setFact(arg+"--written");
-		killComponent();
+		killAgent();
 	}
 }

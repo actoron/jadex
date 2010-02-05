@@ -672,7 +672,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 //		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, 
 //			OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATING);
 		interpreter.startMonitorConsequences();
-		getInterpreter().killComponent();
+		getInterpreter().killAgent();
 		interpreter.endMonitorConsequences();
 	}
 

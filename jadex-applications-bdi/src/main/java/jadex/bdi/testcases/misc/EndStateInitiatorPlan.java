@@ -19,6 +19,6 @@ public class EndStateInitiatorPlan extends Plan
 		waitFor(300);
 
 		// Kill agent to start end state.
-		killComponent();
+		killAgent();
 	}
 }

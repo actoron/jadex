@@ -12,6 +12,6 @@ public class FinishedPlan extends Plan
 	 */
 	public void body()
 	{
-		killComponent();
+		killAgent();
 	}
 }

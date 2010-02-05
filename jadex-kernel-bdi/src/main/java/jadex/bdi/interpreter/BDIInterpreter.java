@@ -829,7 +829,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	/**
 	 *  Kill the component.
 	 */
-	public void	killComponent()
+	public void	killAgent()
 	{
 		((IComponentExecutionService)adapter.getServiceContainer()
 			.getService(IComponentExecutionService.class))

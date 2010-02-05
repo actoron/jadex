@@ -15,6 +15,6 @@ public class ArgumentsWorkerPlan extends Plan
 	{
 		IMessageEvent me = createMessageEvent("inform_created");
 		sendMessage(me);
-		killComponent();
+		killAgent();
 	}
 }

@@ -552,6 +552,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 					CESComponentDescription	desc	= (CESComponentDescription)descs.get(cid);
 					desc.setState(IComponentDescription.STATE_TERMINATED);
 					descs.remove(cid);
+					ccs.remove(cid);
 					
 					// Stop execution of agent.
 					((IExecutionService)container.getService(IExecutionService.class)).cancel(adapter, null);

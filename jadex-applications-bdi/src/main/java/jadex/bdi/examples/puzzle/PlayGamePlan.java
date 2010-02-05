@@ -42,6 +42,6 @@ public class PlayGamePlan extends Plan
 			}
 		}
 
-		killComponent();
+		killAgent();
 	}
 }
