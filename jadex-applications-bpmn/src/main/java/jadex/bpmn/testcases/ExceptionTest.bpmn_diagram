@@ -10,7 +10,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_kVAXExGCEd-qQOr2ZLx-Mw"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_kVAXFBGCEd-qQOr2ZLx-Mw" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="ExceptionTest.bpmn#_kU2mERGCEd-qQOr2ZLx-Mw"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_kVAXFRGCEd-qQOr2ZLx-Mw" x="8" y="72"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_kVAXFRGCEd-qQOr2ZLx-Mw" y="94"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_omlhBBGCEd-qQOr2ZLx-Mw" type="2002">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_9sCQwBGCEd-qQOr2ZLx-Mw" source="SubProcess_Annotation">
@@ -44,7 +44,7 @@
             <styles xmi:type="notation:FillStyle" xmi:id="_ApKTxRGEEd-qQOr2ZLx-Mw"/>
             <styles xmi:type="notation:LineStyle" xmi:id="_ApKTxhGEEd-qQOr2ZLx-Mw" lineColor="0"/>
             <element xmi:type="bpmn:Activity" href="ExceptionTest.bpmn#_ApKTwRGEEd-qQOr2ZLx-Mw"/>
-            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ApKTxxGEEd-qQOr2ZLx-Mw" x="186" y="41"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ApKTxxGEEd-qQOr2ZLx-Mw" x="166" y="41"/>
           </children>
           <styles xmi:type="notation:DrawerStyle" xmi:id="_omvSARGCEd-qQOr2ZLx-Mw"/>
           <styles xmi:type="notation:SortingStyle" xmi:id="_omvSAhGCEd-qQOr2ZLx-Mw"/>
@@ -68,7 +68,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_omlhBxGCEd-qQOr2ZLx-Mw"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_omlhCBGCEd-qQOr2ZLx-Mw" lineColor="0"/>
         <element xmi:type="bpmn:SubProcess" href="ExceptionTest.bpmn#_omlhARGCEd-qQOr2ZLx-Mw"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_omlhCRGCEd-qQOr2ZLx-Mw" x="61" y="21" width="426" height="135"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_omlhCRGCEd-qQOr2ZLx-Mw" x="63" y="21" width="426" height="180"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_9c_IIhGCEd-qQOr2ZLx-Mw" type="2001">
         <children xmi:type="notation:Node" xmi:id="_9c_IKBGCEd-qQOr2ZLx-Mw" type="4001"/>
@@ -77,7 +77,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_9c_IJRGCEd-qQOr2ZLx-Mw"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_9c_IJhGCEd-qQOr2ZLx-Mw" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="ExceptionTest.bpmn#_9c_IIRGCEd-qQOr2ZLx-Mw"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_9c_IJxGCEd-qQOr2ZLx-Mw" x="536" y="151"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_9c_IJxGCEd-qQOr2ZLx-Mw" x="538" y="190"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_BnHmQhGDEd-qQOr2ZLx-Mw" type="2001">
         <children xmi:type="notation:Node" xmi:id="_BnHmSBGDEd-qQOr2ZLx-Mw" type="4001"/>
@@ -86,7 +86,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_BnHmRRGDEd-qQOr2ZLx-Mw"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_BnHmRhGDEd-qQOr2ZLx-Mw" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="ExceptionTest.bpmn#_BnHmQRGDEd-qQOr2ZLx-Mw"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_BnHmRxGDEd-qQOr2ZLx-Mw" x="536" y="58"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_BnHmRxGDEd-qQOr2ZLx-Mw" x="538" y="80"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_NyTJshGDEd-qQOr2ZLx-Mw" type="2001">
         <children xmi:type="notation:Node" xmi:id="_NyTJuBGDEd-qQOr2ZLx-Mw" type="4001"/>
@@ -95,7 +95,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_NyTJtRGDEd-qQOr2ZLx-Mw"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_NyTJthGDEd-qQOr2ZLx-Mw" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="ExceptionTest.bpmn#_NyTJsRGDEd-qQOr2ZLx-Mw"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_NyTJtxGDEd-qQOr2ZLx-Mw" x="689" y="114"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_NyTJtxGDEd-qQOr2ZLx-Mw" x="703" y="146"/>
       </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_Ryn6oRF6Ed-qQOr2ZLx-Mw"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_Ryn6ohF6Ed-qQOr2ZLx-Mw"/>
@@ -106,7 +106,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_RyeJpxF6Ed-qQOr2ZLx-Mw" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_RyeJqBF6Ed-qQOr2ZLx-Mw" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="ExceptionTest.bpmn#_RyeJoRF6Ed-qQOr2ZLx-Mw"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Ryn6pBF6Ed-qQOr2ZLx-Mw" x="16" y="16" width="789" height="248"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Ryn6pBF6Ed-qQOr2ZLx-Mw" x="16" y="16" width="1075" height="292"/>
   </children>
   <styles xmi:type="notation:PageStyle" xmi:id="_RxuiwRF6Ed-qQOr2ZLx-Mw"/>
   <styles xmi:type="notation:GuideStyle" xmi:id="_RxuiwhF6Ed-qQOr2ZLx-Mw"/>

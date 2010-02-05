@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_uFG-IRJREd-3Ruc_856dPQ" iD="_uFG-IBJREd-3Ruc_856dPQ">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_jCnb4BJjEd-3Ruc_856dPQ" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jCnb4RJjEd-3Ruc_856dPQ" key="imports" value="jadex.bpmn.runtime.task.*␟jadex.adapter.base.test.*␟jadex.commons.IFilter␟jadex.adapter.base.fipa.SFipa"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jCnb4hJjEd-3Ruc_856dPQ" key="Package" value="jadex.bpmn.testcases"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IB5wIBJ6Ed-3Ruc_856dPQ" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_uFjqERJREd-3Ruc_856dPQ" iD="_uFjqEBJREd-3Ruc_856dPQ" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_uFjqExJREd-3Ruc_856dPQ" iD="_uFjqEhJREd-3Ruc_856dPQ" outgoingEdges="_atklERJ6Ed-3Ruc_856dPQ" name="Pre Message Receival" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_93ja0RJfEd-3Ruc_856dPQ" iD="_93ja0BJfEd-3Ruc_856dPQ" outgoingEdges="_5VX00RJ6Ed-3Ruc_856dPQ" incomingEdges="_93ja2hJfEd-3Ruc_856dPQ" name="Receive Message" activityType="EventIntermediateMessage">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_FK_zQBJgEd-3Ruc_856dPQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FK_zQRJgEd-3Ruc_856dPQ" key="message" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FK_zQhJgEd-3Ruc_856dPQ" key="mode" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GF25ABJgEd-3Ruc_856dPQ" key="filter" value="IFilter.ALWAYS"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gZJ7wBJiEd-3Ruc_856dPQ" key="msgtype" value=""/>
+      </eAnnotations>
+      <incomingMessages xmi:type="bpmn:MessagingEdge" href="#__aYDARJgEd-3Ruc_856dPQ"/>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_-btJYRJiEd-3Ruc_856dPQ" iD="_-btJYBJiEd-3Ruc_856dPQ" incomingEdges="_5VX00RJ6Ed-3Ruc_856dPQ" name="Succeeded" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_FD8BoBJjEd-3Ruc_856dPQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FD8BoRJjEd-3Ruc_856dPQ" key="class" value="StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IxnNQBJjEd-3Ruc_856dPQ" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Message sending testcase.&quot;, true, null)})"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ZU6JARJ6Ed-3Ruc_856dPQ" iD="_ZU6JABJ6Ed-3Ruc_856dPQ" outgoingEdges="_93ja2hJfEd-3Ruc_856dPQ _hMko0RJ6Ed-3Ruc_856dPQ" incomingEdges="_atklERJ6Ed-3Ruc_856dPQ" activityType="EventIntermediateMultiple"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_g5MZ0RJ6Ed-3Ruc_856dPQ" iD="_g5MZ0BJ6Ed-3Ruc_856dPQ" outgoingEdges="_jMIFyhJ6Ed-3Ruc_856dPQ" incomingEdges="_hMko0RJ6Ed-3Ruc_856dPQ" activityType="EventIntermediateTimer">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_NH0roBJ7Ed-3Ruc_856dPQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NH0roRJ7Ed-3Ruc_856dPQ" key="timer" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NH0rohJ7Ed-3Ruc_856dPQ" key="duration" value="2000"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_jMIFwRJ6Ed-3Ruc_856dPQ" iD="_jMIFwBJ6Ed-3Ruc_856dPQ" incomingEdges="_jMIFyhJ6Ed-3Ruc_856dPQ" name="Failed" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_6goHABJ6Ed-3Ruc_856dPQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6goHARJ6Ed-3Ruc_856dPQ" key="class" value="StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7_i8EBJ6Ed-3Ruc_856dPQ" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Message sending test.&quot;, false, &quot;Message did not arrive.&quot;)})"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_93ja2hJfEd-3Ruc_856dPQ" iD="_93ja2RJfEd-3Ruc_856dPQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_atklERJ6Ed-3Ruc_856dPQ" iD="_atklEBJ6Ed-3Ruc_856dPQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_hMko0RJ6Ed-3Ruc_856dPQ" iD="_hMko0BJ6Ed-3Ruc_856dPQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_jMIFyhJ6Ed-3Ruc_856dPQ" iD="_jMIFyRJ6Ed-3Ruc_856dPQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_5VX00RJ6Ed-3Ruc_856dPQ" iD="_5VX00BJ6Ed-3Ruc_856dPQ"/>
+  </pools>
+  <pools xmi:type="bpmn:Pool" xmi:id="_v3aCMRJREd-3Ruc_856dPQ" iD="_v3aCMBJREd-3Ruc_856dPQ" name="Pool0">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_eQvvsRJgEd-3Ruc_856dPQ" iD="_eQvvsBJgEd-3Ruc_856dPQ" outgoingEdges="_2dIbOhJgEd-3Ruc_856dPQ" name="Pre Message&#xD;&#xA;Sending"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_2dIbMRJgEd-3Ruc_856dPQ" iD="_2dIbMBJgEd-3Ruc_856dPQ" outgoingEdges="_4D8oChJgEd-3Ruc_856dPQ" incomingEdges="_2dIbOhJgEd-3Ruc_856dPQ" name="Send Message" activityType="EventIntermediateMessage">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_K2eS4BJhEd-3Ruc_856dPQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_K2eS4RJhEd-3Ruc_856dPQ" key="message" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_K2eS4hJhEd-3Ruc_856dPQ" key="mode" value="&quot;send&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NfTWUBJhEd-3Ruc_856dPQ" key="msgtype" value="&quot;fipa&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gJz4MBJiEd-3Ruc_856dPQ" key="filter" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_g5my4BJhEd-3Ruc_856dPQ" source="activity">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_g5my4RJhEd-3Ruc_856dPQ" key="parameters" value="performative␋SFipa.INFORM␟receivers␋new String[]{&quot;MessageTest&quot;}␟content␋&quot;content&quot;"/>
+      </eAnnotations>
+      <outgoingMessages xmi:type="bpmn:MessagingEdge" href="#__aYDARJgEd-3Ruc_856dPQ"/>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_4D8oARJgEd-3Ruc_856dPQ" iD="_4D8oABJgEd-3Ruc_856dPQ" incomingEdges="_4D8oChJgEd-3Ruc_856dPQ" name="Post Message&#xD;&#xA;Sending" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_gJVaQBJmEd-3Ruc_856dPQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gJVaQRJmEd-3Ruc_856dPQ" key="class" value=""/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_2dIbOhJgEd-3Ruc_856dPQ" iD="_2dIbORJgEd-3Ruc_856dPQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_4D8oChJgEd-3Ruc_856dPQ" iD="_4D8oCRJgEd-3Ruc_856dPQ"/>
+  </pools>
+  <messages xmi:type="bpmn:MessagingEdge" xmi:id="__aYDARJgEd-3Ruc_856dPQ" iD="__aYDABJgEd-3Ruc_856dPQ" source="_2dIbMRJgEd-3Ruc_856dPQ" target="_93ja0RJfEd-3Ruc_856dPQ"/>
+</bpmn:BpmnDiagram>

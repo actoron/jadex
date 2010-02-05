@@ -10,11 +10,15 @@
     <vertices xmi:type="bpmn:SubProcess" xmi:id="_omlhARGCEd-qQOr2ZLx-Mw" iD="_omlhABGCEd-qQOr2ZLx-Mw" outgoingEdges="_BnHmShGDEd-qQOr2ZLx-Mw" incomingEdges="_vLsMwRGCEd-qQOr2ZLx-Mw">
       <vertices xmi:type="bpmn:Activity" xmi:id="_omlhAxGCEd-qQOr2ZLx-Mw" iD="_omlhAhGCEd-qQOr2ZLx-Mw" outgoingEdges="_BiPQ0RGEEd-qQOr2ZLx-Mw" name="Sub 1"/>
       <vertices xmi:type="bpmn:Activity" xmi:id="_1E1xcRGCEd-qQOr2ZLx-Mw" iD="_1E1xcBGCEd-qQOr2ZLx-Mw" incomingEdges="_BvpasRGEEd-qQOr2ZLx-Mw" name="Sub 3" activityType="Task"/>
-      <vertices xmi:type="bpmn:Activity" xmi:id="_ApKTwRGEEd-qQOr2ZLx-Mw" iD="_ApKTwBGEEd-qQOr2ZLx-Mw" outgoingEdges="_BvpasRGEEd-qQOr2ZLx-Mw" incomingEdges="_BiPQ0RGEEd-qQOr2ZLx-Mw" activityType="EventIntermediateError"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_ApKTwRGEEd-qQOr2ZLx-Mw" iD="_ApKTwBGEEd-qQOr2ZLx-Mw" outgoingEdges="_BvpasRGEEd-qQOr2ZLx-Mw" incomingEdges="_BiPQ0RGEEd-qQOr2ZLx-Mw" name="Throw exception" activityType="EventIntermediateError">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_QUdpkBI1Ed-3Ruc_856dPQ" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QUdpkhI1Ed-3Ruc_856dPQ" key="exception" value="new RuntimeException()"/>
+        </eAnnotations>
+      </vertices>
       <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_AeQgwRGDEd-qQOr2ZLx-Mw" iD="_AeQgwBGDEd-qQOr2ZLx-Mw"/>
       <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_BiPQ0RGEEd-qQOr2ZLx-Mw" iD="_BiPQ0BGEEd-qQOr2ZLx-Mw"/>
       <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_BvpasRGEEd-qQOr2ZLx-Mw" iD="_BvpasBGEEd-qQOr2ZLx-Mw"/>
-      <eventHandlers xmi:type="bpmn:Activity" xmi:id="__Z3EgRGCEd-qQOr2ZLx-Mw" iD="__Z3EgBGCEd-qQOr2ZLx-Mw" outgoingEdges="_AeQgwRGDEd-qQOr2ZLx-Mw" name="Catch Exception&#xD;&#xA;catch = true" activityType="EventIntermediateError"/>
+      <eventHandlers xmi:type="bpmn:Activity" xmi:id="__Z3EgRGCEd-qQOr2ZLx-Mw" iD="__Z3EgBGCEd-qQOr2ZLx-Mw" outgoingEdges="_AeQgwRGDEd-qQOr2ZLx-Mw" name="Catch Exception&#xD;&#xA;" activityType="EventIntermediateError"/>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_9c_IIRGCEd-qQOr2ZLx-Mw" iD="_9c_IIBGCEd-qQOr2ZLx-Mw" outgoingEdges="_Ph6tMRGDEd-qQOr2ZLx-Mw" incomingEdges="_AeQgwRGDEd-qQOr2ZLx-Mw" name="Success">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_7N_2IBGEEd-qQOr2ZLx-Mw" source="jadex">
