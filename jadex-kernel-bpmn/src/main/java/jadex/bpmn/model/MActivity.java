@@ -61,6 +61,9 @@ public class MActivity extends MAssociationTarget
 	/** The lane (if any). */
 	protected MLane lane;
 		
+	/** The flag if this activity is an event handler. */
+	protected boolean eventhandler;
+	
 	//-------- added --------
 	
 	/** The parameters. */
@@ -538,4 +541,23 @@ public class MActivity extends MAssociationTarget
 			name	= getActivityType()+"("+getId()+")";
 		return name;
 	}
+
+	/**
+	 *  Get the eventhandler.
+	 *  @return The eventhandler.
+	 */
+	public boolean isEventHandler()
+	{
+		return this.eventhandler;
+	}
+
+	/**
+	 *  Set the eventhandler.
+	 *  @param eventhandler The eventhandler to set.
+	 */
+	public void setEventHandler(boolean eventhandler)
+	{
+		this.eventhandler = eventhandler;
+	}
+	
 }

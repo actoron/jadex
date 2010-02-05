@@ -179,7 +179,7 @@ public class BpmnXMLReader
 			new SubobjectInfo(new BeanAttributeInfo("eAnnotations", "annotation"))
 			})));
 		
-		types.add(new TypeInfo(new XMLInfo("eventHandlers"), new ObjectInfo(MActivity.class, new ActivityPostProcessor()),
+		types.add(new TypeInfo(new XMLInfo("eventHandlers"), new ObjectInfo(MActivity.class, new EventHandlerPostProcessor()),
 			new MappingInfo(null, new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", "description"),
 			new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription"),
@@ -476,35 +476,73 @@ public class BpmnXMLReader
 							if("parameters".equals(key))
 							{
 								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
+								
 								while(stok.hasMoreTokens())
 								{
 									String paramtext = stok.nextToken();
 									StringTokenizer stok2 = new StringTokenizer(paramtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-									String dir = stok2.nextToken();
-									String name = stok2.nextToken();
-									String clazzname = stok2.nextToken();
-									String val = stok2.nextToken();
-									
-									// context variable
-									Class clazz = SReflect.findClass0(clazzname, dia.getAllImports(), classloader);
-									if(clazz!=null)
+
+									// Parameters of normal activities have 4 elements
+									if(stok2.countTokens()==4)
 									{
+										String dir = stok2.nextToken();
+										String name = stok2.nextToken();
+										String clazzname = stok2.nextToken();
+										String val = stok2.nextToken();
+										
+										// context variable
+										Class clazz = SReflect.findClass0(clazzname, dia.getAllImports(), classloader);
+										if(clazz!=null)
+										{
+											IParsedExpression exp = null;
+											if(val!=null)
+											{
+												exp = parser.parseExpression(val, dia.getAllImports(), null, classloader);
+											}
+											MParameter param = new MParameter(dir, clazz, name, exp);
+											act.addParameter(param);
+//											System.out.println("Parameter: "+param);
+										}
+									}
+									
+									// Parameters of event handlers have 2 elements = are treated as properties?!
+									else if(stok2.countTokens()==2)
+									{
+										String name = stok2.nextToken();
+										String val = stok2.nextToken();
+										
+										// context variable
 										IParsedExpression exp = null;
 										if(val!=null)
 										{
 											exp = parser.parseExpression(val, dia.getAllImports(), null, classloader);
 										}
-										MParameter param = new MParameter(dir, clazz, name, exp);
-										act.addParameter(param);
-//										System.out.println("Parameter: "+param);
+										act.setPropertyValue(name, exp);
+//										System.out.println("Parameter/property: "+name+" "+exp);
+									}
+									else
+									{
+										throw new RuntimeException("Parameter specification error: "+stok2.countTokens()+" "+paramtext);
 									}
 								}
 							}
 							else // property
 							{
-								IParsedExpression propval = parser.parseExpression(value, dia.getAllImports(), null, classloader);
-								act.setPropertyValue(key, propval);
-//								System.out.println("Property: "+key+" "+value);
+								// Skip empty string (cannot be parsed to anything), for parsing empty string "" need to be used
+								if(!"".equals(value))
+								{
+									try
+									{
+										IParsedExpression propval = parser.parseExpression(value, dia.getAllImports(), null, classloader);
+										act.setPropertyValue(key, propval);
+	//									System.out.println("Property: "+key+" "+value);
+									}
+									catch(Exception e)
+									{
+										System.out.println("Property: "+key+" "+value);
+										e.printStackTrace();
+									}
+								}
 							}
 						}
 					}
@@ -521,6 +559,31 @@ public class BpmnXMLReader
 		public int getPass()
 		{
 			return 2;
+		}
+	}
+	
+	/**
+	 *  Event handler post processor.
+	 */
+	static class EventHandlerPostProcessor extends ActivityPostProcessor
+	{
+		//-------- IPostProcessor interface --------
+		
+		/**
+		 *  Establish element connections.
+		 */
+		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		{
+			Object ret = super.postProcess(context, object, root, classloader);
+			if(ret==null)
+			{
+				((MActivity)object).setEventHandler(true);
+			}
+			else
+			{
+				((MActivity)ret).setEventHandler(true);
+			}
+			return ret;
 		}
 	}
 	

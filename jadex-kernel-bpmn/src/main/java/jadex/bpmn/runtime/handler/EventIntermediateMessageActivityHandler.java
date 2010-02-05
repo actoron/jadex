@@ -54,17 +54,15 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	 */
 	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
-		if(MODE_SEND.equals(thread.getPropertyValue(PROPERTY_MODE)))
+		String mode = thread.hasPropertyValue(PROPERTY_MODE)? (String)thread.getPropertyValue(PROPERTY_MODE): MODE_RECEIVE;
+				
+		if(MODE_SEND.equals(mode))
 		{
 			sendMessage(activity, instance, thread);
 		}
-		else if(!thread.hasPropertyValue(PROPERTY_MODE) || MODE_RECEIVE.equals(thread.getPropertyValue(PROPERTY_MODE)))
+		else if(MODE_RECEIVE.equals(mode))
 		{
 			receiveMessage(activity, instance, thread);
-		}
-		else
-		{
-			throw new RuntimeException("Invalid mode: "+thread.getPropertyValue(PROPERTY_MODE)+", "+thread);
 		}
 	}
 	
@@ -84,7 +82,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 		
 		if(thread.hasPropertyValue(PROPERTY_MESSAGE))
 		{
-			msg = (Map)thread.getParameterValue(PROPERTY_MESSAGE);
+			msg = (Map)thread.getPropertyValue(PROPERTY_MESSAGE);
 		}
 		else
 		{

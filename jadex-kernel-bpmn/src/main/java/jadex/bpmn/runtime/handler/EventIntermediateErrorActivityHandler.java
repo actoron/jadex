@@ -14,12 +14,12 @@ public class EventIntermediateErrorActivityHandler extends DefaultActivityHandle
 	 */
 	protected void doExecute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
-		boolean cat = thread.hasPropertyValue("catch")? ((Boolean)thread.getPropertyValue("catch", activity)).booleanValue(): false;
-		
-		if(cat)
+		// Do catch exception when the activity is an event handler.
+		if(activity.isEventHandler())
 		{
 			super.doExecute(activity, instance, thread);
 		}
+		// Otherwise throw an exception.
 		else
 		{
 			Exception ex = (Exception)thread.getPropertyValue("exception", activity);
