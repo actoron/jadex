@@ -21,15 +21,17 @@ import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.gmf.runtime.common.ui.services.util.CommonLabelProvider;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.FigureUtilities;
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.ICellModifier;
+import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
@@ -46,8 +48,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
@@ -61,25 +61,25 @@ public abstract class Abstract4ColumnTablePropertySection extends AbstractJadexP
 
 	// ---- constants ----
 	
-	/**
-	 * the firstAttribute column label
-	 */
-	private final static String DEFAULT_FIRST_COLUMN = "First"; // //$NON-NLS-1$
-	
-	/**
-	 * the secondAttribute column label
-	 */
-	private final static String DEFAULT_SECOND_COLUMN = "Second"; // //$NON-NLS-1$
-	
-	/**
-	 * the secondAttribute column label
-	 */
-	private final static String DEFAULT_THIRD_COLUMN = "Third"; // //$NON-NLS-1$
-	
-	/**
-	 * the secondAttribute column label
-	 */
-	private final static String DEFAULT_FOURTH_COLUMN = "Fourth"; // //$NON-NLS-1$
+//	/**
+//	 * the firstAttribute column label
+//	 */
+//	private final static String DEFAULT_FIRST_COLUMN = "First"; // //$NON-NLS-1$
+//	
+//	/**
+//	 * the secondAttribute column label
+//	 */
+//	private final static String DEFAULT_SECOND_COLUMN = "Second"; // //$NON-NLS-1$
+//	
+//	/**
+//	 * the secondAttribute column label
+//	 */
+//	private final static String DEFAULT_THIRD_COLUMN = "Third"; // //$NON-NLS-1$
+//	
+//	/**
+//	 * the secondAttribute column label
+//	 */
+//	private final static String DEFAULT_FOURTH_COLUMN = "Fourth"; // //$NON-NLS-1$
 
 	protected final static int[] DEFAULT_COLUMN_WEIGHT = new int[] { 1, 1, 1, 8 };
 	
@@ -99,17 +99,17 @@ public abstract class Abstract4ColumnTablePropertySection extends AbstractJadexP
 	/** The label string for the tableViewer */
 	private String tableViewerLabel;
 	
-	/** the first column label */
-	private String firstColumn; 
-	
-	/** the second column label */
-	private String secondColumn; 
-	
-	/** the third column label */
-	private String thirdColumn; 
-	
-	/** the fourth column label */
-	private String fourthColumn; 
+//	/** the first column label */
+//	private String firstColumn; 
+//	
+//	/** the second column label */
+//	private String secondColumn; 
+//	
+//	/** the third column label */
+//	private String thirdColumn; 
+//	
+//	/** the fourth column label */
+//	private String fourthColumn; 
 	
 	private String[] columnNames;
 	
@@ -134,20 +134,20 @@ public abstract class Abstract4ColumnTablePropertySection extends AbstractJadexP
 		if (columns != null && columnsWeight != null)
 		{
 			assert (columns.length == 4) && (columnsWeight.length == 4);
-			this.firstColumn = columns[0];
-			this.secondColumn = columns[1];
-			this.thirdColumn = columns[2];
-			this.fourthColumn = columns[3];
+//			this.firstColumn = columns[0];
+//			this.secondColumn = columns[1];
+//			this.thirdColumn = columns[2];
+//			this.fourthColumn = columns[3];
 			this.columsWeight = columnsWeight;
 			this.columnNames = columns;
 			this.defaultListElementAttributeValues = defaultListElementAttributeValues;
 		}
 		else
 		{
-			this.firstColumn = DEFAULT_FIRST_COLUMN;
-			this.secondColumn = DEFAULT_SECOND_COLUMN;
-			this.thirdColumn = DEFAULT_THIRD_COLUMN;
-			this.fourthColumn = DEFAULT_FOURTH_COLUMN;
+//			this.firstColumn = DEFAULT_FIRST_COLUMN;
+//			this.secondColumn = DEFAULT_SECOND_COLUMN;
+//			this.thirdColumn = DEFAULT_THIRD_COLUMN;
+//			this.fourthColumn = DEFAULT_FOURTH_COLUMN;
 			this.columsWeight = DEFAULT_COLUMN_WEIGHT;
 			this.defaultListElementAttributeValues = DEFAULT_PARAMETER_VALUES;
 		}
@@ -247,7 +247,7 @@ public abstract class Abstract4ColumnTablePropertySection extends AbstractJadexP
 
 		// the displayed table
 		TableViewer viewer = new TableViewer(getWidgetFactory().createTable(parent,
-				SWT.SINGLE | /*SWT.H_SCROLL | SWT.V_SCROLL |*/ SWT.FULL_SELECTION | SWT.BORDER));
+				SWT.FULL_SELECTION | SWT.BORDER));
 
 		viewer.getTable().setLinesVisible(true);
 		viewer.getTable().setHeaderVisible(true);
@@ -255,14 +255,16 @@ public abstract class Abstract4ColumnTablePropertySection extends AbstractJadexP
 
 		Font tableFont = viewer.getTable().getFont();
 		TableLayout tableLayout = new TableLayout();
-		for (int i = 0; i < columns.length; i++)
+		for (int columnIndex = 0; columnIndex < columns.length; columnIndex++)
 		{
-			TableColumn column = new TableColumn(viewer.getTable(),
+			TableViewerColumn column = new TableViewerColumn(viewer,
 					SWT.LEFT);
-			column.setText(columns[i]);
+			column.getColumn().setText(columns[columnIndex]);
 
-			tableLayout.addColumnData(new ColumnWeightData(weight[i],
-					FigureUtilities.getTextWidth(columns[i], tableFont), true));
+			column.setEditingSupport(new General4ParameterEditingSupport(viewer, columnIndex));
+
+			tableLayout.addColumnData(new ColumnWeightData(weight[columnIndex],
+					FigureUtilities.getTextWidth(columns[columnIndex], tableFont), true));
 		}
 		viewer.getTable().setLayout(tableLayout);
 
@@ -278,164 +280,186 @@ public abstract class Abstract4ColumnTablePropertySection extends AbstractJadexP
 	 */
 	private void createCellModifier(TableViewer viewer)
 	{
-		TableViewerEditor.create(viewer,
-				new ColumnViewerEditorActivationStrategy(viewer),
-				TableViewerEditor.KEEP_EDITOR_ON_DOUBLE_CLICK
-						| TableViewerEditor.TABBING_HORIZONTAL
-						| TableViewerEditor.TABBING_CYCLE_IN_ROW);
-
-//		// Create the cell editors
-//		CellEditor[] editors = new CellEditor[] {
-//				new TextCellEditor(viewer.getTable()), // firstAttribute (text)
-//				new TextCellEditor(viewer.getTable()) // secondAttribute
-//		};
-		// Create the cell editors
-		CellEditor[] editors = new CellEditor[columnNames.length];
-		for (int i = 0; i < editors.length; i++)
-		{
-			editors[i] = new TextCellEditor(viewer.getTable());
-		}
 		
-		viewer.setCellEditors(editors);
-
-		// create the modify command
-		viewer.setCellModifier(new ICellModifier()
+		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(
+				viewer)
 		{
-			/**
-			 * Can modify all columns if model element exist. [Can only modify
-			 * the column named NAME else.]
-			 * @generated NOT
-			 */
-			public boolean canModify(Object element, String property)
+			protected boolean isEditorActivationEvent(
+					ColumnViewerEditorActivationEvent event)
 			{
-				if (element instanceof General4Parameter)
-				{
-					return true;
-				}
-				return false;
+				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
+						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
+						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION
+						|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED /*&& event.keyCode == SWT.CR*/)
+						;
 			}
+		};
 
-			/**
-			 * @return the secondAttribute of the property for the given element.
-			 * @generated NOT
-			 */
-			public Object getValue(Object element, String property)
-			{
-				if (element instanceof General4Parameter)
-				{
-					General4Parameter param = (General4Parameter) element;
-					if (firstColumn.equals(property))
-					{
-						return param.getFirstAttribute();
-					}
-
-					if (secondColumn.equals(property))
-					{
-						return param.getSecondAttribute();
-					}
-					
-					if (thirdColumn.equals(property))
-					{
-						return param.getThirdAttribute();
-					}
-					
-					if (fourthColumn.equals(property))
-					{
-						return param.getFourthAttribute();
-					}
-				}
-				// fall through
-				return null;
-			}
-
-			/**
-			 * modifies the secondAttribute of the General4Parameter according to the secondAttribute
-			 * given by the CellEditor.
-			 */
-			public void modify(Object element, String property,
-					final Object value)
-			{
-
-				if (element instanceof TableItem)
-				{
-
-					if ((((TableItem) element).getData()) instanceof General4Parameter)
-					{
-						final General4Parameter param = (General4Parameter) ((TableItem) element)
-								.getData();
-						final String fproperty = property;
-
-						// modify the element itself
-						if (value != null)
-						{
-							// modify the Parameter
-							ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
-									modelElement,
-									"Update EModelElement parameter list")
-							{
-								@Override
-								protected CommandResult doExecuteWithResult(
-										IProgressMonitor monitor,
-										IAdaptable info)
-										throws ExecutionException
-								{
-									
-									List params = getParameterList();
-									General4Parameter paramToChange = (General4Parameter) params.get(params.indexOf(param));
-
-									if (firstColumn.equals(fproperty))
-									{
-										paramToChange.setFirstAttribute((String) value);
-									}
-									else if (secondColumn.equals(fproperty))
-									{
-										paramToChange.setSecondAttribute((String) value);
-									}
-									else if (thirdColumn.equals(fproperty))
-									{
-										paramToChange.setThirdAttribute((String) value);
-									}
-									else if (fourthColumn.equals(fproperty))
-									{
-										paramToChange.setFourthAttribute((String) value);
-									}
-									else
-									{
-										throw new UnsupportedOperationException(
-												Messages.JadexCommonPropertySection_InvalidEditColumn_Message);
-									}
-
-									updateParameterList(params);
-									
-									return CommandResult.newOKCommandResult();
-								}
-							};
-							try
-							{
-								command.execute(null, null);
-								refresh();
-								refreshSelection();
-							}
-							catch (ExecutionException e)
-							{
-								BpmnDiagramEditorPlugin
-										.getInstance()
-										.getLog()
-										.log(
-												new Status(
-														IStatus.ERROR,
-														JadexBpmnEditor.ID,
-														IStatus.ERROR, e
-																.getMessage(),
-														e));
-							}
-						}
-
-					}
-				}
-
-			}
-		});
+		TableViewerEditor.create(viewer, actSupport,
+				TableViewerEditor.TABBING_HORIZONTAL
+						| TableViewerEditor.KEYBOARD_ACTIVATION
+						| TableViewerEditor.KEEP_EDITOR_ON_DOUBLE_CLICK
+						| TableViewerEditor.TABBING_CYCLE_IN_ROW
+						);
+		
+//		TableViewerEditor.create(viewer,
+//				new ColumnViewerEditorActivationStrategy(viewer),
+//				TableViewerEditor.KEEP_EDITOR_ON_DOUBLE_CLICK
+//						| TableViewerEditor.TABBING_HORIZONTAL
+//						| TableViewerEditor.TABBING_CYCLE_IN_ROW);
+//
+////		// Create the cell editors
+////		CellEditor[] editors = new CellEditor[] {
+////				new TextCellEditor(viewer.getTable()), // firstAttribute (text)
+////				new TextCellEditor(viewer.getTable()) // secondAttribute
+////		};
+//		// Create the cell editors
+//		CellEditor[] editors = new CellEditor[columnNames.length];
+//		for (int i = 0; i < editors.length; i++)
+//		{
+//			editors[i] = new TextCellEditor(viewer.getTable());
+//		}
+//		
+//		viewer.setCellEditors(editors);
+//
+//		// create the modify command
+//		viewer.setCellModifier(new ICellModifier()
+//		{
+//			/**
+//			 * Can modify all columns if model element exist. [Can only modify
+//			 * the column named NAME else.]
+//			 * @generated NOT
+//			 */
+//			public boolean canModify(Object element, String property)
+//			{
+//				if (element instanceof General4Parameter)
+//				{
+//					return true;
+//				}
+//				return false;
+//			}
+//
+//			/**
+//			 * @return the secondAttribute of the property for the given element.
+//			 * @generated NOT
+//			 */
+//			public Object getValue(Object element, String property)
+//			{
+//				if (element instanceof General4Parameter)
+//				{
+//					General4Parameter param = (General4Parameter) element;
+//					if (firstColumn.equals(property))
+//					{
+//						return param.getFirstAttribute();
+//					}
+//
+//					if (secondColumn.equals(property))
+//					{
+//						return param.getSecondAttribute();
+//					}
+//					
+//					if (thirdColumn.equals(property))
+//					{
+//						return param.getThirdAttribute();
+//					}
+//					
+//					if (fourthColumn.equals(property))
+//					{
+//						return param.getFourthAttribute();
+//					}
+//				}
+//				// fall through
+//				return null;
+//			}
+//
+//			/**
+//			 * modifies the secondAttribute of the General4Parameter according to the secondAttribute
+//			 * given by the CellEditor.
+//			 */
+//			public void modify(Object element, String property,
+//					final Object value)
+//			{
+//
+//				if (element instanceof TableItem)
+//				{
+//
+//					if ((((TableItem) element).getData()) instanceof General4Parameter)
+//					{
+//						final General4Parameter param = (General4Parameter) ((TableItem) element)
+//								.getData();
+//						final String fproperty = property;
+//
+//						// modify the element itself
+//						if (value != null)
+//						{
+//							// modify the Parameter
+//							ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
+//									modelElement,
+//									"Update EModelElement parameter list")
+//							{
+//								@Override
+//								protected CommandResult doExecuteWithResult(
+//										IProgressMonitor monitor,
+//										IAdaptable info)
+//										throws ExecutionException
+//								{
+//									
+//									List params = getParameterList();
+//									General4Parameter paramToChange = (General4Parameter) params.get(params.indexOf(param));
+//
+//									if (firstColumn.equals(fproperty))
+//									{
+//										paramToChange.setFirstAttribute((String) value);
+//									}
+//									else if (secondColumn.equals(fproperty))
+//									{
+//										paramToChange.setSecondAttribute((String) value);
+//									}
+//									else if (thirdColumn.equals(fproperty))
+//									{
+//										paramToChange.setThirdAttribute((String) value);
+//									}
+//									else if (fourthColumn.equals(fproperty))
+//									{
+//										paramToChange.setFourthAttribute((String) value);
+//									}
+//									else
+//									{
+//										throw new UnsupportedOperationException(
+//												Messages.JadexCommonPropertySection_InvalidEditColumn_Message);
+//									}
+//
+//									updateParameterList(params);
+//									
+//									return CommandResult.newOKCommandResult();
+//								}
+//							};
+//							try
+//							{
+//								command.execute(null, null);
+//								refresh();
+//								refreshSelection();
+//							}
+//							catch (ExecutionException e)
+//							{
+//								BpmnDiagramEditorPlugin
+//										.getInstance()
+//										.getLog()
+//										.log(
+//												new Status(
+//														IStatus.ERROR,
+//														JadexBpmnEditor.ID,
+//														IStatus.ERROR, e
+//																.getMessage(),
+//														e));
+//							}
+//						}
+//
+//					}
+//				}
+//
+//			}
+//		});
 	}
 	
 	/**
@@ -972,7 +996,167 @@ public abstract class Abstract4ColumnTablePropertySection extends AbstractJadexP
 
 	}
 	
+	protected class General4ParameterEditingSupport extends EditingSupport {
+		
+		private CellEditor editor;
+		private int attributeIndex;
+
+		public General4ParameterEditingSupport(TableViewer viewer, int attributeIndex)
+		{
+			super(viewer);
+			this.editor = new TextCellEditor(viewer.getTable());
+			this.attributeIndex = attributeIndex;
+		}
+
+		/**
+		 * Can edit all columns.
+		 * @generated NOT
+		 */
+		public boolean canEdit(Object element)
+		{
+			if (element instanceof General4Parameter)
+			{
+				return true;
+			}
+			return false;
+		}
+		
+		protected CellEditor getCellEditor(Object element) {
+			return editor;
+		}
+
+		protected void setValue(Object element, Object value) {
+			doSetValue(element, value);
+			getViewer().update(element, null);
+		}
+
+		protected Object getValue(Object element)
+		{
+			String ret;
+			switch (attributeIndex)
+			{
+				case 0:
+					ret = ((General4Parameter) element).firstAttribute;
+					break;
+				case 1:
+					ret = ((General4Parameter) element).secondAttribute;
+					break;
+				case 2:
+					ret = ((General4Parameter) element).thirdAttribute;
+					break;
+				case 3:
+					ret = ((General4Parameter) element).fourthAttribute;
+					break;
+
+				default:
+					ret = "";
+					break;
+			}
+			return ret;
+		}
+		
+		protected void doSetValue(Object element, Object value)
+		{
+			
+			final General4Parameter param = (General4Parameter) element;
+			final String newValue = value.toString();
+			
+			// modify the Model
+			final ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
+					modelElement,
+					"Update EModelElement parameter list")
+			{
+				@Override
+				protected CommandResult doExecuteWithResult(
+						IProgressMonitor monitor,
+						IAdaptable info)
+						throws ExecutionException
+				{
+					
+					List parameterList = getParameterList();
+					General4Parameter paramToChange = (General4Parameter) parameterList.get(parameterList.indexOf(param));
+
+					switch (attributeIndex)
+					{
+						case 0:
+							paramToChange.firstAttribute = newValue;
+							break;
+						case 1:
+							paramToChange.secondAttribute = newValue;
+							break;
+						case 2:
+							paramToChange.thirdAttribute = newValue;
+							break;
+						case 3:
+							paramToChange.fourthAttribute = newValue;
+							break;
+
+						default:
+							throw new UnsupportedOperationException(
+									Messages.JadexCommonPropertySection_InvalidEditColumn_Message);
+					}
+
+					updateParameterList(parameterList);
+					
+					return CommandResult.newOKCommandResult();
+				}
+			};
+			
+//			Display.getCurrent().asyncExec(new Runnable()
+//			{
+//				@Override
+//				public void run()
+//				{
+					try
+					{
+						//command.setReuseParentTransaction(true);
+						command.execute(null, null);
+						//refresh();
+						//refreshSelection();
+					}
+					catch (ExecutionException e)
+					{
+						BpmnDiagramEditorPlugin
+								.getInstance()
+								.getLog()
+								.log(
+										new Status(
+												IStatus.ERROR,
+												JadexBpmnEditor.ID,
+												IStatus.ERROR, e
+														.getMessage(),
+												e));
+					}
+//				}
+//			});
+			
+			
+			
+			// update the corresponding table element
+			switch (attributeIndex)
+			{
+				case 0:
+					((General4Parameter) element).firstAttribute = value.toString();
+					break;
+				case 1:
+					((General4Parameter) element).secondAttribute = value.toString();
+					break;
+				case 2:
+					((General4Parameter) element).thirdAttribute = value.toString();
+					break;
+				case 3:
+					((General4Parameter) element).fourthAttribute = value.toString();
+					break;
+
+				default:
+					break;
+			}
+		}
+	}
 	
+	
+
+
 	
 }
 
