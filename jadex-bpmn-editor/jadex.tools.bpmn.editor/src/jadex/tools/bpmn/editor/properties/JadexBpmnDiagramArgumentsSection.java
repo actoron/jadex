@@ -12,7 +12,7 @@ public class JadexBpmnDiagramArgumentsSection extends
 		Abstract4ColumnTablePropertySection
 {
 
-	public static final String label = "Arguents";
+	public static final String label = "Arguments";
 	public static final String[] fields = new String[] {"Name", "Description", "Typename", "Value"};
 	public static final int[] columnWeights = new int[] {1,1,1,8};
 	public static final String[] defaultListElementAttributeValues = new String[]{"name", "description", "Object", ""};
