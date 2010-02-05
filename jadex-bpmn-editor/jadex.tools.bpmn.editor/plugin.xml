@@ -5,8 +5,10 @@
          point="org.eclipse.ui.editors">
       <editor
             class="jadex.tools.bpmn.editor.JadexBpmnEditor"
+            matchingStrategy="org.eclipse.stp.bpmn.diagram.part.BpmnMatchingStrategy"
             contributorClass="jadex.tools.bpmn.editor.JadexBpmnEditorContributor"
             extensions="bpmn_diagram"
+            default="true"
             icon="icons/bpmn.png"
             id="jadex.tools.bpmn.editor.JadexBpmnEditorID"
             name="Jadex BPMN Editor">
