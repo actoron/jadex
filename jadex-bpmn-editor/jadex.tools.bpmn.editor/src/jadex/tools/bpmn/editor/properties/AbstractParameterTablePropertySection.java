@@ -21,9 +21,12 @@ import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.gmf.runtime.common.ui.services.util.CommonLabelProvider;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.FigureUtilities;
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
+import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -32,6 +35,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerEditor;
+import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.stp.bpmn.diagram.part.BpmnDiagramEditorPlugin;
@@ -231,7 +235,7 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 
 		// the displayed table
 		TableViewer viewer = new TableViewer(getWidgetFactory().createTable(parent,
-				SWT.SINGLE | /*SWT.H_SCROLL | SWT.V_SCROLL |*/ SWT.FULL_SELECTION | SWT.BORDER));
+				 /*SWT.H_SCROLL | SWT.V_SCROLL |*/ SWT.FULL_SELECTION | SWT.BORDER));
 
 		viewer.getTable().setLinesVisible(true);
 		viewer.getTable().setHeaderVisible(true);
@@ -263,11 +267,6 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 	 */
 	private void createCellModifier(TableViewer viewer)
 	{
-		TableViewerEditor.create(viewer,
-				new ColumnViewerEditorActivationStrategy(viewer),
-				TableViewerEditor.KEEP_EDITOR_ON_DOUBLE_CLICK
-						| TableViewerEditor.TABBING_HORIZONTAL
-						| TableViewerEditor.TABBING_CYCLE_IN_ROW);
 
 		// Create the cell editors
 		CellEditor[] editors = new CellEditor[] {
@@ -436,6 +435,28 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 
 			}
 		});
+		
+
+		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(
+				viewer)
+		{
+			protected boolean isEditorActivationEvent(
+					ColumnViewerEditorActivationEvent event)
+			{
+				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
+						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
+						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION
+						|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED /*&& event.keyCode == SWT.CR*/)
+						;
+			}
+		};
+
+		TableViewerEditor.create(viewer, actSupport,
+				TableViewerEditor.TABBING_HORIZONTAL
+						| TableViewerEditor.KEYBOARD_ACTIVATION
+						| TableViewerEditor.KEEP_EDITOR_ON_DOUBLE_CLICK
+						| TableViewerEditor.TABBING_CYCLE_IN_ROW
+						);
 	}
 	
 	/**
