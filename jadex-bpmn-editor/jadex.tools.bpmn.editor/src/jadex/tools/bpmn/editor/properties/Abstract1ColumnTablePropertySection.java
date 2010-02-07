@@ -324,7 +324,7 @@ public abstract class Abstract1ColumnTablePropertySection extends AbstractJadexP
 							{
 								command.execute(null, null);
 								refresh();
-								refreshSelection();
+								refreshSelectedEditPart();
 							}
 							catch (ExecutionException e)
 							{
@@ -395,7 +395,7 @@ public abstract class Abstract1ColumnTablePropertySection extends AbstractJadexP
 				{
 					command.execute(null, null);
 					refresh();
-					refreshSelection();
+					refreshSelectedEditPart();
 				}
 				catch (ExecutionException ex)
 				{
@@ -447,7 +447,7 @@ public abstract class Abstract1ColumnTablePropertySection extends AbstractJadexP
 				{
 					command.execute(null, null);
 					refresh();
-					refreshSelection();
+					refreshSelectedEditPart();
 				}
 				catch (ExecutionException ex)
 				{

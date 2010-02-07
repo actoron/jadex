@@ -46,7 +46,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -514,7 +513,7 @@ public abstract class Abstract4ColumnTablePropertySection extends AbstractJadexP
 				{
 					command.execute(null, null);
 					refresh();
-					refreshSelection();
+					refreshSelectedEditPart();
 				}
 				catch (ExecutionException ex)
 				{
@@ -566,7 +565,7 @@ public abstract class Abstract4ColumnTablePropertySection extends AbstractJadexP
 				{
 					command.execute(null, null);
 					refresh();
-					refreshSelection();
+					refreshSelectedEditPart();
 				}
 				catch (ExecutionException ex)
 				{
@@ -608,18 +607,18 @@ public abstract class Abstract4ColumnTablePropertySection extends AbstractJadexP
 	{
 		updateJadexEAnnotation(annotationDetailName, convertParameterList(params));
 		
-		// HACK? Should use notification?
-		Display.getCurrent().asyncExec(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				if (tableViewer != null && modelElement != null)				
-				{
-					tableViewer.refresh();
-				}
-			}
-		});
+//		// HACK? Should use notification?
+//		Display.getCurrent().asyncExec(new Runnable()
+//		{
+//			@Override
+//			public void run()
+//			{
+//				if (tableViewer != null && modelElement != null)				
+//				{
+//					tableViewer.refresh();
+//				}
+//			}
+//		});
 		
 	}
 	
@@ -1027,7 +1026,10 @@ public abstract class Abstract4ColumnTablePropertySection extends AbstractJadexP
 
 		protected void setValue(Object element, Object value) {
 			doSetValue(element, value);
+			// refresh the table viewer element
 			getViewer().update(element, null);
+			// refresh the graphical edit part
+			refreshSelectedEditPart();
 		}
 
 		protected Object getValue(Object element)
@@ -1111,8 +1113,7 @@ public abstract class Abstract4ColumnTablePropertySection extends AbstractJadexP
 					{
 						//command.setReuseParentTransaction(true);
 						command.execute(null, null);
-						//refresh();
-						//refreshSelection();
+						
 					}
 					catch (ExecutionException e)
 					{

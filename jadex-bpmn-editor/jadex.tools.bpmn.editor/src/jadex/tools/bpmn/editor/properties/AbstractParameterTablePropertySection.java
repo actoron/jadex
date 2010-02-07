@@ -413,7 +413,7 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 							{
 								command.execute(null, null);
 								refresh();
-								refreshSelection();
+								refreshSelectedEditPart();
 							}
 							catch (ExecutionException e)
 							{
@@ -506,7 +506,7 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 				{
 					command.execute(null, null);
 					refresh();
-					refreshSelection();
+					refreshSelectedEditPart();
 				}
 				catch (ExecutionException ex)
 				{
@@ -558,7 +558,7 @@ public abstract class AbstractParameterTablePropertySection extends AbstractJade
 				{
 					command.execute(null, null);
 					refresh();
-					refreshSelection();
+					refreshSelectedEditPart();
 				}
 				catch (ExecutionException ex)
 				{

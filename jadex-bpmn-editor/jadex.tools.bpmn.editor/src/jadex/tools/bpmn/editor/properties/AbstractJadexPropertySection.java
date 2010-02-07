@@ -99,6 +99,7 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	 * <p><code>0x241F</code>	(9247)	SYMBOL FOR UNIT SEPARATOR</p>
 	 */
 	public static final String LIST_ELEMENT_DELIMITER = "\u241F"; // "<*>";
+	//public static final String LIST_ELEMENT_DELIMITER = "#"; // "<*>";
 	
 	
 	/** 
@@ -106,6 +107,7 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	 * <p><code>0x240B</code>	(9227)	SYMBOL FOR VERTICAL TABULATION</p>
 	 */
 	public static final String LIST_ELEMENT_ATTRIBUTE_DELIMITER = "\u240B"; //"#|#";
+	//public static final String LIST_ELEMENT_ATTRIBUTE_DELIMITER = "|"; //"#|#";
 
 	
 	// ---- attributes ----
@@ -251,7 +253,7 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	 * 
 	 * @generated NOT
 	 */
-	protected void refreshSelection()
+	protected void refreshSelectedEditPart()
 	{
 		if (getSelection() instanceof IStructuredSelection)
 		{
