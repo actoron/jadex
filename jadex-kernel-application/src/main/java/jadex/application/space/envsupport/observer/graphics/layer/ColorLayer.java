@@ -83,8 +83,8 @@ public class ColorLayer implements ILayer
 		prevals.put("$space", persp.getObserverCenter().getSpace());
 		Color c = color instanceof Color? (Color)color: (Color)SObjectInspector.getProperty(persp, (String)color, "$perspective", prevals);
 		
-		if(c==null)
-			System.out.println("here");
+//		if(c==null)
+//			System.out.println("here");
 		
 		gl.glColor4fv(c.getComponents(null), 0);
 		

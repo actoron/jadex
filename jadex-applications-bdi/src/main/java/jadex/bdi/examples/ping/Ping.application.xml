@@ -12,7 +12,7 @@
 	
 	<agenttypes>
 		<agenttype name="Ping" filename="jadex/bdi/examples/ping/Ping.agent.xml"/>
-		<agenttype name="Pinging" filename="jadex.bdi.examples.ping.Pinging"/>
+		<agenttype name="Pinging" filename="jadex/bdi/examples/ping/Pinging.agent.xml"/>
 	</agenttypes>
 	
 	<applications>
