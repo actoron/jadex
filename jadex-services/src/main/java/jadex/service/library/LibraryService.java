@@ -323,7 +323,7 @@ public class LibraryService implements IService, ILibraryService
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 //		baseClassLoader = Thread.currentThread().getContextClassLoader();
 //		libraryClassLoader = new DynamicMemoryClassLoader(baseClassLoader, null, null);
@@ -334,7 +334,7 @@ public class LibraryService implements IService, ILibraryService
 	 *  Releases all cached resources and shuts down the library service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
 		basecl = null;
 		libcl = null;

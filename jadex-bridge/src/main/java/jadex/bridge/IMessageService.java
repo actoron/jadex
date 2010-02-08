@@ -8,7 +8,7 @@ import java.util.Map;
  *  The interface for the message service. It is responsible for
  *  managing the transports and sending/delivering messages.
  */
-public interface IMessageService extends IService
+public interface IMessageService
 {
 	/**
 	 *  Send a message.

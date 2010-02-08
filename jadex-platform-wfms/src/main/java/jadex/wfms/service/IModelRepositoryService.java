@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Repository service for accessing process models.
  */
-public interface IModelRepositoryService extends IService
+public interface IModelRepositoryService
 {
 	/**
 	 *  Add a process model.

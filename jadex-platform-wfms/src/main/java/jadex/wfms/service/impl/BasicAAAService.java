@@ -1,6 +1,7 @@
 package jadex.wfms.service.impl;
 
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 import jadex.wfms.bdi.client.standard.SCapReqs;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IAAAService;
@@ -17,7 +18,7 @@ import java.util.Set;
 /** 
  *	Basic Authentication, Access control and Accounting Service.
  */
-public class BasicAAAService implements IAAAService
+public class BasicAAAService implements IAAAService, IService
 {
 	private Map userClients;
 	
@@ -61,7 +62,7 @@ public class BasicAAAService implements IAAAService
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 	}
 	
@@ -69,8 +70,10 @@ public class BasicAAAService implements IAAAService
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
+		if(listener!=null)
+			listener.resultAvailable(this, null);
 	}
 	
 	/**

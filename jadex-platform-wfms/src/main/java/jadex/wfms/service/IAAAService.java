@@ -10,7 +10,7 @@ import java.util.Set;
 /** 
  * Authentication, Access control and Accounting Service.
  */
-public interface IAAAService extends IService
+public interface IAAAService
 {
 	/** Keyword representing all roles */
 	public static final String ALL_ROLES = "all";

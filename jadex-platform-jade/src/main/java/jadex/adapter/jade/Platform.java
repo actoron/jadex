@@ -171,7 +171,7 @@ public class Platform extends BasicServiceContainer implements IPlatform
 					listener.resultAvailable(null);
 			}
 			
-			public void start()
+			public void startService()
 			{
 				// nop
 			}
@@ -190,12 +190,12 @@ public class Platform extends BasicServiceContainer implements IPlatform
 	/**
 	 *  Start the platform.
 	 */
-	public void start()
+	public void startService()
 	{
 		for(Iterator it=services.keySet().iterator(); it.hasNext(); )
 		{
 			IService service = (IService)services.get(it.next());
-			service.start();
+			service.startService();
 		}
 		
 		// Start Jade platform with platform agent
@@ -451,7 +451,7 @@ public class Platform extends BasicServiceContainer implements IPlatform
 		long starttime = System.currentTimeMillis();
 		
 		platform = new Platform();
-		platform.start();
+		platform.startService();
 		
 		long startup = System.currentTimeMillis() - starttime;
 		platform.logger.info("Platform startup time: " + startup + " ms.");

@@ -18,6 +18,7 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 import jadex.service.clock.IClockService;
 import jadex.service.execution.IExecutionService;
 
@@ -39,7 +40,7 @@ import java.util.logging.Logger;
  *  that are individually executed on the execution service, i.e. they are delivered
  *  synchronous or asynchronous depending on the execution service mode.
  */
-public class MessageService implements IMessageService
+public class MessageService implements IMessageService, IService
 {
 	//-------- constants --------
 	
@@ -283,7 +284,7 @@ public class MessageService implements IMessageService
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 		ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
 		for(int i=0; i<tps.length; i++)
@@ -306,7 +307,7 @@ public class MessageService implements IMessageService
 	/**
 	 *  Called when the platform shuts down. Do necessary cleanup here (if any).
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();

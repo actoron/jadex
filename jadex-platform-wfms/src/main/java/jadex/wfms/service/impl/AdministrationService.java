@@ -1,6 +1,7 @@
 package jadex.wfms.service.impl;
 
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
@@ -22,7 +23,7 @@ import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-public class AdministrationService implements IAdministrationService
+public class AdministrationService implements IAdministrationService, IService
 {
 	private IServiceContainer wfms;
 	
@@ -88,7 +89,7 @@ public class AdministrationService implements IAdministrationService
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 	}
 	
@@ -96,8 +97,10 @@ public class AdministrationService implements IAdministrationService
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
+		if(listener!=null)
+			listener.resultAvailable(this, null);
 	}
 	
 	/**

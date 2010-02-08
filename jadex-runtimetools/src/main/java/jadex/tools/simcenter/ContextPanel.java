@@ -125,7 +125,7 @@ public class ContextPanel extends AbstractTimePanel
 		{
 			try
 			{
-				getSimulationService().start();
+				getSimulationService().startService();
 			}
 			catch(Exception ex)
 			{

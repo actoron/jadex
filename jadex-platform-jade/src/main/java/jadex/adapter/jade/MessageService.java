@@ -39,6 +39,7 @@ import jadex.bridge.ISearchConstraints;
 import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 import jadex.service.clock.IClockService;
 
 import java.util.Collection;
@@ -51,7 +52,7 @@ import java.util.logging.Logger;
  *  The Message service serves several message-oriented purposes: a) sending and
  *  delivering messages by using transports 
  */
-public class MessageService implements IMessageService
+public class MessageService implements IMessageService, IService
 {
 	//-------- constants --------
 	
@@ -358,15 +359,17 @@ public class MessageService implements IMessageService
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 	}
 	
 	/**
 	 *  Called when the platform shuts down. Do necessary cleanup here (if any).
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
+		if(listener!=null)
+			listener.resultAvailable(this, null);
 	}
 }
 

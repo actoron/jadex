@@ -9,6 +9,7 @@ import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.ThreadPoolFactory;
 import jadex.service.BasicServiceContainer;
+import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.ClockService;
 import jadex.service.clock.IClockService;
@@ -66,7 +67,7 @@ public class InterpreterTest
 			final BDIInterpreter[]	interpreters	= new BDIInterpreter[1];
 			
 			final BasicServiceContainer container = new BasicServiceContainer();
-			container.addService(IClockService.class, "clock_service", clock);
+			container.addService(IClockService.class, "clock_service", (IService)clock);
 			
 			final BDIInterpreter interpreter = new BDIInterpreter(new IComponentAdapter()
 			{

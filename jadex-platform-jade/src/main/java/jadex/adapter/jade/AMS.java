@@ -799,7 +799,7 @@ public class AMS implements IAMS, IService
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 		// nothing to do.
 	}
@@ -810,7 +810,7 @@ public class AMS implements IAMS, IService
 	 *  (as specified in the platform shutdown time).
 	 *  Remaining agents should be discarded.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();

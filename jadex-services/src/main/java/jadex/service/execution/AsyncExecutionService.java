@@ -6,6 +6,7 @@ import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.service.IService;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.Set;
 /**
  *  The asynchronous executor service that executes all tasks in separate executors.
  */
-public class AsyncExecutionService	implements IExecutionService
+public class AsyncExecutionService	implements IExecutionService, IService
 {
 	//-------- attributes --------
 	
@@ -228,7 +229,7 @@ public class AsyncExecutionService	implements IExecutionService
 	 *  Start the execution service.
 	 *  Resumes all scheduled tasks. 
 	 */
-	public synchronized void start()
+	public synchronized void startService()
 	{
 		if(shutdown)
 			throw new RuntimeException("Cannot start: shutdowning service.");
@@ -258,7 +259,7 @@ public class AsyncExecutionService	implements IExecutionService
 	 *  Shutdown the executor service.
 	 *  // todo: make callable more than once
 	 */
-	public synchronized void shutdown(IResultListener listener)
+	public synchronized void shutdownService(IResultListener listener)
 	{
 		if(shutdown)
 		{

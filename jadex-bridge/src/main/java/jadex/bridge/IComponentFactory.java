@@ -11,7 +11,7 @@ import javax.swing.Icon;
  *  and is capable of loading component models from files
  *  as well as instantiating components.
  */
-public interface IComponentFactory extends IService
+public interface IComponentFactory
 {
 	//-------- methods --------
 	

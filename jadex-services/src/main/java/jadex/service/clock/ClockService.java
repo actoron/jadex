@@ -6,6 +6,7 @@ import jadex.commons.concurrent.IThreadPool;
 import jadex.service.IService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,7 +35,7 @@ public class ClockService implements IClockService, IService
 	{
 		this.clock = clock;
 //		this.platform = platform;
-		this.listeners = new ArrayList();
+		this.listeners = Collections.synchronizedList(new ArrayList());
 	}
 	
 	/**
@@ -195,6 +196,14 @@ public class ClockService implements IClockService, IService
 	}
 	
 	/**
+	 *  Start the clock.
+	 */
+	public void start()
+	{
+		clock.start();
+	}
+
+	/**
 	 *  Stop the clock.
 	 */
 	public synchronized void stop()
@@ -207,7 +216,7 @@ public class ClockService implements IClockService, IService
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 		clock.start();
 	}
@@ -216,9 +225,11 @@ public class ClockService implements IClockService, IService
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
 		clock.dispose();
+		if(listener!=null)
+			listener.resultAvailable(this, null);
 	}
 	
 	//--------- methods --------

@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  *  General interface for components that the container can execute.
  */
-public interface IComponentExecutionService	extends IService
+public interface IComponentExecutionService
 {
 	//-------- management methods --------
 	

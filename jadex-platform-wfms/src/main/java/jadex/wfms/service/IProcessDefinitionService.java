@@ -11,7 +11,7 @@ import java.util.Set;
  * Administrative service interface
  *
  */
-public interface IProcessDefinitionService extends IService
+public interface IProcessDefinitionService
 {
 	/**
 	 * Adds a process model to the repository

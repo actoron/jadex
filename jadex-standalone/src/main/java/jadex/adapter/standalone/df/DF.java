@@ -333,7 +333,7 @@ public class DF implements IDF, IService
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 		// nothing to do.
 	}
@@ -342,7 +342,7 @@ public class DF implements IDF, IService
 	 *  Called when the platform shuts down.
 	 *  Do necessary cleanup here (if any).
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();

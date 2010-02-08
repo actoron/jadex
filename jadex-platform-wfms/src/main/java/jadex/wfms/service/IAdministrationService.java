@@ -9,7 +9,7 @@ import jadex.wfms.listeners.IProcessListener;
 
 import java.util.Map;
 
-public interface IAdministrationService extends IService
+public interface IAdministrationService
 {
 	/**
 	 * Returns the current activities for all users

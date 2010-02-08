@@ -3,7 +3,6 @@ package jadex.service.execution;
 import jadex.commons.ICommand;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
-import jadex.service.IService;
 
 /**
  *  Common interface for different execution services.
@@ -18,7 +17,7 @@ import jadex.service.IService;
  *  State representation? = all executables and their state?
  *  todo: use callbacks?
  */
-public interface IExecutionService extends IService
+public interface IExecutionService
 {
 	/**
 	 *  Execute a task. Triggers the task to
@@ -39,7 +38,7 @@ public interface IExecutionService extends IService
 	/**
 	 *  (Re-) Start the service (all tasks).  
 	 */
-	public void start();
+	public void startService();
 
 	/**
 	 *  Stop the service (all tasks).

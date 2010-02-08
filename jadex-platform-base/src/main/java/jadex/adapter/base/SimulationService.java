@@ -6,6 +6,7 @@ import jadex.commons.ICommand;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.ClockService;
 import jadex.service.clock.IClock;
@@ -20,7 +21,7 @@ import java.util.List;
  *  execution of one application. It provides basic features for
  *  starting, stopping and stepwise execution.
  */
-public class SimulationService implements ISimulationService
+public class SimulationService implements ISimulationService, IService
 {		
 	//-------- attributes --------
 
@@ -99,7 +100,7 @@ public class SimulationService implements ISimulationService
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
 		pause();
 		if(listener!=null)
@@ -111,7 +112,7 @@ public class SimulationService implements ISimulationService
 	/**
 	 *  Start (and run) the execution. 
 	 */
-	public void start()
+	public void startService()
 	{
 		boolean dorun = false;
 		synchronized(this)
@@ -128,7 +129,7 @@ public class SimulationService implements ISimulationService
 		if(dorun)
 			getClockService().start();
 			
-		getExecutorService().start();
+		getExecutorService().startService();
 	}
 	
 	/**
@@ -182,7 +183,6 @@ public class SimulationService implements ISimulationService
 		if(dorun)
 		{
 			getClockService().start();
-//			getExecutorService().start();
 		}
 		
 		boolean advanced = getClockService().advanceEvent();
@@ -231,7 +231,6 @@ public class SimulationService implements ISimulationService
 		if(dorun)
 		{
 			getClockService().start();
-//			getExecutorService().start();
 		}
 		
 		// Do not hold lock while clock is advanced to avoid deadlocks

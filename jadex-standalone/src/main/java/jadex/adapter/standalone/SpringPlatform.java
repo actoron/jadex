@@ -192,7 +192,7 @@ public class SpringPlatform extends AbstractPlatform
 				{
 					Object key2 = it2.next();
 					IService service = (IService)tmp.get(key2);
-					service.start();
+					service.startService();
 				}
 			}
 		}

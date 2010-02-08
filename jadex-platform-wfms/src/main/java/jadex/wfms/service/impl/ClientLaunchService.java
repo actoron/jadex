@@ -31,11 +31,13 @@ public class ClientLaunchService implements IService
 		});
 	}
 	
-	public void start()
+	public void startService()
 	{
 	}
 	
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{	
+		if(listener!=null)
+			listener.resultAvailable(this, null);
 	}
 }

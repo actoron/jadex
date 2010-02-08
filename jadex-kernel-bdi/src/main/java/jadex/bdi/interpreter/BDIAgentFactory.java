@@ -10,6 +10,7 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
+import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
@@ -23,7 +24,7 @@ import javax.swing.UIDefaults;
 /**
  *  Factory for creating Jadex V2 BDI agents.
  */
-public class BDIAgentFactory implements IComponentFactory
+public class BDIAgentFactory implements IComponentFactory, IService
 {
 	//-------- constants --------
 	
@@ -71,7 +72,7 @@ public class BDIAgentFactory implements IComponentFactory
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 		init();
 	}
@@ -80,7 +81,7 @@ public class BDIAgentFactory implements IComponentFactory
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
 		if(listener!=null)
 			listener.resultAvailable(this, null);

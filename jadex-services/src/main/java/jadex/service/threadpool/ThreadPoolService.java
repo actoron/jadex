@@ -29,7 +29,7 @@ public class ThreadPoolService implements IThreadPool, IService
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 		// Nothing to do.
 	}
@@ -47,7 +47,7 @@ public class ThreadPoolService implements IThreadPool, IService
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
 		threadpool.dispose();
 		if(listener!=null)

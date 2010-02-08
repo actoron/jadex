@@ -116,7 +116,7 @@ public class HierarchicalServiceContainer extends BasicServiceContainer
 					{
 						Object key2 = it2.next();
 						IService service = (IService)tmp.get(key2);
-						service.start();
+						service.startService();
 					}
 				}
 			}
@@ -143,7 +143,7 @@ public class HierarchicalServiceContainer extends BasicServiceContainer
 						Object key2 = it2.next();
 						IService service = (IService)tmp.get(key2);
 	//					System.out.println("Service shutdown: " + service);
-						service.shutdown(null); // Todo: use result listener?
+						service.shutdownService(null); // Todo: use result listener?
 					}
 				}
 			}

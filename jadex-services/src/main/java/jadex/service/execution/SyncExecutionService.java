@@ -6,6 +6,7 @@ import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.service.IService;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,7 +16,7 @@ import java.util.Set;
 /**
  *  The synchronous execution service that executes all tasks in zero to one thread.
  */
-public class SyncExecutionService	implements	IExecutionService
+public class SyncExecutionService	implements	IExecutionService, IService
 {
 	//-------- attributes --------
 	
@@ -216,7 +217,7 @@ public class SyncExecutionService	implements	IExecutionService
 	 *  Start the executor service.
 	 *  Resumes all tasks.
 	 */
-	public synchronized void start()
+	public synchronized void startService()
 	{
 		if(shutdown)
 			return;
@@ -246,7 +247,7 @@ public class SyncExecutionService	implements	IExecutionService
 	/**
 	 *  Shutdown the executor service.
 	 */
-	public synchronized void shutdown(IResultListener listener)
+	public synchronized void shutdownService(IResultListener listener)
 	{
 		if(!running || shutdown)
 		{

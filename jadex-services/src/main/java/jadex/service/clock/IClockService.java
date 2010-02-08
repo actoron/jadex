@@ -1,13 +1,12 @@
 package jadex.service.clock;
 
 import jadex.commons.IChangeListener;
-import jadex.service.IService;
 
 
 /**
  *  The clock service.
  */
-public interface IClockService extends IService
+public interface IClockService
 {
 	//-------- constants --------
 	
@@ -70,6 +69,11 @@ public interface IClockService extends IService
 	 */
 	public void setDilation(double dilation);
 	
+	/**
+	 *  Start the clock.
+	 */
+	public void start();
+
 	/**
 	 *  Stop the clock.
 	 */

@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * 
  */
-public interface IExecutionService extends IService
+public interface IExecutionService
 {
 	/**
 	 *  Load a process model.

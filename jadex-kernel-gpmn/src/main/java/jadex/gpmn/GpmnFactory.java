@@ -10,6 +10,7 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
 import jadex.gpmn.model.MGpmnModel;
+import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
@@ -24,7 +25,7 @@ import javax.swing.UIDefaults;
 /**
  *  Factory for loading gpmn processes. 
  */
-public class GpmnFactory implements IComponentFactory
+public class GpmnFactory implements IComponentFactory, IService
 {
 	//-------- constants --------
 	
@@ -84,7 +85,7 @@ public class GpmnFactory implements IComponentFactory
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 //		// Absolute start time (for testing and benchmarking).
 //		long starttime = System.currentTimeMillis();
@@ -141,8 +142,10 @@ public class GpmnFactory implements IComponentFactory
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
+		if(listener!=null)
+			listener.resultAvailable(this, null);
 	}
 	
 	/**

@@ -2,6 +2,7 @@ package jadex.wfms.service.impl;
 
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.wfms.listeners.IProcessRepositoryListener;
@@ -29,7 +30,7 @@ import java.util.Set;
  * Basic Model Repository Service implementation
  *
  */
-public class BasicModelRepositoryService implements IModelRepositoryService
+public class BasicModelRepositoryService implements IModelRepositoryService, IService
 {
 	private static final String LIBRARY_STATE_PATH = System.getProperty("java.io.tmpdir").concat(File.separator).concat("wfms_lib_state.db");
 	private static final String REPOSITORY_PATH = System.getProperty("java.io.tmpdir").concat(File.separator).concat("wfms_repository.db");
@@ -71,7 +72,7 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 	}
 	
@@ -79,8 +80,10 @@ public class BasicModelRepositoryService implements IModelRepositoryService
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
+		if(listener!=null)
+			listener.resultAvailable(this, null);
 	}
 	
 	/**

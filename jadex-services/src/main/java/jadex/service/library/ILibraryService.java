@@ -1,7 +1,5 @@
 package jadex.service.library;
 
-import jadex.service.IService;
-
 import java.net.URL;
 import java.util.List;
 
@@ -9,7 +7,7 @@ import java.util.List;
  *  Interface for the Library Service. It provides a platform service
  *  for dynamic loading and unloading of classes, libraries and resources.
  */
-public interface ILibraryService extends IService
+public interface ILibraryService
 {
 	//-------- constants --------
 	

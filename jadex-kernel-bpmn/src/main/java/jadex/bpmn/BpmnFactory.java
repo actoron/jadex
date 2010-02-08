@@ -9,6 +9,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
@@ -23,7 +24,7 @@ import javax.swing.UIDefaults;
 /**
  *  Foctory for loading bpmn processes.
  */
-public class BpmnFactory implements IComponentFactory
+public class BpmnFactory implements IComponentFactory, IService
 {
 	//-------- constants --------
 	
@@ -70,7 +71,7 @@ public class BpmnFactory implements IComponentFactory
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 		final ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 		loader.setClassLoader(libservice.getClassLoader());
@@ -93,8 +94,10 @@ public class BpmnFactory implements IComponentFactory
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
+		if(listener!=null)
+			listener.resultAvailable(this, null);
 	}
 	
 	/**

@@ -8,6 +8,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
@@ -22,7 +23,7 @@ import java.util.logging.Logger;
 /**
  * 
  */
-public class BpmnProcessService implements IExecutionService
+public class BpmnProcessService implements IExecutionService, IService
 {
 	//-------- attributes --------
 	
@@ -52,7 +53,7 @@ public class BpmnProcessService implements IExecutionService
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 	}
 	
@@ -60,8 +61,10 @@ public class BpmnProcessService implements IExecutionService
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
+		if(listener!=null)
+			listener.resultAvailable(this, null);
 	}
 	
 	/**

@@ -2,12 +2,11 @@ package jadex.adapter.base;
 
 import jadex.commons.IChangeListener;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.service.IService;
 
 /**
  *  Interface for the time simulation service.
  */
-public interface ISimulationService extends IService
+public interface ISimulationService
 {
 	//-------- constants --------
 	
@@ -25,7 +24,7 @@ public interface ISimulationService extends IService
 	/**
 	 *  Start (and run) the execution. 
 	 */
-	public void start();
+	public void startService();
 	
 	/**
 	 *  Pause the execution (can be resumed via start or step).

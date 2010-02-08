@@ -2,6 +2,7 @@ package jadex.wfms.service.impl;
 
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.wfms.IProcess;
 import jadex.wfms.service.IBpmnProcessService;
@@ -16,7 +17,7 @@ import java.util.Map;
 /**
  *  The meta execution service wraps all specific process execution services.
  */
-public class MetaExecutionService implements IExecutionService
+public class MetaExecutionService implements IExecutionService, IService
 {
 	//-------- attributes --------
 	
@@ -57,7 +58,7 @@ public class MetaExecutionService implements IExecutionService
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 	}
 	
@@ -65,8 +66,10 @@ public class MetaExecutionService implements IExecutionService
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
+		if(listener!=null)
+			listener.resultAvailable(this, null);
 	}
 	
 	/**

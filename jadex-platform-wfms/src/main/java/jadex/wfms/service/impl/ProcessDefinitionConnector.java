@@ -2,6 +2,7 @@ package jadex.wfms.service.impl;
 
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.wfms.client.IClient;
 import jadex.wfms.listeners.IProcessRepositoryListener;
@@ -18,7 +19,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-public class ProcessDefinitionConnector implements IProcessDefinitionService
+public class ProcessDefinitionConnector implements IProcessDefinitionService, IService
 {
 	/** The WFMS */
 	private IServiceContainer wfms;
@@ -35,7 +36,7 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 	}
 	
@@ -43,8 +44,10 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
+		if(listener!=null)
+			listener.resultAvailable(this, null);
 	}
 	
 	/**

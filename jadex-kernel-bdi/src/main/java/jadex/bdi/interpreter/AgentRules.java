@@ -2788,8 +2788,13 @@ public class AgentRules
 		activateEndState(state, ragent);
 		
 		// Hack! Make timeout explicit/configurable.
+		Long prop	= null;
 		final BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
-		Long prop = (Long)state.getAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_properties, TERMINATION_TIMEOUT);
+		Object param	= state.getAttributeValue(ragent, OAVBDIRuntimeModel.capability_has_properties, TERMINATION_TIMEOUT);
+		if(param!=null)
+		{
+			prop	= (Long)state.getAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value);
+		}
 		long tt = prop!=null? prop.longValue(): 10000;
 		
 		// changed *.class to *.TYPE due to javaflow bug

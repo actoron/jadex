@@ -7,6 +7,7 @@ import jadex.bridge.IComponentListener;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.concurrent.IResultListener;
 import jadex.gpmn.GpmnXMLReader;
+import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.wfms.service.IExecutionService;
@@ -21,7 +22,7 @@ import java.util.logging.Logger;
 /**
  * 
  */
-public class GpmnProcessService implements IExecutionService
+public class GpmnProcessService implements IExecutionService, IService
 {
 	//-------- attributes --------
 	
@@ -99,7 +100,7 @@ public class GpmnProcessService implements IExecutionService
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 	}
 	
@@ -107,8 +108,10 @@ public class GpmnProcessService implements IExecutionService
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
+		if(listener!=null)
+			listener.resultAvailable(this, null);
 	}
 	
 	/**

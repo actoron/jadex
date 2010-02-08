@@ -10,11 +10,11 @@ public interface IService
 	/**
 	 *  Start the service.
 	 */
-	public void start();
+	public void startService();
 	
 	/**
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener);
+	public void shutdownService(IResultListener listener);
 }

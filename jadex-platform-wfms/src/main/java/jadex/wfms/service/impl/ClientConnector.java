@@ -1,6 +1,7 @@
 package jadex.wfms.service.impl;
 
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.wfms.client.IClient;
 import jadex.wfms.client.IClientActivity;
@@ -27,7 +28,7 @@ import java.util.Set;
 /**
  * 
  */
-public class ClientConnector implements IClientService, IWfmsClientService
+public class ClientConnector implements IClientService, IWfmsClientService, IService
 {
 	
 	private IServiceContainer wfms;
@@ -58,7 +59,7 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 	}
 	
@@ -66,8 +67,10 @@ public class ClientConnector implements IClientService, IWfmsClientService
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
+		if(listener!=null)
+			listener.resultAvailable(this, null);
 	}
 	
 	public synchronized void queueWorkitem(IWorkitem workitem, IResultListener listener)

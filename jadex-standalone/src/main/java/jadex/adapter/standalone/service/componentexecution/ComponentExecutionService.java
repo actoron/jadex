@@ -18,6 +18,7 @@ import jadex.bridge.ISearchConstraints;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.execution.IExecutionService;
 
@@ -34,7 +35,7 @@ import java.util.logging.Logger;
 /**
  *  Standalone implementation of component execution service.
  */
-public class ComponentExecutionService implements IComponentExecutionService
+public class ComponentExecutionService implements IComponentExecutionService, IService
 {
 	//-------- constants --------
 
@@ -893,7 +894,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public void startService()
 	{
 		
 	}
@@ -902,7 +903,7 @@ public class ComponentExecutionService implements IComponentExecutionService
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public void shutdownService(IResultListener listener)
 	{
 		if(listener!=null)
 			listener.resultAvailable(this, null);

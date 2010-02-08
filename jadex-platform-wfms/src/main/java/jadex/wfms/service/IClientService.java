@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  *  Interface for wfms clients. 
  */
-public interface IClientService extends IService
+public interface IClientService
 {
 	/**
 	 * Requests the Process Definition Service
