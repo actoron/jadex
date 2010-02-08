@@ -19,9 +19,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
-import org.eclipse.gmf.runtime.common.ui.services.util.CommonLabelProvider;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.FigureUtilities;
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -100,8 +100,6 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	{
 		super(containerEAnnotationName, annotationDetailName);
 
-		// FIXME: allow -1 as unique column index to support no unique column?
-		
 		assert (columns != null && columnsWeight != null);
 		assert (columns.length == columnsWeight.length);
 		assert (uniqueColumnIndex != -1 && uniqueColumnIndex < columns.length);
@@ -138,7 +136,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 		
 		Group sectionGroup = getWidgetFactory().createGroup(sectionComposite, tableViewerLabel);
 		sectionGroup.setLayout(new FillLayout(SWT.VERTICAL));
-		createParameterTableComposite(sectionGroup);
+		createTableViewer(sectionGroup);
 	}
 
 	
@@ -190,7 +188,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	 * 
 	 * @generated NOT
 	 */
-	protected TableViewer createParameterTableComposite(Composite parent)
+	protected TableViewer createTableViewer(Composite parent)
 	{
 		Composite tableComposite = getWidgetFactory().createComposite(parent/*, SWT.BORDER*/);
 
@@ -223,10 +221,10 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	 * @param parent
 	 * 
 	 */
-	private TableViewer createTable(Composite parent, GridData tableLayoutData)
+	protected TableViewer createTable(Composite parent, GridData tableLayoutData)
 	{
-		String[] columns = columnNames;
-		int[] weight = columsWeight;
+		//String[] columns = columnNames;
+		//int[] weight = columsWeight;
 
 		// the displayed table
 		TableViewer viewer = new TableViewer(getWidgetFactory().createTable(parent,
@@ -236,37 +234,44 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 		viewer.getTable().setHeaderVisible(true);
 		viewer.getTable().setLayoutData(tableLayoutData);
 
+		createColumns(viewer);
+		
 		Font tableFont = viewer.getTable().getFont();
 		TableLayout tableLayout = new TableLayout();
-		for (int columnIndex = 0; columnIndex < columns.length; columnIndex++)
+		for (int columnIndex = 0; columnIndex < columnNames.length; columnIndex++)
 		{
-			TableViewerColumn column = new TableViewerColumn(viewer,
-					SWT.LEFT);
-			column.getColumn().setText(columns[columnIndex]);
-
-			column.setEditingSupport(new MultiColumnTableEditingSupport(viewer, columnIndex));
-
-//			column.setLabelProvider(new ColumnLabelProvider() {
-//
-//				public String getText(Object element) {
-//					return ((Person) element).email;
-//				}
-//
-//			});
-			
-
-			
-			tableLayout.addColumnData(new ColumnWeightData(weight[columnIndex],
-					FigureUtilities.getTextWidth(columns[columnIndex], tableFont), true));
+			tableLayout.addColumnData(new ColumnWeightData(columsWeight[columnIndex],
+					FigureUtilities.getTextWidth(columnNames[columnIndex], tableFont), true));
 		}
 		viewer.getTable().setLayout(tableLayout);
 
 		viewer.setContentProvider(new MultiColumnTableContentProvider());
 		// FIX ME: use column specific label provider (see above)
-		viewer.setLabelProvider(new MultiColumnTableLabelProvider());
-		viewer.setColumnProperties(columns);
+		//viewer.setLabelProvider(new MultiColumnTableLabelProvider());
+		viewer.setColumnProperties(columnNames);
 
 		return viewer;
+	}
+	
+	protected void createColumns(TableViewer viewer)
+	{
+		for (int columnIndex = 0; columnIndex < columnNames.length; columnIndex++)
+		{
+			TableViewerColumn column = new TableViewerColumn(viewer, SWT.LEFT);
+			column.getColumn().setText(columnNames[columnIndex]);
+
+			column.setEditingSupport(new MultiColumnTableEditingSupport(viewer, columnIndex));
+			column.setLabelProvider(new MultiColumnTableLabelProvider(columnIndex));
+
+//			column.setLabelProvider(new ColumnLabelProvider()
+//			{
+//				public String getText(Object element)
+//				{
+//					return ((Person) element).email;
+//				}
+//			});
+		}
+
 	}
 	
 	/**
@@ -336,7 +341,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 
 						synchronized (uniqueColumnValueCash)
 						{
-							List tableRows = getTableRowList();
+							List<MultiColumnTableRow> tableRows = getTableRowList();
 							String uniqueValue = createUniqueRowValue(newRow, tableRows);
 							newRow.columnValues[uniqueColumnIndex] = uniqueValue;
 							addUniqueRowValue(uniqueValue);
@@ -395,7 +400,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 							MultiColumnTableRow rowToRemove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
 									.getSelection()).getFirstElement();
 							
-							List tableRowList = getTableRowList();
+							List<MultiColumnTableRow> tableRowList = getTableRowList();
 							uniqueColumnValueCash.remove(rowToRemove.columnValues[uniqueColumnIndex]);
 							tableRowList.remove(rowToRemove);
 							updateTableRowList(tableRowList);
@@ -675,10 +680,65 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	 * Label provider in charge of rendering the keys and columnValues of the annotation
 	 * attached to the object. Currently based on CommonLabelProvider.
 	 */
-	protected class MultiColumnTableLabelProvider extends CommonLabelProvider
+	protected class MultiColumnTableLabelProvider extends ColumnLabelProvider
 			implements ITableLabelProvider
 	{
 
+		// ---- attributes ----
+		
+		private int columIndex;
+		
+		// ---- constructors ----
+		
+		/**
+		 * @param columIndex
+		 */
+		protected MultiColumnTableLabelProvider()
+		{
+			super();
+			this.columIndex = -1;
+		}
+		
+		/**
+		 * @param columIndex
+		 */
+		protected MultiColumnTableLabelProvider(int columIndex)
+		{
+			super();
+			assert columIndex >= 0 : "column index < 0";
+			this.columIndex = columIndex;
+		}
+		
+		// ---- ColumnLabelProvider overrides ----
+		
+		@Override
+		public Image getImage(Object element)
+		{
+			if (columIndex >= 0)
+			{
+				return this.getColumnImage(element, columIndex);
+			}
+			else
+			{
+				return super.getImage(element);
+			}
+		}
+
+		@Override
+		public String getText(Object element)
+		{
+			if (columIndex >= 0)
+			{
+				return this.getColumnText(element, columIndex);
+			}
+			else
+			{
+				return super.getText(element);
+			}
+		}
+		
+		// ---- ITableLabelProvider implementation ----
+		
 		/**
 		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
 		 */
@@ -854,6 +914,13 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 			this.editor = new TextCellEditor(viewer.getTable());
 			this.attributeIndex = attributeIndex;
 		}
+		
+		public MultiColumnTableEditingSupport(TableViewer viewer, int attributeIndex, CellEditor editor)
+		{
+			super(viewer);
+			this.editor = editor;
+			this.attributeIndex = attributeIndex;
+		}
 
 		/**
 		 * Can edit all columns.
@@ -914,7 +981,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 						throws ExecutionException
 				{
 
-					List tableRowList = getTableRowList();
+					List<MultiColumnTableRow> tableRowList = getTableRowList();
 					MultiColumnTableRow rowToEdit = (MultiColumnTableRow) tableRowList.get(tableRowList.indexOf(editRow));
 
 					

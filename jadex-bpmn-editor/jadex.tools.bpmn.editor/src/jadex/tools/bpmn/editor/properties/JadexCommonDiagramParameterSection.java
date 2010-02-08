@@ -10,7 +10,7 @@ package jadex.tools.bpmn.editor.properties;
  * 
  */
 public class JadexCommonDiagramParameterSection extends
-		AbstractParameterTablePropertySection
+		AbstractNewParameterTablePropertySection
 {
 
 	/**
