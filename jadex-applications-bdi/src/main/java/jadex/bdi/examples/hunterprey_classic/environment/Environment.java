@@ -15,6 +15,8 @@ import jadex.bdi.examples.hunterprey_classic.WorldObject;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyChangeSupport;
 import jadex.commons.collection.MultiCollection;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
 import java.beans.PropertyChangeListener;
 import java.io.FileOutputStream;
@@ -31,8 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
-import nuggets.Nuggets;
 
 /**
  *  The environment is the container all objects and creatures.
@@ -136,7 +136,7 @@ public class Environment implements IEnvironment
 			{
 				out.append(new String(b, 0, n));
 			}
-			highscore = SUtil.arrayToList(Nuggets.objectFromXML(out.toString(), Environment.class.getClassLoader()));
+			highscore = SUtil.arrayToList(JavaReader.objectFromXML(out.toString(), Environment.class.getClassLoader()));
 		}
 		catch(Exception e)
 		{
@@ -774,7 +774,7 @@ public class Environment implements IEnvironment
 			
 			// write as xml file
 			os = new OutputStreamWriter(new FileOutputStream(outputFile), "UTF-8");
-			os.write(Nuggets.objectToXML(getHighscore(),this.getClass().getClassLoader()));
+			os.write(JavaWriter.objectToXML(getHighscore(),this.getClass().getClassLoader()));
 			os.close();
 
 //			System.out.println("Saved highscore.");

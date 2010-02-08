@@ -4,9 +4,10 @@ import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.CurrentVision;
 import jadex.bdi.examples.hunterprey_classic.Vision;
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBeliefListener;
 import jadex.commons.SUtil;
+import jadex.xml.bean.JavaReader;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -22,8 +23,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-
-import nuggets.Nuggets;
 
 
 /**
@@ -111,7 +110,7 @@ public class ObserverGui	extends EnvironmentGui
 				fileData.append(buf, 0, numRead);
 			}
 			reader.close();
-			Creature[]	hscreatures	= (Creature[]) Nuggets.objectFromXML(fileData.toString(), this.getClass().getClassLoader());
+			Creature[]	hscreatures	= (Creature[]) JavaReader.objectFromXML(fileData.toString(), this.getClass().getClassLoader());
 		
 			highscore.update(hscreatures);
 		}

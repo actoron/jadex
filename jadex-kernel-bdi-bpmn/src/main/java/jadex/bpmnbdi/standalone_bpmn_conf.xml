@@ -1,5 +1,5 @@
 <!--
-  Standalone platform properties.
+  BPMN platform properties.
 -->
 <properties xmlns="http://jadex.sourceforge.net/jadexconf"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -7,13 +7,9 @@
 	                    http://jadex.sourceforge.net/configuration.xsd"
 	name="standalone_conf">
 	
-	<properties type="platform_standalone" name="lars">
-		<property type="platformname">lars</property>
-		<property type="platform_shutdown_time">1000</property>
-		<property type="welcome">false</property>
-		<property type="autoshutdown">true</property>
+	<properties type="platform_standalone">
 		
-		<!-- Platform services. -->
+				<!-- Platform services. -->
 		<properties type="services">
 			<!-- Library service. -->
 			<property type="jadex.service.library.ILibraryService" name="library_service">
@@ -27,12 +23,7 @@
 					new jadex.commons.concurrent.ThreadPool(
 						new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
 			</property>
-			
-			<!-- AMS service. -->
-			<property type="jadex.bridge.IComponentExecutionService" name="ams_service">
-				new jadex.adapter.standalone.service.componentexecution.ComponentExecutionService($platform)
-			</property> 
-			
+						
 			<!-- DF service. -->
 			<property type="jadex.adapter.base.fipa.IDF" name="df_service">new jadex.adapter.standalone.df.DF($platform)</property>
 			
@@ -55,7 +46,7 @@
 				new jadex.service.clock.ClockService(
 					new jadex.service.clock.SystemClock("system_clock", 100,
 					$platform.getService(jadex.service.threadpool.ThreadPoolService.class)))
-//				new jadex.service.clock.SimulationEventClock("simulation_clock",
+//				new jadex.adapter.base.clock.SimulationEventClock("simulation_clock",
 //					System.currentTimeMillis(), 200))
 			</property>
 
@@ -69,35 +60,22 @@
 				new jadex.service.execution.SyncExecutionService(
 					$platform.getService(jadex.service.threadpool.ThreadPoolService.class))
 			</property>
-
-			<!-- Context service. -->
-			<property type="jadex.bridge.IContextService" name="context_service">
-				new jadex.adapter.base.contextservice.ContextService(
-					new Class[]
-					{
-						jadex.bridge.IContext.class,
-						jadex.adapter.base.contextservice.BaseContext.class,
-						jadex.bridge.IApplicationContext.class
-					},
-					new jadex.adapter.base.contextservice.IContextFactory[]
-					{
-						new jadex.adapter.base.contextservice.DefaultContextFactory(),
-						new jadex.adapter.base.contextservice.DefaultContextFactory(),
-						new jadex.adapter.base.appdescriptor.ApplicationContextFactory($platform)
-					})
-			</property>
 			
 			<!-- Element factories -->
 			
 			<property type="jadex.bridge.IComponentFactory" name="application_factory">
-				new jadex.adapter.base.appdescriptor.ApplicationFactory($platform,
+				new jadex.application.ApplicationComponentFactory($platform,
 					new java.util.Set[]
 					{
-						jadex.adapter.base.agr.MAGRSpaceType.getXMLMapping(),
-						jadex.application.space.envsupport.MEnvSpaceType.getXMLMapping()
+						jadex.application.space.envsupport.MEnvSpaceType.getXMLMapping(),
+						jadex.application.space.agr.MAGRSpaceType.getXMLMapping()
 					}
 				)		
 			</property>
+			
+			<!-- Element factories -->
+						
+			
 			
 			<property type="jadex.bridge.IComponentFactory" name="bdi_factory">
 				new jadex.bdi.interpreter.BDIAgentFactory(
@@ -108,7 +86,8 @@
 						"planexecutor_standard", 
 						"standard.timeout", 
 						"microplansteps",
-						"planexecutor_bpmn"
+						"planexecutor_bpmn",
+						"debugger.panels"
 					},
 					new Object[]
 					{
@@ -116,7 +95,8 @@
 						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class)),
 						new java.lang.Long(10000),
 						Boolean.TRUE,
-						new jadex.bpmnbdi.BpmnPlanExecutor($platform)
+						new jadex.bpmnbdi.BpmnPlanExecutor($platform),
+						"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
 					}
 				), $platform)
 			</property>
@@ -125,43 +105,37 @@
 				new jadex.microkernel.MicroAgentFactory($platform)
 			</property>
 			
+			<!-- AMS service. -->
+			<property type="jadex.bridge.IComponentExecutionService" name="ams_service">
+				new jadex.adapter.standalone.service.componentexecution.ComponentExecutionService($platform)
+			</property> 
+			
 			<property type="jadex.bridge.IComponentFactory" name="bpmn_factory">
-				new jadex.wfms.service.loader.BpmnFactory($platform, null)
-			</property>
-			
-			<property type="jadex.bridge.IComponentFactory" name="gpmn_factory">
-				new jadex.wfms.service.loader.GpmnFactory($platform)
-			</property>
-			
-			<!-- <property type="jadex.bridge.IComponentFactory" name="gpmn_factory">
-				new jadex.gpmn.GpmnAgentFactory(
-				jadex.commons.SUtil.createHashMap(
+				new jadex.bpmn.BpmnFactory($platform, jadex.commons.SUtil.createHashMap(
 					new String[]
 					{
-						"messagetype_fipa", 
-						"planexecutor_standard", 
-						"standard.timeout", 
-						"tooladapter.introspector",
-						"microplansteps",
-						"planexecutor_bpmn"
+						"debugger.panels"
 					},
 					new Object[]
 					{
-						new jadex.adapter.base.fipa.FIPAMessageType(), 
-						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class)),
-						new java.lang.Long(10000),
-						jadex.tools.introspector.IntrospectorAdapter.class,
-						Boolean.TRUE,
-						new jadex.bpmnbdi.BpmnPlanExecutor($platform)
-					}
-				), $platform)
-			</property> -->
+						"jadex.tools.debugger.bpmn.BpmnDebuggerPanel, jadex.tools.debugger.common.ObjectInspectorDebuggerPanel"
+					})
+				)
+			</property>
+			
+			<property type="jadex.bridge.IComponentFactory" name="gpmn_factory">
+				new jadex.gpmn.GpmnFactory($platform, jadex.commons.SUtil.createHashMap(
+					new String[]
+					{
+						"debugger.panels"
+					},
+					new Object[]
+					{
+						"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
+					})
+				)
+			</property>
 		</properties>
-						
-		<!-- Agents. -->
-  		<property type="daemonagent" name="ams">jadex/bdi/amsagent/AMS.agent.xml</property>
-		<property type="daemonagent" name="df">jadex/bdi/dfagent/DF.agent.xml</property>
- 		<property type="agent" name="jcc">jadex/tools/jcc/JCC.agent.xml</property>
 	</properties>
-	
+		
 </properties>
