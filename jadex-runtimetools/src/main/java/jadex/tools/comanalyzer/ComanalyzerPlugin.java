@@ -25,6 +25,8 @@ import jadex.tools.common.GuiProperties;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.jcc.AgentControlCenter;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -64,8 +66,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.tree.TreePath;
-
-import nuggets.Nuggets;
 
 
 /**
@@ -1501,7 +1501,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 //					message_maps.add(messages[i].getParameters());
 //				}
 				ClassLoader cl = ((ILibraryService)jcc.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
-				String xml = Nuggets.objectToXML(new Object[]{agentlist.getAgents(), messagelist.getMessages()}, cl);
+				String xml = JavaWriter.objectToXML(new Object[]{agentlist.getAgents(), messagelist.getMessages()}, cl);
 
 				byte buffer[] = xml.getBytes();
 				File f = new File(fileName);
@@ -1596,7 +1596,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 //					}
 //				}
 				ClassLoader cl = ((ILibraryService)jcc.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
-				Object[] stored = (Object[])Nuggets.objectFromXML(xml, cl);
+				Object[] stored = (Object[])JavaReader.objectFromXML(xml, cl);
 				
 				agentlist.removeAllAgents();
 				Agent[] agents = (Agent[])stored[0];

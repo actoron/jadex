@@ -14,6 +14,8 @@ import jadex.commons.SUtil;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.FipaMessagePanel;
 import jadex.tools.common.GuiProperties;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -47,8 +49,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-
-import nuggets.Nuggets;
 
 /**
  * A panel for sending and receiving messages.
@@ -605,7 +605,7 @@ public class FipaConversationPanel extends JSplitPane
 	public IMessageEvent	decodeMessage(String msg)
 	{
 		ClassLoader cl = ((ILibraryService)agent.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
-		Map	map	= (Map)Nuggets.objectFromXML(msg, cl);
+		Map	map	= (Map)JavaReader.objectFromXML(msg, cl);
 		IMessageEvent	message	= agent.createMessageEvent((String)map.get(ConversationPlugin.ENCODED_MESSAGE_TYPE));
 
 		String[] params	= message.getMessageType().getParameterNames();
@@ -673,7 +673,7 @@ public class FipaConversationPanel extends JSplitPane
 				map.put(paramsets[i].getName(), paramsets[i].getValues());
 			}
 			ClassLoader cl = ((ILibraryService)agent.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
-			String	msg	= Nuggets.objectToXML(map, cl);
+			String	msg	= JavaWriter.objectToXML(map, cl);
 			return msg;
 		}
 //		catch(AgentTerminatedException e)

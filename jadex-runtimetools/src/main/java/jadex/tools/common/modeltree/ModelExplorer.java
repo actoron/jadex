@@ -340,6 +340,7 @@ public class ModelExplorer extends JTree
 			}
 		}
 		ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
+//		String	treesave	= JavaWriter.objectToXML(mep, cl);	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
 		String	treesave	= Nuggets.objectToXML(mep, cl);
 		props.addProperty(new Property("tree", treesave));
 				
@@ -382,7 +383,8 @@ public class ModelExplorer extends JTree
 			try
 			{
 				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
-				ModelExplorerProperties	mep	= (ModelExplorerProperties)Nuggets.objectFromXML(treexml, cl); 
+//				ModelExplorerProperties	mep	= (ModelExplorerProperties)JavaReader.objectFromXML(treexml, cl); 	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
+				ModelExplorerProperties	mep	= (ModelExplorerProperties)Nuggets.objectFromXML(treexml, cl);
 				this.root	= mep.root;
 				((ModelExplorerTreeModel)getModel()).setRoot(this.root);
 
@@ -399,7 +401,7 @@ public class ModelExplorer extends JTree
 			catch(Exception e)
 			{
 				System.err.println("Cannot load project tree: "+e.getClass().getName());
-				//e.printStackTrace();
+//				e.printStackTrace();
 			}
 		}
 		

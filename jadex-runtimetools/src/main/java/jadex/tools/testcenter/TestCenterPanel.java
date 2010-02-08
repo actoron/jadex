@@ -15,6 +15,8 @@ import jadex.tools.common.EditableList;
 import jadex.tools.common.ElementPanel;
 import jadex.tools.common.ScrollablePanel;
 import jadex.tools.jcc.AgentControlCenter;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -30,8 +32,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -54,8 +55,6 @@ import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
-
-import nuggets.Nuggets;
 
 /**
  *  The test center panel for running tests and viewing the results.
@@ -322,10 +321,9 @@ public class TestCenterPanel extends JSplitPane
 								file	= new File(file.getParentFile(), file.getName()+FILEEXTENSION_TESTS);
 								loadsavechooser.setSelectedFile(file);
 							}
-							Nuggets nug = new Nuggets();
-							FileOutputStream fos = new FileOutputStream(file);
 							ClassLoader cl = ((ILibraryService)plugin.getJCC().getServiceContainer().getService(ILibraryService.class)).getClassLoader();
-							nug.write(teststable.getEntries(), fos, cl);
+							FileWriter fos = new FileWriter(file);
+							fos.write(JavaWriter.objectToXML(teststable.getEntries(), cl));
 							fos.close();
 						}
 						catch(Exception e)
@@ -347,18 +345,35 @@ public class TestCenterPanel extends JSplitPane
 					File file = loadsavechooser.getSelectedFile();
 					if(file!=null)
 					{
+						FileReader fis = null;
 						try
 						{
-							FileInputStream fis = new FileInputStream(file);
-							Nuggets nug = new Nuggets();
-							
+							fis = new FileReader(file);
+							StringBuffer out = new StringBuffer();
+							char[] b = new char[4096];
+							for(int n; (n = fis.read(b)) != -1;) 
+							{
+								out.append(new String(b, 0, n));
+							}
 							ClassLoader cl = ((ILibraryService)plugin.getJCC().getServiceContainer().getService(ILibraryService.class)).getClassLoader();
-							String[] names = (String[])nug.readObject(fis, cl);
+							String[] names = (String[])JavaReader.objectFromXML(out.toString(), cl);
 							teststable.setEntries(names);
 						}
 						catch(Exception e)
 						{
-							e.printStackTrace();
+						}
+						finally
+						{
+							if(fis!=null)
+							{
+								try
+								{
+									fis.close();
+								}
+								catch(Exception e)
+								{
+								}
+							}
 						}
 					}
 				}
