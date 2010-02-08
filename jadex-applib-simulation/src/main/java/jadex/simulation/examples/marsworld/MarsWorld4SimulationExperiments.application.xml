@@ -252,13 +252,13 @@
 
 	<agenttypes>
 		 <agenttype name="Sentry"
-			filename="jadex/simulation/examples/marsworld/Sentry.agent.xml" />
+			filename="jadex/simulation/examples/marsworld/sentry/Sentry.agent.xml" />
 			<!--<agenttype name="Sentry"
 			filename="jadex/bdi/examples/marsworld/sentry/Sentry.agent.xml" />-->
 		<agenttype name="Producer"
-			filename="jadex/bdi/examples/marsworld/producer/Producer.agent.xml" />
+			filename="jadex/simulation/examples/marsworld/producer/Producer.agent.xml" />
 		<agenttype name="Carry"
-			filename="jadex/bdi/examples/marsworld/carry/Carry.agent.xml" />
+			filename="jadex/simulation/examples/marsworld/carry/Carry.agent.xml" />
 		<agenttype name="ClientSimulator"
 			filename="jadex/simulation/client/ClientSimulator.agent.xml" />
 	</agenttypes>
@@ -356,8 +356,8 @@
 					</agr:group>
 				</agr:agrspace>
 
-				<env:envspace name="my2dspace" type="2dspace" width="2"
-					height="2">
+				<env:envspace name="my2dspace" type="2dspace" width="0.5"
+					height="0.5">
 					<env:objects>
 						<env:object type="homebase">
 							<env:property name="space">$space</env:property>

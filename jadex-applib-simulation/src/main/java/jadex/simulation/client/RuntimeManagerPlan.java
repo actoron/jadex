@@ -41,7 +41,7 @@ public class RuntimeManagerPlan extends Plan {
 
 		// Map args = new HashMap();
 		// args.put(Constants.EXPERIMENT_ID, experimentID);
-		// args.put(Constants.SIMULATION_FACTS_FOR_CLIENT, simFacts);		
+		// args.put(Constants.SIMULATION_FACTS_FOR_CLIENT, simFacts);
 
 		System.out.println("#Client# Started CLIENT Simulation run....: " + simConf.getName() + " - " + experimentID + ", currentVal: " + parameterSweepValue);
 		// String msg = (String) getBeliefbase().getBelief("msg").getFact();
@@ -52,18 +52,14 @@ public class RuntimeManagerPlan extends Plan {
 		// startApp();
 
 		// Init Arguments like StartTime
-		
-		
-		//TEST
-		ContinuousSpace2D spaceTMP = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope()
-				.getParent()).getSpace("my2dspace");								        
-//		IExecutionService exeservice = (IExecutionService) space.getContext().getServiceContainer().getService(IExecutionService.class);
-		IServiceContainer exeservice =  spaceTMP.getContext().getServiceContainer();
-//		DeltaTimeExecutor4Simulation exeservice = (DeltaTimeExecutor4Simulation) spaceTMP.getContext().getServiceContainer().getService(DeltaTimeExecutor4Simulation.class);
-//		System.out.println(exeservice.getName());
-		
-		
-		
+
+		// TEST
+		ContinuousSpace2D spaceTMP = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace");
+		// IExecutionService exeservice = (IExecutionService) space.getContext().getServiceContainer().getService(IExecutionService.class);
+		IServiceContainer exeservice = spaceTMP.getContext().getServiceContainer();
+		// DeltaTimeExecutor4Simulation exeservice = (DeltaTimeExecutor4Simulation) spaceTMP.getContext().getServiceContainer().getService(DeltaTimeExecutor4Simulation.class);
+		// System.out.println(exeservice.getName());
+
 		init();
 
 		// Determine terminate condition
@@ -156,11 +152,10 @@ public class RuntimeManagerPlan extends Plan {
 		// waitFor(2000);
 		// simServ.shutdown(null);
 		System.out.println("Trying to kill component....");
-//		getExternalAccess().killAgent();
-		IComponentExecutionService	ces 	= (IComponentExecutionService)spaceTMP.getContext()
-			.getServiceContainer().getService(IComponentExecutionService.class);
+		// getExternalAccess().killAgent();
+		IComponentExecutionService ces = (IComponentExecutionService) spaceTMP.getContext().getServiceContainer().getService(IComponentExecutionService.class);
 		ces.destroyComponent(spaceTMP.getContext().getComponentIdentifier(), null);
-//		 getExternalAccess().getApplicationContext().killComponent(null);
+		// getExternalAccess().getApplicationContext().killComponent(null);
 
 	}
 
@@ -187,12 +182,10 @@ public class RuntimeManagerPlan extends Plan {
 	private void sendResult() {
 		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
 		facts.put(Constants.EXPERIMENT_END_TIME, new Long(getCurrentTime()));
-		
-		//Get the map of observed events from the beliefbase
+
+		// Get the map of observed events from the beliefbase
 		HashMap observedEvents = (HashMap) getBeliefbase().getBelief(Constants.OBSERVED_EVENTS_MAP).getFact();
 		facts.put(Constants.OBSERVED_EVENTS_MAP, observedEvents);
-						
-		
 
 		IComponentIdentifier[] receivers = new IComponentIdentifier[1];
 		receivers[0] = getMasterAgent();
@@ -256,14 +249,13 @@ public class RuntimeManagerPlan extends Plan {
 
 		// final IClockService clockservice = (IClockService)container.getService(IClockService.class);
 
-//		ContinuousSpace2D space = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace");		
-		
-		IClockService clockservice = (IClockService) getScope().getServiceContainer().getService(IClockService.class);
-//		long clockService = clockservice.getTime();
-//		long systemTime = new Long(System.currentTimeMillis());
+		// ContinuousSpace2D space = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace");
 
-//		System.out.println("***********************************************************" + clockService + " - " + systemTime);
-		
+		IClockService clockservice = (IClockService) getScope().getServiceContainer().getService(IClockService.class);
+		// long clockService = clockservice.getTime();
+		// long systemTime = new Long(System.currentTimeMillis());
+
+		// System.out.println("***********************************************************" + clockService + " - " + systemTime);
 
 		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
 		facts.put(Constants.EXPERIMENT_START_TIME, new Long(clockservice.getTime()));
@@ -277,27 +269,28 @@ public class RuntimeManagerPlan extends Plan {
 	 */
 	private Long getTerminationTime(int mode, long value) {
 		Long currentTime = new Long(getCurrentTime());
-		
+
 		if (mode == 0) {
-			// Long relativeTime = new Long(10000);	
+			// Long relativeTime = new Long(10000);
 			Long terminationTime = new Long(value + currentTime.longValue());
 			System.out.println("StartTime: " + TimeConverter.longTime2DateString(currentTime) + "TerminationTime: " + TimeConverter.longTime2DateString(terminationTime));
 			return new Long(value);
 		} else {// TODO: There might be a problem with Day Light Savings Time!
 			Calendar cal = Calendar.getInstance();
-			// Date terminationTime = cal.getTime();			
+			// Date terminationTime = cal.getTime();
 			Long duration = new Long(value - currentTime.longValue());
-			System.out.println("StartTime: " + TimeConverter.longTime2DateString(currentTime) + "TerminationTime: " + TimeConverter.longTime2DateString(new Long(value))
-					+ ", Duration: " + duration.longValue());
+			System.out.println("StartTime: " + TimeConverter.longTime2DateString(currentTime) + "TerminationTime: " + TimeConverter.longTime2DateString(new Long(value)) + ", Duration: "
+					+ duration.longValue());
 			return duration;
 		}
 	}
 
 	/**
 	 * Returns current Time using the IClockService
+	 * 
 	 * @return
 	 */
-	private long getCurrentTime(){
+	private long getCurrentTime() {
 		IClockService clockservice = (IClockService) getScope().getServiceContainer().getService(IClockService.class);
 		return clockservice.getTime();
 	}
