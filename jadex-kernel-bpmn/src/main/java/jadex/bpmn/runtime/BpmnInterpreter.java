@@ -2,6 +2,7 @@ package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.bpmn.runtime.handler.DefaultStepHandler;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler;
@@ -207,6 +208,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 		variables.put("$clock", getComponentAdapter().getServiceContainer().getService(IClockService.class));
 		variables.put("$args", this.arguments);
 		variables.put("$results", this.results);
+		variables.put("$interpreter", this);
 		
 		Set	vars	= model.getContextVariables();
 		for(Iterator it=vars.iterator(); it.hasNext(); )
@@ -376,6 +378,14 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 //							// todo: initiate kill process?!
 //							
 ////							System.out.println("CC: "+adapter);
+				
+							// Call cancel on all running threads.
+							for(Iterator it= getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+							{
+								ProcessThread pt = (ProcessThread)it.next();
+								getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
+//								System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
+							}
 							listener.resultAvailable(BpmnInterpreter.this, adapter.getComponentIdentifier());
 //						}
 //					});
@@ -763,7 +773,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 				throw new UnsupportedOperationException("No handler for activity: "+thread);
 			if(history!=null)
 				history.add(new HistoryEntry(stepnumber++, thread.getId(), thread.getActivity()));
-			System.out.println("Step: "+thread.getActivity()+" "+thread);
+//			System.out.println("Step: "+thread.getActivity()+" "+thread);
 			handler.execute(thread.getActivity(), this, thread);
 			
 			// Check if thread now waits for a message and there is at least one in the message queue.
@@ -779,7 +789,6 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 					if(filter!=null && filter.filter(message))
 					{
 						notify(thread.getActivity(), thread, message);
-//						((DefaultActivityHandler)getActivityHandler(thread.getActivity())).notify(thread.getActivity(), BpmnInterpreter.this, thread, message);
 						processed = true;
 						messages.remove(i);
 //						System.out.println("Dispatched from waitqueue: "+messages.size()+" "+message);
@@ -824,7 +833,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			{
 				public void run()
 				{
-					if(thread.getActivity().equals(activity))
+					if(isCurrentActivity(activity, thread))
 					{
 //						System.out.println("Notify: "+activity+" "+thread+" "+event);
 						getStepHandler(activity).step(activity, BpmnInterpreter.this, thread, event);
@@ -840,7 +849,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 		}
 		else
 		{
-			if(thread.getActivity().equals(activity))
+			if(isCurrentActivity(activity, thread))
 			{
 //				System.out.println("Notify: "+activity+" "+thread+" "+event);
 				getStepHandler(activity).step(activity, BpmnInterpreter.this, thread, event);
@@ -852,6 +861,29 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 				System.out.println("Nop, due to outdated notify: "+thread+" "+activity);
 			}
 		}
+	}
+	
+	/**
+	 *  Test if the notification is relevant for the current thread.
+	 *  The normal test is if thread.getActivity().equals(activity).
+	 *  This method must handle the additional case that the current
+	 *  activity of the thread is a multiple event activity. In this case
+	 *  the notification could be for one of the child events. 
+	 */
+	protected boolean isCurrentActivity(final MActivity activity, final ProcessThread thread)
+	{
+		boolean ret = thread.getActivity().equals(activity);
+		if(!ret && MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE.equals(thread.getActivity().getActivityType()))
+		{
+			List outedges = thread.getActivity().getOutgoingSequenceEdges();
+			for(int i=0; i<outedges.size() && !ret; i++)
+			{
+				MSequenceEdge edge = (MSequenceEdge)outedges.get(i);
+				ret = edge.getTarget().equals(activity);
+			}
+		}
+		return ret;
+		
 	}
 	
 	/**

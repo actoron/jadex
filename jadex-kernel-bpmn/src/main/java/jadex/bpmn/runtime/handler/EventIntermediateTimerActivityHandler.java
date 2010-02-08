@@ -3,8 +3,10 @@ package jadex.bpmn.runtime.handler;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.CheckedAction;
+import jadex.bridge.InterpreterTimedObject;
 import jadex.service.clock.IClockService;
-import jadex.service.clock.ITimedObject;
+import jadex.service.clock.ITimer;
 
 /**
  *  Uses timer service for implementing waiting.
@@ -23,33 +25,33 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	public Object doWait(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, long duration)
 	{
 		IClockService cs = (IClockService)instance.getComponentAdapter().getServiceContainer().getService(IClockService.class);
-		Object ret = cs.createTimer(duration, new ITimedObject()
+		Object ret = cs.createTimer(duration, new InterpreterTimedObject(instance.getComponentAdapter(), new CheckedAction()
 		{
-			public void timeEventOccurred(long currenttime)
+			public void run()
 			{
 				instance.notify(activity, thread, null);
 			}
-		});
+		}));
 		return ret;
 	}
 	
 	/**
-	 *  Template method to be implemented by platform-specific subclasses.
-	 *  @param activity	The timing event activity.
+	 *  Execute an activity.
+	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
-	 *  @param thread	The process thread.
-	 *  @param duration	The duration to wait.
+	 *  @param thread The process thread.
+	 *  @param info The info object.
 	 */
-//	public void doWait(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, long duration)
-//	{
-//		final Timer	timer	= new Timer();
-//		timer.schedule(new TimerTask()
-//		{	
-//			public void run()
-//			{
-//				timer.cancel();
-//				EventIntermediateTimerActivityHandler.this.notify(activity, instance, thread, null);
-//			}
-//		}, duration);
-//	}
+	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	{
+		Object wi = thread.getWaitInfo();
+		if(wi instanceof ITimer)
+		{
+			((ITimer)wi).cancel();
+		}
+		else
+		{
+			throw new RuntimeException("Internal timer error: "+wi);
+		}
+	}
 }

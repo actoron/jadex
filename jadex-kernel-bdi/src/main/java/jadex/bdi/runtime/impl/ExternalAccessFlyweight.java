@@ -1,5 +1,6 @@
 package jadex.bdi.runtime.impl;
 
+import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.interpreter.PlanRules;
@@ -10,6 +11,7 @@ import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.TimeoutException;
 import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.InterpreterTimedObject;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVObjectType;
 import jadex.service.clock.IClockService;
@@ -758,7 +760,7 @@ public class ExternalAccessFlyweight extends CapabilityFlyweight implements IBDI
 					
 //					System.out.println("Timer created: "+start);
 					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer, ((IClockService)getInterpreter()
-						.getComponentAdapter().getServiceContainer().getService(IClockService.class)).createTimer(timeout, new InterpreterTimedObject(getState(), wakeup)));
+						.getComponentAdapter().getServiceContainer().getService(IClockService.class)).createTimer(timeout, new InterpreterTimedObject(BDIInterpreter.getInterpreter(getState()).getComponentAdapter(), wakeup)));
 				}
 			
 				object = ea;

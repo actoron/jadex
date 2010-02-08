@@ -7,9 +7,9 @@ import jadex.bdi.runtime.TimeoutException;
 import jadex.bdi.runtime.impl.ChangeEventFlyweight;
 import jadex.bdi.runtime.impl.GoalFlyweight;
 import jadex.bdi.runtime.impl.InternalEventFlyweight;
-import jadex.bdi.runtime.impl.InterpreterTimedObject;
 import jadex.bdi.runtime.impl.MessageEventFlyweight;
 import jadex.bridge.CheckedAction;
+import jadex.bridge.InterpreterTimedObject;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
@@ -2096,7 +2096,7 @@ public class PlanRules
 				// timer runs on other thread.
 				final	ITimer[]	thetimer	= new ITimer[1];
 				ITimer timer = ((IClockService)BDIInterpreter.getInterpreter(state).getComponentAdapter().getServiceContainer()
-					.getService(IClockService.class)).createTimer(timeout, new InterpreterTimedObject(state, new CheckedAction()
+					.getService(IClockService.class)).createTimer(timeout, new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getComponentAdapter(), new CheckedAction()
 				{
 					public boolean isValid()
 					{

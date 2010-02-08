@@ -1,6 +1,8 @@
 package jadex.bpmnbdi.handler;
 
 import jadex.bdi.interpreter.OAVBDIMetaModel;
+import jadex.bdi.runtime.impl.ElementFlyweight;
+import jadex.bdi.runtime.impl.MessageEventFlyweight;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
@@ -37,6 +39,8 @@ public class EventIntermediateRuleActicityHandler	extends DefaultActivityHandler
 				boolean ret = false;
 				BpmnPlanBodyInstance inst = (BpmnPlanBodyInstance)instance;
 				IOAVState state = inst.getState();
+				if(event instanceof ElementFlyweight)
+					event = ((ElementFlyweight)event).getHandle();
 				if(OAVBDIMetaModel.condition_type.equals(state.getType(event)))
 				{
 					String type = (String)state.getAttributeValue(event, OAVBDIMetaModel.modelelement_has_name);

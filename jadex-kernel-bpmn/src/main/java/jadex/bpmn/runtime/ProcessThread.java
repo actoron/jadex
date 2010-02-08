@@ -63,7 +63,7 @@ public class ProcessThread	implements ITaskContext
 	protected MSequenceEdge	edge;
 		
 	/** The data of the current or last activity. */
-	protected Map	data;
+	protected Map data;
 	
 	/** The thread context. */
 	protected ThreadContext	context;

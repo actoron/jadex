@@ -3,6 +3,7 @@ package jadex.bpmnbdi.handler;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.IInternalEvent;
+import jadex.bdi.runtime.impl.ElementFlyweight;
 import jadex.bdi.runtime.impl.InternalEventFlyweight;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
@@ -40,9 +41,8 @@ public class EventIntermediateSignalActivityHandler	extends DefaultActivityHandl
 				boolean ret = false;
 				BpmnPlanBodyInstance inst = (BpmnPlanBodyInstance)instance;
 				IOAVState state = inst.getState();
-				// Hack?!
-				if(event instanceof IInternalEvent)
-					event = ((InternalEventFlyweight)event).getHandle();
+				if(event instanceof ElementFlyweight)
+					event = ((ElementFlyweight)event).getHandle();
 				if(OAVBDIRuntimeModel.internalevent_type.equals(state.getType(event)))
 				{
 					Object mmsg = state.getAttributeValue(event, OAVBDIRuntimeModel.element_has_model);

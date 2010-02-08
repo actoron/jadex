@@ -10,7 +10,7 @@ import jadex.bpmn.runtime.ProcessThread;
 import jadex.commons.IFilter;
 
 /**
- * 
+ *  Step handler that can be used for event-multiple elements.
  */
 public class EventMultipleStepHandler implements IStepHandler
 {

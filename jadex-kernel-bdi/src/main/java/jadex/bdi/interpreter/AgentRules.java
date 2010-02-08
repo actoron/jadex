@@ -1,9 +1,9 @@
 package jadex.bdi.interpreter;
 
 import jadex.bdi.runtime.IPlanExecutor;
-import jadex.bdi.runtime.impl.InterpreterTimedObject;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.IArgument;
+import jadex.bridge.InterpreterTimedObject;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
@@ -1388,7 +1388,7 @@ public class AgentRules
 		{
 			final ITimedObject[]	to	= new ITimedObject[1];
 			final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
-			to[0] = new InterpreterTimedObject(state, new CheckedAction()
+			to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getComponentAdapter(), new CheckedAction()
 			{
 				public void run()
 				{
@@ -1564,7 +1564,7 @@ public class AgentRules
 			final ITimedObject[]	to	= new ITimedObject[1];
 			
 			final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
-			to[0]	= new InterpreterTimedObject(state, new CheckedAction()
+			to[0]	= new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getComponentAdapter(), new CheckedAction()
 			{
 				public void run()
 				{
@@ -2799,7 +2799,7 @@ public class AgentRules
 		
 		// changed *.class to *.TYPE due to javaflow bug
 		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_timer, ((IClockService)interpreter.getComponentAdapter().getServiceContainer()
-			.getService(IClockService.TYPE)).createTimer(tt, new InterpreterTimedObject(state, new CheckedAction()
+			.getService(IClockService.TYPE)).createTimer(tt, new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getComponentAdapter(), new CheckedAction()
 			{
 				public boolean isValid()
 				{

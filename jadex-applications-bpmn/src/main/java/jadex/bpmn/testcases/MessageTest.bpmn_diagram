@@ -46,7 +46,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_g5MZ1RJ6Ed-3Ruc_856dPQ"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_g5MZ1hJ6Ed-3Ruc_856dPQ" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="MessageTest.bpmn#_g5MZ0RJ6Ed-3Ruc_856dPQ"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_g5MZ1xJ6Ed-3Ruc_856dPQ" x="270" y="55"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_g5MZ1xJ6Ed-3Ruc_856dPQ" x="251" y="55"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_jMIFwhJ6Ed-3Ruc_856dPQ" type="2001">
         <children xmi:type="notation:Node" xmi:id="_jMIFyBJ6Ed-3Ruc_856dPQ" type="4001"/>

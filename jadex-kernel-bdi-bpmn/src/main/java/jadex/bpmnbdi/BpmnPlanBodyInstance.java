@@ -1372,7 +1372,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 			{
 				public void run()
 				{
-					if(thread.getActivity().equals(activity))
+					if(isCurrentActivity(activity, thread))
 					{
 						try
 						{
@@ -1399,7 +1399,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 		}
 		else
 		{
-			if(thread.getActivity().equals(activity))
+			if(isCurrentActivity(activity, thread))
 			{
 				try
 				{
