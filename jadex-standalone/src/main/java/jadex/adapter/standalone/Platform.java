@@ -84,8 +84,11 @@ public class Platform extends AbstractPlatform
 	/** Configuration entry for platform shutdown delay (time for agents to terminate gracefully). */
 	public static String PLATFORM_SHUTDOWN_TIME = PLATFORM+SEPARATOR+"platform_shutdown_time";
 
-	/** The fallback configuration. */
-	public static final String FALLBACK_CONFIGURATION = "jadex/adapter/standalone/standalone_conf.xml";
+	/** The fallback configuration for basic services. */
+	public static final String FALLBACK_SERVICES_CONFIGURATION = "jadex/adapter/standalone/standalone_conf.xml";
+
+	/** The fallback configuration for standard agents (ams/df/jcc). */
+	public static final String FALLBACK_AGENTS_CONFIGURATION = "jadex/adapter/standalone/standalone_platformagents_conf.xml";
 
 	/** The configuration. */
 	protected Properties[] configurations;
@@ -436,7 +439,7 @@ public class Platform extends AbstractPlatform
 		
 		// Initialize platform configuration from args.
 		String[] conffiles;
-		if(args[0].equals("-"+CONFIGURATION))
+		if(args.length>0 && args[0].equals("-"+CONFIGURATION))
 		{
 			conffiles = new String[args.length-1];
 			System.arraycopy(args, 1, conffiles, 0, args.length-1);
@@ -447,7 +450,7 @@ public class Platform extends AbstractPlatform
 		}
 		else
 		{
-			conffiles = new String[]{FALLBACK_CONFIGURATION};
+			conffiles = new String[]{FALLBACK_SERVICES_CONFIGURATION, FALLBACK_AGENTS_CONFIGURATION};
 		}
 		
 		// Create an instance of the platform.

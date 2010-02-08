@@ -1,2 +1,2 @@
 cd lib
-java -jar jadex-launch-2.0-beta4.jar
+java -jar jadex-launch-2.0-rc1.jar

@@ -4,7 +4,7 @@
   <groupId>jadex</groupId>
   <artifactId>jadex</artifactId>
   <packaging>pom</packaging>
-  <version>2.0-beta4</version>
+  <version>2.0-rc1</version>
   <name>jadex</name>
   <profiles>
   	<profile>
@@ -24,7 +24,7 @@
 		    </plugins>
   		</build>
 		<modules>
-				<module>jadex-services</module>
+			<module>jadex-services</module>
 		    <module>jadex-commons</module>
 		    <module>jadex-xml</module>
 		    <module>jadex-rules</module>
@@ -35,7 +35,7 @@
   	<profile>
   		<id>jadex-full-dist</id>
 		<modules>
-		 		<module>jadex-services</module>
+		 	<module>jadex-services</module>
 		    <module>jadex-commons</module>
 		    <module>jadex-xml</module>
 		    <module>jadex-javaparser</module>
@@ -45,7 +45,7 @@
 		    <module>jadex-kernel-bdi</module>
 		    <module>jadex-applib-bdi</module>
 		    <module>jadex-applications-bdi</module>
-		    <module>jadex-applib-simulation</module>
+		    <!-- <module>jadex-applib-simulation</module> -->
 		    <module>jadex-runtimetools</module>
 		    <module>jadex-kernel-micro</module>
 		    <module>jadex-applications-micro</module>
@@ -53,9 +53,15 @@
 		    <module>jadex-rules-applications</module>
 		    <module>jadex-rules-tools</module>
 		    <module>jadex-kernel-application</module>
+		    <module>jadex-kernel-bpmn</module>
+		    <module>jadex-applications-bpmn</module>
+		    <module>jadex-kernel-bdi-bpmn</module>
+		    <module>jadex-applications-bdi-bpmn</module>
+		    <module>jadex-kernel-gpmn</module>
+		    <module>jadex-applications-gpmn</module>
 		    <module>jadex-standalone</module>
 		    <module>jadex-launch</module>
-		    <module>jadex-apleis</module>
+		    <!-- <module>jadex-apleis</module> -->
 		</modules>
   	</profile>
   	<profile>

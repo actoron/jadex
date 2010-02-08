@@ -1,6 +1,7 @@
 - set release number in poms and in jadex.bridge.IVersionInfo
 - remove target directories in jadex and all projects
 - do maven install (for artifacts being locally available)
+- clean dependent projects (and iterate from previous step)
 - build jadex maven javadoc
 - build jadex distribution
 - rebuild applications.jccproject.xml

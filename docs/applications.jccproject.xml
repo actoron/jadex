@@ -1616,14 +1616,14 @@
 <java.lang.String n:id="643">children_date</java.lang.String>
 <java.util.Date n:id="644" v="2009-07-09T11:37:33"/>
 <java.util.HashMap n:id="5">6 7 8 9 a b 641 642 643 644</java.util.HashMap>
-<JarNode n:id="4" relativePath="jadex-applications-bdi-2.0-beta4.jar" r:parent="2" r:properties="5"/>
+<JarNode n:id="4" relativePath="jadex-applications-bdi-2.0-rc1.jar" r:parent="2" r:properties="5"/>
 <java.util.ArrayList n:id="3">4</java.util.ArrayList>
 <RootNode n:id="2" r:children="3"/>
 <java.util.ArrayList n:id="645">4</java.util.ArrayList>
 <ModelExplorer_24_ModelExplorerProperties n:id="1" r:rootNode="2" r:expandedNodes="645"/>
 </n:root>
 ]]></property>
-			<property type="lastpath">jadex-applications-bdi-2.0-beta4.jar</property>
+			<property type="lastpath">jadex-applications-bdi-2.0-rc1.jar</property>
 			<property type="refresh">false</property>
 		</properties>
 		<properties type="spanel">
@@ -1683,7 +1683,7 @@
 <java.util.Date n:id="2c" v="2009-07-09T11:35:53"/>
 <java.lang.Boolean n:id="2d" v="true"/>
 <java.util.HashMap n:id="8">9 a b c d e 22 2c 24 2d</java.util.HashMap>
-<JarNode n:id="5" relativePath="jadex-applications-bdi-2.0-beta4.jar" r:parent="6" r:properties="8"/>
+<JarNode n:id="5" relativePath="jadex-applications-bdi-2.0-rc1.jar" r:parent="6" r:properties="8"/>
 <java.util.Date n:id="2f" v="2009-07-09T11:35:57"/>
 <java.util.Date n:id="30" v="2009-07-09T11:33:40"/>
 <java.util.ArrayList n:id="31">3</java.util.ArrayList>
@@ -3414,7 +3414,7 @@
 <ModelExplorer_24_ModelExplorerProperties n:id="1" r:selectedNode="2" r:rootNode="6" r:expandedNodes="6e9"/>
 </n:root>
 ]]></property>
-			<property type="lastpath">jadex-applications-bdi-2.0-beta4.jar</property>
+			<property type="lastpath">jadex-applications-bdi-2.0-rc1.jar</property>
 			<property type="refresh">false</property>
 		</properties>
 		<properties type="testspanel">
@@ -3504,7 +3504,7 @@
 		</properties>
 	</properties>
 	<properties type="Library Tool">
-		<property type="cp">..\..\..\..\..\Dokumente%20und%20Einstellungen\Alex\Desktop\jadex-2.0-beta4\lib\jadex-applications-bdi-2.0-beta4.jar</property>
-		<property type="cp">..\..\..\..\..\Dokumente%20und%20Einstellungen\Alex\Desktop\jadex-2.0-beta4\lib\jadex-applications-bdi-2.0-beta4.jar</property>
+		<property type="cp">..\..\..\..\..\Dokumente%20und%20Einstellungen\Alex\Desktop\jadex-2.0-rc1\lib\jadex-applications-bdi-2.0-rc1.jar</property>
+		<property type="cp">..\..\..\..\..\Dokumente%20und%20Einstellungen\Alex\Desktop\jadex-2.0-rc1\lib\jadex-applications-bdi-2.0-rc1.jar</property>
 	</properties>
 </properties>
