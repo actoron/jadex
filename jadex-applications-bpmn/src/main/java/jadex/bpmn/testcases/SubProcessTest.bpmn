@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_uPzp4RTQEd-a46HbtL-N3Q" iD="_uPzp4BTQEd-a46HbtL-N3Q">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_18RCcBTUEd-a46HbtL-N3Q" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_18RCcRTUEd-a46HbtL-N3Q" key="imports" value="java.util.*␟jadex.adapter.base.test.*␟jadex.bpmn.runtime.task.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BeUJUBTVEd-a46HbtL-N3Q" key="Package" value="jadex.bpmn.testcases"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LDy10BTVEd-a46HbtL-N3Q" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_uQZfwRTQEd-a46HbtL-N3Q" iD="_uQZfwBTQEd-a46HbtL-N3Q" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_uSXZMRTREd-a46HbtL-N3Q" iD="_uSXZMBTREd-a46HbtL-N3Q" outgoingEdges="_wXlZQhTREd-a46HbtL-N3Q" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_wXSeURTREd-a46HbtL-N3Q" iD="_wXSeUBTREd-a46HbtL-N3Q" outgoingEdges="_57q3SBTUEd-a46HbtL-N3Q" incomingEdges="_wXlZQhTREd-a46HbtL-N3Q" activityType="SubProcess">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_yJOOoBTUEd-a46HbtL-N3Q" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yJOOoRTUEd-a46HbtL-N3Q" key="class" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yptFgBTUEd-a46HbtL-N3Q" key="parameters" value="inout␋list␋List␋new ArrayList()"/>
+      </eAnnotations>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_wXSeUxTREd-a46HbtL-N3Q" iD="_wXSeUhTREd-a46HbtL-N3Q" outgoingEdges="_532OkRTREd-a46HbtL-N3Q" name="Sub 1a &#xD;&#xA;(1)"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_zaMOoRTREd-a46HbtL-N3Q" iD="_zaMOoBTREd-a46HbtL-N3Q" outgoingEdges="_z5yUsRTREd-a46HbtL-N3Q" name="wait for 1 sec" activityType="EventStartTimer">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_J7yhYBTUEd-a46HbtL-N3Q" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_J7yhYRTUEd-a46HbtL-N3Q" key="timer" value=""/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_J7yhYhTUEd-a46HbtL-N3Q" key="duration" value="1000"/>
+        </eAnnotations>
+      </vertices>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_z5ojsRTREd-a46HbtL-N3Q" iD="_z5ojsBTREd-a46HbtL-N3Q" outgoingEdges="_1iFvQhTREd-a46HbtL-N3Q" incomingEdges="_z5yUsRTREd-a46HbtL-N3Q" name="Sub 1b &#xD;&#xA;(2)" activityType="Task"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_1h8lURTREd-a46HbtL-N3Q" iD="_1h8lUBTREd-a46HbtL-N3Q" outgoingEdges="_2y2zkRTREd-a46HbtL-N3Q" incomingEdges="_1iFvQhTREd-a46HbtL-N3Q" name="wait for 2,5 sec" activityType="EventIntermediateTimer">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_uRa2oBTUEd-a46HbtL-N3Q" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uRa2oRTUEd-a46HbtL-N3Q" key="timer" value=""/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uRa2ohTUEd-a46HbtL-N3Q" key="duration" value="2500"/>
+        </eAnnotations>
+      </vertices>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_2ytCkRTREd-a46HbtL-N3Q" iD="_2ytCkBTREd-a46HbtL-N3Q" incomingEdges="_2y2zkRTREd-a46HbtL-N3Q" name="Sub 2b&#xD;&#xA;(5)" activityType="Task"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_53tEoRTREd-a46HbtL-N3Q" iD="_53tEoBTREd-a46HbtL-N3Q" outgoingEdges="_8QuxgRTREd-a46HbtL-N3Q" incomingEdges="_532OkRTREd-a46HbtL-N3Q" name="wait for 2 secs" activityType="EventIntermediateTimer">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_MAHJkBTUEd-a46HbtL-N3Q" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MAHJkRTUEd-a46HbtL-N3Q" key="timer" value=""/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MAHJkhTUEd-a46HbtL-N3Q" key="duration" value="2000"/>
+        </eAnnotations>
+      </vertices>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_8QlnkRTREd-a46HbtL-N3Q" iD="_8QlnkBTREd-a46HbtL-N3Q" outgoingEdges="_9YQaQRTREd-a46HbtL-N3Q" incomingEdges="_8QuxgRTREd-a46HbtL-N3Q" name="Sub 2a&#xD;&#xA;(3)" activityType="Task"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_9YHQURTREd-a46HbtL-N3Q" iD="_9YHQUBTREd-a46HbtL-N3Q" outgoingEdges="_-ACzCBTREd-a46HbtL-N3Q" incomingEdges="_9YQaQRTREd-a46HbtL-N3Q" name="wait for 1 sec" activityType="EventIntermediateTimer">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_vIGnABTUEd-a46HbtL-N3Q" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vIGnARTUEd-a46HbtL-N3Q" key="timer" value=""/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vIGnAhTUEd-a46HbtL-N3Q" key="duration" value="1000"/>
+        </eAnnotations>
+      </vertices>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_9_5pERTREd-a46HbtL-N3Q" iD="_9_5pEBTREd-a46HbtL-N3Q" incomingEdges="_-ACzCBTREd-a46HbtL-N3Q" name="Sub 3a&#xD;&#xA;(4)" activityType="Task"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_z5yUsRTREd-a46HbtL-N3Q" iD="_z5yUsBTREd-a46HbtL-N3Q"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_1iFvQhTREd-a46HbtL-N3Q" iD="_1iFvQRTREd-a46HbtL-N3Q"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_2y2zkRTREd-a46HbtL-N3Q" iD="_2y2zkBTREd-a46HbtL-N3Q"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_532OkRTREd-a46HbtL-N3Q" iD="_532OkBTREd-a46HbtL-N3Q"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_8QuxgRTREd-a46HbtL-N3Q" iD="_8QuxgBTREd-a46HbtL-N3Q"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_9YQaQRTREd-a46HbtL-N3Q" iD="_9YQaQBTREd-a46HbtL-N3Q"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_-ACzCBTREd-a46HbtL-N3Q" iD="_-ACzBxTREd-a46HbtL-N3Q"/>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_57hGQRTUEd-a46HbtL-N3Q" iD="_57hGQBTUEd-a46HbtL-N3Q" outgoingEdges="_7DMgChTUEd-a46HbtL-N3Q _8FgRkRTUEd-a46HbtL-N3Q" incomingEdges="_57q3SBTUEd-a46HbtL-N3Q" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_7DMgARTUEd-a46HbtL-N3Q" iD="_7DMgABTUEd-a46HbtL-N3Q" incomingEdges="_7DMgChTUEd-a46HbtL-N3Q" name="Success" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_PmN4IBTVEd-a46HbtL-N3Q" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PmN4IRTVEd-a46HbtL-N3Q" key="class" value="StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QAv4ABTVEd-a46HbtL-N3Q" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Test subprocess execution.&quot;, true, null)})"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_8FWgkRTUEd-a46HbtL-N3Q" iD="_8FWgkBTUEd-a46HbtL-N3Q" incomingEdges="_8FgRkRTUEd-a46HbtL-N3Q" name="Failure" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_j4Q1ABTVEd-a46HbtL-N3Q" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_j4Q1ARTVEd-a46HbtL-N3Q" key="parameters" value="in␋name1␋String␋&quot;testresults&quot;␟in␋value1␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Test subprocess execution.&quot;, false, &quot;Wrong execution order.&quot;)})"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mLCI4BTVEd-a46HbtL-N3Q" key="class" value="StoreResultsTask.class"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_wXlZQhTREd-a46HbtL-N3Q" iD="_wXlZQRTREd-a46HbtL-N3Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_57q3SBTUEd-a46HbtL-N3Q" iD="_57q3RxTUEd-a46HbtL-N3Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_7DMgChTUEd-a46HbtL-N3Q" iD="_7DMgCRTUEd-a46HbtL-N3Q">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_6AeCQBTVEd-a46HbtL-N3Q" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6AeCQRTVEd-a46HbtL-N3Q" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6AeCQhTVEd-a46HbtL-N3Q" key="condition" value="Arrays.equals(list.toArray(), new String[]{&quot;1a&quot;, &quot;1b&quot;, &quot;2a&quot;, &quot;3a&quot;, &quot;2b&quot;})"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_8FgRkRTUEd-a46HbtL-N3Q" iD="_8FgRkBTUEd-a46HbtL-N3Q"/>
+  </pools>
+</bpmn:BpmnDiagram>

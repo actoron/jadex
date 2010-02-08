@@ -483,12 +483,13 @@ public class BpmnXMLReader
 									StringTokenizer stok2 = new StringTokenizer(paramtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
 
 									// Parameters of normal activities have 4 elements
-									if(stok2.countTokens()==4)
+									int tokcnt = stok2.countTokens();
+									if(tokcnt==3 || tokcnt==4)
 									{
 										String dir = stok2.nextToken();
 										String name = stok2.nextToken();
 										String clazzname = stok2.nextToken();
-										String val = stok2.nextToken();
+										String val = stok2.hasMoreTokens()? stok2.nextToken(): null;
 										
 										// context variable
 										Class clazz = SReflect.findClass0(clazzname, dia.getAllImports(), classloader);
@@ -506,7 +507,7 @@ public class BpmnXMLReader
 									}
 									
 									// Parameters of event handlers have 2 elements = are treated as properties?!
-									else if(stok2.countTokens()==2)
+									else if(tokcnt==2)
 									{
 										String name = stok2.nextToken();
 										String val = stok2.nextToken();

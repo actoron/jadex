@@ -28,14 +28,14 @@ public class JadexUserTaskActivityFilter implements IFilter
 	@Override
 	public boolean select(Object toTest)
 	{
-		if (toTest instanceof SubProcessEditPart || toTest instanceof SubProcessNameEditPart
-				|| toTest instanceof SubProcessSubProcessBodyCompartmentEditPart || toTest instanceof SubProcessSubProcessBorderCompartmentEditPart)
+		if(toTest instanceof SubProcessEditPart || toTest instanceof SubProcessNameEditPart
+			|| toTest instanceof SubProcessSubProcessBodyCompartmentEditPart || toTest instanceof SubProcessSubProcessBorderCompartmentEditPart)
 		{
 			return true;
 		}
 		
 		
-		if (toTest instanceof ActivityEditPart || toTest instanceof Activity2EditPart)
+		if(toTest instanceof ActivityEditPart || toTest instanceof Activity2EditPart)
 		{
 			EditPart part = (EditPart) toTest;
 			if (part.getModel() instanceof View)

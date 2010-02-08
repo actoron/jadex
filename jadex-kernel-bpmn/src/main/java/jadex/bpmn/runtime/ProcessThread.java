@@ -579,6 +579,8 @@ public class ProcessThread	implements ITaskContext
 			{
 				data.remove(it.next());
 			}
+			
+//			System.out.println("Data in thread: "+this.getId()+" "+data);
 		}
 	}
 	
