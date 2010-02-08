@@ -7,6 +7,7 @@ import jadex.tools.bpmn.diagram.Messages;
 import jadex.tools.bpmn.editor.JadexBpmnEditor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -59,6 +60,8 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 public abstract class AbstractMultiColumnTablePropertySection extends AbstractJadexPropertySection
 {
 	
+	
+	
 	// ---- attributes ----
 	
 	/** The viewer/editor for parameter */ 
@@ -83,7 +86,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	
 	private int uniqueColumnIndex;
 	
-	private HashSet<String> uniqueColumnValueCash;
+	private HashMap<EModelElement, HashSet<String>> uniqueColumnValuesMap;
 
 	// ---- constructor ----
 	
@@ -108,9 +111,10 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 		this.columsWeight = columnsWeight;
 		this.columnNames = columns;
 		
-		this.uniqueColumnIndex = uniqueColumnIndex;
-		this.uniqueColumnValueCash = new HashSet<String>();
+		this.uniqueColumnValuesMap = new HashMap<EModelElement, HashSet<String>>();
 		
+		this.uniqueColumnIndex = uniqueColumnIndex;
+
 		if (defaultListElementAttributeValues != null)
 		{
 			assert (columns.length == defaultListElementAttributeValues.length);
@@ -147,12 +151,14 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	public void setInput(IWorkbenchPart part, ISelection selection)
 	{
 		super.setInput(part, selection);
-		
+
 		if (modelElement != null)
 		{
 			tableViewer.setInput(modelElement);
 			addButton.setEnabled(true);
 			delButton.setEnabled(true);
+
+			getUniqueColumnValueCash(modelElement);
 
 			return;
 		}
@@ -161,7 +167,23 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 		tableViewer.setInput(null);
 		addButton.setEnabled(false);
 		delButton.setEnabled(false);
+
 	}
+	
+	private HashSet<String> getUniqueColumnValueCash(EModelElement element)
+	{
+		if (uniqueColumnValuesMap.containsKey(modelElement))
+		{
+			return uniqueColumnValuesMap.get(modelElement);
+		}
+		else
+		{
+			HashSet<String> newSet = new HashSet<String>();
+			uniqueColumnValuesMap.put(modelElement, newSet);
+			return newSet;
+		}
+	}
+	
 
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#refresh()
@@ -339,7 +361,8 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 						MultiColumnTableRow newRow = new MultiColumnTableRow(
 								defaultListElementAttributeValues);
 
-						synchronized (uniqueColumnValueCash)
+						HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
+						synchronized (uniqueValueCash)
 						{
 							List<MultiColumnTableRow> tableRows = getTableRowList();
 							String uniqueValue = createUniqueRowValue(newRow, tableRows);
@@ -395,13 +418,15 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 							IProgressMonitor monitor, IAdaptable info)
 							throws ExecutionException
 					{
-						synchronized (uniqueColumnValueCash)
+						HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
+						synchronized (uniqueValueCash)
 						{
 							MultiColumnTableRow rowToRemove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
 									.getSelection()).getFirstElement();
 							
 							List<MultiColumnTableRow> tableRowList = getTableRowList();
-							uniqueColumnValueCash.remove(rowToRemove.columnValues[uniqueColumnIndex]);
+							//modelElementUniqueColumnValueCash.remove(rowToRemove.columnValues[uniqueColumnIndex]);
+							uniqueValueCash.remove(rowToRemove.columnValues[uniqueColumnIndex]);
 							tableRowList.remove(rowToRemove);
 							updateTableRowList(tableRowList);
 						}
@@ -436,13 +461,14 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	{
 		assert (row != null && table != null);
 		
-		synchronized (uniqueColumnValueCash)
+		HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
+		synchronized (uniqueValueCash)
 		{
 			String uniqueColumnValue = row.columnValues[uniqueColumnIndex];
 
 			int counter = 1;
 			String uniqueValueToUse = uniqueColumnValue;
-			while (uniqueColumnValueCash.contains(uniqueValueToUse))
+			while (uniqueValueCash.contains(uniqueValueToUse))
 			{
 				uniqueValueToUse = uniqueColumnValue + counter;
 				counter++;
@@ -455,17 +481,19 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	
 	private boolean addUniqueRowValue(String uniqueValue)
 	{
-		synchronized (uniqueColumnValueCash)
+		HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
+		synchronized (uniqueValueCash)
 		{
-			return uniqueColumnValueCash.add(uniqueValue);
+			return uniqueValueCash.add(uniqueValue);
 		}
 	}
 	
 	private boolean removeUniqueRowValue(String uniqueValue)
 	{
-		synchronized (uniqueColumnValueCash)
+		HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
+		synchronized (uniqueValueCash)
 		{
-			return uniqueColumnValueCash.remove(uniqueValue);
+			return uniqueValueCash.remove(uniqueValue);
 		}
 	}
 	
@@ -990,7 +1018,8 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 					{
 						if (!newValue.equals(rowToEdit.columnValues[attributeIndex]))
 						{
-							synchronized (uniqueColumnValueCash)
+							HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
+							synchronized (uniqueValueCash)
 							{
 								removeUniqueRowValue(rowToEdit.columnValues[uniqueColumnIndex]);
 								
@@ -1047,7 +1076,6 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 		}
 	}
 
-	
 }
 
 
