@@ -100,6 +100,8 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	{
 		super(containerEAnnotationName, annotationDetailName);
 
+		// FIXME: allow -1 as unique column index to support no unique column?
+		
 		assert (columns != null && columnsWeight != null);
 		assert (columns.length == columnsWeight.length);
 		assert (uniqueColumnIndex != -1 && uniqueColumnIndex < columns.length);

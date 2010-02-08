@@ -11,11 +11,14 @@ import jadex.tools.bpmn.diagram.Messages;
  * 
  */
 public class JadexSequenceMappingSection extends
-		Abstract2ColumnTablePropertySection
+		AbstractMultiColumnTablePropertySection
 {
 
-	private static final String[] COLUMN_NAMES = new String[]{"Name", "Value"};
-	private static final  int[] COLUMN_WEIGHTS = new int[]{1 ,6};
+	//public static final String label = "Mappings";
+	public static final String[] fields = new String[]{"Name", "Value"};
+	public static final int[] columnWeights = new int[]{1 ,6};
+	public static final String[] defaultListElementAttributeValues = new String[]{"name", ""};
+	public static final int uniqueListElementAttribute = 0;
 	
 	/**
 	 * Default constructor, initializes super class
@@ -23,7 +26,8 @@ public class JadexSequenceMappingSection extends
 	public JadexSequenceMappingSection()
 	{
 		super(JADEX_SEQUENCE_ANNOTATION, JADEX_MAPPING_LIST_DETAIL,
-				Messages.JadexSequenceMappingSection_MappingTable_Label, COLUMN_NAMES, COLUMN_WEIGHTS);
+				Messages.JadexSequenceMappingSection_MappingTable_Label, fields, columnWeights, defaultListElementAttributeValues, uniqueListElementAttribute);
+		
 	}
 
 }

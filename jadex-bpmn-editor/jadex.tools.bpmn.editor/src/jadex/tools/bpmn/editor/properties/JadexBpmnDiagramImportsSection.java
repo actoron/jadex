@@ -11,7 +11,7 @@ import jadex.tools.bpmn.diagram.Messages;
  * 
  */
 public class JadexBpmnDiagramImportsSection extends
-		Abstract1ColumnTablePropertySection
+		AbstractMultiColumnTablePropertySection
 {
 
 	/**
@@ -19,8 +19,13 @@ public class JadexBpmnDiagramImportsSection extends
 	 */
 	public JadexBpmnDiagramImportsSection()
 	{
+//		super(JADEX_GLOBAL_ANNOTATION, JADEX_IMPORT_LIST_DETAIL,
+//				Messages.JadexGlobalDiagramSection_Imports_Label, "import");
 		super(JADEX_GLOBAL_ANNOTATION, JADEX_IMPORT_LIST_DETAIL,
-				Messages.JadexGlobalDiagramSection_Imports_Label, "import");
+				Messages.JadexGlobalDiagramSection_Imports_Label, 
+				new String[]{"import"}, 
+				new int[]{1}, 
+				new String[]{"jadex.*"}, 0);
 	}
 
 }
