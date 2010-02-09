@@ -40,6 +40,9 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	/** Constant for event start empty. */
 	public static final String EVENT_START_EMPTY = "EventStartEmpty";
 	
+	/** Constant for event start timer. */
+	public static final String EVENT_START_TIMER = "EventStartTimer";
+	
 	/** Constant for event end empty. */
 	public static final String EVENT_END_EMPTY = "EventEndEmpty";
 

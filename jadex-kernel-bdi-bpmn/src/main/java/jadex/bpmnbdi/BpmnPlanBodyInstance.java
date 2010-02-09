@@ -88,6 +88,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	static
 	{
 		Map	defhandlers	= new HashMap(BpmnInterpreter.DEFAULT_ACTIVITY_HANDLERS);
+		defhandlers.put(MBpmnModel.EVENT_START_TIMER, new EventIntermediateTimerActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE, new EventIntermediateMessageActivityHandler());
 		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new EventIntermediateRuleActicityHandler());

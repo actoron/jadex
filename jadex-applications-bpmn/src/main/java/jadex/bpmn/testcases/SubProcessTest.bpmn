@@ -12,35 +12,60 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yJOOoRTUEd-a46HbtL-N3Q" key="class" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yptFgBTUEd-a46HbtL-N3Q" key="parameters" value="inout␋list␋List␋new ArrayList()"/>
       </eAnnotations>
-      <vertices xmi:type="bpmn:Activity" xmi:id="_wXSeUxTREd-a46HbtL-N3Q" iD="_wXSeUhTREd-a46HbtL-N3Q" outgoingEdges="_532OkRTREd-a46HbtL-N3Q" name="Sub 1a &#xD;&#xA;(1)"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_wXSeUxTREd-a46HbtL-N3Q" iD="_wXSeUhTREd-a46HbtL-N3Q" outgoingEdges="_532OkRTREd-a46HbtL-N3Q" name="Sub 1a &#xD;&#xA;(1)">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_w-0SwBVdEd-a46HbtL-N3Q" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w-0SwRVdEd-a46HbtL-N3Q" key="class" value="jadex.bpmn.runtime.task.InvokeMethodTask.class"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yn37QBVdEd-a46HbtL-N3Q" key="parameters" value="in␋object␋List␋list␟in␋methodname␋String␋&quot;add&quot;␟in␋param␋Object␋&quot;1a&quot;"/>
+        </eAnnotations>
+      </vertices>
       <vertices xmi:type="bpmn:Activity" xmi:id="_zaMOoRTREd-a46HbtL-N3Q" iD="_zaMOoBTREd-a46HbtL-N3Q" outgoingEdges="_z5yUsRTREd-a46HbtL-N3Q" name="wait for 1 sec" activityType="EventStartTimer">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_J7yhYBTUEd-a46HbtL-N3Q" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_J7yhYRTUEd-a46HbtL-N3Q" key="timer" value=""/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_J7yhYhTUEd-a46HbtL-N3Q" key="duration" value="1000"/>
         </eAnnotations>
       </vertices>
-      <vertices xmi:type="bpmn:Activity" xmi:id="_z5ojsRTREd-a46HbtL-N3Q" iD="_z5ojsBTREd-a46HbtL-N3Q" outgoingEdges="_1iFvQhTREd-a46HbtL-N3Q" incomingEdges="_z5yUsRTREd-a46HbtL-N3Q" name="Sub 1b &#xD;&#xA;(2)" activityType="Task"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_z5ojsRTREd-a46HbtL-N3Q" iD="_z5ojsBTREd-a46HbtL-N3Q" outgoingEdges="_1iFvQhTREd-a46HbtL-N3Q" incomingEdges="_z5yUsRTREd-a46HbtL-N3Q" name="Sub 1b &#xD;&#xA;(2)" activityType="Task">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YiS_4BVlEd-9a_-KE2TdXg" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YiS_4RVlEd-9a_-KE2TdXg" key="class" value="jadex.bpmn.runtime.task.InvokeMethodTask.class"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AB-2UBVmEd-9a_-KE2TdXg" key="parameters" value="in␋object␋List␋list␟in␋methodname␋String␋&quot;add&quot;␟in␋param␋Object␋&quot;1b&quot;"/>
+        </eAnnotations>
+      </vertices>
       <vertices xmi:type="bpmn:Activity" xmi:id="_1h8lURTREd-a46HbtL-N3Q" iD="_1h8lUBTREd-a46HbtL-N3Q" outgoingEdges="_2y2zkRTREd-a46HbtL-N3Q" incomingEdges="_1iFvQhTREd-a46HbtL-N3Q" name="wait for 2,5 sec" activityType="EventIntermediateTimer">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_uRa2oBTUEd-a46HbtL-N3Q" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uRa2oRTUEd-a46HbtL-N3Q" key="timer" value=""/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uRa2ohTUEd-a46HbtL-N3Q" key="duration" value="2500"/>
         </eAnnotations>
       </vertices>
-      <vertices xmi:type="bpmn:Activity" xmi:id="_2ytCkRTREd-a46HbtL-N3Q" iD="_2ytCkBTREd-a46HbtL-N3Q" incomingEdges="_2y2zkRTREd-a46HbtL-N3Q" name="Sub 2b&#xD;&#xA;(5)" activityType="Task"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_2ytCkRTREd-a46HbtL-N3Q" iD="_2ytCkBTREd-a46HbtL-N3Q" incomingEdges="_2y2zkRTREd-a46HbtL-N3Q" name="Sub 2b&#xD;&#xA;(5)" activityType="Task">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ZLH6cBVlEd-9a_-KE2TdXg" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZLH6cRVlEd-9a_-KE2TdXg" key="class" value="jadex.bpmn.runtime.task.InvokeMethodTask.class"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XGYmEBVmEd-9a_-KE2TdXg" key="parameters" value="in␋object␋List␋list␟in␋methodname␋String␋&quot;add&quot;␟in␋param␋Object␋&quot;2b&quot;"/>
+        </eAnnotations>
+      </vertices>
       <vertices xmi:type="bpmn:Activity" xmi:id="_53tEoRTREd-a46HbtL-N3Q" iD="_53tEoBTREd-a46HbtL-N3Q" outgoingEdges="_8QuxgRTREd-a46HbtL-N3Q" incomingEdges="_532OkRTREd-a46HbtL-N3Q" name="wait for 2 secs" activityType="EventIntermediateTimer">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_MAHJkBTUEd-a46HbtL-N3Q" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MAHJkRTUEd-a46HbtL-N3Q" key="timer" value=""/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MAHJkhTUEd-a46HbtL-N3Q" key="duration" value="2000"/>
         </eAnnotations>
       </vertices>
-      <vertices xmi:type="bpmn:Activity" xmi:id="_8QlnkRTREd-a46HbtL-N3Q" iD="_8QlnkBTREd-a46HbtL-N3Q" outgoingEdges="_9YQaQRTREd-a46HbtL-N3Q" incomingEdges="_8QuxgRTREd-a46HbtL-N3Q" name="Sub 2a&#xD;&#xA;(3)" activityType="Task"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_8QlnkRTREd-a46HbtL-N3Q" iD="_8QlnkBTREd-a46HbtL-N3Q" outgoingEdges="_9YQaQRTREd-a46HbtL-N3Q" incomingEdges="_8QuxgRTREd-a46HbtL-N3Q" name="Sub 2a&#xD;&#xA;(3)" activityType="Task">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KzIhMBVlEd-9a_-KE2TdXg" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KzIhMRVlEd-9a_-KE2TdXg" key="parameters" value="in␋object␋List␋list␟in␋methodname␋String␋&quot;add&quot;␟in␋param␋Object␋&quot;2a&quot;"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O-mcEBVlEd-9a_-KE2TdXg" key="class" value="jadex.bpmn.runtime.task.InvokeMethodTask.class"/>
+        </eAnnotations>
+      </vertices>
       <vertices xmi:type="bpmn:Activity" xmi:id="_9YHQURTREd-a46HbtL-N3Q" iD="_9YHQUBTREd-a46HbtL-N3Q" outgoingEdges="_-ACzCBTREd-a46HbtL-N3Q" incomingEdges="_9YQaQRTREd-a46HbtL-N3Q" name="wait for 1 sec" activityType="EventIntermediateTimer">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_vIGnABTUEd-a46HbtL-N3Q" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vIGnARTUEd-a46HbtL-N3Q" key="timer" value=""/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vIGnAhTUEd-a46HbtL-N3Q" key="duration" value="1000"/>
         </eAnnotations>
       </vertices>
-      <vertices xmi:type="bpmn:Activity" xmi:id="_9_5pERTREd-a46HbtL-N3Q" iD="_9_5pEBTREd-a46HbtL-N3Q" incomingEdges="_-ACzCBTREd-a46HbtL-N3Q" name="Sub 3a&#xD;&#xA;(4)" activityType="Task"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_9_5pERTREd-a46HbtL-N3Q" iD="_9_5pEBTREd-a46HbtL-N3Q" incomingEdges="_-ACzCBTREd-a46HbtL-N3Q" name="Sub 3a&#xD;&#xA;(4)" activityType="Task">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_X1Sv8BVlEd-9a_-KE2TdXg" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X1Sv8RVlEd-9a_-KE2TdXg" key="class" value="jadex.bpmn.runtime.task.InvokeMethodTask.class"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gwpE4BVmEd-9a_-KE2TdXg" key="parameters" value="in␋object␋List␋list␟in␋methodname␋String␋&quot;add&quot;␟in␋param␋Object␋&quot;3a&quot;"/>
+        </eAnnotations>
+      </vertices>
       <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_z5yUsRTREd-a46HbtL-N3Q" iD="_z5yUsBTREd-a46HbtL-N3Q"/>
       <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_1iFvQhTREd-a46HbtL-N3Q" iD="_1iFvQRTREd-a46HbtL-N3Q"/>
       <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_2y2zkRTREd-a46HbtL-N3Q" iD="_2y2zkBTREd-a46HbtL-N3Q"/>
@@ -58,7 +83,7 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_8FWgkRTUEd-a46HbtL-N3Q" iD="_8FWgkBTUEd-a46HbtL-N3Q" incomingEdges="_8FgRkRTUEd-a46HbtL-N3Q" name="Failure" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_j4Q1ABTVEd-a46HbtL-N3Q" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_j4Q1ARTVEd-a46HbtL-N3Q" key="parameters" value="in␋name1␋String␋&quot;testresults&quot;␟in␋value1␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Test subprocess execution.&quot;, false, &quot;Wrong execution order.&quot;)})"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_j4Q1ARTVEd-a46HbtL-N3Q" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Test subprocess execution.&quot;, false, &quot;Wrong execution order.&quot;)})"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mLCI4BTVEd-a46HbtL-N3Q" key="class" value="StoreResultsTask.class"/>
       </eAnnotations>
     </vertices>

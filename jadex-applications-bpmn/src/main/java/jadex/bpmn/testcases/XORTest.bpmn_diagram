@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_aR6-4hVvEd-9a_-KE2TdXg" type="Bpmn" name="XORTest.bpmn_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_aSg0wBVvEd-9a_-KE2TdXg" type="1001">
+    <children xmi:type="notation:Node" xmi:id="_aSg0xhVvEd-9a_-KE2TdXg" type="4008"/>
+    <children xmi:type="notation:Node" xmi:id="_aSg0xxVvEd-9a_-KE2TdXg" type="5001">
+      <children xmi:type="notation:Node" xmi:id="_aSqlwBVvEd-9a_-KE2TdXg" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_aSqlxhVvEd-9a_-KE2TdXg" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_aSqlwRVvEd-9a_-KE2TdXg" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_aSqlwhVvEd-9a_-KE2TdXg"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_aSqlwxVvEd-9a_-KE2TdXg"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_aSqlxBVvEd-9a_-KE2TdXg" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="XORTest.bpmn#_aSXq0xVvEd-9a_-KE2TdXg"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_aSqlxxVvEd-9a_-KE2TdXg" x="55" y="70" width="111" height="61"/>
+      </children>
+      <styles xmi:type="notation:DrawerStyle" xmi:id="_aSg0yBVvEd-9a_-KE2TdXg"/>
+      <styles xmi:type="notation:SortingStyle" xmi:id="_aSg0yRVvEd-9a_-KE2TdXg"/>
+      <styles xmi:type="notation:FilteringStyle" xmi:id="_aSg0yhVvEd-9a_-KE2TdXg"/>
+    </children>
+    <styles xmi:type="notation:FontStyle" xmi:id="_aSg0wRVvEd-9a_-KE2TdXg" fontName="Arial"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_aSg0whVvEd-9a_-KE2TdXg"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_aSg0wxVvEd-9a_-KE2TdXg" fillColor="16771304"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_aSg0xBVvEd-9a_-KE2TdXg" lineColor="11119017"/>
+    <element xmi:type="bpmn:Pool" href="XORTest.bpmn#_aSXq0RVvEd-9a_-KE2TdXg"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_aSg0yxVvEd-9a_-KE2TdXg" x="16" y="16" width="1500" height="200"/>
+  </children>
+  <styles xmi:type="notation:PageStyle" xmi:id="_aR6-4xVvEd-9a_-KE2TdXg"/>
+  <styles xmi:type="notation:GuideStyle" xmi:id="_aR6-5BVvEd-9a_-KE2TdXg"/>
+  <styles xmi:type="notation:DescriptionStyle" xmi:id="_aR6-5RVvEd-9a_-KE2TdXg"/>
+  <element xmi:type="bpmn:BpmnDiagram" href="XORTest.bpmn#_aR6-4RVvEd-9a_-KE2TdXg"/>
+</notation:Diagram>

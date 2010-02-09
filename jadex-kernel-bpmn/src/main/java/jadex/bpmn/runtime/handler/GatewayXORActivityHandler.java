@@ -40,7 +40,7 @@ public class GatewayXORActivityHandler implements IActivityHandler
 				IParsedExpression exp = edge.getCondition();
 				if(exp!=null)
 				{
-					if(((Boolean)exp.getValue(fetcher)).booleanValue())
+					if(isValid(exp, fetcher))
 					{
 						thread.setLastEdge(edge);
 						def = null;
@@ -81,6 +81,24 @@ public class GatewayXORActivityHandler implements IActivityHandler
 	 */
 	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
+	}
+	
+	/**
+	 *  Safely evaluate a branch expression.
+	 */
+	protected boolean isValid(IParsedExpression exp, IValueFetcher fetcher)
+	{
+		boolean ret = false;
+		try
+		{
+			ret = ((Boolean)exp.getValue(fetcher)).booleanValue();
+		}
+		catch(Exception e)
+		{
+			System.out.println("Error in branch condition: "+exp);
+			e.printStackTrace();
+		}
+		return ret;
 	}
 }
 
