@@ -29,6 +29,7 @@ public class CreateComponentTask implements ITask
 		reserved.add("subcomponent");
 		reserved.add("resultlistener");
 		reserved.add("resultmapping");
+		reserved.add("wait");
 		reserved.add("arguments");
 	}
 	
@@ -44,6 +45,7 @@ public class CreateComponentTask implements ITask
 		boolean sub = context.getParameterValue("subcomponent")!=null? ((Boolean)context.getParameterValue("subcomponent")).booleanValue(): false;
 		IResultListener resultlistener = (IResultListener)context.getParameterValue("resultlistener");
 		final String[] resultmapping = (String[])context.getParameterValue("resultmapping");
+		boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): resultlistener==null && resultmapping!=null;
 		
 		Map args = (Map)context.getParameterValue("arguments");
 		if(args==null)
@@ -63,11 +65,8 @@ public class CreateComponentTask implements ITask
 //		System.out.println("args: "+args);
 
 		IComponentExecutionService ces = (IComponentExecutionService)instance.getComponentAdapter().getServiceContainer().getService(IComponentExecutionService.class);
-		
-		// Wait for subtask when results are needed (use also wait flag?!)
-		boolean wait = resultlistener==null && resultmapping!=null;
-		
-		if(wait)
+				
+		if(resultlistener==null && resultmapping!=null)
 		{
 			resultlistener = new IResultListener()
 			{
@@ -81,7 +80,7 @@ public class CreateComponentTask implements ITask
 							Object value = results.get(resultmapping[i]);
 							context.setParameterValue(resultmapping[i+1], value);
 							
-							System.out.println("Mapped result value: "+value+" "+resultmapping[i]+" "+resultmapping[i+1]);
+//							System.out.println("Mapped result value: "+value+" "+resultmapping[i]+" "+resultmapping[i+1]);
 						}
 					}
 					listener.resultAvailable(CreateComponentTask.this, null);
