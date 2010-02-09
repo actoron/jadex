@@ -111,9 +111,16 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 					tmpField.setText(tmpValue != null ? tmpValue : "");
 					tmpField.setEnabled(true);
 				}
-
 			}
-			
+			else
+			{
+				for (int i = 0; i < textFieldNames.length; i++)
+				{
+					textFields[i].setText("");
+					textFields[i].setEnabled(true);
+				}
+			}
+
 			return;
 		}
 		

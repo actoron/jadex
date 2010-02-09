@@ -23,6 +23,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
@@ -115,10 +116,10 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	/** The composite that holds the section parts */
 	protected Composite sectionComposite;
 	
-	/** The modelElement (task) that holds task implementation class and parameters, may be null. */
+	/** The modelElement, may be null. */
 	protected EModelElement modelElement;
 	
-	/** The EAnnotations name that contains the table information as detail */
+	/** The EAnnotations name that contains the detail */
 	protected String containerEAnnotationName;
 	
 	/** The EAnnotations detail that contains the information */
@@ -182,16 +183,20 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 			{
 				EModelElement elm = (EModelElement) unknownInput;
 				modelElement = (EModelElement) elm;
-
+				
 				return;
 			}
 		}
-		
+
 		// fall through
 		modelElement = null;
 
 	}
 
+	protected void changed(Control[] changed)
+	{
+		sectionComposite.changed(changed);
+	}
 	
 	
 	/**

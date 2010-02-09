@@ -16,6 +16,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
@@ -117,37 +118,35 @@ public abstract class AbstractComboPropertySection extends AbstractJadexProperty
 			cCombo.setItems(predefinedItems);
 			
 			EAnnotation ea = modelElement.getEAnnotation(containerEAnnotationName);
-			if (ea != null)
+			if (ea != null && ea.getDetails().get(annotationDetailName) != null)
 			{
 				String value = (String) ea.getDetails().get(annotationDetailName);
 				
-				if (value != null)
+				int valueIndex = -1;
+				// search value in items
+				String[] items = cCombo.getItems();
+				for (int i = 0; i < items.length; i++)
 				{
-					int valueIndex = -1;
-					// search value in items
-					String[] items = cCombo.getItems();
-					for (int i = 0; i < items.length; i++)
+					if (items[i].equals(value))
 					{
-						if (items[i].equals(value))
-						{
-							valueIndex = i;
-						}
+						valueIndex = i;
 					}
-					
-					// add the value to the items list
-					if (valueIndex == -1)
-					{
-						cCombo.add(value, 0);
-						valueIndex = 0;
-					}
-					cCombo.select(valueIndex);
 				}
-				else
+				
+				// add the value to the items list
+				if (valueIndex == -1)
 				{
-					// add empty value
-					cCombo.add("", 0); // //$NON-NLS-1$
-					cCombo.select(0);
+					cCombo.add(value, 0);
+					valueIndex = 0;
 				}
+				cCombo.select(valueIndex);
+				
+			}
+			else
+			{
+				// add empty value
+				cCombo.add("", 0); // //$NON-NLS-1$
+				cCombo.select(0);
 			}
 			
 			cCombo.setEnabled(true);

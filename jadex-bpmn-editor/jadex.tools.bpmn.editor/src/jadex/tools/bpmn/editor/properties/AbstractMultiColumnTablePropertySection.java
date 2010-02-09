@@ -48,6 +48,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -159,7 +160,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 			delButton.setEnabled(true);
 
 			getUniqueColumnValueCash(modelElement);
-
+			
 			return;
 		}
 
