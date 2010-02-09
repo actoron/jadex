@@ -276,7 +276,8 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 
 				Icon	overlay	= null;
 				IComponentDescription ad = (IComponentDescription)((DefaultTreeTableNode)value).getUserObject();
-				if(IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
+				if(IComponentDescription.STATE_SUSPENDED.equals(ad.getState())
+					|| IComponentDescription.STATE_WAITING.equals(ad.getState()))
 				{
 					overlay = StarterPlugin.icons.getIcon("component_suspended");
 				}
