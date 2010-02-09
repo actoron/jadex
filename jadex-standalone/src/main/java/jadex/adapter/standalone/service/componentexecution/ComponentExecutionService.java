@@ -167,8 +167,10 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 						cid.setAddresses(ms.getAddresses());
 				}
 		
+				IComponentDescription padesc = parent!=null? (IComponentDescription)descs.get(parent): null;
 				ad	= new CESComponentDescription(cid, type, parent);
-				if(suspend)
+				// Suspend when set to suspend or when parent is also suspended.
+				if(suspend || (padesc!=null && IComponentDescription.STATE_SUSPENDED.equals(padesc.getState())))
 				{
 					ad.setState(IComponentDescription.STATE_SUSPENDED);
 				}

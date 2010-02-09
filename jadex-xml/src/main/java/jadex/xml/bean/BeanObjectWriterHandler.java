@@ -171,16 +171,13 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			
 			if(clazz.isArray())
 			{
-				if(clazz.isArray())
+				int[] lens = SUtil.getArrayLengths(object);
+				tag = tag.substring(0, tag.indexOf("["))+"__";
+				for(int i=0; i<lens.length; i++)
 				{
-					int[] lens = SUtil.getArrayLengths(object);
-					tag = tag.substring(0, tag.indexOf("["))+"__";
-					for(int i=0; i<lens.length; i++)
-					{
-						tag += lens[i];
-						if(i+1<lens.length)
-							tag += "_";
-					}
+					tag += lens[i];
+					if(i+1<lens.length)
+						tag += "_";
 				}
 			}
 		}
