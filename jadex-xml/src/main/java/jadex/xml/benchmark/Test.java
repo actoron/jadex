@@ -43,6 +43,7 @@ public class Test //extends TestCase
 				t.testList();
 				t.testSet();
 				t.testMap();
+				t.testInnerClass();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -231,6 +232,16 @@ public class Test //extends TestCase
 	}
 	
 	/**
+	 *  Test if inner class transfer works.
+	 */
+	public void testInnerClass() throws Exception
+	{
+		InnerClass ic = new InnerClass("some string");
+		
+		doWriteAndRead(ic);
+	}
+	
+	/**
 	 *  Get some bean.
 	 */
 	protected Object getABean()
@@ -242,5 +253,53 @@ public class Test //extends TestCase
 		A a = new A(10, "test a", b1, new B[]{b1, b2, b3, b4});
 		return a;
 	}
+	
+	public static class InnerClass
+	{
+		protected String string;
+		
+		public InnerClass()
+		{
+		}
+		
+		public InnerClass(String string)
+		{
+			this.string = string;
+		}
 
+		public String getString() 
+		{
+			return string;
+		}
+
+		public void setString(String string) 
+		{
+			this.string = string;
+		}
+
+		public int hashCode() 
+		{
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((string == null) ? 0 : string.hashCode());
+			return result;
+		}
+
+		public boolean equals(Object obj) 
+		{
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			InnerClass other = (InnerClass) obj;
+			if (string == null) {
+				if (other.string != null)
+					return false;
+			} else if (!string.equals(other.string))
+				return false;
+			return true;
+		}
+	}
 }

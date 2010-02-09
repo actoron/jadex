@@ -108,13 +108,6 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		{
 			if(type instanceof Class)
 			{
-				// Class name not necessary no more
-//				Class clazz = (Class)type;
-//				type = SReflect.getClassName(clazz);
-//				ret = findTypeInfo((Set)typeinfos.get(type), fullpath);
-//				if(ret==null)
-//				{
-				
 				// Try if interface or supertype is registered
 				List tocheck = new ArrayList();
 				tocheck.add(type);
@@ -193,7 +186,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	//			System.out.println("here: "+typeinfo);
 				
 				String pck = tag.getNamespaceURI().substring(SXML.PROTOCOL_TYPEINFO.length());
-				String clazzname = pck+"."+tag.getLocalPart();
+				String clazzname = pck+"."+tag.getLocalPart().replace("-", "$");
+//				System.out.println("Clazzname: "+clazzname);
 				
 				// Special case array
 				int idx = clazzname.indexOf("__");

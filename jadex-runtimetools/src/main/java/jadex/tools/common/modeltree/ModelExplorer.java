@@ -16,6 +16,8 @@ import jadex.service.library.ILibraryServiceListener;
 import jadex.service.threadpool.ThreadPoolService;
 import jadex.tools.common.PopupBuilder;
 import jadex.tools.common.ToolTipAction;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,7 +54,6 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.TreePath;
 
-import nuggets.Nuggets;
 
 /**
  *  The model panel.
@@ -340,8 +341,8 @@ public class ModelExplorer extends JTree
 			}
 		}
 		ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
-//		String	treesave	= JavaWriter.objectToXML(mep, cl);	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
-		String	treesave	= Nuggets.objectToXML(mep, cl);
+		String	treesave	= JavaWriter.objectToXML(mep, cl);	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
+//		String	treesave	= Nuggets.objectToXML(mep, cl);
 		props.addProperty(new Property("tree", treesave));
 				
 		// Save the last loaded file.
@@ -383,8 +384,8 @@ public class ModelExplorer extends JTree
 			try
 			{
 				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
-//				ModelExplorerProperties	mep	= (ModelExplorerProperties)JavaReader.objectFromXML(treexml, cl); 	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
-				ModelExplorerProperties	mep	= (ModelExplorerProperties)Nuggets.objectFromXML(treexml, cl);
+				ModelExplorerProperties	mep	= (ModelExplorerProperties)JavaReader.objectFromXML(treexml, cl); 	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
+//				ModelExplorerProperties	mep	= (ModelExplorerProperties)Nuggets.objectFromXML(treexml, cl);
 				this.root	= mep.root;
 				((ModelExplorerTreeModel)getModel()).setRoot(this.root);
 
