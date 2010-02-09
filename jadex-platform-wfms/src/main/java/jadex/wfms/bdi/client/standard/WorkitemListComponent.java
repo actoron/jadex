@@ -1,7 +1,6 @@
 package jadex.wfms.bdi.client.standard;
 
 import jadex.wfms.client.IWorkitem;
-import jadex.wfms.client.Workitem;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -16,14 +15,11 @@ import java.util.Set;
 
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-
-import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 
 public class WorkitemListComponent extends JPanel
 {
@@ -58,7 +54,7 @@ public class WorkitemListComponent extends JPanel
 			}
 		};
 		
-		workitemTable.setDefaultRenderer(Object.class, new DefaultTableRenderer()
+		workitemTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer()
 		{
 			
 			public Component getTableCellRendererComponent(JTable table,
