@@ -72,7 +72,7 @@
                 <Time value="120000" type="absolute"/>
             </TerminateCondition>
         </General>
-        <Rows experiments="10">
+        <Rows experiments="5">
             <TerminateCondition>
                 <!--<Time value="7000" type="relative"/>-->
                 <TargetFunction function="$object.money &gt; 5"/>
