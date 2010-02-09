@@ -87,7 +87,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	private String[] columnNames;
 	
 	/** the column weights */
-	private int[] columsWeight;
+	private int[] columWeights;
 	
 	private String[] defaultListElementAttributeValues;
 	
@@ -115,7 +115,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 		assert (uniqueColumnIndex != -1 && uniqueColumnIndex < columns.length);
 		
 		this.tableViewerLabel = tableLabel;
-		this.columsWeight = columnsWeight;
+		this.columWeights = columnsWeight;
 		this.columnNames = columns;
 		
 		this.uniqueColumnValuesMap = new HashMap<EModelElement, HashSet<String>>();
@@ -253,7 +253,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	protected TableViewer createTable(Composite parent, GridData tableLayoutData)
 	{
 		//String[] columns = columnNames;
-		//int[] weight = columsWeight;
+		//int[] weight = columWeights;
 
 		// the displayed table
 		TableViewer viewer = new TableViewer(getWidgetFactory().createTable(parent,
@@ -269,7 +269,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 		TableLayout tableLayout = new TableLayout();
 		for (int columnIndex = 0; columnIndex < columnNames.length; columnIndex++)
 		{
-			tableLayout.addColumnData(new ColumnWeightData(columsWeight[columnIndex],
+			tableLayout.addColumnData(new ColumnWeightData(columWeights[columnIndex],
 					FigureUtilities.getTextWidth(columnNames[columnIndex], tableFont), true));
 		}
 		viewer.getTable().setLayout(tableLayout);
