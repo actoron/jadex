@@ -40,14 +40,34 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	/** Constant for event start empty. */
 	public static final String EVENT_START_EMPTY = "EventStartEmpty";
 	
+	/** Constant for event start message. */
+	public static final String EVENT_START_MESSAGE = "EventStartMessage";
+
 	/** Constant for event start timer. */
 	public static final String EVENT_START_TIMER = "EventStartTimer";
+
+	/** Constant for event start rule. */
+	public static final String EVENT_START_RULE = "EventStartRule";
+
+	/** Constant for event start signal. */
+	public static final String EVENT_START_SIGNAL = "EventStartSignal";
+	
+	/** Constant for event start multiple. */
+	public static final String EVENT_START_MULTIPLE = "EventStartMultiple";
+	
 	
 	/** Constant for event end empty. */
 	public static final String EVENT_END_EMPTY = "EventEndEmpty";
 
 	/** Constant for event end error. */
 	public static final String EVENT_END_ERROR = "EventEndError";
+	
+	/** Constant for event end message. */
+	public static final String EVENT_END_MESSAGE = "EventEndMessage";
+		
+	
+	/** Constant for event start empty. */
+	public static final String EVENT_INTERMEDIATE_EMPTY = "EventIntermediateEmpty";
 	
 	/** Constant for event intermediate error. */
 	public static final String EVENT_INTERMEDIATE_ERROR = "EventIntermediateError";

@@ -71,24 +71,46 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 		
 		Map activityhandlers = new HashMap();
 		
+		// Task/Subprocess handler.
 		activityhandlers.put(MBpmnModel.TASK, new TaskActivityHandler());
 		activityhandlers.put(MBpmnModel.SUBPROCESS, new SubProcessActivityHandler());
 	
+		// Gateway handler.
 		activityhandlers.put(MBpmnModel.GATEWAY_PARALLEL, new GatewayParallelActivityHandler());
 		activityhandlers.put(MBpmnModel.GATEWAY_DATABASED_EXCLUSIVE, new GatewayXORActivityHandler());
 	
+		// Initial events.
+		// Options: empty, message, rule, timer, signal, multi, link
+		// Missing: link 
+		// Note: non-empty start events are currently only supported in subworkflows
+		// It is currently not possible to start a top-level workflow using the other event types,
+		// i.e. the creation of a workflow is not supported. 
 		activityhandlers.put(MBpmnModel.EVENT_START_EMPTY, new DefaultActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_START_TIMER, new EventIntermediateTimerActivityHandler());
-		activityhandlers.put(MBpmnModel.EVENT_END_EMPTY, new DefaultActivityHandler());
-		activityhandlers.put(MBpmnModel.EVENT_END_ERROR, new EventEndErrorActivityHandler());
-		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_ERROR, new EventIntermediateErrorActivityHandler());
-		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_START_MESSAGE, new EventIntermediateMessageActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_START_MULTIPLE, new EventIntermediateMultipleActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_START_RULE, new EventIntermediateNotificationHandler());
+		activityhandlers.put(MBpmnModel.EVENT_START_SIGNAL, new EventIntermediateNotificationHandler());
+			
+		// Intermediate events.
+		// Options: empty, message, rule, timer, error, signal, multi, link, compensation, cancel
+		// Missing: link, compensation, cancel
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_EMPTY, new DefaultActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE, new EventIntermediateMessageActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new EventIntermediateNotificationHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_TIMER, new EventIntermediateTimerActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_ERROR, new EventIntermediateErrorActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE, new EventIntermediateMultipleActivityHandler());
 		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL, new EventIntermediateNotificationHandler());
 //		defhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new UserInteractionActivityHandler());
-		activityhandlers.put(MBpmnModel.EVENT_INTERMEDIATE_RULE, new EventIntermediateNotificationHandler());
 		
+		// End events.
+		// Options: empty, message, error, compensation, terminate, signal, multi, cancel, link
+		// Missing: link, compensation, cancel, terminate, signal, multi
+		activityhandlers.put(MBpmnModel.EVENT_END_EMPTY, new DefaultActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_END_ERROR, new EventEndErrorActivityHandler());
+		activityhandlers.put(MBpmnModel.EVENT_END_MESSAGE, new EventIntermediateMessageActivityHandler());
+
 		DEFAULT_ACTIVITY_HANDLERS = Collections.unmodifiableMap(activityhandlers);
 	}
 	
