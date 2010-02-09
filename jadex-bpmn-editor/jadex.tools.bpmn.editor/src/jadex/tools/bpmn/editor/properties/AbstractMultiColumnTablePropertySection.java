@@ -6,6 +6,7 @@ package jadex.tools.bpmn.editor.properties;
 import jadex.tools.bpmn.diagram.Messages;
 import jadex.tools.bpmn.editor.JadexBpmnEditor;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,11 +23,15 @@ import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.FigureUtilities;
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.CellNavigationStrategy;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationListener;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
+import org.eclipse.jface.viewers.ColumnViewerEditorDeactivationEvent;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -35,8 +40,10 @@ import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TableViewerEditor;
+import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.stp.bpmn.diagram.part.BpmnDiagramEditorPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -48,7 +55,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -300,10 +306,39 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	/**
 	 * Create the cell modifier command to update {@link EAnnotation}
 	 */
-	private void setupTableNavigation(TableViewer viewer)
+	private void setupTableNavigation(final TableViewer viewer)
 	{
 		
-		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(
+//		CellNavigationStrategy naviStrat = new CellNavigationStrategy();
+//
+//		// from Snippet059CellNavigationIn33 
+//		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(
+//				viewer, new FocusCellOwnerDrawHighlighter(viewer));
+//		try
+//		{
+//			Field f = focusCellManager.getClass().getSuperclass().getDeclaredField("navigationStrategy");
+//			f.setAccessible(true);
+//			f.set(focusCellManager, naviStrat);
+//		}
+//		catch (SecurityException e)
+//		{
+//			e.printStackTrace();
+//		}
+//		catch (NoSuchFieldException e)
+//		{
+//			e.printStackTrace();
+//		}
+//		catch (IllegalArgumentException e)
+//		{
+//			e.printStackTrace();
+//		}
+//		catch (IllegalAccessException e)
+//		{
+//			e.printStackTrace();
+//		}
+
+		
+		ColumnViewerEditorActivationStrategy editorActivationSupport = new ColumnViewerEditorActivationStrategy(
 				viewer)
 		{
 			protected boolean isEditorActivationEvent(
@@ -312,17 +347,46 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
 						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
 						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION
-						|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED /*&& event.keyCode == SWT.CR*/)
+						|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
 						;
 			}
 		};
 
-		TableViewerEditor.create(viewer, actSupport,
+		TableViewerEditor.create(viewer,/* focusCellManager,*/ editorActivationSupport,
 				TableViewerEditor.TABBING_HORIZONTAL
 						| TableViewerEditor.KEYBOARD_ACTIVATION
 						| TableViewerEditor.KEEP_EDITOR_ON_DOUBLE_CLICK
-						| TableViewerEditor.TABBING_CYCLE_IN_ROW
+						//| TableViewerEditor.TABBING_CYCLE_IN_ROW
+						| TableViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR
 						);
+		
+//		viewer.getColumnViewerEditor().addEditorActivationListener(
+//				new ColumnViewerEditorActivationListener() {
+//
+//					public void afterEditorActivated(
+//							ColumnViewerEditorActivationEvent event) {
+//
+//					}
+//
+//					public void afterEditorDeactivated(
+//							ColumnViewerEditorDeactivationEvent event) {
+//
+//					}
+//
+//					public void beforeEditorActivated(
+//							ColumnViewerEditorActivationEvent event) {
+//						ViewerCell cell = (ViewerCell) event.getSource();
+//						viewer.getTable().showColumn(
+//								viewer.getTable().getColumn(cell.getColumnIndex()));
+//					}
+//
+//					public void beforeEditorDeactivated(
+//							ColumnViewerEditorDeactivationEvent event) {
+//
+//					}
+//
+//				});
+
 	}
 	
 	/**
