@@ -20,15 +20,7 @@
           <target>1.6</target>
         </configuration>
       </plugin>
-     </plugins>
-    <resources>
-      <resource>
-      	<directory>src/test/java</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-    </resources>
+    </plugins>
   </build>
   <dependencies>
   	<dependency>

@@ -14,14 +14,6 @@
     <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
   </parent>
   <build>
-    <resources>
-      <resource>
-      	<directory>src/main/java</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-    </resources>
     <plugins>
       <!-- XMLDecoder with classloader only in 1.5 -->
       <plugin>
