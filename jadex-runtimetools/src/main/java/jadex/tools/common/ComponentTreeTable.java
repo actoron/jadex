@@ -8,6 +8,7 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.jtable.ResizeableTableHeader;
 import jadex.commons.jtable.VisibilityTableColumnModel;
+import jadex.service.IServiceContainer;
 import jadex.tools.common.jtreetable.DefaultTreeTableCellRenderer;
 import jadex.tools.common.jtreetable.DefaultTreeTableModel;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
@@ -74,12 +75,12 @@ public class ComponentTreeTable extends JScrollPane
 	/**
 	 *  Open the gui.
 	 */
-	public ComponentTreeTable(String platname)
+	public ComponentTreeTable(IServiceContainer container)
 	{
 		// Initialize default node types (may be overriden from outside).
 		this.nodetypes = new HashMap();
 		addNodeType(new TreeTableNodeType(NODE_CONTAINER, new Icon[]{icons.getIcon(NODE_CONTAINER)}, new String[]{"name"}, new String[]{"Name"}));
-		addNodeType(new TreeTableNodeType(NODE_COMPONENT, new Icon[]{icons.getIcon(NODE_COMPONENT)}, new String[]{"name", "address"}, new String[]{"Name", "Address"}));
+		addNodeType(new ComponentTreeTableNodeType(container));
 
 		this.nodes = new HashMap();
 		this.getViewport().setBackground(UIManager.getColor("List.background"));
@@ -92,7 +93,7 @@ public class ComponentTreeTable extends JScrollPane
 		//renderer.setFont(font);
 
 		// Setup tree table component.
-		this.platform = new DefaultTreeTableNode(getNodeType(NODE_CONTAINER), platname != null ? platname : "Local Platform");
+		this.platform = new DefaultTreeTableNode(getNodeType(NODE_CONTAINER), container.getName());
 		this.treetable = new JTreeTable(new DefaultTreeTableModel(platform, getNodeType(NODE_COMPONENT).getColumnNames()));
 		//treetable.setFont(font);
 		//treetable.setRowHeight(treetable.getFontMetrics(font).getHeight());

@@ -160,7 +160,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 	 */
 	public JComponent createView()
 	{
-		df_agents = new ComponentTreeTable(((AgentControlCenter)getJCC()).getAgent().getServiceContainer().getName());
+		df_agents = new ComponentTreeTable(((AgentControlCenter)getJCC()).getAgent().getServiceContainer());
 		df_agents.setMinimumSize(new Dimension(0, 0));
 		df_agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		df_agents.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(REFRESH_DF);

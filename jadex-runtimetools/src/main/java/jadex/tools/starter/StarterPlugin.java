@@ -263,7 +263,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
   		};
   		mpanel.addMouseListener(ml);
 
-		components = new ComponentTreeTable(getJCC().getServiceContainer().getName());
+		components = new ComponentTreeTable(getJCC().getServiceContainer());
 		components.setMinimumSize(new Dimension(0, 0));
 		components.getTreetable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		

@@ -116,7 +116,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		agents = new ComponentTreeTable(((AgentControlCenter)getJCC()).getAgent().getServiceContainer().getName());
+		agents = new ComponentTreeTable(((AgentControlCenter)getJCC()).getAgent().getServiceContainer());
 		agents.setMinimumSize(new Dimension(0, 0));
 		split.add(agents);
 		agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

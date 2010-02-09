@@ -44,9 +44,12 @@ public class ComponentTreeTableNodeType extends TreeTableNodeType
 		Icon	ret	= null;
 		IComponentDescription ad = (IComponentDescription)((DefaultTreeTableNode)value).getUserObject();
 		String type	= ad.getType();
-		Iterator	factories	= container.getServices(IComponentFactory.class).iterator();
-		while(ret==null && factories.hasNext())
-			ret	= ((IComponentFactory)factories.next()).getComponentTypeIcon(type);
+		if(type!=null)
+		{
+			Iterator	factories	= container.getServices(IComponentFactory.class).iterator();
+			while(ret==null && factories.hasNext())
+				ret	= ((IComponentFactory)factories.next()).getComponentTypeIcon(type);
+		}
 		
 		return ret;
 	}

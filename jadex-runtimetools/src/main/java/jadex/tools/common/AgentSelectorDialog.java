@@ -289,10 +289,10 @@ public class AgentSelectorDialog
 		ok.setEnabled(!singleselection || sellist.size()>0);
 
 		IComponentExecutionService ces = (IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class);
-		this.tree	= new ComponentTreeTable(agent.getServiceContainer().getName());
+		this.tree	= new ComponentTreeTable(agent.getServiceContainer());
 		this.tree.setPreferredSize(new Dimension(200, 100));
 		tree.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.seltree	= new ComponentTreeTable(agent.getServiceContainer().getName());
+		this.seltree	= new ComponentTreeTable(agent.getServiceContainer());
 		this.seltree.setPreferredSize(new Dimension(200, 100));
 		seltree.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		seltree.getTreetable().getTree().setRootVisible(false);	// Don't show platform node.
