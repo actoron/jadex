@@ -18,10 +18,12 @@ public class ListChoiceParameterPanel extends AbstractParameterPanel
 	{
 		super(parameterName, readOnly);
 		if (initialValue == null)
-			throw new RuntimeException("Unitialized ListChoice: " + parameterName);
+			throw new RuntimeException("Uninitialized ListChoice: " + parameterName);
 		
 		parameterValue = initialValue;
 		parameterBox = new JComboBox(parameterValue.getChoices());
+		if (initialValue.getSelection() != null)
+			parameterBox.setSelectedItem(initialValue.getSelection());
 		parameterBox.setEditable(false);
 		
 		GridBagConstraints g = new GridBagConstraints();

@@ -3,6 +3,7 @@ package jadex.wfms.bdi.client.standard.parametergui;
 import jadex.commons.SReflect;
 import jadex.wfms.parametertypes.Document;
 import jadex.wfms.parametertypes.ListChoice;
+import jadex.wfms.parametertypes.MultiListChoice;
 import jadex.wfms.parametertypes.Text;
 
 import java.util.Map;
@@ -36,6 +37,10 @@ public class SParameterPanelFactory
 		else if (parameterType.equals(ListChoice.class))
 		{
 			return new ListChoiceParameterPanel(parameterName, (ListChoice) parameterValue, readOnly);
+		}
+		else if (parameterType.equals(MultiListChoice.class))
+		{
+			return new MultiListChoiceParameterPanel(parameterName, (MultiListChoice) parameterValue, readOnly);
 		}
 		
 		throw new RuntimeException("Unknown Parameter Type: " + parameterType.getCanonicalName());

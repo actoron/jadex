@@ -3,7 +3,7 @@
   <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_IzD2wX3OEd6VFdlpWzoevQ" iD="_IzD2wH3OEd6VFdlpWzoevQ" name="package jadex.gpmn.runtime.plan;&#xD;&#xA;&#xD;&#xA;import jadex.bdi.runtime.IGoal;&#xD;&#xA;import jadex.bpmnbdi.task.*;">
     <associations xmi:type="bpmn:Association" xmi:id="_IzNnyX3OEd6VFdlpWzoevQ"/>
   </artifacts>
-  <pools xmi:type="bpmn:Pool" xmi:id="_xQYFAX3MEd6VFdlpWzoevQ" iD="_xQYFAH3MEd6VFdlpWzoevQ" associations="_IzNnyX3OEd6VFdlpWzoevQ" name="Pool">
+  <pools xmi:type="bpmn:Pool" xmi:id="_xQYFAX3MEd6VFdlpWzoevQ" iD="_xQYFAH3MEd6VFdlpWzoevQ" associations="_IzNnyX3OEd6VFdlpWzoevQ" name="body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_2Yo_UX3MEd6VFdlpWzoevQ" iD="_2Yo_UH3MEd6VFdlpWzoevQ" outgoingEdges="_Mdk2IX3NEd6VFdlpWzoevQ" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_6q0mMX3MEd6VFdlpWzoevQ" iD="_6q0mMH3MEd6VFdlpWzoevQ" outgoingEdges="_BpS-wX3OEd6VFdlpWzoevQ _AEp6MX3kEd6VFdlpWzoevQ" incomingEdges="_NNZwkX3NEd6VFdlpWzoevQ" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:SubProcess" xmi:id="_HVAZ0X3NEd6VFdlpWzoevQ" iD="_HVAZ0H3NEd6VFdlpWzoevQ" outgoingEdges="_NNZwkX3NEd6VFdlpWzoevQ" incomingEdges="_Mdk2IX3NEd6VFdlpWzoevQ _BpS-wX3OEd6VFdlpWzoevQ" name="inout int i = 0&#xD;&#xA;out IGoal[] goals = new IGoal[$plan.subgoals.length]" looping="false">

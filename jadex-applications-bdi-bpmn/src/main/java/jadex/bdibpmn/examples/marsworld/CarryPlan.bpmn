@@ -3,7 +3,7 @@
   <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_-RpaYYAmEd6N8dR31QwQkg" iD="_-RpaYIAmEd6N8dR31QwQkg" name="package jadex.bpmn.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.bpmnbdi.task.*;&#xD;&#xA;import jadex.commons.SUtil;&#xD;&#xA;import java.util.Map;">
     <associations xmi:type="bpmn:Association" xmi:id="_-RpaaYAmEd6N8dR31QwQkg"/>
   </artifacts>
-  <pools xmi:type="bpmn:Pool" xmi:id="_Gdz1d4AlEd6N8dR31QwQkg" iD="_Gdz1doAlEd6N8dR31QwQkg" associations="_-RpaaYAmEd6N8dR31QwQkg" name="Pool">
+  <pools xmi:type="bpmn:Pool" xmi:id="_Gdz1d4AlEd6N8dR31QwQkg" iD="_Gdz1doAlEd6N8dR31QwQkg" associations="_-RpaaYAmEd6N8dR31QwQkg" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_Gdz1eYAlEd6N8dR31QwQkg" iD="_Gdz1eIAlEd6N8dR31QwQkg" outgoingEdges="_J0-lkYAlEd6N8dR31QwQkg" incomingEdges="_Jgj0wYAlEd6N8dR31QwQkg" name="Carry Ore&#xD;&#xA;&#xD;&#xA;class = DispatchGoalTask.class&#xD;&#xA;in Object target&#xD;&#xA;in String type = &quot;carry_ore&quot;&#xD;&#xA;in Map parameters = SUtil.createHashMap(new String[]{&quot;target&quot;}, new Object[]{target})" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_HtFE8YAlEd6N8dR31QwQkg" iD="_HtFE8IAlEd6N8dR31QwQkg" outgoingEdges="_I3SOQYAlEd6N8dR31QwQkg" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_I3JEUYAlEd6N8dR31QwQkg" iD="_I3JEUIAlEd6N8dR31QwQkg" outgoingEdges="_Jgj0wYAlEd6N8dR31QwQkg" incomingEdges="_I3SOQYAlEd6N8dR31QwQkg _J0-lkYAlEd6N8dR31QwQkg" name="type = &quot;request_carry&quot;" activityType="EventIntermediateMessage"/>

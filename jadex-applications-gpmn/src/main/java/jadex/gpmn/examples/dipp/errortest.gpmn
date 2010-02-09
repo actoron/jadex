@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpmn:GpmnDiagram xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" id="_-VgM0BSpEd-u8KL6RfB-ig">
+  <artifacts xsi:type="gpmn:Context" id="_BIq4ABSqEd-u8KL6RfB-ig"/>
+  <vertices xsi:type="gpmn:AchieveGoal" id="__KtWgBSpEd-u8KL6RfB-ig" name="ErrorGoal" exclude="when_succeeded">
+    <outgoingEdges>_DhAoYBSqEd-u8KL6RfB-ig</outgoingEdges>
+    <outgoingEdges>_FYixwBSqEd-u8KL6RfB-ig</outgoingEdges>
+    <failurecondition></failurecondition>
+  </vertices>
+  <vertices xsi:type="gpmn:Plan" id="_BuLY0BSqEd-u8KL6RfB-ig" description="" name="Errorplan1" bpmnPlan="jadex/gpmn/examples/dipp/error1.bpmn">
+    <incomingEdges>_DhAoYBSqEd-u8KL6RfB-ig</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:Plan" id="_EBkXwBSqEd-u8KL6RfB-ig" name="Errorplan2" bpmnPlan="jadex/gpmn/examples/dipp/error2.bpmn">
+    <incomingEdges>_FYixwBSqEd-u8KL6RfB-ig</incomingEdges>
+  </vertices>
+  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_DhAoYBSqEd-u8KL6RfB-ig"/>
+  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_FYixwBSqEd-u8KL6RfB-ig"/>
+</gpmn:GpmnDiagram>

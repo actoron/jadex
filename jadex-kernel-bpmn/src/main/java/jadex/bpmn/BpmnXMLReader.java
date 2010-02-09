@@ -37,6 +37,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -603,17 +604,25 @@ public class BpmnXMLReader
 			super.postProcess(context, object, root, classloader);
 			
 			// Set pool of activities.
-			MPool	pool	= (MPool)object;
-			List	activities	= pool.getActivities();
-			if(activities!=null && !activities.isEmpty())
-			{
-				for(int i=0; i< activities.size(); i++)
-				{
-					((MActivity)activities.get(i)).setPool(pool);
-				}
-			}
+			MPool pool = (MPool) object;
+			setSubActivities(pool, pool);
 			
 			return null;
+		}
+		
+		private void setSubActivities(MAssociationTarget parent, MPool pool)
+		{
+			List activities = parent instanceof MSubProcess? ((MSubProcess)parent).getActivities(): ((MPool)parent).getActivities();
+			if (activities != null)
+			{
+				for (Iterator it = activities.iterator(); it.hasNext(); )
+				{
+					MActivity activity = (MActivity) it.next();
+					activity.setPool(pool);
+					if (activity instanceof MSubProcess)
+						setSubActivities((MSubProcess) activity, pool);
+				}
+			}
 		}
 	}
 	

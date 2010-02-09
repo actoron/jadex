@@ -676,16 +676,19 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	public static List	getStartActivities(List activities)
 	{
 		List	ret	= null;
-		for(Iterator it=activities.iterator(); it.hasNext(); )
+		if (activities != null)
 		{
-			MActivity	activity	= (MActivity) it.next();
-			if(activity.getIncomingSequenceEdges()==null || activity.getIncomingSequenceEdges().isEmpty())
+			for(Iterator it=activities.iterator(); it.hasNext(); )
 			{
-				if(ret==null)
+				MActivity	activity	= (MActivity) it.next();
+				if(activity.getIncomingSequenceEdges()==null || activity.getIncomingSequenceEdges().isEmpty())
 				{
-					ret	= new ArrayList();
+					if(ret==null)
+					{
+						ret	= new ArrayList();
+					}
+					ret.add(activity);
 				}
-				ret.add(activity);
 			}
 		}
 		

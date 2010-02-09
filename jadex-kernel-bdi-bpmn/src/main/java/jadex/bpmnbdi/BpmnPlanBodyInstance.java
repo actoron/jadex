@@ -47,7 +47,6 @@ import jadex.bdi.runtime.impl.WaitAbstractionFlyweight;
 import jadex.bdi.runtime.impl.WaitqueueFlyweight;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInterpreter;
@@ -79,8 +78,8 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 {
 	//-------- static part --------
 	
-	/** Identifier for an undefined lane (e.g. when no 'aborted' lane is specified). */
-	protected static String	LANE_UNDEFINED	= "undefined-lane";
+	/** Identifier for an undefined pool (e.g. when no 'aborted' pool is specified). */
+	protected static String	POOL_UNDEFINED	= "undefined-pool";
 	
 	/** The activity execution handlers (activity type -> handler). */
 	public static final Map	PLAN_ACTIVITY_HANDLERS;
@@ -275,14 +274,14 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 		long	mindur	= -1;
 		if(waittimes!=null)
 		{
-			String lane	= getLane(getLastState());
-			if(!LANE_UNDEFINED.equals(lane))
+			String pool	= getPool(getLastState());
+			if(!POOL_UNDEFINED.equals(pool))
 			{
 				IClockService	clock	= (IClockService)interpreter.getComponentAdapter().getServiceContainer().getService(IClockService.class);
 				for(Iterator it=waittimes.keySet().iterator(); it.hasNext(); )
 				{
 					ProcessThread	thread	= (ProcessThread) it.next();
-					if(thread.belongsTo(null, lane))
+					if(thread.belongsTo(pool, null))
 					{
 						long	time	= Math.max(((Number)waittimes.get(thread)).longValue()-clock.getTime(), 0);
 						mindur	= mindur==-1 ? time : time<mindur ? time : mindur;
@@ -300,8 +299,8 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	public Object  getWaitAbstraction()
 	{
 		Object ret	= null;
-		String lane	= getLane(getLastState());
-		if(!LANE_UNDEFINED.equals(lane))
+		String pool	= getPool(getLastState());
+		if(!POOL_UNDEFINED.equals(pool))
 		{
 			ret = getState().createObject(OAVBDIRuntimeModel.waitabstraction_type);
 			boolean empty = true;
@@ -309,7 +308,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 			for(Iterator it=context.getAllThreads().iterator(); it.hasNext(); )
 			{
 				ProcessThread pt = (ProcessThread)it.next();
-				if(pt.isWaiting() && pt.belongsTo(null, lane))
+				if(pt.isWaiting() && pt.belongsTo(pool, null))
 				{
 					MActivity act = pt.getActivity();				
 					if(MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(act.getActivityType()))
@@ -1166,32 +1165,31 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	}
 
 	/**
-	 *  Get the lane corresponding to the current plan lifecycle state.
+	 *  Get the pool corresponding to the current plan lifecycle state.
 	 *  @param steptype	The step type.
 	 *  @return	The corresponding lane.
 	 */
-	protected String getLane(String steptype)
+	protected String getPool(String steptype)
 	{
-		String	lane	= null;
+		String	pool	= null;
 		List	pools	= getModelElement().getPools();
-		List	lanes	= ((MPool)pools.get(0)).getLanes();
-		if(lanes!=null && !lanes.isEmpty())
+		if(pools!=null && !pools.isEmpty())
 		{
-			for(int i=0; lane==null && i<lanes.size(); i++)
+			for(int i=0; pool==null && i<pools.size(); i++)
 			{
-				String name	= ((MLane)lanes.get(i)).getName();
+				String name	= ((MPool)pools.get(i)).getName();
 				if(name.trim().toLowerCase().equals(steptype))
-					lane	= name;
+					pool	= name;
 			}
 			
-			if(lane==null)
-				lane	= LANE_UNDEFINED;
+			if(pool==null)
+				pool	= POOL_UNDEFINED;
 		}
 		
-		if(lane==null && !OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY.equals(steptype))
-			lane	= LANE_UNDEFINED;
+		if(pool==null && !OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY.equals(steptype))
+			pool	= POOL_UNDEFINED;
 
-		return lane;
+		return pool;
 	}
 
 	Collection	cts;

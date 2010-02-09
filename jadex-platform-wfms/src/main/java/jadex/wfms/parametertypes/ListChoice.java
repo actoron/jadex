@@ -2,36 +2,42 @@ package jadex.wfms.parametertypes;
 
 public class ListChoice
 {
-	private String[] choices;
+	private Object[] choices;
 	
-	private String selection;
+	private Object selection;
 	
 	public ListChoice()
 	{
-		choices = new String[0];
+		this(new Object[0]);
 	}
 	
-	public ListChoice(String[] choices)
+	public ListChoice(Object[] choices)
+	{
+		this(choices, null);
+	}
+	
+	public ListChoice(Object[] choices, Object selection)
 	{
 		this.choices = choices;
+		this.selection = selection;
 	}
 	
-	public String[] getChoices()
+	public Object[] getChoices()
 	{
 		return choices;
 	}
 	
-	public void setChoices(String[] choices)
+	public void setChoices(Object[] choices)
 	{
 		this.choices = choices;
 	}
 	
-	public String getSelection()
+	public Object getSelection()
 	{
 		return selection;
 	}
 	
-	public void setSelection(String selection)
+	public void setSelection(Object selection)
 	{
 		this.selection = selection;
 	}

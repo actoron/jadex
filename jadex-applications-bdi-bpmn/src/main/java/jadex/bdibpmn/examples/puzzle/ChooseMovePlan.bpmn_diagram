@@ -10,7 +10,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_hOFuhXa4Ed6l0pFqo-bUbg"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_hOFuhna4Ed6l0pFqo-bUbg" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="ChooseMovePlan.bpmn#_hOFugXa4Ed6l0pFqo-bUbg"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_hOFuh3a4Ed6l0pFqo-bUbg" x="3" y="10" width="300" height="115"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_hOFuh3a4Ed6l0pFqo-bUbg" x="3" y="4" width="300" height="115"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_uWOCYna4Ed6l0pFqo-bUbg" type="2001">
         <children xmi:type="notation:Node" xmi:id="_uWXMUHa4Ed6l0pFqo-bUbg" type="4001"/>
@@ -30,7 +30,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_qIems3akEd6l0pFqo-bUbg" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_qIemtHakEd6l0pFqo-bUbg" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="ChooseMovePlan.bpmn#_qGY8AXakEd6l0pFqo-bUbg"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_qJONlHakEd6l0pFqo-bUbg" x="16" y="16" width="971" height="137"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_qJONlHakEd6l0pFqo-bUbg" x="16" y="16" width="971" height="131"/>
   </children>
   <children xmi:type="notation:Node" xmi:id="_hg9acnaoEd6l0pFqo-bUbg" type="1002">
     <children xmi:type="notation:Node" xmi:id="_hg9aeHaoEd6l0pFqo-bUbg" type="4009"/>

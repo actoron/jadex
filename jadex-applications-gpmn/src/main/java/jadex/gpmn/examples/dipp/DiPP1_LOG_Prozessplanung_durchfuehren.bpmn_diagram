@@ -10,7 +10,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_2G7C-XeaEd6uv6EsxGS0Yg"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_2G7C-neaEd6uv6EsxGS0Yg" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="DiPP1_LOG_Prozessplanung_durchfuehren.bpmn#_2G7C6XeaEd6uv6EsxGS0Yg"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_2G7C_XeaEd6uv6EsxGS0Yg" x="76" y="70" width="266" height="61"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_2G7C_XeaEd6uv6EsxGS0Yg" x="99" y="65" width="266" height="61"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_fXtDgnebEd6uv6EsxGS0Yg" type="2001">
         <children xmi:type="notation:Node" xmi:id="_fXtDiHebEd6uv6EsxGS0Yg" type="4001"/>
@@ -19,7 +19,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_fXtDhXebEd6uv6EsxGS0Yg"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_fXtDhnebEd6uv6EsxGS0Yg" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="DiPP1_LOG_Prozessplanung_durchfuehren.bpmn#_fXtDgXebEd6uv6EsxGS0Yg"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fXtDh3ebEd6uv6EsxGS0Yg" x="365" y="84"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fXtDh3ebEd6uv6EsxGS0Yg" x="388" y="79"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_hYAHUnebEd6uv6EsxGS0Yg" type="2001">
         <children xmi:type="notation:Node" xmi:id="_hYAHWHebEd6uv6EsxGS0Yg" type="4001"/>
@@ -28,7 +28,16 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_hYAHVXebEd6uv6EsxGS0Yg"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_hYAHVnebEd6uv6EsxGS0Yg" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="DiPP1_LOG_Prozessplanung_durchfuehren.bpmn#_hYAHUXebEd6uv6EsxGS0Yg"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_hYAHV3ebEd6uv6EsxGS0Yg" x="23" y="84"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_hYAHV3ebEd6uv6EsxGS0Yg" x="46" y="79"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_O8F9EBTVEd-pLK0AZ_MMug" type="2007">
+        <children xmi:type="notation:Node" xmi:id="_O8GkIBTVEd-pLK0AZ_MMug" type="4007"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_O8F9ERTVEd-pLK0AZ_MMug" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_O8F9EhTVEd-pLK0AZ_MMug"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_O8F9ExTVEd-pLK0AZ_MMug" fillColor="16771304"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_O8F9FBTVEd-pLK0AZ_MMug" lineColor="0"/>
+        <element xmi:type="bpmn:Lane" href="DiPP1_LOG_Prozessplanung_durchfuehren.bpmn#_O8Dg0RTVEd-pLK0AZ_MMug"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_O8F9FRTVEd-pLK0AZ_MMug" y="5" height="178"/>
       </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_2G7C8neaEd6uv6EsxGS0Yg"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_2G7C83eaEd6uv6EsxGS0Yg"/>

@@ -3,7 +3,7 @@
   <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_8JfKMXzoEd6zCuIqBrMhmQ" iD="_8JfKMHzoEd6zCuIqBrMhmQ" name="package jadex.bdibpmn.examples.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.bpmnbdi.task.*;&#xD;&#xA;import jadex.application.space.envsupport.math.*;&#xD;&#xA;import jadex.commons.SUtil;&#xD;&#xA;import java.util.Map;">
     <associations xmi:type="bpmn:Association" xmi:id="_8JysMHzoEd6zCuIqBrMhmQ"/>
   </artifacts>
-  <pools xmi:type="bpmn:Pool" xmi:id="_isytYXzoEd6zCuIqBrMhmQ" iD="_isytYHzoEd6zCuIqBrMhmQ" associations="_8JysMHzoEd6zCuIqBrMhmQ" name="Pool">
+  <pools xmi:type="bpmn:Pool" xmi:id="_isytYXzoEd6zCuIqBrMhmQ" iD="_isytYHzoEd6zCuIqBrMhmQ" associations="_8JysMHzoEd6zCuIqBrMhmQ" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_iuIxMXzoEd6zCuIqBrMhmQ" iD="_iuIxMHzoEd6zCuIqBrMhmQ" name="Move&#xD;&#xA;&#xD;&#xA;class = DispatchGoalTask.class&#xD;&#xA;in String type = &quot;move_dest&quot;&#xD;&#xA;in Map parameters = SUtil.createHashMap(new String[]{&quot;destination&quot;}, new Object[]{$beliefbase.environment.getRandomPosition(Vector2Int.ZERO)})" activityType="Task"/>
   </pools>
 </bpmn:BpmnDiagram>

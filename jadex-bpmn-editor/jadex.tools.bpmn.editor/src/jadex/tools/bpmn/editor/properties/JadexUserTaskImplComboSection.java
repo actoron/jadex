@@ -26,6 +26,7 @@ public class JadexUserTaskImplComboSection extends
 	
 	protected static final String[] comboItems = new String[] {
 		"jadex.wfms.client.task.WorkitemTask.class",
+		"jadex.bpmnbdi.task.WriteBeliefTask.class",
 		"jadex.bpmn.runtime.task.PrintTask.class",
 		"jadex.bpmn.runtime.task.CreateComponentTask.class",
 		"jadex.bpmn.runtime.task.DestroyComponentTask.class",

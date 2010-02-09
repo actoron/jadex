@@ -199,6 +199,8 @@ public class GpmnXMLReader
 			new ObjectInfo(MPlan.class, new ProcessElementPostProcessor()),
 			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")},
 			new SubobjectInfo[]{
+					new SubobjectInfo(new BeanAttributeInfo("precondition", "preCondition")),
+					new SubobjectInfo(new BeanAttributeInfo("contextcondition", "contextCondition")),
 //			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge")),
 			new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
 			new SubobjectInfo(new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")),

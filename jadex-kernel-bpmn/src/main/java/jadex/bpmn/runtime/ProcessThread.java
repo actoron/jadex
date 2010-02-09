@@ -6,6 +6,7 @@ import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bridge.InterpreterTimedObject;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.javaparser.IParsedExpression;
@@ -579,8 +580,6 @@ public class ProcessThread	implements ITaskContext
 			{
 				data.remove(it.next());
 			}
-			
-//			System.out.println("Data in thread: "+this.getId()+" "+data);
 		}
 	}
 	

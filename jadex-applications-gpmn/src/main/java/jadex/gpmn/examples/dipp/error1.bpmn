@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_TrO0QRSqEd-u8KL6RfB-ig" iD="_TrO0QBSqEd-u8KL6RfB-ig">
+  <pools xmi:type="bpmn:Pool" xmi:id="_TrkLcRSqEd-u8KL6RfB-ig" iD="_TrkLcBSqEd-u8KL6RfB-ig" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_TrlZkRSqEd-u8KL6RfB-ig" iD="_TrlZkBSqEd-u8KL6RfB-ig" outgoingEdges="_ZqaIcRSqEd-u8KL6RfB-ig" incomingEdges="_W8r98RSqEd-u8KL6RfB-ig" name="ErrorTask1" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_aQyL8BSqEd-u8KL6RfB-ig" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aQyzABSqEd-u8KL6RfB-ig" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Wsj3QRSqEd-u8KL6RfB-ig" iD="_Wsj3QBSqEd-u8KL6RfB-ig" outgoingEdges="_W8r98RSqEd-u8KL6RfB-ig" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ZPa1kRSqEd-u8KL6RfB-ig" iD="_ZPa1kBSqEd-u8KL6RfB-ig" incomingEdges="_ZqaIcRSqEd-u8KL6RfB-ig" activityType="EventEndError"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_W8r98RSqEd-u8KL6RfB-ig" iD="_W8r98BSqEd-u8KL6RfB-ig"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ZqaIcRSqEd-u8KL6RfB-ig" iD="_ZqaIcBSqEd-u8KL6RfB-ig"/>
+  </pools>
+</bpmn:BpmnDiagram>

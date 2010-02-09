@@ -10,6 +10,12 @@ public class MPlan extends MProcessElement
 	
 	/** The target condition. */
 	protected String bpmnplan;
+	
+	/** The precondition. */
+	protected String precondition;
+	
+	/** The contextcondition. */
+	protected String contextcondition;
 
 	//-------- methods --------
 
@@ -30,4 +36,42 @@ public class MPlan extends MProcessElement
 	{
 		this.bpmnplan = bpmnplan;
 	}
+
+	/**
+	 *  Get the precondition.
+	 *  @return The precondition.
+	 */
+	public String getPreCondition()
+	{
+		return precondition;
+	}
+
+	/**
+	 *  Set the precondition.
+	 *  @param precondition The precondition to set.
+	 */
+	public void setPreCondition(String precondition)
+	{
+		this.precondition = precondition;
+	}
+
+	/**
+	 *  Get the contextcondition.
+	 *  @return The contextcondition.
+	 */
+	public String getContextCondition()
+	{
+		return contextcondition;
+	}
+
+	/**
+	 *  Set the contextcondition.
+	 *  @param contextcondition The contextcondition to set.
+	 */
+	public void setContextCondition(String contextcondition)
+	{
+		this.contextcondition = contextcondition;
+	}
+	
+	
 }

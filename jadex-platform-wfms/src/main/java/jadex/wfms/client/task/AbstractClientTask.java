@@ -44,12 +44,15 @@ public abstract class AbstractClientTask implements ITask
 				if (param.getName().startsWith("GUI_"))
 				{
 					String paramName = param.getName().substring(4);
+					String guiParamName = paramName.substring(paramName.indexOf(':') + 1);
+					paramName = paramName.substring(0, paramName.indexOf(':'));
 					if (!guiProperties.containsKey(paramName))
 						guiProperties.put(paramName, new HashMap());
 					Map propertyMap = (Map) guiProperties.get(paramName);
-					GuiProperty[] p = (GuiProperty[]) context.getParameterValue(param.getName());
-					for (int i = 0; i < p.length; ++i)
-						propertyMap.put(p[i].getName(), p[i].getValue());
+					//GuiProperty[] p = (GuiProperty[]) context.getParameterValue(param.getName());
+					//for (int i = 0; i < p.length; ++i)
+					//	propertyMap.put(p[i].getName(), p[i].getValue());
+					propertyMap.put(guiParamName, context.getParameterValue(param.getName()));
 				}
 				else
 				{

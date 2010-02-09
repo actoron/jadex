@@ -266,8 +266,8 @@ public class GpmnBDIConverter
 					{
 						// Create plan with body and name
 						Object planhandle = par
-							? createPlan(scopehandle, state, "implicit_"+goal.getName(), "jadex.gpmn.runtime.plan.ParallelGoalExecutionPlan", "bpmn")
-							: createPlan(scopehandle, state, "implicit_"+goal.getName(), "jadex.gpmn.runtime.plan.SequentialGoalExecutionPlan", "bpmn");
+							? createPlan(scopehandle, state, "implicit_"+goal.getName(), "jadex.gpmn.runtime.plan.ParallelGoalExecutionPlan", null, null, "bpmn")
+							: createPlan(scopehandle, state, "implicit_"+goal.getName(), "jadex.gpmn.runtime.plan.SequentialGoalExecutionPlan", null, null, "bpmn");
 						
 						
 						// Create trigger
@@ -291,7 +291,7 @@ public class GpmnBDIConverter
 			{
 				MPlan plan = (MPlan)plans.get(i);
 				
-				Object planhandle = createPlan(scopehandle, state, plan.getName(), plan.getBpmnPlan(), "bpmn");
+				Object planhandle = createPlan(scopehandle, state, plan.getName(), plan.getBpmnPlan(), plan.getPreCondition(), plan.getContextCondition(), "bpmn");
 			
 				List inedges = plan.getIncomingSequenceEdges();
 				if(inedges!=null)
@@ -313,7 +313,7 @@ public class GpmnBDIConverter
 		
 		// Create plan for starting/monitoring the process.
 		String planname = "startandmonitor_"+proc.getName();//.substring(0, proc.getName().indexOf("."));
-		Object planhandle = createPlan(scopehandle, state, planname, "jadex.gpmn.runtime.plan.StartAndMonitorProcessPlan", null);
+		Object planhandle = createPlan(scopehandle, state, planname, "jadex.gpmn.runtime.plan.StartAndMonitorProcessPlan", null, null, null);
 		
 		// Create achieve_goals maintain_goals paramterset
 		List agoalnames = new ArrayList();
@@ -551,7 +551,7 @@ public class GpmnBDIConverter
 	/**
 	 *  Create a plan.
 	 */
-	protected Object createPlan(Object scopehandle, IOAVState state, String name, String impl, String bodytype)
+	protected Object createPlan(Object scopehandle, IOAVState state, String name, String impl, String precond, String contextcond, String bodytype)
 	{
 		Object planhandle = state.createObject(OAVBDIMetaModel.plan_type);
 		state.setAttributeValue(planhandle, OAVBDIMetaModel.modelelement_has_name, name);
@@ -561,6 +561,23 @@ public class GpmnBDIConverter
 		state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_impl, impl);
 		if(bodytype!=null)
 			state.setAttributeValue(bodyhandle, OAVBDIMetaModel.body_has_type, bodytype);
+		
+		if(precond!=null)
+		{
+			Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
+			state.setAttributeValue(planhandle, OAVBDIMetaModel.plan_has_precondition, condhandle);
+			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, precond);
+			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
+		}
+		
+		if(contextcond!=null)
+		{
+			Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
+			state.setAttributeValue(planhandle, OAVBDIMetaModel.plan_has_contextcondition, condhandle);
+			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, contextcond);
+			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
+		}
+		
 		return planhandle;
 	}
 	

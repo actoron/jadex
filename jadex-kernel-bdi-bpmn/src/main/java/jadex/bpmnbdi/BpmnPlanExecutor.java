@@ -9,7 +9,6 @@ import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.PlanFailureException;
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler.EventEndErrorException;
@@ -83,11 +82,30 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			throw new RuntimeException("Plan body could not be created: "+impl);
 		}
 		
-		// Check names of lanes, if any.
+		// Check names of pools, if any.
 		else
 		{
 			List	pools	= bodymodel.getPools();
-			if(pools==null || pools.size()!=1)
+			if(pools!=null && !pools.isEmpty())
+			{
+				for(int i=0; i<pools.size(); i++)
+				{
+					String name	= ((MPool)pools.get(i)).getName();
+					if(name==null)
+					{
+						throw new RuntimeException("Pools require a name (e.g. 'Body' or 'Aborted'): "+bodymodel);
+					}
+					name	= name.trim().toLowerCase();
+					if(!OAVBDIRuntimeModel.PLANLIFECYCLESTATE_BODY.equals(name)
+							&& !OAVBDIRuntimeModel.PLANLIFECYCLESTATE_PASSED.equals(name)
+						&& !OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED.equals(name)
+						&& !OAVBDIRuntimeModel.PLANLIFECYCLESTATE_ABORTED.equals(name))
+					{
+						throw new RuntimeException("Unsupported name of pool. Use one of 'Body', 'Passed', 'Failed', 'Aborted': "+name);
+					}
+				}
+			}	
+			/*if(pools==null || pools.size()!=1)
 				throw new RuntimeException("Only one pool supported for BPMN plans: "+bodymodel);
 			List	lanes	= ((MPool)pools.get(0)).getLanes();
 			if(lanes!=null && !lanes.isEmpty())
@@ -108,7 +126,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 						throw new RuntimeException("Unsupported name of lane. Use one of 'Body', 'Passed', 'Failed', 'Aborted': "+name);
 					}
 				}
-			}
+			}*/
 		}
 
 		// Create the body data structure and update state
@@ -140,19 +158,19 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			bodyinstance.updateWaitingThreads();
 		}
 		
-		// Find lane to execute.
-		String lane = bodyinstance.getLane(steptype);
+		// Find pool to execute.
+		String pool = bodyinstance.getPool(steptype);
 //		String planname = (String)interpreter.getState().getAttributeValue(interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name);
-//		System.out.println("Executing plan step: "+rplan+" "+planname+", "+lane+", "+bodyinstance);
+//		System.out.println("Executing plan step: "+rplan+" "+planname+", "+pool+", "+bodyinstance);
 
 		Throwable throwable = null;
 		try
 		{
-			// Abort threads from the previous lane (i.e. body), when the lifecyclestate has changed.
+			// Abort threads from the previous pool (i.e. body), when the lifecyclestate has changed.
 			if(bodyinstance.getLastState()!=null && !bodyinstance.getLastState().equals(steptype))
 			{
-				String	abortlane	= bodyinstance.getLane(bodyinstance.getLastState());
-				if(!BpmnPlanBodyInstance.LANE_UNDEFINED.equals(abortlane))
+				String	abortpool	= bodyinstance.getPool(bodyinstance.getLastState());
+				if(!BpmnPlanBodyInstance.POOL_UNDEFINED.equals(abortpool))
 				{
 					Set	threads	= bodyinstance.getThreadContext().getAllThreads();
 					if(threads!=null && !threads.isEmpty())
@@ -160,7 +178,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 						for(Iterator it=threads.iterator(); it.hasNext(); )
 						{
 							ProcessThread	thread	= (ProcessThread)it.next();
-							if(thread.belongsTo(null, abortlane))
+							if(thread.belongsTo(abortpool, null))
 							{
 								thread.getThreadContext().removeThread(thread);
 							}
@@ -170,15 +188,15 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 			}
 			
 			// Execute a step.
-			if(!BpmnPlanBodyInstance.LANE_UNDEFINED.equals(lane))
+			if(!BpmnPlanBodyInstance.POOL_UNDEFINED.equals(pool))
 			{
-				if(bodyinstance.isReady(null, lane))
+				if(bodyinstance.isReady(pool, null))
 				{
 					// Set processing state to "running"
 					interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_RUNNING);
 					bodyinstance.setLastState(steptype);
 					
-					bodyinstance.executeStep(null, lane);
+					bodyinstance.executeStep(pool, null);
 				}
 				
 				// When the bodyinstance is not ready, it means that a task
@@ -205,12 +223,12 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		
 
 		// Check for errors / exception / final state
-		if(throwable==null && !BpmnPlanBodyInstance.LANE_UNDEFINED.equals(lane) && !bodyinstance.isFinished(null, lane))
+		if(throwable==null && !BpmnPlanBodyInstance.POOL_UNDEFINED.equals(pool) && !bodyinstance.isFinished(pool, null))
 		{
 			long	timeout	= bodyinstance.getTimeout();
 			Object	wa	= bodyinstance.getWaitAbstraction();
 			
-			if(bodyinstance.isReady(null, lane))
+			if(bodyinstance.isReady(pool, null))
 			{
 				// Set waitqueue of plan.
 				bodyinstance.updateWaitqueue(wa);
