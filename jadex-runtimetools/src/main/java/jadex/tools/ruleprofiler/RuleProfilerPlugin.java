@@ -1,9 +1,11 @@
 package jadex.tools.ruleprofiler;
 
+import jadex.bdi.interpreter.BDIAgentFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentListener;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.tools.common.CombiIcon;
 import jadex.tools.common.ComponentTreeTable;
@@ -41,7 +43,7 @@ import javax.swing.tree.TreePath;
  *  The rule profiler allows to browse through
  *  profiling information gathered in the rule system.
  */
-public class RuleProfilerPlugin extends AbstractJCCPlugin
+public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentListener
 {
 	// -------- constants --------
 
@@ -213,22 +215,23 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin
 		// todo: ?! is this ok?
 		
 		IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
-		ces.addComponentListener(null, new IComponentListener()
+		ces.getComponentDescriptions(new IResultListener()
 		{
-			public void componentRemoved(IComponentDescription desc, Map results)
+			public void resultAvailable(Object source, Object result)
 			{
-				agentDied(desc);
+				IComponentDescription[] res = (IComponentDescription[])result;
+				for(int i=0; i<res.length; i++)
+				{
+					if(BDIAgentFactory.FILETYPE_BDIAGENT.equals(res[i].getType()))
+						componentAdded(res[i]);
+				}
 			}
 			
-			public void componentAdded(IComponentDescription desc)
-			{
-				agentBorn(desc);
-			}
-
-			public void componentChanged(IComponentDescription desc)
+			public void exceptionOccurred(Object source, Exception exception)
 			{
 			}
 		});
+		ces.addComponentListener(null, this);
 		
 //		SwingUtilities.invokeLater(new Runnable()
 //		{
@@ -242,54 +245,60 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin
 	}
 	
 	/**
-	 * @param ad
+	 *  Called when an component has died.
+	 *  @param ad The component description.
 	 */
-	public void agentDied(final IComponentDescription ad)
+	public void componentRemoved(final IComponentDescription ad, Map results)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				agents.removeComponent(ad);
-				if(cards.isAvailable(ad))
+				if(BDIAgentFactory.FILETYPE_BDIAGENT.equals(ad.getType()))
 				{
-					detail.remove(cards.getComponent(ad));
+					agents.removeComponent(ad);
+					if(cards.isAvailable(ad))
+					{
+						detail.remove(cards.getComponent(ad));
+					}
 				}
 			}
 		});
 	}
 
 	/**
-	 * @param ad
+	 *  Called when an component is born.
+	 *  @param ad the component description.
 	 */
-	public void agentBorn(final IComponentDescription ad)
+	public void componentAdded(final IComponentDescription ad)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				// hack dont introspect the agent
-				// if(!jcc.getAgent().getAgentIdentifier().equals(ad.getName()))
-				// {
-				agents.addComponent(ad);
-				// }
+				if(BDIAgentFactory.FILETYPE_BDIAGENT.equals(ad.getType()))
+					agents.addComponent(ad);
 			}
 		});
 	}
-
+	
 	/**
-	 * @param ad
+	 *  Called when an component changed.
+	 *  @param ad the component description.
 	 */
-	public void agentChanged(final IComponentDescription ad)
+	public void componentChanged(final IComponentDescription ad)
 	{
-		// nop?
 		// Update components on awt thread.
-		/*
-		 * SwingUtilities.invokeLater(new Runnable() { public void run() {
-		 * agents.addAgent(ad); } });
-		 */
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				if(BDIAgentFactory.FILETYPE_BDIAGENT.equals(ad.getType()))
+					agents.updateComponent(ad);
+			}
+		});
 	}
 
 	final AbstractAction	START_PROFILER	= new AbstractAction("Profile Agent", icons.getIcon("profile_agent"))
