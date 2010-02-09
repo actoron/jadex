@@ -778,7 +778,8 @@ public class ControlCenter implements IControlCenter
 			 * JOptionPane.showMessageDialog(window, text, "Cache problem",
 			 * JOptionPane.ERROR_MESSAGE); }
 			 */
-			closeProject();
+			saveProject();
+//			closeProject();
 			closePlugins();
 			killed = true;
 			
@@ -791,7 +792,8 @@ public class ControlCenter implements IControlCenter
 			if(msg != null && msg.isRemember())
 				jccexit = JCC_EXIT_KEEP;
 
-			closeProject();
+			saveProject();
+//			closeProject();
 			closePlugins();
 			killed = true;
 			

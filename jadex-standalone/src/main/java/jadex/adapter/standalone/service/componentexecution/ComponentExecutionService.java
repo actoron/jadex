@@ -56,6 +56,9 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 	/** The cleanup commands for the components (component id -> cleanup command). */
 	protected Map ccs;
 	
+	/** The children of a component (component id -> children ids). */
+	protected MultiCollection	children;
+	
 	/** The logger. */
 	protected Logger logger;
 
@@ -77,6 +80,7 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 		this.adapters = Collections.synchronizedMap(SCollection.createHashMap());
 		this.descs = Collections.synchronizedMap(SCollection.createLinkedHashMap());
 		this.ccs = SCollection.createLinkedHashMap();
+		this.children	= SCollection.createMultiCollection();
 		this.logger = Logger.getLogger(container.getName()+".cms");
 		this.listeners = SCollection.createMultiCollection();
 		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());
@@ -173,6 +177,10 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 					ad.setState(IComponentDescription.STATE_ACTIVE);
 				}
 				descs.put(cid, ad);
+				if(parent!=null)
+				{
+					children.put(parent, cid);
+				}
 			}
 
 			adapter = new StandaloneComponentAdapter(container, ad);
@@ -266,14 +274,10 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 		{
 			synchronized(descs)
 			{
-				// Kill subcomponents: todo store subcomponents for speed (multicollection)
-				for(Iterator it=descs.values().iterator(); it.hasNext(); )
+				// Kill subcomponents
+				for(Iterator it=children.getCollection(cid).iterator(); it.hasNext(); )
 				{
-					IComponentDescription	sub	= (IComponentDescription)it.next();
-					if(cid.equals(sub.getParent()))
-					{
-						destroyComponent(sub.getName(), null);	// todo: cascading delete with wait.
-					}
+					destroyComponent((IComponentIdentifier)it.next(), null);	// todo: cascading delete with wait.
 				}
 				
 //				System.out.println("killing: "+cid);
@@ -331,14 +335,12 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 			synchronized(descs)
 			{
 				// Suspend subcomponents
-				for(Iterator it=descs.values().iterator(); it.hasNext(); )
+				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
 				{
-					IComponentDescription	sub	= (IComponentDescription)it.next();
-					if(componentid.equals(sub.getParent())
-						&& (IComponentDescription.STATE_ACTIVE.equals(sub.getState())
-							/*|| IComponentDescription.STATE_TERMINATING.equals(sub.getState())*/))
+					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
+					if(IComponentDescription.STATE_ACTIVE.equals(((IComponentDescription)descs.get(child)).getState()))
 					{
-						suspendComponent(sub.getName(), null);	// todo: cascading suspend with wait?
+						suspendComponent((IComponentIdentifier)it.next(), null);	// todo: cascading resume with wait.
 					}
 				}
 
@@ -390,12 +392,12 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 			synchronized(descs)
 			{
 				// Resume subcomponents
-				for(Iterator it=descs.values().iterator(); it.hasNext(); )
+				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
 				{
-					IComponentDescription	sub	= (IComponentDescription)it.next();
-					if(componentid.equals(sub.getParent()) && IComponentDescription.STATE_SUSPENDED.equals(sub.getState()))
+					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
+					if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(child)).getState()))
 					{
-						resumeComponent(sub.getName(), null);	// todo: cascading resume with wait?
+						resumeComponent((IComponentIdentifier)it.next(), null);	// todo: cascading resume with wait.
 					}
 				}
 
@@ -561,6 +563,8 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 					// Deregister destroyed component at parent.
 					if(desc.getParent()!=null)
 					{
+						children.remove(desc.getParent(), desc.getName());
+
 						StandaloneComponentAdapter	pad	= (StandaloneComponentAdapter)adapters.get(desc.getParent());
 						if(pad!=null)
 							pad.getComponentInstance().componentDestroyed(cid);

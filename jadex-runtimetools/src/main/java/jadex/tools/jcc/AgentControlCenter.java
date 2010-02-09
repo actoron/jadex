@@ -38,7 +38,8 @@ public class AgentControlCenter extends ControlCenter
 					{
 						if(!killed)
 						{
-							closeProject();
+							saveProject();
+//							closeProject();
 							closePlugins();
 							killed = true;
 						}

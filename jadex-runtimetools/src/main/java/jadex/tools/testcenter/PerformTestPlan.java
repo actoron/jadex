@@ -43,8 +43,16 @@ public class PerformTestPlan extends Plan
 			ces.createComponent(null, testcase.getType(), null, args, false, id, getComponentIdentifier(), res);
 			testagent	= (IComponentIdentifier)id.waitForResult();
 			Testcase	result	= (Testcase)((Map)res.waitForResult(timeout)).get("testresults");
-			testcase.setTestCount(result.getTestCount());
-			testcase.setReports(result.getReports());
+			if(result!=null)
+			{
+				testcase.setTestCount(result.getTestCount());
+				testcase.setReports(result.getReports());
+			}
+			else
+			{
+				testcase.setTestCount(1);
+				testcase.setReports(new TestReport[]{new TestReport("#1", "Test execution", false, "Component did not produce a result.")});
+			}
 		}
 		catch(TimeoutException te)
 		{
