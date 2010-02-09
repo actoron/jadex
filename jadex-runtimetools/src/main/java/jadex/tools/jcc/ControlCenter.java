@@ -217,10 +217,6 @@ public class ControlCenter implements IControlCenter
 	 */
 	public void closeProject()
 	{
-		// Unconditionally save project (saves platform settings even when no
-		// project is open).
-		saveProject();
-
 		resetPlugins();
 
 		setCurrentProject(null);

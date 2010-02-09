@@ -569,6 +569,7 @@ public class ControlCenterWindow extends JFrame
 	/**
 	 *  Save the current project settings.
 	 *  Asks the user for a project file name.
+	 *  @param usename	Use the last name as default?
 	 */
 	protected void saveProjectAs()
 	{
