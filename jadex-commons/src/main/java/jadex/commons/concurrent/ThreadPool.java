@@ -91,12 +91,20 @@ public class ThreadPool implements IThreadPool
 	{
 		this.running = false;
 		this.tasks.setClosed(true);
-		Thread.yield();
-		for(int i=0; i<pool.size(); i++) // Hack!!! Kill all threads.
-		{
-			Thread t = (Thread)pool.get(i);
-			t.stop();
-		}
+		
+		// Todo: kill threads that don't terminate?
+		// How to find zombies???
+		// What about the current thread?
+//		Thread.yield();
+//		for(int i=0; i<pool.size(); i++) // Hack!!! Kill all threads.
+//		{
+//			Thread t = (Thread)pool.get(i);
+//			if(!t.equals(Thread.currentThread()))
+//			{
+//				System.err.println("Threadpool: Killing blocked thread: "+t);
+//				t.stop();
+//			}
+//		}
 	}
 	
 	/**

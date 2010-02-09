@@ -1,10 +1,19 @@
 package jadex.adapter.standalone;
 
+import jadex.adapter.base.DefaultResultListener;
 import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.PropertyServiceContainer;
+import jadex.service.clock.IClockService;
+import jadex.service.clock.ITimedObject;
+import jadex.service.clock.ITimer;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -100,194 +109,77 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 	/**
 	 *  Shutdown the platform.
 	 */
-	public void shutdown(final IResultListener listener)
+	public void shutdown(IResultListener rl)
 	{
+		if(rl==null)
+			rl	= DefaultResultListener.getInstance();
+		final IResultListener	listener	= rl;
+		
 		//System.out.println("Shutting down the platform: "+getName());
-		// Hack !!! Should be synchronized with AMS.
+		// Hack !!! Should be synchronized with CES.
 		synchronized(this)
 		{
 			if(shuttingdown)
 				return;
 
 			this.shuttingdown = true;
-
-			/*
-			final IAMS ams = getAMSService();
-			ams.getComponentIdentifiers(new IResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-					IComponentIdentifier[] agents = (IComponentIdentifier[])result;
-					for(int i = 0; i < agents.length; i++)
-					{
-						try
-						{
-							// Do not kill ams and df agents immediately.
-							if(!daemonagents.contains(agents[i]))
-							{
-								ams.destroyComponent(agents[i], null);
-								//System.out.println("Killing normal agent: "+agents[i]);
-							}
-						}
-						catch(RuntimeException e)
-						{
-							// Due to race conditions, agent may have killed itself already.
-						}
-					}
-				}
-
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-			});
-		*/
 		}
-		/*
-		// Necessary because shutdown method should return
-		new Thread(new Runnable()
+		
+		// Step 1: Find existing components.
+		final IComponentExecutionService	ces	= (IComponentExecutionService)getService(IComponentExecutionService.class);
+		ces.getComponentIdentifiers(new IResultListener()
 		{
-			public void run()
+			public void resultAvailable(Object source, Object result)
 			{
-				long shutdown = System.currentTimeMillis() + MAX_SHUTDOWM_TIME;
-				try
+				// Step 2: Kill existing components excepts daemons.
+				final List comps = new ArrayList(Arrays.asList((IComponentIdentifier[])result));
+				for(Iterator it=daemonagents.iterator(); it.hasNext(); )
 				{
-					if(shutdowntime != 0)
-						shutdown = System.currentTimeMillis() + shutdowntime;
+					comps.remove(it.next());
 				}
-				catch(NumberFormatException e)
+				killComponents(comps, shutdowntime!=0 ? shutdowntime : MAX_SHUTDOWM_TIME, new IResultListener()
 				{
-				}
-
-				// Wait until agents have died.
-				// Hack!!! Should not poll AMS?
-				final boolean[] wait = new boolean[1];
-				
-				while(wait[0] && System.currentTimeMillis() < shutdown)
-				{
-					getAMSService().getAgentCount(new IResultListener()
+					public void resultAvailable(Object source, Object result)
 					{
-						public void resultAvailable(Object result)
+						// Step 3: Find remaining components.
+						ces.getComponentIdentifiers(new IResultListener()
 						{
-							wait[0] = ((Integer)result).intValue() > daemonagents.size();
-						}
-
-						public void exceptionOccurred(Exception exception)
-						{
-						}
-					});
-					try
-					{
-						Thread.sleep(100);
-					}
-					catch(InterruptedException e)
-					{
-					}
-				}
-
-				// Hack!! Should not need to rely on preconfigured system agents. 
-				// Should instead use agent types? 
-				ComponentIdentifier[] sagents = (ComponentIdentifier[])daemonagents.toArray(new ComponentIdentifier[daemonagents.size()]);
-				for(int i = 0; i < sagents.length; i++)
-				{
-					try
-					{
-						//System.out.println("Killing system agent: "+sagents[i]);
-						final boolean[] finished = new boolean[1];
-						SComponentExecutionService.destroyComponent(AbstractPlatform.this, sagents[i], new IResultListener()
-						{
-							public void resultAvailable(Object result)
+							public void resultAvailable(Object source, Object result)
 							{
-								finished[0] = true;
+								// Step 4: Kill remaining components.
+								killComponents(Arrays.asList((IComponentIdentifier[])result), shutdowntime!=0 ? shutdowntime : MAX_SHUTDOWM_TIME, new IResultListener()
+								{
+									public void resultAvailable(Object source, Object result)
+									{
+										// Step 5: Stop the services.
+										AbstractPlatform.super.shutdown(listener);
+									}
+									public void exceptionOccurred(Object source, Exception exception)
+									{
+										listener.exceptionOccurred(source, exception);
+									}
+								});
 							}
 
-							public void exceptionOccurred(Exception exception)
+							public void exceptionOccurred(Object source, Exception exception)
 							{
-								finished[0] = true;
+								listener.exceptionOccurred(source, exception);
 							}
-						});
-						while(!finished[0])
-						{
-							try
-							{
-								Thread.sleep(100);
-							}
-							catch(Exception e)
-							{
-							}
-						}
+						});		
 					}
-					catch(RuntimeException e)
+					
+					public void exceptionOccurred(Object source, Exception exception)
 					{
-						e.printStackTrace();
-						// Due to race conditions, agent may have killed itself already.
+						listener.exceptionOccurred(source, exception);
 					}
-				}
+				});
+			}
 
-				// Hack!!! Should not poll AMS?
-				long start = System.currentTimeMillis();
-
-				// Wait until agents have died.
-				// Hack!!! Should not poll AMS?
-				wait[0] = true;
-				while(wait[0] && start + 1000 > System.currentTimeMillis())
-				{
-					getAMSService().getAgentCount(new IResultListener()
-					{
-						public void resultAvailable(Object result)
-						{
-							wait[0] = ((Integer)result).intValue() > daemonagents.size();
-						}
-
-						public void exceptionOccurred(Exception exception)
-						{
-						}
-					});
-					try
-					{
-						Thread.sleep(100);
-					}
-					catch(InterruptedException e)
-					{
-					}
-				}
-
-				// Use list for shutdown in inverted insertion order. (Hack!!! is there a better way?)
-				/*List servicelist = new ArrayList();
-				for(Iterator it = services.values().iterator(); it.hasNext();)
-				{
-					servicelist.add(it.next());
-				}
-				// Todo: use result listener?
-				while(!servicelist.isEmpty())
-				{
-					((IPlatformService)servicelist.remove(servicelist.size() - 1)).shutdown(null);
-				}*/
-
-				// Stop the services.
-				AbstractPlatform.super.shutdown(listener);
-//				for(Iterator it = services.keySet().iterator(); it.hasNext();)
-//				{
-//					Object key = it.next();
-//					Map tmp = (Map)services.get(key);
-//					if(tmp != null)
-//					{
-//						for(Iterator it2 = tmp.keySet().iterator(); it2.hasNext();)
-//						{
-//							Object key2 = it2.next();
-//							IService service = (IService)tmp.get(key2);
-////							System.out.println("Service shutdown: " + service);
-//							service.shutdown(null); // Todo: use result listener?
-//						}
-//					}
-//				}
-
-				//				if(listener!=null)
-				//					listener.resultAvailable(null);
-				//				System.exit(0);
-
-//				ThreadPoolFactory.getThreadPool(getName()).dispose();
-			/*}
-		}).start();*/
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				listener.exceptionOccurred(source, exception);
+			}
+		});		
 	}
 	
 	/**
@@ -295,33 +187,86 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 	 */
 	protected void createComponent(String name, String model, String config, Map args, final boolean daemon)
 	{
-//		ILoadableComponentModel lmodel = SComponentFactory.loadModel(this, model);
-//		if(lmodel instanceof ApplicationModel)
-//		{
-//			SComponentFactory.createApplication(this, name, model, config, args);
-//		}
-//		else
-//		{
-			final IComponentExecutionService	ces	= (IComponentExecutionService)getService(IComponentExecutionService.class);
-			ces.createComponent(name, model, config, args, false, null, null, null); //new IResultListener()
-//		}
-		
-//		{
-//			public void resultAvailable(Object result)
-//			{
-//				final IComponentIdentifier aid = (IComponentIdentifier)result;
-//				if(daemon)
-//					daemonagents.add(aid);
-//				ces.startComponent(aid, null);
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-//				System.err.println("Exception occurred: " + exception);
-//			}
-//		}, null);
+		IComponentExecutionService	ces	= (IComponentExecutionService)getService(IComponentExecutionService.class);
+		ces.createComponent(name, model, config, args, false, null, null, null);
 	}
-	
+
+	/**
+	 *  Kill the given components within the specified timeout.
+	 *  @param comps	The component ids.
+	 *  @param timeout	The time after which to inform the listener anyways.
+	 *  @param listener	The result listener.
+	 */
+	protected void killComponents(final List comps, long timeout, final IResultListener listener)
+	{
+		if(comps.isEmpty())
+			listener.resultAvailable(this, null);
+		
+		// Timer entry to notify lister after timeout.
+		final	boolean	notified[]	= new boolean[1];
+		IClockService clock	= (IClockService)getService(IClockService.class);
+		final ITimer	killtimer	= clock.createTimer(timeout, new ITimedObject()
+		{
+			public void timeEventOccurred(long currenttime)
+			{
+				boolean	notify	= false;
+				synchronized(notified)
+				{
+					if(!notified[0])
+					{
+						notify	= true;
+						notified[0]	= true;
+					}
+				}
+				if(notify)
+				{
+					listener.resultAvailable(this, null);
+				}
+			}
+		});
+		
+		// Kill the given components.
+		IResultListener	rl	= new IResultListener()
+		{
+			int cnt	= 0;
+			public void resultAvailable(Object source, Object result)
+			{
+				testFinished();
+			}
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				testFinished();
+			}
+			protected synchronized void testFinished()
+			{
+				cnt++;
+				if(cnt==comps.size())
+				{
+					killtimer.cancel();
+					boolean	notify	= false;
+					synchronized(notified)
+					{
+						if(!notified[0])
+						{
+							notify	= true;
+							notified[0]	= true;
+						}
+					}
+					if(notify)
+					{
+						listener.resultAvailable(this, null);
+					}
+				}
+			}
+		};
+		IComponentExecutionService	ces	= (IComponentExecutionService)getService(IComponentExecutionService.class);
+		for(int i=0; i < comps.size(); i++)
+		{
+			//System.out.println("Killing component: "+comps.get(i));
+			ces.destroyComponent((IComponentIdentifier)comps.get(i), rl);
+		}
+	}
+
 	/**
 	 *  Create an application.
 	 * /
