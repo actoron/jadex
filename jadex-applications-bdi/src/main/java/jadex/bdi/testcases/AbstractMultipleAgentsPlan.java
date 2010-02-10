@@ -65,7 +65,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 				
 				SyncResultListener	listener	= new SyncResultListener();
 				IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
-				ces.createComponent(null, type, config, args[i], false, listener, null, null);
+				ces.createComponent(null, type, config, args[i], false, listener, null, null, false);
 				IComponentIdentifier aid = (IComponentIdentifier)listener.waitForResult();
 				agents.add(aid);
 			}

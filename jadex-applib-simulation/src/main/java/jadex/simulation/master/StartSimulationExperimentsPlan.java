@@ -203,7 +203,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 		try {
 			IComponentExecutionService executionService = (IComponentExecutionService) getScope().getServiceContainer().getService(IComponentExecutionService.class);
 
-			executionService.createComponent(appName, fileName, configName, args, false, null, null, null);
+			executionService.createComponent(appName, fileName, configName, args, false, null, null, null, false);
 
 		} catch (Exception e) {
 			// JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this),
