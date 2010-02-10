@@ -6,7 +6,6 @@ package jadex.tools.bpmn.editor.properties;
 import jadex.tools.bpmn.diagram.Messages;
 import jadex.tools.bpmn.editor.JadexBpmnEditor;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,15 +22,11 @@ import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.FigureUtilities;
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.CellNavigationStrategy;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
-import org.eclipse.jface.viewers.ColumnViewerEditorActivationListener;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
-import org.eclipse.jface.viewers.ColumnViewerEditorDeactivationEvent;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.EditingSupport;
-import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -40,10 +35,8 @@ import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TableViewerEditor;
-import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.stp.bpmn.diagram.part.BpmnDiagramEditorPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -424,7 +417,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 							throws ExecutionException
 					{
 						MultiColumnTableRow newRow = new MultiColumnTableRow(
-								defaultListElementAttributeValues);
+								defaultListElementAttributeValues, uniqueColumnIndex);
 
 						HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
 						synchronized (uniqueValueCash)
@@ -665,7 +658,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 
 			} // end while paramTokens
 
-			MultiColumnTableRow newRow = new MultiColumnTableRow(attributes);
+			MultiColumnTableRow newRow = new MultiColumnTableRow(attributes, uniqueColumnIndex);
 			addUniqueRowValue(newRow.getColumnValueAt(uniqueColumnIndex));
 			tableRowList.add(newRow);
 
@@ -864,23 +857,34 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 		// ---- attributes ----
 
 		private String[] columnValues;
+		private int uniqueColumnIndex;
 		
 		// ---- constructors ----
 		
 		/** default constructor */
-		public MultiColumnTableRow(String[] columnValues)
+		public MultiColumnTableRow(String[] columnValues, int uniqueColumnIndex)
 		{
 			super();
+			
+			this.uniqueColumnIndex = uniqueColumnIndex;
 			
 			this.columnValues = new String[columnValues.length];
 			for (int i = 0; i < columnValues.length; i++)
 			{
-				assert columnValues[i] != null;
+				assert columnValues[i] != null : "Value for column index '"+i+"' is null";
 				this.columnValues[i] = new String(columnValues[i]);
 			}
 			
 			//this.columnValues = columnValues;
 			
+		}
+		
+		// ---- methods ----
+		
+		/** check if the unique column index is valid and can be used */
+		private boolean useUniqueColumn()
+		{
+			return uniqueColumnIndex >= 0 && uniqueColumnIndex < columnValues.length;
 		}
 
 		// ---- overrides ----
@@ -897,10 +901,18 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 			}
 			
 			boolean returnValue = true;
-			for (int i = 0; returnValue && i < this.columnValues.length; i++)
+			if (useUniqueColumn())
 			{
-				returnValue =  returnValue &&  this.columnValues[i].equals(((MultiColumnTableRow) obj).columnValues[i]);
+				returnValue = this.columnValues[uniqueColumnIndex].equals(((MultiColumnTableRow) obj).columnValues[uniqueColumnIndex]);
 			}
+			else
+			{
+				for (int i = 0; returnValue && i < this.columnValues.length; i++)
+				{
+					returnValue =  returnValue &&  this.columnValues[i].equals(((MultiColumnTableRow) obj).columnValues[i]);
+				}
+			}
+
 			return returnValue;
 		}
 
@@ -911,9 +923,17 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 		public int hashCode()
 		{
 			int returnHash = 31;
-			for (int i = 0; i < this.columnValues.length; i++)
+			
+			if (useUniqueColumn())
 			{
-				returnHash = returnHash + this.columnValues[i].hashCode() * 31;
+				returnHash = this.columnValues[uniqueColumnIndex].hashCode();
+			}
+			else
+			{
+				for (int i = 0; i < this.columnValues.length; i++)
+				{
+					returnHash = returnHash + this.columnValues[i].hashCode() * 31;
+				}
 			}
 			return returnHash;
 		}

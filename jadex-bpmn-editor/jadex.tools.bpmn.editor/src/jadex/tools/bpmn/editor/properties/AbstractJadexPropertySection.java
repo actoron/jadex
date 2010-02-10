@@ -159,7 +159,6 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
 		sectionComposite = getWidgetFactory().createComposite(parent);
-		//sectionComposite = getWidgetFactory().createGroup(parent, "group");
 		sectionComposite.setLayout(new FillLayout());
 	}
 

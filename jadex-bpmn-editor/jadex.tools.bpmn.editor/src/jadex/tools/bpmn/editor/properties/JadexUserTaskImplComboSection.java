@@ -181,13 +181,14 @@ public class JadexUserTaskImplComboSection extends
 		
 		if (sectionLayout instanceof GridLayout)
 		{
+
 			// extend the section layout with a new column
 			//((GridLayout) sectionLayout).numColumns = ((GridLayout) sectionLayout).numColumns +1;
-
+			
 			GridData labelData = new GridData();
 			labelData.horizontalSpan = ((GridLayout) sectionLayout).numColumns;
 			
-			labelData.widthHint = 700; 
+			labelData.widthHint = 600; 
 			labelData.horizontalAlignment = SWT.FILL;
 			labelData.heightHint = 100;
 

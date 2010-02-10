@@ -91,7 +91,7 @@ public class AbstractParameterTablePropertySection extends
 		column0.getColumn().setText(DIRECTION_COLUMN);
 		
 		ComboBoxCellEditor editor = new ComboBoxCellEditor(((TableViewer) viewer)
-				.getTable(), DIRECTION_VALUES);
+				.getTable(), DIRECTION_VALUES, SWT.READ_ONLY);
 		column0.setEditingSupport(new MultiColumnTableEditingSupport(viewer, 0, editor)
 		{
 			protected Object getValue(Object element)
