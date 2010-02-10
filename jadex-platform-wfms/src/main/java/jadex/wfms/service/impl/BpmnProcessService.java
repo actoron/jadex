@@ -140,7 +140,7 @@ public class BpmnProcessService implements IExecutionService, IService
 				{
 					Logger.getLogger("Wfms").log(Level.SEVERE, "Failed to start model: " + model.getFilename());
 				}
-			}, null, null);
+			}, null, null, false);
 		}
 		catch(Exception e)
 		{

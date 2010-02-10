@@ -46,6 +46,7 @@ public class CreateComponentTask implements ITask
 		IResultListener resultlistener = (IResultListener)context.getParameterValue("resultlistener");
 		final String[] resultmapping = (String[])context.getParameterValue("resultmapping");
 		boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): resultlistener==null && resultmapping!=null;
+		boolean master = context.getParameterValue("master")!=null? ((Boolean)context.getParameterValue("master")).booleanValue(): false;
 		
 		Map args = (Map)context.getParameterValue("arguments");
 		if(args==null)
@@ -93,7 +94,7 @@ public class CreateComponentTask implements ITask
 			};
 		}
 		
-		ces.createComponent(name, model, config, args, suspend, null, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, resultlistener);
+		ces.createComponent(name, model, config, args, suspend, null, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, resultlistener, master);
 
 		if(!wait)
 			listener.resultAvailable(this, null);

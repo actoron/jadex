@@ -53,7 +53,7 @@ public class AgentCreationAgent extends MicroAgent
 //				System.out.println("Args: "+num+" "+args);
 
 			final IComponentExecutionService ces = (IComponentExecutionService)getServiceContainer().getService(IComponentExecutionService.class);
-			ces.createComponent(createPeerName(num+1), getClass().getName()+".class", null, args, false, null, null, null);		
+			ces.createComponent(createPeerName(num+1), getClass().getName()+".class", null, args, false, null, null, null, false);		
 		}
 		else
 		{

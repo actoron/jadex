@@ -188,7 +188,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 	protected void createComponent(String name, String model, String config, Map args, final boolean daemon)
 	{
 		IComponentExecutionService	ces	= (IComponentExecutionService)getService(IComponentExecutionService.class);
-		ces.createComponent(name, model, config, args, false, null, null, null);
+		ces.createComponent(name, model, config, args, false, null, null, null, false);
 	}
 
 	/**

@@ -901,6 +901,6 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 			{
 				getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
 			}
-		}, null, killlistener);
+		}, null, killlistener, false);
 	}
 }

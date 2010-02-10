@@ -177,7 +177,7 @@ public class GpmnProcessService implements IExecutionService, IService
 			{
 				Logger.getLogger("Wfms").log(Level.SEVERE, "Failed to start model: " + name);
 			}
-		}, null, null);
+		}, null, null, false);
 		
 		
 		/*ams.createAgent(name, modelname, null, null, new IResultListener()

@@ -111,7 +111,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 						});
 						
 					}
-				}, app.getComponentIdentifier(), null);
+				}, app.getComponentIdentifier(), null, false);
 			}
 		}
 	}

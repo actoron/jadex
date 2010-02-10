@@ -31,6 +31,9 @@ public class CESComponentDescription implements IComponentDescription, Cloneable
 
 	/** The breakpoints. */
 	protected String[] breakpoints;
+	
+	/** The master flag. */
+	protected boolean master;
 
 	//-------- constructors --------
 
@@ -44,13 +47,14 @@ public class CESComponentDescription implements IComponentDescription, Cloneable
 	/**
 	 *  Create a new CESComponentDescription.
 	 */
-	public CESComponentDescription(IComponentIdentifier aid, String type, IComponentIdentifier parent)
+	public CESComponentDescription(IComponentIdentifier aid, String type, IComponentIdentifier parent, boolean master)
 	{
 		this();
 		setName(aid);
 		setType(type);
 		setParent(parent);
 		setState(IComponentDescription.STATE_ACTIVE);
+		setMaster(master);
 	}
 
 	//-------- accessor methods --------
@@ -161,6 +165,24 @@ public class CESComponentDescription implements IComponentDescription, Cloneable
 	public void	setBreakpoints(String[] breakpoints)
 	{
 		this.breakpoints	= breakpoints;
+	}
+	
+	/**
+	 *  Get the master.
+	 *  @return The master.
+	 */
+	public boolean isMaster()
+	{
+		return this.master;
+	}
+
+	/**
+	 *  Set the master.
+	 *  @param master The master to set.
+	 */
+	public void setMaster(boolean master)
+	{
+		this.master = master;
 	}
 		
 	//-------- methods --------

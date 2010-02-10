@@ -40,7 +40,7 @@ public class PerformTestPlan extends Plan
 			SyncResultListener	res	= new SyncResultListener();
 			Map	args	= new HashMap();
 			args.put("timeout", timeout);
-			ces.createComponent(null, testcase.getType(), null, args, false, id, getComponentIdentifier(), res);
+			ces.createComponent(null, testcase.getType(), null, args, false, id, getComponentIdentifier(), res, false);
 			testagent	= (IComponentIdentifier)id.waitForResult();
 			Testcase	result	= (Testcase)((Map)res.waitForResult(timeout)).get("testresults");
 			if(result!=null)

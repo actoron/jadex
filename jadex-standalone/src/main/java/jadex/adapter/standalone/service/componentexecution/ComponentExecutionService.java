@@ -99,7 +99,7 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 	 *  @param parent The parent (if any).
 	 */
 	public void	createComponent(String name, String model, final String config, final Map args, final boolean suspend, 
-		IResultListener listener, IComponentIdentifier parent, final IResultListener resultlistener)
+		IResultListener listener, IComponentIdentifier parent, final IResultListener resultlistener, boolean master)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
@@ -145,7 +145,7 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 		
 		final ComponentIdentifier cid;
 		final StandaloneComponentAdapter adapter;
-		final CESComponentDescription	ad;
+		final CESComponentDescription ad;
 		synchronized(adapters)
 		{
 			synchronized(descs)
@@ -168,7 +168,7 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 				}
 		
 				IComponentDescription padesc = parent!=null? (IComponentDescription)descs.get(parent): null;
-				ad	= new CESComponentDescription(cid, type, parent);
+				ad	= new CESComponentDescription(cid, type, parent, master);
 				// Suspend when set to suspend or when parent is also suspended.
 				if(suspend || (padesc!=null && IComponentDescription.STATE_SUSPENDED.equals(padesc.getState())))
 				{
@@ -569,7 +569,12 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 
 						StandaloneComponentAdapter	pad	= (StandaloneComponentAdapter)adapters.get(desc.getParent());
 						if(pad!=null)
+						{
 							pad.getComponentInstance().componentDestroyed(cid);
+							if(desc.isMaster())
+								destroyComponent(pad.getComponentIdentifier(), null);
+//								pad.getComponentInstance().killComponent(null);
+						}
 						// else parent has just been killed.
 					}
 				}
@@ -714,7 +719,7 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 	 */
 	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, IComponentIdentifier parent)
 	{
-		CESComponentDescription	ret	= new CESComponentDescription(id, type, parent);
+		CESComponentDescription	ret	= new CESComponentDescription(id, type, parent, false);
 		ret.setState(state);
 		ret.setOwnership(ownership);
 		return ret;

@@ -23,7 +23,7 @@ public interface IComponentExecutionService
 	 *  @param parent The parent component (if any).
 	 */
 	public void	createComponent(String name, String model, String config, Map args, boolean suspend, 
-		IResultListener listener, IComponentIdentifier parent, IResultListener killlistener);
+		IResultListener listener, IComponentIdentifier parent, IResultListener killlistener, boolean master);
 		
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.

@@ -43,7 +43,7 @@ public class ResultAgent extends MicroAgent
 					System.out.println("exception occurred: "+exception);
 					killAgent();
 				}
-			}));
+			}), false);
 		}
 	}
 	
