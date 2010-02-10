@@ -25,6 +25,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Layout;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -138,8 +140,8 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	{
 		super();
 		
-		assert containerEAnnotationName != null && !containerEAnnotationName.isEmpty();
-		assert annotationDetailName != null && !annotationDetailName.isEmpty();
+		assert containerEAnnotationName != null && !containerEAnnotationName.isEmpty() : this.getClass() + ": containerEAnnotationName not set";
+		assert annotationDetailName != null && !annotationDetailName.isEmpty() : this.getClass() + ": annotationDetailName not set";
 		
 		this.containerEAnnotationName = containerEAnnotationName;
 		this.annotationDetailName = annotationDetailName;
@@ -157,6 +159,7 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
 		sectionComposite = getWidgetFactory().createComposite(parent);
+		//sectionComposite = getWidgetFactory().createGroup(parent, "group");
 		sectionComposite.setLayout(new FillLayout());
 	}
 
@@ -286,6 +289,28 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 					
 				}
 		}
+	}
+	
+	/**
+	 * Create a group with all existing controls in sectionComposite 
+	 * and replace the section composite with it
+	 * @param groupLabel
+	 * @return created Group
+	 */
+	protected Group groupExistingControls(String groupLabel)
+	{
+		// The layout of the section composite
+		Layout sectionLayout = sectionComposite.getLayout();
+		Control[] controls = sectionComposite.getParent().getChildren();
+		Group sectionGroup = getWidgetFactory().createGroup(
+				sectionComposite.getParent(), groupLabel);
+		sectionGroup.setLayout(sectionLayout);
+		sectionComposite = sectionGroup;
+		for (int i = 0; i < controls.length; i++)
+		{
+			controls[i].setParent(sectionGroup);
+		}
+		return sectionGroup;
 	}
 	
 	// ---- static methods ----

@@ -3,14 +3,29 @@
  */
 package jadex.tools.bpmn.editor.properties;
 
+import jadex.tools.bpmn.runtime.task.IRuntimeTaskProvider;
+import jadex.tools.bpmn.runtime.task.ParameterMetaInfo;
+import jadex.tools.bpmn.runtime.task.StaticJadexRuntimeTaskProvider;
+import jadex.tools.bpmn.runtime.task.TaskMetaInfo;
+
+import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 
@@ -24,17 +39,23 @@ public class JadexUserTaskImplComboSection extends
 
 	// ---- constants ----
 	
-	protected static final String[] comboItems = new String[] {
-		"jadex.bpmnbdi.task.WriteBeliefTask.class",
-		"jadex.bpmn.runtime.task.PrintTask.class",
-		"jadex.bpmn.runtime.task.InvokeMethodTask.class",
-		"jadex.bpmn.runtime.task.CreateComponentTask.class",
-		"jadex.bpmn.runtime.task.DestroyComponentTask.class",
-		"jadex.wfms.client.task.WorkitemTask.class"
-	};
+//	protected static final String[] comboItems = new String[] {
+//		"jadex.bpmnbdi.task.WriteBeliefTask.class",
+//		"jadex.bpmn.runtime.task.PrintTask.class",
+//		"jadex.bpmn.runtime.task.InvokeMethodTask.class",
+//		"jadex.bpmn.runtime.task.CreateComponentTask.class",
+//		"jadex.bpmn.runtime.task.DestroyComponentTask.class",
+//		"jadex.wfms.client.task.WorkitemTask.class"
+//	};
+
+	protected static final String ACTIVITY_TASK_IMPLEMENTATION_GROUP = "Task implementation";
 	
 	// ---- attributes ----
-
+	
+	//protected CLabel taskMetaInfoLabel;
+	protected Text taskMetaInfoText;
+	
+	protected IRuntimeTaskProvider taskProvider;
 
 	// ---- constructor ----
 
@@ -43,8 +64,34 @@ public class JadexUserTaskImplComboSection extends
 	 */
 	public JadexUserTaskImplComboSection()
 	{
-		super(JADEX_GLOBAL_ANNOTATION, JADEX_ACTIVITY_CLASS_DETAIL,
-				comboItems /*, Messages.JadexUserTaskImplComboSection_ImplementationClass_label*/);
+		super(JADEX_GLOBAL_ANNOTATION, JADEX_ACTIVITY_CLASS_DETAIL);
+		this.taskProvider = new StaticJadexRuntimeTaskProvider();
+	}
+
+	// ---- override methods ----
+	
+	/**
+	 * @see jadex.tools.bpmn.editor.properties.AbstractComboPropertySection#getComboItems()
+	 */
+	@Override
+	protected String[] getComboItems()
+	{
+		//return comboItems;
+		return taskProvider.getAvailableTaskImplementations();
+	}
+
+
+	/**
+	 * Manages the input.
+	 */
+	@Override
+	public void setInput(IWorkbenchPart part, ISelection selection)
+	{
+		super.setInput(part, selection);
+		if (modelElement != null && cCombo != null)
+		{
+			updateTaskMetaInfo(cCombo.getText());
+		}
 	}
 
 	/* (non-Javadoc)
@@ -52,10 +99,12 @@ public class JadexUserTaskImplComboSection extends
 	 */
 	@Override
 	public void createControls(Composite parent,
-			TabbedPropertySheetPage aTabbedPropertySheetPage)
+			TabbedPropertySheetPage tabbedPropertySheetPage)
 	{
 		
-		super.createControls(parent, aTabbedPropertySheetPage);
+		super.createControls(parent, tabbedPropertySheetPage);
+
+		addUserTaskMetaInfo();
 		
 		// Add some listeners to the abstract combo
 		
@@ -98,11 +147,90 @@ public class JadexUserTaskImplComboSection extends
 			}
 		});
 		
+		cCombo.addSelectionListener(new SelectionListener()
+		{
+			
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				String taskClassName = ((CCombo) e.getSource()).getText();
+				updateTaskMetaInfo(taskClassName);
+				
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e)
+			{
+				widgetSelected(e);
+			}
+		});
+		
 		
 	}
 
 	// ---- methods ----
 	
-	
+	protected void addUserTaskMetaInfo()
+	{
+		
+		sectionComposite = groupExistingControls(ACTIVITY_TASK_IMPLEMENTATION_GROUP);
+		
+		Layout sectionLayout = sectionComposite.getLayout();
+		
+		//taskMetaInfoLabel = getWidgetFactory().createCLabel(sectionComposite, "test", SWT.WRAP | SWT.MULTI );
+		taskMetaInfoText = getWidgetFactory().createText(sectionComposite, "test", SWT.READ_ONLY | SWT.MULTI | SWT.V_SCROLL );
+		
+		if (sectionLayout instanceof GridLayout)
+		{
+			// extend the section layout with a new column
+			//((GridLayout) sectionLayout).numColumns = ((GridLayout) sectionLayout).numColumns +1;
 
+			GridData labelData = new GridData();
+			labelData.horizontalSpan = ((GridLayout) sectionLayout).numColumns;
+			
+			labelData.widthHint = 700; 
+			labelData.horizontalAlignment = SWT.FILL;
+			labelData.heightHint = 100;
+
+			//taskMetaInfoLabel.setLayoutData(labelData);
+			taskMetaInfoText.setLayoutData(labelData);
+		}
+
+	}
+	
+	protected void updateTaskMetaInfo(String taskClassName)
+	{
+		
+		String metaInfo;
+		metaInfo = createTaskMetaInfoString(taskProvider.getTaskMetaInfoFor(taskClassName));
+		
+		//taskMetaInfoLabel.setText(metaInfo);
+		taskMetaInfoText.setText(metaInfo);
+	}
+	
+	protected String createTaskMetaInfoString(TaskMetaInfo taskMetaInfo)
+	{
+		if (taskMetaInfo == null)
+		{
+			return "";
+		}
+		
+		StringBuffer info = new StringBuffer();
+		info.append(taskMetaInfo.getDescription() + "\n");
+		
+		ParameterMetaInfo[] params = taskMetaInfo.getParameterMetaInfos();
+		for (int i = 0; i < params.length; i++)
+		{
+			info.append("\n" + "Parameter:" + params[i].getName() + "\n");
+			info.append("\t" + "Direction: " + params[i].getDirection() + "\n");
+			info.append("\t" + "Class: " + params[i].getClazz() + "\n");
+			info.append("\t" + "Initial value: " + params[i].getInitialValue() + "\n");
+			info.append("\t" + "Description: " + params[i].getDescription() + "\n");
+			
+			//info.append("\t" + params[i].toString());
+		}
+		
+		return info.toString();
+	}
+	
 }

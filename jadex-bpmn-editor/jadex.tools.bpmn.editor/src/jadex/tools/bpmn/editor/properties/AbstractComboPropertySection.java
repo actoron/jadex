@@ -16,7 +16,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
@@ -27,26 +26,13 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  */
 public abstract class AbstractComboPropertySection extends AbstractJadexPropertySection
 {
-
-	// JadexCommonPropertySection.JADEX_ACTIVITY_ANNOTATION
-	// containerEAnnotationName
-	
-	// ---- constants ----
-	
-	private static final String[] DEFAULT_COMBO_ITEMS = new String[] {
-			"Default_1 in AbstractComboPropertySection", //$NON-NLS-1$
-			"Default_2 in AbstractComboPropertySection", //$NON-NLS-1$
-			"Default_3 in AbstractComboPropertySection", //$NON-NLS-1$
-			"Default_4 in AbstractComboPropertySection" //$NON-NLS-1$
-	};
 	
 	// ---- attributes ----
 	
-	/** The Combo for implementing class */
+	/** The CCombo for implementing class */
 	protected CCombo cCombo;
 	
-	protected String[] cComboItems;
-
+	/** The CCombo label */
 	protected String cComboLabel;
 
 	// ---- constructor ----
@@ -58,35 +44,33 @@ public abstract class AbstractComboPropertySection extends AbstractJadexProperty
 	protected AbstractComboPropertySection(String containerEAnnotationName,
 			String annotationDetailName)
 	{
-		this(containerEAnnotationName, annotationDetailName, DEFAULT_COMBO_ITEMS);
-	}
-
-	/**
-	 */
-	protected AbstractComboPropertySection(String containerEAnnotationName,
-			String annotationDetailName, String[] comboItems)
-	{
-		this(containerEAnnotationName, annotationDetailName, comboItems, annotationDetailName);
+		this(containerEAnnotationName, annotationDetailName, annotationDetailName);
 	}
 	
 	/**
 	 */
 	protected AbstractComboPropertySection(String containerEAnnotationName,
-			String annotationDetailName, String[] comboItems, String comboLabel)
+			String annotationDetailName, String comboLabel)
 	{
 		super(containerEAnnotationName, annotationDetailName);
-
-		assert comboItems != null;
 		
 		if (comboLabel == null)
 		{
 			comboLabel = annotationDetailName;
 		}
-		
-		this.cComboItems = comboItems;
+
 		this.cComboLabel = comboLabel;
 	}
 
+	// ---- abstract methods ----
+	
+	
+	/** 
+	 * Provide predefined items for CCombo 
+	 * TODO: create ComboItemsProvider for tooltips?
+	 */
+	protected abstract String[] getComboItems();
+	
 	// ---- methods ----
 
 	/**
@@ -114,7 +98,9 @@ public abstract class AbstractComboPropertySection extends AbstractJadexProperty
 		{
 			
 			// update the combo values
-			String[] predefinedItems = this.cComboItems;
+			//String[] predefinedItems = this.cComboItems;
+			String[] predefinedItems = getComboItems();
+			
 			cCombo.setItems(predefinedItems);
 			
 			EAnnotation ea = modelElement.getEAnnotation(containerEAnnotationName);
@@ -190,7 +176,9 @@ public abstract class AbstractComboPropertySection extends AbstractJadexProperty
 		final CCombo combo = getWidgetFactory().createCCombo(sectionComposite, SWT.NONE);
 		combo.setLayoutData(comboGridData);
 		
-		String[] items = this.cComboItems;
+		//String[] items = this.cComboItems;
+		String[] items = getComboItems();
+		
 		combo.setItems(items);
 		combo.setText(combo.getItem(0));
 		
