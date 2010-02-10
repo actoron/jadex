@@ -210,8 +210,7 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 			else
 			{
 				createComponentInstance(config, args, suspend, listener,
-						resultlistener, factory, lmodel, cid, adapter, null, ad, null);
-				
+					resultlistener, factory, lmodel, cid, adapter, null, ad, null);
 			}
 		}				
 	}
@@ -235,7 +234,7 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 		// Register component at parent.
 		if(pad!=null)
 		{
-			pad.getComponentInstance().componentCreated(cid, lmodel);
+			pad.getComponentInstance().componentCreated(ad, lmodel);
 		}
 
 		IComponentListener[]	alisteners;
@@ -570,10 +569,7 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 						StandaloneComponentAdapter	pad	= (StandaloneComponentAdapter)adapters.get(desc.getParent());
 						if(pad!=null)
 						{
-							pad.getComponentInstance().componentDestroyed(cid);
-							if(desc.isMaster())
-								destroyComponent(pad.getComponentIdentifier(), null);
-//								pad.getComponentInstance().killComponent(null);
+							pad.getComponentInstance().componentDestroyed(desc);
 						}
 						// else parent has just been killed.
 					}

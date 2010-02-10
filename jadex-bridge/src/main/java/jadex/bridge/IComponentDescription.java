@@ -61,4 +61,10 @@ public interface IComponentDescription
 	 *  @return The enabled breakpoints.
 	 */
 	public String[]	getBreakpoints();
+	
+	/**
+	 *  Is the agent a master.
+	 *  @return True, if master agent.
+	 */
+	public boolean isMaster();
 }

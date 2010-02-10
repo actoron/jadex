@@ -13,6 +13,7 @@ import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
@@ -687,7 +688,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The newly created component.
 	 */
-	public void	componentCreated(IComponentIdentifier comp, ILoadableComponentModel model)
+	public void	componentCreated(IComponentDescription desc, ILoadableComponentModel model)
 	{
 	}
 	
@@ -697,7 +698,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The destroyed component.
 	 */
-	public void	componentDestroyed(IComponentIdentifier comp)
+	public void	componentDestroyed(IComponentDescription desc)
 	{
 	}	
 	

@@ -11,6 +11,7 @@ import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.runtime.ISpace;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
@@ -238,8 +239,9 @@ public class Application	implements IApplication, IComponentInstance
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The newly created component.
 	 */
-	public void	componentCreated(IComponentIdentifier comp, ILoadableComponentModel model)
+	public void	componentCreated(IComponentDescription desc, ILoadableComponentModel model)
 	{
+		IComponentIdentifier comp = desc.getName();
 		List	atypes	= this.model.getApplicationType().getMAgentTypes();
 		boolean	found	= false;
 		String	type	= null;
@@ -304,8 +306,9 @@ public class Application	implements IApplication, IComponentInstance
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The destroyed component.
 	 */
-	public void	componentDestroyed(IComponentIdentifier comp)
+	public void	componentDestroyed(IComponentDescription desc)
 	{
+		IComponentIdentifier comp = desc.getName();
 		ISpace[]	aspaces	= null;
 		synchronized(this)
 		{
@@ -330,7 +333,21 @@ public class Application	implements IApplication, IComponentInstance
 				ctypes.remove(comp);
 			}
 		}
+		
+		if(desc.isMaster())
+			killApplication();
 	}
+	
+	/**
+	 *  Kill the application.
+	 */
+	public void killApplication()
+	{
+		((IComponentExecutionService)getComponentAdapter().getServiceContainer()
+			.getService(IComponentExecutionService.class))
+			.destroyComponent(getComponentAdapter().getComponentIdentifier(), null);
+	}
+	
 	
 	/**
 	 *  Add an agent property. 
@@ -374,6 +391,15 @@ public class Application	implements IApplication, IComponentInstance
 	}*/
 	
 	//-------- methods --------
+
+	/**
+	 *  Get the component adapter.
+	 *  @return The component adapter.
+	 */
+	public IComponentAdapter getComponentAdapter() 
+	{
+		return adapter;
+	}
 
 	/**
 	 *  Get the name.
