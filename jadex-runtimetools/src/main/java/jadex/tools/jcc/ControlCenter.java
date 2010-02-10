@@ -263,7 +263,7 @@ public class ControlCenter implements IControlCenter
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			
 			final String failed = SUtil.wrapText("Could not open project\n\n"
 				+ e.getMessage());

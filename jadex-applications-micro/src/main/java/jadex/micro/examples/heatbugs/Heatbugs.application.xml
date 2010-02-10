@@ -119,6 +119,7 @@
 	
 	<agenttypes>
 		<agenttype name="Heatbug" filename="jadex/micro/examples/heatbugs/HeatbugAgent.class"/>
+		<!--  <agenttype name="Heatbug" filename="jadex.micro.examples.heatbugs.HeatbugAgent.class"/>-->
 	</agenttypes>
 	
 	<applications>

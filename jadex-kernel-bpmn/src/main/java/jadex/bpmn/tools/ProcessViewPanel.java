@@ -18,8 +18,10 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -258,7 +260,7 @@ public class ProcessViewPanel extends JPanel
 			{
 				ProcessThread pt = (ProcessThread)it.next();
 				ret.add(new ProcessThreadInfo(pt.getId(), pt.getActivity(), //pt.getLastEdge(), 
-					pt.getException(), pt.isWaiting()));
+					pt.getException(), pt.isWaiting(), new HashMap(pt.getData())));
 			}
 		}
 		return (ProcessThreadInfo[])ret.toArray(new ProcessThreadInfo[ret.size()]);
@@ -271,7 +273,7 @@ public class ProcessViewPanel extends JPanel
 	 */
 	protected class ProcessThreadModel extends AbstractTableModel
 	{
-		protected String[] colnames = new String[]{"Process-Id", "Activity", "Pool", "Lane", "Exception", "Status"};
+		protected String[] colnames = new String[]{"Process-Id", "Activity", "Pool", "Lane", "Exception", "Data", "Status"};
 		
 		public String getColumnName(int column)
 		{
@@ -280,7 +282,7 @@ public class ProcessViewPanel extends JPanel
 
 		public int getColumnCount()
 		{
-			return 6;
+			return 7;
 		}
 		
 		public int getRowCount()
@@ -317,6 +319,10 @@ public class ProcessViewPanel extends JPanel
 				ret = pti.getException();
 			}
 			else if(column==5)
+			{
+				ret = pti.getData();
+			}
+			else if(column==6)
 			{
 				ret = pti.isWaiting()? "waiting": "ready";
 			}
@@ -399,6 +405,9 @@ class ProcessThreadInfo
 	
 	/** Is the process in a waiting state. */
 	protected boolean waiting;
+	
+	/** The data of the process. */
+	protected Map data;
 
 	//-------- constructors --------
 	
@@ -406,12 +415,13 @@ class ProcessThreadInfo
 	 *  Create a new info.
 	 */
 	public ProcessThreadInfo(String id, MActivity activity,
-		Exception exception, boolean waiting)
+		Exception exception, boolean waiting, Map data)
 	{
 		this.id = id;
 		this.activity = activity;
 		this.exception = exception;
 		this.waiting = waiting;
+		this.data = data;
 	}
 
 	//-------- methods --------
@@ -426,30 +436,12 @@ class ProcessThreadInfo
 	}
 
 	/**
-	 *  Set the id.
-	 *  @param id The id to set.
-	 */
-	public void setId(String id)
-	{
-		this.id = id;
-	}
-	
-	/**
 	 *  Get the activity.
 	 *  @return The activity.
 	 */
 	public MActivity getActivity()
 	{
 		return this.activity;
-	}
-
-	/**
-	 *  Set the activity.
-	 *  @param activity The activity to set.
-	 */
-	public void setActivity(MActivity activity)
-	{
-		this.activity = activity;
 	}
 
 	/**
@@ -462,15 +454,6 @@ class ProcessThreadInfo
 	}
 
 	/**
-	 *  Set the exception.
-	 *  @param exception The exception to set.
-	 */
-	public void setException(Exception exception)
-	{
-		this.exception = exception;
-	}
-
-	/**
 	 *  Get the waiting.
 	 *  @return The waiting.
 	 */
@@ -480,12 +463,12 @@ class ProcessThreadInfo
 	}
 
 	/**
-	 *  Set the waiting.
-	 *  @param waiting The waiting to set.
+	 *  Get the data.
+	 *  @return The data.
 	 */
-	public void setWaiting(boolean waiting)
+	public Map getData()
 	{
-		this.waiting = waiting;
+		return this.data;
 	}
 
 	/**

@@ -414,6 +414,15 @@ public class ProcessThread	implements ITaskContext
 	{
 		return this.instance;
 	}
+	
+	/**
+	 *  Get the data.
+	 *  @return The data.
+	 */
+	public Map getData()
+	{
+		return this.data;
+	}
 
 	/**
 	 *  Test if the thread belongs to the given pool and/or lane.

@@ -389,7 +389,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		agents = new ComponentTreeTable(null);
+		agents = new ComponentTreeTable(getJCC().getServiceContainer());
 		agents.setMinimumSize(new Dimension(0, 0));
 		split.add(agents);
 		agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

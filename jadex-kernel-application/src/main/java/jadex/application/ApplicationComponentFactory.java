@@ -120,6 +120,15 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 			new MappingInfo(null, "description", new BeanAttributeInfo((String)null, "defaultValue", null, exconv, null))));
 		types.add(new TypeInfo(new XMLInfo("import"), new ObjectInfo(String.class)));
 		
+		types.add(new TypeInfo(new XMLInfo("componenttype"), new ObjectInfo(MAgentType.class)));
+		types.add(new TypeInfo(new XMLInfo("component"), new ObjectInfo(MAgentInstance.class),
+			new MappingInfo(null, new BeanAttributeInfo[]{
+			new BeanAttributeInfo("type", "typeName"),
+			new BeanAttributeInfo("number", "numberText")}
+		, null)));
+		types.add(new TypeInfo(new XMLInfo("component/arguments/argument"), new ObjectInfo(MArgument.class), 
+			new MappingInfo(null, null, "value")));
+		
 //		types.add(new TypeInfo(null, "applicationtype", MApplicationType.class, "description", null,
 //			new BeanAttributeInfo[]{new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE)}, 
 //			null, null, new SubobjectInfo[]{

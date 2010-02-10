@@ -175,6 +175,8 @@ public abstract class AbstractModelLoader
 	 */
 	public synchronized ICacheableModel	loadModel(String name, String extension, String[] imports) throws Exception
 	{
+//		System.out.println("filename: "+name);
+		
 		// Lookup cache by name/extension/imports
 		ICacheableModel cached = null;
 		Object[] keys	= imports!=null? new Object[imports.length+2]: new Object[2];
