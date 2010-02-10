@@ -184,7 +184,9 @@ public class MathNode	extends ExpressionNode
 					setStaticType(Integer.class);
 				}
 			}
-			else if(cleft==String.class && op==ADD)
+			else if((cleft==null || String.class==cleft)
+			&& (cright==null || String.class==cright)
+			&& op==ADD)
 			{
 				// String concatenation: ok.
 				setStaticType(String.class);

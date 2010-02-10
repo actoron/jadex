@@ -30,7 +30,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_yNYAcRY1Ed-yC473XtaJZQ" iD="_yNYAcBY1Ed-yC473XtaJZQ" incomingEdges="_yNhxcRY1Ed-yC473XtaJZQ" activityType="EventEndEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_SL21oRY-Ed-yC473XtaJZQ" iD="_SL21oBY-Ed-yC473XtaJZQ" outgoingEdges="_yNhxcRY1Ed-yC473XtaJZQ" incomingEdges="_SMJwkRY-Ed-yC473XtaJZQ" name="Print results" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YKhMcBY-Ed-yC473XtaJZQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YKhMcRY-Ed-yC473XtaJZQ" key="parameters" value="in␋text␋String␋((String)$interpreter.getComponentIdentifier().getLocalName())+&quot; received &quot;+$args.get(&quot;message_number&quot;)+&quot; messages.&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YKhMcRY-Ed-yC473XtaJZQ" key="parameters" value="in␋text␋String␋$interpreter.getComponentIdentifier().getLocalName()+&quot; received &quot;+$args.get(&quot;message_number&quot;)+&quot; messages.&quot;"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fy-yoBY-Ed-yC473XtaJZQ" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
       </eAnnotations>
     </vertices>
