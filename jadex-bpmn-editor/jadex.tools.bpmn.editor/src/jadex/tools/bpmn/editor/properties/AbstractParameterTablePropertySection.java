@@ -99,7 +99,7 @@ public class AbstractParameterTablePropertySection extends
 				for (int i = 0; i < DIRECTION_VALUES.length; i++)
 				{
 					if (DIRECTION_VALUES[i]
-							.equals(((MultiColumnTableRow) element)
+							.equals(((AbstractMultiColumnTableRow) element)
 									.getColumnValueAt(0)))
 					{
 						return new Integer(i);
