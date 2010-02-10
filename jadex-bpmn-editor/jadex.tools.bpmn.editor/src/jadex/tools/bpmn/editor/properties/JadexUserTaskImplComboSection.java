@@ -8,7 +8,6 @@ import jadex.tools.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.tools.bpmn.runtime.task.StaticJadexRuntimeTaskProvider;
 import jadex.tools.bpmn.runtime.task.TaskMetaInfo;
 
-import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
