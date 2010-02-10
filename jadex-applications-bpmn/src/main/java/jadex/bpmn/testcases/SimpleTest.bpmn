@@ -4,8 +4,14 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6EKYRDQEd-nouu311XMtg" key="imports" value="jadex.bpmn.runtime.task.*␟jadex.adapter.base.test.*␟jadex.bridge.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6EKYhDQEd-nouu311XMtg" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_B9ptoBDYEd-hjJU8_9Katg" key="results" value="testresults␋Test results.␋Testcase␋"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DC4cABaZEd-YccbjZenQqQ" key="Description" value="Test if a testcase works in principle."/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_Kp6EQfxtEd6BS97d4w8Gew" iD="_Kp6EQPxtEd6BS97d4w8Gew" name="Pool">
-    <vertices xmi:type="bpmn:Activity" xmi:id="_aZp6qfxtEd6BS97d4w8Gew" iD="_aZp6ofxtEd6BS97d4w8Gew" name="Save results&#xD;&#xA;class = StoreResultsTask.class&#xD;&#xA;in String name = &quot;testresults&quot;&#xD;&#xA;in Object value = new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Simple BPMN testcase.&quot;, true, null)})" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_aZp6qfxtEd6BS97d4w8Gew" iD="_aZp6ofxtEd6BS97d4w8Gew" name="Save results" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_LFyigBaZEd-YccbjZenQqQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LFyigRaZEd-YccbjZenQqQ" key="class" value="StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ODoMoBaZEd-YccbjZenQqQ" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Object␋ new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Simple BPMN testcase.&quot;, true, null)})"/>
+      </eAnnotations>
+    </vertices>
   </pools>
 </bpmn:BpmnDiagram>

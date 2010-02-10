@@ -4,6 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hjfBkRYrEd-yC473XtaJZQ" key="imports" value="jadex.bpmn.examples.execute␟jadex.commons.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hjfBkhYrEd-yC473XtaJZQ" key="Package" value="jadex.bpmn.examples.message"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WezAkBY1Ed-yC473XtaJZQ" key="arguments" value="message_number␋&quot;The number of messages to receive.&quot;␋int␋10"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hpToMBaYEd-YccbjZenQqQ" key="Description" value="The Message Receival process waits for a predefined number of messages and then terminates."/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_Q5erIc-aEd6NWbZHdUI2WQ" iD="_Q5erIM-aEd6NWbZHdUI2WQ" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_Q5erI8-aEd6NWbZHdUI2WQ" iD="_Q5erIs-aEd6NWbZHdUI2WQ" outgoingEdges="_bjpHwc-aEd6NWbZHdUI2WQ" incomingEdges="_6WZS8dBNEd6NWbZHdUI2WQ _b0-_QdByEd6NWbZHdUI2WQ" name="PreMessage" activityType="Task">

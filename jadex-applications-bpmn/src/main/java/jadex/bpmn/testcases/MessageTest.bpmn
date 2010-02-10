@@ -4,6 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jCnb4RJjEd-3Ruc_856dPQ" key="imports" value="jadex.bpmn.runtime.task.*␟jadex.adapter.base.test.*␟jadex.commons.IFilter␟jadex.adapter.base.fipa.SFipa␟jadex.bridge.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jCnb4hJjEd-3Ruc_856dPQ" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IB5wIBJ6Ed-3Ruc_856dPQ" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5CRSsBaYEd-YccbjZenQqQ" key="Description" value="Test if a message can be sent and received by a process."/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_uFjqERJREd-3Ruc_856dPQ" iD="_uFjqEBJREd-3Ruc_856dPQ" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_uFjqExJREd-3Ruc_856dPQ" iD="_uFjqEhJREd-3Ruc_856dPQ" outgoingEdges="_atklERJ6Ed-3Ruc_856dPQ" name="Pre Message Receival" activityType="Task"/>

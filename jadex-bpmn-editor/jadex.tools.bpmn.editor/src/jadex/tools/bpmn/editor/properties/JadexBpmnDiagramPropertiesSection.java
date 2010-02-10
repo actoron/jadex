@@ -16,7 +16,8 @@ public class JadexBpmnDiagramPropertiesSection extends
 
 	// ---- constants ----
 	
-	private static final String[] textFieldNames = new String[] {Messages.JadexGlobalDiagramSection_Package_Label};
+	private static final String[] textFieldNames = new String[]{Messages.JadexGlobalDiagramSection_Description_Label,
+		Messages.JadexGlobalDiagramSection_Package_Label};
 	
 	// ---- attributes ----
 

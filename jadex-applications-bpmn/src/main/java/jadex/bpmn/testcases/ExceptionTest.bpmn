@@ -4,6 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ekt5cRF7Ed-qQOr2ZLx-Mw" key="imports" value="jadex.bpmn.runtime.task.*␟jadex.adapter.base.test.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ekt5chF7Ed-qQOr2ZLx-Mw" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dGKx0BGCEd-qQOr2ZLx-Mw" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xyPaoBaYEd-YccbjZenQqQ" key="Description" value="Test if an exception can be thrown and catched."/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_RyeJoRF6Ed-qQOr2ZLx-Mw" iD="_RyeJoBF6Ed-qQOr2ZLx-Mw" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_kU2mERGCEd-qQOr2ZLx-Mw" iD="_kU2mEBGCEd-qQOr2ZLx-Mw" outgoingEdges="_vLsMwRGCEd-qQOr2ZLx-Mw" activityType="EventStartEmpty"/>

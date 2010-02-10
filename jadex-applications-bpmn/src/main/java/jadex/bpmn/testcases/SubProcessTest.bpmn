@@ -4,6 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_18RCcRTUEd-a46HbtL-N3Q" key="imports" value="java.util.*␟jadex.adapter.base.test.*␟jadex.bpmn.runtime.task.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BeUJUBTVEd-a46HbtL-N3Q" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LDy10BTVEd-a46HbtL-N3Q" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_d8Mn0BaZEd-YccbjZenQqQ" key="Description" value="Test if a parallel subprocess works."/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_uQZfwRTQEd-a46HbtL-N3Q" iD="_uQZfwBTQEd-a46HbtL-N3Q" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_uSXZMRTREd-a46HbtL-N3Q" iD="_uSXZMBTREd-a46HbtL-N3Q" outgoingEdges="_wXlZQhTREd-a46HbtL-N3Q" activityType="EventStartEmpty"/>

@@ -25,6 +25,7 @@ public class Messages extends NLS
 
 	public static String JadexGlobalDiagramSection_Imports_Label;
 
+	public static String JadexGlobalDiagramSection_Description_Label;
 	public static String JadexGlobalDiagramSection_Package_Label;
 
 	public static String JadexSequenceMappingSection_MappingTable_Label;

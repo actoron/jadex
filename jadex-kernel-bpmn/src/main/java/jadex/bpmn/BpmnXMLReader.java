@@ -1018,7 +1018,11 @@ public class BpmnXMLReader
 							String key = detail.getKey();
 							String value = detail.getValue();
 							
-							if("imports".equals(key))
+							if("Description".equals(key))
+							{
+								model.setDescription(value);
+							}
+							else if("imports".equals(key))
 							{
 								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
 								String[] imps = new String[stok.countTokens()];

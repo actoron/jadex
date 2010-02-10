@@ -5,6 +5,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5AfH4hDjEd-hjJU8_9Katg" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QomqcBFtEd-qQOr2ZLx-Mw" key="parameters" value="inout␋length␋int␋10"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lHrgQBF5Ed-qQOr2ZLx-Mw" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1ZSZ0BaYEd-YccbjZenQqQ" key="Description" value="Test if the for loop works."/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_MkR4oRDZEd-hjJU8_9Katg" iD="_MkR4oBDZEd-hjJU8_9Katg" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_MkR4oxDZEd-hjJU8_9Katg" iD="_MkR4ohDZEd-hjJU8_9Katg" outgoingEdges="_d1OQchDjEd-hjJU8_9Katg" incomingEdges="_R0Tn0RDZEd-hjJU8_9Katg _fYdk0RDjEd-hjJU8_9Katg" name="Count" activityType="Task">

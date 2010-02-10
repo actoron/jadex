@@ -5,6 +5,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nQAekhVyEd-9a_-KE2TdXg" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zMllUBVyEd-9a_-KE2TdXg" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Bby2ABVzEd-9a_-KE2TdXg" key="parameters" value="in␋list␋List␋new ArrayList()"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mrbo0BaZEd-YccbjZenQqQ" key="Description" value="Test if xor gateway works."/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_aSXq0RVvEd-9a_-KE2TdXg" iD="_aSXq0BVvEd-9a_-KE2TdXg" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_bdeMARVvEd-9a_-KE2TdXg" iD="_bdeMABVvEd-9a_-KE2TdXg" outgoingEdges="_l7MdMRVxEd-9a_-KE2TdXg" activityType="EventStartEmpty"/>

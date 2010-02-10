@@ -4,6 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vDB_4RV7Ed-yC473XtaJZQ" key="imports" value="jadex.adapter.base.test.*␟jadex.bpmn.runtime.task.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vDB_4hV7Ed-yC473XtaJZQ" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2zGC4BV7Ed-yC473XtaJZQ" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_g8QfgBaZEd-YccbjZenQqQ" key="Description" value="Test if a subworklow can be started and wait for its results."/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_V9uhoRV2Ed-yC473XtaJZQ" iD="_V9uhoBV2Ed-yC473XtaJZQ" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_V9uhoxV2Ed-yC473XtaJZQ" iD="_V9uhohV2Ed-yC473XtaJZQ" outgoingEdges="_mdPj4RV9Ed-yC473XtaJZQ" incomingEdges="_YXpmYRV2Ed-yC473XtaJZQ" name="Start subworkflow &#xD;&#xA;and wait for result" activityType="Task">
