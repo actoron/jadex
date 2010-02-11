@@ -204,7 +204,7 @@
 				<xs:documentation>A master agent ist required for the application, thus, if a master agent is killed, the application will be closed down. Default is false.</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="suspended" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="suspend" type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="argument" mixed="true">
 		<xs:annotation>
@@ -221,7 +221,10 @@
 			<xs:documentation>An import allows to add a package (e.g. java.util.*) or a class (e.g. java.util.Map) to the class lookup mechanism.</xs:documentation>
 		</xs:annotation>
 	</xs:complexType>
-	<xs:complexType name="argumenttype">
+	<xs:complexType name="argumenttype" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Argument specification for a component.</xs:documentation>
+		</xs:annotation>
 		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="description" type="xs:string" use="optional"/>
 		<xs:attribute name="typename" type="xs:string" use="optional"/>
