@@ -5,6 +5,7 @@ import jadex.adapter.base.test.Testcase;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -1075,23 +1076,29 @@ public class TestCenterPanel extends JSplitPane
 			{
 				public void run()
 				{
-					// Handling of finished goal.
-					IGoal	goal	= (IGoal)ae.getSource();
-					
-					// Ignore if goal is leftover from aborted execution.
-					if(goals.remove(goal))
+					try
 					{
-						if(!goal.isSucceeded() && !aborted)
-						{
-							String text = SUtil.wrapText("Testcase error: "+goal.getException().getMessage());
-							JOptionPane.showMessageDialog(SGUI.getWindowParent(TestCenterPanel.this),
-								text, "Testcase problem", JOptionPane.INFORMATION_MESSAGE);
-						}
+						// Handling of finished goal.
+						IGoal	goal	= (IGoal)ae.getSource();
 						
-//						System.out.println("Goal finished: "+goal);
-						startNextTestcases();
-						updateProgress();
-						updateDetails();
+						// Ignore if goal is leftover from aborted execution.
+						if(goals.remove(goal))
+						{
+							if(!goal.isSucceeded() && !aborted)
+							{
+								String text = SUtil.wrapText("Testcase error: "+goal.getException().getMessage());
+								JOptionPane.showMessageDialog(SGUI.getWindowParent(TestCenterPanel.this),
+									text, "Testcase problem", JOptionPane.INFORMATION_MESSAGE);
+							}
+							
+	//						System.out.println("Goal finished: "+goal);
+							startNextTestcases();
+							updateProgress();
+							updateDetails();
+						}
+					}
+					catch(ComponentTerminatedException cte)
+					{
 					}
 				}
 			});

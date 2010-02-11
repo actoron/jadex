@@ -4,6 +4,7 @@ import jadex.adapter.base.test.TestReport;
 import jadex.bdi.runtime.IEventbase;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.commons.SGUI;
 
 import java.awt.event.ActionEvent;
@@ -40,8 +41,14 @@ public class GuiOpenClosePlan extends Plan
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				IEventbase eb = getExternalAccess().getEventbase();
-				eb.dispatchInternalEvent(eb.createInternalEvent("gui_closed"));
+				try
+				{
+					IEventbase eb = getExternalAccess().getEventbase();
+					eb.dispatchInternalEvent(eb.createInternalEvent("gui_closed"));
+				}
+				catch(ComponentTerminatedException cte)
+				{
+				}
 			}
 		});
 		frame.getContentPane().add("Center", button);
@@ -91,4 +98,17 @@ public class GuiOpenClosePlan extends Plan
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr);
 	}
 
+	/**
+	 *  Cleanup when testcase is aborted.
+	 */
+	public void aborted()
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				frame.dispose();
+			}
+		});
+	}
 }

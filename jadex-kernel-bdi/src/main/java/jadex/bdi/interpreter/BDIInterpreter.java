@@ -12,15 +12,16 @@ import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.collection.LRU;
+import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.ISynchronizator;
 import jadex.javaparser.IParsedExpression;
@@ -144,6 +145,9 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	/** The plan executor. */
 	protected Map planexecutors;
 	
+	/** The externally synchronized threads to be notified on cleanup. */
+	protected Set	externalthreads;
+	
 	//-------- constructors --------
 	
 	/**
@@ -166,6 +170,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		this.volcache = new LRU(0);	// 50
 		this.stacache = new LRU(20);
 		this.microplansteps = true;
+		this.externalthreads	= Collections.synchronizedSet(SCollection.createLinkedHashSet());
 
 		state.setSynchronizator(new ISynchronizator()
 		{
@@ -678,7 +683,21 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 */
 	public void cleanup()
 	{
+//		System.err.println("Cleanup: "+state);
+
 		BDIInterpreter.interpreters.remove(state);
+		
+		for(Iterator it=externalthreads.iterator(); it.hasNext(); )
+		{
+			Throwable[]	exception	= (Throwable[])it.next();
+			synchronized(exception)
+			{
+				exception[0] = new ComponentTerminatedException(getComponentAdapter().getComponentIdentifier().getName());
+				exception[0].fillInStackTrace();
+				exception.notify();
+				it.remove();
+			}
+		}
 //		System.out.println(BDIInterpreter.interpreters.size());
 	}
 
@@ -864,6 +883,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 
 			final boolean[] notified = new boolean[1];
 			final Throwable[] exception = new Throwable[1];
+			externalthreads.add(exception);
 			
 			// Add external will throw exception if action execution cannot be done.
 //			System.err.println("invokeSynchonized("+code+"): adding");
@@ -886,10 +906,11 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 						exception[0]	= e;
 					}
 					
-					synchronized(notified)
+					synchronized(exception)
 					{
-						notified.notify();
+						exception.notify();
 						notified[0] = true;
+						externalthreads.remove(exception);
 					}
 				}
 				
@@ -902,11 +923,20 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			try
 			{
 //				System.err.println("invokeSynchonized("+code+"): waiting");
-				synchronized(notified)
+				synchronized(exception)
 				{
 					if(!notified[0])
 					{
-						notified.wait();
+						if(BDIInterpreter.getInterpreter(state)!=null)
+						{
+//							System.err.println("Waiting: "+state);
+							exception.wait();
+//							System.err.println("Continued: "+state);
+						}
+						else
+						{
+							throw new ComponentTerminatedException(getComponentAdapter().getComponentIdentifier().getName());
+						}
 					}
 				}
 //				System.err.println("invokeSynchonized("+code+"): returned");

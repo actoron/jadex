@@ -4,6 +4,7 @@ import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.IElement;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.rules.state.IOAVState;
@@ -56,7 +57,7 @@ public abstract class ElementFlyweight implements IElement
 		
 		this.interpreter = BDIInterpreter.getInterpreter(state);
 		if(interpreter==null)
-			throw new RuntimeException("Cannot create flyweight for dead agent: "+handle);
+			throw new ComponentTerminatedException("Cannot create flyweight for dead agent: "+handle);
 		setHandle(handle);
 	}
 	

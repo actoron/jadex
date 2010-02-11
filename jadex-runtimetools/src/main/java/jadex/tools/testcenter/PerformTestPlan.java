@@ -6,6 +6,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
 import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.concurrent.IResultListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -84,7 +85,16 @@ public class PerformTestPlan extends Plan
 		if(testagent!=null)
 		{
 			IComponentExecutionService	ces	= (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
-			ces.destroyComponent(testagent, null);
+			// Empty listener avoids failures printed to console.
+			ces.destroyComponent(testagent, new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+				}
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+				}
+			});
 		}
 	}
 }

@@ -28,13 +28,13 @@ public class AgentControlCenter extends ControlCenter
 		
 		this.agent = agent;
 
-		SwingUtilities.invokeLater(new Runnable()
+		agent.addAgentListener(new IAgentListener()
 		{
-			public void run()
+			public void agentTerminating(AgentEvent ae)
 			{
-				agent.addAgentListener(new IAgentListener()
+				SwingUtilities.invokeLater(new Runnable()
 				{
-					public void agentTerminating(AgentEvent ae)
+					public void run()
 					{
 						if(!killed)
 						{
@@ -46,11 +46,11 @@ public class AgentControlCenter extends ControlCenter
 						window.setVisible(false);
 						window.dispose();
 					}
-
-					public void agentTerminated(AgentEvent ae)
-					{
-					}
 				});
+			}
+
+			public void agentTerminated(AgentEvent ae)
+			{
 			}
 		});
 	}

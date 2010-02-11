@@ -200,9 +200,6 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public IComponentIdentifier getComponentIdentifier()
 	{
-		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
-			throw new ComponentTerminatedException(cid.getName());
-
 		// todo: remove cast, HACK!!!
 		// todo: add transport addresses for multi-platform communication.
 		return (IComponentIdentifier)((ComponentIdentifier)cid).clone();
@@ -214,24 +211,8 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public IServiceContainer	getServiceContainer()
 	{
-		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
-			throw new ComponentTerminatedException(cid.getName());
-
 		return container;
 	}
-	
-	/**
-	 *  Get the clock.
-	 *  @return The clock.
-	 * /
-	public IClockService getClock()
-	{
-		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
-			throw new ComponentTerminatedException(cid.getName());
-
-//		return platform.getClock();
-		return (IClockService)container.getService(IClockService.class);
-	}*/
 	
 	/**
 	 *  String representation of the agent.
@@ -242,15 +223,6 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	}
 
 	//-------- methods called by the standalone platform --------
-
-	/**
-	 *  Gracefully terminate the agent.
-	 *  This method is called from the reasoning engine and delegated to the ams.
-	 * /
-	public void killComponent()
-	{
-		((IComponentExecutionService)container.getService(IComponentExecutionService.class)).destroyComponent(cid, null);
-	}*/
 
 	/**
 	 *  Gracefully terminate the agent.
@@ -306,24 +278,6 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		component.messageArrived(msg);
 	}
 	
-	/**
-	 *  Called when a message needs to be sent.
-	 *  (Called from component instance).
-	 * /
-	public void	sendMessage(Map message, MessageType type)
-	{
-		if(IComponentDescription.STATE_TERMINATED.equals(state) || fatalerror)
-			throw new ComponentTerminatedException(cid.getName());
-
-		IMessageAdapter msg = new DefaultMessageAdapter(message, type);
-		
-		((IMessageService)getServiceContainer().getService(IMessageService.class)).sendMessage(msg.getParameterMap(),
-			msg.getMessageType(), getComponentIdentifier(), getComponentInstance().getClassLoader());
-
-		for(int i=0; i<tooladapters.length; i++)
-			tooladapters[i].messageSent(msg);
-	}*/
-	
 	//-------- IExecutable interface --------
 
 	/**
@@ -332,18 +286,15 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public boolean	execute()
 	{
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
+			throw new ComponentTerminatedException(cid.getName());
+
 		// Remember execution thread.
 		this.componentthread	= Thread.currentThread();
 		
 		ClassLoader	cl	= componentthread.getContextClassLoader();
 		componentthread.setContextClassLoader(model.getClassLoader());
 
-		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
-			throw new ComponentTerminatedException(cid.getName());
-
-		assert IComponentDescription.STATE_ACTIVE.equals(desc.getState()) /*|| IComponentDescription.STATE_TERMINATING.equals(desc.getState())*/
-		||  IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) ||  IComponentDescription.STATE_WAITING.equals(desc.getState()) : desc.getState();
-		
 		// Copy actions from external threads into the state.
 		// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
 		boolean	extexecuted	= false;
@@ -491,6 +442,9 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public void invokeLater(Runnable action)
 	{
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
+			throw new ComponentTerminatedException(cid.getName());
+
 		synchronized(ext_entries)
 		{
 			if(ext_forbidden)
@@ -510,9 +464,6 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public IComponentInstance	getComponentInstance()
 	{
-		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
-			throw new ComponentTerminatedException(cid.getName());
-
 		return component;
 	}
 
@@ -523,54 +474,12 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public void	doStep(IResultListener listener)
 	{
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
+			throw new ComponentTerminatedException(cid.getName());
+
 		if(dostep)
 			listener.exceptionOccurred(this, new RuntimeException("Only one step allowed at a time."));
 			
 		this.dostep	= true;		this.steplistener	= listener;
 	}
-//		
-//	/**
-//	 *  Add a breakpoint to the interpreter.
-//	 */
-//	public void	addBreakpoint(Object rule)
-//	{
-//		if(breakpoints==null)
-//			breakpoints	= new HashSet();
-//		breakpoints.add(rule);
-//	}
-//	
-//	/**
-//	 *  Remove a breakpoint from the interpreter.
-//	 */
-//	public void	removeBreakpoint(Object rule)
-//	{
-//		if(breakpoints.remove(rule) && breakpoints.isEmpty())
-//			breakpoints	= null;
-//	}
-//	
-//	/**
-//	 *  Check if a rule is a breakpoint for the interpreter.
-//	 */
-//	public boolean	isBreakpoint(Object rule)
-//	{
-//		return breakpoints!=null && breakpoints.contains(rule);
-//	}
-//	
-//	/**
-//	 *  Add a command to be executed, when a breakpoint is reached.
-//	 */
-//	public void	addBreakpointCommand(ICommand command)
-//	{
-//		if(breakpointcommands==null)
-//		{
-//			breakpointcommands	= new ICommand[]{command};
-//		}
-//		else
-//		{
-//			ICommand[]	newarray	= new ICommand[breakpointcommands.length+1];
-//			System.arraycopy(breakpointcommands, 0, newarray, 0, breakpointcommands.length);
-//			newarray[breakpointcommands.length]	= command;
-//			breakpointcommands	= newarray;
-//		}
-//	}
 }
