@@ -53,7 +53,7 @@
 				</agr:agrspace>
 			</spaces>
 			<agents>
-				<agent type="Environment"/>
+				<agent type="Environment" master="true"/>
 				<agent type="Sentry"/>
 				<agent type="Producer" number="2"/>
 				<agent type="Carrier" number="3"/>

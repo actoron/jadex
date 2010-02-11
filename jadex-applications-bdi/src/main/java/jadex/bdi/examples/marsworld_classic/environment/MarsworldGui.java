@@ -95,20 +95,7 @@ public class MarsworldGui	extends JFrame
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				/*IComponentIdentifier[] as = (IComponentIdentifier[])agent.getBeliefbase().getBeliefSet("startedagents").getFacts();
-				for(int i=0; i<as.length; i++)
-				{
-					try
-					{
-						IGoal kg = agent.createGoal("ams_destroy_agent");
-						kg.getParameter("agentidentifier").setValue(as[i]);
-						agent.dispatchTopLevelGoalAndWait(kg);
-					}
-					catch(GoalFailureException gfe) {}
-				}*/
-//				agent.killAgent();
-//				IContextService ics = (IContextService)agent.getServiceContainer().getService(IContextService.class);
-//				ics.deleteContext(agent.getApplicationContext(), null);
+				agent.killAgent();
 			}
 		});
 		
