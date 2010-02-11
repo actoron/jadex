@@ -29,7 +29,7 @@
 	<applications>
 		<application name="1 Sentry / 2 Producers / 3 Carriers">
 			<agents>
-				<agent type="Environment" master="true">
+				<agent type="Environment" master="true"/>
 				<agent type="Sentry"/>
 				<agent type="Producer" number="2" />
 				<agent type="Carrier" number="3" />

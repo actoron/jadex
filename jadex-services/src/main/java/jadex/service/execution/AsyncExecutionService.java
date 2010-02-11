@@ -101,7 +101,7 @@ public class AsyncExecutionService	implements IExecutionService, IService
 							{
 								// isRunning() refers to running state of executor!
 								// Do not remove when a new executor has already been added for the task.
-								if(!this.isRunning() && executors.get(task)==this)	
+								if(!this.isRunning() && executors!=null && executors.get(task)==this)	
 								{
 //									System.out.println("Removing executor for: "+task+", "+this);
 									executors.remove(task); // weak for testing
@@ -168,7 +168,8 @@ public class AsyncExecutionService	implements IExecutionService, IService
 					{
 						if(listener!=null)
 							listener.resultAvailable(source, result);
-						executors.remove(task);
+						if(executors!=null)
+							executors.remove(task);
 					}
 				}
 
@@ -179,7 +180,8 @@ public class AsyncExecutionService	implements IExecutionService, IService
 					{
 						if(listener!=null)
 							listener.exceptionOccurred(source, exception);
-						executors.remove(task);
+						if(executors!=null)
+							executors.remove(task);
 					}
 				}
 			};
