@@ -100,7 +100,7 @@
 			<parameterset name="result" class="ICandidateInfo" direction="out">
 				<goalmapping ref="choosemove.result"/>
 			</parameterset>
-			<body class="ChooseMovePlan"/>
+			<body type="bpmn" class="ChooseMovePlan"/>
 			<trigger>
 				<goal ref="choosemove"/>
 			</trigger>
