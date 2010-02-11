@@ -59,6 +59,7 @@ public class StaticJadexRuntimeTaskProvider implements IRuntimeTaskProvider
 			Object.class, "value0[..n]", null, "The value0[..n] parameter(s) identify the value(s) of the result parameter(s) belonging to the name(s).");
 		TaskMetaInfo tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{namemi, valuemi, namesmi, valuesmi});
 		map.put("jadex.bpmn.runtime.task.StoreResults.class", tmi);
+		map.put("StoreResults.class", tmi);
 		
 		// invoke method task.
 		desc = "The invoke method task can be used to invoke a mathod on an object or a" +
@@ -78,6 +79,7 @@ public class StaticJadexRuntimeTaskProvider implements IRuntimeTaskProvider
 			String.class, "returnname", null, "The returnname parameter identifies the result task parameter for storing the result of the call.");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{objectmi, classmi, methodnamemi, parammi, paramsmi, retmi});
 		map.put("jadex.bpmn.runtime.task.InvokeMethodTask.class", tmi);
+		map.put("InvokeMethodTask.class", tmi);
 
 		// create component task.
 		desc = "The create component task can be used for creating a new component instance. " +
@@ -108,6 +110,7 @@ public class StaticJadexRuntimeTaskProvider implements IRuntimeTaskProvider
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{namemi, modelmi, confmi, suspendmi, 
 			subcommi, killimi, resultmapmi, waitmi, mastermi, argumentsmi});
 		map.put("jadex.bpmn.runtime.task.CreateComponentTask.class", tmi);
+		map.put("CreateComponentTask.class", tmi);
 		
 		//  destroy component task.
 		desc = "The destroy component task can be used for killing a specific component.";
@@ -122,6 +125,7 @@ public class StaticJadexRuntimeTaskProvider implements IRuntimeTaskProvider
 				"This is e.g. necessary if the return values should be used.");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{cidmi, namemi, lismi, waitmi}); 
 		map.put("jadex.bpmn.runtime.task.DestroyComponentTask.class", tmi);
+		map.put("DestroyComponentTask.class", tmi);
 		
 		// user interaction task.
 		desc = "The user interaction task can be used for fetching in parameter values " +
@@ -129,6 +133,7 @@ public class StaticJadexRuntimeTaskProvider implements IRuntimeTaskProvider
 			"in parameters.";
 		tmi = new TaskMetaInfo(desc, null); 
 		map.put("jadex.bpmn.runtime.task.UserInteractionTask.class", tmi);
+		map.put("UserInteractionTask.class", tmi);
 		
 		// BDI tasks.
 		
@@ -145,6 +150,7 @@ public class StaticJadexRuntimeTaskProvider implements IRuntimeTaskProvider
 			boolean.class, "wait", null, "The wait parameter to wait for the results.");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{typemi, paramsmi, subgoal, wait}); 
 		map.put("jadex.bpmnbdi.task.DispatchGoalTask.class", tmi);
+		map.put("DispatchGoalTask.class", tmi);
 	
 		// wait for goal task.
 		desc = "The wait for goal task can be used to wait for an existing goal (available only in bdi-bpmn plans).";
@@ -152,6 +158,7 @@ public class StaticJadexRuntimeTaskProvider implements IRuntimeTaskProvider
 			Object.class, "goal", null, "The goal parameter identifies the goal to be waited for.");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{goalmi});
 		map.put("jadex.bpmnbdi.task.WaitForGoalTask.class", tmi);
+		map.put("WaitForGoalTask.class", tmi);
 		
 		// dispatch internal event task.
 		desc = "The dispatch internal event task can be used for dipatching an internal event (available only in bdi-bpmn plans).";
@@ -161,6 +168,7 @@ public class StaticJadexRuntimeTaskProvider implements IRuntimeTaskProvider
 			Map.class, "parameters", null, "The 'parameter' parameter allows to specify the goal parameters.");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{typemi, paramsmi}); 
 		map.put("jadex.bpmnbdi.task.DispatchInternalEventTask.class", tmi);
+		map.put("DispatchInternalEventTask.class", tmi);
 		
 		// write belief task.
 		desc = "The write belief task can be used for setting a value to a belief or" +
@@ -175,6 +183,7 @@ public class StaticJadexRuntimeTaskProvider implements IRuntimeTaskProvider
 			String.class, "mode", null, "The mode parameter identifies the beliefset mode (add, remove, or remove all).");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{belnamemi, belsetnamemi, valuemi, modemi}); 
 		map.put("jadex.bpmnbdi.task.WriteBeliefTask.class", tmi);
+		map.put("WriteBeliefTask.class", tmi);
 			
 		// write parameter task.
 		desc = "The write parameter task can be used for setting a value to a parameter or" +
@@ -189,6 +198,7 @@ public class StaticJadexRuntimeTaskProvider implements IRuntimeTaskProvider
 			String.class, "mode", null, "The mode parameter identifies the parameterset mode (add, remove, or remove all).");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{paramnamnmi, paramsetnamemi, valuemi, modemi});
 		map.put("jadex.bpmnbdi.task.WriteParameterTask.class", tmi);
+		map.put("WriteParameterTask.class", tmi);
 		
 		// These task are in bdi but aren't bdi specific
 		
@@ -209,6 +219,7 @@ public class StaticJadexRuntimeTaskProvider implements IRuntimeTaskProvider
 			boolean.class, "wait", null, "The wait parameter to wait for the task.");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{typemi, spacemi, objectid, propsmi, taskidmi, waitmi}); 
 		map.put("jadex.bpmnbdi.task.CreateSpaceObjectTaskTask.class", tmi);
+		map.put("CreateSpaceObjectTaskTask.class", tmi);
 		
 		// wait for space object task task.
 		desc = "The wait for space object task task can be used to wait for completion of a task in an" +
@@ -221,6 +232,7 @@ public class StaticJadexRuntimeTaskProvider implements IRuntimeTaskProvider
 			Object.class, "taskid", null, "The taskid parameter for the return value, i.e. the id of the created task.");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{spacemi, objectid, taskidmi}); 
 		map.put("jadex.bpmnbdi.task.WaitForSpaceObjectTaskTask.class", tmi);
+		map.put("WaitForSpaceObjectTaskTask.class", tmi);
 		
 		// remove space object task task.
 		desc = "The remove space object task task can be used to remove a task in an" +
@@ -233,6 +245,7 @@ public class StaticJadexRuntimeTaskProvider implements IRuntimeTaskProvider
 			Object.class, "taskid", null, "The taskid parameter for identifying the task.");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{spacemi, objectid, taskidmi}); 
 		map.put("jadex.bpmnbdi.task.RemoveSpaceObjectTaskTask.class", tmi);
+		map.put("RemoveSpaceObjectTaskTask.class", tmi);
 		
 		return map;
 	}
