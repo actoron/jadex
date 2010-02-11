@@ -43,6 +43,6 @@ public class SParameterPanelFactory
 			return new MultiListChoiceParameterPanel(parameterName, (MultiListChoice) parameterValue, readOnly);
 		}
 		
-		throw new RuntimeException("Unknown Parameter Type: " + parameterType.getCanonicalName());
+		throw new RuntimeException("Unknown Parameter [" + parameterName + "] Type: " + parameterType.getCanonicalName());
 	}
 }

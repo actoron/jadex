@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_m9dccBcnEd-4T9k5IgEFpw" iD="_m9c1YBcnEd-4T9k5IgEFpw">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_nqzDkBcnEd-4T9k5IgEFpw" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nqzqoBcnEd-4T9k5IgEFpw" key="imports" value="jadex.wfms.parametertypes.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nqzqoRcnEd-4T9k5IgEFpw" key="Package" value="jadex.bpmn.examples.dipp"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_m9dcdhcnEd-4T9k5IgEFpw" iD="_m9dcdRcnEd-4T9k5IgEFpw" name="Body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_m9eDgRcnEd-4T9k5IgEFpw" iD="_m9eDgBcnEd-4T9k5IgEFpw" outgoingEdges="_XMRmMRcoEd-4T9k5IgEFpw" incomingEdges="_vGIMsRcnEd-4T9k5IgEFpw" name="Absichern_SetKomm_VM_Flaechen" lanes="_spZrkRcnEd-4T9k5IgEFpw" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_riEQEBcnEd-4T9k5IgEFpw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_riEQERcnEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4S-90BcnEd-4T9k5IgEFpw" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP2 - Absicherung Layout &lt;/H2> &lt;BR> &lt;H3> Absicherung Set Komm. VM Fl&amp;auml;chen &lt;BR> &lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)␟inout␋Setflaechen_und_Kommissiornierflaechen_abgesichert␋boolean␋$beliefbase.Set_Komm_abgesichert"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_rYbL4RcnEd-4T9k5IgEFpw" iD="_rYbL4BcnEd-4T9k5IgEFpw" outgoingEdges="_vGIMsRcnEd-4T9k5IgEFpw" lanes="_spZrkRcnEd-4T9k5IgEFpw" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_WsWwARcoEd-4T9k5IgEFpw" iD="_WsWwABcoEd-4T9k5IgEFpw" outgoingEdges="_4MKHoRcoEd-4T9k5IgEFpw" incomingEdges="_XMRmMRcoEd-4T9k5IgEFpw" name="Set_Komm_abgesichert_speichern" lanes="_spZrkRcnEd-4T9k5IgEFpw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_XSbRgBcoEd-4T9k5IgEFpw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XSbRgRcoEd-4T9k5IgEFpw" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Zx3vcBcoEd-4T9k5IgEFpw" key="parameters" value="in␋beliefname␋String␋&quot;Set_Komm_abgesichert&quot;␟in␋value␋Object␋"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_xd3DoRcoEd-4T9k5IgEFpw" iD="_xd3DoBcoEd-4T9k5IgEFpw" outgoingEdges="__laNIRcoEd-4T9k5IgEFpw" incomingEdges="_4MKHoRcoEd-4T9k5IgEFpw" name="Foerdereinrichtungen_abgesichern" lanes="_spZrkRcnEd-4T9k5IgEFpw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_xw1C8BcoEd-4T9k5IgEFpw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xw1qABcoEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yA5fQBcoEd-4T9k5IgEFpw" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP2 - Absicherung Layout &lt;/H2> &lt;BR> &lt;H3> Absicherung F&amp;ouml;rdereinrichtungen&lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_-Z3AARcoEd-4T9k5IgEFpw" iD="_-Z3AABcoEd-4T9k5IgEFpw" outgoingEdges="_Kiu2URcpEd-4T9k5IgEFpw" incomingEdges="__laNIRcoEd-4T9k5IgEFpw" name="Absichern_Fahrstrassen" lanes="_spZrkRcnEd-4T9k5IgEFpw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-ftJUBcoEd-4T9k5IgEFpw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-ftwYBcoEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GMi5MBcpEd-4T9k5IgEFpw" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP2 - Absicherung Layout &lt;/H2> &lt;BR> &lt;H3> Absichern Fahrstrassen&lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_JjcjkRcpEd-4T9k5IgEFpw" iD="_JjcjkBcpEd-4T9k5IgEFpw" incomingEdges="_Kiu2URcpEd-4T9k5IgEFpw" lanes="_spZrkRcnEd-4T9k5IgEFpw" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_vGIMsRcnEd-4T9k5IgEFpw" iD="_vGIMsBcnEd-4T9k5IgEFpw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_vHKugBcnEd-4T9k5IgEFpw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vHLVkBcnEd-4T9k5IgEFpw" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vHLVkRcnEd-4T9k5IgEFpw" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_XMRmMRcoEd-4T9k5IgEFpw" iD="_XMRmMBcoEd-4T9k5IgEFpw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_XNP2kBcoEd-4T9k5IgEFpw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XNP2kRcoEd-4T9k5IgEFpw" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XNQdoBcoEd-4T9k5IgEFpw" key="condition" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_j6Ri0BcoEd-4T9k5IgEFpw" source="sequence">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_j6SJ4BcoEd-4T9k5IgEFpw" key="mappings" value="value␋Setflaechen_und_Kommissiornierflaechen_abgesichert"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_4MKHoRcoEd-4T9k5IgEFpw" iD="_4MKHoBcoEd-4T9k5IgEFpw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_4NMpcBcoEd-4T9k5IgEFpw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4NMpcRcoEd-4T9k5IgEFpw" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4NMpchcoEd-4T9k5IgEFpw" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="__laNIRcoEd-4T9k5IgEFpw" iD="__laNIBcoEd-4T9k5IgEFpw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__ma5wBcoEd-4T9k5IgEFpw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__ma5wRcoEd-4T9k5IgEFpw" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__ma5whcoEd-4T9k5IgEFpw" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Kiu2URcpEd-4T9k5IgEFpw" iD="_Kiu2UBcpEd-4T9k5IgEFpw"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_spZrkRcnEd-4T9k5IgEFpw" iD="_spZrkBcnEd-4T9k5IgEFpw" name="LayoutPlaner" activities="_rYbL4RcnEd-4T9k5IgEFpw _m9eDgRcnEd-4T9k5IgEFpw _WsWwARcoEd-4T9k5IgEFpw _xd3DoRcoEd-4T9k5IgEFpw _-Z3AARcoEd-4T9k5IgEFpw _JjcjkRcpEd-4T9k5IgEFpw"/>
+  </pools>
+</bpmn:BpmnDiagram>

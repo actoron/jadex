@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gpmn:GpmnDiagram xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" id="_AznrkLmFEd6y6pbFUAB2Hw">
   <artifacts xsi:type="gpmn:Context" id="__6xbwN6WEd62vdy0afypXQ">
-    <elements id="_NJwlkN6XEd62vdy0afypXQ" initialValue="true" name="praemissen_ok" set="false" type="boolean"/>
+    <elements id="_NJwlkN6XEd62vdy0afypXQ" initialValue="true" name="dipp1_praemissen_ok" set="false" type="boolean"/>
     <elements id="_TKgAAN6XEd62vdy0afypXQ" name="produktmodell" type="boolean"/>
     <elements id="_WbHcMN6XEd62vdy0afypXQ" name="vertriebsprognosen" type="boolean"/>
     <elements id="_YjxKwN6XEd62vdy0afypXQ" name="gs_konzept" type="boolean"/>
@@ -11,29 +11,32 @@
     <elements id="_cwav8BJhEd-xIPbCdXs7xg" initialValue="new String[0]" name="zielwerke" type="String[]"/>
     <elements id="_kxotABJkEd-GwOYBvKt2Jg" initialValue="new String[0]" name="modelmix_br" type="String[]"/>
     <elements id="_N3a-kBJlEd-GwOYBvKt2Jg" initialValue="false" name="edrive_absichern" type="boolean"/>
+    <elements id="_OjoqYBZBEd-jGLD5OCZpUA" initialValue="false" name="Teilebedarfe_abgeleitet" type="boolean"/>
+    <elements id="_iL2fwBZEEd-jGLD5OCZpUA" initialValue="false" name="SLT_Vorentwicklung" type="boolean"/>
+    <elements id="_lZ2FwBZEEd-jGLD5OCZpUA" initialValue="false" name="ULT_Festlegung" type="boolean"/>
+    <elements id="_GrM3EBZYEd-xN_GMKM5g9Q" initialValue="false" name="LogPlaene_100Prozent" type="boolean"/>
+    <elements id="_IwYa4BZYEd-xN_GMKM5g9Q" initialValue="false" name="TF_100Prozent" type="boolean"/>
+    <elements id="_KwhtsBZYEd-xN_GMKM5g9Q" initialValue="false" name="PosV_100Prozent" type="boolean"/>
+    <elements id="_Kx1ewBcoEd-4T9k5IgEFpw" initialValue="false" name="Set_Komm_abgesichert" type="boolean"/>
   </artifacts>
   <vertices xsi:type="gpmn:MaintainGoal" id="_ELbU4LmFEd6y6pbFUAB2Hw" name="Prämissen_ok">
     <outgoingEdges>_NewhcLmFEd6y6pbFUAB2Hw</outgoingEdges>
-    <maintaincondition>$beliefbase.praemissen_ok</maintaincondition>
+    <maintaincondition>$beliefbase.dipp1_praemissen_ok</maintaincondition>
   </vertices>
   <vertices xsi:type="gpmn:Plan" id="_H_rpoLmFEd6y6pbFUAB2Hw" description="" name="Info_Prämissen_fehlen" bpmnPlan="jadex/gpmn/examples/dipp/MG_Praemissen_fehlen.bpmn">
     <incomingEdges>_NewhcLmFEd6y6pbFUAB2Hw</incomingEdges>
   </vertices>
   <vertices xsi:type="gpmn:Plan" id="_28mtsLmFEd6y6pbFUAB2Hw" description="" name="Dipp1_LOG_Planunsprämissen_abgleichen" bpmnPlan="jadex/gpmn/examples/dipp/DiPP1_LOG_Planungspraemissen_abgleichen.bpmn">
-    <incomingEdges>_dOXJ4BGVEd-iAJhQaWu0kA</incomingEdges>
+    <incomingEdges>_pbAboBYkEd-jGLD5OCZpUA</incomingEdges>
   </vertices>
-  <vertices xsi:type="gpmn:AchieveGoal" id="_-gn4wLmFEd6y6pbFUAB2Hw" name="Dipp1_Logistik_Absicherung_durchführen">
+  <vertices xsi:type="gpmn:AchieveGoal" id="_-gn4wLmFEd6y6pbFUAB2Hw" name="Dipp1_Logistik_Absicherung_durchführen" sequential="false">
     <outgoingEdges>_0YYA8LmGEd6y6pbFUAB2Hw</outgoingEdges>
     <outgoingEdges>_tscUcLmGEd6y6pbFUAB2Hw</outgoingEdges>
-    <outgoingEdges>_jAjZgLmGEd6y6pbFUAB2Hw</outgoingEdges>
-    <incomingEdges>_TOTS0BGYEd-iAJhQaWu0kA</incomingEdges>
-  </vertices>
-  <vertices xsi:type="gpmn:AchieveGoal" id="_TR5IQLmGEd6y6pbFUAB2Hw" name="Dipp1_LOG_Ladungsträger_abgesichern">
-    <outgoingEdges>_nU91ALmGEd6y6pbFUAB2Hw</outgoingEdges>
-    <incomingEdges>_jAjZgLmGEd6y6pbFUAB2Hw</incomingEdges>
+    <outgoingEdges>_wfNJEBYiEd-jGLD5OCZpUA</outgoingEdges>
+    <incomingEdges>_xIoOoBYkEd-jGLD5OCZpUA</incomingEdges>
   </vertices>
   <vertices xsi:type="gpmn:Plan" id="_k0pNULmGEd6y6pbFUAB2Hw" description="" name="Dipp1_LOG_Ladungsträger_absichern" bpmnPlan="jadex/gpmn/examples/dipp/DiPP1_LOG_Ladungstraeger_absichern.bpmn">
-    <incomingEdges>_nU91ALmGEd6y6pbFUAB2Hw</incomingEdges>
+    <incomingEdges>_wHudMBYiEd-jGLD5OCZpUA</incomingEdges>
   </vertices>
   <vertices xsi:type="gpmn:AchieveGoal" id="_o4k80LmGEd6y6pbFUAB2Hw" name="Dipp1_LOG_Prozessplanung_durchgeführen">
     <outgoingEdges>_AqqR8LmHEd6y6pbFUAB2Hw</outgoingEdges>
@@ -49,20 +52,10 @@
   <vertices xsi:type="gpmn:Plan" id="_7LALULmGEd6y6pbFUAB2Hw" description="" name="Dipp1_LOG_Lieferantenstandorte_prüfen" bpmnPlan="jadex/gpmn/examples/dipp/DiPP1_LOG_Lieferantenstandort_pruefen.bpmn">
     <incomingEdges>__zCtcLmGEd6y6pbFUAB2Hw</incomingEdges>
   </vertices>
-  <vertices xsi:type="gpmn:AchieveGoal" id="_WgVysBGVEd-iAJhQaWu0kA" name="Dipp1_LOG_Planunsprämissen_abgeglichen">
-    <outgoingEdges>_dOXJ4BGVEd-iAJhQaWu0kA</outgoingEdges>
-    <incomingEdges>_Srb2UBGYEd-iAJhQaWu0kA</incomingEdges>
-  </vertices>
-  <vertices xsi:type="gpmn:AchieveGoal" id="_JSAo0BGYEd-iAJhQaWu0kA" name="Dipp1_Logistik_absichern" sequential="true">
-    <outgoingEdges>_Srb2UBGYEd-iAJhQaWu0kA</outgoingEdges>
-    <outgoingEdges>_TOTS0BGYEd-iAJhQaWu0kA</outgoingEdges>
-    <incomingEdges>_2AWQQBGqEd-iAJhQaWu0kA</incomingEdges>
-  </vertices>
   <vertices xsi:type="gpmn:AchieveGoal" id="_JJWMUBGpEd-iAJhQaWu0kA" name="Dipp1_absichern" sequential="false">
     <outgoingEdges>_QW-QoBGpEd-iAJhQaWu0kA</outgoingEdges>
-    <outgoingEdges>_2AWQQBGqEd-iAJhQaWu0kA</outgoingEdges>
+    <outgoingEdges>_yrwOQBYkEd-jGLD5OCZpUA</outgoingEdges>
     <incomingEdges>_HoLcoBI6Ed-7Y7NmdZIRDg</incomingEdges>
-    <targetcondition></targetcondition>
   </vertices>
   <vertices xsi:type="gpmn:AchieveGoal" id="_NeH0MBGpEd-iAJhQaWu0kA" name="Dipp1_Montage_absichern">
     <outgoingEdges>_AyEtcBGrEd-iAJhQaWu0kA</outgoingEdges>
@@ -77,7 +70,9 @@
   </vertices>
   <vertices xsi:type="gpmn:AchieveGoal" id="_qZLEcBI8Ed-7Y7NmdZIRDg" name="Dipp2_absichern" sequential="false">
     <outgoingEdges>_87LAABI8Ed-7Y7NmdZIRDg</outgoingEdges>
+    <outgoingEdges>_5E14cBY-Ed-jGLD5OCZpUA</outgoingEdges>
     <incomingEdges>_uuF2QBI8Ed-7Y7NmdZIRDg</incomingEdges>
+    <contextcondition>$beliefbase.dipp1_praemissen_ok</contextcondition>
   </vertices>
   <vertices xsi:type="gpmn:AchieveGoal" id="_6PuGYBI8Ed-7Y7NmdZIRDg" name="DiPP2_Montage_absichern">
     <outgoingEdges>_KWdgcBI9Ed-7Y7NmdZIRDg</outgoingEdges>
@@ -86,21 +81,118 @@
   <vertices xsi:type="gpmn:Plan" id="_IGcloBI9Ed-7Y7NmdZIRDg" description="" name="Dipp2_Montage_absichern" bpmnPlan="jadex/gpmn/examples/dipp/DiPP2_MO_Montage_Absicherung.bpmn">
     <incomingEdges>_KWdgcBI9Ed-7Y7NmdZIRDg</incomingEdges>
   </vertices>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_vCLKYBYiEd-jGLD5OCZpUA" name="Dipp1_LOG_Ladungsträger_abgesichern">
+    <outgoingEdges>_wHudMBYiEd-jGLD5OCZpUA</outgoingEdges>
+    <incomingEdges>_wfNJEBYiEd-jGLD5OCZpUA</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_oDMUIBYkEd-jGLD5OCZpUA" name="Dipp1_LOG_Planunsprämissen_abgeglichen">
+    <outgoingEdges>_pbAboBYkEd-jGLD5OCZpUA</outgoingEdges>
+    <incomingEdges>_wsrScBYkEd-jGLD5OCZpUA</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:PerformGoal" id="_uSeg4BYkEd-jGLD5OCZpUA" name="Dipp1_Logistik_absichern" sequential="true">
+    <outgoingEdges>_wsrScBYkEd-jGLD5OCZpUA</outgoingEdges>
+    <outgoingEdges>_xIoOoBYkEd-jGLD5OCZpUA</outgoingEdges>
+    <incomingEdges>_yrwOQBYkEd-jGLD5OCZpUA</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_uDayYBY-Ed-jGLD5OCZpUA" name="Dipp2_LOG_Planunsprämissen_abgleichen">
+    <outgoingEdges>_GdP8oBZCEd-jGLD5OCZpUA</outgoingEdges>
+    <incomingEdges>_7_pcsBY-Ed-jGLD5OCZpUA</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:PerformGoal" id="_0pjY4BY-Ed-jGLD5OCZpUA" name="Dipp2_Logistik_absichern" sequential="true">
+    <outgoingEdges>_7_pcsBY-Ed-jGLD5OCZpUA</outgoingEdges>
+    <outgoingEdges>_ImtHABZDEd-jGLD5OCZpUA</outgoingEdges>
+    <outgoingEdges>_NQqNUBZGEd-jGLD5OCZpUA</outgoingEdges>
+    <incomingEdges>_5E14cBY-Ed-jGLD5OCZpUA</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:Plan" id="_V_5AkBZBEd-jGLD5OCZpUA" name="Dipp2_LOG_Planunsprämissen_abgleichen" bpmnPlan="jadex/gpmn/examples/dipp/DiPP2_LOG_Planungspraemissen_abgleichen.bpmn">
+    <incomingEdges>_GdP8oBZCEd-jGLD5OCZpUA</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_C012EBZDEd-jGLD5OCZpUA" name="DiPP2_LOG_Ladungstraeger_festlegen">
+    <outgoingEdges>_Q5A7cBZDEd-jGLD5OCZpUA</outgoingEdges>
+    <incomingEdges>_ImtHABZDEd-jGLD5OCZpUA</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:Plan" id="_Opw1oBZDEd-jGLD5OCZpUA" name="DiPP2_LOG_Ladungstraeger_festlegen" bpmnPlan="jadex/gpmn/examples/dipp/DiPP2_LOG_Ladungstraeger_festlegen.bpmn">
+    <incomingEdges>_Q5A7cBZDEd-jGLD5OCZpUA</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_B1pikBZGEd-jGLD5OCZpUA" name="DiPP2_LOG_Logistik_intern_absichern">
+    <outgoingEdges>_w06I8BZGEd-jGLD5OCZpUA</outgoingEdges>
+    <outgoingEdges>_0iBT4BZGEd-jGLD5OCZpUA</outgoingEdges>
+    <incomingEdges>_UXma0BZGEd-jGLD5OCZpUA</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_LFQswBZGEd-jGLD5OCZpUA" name="DiPP2_LOG_Prozesse_absichern" sequential="false">
+    <outgoingEdges>_UXma0BZGEd-jGLD5OCZpUA</outgoingEdges>
+    <outgoingEdges>_z7aIUBchEd-4T9k5IgEFpw</outgoingEdges>
+    <outgoingEdges>_oUE8ABclEd-4T9k5IgEFpw</outgoingEdges>
+    <incomingEdges>_vmOegBcmEd-4T9k5IgEFpw</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:Plan" id="_vU-nQBZGEd-jGLD5OCZpUA" name="DiPP2_LOG_Prozessplanung_absichern" bpmnPlan="jadex/gpmn/examples/dipp/DiPP2_LOG_Prozessplanung_absichern.bpmn" precondition="(($beliefbase.modelmix_br == null) || ($beliefbase.modelmix_br.length == 0))">
+    <incomingEdges>_w06I8BZGEd-jGLD5OCZpUA</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:Plan" id="_zVIqABZGEd-jGLD5OCZpUA" name="DiPP2_LOG_Prozessplanung_ModelMix_absichern" bpmnPlan="jadex/gpmn/examples/dipp/DiPP2_LOG_Prozessplanung_ModelMix_absichern.bpmn" precondition="(($beliefbase.modelmix_br != null) &amp;amp;&amp;amp; ($beliefbase.modelmix_br.length > 0))">
+    <incomingEdges>_0iBT4BZGEd-jGLD5OCZpUA</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_uGJlIBchEd-4T9k5IgEFpw" name="DiPP2_LOG_MOLOG_Integration_abgesichern">
+    <outgoingEdges>_xEtykBciEd-4T9k5IgEFpw</outgoingEdges>
+    <outgoingEdges>_xWdp4BciEd-4T9k5IgEFpw</outgoingEdges>
+    <incomingEdges>_z7aIUBchEd-4T9k5IgEFpw</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:Plan" id="_45H_gBchEd-4T9k5IgEFpw" name="DiPP2_LOG_MOLOG_Integration_absichern" bpmnPlan="jadex/gpmn/examples/dipp/DiPP2_LOG_MOLOG_Integration_absichern.bpmn" precondition="!$beliefbase.edrive_absichern">
+    <incomingEdges>_xEtykBciEd-4T9k5IgEFpw</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:Plan" id="_8uoRcBchEd-4T9k5IgEFpw" name="DiPP2_LOG_MOLOG_Integration_absichern_eDrive" bpmnPlan="jadex/gpmn/examples/dipp/DiPP2_LOG_MOLOG_Integration__eDrive_absichern.bpmn" precondition="$beliefbase.edrive_absichern">
+    <incomingEdges>_xWdp4BciEd-4T9k5IgEFpw</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_mD6QMBclEd-4T9k5IgEFpw" name="DiPP2_LOG_Logistik_extern_absichern">
+    <outgoingEdges>_v8eQwBclEd-4T9k5IgEFpw</outgoingEdges>
+    <incomingEdges>_oUE8ABclEd-4T9k5IgEFpw</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:Plan" id="_p-xjQBclEd-4T9k5IgEFpw" name="DiPP2_LOG_SupplyChain_absichern" bpmnPlan="jadex/gpmn/examples/dipp/DiPP2_LOG_SupplyChain_absichern.bpmn">
+    <incomingEdges>_v8eQwBclEd-4T9k5IgEFpw</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_oLYdkBcmEd-4T9k5IgEFpw" name="DiPP2_LOG_Prozesse_Layout_absichern" sequential="false">
+    <outgoingEdges>_vmOegBcmEd-4T9k5IgEFpw</outgoingEdges>
+    <outgoingEdges>_VxSEUBcnEd-4T9k5IgEFpw</outgoingEdges>
+    <incomingEdges>_NQqNUBZGEd-jGLD5OCZpUA</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_R8LbABcnEd-4T9k5IgEFpw" name="DiPP2_LOG_Layout_absichern">
+    <outgoingEdges>_dgekoBcnEd-4T9k5IgEFpw</outgoingEdges>
+    <incomingEdges>_VxSEUBcnEd-4T9k5IgEFpw</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:Plan" id="_cQuM8BcnEd-4T9k5IgEFpw" name="DiPP2_LOG_Layout_absichern" bpmnPlan="jadex/gpmn/examples/dipp/DiPP2_LOG_Layout_absichern.bpmn">
+    <incomingEdges>_dgekoBcnEd-4T9k5IgEFpw</incomingEdges>
+  </vertices>
   <sequenceEdges xsi:type="gpmn:PlanEdge" id="_NewhcLmFEd6y6pbFUAB2Hw"/>
-  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_jAjZgLmGEd6y6pbFUAB2Hw"/>
-  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_nU91ALmGEd6y6pbFUAB2Hw"/>
   <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_tscUcLmGEd6y6pbFUAB2Hw"/>
   <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_0YYA8LmGEd6y6pbFUAB2Hw"/>
   <sequenceEdges xsi:type="gpmn:PlanEdge" id="__zCtcLmGEd6y6pbFUAB2Hw"/>
   <sequenceEdges xsi:type="gpmn:PlanEdge" id="_AqqR8LmHEd6y6pbFUAB2Hw"/>
-  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_dOXJ4BGVEd-iAJhQaWu0kA"/>
-  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_Srb2UBGYEd-iAJhQaWu0kA"/>
-  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_TOTS0BGYEd-iAJhQaWu0kA" sequentialOrder="1"/>
   <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_QW-QoBGpEd-iAJhQaWu0kA"/>
-  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_2AWQQBGqEd-iAJhQaWu0kA"/>
   <sequenceEdges xsi:type="gpmn:PlanEdge" id="_AyEtcBGrEd-iAJhQaWu0kA"/>
   <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_HoLcoBI6Ed-7Y7NmdZIRDg"/>
   <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_uuF2QBI8Ed-7Y7NmdZIRDg" sequentialOrder="1"/>
   <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_87LAABI8Ed-7Y7NmdZIRDg"/>
   <sequenceEdges xsi:type="gpmn:PlanEdge" id="_KWdgcBI9Ed-7Y7NmdZIRDg"/>
+  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_wHudMBYiEd-jGLD5OCZpUA"/>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_wfNJEBYiEd-jGLD5OCZpUA"/>
+  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_pbAboBYkEd-jGLD5OCZpUA"/>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_wsrScBYkEd-jGLD5OCZpUA"/>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_xIoOoBYkEd-jGLD5OCZpUA" sequentialOrder="1"/>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_yrwOQBYkEd-jGLD5OCZpUA"/>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_5E14cBY-Ed-jGLD5OCZpUA"/>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_7_pcsBY-Ed-jGLD5OCZpUA"/>
+  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_GdP8oBZCEd-jGLD5OCZpUA"/>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_ImtHABZDEd-jGLD5OCZpUA" sequentialOrder="1"/>
+  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_Q5A7cBZDEd-jGLD5OCZpUA"/>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_NQqNUBZGEd-jGLD5OCZpUA" sequentialOrder="2"/>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_UXma0BZGEd-jGLD5OCZpUA"/>
+  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_w06I8BZGEd-jGLD5OCZpUA"/>
+  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_0iBT4BZGEd-jGLD5OCZpUA"/>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_z7aIUBchEd-4T9k5IgEFpw"/>
+  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_xEtykBciEd-4T9k5IgEFpw"/>
+  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_xWdp4BciEd-4T9k5IgEFpw"/>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_oUE8ABclEd-4T9k5IgEFpw"/>
+  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_v8eQwBclEd-4T9k5IgEFpw"/>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_vmOegBcmEd-4T9k5IgEFpw"/>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_VxSEUBcnEd-4T9k5IgEFpw"/>
+  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_dgekoBcnEd-4T9k5IgEFpw"/>
 </gpmn:GpmnDiagram>

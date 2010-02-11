@@ -50,15 +50,6 @@
     <element xmi:type="bpmn:Pool" href="DiPP1_LOG_Lieferantenstandort_pruefen.bpmn#_5u7rZ3eaEd6uv6EsxGS0Yg"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5u7rdXeaEd6uv6EsxGS0Yg" x="16" y="16" width="1500" height="200"/>
   </children>
-  <children xmi:type="notation:Node" xmi:id="_lxVfEnebEd6uv6EsxGS0Yg" type="1002">
-    <children xmi:type="notation:Node" xmi:id="_lxVfGHebEd6uv6EsxGS0Yg" type="4009"/>
-    <styles xmi:type="notation:FontStyle" xmi:id="_lxVfE3ebEd6uv6EsxGS0Yg" fontName="Arial"/>
-    <styles xmi:type="notation:DescriptionStyle" xmi:id="_lxVfFHebEd6uv6EsxGS0Yg"/>
-    <styles xmi:type="notation:FillStyle" xmi:id="_lxVfFXebEd6uv6EsxGS0Yg"/>
-    <styles xmi:type="notation:LineStyle" xmi:id="_lxVfFnebEd6uv6EsxGS0Yg" lineColor="0"/>
-    <element xmi:type="bpmn:TextAnnotation" href="DiPP1_LOG_Lieferantenstandort_pruefen.bpmn#_lxVfEXebEd6uv6EsxGS0Yg"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_lxVfF3ebEd6uv6EsxGS0Yg" x="16" y="227"/>
-  </children>
   <styles xmi:type="notation:PageStyle" xmi:id="_5u7rY3eaEd6uv6EsxGS0Yg"/>
   <styles xmi:type="notation:GuideStyle" xmi:id="_5u7rZHeaEd6uv6EsxGS0Yg"/>
   <styles xmi:type="notation:DescriptionStyle" xmi:id="_5u7rZXeaEd6uv6EsxGS0Yg"/>
@@ -86,12 +77,5 @@
     <styles xmi:type="notation:LineStyle" xmi:id="_YhwfbnebEd6uv6EsxGS0Yg" lineColor="0"/>
     <element xmi:type="bpmn:SequenceEdge" href="DiPP1_LOG_Lieferantenstandort_pruefen.bpmn#_YhwfanebEd6uv6EsxGS0Yg"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Yhwfb3ebEd6uv6EsxGS0Yg" points="[2, 1, -185, -99]$[134, 72, -53, -28]"/>
-  </edges>
-  <edges xmi:type="notation:Edge" xmi:id="_lxVfGnebEd6uv6EsxGS0Yg" type="3003" source="_lxVfEnebEd6uv6EsxGS0Yg" target="_5u7raneaEd6uv6EsxGS0Yg">
-    <styles xmi:type="notation:RoutingStyle" xmi:id="_lxVfG3ebEd6uv6EsxGS0Yg"/>
-    <styles xmi:type="notation:FontStyle" xmi:id="_lxVfHHebEd6uv6EsxGS0Yg" fontName="Arial"/>
-    <styles xmi:type="notation:LineStyle" xmi:id="_lxVfHXebEd6uv6EsxGS0Yg" lineColor="0"/>
-    <element xmi:type="bpmn:Association" href="DiPP1_LOG_Lieferantenstandort_pruefen.bpmn#_lxVfGXebEd6uv6EsxGS0Yg"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_lxVfHnebEd6uv6EsxGS0Yg" points="[0, 0, -766, -116]$[105, 16, -661, -100]"/>
   </edges>
 </notation:Diagram>

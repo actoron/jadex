@@ -2,12 +2,8 @@ package jadex.wfms.client;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-
-import jadex.commons.concurrent.IResultListener;
 
 /**
  * A client workitem.
@@ -70,6 +66,11 @@ public class Workitem implements IWorkitem, IClientActivity
 	public String getName()
 	{
 		return name;
+	}
+	
+	public static String beautifyParameterName(String parameterName)
+	{
+		return parameterName.replaceAll("_", " ");
 	}
 	
 	/**

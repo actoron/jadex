@@ -1,5 +1,6 @@
 package jadex.wfms.bdi.client.standard.parametergui;
 
+import jadex.wfms.bdi.client.standard.SGuiHelper;
 import jadex.wfms.parametertypes.Text;
 
 import java.awt.Dimension;
@@ -24,8 +25,9 @@ public class TextParameterPanel extends AbstractParameterPanel
 		if (parameterValue == null)
 			parameterValue = new Text();
 		
-		if (!Boolean.FALSE.equals(guiProperties.get("border")))
-			setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), ActivityComponent.beautifyParameterName(parameterName)));
+		if (((!readOnly) && (!Boolean.FALSE.equals(guiProperties.get("border")))) ||
+			((readOnly) && (Boolean.TRUE.equals("border"))))
+			setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), SGuiHelper.beautifyName(parameterName)));
 		
 		GridBagConstraints g = new GridBagConstraints();
 		g.gridx = 0;

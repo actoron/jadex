@@ -1,5 +1,6 @@
 package jadex.wfms.bdi.client.standard.parametergui;
 
+import jadex.wfms.bdi.client.standard.SGuiHelper;
 import jadex.wfms.client.IClientActivity;
 
 import java.awt.GridBagConstraints;
@@ -76,11 +77,6 @@ public class ActivityComponent extends JScrollPane
 		addParameterPanels();
 		
 		addButtons();
-	}
-	
-	public static String beautifyParameterName(String parameterName)
-	{
-		return parameterName.replaceAll("_", " ");
 	}
 	
 	public IClientActivity getActivity()
@@ -168,7 +164,7 @@ public class ActivityComponent extends JScrollPane
 			JLabel parameterLabel = null;
 			if (panel.requiresLabel())
 			{
-				parameterLabel = new JLabel(beautifyParameterName(name));
+				parameterLabel = new JLabel(SGuiHelper.beautifyName(name));
 				parameterLabel.setBorder(new EmptyBorder(new Insets(0, 0, 0, 20)));
 			}
 			

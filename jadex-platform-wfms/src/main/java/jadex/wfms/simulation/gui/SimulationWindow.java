@@ -7,7 +7,6 @@ import jadex.commons.collection.TreeNode;
 import jadex.gpmn.model.MGpmnModel;
 import jadex.wfms.simulation.ClientProcessMetaModel;
 import jadex.wfms.simulation.ModelTreeNode;
-import jadex.wfms.simulation.SimLauncher;
 import jadex.wfms.simulation.stateholder.IParameterStateSet;
 import jadex.wfms.simulation.stateholder.gui.IStatePanel;
 import jadex.wfms.simulation.stateholder.gui.StatePanelFactory;
@@ -371,7 +370,7 @@ public class SimulationWindow extends JFrame
 	
 	private static final ImageIcon createImageIcon(String path)
 	{
-		URL imgURL = SimLauncher.class.getResource(path);
+		URL imgURL = SimulationWindow.class.getResource(path);
 		if (imgURL != null)
 			try
 			{

@@ -523,7 +523,7 @@ public class StandardClientApplication
 				else if (mainSplitPane.getRightComponent() instanceof JTabbedPane)
 				{
 					JTabbedPane tabPane = (JTabbedPane) mainSplitPane.getRightComponent();
-					tabPane.add(ac, ac.getActivity().getName());
+					tabPane.add(ac, SGuiHelper.beautifyName(ac.getActivity().getName()));
 					tabPane.setSelectedComponent(ac);
 				}
 			}

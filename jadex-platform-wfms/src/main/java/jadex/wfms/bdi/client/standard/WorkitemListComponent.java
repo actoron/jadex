@@ -62,7 +62,7 @@ public class WorkitemListComponent extends JPanel
 					int row, int column)
 			{
 				if (value instanceof IWorkitem)
-					return super.getTableCellRendererComponent(table, ((IWorkitem) value).getName(), isSelected, hasFocus, row, column);
+					return super.getTableCellRendererComponent(table, SGuiHelper.beautifyName(((IWorkitem) value).getName()), isSelected, hasFocus, row, column);
 				return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 			}
 		});

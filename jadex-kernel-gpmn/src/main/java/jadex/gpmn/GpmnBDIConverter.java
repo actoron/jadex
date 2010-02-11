@@ -14,6 +14,7 @@ import jadex.gpmn.model.MGoal;
 import jadex.gpmn.model.MGpmnModel;
 import jadex.gpmn.model.MMaintainGoal;
 import jadex.gpmn.model.MParameter;
+import jadex.gpmn.model.MPerformGoal;
 import jadex.gpmn.model.MPlan;
 import jadex.gpmn.model.MProcess;
 import jadex.gpmn.model.MProcessElement;
@@ -196,7 +197,8 @@ public class GpmnBDIConverter
 			{
 				MGoal goal = (MGoal)goals.get(i);
 				OAVObjectType goaltype = goal instanceof MAchieveGoal? OAVBDIMetaModel.achievegoal_type: 
-					goal instanceof MMaintainGoal? OAVBDIMetaModel.maintaingoal_type: null;
+					goal instanceof MMaintainGoal? OAVBDIMetaModel.maintaingoal_type:
+					goal instanceof MPerformGoal? OAVBDIMetaModel.performgoal_type: null;
 				Object goalhandle = createGoal(state, scopehandle, goal.getName(), goaltype, goal.getRetry(), 
 					goal.getRetryDelay(), goal.getRecur(), goal.getRecurDelay(), goal.getExcludeMode(), 
 					goal.getRetry(), goal.getUnique(), goal.getCreationCondition(), goal.getContextCondition(), 
@@ -433,6 +435,14 @@ public class GpmnBDIConverter
 			{
 				planhandle = it.next();
 				postProcessParameterElement(state, scopehandle, planhandle, expost, clpost, classloader);
+				
+				Object condhandle = state.getAttributeValue(planhandle, OAVBDIMetaModel.plan_has_precondition);
+				if(condhandle!=null)
+					expost.postProcess(state, condhandle, scopehandle, classloader);
+				
+				condhandle = state.getAttributeValue(planhandle, OAVBDIMetaModel.plan_has_contextcondition);
+				if(condhandle!=null)
+					expost.postProcess(state, condhandle, scopehandle, classloader);
 			}
 		}
 	}
@@ -564,10 +574,12 @@ public class GpmnBDIConverter
 		
 		if(precond!=null)
 		{
-			Object condhandle = state.createObject(OAVBDIMetaModel.condition_type);
+			// TODO: HACK!! Braindead attribute xml-encoding
+			precond = precond.replaceAll("&amp;", "&");
+			Object condhandle = state.createObject(OAVBDIMetaModel.expression_type);
 			state.setAttributeValue(planhandle, OAVBDIMetaModel.plan_has_precondition, condhandle);
 			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, precond);
-			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "jcl");
+			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_language, "java");
 		}
 		
 		if(contextcond!=null)

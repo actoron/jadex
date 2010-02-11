@@ -10,6 +10,7 @@ import jadex.gpmn.model.MContext;
 import jadex.gpmn.model.MGpmnModel;
 import jadex.gpmn.model.MMaintainGoal;
 import jadex.gpmn.model.MParameter;
+import jadex.gpmn.model.MPerformGoal;
 import jadex.gpmn.model.MPlan;
 import jadex.gpmn.model.MProcess;
 import jadex.gpmn.model.MProcessElement;
@@ -187,6 +188,25 @@ public class GpmnXMLReader
 			new SubobjectInfo(new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")),
 			})));
 		
+		types.add(new TypeInfo(new XMLInfo("vertices", new IFilter()
+		{
+			public boolean filter(Object obj)
+			{
+				String type = (String)((Map)obj).get("type");
+				return type.endsWith("PerformGoal");
+			}
+		}), 
+		new ObjectInfo(MPerformGoal.class, new ProcessElementPostProcessor()),
+		new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"), new BeanAttributeInfo("exclude", "excludeMode")},
+		new SubobjectInfo[]{
+		new SubobjectInfo(new BeanAttributeInfo("creationcondition", "creationCondition")),
+		new SubobjectInfo(new BeanAttributeInfo("contextcondition", "contextCondition")),
+		new SubobjectInfo(new BeanAttributeInfo("dropcondition", "dropCondition")),
+//		new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge"))
+		new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
+		new SubobjectInfo(new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")),
+		})));
+		
 		types.add(new TypeInfo(new XMLInfo("vertices", 
 			new IFilter()
 			{
@@ -197,10 +217,10 @@ public class GpmnXMLReader
 				}
 			}),
 			new ObjectInfo(MPlan.class, new ProcessElementPostProcessor()),
-			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")},
+			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"),
+														  new BeanAttributeInfo("precondition", "preCondition"),
+														  new BeanAttributeInfo("contextcondition", "contextCondition")},
 			new SubobjectInfo[]{
-					new SubobjectInfo(new BeanAttributeInfo("precondition", "preCondition")),
-					new SubobjectInfo(new BeanAttributeInfo("contextcondition", "contextCondition")),
 //			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge")),
 			new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
 			new SubobjectInfo(new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")),
