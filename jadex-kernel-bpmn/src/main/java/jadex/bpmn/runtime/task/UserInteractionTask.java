@@ -175,4 +175,18 @@ public class UserInteractionTask implements ITask
 			}
 		});
 	}
+	
+	//-------- static methods --------
+	
+	/**
+	 *  Get the meta information about the agent.
+	 */
+	public static TaskMetaInfo getMetaInfo()
+	{
+		String desc = "The user interaction task can be used for fetching in parameter values " +
+			"via an interactive user interface dialog. The task automatically uses all declared" +
+			"in parameters.";
+		
+		return new TaskMetaInfo(desc, null); 
+	}
 }

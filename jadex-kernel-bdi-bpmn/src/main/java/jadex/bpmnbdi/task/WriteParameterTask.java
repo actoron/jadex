@@ -3,6 +3,8 @@ package jadex.bpmnbdi.task;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
+import jadex.bpmn.runtime.task.ParameterMetaInfo;
+import jadex.bpmn.runtime.task.TaskMetaInfo;
 import jadex.bpmnbdi.BpmnPlanBodyInstance;
 
 /**
@@ -66,5 +68,27 @@ public class WriteParameterTask extends AbstractTask
 		{
 			throw new RuntimeException("Parameter(set)name no specified: "+context);
 		}
+	}
+	
+	//-------- static methods --------
+	
+	/**
+	 *  Get the meta information about the agent.
+	 */
+	public static TaskMetaInfo getMetaInfo()
+	{
+		String desc = "The write parameter task can be used for setting a value to a parameter or" +
+			"for adding/removing a value to/from a parameterset.";
+		
+		ParameterMetaInfo paramnamnmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			String.class, "parametername", null, "The parametername parameter identifies the parameter.");
+		ParameterMetaInfo paramsetnamemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			String.class, "parametersetname", null, "The parametersetname parameter identifies the parameterset.");
+		ParameterMetaInfo valuemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			Object.class, "value", null, "The value parameter identifies the value to set/add/remove.");
+		ParameterMetaInfo modemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			String.class, "mode", null, "The mode parameter identifies the parameterset mode (add, remove, or remove all).");
+
+		return new TaskMetaInfo(desc, new ParameterMetaInfo[]{paramnamnmi, paramsetnamemi, valuemi, modemi}); 
 	}
 }

@@ -7,6 +7,8 @@ import jadex.bdi.runtime.IGoalListener;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.bpmn.runtime.task.ParameterMetaInfo;
+import jadex.bpmn.runtime.task.TaskMetaInfo;
 import jadex.commons.concurrent.IResultListener;
 
 /**
@@ -62,5 +64,20 @@ public class WaitForGoalTask	implements ITask
 		{
 			listener.exceptionOccurred(this, e);
 		}
+	}
+	
+	//-------- static methods --------
+	
+	/**
+	 *  Get the meta information about the agent.
+	 */
+	public static TaskMetaInfo getMetaInfo()
+	{
+		String desc = "The wait for goal task can be used to wait for an existing goal.";
+		
+		ParameterMetaInfo goalmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			IGoal.class, "goal", null, "The goal parameter identifies the goal to be waited for.");
+
+		return new TaskMetaInfo(desc, new ParameterMetaInfo[]{goalmi}); 
 	}
 }

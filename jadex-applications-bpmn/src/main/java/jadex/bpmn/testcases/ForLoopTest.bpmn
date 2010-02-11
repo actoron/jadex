@@ -10,7 +10,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_MkR4oRDZEd-hjJU8_9Katg" iD="_MkR4oBDZEd-hjJU8_9Katg" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_MkR4oxDZEd-hjJU8_9Katg" iD="_MkR4ohDZEd-hjJU8_9Katg" outgoingEdges="_d1OQchDjEd-hjJU8_9Katg" incomingEdges="_R0Tn0RDZEd-hjJU8_9Katg _fYdk0RDjEd-hjJU8_9Katg" name="Count" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_nPW0IBDZEd-hjJU8_9Katg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nPW0IRDZEd-hjJU8_9Katg" key="class" value="PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nPW0IRDZEd-hjJU8_9Katg" key="class" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oqtX0BDZEd-hjJU8_9Katg" key="parameters" value="inout␋cnt␋int␋!$thread.hasParameterValue(&quot;cnt&quot;)? 0: cnt+1␟inout␋i␋String␋0␟in␋text␋String␋&quot;&quot;+cnt"/>
       </eAnnotations>
     </vertices>
@@ -18,7 +18,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_d1EfcRDjEd-hjJU8_9Katg" iD="_d1EfcBDjEd-hjJU8_9Katg" outgoingEdges="_fYdk0RDjEd-hjJU8_9Katg _r_9Q0RDjEd-hjJU8_9Katg" incomingEdges="_d1OQchDjEd-hjJU8_9Katg" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_r_zf0RDjEd-hjJU8_9Katg" iD="_r_zf0BDjEd-hjJU8_9Katg" incomingEdges="_IcnCMRDlEd-qQOr2ZLx-Mw" name="Finished" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_t3dlABDjEd-hjJU8_9Katg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_t3dlARDjEd-hjJU8_9Katg" key="class" value="PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_t3dlARDjEd-hjJU8_9Katg" key="class" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_viwCIBDjEd-hjJU8_9Katg" key="parameters" value="in␋text␋String␋&quot;Succeeded&quot;"/>
       </eAnnotations>
     </vertices>
@@ -38,7 +38,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_xGKg8RF4Ed-qQOr2ZLx-Mw" iD="_xGKg8BF4Ed-qQOr2ZLx-Mw" incomingEdges="_gBYeoRDmEd-qQOr2ZLx-Mw" name="Finished">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2v0REBF4Ed-qQOr2ZLx-Mw" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2v0RERF4Ed-qQOr2ZLx-Mw" key="parameters" value="in␋text␋String␋&quot;failure&quot;"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yr-LsBF5Ed-qQOr2ZLx-Mw" key="class" value="PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yr-LsBF5Ed-qQOr2ZLx-Mw" key="class" value=""/>
       </eAnnotations>
     </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_R0Tn0RDZEd-hjJU8_9Katg" iD="_R0Tn0BDZEd-hjJU8_9Katg"/>

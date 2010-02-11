@@ -10,7 +10,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_V9uhoxV2Ed-yC473XtaJZQ" iD="_V9uhohV2Ed-yC473XtaJZQ" outgoingEdges="_mdPj4RV9Ed-yC473XtaJZQ" incomingEdges="_YXpmYRV2Ed-yC473XtaJZQ" name="Start subworkflow &#xD;&#xA;and wait for result" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Z-6fIBV2Ed-yC473XtaJZQ" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z-6fIRV2Ed-yC473XtaJZQ" key="class" value="jadex.bpmn.runtime.task.CreateComponentTask.class"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_M-uXkBV8Ed-yC473XtaJZQ" key="parameters" value="in␋model␋String␋&quot;jadex/bpmn/examples/execute/Result.bpmn&quot;␟in␋subcomponent␋boolean␋true␟out␋taskresult␋String␋␟in␋resultmapping␋String[]␋new String[]{&quot;out&quot;, &quot;taskresult&quot;}␟in␋in␋String␋&quot;my_result&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_M-uXkBV8Ed-yC473XtaJZQ" key="parameters" value="in␋model␋String␋&quot;jadex/bpmn/testcases/Result.bpmn&quot;␟in␋subcomponent␋boolean␋true␟out␋taskresult␋String␋␟in␋resultmapping␋String[]␋new String[]{&quot;out&quot;, &quot;taskresult&quot;}␟in␋in␋String␋&quot;my_result&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_Xr1pQRV2Ed-yC473XtaJZQ" iD="_Xr1pQBV2Ed-yC473XtaJZQ" outgoingEdges="_YXpmYRV2Ed-yC473XtaJZQ" activityType="EventStartEmpty"/>

@@ -4,6 +4,8 @@ import jadex.bdi.runtime.IInternalEvent;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
+import jadex.bpmn.runtime.task.ParameterMetaInfo;
+import jadex.bpmn.runtime.task.TaskMetaInfo;
 import jadex.bpmnbdi.BpmnPlanBodyInstance;
 
 import java.util.Iterator;
@@ -12,7 +14,7 @@ import java.util.Map;
 /**
  *  Dispatch an internal event task.
  */
-public class InternalEventTask	extends AbstractTask
+public class DispatchInternalEventTask	extends AbstractTask
 {
 	/**
 	 *  Execute the task.
@@ -38,6 +40,23 @@ public class InternalEventTask	extends AbstractTask
 		}
 		
 		plan.dispatchInternalEvent(event);
+	}
+	
+	//-------- static methods --------
+	
+	/**
+	 *  Get the meta information about the agent.
+	 */
+	public static TaskMetaInfo getMetaInfo()
+	{
+		String desc = "The dispatch internal event task can be used for dipatching an internal event.";
+		
+		ParameterMetaInfo typemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			String.class, "type", null, "The type parameter identifies the user goal type.");
+		ParameterMetaInfo paramsmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			Map.class, "parameters", null, "The 'parameter' parameter allows to specify the goal parameters.");
+
+		return new TaskMetaInfo(desc, new ParameterMetaInfo[]{typemi, paramsmi}); 
 	}
 }
 

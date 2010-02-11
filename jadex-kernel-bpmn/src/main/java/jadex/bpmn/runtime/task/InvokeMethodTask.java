@@ -21,7 +21,7 @@ public class InvokeMethodTask extends AbstractTask
 	public void doExecute(ITaskContext context, BpmnInterpreter instance)
 	{
 		Object object = context.hasParameterValue("object")? context.getParameterValue("object"): null;
-		Class clazz = context.hasParameterValue("clazz")? (Class)context.getParameterValue("clazz"): object.getClass();
+		Class clazz = context.hasParameterValue("class")? (Class)context.getParameterValue("class"): object.getClass();
 		String methodname = (String)context.getParameterValue("methodname");
 		String returnname = context.hasParameterValue("returnname")? (String)context.getParameterValue("returnname"): null;
 		
@@ -58,6 +58,34 @@ public class InvokeMethodTask extends AbstractTask
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	//-------- static methods --------
+	
+	/**
+	 *  Get the meta information about the agent.
+	 */
+	public static TaskMetaInfo getMetaInfo()
+	{
+		String desc = "The invoke method task can be used to invoke a mathod on an object or a" +
+			"static method on a class. It accepts any number of parameters and may store the result" +
+			"in a specific parameter.";
+		ParameterMetaInfo objectmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			Object.class, "object", null, "The object parameter identifies the object the method should be called on.");
+		ParameterMetaInfo classmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			Class.class, "class", null, "The class parameter identifies the class the method should be called on (alternativly to object).");
+		ParameterMetaInfo methodnamemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			String.class, "methodname", null, "The methodname parameter identifies the method to be called.");
 		
+		ParameterMetaInfo parammi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			Object.class, "param", null, "The param parameter stores the value for an input parameter of the methodcall.");
+		ParameterMetaInfo paramsmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			Object.class, "param0[..n]", null, "The param0[..n] parameter(s) stores the value(s) for input parameter(s) of the methodcall.");
+
+		ParameterMetaInfo retmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			String.class, "returnname", null, "The returnname parameter identifies the result task parameter for storing the result of the call.");
+
+		
+		return new TaskMetaInfo(desc, new ParameterMetaInfo[]{objectmi, classmi, methodnamemi, parammi, paramsmi, retmi}); 
 	}
 }

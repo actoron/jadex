@@ -1,8 +1,12 @@
 package jadex.bpmnbdi.task;
 
+import java.util.Map;
+
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.AbstractTask;
+import jadex.bpmn.runtime.task.ParameterMetaInfo;
+import jadex.bpmn.runtime.task.TaskMetaInfo;
 import jadex.bpmnbdi.BpmnPlanBodyInstance;
 
 /**
@@ -66,5 +70,27 @@ public class WriteBeliefTask extends AbstractTask
 		{
 			throw new RuntimeException("Belief(set)name no specified: "+context);
 		}
+	}
+	
+	//-------- static methods --------
+	
+	/**
+	 *  Get the meta information about the agent.
+	 */
+	public static TaskMetaInfo getMetaInfo()
+	{
+		String desc = "The write belief task can be used for setting a value to a belief or" +
+			"for adding/removing a value to/from a beliefset.";
+		
+		ParameterMetaInfo belnamemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			String.class, "beliefname", null, "The beliefname parameter identifies the belief.");
+		ParameterMetaInfo belsetnamemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			String.class, "beliefsetname", null, "The beliefsetname parameter identifies the beliefset.");
+		ParameterMetaInfo valuemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			Object.class, "value", null, "The value parameter identifies the value to set/add/remove.");
+		ParameterMetaInfo modemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
+			String.class, "mode", null, "The mode parameter identifies the beliefset mode (add, remove, or remove all).");
+
+		return new TaskMetaInfo(desc, new ParameterMetaInfo[]{belnamemi, belsetnamemi, valuemi, modemi}); 
 	}
 }

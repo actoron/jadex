@@ -177,7 +177,7 @@ public class JadexUserTaskImplComboSection extends
 		Layout sectionLayout = sectionComposite.getLayout();
 		
 		//taskMetaInfoLabel = getWidgetFactory().createCLabel(sectionComposite, "test", SWT.WRAP | SWT.MULTI );
-		taskMetaInfoText = getWidgetFactory().createText(sectionComposite, "test", SWT.READ_ONLY | SWT.MULTI | SWT.V_SCROLL );
+		taskMetaInfoText = getWidgetFactory().createText(sectionComposite, "", SWT.READ_ONLY | SWT.MULTI | SWT.V_SCROLL );
 		
 		if (sectionLayout instanceof GridLayout)
 		{
