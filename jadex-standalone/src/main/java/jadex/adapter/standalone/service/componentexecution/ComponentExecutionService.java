@@ -276,9 +276,10 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 			synchronized(descs)
 			{
 				// Kill subcomponents
-				for(Iterator it=children.getCollection(cid).iterator(); it.hasNext(); )
+				Object[]	achildren	= children.getCollection(cid).toArray();	// Use copy as children may change on destroy.
+				for(int i=0; i<achildren.length; i++)
 				{
-					destroyComponent((IComponentIdentifier)it.next(), null);	// todo: cascading delete with wait.
+					destroyComponent((IComponentIdentifier)achildren[i], null);	// todo: cascading delete with wait.
 				}
 				
 //				System.out.println("killing: "+cid);

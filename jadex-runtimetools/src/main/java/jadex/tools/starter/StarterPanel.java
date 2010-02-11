@@ -2,6 +2,7 @@ package jadex.tools.starter;
 
 import jadex.adapter.base.SComponentFactory;
 import jadex.bridge.IArgument;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IReport;
 import jadex.commons.FixedJComboBox;
@@ -15,10 +16,12 @@ import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.service.library.ILibraryService;
+import jadex.tools.common.AgentSelectorDialog;
 import jadex.tools.common.ElementPanel;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.JValidatorTextField;
 import jadex.tools.common.ParserValidator;
+import jadex.tools.jcc.AgentControlCenter;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -56,7 +59,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
- * The starter gui allows for starting agents platform independently.
+ * The starter gui allows for starting components platform independently.
  */
 public class StarterPanel extends JPanel
 {
@@ -66,6 +69,7 @@ public class StarterPanel extends JPanel
 	protected static UIDefaults	icons	= new UIDefaults(new Object[]
 	{
 		"Browse", SGUI.makeIcon(StarterPanel.class,	"/jadex/tools/common/images/dots_small.png"),
+		"delete", SGUI.makeIcon(StarterPanel.class,	"/jadex/tools/common/images/delete_small.png")
 	});
 
 	//-------- attributes --------
@@ -75,6 +79,9 @@ public class StarterPanel extends JPanel
 
 	/** The last loaded filename. */
 	protected String lastfile;
+
+	/** The selected parent (if any). */
+	protected IComponentIdentifier	parent;
 
 	//-------- gui widgets --------
 
@@ -90,9 +97,10 @@ public class StarterPanel extends JPanel
 	/** The suspend mode. */
 	protected JCheckBox suspend;
 
-	/** The agent type. */
+	/** The component type. */
 	protected JTextField componentname;
 	protected JLabel componentnamel;
+	protected JTextField parenttf;
 
 //	/** The application name. */
 //	protected JComboBox appname;
@@ -100,17 +108,17 @@ public class StarterPanel extends JPanel
 //	protected DefaultComboBoxModel appmodel;
 	
 	protected JLabel confl;
-	protected JLabel confdummy = new JLabel("Configuration"); // Hack! only for reading sizes
+	protected JLabel confdummy = new JLabel("Component Name"); // Hack! only for reading sizes
 	protected JLabel filenamel;
 	
-	/** The agent name generator flag. */
+	/** The component name generator flag. */
 	protected JCheckBox genname;
 
-	/** The agent arguments. */
+	/** The component arguments. */
 	protected JPanel arguments;
 	protected List argelems;
 	
-	/** The agent results. */
+	/** The component results. */
 	protected JPanel results;
 	protected List reselems;
 	protected JCheckBox storeresults;
@@ -123,7 +131,7 @@ public class StarterPanel extends JPanel
 	/** The description panel. */
 	protected ElementPanel modeldesc;
 
-	/** The agent specific panel. */
+	/** The component specific panel. */
 	protected JPanel componentpanel;
 	
 //	/** The application specific panel. */
@@ -132,8 +140,8 @@ public class StarterPanel extends JPanel
 	/** The starter plugin. */
 	protected StarterPlugin	starter;
 
-	/** The spinner for the number of agents to start. */
-	protected JSpinner numagents;
+	/** The spinner for the number of components to start. */
+	protected JSpinner numcomponents;
 	
 	//-------- constructors --------
 
@@ -171,7 +179,7 @@ public class StarterPanel extends JPanel
 //				{
 //					String name = f.getName();
 ////					return f.isDirectory() || name.endsWith(SXML.FILE_EXTENSION_AGENT) || name.endsWith(SXML.FILE_EXTENSION_CAPABILITY);
-////					boolean	ret	= f.isDirectory() || agentfactory.isLoadable(name) || appfactory.isLoadable(name);
+////					boolean	ret	= f.isDirectory() || componentfactory.isLoadable(name) || appfactory.isLoadable(name);
 //					boolean	ret	= f.isDirectory() || SComponentFactory.isLoadable(starter.getJCC().getServiceContainer(), name);
 //
 ////					Thread.currentThread().setContextClassLoader(oldcl);
@@ -276,7 +284,7 @@ public class StarterPanel extends JPanel
 		suspend = new JCheckBox("Start suspended");
 		suspend.setToolTipText("Start in suspended mode");
 
-		// The agent name.
+		// The component name.
 		componentname = new JTextField();
 		
 //		// The application name.
@@ -302,7 +310,7 @@ public class StarterPanel extends JPanel
 //		}
 //		appname = new JComboBox();
 
-		// The generate flag for the agentname;
+		// The generate flag for the componentname;
 		genname = new JCheckBox("Auto generate", false);
 		genname.setToolTipText("Auto generate the component instance name");
 		genname.addActionListener(new ActionListener()
@@ -310,12 +318,12 @@ public class StarterPanel extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				componentname.setEditable(!genname.isSelected());
-				numagents.setEnabled(genname.isSelected());
+				numcomponents.setEnabled(genname.isSelected());
 			}
 		});
 		
-		numagents = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
-		((JSpinner.DefaultEditor)numagents.getEditor()).getTextField().setColumns(4);
+		numcomponents = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
+		((JSpinner.DefaultEditor)numcomponents.getEditor()).getTextField().setColumns(4);
 		
 		// The arguments.
 		arguments = new JPanel(new GridBagLayout());
@@ -381,7 +389,7 @@ public class StarterPanel extends JPanel
 					{
 //						if(model instanceof ApplicationModel)
 //						{
-////							IApplicationFactory fac = starter.getJCC().getAgent().getPlatform().getApplicationFactory();
+////							IApplicationFactory fac = starter.getJCC().getComponent().getPlatform().getApplicationFactory();
 //							try
 //							{
 //								SComponentFactory.createApplication(starter.getJCC().getServiceContainer(), (String)appname.getSelectedItem(), filename.getText(), configname, args);
@@ -405,13 +413,13 @@ public class StarterPanel extends JPanel
 //									ac = (IApplicationContext)cs.getContext(apn);
 //								}
 //							}	
-							String typename = /*ac!=null? ac.getAgentType(filename.getText()):*/ filename.getText();
+							String typename = /*ac!=null? ac.getComponentType(filename.getText()):*/ filename.getText();
 							final String fullname = model.getPackage()+"."+model.getName();
 //							if(typename==null)
 //							{
-//								JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), "Could not resolve agent type: "
+//								JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), "Could not resolve component type: "
 //									+filename.getText()+"\n in application: "+ac.getName(), 
-//									"Agent Type Problem", JOptionPane.INFORMATION_MESSAGE);
+//									"Component Type Problem", JOptionPane.INFORMATION_MESSAGE);
 //							}
 //							else
 							{
@@ -450,12 +458,12 @@ public class StarterPanel extends JPanel
 								String an = genname.isSelected()?  null: componentname.getText();
 								if(an==null) // i.e. name auto generate
 								{
-									int max = ((Integer)numagents.getValue()).intValue();
+									int max = ((Integer)numcomponents.getValue()).intValue();
 									for(int i=0; i<max; i++)
 									{
 //										if(ac!=null)
 //										{
-//											ac.createAgent(an, typename, configname, args, suspend.isSelected(), false, null, null);
+//											ac.createComponent(an, typename, configname, args, suspend.isSelected(), false, null, null);
 //										}
 //										else
 										{
@@ -467,7 +475,7 @@ public class StarterPanel extends JPanel
 								{
 //									if(ac!=null)
 //									{
-//										ac.createAgent(an, typename, configname, args, suspend.isSelected(), false, null, null);
+//										ac.createComponent(an, typename, configname, args, suspend.isSelected(), false, null, null);
 //									}
 //									else
 									{
@@ -521,18 +529,54 @@ public class StarterPanel extends JPanel
 		int y = 0;
 	
 		componentpanel = new JPanel(new GridBagLayout());
-		componentnamel = new JLabel("Agent name");
+		componentnamel = new JLabel("Component name");
 		componentpanel.add(componentnamel, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.WEST,
 			GridBagConstraints.BOTH, new Insets(0, 0, 0, 2), 0, 0));
 		JPanel tmp = new JPanel(new BorderLayout());
 		tmp.add(componentname, BorderLayout.CENTER);
 		JPanel tmp2 = new JPanel(new BorderLayout());
 		tmp2.add(genname, BorderLayout.WEST);
-		tmp2.add(numagents, BorderLayout.EAST);
+		tmp2.add(numcomponents, BorderLayout.EAST);
 		tmp.add(tmp2, BorderLayout.EAST);
 		componentpanel.add(tmp, new GridBagConstraints(1, 0, 4, 1, 1, 0, GridBagConstraints.EAST,
-			GridBagConstraints.BOTH, new Insets(0, 2, 0, 2), 0, 0));
+				GridBagConstraints.BOTH, new Insets(0, 2, 2, 2), 0, 0));
+			
+		componentpanel.add(new JLabel("Parent"), new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.WEST,
+				GridBagConstraints.BOTH, new Insets(2, 0, 0, 2), 0, 0));
+		parenttf	= new JTextField();
+		parenttf.setEditable(false);
+		componentpanel.add(parenttf, new GridBagConstraints(1, 1, 2, 1, 1, 0, GridBagConstraints.EAST,
+				GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
 		
+		JButton	chooseparent	= new JButton(icons.getIcon("Browse"));
+		chooseparent.setMargin(new Insets(0,0,0,0));
+		chooseparent.setToolTipText("Choose parent");
+		componentpanel.add(chooseparent, new GridBagConstraints(3, 1, 1, 1, 0, 0, GridBagConstraints.EAST,
+				GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
+		final AgentSelectorDialog	agentselector	= new AgentSelectorDialog(this, ((AgentControlCenter)starter.getJCC()).getAgent());
+		chooseparent.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				IComponentIdentifier newparent	= agentselector.selectAgent(parent);
+				if(newparent!=null)
+					setParent(newparent);
+			}
+		});
+		JButton	clearparent	= new JButton(icons.getIcon("delete"));
+		clearparent.setMargin(new Insets(0,0,0,0));
+		clearparent.setToolTipText("Clear parent");
+		componentpanel.add(clearparent, new GridBagConstraints(4, 1, 1, 1, 0, 0, GridBagConstraints.EAST,
+				GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
+		clearparent.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				setParent(null);
+			}
+		});
+
+			
 //		apppanel = new JPanel(new GridBagLayout());
 //		appnamel = new JLabel("Application name");
 //		apppanel.add(appnamel, new GridBagConstraints(0, 0, 1, 1, 0, 0, GridBagConstraints.WEST,
@@ -578,13 +622,13 @@ public class StarterPanel extends JPanel
 		componentnamel.setPreferredSize(confl.getPreferredSize());
 
 		/*y++;
-		agentnamel = new JLabel("Agent name");
-		content.add(agentnamel, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.WEST,
+		componentnamel = new JLabel("Component name");
+		content.add(componentnamel, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.WEST,
 				GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 		JPanel tmp = new JPanel(new BorderLayout());
-		tmp.add(agentname, "Center");
-		tmp.add(genagentname, "East");
-		//content.add(agentname, new GridBagConstraints(1, y, 2, 1, 1, 0, GridBagConstraints.WEST,
+		tmp.add(componentname, "Center");
+		tmp.add(gencomponentname, "East");
+		//content.add(componentname, new GridBagConstraints(1, y, 2, 1, 1, 0, GridBagConstraints.WEST,
 		//			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
 		content.add(tmp, new GridBagConstraints(1, y, 4, 1, 0, 0, GridBagConstraints.EAST,
 					GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
@@ -660,7 +704,7 @@ public class StarterPanel extends JPanel
 	}
 	
 	/**
-	 *  Load an agent model.
+	 *  Load an component model.
 	 *  @param adf The adf to load.
 	 */
 	public void loadModel(final String adf)
@@ -685,48 +729,31 @@ public class StarterPanel extends JPanel
 					model = SComponentFactory.loadModel(starter.getJCC().getServiceContainer(), adf);
 					updateGuiForNewModel(adf);
 					
-//					if(model instanceof ApplicationModel)
-//					{
-////						System.out.println("Model loaded: "+adf);
-//						
-//						createArguments();
-//						createResults();
-//						arguments.setVisible(true);
-//						results.setVisible(true);
-//						componentpanel.setVisible(false);
-//						start.setVisible(true);
-//						
-//						filenamel.setMinimumSize(appnamel.getMinimumSize());
-//						filenamel.setPreferredSize(appnamel.getPreferredSize());
-//						confl.setMinimumSize(appnamel.getMinimumSize());
-//						confl.setPreferredSize(appname.getPreferredSize());
-//					}
-					/*else*/ if(SComponentFactory.isStartable(starter.getJCC().getServiceContainer(), adf))
+					if(SComponentFactory.isStartable(starter.getJCC().getServiceContainer(), adf))
 					{
-//						System.out.println("Model loaded: "+adf);
-						
 						createArguments();
 						createResults();
 						arguments.setVisible(true);
 						results.setVisible(true);
-//						apppanel.setVisible(true);
 						componentpanel.setVisible(true);
 						start.setVisible(true);
+						
 						filenamel.setMinimumSize(confdummy.getMinimumSize());
 						filenamel.setPreferredSize(confdummy.getPreferredSize());
 						confl.setMinimumSize(confdummy.getMinimumSize());
 						confl.setPreferredSize(confdummy.getPreferredSize());
+						componentnamel.setMinimumSize(confdummy.getMinimumSize());
+						componentnamel.setPreferredSize(confdummy.getPreferredSize());
 					}
-					else //if(agentfactory.isLoadable(adf))
+					else
 					{
-//						apppanel.setVisible(false);
 						arguments.setVisible(false);
 						results.setVisible(false);
 						componentpanel.setVisible(false);
 						start.setVisible(false);
 						
-						componentnamel.setMinimumSize(confdummy.getMinimumSize());
-						componentnamel.setPreferredSize(confdummy.getPreferredSize());
+						filenamel.setMinimumSize(confdummy.getMinimumSize());
+						filenamel.setPreferredSize(confdummy.getPreferredSize());
 						confl.setMinimumSize(confdummy.getMinimumSize());
 						confl.setPreferredSize(confdummy.getPreferredSize());
 					}
@@ -759,7 +786,7 @@ public class StarterPanel extends JPanel
 			config.removeAllItems();
 //			clearArguments();
 //			clearResults();
-			setAgentName("");
+			setComponentName("");
 			clearApplicationName();
 			filename.setText("");
 			if(error!=null)
@@ -786,7 +813,7 @@ public class StarterPanel extends JPanel
 		
 		filename.setText(adf);
 
-//		if(model.getName()!=null && SXML.isAgentFilename(adf))
+//		if(model.getName()!=null && SXML.isComponentFilename(adf))
 		/*if(model.getName()!=null && model instanceof ApplicationModel)
 		{
 			appname.setModel(new DefaultComboBoxModel(new String[]{model.getName()}));
@@ -799,7 +826,7 @@ public class StarterPanel extends JPanel
 //			appname.removeAllItems();
 //			appname.addItem("");
 //			appname.setSelectedItem("");
-//			IContextService cs = (IContextService)starter.getJCC().getAgent().getPlatform().getService(IContextService.class);
+//			IContextService cs = (IContextService)starter.getJCC().getComponent().getPlatform().getService(IContextService.class);
 //			if(cs!=null)
 //			{
 //				IContext[] contexts =  cs.getContexts(IApplicationContext.class);
@@ -823,7 +850,7 @@ public class StarterPanel extends JPanel
 			config.removeItemListener(lis[i]);
 		config.removeAllItems();
 		
-		// Add all known agent configuration names to the config chooser.
+		// Add all known component configuration names to the config chooser.
 		
 		String[] confignames = model.getConfigurations();
 		for(int i = 0; i<confignames.length; i++)
@@ -894,7 +921,7 @@ public class StarterPanel extends JPanel
 			}
 
 			// Adjust state of start button depending on model checking state.
-//			start.setEnabled(SXML.isAgentFilename(adf) && (report==null || report.isEmpty()));
+//			start.setEnabled(SXML.isComponentFilename(adf) && (report==null || report.isEmpty()));
 			start.setEnabled(model.isStartable() && (report==null || report.isEmpty()));
 		
 			for(int i=0; i<lis.length; i++)
@@ -955,7 +982,7 @@ public class StarterPanel extends JPanel
 		}
 		setArguments(argvals);
 
-		setAgentName(props.getStringProperty("name"));
+		setComponentName(props.getStringProperty("name"));
 		setAutoGenerate(props.getBooleanProperty("autogenerate"));
 		
 	}
@@ -971,7 +998,7 @@ public class StarterPanel extends JPanel
 		config.removeAllItems();
 		clearArguments();
 		clearResults();
-		setAgentName("");
+		setComponentName("");
 		//model = null;
 		//start.setEnabled(false);
 	}
@@ -1134,7 +1161,7 @@ public class StarterPanel extends JPanel
 			
 			JButton cr = new JButton("Clear results");
 			
-			JLabel sa = new JLabel("Select agent instance");
+			JLabel sa = new JLabel("Select component instance");
 			selectavail= new FixedJComboBox();
 			
 			selectavail.addItem("- no instance selected -");
@@ -1277,10 +1304,10 @@ public class StarterPanel extends JPanel
 	}
 	
 	/**
-	 *  Set the agent name.
+	 *  Set the component name.
 	 *  @param name The name.
 	 */
-	protected void setAgentName(final String name)
+	protected void setComponentName(final String name)
 	{
 		if(name!=null)
 		{
@@ -1305,7 +1332,7 @@ public class StarterPanel extends JPanel
 	{
 		genname.setSelected(autogen);
 		componentname.setEditable(!autogen);
-		numagents.setEnabled(autogen);
+		numcomponents.setEnabled(autogen);
 	}
 
 	/**
@@ -1336,6 +1363,16 @@ public class StarterPanel extends JPanel
 		f.getContentPane().add(new StarterPanel(null));
 		f.pack();
 		f.setVisible(true);
+	}
+
+	/**
+	 *  Set the current parent.
+	 *  @param parent	The component id.
+	 */
+	public void setParent(IComponentIdentifier parent)
+	{
+		this.parent	= parent;
+		parenttf.setText(parent!=null ? parent.getName() : "");
 	}
 }
 

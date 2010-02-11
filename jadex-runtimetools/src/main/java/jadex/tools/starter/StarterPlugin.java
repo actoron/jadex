@@ -220,17 +220,17 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 					// An example to facilitate understanding:
 					// root
 					//  +-classes1
-					//  |  +- MyAgent.component.xml
+					//  |  +- MyComponent.component.xml
 					//  +-classes2
-					//  |  +- MyAgent.component.xml
+					//  |  +- MyComponent.component.xml
 
 					String model = ((FileNode)node).getRelativePath();
-//					if(getJCC().getAgent().getPlatform().getAgentFactory().isLoadable(model))
+//					if(getJCC().getComponent().getPlatform().getComponentFactory().isLoadable(model))
 					if(SComponentFactory.isLoadable(getJCC().getServiceContainer(), model))
 					{
 						loadModel(model);
 					}
-//					else if(getJCC().getAgent().getPlatform().getApplicationFactory().isLoadable(model))
+//					else if(getJCC().getComponent().getPlatform().getApplicationFactory().isLoadable(model))
 //					{
 //						loadModel(model);
 //					}
@@ -251,7 +251,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 						{
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 							String type = ((FileNode)node).getFile().getAbsolutePath();
-//							if(getJCC().getAgent().getPlatform().getAgentFactory().isStartable(type))
+//							if(getJCC().getComponent().getPlatform().getComponentFactory().isStartable(type))
 							// todo: resultcollect = false?
 							if(SComponentFactory.isStartable(getJCC().getServiceContainer(), type))
 								createComponent(type, null, null, null, false, null);
@@ -297,6 +297,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		components.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(KILL_COMPONENT);
 		components.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(SUSPEND_COMPONENT);
 		components.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(RESUME_COMPONENT);
+		components.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(USE_AS_PARENT);
 		components.getNodeType(ComponentTreeTable.NODE_CONTAINER).addPopupAction(KILL_PLATFORM);
 		components.getTreetable().getSelectionModel().setSelectionInterval(0, 0);
 		
@@ -315,7 +316,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		csplit.add(spanel);
 		csplit.setDividerLocation(180);
             			
-//		jcc.addAgentListListener(this);
+//		jcc.addComponentListListener(this);
 		
 		// todo: ?! is this ok?
 		
@@ -342,6 +343,9 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 //				components.adjustColumnWidths();
 //			}
 //		});
+		
+//		JTreeTableComboTest.test(components.getTreetable());
+		
 
 		return csplit;
 	}
@@ -594,6 +598,25 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		}
 	};
 
+	/**
+	 *  Action for selecting a component as current parent.
+	 */
+	final AbstractAction USE_AS_PARENT = new AbstractAction("Use component as parent", icons.getIcon("start_component"))
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
+			for(int i=0; paths!=null && i<paths.length; i++) 
+			{
+				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
+				if(node!=null && node.getUserObject() instanceof IComponentDescription)
+				{
+					spanel.setParent(((IComponentDescription)node.getUserObject()).getName());
+				}
+			}
+		}
+	};
+
 //	/**
 //	 *  Action for killing an application.
 //	 */
@@ -678,6 +701,8 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		{
 			public void run()
 			{
+				if(ad.getName().equals(spanel.parent))
+					spanel.setParent(null);
 				components.removeComponent(ad);
 			}
 		});
@@ -749,10 +774,10 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 					{
 						try
 						{
-//							IAgentFactory componentfactory = getJCC().getAgent().getPlatform().getAgentFactory();
+//							IComponentFactory componentfactory = getJCC().getComponent().getPlatform().getComponentFactory();
 							ILoadableComponentModel model = SComponentFactory.loadModel(getJCC().getServiceContainer(), type);
 							String[] inistates = model.getConfigurations();
-//							IMBDIAgent model = SXML.loadAgentModel(type, null);
+//							IMBDIComponent model = SXML.loadComponentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
 							
 							if(inistates.length>1)
@@ -867,7 +892,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	 *  @param filename The filename.
 	 *  @return True, if it is an component file.
 	 * /
-	public static boolean isAgentFilename(String filename)
+	public static boolean isComponentFilename(String filename)
 	{
 		return filename!=null && filename.toLowerCase().endsWith(FILE_EXTENSION_COMPONENT);
 	}
@@ -901,6 +926,6 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 			{
 				getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
 			}
-		}, null, killlistener, false);
+		}, spanel.parent, killlistener, false);
 	}
 }

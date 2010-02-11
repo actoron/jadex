@@ -60,7 +60,7 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 		super(starter.getJCC());
 		this.starter	= starter;
 		checkcomp	= new JLabel(icons.getIcon("checking_on"));
-		checkcomp.setToolTipText("Checking validity of agent models.");
+		checkcomp.setToolTipText("Checking validity of componentomponent models.");
 	}
 	
 	//-------- methods --------
@@ -199,19 +199,19 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 					String	file	= fn.getFile().getAbsolutePath();
 					try
 					{
-//						if(jcc.getAgent().getPlatform().getAgentFactory().isLoadable(file))
+//						if(jcc.getComponent().getPlatform().getComponentFactory().isLoadable(file))
 						if(SComponentFactory.isLoadable(jcc.getServiceContainer(), file))
 						{
-//							ILoadableElementModel model = jcc.getAgent().getPlatform().getAgentFactory().loadModel(file);
+//							ILoadableElementModel model = jcc.getComponent().getPlatform().getComponentFactory().loadModel(file);
 							ILoadableComponentModel model = SComponentFactory.loadModel(jcc.getServiceContainer(), file);
 							if(model!=null)
 							{
 								newvalid	= model.getReport().isEmpty();
 							}
 						}
-//						else if(jcc.getAgent().getPlatform().getApplicationFactory().isLoadable(file))
+//						else if(jcc.getComponent().getPlatform().getApplicationFactory().isLoadable(file))
 //						{
-//							ILoadableElementModel model = jcc.getAgent().getPlatform().getApplicationFactory().loadModel(file);
+//							ILoadableElementModel model = jcc.getComponent().getPlatform().getApplicationFactory().loadModel(file);
 //							if(model!=null)
 //							{
 //								newvalid	= model.getReport().isEmpty();
