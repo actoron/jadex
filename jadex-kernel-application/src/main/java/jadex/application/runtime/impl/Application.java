@@ -265,7 +265,8 @@ public class Application	implements IApplication, IComponentInstance
 			}
 			ILoadableComponentModel amodel = factory.loadModel(atype.getFilename());
 			
-			if(amodel.getFilename().equals(model.getFilename()))
+			if(amodel.getPackage().equals(model.getPackage()) && amodel.getName().equals(model.getName()))
+//			if(amodel.getFilename().equals(model.getFilename()))
 			{
 				synchronized(this)
 				{

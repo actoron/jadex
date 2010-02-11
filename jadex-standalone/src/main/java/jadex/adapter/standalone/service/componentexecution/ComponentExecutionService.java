@@ -146,6 +146,7 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 		final ComponentIdentifier cid;
 		final StandaloneComponentAdapter adapter;
 		final CESComponentDescription ad;
+		StandaloneComponentAdapter pad	= null;
 		synchronized(adapters)
 		{
 			synchronized(descs)
@@ -190,30 +191,35 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 
 			if(parent!=null)
 			{
-				final IResultListener	rl	= listener;
-				final IComponentFactory	cf	= factory;
-				final StandaloneComponentAdapter pad	= (StandaloneComponentAdapter)adapters.get(parent);
-				pad.getComponentInstance().getExternalAccess(new IResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						createComponentInstance(config, args, suspend, rl,
-							resultlistener, cf, lmodel, cid, adapter, pad, ad, (IExternalAccess)result);
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						rl.exceptionOccurred(source, exception);
-					}
-				});
+				pad	= (StandaloneComponentAdapter)adapters.get(parent);
 			}
-			else
+		}
+
+		if(pad!=null)
+		{
+			final IResultListener	rl	= listener;
+			final IComponentFactory	cf	= factory;
+			final StandaloneComponentAdapter	fpad	= pad;
+			pad.getComponentInstance().getExternalAccess(new IResultListener()
 			{
-				createComponentInstance(config, args, suspend, listener,
-					resultlistener, factory, lmodel, cid, adapter, null, ad, null);
-			}
-		}				
-	}
+				public void resultAvailable(Object source, Object result)
+				{
+					createComponentInstance(config, args, suspend, rl,
+						resultlistener, cf, lmodel, cid, adapter, fpad, ad, (IExternalAccess)result);
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					rl.exceptionOccurred(source, exception);
+				}
+			});
+		}
+		else
+		{
+			createComponentInstance(config, args, suspend, listener,
+				resultlistener, factory, lmodel, cid, adapter, null, ad, null);
+		}
+}
 
 	/**
 	 *  Create an instance of a component (step 2 of creation process).
