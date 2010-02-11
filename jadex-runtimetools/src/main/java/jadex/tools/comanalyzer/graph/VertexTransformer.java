@@ -200,8 +200,6 @@ public class VertexTransformer {
 				iconname = "agent_standard";
 			} else if (agent.getState().equals(Agent.STATE_DEAD)) {
 				iconname = "agent_dead";
-			} else if (agent.getState().equals(Agent.STATE_UNKNOWN)) {
-				iconname = "agent_unknown";
 			} else if (agent.getState().equals(Agent.STATE_DUMMY)) {
 				iconname = "agent_dummy";
 			} else {

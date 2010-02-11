@@ -83,7 +83,7 @@ public class Application	implements IApplication, IComponentInstance
 		this.adapter = adapter;
 		this.model = model;
 		this.parent = parent;
-		this.arguments = arguments;
+		this.arguments = arguments==null ? new HashMap() : arguments;
 		this.results = new HashMap();
 		
 		// Init the arguments with default values.

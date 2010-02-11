@@ -110,7 +110,7 @@ public class AgentList implements Serializable
 		for(Iterator iter = elements.iterator(); iter.hasNext();)
 		{
 			Agent original = (Agent)iter.next();
-			if(SUtil.equals(original.getAid(), aid))
+			if(SUtil.equals(original.getDescription()!=null ? original.getDescription().getName() : null, aid))
 			{
 				return original;
 			}
@@ -146,17 +146,17 @@ public class AgentList implements Serializable
 		if(!listeners.contains(listener))
 		{
 			listeners.add(listener);
-			for(Iterator iter = elements.iterator(); iter.hasNext();)
-			{
-				Agent agent = (Agent)iter.next();
+//			for(Iterator iter = elements.iterator(); iter.hasNext();)
+//			{
+//				Agent agent = (Agent)iter.next();
 				listener.agentsAdded((Agent[])elements.toArray(new Agent[elements.size()]));
-			}
+//			}
 
 		}
 	}
 
 	/**
-	 * Notifies the listeners about the removel of agents.
+	 * Notifies the listeners about the removal of agents.
 	 * @param agents The removed agents.
 	 */
 	protected void fireAgentsRemoved(Agent[] agents)

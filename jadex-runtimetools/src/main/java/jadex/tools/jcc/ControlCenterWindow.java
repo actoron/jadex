@@ -636,6 +636,7 @@ public class ControlCenterWindow extends JFrame
 			boolean canopen = file!=null && file.canWrite() && file.getName().toLowerCase().endsWith(ControlCenter.JCCPROJECT_EXTENSION);
 			if(canopen)
 			{
+				controlcenter.saveProject();
 				controlcenter.closeProject();
 				try
 				{
@@ -701,6 +702,7 @@ public class ControlCenterWindow extends JFrame
 	{
 		public void actionPerformed(ActionEvent e)
 		{
+			controlcenter.saveProject();
 			controlcenter.closeProject();
 		}
 	};

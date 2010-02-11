@@ -341,7 +341,7 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
 					if(IComponentDescription.STATE_ACTIVE.equals(((IComponentDescription)descs.get(child)).getState()))
 					{
-						suspendComponent((IComponentIdentifier)it.next(), null);	// todo: cascading resume with wait.
+						suspendComponent(child, null);	// todo: cascading resume with wait.
 					}
 				}
 
@@ -396,9 +396,10 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
 				{
 					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
-					if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(child)).getState()))
+					if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(child)).getState())
+						|| IComponentDescription.STATE_WAITING.equals(((IComponentDescription)descs.get(child)).getState()))
 					{
-						resumeComponent((IComponentIdentifier)it.next(), null);	// todo: cascading resume with wait.
+						resumeComponent(child, null);	// todo: cascading resume with wait.
 					}
 				}
 
@@ -407,8 +408,9 @@ public class ComponentExecutionService implements IComponentExecutionService, IS
 				if(adapter==null || ad==null)
 					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
 					//throw new RuntimeException("Agent Identifier not registered in AMS: "+aid);
-				if(!IComponentDescription.STATE_SUSPENDED.equals(ad.getState()))
-					listener.exceptionOccurred(this, new RuntimeException("Only suspended components can be resumed: "+componentid+" "+ad.getState()));
+				if(!IComponentDescription.STATE_SUSPENDED.equals(ad.getState())
+					&& !IComponentDescription.STATE_WAITING.equals(ad.getState()))
+					listener.exceptionOccurred(this, new RuntimeException("Only suspended/waiting components can be resumed: "+componentid+" "+ad.getState()));
 					//throw new RuntimeException("Only suspended agents can be resumed: "+aid+" "+ad.getState());
 				
 				ad.setState(IComponentDescription.STATE_ACTIVE);

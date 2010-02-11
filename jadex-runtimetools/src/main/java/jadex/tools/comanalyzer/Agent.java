@@ -1,6 +1,6 @@
 package jadex.tools.comanalyzer;
 
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentDescription;
 import jadex.commons.IFilter;
 
 import java.util.ArrayList;
@@ -27,6 +27,8 @@ public class Agent extends ParameterElement
 
 	public static final String AID = "aid";
 
+	public static final String DESCRIPTION = "desc";
+
 	public static final String MESSAGE_COUNT = "message_count";
 
 	public static final String MESSAGE_VISIBLE = "message_visible";
@@ -42,8 +44,6 @@ public class Agent extends ParameterElement
 
 	public static final String STATE_DUMMY = "dummy";
 
-	public static final String STATE_UNKNOWN = "unknown";
-
 	public static final String STATE_REMOTE = "remote";
 
 	/** The allowed message attributes. */
@@ -54,6 +54,7 @@ public class Agent extends ParameterElement
 		AGENT_ATTRIBUTES = new ArrayList();
 		AGENT_ATTRIBUTES.add(ID);
 		AGENT_ATTRIBUTES.add(AID);
+		AGENT_ATTRIBUTES.add(DESCRIPTION);
 		AGENT_ATTRIBUTES.add(NAME);
 		AGENT_ATTRIBUTES.add(STATE);
 		AGENT_ATTRIBUTES.add(MESSAGE_COUNT);
@@ -84,18 +85,19 @@ public class Agent extends ParameterElement
 	/**
 	 * Constructor for any named agent to be put on the Agent Canvas
 	 */
-	public Agent(IComponentIdentifier aid)
+	public Agent(IComponentDescription desc)
 	{
 		this.visible = true;
 
-		parameters.put(ID, aid==null? DUMMY_NAME: aid.getName());
-		parameters.put(AID, aid);
+		parameters.put(ID, desc==null? DUMMY_NAME: desc.getName().getName());
+		parameters.put(AID, desc==null? null: desc.getName());
+		parameters.put(DESCRIPTION, desc);
 
 		// parameters.put(STATE, STATE_UNKNOWN);
 		parameters.put(MESSAGE_COUNT, new Integer(NO_MESSAGES));
 		parameters.put(MESSAGE_VISIBLE, new Integer(NO_MESSAGES));
 
-		parameters.put(NAME, aid==null? DUMMY_NAME: aid.getName());
+		parameters.put(NAME, desc==null? DUMMY_NAME: desc.getName().getName());
 		parameters.put(CLASS, Agent.class.getSimpleName());
 	}
 
@@ -163,11 +165,11 @@ public class Agent extends ParameterElement
 	}
 
 	/**
-	 * @return The agent identifier.
+	 * @return The component description.
 	 */
-	public IComponentIdentifier getAid()
+	public IComponentDescription getDescription()
 	{
-		return (IComponentIdentifier)parameters.get(AID);
+		return (IComponentDescription)parameters.get(DESCRIPTION);
 	}
 
 	/**

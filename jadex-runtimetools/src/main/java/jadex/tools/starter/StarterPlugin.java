@@ -555,7 +555,9 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
 					ret &= IComponentDescription.STATE_SUSPENDED.equals(
-						((IComponentDescription)node.getUserObject()).getState());
+						((IComponentDescription)node.getUserObject()).getState())
+						|| IComponentDescription.STATE_WAITING.equals(
+							((IComponentDescription)node.getUserObject()).getState());
 				}
 			}
 			return ret;
@@ -821,9 +823,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 			if(node instanceof FileNode)
 			{
 				String type = ((FileNode)node).getFile().getAbsolutePath();
-				// todo: fix me
-				if(type.endsWith(".component.xml"))
-//				if(SXML.isAgentFilename(type))
+				if(SComponentFactory.isStartable(getJCC().getServiceContainer(), type))
 					ret = true;
 			}
 			return ret;
