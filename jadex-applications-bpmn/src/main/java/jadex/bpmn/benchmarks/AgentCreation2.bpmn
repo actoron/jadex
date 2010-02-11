@@ -4,7 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_t_U5MdkMEd6KRaQAf_IpCg" key="imports" value="jadex.commons.*␟jadex.bridge.*␟jadex.bpmn.runtime.task.*␟jadex.bpmn.model.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_t_U5MtkMEd6KRaQAf_IpCg" key="package" value="jadex.bpmn.benchmarks"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wn6ZENndEd6-RuLHHhoEBw" key="arguments" value="max␋&quot;The maximum numbers of processes to create.&quot;␋&quot;int&quot;␋new Integer(1000)"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cybUsNtDEd6x4pN6Y6csZw" key="Package" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cybUsNtDEd6x4pN6Y6csZw" key="Package" value="jadex.bpmn.benchmarks"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_fZ7WEdkMEd6KRaQAf_IpCg" iD="_fZ7WENkMEd6KRaQAf_IpCg" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_fZ7WE9kMEd6KRaQAf_IpCg" iD="_fZ7WEtkMEd6KRaQAf_IpCg" outgoingEdges="_6dcU2tkOEd6KRaQAf_IpCg" name="Fetch and prepare arguments" activityType="Task">
@@ -30,10 +30,10 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_YrA_UdkSEd6KRaQAf_IpCg" iD="_YrA_UNkSEd6KRaQAf_IpCg" outgoingEdges="_cVaNcdkSEd6KRaQAf_IpCg" incomingEdges="_YrA_WtkSEd6KRaQAf_IpCg _ecaWMdkSEd6KRaQAf_IpCg" name="Delete Processes" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__E1_4NnhEd6-RuLHHhoEBw" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__E1_4dnhEd6-RuLHHhoEBw" key="class" value="DestroyComponentTask.class"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BFu5kNniEd6-RuLHHhoEBw" key="parameters" value="inout␋i␋int␋max-1␟in␋name␋String␋i==1? &quot;AgentCreation2&quot;: &quot;AgentCreation_#&quot;+i␟inout␋killstarttime␋long␋killstarttime␟inout␋dur␋double␋dur␟inout␋pera␋double␋pera␟inout␋omem␋long␋omem␟inout␋upera␋double␋upera"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BFu5kNniEd6-RuLHHhoEBw" key="parameters" value="inout␋i␋int␋max-1␟inout␋name␋String␋i==1? &quot;AgentCreation2&quot;: &quot;AgentCreation_#&quot;+i␟inout␋killstarttime␋long␋killstarttime␟inout␋dur␋double␋dur␟inout␋pera␋double␋pera␟inout␋omem␋long␋omem␟inout␋upera␋double␋upera"/>
       </eAnnotations>
     </vertices>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_cVQccdkSEd6KRaQAf_IpCg" iD="_cVQccNkSEd6KRaQAf_IpCg" outgoingEdges="_ecaWMdkSEd6KRaQAf_IpCg _Zokh0dkUEd6KRaQAf_IpCg" incomingEdges="_cVaNcdkSEd6KRaQAf_IpCg" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_cVQccdkSEd6KRaQAf_IpCg" iD="_cVQccNkSEd6KRaQAf_IpCg" outgoingEdges="_ecaWMdkSEd6KRaQAf_IpCg _Zokh0dkUEd6KRaQAf_IpCg" incomingEdges="_e4HL8RblEd-yC473XtaJZQ" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_ZoQ_0dkUEd6KRaQAf_IpCg" iD="_ZoQ_0NkUEd6KRaQAf_IpCg" outgoingEdges="_j7yeEdkUEd6KRaQAf_IpCg" incomingEdges="_Zokh0dkUEd6KRaQAf_IpCg" name="Print Kill Results" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Vavq4NniEd6-RuLHHhoEBw" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Vavq4dniEd6-RuLHHhoEBw" key="class" value="PrintTask.class"/>
@@ -41,6 +41,12 @@
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_j7pUIdkUEd6KRaQAf_IpCg" iD="_j7pUINkUEd6KRaQAf_IpCg" incomingEdges="_j7yeEdkUEd6KRaQAf_IpCg" activityType="EventEndEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_eGC10RblEd-yC473XtaJZQ" iD="_eGC10BblEd-yC473XtaJZQ" outgoingEdges="_e4HL8RblEd-yC473XtaJZQ" incomingEdges="_cVaNcdkSEd6KRaQAf_IpCg" name="Print Kill">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_EHGyIBbmEd-yC473XtaJZQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EHGyIRbmEd-yC473XtaJZQ" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FHU5ABbmEd-yC473XtaJZQ" key="parameters" value="in␋text␋String␋&quot;Successfully destroyed peer: &quot;+name␟inout␋i␋int␋i␟inout␋killstarttime␋long␋killstarttime␟inout␋dur␋double␋dur␟inout␋pera␋double␋pera␟inout␋omem␋long␋omem␟inout␋upera␋double␋upera"/>
+      </eAnnotations>
+    </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_6dcU2tkOEd6KRaQAf_IpCg" iD="_6dcU2dkOEd6KRaQAf_IpCg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_7yYHcdkOEd6KRaQAf_IpCg" iD="_7yYHcNkOEd6KRaQAf_IpCg" name="If maximum number of &#xD;&#xA;processes not yet reached">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_jKpQwNnfEd6-RuLHHhoEBw" source="jadex">
@@ -66,5 +72,6 @@
     </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Zokh0dkUEd6KRaQAf_IpCg" iD="_Zokh0NkUEd6KRaQAf_IpCg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_j7yeEdkUEd6KRaQAf_IpCg" iD="_j7yeENkUEd6KRaQAf_IpCg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_e4HL8RblEd-yC473XtaJZQ" iD="_e4HL8BblEd-yC473XtaJZQ"/>
   </pools>
 </bpmn:BpmnDiagram>
