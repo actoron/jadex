@@ -523,6 +523,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				Map observer = (Map)observers.get(i);
 				
 				String title = MEnvSpaceInstance.getProperty(observer, "name")!=null? (String)MEnvSpaceInstance.getProperty(observer, "name"): "Default Observer";
+				Boolean	killonexit	= (Boolean)MEnvSpaceInstance.getProperty(observer, "killonexit");
 				
 				List plugs = (List)observer.get("plugins");
 				List plugins = null;
@@ -539,7 +540,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					}
 				}
 				
-				final ObserverCenter oc = new ObserverCenter(title, this, (ILibraryService)context.getServiceContainer().getService(ILibraryService.class), plugins);
+				final ObserverCenter oc = new ObserverCenter(title, this, (ILibraryService)context.getServiceContainer().getService(ILibraryService.class), plugins,
+					killonexit!=null ? killonexit.booleanValue() : true);
 							
 				IComponentExecutionService cs = (IComponentExecutionService)context.getServiceContainer().getService(IComponentExecutionService.class);
 				cs.addComponentListener(context.getComponentIdentifier(), new IComponentListener()

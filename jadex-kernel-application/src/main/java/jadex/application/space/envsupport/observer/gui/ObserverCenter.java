@@ -8,6 +8,7 @@ import jadex.application.space.envsupport.observer.gui.plugin.IObserverCenterPlu
 import jadex.application.space.envsupport.observer.gui.plugin.IntrospectorPlugin;
 import jadex.application.space.envsupport.observer.gui.plugin.VisualsPlugin;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
+import jadex.bridge.IComponentExecutionService;
 import jadex.commons.IChangeListener;
 import jadex.service.clock.IClockService;
 import jadex.service.library.ILibraryService;
@@ -89,6 +90,9 @@ public class ObserverCenter
 	/** The clock listener for sync gui updates. */
 	protected IChangeListener	clocklistener;
 	
+	/** Kill the application on exit. */
+	protected boolean	killonexit;
+	
 	/** Creates an observer center.
 	 *  
 	 *  @param title title of the observer window
@@ -96,10 +100,11 @@ public class ObserverCenter
 	 *  @param libSrvc the platform library service for loading resources (images etc.)
 	 *  @param plugins custom plugins used in the observer
 	 */
-	public ObserverCenter(final String title, final IEnvironmentSpace space, ILibraryService libSrvc, List plugins)
+	public ObserverCenter(final String title, final IEnvironmentSpace space, ILibraryService libSrvc, List plugins, boolean killonexit)
 	{
 		selectedObjectListeners = Collections.synchronizedList(new ArrayList());
 		this.space = (Space2D) space;
+		this.killonexit	= killonexit;
 		areasize = ((Space2D)space).getAreaSize().copy();
 		perspectives = Collections.synchronizedMap(new HashMap());
 		externaldataviews = Collections.synchronizedMap(new HashMap());
@@ -641,6 +646,12 @@ public class ObserverCenter
 		public void windowClosing(WindowEvent e)
 		{
 			dispose();
+			if(killonexit)
+			{
+				IComponentExecutionService	ces	= (IComponentExecutionService)space.getContext()
+					.getServiceContainer().getService(IComponentExecutionService.class);
+				ces.destroyComponent(space.getContext().getComponentIdentifier(), null);
+			}
 		}
 		
 		public void windowDeactivated(WindowEvent e)

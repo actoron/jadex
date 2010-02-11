@@ -415,7 +415,7 @@
 					</env:processes>
 	
 					<env:observers>
-						<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
+						<env:observer name="HunterPrey World" view="view_all" perspective="icons" killonexit="true"/>
 					</env:observers>
 	 			</env:envspace>
 			</spaces>

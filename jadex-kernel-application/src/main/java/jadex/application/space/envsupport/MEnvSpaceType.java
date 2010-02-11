@@ -1076,6 +1076,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("view", null, null, null, null, ""),
 			new BeanAttributeInfo("perspective", null, null, null, null, ""),
+			new BeanAttributeInfo("killonexit", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "")
 			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "plugin"), "plugins", null, null, null, "")),
