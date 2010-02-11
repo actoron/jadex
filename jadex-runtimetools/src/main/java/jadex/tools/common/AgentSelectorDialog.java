@@ -231,8 +231,27 @@ public class AgentSelectorDialog
 		IComponentExecutionService ams = (IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class);
 		int	row	= seltree.getTreetable().getSelectionModel().getMinSelectionIndex();
 		this.seltree.removeComponents();
+		DefaultTreeTableNode[]	known	= tree.getAllComponents();
 		for(int i=0; i<sellist.size(); i++)
-			seltree.addComponent(ams.createComponentDescription((IComponentIdentifier)sellist.get(i), null, null, null, null));
+		{
+			// Try to find in known agents.
+			boolean	found	= false;
+			IComponentIdentifier	cid	= (IComponentIdentifier)sellist.get(i);
+			for(int j=0; !found && j<known.length; j++)
+			{
+				IComponentDescription	desc	= (IComponentDescription)known[j].getUserObject();
+				if(desc.getName().equals(cid))
+				{
+					found	= true;
+					seltree.addComponent(desc);
+				}
+			}
+			
+			if(!found)
+			{
+				seltree.addComponent(ams.createComponentDescription(cid, null, null, "unknown-component-type", null));
+			}
+		}
 		// Force table repaint (hack???).
 		seltree.getTreetable().tableChanged(new TableModelEvent(seltree.getTreetable().getModel(), TableModelEvent.HEADER_ROW));
 		((ResizeableTableHeader)seltree.getTreetable().getTableHeader()).resizeAllColumns();

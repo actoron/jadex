@@ -2,6 +2,7 @@ package jadex.tools.common;
 
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
+import jadex.commons.SGUI;
 import jadex.service.IServiceContainer;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.jtreetable.TreeTableNodeType;
@@ -9,6 +10,7 @@ import jadex.tools.common.jtreetable.TreeTableNodeType;
 import java.util.Iterator;
 
 import javax.swing.Icon;
+import javax.swing.UIDefaults;
 
 /**
  *  A custom tree table node type for representing
@@ -16,6 +18,14 @@ import javax.swing.Icon;
  */
 public class ComponentTreeTableNodeType extends TreeTableNodeType
 {
+	//-------- constants --------
+
+	/** The image icons. */
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
+	{
+		"component",	SGUI.makeIcon(ComponentTreeTableNodeType.class, "/jadex/tools/common/images/new_agent.png"),
+	});
+
 	//-------- attributes --------
 	
 	/** The service container. */
@@ -50,6 +60,9 @@ public class ComponentTreeTableNodeType extends TreeTableNodeType
 			while(ret==null && factories.hasNext())
 				ret	= ((IComponentFactory)factories.next()).getComponentTypeIcon(type);
 		}
+		
+		if(ret==null)
+			ret	= icons.getIcon("component");
 		
 		return ret;
 	}
