@@ -233,4 +233,11 @@ public class JadexUserTaskImplComboSection extends
 		return info.toString();
 	}
 	
+	protected void createTaskParameter(String taskClassName)
+	{
+		TaskMetaInfo metaInfo = taskProvider.getTaskMetaInfoFor(taskClassName);
+		ParameterMetaInfo[] taskParameter = metaInfo.getParameterMetaInfos();
+		// TODO: implement
+	}
+	
 }

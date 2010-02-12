@@ -736,7 +736,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 				if(parameterListString!=null)
 				{
 					return convertMultiColumnTableString(parameterListString, columnNames.length, uniqueColumnIndex).toArray();
-					// TODO: check if adding to unique map is needed, see get getTableRowList()
+					// add to unique map not need, its only a content provider
 				}
 					
 			}
@@ -1062,7 +1062,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 		protected void doSetValue(Object element, Object value)
 		{
 			
-			final AbstractMultiColumnTableRow editRow = (AbstractMultiColumnTableRow) element;
+			final AbstractMultiColumnTableRow tableViewerRow = (AbstractMultiColumnTableRow) element;
 			final String newValue = value.toString();
 			
 			// modify the Model
@@ -1078,7 +1078,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 				{
 
 					List<AbstractMultiColumnTableRow> tableRowList = getTableRowList();
-					AbstractMultiColumnTableRow rowToEdit = (AbstractMultiColumnTableRow) tableRowList.get(tableRowList.indexOf(editRow));
+					AbstractMultiColumnTableRow rowToEdit = (AbstractMultiColumnTableRow) tableRowList.get(tableRowList.indexOf(tableViewerRow));
 
 					
 					
@@ -1100,7 +1100,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 								updateTableRowList(tableRowList);
 
 								// update the corresponding table element
-								editRow.getColumnValues()[attributeIndex] = newUniqueValue;
+								tableViewerRow.getColumnValues()[attributeIndex] = newUniqueValue;
 							}
 
 							return CommandResult.newOKCommandResult();
@@ -1111,7 +1111,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 					updateTableRowList(tableRowList);
 					
 					// update the corresponding table element
-					editRow.getColumnValues()[attributeIndex] = newValue;
+					tableViewerRow.getColumnValues()[attributeIndex] = newValue;
 										
 					return CommandResult.newOKCommandResult();
 				}
@@ -1136,10 +1136,6 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 												.getMessage(),
 										e));
 			}
-
-			// update the corresponding table element
-			// don't use this!
-			//((AbstractMultiColumnTableRow) element).columnValues[attributeIndex] = newValue;
 
 		}
 	}

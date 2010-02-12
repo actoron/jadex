@@ -49,15 +49,15 @@ public class AbstractParameterTablePropertySection extends
 	protected final static String DEFAULT_DIRECTION = "inout"; //$NON-NLS-1$
 	
 	
-	protected final static String[] DEFAULT_COLUMN_NAMES
+	protected final static String[] DEFAULT_PARAMTER_COLUMN_NAMES
 		= new String[] { DIRECTION_COLUMN, NAME_COLUMN, TYPE_COLUMN, VALUE_COLUMN  };
 	
-	protected final static int[] DEFAULT_COLUMN_WEIGHT = new int[] { 1, 1, 1, 8 };
+	protected final static int[] DEFAULT_PARAMETER_COLUMN_WEIGHT = new int[] { 1, 1, 1, 8 };
 	
 
-	public static final String[] defaultListElementAttributeValues = new String[]{DEFAULT_DIRECTION, "name", "Object", ""};
+	public static final String[] DEFAULT_PARAMETER_ROWATTRIBUTE_VALUES = new String[]{DEFAULT_DIRECTION, "name", "Object", ""};
 	
-	public static final int uniqueListElementAttribute = 1;
+	public static final int UNIQUE_PARAMETER_ROW_ATTRIBUTE = 1;
 	
 	
 	/**
@@ -65,7 +65,7 @@ public class AbstractParameterTablePropertySection extends
 	 */
 	public AbstractParameterTablePropertySection(String containerEAnnotationName, String annotationDetailName)
 	{
-		this(containerEAnnotationName, annotationDetailName, DEFAULT_COLUMN_WEIGHT);
+		this(containerEAnnotationName, annotationDetailName, DEFAULT_PARAMETER_COLUMN_WEIGHT);
 	}
 	
 	/**
@@ -74,8 +74,8 @@ public class AbstractParameterTablePropertySection extends
 	public AbstractParameterTablePropertySection(String containerEAnnotationName, String annotationDetailName, int[] columnWeights)
 	{
 		super(containerEAnnotationName, annotationDetailName,
-				Messages.JadexCommonParameterListSection_ParameterTable_Label, DEFAULT_COLUMN_NAMES, 
-				columnWeights, defaultListElementAttributeValues, uniqueListElementAttribute);
+				Messages.JadexCommonParameterListSection_ParameterTable_Label, DEFAULT_PARAMTER_COLUMN_NAMES, 
+				columnWeights, DEFAULT_PARAMETER_ROWATTRIBUTE_VALUES, UNIQUE_PARAMETER_ROW_ATTRIBUTE);
 	}
 	
 	/**
@@ -126,10 +126,10 @@ public class AbstractParameterTablePropertySection extends
 //			}
 //		});
 		
-		for (int columnIndex = 1; columnIndex < DEFAULT_COLUMN_NAMES.length; columnIndex++)
+		for (int columnIndex = 1; columnIndex < DEFAULT_PARAMTER_COLUMN_NAMES.length; columnIndex++)
 		{
 			TableViewerColumn column1 = new TableViewerColumn(viewer, SWT.LEFT);
-			column1.getColumn().setText(DEFAULT_COLUMN_NAMES[columnIndex]);
+			column1.getColumn().setText(DEFAULT_PARAMTER_COLUMN_NAMES[columnIndex]);
 			column1.setEditingSupport(new MultiColumnTableEditingSupport(viewer, columnIndex));
 			column1.setLabelProvider(new MultiColumnTableLabelProvider(columnIndex));
 		}
