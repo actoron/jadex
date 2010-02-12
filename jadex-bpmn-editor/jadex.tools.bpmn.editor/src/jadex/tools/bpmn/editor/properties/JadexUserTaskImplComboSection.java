@@ -7,9 +7,14 @@ import jadex.tools.bpmn.runtime.task.IRuntimeTaskProvider;
 import jadex.tools.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.tools.bpmn.runtime.task.StaticJadexRuntimeTaskProvider;
 import jadex.tools.bpmn.runtime.task.TaskMetaInfo;
+import jadex.tools.table.MultiColumnTable;
+import jadex.tools.table.MultiColumnTable.MultiColumnTableRow;
+
+import java.util.ArrayList;
 
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.SelectionEvent;
@@ -37,15 +42,6 @@ public class JadexUserTaskImplComboSection extends
 {
 
 	// ---- constants ----
-	
-//	protected static final String[] comboItems = new String[] {
-//		"jadex.bpmnbdi.task.WriteBeliefTask.class",
-//		"jadex.bpmn.runtime.task.PrintTask.class",
-//		"jadex.bpmn.runtime.task.InvokeMethodTask.class",
-//		"jadex.bpmn.runtime.task.CreateComponentTask.class",
-//		"jadex.bpmn.runtime.task.DestroyComponentTask.class",
-//		"jadex.wfms.client.task.WorkitemTask.class"
-//	};
 
 	protected static final String ACTIVITY_TASK_IMPLEMENTATION_GROUP = "Task implementation";
 	
@@ -166,6 +162,7 @@ public class JadexUserTaskImplComboSection extends
 			{
 				String taskClassName = ((CCombo) e.getSource()).getText();
 				updateTaskMetaInfo(taskClassName);
+				generateTaskParameterTable(taskClassName);
 				
 			}
 			
@@ -245,12 +242,107 @@ public class JadexUserTaskImplComboSection extends
 		return info.toString();
 	}
 	
-	protected void createTaskParameter(String taskClassName)
+	protected void generateTaskParameterTable(String taskClassName)
 	{
 		TaskMetaInfo metaInfo = taskProvider.getTaskMetaInfoFor(taskClassName);
 		ParameterMetaInfo[] taskParameter = metaInfo.getParameterMetaInfos();
+
+		MultiColumnTable parameterTable;
+		String currentParameterString = getJadexEAnnotationDetail(
+				modelElement,
+				JadexCommonDiagramParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
+				JadexCommonDiagramParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER);
+		if (currentParameterString != null && !currentParameterString.isEmpty())
+		{
+			parameterTable = MultiColumnTable
+					.convertMultiColumnTableString(
+							currentParameterString,
+							JadexCommonDiagramParameterSection.DEFAULT_PARAMTER_COLUMN_NAMES.length,
+							JadexCommonDiagramParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE);
+			parameterTable = updateTaskParamterTable(parameterTable, taskParameter);
+		}
+		else
+		{
+			parameterTable = createNewParameterTable(taskParameter);
+		}
+
+		updateJadexEAnnotationDetail(
+				modelElement,
+				JadexCommonDiagramParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
+				JadexCommonDiagramParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER,
+				MultiColumnTable.convertMultiColumnRowList(parameterTable));
+
+		//Composite sectionRoot = findSectionRootComposite(this.sectionComposite);
+		//List<Group> paramterGroups = findSectionGroupComposite(rootPropertyComposite, Messages.JadexCommonParameterListSection_ParameterTable_Label);
 		
-		// TODO: implement
+		//for (Group group : paramterGroups)
+		//{
+		//	group.redraw();
+		//}
+		
+		TableViewer viewer = JadexCommonDiagramParameterSection.getParameterTableViewerFor(modelElement);
+		if (viewer != null)
+		{
+			viewer.refresh();
+		}
 	}
+	
+	/**
+	 * Create a new Table for meta info
+	 * @param parameterMetaInfo
+	 * @return
+	 */
+	protected MultiColumnTable createNewParameterTable(ParameterMetaInfo[] parameterMetaInfo)
+	{
+		MultiColumnTable newTable = new MultiColumnTable(parameterMetaInfo.length);
+		for (int i = 0; i < parameterMetaInfo.length; i++)
+		{
+			String[] columnValues = new String[] {
+					parameterMetaInfo[i].getDirection(),
+					parameterMetaInfo[i].getName(),
+					parameterMetaInfo[i].getClazz().getName(),
+					parameterMetaInfo[i].getInitialValue() };
+			newTable.add(newTable.new MultiColumnTableRow(
+					columnValues,
+					JadexCommonDiagramParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE));
+
+		}
+		
+		return newTable;
+	}
+	
+	/**
+	 * Update the table with meta info
+	 * 
+	 * @param table
+	 * @param metaInfo
+	 */
+	protected MultiColumnTable updateTaskParamterTable(MultiColumnTable table, ParameterMetaInfo[] metaInfo)
+	{
+		MultiColumnTable newTable = createNewParameterTable(metaInfo);
+		int typeIndex = AbstractParameterTablePropertySection.getDefaultIndexForColumn(AbstractParameterTablePropertySection.TYPE_COLUMN);
+		int valueIndex = AbstractParameterTablePropertySection.getDefaultIndexForColumn(AbstractParameterTablePropertySection.VALUE_COLUMN);
+		
+		for (MultiColumnTableRow row : table.getRowList())
+		{
+			int rowIndex = newTable.indexOf(row);
+			if (rowIndex > -1)
+			{
+				MultiColumnTableRow newRow = newTable.get(rowIndex);
+				
+				if (newRow.getColumnValueAt(typeIndex).equals(row.getColumnValueAt(typeIndex)))
+				{
+					// types are equal (add the old value)
+					newRow.setColumnValueAt(valueIndex, row.getColumnValueAt(valueIndex));
+				}
+				
+			}
+		}
+		
+		
+		return newTable;
+	}
+	
+	
 	
 }

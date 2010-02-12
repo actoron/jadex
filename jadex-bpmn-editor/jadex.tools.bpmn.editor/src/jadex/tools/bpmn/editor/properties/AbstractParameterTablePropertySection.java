@@ -6,10 +6,16 @@ package jadex.tools.bpmn.editor.properties;
 import jadex.tools.bpmn.diagram.Messages;
 import jadex.tools.table.MultiColumnTable.MultiColumnTableRow;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.ui.IWorkbenchPart;
 
 /**
  * @author Claas
@@ -61,6 +67,17 @@ public class AbstractParameterTablePropertySection extends
 	public static final int UNIQUE_PARAMETER_ROW_ATTRIBUTE = 1;
 	
 	
+	// ---- attributes -----
+	
+	/**
+	 * We need a reference to the parameter table viewer to refresh it 
+	 * whenever the annotation was changed somewhere.
+	 */
+	 protected static Map<EModelElement, TableViewer> tableViewerMap;
+	
+	 
+	 // ----- constructor ----
+	 
 	/**
 	 * Default constructor, initializes super class
 	 */
@@ -77,8 +94,105 @@ public class AbstractParameterTablePropertySection extends
 		super(containerEAnnotationName, annotationDetailName,
 				Messages.JadexCommonParameterListSection_ParameterTable_Label, DEFAULT_PARAMTER_COLUMN_NAMES, 
 				columnWeights, DEFAULT_PARAMETER_ROWATTRIBUTE_VALUES, UNIQUE_PARAMETER_ROW_ATTRIBUTE);
+		
+		
 	}
 	
+	 // ---- static methods ----
+	
+	/**
+	 * Get the parameter {@link TableViewer} for element
+	 * @param element
+	 * @return TableViewer for parameter, may be null
+	 */
+	public static TableViewer getParameterTableViewerFor(EModelElement element)
+	{
+		if (tableViewerMap != null)
+		{
+			return tableViewerMap.get(element);
+		}
+		return null;
+	}
+	
+	/**
+	 * Add the parameter {@link TableViewer} for element
+	 * @param element the element
+	 * @param viewer the viewer
+	 * @return viewer the preview viewer, may be null
+	 */
+	public static TableViewer addParameterTableViewerFor(EModelElement element, TableViewer viewer)
+	{
+		if (tableViewerMap == null)
+		{
+			tableViewerMap = new HashMap<EModelElement, TableViewer>();
+		}
+		return tableViewerMap.put(element, viewer);
+	}
+	
+	/**
+	 * Remove a existing table viewer registration
+	 * @param element
+	 * @param viewer
+	 * @return
+	 */
+	public static TableViewer removeParameterTableViewerFor(EModelElement element, TableViewer viewer)
+	{
+		// remove the table viewer from register
+		if (tableViewerMap != null)
+		{
+			return tableViewerMap.remove(element);
+		}
+		return null;
+	}
+	
+	/**
+	 * Calculate the default index for columnName
+	 * @param columnName
+	 * @return
+	 */
+	protected static int getDefaultIndexForColumn(String columnName)
+	{
+		for (int index = 0; index < DEFAULT_PARAMTER_COLUMN_NAMES.length; index++)
+		{
+			if(columnName.equals(DEFAULT_PARAMTER_COLUMN_NAMES[index]))
+			{
+				return index;
+			}
+		}
+		return -1;
+	}
+	
+	// ---- methods ----
+
+	/* (non-Javadoc)
+	 * @see jadex.tools.bpmn.editor.properties.AbstractJadexPropertySection#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		removeParameterTableViewerFor(modelElement, tableViewer);
+		super.dispose();
+	}
+	
+	
+	
+	/* (non-Javadoc)
+	 * @see jadex.tools.bpmn.editor.properties.AbstractMultiColumnTablePropertySection#setInput(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
+	@Override
+	public void setInput(IWorkbenchPart part, ISelection selection)
+	{
+		// deregister the old viewer
+		removeParameterTableViewerFor(modelElement, tableViewer);
+		
+		super.setInput(part, selection);
+		
+		// register the table viewer for new element
+		addParameterTableViewerFor(modelElement, tableViewer);
+		
+		System.out.println(tableViewerMap.size());
+	}
+
 	/**
 	 * Create the parameter edit table
 	 * @param parent
@@ -148,6 +262,8 @@ public class AbstractParameterTablePropertySection extends
 //		column3.setLabelProvider(new MultiColumnTableLabelProvider(3));
 		
 	}
+
+	
 	
 	
 }

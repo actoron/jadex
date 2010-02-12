@@ -6,6 +6,9 @@ package jadex.tools.bpmn.editor.properties;
 import jadex.tools.bpmn.diagram.Messages;
 import jadex.tools.bpmn.editor.JadexBpmnPlugin;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -21,7 +24,6 @@ import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -91,10 +93,7 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	/** Key for the implementing error. */
 	public static final String JADEX_EVENT_ERROR_DETAIL = "error";
 
-	
-	
-	/** Key for the parameter map of a task. */
-	public static final String JADEX_FLOW_EXAMPLE_ANNOTATION = "example";
+
 	
 	
 	/** The composite that holds the section parts */
@@ -142,6 +141,7 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 			TabbedPropertySheetPage aTabbedPropertySheetPage)
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
+		
 		sectionComposite = getWidgetFactory().createComposite(parent);
 		sectionComposite.setLayout(new FillLayout());
 	}
@@ -200,56 +200,56 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	
 	/**
 	 * Update 
-	 * @param key
+	 * @param detail
 	 * @param value
 	 */
-	protected boolean updateJadexEAnnotation(final String key, final String value)
+	protected boolean updateJadexEAnnotation(final String detail, final String value)
 	{
-		// we can only update an activity
 		if(modelElement == null)
 		{
 			return false;
 		}
 		
+		return updateJadexEAnnotationDetail(modelElement, containerEAnnotationName, detail, value);
 		
-		// create the TransactionalCommand
-		ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
-				modelElement, Messages.JadexCommonPropertySection_update_eannotation_command_name)
-		{
-			@Override
-			protected CommandResult doExecuteWithResult(
-					IProgressMonitor arg0, IAdaptable arg1)
-					throws ExecutionException
-			{
-				EAnnotation annotation = modelElement.getEAnnotation(containerEAnnotationName);
-				if (annotation == null)
-				{
-					annotation = EcoreFactory.eINSTANCE.createEAnnotation();
-					annotation.setSource(containerEAnnotationName);
-					annotation.setEModelElement(modelElement);
-					annotation.getDetails().put(annotationDetailName, ""); //$NON-NLS-1$
-				}
-				
-				annotation.getDetails().put(key, value);
-				
-				return CommandResult.newOKCommandResult();
-			}
-		};
-		// execute command
-		try
-		{
-			IStatus status = command.execute(new NullProgressMonitor(), null);
-			return status.isOK();
-		}
-		catch (ExecutionException exception)
-		{
-			JadexBpmnPlugin.getDefault().getLog().log(
-					new Status(IStatus.ERROR, JadexBpmnPlugin.PLUGIN_ID,
-							IStatus.ERROR, exception.getMessage(),
-							exception));
-			
-			return false;
-		}
+//		// create the TransactionalCommand
+//		ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
+//				modelElement, Messages.JadexCommonPropertySection_update_eannotation_command_name)
+//		{
+//			@Override
+//			protected CommandResult doExecuteWithResult(
+//					IProgressMonitor arg0, IAdaptable arg1)
+//					throws ExecutionException
+//			{
+//				EAnnotation annotation = modelElement.getEAnnotation(containerEAnnotationName);
+//				if (annotation == null)
+//				{
+//					annotation = EcoreFactory.eINSTANCE.createEAnnotation();
+//					annotation.setSource(containerEAnnotationName);
+//					annotation.setEModelElement(modelElement);
+//					annotation.getDetails().put(key, ""); //$NON-NLS-1$
+//				}
+//				
+//				annotation.getDetails().put(key, value);
+//				
+//				return CommandResult.newOKCommandResult();
+//			}
+//		};
+//		// execute command
+//		try
+//		{
+//			IStatus status = command.execute(new NullProgressMonitor(), null);
+//			return status.isOK();
+//		}
+//		catch (ExecutionException exception)
+//		{
+//			JadexBpmnPlugin.getDefault().getLog().log(
+//					new Status(IStatus.ERROR, JadexBpmnPlugin.PLUGIN_ID,
+//							IStatus.ERROR, exception.getMessage(),
+//							exception));
+//			
+//			return false;
+//		}
 	}
 	
 	/**
@@ -309,21 +309,152 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 		return sectionGroup;
 	}
 	
+	
+//	/**
+//	 * Search for Composite containing section root composite as data for key
+//	 * JADEX_PROPERTY_SECTION_ROOT
+//	 * @param receiver the Composite on which getParent is acalled
+//	 * @return the jadex root Composite
+//	 */
+//	protected static Composite findSectionRootComposite(Composite receiver)
+//	{
+//		Composite currentSection = receiver;
+//		Composite sectionRoot = (Composite) currentSection.getData(JADEX_PROPERTY_SECTION_ROOT);;
+//		
+//		while (sectionRoot == null)
+//		{
+//			currentSection = currentSection.getParent();
+//			sectionRoot = (Composite) currentSection.getData(JADEX_PROPERTY_SECTION_ROOT);
+//		}
+//		
+//		return sectionRoot;		
+//	}
+	
+//	/**
+//	 * Search subsequent the Composites for groups with specified label
+//	 * @param receiver the section on which getChildren() is called
+//	 * @param groupLabel to search groups with
+//	 * @return List<Group> of all found groups with groupLabel
+//	 */
+//	protected static  List<Group> findSectionGroupComposite(Composite receiver, String groupLabel)
+//	{
+//		ArrayList<Group> foundGroups = new ArrayList<Group>();
+//		Control[] children = receiver.getChildren();
+//		for (int i = 0; i < children.length; i++)
+//		{
+//			if (children[i] instanceof Composite)
+//			{
+//				Composite child = (Composite) children[i];
+//				if (child instanceof Group)
+//				{
+//					String label = ((Group) child).getText();
+//					if (groupLabel.equals(label))
+//					{
+//						foundGroups.add((Group) child);
+//						continue;
+//					}
+//				}
+//				foundGroups.addAll(findSectionGroupComposite(child, groupLabel));
+//			}
+//		}
+//		return foundGroups;		
+//	}
+	
 	// ---- static methods ----
 	
 	/**
-	 * Dummy method for empty composites
+	 * Update annotation detail
+	 * @param element
+	 * @param annotationIdentifier
+	 * @param annotationDetail
+	 * @param value
+	 * @return
 	 */
-	protected static Composite createEmptyComposite(Composite parent, AbstractPropertySection section)
+	protected static boolean updateJadexEAnnotationDetail(final EModelElement element, final String annotationIdentifier, final String annotationDetail, final String value)
 	{
-		Composite newComposite = section.getWidgetFactory().createComposite(parent/*, SWT.BORDER*/);
+		if(element == null)
+		{
+			return false;
+		}
 		
-		// The layout of the composite
-		GridLayout layout = new GridLayout(1, false);
-		newComposite.setLayout(layout);
 		
-		//section.getWidgetFactory().createCLabel(newComposite, "---- empty composite ----");
-		
-		return newComposite;
+		// create the TransactionalCommand
+		ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
+				element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
+		{
+			@Override
+			protected CommandResult doExecuteWithResult(
+					IProgressMonitor arg0, IAdaptable arg1)
+					throws ExecutionException
+			{
+				EAnnotation annotation = element.getEAnnotation(annotationIdentifier);
+				if (annotation == null)
+				{
+					annotation = EcoreFactory.eINSTANCE.createEAnnotation();
+					annotation.setSource(annotationIdentifier);
+					annotation.setEModelElement(element);
+					annotation.getDetails().put(annotationDetail, ""); //$NON-NLS-1$
+				}
+				
+				annotation.getDetails().put(annotationDetail, value);
+				
+				return CommandResult.newOKCommandResult();
+			}
+		};
+		// execute command
+		try
+		{
+			IStatus status = command.execute(new NullProgressMonitor(), null);
+			return status.isOK();
+		}
+		catch (ExecutionException exception)
+		{
+			JadexBpmnPlugin.getDefault().getLog().log(
+					new Status(IStatus.ERROR, JadexBpmnPlugin.PLUGIN_ID,
+							IStatus.ERROR, exception.getMessage(),
+							exception));
+			
+			return false;
+		}
 	}
+	
+	/**
+	 * Get annotation detail
+	 * @param element
+	 * @param annotationIdentifier
+	 * @param annotationDetail
+	 * @return
+	 */
+	protected static String getJadexEAnnotationDetail(final EModelElement element, final String annotationIdentifier, final String annotationDetail)
+	{
+		if(element == null)
+		{
+			return null;
+		}
+
+		EAnnotation annotation = element.getEAnnotation(annotationIdentifier);
+		if (annotation != null)
+		{
+			return annotation.getDetails().get(annotationDetail);
+		}
+	
+		return null;
+		
+	}
+	
+//	/**
+//	 * Dummy method for empty composites
+//	 */
+//	protected static Composite createEmptyComposite(Composite parent, AbstractPropertySection section)
+//	{
+//		Composite newComposite = section.getWidgetFactory().createComposite(parent/*, SWT.BORDER*/);
+//		
+//		// The layout of the composite
+//		GridLayout layout = new GridLayout(1, false);
+//		newComposite.setLayout(layout);
+//		
+//		//section.getWidgetFactory().createCLabel(newComposite, "---- empty composite ----");
+//		
+//		return newComposite;
+//	}
 }

@@ -8,6 +8,7 @@ import jadex.tools.table.MultiColumnTable.MultiColumnTableRow;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -62,7 +63,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	// ---- attributes ----
 	
 	/** The viewer/editor for parameter */ 
-	private TableViewer tableViewer;
+	protected TableViewer tableViewer;
 	
 	/** The table add element button */
 	private Button addButton;
@@ -83,7 +84,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	
 	private int uniqueColumnIndex;
 	
-	private HashMap<EModelElement, HashSet<String>> uniqueColumnValuesMap;
+	private Map<EModelElement, HashSet<String>> uniqueColumnValuesMap;
 
 	// ---- constructor ----
 	
