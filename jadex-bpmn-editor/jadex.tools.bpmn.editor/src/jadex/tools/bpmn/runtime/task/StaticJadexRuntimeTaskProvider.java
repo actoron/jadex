@@ -8,7 +8,7 @@ import java.util.Map;
  *  Helper class for delivering meta data for tasks as long as no
  *  introspection task provider is available.
  */
-public class StaticJadexRuntimeTaskProvider implements IRuntimeTaskProvider
+public class StaticJadexRuntimeTaskProvider extends RuntimeTaskProviderSupport
 {
 	// ---- static part ----
 	
@@ -250,9 +250,7 @@ public class StaticJadexRuntimeTaskProvider implements IRuntimeTaskProvider
 		return map;
 	}
 	
-	// ---- attributes ----
 	
-	protected Map metaInfoMap;
 	
 	// ---- constructor ----
 	
@@ -274,13 +272,5 @@ public class StaticJadexRuntimeTaskProvider implements IRuntimeTaskProvider
 		return TASK_IMPLEMENTATIONS;
 	}
 	
-	
-	/* (non-Javadoc)
-	 * @see jadex.tools.bpmn.runtime.task.IRuntimeTaskProvider#getTaskMetaInfoFor(java.lang.String)
-	 */
-	public TaskMetaInfo getTaskMetaInfoFor(String implementationClass)
-	{
-		return (TaskMetaInfo)metaInfoMap.get(implementationClass);
-	}
 
 }
