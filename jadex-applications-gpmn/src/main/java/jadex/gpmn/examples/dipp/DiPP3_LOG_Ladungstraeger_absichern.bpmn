@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_ffqWQRe4Ed-cUJRTmkeIHQ" iD="_ffqWQBe4Ed-cUJRTmkeIHQ">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_g3vjgBe4Ed-cUJRTmkeIHQ" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_g3wKkBe4Ed-cUJRTmkeIHQ" key="imports" value="jadex.wfms.parametertypes.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_g3wKkRe4Ed-cUJRTmkeIHQ" key="Package" value="jadex.gpmn.examples.dipp"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_ffq9VRe4Ed-cUJRTmkeIHQ" iD="_ffq9VBe4Ed-cUJRTmkeIHQ" name="Body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ffrkYRe4Ed-cUJRTmkeIHQ" iD="_ffrkYBe4Ed-cUJRTmkeIHQ" outgoingEdges="_wWaQ8Re4Ed-cUJRTmkeIHQ" incomingEdges="_m1XYgRe4Ed-cUJRTmkeIHQ" name="DiPP3_LOG_Absichern_LT" lanes="_iTYbERe4Ed-cUJRTmkeIHQ" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_kRyogBe4Ed-cUJRTmkeIHQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_kRzPkBe4Ed-cUJRTmkeIHQ" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6atncBe4Ed-cUJRTmkeIHQ" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP3 - Absicherung Ladungstr&amp;auml;ger &lt;/H2> &lt;br> &lt;H3>SLT-Bemusterung &lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)␟inout␋Alle_SonderLadungstraeger_bemustert␋boolean␋$beliefbase.SLT_Bemusterung"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_lTYBURe4Ed-cUJRTmkeIHQ" iD="_lTYBUBe4Ed-cUJRTmkeIHQ" outgoingEdges="_m1XYgRe4Ed-cUJRTmkeIHQ" lanes="_iTYbERe4Ed-cUJRTmkeIHQ" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_vedVQRe4Ed-cUJRTmkeIHQ" iD="_vedVQBe4Ed-cUJRTmkeIHQ" incomingEdges="_y9UBwRe4Ed-cUJRTmkeIHQ" lanes="_iTYbERe4Ed-cUJRTmkeIHQ" activityType="EventEndEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_xtWOsRe4Ed-cUJRTmkeIHQ" iD="_xtWOsBe4Ed-cUJRTmkeIHQ" outgoingEdges="_y9UBwRe4Ed-cUJRTmkeIHQ" incomingEdges="_wWaQ8Re4Ed-cUJRTmkeIHQ" name="SLT_Bemusterung_speichern" lanes="_iTYbERe4Ed-cUJRTmkeIHQ">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ykM-MBe4Ed-cUJRTmkeIHQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ykM-MRe4Ed-cUJRTmkeIHQ" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_22fSwBe4Ed-cUJRTmkeIHQ" key="parameters" value="in␋beliefname␋String␋&quot;SLT_Bemusterung&quot;␟in␋value␋Object␋"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_m1XYgRe4Ed-cUJRTmkeIHQ" iD="_m1XYgBe4Ed-cUJRTmkeIHQ">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_m2YsMBe4Ed-cUJRTmkeIHQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m2ZTQBe4Ed-cUJRTmkeIHQ" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m2ZTQRe4Ed-cUJRTmkeIHQ" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_wWaQ8Re4Ed-cUJRTmkeIHQ" iD="_wWaQ8Be4Ed-cUJRTmkeIHQ">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wXQlgBe4Ed-cUJRTmkeIHQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wXQlgRe4Ed-cUJRTmkeIHQ" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wXQlghe4Ed-cUJRTmkeIHQ" key="condition" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_UrksIBe5Ed-cUJRTmkeIHQ" source="sequence">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_UrksIRe5Ed-cUJRTmkeIHQ" key="mappings" value="value␋Alle_SonderLadungstraeger_bemustert"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_y9UBwRe4Ed-cUJRTmkeIHQ" iD="_y9UBwBe4Ed-cUJRTmkeIHQ"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_iTYbERe4Ed-cUJRTmkeIHQ" iD="_iTYbEBe4Ed-cUJRTmkeIHQ" name="LT_Planer" activities="_ffrkYRe4Ed-cUJRTmkeIHQ _lTYBURe4Ed-cUJRTmkeIHQ _vedVQRe4Ed-cUJRTmkeIHQ _xtWOsRe4Ed-cUJRTmkeIHQ"/>
+  </pools>
+</bpmn:BpmnDiagram>

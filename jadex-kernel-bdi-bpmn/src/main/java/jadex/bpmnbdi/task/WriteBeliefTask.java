@@ -66,6 +66,22 @@ public class WriteBeliefTask extends AbstractTask
 				throw new RuntimeException("Unknown mode: "+context.getParameterValue("mode")+", "+context);
 			}
 		}
+		else if (context.hasParameterValue("beliefname0"))
+		{
+			for(int i=0; ; i++)
+			{
+				if(context.hasParameterValue("beliefname"+i))
+				{
+					String name = (String)context.getParameterValue("beliefname"+i);
+					Object value = context.getParameterValue("value"+i);
+					inst.getBeliefbase().getBelief(name).setFact(value);
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
 		else
 		{
 			throw new RuntimeException("Belief(set)name no specified: "+context);

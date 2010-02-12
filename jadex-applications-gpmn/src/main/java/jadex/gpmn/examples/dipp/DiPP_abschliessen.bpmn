@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_H4M5wRfZEd-1oacAaeC3TQ" iD="_H4M5wBfZEd-1oacAaeC3TQ">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_iEpYgBfZEd-1oacAaeC3TQ" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iEp_kBfZEd-1oacAaeC3TQ" key="imports" value="jadex.wfms.parametertypes.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iEp_kRfZEd-1oacAaeC3TQ" key="Package" value="jadex.gpmn.examples.dipp"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_H4bjQRfZEd-1oacAaeC3TQ" iD="_H4bjQBfZEd-1oacAaeC3TQ" name="Body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_H4hp4RfZEd-1oacAaeC3TQ" iD="_H4hp4BfZEd-1oacAaeC3TQ" outgoingEdges="_rHQBcRfZEd-1oacAaeC3TQ" incomingEdges="_VcQUoRfZEd-1oacAaeC3TQ" name="DiPP_abschliessen" lanes="_RCWVIRfZEd-1oacAaeC3TQ" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ic-Y8BfZEd-1oacAaeC3TQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ic-Y8RfZEd-1oacAaeC3TQ" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jMd8MBfZEd-1oacAaeC3TQ" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP -Digitales Produktions-Packaging erfolgreich abgeschlossen &lt;/H2> &lt;/CENTER>&lt;/HTML>&quot;)"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_U6_aoBfZEd-1oacAaeC3TQ" iD="_U6-zkBfZEd-1oacAaeC3TQ" outgoingEdges="_VcQUoRfZEd-1oacAaeC3TQ" lanes="_RCWVIRfZEd-1oacAaeC3TQ" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_qfdosRfZEd-1oacAaeC3TQ" iD="_qfdosBfZEd-1oacAaeC3TQ" incomingEdges="_rHQBcRfZEd-1oacAaeC3TQ" lanes="_RCWVIRfZEd-1oacAaeC3TQ" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_VcQUoRfZEd-1oacAaeC3TQ" iD="_VcQUoBfZEd-1oacAaeC3TQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_rHQBcRfZEd-1oacAaeC3TQ" iD="_rHQBcBfZEd-1oacAaeC3TQ"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_RCWVIRfZEd-1oacAaeC3TQ" iD="_RCWVIBfZEd-1oacAaeC3TQ" name="ProzessPlaner" activities="_H4hp4RfZEd-1oacAaeC3TQ _U6_aoBfZEd-1oacAaeC3TQ _qfdosRfZEd-1oacAaeC3TQ"/>
+  </pools>
+</bpmn:BpmnDiagram>
