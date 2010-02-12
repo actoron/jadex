@@ -4,6 +4,7 @@
 package jadex.tools.bpmn.editor.properties;
 
 import jadex.tools.bpmn.diagram.Messages;
+import jadex.tools.table.MultiColumnTable.MultiColumnTableRow;
 
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.TableViewer;
@@ -99,7 +100,7 @@ public class AbstractParameterTablePropertySection extends
 				for (int i = 0; i < DIRECTION_VALUES.length; i++)
 				{
 					if (DIRECTION_VALUES[i]
-							.equals(((AbstractMultiColumnTableRow) element)
+							.equals(((MultiColumnTableRow) element)
 									.getColumnValueAt(0)))
 					{
 						return new Integer(i);

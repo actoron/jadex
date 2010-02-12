@@ -53,6 +53,24 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 	// ---- methods ----
 
 	/**
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		if (textFields != null)
+		{
+			for (int i = 0; i < textFields.length; i++)
+			{
+				textFields[i].dispose();
+			}
+		}
+
+		super.dispose();
+	}
+
+	
+	/**
 	 * Creates the UI of the section.
 	 */
 	@Override

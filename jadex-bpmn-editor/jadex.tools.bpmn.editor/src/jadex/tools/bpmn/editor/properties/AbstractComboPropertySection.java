@@ -70,9 +70,22 @@ public abstract class AbstractComboPropertySection extends AbstractJadexProperty
 	 * TODO: create ComboItemsProvider for tooltips?
 	 */
 	protected abstract String[] getComboItems();
+
 	
 	// ---- methods ----
+	
+	/**
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		if (cCombo != null)
+			cCombo.dispose();
 
+		super.dispose();
+	}
+	
 	/**
 	 * Creates the UI of the section.
 	 */

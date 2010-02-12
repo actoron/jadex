@@ -81,7 +81,7 @@ public abstract class RuntimeTaskProviderSupport implements IRuntimeTaskProvider
 			}
 		}
 		
-		return new TaskMetaInfo("No MetaInfo available", new ParameterMetaInfo[0]);
+		return new TaskMetaInfo("", new ParameterMetaInfo[0]);
 	}
 
 }

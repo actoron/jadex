@@ -1,16 +1,13 @@
-/**
- * 
- */
+
 package jadex.tools.bpmn.editor.properties;
 
 import jadex.tools.bpmn.diagram.Messages;
 import jadex.tools.bpmn.editor.JadexBpmnEditor;
+import jadex.tools.table.MultiColumnTable;
+import jadex.tools.table.MultiColumnTable.MultiColumnTableRow;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.StringTokenizer;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -416,18 +413,19 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 							IProgressMonitor monitor, IAdaptable info)
 							throws ExecutionException
 					{
-						AbstractMultiColumnTableRow newRow = new AbstractMultiColumnTableRow(
-								defaultListElementAttributeValues, uniqueColumnIndex);
-
+						
+						MultiColumnTableRow newRow;
 						HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
 						synchronized (uniqueValueCash)
 						{
-							List<AbstractMultiColumnTableRow> tableRows = getTableRowList();
-							String uniqueValue = createUniqueRowValue(newRow, tableRows);
+							MultiColumnTable table = getTableRowList();
+							newRow = table.new MultiColumnTableRow(
+									defaultListElementAttributeValues, uniqueColumnIndex);
+							String uniqueValue = createUniqueRowValue(newRow, table);
 							newRow.getColumnValues()[uniqueColumnIndex] = uniqueValue;
 							addUniqueRowValue(uniqueValue);
-							tableRows.add(newRow);
-							updateTableRowList(tableRows);
+							table.add(newRow);
+							updateTableRowList(table);
 						}
 
 						return CommandResult.newOKCommandResult(newRow);
@@ -479,10 +477,10 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 						HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
 						synchronized (uniqueValueCash)
 						{
-							AbstractMultiColumnTableRow rowToRemove = (AbstractMultiColumnTableRow) ((IStructuredSelection) tableViewer
+							MultiColumnTableRow rowToRemove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
 									.getSelection()).getFirstElement();
 							
-							List<AbstractMultiColumnTableRow> tableRowList = getTableRowList();
+							MultiColumnTable tableRowList = getTableRowList();
 							//modelElementUniqueColumnValueCash.remove(rowToRemove.columnValues[uniqueColumnIndex]);
 							uniqueValueCash.remove(rowToRemove.getColumnValues()[uniqueColumnIndex]);
 							tableRowList.remove(rowToRemove);
@@ -515,7 +513,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	// ---- converter and help methods ----
 
 	
-	private String createUniqueRowValue(AbstractMultiColumnTableRow row, List<AbstractMultiColumnTableRow> table)
+	private String createUniqueRowValue(MultiColumnTableRow row, MultiColumnTable table)
 	{
 		assert (row != null && table != null);
 		
@@ -556,11 +554,11 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	}
 	
 	/**
-	 * Retrieve the EAnnotation from the modelElement and converts it to a {@link AbstractMultiColumnTableRow} list
+	 * Retrieve the EAnnotation from the modelElement and converts it to a {@link MultiColumnTableRow} list
 	 * @param act
 	 * @return
 	 */
-	private List<AbstractMultiColumnTableRow> getTableRowList()
+	private MultiColumnTable getTableRowList()
 	{
 		EAnnotation ea = modelElement.getEAnnotation(containerEAnnotationName);
 		if (ea != null)
@@ -568,158 +566,38 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 			String value = (String) ea.getDetails().get(annotationDetailName);
 			if (value != null)
 			{
-				List<AbstractMultiColumnTableRow> rowList = convertMultiColumnTableString(value, columnNames.length, uniqueColumnIndex);
-				for (AbstractMultiColumnTableRow abstractMultiColumnTableRow : rowList)
+				MultiColumnTable table = MultiColumnTable.convertMultiColumnTableString(value, columnNames.length, uniqueColumnIndex);
+				for (MultiColumnTableRow multiColumnTableRow : table.getRowList())
 				{
-					addUniqueRowValue(abstractMultiColumnTableRow.getColumnValueAt(uniqueColumnIndex));
+					addUniqueRowValue(multiColumnTableRow.getColumnValueAt(uniqueColumnIndex));
 				}
-				return rowList;
+				return table;
 			}
 		}
 
-		return new ArrayList<AbstractMultiColumnTableRow>(0);
+		return new MultiColumnTable(0);
 	}
 	
 	/**
-	 * Updates the EAnnotation for the modelElement task parameter list
-	 * @param params
+	 * Updates the EAnnotation for the modelElement with table data
+	 * @param table
 	 */
-	private void updateTableRowList(List<AbstractMultiColumnTableRow> params)
+	private void updateTableRowList(MultiColumnTable table)
 	{
-		updateJadexEAnnotation(annotationDetailName, convertMultiColumnRowList(params));
+		updateJadexEAnnotation(annotationDetailName, MultiColumnTable.convertMultiColumnRowList(table));
 	}
 	
 	
 	/**
-	 * Convert a string representation of a AbstractMultiColumnTableRow list into a
-	 * AbstractMultiColumnTableRow list
-	 * 
-	 * @param stringToConvert
-	 * @param columnCount
-	 * @param uniqueColumn
-	 * @return
-	 */
-	public static List<AbstractMultiColumnTableRow> convertMultiColumnTableString(
-			String stringToConvert, int columnCount, int uniqueColumn)
-	{
-		StringTokenizer listTokens = new StringTokenizer(stringToConvert, JadexCommonPropertySection.LIST_ELEMENT_DELIMITER);
-		List<AbstractMultiColumnTableRow> tableRowList = new ArrayList<AbstractMultiColumnTableRow>(listTokens.countTokens());
-		while (listTokens.hasMoreTokens())
-		{
-			String parameterElement = listTokens.nextToken();
-			StringTokenizer parameterTokens = new StringTokenizer(
-					parameterElement,
-					JadexCommonPropertySection.LIST_ELEMENT_ATTRIBUTE_DELIMITER,
-					true);
-
-			// number of columns is the index that will be used.
-			// initialize array with empty strings because we 
-			// don't check the values
-			String[] attributes = new String[columnCount];
-			for (int index = 0; index < attributes.length; index++)
-			{
-				attributes[index] = attributes[index] != null ? attributes[index] : "";
-			}
-			
-			int attributeIndexCounter = 0;	
-			String lastToken = null;
-
-			while (parameterTokens.hasMoreTokens())
-			{
-				String attributeToken = parameterTokens.nextToken();
-
-				if (!attributeToken.equals(LIST_ELEMENT_ATTRIBUTE_DELIMITER))
-				{
-					attributes[attributeIndexCounter] = attributeToken;
-					attributeIndexCounter++;
-				}
-				// we found a delimiter
-				else
-				{
-					if (	// we found a delimiter at the first position
-							lastToken == null 
-							// we found a delimiter at the last position, 
-							|| !parameterTokens.hasMoreTokens()
-							// we found two delimiter without any content between
-							|| attributeToken.equals(lastToken))
-					{
-						attributes[attributeIndexCounter] = "";
-						attributeIndexCounter++;
-					}
-					
-				}
-
-				// remember last token
-				lastToken = attributeToken;
-
-			} // end while paramTokens
-
-			AbstractMultiColumnTableRow newRow = new AbstractMultiColumnTableRow(attributes, uniqueColumn);
-			//addUniqueRowValue(newRow.getColumnValueAt(uniqueColumnIndex));
-			tableRowList.add(newRow);
-
-		} // end while listTokens
-		
-		return tableRowList;
-	}
-	
-	/**
-	 * Convert a list of AbstractMultiColumnTableRow into a string representation using  
-	 * <code>LIST_ELEMENT_DELIMITER</code> from {@link AbstractJadexPropertySection}
-	 * as delimiter
-	 * 
-	 * @param params
-	 * @return
-	 */
-	public static String convertMultiColumnRowList(List<AbstractMultiColumnTableRow> params)
-	{
-		StringBuffer buffer = new StringBuffer();
-		for (AbstractMultiColumnTableRow abstractMultiColumnTableRow : params)
-		{
-			if (buffer.length() != 0)
-			{
-				buffer.append(LIST_ELEMENT_DELIMITER);
-			}
-
-			buffer.append(convertMultiColumnRowToString(abstractMultiColumnTableRow));
-		}
-		return buffer.toString();
-	}
-	
-	/**
-	 * Convert a row of the table to a String representation using 
-	 * <code>LIST_ELEMENT_ATTRIBUTE_DELIMITER</code> from 
-	 * {@link AbstractJadexPropertySection} as delimiter
-	 * @param row to convert
-	 * @return String representation of row
-	 */
-	public static String convertMultiColumnRowToString(AbstractMultiColumnTableRow row)
-	{
-		StringBuffer buffer = new StringBuffer();
-		for (int i = 0; i < row.getColumnValues().length; i++)
-		{
-			buffer.append(row.getColumnValues()[i]);
-			buffer.append(LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-		}
-		// remove last delimiter
-		buffer.delete(buffer.length()
-				- LIST_ELEMENT_ATTRIBUTE_DELIMITER.length(), buffer.length());
-		//System.out.println(buffer.toString());
-		return buffer.toString();
-	}
-	
-	// ---- internal used model classes ----
-	
-	/**
-	 * Simple content provider that reflects the ContextElements 
-	 * of an Context given as an input. Marked as dynamic / static.
+	 * Simple content provider that reflects the table values  
+	 * of the specified annotation detail given as value from containing class.
 	 */
 	protected class MultiColumnTableContentProvider implements IStructuredContentProvider {
 
 		/**
 		 * Generate the content for the table.
 		 * 
-		 * @return Object[] that contains AbstractMultiColumnTableRow objects.
+		 * @return Object[] that contains MultiColumnTableRow objects.
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
 		public Object[] getElements(Object inputElement)
@@ -732,10 +610,10 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 			
 			if (inputElement instanceof EAnnotation)
 			{
-				String parameterListString = ((EAnnotation) inputElement).getDetails().get(annotationDetailName);
-				if(parameterListString!=null)
+				String tableString = ((EAnnotation) inputElement).getDetails().get(annotationDetailName);
+				if(tableString!=null)
 				{
-					return convertMultiColumnTableString(parameterListString, columnNames.length, uniqueColumnIndex).toArray();
+					return MultiColumnTable.convertMultiColumnTableString(tableString, columnNames.length, uniqueColumnIndex).toArray();
 					// add to unique map not need, its only a content provider
 				}
 					
@@ -773,12 +651,15 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 
 		// ---- attributes ----
 		
+		/** 
+		 * The index for this column
+		 */
 		private int columIndex;
 		
 		// ---- constructors ----
 		
 		/**
-		 * @param columIndex
+		 * empty constructor, sets column index to -1
 		 */
 		protected MultiColumnTableLabelProvider()
 		{
@@ -787,7 +668,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 		}
 		
 		/**
-		 * @param columIndex
+		 * @param columIndex the column index to provide the label for
 		 */
 		protected MultiColumnTableLabelProvider(int columIndex)
 		{
@@ -839,9 +720,9 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 		 */
 		public String getColumnText(Object element, int columnIndex)
 		{
-			if (element instanceof AbstractMultiColumnTableRow)
+			if (element instanceof MultiColumnTableRow)
 			{
-				return ((AbstractMultiColumnTableRow) element).getColumnValues()[columnIndex];
+				return ((MultiColumnTableRow) element).getColumnValues()[columnIndex];
 			}
 			return super.getText(element);
 		}
@@ -849,11 +730,11 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	}
 	
 //	/**
-//	 * Internal representation of a jadex runtime AbstractMultiColumnTableRow
+//	 * Internal representation of a jadex runtime MultiColumnTableRow
 //	 * 
 //	 * @author Claas Altschaffel
 //	 */
-//	public class AbstractMultiColumnTableRow {
+//	public class MultiColumnTableRow {
 //		
 //		// ---- attributes ----
 //
@@ -863,7 +744,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 //		// ---- constructors ----
 //		
 //		/** default constructor */
-//		public AbstractMultiColumnTableRow(String[] columnValues, int uniqueColumnIndex)
+//		public MultiColumnTableRow(String[] columnValues, int uniqueColumnIndex)
 //		{
 //			super();
 //			
@@ -896,7 +777,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 //		@Override
 //		public boolean equals(Object obj)
 //		{
-//			if (!(obj instanceof AbstractMultiColumnTableRow))
+//			if (!(obj instanceof MultiColumnTableRow))
 //			{
 //				return false;
 //			}
@@ -904,13 +785,13 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 //			boolean returnValue = true;
 //			if (useUniqueColumn())
 //			{
-//				returnValue = this.columnValues[uniqueColumnIndex].equals(((AbstractMultiColumnTableRow) obj).columnValues[uniqueColumnIndex]);
+//				returnValue = this.columnValues[uniqueColumnIndex].equals(((MultiColumnTableRow) obj).columnValues[uniqueColumnIndex]);
 //			}
 //			else
 //			{
 //				for (int i = 0; returnValue && i < this.columnValues.length; i++)
 //				{
-//					returnValue =  returnValue &&  this.columnValues[i].equals(((AbstractMultiColumnTableRow) obj).columnValues[i]);
+//					returnValue =  returnValue &&  this.columnValues[i].equals(((MultiColumnTableRow) obj).columnValues[i]);
 //				}
 //			}
 //
@@ -946,7 +827,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 //		public String toString()
 //		{
 //			StringBuffer buffer = new StringBuffer();
-//			buffer.append("AbstractMultiColumnTableRow(");
+//			buffer.append("MultiColumnTableRow(");
 //			for (int i = 0; i < this.columnValues.length; i++)
 //			{
 //				buffer.append("`");
@@ -1024,7 +905,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 		 */
 		public boolean canEdit(Object element)
 		{
-			if (element instanceof AbstractMultiColumnTableRow)
+			if (element instanceof MultiColumnTableRow)
 			{
 				return true;
 			}
@@ -1051,7 +932,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 		 */
 		protected Object getValue(Object element)
 		{
-			return ((AbstractMultiColumnTableRow) element).getColumnValues()[attributeIndex];
+			return ((MultiColumnTableRow) element).getColumnValues()[attributeIndex];
 		}
 		
 		/**
@@ -1062,7 +943,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 		protected void doSetValue(Object element, Object value)
 		{
 			
-			final AbstractMultiColumnTableRow tableViewerRow = (AbstractMultiColumnTableRow) element;
+			final MultiColumnTableRow tableViewerRow = (MultiColumnTableRow) element;
 			final String newValue = value.toString();
 			
 			// modify the Model
@@ -1077,8 +958,8 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 						throws ExecutionException
 				{
 
-					List<AbstractMultiColumnTableRow> tableRowList = getTableRowList();
-					AbstractMultiColumnTableRow rowToEdit = (AbstractMultiColumnTableRow) tableRowList.get(tableRowList.indexOf(tableViewerRow));
+					MultiColumnTable tableRowList = getTableRowList();
+					MultiColumnTableRow rowToEdit = (MultiColumnTableRow) tableRowList.get(tableRowList.indexOf(tableViewerRow));
 
 					
 					

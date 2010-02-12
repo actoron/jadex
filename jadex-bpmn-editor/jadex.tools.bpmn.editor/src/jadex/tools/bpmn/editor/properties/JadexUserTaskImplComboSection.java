@@ -51,7 +51,6 @@ public class JadexUserTaskImplComboSection extends
 	
 	// ---- attributes ----
 	
-	//protected CLabel taskMetaInfoLabel;
 	protected Text taskMetaInfoText;
 	
 	protected IRuntimeTaskProvider taskProvider;
@@ -68,6 +67,19 @@ public class JadexUserTaskImplComboSection extends
 	}
 
 	// ---- override methods ----
+	
+	/**
+	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		if (taskMetaInfoText != null)
+			taskMetaInfoText.dispose();
+
+		super.dispose();
+	}
+
 	
 	/**
 	 * @see jadex.tools.bpmn.editor.properties.AbstractComboPropertySection#getComboItems()
@@ -221,7 +233,7 @@ public class JadexUserTaskImplComboSection extends
 		ParameterMetaInfo[] params = taskMetaInfo.getParameterMetaInfos();
 		for (int i = 0; i < params.length; i++)
 		{
-			info.append("\n" + "Parameter:" + params[i].getName() + "\n");
+			info.append("\n" + "Parameter: " + params[i].getName() + "\n");
 			info.append("\t" + "Direction: " + params[i].getDirection() + "\n");
 			info.append("\t" + "Class: " + params[i].getClazz() + "\n");
 			info.append("\t" + "Initial value: " + params[i].getInitialValue() + "\n");
@@ -237,6 +249,7 @@ public class JadexUserTaskImplComboSection extends
 	{
 		TaskMetaInfo metaInfo = taskProvider.getTaskMetaInfoFor(taskClassName);
 		ParameterMetaInfo[] taskParameter = metaInfo.getParameterMetaInfos();
+		
 		// TODO: implement
 	}
 	
