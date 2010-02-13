@@ -341,7 +341,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 			{
 				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
 						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
-						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION
+						//|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION
 						|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
 						|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC
 						;
