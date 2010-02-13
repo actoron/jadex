@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -33,6 +34,7 @@ import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TableViewerEditor;
+import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.stp.bpmn.diagram.part.BpmnDiagramEditorPlugin;
@@ -329,6 +331,8 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 //		}
 
 		
+		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(viewer,new FocusCellOwnerDrawHighlighter(viewer));
+		
 		ColumnViewerEditorActivationStrategy editorActivationSupport = new ColumnViewerEditorActivationStrategy(
 				viewer)
 		{
@@ -339,12 +343,13 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
 						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION
 						|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == SWT.CR)
+						|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC
 						;
 			}
 		};
 
-		TableViewerEditor.create(viewer,/* focusCellManager,*/ editorActivationSupport,
-				TableViewerEditor.TABBING_HORIZONTAL
+		TableViewerEditor.create(viewer, focusCellManager, editorActivationSupport,
+				TableViewerEditor.TABBING_HORIZONTAL | TableViewerEditor.TABBING_VERTICAL
 						| TableViewerEditor.KEYBOARD_ACTIVATION
 						| TableViewerEditor.KEEP_EDITOR_ON_DOUBLE_CLICK
 						//| TableViewerEditor.TABBING_CYCLE_IN_ROW
