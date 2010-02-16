@@ -2,7 +2,7 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_rkhfMRfMEd-uLKn09PqHSg" iD="_rkhfMBfMEd-uLKn09PqHSg">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_y6zJMBfMEd-uLKn09PqHSg" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_y6zwQBfMEd-uLKn09PqHSg" key="imports" value="jadex.wfms.parametertypes.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_y6zwQRfMEd-uLKn09PqHSg" key="Package" value="jadex.gpmn.examples.dipp"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_y6zwQRfMEd-uLKn09PqHSg" key="Package" value="jadex.wfms.examples.dipp"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_rkvhoRfMEd-uLKn09PqHSg" iD="_rkvhoBfMEd-uLKn09PqHSg" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_rk1oQRfMEd-uLKn09PqHSg" iD="_rk1oQBfMEd-uLKn09PqHSg" outgoingEdges="_XEIu4RfNEd-uLKn09PqHSg" incomingEdges="__zTFoRfMEd-uLKn09PqHSg" name="Simulation_Planer_informieren" lanes="_6Yfp0RfMEd-uLKn09PqHSg" activityType="Task">

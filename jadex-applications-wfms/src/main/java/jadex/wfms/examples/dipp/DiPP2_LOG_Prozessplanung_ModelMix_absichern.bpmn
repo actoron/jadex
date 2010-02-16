@@ -2,7 +2,7 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_UwN5sRZHEd-jGLD5OCZpUA" iD="_UwN5sBZHEd-jGLD5OCZpUA">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WkxnkBZHEd-jGLD5OCZpUA" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WkyOoBZHEd-jGLD5OCZpUA" key="imports" value="jadex.wfms.parametertypes.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WkyOoRZHEd-jGLD5OCZpUA" key="Package" value="jadex.gpmn.examples.dipp"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WkyOoRZHEd-jGLD5OCZpUA" key="Package" value="jadex.wfms.examples.dipp"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_j7aTsBZWEd-xN_GMKM5g9Q" key="parameters" value="in␋zielwerke␋String[]␋$beliefbase.zielwerke"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_UwN5txZHEd-jGLD5OCZpUA" iD="_UwN5thZHEd-jGLD5OCZpUA" name="Body">

@@ -2,10 +2,10 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_5u7rYXeaEd6uv6EsxGS0Yg" iD="_5u7rYHeaEd6uv6EsxGS0Yg">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-R62wBY9Ed-jGLD5OCZpUA" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-R7d0BY9Ed-jGLD5OCZpUA" key="imports" value="jadex.wfms.client.task.WorkitemTask␟jadex.wfms.parametertypes.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-R7d0RY9Ed-jGLD5OCZpUA" key="Package" value="jadex.gpmn.examples.dipp"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-R7d0RY9Ed-jGLD5OCZpUA" key="Package" value="jadex.wfms.examples.dipp"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_5u7rZ3eaEd6uv6EsxGS0Yg" iD="_5u7rZneaEd6uv6EsxGS0Yg" name="body">
-    <vertices xmi:type="bpmn:Activity" xmi:id="_5u7raXeaEd6uv6EsxGS0Yg" iD="_5u7raHeaEd6uv6EsxGS0Yg" outgoingEdges="_X7w2anebEd6uv6EsxGS0Yg" incomingEdges="_YhwfanebEd6uv6EsxGS0Yg" name="DiPP1_LOG_Lieferantenstandort_pruefen&#xD;&#xA;class = WorkitemTask.class" lanes="_SaaeERTVEd-pLK0AZ_MMug" activityType="Task">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_5u7raXeaEd6uv6EsxGS0Yg" iD="_5u7raHeaEd6uv6EsxGS0Yg" outgoingEdges="_X7w2anebEd6uv6EsxGS0Yg" incomingEdges="_YhwfanebEd6uv6EsxGS0Yg" name="DiPP1_LOG_Lieferantenstandort_pruefen" lanes="_SaaeERTVEd-pLK0AZ_MMug" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-mvQMBY9Ed-jGLD5OCZpUA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-mvQMRY9Ed-jGLD5OCZpUA" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__aUCMBY9Ed-jGLD5OCZpUA" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP1 - Absicherung Lieferanten &lt;/H2> &lt;br> &lt;H3>Durchrechnen von Logistikkosten mit potentiellen Lieferanten (genannt von Einkauf) &lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)"/>

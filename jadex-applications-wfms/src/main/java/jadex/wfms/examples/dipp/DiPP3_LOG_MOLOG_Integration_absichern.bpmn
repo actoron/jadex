@@ -2,7 +2,7 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_DGCKERe_Ed-cUJRTmkeIHQ" iD="_DGCKEBe_Ed-cUJRTmkeIHQ">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_GGx-QBe_Ed-cUJRTmkeIHQ" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GGx-QRe_Ed-cUJRTmkeIHQ" key="imports" value="jadex.wfms.parametertypes.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GGx-Qhe_Ed-cUJRTmkeIHQ" key="Package" value="jadex.gpmn.examples.dipp"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GGx-Qhe_Ed-cUJRTmkeIHQ" key="Package" value="jadex.wfms.examples.dipp"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_DGSBsRe_Ed-cUJRTmkeIHQ" iD="_DGSBsBe_Ed-cUJRTmkeIHQ" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_DGSowRe_Ed-cUJRTmkeIHQ" iD="_DGSowBe_Ed-cUJRTmkeIHQ" outgoingEdges="_j2gWgRe_Ed-cUJRTmkeIHQ" incomingEdges="_K5350Re_Ed-cUJRTmkeIHQ" name="MaZo_optimieren_und_absichern" lanes="_Ip3mEBe_Ed-cUJRTmkeIHQ" activityType="Task">

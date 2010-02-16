@@ -1,4 +1,4 @@
-package jadex.gpmn.examples.dipp;
+package jadex.wfms.examples.dipp;
 
 public class SItemLists
 {

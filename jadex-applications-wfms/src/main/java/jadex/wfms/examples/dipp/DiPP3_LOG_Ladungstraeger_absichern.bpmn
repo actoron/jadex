@@ -2,7 +2,7 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_ffqWQRe4Ed-cUJRTmkeIHQ" iD="_ffqWQBe4Ed-cUJRTmkeIHQ">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_g3vjgBe4Ed-cUJRTmkeIHQ" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_g3wKkBe4Ed-cUJRTmkeIHQ" key="imports" value="jadex.wfms.parametertypes.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_g3wKkRe4Ed-cUJRTmkeIHQ" key="Package" value="jadex.gpmn.examples.dipp"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_g3wKkRe4Ed-cUJRTmkeIHQ" key="Package" value="jadex.wfms.examples.dipp"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_ffq9VRe4Ed-cUJRTmkeIHQ" iD="_ffq9VBe4Ed-cUJRTmkeIHQ" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_ffrkYRe4Ed-cUJRTmkeIHQ" iD="_ffrkYBe4Ed-cUJRTmkeIHQ" outgoingEdges="_wWaQ8Re4Ed-cUJRTmkeIHQ" incomingEdges="_m1XYgRe4Ed-cUJRTmkeIHQ" name="DiPP3_LOG_Absichern_LT" lanes="_iTYbERe4Ed-cUJRTmkeIHQ" activityType="Task">

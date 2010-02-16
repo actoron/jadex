@@ -2,7 +2,7 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_Rd2uQRGrEd-iAJhQaWu0kA" iD="_Rd2uQBGrEd-iAJhQaWu0kA">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_bO8N0BGrEd-iAJhQaWu0kA" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bO8N0RGrEd-iAJhQaWu0kA" key="imports" value="jadex.wfms.parametertypes.*␟jadex.gpmn.examples.dipp.SItemLists"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bO8N0hGrEd-iAJhQaWu0kA" key="Package" value="jadex.gpmn.examples.dipp"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bO8N0hGrEd-iAJhQaWu0kA" key="Package" value="jadex.wfms.examples.dipp"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_RfhiMBGrEd-iAJhQaWu0kA" iD="_Rfg7IBGrEd-iAJhQaWu0kA" name="body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_aNq-ERGrEd-iAJhQaWu0kA" iD="_aNq-EBGrEd-iAJhQaWu0kA" outgoingEdges="_sY32ERJiEd-GwOYBvKt2Jg" incomingEdges="_Pq008RGsEd-iAJhQaWu0kA" name="DiPP2_Montage_Grunddaten_eingeben" lanes="_X5pF8RGrEd-iAJhQaWu0kA">

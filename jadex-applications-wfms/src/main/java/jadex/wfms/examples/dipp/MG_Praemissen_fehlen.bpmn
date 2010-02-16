@@ -2,7 +2,7 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_pzVRgXdyEd6uv6EsxGS0Yg" iD="_pzVRgHdyEd6uv6EsxGS0Yg">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_IzuzMBY_Ed-jGLD5OCZpUA" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IzuzMRY_Ed-jGLD5OCZpUA" key="imports" value="jadex.wfms.client.task.WorkitemTask␟jadex.wfms.parametertypes.Text␟jadex.bpmnbdi.task.*␟jadex.commons.SUtil"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IzuzMhY_Ed-jGLD5OCZpUA" key="Package" value="jadex.gpmn.examples.dipp"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IzuzMhY_Ed-jGLD5OCZpUA" key="Package" value="jadex.wfms.examples.dipp"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_p0YaYXdyEd6uv6EsxGS0Yg" iD="_p0YaYHdyEd6uv6EsxGS0Yg" name="body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_xDz1gXdyEd6uv6EsxGS0Yg" iD="_xDz1gHdyEd6uv6EsxGS0Yg" outgoingEdges="_39BwGndyEd6uv6EsxGS0Yg" name="Start" lanes="_lIyowRTVEd-pLK0AZ_MMug" activityType="EventStartEmpty"/>

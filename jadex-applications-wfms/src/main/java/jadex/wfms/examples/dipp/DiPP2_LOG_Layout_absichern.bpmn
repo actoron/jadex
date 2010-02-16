@@ -2,7 +2,7 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_m9dccBcnEd-4T9k5IgEFpw" iD="_m9c1YBcnEd-4T9k5IgEFpw">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_nqzDkBcnEd-4T9k5IgEFpw" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nqzqoBcnEd-4T9k5IgEFpw" key="imports" value="jadex.wfms.parametertypes.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nqzqoRcnEd-4T9k5IgEFpw" key="Package" value="jadex.bpmn.examples.dipp"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nqzqoRcnEd-4T9k5IgEFpw" key="Package" value="jadex.wfms.examples.dipp"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_m9dcdhcnEd-4T9k5IgEFpw" iD="_m9dcdRcnEd-4T9k5IgEFpw" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_m9eDgRcnEd-4T9k5IgEFpw" iD="_m9eDgBcnEd-4T9k5IgEFpw" outgoingEdges="_XMRmMRcoEd-4T9k5IgEFpw" incomingEdges="_vGIMsRcnEd-4T9k5IgEFpw" name="Absichern_SetKomm_VM_Flaechen" lanes="_spZrkRcnEd-4T9k5IgEFpw" activityType="Task">

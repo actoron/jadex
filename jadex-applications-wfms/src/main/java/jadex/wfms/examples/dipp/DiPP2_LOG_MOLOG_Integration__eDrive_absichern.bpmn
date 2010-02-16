@@ -2,7 +2,7 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_mhbIERckEd-4T9k5IgEFpw" iD="_mhbIEBckEd-4T9k5IgEFpw">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_nEEiIBckEd-4T9k5IgEFpw" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nEEiIRckEd-4T9k5IgEFpw" key="imports" value="jadex.wfms.parametertypes.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nEEiIhckEd-4T9k5IgEFpw" key="Package" value="jadex.bpmn.examples.dipp"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nEEiIhckEd-4T9k5IgEFpw" key="Package" value="jadex.wfms.examples.dipp"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_mhbvJRckEd-4T9k5IgEFpw" iD="_mhbvJBckEd-4T9k5IgEFpw" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_mhcWMRckEd-4T9k5IgEFpw" iD="_mhcWMBckEd-4T9k5IgEFpw" outgoingEdges="__IBqYRckEd-4T9k5IgEFpw" incomingEdges="_phZgMRckEd-4T9k5IgEFpw" name="Feinplanung_MaZo" lanes="_QJHM0RclEd-4T9k5IgEFpw" activityType="Task">

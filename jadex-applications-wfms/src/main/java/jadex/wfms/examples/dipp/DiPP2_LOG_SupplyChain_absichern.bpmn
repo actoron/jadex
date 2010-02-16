@@ -2,7 +2,7 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="__iKMMRclEd-4T9k5IgEFpw" iD="__iKMMBclEd-4T9k5IgEFpw">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_A5UzcBcmEd-4T9k5IgEFpw" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A5UzcRcmEd-4T9k5IgEFpw" key="imports" value="jadex.wfms.parametertypes.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A5UzchcmEd-4T9k5IgEFpw" key="Package" value="jadex.gpmn.examples.dipp"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A5UzchcmEd-4T9k5IgEFpw" key="Package" value="jadex.wfms.examples.dipp"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="__iKzRRclEd-4T9k5IgEFpw" iD="__iKzRBclEd-4T9k5IgEFpw" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="__iLaURclEd-4T9k5IgEFpw" iD="__iLaUBclEd-4T9k5IgEFpw" outgoingEdges="_KYT2YRcmEd-4T9k5IgEFpw" incomingEdges="_GdtCARcmEd-4T9k5IgEFpw" name="Absichern_SupplyChain" lanes="_Cntn4RcmEd-4T9k5IgEFpw" activityType="Task">

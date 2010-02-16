@@ -2,7 +2,7 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_2G7C4XeaEd6uv6EsxGS0Yg" iD="_2G7C4HeaEd6uv6EsxGS0Yg">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_BVhAEBY9Ed-jGLD5OCZpUA" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BVhAERY9Ed-jGLD5OCZpUA" key="imports" value="jadex.wfms.client.task.WorkitemTask␟jadex.wfms.parametertypes.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BVhAEhY9Ed-jGLD5OCZpUA" key="Package" value="jadex.bpmn.examples.dipp"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BVhAEhY9Ed-jGLD5OCZpUA" key="Package" value="jadex.wfms.examples.dipp"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_2G7C53eaEd6uv6EsxGS0Yg" iD="_2G7C5neaEd6uv6EsxGS0Yg" name="body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_2G7C6XeaEd6uv6EsxGS0Yg" iD="_2G7C6HeaEd6uv6EsxGS0Yg" outgoingEdges="_fXtDinebEd6uv6EsxGS0Yg" incomingEdges="_hYAHWnebEd6uv6EsxGS0Yg" name="DiPP1_LOG_Prozessplanung_durchfuehren" lanes="_O8Dg0RTVEd-pLK0AZ_MMug" activityType="Task">

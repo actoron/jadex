@@ -2,7 +2,7 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_1V6l8Be6Ed-cUJRTmkeIHQ" iD="_1VtxoBe6Ed-cUJRTmkeIHQ">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2xVbEBe6Ed-cUJRTmkeIHQ" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2xWCIBe6Ed-cUJRTmkeIHQ" key="imports" value="jadex.wfms.parametertypes.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2xi2cBe6Ed-cUJRTmkeIHQ" key="Package" value="jadex.gpmn.examples.dipp"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2xi2cBe6Ed-cUJRTmkeIHQ" key="Package" value="jadex.wfms.examples.dipp"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_1WBToRe6Ed-cUJRTmkeIHQ" iD="_1WBToBe6Ed-cUJRTmkeIHQ" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_1WB6sRe6Ed-cUJRTmkeIHQ" iD="_1WB6sBe6Ed-cUJRTmkeIHQ" outgoingEdges="_VsTecRe7Ed-cUJRTmkeIHQ" incomingEdges="_7y7FoRe6Ed-cUJRTmkeIHQ" name="Logistikprozesse_optimieren" lanes="_4XtjARe6Ed-cUJRTmkeIHQ" activityType="Task">
