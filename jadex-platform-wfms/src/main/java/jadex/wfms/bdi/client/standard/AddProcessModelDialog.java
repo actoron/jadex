@@ -5,6 +5,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -13,7 +16,6 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 public class AddProcessModelDialog extends JDialog
 {
@@ -36,7 +38,9 @@ public class AddProcessModelDialog extends JDialog
 		
 		setLayout(new GridBagLayout());
 		
-		addModelBox(selections);
+		List sortSel = new ArrayList(selections);
+		Collections.sort(sortSel);
+		addModelBox(sortSel);
 		
 		JPanel buttonFiller = new JPanel();
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -93,7 +97,7 @@ public class AddProcessModelDialog extends JDialog
 		return (String) modelBox.getSelectedItem();
 	}
 	
-	private void addModelBox(Set selections)
+	private void addModelBox(List selections)
 	{
 		JLabel modelLabel = new JLabel(PROCESS_MODEL_LABEL);
 		GridBagConstraints gbc = new GridBagConstraints();

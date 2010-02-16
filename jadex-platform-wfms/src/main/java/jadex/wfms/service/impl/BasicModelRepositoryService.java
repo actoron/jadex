@@ -16,7 +16,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -58,7 +57,13 @@ public class BasicModelRepositoryService implements IModelRepositoryService, ISe
 		this.listeners = Collections.synchronizedSet(new HashSet());
 		this.models = Collections.synchronizedMap(new HashMap());
 		this.modelPaths = Collections.synchronizedMap(new HashMap());
-		
+	}
+	
+	/**
+	 *  Start the service.
+	 */
+	public void startService()
+	{
 		try
 		{
 			readRepository();
@@ -67,13 +72,6 @@ public class BasicModelRepositoryService implements IModelRepositoryService, ISe
 		{
 			e.printStackTrace();
 		}
-	}
-	
-	/**
-	 *  Start the service.
-	 */
-	public void startService()
-	{
 	}
 	
 	/**
@@ -296,6 +294,7 @@ public class BasicModelRepositoryService implements IModelRepositoryService, ISe
 				}
 				catch (Exception e)
 				{
+					e.printStackTrace();
 				}
 				line = reader.readLine();
 			}
@@ -318,6 +317,7 @@ public class BasicModelRepositoryService implements IModelRepositoryService, ISe
 			}
 			catch (Exception e)
 			{
+				e.printStackTrace();
 			}
 			line = reader.readLine();
 		}
@@ -334,11 +334,16 @@ public class BasicModelRepositoryService implements IModelRepositoryService, ISe
 			PrintWriter writer = new PrintWriter(tmpFile);
 			
 			List urls = ((ILibraryService) wfms.getService(ILibraryService.class)).getURLs();
+			HashSet knownPaths = new HashSet();
 			for (Iterator it = urls.iterator(); it.hasNext(); )
 			{
 				URL url = (URL) it.next();
-				if ((new File(url.getPath()).isDirectory()))
+				if ((new File(url.getPath()).isDirectory()) &&
+					(!knownPaths.contains(url.getPath())))
+				{
 					writer.println(url.getPath());
+					knownPaths.add(url.getPath());
+				}
 			}
 			writer.close();
 			tmpFile.renameTo(new File(LIBRARY_STATE_PATH));

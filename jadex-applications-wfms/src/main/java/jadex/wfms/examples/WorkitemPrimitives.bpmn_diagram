@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_4FOF0BogEd-ylKS_uyVCzg" type="Bpmn" name="WorkitemPrimitives.bpmn_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_4FqxwBogEd-ylKS_uyVCzg" type="1001">
+    <children xmi:type="notation:Node" xmi:id="_4Ft1EBogEd-ylKS_uyVCzg" type="4008"/>
+    <children xmi:type="notation:Node" xmi:id="_4FvDMBogEd-ylKS_uyVCzg" type="5001">
+      <children xmi:type="notation:Node" xmi:id="_4F1w4BogEd-ylKS_uyVCzg" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_4F2_ABogEd-ylKS_uyVCzg" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_4F1w4RogEd-ylKS_uyVCzg" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_4F1w4hogEd-ylKS_uyVCzg"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_4F1w4xogEd-ylKS_uyVCzg"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_4F1w5BogEd-ylKS_uyVCzg" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="WorkitemPrimitives.bpmn#_4FnucRogEd-ylKS_uyVCzg"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_4F2_ARogEd-ylKS_uyVCzg" x="182" y="68" width="173" height="61"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_x7rX4BokEd-ylKS_uyVCzg" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_x7r-8BokEd-ylKS_uyVCzg" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_x7rX4RokEd-ylKS_uyVCzg" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_x7rX4hokEd-ylKS_uyVCzg"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_x7rX4xokEd-ylKS_uyVCzg"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_x7rX5BokEd-ylKS_uyVCzg" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="WorkitemPrimitives.bpmn#_x7pisBokEd-ylKS_uyVCzg"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_x7rX5RokEd-ylKS_uyVCzg" x="29" y="82"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_4022MBokEd-ylKS_uyVCzg" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_403dQBokEd-ylKS_uyVCzg" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_4022MRokEd-ylKS_uyVCzg" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_4022MhokEd-ylKS_uyVCzg"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_4022MxokEd-ylKS_uyVCzg"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_4022NBokEd-ylKS_uyVCzg" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="WorkitemPrimitives.bpmn#_402PIRokEd-ylKS_uyVCzg"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_4022NRokEd-ylKS_uyVCzg" x="455" y="82"/>
+      </children>
+      <styles xmi:type="notation:DrawerStyle" xmi:id="_4FvDMRogEd-ylKS_uyVCzg"/>
+      <styles xmi:type="notation:SortingStyle" xmi:id="_4FvDMhogEd-ylKS_uyVCzg"/>
+      <styles xmi:type="notation:FilteringStyle" xmi:id="_4FvDMxogEd-ylKS_uyVCzg"/>
+    </children>
+    <styles xmi:type="notation:FontStyle" xmi:id="_4FqxwRogEd-ylKS_uyVCzg" fontName="Arial"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_4FqxwhogEd-ylKS_uyVCzg"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_4FqxwxogEd-ylKS_uyVCzg" fillColor="16771304"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_4FqxxBogEd-ylKS_uyVCzg" lineColor="11119017"/>
+    <element xmi:type="bpmn:Pool" href="WorkitemPrimitives.bpmn#_4FnHYRogEd-ylKS_uyVCzg"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_4FvqQBogEd-ylKS_uyVCzg" x="16" y="16" width="1500" height="200"/>
+  </children>
+  <styles xmi:type="notation:PageStyle" xmi:id="_4FOF0RogEd-ylKS_uyVCzg"/>
+  <styles xmi:type="notation:GuideStyle" xmi:id="_4FOF0hogEd-ylKS_uyVCzg"/>
+  <styles xmi:type="notation:DescriptionStyle" xmi:id="_4FOF0xogEd-ylKS_uyVCzg"/>
+  <element xmi:type="bpmn:BpmnDiagram" href="WorkitemPrimitives.bpmn#_4E7K4RogEd-ylKS_uyVCzg"/>
+  <edges xmi:type="notation:Edge" xmi:id="_yR3qUBokEd-ylKS_uyVCzg" type="3001" source="_x7rX4BokEd-ylKS_uyVCzg" target="_4F1w4BogEd-ylKS_uyVCzg">
+    <children xmi:type="notation:Node" xmi:id="_yR5fgBokEd-ylKS_uyVCzg" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_yR5fgRokEd-ylKS_uyVCzg" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_yR5fghokEd-ylKS_uyVCzg" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_yR5fgxokEd-ylKS_uyVCzg" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_yR3qURokEd-ylKS_uyVCzg" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_yR3qUhokEd-ylKS_uyVCzg" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_yR3qUxokEd-ylKS_uyVCzg" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="WorkitemPrimitives.bpmn#_yRzY4RokEd-ylKS_uyVCzg"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_yR3qVBokEd-ylKS_uyVCzg" points="[15, -2, -173, 6]$[135, -18, -53, -10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_6DiP0BokEd-ylKS_uyVCzg" type="3001" source="_4F1w4BogEd-ylKS_uyVCzg" target="_4022MBokEd-ylKS_uyVCzg">
+    <children xmi:type="notation:Node" xmi:id="_6Di24BokEd-ylKS_uyVCzg" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_6Di24RokEd-ylKS_uyVCzg" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_6Di24hokEd-ylKS_uyVCzg" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_6Di24xokEd-ylKS_uyVCzg" y="40"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_6DiP0RokEd-ylKS_uyVCzg" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_6DiP0hokEd-ylKS_uyVCzg" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_6DiP0xokEd-ylKS_uyVCzg" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="WorkitemPrimitives.bpmn#_6DhBsRokEd-ylKS_uyVCzg"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_6DiP1BokEd-ylKS_uyVCzg" points="[85, 0, -119, -1]$[219, 0, 15, -1]"/>
+  </edges>
+</notation:Diagram>

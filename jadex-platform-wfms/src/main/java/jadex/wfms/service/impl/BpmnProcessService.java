@@ -4,12 +4,15 @@ import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
+import jadex.service.library.ILibraryService;
 import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
 import jadex.wfms.service.IAdministrationService;
@@ -33,9 +36,6 @@ public class BpmnProcessService implements IExecutionService, IService
 	/** Running process instances */
 	protected Map processes;
 	
-	/** The model loader */
-	protected BpmnModelLoader loader;
-	
 	//-------- constructors --------
 	
 	/**
@@ -45,7 +45,6 @@ public class BpmnProcessService implements IExecutionService, IService
 	{
 		this.wfms = wfms;
 		this.processes = new HashMap();
-		this.loader = new BpmnModelLoader();
 	}
 	
 	//-------- methods --------
@@ -75,10 +74,11 @@ public class BpmnProcessService implements IExecutionService, IService
 	public ILoadableComponentModel loadModel(String filename, String[] imports)
 	{
 		ILoadableComponentModel ret = null;
-		
+		IComponentFactory factory = (IComponentFactory) wfms.getService(IComponentFactory.class, "bpmn_factory");
+		ILibraryService ls = (ILibraryService) wfms.getService(ILibraryService.class);
 		try
 		{
-			ret = (ILoadableComponentModel) loader.loadBpmnModel(filename, imports);
+			ret = factory.loadModel(ls.getClassLoader().getResource(filename).getPath());
 		}
 		catch(Exception e)
 		{
@@ -100,7 +100,8 @@ public class BpmnProcessService implements IExecutionService, IService
 		{
 			IModelRepositoryService mr = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
 //			String path = mr.getProcessModelPath(modelname);
-			final MBpmnModel model = loader.loadBpmnModel(modelname, mr.getImports());
+			IComponentFactory factory = (IComponentFactory) wfms.getService(IComponentFactory.class, "bpmn_factory");
+			final MBpmnModel model = (MBpmnModel) factory.loadModel(modelname);
 			
 			Logger.getLogger("Wfms").log(Level.INFO, "Starting BPMN process " + id.toString());
 			//final BpmnInterpreter instance = new BpmnInterpreter(adapter, model, arguments, config, handlers, fetcher);

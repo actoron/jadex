@@ -1,5 +1,6 @@
 package jadex.wfms.client;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -29,8 +30,8 @@ public class Workitem implements IWorkitem, IClientActivity
 	/** Values of the parameters */
 	private Map parameterValues;
 	
-	/** GUI properties for parameters */
-	private Map guiProperties;
+	/** Meta properties for parameters and workitem */
+	private Map workitemMetaProperties;
 	
 	/** Read-only parameters */
 	private Set readOnlyParameters;
@@ -54,7 +55,7 @@ public class Workitem implements IWorkitem, IClientActivity
 		}*/
 		this.parameterTypes = parameterTypes;
 		this.parameterValues = parameterValues!=null ? parameterValues:new HashMap();
-		this.guiProperties = guiProperties;
+		this.workitemMetaProperties = guiProperties;
 		this.readOnlyParameters = readOnlyParameters;
 	}
 	
@@ -66,11 +67,6 @@ public class Workitem implements IWorkitem, IClientActivity
 	public String getName()
 	{
 		return name;
-	}
-	
-	public static String beautifyParameterName(String parameterName)
-	{
-		return parameterName.replaceAll("_", " ");
 	}
 	
 	/**
@@ -115,15 +111,24 @@ public class Workitem implements IWorkitem, IClientActivity
 	}
 	
 	/**
-	 * Returns the GUI-properties of a parameter
-	 * @param parameterName name of the parameter
-	 * @return the GUI-properties
+	 * Returns the Meta-properties of the workitem
+	 * @return the Meta-properties
 	 */
-	public Map getParameterGuiProperties(String parameterName)
+	public Map getMetaProperties()
 	{
-		Map propertyMap = (Map) guiProperties.get(parameterName);
+		return getParameterMetaProperties(null);
+	}
+	
+	/**
+	 * Returns the Meta-properties of a parameter
+	 * @param parameterName name of the parameter
+	 * @return the Meta-properties
+	 */
+	public Map getParameterMetaProperties(String parameterName)
+	{
+		Map propertyMap = (Map) workitemMetaProperties.get(parameterName);
 		if (propertyMap == null)
-			propertyMap = new HashMap();
+			propertyMap = Collections.EMPTY_MAP;
 		return propertyMap;
 	}
 	
@@ -222,17 +227,7 @@ public class Workitem implements IWorkitem, IClientActivity
 	public void setId(String id) {
 		this.id = id;
 	}
-	
-	public Map getGuiProperties()
-	{
-		return guiProperties;
-	}
-	
-	public void setGuiProperties(Map guiProperties)
-	{
-		this.guiProperties = guiProperties;
-	}
-	
+
 	public String toString()
 	{
 		return id.concat(" [").concat(role).concat("]");
@@ -240,6 +235,24 @@ public class Workitem implements IWorkitem, IClientActivity
 	
 	// --------------------------- Comparison -------------------------
 	
+	/**
+	 *  Get the workitemMetaProperties.
+	 *  @return The workitemMetaProperties.
+	 */
+	public Map getWorkitemMetaProperties()
+	{
+		return workitemMetaProperties;
+	}
+
+	/**
+	 *  Set the workitemMetaProperties.
+	 *  @param workitemMetaProperties The workitemMetaProperties to set.
+	 */
+	public void setWorkitemMetaProperties(Map workitemMetaProperties)
+	{
+		this.workitemMetaProperties = workitemMetaProperties;
+	}
+
 	public int hashCode()
 	{
 		/*if (id == null)

@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class SParameterPanelFactory
 {
-	public static final AbstractParameterPanel createParameterPanel(String parameterName, Class parameterType, Object parameterValue, Map guiProperties, boolean readOnly)
+	public static final AbstractParameterPanel createParameterPanel(String parameterName, Class parameterType, Object parameterValue, Map metaProperties, boolean readOnly)
 	{
 		if (parameterType.isPrimitive())
 			parameterType = SReflect.getWrappedType(parameterType);
@@ -20,6 +20,8 @@ public class SParameterPanelFactory
 		}
 		else if (parameterType.equals(String.class))
 		{
+			if ((readOnly) && (metaProperties != null) && (!Boolean.TRUE.equals(metaProperties.get("string_panel"))))
+				return new TextParameterPanel(parameterName, new Text((String) parameterValue), metaProperties, readOnly);
 			return new StringParameterPanel(parameterName, (String) parameterValue, readOnly);
 		}
 		else if (parameterType.equals(Boolean.class))
@@ -28,11 +30,11 @@ public class SParameterPanelFactory
 		}
 		else if (parameterType.equals(Document.class))
 		{
-			return new DocumentParameterPanel(parameterName, (Document) parameterValue, readOnly);
+			return new DocumentParameterPanel(parameterName, (Document) parameterValue, metaProperties, readOnly);
 		}
 		else if (parameterType.equals(Text.class))
 		{
-			return new TextParameterPanel(parameterName, (Text) parameterValue, guiProperties, readOnly);
+			return new TextParameterPanel(parameterName, (Text) parameterValue, metaProperties, readOnly);
 		}
 		else if (parameterType.equals(ListChoice.class))
 		{
@@ -43,6 +45,6 @@ public class SParameterPanelFactory
 			return new MultiListChoiceParameterPanel(parameterName, (MultiListChoice) parameterValue, readOnly);
 		}
 		
-		throw new RuntimeException("Unknown Parameter [" + parameterName + "] Type: " + parameterType.getCanonicalName());
+		throw new RuntimeException("GUI is unable to interpret parameter [" + parameterName + "] type: " + parameterType.getCanonicalName());
 	}
 }

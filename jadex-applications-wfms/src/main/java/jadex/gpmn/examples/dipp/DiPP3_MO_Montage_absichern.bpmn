@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_Rd2uQRGrEd-iAJhQaWu0kA" iD="_Rd2uQBGrEd-iAJhQaWu0kA">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_bO8N0BGrEd-iAJhQaWu0kA" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bO8N0RGrEd-iAJhQaWu0kA" key="imports" value="jadex.wfms.parametertypes.*␟jadex.gpmn.examples.dipp.SItemLists"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bO8N0hGrEd-iAJhQaWu0kA" key="Package" value="jadex.gpmn.examples.dipp"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_RfhiMBGrEd-iAJhQaWu0kA" iD="_Rfg7IBGrEd-iAJhQaWu0kA" name="body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_aNq-ERGrEd-iAJhQaWu0kA" iD="_aNq-EBGrEd-iAJhQaWu0kA" outgoingEdges="_sY32ERJiEd-GwOYBvKt2Jg" incomingEdges="_Pq008RGsEd-iAJhQaWu0kA" name="DiPP3_Montage_Grunddaten_eingeben" lanes="_X5pF8RGrEd-iAJhQaWu0kA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_tGsSgBGrEd-iAJhQaWu0kA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tGsSgRGrEd-iAJhQaWu0kA" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP3 - Absicherung Montageplanung &lt;/H2> &lt;br> &lt;h3> Eingabe Grunddaten&lt;/h3>  &lt;/CENTER>&lt;/HTML> &quot;)␟inout␋Baureihe␋ListChoice␋new ListChoice(SItemLists.BAUREIHEN, $beliefbase.baureihe)␟inout␋Zielwerke␋MultiListChoice␋new MultiListChoice(SItemLists.WERKE, $beliefbase.zielwerke)␟inout␋Modelmix_mit_Baureihe␋MultiListChoice␋new MultiListChoice(SItemLists.BAUREIHEN, $beliefbase.modelmix_br)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PxA8gBGsEd-iAJhQaWu0kA" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_PCebgRGsEd-iAJhQaWu0kA" iD="_PCebgBGsEd-iAJhQaWu0kA" outgoingEdges="_Pq008RGsEd-iAJhQaWu0kA" lanes="_X5pF8RGrEd-iAJhQaWu0kA" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_rJw2URGsEd-iAJhQaWu0kA" iD="_rJw2UBGsEd-iAJhQaWu0kA" incomingEdges="_W5l7wBI7Ed-7Y7NmdZIRDg" lanes="_X5pF8RGrEd-iAJhQaWu0kA" activityType="EventEndEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_VUJA4RI7Ed-7Y7NmdZIRDg" iD="_VUJA4BI7Ed-7Y7NmdZIRDg" outgoingEdges="_W5l7wBI7Ed-7Y7NmdZIRDg" incomingEdges="_w5ceQRJiEd-GwOYBvKt2Jg" name="Montage_Absicherung" lanes="_X5pF8RGrEd-iAJhQaWu0kA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_cWEykBI7Ed-7Y7NmdZIRDg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cWFZoBI7Ed-7Y7NmdZIRDg" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP3 - Absicherung Montageplanung &lt;/H2> &lt;/CENTER>&lt;/HTML>&quot;)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pLWb4BI7Ed-7Y7NmdZIRDg" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_fnlsARJOEd-xIPbCdXs7xg" iD="_fnlsABJOEd-xIPbCdXs7xg" outgoingEdges="_x5HykRJiEd-GwOYBvKt2Jg" incomingEdges="_dJcZIRJPEd-xIPbCdXs7xg" name="Baureihe_speichern" lanes="_X5pF8RGrEd-iAJhQaWu0kA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_htV3kBJOEd-xIPbCdXs7xg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_htV3kRJOEd-xIPbCdXs7xg" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ARevUBJPEd-xIPbCdXs7xg" key="parameters" value="in␋beliefname␋String␋&quot;baureihe&quot;␟in␋value␋String␋null"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_aNTdgRJiEd-xIPbCdXs7xg" iD="_aNTdgBJiEd-xIPbCdXs7xg" outgoingEdges="_xgugsRJiEd-GwOYBvKt2Jg" incomingEdges="_tpeiURJiEd-GwOYBvKt2Jg" name="Zielwerke_speichern" lanes="_X5pF8RGrEd-iAJhQaWu0kA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dZ-04BJiEd-xIPbCdXs7xg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dZ_b8BJiEd-xIPbCdXs7xg" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2nVOIBJiEd-GwOYBvKt2Jg" key="parameters" value="in␋beliefname␋String␋&quot;zielwerke&quot;␟in␋value␋String[]␋null"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_rbj5QRJiEd-GwOYBvKt2Jg" iD="_rbj5QBJiEd-GwOYBvKt2Jg" outgoingEdges="_dJcZIRJPEd-xIPbCdXs7xg _tpeiURJiEd-GwOYBvKt2Jg _dpZpkRJlEd-GwOYBvKt2Jg" incomingEdges="_sY32ERJiEd-GwOYBvKt2Jg" lanes="_X5pF8RGrEd-iAJhQaWu0kA" activityType="GatewayParallel"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_uqTGIRJiEd-GwOYBvKt2Jg" iD="_uqTGIBJiEd-GwOYBvKt2Jg" outgoingEdges="_w5ceQRJiEd-GwOYBvKt2Jg" incomingEdges="_xgugsRJiEd-GwOYBvKt2Jg _x5HykRJiEd-GwOYBvKt2Jg _jBQfERJlEd-GwOYBvKt2Jg" lanes="_X5pF8RGrEd-iAJhQaWu0kA" activityType="GatewayParallel"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_bJht0RJlEd-GwOYBvKt2Jg" iD="_bJht0BJlEd-GwOYBvKt2Jg" outgoingEdges="_jBQfERJlEd-GwOYBvKt2Jg" incomingEdges="_dpZpkRJlEd-GwOYBvKt2Jg" name="Modelmix_speichern" lanes="_X5pF8RGrEd-iAJhQaWu0kA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_3VGywBJlEd-GwOYBvKt2Jg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3VGywRJlEd-GwOYBvKt2Jg" key="parameters" value="in␋beliefname␋String␋&quot;modelmix_br&quot;␟in␋value␋String[]␋null"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_JyukoBJmEd-GwOYBvKt2Jg" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Pq008RGsEd-iAJhQaWu0kA" iD="_Pq008BGsEd-iAJhQaWu0kA"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_W5l7wBI7Ed-7Y7NmdZIRDg" iD="_W5lUsBI7Ed-7Y7NmdZIRDg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_dJcZIRJPEd-xIPbCdXs7xg" iD="_dJcZIBJPEd-xIPbCdXs7xg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_gV1coBJPEd-xIPbCdXs7xg" source="sequence">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gV1coRJPEd-xIPbCdXs7xg" key="mappings" value="value␋Baureihe.getSelection()"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_sY32ERJiEd-GwOYBvKt2Jg" iD="_sY32EBJiEd-GwOYBvKt2Jg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_MLPbgBJjEd-GwOYBvKt2Jg" source="sequence">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MLPbgRJjEd-GwOYBvKt2Jg" key="mappings" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_tpeiURJiEd-GwOYBvKt2Jg" iD="_tpeiUBJiEd-GwOYBvKt2Jg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_8Sk5sBJiEd-GwOYBvKt2Jg" source="sequence">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8Sk5sRJiEd-GwOYBvKt2Jg" key="mappings" value="value␋Zielwerke.getSelections()"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_w5ceQRJiEd-GwOYBvKt2Jg" iD="_w5ceQBJiEd-GwOYBvKt2Jg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_xgugsRJiEd-GwOYBvKt2Jg" iD="_xgugsBJiEd-GwOYBvKt2Jg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_x5HykRJiEd-GwOYBvKt2Jg" iD="_x5HykBJiEd-GwOYBvKt2Jg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_dpZpkRJlEd-GwOYBvKt2Jg" iD="_dpZpkBJlEd-GwOYBvKt2Jg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ygsokBJlEd-GwOYBvKt2Jg" source="sequence">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ygsokRJlEd-GwOYBvKt2Jg" key="mappings" value="value␋Modelmix_mit_Baureihe.getSelections()"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_jBQfERJlEd-GwOYBvKt2Jg" iD="_jBQfEBJlEd-GwOYBvKt2Jg"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_X5pF8RGrEd-iAJhQaWu0kA" iD="_X5pF8BGrEd-iAJhQaWu0kA" name="MontagePlaner" activities="_aNq-ERGrEd-iAJhQaWu0kA _PCebgRGsEd-iAJhQaWu0kA _rJw2URGsEd-iAJhQaWu0kA _VUJA4RI7Ed-7Y7NmdZIRDg _fnlsARJOEd-xIPbCdXs7xg _aNTdgRJiEd-xIPbCdXs7xg _rbj5QRJiEd-GwOYBvKt2Jg _uqTGIRJiEd-GwOYBvKt2Jg _bJht0RJlEd-GwOYBvKt2Jg"/>
+  </pools>
+</bpmn:BpmnDiagram>

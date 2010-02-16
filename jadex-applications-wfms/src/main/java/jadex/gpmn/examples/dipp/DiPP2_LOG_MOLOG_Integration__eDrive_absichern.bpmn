@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_mhbIERckEd-4T9k5IgEFpw" iD="_mhbIEBckEd-4T9k5IgEFpw">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_nEEiIBckEd-4T9k5IgEFpw" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nEEiIRckEd-4T9k5IgEFpw" key="imports" value="jadex.wfms.parametertypes.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nEEiIhckEd-4T9k5IgEFpw" key="Package" value="jadex.bpmn.examples.dipp"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_mhbvJRckEd-4T9k5IgEFpw" iD="_mhbvJBckEd-4T9k5IgEFpw" name="Body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_mhcWMRckEd-4T9k5IgEFpw" iD="_mhcWMBckEd-4T9k5IgEFpw" outgoingEdges="__IBqYRckEd-4T9k5IgEFpw" incomingEdges="_phZgMRckEd-4T9k5IgEFpw" name="Feinplanung_MaZo" lanes="_QJHM0RclEd-4T9k5IgEFpw" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_oA590BckEd-4T9k5IgEFpw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oA590RckEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zlyWQBckEd-4T9k5IgEFpw" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP2 - Absicherung MOLOG &lt;/H2> &lt;br>  &lt;H3> Feinplanung Materialzonen f&amp;uuml;r E-Antrieb&lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_omYCYRckEd-4T9k5IgEFpw" iD="_omYCYBckEd-4T9k5IgEFpw" outgoingEdges="_phZgMRckEd-4T9k5IgEFpw" lanes="_QJHM0RclEd-4T9k5IgEFpw" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_-bLygRckEd-4T9k5IgEFpw" iD="_-bLygBckEd-4T9k5IgEFpw" outgoingEdges="_TtnOURclEd-4T9k5IgEFpw" incomingEdges="__IBqYRckEd-4T9k5IgEFpw" name="Absicherung_3D" lanes="_QJHM0RclEd-4T9k5IgEFpw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-fx-oBckEd-4T9k5IgEFpw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-fx-oRckEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BT6TIBclEd-4T9k5IgEFpw" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP2 - Absicherung MOLOG &lt;/H2> &lt;br>  &lt;H3> Absicherung Materialzonen in 3D f&amp;uuml;r E-Antrieb&lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_OJuH8RclEd-4T9k5IgEFpw" iD="_OJuH8BclEd-4T9k5IgEFpw" outgoingEdges="_hJ3YERclEd-4T9k5IgEFpw" incomingEdges="_TtnOURclEd-4T9k5IgEFpw" name="Absichern_Set_Komm_VM" lanes="_QJHM0RclEd-4T9k5IgEFpw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Oz9-0BclEd-4T9k5IgEFpw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Oz-l4BclEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_UfYCcBclEd-4T9k5IgEFpw" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP2 - Absicherung MOLOG  &lt;/H2> &lt;br> &lt;H3> Absicherung Set- und Kommissionierfl&amp;auml;chen und Vormontagen (gemeinsam mit Montage) f&amp;uuml;r E-Antrieb  &lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_giDxMRclEd-4T9k5IgEFpw" iD="_giDxMBclEd-4T9k5IgEFpw" incomingEdges="_hJ3YERclEd-4T9k5IgEFpw" lanes="_QJHM0RclEd-4T9k5IgEFpw" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_phZgMRckEd-4T9k5IgEFpw" iD="_phZgMBckEd-4T9k5IgEFpw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="__IBqYRckEd-4T9k5IgEFpw" iD="__IBqYBckEd-4T9k5IgEFpw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__I9egBckEd-4T9k5IgEFpw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__I9egRckEd-4T9k5IgEFpw" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__I9eghckEd-4T9k5IgEFpw" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_TtnOURclEd-4T9k5IgEFpw" iD="_TtnOUBclEd-4T9k5IgEFpw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_hJ3YERclEd-4T9k5IgEFpw" iD="_hJ3YEBclEd-4T9k5IgEFpw"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_QJHM0RclEd-4T9k5IgEFpw" iD="_QJHM0BclEd-4T9k5IgEFpw" name="ProzessPlaner" activities="_mhcWMRckEd-4T9k5IgEFpw _OJuH8RclEd-4T9k5IgEFpw _omYCYRckEd-4T9k5IgEFpw _-bLygRckEd-4T9k5IgEFpw _giDxMRclEd-4T9k5IgEFpw"/>
+  </pools>
+</bpmn:BpmnDiagram>

@@ -1,5 +1,6 @@
 package jadex.wfms.bdi.client.standard.parametergui;
 
+import jadex.wfms.bdi.client.standard.SGuiHelper;
 import jadex.wfms.parametertypes.Document;
 
 import java.awt.Component;
@@ -15,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
@@ -47,15 +49,20 @@ public class DocumentParameterPanel extends AbstractParameterPanel
 	
 	private JPanel mainPanel;
 	
-	public DocumentParameterPanel(String parameterName, Document initialValue, boolean readOnly)
+	public DocumentParameterPanel(String parameterName, Document initialValue, Map metaProperties, boolean readOnly)
 	{
 		super(parameterName, readOnly);
 		
 		document = initialValue;
 		
 		mainPanel = new JPanel(new GridBagLayout());
+		
+		String borderTitle = (String) metaProperties.get("short_description");
+		if (borderTitle == null)
+			borderTitle = SGuiHelper.beautifyName(parameterName);
 		TitledBorder border = new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED));
-		border.setTitle(parameterName);
+		border.setTitle(borderTitle);
+		
 		mainPanel.setBorder(border);
 		GridBagConstraints g = new GridBagConstraints();
 		g.gridx = 0;

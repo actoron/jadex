@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_1V6l8Re6Ed-cUJRTmkeIHQ" type="Bpmn" name="DiPP3_LOG_Prozessplanung_absichern.bpmn_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_1WChwBe6Ed-cUJRTmkeIHQ" type="1001">
+    <children xmi:type="notation:Node" xmi:id="_1WDI0Be6Ed-cUJRTmkeIHQ" type="4008"/>
+    <children xmi:type="notation:Node" xmi:id="_1WDI0Re6Ed-cUJRTmkeIHQ" type="5001">
+      <children xmi:type="notation:Node" xmi:id="_1WDv4Re6Ed-cUJRTmkeIHQ" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_1WEW8Be6Ed-cUJRTmkeIHQ" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_1WDv4he6Ed-cUJRTmkeIHQ" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_1WDv4xe6Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_1WDv5Be6Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_1WDv5Re6Ed-cUJRTmkeIHQ" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_1WB6sRe6Ed-cUJRTmkeIHQ"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_1WEW8Re6Ed-cUJRTmkeIHQ" x="121" y="65" width="172" height="61"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_4XzCkBe6Ed-cUJRTmkeIHQ" type="2007">
+        <children xmi:type="notation:Node" xmi:id="_4XzpoBe6Ed-cUJRTmkeIHQ" type="4007"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_4XzCkRe6Ed-cUJRTmkeIHQ" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_4XzCkhe6Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_4XzCkxe6Ed-cUJRTmkeIHQ" fillColor="16771304"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_4XzClBe6Ed-cUJRTmkeIHQ" lineColor="0"/>
+        <element xmi:type="bpmn:Lane" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_4XtjARe6Ed-cUJRTmkeIHQ"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_4XzClRe6Ed-cUJRTmkeIHQ" y="5" height="186"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_7Cbc0Be6Ed-cUJRTmkeIHQ" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_7CcD4Be6Ed-cUJRTmkeIHQ" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_7Cbc0Re6Ed-cUJRTmkeIHQ" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_7Cbc0he6Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_7Cbc0xe6Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_7Cbc1Be6Ed-cUJRTmkeIHQ" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_7CaOsRe6Ed-cUJRTmkeIHQ"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_7Cbc1Re6Ed-cUJRTmkeIHQ" x="40" y="79"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_Uy-pwBe7Ed-cUJRTmkeIHQ" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_Uy_Q0Be7Ed-cUJRTmkeIHQ" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_Uy-pwRe7Ed-cUJRTmkeIHQ" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_Uy-pwhe7Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_Uy-pwxe7Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_Uy-pxBe7Ed-cUJRTmkeIHQ" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_Uy9boRe7Ed-cUJRTmkeIHQ"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Uy-pxRe7Ed-cUJRTmkeIHQ" x="442" y="65" width="206"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_vEbkUBe7Ed-cUJRTmkeIHQ" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_vEcLYBe7Ed-cUJRTmkeIHQ" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_vEbkURe7Ed-cUJRTmkeIHQ" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_vEbkUhe7Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_vEbkUxe7Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_vEbkVBe7Ed-cUJRTmkeIHQ" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_vEZvIRe7Ed-cUJRTmkeIHQ"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_vEbkVRe7Ed-cUJRTmkeIHQ" x="748" y="65" width="142"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_5r4rMBe7Ed-cUJRTmkeIHQ" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_5r5SQBe7Ed-cUJRTmkeIHQ" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_5r4rMRe7Ed-cUJRTmkeIHQ" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_5r4rMhe7Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_5r4rMxe7Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_5r4rNBe7Ed-cUJRTmkeIHQ" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_5r22ARe7Ed-cUJRTmkeIHQ"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5r4rNRe7Ed-cUJRTmkeIHQ" x="1012" y="121"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_Qs8MABe8Ed-cUJRTmkeIHQ" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_Qs9aIBe8Ed-cUJRTmkeIHQ" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_Qs8zEBe8Ed-cUJRTmkeIHQ" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_Qs8zERe8Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_Qs8zEhe8Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_Qs8zExe8Ed-cUJRTmkeIHQ" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_Qs6W0Re8Ed-cUJRTmkeIHQ"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Qs8zFBe8Ed-cUJRTmkeIHQ" x="1129" y="13" width="149"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_Q6FQIBe8Ed-cUJRTmkeIHQ" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_Q6F3MBe8Ed-cUJRTmkeIHQ" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_Q6FQIRe8Ed-cUJRTmkeIHQ" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_Q6FQIhe8Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_Q6FQIxe8Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_Q6FQJBe8Ed-cUJRTmkeIHQ" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_Q6ECARe8Ed-cUJRTmkeIHQ"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Q6FQJRe8Ed-cUJRTmkeIHQ" x="1129" y="121" width="149"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_HJoNQBe9Ed-cUJRTmkeIHQ" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_HJo0UBe9Ed-cUJRTmkeIHQ" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_HJoNQRe9Ed-cUJRTmkeIHQ" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_HJoNQhe9Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_HJoNQxe9Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_HJoNRBe9Ed-cUJRTmkeIHQ" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_HJlxARe9Ed-cUJRTmkeIHQ"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HJoNRRe9Ed-cUJRTmkeIHQ" x="1372" y="121"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_JtClMBe9Ed-cUJRTmkeIHQ" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_JtDMQBe9Ed-cUJRTmkeIHQ" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_JtClMRe9Ed-cUJRTmkeIHQ" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_JtClMhe9Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_JtClMxe9Ed-cUJRTmkeIHQ"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_JtClNBe9Ed-cUJRTmkeIHQ" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_JtBXERe9Ed-cUJRTmkeIHQ"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_JtClNRe9Ed-cUJRTmkeIHQ" x="1556" y="83"/>
+      </children>
+      <styles xmi:type="notation:DrawerStyle" xmi:id="_1WDI0he6Ed-cUJRTmkeIHQ"/>
+      <styles xmi:type="notation:SortingStyle" xmi:id="_1WDI0xe6Ed-cUJRTmkeIHQ"/>
+      <styles xmi:type="notation:FilteringStyle" xmi:id="_1WDI1Be6Ed-cUJRTmkeIHQ"/>
+    </children>
+    <styles xmi:type="notation:FontStyle" xmi:id="_1WChwRe6Ed-cUJRTmkeIHQ" fontName="Arial"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_1WChwhe6Ed-cUJRTmkeIHQ"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_1WChwxe6Ed-cUJRTmkeIHQ" fillColor="16771304"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_1WChxBe6Ed-cUJRTmkeIHQ" lineColor="11119017"/>
+    <element xmi:type="bpmn:Pool" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_1WBToRe6Ed-cUJRTmkeIHQ"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_1WDv4Be6Ed-cUJRTmkeIHQ" x="16" y="16" width="1928" height="208"/>
+  </children>
+  <styles xmi:type="notation:PageStyle" xmi:id="_1V6l8he6Ed-cUJRTmkeIHQ"/>
+  <styles xmi:type="notation:GuideStyle" xmi:id="_1V6l8xe6Ed-cUJRTmkeIHQ"/>
+  <styles xmi:type="notation:DescriptionStyle" xmi:id="_1V6l9Be6Ed-cUJRTmkeIHQ"/>
+  <element xmi:type="bpmn:BpmnDiagram" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_1V6l8Be6Ed-cUJRTmkeIHQ"/>
+  <edges xmi:type="notation:Edge" xmi:id="_7zWjcBe6Ed-cUJRTmkeIHQ" type="3001" source="_7Cbc0Be6Ed-cUJRTmkeIHQ" target="_1WDv4Re6Ed-cUJRTmkeIHQ">
+    <children xmi:type="notation:Node" xmi:id="_7zXKgBe6Ed-cUJRTmkeIHQ" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_7zXKgRe6Ed-cUJRTmkeIHQ" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_7zXKghe6Ed-cUJRTmkeIHQ" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_7zXKgxe6Ed-cUJRTmkeIHQ" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_7zWjcRe6Ed-cUJRTmkeIHQ" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_7zWjche6Ed-cUJRTmkeIHQ" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_7zWjcxe6Ed-cUJRTmkeIHQ" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_7y7FoRe6Ed-cUJRTmkeIHQ"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_7zWjdBe6Ed-cUJRTmkeIHQ" points="[15, -2, -84, 12]$[46, -4, -53, 10]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_VsUskBe7Ed-cUJRTmkeIHQ" type="3001" source="_1WDv4Re6Ed-cUJRTmkeIHQ" target="_Uy-pwBe7Ed-cUJRTmkeIHQ">
+    <children xmi:type="notation:Node" xmi:id="_VsUslRe7Ed-cUJRTmkeIHQ" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_VsUslhe7Ed-cUJRTmkeIHQ" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_VsUslxe7Ed-cUJRTmkeIHQ" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_VsUsmBe7Ed-cUJRTmkeIHQ" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_VsUskRe7Ed-cUJRTmkeIHQ" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_VsUskhe7Ed-cUJRTmkeIHQ" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_VsUskxe7Ed-cUJRTmkeIHQ" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_VsTecRe7Ed-cUJRTmkeIHQ"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_VsUslBe7Ed-cUJRTmkeIHQ" points="[84, 5, -164, 5]$[268, 29, 20, 29]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_0VRy4Be7Ed-cUJRTmkeIHQ" type="3001" source="_Uy-pwBe7Ed-cUJRTmkeIHQ" target="_vEbkUBe7Ed-cUJRTmkeIHQ">
+    <children xmi:type="notation:Node" xmi:id="_0VSZ8Be7Ed-cUJRTmkeIHQ" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_0VSZ8Re7Ed-cUJRTmkeIHQ" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_0VSZ8he7Ed-cUJRTmkeIHQ" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_0VSZ8xe7Ed-cUJRTmkeIHQ" y="40"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_0VRy4Re7Ed-cUJRTmkeIHQ" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_0VRy4he7Ed-cUJRTmkeIHQ" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_0VRy4xe7Ed-cUJRTmkeIHQ" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_0VP9sRe7Ed-cUJRTmkeIHQ"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_0VRy5Be7Ed-cUJRTmkeIHQ" points="[101, 9, -173, 9]$[257, 29, -17, 29]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_7CIscBe7Ed-cUJRTmkeIHQ" type="3001" source="_vEbkUBe7Ed-cUJRTmkeIHQ" target="_5r4rMBe7Ed-cUJRTmkeIHQ">
+    <children xmi:type="notation:Node" xmi:id="_7CJTgBe7Ed-cUJRTmkeIHQ" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_7CJTgRe7Ed-cUJRTmkeIHQ" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_7CJTghe7Ed-cUJRTmkeIHQ" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_7CJTgxe7Ed-cUJRTmkeIHQ" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_7CIscRe7Ed-cUJRTmkeIHQ" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_7CIsche7Ed-cUJRTmkeIHQ" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_7CIscxe7Ed-cUJRTmkeIHQ" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_7CHeURe7Ed-cUJRTmkeIHQ"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_7CIsdBe7Ed-cUJRTmkeIHQ" points="[69, -2, -137, -3]$[224, -6, 18, -7]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_RtQZgBe8Ed-cUJRTmkeIHQ" type="3001" source="_5r4rMBe7Ed-cUJRTmkeIHQ" target="_Qs8MABe8Ed-cUJRTmkeIHQ">
+    <children xmi:type="notation:Node" xmi:id="_RtQZhRe8Ed-cUJRTmkeIHQ" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_RtQZhhe8Ed-cUJRTmkeIHQ" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_RtQZhxe8Ed-cUJRTmkeIHQ" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_RtQZiBe8Ed-cUJRTmkeIHQ" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_RtQZgRe8Ed-cUJRTmkeIHQ" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_RtQZghe8Ed-cUJRTmkeIHQ" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_RtQZgxe8Ed-cUJRTmkeIHQ" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_RtPLYBe8Ed-cUJRTmkeIHQ"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_RtQZhBe8Ed-cUJRTmkeIHQ" points="[22, -3, -189, 45]$[235, -19, 24, 29]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_6HArgBe8Ed-cUJRTmkeIHQ" type="3001" source="_5r4rMBe7Ed-cUJRTmkeIHQ" target="_Q6FQIBe8Ed-cUJRTmkeIHQ">
+    <children xmi:type="notation:Node" xmi:id="_6HBSkBe8Ed-cUJRTmkeIHQ" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_6HBSkRe8Ed-cUJRTmkeIHQ" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_6HBSkhe8Ed-cUJRTmkeIHQ" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_6HBSkxe8Ed-cUJRTmkeIHQ" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_6HArgRe8Ed-cUJRTmkeIHQ" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_6HArghe8Ed-cUJRTmkeIHQ" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_6HArgxe8Ed-cUJRTmkeIHQ" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_6G_dYRe8Ed-cUJRTmkeIHQ"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_6HArhBe8Ed-cUJRTmkeIHQ" points="[17, 7, -137, -35]$[123, 71, -31, 29]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_H1w6gBe9Ed-cUJRTmkeIHQ" type="3001" source="_Qs8MABe8Ed-cUJRTmkeIHQ" target="_HJoNQBe9Ed-cUJRTmkeIHQ">
+    <children xmi:type="notation:Node" xmi:id="_H1w6hRe9Ed-cUJRTmkeIHQ" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_H1w6hhe9Ed-cUJRTmkeIHQ" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_H1w6hxe9Ed-cUJRTmkeIHQ" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_H1w6iBe9Ed-cUJRTmkeIHQ" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_H1w6gRe9Ed-cUJRTmkeIHQ" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_H1w6ghe9Ed-cUJRTmkeIHQ" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_H1w6gxe9Ed-cUJRTmkeIHQ" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_H1vsYRe9Ed-cUJRTmkeIHQ"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_H1w6hBe9Ed-cUJRTmkeIHQ" points="[73, 25, -124, -46]$[180, 62, -17, -9]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_IGdo8Be9Ed-cUJRTmkeIHQ" type="3001" source="_Q6FQIBe8Ed-cUJRTmkeIHQ" target="_HJoNQBe9Ed-cUJRTmkeIHQ">
+    <children xmi:type="notation:Node" xmi:id="_IGeQABe9Ed-cUJRTmkeIHQ" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_IGeQARe9Ed-cUJRTmkeIHQ" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_IGeQAhe9Ed-cUJRTmkeIHQ" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_IGeQAxe9Ed-cUJRTmkeIHQ" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_IGdo8Re9Ed-cUJRTmkeIHQ" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_IGdo8he9Ed-cUJRTmkeIHQ" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_IGdo8xe9Ed-cUJRTmkeIHQ" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_IGZ-kRe9Ed-cUJRTmkeIHQ"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_IGdo9Be9Ed-cUJRTmkeIHQ" points="[73, -14, -124, 23]$[173, -36, -24, 1]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_KuZUgBe9Ed-cUJRTmkeIHQ" type="3001" source="_HJoNQBe9Ed-cUJRTmkeIHQ" target="_JtClMBe9Ed-cUJRTmkeIHQ">
+    <children xmi:type="notation:Node" xmi:id="_KuZUhRe9Ed-cUJRTmkeIHQ" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_KuZUhhe9Ed-cUJRTmkeIHQ" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_KuZUhxe9Ed-cUJRTmkeIHQ" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_KuZUiBe9Ed-cUJRTmkeIHQ" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_KuZUgRe9Ed-cUJRTmkeIHQ" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_KuZUghe9Ed-cUJRTmkeIHQ" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_KuZUgxe9Ed-cUJRTmkeIHQ" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="DiPP3_LOG_Prozessplanung_absichern.bpmn#_KuYGYRe9Ed-cUJRTmkeIHQ"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_KuZUhBe9Ed-cUJRTmkeIHQ" points="[15, -10, -79, 42]$[93, -67, -1, -15]"/>
+  </edges>
+</notation:Diagram>

@@ -2,6 +2,7 @@ package jadex.wfms.service.impl;
 
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.ILoadableComponentModel;
@@ -122,9 +123,11 @@ public class GpmnProcessService implements IExecutionService, IService
 	public ILoadableComponentModel loadModel(String filename, String[] imports)
 	{
 		ILoadableComponentModel ret = null;
+		ILibraryService ls = (ILibraryService) wfms.getService(ILibraryService.class);
 		try
 		{
-			ret = (ILoadableComponentModel) GpmnXMLReader.read(filename, ((ILibraryService)wfms.getService(ILibraryService.class)).getClassLoader(), null);
+			IComponentFactory factory = (IComponentFactory) wfms.getService(IComponentFactory.class, "gpmn_factory");
+			ret = factory.loadModel(ls.getClassLoader().getResource(filename).getPath());
 		}
 		catch(Exception e)
 		{

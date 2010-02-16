@@ -3,6 +3,7 @@ package jadex.wfms.bdi.client.standard.parametergui;
 import jadex.wfms.bdi.client.standard.SGuiHelper;
 import jadex.wfms.client.IClientActivity;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -19,6 +20,7 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
@@ -46,7 +48,16 @@ public class ActivityComponent extends JScrollPane
 	
 	public ActivityComponent(IClientActivity activity)
 	{
-		JPanel mainPanel = new JPanel(new GridBagLayout());
+		setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		JPanel mainPanel = new JPanel(new GridBagLayout())
+		{
+			public Dimension getPreferredSize()
+			{
+				Dimension d = super.getPreferredSize();
+				d.width = ActivityComponent.this.getViewportBorderBounds().width;
+				return d;
+			}
+		};
 		setViewportView(mainPanel);
 		this.activity = activity;
 		categoryPanels = new HashMap();
@@ -141,30 +152,22 @@ public class ActivityComponent extends JScrollPane
 	private void addParameterPanels()
 	{
 		List parameterNames = new LinkedList(activity.getParameterNames());
-		Collections.sort(parameterNames, new Comparator()
-		{
-			public int compare(Object arg0, Object arg1)
-			{
-				Integer order0 = (Integer) activity.getParameterGuiProperties((String) arg0).get("order");
-				Integer order1 = (Integer) activity.getParameterGuiProperties((String) arg1).get("order");
-				int ret = order0 != null? order0.intValue():0;
-				ret -= order1 != null? order1.intValue():0;
-				return ret;
-			}
-		});
 		
 		int y = 0;
 		//Set parameterNames = activity.getParameterNames();
 		for (Iterator it = parameterNames.iterator(); it.hasNext(); )
 		{
 			String name = (String) it.next();
-			
-			AbstractParameterPanel panel = SParameterPanelFactory.createParameterPanel(name, activity.getParameterType(name), activity.getParameterValue(name), activity.getParameterGuiProperties(name), activity.isReadOnly(name));
+			Map metaProperties = activity.getParameterMetaProperties(name);
+			AbstractParameterPanel panel = SParameterPanelFactory.createParameterPanel(name, activity.getParameterType(name), activity.getParameterValue(name), metaProperties, activity.isReadOnly(name));
 			
 			JLabel parameterLabel = null;
 			if (panel.requiresLabel())
 			{
-				parameterLabel = new JLabel(SGuiHelper.beautifyName(name));
+				String labelText = (String) metaProperties.get("short_description");
+				if (labelText == null)
+					labelText = SGuiHelper.beautifyName(name);
+				parameterLabel = new JLabel(labelText);
 				parameterLabel.setBorder(new EmptyBorder(new Insets(0, 0, 0, 20)));
 			}
 			
@@ -182,9 +185,9 @@ public class ActivityComponent extends JScrollPane
 			g.insets = new Insets(5, 5 , 5, 5);
 			g.anchor = GridBagConstraints.NORTH;
 			
-			if (activity.getParameterGuiProperties(name).containsKey("category"))
+			if (activity.getParameterMetaProperties(name).containsKey("category"))
 			{
-				String category = (String) activity.getParameterGuiProperties(name).get("category");
+				String category = (String) activity.getParameterMetaProperties(name).get("category");
 				CategoryPanel catPanel = (CategoryPanel) categoryPanels.get(category);
 				if (catPanel == null)
 				{

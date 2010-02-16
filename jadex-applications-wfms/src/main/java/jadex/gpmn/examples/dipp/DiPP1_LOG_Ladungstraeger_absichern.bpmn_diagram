@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_yzBpMneaEd6uv6EsxGS0Yg" type="Bpmn" name="DiPP1_LOG_Ladungstraeger_absichern.bpmn_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_yzBpOneaEd6uv6EsxGS0Yg" type="1001">
+    <children xmi:type="notation:Node" xmi:id="_yzBpQHeaEd6uv6EsxGS0Yg" type="4008"/>
+    <children xmi:type="notation:Node" xmi:id="_yzBpQXeaEd6uv6EsxGS0Yg" type="5001">
+      <children xmi:type="notation:Node" xmi:id="_yzBpRneaEd6uv6EsxGS0Yg" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_yzBpTHeaEd6uv6EsxGS0Yg" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_yzBpR3eaEd6uv6EsxGS0Yg" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_yzBpSHeaEd6uv6EsxGS0Yg"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_yzBpSXeaEd6uv6EsxGS0Yg"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_yzBpSneaEd6uv6EsxGS0Yg" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="DiPP1_LOG_Ladungstraeger_absichern.bpmn#_yzBpOXeaEd6uv6EsxGS0Yg"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_yzBpTXeaEd6uv6EsxGS0Yg" x="134" y="65" width="240" height="61"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_Pt5dEnebEd6uv6EsxGS0Yg" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_Pt5dGHebEd6uv6EsxGS0Yg" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_Pt5dE3ebEd6uv6EsxGS0Yg" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_Pt5dFHebEd6uv6EsxGS0Yg"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_Pt5dFXebEd6uv6EsxGS0Yg"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_Pt5dFnebEd6uv6EsxGS0Yg" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="DiPP1_LOG_Ladungstraeger_absichern.bpmn#_Pt5dEXebEd6uv6EsxGS0Yg"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Pt5dF3ebEd6uv6EsxGS0Yg" x="58" y="79"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_QzfMInebEd6uv6EsxGS0Yg" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_QzfMKHebEd6uv6EsxGS0Yg" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_QzfMI3ebEd6uv6EsxGS0Yg" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_QzfMJHebEd6uv6EsxGS0Yg"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_QzfMJXebEd6uv6EsxGS0Yg"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_QzfMJnebEd6uv6EsxGS0Yg" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="DiPP1_LOG_Ladungstraeger_absichern.bpmn#_QzfMIXebEd6uv6EsxGS0Yg"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_QzfMJ3ebEd6uv6EsxGS0Yg" x="396" y="79"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_KiGeABTVEd-pLK0AZ_MMug" type="2007">
+        <children xmi:type="notation:Node" xmi:id="_KiHFEBTVEd-pLK0AZ_MMug" type="4007"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_KiGeARTVEd-pLK0AZ_MMug" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_KiGeAhTVEd-pLK0AZ_MMug"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_KiGeAxTVEd-pLK0AZ_MMug" fillColor="16771304"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_KiGeBBTVEd-pLK0AZ_MMug" lineColor="0"/>
+        <element xmi:type="bpmn:Lane" href="DiPP1_LOG_Ladungstraeger_absichern.bpmn#_KiEBwRTVEd-pLK0AZ_MMug"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_KiGeBRTVEd-pLK0AZ_MMug" y="5" height="178"/>
+      </children>
+      <styles xmi:type="notation:DrawerStyle" xmi:id="_yzBpQneaEd6uv6EsxGS0Yg"/>
+      <styles xmi:type="notation:SortingStyle" xmi:id="_yzBpQ3eaEd6uv6EsxGS0Yg"/>
+      <styles xmi:type="notation:FilteringStyle" xmi:id="_yzBpRHeaEd6uv6EsxGS0Yg"/>
+    </children>
+    <styles xmi:type="notation:FontStyle" xmi:id="_yzBpO3eaEd6uv6EsxGS0Yg" fontName="Arial"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_yzBpPHeaEd6uv6EsxGS0Yg"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_yzBpPXeaEd6uv6EsxGS0Yg" fillColor="16771304"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_yzBpPneaEd6uv6EsxGS0Yg" lineColor="11119017"/>
+    <element xmi:type="bpmn:Pool" href="DiPP1_LOG_Ladungstraeger_absichern.bpmn#_yzBpN3eaEd6uv6EsxGS0Yg"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_yzBpRXeaEd6uv6EsxGS0Yg" x="16" y="16" width="1500" height="200"/>
+  </children>
+  <styles xmi:type="notation:PageStyle" xmi:id="_yzBpM3eaEd6uv6EsxGS0Yg"/>
+  <styles xmi:type="notation:GuideStyle" xmi:id="_yzBpNHeaEd6uv6EsxGS0Yg"/>
+  <styles xmi:type="notation:DescriptionStyle" xmi:id="_yzBpNXeaEd6uv6EsxGS0Yg"/>
+  <element xmi:type="bpmn:BpmnDiagram" href="DiPP1_LOG_Ladungstraeger_absichern.bpmn#_yzBpMXeaEd6uv6EsxGS0Yg"/>
+  <edges xmi:type="notation:Edge" xmi:id="_PuDOEnebEd6uv6EsxGS0Yg" type="3001" source="_Pt5dEnebEd6uv6EsxGS0Yg" target="_yzBpRneaEd6uv6EsxGS0Yg">
+    <children xmi:type="notation:Node" xmi:id="_PuDOF3ebEd6uv6EsxGS0Yg" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_PuDOGHebEd6uv6EsxGS0Yg" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_PuDOGXebEd6uv6EsxGS0Yg" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_PuDOGnebEd6uv6EsxGS0Yg" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_PuDOE3ebEd6uv6EsxGS0Yg" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_PuDOFHebEd6uv6EsxGS0Yg" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_PuDOFXebEd6uv6EsxGS0Yg" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="DiPP1_LOG_Ladungstraeger_absichern.bpmn#_PuDOEXebEd6uv6EsxGS0Yg"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_PuDOFnebEd6uv6EsxGS0Yg" points="[2, 0, -229, -99]$[178, 76, -53, -23]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_QzfMK3ebEd6uv6EsxGS0Yg" type="3001" source="_yzBpRneaEd6uv6EsxGS0Yg" target="_QzfMInebEd6uv6EsxGS0Yg">
+    <children xmi:type="notation:Node" xmi:id="_QzfMMHebEd6uv6EsxGS0Yg" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_QzfMMXebEd6uv6EsxGS0Yg" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_QzfMMnebEd6uv6EsxGS0Yg" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_QzfMM3ebEd6uv6EsxGS0Yg" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_QzfMLHebEd6uv6EsxGS0Yg" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_QzfMLXebEd6uv6EsxGS0Yg" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_QzfMLnebEd6uv6EsxGS0Yg" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="DiPP1_LOG_Ladungstraeger_absichern.bpmn#_QzfMKnebEd6uv6EsxGS0Yg"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_QzfML3ebEd6uv6EsxGS0Yg" points="[-53, -23, 178, 76]$[-229, -99, 2, 0]"/>
+  </edges>
+</notation:Diagram>

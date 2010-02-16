@@ -17,7 +17,7 @@ public class TextParameterPanel extends AbstractParameterPanel
 	
 	private Text parameterValue;
 	
-	public TextParameterPanel(String parameterName, Text initialValue, Map guiProperties, boolean readOnly)
+	public TextParameterPanel(String parameterName, Text initialValue, Map metaProperties, boolean readOnly)
 	{
 		super(parameterName, readOnly);
 		
@@ -25,9 +25,14 @@ public class TextParameterPanel extends AbstractParameterPanel
 		if (parameterValue == null)
 			parameterValue = new Text();
 		
-		if (((!readOnly) && (!Boolean.FALSE.equals(guiProperties.get("border")))) ||
-			((readOnly) && (Boolean.TRUE.equals("border"))))
-			setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), SGuiHelper.beautifyName(parameterName)));
+		if (((!readOnly) && (!Boolean.FALSE.equals(metaProperties.get("border")))) ||
+			((readOnly) && (Boolean.TRUE.equals(metaProperties.get("border")))))
+		{
+			String borderTitle = (String) metaProperties.get("short_description");
+			if (borderTitle == null)
+				borderTitle = SGuiHelper.beautifyName(parameterName);
+			setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), borderTitle));
+		}
 		
 		GridBagConstraints g = new GridBagConstraints();
 		g.gridx = 0;

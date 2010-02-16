@@ -101,6 +101,7 @@
 				<module>jadex-kernel-gpmn</module>
 				<module>jadex-platform-wfms</module>
 				<module>jadex-wfms-launch</module>
+				<module>jadex-applications-wfms</module>
 		</modules>
   	</profile>
   	<profile>

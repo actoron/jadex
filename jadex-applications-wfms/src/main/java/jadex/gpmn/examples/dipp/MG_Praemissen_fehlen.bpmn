@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_pzVRgXdyEd6uv6EsxGS0Yg" iD="_pzVRgHdyEd6uv6EsxGS0Yg">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_IzuzMBY_Ed-jGLD5OCZpUA" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IzuzMRY_Ed-jGLD5OCZpUA" key="imports" value="jadex.wfms.client.task.WorkitemTask␟jadex.wfms.parametertypes.Text␟jadex.bpmnbdi.task.*␟jadex.commons.SUtil"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IzuzMhY_Ed-jGLD5OCZpUA" key="Package" value="jadex.gpmn.examples.dipp"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_p0YaYXdyEd6uv6EsxGS0Yg" iD="_p0YaYHdyEd6uv6EsxGS0Yg" name="body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_xDz1gXdyEd6uv6EsxGS0Yg" iD="_xDz1gHdyEd6uv6EsxGS0Yg" outgoingEdges="_39BwGndyEd6uv6EsxGS0Yg" name="Start" lanes="_lIyowRTVEd-pLK0AZ_MMug" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_39BwEXdyEd6uv6EsxGS0Yg" iD="_39BwEHdyEd6uv6EsxGS0Yg" outgoingEdges="_HzzpSnd4Ed6uv6EsxGS0Yg" incomingEdges="_39BwGndyEd6uv6EsxGS0Yg" name="Informieren_Planer" lanes="_lIyowRTVEd-pLK0AZ_MMug" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_QJuJUBY_Ed-jGLD5OCZpUA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QJuJURY_Ed-jGLD5OCZpUA" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_SITV4BY_Ed-jGLD5OCZpUA" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;html>&lt;body>&lt;h3>Fehlende_Praemissen&lt;/h3>&lt;p>&quot; + SUtil.arrayToString($beliefbase.praemissen_fehlend))"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ysn7gXd0Ed6uv6EsxGS0Yg" iD="_ysn7gHd0Ed6uv6EsxGS0Yg" outgoingEdges="_-upTQRfjEd-x9rxZmbnVvg" incomingEdges="_Be_S4RZCEd-jGLD5OCZpUA" name="Dipp1_Reaktivieren_Praemissen_abgleichen" lanes="_lIyowRTVEd-pLK0AZ_MMug" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_krDfYBY_Ed-jGLD5OCZpUA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_krDfYRY_Ed-jGLD5OCZpUA" key="class" value="jadex.bpmnbdi.task.DispatchGoalTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wThXUBY_Ed-jGLD5OCZpUA" key="parameters" value="in␋type␋String␋&quot;Dipp1_LOG_Planunspraemissen_abgleichen&quot;␟in␋wait␋boolean␋true"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_7W41kXd3Ed6uv6EsxGS0Yg" iD="_7W41kHd3Ed6uv6EsxGS0Yg" incomingEdges="_-upTQRfjEd-x9rxZmbnVvg" name="End" lanes="_lIyowRTVEd-pLK0AZ_MMug" activityType="EventEndEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_HzzpQXd4Ed6uv6EsxGS0Yg" iD="_HzzpQHd4Ed6uv6EsxGS0Yg" outgoingEdges="_Be_S4RZCEd-jGLD5OCZpUA" incomingEdges="_HzzpSnd4Ed6uv6EsxGS0Yg" name="Ruecksetzen_Kontext" lanes="_lIyowRTVEd-pLK0AZ_MMug" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Y1KPcBY_Ed-jGLD5OCZpUA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Y1KPcRY_Ed-jGLD5OCZpUA" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bDHUwBY_Ed-jGLD5OCZpUA" key="parameters" value="in␋beliefsetname␋String␋&quot;praemissen_fehlend&quot;␟in␋mode␋String␋&quot;removeAll&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_39BwGndyEd6uv6EsxGS0Yg" iD="_39BwGXdyEd6uv6EsxGS0Yg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_HzzpSnd4Ed6uv6EsxGS0Yg" iD="_HzzpSXd4Ed6uv6EsxGS0Yg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Be_S4RZCEd-jGLD5OCZpUA" iD="_Be_S4BZCEd-jGLD5OCZpUA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_CX2A0BffEd-sH7uHOdxvTQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_CX2n4BffEd-sH7uHOdxvTQ" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_CX2n4RffEd-sH7uHOdxvTQ" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_-upTQRfjEd-x9rxZmbnVvg" iD="_-upTQBfjEd-x9rxZmbnVvg"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_lIyowRTVEd-pLK0AZ_MMug" iD="_lIyowBTVEd-pLK0AZ_MMug" name="ProzessPlaner" activities="_ysn7gXd0Ed6uv6EsxGS0Yg _39BwEXdyEd6uv6EsxGS0Yg _xDz1gXdyEd6uv6EsxGS0Yg _HzzpQXd4Ed6uv6EsxGS0Yg _7W41kXd3Ed6uv6EsxGS0Yg"/>
+  </pools>
+</bpmn:BpmnDiagram>

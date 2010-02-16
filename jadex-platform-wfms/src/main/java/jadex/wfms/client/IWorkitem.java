@@ -58,11 +58,17 @@ public interface IWorkitem
 	public Class getParameterType(String parameterName);
 	
 	/**
-	 * Returns the GUI-properties of a parameter
-	 * @param parameterName name of the parameter
-	 * @return the GUI-properties
+	 * Returns the Meta-properties of the workitem
+	 * @return the Meta-properties, never null
 	 */
-	public Map getParameterGuiProperties(String parameterName);
+	public Map getMetaProperties();
+	
+	/**
+	 * Returns the Meta-properties of a parameter
+	 * @param parameterName name of the parameter
+	 * @return the Meta-properties, never null
+	 */
+	public Map getParameterMetaProperties(String parameterName);
 	
 	/**
 	 * Returns whether a parameter is read-only.

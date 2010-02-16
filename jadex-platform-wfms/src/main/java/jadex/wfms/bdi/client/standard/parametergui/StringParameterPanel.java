@@ -29,11 +29,11 @@ public class StringParameterPanel extends AbstractParameterPanel
 	
 	public boolean isParameterValueValid()
 	{
-		if (parameterField.getText().isEmpty())
+		/*if (parameterField.getText().isEmpty())
 		{
 			parameterField.setBackground(Color.RED);
 			return false;
-		}
+		}*/
 		return true;
 	}
 	

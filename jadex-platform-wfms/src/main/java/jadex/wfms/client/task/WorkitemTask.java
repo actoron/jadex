@@ -13,6 +13,8 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.wfms.client.IWorkitem;
@@ -47,7 +49,7 @@ public class WorkitemTask implements ITask
 	{
 		Map parameterTypes = new LinkedHashMap();
 		Map parameterValues = new HashMap();
-		Map guiProperties = new HashMap();
+		Map metaProperties = new HashMap();
 		Set readOnlyParameters = new HashSet();
 		Map parameters = context.getModelElement().getParameters();
 		if (parameters != null)
@@ -57,34 +59,44 @@ public class WorkitemTask implements ITask
 				String pName = (String) it.next();
 				MParameter param = (MParameter) parameters.get(pName);
 				//MParameter param = (MParameter) it.next();
-				if (param.getName().startsWith("META_"))
+				if (param.getName().startsWith("META_P_"))
 				{
-					String paramName = param.getName().substring(5);
-					String guiParamName = paramName.substring(paramName.indexOf(':') + 1);
+					String paramName = param.getName().substring(7);
+					String propName = paramName.substring(paramName.indexOf(':') + 1);
 					paramName = paramName.substring(0, paramName.indexOf(':'));
-					if (paramName.equals("category"))
+					Map propertyMap = (Map) metaProperties.get(paramName);
+					if (propertyMap == null)
 					{
+						propertyMap = new HashMap();
+						metaProperties.put(paramName, propertyMap);
+					}
+					propertyMap.put(propName, context.getParameterValue(param.getName()));
+				}
+				else if (param.getName().startsWith("META_"))
+				{
+					String propName = param.getName().substring(5);
+					if (propName.startsWith("category"))
+					{
+						String catName = propName.substring(propName.indexOf(':') + 1);
+						propName = propName.substring(0, propName.indexOf(':'));
 						String[] members = (String[]) context.getParameterValue(param.getName());
 						for (int i = 0; i < members.length; ++i)
 						{
-							if (!guiProperties.containsKey(members[i]))
-								guiProperties.put(members[i], new HashMap());
-							((Map) guiProperties.get(members[i])).put(paramName, guiParamName);
+							if (!metaProperties.containsKey(members[i]))
+								metaProperties.put(members[i], new HashMap());
+							((Map) metaProperties.get(members[i])).put(propName, catName);
 						}
 					}
 					else
 					{
-						if (!guiProperties.containsKey(paramName))
-							guiProperties.put(paramName, new HashMap());
-						Map propertyMap = (Map) guiProperties.get(paramName);
-						propertyMap.put(guiParamName, context.getParameterValue(param.getName()));
+						if (!metaProperties.containsKey(null))
+							metaProperties.put(null, new HashMap());
+						((Map) metaProperties.get(null)).put(propName, context.getParameterValue(param.getName()));
 					}
 				}
 				else if (!param.getName().startsWith("IGNORE_"))
 				{
 					parameterTypes.put(param.getName(), param.getClazz());
-					if (param.getName().equals("counter"))
-						System.out.println(context.getParameterValue("counter"));
 					if (context.getParameterValue(param.getName()) != null)
 						parameterValues.put(param.getName(), context.getParameterValue(param.getName()));
 					if (param.getDirection().equals(MParameter.DIRECTION_IN))
@@ -92,13 +104,24 @@ public class WorkitemTask implements ITask
 				}
 			}
 		}
-		MLane lane = context.getModelElement().getLane();
+		
 		String role = null;
-		if (lane != null)
-			role = context.getModelElement().getLane().getName();
+		
+		Map workitemMetaProps = (Map) metaProperties.get(null);
+		if (workitemMetaProps != null)
+			role = (String) workitemMetaProps.get("role");
+		
+		if (role == null)
+		{
+			MLane lane = context.getModelElement().getLane();
+			if (lane != null)
+				role = context.getModelElement().getLane().getName();
+		}
+		
 		if (role == null)
 			role = IAAAService.ANY_ROLE;
-		Workitem wi = new Workitem(context.getModelElement().getName(), type, role, parameterTypes, parameterValues, guiProperties, readOnlyParameters);
+		
+		Workitem wi = new Workitem(context.getModelElement().getName(), type, role, parameterTypes, parameterValues, metaProperties, readOnlyParameters);
 		wi.setId(context.getModelElement().getName() + "_" + String.valueOf(Integer.toHexString(System.identityHashCode(wi))));
 		return wi;
 	}
