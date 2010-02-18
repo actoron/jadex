@@ -1,11 +1,9 @@
 package jadex.xml.reader;
 
-import jadex.xml.IContext;
-
 import java.util.List;
 
 /**
- * 
+ *  Interface for bulk linker.
  */
 public interface IBulkObjectLinker
 {

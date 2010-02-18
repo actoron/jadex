@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -331,7 +332,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		if(linkinfo instanceof SubobjectInfo)
 		{
 			SubobjectInfo sinfo = (SubobjectInfo)linkinfo;
-			setElementValue(sinfo.getLinkInfo(), tag, parent, object, sinfo.getConverter(), null, context);
+			setElementValue(sinfo.getAccessInfo(), tag, parent, object, sinfo.getConverter(), null, context);
 			linked = true;
 		}
 		
@@ -739,6 +740,12 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						{
 							Field f = (Field)sh;
 							Object map = f.get(object);
+							// Hack?! create on demand, should be customizable.
+							if(map==null)
+							{
+								map = new HashMap();
+								f.set(object, map);
+							}
 							Object arg = convertValue(val, null, converter, context, id);
 							((Map)map).put(key, arg);
 							set = true;

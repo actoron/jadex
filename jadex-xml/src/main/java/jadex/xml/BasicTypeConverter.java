@@ -110,12 +110,7 @@ class IntegerTypeConverter implements IStringObjectConverter
 	 */
 	public Object convertString(String val, IContext context)
 	{
-		Object ret = val;
-		if(ret instanceof String)
-		{
-			ret = new Integer((String)val);
-		}
-		return ret;
+		return new Integer(val);
 	}
 	
 }
@@ -131,12 +126,7 @@ class LongTypeConverter implements IStringObjectConverter
 	 */
 	public Object convertString(String val, IContext context)
 	{
-		Object ret = val;
-		if(val instanceof String)
-		{
-			ret = new Long((String)val);
-		}
-		return ret;
+		return new Long(val);
 	}
 	
 }
@@ -152,12 +142,7 @@ class FloatTypeConverter implements IStringObjectConverter
 	 */
 	public Object convertString(String val, IContext context)
 	{
-		Object ret = val;
-		if(val instanceof String)
-		{
-			ret = new Float((String)val);
-		}
-		return ret;
+		return new Float(val);
 	}
 	
 }
@@ -173,12 +158,7 @@ class DoubleTypeConverter implements IStringObjectConverter
 	 */
 	public Object convertString(String val, IContext context)
 	{
-		Object ret = val;
-		if(val instanceof String)
-		{
-			ret = new Double((String)val);
-		}
-		return ret;
+		return new Double(val);
 	}
 }
 
@@ -193,12 +173,7 @@ class BooleanTypeConverter implements IStringObjectConverter
 	 */
 	public Object convertString(String val, IContext context)
 	{
-		Object ret = val;
-		if(val instanceof String)
-		{
-			ret = new Boolean((String)val);
-		}
-		return ret;
+		return new Boolean(val);
 	}
 }
 
@@ -213,12 +188,7 @@ class ShortTypeConverter implements IStringObjectConverter
 	 */
 	public Object convertString(String val, IContext context)
 	{
-		Object ret = val;
-		if(val instanceof String)
-		{
-			ret = new Short((String)val);
-		}
-		return ret;
+		return new Short(val);
 	}
 }
 
@@ -248,12 +218,7 @@ class CharacterTypeConverter implements IStringObjectConverter
 	 */
 	public Object convertString(String val, IContext context)
 	{
-		Object ret = val;
-		if(val instanceof String)
-		{
-			ret = new Character(((String)val).charAt(0)); //?
-		}
-		return ret;
+		return new Character(((String)val).charAt(0)); //?
 	}
 	
 }

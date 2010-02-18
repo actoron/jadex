@@ -1,13 +1,9 @@
 package jadex.xml.reader;
 
-import jadex.xml.IContext;
-
-import java.util.List;
-
 import javax.xml.namespace.QName;
 
 /**
- * 
+ *  Interface for sequential linker. 
  */
 public interface IObjectLinker
 {

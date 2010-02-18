@@ -1,10 +1,12 @@
 package jadex.xml;
 
 /**
- * 
+ *  Interface for converters that convert an object to another object.
  */
 public interface IObjectObjectConverter
 {
+	//-------- methods --------
+	
 	/**
 	 *  Convert an object to another object.
 	 *  @param val The value to convert.

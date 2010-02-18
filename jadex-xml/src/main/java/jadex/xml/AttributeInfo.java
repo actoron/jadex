@@ -9,9 +9,6 @@ public class AttributeInfo
 {
 	//-------- constants --------
 	
-	/** Constant for identifying this. */
-	public static final String THIS = "__this"; 
-
 	/** Constant for identifying content. */
 	public static final String CONTENT = "__content"; 
 	
@@ -24,7 +21,6 @@ public class AttributeInfo
 	/** The value of this attribute is used as idref. */
 	public static final String IDREF = "idref";
 
-	
 	//-------- attributes --------
 	
 	/** The access info. */

@@ -215,7 +215,7 @@ public class MEnvSpaceType	extends MSpaceType
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "name")}), null, 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AttributeInfo.THIS), atexconv))));
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), atexconv))));
 
 /*
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "createagent")}, MultiCollection.class, null, null,

@@ -7,10 +7,12 @@ import javax.xml.namespace.QName;
 import jadex.commons.IFilter;
 
 /**
- * 
+ *  Info for an xml element, i.e. identifying tag(path), filter etc. 
  */
 public class XMLInfo
 {
+	//-------- attributes --------
+
 	/** The xml tag/path. */
 	protected String xmlpath;
 	
@@ -26,8 +28,10 @@ public class XMLInfo
 	/** The preprocessor. */
 //	protected IPreProcessor preprocessor;
 	
+	//-------- constructors --------
+	
 	/**
-	 * @param xmlpath
+	 *  Create a new xml info.
 	 */
 	public XMLInfo(String xmlpath)
 	{
@@ -35,7 +39,7 @@ public class XMLInfo
 	}
 
 	/**
-	 * @param xmlpathelements
+	 *  Create a new xml info.
 	 */
 	public XMLInfo(QName[] xmlpathelements)
 	{
@@ -43,8 +47,7 @@ public class XMLInfo
 	}
 
 	/**
-	 * @param xmlpath
-	 * @param filter
+	 *  Create a new xml info.
 	 */
 	public XMLInfo(String xmlpath, IFilter filter)
 	{
@@ -52,8 +55,7 @@ public class XMLInfo
 	}
 	
 	/**
-	 * @param xmlpathelements
-	 * @param filter
+	 *  Create a new xml info.
 	 */
 	public XMLInfo(QName[] xmlpathelements, IFilter filter)
 	{
@@ -61,9 +63,7 @@ public class XMLInfo
 	}
 
 	/**
-	 * @param xmlpath
-	 * @param filter
-	 * @param createfromtag
+	 *  Create a new xml info.
 	 */
 	public XMLInfo(String xmlpath, IFilter filter, boolean createfromtag)
 	{
@@ -73,9 +73,7 @@ public class XMLInfo
 	}
 
 	/**
-	 * @param xmlpathelements
-	 * @param filter
-	 * @param createfromtag
+	 *  Create a new xml info.
 	 */
 	public XMLInfo(QName[] xmlpathelements, IFilter filter, boolean createfromtag)
 	{
@@ -84,6 +82,8 @@ public class XMLInfo
 		this.createfromtag = createfromtag;
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Get the xmlpath.
 	 *  @return The xmlpath.

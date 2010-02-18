@@ -209,7 +209,7 @@ public class Reader
 					TypeInfo patypeinfo = ((StackElement)pse).getTypeInfo();
 					SubobjectInfo linkinfo = getSubobjectInfoRead(localname, fullpath, patypeinfo, 
 						readcontext.getTopStackElement()!=null? readcontext.getTopStackElement().getRawAttributes(): null);
-					if(linkinfo!=null && linkinfo.getLinkInfo().isIgnoreRead())
+					if(linkinfo!=null && linkinfo.getAccessInfo().isIgnoreRead())
 					{
 						readcontext.setReadIgnore(readcontext.getReadIgnore()+1);
 						if(DEBUG)

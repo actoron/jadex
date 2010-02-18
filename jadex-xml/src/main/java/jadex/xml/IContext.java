@@ -1,9 +1,8 @@
 package jadex.xml;
 
-import java.util.List;
 
 /**
- * 
+ *  Common interface for read and write contexts.
  */
 public interface IContext
 {

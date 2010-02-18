@@ -1,22 +1,22 @@
 package jadex.xml;
 
 /**
- * 
+ *  Information about an object, esp. the object type or its creator.
  */
 public class ObjectInfo
 {
-	/** Constant indicating that the type is not creatable from tag information. */
-//	public static String NOT_CREATEDABLE_FROM_TAG = "not_creatable_from_tag";
-
+	//-------- attributes --------
+	
 	/** The object type. */
-	protected Object typeinfo; // (class if not Ibeancreator)
+	protected Object typeinfo; // (class if not e.g. Ibeancreator)
 
 	/** The post processor (if any). */
 	protected IPostProcessor postproc;
 
+	//-------- constructors --------
 	
 	/**
-	 * @param typeinfo
+	 *  Create a new object info.
 	 */
 	public ObjectInfo(Object typeinfo)
 	{
@@ -24,13 +24,15 @@ public class ObjectInfo
 	}
 
 	/**
-	 * @param typeinfo
+	 *  Create a new object info.
 	 */
 	public ObjectInfo(Object typeinfo, IPostProcessor postproc)
 	{
 		this.typeinfo = typeinfo;
 		this.postproc = postproc;
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Get the typeinfo.

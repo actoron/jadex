@@ -1,10 +1,12 @@
 package jadex.xml;
 
 /**
- * 
+ *  Converter for subobjects. Consist of two methods for object-object conversion.
  */
 public interface ISubObjectConverter
 {
+	//-------- methods --------
+	
 	/**
 	 *  Convert an object to another object.
 	 *  @param val The value to convert.

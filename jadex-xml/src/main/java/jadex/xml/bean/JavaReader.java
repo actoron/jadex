@@ -120,7 +120,7 @@ public class JavaReader extends Reader
 			};
 			
 			TypeInfo ti_color = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.awt", "Color")}), 
-				null, new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AttributeInfo.THIS), new AttributeConverter(coconv, null))));
+				null, new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(coconv, null))));
 			typeinfos.add(ti_color);
 			
 			TypeInfo ti_class = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Class")}),

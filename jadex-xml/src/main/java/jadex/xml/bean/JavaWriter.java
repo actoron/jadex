@@ -90,7 +90,7 @@ public class JavaWriter extends Writer
 			
 			TypeInfo ti_list = new TypeInfo(null, new ObjectInfo(List.class), new MappingInfo(null,
 				new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo("entries", AttributeInfo.THIS), null, true)
+				new SubobjectInfo(new AccessInfo("entries", AccessInfo.THIS), null, true)
 			}));
 			typeinfos.add(ti_list);
 			
@@ -98,7 +98,7 @@ public class JavaWriter extends Writer
 			
 			TypeInfo ti_set = new TypeInfo(null, new ObjectInfo(Set.class), new MappingInfo(null,
 				new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo("entries", AttributeInfo.THIS), null, true)
+				new SubobjectInfo(new AccessInfo("entries", AccessInfo.THIS), null, true)
 			}));
 			typeinfos.add(ti_set);
 			
@@ -106,7 +106,7 @@ public class JavaWriter extends Writer
 			
 			TypeInfo ti_array = new TypeInfo(null, new ObjectInfo(Object[].class),
 				new MappingInfo(null, new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo("entries", AttributeInfo.THIS), null, true)
+				new SubobjectInfo(new AccessInfo("entries", AccessInfo.THIS), null, true)
 			}));
 			typeinfos.add(ti_array);
 			
@@ -120,7 +120,7 @@ public class JavaWriter extends Writer
 				}
 			};
 			TypeInfo ti_color = new TypeInfo(null, new ObjectInfo(Color.class), new MappingInfo(null, null,
-				new AttributeInfo(new AccessInfo((String)null, AttributeInfo.THIS), new AttributeConverter(null, coconv))));
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, coconv))));
 			typeinfos.add(ti_color);
 			
 			// java.util.Date
@@ -149,7 +149,7 @@ public class JavaWriter extends Writer
 				}
 			};
 			TypeInfo ti_class = new TypeInfo(null, new ObjectInfo(Class.class), new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("classname", AttributeInfo.THIS), new AttributeConverter(null, clconv))},
+				new AttributeInfo(new AccessInfo("classname", AccessInfo.THIS), new AttributeConverter(null, clconv))},
 				null
 			));
 			typeinfos.add(ti_class);

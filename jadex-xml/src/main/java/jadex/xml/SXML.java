@@ -7,6 +7,8 @@ import javax.xml.namespace.QName;
  */
 public class SXML
 {
+	//-------- constants --------
+	
 	/** The ID attribute constant. */
 	public static final String ID = "__ID";
 	

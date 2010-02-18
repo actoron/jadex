@@ -1,10 +1,12 @@
 package jadex.xml;
 
 /**
- * 
+ *  Converter for attributes. Consist of a string-object and a object-string converter.
+ *  The first for reading the second for writing.
  */
 public class AttributeConverter implements IAttributeConverter
 {
+	//-------- attributes --------
 	
 	/** The string object converter. */
 	protected IStringObjectConverter soconv;
@@ -12,6 +14,8 @@ public class AttributeConverter implements IAttributeConverter
 	/** The object string converter. */
 	protected IObjectStringConverter osconv;
 
+	//-------- constructors --------
+	
 	/**
 	 *  Create a new attribute converter.
 	 */
@@ -20,6 +24,8 @@ public class AttributeConverter implements IAttributeConverter
 		this.soconv = soconv;
 		this.osconv = osconv;
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Convert a string value to another type.

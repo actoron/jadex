@@ -5,6 +5,8 @@ package jadex.xml;
  */
 public interface IPostProcessor
 {
+	//-------- methods --------
+	
 	/**
 	 *  Post-process an object after an XML has been loaded.
 	 *  @param context The context.

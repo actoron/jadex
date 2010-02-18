@@ -43,6 +43,7 @@ public class RequestAddProcessPlan extends AbstractWfmsPlan
 		}
 		catch (RuntimeException e)
 		{
+			e.printStackTrace();
 			fail(e.getMessage(), e);
 		}
 	}

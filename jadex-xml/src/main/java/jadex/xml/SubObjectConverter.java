@@ -1,15 +1,20 @@
 package jadex.xml;
 
 /**
- *
+ *  Converter for subobjects. Consist of two object-object converter.
+ *  The first for reading the second for writing.
  */
 public class SubObjectConverter implements ISubObjectConverter
 {
+	//-------- attributes --------
+
 	/** The object object read converter. */
 	protected IObjectObjectConverter rconv;
 	
 	/** The object object write converter. */
 	protected IObjectObjectConverter wconv;
+
+	//-------- constructors --------
 
 	/**
 	 *  Create a new attribute converter.
@@ -19,7 +24,9 @@ public class SubObjectConverter implements ISubObjectConverter
 		this.rconv = rconv;
 		this.wconv = wconv;
 	}
-	
+
+	//-------- methods --------
+
 	/**
 	 *  Convert an object to another object.
 	 *  @param val The value to convert.

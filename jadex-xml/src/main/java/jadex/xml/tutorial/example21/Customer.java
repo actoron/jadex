@@ -7,4 +7,15 @@ public class Customer {
     public String city;
     public String state;
     public Integer zip;
+	
+    public String toString()
+	{
+		return "Customer ["
+			+ (this.city != null ? "city=" + this.city + ", " : "")
+			+ (this.name != null ? "name=" + this.name + ", " : "")
+			+ (this.state != null ? "state=" + this.state + ", " : "")
+			+ (this.street != null ? "street=" + this.street + ", " : "")
+			+ (this.zip != null ? "zip=" + this.zip : "") + "]";
+	}
+    
 }

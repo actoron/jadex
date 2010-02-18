@@ -11,6 +11,9 @@ public class AccessInfo
 {
 	//-------- constants --------
 	
+	/** Constant for identifying this. */
+	public static final String THIS = "__this";
+	
 	/** Ignore when reading. */
 	public static final String IGNORE_READ = "ignore_read";
 	
@@ -36,6 +39,7 @@ public class AccessInfo
 	
 	/** The extra info. */
 	protected Object extrainfo;
+
 
 	//-------- constructors --------
 	

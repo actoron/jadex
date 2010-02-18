@@ -1,13 +1,15 @@
 package jadex.xml;
 
 import java.util.Arrays;
-import java.util.Map;
 
 /**
- * 
+ *  The mapping info stores all for for mapping between the different
+ *  elements of an object, i.e. attributes, subojects etc. 
  */
 public class MappingInfo
 {
+	//-------- attributes --------
+	
 	/** The supertype. */
 	protected TypeInfo supertype;
 	
@@ -26,10 +28,10 @@ public class MappingInfo
 	/** The include fields flag. */
 	protected boolean includefields;
 
-	
+	//-------- constructors --------
 	
 	/**
-	 * @param supertype
+	 *  Create a new mapping info.
 	 */
 	public MappingInfo(TypeInfo supertype)
 	{
@@ -37,8 +39,7 @@ public class MappingInfo
 	}
 
 	/**
-	 * @param supertype
-	 * @param attributeinfos
+	 *  Create a new mapping info.
 	 */
 	public MappingInfo(TypeInfo supertype, AttributeInfo[] attributeinfos)
 	{
@@ -47,8 +48,7 @@ public class MappingInfo
 	}
 	
 	/**
-	 * @param supertype
-	 * @param subobjectinfos
+	 *  Create a new mapping info.
 	 */
 	public MappingInfo(TypeInfo supertype, SubobjectInfo[] subobjectinfos)
 	{
@@ -57,9 +57,7 @@ public class MappingInfo
 	}
 
 	/**
-	 * @param supertype
-	 * @param commentinfo
-	 * @param contentinfo
+	 *  Create a new mapping info.
 	 */
 	public MappingInfo(TypeInfo supertype, Object commentinfo,
 		Object contentinfo)
@@ -73,9 +71,7 @@ public class MappingInfo
 	}
 
 	/**
-	 * @param supertype
-	 * @param attributeinfos
-	 * @param subobjectinfos
+	 *  Create a new mapping info.
 	 */
 	public MappingInfo(TypeInfo supertype, AttributeInfo[] attributeinfos,
 		SubobjectInfo[] subobjectinfos)
@@ -86,10 +82,7 @@ public class MappingInfo
 	}
 
 	/**
-	 * @param supertype
-	 * @param commentinfo
-	 * @param contentinfo
-	 * @param attributeinfos
+	 *  Create a new mapping info.
 	 */
 	public MappingInfo(TypeInfo supertype, Object commentinfo,
 		Object contentinfo, AttributeInfo[] attributeinfos)
@@ -104,11 +97,7 @@ public class MappingInfo
 	}
 
 	/**
-	 * @param supertype
-	 * @param commentinfo
-	 * @param contentinfo
-	 * @param attributeinfos
-	 * @param subobjectinfos
+	 *  Create a new mapping info.
 	 */
 	public MappingInfo(TypeInfo supertype, Object commentinfo,
 		Object contentinfo, AttributeInfo[] attributeinfos,
@@ -125,12 +114,7 @@ public class MappingInfo
 	}
 
 	/**
-	 * @param supertype
-	 * @param commentinfo
-	 * @param contentinfo
-	 * @param attributeinfos
-	 * @param subobjectinfos
-	 * @param includefields
+	 *  Create a new mapping info.
 	 */
 	public MappingInfo(TypeInfo supertype, Object commentinfo,
 		Object contentinfo, AttributeInfo[] attributeinfos,
@@ -147,6 +131,8 @@ public class MappingInfo
 			System.out.println("here: "+this);
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Get the supertype.
 	 *  @return The supertype.
@@ -255,6 +241,10 @@ public class MappingInfo
 		this.includefields = includefields;
 	}
 
+	/**
+	 *  Get the string representation.
+	 *  @return The string representation.
+	 */
 	public String toString()
 	{
 		return "MappingInfo [attributeinfos=" + Arrays.toString(attributeinfos)

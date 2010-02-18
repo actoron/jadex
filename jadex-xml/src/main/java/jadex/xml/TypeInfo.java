@@ -13,55 +13,26 @@ import java.util.TreeSet;
 import javax.xml.namespace.QName;
 
 /**
- *  Mapping from tag (or path fragment) to OAV type.
+ *  Mapping from tag (or path fragment) to object.
  */
 public class TypeInfo	extends AbstractInfo
 {	
 	//-------- attributes -------- 
 	
-	// read + write 
-	
-//	/** The supertype. */
-//	protected TypeInfo supertype;
-	
-//	/** The object type. */
-//	protected Object typeinfo; // (if not Ibeancreator)
-	
-//	/** The comment info. */
-//	protected Object commentinfo;
-//	
-//	/** The content info. */
-//	protected Object contentinfo;
-	
-//	/** The include fields flag. */
-//	protected boolean includefields;
-	
-	// read
-	
-//	/** The post processor (if any). */
-//	protected IPostProcessor postproc;
-//	
-//	/** Create from tag flag. */
-//	protected boolean createfromtag;
-	
-//	/** The linker. */
-//	protected Object linker;
-//	
-//	/** The link mode (determined by the linker if present). */
-//	protected boolean bulklink;
-	
 	// todo: IPreWriter for doing sth with the object before writing?
-		
-	/** The attributes info (xmlname -> attrinfo). */
-	protected Map attributeinfos;
 	
+	/** The object info for storing info about the object side, e.g. the object type. */
 	protected ObjectInfo objectinfo;
 	
+	/** The map info contains all mapping relevant data, e.g. for attributes, subobjects etc. */
 	protected MappingInfo mapinfo;
 	
+	/** The link info . */
 	protected LinkingInfo linkinfo;
+
 	
-	// write
+	/** The attributes info (xmlname -> attrinfo). */
+	protected Map attributeinfos;
 	
 	/** The sub objects (non-xml name -> subobject info). */
 	protected Map subobjectinfoswrite;
@@ -105,240 +76,7 @@ public class TypeInfo	extends AbstractInfo
 		this.subobjectinfosread = createSubobjectInfosRead(mapinfo==null? null: mapinfo.getSubobjectInfos());
 	}
 	
-//	/**
-//	 *  Create a new type info.
-//	 *  @param xmlpath The path or tag.
-//	 *  @param typeinfo The type of object to create.
-//	 */
-//	public TypeInfo(TypeInfo supertype, String xmlpath, Object typeinfo)
-//	{
-//		this(supertype, xmlpath, typeinfo, null, null);
-//	}
-//	
-//	/**
-//	 *  Create a new type info.
-//	 *  @param xmlpath The path or tag.
-//	 *  @param type The type of object to create.
-//	 *  @param commentinfo The commnentinfo.
-//	 *  @param contentinfo The contentinfo.
-//	 */
-//	public TypeInfo(TypeInfo supertype, String xmlpath, Object typeinfo, Object commentinfo, Object contentinfo)
-//	{
-//		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, null, null);
-//	}
-//	
-//	/**
-//	 *  Create a new type info.
-//	 *  @param xmlpath The path or tag.
-//	 *  @param typeinfo The type of object to create.
-//	 *  @param commentinfo The commnent.
-//	 *  @param contentinfo The content.
-//	 *  @param attributesinfo The attributes map.
-//	 *  @param postproc The post processor. 
-//	 */
-//	public TypeInfo(TypeInfo supertype, String xmlpath, Object typeinfo, Object commentinfo, Object contentinfo, 
-//		AttributeInfo[] attributesinfo, IPostProcessor postproc)
-//	{
-//		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributesinfo, postproc, null);
-//	}
-//	
-//	/**
-//	 *  Create a new type info.
-//	 *  @param xmlpath The path or tag.
-//	 *  @param typeinfo The type of object to create.
-//	 *  @param commentinfo The commnent.
-//	 *  @param contentinfo The content.
-//	 *  @param attributesinfo The attributes map.
-//	 *  @param postproc The post processor. 
-//	 */
-//	public TypeInfo(TypeInfo supertype, String xmlpath, Object typeinfo, Object commentinfo, Object contentinfo, 
-//		AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter)
-//	{
-//		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributeinfos, postproc, filter, null);
-//	}
-//	
-//	/**
-//	 *  Create a new type info.
-//	 * @param xmlpath The path or tag.
-//	 * @param typeinfo The type of object to create.
-//	 * @param commentinfo The commnent.
-//	 * @param contentinfo The content.
-//	 * @param attributeinfos The attributes map.
-//	 * @param postproc The post processor. 
-//	 */
-//	public TypeInfo(TypeInfo supertype, String xmlpath, Object typeinfo, Object commentinfo, 
-//		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
-//		SubobjectInfo[] subobjectinfos)
-//	{
-//		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributeinfos, postproc, filter, subobjectinfos, true, false);
-//	}
-//	
-//	/**
-//	 *  Create a new type info.
-//	 * @param xmlpath The path or tag.
-//	 * @param typeinfo The type of object to create.
-//	 * @param commentinfo The commnent.
-//	 * @param contentinfo The content.
-//	 * @param attributeinfos The attributes map.
-//	 * @param postproc The post processor. 
-//	 */
-//	public TypeInfo(TypeInfo supertype, String xmlpath, Object typeinfo, Object commentinfo, 
-//		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
-//		SubobjectInfo[] subobjectinfos, boolean createfromtag, boolean includefields)
-//	{
-//		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributeinfos, postproc, filter, subobjectinfos, true, false, null);
-//	}
-//	
-//	/**
-//	 *  Create a new type info.
-//	 * @param xmlpath The path or tag.
-//	 * @param typeinfo The type of object to create.
-//	 * @param commentinfo The commnent.
-//	 * @param contentinfo The content.
-//	 * @param attributeinfos The attributes map.
-//	 * @param postproc The post processor. 
-//	 */
-//	public TypeInfo(TypeInfo supertype, String xmlpath, Object typeinfo, Object commentinfo, 
-//		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
-//		SubobjectInfo[] subobjectinfos, boolean createfromtag, boolean includefields, Object linker)
-//	{
-//		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributeinfos, postproc, filter, subobjectinfos, true, false, null, false);
-//	}
-//	
-//	/**
-//	 *  Create a new type info.
-//	 * @param xmlpath The path or tag.
-//	 * @param typeinfo The type of object to create.
-//	 * @param commentinfo The commnent.
-//	 * @param contentinfo The content.
-//	 * @param attributeinfos The attributes map.
-//	 * @param postproc The post processor. 
-//	 */
-//	public TypeInfo(TypeInfo supertype, String xmlpath, Object typeinfo, Object commentinfo, 
-//		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
-//		SubobjectInfo[] subobjectinfos, boolean createfromtag, boolean includefields, Object linker, boolean bulklink)
-//	{
-//		super(xmlpath, filter);
-//		this.supertype = supertype;
-//		this.typeinfo = typeinfo;
-//		this.commentinfo = commentinfo;
-//		this.contentinfo = contentinfo;
-//		this.postproc = postproc;
-//		this.createfromtag = createfromtag;
-//		this.includefields = includefields;
-//		this.linker = linker;
-//		this.bulklink = bulklink;
-//		
-//		if(attributeinfos!=null)
-//			this.attributeinfos = createAttributeInfos(attributeinfos);
-//		
-//		if(subobjectinfos!=null)
-//			this.subobjectinfoswrite = createSubobjectInfosWrite(subobjectinfos);
-//		this.subobjectinfosread = createSubobjectInfosRead(subobjectinfos);
-//	}
-//	
-//	//-------- all constructors also with xmlpath as QName[] :-(  --------
-//	
-//	/**
-//	 *  Create a new type info.
-//	 *  @param xmlpath The path or tag.
-//	 *  @param typeinfo The type of object to create.
-//	 */
-//	public TypeInfo(TypeInfo supertype, QName[] xmlpath, Object typeinfo)
-//	{
-//		this(supertype, xmlpath, typeinfo, null, null);
-//	}
-//	
-//	/**
-//	 *  Create a new type info.
-//	 *  @param xmlpath The path or tag.
-//	 *  @param type The type of object to create.
-//	 *  @param commentinfo The commnentinfo.
-//	 *  @param contentinfo The contentinfo.
-//	 */
-//	public TypeInfo(TypeInfo supertype, QName[] xmlpath, Object typeinfo, Object commentinfo, Object contentinfo)
-//	{
-//		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, null, null);
-//	}
-//	
-//	/**
-//	 *  Create a new type info.
-//	 *  @param xmlpath The path or tag.
-//	 *  @param typeinfo The type of object to create.
-//	 *  @param commentinfo The commnent.
-//	 *  @param contentinfo The content.
-//	 *  @param attributesinfo The attributes map.
-//	 *  @param postproc The post processor. 
-//	 */
-//	public TypeInfo(TypeInfo supertype, QName[] xmlpath, Object typeinfo, Object commentinfo, Object contentinfo, 
-//		AttributeInfo[] attributesinfo, IPostProcessor postproc)
-//	{
-//		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributesinfo, postproc, null);
-//	}
-//	
-//	/**
-//	 *  Create a new type info.
-//	 *  @param xmlpath The path or tag.
-//	 *  @param typeinfo The type of object to create.
-//	 *  @param commentinfo The commnent.
-//	 *  @param contentinfo The content.
-//	 *  @param attributesinfo The attributes map.
-//	 *  @param postproc The post processor. 
-//	 */
-//	public TypeInfo(TypeInfo supertype, QName[] xmlpath, Object typeinfo, Object commentinfo, Object contentinfo, 
-//		AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter)
-//	{
-//		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributeinfos, postproc, filter, null);
-//	}
-//	
-//	/**
-//	 *  Create a new type info.
-//	 * @param xmlpath The path or tag.
-//	 * @param typeinfo The type of object to create.
-//	 * @param commentinfo The commnent.
-//	 * @param contentinfo The content.
-//	 * @param attributeinfos The attributes map.
-//	 * @param postproc The post processor. 
-//	 */
-//	public TypeInfo(TypeInfo supertype, QName[] xmlpath, Object typeinfo, Object commentinfo, 
-//		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
-//		SubobjectInfo[] subobjectinfos)
-//	{
-//		this(supertype, xmlpath, typeinfo, commentinfo, contentinfo, attributeinfos, postproc, filter, subobjectinfos, true);
-//	}
-//	
-//	/**
-//	 *  Create a new type info.
-//	 * @param xmlpath The path or tag.
-//	 * @param typeinfo The type of object to create.
-//	 * @param commentinfo The commnent.
-//	 * @param contentinfo The content.
-//	 * @param attributeinfos The attributes map.
-//	 * @param postproc The post processor. 
-//	 */
-//	public TypeInfo(TypeInfo supertype, QName[] xmlpath, Object typeinfo, Object commentinfo, 
-//		Object contentinfo, AttributeInfo[] attributeinfos, IPostProcessor postproc, IFilter filter,
-//		SubobjectInfo[] subobjectinfos, boolean createfromtag)
-//	{
-//		super(xmlpath, filter);
-//		this.supertype = supertype;
-//		this.typeinfo = typeinfo;
-//		this.commentinfo = commentinfo;
-//		this.contentinfo = contentinfo;
-//		this.postproc = postproc;
-//		this.createfromtag = createfromtag;
-//		
-//		if(attributeinfos!=null)
-//			this.attributeinfos = createAttributeInfos(attributeinfos);
-//		
-//		if(subobjectinfos!=null)
-//			this.subobjectinfoswrite = createSubobjectInfosWrite(subobjectinfos);
-//		this.subobjectinfosread = createSubobjectInfosRead(subobjectinfos);
-//	}
-	
 	//-------- methods --------
-	
-	
 	
 	/**
 	 *  Get the type info.
@@ -415,40 +153,6 @@ public class TypeInfo	extends AbstractInfo
 	}
 	
 	/**
-	 *  Get the namespace.
-	 *  @return The namespace.
-	 * /
-	public Namespace getNamespace()
-	{
-		return namespace!=null? namespace: supertype!=null? supertype.getNamespace(): null;
-	}*/
-	
-	/**
-	 *  Add an attribute info.
-	 *  @param xmlname The xml attribute name.
-	 *  @param attrinfo The attribute info.
-	 * /
-	public void addAttributeInfo(String xmlname, Object attrinfo)
-	{
-		if(attributeinfos==null)
-			attributeinfos = new HashMap();
-		attributeinfos.put(xmlname, attrinfo);
-	}*/
-
-	/**
-	 *  Get the attribute info.
-	 *  @param xmlname The xml name of the attribute.
-	 *  @return The attribute info.
-	 * /
-	public Object getAttributeInfo(String xmlname)
-	{
-		Object ret = attributeinfos==null? null: attributeinfos.get(xmlname);
-		if(ret==null && supertype!=null)
-			ret = supertype.getAttributeInfo(xmlname);
-		return ret;
-	}*/
-
-	/**
 	 *  Get the attribute info.
 	 *  @param xmlname The xml name of the attribute.
 	 *  @return The attribute info.
@@ -511,18 +215,6 @@ public class TypeInfo	extends AbstractInfo
 		return ret!=null? ret: getSupertype()!=null? getSupertype().getPostProcessor(): null;
 	}
 
-	
-	/**
-	 *  Add a subobjects info.
-	 *  @param info The subobjects info.
-	 * /
-	public void addSubobjectInfo(Object nonxmlname, SubobjectInfo info)
-	{
-		if(subobjectinfoswrite==null)
-			subobjectinfoswrite = new HashMap();
-		subobjectinfoswrite.put(nonxmlname, info);
-	}*/
-	
 	/**
 	 *  Get the subobject infos. 
 	 *  @return The subobject infos.
@@ -557,28 +249,9 @@ public class TypeInfo	extends AbstractInfo
 	{
 		SubobjectInfo ret = null;
 		
-		// Hack exclude tag when classname :-(
-//		if(tag.indexOf(".")!=-1)
-//		{
-//			tag = fullpath[fullpath.length-2];
-//			String[] tmp = new String[fullpath.length-1];
-//			System.arraycopy(fullpath, 0, tmp, 0, tmp.length);
-//			fullpath = tmp;
-//		}
-		
 		Set subobjects = subobjectinfosread!=null? (Set)subobjectinfosread.get(tag): null;
 		ret = findSubobjectInfo(subobjects, fullpath, rawattributes);
 		
-//		Set subobjects = subobjectinfosread!=null? (Set)subobjectinfosread.get(tag): null;			
-//		if(subobjects!=null)
-//		{
-//			for(Iterator it=subobjects.iterator(); ret==null && it.hasNext(); )
-//			{
-//				SubobjectInfo tmp = (SubobjectInfo)it.next();
-//				if(fullpath.endsWith(tmp.getXMLPath()) && (tmp.getFilter()==null || tmp.getFilter().filter(rawattributes)))
-//					ret = tmp;
-//			}
-//		}
 		return ret;
 	}
 	
@@ -643,7 +316,7 @@ public class TypeInfo	extends AbstractInfo
 		Map ret = new LinkedHashMap();
 		for(int i=0; i<subobjectinfos.length; i++)
 		{
-			ret.put(subobjectinfos[i].getLinkInfo(), subobjectinfos[i]);
+			ret.put(subobjectinfos[i].getAccessInfo(), subobjectinfos[i]);
 		}
 		return ret;
 	}

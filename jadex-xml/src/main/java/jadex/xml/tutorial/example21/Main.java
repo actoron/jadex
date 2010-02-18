@@ -1,11 +1,15 @@
 package jadex.xml.tutorial.example21;
 
 import jadex.commons.SUtil;
-import jadex.xml.AttributeInfo;
+import jadex.xml.AccessInfo;
+import jadex.xml.IContext;
+import jadex.xml.IObjectObjectConverter;
+import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
-import jadex.xml.XMLInfo;
+import jadex.xml.SubObjectConverter;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
@@ -27,12 +31,22 @@ public class Main
 		Set typeinfos = new HashSet();
 		
 		typeinfos.add(new TypeInfo(new XMLInfo("customer"), new ObjectInfo(Customer.class)));
+		typeinfos.add(new TypeInfo(new XMLInfo("entry"), new ObjectInfo(Entry.class)));
+		typeinfos.add(new TypeInfo(new XMLInfo("directory"), new ObjectInfo(Directory.class), 
+			new MappingInfo(null, new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo("entry", null, null, null, 
+			new BeanAccessInfo(Directory.class.getField("customerMap"),
+				null, "customerMap", Entry.class.getField("key"))),
+			new SubObjectConverter(new IObjectObjectConverter()
+			{
+				public Object convertObject(Object val, IContext context)
+				{
+					return ((Entry)val).customer;
+				}
+			}, null))
+		})));
 		
-//		typeinfos.add(new TypeInfo(null, "customer", Customer.class));
-//		typeinfos.add(new TypeInfo(null, "directory", Directory.class, null, null,
-//			new AttributeInfo[]{
-//			new BeanAttributeInfo("key", null, null, null, null, "customerMap", null, null, null, null)
-//		}, null));
+		//Directory.class.getMethod("putCustomer", new Class[]{String.class, Object.class})
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos

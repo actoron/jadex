@@ -42,61 +42,6 @@ public class AbstractInfo
 		}
 	}
 
-	
-	/**
-	 *  Create an abstract OAV info.
-	 * /
-	public AbstractInfo(String xmlpath, IFilter filter)
-	{
-		this.xmlpath = xmlpath;
-		if(xmlpath!=null)
-		{
-			StringTokenizer stok = new StringTokenizer(xmlpath, "/");
-			this.xmlpathelements = new QName[stok.countTokens()];
-			this.xmlpathelementswithouttag = new QName[stok.countTokens()-1];
-			for(int i=0; stok.hasMoreTokens(); i++)
-			{
-				xmlpathelements[i] = QName.valueOf(stok.nextToken());//convertStringToQName(stok.nextToken());
-				if(i<xmlpathelementswithouttag.length)
-					xmlpathelementswithouttag[i] = xmlpathelements[i];
-			}
-		}
-		
-		this.filter = filter;
-		synchronized(AbstractInfo.class)
-		{
-			this.id = idcnt++;
-		}
-	}*/
-	
-	/**
-	 *  Create an abstract OAV info.
-	 * /
-	public AbstractInfo(QName[] xmlpath, IFilter filter)
-	{
-		if(xmlpath!=null)
-		{
-			// Only use local part
-			StringBuffer buf = new StringBuffer();
-			for(int i=0; i<xmlpath.length; i++)
-			{
-				if(i>0)
-					buf.append("/");
-				buf.append(xmlpath[i].getLocalPart());
-			}
-			this.xmlpath = buf.toString();
-			this.xmlpathelements = xmlpath;
-			this.xmlpathelementswithouttag = new QName[xmlpathelements.length-1];
-			System.arraycopy(xmlpathelements, 0, xmlpathelementswithouttag, 0, xmlpathelementswithouttag.length);
-		}
-		
-		this.filter = filter;
-		synchronized(AbstractInfo.class)
-		{
-			this.id = idcnt++;
-		}
-	}*/
-	
 	//-------- methods --------
 
 	/**
@@ -189,16 +134,6 @@ public class AbstractInfo
 	}
 	
 	/**
-	 *  Convert a string to a qname.
-	 *  @param s The string.
-	 *  @return The qname.
-	 * /
-	public QName convertStringToQName(String s)
-	{
-		return QName.valueOf(s);
-	}*/
-	
-	/**
 	 *  Get a string representation of this mapping.
 	 */
 	public String	toString()
@@ -215,7 +150,6 @@ public class AbstractInfo
 	}
 
 	//-------- helper classes --------
-	
 	
 	/**
 	 *  Compare infos by specificity of the XML path.

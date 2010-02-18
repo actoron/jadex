@@ -163,7 +163,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 				for(Iterator it=subobsinfos.iterator(); it.hasNext(); )
 				{
 					SubobjectInfo soinfo = (SubobjectInfo)it.next();
-					info = soinfo.getLinkInfo();
+					info = soinfo.getAccessInfo();
 					TypeInfo sotypeinfo = soinfo.getTypeInfo();
 					Object property = getProperty(info);
 					if(property!=null)
