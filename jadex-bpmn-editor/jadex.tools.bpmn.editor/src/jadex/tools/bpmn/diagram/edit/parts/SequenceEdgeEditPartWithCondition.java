@@ -6,13 +6,16 @@ package jadex.tools.bpmn.diagram.edit.parts;
 import jadex.tools.bpmn.editor.properties.AbstractJadexPropertySection;
 import jadex.tools.bpmn.editor.properties.JadexSequencePropertiesSection;
 
+import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.Connection;
 import org.eclipse.draw2d.ConnectionLocator;
+import org.eclipse.draw2d.LineBorder;
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.stp.bpmn.SequenceEdge;
 import org.eclipse.stp.bpmn.diagram.edit.parts.SequenceEdgeEditPart;
+import org.eclipse.swt.graphics.Color;
 
 
 /**
@@ -43,6 +46,9 @@ public class SequenceEdgeEditPartWithCondition extends SequenceEdgeEditPart
 		String condition = getCondition();
 		WrappingLabel conditionFigure = new WrappingLabel();
 		conditionFigure.setText(condition);
+		
+		setConditionLabelStyles(conditionFigure);
+		
 		ConnectionLocator locator = new ConnectionLocator(edgeFigure, ConnectionLocator.MIDDLE);
 		locator.setRelativePosition(PositionConstants.SOUTH_EAST);
 		locator.setGap(10);
@@ -66,6 +72,15 @@ public class SequenceEdgeEditPartWithCondition extends SequenceEdgeEditPart
 			condition = AbstractJadexPropertySection.getJadexEAnnotationDetail(edge, JadexSequencePropertiesSection.SEQUENCE_PROPERTIES_ANNOTATION_IDENTIFIER, JadexSequencePropertiesSection.SEQUENCE_PROPERTIES_CONDITION_DETAIL_IDENTIFIER);
 		}
 		return condition;
+	}
+	
+	private void setConditionLabelStyles(WrappingLabel label)
+	{
+		if (label.getText() != null && !label.getText().isEmpty())
+		{
+			label.setForegroundColor(ColorConstants.darkBlue);
+			//label.setBorder(new LineBorder());
+		}
 	}
 	
 	
