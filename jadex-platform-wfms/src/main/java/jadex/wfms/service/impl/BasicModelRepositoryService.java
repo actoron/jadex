@@ -70,7 +70,6 @@ public class BasicModelRepositoryService implements IModelRepositoryService, ISe
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
 		}
 	}
 	
@@ -262,7 +261,7 @@ public class BasicModelRepositoryService implements IModelRepositoryService, ISe
 				for (Iterator it = subSet.iterator(); it.hasNext(); )
 				{
 					if (prependDir)
-						ret.add(dir.getName().concat(File.separator).concat((String) it.next()));
+						ret.add(dir.getName().concat("/").concat((String) it.next()));
 					else
 						ret.add(it.next());
 				}
@@ -270,7 +269,7 @@ public class BasicModelRepositoryService implements IModelRepositoryService, ISe
 			else if ((content[i].getName().endsWith(".bpmn")) || (content[i].getName().endsWith(".gpmn")))
 			{
 				if (prependDir)
-					ret.add(dir.getName().concat(File.separator).concat(content[i].getName()));
+					ret.add(dir.getName().concat("/").concat(content[i].getName()));
 				else
 					ret.add(content[i].getName());
 			}
@@ -294,7 +293,6 @@ public class BasicModelRepositoryService implements IModelRepositoryService, ISe
 				}
 				catch (Exception e)
 				{
-					e.printStackTrace();
 				}
 				line = reader.readLine();
 			}
@@ -317,7 +315,6 @@ public class BasicModelRepositoryService implements IModelRepositoryService, ISe
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
 			}
 			line = reader.readLine();
 		}
