@@ -245,9 +245,6 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 	 */
 	protected TableViewer createTable(Composite parent, GridData tableLayoutData)
 	{
-		//String[] columns = columnNames;
-		//int[] weight = columWeights;
-
 		// the displayed table
 		TableViewer viewer = new TableViewer(getWidgetFactory().createTable(parent,
 				SWT.FULL_SELECTION | SWT.BORDER));
@@ -268,8 +265,7 @@ public abstract class AbstractMultiColumnTablePropertySection extends AbstractJa
 		viewer.getTable().setLayout(tableLayout);
 
 		viewer.setContentProvider(new MultiColumnTableContentProvider());
-		// FIX ME: use column specific label provider (see above)
-		//viewer.setLabelProvider(new MultiColumnTableLabelProvider());
+
 		viewer.setColumnProperties(columnNames);
 
 		return viewer;

@@ -10,8 +10,6 @@ import jadex.tools.bpmn.runtime.task.TaskMetaInfo;
 import jadex.tools.table.MultiColumnTable;
 import jadex.tools.table.MultiColumnTable.MultiColumnTableRow;
 
-import java.util.ArrayList;
-
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TableViewer;
