@@ -210,46 +210,13 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 			return false;
 		}
 		
-		return updateJadexEAnnotationDetail(modelElement, containerEAnnotationName, detail, value);
+		boolean success = updateJadexEAnnotationDetail(modelElement, containerEAnnotationName, detail, value);
+		if (success)
+		{
+			refreshSelectedEditPart();
+		}
 		
-//		// create the TransactionalCommand
-//		ModifyJadexEAnnotationCommand command = new ModifyJadexEAnnotationCommand(
-//				modelElement, Messages.JadexCommonPropertySection_update_eannotation_command_name)
-//		{
-//			@Override
-//			protected CommandResult doExecuteWithResult(
-//					IProgressMonitor arg0, IAdaptable arg1)
-//					throws ExecutionException
-//			{
-//				EAnnotation annotation = modelElement.getEAnnotation(containerEAnnotationName);
-//				if (annotation == null)
-//				{
-//					annotation = EcoreFactory.eINSTANCE.createEAnnotation();
-//					annotation.setSource(containerEAnnotationName);
-//					annotation.setEModelElement(modelElement);
-//					annotation.getDetails().put(key, ""); //$NON-NLS-1$
-//				}
-//				
-//				annotation.getDetails().put(key, value);
-//				
-//				return CommandResult.newOKCommandResult();
-//			}
-//		};
-//		// execute command
-//		try
-//		{
-//			IStatus status = command.execute(new NullProgressMonitor(), null);
-//			return status.isOK();
-//		}
-//		catch (ExecutionException exception)
-//		{
-//			JadexBpmnPlugin.getDefault().getLog().log(
-//					new Status(IStatus.ERROR, JadexBpmnPlugin.PLUGIN_ID,
-//							IStatus.ERROR, exception.getMessage(),
-//							exception));
-//			
-//			return false;
-//		}
+		return success;
 	}
 	
 	/**
@@ -370,7 +337,7 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	 * @param value
 	 * @return
 	 */
-	protected static boolean updateJadexEAnnotationDetail(final EModelElement element, final String annotationIdentifier, final String annotationDetail, final String value)
+	public static boolean updateJadexEAnnotationDetail(final EModelElement element, final String annotationIdentifier, final String annotationDetail, final String value)
 	{
 		if(element == null)
 		{
@@ -425,7 +392,7 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	 * @param annotationDetail
 	 * @return
 	 */
-	protected static String getJadexEAnnotationDetail(final EModelElement element, final String annotationIdentifier, final String annotationDetail)
+	public static String getJadexEAnnotationDetail(final EModelElement element, final String annotationIdentifier, final String annotationDetail)
 	{
 		if(element == null)
 		{

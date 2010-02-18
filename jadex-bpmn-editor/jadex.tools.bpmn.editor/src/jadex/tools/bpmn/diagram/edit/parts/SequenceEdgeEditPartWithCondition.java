@@ -3,14 +3,15 @@
  */
 package jadex.tools.bpmn.diagram.edit.parts;
 
-import org.eclipse.draw2d.BendpointLocator;
+import jadex.tools.bpmn.editor.properties.AbstractJadexPropertySection;
+import jadex.tools.bpmn.editor.properties.JadexSequencePropertiesSection;
+
 import org.eclipse.draw2d.Connection;
 import org.eclipse.draw2d.ConnectionLocator;
-import org.eclipse.draw2d.MidpointLocator;
-import org.eclipse.gef.EditPart;
-import org.eclipse.gmf.runtime.diagram.ui.editparts.LabelEditPart;
+import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.WrappingLabel;
 import org.eclipse.gmf.runtime.notation.View;
+import org.eclipse.stp.bpmn.SequenceEdge;
 import org.eclipse.stp.bpmn.diagram.edit.parts.SequenceEdgeEditPart;
 
 
@@ -37,38 +38,56 @@ public class SequenceEdgeEditPartWithCondition extends SequenceEdgeEditPart
 	@Override
 	protected Connection createConnectionFigure()
 	{
-		return new EdgeFigureWithCondition();
+		EdgeFigureWithCondition edgeFigure = new EdgeFigureWithCondition();
+		
+		String condition = getCondition();
+		WrappingLabel conditionFigure = new WrappingLabel();
+		conditionFigure.setText(condition);
+		ConnectionLocator locator = new ConnectionLocator(edgeFigure, ConnectionLocator.MIDDLE);
+		locator.setRelativePosition(PositionConstants.SOUTH_EAST);
+		locator.setGap(10);
+		edgeFigure.add(conditionFigure, locator);
+		edgeFigure.setFigureSequenceEdgeConditionFigure(conditionFigure);
+
+		return edgeFigure;
+	}
+
+	/**
+	 * Get the condition from annotation
+	 * @return
+	 */
+	private String getCondition()
+	{
+		String condition = null;
+		Object edgeModel = getPrimaryView().getElement();
+		if (edgeModel != null && edgeModel instanceof SequenceEdge)
+		{
+			SequenceEdge edge = (SequenceEdge) edgeModel;
+			condition = AbstractJadexPropertySection.getJadexEAnnotationDetail(edge, JadexSequencePropertiesSection.SEQUENCE_PROPERTIES_ANNOTATION_IDENTIFIER, JadexSequencePropertiesSection.SEQUENCE_PROPERTIES_CONDITION_DETAIL_IDENTIFIER);
+		}
+		return condition;
 	}
 	
-//	/**
-//	 * @generated NOT
-//	 */
-//	protected boolean addFixedChildGen(EditPart childEditPart)
-//	{
-//		if (childEditPart instanceof WrappingLabelEditPart)
-//		{
-//			((WrappingLabelEditPart) childEditPart).setLabel(((EdgeFigureWithCondition)getConnectionFigure())
-//					.getFigureSequenceEdgeConditionFigure());
-//			return true;
-//		}
-//		return false;
-//	}
-//	
-//
-//	/**
-//	 * @generated NOT
-//	 */
-//	protected boolean removeFixedChild(EditPart childEditPart)
-//	{
-//		if (childEditPart instanceof WrappingLabelEditPart)
-//		{
-//			return true;
-//		}
-//		return false;
-//	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.gmf.runtime.diagram.ui.editparts.ConnectionEditPart#refresh()
+	 */
+	@Override
+	public void refresh()
+	{
+		super.refresh();
+		EdgeFigureWithCondition edgeFigure = (EdgeFigureWithCondition) getFigure();
+		if (edgeFigure != null)
+		{
+			WrappingLabel label = edgeFigure.getFigureSequenceEdgeConditionFigure();
+			label.setText(getCondition());
+			label.repaint();
+		}
+	}
 
-	
-	
+
+
+
 	/**
 	 * Extend the BPMN EdgeFigure to support customization
 	 * 
@@ -88,7 +107,6 @@ public class SequenceEdgeEditPartWithCondition extends SequenceEdgeEditPart
 		public EdgeFigureWithCondition()
 		{
 			super();
-			//this.setForegroundColor(org.eclipse.draw2d.ColorConstants.red);
 			this.createContents();
 		}
 		
@@ -99,23 +117,28 @@ public class SequenceEdgeEditPartWithCondition extends SequenceEdgeEditPart
 		private void createContents()
 		{
 
-			fFigureSequenceEdgeConditionFigure = new WrappingLabel();
-//			fFigureSequenceEdgeConditionFigure.setText("SOME TEXT");
-
-			//new BendpointLocator(this, 0);
-			//new MidpointLocator(this, 0)
-			this.add(fFigureSequenceEdgeConditionFigure, new ConnectionLocator(this, ConnectionLocator.SOURCE));
-
 		}
 
-
 		/**
+		 * @return the fFigureSequenceEdgeConditionFigure
 		 * @generated NOT
 		 */
 		public WrappingLabel getFigureSequenceEdgeConditionFigure()
 		{
 			return fFigureSequenceEdgeConditionFigure;
 		}
+
+
+		/**
+		 * @param fFigureSequenceEdgeConditionFigure the fFigureSequenceEdgeConditionFigure to set
+		 * @generated NOT
+		 */
+		public void setFigureSequenceEdgeConditionFigure(WrappingLabel sequenceEdgeConditionFigure)
+		{
+			this.fFigureSequenceEdgeConditionFigure = sequenceEdgeConditionFigure;
+		}
+		
+		
 	}
 
 }
