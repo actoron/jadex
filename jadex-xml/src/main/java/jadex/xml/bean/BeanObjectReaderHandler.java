@@ -5,6 +5,7 @@ import jadex.commons.SUtil;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.BasicTypeConverter;
+import jadex.xml.ICustomProcessor;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.ISubObjectConverter;
 import jadex.xml.ObjectInfo;
@@ -704,6 +705,10 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 							e.printStackTrace();
 						}
 					}
+					else if(kh instanceof ICustomProcessor)
+					{
+						key = ((ICustomProcessor)kh).processValue(targetobj);
+					}
 					else
 					{
 						throw new RuntimeException("Unknown key help: "+kh); 
@@ -754,7 +759,11 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						{
 							e.printStackTrace();
 						}
-						
+					}
+					else if(sh instanceof ICustomProcessor)
+					{
+						Object arg = convertValue(val, null, converter, context, id);
+						((ICustomProcessor)sh).processValue(new Object[]{object, arg});
 					}
 					else
 					{
@@ -830,6 +839,11 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					{
 						e.printStackTrace();
 					}
+				}
+				else if(sh instanceof ICustomProcessor)
+				{
+					Object arg = convertValue(val, null, converter, context, id);
+					((ICustomProcessor)sh).processValue(new Object[]{object, arg});
 				}
 				else
 				{

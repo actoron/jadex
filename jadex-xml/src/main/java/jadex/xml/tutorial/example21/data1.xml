@@ -1,5 +1,5 @@
 <dms:directory xmlns:dms="http://www.sosnoski.com">
-  <dms:map dms:size="4">
+  <dms:map><!--  dms:size="4">-->
     <dms:entry dms:key="38193">
       <dms:customer dms:state="WA" dms:zip="98059">
         <dms:name dms:first-name="John" dms:last-name="Smith"/>

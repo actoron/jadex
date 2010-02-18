@@ -2,7 +2,9 @@ package jadex.xml.tutorial.example21;
 
 import jadex.commons.SUtil;
 import jadex.xml.AccessInfo;
+import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
+import jadex.xml.ICustomProcessor;
 import jadex.xml.IObjectObjectConverter;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
@@ -15,8 +17,13 @@ import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
 
 import java.io.InputStream;
+import java.net.URI;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 /**
  *  Main class to execute tutorial lesson c (taken from Jibx website).
@@ -30,23 +37,37 @@ public class Main
 	{
 		Set typeinfos = new HashSet();
 		
+		typeinfos.add(new TypeInfo(new XMLInfo("name"), new ObjectInfo(Name.class),
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("first-name", "firstName")),
+			new AttributeInfo(new AccessInfo("last-name", "lastName"))
+			})));
 		typeinfos.add(new TypeInfo(new XMLInfo("customer"), new ObjectInfo(Customer.class)));
-		typeinfos.add(new TypeInfo(new XMLInfo("entry"), new ObjectInfo(Entry.class)));
+		typeinfos.add(new TypeInfo(new XMLInfo("entry"), new ObjectInfo(HashMap.class),
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("key", null, null, null, new BeanAccessInfo("")))},
+			new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo("customer", null, null, null, new BeanAccessInfo("")))
+			})));
 		typeinfos.add(new TypeInfo(new XMLInfo("directory"), new ObjectInfo(Directory.class), 
 			new MappingInfo(null, new SubobjectInfo[]{
 			new SubobjectInfo(new AccessInfo("entry", null, null, null, 
 			new BeanAccessInfo(Directory.class.getField("customerMap"),
-				null, "customerMap", Entry.class.getField("key"))),
+			null, "customerMap", new ICustomProcessor() 
+			{
+				public Object processValue(Object object) 
+				{
+					return ((Map)object).get("key");
+				}
+			})),
 			new SubObjectConverter(new IObjectObjectConverter()
 			{
 				public Object convertObject(Object val, IContext context)
 				{
-					return ((Entry)val).customer;
+					return ((Map)val).get("customer");
 				}
 			}, null))
 		})));
-		
-		//Directory.class.getMethod("putCustomer", new Class[]{String.class, Object.class})
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos
@@ -54,12 +75,52 @@ public class Main
 		InputStream is = SUtil.getResource("jadex/xml/tutorial/example21/data0.xml", null);
 		Object object1 = xmlreader.read(is, null, null);
 		is.close();
-//		is = SUtil.getResource("jadex/xml/tutorial/example21/data1.xml", null);
-//		Object object2 = xmlreader.read(is, null, null);
-//		is.close();
 		
 		// And print out the result.
 		System.out.println("Read object 1: "+object1);
-//		System.out.println("Read object 2: "+object2);
+
+		
+		typeinfos = new HashSet();
+		
+		String uri = "http://www.sosnoski.com";
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "name")}), new ObjectInfo(Name.class),
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo(new QName(uri, "first-name"), "firstName")),
+			new AttributeInfo(new AccessInfo(new QName(uri, "last-name"), "lastName"))
+			})));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "customer")}), new ObjectInfo(Customer.class)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "entry")}), new ObjectInfo(HashMap.class),
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo(new QName(uri, "key"), null, null, null, new BeanAccessInfo("")))},
+			new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo(new QName(uri, "customer"), null, null, null, new BeanAccessInfo("")))
+			})));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "directory")}), new ObjectInfo(Directory.class), 
+			new MappingInfo(null, new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo(new QName(uri, "entry"), null, null, null, 
+			new BeanAccessInfo(Directory.class.getField("customerMap"),
+			null, "customerMap", new ICustomProcessor() 
+			{
+				public Object processValue(Object object) 
+				{
+					return ((Map)object).get("key");
+				}
+			})),
+			new SubObjectConverter(new IObjectObjectConverter()
+			{
+				public Object convertObject(Object val, IContext context)
+				{
+					return ((Map)val).get("customer");
+				}
+			}, null))
+		})));	
+		
+		xmlreader = new Reader(new BeanObjectReaderHandler(typeinfos));
+		is = SUtil.getResource("jadex/xml/tutorial/example21/data1.xml", null);
+		Object object2 = xmlreader.read(is, null, null);
+		is.close();
+		
+		System.out.println("Read object 2: "+object2);
 	}
 }
