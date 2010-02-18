@@ -533,7 +533,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					for(int j=0; j<plugs.size(); j++)
 					{
 						Map plug = (Map)plugs.get(j);
-						Class clazz = (Class)MEnvSpaceInstance.getProperty(plug, "class");
+						Class clazz = (Class)MEnvSpaceInstance.getProperty(plug, "clazz");
 						IPropertyObject po = (IPropertyObject)clazz.newInstance();
 						MEnvSpaceInstance.setProperties(po, (List)plug.get("properties"), fetcher);
 						plugins.add(po);

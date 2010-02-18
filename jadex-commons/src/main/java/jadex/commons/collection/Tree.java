@@ -70,13 +70,16 @@ public class Tree
     public List toList(String order) 
     {
         List ret = new ArrayList();
-        if(PREORDER.equals(order))
+        if(root!=null)
         {
-        	walkPreorder(root, ret);
-        }
-        else if(POSTORDER.equals(order))
-        {
-        	walkPostorder(root, ret);
+	        if(PREORDER.equals(order))
+	        {
+	        	walkPreorder(root, ret);
+	        }
+	        else if(POSTORDER.equals(order))
+	        {
+	        	walkPostorder(root, ret);
+	        }
         }
         return ret;
     }
@@ -96,7 +99,15 @@ public class Tree
      */
     public String toString() 
     {
-        return toList(PREORDER).toString();
+    	try
+    	{
+    		return toList(PREORDER).toString();
+    	}
+    	catch(Exception e)
+    	{
+    		e.printStackTrace();
+    	}
+    	return "error";
     }
      
     /**

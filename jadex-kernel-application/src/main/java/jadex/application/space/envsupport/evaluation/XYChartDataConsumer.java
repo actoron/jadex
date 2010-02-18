@@ -132,7 +132,7 @@ public class XYChartDataConsumer extends AbstractChartDataConsumer
 				seriesmap.put(new Integer(j), new Integer(j));
 			}
 			dataset.addSeries(series);
-			System.out.println("Created series: "+seriesname+" "+j);
+//			System.out.println("Created series: "+seriesname+" "+j);
 		}	
 		VectorSeries ser = dataset.getSeries(seriesnum);
 		

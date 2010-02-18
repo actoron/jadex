@@ -1,18 +1,21 @@
 package jadex.xml.tutorial.example14;
 
 import jadex.commons.SUtil;
+import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
-import jadex.xml.ObjectInfo;
-import jadex.xml.XMLInfo;
 import jadex.xml.MappingInfo;
+import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
 
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 /**
  *  Main class to execute tutorial lesson c (taken from Jibx website).
@@ -32,9 +35,9 @@ public class Main
 		
 		typeinfos.add(new TypeInfo(new XMLInfo("customer"), new ObjectInfo(Customer.class), 
 			new MappingInfo(null, new SubobjectInfo[]{
-			new SubobjectInfo(new AttributeInfo("ship-address", "shipaddress")),
-			new SubobjectInfo(new AttributeInfo("bill-address", "billaddress"))}
-		)));
+			new SubobjectInfo(new AccessInfo("ship-address", "shipaddress")),
+			new SubobjectInfo(new AccessInfo("bill-address", "billaddress"))
+		})));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo("ship-address"), new ObjectInfo(Address.class)));
 		typeinfos.add(new TypeInfo(new XMLInfo("bill-address"), new ObjectInfo(Address.class)));

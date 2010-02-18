@@ -1,5 +1,7 @@
 package jadex.xml.reader;
 
+import jadex.xml.IContext;
+
 import java.util.List;
 
 /**
@@ -15,6 +17,5 @@ public interface IBulkObjectLinker
 	 *  @param classloader The classloader.
 	 *  @param root The root object.
 	 */
-	public void bulkLinkObjects(Object parent, List children, Object context, 
-		ClassLoader classloader, Object root) throws Exception;
+	public void bulkLinkObjects(Object parent, List children, ReadContext context) throws Exception;
 }

@@ -127,7 +127,7 @@ public class TreeNode
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("{").append(getData().toString()).append(",[");
+		sb.append("{").append(""+getData()).append(",[");
 		List children = getChildren();
 		if(children!=null)
 		{

@@ -1,19 +1,24 @@
 package jadex.xml.tutorial.example20;
 
 import jadex.commons.SUtil;
-import jadex.xml.AttributeInfo;
-import jadex.xml.ObjectInfo;
-import jadex.xml.ITypeConverter;
-import jadex.xml.XMLInfo;
+import jadex.xml.AccessInfo;
+import jadex.xml.IContext;
+import jadex.xml.IObjectObjectConverter;
+import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
+import jadex.xml.ObjectInfo;
+import jadex.xml.SubObjectConverter;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
 
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 /**
  *  Main class to execute tutorial lesson c (taken from Jibx website).
@@ -35,19 +40,17 @@ public class Main
 		// and not as attributeinfos, because they are subtags in they xml.
 		Set typeinfos = new HashSet();
 		
-		ITypeConverter totalconv = new ITypeConverter()
+		IObjectObjectConverter totalconv = new IObjectObjectConverter()
 		{
-			public Object convertObject(Object val, Object root,
-				ClassLoader classloader, Object context)
+			public Object convertObject(Object val, IContext context)
 			{
 				return Conversion.deserializeDollarsCents((String)val);
 			}
 		};
 		
-		ITypeConverter ordersconv = new ITypeConverter()
+		IObjectObjectConverter ordersconv = new IObjectObjectConverter()
 		{
-			public Object convertObject(Object val, Object root,
-				ClassLoader classloader, Object context)
+			public Object convertObject(Object val, IContext context)
 			{
 				return Conversion.deserializeIntArray((String)val);
 			}
@@ -55,8 +58,8 @@ public class Main
 		
 		typeinfos.add(new TypeInfo(new XMLInfo("customer"), new ObjectInfo(Customer.class),
 			new MappingInfo(null, new SubobjectInfo[]{
-			new SubobjectInfo(new AttributeInfo("total", null, null, totalconv, null)),
-			new SubobjectInfo(new AttributeInfo("orders", null, null, ordersconv, null))
+			new SubobjectInfo(new AccessInfo("total"), new SubObjectConverter(totalconv, null)),
+			new SubobjectInfo(new AccessInfo("orders"), new SubObjectConverter(ordersconv, null))
 		})));
 		
 //		typeinfos.add(new TypeInfo(null, "customer", Customer.class, null, null,

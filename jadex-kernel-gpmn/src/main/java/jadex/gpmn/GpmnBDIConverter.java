@@ -6,6 +6,7 @@ import jadex.bdi.interpreter.OAVBDIModelLoader;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.interpreter.OAVBDIXMLReader;
 import jadex.bdi.interpreter.Report;
+import jadex.xml.IContext;
 import jadex.xml.IPostProcessor;
 import jadex.gpmn.model.MAchieveGoal;
 import jadex.gpmn.model.MArtifact;
@@ -148,7 +149,7 @@ public class GpmnBDIConverter
 	/**
 	 *  Convert all aspects of a process.
 	 */
-	public void doConvert(MProcess proc, ClassLoader classloader, IOAVState state, Object scopehandle)
+	public void doConvert(MProcess proc, final ClassLoader classloader, final IOAVState state, final Object scopehandle)
 	{		
 		// Handle package and imports here?!
 		// todo:
@@ -355,6 +356,21 @@ public class GpmnBDIConverter
 		
 		// Do second pass post-processing
 		
+		IContext context = new IContext() 
+		{
+			public Object getRootObject() 
+			{
+				return scopehandle;
+			}
+			public ClassLoader getClassLoader() 
+			{
+				return classloader;
+			}
+			public Object getUserContext() 
+			{
+				return state;
+			}
+		};
 		
 		OAVBDIXMLReader.ExpressionProcessor expost = new OAVBDIXMLReader.ExpressionProcessor();
 		OAVBDIXMLReader.ClassPostProcessor clpost = new OAVBDIXMLReader.ClassPostProcessor(OAVBDIMetaModel.typedelement_has_classname, OAVBDIMetaModel.typedelement_has_class);
@@ -367,9 +383,10 @@ public class GpmnBDIConverter
 			{
 				Object belhandle = it.next();
 				Object exphandle = state.getAttributeValue(belhandle, OAVBDIMetaModel.belief_has_fact);
-				clpost.postProcess(state, belhandle, scopehandle, classloader);
+//				clpost.postProcess(state, belhandle, scopehandle, classloader);
+				clpost.postProcess(context, belhandle);
 				if(exphandle!=null)
-					expost.postProcess(state, exphandle, scopehandle, classloader);
+					expost.postProcess(context, exphandle);
 			}
 		}
 		Collection beliefsethandles = state.getAttributeValues(scopehandle, OAVBDIMetaModel.capability_has_beliefsets);
@@ -379,16 +396,16 @@ public class GpmnBDIConverter
 			{
 				Object belsethandle = it.next();
 				Object exphandle = state.getAttributeValue(belsethandle, OAVBDIMetaModel.beliefset_has_factsexpression);
-				clpost.postProcess(state, belsethandle, scopehandle, classloader);
+				clpost.postProcess(context, belsethandle);
 				if(exphandle!=null)
-					expost.postProcess(state, exphandle, scopehandle, classloader);
+					expost.postProcess(context, exphandle);
 				Collection expshandle = state.getAttributeValues(belsethandle, OAVBDIMetaModel.beliefset_has_facts);
 				if(expshandle!=null)
 				{
 					for(Iterator it2=expshandle.iterator(); it2.hasNext(); )
 					{
 						exphandle = it2.next();
-						expost.postProcess(state, exphandle, scopehandle, classloader);
+						expost.postProcess(context, exphandle);
 					}
 				}
 			}
@@ -400,29 +417,29 @@ public class GpmnBDIConverter
 			for(Iterator it = goalhandles.iterator(); it.hasNext(); )
 			{
 				Object goalhandle = it.next();
-				postProcessParameterElement(state, scopehandle, goalhandle, expost, clpost, classloader);
+				postProcessParameterElement(context, goalhandle, expost, clpost);
 
 				Object condhandle = state.getAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_creationcondition);
 				if(condhandle!=null)
-					expost.postProcess(state, condhandle, scopehandle, classloader);
+					expost.postProcess(context, condhandle);
 				condhandle = state.getAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_contextcondition);
 				if(condhandle!=null)
-					expost.postProcess(state, condhandle, scopehandle, classloader);
+					expost.postProcess(context, condhandle);
 				condhandle = state.getAttributeValue(goalhandle, OAVBDIMetaModel.goal_has_dropcondition);
 				if(condhandle!=null)
-					expost.postProcess(state, condhandle, scopehandle, classloader);
+					expost.postProcess(context, condhandle);
 
 				if(state.getType(goalhandle).isSubtype(OAVBDIMetaModel.achievegoal_type))
 				{
 					condhandle = state.getAttributeValue(goalhandle, OAVBDIMetaModel.achievegoal_has_targetcondition);
 					if(condhandle!=null)
-						expost.postProcess(state, condhandle, scopehandle, classloader);
+						expost.postProcess(context, condhandle);
 				}
 				else if(state.getType(goalhandle).isSubtype(OAVBDIMetaModel.maintaingoal_type))
 				{
 					condhandle = state.getAttributeValue(goalhandle, OAVBDIMetaModel.maintaingoal_has_maintaincondition);
 					if(condhandle!=null)
-						expost.postProcess(state, condhandle, scopehandle, classloader);
+						expost.postProcess(context, condhandle);
 				}				
 			}
 		}
@@ -434,15 +451,15 @@ public class GpmnBDIConverter
 			for(Iterator it = planhandles.iterator(); it.hasNext(); )
 			{
 				planhandle = it.next();
-				postProcessParameterElement(state, scopehandle, planhandle, expost, clpost, classloader);
+				postProcessParameterElement(context, planhandle, expost, clpost);
 				
 				Object condhandle = state.getAttributeValue(planhandle, OAVBDIMetaModel.plan_has_precondition);
 				if(condhandle!=null)
-					expost.postProcess(state, condhandle, scopehandle, classloader);
+					expost.postProcess(context, condhandle);
 				
 				condhandle = state.getAttributeValue(planhandle, OAVBDIMetaModel.plan_has_contextcondition);
 				if(condhandle!=null)
-					expost.postProcess(state, condhandle, scopehandle, classloader);
+					expost.postProcess(context, condhandle);
 			}
 		}
 	}
@@ -685,19 +702,21 @@ public class GpmnBDIConverter
 	/**
 	 *  Post process a parameter element.
 	 */
-	protected void postProcessParameterElement(IOAVState state, Object scopehandle, Object paramelem, 
-		IPostProcessor exproc, IPostProcessor clproc, ClassLoader classloader)
+	protected void postProcessParameterElement(IContext context, Object paramelem, 
+		IPostProcessor exproc, IPostProcessor clproc)
 	{
+		IOAVState state = (IOAVState)context.getUserContext();
 		Collection paramhandles = state.getAttributeValues(paramelem, OAVBDIMetaModel.parameterelement_has_parameters);
 		if(paramhandles!=null)
 		{
 			for(Iterator it2 = paramhandles.iterator(); it2.hasNext(); )
 			{
 				Object paramhandle = it2.next();
-				clproc.postProcess(state, paramhandle, scopehandle, classloader);
+				clproc.postProcess(context, paramhandle);
+//				clproc.postProcess(state, paramhandle, scopehandle, classloader);
 				Object exphandle = state.getAttributeValue(paramhandle, OAVBDIMetaModel.parameter_has_value);
 				if(exphandle!=null)
-					exproc.postProcess(state, exphandle, scopehandle, classloader);
+					exproc.postProcess(context, exphandle);
 			}
 		}
 		Collection paramsethandles = state.getAttributeValues(paramelem, OAVBDIMetaModel.parameterelement_has_parametersets);
@@ -706,17 +725,17 @@ public class GpmnBDIConverter
 			for(Iterator it2 = paramsethandles.iterator(); it2.hasNext(); )
 			{
 				Object paramsethandle = it2.next();
-				clproc.postProcess(state, paramsethandle, scopehandle, classloader);
+				clproc.postProcess(context, paramsethandle);
 				Object exphandle = state.getAttributeValue(paramsethandle, OAVBDIMetaModel.parameterset_has_valuesexpression);
 				if(exphandle!=null)
-					exproc.postProcess(state, exphandle, scopehandle, classloader);
+					exproc.postProcess(context, exphandle);
 				Collection expshandle = state.getAttributeValues(paramsethandle, OAVBDIMetaModel.parameterset_has_values);
 				if(expshandle!=null)
 				{
 					for(Iterator it3=expshandle.iterator(); it3.hasNext(); )
 					{
 						exphandle = it3.next();
-						exproc.postProcess(state, exphandle, scopehandle, classloader);
+						exproc.postProcess(context, exphandle);
 					}
 				}
 			}

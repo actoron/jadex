@@ -27,7 +27,6 @@ public class WriteObjectInfo
 	protected String content;
 	
 	/** The subobjects tree. */
-//	protected Map subobjects;
 	protected Tree subobjects;
 	
 	//-------- methods --------

@@ -15,14 +15,16 @@ import jadex.gpmn.model.MPlan;
 import jadex.gpmn.model.MProcess;
 import jadex.gpmn.model.MProcessElement;
 import jadex.gpmn.model.MSequenceEdge;
+import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
+import jadex.xml.IContext;
 import jadex.xml.IPostProcessor;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
-import jadex.xml.bean.BeanAttributeInfo;
+import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
 
@@ -104,40 +106,42 @@ public class GpmnXMLReader
 		
 		String uri = "http://jadex.sourceforge.net/gpmn";
 		
+		IFilter goalfilter = new IFilter()
+		{
+			public boolean filter(Object obj)
+			{
+				String type = (String)((Map)obj).get("type");
+				boolean ret = type!=null?type.endsWith("Goal"):false;
+				return ret;
+			}
+		};
+		IFilter planfilter = new IFilter()
+		{
+			public boolean filter(Object obj)
+			{
+				String type = (String)((Map)obj).get("type");
+				boolean ret = type!=null?type.endsWith("Plan"):false;
+				return ret;
+			}
+		};
+		
 		TypeInfo ti_proc = new TypeInfo(new XMLInfo("processes"), new ObjectInfo(MProcess.class),
-			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")},
+			new MappingInfo(null, new BeanAccessInfo[]{new BeanAccessInfo("ID", "Id")},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge")),
-			new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
-			new SubobjectInfo(new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")),
-			new SubobjectInfo(new BeanAttributeInfo("artifacts", "artifact")),
-			new SubobjectInfo(new BeanAttributeInfo("vertices", "goal"), new IFilter()
-			{
-				public boolean filter(Object obj)
-				{
-					String type = (String)((Map)obj).get("type");
-					boolean ret = type!=null?type.endsWith("Goal"):false;
-					return ret;
-				}
-			}),
-			new SubobjectInfo(new BeanAttributeInfo("vertices", "plan"),
-			new IFilter()
-			{
-				public boolean filter(Object obj)
-				{
-					String type = (String)((Map)obj).get("type");
-					boolean ret = type!=null?type.endsWith("Plan"):false;
-					return ret;
-				}
-			})
+			new SubobjectInfo(new AccessInfo("sequenceEdges", "sequenceEdge")),
+			new SubobjectInfo(new AccessInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
+			new SubobjectInfo(new AccessInfo("incomingEdges", "incomingSequenceEdgesDescription")),
+			new SubobjectInfo(new AccessInfo("artifacts", "artifact")),
+			new SubobjectInfo(new XMLInfo("vertices", goalfilter), new AccessInfo("vertices", "goal")),
+			new SubobjectInfo(new XMLInfo("vertices", planfilter), new AccessInfo("vertices", "plan")),
 		}));	
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "GpmnDiagram")}), new ObjectInfo(MGpmnModel.class),
-			new MappingInfo(ti_proc, new BeanAttributeInfo[]{
-			new BeanAttributeInfo("ID", "Id"),
-			new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE),
-			new BeanAttributeInfo("version", null, AttributeInfo.IGNORE_READWRITE),
-			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
+			new MappingInfo(ti_proc, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("ID", "Id")),
+			new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE)),
+			new AttributeInfo(new AccessInfo("version", null, AccessInfo.IGNORE_READWRITE)),
+			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE))
 			}, null)));//, null, null,
 //			new SubobjectInfo[]{
 //			new SubobjectInfo(new BeanAttributeInfo("processes", "process"))
@@ -154,17 +158,17 @@ public class GpmnXMLReader
 				}
 			}),  
 			new ObjectInfo(MAchieveGoal.class, new ProcessElementPostProcessor()), 
-			new MappingInfo(null, new BeanAttributeInfo[]{
-			new BeanAttributeInfo("ID", "Id"), 
-			new BeanAttributeInfo("exclude", "excludeMode")},
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("ID", "Id")), 
+			new AttributeInfo(new AccessInfo("exclude", "excludeMode"))},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("creationcondition", "creationCondition")),
-			new SubobjectInfo(new BeanAttributeInfo("contextcondition", "contextCondition")),
-			new SubobjectInfo(new BeanAttributeInfo("dropcondition", "dropCondition")),
-			new SubobjectInfo(new BeanAttributeInfo("targetcondition", "targetCondition")),
+			new SubobjectInfo(new AccessInfo("creationcondition", "creationCondition")),
+			new SubobjectInfo(new AccessInfo("contextcondition", "contextCondition")),
+			new SubobjectInfo(new AccessInfo("dropcondition", "dropCondition")),
+			new SubobjectInfo(new AccessInfo("targetcondition", "targetCondition")),
 //			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge"))
-			new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
-			new SubobjectInfo(new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")),
+			new SubobjectInfo(new AccessInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
+			new SubobjectInfo(new AccessInfo("incomingEdges", "incomingSequenceEdgesDescription")),
 		})));
 		
 		
@@ -177,15 +181,17 @@ public class GpmnXMLReader
 				}
 			}), 
 			new ObjectInfo(MMaintainGoal.class, new ProcessElementPostProcessor()),
-			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"), new BeanAttributeInfo("exclude", "excludeMode")},
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("ID", "Id")), 
+			new AttributeInfo(new AccessInfo("exclude", "excludeMode"))},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("creationcondition", "creationCondition")),
-			new SubobjectInfo(new BeanAttributeInfo("contextcondition", "contextCondition")),
-			new SubobjectInfo(new BeanAttributeInfo("dropcondition", "dropCondition")),
-			new SubobjectInfo(new BeanAttributeInfo("maintaincondition", "maintainCondition")),
+			new SubobjectInfo(new AccessInfo("creationcondition", "creationCondition")),
+			new SubobjectInfo(new AccessInfo("contextcondition", "contextCondition")),
+			new SubobjectInfo(new AccessInfo("dropcondition", "dropCondition")),
+			new SubobjectInfo(new AccessInfo("maintaincondition", "maintainCondition")),
 //			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge"))
-			new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
-			new SubobjectInfo(new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")),
+			new SubobjectInfo(new AccessInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
+			new SubobjectInfo(new AccessInfo("incomingEdges", "incomingSequenceEdgesDescription")),
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo("vertices", new IFilter()
@@ -197,14 +203,16 @@ public class GpmnXMLReader
 			}
 		}), 
 		new ObjectInfo(MPerformGoal.class, new ProcessElementPostProcessor()),
-		new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"), new BeanAttributeInfo("exclude", "excludeMode")},
+		new MappingInfo(null, new AttributeInfo[]{
+		new AttributeInfo(new AccessInfo("ID", "Id")), 
+		new AttributeInfo(new AccessInfo("exclude", "excludeMode"))},
 		new SubobjectInfo[]{
-		new SubobjectInfo(new BeanAttributeInfo("creationcondition", "creationCondition")),
-		new SubobjectInfo(new BeanAttributeInfo("contextcondition", "contextCondition")),
-		new SubobjectInfo(new BeanAttributeInfo("dropcondition", "dropCondition")),
+		new SubobjectInfo(new AccessInfo("creationcondition", "creationCondition")),
+		new SubobjectInfo(new AccessInfo("contextcondition", "contextCondition")),
+		new SubobjectInfo(new AccessInfo("dropcondition", "dropCondition")),
 //		new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge"))
-		new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
-		new SubobjectInfo(new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")),
+		new SubobjectInfo(new AccessInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
+		new SubobjectInfo(new AccessInfo("incomingEdges", "incomingSequenceEdgesDescription")),
 		})));
 		
 		types.add(new TypeInfo(new XMLInfo("vertices", 
@@ -217,23 +225,26 @@ public class GpmnXMLReader
 				}
 			}),
 			new ObjectInfo(MPlan.class, new ProcessElementPostProcessor()),
-			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"),
-														  new BeanAttributeInfo("precondition", "preCondition"),
-														  new BeanAttributeInfo("contextcondition", "contextCondition")},
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("ID", "Id")),
+			new AttributeInfo(new AccessInfo("precondition", "preCondition")),
+			new AttributeInfo(new AccessInfo("contextcondition", "contextCondition"))},
 			new SubobjectInfo[]{
 //			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge")),
-			new SubobjectInfo(new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
-			new SubobjectInfo(new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription")),
+			new SubobjectInfo(new AccessInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
+			new SubobjectInfo(new AccessInfo("incomingEdges", "incomingSequenceEdgesDescription")),
 			})));	
 		
 		types.add(new TypeInfo(new XMLInfo("sequenceEdges"), new ObjectInfo(MSequenceEdge.class),
-			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"),
-			new BeanAttributeInfo("associations", "associationsDescription")}, null)));
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("ID", "Id")),
+			new AttributeInfo(new AccessInfo("associations", "associationsDescription"))}, null)));
 		
 		types.add(new TypeInfo(new XMLInfo("elements"), new ObjectInfo(MParameter.class),
-			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id"),
-			new BeanAttributeInfo("type", "className"),
-			new BeanAttributeInfo("initialValue", "initialValueDescription")}, null)));
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("ID", "Id")),
+			new AttributeInfo(new AccessInfo("type", "className")),
+			new AttributeInfo(new AccessInfo("initialValue", "initialValueDescription"))}, null)));
 		
 		types.add(new TypeInfo(new XMLInfo("artifacts", new IFilter()
 			{
@@ -244,9 +255,10 @@ public class GpmnXMLReader
 				}
 			}), 
 			new ObjectInfo(MArtifact.class),
-			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")},
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("ID", "Id"))},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("associations", "association"))
+			new SubobjectInfo(new AccessInfo("associations", "association"))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo("artifacts", new IFilter()
@@ -258,9 +270,9 @@ public class GpmnXMLReader
 				}
 			}), 
 			new ObjectInfo(MContext.class),
-			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("ID", "Id")},
+			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("ID", "Id"))},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("elements", "parameter"))
+			new SubobjectInfo(new AccessInfo("elements", "parameter"))
 			})));
 		
 		return types;
@@ -330,9 +342,9 @@ public class GpmnXMLReader
 		/**
 		 *  Establish element connections.
 		 */
-		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		public Object postProcess(IContext context, Object object)
 		{
-			MGpmnModel dia = (MGpmnModel)root;
+			MGpmnModel dia = (MGpmnModel)context.getRootObject();
 			MProcessElement pe = (MProcessElement)object;
 
 			// Make edge connections.

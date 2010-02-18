@@ -1,8 +1,10 @@
 package jadex.xml.writer;
 
 import jadex.commons.SReflect;
+import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
-import jadex.xml.ITypeConverter;
+import jadex.xml.IContext;
+import jadex.xml.IObjectStringConverter;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoTypeManager;
@@ -49,7 +51,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public TypeInfo getTypeInfo(Object object, QName[] fullpath, Object context)
+	public TypeInfo getTypeInfo(Object object, QName[] fullpath, IContext context)
 	{
 		Object type = getObjectType(object, context);
 		return titmanager.getTypeInfo(type, fullpath);
@@ -60,12 +62,12 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	 *  @param object The object.
 	 *  @return The object type.
 	 */
-	public abstract Object getObjectType(Object object, Object context);
+	public abstract Object getObjectType(Object object, IContext context);
 	
 	/**
 	 *  Get write info for an object.
 	 */
-	public WriteObjectInfo getObjectWriteInfo(Object object, TypeInfo typeinfo, Object context, ClassLoader classloader)
+	public WriteObjectInfo getObjectWriteInfo(Object object, TypeInfo typeinfo, IContext context)
 	{
 		// todo: conversion value to string
 		
@@ -88,7 +90,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 						Object value = getValue(object, property, context, info);
 						if(value!=null)
 						{
-							value = convertValue(info, value, classloader, context);
+							value = convertValue(info, value, context);
 							wi.setComment(value.toString());
 						}
 					}
@@ -109,7 +111,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 						Object value = getValue(object, property, context, info);
 						if(value!=null)
 						{
-							value = convertValue(info, value, classloader, context);
+							value = convertValue(info, value, context);
 							wi.setContent(value.toString());
 						}
 					}
@@ -136,7 +138,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 								Object defval = getDefaultValue(info);
 								if(!value.equals(defval))
 								{
-									value = convertValue(info, value, classloader, context);
+									value = convertValue(info, value, context);
 									
 									// Do we want sometimes to write default values?
 									String xmlattrname = null;
@@ -167,7 +169,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 					if(property!=null)
 					{
 						doneprops.add(getPropertyName(property));
-						if(!(info instanceof AttributeInfo && ((AttributeInfo)info).isIgnoreWrite()))
+						if(!(info instanceof AccessInfo && ((AccessInfo)info).isIgnoreWrite()))
 						{	
 							String propname = getPropertyName(property);
 							Object value = getValue(object, property, context, info);
@@ -283,7 +285,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	/**
 	 * 
 	 */
-	protected QName[] createPath(QName[] xmlpath, Object value, Object context)
+	protected QName[] createPath(QName[] xmlpath, Object value, IContext context)
 	{
 		QName[] ret = xmlpath;
 		if(gentypetags)
@@ -299,15 +301,15 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	/**
 	 *  Convert a value before writing.
 	 */
-	protected Object convertValue(Object info, Object value, ClassLoader classloader, Object context)
+	protected Object convertValue(Object info, Object value, IContext context)
 	{
 		Object ret = value;
 		if(info instanceof AttributeInfo)
 		{
-			ITypeConverter conv = ((AttributeInfo)info).getConverterWrite();
+			IObjectStringConverter conv = ((AttributeInfo)info).getConverter();
 			if(conv!=null)
 			{
-				ret = conv.convertObject(value, null, classloader, context);
+				ret = conv.convertObject(value, context);
 			}
 		}
 		return ret;
@@ -321,7 +323,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 		Object ret = null;
 		if(property instanceof AttributeInfo)
 		{
-			ret = ((AttributeInfo)property).getDefaultValue();
+			ret = ((AttributeInfo)property).getAccessInfo().getDefaultValue();
 		}
 		return ret;
 	}
@@ -329,7 +331,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	/**
 	 *  Get a value from an object.
 	 */
-	protected abstract Object getValue(Object object, Object attr, Object context, Object info);
+	protected abstract Object getValue(Object object, Object attr, IContext context, Object info);
 	
 	/**
 	 *  Get the property.
@@ -344,7 +346,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	/**
 	 *  Get the properties of an object. 
 	 */
-	protected abstract Collection getProperties(Object object, Object context, boolean includefields);
+	protected abstract Collection getProperties(Object object, IContext context, boolean includefields);
 
 	/**
 	 *  Test is a value is a basic type (and can be mapped to an attribute).
@@ -354,10 +356,10 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	/**
 	 *  Test if a value is compatible with the defined typeinfo.
 	 */
-	protected abstract boolean isTypeCompatible(Object object, TypeInfo info, Object context);
+	protected abstract boolean isTypeCompatible(Object object, TypeInfo info, IContext context);
 	
 	/**
 	 *  Test if a value is decodable to the same type.
 	 */
-	protected abstract boolean isDecodableToSameType(Object property, Object value, Object context); 
+	protected abstract boolean isDecodableToSameType(Object property, Object value, IContext context); 
 }

@@ -14,6 +14,31 @@ public class LinkingInfo
 	protected boolean bulklink;
 
 	/**
+	 *  Create a new linking info.
+	 */
+	public LinkingInfo(boolean bulklink)
+	{
+		this(null, bulklink);
+	}
+	
+	/**
+	 *  Create a new linking info.
+	 */
+	public LinkingInfo(Object linker)
+	{
+		this(linker, false);
+	}
+	
+	/**
+	 *  Create a new linking info.
+	 */
+	public LinkingInfo(Object linker, boolean bulklink)
+	{
+		this.linker = linker;
+		this.bulklink = bulklink;
+	}
+
+	/**
 	 *  Get the linker.
 	 *  @return The linker.
 	 */

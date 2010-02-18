@@ -1,25 +1,20 @@
 package jadex.xml.tutorial.example11;
 
 import jadex.commons.SUtil;
+import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
-import jadex.xml.ObjectInfo;
-import jadex.xml.XMLInfo;
 import jadex.xml.MappingInfo;
-import jadex.xml.SubobjectInfo;
+import jadex.xml.ObjectInfo;
 import jadex.xml.TypeInfo;
-import jadex.xml.bean.BeanAttributeInfo;
+import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
-import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.reader.Reader;
-import jadex.xml.tutorial.example08.Airport;
-import jadex.xml.tutorial.example08.Carrier;
-import jadex.xml.writer.Writer;
 
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 /**
  *  Main class to execute tutorial lesson c (taken from Jibx website).
@@ -42,30 +37,24 @@ public class Main
 		Set typeinfos = new HashSet();
 		typeinfos.add(new TypeInfo(new XMLInfo("timetable"), new ObjectInfo(TimeTable.class)));
 		typeinfos.add(new TypeInfo(new XMLInfo("carrier"), new ObjectInfo(Carrier.class),
-			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo("code", null, null, null, null, null, false, AttributeInfo.ID)})));
-		typeinfos.add(new TypeInfo(new XMLInfo("carrier"), new ObjectInfo(Carrier.class),
-			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo("code", null, null, null, null, null, false, AttributeInfo.ID)})));
+			new MappingInfo(null, new AttributeInfo[]{ 
+			new AttributeInfo(new AccessInfo("code"), null, AttributeInfo.ID)
+		})));
 		typeinfos.add(new TypeInfo(new XMLInfo("airport"), new ObjectInfo(Airport.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo("code", null, null, null, null, null, false, AttributeInfo.ID)})));
+			new AttributeInfo(new AccessInfo("code"), null, AttributeInfo.ID)
+		})));
 		typeinfos.add(new TypeInfo(new XMLInfo("route"), new ObjectInfo(Route.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo("from", null, null, null, null, null, false, AttributeInfo.IDREF),
-			new AttributeInfo("to", null, null, null, null, null, false, AttributeInfo.IDREF)}
-		)));
-		typeinfos.add(new TypeInfo(new XMLInfo("route"), new ObjectInfo(Airport.class),
-			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo("from", null, null, null, null, null, false, AttributeInfo.IDREF),
-			new AttributeInfo("to", null, null, null, null, null, false, AttributeInfo.IDREF)}
-		)));
+			new AttributeInfo(new AccessInfo("from"), null, AttributeInfo.IDREF),
+			new AttributeInfo(new AccessInfo("to"), null, AttributeInfo.IDREF)
+		})));
 		typeinfos.add(new TypeInfo(new XMLInfo("flight"), new ObjectInfo(Flight.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo("carrier", null, null, null, null, null, false, AttributeInfo.IDREF),
-			new AttributeInfo("depart", "departure"),
-			new AttributeInfo("arrive", "arrival"),}
-		)));
+			new AttributeInfo(new AccessInfo("carrier"), null, AttributeInfo.IDREF),
+			new AttributeInfo(new AccessInfo("depart", "departure")),
+			new AttributeInfo(new AccessInfo("arrive", "arrival")),
+		})));
 	
 //		typeinfos.add(new TypeInfo(null, "timetable", TimeTable.class, null, null, null, null, null,
 //			new SubobjectInfo[]{

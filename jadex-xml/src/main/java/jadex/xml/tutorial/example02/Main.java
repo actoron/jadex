@@ -1,19 +1,20 @@
 package jadex.xml.tutorial.example02;
 
 import jadex.commons.SUtil;
-import jadex.xml.ObjectInfo;
-import jadex.xml.XMLInfo;
+import jadex.xml.AccessInfo;
 import jadex.xml.MappingInfo;
+import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
-import jadex.xml.bean.BeanAttributeInfo;
+import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
-import jadex.xml.tutorial.example01.Customer;
 
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 /**
  *  Main class to execute tutorial lesson.
@@ -33,9 +34,9 @@ public class Main
 		typeinfos.add(new TypeInfo(new XMLInfo("customer"), new ObjectInfo(Customer.class)));
 		typeinfos.add(new TypeInfo(new XMLInfo("person"), new ObjectInfo(Person.class),
 			new MappingInfo(null, new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("cust-num", "customernumber")),
-			new SubobjectInfo(new BeanAttributeInfo("first-name", "firstname")),
-			new SubobjectInfo(new BeanAttributeInfo("last-name", "lastname"))
+			new SubobjectInfo(new AccessInfo("cust-num", "customernumber")),
+			new SubobjectInfo(new AccessInfo("first-name", "firstname")),
+			new SubobjectInfo(new AccessInfo("last-name", "lastname"))
 		})));
 
 		// Create an xml reader with standard bean object reader and the

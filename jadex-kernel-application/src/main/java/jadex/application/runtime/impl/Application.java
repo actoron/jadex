@@ -20,6 +20,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
@@ -265,7 +266,7 @@ public class Application	implements IApplication, IComponentInstance
 			}
 			ILoadableComponentModel amodel = factory.loadModel(atype.getFilename());
 			
-			if(amodel.getPackage().equals(model.getPackage()) && amodel.getName().equals(model.getName()))
+			if(SUtil.equals(amodel.getPackage(), model.getPackage()) && amodel.getName().equals(model.getName()))
 //			if(amodel.getFilename().equals(model.getFilename()))
 			{
 				synchronized(this)
@@ -682,6 +683,7 @@ public class Application	implements IApplication, IComponentInstance
 					catch(Exception e)
 					{
 						System.out.println("Exception while creating space: "+si.getName());
+						e.printStackTrace();
 					}
 				}
 			}

@@ -2,8 +2,10 @@ package jadex.xml.bean;
 
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.BasicTypeConverter;
+import jadex.xml.IContext;
 import jadex.xml.ObjectInfo;
 import jadex.xml.Namespace;
 import jadex.xml.SXML;
@@ -67,7 +69,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public TypeInfo getTypeInfo(Object object, QName[] fullpath, Object context)
+	public TypeInfo getTypeInfo(Object object, QName[] fullpath, IContext context)
 	{
 		Object type = getObjectType(object, context);
 		if(no_typeinfos!=null && no_typeinfos.contains(type))
@@ -147,7 +149,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 *  @param object The object.
 	 *  @return The object type.
 	 */
-	public Object getObjectType(Object object, Object context)
+	public Object getObjectType(Object object, IContext context)
 	{
 		return object.getClass();
 	}
@@ -155,7 +157,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Get the tag name for an object.
 	 */
-	public QName getTagName(Object object, Object context)
+	public QName getTagName(Object object, IContext context)
 	{
 		Object[] ret = new Object[2];
 		
@@ -224,23 +226,26 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Get a value from an object.
 	 */
-	protected Object getValue(Object object, Object attr, Object context, Object info)
+	protected Object getValue(Object object, Object attr, IContext context, Object info)
 	{
 		if(attr==AttributeInfo.THIS)
 			return object;
 		
 		Object value = null;
 		
-		Method method;
+		Method method = null;
 		Field field = null;
 		
-		BeanAttributeInfo binfo = null;
-		if(info instanceof BeanAttributeInfo)
-			binfo = (BeanAttributeInfo)info;
+		BeanAccessInfo binfo = (info instanceof AccessInfo) && (((AccessInfo)info).getExtraInfo() instanceof BeanAccessInfo)? 
+			(BeanAccessInfo)((AccessInfo)info).getExtraInfo(): null;
 		
-		if(binfo!=null && binfo.getWriteMethod()!=null)
+		if(binfo!=null && binfo.getFetchHelp()!=null)
 		{
-			method = ((BeanAttributeInfo)info).getWriteMethod();
+			Object tmp = binfo.getFetchHelp();
+			if(tmp instanceof Method)
+				method = (Method)tmp;
+			else //if(tmp instanceof Field)
+				field = (Field)tmp;
 		}
 		else if(attr instanceof BeanProperty)
 		{
@@ -311,7 +316,12 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		Object ret = null;
 		if(info instanceof AttributeInfo)
 		{
-			ret = ((AttributeInfo)info).getAttributeIdentifier();
+			info = ((AttributeInfo)info).getAccessInfo();
+		}
+		
+		if(info instanceof AccessInfo)
+		{
+			ret = ((AccessInfo)info).getObjectIdentifier();
 		}
 		else if(info instanceof String)
 		{
@@ -349,7 +359,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Get the properties of an object. 
 	 */
-	protected Collection getProperties(Object object, Object context, boolean includefields)
+	protected Collection getProperties(Object object, IContext context, boolean includefields)
 	{
 		return introspector.getBeanProperties(object.getClass(), includefields).values();
 	}
@@ -384,7 +394,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Test if a value is compatible with the defined typeinfo.
 	 */
-	protected boolean isTypeCompatible(Object object, TypeInfo info, Object context)
+	protected boolean isTypeCompatible(Object object, TypeInfo info, IContext context)
 	{
 		boolean ret = true;
 		if(info!=null && object!=null)
@@ -400,7 +410,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 *  Works for basic (final) types only and checks if the
 	 *  two types are of same class.
 	 */
-	protected boolean isDecodableToSameType(Object property, Object value, Object context)
+	protected boolean isDecodableToSameType(Object property, Object value, IContext context)
 	{
 		boolean ret = true;
 		if(value!=null)

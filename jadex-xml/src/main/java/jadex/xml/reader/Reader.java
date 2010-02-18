@@ -4,7 +4,7 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IPostProcessor;
-import jadex.xml.ITypeConverter;
+import jadex.xml.IStringObjectConverter;
 import jadex.xml.SXML;
 import jadex.xml.StackElement;
 import jadex.xml.SubobjectInfo;
@@ -123,7 +123,7 @@ public class Reader
 //			System.out.println("i: "+i);
 		}
 			
-		return readcontext.root;
+		return readcontext.rootobject;
 	}
 	
 	/**
@@ -158,16 +158,15 @@ public class Reader
 	 */
 	protected void handleStartElement(ReadContext readcontext) throws Exception
 	{
-		int readignore = readcontext.getReadIgnore();
 		XMLStreamReader parser = readcontext.getParser();
 		
-		if(readignore>0)
+		if(readcontext.getReadIgnore()>0)
 		{
-			readcontext.setReadIgnore(readignore++);
+			readcontext.setReadIgnore(readcontext.getReadIgnore()+1);
 			if(DEBUG)
 				System.out.println("Ignoring: "+parser.getLocalName());
 		}
-		else if(readignore==0)
+		else if(readcontext.getReadIgnore()==0)
 		{
 			List stack = readcontext.getStack();
 
@@ -212,14 +211,14 @@ public class Reader
 						readcontext.getTopStackElement()!=null? readcontext.getTopStackElement().getRawAttributes(): null);
 					if(linkinfo!=null && linkinfo.getLinkInfo().isIgnoreRead())
 					{
-						readignore++;
+						readcontext.setReadIgnore(readcontext.getReadIgnore()+1);
 						if(DEBUG)
 							System.out.println("Ignoring: "+parser.getLocalName());
 					}
 				}
 			}
 			
-			if(readignore==0)
+			if(readcontext.getReadIgnore()==0)
 			{
 				// Test if it is an object reference
 				String idref = rawattrs!=null? (String)rawattrs.get(SXML.IDREF): null;
@@ -243,14 +242,14 @@ public class Reader
 						ti = localname;
 					}
 					object = handler.createObject(ti, readcontext.getStack().isEmpty(), 
-						readcontext.getCallContext(), rawattrs, readcontext.getClassLoader());
+						readcontext, rawattrs);
 					if(DEBUG && object==null)
 						System.out.println("No mapping found: "+localname);
 					
 					// Try to search type info via type (when tag contained type information)
 					if(typeinfo==null && object!=null)
 					{
-						typeinfo = handler.getTypeInfo(object, fullpath, readcontext.getCallContext());
+						typeinfo = handler.getTypeInfo(object, fullpath, readcontext);
 					}
 					
 					// If object has internal id save it in the readobjects map.
@@ -264,7 +263,7 @@ public class Reader
 					stack.add(new StackElement(localname, object, rawattrs, typeinfo));
 					if(stack.size()==1)
 					{
-						readcontext.setRoot(object);
+						readcontext.setRootObject(object);
 					}
 				
 					// Handle attributes.
@@ -308,7 +307,7 @@ public class Reader
 		//							Object val = attrconverter!=null? attrconverter.convertObject(attrval, root, classloader): attrval;
 									
 									handler.handleAttributeValue(object, attrname, attrpath, attrval, attrinfo, 
-										readcontext.getCallContext(), readcontext.getClassLoader(), readcontext.getRoot(), readcontext.getReadObjects());
+										readcontext);
 								
 									if(attrinfo instanceof AttributeInfo && AttributeInfo.ID.equals(((AttributeInfo)attrinfo).getId()))
 									{
@@ -326,7 +325,7 @@ public class Reader
 							
 							// Hack. want to read attribute info here
 							handler.handleAttributeValue(object, attrname, attrpath, null, attrinfo, 
-								readcontext.getCallContext(), readcontext.getClassLoader(), readcontext.getRoot(), readcontext.getReadObjects());
+								readcontext);
 						}
 					}
 					
@@ -337,7 +336,7 @@ public class Reader
 						if(commentinfo!=null)
 						{
 							handler.handleAttributeValue(object, null, null, readcontext.getComment(), commentinfo, 
-								readcontext.getCallContext(), readcontext.getClassLoader(), readcontext.getRoot(), readcontext.getReadObjects());
+								readcontext);
 						}
 					}
 				}
@@ -355,9 +354,7 @@ public class Reader
 	 */
 	protected void handleEndElement(final ReadContext readcontext) throws Exception
 	{
-		int readignore = readcontext.getReadIgnore();
-		
-		if(readignore==0)
+		if(readcontext.getReadIgnore()==0)
 		{
 			XMLStreamReader parser = readcontext.getParser();
 			List stack = readcontext.getStack();
@@ -374,22 +371,24 @@ public class Reader
 			{
 				// Handle possible content type conversion.
 				Object val = topse.getContent()!=null? topse.getContent(): topse.getObject();
-				if(typeinfo!=null && typeinfo.getContentInfo()!=null)
+				if(val instanceof String)
 				{
-					Object coninfo = typeinfo.getContentInfo();
-					if(coninfo!=null && coninfo instanceof AttributeInfo)
+					if(typeinfo!=null && typeinfo.getContentInfo()!=null)
 					{
-						ITypeConverter conv = ((AttributeInfo)coninfo).getConverterRead();
-						if(conv!=null)
+						Object coninfo = typeinfo.getContentInfo();
+						if(coninfo!=null && coninfo instanceof AttributeInfo)
 						{
-							val = conv.convertObject(val, readcontext.getRoot(), readcontext.getClassLoader(), 
-								readcontext.getCallContext());
+							IStringObjectConverter conv = ((AttributeInfo)coninfo).getConverter();
+							if(conv!=null)
+							{
+								val = conv.convertString((String)val, readcontext);
+							}
 						}
 					}
-				}
-				else
-				{
-					val = handler.convertContentObject(val, localname, readcontext.getCallContext(), readcontext.getClassLoader());
+					else
+					{
+						val = handler.convertContentObject((String)val, localname, readcontext);
+					}
 				}
 				
 				topse = new StackElement(topse.getTag(), val, topse.getRawAttributes());
@@ -397,7 +396,7 @@ public class Reader
 //				readcontext.setTopse(topse);
 				// If this is the only element on stack, set also root to it
 				if(stack.size()==1)
-					readcontext.setRoot(topse.getObject());
+					readcontext.setRootObject(topse.getObject());
 	
 				// If object has internal id save it in the readobjects map.
 				String id = topse.getRawAttributes()!=null? (String)topse.getRawAttributes().get(SXML.ID): null;
@@ -417,7 +416,7 @@ public class Reader
 					if(typeinfo!=null && typeinfo.getContentInfo()!=null) 
 					{
 						handler.handleAttributeValue(topse.getObject(), null, null, topse.getContent(), typeinfo.getContentInfo(), 
-							readcontext.getCallContext(), readcontext.getClassLoader(), readcontext.getRoot(), readcontext.getReadObjects());
+							readcontext);
 					}
 					else
 					{
@@ -432,20 +431,19 @@ public class Reader
 					final IPostProcessor postproc = typeinfo.getPostProcessor();
 					if(postproc.getPass()==0)
 					{
-						Object changed = typeinfo.getPostProcessor().postProcess(readcontext.getCallContext(), topse.getObject(), 
-							readcontext.getRoot(), readcontext.getClassLoader());
+						Object changed = typeinfo.getPostProcessor().postProcess(readcontext, topse.getObject());
 						if(changed!=null)
 							topse.setObject(changed);
 					}
 					else
 					{
 						final Object object = topse.getObject();
-						final Object ro = readcontext.getRoot();
+						final Object ro = readcontext.getRootObject();
 						readcontext.getPostProcessors().put(new Integer(postproc.getPass()), new Runnable()
 						{
 							public void run()
 							{
-								Object check = postproc.postProcess(readcontext.getCallContext(), object, ro, readcontext.getClassLoader());
+								Object check = postproc.postProcess(readcontext, object);
 								if(check!=null)
 									throw new RuntimeException("Object replacement only possible in first pass.");
 							}
@@ -462,8 +460,7 @@ public class Reader
 					if(childs!=null)
 					{
 						IBulkObjectLinker linker = (IBulkObjectLinker)(typeinfo!=null && typeinfo.getLinker()!=null? typeinfo.getLinker(): handler);
-						linker.bulkLinkObjects(topse.getObject(), childs, readcontext.getCallContext(), 
-							readcontext.getClassLoader(), readcontext.getRoot());
+						linker.bulkLinkObjects(topse.getObject(), childs, readcontext);
 					}
 				}
 				if(stack.size()>1)
@@ -489,14 +486,13 @@ public class Reader
 					if(!bulklink)
 					{
 						IObjectLinker linker = (IObjectLinker)(typeinfo!=null && typeinfo.getLinker()!=null? typeinfo.getLinker(): handler);
-						linker.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), 
-							(QName[])pathname.toArray(new QName[pathname.size()]), 
-							readcontext.getCallContext(), readcontext.getClassLoader(), readcontext.getRoot());
+						linker.linkObject(topse.getObject(), pse.getObject(), linkinfo==null? null: linkinfo, 
+							(QName[])pathname.toArray(new QName[pathname.size()]), readcontext);
 					}
 					else
 					{
 						// Save the finished object as child for its parent.
-						children.put(pse.getObject(), new LinkData(topse.getObject(), linkinfo==null? null: linkinfo.getLinkInfo(), 
+						children.put(pse.getObject(), new LinkData(topse.getObject(), linkinfo==null? null: linkinfo, 
 							(QName[])pathname.toArray(new QName[pathname.size()])));	
 					}
 				}
@@ -506,7 +502,7 @@ public class Reader
 		}
 		else
 		{
-			readcontext.setReadIgnore(readignore--);
+			readcontext.setReadIgnore(readcontext.getReadIgnore()-1);
 		}
 	}
 	

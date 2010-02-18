@@ -1,5 +1,6 @@
 package jadex.xml.writer;
 
+import jadex.xml.IContext;
 import jadex.xml.TypeInfo;
 
 import javax.xml.namespace.QName;
@@ -17,12 +18,12 @@ public interface IObjectWriterHandler
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public TypeInfo getTypeInfo(Object object, QName[] fullpath, Object context);
+	public TypeInfo getTypeInfo(Object object, QName[] fullpath, IContext context);
 	
 	/**
 	 *  Get the tag name for an object.
 	 */
-	public QName getTagName(Object object, Object context);
+	public QName getTagName(Object object, IContext context);
 		
 	/**
 	 *  Get the tag with namespace.
@@ -34,5 +35,5 @@ public interface IObjectWriterHandler
 	 *  @param object The object.
 	 *  @param typeinfo The Typeinfo.
 	 */
-	public WriteObjectInfo getObjectWriteInfo(Object object, TypeInfo typeinfo, Object context, ClassLoader classloader);
+	public WriteObjectInfo getObjectWriteInfo(Object object, TypeInfo typeinfo, IContext context);
 }

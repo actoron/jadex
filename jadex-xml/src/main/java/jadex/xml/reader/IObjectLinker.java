@@ -1,5 +1,7 @@
 package jadex.xml.reader;
 
+import jadex.xml.IContext;
+
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -17,6 +19,6 @@ public interface IObjectLinker
 	 *  @param tagname The current tagname (for name guessing).
 	 *  @param context The context.
 	 */
-	public void linkObject(Object object, Object parent, Object linkinfo, QName[] pathname, 
-		Object context, ClassLoader classloader, Object root) throws Exception;
+	public void linkObject(Object object, Object parent, Object linkinfo, 
+		QName[] pathname, ReadContext context) throws Exception;
 }

@@ -2,17 +2,20 @@ package jadex.xml.bean;
 
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.collection.MultiCollection;
+import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.BasicTypeConverter;
+import jadex.xml.IStringObjectConverter;
+import jadex.xml.ISubObjectConverter;
 import jadex.xml.ObjectInfo;
-import jadex.xml.ITypeConverter;
 import jadex.xml.SXML;
+import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
 import jadex.xml.TypeInfoTypeManager;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.LinkData;
+import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
 
 import java.lang.reflect.Array;
@@ -21,11 +24,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -96,7 +95,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public TypeInfo getTypeInfo(Object object, QName[] fullpath, Object context)
+	public TypeInfo getTypeInfo(Object object, QName[] fullpath, ReadContext context)
 	{
 		Object type = getObjectType(object, context);
 		if(no_typeinfos!=null && no_typeinfos.contains(type))
@@ -170,7 +169,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(Object type, boolean root, Object context, Map rawattributes, ClassLoader classloader) throws Exception
+	public Object createObject(Object type, boolean root, ReadContext context, Map rawattributes) throws Exception
 	{
 		Object ret = null;
 		
@@ -204,7 +203,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					}
 				}
 				
-				Class clazz = SReflect.classForName0(clazzname, classloader);
+				Class clazz = SReflect.classForName0(clazzname, context.getClassLoader());
 				
 				if(clazz!=null)
 				{
@@ -248,7 +247,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		}
 		else if(type instanceof IBeanObjectCreator)
 		{
-			ret = ((IBeanObjectCreator)type).createObject(context, rawattributes, classloader);
+			ret = ((IBeanObjectCreator)type).createObject(context, rawattributes);
 		}
 		
 		
@@ -260,7 +259,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param object The object.
 	 *  @return The object type.
 	 */
-	public Object getObjectType(Object object, Object context)
+	public Object getObjectType(Object object, ReadContext context)
 	{
 		return object.getClass();
 	}
@@ -268,18 +267,18 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	/**
 	 *  Convert an object to another type of object.
 	 */
-	public Object convertContentObject(Object object, QName tag, Object context, ClassLoader classloader)
+	public Object convertContentObject(String value, QName tag, ReadContext context)
 	{
-		Object ret = object;
+		Object ret = value;
 		if(tag.getNamespaceURI().startsWith(SXML.PROTOCOL_TYPEINFO))
 		{
 			String clazzname = tag.getNamespaceURI().substring(SXML.PROTOCOL_TYPEINFO.length())+"."+tag.getLocalPart();
-			Class clazz = SReflect.classForName0(clazzname, classloader);
+			Class clazz = SReflect.classForName0(clazzname, context.getClassLoader());
 			if(clazz!=null)
 			{
 				if(!BasicTypeConverter.isBuiltInType(clazz))
 					throw new RuntimeException("No converter known for: "+clazz);
-				ret = BasicTypeConverter.getBasicConverter(clazz).convertObject(object, null, classloader, context);
+				ret = BasicTypeConverter.getBasicStringConverter(clazz).convertString(value, context);
 			}
 		}
 		return ret;
@@ -295,13 +294,21 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 */
 	public void handleAttributeValue(Object object, QName xmlattrname, List attrpath, String attrval, 
-		Object attrinfo, Object context, ClassLoader classloader, Object root, Map readobjects) throws Exception
+		Object attrinfo, ReadContext context) throws Exception
 	{
 		// Hack!
+		Object converter = attrinfo instanceof AttributeInfo? ((AttributeInfo)attrinfo).getConverter(): null;
+		String id = attrinfo instanceof AttributeInfo? ((AttributeInfo)attrinfo).getId(): null;
+		Object accessinfo = attrinfo instanceof AttributeInfo? ((AttributeInfo)attrinfo).getAccessInfo(): attrinfo;
+		
 		if(attrval!=null)
-			setAttributeValue(attrinfo, xmlattrname, object, attrval, root, classloader, context, readobjects);
-		else if(attrinfo instanceof BeanAttributeInfo && ((BeanAttributeInfo)attrinfo).getDefaultValue()!=null)
-			setAttributeValue(attrinfo, xmlattrname, object, ((BeanAttributeInfo)attrinfo).getDefaultValue(), root, classloader, context, readobjects);
+		{
+			setElementValue(accessinfo, xmlattrname, object, attrval, converter, id, context);
+		}
+		else if(accessinfo instanceof AccessInfo && ((AccessInfo)accessinfo).getDefaultValue()!=null)
+		{
+			setElementValue(accessinfo, xmlattrname, object, ((AccessInfo)accessinfo).getDefaultValue(), converter, id, context);
+		}
 	}
 		
 
@@ -314,16 +321,17 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 */
 	public void linkObject(Object object, Object parent, Object linkinfo, 
-		QName[] pathname, Object context, ClassLoader classloader, Object root) throws Exception
+		QName[] pathname, ReadContext context) throws Exception
 	{
 		QName tag = pathname[pathname.length-1];
 		
 		// Add object to its parent.
 		boolean	linked	= false;
 		
-		if(linkinfo!=null)
+		if(linkinfo instanceof SubobjectInfo)
 		{
-			setAttributeValue(linkinfo, tag, parent, object, root, classloader, context, null);
+			SubobjectInfo sinfo = (SubobjectInfo)linkinfo;
+			setElementValue(sinfo.getLinkInfo(), tag, parent, object, sinfo.getConverter(), null, context);
 			linked = true;
 		}
 		
@@ -370,7 +378,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			for(int i=0; i<fieldnames.length && !linked; i++)
 			{
-				linked = setField(fieldnames[i], parent, object, null, classloader, context, root, null, null);
+				linked = setField(fieldnames[i], parent, object, null, context, null);
 			}
 			
 			// Try name guessing via class/superclass/interface names of object to add
@@ -380,13 +388,13 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				
 				for(int i=0; i<plunames.length && !linked; i++)
 				{
-					linked = internalLinkObjects(clazz, "set"+plunames[i], object, parent, root, classloader);
+					linked = internalLinkObjects(clazz, "set"+plunames[i], object, parent, context);
 					if(!linked)
 					{
-						linked = internalLinkObjects(clazz, "add"+sinnames[i], object, parent, root, classloader);
+						linked = internalLinkObjects(clazz, "add"+sinnames[i], object, parent, context);
 						if(!linked && !sinnames[i].equals(plunames[i]))
 						{	
-							linked = internalLinkObjects(clazz, "add"+plunames[i], object, parent, root, classloader);
+							linked = internalLinkObjects(clazz, "add"+plunames[i], object, parent, context);
 						}
 					}
 				}
@@ -395,15 +403,15 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				if(!linked && !BasicTypeConverter.isBuiltInType(clazz))
 				{
 					String name = SReflect.getInnerClassName(clazz);
-					linked = internalLinkObjects(clazz, "set"+name, object, parent, root, classloader);
+					linked = internalLinkObjects(clazz, "set"+name, object, parent, context);
 					if(!linked)
 					{
-						linked = internalLinkObjects(clazz, "add"+name, object, parent, root, classloader);
+						linked = internalLinkObjects(clazz, "add"+name, object, parent, context);
 						if(!linked)
 						{
 							String sinname = SUtil.getSingular(name);
 							if(!name.equals(sinname))
-								linked = internalLinkObjects(clazz, "add"+sinname, object, parent, root, classloader);
+								linked = internalLinkObjects(clazz, "add"+sinname, object, parent, context);
 						}
 					}
 				}
@@ -434,7 +442,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 */
 	public void bulkLinkObjects(List childs, Object parent, Object linkinfo, 
-		QName[] pathname, Object context, ClassLoader classloader, Object root) throws Exception
+		QName[] pathname, ReadContext context) throws Exception
 	{
 		QName tag = pathname[pathname.length-1];
 		
@@ -443,7 +451,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		
 		if(linkinfo!=null)
 		{
-			setBulkAttributeValues(linkinfo, tag, parent, childs, root, classloader, context, null);
+			// converter and id null?!
+			setBulkAttributeValues(linkinfo, tag, parent, childs, null, null, context);
 			linked = true;
 		}
 		
@@ -497,10 +506,10 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			// Try via fieldname
 			for(int i=0; i<plufieldnames.length && !linked; i++)
 			{
-				linked = setBulkField(plufieldnames[i], parent, childs, null, classloader, context, root, null, null);
+				linked = setBulkField(plufieldnames[i], parent, childs, null, context, null);
 				if(!linked && !origfieldnames[i].equals(plufieldnames[i]))
 				{
-					linked = setBulkField(origfieldnames[i], parent, childs, null, classloader, context, root, null, null);
+					linked = setBulkField(origfieldnames[i], parent, childs, null, context, null);
 				}
 			}
 			
@@ -511,10 +520,10 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				
 				for(int i=0; i<plunames.length && !linked; i++)
 				{
-					linked = internalBulkLinkObjects(clazz, "set"+plunames[i], childs, parent, root, classloader);
+					linked = internalBulkLinkObjects(clazz, "set"+plunames[i], childs, parent, context);
 					if(!linked && !orignames[i].equals(plunames[i]))
 					{
-						linked = internalBulkLinkObjects(clazz, "set"+orignames[i], childs, parent, root, classloader);
+						linked = internalBulkLinkObjects(clazz, "set"+orignames[i], childs, parent, context);
 					}
 				}
 				
@@ -522,7 +531,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				if(!linked && !BasicTypeConverter.isBuiltInType(clazz))
 				{
 					String name = SReflect.getInnerClassName(clazz);
-					linked = internalBulkLinkObjects(clazz, "set"+name, childs, parent, root, classloader);
+					linked = internalBulkLinkObjects(clazz, "set"+name, childs, parent, context);
 				}
 				
 				if(!linked)
@@ -571,10 +580,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param classloader The classloader.
 	 *  @param root The root object.
 	 */
-	public void bulkLinkObjects(Object parent, List children, Object context, 
-		ClassLoader classloader, Object root) throws Exception
+	public void bulkLinkObjects(Object parent, List children, ReadContext context) throws Exception
 	{
-		System.out.println("bulk link for: "+parent+" "+children);
+//		System.out.println("bulk link for: "+parent+" "+children);
 		
 		// The default bulk strategy is as follows:
 		// Linear scan the subpaths(tags) of the parent
@@ -592,7 +600,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			QName[] pn = ld.getPathname();
 			if(!Arrays.equals(pathname, pn))
 			{
-				handleBulkLinking(childs, parent, context, classloader, root, pathname, children, startidx);
+				handleBulkLinking(childs, parent, context, pathname, children, startidx);
 				
 				pathname = pn;
 				linkdata = ld;
@@ -601,22 +609,21 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			}
 			childs.add(ld.getChild());
 		}
-		handleBulkLinking(childs, parent, context, classloader, root, pathname, children, startidx);
+		handleBulkLinking(childs, parent, context, pathname, children, startidx);
 		
 	}
 	
 	/**
 	 *  Initiate the bulk link calls.
 	 */
-	protected void handleBulkLinking(List childs, Object parent, Object context, ClassLoader classloader, 
-		Object root, QName[] pathname, List linkdatas, int startidx) throws Exception
+	protected void handleBulkLinking(List childs, Object parent, ReadContext context, QName[] pathname, List linkdatas, int startidx) throws Exception
 	{
 		if(childs.size()>1)
 		{
 			try
 			{
 				bulkLinkObjects(childs, parent, ((LinkData)linkdatas.get(startidx)).getLinkinfo(), 
-					pathname, context, classloader, root);
+					pathname, context);
 			}
 			catch(Exception e)
 			{
@@ -625,14 +632,14 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				for(int i=0; i<childs.size(); i++)
 				{
 					linkObject(childs.get(i), parent, ((LinkData)linkdatas.get(startidx+i)).getLinkinfo(), 
-						pathname, context, classloader, root);
+						pathname, context);
 				}
 			}
 		}
 		else
 		{
 			linkObject(childs.get(0), parent, ((LinkData)linkdatas.get(startidx)).getLinkinfo(), 
-				pathname, context, classloader, root);
+				pathname, context);
 		}
 	}
 	
@@ -648,8 +655,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param root The root object.
 	 *  @param classloader The classloader.
 	 */
-	protected void setAttributeValue(Object attrinfo, QName xmlattrname, Object object, 
-		Object val, Object root, ClassLoader classloader, Object context, Map readobjects)
+	protected void setElementValue(Object accessinfo, QName xmlname, Object object, Object val, Object converter, String id, ReadContext context)
 	{
 		if(NULL.equals(val))
 			return;
@@ -657,9 +663,10 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		boolean set = false;
 		
 		// Write to a map.
-		if(attrinfo instanceof BeanAttributeInfo)
+		if(accessinfo instanceof AccessInfo && ((AccessInfo)accessinfo).getExtraInfo() instanceof BeanAccessInfo)
 		{	
-			BeanAttributeInfo bai = (BeanAttributeInfo)attrinfo;
+			AccessInfo ai = (AccessInfo)accessinfo;
+			BeanAccessInfo bai = (BeanAccessInfo)ai.getExtraInfo();
 			
 			// Put value in map 1) fetch key 2) set value in map
 			if(bai.getMapName()!=null)
@@ -667,42 +674,87 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				String mapname = bai.getMapName().length()==0? bai.getMapName(): bai.getMapName().substring(0,1).toUpperCase()+bai.getMapName().substring(1);
 //				String jattrname = bai.getAttributeName()!=null? bai.getAttributeName(): xmlattrname;
 				
+				// fetch the key value
 				Object key = null;
-				if(bai.getReadMapKeyMethod()!=null)
+				if(bai.getKeyHelp()!=null)
 				{
-					Method m = bai.getReadMapKeyMethod();
-					try
+					Object kh = bai.getKeyHelp();
+					Object targetobj = bai.isKeyFromParent()? object: val; 
+					
+					if(kh instanceof Method)
 					{
-						key = m.invoke(val, new Object[0]);
+						try
+						{
+							key = ((Method)kh).invoke(targetobj, new Object[0]);
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
 					}
-					catch(Exception e)
+					else if(kh instanceof Field)
 					{
-						e.printStackTrace();
+						try
+						{
+							key = ((Field)kh).get(targetobj);
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
+					else
+					{
+						throw new RuntimeException("Unknown key help: "+kh); 
 					}
 				}
 				else
 				{
-					key =  bai.getAttributeIdentifier()!=null? bai.getAttributeIdentifier(): xmlattrname;
+					key =  ai.getObjectIdentifier()!=null? ai.getObjectIdentifier(): xmlname;
 				}
 				
-				// Set map value with predefined read method.
-				if(bai.getReadMethod()!=null)
+				// Set map value with predefined read method or field.
+				if(bai.getStoreHelp()!=null)
 				{
-					Method m = bai.getReadMethod();
-					Class[] ps = m.getParameterTypes();
-					Object arg = convertValue(val, ps[1], bai.getConverterRead(), root, classloader, bai.getId(), readobjects);
-					
-					try
+					Object sh = bai.getStoreHelp();
+										
+					if(sh instanceof Method)
 					{
-						m.invoke(object, new Object[]{key, arg});
-						set = true;
+						try
+						{
+							Method m = (Method)sh;
+							Class[] ps = m.getParameterTypes();
+							Object arg = convertValue(val, ps[1], converter, context, id);
+							m.invoke(object, new Object[]{key, arg});
+							set = true;
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
 					}
-					catch(Exception e)
+					else if(sh instanceof Field)
 					{
-						e.printStackTrace();
+						try
+						{
+							Field f = (Field)sh;
+							Object map = f.get(object);
+							Object arg = convertValue(val, null, converter, context, id);
+							((Map)map).put(key, arg);
+							set = true;
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+						
+					}
+					else
+					{
+						throw new RuntimeException("Unknown map store help: "+sh);
 					}
 				}
-				// Fetch map value with guessing method name.
+				// Set map value with guessing method name.
 				else
 				{
 					String[] prefixes = new String[]{"put", "set", "add"};
@@ -714,7 +766,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 							Class[] ps = ms[j].getParameterTypes();
 							if(ps.length==2)
 							{
-								Object arg = convertValue(val, ps[1], bai.getConverterRead(), root, classloader, bai.getId(), readobjects);
+								Object arg = convertValue(val, ps[1], converter, context, id);
 								
 								try
 								{
@@ -732,17 +784,39 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			}
 			
 			// Fetch value using predefined read method.
-			else if(bai.getReadMethod()!=null)
+			else if(bai.getStoreHelp()!=null)
 			{
-				Method m = bai.getReadMethod();
-				Class[] ps = m.getParameterTypes();
-				if(ps.length==1)
+				Object sh = bai.getStoreHelp();
+				
+				if(sh instanceof Method)
 				{
-					Object arg = convertValue(val, ps[0], bai.getConverterRead(), root, classloader, bai.getId(), readobjects);
-					
+					Method m = (Method)sh;
+					Class[] ps = m.getParameterTypes();
+					if(ps.length==1)
+					{
+						Object arg = convertValue(val, ps[0], converter, context, id);
+						try
+						{
+							m.invoke(object, new Object[]{arg});
+							set = true;
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
+					else
+					{
+						throw new RuntimeException("Read method should have one parameter: "+bai+" "+m);
+					}
+				}
+				else if(sh instanceof Field)
+				{
 					try
 					{
-						m.invoke(object, new Object[]{arg});
+						Field f = (Field)sh;
+						Object arg = convertValue(val, f.getType(), converter, context, id);
+						f.set(object, arg);
 						set = true;
 					}
 					catch(Exception e)
@@ -752,27 +826,28 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				}
 				else
 				{
-					throw new RuntimeException("Read method should have one parameter: "+bai+" "+m);
+					throw new RuntimeException("Unknown store help: "+sh);
 				}
 			}
 		}
 	
-		// Try 
-		if(!set && attrinfo instanceof AttributeInfo)
+		// Try using object identifier from access info
+		if(!set && accessinfo instanceof AccessInfo)
 		{
-			AttributeInfo ai = (AttributeInfo)attrinfo;
-			ITypeConverter converter = ai.getConverterRead();
+			try
+			{
+			AccessInfo ai = (AccessInfo)accessinfo;
 			
-			String fieldname = ai.getAttributeIdentifier()!=null? ((String)ai.getAttributeIdentifier()): xmlattrname.getLocalPart();
-			set = setField(fieldname, object, val, converter, classloader, context, root, ai.getId(), readobjects);
+			String fieldname = ai.getObjectIdentifier()!=null? ((String)ai.getObjectIdentifier()): xmlname.getLocalPart();
+			set = setField(fieldname, object, val, converter, context, id);
 
 			if(!set)
 			{
-				String postfix = ai.getAttributeIdentifier()!=null? ((String)ai.getAttributeIdentifier())
-					.substring(0,1).toUpperCase()+((String)ai.getAttributeIdentifier()).substring(1)
-					: xmlattrname.getLocalPart().substring(0,1).toUpperCase()+xmlattrname.getLocalPart().substring(1);
+				String postfix = ai.getObjectIdentifier()!=null? ((String)ai.getObjectIdentifier())
+					.substring(0,1).toUpperCase()+((String)ai.getObjectIdentifier()).substring(1)
+					: xmlname.getLocalPart().substring(0,1).toUpperCase()+xmlname.getLocalPart().substring(1);
 					
-				set = invokeSetMethod(new String[]{"set", "add"}, postfix, val, object, root, classloader, converter, ai.getId(), readobjects);
+				set = invokeSetMethod(new String[]{"set", "add"}, postfix, val, object, context, converter, id);
 			
 				if(!set)
 				{
@@ -781,9 +856,14 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					if(!postfix.equals(oldpostfix))
 					{
 						// First try add, as set might also be there and used for a non-multi attribute.
-						set = invokeSetMethod(new String[]{"set", "add"}, postfix, val, object, root, classloader, converter, ai.getId(), readobjects);
+						set = invokeSetMethod(new String[]{"set", "add"}, postfix, val, object, context, converter, id);
 					}
 				}
+			}
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
 			}
 		}
 		else if(!set) // attribute info is null or string
@@ -793,10 +873,10 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			// Try to find bean class information
 			
 			Map props = introspector.getBeanProperties(object.getClass(), true);
-			BeanProperty prop = (BeanProperty)props.get(attrinfo instanceof String? attrinfo: xmlattrname.getLocalPart());
+			BeanProperty prop = (BeanProperty)props.get(accessinfo instanceof String? accessinfo: xmlname.getLocalPart());
 			if(prop!=null)
 			{
-				Object arg = convertValue(val, prop.getSetterType(), null, root, classloader, null, null);
+				Object arg = convertValue(val, prop.getSetterType(), converter, context, id);
 
 				try
 				{
@@ -814,9 +894,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			if(!set)
 			{
-				String postfix = attrinfo instanceof String? ((String)attrinfo).substring(0,1).toUpperCase()+((String)attrinfo).substring(1)
-					: xmlattrname.getLocalPart().substring(0,1).toUpperCase()+xmlattrname.getLocalPart().substring(1);
-				set = invokeSetMethod(new String[]{"set", "add"}, postfix, val, object, root, classloader, null, null, null);
+				String postfix = accessinfo instanceof String? ((String)accessinfo).substring(0,1).toUpperCase()+((String)accessinfo).substring(1)
+					: xmlname.getLocalPart().substring(0,1).toUpperCase()+xmlname.getLocalPart().substring(1);
+				set = invokeSetMethod(new String[]{"set", "add"}, postfix, val, object, context, null, null);
 			
 				if(!set)
 				{
@@ -824,14 +904,14 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					postfix = SUtil.getSingular(postfix);
 					if(!postfix.equals(oldpostfix))
 					{
-						set = invokeSetMethod(new String[]{"set", "add"}, postfix, val, object, root, classloader, null, null, null);
+						set = invokeSetMethod(new String[]{"set", "add"}, postfix, val, object, context, null, null);
 					}
 				}
 			}
 		}
 		
 		if(!set)
-			throw new RuntimeException("Failure in setting attribute: "+xmlattrname+" on object: "+object);
+			throw new RuntimeException("Failure in setting attribute: "+xmlname+" on object: "+object);
 	}
 	
 	/**
@@ -844,30 +924,53 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param root The root object.
 	 *  @param classloader The classloader.
 	 */
-	protected void setBulkAttributeValues(Object attrinfo, QName xmlattrname, Object object, 
-		List vals, Object root, ClassLoader classloader, Object context, Map readobjects)
+	protected void setBulkAttributeValues(Object accessinfo, QName xmlattrname, Object object, 
+		List vals, Object converter, String id, ReadContext context)
 	{
 		boolean set = false;
 		
 		// Write to a map.
-		if(attrinfo instanceof BeanAttributeInfo)
+		if(accessinfo instanceof AccessInfo && ((AccessInfo)accessinfo).getExtraInfo() instanceof BeanAccessInfo)
 		{	
-			BeanAttributeInfo bai = (BeanAttributeInfo)attrinfo;
-			
+			AccessInfo ai = (AccessInfo)accessinfo;
+			BeanAccessInfo bai = (BeanAccessInfo)ai.getExtraInfo();
+					
 			// todo: support map?
 			
 			// Fetch value using predefined read method.
-			if(bai.getReadMethod()!=null)
+			if(bai.getStoreHelp()!=null)
 			{
-				Method m = bai.getReadMethod();
-				Class[] ps = m.getParameterTypes();
-				if(ps.length==1)
+				Object sh = bai.getStoreHelp();
+				
+				if(sh instanceof Method)
 				{
-					Object arg = convertBulkValues(vals, ps[0], bai.getConverterRead(), root, classloader, bai.getId(), readobjects);
-					
+					Method m = (Method)sh;
+					Class[] ps = m.getParameterTypes();
+					if(ps.length==1)
+					{
+						Object arg = convertBulkValues(vals, ps[0], converter, context, id);
+						try
+						{
+							m.invoke(object, new Object[]{arg});
+							set = true;
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
+					else
+					{
+						throw new RuntimeException("Read method should have one parameter: "+bai+" "+m);
+					}
+				}
+				else if(sh instanceof Field)
+				{
 					try
 					{
-						m.invoke(object, new Object[]{arg});
+						Field f = (Field)sh;
+						Object arg = convertBulkValues(vals, f.getType(), converter, context, id);
+						f.set(object, arg);
 						set = true;
 					}
 					catch(Exception e)
@@ -877,27 +980,26 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				}
 				else
 				{
-					throw new RuntimeException("Read method should have one parameter: "+bai+" "+m);
+					throw new RuntimeException("Unknown store help: "+sh);
 				}
 			}
 		}
 	
 		// Try 
-		if(!set && attrinfo instanceof AttributeInfo)
+		if(!set && accessinfo instanceof AccessInfo)
 		{
-			AttributeInfo ai = (AttributeInfo)attrinfo;
-			ITypeConverter converter = ai instanceof BeanAttributeInfo? ((BeanAttributeInfo)ai).getConverterRead(): null;
+			AccessInfo ai = (AccessInfo)accessinfo;
 			
-			String fieldname = ai.getAttributeIdentifier()!=null? ((String)ai.getAttributeIdentifier()): xmlattrname.getLocalPart();
-			set = setBulkField(fieldname, object, vals, converter, classloader, context, root, ai.getId(), readobjects);
+			String fieldname = ai.getObjectIdentifier()!=null? ((String)ai.getObjectIdentifier()): xmlattrname.getLocalPart();
+			set = setBulkField(fieldname, object, vals, converter, context, id);
 
 			if(!set)
 			{
-				String postfix = ai.getAttributeIdentifier()!=null? ((String)ai.getAttributeIdentifier())
-					.substring(0,1).toUpperCase()+((String)ai.getAttributeIdentifier()).substring(1)
+				String postfix = ai.getObjectIdentifier()!=null? ((String)ai.getObjectIdentifier())
+					.substring(0,1).toUpperCase()+((String)ai.getObjectIdentifier()).substring(1)
 					: xmlattrname.getLocalPart().substring(0,1).toUpperCase()+xmlattrname.getLocalPart().substring(1);
 					
-				set = invokeBulkSetMethod(new String[]{"set"}, postfix, vals, object, root, classloader, converter, ai.getId(), readobjects);
+				set = invokeBulkSetMethod(new String[]{"set"}, postfix, vals, object, context, converter, id);
 			}
 		}
 		else if(!set) // attribute info is null or string
@@ -907,10 +1009,10 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			// Try to find bean class information
 			
 			Map props = introspector.getBeanProperties(object.getClass(), true);
-			BeanProperty prop = (BeanProperty)props.get(attrinfo instanceof String? attrinfo: xmlattrname.getLocalPart());
+			BeanProperty prop = (BeanProperty)props.get(accessinfo instanceof String? accessinfo: xmlattrname.getLocalPart());
 			if(prop!=null)
 			{
-				Object arg = convertBulkValues(vals, prop.getSetterType(), null, root, classloader, null, null);
+				Object arg = convertBulkValues(vals, prop.getSetterType(), null, context, null);
 
 				try
 				{
@@ -928,9 +1030,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			if(!set)
 			{
-				String postfix = attrinfo instanceof String? ((String)attrinfo).substring(0,1).toUpperCase()+((String)attrinfo).substring(1)
+				String postfix = accessinfo instanceof String? ((String)accessinfo).substring(0,1).toUpperCase()+((String)accessinfo).substring(1)
 					: xmlattrname.getLocalPart().substring(0,1).toUpperCase()+xmlattrname.getLocalPart().substring(1);
-				set = invokeBulkSetMethod(new String[]{"set"}, postfix, vals, object, root, classloader, null, null, null);
+				set = invokeBulkSetMethod(new String[]{"set"}, postfix, vals, object, context, null, null);
 			}
 		}
 		
@@ -942,14 +1044,14 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  Set a value directly on a Java bean.
 	 *  @param prefixes The method prefixes.
 	 *  @param postfix The mothod postfix.
-	 *  @param attrval The attribute value.
+	 *  @param value The attribute value.
 	 *  @param object The object.
 	 *  @param root The root.
 	 *  @param classloader The classloader.
 	 *  @param converter The converter.
 	 */
-	protected boolean invokeSetMethod(String[] prefixes, String postfix, Object attrval, Object object, 
-		Object root, ClassLoader classloader, ITypeConverter converter, String idref, Map readobjects)
+	protected boolean invokeSetMethod(String[] prefixes, String postfix, Object value, Object object, 
+		ReadContext context, Object converter, String idref)
 	{
 		boolean set = false;
 				
@@ -964,7 +1066,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					Class[] ps = ms[j].getParameterTypes();
 					if(ps.length==1)
 					{
-						Object arg = convertValue(attrval, ps[0], converter, root, classloader, idref, readobjects);
+						Object arg = convertValue(value, ps[0], converter, context, idref);
 						
 						try
 						{
@@ -997,7 +1099,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param converter The converter.
 	 */
 	protected boolean invokeBulkSetMethod(String[] prefixes, String postfix, List vals, Object object, 
-		Object root, ClassLoader classloader, ITypeConverter converter, String idref, Map readobjects)
+		ReadContext context, Object converter, String idref)
 	{
 		boolean set = false;
 				
@@ -1012,7 +1114,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 					Class[] ps = ms[j].getParameterTypes();
 					if(ps.length==1)
 					{
-						Object arg = convertBulkValues(vals, ps[0], converter, root, classloader, idref, readobjects);
+						Object arg = convertBulkValues(vals, ps[0], converter, context, idref);
 						
 						try
 						{
@@ -1037,8 +1139,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	/**
 	 *  Directly access a field for setting/(adding) the object.
 	 */
-	protected boolean setField(String fieldname, Object parent, Object object, ITypeConverter converter,
-		ClassLoader classloader, Object context, Object root, String idref, Map readobjects)
+	protected boolean setField(String fieldname, Object parent, Object object, Object converter, 
+		ReadContext context, String idref)
 	{
 		boolean set = false;
 		try
@@ -1046,11 +1148,12 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			Field field = parent.getClass().getField(fieldname);
 			Class type = field.getType();
 			
-			object = convertValue(object, type, converter, root, classloader, idref, readobjects);
+			Object val = object;
+			val = convertValue(object, type, converter, context, idref);
 			
-			if(SReflect.isSupertype(type, object.getClass()))
+			if(SReflect.isSupertype(type, val.getClass()))
 			{
-				field.set(parent, object);
+				field.set(parent, val);
 				set = true;
 			}
 		}
@@ -1064,8 +1167,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	/**
 	 *  Directly access a field for setting the objects.
 	 */
-	protected boolean setBulkField(String fieldname, Object parent, List objects, ITypeConverter converter,
-		ClassLoader classloader, Object context, Object root, String idref, Map readobjects)
+	protected boolean setBulkField(String fieldname, Object parent, List objects, Object converter,
+		ReadContext context, String idref)
 	{
 		boolean set = false;
 		try
@@ -1075,7 +1178,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 //			object = convertAttributeValue(object, type, converter, root, classloader, idref, readobjects);
 			
-			Object arg = convertBulkValues(objects, type, converter, root, classloader, idref, readobjects);
+			Object arg = convertBulkValues(objects, type, converter, context, idref);
 			
 			field.set(parent, arg);
 			set = true;
@@ -1096,7 +1199,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param root The root.
 	 *  @param classloader classloader.
 	 */
-	protected boolean internalLinkObjects(Class clazz, String name, Object object, Object parent, Object root, ClassLoader classloader) throws Exception
+	protected boolean internalLinkObjects(Class clazz, String name, Object object, 
+		Object parent, ReadContext context) throws Exception
 	{
 		boolean ret = false;
 			
@@ -1120,12 +1224,12 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				}
 				else if(object instanceof String)
 				{
-					ITypeConverter converter = BasicTypeConverter.getBasicConverter(ps[0]);
+					IStringObjectConverter converter = BasicTypeConverter.getBasicStringConverter(ps[0]);
 					if(converter != null)
 					{
 						try
 						{
-							object = converter.convertObject((String)object, root, classloader, null);
+							object = converter.convertString((String)object, context);
 							ms[i].invoke(parent, new Object[]{object});
 							ret	= true;
 						}
@@ -1150,7 +1254,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param classloader classloader.
 	 */
 	protected boolean internalBulkLinkObjects(Class clazz, String name, List childs, 
-		Object parent, Object root, ClassLoader classloader) throws Exception
+		Object parent, ReadContext context) throws Exception
 	{
 		boolean ret = false;
 			
@@ -1162,7 +1266,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			{
 				try
 				{
-					Object arg = convertBulkValues(childs, ps[0], null, root, classloader, null, null);
+					Object arg = convertBulkValues(childs, ps[0], null, context, null);
 					ms[i].invoke(parent, new Object[]{arg});
 					ret	= true;
 				}	
@@ -1184,40 +1288,44 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  @param root The root.
 	 *  @param classloader The classloader.
 	 */
-	protected Object convertValue(Object val, Class targetclass, ITypeConverter converter, 
-		Object root, ClassLoader classloader, String id, Map readobjects)
+	protected Object convertValue(Object val, Class targetclass, Object converter, 
+		ReadContext context, String id)
 	{
 		Object ret = val;
 
-//		if(converter!=null && !converter.acceptsInputType(attrval.getClass()))
-//			System.out.println("hererrrrr: "+attrval+" "+converter);
+		// When 'id' is idref interpret value as key for stored object.
+		if(AttributeInfo.IDREF.equals(id))
+		{
+			ret = context.getReadObjects().get(val);
+		}
+		else if(converter instanceof ISubObjectConverter)
+		{
+			ret = ((ISubObjectConverter)converter).convertObjectForRead(val, context);
+		}
+		// If a string converter is available
+		else if(val instanceof String)
+		{
+			if(converter instanceof IStringObjectConverter)
+			{
+				ret = ((IStringObjectConverter)converter).convertString((String)val, context);
+			}
+			else if(!String.class.isAssignableFrom(targetclass))
+			{
+				IStringObjectConverter conv = BasicTypeConverter.getBasicStringConverter(targetclass);
+				if(conv!=null)
+					ret = conv.convertString((String)val, context);
+			}
+		}
 		
-		if(converter!=null)// && converter.acceptsInputType(attrval.getClass()))
-		{
-			ret = converter.convertObject(val, root, classloader, null);
-		}
-		else if(!String.class.isAssignableFrom(targetclass))
-		{
-			if(AttributeInfo.IDREF.equals(id))
-			{
-				ret = readobjects.get(val);
-			}
-			else
-			{
-				ITypeConverter conv = BasicTypeConverter.getBasicConverter(targetclass);
-				if(conv!=null)// && conv.acceptsInputType(attrval.getClass()))
-					ret = conv.convertObject(val, root, classloader, null);
-			}
-		}
-			
+		
 		return ret;
 	}
 	
 	/**
 	 *  Convert a list of values into the target format (list, set, collection, array).
 	 */
-	protected Object convertBulkValues(List vals, Class targetclass, ITypeConverter converter, 
-		Object root, ClassLoader classloader, String id, Map readobjects)
+	protected Object convertBulkValues(List vals, Class targetclass, Object converter, 
+		ReadContext context, String id)
 	{
 		// todo: use converter?!
 		

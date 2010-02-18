@@ -7,6 +7,7 @@ import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.xml.AttributeInfo;
 import jadex.xml.BasicTypeConverter;
+import jadex.xml.IContext;
 import jadex.xml.Namespace;
 import jadex.xml.SXML;
 import jadex.xml.TypeInfo;
@@ -58,7 +59,7 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 	 *  @param object The object.
 	 *  @return The object type.
 	 */
-	public Object getObjectType(Object object, Object context)
+	public Object getObjectType(Object object, IContext context)
 	{
 		return ((IOAVState)context).getType(object);
 	}
@@ -66,7 +67,7 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Get the tag name for an object.
 	 */
-	public QName getTagName(Object object, Object context)
+	public QName getTagName(Object object, IContext context)
 	{
 		QName ret;
 		IOAVState state = (IOAVState)context;
@@ -120,7 +121,7 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Get a value from an object.
 	 */
-	protected Object getValue(Object object, Object attr, Object context, Object info)
+	protected Object getValue(Object object, Object attr, IContext context, Object info)
 	{
 		Object ret;
 		try
@@ -190,7 +191,7 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Get the properties of an object. 
 	 */
-	protected Collection getProperties(Object object, Object context, boolean includefields)
+	protected Collection getProperties(Object object, IContext context, boolean includefields)
 	{
 		Collection ret = new LinkedHashSet();
 		IOAVState state = (IOAVState)context;
@@ -223,7 +224,7 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Test if a value is compatible with the defined typeinfo.
 	 */
-	protected boolean isTypeCompatible(Object object, TypeInfo info, Object context)
+	protected boolean isTypeCompatible(Object object, TypeInfo info, IContext context)
 	{
 		boolean ret = true;
 		if(info!=null && info.getTypeInfo() instanceof OAVObjectType)
@@ -239,7 +240,7 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 	 *  Works for basic (final) types only and checks if the
 	 *  two types are of same class.
 	 */
-	protected boolean isDecodableToSameType(Object property, Object value, Object context)
+	protected boolean isDecodableToSameType(Object property, Object value, IContext context)
 	{
 		boolean ret = true;
 		if(value!=null)

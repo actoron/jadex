@@ -1,5 +1,7 @@
 package jadex.xml;
 
+import java.util.StringTokenizer;
+
 import javax.xml.namespace.QName;
 
 import jadex.commons.IFilter;
@@ -21,13 +23,15 @@ public class XMLInfo
 	/** Create from tag flag. */
 	protected boolean createfromtag;
 
+	/** The preprocessor. */
+//	protected IPreProcessor preprocessor;
 	
 	/**
 	 * @param xmlpath
 	 */
 	public XMLInfo(String xmlpath)
 	{
-		this.xmlpath = xmlpath;
+		this(xmlpath, null);
 	}
 
 	/**
@@ -35,7 +39,7 @@ public class XMLInfo
 	 */
 	public XMLInfo(QName[] xmlpathelements)
 	{
-		this.xmlpathelements = xmlpathelements;
+		this(xmlpathelements, null);
 	}
 
 	/**
@@ -44,8 +48,7 @@ public class XMLInfo
 	 */
 	public XMLInfo(String xmlpath, IFilter filter)
 	{
-		this.xmlpath = xmlpath;
-		this.filter = filter;
+		this(xmlpath, filter, false);
 	}
 	
 	/**
@@ -54,8 +57,7 @@ public class XMLInfo
 	 */
 	public XMLInfo(QName[] xmlpathelements, IFilter filter)
 	{
-		this.xmlpathelements = xmlpathelements;
-		this.filter = filter;
+		this(xmlpathelements, filter, false);
 	}
 
 	/**
@@ -65,7 +67,7 @@ public class XMLInfo
 	 */
 	public XMLInfo(String xmlpath, IFilter filter, boolean createfromtag)
 	{
-		this.xmlpath = xmlpath;
+		setXMLPath(xmlpath);
 		this.filter = filter;
 		this.createfromtag = createfromtag;
 	}
@@ -77,7 +79,7 @@ public class XMLInfo
 	 */
 	public XMLInfo(QName[] xmlpathelements, IFilter filter, boolean createfromtag)
 	{
-		this.xmlpathelements = xmlpathelements;
+		setXMLPathElements(xmlpathelements);
 		this.filter = filter;
 		this.createfromtag = createfromtag;
 	}
@@ -86,7 +88,7 @@ public class XMLInfo
 	 *  Get the xmlpath.
 	 *  @return The xmlpath.
 	 */
-	public String getXmlPath()
+	public String getXMLPath()
 	{
 		return xmlpath;
 	}
@@ -94,29 +96,46 @@ public class XMLInfo
 	/**
 	 *  Set the xmlpath.
 	 *  @param xmlpath The xmlpath to set.
-	 * /
-	public void setXmlPath(String xmlpath)
+	 */
+	protected void setXMLPath(String xmlpath)
 	{
 		this.xmlpath = xmlpath;
-	}*/
+		
+		StringTokenizer stok = new StringTokenizer(xmlpath, "/");
+		this.xmlpathelements = new QName[stok.countTokens()];
+		for(int i=0; stok.hasMoreTokens(); i++)
+		{
+			xmlpathelements[i] = QName.valueOf(stok.nextToken());
+		}
+	}
 
 	/**
 	 *  Get the xmlpathelements.
 	 *  @return The xmlpathelements.
 	 */
-	public QName[] getXmlPathElements()
+	public QName[] getXMLPathElements()
 	{
 		return xmlpathelements;
 	}
-
+	
 	/**
 	 *  Set the xmlpathelements.
 	 *  @param xmlpathelements The xmlpathelements to set.
-	 * /
-	public void setXmlPathElements(QName[] xmlpathelements)
+	 */
+	protected void setXMLPathElements(QName[] xmlpathelements)
 	{
 		this.xmlpathelements = xmlpathelements;
-	}*/
+		
+		// Only use local part
+		StringBuffer buf = new StringBuffer();
+		for(int i=0; i<xmlpathelements.length; i++)
+		{
+			if(i>0)
+				buf.append("/");
+			buf.append(xmlpathelements[i].getLocalPart());
+		}
+		this.xmlpath = buf.toString();
+	}
 
 	/**
 	 *  Get the filter.
@@ -127,15 +146,6 @@ public class XMLInfo
 		return filter;
 	}
 
-	/**
-	 *  Set the filter.
-	 *  @param filter The filter to set.
-	 * /
-	public void setFilter(IFilter filter)
-	{
-		this.filter = filter;
-	}*/
-	
 	/**
 	 *  Get the createfromtag.
 	 *  @return The createfromtag.

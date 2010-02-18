@@ -1,6 +1,7 @@
 package jadex.xml.reader;
 
 import jadex.commons.collection.MultiCollection;
+import jadex.xml.IContext;
 import jadex.xml.StackElement;
 
 import java.util.ArrayList;
@@ -11,9 +12,9 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamReader;
 
 /**
- * 
+ *  Context for reader that stores all relevant information of the read process.
  */
-public class ReadContext
+public class ReadContext implements IContext
 {
 	//-------- attributes --------
 	
@@ -24,7 +25,7 @@ public class ReadContext
 	protected ClassLoader classloader;
 	
 	/** The root object. */
-	protected Object root;
+	protected Object rootobject;
 	
 	/** The stack. */
 	protected List stack;
@@ -70,7 +71,7 @@ public class ReadContext
 		this.parser = parser;
 		this.callcontext = callcontext;
 		this.classloader = classloader;
-		this.root = root;
+		this.rootobject = root;
 		this.stack = stack;
 //		this.topse = topse;
 		this.comment = comment;
@@ -100,21 +101,21 @@ public class ReadContext
 	}
 
 	/**
-	 *  Get the root.
-	 *  @return The root.
+	 *  Get the root object.
+	 *  @return The root object.
 	 */
-	public Object getRoot()
+	public Object getRootObject()
 	{
-		return root;
+		return rootobject;
 	}
 
 	/**
-	 *  Set the root.
-	 *  @param root The root to set.
+	 *  Set the root object.
+	 *  @param root The rootobject to set.
 	 */
-	public void setRoot(Object root)
+	public void setRootObject(Object root)
 	{
-		this.root = root;
+		this.rootobject = root;
 	}
 
 	/**
@@ -202,7 +203,7 @@ public class ReadContext
 	 *  Get the callcontext.
 	 *  @return The callcontext.
 	 */
-	public Object getCallContext()
+	public Object getUserContext()
 	{
 		return callcontext;
 	}

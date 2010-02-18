@@ -140,7 +140,7 @@ public class TimeChartDataConsumer extends AbstractChartDataConsumer
 				seriesmap.put(new Integer(j), new Integer(j));
 			}
 			dataset.addSeries(series);
-			System.out.println("Created series: "+seriesname+" "+j);
+//			System.out.println("Created series: "+seriesname+" "+j);
 		}	
 		TimeSeries ser = dataset.getSeries(seriesnum);
 		

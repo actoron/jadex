@@ -6,7 +6,7 @@ package jadex.xml;
 public class ObjectInfo
 {
 	/** Constant indicating that the type is not creatable from tag information. */
-	public static String NOT_CREATEDABLE_FROM_TAG = "not_creatable_from_tag";
+//	public static String NOT_CREATEDABLE_FROM_TAG = "not_creatable_from_tag";
 
 	/** The object type. */
 	protected Object typeinfo; // (class if not Ibeancreator)

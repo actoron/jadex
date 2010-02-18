@@ -6,7 +6,7 @@ import jadex.xml.ObjectInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
-import jadex.xml.bean.BeanAttributeInfo;
+import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
 

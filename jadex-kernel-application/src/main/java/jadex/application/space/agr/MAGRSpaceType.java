@@ -4,13 +4,15 @@ import jadex.application.model.MApplicationType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.model.MSpaceType;
 import jadex.commons.SReflect;
+import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
+import jadex.xml.IContext;
 import jadex.xml.IPostProcessor;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
-import jadex.xml.bean.BeanAttributeInfo;
+import jadex.xml.bean.BeanAccessInfo;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -117,11 +119,10 @@ public class MAGRSpaceType	extends MSpaceType
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "role")}), new ObjectInfo(MRoleType.class)));
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "agrspace")}), 
 			new ObjectInfo(MAGRSpaceInstance.class, new IPostProcessor() {
-			public Object postProcess(Object context, Object object, Object root,
-					ClassLoader classloader)
+			public Object postProcess(IContext context, Object object)
 			{
 				MSpaceInstance	si	= (MSpaceInstance)object;
-				MApplicationType	apptype	= (MApplicationType)root;
+				MApplicationType	apptype	= (MApplicationType)context.getRootObject();
 				List spacetypes = apptype.getMSpaceTypes();
 				for(int i=0; i<spacetypes.size(); i++)
 				{
@@ -139,12 +140,12 @@ public class MAGRSpaceType	extends MSpaceType
 			{
 				return 1;
 			}}),
-			new MappingInfo(null, new AttributeInfo[]{new BeanAttributeInfo("type", "typeName")})));	
+			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("type", "typeName"))})));	
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "group")}), new ObjectInfo(MGroupInstance.class),
-			new MappingInfo(null, new AttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null)));
+			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("type", "typeName"))}, null)));
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "position")}), new ObjectInfo(MPosition.class),
-			new MappingInfo(null, new AttributeInfo[]{new BeanAttributeInfo("agenttype", "agentType"), 
-			new BeanAttributeInfo("role", "roleType")}, null)));
+			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("agenttype", "agentType")), 
+			new AttributeInfo(new AccessInfo("role", "roleType"))}, null)));
 		
 //		types.add(new TypeInfo(null, new QName[]{new QName(uri, "agrspacetype")}, MAGRSpaceType.class));
 //		types.add(new TypeInfo(null, new QName[]{new QName(uri, "grouptype")}, MGroupType.class));

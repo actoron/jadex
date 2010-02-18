@@ -58,6 +58,9 @@ public class TypeInfoPathManager
 		if(typeinfos==null)
 			typeinfos = new HashMap();
 		
+		if(typeinfo.getXMLTag()==null)
+			throw new RuntimeException("XML tag must not be null: "+typeinfo);
+		
 		TreeSet tiset = (TreeSet)typeinfos.get(typeinfo.getXMLTag());
 		if(tiset==null)
 		{

@@ -1,6 +1,7 @@
 package jadex.xml.reader;
 
 
+import jadex.xml.IContext;
 import jadex.xml.TypeInfo;
 
 import java.util.List;
@@ -22,19 +23,19 @@ public interface IObjectReaderHandler extends IObjectLinker, IBulkObjectLinker
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(Object typeinfo, boolean root, Object context, Map rawattributes, ClassLoader classloader) throws Exception;
+	public Object createObject(Object typeinfo, boolean root, ReadContext context, Map rawattributes) throws Exception;
 	
 	/**
 	 *  Get the object type
 	 *  @param object The object.
 	 *  @return The object type.
 	 */
-	public Object getObjectType(Object object, Object context);
+	public Object getObjectType(Object object, ReadContext context);
 	
 	/**
 	 *  Convert a content string object to another type of object.
 	 */
-	public Object convertContentObject(Object object, QName tag, Object context, ClassLoader classloader);
+	public Object convertContentObject(String object, QName tag, ReadContext context);
 	
 	/**
 	 *  Handle the attribute of an object.
@@ -45,7 +46,7 @@ public interface IObjectReaderHandler extends IObjectLinker, IBulkObjectLinker
 	 *  @param context The context.
 	 */
 	public void handleAttributeValue(Object object, QName xmlattrname, List attrpath, String attrval, 
-		Object attrinfo, Object context, ClassLoader classloader, Object root, Map readobjects) throws Exception;
+		Object attrinfo, ReadContext context) throws Exception;
 	
 	/**
 	 *  Link an object to its parent.
@@ -83,5 +84,5 @@ public interface IObjectReaderHandler extends IObjectLinker, IBulkObjectLinker
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public TypeInfo getTypeInfo(Object type, QName[] fullpath, Object context);
+	public TypeInfo getTypeInfo(Object type, QName[] fullpath, ReadContext context);
 }

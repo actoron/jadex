@@ -22,14 +22,16 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
+import jadex.xml.IContext;
 import jadex.xml.IPostProcessor;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
-import jadex.xml.bean.BeanAttributeInfo;
+import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
 
@@ -119,76 +121,77 @@ public class BpmnXMLReader
 		String xmiuri = "http://www.omg.org/XMI";
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "BpmnDiagram")}), new ObjectInfo(MBpmnModel.class, new BpmnModelPostProcessor()), 
-			new MappingInfo(null, new BeanAttributeInfo[]{
-			new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE),
-			new BeanAttributeInfo(new QName("http://www.omg.org/XMI", "version"), null, AttributeInfo.IGNORE_READWRITE),
-			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), AccessInfo.IGNORE_READWRITE)),
+			new AttributeInfo(new AccessInfo(new QName("http://www.omg.org/XMI", "version"), null, AccessInfo.IGNORE_READWRITE)),
+			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("pools", "pool")),
-			new SubobjectInfo(new BeanAttributeInfo("artifacts", "artifact")),
-			new SubobjectInfo(new BeanAttributeInfo("messages", "messagingEdge")),
-			new SubobjectInfo(new BeanAttributeInfo("eAnnotations", "annotation"))
+			new SubobjectInfo(new AccessInfo("pools", "pool")),
+			new SubobjectInfo(new AccessInfo("artifacts", "artifact")),
+			new SubobjectInfo(new AccessInfo("messages", "messagingEdge")),
+			new SubobjectInfo(new AccessInfo("eAnnotations", "annotation"))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo("eAnnotations"), new ObjectInfo(MAnnotation.class), 
-			new MappingInfo(null, new BeanAttributeInfo[]{
+			new MappingInfo(null, new BeanAccessInfo[]{
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("details", "detail")),
+			new SubobjectInfo(new AccessInfo("details", "detail")),
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo("details"), new ObjectInfo(MAnnotationDetail.class)));
 		
 		types.add(new TypeInfo(new XMLInfo("pools"), new ObjectInfo(MPool.class, new PoolPostProcessor()),
-			new MappingInfo(null, new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", "description"),
-			new BeanAttributeInfo("associations", "associationsDescription"),
-			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("name", "description")),
+			new AttributeInfo(new AccessInfo("associations", "associationsDescription")),
+			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE))
 			}, 
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("vertices", "activity")),
-			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge")),
-			new SubobjectInfo(new BeanAttributeInfo("lanes", "lane")),
-			new SubobjectInfo(new BeanAttributeInfo("eAnnotations", "annotation"))
+			new SubobjectInfo(new AccessInfo("vertices", "activity")),
+			new SubobjectInfo(new AccessInfo("sequenceEdges", "sequenceEdge")),
+			new SubobjectInfo(new AccessInfo("lanes", "lane")),
+			new SubobjectInfo(new AccessInfo("eAnnotations", "annotation"))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo("artifacts"), new ObjectInfo(MArtifact.class),
-			new MappingInfo(null, new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", "description"),
-			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("name", "description")),
+			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("associations", "association")),
-			new SubobjectInfo(new BeanAttributeInfo("eAnnotations", "annotation"))
+			new SubobjectInfo(new AccessInfo("associations", "association")),
+			new SubobjectInfo(new AccessInfo("eAnnotations", "annotation"))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo("associations"), new ObjectInfo(MAssociation.class, new AssociationPostProcessor()), 
-			new MappingInfo(null, new BeanAttributeInfo[]{
-			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("eAnnotations", "annotation"))
+			new SubobjectInfo(new XMLInfo("eAnnotations"), new AccessInfo("eAnnotations", "annotation"))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo("lanes"), new ObjectInfo(MLane.class, new LanePostProcessor()),
-			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("name", "description"), 
-			new BeanAttributeInfo("activities", "activitiesDescription"),
-			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("name", "description")), 
+			new AttributeInfo(new AccessInfo("activities", "activitiesDescription")),
+			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("eAnnotations", "annotation"))
+			new SubobjectInfo(new XMLInfo("eAnnotations"), new AccessInfo("eAnnotations", "annotation"))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo("eventHandlers"), new ObjectInfo(MActivity.class, new EventHandlerPostProcessor()),
-			new MappingInfo(null, new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", "description"),
-			new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription"),
-			new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription"),
-			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE),
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("name", "description")),
+			new AttributeInfo(new AccessInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
+			new AttributeInfo(new AccessInfo("incomingEdges", "incomingSequenceEdgesDescription")),
+			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE)),
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("eAnnotations", "annotation"))
+			new SubobjectInfo(new XMLInfo("eAnnotations"), new AccessInfo("eAnnotations", "annotation"))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo("vertices", 
@@ -201,19 +204,19 @@ public class BpmnXMLReader
 				}
 			}), 
 			new ObjectInfo(MActivity.class, new ActivityPostProcessor()),
-			new MappingInfo(null, new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", "description"),
-			new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription"),
-			new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription"),
-			new BeanAttributeInfo("lanes", "laneDescription"),
-			new BeanAttributeInfo("associations", "associationsDescription"),
-			new BeanAttributeInfo("activityType", "activityType", null, null, null, null, MBpmnModel.TASK),
-			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("name", "description")),
+			new AttributeInfo(new AccessInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
+			new AttributeInfo(new AccessInfo("incomingEdges", "incomingSequenceEdgesDescription")),
+			new AttributeInfo(new AccessInfo("lanes", "laneDescription")),
+			new AttributeInfo(new AccessInfo("associations", "associationsDescription")),
+			new AttributeInfo(new AccessInfo("activityType", "activityType", null, MBpmnModel.TASK)),
+			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("incomingMessages", "incomingMessageDescription")),
-			new SubobjectInfo(new BeanAttributeInfo("outgoingMessages", "outgoingMessageDescription")),
-			new SubobjectInfo(new BeanAttributeInfo("eAnnotations", "annotation"))
+			new SubobjectInfo(new AccessInfo("incomingMessages", "incomingMessageDescription")),
+			new SubobjectInfo(new AccessInfo("outgoingMessages", "outgoingMessageDescription")),
+			new SubobjectInfo(new AccessInfo("eAnnotations", "annotation"))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo("vertices", 
@@ -226,71 +229,72 @@ public class BpmnXMLReader
 				}
 			}),
 			new ObjectInfo(MSubProcess.class, new ActivityPostProcessor()),
-			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("name", "description"),
-			new BeanAttributeInfo("outgoingEdges", "outgoingSequenceEdgesDescription"),
-			new BeanAttributeInfo("incomingEdges", "incomingSequenceEdgesDescription"),
-			new BeanAttributeInfo("lanes", "laneDescription"),
-			new BeanAttributeInfo("associations", "associationsDescription"),
-			new BeanAttributeInfo("activityType", "activityType", null, null, null, null, MBpmnModel.SUBPROCESS),
-			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)	
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("name", "description")),
+			new AttributeInfo(new AccessInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
+			new AttributeInfo(new AccessInfo("incomingEdges", "incomingSequenceEdgesDescription")),
+			new AttributeInfo(new AccessInfo("lanes", "laneDescription")),
+			new AttributeInfo(new AccessInfo("associations", "associationsDescription")),
+			new AttributeInfo(new AccessInfo("activityType", "activityType", null, MBpmnModel.SUBPROCESS)),
+			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE))	
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("incomingMessages", "incomingMessageDescription")),
-			new SubobjectInfo(new BeanAttributeInfo("outgoingMessages", "outgoingMessageDescription")),
-			new SubobjectInfo(new BeanAttributeInfo("eventHandlers", "eventHandler")),
-			new SubobjectInfo(new BeanAttributeInfo("vertices", "Activity")),
-			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge")),
-			new SubobjectInfo(new BeanAttributeInfo("eAnnotations", "annotation"))
+			new SubobjectInfo(new AccessInfo("incomingMessages", "incomingMessageDescription")),
+			new SubobjectInfo(new AccessInfo("outgoingMessages", "outgoingMessageDescription")),
+			new SubobjectInfo(new AccessInfo("eventHandlers", "eventHandler")),
+			new SubobjectInfo(new AccessInfo("vertices", "Activity")),
+			new SubobjectInfo(new AccessInfo("sequenceEdges", "sequenceEdge")),
+			new SubobjectInfo(new AccessInfo("eAnnotations", "annotation"))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo("sequenceEdges"), new ObjectInfo(MSequenceEdge.class, new SequenceEdgePostProcessor()),
-			new MappingInfo(null, new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", "description"), 
-			new BeanAttributeInfo("associations", "associationsDescription"),
-			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE)
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("name", "description")), 
+			new AttributeInfo(new AccessInfo("associations", "associationsDescription")),
+			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("eAnnotations", "annotation"))
+			new SubobjectInfo(new XMLInfo("eAnnotations"), new AccessInfo("eAnnotations", "annotation"))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo("messagingEdges"), new ObjectInfo(MMessagingEdge.class),
-			new MappingInfo(null, new BeanAttributeInfo[]{
-			new BeanAttributeInfo("name", "description"), 
-			new BeanAttributeInfo("associations", "associationsDescription"),
-			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE),
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("name", "description")), 
+			new AttributeInfo(new AccessInfo("associations", "associationsDescription")),
+			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE)),
 			}, 
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("eAnnotations", "annotation"))
+			new SubobjectInfo(new AccessInfo("eAnnotations", "annotation"))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo("incomingMessages"), new ObjectInfo(HashMap.class), 
-			new MappingInfo(null, new BeanAttributeInfo[]{
-			new BeanAttributeInfo(new QName(xmiuri, "type"), null, null, null, null, ""),
-			new BeanAttributeInfo("href", null, null, null, null, ""),
-			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE),
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo(new QName(xmiuri, "type"), null, null, null, new BeanAccessInfo(""))),
+			new AttributeInfo(new AccessInfo("href", null, null, null, new BeanAccessInfo(""))),
+			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE)),
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("eAnnotations", "annotation"))
+			new SubobjectInfo(new AccessInfo("eAnnotations", "annotation"))
 			})));
 
 		types.add(new TypeInfo(new XMLInfo("outgoingMessages"), new ObjectInfo(HashMap.class), 
-			new MappingInfo(null, new BeanAttributeInfo[]{
-			new BeanAttributeInfo(new QName(xmiuri, "type"), null, null, null, null, ""),
-			new BeanAttributeInfo("href", null, null, null, null, ""),
-			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE),
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo(new QName(xmiuri, "type"), null, null, null, new BeanAccessInfo(""))),
+			new AttributeInfo(new AccessInfo("href", null, null, null, new BeanAccessInfo(""))),
+			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE)),
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("eAnnotations", "annotation"))
+			new SubobjectInfo(new AccessInfo("eAnnotations", "annotation"))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo("messages"), new ObjectInfo(MMessagingEdge.class), 
-			new MappingInfo(null, new BeanAttributeInfo[]{
-			new BeanAttributeInfo("source", "sourceDescription"),
-			new BeanAttributeInfo("target", "targetDescription"),
-			new BeanAttributeInfo("iD", null, AttributeInfo.IGNORE_READWRITE),
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("source", "sourceDescription")),
+			new AttributeInfo(new AccessInfo("target", "targetDescription")),
+			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE)),
 			}, 
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("eAnnotations", "annotation"))
+			new SubobjectInfo(new AccessInfo("eAnnotations", "annotation"))
 			})));
 		
 		return types;
@@ -336,9 +340,9 @@ public class BpmnXMLReader
 		/**
 		 *  Establish element connections.
 		 */
-		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		public Object postProcess(IContext context, Object object)
 		{
-			MBpmnModel dia = (MBpmnModel)root;
+			MBpmnModel dia = (MBpmnModel)context.getRootObject();
 			MActivity act = (MActivity)object;
 			
 //			System.out.println("Act: "+act.getName()+" "+act.getDescription());
@@ -426,7 +430,7 @@ public class BpmnXMLReader
 						StringTokenizer stok2 = new StringTokenizer(prop, " \t=");
 						String paramdir = stok2.nextToken();
 						String paramclazzname = stok2.nextToken();
-						Class paramclazz = SReflect.findClass0(paramclazzname, dia.getAllImports(), classloader);
+						Class paramclazz = SReflect.findClass0(paramclazzname, dia.getAllImports(), context.getClassLoader());
 						if(paramclazz==null)
 							throw new RuntimeException("Parameter class not found in imports: "+dia+", "+act+", "+paramclazzname+", "+SUtil.arrayToString(dia.getAllImports()));
 						String paramname = stok2.nextToken();
@@ -434,7 +438,7 @@ public class BpmnXMLReader
 						if(stok2.hasMoreTokens())
 						{
 							String proptext = prop.substring(idx+1).trim();
-							paramexp = parser.parseExpression(proptext, dia.getAllImports(), null, classloader);
+							paramexp = parser.parseExpression(proptext, dia.getAllImports(), null, context.getClassLoader());
 						}
 						MParameter param = new MParameter(paramdir, paramclazz, paramname, paramexp);
 						act.addParameter(param);
@@ -444,7 +448,7 @@ public class BpmnXMLReader
 						// property
 						String propname = prop.substring(0, idx).trim();
 						String proptext = prop.substring(idx+1).trim();
-						IParsedExpression propval = parser.parseExpression(proptext, dia.getAllImports(), null, classloader);
+						IParsedExpression propval = parser.parseExpression(proptext, dia.getAllImports(), null, context.getClassLoader());
 						act.setPropertyValue(propname, propval);
 					}
 					else
@@ -493,13 +497,13 @@ public class BpmnXMLReader
 										String val = stok2.hasMoreTokens()? stok2.nextToken(): null;
 										
 										// context variable
-										Class clazz = SReflect.findClass0(clazzname, dia.getAllImports(), classloader);
+										Class clazz = SReflect.findClass0(clazzname, dia.getAllImports(), context.getClassLoader());
 										if(clazz!=null)
 										{
 											IParsedExpression exp = null;
 											if(val!=null)
 											{
-												exp = parser.parseExpression(val, dia.getAllImports(), null, classloader);
+												exp = parser.parseExpression(val, dia.getAllImports(), null, context.getClassLoader());
 											}
 											MParameter param = new MParameter(dir, clazz, name, exp);
 											act.addParameter(param);
@@ -517,7 +521,7 @@ public class BpmnXMLReader
 										IParsedExpression exp = null;
 										if(val!=null)
 										{
-											exp = parser.parseExpression(val, dia.getAllImports(), null, classloader);
+											exp = parser.parseExpression(val, dia.getAllImports(), null, context.getClassLoader());
 										}
 										act.setPropertyValue(name, exp);
 //										System.out.println("Parameter/property: "+name+" "+exp);
@@ -535,7 +539,7 @@ public class BpmnXMLReader
 								{
 									try
 									{
-										IParsedExpression propval = parser.parseExpression(value, dia.getAllImports(), null, classloader);
+										IParsedExpression propval = parser.parseExpression(value, dia.getAllImports(), null, context.getClassLoader());
 										act.setPropertyValue(key, propval);
 	//									System.out.println("Property: "+key+" "+value);
 									}
@@ -574,9 +578,9 @@ public class BpmnXMLReader
 		/**
 		 *  Establish element connections.
 		 */
-		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		public Object postProcess(IContext context, Object object)
 		{
-			Object ret = super.postProcess(context, object, root, classloader);
+			Object ret = super.postProcess(context, object);
 			if(ret==null)
 			{
 				((MActivity)object).setEventHandler(true);
@@ -599,9 +603,9 @@ public class BpmnXMLReader
 		/**
 		 *  Establish element connections.
 		 */
-		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		public Object postProcess(IContext context, Object object)
 		{
-			super.postProcess(context, object, root, classloader);
+			super.postProcess(context, object);
 			
 			// Set pool of activities.
 			MPool pool = (MPool) object;
@@ -610,7 +614,10 @@ public class BpmnXMLReader
 			return null;
 		}
 		
-		private void setSubActivities(MAssociationTarget parent, MPool pool)
+		/**
+		 *  Associate also subactivities with outer pool.
+		 */
+		protected void setSubActivities(MAssociationTarget parent, MPool pool)
 		{
 			List activities = parent instanceof MSubProcess? ((MSubProcess)parent).getActivities(): ((MPool)parent).getActivities();
 			if (activities != null)
@@ -637,16 +644,16 @@ public class BpmnXMLReader
 		/**
 		 *  Establish element connections.
 		 */
-		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		public Object postProcess(IContext context, Object object)
 		{
-			super.postProcess(context, object, root, classloader);
+			super.postProcess(context, object);
 			
 			// Resolve activities
 			MLane	lane	= (MLane)object;
 			String	actdesc	= lane.getActivitiesDescription();
 			if(actdesc!=null)
 			{
-				MBpmnModel dia = (MBpmnModel)root;
+				MBpmnModel dia = (MBpmnModel)context.getRootObject();
 				Map	activities	= dia.getAllActivities();
 				
 				StringTokenizer stok = new StringTokenizer(actdesc);
@@ -673,9 +680,9 @@ public class BpmnXMLReader
 		/**
 		 *  Set source and target of association.
 		 */
-		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		public Object postProcess(IContext context, Object object)
 		{
-			MBpmnModel dia = (MBpmnModel)root;
+			MBpmnModel dia = (MBpmnModel)context.getRootObject();
 			MAssociation asso = (MAssociation)object;
 			
 			MArtifact source = (MArtifact)dia.getAllAssociationSources().get(asso.getId());
@@ -715,9 +722,9 @@ public class BpmnXMLReader
 		/**
 		 *  Establish element connections.
 		 */
-		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		public Object postProcess(IContext context, Object object)
 		{
-			MBpmnModel dia = (MBpmnModel)root;
+			MBpmnModel dia = (MBpmnModel)context.getRootObject();
 			MSequenceEdge edge = (MSequenceEdge)object;
 			JavaCCExpressionParser parser = new JavaCCExpressionParser();
 
@@ -752,14 +759,14 @@ public class BpmnXMLReader
 									String propname = stok2.nextToken();
 									String proptext = stok2.nextToken();
 									
-									IParsedExpression exp = parser.parseExpression(proptext, dia.getAllImports(), null, classloader);
+									IParsedExpression exp = parser.parseExpression(proptext, dia.getAllImports(), null, context.getClassLoader());
 									IParsedExpression iexp	= null;
 
 									if(propname.endsWith("]") && propname.indexOf("[")!=-1)
 									{
 										String	itext	= propname.substring(propname.indexOf("[")+1, propname.length()-1);
 										propname	= propname.substring(0, propname.indexOf("["));
-										iexp	= parser.parseExpression(itext, dia.getAllImports(), null, classloader);
+										iexp	= parser.parseExpression(itext, dia.getAllImports(), null, context.getClassLoader());
 									}
 
 									edge.addParameterMapping(propname, exp, iexp);
@@ -769,7 +776,7 @@ public class BpmnXMLReader
 							}
 							else if("condition".equals(key) && value!=null && value.length()>0)
 							{
-								IParsedExpression cond = parser.parseExpression(value, dia.getAllImports(), null, classloader);
+								IParsedExpression cond = parser.parseExpression(value, dia.getAllImports(), null, context.getClassLoader());
 								edge.setCondition(cond);
 								
 //								System.out.println("Condition: "+key+" "+value);
@@ -801,14 +808,14 @@ public class BpmnXMLReader
 					{
 						String	propname = prop.substring(0, idx).trim();
 						String	proptext = prop.substring(idx+1).trim();
-						IParsedExpression exp = parser.parseExpression(proptext, dia.getAllImports(), null, classloader);
+						IParsedExpression exp = parser.parseExpression(proptext, dia.getAllImports(), null, context.getClassLoader());
 						IParsedExpression iexp	= null;
 
 						if(propname.endsWith("]") && propname.indexOf("[")!=-1)
 						{
 							String	itext	= propname.substring(propname.indexOf("[")+1, propname.length()-1);
 							propname	= propname.substring(0, propname.indexOf("["));
-							iexp	= parser.parseExpression(itext, dia.getAllImports(), null, classloader);
+							iexp	= parser.parseExpression(itext, dia.getAllImports(), null, context.getClassLoader());
 						}
 
 						edge.addParameterMapping(propname, exp, iexp);
@@ -826,12 +833,14 @@ public class BpmnXMLReader
 				if(lineone!=null && linetwo!=null)
 				{
 					edge.setName(lineone);
-					IParsedExpression cond = parser.parseExpression(linetwo, dia.getAllImports(), null, classloader);
+					IParsedExpression cond = parser.parseExpression(linetwo, 
+						dia.getAllImports(), null, context.getClassLoader());
 					edge.setCondition(cond);
 				}
 				else if(lineone!=null)
 				{
-					IParsedExpression cond = parser.parseExpression(lineone, dia.getAllImports(), null, classloader);
+					IParsedExpression cond = parser.parseExpression(lineone, 
+						dia.getAllImports(), null, context.getClassLoader());
 					edge.setCondition(cond);
 				}
 			}
@@ -860,9 +869,9 @@ public class BpmnXMLReader
 		/**
 		 *  Establish element connections.
 		 */
-		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		public Object postProcess(IContext context, Object object)
 		{
-			MBpmnModel dia = (MBpmnModel)root;
+			MBpmnModel dia = (MBpmnModel)context.getRootObject();
 			MNamedIdElement namedelem = (MNamedIdElement)object;
 			JavaCCExpressionParser parser = new JavaCCExpressionParser();
 
@@ -880,7 +889,8 @@ public class BpmnXMLReader
 					{
 						String propname = prop.substring(0, idx).trim();
 						String proptext = prop.substring(idx+1).trim();
-						Object propval = parser.parseExpression(proptext, dia.getAllImports(), null, classloader).getValue(null);
+						Object propval = parser.parseExpression(proptext, dia.getAllImports(), 
+							null, context.getClassLoader()).getValue(null);
 						namedelem.setPropertyValue(propname, propval);
 					}
 					else
@@ -914,9 +924,9 @@ public class BpmnXMLReader
 		/**
 		 *  Establish element connections.
 		 */
-		public Object postProcess(Object context, Object object, Object root, ClassLoader classloader)
+		public Object postProcess(IContext context, Object object)
 		{
-			MBpmnModel model = (MBpmnModel)root;
+			MBpmnModel model = (MBpmnModel)context.getRootObject();
 			JavaCCExpressionParser parser = new JavaCCExpressionParser();
 
 			// Read information from artifact text (normal stp modeller)
@@ -951,7 +961,8 @@ public class BpmnXMLReader
 						String argstr = prop.substring(prop.indexOf("argument")+8).trim();
 						
 						String[] imps = (String[])imports.toArray(new String[imports.size()]);
-						IArgument arg = (IArgument)parser.parseExpression(argstr, imps, null, classloader).getValue(null);
+						IArgument arg = (IArgument)parser.parseExpression(argstr, imps, null, 
+							context.getClassLoader()).getValue(null);
 						
 						model.addArgument(arg);
 					}
@@ -960,7 +971,8 @@ public class BpmnXMLReader
 						String resstr = prop.substring(prop.indexOf("result")+6).trim();
 						
 						String[] imps = (String[])imports.toArray(new String[imports.size()]);
-						IArgument res = (IArgument)parser.parseExpression(resstr, imps, null, classloader).getValue(null);
+						IArgument res = (IArgument)parser.parseExpression(resstr, imps, null, 
+							context.getClassLoader()).getValue(null);
 						
 						model.addResult(res);
 					}
@@ -980,14 +992,14 @@ public class BpmnXMLReader
 						{
 							String clazzname = stok2.nextToken();
 							String[]	imps	= (String[])imports.toArray(new String[imports.size()]);
-							Class clazz = SReflect.findClass0(clazzname, imps, classloader);
+							Class clazz = SReflect.findClass0(clazzname, imps, context.getClassLoader());
 							if(clazz!=null)
 							{
 								String name = stok2.nextToken();
 								IParsedExpression exp = null;
 								if(init!=null)
 								{
-									exp = parser.parseExpression(init, imps, null, classloader);
+									exp = parser.parseExpression(init, imps, null, context.getClassLoader());
 								}
 								
 								model.addContextVariable(name, clazz, exp);
@@ -1015,10 +1027,10 @@ public class BpmnXMLReader
 						{
 							MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
 							
-							String key = detail.getKey();
+							String key = detail.getKey().toLowerCase();
 							String value = detail.getValue();
 							
-							if("Description".equals(key))
+							if("description".equals(key))
 							{
 								model.setDescription(value);
 							}
@@ -1051,13 +1063,13 @@ public class BpmnXMLReader
 									String val = stok2.nextToken();
 									
 									// context variable
-									Class clazz = SReflect.findClass0(clazzname, model.getAllImports(), classloader);
+									Class clazz = SReflect.findClass0(clazzname, model.getAllImports(), context.getClassLoader());
 									if(clazz!=null)
 									{
 										IParsedExpression exp = null;
 										if(val!=null)
 										{
-											exp = parser.parseExpression(val, model.getAllImports(), null, classloader);
+											exp = parser.parseExpression(val, model.getAllImports(), null, context.getClassLoader());
 										}
 										model.addContextVariable(name, clazz, exp);
 //										System.out.println("Context variable: "+name);
@@ -1078,7 +1090,7 @@ public class BpmnXMLReader
 									
 									Object val = null;
 									if(valtext!=null)
-										val = parser.parseExpression(valtext, model.getAllImports(), null, classloader).getValue(null);
+										val = parser.parseExpression(valtext, model.getAllImports(), null, context.getClassLoader()).getValue(null);
 									IArgument arg = new Argument(name, desc, typename, val);
 									
 									model.addArgument(arg);
@@ -1099,12 +1111,16 @@ public class BpmnXMLReader
 									
 									Object val = null;
 									if(valtext!=null)
-										val = parser.parseExpression(valtext, model.getAllImports(), null, classloader).getValue(null);
+										val = parser.parseExpression(valtext, model.getAllImports(), null, context.getClassLoader()).getValue(null);
 									IArgument res = new Argument(name, desc, typename, val);
 									
 									model.addResult(res);
 //									System.out.println("Argument: "+arg);
 								}
+							}
+							else
+							{
+								System.out.println("Unknown: "+key+" "+value);
 							}
 						}
 					}

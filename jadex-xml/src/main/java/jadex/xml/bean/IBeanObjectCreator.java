@@ -1,5 +1,7 @@
 package jadex.xml.bean;
 
+import jadex.xml.IContext;
+
 import java.util.Map;
 
 /**
@@ -14,5 +16,5 @@ public interface IBeanObjectCreator
 	 *  @param rawattributes The raw attributes.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(Object context, Map rawattributes, ClassLoader classloader) throws Exception;
+	public Object createObject(IContext context, Map rawattributes) throws Exception;
 }

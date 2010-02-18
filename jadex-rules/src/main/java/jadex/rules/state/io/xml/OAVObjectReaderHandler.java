@@ -5,17 +5,20 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
+import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.BasicTypeConverter;
-import jadex.xml.ITypeConverter;
+import jadex.xml.IStringObjectConverter;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
+import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
 import jadex.xml.TypeInfoTypeManager;
 import jadex.xml.bean.IBeanObjectCreator;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.LinkData;
+import jadex.xml.reader.ReadContext;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -75,7 +78,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param fullpath The full path.
 	 *  @return The most specific mapping info.
 	 */
-	public TypeInfo getTypeInfo(Object object, QName[] fullpath, Object context)
+	public TypeInfo getTypeInfo(Object object, QName[] fullpath, ReadContext context)
 	{
 		Object type = getObjectType(object, context);
 		if(no_typeinfos!=null && no_typeinfos.contains(type))
@@ -156,10 +159,10 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 *  @return The created object (or null for none).
 	 */
-	public Object createObject(Object type, boolean root, Object context, Map rawattributes, ClassLoader classloader) throws Exception
+	public Object createObject(Object type, boolean root, ReadContext context, Map rawattributes) throws Exception
 	{
 		Object ret = null;
-		IOAVState state = (IOAVState)context;
+		IOAVState state = (IOAVState)context.getUserContext();
 		
 		if(type instanceof TypeInfo)
 			type =  ((TypeInfo)type).getTypeInfo();
@@ -179,7 +182,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		}
 		else if(type instanceof IBeanObjectCreator)
 		{
-			ret = ((IBeanObjectCreator)type).createObject(context, rawattributes, classloader);
+			ret = ((IBeanObjectCreator)type).createObject(context, rawattributes);
 		}
 		else if(type instanceof QName)
 		{
@@ -200,7 +203,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param object The object.
 	 *  @return The object type.
 	 */
-	public Object getObjectType(Object object, Object context)
+	public Object getObjectType(Object object, ReadContext context)
 	{
 		return ((IOAVState)context).getType(object);
 	}
@@ -208,18 +211,18 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	/**
 	 *  Convert an object to another type of object.
 	 */
-	public Object convertContentObject(Object object, QName tag, Object context, ClassLoader classloader)
+	public Object convertContentObject(String object, QName tag, ReadContext context)
 	{
 		Object ret = object;
 		if(tag.getNamespaceURI().startsWith(SXML.PROTOCOL_TYPEINFO))
 		{
 			String clazzname = tag.getNamespaceURI().substring(8)+"."+tag.getLocalPart();
-			Class clazz = SReflect.classForName0(clazzname, classloader);
+			Class clazz = SReflect.classForName0(clazzname, context.getClassLoader());
 			if(clazz!=null)
 			{
 				if(!BasicTypeConverter.isBuiltInType(clazz))
 					throw new RuntimeException("No converter known for: "+clazz);
-				ret = BasicTypeConverter.getBasicConverter(clazz).convertObject(object, null, classloader, context);
+				ret = BasicTypeConverter.getBasicStringConverter(clazz).convertString(object, context);
 			}
 		}
 		
@@ -247,15 +250,15 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param context The context.
 	 */
 	public void handleAttributeValue(Object object, QName xmlattrname, List attrpath, String attrval, 
-		Object attrinfo, Object context, ClassLoader classloader, Object root, Map readobjects) throws Exception
+		Object attrinfo, ReadContext context) throws Exception
 	{
 		// todo: implement idref!
 		
 		// If attrval==null only set if default value available.
-		if(attrval==null && !(attrinfo instanceof AttributeInfo && ((AttributeInfo)attrinfo).getDefaultValue()!=null))
+		if(attrval==null && !(attrinfo instanceof AttributeInfo && ((AttributeInfo)attrinfo).getAccessInfo().getDefaultValue()!=null))
 			return;
 		
-		IOAVState state = (IOAVState)context;
+		IOAVState state = (IOAVState)context.getUserContext();
 
 		OAVAttributeType attrtype = null;
 		Object val = attrval;
@@ -264,14 +267,14 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		{
 			AttributeInfo info = (AttributeInfo)attrinfo;
 			attrtype = (OAVAttributeType)info.getAttributeIdentifier();
-			if(val==null && ((AttributeInfo)attrinfo).getDefaultValue()!=null)
-				val = ((AttributeInfo)attrinfo).getDefaultValue();
+			if(val==null && ((AttributeInfo)attrinfo).getAccessInfo().getDefaultValue()!=null)
+				val = ((AttributeInfo)attrinfo).getAccessInfo().getDefaultValue();
 			
 			if(info instanceof AttributeInfo)
 			{
-				ITypeConverter conv = ((AttributeInfo)info).getConverterRead();
+				IStringObjectConverter conv = ((AttributeInfo)info).getConverter();
 				if(conv!=null)
-					val = conv.convertObject(attrval, root, classloader, null);
+					val = conv.convertString(attrval, null);
 			}
 		}
 		else if(attrinfo instanceof OAVAttributeType)
@@ -320,8 +323,8 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		{
 			Object arg = val instanceof String && attrtype.getType() instanceof OAVJavaType 
 				&& BasicTypeConverter.isBuiltInType(((OAVJavaType)attrtype.getType()).getClazz())?
-				BasicTypeConverter.getBasicConverter((((OAVJavaType)attrtype.getType()).getClazz())).convertObject(attrval, root, classloader, null):
-					val;
+				BasicTypeConverter.getBasicStringConverter((((OAVJavaType)attrtype.getType()).getClazz()))
+					.convertString(attrval, null): val;
 	
 			setAttributeValue(state, object, attrtype, arg);		
 		}
@@ -339,9 +342,9 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param tagname The current tagname (for name guessing).
 	 *  @param context The context.
 	 */
-	public void linkObject(Object elem, Object parent, Object linkinfo, QName[] pathname, Object context, ClassLoader classloader, Object root) throws Exception
+	public void linkObject(Object elem, Object parent, Object linkinfo, QName[] pathname, ReadContext context) throws Exception
 	{
-		IOAVState state = (IOAVState)context;
+		IOAVState state = (IOAVState)context.getUserContext();
 	
 //		int idx = pathname.lastIndexOf("/");
 //		String tagname = idx!=-1? pathname.substring(idx+1): pathname;
@@ -355,13 +358,15 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 		
 		OAVAttributeType attrtype = null;
 
-		if(linkinfo instanceof AttributeInfo)
+		if(linkinfo instanceof SubobjectInfo)
 		{
-			AttributeInfo info = (AttributeInfo)linkinfo;
-			attrtype = (OAVAttributeType)info.getAttributeIdentifier();
-			ITypeConverter conv = info.getConverterRead();
-			if(conv!=null)
-				elem = conv.convertObject(elem, root, classloader, null);
+			SubobjectInfo info = (SubobjectInfo)linkinfo;
+			attrtype = (OAVAttributeType)info.getLinkInfo().getObjectIdentifier();
+			
+			// todo:?
+//			IStringObjectConverter conv = info.getConverter();
+//			if(conv!=null)
+//				elem = conv.convertString(elem, null);
 		}
 		else if(linkinfo instanceof OAVAttributeType)
 		{
@@ -395,10 +400,9 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  @param children The children objects (link datas).
 	 *  @param context The context.
 	 *  @param classloader The classloader.
-	 *  @param root The root object.
+	 *  @param rootobject The root object.
 	 */
-	public void bulkLinkObjects(Object parent, List children, Object context, 
-		ClassLoader classloader, Object root) throws Exception
+	public void bulkLinkObjects(Object parent, List children, ReadContext context) throws Exception
 	{
 //		System.out.println("bulk link for: "+parent+" "+children);
 		for(int i=0; i<children.size(); i++)
@@ -406,7 +410,7 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 			LinkData linkdata = (LinkData)children.get(i);
 			
 			linkObject(linkdata.getChild(), parent, linkdata.getLinkinfo(), 
-				linkdata.getPathname(), context, classloader, root);
+				linkdata.getPathname(), context);
 		}
 	}
 	

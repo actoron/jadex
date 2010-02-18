@@ -90,7 +90,10 @@ public class Writer
 		
 		writer.writeStartDocument();//"utf-8", "1.0");
 		writer.writeCharacters(lf);
-		writeObject(writer, object, writtenobs, null, stack, context, classloader);
+		
+		WriteContext wc = new WriteContext(writer, context, object, classloader);
+		writeObject(wc, object, null);
+//		writeObject(writer, object, writtenobs, null, stack, context, classloader);
 		writer.writeEndDocument();
 		writer.close();
 	}
@@ -98,9 +101,11 @@ public class Writer
 	/**
 	 *  Write an object to xml.
 	 */
-	public void writeObject(XMLStreamWriter writer, Object object, Map writtenobs, QName tag, 
-		List stack, Object context, ClassLoader classloader) throws Exception
+	public void writeObject(WriteContext wc, Object object, QName tag) throws Exception
 	{
+		XMLStreamWriter writer = wc.getWriter();
+		List stack = wc.getStack();
+		
 		// Special case null
 		if(object==null)
 		{
@@ -111,7 +116,7 @@ public class Writer
 		
 //		if(tagname!=null)
 //			System.out.println("tagname: "+tagname);
-		TypeInfo typeinfo = handler.getTypeInfo(object, getXMLPath(stack), context); 
+		TypeInfo typeinfo = handler.getTypeInfo(object, getXMLPath(stack), wc); 
 		if(typeinfo!=null)
 		{
 			tag = typeinfo.getXMLTag();
@@ -119,7 +124,7 @@ public class Writer
 		
 		if(tag==null)
 		{
-			tag = handler.getTagName(object, context);
+			tag = handler.getTagName(object, wc);
 		}
 		
 		// Create tag with prefix if it has a namespace but no prefix.
@@ -128,16 +133,16 @@ public class Writer
 			tag = handler.getTagWithPrefix(tag);
 		}
 		
-		if(genids && writtenobs.containsKey(object))
+		if(genids && wc.getWrittenObjects().containsKey(object))
 		{
 			writeStartObject(writer, tag, stack.size());
-			writer.writeAttribute(SXML.IDREF, (String)writtenobs.get(object));
+			writer.writeAttribute(SXML.IDREF, (String)wc.getWrittenObjects().get(object));
 			writeEndObject(writer, 0);
 		}
 		else
 		{
 			// Check for cycle structures, which are not mappable without ids.
-			if(writtenobs.containsKey(object))
+			if(wc.getWrittenObjects().containsKey(object))
 			{
 				boolean rec = false;
 				for(int i=0; i<stack.size() && !rec; i++)
@@ -147,7 +152,7 @@ public class Writer
 				}
 			}
 			
-			WriteObjectInfo wi = handler.getObjectWriteInfo(object, typeinfo, context, classloader);
+			WriteObjectInfo wi = handler.getObjectWriteInfo(object, typeinfo, wc);
 
 			// Comment
 			
@@ -163,7 +168,7 @@ public class Writer
 			
 			StackElement topse = new StackElement(tag, object);
 			stack.add(topse);
-			writtenobs.put(object, ""+id);
+			wc.getWrittenObjects().put(object, ""+id);
 			if(genids)
 				writer.writeAttribute(SXML.ID, ""+id);
 			id++;
@@ -209,7 +214,9 @@ public class Writer
 				{	
 					writer.writeCharacters(lf);
 					
-					writeSubobjects(writer, subobs.getRootNode(), writtenobs, stack, context, classloader, typeinfo);
+//					writeSubobjects(writer, subobs.getRootNode(), wc.getWrittenObjects(), stack, 
+//						wc.getCallContext(), wc.getClassLoader(), typeinfo);
+					writeSubobjects(wc, subobs.getRootNode(), typeinfo);
 					
 					writeEndObject(writer, stack.size()-1);
 				}
@@ -221,9 +228,13 @@ public class Writer
 	/**
 	 *  Write the subobjects of an object.
 	 */
-	protected void writeSubobjects(XMLStreamWriter writer, TreeNode node, Map writtenobs, 
-		List stack, Object context, ClassLoader classloader, TypeInfo typeinfo) throws Exception
+//	protected void writeSubobjects(XMLStreamWriter writer, TreeNode node, Map writtenobs, 
+//			List stack, Object context, ClassLoader classloader, TypeInfo typeinfo) throws Exception
+	protected void writeSubobjects(WriteContext wc, TreeNode node, TypeInfo typeinfo) throws Exception
 	{
+		XMLStreamWriter writer = wc.getWriter();
+		List stack = wc.getStack();
+			
 		List children = node.getChildren();
 		for(int i=0; i<children.size(); i++)
 		{
@@ -237,14 +248,16 @@ public class Writer
 				writer.writeCharacters(lf);
 				stack.add(new StackElement(subtag, null));
  
-				writeSubobjects(writer, subnode, writtenobs, stack, context, classloader, typeinfo);
-					
+//				writeSubobjects(writer, subnode, writtenobs, stack, context, classloader, typeinfo);
+				writeSubobjects(wc, subnode, typeinfo);
+						
 				stack.remove(stack.size()-1);
 				writeEndObject(writer, stack.size());
 			}
 			else
 			{
-				writeObject(writer, ((Object[])tmp)[1], writtenobs, (QName)((Object[])tmp)[0], stack, context, classloader);
+				writeObject(wc, ((Object[])tmp)[1], (QName)((Object[])tmp)[0]);
+//				writeObject(writer, ((Object[])tmp)[1], writtenobs, (QName)((Object[])tmp)[0], stack, context, classloader);
 			}
 		}
 	}

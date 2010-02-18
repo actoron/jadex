@@ -71,7 +71,7 @@ public class MEisSpaceType extends MSpaceType
 		 *  Convert a string value to a type.
 		 *  @param val The string value to convert.
 		 */
-		public Object convertObject(Object val, Object root, ClassLoader classloader, Object context)
+		public Object convertObject(Object val, ClassLoader classloader, Object context)
 		{
 //			if(!(val instanceof String))
 //				throw new RuntimeException("Source value must be string: "+val);
@@ -86,14 +86,5 @@ public class MEisSpaceType extends MSpaceType
 			return ret;
 		}
 		
-		/**
-		 *  Test if a converter accepts a specific input type.
-		 *  @param inputtype The input type.
-		 *  @return True, if accepted.
-		 * /
-		public boolean acceptsInputType(Class inputtype)
-		{
-			return String.class.isAssignableFrom(inputtype);
-		}*/
 	}
 }

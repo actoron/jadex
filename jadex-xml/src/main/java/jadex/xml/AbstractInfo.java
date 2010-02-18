@@ -16,11 +16,7 @@ public class AbstractInfo
 {
 	//-------- attributes --------
 	
-	/** The xml tag/path. */
-	protected String xmlpath;
-	
-	/** The xml path elements. */
-	protected QName[] xmlpathelements;
+	protected XMLInfo xmlinfo;
 	
 	/** The xml path elements without tag. */
 	protected QName[] xmlpathelementswithouttag;
@@ -31,9 +27,6 @@ public class AbstractInfo
 	/** The id cnt. */
 	protected static int idcnt;
 
-	protected XMLInfo xmlinfo;
-
-	
 	//-------- constructors --------
 	
 	/**
@@ -43,40 +36,6 @@ public class AbstractInfo
 	{
 		this.xmlinfo = xmlinfo;
 			
-		if(xmlinfo!=null)
-		{
-			if(xmlinfo.getXmlPath()!=null)
-			{
-				this.xmlpath = xmlinfo.getXmlPath();
-	
-				StringTokenizer stok = new StringTokenizer(xmlpath, "/");
-				this.xmlpathelements = new QName[stok.countTokens()];
-				this.xmlpathelementswithouttag = new QName[stok.countTokens()-1];
-				for(int i=0; stok.hasMoreTokens(); i++)
-				{
-					xmlpathelements[i] = QName.valueOf(stok.nextToken());//convertStringToQName(stok.nextToken());
-					if(i<xmlpathelementswithouttag.length)
-						xmlpathelementswithouttag[i] = xmlpathelements[i];
-				}
-			}
-			else
-			{
-				// Only use local part
-				StringBuffer buf = new StringBuffer();
-				for(int i=0; i<xmlinfo.getXmlPathElements().length; i++)
-				{
-					if(i>0)
-						buf.append("/");
-					buf.append(xmlinfo.getXmlPathElements()[i].getLocalPart());
-				}
-				this.xmlpath = buf.toString();
-				this.xmlpathelements = xmlinfo.getXmlPathElements();
-				this.xmlpathelementswithouttag = new QName[xmlpathelements.length-1];
-				System.arraycopy(xmlpathelements, 0, xmlpathelementswithouttag, 0, xmlpathelementswithouttag.length);
-		
-			}	
-		}
-		
 		synchronized(AbstractInfo.class)
 		{
 			this.id = idcnt++;
@@ -154,7 +113,7 @@ public class AbstractInfo
 	 */
 	public String getXMLPath()
 	{
-		return this.xmlpath;
+		return xmlinfo!=null? xmlinfo.getXMLPath(): null;
 	}
 
 	/**
@@ -162,7 +121,7 @@ public class AbstractInfo
 	 */
 	public QName getXMLTag()
 	{
-		return xmlpathelements!=null? xmlpathelements[xmlpathelements.length-1]: null;
+		return xmlinfo!=null && xmlinfo.getXMLPathElements()!=null? xmlinfo.getXMLPathElements()[xmlinfo.getXMLPathElements().length-1]: null;
 	}
 	
 	/**
@@ -171,7 +130,7 @@ public class AbstractInfo
 	 */
 	public QName[] getXMLPathElements()
 	{
-		return xmlpathelements;
+		return xmlinfo!=null && xmlinfo.getXMLPathElements()!=null? xmlinfo.getXMLPathElements(): null;
 	}
 	
 	/**
@@ -179,6 +138,11 @@ public class AbstractInfo
 	 */
 	public QName[] getXMLPathElementsWithoutElement()
 	{
+		if(xmlpathelementswithouttag==null && xmlinfo!=null)
+		{
+			xmlpathelementswithouttag = new QName[xmlinfo.getXMLPathElements().length-1];
+			System.arraycopy(xmlinfo.getXMLPathElements(), 0, xmlpathelementswithouttag, 0, xmlinfo.getXMLPathElements().length-1);
+		}
 		return xmlpathelementswithouttag;
 	}
 	
@@ -203,7 +167,7 @@ public class AbstractInfo
 	 */
 	public int getXMLPathDepth()
 	{
-		return xmlpathelements!=null? xmlpathelements.length-1: 0;
+		return xmlinfo!=null && xmlinfo.getXMLPathElements()!=null? xmlinfo.getXMLPathElements().length-1: 0;
 	}
 	
 	/**
@@ -241,8 +205,11 @@ public class AbstractInfo
 	{
 		StringBuffer	sbuf	= new StringBuffer();
 		sbuf.append(SReflect.getInnerClassName(getClass()));
-		sbuf.append("(path=");
-		sbuf.append(xmlpath);
+		if(xmlinfo!=null && xmlinfo.getXMLPath()!=null)
+		{
+			sbuf.append("(path=");
+			sbuf.append(xmlinfo.getXMLPath());
+		}
 		sbuf.append(")");
 		return sbuf.toString();
 	}

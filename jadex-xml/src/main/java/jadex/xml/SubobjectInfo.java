@@ -1,10 +1,7 @@
 package jadex.xml;
 
-import jadex.commons.IFilter;
-
-import java.util.StringTokenizer;
-
 import javax.xml.namespace.QName;
+
 
 /**
  *  Info object for subobjects, i.e. objects that are contained in another object.
@@ -13,17 +10,24 @@ public class SubobjectInfo extends AbstractInfo
 {
 	//-------- attributes --------
 	
-	// read + write
+	/** The type info. */
+	protected TypeInfo typeinfo;
+	
+	/** The access info. */
+	protected AccessInfo accessinfo;
 	
 	/** The link info. */
-	protected AttributeInfo linkinfo;
+//	protected AttributeInfo linkinfo;
 	
 	/** The type info of the subobjects. */
 	// E.g. used for write check, i.e. is it the object of the right type
-	protected TypeInfo typeinfo;
+//	protected TypeInfo typeinfo;
 	
 	/** The multiplicity. */
 	protected boolean multi;
+	
+	/** The subobject converter. */
+	protected ISubObjectConverter converter;
 
 	//-------- constructors --------
 	
@@ -31,108 +35,184 @@ public class SubobjectInfo extends AbstractInfo
 	 *  Create a link info. 
 	 *  @param xmlpath The xmlpath.
 	 *  @param linkinfo The link info.
-	 */
+	 * /
 	public SubobjectInfo(AttributeInfo linkinfo)
 	{
 		this(linkinfo, null);
-	}
+	}*/
 	
 	/**
 	 *  Create a link info. 
 	 *  @param xmlpath The xmlpath.
 	 *  @param linkinfo The link info.
-	 */
+	 * /
 	public SubobjectInfo(AttributeInfo linkinfo, IFilter filter)
 	{
 		this(linkinfo, filter, null);
-	}
+	}*/
 	
 	/**
 	 *  Create a link info. 
 	 *  @param xmlpath The xmlpath.
 	 *  @param linkinfo The link info.
-	 */
+	 * /
 	public SubobjectInfo(AttributeInfo linkinfo, IFilter filter, TypeInfo typeinfo)
 	{
 		this(linkinfo, filter, typeinfo, false);
-	}
+	}*/
 	
 	/**
 	 *  Create a link info. 
 	 *  @param xmlpath The xmlpath.
 	 *  @param linkinfo The link info.
-	 */
+	 * /
 	public SubobjectInfo(AttributeInfo linkinfo, IFilter filter, TypeInfo typeinfo, boolean multi)
 	{
 		this((String)null, linkinfo, filter, typeinfo, multi);
-	}
+	}*/
 	
 	/**
 	 *  Create a link info. 
 	 *  @param xmlpath The xmlpath.
 	 *  @param linkinfo The link info.
-	 */
+	 * /
 	public SubobjectInfo(QName[] path, AttributeInfo linkinfo, IFilter filter, TypeInfo typeinfo, boolean multi)
 	{
 		super(new XMLInfo(createFullpath(path, linkinfo.getXMLAttributeName()), filter));
 		this.linkinfo = linkinfo;
 		this.typeinfo = typeinfo;
 		this.multi = multi;
-	}
+	}*/
 	
 	/**
 	 *  Create a link info. 
 	 *  @param xmlpath The xmlpath.
 	 *  @param linkinfo The link info.
-	 */
+	 * /
 	public SubobjectInfo(QName[] path, AttributeInfo linkinfo)
 	{
 		this(path, linkinfo, null, null, false);
-	}
+	}*/
 	
 	/**
 	 *  Create a link info. 
 	 *  @param xmlpath The xmlpath.
 	 *  @param linkinfo The link info.
-	 */
+	 * /
 	public SubobjectInfo(String path, AttributeInfo linkinfo)
 	{
 		this(path, linkinfo, null, null, false);
-	}
+	}*/
 	
 	/**
 	 *  Create a link info. 
 	 *  @param xmlpath The xmlpath.
 	 *  @param linkinfo The link info.
-	 */
+	 * /
 	public SubobjectInfo(String path, AttributeInfo linkinfo, IFilter filter)
 	{
 		this(path, linkinfo, filter, null);
-	}
+	}*/
 	
 	/**
 	 *  Create a link info. 
 	 *  @param xmlpath The xmlpath.
 	 *  @param linkinfo The link info.
-	 */
+	 * /
 	public SubobjectInfo(String path, AttributeInfo linkinfo, IFilter filter, TypeInfo typeinfo)
 	{
 		this(path, linkinfo, filter, typeinfo, false);
-	}
+	}*/
 	
 	/**
 	 *  Create a link info. 
 	 *  @param xmlpath The xmlpath.
 	 *  @param linkinfo The link info.
-	 */
+	 * /
 	public SubobjectInfo(String path, AttributeInfo linkinfo, IFilter filter, TypeInfo typeinfo, boolean multi)
 	{
 		this(createPath(path), linkinfo, filter, typeinfo, multi);
+	}*/
+	
+	/**
+	 * 
+	 * /
+	public SubobjectInfo(XMLInfo xmlinfo)
+	{
+		this(xmlinfo, xmlinfo!=null? new AccessInfo(xmlinfo.getXMLPathElements()[xmlinfo.getXMLPathElements().length-1]): null, null);
+	}*/
+	
+	/**
+	 * 
+	 */
+	public SubobjectInfo(XMLInfo xmlinfo, AccessInfo accessinfo)
+	{
+		this(xmlinfo, accessinfo, null);
+	}
+	
+	/**
+	 * 
+	 */
+	public SubobjectInfo(XMLInfo xmlinfo, AccessInfo accessinfo, ISubObjectConverter converter)
+	{
+		this(xmlinfo, accessinfo, converter, false);
+	}
+	
+	/**
+	 * 
+	 */
+	public SubobjectInfo(XMLInfo xmlinfo, AccessInfo accessinfo, ISubObjectConverter converter, boolean multi)
+	{
+		this(xmlinfo, accessinfo, converter, multi, null);
+	}
+	
+	/**
+	 * 
+	 */
+	public SubobjectInfo(XMLInfo xmlinfo, AccessInfo accessinfo, ISubObjectConverter converter, boolean multi, TypeInfo typeinfo)
+	{
+		super(xmlinfo);
+		this.accessinfo = accessinfo;
+		this.converter = converter;
+		this.multi = multi;
+		this.typeinfo = typeinfo;
+	}
+	
+	/**
+	 * 
+	 */
+	public SubobjectInfo(AccessInfo accessinfo)
+	{
+		this(accessinfo, null);
+	}
+	
+	/**
+	 * 
+	 */
+	public SubobjectInfo(AccessInfo accessinfo, ISubObjectConverter converter)
+	{
+		this(accessinfo, converter, false);
+	}
+	
+	/**
+	 * 
+	 */
+	public SubobjectInfo(AccessInfo accessinfo, ISubObjectConverter converter, boolean multi)
+	{
+		this(accessinfo, converter, multi, null);
+	}
+	
+	/**
+	 * 
+	 */
+	public SubobjectInfo(AccessInfo accessinfo, ISubObjectConverter converter, boolean multi, TypeInfo typeinfo)
+	{
+		this(new XMLInfo(new QName[]{accessinfo.getXmlObjectName()}), accessinfo, converter, multi, typeinfo);
 	}
 	
 	/**
 	 *  Create full path. 
-	 */
+	 * /
 	public static QName[] createPath(String path)
 	{
 		QName[] ret = null;
@@ -146,11 +226,11 @@ public class SubobjectInfo extends AbstractInfo
 			}
 		}
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Create full path. 
-	 */
+	 * /
 	public static QName[] createFullpath(QName[] path, QName name)
 	{
 		QName[] ret;
@@ -166,18 +246,18 @@ public class SubobjectInfo extends AbstractInfo
 		}
 		
 		return ret;
-	}
+	}*/
 	
 	//-------- methods --------
 	
 	/**
 	 *  Get the link info.
 	 *  @return The link info.
-	 */
+	 * /
 	public AttributeInfo getLinkInfo()
 	{
 		return this.linkinfo;
-	}
+	}*/
 
 	/**
 	 *  Get the typeinfo.
@@ -195,5 +275,22 @@ public class SubobjectInfo extends AbstractInfo
 	{
 		return multi;
 	}
-		
+	
+	/**
+	 *  Get the link info.
+	 *  @return The link info.
+	 */
+	public AccessInfo getLinkInfo()
+	{
+		return this.accessinfo;
+	}
+
+	/**
+	 *  Get the converter.
+	 *  @return The converter.
+	 */
+	public ISubObjectConverter getConverter()
+	{
+		return this.converter;
+	}
 }

@@ -1,13 +1,12 @@
 package jadex.xml.tutorial.example07;
 
 import jadex.commons.SUtil;
-import jadex.xml.AttributeInfo;
-import jadex.xml.ObjectInfo;
-import jadex.xml.XMLInfo;
+import jadex.xml.AccessInfo;
 import jadex.xml.MappingInfo;
+import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
-import jadex.xml.bean.BeanAttributeInfo;
+import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.reader.Reader;
@@ -18,6 +17,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.xml.namespace.QName;
 
 /**
  *  Main class to execute tutorial lesson.
@@ -36,12 +37,12 @@ public class Main
 		Set typeinfos = new HashSet();
 		typeinfos.add(new TypeInfo(new XMLInfo("customer"), new ObjectInfo(Customer.class),
 			new MappingInfo(null, new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo("street", "street")),
-			new SubobjectInfo(new BeanAttributeInfo("city", "city")),
-			new SubobjectInfo(new BeanAttributeInfo("state", "state")),
-			new SubobjectInfo(new BeanAttributeInfo("zip", "zip")),
-			new SubobjectInfo(new BeanAttributeInfo("instructions", "instructions", AttributeInfo.IGNORE_READWRITE)),
-			new SubobjectInfo(new BeanAttributeInfo("phone", "phone"))
+			new SubobjectInfo(new AccessInfo("street")),
+			new SubobjectInfo(new AccessInfo("city")),
+			new SubobjectInfo(new AccessInfo("state")),
+			new SubobjectInfo(new AccessInfo("zip")),
+			new SubobjectInfo(new AccessInfo("instructions", "instructions", AccessInfo.IGNORE_READWRITE)),
+			new SubobjectInfo(new AccessInfo("phone"))
 		})));
 		
 		// Create an xml reader with standard bean object reader and the

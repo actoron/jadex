@@ -17,15 +17,6 @@ public class AttributeInfo
 	
 	/** Constant for identifying comment. */
 	public static final String COMMENT = "__comment"; 
-	
-	/** Ignore when reading. */
-	public static final String IGNORE_READ = "ignore_read";
-	
-	/** Ignore when writing. */
-	public static final String IGNORE_WRITE = "ignore_write";
-
-	/** Ignore when reading and writing. */
-	public static final String IGNORE_READWRITE = "ignore_readwrite";
 
 	/** The value of this attribute is used as id. */
 	public static final String ID = "id";
@@ -36,141 +27,57 @@ public class AttributeInfo
 	
 	//-------- attributes --------
 	
-	// read + write
+	/** The access info. */
+	protected AccessInfo accessinfo;
 	
-	/** The object attribute. */
-	protected Object attributeidentifier;
-
-	/** The xml attribute name. */
-	protected QName xmlattributename;
-	
-	/** The default value. */
-	protected Object defaultvalue;
-	
-	/** The ignore property. */
-	protected String ignore;
-	
-	// read
-	
-	/** The attribute value converter for reading. */
-	protected ITypeConverter converterread;
+	/** The attribute converter. */
+	protected IAttributeConverter converter;
 	
 	/** Is this attribute used as id or idref. */
 	protected String id;
 	
-	// write
-	
-	/** The attribute value converter for write. */
-	protected ITypeConverter converterwrite;
-	
+	// todo: ?
 	/** Flag for writing attribute as tag. */
-	protected boolean writeastag;
+//	protected boolean writeastag;
 	
 	//-------- constructors --------
 		
 	/**
 	 *  Create a new attribute info. 
 	 */
-	public AttributeInfo(QName xmlattributename, Object attributeidentifier)
+	public AttributeInfo(AccessInfo accessinfo)
 	{
-		this(xmlattributename, attributeidentifier, null);
+		this(accessinfo, null);
 	}
 	
 	/**
 	 *  Create a new attribute info. 
 	 */
-	public AttributeInfo(QName xmlattributename, Object attributeidentifier, String ignore)
+	public AttributeInfo(AccessInfo accessinfo, IAttributeConverter converter)
 	{
-		this(xmlattributename, attributeidentifier, ignore, null, null);
+		this(accessinfo, converter, null);
 	}
 	
 	/**
-	 *  Create a new bean attribute info. 
+	 *  Create a new attribute info. 
 	 */
-	public AttributeInfo(QName xmlattributename, Object attributeidentifier, String ignore, ITypeConverter converterread, ITypeConverter converterwrite)
+	public AttributeInfo(AccessInfo accessinfo, IAttributeConverter converter, String id)
 	{
-		this(xmlattributename, attributeidentifier, ignore, converterread, converterwrite, null);
-	}
-	
-	/**
-	 *  Create a new bean attribute info. 
-	 */
-	public AttributeInfo(QName xmlattributename, Object attributeidentifier, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, Object defaultvalue)
-	{
-		this(xmlattributename, attributeidentifier, ignore, converterread, converterwrite, null, false);
-	}
-	
-	/**
-	 *  Create a new bean attribute info. 
-	 */
-	public AttributeInfo(QName xmlattributename, Object attributeidentifier, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, Object defaultvalue, boolean writeastag)
-	{
-		this(xmlattributename, attributeidentifier, ignore, converterread, converterwrite, null, false, null);
-	}
-	
-	/**
-	 *  Create a new bean attribute info. 
-	 */
-	public AttributeInfo(QName xmlattributename, Object attributeidentifier, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, Object defaultvalue, boolean writeastag, String id)
-	{
-		this.xmlattributename = xmlattributename;
-		this.attributeidentifier = attributeidentifier;
-		this.ignore = ignore;
-		this.converterread = converterread;
-		this.converterwrite = converterwrite;
-		this.defaultvalue = defaultvalue;
+		this.accessinfo = accessinfo;
+		this.converter = converter;
 		this.id = id;
-	}
-	
-	/**
-	 *  Create a new attribute info. 
-	 */
-	public AttributeInfo(String xmlattributename, Object attributeidentifier)
-	{
-		this(xmlattributename, attributeidentifier, null);
-	}
-	
-	/**
-	 *  Create a new attribute info. 
-	 */
-	public AttributeInfo(String xmlattributename, Object attributeidentifier, String ignore)
-	{
-		this(xmlattributename, attributeidentifier, ignore, null, null);
-	}
-	
-	/**
-	 *  Create a new bean attribute info. 
-	 */
-	public AttributeInfo(String xmlattributename, Object attributeidentifier, String ignore, ITypeConverter converterread, ITypeConverter converterwrite)
-	{
-		this(xmlattributename, attributeidentifier, ignore, converterread, converterwrite, null);
-	}
-	
-	/**
-	 *  Create a new bean attribute info. 
-	 */
-	public AttributeInfo(String xmlattributename, Object attributeidentifier, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, Object defaultvalue)
-	{
-		this(xmlattributename==null? null: QName.valueOf(xmlattributename), attributeidentifier, ignore, converterread, converterwrite, defaultvalue);
-	}
-	
-	/**
-	 *  Create a new bean attribute info. 
-	 */
-	public AttributeInfo(String xmlattributename, Object attributeidentifier, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, Object defaultvalue, boolean writeastag)
-	{
-		this(xmlattributename==null? null: QName.valueOf(xmlattributename), attributeidentifier, ignore, converterread, converterwrite, defaultvalue, writeastag);
-	}
-	
-	/**
-	 *  Create a new bean attribute info. 
-	 */
-	public AttributeInfo(String xmlattributename, Object attributeidentifier, String ignore, ITypeConverter converterread, ITypeConverter converterwrite, Object defaultvalue, boolean writeastag, String id)
-	{
-		this(xmlattributename==null? null: QName.valueOf(xmlattributename), attributeidentifier, ignore, converterread, converterwrite, defaultvalue, writeastag, id);
 	}
 
 	//-------- methods --------
+	
+	/**
+	 *  Get the accessinfo.
+	 *  @return The accessinfo.
+	 */
+	public AccessInfo getAccessInfo()
+	{
+		return this.accessinfo;
+	}
 	
 	/**
 	 *  Get the attributeidentifier.
@@ -178,7 +85,7 @@ public class AttributeInfo
 	 */
 	public Object getAttributeIdentifier()
 	{
-		return this.attributeidentifier;
+		return accessinfo.getObjectIdentifier();
 	}
 	
 	/**
@@ -187,7 +94,7 @@ public class AttributeInfo
 	 */
 	public QName getXMLAttributeName()
 	{
-		return this.xmlattributename;
+		return accessinfo.getXmlObjectName();
 	}
 	
 	/**
@@ -196,7 +103,7 @@ public class AttributeInfo
 	 */
 	public boolean isIgnoreRead()
 	{
-		return IGNORE_READ.equals(ignore) || IGNORE_READWRITE.equals(ignore);
+		return accessinfo.isIgnoreRead();
 	}
 	
 	/**
@@ -205,34 +112,16 @@ public class AttributeInfo
 	 */
 	public boolean isIgnoreWrite()
 	{
-		return IGNORE_WRITE.equals(ignore) || IGNORE_READWRITE.equals(ignore);
+		return accessinfo.isIgnoreWrite();
 	}
 	
 	/**
-	 *  Get the attribute converter for reading.
+	 *  Get the attribute converter.
 	 *  @return The converter.
 	 */
-	public ITypeConverter getConverterRead()
+	public IAttributeConverter getConverter()
 	{
-		return this.converterread;
-	}
-
-	/**
-	 *  Get the attribute converter for writing.
-	 *  @return The converter.
-	 */
-	public ITypeConverter getConverterWrite()
-	{
-		return this.converterwrite;
-	}
-
-	/**
-	 *  Get the default value.
-	 *  @return the defaultvalue.
-	 */
-	public Object getDefaultValue()
-	{
-		return this.defaultvalue;
+		return this.converter;
 	}
 
 	/**
@@ -242,15 +131,6 @@ public class AttributeInfo
 	public String getId()
 	{
 		return id;
-	}
+	}	
 
-	/**
-	 *  Set the id.
-	 *  @param id The id to set.
-	 */
-	public void setId(String id)
-	{
-		this.id = id;
-	}
-	
 }

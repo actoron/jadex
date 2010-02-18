@@ -23,14 +23,17 @@ import jadex.javaparser.SJavaParser;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
+import jadex.xml.AccessInfo;
+import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
-import jadex.xml.ITypeConverter;
+import jadex.xml.IContext;
+import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
-import jadex.xml.bean.BeanAttributeInfo;
+import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
 
@@ -88,10 +91,9 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 		
 		Set types = new HashSet();
 		
-		ITypeConverter exconv = new ITypeConverter()
+		IStringObjectConverter exconv = new IStringObjectConverter()
 		{
-			public Object convertObject(Object val, Object root,
-				ClassLoader classloader, Object context)
+			public Object convertString(String val, IContext context)
 			{
 				return SJavaParser.evaluateExpression((String)val, null);
 			}
@@ -99,33 +101,35 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 		
 		types.add(new TypeInfo(new XMLInfo("applicationtype"), new ObjectInfo(MApplicationType.class), 
 			new MappingInfo(null, "description", null,
-			new BeanAttributeInfo[]{new BeanAttributeInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AttributeInfo.IGNORE_READWRITE)}, 
+			new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE))
+			}, 
 			new SubobjectInfo[]{
-			new SubobjectInfo("arguments", new AttributeInfo("argument", "argument")),
-			new SubobjectInfo("arguments", new AttributeInfo("result", "result"))
+			new SubobjectInfo(new XMLInfo("arguments/argument"), new AccessInfo("argument", "argument")),
+			new SubobjectInfo(new XMLInfo("arguments/result"), new AccessInfo("result", "result"))
 			})));
 		types.add(new TypeInfo(new XMLInfo("spacetype"), new ObjectInfo(MSpaceType.class)));
 		types.add(new TypeInfo(new XMLInfo("agenttype"), new ObjectInfo(MAgentType.class)));
 		types.add(new TypeInfo(new XMLInfo("application"), new ObjectInfo(MApplicationInstance.class), 
-			new MappingInfo(null, new BeanAttributeInfo[]{new BeanAttributeInfo("type", "typeName")}, null)));
+			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("type", "typeName"))}, null)));
 		types.add(new TypeInfo(new XMLInfo("space"), new ObjectInfo(MSpaceInstance.class)));
 		types.add(new TypeInfo(new XMLInfo("agent"), new ObjectInfo(MAgentInstance.class),
-			new MappingInfo(null, new BeanAttributeInfo[]{
-			new BeanAttributeInfo("type", "typeName"),
-			new BeanAttributeInfo("number", "numberText")}
-		, null)));
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("type", "typeName")),
+			new AttributeInfo(new AccessInfo("number", "numberText"))
+			}, null)));
 		types.add(new TypeInfo(new XMLInfo("agent/arguments/argument"), new ObjectInfo(MArgument.class), 
 			new MappingInfo(null, null, "value")));
 		types.add(new TypeInfo(new XMLInfo("applicationtype/arguments/argument"), new ObjectInfo(Argument.class), 
-			new MappingInfo(null, "description", new BeanAttributeInfo((String)null, "defaultValue", null, exconv, null))));
+			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)))));
 		types.add(new TypeInfo(new XMLInfo("import"), new ObjectInfo(String.class)));
 		
 		types.add(new TypeInfo(new XMLInfo("componenttype"), new ObjectInfo(MAgentType.class)));
 		types.add(new TypeInfo(new XMLInfo("component"), new ObjectInfo(MAgentInstance.class),
-			new MappingInfo(null, new BeanAttributeInfo[]{
-			new BeanAttributeInfo("type", "typeName"),
-			new BeanAttributeInfo("number", "numberText")}
-		, null)));
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("type", "typeName")),
+			new AttributeInfo(new AccessInfo("number", "numberText"))
+			}, null)));
 		types.add(new TypeInfo(new XMLInfo("component/arguments/argument"), new ObjectInfo(MArgument.class), 
 			new MappingInfo(null, null, "value")));
 		
