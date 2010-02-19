@@ -1,5 +1,5 @@
 
-package jadex.xml.tutorial.example10;
+package jadex.xml.tutorial.jibx.example10;
 
 import java.util.ArrayList;
 

@@ -1,5 +1,5 @@
 
-package jadex.xml.tutorial.example17;
+package jadex.xml.tutorial.jibx.example17;
 
 public class Customer {
     public Identity identity;

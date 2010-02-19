@@ -1,5 +1,5 @@
 
-package jadex.xml.tutorial.example22;
+package jadex.xml.tutorial.jibx.example22;
 
 public class Person {
     private String firstName;

@@ -1,5 +1,5 @@
 
-package jadex.xml.tutorial.example14;
+package jadex.xml.tutorial.jibx.example14;
 
 public class Address {
     public String street;

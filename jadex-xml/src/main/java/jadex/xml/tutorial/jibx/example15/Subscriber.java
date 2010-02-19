@@ -1,7 +1,7 @@
 
-package jadex.xml.tutorial.example15;
+package jadex.xml.tutorial.jibx.example15;
 
-import jadex.xml.tutorial.example14.Address;
+import jadex.xml.tutorial.jibx.example14.Address;
 
 public class Subscriber {
     public String name;

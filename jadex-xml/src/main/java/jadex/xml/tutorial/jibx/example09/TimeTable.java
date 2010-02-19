@@ -1,5 +1,5 @@
 
-package jadex.xml.tutorial.example09;
+package jadex.xml.tutorial.jibx.example09;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -1,5 +1,5 @@
 
-package jadex.xml.tutorial.example20;
+package jadex.xml.tutorial.jibx.example20;
 
 public class Conversion
 {

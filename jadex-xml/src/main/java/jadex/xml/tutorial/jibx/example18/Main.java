@@ -1,4 +1,4 @@
-package jadex.xml.tutorial.example18;
+package jadex.xml.tutorial.jibx.example18;
 
 import jadex.commons.SUtil;
 import jadex.xml.AccessInfo;
@@ -44,7 +44,7 @@ public class Main
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos
 		Reader xmlreader = new Reader(new BeanObjectReaderHandler(typeinfos));
-		InputStream is = SUtil.getResource("jadex/xml/tutorial/example18/data.xml", null);
+		InputStream is = SUtil.getResource("jadex/xml/tutorial/jibx/example18/data.xml", null);
 		Object object = xmlreader.read(is, null, null);
 		is.close();
 		

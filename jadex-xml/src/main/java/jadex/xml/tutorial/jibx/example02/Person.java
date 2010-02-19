@@ -1,4 +1,4 @@
-package jadex.xml.tutorial.example02;
+package jadex.xml.tutorial.jibx.example02;
 
 /**
  *  Person example class.

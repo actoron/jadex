@@ -228,7 +228,6 @@ public class Reader
 						throw new RuntimeException("idref not contained: "+idref);
 					object = readcontext.getReadObjects().get(idref);
 					StackElement se = new StackElement(localname, object, rawattrs, typeinfo);
-//					readcontext.setTopse(se);
 					stack.add(se);
 				}
 				else

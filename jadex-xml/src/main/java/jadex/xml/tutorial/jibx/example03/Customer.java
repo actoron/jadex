@@ -1,4 +1,4 @@
-package jadex.xml.tutorial.example03;
+package jadex.xml.tutorial.jibx.example03;
 
 /**
  *  Customer example class.

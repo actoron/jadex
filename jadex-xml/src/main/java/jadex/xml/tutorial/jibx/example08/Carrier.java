@@ -1,5 +1,5 @@
 
-package jadex.xml.tutorial.example08;
+package jadex.xml.tutorial.jibx.example08;
 
 public class Carrier
 {

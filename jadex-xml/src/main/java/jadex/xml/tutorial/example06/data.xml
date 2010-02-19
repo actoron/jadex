@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<invoice>
+	<name>Jadex agent software suite.</name>
+	<description>Special update offer.</description>
+	<price>999.98</price>
+	<product name="Jadex">
+		<type>"Software"</type>
+		<date>11.01.2010</date>		
+	</product>
+	<quantity>1</quantity>
+</invoice>

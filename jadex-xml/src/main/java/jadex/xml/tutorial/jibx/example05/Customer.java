@@ -1,5 +1,5 @@
 
-package jadex.xml.tutorial.example05;
+package jadex.xml.tutorial.jibx.example05;
 
 public class Customer {
     public int customerNumber;

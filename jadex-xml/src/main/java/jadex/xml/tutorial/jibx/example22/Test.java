@@ -1,5 +1,5 @@
 
-package jadex.xml.tutorial.example22;
+package jadex.xml.tutorial.jibx.example22;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
