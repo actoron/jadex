@@ -1,5 +1,6 @@
 <customer>
-  <person cust-num="123456789" first-name="John">Smith</person>
+  <!-- <person cust-num="123456789" first-name="John">Smith</person> -->
+  <person customerNumber="123456789" firstName="John" lastName="Smith"></person>
   <ship-address zip="98059">
     <street>12345 Happy Lane</street>
     <city>Plunk</city>

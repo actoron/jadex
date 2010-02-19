@@ -269,8 +269,8 @@ public class BpmnXMLReader
 		
 		types.add(new TypeInfo(new XMLInfo("incomingMessages"), new ObjectInfo(HashMap.class), 
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo(new QName(xmiuri, "type"), null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("href", null, null, null, new BeanAccessInfo(""))),
+			new AttributeInfo(new AccessInfo(new QName(xmiuri, "type"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("href", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE)),
 			},
 			new SubobjectInfo[]{
@@ -279,8 +279,8 @@ public class BpmnXMLReader
 
 		types.add(new TypeInfo(new XMLInfo("outgoingMessages"), new ObjectInfo(HashMap.class), 
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo(new QName(xmiuri, "type"), null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("href", null, null, null, new BeanAccessInfo(""))),
+			new AttributeInfo(new AccessInfo(new QName(xmiuri, "type"), null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("href", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE)),
 			},
 			new SubobjectInfo[]{

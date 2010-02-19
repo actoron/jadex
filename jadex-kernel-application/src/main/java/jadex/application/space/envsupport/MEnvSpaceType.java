@@ -169,11 +169,11 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		TypeInfo ti_po = new TypeInfo(new XMLInfo("abstract_propertyobject"), new ObjectInfo(MultiCollection.class), 
 			new MappingInfo(null, new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "property"), "properties", null, null, new BeanAccessInfo("")))
+			new SubobjectInfo(new AccessInfo(new QName(uri, "property"), "properties", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			}));		
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "objecttype")}), new ObjectInfo(MultiCollection.class),
-			new MappingInfo(ti_po, new AttributeInfo[]{new AttributeInfo(new AccessInfo(new QName("name"), "name", null, null, new BeanAccessInfo("")))}, null)));
+			new MappingInfo(ti_po, new AttributeInfo[]{new AttributeInfo(new AccessInfo(new QName("name"), "name", null, null, new BeanAccessInfo(AccessInfo.THIS)))}, null)));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "envspacetype")}), new ObjectInfo(MEnvSpaceType.class),
 			new MappingInfo(null, new AttributeInfo[]{
@@ -234,70 +234,70 @@ public class MEnvSpaceType	extends MSpaceType
 */
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "percepttype")}), new ObjectInfo(MultiCollection.class), 
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("objecttype", "objecttypes", null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("agenttype", "agenttypes", null, null, new BeanAccessInfo("")))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("objecttype", "objecttypes", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("agenttype", "agenttypes", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			}, 
 			new SubobjectInfo[]{
 //			new SubobjectInfo("percepttype/objecttypes/objecttype", new AttributeInfo("objecttype", "objecttypes", null, "")),
 //			new SubobjectInfo("percepttype/agenttypes/agenttype", new AttributeInfo("percepttype", "agenttypes", new ITypeConverter()
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "objecttypes")}), new AccessInfo(new QName(uri, "objecttype"), "objecttypes", null, null, new BeanAccessInfo(""))),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "agenttypes")}), new AccessInfo(new QName(uri, "agenttype"), "agenttypes", null, null, new BeanAccessInfo("")), sunameconv)
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "objecttypes")}), new AccessInfo(new QName(uri, "objecttype"), "objecttypes", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "agenttypes")}), new AccessInfo(new QName(uri, "agenttype"), "agenttypes", null, null, new BeanAccessInfo(AccessInfo.THIS)), sunameconv)
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "actiontype")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo("")))
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "parameter"), "parameters", null, null, new BeanAccessInfo("")))
+			new SubobjectInfo(new AccessInfo(new QName(uri, "parameter"), "parameters", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "parameter")}), new ObjectInfo(HashMap.class), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv)
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv)
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "processtype")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo("")))
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "tasktype")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo("")))
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri,"perceptgenerator")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo("")))
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri,"perceptprocessor")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new AttributeInfo[]{	
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("agenttype", null, null, null, new BeanAccessInfo("")))
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("agenttype", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "percepttype"), "percepttypes", null, null, new BeanAccessInfo("")), sunameconv),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "percepttype"), "percepttypes", null, null, new BeanAccessInfo(AccessInfo.THIS)), sunameconv),
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri,"perceptprocessor"), new QName(uri, "percepttype")}), new ObjectInfo(HashMap.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo("")))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "view")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("objecttype", null, null, null, new BeanAccessInfo(""))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("objecttype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
@@ -318,19 +318,19 @@ public class MEnvSpaceType	extends MSpaceType
 					ret.init(space, props);
 					return ret;
 				}
-			}, new BeanAccessInfo("")))
+			}, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "perspective")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),		
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("opengl", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("invertxaxis", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("invertyaxis", null, null, Boolean.TRUE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("objectplacement", null, null, OBJECTPLACEMENT_BORDER, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("zoomlimit", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("bgcolor", null, null, null, new BeanAccessInfo("")),  new AttributeConverter(colorconv, null)),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),		
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("opengl", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("invertxaxis", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("invertyaxis", null, null, Boolean.TRUE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("objectplacement", null, null, OBJECTPLACEMENT_BORDER, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("zoomlimit", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("bgcolor", null, null, null, new BeanAccessInfo(AccessInfo.THIS)),  new AttributeConverter(colorconv, null)),
 			new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
@@ -407,31 +407,31 @@ public class MEnvSpaceType	extends MSpaceType
 					
 					return ret;
 				}
-			}, new BeanAccessInfo("")))
+			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "drawable"), "drawables", null, null, new BeanAccessInfo(""))),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "prelayers"), new QName(uri, "gridlayer")}), new AccessInfo(new QName(uri, "gridlayer"), "prelayers", null, null, new BeanAccessInfo(""))),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "prelayers"), new QName(uri, "tiledlayer")}), new AccessInfo(new QName(uri, "tiledlayer"), "prelayers", null, null, new BeanAccessInfo(""))),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "prelayers"), new QName(uri, "colorlayer")}), new AccessInfo(new QName(uri, "colorlayer"), "prelayers", null, null, new BeanAccessInfo(""))),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "postlayers"), new QName(uri, "gridlayer")}), new AccessInfo(new QName(uri, "gridlayer"), "postlayers", null, null, new BeanAccessInfo(""))),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "postlayers"), new QName(uri, "tiledlayer")}), new AccessInfo(new QName(uri, "tiledlayer"), "postlayers", null, null, new BeanAccessInfo(""))),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "postlayers"), new QName(uri, "colorlayer")}), new AccessInfo(new QName(uri, "colorlayer"), "postlayers", null, null, new BeanAccessInfo("")))
+			new SubobjectInfo(new AccessInfo(new QName(uri, "drawable"), "drawables", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "prelayers"), new QName(uri, "gridlayer")}), new AccessInfo(new QName(uri, "gridlayer"), "prelayers", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "prelayers"), new QName(uri, "tiledlayer")}), new AccessInfo(new QName(uri, "tiledlayer"), "prelayers", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "prelayers"), new QName(uri, "colorlayer")}), new AccessInfo(new QName(uri, "colorlayer"), "prelayers", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "postlayers"), new QName(uri, "gridlayer")}), new AccessInfo(new QName(uri, "gridlayer"), "postlayers", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "postlayers"), new QName(uri, "tiledlayer")}), new AccessInfo(new QName(uri, "tiledlayer"), "postlayers", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "postlayers"), new QName(uri, "colorlayer")}), new AccessInfo(new QName(uri, "colorlayer"), "postlayers", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "drawable")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("objecttype", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("y", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(""))),
+			new AttributeInfo(new AccessInfo("objecttype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("y", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
@@ -476,36 +476,36 @@ public class MEnvSpaceType	extends MSpaceType
 					
 					return ret;
 				}
-			}, new BeanAccessInfo("")))
+			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "texturedrectangle"), "parts", null, null, new BeanAccessInfo(""))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "triangle"), "parts", null, null, new BeanAccessInfo(""))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "rectangle"), "parts", null, null, new BeanAccessInfo(""))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "regularpolygon"), "parts", null, null, new BeanAccessInfo(""))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "ellipse"), "parts", null, null, new BeanAccessInfo(""))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "text"), "parts", null, null, new BeanAccessInfo(""))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo("")), suexconv)
+			new SubobjectInfo(new AccessInfo(new QName(uri, "texturedrectangle"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "triangle"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "rectangle"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "regularpolygon"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "ellipse"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "text"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 			})));
 
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "texturedrectangle")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("y", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo("")), new AttributeConverter(attcolconv, null)),
-			new AttributeInfo(new AccessInfo("imagepath", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("layer", null, null, null, new BeanAccessInfo("")), new AttributeConverter(attintconv, null)),
+			new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("y", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(attcolconv, null)),
+			new AttributeInfo(new AccessInfo("imagepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("layer", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(attintconv, null)),
 			new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
@@ -537,29 +537,29 @@ public class MEnvSpaceType	extends MSpaceType
 					IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
 					return new TexturedRectangle(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), (String)MEnvSpaceInstance.getProperty(args, "imagepath"), exp);
 				}
-			}, new BeanAccessInfo("")))
+			}, new BeanAccessInfo(AccessInfo.THIS)))
 			}, 
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo("")), suexconv)
+			new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "triangle")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo("")), attcolconv),
-			new AttributeInfo(new AccessInfo("layer", null, null, null, new BeanAccessInfo("")), attintconv),
+			new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+			new AttributeInfo(new AccessInfo("layer", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attintconv),
 			new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
@@ -592,29 +592,29 @@ public class MEnvSpaceType	extends MSpaceType
 					IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
 					return new Triangle(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
 				}
-			}, new BeanAccessInfo("")))
+			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo("")), suexconv)
+			new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "rectangle")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo("")), attcolconv),
-			new AttributeInfo(new AccessInfo("layer", null, null, null, new BeanAccessInfo("")), attintconv),
+			new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+			new AttributeInfo(new AccessInfo("layer", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attintconv),
 			new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 			{
 				public Object createObject(Map args) throws Exception
@@ -646,30 +646,30 @@ public class MEnvSpaceType	extends MSpaceType
 					IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
 					return new Rectangle(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
 				}
-			}, new BeanAccessInfo("")))
+			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo("")), suexconv)
+			new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "regularpolygon")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatex", null, null,null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatey", null, null,null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatez", null, null,null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("width", null, null,null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("height", null, null,null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo("")), attcolconv),
-			new AttributeInfo(new AccessInfo("vertices", null, null, new Integer(3), new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("layer", null, null, null, new BeanAccessInfo("")), attintconv),
+			new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatex", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatey", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatez", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("width", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("height", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+			new AttributeInfo(new AccessInfo("vertices", null, null, new Integer(3), new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("layer", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attintconv),
 			new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 			{
 				public Object createObject(Map args) throws Exception
@@ -705,29 +705,29 @@ public class MEnvSpaceType	extends MSpaceType
 					IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
 					return new RegularPolygon(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), vertices, exp);
 				}
-			}, new BeanAccessInfo("")))
+			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo("")), suexconv)
+			new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 			})));
 	
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "ellipse")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatex", null, null,null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatey", null, null,null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("rotatez", null, null,null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("width", null, null,null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("height", null, null,null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo("")), attcolconv),
-			new AttributeInfo(new AccessInfo("layer", null, null, null, new BeanAccessInfo("")), attintconv),
+			new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatex", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatey", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("rotatez", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("width", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("height", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+			new AttributeInfo(new AccessInfo("layer", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attintconv),
 			new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 			{
 				public Object createObject(Map args) throws Exception
@@ -760,26 +760,26 @@ public class MEnvSpaceType	extends MSpaceType
 					IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
 					return new Ellipse(position, rotation, size, absFlags, MEnvSpaceInstance.getProperty(args, "color"), exp);
 				}
-			}, new BeanAccessInfo("")))
+			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo("")), suexconv)
+			new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "text")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("y", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("font", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("style", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo("")), atcolconv),
-			new AttributeInfo(new AccessInfo("layer", null, null, null, new BeanAccessInfo("")), attintconv),
-			new AttributeInfo(new AccessInfo("text", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("align", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("y", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("font", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("style", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atcolconv),
+			new AttributeInfo(new AccessInfo("layer", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attintconv),
+			new AttributeInfo(new AccessInfo("text", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("align", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
 			new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
@@ -828,18 +828,18 @@ public class MEnvSpaceType	extends MSpaceType
 					IParsedExpression exp = (IParsedExpression)MEnvSpaceInstance.getProperty(args, "drawcondition");
 					return new Text(position, font, (Color)MEnvSpaceInstance.getProperty(args, "color"), text, align, absFlags, exp);
 				}
-			}, new BeanAccessInfo("")))
+			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo("")), suexconv)
+			new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "gridlayer")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo("")), attcolconv),
-			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("type", null, null, "gridlayer", new BeanAccessInfo(""))),
+			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("type", null, null, "gridlayer", new BeanAccessInfo(AccessInfo.THIS))),
 			new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
@@ -848,16 +848,16 @@ public class MEnvSpaceType	extends MSpaceType
 							(Double)MEnvSpaceInstance.getProperty(args, "height"));
 					return new GridLayer(size, MEnvSpaceInstance.getProperty(args, "color"));
 				}
-			}, new BeanAccessInfo("")))
+			}, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "tiledlayer")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("imagepath", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo("")), attcolconv),
-			new AttributeInfo(new AccessInfo("type", null, null, "tiledlayer", new BeanAccessInfo(""))),
+			new AttributeInfo(new AccessInfo("imagepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+			new AttributeInfo(new AccessInfo("type", null, null, "tiledlayer", new BeanAccessInfo(AccessInfo.THIS))),
 			new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
@@ -866,168 +866,168 @@ public class MEnvSpaceType	extends MSpaceType
 						(Double)MEnvSpaceInstance.getProperty(args, "height"));
 					return new TiledLayer(size, MEnvSpaceInstance.getProperty(args, "color"), (String)MEnvSpaceInstance.getProperty(args, "imagepath"));
 				}
-			}, new BeanAccessInfo("")))
+			}, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "colorlayer")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo("")), attcolconv),
-			new AttributeInfo(new AccessInfo("type", null, null, "colorlayer", new BeanAccessInfo(""))),
+			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+			new AttributeInfo(new AccessInfo("type", null, null, "colorlayer", new BeanAccessInfo(AccessInfo.THIS))),
 			new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()
 			{
 				public Object createObject(Map args) throws Exception
 				{
 					return new ColorLayer(MEnvSpaceInstance.getProperty(args, "color"));
 				}
-			}, new BeanAccessInfo("")))
+			}, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "spaceexecutor")}), new ObjectInfo(MultiCollection.class), 
-			new MappingInfo(ti_po, null, new AttributeInfo(new AccessInfo("expression", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(ti_po, null, new AttributeInfo(new AccessInfo("expression", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv)
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv)
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "envspacetype"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "envspace"), new QName(uri, "property")}), new ObjectInfo(HashMap.class),
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "processtype"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "tasktype"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "actiontype"), new QName(uri, "property")}), new ObjectInfo(HashMap.class),
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "percepttype"), new QName(uri, "agenttypes"), new QName(uri, "agenttype")}), new ObjectInfo(HashMap.class),			
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo("")))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "perceptgenerator"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "perceptprocessor"), new QName(uri, "property")}), new ObjectInfo(HashMap.class),
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "view"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "perspective"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "object"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "avatar"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "process"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "objecttype"), new QName(uri, "property")}), new ObjectInfo(HashMap.class),
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("event", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+			new AttributeInfo(new AccessInfo("event", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "drawable"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "spaceexecutor"), new QName(uri, "property")}), new ObjectInfo(HashMap.class),
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "dataconsumer"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "plugin"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 
 		// type instance declarations.
@@ -1078,84 +1078,84 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "object")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("type", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("number", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("type", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("number", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null))
 			})));
 			
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "avatar")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("type", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("owner", null, null, null, new BeanAccessInfo(""))),
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("type", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("owner", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			})));
 			
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "process")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("type", null, null, null, new BeanAccessInfo(""))),
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("type", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "spaceaction")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("type", null, null, null, new BeanAccessInfo("")))
+			new AttributeInfo(new AccessInfo("type", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "parameter"), "parameters", null, null, new BeanAccessInfo("")))
+			new SubobjectInfo(new AccessInfo(new QName(uri, "parameter"), "parameters", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "spaceaction"), new QName(uri, "parameter")}), new ObjectInfo(HashMap.class),
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo("")))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "observer")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("view", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("perspective", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("killonexit", null, null, Boolean.TRUE, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("view", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("perspective", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("killonexit", null, null, Boolean.TRUE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "plugin"), "plugins", null, null, new BeanAccessInfo(""))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "plugin"), "plugins", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			})));
 			
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "plugin")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			//new BeanAccessInfo("class", null, null, typeconv, null, ""),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo("")), attypeconv),
+			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "property"), "properties", null, null, new BeanAccessInfo(""))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "property"), "properties", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "data")}), new ObjectInfo(MultiCollection.class), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, "content", null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, "content", null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo("")))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "source"), "source", null, null, new BeanAccessInfo(""))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "data"), "subdata", null, null, new BeanAccessInfo("")))
+			new SubobjectInfo(new AccessInfo(new QName(uri, "source"), "source", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "data"), "subdata", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "source")}), new ObjectInfo(HashMap.class), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("content", null, null, null, new BeanAccessInfo("")), atexconv),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("content", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("objecttype", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("aggregate", null, null, null, new BeanAccessInfo("")), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("objecttype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("aggregate", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "dataconsumer")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(""))),
-			new AttributeInfo(new AccessInfo("class", null, null, null, new BeanAccessInfo("")), attypeconv)
+			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("class", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv)
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "property"), "properties", null, null, new BeanAccessInfo("")))
+			new SubobjectInfo(new AccessInfo(new QName(uri, "property"), "properties", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 		
 		return types;

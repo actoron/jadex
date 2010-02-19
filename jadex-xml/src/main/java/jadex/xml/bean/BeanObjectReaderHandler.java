@@ -5,7 +5,7 @@ import jadex.commons.SUtil;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.BasicTypeConverter;
-import jadex.xml.ICustomProcessor;
+import jadex.xml.IReturnValueCommand;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.ISubObjectConverter;
 import jadex.xml.ObjectInfo;
@@ -672,10 +672,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			// Put value in map 1) fetch key 2) set value in map
 			if(bai.getMapName()!=null)
-			{
-				String mapname = bai.getMapName().length()==0? bai.getMapName(): bai.getMapName().substring(0,1).toUpperCase()+bai.getMapName().substring(1);
-//				String jattrname = bai.getAttributeName()!=null? bai.getAttributeName(): xmlattrname;
-				
+			{				
 				// fetch the key value
 				Object key = null;
 				if(bai.getKeyHelp()!=null)
@@ -705,9 +702,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 							e.printStackTrace();
 						}
 					}
-					else if(kh instanceof ICustomProcessor)
+					else if(kh instanceof IReturnValueCommand)
 					{
-						key = ((ICustomProcessor)kh).processValue(targetobj);
+						key = ((IReturnValueCommand)kh).execute(targetobj);
 					}
 					else
 					{
@@ -760,10 +757,10 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 							e.printStackTrace();
 						}
 					}
-					else if(sh instanceof ICustomProcessor)
+					else if(sh instanceof IReturnValueCommand)
 					{
 						Object arg = convertValue(val, null, converter, context, id);
-						((ICustomProcessor)sh).processValue(new Object[]{object, arg});
+						((IReturnValueCommand)sh).execute(new Object[]{object, arg});
 					}
 					else
 					{
@@ -773,6 +770,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				// Set map value with guessing method name.
 				else
 				{
+					String mapname = bai.getMapName().length()==0 || AccessInfo.THIS.equals(bai.getMapName())? ""
+						: bai.getMapName().substring(0,1).toUpperCase()+bai.getMapName().substring(1);
+					
 					String[] prefixes = new String[]{"put", "set", "add"};
 					for(int i=0; i<prefixes.length && !set; i++)
 					{
@@ -840,10 +840,10 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 						e.printStackTrace();
 					}
 				}
-				else if(sh instanceof ICustomProcessor)
+				else if(sh instanceof IReturnValueCommand)
 				{
 					Object arg = convertValue(val, null, converter, context, id);
-					((ICustomProcessor)sh).processValue(new Object[]{object, arg});
+					((IReturnValueCommand)sh).execute(new Object[]{object, arg});
 				}
 				else
 				{

@@ -1,4 +1,4 @@
-package jadex.xml.tutorial.example14;
+package jadex.xml.tutorial.example17;
 
 import jadex.commons.SUtil;
 import jadex.xml.AccessInfo;
@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- *  Main class to execute tutorial lesson c (taken from Jibx website).
+ *  Main class to execute tutorial lesson.
  */
 public class Main
 {
@@ -28,24 +28,35 @@ public class Main
 		
 		typeinfos.add(new TypeInfo(new XMLInfo("customer"), new ObjectInfo(Customer.class), 
 			new MappingInfo(null, new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo("ship-address", "shipAddress")),
-			new SubobjectInfo(new AccessInfo("bill-address", "billAddress"))
-		})));
-		
-		typeinfos.add(new TypeInfo(new XMLInfo("ship-address"), new ObjectInfo(Address.class)));
-		typeinfos.add(new TypeInfo(new XMLInfo("bill-address"), new ObjectInfo(Address.class)));
-		typeinfos.add(new TypeInfo(new XMLInfo("subscriber"), new ObjectInfo(Subscriber.class)));
+			new SubobjectInfo(new AccessInfo("person", "identity")),
+			new SubobjectInfo(new AccessInfo("company", "identity")),
+			new SubobjectInfo(new AccessInfo("base-ident", "identity"))
+			})));
+		TypeInfo ti_id = new TypeInfo(new XMLInfo("base-ident"), new ObjectInfo(Identity.class),
+			new MappingInfo(null, new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo("cust-num", "customerNumber"))
+			}));
+		typeinfos.add(ti_id);
+		typeinfos.add(new TypeInfo(new XMLInfo("person"), new ObjectInfo(Person.class),
+			new MappingInfo(ti_id, new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo("first-name", "firstName")),
+			new SubobjectInfo(new AccessInfo("last-name", "lastName"))
+			})));
+		typeinfos.add(new TypeInfo(new XMLInfo("company"), new ObjectInfo(Company.class),
+			new MappingInfo(ti_id, new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo("tax-id", "taxId")),
+			})));
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos
 		Reader xmlreader = new Reader(new BeanObjectReaderHandler(typeinfos));
-		InputStream is = SUtil.getResource("jadex/xml/tutorial/example14/data1.xml", null);
+		InputStream is = SUtil.getResource("jadex/xml/tutorial/example17/data1.xml", null);
 		Object object1 = xmlreader.read(is, null, null);
 		is.close();
-		is = SUtil.getResource("jadex/xml/tutorial/example14/data2.xml", null);
+		is = SUtil.getResource("jadex/xml/tutorial/example17/data2.xml", null);
 		Object object2 = xmlreader.read(is, null, null);
 		is.close();
-		is = SUtil.getResource("jadex/xml/tutorial/example14/data3.xml", null);
+		is = SUtil.getResource("jadex/xml/tutorial/example17/data3.xml", null);
 		Object object3 = xmlreader.read(is, null, null);
 		is.close();
 		

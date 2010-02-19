@@ -1,11 +1,13 @@
 
-package jadex.xml.tutorial.example14;
+package jadex.xml.tutorial.example05;
 
 public class Customer {
     public int customerNumber;
     public String firstName;
     public String lastName;
-    public Address shipAddress;
-    public Address billAddress;
+    public String street;
+    public String city;
+    public String state;
+    public Integer zip;
     public String phone;
 }

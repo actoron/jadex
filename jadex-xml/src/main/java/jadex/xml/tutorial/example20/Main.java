@@ -4,7 +4,6 @@ import jadex.commons.SUtil;
 import jadex.xml.AccessInfo;
 import jadex.xml.IContext;
 import jadex.xml.IObjectObjectConverter;
-import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SubObjectConverter;
@@ -17,8 +16,6 @@ import jadex.xml.reader.Reader;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.xml.namespace.QName;
 
 /**
  *  Main class to execute tutorial lesson c (taken from Jibx website).
@@ -61,12 +58,6 @@ public class Main
 			new SubobjectInfo(new AccessInfo("total"), new SubObjectConverter(totalconv, null)),
 			new SubobjectInfo(new AccessInfo("orders"), new SubObjectConverter(ordersconv, null))
 		})));
-		
-//		typeinfos.add(new TypeInfo(null, "customer", Customer.class, null, null,
-//			null, null, null, new SubobjectInfo[]{
-//			new SubobjectInfo(new AttributeInfo("total", null, null, totalconv, null)),
-//			new SubobjectInfo(new AttributeInfo("orders", null, null, ordersconv, null))
-//		}));
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos

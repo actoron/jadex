@@ -4,8 +4,8 @@ import jadex.commons.SUtil;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
-import jadex.xml.ICustomProcessor;
 import jadex.xml.IObjectObjectConverter;
+import jadex.xml.IReturnValueCommand;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SubObjectConverter;
@@ -17,7 +17,6 @@ import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
 
 import java.io.InputStream;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -45,19 +44,19 @@ public class Main
 		typeinfos.add(new TypeInfo(new XMLInfo("customer"), new ObjectInfo(Customer.class)));
 		typeinfos.add(new TypeInfo(new XMLInfo("entry"), new ObjectInfo(HashMap.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("key", null, null, null, new BeanAccessInfo("")))},
+			new AttributeInfo(new AccessInfo("key", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo("customer", null, null, null, new BeanAccessInfo("")))
+			new SubobjectInfo(new AccessInfo("customer", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 		typeinfos.add(new TypeInfo(new XMLInfo("directory"), new ObjectInfo(Directory.class), 
 			new MappingInfo(null, new SubobjectInfo[]{
 			new SubobjectInfo(new AccessInfo("entry", null, null, null, 
 			new BeanAccessInfo(Directory.class.getField("customerMap"),
-			null, "customerMap", new ICustomProcessor() 
+			null, "customerMap", new IReturnValueCommand()
 			{
-				public Object processValue(Object object) 
+				public Object execute(Object args)
 				{
-					return ((Map)object).get("key");
+					return ((Map)args).get("key");
 				}
 			})),
 			new SubObjectConverter(new IObjectObjectConverter()
@@ -92,19 +91,19 @@ public class Main
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "customer")}), new ObjectInfo(Customer.class)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "entry")}), new ObjectInfo(HashMap.class),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo(new QName(uri, "key"), null, null, null, new BeanAccessInfo("")))},
+			new AttributeInfo(new AccessInfo(new QName(uri, "key"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)))},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "customer"), null, null, null, new BeanAccessInfo("")))
+			new SubobjectInfo(new AccessInfo(new QName(uri, "customer"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "directory")}), new ObjectInfo(Directory.class), 
 			new MappingInfo(null, new SubobjectInfo[]{
 			new SubobjectInfo(new AccessInfo(new QName(uri, "entry"), null, null, null, 
 			new BeanAccessInfo(Directory.class.getField("customerMap"),
-			null, "customerMap", new ICustomProcessor() 
+			null, "customerMap", new IReturnValueCommand()
 			{
-				public Object processValue(Object object) 
+				public Object execute(Object args)
 				{
-					return ((Map)object).get("key");
+					return ((Map)args).get("key");
 				}
 			})),
 			new SubObjectConverter(new IObjectObjectConverter()

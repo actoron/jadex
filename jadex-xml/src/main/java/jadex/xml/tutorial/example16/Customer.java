@@ -1,7 +1,8 @@
 
 package jadex.xml.tutorial.example16;
 
-public class Customer {
+public class Customer 
+{
     public Identity identity;
     public String street;
     public String city;

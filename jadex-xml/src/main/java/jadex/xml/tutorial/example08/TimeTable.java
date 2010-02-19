@@ -1,8 +1,6 @@
 
 package jadex.xml.tutorial.example08;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class TimeTable

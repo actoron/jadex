@@ -33,9 +33,17 @@ public class MappingInfo
 	/**
 	 *  Create a new mapping info.
 	 */
+	public MappingInfo(boolean includefield)
+	{
+		this(null, null, null, null, null, includefield);
+	}
+	
+	/**
+	 *  Create a new mapping info.
+	 */
 	public MappingInfo(TypeInfo supertype)
 	{
-		this.supertype = supertype;
+		this(supertype, (AttributeInfo[])null);
 	}
 
 	/**
@@ -43,8 +51,7 @@ public class MappingInfo
 	 */
 	public MappingInfo(TypeInfo supertype, AttributeInfo[] attributeinfos)
 	{
-		this.supertype = supertype;
-		this.attributeinfos = attributeinfos;
+		this(supertype, attributeinfos, null);
 	}
 	
 	/**
@@ -52,8 +59,7 @@ public class MappingInfo
 	 */
 	public MappingInfo(TypeInfo supertype, SubobjectInfo[] subobjectinfos)
 	{
-		this.supertype = supertype;
-		this.subobjectinfos = subobjectinfos;
+		this(supertype, null, subobjectinfos);
 	}
 
 	/**
@@ -62,12 +68,7 @@ public class MappingInfo
 	public MappingInfo(TypeInfo supertype, Object commentinfo,
 		Object contentinfo)
 	{		
-		this.supertype = supertype;
-		this.commentinfo = commentinfo;
-		this.contentinfo = contentinfo;
-	
-		if((commentinfo instanceof AttributeInfo[]) || (contentinfo instanceof AttributeInfo[]))
-			System.out.println("here: "+this);
+		this(supertype, commentinfo, contentinfo, null);
 	}
 
 	/**
@@ -76,9 +77,7 @@ public class MappingInfo
 	public MappingInfo(TypeInfo supertype, AttributeInfo[] attributeinfos,
 		SubobjectInfo[] subobjectinfos)
 	{
-		this.supertype = supertype;
-		this.attributeinfos = attributeinfos;
-		this.subobjectinfos = subobjectinfos;
+		this(supertype, null, null, attributeinfos, subobjectinfos);
 	}
 
 	/**
@@ -87,13 +86,7 @@ public class MappingInfo
 	public MappingInfo(TypeInfo supertype, Object commentinfo,
 		Object contentinfo, AttributeInfo[] attributeinfos)
 	{		
-		this.supertype = supertype;
-		this.commentinfo = commentinfo;
-		this.contentinfo = contentinfo;
-		this.attributeinfos = attributeinfos;
-
-		if((commentinfo instanceof AttributeInfo[]) || (contentinfo instanceof AttributeInfo[]))
-			System.out.println("here: "+this);
+		this(supertype, commentinfo, contentinfo, attributeinfos, null);
 	}
 
 	/**
@@ -103,14 +96,7 @@ public class MappingInfo
 		Object contentinfo, AttributeInfo[] attributeinfos,
 		SubobjectInfo[] subobjectinfos)
 	{
-		this.supertype = supertype;
-		this.commentinfo = commentinfo;
-		this.contentinfo = contentinfo;
-		this.attributeinfos = attributeinfos;
-		this.subobjectinfos = subobjectinfos;
-	
-		if((commentinfo instanceof AttributeInfo[]) || (contentinfo instanceof AttributeInfo[]))
-			System.out.println("here: "+this);
+		this(supertype, commentinfo, contentinfo, attributeinfos, subobjectinfos, false);
 	}
 
 	/**
