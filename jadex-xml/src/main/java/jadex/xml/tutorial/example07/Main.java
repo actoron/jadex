@@ -29,7 +29,8 @@ public class Main
 	public static void main(String[] args) throws Exception
 	{
 		// Read an xml in an object structure (an invoice that contains a product object). 
-		// Using a custom converter to convert a string to 
+		// Using a custom subobject converter to convert a string to a date.
+		// (for attributes similar attribute converters can be used).
 		
 		// Create minimal type infos for both types that need to be mapped
 		Set typeinfos = new HashSet();
