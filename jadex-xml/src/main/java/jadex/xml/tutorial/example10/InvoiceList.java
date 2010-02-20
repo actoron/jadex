@@ -16,8 +16,8 @@ public class InvoiceList
 	//-------- methods --------
 	
 	/**
-	 *  Add an invoice item.
-	 *  @param item The item.
+	 *  Set the invoice items.
+	 *  @param invoices The invoice items.
 	 */
 	public void setItems(Invoice[] invoice)
 	{
