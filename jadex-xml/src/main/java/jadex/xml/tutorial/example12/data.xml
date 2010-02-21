@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<products>
+	<software>
+		<item>
+			<name>Jadex agent software suite</name>
+			<description>Special update offer</description>
+			<price>999.98</price>
+			<version>V2</version>
+		</item>
+	</software>
+	<computers>
+		<item>
+			<name>Laptop</name>
+			<description>Laptop in black</description>
+			<price>500</price>
+			<processor>i386</processor>
+			<ram>3gb</ram>
+			<harddrive>1tb</harddrive>
+		</item>
+	</computers>
+</products>
