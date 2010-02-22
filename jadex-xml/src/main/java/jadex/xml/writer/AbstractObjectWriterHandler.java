@@ -27,8 +27,11 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	/** Control flag for generating container tags. */
 	protected boolean gentypetags;
 	
+	/** Flag indicating if writing tags should be preferred wrt. attributes. */
+	protected boolean prefertags;
+	
 	/** The flattening flag for tags, i.e. generate always new containing tags or use one. */
-	protected boolean flattening = true;
+	protected boolean flattening;
 	
 	/** The type info manager. */
 	protected TypeInfoTypeManager titmanager;
@@ -38,17 +41,11 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	/**
 	 *  Create a new writer handler.
 	 */
-	public AbstractObjectWriterHandler(Set typeinfos)
-	{
-		this(true, typeinfos);
-	}
-	
-	/**
-	 *  Create a new writer handler.
-	 */
-	public AbstractObjectWriterHandler(boolean gentypetags, Set typeinfos)
+	public AbstractObjectWriterHandler(boolean gentypetags, boolean prefertags, boolean flattening, Set typeinfos)
 	{
 		this.gentypetags = gentypetags;
+		this.prefertags = prefertags;
+		this.flattening = flattening;
 		this.titmanager = new TypeInfoTypeManager(typeinfos);
 	}
 	
@@ -66,6 +63,15 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 		return titmanager.getTypeInfo(type, fullpath);
 	}
 	
+	/**
+	 *  Get the titmanager.
+	 *  @return The titmanager.
+	 */
+	public TypeInfoTypeManager getTypeInfoManager()
+	{
+		return this.titmanager;
+	}
+
 	/**
 	 *  Get the object type
 	 *  @param object The object.
@@ -215,19 +221,18 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 				for(Iterator it=subobsinfos.iterator(); it.hasNext(); )
 				{
 					SubobjectInfo soinfo = (SubobjectInfo)it.next();
-					info = soinfo.getAccessInfo();
+					AccessInfo ai = soinfo.getAccessInfo();
 					TypeInfo sotypeinfo = soinfo.getTypeInfo();
-					Object property = getProperty(info);
+					Object property = getProperty(soinfo);
 					if(property!=null)
 					{
 						doneprops.add(getPropertyName(property));
-						if(!(info instanceof AccessInfo && ((AccessInfo)info).isIgnoreWrite()))
+						if(!(ai instanceof AccessInfo && ((AccessInfo)ai).isIgnoreWrite()))
 						{	
 							String propname = getPropertyName(property);
-							Object value = getValue(object, property, context, info);
+							Object value = getValue(object, property, context, soinfo);
 							if(value!=null)
 							{
-//								String xmlsoname = soinfo.getXMLPath()!=null? soinfo.getXMLPath(): getPropertyName(property);
 								QName[] xmlpath = soinfo.getXMLPathElements();
 								if(xmlpath==null)
 									xmlpath = new QName[]{QName.valueOf(getPropertyName(property))};
@@ -284,7 +289,8 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 						// Make to an attribute when
 						// a) it is a basic type
 						// b) it can be decoded to the right object type
-						boolean prefertags = typeinfo!=null && typeinfo.getMappingInfo()!=null && typeinfo.getMappingInfo().isPreferTags();
+						Boolean pt = typeinfo!=null && typeinfo.getMappingInfo()!=null? typeinfo.getMappingInfo().getPreferTags(): null;
+						boolean prefertags = pt!=null? pt.booleanValue(): this.prefertags;
 						if(!prefertags && isBasicType(property, value) && isDecodableToSameType(property, value, context))
 						{
 							if(!value.equals(getDefaultValue(property)))

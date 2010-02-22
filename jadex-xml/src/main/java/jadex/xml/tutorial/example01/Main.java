@@ -43,10 +43,10 @@ public class Main
 		
 		typeinfos = new HashSet();
 		typeinfos.add(new TypeInfo(new XMLInfo("invoice"), new ObjectInfo(Invoice.class),
-			new MappingInfo(true, true)));
+			new MappingInfo(true)));
 		
 		// Write the xml to the output file.
-		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(typeinfos), false, true);
+		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(false, true, typeinfos), false, true);
 		OutputStream os = new FileOutputStream("out.xml");
 		xmlwriter.write(object, os, null, null);
 		os.close();

@@ -5,10 +5,13 @@ import jadex.commons.SUtil;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.BasicTypeConverter;
+import jadex.xml.IAttributeConverter;
 import jadex.xml.IContext;
-import jadex.xml.ObjectInfo;
+import jadex.xml.ISubObjectConverter;
 import jadex.xml.Namespace;
+import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
+import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.writer.AbstractObjectWriterHandler;
 
@@ -41,7 +44,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		
 	/** No type infos. */
 	protected Set no_typeinfos;
-	
+		
 	//-------- constructors --------
 	
 	/**
@@ -57,7 +60,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	public BeanObjectWriterHandler(boolean gentypetags, Set typeinfos)
 	{
-		super(gentypetags, typeinfos);
+		this(gentypetags, false, typeinfos);
 	}
 	
 	/**
@@ -65,7 +68,15 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	public BeanObjectWriterHandler(boolean gentypetags, boolean prefertags, Set typeinfos)
 	{
-		super(gentypetags, typeinfos);
+		this(gentypetags, prefertags, true, typeinfos);
+	}
+	
+	/**
+	 *  Create a new writer.
+	 */
+	public BeanObjectWriterHandler(boolean gentypetags, boolean prefertags, boolean flattening ,Set typeinfos)
+	{
+		super(gentypetags, prefertags, flattening, typeinfos);
 	}
 	
 	//-------- methods --------
@@ -102,8 +113,8 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				for(int i=0; i<tocheck.size() && ret==null; i++)
 				{
 					Class clazz = (Class)tocheck.get(i);
-					Set tis = titmanager.getTypeInfosByType(clazz);
-					ret = titmanager.findTypeInfo(tis, fullpath);
+					Set tis = getTypeInfoManager().getTypeInfosByType(clazz);
+					ret = getTypeInfoManager().findTypeInfo(tis, fullpath);
 					if(ret==null)
 					{
 						Class[] interfaces = clazz.getInterfaces();
@@ -120,7 +131,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				if(ret==null && ((Class)type).isArray())
 				{
 //					System.out.println("array: "+type);
-					ret = titmanager.findTypeInfo(titmanager.getTypeInfosByType(Object[].class), fullpath);
+					ret = getTypeInfoManager().findTypeInfo(getTypeInfoManager().getTypeInfosByType(Object[].class), fullpath);
 				}
 				
 				// Add concrete class for same info if it is used
@@ -137,7 +148,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 //						ret.getDeclaredAttributeInfos(), ret.getPostProcessor(), ret.getFilter(), 
 //						ret.getDeclaredSubobjectInfos());
 					
-					titmanager.addTypeInfo(ti);
+					getTypeInfoManager().addTypeInfo(ti);
 				}
 				else
 				{
@@ -243,12 +254,14 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		Method method = null;
 		Field field = null;
 		
-		BeanAccessInfo binfo = (info instanceof AccessInfo) && (((AccessInfo)info).getExtraInfo() instanceof BeanAccessInfo)? 
+		AccessInfo ai = info instanceof AttributeInfo? ((AttributeInfo)info).getAccessInfo(): 
+			info instanceof SubobjectInfo? ((SubobjectInfo)info).getAccessInfo(): null;
+		BeanAccessInfo bai = ai!=null && (ai.getExtraInfo() instanceof BeanAccessInfo)? 
 			(BeanAccessInfo)((AccessInfo)info).getExtraInfo(): null;
 		
-		if(binfo!=null && binfo.getFetchHelp()!=null)
+		if(bai!=null && bai.getFetchHelp()!=null)
 		{
-			Object tmp = binfo.getFetchHelp();
+			Object tmp = bai.getFetchHelp();
 			if(tmp instanceof Method)
 				method = (Method)tmp;
 			else //if(tmp instanceof Field)
@@ -312,6 +325,24 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			throw new RuntimeException("Could not fetch value: "+object+" "+attr);
 		}
 		
+		// Convert values.
+		if(info instanceof AttributeInfo)
+		{
+			IAttributeConverter conv = ((AttributeInfo)info).getConverter();
+			if(conv!=null)
+			{
+				value = conv.convertObject(value, context);
+			}
+		}
+		else if(info instanceof SubobjectInfo)
+		{
+			ISubObjectConverter conv = ((SubobjectInfo)info).getConverter();
+			if(conv!=null)
+			{
+				value = conv.convertObjectForWrite(value, context);
+			}
+		}
+		
 		return value;
 	}
 	
@@ -324,6 +355,10 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		if(info instanceof AttributeInfo)
 		{
 			info = ((AttributeInfo)info).getAccessInfo();
+		}
+		else if(info instanceof SubobjectInfo)
+		{
+			info = ((SubobjectInfo)info).getAccessInfo();
 		}
 		
 		if(info instanceof AccessInfo)

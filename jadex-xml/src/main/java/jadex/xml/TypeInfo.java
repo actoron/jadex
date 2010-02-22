@@ -149,7 +149,7 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	public boolean isIncludeFields()
 	{
-		return mapinfo!=null? mapinfo.isIncludeFields(): false;
+		return mapinfo!=null? mapinfo.getIncludeFields()!=null && mapinfo.getIncludeFields().booleanValue(): false;
 	}
 	
 	/**
@@ -368,7 +368,7 @@ public class TypeInfo	extends AbstractInfo
 	 */
 	protected Map createAttributeInfos(AttributeInfo[] attributeinfos)
 	{
-		Map ret = new HashMap();
+		Map ret = new LinkedHashMap();
 		for(int i=0; i<attributeinfos.length; i++)
 		{
 			QName xmlname = attributeinfos[i].getXMLAttributeName();

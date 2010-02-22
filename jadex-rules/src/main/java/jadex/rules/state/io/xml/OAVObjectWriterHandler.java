@@ -46,10 +46,25 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Create a new writer.
 	 */
-	public OAVObjectWriterHandler(boolean gencontainertags, Set typeinfos)
+	public OAVObjectWriterHandler(boolean gentypetags, Set typeinfos)
 	{
-		super(typeinfos);
-		this.gentypetags = gencontainertags;
+		this(gentypetags, false, typeinfos);
+	}
+	
+	/**
+	 *  Create a new writer.
+	 */
+	public OAVObjectWriterHandler(boolean gentypetags, boolean prefertags, Set typeinfos)
+	{
+		this(gentypetags, prefertags, true, typeinfos);
+	}
+	
+	/**
+	 *  Create a new writer.
+	 */
+	public OAVObjectWriterHandler(boolean gentypetags, boolean prefertags, boolean flattening ,Set typeinfos)
+	{
+		super(gentypetags, prefertags, flattening, typeinfos);
 	}
 	
 	//-------- methods --------

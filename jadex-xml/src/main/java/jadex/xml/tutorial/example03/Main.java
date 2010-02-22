@@ -36,6 +36,7 @@ public class Main
 		Set typeinfos = new HashSet();
 		typeinfos.add(new TypeInfo(new XMLInfo("invoice"), new ObjectInfo(Invoice.class),
 			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("name")), // only for writing (make it attribute)
 			new AttributeInfo(new AccessInfo("productkey", "key"))		
 			})));
 		
@@ -46,12 +47,8 @@ public class Main
 		Object object = xmlreader.read(is, null, null);
 		is.close();
 		
-		typeinfos = new HashSet();
-		typeinfos.add(new TypeInfo(new XMLInfo("invoice"), new ObjectInfo(Invoice.class),
-			new MappingInfo(false, true)));
-		
 		// Write the xml to the output file.
-		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(typeinfos), false, true);
+		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(false, true, typeinfos), false, true);
 		OutputStream os = new FileOutputStream("out.xml");
 		xmlwriter.write(object, os, null, null);
 		os.close();

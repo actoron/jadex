@@ -28,25 +28,25 @@ public class MappingInfo
 	//-------- extra writing info --------
 	
 	/** The include fields flag. */
-	protected boolean includefields;
+	protected Boolean includefields;
 	
 	/** The include fields flag. */
-	protected boolean prefertags;
+	protected Boolean prefertags;
 
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new mapping info.
 	 */
-	public MappingInfo(boolean includefields)
+	public MappingInfo(Boolean includefields)
 	{
-		this(includefields, false);
+		this(includefields, null);
 	}
 	
 	/**
 	 *  Create a new mapping info.
 	 */
-	public MappingInfo(boolean includefields, boolean prefertags)
+	public MappingInfo(Boolean includefields, Boolean prefertags)
 	{
 		this(null, null, null, null, null, includefields, prefertags);
 	}
@@ -109,7 +109,7 @@ public class MappingInfo
 		Object contentinfo, AttributeInfo[] attributeinfos,
 		SubobjectInfo[] subobjectinfos)
 	{
-		this(supertype, commentinfo, contentinfo, attributeinfos, subobjectinfos, false, false);
+		this(supertype, commentinfo, contentinfo, attributeinfos, subobjectinfos, null, null);
 	}
 
 	/**
@@ -117,7 +117,7 @@ public class MappingInfo
 	 */
 	public MappingInfo(TypeInfo supertype, Object commentinfo,
 		Object contentinfo, AttributeInfo[] attributeinfos,
-		SubobjectInfo[] subobjectinfos, boolean includefields, boolean prefertags)
+		SubobjectInfo[] subobjectinfos, Boolean includefields, Boolean prefertags)
 	{
 		this.supertype = supertype;
 		this.commentinfo = commentinfo;
@@ -182,7 +182,7 @@ public class MappingInfo
 	 *  Get the includefields.
 	 *  @return The includefields.
 	 */
-	public boolean isIncludeFields()
+	public Boolean getIncludeFields()
 	{
 		return includefields;
 	}
@@ -191,7 +191,7 @@ public class MappingInfo
 	 *  Get the prefertags.
 	 *  @return The prefertags.
 	 */
-	public boolean isPreferTags()
+	public Boolean getPreferTags()
 	{
 		return this.prefertags;
 	}
