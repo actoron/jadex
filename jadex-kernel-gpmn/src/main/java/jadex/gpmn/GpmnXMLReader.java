@@ -126,8 +126,8 @@ public class GpmnXMLReader
 		};
 		
 		TypeInfo ti_proc = new TypeInfo(new XMLInfo("processes"), new ObjectInfo(MProcess.class),
-			new MappingInfo(null, new BeanAccessInfo[]{new BeanAccessInfo("ID", "Id")},
-			new SubobjectInfo[]{
+			new MappingInfo(null, new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo("ID", "Id")),
 			new SubobjectInfo(new AccessInfo("sequenceEdges", "sequenceEdge")),
 			new SubobjectInfo(new AccessInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
 			new SubobjectInfo(new AccessInfo("incomingEdges", "incomingSequenceEdgesDescription")),
@@ -226,10 +226,12 @@ public class GpmnXMLReader
 			}),
 			new ObjectInfo(MPlan.class, new ProcessElementPostProcessor()),
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("ID", "Id")),
-			new AttributeInfo(new AccessInfo("precondition", "preCondition")),
-			new AttributeInfo(new AccessInfo("contextcondition", "contextCondition"))},
+			new AttributeInfo(new AccessInfo("ID", "Id"))},
+			//new AttributeInfo(new AccessInfo("precondition", "preCondition")),
+			//new AttributeInfo(new AccessInfo("contextcondition", "contextCondition"))},
 			new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo("precondition", "preCondition")),
+			new SubobjectInfo(new AccessInfo("contextcondition", "contextCondition")),
 //			new SubobjectInfo(new BeanAttributeInfo("sequenceEdges", "sequenceEdge")),
 			new SubobjectInfo(new AccessInfo("outgoingEdges", "outgoingSequenceEdgesDescription")),
 			new SubobjectInfo(new AccessInfo("incomingEdges", "incomingSequenceEdgesDescription")),
