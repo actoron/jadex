@@ -25,6 +25,53 @@ public class ProductList
 			productlist = new ArrayList();
 		productlist.add(product);
 	}
+	
+	/**
+	 *  Get the productlist.
+	 *  @return The productlist.
+	 */
+	public List getProducts()
+	{
+		return productlist;
+	}
+	
+	/**
+	 *  Get the productlist.
+	 *  @return The productlist.
+	 */
+	public List getSoftware()
+	{
+		List ret = new ArrayList();
+		if(productlist!=null)
+		{
+			for(int i=0; i<productlist.size(); i++)
+			{
+				Product p = (Product)productlist.get(i);
+				if(p instanceof Software)
+					ret.add(p);
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Get the productlist.
+	 *  @return The productlist.
+	 */
+	public List getComputers()
+	{
+		List ret = new ArrayList();
+		if(productlist!=null)
+		{
+			for(int i=0; i<productlist.size(); i++)
+			{
+				Product p = (Product)productlist.get(i);
+				if(p instanceof Computer)
+					ret.add(p);
+			}
+		}
+		return ret;
+	}
 
 	/**
 	 *  Get the string representation.

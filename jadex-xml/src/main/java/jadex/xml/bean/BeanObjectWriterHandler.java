@@ -257,15 +257,22 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		AccessInfo ai = info instanceof AttributeInfo? ((AttributeInfo)info).getAccessInfo(): 
 			info instanceof SubobjectInfo? ((SubobjectInfo)info).getAccessInfo(): null;
 		BeanAccessInfo bai = ai!=null && (ai.getExtraInfo() instanceof BeanAccessInfo)? 
-			(BeanAccessInfo)((AccessInfo)info).getExtraInfo(): null;
+			(BeanAccessInfo)ai.getExtraInfo(): null;
 		
-		if(bai!=null && bai.getFetchHelp()!=null)
+		if(bai!=null)
 		{
-			Object tmp = bai.getFetchHelp();
-			if(tmp instanceof Method)
-				method = (Method)tmp;
-			else //if(tmp instanceof Field)
-				field = (Field)tmp;
+			if(bai.getMapName()!=null)
+			{
+				System.out.println("todo");
+			}
+			if(bai.getFetchHelp()!=null)
+			{
+				Object tmp = bai.getFetchHelp();
+				if(tmp instanceof Method)
+					method = (Method)tmp;
+				else //if(tmp instanceof Field)
+					field = (Field)tmp;
+			}
 		}
 		else if(attr instanceof BeanProperty)
 		{

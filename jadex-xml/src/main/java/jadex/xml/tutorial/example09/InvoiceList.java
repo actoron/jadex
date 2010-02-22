@@ -25,6 +25,24 @@ public class InvoiceList
 			invoicelist = new ArrayList();
 		invoicelist.add(invoice);
 	}
+	
+	/**
+	 *  Get the invoicelist.
+	 *  @return The invoicelist.
+	 */
+	public List getItems()
+	{
+		return invoicelist;
+	}
+	
+	/**
+	 *  Set the invoicelist.
+	 *  @param invoicelist The invoicelist to set.
+	 */
+	public void setItems(List invoicelist)
+	{
+		this.invoicelist = invoicelist;
+	}
 
 	/**
 	 *  Get the string representation.

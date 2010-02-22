@@ -9,9 +9,15 @@ import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
+import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.reader.Reader;
+import jadex.xml.tutorial.example09.Invoice;
+import jadex.xml.tutorial.example09.InvoiceList;
+import jadex.xml.writer.Writer;
 
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,12 +49,27 @@ public class Main
 		// custom typeinfos
 		Reader xmlreader = new Reader(new BeanObjectReaderHandler(typeinfos));
 		InputStream is = SUtil.getResource("jadex/xml/tutorial/example10/data.xml", null);
-		
-		// Read the xml.
 		Object object = xmlreader.read(is, null, null);
 		is.close();
+
+		typeinfos = new HashSet();
+		typeinfos.add(new TypeInfo(new XMLInfo("invoice"), new ObjectInfo(InvoiceList.class), 
+			new MappingInfo(null, new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo("item", "items"), null, true)
+			})));
+		typeinfos.add(new TypeInfo(new XMLInfo("item"), new ObjectInfo(Invoice.class),
+			new MappingInfo(null, new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo("product-key", "key"))		
+			})));
+		
+		// Write the xml to the output file.
+		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(false, true, typeinfos), false, true);
+		OutputStream os = new FileOutputStream("out.xml");
+		xmlwriter.write(object, os, null, null);
+		os.close();
 		
 		// And print out the result.
 		System.out.println("Read object: "+object);
+		System.out.println("Wrote object to out.xml");
 	}
 }
