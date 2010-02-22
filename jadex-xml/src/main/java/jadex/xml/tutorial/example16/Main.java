@@ -5,12 +5,17 @@ import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
+import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
+import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.reader.Reader;
+import jadex.xml.writer.Writer;
 
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,13 +29,25 @@ public class Main
 	 */
 	public static void main(String[] args) throws Exception
 	{
-		// 
+		// This example shows the usage of id and idref attributes.
+		
+		// During the read process id attributes will be used to store
+		// the object under the corresponding attribute value. When idref
+		// attributes are used the attribute will be used to fetch the 
+		// already read object and strore it as attribute value.
+		
+		// During the write process the writer replaces idref attribute values
+		// with the corresponding id value of the object that should be originally
+		// written as attribute value.
 		
 		// Create minimal type infos for types that need to be mapped
 		
 		Set typeinfos = new HashSet();
 		typeinfos.add(new TypeInfo(new XMLInfo("products"), new ObjectInfo(ProductList.class))); 
-		typeinfos.add(new TypeInfo(new XMLInfo("product"), new ObjectInfo(Product.class)));
+		typeinfos.add(new TypeInfo(new XMLInfo("product"), new ObjectInfo(Product.class),
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("name"), null, AttributeInfo.ID)
+		})));
 		typeinfos.add(new TypeInfo(new XMLInfo("part"), new ObjectInfo(Part.class),
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("product"), null, AttributeInfo.IDREF)
@@ -40,12 +57,38 @@ public class Main
 		// custom typeinfos
 		Reader xmlreader = new Reader(new BeanObjectReaderHandler(typeinfos));
 		InputStream is = SUtil.getResource("jadex/xml/tutorial/example16/data.xml", null);
-		
-		// Read the xml.
 		Object object = xmlreader.read(is, null, null);
 		is.close();
 		
+		// For writing some more information is necessary
+		// - use a container tag for parts/part
+		// - write price as tag, not as attribute
+		
+		typeinfos = new HashSet();
+		typeinfos.add(new TypeInfo(new XMLInfo("products"), new ObjectInfo(ProductList.class),
+			new MappingInfo(null, new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo("product", "products"), null, true)
+			}))); 
+		typeinfos.add(new TypeInfo(new XMLInfo("product"), new ObjectInfo(Product.class),
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("name"), null, AttributeInfo.ID)},
+			new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo("price", "price")),
+			new SubobjectInfo(new XMLInfo("parts/part"), new AccessInfo("part", "parts"), null, true)
+			})));
+		typeinfos.add(new TypeInfo(new XMLInfo("part"), new ObjectInfo(Part.class),
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("product"), null, AttributeInfo.IDREF)
+		})));
+		
+		// Write the xml to the output file.
+		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(typeinfos), false, true);
+		OutputStream os = new FileOutputStream("out.xml");
+		xmlwriter.write(object, os, null, null);
+		os.close();
+		
 		// And print out the result.
 		System.out.println("Read object: "+object);
+		System.out.println("Wrote object to out.xml");
 	}
 }

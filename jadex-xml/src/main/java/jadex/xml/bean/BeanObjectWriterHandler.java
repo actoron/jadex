@@ -57,8 +57,15 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	public BeanObjectWriterHandler(boolean gentypetags, Set typeinfos)
 	{
-		super(typeinfos);
-		this.gentypetags = gentypetags;
+		super(gentypetags, typeinfos);
+	}
+	
+	/**
+	 *  Create a new writer.
+	 */
+	public BeanObjectWriterHandler(boolean gentypetags, boolean prefertags, Set typeinfos)
+	{
+		super(gentypetags, typeinfos);
 	}
 	
 	//-------- methods --------

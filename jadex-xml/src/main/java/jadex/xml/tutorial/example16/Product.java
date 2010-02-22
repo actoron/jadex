@@ -69,11 +69,20 @@ public class Product
 	}
 
 	/**
+	 *  Get the parts.
+	 *  @return The parts.
+	 */
+	public List getParts()
+	{
+		return this.parts;
+	}
+
+	/**
 	 *  Get the string representation.
 	 *  @return The string representation.
 	 */
 	public String toString()
 	{
-		return "Product(name=" + name + ", price=" + price + ")";
+		return "Product(name=" + name + ", price=" + price + ", parts=" + parts + ")";
 	}	
 }

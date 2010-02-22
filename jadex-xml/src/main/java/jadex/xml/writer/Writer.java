@@ -180,9 +180,43 @@ public class Writer
 			{
 				for(Iterator it=attrs.keySet().iterator(); it.hasNext(); )
 				{
-					String propname = (String)it.next();
+					Object propname = it.next();
 					String value = (String)attrs.get(propname);
-					writer.writeAttribute(propname, value);
+					if(propname instanceof String)
+					{
+						writer.writeAttribute((String)propname, value);
+					}
+					else if(propname instanceof QName)
+					{
+						QName attrname = (QName)propname;
+						// Create tag with prefix if it has a namespace but no prefix.
+						if(!XMLConstants.NULL_NS_URI.equals(attrname.getNamespaceURI()) && XMLConstants.DEFAULT_NS_PREFIX.equals(attrname.getPrefix()))
+						{
+							attrname = handler.getTagWithPrefix(tag);
+						}
+						String uri = attrname.getNamespaceURI();
+						String prefix = attrname.getPrefix();
+						String localname = attrname.getLocalPart();
+						
+						if(!XMLConstants.NULL_NS_URI.equals(uri))
+						{
+							if(!prefix.equals(writer.getPrefix(uri)))
+							{
+								writer.writeAttribute(prefix, uri, localname, value);
+								writer.writeNamespace(prefix, uri);
+							}
+							else
+							{
+								writer.writeAttribute(prefix, uri, localname, value);
+							}
+						}
+						else
+						{
+							writer.writeAttribute(localname, value);
+						}
+						
+						//		System.out.println("name"+tag.getLocalPart()+" prefix:"+prefix+" writerprefix:"+writer.getPrefix(uri)+" uri:"+uri);
+					}
 				}
 			}
 			
@@ -228,8 +262,6 @@ public class Writer
 	/**
 	 *  Write the subobjects of an object.
 	 */
-//	protected void writeSubobjects(XMLStreamWriter writer, TreeNode node, Map writtenobs, 
-//			List stack, Object context, ClassLoader classloader, TypeInfo typeinfo) throws Exception
 	protected void writeSubobjects(WriteContext wc, TreeNode node, TypeInfo typeinfo) throws Exception
 	{
 		XMLStreamWriter writer = wc.getWriter();

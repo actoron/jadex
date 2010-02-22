@@ -63,7 +63,7 @@ public class WriteObjectInfo
 	 *  @param name The name.
 	 *  @param value The value.
 	 */
-	public void addAttribute(String name, String value)
+	public void addAttribute(Object name, String value)
 	{
 		if(attributes==null)
 			attributes = new LinkedHashMap();

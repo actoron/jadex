@@ -25,7 +25,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	//-------- attributes --------
 	
 	/** Control flag for generating container tags. */
-	protected boolean gentypetags = true;
+	protected boolean gentypetags;
 	
 	/** The flattening flag for tags, i.e. generate always new containing tags or use one. */
 	protected boolean flattening = true;
@@ -40,6 +40,15 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	 */
 	public AbstractObjectWriterHandler(Set typeinfos)
 	{
+		this(true, typeinfos);
+	}
+	
+	/**
+	 *  Create a new writer handler.
+	 */
+	public AbstractObjectWriterHandler(boolean gentypetags, Set typeinfos)
+	{
+		this.gentypetags = gentypetags;
 		this.titmanager = new TypeInfoTypeManager(typeinfos);
 	}
 	
@@ -132,18 +141,61 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 						doneprops.add(getPropertyName(property));
 						if(!(info instanceof AttributeInfo && ((AttributeInfo)info).isIgnoreWrite()))
 						{	
-							Object value = getValue(object, property, context, info);
+							Object value = getValue(object, property, context, info);	
+							
 							if(value!=null)
 							{
+								// When attribute is a IDREF then 
+								// a) find type info for current value
+								// b) find id attribute
+								// c) find id attribute value
+								AttributeInfo attrinfo = (AttributeInfo)info;
+								if(AttributeInfo.IDREF.equals(attrinfo.getId()))
+								{
+									Set tis = titmanager.getTypeInfosByType(value.getClass());
+									if(tis==null || tis.size()!=1)
+										throw new RuntimeException("Could not determine type info for idref object: "+value);
+									TypeInfo ti = (TypeInfo)tis.iterator().next();
+									
+									AttributeInfo idinfo = null;
+									if(ti.getAttributeInfos()!=null)
+									{
+										for(Iterator it2 = ti.getAttributeInfos().iterator(); idinfo==null && it2.hasNext(); )
+										{
+											AttributeInfo tmp = (AttributeInfo)it2.next();
+											if(AttributeInfo.ID.equals(tmp.getId()))
+												idinfo = tmp;
+										}
+									}
+									if(idinfo==null && (ti.getCommentInfo() instanceof AttributeInfo) 
+										&& AttributeInfo.ID.equals(((AttributeInfo)ti.getCommentInfo()).getId()))
+									{
+										idinfo = ((AttributeInfo)ti.getCommentInfo());
+									}
+									if(idinfo==null && (ti.getContentInfo() instanceof AttributeInfo) 
+										&& AttributeInfo.ID.equals(((AttributeInfo)ti.getContentInfo()).getId()))
+									{
+										idinfo = ((AttributeInfo)ti.getContentInfo());
+									}
+									
+									if(idinfo==null)
+										throw new RuntimeException("Could not determine id attribute of type info: "+ti);
+									
+									Object prop = getProperty(idinfo);
+									value = getValue(value, prop, context, idinfo);
+									
+//									System.out.println("Found id value: "+value);
+								}
+								
 								Object defval = getDefaultValue(info);
 								if(!value.equals(defval))
 								{
 									value = convertValue(info, value, context);
 									
 									// Do we want sometimes to write default values?
-									String xmlattrname = null;
+									Object xmlattrname = null;
 									if(info instanceof AttributeInfo)
-										xmlattrname = ((AttributeInfo)info).getXMLAttributeName().getLocalPart();
+										xmlattrname = ((AttributeInfo)info).getXMLAttributeName();
 									if(xmlattrname==null)
 										xmlattrname = getPropertyName(property);
 									
@@ -232,7 +284,8 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 						// Make to an attribute when
 						// a) it is a basic type
 						// b) it can be decoded to the right object type
-						if(isBasicType(property, value) && isDecodableToSameType(property, value, context))
+						boolean prefertags = typeinfo!=null && typeinfo.getMappingInfo()!=null && typeinfo.getMappingInfo().isPreferTags();
+						if(!prefertags && isBasicType(property, value) && isDecodableToSameType(property, value, context))
 						{
 							if(!value.equals(getDefaultValue(property)))
 								wi.addAttribute(propname, value.toString());
@@ -242,26 +295,9 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 							// todo: remove
 							// Hack special case array, todo: support generically via typeinfo???
 							QName[] xmlpath = new QName[]{QName.valueOf(propname)};
-							
-//							if(value.getClass().isArray())
-//							{
-//								Iterator it2 = SReflect.getIterator(value);
-//								if(it2.hasNext())
-//								{
-//									while(it2.hasNext())
-//									{
-//										Object val = it2.next();
-//										QName[] path = createPath(xmlpath, val, context);
-//										wi.addSubobject(path, val);
-//									}
-//								}
-//							}
-//							else
-							{
-								QName[] path = createPath(xmlpath, value, context);
-								// todo: use some default for flattening
-								wi.addSubobject(path, value, flattening);
-							}
+							QName[] path = createPath(xmlpath, value, context);
+							// todo: use some default for flattening
+							wi.addSubobject(path, value, flattening);
 						}
 					}
 				}
@@ -283,7 +319,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	}
 	
 	/**
-	 * 
+	 *  Create a qname path.
 	 */
 	protected QName[] createPath(QName[] xmlpath, Object value, IContext context)
 	{

@@ -59,30 +59,12 @@ public class LinkingInfo
 	}
 
 	/**
-	 *  Set the linker.
-	 *  @param linker The linker to set.
-	 */
-	public void setLinker(Object linker)
-	{
-		this.linker = linker;
-	}
-
-	/**
 	 *  Get the bulklink.
 	 *  @return The bulklink.
 	 */
 	public boolean isBulkLink()
 	{
 		return bulklink;
-	}
-
-	/**
-	 *  Set the bulklink.
-	 *  @param bulklink The bulklink to set.
-	 */
-	public void setBulkLink(boolean bulklink)
-	{
-		this.bulklink = bulklink;
 	}
 
 	/**

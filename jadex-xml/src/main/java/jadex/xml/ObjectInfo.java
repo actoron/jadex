@@ -61,13 +61,4 @@ public class ObjectInfo
 		return postproc;
 	}
 
-	/**
-	 *  Set the postproc.
-	 *  @param postproc The postproc to set.
-	 */
-	public void setPostProcessor(IPostProcessor postproc)
-	{
-		this.postproc = postproc;
-	}
-
 }

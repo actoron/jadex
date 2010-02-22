@@ -239,10 +239,8 @@ public class MEnvSpaceType	extends MSpaceType
 			new AttributeInfo(new AccessInfo("agenttype", "agenttypes", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			}, 
 			new SubobjectInfo[]{
-//			new SubobjectInfo("percepttype/objecttypes/objecttype", new AttributeInfo("objecttype", "objecttypes", null, "")),
-//			new SubobjectInfo("percepttype/agenttypes/agenttype", new AttributeInfo("percepttype", "agenttypes", new ITypeConverter()
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "objecttypes")}), new AccessInfo(new QName(uri, "objecttype"), "objecttypes", null, null, new BeanAccessInfo(AccessInfo.THIS))),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "agenttypes")}), new AccessInfo(new QName(uri, "agenttype"), "agenttypes", null, null, new BeanAccessInfo(AccessInfo.THIS)), sunameconv)
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "objecttype")}), new AccessInfo(new QName(uri, "objecttype"), "objecttypes", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "agenttype")}), new AccessInfo(new QName(uri, "agenttype"), "agenttypes", null, null, new BeanAccessInfo(AccessInfo.THIS)), sunameconv)
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "actiontype")}), new ObjectInfo(MultiCollection.class),

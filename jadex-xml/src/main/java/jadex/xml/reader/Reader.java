@@ -311,7 +311,7 @@ public class Reader
 									if(attrinfo instanceof AttributeInfo && AttributeInfo.ID.equals(((AttributeInfo)attrinfo).getId()))
 									{
 //										System.out.println("ID: "+attrval+", "+object);
-										readcontext.getReadObjects().put(rawattrs.get(attrval), object);
+										readcontext.getReadObjects().put(attrval, object);
 									}
 								}
 							}
@@ -582,7 +582,7 @@ public class Reader
 	}*/
 	
 	/**
-	 * 
+	 *  Get a subobject info for reading.
 	 */
 	public static SubobjectInfo getSubobjectInfoRead(QName localname, QName[] fullpath, TypeInfo patypeinfo, Map attrs)
 	{

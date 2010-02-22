@@ -25,17 +25,30 @@ public class MappingInfo
 	/** The subobject infos. */
 	protected SubobjectInfo[] subobjectinfos;
 	
+	//-------- extra writing info --------
+	
 	/** The include fields flag. */
 	protected boolean includefields;
+	
+	/** The include fields flag. */
+	protected boolean prefertags;
 
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new mapping info.
 	 */
-	public MappingInfo(boolean includefield)
+	public MappingInfo(boolean includefields)
 	{
-		this(null, null, null, null, null, includefield);
+		this(includefields, false);
+	}
+	
+	/**
+	 *  Create a new mapping info.
+	 */
+	public MappingInfo(boolean includefields, boolean prefertags)
+	{
+		this(null, null, null, null, null, includefields, prefertags);
 	}
 	
 	/**
@@ -96,7 +109,7 @@ public class MappingInfo
 		Object contentinfo, AttributeInfo[] attributeinfos,
 		SubobjectInfo[] subobjectinfos)
 	{
-		this(supertype, commentinfo, contentinfo, attributeinfos, subobjectinfos, false);
+		this(supertype, commentinfo, contentinfo, attributeinfos, subobjectinfos, false, false);
 	}
 
 	/**
@@ -104,7 +117,7 @@ public class MappingInfo
 	 */
 	public MappingInfo(TypeInfo supertype, Object commentinfo,
 		Object contentinfo, AttributeInfo[] attributeinfos,
-		SubobjectInfo[] subobjectinfos, boolean includefields)
+		SubobjectInfo[] subobjectinfos, boolean includefields, boolean prefertags)
 	{
 		this.supertype = supertype;
 		this.commentinfo = commentinfo;
@@ -112,6 +125,7 @@ public class MappingInfo
 		this.attributeinfos = attributeinfos;
 		this.subobjectinfos = subobjectinfos;
 		this.includefields = includefields;
+		this.prefertags = prefertags;
 	
 		if((commentinfo instanceof AttributeInfo[]) || (contentinfo instanceof AttributeInfo[]))
 			System.out.println("here: "+this);
@@ -129,30 +143,12 @@ public class MappingInfo
 	}
 
 	/**
-	 *  Set the supertype.
-	 *  @param supertype The supertype to set.
-	 */
-	public void setSupertype(TypeInfo supertype)
-	{
-		this.supertype = supertype;
-	}
-
-	/**
 	 *  Get the commentinfo.
 	 *  @return The commentinfo.
 	 */
 	public Object getCommentInfo()
 	{
 		return commentinfo;
-	}
-
-	/**
-	 *  Set the commentinfo.
-	 *  @param commentinfo The commentinfo to set.
-	 */
-	public void setCommentInfo(Object commentinfo)
-	{
-		this.commentinfo = commentinfo;
 	}
 
 	/**
@@ -165,30 +161,12 @@ public class MappingInfo
 	}
 
 	/**
-	 *  Set the contentinfo.
-	 *  @param contentinfo The contentinfo to set.
-	 */
-	public void setContentInfo(Object contentinfo)
-	{
-		this.contentinfo = contentinfo;
-	}
-
-	/**
 	 *  Get the attributeinfos.
 	 *  @return The attributeinfos.
 	 */
 	public AttributeInfo[] getAttributeInfos()
 	{
 		return attributeinfos;
-	}
-
-	/**
-	 *  Set the attributeinfos.
-	 *  @param attributeinfos The attributeinfos to set.
-	 */
-	public void setAttributeInfos(AttributeInfo[] attributeinfos)
-	{
-		this.attributeinfos = attributeinfos;
 	}
 
 	/**
@@ -201,15 +179,6 @@ public class MappingInfo
 	}
 
 	/**
-	 *  Set the subobjectinfos.
-	 *  @param subobjectinfos The subobjectinfos to set.
-	 */
-	public void setSubobjectInfos(SubobjectInfo[] subobjectinfos)
-	{
-		this.subobjectinfos = subobjectinfos;
-	}
-
-	/**
 	 *  Get the includefields.
 	 *  @return The includefields.
 	 */
@@ -219,12 +188,12 @@ public class MappingInfo
 	}
 
 	/**
-	 *  Set the includefields.
-	 *  @param includefields The includefields to set.
+	 *  Get the prefertags.
+	 *  @return The prefertags.
 	 */
-	public void setIncludeFields(boolean includefields)
+	public boolean isPreferTags()
 	{
-		this.includefields = includefields;
+		return this.prefertags;
 	}
 
 	/**
@@ -233,10 +202,12 @@ public class MappingInfo
 	 */
 	public String toString()
 	{
-		return "MappingInfo [attributeinfos=" + Arrays.toString(attributeinfos)
-			+ ", commentinfo=" + commentinfo + ", contentinfo="
-			+ contentinfo + ", includefields=" + includefields
-			+ ", subobjectinfos=" + Arrays.toString(subobjectinfos)
-			+ ", supertype=" + supertype + "]";
+		return "MappingInfo(attributeinfos="
+			+ Arrays.toString(this.attributeinfos) + ", commentinfo="
+			+ this.commentinfo + ", contentinfo=" + this.contentinfo
+			+ ", includefields=" + this.includefields + ", prefertags="
+			+ this.prefertags + ", subobjectinfos="
+			+ Arrays.toString(this.subobjectinfos) + ", supertype="
+			+ this.supertype + ", toString()=" + super.toString() + ")";
 	}
 }

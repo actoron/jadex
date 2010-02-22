@@ -1,13 +1,21 @@
 package jadex.xml.tutorial.example15;
 
 import jadex.commons.SUtil;
+import jadex.xml.AccessInfo;
+import jadex.xml.AttributeInfo;
+import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
+import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
+import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.reader.Reader;
+import jadex.xml.writer.Writer;
 
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,29 +31,56 @@ public class Main
 	 */
 	public static void main(String[] args) throws Exception
 	{
-		// In this example different namespaces are used.
+		// In this example different namespaces are used for reading and writing.
 		// Jadex XML assumes that tags without explicit namespace belong
 		// to the default namespace. If they are from a different namespace
 		// this namespace has to be used in the XMLInfo description via
 		// QNames.
 		
+		// todo: explicit support for default namespace when writing, i.e.
+		// omit prefix for default namespace.
+		
 		// Create minimal type infos for both types that need to be mapped
-		String uri = "http://jadex.informatik.uni-hamburg.de/ns2";
+		String uri1 = "http://jadex.informatik.uni-hamburg.de/ns1";
+		String uri2 = "http://jadex.informatik.uni-hamburg.de/ns2";
 		
 		Set typeinfos = new HashSet();
 		typeinfos.add(new TypeInfo(new XMLInfo("invoice"), new ObjectInfo(Invoice.class)));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "product")}), new ObjectInfo(Product.class))); 
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri2, "product")}), new ObjectInfo(Product.class))); 
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos
 		Reader xmlreader = new Reader(new BeanObjectReaderHandler(typeinfos));
 		InputStream is = SUtil.getResource("jadex/xml/tutorial/example15/data.xml", null);
-		
-		// Read the xml.
 		Object object = xmlreader.read(is, null, null);
 		is.close();
 		
+		
+		typeinfos = new HashSet();
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri1, "invoice")}), new ObjectInfo(Invoice.class),
+			new MappingInfo(null, new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo(new QName(uri1, "name"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri1, "description"))),	
+			new SubobjectInfo(new AccessInfo(new QName(uri1, "price"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri1, "quantity")))
+		})));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri2, "product")}), new ObjectInfo(Product.class),
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo(new QName(uri2, "name")))		
+			},
+			new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo(new QName(uri2, "type"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri2, "date")))	
+			})));
+		
+		// Write the xml to the output file.
+		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(typeinfos), false, true);
+		OutputStream os = new FileOutputStream("out.xml");
+		xmlwriter.write(object, os, null, null);
+		os.close();
+		
 		// And print out the result.
 		System.out.println("Read object: "+object);
+		System.out.println("Wrote object to out.xml");
 	}
 }
