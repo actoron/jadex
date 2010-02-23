@@ -94,18 +94,12 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			return null;
 			
 		TypeInfo ret = super.getTypeInfo(object, fullpath, context);
+		
 		// Hack! due to HashMap.Entry is not visible as class
 		if(ret==null)
 		{
 			if(type instanceof Class)
 			{
-				// Class name not necessary no more
-//				Class clazz = (Class)type;
-//				type = SReflect.getClassName(clazz);
-//				ret = findTypeInfo((Set)typeinfos.get(type), fullpath);
-//				if(ret==null)
-//				{
-				
 				// Try if interface or supertype is registered
 				List tocheck = new ArrayList();
 				tocheck.add(type);
@@ -113,8 +107,14 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				for(int i=0; i<tocheck.size() && ret==null; i++)
 				{
 					Class clazz = (Class)tocheck.get(i);
-					Set tis = getTypeInfoManager().getTypeInfosByType(clazz);
-					ret = getTypeInfoManager().findTypeInfo(tis, fullpath);
+//					Set tis = getTypeInfoManager().getTypeInfosByType(clazz);
+//					ret = getTypeInfoManager().findTypeInfo(tis, fullpath);
+					ret = getTypeInfoManager().getTypeInfo(clazz, fullpath);
+					
+//					Set tis = getTypeInfoManager().getTypeInfosByType(clazz);
+//					if(tis.size()==1)
+//						ret = (TypeInfo)tis.iterator().next();
+					
 					if(ret==null)
 					{
 						Class[] interfaces = clazz.getInterfaces();
@@ -131,7 +131,8 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				if(ret==null && ((Class)type).isArray())
 				{
 //					System.out.println("array: "+type);
-					ret = getTypeInfoManager().findTypeInfo(getTypeInfoManager().getTypeInfosByType(Object[].class), fullpath);
+//					ret = getTypeInfoManager().findTypeInfo(getTypeInfoManager().getTypeInfosByType(Object[].class), fullpath);
+					ret = getTypeInfoManager().getTypeInfo(Object[].class, fullpath);
 				}
 				
 				// Add concrete class for same info if it is used
@@ -142,11 +143,6 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 					
 					TypeInfo ti = new TypeInfo(ret.getXMLInfo(),
 						cricpy, ret.getMappingInfo(), ret.getLinkInfo());
-					
-//					TypeInfo ti = new TypeInfo(ret.getSupertype(), ret.getXMLPath(), 
-//						type, ret.getCommentInfo(), ret.getContentInfo(), 
-//						ret.getDeclaredAttributeInfos(), ret.getPostProcessor(), ret.getFilter(), 
-//						ret.getDeclaredSubobjectInfos());
 					
 					getTypeInfoManager().addTypeInfo(ti);
 				}

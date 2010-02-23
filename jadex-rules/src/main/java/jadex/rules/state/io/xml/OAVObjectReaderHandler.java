@@ -104,8 +104,9 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 				for(int i=0; i<tocheck.size() && ret==null; i++)
 				{
 					Class clazz = (Class)tocheck.get(i);
-					Set tis = titmanager.getTypeInfosByType(clazz);
-					ret = titmanager.findTypeInfo(tis, fullpath);
+//					Set tis = titmanager.getTypeInfosByType(clazz);
+//					ret = titmanager.findTypeInfo(tis, fullpath);
+					ret = titmanager.getTypeInfo(clazz, fullpath);
 					if(ret==null)
 					{
 						Class[] interfaces = clazz.getInterfaces();

@@ -60,8 +60,24 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	 */
 	public TypeInfo getTypeInfo(Object object, QName[] fullpath, IContext context)
 	{
+		TypeInfo ret = null;
 		Object type = getObjectType(object, context);
-		return titmanager.getTypeInfo(type, fullpath);
+		Set tis = titmanager.getTypeInfosByType(type);
+		if(tis!=null)
+		{
+			// Take not into account path if only one candidate
+			if(tis.size()==1)
+			{
+				ret = (TypeInfo)tis.iterator().next();
+			}
+			// Else disambiguate using path
+			else if(tis.size()>1)
+			{
+				ret = titmanager.findTypeInfo(tis, fullpath);
+			}
+		}
+		return ret;
+//		return titmanager.getTypeInfo(type, fullpath);
 	}
 	
 	/**

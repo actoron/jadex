@@ -85,6 +85,8 @@ public class TypeInfoTypeManager
 	
 	/**
 	 *  Find a type info from a set of possible matching typeinfos.
+	 *  Note that here the typeinfo path is checked for compliance
+	 *  with the stack path.
 	 */
 	public TypeInfo findTypeInfo(Set typeinfos, QName[] fullpath)
 	{

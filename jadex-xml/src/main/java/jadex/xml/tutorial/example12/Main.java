@@ -32,6 +32,12 @@ public class Main
 		// Java objects. In this case the context of the xml tag is used to distinguish
 		// both kinds of object (software/item vs. computers", "product).
 		
+		// During writing one problem is that we want to put 'software' and 'computer'
+		// tags around products according to their type. This can be done without
+		// implementing special getSoftware() and getComputers() methods in the Java product list class.
+		// Instead two multi subobjects are declared using an object info to declare which
+		// object instances are really part of the subobject.
+		
 		// Create minimal type infos for types that need to be mapped
 		Set typeinfos = new HashSet();
 		typeinfos.add(new TypeInfo(new XMLInfo("products"), new ObjectInfo(ProductList.class), 
@@ -52,14 +58,12 @@ public class Main
 		typeinfos = new HashSet();
 		typeinfos.add(new TypeInfo(new XMLInfo("products"), new ObjectInfo(ProductList.class), 
 			new MappingInfo(null, new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo("software", "software"), null, true),
-			new SubobjectInfo(new AccessInfo("computers", "computers"), null, true),
+			new SubobjectInfo(new XMLInfo("software/item"), new AccessInfo("software", "products"), null, true, new ObjectInfo(Software.class)),
+			new SubobjectInfo(new XMLInfo("computers/item"), new AccessInfo("computers", "products"), null, true, new ObjectInfo(Computer.class)),
 			})));
 		typeinfos.add(new TypeInfo(new XMLInfo("software/item"), new ObjectInfo(Software.class)));
 		typeinfos.add(new TypeInfo(new XMLInfo("computers/item"), new ObjectInfo(Computer.class)));
 
-		
-		
 		// Write the xml to the output file.
 		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(false, true, typeinfos), false, true);
 		OutputStream os = new FileOutputStream("out.xml");

@@ -49,9 +49,10 @@ public class Main
 		is.close();
 		
 		typeinfos = new HashSet();
-		typeinfos.add(new TypeInfo(new XMLInfo("invoice"), new ObjectInfo(Invoice.class),
+		typeinfos.add(new TypeInfo(new XMLInfo("someuglycontainertag/invoice"), new ObjectInfo(Invoice.class),
 			new MappingInfo(null, new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo("product-key", "key"))		
+			new SubobjectInfo(new AccessInfo("product-key", "key")),
+			new SubobjectInfo(new XMLInfo("someuglyothercontainertag/quantity"), new AccessInfo("quantity"))
 			})));
 		
 		// Write the xml to the output file.

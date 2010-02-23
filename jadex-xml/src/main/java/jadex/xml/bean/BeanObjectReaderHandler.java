@@ -116,8 +116,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				for(int i=0; i<tocheck.size() && ret==null; i++)
 				{
 					Class clazz = (Class)tocheck.get(i);
-					Set tis = titmanager.getTypeInfosByType(clazz);
-					ret = titmanager.findTypeInfo(tis, fullpath);
+//					Set tis = titmanager.getTypeInfosByType(clazz);
+//					ret = titmanager.findTypeInfo(tis, fullpath);
+					ret = titmanager.getTypeInfo(clazz, fullpath);
 					if(ret==null)
 					{
 						Class[] interfaces = clazz.getInterfaces();
@@ -133,7 +134,8 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				// Requires Object[].class being registered 
 				if(ret==null && ((Class)type).isArray())
 				{
-					ret = titmanager.findTypeInfo(titmanager.getTypeInfosByType(Object[].class), fullpath);
+//					ret = titmanager.findTypeInfo(titmanager.getTypeInfosByType(Object[].class), fullpath);
+					ret = titmanager.getTypeInfo(Object[].class, fullpath);
 				}
 				
 				// Add concrete class for same info if it is used

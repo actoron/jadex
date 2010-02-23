@@ -117,9 +117,11 @@ public class Writer
 //		if(tagname!=null)
 //			System.out.println("tagname: "+tagname);
 		TypeInfo typeinfo = handler.getTypeInfo(object, getXMLPath(stack), wc); 
+		QName[] path = new QName[0];
 		if(typeinfo!=null)
 		{
 			tag = typeinfo.getXMLTag();
+			path = typeinfo.getXMLInfo().getXMLPathElements();
 		}
 		
 		if(tag==null)
@@ -132,6 +134,15 @@ public class Writer
 		{
 			tag = handler.getTagWithPrefix(tag);
 		}
+		
+		// Write path to tag
+		for(int i=0; i+1<path.length; i++)
+		{
+			writeStartObject(writer, path[i], stack.size());
+			stack.add(new StackElement(path[i], object));
+			writer.writeCharacters(lf);
+		}
+		
 		
 		if(genids && wc.getWrittenObjects().containsKey(object))
 		{
@@ -220,14 +231,46 @@ public class Writer
 				}
 			}
 			
-			if(wi.getContent()==null && (wi.getSubobjects()==null || wi.getSubobjects().isEmpty()))
+//			if(wi.getContent()==null && (wi.getSubobjects()==null || wi.getSubobjects().isEmpty()))
+//			{
+//				writeEndObject(writer, 0);
+//			}
+//			else
+//			{
+//				// Content
+//				
+//				String content = wi.getContent();
+//				if(content!=null)
+//				{
+//					if(content.indexOf("<")!=-1 || content.indexOf(">")!=-1 || content.indexOf("&")!=-1)
+//						writer.writeCData(content);
+//					else
+//						writer.writeCharacters(content);
+//				}
+//				
+//				// Subobjects
+//				
+//				Tree subobs = wi.getSubobjects();
+//				if(subobs==null || subobs.isEmpty())
+//				{
+//					writeEndObject(writer, 0);
+//				}
+//				else
+//				{	
+//					writer.writeCharacters(lf);
+//					
+////					writeSubobjects(writer, subobs.getRootNode(), wc.getWrittenObjects(), stack, 
+////						wc.getCallContext(), wc.getClassLoader(), typeinfo);
+//					writeSubobjects(wc, subobs.getRootNode(), typeinfo);
+//					
+//					writeEndObject(writer, stack.size()-1);
+//				}
+//			}
+			
+			// Content
+			
+			if(wi.getContent()!=null)
 			{
-				writeEndObject(writer, 0);
-			}
-			else
-			{
-				// Content
-				
 				String content = wi.getContent();
 				if(content!=null)
 				{
@@ -236,26 +279,28 @@ public class Writer
 					else
 						writer.writeCharacters(content);
 				}
-				
-				// Subobjects
-				
-				Tree subobs = wi.getSubobjects();
-				if(subobs==null || subobs.isEmpty())
-				{
-					writeEndObject(writer, 0);
-				}
-				else
-				{	
-					writer.writeCharacters(lf);
-					
-//					writeSubobjects(writer, subobs.getRootNode(), wc.getWrittenObjects(), stack, 
-//						wc.getCallContext(), wc.getClassLoader(), typeinfo);
-					writeSubobjects(wc, subobs.getRootNode(), typeinfo);
-					
-					writeEndObject(writer, stack.size()-1);
-				}
 			}
+			
+			// Subobjects
+			
+			boolean subs = wi.getSubobjects()!=null && !wi.getSubobjects().isEmpty();
+			if(subs)
+			{
+				Tree subobs = wi.getSubobjects();
+				writer.writeCharacters(lf);
+				
+				writeSubobjects(wc, subobs.getRootNode(), typeinfo);
+			}
+			
+			writeEndObject(writer, subs? stack.size()-1: 0);
 			stack.remove(stack.size()-1);
+			
+			// Write path to tag.
+			for(int i=0; i+1<path.length; i++)
+			{
+				writeEndObject(writer, stack.size()-1);
+				stack.remove(stack.size()-1);
+			}
 		}
 	}
 	
@@ -280,7 +325,6 @@ public class Writer
 				writer.writeCharacters(lf);
 				stack.add(new StackElement(subtag, null));
  
-//				writeSubobjects(writer, subnode, writtenobs, stack, context, classloader, typeinfo);
 				writeSubobjects(wc, subnode, typeinfo);
 						
 				stack.remove(stack.size()-1);
@@ -289,7 +333,6 @@ public class Writer
 			else
 			{
 				writeObject(wc, ((Object[])tmp)[1], (QName)((Object[])tmp)[0]);
-//				writeObject(writer, ((Object[])tmp)[1], writtenobs, (QName)((Object[])tmp)[0], stack, context, classloader);
 			}
 		}
 	}

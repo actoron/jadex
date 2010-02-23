@@ -38,7 +38,7 @@ public class ProductList
 	/**
 	 *  Get the productlist.
 	 *  @return The productlist.
-	 */
+	 * /
 	public List getSoftware()
 	{
 		List ret = new ArrayList();
@@ -52,12 +52,12 @@ public class ProductList
 			}
 		}
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Get the productlist.
 	 *  @return The productlist.
-	 */
+	 * /
 	public List getComputers()
 	{
 		List ret = new ArrayList();
@@ -71,7 +71,7 @@ public class ProductList
 			}
 		}
 		return ret;
-	}
+	}*/
 
 	/**
 	 *  Get the string representation.
