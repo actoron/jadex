@@ -232,42 +232,6 @@ public class Writer
 				}
 			}
 			
-//			if(wi.getContent()==null && (wi.getSubobjects()==null || wi.getSubobjects().isEmpty()))
-//			{
-//				writeEndObject(writer, 0);
-//			}
-//			else
-//			{
-//				// Content
-//				
-//				String content = wi.getContent();
-//				if(content!=null)
-//				{
-//					if(content.indexOf("<")!=-1 || content.indexOf(">")!=-1 || content.indexOf("&")!=-1)
-//						writer.writeCData(content);
-//					else
-//						writer.writeCharacters(content);
-//				}
-//				
-//				// Subobjects
-//				
-//				Tree subobs = wi.getSubobjects();
-//				if(subobs==null || subobs.isEmpty())
-//				{
-//					writeEndObject(writer, 0);
-//				}
-//				else
-//				{	
-//					writer.writeCharacters(lf);
-//					
-////					writeSubobjects(writer, subobs.getRootNode(), wc.getWrittenObjects(), stack, 
-////						wc.getCallContext(), wc.getClassLoader(), typeinfo);
-//					writeSubobjects(wc, subobs.getRootNode(), typeinfo);
-//					
-//					writeEndObject(writer, stack.size()-1);
-//				}
-//			}
-			
 			// Content
 			
 			if(wi.getContent()!=null)

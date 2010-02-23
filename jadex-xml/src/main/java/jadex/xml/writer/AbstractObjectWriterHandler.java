@@ -255,9 +255,10 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 									xmlpath = new QName[]{QName.valueOf(getPropertyName(property))};
 								
 								// Fetch elements directly if it is a multi subobject
-								if(soinfo.isMulti())
+								if(soinfo.getMulti()!=null && soinfo.getMulti().booleanValue())
 								{
 									Iterator it2 = SReflect.getIterator(value);
+									boolean flat = soinfo.getFlattening()!=null? soinfo.getFlattening().booleanValue(): flattening;
 									while(it2.hasNext())
 									{
 										Object val = it2.next();
@@ -265,8 +266,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 										if(isTypeCompatible(val, obinfo, context))
 										{
 											QName[] path = createPath(xmlpath, val, context);
-											// todo: extract flattening info from subobject info
-											wi.addSubobject(path, val, flattening);
+											wi.addSubobject(path, val, flat);
 										}
 									}
 								}
@@ -275,8 +275,8 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 									if(isTypeCompatible(value, obinfo, context))
 									{
 										QName[] path = createPath(xmlpath, value, context);
-										// todo: extract flattening info from subobject info
-										wi.addSubobject(path, value, flattening);
+										boolean flat = soinfo.getFlattening()!=null? soinfo.getFlattening().booleanValue(): flattening;
+										wi.addSubobject(path, value, flat);
 									}
 								}
 							}

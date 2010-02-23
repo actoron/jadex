@@ -3,6 +3,7 @@ package jadex.xml.tutorial.example11;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  List of invoice items.
@@ -26,6 +27,24 @@ public class InvoiceMap
 			invoicemap = new HashMap();
 		invoicemap.put(key, invoice);
 	}
+	
+	/**
+	 *  Get the invoicemap.
+	 *  @return The invoicemap.
+	 */
+	public Map getItems()
+	{
+		return this.invoicemap;
+	}
+	
+	/**
+	 *  Get the invoicemap.
+	 *  @return The invoicemap.
+	 * /
+	public Set getEntries()
+	{
+		return this.invoicemap.entrySet();
+	}*/
 
 	/**
 	 *  Get the string representation.

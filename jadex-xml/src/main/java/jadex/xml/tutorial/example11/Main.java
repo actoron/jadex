@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -35,6 +36,12 @@ public class Main
 		// is used, the BeanAccessInfo(). It allows to specify access via
 		// store/fetch fields or methods and also via a mapname and key access help
 		// (field/method).
+		
+		// Writing the map as collection is here sufficient because the map keys
+		// are also part of the elements in the map.
+		// new SubobjectInfo(new AccessInfo("item", "items"), null, true)
+		// There is currently no special support for writing maps, because
+		// they can be preprocessed in Java before writing. 
 		
 		// Create minimal type infos for types that need to be mapped
 		Set typeinfos = new HashSet();
@@ -58,10 +65,9 @@ public class Main
 		typeinfos = new HashSet();
 		typeinfos.add(new TypeInfo(new XMLInfo("invoice"), new ObjectInfo(InvoiceMap.class), 
 			new MappingInfo(null, new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo("item", "item", null, null, new BeanAccessInfo(null, null, "item", 
-				Invoice.class.getMethod("getKey", new Class[0]))))		
+			new SubobjectInfo(new AccessInfo("item", "items"), null, true)		
 			})));
-		typeinfos.add(new TypeInfo(new XMLInfo("item"), new ObjectInfo(Invoice.class),
+		typeinfos.add(new TypeInfo(new XMLInfo("item"), new ObjectInfo(Map.Entry.class),
 			new MappingInfo(null, new SubobjectInfo[]{
 			new SubobjectInfo(new AccessInfo("product-key", "key"))		
 			})));

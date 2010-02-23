@@ -1,5 +1,6 @@
 package jadex.xml.writer;
 
+import jadex.commons.SUtil;
 import jadex.commons.collection.Tree;
 import jadex.commons.collection.TreeNode;
 
@@ -104,7 +105,7 @@ public class WriteObjectInfo
 	 */
 	public void addSubobject(QName[] pathname, Object subobject, boolean flatten)
 	{
-//		System.out.println("added: "+SUtil.arrayToString(pathname)+" "+subobject);
+//		System.out.println("added: "+SUtil.arrayToString(pathname)+" "+subobject+" "+flatten);
 		if(subobjects==null)
 			subobjects = new Tree();
 		

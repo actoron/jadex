@@ -15,3 +15,4 @@ todo write 11 using a collection, here a map
 15 using namespaces
 16 reading/writing objects with ids
 17 serializing and deserializing arbitrary Java beans
+18 flattening the output

@@ -17,10 +17,13 @@ public class SubobjectInfo extends AbstractInfo
 	protected ISubObjectConverter converter;
 
 	/** The multiplicity. */
-	protected boolean multi;
+	protected Boolean multi;
 
 	/** The object info (for writing). */
 	protected ObjectInfo objectinfo;
+	
+	/** The flattening flag. */
+	protected Boolean flattening;
 	
 	//-------- constructors --------
 	
@@ -43,7 +46,7 @@ public class SubobjectInfo extends AbstractInfo
 	/**
 	 *  Create a new subobject info.
 	 */
-	public SubobjectInfo(XMLInfo xmlinfo, AccessInfo accessinfo, ISubObjectConverter converter, boolean multi)
+	public SubobjectInfo(XMLInfo xmlinfo, AccessInfo accessinfo, ISubObjectConverter converter, Boolean multi)
 	{
 		this(xmlinfo, accessinfo, converter, multi, null);
 	}
@@ -51,13 +54,22 @@ public class SubobjectInfo extends AbstractInfo
 	/**
 	 *  Create a new subobject info.
 	 */
-	public SubobjectInfo(XMLInfo xmlinfo, AccessInfo accessinfo, ISubObjectConverter converter, boolean multi, ObjectInfo objectinfo)
+	public SubobjectInfo(XMLInfo xmlinfo, AccessInfo accessinfo, ISubObjectConverter converter, Boolean multi, ObjectInfo objectinfo)
+	{
+		this(xmlinfo, accessinfo, converter, multi, objectinfo, null);
+	}
+	
+	/**
+	 *  Create a new subobject info.
+	 */
+	public SubobjectInfo(XMLInfo xmlinfo, AccessInfo accessinfo, ISubObjectConverter converter, Boolean multi, ObjectInfo objectinfo, Boolean flattening)
 	{
 		super(xmlinfo);
 		this.accessinfo = accessinfo;
 		this.converter = converter;
 		this.multi = multi;
 		this.objectinfo = objectinfo;
+		this.flattening = flattening;
 	}
 	
 	/**
@@ -116,7 +128,7 @@ public class SubobjectInfo extends AbstractInfo
 	 *  Test if it is a multi subobject.
 	 *  @return True, if multi.
 	 */
-	public boolean isMulti()
+	public Boolean getMulti()
 	{
 		return multi;
 	}
@@ -129,4 +141,14 @@ public class SubobjectInfo extends AbstractInfo
 	{
 		return this.objectinfo;
 	}
+
+	/**
+	 *  Get the flattening.
+	 *  @return The flattening.
+	 */
+	public Boolean getFlattening()
+	{
+		return this.flattening;
+	}
+	
 }
