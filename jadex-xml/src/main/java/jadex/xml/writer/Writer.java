@@ -118,11 +118,22 @@ public class Writer
 //			System.out.println("tagname: "+tagname);
 		TypeInfo typeinfo = handler.getTypeInfo(object, getXMLPath(stack), wc); 
 		QName[] path = new QName[0];
-		if(typeinfo!=null)
+		
+		// Only use typeinfo for getting tag (path) when not set in method call (subobject)
+		if(tag==null && typeinfo!=null)
 		{
 			tag = typeinfo.getXMLTag();
 			if(typeinfo.getXMLInfo()!=null)
+			{	
 				path = typeinfo.getXMLInfo().getXMLPathElements();
+				// Write path to tag
+				for(int i=0; i+1<path.length; i++)
+				{
+					writeStartObject(writer, path[i], stack.size());
+					stack.add(new StackElement(path[i], object));
+					writer.writeCharacters(lf);
+				}
+			}
 		}
 		
 		if(tag==null)
@@ -135,15 +146,6 @@ public class Writer
 		{
 			tag = handler.getTagWithPrefix(tag);
 		}
-		
-		// Write path to tag
-		for(int i=0; i+1<path.length; i++)
-		{
-			writeStartObject(writer, path[i], stack.size());
-			stack.add(new StackElement(path[i], object));
-			writer.writeCharacters(lf);
-		}
-		
 		
 		if(genids && wc.getWrittenObjects().containsKey(object))
 		{

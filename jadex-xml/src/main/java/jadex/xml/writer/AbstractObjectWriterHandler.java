@@ -255,7 +255,8 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 									xmlpath = new QName[]{QName.valueOf(getPropertyName(property))};
 								
 								// Fetch elements directly if it is a multi subobject
-								if(soinfo.getMulti()!=null && soinfo.getMulti().booleanValue())
+//								if(soinfo.getMulti()!=null && soinfo.getMulti().booleanValue())
+								if(soinfo.isMulti())
 								{
 									Iterator it2 = SReflect.getIterator(value);
 									boolean flat = soinfo.getFlattening()!=null? soinfo.getFlattening().booleanValue(): flattening;
