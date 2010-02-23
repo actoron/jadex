@@ -121,7 +121,8 @@ public class Writer
 		if(typeinfo!=null)
 		{
 			tag = typeinfo.getXMLTag();
-			path = typeinfo.getXMLInfo().getXMLPathElements();
+			if(typeinfo.getXMLInfo()!=null)
+				path = typeinfo.getXMLInfo().getXMLPathElements();
 		}
 		
 		if(tag==null)

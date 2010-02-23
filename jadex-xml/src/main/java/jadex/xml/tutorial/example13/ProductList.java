@@ -25,6 +25,15 @@ public class ProductList
 			productlist = new ArrayList();
 		productlist.add(product);
 	}
+	
+	/**
+	 *  Get the productlist.
+	 *  @return The productlist.
+	 */
+	public List getProducts()
+	{
+		return productlist;
+	}
 
 	/**
 	 *  Get the string representation.

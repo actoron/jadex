@@ -72,4 +72,16 @@ public class Product
 		this.price = price;
 	}	
 	
+	/**
+	 *  Get the type.
+	 *  @return The type.
+	 */
+	public String getType()
+	{
+		String ret = this.getClass().getName();
+		int idx =  ret.lastIndexOf(".");
+		ret = idx!=-1? ret.substring(idx+1): ret;
+		return ret;
+	}
+	
 }

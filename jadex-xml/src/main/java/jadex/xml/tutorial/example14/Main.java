@@ -2,6 +2,7 @@ package jadex.xml.tutorial.example14;
 
 import jadex.commons.SUtil;
 import jadex.xml.AccessInfo;
+import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IPostProcessor;
 import jadex.xml.MappingInfo;
@@ -10,9 +11,13 @@ import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
+import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.reader.Reader;
+import jadex.xml.writer.Writer;
 
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -68,12 +73,35 @@ public class Main
 		// custom typeinfos
 		Reader xmlreader = new Reader(new BeanObjectReaderHandler(typeinfos));
 		InputStream is = SUtil.getResource("jadex/xml/tutorial/example14/data.xml", null);
-		
-		// Read the xml.
 		Object object = xmlreader.read(is, null, null);
 		is.close();
 		
+		typeinfos = new HashSet();
+		typeinfos.add(new TypeInfo(new XMLInfo("products"), new ObjectInfo(ProductList.class), 
+			new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("name"))		
+			},
+			new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo("software", "products"), null, true, new ObjectInfo(Software.class)),
+			new SubobjectInfo(new AccessInfo("computer", "products"), null, true, new ObjectInfo(Computer.class)),
+			})));
+		typeinfos.add(new TypeInfo(new XMLInfo("software"), new ObjectInfo(Software.class),
+			new MappingInfo(null, new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo("products", "productlist", AccessInfo.IGNORE_WRITE))
+			})));
+		typeinfos.add(new TypeInfo(new XMLInfo("computer"), new ObjectInfo(Computer.class),
+			new MappingInfo(null, new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo("products", "productlist", AccessInfo.IGNORE_WRITE))
+			})));
+
+		// Write the xml to the output file.
+		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(false, true, typeinfos), false, true);
+		OutputStream os = new FileOutputStream("out.xml");
+		xmlwriter.write(object, os, null, null);
+		os.close();
+		
 		// And print out the result.
 		System.out.println("Read object: "+object);
+		System.out.println("Wrote object to out.xml");
 	}
 }

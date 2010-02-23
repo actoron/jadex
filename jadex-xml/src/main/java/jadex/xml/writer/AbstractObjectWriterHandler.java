@@ -244,7 +244,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 					if(property!=null)
 					{
 						doneprops.add(getPropertyName(property));
-						if(!(ai instanceof AccessInfo && ((AccessInfo)ai).isIgnoreWrite()))
+						if(!(ai!=null && ai.isIgnoreWrite()))
 						{	
 							String propname = getPropertyName(property);
 							Object value = getValue(object, property, context, soinfo);
