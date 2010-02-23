@@ -5,6 +5,7 @@ import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IObjectStringConverter;
+import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoTypeManager;
@@ -222,7 +223,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 				{
 					SubobjectInfo soinfo = (SubobjectInfo)it.next();
 					AccessInfo ai = soinfo.getAccessInfo();
-					TypeInfo sotypeinfo = soinfo.getTypeInfo();
+					ObjectInfo obinfo = soinfo.getObjectInfo();
 					Object property = getProperty(soinfo);
 					if(property!=null)
 					{
@@ -245,7 +246,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 									{
 										Object val = it2.next();
 										
-										if(isTypeCompatible(val, sotypeinfo, context))
+										if(isTypeCompatible(val, obinfo, context))
 										{
 											QName[] path = createPath(xmlpath, val, context);
 											// todo: extract flattening info from subobject info
@@ -255,7 +256,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 								}
 								else
 								{
-									if(isTypeCompatible(value, sotypeinfo, context))
+									if(isTypeCompatible(value, obinfo, context))
 									{
 										QName[] path = createPath(xmlpath, value, context);
 										// todo: extract flattening info from subobject info
@@ -398,7 +399,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	/**
 	 *  Test if a value is compatible with the defined typeinfo.
 	 */
-	protected abstract boolean isTypeCompatible(Object object, TypeInfo info, IContext context);
+	protected abstract boolean isTypeCompatible(Object object, ObjectInfo info, IContext context);
 	
 	/**
 	 *  Test if a value is decodable to the same type.

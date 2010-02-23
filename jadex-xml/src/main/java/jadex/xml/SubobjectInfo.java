@@ -19,8 +19,8 @@ public class SubobjectInfo extends AbstractInfo
 	/** The multiplicity. */
 	protected boolean multi;
 
-	/** The type info. */
-	protected TypeInfo typeinfo;
+	/** The object info (for writing). */
+	protected ObjectInfo objectinfo;
 	
 	//-------- constructors --------
 	
@@ -51,13 +51,13 @@ public class SubobjectInfo extends AbstractInfo
 	/**
 	 *  Create a new subobject info.
 	 */
-	public SubobjectInfo(XMLInfo xmlinfo, AccessInfo accessinfo, ISubObjectConverter converter, boolean multi, TypeInfo typeinfo)
+	public SubobjectInfo(XMLInfo xmlinfo, AccessInfo accessinfo, ISubObjectConverter converter, boolean multi, ObjectInfo objectinfo)
 	{
 		super(xmlinfo);
 		this.accessinfo = accessinfo;
 		this.converter = converter;
 		this.multi = multi;
-		this.typeinfo = typeinfo;
+		this.objectinfo = objectinfo;
 	}
 	
 	/**
@@ -87,9 +87,9 @@ public class SubobjectInfo extends AbstractInfo
 	/**
 	 *  Create a new subobject info.
 	 */
-	public SubobjectInfo(AccessInfo accessinfo, ISubObjectConverter converter, boolean multi, TypeInfo typeinfo)
+	public SubobjectInfo(AccessInfo accessinfo, ISubObjectConverter converter, boolean multi, ObjectInfo objectinfo)
 	{
-		this(new XMLInfo(new QName[]{accessinfo.getXmlObjectName()}), accessinfo, converter, multi, typeinfo);
+		this(new XMLInfo(new QName[]{accessinfo.getXmlObjectName()}), accessinfo, converter, multi, objectinfo);
 	}
 	
 	//-------- methods --------
@@ -122,11 +122,11 @@ public class SubobjectInfo extends AbstractInfo
 	}
 	
 	/**
-	 *  Get the typeinfo.
-	 *  @return The typeinfo.
+	 *  Get the objectinfo.
+	 *  @return The objectinfo.
 	 */
-	public TypeInfo getTypeInfo()
+	public ObjectInfo getObjectInfo()
 	{
-		return this.typeinfo;
+		return this.objectinfo;
 	}
 }

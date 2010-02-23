@@ -443,10 +443,10 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Test if a value is compatible with the defined typeinfo.
 	 */
-	protected boolean isTypeCompatible(Object object, TypeInfo info, IContext context)
+	protected boolean isTypeCompatible(Object object, ObjectInfo info, IContext context)
 	{
 		boolean ret = true;
-		if(info!=null && object!=null)
+		if(info!=null && object!=null && info.getTypeInfo() instanceof Class)
 		{
 			Class clazz = (Class)info.getTypeInfo();
 			ret = clazz.isAssignableFrom(object.getClass());
