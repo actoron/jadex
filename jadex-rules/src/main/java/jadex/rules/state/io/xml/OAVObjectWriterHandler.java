@@ -9,6 +9,7 @@ import jadex.xml.AttributeInfo;
 import jadex.xml.BasicTypeConverter;
 import jadex.xml.IContext;
 import jadex.xml.Namespace;
+import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
 import jadex.xml.TypeInfo;
 import jadex.xml.writer.AbstractObjectWriterHandler;
@@ -239,7 +240,7 @@ public class OAVObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Test if a value is compatible with the defined typeinfo.
 	 */
-	protected boolean isTypeCompatible(Object object, TypeInfo info, IContext context)
+	protected boolean isTypeCompatible(Object object, ObjectInfo info, IContext context)
 	{
 		boolean ret = true;
 		if(info!=null && info.getTypeInfo() instanceof OAVObjectType)
