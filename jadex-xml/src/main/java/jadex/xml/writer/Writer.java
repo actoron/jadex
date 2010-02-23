@@ -52,12 +52,21 @@ public class Writer
 	//-------- constructors --------
 
 	/**
-	 *  Create a new reader.
+	 *  Create a new reader (with genids=true and indent=true).
 	 *  @param handler The handler.
 	 */
 	public Writer(IObjectWriterHandler handler)
 	{
-		this(handler, true, true);
+		this(handler, true);
+	}
+	
+	/**
+	 *  Create a new reader (with genids=true and indent=true).
+	 *  @param handler The handler.
+	 */
+	public Writer(IObjectWriterHandler handler, boolean genids)
+	{
+		this(handler, genids, true);
 	}
 	
 	/**

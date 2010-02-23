@@ -48,33 +48,33 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	//-------- constructors --------
 	
 	/**
-	 *  Create a new writer.
+	 *  Create a new writer (gentypetags=false, prefertags=true, flattening=true).
 	 */
 	public BeanObjectWriterHandler(Set typeinfos)
 	{
-		this(false, typeinfos);
+		this(typeinfos, false);
 	}
 	
 	/**
-	 *  Create a new writer.
+	 *  Create a new writer (prefertags=true, flattening=true).
 	 */
-	public BeanObjectWriterHandler(boolean gentypetags, Set typeinfos)
+	public BeanObjectWriterHandler(Set typeinfos, boolean gentypetags)
 	{
-		this(gentypetags, false, typeinfos);
+		this(typeinfos, gentypetags, false);
 	}
 	
 	/**
-	 *  Create a new writer.
+	 *  Create a new writer (flattening=true).
 	 */
-	public BeanObjectWriterHandler(boolean gentypetags, boolean prefertags, Set typeinfos)
+	public BeanObjectWriterHandler(Set typeinfos, boolean gentypetags, boolean prefertags)
 	{
-		this(gentypetags, prefertags, true, typeinfos);
+		this(typeinfos, gentypetags, prefertags, true);
 	}
 	
 	/**
 	 *  Create a new writer.
 	 */
-	public BeanObjectWriterHandler(boolean gentypetags, boolean prefertags, boolean flattening ,Set typeinfos)
+	public BeanObjectWriterHandler(Set typeinfos, boolean gentypetags, boolean prefertags ,boolean flattening)
 	{
 		super(gentypetags, prefertags, flattening, typeinfos);
 	}

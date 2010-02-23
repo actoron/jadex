@@ -10,8 +10,6 @@ import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.writer.Writer;
 
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +23,10 @@ public class Main
 	 */
 	public static void main(String[] args) throws Exception
 	{
-		//
+		// This example shows what 'flattening' means for writing.
+		// The same object structure is written with flattening=true and false.
+		// As result flattening allows to share super tags, i.e. it puts
+		// sub elements under the same super tag.
 		
 		Product sugar = new Product("sugar", 1.0);
 		Product milk = new Product("milk", 0.5);
@@ -34,7 +35,7 @@ public class Main
 			new Part(sugar, 4), new Part(milk, 0.5), new Part(egg, 2)});
 		ProductList pl = new ProductList(new Product[]{sugar, milk, egg, cookie});
 		
-		Set<TypeInfo> typeinfos = new HashSet();
+		Set typeinfos = new HashSet();
 		typeinfos.add(new TypeInfo(new XMLInfo("products"), new ObjectInfo(ProductList.class),
 			new MappingInfo(null, new SubobjectInfo[]{
 			new SubobjectInfo(new AccessInfo("product", "products"), null, true)
@@ -52,17 +53,13 @@ public class Main
 		})));
 		
 		// Write the xml to the output file.
-		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(false, true, true, typeinfos), false, true);
-		OutputStream os = new FileOutputStream("out.xml");
-		xmlwriter.write(pl, os, null, null);
-		os.close();
-		
-		xmlwriter = new Writer(new BeanObjectWriterHandler(false, true, false, typeinfos), false, true);
-		os = new FileOutputStream("out2.xml");
-		xmlwriter.write(pl, os, null, null);
-		os.close();
+		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(typeinfos, false, true), false);
+		String xml1 = xmlwriter.objectToXML(xmlwriter, pl, null);
+		xmlwriter = new Writer(new BeanObjectWriterHandler(typeinfos, false, true, false), false);
+		String xml2 = xmlwriter.objectToXML(xmlwriter, pl, null);
 		
 		// And print out the result.
-		System.out.println("Wrote object to out.xml");
+		System.out.println("Wrote xml 1: "+xml1);
+		System.out.println("Wrote xml 2: "+xml2);
 	}
 }

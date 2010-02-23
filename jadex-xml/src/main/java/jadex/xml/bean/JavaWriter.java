@@ -40,7 +40,7 @@ public class JavaWriter extends Writer
 	 */
 	public JavaWriter(Set typeinfos)
 	{
-		super(new BeanObjectWriterHandler(true, joinTypeInfos(typeinfos)));
+		super(new BeanObjectWriterHandler(joinTypeInfos(typeinfos), true));
 	}
 
 	//-------- methods --------
