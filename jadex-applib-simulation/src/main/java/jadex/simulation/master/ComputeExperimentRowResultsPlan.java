@@ -45,9 +45,13 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 			System.out.println("#ComputeExperimentRowResultsPlan# Simulation finished. Write Res of Simulation to XML!");
 			XMLHandler.writeXML(result, "SimRes" + result.getStarttime() + ".xml", SimulationResult.class);
 
-			doShortEvaluation(rowResults);
+			doShortEvaluation(rowResults, "Final");
 
 		} else {
+			
+			//Print and persist intermediateResults
+			System.out.println("#ComputeExperimentRowResultsPlan# Printing intermediate results!");
+			doShortEvaluation((HashMap) getBeliefbase().getBelief("rowResults").getFact(), "Intermediate");
 
 			// optimize --> put new parameters
 			// Start new Row
@@ -66,7 +70,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 	 * 
 	 * @param rowResults
 	 */
-	private void doShortEvaluation(HashMap rowResults) {
+	private void doShortEvaluation(HashMap rowResults, String fileAppendix) {
 
 		SimulationConfiguration simConf = (SimulationConfiguration) getBeliefbase().getBelief("simulationConf").getFact();
 		HashMap facts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
@@ -80,7 +84,7 @@ public class ComputeExperimentRowResultsPlan extends Plan {
 
 		System.out.println(evalRes.toString());
 		try {
-			BufferedWriter out = new BufferedWriter(new FileWriter("SimRes"  + evalRes.getSimulationStartime() + ".txt"));
+			BufferedWriter out = new BufferedWriter(new FileWriter("SimRes"  + evalRes.getSimulationStartime() + "-" + fileAppendix + ".txt"));
 			out.write(evalRes.toString());
 			out.close();
 		} catch (IOException e) {

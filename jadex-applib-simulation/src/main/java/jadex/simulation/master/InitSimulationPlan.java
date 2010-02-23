@@ -20,6 +20,9 @@ public class InitSimulationPlan extends Plan{
 		System.out.println("#InitSim# Starting first round of Simulation Experiments.");
 		dispatchTopLevelGoal(goal);
 		
+		//trigger the start of the simulation control center
+		dispatchInternalEvent(createInternalEvent("triggerStartOfSimulationControlCenter"));
+		
 	}
 
 	/**

@@ -158,6 +158,9 @@
 
 		<!-- Event to trigger the evaluation of a simulation row. -->
 		<internalevent name="triggerExperimentRowEvaluation" />
+		
+		<!-- Event to trigger the start of the simulation control center. -->
+		<internalevent name="triggerStartOfSimulationControlCenter" />
 
 	</events>
 

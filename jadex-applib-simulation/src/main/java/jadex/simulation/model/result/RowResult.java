@@ -1,15 +1,14 @@
 package jadex.simulation.model.result;
 
-import jadex.simulation.model.ObservedEvent;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import cern.colt.list.DoubleArrayList;
+import cern.jet.stat.Descriptive;
 
 @XmlRootElement(name = "RowResults")
 public class RowResult extends IResult {
@@ -69,7 +68,8 @@ public class RowResult extends IResult {
 	}
 
 	public String toStringShort() {
-		double meanValue = 0.0;
+//		double meanValue = 0.0;
+		DoubleArrayList durations = new DoubleArrayList();
 
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("Row Number: ");
@@ -92,12 +92,26 @@ public class RowResult extends IResult {
 			buffer.append("Duration: ");
 			buffer.append(experiment.getDuraration());
 			buffer.append("\n");
-			meanValue += experiment.getDuraration();
+//			meanValue += experiment.getDuraration();
+			durations.add(experiment.getDuraration());
 		}
-		//Eval:
+		//Eval:		
+		//list has to be ordered according to the Colt API
+		durations.sort();
+		double durationTimeMean = Descriptive.mean(durations);
+		double durationTimeMedian = Descriptive.median(durations);
+		double durationTimeSampleVariance = Descriptive.sampleVariance(durations, durationTimeMean);
 		buffer.append("\t");
-		buffer.append("Mean value for duration: ");
-		buffer.append(meanValue /getExperimentsResults().size());		
+		buffer.append( "Duration Time Stats:  Mean value: " + durationTimeMean + ", Median value: " + durationTimeMedian + ", Sample Variance Value: " +  durationTimeSampleVariance);		
+				
+		
+		//Hack: to be able to copy the values easily in a new colt.evaluation
+		buffer.append("\n\t");
+		for(int i=0; i<durations.size(); i++){
+			buffer.append(durations.get(i));
+			buffer.append(",");
+		}
+		
 		buffer.append("\n");
 		return buffer.toString();
 	}

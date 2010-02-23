@@ -132,8 +132,8 @@ public class StartSimulationExperimentsPlan extends Plan {
 		
 //		System.out.println("#StartSimEx# Try to write RowResult to XML-File.");
 		
-		System.out.println("#StartSimExp# Write Row Res to XML");
-		XMLHandler.writeXML(rowResult, "rowRes" +".xml", RowResult.class);
+//		System.out.println("#StartSimExp# Write Row Res to XML");
+//		XMLHandler.writeXML(rowResult, "rowRes" +".xml", RowResult.class);
 		
 		//evaluate row
 		dispatchInternalEvent(createInternalEvent("triggerExperimentRowEvaluation"));

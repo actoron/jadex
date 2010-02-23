@@ -1,24 +1,24 @@
 # gnuplot script
-set title "Analysis of the Cumulated Travel Time"
-set xlab "Time (sec)"
-set ylab "x-Point"
+set title "Evaluation of case study: mining ore resources"
+set xlab "Number of sentries"
+set ylab "Time in seconds"
 #set zlab "y-Point"
 #set yrange [-1:8]
 #set xtics 10
 set grid
 #plot "data100.txt" using 0:(($1+$2+$3+$4+$5+$6+$7+$8+$9+$10)/10) w l title "Mean Average of chosen direction (10 runs of 100 vehicles)"
 #plot "data200Strategy5CulTime.txt" using 1:2 w l title "Cumulated Travel Time with Deterministic Routing - Run1", "data200Strategy5CulTime.txt" using 3:4 #w l title "Cumulated Travel Time with Stochastic Routing - Run 2 ", "data200Strategy5CulTime.txt" using 5:6 w l title "Cumulated Travel Time with #Deterministic Routing - Run3", "data200Strategy5CulTime.txt" using 7:8 w l title "Cumulated Travel Time with Deterministic Routing - Run4"
-#plot "data200Strategy5CulTime.txt" using 1:2 w l title "Stochastic Routing", "data200Strategy6CulTime.txt" using 1:2 w l title "Deterministic Routing"
+#plot "data200Strategy5CulTime.txt" using 1:2 w l title "Mean Value", "data200Strategy6CulTime.txt" using 1:2 w l title "Median Value"
 
-set xrange [-1:11]
-set yrange [-0.2:1.2]
+set xrange [0:18]
+set yrange [0:120]
 #set zrange [-0.2:1.1]
 #set view 45,40,1.0,2.5
 #splot 'data.txt'
-plot "data.txt" w l title "yo"
+plot "sentrydata.txt" using 1:2 w l title "Mean Value", "sentrydata.txt" using 1:3 w l title "Median Value"
 
 pause -1
-set output "ComparingTheCumulatedTravelTimes.ps"
+set output "SentryDataEval.ps"
 #set terminal postscript eps enhanced color defaultplex "Arial" 14
 set terminal postscript "Arial" 14
 #set terminal postscript eps enhanced color
