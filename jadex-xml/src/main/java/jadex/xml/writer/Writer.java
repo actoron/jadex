@@ -129,7 +129,8 @@ public class Writer
 		QName[] path = new QName[0];
 		
 		// Only use typeinfo for getting tag (path) when not set in method call (subobject)
-		if(tag==null && typeinfo!=null)
+		// Generated tag names (that start with 'protocol typeinfo' are overruled by typeinfo spec.
+		if((tag==null || tag.getNamespaceURI().startsWith(SXML.PROTOCOL_TYPEINFO)) && typeinfo!=null)
 		{
 			tag = typeinfo.getXMLTag();
 			if(typeinfo.getXMLInfo()!=null)
