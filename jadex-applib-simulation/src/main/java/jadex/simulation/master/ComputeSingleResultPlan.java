@@ -19,7 +19,7 @@ import java.util.Map;
 import org.jfree.ui.ArrowPanel;
 
 /**
- * Responsible for dealing with the resul of one single simulation experiment.
+ * Responsible for dealing with the result of one single simulation experiment.
  * @author vilenica
  *
  */

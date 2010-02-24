@@ -30,6 +30,14 @@
             <Evaluation mode="onChange"/><!--If perdiocal, all have to have the same value -->
             <Filter mode="all"/><!-- All / one / subset of objects-JavaCondLanguage -->
         </Observer>
+        <Observer>
+            <Data name="11HomebaseLogger">
+                <ObjectSource type="ISpa222ceObject" name="homebase"/>
+                <ElementSource type="Pro222perty" name="ore" class="String"/>
+            </Data>
+            <Evaluation mode="2onChange"/>
+            <Filter mode="2all"/>
+        </Observer>
     </Observers>
 
     <DataVisualization>
