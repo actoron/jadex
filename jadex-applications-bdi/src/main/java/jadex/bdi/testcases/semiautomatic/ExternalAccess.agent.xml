@@ -1,0 +1,45 @@
+<!--
+	<H3>Test fetching external access from agent that has not been started.</H3>
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="ExternalAccess"
+	package="jadex.bdi.testcases.semiautomatic">
+
+	<imports>
+		<import>jadex.bdi.planlib.test.*</import>
+		<import>jadex.adapter.base.test.*</import>
+	</imports>
+
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
+
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		
+		<beliefref name="testresults" result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+	</beliefs>
+
+	<plans>
+		<plan name="get_externalaccess">
+			<body class="GetExternalAccessPlan"/>
+		</plan>
+	</plans>
+	
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="get_externalaccess"></initialplan>
+			</plans>
+		</configuration>
+		<configuration name="get_externalaccess"/>
+	</configurations>
+
+</agent>
