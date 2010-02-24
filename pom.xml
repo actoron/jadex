@@ -8,6 +8,27 @@
   <name>jadex</name>
   <profiles>
   	<profile>
+  		<id>jadex-xml-dist</id>
+  		<build>
+  			<finalName>jadex-xml-${project.version}</finalName>
+		    <plugins>
+		      <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-assembly-plugin</artifactId>
+		        <configuration>
+		          <descriptors>
+		            <descriptor>src/main/assembly/dist-assembly-xml.xml</descriptor>
+		          </descriptors>
+		        </configuration>
+		      </plugin>
+		    </plugins>
+  		</build>
+		<modules>
+		    <module>jadex-commons</module>
+		    <module>jadex-xml</module>
+		</modules>
+  	</profile>
+  	<profile>
   		<id>jadex-rules-dist</id>
   		<build>
   			<finalName>jadex-rules-${project.version}</finalName>

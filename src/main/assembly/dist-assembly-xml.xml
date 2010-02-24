@@ -1,6 +1,6 @@
 <assembly>
   
-  <id>rules-dist</id>
+  <id>xml-dist</id>
   
   <formats>
     <format>dir</format>
