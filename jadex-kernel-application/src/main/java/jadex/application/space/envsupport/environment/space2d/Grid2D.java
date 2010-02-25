@@ -68,7 +68,7 @@ public class Grid2D extends Space2D
 	/**
 	 * Creates a new {@link ContinuousSpace2D} with the default name.
 	 * 
-	 * @param actionexecutor executor for agent actions
+	 * @param actionexecutor executor for component actions
 	 * @param areasize the size of the 2D area
 	 */
 	public Grid2D(IVector2 areasize)
@@ -80,7 +80,7 @@ public class Grid2D extends Space2D
 	 * Creates a new {@link ContinuousSpace2D} with a special ID.
 	 * @param name the name of this space
 	 * @param areasize the size of the 2D area
-	 * @param actionexecutor executor for agent actions
+	 * @param actionexecutor executor for component actions
 	 */
 	public Grid2D(Object name, IVector2 areasize)
 	{

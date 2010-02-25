@@ -49,9 +49,9 @@
 			</env:objecttypes>
 			
 			<env:avatarmappings>
-				<env:avatarmapping agenttype="MicroPrey" objecttype="prey"/>
-				<env:avatarmapping agenttype="DumbPrey" objecttype="prey"/>
-				<env:avatarmapping agenttype="DumbHunter" objecttype="hunter"/>
+				<env:avatarmapping componenttype="MicroPrey" objecttype="prey"/>
+				<env:avatarmapping componenttype="DumbPrey" objecttype="prey"/>
+				<env:avatarmapping componenttype="DumbHunter" objecttype="hunter"/>
 			</env:avatarmappings>
 
 			<env:actiontypes>
@@ -76,64 +76,64 @@
 			
 			<env:percepttypes>
 				<env:percepttype name="food_seen" objecttype="food">
-					<env:agenttypes>
-						<env:agenttype name="MicroPrey"/>
-						<env:agenttype name="DumbPrey"/>
-						<env:agenttype name="CleverPrey"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="MicroPrey"/>
+						<env:componenttype name="DumbPrey"/>
+						<env:componenttype name="CleverPrey"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="food_out_of_sight" objecttype="food">
-					<env:agenttypes>
-						<env:agenttype name="MicroPrey"/>
-						<env:agenttype name="DumbPrey"/>
-						<env:agenttype name="CleverPrey"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="MicroPrey"/>
+						<env:componenttype name="DumbPrey"/>
+						<env:componenttype name="CleverPrey"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="food_eaten" objecttype="food">
-					<env:agenttypes>
-						<env:agenttype name="MicroPrey"/>
-						<env:agenttype name="DumbPrey"/>
-						<env:agenttype name="CleverPrey"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="MicroPrey"/>
+						<env:componenttype name="DumbPrey"/>
+						<env:componenttype name="CleverPrey"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="prey_moved" objecttype="prey">
-					<env:agenttypes>
+					<env:componenttypes>
 						<!-- Todo: Use avatar types for mapping? -->
-						<env:agenttype name="CleverPrey"/>
-						<env:agenttype name="DumbHunter"/>
-					</env:agenttypes>
+						<env:componenttype name="CleverPrey"/>
+						<env:componenttype name="DumbHunter"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="prey_seen" objecttype="prey">
-					<env:agenttypes>
-						<env:agenttype name="DumbHunter"/>
-						<env:agenttype name="LAHunter"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="DumbHunter"/>
+						<env:componenttype name="LAHunter"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="prey_gone" objecttype="prey">
-					<env:agenttypes>
-						<env:agenttype name="DumbHunter"/>
-						<env:agenttype name="LAHunter"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="DumbHunter"/>
+						<env:componenttype name="LAHunter"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="obstacle_seen" objecttype="obstacle">
-					<env:agenttypes>
-						<env:agenttype name="LAHunter"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="LAHunter"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="obstacle_gone" objecttype="obstacle">
-					<env:agenttypes>
-						<env:agenttype name="LAHunter"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="LAHunter"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="hunter_seen" objecttype="hunter">
-					<env:agenttypes>
-						<env:agenttype name="CleverPrey"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="CleverPrey"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="hunter_gone" objecttype="hunter">
-					<env:agenttypes>
-						<env:agenttype name="CleverPrey"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="CleverPrey"/>
+					</env:componenttypes>
 				</env:percepttype>
 					
 				<env:perceptgenerator name="visiongen" class="DefaultVisionGenerator">
@@ -157,9 +157,9 @@
 					</env:property>
 				</env:perceptgenerator>
 				
-				<env:perceptprocessor agenttype="MicroPrey" class="MicroPreyVisionProcessor"/>
+				<env:perceptprocessor componenttype="MicroPrey" class="MicroPreyVisionProcessor"/>
 
-				<env:perceptprocessor agenttype="CleverPrey" class="DefaultBDIVisionProcessor">
+				<env:perceptprocessor componenttype="CleverPrey" class="DefaultBDIVisionProcessor">
 					<env:property name="range">new Vector1Int(2)</env:property>
 					<env:property name="percepttypes">
 						new Object[]
@@ -176,7 +176,7 @@
 					</env:property>
 				</env:perceptprocessor>
 				
-				<env:perceptprocessor agenttype="DumbPrey"	class="DefaultBDIVisionProcessor">
+				<env:perceptprocessor componenttype="DumbPrey"	class="DefaultBDIVisionProcessor">
 					<env:property name="percepttypes">
 						new Object[]
 						{
@@ -197,7 +197,7 @@
 					</env:property>
 				</env:perceptprocessor>
 				
-				<env:perceptprocessor agenttype="DumbHunter"	class="DefaultBDIVisionProcessor">
+				<env:perceptprocessor componenttype="DumbHunter"	class="DefaultBDIVisionProcessor">
 					<env:property name="percepttypes">
 						new Object[]
 						{
@@ -218,7 +218,7 @@
 					</env:property>
 				</env:perceptprocessor>
 				
-				<env:perceptprocessor agenttype="LAHunter" class="DefaultBDIVisionProcessor">
+				<env:perceptprocessor componenttype="LAHunter" class="DefaultBDIVisionProcessor">
 					<env:property name="percepttypes">
 						new Object[]
 						{
@@ -307,11 +307,11 @@
 		</env:envspacetype>
 	</spacetypes>
 
-	<agenttypes>
-		<agenttype name="MicroPrey" filename="jadex/micro/examples/hunterprey/MicroPreyAgent.class"/>
-		<agenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey/dumbprey/DumbPrey.agent.xml"/>
-		<agenttype name="DumbHunter" filename="jadex/bdi/examples/hunterprey/dumbhunter/DumbHunter.agent.xml"/>
-	</agenttypes>
+	<componenttypes>
+		<componenttype name="MicroPrey" filename="jadex/micro/examples/hunterprey/MicroPreyAgent.class"/>
+		<componenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey/dumbprey/DumbPrey.agent.xml"/>
+		<componenttype name="DumbHunter" filename="jadex/bdi/examples/hunterprey/dumbhunter/DumbHunter.agent.xml"/>
+	</componenttypes>
 
 	<applications>
 		<application name="One Micro Prey">
@@ -333,9 +333,9 @@
 				</env:envspace>
 			</spaces>
  			
- 			<agents>
+ 			<components>
 				<agent name="Mickey" type="MicroPrey"/>
-			</agents>			
+			</components>			
  		</application>
 
 		<application name="One Prey / One Hunter">
@@ -357,10 +357,10 @@
 	 			</env:envspace>
 			</spaces>
 			
- 			<agents>
+ 			<components>
 				<agent name="Dumbo" type="DumbPrey"/>
 				<agent name="Lupo" type="DumbHunter"/>
-			</agents>
+			</components>
  		</application>
 
 		<application name="Empty">
@@ -402,9 +402,9 @@
 	 			</env:envspace>
 			</spaces>
 
-			<agents>
+			<components>
 				<agent type="MicroPrey" number="500"/>
-			</agents>
+			</components>
  		</application>
  		
 		<application name="Lupo's Paradise">
@@ -426,10 +426,10 @@
 	 			</env:envspace>
 			</spaces>
 
-			<agents>
+			<components>
 				<agent type="MicroPrey" number="2000"/>
 				<agent name="Lupo" type="DumbHunter"/>
-			</agents>
+			</components>
  		</application>
 
 		<application name="Battlefield">
@@ -451,10 +451,10 @@
 	 			</env:envspace>
 			</spaces>
 
-			<agents>
+			<components>
 				<agent type="MicroPrey" number="100"/>
 				<agent type="DumbHunter" number="10"/>
-			</agents>
+			</components>
  		</application>
 
 		<application name="Five Dumb Preys">
@@ -476,13 +476,13 @@
 	 			</env:envspace>
 			</spaces>
 
- 			<agents>
+ 			<components>
 				<agent name="Duffy" type="DumbPrey"/>
 				<agent name="Dumbo" type="DumbPrey"/>
 				<agent name="Dimitri" type="DumbPrey"/>
 				<agent name="Dork" type="DumbPrey"/>
 				<agent name="Django" type="DumbPrey"/>
-			</agents>
+			</components>
  		</application>
 	</applications>
 

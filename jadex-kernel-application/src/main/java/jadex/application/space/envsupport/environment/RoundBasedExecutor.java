@@ -1,7 +1,7 @@
 package jadex.application.space.envsupport.environment;
 
 import jadex.application.space.envsupport.dataview.IDataView;
-import jadex.application.space.envsupport.environment.AgentActionList.ActionEntry;
+import jadex.application.space.envsupport.environment.ComponentActionList.ActionEntry;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
@@ -93,16 +93,16 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 		Comparator comp = (Comparator)getProperty("comparator");
 		if(comp!=null)
 		{
-			space.getAgentActionList().setOrdering(comp);
+			space.getComponentActionList().setOrdering(comp);
 		}
 		if(MODE_LASTACTION.equals(getProperty(PROPERTY_MODE)))
 		{
-			space.getAgentActionList().setScheduleCommand(new ICommand()
+			space.getComponentActionList().setScheduleCommand(new ICommand()
 			{
 				public void execute(Object args)
 				{
 					ActionEntry	entry	= (ActionEntry)args;
-					ActionEntry	entries[]	= space.getAgentActionList().getActionEntries();
+					ActionEntry	entries[]	= space.getComponentActionList().getActionEntries();
 					
 					if(entries.length>0)
 					{
@@ -116,12 +116,12 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 							if(actor.equals(actor2))
 							{
 //								System.out.println("Removing duplicate action: "+entries[i]);
-								space.getAgentActionList().removeAgentAction(entries[i]);
+								space.getComponentActionList().removeComponentAction(entries[i]);
 							}
 						}
 					}
 					
-					space.getAgentActionList().addAgentAction(entry);
+					space.getComponentActionList().addComponentAction(entry);
 				}
 			});
 		}
@@ -148,8 +148,8 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 							obj.updateObject(space, progress, clockservice);
 						}
 						
-						// Execute the scheduled agent actions.
-						space.getAgentActionList().executeActions(null, false);
+						// Execute the scheduled component actions.
+						space.getComponentActionList().executeActions(null, false);
 						
 						// Execute the processes.
 						Object[] procs = space.getProcesses().toArray();
@@ -174,11 +174,11 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 						}
 					}
 					
-					// Send the percepts to the agents.
+					// Send the percepts to the components.
 					space.getPerceptList().processPercepts(null);
 
-					// Wakeup the agents.
-					space.getAgentActionList().wakeupAgents(null);
+					// Wakeup the components.
+					space.getComponentActionList().wakeupComponents(null);
 					
 					first = false;
 				}

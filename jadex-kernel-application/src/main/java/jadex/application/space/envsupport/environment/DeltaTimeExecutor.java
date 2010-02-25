@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * Space executor that connects to a clock service and reacts on time deltas.
  */
-// Todo: immediate execution of agent actions and percepts?
+// Todo: immediate execution of component actions and percepts?
 public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExecutor
 {
 	//-------- attributes --------
@@ -98,8 +98,8 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 						obj.updateObject(space, progress, clockservice);
 					}
 					
-					// Execute the scheduled agent actions.
-					space.getAgentActionList().executeActions(null, true);
+					// Execute the scheduled component actions.
+					space.getComponentActionList().executeActions(null, true);
 					
 					// Execute the processes.
 					Object[] procs = space.getProcesses().toArray();
@@ -123,7 +123,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 						consumer.consumeData(currenttime, clockservice.getTick());
 					}
 					
-					// Send the percepts to the agents.
+					// Send the percepts to the components.
 					space.getPerceptList().processPercepts(null);
 				}
 				return false;

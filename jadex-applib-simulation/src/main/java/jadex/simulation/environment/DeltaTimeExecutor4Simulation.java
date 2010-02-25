@@ -127,7 +127,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 					}
 
 					// Execute the scheduled agent actions.
-					space.getAgentActionList().executeActions(null, true);
+					space.getComponentActionList().executeActions(null, true);
 
 					// Execute the processes.
 					Object[] procs = space.getProcesses().toArray();
@@ -353,7 +353,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 	 */
 	private IComponentIdentifier getIComponentIdentifier(AbstractEnvironmentSpace space, String agentType) {
 
-		for (IComponentIdentifier agentIdentifier : space.getAgents()) {
+		for (IComponentIdentifier agentIdentifier : space.getComponents()) {
 			if (space.getContext().getComponentType(agentIdentifier).equals(agentType)) {
 				return agentIdentifier;
 			}

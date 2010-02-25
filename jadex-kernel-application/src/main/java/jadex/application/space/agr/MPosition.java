@@ -1,6 +1,6 @@
 package jadex.application.space.agr;
 
-import jadex.application.model.MAgentType;
+import jadex.application.model.MComponentType;
 import jadex.application.model.MApplicationType;
 import jadex.commons.SReflect;
 
@@ -13,7 +13,7 @@ public class MPosition
 	protected String	role;
 	
 	/** The agent type. */
-	protected String	agenttype;
+	protected String	componenttype;
 
 	//-------- methods --------
 	
@@ -39,27 +39,27 @@ public class MPosition
 	 *  Get the agent type.
 	 *  @return The agent type.
 	 */
-	public String	getAgentType()
+	public String	getComponentType()
 	{
-		return this.agenttype;
+		return this.componenttype;
 	}
 
 	/**
 	 *  Set the agent type.
 	 *  @param agenttype The agent type to set.
 	 */
-	public void setAgentType(String	agenttype)
+	public void setComponentType(String	agenttype)
 	{
-		this.agenttype = agenttype;
+		this.componenttype = agenttype;
 	}
 	
 	/**
 	 *  Get the agent type.
 	 *  @return The agent type.
 	 */
-	public MAgentType	getMAgentType(MApplicationType apptype)
+	public MComponentType	getMComponentType(MApplicationType apptype)
 	{
-		return apptype.getMAgentType(agenttype);
+		return apptype.getMComponentType(componenttype);
 	}
 	
 	/**
@@ -73,7 +73,7 @@ public class MPosition
 		sbuf.append("(roletype=");
 		sbuf.append(getRoleType());
 		sbuf.append(", agenttype=");
-		sbuf.append(getAgentType());
+		sbuf.append(getComponentType());
 		sbuf.append(")");
 		return sbuf.toString();
 	}

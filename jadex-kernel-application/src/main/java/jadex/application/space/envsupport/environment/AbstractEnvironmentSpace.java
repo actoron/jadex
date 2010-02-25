@@ -62,7 +62,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/** The percepttypes. */
 	protected Map percepttypes;
 	
-	/** Available agent actions. */
+	/** Available component actions. */
 	protected Map actions;
 	
 	/** The percept generators. */
@@ -98,8 +98,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/** Task id counter for new ids. */
 	protected AtomicCounter taskidcounter;
 	
-	/** The list of scheduled agent actions. */
-	protected AgentActionList actionlist;
+	/** The list of scheduled component actions. */
+	protected ComponentActionList actionlist;
 	
 	/** The list of scheduled percepts. */
 	protected PerceptList perceptlist;
@@ -144,7 +144,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		
 		this.objectidcounter = new AtomicCounter();
 		this.taskidcounter = new AtomicCounter();
-		this.actionlist	= new AgentActionList(this);
+		this.actionlist	= new ComponentActionList(this);
 		this.perceptlist = new PerceptList(this);
 		
 		this.dataproviders = new HashMap();
@@ -212,22 +212,22 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			for(int i=0; i<avmappings.size(); i++)
 			{
 				AvatarMapping mapping = (AvatarMapping)avmappings.get(i);
-//				String agenttype = (String)MEnvSpaceInstance.getProperty(mmapping, "agenttype");
+//				String componenttype = (String)MEnvSpaceInstance.getProperty(mmapping, "componenttype");
 //				String avatartype = (String)(String)MEnvSpaceInstance.getProperty(mmapping, "objecttype");
 //				Boolean createavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createavatar");
-//				Boolean createagent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createagent");
+//				Boolean createcomponent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "createcomponent");
 //				Boolean killavatar = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killavatar");
-//				Boolean killagent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killagent");
+//				Boolean killcomponent = (Boolean)MEnvSpaceInstance.getProperty(mmapping, "killcomponent");
 //				
-//				AvatarMapping mapping = new AvatarMapping(agenttype, avatartype);
+//				AvatarMapping mapping = new AvatarMapping(componenttype, avatartype);
 //				if(createavatar!=null)
 //					mapping.setCreateAvatar(createavatar.booleanValue());
-//				if(createagent!=null)
-//					mapping.setCreateAgent(createagent.booleanValue());
+//				if(createcomponent!=null)
+//					mapping.setCreateComponent(createcomponent.booleanValue());
 //				if(killavatar!=null)
 //					mapping.setKillAvatar(killavatar.booleanValue());
-//				if(killagent!=null)
-//					mapping.setKillAgent(killagent.booleanValue());
+//				if(killcomponent!=null)
+//					mapping.setKillComponent(killcomponent.booleanValue());
 //				
 				this.addAvatarMappings(mapping);
 			}
@@ -244,8 +244,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				
 				pt.setName((String)MEnvSpaceInstance.getProperty(mpercepttype, "name"));
 				
-				List atypes = (List)mpercepttype.get("agenttypes");
-				pt.setAgentTypes(atypes==null? null: new HashSet(atypes));
+				List atypes = (List)mpercepttype.get("componenttypes");
+				pt.setComponentTypes(atypes==null? null: new HashSet(atypes));
 				
 				List otypes = (List)mpercepttype.get("objecttypes");
 				pt.setObjectTypes(otypes==null? null: new HashSet(otypes));
@@ -332,9 +332,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				List props = (List)mproc.get("properties");
 				MEnvSpaceInstance.setProperties(proc, props, fetcher);
 				
-				String agenttype = (String)MEnvSpaceInstance.getProperty(mproc, "agenttype");
+				String componenttype = (String)MEnvSpaceInstance.getProperty(mproc, "componenttype");
 				List ptypes = (List)mproc.get("percepttypes");
-				this.addPerceptProcessor(agenttype, ptypes==null? null: new HashSet(ptypes), proc);
+				this.addPerceptProcessor(componenttype, ptypes==null? null: new HashSet(ptypes), proc);
 			}
 		}
 		
@@ -916,37 +916,37 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				}
 			}
 			
-			// Possibly create agent.
+			// Possibly create component.
 			for(Iterator it=avatarmappings.keySet().iterator(); it.hasNext(); )
 			{
-				String agenttype = (String)it.next();
-				AvatarMapping mapping = getAvatarMapping(agenttype, typename);
-				if(mapping!=null && mapping.isCreateAgent())
+				String componenttype = (String)it.next();
+				AvatarMapping mapping = getAvatarMapping(componenttype, typename);
+				if(mapping!=null && mapping.isCreateComponent())
 				{
 //					final Object	fid	= id;
 					
 //					String	name	= null;
-					if(mapping.getAgentName()!=null)
+					if(mapping.getComponentName()!=null)
 					{
 						SimpleValueFetcher	fetch	= new SimpleValueFetcher();
 						fetch.setValue("$space", this);
 						fetch.setValue("$object", ret);
-						name	= (String) mapping.getAgentName().getValue(fetch);
+						name	= (String) mapping.getComponentName().getValue(fetch);
 					}
 					
 					throw new UnsupportedOperationException();
 					
 //					// todo: what about arguments etc.?
-//					((ApplicationContext)getContext()).createAgent(name, agenttype, null, null, false, false, new IResultListener() {
+//					((ApplicationContext)getContext()).createAgent(name, componenttype, null, null, false, false, new IResultListener() {
 //						
 //						public void resultAvailable(Object source, Object result)
 //						{
-//							IComponentIdentifier	agent	= (IComponentIdentifier)result;
+//							IComponentIdentifier	component	= (IComponentIdentifier)result;
 //							
-//							setOwner(fid, agent);
+//							setOwner(fid, component);
 //							
-//							((IComponentManagementService)((ApplicationContext)getContext()).getServiceContainer().getService(IComponentManagementService.class)).resumeComponent(agent, null);
-////							SComponentManagementService.startComponent(((ApplicationContext)getContext()).getPlatform(), agent, null);
+//							((IComponentManagementService)((ApplicationContext)getContext()).getServiceContainer().getService(IComponentManagementService.class)).resumeComponent(component, null);
+////							SComponentManagementService.startComponent(((ApplicationContext)getContext()).getPlatform(), component, null);
 //						}
 //						
 //						public void exceptionOccurred(Object source, Exception exception)
@@ -1019,16 +1019,16 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				throw new RuntimeException("No object found for id: "+id);
 			String	objecttype	= obj.getType();
 			
-			// Possibly kill agent.
-			IComponentIdentifier agent = (IComponentIdentifier)obj.getProperty(ISpaceObject.PROPERTY_OWNER);
-			if(agent!=null)
+			// Possibly kill component.
+			IComponentIdentifier component = (IComponentIdentifier)obj.getProperty(ISpaceObject.PROPERTY_OWNER);
+			if(component!=null)
 			{
-				String	agenttype = getContext().getComponentType(agent);
-				AvatarMapping mapping = getAvatarMapping(agenttype, objecttype);
-				if(mapping.isKillAgent())
+				String	componenttype = getContext().getComponentType(component);
+				AvatarMapping mapping = getAvatarMapping(componenttype, objecttype);
+				if(mapping.isKillComponent())
 				{
 					IComponentManagementService ces = (IComponentManagementService)getContext().getServiceContainer().getService(IComponentManagementService.class);
-					ces.destroyComponent(agent, null);
+					ces.destroyComponent(component, null);
 				}
 			}
 			
@@ -1120,27 +1120,27 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	
 	/**
 	 * Adds an avatar mapping.
-	 * @param agenttype The agent type.
-	 * @param objecttype The object type to represent the agent.
+	 * @param componenttype The component type.
+	 * @param objecttype The object type to represent the component.
 	 */
 	public void addAvatarMappings(AvatarMapping mapping)
 	{
 		synchronized(monitor)
 		{
-			this.avatarmappings.put(mapping.getAgentType(), mapping);			
+			this.avatarmappings.put(mapping.getComponentType(), mapping);			
 		}
 	}
 
 	/**
 	 * Remove an avatar mapping.
-	 * @param agenttype The agent type.
-	 * @param objecttype The object type to represent the agent.
+	 * @param componenttype The component type.
+	 * @param objecttype The object type to represent the component.
 	 */
 	public void removeAvatarMappings(AvatarMapping mapping)
 	{
 		synchronized(monitor)
 		{
-			this.avatarmappings.remove(mapping.getAgentType(), mapping);			
+			this.avatarmappings.remove(mapping.getComponentType(), mapping);			
 		}
 	}
 	
@@ -1194,7 +1194,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	{
 		synchronized(monitor)
 		{
-			actionlist.scheduleAgentAction(getSpaceAction(id), parameters, listener);
+			actionlist.scheduleComponentAction(getSpaceAction(id), parameters, listener);
 		}
 	}
 	
@@ -1216,22 +1216,22 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	}
 	
 	/**
-	 *  Create a percept for the given agent.
+	 *  Create a percept for the given component.
 	 *  @param typename The percept type.
 	 *  @param data	The content of the percept (if any).
-	 *  @param agent The agent that should receive the percept.
+	 *  @param component The component that should receive the percept.
 	 */
-	public void createPercept(String typename, Object data, IComponentIdentifier agent, ISpaceObject avatar)
+	public void createPercept(String typename, Object data, IComponentIdentifier component, ISpaceObject avatar)
 	{
 		synchronized(monitor)
 		{
 //			if(!percepttypes.containsKey(typename))
 //				throw new RuntimeException("Unknown percept type: "+typename);
 			
-//			System.out.println("New percept: "+typename+", "+data+", "+agent);
+//			System.out.println("New percept: "+typename+", "+data+", "+component);
 			
-			String	agenttype = context.getComponentType(agent);
-			List procs	= (List)perceptprocessors.get(agenttype);
+			String	componenttype = context.getComponentType(component);
+			List procs	= (List)perceptprocessors.get(componenttype);
 			IPerceptProcessor proc = null;
 			if(procs!=null)
 			{
@@ -1244,9 +1244,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			}
 			
 			if(proc!=null)
-				perceptlist.schedulePercept(typename, data, agent, avatar, proc);
+				perceptlist.schedulePercept(typename, data, component, avatar, proc);
 			else
-				System.out.println("Warning: No processor for percept: "+typename+", "+data+", "+agent+", "+avatar);
+				System.out.println("Warning: No processor for percept: "+typename+", "+data+", "+component+", "+avatar);
 		}
 	}
 	
@@ -1317,7 +1317,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  Get the avatar objects.
 	 *  @return The avatar objects. 
 	 */
-	public IComponentIdentifier[] getAgents()
+	public IComponentIdentifier[] getComponents()
 	{
 		synchronized(monitor)
 		{
@@ -1338,7 +1338,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			if(ownedobjs!=null)
 			{
 				if(ownedobjs.size()>1)
-					throw new RuntimeException("More than one avatar for agent: "+owner);
+					throw new RuntimeException("More than one avatar for component: "+owner);
 				else if(ownedobjs.size()==1)
 					ret = (ISpaceObject)ownedobjs.get(0);
 			}
@@ -1465,33 +1465,33 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 
 	/**
 	 *  Add a percept processor.
-	 *  @param	agenttype	The agent type.
+	 *  @param	componenttype	The component type.
 	 *  @param	proc	The percept processor.
 	 */
-	public void addPerceptProcessor(String agenttype, Set percepttypes, IPerceptProcessor proc)
+	public void addPerceptProcessor(String componenttype, Set percepttypes, IPerceptProcessor proc)
 	{
 		synchronized(monitor)
 		{
-			perceptprocessors.put(agenttype, new Object[]{percepttypes, proc});
+			perceptprocessors.put(componenttype, new Object[]{percepttypes, proc});
 		}
 	}
 	
 	/**
 	 *  remove a percept processor.
-	 *  @param	agenttype	The agent type.
+	 *  @param	componenttype	The component type.
 	 *  @param	proc	The percept processor.
 	 */
-	public void removePerceptProcessor(String agenttype, IPerceptProcessor proc)
+	public void removePerceptProcessor(String componenttype, IPerceptProcessor proc)
 	{
 		synchronized(monitor)
 		{
-			List procs = (List)perceptprocessors.get(agenttype);
+			List procs = (List)perceptprocessors.get(componenttype);
 			for(int i=0; i<procs.size(); i++)
 			{
 				Object[] tmp = (Object[])procs.get(i);
 				if(proc.equals(tmp[1]))
 				{
-					perceptprocessors.remove(agenttype, tmp);
+					perceptprocessors.remove(componenttype, tmp);
 					break;
 				}
 			}
@@ -1502,7 +1502,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 *  Add a space percept type.
 	 *  @param typename The percept name.
 	 *  @param objecttypes The objecttypes.
-	 *  @param agenttypes The agenttypes.
+	 *  @param componenttypes The componenttypes.
 	 */
 	public void addPerceptType(PerceptType percepttype)
 	{
@@ -1540,7 +1540,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	//-------- ISpace methods --------
 	
 	/**
-	 *  Called when an agent was added. 
+	 *  Called when an component was added. 
 	 */
 	public void componentAdded(IComponentIdentifier aid, String type)
 	{
@@ -1559,10 +1559,10 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			}
 			else
 			{
-				String	agenttype	= context.getComponentType(aid);
-				if(agenttype!=null && avatarmappings.getCollection(agenttype)!=null)
+				String	componenttype	= context.getComponentType(aid);
+				if(componenttype!=null && avatarmappings.getCollection(componenttype)!=null)
 				{
-					for(Iterator it=avatarmappings.getCollection(agenttype).iterator(); it.hasNext(); )
+					for(Iterator it=avatarmappings.getCollection(componenttype).iterator(); it.hasNext(); )
 					{
 						AvatarMapping mapping = (AvatarMapping)it.next();
 						if(mapping.isCreateAvatar())
@@ -1580,23 +1580,23 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				for(Iterator it=perceptgenerators.keySet().iterator(); it.hasNext(); )
 				{
 					IPerceptGenerator gen = (IPerceptGenerator)perceptgenerators.get(it.next());
-					gen.agentAdded(aid, this);
+					gen.componentAdded(aid, this);
 				}
 			}
 		}
 	}
 	
 	/**
-	 *  Called when an agent was removed.
+	 *  Called when an component was removed.
 	 */
 	public void componentRemoved(IComponentIdentifier aid)
 	{
 		synchronized(monitor)
 		{
-			String	agenttype	= context.getComponentType(aid);
+			String	componenttype	= context.getComponentType(aid);
 			
-			// Possibly kill avatars of that agent.
-			if(agenttype!=null && avatarmappings.getCollection(agenttype)!=null)
+			// Possibly kill avatars of that component.
+			if(componenttype!=null && avatarmappings.getCollection(componenttype)!=null)
 			{
 				ISpaceObject[] avatars = getAvatars(aid);
 				if(avatars!=null)
@@ -1604,7 +1604,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					for(int i=0; i<avatars.length; i++)
 					{
 						String avatartype = avatars[i].getType();
-						AvatarMapping mapping = getAvatarMapping(agenttype, avatartype);
+						AvatarMapping mapping = getAvatarMapping(componenttype, avatartype);
 						
 						if(mapping!=null && mapping.isKillAvatar())
 						{
@@ -1619,7 +1619,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				for(Iterator it=perceptgenerators.keySet().iterator(); it.hasNext(); )
 				{
 					IPerceptGenerator gen = (IPerceptGenerator)perceptgenerators.get(it.next());
-					gen.agentRemoved(aid, this);
+					gen.componentRemoved(aid, this);
 				}
 			}
 		}
@@ -1705,9 +1705,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	}
 	
 	/**
-	 *  Get the list of scheduled agent actions
+	 *  Get the list of scheduled component actions
 	 */
-	public AgentActionList	getAgentActionList()
+	public ComponentActionList	getComponentActionList()
 	{
 		return actionlist;
 	}
@@ -1795,8 +1795,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	}
 
 	/**
-	 *  Initial settings for the avatar of a specific agent.
-	 *  @param ownerid	The agent id.
+	 *  Initial settings for the avatar of a specific component.
+	 *  @param ownerid	The component id.
 	 *  @param type	The object type.
 	 *  @param props	The properties for the object (if any).
 	 */
@@ -1812,12 +1812,12 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	}
 	
 	/**
-	 *  Get the avatar mapping for an agent avatar combination.
+	 *  Get the avatar mapping for an component avatar combination.
 	 */
-	protected AvatarMapping getAvatarMapping(String agenttype, String avatartype)
+	protected AvatarMapping getAvatarMapping(String componenttype, String avatartype)
 	{
 		AvatarMapping mapping = null;
-		for(Iterator it=avatarmappings.getCollection(agenttype).iterator(); mapping==null && it.hasNext(); )
+		for(Iterator it=avatarmappings.getCollection(componenttype).iterator(); mapping==null && it.hasNext(); )
 		{
 			AvatarMapping	test = (AvatarMapping)it.next();
 			if(avatartype.equals(test.getObjectType()))

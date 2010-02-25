@@ -25,8 +25,8 @@ public class MApplicationType
 	/** The list of contained space types. */
 	protected List spacetypes;
 	
-	/** The list of contained agent types. */
-	protected List agenttypes;
+	/** The list of contained component types. */
+	protected List componenttypes;
 	
 	/** The list of contained application descriptions. */
 	protected List applications;
@@ -49,7 +49,7 @@ public class MApplicationType
 	{
 		this.imports = new ArrayList();
 		this.spacetypes = new ArrayList();
-		this.agenttypes = new ArrayList();
+		this.componenttypes = new ArrayList();
 		this.applications = new ArrayList();
 		this.arguments = new ArrayList();
 		this.results = new ArrayList();
@@ -121,17 +121,17 @@ public class MApplicationType
 	}
 	
 	/**
-	 *  Add an agent type.
-	 *  @param agenttype The agent type.
+	 *  Add an component type.
+	 *  @param componenttype The component type.
 	 */
-	public void addMAgentType(MAgentType agenttype)
+	public void addMComponentType(MComponentType componenttype)
 	{
-		this.agenttypes.add(agenttype);
+		this.componenttypes.add(componenttype);
 	}
 	
 	/**
 	 *  Add a space type.
-	 *  @param agenttype The space type.
+	 *  @param componenttype The space type.
 	 */
 	public void addMSpaceType(MSpaceType spacetype)
 	{
@@ -193,12 +193,12 @@ public class MApplicationType
 	}
 	
 	/**
-	 *  Get the agenttypes.
-	 *  @return The agenttypes.
+	 *  Get the componenttypes.
+	 *  @return The componenttypes.
 	 */
-	public List getMAgentTypes()
+	public List getMComponentTypes()
 	{
-		return this.agenttypes;
+		return this.componenttypes;
 	}
 	
 	/**
@@ -211,16 +211,16 @@ public class MApplicationType
 	}
 
 	/**
-	 *  Get a named agenttype.
-	 *  @param name The agent type name.
-	 *  @return The agenttype (if any).
+	 *  Get a named componenttype.
+	 *  @param name The component type name.
+	 *  @return The componenttype (if any).
 	 */
-	public MAgentType getMAgentType(String name)
+	public MComponentType getMComponentType(String name)
 	{
-		MAgentType	ret	= null;
-		for(int i=0; ret==null && i<agenttypes.size(); i++)
+		MComponentType	ret	= null;
+		for(int i=0; ret==null && i<componenttypes.size(); i++)
 		{
-			MAgentType	at	= (MAgentType)agenttypes.get(i);
+			MComponentType	at	= (MComponentType)componenttypes.get(i);
 			if(at.getName().equals(name))
 				ret	= at;
 		}

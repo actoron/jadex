@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  Agent instance representation. 
+ *  Component instance representation. 
  */
-public class MAgentInstance
+public class MComponentInstance
 {
 	//-------- attributes --------
 	
@@ -28,7 +28,7 @@ public class MAgentInstance
 	/** The start flag. */
 	protected boolean start;
 	
-	/** The number of agents. */
+	/** The number of components. */
 //	protected int number;
 	protected String numbertext;
 	
@@ -47,9 +47,9 @@ public class MAgentInstance
 	//-------- constructors --------
 	
 	/**
-	 *  Create a new agent.
+	 *  Create a new component.
 	 */
-	public MAgentInstance()
+	public MComponentInstance()
 	{
 		this.arguments = new ArrayList();
 		this.start = true;
@@ -113,7 +113,7 @@ public class MAgentInstance
 	}
 	
 	/**
-	 *  Test if agent should be started (not only created).
+	 *  Test if component should be started (not only created).
 	 *  @return True, if should be started.
 	 */
 	public boolean isStart()
@@ -122,7 +122,7 @@ public class MAgentInstance
 	}
 
 	/**
-	 *  Set if the agent should also be started.
+	 *  Set if the component should also be started.
 	 *  @param start The start flag to set.
 	 */
 	public void setStart(boolean start)
@@ -185,7 +185,7 @@ public class MAgentInstance
 	}
 	
 	/**
-	 *  Get the number of agents to start.
+	 *  Get the number of components to start.
 	 *  @return The number.
 	 */
 	public int getNumber(IApplication context, ClassLoader classloader)
@@ -205,7 +205,7 @@ public class MAgentInstance
 	}
 	
 	/**
-	 *  Get the number of agents to start.
+	 *  Get the number of components to start.
 	 *  @return The number.
 	 * /
 	public int getNumber()
@@ -214,7 +214,7 @@ public class MAgentInstance
 	}*/
 
 	/**
-	 *  Set the number of agents.
+	 *  Set the number of components.
 	 *  @param number The number to set.
 	 * /
 	public void setNumber(int number)
@@ -275,17 +275,17 @@ public class MAgentInstance
 	}
 	
 	/**
-	 *  Get the model of the agent instance.
-	 *  @param apptype The application type this agent is used in.
-	 *  @return The name of the agent type.
+	 *  Get the model of the component instance.
+	 *  @param apptype The application type this component is used in.
+	 *  @return The name of the component type.
 	 */
-	public MAgentType getType(MApplicationType apptype)
+	public MComponentType getType(MApplicationType apptype)
 	{
-		MAgentType ret = null;
-		List agenttypes = apptype.getMAgentTypes();
-		for(int i=0; ret==null && i<agenttypes.size(); i++)
+		MComponentType ret = null;
+		List componenttypes = apptype.getMComponentTypes();
+		for(int i=0; ret==null && i<componenttypes.size(); i++)
 		{
-			MAgentType at = (MAgentType)agenttypes.get(i);
+			MComponentType at = (MComponentType)componenttypes.get(i);
 			if(at.getName().equals(getTypeName()))
 				ret = at;
 		}

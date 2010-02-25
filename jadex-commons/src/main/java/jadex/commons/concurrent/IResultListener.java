@@ -1,7 +1,7 @@
 package jadex.commons.concurrent;
 
 /**
- *  Callback interface for methods on agent platform level. 
+ *  Callback interface for methods that should operate decoupled from caller thread. 
  */
 public interface IResultListener
 {

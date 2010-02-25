@@ -7,17 +7,17 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="BlackJack" package="jadex.bdi.examples.blackjack">
 	
-	<agenttypes>
-		<agenttype name="Manager" filename="jadex/bdi/examples/blackjack/manager/Manager.agent.xml"/>
-		<agenttype name="Dealer" filename="jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml"/>
-		<agenttype name="Player" filename="jadex/bdi/examples/blackjack/player/Player.agent.xml"/>
-	</agenttypes>
+	<componenttypes>
+		<componenttype name="Manager" filename="jadex/bdi/examples/blackjack/manager/Manager.agent.xml"/>
+		<componenttype name="Dealer" filename="jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml"/>
+		<componenttype name="Player" filename="jadex/bdi/examples/blackjack/player/Player.agent.xml"/>
+	</componenttypes>
 	
 	<applications>
 		<application name="Only Manager">
-			<agents>
+			<components>
 				<agent type="Manager" master="true"/>
-			</agents>
+			</components>
 		</application>
 	</applications>
 

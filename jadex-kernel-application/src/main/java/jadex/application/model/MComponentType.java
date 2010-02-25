@@ -1,9 +1,9 @@
 package jadex.application.model;
 
 /**
- *  Agent type representation.
+ *  Component type representation.
  */
-public class MAgentType
+public class MComponentType
 {
 	//-------- attributes --------
 
@@ -16,9 +16,9 @@ public class MAgentType
 	//-------- constructors --------
 
 	/**
-	 *  Create a new agent type.
+	 *  Create a new component type.
 	 */
-	public MAgentType()
+	public MComponentType()
 	{
 	}
 

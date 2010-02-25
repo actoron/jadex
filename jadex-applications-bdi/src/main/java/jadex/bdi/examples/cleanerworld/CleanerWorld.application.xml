@@ -62,8 +62,8 @@
 			</env:objecttypes>
 			
 			<env:avatarmappings>
-				<env:avatarmapping agenttype="Cleaner" objecttype="cleaner"/>
-				<env:avatarmapping agenttype="Truck" objecttype="truck"/>
+				<env:avatarmapping componenttype="Cleaner" objecttype="cleaner"/>
+				<env:avatarmapping componenttype="Truck" objecttype="truck"/>
 			</env:avatarmappings>
 		
 			<env:actiontypes>
@@ -87,13 +87,13 @@
 			</env:processtypes>
 			
 			<env:percepttypes>
-				<env:percepttype name="cleaner_moved" objecttype="cleaner" agenttype="Cleaner" />
-				<env:percepttype name="waste_appeared" objecttype="waste" agenttype="Cleaner" />
-				<env:percepttype name="waste_disappeared" objecttype="waste" agenttype="Cleaner" />
-				<env:percepttype name="wastebin_appeared" objecttype="wastebin" agenttype="Cleaner" />
-				<env:percepttype name="wastebin_disappeared" objecttype="wastebin" agenttype="Cleaner" />
-				<env:percepttype name="chargingstation_appeared" objecttype="chargingstation" agenttype="Cleaner" />
-				<env:percepttype name="chargingstation_disappeared" objecttype="chargingstation" agenttype="Cleaner" />
+				<env:percepttype name="cleaner_moved" objecttype="cleaner" componenttype="Cleaner" />
+				<env:percepttype name="waste_appeared" objecttype="waste" componenttype="Cleaner" />
+				<env:percepttype name="waste_disappeared" objecttype="waste" componenttype="Cleaner" />
+				<env:percepttype name="wastebin_appeared" objecttype="wastebin" componenttype="Cleaner" />
+				<env:percepttype name="wastebin_disappeared" objecttype="wastebin" componenttype="Cleaner" />
+				<env:percepttype name="chargingstation_appeared" objecttype="chargingstation" componenttype="Cleaner" />
+				<env:percepttype name="chargingstation_disappeared" objecttype="chargingstation" componenttype="Cleaner" />
 					
 				<env:perceptgenerator name="visiongen" class="DefaultVisionGenerator">
 					<env:property name="range">0.1</env:property>
@@ -112,7 +112,7 @@
 					</env:property>
 				</env:perceptgenerator>
 				
-				<env:perceptprocessor agenttype="Cleaner" class="DefaultBDIVisionProcessor" >
+				<env:perceptprocessor componenttype="Cleaner" class="DefaultBDIVisionProcessor" >
 					<env:property name="percepttypes">
 						new Object[]
 						{
@@ -191,10 +191,10 @@
 		</env:envspacetype>
 	</spacetypes>
 	
-	<agenttypes>
-		<agenttype name="Cleaner" filename="jadex/bdi/examples/cleanerworld/cleaner/Cleaner.agent.xml"/>
-		<agenttype name="Truck" filename="jadex/bdi/examples/cleanerworld/truck/Truck.agent.xml"/>
-	</agenttypes>
+	<componenttypes>
+		<componenttype name="Cleaner" filename="jadex/bdi/examples/cleanerworld/cleaner/Cleaner.agent.xml"/>
+		<componenttype name="Truck" filename="jadex/bdi/examples/cleanerworld/truck/Truck.agent.xml"/>
+	</componenttypes>
 	
 	<applications>
 		<application name="One cleaner">
@@ -242,9 +242,9 @@
 					</env:observers>
 				</env:envspace>
 			</spaces>
-			<agents>
+			<components>
 				<agent type="Cleaner"/>
-			</agents>
+			</components>
 		</application>
 		
 		<application name="Two cleaners">
@@ -293,9 +293,9 @@
 				</env:envspace>
 			</spaces>
 
-			<agents>
+			<components>
 				<agent type="Cleaner" number="2"/>
-			</agents>
+			</components>
 		</application>
 	</applications>
 

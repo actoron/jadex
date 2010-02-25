@@ -55,8 +55,8 @@
 			
 			<!-- Declaration of the relationships between agents and their avatar objects in the space. -->
 			<env:avatarmappings>
-				<env:avatarmapping agenttype="Collector" objecttype="collector"/>
-				<env:avatarmapping agenttype="Burner" objecttype="burner"/>
+				<env:avatarmapping componenttype="Collector" objecttype="collector"/>
+				<env:avatarmapping componenttype="Burner" objecttype="burner"/>
 			</env:avatarmappings>
 		
 			<!-- Actions that can be performed in the environment. -->
@@ -112,7 +112,7 @@
 				</env:perceptgenerator>
 				
 				<!-- Percept processors consume percepts and push them into the agents. -->
-				<env:perceptprocessor agenttype="Collector" class="DefaultBDIVisionProcessor" >
+				<env:perceptprocessor componenttype="Collector" class="DefaultBDIVisionProcessor" >
 					<env:property name="percepttypes">
 						new Object[]
 						{
@@ -122,7 +122,7 @@
 					</env:property>
 				</env:perceptprocessor>
 				
-				<env:perceptprocessor agenttype="Burner" class="DefaultBDIVisionProcessor" >
+				<env:perceptprocessor componenttype="Burner" class="DefaultBDIVisionProcessor" >
 					<env:property name="percepttypes">
 						new Object[]
 						{
@@ -209,10 +209,10 @@
 	</spacetypes>
 	
 	<!-- Agent types of the application. -->
-	<agenttypes>
-		<agenttype name="Collector" filename="jadex/bdi/examples/garbagecollector/GarbageCollector.agent.xml"/>
-		<agenttype name="Burner" filename="jadex/bdi/examples/garbagecollector/GarbageBurner.agent.xml"/>
-	</agenttypes>
+	<componenttypes>
+		<componenttype name="Collector" filename="jadex/bdi/examples/garbagecollector/GarbageCollector.agent.xml"/>
+		<componenttype name="Burner" filename="jadex/bdi/examples/garbagecollector/GarbageBurner.agent.xml"/>
+	</componenttypes>
 	
 	<!-- Application instance definitions. -->
 	<applications>
@@ -232,10 +232,10 @@
 				</env:envspace>
 			</spaces>
 
-			<agents>
+			<components>
 				<agent type="Collector"/>
 				<agent type="Burner"/>
-			</agents>			
+			</components>			
 		</application>
 		
 		<application name="One Burner / Two Collectors">
@@ -253,14 +253,14 @@
 				</env:envspace>
 			</spaces>
 			
-			<agents>
+			<components>
 				<!-- Using names for agents is problemat -->
 				<!-- <agent name="Collector2" type="Collector"/>
 				<agent name="Collector1" type="Collector"/>
 				<agent name="Burner1" type="Burner"/> -->
 				<agent type="Collector" number="2"/>
 				<agent type="Burner" number="1"/>
-			</agents>
+			</components>
 		</application>
 		
 		<application name="Two Burners / Three Collectors">
@@ -278,10 +278,10 @@
 				</env:envspace>
 			</spaces>
 
-			<agents>
+			<components>
 				<agent type="Collector" number="3"/>
 				<agent type="Burner" number="2"/>
-			</agents>
+			</components>
 		</application>
 		
 		<application name="Many Burners / Too Many Collectors">
@@ -299,10 +299,10 @@
 				</env:envspace>
 			</spaces>
 
-			<agents>
+			<components>
 				<agent type="Collector" number="30"/>
 				<agent type="Burner" number="5"/>
-			</agents>
+			</components>
 		</application>
 		
 		<application name="No Agents">

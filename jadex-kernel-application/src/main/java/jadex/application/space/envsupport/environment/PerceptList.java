@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- *  The list of scheduled agent percepts and convenience methods for
+ *  The list of scheduled component percepts and convenience methods for
  *  processing selected percepts.
  *  This implementation is not thread-safe, i.e. methods
  *  should only be called from threads that are already synchronized
@@ -42,16 +42,16 @@ public class PerceptList
 	 *  Schedules a percept.
 	 *  @param type	The percept type.
 	 *  @param data	The content of the percept (if any).
-	 *  @param agent	The agent that should receive the percept.
-	 *  @param avatar	The avatar of the agent (if any).
+	 *  @param component	The component that should receive the percept.
+	 *  @param avatar	The avatar of the component (if any).
 	 *  @param processor	The percept processor.
 	 */
-	public void schedulePercept(String type, Object data, IComponentIdentifier agent, ISpaceObject avatar, IPerceptProcessor processor)
+	public void schedulePercept(String type, Object data, IComponentIdentifier component, ISpaceObject avatar, IPerceptProcessor processor)
 	{
 		if(percepts==null)
 			percepts	= new LinkedHashSet();
 		
-		percepts.add(new PerceptEntry(type, data, agent, avatar, processor));
+		percepts.add(new PerceptEntry(type, data, component, avatar, processor));
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class PerceptList
 						it.remove();
 						try
 						{
-							entry.processor.processPercept(space, entry.type, entry.data, entry.agent, entry.avatar);
+							entry.processor.processPercept(space, entry.type, entry.data, entry.component, entry.avatar);
 						}
 						catch(Exception e)
 						{
@@ -121,10 +121,10 @@ public class PerceptList
 		/** The percept content (if any). */
 		public Object	data;
 		
-		/** The receiving agent. */
-		public IComponentIdentifier	agent;
+		/** The receiving component. */
+		public IComponentIdentifier	component;
 		
-		/** The avatar of the agent (if any). */
+		/** The avatar of the component (if any). */
 		public ISpaceObject	avatar;
 		
 		/** The processor. */
@@ -135,11 +135,11 @@ public class PerceptList
 		/**
 		 *  Convenience constructor for inline entry creation.
 		 */
-		public PerceptEntry(String type, Object data, IComponentIdentifier agent, ISpaceObject avatar, IPerceptProcessor processor)
+		public PerceptEntry(String type, Object data, IComponentIdentifier component, ISpaceObject avatar, IPerceptProcessor processor)
 		{
 			this.type	= type;
 			this.data	= data;
-			this.agent	= agent;
+			this.component	= component;
 			this.avatar	= avatar;
 			this.processor	= processor;
 		}

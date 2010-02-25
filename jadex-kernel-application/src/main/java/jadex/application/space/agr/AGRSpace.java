@@ -91,7 +91,7 @@ public class AGRSpace implements ISpace
 			MPosition[]	positions	= mgroups[g].getMPositions();
 			for(int p=0; positions!=null && p<positions.length; p++)
 			{
-				String	at	= positions[p].getAgentType();
+				String	at	= positions[p].getComponentType();
 				String	rt	= positions[p].getRoleType();
 				group.addRoleForType(at, rt);
 			}

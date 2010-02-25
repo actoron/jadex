@@ -10,28 +10,28 @@
 						http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="Ping" package="jadex.bdi.examples.ping">
 	
-	<agenttypes>
-		<agenttype name="Ping" filename="jadex/bdi/examples/ping/Ping.agent.xml"/>
-		<agenttype name="Pinging" filename="jadex/bdi/examples/ping/Pinging.agent.xml"/>
-	</agenttypes>
+	<componenttypes>
+		<componenttype name="Ping" filename="jadex/bdi/examples/ping/Ping.agent.xml"/>
+		<componenttype name="Pinging" filename="jadex/bdi/examples/ping/Pinging.agent.xml"/>
+	</componenttypes>
 	
 	<applications>
 		<application name="Simple Pinging">
-			<agents>
+			<components>
 				<agent type="Ping" name="Ping" />
 				<agent type="Pinging" name="Pinging" />
-			</agents>
+			</components>
 		</application>
 
 		<application name="Multi Pinging">
-			<agents>
+			<components>
 				<agent type="Ping" name="Ping"/>
 				<agent type="Pinging" number="2"/>
-			</agents>
+			</components>
 		</application>
 
 		<application name="Fast Pinging">
-			<agents>
+			<components>
 				<agent type="Ping" name="Ping"/>
 				<agent type="Pinging" name="FastPinging">
 					<arguments>
@@ -40,7 +40,7 @@
 						</argument>
 					</arguments>
 				</agent>
-			</agents>
+			</components>
 		</application>
 	</applications>
 	

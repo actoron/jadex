@@ -1,8 +1,8 @@
 package jadex.application.runtime.impl;
 
 import jadex.application.model.ApplicationModel;
-import jadex.application.model.MAgentInstance;
-import jadex.application.model.MAgentType;
+import jadex.application.model.MComponentInstance;
+import jadex.application.model.MComponentType;
 import jadex.application.model.MApplicationInstance;
 import jadex.application.model.MApplicationType;
 import jadex.application.model.MSpaceInstance;
@@ -32,11 +32,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  The application context provides a closed environment for agents.
- *  If agents spawn other agents, these will automatically be added to
+ *  The application context provides a closed environment for components.
+ *  If components spawn other components, these will automatically be added to
  *  the context.
- *  When the context is deleted all agents will be destroyed.
- *  An agent must only be in one application context.
+ *  When the context is deleted all components will be destroyed.
+ *  An component must only be in one application context.
  */
 public class Application	implements IApplication, IComponentInstance
 {
@@ -61,7 +61,7 @@ public class Application	implements IApplication, IComponentInstance
 	protected boolean	inited;
 	
 	/** Flag to indicate that the context is about to be deleted
-	 * (no more agents can be added). */
+	 * (no more components can be added). */
 	protected boolean	terminating;
 	
 	/** Component type mapping (cid -> logical type name). */
@@ -167,14 +167,14 @@ public class Application	implements IApplication, IComponentInstance
 	public void	deleteContext(final IResultListener listener)
 	{
 		this.setTerminating(true);
-//		final IComponentIdentifier[]	agents	= getAgents();
-//		if(agents!=null && agents.length>0)
+//		final IComponentIdentifier[]	components	= getComponents();
+//		if(components!=null && components.length>0)
 //		{
 //			// Create AMS result listener (l2), when listener is used.
-//			// -> notifies listener, when last agent is killed.
+//			// -> notifies listener, when last component is killed.
 //			IResultListener	l2	= listener!=null ? new IResultListener()
 //			{
-//				int tokill	= agents.length;
+//				int tokill	= components.length;
 //				Exception	exception;
 //				
 //				public void resultAvailable(Object result)
@@ -190,8 +190,8 @@ public class Application	implements IApplication, IComponentInstance
 //				}
 //				
 //				/**
-//				 *  Called for each killed agent.
-//				 *  Decrease counter and notify listener, when last agent is killed.
+//				 *  Called for each killed component.
+//				 *  Decrease counter and notify listener, when last component is killed.
 //				 */
 //				protected void	result()
 //				{
@@ -212,13 +212,13 @@ public class Application	implements IApplication, IComponentInstance
 //				}
 //			} : null;
 //			
-//			// Kill all agents in the context. 
+//			// Kill all components in the context. 
 ////			IAMS ams = (IAMS) platform.getService(IAMS.class);
-//			for(int i=0; i<agents.length; i++)
+//			for(int i=0; i<components.length; i++)
 //			{
 //				IComponentManagementService ces = (IComponentManagementService)container.getService(IComponentManagementService.class);
-//				ces.destroyComponent(agents[i], l2);
-////				ams.destroyAgent(agents[i], l2);
+//				ces.destroyComponent(components[i], l2);
+////				ams.destroyComponent(components[i], l2);
 //			}
 //		}
 //		else
@@ -243,12 +243,12 @@ public class Application	implements IApplication, IComponentInstance
 	public void	componentCreated(IComponentDescription desc, ILoadableComponentModel model)
 	{
 		IComponentIdentifier comp = desc.getName();
-		List	atypes	= this.model.getApplicationType().getMAgentTypes();
+		List	atypes	= this.model.getApplicationType().getMComponentTypes();
 		boolean	found	= false;
 		String	type	= null;
 		for(int i=0; !found	&& i<atypes.size(); i++)
 		{
-			MAgentType	atype	= (MAgentType)atypes.get(i);
+			MComponentType	atype	= (MComponentType)atypes.get(i);
 			
 			// Hack!!! simplify lookup!?
 			IComponentFactory factory = null;
@@ -352,42 +352,42 @@ public class Application	implements IApplication, IComponentInstance
 	
 	
 	/**
-	 *  Add an agent property. 
-	 *  @param agent The agent.
+	 *  Add an component property. 
+	 *  @param component The component.
 	 *  @param key The key.
 	 *  @param prop The property.
 	 * /
-	public synchronized void addProperty(IComponentIdentifier agent, String key, Object prop)
+	public synchronized void addProperty(IComponentIdentifier component, String key, Object prop)
 	{
-		if(!containsAgent(agent))
-			throw new RuntimeException("Agent not contained in context: "+agent+" "+this);
+		if(!containsComponent(component))
+			throw new RuntimeException("Component not contained in context: "+component+" "+this);
 			
-		Map agentprops = (Map)properties.get(agent);
-		if(agentprops==null)
+		Map componentprops = (Map)properties.get(component);
+		if(componentprops==null)
 		{
-			agentprops = new HashMap();
-			properties.put(agent, agentprops);
+			componentprops = new HashMap();
+			properties.put(component, componentprops);
 		}
 		
-		agentprops.put(key, prop);
+		componentprops.put(key, prop);
 	}
 	
 	/**
-	 *  Get agent property. 
-	 *  @param agent The agent.
+	 *  Get component property. 
+	 *  @param component The component.
 	 *  @param key The key.
 	 *  @return The property. 
 	 * /
-	public synchronized Object getProperty(IComponentIdentifier agent, String key)
+	public synchronized Object getProperty(IComponentIdentifier component, String key)
 	{
 		Object ret = null;
 		
-		if(!containsAgent(agent))
-			throw new RuntimeException("Agent not contained in context: "+agent+" "+this);
+		if(!containsComponent(component))
+			throw new RuntimeException("Component not contained in context: "+component+" "+this);
 			
-		Map agentprops = (Map)properties.get(agent);
-		if(agentprops!=null)
-			ret = agentprops.get(key);
+		Map componentprops = (Map)properties.get(component);
+		if(componentprops!=null)
+			ret = componentprops.get(key);
 		
 		return ret;
 	}*/
@@ -423,10 +423,10 @@ public class Application	implements IApplication, IComponentInstance
 		ret.append(adapter.getComponentIdentifier().getLocalName());
 //		ret.append(", parent=");
 //		ret.append(getParentContext());
-//		IComponentIdentifier[]	aids	= getAgents(); 
+//		IComponentIdentifier[]	aids	= getComponents(); 
 //		if(aids!=null)
 //		{
-//			ret.append(", agents=");
+//			ret.append(", components=");
 //			ret.append(SUtil.arrayToString(aids));
 //		}
 //		IContext[]	subcs	= getSubContexts(); 
@@ -475,23 +475,23 @@ public class Application	implements IApplication, IComponentInstance
 	}
 	
 	/**
-	 *  Create an agent in the context.
-	 *  @param name	The name of the newly created agent.
-	 *  @param type	The agent type as defined in the application type.
-	 *  @param configuration	The agent configuration.
-	 *  @param arguments	Arguments for the new agent.
-	 *  @param start	Should the new agent be started?
+	 *  Create an component in the context.
+	 *  @param name	The name of the newly created component.
+	 *  @param type	The component type as defined in the application type.
+	 *  @param configuration	The component configuration.
+	 *  @param arguments	Arguments for the new component.
+	 *  @param start	Should the new component be started?
 	 *  
-	 *  @param istener	A listener to be notified, when the agent is created (if any).
-	 *  @param creator	The agent that wants to create a new agent (if any).	
+	 *  @param istener	A listener to be notified, when the component is created (if any).
+	 *  @param creator	The component that wants to create a new component (if any).	
 	 * /
-	public void createAgent(String name, final String type, String configuration,
+	public void createComponent(String name, final String type, String configuration,
 			Map arguments, final boolean start, final boolean master, 
 			final IResultListener listener)
 	{
-		MAgentType	at	= model.getApplicationType().getMAgentType(type);
+		MComponentType	at	= model.getApplicationType().getMComponentType(type);
 		if(at==null)
-			throw new RuntimeException("Unknown agent type '"+type+"' in application: "+model);
+			throw new RuntimeException("Unknown component type '"+type+"' in application: "+model);
 //		final IAMS	ams	= (IAMS) platform.getService(IAMS.class);
 		IComponentManagementService ces = (IComponentManagementService)container.getService(IComponentManagementService.class);
 
@@ -508,17 +508,17 @@ public class Application	implements IApplication, IComponentInstance
 				IComponentIdentifier aid = (IComponentIdentifier)result;
 				synchronized(Application.this)
 				{
-					if(agenttypes==null)
-						agenttypes	= new HashMap();
-					agenttypes.put(aid, type);
+					if(componenttypes==null)
+						componenttypes	= new HashMap();
+					componenttypes.put(aid, type);
 				}
 				
-				if(!containsAgent(aid))
-					addAgent(aid);	// Hack??? agentCreated() may be called from AMS.
+				if(!containsComponent(aid))
+					addComponent(aid);	// Hack??? componentCreated() may be called from AMS.
 				
 				if(master)
 				{
-					addProperty(aid, PROPERTY_AGENT_MASTER, master? Boolean.TRUE: Boolean.FALSE);
+					addProperty(aid, PROPERTY_COMPONENT_MASTER, master? Boolean.TRUE: Boolean.FALSE);
 				}
 				
 				if(start)
@@ -536,14 +536,14 @@ public class Application	implements IApplication, IComponentInstance
 	}*/
 	
 	/**
-	 *  Remove an agent from a context.
+	 *  Remove an component from a context.
 	 * /
-	// Cannot be synchronized due to deadlock with space (uses context.getAgentType()).
-	public void	removeAgent(IComponentIdentifier agent)
+	// Cannot be synchronized due to deadlock with space (uses context.getComponentType()).
+	public void	removeComponent(IComponentIdentifier component)
 	{
-		boolean master = isAgentMaster(agent);
+		boolean master = isComponentMaster(component);
 			
-		super.removeAgent(agent);
+		super.removeComponent(component);
 		
 		if(master)
 			((IContextService)container.getService(IContextService.class)).deleteContext(this, null);
@@ -551,7 +551,7 @@ public class Application	implements IApplication, IComponentInstance
 
 	/**
 	 *  Get the flag indicating if the context is about to be deleted
-	 *  (no more agents can be added).
+	 *  (no more components can be added).
 	 */
 	public boolean	isTerminating()
 	{
@@ -560,7 +560,7 @@ public class Application	implements IApplication, IComponentInstance
 
 	/**
 	 *  Set the flag indicating if the context is about to be deleted
-	 *  (no more agents can be added).
+	 *  (no more components can be added).
 	 */
 	protected void setTerminating(boolean terminating)
 	{
@@ -571,48 +571,48 @@ public class Application	implements IApplication, IComponentInstance
 	}
 
 	/**
-	 *  Set an agent as master (causes context to be terminated on its deletion).
-	 *  @param agent The agent.
+	 *  Set an component as master (causes context to be terminated on its deletion).
+	 *  @param component The component.
 	 *  @param master The master.
 	 * /
-	public void setAgentMaster(IComponentIdentifier agent, boolean master)
+	public void setComponentMaster(IComponentIdentifier component, boolean master)
 	{
-		addProperty(agent, PROPERTY_AGENT_MASTER, master? Boolean.TRUE: Boolean.FALSE);
+		addProperty(component, PROPERTY_COMPONENT_MASTER, master? Boolean.TRUE: Boolean.FALSE);
 	}
 	
 	/**
-	 *  Set an agent as master (causes context to be terminated on its deletion).
-	 *  @param agent The agent.
-	 *  @return True, if agent is master.
+	 *  Set an component as master (causes context to be terminated on its deletion).
+	 *  @param component The component.
+	 *  @return True, if component is master.
 	 * /
-	public boolean isAgentMaster(IComponentIdentifier agent)
+	public boolean isComponentMaster(IComponentIdentifier component)
 	{
-		Boolean ret = (Boolean)getProperty(agent, PROPERTY_AGENT_MASTER);
+		Boolean ret = (Boolean)getProperty(component, PROPERTY_COMPONENT_MASTER);
 		return ret==null? false: ret.booleanValue();
 	}*/
 	
 	/**
-	 *  Get the agent type for an agent id.
-	 *  @param aid	The agent id.
-	 *  @return The agent type name.
+	 *  Get the component type for an component id.
+	 *  @param aid	The component id.
+	 *  @return The component type name.
 	 * /
-	public synchronized String	getAgentType(IComponentIdentifier aid)
+	public synchronized String	getComponentType(IComponentIdentifier aid)
 	{
-		return agenttypes!=null ? (String)agenttypes.get(aid) : null;
+		return componenttypes!=null ? (String)componenttypes.get(aid) : null;
 	}*/
 	
 	/**
-	 *  Get the agent types.
-	 *  @return The agent types.
+	 *  Get the component types.
+	 *  @return The component types.
 	 * /
-	public String[] getAgentTypes()
+	public String[] getComponentTypes()
 	{
-		List atypes = model.getApplicationType().getMAgentTypes();
+		List atypes = model.getApplicationType().getMComponentTypes();
 		String[] ret = atypes!=null? new String[atypes.size()]: SUtil.EMPTY_STRING;
 		
 		for(int i=0; i<ret.length; i++)
 		{
-			MAgentType at = (MAgentType)atypes.get(i);
+			MComponentType at = (MComponentType)atypes.get(i);
 			ret[i] = at.getName();
 		}
 		
@@ -620,21 +620,21 @@ public class Application	implements IApplication, IComponentInstance
 	}
 	
 	/**
-	 *  Get the agent type for an agent filename.
-	 *  @param aid	The agent filename.
-	 *  @return The agent type name.
+	 *  Get the component type for an component filename.
+	 *  @param aid	The component filename.
+	 *  @return The component type name.
 	 * /
-	public String getAgentType(String filename)
+	public String getComponentType(String filename)
 	{
 		String ret = null;
 		filename = filename.replace('\\', '/');
 		
-		List agenttypes = model.getApplicationType().getMAgentTypes();
-		for(Iterator it=agenttypes.iterator(); it.hasNext(); )
+		List componenttypes = model.getApplicationType().getMComponentTypes();
+		for(Iterator it=componenttypes.iterator(); it.hasNext(); )
 		{
-			MAgentType agenttype = (MAgentType)it.next();
-			if(filename.endsWith(agenttype.getFilename()))
-				ret = agenttype.getName();
+			MComponentType componenttype = (MComponentType)it.next();
+			if(filename.endsWith(componenttype.getFilename()))
+				ret = componenttype.getName();
 		}
 		
 		return ret;
@@ -652,12 +652,12 @@ public class Application	implements IApplication, IComponentInstance
 	//-------- methods to be called by adapter --------
 
 	/**
-	 *  Can be called on the agent thread only.
+	 *  Can be called on the component thread only.
 	 * 
-	 *  Main method to perform agent execution.
-	 *  Whenever this method is called, the agent performs
+	 *  Main method to perform component execution.
+	 *  Whenever this method is called, the component performs
 	 *  one of its scheduled actions.
-	 *  The platform can provide different execution models for agents
+	 *  The platform can provide different execution models for components
 	 *  (e.g. thread based, or synchronous).
 	 *  To avoid idle waiting, the return value can be checked.
 	 *  The platform guarantees that executeAction() will not be called in parallel. 
@@ -688,21 +688,21 @@ public class Application	implements IApplication, IComponentInstance
 				}
 			}
 			
-			List agents = config.getMAgentInstances();
+			List components = config.getMComponentInstances();
 			ClassLoader cl = ((ILibraryService)adapter.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
-			for(int i=0; i<agents.size(); i++)
+			for(int i=0; i<components.size(); i++)
 			{
-				final MAgentInstance agent = (MAgentInstance)agents.get(i);
+				final MComponentInstance component = (MComponentInstance)components.get(i);
 				
-	//			System.out.println("Create: "+agent.getName()+" "+agent.getTypeName()+" "+agent.getConfiguration());
-				int num = agent.getNumber(this, cl);
+	//			System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration());
+				int num = component.getNumber(this, cl);
 				for(int j=0; j<num; j++)
 				{
 					IComponentManagementService	ces	= (IComponentManagementService)adapter.getServiceContainer().getService(IComponentManagementService.class);
-					ces.createComponent(agent.getName(), agent.getType(model.getApplicationType()).getFilename(), agent.getConfiguration(), 
-						agent.getArguments(this, cl), agent.isSuspended(), null, adapter.getComponentIdentifier(), null, agent.isMaster());					
-	//				context.createAgent(agent.getName(), agent.getTypeName(),
-	//					agent.getConfiguration(), agent.getArguments(container, apptype, cl), agent.isStart(), agent.isMaster(),
+					ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(), component.getConfiguration(), 
+						component.getArguments(this, cl), component.isSuspended(), null, adapter.getComponentIdentifier(), null, component.isMaster());					
+	//				context.createComponent(component.getName(), component.getTypeName(),
+	//					component.getConfiguration(), component.getArguments(container, apptype, cl), component.isStart(), component.isMaster(),
 	//					DefaultResultListener.getInstance(), null);	
 				}
 			}
@@ -720,7 +720,7 @@ public class Application	implements IApplication, IComponentInstance
 	/**
 	 *  Can be called concurrently (also during executeAction()).
 	 *  
-	 *  Inform the agent that a message has arrived.
+	 *  Inform the component that a message has arrived.
 	 *  Can be called concurrently (also during executeAction()).
 	 *  @param message The message that arrived.
 	 */
@@ -732,11 +732,11 @@ public class Application	implements IApplication, IComponentInstance
 	/**
 	 *  Can be called concurrently (also during executeAction()).
 	 *   
-	 *  Request agent to kill itself.
-	 *  The agent might perform arbitrary cleanup activities during which executeAction()
+	 *  Request component to kill itself.
+	 *  The component might perform arbitrary cleanup activities during which executeAction()
 	 *  will still be called as usual.
 	 *  Can be called concurrently (also during executeAction()).
-	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
+	 *  @param listener	When cleanup of the component is finished, the listener must be notified.
 	 */
 	public void killComponent(IResultListener listener)
 	{
@@ -748,7 +748,7 @@ public class Application	implements IApplication, IComponentInstance
 	/**
 	 *  Can be called concurrently (also during executeAction()).
 	 * 
-	 *  Get the external access for this agent.
+	 *  Get the external access for this component.
 	 *  The specific external access interface is kernel specific
 	 *  and has to be casted to its corresponding incarnation.
 	 *  @param listener	External access is delivered via result listener.
@@ -775,11 +775,11 @@ public class Application	implements IApplication, IComponentInstance
 	}
 
 	/**
-	 *  Get the class loader of the agent.
-	 *  The agent class loader is required to avoid incompatible class issues,
-	 *  when changing the platform class loader while agents are running. 
+	 *  Get the class loader of the component.
+	 *  The component class loader is required to avoid incompatible class issues,
+	 *  when changing the platform class loader while components are running. 
 	 *  This may occur e.g. when decoding messages and instantiating parameter values.
-	 *  @return	The agent class loader. 
+	 *  @return	The component class loader. 
 	 */
 	public ClassLoader getClassLoader()
 	{
@@ -843,6 +843,6 @@ public class Application	implements IApplication, IComponentInstance
 	 */
 	public String	getComponentFilename(String type)
 	{
-		return model.getApplicationType().getMAgentType(type).getFilename();
+		return model.getApplicationType().getMComponentType(type).getFilename();
 	}
 }

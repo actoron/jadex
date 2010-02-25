@@ -53,8 +53,8 @@
 			
 			<!-- Declaration of the relationships between agents and their avatar objects in the space. -->
 			<env:avatarmappings>
-				<env:avatarmapping agenttype="Collector" objecttype="collector"/>
-				<env:avatarmapping agenttype="Burner" objecttype="burner"/>
+				<env:avatarmapping componenttype="Collector" objecttype="collector"/>
+				<env:avatarmapping componenttype="Burner" objecttype="burner"/>
 			</env:avatarmappings>
 		
 			<!-- Actions that can be performed in the environment. -->
@@ -110,7 +110,7 @@
 				</env:perceptgenerator>
 				
 				<!-- Percept processors consume percepts and push them into the agents. -->
-				<!-- <env:perceptprocessor agenttype="Collector" class="DefaultBDIVisionProcessor" >
+				<!-- <env:perceptprocessor componenttype="Collector" class="DefaultBDIVisionProcessor" >
 					<env:property name="percepttypes">
 						new Object[]
 						{
@@ -120,7 +120,7 @@
 					</env:property>
 				</env:perceptprocessor>-->
 				
-				<env:perceptprocessor agenttype="Burner" class="DefaultBDIVisionProcessor" >
+				<env:perceptprocessor componenttype="Burner" class="DefaultBDIVisionProcessor" >
 					<env:property name="percepttypes">
 						new Object[]
 						{
@@ -207,10 +207,10 @@
 	</spacetypes>
 	
 	<!-- Agent types of the application. -->
-	<agenttypes>
-		<agenttype name="Collector" filename="jadex/garbagecollector/MoveAgent.class"/>
-		<agenttype name="Burner" filename="jadex/bdi/examples/garbagecollector/GarbageBurner.agent.xml"/>
-	</agenttypes>
+	<componenttypes>
+		<componenttype name="Collector" filename="jadex/garbagecollector/MoveAgent.class"/>
+		<componenttype name="Burner" filename="jadex/bdi/examples/garbagecollector/GarbageBurner.agent.xml"/>
+	</componenttypes>
 	
 	<!-- Application instance definitions. -->
 	<applications>

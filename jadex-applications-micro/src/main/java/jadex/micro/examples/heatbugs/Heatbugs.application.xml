@@ -62,7 +62,7 @@
 			</env:objecttypes>
 			
 			<env:avatarmappings>
-				<env:avatarmapping agenttype="Heatbug" objecttype="heatbug"/>
+				<env:avatarmapping componenttype="Heatbug" objecttype="heatbug"/>
 			</env:avatarmappings>
 		
 			<env:actiontypes>
@@ -117,10 +117,10 @@
 		</env:envspacetype>
 	</spacetypes>
 	
-	<agenttypes>
-		<agenttype name="Heatbug" filename="jadex/micro/examples/heatbugs/HeatbugAgent.class"/>
-		<!--  <agenttype name="Heatbug" filename="jadex.micro.examples.heatbugs.HeatbugAgent.class"/>-->
-	</agenttypes>
+	<componenttypes>
+		<componenttype name="Heatbug" filename="jadex/micro/examples/heatbugs/HeatbugAgent.class"/>
+		<!--  <componenttype name="Heatbug" filename="jadex.micro.examples.heatbugs.HeatbugAgent.class"/>-->
+	</componenttypes>
 	
 	<applications>
 		<application name="20x20 and 10 bugs">
@@ -217,14 +217,14 @@
 				</env:envspace>
 			</spaces>
 
-			<agents>
+			<components>
 				<agent type="Heatbug" number="10"/>
 				<!-- <agent type="Heatbug">
 					<arguments>
 						<argument name="ideal_temp">$args.ideal_temp</argument>
 					</arguments>
 				</agent> -->
-			</agents>
+			</components>
 		</application>
 		
 		<application name="30x30 and 40 bugs">
@@ -304,9 +304,9 @@
 				</env:envspace>
 			</spaces>
 
-			<agents>
+			<components>
 				<agent type="Heatbug" number="40"/>
-			</agents>
+			</components>
 		</application>
 		
 		<application name="50x50 and 100 bugs">
@@ -357,9 +357,9 @@
 				</env:envspace>
 			</spaces>
 
-			<agents>
+			<components>
 				<agent type="Heatbug" number="100"/>
-			</agents>
+			</components>
 		</application>
 	</applications>
 

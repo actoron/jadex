@@ -31,7 +31,7 @@ public interface IEnvironmentSpace extends IPropertyObject
 	 *  Add a space percept type.
 	 *  @param typename The percept name.
 	 *  @param objecttypes The objecttypes.
-	 *  @param agenttypes The agenttypes.
+	 *  @param componenttypes The componenttypes.
 	 */
 	public void addPerceptType(PerceptType percepttype);
 	

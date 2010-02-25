@@ -23,33 +23,33 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="HunterPrey" package="jadex.bdi.examples.hunterprey_classic">
 	
-	<agenttypes>
-		<agenttype name="Environment" filename="jadex/bdi/examples/hunterprey_classic/environment/Environment.agent.xml"/>
+	<componenttypes>
+		<componenttype name="Environment" filename="jadex/bdi/examples/hunterprey_classic/environment/Environment.agent.xml"/>
 		
-		<agenttype name="SleepingPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/sleepingprey/SleepingPrey.agent.xml"/>
-		<agenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/dumbprey/DumbPrey.agent.xml"/>
-		<agenttype name="LazyPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/lazyprey/LazyPrey.agent.xml"/>
-		<agenttype name="CleverPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/cleverprey/CleverPrey.agent.xml"/>
+		<componenttype name="SleepingPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/sleepingprey/SleepingPrey.agent.xml"/>
+		<componenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/dumbprey/DumbPrey.agent.xml"/>
+		<componenttype name="LazyPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/lazyprey/LazyPrey.agent.xml"/>
+		<componenttype name="CleverPrey" filename="jadex/bdi/examples/hunterprey_classic/creature/preys/cleverprey/CleverPrey.agent.xml"/>
 		
-		<agenttype name="DumbHunter" filename="jadex/bdi/examples/hunterprey_classic/creature/hunters/dumbhunter/DumbHunter.agent.xml"/>
-		<agenttype name="CleverHunter" filename="jadex/bdi/examples/hunterprey_classic/creature/hunters/ldahunter/LAHunter.agent.xml"/>
-	</agenttypes>
+		<componenttype name="DumbHunter" filename="jadex/bdi/examples/hunterprey_classic/creature/hunters/dumbhunter/DumbHunter.agent.xml"/>
+		<componenttype name="CleverHunter" filename="jadex/bdi/examples/hunterprey_classic/creature/hunters/ldahunter/LAHunter.agent.xml"/>
+	</componenttypes>
 	
 	<applications>
 		<application name="Some hunters and preys">
-			<agents>
+			<components>
 				<agent type="Environment" />
 				<agent type="DumbPrey" number="2"/>
 				<agent type="CleverPrey" number="2" />
 				<agent type="DumbHunter" number="2" />
 				<agent type="CleverHunter" number="1" />
-			</agents>
+			</components>
 		</application>
 		<application name="Willy">
-			<agents>
+			<components>
 				<agent type="Environment" />
 				<agent type="CleverHunter" number="1" />
-			</agents>
+			</components>
 		</application>
 	</applications>
 

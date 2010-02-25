@@ -1,8 +1,8 @@
 package jadex.application;
 
 import jadex.application.model.ApplicationModel;
-import jadex.application.model.MAgentInstance;
-import jadex.application.model.MAgentType;
+import jadex.application.model.MComponentInstance;
+import jadex.application.model.MComponentType;
 import jadex.application.model.MApplicationInstance;
 import jadex.application.model.MApplicationType;
 import jadex.application.model.MArgument;
@@ -109,11 +109,11 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 			new SubobjectInfo(new XMLInfo("arguments/result"), new AccessInfo("result", "result"))
 			})));
 		types.add(new TypeInfo(new XMLInfo("spacetype"), new ObjectInfo(MSpaceType.class)));
-		types.add(new TypeInfo(new XMLInfo("agenttype"), new ObjectInfo(MAgentType.class)));
+		types.add(new TypeInfo(new XMLInfo("agenttype"), new ObjectInfo(MComponentType.class)));
 		types.add(new TypeInfo(new XMLInfo("application"), new ObjectInfo(MApplicationInstance.class), 
 			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("type", "typeName"))}, null)));
 		types.add(new TypeInfo(new XMLInfo("space"), new ObjectInfo(MSpaceInstance.class)));
-		types.add(new TypeInfo(new XMLInfo("agent"), new ObjectInfo(MAgentInstance.class),
+		types.add(new TypeInfo(new XMLInfo("agent"), new ObjectInfo(MComponentInstance.class),
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("type", "typeName")),
 			new AttributeInfo(new AccessInfo("number", "numberText"))
@@ -124,8 +124,8 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)))));
 		types.add(new TypeInfo(new XMLInfo("import"), new ObjectInfo(String.class)));
 		
-		types.add(new TypeInfo(new XMLInfo("componenttype"), new ObjectInfo(MAgentType.class)));
-		types.add(new TypeInfo(new XMLInfo("component"), new ObjectInfo(MAgentInstance.class),
+		types.add(new TypeInfo(new XMLInfo("componenttype"), new ObjectInfo(MComponentType.class)));
+		types.add(new TypeInfo(new XMLInfo("component"), new ObjectInfo(MComponentInstance.class),
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("type", "typeName")),
 			new AttributeInfo(new AccessInfo("number", "numberText"))

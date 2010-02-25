@@ -16,32 +16,32 @@
 		<import>jadex.wfms.bdi.client.standard.*</import>
 	</imports>
 	
-	<agenttypes>
-		<agenttype name="WfmsClientInterfaceAgent" filename="jadex/wfms/bdi/clientinterface/WfmsClientInterface.agent.xml"/>
-		<agenttype name="WfmsPdInterfaceAgent" filename="jadex/wfms/bdi/pdinterface/WfmsPdInterface.agent.xml"/>
-		<agenttype name="ClientApplication" filename="jadex/wfms/bdi/client/standard/StandardClientApplication.agent.xml"/>
-	</agenttypes>
+	<componenttypes>
+		<componenttype name="WfmsClientInterfaceAgent" filename="jadex/wfms/bdi/clientinterface/WfmsClientInterface.agent.xml"/>
+		<componenttype name="WfmsPdInterfaceAgent" filename="jadex/wfms/bdi/pdinterface/WfmsPdInterface.agent.xml"/>
+		<componenttype name="ClientApplication" filename="jadex/wfms/bdi/client/standard/StandardClientApplication.agent.xml"/>
+	</componenttypes>
 	
 	<applications>
 		<application name="WFMS and one client application">
-			<agents>
+			<components>
 				<agent type="WfmsClientInterfaceAgent"/>
 				<agent type="WfmsPdInterfaceAgent"/>
 				<agent type="ClientApplication"/>
-			</agents>
+			</components>
 		</application>
 		<application name="WFMS and two client applications">
-			<agents>
+			<components>
 				<agent type="WfmsClientInterfaceAgent"/>
 				<agent type="WfmsPdInterfaceAgent"/>
 				<agent type="ClientApplication" number="2"/>
-			</agents>
+			</components>
 		</application>
 		<application name="WFMS only">
-			<agents>
+			<components>
 				<agent type="WfmsClientInterfaceAgent"/>
 				<agent type="WfmsPdInterfaceAgent"/>
-			</agents>
+			</components>
 		</application>
 	</applications>
 

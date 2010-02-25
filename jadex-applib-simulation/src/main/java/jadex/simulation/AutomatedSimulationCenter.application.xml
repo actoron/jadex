@@ -7,17 +7,17 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="AutomatedSimulationCenter" package="jadex.simulation">
 	
-	<agenttypes>		
-		<agenttype name="SimulationManager" filename="jadex/simulation/master/SimulationManager.agent.xml"/>
-	</agenttypes>
+	<componenttypes>		
+		<componenttype name="SimulationManager" filename="jadex/simulation/master/SimulationManager.agent.xml"/>
+	</componenttypes>
 	
 	<applications>
 		<application name="First Configuration">
-			<agents>
+			<components>
 				<agent type="SimulationManager" master="true">
 				<!-- <argument name="diffusion">§.property.name</argument>-->
 				</agent>
-			</agents>
+			</components>
 		</application>
 	</applications>
 

@@ -144,7 +144,7 @@ public class MAGRSpaceType	extends MSpaceType
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "group")}), new ObjectInfo(MGroupInstance.class),
 			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("type", "typeName"))}, null)));
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "position")}), new ObjectInfo(MPosition.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("agenttype", "agentType")), 
+			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("componenttype", "componentType")), 
 			new AttributeInfo(new AccessInfo("role", "roleType"))}, null)));
 		
 //		types.add(new TypeInfo(null, new QName[]{new QName(uri, "agrspacetype")}, MAGRSpaceType.class));

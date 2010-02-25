@@ -104,11 +104,11 @@
 			</env:objecttypes>
 
 			<env:avatarmappings>
-				<env:avatarmapping agenttype="Sentry" objecttype="sentry" />
-				<env:avatarmapping agenttype="Producer"
+				<env:avatarmapping componenttype="Sentry" objecttype="sentry" />
+				<env:avatarmapping componenttype="Producer"
 					objecttype="producer" />
-				<env:avatarmapping agenttype="Carry" objecttype="carry" />
-				<env:avatarmapping agenttype="ClientSimulator" objecttype="clientSimulator" />
+				<env:avatarmapping componenttype="Carry" objecttype="carry" />
+				<env:avatarmapping componenttype="ClientSimulator" objecttype="clientSimulator" />
 			</env:avatarmappings>
 
 			<env:tasktypes>
@@ -250,27 +250,27 @@
 		</env:envspacetype>
 	</spacetypes>
 
-	<agenttypes>
-		 <agenttype name="Sentry"
+	<componenttypes>
+		 <componenttype name="Sentry"
 			filename="jadex/simulation/examples/marsworld/sentry/Sentry.agent.xml" />
-			<!--<agenttype name="Sentry"
+			<!--<componenttype name="Sentry"
 			filename="jadex/bdi/examples/marsworld/sentry/Sentry.agent.xml" />-->
-		<agenttype name="Producer"
+		<componenttype name="Producer"
 			filename="jadex/simulation/examples/marsworld/producer/Producer.agent.xml" />
-		<agenttype name="Carry"
+		<componenttype name="Carry"
 			filename="jadex/simulation/examples/marsworld/carry/Carry.agent.xml" />
-		<agenttype name="ClientSimulator"
+		<componenttype name="ClientSimulator"
 			filename="jadex/simulation/client/ClientSimulator.agent.xml" />
-	</agenttypes>
+	</componenttypes>
 
 	<applications>
 		<application name="1 Sentry / 2 Producers / 3 Carries">
 			<spaces>
 				<agr:agrspace name="myagrspace" type="marsagrspace">
 					<agr:group name="mymarsteam" type="marsteam">
-						<agr:position role="sentry" agenttype="Sentry" />
-						<agr:position role="producer" agenttype="Producer" />
-						<agr:position role="carrier" agenttype="Carry" />
+						<agr:position role="sentry" componenttype="Sentry" />
+						<agr:position role="producer" componenttype="Producer" />
+						<agr:position role="carrier" componenttype="Carry" />
 					</agr:group>
 				</agr:agrspace>
 
@@ -330,7 +330,7 @@
 					</env:observers>
 				</env:envspace>
 			</spaces>
-			<agents>
+			<components>
 				<agent type="Sentry" number="$args.NumberOfSentries" />
 				<agent type="Producer" number="1" />
 				<agent type="Carry" number="1" />
@@ -343,16 +343,16 @@
 						<argument name="simulationFacts">$args.Simulation_Facts_For_Client</argument>						
 					</arguments>
 				</agent>
-			</agents>
+			</components>
 		</application>
 
 		<application name="Multi">
 			<spaces>
 				<agr:agrspace name="myagrspace" type="marsagrspace">
 					<agr:group name="mymarsteam" type="marsteam">
-						<agr:position role="sentry" agenttype="Sentry" />
-						<agr:position role="producer" agenttype="Producer" />
-						<agr:position role="carrier" agenttype="Carry" />
+						<agr:position role="sentry" componenttype="Sentry" />
+						<agr:position role="producer" componenttype="Producer" />
+						<agr:position role="carrier" componenttype="Carry" />
 					</agr:group>
 				</agr:agrspace>
 
@@ -380,11 +380,11 @@
 					</env:observers>
 				</env:envspace>
 			</spaces>
-			<agents>
+			<components>
 				<agent type="Sentry" number="2" />
 				<agent type="Producer" number="5" />
 				<agent type="Carry" number="10" />
-			</agents>
+			</components>
 		</application>
 	</applications>
 

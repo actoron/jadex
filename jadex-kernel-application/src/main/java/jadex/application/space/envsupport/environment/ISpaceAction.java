@@ -16,7 +16,7 @@ public interface ISpaceAction extends IPropertyObject
 	/** The constant for the object id parameter (target of the action). */
 	public static final String OBJECT_ID = "object_id";
 	
-	/** The constant for the actor id parameter (agent performing the action). */
+	/** The constant for the actor id parameter (component performing the action). */
 	public static final String ACTOR_ID  = "actor_id";
 
 	//-------- methods --------

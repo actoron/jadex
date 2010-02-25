@@ -3,32 +3,32 @@ package jadex.application.space.envsupport.environment;
 import jadex.javaparser.IParsedExpression;
 
 /**
- *  Relationship specification between an agent type and an avatar type.
+ *  Relationship specification between an component type and an avatar type.
  */
 public class AvatarMapping
 {
 	//-------- attributes --------
 
-	/** The agent type name. */
-	protected String agenttype;
+	/** The component type name. */
+	protected String componenttype;
 	
 	/** The object type. */
 	protected String objecttype;
 
-	/** The flag for creating the avatar when an agent is created. */
+	/** The flag for creating the avatar when an component is created. */
 	protected boolean createavatar;
 	
-	/** The flag for creating the agent when an avatar is created. */
-	protected boolean createagent;
+	/** The flag for creating the component when an avatar is created. */
+	protected boolean createcomponent;
 	
-	/** The flag for deleting the avatar when agent is killed. */
+	/** The flag for deleting the avatar when component is killed. */
 	protected boolean killavatar;
 	
-	/** The flag for deleting the agent when avatar is killed. */
-	protected boolean killagent;
+	/** The flag for deleting the component when avatar is killed. */
+	protected boolean killcomponent;
 	
-	/** The name of the agent to be created for an avatar. */
-	protected IParsedExpression	agentname;
+	/** The name of the component to be created for an avatar. */
+	protected IParsedExpression	componentname;
 	
 	//-------- constructors --------
 	
@@ -44,34 +44,34 @@ public class AvatarMapping
 	/**
 	 *  Create a new avatar mapping. 
 	 */
-	public AvatarMapping(String agenttype, String objecttype)
+	public AvatarMapping(String componenttype, String objecttype)
 	{
-		this(agenttype, objecttype, true, false, true, false);
+		this(componenttype, objecttype, true, false, true, false);
 	}
 	
 	/**
 	 *  Create a new avatar mapping. 
 	 */
-	public AvatarMapping(String agenttype, String objecttype, boolean createavatar, 
-		boolean createagent, boolean killavatar, boolean killagent)
+	public AvatarMapping(String componenttype, String objecttype, boolean createavatar, 
+		boolean createcomponent, boolean killavatar, boolean killcomponent)
 	{
-		this.agenttype = agenttype;
+		this.componenttype = componenttype;
 		this.objecttype = objecttype;
 		this.createavatar = createavatar;
-		this.createagent = createagent;
+		this.createcomponent = createcomponent;
 		this.killavatar = killavatar;
-		this.killagent = killagent;
+		this.killcomponent = killcomponent;
 	}
 	
 	//-------- methods --------
 
 	/**
-	 *  Get the agenttype.
-	 *  @return The agenttype.
+	 *  Get the componenttype.
+	 *  @return The componenttype.
 	 */
-	public String getAgentType()
+	public String getComponentType()
 	{
-		return this.agenttype;
+		return this.componenttype;
 	}
 
 	/**
@@ -93,12 +93,12 @@ public class AvatarMapping
 	}
 
 	/**
-	 *  Should agent be created.
-	 *  @return True, for agent being created.
+	 *  Should component be created.
+	 *  @return True, for component being created.
 	 */
-	public boolean isCreateAgent()
+	public boolean isCreateComponent()
 	{
-		return this.createagent;
+		return this.createcomponent;
 	}
 
 	/**
@@ -111,29 +111,29 @@ public class AvatarMapping
 	}
 
 	/**
-	 *  Should agent being killed.
-	 *  @return True, for agent being created.
+	 *  Should component being killed.
+	 *  @return True, for component being created.
 	 */
-	public boolean isKillAgent()
+	public boolean isKillComponent()
 	{
-		return this.killagent;
+		return this.killcomponent;
 	}
 
 	/**
-	 *  Get the agent name expression, if any.
-	 *  @return The agent name expression or null.
+	 *  Get the component name expression, if any.
+	 *  @return The component name expression or null.
 	 */
-	public IParsedExpression	getAgentName()
+	public IParsedExpression	getComponentName()
 	{
-		return this.agentname;
+		return this.componentname;
 	}
 
 	/**
-	 * @param agenttype the agenttype to set
+	 * @param componenttype the componenttype to set
 	 */
-	public void setAgentType(String agenttype)
+	public void setComponentType(String componenttype)
 	{
-		this.agenttype = agenttype;
+		this.componenttype = componenttype;
 	}
 
 	/**
@@ -153,11 +153,11 @@ public class AvatarMapping
 	}
 
 	/**
-	 * @param createagent the createagent to set
+	 * @param createcomponent the createcomponent to set
 	 */
-	public void setCreateAgent(boolean createagent)
+	public void setCreateComponent(boolean createcomponent)
 	{
-		this.createagent = createagent;
+		this.createcomponent = createcomponent;
 	}
 
 	/**
@@ -169,19 +169,19 @@ public class AvatarMapping
 	}
 
 	/**
-	 * @param killagent the killagent to set
+	 * @param killcomponent the killcomponent to set
 	 */
-	public void setKillAgent(boolean killagent)
+	public void setKillComponent(boolean killcomponent)
 	{
-		this.killagent = killagent;
+		this.killcomponent = killcomponent;
 	}
 
 	/**
-	 *  Set the agent name expression.
-	 *  @param name	The agent name expression.
+	 *  Set the component name expression.
+	 *  @param name	The component name expression.
 	 */
-	public void setAgentName(IParsedExpression agentname)
+	public void setComponentName(IParsedExpression componentname)
 	{
-		this.agentname = agentname;
+		this.componentname = componentname;
 	}
 }

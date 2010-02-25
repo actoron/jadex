@@ -14,13 +14,13 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- *  The list of scheduled agent actions and convenience methods for
+ *  The list of scheduled component actions and convenience methods for
  *  executing selected actions.
  *  This implementation is not thread-safe, i.e. methods
  *  should only be called from threads that are already synchronized
  *  with the environment space monitor.
  */
-public class AgentActionList 
+public class ComponentActionList 
 {
 	//-------- attributes --------
 
@@ -41,7 +41,7 @@ public class AgentActionList
 	/**
 	 *  Create a new action list.
 	 */
-	public AgentActionList(IEnvironmentSpace space)
+	public ComponentActionList(IEnvironmentSpace space)
 	{
 		this.space	= space;
 	}
@@ -49,12 +49,12 @@ public class AgentActionList
 	//-------- methods --------
 	
 	/**
-	 * Schedules an agent action.
+	 * Schedules an component action.
 	 * @param action	The action.
 	 * @param parameters parameters for the action (may be null)
 	 * @param listener the result listener
 	 */
-	public void scheduleAgentAction(ISpaceAction action, Map parameters, IResultListener listener)
+	public void scheduleComponentAction(ISpaceAction action, Map parameters, IResultListener listener)
 	{
 		ActionEntry	entry	= new ActionEntry(action, parameters, listener);
 		
@@ -64,14 +64,14 @@ public class AgentActionList
 
 		// Otherwise queue action (default).
 		else
-			addAgentAction(entry);
+			addComponentAction(entry);
 	}
 	
 	/**
-	 * Add an agent action.
+	 * Add an component action.
 	 * @param entry	The action entry.
 	 */
-	public void addAgentAction(ActionEntry entry)
+	public void addComponentAction(ActionEntry entry)
 	{
 		if(actions==null)
 			actions	= new LinkedHashSet();
@@ -80,10 +80,10 @@ public class AgentActionList
 	}
 
 	/**
-	 * Remove an agent action.
+	 * Remove an component action.
 	 * @param entry	The action entry.
 	 */
-	public void removeAgentAction(ActionEntry entry)
+	public void removeComponentAction(ActionEntry entry)
 	{
 		if(actions!=null)
 		{		
@@ -129,8 +129,8 @@ public class AgentActionList
 	/**
 	 *  Should be called on environment thread only.
 	 *  @param filter	A filter to select only a subset of actions (or null for all actions).
-	 *  @param wakeup	Immediately wake up each calling agent after its action has been executed
-	 *  (otherwise wakeupAgents() has to be called separately).
+	 *  @param wakeup	Immediately wake up each calling component after its action has been executed
+	 *  (otherwise wakeupComponents() has to be called separately).
 	 */
 	public void executeActions(IFilter filter, boolean wakeup)
 	{
@@ -195,9 +195,9 @@ public class AgentActionList
 	/**
 	 *  Should be called on environment thread only.
 	 *  @param filter	A filter to select only a subset of actions (or null for all actions).
-	 *  (otherwise wakeupAgents() has to be called separately).
+	 *  (otherwise wakeupComponents() has to be called separately).
 	 */
-	public void wakeupAgents(IFilter filter)
+	public void wakeupComponents(IFilter filter)
 	{
 		if(executed!=null && !(executed.isEmpty()))
 		{

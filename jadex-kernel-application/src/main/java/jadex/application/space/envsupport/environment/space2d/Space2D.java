@@ -44,7 +44,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	/**
 	 * Initializes the 2D-Space.
 	 * @param spaceexecutor executor for the space
-	 * @param actionexecutor executor for agent actions
+	 * @param actionexecutor executor for component actions
 	 * @param areasize the size of the 2D area
 	 */
 	protected Space2D(IVector2 areasize)

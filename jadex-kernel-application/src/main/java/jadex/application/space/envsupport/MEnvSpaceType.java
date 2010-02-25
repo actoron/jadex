@@ -124,8 +124,8 @@ public class MEnvSpaceType	extends MSpaceType
 //		sbuf.append(getName());
 //		sbuf.append(", dimensions=");
 //		sbuf.append(getDimensions());
-//		sbuf.append(", agent action types=");
-//		sbuf.append(getMEnvAgentActionTypes());
+//		sbuf.append(", component action types=");
+//		sbuf.append(getMEnvComponentActionTypes());
 //		sbuf.append(", space action types=");
 //		sbuf.append(getMEnvSpaceActionTypes());
 //		sbuf.append(", class=");
@@ -203,22 +203,22 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "avatarmapping")}), new ObjectInfo(AvatarMapping.class), 
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("agenttype", "agentType")),
+			new AttributeInfo(new AccessInfo("componenttype", "componentType")),
 			new AttributeInfo(new AccessInfo("objecttype", "objectType")),
 			new AttributeInfo(new AccessInfo("createavatar", "createAvatar")),
-			new AttributeInfo(new AccessInfo("createagent", "createAgent")),
+			new AttributeInfo(new AccessInfo("createcomponent", "createComponent")),
 			new AttributeInfo(new AccessInfo("killavatar", "killAvatar")),
-			new AttributeInfo(new AccessInfo("killagent", "killAgent"))
+			new AttributeInfo(new AccessInfo("killcomponent", "killComponent"))
 			},
 			new SubobjectInfo[]{
-			new SubobjectInfo(new AccessInfo(new QName(uri, "name"), "agentName"))
+			new SubobjectInfo(new AccessInfo(new QName(uri, "name"), "componentName"))
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "name")}), null, 
 			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), atexconv))));
 
 /*
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "createagent")}, MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "createcomponent")}, MultiCollection.class, null, null,
 			null, null, null,
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "name"), "name", null, null, null, "")),
@@ -236,11 +236,11 @@ public class MEnvSpaceType	extends MSpaceType
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new AttributeInfo(new AccessInfo("objecttype", "objecttypes", null, null, new BeanAccessInfo(AccessInfo.THIS))),
-			new AttributeInfo(new AccessInfo("agenttype", "agenttypes", null, null, new BeanAccessInfo(AccessInfo.THIS)))
+			new AttributeInfo(new AccessInfo("componenttype", "componenttypes", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			}, 
 			new SubobjectInfo[]{
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "objecttype")}), new AccessInfo(new QName(uri, "objecttype"), "objecttypes", null, null, new BeanAccessInfo(AccessInfo.THIS))),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "agenttype")}), new AccessInfo(new QName(uri, "agenttype"), "agenttypes", null, null, new BeanAccessInfo(AccessInfo.THIS)), sunameconv)
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype")}), new AccessInfo(new QName(uri, "componenttype"), "componenttypes", null, null, new BeanAccessInfo(AccessInfo.THIS)), sunameconv)
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "actiontype")}), new ObjectInfo(MultiCollection.class),
@@ -280,7 +280,7 @@ public class MEnvSpaceType	extends MSpaceType
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri,"perceptprocessor")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new AttributeInfo[]{	
 			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
-			new AttributeInfo(new AccessInfo("agenttype", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
+			new AttributeInfo(new AccessInfo("componenttype", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new AccessInfo(new QName(uri, "percepttype"), "percepttypes", null, null, new BeanAccessInfo(AccessInfo.THIS)), sunameconv),
@@ -926,7 +926,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "percepttype"), new QName(uri, "agenttypes"), new QName(uri, "agenttype")}), new ObjectInfo(HashMap.class),			
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "percepttype"), new QName(uri, "componenttypes"), new QName(uri, "componenttype")}), new ObjectInfo(HashMap.class),			
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
@@ -1213,15 +1213,15 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "avatarmapping")}, AvatarMapping.class, null, null,
 			new BeanAttributeInfo[]{
-			new BeanAttributeInfo("agenttype", "agentType"),
+			new BeanAttributeInfo("componenttype", "componentType"),
 			new BeanAttributeInfo("objecttype", "objectType"),
 			new BeanAttributeInfo("createavatar", "createAvatar"),
-			new BeanAttributeInfo("createagent", "createAgent"),
+			new BeanAttributeInfo("createcomponent", "createComponent"),
 			new BeanAttributeInfo("killavatar", "killAvatar"),
-			new BeanAttributeInfo("killagent", "killAgent")
+			new BeanAttributeInfo("killcomponent", "killComponent")
 			}, null, null,
 			new SubobjectInfo[]{
-			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "name"), "agentName"))
+			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "name"), "componentName"))
 			}));
 		
 		types.add(new TypeInfo(null, new QName[]{new QName(uri, "name")}, null, null,
@@ -1229,7 +1229,7 @@ public class MEnvSpaceType	extends MSpaceType
 			null, null, null, null, false));
 
 		/*
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "createagent")}, MultiCollection.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "createcomponent")}, MultiCollection.class, null, null,
 			null, null, null,
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "name"), "name", null, null, null, "")),
@@ -1247,13 +1247,13 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, ""),
 			new BeanAttributeInfo("objecttype", "objecttypes", null, null, null, ""),
-			new BeanAttributeInfo("agenttype", "agenttypes", null, null, null, "")
+			new BeanAttributeInfo("componenttype", "componenttypes", null, null, null, "")
 			}, null, null,
 			new SubobjectInfo[]{
 //			new SubobjectInfo("percepttype/objecttypes/objecttype", new BeanAttributeInfo("objecttype", "objecttypes", null, "")),
-//			new SubobjectInfo("percepttype/agenttypes/agenttype", new BeanAttributeInfo("percepttype", "agenttypes", new ITypeConverter()
+//			new SubobjectInfo("percepttype/componenttypes/componenttype", new BeanAttributeInfo("percepttype", "componenttypes", new ITypeConverter()
 			new SubobjectInfo(new QName[]{new QName(uri, "objecttypes")}, new BeanAttributeInfo(new QName(uri, "objecttype"), "objecttypes", null, null, null, "")),
-			new SubobjectInfo(new QName[]{new QName(uri, "agenttypes")}, new BeanAttributeInfo(new QName(uri, "agenttype"), "agenttypes", null, nameconv, null, ""))
+			new SubobjectInfo(new QName[]{new QName(uri, "componenttypes")}, new BeanAttributeInfo(new QName(uri, "componenttype"), "componenttypes", null, nameconv, null, ""))
 			}));
 		
 		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri, "actiontype")}, MultiCollection.class, null, null,
@@ -1291,7 +1291,7 @@ public class MEnvSpaceType	extends MSpaceType
 		types.add(new TypeInfo(ti_po, new QName[]{new QName(uri,"perceptprocessor")}, MultiCollection.class, null, null,
 			new BeanAttributeInfo[]{	
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
-			new BeanAttributeInfo("agenttype", null, null, null, null, "")
+			new BeanAttributeInfo("componenttype", null, null, null, null, "")
 			}, null, null,
 			new SubobjectInfo[]{
 			new SubobjectInfo(new BeanAttributeInfo(new QName(uri, "percepttype"), "percepttypes", null, nameconv, null, "")),
@@ -1928,7 +1928,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new BeanAttributeInfo("class", "clazz", null, typeconv, null, ""),
 			new BeanAttributeInfo("dynamic", null, null, BasicTypeConverter.BOOLEAN_CONVERTER, null, "", Boolean.FALSE)}, null));
 
-		types.add(new TypeInfo(null, new QName[]{new QName(uri, "percepttype"), new QName(uri, "agenttypes"), new QName(uri, "agenttype")}, HashMap.class, null, null,
+		types.add(new TypeInfo(null, new QName[]{new QName(uri, "percepttype"), new QName(uri, "componenttypes"), new QName(uri, "componenttype")}, HashMap.class, null, null,
 			new BeanAttributeInfo[]{
 			new BeanAttributeInfo("name", null, null, null, null, "")}, null));
 		
@@ -2211,7 +2211,7 @@ public class MEnvSpaceType	extends MSpaceType
 		
 		// percepts
 		linkinfos.add(new LinkInfo("percepttype/objecttypes/objecttype", new BeanAttributeInfo("objecttypes", null, "")));
-		linkinfos.add(new LinkInfo("percepttype/agenttypes/agenttype", new BeanAttributeInfo("agenttypes", new ITypeConverter()
+		linkinfos.add(new LinkInfo("percepttype/componenttypes/componenttype", new BeanAttributeInfo("componenttypes", new ITypeConverter()
 		{
 			public boolean acceptsInputType(Class inputtype)
 			{

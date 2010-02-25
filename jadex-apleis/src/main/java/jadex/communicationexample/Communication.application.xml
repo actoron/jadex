@@ -17,9 +17,9 @@
 		<eis:eisspacetype name="env" class="communicationexample.EnvironmentInterface"></eis:eisspacetype>
 	</spacetypes>
 	
-	<agenttypes>
-		<agenttype name="CommunicationAgent" filename="jadex/communicationexample/CommunicationAgent.class"/>
-	</agenttypes>
+	<componenttypes>
+		<componenttype name="CommunicationAgent" filename="jadex/communicationexample/CommunicationAgent.class"/>
+	</componenttypes>
 	
 	<applications>
 		<application name="communication">
@@ -27,7 +27,7 @@
 				<eis:eisspace name="myenv" type="env"></eis:eisspace>
 			</spaces>
 
-			<agents>
+			<components>
 				<agent type="CommunicationAgent" name="ag1">
 					<arguments>
 						<argument name="tell">"hi"</argument>
@@ -43,7 +43,7 @@
 						<argument name="tell">"bonjour"</argument>
 					</arguments>
 				</agent>
-			</agents>
+			</components>
 		</application>
 	</applications>
 

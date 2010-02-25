@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *  Percept generator for moving agents.
+ *  Percept generator for moving components.
  */
 public class DefaultVisionGenerator extends SimplePropertyObject implements IPerceptGenerator
 {
@@ -57,26 +57,26 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 	
 	//-------- attributes --------
 	
-	/** The percept receiving agent types. */
+	/** The percept receiving component types. */
 	protected Map actiontypes;
 	
 	//-------- IPerceptGenerator --------
 		
 	/**
-	 *  Called when an agent was added to the space.
-	 *  @param agent The agent identifier.
+	 *  Called when an component was added to the space.
+	 *  @param component The component identifier.
 	 *  @param space The space.
 	 */
-	public void agentAdded(IComponentIdentifier agent, IEnvironmentSpace space)
+	public void componentAdded(IComponentIdentifier component, IEnvironmentSpace space)
 	{
 	}
 	
 	/**
-	 *  Called when an agent was remove from the space.
-	 *  @param agent The agent identifier.
+	 *  Called when an component was remove from the space.
+	 *  @param component The component identifier.
 	 *  @param space The space.
 	 */
-	public void agentRemoved(IComponentIdentifier agent, IEnvironmentSpace space)
+	public void componentRemoved(IComponentIdentifier component, IEnvironmentSpace space)
 	{
 	}
 	
@@ -106,7 +106,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 				IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION);
 				IComponentIdentifier owner = (IComponentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 
-				// Create event for agent that is seen by moving agent.
+				// Create event for component that is seen by moving component.
 				if(owner!=null)
 				{
 					if((oldpos==null || space.getDistance(oldpos, objpos).greater(getRange(objects[i])))
@@ -118,7 +118,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					}
 				}
 				
-				// Create event for moving agent.
+				// Create event for moving component.
 				if(eventowner!=null)
 				{
 					if((oldpos==null || space.getDistance(oldpos, objpos).greater(getRange(event.getSpaceObject())))
@@ -130,7 +130,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					}
 				}
 				
-				// Post movement to agents that stayed in vision range
+				// Post movement to components that stayed in vision range
 				if(owner!=null)
 				{
 					if(oldpos!=null && !space.getDistance(oldpos, objpos).greater(getRange(objects[i]))
@@ -178,7 +178,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 			{
 				ISpaceObject[]	objects	= (ISpaceObject[])space.getNearObjects(pos, maxrange, null).toArray(new ISpaceObject[0]);
 				
-				// Post appearance for object itself (if agent) as well as all agents in vision range
+				// Post appearance for object itself (if component) as well as all components in vision range
 				for(int i=0; i<objects.length; i++)
 				{
 					IComponentIdentifier owner = (IComponentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
@@ -211,7 +211,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 			{
 				ISpaceObject[]	objects	= (ISpaceObject[])space.getNearObjects(pos, maxrange, null).toArray(new ISpaceObject[0]);
 				
-				// Post disappearance for all agents in vision range
+				// Post disappearance for all components in vision range
 				for(int i=0; i<objects.length; i++)
 				{
 					IComponentIdentifier owner = (IComponentIdentifier)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
@@ -239,16 +239,16 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 	/**
 	 *  Get the percept type.
 	 *  @param space The space.
-	 *  @param agenttype The agent type.
+	 *  @param componenttype The component type.
 	 *  @param objecttype The object type.
 	 *  @param actiontype The action type.
 	 *  @return The matching percept. 
 	 */
-	protected String getPerceptType(IEnvironmentSpace space, String agenttype, String objecttype, String actiontype)
+	protected String getPerceptType(IEnvironmentSpace space, String componenttype, String objecttype, String actiontype)
 	{
 		String ret = null;
 		
-//		if(agenttype.equals("Collector") && objecttype.equals("garbage") && actiontype.equals(APPEARED))
+//		if(componenttype.equals("Collector") && objecttype.equals("garbage") && actiontype.equals(APPEARED))
 //			System.out.println("here");
 		
 		Object[] percepttypes = getPerceptTypes();
@@ -257,7 +257,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 			PerceptType pt = (PerceptType)space.getPerceptType(((String[])percepttypes[i])[0]);
 			if(pt==null)
 				throw new RuntimeException("Unknown percept type: "+pt);
-			if((pt.getAgentTypes()==null || pt.getAgentTypes().contains(agenttype))
+			if((pt.getComponentTypes()==null || pt.getComponentTypes().contains(componenttype))
 				&& (pt.getObjectTypes()==null || pt.getObjectTypes().contains(objecttype))
 				&& (getActionTypes(pt)==null || getActionTypes(pt).contains(actiontype)))
 			{
@@ -266,7 +266,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 		}
 		
 //		if(ret==null)
-//			System.out.println("No percept found for: "+agenttype+" "+objecttype+" "+actiontype);
+//			System.out.println("No percept found for: "+componenttype+" "+objecttype+" "+actiontype);
 		
 		return ret;
 	}

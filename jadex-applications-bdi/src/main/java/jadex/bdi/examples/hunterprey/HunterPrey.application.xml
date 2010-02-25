@@ -53,10 +53,10 @@
 			</env:objecttypes>
 			
 			<env:avatarmappings>
-				<env:avatarmapping agenttype="DumbPrey" objecttype="prey"/>
-				<env:avatarmapping agenttype="CleverPrey" objecttype="prey"/>
-				<env:avatarmapping agenttype="DumbHunter" objecttype="hunter"/>
-				<env:avatarmapping agenttype="LAHunter" objecttype="hunter"/>
+				<env:avatarmapping componenttype="DumbPrey" objecttype="prey"/>
+				<env:avatarmapping componenttype="CleverPrey" objecttype="prey"/>
+				<env:avatarmapping componenttype="DumbHunter" objecttype="hunter"/>
+				<env:avatarmapping componenttype="LAHunter" objecttype="hunter"/>
 			</env:avatarmappings>
 			
 			<env:actiontypes>
@@ -82,61 +82,61 @@
 
 			<env:percepttypes>
 				<env:percepttype name="food_seen" objecttype="food">
-					<env:agenttypes>
-						<env:agenttype name="DumbPrey"/>
-						<env:agenttype name="CleverPrey"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="DumbPrey"/>
+						<env:componenttype name="CleverPrey"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="food_out_of_sight" objecttype="food">
-					<env:agenttypes>
-						<env:agenttype name="DumbPrey"/>
-						<env:agenttype name="CleverPrey"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="DumbPrey"/>
+						<env:componenttype name="CleverPrey"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="food_eaten" objecttype="food">
-					<env:agenttypes>
-						<env:agenttype name="DumbPrey"/>
-						<env:agenttype name="CleverPrey"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="DumbPrey"/>
+						<env:componenttype name="CleverPrey"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="prey_moved" objecttype="prey">
-					<env:agenttypes>
+					<env:componenttypes>
 						<!-- Todo: Use avatar types for mapping? -->
-						<env:agenttype name="CleverPrey"/>
-						<env:agenttype name="DumbHunter"/>
-					</env:agenttypes>
+						<env:componenttype name="CleverPrey"/>
+						<env:componenttype name="DumbHunter"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="prey_seen" objecttype="prey">
-					<env:agenttypes>
-						<env:agenttype name="DumbHunter"/>
-						<env:agenttype name="LAHunter"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="DumbHunter"/>
+						<env:componenttype name="LAHunter"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="prey_gone" objecttype="prey">
-					<env:agenttypes>
-						<env:agenttype name="DumbHunter"/>
-						<env:agenttype name="LAHunter"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="DumbHunter"/>
+						<env:componenttype name="LAHunter"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="obstacle_seen" objecttype="obstacle">
-					<env:agenttypes>
-						<env:agenttype name="LAHunter"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="LAHunter"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="obstacle_gone" objecttype="obstacle">
-					<env:agenttypes>
-						<env:agenttype name="LAHunter"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="LAHunter"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="hunter_seen" objecttype="hunter">
-					<env:agenttypes>
-						<env:agenttype name="CleverPrey"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="CleverPrey"/>
+					</env:componenttypes>
 				</env:percepttype>
 				<env:percepttype name="hunter_gone" objecttype="hunter">
-					<env:agenttypes>
-						<env:agenttype name="CleverPrey"/>
-					</env:agenttypes>
+					<env:componenttypes>
+						<env:componenttype name="CleverPrey"/>
+					</env:componenttypes>
 				</env:percepttype>
 					
 				<env:perceptgenerator name="visiongen" class="DefaultVisionGenerator">
@@ -160,7 +160,7 @@
 					</env:property>
 				</env:perceptgenerator>
 				
-				<env:perceptprocessor agenttype="CleverPrey" class="DefaultBDIVisionProcessor">
+				<env:perceptprocessor componenttype="CleverPrey" class="DefaultBDIVisionProcessor">
 					<env:property name="range">new Vector1Int(2)</env:property>
 					<env:property name="percepttypes">
 						new Object[]
@@ -177,7 +177,7 @@
 					</env:property>
 				</env:perceptprocessor>
 				
-				<env:perceptprocessor agenttype="DumbPrey"	class="DefaultBDIVisionProcessor">
+				<env:perceptprocessor componenttype="DumbPrey"	class="DefaultBDIVisionProcessor">
 					<env:property name="percepttypes">
 						new Object[]
 						{
@@ -198,7 +198,7 @@
 					</env:property>
 				</env:perceptprocessor>
 				
-				<env:perceptprocessor agenttype="DumbHunter"	class="DefaultBDIVisionProcessor">
+				<env:perceptprocessor componenttype="DumbHunter"	class="DefaultBDIVisionProcessor">
 					<env:property name="percepttypes">
 						new Object[]
 						{
@@ -219,7 +219,7 @@
 					</env:property>
 				</env:perceptprocessor>
 				
-				<env:perceptprocessor agenttype="LAHunter" class="DefaultBDIVisionProcessor">
+				<env:perceptprocessor componenttype="LAHunter" class="DefaultBDIVisionProcessor">
 					<env:property name="percepttypes">
 						new Object[]
 						{
@@ -308,12 +308,12 @@
 		</env:envspacetype>
 	</spacetypes>
 
-	<agenttypes>
-		<agenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey/dumbprey/DumbPrey.agent.xml"/>
-		<agenttype name="CleverPrey" filename="jadex/bdi/examples/hunterprey/cleverprey/CleverPrey.agent.xml"/>
-		<agenttype name="DumbHunter" filename="jadex/bdi/examples/hunterprey/dumbhunter/DumbHunter.agent.xml"/>
-		<agenttype name="LAHunter" filename="jadex/bdi/examples/hunterprey/ldahunter/LAHunter.agent.xml"/>
-	</agenttypes>
+	<componenttypes>
+		<componenttype name="DumbPrey" filename="jadex/bdi/examples/hunterprey/dumbprey/DumbPrey.agent.xml"/>
+		<componenttype name="CleverPrey" filename="jadex/bdi/examples/hunterprey/cleverprey/CleverPrey.agent.xml"/>
+		<componenttype name="DumbHunter" filename="jadex/bdi/examples/hunterprey/dumbhunter/DumbHunter.agent.xml"/>
+		<componenttype name="LAHunter" filename="jadex/bdi/examples/hunterprey/ldahunter/LAHunter.agent.xml"/>
+	</componenttypes>
 
 	<applications>
 		<application name="Classic">
@@ -334,7 +334,7 @@
 					</env:observers>
 	 			</env:envspace>
 			</spaces>
- 			<agents>
+ 			<components>
 				<agent type="DumbPrey" name="Dumbo"/>
 				<!-- <agent type="DumbPrey" name="Duffy"/> -->
 				<agent type="CleverPrey" name="Heinz" configuration="Lazy"/>
@@ -346,7 +346,7 @@
 				<agent type="DumbHunter" name="Louis"/>
 				<agent type="LAHunter" name="Willy"/>
 				<!-- <agent type="LAHunter" name="Wolfram"/> -->
-			</agents>
+			</components>
  		</application>
 
 		<application name="Land of Peace">
@@ -367,11 +367,11 @@
 					</env:observers>
 	 			</env:envspace>
 			</spaces>
-			<agents>
+			<components>
 				<agent type="DumbPrey" number="50"/>
 				<agent type="CleverPrey" number="40" configuration="Clever"/>
 				<agent type="CleverPrey" number="10" configuration="Opportunistic"/>
-			</agents>
+			</components>
  		</application>
  		
 		<application name="Lupo's Paradise">
@@ -392,13 +392,13 @@
 					</env:observers>
 	 			</env:envspace>
 			</spaces>
-			<agents>
+			<components>
 				<agent type="DumbPrey" number="80"/>
 				<agent type="CleverPrey" number="10" configuration="Clever"/>
 				<agent type="CleverPrey" number="5" configuration="Opportunistic"/>
 				<agent type="CleverPrey" number="5" configuration="Lazy"/>
 				<agent name="Lupo" type="DumbHunter"/>
-			</agents>
+			</components>
  		</application>
 
 		<application name="Battlefield">
@@ -419,14 +419,14 @@
 					</env:observers>
 	 			</env:envspace>
 			</spaces>
-			<agents>
+			<components>
 				<agent type="DumbPrey" number="100"/>
 				<agent type="CleverPrey" number="50" configuration="Clever"/>
 				<agent type="CleverPrey" number="25" configuration="Opportunistic"/>
 				<agent type="CleverPrey" number="25" configuration="Lazy"/>
 				<agent type="DumbHunter" number="25"/>
 				<agent type="LAHunter" number="5"/>
-			</agents>
+			</components>
  		</application>
 
 		<application name="Empty (no creatures)">
@@ -450,10 +450,10 @@
  		</application>
 		<!-- 
 		<application name="debug">
-			<agents>
+			<components>
 				<agent type="CleverPrey" name="testprey" />
 				<agent type="CleverPrey" name="foodprey" />
-			</agents>
+			</components>
 
 			<env:envspace name="my2dspace" type="2dspace">
 				<env:avatars>

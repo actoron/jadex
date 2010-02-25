@@ -17,10 +17,10 @@
 		<eis:eisspacetype name="env" class="carriageexample.EnvironmentInterface"/>
 	</spacetypes>
 	
-	<agenttypes>
-		<agenttype name="PushingAgent" filename="jadex/carriageexample/PushingAgent.class"/>
-		<agenttype name="AlternatingAgent" filename="jadex/carriageexample/AlternatingAgent.class"/>
-	</agenttypes>
+	<componenttypes>
+		<componenttype name="PushingAgent" filename="jadex/carriageexample/PushingAgent.class"/>
+		<componenttype name="AlternatingAgent" filename="jadex/carriageexample/AlternatingAgent.class"/>
+	</componenttypes>
 	
 	<applications>
 		<application name="carriage">
@@ -28,10 +28,10 @@
 				<eis:eisspace name="myenv" type="env"/>
 			</spaces>
 
-			<agents>
+			<components>
 				<agent type="PushingAgent" />
 				<agent type="AlternatingAgent" />
-			</agents>
+			</components>
 		</application>
 	</applications>
 

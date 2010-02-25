@@ -5,7 +5,7 @@ import java.util.Set;
 
 /**
  *  Class for representation a percept type, which has a name,
- *  a set of object types and a set of agent types.
+ *  a set of object types and a set of component types.
  */
 public class PerceptType
 {
@@ -17,8 +17,8 @@ public class PerceptType
 	/** The object types. */
 	protected Set objecttypes;
 	
-	/** The agent types. */
-	protected Set agenttypes;
+	/** The component types. */
+	protected Set componenttypes;
 	
 	//-------- methods --------
 	
@@ -34,11 +34,11 @@ public class PerceptType
 	/**
 	 *  Create a new percept type.
 	 */
-	public PerceptType(String name, Set objecttypes, Set agenttypes)
+	public PerceptType(String name, Set objecttypes, Set componenttypes)
 	{
 		this.name = name;
 		this.objecttypes = objecttypes==null? Collections.EMPTY_SET: objecttypes;
-		this.agenttypes = agenttypes==null? Collections.EMPTY_SET: agenttypes;
+		this.componenttypes = componenttypes==null? Collections.EMPTY_SET: componenttypes;
 	}
 
 	//-------- methods --------
@@ -83,22 +83,22 @@ public class PerceptType
 
 
 	/**
-	 *  Get the agent types.
-	 *  @return The agenttypes.
+	 *  Get the component types.
+	 *  @return The componenttypes.
 	 */
-	public Set getAgentTypes()
+	public Set getComponentTypes()
 	{
-		return this.agenttypes;
+		return this.componenttypes;
 	}
 
 
 	/**
-	 *  Set the agent types.
-	 *  @param agenttypes the agenttypes to set.
+	 *  Set the component types.
+	 *  @param componenttypes the componenttypes to set.
 	 */
-	public void setAgentTypes(Set agenttypes)
+	public void setComponentTypes(Set componenttypes)
 	{
-		this.agenttypes = agenttypes;
+		this.componenttypes = componenttypes;
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class PerceptType
 	 */
 	public String toString()
 	{
-		return "PerceptType(name="+name+", objecttypes="+objecttypes+", agenttypes="+agenttypes+")";
+		return "PerceptType(name="+name+", objecttypes="+objecttypes+", componenttypes="+componenttypes+")";
 	}
 	
 	

@@ -1,10 +1,10 @@
 package jadex.bdi.examples.hunterprey;
 
-import jadex.application.space.envsupport.environment.AgentActionList;
+import jadex.application.space.envsupport.environment.ComponentActionList;
 import jadex.application.space.envsupport.environment.ISpaceAction;
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.environment.AgentActionList.ActionEntry;
+import jadex.application.space.envsupport.environment.ComponentActionList.ActionEntry;
 import jadex.bridge.IComponentIdentifier;
 
 import java.util.Comparator;
@@ -36,8 +36,8 @@ public class CreatureActionComparator implements Comparator
 	 */
 	public int compare(Object obj1, Object obj2)
 	{
-		AgentActionList.ActionEntry	entry1	= (ActionEntry)obj1;
-		AgentActionList.ActionEntry	entry2	= (ActionEntry)obj2;
+		ComponentActionList.ActionEntry	entry1	= (ActionEntry)obj1;
+		ComponentActionList.ActionEntry	entry2	= (ActionEntry)obj2;
 		
 		int	ret	= entry1.compareTo(entry2);
 		

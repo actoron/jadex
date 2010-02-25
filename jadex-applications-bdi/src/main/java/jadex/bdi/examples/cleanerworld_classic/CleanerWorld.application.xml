@@ -12,49 +12,49 @@
 		<structuringtype name="env_type" type="continuous_space"/>
 	</structuringtypes> -->
 	
-	<agenttypes>
-		<agenttype name="EnvironmentLocal" filename="jadex/bdi/examples/cleanerworld_classic/environment/EnvironmentLocal.agent.xml"/>
-		<agenttype name="CleanerLocal" filename="jadex/bdi/examples/cleanerworld_classic/cleaner/CleanerLocal.agent.xml"/>
-		<agenttype name="EnvironmentRemote" filename="jadex/bdi/examples/cleanerworld_classic/environment/Environment.agent.xml"/>
-		<agenttype name="CleanerRemote" filename="jadex/bdi/examples/cleanerworld_classic/cleaner/Cleaner.agent.xml"/>
-	</agenttypes>
+	<componenttypes>
+		<componenttype name="EnvironmentLocal" filename="jadex/bdi/examples/cleanerworld_classic/environment/EnvironmentLocal.agent.xml"/>
+		<componenttype name="CleanerLocal" filename="jadex/bdi/examples/cleanerworld_classic/cleaner/CleanerLocal.agent.xml"/>
+		<componenttype name="EnvironmentRemote" filename="jadex/bdi/examples/cleanerworld_classic/environment/Environment.agent.xml"/>
+		<componenttype name="CleanerRemote" filename="jadex/bdi/examples/cleanerworld_classic/cleaner/Cleaner.agent.xml"/>
+	</componenttypes>
 	
 	<applications>
 		<application name="Two cleaners local">
 			<!-- <structurings>
 				<structuring name="env" type="env_type"/>
 			</structurings> -->
-			<agents>
+			<components>
 				<agent type="EnvironmentLocal" master="true"/>
 				<agent type="CleanerLocal" number="2"/>
-			</agents>
+			</components>
 		</application>
 		<application name="One cleaner local">
 			<!--  <structurings>
 				<structuring name="env" type="env_type"/>
 			</structurings>-->
-			<agents>
+			<components>
 				<agent type="EnvironmentLocal" master="true"/>
 				<agent type="CleanerLocal"/>
-			</agents>
+			</components>
 		</application>
 		<application name="Two cleaners remote">
 			<!--  <structurings>
 				<structuring name="env" type="env_type"/>
 			</structurings>-->
-			<agents>
+			<components>
 				<agent type="EnvironmentRemote" master="true"/>
 				<agent type="CleanerRemote" number="2"/>
-			</agents>
+			</components>
 		</application>
 		<application name="One cleaner remote">
 			<!--  <structurings>
 				<structuring name="env" type="env_type"/>
 			</structurings>-->
-			<agents>
+			<components>
 				<agent type="EnvironmentRemote" master="true"/>
 				<agent type="CleanerRemote"/>
-			</agents>
+			</components>
 		</application>
 	</applications>
 

@@ -17,14 +17,14 @@
 		<import>jadex.service.clock.IClockService</import>
 	</imports>
 	
-	<agenttypes>
-		<agenttype name="Buyer" filename="jadex/bdi/examples/booktrading/buyer/Buyer.agent.xml"/>
-		<agenttype name="Seller" filename="jadex/bdi/examples/booktrading/seller/Seller.agent.xml"/>
-	</agenttypes>
+	<componenttypes>
+		<componenttype name="Buyer" filename="jadex/bdi/examples/booktrading/buyer/Buyer.agent.xml"/>
+		<componenttype name="Seller" filename="jadex/bdi/examples/booktrading/seller/Seller.agent.xml"/>
+	</componenttypes>
 	
 	<applications>
 		<application name="One buyer and one seller">
-			<agents>
+			<components>
 				<agent type="Buyer" >
 					<arguments>
 						<argument name="initial_orders">
@@ -51,10 +51,10 @@
 						</argument>
 					</arguments>
 				</agent>
-			</agents>
+			</components>
 		</application>
 		<application name="One buyer and one seller (one order)">
-			<agents>
+			<components>
 				<agent type="Buyer" >
 					<arguments>
 						<argument name="initial_orders">
@@ -75,10 +75,10 @@
 						</argument>
 					</arguments>
 				</agent>
-			</agents>
+			</components>
 		</application>
 		<application name="Two buyers and one seller">
-			<agents>
+			<components>
 				<agent type="Buyer" number="3">
 					<arguments>
 						<argument name="initial_orders">
@@ -105,7 +105,7 @@
 						</argument>
 					</arguments>
 				</agent>
-			</agents>
+			</components>
 		</application>
 	</applications>
 

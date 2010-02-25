@@ -16,8 +16,8 @@ public class MApplicationInstance
 	/** The list of spaces. */
 	protected List spaces;
 	
-	/** The list of contained agents. */
-	protected List agents;
+	/** The list of contained components. */
+	protected List components;
 	
 	//-------- constructors --------
 	
@@ -27,7 +27,7 @@ public class MApplicationInstance
 	public MApplicationInstance()
 	{
 		this.spaces = new ArrayList();
-		this.agents = new ArrayList();
+		this.components = new ArrayList();
 	}
 	
 	//-------- methods --------
@@ -51,21 +51,21 @@ public class MApplicationInstance
 	}
 	
 	/**
-	 *  Add an agent.
-	 *  @param agent The agent.
+	 *  Add an component.
+	 *  @param component The component.
 	 */
-	public void addMAgentInstance(MAgentInstance agent)
+	public void addMComponentInstance(MComponentInstance component)
 	{
-		this.agents.add(agent);
+		this.components.add(component);
 	}
 	
 	/**
-	 *  Get all agents.
-	 *  @return The agents.
+	 *  Get all components.
+	 *  @return The components.
 	 */
-	public List getMAgentInstances()
+	public List getMComponentInstances()
 	{
-		return agents;
+		return components;
 	}
 
 	/**

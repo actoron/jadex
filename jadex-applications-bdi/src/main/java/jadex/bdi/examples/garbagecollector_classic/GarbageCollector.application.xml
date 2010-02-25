@@ -12,33 +12,33 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="GarbageCollector" package="jadex.bdi.examples.garbagecollector">
 	
-	<agenttypes>
-		<agenttype name="Environment" filename="jadex/bdi/examples/garbagecollector_classic/Environment.agent.xml"/>
-		<agenttype name="Collector" filename="jadex/bdi/examples/garbagecollector_classic/GarbageCollector.agent.xml"/>
-		<agenttype name="Burner" filename="jadex/bdi/examples/garbagecollector_classic/GarbageBurner.agent.xml"/>
-	</agenttypes>
+	<componenttypes>
+		<componenttype name="Environment" filename="jadex/bdi/examples/garbagecollector_classic/Environment.agent.xml"/>
+		<componenttype name="Collector" filename="jadex/bdi/examples/garbagecollector_classic/GarbageCollector.agent.xml"/>
+		<componenttype name="Burner" filename="jadex/bdi/examples/garbagecollector_classic/GarbageBurner.agent.xml"/>
+	</componenttypes>
 	
 	<applications>
 		<application name="Two Burners / Two Collectors">
-			<agents>
+			<components>
 				<agent type="Environment" master="true"/>
 				<agent type="Collector" number="2"/>
 				<agent type="Burner" number="2" />
-			</agents>
+			</components>
 		</application>
 		<application name="One Burner / One Collector">
-			<agents>
+			<components>
 				<agent type="Environment" master="true"/>
 				<agent type="Collector"/>
 				<agent type="Burner"/>
-			</agents>
+			</components>
 		</application>
 		<application name="Two Burners / Six Collectors">
-			<agents>
+			<components>
 				<agent type="Environment" master="true"/>
 				<agent type="Collector" number="6"/>
 				<agent type="Burner" number="2" />
-			</agents>
+			</components>
 		</application>
 	</applications>
 
