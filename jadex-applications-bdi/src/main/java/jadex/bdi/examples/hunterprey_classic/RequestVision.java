@@ -3,13 +3,13 @@
  */
 package jadex.bdi.examples.hunterprey_classic;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 
 /**
  *  Java class for concept RequestVision of hunterprey_beans ontology.
  */
-public class RequestVision implements IAgentAction
+public class RequestVision implements IComponentAction
 {
 	//-------- attributes ----------
 

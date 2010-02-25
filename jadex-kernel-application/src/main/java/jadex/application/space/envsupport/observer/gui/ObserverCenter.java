@@ -8,7 +8,7 @@ import jadex.application.space.envsupport.observer.gui.plugin.IObserverCenterPlu
 import jadex.application.space.envsupport.observer.gui.plugin.IntrospectorPlugin;
 import jadex.application.space.envsupport.observer.gui.plugin.VisualsPlugin;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.IChangeListener;
 import jadex.service.clock.IClockService;
 import jadex.service.library.ILibraryService;
@@ -648,8 +648,8 @@ public class ObserverCenter
 			dispose();
 			if(killonexit)
 			{
-				IComponentExecutionService	ces	= (IComponentExecutionService)space.getContext()
-					.getServiceContainer().getService(IComponentExecutionService.class);
+				IComponentManagementService	ces	= (IComponentManagementService)space.getContext()
+					.getServiceContainer().getService(IComponentManagementService.class);
 				ces.destroyComponent(space.getContext().getComponentIdentifier(), null);
 			}
 		}

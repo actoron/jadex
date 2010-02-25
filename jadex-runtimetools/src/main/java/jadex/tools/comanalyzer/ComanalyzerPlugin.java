@@ -1,7 +1,7 @@
 package jadex.tools.comanalyzer;
 
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IMessageAdapter;
@@ -150,7 +150,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	protected Map listeners;
 
 	/** The global list of recognized agents. */
-	protected AgentList agentlist;
+	protected ComponentList componentlist;
 
 	/** The global list of recorded messages. */
 	protected MessageList messagelist;
@@ -159,10 +159,10 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	protected MessageFilter[] messagefilter;
 
 	/** The global agentfilter */
-	protected AgentFilter[] agentfilter;
+	protected ComponentFilter[] agentfilter;
 
 	/** The agentfilter for zero messages*/
-	protected static final AgentFilter[] zeromessages = new AgentFilter[] {new AgentFilter(Agent.MESSAGE_VISIBLE, new Integer(Agent.NO_MESSAGES))};	
+	protected static final ComponentFilter[] zeromessages = new ComponentFilter[] {new ComponentFilter(Component.MESSAGE_VISIBLE, new Integer(Component.NO_MESSAGES))};	
 	
 	/** Observe all new agents. */
 	protected boolean observe_all_new;
@@ -185,8 +185,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	{
 		this.messagenr = 1;
 		this.listeners = new HashMap();
-		this.agentlist = new AgentList();
-		this.agentfilter = new AgentFilter[]{AgentFilter.EMPTY};
+		this.componentlist = new ComponentList();
+		this.agentfilter = new ComponentFilter[]{ComponentFilter.EMPTY};
 		this.messagelist = new MessageList();
 		this.messagefilter = new MessageFilter[]{MessageFilter.EMPTY};
 		this.timer = new Timer(true);
@@ -406,18 +406,18 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			{
 				Icon ret	= super.selectIcon(value);
 				IComponentDescription ad = (IComponentDescription)((DefaultTreeTableNode)value).getUserObject();
-				Agent agent = agentlist.getAgent(ad.getName());
+				Component agent = componentlist.getAgent(ad.getName());
 
 				Icon	overlay	= null;
-				if(agent.getState().equals(Agent.STATE_OBSERVED))
+				if(agent.getState().equals(Component.STATE_OBSERVED))
 				{
 					overlay = ComanalyzerPlugin.icons.getIcon("agent_introspected");
 				}
-				else if(agent.getState().equals(Agent.STATE_DEAD))
+				else if(agent.getState().equals(Component.STATE_DEAD))
 				{
 					overlay = ComanalyzerPlugin.icons.getIcon("agent_dead");
 				}
-				else if(agent.getState().equals(Agent.STATE_DUMMY))
+				else if(agent.getState().equals(Component.STATE_DUMMY))
 				{
 					overlay = ComanalyzerPlugin.icons.getIcon("agent_dummy");
 				}
@@ -445,7 +445,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		// add agentlist and messagelist listeners to tooltabs
 		for(int i = 0; i < tools.length; i++)
 		{
-			agentlist.addListener(tools[i]);
+			componentlist.addListener(tools[i]);
 			messagelist.addListener(tools[i]);
 		}
 
@@ -471,7 +471,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 
 //		jcc.addAgentListListener(this);
 		
-		IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
+		IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
 		ces.getComponentDescriptions(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
@@ -511,9 +511,9 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 //		});
 
 		// add dummy agent to agentlist
-		Agent dummy = Agent.DUMMY_AGENT;
+		Component dummy = Component.DUMMY_AGENT;
 		applyAgentFilter(dummy);
-		agentlist.addAgent(dummy);
+		componentlist.addAgent(dummy);
 		
 
 		IMessageService ms = (IMessageService)getJCC().getServiceContainer().getService(IMessageService.class);
@@ -542,8 +542,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 //					removeAgentListener(ad, false);
 //				}
 				// set agent state and update agent
-				Agent agent = (Agent)agentlist.getAgent(ad.getName());
-				agent.setState(Agent.STATE_DEAD);
+				Component agent = (Component)componentlist.getAgent(ad.getName());
+				agent.setState(Component.STATE_DEAD);
 				applyAgentFilter(agent);
 				// update agenttree
 				agents.updateComponent(ad);
@@ -568,13 +568,13 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 //				}
 
 				boolean updateAgent = true;
-				Agent agent = agentlist.getAgent(ad.getName());
+				Component agent = componentlist.getAgent(ad.getName());
 				if(agent == null)
 				{
-					agent = new Agent(ad);
+					agent = new Component(ad);
 					updateAgent = false;
 				}
-				agent.setState(observe_all_new ? Agent.STATE_OBSERVED : Agent.STATE_IGNORED);
+				agent.setState(observe_all_new ? Component.STATE_OBSERVED : Component.STATE_IGNORED);
 
 				if(updateAgent)
 				{
@@ -584,7 +584,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				else
 				{
 					applyAgentFilter(agent);
-					agentlist.addAgent(agent);
+					componentlist.addAgent(agent);
 					agents.addComponent(ad);
 				}
 			}
@@ -722,8 +722,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 
 				// apply filter to sender and receiver
 				// to account for new visibility of the message
-				Agent sender = messages[i].getSender();
-				Agent receiver = messages[i].getReceiver();
+				Component sender = messages[i].getSender();
+				Component receiver = messages[i].getReceiver();
 				if(sender.applyFilter(agentfilter, true))
 				{
 					if(!updated_agents.contains(sender))
@@ -743,8 +743,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 
 
 		
-		agentlist.fireAgentsChanged((Agent[])updated_agents
-			.toArray(new Agent[updated_agents.size()]));
+		componentlist.fireAgentsChanged((Component[])updated_agents
+			.toArray(new Component[updated_agents.size()]));
 		messagelist.fireMessagesChanged((Message[])updated_messages
 			.toArray(new Message[updated_messages.size()]));
 	}
@@ -752,7 +752,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	/**
 	 * @return The agentfilter.
 	 */
-	public AgentFilter[] getAgentFilter()
+	public ComponentFilter[] getAgentFilter()
 	{
 		return agentfilter;
 	}
@@ -761,7 +761,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	 * Sets a new agentfilter.
 	 * @param filter The filter to set.
 	 */
-	public void setAgentFilter(AgentFilter[] filter)
+	public void setAgentFilter(ComponentFilter[] filter)
 	{
 		this.agentfilter = filter;
 	}
@@ -774,35 +774,35 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	{
 		List filters = new ArrayList();
 
-		AgentFilter[] afs = getAgentFilter();
+		ComponentFilter[] afs = getAgentFilter();
 		for(int i = 0; i < afs.length; i++)
 		{
-			if(afs[i].containsValue(Agent.STATE, Agent.STATE_DUMMY))
+			if(afs[i].containsValue(Component.STATE, Component.STATE_DUMMY))
 			{
-				AgentFilter af = new AgentFilter();
-				af.addValue(Agent.STATE, Agent.STATE_DUMMY);
+				ComponentFilter af = new ComponentFilter();
+				af.addValue(Component.STATE, Component.STATE_DUMMY);
 				filters.add(afs[i]);
 			}
-			if(afs[i].containsValue(Agent.STATE, Agent.STATE_IGNORED))
+			if(afs[i].containsValue(Component.STATE, Component.STATE_IGNORED))
 			{
-				AgentFilter af = new AgentFilter();
-				af.addValue(Agent.STATE, Agent.STATE_IGNORED);
+				ComponentFilter af = new ComponentFilter();
+				af.addValue(Component.STATE, Component.STATE_IGNORED);
 				filters.add(afs[i]);
 			}
-			if(afs[i].containsValue(Agent.STATE, Agent.STATE_DEAD))
+			if(afs[i].containsValue(Component.STATE, Component.STATE_DEAD))
 			{
-				AgentFilter af = new AgentFilter();
-				af.addValue(Agent.STATE, Agent.STATE_DEAD);
+				ComponentFilter af = new ComponentFilter();
+				af.addValue(Component.STATE, Component.STATE_DEAD);
 				filters.add(afs[i]);
 			}
-			if(afs[i].containsValue(Agent.MESSAGE_VISIBLE, new Integer(Agent.NO_MESSAGES)))
+			if(afs[i].containsValue(Component.MESSAGE_VISIBLE, new Integer(Component.NO_MESSAGES)))
 			{
-				AgentFilter af = new AgentFilter();
-				af.addValue(Agent.STATE, new Integer(Agent.NO_MESSAGES));
+				ComponentFilter af = new ComponentFilter();
+				af.addValue(Component.STATE, new Integer(Component.NO_MESSAGES));
 				filters.add(afs[i]);
 			}
 		}
-		this.agentfilter = ((AgentFilter[])filters.toArray(new AgentFilter[filters.size()]));
+		this.agentfilter = ((ComponentFilter[])filters.toArray(new ComponentFilter[filters.size()]));
 
 	}
 
@@ -811,16 +811,16 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	 */
 	public void applyAgentFilter()
 	{
-		applyAgentFilter(agentlist.getAgents());
+		applyAgentFilter(componentlist.getAgents());
 	}
 
 	/**
 	 * Applies the current agentfilter to a single agent.
 	 * @param agent The agent the filter applied to.
 	 */
-	protected void applyAgentFilter(Agent agent)
+	protected void applyAgentFilter(Component agent)
 	{
-		applyAgentFilter(new Agent[]{agent});
+		applyAgentFilter(new Component[]{agent});
 	}
 
 	/**
@@ -828,7 +828,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	 * 
 	 * @param agents The agents to apply the filter to.
 	 */
-	protected void applyAgentFilter(Agent[] agents) {
+	protected void applyAgentFilter(Component[] agents) {
 		List updated_agents = new ArrayList();
 		List updated_messages = new ArrayList();
 
@@ -836,11 +836,11 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		// apply with out zero message filter first
 		for (int i = 0; i < agents.length; i++) {
 			agents[i].applyFilter(agentfilter, false);	
-			if (!agents[i].equals(Agent.DUMMY_AGENT) && agents[i].getMessages().size() > 0) {
+			if (!agents[i].equals(Component.DUMMY_AGENT) && agents[i].getMessages().size() > 0) {
 				if (agents[i].isVisible()) {
-					Agent.DUMMY_AGENT.getMessages().removeAll(agents[i].getMessages());
+					Component.DUMMY_AGENT.getMessages().removeAll(agents[i].getMessages());
 				} else {
-					Agent.DUMMY_AGENT.getMessages().addAll(agents[i].getMessages());
+					Component.DUMMY_AGENT.getMessages().addAll(agents[i].getMessages());
 
 				}
 			}			
@@ -848,22 +848,22 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		
 		for (int i = 0; i < agents.length; i++) {
 			agents[i].applyFilter(agentfilter, true);
-				if (!agents[i].equals(Agent.DUMMY_AGENT) && agents[i].getMessages().size() > 0) {
+				if (!agents[i].equals(Component.DUMMY_AGENT) && agents[i].getMessages().size() > 0) {
 					if (agents[i].isVisible()) {
-						Agent.DUMMY_AGENT.getMessages().removeAll(agents[i].getMessages());
+						Component.DUMMY_AGENT.getMessages().removeAll(agents[i].getMessages());
 					} else {
-						Agent.DUMMY_AGENT.getMessages().addAll(agents[i].getMessages());
+						Component.DUMMY_AGENT.getMessages().addAll(agents[i].getMessages());
 
 					}
 				}
 		}
 		
 
-		updated_agents.addAll(agentlist.getList());		
+		updated_agents.addAll(componentlist.getList());		
 		updated_messages.addAll(messagelist.getList());
 
-		agentlist.fireAgentsChanged((Agent[]) updated_agents
-				.toArray(new Agent[updated_agents.size()]));
+		componentlist.fireAgentsChanged((Component[]) updated_agents
+				.toArray(new Component[updated_agents.size()]));
 		messagelist.fireMessagesChanged((Message[]) updated_messages
 				.toArray(new Message[updated_messages.size()]));
 	}
@@ -897,17 +897,17 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	/**
 	 * @return The agentlist.
 	 */
-	public AgentList getAgentList()
+	public ComponentList getAgentList()
 	{
-		return agentlist;
+		return componentlist;
 	}
 
 	/**
 	 * @return The array of agents.
 	 */
-	public Agent[] getAgents()
+	public Component[] getAgents()
 	{
-		return agentlist.getAgents();
+		return componentlist.getAgents();
 	}
 
 	/**
@@ -1044,17 +1044,17 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		messagelist.addMessage(message);
 
 		// add sender to agentlist/tree if not present
-		Agent sender = agentlist.getAgent(sid);
+		Component sender = componentlist.getAgent(sid);
 		if(sender == null)
 		{
 			// add to agent tree table
-			IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer()
-				.getService(IComponentExecutionService.class);
-			sender = new Agent(ces.createComponentDescription(sid, null, null, "unknown-component-type", null));
-			sender.setState(Agent.STATE_DEAD);
+			IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer()
+				.getService(IComponentManagementService.class);
+			sender = new Component(ces.createComponentDescription(sid, null, null, "unknown-component-type", null));
+			sender.setState(Component.STATE_DEAD);
 			sender.addMessage(message);
 			sender.applyFilter(agentfilter, true);
-			agentlist.addAgent(sender);
+			componentlist.addAgent(sender);
 			agents.addComponent(sender.getDescription());
 		}
 		else
@@ -1065,16 +1065,16 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		}
 
 		// add receiver to agentlist/tree if not present
-		Agent receiver = agentlist.getAgent(rid);
+		Component receiver = componentlist.getAgent(rid);
 		if(receiver == null)
 		{
-			IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer()
-			.getService(IComponentExecutionService.class);
-			receiver = new Agent(ces.createComponentDescription(rid, null, null, "unknown-component-type", null));
-			receiver.setState(Agent.STATE_DEAD);
+			IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer()
+			.getService(IComponentManagementService.class);
+			receiver = new Component(ces.createComponentDescription(rid, null, null, "unknown-component-type", null));
+			receiver.setState(Component.STATE_DEAD);
 			receiver.addMessage(message);
 			receiver.applyFilter(agentfilter, true);
-			agentlist.addAgent(receiver);
+			componentlist.addAgent(receiver);
 			agents.addComponent(sender.getDescription());
 		}
 		else
@@ -1174,12 +1174,12 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		public void actionPerformed(ActionEvent e)
 		{
 			List update = new ArrayList();
-			Agent[] agents = agentlist.getAgents();
+			Component[] agents = componentlist.getAgents();
 			for(int i = 0; i < agents.length; i++)
 			{
-				if(agents[i].getState().equals(Agent.STATE_OBSERVED))
+				if(agents[i].getState().equals(Component.STATE_OBSERVED))
 				{
-					agents[i].setState(Agent.STATE_IGNORED);
+					agents[i].setState(Component.STATE_IGNORED);
 					update.add(agents[i]);
 					observed.remove(agents[i].getDescription().getName());
 					ComanalyzerPlugin.this.agents.updateComponent(agents[i].getDescription());
@@ -1196,12 +1196,12 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		public void actionPerformed(ActionEvent e)
 		{
 			List update = new ArrayList();
-			Agent[] agents = agentlist.getAgents();
+			Component[] agents = componentlist.getAgents();
 			for(int i = 0; i < agents.length; i++)
 			{
-				if(agents[i].getState().equals(Agent.STATE_IGNORED))
+				if(agents[i].getState().equals(Component.STATE_IGNORED))
 				{
-					agents[i].setState(Agent.STATE_OBSERVED);
+					agents[i].setState(Component.STATE_OBSERVED);
 					update.add(agents[i]);
 					observed.add(agents[i].getDescription().getName());
 					ComanalyzerPlugin.this.agents.updateComponent(agents[i].getDescription());
@@ -1227,16 +1227,16 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			Agent[] agents = agentlist.getAgents();
+			Component[] agents = componentlist.getAgents();
 			for(int i = 0; i < agents.length; i++)
 			{
-				if(agents[i].getState().equals(Agent.STATE_DEAD))
+				if(agents[i].getState().equals(Component.STATE_DEAD))
 				{
 					// remove messages of dead agent from messagelist
 					messagelist.removeMessages((Message[])agents[i].getMessages().toArray(new Message[0]));
 					messagelist.fireMessagesRemoved((Message[])agents[i].getMessages().toArray(new Message[0]));
 					// remove dead agent from agentlist
-					agentlist.removeAgent(agents[i]);
+					componentlist.removeAgent(agents[i]);
 					// remove dead agent from agentree
 					ComanalyzerPlugin.this.agents.removeComponent(agents[i].getDescription());
 				}
@@ -1253,7 +1253,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			messagelist.removeAllMessages();
 			// remove messages from agents
 			List update = new ArrayList();
-			Agent[] agents = agentlist.getAgents();
+			Component[] agents = componentlist.getAgents();
 			for(int i = 0; i < agents.length; i++)
 			{
 				agents[i].removeAllMessages();
@@ -1273,14 +1273,14 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 			messagenr = 0;
 			messagelist.removeAllMessages();
 			// remove messages from agents
-			Agent[] agents = agentlist.getAgents();
+			Component[] agents = componentlist.getAgents();
 			for(int i = 0; i < agents.length; i++)
 			{
 				agents[i].removeAllMessages();
 				// remove dead agents from agentlist and agentree
-				if(agents[i].getState().equals(Agent.STATE_DEAD))
+				if(agents[i].getState().equals(Component.STATE_DEAD))
 				{
-					agentlist.removeAgent(agents[i]);
+					componentlist.removeAgent(agents[i]);
 					ComanalyzerPlugin.this.agents.removeComponent(agents[i].getDescription());
 				}
 			}
@@ -1343,8 +1343,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 //				{
 					split.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-					Agent agent = agentlist.getAgent(desc.getName());
-					agent.setState(Agent.STATE_OBSERVED);
+					Component agent = componentlist.getAgent(desc.getName());
+					agent.setState(Component.STATE_OBSERVED);
 					applyAgentFilter(agent);
 
 					agents.updateComponent(desc);
@@ -1365,8 +1365,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				if(node != null && node.getUserObject() instanceof IComponentDescription)
 				{
 					IComponentDescription desc = (IComponentDescription)node.getUserObject();
-					Agent agent = agentlist.getAgent(desc.getName());
-					ret = agent.getState().equals(Agent.STATE_IGNORED);
+					Component agent = componentlist.getAgent(desc.getName());
+					ret = agent.getState().equals(Component.STATE_IGNORED);
 				}
 			}
 			return ret;
@@ -1393,8 +1393,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				{
 					split.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-					Agent agent = agentlist.getAgent(desc.getName());
-					agent.setState(Agent.STATE_IGNORED);
+					Component agent = componentlist.getAgent(desc.getName());
+					agent.setState(Component.STATE_IGNORED);
 					applyAgentFilter(agent);
 
 					agents.updateComponent(desc);
@@ -1415,8 +1415,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				if(node != null && node.getUserObject() instanceof IComponentDescription)
 				{
 					IComponentDescription desc = (IComponentDescription)node.getUserObject();
-					Agent agent = agentlist.getAgent(desc.getName());
-					ret = agent.getState().equals(Agent.STATE_OBSERVED);
+					Component agent = componentlist.getAgent(desc.getName());
+					ret = agent.getState().equals(Component.STATE_OBSERVED);
 				}
 			}
 			return ret;
@@ -1440,7 +1440,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 //					message_maps.add(messages[i].getParameters());
 //				}
 				ClassLoader cl = ((ILibraryService)jcc.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
-				String xml = JavaWriter.objectToXML(new Object[]{agentlist.getAgents(), messagelist.getMessages()}, cl);
+				String xml = JavaWriter.objectToXML(new Object[]{componentlist.getAgents(), messagelist.getMessages()}, cl);
 
 				byte buffer[] = xml.getBytes();
 				File f = new File(fileName);
@@ -1537,10 +1537,10 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				ClassLoader cl = ((ILibraryService)jcc.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
 				Object[] stored = (Object[])JavaReader.objectFromXML(xml, cl);
 				
-				agentlist.removeAllAgents();
-				Agent[] agents = (Agent[])stored[0];
+				componentlist.removeAllAgents();
+				Component[] agents = (Component[])stored[0];
 				for(int i=0; i<agents.length; i++)
-					agentlist.addAgent(agents[i]);
+					componentlist.addAgent(agents[i]);
 				
 				messagelist.removeAllMessages();
 				Message[] messages = (Message[])stored[1];

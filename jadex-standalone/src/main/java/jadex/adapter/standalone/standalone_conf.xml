@@ -13,14 +13,11 @@
 		<property type="welcome">true</property>
 		<property type="autoshutdown">true</property>
 		
-		<!-- Platform services. -->
 		<properties type="services">
-			<!-- Library service. -->
 			<property type="jadex.service.library.ILibraryService" name="library_service">
 				new jadex.service.library.LibraryService()
 			</property>
 			
-			<!-- Threadpool service. -->
 			<property type="jadex.service.threadpool.ThreadPoolService" name="threadpool_service">
 				new jadex.service.threadpool.ThreadPoolService(
 					//new jadex.commons.concurrent.java5.JavaThreadPool()
@@ -28,10 +25,8 @@
 						new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
 			</property>
 						
-			<!-- DF service. -->
 			<property type="jadex.adapter.base.fipa.IDF" name="df_service">new jadex.adapter.standalone.df.DF($platform)</property>
 			
-			<!-- Message service. -->
 			<property type="jadex.bridge.IMessageService" name="message_service">new jadex.adapter.standalone.MessageService($platform, 
 				new jadex.adapter.standalone.transport.ITransport[]
 				{
@@ -105,9 +100,8 @@
 				new jadex.microkernel.MicroAgentFactory($platform)
 			</property>
 			
-			<!-- AMS service. -->
-			<property type="jadex.bridge.IComponentExecutionService" name="ams_service">
-				new jadex.adapter.standalone.service.componentexecution.ComponentExecutionService($platform)
+			<property type="jadex.bridge.IComponentManagementService" name="cms_service">
+				new jadex.adapter.standalone.service.componentexecution.ComponentManagementService($platform)
 			</property> 
 			
 		</properties>

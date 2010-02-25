@@ -40,7 +40,7 @@
 		</achievegoal>
 
 		<maintaingoal name="df_keep_registered" recurdelay="60000" exported="true">
-			<!-- Will contain the actually registered agent description. -->
+			<!-- Will contain the actually registered component description. -->
 			<parameter name="description" class="IDFComponentDescription"/>
 			<parameter name="df" class="jadex.bridge.IComponentIdentifier" optional="true"/>
 			<parameter name="leasetime" class="Long" optional="true">
@@ -81,8 +81,8 @@
 		</maintaingoal>
 
 		<achievegoal name="df_deregister" exported="true">
-			<!-- The agent description to deregister. Null for deregistering the
-				agent description of the dispatching agent. -->
+			<!-- The component description to deregister. Null for deregistering the
+				component description of the dispatching component. -->
 			<parameter name="description" class="IDFComponentDescription" optional="true"/>
 			<parameter name="df" class="jadex.bridge.IComponentIdentifier" optional="true"/>
 		</achievegoal>

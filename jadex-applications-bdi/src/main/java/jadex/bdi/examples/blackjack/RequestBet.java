@@ -1,12 +1,12 @@
 package jadex.bdi.examples.blackjack;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 
 /**
  *  Java class for concept RequestBet of blackjack_beans ontology.
  */
-public class RequestBet implements IAgentAction
+public class RequestBet implements IComponentAction
 {
 	//-------- attributes ----------
 

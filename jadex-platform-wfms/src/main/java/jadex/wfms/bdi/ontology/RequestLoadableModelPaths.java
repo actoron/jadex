@@ -2,13 +2,13 @@ package jadex.wfms.bdi.ontology;
 
 import java.util.Set;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 /**
  * Request for a potential set of loadable process models
  *
  */
-public class RequestLoadableModelPaths implements IAgentAction
+public class RequestLoadableModelPaths implements IComponentAction
 {
 	/** The model paths */
 	private Set modelPaths;

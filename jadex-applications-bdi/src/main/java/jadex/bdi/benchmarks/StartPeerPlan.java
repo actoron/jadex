@@ -2,7 +2,7 @@ package jadex.bdi.benchmarks;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.collection.SCollection;
 
@@ -158,7 +158,7 @@ public class StartPeerPlan extends Plan
 	 */
 	protected IComponentIdentifier serviceCreateAgent(String name, Map args)
 	{
-		final IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+		final IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
 		SyncResultListener lis = new SyncResultListener();
 		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", null, args, false, lis, null, null, false);
 		IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
@@ -189,7 +189,7 @@ public class StartPeerPlan extends Plan
 	 */
 	protected void serviceDestroyAgent(String name)
 	{
-		final IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+		final IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
 		SyncResultListener lis = new SyncResultListener();
 		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
 		ces.destroyComponent(aid, lis);
@@ -203,7 +203,7 @@ public class StartPeerPlan extends Plan
 	 */
 	protected void capabilityDestroyAgent(String name)
 	{
-		final IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+		final IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
 		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
 		IGoal sp = createGoal("ams_destroy_agent");
 		sp.getParameter("agentidentifier").setValue(aid);

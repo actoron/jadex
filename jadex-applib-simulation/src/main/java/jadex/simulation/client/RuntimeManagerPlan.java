@@ -11,7 +11,7 @@ import jadex.application.space.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
@@ -153,7 +153,7 @@ public class RuntimeManagerPlan extends Plan {
 		// simServ.shutdown(null);
 		System.out.println("Trying to kill component....");
 		// getExternalAccess().killAgent();
-		IComponentExecutionService ces = (IComponentExecutionService) spaceTMP.getContext().getServiceContainer().getService(IComponentExecutionService.class);
+		IComponentManagementService ces = (IComponentManagementService) spaceTMP.getContext().getServiceContainer().getService(IComponentManagementService.class);
 		ces.destroyComponent(spaceTMP.getContext().getComponentIdentifier(), null);
 		// getExternalAccess().getApplicationContext().killComponent(null);
 

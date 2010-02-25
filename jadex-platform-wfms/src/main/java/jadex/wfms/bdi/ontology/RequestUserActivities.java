@@ -1,13 +1,13 @@
 package jadex.wfms.bdi.ontology;
 
 import java.util.Map;
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 /**
  * Class representing a request for activities of all users
  *
  */
-public class RequestUserActivities implements IAgentAction
+public class RequestUserActivities implements IComponentAction
 {
 	/** The activities of the users */
 	private Map userActivities;

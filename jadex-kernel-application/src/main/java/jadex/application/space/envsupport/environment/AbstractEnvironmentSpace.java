@@ -17,7 +17,7 @@ import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.observer.gui.ObserverCenter;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.commons.IPropertyObject;
@@ -374,7 +374,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				if(owner==null)
 					throw new RuntimeException("Attribute 'owner' required for avatar: "+mobj);
 				IComponentIdentifier	ownerid	= null;
-				IComponentExecutionService ces = ((IComponentExecutionService)context.getServiceContainer().getService(IComponentExecutionService.class));
+				IComponentManagementService ces = ((IComponentManagementService)context.getServiceContainer().getService(IComponentManagementService.class));
 				if(owner.indexOf("@")!=-1)
 					ownerid	= ces.createComponentIdentifier((String)owner, false, null);
 				else
@@ -543,7 +543,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				final ObserverCenter oc = new ObserverCenter(title, this, (ILibraryService)context.getServiceContainer().getService(ILibraryService.class), plugins,
 					killonexit!=null ? killonexit.booleanValue() : true);
 							
-				IComponentExecutionService cs = (IComponentExecutionService)context.getServiceContainer().getService(IComponentExecutionService.class);
+				IComponentManagementService cs = (IComponentManagementService)context.getServiceContainer().getService(IComponentManagementService.class);
 				cs.addComponentListener(context.getComponentIdentifier(), new IComponentListener()
 				{
 					public void componentRemoved(IComponentDescription desc, Map results)
@@ -1027,7 +1027,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				AvatarMapping mapping = getAvatarMapping(agenttype, objecttype);
 				if(mapping.isKillAgent())
 				{
-					IComponentExecutionService ces = (IComponentExecutionService)getContext().getServiceContainer().getService(IComponentExecutionService.class);
+					IComponentManagementService ces = (IComponentManagementService)getContext().getServiceContainer().getService(IComponentManagementService.class);
 					ces.destroyComponent(agent, null);
 				}
 			}

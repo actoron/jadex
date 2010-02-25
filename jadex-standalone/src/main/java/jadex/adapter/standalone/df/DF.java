@@ -34,11 +34,8 @@ public class DF implements IDF, IService
 	/** The platform. */
 	protected AbstractPlatform platform;
 	
-	/** The registered agents. */
-	protected IndexMap	agents;
-	
-	/** The logger. */
-	//protected Logger logger;
+	/** The registered components. */
+	protected IndexMap	components;
 	
 	//-------- constructors --------
 
@@ -48,34 +45,33 @@ public class DF implements IDF, IService
 	public DF(AbstractPlatform platform)
 	{
 		this.platform = platform;
-		this.agents	= new IndexMap();
-		//this.logger = Logger.getLogger("DF" + this);
+		this.components	= new IndexMap();
 	}
 	
 	//-------- IDF interface methods --------
 
 	/**
 	 *  Register a component description.
-	 *  @throws RuntimeException when the agent is already registered.
+	 *  @throws RuntimeException when the component description is already registered.
 	 */
-	public void	register(IDFComponentDescription adesc, IResultListener listener)
+	public void	register(IDFComponentDescription cdesc, IResultListener listener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
 		//System.out.println("Registered: "+adesc.getName()+" "+adesc.getLeaseTime());
-		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(adesc, this);
+		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, this);
 
 		// Add description, when valid.
 		IClockService clock = (IClockService)platform.getService(IClockService.class);
 		if(clone.getLeaseTime()==null || clone.getLeaseTime().getTime()>clock.getTime())
 		{
-			synchronized(agents)
+			synchronized(components)
 			{
 				// Automatically throws exception, when key exists.
-				if(agents.containsKey(clone.getName()))
-					throw new RuntimeException("Componentomponent already registered: "+adesc.getName());
-				agents.add(clone.getName(), clone);
+				if(components.containsKey(clone.getName()))
+					throw new RuntimeException("Componentomponent already registered: "+cdesc.getName());
+				components.add(clone.getName(), clone);
 //				System.out.println("registered: "+clone.getName());
 			}
 			
@@ -93,22 +89,22 @@ public class DF implements IDF, IService
 
 	/**
 	 *  Deregister a component description.
-	 *  @throws RuntimeException when the agent is not registered.
+	 *  @throws RuntimeException when the component is not registered.
 	 */
-	public void	deregister(IDFComponentDescription adesc, IResultListener listener)
+	public void	deregister(IDFComponentDescription cdesc, IResultListener listener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
-		synchronized(agents)
+		synchronized(components)
 		{
-			if(!agents.containsKey(adesc.getName()))
+			if(!components.containsKey(cdesc.getName()))
 			{
 				//throw new RuntimeException("Component not registered: "+adesc.getName());
-				listener.exceptionOccurred(this, new RuntimeException("Component not registered: "+adesc.getName()));
+				listener.exceptionOccurred(this, new RuntimeException("Component not registered: "+cdesc.getName()));
 				return;
 			}
-			agents.removeKey(adesc.getName());
+			components.removeKey(cdesc.getName());
 			//System.out.println("deregistered: "+adesc.getName());
 		}
 		
@@ -117,24 +113,24 @@ public class DF implements IDF, IService
 
 	/**
 	 *  Modify a component description.
-	 *  @throws RuntimeException when the agent is not registered.
+	 *  @throws RuntimeException when the component is not registered.
 	 */
-	public void	modify(IDFComponentDescription adesc, IResultListener listener)
+	public void	modify(IDFComponentDescription cdesc, IResultListener listener)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
 		// Use clone to avoid caller manipulating object after insertion.
-		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(adesc, this);
+		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, this);
 
 		// Change description, when valid.
 		IClockService clock = (IClockService)platform.getService(IClockService.class);
 		if(clone.getLeaseTime()==null || clone.getLeaseTime().getTime()>clock.getTime())
 		{
 			// Automatically throws exception, when key does not exist.
-			synchronized(agents)
+			synchronized(components)
 			{
-				agents.replace(clone.getName(), clone);
+				components.replace(clone.getName(), clone);
 			}
 			//System.out.println("modified: "+clone.getName());
 			listener.resultAvailable(this, clone);
@@ -147,8 +143,8 @@ public class DF implements IDF, IService
 	}
 
 	/**
-	 *  Search for agents matching the given description.
-	 *  @return An array of matching agent descriptions. 
+	 *  Search for components matching the given description.
+	 *  @return An array of matching component descriptions. 
 	 */
 	public void	search(IDFComponentDescription adesc, ISearchConstraints con, IResultListener listener)
 	{
@@ -162,15 +158,15 @@ public class DF implements IDF, IService
 		// If name is supplied, just lookup description.
 		if(adesc.getName()!=null)
 		{
-			synchronized(agents)
+			synchronized(components)
 			{
-				if(agents.containsKey(adesc.getName()))
+				if(components.containsKey(adesc.getName()))
 				{
-					DFComponentDescription ad = (DFComponentDescription)agents.get(adesc.getName());
+					DFComponentDescription ad = (DFComponentDescription)components.get(adesc.getName());
 					// Remove description when invalid.
 					IClockService clock = (IClockService)platform.getService(IClockService.class);
 					if(ad.getLeaseTime()!=null && ad.getLeaseTime().getTime()<clock.getTime())
-						agents.removeKey(ad.getName());
+						components.removeKey(ad.getName());
 					else
 						ret.add(ad);
 				}
@@ -180,16 +176,16 @@ public class DF implements IDF, IService
 		// Otherwise search for matching descriptions.
 		else
 		{
-			synchronized(agents)
+			synchronized(components)
 			{
-				DFComponentDescription[]	descs	= (DFComponentDescription[])agents.toArray(new DFComponentDescription[agents.size()]);
+				DFComponentDescription[]	descs	= (DFComponentDescription[])components.toArray(new DFComponentDescription[components.size()]);
 				for(int i=0; (con==null || con.getMaxResults()==-1 || ret.size()<con.getMaxResults()) && i<descs.length; i++)
 				{
 					// Remove description when invalid.
 					IClockService clock = (IClockService)platform.getService(IClockService.class);
 					if(descs[i].getLeaseTime()!=null && descs[i].getLeaseTime().getTime()<clock.getTime())
 					{
-						agents.removeKey(descs[i].getName());
+						components.removeKey(descs[i].getName());
 					}
 					// Otherwise match against template.
 					else
@@ -248,34 +244,34 @@ public class DF implements IDF, IService
 	}
 
 	/**
-	 *  Create a df agent description.
-	 *  @param agent The agent.
+	 *  Create a df component description.
+	 *  @param component The component.
 	 *  @param service The service.
-	 *  @return The df agent description.
+	 *  @return The df component description.
 	 */
-	public IDFComponentDescription createDFComponentDescription(IComponentIdentifier agent, IDFServiceDescription service)
+	public IDFComponentDescription createDFComponentDescription(IComponentIdentifier component, IDFServiceDescription service)
 	{
 		DFComponentDescription	ret	= new DFComponentDescription();
-		ret.setName(agent);
+		ret.setName(component);
 		if(service!=null)
 			ret.addService(service);
 		return ret;
 	}
 
 	/**
-	 *  Create a new df agent description.
-	 *  @param agent The agent id.
+	 *  Create a new df component description.
+	 *  @param component The component id.
 	 *  @param services The services.
 	 *  @param languages The languages.
 	 *  @param ontologies The ontologies.
 	 *  @param protocols The protocols.
-	 *  @return The agent description.
+	 *  @return The component description.
 	 */
-	public IDFComponentDescription	createDFComponentDescription(IComponentIdentifier agent, IDFServiceDescription[] services,
+	public IDFComponentDescription	createDFComponentDescription(IComponentIdentifier component, IDFServiceDescription[] services,
 		String[] languages, String[] ontologies, String[] protocols, Date leasetime)
 	{
 		DFComponentDescription	ret	= new DFComponentDescription();
-		ret.setName(agent);
+		ret.setName(component);
 		ret.setLeaseTime(leasetime);
 		for(int i=0; services!=null && i<services.length; i++)
 			ret.addService(services[i]);
@@ -306,7 +302,7 @@ public class DF implements IDF, IService
 	 *  Create a component identifier.
 	 *  @param name The name.
 	 *  @param local True for local name ().
-	 *  @return The new agent identifier.
+	 *  @return The new component identifier.
 	 */
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
 	{

@@ -1,7 +1,5 @@
 package jadex.bridge;
 
-import jadex.service.IService;
-
 import java.util.Map;
 
 /**
@@ -12,12 +10,12 @@ public interface IMessageService
 {
 	/**
 	 *  Send a message.
-	 *  @param cl The class loader used by the sending agent (i.e. corresponding to classes of objects in the message map).
+	 *  @param cl The class loader used by the sending component (i.e. corresponding to classes of objects in the message map).
 	 */
 	public void sendMessage(Map message, MessageType msgtype, IComponentIdentifier sender, ClassLoader cl);
 	
 	/**
-	 *  Deliver a message to some agents.
+	 *  Deliver a message to some components.
 	 */
 	public void deliverMessage(Map message, String msgtype, IComponentIdentifier[] receivers);
 	
@@ -26,8 +24,8 @@ public interface IMessageService
 	 *  @return The addresses of all transports.
 	 */
 	// todo: remove
-	// It could be a good idea to NOT have the addresses in the agent identifiers all the time.
-	// Only when sending a message across platform borders the agent identifiers should be 
+	// It could be a good idea to NOT have the addresses in the component identifiers all the time.
+	// Only when sending a message across platform borders the component identifiers should be 
 	// enhanced with the addresses to enable the other platform answering.
 	// In the local case one could always omit the addresses and try out the services.
 	public String[] getAddresses();

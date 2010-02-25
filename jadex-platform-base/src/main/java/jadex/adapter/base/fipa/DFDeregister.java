@@ -5,12 +5,12 @@ package jadex.adapter.base.fipa;
 /**
  *  Java class for concept DFDeregister of beanynizer_beans_fipa_default ontology.
  */
-public class DFDeregister implements IAgentAction
+public class DFDeregister implements IComponentAction
 {
 	//-------- attributes ----------
 
-	/** Attribute for slot dfagentdescription. */
-	protected IDFComponentDescription dfagentdescription;
+	/** Attribute for slot dfcomponentdescription. */
+	protected IDFComponentDescription dfcomponentdescription;
 
 	//-------- constructors --------
 
@@ -25,29 +25,29 @@ public class DFDeregister implements IAgentAction
 	/**
 	 * Create a new <code>DFDeregister</code>.
 	 */
-	public DFDeregister(IDFComponentDescription dfagentdescription)
+	public DFDeregister(IDFComponentDescription dfcomponentdescription)
 	{
-		this.dfagentdescription	= dfagentdescription;
+		this.dfcomponentdescription	= dfcomponentdescription;
 	}
 
 	//-------- accessor methods --------
 
 	/**
-	 *  Get the dfagentdescription of this DFDeregister.
-	 * @return dfagentdescription
+	 *  Get the dfcomponentdescription of this DFDeregister.
+	 * @return dfcomponentdescription
 	 */
 	public IDFComponentDescription getComponentDescription()
 	{
-		return this.dfagentdescription;
+		return this.dfcomponentdescription;
 	}
 
 	/**
-	 *  Set the dfagentdescription of this DFDeregister.
-	 * @param dfagentdescription the value to be set
+	 *  Set the dfcomponentdescription of this DFDeregister.
+	 * @param dfcomponentdescription the value to be set
 	 */
-	public void setComponentDescription(IDFComponentDescription dfagentdescription)
+	public void setComponentDescription(IDFComponentDescription dfcomponentdescription)
 	{
-		this.dfagentdescription = dfagentdescription;
+		this.dfcomponentdescription = dfcomponentdescription;
 	}
 
 	//-------- additional methods --------

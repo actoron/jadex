@@ -10,15 +10,15 @@ import java.util.List;
 /**
  *  Java class for concept DFSearch of beanynizer_beans_fipa_default ontology.
  */
-public class DFSearch implements IAgentAction
+public class DFSearch implements IComponentAction
 {
 	//-------- attributes ----------
 
 	/** Attribute for slot searchconstraints. */
 	protected ISearchConstraints searchconstraints;
 
-	/** Attribute for slot dfagentdescription. */
-	protected IDFComponentDescription dfagentdescription;
+	/** Attribute for slot dfcomponentdescription. */
+	protected IDFComponentDescription dfcomponentdescription;
 
 	/** Attribute for slot results. */
 	protected List results;
@@ -37,10 +37,10 @@ public class DFSearch implements IAgentAction
 	/**
 	 * Create a new <code>DFSearch</code>.
 	 */
-	public DFSearch(IDFComponentDescription dfagentdescription, IDFComponentDescription[] results)
+	public DFSearch(IDFComponentDescription dfcomponentdescription, IDFComponentDescription[] results)
 	{
 		this();
-		this.dfagentdescription	= dfagentdescription;
+		this.dfcomponentdescription	= dfcomponentdescription;
 		setResults(results);
 	}
 
@@ -65,21 +65,21 @@ public class DFSearch implements IAgentAction
 	}
 
 	/**
-	 *  Get the dfagentdescription of this DFSearch.
-	 * @return dfagentdescription
+	 *  Get the dfcomponentdescription of this DFSearch.
+	 * @return dfcomponentdescription
 	 */
 	public IDFComponentDescription getComponentDescription()
 	{
-		return this.dfagentdescription;
+		return this.dfcomponentdescription;
 	}
 
 	/**
-	 *  Set the dfagentdescription of this DFSearch.
-	 * @param dfagentdescription the value to be set
+	 *  Set the dfcomponentdescription of this DFSearch.
+	 * @param dfcomponentdescription the value to be set
 	 */
-	public void setComponentDescription(IDFComponentDescription dfagentdescription)
+	public void setComponentDescription(IDFComponentDescription dfcomponentdescription)
 	{
-		this.dfagentdescription = dfagentdescription;
+		this.dfcomponentdescription = dfcomponentdescription;
 	}
 
 	/**

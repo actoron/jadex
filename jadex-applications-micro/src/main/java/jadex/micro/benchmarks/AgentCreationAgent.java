@@ -1,7 +1,7 @@
 package jadex.micro.benchmarks;
 
 import jadex.bridge.IArgument;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.concurrent.IResultListener;
 import jadex.microkernel.MicroAgent;
@@ -52,7 +52,7 @@ public class AgentCreationAgent extends MicroAgent
 			args.put("num", new Integer(num+1));
 //				System.out.println("Args: "+num+" "+args);
 
-			final IComponentExecutionService ces = (IComponentExecutionService)getServiceContainer().getService(IComponentExecutionService.class);
+			final IComponentManagementService ces = (IComponentManagementService)getServiceContainer().getService(IComponentManagementService.class);
 			ces.createComponent(createPeerName(num+1), getClass().getName()+".class", null, args, false, null, null, null, false);		
 		}
 		else
@@ -101,7 +101,7 @@ public class AgentCreationAgent extends MicroAgent
 	{
 		final String name = createPeerName(cnt);
 //		System.out.println("Destroying peer: "+name);
-		final IComponentExecutionService ces = (IComponentExecutionService)getServiceContainer().getService(IComponentExecutionService.class);
+		final IComponentManagementService ces = (IComponentManagementService)getServiceContainer().getService(IComponentManagementService.class);
 		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
 		ces.destroyComponent(aid, createResultListener(new IResultListener()
 		{

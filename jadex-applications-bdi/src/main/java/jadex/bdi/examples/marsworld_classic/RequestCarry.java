@@ -1,12 +1,12 @@
 package jadex.bdi.examples.marsworld_classic;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 
 /**
  *  Java class for concept RequestCarry of mars_beans ontology.
  */
-public class RequestCarry implements IAgentAction
+public class RequestCarry implements IComponentAction
 {
 	//-------- attributes ----------
 

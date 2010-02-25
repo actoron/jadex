@@ -1,7 +1,7 @@
 package jadex.wfms.service.impl;
 
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
@@ -146,7 +146,7 @@ public class GpmnProcessService implements IExecutionService, IService
 	public Object startProcess(String modelname, final Object id, Map arguments, boolean stepmode)
 	{
 		final String name = id.toString();
-		final IComponentExecutionService ces = (IComponentExecutionService)wfms.getService(IComponentExecutionService.class);
+		final IComponentManagementService ces = (IComponentManagementService)wfms.getService(IComponentManagementService.class);
 		ces.createComponent(String.valueOf(id), modelname, null, arguments, true, new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)

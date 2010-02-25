@@ -3,13 +3,13 @@
  */
 package jadex.bdi.examples.hunterprey_classic;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 
 /**
  *  Java class for concept RequestMove of hunterprey_beans ontology.
  */
-public class RequestMove implements IAgentAction
+public class RequestMove implements IComponentAction
 {
 	//-------- constants ----------
 

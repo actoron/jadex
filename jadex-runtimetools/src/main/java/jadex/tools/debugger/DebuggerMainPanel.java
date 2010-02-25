@@ -2,7 +2,7 @@ package jadex.tools.debugger;
 
 import jadex.adapter.base.SComponentFactory;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.SReflect;
@@ -71,8 +71,8 @@ public class DebuggerMainPanel extends JSplitPane
 		this.desc	= desc;
 		this.setOneTouchExpandable(true);
 		
-		IComponentExecutionService	ces	= ((IComponentExecutionService)
-			jcc.getServiceContainer().getService(IComponentExecutionService.class));
+		IComponentManagementService	ces	= ((IComponentManagementService)
+			jcc.getServiceContainer().getService(IComponentManagementService.class));
 		
 		// The right panel (step & custom tabs)
 		JPanel	rightpanel	= new JPanel();
@@ -138,8 +138,8 @@ public class DebuggerMainPanel extends JSplitPane
 			{
 				step.setEnabled(false);
 				run.setEnabled(false);
-				IComponentExecutionService	ces	= (IComponentExecutionService)
-					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentExecutionService.class);
+				IComponentManagementService	ces	= (IComponentManagementService)
+					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentManagementService.class);
 				ces.stepComponent(DebuggerMainPanel.this.desc.getName(), new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
@@ -171,8 +171,8 @@ public class DebuggerMainPanel extends JSplitPane
 				step.setEnabled(false);
 				run.setEnabled(false);
 				stepmode.setSelected(false);
-				final IComponentExecutionService	ces	= (IComponentExecutionService)
-					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentExecutionService.class);
+				final IComponentManagementService	ces	= (IComponentManagementService)
+					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentManagementService.class);
 				ces.stepComponent(DebuggerMainPanel.this.desc.getName(), new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
@@ -221,8 +221,8 @@ public class DebuggerMainPanel extends JSplitPane
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				IComponentExecutionService	ces	= (IComponentExecutionService)
-					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentExecutionService.class);
+				IComponentManagementService	ces	= (IComponentManagementService)
+					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentManagementService.class);
 				if(stepmode.isSelected())
 				{
 					ces.suspendComponent(DebuggerMainPanel.this.desc.getName(), null);

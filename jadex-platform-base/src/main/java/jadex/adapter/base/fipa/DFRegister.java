@@ -3,14 +3,14 @@ package jadex.adapter.base.fipa;
 /**
  * Java class for concept DFRegister of beanynizer_beans_fipa_default ontology.
  */
-public class DFRegister implements IAgentAction {
+public class DFRegister implements IComponentAction {
 	// -------- attributes ----------
 
 	/** Attribute for slot result. */
 	protected IDFComponentDescription result;
 
-	/** Attribute for slot dfagentdescription. */
-	protected IDFComponentDescription dfagentdescription;
+	/** Attribute for slot dfcomponentdescription. */
+	protected IDFComponentDescription dfcomponentdescription;
 
 	// -------- constructors --------
 
@@ -24,9 +24,9 @@ public class DFRegister implements IAgentAction {
 	/**
 	 * Create a new <code>DFRegister</code>.
 	 */
-	public DFRegister(IDFComponentDescription dfagentdescription, IDFComponentDescription result)
+	public DFRegister(IDFComponentDescription dfcomponentdescription, IDFComponentDescription result)
 	{
-		this.dfagentdescription	= dfagentdescription;
+		this.dfcomponentdescription	= dfcomponentdescription;
 		this.result	= result;
 	}
 
@@ -52,22 +52,22 @@ public class DFRegister implements IAgentAction {
 	}
 
 	/**
-	 * Get the dfagentdescription of this DFRegister.
+	 * Get the dfcomponentdescription of this DFRegister.
 	 * 
-	 * @return dfagentdescription
+	 * @return dfcomponentdescription
 	 */
 	public IDFComponentDescription getComponentDescription() {
-		return this.dfagentdescription;
+		return this.dfcomponentdescription;
 	}
 
 	/**
-	 * Set the dfagentdescription of this DFRegister.
+	 * Set the dfcomponentdescription of this DFRegister.
 	 * 
-	 * @param dfagentdescription
+	 * @param dfcomponentdescription
 	 *            the value to be set
 	 */
-	public void setComponentDescription(IDFComponentDescription dfagentdescription) {
-		this.dfagentdescription = dfagentdescription;
+	public void setComponentDescription(IDFComponentDescription dfcomponentdescription) {
+		this.dfcomponentdescription = dfcomponentdescription;
 	}
 
 	// -------- additional methods --------

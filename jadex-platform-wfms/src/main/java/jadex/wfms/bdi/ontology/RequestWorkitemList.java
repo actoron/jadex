@@ -1,10 +1,10 @@
 package jadex.wfms.bdi.ontology;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 import java.util.Set;
 
-public class RequestWorkitemList implements IAgentAction
+public class RequestWorkitemList implements IComponentAction
 {
 	private Set workitems;
 	

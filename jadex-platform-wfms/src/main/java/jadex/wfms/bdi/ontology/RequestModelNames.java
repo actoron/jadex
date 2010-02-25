@@ -2,9 +2,9 @@ package jadex.wfms.bdi.ontology;
 
 import java.util.Set;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
-public class RequestModelNames implements IAgentAction
+public class RequestModelNames implements IComponentAction
 {
 	/** The model names */
 	private Set modelNames;

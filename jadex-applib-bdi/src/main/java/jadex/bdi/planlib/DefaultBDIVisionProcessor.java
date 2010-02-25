@@ -10,7 +10,7 @@ import jadex.application.space.envsupport.math.Vector1Double;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
@@ -86,7 +86,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 		
 		if(invoke)
 		{
-			IComponentExecutionService ces = (IComponentExecutionService)space.getContext().getServiceContainer().getService(IComponentExecutionService.class);
+			IComponentManagementService ces = (IComponentManagementService)space.getContext().getServiceContainer().getService(IComponentManagementService.class);
 			ces.getExternalAccess(agent, new IResultListener()
 			{
 				public void exceptionOccurred(Object source, Exception exception)

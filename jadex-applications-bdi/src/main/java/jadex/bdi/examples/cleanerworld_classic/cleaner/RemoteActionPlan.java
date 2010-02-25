@@ -1,6 +1,6 @@
 package jadex.bdi.examples.cleanerworld_classic.cleaner;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 import jadex.adapter.base.fipa.IDF;
 import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.IDFServiceDescription;
@@ -22,7 +22,7 @@ public abstract class RemoteActionPlan extends Plan
 	 *  @return The finished goal.
 	 *  @throws GoalFailureException	when the request goal fails.
 	 */
-	public IGoal requestAction(IAgentAction action)
+	public IGoal requestAction(IComponentAction action)
 		throws GoalFailureException
 	{
 		// Search and store the environment agent.

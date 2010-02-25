@@ -1,8 +1,8 @@
 package jadex.wfms.bdi.ontology;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
-public class RequestAddProcess implements IAgentAction
+public class RequestAddProcess implements IComponentAction
 {
 	private String processPath;
 	

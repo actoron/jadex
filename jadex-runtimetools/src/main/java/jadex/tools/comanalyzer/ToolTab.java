@@ -21,7 +21,7 @@ import javax.swing.UIDefaults;
 /**
  * Base class for tool components.
  */
-public abstract class ToolTab extends JPanel implements IAgentListListener, IMessageListListener
+public abstract class ToolTab extends JPanel implements IComponentListListener, IMessageListListener
 {
 
 	/** Icon paths */
@@ -49,7 +49,7 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 	protected List messagelist;
 
 	/** The agentlist held by the tool */
-	protected List agentlist;
+	protected List componentlist;
 
 	/** The plugin. */
 	protected ComanalyzerPlugin plugin;
@@ -75,7 +75,7 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 	public ToolTab(ComanalyzerPlugin plugin, String name, Icon icon)
 	{
 		this.messagelist = new ArrayList();
-		this.agentlist = new ArrayList();
+		this.componentlist = new ArrayList();
 		this.name = name;
 		this.icon = icon;
 		this.plugin = plugin;
@@ -215,7 +215,7 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 //		{
 //			public void run()
 //			{
-				agentlist.clear();
+				componentlist.clear();
 				messagelist.clear();
 				getCanvas().clear();
 				getCanvas().repaintCanvas();
@@ -237,14 +237,14 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 
 				getCanvas().clear();
 
-				agentlist.clear();
-				agentlist.addAll(SUtil.arrayToList(getPlugin().getAgents()));
-				for(Iterator iterator = agentlist.iterator(); iterator.hasNext();)
+				componentlist.clear();
+				componentlist.addAll(SUtil.arrayToList(getPlugin().getAgents()));
+				for(Iterator iterator = componentlist.iterator(); iterator.hasNext();)
 				{
-					Agent agent = (Agent)iterator.next();
+					Component agent = (Component)iterator.next();
 					if(agent.isVisible())
 					{
-						getCanvas().updateAgent(agent, false);
+						getCanvas().updateComponent(agent, false);
 					}
 				}
 
@@ -334,7 +334,7 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 	/**
 	 * Update the view as for agents have been added.
 	 */
-	public void agentsAdded(final Agent[] agents)
+	public void componentsAdded(final Component[] agents)
 	{
 		if(!isActive())
 			return;
@@ -345,8 +345,8 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 //			{
 				for(int i = 0; i < agents.length; i++)
 				{
-					agentlist.add(agents[i]);
-					getCanvas().updateAgent(agents[i], false);
+					componentlist.add(agents[i]);
+					getCanvas().updateComponent(agents[i], false);
 				}
 				getCanvas().repaintCanvas();
 //			}
@@ -356,7 +356,7 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 	/**
 	 * Update the view as for agents have changed due to filter operaions.
 	 */
-	public void agentsChanged(final Agent[] agents)
+	public void componentsChanged(final Component[] agents)
 	{
 //		SwingUtilities.invokeLater(new Runnable()
 //		{
@@ -365,9 +365,9 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 
 				for(int i = 0; i < agents.length; i++)
 				{
-					if(agentlist.contains(agents[i]))
+					if(componentlist.contains(agents[i]))
 					{
-						getCanvas().updateAgent(agents[i], true);
+						getCanvas().updateComponent(agents[i], true);
 					}
 				}
 				getCanvas().repaintCanvas();
@@ -379,7 +379,7 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 	/**
 	 * Update the view as for agents have been removed.
 	 */
-	public void agentsRemoved(final Agent[] agents)
+	public void componentsRemoved(final Component[] agents)
 	{
 //		SwingUtilities.invokeLater(new Runnable()
 //		{
@@ -387,8 +387,8 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 //			{
 				for(int i = 0; i < agents.length; i++)
 				{
-					agentlist.remove(agents[i]);
-					getCanvas().removeAgent(agents[i]);
+					componentlist.remove(agents[i]);
+					getCanvas().removeComponent(agents[i]);
 				}
 				getCanvas().repaintCanvas();
 //			}
@@ -408,22 +408,22 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 		boolean show_dead = true;
 		boolean show_zero = true;
 
-		AgentFilter[] afs = plugin.getAgentFilter();
+		ComponentFilter[] afs = plugin.getAgentFilter();
 		for(int i = 0; i < afs.length; i++)
 		{
-			if(afs[i].containsValue(Agent.STATE, Agent.STATE_DUMMY))
+			if(afs[i].containsValue(Component.STATE, Component.STATE_DUMMY))
 			{
 				show_dummy = false;
 			}
-			if(afs[i].containsValue(Agent.STATE, Agent.STATE_IGNORED))
+			if(afs[i].containsValue(Component.STATE, Component.STATE_IGNORED))
 			{
 				show_ignored = false;
 			}
-			if(afs[i].containsValue(Agent.STATE, Agent.STATE_DEAD))
+			if(afs[i].containsValue(Component.STATE, Component.STATE_DEAD))
 			{
 				show_dead = false;
 			}
-			if(afs[i].containsValue(Agent.MESSAGE_VISIBLE, new Integer(Agent.NO_MESSAGES)))
+			if(afs[i].containsValue(Component.MESSAGE_VISIBLE, new Integer(Component.NO_MESSAGES)))
 			{
 				show_zero = false;
 			}
@@ -452,7 +452,7 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 		boolean add_filter = true;
 		List filters = new ArrayList();
 
-		AgentFilter[] afs = plugin.getAgentFilter();
+		ComponentFilter[] afs = plugin.getAgentFilter();
 		for(int i = 0; i < afs.length; i++)
 		{
 			if(afs[i].containsValue(name, value))
@@ -466,12 +466,12 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 		}
 		if(add_filter)
 		{
-			AgentFilter filter = new AgentFilter();
+			ComponentFilter filter = new ComponentFilter();
 			filter.addValue(name, value);
 			filters.add(filter);
 		}
 
-		plugin.setAgentFilter((AgentFilter[])filters.toArray(new AgentFilter[filters.size()]));
+		plugin.setAgentFilter((ComponentFilter[])filters.toArray(new ComponentFilter[filters.size()]));
 		refreshToolBar();
 		plugin.applyAgentFilter();
 	}
@@ -515,8 +515,8 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 			messagesRemoved(plugin.getMessages());
 
 			// add all the agents
-			agentlist.addAll(SUtil.arrayToList(plugin.getAgents()));
-			agentsChanged(plugin.getAgents());
+			componentlist.addAll(SUtil.arrayToList(plugin.getAgents()));
+			componentsChanged(plugin.getAgents());
 
 			for(int i = 0; i < plugin.getMessageList().size(); i++)
 			{
@@ -573,10 +573,10 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 		public void actionPerformed(ActionEvent e)
 		{
 
-			if(agentlist.size() == 0)
+			if(componentlist.size() == 0)
 			{
-				agentlist.addAll(plugin.getAgentList().getList());
-				agentsChanged(plugin.getAgents());
+				componentlist.addAll(plugin.getAgentList().getList());
+				componentsChanged(plugin.getAgents());
 			}
 
 			for(int i = messagelist.size() + 1; i < plugin.getMessageList().size(); i++)
@@ -610,7 +610,7 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 
 		public void actionPerformed(ActionEvent e)
 		{
-			changeAgentFilter(Agent.STATE, Agent.STATE_DUMMY);
+			changeAgentFilter(Component.STATE, Component.STATE_DUMMY);
 		}
 	};
 
@@ -620,7 +620,7 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 
 		public void actionPerformed(ActionEvent e)
 		{
-			changeAgentFilter(Agent.STATE, Agent.STATE_IGNORED);
+			changeAgentFilter(Component.STATE, Component.STATE_IGNORED);
 		}
 	};
 
@@ -630,7 +630,7 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 
 		public void actionPerformed(ActionEvent e)
 		{
-			changeAgentFilter(Agent.STATE, Agent.STATE_DEAD);
+			changeAgentFilter(Component.STATE, Component.STATE_DEAD);
 		}
 	};
 
@@ -639,7 +639,7 @@ public abstract class ToolTab extends JPanel implements IAgentListListener, IMes
 	{
 		public void actionPerformed(ActionEvent ae)
 		{
-			changeAgentFilter(Agent.MESSAGE_VISIBLE, new Integer(Agent.NO_MESSAGES));
+			changeAgentFilter(Component.MESSAGE_VISIBLE, new Integer(Component.NO_MESSAGES));
 		}
 	};
 

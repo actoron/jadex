@@ -5,7 +5,7 @@ import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
 
 import java.awt.event.WindowAdapter;
@@ -50,7 +50,7 @@ public class EnvironmentGui	extends JFrame
 						try
 						{
 							IGoal kill = agent.createGoal("ams_destroy_agent");
-							IComponentExecutionService ces = (IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class);
+							IComponentManagementService ces = (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
 							kill.getParameter("agentidentifier").setValue(ces.createComponentIdentifier(wobs[i].getName(), true, null));
 							agent.dispatchTopLevelGoalAndWait(kill);
 						}

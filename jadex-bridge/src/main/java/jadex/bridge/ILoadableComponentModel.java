@@ -5,11 +5,11 @@ import java.util.Map;
 
 /**
  *  This model interface to be used (invoked) by tools and adapters.
- *  Can represent an application or an agent (also capability).
+ *  Can represent an application or an component (also capability).
  *  Applications can be loaded by the application factory.
  *  @link{IApplicationFactory}
- *  Agent types can be loaded by the kernel's agent factory
- *  @link{IAgentFactory}. 
+ *  Component types can be loaded by the kernel's component factory
+ *  @link{IComponentFactory}. 
  */
 public interface ILoadableComponentModel
 {

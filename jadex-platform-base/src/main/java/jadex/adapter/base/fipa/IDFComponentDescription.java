@@ -5,7 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import java.util.Date;
 
 /**
- *  Interface for df agent descriptions.
+ *  Interface for df component descriptions.
  */
 public interface IDFComponentDescription
 {
@@ -16,8 +16,8 @@ public interface IDFComponentDescription
 	public String[] getLanguages();
 
 	/**
-	 *  Get the agentidentifier of this ComponentDescription.
-	 * @return agentidentifier
+	 *  Get the componentidentifier of this ComponentDescription.
+	 * @return componentidentifier
 	 */
 	public IComponentIdentifier getName();
 

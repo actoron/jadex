@@ -3,13 +3,13 @@
  */
 package jadex.bdi.examples.cleanerworld_classic;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 
 /**
  *  Java class for concept RequestDropWaste of cleaner_beans ontology.
  */
-public class RequestDropWaste implements IAgentAction
+public class RequestDropWaste implements IComponentAction
 {
 	//-------- attributes ----------
 

@@ -1,12 +1,12 @@
 package jadex.tools.ontology;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 
 /**
  *  Java class for concept SendTraces of jadex.tools.tracer ontology.
  */
-public class SendTraces implements IAgentAction
+public class SendTraces implements IComponentAction
 {
 	//-------- attributes ----------
 

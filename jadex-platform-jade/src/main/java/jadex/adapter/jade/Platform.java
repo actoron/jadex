@@ -26,7 +26,7 @@ import jadex.bridge.IApplicationContext;
 import jadex.bridge.IApplicationFactory;
 import jadex.bridge.IContext;
 import jadex.bridge.IContextService;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IPlatform;
 import jadex.bridge.MessageType;

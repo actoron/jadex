@@ -30,7 +30,7 @@ public interface ITransport
 	/**
 	 *  Send a message.
 	 *  @param message The message to send.
-	 *  @return The agent identifiers to which this 
+	 *  @return The component identifiers to which this 
 	 *  message could not be delivered.
 	 */
 	public ComponentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] receivers);

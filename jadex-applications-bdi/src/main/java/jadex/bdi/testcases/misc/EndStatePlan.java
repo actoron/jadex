@@ -8,7 +8,7 @@ import jadex.adapter.base.test.TestReport;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.collection.SCollection;
 
@@ -45,8 +45,8 @@ public class EndStatePlan extends Plan
 		// Check if worker agent has been correctly removed.
 		waitFor(1000);	// Hack!!! how to ensure that agent has time to remove itself?
 		IGoal	search	= createGoal("amscap.ams_search_agents");
-		IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer()
-			.getService(IComponentExecutionService.class);
+		IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer()
+			.getService(IComponentManagementService.class);
 		search.getParameter("description").setValue(ces.createComponentDescription(worker, null, null, null, null));
 		dispatchSubgoalAndWait(search);
 		TestReport	report	= new TestReport("termination", "Test if the worker agent has been terminated");

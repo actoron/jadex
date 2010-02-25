@@ -2,7 +2,7 @@ package jadex.tools.starter;
 
 import jadex.adapter.base.SComponentFactory;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.ILoadableComponentModel;
@@ -320,7 +320,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		
 		// todo: ?! is this ok?
 		
-		IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
+		IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
 		ces.getComponentDescriptions(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
@@ -487,7 +487,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
 				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
-					IComponentExecutionService ces = (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
+					IComponentManagementService ces = (IComponentManagementService)getJCC().getServiceContainer().getService(IComponentManagementService.class);
 					ces.suspendComponent(((IComponentDescription)node.getUserObject()).getName(), new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
@@ -533,7 +533,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
 				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
-					IComponentExecutionService ces = (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
+					IComponentManagementService ces = (IComponentManagementService)getJCC().getServiceContainer().getService(IComponentManagementService.class);
 					ces.resumeComponent(((IComponentDescription)node.getUserObject()).getName(), new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
@@ -581,7 +581,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
 				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
-					IComponentExecutionService ces = (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
+					IComponentManagementService ces = (IComponentManagementService)getJCC().getServiceContainer().getService(IComponentManagementService.class);
 					ces.destroyComponent(((IComponentDescription)node.getUserObject()).getName(), new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
@@ -914,7 +914,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	 */
 	public void createComponent(String type, String name, String configname, Map arguments, boolean suspend, IResultListener killlistener)
 	{
-		final IComponentExecutionService	ces	= (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
+		final IComponentManagementService	ces	= (IComponentManagementService)getJCC().getServiceContainer().getService(IComponentManagementService.class);
 		ces.createComponent(name, type, configname, arguments, suspend, new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)

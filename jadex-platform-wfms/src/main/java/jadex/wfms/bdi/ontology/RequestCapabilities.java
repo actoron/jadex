@@ -2,13 +2,13 @@ package jadex.wfms.bdi.ontology;
 
 import java.util.Set;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 /**
  * A request for client capabilities.
  *
  */
-public class RequestCapabilities implements IAgentAction
+public class RequestCapabilities implements IComponentAction
 {
 	/** Capabilities of the user of the client */
 	private Set capabilities;

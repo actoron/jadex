@@ -40,7 +40,7 @@ public class DFRemoteRegisterPlan extends Plan
 		IGoal req = createGoal("rp_initiate");
 		req.getParameter("receiver").setValue(getParameter("df").getValue());
 		req.getParameter("action").setValue(re);
-		req.getParameter("ontology").setValue(SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME);
+		req.getParameter("ontology").setValue(SFipa.COMPONENT_MANAGEMENT_ONTOLOGY_NAME);
 		dispatchSubgoalAndWait(req);
 
 		getParameter("result").setValue(((DFRegister)((Done)req.getParameter("result").getValue()).getAction()).getResult());

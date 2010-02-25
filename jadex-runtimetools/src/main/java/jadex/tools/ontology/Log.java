@@ -1,10 +1,10 @@
 package jadex.tools.ontology;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 
 
-public class Log implements IAgentAction
+public class Log implements IComponentAction
 {
 	//-------- attributes ----------
 

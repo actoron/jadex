@@ -1,6 +1,6 @@
 package jadex.tools.common;
 
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 
 import java.awt.GridBagConstraints;
@@ -24,7 +24,7 @@ public class ComponentIdentifierPanel extends JPanel
 	//-------- attributes --------
 
 	/** The agent identifier.*/
-	protected IComponentExecutionService ces;
+	protected IComponentManagementService ces;
 	
 	/** The agent identifier.*/
 	protected IComponentIdentifier	aid;
@@ -51,7 +51,7 @@ public class ComponentIdentifierPanel extends JPanel
 	 *  Create a new agent identifier panel.
 	 *  @param aid	The agent identifier (or null for new).
 	 */
-	public ComponentIdentifierPanel(IComponentIdentifier aid, IComponentExecutionService ces)
+	public ComponentIdentifierPanel(IComponentIdentifier aid, IComponentManagementService ces)
 	{
 		this.ces	= ces;
 		this.aid	= aid!=null ? aid : ces.createComponentIdentifier(null, false, null);

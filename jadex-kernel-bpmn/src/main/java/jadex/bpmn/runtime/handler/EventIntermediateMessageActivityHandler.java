@@ -3,7 +3,7 @@ package jadex.bpmn.runtime.handler;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
 import jadex.commons.IFilter;
@@ -93,7 +93,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 			Object recs = thread.getPropertyValue(ri);
 			if(SReflect.isIterable(recs))
 			{
-				IComponentExecutionService ces = (IComponentExecutionService)instance.getComponentAdapter().getServiceContainer().getService(IComponentExecutionService.class);
+				IComponentManagementService ces = (IComponentManagementService)instance.getComponentAdapter().getServiceContainer().getService(IComponentManagementService.class);
 				List newrecs = new ArrayList();
 				for(Iterator it=SReflect.getIterator(recs); it.hasNext(); )
 				{

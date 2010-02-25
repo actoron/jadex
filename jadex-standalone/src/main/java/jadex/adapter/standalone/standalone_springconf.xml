@@ -28,76 +28,6 @@
 			<value type="long">10000</value>
 		</property>
 		
-		<property name="messageTypes">
-			<map>
-				<entry>
-					<key><value>fipa</value></key>
-					<bean class="jadex.adapter.base.fipa.FIPAMessageType"/>
-				</entry>
-			</map>
-		</property>
-		
-		<property name="applicationFactory">
-			<bean id="app_fac" class="jadex.adapter.base.appdescriptor.ApplicationFactory">
-				<constructor-arg ref="platform"/>
-				<constructor-arg>
-					<list>
-						<bean class="jadex.adapter.base.agr.MAGRSpaceType" factory-method="getXMLMapping"/>
-						<bean class="jadex.application.space.envsupport.MEnvSpaceType" factory-method="getXMLMapping"/>
-					</list>
-				</constructor-arg>
-			</bean>
-		</property>
-			
-		<property name="agentFactories">
-			<list value-type="jadex.bridge.IJadexAgentFactory">
-				
-				<bean id="kernel_v2_bdi_factory" class="jadex.bdi.interpreter.BDIAgentFactory">
-					<constructor-arg>
-						<map>
-							<entry>
-								<key>
-									<value>messagetype_fipa</value>
-								</key>
-								<bean class="jadex.adapter.base.fipa.FIPAMessageType"></bean>
-							</entry>
-							<entry>
-								<key>
-									<value>planexecutor_standard</value>
-								</key>
-								<bean class="jadex.bdi.runtime.JavaStandardPlanExecutor">
-									<constructor-arg ref="threadPool" />
-								</bean>
-							</entry>
-							<entry>
-								<key>
-									<value>standard.timeout</value>
-								</key>
-								<value type="long">10000</value>
-							</entry>
-							<entry>
-								<key>
-									<value>tooladapter.introspector</value>
-								</key>
-								<value type="java.lang.Class">jadex.tools.introspector.IntrospectorAdapter</value>
-							</entry>
-							<entry>
-								<key>
-									<value>microplansteps</value>
-								</key>
-								<value type="boolean">true</value>
-							</entry>
-						</map>
-					</constructor-arg>
-					<constructor-arg ref="platform"/>
-				</bean>
-				
-				<bean id="kernel_v2_micro_factory" class="jadex.microkernel.MicroAgentFactory">
-					<constructor-arg ref="platform"/>
-				</bean>
-			</list>
-		</property>
-
 		<property name="services">
 			<map>
 				<entry>
@@ -132,14 +62,14 @@
 			
 				<entry>
 					<key>
-						<value type="java.lang.Class">jadex.bridge.IComponentExecutionService</value>
+						<value type="java.lang.Class">jadex.bridge.IComponentManagementService</value>
 					</key>
 					<map>
 						<entry>
 							<key>
-								<value type="java.lang.String">ams_service</value>
+								<value type="java.lang.String">cms_service</value>
 							</key>
-							<bean class="jadex.adapter.standalone.service.componentexecution.ComponentExecutionService">
+							<bean class="jadex.adapter.standalone.service.componentexecution.ComponentManagementService">
 								<constructor-arg ref="platform"/>
 							</bean>
 						</entry>
@@ -186,6 +116,11 @@
 											<constructor-arg ref="platform"/>
 											<constructor-arg type="int" value="8765"/>
 										</bean>
+									</list>
+								</constructor-arg>
+								<constructor-arg>
+									<list value-type="jadex.bridge.MessageType">
+										<bean class="jadex.adapter.base.fipa.FIPAMessageType"></bean>
 									</list>
 								</constructor-arg>
 							</bean>
@@ -250,30 +185,75 @@
 				
 				<entry>
 					<key>
-						<value type="java.lang.Class">jadex.bridge.IContextService</value>
+						<value type="java.lang.Class">jadex.bridge.IComponentFactory</value>
 					</key>
 					<map>
 						<entry>
 							<key>
-								<value type="java.lang.String">context_service</value>
+								<value type="java.lang.String">application_factory</value>
 							</key>
-							<bean class="jadex.adapter.base.contextservice.ContextService">
+							<bean class="jadex.application.ApplicationComponentFactory">
+								<constructor-arg ref="platform"/>
 								<constructor-arg>
-									<list>
-										<value type="java.lang.Class">jadex.bridge.IContext</value>
-										<value type="java.lang.Class">jadex.adapter.base.contextservice.BaseContext</value>
-										<value type="java.lang.Class">jadex.bridge.IApplicationContext</value>
-									</list>
+									<set>
+										<bean class="jadex.application.space.envsupport.MEnvSpaceType" factory-method="getXMLMapping"/>
+										<bean class="jadex.application.space.agr.MAGRSpaceType" factory-method="getXMLMapping"/>
+									</set>
 								</constructor-arg>
+							</bean>
+						</entry>
+					
+						<entry>
+							<key>
+								<value type="java.lang.String">micro_factory</value>
+							</key>
+							<bean class="jadex.microkernel.MicroAgentFactory">
+								<constructor-arg ref="platform"/>
+							</bean>
+						</entry>
+					
+						<entry>
+							<key>
+								<value type="java.lang.String">bdi_factory</value>
+							</key>
+							<bean class="jadex.bdi.interpreter.BDIAgentFactory">
 								<constructor-arg>
-									<list>
-										<bean class="jadex.adapter.base.contextservice.DefaultContextFactory"></bean>
-										<bean class="jadex.adapter.base.contextservice.DefaultContextFactory"></bean>
-										<bean class="jadex.adapter.base.appdescriptor.ApplicationContextFactory">
-											<constructor-arg ref="platform"></constructor-arg>
-										</bean>
-									</list>
+									<map>
+										<entry>
+											<key>
+												<value>messagetype_fipa</value>
+											</key>
+											<bean class="jadex.adapter.base.fipa.FIPAMessageType"></bean>
+										</entry>
+										<entry>
+											<key>
+												<value>planexecutor_standard</value>
+											</key>
+											<bean class="jadex.bdi.runtime.JavaStandardPlanExecutor">
+												<constructor-arg ref="threadPool" />
+											</bean>
+										</entry>
+										<entry>
+											<key>
+												<value>standard.timeout</value>
+											</key>
+											<value type="long">10000</value>
+										</entry>
+										<entry>
+											<key>
+												<value>microplansteps</value>
+											</key>
+											<value type="boolean">true</value>
+										</entry>
+										<entry>
+											<key>
+												<value>debugger.panels</value>
+											</key>
+											<value type="java.lang.String">"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"</value>
+										</entry>
+									</map>
 								</constructor-arg>
+								<constructor-arg ref="platform"/>
 							</bean>
 						</entry>
 					</map>
@@ -281,11 +261,11 @@
 			</map>
 		</property>
 		
-		<property name="daemonAgents">
+		<property name="daemonComponents">
 			<map>
 				<entry>
 					<key><value>ams</value></key>
-					<value type="java.lang.String">jadex/bdi/amsagent/AMS.agent.xml</value>
+					<value type="java.lang.String">jadex/bdi/cmsagent/CMS.agent.xml</value>
 				</entry>
 				<entry>
 					<key><value>df</value></key>
@@ -294,7 +274,7 @@
 			</map>
 		</property>
 		
-		<property name="agents">
+		<property name="components">
 			<map>
 				<entry>
 					<key><value>jcc</value></key>

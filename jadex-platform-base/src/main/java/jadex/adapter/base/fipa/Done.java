@@ -9,7 +9,7 @@ public class Done
 	//-------- attributes --------
 	
 	/** The completed action. */
-	protected IAgentAction	action;
+	protected IComponentAction	action;
 	
 	//-------- constructors --------
 	
@@ -23,7 +23,7 @@ public class Done
 	/**
 	 *  Create a done action.
 	 */
-	public Done(IAgentAction action)
+	public Done(IComponentAction action)
 	{
 		this.action	= action;
 	}
@@ -33,7 +33,7 @@ public class Done
 	/**
 	 *  Get the action.
 	 */
-	public IAgentAction getAction()
+	public IComponentAction getAction()
 	{
 		return action;
 	}
@@ -41,7 +41,7 @@ public class Done
 	/**
 	 *  Set the action.
 	 */
-	public void setAction(IAgentAction action)
+	public void setAction(IComponentAction action)
 	{
 		this.action = action;
 	}

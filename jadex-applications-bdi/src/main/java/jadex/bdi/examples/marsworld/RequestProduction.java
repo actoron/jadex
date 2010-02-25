@@ -5,13 +5,13 @@
 package jadex.bdi.examples.marsworld;
 
 import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 
 /**
  *  Java class for concept RequestProduction of mars_beans ontology.
  */
-public class RequestProduction implements IAgentAction
+public class RequestProduction implements IComponentAction
 {
 	//-------- attributes ----------
 

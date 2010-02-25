@@ -1,10 +1,10 @@
 package jadex.wfms.bdi.ontology;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 import java.util.Set;
 
-public class RequestActivityList implements IAgentAction
+public class RequestActivityList implements IComponentAction
 {
 	private Set activities;
 	

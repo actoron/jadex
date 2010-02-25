@@ -7,7 +7,7 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
 
@@ -25,8 +25,8 @@ public class AMSTestPlan extends Plan
 	{
 		int num=1;
 		num = performTests(num, null); // test locally
-		IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
-		IComponentIdentifier aa = ces.createComponentIdentifier(SFipa.AMS_AGENT, true, null);
+		IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
+		IComponentIdentifier aa = ces.createComponentIdentifier(SFipa.CMS_COMPONENT, true, null);
 		performTests(num, aa); // test remotely
 	}
 
@@ -50,7 +50,7 @@ public class AMSTestPlan extends Plan
 		// Try to search the AMS.
 		TestReport tr = new TestReport("#"+num++, "Searching for all agents");
 		getLogger().info("\nSearching for all agents.");
-		IComponentExecutionService amsservice = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+		IComponentManagementService amsservice = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
 		IComponentDescription desc = amsservice.createComponentDescription(null, null, null, null, null);
 		ISearchConstraints constraints = amsservice.createSearchConstraints(-1, 0);
 		

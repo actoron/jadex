@@ -3,7 +3,7 @@ package jadex.bpmn.runtime.task;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.concurrent.IResultListener;
 
@@ -17,7 +17,7 @@ public class DestroyComponentTask implements ITask
 	 */
 	public void execute(ITaskContext context, BpmnInterpreter instance, final IResultListener listener)
 	{
-		IComponentExecutionService ces = (IComponentExecutionService)instance.getComponentAdapter().getServiceContainer().getService(IComponentExecutionService.class);
+		IComponentManagementService ces = (IComponentManagementService)instance.getComponentAdapter().getServiceContainer().getService(IComponentManagementService.class);
 		final IResultListener resultlistener = (IResultListener)context.getParameterValue("resultlistener");
 		boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): false;
 		

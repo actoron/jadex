@@ -11,7 +11,7 @@ import java.util.List;
 
 
 /**
- *  An agent description.
+ *  An component description.
  */
 public class DFComponentDescription implements IDFComponentDescription, Serializable
 {
@@ -20,7 +20,7 @@ public class DFComponentDescription implements IDFComponentDescription, Serializ
 	/** Attribute for slot languages. */
 	protected List languages;
 
-	/** Attribute for slot agentidentifier. */
+	/** Attribute for slot componentidentifier. */
 	protected IComponentIdentifier name;
 
 	/** Attribute for slot ontologies. */
@@ -38,7 +38,7 @@ public class DFComponentDescription implements IDFComponentDescription, Serializ
 	//-------- constructor --------
 
 	/**
-	 *  Create a new agent description.
+	 *  Create a new component description.
 	 */
 	public DFComponentDescription()
 	{
@@ -46,7 +46,7 @@ public class DFComponentDescription implements IDFComponentDescription, Serializ
 	}
 
 	/**
-	 *  Create a new agent description.
+	 *  Create a new component description.
 	 *  @param name The name.
 	 */
 	public DFComponentDescription(IComponentIdentifier name)
@@ -55,7 +55,7 @@ public class DFComponentDescription implements IDFComponentDescription, Serializ
 	}
 
 	/**
-	 *  Create a new agent description.
+	 *  Create a new component description.
 	 *  @param name The name.
 	 *  @param services The services.
 	 *  @param protocols The protocols.
@@ -149,8 +149,8 @@ public class DFComponentDescription implements IDFComponentDescription, Serializ
 
 
 	/**
-	 *  Get the agentidentifier of this ComponentDescription.
-	 * @return agentidentifier
+	 *  Get the componentidentifier of this ComponentDescription.
+	 * @return componentidentifier
 	 */
 	public IComponentIdentifier getName()
 	{
@@ -158,7 +158,7 @@ public class DFComponentDescription implements IDFComponentDescription, Serializ
 	}
 
 	/**
-	 *  Set the agentidentifier of this ComponentDescription.
+	 *  Set the componentidentifier of this ComponentDescription.
 	 * @param name the value to be set
 	 */
 	public void setName(IComponentIdentifier name)

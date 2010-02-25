@@ -1,7 +1,7 @@
 package jadex.micro.examples;
 
 import jadex.bridge.IArgument;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.concurrent.IResultListener;
 import jadex.microkernel.MicroAgent;
 import jadex.microkernel.MicroAgentMetaInfo;
@@ -27,8 +27,8 @@ public class ResultAgent extends MicroAgent
 		{
 			setResultValue("result", "not last: "+getAgentName()+": "+Math.random());
 			
-			IComponentExecutionService ces = (IComponentExecutionService)getServiceContainer()
-				.getService(IComponentExecutionService.class);
+			IComponentManagementService ces = (IComponentManagementService)getServiceContainer()
+				.getService(IComponentManagementService.class);
 			
 			ces.createComponent(null, getClass().getName()+".class", null, null, false, null, getComponentIdentifier(), createResultListener(new IResultListener()
 			{

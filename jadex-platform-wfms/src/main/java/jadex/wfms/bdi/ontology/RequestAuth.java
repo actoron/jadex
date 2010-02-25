@@ -1,9 +1,9 @@
 package jadex.wfms.bdi.ontology;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 import jadex.adapter.base.fipa.SFipa;
 
-public class RequestAuth implements IAgentAction
+public class RequestAuth implements IComponentAction
 {
 	/** The user name */
 	private String userName;

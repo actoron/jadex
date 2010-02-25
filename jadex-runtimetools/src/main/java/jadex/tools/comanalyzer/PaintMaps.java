@@ -113,8 +113,8 @@ public class PaintMaps
 			protocolPaints.put(protocol, paint);
 		}
 
-		Agent sender = message.getSender();
-		Agent receiver = message.getReceiver();
+		Component sender = message.getSender();
+		Component receiver = message.getReceiver();
 
 		if(!agentPaints.containsKey(sender))
 		{

@@ -14,7 +14,7 @@
    </imports>
 
 	<capabilities>
-		<capability name="ams" file="jadex.bdi.planlib.ams.AMS" />
+		<capability name="cms" file="jadex.bdi.planlib.cms.CMS" />
 		<capability name="df" file="jadex.bdi.planlib.df.DF" />
 		<!--  <capability name="toolcap" file="jadex.tools.common.Tool" />-->
 		<!-- <capability name="loggercap" file="jadex.tools.logger.Logger"/> -->
@@ -25,7 +25,7 @@
 		<belief name="jcc" class="AgentControlCenter" />
 
 		<beliefsetref name="agents">
-			<concrete ref="ams.agents"/>
+			<concrete ref="cms.agents"/>
 		</beliefsetref>
 
 		<beliefref name="testcase_timeout">
@@ -34,28 +34,28 @@
 	</beliefs>
 
 	<goals>
-		<achievegoalref name="ams_create_agent">
-			<concrete ref="ams.ams_create_agent" />
+		<achievegoalref name="cms_create_agent">
+			<concrete ref="cms.cms_create_agent" />
 		</achievegoalref>
 
-		<achievegoalref name="ams_destroy_agent">
-			<concrete ref="ams.ams_destroy_agent" />
+		<achievegoalref name="cms_destroy_agent">
+			<concrete ref="cms.cms_destroy_agent" />
 		</achievegoalref>
 		
-		<achievegoalref name="ams_suspend_agent">
-			<concrete ref="ams.ams_suspend_agent" />
+		<achievegoalref name="cms_suspend_agent">
+			<concrete ref="cms.cms_suspend_agent" />
 		</achievegoalref>
 		
-		<achievegoalref name="ams_resume_agent">
-			<concrete ref="ams.ams_resume_agent" />
+		<achievegoalref name="cms_resume_agent">
+			<concrete ref="cms.cms_resume_agent" />
 		</achievegoalref>
 
-		<achievegoalref name="ams_shutdown_platform">
-			<concrete ref="ams.ams_shutdown_platform" />
+		<achievegoalref name="cms_shutdown_platform">
+			<concrete ref="cms.cms_shutdown_platform" />
 		</achievegoalref>
 
-		<achievegoalref name="ams_search_agents">
-			<concrete ref="ams.ams_search_agents" />
+		<achievegoalref name="cms_search_agents">
+			<concrete ref="cms.cms_search_agents" />
 		</achievegoalref>
       
         <achievegoalref name="df_register">
@@ -111,16 +111,16 @@
 		<!-- <plan name="receiver">
 			<body class="MailPlan" />
 			<trigger>
-				<messageevent ref="fipamsg" />
+				<messageevent ref="fipcmsg" />
 				<messageevent ref="agent_inform"/>
 			</trigger>
 		</plan> -->
 	</plans>
 
 	<events>
-		<messageevent name="fipamsg" type="fipa" />
+		<messageevent name="fipcmsg" type="fipa" />
 
-		<!-- Message to issue a request to an observed agent. -->
+		<!-- Message to issue a request to an observed component. -->
 		<messageevent name="tool_request" type="fipa" direction="send">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>"request"</value>
@@ -133,7 +133,7 @@
 			</parameter>
 		</messageevent>
 		
-		<!-- Message to issue a log request to an agent. -->
+		<!-- Message to issue a log request to an component. -->
 		<!-- <messageevent name="logger_tool_request" type="fipa" 	direction="send">
 			<parameter name="performative" class="String" 		direction="fixed">
 				<value>"request"</value>
@@ -146,7 +146,7 @@
 			</parameter>
 		</messageevent> -->
 		
-      <messageevent name="agent_inform" type="fipa" direction="receive">
+      <messageevent name="component_inform" type="fipa" direction="receive">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>"inform"</value>
 			</parameter>
@@ -168,7 +168,7 @@
 	<configurations>
 		<configuration name="default">
 			<capabilities>
-				<initialcapability ref="ams" configuration="agentlist"/>
+				<initialcapability ref="cms" configuration="componentlist"/>
 			</capabilities>
 			<beliefs>
 				<initialbelief ref="jcc">

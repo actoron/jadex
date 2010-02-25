@@ -1,19 +1,19 @@
 package jadex.bridge;
 
 /**
- *  Interface for agent identifiers.
+ *  Interface for component identifiers.
  */
 public interface IComponentIdentifier
 {
 	/**
-	 *  Get the agent name.
-	 *  @return The name of an agent
+	 *  Get the component name.
+	 *  @return The name of an component.
 	 */
 	public String getName();
 	
 	/**
-	 *  Get the local agent name.
-	 *  @return the local name of an agent
+	 *  Get the local component name.
+	 *  @return The local name of an component.
 	 */
 	public String getLocalName();
 

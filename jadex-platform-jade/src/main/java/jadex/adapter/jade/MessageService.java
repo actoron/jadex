@@ -18,12 +18,12 @@ import jade.domain.JADEAgentManagement.CreateAgent;
 import jade.domain.JADEAgentManagement.JADEManagementOntology;
 import jade.domain.JADEAgentManagement.KillAgent;
 import jade.lang.acl.ACLMessage;
-import jadex.adapter.base.fipa.AMSCreateAgent;
-import jadex.adapter.base.fipa.AMSDestroyAgent;
-import jadex.adapter.base.fipa.AMSResumeAgent;
-import jadex.adapter.base.fipa.AMSSearchAgents;
+import jadex.adapter.base.fipa.CMSCreateComponent;
+import jadex.adapter.base.fipa.CMSDestroyComponent;
+import jadex.adapter.base.fipa.CMSResumeComponent;
+import jadex.adapter.base.fipa.CMSSearchComponents;
 import jadex.adapter.base.fipa.AMSStartAgent;
-import jadex.adapter.base.fipa.AMSSuspendAgent;
+import jadex.adapter.base.fipa.CMSSuspendComponent;
 import jadex.adapter.base.fipa.DFDeregister;
 import jadex.adapter.base.fipa.DFModify;
 import jadex.adapter.base.fipa.DFRegister;
@@ -186,9 +186,9 @@ public class MessageService implements IMessageService, IService
 					deregister.setDescription(SJade.convertAgentDescriptiontoJade(dfadesc));
 					request	= deregister;
 				}
-				else if(content instanceof AMSCreateAgent)
+				else if(content instanceof CMSCreateComponent)
 				{
-					AMSCreateAgent	aca	= (AMSCreateAgent)content;
+					CMSCreateComponent	aca	= (CMSCreateComponent)content;
 					if(aca.getName()==null)
 					{
 						AMS	ams	= (AMS)platform.getService(IAMS.class);
@@ -211,7 +211,7 @@ public class MessageService implements IMessageService, IService
 				}
 				else if(content instanceof AMSStartAgent)
 				{
-					IComponentIdentifier	amsaid	= ((AMSStartAgent)content).getAgentIdentifier();
+					IComponentIdentifier	amsaid	= ((AMSStartAgent)content).getComponentIdentifier();
 					Modify	start	= new Modify();
 					AMSAgentDescription	adesc	= new AMSAgentDescription();
 					adesc.setName(SJade.convertAIDtoJade(amsaid));
@@ -219,17 +219,17 @@ public class MessageService implements IMessageService, IService
 					start.setDescription(adesc);
 					request	= start;
 				}
-				else if(content instanceof AMSDestroyAgent)
+				else if(content instanceof CMSDestroyComponent)
 				{
-					IComponentIdentifier	amsaid	= ((AMSDestroyAgent)content).getAgentIdentifier();
+					IComponentIdentifier	amsaid	= ((CMSDestroyComponent)content).getComponentIdentifier();
 					KillAgent	destroy	= new KillAgent();
 					destroy.setAgent(SJade.convertAIDtoJade(amsaid));
 					request	= destroy;
 					ontology	= JADEManagementOntology.NAME;
 				}
-				else if(content instanceof AMSSuspendAgent)
+				else if(content instanceof CMSSuspendComponent)
 				{
-					IComponentIdentifier	amsaid	= ((AMSSuspendAgent)content).getAgentIdentifier();
+					IComponentIdentifier	amsaid	= ((CMSSuspendComponent)content).getAgentIdentifier();
 					Modify	suspend	= new Modify();
 					AMSAgentDescription	adesc	= new AMSAgentDescription();
 					adesc.setName(SJade.convertAIDtoJade(amsaid));
@@ -237,9 +237,9 @@ public class MessageService implements IMessageService, IService
 					suspend.setDescription(adesc);
 					request	= suspend;
 				}
-				else if(content instanceof AMSResumeAgent)
+				else if(content instanceof CMSResumeComponent)
 				{
-					IComponentIdentifier	amsaid	= ((AMSResumeAgent)content).getAgentIdentifier();
+					IComponentIdentifier	amsaid	= ((CMSResumeComponent)content).getComponentIdentifier();
 					Modify	resume	= new Modify();
 					AMSAgentDescription	adesc	= new AMSAgentDescription();
 					adesc.setName(SJade.convertAIDtoJade(amsaid));
@@ -247,15 +247,15 @@ public class MessageService implements IMessageService, IService
 					resume.setDescription(adesc);
 					request	= resume;
 				}
-				else if(content instanceof AMSSearchAgents)
+				else if(content instanceof CMSSearchComponents)
 				{
 					Search	search	= new Search();
-					AMSAgentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoJade(((AMSSearchAgents)content).getAgentDescription());
+					AMSAgentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoJade(((CMSSearchComponents)content).getAgentDescription());
 					// Hack !!! Strip addresses/resolvers from aid before search (JADE doesn't store these in AMS and therefore finds no matches, grrr).
 					if(amsadesc.getName()!=null)
 						amsadesc.setName(new AID(amsadesc.getName().getName(), AID.ISGUID));
 					search.setDescription(amsadesc);
-					ISearchConstraints	cons	= ((AMSSearchAgents)content).getSearchConstraints();
+					ISearchConstraints	cons	= ((CMSSearchComponents)content).getSearchConstraints();
 					if(cons!=null)
 					{
 						search.setConstraints(SJade.convertSearchConstraintstoJade(cons));

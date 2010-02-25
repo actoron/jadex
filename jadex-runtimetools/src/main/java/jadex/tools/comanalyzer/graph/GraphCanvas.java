@@ -1,7 +1,7 @@
 package jadex.tools.comanalyzer.graph;
 
 import jadex.commons.SGUI;
-import jadex.tools.comanalyzer.Agent;
+import jadex.tools.comanalyzer.Component;
 import jadex.tools.comanalyzer.Message;
 import jadex.tools.comanalyzer.PaintMaps;
 import jadex.tools.comanalyzer.ToolCanvas;
@@ -285,8 +285,8 @@ public class GraphCanvas extends ToolCanvas
 
 		if(newpair != null)
 		{
-			Agent sender = (Agent)newpair.getFirst();
-			Agent receiver = (Agent)newpair.getSecond();
+			Component sender = (Component)newpair.getFirst();
+			Component receiver = (Component)newpair.getSecond();
 			// check if message is already displayed
 			MessageGroup edge = (MessageGroup)graph.findEdge(message);
 			if(edge != null)
@@ -334,7 +334,7 @@ public class GraphCanvas extends ToolCanvas
 	 * @param isPresent <code>true</code> if removal is skipped. (Can be
 	 * applied to new agents)
 	 */
-	public void updateAgent(Agent agent, boolean update)
+	public void updateComponent(Component agent, boolean update)
 	{
 		if(agent.isVisible())
 		{
@@ -345,7 +345,7 @@ public class GraphCanvas extends ToolCanvas
 		}
 		else if(update)
 		{
-			removeAgent(agent);
+			removeComponent(agent);
 		}
 
 	}
@@ -354,7 +354,7 @@ public class GraphCanvas extends ToolCanvas
 	 * Removes an agent.
 	 * @param agent The agent to remove.
 	 */
-	public void removeAgent(Agent agent)
+	public void removeComponent(Component agent)
 	{
 		graph.removeVertexElement(agent);
 		visible_agents.remove(agent);
@@ -451,7 +451,7 @@ public class GraphCanvas extends ToolCanvas
 	 * @param sender The sender in the presentation.
 	 * @param receiver The receiver in the presentation. (e.g. dummy)
 	 */
-	public void addMessage(Message message, Agent sender, Agent receiver)
+	public void addMessage(Message message, Component sender, Component receiver)
 	{
 		// consider different graph types
 		switch(graphType)
@@ -478,7 +478,7 @@ public class GraphCanvas extends ToolCanvas
 	 * 
 	 * @param agent The agent to add.
 	 */
-	public void addAgent(Agent agent)
+	public void addAgent(Component agent)
 	{
 		graph.addVertexElement(agent);
 		
@@ -686,7 +686,7 @@ public class GraphCanvas extends ToolCanvas
 
 		}
 
-		public AgentGroup(Agent agent)
+		public AgentGroup(Component agent)
 		{
 			addElement(agent);
 		}

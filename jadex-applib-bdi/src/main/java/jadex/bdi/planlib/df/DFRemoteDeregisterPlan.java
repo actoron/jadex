@@ -30,7 +30,7 @@ public class DFRemoteDeregisterPlan extends Plan
 		IGoal req = createGoal("rp_initiate");
 		req.getParameter("receiver").setValue(getParameter("df").getValue());
 		req.getParameter("action").setValue(dre);
-		req.getParameter("ontology").setValue(SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME);
+		req.getParameter("ontology").setValue(SFipa.COMPONENT_MANAGEMENT_ONTOLOGY_NAME);
 		dispatchSubgoalAndWait(req);
 	}
 }

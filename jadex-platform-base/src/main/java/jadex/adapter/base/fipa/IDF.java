@@ -8,31 +8,31 @@ import java.util.Date;
 
 /**
  *  Interface for the directory facilitator (DF). Provides services for registering,
- *  modifying, deregistering and searching of agent resp. service descriptions.
+ *  modifying, deregistering and searching of component resp. service descriptions.
  */
 public interface IDF
 {
 	/**
-	 *  Register an agent description.
-	 *  @throws RuntimeException when the agent is already registered.
+	 *  Register an component description.
+	 *  @throws RuntimeException when the component is already registered.
 	 */
 	public void	register(IDFComponentDescription adesc, IResultListener listener);
 	
 	/**
-	 *  Deregister an agent description.
-	 *  @throws RuntimeException when the agent is not registered.
+	 *  Deregister an component description.
+	 *  @throws RuntimeException when the component is not registered.
 	 */
 	public void	deregister(IDFComponentDescription adesc, IResultListener listener);
 	
 	/**
-	 *  Modify an agent description.
-	 *  @throws RuntimeException when the agent is not registered.
+	 *  Modify an component description.
+	 *  @throws RuntimeException when the component is not registered.
 	 */
 	public void	modify(IDFComponentDescription adesc, IResultListener listener);
 	
 	/**
-	 *  Search for agents matching the given description.
-	 *  @return An array of matching agent descriptions. 
+	 *  Search for components matching the given description.
+	 *  @return An array of matching component descriptions. 
 	 */
 	public void search(IDFComponentDescription adesc, ISearchConstraints con, IResultListener listener);
 
@@ -60,23 +60,23 @@ public interface IDF
 		String[] languages, String[] ontologies, String[] protocols, IProperty[] properties);
 
 	/**
-	 *  Create a df agent description.
-	 *  @param agent The agent.
+	 *  Create a df component description.
+	 *  @param component The component.
 	 *  @param service The service.
-	 *  @return The df agent description.
+	 *  @return The df component description.
 	 */
-	public IDFComponentDescription createDFComponentDescription(IComponentIdentifier agent, IDFServiceDescription service);
+	public IDFComponentDescription createDFComponentDescription(IComponentIdentifier component, IDFServiceDescription service);
 
 	/**
-	 *  Create a new df agent description.
-	 *  @param agent The agent id.
+	 *  Create a new df component description.
+	 *  @param component The component id.
 	 *  @param services The services.
 	 *  @param languages The languages.
 	 *  @param ontologies The ontologies.
 	 *  @param protocols The protocols.
-	 *  @return The agent description.
+	 *  @return The component description.
 	 */
-	public IDFComponentDescription	createDFComponentDescription(IComponentIdentifier agent, IDFServiceDescription[] services,
+	public IDFComponentDescription	createDFComponentDescription(IComponentIdentifier component, IDFServiceDescription[] services,
 		String[] languages, String[] ontologies, String[] protocols, Date leasetime);
 
 	/**
@@ -88,20 +88,20 @@ public interface IDF
 	public ISearchConstraints createSearchConstraints(int maxresults, int maxdepth);
 
 	/**
-	 *  Create an agent identifier.
+	 *  Create an component identifier.
 	 *  @param name The name.
 	 *  @param local True for local name.
-	 *  @return The new agent identifier.
+	 *  @return The new component identifier.
 	 */
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local);
 	
 	/**
-	 *  Create an agent identifier.
+	 *  Create an component identifier.
 	 *  @param name The name.
 	 *  @param local True for local name.
 	 *  @param addresses The addresses.
 	 *  @param resolvers The resolvers.
-	 *  @return The new agent identifier.
+	 *  @return The new component identifier.
 	 */
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses);
 }

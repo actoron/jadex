@@ -6,7 +6,7 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.IParameterSet;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.commons.Properties;
@@ -90,7 +90,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable().getTree().getSelectionPath().getLastPathComponent();
 			IComponentDescription desc = (IComponentDescription)node.getUserObject();
 			// Use clone, as added agent id might be modified by user.
-			IComponentExecutionService ces  = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
+			IComponentManagementService ces  = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
 			IComponentIdentifier	receiver	= desc.getName();
 			receiver = ces.createComponentIdentifier(receiver.getName(), false, receiver.getAddresses());
 			IMessageEvent	message	= convcenter.getMessagePanel().getMessage();
@@ -144,7 +144,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			}
 		});
 
-		IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
+		IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
 		ces.getComponentDescriptions(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)

@@ -7,7 +7,7 @@ package jadex.bridge;
 public class ComponentTerminatedException	extends RuntimeException
 {
 	/**
-	 *	Create an agent termination exception.  
+	 *	Create an component termination exception.  
 	 */
 	public ComponentTerminatedException(String msg)
 	{

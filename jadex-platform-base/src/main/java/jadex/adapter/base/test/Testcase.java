@@ -3,13 +3,13 @@ package jadex.adapter.base.test;
 import jadex.commons.SUtil;
 
 /**
- *  A testcase consists of an agent type to test and the result reports.
+ *  A testcase consists of an component type to test and the result reports.
  */
 public class Testcase
 {
 	//-------- attributes --------
 
-	/** The agent type. */
+	/** The component type. */
 	protected String type;
 
 	/** The number of tests to be performed. */
@@ -162,7 +162,7 @@ public class Testcase
 	}
 
 	/**
-	 *  Have all agent tests succeeded.
+	 *  Have all component tests succeeded.
 	 */
 	public boolean isSucceeded()
 	{

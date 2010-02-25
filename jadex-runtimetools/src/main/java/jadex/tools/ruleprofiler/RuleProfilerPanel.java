@@ -3,7 +3,7 @@ package jadex.tools.ruleprofiler;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.impl.ElementFlyweight;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SGUI;
 import jadex.commons.TreeExpansionHandler;
@@ -77,7 +77,7 @@ public class RuleProfilerPanel	extends JPanel
 		this.observed	= observed;
 
         // Hack!?!?!
-		((IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class))
+		((IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class))
 			.getExternalAccess(observed, new IResultListener()
 		{
 			public void exceptionOccurred(Object source, Exception exception)

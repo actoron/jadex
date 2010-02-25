@@ -1,12 +1,12 @@
 package jadex.wfms.bdi.ontology;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 /**
  * Request to remove a process model from the repository.
  *
  */
-public class RequestRemoveProcess implements IAgentAction
+public class RequestRemoveProcess implements IComponentAction
 {
 	/** Name of the process model */
 	private String processName;

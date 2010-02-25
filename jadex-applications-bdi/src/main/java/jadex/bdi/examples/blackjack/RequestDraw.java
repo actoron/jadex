@@ -1,6 +1,6 @@
 package jadex.bdi.examples.blackjack;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
 /**
  *  Java class for concept RequestDraw of blackjack_beans ontology.
  */
-public class RequestDraw implements IAgentAction
+public class RequestDraw implements IComponentAction
 {
 	//-------- attributes ----------
 

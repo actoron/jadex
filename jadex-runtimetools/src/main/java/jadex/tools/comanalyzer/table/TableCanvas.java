@@ -5,7 +5,7 @@ import jadex.commons.SUtil;
 import jadex.commons.jtable.ResizeableTableHeader;
 import jadex.commons.jtable.TableSorter;
 import jadex.commons.jtable.VisibilityTableColumnModel;
-import jadex.tools.comanalyzer.Agent;
+import jadex.tools.comanalyzer.Component;
 import jadex.tools.comanalyzer.Message;
 import jadex.tools.comanalyzer.MessageFilterMenu;
 import jadex.tools.comanalyzer.ToolCanvas;
@@ -67,9 +67,9 @@ public class TableCanvas extends ToolCanvas
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.setBackground(UIManager.getColor("List.background"));
 		table.setPreferredScrollableViewportSize(new Dimension(800, 70));
-		table.setDefaultRenderer(IComponentIdentifier.class, new AgentIdentifierRenderer());
+		table.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer());
 		// setDefaultRenderer(Object.class, new ContentRenderer());
-		table.setDefaultRenderer(IComponentIdentifier[].class, new AgentIdentifiersRenderer());
+		table.setDefaultRenderer(IComponentIdentifier[].class, new ComponentIdentifiersRenderer());
 		table.setDefaultRenderer(Date.class, new DateTimeRenderer());
 		table.addMouseListener(new TableMouseListener(table));
 
@@ -147,7 +147,7 @@ public class TableCanvas extends ToolCanvas
 	 * @param isPresent <code>true</code> if removal is skipped. (Can be
 	 * applied to new agents)
 	 */
-	public void updateAgent(Agent agent, boolean update)
+	public void updateComponent(Component agent, boolean update)
 	{
 		// the table dont have a representation for agents
 	}
@@ -157,7 +157,7 @@ public class TableCanvas extends ToolCanvas
 	 * 
 	 * @param agent The agent to remove.
 	 */
-	public void removeAgent(Agent agent)
+	public void removeComponent(Component agent)
 	{
 		// the table dont have a representation for agents
 	}

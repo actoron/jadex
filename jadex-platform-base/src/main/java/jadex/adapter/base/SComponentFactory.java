@@ -12,14 +12,14 @@ import java.util.Map;
 import javax.swing.Icon;
 
 /**
- *  Standard meta agent factory. Uses several sub
+ *  Standard meta component factory. Uses several sub
  *  factories and uses them according to their order
  *  and isLoadable() method.
  */
 public class SComponentFactory
 {	
 	/**
-	 *  Load an agent model.
+	 *  Load an component model.
 	 *  @param model The model.
 	 *  @return The loaded model.
 	 */
@@ -94,7 +94,7 @@ public class SComponentFactory
 	}*/
 	
 	/**
-	 *  Test if a model is startable (e.g. an agent).
+	 *  Test if a model is startable (e.g. a component).
 	 *  @param model The model.
 	 *  @return True, if startable (and should therefore also be loadable).
 	 */

@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- *  Built-in standalone agent platform.
+ *  Built-in standalone component platform.
  */
 public class Platform extends AbstractPlatform
 {
@@ -35,60 +35,45 @@ public class Platform extends AbstractPlatform
 
 	/** The platform service(s). */
 	public static final String SERVICES = PLATFORM+SEPARATOR+"services";
-	
-	/** The platform agent(s). */
-//	public static final String AGENTS = PLATFORM+SEPARATOR+"agents";
-
-//	/** The platform kernel(s). */
-//	public static final String KERNEL = "platform_standalone.kernel";
-
-//	/** The agent factory. */
-//	public static final String AGENT_FACTORY = "agent_factory";
-
-//	/** The application factory. */
-//	public static final String APPLICATION_FACTORY = "application_factory";
-	
-//	/** The agent factory. */
-//	public static final String MESSAGETYPE = "messagetype";
 
 	/** A lib path. */
 	public static final String LIBPATH = PLATFORM+SEPARATOR+"libpath";
 	
-	/** A daemon agent. */
-	public static final String DAEMONAGENT = PLATFORM+SEPARATOR+"daemonagent";
+	/** A daemon component. */
+	public static final String DAEMONCOMPONENT = PLATFORM+SEPARATOR+"daemoncomponent";
 
-	/** An application agent. */
-	public static final String AGENT = PLATFORM+SEPARATOR+"agent";
+	/** An application component. */
+	public static final String COMPONENT = PLATFORM+SEPARATOR+"component";
 
-	/** An application agent. */
+	/** An application component. */
 	public static final String APPLICATION = PLATFORM+SEPARATOR+"application";
 	
-	/** An agent argument. */
+	/** An component argument. */
 	public static final String ARGUMENT = "argument";
 
-	/** An agent argument set. */
+	/** An component argument set. */
 	public static final String ARGUMENTSET = "argumentset";
 	
-	/** An agent model. */
+	/** An component model. */
 	public static final String MODEL = "model";
 	
-	/** An agent config. */
+	/** An component config. */
 	public static final String CONFIG = "config";
 	
-	/** Shut down the platform, when the last agent is killed. */
+	/** Shut down the platform, when the last component is killed. */
 	public static final String AUTOSHUTDOWN = PLATFORM+SEPARATOR+"autoshutdown";
 
 	/** The platform name. */
 	public static final String PLATFORMNAME = PLATFORM+SEPARATOR+"platformname";
 
-	/** Configuration entry for platform shutdown delay (time for agents to terminate gracefully). */
+	/** Configuration entry for platform shutdown delay (time for components to terminate gracefully). */
 	public static String PLATFORM_SHUTDOWN_TIME = PLATFORM+SEPARATOR+"platform_shutdown_time";
 
 	/** The fallback configuration for basic services. */
 	public static final String FALLBACK_SERVICES_CONFIGURATION = "jadex/adapter/standalone/standalone_conf.xml";
 
-	/** The fallback configuration for standard agents (ams/df/jcc). */
-	public static final String FALLBACK_AGENTS_CONFIGURATION = "jadex/adapter/standalone/standalone_platformagents_conf.xml";
+	/** The fallback configuration for standard components (ams/df/jcc). */
+	public static final String FALLBACK_COMPONENTS_CONFIGURATION = "jadex/adapter/standalone/standalone_platformcomponents_conf.xml";
 
 	/** The configuration. */
 	protected Properties[] configurations;
@@ -122,13 +107,6 @@ public class Platform extends AbstractPlatform
 			props[i] = (Properties)PropertiesXMLHelper.getPropertyReader()
 				.read(SUtil.getResource(conffiles[i], classloader), classloader, null);
 		}
-		
-		// Unify properties
-//		Properties ret = props[0];
-//		for(int i=1; i<props.length; i++)
-//		{
-//			ret.addProperties(props[i]);
-//		}
 		
 		return props;
 	}
@@ -195,35 +173,10 @@ public class Platform extends AbstractPlatform
 		fetcher.setValue("$platform", this);
 		fetcher.setValue("$platformname", name);
 		
-//		// Initialize message types.
-//		Property[] props = platconf.getProperties(MESSAGETYPE);
-//		for(int i = 0; i < props.length; i++)
-//		{
-//			messagetypes.put(props[i].getName(), SJavaParser.evaluateExpression(props[i].getValue(), fetcher));
-//		}
-		
 		// Initialize services.
-//		props = platconf.getSubproperty(SERVICES).getProperties();
 		init(Properties.getSubproperties(configurations, SERVICES), fetcher, parent);
-		
-//		for(int i = 0; i < props.length; i++)
-//		{
-//			Class type;
-//			if(props[i].getType()==null)
-//				type = IService.class;
-//			else
-//				type = SReflect.classForName0(props[i].getType(), null);
-//			if(type==null)
-//				throw new RuntimeException("Could not resolve service type: "+props[i].getType());
-//			addService(type, props[i].getName(), (IService)SJavaParser.evaluateExpression(props[i].getValue(), fetcher));
-//		}
 
-//		this.agentfactory = createAgentFactory(platconf, fetcher);
-		
-//		this.appfactory = createApplicationFactory(platconf, fetcher);
-		
 		this.logger = Logger.getLogger("Platform_" + getName());
-
 		
 		// Logger.info("Free Memory: " + Runtime.getRuntime().freeMemory() + " bytes");
 		// Runtime.getRuntime().gc();
@@ -323,16 +276,16 @@ public class Platform extends AbstractPlatform
 			}
 			*/
 	
-			// Create daemon agents.
-			this.daemonagents = SCollection.createLinkedHashSet();
-			Property[] props = Properties.getProperties(configurations, DAEMONAGENT);
+			// Create daemon components.
+			this.daemoncomponents = SCollection.createLinkedHashSet();
+			Property[] props = Properties.getProperties(configurations, DAEMONCOMPONENT);
 //			System.out.println("starting: "+props.length);
 			for(int i = 0; i < props.length; i++)
 			{
 //				System.out.println("starting: "+props[i].getName());
 				createComponent(props[i].getName(), props[i].getValue(), null, null, true);
 			}
-			Properties[] subprops = Properties.getSubproperties(configurations, DAEMONAGENT);
+			Properties[] subprops = Properties.getSubproperties(configurations, DAEMONCOMPONENT);
 			for(int i = 0; i < subprops.length; i++)
 			{
 				Map args = getArguments(subprops[i]);
@@ -340,14 +293,15 @@ public class Platform extends AbstractPlatform
 				Property config = subprops[i].getProperty(CONFIG);
 				createComponent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, true);
 			}
+			
 	
-			// Create application agents.
-			props = Properties.getProperties(configurations, AGENT);
+			// Create application components.
+			props = Properties.getProperties(configurations, COMPONENT);
 			for(int i = 0; i < props.length; i++)
 			{
 				createComponent(props[i].getName(), props[i].getValue(), null, null, false);
 			}
-			subprops = Properties.getSubproperties(configurations, AGENT);
+			subprops = Properties.getSubproperties(configurations, COMPONENT);
 			for(int i = 0; i < subprops.length; i++)
 			{
 				Map args = getArguments(subprops[i]);
@@ -429,7 +383,7 @@ public class Platform extends AbstractPlatform
 	private static Platform	platform;
 
 	/**
-	 *  Start a platform with the agents specified
+	 *  Start a platform with the components specified
 	 *  by the arguments in the form "name:model" or just "model".
 	 */
 	public static void main(String[] args) throws Exception
@@ -450,7 +404,7 @@ public class Platform extends AbstractPlatform
 		}
 		else
 		{
-			conffiles = new String[]{FALLBACK_SERVICES_CONFIGURATION, FALLBACK_AGENTS_CONFIGURATION};
+			conffiles = new String[]{FALLBACK_SERVICES_CONFIGURATION, FALLBACK_COMPONENTS_CONFIGURATION};
 		}
 		
 		// Create an instance of the platform.

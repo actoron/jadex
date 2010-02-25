@@ -4,7 +4,7 @@ import jadex.application.space.envsupport.dataview.IDataView;
 import jadex.application.space.envsupport.environment.AgentActionList.ActionEntry;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.commons.ICommand;
@@ -213,7 +213,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 		});
 		
 		// Add the executor as context listener on the application.
-		IComponentExecutionService	ces	= (IComponentExecutionService)container.getService(IComponentExecutionService.class);
+		IComponentManagementService	ces	= (IComponentManagementService)container.getService(IComponentManagementService.class);
 		ces.addComponentListener(space.getContext().getComponentIdentifier(), new IComponentListener()
 		{
 			

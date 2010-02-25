@@ -6,7 +6,7 @@ import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.agr.AGRSpace;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 import jadex.simulation.helper.Constants;
@@ -201,7 +201,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 		// <argument name="evaporation_rate" typename="Double">0.03</argument>
 
 		try {
-			IComponentExecutionService executionService = (IComponentExecutionService) getScope().getServiceContainer().getService(IComponentExecutionService.class);
+			IComponentManagementService executionService = (IComponentManagementService) getScope().getServiceContainer().getService(IComponentManagementService.class);
 
 			executionService.createComponent(appName, fileName, configName, args, false, null, null, null, false);
 

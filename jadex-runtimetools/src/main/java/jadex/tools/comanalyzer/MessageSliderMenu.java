@@ -86,10 +86,10 @@ public class MessageSliderMenu extends TitlePopupMenu implements ChangeListener
 		label.setText(display);
 
 		// add all agents to the tool if there are non
-		if(tool.agentlist.size() == 0)
+		if(tool.componentlist.size() == 0)
 		{
-			tool.agentlist.addAll(SUtil.arrayToList(tool.getPlugin().getAgents()));
-			tool.agentsChanged((Agent[])tool.agentlist.toArray(new Agent[tool.agentlist.size()]));
+			tool.componentlist.addAll(SUtil.arrayToList(tool.getPlugin().getAgents()));
+			tool.componentsChanged((Component[])tool.componentlist.toArray(new Component[tool.componentlist.size()]));
 		}
 
 		List messages = tool.plugin.getMessageList().getList();

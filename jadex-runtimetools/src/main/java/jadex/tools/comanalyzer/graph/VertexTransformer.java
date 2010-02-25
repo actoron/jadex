@@ -1,6 +1,6 @@
 package jadex.tools.comanalyzer.graph;
 
-import jadex.tools.comanalyzer.Agent;
+import jadex.tools.comanalyzer.Component;
 import jadex.tools.comanalyzer.graph.GraphCanvas.AgentGroup;
 
 import java.awt.Font;
@@ -48,7 +48,7 @@ public class VertexTransformer {
 			if (enabled) {
 				if (((AgentGroup)group).isSingelton()) {
 					// only apply for singelton
-					Agent agent = (Agent)((AgentGroup)group).getSingelton();
+					Component agent = (Component)((AgentGroup)group).getSingelton();
 					String mls = agent.getId();
 					return mls;
 				}
@@ -191,16 +191,16 @@ public class VertexTransformer {
 		public Object transform(Object group)
 		{
 
-			Agent agent = (Agent)((AgentGroup)group).getSingelton();
+			Component agent = (Component)((AgentGroup)group).getSingelton();
 			String iconname = null;
 			// returns the iconname from the agent state
-			if (agent.getState().equals(Agent.STATE_OBSERVED)) {
+			if (agent.getState().equals(Component.STATE_OBSERVED)) {
 				iconname = "agent_standard";
-			} else if (agent.getState().equals(Agent.STATE_IGNORED)) {
+			} else if (agent.getState().equals(Component.STATE_IGNORED)) {
 				iconname = "agent_standard";
-			} else if (agent.getState().equals(Agent.STATE_DEAD)) {
+			} else if (agent.getState().equals(Component.STATE_DEAD)) {
 				iconname = "agent_dead";
-			} else if (agent.getState().equals(Agent.STATE_DUMMY)) {
+			} else if (agent.getState().equals(Component.STATE_DUMMY)) {
 				iconname = "agent_dummy";
 			} else {
 				iconname = "agent_unknown";
@@ -357,7 +357,7 @@ public class VertexTransformer {
 		public Object transform(Object group)
 		{
 			if (((AgentGroup)group).isSingelton()) {
-				return ((Agent)((AgentGroup)group).getSingelton()).getId();
+				return ((Component)((AgentGroup)group).getSingelton()).getId();
 			} else {
 				return null;
 			}

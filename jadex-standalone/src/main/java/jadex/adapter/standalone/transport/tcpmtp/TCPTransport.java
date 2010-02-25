@@ -399,7 +399,7 @@ public class TCPTransport implements ITransport
 	
 	/**
 	 *  Deliver messages to local message service
-	 *  for disptaching to the agents.
+	 *  for disptaching to the components.
 	 *  @param con The connection.
 	 */
 	protected void deliverMessages(TCPInputConnection con)

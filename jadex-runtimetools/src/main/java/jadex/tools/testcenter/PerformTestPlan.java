@@ -4,7 +4,7 @@ import jadex.adapter.base.test.TestReport;
 import jadex.adapter.base.test.Testcase;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.concurrent.IResultListener;
 
@@ -34,7 +34,7 @@ public class PerformTestPlan extends Plan
 		getLogger().info("Performing testcase: "+testcase.getType());
 		long	starttime	= getTime();
 
-		IComponentExecutionService	ces	= (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+		IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
 		try
 		{
 			SyncResultListener	id	= new SyncResultListener();
@@ -84,7 +84,7 @@ public class PerformTestPlan extends Plan
 	{
 		if(testagent!=null)
 		{
-			IComponentExecutionService	ces	= (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+			IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
 			// Empty listener avoids failures printed to console.
 			ces.destroyComponent(testagent, new IResultListener()
 			{

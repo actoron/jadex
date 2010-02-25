@@ -19,7 +19,7 @@
 	
 	<capabilities>
 		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
-		<capability name="amscap" file="jadex.bdi.planlib.ams.AMS"/>
+		<capability name="amscap" file="jadex.bdi.planlib.cms.CMS"/>
 		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 	</capabilities>
 	

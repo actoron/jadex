@@ -16,26 +16,26 @@ public class SFipa
 {
 	//-------- constants --------
 
-	/** The name of the fipa agent management ontology. */
-	public static final String	AGENT_MANAGEMENT_ONTOLOGY_NAME	= "fipa-agent-management";
+	/** The name of the fipa component management ontology. */
+	public static final String	COMPONENT_MANAGEMENT_ONTOLOGY_NAME	= "fipa-component-management";
 
 	/** The FIPA message type. */
 	public static final String MESSAGE_TYPE_NAME_FIPA = "fipa";
 
-	/** The FIPA AMS local agent identifier. */
-//	public static final IFIPAAgentIdentifier AMS = new AgentIdentifier("ams", true);
+	/** The FIPA AMS local component identifier. */
+//	public static final IFIPAComponentIdentifier AMS = new ComponentIdentifier("cms", true);
 
-	/** The default ams agent name. */
-	public static final String AMS_AGENT = "ams";
+	/** The default cms component name. */
+	public static final String CMS_COMPONENT = "cms";
 	
-	/** The FIPA DF local agent identifier. */
-//	public static final IFIPAAgentIdentifier DF = new AgentIdentifier("df", true);
+	/** The FIPA DF local component identifier. */
+//	public static final IFIPAComponentIdentifier DF = new ComponentIdentifier("df", true);
 
-	/** The default df agent name. */
-	public static final String DF_AGENT = "df";
+	/** The default df component name. */
+	public static final String DF_COMPONENT = "df";
 	
 //	/** The (standard) AMS service name. */
-//	public static final String AMS_SERVICE = "ams_service";
+//	public static final String AMS_SERVICE = "cms_service";
 //	
 //	/** The (standard) DF service name. */
 //	public static final String DF_SERVICE = "df_service";
@@ -191,26 +191,26 @@ public class SFipa
 	public static final MessageType FIPA_MESSAGE_TYPE = new FIPAMessageType();
 	
 	/**
-	 *  Clone the agent identifier.
-	 *  @param source The source agent identifier.
-	 *  @param ams The ams service.
+	 *  Clone the component identifier.
+	 *  @param source The source component identifier.
+	 *  @param cms The cms service.
 	 * /
-	public IComponentIdentifier cloneAgentIdentifier(IComponentIdentifier source, IComponentExecutionService ces)
+	public IComponentIdentifier cloneComponentIdentifier(IComponentIdentifier source, IComponentExecutionService ces)
 	{
 		IComponentIdentifier clone = ces.createComponentIdentifier(source.getName(), false, source.getAddresses());
 		
 		// Deep copy of resolvers.
-//		AgentIdentifier[] res = getResolvers();
+//		ComponentIdentifier[] res = getResolvers();
 //		for(int i = 0; i < res.length; i++)
-//			clone.addResolver((AgentIdentifier)res[i].clone());
+//			clone.addResolver((ComponentIdentifier)res[i].clone());
 
 		return clone;
 	}*/
 	
 	/**
-	 *  Clone the ams agent description.
-	 *  @param source The source ams agent description.
-	 *  @param ams The ams service.
+	 *  Clone the cms component description.
+	 *  @param source The source cms component description.
+	 *  @param cms The cms service.
 	 * /
 	public static IComponentDescription cloneComponentDescription(IComponentDescription source, IComponentExecutionService ces)
 	{
@@ -233,8 +233,8 @@ public class SFipa
 	}
 	
 	/**
-	 *  Clone the df agent description.
-	 *  @param source The source df agent description.
+	 *  Clone the df component description.
+	 *  @param source The source df component description.
 	 *  @param df The df service.
 	 */
 	public static IDFComponentDescription cloneDFComponentDescription(IDFComponentDescription source, IDF df)

@@ -1,7 +1,7 @@
 package jadex.microkernel;
 
 import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageService;
@@ -258,8 +258,8 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public void killAgent()
 	{
-		((IComponentExecutionService)interpreter.getAgentAdapter().getServiceContainer()
-			.getService(IComponentExecutionService.class))
+		((IComponentManagementService)interpreter.getAgentAdapter().getServiceContainer()
+			.getService(IComponentManagementService.class))
 			.destroyComponent(interpreter.getAgentAdapter().getComponentIdentifier(), null);
 	}
 		

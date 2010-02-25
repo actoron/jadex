@@ -3,13 +3,13 @@
  */
 package jadex.bdi.examples.hunterprey_classic;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 
 /**
  *  Java class for concept RequestWorldSize of hunterprey_beans ontology.
  */
-public class RequestWorldSize implements IAgentAction
+public class RequestWorldSize implements IComponentAction
 {
 	//-------- attributes ----------
 

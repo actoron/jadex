@@ -1,7 +1,7 @@
 package jadex.tools.debugger;
 
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentListener;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
@@ -242,7 +242,7 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 			}
 		});
 
-		IComponentExecutionService ces = (IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class);
+		IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
 		ces.getComponentDescriptions(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)

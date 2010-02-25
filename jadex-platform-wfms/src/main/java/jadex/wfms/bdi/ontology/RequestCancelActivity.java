@@ -1,10 +1,10 @@
 package jadex.wfms.bdi.ontology;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 
-public class RequestCancelActivity implements IAgentAction
+public class RequestCancelActivity implements IComponentAction
 {
 	private IClientActivity activity;
 	

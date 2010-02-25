@@ -3,7 +3,7 @@ package jadex.application.space.envsupport.environment;
 import jadex.application.space.envsupport.dataview.IDataView;
 import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentListener;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
@@ -175,7 +175,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 		}
 		
 		// Add the executor as context listener on the application.
-		IComponentExecutionService	ces	= (IComponentExecutionService)container.getService(IComponentExecutionService.class);
+		IComponentManagementService	ces	= (IComponentManagementService)container.getService(IComponentManagementService.class);
 		ces.addComponentListener(space.getContext().getComponentIdentifier(), new IComponentListener()
 		{
 			

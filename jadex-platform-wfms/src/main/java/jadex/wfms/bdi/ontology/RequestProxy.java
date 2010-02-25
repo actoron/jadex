@@ -1,10 +1,10 @@
 package jadex.wfms.bdi.ontology;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 import jadex.bridge.IComponentIdentifier;
 import jadex.wfms.client.IClient;
 
-public class RequestProxy implements IAgentAction
+public class RequestProxy implements IComponentAction
 {
 	/** The component identifier */
 	private IComponentIdentifier componentIdentifier;

@@ -13,7 +13,7 @@
 
 	<capabilities>
 		<!-- AMS capability is required to kill other agents on exit. -->
-		<capability name="amscap" file="jadex.bdi.planlib.ams.AMS"/>
+		<capability name="amscap" file="jadex.bdi.planlib.cms.CMS"/>
 	</capabilities>
 	
 	<beliefs>

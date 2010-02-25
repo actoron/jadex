@@ -12,7 +12,7 @@ import jadex.application.runtime.ISpace;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
@@ -345,8 +345,8 @@ public class Application	implements IApplication, IComponentInstance
 	 */
 	public void killApplication()
 	{
-		((IComponentExecutionService)getComponentAdapter().getServiceContainer()
-			.getService(IComponentExecutionService.class))
+		((IComponentManagementService)getComponentAdapter().getServiceContainer()
+			.getService(IComponentManagementService.class))
 			.destroyComponent(getComponentAdapter().getComponentIdentifier(), null);
 	}
 	
@@ -698,7 +698,7 @@ public class Application	implements IApplication, IComponentInstance
 				int num = agent.getNumber(this, cl);
 				for(int j=0; j<num; j++)
 				{
-					IComponentExecutionService	ces	= (IComponentExecutionService)adapter.getServiceContainer().getService(IComponentExecutionService.class);
+					IComponentManagementService	ces	= (IComponentManagementService)adapter.getServiceContainer().getService(IComponentManagementService.class);
 					ces.createComponent(agent.getName(), agent.getType(model.getApplicationType()).getFilename(), agent.getConfiguration(), 
 						agent.getArguments(this, cl), agent.isSuspended(), null, adapter.getComponentIdentifier(), null, agent.isMaster());					
 	//				context.createAgent(agent.getName(), agent.getTypeName(),

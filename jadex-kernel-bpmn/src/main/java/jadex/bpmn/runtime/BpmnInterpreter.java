@@ -20,7 +20,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
@@ -311,8 +311,8 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			
 			if(!finishing && isFinished(null, null))
 			{
-				((IComponentExecutionService)adapter.getServiceContainer()
-					.getService(IComponentExecutionService.class))
+				((IComponentManagementService)adapter.getServiceContainer()
+					.getService(IComponentManagementService.class))
 					.destroyComponent(adapter.getComponentIdentifier(), null);
 				finishing = true;
 			}

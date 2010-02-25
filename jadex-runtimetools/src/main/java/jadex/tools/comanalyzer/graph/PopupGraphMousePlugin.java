@@ -1,7 +1,7 @@
 package jadex.tools.comanalyzer.graph;
 
-import jadex.tools.comanalyzer.Agent;
-import jadex.tools.comanalyzer.AgentFilterMenu;
+import jadex.tools.comanalyzer.Component;
+import jadex.tools.comanalyzer.ComponentFilterMenu;
 import jadex.tools.comanalyzer.Message;
 import jadex.tools.comanalyzer.MessageFilterMenu;
 import jadex.tools.comanalyzer.graph.GraphCanvas.AgentGroup;
@@ -66,7 +66,7 @@ class PopupGraphMousePlugin extends AbstractPopupGraphMousePlugin implements Mou
 			{
 				if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2)
 				{
-					canvas.getToolTab().getToolPanel().showElementDetails(((Agent)agents.getSingelton()).getParameters());
+					canvas.getToolTab().getToolPanel().showElementDetails(((Component)agents.getSingelton()).getParameters());
 				}
 			}
 		}
@@ -85,7 +85,7 @@ class PopupGraphMousePlugin extends AbstractPopupGraphMousePlugin implements Mou
 		if (pickSupport != null) {
 			AgentGroup v = (AgentGroup)pickSupport.getVertex(vv.getGraphLayout(), p.getX(), p.getY());
 			if (v != null) {
-				AgentFilterMenu apopup;
+				ComponentFilterMenu apopup;
 				Set picked = vv.getPickedVertexState().getPicked();
 				if (picked.contains(v)) {
 					List agents = new ArrayList();
@@ -93,7 +93,7 @@ class PopupGraphMousePlugin extends AbstractPopupGraphMousePlugin implements Mou
 					{
 						agents.addAll(((AgentGroup)it.next()).getElements());
 					}
-					apopup = new AgentFilterMenu(canvas.getToolTab().getPlugin(), (Agent[]) agents.toArray(new Agent[agents.size()]));
+					apopup = new ComponentFilterMenu(canvas.getToolTab().getPlugin(), (Component[]) agents.toArray(new Component[agents.size()]));
 				} 
 				else 
 				{
@@ -101,7 +101,7 @@ class PopupGraphMousePlugin extends AbstractPopupGraphMousePlugin implements Mou
 					vv.getPickedVertexState().pick(v, true);
 					vv.repaint();
 					List agents = v.getElements();
-					apopup = new AgentFilterMenu(canvas.getToolTab().getPlugin(), (Agent[]) agents.toArray(new Agent[agents.size()]));
+					apopup = new ComponentFilterMenu(canvas.getToolTab().getPlugin(), (Component[]) agents.toArray(new Component[agents.size()]));
 				}
 
 				apopup.show(vv, e.getX(), e.getY());

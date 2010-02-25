@@ -63,8 +63,8 @@ public interface IComponentDescription
 	public String[]	getBreakpoints();
 	
 	/**
-	 *  Is the agent a master.
-	 *  @return True, if master agent.
+	 *  Is the component a master.
+	 *  @return True, if master component.
 	 */
 	public boolean isMaster();
 }

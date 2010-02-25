@@ -3,13 +3,13 @@
  */
 package jadex.bdi.examples.blackjack;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 
 /**
  *  Editable Java class for concept <code>RequestFinished</code> of blackjack_beans ontology.
  */
-public class RequestFinished implements IAgentAction
+public class RequestFinished implements IComponentAction
 {
 	//-------- attributes ----------
 

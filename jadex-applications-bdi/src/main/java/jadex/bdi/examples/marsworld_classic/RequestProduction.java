@@ -4,13 +4,13 @@
  */
 package jadex.bdi.examples.marsworld_classic;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 
 /**
  *  Java class for concept RequestProduction of mars_beans ontology.
  */
-public class RequestProduction implements IAgentAction
+public class RequestProduction implements IComponentAction
 {
 	//-------- attributes ----------
 

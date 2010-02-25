@@ -10,7 +10,7 @@ import jadex.bdi.runtime.IEvent;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 
@@ -33,8 +33,8 @@ public class DFTestPlan extends Plan
 		num	= performInitialTests(num);
 		num = performTests(num, null); // test locally
 		
-		IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
-		IComponentIdentifier da = ces.createComponentIdentifier(SFipa.DF_AGENT, true, null);
+		IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
+		IComponentIdentifier da = ces.createComponentIdentifier(SFipa.DF_COMPONENT, true, null);
 		performTests(num, da); // test remotely
 	}
 	

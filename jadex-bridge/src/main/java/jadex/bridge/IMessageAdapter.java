@@ -4,7 +4,7 @@ import java.util.Map;
 
 
 /**
- *  Interface for external messages to be passed to a kernel agent.
+ *  Interface for external messages to be passed to a kernel component.
  */
 //Todo: remove this struct?
 public interface IMessageAdapter

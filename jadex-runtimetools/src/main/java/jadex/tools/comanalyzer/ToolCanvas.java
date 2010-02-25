@@ -55,13 +55,13 @@ public abstract class ToolCanvas extends JPanel
 	 * @param isPresent <code>true</code> if removal is skipped. (Can be
 	 * applied to new agents)
 	 */
-	public abstract void updateAgent(Agent agent, boolean update);
+	public abstract void updateComponent(Component agent, boolean update);
 
 	/** 
 	 * Removes an agent.
 	 * @param agent The agent to remove.
 	 */
-	public abstract void removeAgent(Agent agent);
+	public abstract void removeComponent(Component agent);
 
 	/** 
 	 * Clear the canvas and remove all internal messages and agents.

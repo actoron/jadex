@@ -1,12 +1,12 @@
 package jadex.bdi.examples.cleanerworld_classic;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 
 /**
  *  Java class for concept RequestPickUpWaste of cleaner_beans ontology.
  */
-public class RequestPickUpWaste implements IAgentAction
+public class RequestPickUpWaste implements IComponentAction
 {
 
 	//-------- attributes ----------

@@ -3,7 +3,7 @@ package jadex.wfms.service.impl;
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
@@ -105,7 +105,7 @@ public class BpmnProcessService implements IExecutionService, IService
 			
 			Logger.getLogger("Wfms").log(Level.INFO, "Starting BPMN process " + id.toString());
 			//final BpmnInterpreter instance = new BpmnInterpreter(adapter, model, arguments, config, handlers, fetcher);
-			final IComponentExecutionService ces = (IComponentExecutionService)wfms.getService(IComponentExecutionService.class);
+			final IComponentManagementService ces = (IComponentManagementService)wfms.getService(IComponentManagementService.class);
 			//instance.setWfms(wfms);
 			//BpmnExecutor executor = new BpmnExecutor(instance, true);
 			ces.createComponent(String.valueOf(id), modelname, null, arguments, true, new IResultListener()

@@ -1,11 +1,11 @@
 package jadex.tools.ontology;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 /**
  *  Java class for concept ToolRequest of jadex.tools.introspector ontology.
  */
-public abstract class ToolRequest implements IAgentAction
+public abstract class ToolRequest implements IComponentAction
 {
 	//-------- attributes ----------
 

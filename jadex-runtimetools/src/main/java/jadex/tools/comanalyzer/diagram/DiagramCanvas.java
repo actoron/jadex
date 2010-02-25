@@ -1,8 +1,8 @@
 package jadex.tools.comanalyzer.diagram;
 
 import jadex.commons.collection.SortedList;
-import jadex.tools.comanalyzer.Agent;
-import jadex.tools.comanalyzer.AgentFilterMenu;
+import jadex.tools.comanalyzer.Component;
+import jadex.tools.comanalyzer.ComponentFilterMenu;
 import jadex.tools.comanalyzer.Message;
 import jadex.tools.comanalyzer.MessageFilterMenu;
 import jadex.tools.comanalyzer.ToolCanvas;
@@ -31,14 +31,14 @@ public class DiagramCanvas extends ToolCanvas
 
 	// -------- attributes --------
 
-	/** The panel for agents */
-	protected AgentCanvas header;
+	/** The panel for components */
+	protected ComponentCanvas header;
 
 	/** The panel for messages */
 	protected MessageCanvas detail;
 
-	/** Internal agentlist for display */
-	protected SortedList visible_agents;
+	/** Internal componentlist for display */
+	protected SortedList visible_components;
 
 	/** Internal messagelist for display */
 	protected SortedMap visible_messages;
@@ -57,11 +57,11 @@ public class DiagramCanvas extends ToolCanvas
 	{
 		super(tooltab);
 
-		visible_agents = new SortedList();
+		visible_components = new SortedList();
 		visible_messages = new TreeMap();
 
-		// init agent and messages panel
-		header = new AgentCanvas(this);
+		// init component and messages panel
+		header = new ComponentCanvas(this);
 		detail = new MessageCanvas(this);
 
 		JScrollPane scroll = new JScrollPane();
@@ -71,13 +71,13 @@ public class DiagramCanvas extends ToolCanvas
 		this.setLayout(new BorderLayout());
 		this.add(BorderLayout.CENTER, scroll);
 
-		// change cursor when over an agent
+		// change cursor when over an component
 		header.addMouseMotionListener(new MouseMotionAdapter()
 		{
 			public void mouseMoved(MouseEvent e)
 			{
-				Agent selectedAgent = header.getAgent(e.getX(), e.getY());
-				if((selectedAgent != null))
+				Component selectedComponent = header.getComponent(e.getX(), e.getY());
+				if((selectedComponent != null))
 				{
 					setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 				}
@@ -95,20 +95,20 @@ public class DiagramCanvas extends ToolCanvas
 			{
 				if(e.getButton() == MouseEvent.BUTTON3)
 				{
-					Agent selectedAgent = header.getAgent(e.getX(), e.getY());
-					if((selectedAgent != null))
+					Component selectedComponent = header.getComponent(e.getX(), e.getY());
+					if((selectedComponent != null))
 					{
-						AgentFilterMenu mpopup = new AgentFilterMenu(tooltab.getPlugin(), selectedAgent);
+						ComponentFilterMenu mpopup = new ComponentFilterMenu(tooltab.getPlugin(), selectedComponent);
 						mpopup.show(e.getComponent(), e.getX(), e.getY());
 					}
 
 				}
 				if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2)
 				{
-					Agent selectedAgent = header.getAgent(e.getX(), e.getY());
-					if((selectedAgent != null))
+					Component selectedComponent = header.getComponent(e.getX(), e.getY());
+					if((selectedComponent != null))
 					{
-						tooltab.getToolPanel().showElementDetails(selectedAgent.getParameters());
+						tooltab.getToolPanel().showElementDetails(selectedComponent.getParameters());
 					}
 				}
 			}
@@ -178,8 +178,8 @@ public class DiagramCanvas extends ToolCanvas
 
 		if(newPair != null)
 		{
-			Agent sender = (Agent)newPair.getFirst();
-			Agent receiver = (Agent)newPair.getSecond();
+			Component sender = (Component)newPair.getFirst();
+			Component receiver = (Component)newPair.getSecond();
 			// check if message is already displayed
 			if(visible_messages.containsKey(message))
 			{
@@ -218,37 +218,37 @@ public class DiagramCanvas extends ToolCanvas
 	}
 
 	/**
-	 * Updates an agent by adding it, if the agent can be displayed or removing
+	 * Updates an component by adding it, if the component can be displayed or removing
 	 * it if present.
 	 * 
-	 * @param agent The agent to add.
+	 * @param component The component to add.
 	 * @param isPresent <code>true</code> if removal is skipped. (Can be
-	 * applied to new agents)
+	 * applied to new components)
 	 */
-	public void updateAgent(Agent agent, boolean update)
+	public void updateComponent(Component component, boolean update)
 	{
-		if(agent.isVisible())
+		if(component.isVisible())
 		{
-			if(!visible_agents.contains(agent))
+			if(!visible_components.contains(component))
 			{
-				addAgent(agent);
+				addComponent(component);
 			}
 		}
 		else if(update)
 		{
-			removeAgent(agent);
+			removeComponent(component);
 		}
 		return;
 	}
 
 	/**
-	 * Removes an agent.
+	 * Removes an component.
 	 * 
-	 * @param agent The agent to remove.
+	 * @param component The component to remove.
 	 */
-	public void removeAgent(Agent agent)
+	public void removeComponent(Component component)
 	{
-		visible_agents.remove(agent);
+		visible_components.remove(component);
 	}
 
 	/**
@@ -259,7 +259,7 @@ public class DiagramCanvas extends ToolCanvas
 	public void repaintCanvas()
 	{
 
-		int horDim = (visible_agents.size() * 80);
+		int horDim = (visible_components.size() * 80);
 		int vertDim = 20 + (visible_messages.size() * 20);
 		header.setPreferredSize();
 		detail.setPreferredSize();
@@ -277,11 +277,11 @@ public class DiagramCanvas extends ToolCanvas
 	}
 
 	/**
-	 * Clear the diagramm by removing all messages and agents.
+	 * Clear the diagramm by removing all messages and components.
 	 */
 	public void clear()
 	{
-		visible_agents.clear();
+		visible_components.clear();
 		visible_messages.clear();
 	}
 
@@ -304,12 +304,12 @@ public class DiagramCanvas extends ToolCanvas
 	}
 
 	/**
-	 * Adds the agent.
-	 * @param agent The agent to add.
+	 * Adds the component.
+	 * @param component The component to add.
 	 */
-	public void addAgent(Agent agent)
+	public void addComponent(Component component)
 	{
-		visible_agents.add(agent);
+		visible_components.add(component);
 	}
 
 	/**
@@ -319,7 +319,7 @@ public class DiagramCanvas extends ToolCanvas
 	 * @param sender The sender in the presentation.
 	 * @param receiver The receiver in the presentation. (e.g. dummy)
 	 */
-	public void addMessage(Message message, Agent sender, Agent receiver)
+	public void addMessage(Message message, Component sender, Component receiver)
 	{
 		visible_messages.put(message, new Pair(sender, receiver));
 	}

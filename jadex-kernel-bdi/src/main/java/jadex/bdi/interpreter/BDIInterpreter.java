@@ -15,7 +15,7 @@ import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
@@ -561,8 +561,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 */
 	public void	killAgent()
 	{
-		((IComponentExecutionService)adapter.getServiceContainer()
-			.getService(IComponentExecutionService.class))
+		((IComponentManagementService)adapter.getServiceContainer()
+			.getService(IComponentManagementService.class))
 			.destroyComponent(adapter.getComponentIdentifier(), null);
 	}
 	/**

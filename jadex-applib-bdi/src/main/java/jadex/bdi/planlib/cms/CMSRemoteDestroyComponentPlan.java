@@ -1,0 +1,29 @@
+package jadex.bdi.planlib.cms;
+
+import jadex.adapter.base.fipa.CMSDestroyComponent;
+import jadex.adapter.base.fipa.SFipa;
+import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.Plan;
+import jadex.bridge.IComponentIdentifier;
+
+/**
+ *  Destroy an component on a remote cms.
+ */
+public class CMSRemoteDestroyComponentPlan extends Plan
+{
+	/**
+	 * The body method is called on the
+	 * instatiated plan instance from the scheduler.
+	 */
+	public void body()
+	{
+		CMSDestroyComponent da = new CMSDestroyComponent();
+		da.setComponentIdentifier((IComponentIdentifier)getParameter("componentidentifier").getValue());
+
+		IGoal req = createGoal("rp_initiate");
+		req.getParameter("receiver").setValue(getParameter("cms").getValue());
+		req.getParameter("action").setValue(da);
+		req.getParameter("ontology").setValue(SFipa.COMPONENT_MANAGEMENT_ONTOLOGY_NAME);
+		dispatchSubgoalAndWait(req);
+	}
+}

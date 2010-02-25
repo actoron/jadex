@@ -18,7 +18,7 @@ public class InterpreterTimedObject implements ITimedObject
 	protected CheckedAction action;
 	
 	/** The component execution service. */
-	protected IComponentExecutionService ces;
+	protected IComponentManagementService ces;
 
 	/** The component identifier. */
 	protected IComponentIdentifier cid;
@@ -32,7 +32,7 @@ public class InterpreterTimedObject implements ITimedObject
 	{
 		this.adapter = adapter;
 		this.action = runnable;
-		this.ces = (IComponentExecutionService)adapter.getServiceContainer().getService(IComponentExecutionService.class);
+		this.ces = (IComponentManagementService)adapter.getServiceContainer().getService(IComponentManagementService.class);
 		this.cid = adapter.getComponentIdentifier();
 	}
 	
@@ -67,7 +67,7 @@ public class InterpreterTimedObject implements ITimedObject
 			}
 		});
 		
-		// else agent was terminated
+		// else component was terminated
 	}
 	
 	/**

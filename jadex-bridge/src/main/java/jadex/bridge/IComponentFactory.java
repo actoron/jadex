@@ -1,7 +1,5 @@
 package jadex.bridge;
 
-import jadex.service.IService;
-
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -30,7 +28,7 @@ public interface IComponentFactory
 	public boolean isLoadable(String model);
 	
 	/**
-	 *  Test if a model is startable (e.g. an agent).
+	 *  Test if a model is startable (e.g. an component).
 	 *  @param model The model (e.g. file name).
 	 *  @return True, if startable (and loadable).
 	 */
@@ -57,7 +55,7 @@ public interface IComponentFactory
 	 * @param adapter The component adapter.
 	 * @param model The component model.
 	 * @param config The name of the configuration (or null for default configuration) 
-	 * @param arguments The arguments for the agent as name/value pairs.
+	 * @param arguments The arguments for the component as name/value pairs.
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */

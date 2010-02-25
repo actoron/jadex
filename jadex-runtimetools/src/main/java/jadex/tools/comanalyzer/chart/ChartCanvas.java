@@ -1,6 +1,6 @@
 package jadex.tools.comanalyzer.chart;
 
-import jadex.tools.comanalyzer.Agent;
+import jadex.tools.comanalyzer.Component;
 import jadex.tools.comanalyzer.Message;
 import jadex.tools.comanalyzer.MessageFilterMenu;
 import jadex.tools.comanalyzer.PaintMaps;
@@ -206,7 +206,7 @@ public class ChartCanvas extends ToolCanvas
 	 * @param isPresent <code>true</code> if removal is skipped. (Can be
 	 * applied to new agents)
 	 */
-	public void updateAgent(Agent agent, boolean update)
+	public void updateComponent(Component agent, boolean update)
 	{
 		if(agent.isVisible())
 		{
@@ -217,7 +217,7 @@ public class ChartCanvas extends ToolCanvas
 		}
 		else if(update)
 		{
-			removeAgent(agent);
+			removeComponent(agent);
 		}
 		return;
 	}
@@ -227,7 +227,7 @@ public class ChartCanvas extends ToolCanvas
 	 * 
 	 * @param agent The agent to remove.
 	 */
-	public void removeAgent(Agent agent)
+	public void removeComponent(Component agent)
 	{
 		visible_agents.remove(agent);
 	}
@@ -259,7 +259,7 @@ public class ChartCanvas extends ToolCanvas
 	 * 
 	 * @param agent The agent to add.
 	 */
-	public void addAgent(Agent agent)
+	public void addAgent(Component agent)
 	{
 		visible_agents.add(agent);
 	}
@@ -352,7 +352,7 @@ public class ChartCanvas extends ToolCanvas
 		// add visible items again
 		for(Iterator iter = agents.iterator(); iter.hasNext();)
 		{
-			Agent agent = (Agent)iter.next();
+			Component agent = (Component)iter.next();
 			addAgent(agent);
 		}
 		for(Iterator iter = messages.iterator(); iter.hasNext();)
@@ -418,7 +418,7 @@ public class ChartCanvas extends ToolCanvas
 		{
 			PiePlot pieplot = (PiePlot)((MultiplePiePlot)plot).getPieChart().getPlot(); // ????
 			ChartLabelGenerator generator = new ChartLabelGenerator(ChartLabelGenerator.DEFAULT_ITEM_LABEL_FORMAT);
-			generator.setDefaultRenderer(Agent.class, new AgentKeyRenderer());
+			generator.setDefaultRenderer(Component.class, new AgentKeyRenderer());
 			pieplot.setLabelGenerator(showLabels ? generator : null);
 		}
 		if(plot instanceof CategoryPlot)
@@ -521,10 +521,10 @@ public class ChartCanvas extends ToolCanvas
 
 		// The label renderer. Labels are provided by the bar renderer.
 		ChartLabelGenerator generator_simple = new ChartLabelGenerator(ChartLabelGenerator.DEFAULT_LABEL_FORMAT);
-		generator_simple.setDefaultRenderer(Agent.class, new AgentKeyRenderer());
+		generator_simple.setDefaultRenderer(Component.class, new AgentKeyRenderer());
 		generator_simple.setDefaultRenderer(String.class, new GroupKeyRenderer());
 		ChartLabelGenerator generator_advanced = new ChartLabelGenerator(ChartLabelGenerator.DEFAULT_ITEM_LABEL_FORMAT);
-		generator_advanced.setDefaultRenderer(Agent.class, new AgentKeyRenderer());
+		generator_advanced.setDefaultRenderer(Component.class, new AgentKeyRenderer());
 		generator_advanced.setDefaultRenderer(String.class, new GroupKeyRenderer());
 
 		renderer.setLegendItemLabelGenerator(generator_simple);
@@ -578,9 +578,9 @@ public class ChartCanvas extends ToolCanvas
 
 		// create label renderers
 		ChartLabelGenerator generator_simple = new ChartLabelGenerator(ChartLabelGenerator.DEFAULT_LABEL_FORMAT);
-		generator_simple.setDefaultRenderer(Agent.class, new AgentKeyRenderer());
+		generator_simple.setDefaultRenderer(Component.class, new AgentKeyRenderer());
 		ChartLabelGenerator generator_advanced = new ChartLabelGenerator(ChartLabelGenerator.DEFAULT_ITEM_LABEL_FORMAT);
-		generator_advanced.setDefaultRenderer(Agent.class, new AgentKeyRenderer());
+		generator_advanced.setDefaultRenderer(Component.class, new AgentKeyRenderer());
 
 		// legend is generated in multiple pie plot
 		// plot.setBaseItemLabelGenerator(showLabels ? generator_advanced :
@@ -683,7 +683,7 @@ public class ChartCanvas extends ToolCanvas
 	{
 		public String render(Comparable key)
 		{
-			return ((Agent)key).getId();
+			return ((Component)key).getId();
 		}
 	}
 

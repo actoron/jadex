@@ -21,17 +21,17 @@ import jade.domain.JADEAgentManagement.JADEManagementOntology;
 import jade.domain.JADEAgentManagement.KillAgent;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.List;
-import jadex.adapter.base.fipa.AMSCreateAgent;
-import jadex.adapter.base.fipa.AMSDestroyAgent;
-import jadex.adapter.base.fipa.AMSResumeAgent;
-import jadex.adapter.base.fipa.AMSSearchAgents;
-import jadex.adapter.base.fipa.AMSSuspendAgent;
+import jadex.adapter.base.fipa.CMSCreateComponent;
+import jadex.adapter.base.fipa.CMSDestroyComponent;
+import jadex.adapter.base.fipa.CMSResumeComponent;
+import jadex.adapter.base.fipa.CMSSearchComponents;
+import jadex.adapter.base.fipa.CMSSuspendComponent;
 import jadex.adapter.base.fipa.DFDeregister;
 import jadex.adapter.base.fipa.DFModify;
 import jadex.adapter.base.fipa.DFRegister;
 import jadex.adapter.base.fipa.DFSearch;
 import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 import jadex.adapter.base.fipa.IDFComponentDescription;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bridge.IComponentDescription;
@@ -200,7 +200,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 							{
 								Action	action	= (Action)((Done)content).getAction();
 								Concept	request	= action.getAction();
-								IAgentAction	jadexaction	= null;
+								IComponentAction	jadexaction	= null;
 								if(request instanceof Register)
 								{
 									IDFComponentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Register)request).getDescription(), ams);
@@ -217,9 +217,9 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 									{
 										IComponentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription)((Modify)request).getDescription(), ams);
 										if(AMSAgentDescription.SUSPENDED.equals(amsadesc.getState()))
-											jadexaction	= new AMSSuspendAgent(amsadesc.getName());
+											jadexaction	= new CMSSuspendComponent(amsadesc.getName());
 										else
-											jadexaction	= new AMSResumeAgent(amsadesc.getName());
+											jadexaction	= new CMSResumeComponent(amsadesc.getName());
 										// todo: AMSStartAgent ???
 									}
 									else
@@ -235,11 +235,11 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 									AID tmp = (AID)msg.getSender();
 									int idx = tmp.getName().indexOf("@");
 									tmp.setName(((CreateAgent)request).getAgentName() + tmp.getName().substring(idx));
-									jadexaction	= new AMSCreateAgent(SJade.convertAIDtoFipa(tmp, ams));
+									jadexaction	= new CMSCreateComponent(SJade.convertAIDtoFipa(tmp, ams));
 								}
 								else if(request instanceof KillAgent)
 								{
-									jadexaction	= new AMSDestroyAgent(SJade.convertAIDtoFipa(((KillAgent)request).getAgent(), ams));
+									jadexaction	= new CMSDestroyComponent(SJade.convertAIDtoFipa(((KillAgent)request).getAgent(), ams));
 								}
 								else
 								{
@@ -251,7 +251,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 							{
 								Action	action	= (Action)((Result)content).getAction();
 								Concept	request	= action.getAction();
-								IAgentAction	jadexaction	= null;
+								IComponentAction	jadexaction	= null;
 								if(request instanceof Search)
 								{
 									if(msg.getSender().getLocalName().toLowerCase().indexOf("ams")!=-1)
@@ -261,7 +261,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 										IComponentDescription[]	results	= new IComponentDescription[items.size()];
 										for(int i=0; i<results.length; i++)
 											results[i]	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription) items.get(i), ams);
-										jadexaction	= new AMSSearchAgents(amsadesc, results);
+										jadexaction	= new CMSSearchComponents(amsadesc, results);
 									}
 									else
 									{

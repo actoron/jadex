@@ -105,7 +105,7 @@
 		</properties>
 		
 		<!-- Agents. -->
-  		<property type="daemonagent" name="ams">jadex/bdi/amsagent/AMS.agent.xml</property>
+  		<property type="daemonagent" name="ams">jadex/bdi/cmsagent/CMS.agent.xml</property>
 		<property type="daemonagent" name="df">jadex/bdi/dfagent/DF.agent.xml</property>
  		<property type="agent" name="jcc">jadex/tools/jcc/JCC.agent.xml</property>
 	

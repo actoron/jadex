@@ -1,13 +1,13 @@
 package jadex.adapter.standalone;
 
 import jadex.adapter.standalone.fipaimpl.ComponentIdentifier;
-import jadex.adapter.standalone.service.componentexecution.ComponentExecutionService;
+import jadex.adapter.standalone.service.componentexecution.ComponentManagementService;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.ILoadableComponentModel;
@@ -73,8 +73,8 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	
 	//-------- external actions --------
 
-	/** The thread executing the agent (null for none). */
-	// Todo: need not be transient, because agent should only be serialized when no action is running?
+	/** The thread executing the component (null for none). */
+	// Todo: need not be transient, because component should only be serialized when no action is running?
 	protected transient Thread componentthread;
 
 	// todo: ensure that entries are empty when saving
@@ -111,12 +111,12 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	//-------- IComponentAdapter methods --------
 
 	/**
-	 *  Called by the agent when it probably awoke from an idle state.
-	 *  The platform has to make sure that the agent will be executed
+	 *  Called by the component when it probably awoke from an idle state.
+	 *  The platform has to make sure that the component will be executed
 	 *  again from now on.
 	 *  Note, this method can be called also from external threads
 	 *  (e.g. property changes). Therefore, on the calling thread
-	 *  no agent related actions must be executed (use some kind
+	 *  no component related actions must be executed (use some kind
 	 *  of wake-up mechanism).
 	 *  Also proper synchronization has to be made sure, as this method
 	 *  can be called concurrently from different threads.
@@ -128,7 +128,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		
 		// todo: check this assert meaning!
 		
-		// Verify that the agent is running.
+		// Verify that the component is running.
 //		assert !IComponentDescription.STATE_INITIATED.equals(state) : this;
 		
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
@@ -137,11 +137,11 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		// Change back to suspended, when previously waiting.
 		if(IComponentDescription.STATE_WAITING.equals(desc.getState()))
 		{
-			ComponentExecutionService	ces	= (ComponentExecutionService)container.getService(IComponentExecutionService.class);
+			ComponentManagementService	ces	= (ComponentManagementService)container.getService(IComponentManagementService.class);
 			ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
 		}
 
-		// Resume execution of the agent (when active or terminating).
+		// Resume execution of the component (when active or terminating).
 		if(IComponentDescription.STATE_ACTIVE.equals(desc.getState())
 			/*|| IComponentDescription.STATE_TERMINATING.equals(desc.getState())*/
 			|| IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))	// Hack!!! external entries must also be executed in suspended state.
@@ -215,20 +215,20 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	}
 	
 	/**
-	 *  String representation of the agent.
+	 *  String representation of the component.
 	 */
 	public String toString()
 	{
-		return "StandaloneAgentAdapter("+cid.getName()+")";
+		return "StandaloneComponentAdapter("+cid.getName()+")";
 	}
 
 	//-------- methods called by the standalone platform --------
 
 	/**
-	 *  Gracefully terminate the agent.
+	 *  Gracefully terminate the component.
 	 *  This method is called from ams and delegated to the reasoning engine,
 	 *  which might perform arbitrary cleanup actions, goals, etc.
-	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
+	 *  @param listener	When cleanup of the component is finished, the listener must be notified.
 	 */
 	public void killComponent(final IResultListener listener)
 	{
@@ -259,7 +259,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	}
 
 	/**
-	 *  Called when a message was sent to the agent.
+	 *  Called when a message was sent to the component.
 	 *  (Called from message transport).
 	 *  (Is it ok to call on external thread?).
 	 */
@@ -281,7 +281,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	//-------- IExecutable interface --------
 
 	/**
-	 *  Executable code for running the agent
+	 *  Executable code for running the component
 	 *  in the platforms executor service.
 	 */
 	public boolean	execute()
@@ -305,7 +305,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			{
 				entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
 //				for(int i=0; i<ext_entries.size(); i++)
-//					state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, ext_entries.get(i));
+//					state.addAttributeValue(rcomponent, OAVBDIRuntimeModel.agent_has_actions, ext_entries.get(i));
 				ext_entries.clear();
 				
 				extexecuted	= true;
@@ -365,7 +365,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		{
 			if(component.isAtBreakpoint(desc.getBreakpoints()))
 			{
-				ComponentExecutionService	ces	= (ComponentExecutionService)container.getService(IComponentExecutionService.class);
+				ComponentManagementService	ces	= (ComponentManagementService)container.getService(IComponentManagementService.class);
 				ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
 			}
 		}
@@ -387,15 +387,15 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 				//agent.getLogger().severe("Fatal error, agent '"+aid+"' will be removed.");
 				System.out.println("Fatal error, agent '"+cid+"' will be removed.");
 					
-				// Remove agent from platform.
-				((IComponentExecutionService)container.getService(IComponentExecutionService.class)).destroyComponent(cid, null);
+				// Remove component from platform.
+				((IComponentManagementService)container.getService(IComponentManagementService.class)).destroyComponent(cid, null);
 			}
 			if(dostep)
 			{
 				dostep	= false;
 				if(!again && IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
 				{
-					ComponentExecutionService	ces	= (ComponentExecutionService)container.getService(IComponentExecutionService.class);
+					ComponentManagementService	ces	= (ComponentManagementService)container.getService(IComponentManagementService.class);
 					ces.setComponentState(cid, IComponentDescription.STATE_WAITING);	// I hope this doesn't cause any deadlocks :-/
 				}
 				again	= again && IComponentDescription.STATE_ACTIVE.equals(desc.getState());
@@ -409,7 +409,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		{
 			if(component.isAtBreakpoint(desc.getBreakpoints()))
 			{
-				ComponentExecutionService	ces	= (ComponentExecutionService)container.getService(IComponentExecutionService.class);
+				ComponentManagementService	ces	= (ComponentManagementService)container.getService(IComponentManagementService.class);
 				ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
 			}
 		}
@@ -460,7 +460,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	//-------- test methods --------
 	
 	/**
-	 *  Make kernel agent available.
+	 *  Make kernel component available.
 	 */
 	public IComponentInstance	getComponentInstance()
 	{

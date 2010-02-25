@@ -29,11 +29,11 @@ public class SpringPlatform extends AbstractPlatform
 	/** The ams listener. */
 	protected IComponentListener amslistener;
 	
-	/** The daemon agents. */
-	protected Map daemagents;
+	/** The daemon components. */
+	protected Map daemcomponents;
 	
-	/** The application agents. */
-	protected Map appagents;
+	/** The application components. */
+	protected Map appcomponents;
 	
 	/** Flag indicating if autoshutdown. */
 	protected boolean autoshutdown;
@@ -130,50 +130,23 @@ public class SpringPlatform extends AbstractPlatform
 	{
 		this.shutdowntime = shutdowntime;
 	}
-
-//	/**
-//	 *  Set the messagetypes.
-//	 *  @param messagetypes The messagetypes to set.
-//	 */
-//	public void setMessageTypes(Map messagetypes)
-//	{
-//		this.messagetypes = messagetypes;
-//	}
-
-	/**
-	 *  Set the agent factories.
-	 *  @param factories The agent factories.
-	 * /
-	public void setAgentFactories(List factories)
-	{
-		this.agentfactory = new MetaAgentFactory(factories);
-	}*/
-
-	/**
-	 *  Set the application factory.
-	 *  @param appfactory The application factory.
-	 * /
-	public void setApplicationFactory(IApplicationFactory appfactory)
-	{
-		this.appfactory = appfactory;
-	}*/
 	
 	/**
-	 *  Set the daemon agents.
-	 *  @param daemonagents The daemon agents.
+	 *  Set the daemon components.
+	 *  @param daemoncomponents The daemon components.
 	 */
-	public void setDaemonAgents(Map daemonagents)
+	public void setDaemonComponents(Map daemoncomponents)
 	{
-		this.daemagents = daemonagents;
+		this.daemcomponents = daemoncomponents;
 	}
 
 	/**
-	 *  Set the agents.
-	 *  @param agents The agents.
+	 *  Set the components.
+	 *  @param components The components.
 	 */
-	public void setAgents(Map appagents)
+	public void setComponents(Map appcomponents)
 	{
-		this.appagents = appagents;
+		this.appcomponents = appcomponents;
 	}
 	
 	/**
@@ -197,17 +170,17 @@ public class SpringPlatform extends AbstractPlatform
 			}
 		}
 		
-		// Create daemon agents.
-		this.daemonagents = SCollection.createLinkedHashSet();
-		if(daemagents != null)
+		// Create daemon components.
+		this.daemoncomponents = SCollection.createLinkedHashSet();
+		if(daemcomponents != null)
 		{
-			for(Iterator it = daemagents.keySet().iterator(); it.hasNext();)
+			for(Iterator it = daemcomponents.keySet().iterator(); it.hasNext();)
 			{
 				String name = (String)it.next();
 				String model;
 				String config = null;
 				Map args = null;
-				Object tmp = daemagents.get(name);
+				Object tmp = daemcomponents.get(name);
 				if(tmp instanceof String)
 				{
 					model = (String)tmp;
@@ -222,16 +195,16 @@ public class SpringPlatform extends AbstractPlatform
 			}
 		}
 		
-		// Create application agents.
-		if(appagents != null)
+		// Create application components.
+		if(appcomponents != null)
 		{
-			for(Iterator it = appagents.keySet().iterator(); it.hasNext();)
+			for(Iterator it = appcomponents.keySet().iterator(); it.hasNext();)
 			{
 				String name = (String)it.next();
 				String model;
 				String config = null;
 				Map args = null;
-				Object tmp = appagents.get(name);
+				Object tmp = appcomponents.get(name);
 				if(tmp instanceof String)
 				{
 					model = (String)tmp;
@@ -259,7 +232,7 @@ public class SpringPlatform extends AbstractPlatform
 	//-------- Static part --------
 
 	/**
-	 *  Start a platform with the agents specified
+	 *  Start a platform with the components specified
 	 *  by the arguments in the form "name:model" or just "model".
 	 */
 	public static void main(String[] args) throws Exception
@@ -282,7 +255,6 @@ public class SpringPlatform extends AbstractPlatform
 		ApplicationContext context = new ClassPathXmlApplicationContext(new String[]{conffile});
 		SpringPlatform platform = (SpringPlatform)context.getBean("platform");
 		platform.start();
-//		startAgents(args, platform);
 		
 		long startup = System.currentTimeMillis() - starttime;
 		platform.logger.info("Platform startup time: " + startup + " ms.");

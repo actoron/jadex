@@ -4,7 +4,7 @@ import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 
 public class SimulationEndPlan extends Plan {
 
@@ -36,7 +36,7 @@ public class SimulationEndPlan extends Plan {
 		
 //		// kill via gui		
 
-		IComponentExecutionService	ces	= (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+		IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
 		ces.destroyComponent(getScope().getParent().getComponentIdentifier(), null);
 	}
 }

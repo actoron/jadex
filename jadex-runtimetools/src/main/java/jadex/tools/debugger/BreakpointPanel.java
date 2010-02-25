@@ -1,7 +1,7 @@
 package jadex.tools.debugger;
 
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentListener;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IBreakpointPanel;
@@ -149,7 +149,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 			}
 		});
 		
-		IComponentExecutionService	ces	= (IComponentExecutionService)container.getService(IComponentExecutionService.class);
+		IComponentManagementService	ces	= (IComponentManagementService)container.getService(IComponentManagementService.class);
 		ces.addComponentListener(description.getName(), new IComponentListener()
 		{
 			public void componentRemoved(IComponentDescription desc, Map results)
@@ -265,7 +265,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 					{
 						bps.remove(breakpoints.get(sorter.modelIndex(rowIndex)));
 					}
-					((IComponentExecutionService)container.getService(IComponentExecutionService.class))
+					((IComponentManagementService)container.getService(IComponentManagementService.class))
 						.setComponentBreakpoints(description.getName(), (String[])bps.toArray(new String[bps.size()]));
 				}
 			});

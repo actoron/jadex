@@ -8,7 +8,7 @@ import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
@@ -118,14 +118,14 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		dealerpan = new JPanel();
 		dealerpan.setBorder(BorderFactory.createTitledBorder(" Dealer "));
 		dealerpan.setBackground(Color.WHITE);
-		final IComponentExecutionService ces = (IComponentExecutionService)access.getServiceContainer().getService(IComponentExecutionService.class);
+		final IComponentManagementService ces = (IComponentManagementService)access.getServiceContainer().getService(IComponentManagementService.class);
 		dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, true, null);
 		dealertf = new JTextField(20);
 		dealertf.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
-				IComponentExecutionService ces = (IComponentExecutionService)access.getServiceContainer().getService(IComponentExecutionService.class);
+				IComponentManagementService ces = (IComponentManagementService)access.getServiceContainer().getService(IComponentManagementService.class);
 				dealeraid = ces.createComponentIdentifier(dealertf.getText(), false, null);
 			}
 		});
@@ -290,7 +290,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			if(n==JOptionPane.YES_OPTION)
 			{
-				final IComponentExecutionService	ces	= (IComponentExecutionService)agent.getServiceContainer().getService(IComponentExecutionService.class);
+				final IComponentManagementService	ces	= (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
 				ces.getComponentDescription(dealeraid, new IResultListener()
 				{
 					

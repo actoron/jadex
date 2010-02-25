@@ -1,12 +1,12 @@
 package jadex.adapter.standalone;
 
 import jadex.adapter.base.DefaultResultListener;
-import jadex.adapter.standalone.service.componentexecution.ComponentExecutionService;
+import jadex.adapter.standalone.service.componentexecution.ComponentManagementService;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.DefaultMessageAdapter;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IContentCodec;
 import jadex.bridge.IMessageAdapter;
@@ -177,7 +177,7 @@ public class MessageService implements IMessageService, IService
 	}
 
 	/**
-	 *  Deliver a message to the intended agents. Called from transports.
+	 *  Deliver a message to the intended components. Called from transports.
 	 *  @param message The native message. 
 	 *  (Synchronized because can be called from concurrently executing transports)
 	 */
@@ -249,7 +249,7 @@ public class MessageService implements IMessageService, IService
 
 	/**
 	 *  Get the adresses of a component.
-	 *  @return The addresses of this agent.
+	 *  @return The addresses of this component.
 	 */
 	public String[] getAddresses()
 	{
@@ -373,7 +373,7 @@ public class MessageService implements IMessageService, IService
 		{
 			try
 			{
-				// Method returns agent identifiers of undelivered agents
+				// Method returns component identifiers of undelivered components
 				receivers = trans[i].sendMessage(msg, type, receivers);
 			}
 			catch(Exception e)
@@ -400,14 +400,14 @@ public class MessageService implements IMessageService, IService
 		
 		for(int i = 0; i < receivers.length; i++)
 		{
-			((ComponentExecutionService)platform.getService(IComponentExecutionService.class)).getComponentAdapter(receivers[i], new IResultListener()
+			((ComponentManagementService)platform.getService(IComponentManagementService.class)).getComponentAdapter(receivers[i], new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					StandaloneComponentAdapter agent = (StandaloneComponentAdapter)result;
-					if(agent != null)
+					StandaloneComponentAdapter component = (StandaloneComponentAdapter)result;
+					if(component != null)
 					{
-						ClassLoader cl = agent.getComponentInstance().getClassLoader();
+						ClassLoader cl = component.getComponentInstance().getClassLoader();
 						Map	message	= (Map) decoded.get(cl);
 						if(message==null)
 						{
@@ -437,7 +437,7 @@ public class MessageService implements IMessageService, IService
 
 						try
 						{
-							agent.receiveMessage(message, messagetype);
+							component.receiveMessage(message, messagetype);
 						}
 						catch(ComponentTerminatedException ate)
 						{

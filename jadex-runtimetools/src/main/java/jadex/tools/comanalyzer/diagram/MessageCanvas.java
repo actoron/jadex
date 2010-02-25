@@ -1,7 +1,7 @@
 package jadex.tools.comanalyzer.diagram;
 
 import jadex.commons.SUtil;
-import jadex.tools.comanalyzer.Agent;
+import jadex.tools.comanalyzer.Component;
 import jadex.tools.comanalyzer.Message;
 import jadex.tools.comanalyzer.PaintMaps;
 
@@ -76,12 +76,12 @@ public class MessageCanvas extends JPanel implements Serializable
 	// -------- MessageCanvas methods --------
 
 	/**
-	 * Set the preffered size according to agent and message count.
+	 * Set the preffered size according to component and message count.
 	 */
 	public void setPreferredSize()
 	{
 		Dimension preferredSize = new Dimension();
-		preferredSize.width = (panelcan.visible_agents.size() * DiagramConstants.xDistTimeline);
+		preferredSize.width = (panelcan.visible_components.size() * DiagramConstants.xDistTimeline);
 		preferredSize.height = DiagramConstants.yDistTimeline + (panelcan.visible_messages.size() * DiagramConstants.yDistTimeline);
 		setPreferredSize(preferredSize);
 		// important for scrollbars
@@ -105,10 +105,10 @@ public class MessageCanvas extends JPanel implements Serializable
 			Message message = (Message)iter.next();
 
 			// get the x- and y-coordinates for the message
-			Agent sender = (Agent)((Pair)panelcan.visible_messages.get(message)).getFirst();
-			Agent receiver = (Agent)((Pair)panelcan.visible_messages.get(message)).getSecond();
-			int posSource = panelcan.visible_agents.indexOf(sender);
-			int posDest = panelcan.visible_agents.indexOf(receiver);
+			Component sender = (Component)((Pair)panelcan.visible_messages.get(message)).getFirst();
+			Component receiver = (Component)((Pair)panelcan.visible_messages.get(message)).getSecond();
+			int posSource = panelcan.visible_components.indexOf(sender);
+			int posDest = panelcan.visible_components.indexOf(receiver);
 
 			int x1 = DiagramConstants.getTimelineX(posSource);
 			int x2 = DiagramConstants.getTimelineX(posDest);
@@ -156,10 +156,10 @@ public class MessageCanvas extends JPanel implements Serializable
 		int agntnr = 0;
 		int msgcount = panelcan.visible_messages.size();
 
-		// add the timelines first (for each agent)
-		for(Iterator iter = panelcan.visible_agents.iterator(); iter.hasNext();)
+		// add the timelines first (for each component)
+		for(Iterator iter = panelcan.visible_components.iterator(); iter.hasNext();)
 		{
-			Agent agent = (Agent)iter.next();
+			Component component = (Component)iter.next();
 
 			int x = DiagramConstants.getTimelineX(agntnr++);
 			float[] dotting = {1.0f, 3.0f};
@@ -181,10 +181,10 @@ public class MessageCanvas extends JPanel implements Serializable
 			Message message = (Message)iter.next();
 
 			// get the x- and y-coordinates for the message
-			Agent sender = (Agent)((Pair)panelcan.visible_messages.get(message)).getFirst();
-			Agent receiver = (Agent)((Pair)panelcan.visible_messages.get(message)).getSecond();
-			int posSource = panelcan.visible_agents.indexOf(sender);
-			int posDest = panelcan.visible_agents.indexOf(receiver);
+			Component sender = (Component)((Pair)panelcan.visible_messages.get(message)).getFirst();
+			Component receiver = (Component)((Pair)panelcan.visible_messages.get(message)).getSecond();
+			int posSource = panelcan.visible_components.indexOf(sender);
+			int posDest = panelcan.visible_components.indexOf(receiver);
 			int x1 = DiagramConstants.getTimelineX(posSource);
 			int x2 = DiagramConstants.getTimelineX(posDest);
 			int y = DiagramConstants.getTimelineY(msgnr++);

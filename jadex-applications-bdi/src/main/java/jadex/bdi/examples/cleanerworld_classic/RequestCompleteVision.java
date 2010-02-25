@@ -1,12 +1,12 @@
 package jadex.bdi.examples.cleanerworld_classic;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
 
 /**
  *  Java class for concept RequestCompleteVision of cleaner_beans ontology.
  */
-public class RequestCompleteVision implements IAgentAction
+public class RequestCompleteVision implements IComponentAction
 {
 	//-------- attributes ----------
 

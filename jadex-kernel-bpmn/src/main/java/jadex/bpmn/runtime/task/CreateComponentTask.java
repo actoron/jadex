@@ -10,7 +10,7 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.concurrent.IResultListener;
 
@@ -67,7 +67,7 @@ public class CreateComponentTask implements ITask
 		}
 //		System.out.println("args: "+args);
 
-		IComponentExecutionService ces = (IComponentExecutionService)instance.getComponentAdapter().getServiceContainer().getService(IComponentExecutionService.class);
+		IComponentManagementService ces = (IComponentManagementService)instance.getComponentAdapter().getServiceContainer().getService(IComponentManagementService.class);
 				
 		IResultListener lis = killlistener;
 		if(wait)

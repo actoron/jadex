@@ -26,7 +26,7 @@ public class DFRemoteSearchPlan extends Plan
 		IGoal req = createGoal("rp_initiate");
 		req.getParameter("receiver").setValue(getParameter("df").getValue());
 		req.getParameter("action").setValue(se);
-		req.getParameter("ontology").setValue(SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME);
+		req.getParameter("ontology").setValue(SFipa.COMPONENT_MANAGEMENT_ONTOLOGY_NAME);
 		dispatchSubgoalAndWait(req);
 
 		getParameterSet("result").addValues(((DFSearch)((Done)req.getParameter("result").getValue()).getAction()).getResults());

@@ -94,10 +94,10 @@ public class Message extends ParameterElement
 	// -------- attributes --------
 
 	/** The sender of the message */
-	protected Agent sender;
+	protected Component sender;
 
 	/** The receiver of the message */
-	protected Agent receiver;
+	protected Component receiver;
 
 	/** The unique id (sequence nr) saved for quick access */
 	protected int uniqueId;
@@ -164,7 +164,7 @@ public class Message extends ParameterElement
 	/**
 	 * @return The sender.
 	 */
-	public Agent getSender()
+	public Component getSender()
 	{
 		return sender;
 	}
@@ -172,7 +172,7 @@ public class Message extends ParameterElement
 	/**
 	 * @return The receiver.
 	 */
-	public Agent getReceiver()
+	public Component getReceiver()
 	{
 		return receiver;
 	}
@@ -218,8 +218,8 @@ public class Message extends ParameterElement
 			return null;
 		}
 
-		Agent sender = getSender();
-		Agent receiver = getReceiver();
+		Component sender = getSender();
+		Component receiver = getReceiver();
 
 		// if sender and receiver are visible return without adjusting
 		if(sender.isVisible() && receiver.isVisible())
@@ -229,10 +229,10 @@ public class Message extends ParameterElement
 
 		// if dummy agent is visible and either one of the participants (XOR)
 		// adjust redirection
-		if(Agent.DUMMY_AGENT.isVisible() && (sender.isVisible() ^ receiver.isVisible()))
+		if(Component.DUMMY_AGENT.isVisible() && (sender.isVisible() ^ receiver.isVisible()))
 		{
-			sender = sender.isVisible() ? sender : Agent.DUMMY_AGENT;
-			receiver = receiver.isVisible() ? receiver : Agent.DUMMY_AGENT;
+			sender = sender.isVisible() ? sender : Component.DUMMY_AGENT;
+			receiver = receiver.isVisible() ? receiver : Component.DUMMY_AGENT;
 			return new Pair(sender, receiver);
 		}
 
@@ -295,7 +295,7 @@ public class Message extends ParameterElement
 	/**
 	 * @param agent The sender to set.
 	 */
-	public void setSender(Agent agent)
+	public void setSender(Component agent)
 	{
 		sender = agent;
 	}
@@ -303,7 +303,7 @@ public class Message extends ParameterElement
 	/**
 	 * @param agent The receiver to set.
 	 */
-	public void setReceiver(Agent agent)
+	public void setReceiver(Component agent)
 	{
 		receiver = agent;
 	}

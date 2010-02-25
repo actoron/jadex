@@ -4,18 +4,18 @@ import jadex.service.IServiceContainer;
 
 
 /**
- *  The adapter for a specific platform agent (e.g. a JADE agent).
- *  These are the methods a kernel agents needs to call on its host agent.
+ *  The adapter for a specific platform component (e.g. a JADE agent).
+ *  These are the methods a kernel components needs to call on its host component.
  */
 public interface IComponentAdapter
 {
 	/**
-	 *  Called by the agent when it probably awoke from an idle state.
-	 *  The platform has to make sure that the agent will be executed
+	 *  Called by the component when it probably awoke from an idle state.
+	 *  The platform has to make sure that the component will be executed
 	 *  again from now on.
 	 *  Note, this method can be called also from external threads
 	 *  (e.g. property changes). Therefore, on the calling thread
-	 *  no agent related actions must be executed (use some kind
+	 *  no component related actions must be executed (use some kind
 	 *  of wake-up mechanism).
 	 *  Also proper synchronization has to be made sure, as this method
 	 *  can be called concurrently from different threads.
@@ -39,21 +39,21 @@ public interface IComponentAdapter
 	public boolean isExternalThread();
 
 	/**
-	 *  Cause termination of the agent.
-	 *  IKernelAgent.killAgent(IResultListener) will be
+	 *  Cause termination of the component.
+	 *  IKernelComponent.killComponent(IResultListener) will be
 	 *  called in turn.
 	 * /
 	public void killComponent()	throws ComponentTerminatedException;*/
 
 	/**
-	 *  Get the agent platform.
-	 *  @return The agent platform.
+	 *  Get the component platform.
+	 *  @return The component platform.
 	 */
 	public IServiceContainer getServiceContainer()	throws ComponentTerminatedException;
 
 	/**
-	 *  Return the native agent-identifier that allows to send
-	 *  messages to this agent.
+	 *  Return the native component-identifier that allows to send
+	 *  messages to this component.
 	 */
 	public IComponentIdentifier getComponentIdentifier() throws ComponentTerminatedException;
 	

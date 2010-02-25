@@ -71,7 +71,7 @@ public class LocalTransport implements ITransport
 	/**
 	 *  Send a message.
 	 *  @param message The message to send.
-	 *  @return The agent identifiers of the agents 
+	 *  @return The component identifiers of the components 
 	 *  the message could not be sent to.
 	 */
 	public ComponentIdentifier[] sendMessage(Map message, String msgtype, IComponentIdentifier[] recs)

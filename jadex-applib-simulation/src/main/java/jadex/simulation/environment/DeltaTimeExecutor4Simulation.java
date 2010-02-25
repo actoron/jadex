@@ -10,7 +10,7 @@ import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
 import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.commons.ChangeEvent;
@@ -176,7 +176,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 								// TODO: Apply / Check if filter has been set on this observer data
 //								System.out.println("#DeltaTime4Exec# Starting get result for BDIAgent.");
 
-								((IComponentExecutionService) space.getContext().getServiceContainer().getService(IComponentExecutionService.class)).getExternalAccess(agentIdentifier,
+								((IComponentManagementService) space.getContext().getServiceContainer().getService(IComponentManagementService.class)).getExternalAccess(agentIdentifier,
 										new IResultListener() {
 
 											@Override
@@ -267,7 +267,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 		}
 
 		// Add the executor as context listener on the application.
-		IComponentExecutionService ces = (IComponentExecutionService) container.getService(IComponentExecutionService.class);
+		IComponentManagementService ces = (IComponentManagementService) container.getService(IComponentManagementService.class);
 		ces.addComponentListener(space.getContext().getComponentIdentifier(), new IComponentListener() {
 
 			public void componentRemoved(IComponentDescription desc, Map results) {
@@ -306,7 +306,7 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 		// final ArrayList<ObservedEvent> observedEventsCopy = new ArrayList<ObservedEvent>();
 		// Collections.copy(observedEvents, observedEventsCopy);
 
-		((IComponentExecutionService) space.getContext().getServiceContainer().getService(IComponentExecutionService.class)).getExternalAccess(clientSimulationAgent, new IResultListener() {
+		((IComponentManagementService) space.getContext().getServiceContainer().getService(IComponentManagementService.class)).getExternalAccess(clientSimulationAgent, new IResultListener() {
 
 			@Override
 			public void resultAvailable(Object source, Object result) {

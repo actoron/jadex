@@ -7,7 +7,7 @@ import jadex.application.space.envsupport.environment.ISpaceProcess;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bridge.IComponentExecutionService;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IResultListener;
@@ -78,7 +78,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 				Map params = new HashMap();
 				params.put("wastebins", todo.toArray());
 				ongoing.addAll(todo);
-				IComponentExecutionService	ces	= (IComponentExecutionService)app.getServiceContainer().getService(IComponentExecutionService.class);
+				IComponentManagementService	ces	= (IComponentManagementService)app.getServiceContainer().getService(IComponentManagementService.class);
 				ces.createComponent(null, app.getComponentFilename("Truck"), null, params, false, new IResultListener()
 				{
 					public void exceptionOccurred(Object source, Exception exception)
@@ -87,8 +87,8 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 					public void resultAvailable(Object source, Object result)
 					{
 						IComponentIdentifier truck = (IComponentIdentifier)result;
-						IComponentExecutionService ces = (IComponentExecutionService)app.getServiceContainer()
-							.getService(IComponentExecutionService.class);
+						IComponentManagementService ces = (IComponentManagementService)app.getServiceContainer()
+							.getService(IComponentManagementService.class);
 						ces.getExternalAccess(truck, new IResultListener()
 						{
 							public void exceptionOccurred(Object source, Exception exception)

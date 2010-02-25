@@ -9,13 +9,13 @@ import java.util.List;
 
 
 /**
- * An agent identifier (AID), see FIPASC00023.
+ * An component identifier (AID), see FIPASC00023.
  */
 public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Serializable
 {
 	//-------- attributes ----------
 
-	/** The agent name. */
+	/** The component name. */
 	protected String name;
 	
 	/** Attribute for slot addresses. */
@@ -27,7 +27,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	//-------- constructors --------
 
 	/**
-	 *  Create a new agent identifier.
+	 *  Create a new component identifier.
 	 *  Bean constructor
 	 */
 	public ComponentIdentifier()
@@ -36,7 +36,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	}
 
 	/**
-	 *  Create a new agent identifier with a given global name.
+	 *  Create a new component identifier with a given global name.
 	 *  @param name A global name (e.g. "ams@lars").
 	 */
 	public ComponentIdentifier(String name)
@@ -45,7 +45,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	}
 
 	/**
-	 *  Create a new agent identifier with a global name and given addresses.
+	 *  Create a new component identifier with a global name and given addresses.
 	 *  @param name A global name (e.g. "ams@lars").
 	 *  @param addresses A list of transport addresses.
 	 */
@@ -55,7 +55,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	}
 
 	/**
-	 *  Create a new agent identifier.
+	 *  Create a new component identifier.
 	 *  @param name A local or global name.
 	 *  @param addresses A list of transport addresses.
 	 *  @param resolvers A list of resolvers, which may provide additional transport adresses.
@@ -73,7 +73,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	//-------- accessor methods --------
 
 	/**
-	 *  Get the agent name.
+	 *  Get the component name.
 	 */
 	public String	getName()
 	{
@@ -81,8 +81,8 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	}
 
 	/**
-	 *  Set the agent name.
-	 *  @param name	The agent name.
+	 *  Set the component name.
+	 *  @param name	The component name.
 	 */
 	public void	setName(String name)
 	{
@@ -247,7 +247,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	//--------- methods --------
 
 	/**
-	 * Clone this agent identifier.
+	 * Clone this component identifier.
 	 * Does a deep copy.
 	 */
 	public Object clone()

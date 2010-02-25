@@ -24,7 +24,7 @@
 			 allowing - for example - to register at the DF. -->
 		<capability name="dfcap" file="jadex.bdi.planlib.df.DF"/>
 		<!-- Capability to start other agents. -->
-		<capability name="amscap" file="jadex.bdi.planlib.ams.AMS"/>
+		<capability name="amscap" file="jadex.bdi.planlib.cms.CMS"/>
 	</capabilities>
 
 	<beliefs>

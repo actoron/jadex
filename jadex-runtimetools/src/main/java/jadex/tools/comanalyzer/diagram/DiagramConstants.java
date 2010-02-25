@@ -28,14 +28,14 @@ public class DiagramConstants
 	/** The y-offset of timeline. */
 	public static final int yOffsetTimeline = 20;
 
-	/** The height of the agentbox. */
-	public static final int heightAgentbox = 30;
+	/** The height of the componentbox. */
+	public static final int heightComponentbox = 30;
 
-	/** The width of the agentbox. */
-	public static final int widthAgentbox = 50;
+	/** The width of the componentbox. */
+	public static final int widthComponentbox = 50;
 
-	/** The y-offset to agentbox */
-	public static final int yOffsetAgentbox = xOffsetTimeline - (widthAgentbox / 2); //20 bei 50 width;
+	/** The y-offset to componentbox */
+	public static final int yOffsetComponentbox = xOffsetTimeline - (widthComponentbox / 2); //20 bei 50 width;
 
 	/** The x- and y-offset of the message number */
 	public static final int xOffsetMessageNumber = 10;
@@ -51,21 +51,21 @@ public class DiagramConstants
 	/** Color of the timeline. */
 	public static final Color COLOR_TIMELINE = Color.LIGHT_GRAY; //new Color(0, 100, 50);
 
-	/** The height for the timeline in AgentCanvas */
-	public static final int heigtAgentboxTimeline = 15;
+	/** The height for the timeline in ComponentCanvas */
+	public static final int heigtComponentboxTimeline = 15;
 
 
 	// -------- helper methods --------
 
 
 	/**
-	 * Get the x-position for the timeline from the index of an agent.
-	 * @param agent_position The index of the agent
+	 * Get the x-position for the timeline from the index of an component.
+	 * @param component_position The index of the component
 	 * @return x-position of the timeline.
 	 */
-	public static int getTimelineX(int agent_position)
+	public static int getTimelineX(int component_position)
 	{
-		return agent_position * xDistTimeline + xOffsetTimeline;
+		return component_position * xDistTimeline + xOffsetTimeline;
 	}
 
 	/**

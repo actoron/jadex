@@ -1,8 +1,8 @@
 package jadex.wfms.bdi.ontology;
 
-import jadex.adapter.base.fipa.IAgentAction;
+import jadex.adapter.base.fipa.IComponentAction;
 
-public class PerformHeartbeat implements IAgentAction
+public class PerformHeartbeat implements IComponentAction
 {
 	private boolean performed;
 	
