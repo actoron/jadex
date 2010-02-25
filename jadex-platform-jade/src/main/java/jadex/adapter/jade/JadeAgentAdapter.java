@@ -4,7 +4,7 @@ import jade.content.ContentElement;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
-import jadex.adapter.base.SComponentExecutionService;
+import jadex.adapter.base.SComponentManagementService;
 import jadex.adapter.base.SComponentFactory;
 import jadex.adapter.base.fipa.IAMS;
 import jadex.adapter.base.fipa.SFipa;
@@ -352,7 +352,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	 */
 	public void killComponent()
 	{
-		SComponentExecutionService.destroyComponent(platform, getComponentIdentifier(), null);
+		SComponentManagementService.destroyComponent(platform, getComponentIdentifier(), null);
 //		((IAMS)platform.getService(IAMS.class)).destroyAgent(getAgentIdentifier(), null);
 	}
 

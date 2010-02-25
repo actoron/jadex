@@ -1,4 +1,4 @@
-package jadex.adapter.standalone.df;
+package jadex.adapter.standalone.service;
 
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.fipa.IDF;
@@ -27,7 +27,7 @@ import java.util.Set;
 /**
  *  Directory facilitator implementation for standalone platform.
  */
-public class DF implements IDF, IService
+public class DirectoryFacilitatorService implements IDF, IService
 {
 	//-------- attributes --------
 
@@ -42,7 +42,7 @@ public class DF implements IDF, IService
 	/**
 	 *  Create a standalone df.
 	 */
-	public DF(AbstractPlatform platform)
+	public DirectoryFacilitatorService(AbstractPlatform platform)
 	{
 		this.platform = platform;
 		this.components	= new IndexMap();

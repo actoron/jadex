@@ -1,4 +1,4 @@
-package jadex.adapter.standalone.service.componentexecution;
+package jadex.adapter.standalone.service;
 
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.standalone.StandaloneComponentAdapter;

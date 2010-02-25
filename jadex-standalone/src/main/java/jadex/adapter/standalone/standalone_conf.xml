@@ -25,7 +25,7 @@
 						new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
 			</property>
 						
-			<property type="jadex.adapter.base.fipa.IDF" name="df_service">new jadex.adapter.standalone.df.DF($platform)</property>
+			<property type="jadex.adapter.base.fipa.IDF" name="df_service">new jadex.adapter.standalone.service.DirectoryFacilitatorService($platform)</property>
 			
 			<property type="jadex.bridge.IMessageService" name="message_service">new jadex.adapter.standalone.MessageService($platform, 
 				new jadex.adapter.standalone.transport.ITransport[]
@@ -101,7 +101,7 @@
 			</property>
 			
 			<property type="jadex.bridge.IComponentManagementService" name="cms_service">
-				new jadex.adapter.standalone.service.componentexecution.ComponentManagementService($platform)
+				new jadex.adapter.standalone.service.ComponentManagementService($platform)
 			</property> 
 			
 		</properties>

@@ -10,8 +10,8 @@
 	<properties type="platform_standalone">
   		<property type="libpath">"../jadex-applications-bpmn/target/classes"</property>
   		
-   		<properties type="agent" name="AgentCreation">
-			<property type="model">jadex/bpmn/benchmarks/AgentCreation.bpmn</property>
+   		<properties type="component" name="AgentCreation">
+			<property type="model">jadex/bpmn/benchmarks/AgentCreation2.bpmn</property>
 			<property type="argument" name="max">10000</property>
 		</properties>
 	</properties>

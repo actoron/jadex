@@ -6,7 +6,7 @@ import jade.wrapper.AgentController;
 import jade.wrapper.PlatformController;
 import jadex.adapter.base.DefaultResultListener;
 import jadex.adapter.base.ISimulationService;
-import jadex.adapter.base.SComponentExecutionService;
+import jadex.adapter.base.SComponentManagementService;
 import jadex.adapter.base.SComponentFactory;
 import jadex.adapter.base.SimulationService;
 import jadex.adapter.base.agr.MAGRSpaceType;
@@ -214,12 +214,12 @@ public class Platform extends BasicServiceContainer implements IPlatform
 			}
 		}
 		
-		SComponentExecutionService.createComponent(this, "jcc", "jadex/tools/jcc/JCC.agent.xml", 
+		SComponentManagementService.createComponent(this, "jcc", "jadex/tools/jcc/JCC.agent.xml", 
 			null, null, new DefaultResultListener(getLogger())
 		{
 			public void resultAvailable(Object result)
 			{
-				SComponentExecutionService.startComponent(platform, result, null);
+				SComponentManagementService.startComponent(platform, result, null);
 			}
 		}, null);
 		

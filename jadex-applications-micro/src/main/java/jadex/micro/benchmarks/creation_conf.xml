@@ -10,7 +10,7 @@
 	<properties type="platform_standalone">
 		<property type="libpath">"../jadex-applications-micro/target/classes"</property>
 	
-		<properties type="agent" name="creation">
+		<properties type="component" name="creation">
 			<property type="model">jadex.micro.benchmarks.AgentCreationAgent.class</property>
 			<property type="argument" name="max">15000</property>
 		</properties>

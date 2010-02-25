@@ -25,7 +25,7 @@
 			</property>
 						
 			<!-- DF service. -->
-			<property type="jadex.adapter.base.fipa.IDF" name="df_service">new jadex.adapter.standalone.df.DF($platform)</property>
+			<property type="jadex.adapter.base.fipa.IDF" name="df_service">new jadex.adapter.standalone.service.DirectoryFacilitatorService($platform)</property>
 			
 			<!-- Message service. -->
 			<property type="jadex.bridge.IMessageService" name="message_service">new jadex.adapter.standalone.MessageService($platform, 
@@ -107,7 +107,7 @@
 			
 			<!-- AMS service. -->
 			<property type="jadex.bridge.IComponentManagementService" name="ams_service">
-				new jadex.adapter.standalone.service.componentexecution.ComponentExecutionService($platform)
+				new jadex.adapter.standalone.service.ComponentManagementService($platform)
 			</property> 
 			
 			<property type="jadex.bridge.IComponentFactory" name="bpmn_factory">

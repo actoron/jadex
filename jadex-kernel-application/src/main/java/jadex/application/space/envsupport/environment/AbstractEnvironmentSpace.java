@@ -946,7 +946,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //							setOwner(fid, agent);
 //							
 //							((IComponentManagementService)((ApplicationContext)getContext()).getServiceContainer().getService(IComponentManagementService.class)).resumeComponent(agent, null);
-////							SComponentExecutionService.startComponent(((ApplicationContext)getContext()).getPlatform(), agent, null);
+////							SComponentManagementService.startComponent(((ApplicationContext)getContext()).getPlatform(), agent, null);
 //						}
 //						
 //						public void exceptionOccurred(Object source, Exception exception)

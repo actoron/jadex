@@ -1,7 +1,7 @@
 package jadex.adapter.standalone;
 
 import jadex.adapter.base.DefaultResultListener;
-import jadex.adapter.standalone.service.componentexecution.ComponentManagementService;
+import jadex.adapter.standalone.service.ComponentManagementService;
 import jadex.adapter.standalone.transport.ITransport;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;

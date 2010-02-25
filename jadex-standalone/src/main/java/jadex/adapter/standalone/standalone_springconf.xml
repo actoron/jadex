@@ -69,7 +69,7 @@
 							<key>
 								<value type="java.lang.String">cms_service</value>
 							</key>
-							<bean class="jadex.adapter.standalone.service.componentexecution.ComponentManagementService">
+							<bean class="jadex.adapter.standalone.service.ComponentManagementService">
 								<constructor-arg ref="platform"/>
 							</bean>
 						</entry>
@@ -85,7 +85,7 @@
 							<key>
 								<value type="java.lang.String">df_service</value>
 							</key>
-							<bean class="jadex.adapter.standalone.df.DF">
+							<bean class="jadex.adapter.standalone.service.DirectoryFacilitatorService">
 								<constructor-arg ref="platform"/>
 							</bean>
 						</entry>
