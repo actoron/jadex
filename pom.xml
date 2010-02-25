@@ -80,7 +80,7 @@
 		    <module>jadex-applications-bdi-bpmn</module>
 		    <module>jadex-kernel-gpmn</module>
 		    <module>jadex-applications-gpmn</module>
-		    <module>jadex-standalone</module>
+		    <module>jadex-platform-standalone</module>
 		    <module>jadex-launch</module>
 		    <!-- <module>jadex-apleis</module> -->
 		</modules>
@@ -113,7 +113,7 @@
 				<module>jadex-rules-applications</module>
 				<module>jadex-rules-tools</module>
 				<module>jadex-kernel-application</module>
-				<module>jadex-standalone</module>
+				<module>jadex-platform-standalone</module>
 				<module>jadex-launch</module>
 				<module>jadex-jade-launch</module>
 				<module>jadex-platform-jade</module>
