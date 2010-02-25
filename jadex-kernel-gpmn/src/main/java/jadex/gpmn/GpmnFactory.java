@@ -180,7 +180,7 @@ public class GpmnFactory implements IComponentFactory, IService
 	public Object startProcess(String modelname, final Object id, Map arguments, boolean stepmode)
 	{
 		final String name = id.toString();
-		final IComponentExecutionService ces = (IComponentExecutionService)container.getService(IComponentExecutionService.class);
+		final IComponentManagementService ces = (IComponentManagementService)container.getService(IComponentManagementService.class);
 		ces.createComponent(name, modelname, null, null, new IResultListener()
 		{
 			

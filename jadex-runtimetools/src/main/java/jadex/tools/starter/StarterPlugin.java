@@ -665,7 +665,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-//			IComponentExecutionService ces = (IComponentExecutionService)getJCC().getServiceContainer().getService(IComponentExecutionService.class);
+//			IComponentManagementService ces = (IComponentManagementService)getJCC().getServiceContainer().getService(IComponentManagementService.class);
 //			ces.shutdownPlatform(new IResultListener()
 //			{
 //				public void resultAvailable(Object result)

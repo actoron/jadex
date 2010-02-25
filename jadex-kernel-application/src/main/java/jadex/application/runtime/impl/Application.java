@@ -216,7 +216,7 @@ public class Application	implements IApplication, IComponentInstance
 ////			IAMS ams = (IAMS) platform.getService(IAMS.class);
 //			for(int i=0; i<agents.length; i++)
 //			{
-//				IComponentExecutionService ces = (IComponentExecutionService)container.getService(IComponentExecutionService.class);
+//				IComponentManagementService ces = (IComponentManagementService)container.getService(IComponentManagementService.class);
 //				ces.destroyComponent(agents[i], l2);
 ////				ams.destroyAgent(agents[i], l2);
 //			}
@@ -493,7 +493,7 @@ public class Application	implements IApplication, IComponentInstance
 		if(at==null)
 			throw new RuntimeException("Unknown agent type '"+type+"' in application: "+model);
 //		final IAMS	ams	= (IAMS) platform.getService(IAMS.class);
-		IComponentExecutionService ces = (IComponentExecutionService)container.getService(IComponentExecutionService.class);
+		IComponentManagementService ces = (IComponentManagementService)container.getService(IComponentManagementService.class);
 
 		
 		ces.createComponent(name, at.getFilename(), configuration, arguments, true, new IResultListener()
@@ -523,7 +523,7 @@ public class Application	implements IApplication, IComponentInstance
 				
 				if(start)
 				{
-					IComponentExecutionService ces = (IComponentExecutionService)container.getService(IComponentExecutionService.class);
+					IComponentManagementService ces = (IComponentManagementService)container.getService(IComponentManagementService.class);
 					ces.resumeComponent(aid, listener);
 				}
 				else

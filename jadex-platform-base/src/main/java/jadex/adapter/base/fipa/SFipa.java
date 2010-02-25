@@ -195,7 +195,7 @@ public class SFipa
 	 *  @param source The source component identifier.
 	 *  @param cms The cms service.
 	 * /
-	public IComponentIdentifier cloneComponentIdentifier(IComponentIdentifier source, IComponentExecutionService ces)
+	public IComponentIdentifier cloneComponentIdentifier(IComponentIdentifier source, IComponentManagementService ces)
 	{
 		IComponentIdentifier clone = ces.createComponentIdentifier(source.getName(), false, source.getAddresses());
 		
@@ -212,7 +212,7 @@ public class SFipa
 	 *  @param source The source cms component description.
 	 *  @param cms The cms service.
 	 * /
-	public static IComponentDescription cloneComponentDescription(IComponentDescription source, IComponentExecutionService ces)
+	public static IComponentDescription cloneComponentDescription(IComponentDescription source, IComponentManagementService ces)
 	{
 		 IComponentIdentifier id = source.getName();
 		 id	= ces.createComponentIdentifier(id.getName(), false, id.getAddresses());

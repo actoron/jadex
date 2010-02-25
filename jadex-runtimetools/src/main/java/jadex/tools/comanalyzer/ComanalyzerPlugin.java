@@ -608,7 +608,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	public void addAgentListener(final IComponentDescription desc)
 	{
 		IComponentIdentifier aid = desc.getName();
-		((IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class))
+		((IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class))
 			.getComponentAdapter(aid, new IResultListener()
 			{
 				public void exceptionOccurred(Exception exception)
@@ -640,7 +640,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	public void removeAgentListener(final IComponentDescription desc, boolean cleanup)
 	{
 		IComponentIdentifier aid = desc.getName();
-		((IComponentExecutionService)jcc.getServiceContainer().getService(IComponentExecutionService.class))
+		((IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class))
 			.getComponentAdapter(aid, new IResultListener()
 			{
 				public void exceptionOccurred(Exception exception)

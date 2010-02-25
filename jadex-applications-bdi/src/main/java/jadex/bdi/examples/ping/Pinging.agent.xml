@@ -23,7 +23,7 @@
 	<beliefs>
 		<belief name="ping_receiver" class="IComponentIdentifier" exported="true">
 			<fact>
-				((IComponentExecutionService)$scope.getServiceContainer().getService(IComponentExecutionService.class))
+				((IComponentManagementService)$scope.getServiceContainer().getService(IComponentManagementService.class))
 					.createComponentIdentifier("Ping", true, null)
 			</fact>
 		</belief>

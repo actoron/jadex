@@ -86,7 +86,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());
     }
     
-    //-------- IComponentExecutionService interface --------
+    //-------- IComponentManagementService interface --------
 
 	/**
 	 *  Create a new component on the platform.
