@@ -96,6 +96,8 @@ public class ComputeSingleResultPlan extends Plan {
 		experimentResults.put(totalRuns, exRes);
 		getBeliefbase().getBelief("experimentResults").setFact(experimentResults);
 		
+		//trigger comp of intermedite res
+		
 		
 		//trigger the start of the next experiment
 		dispatchInternalEvent(createInternalEvent("triggerNewExperiment"));
