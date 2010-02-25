@@ -6,7 +6,7 @@
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	name="ExternalAccess"
-	package="jadex.bdi.testcases.semiautomatic">
+	package="jadex.bdi.testcases.misc">
 
 	<imports>
 		<import>jadex.bdi.planlib.test.*</import>
@@ -25,6 +25,10 @@
 		<beliefref name="testresults" result="true">
 			<concrete ref="testcap.testresults"/>
 		</beliefref>
+		
+		<belief name="somebelief" class="String">
+			<fact>"some value"</fact>		
+		</belief>
 	</beliefs>
 
 	<plans>
@@ -35,11 +39,16 @@
 	
 	<configurations>
 		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="testcap.testcase_cnt">
+					<fact>2</fact>
+				</initialbelief>
+			</beliefs>
 			<plans>
 				<initialplan ref="get_externalaccess"></initialplan>
 			</plans>
 		</configuration>
-		<configuration name="get_externalaccess"/>
+		<configuration name="donothing"/>
 	</configurations>
 
 </agent>

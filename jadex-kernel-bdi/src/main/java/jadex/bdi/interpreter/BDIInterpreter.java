@@ -83,19 +83,12 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	/** The kernel properties. */
 	protected Map kernelprops;
 	
-//	/** The flag indicating if it is not allowed to add external entries. */
-//	protected boolean ext_forbidden;
-	
 	//-------- recreate on init (no state) --------
 	
 	/** The event reificator creates changeevent objects for relevant state changes. */
 	protected EventReificator reificator;
 	
 	//-------- null on init --------
-	
-//	/** The thread executing the agent (null for none). */
-//	// Todo: need not be transient, because agent should only be serialized when no action is running?
-//	protected transient Thread agentthread;
 	
 	/** The plan thread currently executing (null for none). */
 	protected transient Thread planthread;
@@ -111,10 +104,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	
 	/** The agenda state when monitoring was started. */
 	protected transient int agenda_state;
-	
-//	// todo: ensure that entries are empty when saving
-//	/** The entries added from external threads. */
-//	protected transient final List ext_entries;
 	
 	/** The flag for microplansteps. */
 	protected transient boolean microplansteps; 
@@ -148,6 +137,9 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	/** The externally synchronized threads to be notified on cleanup. */
 	protected Set	externalthreads;
 	
+	/** The get-external-access listeners to be notified after init. */
+	protected Set	eal;
+	
 	//-------- constructors --------
 	
 	/**
@@ -164,7 +156,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		this.state = state;
 		this.model = model;
 		this.parent	= parent;
-//		this.ext_entries = Collections.synchronizedList(new ArrayList());
 		this.kernelprops = kernelprops;
 		this.planexecutors = new HashMap();
 		this.volcache = new LRU(0);	// 50
@@ -232,71 +223,12 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		rulesystem = new RuleSystem(state, model.getMatcherFunctionality().getRulebase(), model.getMatcherFunctionality(), new PriorityAgenda());
 		rulesystem.init();
 		
-		// HACK!!! Should use runtime properties. Problem: runtime properties are initialized within start agent action.
-//		Object mprofiling	= state.getAttributeValue(model.getHandle(), OAVBDIMetaModel.capability_has_properties, "profiling");
-//		if(mprofiling!=null)
-//		{
-//			Boolean	profile	= (Boolean)AgentRules.evaluateExpression(state, mprofiling, new OAVBDIFetcher(state, ragent));
-//			if(profile!=null && profile.booleanValue())
-//				state.setProfiler(new Profiler("./"+getAgentAdapter().getComponentIdentifier().getLocalName()+".profile.ser"));
-//		}
-
-		// Initialize tool adapters.
-//		this.tooladapters	= new IToolAdapter[0];
 		if(kernelprops!=null)
 		{
-//			for(Iterator it=kernelprops.keySet().iterator(); it.hasNext(); )
-//			{
-//				Object	key	= (String)it.next();
-//				if(key.toString().startsWith("tooladapter."))
-//				{
-//					try
-//					{
-//						Class	adapterclass	= (Class)kernelprops.get(key);
-//						IToolAdapter	tooladapter	= (IToolAdapter)adapterclass.newInstance();
-//						tooladapter.init(this);
-//						addToolAdapter(tooladapter);
-//					}
-//					catch(Exception e)
-//					{
-//						throw new RuntimeException("Error evaluating kernel property: "+key+", "+kernelprops.get(key), e);
-//					}
-//				}
-//			}
-			
 			Boolean mps = (Boolean)kernelprops.get("microplansteps");
 			if(mps!=null)
 				this.microplansteps = mps.booleanValue();
-		}
-		
-//		OAVTreeModel.createOAVFrame("Agent State", getState(), getAgent()).setVisible(true);
-//		RetePanel.createReteFrame("Agent Rules", ((RetePatternMatcherFunctionality)getRuleSystem().getMatcherFunctionality()).getReteNode(), 
-//			((RetePatternMatcherState)getRuleSystem().getMatcherState()).getReteMemory(), new Object());
-	
-	
-		// agent start action - cannot be done here because agent adapter is not completely initialized!
-		// Get map of arguments for initial beliefs values.
-//		Map	arguments	= (Map)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments);
-//		Map	argcopy	= null;
-//		if(arguments!=null)
-//		{
-//			argcopy	= new HashMap();
-//			argcopy.putAll(arguments);
-//		}
-////		initializeCapabilityInstance(state, ragent, argcopy);	// Only supply copy as map is modified.
-//		Map parents = new HashMap(); 
-//		AgentRules.createCapabilityInstance(state, ragent, parents);
-//		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, parents);
-//		AgentRules.initializeCapabilityInstance(state, ragent);
-//		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
-//		
-//		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE);
-//		// Remove arguments from state.
-//		if(arguments!=null) 
-//			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
-//		
-//		state.expungeStaleObjects();
-//		state.notifyEventListeners();
+		}		
 	}
 	
 	
@@ -317,84 +249,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 */
 	public boolean executeStep()
 	{
-//		// Remember execution thread.
-//		this.agentthread	= Thread.currentThread();
-//		ClassLoader	cl	= agentthread.getContextClassLoader();
-//		agentthread.setContextClassLoader(model.getTypeModel().getClassLoader());
-
 		try
 		{
-//			if(!lock.tryLock())
-//				throw new RuntimeException("Internal execution error.");
-						
-//			// Copy actions from external threads into the state.
-//			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
-//			boolean	extexecuted	= false;
-//			Runnable[]	entries	= null;
-//			synchronized(ext_entries)
-//			{
-//				if(!(ext_entries.isEmpty()))
-//				{
-//					entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
-////					for(int i=0; i<ext_entries.size(); i++)
-////						state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, ext_entries.get(i));
-//					ext_entries.clear();
-//					
-//					extexecuted	= true;
-//				}
-//				String agentstate = (String)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
-//				if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED.equals(agentstate))
-//					ext_forbidden = true;
-//			}
-//			for(int i=0; entries!=null && i<entries.length; i++)
-//			{
-//				if(entries[i] instanceof InterpreterTimedObjectAction)
-//				{
-//					if(((InterpreterTimedObjectAction)entries[i]).isValid())
-//					{
-//						try
-//						{
-//							entries[i].run();
-//						}
-//						catch(Exception e)
-//						{
-//							StringWriter	sw	= new StringWriter();
-//							e.printStackTrace(new PrintWriter(sw));
-//							AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
-//						}
-//					}
-//					try
-//					{
-//						((InterpreterTimedObjectAction)entries[i]).cleanup();
-//					}
-//					catch(Exception e)
-//					{
-//						StringWriter	sw	= new StringWriter();
-//						e.printStackTrace(new PrintWriter(sw));
-//						AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
-//					}
-//				}
-//				else //if(entries[i] instanceof Runnable)
-//				{
-//					try
-//					{
-//						entries[i].run();
-//					}
-//					catch(Exception e)
-//					{
-//						StringWriter	sw	= new StringWriter();
-//						e.printStackTrace(new PrintWriter(sw));
-//						AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
-//					}
-//				}
-//
-////				// Assert for testing state consistency (slow -> comment out for release!)
-////				assert rulesystem.getState().getUnreferencedObjects().isEmpty()
-////					: getAgentAdapter().getComponentIdentifier().getLocalName()
-////					+ ", " + entries[i]
-////					+ ", " + rulesystem.getState().getUnreferencedObjects();
-//			}
-
 			// Hack!!! platform should inform about ext entries to update agenda.
 			Activation	act	= rulesystem.getAgenda().getLastActivation();
 //			System.out.println("here: "+act);
@@ -403,69 +259,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			state.notifyEventListeners();
 			state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
 
-			boolean	execute	= true;
-//			if(!extexecuted)
-			{
-				// Notify/ask tools that we are about to execute an action.
-				
-				// todo!!!
+			rulesystem.getAgenda().fireRule();
 
-//				for(int i=0; execute && i<tooladapters.length; i++)
-//					execute	= tooladapters[i].executeAction();
-				
-				if(execute)
-				{
-					// Execute rules.
-					// Remove obsolete user objects.
-					/*WeakEntry entry;
-					while((entry = (WeakEntry)extaccesses.poll()) !=null)
-					{*/
-		//				Object obj = entry.getValue();
-		//				state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_temporaryobjects, obj);
-		//				System.out.println("Removed: "+entry);
-					//}
-		//			System.out.println("User objects: "+extaccesses.getEntriesSize());
-				
-		//			if(rulesystem.getState().getUnreferencedObjects().size()>0)
-		//			{
-		//				Collection coll = rulesystem.getState().getUnreferencedObjects();
-		//				for(Iterator it=coll.iterator(); it.hasNext(); )
-		//				{
-		//					Object o = it.next();
-		//					System.out.println(o+" "+state.getAttributeValue(state.getAttributeValue(o, 
-		//						OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
-		//				}	
-		//			}
-					
-	//				if(rulesystem.getState().getUnreferencedObjects().size()>0)
-	//					System.out.println("here: "+rulesystem.getState().getUnreferencedObjects());
-					
-	//				Collection unrefs = rulesystem.getState().getUnreferencedObjects();
-	//				if(!unrefs.isEmpty())
-	//				{
-	//					List	cycle	= rulesystem.getState().findCycle(unrefs);
-	//					if(cycle!=null && !cycle.isEmpty())
-	//					{
-	//						JPanel	oavpanel1	= OAVTreeModel.createOAVPanel(state, cycle.get(0));
-	//						JPanel	oavpanel2	= OAVTreeModel.createOAVPanel(state, ragent);
-	//						JSplitPane	split	= new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, oavpanel1, oavpanel2);
-	//						
-	//						JFrame	frame	= new JFrame("Unreferenced Objects / Agent");
-	//						frame.getContentPane().add(split, BorderLayout.CENTER);
-	//						frame.setSize(800, 600);
-	//						frame.setVisible(true);
-	//					}
-	//				}
-					
-//					// Assert for testing state consistency (slow -> comment out for release!)
-//					assert rulesystem.getState().getUnreferencedObjects().isEmpty()
-//						: getAgentAdapter().getComponentIdentifier().getLocalName()
-//						+ ", " + rulesystem.getAgenda().getLastActivation()
-//						+ ", " + rulesystem.getState().getUnreferencedObjects();
-
-					rulesystem.getAgenda().fireRule();
-				}
-			}
 			// Necessary because in step mode state changes may happen and 
 			// event listeners need to be notified!
 			/*Activation*/	act	= rulesystem.getAgenda().getLastActivation();
@@ -475,97 +270,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			state.notifyEventListeners();
 			state.getProfiler().stop(IProfiler.TYPE_RULE, act!=null?act.getRule():null);
 
-			// The following code prints the number of objects in the state
-			// Prints the min values between two new max points for finding memory hogs.
-			/*if(last==0 || last+100<System.currentTimeMillis())
-			{
-				last	= System.currentTimeMillis();
-				if(state.getSize()>lastmax)
-				{
-					if(lastmsg!=null)
-						System.out.println(lastmsg);
-					
-					lastmax	= state.getSize();
-					lastmin	= lastmax;
-					lastmsg	= null;
-				}
-				else if(state.getSize()<lastmin)
-				{
-					lastmin	= state.getSize();
-					StringBuffer	buf	= new StringBuffer();
-					buf.append("OAVState objects: ");
-					buf.append(getAgentAdapter().getComponentIdentifier().getLocalName());
-					buf.append(", ");
-					buf.append(state.getSize());
-					buf.append("\n");
-					Object[]	types	= ((OAVState)state).objectspertype.getKeys();
-					Tuple[]	instances	= new Tuple[types.length];
-					for(int i=0; i<types.length; i++)
-						instances[i]	= new Tuple(types[i],
-							new Integer(((OAVState)state).objectspertype.getCollection(types[i]).size()));
-					Arrays.sort(instances, new Comparator()
-					{
-						public int compare(Object o1, Object o2)
-						{
-							int ret	= ((Integer)((Tuple)o1).get(1)).compareTo(((Tuple)o2).get(1));
-							if(ret==0 && o1!=o2)
-								ret	= ((OAVObjectType)((Tuple)o1).get(0)).getName()
-									.compareTo(((OAVObjectType)((Tuple)o2).get(0)).getName());
-							return ret;
-						}
-					});
-					int cnt	= 0;
-					for(int i=instances.length-1; i>=0 && i>=instances.length-5; i--)
-					{
-						int	ucnt	= 0;
-						int	ecnt	= 0;
-						Set	refs	= new HashSet();
-						Collection	objects	= ((OAVState)state).objectspertype.getCollection(instances[i].get(0));
-						for(Iterator it=objects.iterator(); it.hasNext(); )
-						{
-							Collection	refobjs	= state.getReferencingObjects(it.next());
-							if(refobjs.isEmpty())
-							{
-								ucnt++;
-							}
-							else
-							{
-								for(Iterator it2=refobjs.iterator(); it2.hasNext();)
-								{
-									Object	ref	= it2.next();
-									if(ref instanceof String)
-										refs.add("external_ref_"+(++ecnt));
-									else
-										refs.add(ref);
-								}
-							}
-						}
-						
-						buf.append("\t");
-						buf.append(instances[i].get(0));
-						buf.append(": ");
-						buf.append(instances[i].get(1));
-						buf.append(" unused: ");
-						buf.append(ucnt);
-						buf.append(" references: ");
-						buf.append(refs.size());
-						buf.append(":");
-						buf.append(refs);
-						buf.append("\n");
-						cnt	+= ((Integer)instances[i].get(1)).intValue();
-					}
-					buf.append("\t...: ");
-					buf.append(state.getSize()-cnt);
-					buf.append("\n");
-					lastmsg	= buf.toString();
-				}
-			}*/
-			
-//			lock.unlock();
-			
 			return !rulesystem.getAgenda().isEmpty(); 
-//			return execute && !rulesystem.getAgenda().isEmpty(); 
-	//			&& !OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED.equals(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state));
 		}
 		catch(Throwable e)
 		{
@@ -577,12 +282,6 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				throw (Error)e;
 			else // Shouldn't happen!? 
 				throw new RuntimeException(e);
-		}
-		finally
-		{
-//			// Reset execution thread.
-//			agentthread.setContextClassLoader(cl);
-//			this.agentthread = null;
 		}
 	}
 	
@@ -652,7 +351,18 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			public void run()
 			{
 				if(listener!=null)
-					listener.resultAvailable(getComponentAdapter().getComponentIdentifier(), new ExternalAccessFlyweight(state, ragent));
+				{
+					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING.equals(state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)))
+					{
+						if(eal==null)
+							eal	= new HashSet();
+						eal.add(listener);
+					}
+					else
+					{
+						listener.resultAvailable(getComponentAdapter().getComponentIdentifier(), new ExternalAccessFlyweight(state, ragent));
+					}
+				}
 			}
 		});
 	}

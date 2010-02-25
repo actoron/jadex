@@ -1,6 +1,7 @@
 package jadex.bdi.interpreter;
 
 import jadex.bdi.runtime.IPlanExecutor;
+import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.IArgument;
 import jadex.bridge.InterpreterTimedObject;
@@ -92,6 +93,17 @@ public class AgentRules
 				// Remove arguments from state.
 				if(arguments!=null) 
 					state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
+				
+				// Inform get-external-access listeners (if any). Hack???
+				BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
+				if(bdii.eal!=null)
+				{
+					for(Iterator it=bdii.eal.iterator(); it.hasNext(); )
+					{
+						((IResultListener)it.next()).resultAvailable(bdii.getComponentAdapter().getComponentIdentifier(), new ExternalAccessFlyweight(state, ragent));
+					}
+					bdii.eal	= null;
+				}
 			}
 		};
 		Rule rule = new Rule("agent_start", ragentcon, action);
