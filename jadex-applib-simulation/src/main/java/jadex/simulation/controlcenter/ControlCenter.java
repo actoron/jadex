@@ -4,10 +4,13 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.simulation.model.Observer;
 import jadex.simulation.model.SimulationConfiguration;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import javax.swing.JFrame;
@@ -20,22 +23,25 @@ import javax.swing.table.DefaultTableModel;
 /**
  * Gui, showing details about the simulation setting and the progress.
  */
-public class Gui extends JFrame {
+public class ControlCenter extends JFrame {
 	// -------- attributes --------
 
 	// private JPanel mainPanel = new JPanel(new GridLayout(4, 1));
-	private JPanel mainPanel = new JPanel(new GridLayout(2, 1));
+	private JPanel mainPanel = new JPanel(new GridLayout(3, 1));
 	// private JPanel mainVehiclePnl = new JPanel(new GridLayout(2,1));
 
 	// private Environment env;
 	private IBDIExternalAccess exta;
 	private SimulationConfiguration facts;
+	
+	//contains the list of table models that belong to the currently executed ensemble
+	private ArrayList<DefaultTableModel> currentListOfTableModels = new ArrayList<DefaultTableModel>();
 
-	private DefaultTableModel streetsdm;
-	private DefaultTableModel trafficServicesdm;
-	private DefaultTableModel brokersdm;
-	private DefaultTableModel drivingVehiclesdm;
-	private DefaultTableModel finishedVehiclesdm;
+//	private DefaultTableModel streetsdm;
+//	private DefaultTableModel trafficServicesdm;
+//	private DefaultTableModel brokersdm;
+//	private DefaultTableModel drivingVehiclesdm;
+//	private DefaultTableModel finishedVehiclesdm;
 
 	private Calendar cal = Calendar.getInstance();
 
@@ -47,14 +53,14 @@ public class Gui extends JFrame {
 	 * @param buy
 	 *            The boolean indicating if buyer or seller gui.
 	 */
-	public Gui(final IBDIExternalAccess agent) {
+	public ControlCenter(final IBDIExternalAccess agent) {
 		super("Automated Simulation Control Center");
 		this.exta = agent;
 		this.facts = (SimulationConfiguration) exta.getBeliefbase().getBelief("simulationConf").getFact();
 		// this.env = (Environment) exta.getBeliefbase().getBelief("env").getFact();
 
 		init();
-		// createStreetTable();
+		createNewEnsembleTable();
 		// createTrafficServiceTable();
 		// createBrokerTable();
 		// createDrivingVehiclesTable();
@@ -75,8 +81,7 @@ public class Gui extends JFrame {
 
 	private void init() {
 		JPanel staticInfos = new JPanel(new GridLayout(3, 2));
-		
-		
+
 		staticInfos.add(new JLabel("Name and Configuration: "));
 		staticInfos.add(new JLabel(facts.getApplicationReference().substring(facts.getApplicationReference().lastIndexOf("\\")) + " / " + facts.getApplicationConfiguration()));
 		//		
@@ -121,40 +126,38 @@ public class Gui extends JFrame {
 		JPanel observerPnl = new JPanel();
 
 		String[] columnNames = { "Name", "ObjectType", "ObjectName", "ElementName", "EvaluationMode", "FilterMode" };
-		Object[][] data = new Object[facts.getObserverList().size()][6];		
+		Object[][] data = new Object[facts.getObserverList().size()][6];
 
-
-		for(int i = 0; i < facts.getObserverList().size(); i++){
+		for (int i = 0; i < facts.getObserverList().size(); i++) {
 			Observer obs = facts.getObserverList().get(i);
-			
-//			JPanel tmp = new JPanel(new FlowLayout());
-//			JLabel name = new JLabel("Name: " + obs.getData().getName());
-//			JLabel objectType = new JLabel("ObjectType: " + obs.getData().getObjectSource().getType());
-//			JLabel objectName = new JLabel("ObjectName: " + obs.getData().getObjectSource().getName());
-//			JLabel elementName = new JLabel("ElementName: " + obs.getData().getElementSource().getName());
-//			JLabel evaluationMode = new JLabel("EvaluationMode: " + obs.getEvaluation().getMode());
-//			JLabel filterMode = new JLabel("FilterMode: " + obs.getFilter().getMode());
-			
-			
-			//do for table:
-			
+
+			// JPanel tmp = new JPanel(new FlowLayout());
+			// JLabel name = new JLabel("Name: " + obs.getData().getName());
+			// JLabel objectType = new JLabel("ObjectType: " + obs.getData().getObjectSource().getType());
+			// JLabel objectName = new JLabel("ObjectName: " + obs.getData().getObjectSource().getName());
+			// JLabel elementName = new JLabel("ElementName: " + obs.getData().getElementSource().getName());
+			// JLabel evaluationMode = new JLabel("EvaluationMode: " + obs.getEvaluation().getMode());
+			// JLabel filterMode = new JLabel("FilterMode: " + obs.getFilter().getMode());
+
+			// do for table:
+
 			data[i][0] = obs.getData().getName();
 			data[i][1] = obs.getData().getObjectSource().getType();
 			data[i][2] = obs.getData().getObjectSource().getName();
 			data[i][3] = obs.getData().getElementSource().getName();
 			data[i][4] = obs.getEvaluation().getMode();
 			data[i][5] = obs.getFilter().getMode();
-			
-			//add table to paek
-//			tmp.add(name);
-//			tmp.add(objectType);
-//			tmp.add(objectName);
-//			tmp.add(elementName);
 
-//			observerPnl.add(tmp);
+			// add table to paek
+			// tmp.add(name);
+			// tmp.add(objectType);
+			// tmp.add(objectName);
+			// tmp.add(elementName);
+
+			// observerPnl.add(tmp);
 		}
 		// observerPnl.add(new JLabel("Observers....."));
-		JTable table = new JTable(data, columnNames);		
+		JTable table = new JTable(data, columnNames);
 		JScrollPane scrollPane = new JScrollPane(table);
 		table.setFillsViewportHeight(true);
 
@@ -163,108 +166,99 @@ public class Gui extends JFrame {
 
 	}
 
-	// /**
-	// * Creates the table to show information related to the streets
-	// */
-	// private void createStreetTable() {
-	// // create StreetTable
-	// this.streetsdm = new DefaultTableModel(new String[] { "Street Direction", "Street Status", "Current Capacity", "Current No. of Cars", "Max. of cars" }, 0);
-	// JTable streetsTable = new JTable(streetsdm);
-	// streetsTable.setAutoCreateRowSorter(true);
-	// streetsTable.setPreferredScrollableViewportSize(new Dimension(400, 180));
-	// streetsTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-	// public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column) {
-	// Component comp = super.getTableCellRendererComponent(table, value, selected, focus, row, column);
-	// setOpaque(true);
-	// if (column == 0) {
-	// setHorizontalAlignment(LEFT);
-	// } else {
-	// setHorizontalAlignment(CENTER);
-	// }
-	// if (!selected) {
-	// String currentCapacity = String.valueOf(streetsdm.getValueAt(row, 2));
-	// // Is it a double or a String
-	// if (currentCapacity.indexOf("%") != -1) {
-	// currentCapacity = currentCapacity.substring(0, currentCapacity.length() - 1);
-	// double capacity = Double.valueOf(currentCapacity);
-	// if (capacity < 50.0) {
-	// // comp.setBackground(new Color(211, 255, 156));
-	// comp.setBackground(Color.GREEN);
-	// } else {
-	// // comp.setBackground(table.getBackground());
-	// comp.setBackground(Color.RED);
-	// }
-	// // There is no value avaible for the street
-	// } else {
-	// comp.setBackground(Color.GRAY);
-	// }
-	// }
-	// return comp;
-	// }
-	// });
-	//
-	// JPanel streetPnl = new JPanel(new BorderLayout());
-	// streetPnl.add(BorderLayout.NORTH, new JLabel("Status of Street Agents"));
-	// streetPnl.add(BorderLayout.CENTER, new JScrollPane(streetsTable));
-	// refreshStreetTable();
-	// mainPanel.add(streetPnl);
-	//
-	// // Add IBeliefListener
-	// exta.getBeliefbase().getBelief("listOfStreets").addBeliefListener(new IBeliefListener() {
-	//
-	// @Override
-	// public void beliefChanged(AgentEvent arg0) {
-	// // System.out.println("\nBELIEFLISTENER for StreetList ACTIVATED!!!!\n");
-	// refreshStreetTable();
-	// }
-	// }, false);
-	//
-	// // Add PropertyChangeListener
-	// this.env.addPropertyChangeListener(new PropertyChangeListener() {
-	// public void propertyChange(PropertyChangeEvent ce) {
-	// String propertyname = ce.getPropertyName();
-	// if ("new_street_capacity_object".equals(propertyname)) {
-	// // System.out.println("#Gui#: Received following propertyChange: "
-	// // + propertyname);
-	// refreshStreetTable();
-	// } else {
-	// // System.out.println("#Gui#: Unknown propertyChange");
-	// }
-	// }
-	// });
-	// }
-	//
-	// /**
-	// * Refresh the street table.
-	// */
-	// public synchronized void refreshStreetTable() {
-	//
-	// // First remove all values
-	// while (streetsdm.getRowCount() > 0)
-	// streetsdm.removeRow(0);
-	// // Add new values
-	// HashMap<String, StreetStatusObject> streets = env.getRegisteredStreets();
-	// Set streetSet = streets.entrySet();
-	// Iterator it = streetSet.iterator();
-	// while (it.hasNext()) {
-	// Map.Entry entry = (Map.Entry) it.next();
-	// StreetStatusObject streetObj = (StreetStatusObject) entry.getValue();
-	// String currentStatus, currentCapacity, currentNumberOfVehicles, maxNumberOfVehicles;
-	// // The last update of the StreetObject can't be older than 12sek
-	// if (streetObj.getTimeStamp() + 12000 < System.currentTimeMillis()) {
-	// currentStatus = "Street Status is not up to date!";
-	// currentCapacity = "n/a";
-	// currentNumberOfVehicles = "n/a";
-	// maxNumberOfVehicles = "n/a";
-	// } else {
-	// currentStatus = "OK";
-	// currentCapacity = String.valueOf(formatOutput(streetObj.getCurrentCapacity())) + "%";
-	// currentNumberOfVehicles = String.valueOf(streetObj.getCurrentNumberOfVehicles());
-	// maxNumberOfVehicles = String.valueOf(streetObj.getMaxNumberOfVehicles());
-	// }
-	// streetsdm.addRow(new Object[] { streetObj.getStreetDirection(), currentStatus, currentCapacity, currentNumberOfVehicles, maxNumberOfVehicles });
-	// }
-	// }
+	/**
+	 * Creates the table to show information related to the evaluation of an ensemble
+	 */
+	private void createNewEnsembleTable() {
+		//takes the sub components of this ensemble
+		JPanel ensemblePnl = new JPanel(new BorderLayout());
+		
+		//contains the elements of the "north" part of the panel
+		JPanel northPnl  = new JPanel(new GridLayout(2,1));
+		
+		// create the first table, that contains the cumulated results of the already conducted experiments of an ensemble				
+		DefaultTableModel ensembleResultsDm = new DefaultTableModel(new String[] { "Nr. of conducted experiments", "ObserverName", "Mean Value", "Median Value" }, 0);		
+		JTable ensembleResultsTable = new JTable(ensembleResultsDm);		
+		ensembleResultsTable.setPreferredScrollableViewportSize(new Dimension(400, 20));
+		ensembleResultsDm.addRow(new Object[]{0, facts.getObserverList().get(0).getData().getName() , "--", "--"});
+		
+		//contains the results of the single experiments
+		DefaultTableModel singleExperimentsDm = new DefaultTableModel(new String[] { "ID", "Observed Value" }, 0);
+		JTable singleExperimentsTable = new JTable(singleExperimentsDm);
+		singleExperimentsTable.setAutoCreateRowSorter(true);
+		singleExperimentsTable.setPreferredScrollableViewportSize(new Dimension(400, 40));
+		singleExperimentsDm.addRow(new Object[]{0, "--"});		
+		
+		northPnl.add(new JLabel("Cumulated and Single Results of ensemble: " + 0));
+		northPnl.add(new JScrollPane(ensembleResultsTable));
+		ensemblePnl.add(BorderLayout.NORTH, northPnl);
+		
+		
+		ensemblePnl.add(BorderLayout.CENTER, new JScrollPane(singleExperimentsTable));
+		mainPanel.add(ensemblePnl);			
+		
+		refreshEnsembleTable();
+				
+		currentListOfTableModels.add(ensembleResultsDm);
+		currentListOfTableModels.add(singleExperimentsDm);
+
+		// // Add IBeliefListener
+		// exta.getBeliefbase().getBelief("listOfStreets").addBeliefListener(new IBeliefListener() {
+		//
+		// @Override
+		// public void beliefChanged(AgentEvent arg0) {
+		// // System.out.println("\nBELIEFLISTENER for StreetList ACTIVATED!!!!\n");
+		// refreshEnsembleTable();
+		// }
+		// }, false);
+		//
+		// // Add PropertyChangeListener
+		// this.env.addPropertyChangeListener(new PropertyChangeListener() {
+		// public void propertyChange(PropertyChangeEvent ce) {
+		// String propertyname = ce.getPropertyName();
+		// if ("new_street_capacity_object".equals(propertyname)) {
+		// // System.out.println("#Gui#: Received following propertyChange: "
+		// // + propertyname);
+		// refreshEnsembleTable();
+		// } else {
+		// // System.out.println("#Gui#: Unknown propertyChange");
+		// }
+		// }
+		// });
+	}
+
+	/**
+	 * Refresh the street table.
+	 */
+	public synchronized void refreshEnsembleTable() {
+
+		// // First remove all values
+		// while (streetsdm.getRowCount() > 0)
+		// streetsdm.removeRow(0);
+		// // Add new values
+		// HashMap<String, StreetStatusObject> streets = env.getRegisteredStreets();
+		// Set streetSet = streets.entrySet();
+		// Iterator it = streetSet.iterator();
+		// while (it.hasNext()) {
+		// Map.Entry entry = (Map.Entry) it.next();
+		// StreetStatusObject streetObj = (StreetStatusObject) entry.getValue();
+		// String currentStatus, currentCapacity, currentNumberOfVehicles, maxNumberOfVehicles;
+		// // The last update of the StreetObject can't be older than 12sek
+		// if (streetObj.getTimeStamp() + 12000 < System.currentTimeMillis()) {
+		// currentStatus = "Street Status is not up to date!";
+		// currentCapacity = "n/a";
+		// currentNumberOfVehicles = "n/a";
+		// maxNumberOfVehicles = "n/a";
+		// } else {
+		// currentStatus = "OK";
+		// currentCapacity = String.valueOf(formatOutput(streetObj.getCurrentCapacity())) + "%";
+		// currentNumberOfVehicles = String.valueOf(streetObj.getCurrentNumberOfVehicles());
+		// maxNumberOfVehicles = String.valueOf(streetObj.getMaxNumberOfVehicles());
+		// }
+		// streetsdm.addRow(new Object[] { streetObj.getStreetDirection(), currentStatus, currentCapacity, currentNumberOfVehicles, maxNumberOfVehicles });
+		// }
+	}
+
 	//
 	// /**
 	// * Creates the table to show information related to the TrafficServices
