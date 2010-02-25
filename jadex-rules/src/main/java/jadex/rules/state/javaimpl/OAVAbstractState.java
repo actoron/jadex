@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *  An object holding the agent state as
+ *  An object holding the state as
  *  OAV triples (object, attribute, value).
  */
 public abstract class OAVAbstractState	implements IOAVState

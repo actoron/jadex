@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- *  An object holding the agent state as
+ *  An object holding the state as
  *  OAV triples (object, attribute, value).
  */
 public interface IOAVState
