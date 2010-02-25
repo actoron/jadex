@@ -1,26 +1,16 @@
 package jadex.simulation.master;
 
-import jadex.adapter.base.SComponentFactory;
-import jadex.adapter.base.fipa.IDF;
-import jadex.application.runtime.IApplicationExternalAccess;
-import jadex.application.space.agr.AGRSpace;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentManagementService;
-import jadex.service.IServiceContainer;
-import jadex.service.clock.IClockService;
 import jadex.simulation.helper.Constants;
-import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.Optimization;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.ExperimentResult;
 import jadex.simulation.model.result.RowResult;
-import jadex.simulation.model.result.SimulationResult;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -169,36 +159,6 @@ public class StartSimulationExperimentsPlan extends Plan {
 	}
 
 	private void startApplication(String appName, String fileName, String configName, Map args) {
-		// private void startApplication(String experimentID) {
-
-		// SimulationConfiguration simConf = (SimulationConfiguration)
-		// getBeliefbase().getBelief("simulationConf").getFact();
-		//		
-		// String appName = simConf.getName() + experimentID;
-		// String fileName = simConf.getApplicationReference();
-		// String configName = simConf.getApplicationConfiguration();
-		//
-		// //Put args into application
-		// Map simFacts = new HashMap();
-		// simFacts.put(Constants.SIMULATION_FACTS_FOR_CLIENT, simConf);
-		// simFacts.put(Constants.EXPERIMENT_ID, experimentID);
-		//		
-		// Map args = new HashMap();
-		// args.put(Constants.EXPERIMENT_ID, experimentID);
-		// args.put(Constants.SIMULATION_FACTS_FOR_CLIENT, simFacts);
-		//		
-		// //check, whether parameters have to be swept
-		// if(simConf.getOptimization().getParameterSweeping() != null ){
-		// sweepParameters(simConf, args);
-		// }
-
-		// args.put(new String("evaporation_rat2e"), new Double(0.45));
-		// args.put(new String("tmp_mission_time"), new String("Antisaaaaa"));
-		// args.put(new String("simulationFacts"), (HashMap)
-		// getBeliefbase().getBelief("generalSimulationFacts").getFact());
-		// args.put(new String("nrr"), new Integer(20));
-		// args.put(new String("al"), new Integer(19));
-		// <argument name="evaporation_rate" typename="Double">0.03</argument>
 
 		try {
 			IComponentManagementService executionService = (IComponentManagementService) getScope().getServiceContainer().getService(IComponentManagementService.class);

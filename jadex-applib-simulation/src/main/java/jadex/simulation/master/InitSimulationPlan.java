@@ -2,11 +2,14 @@ package jadex.simulation.master;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.commons.collection.SCollection;
+import jadex.simulation.controlcenter.ControlCenter;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.SimulationConfiguration;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class InitSimulationPlan extends Plan{
 
@@ -21,8 +24,14 @@ public class InitSimulationPlan extends Plan{
 		dispatchTopLevelGoal(goal);
 		
 		//trigger the start of the simulation control center
-		dispatchInternalEvent(createInternalEvent("triggerStartOfSimulationControlCenter"));
+//		IGoal ca = createGoal("amscap.ams_create_agent");
+//		ca.getParameter("type").setValue("/jadex/simulation/client/ControlCenter.agent.xml");
+//		Map args = SCollection.createHashMap();
+//		args.put("simulationConf", getBeliefbase().getBelief("simulationConf").getFact());
+//		ca.getParameter("arguments").setValue(args);
+//		dispatchTopLevelGoal(ca);				
 		
+		ControlCenter tmpGui = new ControlCenter(this.getExternalAccess());
 	}
 
 	/**

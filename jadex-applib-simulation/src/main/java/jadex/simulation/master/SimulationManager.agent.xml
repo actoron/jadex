@@ -30,7 +30,7 @@
 		-->
 		<capability name="dfcap" file="jadex.bdi.planlib.df.DF" />
 		<!-- Capability to start other agents. -->
-		<capability name="amscap" file="jadex.bdi.planlib.cms.CMS" />
+		<capability name="amscap" file="jadex.bdi.planlib.cms.CMS" />		
 	</capabilities>
 
 	<beliefs>
@@ -88,9 +88,9 @@
 			<concrete ref="dfcap.df_search" />
 		</achievegoalref>
 		<!-- Used to start other agents. -->
-		<achievegoalref name="ams_create_agent">
+		<!-- <achievegoalref name="ams_create_agent">
 			<concrete ref="amscap.ams_create_agent" />
-		</achievegoalref>
+		</achievegoalref> -->
 		<!-- Used to stop other agents. -->
 		<achievegoalref name="ams_destroy_agent">
 			<concrete ref="amscap.ams_destroy_agent" />
@@ -143,16 +143,7 @@
 				<internalevent ref="triggerExperimentRowEvaluation" />
 			</trigger>
 		</plan>
-
-		<!--
-			Start the simulation control center.
-		-->
-		<plan name="startOfSimulationControlCenter">
-			<body class="StartControlCenterPlan" />
-			<trigger>
-				<internalevent ref="triggerStartOfSimulationControlCenter" />
-			</trigger>
-		</plan>
+		
 	</plans>
 
 	<events>
@@ -172,10 +163,7 @@
 
 		<!-- Event to trigger the evaluation of a simulation row. -->
 		<internalevent name="triggerExperimentRowEvaluation" />
-
-		<!-- Event to trigger the start of the simulation control center. -->
-		<internalevent name="triggerStartOfSimulationControlCenter" />
-
+		
 	</events>
 
 

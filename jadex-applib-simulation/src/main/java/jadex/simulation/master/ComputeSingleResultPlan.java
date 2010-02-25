@@ -62,7 +62,7 @@ public class ComputeSingleResultPlan extends Plan {
 		
 		ExperimentResult exRes = toExperimentResult(content, new ArrayList(observedEventsMap.values()));
 		
-		System.out.println("#Master#************************* Received message:\n " + exRes.toString());
+		System.out.println("#Master#************************* Received message:\n " + exRes.toString() + "\n\n");
 		
 		//Sorted output of results
 		for (Object key  : sortedResultList) {			

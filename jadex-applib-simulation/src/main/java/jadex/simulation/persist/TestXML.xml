@@ -14,30 +14,23 @@
 <SimulationConfiguration name="MarsWorldExperiments" applicationReference="..\\jadex-applib-simulation\\target\\classes\\jadex\\simulation\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml" applicationConfiguration="1 Sentry / 2 Producers / 3 Carries">
 <!--<SimulationConfiguration name="MarsWorldExperiments" applicationReference="..\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml" applicationConfiguration="1 Sentry / 2 Producers / 3 Carries">-->
     <Observers>
-        <!-- <Observer>
+        <Observer>
             <Data name="StepLogger">
                 <ObjectSource type="BDI_Agent" name="Sentry"/>
                 <ElementSource type="BDI_BELIEF" name="myPos" class="String"/>--><!-- Add type of element: String, long, int etc.? --> 
-            <!-- </Data>
+           </Data>
             <Evaluation mode="periodical" value="1000"/> --><!--If perdiocal, all have to have the same value -->
-            <!-- <Filter mode="all"/> --><!-- All / one / subset of objects-JavaCondLanguage -->
-        <!-- </Observer> -->
-        <Observer>
-            <Data name="HomebaseLogger"><!-- TODO: How to deal with Strings, Lists? -->
-                <ObjectSource type="ISpaceObject" name="homebase"/>
-                <ElementSource type="Property" name="ore" class="String"/><!-- Add type of element: String, long, int etc.? -->
-            </Data>
-            <Evaluation mode="onChange"/><!--If perdiocal, all have to have the same value -->
-            <Filter mode="all"/><!-- All / one / subset of objects-JavaCondLanguage -->
-        </Observer>
-        <Observer>
+            <Filter mode="all"/> <!-- All / one / subset of objects-JavaCondLanguage -->
+         </Observer> 
+
+        <!-- <Observer>
             <Data name="11HomebaseLogger">
                 <ObjectSource type="ISpa222ceObject" name="homebase"/>
                 <ElementSource type="Pro222perty" name="ore" class="String"/>
             </Data>
             <Evaluation mode="2onChange"/>
             <Filter mode="2all"/>
-        </Observer>
+        </Observer>-->
     </Observers>
 
     <DataVisualization>
@@ -73,14 +66,14 @@
     </Optimization>
 
     <RunConfiguration>
-        <General rows="1" parallelRuns="2" delta="true"><!-- For all runs.-->
+        <General rows="3" parallelRuns="2" delta="true"><!-- For all runs.-->
             <StartTime value="113000" type="relative"/><!-- Absolute or relative-->
          <!-- delta=um bei paralleler Ausführung zu Verhindern, dass Seeds von Randoms gleich sind.-->
             <TerminateCondition>
                 <Time value="120000" type="absolute"/>
             </TerminateCondition>
         </General>
-        <Rows experiments="15">
+        <Rows experiments="2">
             <TerminateCondition>
                <!--<Time value="7000" type="relative"/>-->
                  <TargetFunction function="$object.money &gt; 5"/>
