@@ -23,7 +23,7 @@ public class ArgumentsPlan extends Plan
 		TestReport tr = new TestReport("#1", "Test if a worker agent can be started and supplied with arguments.");
 		try
 		{
-			IGoal ca = createGoal("amscap.cms_create_component");
+			IGoal ca = createGoal("cmscap.cms_create_component");
 			ca.getParameter("type").setValue("/jadex/bdi/testcases/misc/ArgumentsWorker.agent.xml");
 			Map args = SCollection.createHashMap();
 			args.put("creator", getComponentIdentifier());

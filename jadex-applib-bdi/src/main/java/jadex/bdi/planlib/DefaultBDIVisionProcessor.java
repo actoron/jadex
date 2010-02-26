@@ -192,7 +192,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 								// Exception might be thrown, when agent not yet initialized
 								// -> AgentRules.findValue() fails due to missing initparents,
 								// when belief is initialized on demand.
-								// -> AMS should not provide external access to agent when not yet inited.  
+								// -> CMS should not provide external access to agent when not yet inited.  
 							}
 						}
 					});

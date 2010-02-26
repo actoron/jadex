@@ -104,7 +104,7 @@
 			</property>
 			
 			<!-- AMS service. -->
-			<property type="jadex.bridge.IComponentManagementService" name="ams_service">
+			<property type="jadex.bridge.IComponentManagementService" name="cms_service">
 				new jadex.adapter.standalone.service.ComponentManagementService($platform)
 			</property> 
 			

@@ -29,7 +29,7 @@ public class EndStatePlan extends Plan
 		getWaitqueue().addMessageEvent("inform_reports");
 		
 		// Create worker agent.
-		IGoal	create	= createGoal("amscap.cms_create_component");
+		IGoal	create	= createGoal("cmscap.cms_create_component");
 		create.getParameter("type").setValue("/jadex/bdi/testcases/misc/EndStateWorker.agent.xml");
 		Map args = SCollection.createHashMap();
 		args.put("testagent", getComponentIdentifier());
@@ -44,7 +44,7 @@ public class EndStatePlan extends Plan
 		
 		// Check if worker agent has been correctly removed.
 		waitFor(1000);	// Hack!!! how to ensure that agent has time to remove itself?
-		IGoal	search	= createGoal("amscap.cms_search_components");
+		IGoal	search	= createGoal("cmscap.cms_search_components");
 		IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer()
 			.getService(IComponentManagementService.class);
 		search.getParameter("description").setValue(ces.createComponentDescription(worker, null, null, null, null));
@@ -68,7 +68,7 @@ public class EndStatePlan extends Plan
 
 		// Create deregister agent.
 		report	= new TestReport("deregister", "Test if an agent can deregister on termination.");
-		create	= createGoal("amscap.cms_create_component");
+		create	= createGoal("cmscap.cms_create_component");
 		create.getParameter("type").setValue("/jadex/bdi/testcases/misc/EndStateDeregister.agent.xml");
 		dispatchSubgoalAndWait(create);
 		IComponentIdentifier	deregister	= (IComponentIdentifier)create.getParameter("componentidentifier").getValue();
@@ -89,7 +89,7 @@ public class EndStatePlan extends Plan
 		else
 		{
 			// Kill deregister agent.
-			IGoal	destroy	= createGoal("amscap.cms_destroy_component");
+			IGoal	destroy	= createGoal("cmscap.cms_destroy_component");
 			destroy.getParameter("componentidentifier").setValue(deregister);
 			dispatchSubgoalAndWait(destroy);
 			
@@ -105,7 +105,7 @@ public class EndStatePlan extends Plan
 			else
 			{
 				// Check if deregister agent has been correctly removed.
-				search = createGoal("amscap.cms_search_components");
+				search = createGoal("cmscap.cms_search_components");
 				search.getParameter("description").setValue(ces.createComponentDescription(deregister, null, null, null, null));
 				dispatchSubgoalAndWait(search);
 				if(search.getParameterSet("result").getValues().length!=0)

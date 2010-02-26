@@ -91,7 +91,7 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //			System.out.println("Killing " + ((IComponentIdentifier)agents.get(i)).getName());
 			try
 			{
-//				IGoal da = createGoal("amscap.cms_destroy_component");
+//				IGoal da = createGoal("cmscap.cms_destroy_component");
 //				da.getParameter("componentidentifier").setValue(agents.get(i));
 //				dispatchSubgoalAndWait(da);
 				

@@ -141,7 +141,7 @@ public class MessageService implements IMessageService, IService
 		// Hack!!! Convert Jadex/Nuggets AMS/DF messages to FIPA.
 		if(type.equals(SFipa.FIPA_MESSAGE_TYPE) && receivers.length==1)
 		{
-			if(SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME.equals(message.get(SFipa.ONTOLOGY)))
+			if(SFipa.COMPONENT_MANAGEMENT_ONTOLOGY_NAME.equals(message.get(SFipa.ONTOLOGY)))
 			{
 				Object	content	= message.get(SFipa.CONTENT);
 				Concept	request	= null;

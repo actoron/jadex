@@ -17,7 +17,7 @@
 
 	<capabilities>
 		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
-		<capability name="amscap" file="jadex.bdi.planlib.cms.CMS"/>
+		<capability name="cmscap" file="jadex.bdi.planlib.cms.CMS"/>
 		<capability name="eacap" file="jadex.bdi.planlib.protocols.englishauction.EnglishAuction"/>
 	</capabilities>
 

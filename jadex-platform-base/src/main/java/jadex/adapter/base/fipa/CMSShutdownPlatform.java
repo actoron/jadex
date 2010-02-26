@@ -10,7 +10,7 @@ public class CMSShutdownPlatform implements IComponentAction
 
 	/**
 	 *  Default Constructor. <br>
-	 *  Create a new <code>AMSShutdownPlatform</code>.
+	 *  Create a new <code>CMSShutdownPlatform</code>.
 	 */
 	public CMSShutdownPlatform()
 	{

@@ -18,7 +18,7 @@
 
 	<capabilities>
 		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
-		<capability name="amscap" file="jadex.bdi.planlib.cms.CMS"/>
+		<capability name="cmscap" file="jadex.bdi.planlib.cms.CMS"/>
 	</capabilities>
 
 	<beliefs>
@@ -45,7 +45,7 @@
 				<value>SFipa.PROTOCOL_REQUEST</value>
 			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
-				<value>SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME</value>
+				<value>SFipa.COMPONENT_MANAGEMENT_ONTOLOGY_NAME</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
 				<value>SFipa.JADEX_XML</value>
@@ -53,7 +53,7 @@
 			<parameter name="reply_with" class="String">
 				<value>SFipa.createUniqueId($scope.getAgentName())</value>
 			</parameter>
-			<match>$content instanceof AMSCreateAgent</match>
+			<match>$content instanceof CMSCreateComponent</match>
 		</messageevent>
 
 		<messageevent name="request_destroy_agent" type="fipa" direction="send">
@@ -64,7 +64,7 @@
 				<value>SFipa.PROTOCOL_REQUEST</value>
 			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
-				<value>SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME</value>
+				<value>SFipa.COMPONENT_MANAGEMENT_ONTOLOGY_NAME</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
 				<value>SFipa.JADEX_XML</value>
@@ -72,7 +72,7 @@
 			<parameter name="reply_with" class="String">
 				<value>SFipa.createUniqueId($scope.getAgentName())</value>
 			</parameter>
-			<match>$content instanceof AMSDestroyAgent</match>
+			<match>$content instanceof CMSCreateComponent</match>
 		</messageevent>
 
 		<messageevent name="request_search_agents" type="fipa" direction="send">
@@ -83,7 +83,7 @@
 				<value>SFipa.PROTOCOL_REQUEST</value>
 			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
-				<value>SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME</value>
+				<value>SFipa.COMPONENT_MANAGEMENT_ONTOLOGY_NAME</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
 				<value>SFipa.JADEX_XML</value>
@@ -91,7 +91,7 @@
 			<parameter name="reply_with" class="String">
 				<value>SFipa.createUniqueId($scope.getAgentName())</value>
 			</parameter>
-			<match>$content instanceof AMSSearchAgents</match>
+			<match>$content instanceof CMSSearchComponents</match>
 		</messageevent>
 
 		<messageevent name="request_shutdown_platform" type="fipa" direction="send">
@@ -102,7 +102,7 @@
 				<value>SFipa.PROTOCOL_REQUEST</value>
 			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
-				<value>SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME</value>
+				<value>SFipa.COMPONENT_MANAGEMENT_ONTOLOGY_NAME</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
 				<value>SFipa.JADEX_XML</value>
@@ -110,7 +110,7 @@
 			<parameter name="reply_with" class="String">
 				<value>SFipa.createUniqueId($scope.getAgentName())</value>
 			</parameter>
-			<match>$content instanceof AMSShutdownPlatform</match>
+			<match>$content instanceof CMSShutdownPlatform</match>
 		</messageevent>
 
 		<messageevent name="inform_done" type="fipa" direction="receive">
@@ -121,7 +121,7 @@
 				<value>SFipa.PROTOCOL_REQUEST</value>
 			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
-				<value>SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME</value>
+				<value>SFipa.COMPONENT_MANAGEMENT_ONTOLOGY_NAME</value>
 			</parameter>
 			<match>$content instanceof Done</match>
 		</messageevent>

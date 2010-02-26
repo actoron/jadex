@@ -23,7 +23,7 @@ public class ConfigElementRefPlan extends Plan
 		getWaitqueue().addMessageEvent("inform_reports");
 		
 		// Create worker agent (kills itself automatically).
-		IGoal	create	= createGoal("amscap.cms_create_component");
+		IGoal	create	= createGoal("cmscap.cms_create_component");
 		create.getParameter("type").setValue("/jadex/bdi/testcases/misc/ConfigElementRefWorker.agent.xml");
 		Map args = SCollection.createHashMap();
 		args.put("testagent", getComponentIdentifier());

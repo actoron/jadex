@@ -18,7 +18,7 @@
 	</imports>
 
 	<capabilities>
-		<capability name="amscap" file="jadex.bdi.planlib.cms.CMS"></capability>
+		<capability name="cmscap" file="jadex.bdi.planlib.cms.CMS"></capability>
 	</capabilities>
 
 	<beliefs>

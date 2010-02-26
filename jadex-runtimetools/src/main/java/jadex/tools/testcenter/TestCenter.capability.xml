@@ -18,7 +18,7 @@
 		</imports>
 
 		<capabilities>
-			<capability name="amscap" file="jadex.bdi.planlib.cms.CMS"/>
+			<capability name="cmscap" file="jadex.bdi.planlib.cms.CMS"/>
 		</capabilities>
 
 		<beliefs>
@@ -33,13 +33,13 @@
 				<parameter name="classloader" class="ClassLoader" optional="true" />
 			</performgoal>
 			<achievegoalref name="cms_create_component">
-				<concrete ref="amscap.cms_create_component"/>
+				<concrete ref="cmscap.cms_create_component"/>
 			</achievegoalref>
-			<achievegoalref name="ams_resume_agent">
-				<concrete ref="amscap.ams_resume_agent"/>
+			<achievegoalref name="cms_resume_component">
+				<concrete ref="cmscap.ams_resume_component"/>
 			</achievegoalref>
 			<achievegoalref name="cms_destroy_component">
-				<concrete ref="amscap.cms_destroy_component"/>
+				<concrete ref="cmscap.cms_destroy_component"/>
 			</achievegoalref>
 		</goals>
 

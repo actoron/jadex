@@ -36,7 +36,7 @@ public class SFipa
 	public static final String DF_COMPONENT = "df";
 	
 //	/** The (standard) AMS service name. */
-//	public static final String AMS_SERVICE = "cms_service";
+//	public static final String CMS_SERVICE = "cms_service";
 //	
 //	/** The (standard) DF service name. */
 //	public static final String DF_SERVICE = "df_service";
