@@ -433,6 +433,15 @@ public class ProcessThread	implements ITaskContext
 	public boolean belongsTo(String pool, String lane)
 	{
 		// Test pool.
+		try
+		{
+			boolean	ret	= pool==null || pool.equals(getActivity().getPool().getName());
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
 		boolean	ret	= pool==null || pool.equals(getActivity().getPool().getName());
 		
 		// Test lane

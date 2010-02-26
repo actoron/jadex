@@ -26,7 +26,6 @@
 <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;jadex-commons&quot; type=&quot;1&quot;/&gt;&#13;&#10;"/>
 <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;jadex-javaparser&quot; type=&quot;1&quot;/&gt;&#13;&#10;"/>
 <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;jadex-kernel-bdi&quot; type=&quot;1&quot;/&gt;&#13;&#10;"/>
-<listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;jadex-kernel-bdi-bpmn&quot; type=&quot;1&quot;/&gt;&#13;&#10;"/>
 <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;jadex-kernel-micro&quot; type=&quot;1&quot;/&gt;&#13;&#10;"/>
 <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;jadex-nuggets&quot; type=&quot;1&quot;/&gt;&#13;&#10;"/>
 <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;jadex-platform-base&quot; type=&quot;1&quot;/&gt;&#13;&#10;"/>
@@ -34,6 +33,9 @@
 <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;jadex-rules-applications&quot; type=&quot;1&quot;/&gt;&#13;&#10;"/>
 <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;jadex-rules-tools&quot; type=&quot;1&quot;/&gt;&#13;&#10;"/>
 <listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;jadex-runtimetools&quot; type=&quot;1&quot;/&gt;&#13;&#10;"/>
+<listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;jadex-kernel-bpmn&quot; type=&quot;1&quot;/&gt;&#13;&#10;"/>
+<listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;jadex-kernel-gpmn&quot; type=&quot;1&quot;/&gt;&#13;&#10;"/>
+<listEntry value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;runtimeClasspathEntry path=&quot;3&quot; projectName=&quot;jadex-kernel-bdibpmn&quot; type=&quot;1&quot;/&gt;&#13;&#10;"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.maven.ide.eclipse.launchconfig.classpathProvider"/>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>

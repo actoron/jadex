@@ -619,17 +619,30 @@ public class BpmnXMLReader
 		 */
 		protected void setSubActivities(MAssociationTarget parent, MPool pool)
 		{
-			List activities = parent instanceof MSubProcess? ((MSubProcess)parent).getActivities(): ((MPool)parent).getActivities();
-			if (activities != null)
+			List activities = parent instanceof MSubProcess? getAllActivities((MSubProcess)parent): ((MPool)parent).getActivities();
+			if(activities != null)
 			{
-				for (Iterator it = activities.iterator(); it.hasNext(); )
+				for(Iterator it = activities.iterator(); it.hasNext(); )
 				{
-					MActivity activity = (MActivity) it.next();
+					MActivity activity = (MActivity)it.next();
 					activity.setPool(pool);
-					if (activity instanceof MSubProcess)
-						setSubActivities((MSubProcess) activity, pool);
+					if(activity instanceof MSubProcess)
+						setSubActivities((MSubProcess)activity, pool);
 				}
 			}
+		}
+		
+		/**
+		 *  Get all activities of a subprocess.
+		 */
+		public List getAllActivities(MSubProcess proc)
+		{
+			List ret = new ArrayList();
+			if(proc.getActivities()!=null)
+				ret.addAll(proc.getActivities());
+			if(proc.getEventHandlers()!=null)
+				ret.addAll(proc.getEventHandlers());
+			return ret;
 		}
 	}
 	
