@@ -25,7 +25,13 @@
 						new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000)))
 			</property>
 						
-			<property type="jadex.adapter.base.fipa.IDF" name="df_service">new jadex.adapter.standalone.service.DirectoryFacilitatorService($platform)</property>
+			<property type="jadex.bridge.IComponentManagementService" name="cms_service">
+				new jadex.adapter.standalone.service.ComponentManagementService($platform)
+			</property> 			
+						
+			<property type="jadex.adapter.base.fipa.IDF" name="df_service">
+				new jadex.adapter.standalone.service.DirectoryFacilitatorService($platform)
+			</property>
 			
 			<property type="jadex.bridge.IMessageService" name="message_service">new jadex.adapter.standalone.MessageService($platform, 
 				new jadex.adapter.standalone.transport.ITransport[]
@@ -49,20 +55,16 @@
 //					System.currentTimeMillis(), 200))
 			</property>
 
-			<!-- Simulation service. -->
 			<property type="jadex.adapter.base.ISimulationService" name="simulation_service">
 				new jadex.adapter.base.SimulationService($platform)
 			</property>
 		
-			<!-- Execution service. -->
 			<property type="jadex.service.execution.IExecutionService" name="execution_service">
 				new jadex.service.execution.AsyncExecutionService(
 					$platform.getService(jadex.service.threadpool.ThreadPoolService.class))
 			</property>
 			
-			<!-- Element factories -->
-			
-			<property type="jadex.bridge.IComponentFactory" name="application_factory">
+			<!-- <property type="jadex.bridge.IComponentFactory" name="application_factory">
 				new jadex.application.ApplicationComponentFactory($platform,
 					new java.util.Set[]
 					{
@@ -99,10 +101,7 @@
 			<property type="jadex.bridge.IComponentFactory" name="micro_factory">
 				new jadex.microkernel.MicroAgentFactory($platform)
 			</property>
-			
-			<property type="jadex.bridge.IComponentManagementService" name="cms_service">
-				new jadex.adapter.standalone.service.ComponentManagementService($platform)
-			</property> 
+			-->
 			
 		</properties>
 	</properties>
