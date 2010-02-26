@@ -31,16 +31,10 @@
 			</fact>
  		</belief>
 
-		<!-- The garbages at the current posistion. -->
-		<beliefset name="garbages" class="String" evaluationmode="push">
+		<!-- The garbages at the current position. -->
+		<beliefset name="garbages" class="WorldObject" evaluationmode="push">
 			<facts language="jcl">
 				$beliefbase.env.getGarbages($beliefbase.pos)
-				
-				// ?rbel_env = (belief (element_has_model ?mbel_env) (belief_has_fact ?env))
-				// ?mbel_env = (mbelief (melement_has_name "env"))
-				// ?rbel_pos = (belief (element_has_model ?mbel_pos) (belief_has_fact ?pos))
-				// ?mbel_pos = (mbelief (melement_has_name "pos"))
- 				// ?env = (Environment (getGarbages (?pos) $?ret))
 			</facts>
 		</beliefset>
 	</beliefs>
@@ -52,16 +46,13 @@
  			per specific piece of garbage. -->
 		<achievegoal name="burn">
 			<parameter name="garbage" class="String">
-				<!--  <bindingoptions>$beliefbase.garbages</bindingoptions>-->
 				<!-- Bind against variable from creation condition. -->
-				<value>?garbage</value>
+				<value>$garbage</value>
 			</parameter>
 			<unique/>
-			<creationcondition language="clips">
-				// Garbage $garbage
-			
-				?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts $?x ?garbage $?y))
-				?mbeliefset = (mbeliefset (melement_has_name "garbages"))
+			<creationcondition language="jcl">
+				WorldObject $garbage
+				&amp;&amp; java.util.Arrays.asList($beliefbase.garbages).contains($garbage)
 			</creationcondition>
 			<deliberation cardinality="1"/>
 		</achievegoal>

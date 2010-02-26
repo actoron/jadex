@@ -418,16 +418,16 @@ public class Environment
 	 *  @param pos The position.
 	 *  @return All objects at the position.
 	 */
-	public String[] getGarbages(Position pos)
+	public WorldObject[] getGarbages(Position pos)
 	{
 		WorldObject[] wos = getWorldObjects(pos);
 		List garbs = new ArrayList();
 		for(int i=0; i<wos.length; i++)
 		{
 			if(wos[i].getType().equals(GARBAGE))
-				garbs.add(wos[i].getName());
+				garbs.add(wos[i]);
 		}
-		return (String[])garbs.toArray(new String[garbs.size()]);
+		return (WorldObject[])garbs.toArray(new WorldObject[garbs.size()]);
 	}
 
 

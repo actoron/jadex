@@ -17,6 +17,7 @@
 		<import>jadex.bdi.examples.marsworld_classic.movement.*</import>
 		<import>jadex.adapter.base.fipa.*</import>
 		<import>java.util.logging.*</import>
+		<import>java.util.*</import>
 	</imports>
 
 	<capabilities>
@@ -51,27 +52,16 @@
 			<!-- The parameter target is bound to one
 				of the facts in the belief my_targets. -->
 			<parameter name="target" class="Target">
-				<value>?target</value>
+				<value>$target</value>
 			</parameter>
 			<unique/>
 			<!-- Create a new goal when a target was added
 				and the mission is going on. -->
-			<creationcondition language="clips">
-				// !$beliefbase.missionend
-				// Hack should not access subcapability directly!!! 
-				(belief (element_has_model ?mbel_missionend) (belief_has_fact false))
-				?mbel_missionend	= (mbelief (melement_has_name "missionend"))
-
-				// select $target from $beliefbase.my_targets
-				// where !$beliefbase.getBeliefSet("analysed_targets").containsFact($target)
-				(beliefset (element_has_model ?mbel_mytargets) (beliefset_has_facts $?x ?target $?y))
-				?mbel_mytargets = (mbeliefset (melement_has_name "my_targets"))
-				(not
-					(and
-						(beliefset (element_has_model ?mbel_analysedtargets) (beliefset_has_facts $?p ?target $?q))
-						?mbel_analysedtargets = (mbeliefset (melement_has_name "analysed_targets"))
-					)
-				)
+			<creationcondition language="jcl">
+				!$beliefbase.missionend &amp;&amp;
+				Target $target &amp;&amp;
+				Arrays.asList($beliefbase.my_targets).contains($target) &amp;&amp;
+				!Arrays.asList($beliefbase.analysed_targets).contains($target)
 			</creationcondition>
 			<!-- Suspend the goal when some other target is nearer to the agent.- ->
 			<contextcondition>
@@ -89,13 +79,8 @@
 				<inhibits ref="move.walk_around"/>
 			</deliberation>
 			<!-- The goal is reached when the target is analysed. -->
-			<targetcondition language="clips">
-				// $beliefbase.getBeliefSet("analysed_targets").containsFact($goal.target)
-				
-				?rgoal	= (goal (parameterelement_has_parameters ?param_target))
-				?param_target	= (parameter (parameter_has_value ?target))
-				(beliefset (element_has_model ?mbel_analysedtargets) (beliefset_has_facts $?p ?target $?q))
-				?mbel_analysedtargets = (mbeliefset (melement_has_name "analysed_targets"))
+			<targetcondition language="jcl">
+				Arrays.asList($beliefbase.analysed_targets).contains($goal.target)
  			</targetcondition>
 		</achievegoal>
 	</goals>

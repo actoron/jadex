@@ -152,18 +152,10 @@
 			<trigger>
 				<goal ref="play_with_player"/>
 			</trigger>
-			<contextcondition language="clips">
-				// $beliefbase.getBeliefSet("players").containsFact($plan.player)
+			<contextcondition language="jcl">
+				$beliefbase.getBeliefSet("players").containsFact($plan.player)
+				&amp;&amp; $plan.player.getState() != Player.STATE_IDLE
 				// &amp;&amp; !$plan.player.getState().equals(Player.STATE_IDLE)
-			
-				// ?player = (Player (playingstate != "idle"))
-				// ?rparam = (parameter (parameter_has_name "player") (parameter_has_value ?player))
-				// ?rplan = (plan (parameterelement_has_parameters contains ?rparam))
-				
-				// ?player = (Player (playingstate != "idle"))
-				// ?rplan = (plan (parameterelement_has_parameters["player"].parameter_has_value ?player))
-
-				?rplan = (plan (parameterelement_has_parameters["player"].parameter_has_value.Player:playingstate != "idle"))
 			</contextcondition>
 		</plan>
 
@@ -344,138 +336,38 @@
 			order by $p.getCards().length
 		</expression>
 		
-		<!-- Check if it is the dealer's turn. -->
-		<!--  <condition name="dealers_turn">
-			// The dealer may draw its initial card when all players have two cards.
-			// $beliefbase.myself.getCards().length==0 &amp;&amp;
-			// (select one Player $p from $beliefbase.players
-			// where !$p.getState().equals(Player.STATE_IDLE) &amp;&amp; $p.getCards().length!=2)
-			// == null
-
-			// The dealer may draw more cards, when all players are either idle or finished.
-			// || (select one Player $p from $beliefbase.players
-			// where !$p.getState().equals(Player.STATE_IDLE) &amp;&amp; !$p.getState().equals(Player.STATE_FINISHED))
-			// == null
-			
-			// ?dealer = (jadex.bdi.examples.blackjack.Player (cardCnt 0))
-			// ?rbelief = (belief (belief_has_fact ?dealer) (element_has_model ?mbelief))
-			// ?mbelief = (mbelief (melement_has_name "myself"))
-			// (not
-			// 	(and
-			// 		?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (cardCnt != 2))
-			//		?rbeliefset = (beliefset (belief_has_facts contains ?player) (element_has_model ?mbeliefset))
-			//		?mbeliefset = (mbeliefset (melement_has_name "players"))
-			//	)
-			// )
-			// ||
-			// (not
-			//	(and
-			//		?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (playingstate != "finished"))
-			//		?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
-			//		?mbeliefset = (mbeliefset (melement_has_name "players"))
-			//	)
-			//)
-			
-			(not
-				(and
-					(not
-						(and
-							?dealer = (jadex.bdi.examples.blackjack.Player (cardCnt 0))
-							?rbelief = (belief (belief_has_fact ?dealer) (element_has_model ?mbelief))
-							?mbelief = (mbelief (melement_has_name "myself"))
-							(not
-								(and
-									?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (cardCnt != 2))
-									?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
-									?mbeliefset = (mbeliefset (melement_has_name "players"))
-								)
-							)
-						)
-					)
-				
-					?player = (jadex.bdi.examples.blackjack.Player (playingstate != "idle") (playingstate != "finished"))
-					?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
-					?mbeliefset = (mbeliefset (melement_has_name "players"))
-				)
-			)
-		</condition>-->
-		
 		<!-- Check if it is the dealer's first turn. -->
-		<condition name="dealers_first_turn" language="clips">
-			?dealer = (Player (cardCnt 0))
-			?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?dealer))
-			
-			//?rbelief = (belief (belief_has_fact ?dealer) (element_has_model ?mbelief))
-			//?mbelief = (mbelief (melement_has_name "myself"))
-			
-			(not
-				(and
-			 		?player = (Player (playingstate != "idle") (cardCnt != 2))
-					?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
-					?mbeliefset = (mbeliefset (melement_has_name "players"))
-				)
-			)
-			
-			// ?dealer = (Player (cardCnt 0))
-			// ?rbelief = (belief (element_has_model.melement_has_name "myself") (belief_has_fact ?dealer))
-			// 
-			// (not
-			//	(and
-			// 		?player = (Player (playingstate != "idle") (cardCnt != 2))
-			//		?rbeliefset = (beliefset (element_has_model.melement_has_name "players") (beliefset_has_facts contains ?player))
-			//	)
-			//)
+		<condition name="dealers_first_turn" language="jcl">
+			$beliefbase.myself.cardCnt==0 &amp;&amp;
+			!(Player $player &amp;&amp; $player.playingstate!="idle"
+							 &amp;&amp; $player.cardCnt!=2
+							 &amp;&amp; Arrays.asList($beliefbase.players).contains($player))
 		</condition>
 		
-		<!-- Check if it is the dealer's first turn. -->
-		<condition name="dealers_second_turn" language="clips">
-			(not
-				(and
-					?player = (Player (playingstate != "idle") (playingstate != "finished"))
-					?rbeliefset = (beliefset (beliefset_has_facts contains ?player) (element_has_model ?mbeliefset))
-					?mbeliefset = (mbeliefset (melement_has_name "players"))
-					
-					//?player = (Player (playingstate != "idle") (playingstate != "finished"))
-					//?rbeliefset = (beliefset (element_has_model.melement_has_name "players") (beliefset_has_facts contains ?player))
-				)
-			)
+		<!-- Check if it is the dealer's second turn. -->
+		<condition name="dealers_second_turn" language="jcl">
+			!(Player $player &amp;&amp; $player.playingstate!="idle"
+							 &amp;&amp; $player.playingstate!="finished"
+							 &amp;&amp; Arrays.asList($beliefbase.players).contains($player))
 		</condition>
 
 		<!-- Check if it is the $player's turn. -->
-		<condition name="players_turn" language="clips">
+		<condition name="players_turn" language="jcl">
 			// All players must be idle, playing, or finished.
-			// (select one Player $p from $beliefbase.players
-			// where !$p.getState().equals(Player.STATE_IDLE)
-			// &amp;&amp; !$p.getState().equals(Player.STATE_PLAYING)
-			// &amp;&amp; !$p.getState().equals(Player.STATE_FINISHED))
-			// == null
+			!(Player $p1 &amp;&amp; $p1.playingstate!="idle"
+						 &amp;&amp; $p1.playingstate!="playing"
+						 &amp;&amp; $p1.playingstate!="finished"
+						 &amp;&amp; Arrays.asList($beliefbase.players).contains($p1))
 
-			// And this player must be the first with the least number of cards.
-			// Hack !!! Assume "one" selects players in order.
-			// &amp;&amp; (select one Player $p from $beliefbase.players
-			// where $p.getState().equals(Player.STATE_PLAYING)
-			// &amp;&amp; $p.getCards().length&lt;=$player.getCards().length
- 			// order by $p.getCards().length)
-			// == $player
-			// <!-- <parameter name="$player" class="Player"/> -->
-			
-			(not
-				(and
-					?p = (Player (playingstate != "idle") (playingstate != "playing") (playingstate != "finished"))
-					?rbeliefset = (beliefset (element_has_model.melement_has_name "players") (beliefset_has_facts contains ?p))
-				)
-			)
-			
-			?player = (Player (playingstate "playing") (cardCnt ?cardcnt))
-			?rparam = (parameter (parameter_has_name "player") (parameter_has_value ?player)) 
-			?rplan = (plan (parameterelement_has_parameters contains ?rparam))
-			
-			(not
-				(and
-					?p = (Player (playingstate "playing") (cardCnt ?cc&amp;:(&lt; ?cc ?cardcnt)))
-					?rbeliefset = (beliefset (element_has_model.melement_has_name "players") (beliefset_has_facts contains ?p))
-				)
-			)
+			&amp;&amp;
+			// And $player must be playing.
+			Player $player &amp;&amp; $player.playingstate=="playing"
+						   &amp;&amp; Arrays.asList($beliefbase.players).contains($player)
+			&amp;&amp;
+			// And no playing player has less cards than $player.
+			!(Player $p2 &amp;&amp; $p2.playingstate=="playing"
+						 &amp;&amp; $p2.cardCnt &lt; $player.cardCnt
+					     &amp;&amp; Arrays.asList($beliefbase.players).contains($p2))
 		</condition>
 
 		<!-- Check if the dealer has drawn its first card. -->

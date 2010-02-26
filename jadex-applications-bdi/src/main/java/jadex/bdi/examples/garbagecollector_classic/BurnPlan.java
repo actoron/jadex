@@ -13,7 +13,7 @@ public class BurnPlan extends Plan
 	 */
 	public void body()
 	{
-//		System.out.println("Burn plan activated!");
+		//System.out.println("Burn plan activated!");
 		
 		Environment env = (Environment)getBeliefbase().getBelief("env").getFact();
 

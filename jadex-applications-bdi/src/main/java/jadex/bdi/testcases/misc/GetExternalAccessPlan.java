@@ -3,8 +3,8 @@ package jadex.bdi.testcases.misc;
 import jadex.adapter.base.test.TestReport;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentExecutionService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.concurrent.IResultListener;
 
 /**
@@ -20,7 +20,7 @@ public class GetExternalAccessPlan extends Plan
 	public void body()
 	{
 		// Create component.
-		IComponentExecutionService ces = (IComponentExecutionService)getScope().getServiceContainer().getService(IComponentExecutionService.class);
+		IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
 		SyncResultListener lis = new SyncResultListener();
 		ces.createComponent("myagent", "jadex/bdi/testcases/misc/ExternalAccess.agent.xml", 
 			"donothing", null, true, lis, null, null, false);

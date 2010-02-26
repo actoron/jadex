@@ -97,40 +97,19 @@
 
 		<achievegoal name="eat_food">
 			<parameter name="$food" class="Food">
-				<!-- <bindingoptions>$beliefbase.food</bindingoptions> -->
-				<value>?food</value>
+				<value>$food</value>
 			</parameter>
 			<unique/>
-			<creationcondition language="clips">
- 				// $beliefbase.eating_allowed &amp;&amp;
- 				// !$beliefbase.getBeliefSet("forbidden_food").containsFact($food)
-
-				?rbel_eating_allowed	= (belief (element_has_model ?mbel_eating_allowed) (belief_has_fact true))
-				?mbel_eating_allowed	= (mbelief (melement_has_name "eating_allowed"))
-
-				?rbelset_food	= (beliefset (element_has_model ?mbelset_food) (beliefset_has_facts $?x ?food $?y))
-				?mbelset_food	= (mbeliefset (melement_has_name "food"))
-
-				?rbelset_forbidden_food	= (beliefset (element_has_model ?mbelset_forbidden_food) (beliefset_has_facts excludes ?food))
-				?mbelset_forbidden_food	= (mbeliefset (melement_has_name "forbidden_food"))
+			<creationcondition language="jcl">
+ 				$beliefbase.eating_allowed &amp;&amp;
+ 				Food $food &amp;&amp; Arrays.asList($beliefbase.food).contains($food)
+ 				&amp;&amp; !Arrays.asList($beliefbase.forbidden_food).contains($food)
 			</creationcondition>
 			<deliberation>
 				<inhibits ref="wander_around"/>
-				<inhibits ref="eat_food">
-					// $beliefbase.my_self.getDistance($goal.$food)
-					// &lt; $beliefbase.my_self.getDistance($ref.$food)
-					
-					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myself))
-					?mbelief = (mbelief (melement_has_name "my_self"))
-					
-					?rparam = (parameter (parameter_has_name "$food") (parameter_has_value ?food))
-					?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
-					
-					?refparam = (parameter (parameter_has_name "waste") (parameter_has_value ?reffood))
-					?refgoal = (goal (parameterelement_has_parameters contains ?refparam &amp;
-						:(&lt; (MethodCallFunction "Creature" "getDistance" ?myself ?food)
-							(MethodCallFunction "Creature" "getDistance" ?myself ?reffood)  
-					)))
+				<inhibits ref="eat_food" language="jcl">
+					$beliefbase.my_self.getDistance($goal.$food)
+					&lt; $beliefbase.my_self.getDistance($ref.$food)
 				</inhibits>
 			</deliberation>
 		</achievegoal>
