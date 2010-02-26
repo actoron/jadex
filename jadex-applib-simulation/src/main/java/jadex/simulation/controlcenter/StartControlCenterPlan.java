@@ -9,7 +9,8 @@ public class StartControlCenterPlan extends Plan{
 	//start control center
 	public void body() {
 		ControlCenter gui = new ControlCenter(this.getExternalAccess());
-				
+	
+		getBeliefbase().getBelief("tmpGUI").setFact(gui);
 	}
 
 }

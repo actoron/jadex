@@ -7,6 +7,7 @@ import jadex.simulation.controlcenter.ControlCenter;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.SimulationConfiguration;
+import jadex.simulation.model.result.IntermediateResult;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +33,7 @@ public class InitSimulationPlan extends Plan{
 //		dispatchTopLevelGoal(ca);				
 		
 		ControlCenter tmpGui = new ControlCenter(this.getExternalAccess());
+		getBeliefbase().getBelief("tmpGUI").setFact(tmpGui);
 	}
 
 	/**
@@ -51,5 +53,6 @@ public class InitSimulationPlan extends Plan{
 		
 		getBeliefbase().getBelief("generalSimulationFacts").setFact(facts);
 		getBeliefbase().getBelief("simulationConf").setFact(simConf);
+		getBeliefbase().getBelief("intermediateResults").setFact(new IntermediateResult(simConf));		
 	};
 }

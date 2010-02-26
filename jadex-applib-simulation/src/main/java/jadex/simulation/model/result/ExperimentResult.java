@@ -41,6 +41,7 @@ public class ExperimentResult extends IResult{
 	@XmlElementWrapper(name="ObservedEvents")
 	@XmlElement(name="ObservedEvent")	
 	public ArrayList<ObservedEvent> getEvents() {
+		sortEventlist();
 		return events;
 	}
 	
@@ -146,7 +147,7 @@ public class ExperimentResult extends IResult{
 	 * Returns the list of observed events ascendingly ordered.
 	 */
 	public void sortEventlist(){
-		Collections.sort(getEvents(), new Comparator() {
+		Collections.sort(this.events, new Comparator() {
 			public int compare(Object arg0, Object arg1) {
 				return new Long(((ObservedEvent) arg0).getRelativeTimestamp()).compareTo(new Long(((ObservedEvent) arg1).getRelativeTimestamp()));
 			}

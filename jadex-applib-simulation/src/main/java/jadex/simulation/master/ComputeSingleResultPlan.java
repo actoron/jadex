@@ -3,20 +3,18 @@ package jadex.simulation.master;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.simulation.controlcenter.ControlCenter;
+import jadex.simulation.evaluation.IntermediateEvaluation;
 import jadex.simulation.helper.Constants;
-import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.ExperimentResult;
+import jadex.simulation.model.result.IntermediateResult;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-
-import org.jfree.ui.ArrowPanel;
 
 /**
  * Responsible for dealing with the result of one single simulation experiment.
@@ -60,9 +58,9 @@ public class ComputeSingleResultPlan extends Plan {
 		Collections.sort(sortedResultList);
 		
 		
-		ExperimentResult exRes = toExperimentResult(content, new ArrayList(observedEventsMap.values()));
+		ExperimentResult experimentRes = toExperimentResult(content, new ArrayList(observedEventsMap.values()));
 		
-		System.out.println("#Master#************************* Received message:\n " + exRes.toString() + "\n\n");
+		System.out.println("#Master#************************* Received message:\n " + experimentRes.toString() + "\n\n");
 		
 		//Sorted output of results
 		for (Object key  : sortedResultList) {			
@@ -93,10 +91,16 @@ public class ComputeSingleResultPlan extends Plan {
 		
 		//store result
 		HashMap experimentResults = (HashMap) getBeliefbase().getBelief("experimentResults").getFact();
-		experimentResults.put(totalRuns, exRes);
+		experimentResults.put(totalRuns, experimentRes);
 		getBeliefbase().getBelief("experimentResults").setFact(experimentResults);
 		
-		//trigger comp of intermedite res
+		//do evaluation of intermediate results of an ensemble, i.e. the results of the already conducted experiments of this ensemble.
+		IntermediateResult interRes = IntermediateEvaluation.updateIntermediateResults((SimulationConfiguration) getBeliefbase().getBelief("simulationConf").getFact(),(IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact(),experimentRes);
+		getBeliefbase().getBelief("intermediateResults").setFact(interRes);
+		
+		
+		ControlCenter gui= (ControlCenter) getBeliefbase().getBelief("tmpGUI").getFact();
+		gui.updateCurrentEnsembleTable(experimentRow, expInRow+1, interRes);
 		
 		
 		//trigger the start of the next experiment

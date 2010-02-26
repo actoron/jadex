@@ -20,6 +20,8 @@
 		<import>java.util.Map</import>
 		<import>java.util.HashMap</import>
 		<import>jadex.simulation.model.*</import>
+		<import>jadex.simulation.model.result.*</import>
+		<import>jadex.simulation.controlcenter.*</import>		
 	</imports>
 
 
@@ -63,6 +65,14 @@
 			<fact>new HashMap()</fact>
 		</belief>
 
+		<!--
+			Contains the intermediate results of an ensemble, i.e. the results of
+			the already conducted experiments of this ensemble. The results
+			contain the aggregated information of the ExperimentResults classes
+			of the ensemble.
+		-->
+		<belief name="intermediateResults" class="IntermediateResult"/>					
+
 		<!--  The parsed simulation configuration xml file. -->
 		<belief name="simulationConf" class="SimulationConfiguration" />
 
@@ -75,6 +85,9 @@
 			</fact>
 		</belief>
 
+
+		<!--  The parsed simulation configuration xml file. -->
+		<belief name="tmpGUI" class="ControlCenter" />
 	</beliefs>
 
 	<goals>
@@ -87,10 +100,10 @@
 		<achievegoalref name="df_search">
 			<concrete ref="dfcap.df_search" />
 		</achievegoalref>
-		<!-- Used to start other agents. -->
-		<!-- <achievegoalref name="cms_create_component">
-			<concrete ref="cmscap.cms_create_component" />
-		</achievegoalref> -->
+		<!-- Used to start other agents. -->		
+		 <achievegoalref name="cms_create_component">
+			<concrete ref="cmscap.cms_create_component" />		
+		</achievegoalref>		
 		<!-- Used to stop other agents. -->
 		<achievegoalref name="cms_destroy_component">
 			<concrete ref="cmscap.cms_destroy_component" />
@@ -143,7 +156,7 @@
 				<internalevent ref="triggerExperimentRowEvaluation" />
 			</trigger>
 		</plan>
-		
+
 	</plans>
 
 	<events>
@@ -163,7 +176,7 @@
 
 		<!-- Event to trigger the evaluation of a simulation row. -->
 		<internalevent name="triggerExperimentRowEvaluation" />
-		
+
 	</events>
 
 

@@ -1,8 +1,10 @@
 package jadex.simulation.controlcenter;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.Observer;
 import jadex.simulation.model.SimulationConfiguration;
+import jadex.simulation.model.result.IntermediateResult;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -12,6 +14,8 @@ import java.awt.event.WindowEvent;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,6 +24,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import cern.colt.list.DoubleArrayList;
+
 /**
  * Gui, showing details about the simulation setting and the progress.
  */
@@ -27,21 +33,25 @@ public class ControlCenter extends JFrame {
 	// -------- attributes --------
 
 	// private JPanel mainPanel = new JPanel(new GridLayout(4, 1));
-	private JPanel mainPanel = new JPanel(new GridLayout(3, 1));
+	private JPanel mainPanel = new JPanel(new GridLayout(2, 1));
+	private JPanel allEnsemblesPanel = new JPanel(new GridLayout(2, 2));
 	// private JPanel mainVehiclePnl = new JPanel(new GridLayout(2,1));
 
 	// private Environment env;
 	private IBDIExternalAccess exta;
 	private SimulationConfiguration facts;
-	
-	//contains the list of table models that belong to the currently executed ensemble
+
+	// contains the list of table models that belong to the currently executed ensemble
 	private ArrayList<DefaultTableModel> currentListOfTableModels = new ArrayList<DefaultTableModel>();
 
-//	private DefaultTableModel streetsdm;
-//	private DefaultTableModel trafficServicesdm;
-//	private DefaultTableModel brokersdm;
-//	private DefaultTableModel drivingVehiclesdm;
-//	private DefaultTableModel finishedVehiclesdm;
+	private DefaultTableModel generalSettingsDm;
+	private DefaultTableModel ensembleResultsDm;
+	private DefaultTableModel singleExperimentsDm;
+	// private DefaultTableModel streetsdm;
+	// private DefaultTableModel trafficServicesdm;
+	// private DefaultTableModel brokersdm;
+	// private DefaultTableModel drivingVehiclesdm;
+	// private DefaultTableModel finishedVehiclesdm;
 
 	private Calendar cal = Calendar.getInstance();
 
@@ -60,7 +70,11 @@ public class ControlCenter extends JFrame {
 		// this.env = (Environment) exta.getBeliefbase().getBelief("env").getFact();
 
 		init();
-		createNewEnsembleTable();
+		for (int i = 0; i < 4; i++) {
+			createNewEnsembleTable(i);
+		}
+		mainPanel.add(allEnsemblesPanel);
+		// createNewEnsembleTable(0);
 		// createTrafficServiceTable();
 		// createBrokerTable();
 		// createDrivingVehiclesTable();
@@ -70,7 +84,8 @@ public class ControlCenter extends JFrame {
 
 		pack();
 		setLocation(jadex.commons.SGUI.calculateMiddlePosition(this));
-		setSize(620, 800);
+//		setSize(620, 800);
+		setSize(900, 900);
 		setVisible(true);
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -162,45 +177,54 @@ public class ControlCenter extends JFrame {
 		table.setFillsViewportHeight(true);
 
 		observerPnl.add(scrollPane);
-		mainPanel.add(observerPnl);
+//		mainPanel.add(observerPnl);
 
 	}
 
 	/**
-	 * Creates the table to show information related to the evaluation of an ensemble
+	 * Creates new panels and tables to show information related to the evaluation of an ensemble
 	 */
-	private void createNewEnsembleTable() {
-		//takes the sub components of this ensemble
-		JPanel ensemblePnl = new JPanel(new BorderLayout());
-		
-		//contains the elements of the "north" part of the panel
-		JPanel northPnl  = new JPanel(new GridLayout(2,1));
-		
-		// create the first table, that contains the cumulated results of the already conducted experiments of an ensemble				
-		DefaultTableModel ensembleResultsDm = new DefaultTableModel(new String[] { "Nr. of conducted experiments", "ObserverName", "Mean Value", "Median Value" }, 0);		
-		JTable ensembleResultsTable = new JTable(ensembleResultsDm);		
-		ensembleResultsTable.setPreferredScrollableViewportSize(new Dimension(400, 20));
-		ensembleResultsDm.addRow(new Object[]{0, facts.getObserverList().get(0).getData().getName() , "--", "--"});
-		
-		//contains the results of the single experiments
-		DefaultTableModel singleExperimentsDm = new DefaultTableModel(new String[] { "ID", "Observed Value" }, 0);
+	public void createNewEnsembleTable(int ensemleNr) {
+		// takes the sub components of this ensemble
+		JPanel singleEnsemblePnl = new JPanel(new BorderLayout());
+
+		// contains the elements of the "north" part of the panel
+		JPanel northPnl = new JPanel(new GridLayout(2, 1));
+
+		// create table, that contains the general settings
+		generalSettingsDm = new DefaultTableModel(new String[] { "Ensemble Number", "Already Conducted" }, 0);
+		JTable generalSettingsTable = new JTable(generalSettingsDm);
+		generalSettingsTable.setPreferredScrollableViewportSize(new Dimension(400, 30));
+		// generalSettingsTable.getColumnModel().getColumn(0).setWidth(30);
+		// generalSettingsTable.getColumnModel().getColumn(1).setWidth(30);
+		generalSettingsDm.addRow(new Object[] { ensemleNr, 0 });
+
+		// create the first table, that contains the cumulated results of the already conducted experiments of an ensemble
+		ensembleResultsDm = new DefaultTableModel(new String[] { "ObserverName", "Mean Value", "Median Value", "SimpleVariance Value" }, 0);
+		JTable ensembleResultsTable = new JTable(ensembleResultsDm);
+		ensembleResultsTable.setPreferredScrollableViewportSize(new Dimension(400, 80));
+		for (Observer obs : facts.getObserverList()) {
+			ensembleResultsDm.addRow(new Object[] { obs.getData().getName(), "--", "--", "--" });
+		}
+
+		// contains the results of the single experiments
+		singleExperimentsDm = new DefaultTableModel(new String[] { "ID", "Observer Name", "Observed Values" }, 0);
 		JTable singleExperimentsTable = new JTable(singleExperimentsDm);
 		singleExperimentsTable.setAutoCreateRowSorter(true);
-		singleExperimentsTable.setPreferredScrollableViewportSize(new Dimension(400, 40));
-		singleExperimentsDm.addRow(new Object[]{0, "--"});		
-		
-		northPnl.add(new JLabel("Cumulated and Single Results of ensemble: " + 0));
+		singleExperimentsTable.setPreferredScrollableViewportSize(new Dimension(400, 90));
+		// singleExperimentsDm.addRow(new Object[]{0, facts.getObserverList().get(0).getData().getName(), "--"});
+
+		// northPnl.add(new JLabel("Cumulated and Single Results of ensemble: " + 0));
+		northPnl.add(new JScrollPane(generalSettingsTable));
 		northPnl.add(new JScrollPane(ensembleResultsTable));
-		ensemblePnl.add(BorderLayout.NORTH, northPnl);
-		
-		
-		ensemblePnl.add(BorderLayout.CENTER, new JScrollPane(singleExperimentsTable));
-		mainPanel.add(ensemblePnl);			
-		
-		refreshEnsembleTable();
-				
+		singleEnsemblePnl.add(BorderLayout.NORTH, northPnl);
+		singleEnsemblePnl.add(BorderLayout.CENTER, new JScrollPane(singleExperimentsTable));
+
 		currentListOfTableModels.add(ensembleResultsDm);
 		currentListOfTableModels.add(singleExperimentsDm);
+
+		allEnsemblesPanel.add(singleEnsemblePnl);
+		// mainPanel.add(allEnsemblesPanel);
 
 		// // Add IBeliefListener
 		// exta.getBeliefbase().getBelief("listOfStreets").addBeliefListener(new IBeliefListener() {
@@ -228,36 +252,72 @@ public class ControlCenter extends JFrame {
 	}
 
 	/**
-	 * Refresh the street table.
+	 * Updates the results of the currently running ensemble
 	 */
-	public synchronized void refreshEnsembleTable() {
+	public void updateCurrentEnsembleTable(int nrOfEnsemble, int nrOfConductedExperiments, IntermediateResult interRes) {
 
-		// // First remove all values
-		// while (streetsdm.getRowCount() > 0)
-		// streetsdm.removeRow(0);
-		// // Add new values
-		// HashMap<String, StreetStatusObject> streets = env.getRegisteredStreets();
-		// Set streetSet = streets.entrySet();
-		// Iterator it = streetSet.iterator();
-		// while (it.hasNext()) {
-		// Map.Entry entry = (Map.Entry) it.next();
-		// StreetStatusObject streetObj = (StreetStatusObject) entry.getValue();
-		// String currentStatus, currentCapacity, currentNumberOfVehicles, maxNumberOfVehicles;
-		// // The last update of the StreetObject can't be older than 12sek
-		// if (streetObj.getTimeStamp() + 12000 < System.currentTimeMillis()) {
-		// currentStatus = "Street Status is not up to date!";
-		// currentCapacity = "n/a";
-		// currentNumberOfVehicles = "n/a";
-		// maxNumberOfVehicles = "n/a";
-		// } else {
-		// currentStatus = "OK";
-		// currentCapacity = String.valueOf(formatOutput(streetObj.getCurrentCapacity())) + "%";
-		// currentNumberOfVehicles = String.valueOf(streetObj.getCurrentNumberOfVehicles());
-		// maxNumberOfVehicles = String.valueOf(streetObj.getMaxNumberOfVehicles());
-		// }
-		// streetsdm.addRow(new Object[] { streetObj.getStreetDirection(), currentStatus, currentCapacity, currentNumberOfVehicles, maxNumberOfVehicles });
-		// }
+		// update general settings
+		generalSettingsDm.removeRow(0);
+		generalSettingsDm.addRow(new Object[] { nrOfEnsemble, nrOfConductedExperiments });
+
+		// update statistical results of ensemble
+		while (ensembleResultsDm.getRowCount() > 0) {
+			ensembleResultsDm.removeRow(0);
+		}
+
+		HashMap<String, HashMap<String, String>> intermediateStats = interRes.getIntermediateStats();
+		for (Iterator it = intermediateStats.keySet().iterator(); it.hasNext();) {
+			Object key = it.next();
+			HashMap<String, String> values = intermediateStats.get(key);
+			ensembleResultsDm.addRow(new Object[] { key, values.get("MeanValue"), values.get("MedianValue"), values.get("sampleVarianceValue") });
+		}
+
+		// update table that contains results of the single experiments
+		HashMap<String, ArrayList<String>> latestResults = interRes.getLatestObserverResults();
+		for (Iterator it = latestResults.keySet().iterator(); it.hasNext();) {
+			Object key = it.next();
+			ArrayList<String> values = latestResults.get(key);
+
+			String tmpRes = new String();
+			// Hack: Transform into a single string
+			for (String string : values) {
+				tmpRes += string + ";";
+			}
+			singleExperimentsDm.addRow(new Object[] { nrOfConductedExperiments - 1, key, tmpRes });
+		}
 	}
+
+	// /**
+	// * Refresh the street table.
+	// */
+	// public synchronized void refreshEnsembleTable() {
+
+	// // First remove all values
+	// while (streetsdm.getRowCount() > 0)
+	// streetsdm.removeRow(0);
+	// // Add new values
+	// HashMap<String, StreetStatusObject> streets = env.getRegisteredStreets();
+	// Set streetSet = streets.entrySet();
+	// Iterator it = streetSet.iterator();
+	// while (it.hasNext()) {
+	// Map.Entry entry = (Map.Entry) it.next();
+	// StreetStatusObject streetObj = (StreetStatusObject) entry.getValue();
+	// String currentStatus, currentCapacity, currentNumberOfVehicles, maxNumberOfVehicles;
+	// // The last update of the StreetObject can't be older than 12sek
+	// if (streetObj.getTimeStamp() + 12000 < System.currentTimeMillis()) {
+	// currentStatus = "Street Status is not up to date!";
+	// currentCapacity = "n/a";
+	// currentNumberOfVehicles = "n/a";
+	// maxNumberOfVehicles = "n/a";
+	// } else {
+	// currentStatus = "OK";
+	// currentCapacity = String.valueOf(formatOutput(streetObj.getCurrentCapacity())) + "%";
+	// currentNumberOfVehicles = String.valueOf(streetObj.getCurrentNumberOfVehicles());
+	// maxNumberOfVehicles = String.valueOf(streetObj.getMaxNumberOfVehicles());
+	// }
+	// streetsdm.addRow(new Object[] { streetObj.getStreetDirection(), currentStatus, currentCapacity, currentNumberOfVehicles, maxNumberOfVehicles });
+	// }
+	// }
 
 	//
 	// /**

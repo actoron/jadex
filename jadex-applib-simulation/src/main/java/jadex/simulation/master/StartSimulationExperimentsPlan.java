@@ -8,6 +8,7 @@ import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.Optimization;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.ExperimentResult;
+import jadex.simulation.model.result.IntermediateResult;
 import jadex.simulation.model.result.RowResult;
 
 import java.util.ArrayList;
@@ -89,6 +90,11 @@ public class StartSimulationExperimentsPlan extends Plan {
 			beliefbaseFacts.put(Constants.TOTAL_EXPERIMENT_COUNTER, new Integer(totalRuns));
 			beliefbaseFacts.put(Constants.ROW_EXPERIMENT_COUNTER, new Integer(expInRow));
 			getBeliefbase().getBelief("generalSimulationFacts").setFact(beliefbaseFacts);
+			
+			//update experiment counter in intermediate results
+			IntermediateResult interRes = (IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact();
+			interRes.setCurrentExperimentNumber(expInRow);
+			getBeliefbase().getBelief("intermediateResults").setFact(interRes);			
 		}
 
 		// Increment row counter
@@ -118,6 +124,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 		rowResults.put(rowResult.getId(), rowResult);
 		
 		getBeliefbase().getBelief("experimentResults").setFact(new HashMap());
+		getBeliefbase().getBelief("intermediateResults").setFact(new IntermediateResult(rowCounter, 0, simConf));
 		getBeliefbase().getBelief("rowResults").setFact(rowResults);
 		
 //		System.out.println("#StartSimEx# Try to write RowResult to XML-File.");
