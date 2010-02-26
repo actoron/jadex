@@ -22,6 +22,7 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
@@ -417,9 +418,20 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 						Object usercond = state.getAttributeValue(fact, OAVBDIMetaModel.expression_has_content);
 						if(usercond!=null)
 						{
+							Variable	var	= null;
+							String	varname	= (String)state.getAttributeValue(fact, OAVBDIMetaModel.expression_has_variable);
+							if(varname!=null)
+							{
+								Class	clazz	= (Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class);
+								var	= new Variable(varname, state.getTypeModel().getJavaType(clazz));
+							}
+							else
+							{
+								var	= new Variable("?ret", OAVJavaType.java_object_type);
+							}
 							String btname = (String)state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name);
 							String rulename = Rulebase.getUniqueRuleName(rb, "belief_dynamicfact_"+btname);
-							Object[]	tmp	= BeliefRules.createDynamicBeliefUserRule(mbel);
+							Object[]	tmp	= BeliefRules.createDynamicBeliefUserRule(mbel, var);
 							rb.addRule(createUserRule(state, mcapa, imports, null, fact, usercond, rulename, tmp));
 						}
 					}
@@ -446,9 +458,20 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 						Object usercond = state.getAttributeValue(facts, OAVBDIMetaModel.expression_has_content);
 						if(usercond!=null)
 						{
+							Variable	var	= null;
+							String	varname	= (String)state.getAttributeValue(facts, OAVBDIMetaModel.expression_has_variable);
+							if(varname!=null)
+							{
+								Class	clazz	= (Class)state.getAttributeValue(mbelset, OAVBDIMetaModel.typedelement_has_class);
+								var	= new Variable(varname, state.getTypeModel().getJavaType(clazz));
+							}
+							else
+							{
+								var	= new Variable("$?ret", OAVJavaType.java_object_type);
+							}
 							String btname = (String)state.getAttributeValue(mbelset, OAVBDIMetaModel.modelelement_has_name);
 							String rulename = Rulebase.getUniqueRuleName(rb, "beliefset_dynamicfacts_"+btname);
-							Object[]	tmp	= BeliefRules.createDynamicBeliefSetUserRule(mbelset);
+							Object[]	tmp	= BeliefRules.createDynamicBeliefSetUserRule(mbelset, var);
 							rb.addRule(createUserRule(state, mcapa, imports, null, facts, usercond, rulename, tmp));
 						}
 					}
@@ -570,13 +593,23 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 					Object value = state.getAttributeValue(mparam, OAVBDIMetaModel.parameter_has_value);
 					if(value!=null)
 					{
-						String	varname	= (String)state.getAttributeValue(value, OAVBDIMetaModel.expression_has_variable);
-						String	ptname	= (String)state.getAttributeValue(mparam, OAVBDIMetaModel.modelelement_has_name);
 						Object	usercond	= state.getAttributeValue(value, OAVBDIMetaModel.expression_has_content);
 						if(usercond!=null)
 						{
-							String rulename = Rulebase.getUniqueRuleName(rb, "parameter_dynamicvalue_"+state.getAttributeValue(mpe, OAVBDIMetaModel.modelelement_has_name)+"_"+ptname);
-							Object[]	tmp	= BeliefRules.createDynamicParameterUserRule(mpe, ptname, varname);
+							Variable	var	= null;
+							String	varname	= (String)state.getAttributeValue(value, OAVBDIMetaModel.expression_has_variable);
+							if(varname!=null)
+							{
+								Class	clazz	= (Class)state.getAttributeValue(mparam, OAVBDIMetaModel.typedelement_has_class);
+								var	= new Variable(varname, state.getTypeModel().getJavaType(clazz));
+							}
+							else
+							{
+								var	= new Variable("?ret", OAVJavaType.java_object_type);
+							}
+							String	ptname	= (String)state.getAttributeValue(mparam, OAVBDIMetaModel.modelelement_has_name);
+							String	rulename	= Rulebase.getUniqueRuleName(rb, "parameter_dynamicvalue_"+state.getAttributeValue(mpe, OAVBDIMetaModel.modelelement_has_name)+"_"+ptname);
+							Object[]	tmp	= BeliefRules.createDynamicParameterUserRule(mpe, ptname, var);
 							rb.addRule(createUserRule(state, mcapa, imports, mpe, value, usercond, rulename, tmp));
 						}
 					}
@@ -608,12 +641,23 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 					Object values = state.getAttributeValue(mparamset, OAVBDIMetaModel.parameterset_has_valuesexpression);
 					if(values!=null)
 					{
-						String ptname = (String)state.getAttributeValue(mparamset, OAVBDIMetaModel.modelelement_has_name);
 						Object usercond = state.getAttributeValue(values, OAVBDIMetaModel.expression_has_content);
 						if(usercond!=null)
 						{
+							Variable	var	= null;
+							String	varname	= (String)state.getAttributeValue(values, OAVBDIMetaModel.expression_has_variable);
+							if(varname!=null)
+							{
+								Class	clazz	= (Class)state.getAttributeValue(mparamset, OAVBDIMetaModel.typedelement_has_class);
+								var	= new Variable(varname, state.getTypeModel().getJavaType(clazz));
+							}
+							else
+							{
+								var	= new Variable("$?ret", OAVJavaType.java_object_type);
+							}
+							String ptname = (String)state.getAttributeValue(mparamset, OAVBDIMetaModel.modelelement_has_name);
 							String rulename = Rulebase.getUniqueRuleName(rb, "parameterset_dynamicvalues_"+state.getAttributeValue(mpe, OAVBDIMetaModel.modelelement_has_name)+"_"+ptname);
-							Object[]	tmp	= BeliefRules.createDynamicParameterSetUserRule(mpe, ptname);
+							Object[]	tmp	= BeliefRules.createDynamicParameterSetUserRule(mpe, ptname, var);
 							rb.addRule(createUserRule(state, mcapa, imports, mpe, values, usercond, rulename, tmp));
 						}
 					}

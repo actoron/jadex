@@ -29,7 +29,7 @@
 
 	<beliefs>
 		<beliefset name="orders" class="Order" evaluationmode="push">
-			<facts language="clips">
+			<facts language="clips" variable="$?ret">
 				// select $g.getParameter("order").getValue()
 				// from IGoal $g in $goalbase.getGoals("sell_book")
 				

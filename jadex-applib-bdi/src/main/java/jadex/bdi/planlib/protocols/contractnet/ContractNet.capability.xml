@@ -42,6 +42,11 @@
 		<belief name="icnp_filter" class="IFilter" exported="true">
 			<fact>IFilter.NEVER</fact>
 		</belief>
+		
+		<!-- Hack!!! required for dynamic parameter value in JCL. -->
+		<belief name="true_const" class="boolean">
+			<fact>true</fact>
+		</belief>
 
 	</beliefs>
 
@@ -85,21 +90,18 @@
 			<parameter name="cfp_info" class="Object" optional="true" direction="inout"/>
 			<!-- Dummy parameter that leads to goal completion, when an acceptable proposal is available or all proposals are evaluated. -->
 			<parameter name="evaluated" class="Boolean" direction="out" evaluationmode="push">
-				<value language="clips">
+				<value language="clips" variable="?ret">
 					// ($goal.acceptables.length>0 ||
 					// (select one ParticipantProposal $prop from $goal.proposals
 					// where $prop.getEvaluation()==null)==null) ? true : null
 					
-					// $goal.acceptables.length>0 ||
-					// !(ParticipantProposal $prop &amp;&amp;
-					// 	$prop.getEvaluation()==null &amp;&amp;
-					// 	Arrays.asList($goal.proposals).contains($prop))
-
+					// $beliefbase.true_const==$ret
+					// &amp;&amp;
 					// !($goal.acceptables.length==0 &amp;&amp;
 					// 	ParticipantProposal $prop &amp;&amp;
 					// 	$prop.getEvaluation()==null &amp;&amp;
 					// 	Arrays.asList($goal.proposals).contains($prop))
-					
+
 					// a v b -> not(not(a v b)) -> not(not(a) n not(b))
 					// a: $goal.acceptables.length>0 
 					// not(a): $goal.acceptables.length==0 (= there is no element in acceptables)
@@ -118,24 +120,6 @@
 						)
 					)
 					?rpe = (goal ((Identity true) ?ret))
-				
-					// alternative implementation
-					//(not
-					//	(and
-					//		?proposal = (ParticipantProposal (evaluation null))
-					//		?proposals = (parameterset (parameterset_has_name "proposals") (parameterset_has_values contains ?proposal))
-					//		?rpe = (goal (parameterelement_has_parametersets contains ?proposals))
-					//
-					//		(not
-					//			(and
-					//				?accproposal = (ParticipantProposal)
-					//				?acceptables = (parameterset (parameterset_has_name "acceptables") (parameterset_has_values contains ?accproposal))
-					//				?rpe = (goal (parameterelement_has_parametersets contains ?acceptables))
-					//			)
-					//		)
-					//	)
-					//)
-					//?rpe = (goal ((Identity true) ?ret))
 				</value>
 			</parameter>
 			<!-- The received proposals. -->
@@ -224,7 +208,7 @@
 			<parameter name="cfp_info" class="Object" optional="true" direction="inout"/>
 			<!-- Dummy paramter that leads to goal completion, when an acceptable proposal is available or all proposals are evaluated. -->
 			<parameter name="evaluated" class="Boolean" direction="out" evaluationmode="push">
-				<value language="clips">
+				<value language="clips" variable="?ret">
 					// ($goal.acceptables.length>0 ||
 					// (select one ParticipantProposal $prop from $goal.proposals
 					// where $prop.getEvaluation()==null)==null) ? true : null

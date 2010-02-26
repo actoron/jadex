@@ -222,6 +222,12 @@ public class BDIParserHelper extends	DefaultParserHelper
 			
 			// Augment goal condition to check parameter (set) variable.
 			Variable	goalvar	= context.getVariable(varname);
+			if(goalvar==null && name.startsWith("$goal.") && context.getVariable("?rpe")!=null)
+			{
+				// Use ?rpe for dynamic parameter values
+				varname	= "?rpe";
+				goalvar	= context.getVariable(varname);
+			}
 			if(goalvar==null)
 				throw new RuntimeException("Variable '"+varname+"' required to build parameter (set) condition: "+name);
 			ObjectCondition	rgoalcon	= (ObjectCondition)context.getObjectCondition(goalvar);
@@ -274,6 +280,12 @@ public class BDIParserHelper extends	DefaultParserHelper
 			
 			// Augment plan condition to check parameter (set) variable.
 			Variable	planvar	= context.getVariable(varname);
+			if(planvar==null && context.getVariable("?rpe")!=null)
+			{
+				// Use ?rpe for dynamic parameter values
+				varname	= "?rpe";
+				planvar	= context.getVariable(varname);
+			}
 			if(planvar==null)
 				throw new RuntimeException("Variable '"+varname+"' required to build parameter (set) condition: "+name);
 			ObjectCondition	rplancon	= (ObjectCondition)context.getObjectCondition(planvar);

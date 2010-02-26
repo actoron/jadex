@@ -17,7 +17,6 @@ import jadex.rules.rulesystem.rules.OrConstraint;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
-import jadex.rules.state.OAVJavaType;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 
@@ -174,11 +173,10 @@ public class BeliefRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param model The belief model element.
 	 */
-	protected static Object[]	createDynamicBeliefUserRule(Object model)
+	protected static Object[]	createDynamicBeliefUserRule(Object model, final Variable var)
 	{
 		Variable rbelief = new Variable("?rbelief", OAVBDIRuntimeModel.belief_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		Variable ret = new Variable("?ret", OAVJavaType.java_object_type);
 			
 		ObjectCondition	belcon	= new ObjectCondition(OAVBDIRuntimeModel.belief_type);
 		belcon.addConstraint(new BoundConstraint(null, rbelief));
@@ -188,37 +186,29 @@ public class BeliefRules
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefs, rbelief, IOperator.CONTAINS));
 
-		return new Object[]{new AndCondition(new ICondition[]{belcon, capcon}),
-			DYNAMIC_BELIEF_CHANGED,null,ret};
-	}
-	
-	/**
-	 *  Action that gets executed when new fact available.
-	 */
-	protected static IAction DYNAMIC_BELIEF_CHANGED = new IAction()
-	{
-		public void execute(IOAVState state, IVariableAssignments assignments)
+		return new Object[]{new AndCondition(new ICondition[]{belcon, capcon}), new IAction()
 		{
-			Object	rbelief	= assignments.getVariableValue("?rbelief");
-			Object	fact	= assignments.getVariableValue("?ret");
-						
-			BeliefRules.setBeliefValue(state, rbelief, fact);
+			public void execute(IOAVState state, IVariableAssignments assignments)
+			{
+				Object	rbelief	= assignments.getVariableValue("?rbelief");
+				Object	fact	= assignments.getVariableValue(var.getName());
+							
+				BeliefRules.setBeliefValue(state, rbelief, fact);
 
-//			System.out.println("Belief "+state.getAttributeValue(state.getAttributeValue(rbelief, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)+" "+state.getAttributeValue(rbelief, OAVBDIRuntimeModel.belief_has_fact));
-		}
-	};
+//				System.out.println("Belief "+state.getAttributeValue(state.getAttributeValue(rbelief, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)+" "+state.getAttributeValue(rbelief, OAVBDIRuntimeModel.belief_has_fact));
+			}
+		}, null, var};
+	}
 	
 	/**
 	 *  Create a rule for a dynamic facts expression.
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param model The belief set model element.
 	 */
-	protected static Object[]	createDynamicBeliefSetUserRule(Object model)
+	protected static Object[]	createDynamicBeliefSetUserRule(Object model, final Variable var)
 	{
 		Variable rbeliefset = new Variable("?rbeliefset", OAVBDIRuntimeModel.beliefset_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		// Hack!!! Todo: multivariable?
-		Variable ret = new Variable("$?ret", OAVJavaType.java_object_type);
 			
 		ObjectCondition	belsetcon	= new ObjectCondition(OAVBDIRuntimeModel.beliefset_type);
 		belsetcon.addConstraint(new BoundConstraint(null, rbeliefset));
@@ -229,25 +219,19 @@ public class BeliefRules
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_beliefsets, rbeliefset, IOperator.CONTAINS));
 
 		return new Object[]{
-			new AndCondition(new ICondition[]{belsetcon, capcon}), 
-			DYNAMIC_BELIEFSET_CHANGED, null, ret};
+			new AndCondition(new ICondition[]{belsetcon, capcon}), new IAction()
+			{
+				public void execute(IOAVState state, IVariableAssignments assignments)
+				{
+					Object rbeliefset	= assignments.getVariableValue("?rbeliefset");
+					Object neworigfacts	= assignments.getVariableValue(var.getName());
+					
+					updateBeliefSet(state, rbeliefset, neworigfacts);
+					
+//					System.out.println("Beliefset "+state.getAttributeValue(state.getAttributeValue(rbeliefset, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)+" "+state.getAttributeValues(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts));
+				}
+			}, null, var};
 	}
-	
-	/**
-	 *  Action that gets executed when new facts available.
-	 */
-	protected static IAction DYNAMIC_BELIEFSET_CHANGED = new IAction()
-	{
-		public void execute(IOAVState state, IVariableAssignments assignments)
-		{
-			Object rbeliefset	= assignments.getVariableValue("?rbeliefset");
-			Object neworigfacts	= assignments.getVariableValue("$?ret");
-			
-			updateBeliefSet(state, rbeliefset, neworigfacts);
-			
-//			System.out.println("Beliefset "+state.getAttributeValue(state.getAttributeValue(rbeliefset, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)+" "+state.getAttributeValues(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts));
-		}
-	};
 	
 	/**
 	 *  Create a rule for an ADF condition.
@@ -317,12 +301,11 @@ public class BeliefRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param ptname The parameter type name (e.g. "location").
 	 */
-	protected static Object[]	createDynamicParameterUserRule(Object mpe, String ptname, final String varname)
+	protected static Object[]	createDynamicParameterUserRule(Object mpe, String ptname, final Variable var)
 	{
 		Variable rparam = new Variable("?rparameter", OAVBDIRuntimeModel.parameter_type);
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.parameterelement_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		Variable ret = varname!=null ? null : new Variable("?ret", OAVJavaType.java_object_type);
 		
 		ObjectCondition	rparamcon	= new ObjectCondition(OAVBDIRuntimeModel.parameter_type);
 		rparamcon.addConstraint(new BoundConstraint(null, rparam));
@@ -346,7 +329,7 @@ public class BeliefRules
 				public void execute(IOAVState state, IVariableAssignments assignments)
 				{
 					Object rparam = assignments.getVariableValue("?rparameter");
-					Object value = assignments.getVariableValue(varname!=null ? varname : "?ret");
+					Object value = assignments.getVariableValue(var.getName());
 					
 //					Object rpe = assignments.getVariableValue("?rpe");
 //					System.out.println("RPE "+rpe+" "+state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model)+" "+rparam);
@@ -355,7 +338,7 @@ public class BeliefRules
 				}
 			},
 			IPriorityEvaluator.PRIORITY_1,
-			ret};
+			var};
 	}
 	
 	/**
@@ -519,13 +502,11 @@ public class BeliefRules
 	 *  @param usercond	The ADF part of the dynamic condition.
 	 *  @param ptname The parameter type name (e.g. "location").
 	 */
-	protected static Object[]	createDynamicParameterSetUserRule(Object mpe, String ptname)
+	protected static Object[]	createDynamicParameterSetUserRule(Object mpe, String ptname, final Variable var)
 	{
 		Variable rparam = new Variable("?rparameterset", OAVBDIRuntimeModel.parameterset_type);
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.parameterelement_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		// Hack!!! Todo: multivariable?
-		Variable ret = new Variable("$?ret", OAVJavaType.java_object_type);
 		
 		ObjectCondition	rparamcon	= new ObjectCondition(OAVBDIRuntimeModel.parameterset_type);
 		rparamcon.addConstraint(new BoundConstraint(null, rparam));
@@ -544,24 +525,19 @@ public class BeliefRules
 		
 		return new Object[]{
 			new AndCondition(new ICondition[]{rparamcon, rparamelemcon, rcapacon}),
-			DYNAMIC_VALUES_CHANGED,
+			new IAction()
+			{
+				public void execute(IOAVState state, IVariableAssignments assignments)
+				{
+					Object rparamset = assignments.getVariableValue("?rparameterset");
+					Object neworigvalues = assignments.getVariableValue(var.getName());
+					
+					updateParameterSet(state, rparamset, neworigvalues);
+				}
+			},
 			IPriorityEvaluator.PRIORITY_1,
-			ret};
+			var};
 	}
-	
-	/**
-	 *  Action that gets executed when new values are available.
-	 */
-	protected static IAction DYNAMIC_VALUES_CHANGED = new IAction()
-	{
-		public void execute(IOAVState state, IVariableAssignments assignments)
-		{
-			Object rparamset = assignments.getVariableValue("?rparameterset");
-			Object neworigvalues = assignments.getVariableValue("$?ret");
-			
-			updateParameterSet(state, rparamset, neworigvalues);
-		}
-	};
 	
 	/**
 	 *  Change values of a dynamic belief set.

@@ -446,7 +446,7 @@ public class BuildContext
 					Variable	var = scope.generateVariableBinding(ocon, null);
 					ocon	= scope.createObjectCondition(ocon.getObjectType(), new IConstraint[]{new BoundConstraint(null, var)});
 					oconstack.set(i, ocon);
-					System.out.println("Clone for consistency: "+oconstack);
+//					System.out.println("Clone for consistency: "+oconstack);
 				}
 			}
 		}

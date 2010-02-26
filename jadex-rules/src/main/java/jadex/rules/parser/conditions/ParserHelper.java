@@ -164,8 +164,9 @@ public class ParserHelper
 			parser.setImports(imports);
 			Expression	pexp	= parser.lhs();
 
-			if(returnvar!=null)
+			if(returnvar!=null && helper.getVariable(returnvar.getName())==null)
 			{
+				// Assign return variable if not already present. (e.g. implicit ?ret variable)
 				ret	= ConstraintBuilder.buildConstraints(new OperationExpression(pexp, new VariableExpression(returnvar), IOperator.EQUAL), helper.getBuildContext());
 			}
 			else if(invert)
