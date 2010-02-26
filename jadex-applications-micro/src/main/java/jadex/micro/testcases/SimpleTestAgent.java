@@ -4,8 +4,8 @@ import jadex.adapter.base.test.TestReport;
 import jadex.adapter.base.test.Testcase;
 import jadex.bridge.Argument;
 import jadex.bridge.IArgument;
-import jadex.microkernel.MicroAgent;
-import jadex.microkernel.MicroAgentMetaInfo;
+import jadex.micro.MicroAgent;
+import jadex.micro.MicroAgentMetaInfo;
 
 /**
  *  A minimal test case agent serving as a demonstrator.

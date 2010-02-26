@@ -1,4 +1,4 @@
-package jadex.microkernel;
+package jadex.micro;
 
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;
@@ -33,7 +33,7 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	 */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"micro_agent",	SGUI.makeIcon(MicroAgentFactory.class, "/jadex/microkernel/images/micro_agent.png"),
+		"micro_agent",	SGUI.makeIcon(MicroAgentFactory.class, "/jadex/micro/images/micro_agent.png"),
 	});
 
 	//-------- attributes --------

@@ -207,7 +207,7 @@
 							<key>
 								<value type="java.lang.String">micro_factory</value>
 							</key>
-							<bean class="jadex.microkernel.MicroAgentFactory">
+							<bean class="jadex.micro.MicroAgentFactory">
 								<constructor-arg ref="platform"/>
 							</bean>
 						</entry>

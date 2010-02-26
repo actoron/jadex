@@ -1,4 +1,4 @@
-package jadex.microkernel;
+package jadex.micro;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.MessageType;

@@ -124,7 +124,7 @@
 			</property>
 			
 			<property type="jadex.bridge.IComponentFactory" name="micro_factory">
-				new jadex.microkernel.MicroAgentFactory($platform)
+				new jadex.micro.MicroAgentFactory($platform)
 			</property>
 			
 			<property type="jadex.bridge.IComponentFactory" name="bpmn_factory">

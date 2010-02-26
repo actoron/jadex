@@ -9,7 +9,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IResultListener;
-import jadex.microkernel.IMicroExternalAccess;
+import jadex.micro.IMicroExternalAccess;
 
 /**
  *  Dumb prey vision processer.

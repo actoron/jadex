@@ -127,6 +127,6 @@
 	</properties>
 	
 	<properties type="kernel" id="kernel_v2_micro">
-		<property type="agent_factory">new jadex.microkernel.MicroAgentFactory($platform)</property>
+		<property type="agent_factory">new jadex.micro.MicroAgentFactory($platform)</property>
 	</properties> 
 </properties>

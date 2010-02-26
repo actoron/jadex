@@ -1,4 +1,4 @@
-package jadex.microkernel;
+package jadex.micro;
 
 import jadex.bridge.MessageType;
 

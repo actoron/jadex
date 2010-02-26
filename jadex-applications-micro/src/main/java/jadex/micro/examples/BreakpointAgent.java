@@ -1,7 +1,7 @@
 package jadex.micro.examples;
 
-import jadex.microkernel.MicroAgent;
-import jadex.microkernel.MicroAgentMetaInfo;
+import jadex.micro.MicroAgent;
+import jadex.micro.MicroAgentMetaInfo;
 
 import java.util.Arrays;
 import java.util.HashSet;

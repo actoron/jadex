@@ -1,8 +1,8 @@
 package jadex.micro.examples.helloworld;
 
 import jadex.bridge.IArgument;
-import jadex.microkernel.MicroAgent;
-import jadex.microkernel.MicroAgentMetaInfo;
+import jadex.micro.MicroAgent;
+import jadex.micro.MicroAgentMetaInfo;
 
 /**
  *  The micro version of the hello world agent.

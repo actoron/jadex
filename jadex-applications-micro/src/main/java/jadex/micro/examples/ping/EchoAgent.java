@@ -3,7 +3,7 @@ package jadex.micro.examples.ping;
 import jadex.adapter.base.fipa.SFipa;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageType;
-import jadex.microkernel.MicroAgent;
+import jadex.micro.MicroAgent;
 
 import java.util.HashMap;
 import java.util.Map;

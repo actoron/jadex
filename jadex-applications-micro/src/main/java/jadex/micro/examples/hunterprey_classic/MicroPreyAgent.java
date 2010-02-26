@@ -18,7 +18,7 @@ import jadex.bridge.ISearchConstraints;
 import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
-import jadex.microkernel.MicroAgent;
+import jadex.micro.MicroAgent;
 
 import java.util.ArrayList;
 import java.util.Collections;

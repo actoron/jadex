@@ -8,8 +8,8 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Int;
 import jadex.bridge.IArgument;
-import jadex.microkernel.MicroAgent;
-import jadex.microkernel.MicroAgentMetaInfo;
+import jadex.micro.MicroAgent;
+import jadex.micro.MicroAgentMetaInfo;
 
 import java.util.HashMap;
 import java.util.Map;

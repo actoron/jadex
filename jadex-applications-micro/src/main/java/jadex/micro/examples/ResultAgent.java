@@ -3,8 +3,8 @@ package jadex.micro.examples;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.concurrent.IResultListener;
-import jadex.microkernel.MicroAgent;
-import jadex.microkernel.MicroAgentMetaInfo;
+import jadex.micro.MicroAgent;
+import jadex.micro.MicroAgentMetaInfo;
 
 /**
  * 

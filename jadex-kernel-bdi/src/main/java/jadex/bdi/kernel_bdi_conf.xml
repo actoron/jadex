@@ -9,7 +9,29 @@
 	
 	<properties type="platform_standalone">
 		<properties type="services">
-			
+			<property type="jadex.bridge.IComponentFactory" name="bdi_factory">
+				new jadex.bdi.interpreter.BDIAgentFactory(
+					jadex.commons.SUtil.createHashMap(
+					new String[]
+					{
+						"messagetype_fipa", 
+						"planexecutor_standard", 
+						"standard.timeout", 
+						"microplansteps",
+						//"planexecutor_bpmn",
+						"debugger.panels"
+					},
+					new Object[]
+					{
+						new jadex.adapter.base.fipa.FIPAMessageType(), 
+						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class)),
+						new java.lang.Long(10000),
+						Boolean.TRUE,
+						//new jadex.bdi.runtime.BpmnPlanExecutor(),
+						"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
+					}
+				), $platform)
+			</property>
 		</properties>
 	</properties>
 </properties>
