@@ -1,0 +1,17 @@
+<!--
+  Standalone platform properties.
+-->
+<properties xmlns="http://jadex.sourceforge.net/jadexconf"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadexconf 
+	                    http://jadex.sourceforge.net/configuration.xsd"
+	name="standalone_conf">
+	
+	<properties type="platform_standalone">
+		<property type="libpath">"../jadex-applications-bdi/target/classes"</property>
+	
+		<properties type="component" name="puzzler">
+			<property type="model">jadex/bdi/examples/puzzle/Benchmark.agent.xml</property>
+		</properties>
+	</properties>
+</properties>

@@ -1,0 +1,18 @@
+<!--
+  Standalone platform properties.
+-->
+<properties xmlns="http://jadex.sourceforge.net/jadexconf"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadexconf 
+	                    http://jadex.sourceforge.net/configuration.xsd"
+	name="standalone_conf">
+	
+	<properties type="platform_standalone">
+		<property type="libpath">"../jadex-applications-bdi/target/classes"</property>
+	
+		<properties type="component" name="blockstacker">
+			<property type="model">jadex/bdi/examples/blocksworld/Blocksworld.agent.xml</property>
+			<property type="config">benchmark(runs=10/goals=50)</property>
+		</properties>
+	</properties>
+</properties>
