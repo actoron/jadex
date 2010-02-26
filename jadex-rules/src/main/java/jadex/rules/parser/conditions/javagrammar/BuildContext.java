@@ -52,6 +52,9 @@ public class BuildContext
 	/** The parent build context (if any). */
 	protected BuildContext	parent;
 	
+	/** Stack for object conditions (for checking if constraints can be generated in current context). */
+	protected List	oconstack;
+	
 	//-------- constructors --------
 	
 	/**
@@ -187,7 +190,7 @@ public class BuildContext
 	 */
 	public Variable	generateVariableBinding(ObjectCondition	condition, String name, Object valuesource)
 	{
-		return generateVariableBinding(condition, name, getReturnType(valuesource, tmodel),	valuesource);
+		return generateVariableBinding(condition, name, getReturnType(condition, valuesource, tmodel),	valuesource);
 	}
 
 	/**
@@ -214,7 +217,7 @@ public class BuildContext
 	 *  @param type	The object type.
 	 *  @param constraints	The constraints (if any).
 	 */
-	public void createObjectCondition(OAVObjectType type, IConstraint[] constraints)
+	public ObjectCondition	createObjectCondition(OAVObjectType type, IConstraint[] constraints)
 	{
 		ObjectCondition	ocon	= new ObjectCondition(type);
 		for(int i=0; constraints!=null && i<constraints.length; i++)
@@ -223,6 +226,8 @@ public class BuildContext
 		}
 		
 		addCondition(ocon);
+		
+		return ocon;
 	}
 
 	/**
@@ -333,7 +338,7 @@ public class BuildContext
 	 *  @param tmodel	The type model.
 	 *  @return The object type.
 	 */
-	protected static OAVObjectType	getReturnType(Object valuesource, OAVTypeModel tmodel)
+	protected static OAVObjectType	getReturnType(ObjectCondition cond, Object valuesource, OAVTypeModel tmodel)
 	{
 		OAVObjectType	ret;
 		
@@ -358,6 +363,10 @@ public class BuildContext
 		else if(valuesource instanceof FunctionCall)
 		{
 			ret	= tmodel.getJavaType(((FunctionCall)valuesource).getFunction().getReturnType());
+		}
+		else if(valuesource==null)
+		{
+			ret	= cond.getObjectType();
 		}
 		else
 		{
@@ -407,6 +416,85 @@ public class BuildContext
 					}
 				}
 			}
+		}
+		return ret;
+	}
+
+	/**
+	 *  Push a condition on the stack.
+	 */
+	public void	pushCondition(ObjectCondition con)
+	{
+		if(oconstack!=null)
+		{
+			// Check stack consistency: inner variables may only be defined in same scope or outside.
+			BuildContext	scope	= getDefiningScope(con);
+			for(int i=0; i<oconstack.size(); i++)
+			{
+				ObjectCondition	ocon	= (ObjectCondition)oconstack.get(i);
+				boolean	consistent	= true;
+				BuildContext	prescope	= getDefiningScope(ocon);
+				consistent	= prescope==scope;
+				while(!consistent && prescope!=null)
+				{
+					prescope	= prescope.getParent();
+					consistent	= prescope==scope;
+				}
+				if(!consistent)
+				{
+					// Create clone of inconsistent condition in inner scope.
+					Variable	var = scope.generateVariableBinding(ocon, null);
+					ocon	= scope.createObjectCondition(ocon.getObjectType(), new IConstraint[]{new BoundConstraint(null, var)});
+					oconstack.set(i, ocon);
+					System.out.println("Clone for consistency: "+oconstack);
+				}
+			}
+		}
+		else
+		{
+			oconstack	= new ArrayList();
+		}
+		
+		oconstack.add(con);
+	}
+	
+	/**
+	 *  Pop a condition from the stack.
+	 */
+	public void	popCondition()
+	{
+		if(oconstack==null || oconstack.isEmpty())
+			throw new RuntimeException("Condition stack error: "+oconstack);
+		
+		if(oconstack.size()==1)
+			oconstack	= null;
+		else
+			oconstack.remove(oconstack.size()-1);
+	}
+	
+	/**
+	 *  Get the current condition from the stack.
+	 */
+	public ObjectCondition	getCurrentCondition()
+	{
+		if(oconstack==null || oconstack.isEmpty())
+			throw new RuntimeException("Condition stack error: "+oconstack);
+		
+		return (ObjectCondition)oconstack.get(oconstack.size()-1);
+	}
+	
+	/**
+	 *  Get the context in which the given condition is defined.
+	 */
+	protected BuildContext	getDefiningScope(ObjectCondition con)
+	{
+		BuildContext	ret	= null;
+		BuildContext	scope	= this;
+		while(scope!=null)
+		{
+			if(scope.lcons.contains(con))
+				ret	= scope;
+			scope	= scope.getParent();
 		}
 		return ret;
 	}

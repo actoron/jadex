@@ -286,32 +286,12 @@
 			is as near as possible to the agent. -->
 		<querygoal name="querywastebin" exclude="never">
 			<parameter name="result" class="Wastebin" evaluationmode="push" direction="out">
-				<!-- <value evaluationmode="dynamic">
-					select one Wastebin $wastebin
-					from $beliefbase.getBeliefSet("wastebins").getFacts()
-					where !$wastebin.isFull()
-					order by $beliefbase.getBelief("my_location").getFact().getDistance($wastebin.getLocation())
-				</value> -->
-				<value language="clips">
-					// Wastebin $wastebin &amp;&amp; !(Wastebin $wb2 &amp;&amp;
-					// $beliefbase.my_location.getDistance($wastebin.getLocation())
-					// &lt; $beliefbase.my_location.getDistance($wastebin.getLocation()))
-				
-					?ret = (Wastebin (location ?loc) (isFull() false))
-					
-					?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?ret))
-					?mbeliefset = (mbeliefset (melement_has_name "wastebins"))
-					
-					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
-					?mbelief = (mbelief (melement_has_name "my_location"))
-					
-					(not 
-						(and
-							?other = (Wastebin (location ?otherloc))
-							?otherloc = (Location (getDistance(?myloc) ?otherdist))
-							?loc = (Location (getDistance(?myloc) &gt; ?otherdist))
-						)
-					)
+				<value language="jcl" variable="$wastebin">
+					Wastebin $wastebin &amp;&amp; !$wastebin.isFull()
+					&amp;&amp;
+					!(Wastebin $wastebin2 &amp;&amp; !$wastebin2.isFull()
+										  &amp;&amp; $beliefbase.my_location.getDistance($wastebin.getLocation())
+												   > $beliefbase.my_location.getDistance($wastebin2.getLocation()))
 				</value>
 			</parameter>
 		</querygoal>
@@ -319,24 +299,11 @@
 		<!-- Find the nearest charging station. -->
 		<querygoal name="querychargingstation" exclude="never">
 			<parameter name="result" class="Chargingstation" evaluationmode="push" direction="out">
-				<!-- <value evaluationmode="dynamic">
-					select one Chargingstation $station
-					from $beliefbase.getBeliefSet("chargingstations").getFacts()
-					order by $beliefbase.getBelief("my_location").getFact().getDistance($station.getLocation())
-				</value>-->
-				<value language="clips">
-					?ret = (Chargingstation (location ?loc))
-					?rbeliefset = (beliefset (element_has_model ?mbeliefset) (beliefset_has_facts contains ?ret))
-					?mbeliefset = (mbeliefset (melement_has_name "chargingstations"))
-					?rbelief = (belief (element_has_model ?mbelief) (belief_has_fact ?myloc))
-					?mbelief = (mbelief (melement_has_name "my_location"))
-					(not 
-						(and
-							?other = (Chargingstation (location ?otherloc))
-							?otherloc = (Location (getDistance(?myloc) ?otherdist))
-							?loc = (Location (getDistance(?myloc) &gt; ?otherdist))
-						)
-					)
+				<value language="jcl" variable="$chargingstation">
+					Chargingstation $chargingstation
+					&amp;&amp;
+					!(Chargingstation $chargingstation2 &amp;&amp; $beliefbase.my_location.getDistance($chargingstation.getLocation())
+																 > $beliefbase.my_location.getDistance($chargingstation2.getLocation()))
 				</value>
 			</parameter>
 		</querygoal>

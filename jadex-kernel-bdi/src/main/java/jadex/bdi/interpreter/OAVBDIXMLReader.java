@@ -400,7 +400,7 @@ public class OAVBDIXMLReader
 					
 //					System.out.println("Found condition: "+se.object);
 
-					if(lang==null || "clips".equals(lang))
+					if("clips".equals(lang))
 					{
 						List	errors	= null;//new ArrayList();
 						try
@@ -421,7 +421,7 @@ public class OAVBDIXMLReader
 //							}
 //						}
 					}
-					else if(lang.equals("jcl"))
+					else if(lang==null || lang.equals("jcl"))
 					{
 						// Java conditions parsed later in createAgentModelEntry()
 					}

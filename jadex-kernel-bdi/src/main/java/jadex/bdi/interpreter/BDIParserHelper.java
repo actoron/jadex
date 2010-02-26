@@ -267,6 +267,58 @@ public class BDIParserHelper extends	DefaultParserHelper
 			}
 		}
 		
+		else if(ret==null && name.startsWith("$plan."))
+		{
+			String	parname	= name.substring(6);
+			String	varname	= "?rplan";
+			
+			// Augment plan condition to check parameter (set) variable.
+			Variable	planvar	= context.getVariable(varname);
+			if(planvar==null)
+				throw new RuntimeException("Variable '"+varname+"' required to build parameter (set) condition: "+name);
+			ObjectCondition	rplancon	= (ObjectCondition)context.getObjectCondition(planvar);
+			if(rplancon==null)
+				throw new RuntimeException("Plan condition required to build parameter (set) condition: "+name);
+			BoundConstraint	bc	= (BoundConstraint)context.getBoundConstraint(planvar);
+			if(bc!=null && bc.getValueSource()!=null)
+				throw new UnsupportedOperationException("Value source for plan object not yet supported.");
+
+			Object	mpar;
+			if((mpar=state.getAttributeValue(melement, OAVBDIMetaModel.parameterelement_has_parameters, parname))!=null)
+			{				
+				// Build parameter condition to bind value variable.
+				Class	clazz	= SReflect.getWrappedType((Class)state.getAttributeValue(mpar, OAVBDIMetaModel.typedelement_has_class));
+				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz), false, true);
+				Variable	parvar	= new Variable(context.generateVariableName(), OAVBDIRuntimeModel.parameter_type, true, true);
+				context.createObjectCondition(OAVBDIRuntimeModel.parameter_type, new IConstraint[]{
+					new LiteralConstraint(OAVBDIRuntimeModel.parameter_has_name, parname),
+					new BoundConstraint(OAVBDIRuntimeModel.parameter_has_value, ret),
+					new BoundConstraint(null, parvar, IOperator.CONTAINS)});
+
+				rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.parameterelement_has_parameters, parvar));
+			}
+			else if((mpar=state.getAttributeValue(melement, OAVBDIMetaModel.parameterelement_has_parametersets, parname))!=null)
+			{
+				// Build parameter set condition to bind values variable.
+				Class	clazz	= SReflect.getWrappedType((Class)state.getAttributeValue(mpar, OAVBDIMetaModel.typedelement_has_class));
+				clazz	= Array.newInstance(SReflect.getWrappedType(clazz), 0).getClass();
+				ret	= new Variable(name, state.getTypeModel().getJavaType(clazz), false, true);
+				Variable	parvar	= new Variable(context.generateVariableName(), OAVBDIRuntimeModel.parameterset_type, true, true);
+				Object	valuesource	= new FunctionCall(new SetToArray(clazz), new Object[]{OAVBDIRuntimeModel.parameterset_has_values});
+				context.createObjectCondition(OAVBDIRuntimeModel.parameterset_type, new IConstraint[]{
+					new LiteralConstraint(OAVBDIRuntimeModel.parameterset_has_name, parname),
+					new BoundConstraint(valuesource, ret),
+					new BoundConstraint(null, parvar, IOperator.CONTAINS)});
+
+				rplancon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.parameterelement_has_parametersets, parvar));
+			}
+
+			if(mpar==null)
+			{
+				throw new RuntimeException("No such parameter (set): "+name);
+			}
+		}
+		
 		else if(ret==null && "$beliefbase".equals(name))
 		{
 			Variable	capvar	= context.getVariable("?rcapa");
@@ -329,7 +381,7 @@ public class BDIParserHelper extends	DefaultParserHelper
 	 */
 	public boolean	isPseudoVariable(String name)
 	{
-		return "$beliefbase".equals(name) || "$goal".equals(name) || "$ref".equals(name);
+		return "$beliefbase".equals(name) || "$goal".equals(name) || "$plan".equals(name) || "$ref".equals(name);
 	}
 
 	//-------- helper classes --------

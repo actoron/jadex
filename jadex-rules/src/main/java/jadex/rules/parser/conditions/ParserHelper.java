@@ -38,14 +38,14 @@ public class ParserHelper
 	{
 		ICondition	ret	= null;
 
-		if(language==null || language.equals("clips"))
+		if(language.equals("clips"))
 		{
 			ICondition	usercon	= parseClipsCondition(text, model, imports, errors);
 			if(invert)
 				usercon	= new NotCondition(usercon);
 			ret	= precon==null ? usercon : usercon==null ? precon : new AndCondition(new ICondition[]{precon, usercon});
 		}
-		else if(language.equals("jcl"))
+		else if(language==null || language.equals("jcl"))
 		{
 			ret	= parseJavaCondition(text, imports, errors, helper, returnvar, invert);
 		}

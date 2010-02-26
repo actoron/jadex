@@ -570,12 +570,13 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 					Object value = state.getAttributeValue(mparam, OAVBDIMetaModel.parameter_has_value);
 					if(value!=null)
 					{
-						String ptname = (String)state.getAttributeValue(mparam, OAVBDIMetaModel.modelelement_has_name);
-						Object usercond = state.getAttributeValue(value, OAVBDIMetaModel.expression_has_content);
+						String	varname	= (String)state.getAttributeValue(value, OAVBDIMetaModel.expression_has_variable);
+						String	ptname	= (String)state.getAttributeValue(mparam, OAVBDIMetaModel.modelelement_has_name);
+						Object	usercond	= state.getAttributeValue(value, OAVBDIMetaModel.expression_has_content);
 						if(usercond!=null)
 						{
 							String rulename = Rulebase.getUniqueRuleName(rb, "parameter_dynamicvalue_"+state.getAttributeValue(mpe, OAVBDIMetaModel.modelelement_has_name)+"_"+ptname);
-							Object[]	tmp	= BeliefRules.createDynamicParameterUserRule(mpe, ptname);
+							Object[]	tmp	= BeliefRules.createDynamicParameterUserRule(mpe, ptname, varname);
 							rb.addRule(createUserRule(state, mcapa, imports, mpe, value, usercond, rulename, tmp));
 						}
 					}

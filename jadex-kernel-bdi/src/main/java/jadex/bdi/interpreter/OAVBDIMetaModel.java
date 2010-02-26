@@ -301,6 +301,9 @@ public class OAVBDIMetaModel
 	/** Expression has language. */
 	public static OAVAttributeType expression_has_language;
 
+	/** Expression has variable. */
+	public static OAVAttributeType expression_has_variable;
+
 	/** Expression has content attribute. */
 	public static OAVAttributeType expression_has_content;
 	
@@ -924,6 +927,7 @@ public class OAVBDIMetaModel
 //		expressionrelevant_has_eventtype = expressionrelevant_type.createAttributeType("mexpressionrelevant_has_eventtype", OAVJavaType.java_string_type);
 
 		expression_has_language = expression_type.createAttributeType("mexpression_has_language", OAVJavaType.java_string_type, OAVAttributeType.NONE);//, "java");
+		expression_has_variable = expression_type.createAttributeType("mexpression_has_variable", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 		expression_has_content = expression_type.createAttributeType("mexpression_has_content", OAVJavaType.java_object_type);// java_parsedexpression_type)
 //		expression_has_class = expression_type.createAttributeType("mexpression_has_class", OAVJavaType.java_class_type);
 //		expression_has_parameters = expression_type.createAttributeType("mexpression_has_parameters",  expressionparameter_type, OAVAttributeType.LIST);

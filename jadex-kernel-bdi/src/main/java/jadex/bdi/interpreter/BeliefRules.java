@@ -317,12 +317,12 @@ public class BeliefRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param ptname The parameter type name (e.g. "location").
 	 */
-	protected static Object[]	createDynamicParameterUserRule(Object mpe, String ptname)
+	protected static Object[]	createDynamicParameterUserRule(Object mpe, String ptname, final String varname)
 	{
 		Variable rparam = new Variable("?rparameter", OAVBDIRuntimeModel.parameter_type);
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.parameterelement_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
-		Variable ret = new Variable("?ret", OAVJavaType.java_object_type);
+		Variable ret = varname!=null ? null : new Variable("?ret", OAVJavaType.java_object_type);
 		
 		ObjectCondition	rparamcon	= new ObjectCondition(OAVBDIRuntimeModel.parameter_type);
 		rparamcon.addConstraint(new BoundConstraint(null, rparam));
@@ -341,27 +341,22 @@ public class BeliefRules
 		
 		return new Object[]{
 			new AndCondition(new ICondition[]{rparamcon, rparamelemcon, rcapacon}),
-			DYNAMIC_VALUE_CHANGED,
+			new IAction()
+			{
+				public void execute(IOAVState state, IVariableAssignments assignments)
+				{
+					Object rparam = assignments.getVariableValue("?rparameter");
+					Object value = assignments.getVariableValue(varname!=null ? varname : "?ret");
+					
+//					Object rpe = assignments.getVariableValue("?rpe");
+//					System.out.println("RPE "+rpe+" "+state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model)+" "+rparam);
+
+					BeliefRules.setParameterValue(state, rparam, value);
+				}
+			},
 			IPriorityEvaluator.PRIORITY_1,
 			ret};
 	}
-	
-	/**
-	 *  Action that gets executed when new value available.
-	 */
-	protected static IAction DYNAMIC_VALUE_CHANGED = new IAction()
-	{
-		public void execute(IOAVState state, IVariableAssignments assignments)
-		{
-			Object rparam = assignments.getVariableValue("?rparameter");
-			Object value = assignments.getVariableValue("?ret");
-			
-//			Object rpe = assignments.getVariableValue("?rpe");
-//			System.out.println("RPE "+rpe+" "+state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model)+" "+rparam);
-
-			BeliefRules.setParameterValue(state, rparam, value);
-		}
-	};
 	
 	/**
 	 *  Set the value of a parameter.
