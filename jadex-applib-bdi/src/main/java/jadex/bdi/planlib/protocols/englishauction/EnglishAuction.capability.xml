@@ -240,7 +240,7 @@
 				<value>SFipa.createUniqueId($scope.getAgentName())</value>
 			</parameter> -->		
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter> 			
  			<!-- This is no encoding, but this is the only parameter left. -->					
  			<parameter name="encoding" class="String" direction="fixed">
@@ -258,7 +258,7 @@
 				<value>SFipa.PROTOCOL_ENGLISH_AUCTION</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<!-- This is no encoding, but this is the only parameter left. -->					
  			<parameter name="encoding" class="String" direction="fixed">
@@ -275,7 +275,7 @@
 				<value>SFipa.PROTOCOL_ENGLISH_AUCTION</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -288,7 +288,7 @@
 				<value>SFipa.PROTOCOL_ENGLISH_AUCTION</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -301,7 +301,7 @@
 				<value>SFipa.PROTOCOL_ENGLISH_AUCTION</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -314,7 +314,7 @@
 				<value>SFipa.PROTOCOL_ENGLISH_AUCTION</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -327,7 +327,7 @@
 				<value>SFipa.PROTOCOL_ENGLISH_AUCTION</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>		

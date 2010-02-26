@@ -8,7 +8,7 @@ import java.util.Properties;
 import nuggets.Nuggets;
 
 /**
- *  The XML codec based on the nuggest framework.
+ *  The XML codec based on the nuggets framework.
  */
 public class NuggetsXMLContentCodec implements IContentCodec, Serializable
 {

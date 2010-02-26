@@ -585,7 +585,7 @@
 				<value>SFipa.createUniqueId($scope.getAgentName())</value>
 			</parameter>-->
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<match>/* $beliefbase.cnp_filter.filter($messagemap) &amp;&amp; */ $conversation_id!=null</match>
 		</messageevent>
@@ -598,7 +598,7 @@
 				<value>SFipa.PROTOCOL_CONTRACT_NET</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -611,7 +611,7 @@
 				<value>SFipa.PROTOCOL_CONTRACT_NET</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -624,7 +624,7 @@
 				<value>SFipa.PROTOCOL_CONTRACT_NET</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -637,7 +637,7 @@
 				<value>SFipa.PROTOCOL_CONTRACT_NET</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -650,7 +650,7 @@
 				<value>SFipa.PROTOCOL_CONTRACT_NET</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -663,7 +663,7 @@
 				<value>SFipa.PROTOCOL_CONTRACT_NET</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -676,7 +676,7 @@
 				<value>SFipa.PROTOCOL_CONTRACT_NET</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -698,7 +698,7 @@
 				<value>SFipa.createUniqueId($scope.getAgentName())</value>
 			</parameter>-->
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<match>/* $beliefbase.icnp_filter.filter($messagemap) &amp;&amp; */ $conversation_id!=null</match>
 		</messageevent>
@@ -711,7 +711,7 @@
 				<value>SFipa.PROTOCOL_ITERATED_CONTRACT_NET</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -724,7 +724,7 @@
 				<value>SFipa.PROTOCOL_ITERATED_CONTRACT_NET</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -737,7 +737,7 @@
 				<value>SFipa.PROTOCOL_ITERATED_CONTRACT_NET</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -750,7 +750,7 @@
 				<value>SFipa.PROTOCOL_ITERATED_CONTRACT_NET</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -763,7 +763,7 @@
 				<value>SFipa.PROTOCOL_ITERATED_CONTRACT_NET</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -776,7 +776,7 @@
 				<value>SFipa.PROTOCOL_ITERATED_CONTRACT_NET</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -789,7 +789,7 @@
 				<value>SFipa.PROTOCOL_ITERATED_CONTRACT_NET</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>

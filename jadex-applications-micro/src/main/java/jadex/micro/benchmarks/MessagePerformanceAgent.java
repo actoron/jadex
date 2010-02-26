@@ -52,7 +52,7 @@ public class MessagePerformanceAgent extends MicroAgent
 			}
 			else
 			{
-				request.put(SFipa.LANGUAGE, SFipa.NUGGETS_XML);
+				request.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
 				request.put(SFipa.CONTENT, new Message("message: "+i, true));
 			}
 			

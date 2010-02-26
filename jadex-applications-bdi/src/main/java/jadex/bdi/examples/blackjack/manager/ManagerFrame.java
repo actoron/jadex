@@ -388,7 +388,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		// start dealer-agent
 		try
 		{
-			IGoal start = agent.getGoalbase().createGoal("ams_create_agent");
+			IGoal start = agent.getGoalbase().createGoal("cms_create_component");
 //			IContextService	cs	= (IContextService) agent.getServiceContainer().getService(IContextService.class);
 //			IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
 //			// Hack! remove cast to ApplicationContext
@@ -397,7 +397,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			start.getParameter("type").setValue("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml");
 			start.getParameter("name").setValue("BlackjackDealer");
 			agent.dispatchTopLevelGoalAndWait(start);
-			IComponentIdentifier	dealer	= (IComponentIdentifier)start.getParameter("agentidentifier").getValue();
+			IComponentIdentifier	dealer	= (IComponentIdentifier)start.getParameter("componentidentifier").getValue();
 			agent.getLogger().info("local DealerAgent started: "+dealer);
 			//access.getBeliefbase().getBelief("localDealerAID").setFact(start.getResult());
 			agent.getBeliefbase().getBelief("localDealerAID").setFact(dealer);
@@ -416,8 +416,8 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		IComponentIdentifier dealer = (IComponentIdentifier)agent.getBeliefbase().getBelief("localDealerAID").getFact();
 		if(dealer!=null)
 		{
-			IGoal destroy = agent.getGoalbase().createGoal("ams_destroy_agent");
-			destroy.getParameter("agentidentifier").setValue(dealer);
+			IGoal destroy = agent.getGoalbase().createGoal("cms_destroy_component");
+			destroy.getParameter("componentidentifier").setValue(dealer);
 			agent.dispatchTopLevelGoalAndWait(destroy);
 			agent.getBeliefbase().getBelief("localDealerAID").setFact(null);
 		}
@@ -436,8 +436,8 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 //			{
 //				if(players[i].getAgentID()!=null)
 //				{
-//					IGoal destroy = agent.getGoalbase().createGoal("ams_destroy_agent");
-//					destroy.getParameter("agentidentifier").setValue(players[i].getAgentID());
+//					IGoal destroy = agent.getGoalbase().createGoal("cms_destroy_component");
+//					destroy.getParameter("componentidentifier").setValue(players[i].getAgentID());
 //					agent.dispatchTopLevelGoalAndWait(destroy);
 //				}
 //			}
@@ -598,7 +598,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			try
 			{
 				agent.getLogger().info("starting playerAgent: "+player.getName());
-				IGoal start = agent.getGoalbase().createGoal("ams_create_agent");
+				IGoal start = agent.getGoalbase().createGoal("cms_create_component");
 //				IContextService	cs	= (IContextService) agent.getServiceContainer().getService(IContextService.class);
 //				IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
 //				// Hack! remove cast to ApplicationContext
@@ -611,7 +611,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				args.put("dealer", dealeraid);
 				start.getParameter("arguments").setValue(args);
 				agent.dispatchTopLevelGoalAndWait(start);
-				IComponentIdentifier	playerid	= (IComponentIdentifier)start.getParameter("agentidentifier").getValue();
+				IComponentIdentifier	playerid	= (IComponentIdentifier)start.getParameter("componentidentifier").getValue();
 				player.setAgentID(playerid);
 			}
 			catch(Exception e)
@@ -626,8 +626,8 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		 */
 		protected void stopPlayer(Player player)
 		{
-			IGoal destroy = agent.getGoalbase().createGoal("ams_destroy_agent");
-			destroy.getParameter("agentidentifier").setValue(player.getAgentID());
+			IGoal destroy = agent.getGoalbase().createGoal("cms_destroy_component");
+			destroy.getParameter("componentidentifier").setValue(player.getAgentID());
 			agent.dispatchTopLevelGoalAndWait(destroy);
 			player.setAgentID(null);
 		}

@@ -54,7 +54,7 @@ public class AMSTestPlan extends Plan
 		IComponentDescription desc = amsservice.createComponentDescription(null, null, null, null, null);
 		ISearchConstraints constraints = amsservice.createSearchConstraints(-1, 0);
 		
-		IGoal	search	= createGoal("amscap.ams_search_agents");
+		IGoal	search	= createGoal("amscap.cms_search_components");
 		search.getParameter("description").setValue(desc);
 		search.getParameter("constraints").setValue(constraints);
 		search.getParameter("ams").setValue(ams);
@@ -78,7 +78,7 @@ public class AMSTestPlan extends Plan
 		// Try to create agent.
 		tr = new TestReport("#"+num++, "Trying to create agent.");
 		getLogger().info("\nTrying to create agent.");
-		IGoal	create	= createGoal("amscap.ams_create_agent");
+		IGoal	create	= createGoal("amscap.cms_create_component");
 		create.getParameter("type").setValue(agenttype);
 		create.getParameter("ams").setValue(ams);
 		IComponentIdentifier agent = null;
@@ -86,7 +86,7 @@ public class AMSTestPlan extends Plan
 		{
 			dispatchSubgoalAndWait(create);
 			//getLogger().info("Success: Created "+create.getResult());
-			agent = (IComponentIdentifier)create.getParameter("agentidentifier").getValue();
+			agent = (IComponentIdentifier)create.getParameter("componentidentifier").getValue();
 			getLogger().info("Success: Created "+agent);
 			tr.setSucceeded(true);
 		}
@@ -103,10 +103,10 @@ public class AMSTestPlan extends Plan
 		{
 			getLogger().info("\nSearching for agent.");
 			
-			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("agentidentifier").getValue(), null, null, null, null);
+			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null);
 			constraints = amsservice.createSearchConstraints(-1, 0);
 		
-			search	= createGoal("amscap.ams_search_agents");
+			search	= createGoal("amscap.cms_search_components");
 			search.getParameter("description").setValue(desc);
 			search.getParameter("constraints").setValue(constraints);
 			search.getParameter("ams").setValue(ams);
@@ -147,7 +147,7 @@ public class AMSTestPlan extends Plan
 				getLogger().info("\nTry to get an external access.");
 				
 				IGoal gext = createGoal("amscap.ams_get_externalaccess");
-				gext.getParameter("agentidentifier").setValue(agent);
+				gext.getParameter("componentidentifier").setValue(agent);
 				try
 				{
 					dispatchSubgoalAndWait(gext);
@@ -172,9 +172,9 @@ public class AMSTestPlan extends Plan
 		if(create.isSucceeded())
 		{
 			getLogger().info("\nTrying to destroy agent.");
-			IGoal	destroy	= createGoal("amscap.ams_destroy_agent");
-			//destroy.getParameter("agentidentifier").setValue(create.getResult());
-			destroy.getParameter("agentidentifier").setValue(create.getParameter("agentidentifier").getValue());
+			IGoal	destroy	= createGoal("amscap.cms_destroy_component");
+			//destroy.getParameter("componentidentifier").setValue(create.getResult());
+			destroy.getParameter("componentidentifier").setValue(create.getParameter("componentidentifier").getValue());
 			destroy.getParameter("ams").setValue(ams);
 			try
 			{
@@ -200,10 +200,10 @@ public class AMSTestPlan extends Plan
 		{
 			getLogger().info("\nSearching for agent again.");
 			
-			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("agentidentifier").getValue(), null, null, null, null);
+			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null);
 			constraints = amsservice.createSearchConstraints(-1, 0);
 	
-			search	= createGoal("amscap.ams_search_agents");
+			search	= createGoal("amscap.cms_search_components");
 			search.getParameter("description").setValue(desc);
 			search.getParameter("constraints").setValue(constraints);
 			search.getParameter("ams").setValue(ams);
@@ -249,7 +249,7 @@ public class AMSTestPlan extends Plan
 		dispatchSubgoalAndWait(shutdown);*/
 
 		/*getLogger().info("Test 1: Creating an agent per message!");
-		IGoal ca = createGoal("ams_create_agent");
+		IGoal ca = createGoal("cms_create_component");
 		ca.getParameter("type").setValue("jadex.bdi.testcases.benchmarks.AgentCreation");
 		ca.getParameter("name").setValue("Creator");
 		ca.getParameterSet("arguments").addValue(new Integer(5));

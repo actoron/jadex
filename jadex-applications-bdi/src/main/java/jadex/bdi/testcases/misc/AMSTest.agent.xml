@@ -48,7 +48,7 @@
 				<value>SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="reply_with" class="String">
 				<value>SFipa.createUniqueId($scope.getAgentName())</value>
@@ -67,7 +67,7 @@
 				<value>SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="reply_with" class="String">
 				<value>SFipa.createUniqueId($scope.getAgentName())</value>
@@ -86,7 +86,7 @@
 				<value>SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="reply_with" class="String">
 				<value>SFipa.createUniqueId($scope.getAgentName())</value>
@@ -105,7 +105,7 @@
 				<value>SFipa.AGENT_MANAGEMENT_ONTOLOGY_NAME</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="reply_with" class="String">
 				<value>SFipa.createUniqueId($scope.getAgentName())</value>

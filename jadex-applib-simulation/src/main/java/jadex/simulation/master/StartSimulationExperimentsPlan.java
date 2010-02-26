@@ -130,7 +130,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 	}
 
 	private void startClientSimulators() {
-		IGoal ca = createGoal("ams_create_agent");
+		IGoal ca = createGoal("cms_create_component");
 		String type = "..\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\simulation\\client\\ClientSimulator.agent.xml";
 		ca.getParameter("type").setValue(type);
 

@@ -30,10 +30,10 @@ public class CMTestPlan extends Plan
 	{
 		// Create receiver agent.
 		String	agenttype	= "/jadex/bdi/testcases/planlib/CMReceiver.agent.xml";
-		IGoal	ca	= createGoal("amscap.ams_create_agent");
+		IGoal	ca	= createGoal("amscap.cms_create_component");
 		ca.getParameter("type").setValue(agenttype);
 		dispatchSubgoalAndWait(ca);
-		IComponentIdentifier	receiver	= (IComponentIdentifier)ca.getParameter("agentidentifier").getValue();
+		IComponentIdentifier	receiver	= (IComponentIdentifier)ca.getParameter("componentidentifier").getValue();
 
 		// Dispatch request goal.
 		IGoal	request	= createGoal("procap.rp_initiate");
@@ -64,8 +64,8 @@ public class CMTestPlan extends Plan
 		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 		
 		// Destroy receiver agent.
-		IGoal	da	= createGoal("amscap.ams_destroy_agent");
-		da.getParameter("agentidentifier").setValue(receiver);
+		IGoal	da	= createGoal("amscap.cms_destroy_component");
+		da.getParameter("componentidentifier").setValue(receiver);
 		dispatchSubgoalAndWait(da);
 	}
 	
@@ -76,10 +76,10 @@ public class CMTestPlan extends Plan
 	{
 		// Create receiver agent.
 		String	agenttype	= "/jadex/bdi/testcases/planlib/CMReceiver.agent.xml";
-		IGoal	ca	= createGoal("amscap.ams_create_agent");
+		IGoal	ca	= createGoal("amscap.cms_create_component");
 		ca.getParameter("type").setValue(agenttype);
 		dispatchSubgoalAndWait(ca);
-		IComponentIdentifier	receiver	= (IComponentIdentifier)ca.getParameter("agentidentifier").getValue();
+		IComponentIdentifier	receiver	= (IComponentIdentifier)ca.getParameter("componentidentifier").getValue();
 
 		// Dispatch request goal.
 		IGoal	request	= createGoal("procap.rp_initiate");
@@ -89,8 +89,8 @@ public class CMTestPlan extends Plan
 		
 		// Wait a sec. and then kill the receiver agent (should abort interaction in its end state).
 		waitFor(1000);
-		IGoal	da	= createGoal("amscap.ams_destroy_agent");
-		da.getParameter("agentidentifier").setValue(receiver);
+		IGoal	da	= createGoal("amscap.cms_destroy_component");
+		da.getParameter("componentidentifier").setValue(receiver);
 		dispatchSubgoalAndWait(da);
 		
 		// Check if goal finishes. (todo: check result).

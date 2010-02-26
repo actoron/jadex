@@ -150,7 +150,7 @@
 				<value>SFipa.REQUEST</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
 				<value>BlackjackOntology.ONTOLOGY_NAME</value>
@@ -163,7 +163,7 @@
 				<value>SFipa.INFORM</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
 				<value>BlackjackOntology.ONTOLOGY_NAME</value>
@@ -177,7 +177,7 @@
 				<value>SFipa.INFORM</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
 				<value>BlackjackOntology.ONTOLOGY_NAME</value>
@@ -193,7 +193,7 @@
 				<value>SFipa.INFORM</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
 				<value>BlackjackOntology.ONTOLOGY_NAME</value>
@@ -210,7 +210,7 @@
 				<value>SFipa.REFUSE</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
 				<value>BlackjackOntology.ONTOLOGY_NAME</value>
@@ -228,7 +228,7 @@
 				<value>SFipa.REQUEST</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
 				<value>BlackjackOntology.ONTOLOGY_NAME</value>
@@ -246,7 +246,7 @@
 				<value>SFipa.REQUEST</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
 				<value>BlackjackOntology.ONTOLOGY_NAME</value>
@@ -263,7 +263,7 @@
 				<value>SFipa.REQUEST</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
 				<value>BlackjackOntology.ONTOLOGY_NAME</value>

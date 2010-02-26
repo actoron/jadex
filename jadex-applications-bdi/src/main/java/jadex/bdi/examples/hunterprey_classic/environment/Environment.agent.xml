@@ -48,8 +48,8 @@
 			<concrete ref="dfcap.df_deregister"/>
 		</achievegoalref>
 
-		<achievegoalref name="ams_destroy_agent">
-			<concrete ref="amscap.ams_destroy_agent"/>
+		<achievegoalref name="cms_destroy_component">
+			<concrete ref="amscap.cms_destroy_component"/>
 		</achievegoalref>
 
 		<querygoalref name="rp_decide_request">
@@ -62,7 +62,7 @@
 		<!-- Destroy the Environment Agent. -->
 		<achievegoal name="end_agent">
 			<!-- The agent to destroy. -->
-			<!-- <parameter name="agentidentifier" class="jadex.bridge.IComponentIdentifier"/> -->
+			<!-- <parameter name="componentidentifier" class="jadex.bridge.IComponentIdentifier"/> -->
 		</achievegoal>
 	</goals>
 
@@ -161,7 +161,7 @@
 				<value>SFipa.REQUEST</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
 				<value>"HunterPreyOntology"</value>
@@ -176,7 +176,7 @@
 				<value>SFipa.REQUEST</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
 				<value>"HunterPreyOntology"</value>
@@ -191,7 +191,7 @@
 				<value>SFipa.REQUEST</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
 				<value>"HunterPreyOntology"</value>
@@ -206,7 +206,7 @@
 				<value>SFipa.REQUEST</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
 				<value>"HunterPreyOntology"</value>
@@ -221,7 +221,7 @@
 				<value>SFipa.INFORM</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
 				<value>"HunterPreyOntology"</value>
@@ -248,7 +248,7 @@
 				<value>SFipa.INFORM</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
 			<parameter name="ontology" class="String" direction="fixed">
 				<value>"HunterPreyOntology"</value>
@@ -285,7 +285,7 @@
 							((IDF)$scope.getServiceContainer().getService(IDF.class))
 								.createDFComponentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
 									.createDFServiceDescription("environment-service", "hunter-prey environment", "University of Hamburg",
-										new String[]{"nuggets_xml"}, new String[]{"hunterprey"}, new String[]{"fipa-request"}, null))
+										new String[]{"JADEX_XML"}, new String[]{"hunterprey"}, new String[]{"fipa-request"}, null))
 						</value>
  					</parameter>
 				</initialgoal>

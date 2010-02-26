@@ -152,7 +152,7 @@ public class StartPeerPlan extends Plan
 	}
 	
 	/**
-	 *  Create an agent by directly using the AMS service.
+	 *  Create an agent by directly using the CMS service.
 	 *  @param name The agent instance name.
 	 *  @param args The arguments.
 	 */
@@ -166,24 +166,24 @@ public class StartPeerPlan extends Plan
 	}
 	
 	/**
-	 *  Create an agent by using the AMS capability.
+	 *  Create an agent by using the CMS capability.
 	 *  @param name The agent instance name.
 	 *  @param args The arguments.
 	 */
 	protected IComponentIdentifier capabilityCreateAgent(String name, Map args)
 	{
-		IGoal sp = createGoal("ams_create_agent");
+		IGoal sp = createGoal("cms_create_component");
 		sp.getParameter("type").setValue("/jadex/bdi/benchmarks/AgentCreation.agent.xml");
 		// todo: Hack! Assumes there is no capability
 		sp.getParameter("configuration").setValue(getScope().getConfigurationName());
 		sp.getParameter("name").setValue(name);
 		sp.getParameter("arguments").setValue(args);
 		dispatchSubgoalAndWait(sp);
-		return (IComponentIdentifier)sp.getParameter("agentidentifier").getValue();
+		return (IComponentIdentifier)sp.getParameter("componentidentifier").getValue();
 	}
 	
 	/**
-	 *  Destroy an agent by directly using the AMS service.
+	 *  Destroy an agent by directly using the CMS service.
 	 *  @param name The agent instance name.
 	 *  @param args The arguments.
 	 */
@@ -197,7 +197,7 @@ public class StartPeerPlan extends Plan
 	}
 	
 	/**
-	 *  Destroy an agent by using the AMS capability.
+	 *  Destroy an agent by using the CMS capability.
 	 *  @param name The agent instance name.
 	 *  @param args The arguments.
 	 */
@@ -205,8 +205,8 @@ public class StartPeerPlan extends Plan
 	{
 		final IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
 		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
-		IGoal sp = createGoal("ams_destroy_agent");
-		sp.getParameter("agentidentifier").setValue(aid);
+		IGoal sp = createGoal("cms_destroy_component");
+		sp.getParameter("componentidentifier").setValue(aid);
 		dispatchSubgoalAndWait(sp);
 		System.out.println("Successfully destroyed peer: "+name);
 	}

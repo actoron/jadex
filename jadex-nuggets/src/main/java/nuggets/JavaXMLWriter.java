@@ -299,7 +299,7 @@ public class JavaXMLWriter implements IWriter {
 // ---------------- prefabricated byte arrays
 
 	/** <code>N_ROOT</code>: */
-	private static final char[]	N_ROOT	= "<n:root xmlns:n=\"nuggets_xml_encoder\"  xmlns:r=\"reference_ids\"".toCharArray();
+	private static final char[]	N_ROOT	= "<n:root xmlns:n=\"JADEX_XML_encoder\"  xmlns:r=\"reference_ids\"".toCharArray();
 	
 
 	/** <code>END_N_ROOT</code>: */

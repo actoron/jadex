@@ -41,8 +41,8 @@
 	</beliefs>
 
 	<goals>
-		<achievegoalref name="ams_destroy_agent">
-			<concrete ref="amscap.ams_destroy_agent"/>
+		<achievegoalref name="cms_destroy_component">
+			<concrete ref="amscap.cms_destroy_component"/>
 		</achievegoalref>
 		<achievegoalref name="df_register">
 			<concrete ref="dfcap.df_register"/>

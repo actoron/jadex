@@ -7,12 +7,15 @@ import jadex.xml.bean.JavaWriter;
 import java.io.Serializable;
 import java.util.Properties;
 
+/**
+ *  Content condec using the Jadex-XML framework.
+ */
 public class JadexXMLContentCodec implements IContentCodec, Serializable
 {
 	//-------- constants --------
 	
 	/** The language identifier. */
-	public static final String	JADEX_XML	= "nuggets-xml";
+	public static final String	JADEX_XML	= "jadex-xml";
 	
 	/** The debug flag. */
 	protected boolean DEBUG = false;

@@ -137,7 +137,7 @@
 				<value>SFipa.createUniqueId($scope.getAgentName())</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
 			</parameter>
 		</messageevent>
 
@@ -149,7 +149,7 @@
 				<value>SFipa.PROTOCOL_SUBSCRIBE</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -162,7 +162,7 @@
 				<value>SFipa.PROTOCOL_SUBSCRIBE</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -175,7 +175,7 @@
 				<value>SFipa.PROTOCOL_SUBSCRIBE</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -188,7 +188,7 @@
 				<value>SFipa.PROTOCOL_SUBSCRIBE</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -201,7 +201,7 @@
 				<value>SFipa.PROTOCOL_SUBSCRIBE</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>

@@ -80,20 +80,20 @@
 	<goals>
 		<!-- Predefined Goals.-->
 		<!-- Used to find other agents. -->
-		<achievegoalref name="ams_search_agents">
-			<concrete ref="amscap.ams_search_agents" />
+		<achievegoalref name="cms_search_components">
+			<concrete ref="amscap.cms_search_components" />
 		</achievegoalref>
 		<!-- Used to search for the dealer. -->
 		<achievegoalref name="df_search">
 			<concrete ref="dfcap.df_search" />
 		</achievegoalref>
 		<!-- Used to start other agents. -->
-		<!-- <achievegoalref name="ams_create_agent">
-			<concrete ref="amscap.ams_create_agent" />
+		<!-- <achievegoalref name="cms_create_component">
+			<concrete ref="amscap.cms_create_component" />
 		</achievegoalref> -->
 		<!-- Used to stop other agents. -->
-		<achievegoalref name="ams_destroy_agent">
-			<concrete ref="amscap.ams_destroy_agent" />
+		<achievegoalref name="cms_destroy_component">
+			<concrete ref="amscap.cms_destroy_component" />
 		</achievegoalref>
 		<!-- Keep agent services registered at DF. -->
 		<maintaingoalref name="df_keep_registered">

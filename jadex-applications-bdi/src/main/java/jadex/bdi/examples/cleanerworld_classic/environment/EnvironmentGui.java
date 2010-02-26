@@ -415,11 +415,11 @@ public class EnvironmentGui	extends JFrame
 //						try
 //						{
 //							// Hack!!! Should ignore remote cleaners.
-//							IGoal	kill	= agent.createGoal("ams_destroy_agent");
+//							IGoal	kill	= agent.createGoal("cms_destroy_component");
 ////							System.out.println("killing: "+cleaners[i].getName());
 //							IComponentIdentifier aid = ((IAMS)agent.getPlatform().getService(IAMS.class))
 //								.createAgentIdentifier(cleaners[i].getName(), true);
-//							kill.getParameter("agentidentifier").setValue(aid);
+//							kill.getParameter("componentidentifier").setValue(aid);
 //							agent.dispatchTopLevelGoalAndWait(kill);
 //						}
 ////						catch(GoalFailureException gfe) {}

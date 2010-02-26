@@ -2581,7 +2581,7 @@ public class AgentRules
 	}
 
 	/**
-	 *  Fetch an element and its scope by its complex name (e.g. amscap.ams_create_agent).
+	 *  Fetch an element and its scope by its complex name (e.g. amscap.cms_create_component).
 	 *  @param name The name.
 	 *  @return An array [restname, scope].
 	 * /
@@ -2605,7 +2605,7 @@ public class AgentRules
 	}*/
 
 	/**
-	 *  Fetch an element and its scope by its complex name (e.g. amscap.ams_create_agent).
+	 *  Fetch an element and its scope by its complex name (e.g. amscap.cms_create_component).
 	 *  @param name The name.
 	 *  @param type The object type (belief, beliefset, goal, internalevent, messageevent).
 	 *  @param rcapa The runtime scope.

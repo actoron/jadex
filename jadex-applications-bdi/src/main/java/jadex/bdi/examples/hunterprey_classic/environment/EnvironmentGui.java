@@ -117,8 +117,8 @@ public class EnvironmentGui	extends JFrame
 //					try
 //					{
 ////						System.out.println(creatures[i].getAID());
-//						IGoal kg = agent.createGoal("ams_destroy_agent");
-//						kg.getParameter("agentidentifier").setValue(creatures[i].getAID());
+//						IGoal kg = agent.createGoal("cms_destroy_component");
+//						kg.getParameter("componentidentifier").setValue(creatures[i].getAID());
 //						agent.dispatchTopLevelGoalAndWait(kg);
 //					}
 //					catch(GoalFailureException gfe) 

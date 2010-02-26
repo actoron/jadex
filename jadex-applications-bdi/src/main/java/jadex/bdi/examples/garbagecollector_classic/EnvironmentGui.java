@@ -49,9 +49,9 @@ public class EnvironmentGui	extends JFrame
 					{
 						try
 						{
-							IGoal kill = agent.createGoal("ams_destroy_agent");
+							IGoal kill = agent.createGoal("cms_destroy_component");
 							IComponentManagementService ces = (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
-							kill.getParameter("agentidentifier").setValue(ces.createComponentIdentifier(wobs[i].getName(), true, null));
+							kill.getParameter("componentidentifier").setValue(ces.createComponentIdentifier(wobs[i].getName(), true, null));
 							agent.dispatchTopLevelGoalAndWait(kill);
 						}
 						catch(GoalFailureException gfe) {}

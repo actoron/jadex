@@ -29,13 +29,13 @@ public class EndStatePlan extends Plan
 		getWaitqueue().addMessageEvent("inform_reports");
 		
 		// Create worker agent.
-		IGoal	create	= createGoal("amscap.ams_create_agent");
+		IGoal	create	= createGoal("amscap.cms_create_component");
 		create.getParameter("type").setValue("/jadex/bdi/testcases/misc/EndStateWorker.agent.xml");
 		Map args = SCollection.createHashMap();
 		args.put("testagent", getComponentIdentifier());
 		create.getParameter("arguments").setValue(args);
 		dispatchSubgoalAndWait(create);
-		IComponentIdentifier	worker	= (IComponentIdentifier)create.getParameter("agentidentifier").getValue();
+		IComponentIdentifier	worker	= (IComponentIdentifier)create.getParameter("componentidentifier").getValue();
 		
 		// Wait for reports from worker agent.
 		IMessageEvent	msg	= waitForMessageEvent("inform_reports");
@@ -44,7 +44,7 @@ public class EndStatePlan extends Plan
 		
 		// Check if worker agent has been correctly removed.
 		waitFor(1000);	// Hack!!! how to ensure that agent has time to remove itself?
-		IGoal	search	= createGoal("amscap.ams_search_agents");
+		IGoal	search	= createGoal("amscap.cms_search_components");
 		IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer()
 			.getService(IComponentManagementService.class);
 		search.getParameter("description").setValue(ces.createComponentDescription(worker, null, null, null, null));
@@ -68,10 +68,10 @@ public class EndStatePlan extends Plan
 
 		// Create deregister agent.
 		report	= new TestReport("deregister", "Test if an agent can deregister on termination.");
-		create	= createGoal("amscap.ams_create_agent");
+		create	= createGoal("amscap.cms_create_component");
 		create.getParameter("type").setValue("/jadex/bdi/testcases/misc/EndStateDeregister.agent.xml");
 		dispatchSubgoalAndWait(create);
-		IComponentIdentifier	deregister	= (IComponentIdentifier)create.getParameter("agentidentifier").getValue();
+		IComponentIdentifier	deregister	= (IComponentIdentifier)create.getParameter("componentidentifier").getValue();
 
 		// Check if deregister agent is registered.
 		waitFor(100);	// Hack!!! how to ensure that agent has time to register itself?
@@ -89,8 +89,8 @@ public class EndStatePlan extends Plan
 		else
 		{
 			// Kill deregister agent.
-			IGoal	destroy	= createGoal("amscap.ams_destroy_agent");
-			destroy.getParameter("agentidentifier").setValue(deregister);
+			IGoal	destroy	= createGoal("amscap.cms_destroy_component");
+			destroy.getParameter("componentidentifier").setValue(deregister);
 			dispatchSubgoalAndWait(destroy);
 			
 			// Check if deregister agent is deregistered.
@@ -105,7 +105,7 @@ public class EndStatePlan extends Plan
 			else
 			{
 				// Check if deregister agent has been correctly removed.
-				search = createGoal("amscap.ams_search_agents");
+				search = createGoal("amscap.cms_search_components");
 				search.getParameter("description").setValue(ces.createComponentDescription(deregister, null, null, null, null));
 				dispatchSubgoalAndWait(search);
 				if(search.getParameterSet("result").getValues().length!=0)

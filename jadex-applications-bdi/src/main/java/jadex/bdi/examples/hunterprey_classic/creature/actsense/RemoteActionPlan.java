@@ -33,7 +33,7 @@ public abstract class RemoteActionPlan extends Plan
 		rg.getParameter("receiver").setValue(env);
 		rg.getParameter("action").setValue(action);
 //		rg.getParameter("ontology").setValue(HunterPreyOntology.ONTOLOGY_NAME);
-		//rg.getParameter("language").setValue(SFipa.NUGGETS_XML);
+		//rg.getParameter("language").setValue(SFipa.JADEX_XML);
 
 		dispatchSubgoalAndWait(rg);
 		

@@ -32,14 +32,14 @@
 				<parameter name="testcase" class="Testcase" direction="inout" />
 				<parameter name="classloader" class="ClassLoader" optional="true" />
 			</performgoal>
-			<achievegoalref name="ams_create_agent">
-				<concrete ref="amscap.ams_create_agent"/>
+			<achievegoalref name="cms_create_component">
+				<concrete ref="amscap.cms_create_component"/>
 			</achievegoalref>
 			<achievegoalref name="ams_resume_agent">
 				<concrete ref="amscap.ams_resume_agent"/>
 			</achievegoalref>
-			<achievegoalref name="ams_destroy_agent">
-				<concrete ref="amscap.ams_destroy_agent"/>
+			<achievegoalref name="cms_destroy_component">
+				<concrete ref="amscap.cms_destroy_component"/>
 			</achievegoalref>
 		</goals>
 
@@ -65,7 +65,7 @@
 					<value>SFipa.INFORM</value>
 				</parameter>
 				<parameter name="language" class="String" direction="fixed">
-					<value>SFipa.NUGGETS_XML</value>
+					<value>SFipa.JADEX_XML</value>
 				 </parameter>
 				 <match>$content instanceof Testcase</match>
 			</messageevent>

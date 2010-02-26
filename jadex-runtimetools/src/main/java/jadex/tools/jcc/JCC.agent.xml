@@ -129,7 +129,7 @@
 				<value>"jadex.tools"</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
 			</parameter>
 		</messageevent>
 		
@@ -142,7 +142,7 @@
 				<value>"jadex.tools.logger"</value>
 			</parameter>
 			<parameter name="language" class="String" 			direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
 			</parameter>
 		</messageevent> -->
 		
@@ -154,7 +154,7 @@
                 <value>"jadex.tools"</value>
             </parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
 			</parameter>
 		</messageevent> 
 

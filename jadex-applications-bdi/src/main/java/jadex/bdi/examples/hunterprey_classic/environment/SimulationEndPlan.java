@@ -17,8 +17,8 @@ public class SimulationEndPlan extends Plan {
 		{
 //			System.out.println(creatures[i].getAID());
 			en.removeCreature(creatures[i]);
-			destroy[i] = createGoal("ams_destroy_agent");
-			destroy[i].getParameter("agentidentifier").setValue(creatures[i].getAID());
+			destroy[i] = createGoal("cms_destroy_component");
+			destroy[i].getParameter("componentidentifier").setValue(creatures[i].getAID());
 			dispatchSubgoal(destroy[i]);
 		}
 		

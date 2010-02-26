@@ -181,7 +181,7 @@ public class MicroPreyAgent extends MicroAgent
 		msg.put(SFipa.PROTOCOL, SFipa.PROTOCOL_REQUEST);
 		msg.put(SFipa.CONVERSATION_ID, SUtil.createUniqueId(myself.getName()));
 		msg.put(SFipa.CONTENT, action);
-		msg.put(SFipa.LANGUAGE, SFipa.NUGGETS_XML);
+		msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
 		msg.put(SFipa.RECEIVERS, Collections.singletonList(environment));
 		msg.put(SFipa.SENDER, getComponentIdentifier());
 		// Todo: message service shouldn't allow sending anonymous messages (i.e. w/o sender)

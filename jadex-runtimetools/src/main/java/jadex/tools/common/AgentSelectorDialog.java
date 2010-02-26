@@ -194,7 +194,7 @@ public class AgentSelectorDialog
 		try
 		{
 			IComponentManagementService ces	= (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
-			IGoal	search	= agent.getGoalbase().createGoal("ams_search_agents");
+			IGoal	search	= agent.getGoalbase().createGoal("cms_search_components");
 			search.getParameter("description").setValue(ces.createComponentDescription(null, null, null, null, null));
 			search.getParameter("constraints").setValue(ces.createSearchConstraints(-1, 0));
 			agent.dispatchTopLevelGoalAndWait(search, 10000); // todo: use some default timeout

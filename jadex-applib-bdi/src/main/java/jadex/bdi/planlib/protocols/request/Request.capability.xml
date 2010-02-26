@@ -203,7 +203,7 @@
 				<value>SFipa.createUniqueId($scope.getAgentName())</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
 			</parameter>
 			<match>$beliefbase.rp_filter.filter($message) &amp;&amp; $conversation_id!=null</match>
 		</messageevent>
@@ -216,7 +216,7 @@
 				<value>SFipa.PROTOCOL_REQUEST</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -229,7 +229,7 @@
 				<value>SFipa.PROTOCOL_REQUEST</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -242,7 +242,7 @@
 				<value>SFipa.PROTOCOL_REQUEST</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -255,7 +255,7 @@
 				<value>SFipa.PROTOCOL_REQUEST</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>
@@ -268,7 +268,7 @@
 				<value>SFipa.PROTOCOL_REQUEST</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
  			</parameter>
  			<match>$conversation_id!=null</match>
 		</messageevent>

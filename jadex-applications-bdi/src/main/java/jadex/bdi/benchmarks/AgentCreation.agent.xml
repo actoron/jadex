@@ -12,7 +12,7 @@
 
 <!--
  	<capabilities>
-		<capability name="amscap" file="jadex.bdi.planlib.cms.CMS"/>
+		<capability name="cmscap" file="jadex.bdi.planlib.cms.CMS"/>
 	</capabilities> -->
 
 	<beliefs>

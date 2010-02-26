@@ -125,7 +125,7 @@
 				<value>SFipa.INFORM</value>
 			</parameter>
 			<parameter name="language" class="String">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
 			</parameter>
 			<parameterset name="receivers" class="IComponentIdentifier">
 				<value>$beliefbase.testagent</value>

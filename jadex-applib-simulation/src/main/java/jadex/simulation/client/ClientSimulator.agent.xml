@@ -119,7 +119,7 @@
 				<value>SFipa.INFORM</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
 			</parameter>
 		</messageevent>
 

@@ -54,14 +54,14 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 		{
 			for(int i=0; i<args.length; i++)
 			{
-//				IGoal ca = createGoal("ams_create_agent");
+//				IGoal ca = createGoal("cms_create_component");
 //				ca.getParameter("type").setValue(type);
 //				if(config!=null)
 //					ca.getParameter("configuration").setValue(config);
 //				if(args[i]!=null)
 //					ca.getParameter("arguments").setValue(args[i]);
 //				dispatchSubgoalAndWait(ca);
-//				agents.add(ca.getParameter("agentidentifier").getValue());
+//				agents.add(ca.getParameter("componentidentifier").getValue());
 				
 				SyncResultListener	listener	= new SyncResultListener();
 				IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
@@ -91,8 +91,8 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //			System.out.println("Killing " + ((IComponentIdentifier)agents.get(i)).getName());
 			try
 			{
-//				IGoal da = createGoal("amscap.ams_destroy_agent");
-//				da.getParameter("agentidentifier").setValue(agents.get(i));
+//				IGoal da = createGoal("amscap.cms_destroy_component");
+//				da.getParameter("componentidentifier").setValue(agents.get(i));
 //				dispatchSubgoalAndWait(da);
 				
 				SyncResultListener	listener	= new SyncResultListener();

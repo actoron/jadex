@@ -24,7 +24,7 @@ public class InitSimulationPlan extends Plan{
 		dispatchTopLevelGoal(goal);
 		
 		//trigger the start of the simulation control center
-//		IGoal ca = createGoal("amscap.ams_create_agent");
+//		IGoal ca = createGoal("amscap.cms_create_component");
 //		ca.getParameter("type").setValue("/jadex/simulation/client/ControlCenter.agent.xml");
 //		Map args = SCollection.createHashMap();
 //		args.put("simulationConf", getBeliefbase().getBelief("simulationConf").getFact());

@@ -80,7 +80,7 @@
 				<value>IntrospectorAdapter.TOOL_INTROSPECTOR</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
 			</parameter>
 		</messageevent>
 
@@ -93,7 +93,7 @@
 				<value>IntrospectorAdapter.TOOL_INTROSPECTOR</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
 			</parameter>
 		</messageevent>
 
@@ -107,7 +107,7 @@
 				<value>IntrospectorAdapter.TOOL_INTROSPECTOR</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
 			</parameter>
 		</messageevent>
 
@@ -120,7 +120,7 @@
 				<value>IntrospectorAdapter.TOOL_INTROSPECTOR</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
 			</parameter>
 			<match>$content instanceof CurrentState</match>
 		</messageevent>
@@ -134,7 +134,7 @@
 				<value>IntrospectorAdapter.TOOL_INTROSPECTOR</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>SFipa.NUGGETS_XML</value>
+				<value>SFipa.JADEX_XML</value>
 			</parameter>
 		</messageevent>
 	</events>
