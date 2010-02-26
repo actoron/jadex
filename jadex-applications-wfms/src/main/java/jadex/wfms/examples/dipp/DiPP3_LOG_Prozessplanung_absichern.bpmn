@@ -20,20 +20,20 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_vEZvIRe7Ed-cUJRTmkeIHQ" iD="_vEZvIBe7Ed-cUJRTmkeIHQ" outgoingEdges="_7CHeURe7Ed-cUJRTmkeIHQ" incomingEdges="_0VP9sRe7Ed-cUJRTmkeIHQ" name="Simulation_ok_speichern" lanes="_4XtjARe6Ed-cUJRTmkeIHQ">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_vLeAcBe7Ed-cUJRTmkeIHQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vLengBe7Ed-cUJRTmkeIHQ" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vLengBe7Ed-cUJRTmkeIHQ" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xXYeYBe7Ed-cUJRTmkeIHQ" key="parameters" value="in␋beliefname␋String␋&quot;Simulation_ok&quot;␟in␋value␋Object␋"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_5r22ARe7Ed-cUJRTmkeIHQ" iD="_5r22ABe7Ed-cUJRTmkeIHQ" outgoingEdges="_RtPLYBe8Ed-cUJRTmkeIHQ _6G_dYRe8Ed-cUJRTmkeIHQ" incomingEdges="_7CHeURe7Ed-cUJRTmkeIHQ" lanes="_4XtjARe6Ed-cUJRTmkeIHQ" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_Qs6W0Re8Ed-cUJRTmkeIHQ" iD="_Qs6W0Be8Ed-cUJRTmkeIHQ" outgoingEdges="_H1vsYRe9Ed-cUJRTmkeIHQ" incomingEdges="_RtPLYBe8Ed-cUJRTmkeIHQ" name="setzen_Kontext" lanes="_4XtjARe6Ed-cUJRTmkeIHQ">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Zpug0Be8Ed-cUJRTmkeIHQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZpvH4Be8Ed-cUJRTmkeIHQ" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZpvH4Be8Ed-cUJRTmkeIHQ" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ScGAABe9Ed-cUJRTmkeIHQ" key="parameters" value="in␋beliefname␋String␋&quot;Simulation_Ergebnis&quot;␟in␋value␋Object␋&quot;OK&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_Q6ECARe8Ed-cUJRTmkeIHQ" iD="_Q6ECABe8Ed-cUJRTmkeIHQ" outgoingEdges="_IGZ-kRe9Ed-cUJRTmkeIHQ" incomingEdges="_6G_dYRe8Ed-cUJRTmkeIHQ" name="setzen_Kontext_repeat" lanes="_4XtjARe6Ed-cUJRTmkeIHQ">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_SZAFMBe8Ed-cUJRTmkeIHQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_SZAsQBe8Ed-cUJRTmkeIHQ" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_SZAsQBe8Ed-cUJRTmkeIHQ" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Y0UGUBe9Ed-cUJRTmkeIHQ" key="parameters" value="in␋beliefname␋String␋&quot;Simulation_Ergebnis&quot;␟in␋value␋Object␋&quot;Failure&quot;"/>
       </eAnnotations>
     </vertices>

@@ -1,0 +1,26 @@
+<!--
+  Standalone platform properties.
+-->
+<properties xmlns="http://jadex.sourceforge.net/jadexconf"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadexconf 
+	                    http://jadex.sourceforge.net/configuration.xsd"
+	name="kernel_gpmn_conf">
+	
+	<properties type="platform_standalone">
+		<properties type="services">
+			<property type="jadex.bridge.IComponentFactory" name="gpmn_factory">
+				new jadex.gpmn.GpmnFactory($platform, jadex.commons.SUtil.createHashMap(
+					new String[]
+					{
+						"debugger.panels"
+					},
+					new Object[]
+					{
+						"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
+					})
+				)
+			</property>
+		</properties>
+	</properties>
+</properties>

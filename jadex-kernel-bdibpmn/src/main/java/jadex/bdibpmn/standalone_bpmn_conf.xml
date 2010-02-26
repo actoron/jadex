@@ -93,7 +93,7 @@
 						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class)),
 						new java.lang.Long(10000),
 						Boolean.TRUE,
-						new jadex.bpmnbdi.BpmnPlanExecutor($platform),
+						new jadex.bdibpmn.BpmnPlanExecutor($platform),
 						"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
 					}
 				), $platform)

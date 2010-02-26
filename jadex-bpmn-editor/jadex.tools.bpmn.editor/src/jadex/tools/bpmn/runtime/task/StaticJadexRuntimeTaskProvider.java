@@ -20,15 +20,15 @@ public class StaticJadexRuntimeTaskProvider extends RuntimeTaskProviderSupport
 		"jadex.bpmn.runtime.task.StoreResultsTask.class",
 		"jadex.bpmn.runtime.task.UserInteractionTask",
 		
-		"jadex.bpmnbdi.task.DispatchGoalTask.class",
-		"jadex.bpmnbdi.task.WaitForGoalTask.class",
-		"jadex.bpmnbdi.task.DispatchInternalEventTask.class",
-		"jadex.bpmnbdi.task.WriteBeliefTask.class",
-		"jadex.bpmnbdi.task.WriteParameterTask.class",
+		"jadex.bdibpmn.task.DispatchGoalTask.class",
+		"jadex.bdibpmn.task.WaitForGoalTask.class",
+		"jadex.bdibpmn.task.DispatchInternalEventTask.class",
+		"jadex.bdibpmn.task.WriteBeliefTask.class",
+		"jadex.bdibpmn.task.WriteParameterTask.class",
 		
-		"jadex.bpmnbdi.task.CreateSpaceObjectTaskTask.class",
-		"jadex.bpmnbdi.task.WaitForSpaceObjectTaskTask.class",
-		"jadex.bpmnbdi.task.RemoveSpaceObjectTaskTask.class",
+		"jadex.bdibpmn.task.CreateSpaceObjectTaskTask.class",
+		"jadex.bdibpmn.task.WaitForSpaceObjectTaskTask.class",
+		"jadex.bdibpmn.task.RemoveSpaceObjectTaskTask.class",
 		
 		"jadex.wfms.client.task.WorkitemTask.class",
 	};
@@ -139,7 +139,7 @@ public class StaticJadexRuntimeTaskProvider extends RuntimeTaskProviderSupport
 		
 		// dispatch goal task.
 		desc = "The dispatch goal task can be used for dipatching a goal as top-level " +
-			" or subgoal and optinally wait for the result (available only in bdi-bpmn plans).";
+			" or subgoal and optinally wait for the result (available only in bdibpmnplans).";
 		ParameterMetaInfo typemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
 			String.class, "type", null, "The type parameter identifies the user goal type.");
 		paramsmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
@@ -149,30 +149,30 @@ public class StaticJadexRuntimeTaskProvider extends RuntimeTaskProviderSupport
 		ParameterMetaInfo wait = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
 			boolean.class, "wait", null, "The wait parameter to wait for the results.");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{typemi, paramsmi, subgoal, wait}); 
-		map.put("jadex.bpmnbdi.task.DispatchGoalTask.class", tmi);
+		map.put("jadex.bdibpmn.task.DispatchGoalTask.class", tmi);
 		map.put("DispatchGoalTask.class", tmi);
 	
 		// wait for goal task.
-		desc = "The wait for goal task can be used to wait for an existing goal (available only in bdi-bpmn plans).";
+		desc = "The wait for goal task can be used to wait for an existing goal (available only in bbdibpmnlans).";
 		ParameterMetaInfo goalmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
 			Object.class, "goal", null, "The goal parameter identifies the goal to be waited for.");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{goalmi});
-		map.put("jadex.bpmnbdi.task.WaitForGoalTask.class", tmi);
+		map.put("jadex.bdibpmn.task.WaitForGoalTask.class", tmi);
 		map.put("WaitForGoalTask.class", tmi);
 		
 		// dispatch internal event task.
-		desc = "The dispatch internal event task can be used for dipatching an internal event (available only in bdi-bpmn plans).";
+		desc = "The dispatch internal event task can be used for dipatching an internal event (available only in bdbdibpmnans).";
 		typemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
 			String.class, "type", null, "The type parameter identifies the user goal type.");
 		paramsmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
 			Map.class, "parameters", null, "The 'parameter' parameter allows to specify the goal parameters.");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{typemi, paramsmi}); 
-		map.put("jadex.bpmnbdi.task.DispatchInternalEventTask.class", tmi);
+		map.put("jadex.bdibpmn.task.DispatchInternalEventTask.class", tmi);
 		map.put("DispatchInternalEventTask.class", tmi);
 		
 		// write belief task.
 		desc = "The write belief task can be used for setting a value to a belief or" +
-			"for adding/removing a value to/from a beliefset (available only in bdi-bpmn plans).";
+			"for adding/removing a value to/from a beliefset (available only in bdibdibpmnns).";
 		ParameterMetaInfo belnamemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
 			String.class, "beliefname", null, "The beliefname parameter identifies the belief.");
 		ParameterMetaInfo belsetnamemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
@@ -182,12 +182,12 @@ public class StaticJadexRuntimeTaskProvider extends RuntimeTaskProviderSupport
 		ParameterMetaInfo modemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
 			String.class, "mode", null, "The mode parameter identifies the beliefset mode (add, remove, or remove all).");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{belnamemi, belsetnamemi, valuemi, modemi}); 
-		map.put("jadex.bpmnbdi.task.WriteBeliefTask.class", tmi);
+		map.put("jadex.bdibpmn.task.WriteBeliefTask.class", tmi);
 		map.put("WriteBeliefTask.class", tmi);
 			
 		// write parameter task.
 		desc = "The write parameter task can be used for setting a value to a parameter or" +
-			"for adding/removing a value to/from a parameterset (available only in bdi-bpmn plans).";
+			"for adding/removing a value to/from a parameterset (available only in bdibbdibpmns).";
 		ParameterMetaInfo paramnamnmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
 			String.class, "parametername", null, "The parametername parameter identifies the parameter.");
 		ParameterMetaInfo paramsetnamemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
@@ -197,14 +197,14 @@ public class StaticJadexRuntimeTaskProvider extends RuntimeTaskProviderSupport
 		modemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
 			String.class, "mode", null, "The mode parameter identifies the parameterset mode (add, remove, or remove all).");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{paramnamnmi, paramsetnamemi, valuemi, modemi});
-		map.put("jadex.bpmnbdi.task.WriteParameterTask.class", tmi);
+		map.put("jadex.bdibpmn.task.WriteParameterTask.class", tmi);
 		map.put("WriteParameterTask.class", tmi);
 		
 		// These task are in bdi but aren't bdi specific
 		
 		// create space object task task.
 		desc = "The create space object task task can be used to create a space object task in an" +
-			"EnvSupport environment (available only in bdi-bpmn plans).";
+			"EnvSupport environment (available only in bdibpbdibpmn).";
 		typemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
 			String.class, "type", null, "The type parameter identifies the space object task type.");
 		ParameterMetaInfo spacemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
@@ -218,12 +218,12 @@ public class StaticJadexRuntimeTaskProvider extends RuntimeTaskProviderSupport
 		waitmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
 			boolean.class, "wait", null, "The wait parameter to wait for the task.");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{typemi, spacemi, objectid, propsmi, taskidmi, waitmi}); 
-		map.put("jadex.bpmnbdi.task.CreateSpaceObjectTaskTask.class", tmi);
+		map.put("jadex.bdibpmn.task.CreateSpaceObjectTaskTask.class", tmi);
 		map.put("CreateSpaceObjectTaskTask.class", tmi);
 		
 		// wait for space object task task.
 		desc = "The wait for space object task task can be used to wait for completion of a task in an" +
-			"EnvSupport environment (available only in bdi-bpmn plans).";
+			"EnvSupport environment (available only in bdibpmbdibpmn.";
 		spacemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
 			Object.class, "space", null, "The space parameter defines the space.");
 		objectid = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
@@ -231,12 +231,12 @@ public class StaticJadexRuntimeTaskProvider extends RuntimeTaskProviderSupport
 		taskidmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT, 
 			Object.class, "taskid", null, "The taskid parameter for the return value, i.e. the id of the created task.");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{spacemi, objectid, taskidmi}); 
-		map.put("jadex.bpmnbdi.task.WaitForSpaceObjectTaskTask.class", tmi);
+		map.put("jadex.bdibpmn.task.WaitForSpaceObjectTaskTask.class", tmi);
 		map.put("WaitForSpaceObjectTaskTask.class", tmi);
 		
 		// remove space object task task.
 		desc = "The remove space object task task can be used to remove a task in an" +
-			"EnvSupport environment (available only in bdi-bpmn plans).";
+			"EnvSupport environment (available only in bdibdibpmnbpmn";
 		spacemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
 			Object.class, "space", null, "The space parameter defines the space.");
 		objectid = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
@@ -244,7 +244,7 @@ public class StaticJadexRuntimeTaskProvider extends RuntimeTaskProviderSupport
 		taskidmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT, 
 			Object.class, "taskid", null, "The taskid parameter for identifying the task.");
 		tmi = new TaskMetaInfo(desc, new ParameterMetaInfo[]{spacemi, objectid, taskidmi}); 
-		map.put("jadex.bpmnbdi.task.RemoveSpaceObjectTaskTask.class", tmi);
+		map.put("jadex.bdibpmn.task.RemoveSpaceObjectTaskTask.class", tmi);
 		map.put("RemoveSpaceObjectTaskTask.class", tmi);
 		
 		return map;

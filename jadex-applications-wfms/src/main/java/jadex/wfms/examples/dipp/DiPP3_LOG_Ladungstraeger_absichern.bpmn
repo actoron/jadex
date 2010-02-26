@@ -15,7 +15,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_vedVQRe4Ed-cUJRTmkeIHQ" iD="_vedVQBe4Ed-cUJRTmkeIHQ" incomingEdges="_y9UBwRe4Ed-cUJRTmkeIHQ" lanes="_iTYbERe4Ed-cUJRTmkeIHQ" activityType="EventEndEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_xtWOsRe4Ed-cUJRTmkeIHQ" iD="_xtWOsBe4Ed-cUJRTmkeIHQ" outgoingEdges="_y9UBwRe4Ed-cUJRTmkeIHQ" incomingEdges="_wWaQ8Re4Ed-cUJRTmkeIHQ" name="SLT_Bemusterung_speichern" lanes="_iTYbERe4Ed-cUJRTmkeIHQ">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ykM-MBe4Ed-cUJRTmkeIHQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ykM-MRe4Ed-cUJRTmkeIHQ" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ykM-MRe4Ed-cUJRTmkeIHQ" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_22fSwBe4Ed-cUJRTmkeIHQ" key="parameters" value="in␋beliefname␋String␋&quot;SLT_Bemusterung&quot;␟in␋value␋Object␋"/>
       </eAnnotations>
     </vertices>

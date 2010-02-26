@@ -91,7 +91,7 @@ public class GpmnFactory implements IComponentFactory, IService
 //		long starttime = System.currentTimeMillis();
 //		
 //		// Initialize platform configuration from args.
-//		String conffile = "jadex/bpmnbdi/standalone_bpmn_conf.xml";
+//		String conffile = "jadex/bdibpmn/standalone_bpmn_conf.xml";
 //		// Create an instance of the platform.
 //		// Hack as long as no loader is present.
 //		String[] args = new String[0];

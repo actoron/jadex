@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_seRskXEWEd6dTLJP0bYxrQ" iD="_seRskHEWEd6dTLJP0bYxrQ">
-  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_JeIQkXHnEd6dTLJP0bYxrQ" iD="_JeIQkHHnEd6dTLJP0bYxrQ" name="package jadex.bdibpmn.examples.execute;&#xD;&#xA;import jadex.bpmn.runtime.task.UserInteractionTask;&#xD;&#xA;import jadex.bpmnbdi.task.*;">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_JeIQkXHnEd6dTLJP0bYxrQ" iD="_JeIQkHHnEd6dTLJP0bYxrQ" name="package jadex.bdibpmn.examples.execute;&#xD;&#xA;import jadex.bpmn.runtime.task.UserInteractionTask;&#xD;&#xA;import jadex.bdibpmn.task.*;">
     <associations xmi:type="bpmn:Association" xmi:id="_JeSBkXHnEd6dTLJP0bYxrQ"/>
   </artifacts>
   <pools xmi:type="bpmn:Pool" xmi:id="_seRsl3EWEd6dTLJP0bYxrQ" iD="_seRslnEWEd6dTLJP0bYxrQ" associations="_JeSBkXHnEd6dTLJP0bYxrQ" name="Body">

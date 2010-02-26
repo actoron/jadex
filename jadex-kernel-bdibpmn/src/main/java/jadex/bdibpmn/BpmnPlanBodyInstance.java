@@ -1,4 +1,4 @@
-package jadex.bpmnbdi;
+package jadex.bdibpmn;
 
 import jadex.bdi.interpreter.AgentRules;
 import jadex.bdi.interpreter.BDIInterpreter;

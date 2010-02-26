@@ -1,0 +1,17 @@
+<!--
+  Standalone platform properties.
+-->
+<properties xmlns="http://jadex.sourceforge.net/jadexconf"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadexconf 
+	                    http://jadex.sourceforge.net/configuration.xsd"
+	name="kernel_micro_conf">
+	
+	<properties type="platform_standalone">
+		<properties type="services">
+			<property type="jadex.bridge.IComponentFactory" name="micro_factory">
+				new jadex.microkernel.MicroAgentFactory($platform)
+			</property>
+		</properties>
+	</properties>
+</properties>

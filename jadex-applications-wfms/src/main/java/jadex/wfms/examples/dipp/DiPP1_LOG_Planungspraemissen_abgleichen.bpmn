@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_c_1ssXd5Ed6uv6EsxGS0Yg" iD="_c_1ssHd5Ed6uv6EsxGS0Yg">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_qp8egBYlEd-jGLD5OCZpUA" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qp9soBYlEd-jGLD5OCZpUA" key="imports" value="jadex.wfms.client.task.WorkitemTask␟jadex.bpmnbdi.task.*␟jadex.wfms.parametertypes.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qp9soBYlEd-jGLD5OCZpUA" key="imports" value="jadex.wfms.client.task.WorkitemTask␟jadex.bdibpmn.task.*␟jadex.wfms.parametertypes.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qp9soRYlEd-jGLD5OCZpUA" key="Package" value="jadex.wfms.examples.dipp"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_c__dsXd5Ed6uv6EsxGS0Yg" iD="_c__dsHd5Ed6uv6EsxGS0Yg" name="body">
@@ -15,25 +15,25 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_IWvFQXd6Ed6uv6EsxGS0Yg" iD="_IWvFQHd6Ed6uv6EsxGS0Yg" outgoingEdges="_KZ3aqnd6Ed6uv6EsxGS0Yg _c1S0IXd6Ed6uv6EsxGS0Yg _oD1JIXd6Ed6uv6EsxGS0Yg _oan4gXd6Ed6uv6EsxGS0Yg" incomingEdges="_IW42R3d6Ed6uv6EsxGS0Yg" activityType="GatewayParallel"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_KZ3aoXd6Ed6uv6EsxGS0Yg" iD="_KZ3aoHd6Ed6uv6EsxGS0Yg" outgoingEdges="_wbq90Xd6Ed6uv6EsxGS0Yg" incomingEdges="_KZ3aqnd6Ed6uv6EsxGS0Yg" name="Produktmodell_Zustand_speichern" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_sWCQEBYpEd-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sWCQERYpEd-jGLD5OCZpUA" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sWCQERYpEd-jGLD5OCZpUA" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s6oK4BYpEd-jGLD5OCZpUA" key="parameters" value="in␋beliefname␋String␋&quot;produktmodell&quot;␟in␋value␋Object␋"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_XhZRnHd6Ed6uv6EsxGS0Yg" iD="_XhZRlHd6Ed6uv6EsxGS0Yg" outgoingEdges="_wuvq0Xd6Ed6uv6EsxGS0Yg" incomingEdges="_c1S0IXd6Ed6uv6EsxGS0Yg" name="Vertriebsprognosen_Zustand_speichern" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_yY-p8BYpEd-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yY_RABYpEd-jGLD5OCZpUA" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yY_RABYpEd-jGLD5OCZpUA" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ymgIkBYpEd-jGLD5OCZpUA" key="parameters" value="in␋beliefname␋String␋&quot;vertriebsprognosen&quot;␟in␋value␋Object␋"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_fyiobHd6Ed6uv6EsxGS0Yg" iD="_fyioZHd6Ed6uv6EsxGS0Yg" outgoingEdges="_xCa0wXd6Ed6uv6EsxGS0Yg" incomingEdges="_oD1JIXd6Ed6uv6EsxGS0Yg" name="Gebietsspeditionskonzept_Zustand_speichern" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_4YFssBYpEd-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4YFssRYpEd-jGLD5OCZpUA" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4YFssRYpEd-jGLD5OCZpUA" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4_FbQBYpEd-jGLD5OCZpUA" key="parameters" value="in␋beliefname␋String␋&quot;gs_konzept&quot;␟in␋value␋Object␋"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_gKhqnHd6Ed6uv6EsxGS0Yg" iD="_gKhqlHd6Ed6uv6EsxGS0Yg" outgoingEdges="_xYUzUXd6Ed6uv6EsxGS0Yg" incomingEdges="_oan4gXd6Ed6uv6EsxGS0Yg" name="Montage_Zustand_speichern" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_qrTzoBYpEd-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qrTzoRYpEd-jGLD5OCZpUA" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qrTzoRYpEd-jGLD5OCZpUA" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_86C08BYpEd-jGLD5OCZpUA" key="parameters" value="in␋beliefname␋String␋&quot;molog_praemissen&quot;␟in␋value␋Object␋"/>
       </eAnnotations>
     </vertices>
@@ -41,28 +41,28 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_C9WwUXd7Ed6uv6EsxGS0Yg" iD="_C9WwUHd7Ed6uv6EsxGS0Yg" outgoingEdges="_MiZX-nd7Ed6uv6EsxGS0Yg _h3EaAXd8Ed6uv6EsxGS0Yg" incomingEdges="_C9WwWnd7Ed6uv6EsxGS0Yg" name="" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_MiZX8Xd7Ed6uv6EsxGS0Yg" iD="_MiZX8Hd7Ed6uv6EsxGS0Yg" outgoingEdges="_L6vZsXeJEd6uv6EsxGS0Yg" incomingEdges="_MiZX-nd7Ed6uv6EsxGS0Yg" name="Fehlende_Produktmodell_Praemisse_speichern" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ZT8mkBYmEd-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZT8mkRYmEd-jGLD5OCZpUA" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZT8mkRYmEd-jGLD5OCZpUA" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_acs-YBYmEd-jGLD5OCZpUA" key="parameters" value="in␋beliefsetname␋String␋&quot;praemissen_fehlend&quot;␟in␋value␋Object␋&quot;Produktmodell&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_b554GHd8Ed6uv6EsxGS0Yg" iD="_b554AHd8Ed6uv6EsxGS0Yg" outgoingEdges="_b554HHd8Ed6uv6EsxGS0Yg _p7Zc0Xd8Ed6uv6EsxGS0Yg" incomingEdges="_h3EaAXd8Ed6uv6EsxGS0Yg _L6vZsXeJEd6uv6EsxGS0Yg" name="" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_b554GXd8Ed6uv6EsxGS0Yg" iD="_b554CHd8Ed6uv6EsxGS0Yg" outgoingEdges="_MU93kXeJEd6uv6EsxGS0Yg" incomingEdges="_b554HHd8Ed6uv6EsxGS0Yg" name="Fehlende_Vertriebsprognosen_Praemisse_speichern" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wEmT4BYmEd-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wEm68BYmEd-jGLD5OCZpUA" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wEm68BYmEd-jGLD5OCZpUA" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x90fUBYmEd-jGLD5OCZpUA" key="parameters" value="in␋beliefsetname␋String␋&quot;praemissen_fehlend&quot;␟in␋value␋Object␋&quot;Vertriebsprognosen&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_k76rJ3d8Ed6uv6EsxGS0Yg" iD="_k7w6HXd8Ed6uv6EsxGS0Yg" outgoingEdges="_k76rK3d8Ed6uv6EsxGS0Yg _qMraEXd8Ed6uv6EsxGS0Yg" incomingEdges="_p7Zc0Xd8Ed6uv6EsxGS0Yg _MU93kXeJEd6uv6EsxGS0Yg" name="" lanes="_DJDz4RTVEd-pLK0AZ_MMug" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_k76rKHd8Ed6uv6EsxGS0Yg" iD="_k76rF3d8Ed6uv6EsxGS0Yg" outgoingEdges="_MtaMwXeJEd6uv6EsxGS0Yg" incomingEdges="_k76rK3d8Ed6uv6EsxGS0Yg" name="Fehlende_Gebietsspeditionskonzept_Praemisse_speichern" lanes="_DJDz4RTVEd-pLK0AZ_MMug" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__dXNoBYmEd-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__dX0sBYmEd-jGLD5OCZpUA" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__dX0sBYmEd-jGLD5OCZpUA" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AH70oBYnEd-jGLD5OCZpUA" key="parameters" value="in␋beliefsetname␋String␋&quot;praemissen_fehlend&quot;␟in␋value␋Object␋&quot;Gebietsspeditionskonzept&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_l4HNtXd8Ed6uv6EsxGS0Yg" iD="_l4HNnXd8Ed6uv6EsxGS0Yg" outgoingEdges="_l4Q-knd8Ed6uv6EsxGS0Yg _UNWwEXq-Ed6bIMHDkFj0cg" incomingEdges="_qMraEXd8Ed6uv6EsxGS0Yg _MtaMwXeJEd6uv6EsxGS0Yg" name="" lanes="_DJDz4RTVEd-pLK0AZ_MMug" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_l4HNtnd8Ed6uv6EsxGS0Yg" iD="_l4HNpXd8Ed6uv6EsxGS0Yg" outgoingEdges="_T1XG0Xq-Ed6bIMHDkFj0cg" incomingEdges="_l4Q-knd8Ed6uv6EsxGS0Yg" name="Fehlende_Montage_Praemisse_speichern" lanes="_DJDz4RTVEd-pLK0AZ_MMug" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_PYxhcBYnEd-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PYxhcRYnEd-jGLD5OCZpUA" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PYxhcRYnEd-jGLD5OCZpUA" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QSMcwBYnEd-jGLD5OCZpUA" key="parameters" value="in␋beliefsetname␋String␋&quot;praemissen_fehlend&quot;␟in␋value␋Object␋&quot;Praemissen_mit_Montage_abgeglichen&quot;"/>
       </eAnnotations>
     </vertices>
@@ -76,13 +76,13 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_fo4iwXq_Ed6bIMHDkFj0cg" iD="_fo4iwHq_Ed6bIMHDkFj0cg" outgoingEdges="_iEmXQXq_Ed6bIMHDkFj0cg" incomingEdges="_fo4iynq_Ed6bIMHDkFj0cg" name="Fehlende_Praemissen_Zusand_speichern" lanes="_DJDz4RTVEd-pLK0AZ_MMug" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_cPU9IBYnEd-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cPU9IRYnEd-jGLD5OCZpUA" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cPU9IRYnEd-jGLD5OCZpUA" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dgaxkBYnEd-jGLD5OCZpUA" key="parameters" value="in␋beliefname␋String␋&quot;dipp1_praemissen_ok&quot;␟in␋value␋Object␋false"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_gnj10RfhEd-sH7uHOdxvTQ" iD="_gnj10BfhEd-sH7uHOdxvTQ" outgoingEdges="_ktZCwRfhEd-sH7uHOdxvTQ" incomingEdges="_sLiswRYoEd-jGLD5OCZpUA" name="Abschluss_Praemissen_speichern" lanes="_DJDz4RTVEd-pLK0AZ_MMug">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hURK0BfhEd-sH7uHOdxvTQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hURK0RfhEd-sH7uHOdxvTQ" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hURK0RfhEd-sH7uHOdxvTQ" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wZy_gBfhEd-sH7uHOdxvTQ" key="parameters" value="in␋beliefname␋String␋&quot;dipp1_praemissen_ok&quot;␟in␋value␋Object␋true"/>
       </eAnnotations>
     </vertices>

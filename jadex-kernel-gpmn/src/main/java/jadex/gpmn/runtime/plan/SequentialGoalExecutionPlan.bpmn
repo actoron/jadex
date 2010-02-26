@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_xP7ZEX3MEd6VFdlpWzoevQ" iD="_xP7ZEH3MEd6VFdlpWzoevQ" name="SequentialGoalExecutionPlan">
-  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_IzD2wX3OEd6VFdlpWzoevQ" iD="_IzD2wH3OEd6VFdlpWzoevQ" name="package jadex.gpmn.runtime.plan;&#xD;&#xA;&#xD;&#xA;import jadex.bpmnbdi.task.*;">
+  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_IzD2wX3OEd6VFdlpWzoevQ" iD="_IzD2wH3OEd6VFdlpWzoevQ" name="package jadex.gpmn.runtime.plan;&#xD;&#xA;&#xD;&#xA;import jadex.bdibpmn.task.*;">
     <associations xmi:type="bpmn:Association" xmi:id="_IzNnyX3OEd6VFdlpWzoevQ"/>
   </artifacts>
   <pools xmi:type="bpmn:Pool" xmi:id="_xQYFAX3MEd6VFdlpWzoevQ" iD="_xQYFAH3MEd6VFdlpWzoevQ" associations="_IzNnyX3OEd6VFdlpWzoevQ" name="body">

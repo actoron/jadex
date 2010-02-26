@@ -21,13 +21,13 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_fnlsARJOEd-xIPbCdXs7xg" iD="_fnlsABJOEd-xIPbCdXs7xg" outgoingEdges="_x5HykRJiEd-GwOYBvKt2Jg" incomingEdges="_dJcZIRJPEd-xIPbCdXs7xg" name="Baureihe_speichern" lanes="_X5pF8RGrEd-iAJhQaWu0kA">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_htV3kBJOEd-xIPbCdXs7xg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_htV3kRJOEd-xIPbCdXs7xg" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_htV3kRJOEd-xIPbCdXs7xg" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ARevUBJPEd-xIPbCdXs7xg" key="parameters" value="in␋beliefname␋String␋&quot;baureihe&quot;␟in␋value␋String␋null"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_aNTdgRJiEd-xIPbCdXs7xg" iD="_aNTdgBJiEd-xIPbCdXs7xg" outgoingEdges="_xgugsRJiEd-GwOYBvKt2Jg" incomingEdges="_tpeiURJiEd-GwOYBvKt2Jg" name="Zielwerke_speichern" lanes="_X5pF8RGrEd-iAJhQaWu0kA">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dZ-04BJiEd-xIPbCdXs7xg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dZ_b8BJiEd-xIPbCdXs7xg" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dZ_b8BJiEd-xIPbCdXs7xg" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2nVOIBJiEd-GwOYBvKt2Jg" key="parameters" value="in␋beliefname␋String␋&quot;zielwerke&quot;␟in␋value␋String[]␋null"/>
       </eAnnotations>
     </vertices>
@@ -36,7 +36,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_bJht0RJlEd-GwOYBvKt2Jg" iD="_bJht0BJlEd-GwOYBvKt2Jg" outgoingEdges="_jBQfERJlEd-GwOYBvKt2Jg" incomingEdges="_dpZpkRJlEd-GwOYBvKt2Jg" name="Modelmix_speichern" lanes="_X5pF8RGrEd-iAJhQaWu0kA">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_3VGywBJlEd-GwOYBvKt2Jg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3VGywRJlEd-GwOYBvKt2Jg" key="parameters" value="in␋beliefname␋String␋&quot;modelmix_br&quot;␟in␋value␋String[]␋null"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_JyukoBJmEd-GwOYBvKt2Jg" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_JyukoBJmEd-GwOYBvKt2Jg" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
       </eAnnotations>
     </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Pq008RGsEd-iAJhQaWu0kA" iD="_Pq008BGsEd-iAJhQaWu0kA"/>

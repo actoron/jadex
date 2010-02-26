@@ -76,8 +76,8 @@
 		    <module>jadex-kernel-application</module>
 		    <module>jadex-kernel-bpmn</module>
 		    <module>jadex-applications-bpmn</module>
-		    <module>jadex-kernel-bdi-bpmn</module>
-		    <module>jadex-applications-bdi-bpmn</module>
+		    <module>jadex-kernel-bdibpmn</module>
+		    <module>jadex-applications-bdibpmn</module>
 		    <module>jadex-kernel-gpmn</module>
 		    <module>jadex-applications-gpmn</module>
 		    <module>jadex-platform-standalone</module>
@@ -104,7 +104,7 @@
 				<module>jadex-applib-simulation</module>
 				<module>jadex-applications-bdi</module>
 				<module>jadex-applications-bpmn</module>
-				<module>jadex-applications-bdi-bpmn</module>
+				<module>jadex-applications-bdibpmn</module>
 				<module>jadex-applications-gpmn</module>
 				<module>jadex-runtimetools</module>
 				<module>jadex-kernel-micro</module>
@@ -117,7 +117,7 @@
 				<module>jadex-launch</module>
 				<module>jadex-jade-launch</module>
 				<module>jadex-platform-jade</module>
-				<module>jadex-kernel-bdi-bpmn</module>
+				<module>jadex-kernel-bdibpmn</module>
 				<module>jadex-kernel-bpmn</module>
 				<module>jadex-kernel-gpmn</module>
 				<module>jadex-platform-wfms</module>

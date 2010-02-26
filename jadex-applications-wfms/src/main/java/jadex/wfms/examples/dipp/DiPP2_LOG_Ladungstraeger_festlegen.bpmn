@@ -15,13 +15,13 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_XJLAARZFEd-jGLD5OCZpUA" iD="_XJLAABZFEd-jGLD5OCZpUA" outgoingEdges="_gAaGcRZFEd-jGLD5OCZpUA _gi-oARZFEd-jGLD5OCZpUA" incomingEdges="_YNoGoRZFEd-jGLD5OCZpUA" lanes="_dqErwRZGEd-jGLD5OCZpUA" activityType="GatewayParallel"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_edPDgRZFEd-jGLD5OCZpUA" iD="_edPDgBZFEd-jGLD5OCZpUA" outgoingEdges="_20N1cRZFEd-jGLD5OCZpUA" incomingEdges="_gAaGcRZFEd-jGLD5OCZpUA" name="SLT_Vorentwicklung_speichern" lanes="_dqErwRZGEd-jGLD5OCZpUA">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_iH0e4BZFEd-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iH1F8BZFEd-jGLD5OCZpUA" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iH1F8BZFEd-jGLD5OCZpUA" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ppZZ8BZFEd-jGLD5OCZpUA" key="parameters" value="in␋beliefname␋String␋&quot;SLT_Vorentwicklung&quot;␟in␋value␋Object␋"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_er5xoBZFEd-jGLD5OCZpUA" iD="_er5KkBZFEd-jGLD5OCZpUA" outgoingEdges="_3PMhQRZFEd-jGLD5OCZpUA" incomingEdges="_gi-oARZFEd-jGLD5OCZpUA" name="ULT_Festlegung_speichern" lanes="_dqErwRZGEd-jGLD5OCZpUA">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ex-kcBZFEd-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ex_LgBZFEd-jGLD5OCZpUA" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ex_LgBZFEd-jGLD5OCZpUA" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_stSowBZFEd-jGLD5OCZpUA" key="parameters" value="in␋beliefname␋String␋&quot;ULT_Festlegung&quot;␟in␋value␋Object␋"/>
       </eAnnotations>
     </vertices>

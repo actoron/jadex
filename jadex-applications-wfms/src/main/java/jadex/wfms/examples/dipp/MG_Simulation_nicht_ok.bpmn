@@ -14,13 +14,13 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_3mSn8BfMEd-uLKn09PqHSg" iD="_3mSA4BfMEd-uLKn09PqHSg" outgoingEdges="__zTFoRfMEd-uLKn09PqHSg" lanes="_6Yfp0RfMEd-uLKn09PqHSg" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_WhWK4RfNEd-uLKn09PqHSg" iD="_WhWK4BfNEd-uLKn09PqHSg" outgoingEdges="_d4cIsRfXEd-uLKn09PqHSg" incomingEdges="_XEIu4RfNEd-uLKn09PqHSg" name="Ruecksetzen_Kontext" lanes="_6Yfp0RfMEd-uLKn09PqHSg">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WnB8IBfNEd-uLKn09PqHSg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WnB8IRfNEd-uLKn09PqHSg" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WnB8IRfNEd-uLKn09PqHSg" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZedcQBfNEd-uLKn09PqHSg" key="parameters" value="in␋beliefname␋String␋&quot;Simulation_Ergebnis&quot;␟in␋value␋Object␋&quot;Repeat&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_bUzuURfXEd-uLKn09PqHSg" iD="_bUzuUBfXEd-uLKn09PqHSg" outgoingEdges="_xgOnoRfXEd-uLKn09PqHSg" incomingEdges="_d4cIsRfXEd-uLKn09PqHSg" name="Simulation_reaktivieren" lanes="_6Yfp0RfMEd-uLKn09PqHSg">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_bbp9MBfXEd-uLKn09PqHSg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bbp9MRfXEd-uLKn09PqHSg" key="class" value="jadex.bpmnbdi.task.DispatchGoalTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bbp9MRfXEd-uLKn09PqHSg" key="class" value="jadex.bdibpmn.task.DispatchGoalTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_njf4wBfXEd-uLKn09PqHSg" key="parameters" value="in␋type␋String␋&quot;DiPP3_LOG_Logistik_intern_absichern&quot;␟in␋wait␋boolean␋true"/>
       </eAnnotations>
     </vertices>

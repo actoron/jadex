@@ -14,7 +14,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_rYbL4RcnEd-4T9k5IgEFpw" iD="_rYbL4BcnEd-4T9k5IgEFpw" outgoingEdges="_vGIMsRcnEd-4T9k5IgEFpw" lanes="_spZrkRcnEd-4T9k5IgEFpw" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_WsWwARcoEd-4T9k5IgEFpw" iD="_WsWwABcoEd-4T9k5IgEFpw" outgoingEdges="_4MKHoRcoEd-4T9k5IgEFpw" incomingEdges="_XMRmMRcoEd-4T9k5IgEFpw" name="Set_Komm_abgesichert_speichern" lanes="_spZrkRcnEd-4T9k5IgEFpw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_XSbRgBcoEd-4T9k5IgEFpw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XSbRgRcoEd-4T9k5IgEFpw" key="class" value="jadex.bpmnbdi.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XSbRgRcoEd-4T9k5IgEFpw" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Zx3vcBcoEd-4T9k5IgEFpw" key="parameters" value="in␋beliefname␋String␋&quot;Set_Komm_abgesichert&quot;␟in␋value␋Object␋"/>
       </eAnnotations>
     </vertices>
