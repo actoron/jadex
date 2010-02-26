@@ -101,8 +101,6 @@
 		<performgoal name="play_game" exclude="never">
 			<contextcondition language="jcl">
 				$beliefbase.players.length > 0
-				
-				// ?rbeliefset = (beliefset (element_has_model.melement_has_name "players") (beliefset_has_facts $?facts &amp; :(> (Length $?facts) 0) ))
 			</contextcondition>
 		</performgoal>
 

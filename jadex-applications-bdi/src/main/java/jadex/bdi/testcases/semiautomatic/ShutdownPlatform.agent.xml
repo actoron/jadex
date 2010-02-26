@@ -22,8 +22,8 @@
 	</capabilities>
 
 	<beliefs>
-		<belief name="ams" class="IComponentIdentifier">
-			<fact>((IComponentManagementService)$scope.getServiceContainer().getService(IComponentManagementService.class)).createComponentIdentifier("ams@horst", false, new String[]{"nio-mtp://134.100.11.203:8888"})</fact>
+		<belief name="cms" class="IComponentIdentifier">
+			<fact>((IComponentManagementService)$scope.getServiceContainer().getService(IComponentManagementService.class)).createComponentIdentifier("cms@horst", false, new String[]{"nio-mtp://134.100.11.203:8888"})</fact>
 		</belief>
 	</beliefs>
 	
@@ -36,8 +36,8 @@
 	<configurations>
 		<configuration name="default">
 			<!-- <goals>
-				<initialgoal ref="ams_shutdown_platform">
-					<parameter ref="ams">
+				<initialgoal ref="cms_shutdown_platform">
+					<parameter ref="cms">
 						<value>$beliefbase.ams</value>
 					</parameter>
 				</initialgoal>

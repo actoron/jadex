@@ -55,7 +55,7 @@
 						<value>new Testcase("jadex.bdi.testcases.goals.GoalBindings")</value>
 						<value>new Testcase("jadex.bdi.testcases.goals.InnerAbstractGoal")</value>
 						<value>new Testcase("jadex.bdi.testcases.misc.DFMobile")</value>
-						<value>new Testcase("jadex.bdi.testcases.misc.AMSTest")</value>
+						<value>new Testcase("jadex.bdi.testcases.misc.CMSTest")</value>
 						<value>new Testcase("jadex.bdi.testcases.plans.PlanAbort")</value>
 						<value>new Testcase("jadex.bdi.testcases.misc.ParameterProtection")</value>
 						<value>new Testcase("jadex.bdi.testcases.beliefs.Evaluationmodes")</value>

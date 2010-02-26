@@ -37,7 +37,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 
 	/**
 	 *  Create a new component identifier with a given global name.
-	 *  @param name A global name (e.g. "ams@lars").
+	 *  @param name A global name (e.g. "cms@lars").
 	 */
 	public ComponentIdentifier(String name)
 	{
@@ -46,7 +46,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 
 	/**
 	 *  Create a new component identifier with a global name and given addresses.
-	 *  @param name A global name (e.g. "ams@lars").
+	 *  @param name A global name (e.g. "cms@lars").
 	 *  @param addresses A list of transport addresses.
 	 */
 	public ComponentIdentifier(String name, String[] addresses)

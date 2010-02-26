@@ -15,9 +15,9 @@ public class ShutdownTesterPlan extends Plan
 	 */
 	public void body()
 	{
-		IComponentIdentifier ams = (IComponentIdentifier)getBeliefbase().getBelief("ams").getFact();
-		IGoal sd = createGoal("ams_shutdown_platform");
-		sd.getParameter("ams").setValue(ams);
+		IComponentIdentifier ams = (IComponentIdentifier)getBeliefbase().getBelief("cms").getFact();
+		IGoal sd = createGoal("cms_shutdown_platform");
+		sd.getParameter("cms").setValue(ams);
 		try
 		{
 			dispatchSubgoalAndWait(sd);

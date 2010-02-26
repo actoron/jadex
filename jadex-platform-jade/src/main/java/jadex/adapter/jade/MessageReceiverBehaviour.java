@@ -213,7 +213,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 								}
 								else if(request instanceof Modify)
 								{
-									if(msg.getSender().getLocalName().toLowerCase().indexOf("ams")!=-1)
+									if(msg.getSender().getLocalName().toLowerCase().indexOf("cms")!=-1)
 									{
 										IComponentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription)((Modify)request).getDescription(), ams);
 										if(AMSAgentDescription.SUSPENDED.equals(amsadesc.getState()))
@@ -254,7 +254,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 								IComponentAction	jadexaction	= null;
 								if(request instanceof Search)
 								{
-									if(msg.getSender().getLocalName().toLowerCase().indexOf("ams")!=-1)
+									if(msg.getSender().getLocalName().toLowerCase().indexOf("cms")!=-1)
 									{
 										IComponentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoFipa((AMSAgentDescription)((Search)request).getDescription(), ams);
 										List	items	= ((Result)content).getItems();
