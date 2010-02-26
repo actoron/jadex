@@ -153,6 +153,8 @@ public class BasicServiceContainer implements IServiceContainer
 	
 	/**
 	 *  Add a service to the platform.
+	 *  If under the same name and type a service was contained,
+	 *  the old one is removed and shutdowned.
 	 *  @param name The name.
 	 *  @param service The service.
 	 */
@@ -167,11 +169,13 @@ public class BasicServiceContainer implements IServiceContainer
 				services = new HashMap();
 			services.put(type, tmp);
 		}
-		tmp.put(name, service);
+		IService old = (IService)tmp.put(name, service);
+		if(old!=null)
+			old.shutdownService(null);
 	}
 
 	/**
-	 *  Add a service to the platform.
+	 *  Removes a service from the platform (shutdowns also the service).
 	 *  @param name The name.
 	 *  @param service The service.
 	 */
@@ -185,7 +189,8 @@ public class BasicServiceContainer implements IServiceContainer
 		boolean removed = false;
 		if(service == null && tmp.size() == 1)
 		{
-			tmp.remove(tmp.keySet().iterator().next());
+			IService rem = (IService)tmp.remove(tmp.keySet().iterator().next());
+			rem.shutdownService(null);
 			removed = true;
 		}
 		else
@@ -195,7 +200,8 @@ public class BasicServiceContainer implements IServiceContainer
 				Object key = it.next();
 				if(tmp.get(key).equals(service))
 				{
-					tmp.remove(key);
+					IService rem = (IService)tmp.remove(key);
+					rem.shutdownService(null);
 					removed = true;
 				}
 			}
