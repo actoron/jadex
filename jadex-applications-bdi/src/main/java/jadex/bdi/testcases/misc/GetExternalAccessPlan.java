@@ -22,8 +22,8 @@ public class GetExternalAccessPlan extends Plan
 		// Create component.
 		IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
 		SyncResultListener lis = new SyncResultListener();
-		ces.createComponent("myagent", "jadex/bdi/testcases/misc/ExternalAccess.agent.xml", 
-			"donothing", null, true, lis, null, null, false);
+		ces.createComponent(null, "jadex/bdi/testcases/misc/ExternalAccess.agent.xml", 
+			"donothing", null, true, lis, getComponentIdentifier(), null, false);
 		IComponentIdentifier cid	= (IComponentIdentifier)lis.waitForResult();
 		
 		// Get external access.
