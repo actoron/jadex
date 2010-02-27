@@ -1,8 +1,10 @@
 package jadex.xml.tutorial.example01;
 
 import jadex.commons.SUtil;
+import jadex.xml.AccessInfo;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
+import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
@@ -54,6 +56,22 @@ public class Main
 		
 		// And print out the result.
 		System.out.println("Read object: "+object);
+		System.out.println("Wrote xml: "+xml);
+		
+		typeinfos = new HashSet();
+		typeinfos.add(new TypeInfo(new XMLInfo("invoice"), new ObjectInfo(Invoice.class),
+			new MappingInfo(null, new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo("name")),
+				new SubobjectInfo(new AccessInfo("description")),
+				new SubobjectInfo(new AccessInfo("price")),
+				new SubobjectInfo(new AccessInfo("key")),
+				new SubobjectInfo(new AccessInfo("quantity"))
+			})));
+		
+		// Write the xml to the output file.
+		xmlwriter = new Writer(new BeanObjectWriterHandler(typeinfos, false, true), false);
+		xml = xmlwriter.objectToXML(xmlwriter, object, null);
+	
 		System.out.println("Wrote xml: "+xml);
 	}
 }
