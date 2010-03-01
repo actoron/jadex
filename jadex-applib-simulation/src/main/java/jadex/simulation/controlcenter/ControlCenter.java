@@ -1,7 +1,6 @@
 package jadex.simulation.controlcenter;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.Observer;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.IntermediateResult;
@@ -17,14 +16,13 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-
-import cern.colt.list.DoubleArrayList;
 
 /**
  * Gui, showing details about the simulation setting and the progress.
@@ -33,13 +31,13 @@ public class ControlCenter extends JFrame {
 	// -------- attributes --------
 
 	// private JPanel mainPanel = new JPanel(new GridLayout(4, 1));
-	private JPanel mainPanel = new JPanel(new GridLayout(2, 1));
-	private JPanel allEnsemblesPanel = new JPanel(new GridLayout(2, 2));
+	private JPanel mainPanel;
+	private JPanel allEnsemblesPanel;
 	// private JPanel mainVehiclePnl = new JPanel(new GridLayout(2,1));
 
 	// private Environment env;
 	private IBDIExternalAccess exta;
-	private SimulationConfiguration facts;
+	private SimulationConfiguration simConf;
 
 	// contains the list of table models that belong to the currently executed ensemble
 	private ArrayList<DefaultTableModel> currentListOfTableModels = new ArrayList<DefaultTableModel>();
@@ -47,6 +45,7 @@ public class ControlCenter extends JFrame {
 	private DefaultTableModel generalSettingsDm;
 	private DefaultTableModel ensembleResultsDm;
 	private DefaultTableModel singleExperimentsDm;
+	private DefaultTableModel staticInfosDm;
 	// private DefaultTableModel streetsdm;
 	// private DefaultTableModel trafficServicesdm;
 	// private DefaultTableModel brokersdm;
@@ -66,13 +65,22 @@ public class ControlCenter extends JFrame {
 	public ControlCenter(final IBDIExternalAccess agent) {
 		super("Automated Simulation Control Center");
 		this.exta = agent;
-		this.facts = (SimulationConfiguration) exta.getBeliefbase().getBelief("simulationConf").getFact();
+		this.simConf = (SimulationConfiguration) exta.getBeliefbase().getBelief("simulationConf").getFact();
 		// this.env = (Environment) exta.getBeliefbase().getBelief("env").getFact();
+		
+		//Compute appropriate number of rows
+		int tmpRowNumber =(int)  Math.ceil(new Double(simConf.getRunConfiguration().getGeneral().getRows()/new Double(4)));		
+//		System.out.println("C: " + tmpRowNumber);
+//		mainPanel = new JPanel(new GridLayout(2, 1));
+		mainPanel = new JPanel();
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+		
+		allEnsemblesPanel = new JPanel(new GridLayout(tmpRowNumber, 4));
 
 		init();
-		for (int i = 0; i < 4; i++) {
-			createNewEnsembleTable(i);
-		}
+//		for (int i = 0; i < 1; i++) {
+//			createNewEnsembleTable(i);
+//		}
 		mainPanel.add(allEnsemblesPanel);
 		// createNewEnsembleTable(0);
 		// createTrafficServiceTable();
@@ -95,15 +103,23 @@ public class ControlCenter extends JFrame {
 	}
 
 	private void init() {
-		JPanel staticInfos = new JPanel(new GridLayout(3, 2));
+//		JPanel staticInfos = new JPanel(new GridLayout(3, 2));
 
-		staticInfos.add(new JLabel("Name and Configuration: "));
-		staticInfos.add(new JLabel(facts.getApplicationReference().substring(facts.getApplicationReference().lastIndexOf("\\")) + " / " + facts.getApplicationConfiguration()));
+		mainPanel.add(new JLabel("Name and Configuration: "));
+		mainPanel.add(new JLabel(simConf.getApplicationReference().substring(simConf.getApplicationReference().lastIndexOf("\\")) + " / " + simConf.getApplicationConfiguration()));
 		//		
 		//		
 		// //panel for run configuration: ensembles
-		staticInfos.add(new JLabel("Ensembles: "));
-		staticInfos.add(new JLabel("To be conducted: " + facts.getRunConfiguration().getGeneral().getRows() + "     - Current: " + 0));
+//		staticInfos.add(new JLabel("Ensembles: "));
+//		staticInfos.add(new JLabel("To be conducted: " + simConf.getRunConfiguration().getGeneral().getRows() + "     - Current: " + 0));
+		
+		staticInfosDm = new DefaultTableModel(new String[] { "Ensembles to conduct", "Currently Conducting", "Experiments to conduct", "Currently Conducting" }, 0);
+		JTable staticInfosTable = new JTable(staticInfosDm);
+		staticInfosTable.setPreferredScrollableViewportSize(new Dimension(400, 30));
+		// generalSettingsTable.getColumnModel().getColumn(0).setWidth(30);
+		// generalSettingsTable.getColumnModel().getColumn(1).setWidth(30);
+		staticInfosDm.addRow(new Object[] { simConf.getRunConfiguration().getGeneral().getRows(), 0 ,simConf.getRunConfiguration().getRows().getExperiments() ,0  });
+		
 		// tmp.add(new JLabel(String.valueOf(facts.getRunConfiguration().getGeneral().getRows())));
 		// tmp.add(new JLabel("Current: "));
 		// tmp.add(new JLabel(String.valueOf(0)));
@@ -113,8 +129,8 @@ public class ControlCenter extends JFrame {
 		//		
 		//		
 		// //panel for run configuration: experiments
-		staticInfos.add(new JLabel("Experiments: "));
-		staticInfos.add(new JLabel("To be conducted: " + facts.getRunConfiguration().getRows().getExperiments() + "     - Current: " + 0));
+//		staticInfos.add(new JLabel("Experiments: "));
+//		staticInfos.add(new JLabel("To be conducted: " + simConf.getRunConfiguration().getRows().getExperiments() + "     - Current: " + 0));
 		// tmp = new JPanel(new FlowLayout());
 		// tmp.add(new JLabel("To be conducted: "));
 		// tmp.add(new JLabel(String.valueOf(facts.getRunConfiguration().getRows().getExperiments())));
@@ -135,16 +151,16 @@ public class ControlCenter extends JFrame {
 		// staticInfos.add(ensembles);
 		// staticInfos.add(experiments);
 
-		mainPanel.add(staticInfos);
+		mainPanel.add(new JScrollPane(staticInfosTable));		
 
 		// do Observer table
 		JPanel observerPnl = new JPanel();
 
 		String[] columnNames = { "Name", "ObjectType", "ObjectName", "ElementName", "EvaluationMode", "FilterMode" };
-		Object[][] data = new Object[facts.getObserverList().size()][6];
+		Object[][] data = new Object[simConf.getObserverList().size()][6];
 
-		for (int i = 0; i < facts.getObserverList().size(); i++) {
-			Observer obs = facts.getObserverList().get(i);
+		for (int i = 0; i < simConf.getObserverList().size(); i++) {
+			Observer obs = simConf.getObserverList().get(i);
 
 			// JPanel tmp = new JPanel(new FlowLayout());
 			// JLabel name = new JLabel("Name: " + obs.getData().getName());
@@ -177,7 +193,7 @@ public class ControlCenter extends JFrame {
 		table.setFillsViewportHeight(true);
 
 		observerPnl.add(scrollPane);
-//		mainPanel.add(observerPnl);
+		mainPanel.add(observerPnl);
 
 	}
 
@@ -186,10 +202,13 @@ public class ControlCenter extends JFrame {
 	 */
 	public void createNewEnsembleTable(int ensemleNr) {
 		// takes the sub components of this ensemble
-		JPanel singleEnsemblePnl = new JPanel(new BorderLayout());
+//		JPanel singleEnsemblePnl = new JPanel(new BorderLayout());
+		JPanel singleEnsemblePnl = new JPanel();
+		singleEnsemblePnl.setLayout(new BoxLayout(singleEnsemblePnl, BoxLayout.Y_AXIS));		
+
 
 		// contains the elements of the "north" part of the panel
-		JPanel northPnl = new JPanel(new GridLayout(2, 1));
+//		JPanel northPnl = new JPanel(new GridLayout(2, 1));
 
 		// create table, that contains the general settings
 		generalSettingsDm = new DefaultTableModel(new String[] { "Ensemble Number", "Already Conducted" }, 0);
@@ -202,8 +221,8 @@ public class ControlCenter extends JFrame {
 		// create the first table, that contains the cumulated results of the already conducted experiments of an ensemble
 		ensembleResultsDm = new DefaultTableModel(new String[] { "ObserverName", "Mean Value", "Median Value", "SimpleVariance Value" }, 0);
 		JTable ensembleResultsTable = new JTable(ensembleResultsDm);
-		ensembleResultsTable.setPreferredScrollableViewportSize(new Dimension(400, 80));
-		for (Observer obs : facts.getObserverList()) {
+		ensembleResultsTable.setPreferredScrollableViewportSize(new Dimension(400, 30));
+		for (Observer obs : simConf.getObserverList()) {
 			ensembleResultsDm.addRow(new Object[] { obs.getData().getName(), "--", "--", "--" });
 		}
 
@@ -215,16 +234,22 @@ public class ControlCenter extends JFrame {
 		// singleExperimentsDm.addRow(new Object[]{0, facts.getObserverList().get(0).getData().getName(), "--"});
 
 		// northPnl.add(new JLabel("Cumulated and Single Results of ensemble: " + 0));
-		northPnl.add(new JScrollPane(generalSettingsTable));
-		northPnl.add(new JScrollPane(ensembleResultsTable));
-		singleEnsemblePnl.add(BorderLayout.NORTH, northPnl);
-		singleEnsemblePnl.add(BorderLayout.CENTER, new JScrollPane(singleExperimentsTable));
+//		northPnl.add(new JScrollPane(generalSettingsTable));
+//		northPnl.add(new JScrollPane(ensembleResultsTable));
+		singleEnsemblePnl.add(new JScrollPane(generalSettingsTable));
+		singleEnsemblePnl.add(new JScrollPane(ensembleResultsTable));
+//		singleEnsemblePnl.add( northPnl);
+		singleEnsemblePnl.add(new JScrollPane(singleExperimentsTable));
 
 		currentListOfTableModels.add(ensembleResultsDm);
 		currentListOfTableModels.add(singleExperimentsDm);
 
 		allEnsemblesPanel.add(singleEnsemblePnl);
+		mainPanel.revalidate();
 		// mainPanel.add(allEnsemblesPanel);
+		
+		//update also static part
+		updateStaticTable(ensemleNr, 0);
 
 		// // Add IBeliefListener
 		// exta.getBeliefbase().getBelief("listOfStreets").addBeliefListener(new IBeliefListener() {
@@ -285,6 +310,14 @@ public class ControlCenter extends JFrame {
 			}
 			singleExperimentsDm.addRow(new Object[] { nrOfConductedExperiments - 1, key, tmpRes });
 		}
+		
+		//update also static part of control center
+		updateStaticTable(nrOfEnsemble, nrOfConductedExperiments);
+	}
+	
+	private void updateStaticTable(int nrOfEnsemble, int nrOfConductedExperiments){
+		staticInfosDm.removeRow(0);
+		staticInfosDm.addRow(new Object[] { simConf.getRunConfiguration().getGeneral().getRows(), nrOfEnsemble ,simConf.getRunConfiguration().getRows().getExperiments(),nrOfConductedExperiments});
 	}
 
 	// /**
@@ -330,44 +363,44 @@ public class ControlCenter extends JFrame {
 	// JTable trafficServicesTable = new JTable(trafficServicesdm);
 	// trafficServicesTable.setAutoCreateRowSorter(true);
 	// trafficServicesTable.setPreferredScrollableViewportSize(new Dimension(400, 180));
-	// trafficServicesTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-	// public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column) {
-	// Component comp = super.getTableCellRendererComponent(table, value, selected, focus, row, column);
-	// setOpaque(true);
-	// if (column == 0) {
-	// setHorizontalAlignment(LEFT);
-	// } else {
-	// setHorizontalAlignment(CENTER);
-	// }
-	// if (!selected) {
-	// String status = String.valueOf(trafficServicesdm.getValueAt(row, 1));
-	// if (status.equals("OK")) {
-	// String currentCapacity = String.valueOf(trafficServicesdm.getValueAt(row, 2));
-	// String hasConnToStreet = String.valueOf(trafficServicesdm.getValueAt(row, 6));
-	// String hasConToBroker = String.valueOf(trafficServicesdm.getValueAt(row, 7));
-	// // / Is it a double or a String
-	// if (currentCapacity.indexOf("%") != -1) {
-	// currentCapacity = currentCapacity.substring(0, currentCapacity.length() - 1);
-	// double capacity = Double.valueOf(currentCapacity);
-	// if (capacity != -1.0 && hasConnToStreet.equals("true") && hasConToBroker.equals("true")) {
-	// // service is working properly
-	// comp.setBackground(Color.GREEN);
-	// } else {
-	// // service is up to date but not working
-	// // properly
-	// comp.setBackground(Color.GRAY);
-	// }
-	// // Just in case there is an error
-	// } else {
-	// comp.setBackground(Color.YELLOW);
-	// }
-	// } else {
-	// comp.setBackground(Color.RED);
-	// }
-	// }
-	// return comp;
-	// }
-	// });
+//	 trafficServicesTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+//	 public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column) {
+//	 Component comp = super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+//	 setOpaque(true);
+//	 if (column == 0) {
+//	 setHorizontalAlignment(LEFT);
+//	 } else {
+//	 setHorizontalAlignment(CENTER);
+//	 }
+//	 if (!selected) {
+//	 String status = String.valueOf(trafficServicesdm.getValueAt(row, 1));
+//	 if (status.equals("OK")) {
+//	 String currentCapacity = String.valueOf(trafficServicesdm.getValueAt(row, 2));
+//	 String hasConnToStreet = String.valueOf(trafficServicesdm.getValueAt(row, 6));
+//	 String hasConToBroker = String.valueOf(trafficServicesdm.getValueAt(row, 7));
+//	 // / Is it a double or a String
+//	 if (currentCapacity.indexOf("%") != -1) {
+//	 currentCapacity = currentCapacity.substring(0, currentCapacity.length() - 1);
+//	 double capacity = Double.valueOf(currentCapacity);
+//	 if (capacity != -1.0 && hasConnToStreet.equals("true") && hasConToBroker.equals("true")) {
+//	 // service is working properly
+//	 comp.setBackground(Color.GREEN);
+//	 } else {
+//	 // service is up to date but not working
+//	 // properly
+//	 comp.setBackground(Color.GRAY);
+//	 }
+//	 // Just in case there is an error
+//	 } else {
+//	 comp.setBackground(Color.YELLOW);
+//	 }
+//	 } else {
+//	 comp.setBackground(Color.RED);
+//	 }
+//	 }
+//	 return comp;
+//	 }
+//	 });
 	//
 	// JPanel trafficServicePnl = new JPanel(new BorderLayout());
 	// trafficServicePnl.add(BorderLayout.NORTH, new JLabel("Status of Traffic Service Agents"));

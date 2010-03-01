@@ -3,6 +3,8 @@ package jadex.simulation.master;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentManagementService;
+import jadex.service.clock.IClockService;
+import jadex.simulation.controlcenter.ControlCenter;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.model.ObservedEvent;
 import jadex.simulation.model.Optimization;
@@ -65,12 +67,19 @@ public class StartSimulationExperimentsPlan extends Plan {
 			sweepParameters(simConf, args);
 		}
 
+		//update GUI: create new panel/table for new ensemble
+		ControlCenter gui= (ControlCenter) getBeliefbase().getBelief("tmpGUI").getFact();
+		gui.createNewEnsembleTable(rowCounter);
+		
 		for (long i = 0; i < experimentsPerRowToMake; i++) {
 
 			String experimentID = rowCounter + "." + expInRow;
 			String appName = simConf.getName() + experimentID;
 
 			args.put(Constants.EXPERIMENT_ID, experimentID);
+			//put tmp_start_time into args in order to observer duration of experiment
+			long tmp_start_time = getClock().getTime();
+			args.put("tmp_start_time", tmp_start_time);
 			((HashMap) args.get(Constants.SIMULATION_FACTS_FOR_CLIENT)).put(Constants.EXPERIMENT_ID, experimentID);
 
 			startApplication(appName, fileName, configName, args);
@@ -122,6 +131,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 		rowResult.setOptimizationValue(experimentList.get(0).getOptimizationValue());
 		
 		rowResults.put(rowResult.getId(), rowResult);
+				
 		
 		getBeliefbase().getBelief("experimentResults").setFact(new HashMap());
 		getBeliefbase().getBelief("intermediateResults").setFact(new IntermediateResult(rowCounter, 0, simConf));

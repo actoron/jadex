@@ -25,6 +25,7 @@ public class IntermediateResult {
 	// --- contains the results of the intermediate statistical evaluation for each observer type
 	private HashMap<String, HashMap<String, String>> intermediateStats = new HashMap<String, HashMap<String,String>>();
 
+
 	public IntermediateResult(SimulationConfiguration simConf) {
 		this.simConf = simConf;
 		initAllHashMaps();

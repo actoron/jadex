@@ -260,6 +260,9 @@ public class RuntimeManagerPlan extends Plan {
 		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
 		facts.put(Constants.EXPERIMENT_START_TIME, new Long(clockservice.getTime()));
 		getBeliefbase().getBelief("simulationFacts").setFact(facts);
+		//Hack: Synchronize start time! 
+		((ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace")).getSpaceObjectsByType("homebase")[0].setProperty("start_time", clockservice.getTime());
+		
 	}
 
 	/**

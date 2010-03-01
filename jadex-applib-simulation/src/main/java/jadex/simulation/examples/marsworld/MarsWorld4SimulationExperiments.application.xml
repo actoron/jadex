@@ -41,6 +41,7 @@
 	<arguments>
 		<!-- The mission time. -->
 		<argument name="tmp_mission_time" typename="String">"Init"</argument>
+		<argument name="tmp_start_time" typename="long"></argument>
 		<argument name="al" typename="Int">new Integer(258)</argument>
 		<argument name="simulationFacts" typename="Map"/>
 		<!-- <argument name="nrr" typename="Int">new Integer(10)</argument> -->
@@ -89,8 +90,12 @@
 				</env:objecttype>
 				<env:objecttype name="homebase">
 					<env:property name="ore">0</env:property>
-					<env:property name="text" dynamic="true">
-						"Collected ore: "+$object.getProperty("ore")+" \n"+ "Remaining time: "+new SimpleDateFormat("mm:ss").format(new Date(Math.max(0,$object.getProperty("missiontime") 	- $object.getProperty("space").getContext().getServiceContainer().getService(IClockService.class).getTime())))</env:property>
+					<env:property name="start_time">$args.tmp_start_time</env:property>					  
+					<env:property name="duration" dynamic="true">$object.getProperty("space").getContext().getServiceContainer().getService(IClockService.class).getTime() - $object.getProperty("start_time")</env:property>
+					<!--<env:property name="text" dynamic="true">
+						 $object.getProperty("duration")</env:property>-->
+					 <env:property name="text" dynamic="true">
+						"Collected ore: "+$object.getProperty("ore")+" \n"+ "Experiment duration: "+new SimpleDateFormat("mm:ss").format(new Date(Math.max(0,$object.getProperty("duration"))))</env:property>
 					<!-- <env:property name="text" dynamic="false">"Only test showing argument: " + $args.tmp_mission_time</env:property>-->
 				</env:objecttype>
 				

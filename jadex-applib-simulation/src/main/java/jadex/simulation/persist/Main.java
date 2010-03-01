@@ -25,6 +25,12 @@ public class Main {
 
 	public static void main(String[] args) {
 
+		double a = 13;
+		double b = 6;
+		int c = (int) Math.ceil(a/b);
+//		;
+		System.out.println("a: "  + Math.ceil(a/b) + " -  "  + c );
+		
 		testList();
 		testXMLOutput();
 		// Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("Europe/Berlin"));
