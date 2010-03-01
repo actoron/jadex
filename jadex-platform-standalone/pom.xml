@@ -31,7 +31,7 @@
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>jadex.adapter.standalone.Platform</mainClass>
+              <mainClass>jadex.standalonem</mainClass>
             </manifest>
           </archive>
         </configuration>
