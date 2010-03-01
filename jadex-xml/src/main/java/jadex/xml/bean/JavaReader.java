@@ -170,4 +170,15 @@ public class JavaReader extends Reader
 			reader = new JavaReader(null);
 		return Reader.objectFromByteArray(reader, val, classloader);
 	}
+	
+	/**
+	 *  Get the default Java reader.
+	 *  @return The Java reader.
+	 */
+	public static Reader getInstance()
+	{
+		if(reader==null)
+			reader = new JavaReader(null);
+		return reader;
+	}
 }

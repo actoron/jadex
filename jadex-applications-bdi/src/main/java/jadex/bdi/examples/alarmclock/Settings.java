@@ -209,18 +209,6 @@ public class Settings implements Cloneable, Serializable
 	}
 
 	/**
-	 *  Save the settings.
-	 */
-	public void save() throws IOException
-	{
-		FileOutputStream fos = new FileOutputStream(filename);
-		ObjectOutputStream enc = new ObjectOutputStream(fos);
-	    enc.writeObject(this);
-	    enc.close();
-		fos.close();
-	}
-
-	/**
 	 *  Save settings without exception.
 	 */
 	protected void save0()
@@ -260,6 +248,19 @@ public class Settings implements Cloneable, Serializable
 		return ret;
 	}
 
+
+	/**
+	 *  Save the settings.
+	 */
+	public void save() throws IOException
+	{
+		FileOutputStream fos = new FileOutputStream(filename);
+		ObjectOutputStream enc = new ObjectOutputStream(fos);
+	    enc.writeObject(this);
+	    enc.close();
+		fos.close();
+	}
+	
 	/**
 	 *  Load the settings.
 	 *  @param settings_loc The settings location.
@@ -286,4 +287,40 @@ public class Settings implements Cloneable, Serializable
 			alarms[i].setClock((IClockService)agent.getServiceContainer().getService(IClockService.class));
 		return ret;
 	}
+	
+	/**
+	 *  Save the settings.
+	 * /
+	public void save() throws IOException
+	{
+		FileOutputStream fos = new FileOutputStream(filename);
+		fos.write(JavaWriter.objectToByteArray(this, null));
+		fos.close();
+	}*/
+	
+	/**
+	 *  Load the settings.
+	 *  @param settings_loc The settings location.
+	 *  @return The loaded settings.
+	 * /
+	public static Settings loadSettings(String settings_loc, IBDIExternalAccess agent)
+	{
+		Settings ret = null;
+		try
+		{
+			final FileInputStream fis = new FileInputStream(settings_loc);
+			ret = (Settings)JavaReader.getInstance().read(fis, null, null);
+			fis.close();
+		}
+		catch(Exception e)
+		{
+			System.out.println("Could not load settings: "+e);
+//			e.printStackTrace();
+			ret = new Settings("./alarmclock_settings.xml");
+		}
+		Alarm[]	alarms	= ret.getAlarms();
+		for(int i=0; i<alarms.length; i++)
+			alarms[i].setClock((IClockService)agent.getServiceContainer().getService(IClockService.class));
+		return ret;
+	}*/
 }

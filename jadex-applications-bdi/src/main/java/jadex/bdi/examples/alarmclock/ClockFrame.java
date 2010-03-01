@@ -81,6 +81,7 @@ public class ClockFrame extends JFrame
 	 */
 	public ClockFrame(IBDIExternalAccess agent)
 	{
+		super("Jadex Clock");
 		this.agent = agent;
 		format = new SimpleDateFormat();
 
