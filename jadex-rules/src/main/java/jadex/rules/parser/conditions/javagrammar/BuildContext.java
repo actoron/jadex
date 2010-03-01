@@ -9,7 +9,9 @@ import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
 import jadex.rules.rulesystem.rules.MethodCall;
 import jadex.rules.rulesystem.rules.ObjectCondition;
+import jadex.rules.rulesystem.rules.TestCondition;
 import jadex.rules.rulesystem.rules.Variable;
+import jadex.rules.rulesystem.rules.functions.OperatorFunction;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
@@ -110,6 +112,23 @@ public class BuildContext
 	 */
 	public ObjectCondition getObjectCondition(Variable var)
 	{
+		ObjectCondition	ret	= getObjectCondition0(var);
+		if(ret==null)
+		{
+			throw new RuntimeException("No object condition for: "+var);
+		}
+		return ret;
+	}
+
+	/**
+	 *  Get an object condition for a variable, i.e. a condition, where
+	 *  constraints related to the variable can be added to.
+	 *  @param var	The variable
+	 *  @return The object condition.
+	 *  @throws RuntimeExcpetion	when no condition was found.
+	 */
+	public ObjectCondition getObjectCondition0(Variable var)
+	{
 		ObjectCondition	ret	= null;
 		try
 		{
@@ -123,10 +142,6 @@ public class BuildContext
 			ret	= (ObjectCondition)bcons.get(var);
 		}
 		
-		if(ret==null)
-		{
-			throw new RuntimeException("No object condition for: "+var);
-		}
 		return ret;
 	}
 
@@ -404,6 +419,19 @@ public class BuildContext
 			{
 				bcs	= ((CollectCondition)con).getBoundConstraints();
 			}
+			else if(con instanceof TestCondition)
+			{
+				FunctionCall	func	= ((TestCondition)con).getConstraint().getFunctionCall();
+				if(func.getFunction() instanceof OperatorFunction && ((OperatorFunction)func.getFunction()).getOperator().equals(IOperator.EQUAL))
+				{
+					List	ps	= func.getParameterSources();
+					if(ps.get(0) instanceof Variable)
+					{
+						ret.add(ps.get(0));
+					}
+				}
+			}
+			
 			for(int j=0; bcs!=null && j<bcs.size(); j++)
 			{
 				BoundConstraint	bc	= (BoundConstraint)bcs.get(j);
@@ -425,6 +453,14 @@ public class BuildContext
 	 */
 	public void	pushCondition(ObjectCondition con)
 	{
+		if(getDefiningScope(con)!=this)
+		{
+			// Create clone of inconsistent condition in inner scope.
+			generateVariableBinding(con, null);	// new null bound constraint to make sure that cloned condition refers to SAME object.
+			con	= createObjectCondition(con.getObjectType(), (IConstraint[])con.getConstraints().toArray(new IConstraint[con.getConstraints().size()]));
+		}
+		
+		// Todo: remove stack (obsolete?)
 		if(oconstack!=null)
 		{
 			// Check stack consistency: inner variables may only be defined in same scope or outside.
@@ -446,7 +482,7 @@ public class BuildContext
 					Variable	var = scope.generateVariableBinding(ocon, null);
 					ocon	= scope.createObjectCondition(ocon.getObjectType(), new IConstraint[]{new BoundConstraint(null, var)});
 					oconstack.set(i, ocon);
-//					System.out.println("Clone for consistency: "+oconstack);
+					System.out.println("Clone for consistency: "+oconstack);
 				}
 			}
 		}

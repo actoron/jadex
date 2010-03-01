@@ -34,6 +34,14 @@
 				// select $g.getParameter("order").getValue()
 				// from IGoal $g in $goalbase.getGoals("purchase_book")
 				
+				// collect($order)
+				// {
+				// 	Order $order &amp;&amp;
+				// 	IGoal $g &amp;&amp;
+				// 	Arrays.asList($goalbase.getGoals("purchase_book")).contains($g) &amp;&amp;
+				// 	$g.getParameter("order").getValue()==$order
+				// }
+				
 				?mgoal = (mgoal (melement_has_name "purchase_book"))
 				$?ret = (collect 
 					?order = (Order)

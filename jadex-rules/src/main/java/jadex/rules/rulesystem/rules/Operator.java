@@ -1,5 +1,6 @@
 package jadex.rules.rulesystem.rules;
 
+import jadex.commons.SUtil;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVObjectType;
 
@@ -33,7 +34,7 @@ public class Operator
 			
 			return val1 instanceof Number && val2 instanceof Number
 				? compare(val1,val2)==0
-				: (val1==null && val2==null) || val1!=null && val1.equals(val2);
+				: (val1==null && val2==null) || val1!=null && (val1.getClass().isArray() && val2!=null && val2.getClass().isArray() ? SUtil.arrayEquals(val1, val2)	: val1.equals(val2));
 		}
 		
 		/**

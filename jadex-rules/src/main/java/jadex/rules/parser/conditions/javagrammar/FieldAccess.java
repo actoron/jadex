@@ -1,5 +1,7 @@
 package jadex.rules.parser.conditions.javagrammar;
 
+import jadex.rules.rulesystem.rules.Variable;
+
 
 /**
  *  Access a field of a value.
@@ -23,6 +25,16 @@ public class FieldAccess	extends	Suffix
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Test if a variable is contained in the suffix.
+	 *  @param var	The variable.
+	 *  @return	True, when the variable is contained.
+	 */
+	public boolean	containsVariable(Variable var)
+	{
+		return false;
+	}
 	
 	/**
 	 *  Get the name of the field.

@@ -2,6 +2,7 @@ package jadex.rules.parser.conditions.javagrammar;
 
 import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rules.ILazyValue;
+import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.rulesystem.rules.functions.IFunction;
 import jadex.rules.state.IOAVState;
 
@@ -65,6 +66,18 @@ public class ConditionalExpression	extends Expression
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Test if a variable is contained in the expression.
+	 *  @param var	The variable.
+	 *  @return	True, when the variable is contained.
+	 */
+	public boolean	containsVariable(Variable var)
+	{
+		return condition.containsVariable(var)
+			|| first.containsVariable(var)
+			|| second.containsVariable(var);
+	}
 	
 	/**
 	 *  Get the condition.

@@ -1,6 +1,7 @@
 package jadex.rules.parser.conditions.javagrammar;
 
 import jadex.commons.SUtil;
+import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.OAVJavaType;
 
 
@@ -36,6 +37,21 @@ public class StaticMethodAccess	extends	Expression
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Test if a variable is contained in the expression.
+	 *  @param var	The variable.
+	 *  @return	True, when the variable is contained.
+	 */
+	public boolean	containsVariable(Variable var)
+	{
+		boolean	ret	= false;
+		for(int i=0; !ret && parametervalues!=null && i<parametervalues.length ; i++)
+		{
+			ret	= parametervalues[i].containsVariable(var);
+		}
+		return ret;
+	}
 	
 	/**
 	 *  Get the object type.

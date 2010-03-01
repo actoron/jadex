@@ -1,6 +1,7 @@
 package jadex.rules.parser.conditions.javagrammar;
 
 import jadex.commons.SUtil;
+import jadex.rules.rulesystem.rules.Variable;
 
 
 /**
@@ -24,6 +25,16 @@ public class LiteralExpression	extends Expression
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Test if a variable is contained in the expression.
+	 *  @param var	The variable.
+	 *  @return	True, when the variable is contained.
+	 */
+	public boolean	containsVariable(Variable var)
+	{
+		return false;
+	}
 	
 	/**
 	 *  Get the value.

@@ -9,7 +9,6 @@ import jadex.rules.state.IProfiler;
 import jadex.rules.state.OAVAttributeType;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;

@@ -2,6 +2,7 @@ package jadex.rules.parser.conditions.javagrammar;
 
 import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.rulesystem.rules.IOperator;
+import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.rulesystem.rules.functions.IFunction;
 import jadex.rules.state.IOAVState;
 
@@ -77,6 +78,17 @@ public class OperationExpression	extends Expression
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Test if a variable is contained in the expression.
+	 *  @param var	The variable.
+	 *  @return	True, when the variable is contained.
+	 */
+	public boolean	containsVariable(Variable var)
+	{
+		return left.containsVariable(var)
+			|| right.containsVariable(var);
+	}
 	
 	/**
 	 *  Get the left value.

@@ -1,5 +1,6 @@
 package jadex.rules.parser.conditions.javagrammar;
 
+import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.OAVObjectType;
 
 
@@ -28,6 +29,16 @@ public class CastExpression	extends Expression
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Test if a variable is contained in the expression.
+	 *  @param var	The variable.
+	 *  @return	True, when the variable is contained.
+	 */
+	public boolean	containsVariable(Variable var)
+	{
+		return value.containsVariable(var);
+	}
 	
 	/**
 	 *  Get the value.

@@ -1,5 +1,7 @@
 package jadex.rules.parser.conditions.javagrammar;
 
+import jadex.rules.rulesystem.rules.Variable;
+
 
 /**
  *  An unary operation operates on one value.
@@ -38,6 +40,16 @@ public class UnaryExpression	extends Expression
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Test if a variable is contained in the expression.
+	 *  @param var	The variable.
+	 *  @return	True, when the variable is contained.
+	 */
+	public boolean	containsVariable(Variable var)
+	{
+		return value.containsVariable(var);
+	}
 	
 	/**
 	 *  Get the value.

@@ -15,6 +15,8 @@ import jadex.rules.rulesystem.rules.LiteralConstraint;
 import jadex.rules.rulesystem.rules.MethodCall;
 import jadex.rules.rulesystem.rules.NotCondition;
 import jadex.rules.rulesystem.rules.ObjectCondition;
+import jadex.rules.rulesystem.rules.PredicateConstraint;
+import jadex.rules.rulesystem.rules.TestCondition;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.rulesystem.rules.functions.IFunction;
 import jadex.rules.rulesystem.rules.functions.Identity;
@@ -238,25 +240,47 @@ public class ConstraintBuilder
 	 */
 	protected static void	buildOperatorConstraint(Expression left, Expression right, IOperator op, BuildContext context)
 	{
-		// Get object condition and value source for left part.
-		Object	valuesource	= getObjectConditionAndValueSource(left, context);
-
-		right	= flattenToPrimary(right, context);
-
-		// Build literal constraint for constant values
-		if(right instanceof LiteralExpression)
+		// Special treatment for unbound variables -> build test condition.
+		// Currently not supported by Rete builder
+		if(left instanceof VariableExpression && context.getObjectCondition0(((VariableExpression)left).getVariable())==null)
 		{
-			// Right side of literal constraint is not a value source (i.e. Constant)
-			context.getCurrentCondition().addConstraint(new LiteralConstraint(valuesource, ((LiteralExpression)right).getValue(), op));
+			// Flatten right side to literal or (temporary) variable.
+			right	= flattenToPrimary(right, context);
+			Object	rightsource	= right instanceof LiteralExpression
+				? new Constant(((LiteralExpression)right).getValue())
+				: ((VariableExpression)right).getVariable();
+			
+			// Build test condition for left side (variable).
+			TestCondition	testcon	= new TestCondition(new PredicateConstraint(new FunctionCall(
+				new OperatorFunction(op), new Object[]{((VariableExpression)left).getVariable(), rightsource})));
+			
+			context.getConditions().add(testcon);
 		}
 
-		// Build variable constraint for other expressions
-		else //if(right instanceof VariableExpression)
+		// Normal treatment: Find object condition + value source for left part and attach constraint based on right part.
+		else
 		{
-			context.getCurrentCondition().addConstraint(new BoundConstraint(valuesource, ((VariableExpression)right).getVariable(), op));
+			// Get object condition and value source for left part.
+			Object	valuesource	= getObjectConditionAndValueSource(left, context);
+	
+			// Flatten right side to literal value or (temporary) variable.
+			right	= flattenToPrimary(right, context);
+	
+			// Build literal constraint for constant values
+			if(right instanceof LiteralExpression)
+			{
+				// Right side of literal constraint is not a value source (i.e. Constant)
+				context.getCurrentCondition().addConstraint(new LiteralConstraint(valuesource, ((LiteralExpression)right).getValue(), op));
+			}
+	
+			// Build variable constraint for other expressions
+			else //if(right instanceof VariableExpression)
+			{
+				context.getCurrentCondition().addConstraint(new BoundConstraint(valuesource, ((VariableExpression)right).getVariable(), op));
+			}
+			
+			context.popCondition();
 		}
-		
-		context.popCondition();
 	}
 	
 	/**
@@ -621,6 +645,18 @@ public class ConstraintBuilder
 				else if(con instanceof CollectCondition)
 				{
 					bcs	= ((CollectCondition)con).getBoundConstraints();
+				}
+				else if(con instanceof TestCondition)
+				{
+					FunctionCall	func	= ((TestCondition)con).getConstraint().getFunctionCall();
+					if(func.getFunction() instanceof OperatorFunction && ((OperatorFunction)func.getFunction()).getOperator().equals(IOperator.EQUAL))
+					{
+						List	ps	= func.getParameterSources();
+						if(ps.get(0) instanceof Variable)
+						{
+							localbound.add(ps.get(0));
+						}
+					}
 				}
 				else if(con instanceof NotCondition)
 				{

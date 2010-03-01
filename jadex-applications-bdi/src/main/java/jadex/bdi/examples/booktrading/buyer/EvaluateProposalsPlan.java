@@ -51,9 +51,9 @@ public class EvaluateProposalsPlan extends Plan
 //			System.out.println("Acceptable offer found: "+accs.get(0));
 			getParameterSet("acceptables").addValue(accs.get(0));
 		}
-//		else
-//		{
+		else
+		{
 //			System.out.println("No acceptable offer found: "+accs);
-//		}
+		}
 	}
 }

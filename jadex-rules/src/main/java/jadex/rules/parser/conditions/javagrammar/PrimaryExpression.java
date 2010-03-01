@@ -1,6 +1,7 @@
 package jadex.rules.parser.conditions.javagrammar;
 
 import jadex.commons.SUtil;
+import jadex.rules.rulesystem.rules.Variable;
 
 /**
  *  A computable value composed of primary value and zero to many suffixes.
@@ -27,6 +28,21 @@ public class PrimaryExpression	extends Expression
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Test if a variable is contained in the expression.
+	 *  @param var	The variable.
+	 *  @return	True, when the variable is contained.
+	 */
+	public boolean	containsVariable(Variable var)
+	{
+		boolean	ret	= prefix.containsVariable(var);
+		for(int i=0; !ret && suffixes!=null && i<suffixes.length ; i++)
+		{
+			ret	= suffixes[i].containsVariable(var);
+		}
+		return ret;
+	}
 	
 	/**
 	 *  Get the prefix value expression.

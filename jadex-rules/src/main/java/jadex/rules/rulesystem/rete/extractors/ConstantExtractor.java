@@ -5,9 +5,6 @@ import jadex.rules.rulesystem.rete.Tuple;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
-import java.util.Collections;
-import java.util.Set;
-
 /**
  *  A constant extractor is responsible for extracting a constant value.
  */

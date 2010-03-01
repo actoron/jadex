@@ -33,6 +33,16 @@ public class ExistentialDeclaration	extends	Expression
 	//-------- methods --------
 	
 	/**
+	 *  Test if a variable is contained in the expression.
+	 *  @param var	The variable.
+	 *  @return	True, when the variable is contained.
+	 */
+	public boolean	containsVariable(Variable var)
+	{
+		return var.equals(variable);
+	}
+	
+	/**
 	 *  Get the variable.
 	 */
 	public Variable	getVariable()

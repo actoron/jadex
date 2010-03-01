@@ -1,5 +1,7 @@
 package jadex.rules.parser.conditions.javagrammar;
 
+import jadex.rules.rulesystem.rules.Variable;
+
 
 /**
  *  Access an element of an array
@@ -23,6 +25,16 @@ public class ArrayAccess	extends	Suffix
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Test if a variable is contained in the suffix.
+	 *  @param var	The variable.
+	 *  @return	True, when the variable is contained.
+	 */
+	public boolean	containsVariable(Variable var)
+	{
+		return index.containsVariable(var);
+	}
 	
 	/**
 	 *  Get the index.

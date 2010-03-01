@@ -331,9 +331,8 @@ public class BeliefRules
 					Object rparam = assignments.getVariableValue("?rparameter");
 					Object value = assignments.getVariableValue(var.getName());
 					
-//					Object rpe = assignments.getVariableValue("?rpe");
-//					System.out.println("RPE "+rpe+" "+state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model)+" "+rparam);
-
+//					System.out.println("Update: "+assignments);
+					
 					BeliefRules.setParameterValue(state, rparam, value);
 				}
 			},

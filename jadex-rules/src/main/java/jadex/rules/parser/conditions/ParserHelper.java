@@ -160,11 +160,16 @@ public class ParserHelper
 		JavaJadexParser parser = new JavaJadexParser(tokens);
 		try
 		{
+			if(returnvar!=null)
+			{
+				helper.addVariable(returnvar);
+			}
+			
 			parser.setParserHelper(helper);
 			parser.setImports(imports);
 			Expression	pexp	= parser.lhs();
 
-			if(returnvar!=null && helper.getVariable(returnvar.getName())==null)
+			if(returnvar!=null && !pexp.containsVariable(returnvar))
 			{
 				// Assign return variable if not already present. (e.g. implicit ?ret variable)
 				ret	= ConstraintBuilder.buildConstraints(new OperationExpression(pexp, new VariableExpression(returnvar), IOperator.EQUAL), helper.getBuildContext());
