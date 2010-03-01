@@ -142,7 +142,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 		ca.getParameter("type").setValue(type);
 
 		Map args = new HashMap();
-		// java jadex.adapter.standalone.Platform
+		// java jadex.standalone.Platform
 		// "hello:jadex.examples.helloworld.HelloWorld(default, msg=\"Hi!\")"
 		args.put("msg", "Novo");
 		// args.put("dealer", dealeraid);

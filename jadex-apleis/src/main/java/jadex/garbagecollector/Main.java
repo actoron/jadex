@@ -1,7 +1,7 @@
 package jadex.garbagecollector;
 
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.adapter.standalone.Platform;
+import jadex.standalone.Platform;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.IContextService;
 

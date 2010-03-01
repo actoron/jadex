@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/jadex-platform-standalone/src/main/java/jadex/adapter/standalone/Platform.java"/>
+<listEntry value="/jadex-platform-standalone/src/main/java/jadex/standalone/Platform.java"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
@@ -12,7 +12,7 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.maven.ide.eclipse.launchconfig.classpathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jadex.adapter.standalone.Platform"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-conf  jadex/adapter/standalone/services_conf.xml &#13;&#10;jadex/bdi/kernel_bdi_conf.xml&#13;&#10;../jadex-applications-bdi/src/main/java/jadex/bdi/benchmarks/creation_conf.xml"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jadex.standalone.Platform"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-conf  jadex/standalone/services_conf.xml &#13;&#10;jadex/bdi/kernel_bdi_conf.xml&#13;&#10;../jadex-applications-bdi/src/main/java/jadex/bdi/benchmarks/creation_conf.xml"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jadex-launch"/>
 </launchConfiguration>

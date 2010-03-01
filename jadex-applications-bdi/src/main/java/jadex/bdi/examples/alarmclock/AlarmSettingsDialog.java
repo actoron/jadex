@@ -111,14 +111,14 @@ public class AlarmSettingsDialog extends JDialog
 		{
 			public String getDescription()
 			{
-				return "Music files (*.mp3, *.wma, *.wav)";
+				return "Music files (*.mp3)";//;, *.wma, *.wav)";
 			}
 
 			public boolean accept(File f)
 			{
 				String name = f.getName();
-				return f.isDirectory() ||  (name.endsWith(".mp3")
-					|| name.endsWith(".wma") || name.endsWith(".wav"));
+				return f.isDirectory() ||  (name.endsWith(".mp3"));
+//					|| name.endsWith(".wma") || name.endsWith(".wav"));
 			}
 		};
 		filechooser.addChoosableFileFilter(load_filter);

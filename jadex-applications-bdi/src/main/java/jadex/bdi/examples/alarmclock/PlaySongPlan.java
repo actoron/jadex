@@ -1,6 +1,8 @@
 package jadex.bdi.examples.alarmclock;
 
 import jadex.bdi.runtime.Plan;
+import jadex.commons.SUtil;
+import jadex.service.library.ILibraryService;
 import jadex.service.threadpool.ThreadPoolService;
 
 import java.io.BufferedInputStream;
@@ -41,24 +43,46 @@ public class PlaySongPlan extends Plan
 	{
 		final URL song = (URL)getParameter("song").getValue();
 		final SyncResultListener lis = new SyncResultListener();
-
+		final ILibraryService ls = (ILibraryService)getScope().getServiceContainer().getService(ILibraryService.class);
+		
 		ThreadPoolService tp = (ThreadPoolService)getScope().getServiceContainer().getService(ThreadPoolService.class);
 		tp.execute(new Runnable()
 		{
 			public void run()
 			{
+				InputStream in = null;
 				try
 				{
-					InputStream in = new BufferedInputStream(song.openStream());
-					AudioDevice dev = FactoryRegistry.systemRegistry().createAudioDevice();
-
-					Player player = new Player(in, dev);
-					player.play();
-					lis.resultAvailable(PlaySongPlan.this, null);
+					in = new BufferedInputStream(song.openStream());
 				}
 				catch(Exception e)
 				{
-					lis.exceptionOccurred(PlaySongPlan.this, e);
+					try
+					{
+						String filename = song.getPath();
+						in = SUtil.getResource(song.getPath(), ls.getClassLoader());
+					}
+					catch(Exception ex)
+					{
+						lis.exceptionOccurred(PlaySongPlan.this, e);
+					}
+				}
+					
+				if(in!=null)
+				{
+					try
+					{
+						AudioDevice dev = FactoryRegistry.systemRegistry().createAudioDevice();
+	
+						Player player = new Player(in, dev);
+						player.play();
+						lis.resultAvailable(PlaySongPlan.this, null);
+					}
+					catch(Exception e)
+					{
+//						e.printStackTrace();
+						lis.exceptionOccurred(PlaySongPlan.this, e);
+					}
 				}
 			}
 		});

@@ -41,19 +41,19 @@
 			
 			<!-- AMS service. -->
 			<property type="jadex.bridge.IComponentManagementService" name="ams_service">
-				new jadex.adapter.standalone.service.ComponentManagementService($platform)
+				new jadex.standalone.service.ComponentManagementService($platform)
 			</property>
 						
 			<!-- DF service. -->
-			<property type="jadex.adapter.base.fipa.IDF" name="df_service">new jadex.adapter.standalone.service.DirectoryFacilitatorService($platform)</property>
+			<property type="jadex.adapter.base.fipa.IDF" name="df_service">new jadex.standalone.service.DirectoryFacilitatorService($platform)</property>
 			
 			<!-- Message service. -->
-			<property type="jadex.bridge.IMessageService" name="message_service">new jadex.adapter.standalone.MessageService($platform, 
-				new jadex.adapter.standalone.transport.ITransport[]
+			<property type="jadex.bridge.IMessageService" name="message_service">new jadex.standalone.MessageService($platform, 
+				new jadex.standalone.transport.ITransport[]
 				{
-					new jadex.adapter.standalone.transport.localmtp.LocalTransport($platform),
-					new jadex.adapter.standalone.transport.tcpmtp.TCPTransport($platform, 9876),
-					new jadex.adapter.standalone.transport.niotcpmtp.NIOTCPTransport($platform, 8765)
+					new jadex.standalone.transport.localmtp.LocalTransport($platform),
+					new jadex.standalone.transport.tcpmtp.TCPTransport($platform, 9876),
+					new jadex.standalone.transport.niotcpmtp.NIOTCPTransport($platform, 8765)
 				},
 				new jadex.bridge.MessageType[]
 				{
