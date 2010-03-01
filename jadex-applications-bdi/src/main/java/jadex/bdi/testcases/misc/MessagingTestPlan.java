@@ -22,9 +22,9 @@ public class MessagingTestPlan extends Plan
 	 */
 	public void	body()
 	{
-		testEMail();
-		
 		testICQ();
+		
+		testEMail();
 	}
 
 	/**

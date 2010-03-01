@@ -53,6 +53,7 @@ public class SendIMPlan extends Plan
 		}
 		catch(MessagingNetworkException e)
 		{
+			e.printStackTrace();
 			fail(e);
 		}
 	}

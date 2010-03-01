@@ -74,7 +74,7 @@ public class SendEmailPlan extends Plan
 		}
 		catch(MessagingException e)
 		{
-//			e.printStackTrace();
+			e.printStackTrace();
 			fail(e);
 		}
 	}
