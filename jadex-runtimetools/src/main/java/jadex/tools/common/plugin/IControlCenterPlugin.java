@@ -13,6 +13,12 @@ import javax.swing.JMenu;
 public interface IControlCenterPlugin
 {
 	/**
+	 *  Test if this plugin should be initialized lazily.
+	 *  @return True, if lazy.
+	 */
+	public boolean isLazy();
+	
+	/**
 	 *  This initializes a plugin and is done in context of a swing thread.
 	 */
 	public void init(IControlCenter main);

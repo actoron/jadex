@@ -110,22 +110,25 @@ public class ControlCenter implements IControlCenter
 						Class plugin_class = null;
 						try
 						{
-							plugin_class = SUtil.class.getClassLoader()
-									.loadClass(tokenizer.nextToken().trim());
+							plugin_class = SUtil.class.getClassLoader().loadClass(tokenizer.nextToken().trim());
 							if(!plugin_set.contains(plugin_class))
 							{
 								IControlCenterPlugin p = (IControlCenterPlugin)plugin_class.newInstance();
 								plugins.put(p, null);
 								plugin_set.add(plugin_class);
 								setStatusText("Plugin loaded successfully: "+ p.getName());
+								
+								// Init non lazy plugin
+								if(!p.isLazy())
+								{
+									initPlugin(p);
+								}
 							}
 						}
 						catch(Throwable e)
 						{
 							// e.printStackTrace();
-							String text = SUtil.wrapText("Plugin("
-									+ plugin_class + ") could not be loaded: "
-									+ e.getMessage());
+							String text = SUtil.wrapText("Plugin("+ plugin_class + ") could not be loaded: "+ e.getMessage());
 							// JOptionPane.showMessageDialog(window, text,
 							// "Plugin Error", JOptionPane.INFORMATION_MESSAGE);
 							System.out.println(text);
@@ -172,15 +175,10 @@ public class ControlCenter implements IControlCenter
 					{
 						// Use default title, location and plugin
 						setCurrentProject(null);
-						Dimension dim = Toolkit.getDefaultToolkit()
-								.getScreenSize();
-						window.setSize(new Dimension((int)(dim.width * 0.6),
-								((int)(dim.height * 0.6))));
-						window
-								.setLocation(SGUI
-										.calculateMiddlePosition(window));
-						activatePlugin((IControlCenterPlugin)plugins.keySet()
-								.iterator().next());
+						Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+						window.setSize(new Dimension((int)(dim.width * 0.6),((int)(dim.height * 0.6))));
+						window.setLocation(SGUI.calculateMiddlePosition(window));
+						activatePlugin((IControlCenterPlugin)plugins.keySet().iterator().next());
 						window.setVisible(true);
 						window.setCenterSplit(-1);
 					}
@@ -265,8 +263,7 @@ public class ControlCenter implements IControlCenter
 		{
 //			e.printStackTrace();
 			
-			final String failed = SUtil.wrapText("Could not open project\n\n"
-				+ e.getMessage());
+			final String failed = SUtil.wrapText("Could not open project\n\n"+ e.getMessage());
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				public void run()
@@ -520,9 +517,8 @@ public class ControlCenter implements IControlCenter
 			{
 				// e.printStackTrace();
 				plugin.reset();
-				final String failed = SUtil
-						.wrapText("Error applying settings to plugin "
-								+ plugin.getName() + "\n\n" + e.getMessage());
+				final String failed = SUtil.wrapText("Error applying settings to plugin "
+					+ plugin.getName() + "\n\n" + e.getMessage());
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
@@ -565,6 +561,18 @@ public class ControlCenter implements IControlCenter
 		window.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
 		// Init the plugin, when not yet inited.
+		initPlugin(plugin);
+		
+		window.setPerspective(plugin);
+
+		window.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+	}
+	
+	/**
+	 * 
+	 */
+	protected void initPlugin(IControlCenterPlugin plugin)
+	{
 		if(plugins.get(plugin) == null)
 		{
 			try
@@ -582,17 +590,14 @@ public class ControlCenter implements IControlCenter
 					GuiProperties.setupHelp(comp, plugin.getHelpID());
 
 				window.content.add(comp, plugin.getName());
-				window.setPerspective(plugin);
+//				window.setPerspective(plugin);
 
-				setStatusText("Plugin activated successfully: "
-						+ plugin.getName());
+				setStatusText("Plugin activated successfully: "+ plugin.getName());
 			}
 			catch(Exception e)
 			{
 				e.printStackTrace();
-				final String failed = SUtil
-						.wrapText("Error during init of plugin "
-								+ plugin.getName() + "\n\n" + e);
+				final String failed = SUtil.wrapText("Error during init of plugin "+ plugin.getName() + "\n\n" + e);
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
@@ -603,12 +608,6 @@ public class ControlCenter implements IControlCenter
 				});
 			}
 		}
-		else
-		{
-			window.setPerspective(plugin);
-		}
-
-		window.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 
 	// -------- IControlCenter interface --------

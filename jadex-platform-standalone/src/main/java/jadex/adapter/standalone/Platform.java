@@ -70,10 +70,19 @@ public class Platform extends AbstractPlatform
 	public static String PLATFORM_SHUTDOWN_TIME = PLATFORM+SEPARATOR+"platform_shutdown_time";
 
 	/** The fallback configuration for basic services. */
-	public static final String FALLBACK_SERVICES_CONFIGURATION = "jadex/adapter/standalone/standalone_conf.xml";
+	public static final String FALLBACK_SERVICES_CONFIGURATION = "jadex/adapter/standalone/services_conf.xml";
 
-	/** The fallback configuration for standard components (ams/df/jcc). */
-	public static final String FALLBACK_COMPONENTS_CONFIGURATION = "jadex/adapter/standalone/standalone_platformcomponents_conf.xml";
+	/** The fallback configuration for standard agents (cms/df/jcc). */
+	public static final String FALLBACK_AGENTS_CONFIGURATION = "jadex/adapter/standalone/platformagents_conf.xml";
+
+	/** The fallback configuration for application kernel. */
+	public static final String FALLBACK_APPLICATION_CONFIGURATION = "jadex/application/kernel_application_conf.xml";
+	
+	/** The fallback configuration for bdi kernel. */
+	public static final String FALLBACK_BDI_CONFIGURATION = "jadex/bdi/kernel_bdi_conf.xml";
+	
+	/** The fallback configuration for micro kernel. */
+	public static final String FALLBACK_MICRO_CONFIGURATION = "jadex/micro/kernel_micro_conf.xml";
 
 	/** The configuration. */
 	protected Properties[] configurations;
@@ -404,7 +413,8 @@ public class Platform extends AbstractPlatform
 		}
 		else
 		{
-			conffiles = new String[]{FALLBACK_SERVICES_CONFIGURATION, FALLBACK_COMPONENTS_CONFIGURATION};
+			conffiles = new String[]{FALLBACK_SERVICES_CONFIGURATION, FALLBACK_AGENTS_CONFIGURATION,
+				FALLBACK_APPLICATION_CONFIGURATION, FALLBACK_BDI_CONFIGURATION, FALLBACK_MICRO_CONFIGURATION};
 		}
 		
 		// Create an instance of the platform.

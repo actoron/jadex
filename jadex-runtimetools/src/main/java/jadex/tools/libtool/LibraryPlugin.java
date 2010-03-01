@@ -21,6 +21,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -58,6 +59,17 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	
 	/** The list. */
 	protected EditableList classpaths;
+	
+	//-------- methods --------
+	
+	/**
+	 *  Test if this plugin should be initialized lazily.
+	 *  @return True, if lazy.
+	 */
+	public boolean isLazy()
+	{
+		return false;
+	}
 	
 	/**
 	 * @return "Library Tool"
@@ -280,7 +292,8 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		{
 			try
 			{
-				File	file = new File(ps[i].getValue());
+				
+				File	file = new File(URLDecoder.decode(ps[i].getValue()));
 				if(file.exists())
 				{
 					ls.addURL(file.toURI().toURL());
@@ -292,6 +305,7 @@ public class LibraryPlugin extends AbstractJCCPlugin
 			}
 			catch(Exception e)
 			{
+				e.printStackTrace();
 				System.out.println("Classpath problem: "+ps[i].getValue());
 			}
 		}
