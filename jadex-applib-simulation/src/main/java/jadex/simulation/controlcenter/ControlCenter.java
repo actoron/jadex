@@ -5,9 +5,9 @@ import jadex.simulation.model.Observer;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.result.IntermediateResult;
 
-import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.DateFormat;
@@ -22,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -39,7 +40,8 @@ public class ControlCenter extends JFrame {
 	private IBDIExternalAccess exta;
 	private SimulationConfiguration simConf;
 
-	// contains the list of table models that belong to the currently executed ensemble
+	// contains the list of table models that belong to the currently executed
+	// ensemble
 	private ArrayList<DefaultTableModel> currentListOfTableModels = new ArrayList<DefaultTableModel>();
 
 	private DefaultTableModel generalSettingsDm;
@@ -65,23 +67,36 @@ public class ControlCenter extends JFrame {
 	public ControlCenter(final IBDIExternalAccess agent) {
 		super("Automated Simulation Control Center");
 		this.exta = agent;
-		this.simConf = (SimulationConfiguration) exta.getBeliefbase().getBelief("simulationConf").getFact();
-		// this.env = (Environment) exta.getBeliefbase().getBelief("env").getFact();
-		
-		//Compute appropriate number of rows
-		int tmpRowNumber =(int)  Math.ceil(new Double(simConf.getRunConfiguration().getGeneral().getRows()/new Double(4)));		
-//		System.out.println("C: " + tmpRowNumber);
-//		mainPanel = new JPanel(new GridLayout(2, 1));
+		this.simConf = (SimulationConfiguration) exta.getBeliefbase()
+				.getBelief("simulationConf").getFact();
+		// this.env = (Environment)
+		// exta.getBeliefbase().getBelief("env").getFact();
+
+		// Compute appropriate number of rows
+		// int tmpRowNumber =(int) Math.ceil(new
+		// Double(simConf.getRunConfiguration().getGeneral().getRows()/new
+		// Double(4)));
+		// System.out.println("C: " + tmpRowNumber);
+		// mainPanel = new JPanel(new GridLayout(2, 1));
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-		
-		allEnsemblesPanel = new JPanel(new GridLayout(tmpRowNumber, 4));
+
+		// allEnsemblesPanel = new JPanel(new GridLayout(tmpRowNumber, 4));
+		allEnsemblesPanel = new JPanel();
+		allEnsemblesPanel.setLayout(new BoxLayout(allEnsemblesPanel,
+				BoxLayout.Y_AXIS));
+		JScrollPane allEnsemblesPanelScrollPane = new JScrollPane(
+				allEnsemblesPanel);
+		allEnsemblesPanelScrollPane.setPreferredSize(new Dimension(250, 200));
+		// allEnsemblesPanelallEnsemblesPanel
 
 		init();
-//		for (int i = 0; i < 1; i++) {
-//			createNewEnsembleTable(i);
-//		}
-		mainPanel.add(allEnsemblesPanel);
+		// for (int i = 0; i < 1; i++) {
+		// createNewEnsembleTable(i);
+		// }
+		// allEnsemblesPanelScrollPane.setv
+		// allEnsemblesPanelScrollPane.add(allEnsemblesPanel);
+		mainPanel.add(allEnsemblesPanelScrollPane);
 		// createNewEnsembleTable(0);
 		// createTrafficServiceTable();
 		// createBrokerTable();
@@ -92,8 +107,8 @@ public class ControlCenter extends JFrame {
 
 		pack();
 		setLocation(jadex.commons.SGUI.calculateMiddlePosition(this));
-//		setSize(620, 800);
-		setSize(900, 900);
+		// setSize(620, 800);
+		setSize(400, 400);
 		setVisible(true);
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -103,24 +118,34 @@ public class ControlCenter extends JFrame {
 	}
 
 	private void init() {
-//		JPanel staticInfos = new JPanel(new GridLayout(3, 2));
+		// JPanel staticInfos = new JPanel(new GridLayout(3, 2));
 
 		mainPanel.add(new JLabel("Name and Configuration: "));
-		mainPanel.add(new JLabel(simConf.getApplicationReference().substring(simConf.getApplicationReference().lastIndexOf("\\")) + " / " + simConf.getApplicationConfiguration()));
+		mainPanel.add(new JLabel(simConf.getApplicationReference().substring(
+				simConf.getApplicationReference().lastIndexOf("\\"))
+				+ " / " + simConf.getApplicationConfiguration()));
 		//		
 		//		
 		// //panel for run configuration: ensembles
-//		staticInfos.add(new JLabel("Ensembles: "));
-//		staticInfos.add(new JLabel("To be conducted: " + simConf.getRunConfiguration().getGeneral().getRows() + "     - Current: " + 0));
-		
-		staticInfosDm = new DefaultTableModel(new String[] { "Ensembles to conduct", "Currently Conducting", "Experiments to conduct", "Currently Conducting" }, 0);
+		// staticInfos.add(new JLabel("Ensembles: "));
+		// staticInfos.add(new JLabel("To be conducted: " +
+		// simConf.getRunConfiguration().getGeneral().getRows() +
+		// "     - Current: " + 0));
+
+		staticInfosDm = new DefaultTableModel(new String[] {
+				"Ensembles to conduct", "Currently Conducting",
+				"Experiments to conduct", "Currently Conducting" }, 0);
 		JTable staticInfosTable = new JTable(staticInfosDm);
-		staticInfosTable.setPreferredScrollableViewportSize(new Dimension(400, 30));
+		staticInfosTable.setPreferredScrollableViewportSize(new Dimension(400,
+				30));
+		staticInfosTable.setDefaultRenderer(Object.class, createDefaultCellRenderer());
 		// generalSettingsTable.getColumnModel().getColumn(0).setWidth(30);
 		// generalSettingsTable.getColumnModel().getColumn(1).setWidth(30);
-		staticInfosDm.addRow(new Object[] { simConf.getRunConfiguration().getGeneral().getRows(), 0 ,simConf.getRunConfiguration().getRows().getExperiments() ,0  });
-		
-		// tmp.add(new JLabel(String.valueOf(facts.getRunConfiguration().getGeneral().getRows())));
+		staticInfosDm.addRow(new Object[] {
+				simConf.getRunConfiguration().getGeneral().getRows(), 0,
+				simConf.getRunConfiguration().getRows().getExperiments(), 0 });
+		// tmp.add(new
+		// JLabel(String.valueOf(facts.getRunConfiguration().getGeneral().getRows())));
 		// tmp.add(new JLabel("Current: "));
 		// tmp.add(new JLabel(String.valueOf(0)));
 		//		
@@ -129,11 +154,14 @@ public class ControlCenter extends JFrame {
 		//		
 		//		
 		// //panel for run configuration: experiments
-//		staticInfos.add(new JLabel("Experiments: "));
-//		staticInfos.add(new JLabel("To be conducted: " + simConf.getRunConfiguration().getRows().getExperiments() + "     - Current: " + 0));
+		// staticInfos.add(new JLabel("Experiments: "));
+		// staticInfos.add(new JLabel("To be conducted: " +
+		// simConf.getRunConfiguration().getRows().getExperiments() +
+		// "     - Current: " + 0));
 		// tmp = new JPanel(new FlowLayout());
 		// tmp.add(new JLabel("To be conducted: "));
-		// tmp.add(new JLabel(String.valueOf(facts.getRunConfiguration().getRows().getExperiments())));
+		// tmp.add(new
+		// JLabel(String.valueOf(facts.getRunConfiguration().getRows().getExperiments())));
 		// tmp.add(new JLabel("Current: "));
 		// tmp.add(new JLabel(String.valueOf(1)));
 		//		
@@ -151,12 +179,13 @@ public class ControlCenter extends JFrame {
 		// staticInfos.add(ensembles);
 		// staticInfos.add(experiments);
 
-		mainPanel.add(new JScrollPane(staticInfosTable));		
+		mainPanel.add(new JScrollPane(staticInfosTable));
 
 		// do Observer table
 		JPanel observerPnl = new JPanel();
 
-		String[] columnNames = { "Name", "ObjectType", "ObjectName", "ElementName", "EvaluationMode", "FilterMode" };
+		String[] columnNames = { "Name", "ObjectType", "ObjectName",
+				"ElementName", "EvaluationMode", "FilterMode" };
 		Object[][] data = new Object[simConf.getObserverList().size()][6];
 
 		for (int i = 0; i < simConf.getObserverList().size(); i++) {
@@ -164,11 +193,16 @@ public class ControlCenter extends JFrame {
 
 			// JPanel tmp = new JPanel(new FlowLayout());
 			// JLabel name = new JLabel("Name: " + obs.getData().getName());
-			// JLabel objectType = new JLabel("ObjectType: " + obs.getData().getObjectSource().getType());
-			// JLabel objectName = new JLabel("ObjectName: " + obs.getData().getObjectSource().getName());
-			// JLabel elementName = new JLabel("ElementName: " + obs.getData().getElementSource().getName());
-			// JLabel evaluationMode = new JLabel("EvaluationMode: " + obs.getEvaluation().getMode());
-			// JLabel filterMode = new JLabel("FilterMode: " + obs.getFilter().getMode());
+			// JLabel objectType = new JLabel("ObjectType: " +
+			// obs.getData().getObjectSource().getType());
+			// JLabel objectName = new JLabel("ObjectName: " +
+			// obs.getData().getObjectSource().getName());
+			// JLabel elementName = new JLabel("ElementName: " +
+			// obs.getData().getElementSource().getName());
+			// JLabel evaluationMode = new JLabel("EvaluationMode: " +
+			// obs.getEvaluation().getMode());
+			// JLabel filterMode = new JLabel("FilterMode: " +
+			// obs.getFilter().getMode());
 
 			// do for table:
 
@@ -198,47 +232,59 @@ public class ControlCenter extends JFrame {
 	}
 
 	/**
-	 * Creates new panels and tables to show information related to the evaluation of an ensemble
+	 * Creates new panels and tables to show information related to the
+	 * evaluation of an ensemble
 	 */
 	public void createNewEnsembleTable(int ensemleNr) {
 		// takes the sub components of this ensemble
-//		JPanel singleEnsemblePnl = new JPanel(new BorderLayout());
+		// JPanel singleEnsemblePnl = new JPanel(new BorderLayout());
 		JPanel singleEnsemblePnl = new JPanel();
-		singleEnsemblePnl.setLayout(new BoxLayout(singleEnsemblePnl, BoxLayout.Y_AXIS));		
-
+		singleEnsemblePnl.setLayout(new BoxLayout(singleEnsemblePnl,
+				BoxLayout.Y_AXIS));
 
 		// contains the elements of the "north" part of the panel
-//		JPanel northPnl = new JPanel(new GridLayout(2, 1));
+		// JPanel northPnl = new JPanel(new GridLayout(2, 1));
 
 		// create table, that contains the general settings
-		generalSettingsDm = new DefaultTableModel(new String[] { "Ensemble Number", "Already Conducted" }, 0);
+		generalSettingsDm = new DefaultTableModel(new String[] {
+				"Ensemble Number", "Already Conducted" }, 0);
 		JTable generalSettingsTable = new JTable(generalSettingsDm);
-		generalSettingsTable.setPreferredScrollableViewportSize(new Dimension(400, 30));
+		generalSettingsTable.setPreferredScrollableViewportSize(new Dimension(
+				400, 30));
 		// generalSettingsTable.getColumnModel().getColumn(0).setWidth(30);
 		// generalSettingsTable.getColumnModel().getColumn(1).setWidth(30);
 		generalSettingsDm.addRow(new Object[] { ensemleNr, 0 });
 
-		// create the first table, that contains the cumulated results of the already conducted experiments of an ensemble
-		ensembleResultsDm = new DefaultTableModel(new String[] { "ObserverName", "Mean Value", "Median Value", "SimpleVariance Value" }, 0);
+		// create the first table, that contains the cumulated results of the
+		// already conducted experiments of an ensemble
+		ensembleResultsDm = new DefaultTableModel(new String[] {
+				"ObserverName", "Mean Value", "Median Value",
+				"SimpleVariance Value" }, 0);
 		JTable ensembleResultsTable = new JTable(ensembleResultsDm);
-		ensembleResultsTable.setPreferredScrollableViewportSize(new Dimension(400, 30));
+		ensembleResultsTable.setPreferredScrollableViewportSize(new Dimension(
+				400, 40));
 		for (Observer obs : simConf.getObserverList()) {
-			ensembleResultsDm.addRow(new Object[] { obs.getData().getName(), "--", "--", "--" });
+			ensembleResultsDm.addRow(new Object[] { obs.getData().getName(),
+					"--", "--", "--" });
 		}
 
 		// contains the results of the single experiments
-		singleExperimentsDm = new DefaultTableModel(new String[] { "ID", "Observer Name", "Observed Values" }, 0);
+		singleExperimentsDm = new DefaultTableModel(new String[] { "ID",
+				"Observer Name", "Observed Values" }, 0);
 		JTable singleExperimentsTable = new JTable(singleExperimentsDm);
 		singleExperimentsTable.setAutoCreateRowSorter(true);
-		singleExperimentsTable.setPreferredScrollableViewportSize(new Dimension(400, 90));
-		// singleExperimentsDm.addRow(new Object[]{0, facts.getObserverList().get(0).getData().getName(), "--"});
+		singleExperimentsTable
+				.setPreferredScrollableViewportSize(new Dimension(400, 90));
+		// singleExperimentsDm.addRow(new Object[]{0,
+		// facts.getObserverList().get(0).getData().getName(), "--"});
 
-		// northPnl.add(new JLabel("Cumulated and Single Results of ensemble: " + 0));
-//		northPnl.add(new JScrollPane(generalSettingsTable));
-//		northPnl.add(new JScrollPane(ensembleResultsTable));
+		// northPnl.add(new JLabel("Cumulated and Single Results of ensemble: "
+		// + 0));
+		// northPnl.add(new JScrollPane(generalSettingsTable));
+		// northPnl.add(new JScrollPane(ensembleResultsTable));
 		singleEnsemblePnl.add(new JScrollPane(generalSettingsTable));
 		singleEnsemblePnl.add(new JScrollPane(ensembleResultsTable));
-//		singleEnsemblePnl.add( northPnl);
+		// singleEnsemblePnl.add( northPnl);
 		singleEnsemblePnl.add(new JScrollPane(singleExperimentsTable));
 
 		currentListOfTableModels.add(ensembleResultsDm);
@@ -247,16 +293,18 @@ public class ControlCenter extends JFrame {
 		allEnsemblesPanel.add(singleEnsemblePnl);
 		mainPanel.revalidate();
 		// mainPanel.add(allEnsemblesPanel);
-		
-		//update also static part
+
+		// update also static part
 		updateStaticTable(ensemleNr, 0);
 
 		// // Add IBeliefListener
-		// exta.getBeliefbase().getBelief("listOfStreets").addBeliefListener(new IBeliefListener() {
+		// exta.getBeliefbase().getBelief("listOfStreets").addBeliefListener(new
+		// IBeliefListener() {
 		//
 		// @Override
 		// public void beliefChanged(AgentEvent arg0) {
-		// // System.out.println("\nBELIEFLISTENER for StreetList ACTIVATED!!!!\n");
+		// //
+		// System.out.println("\nBELIEFLISTENER for StreetList ACTIVATED!!!!\n");
 		// refreshEnsembleTable();
 		// }
 		// }, false);
@@ -279,26 +327,32 @@ public class ControlCenter extends JFrame {
 	/**
 	 * Updates the results of the currently running ensemble
 	 */
-	public void updateCurrentEnsembleTable(int nrOfEnsemble, int nrOfConductedExperiments, IntermediateResult interRes) {
+	public void updateCurrentEnsembleTable(int nrOfEnsemble,
+			int nrOfConductedExperiments, IntermediateResult interRes) {
 
 		// update general settings
 		generalSettingsDm.removeRow(0);
-		generalSettingsDm.addRow(new Object[] { nrOfEnsemble, nrOfConductedExperiments });
+		generalSettingsDm.addRow(new Object[] { nrOfEnsemble,
+				nrOfConductedExperiments });
 
 		// update statistical results of ensemble
 		while (ensembleResultsDm.getRowCount() > 0) {
 			ensembleResultsDm.removeRow(0);
 		}
 
-		HashMap<String, HashMap<String, String>> intermediateStats = interRes.getIntermediateStats();
+		HashMap<String, HashMap<String, String>> intermediateStats = interRes
+				.getIntermediateStats();
 		for (Iterator it = intermediateStats.keySet().iterator(); it.hasNext();) {
 			Object key = it.next();
 			HashMap<String, String> values = intermediateStats.get(key);
-			ensembleResultsDm.addRow(new Object[] { key, values.get("MeanValue"), values.get("MedianValue"), values.get("sampleVarianceValue") });
+			ensembleResultsDm.addRow(new Object[] { key,
+					values.get("MeanValue"), values.get("MedianValue"),
+					values.get("sampleVarianceValue") });
 		}
 
 		// update table that contains results of the single experiments
-		HashMap<String, ArrayList<String>> latestResults = interRes.getLatestObserverResults();
+		HashMap<String, ArrayList<String>> latestResults = interRes
+				.getLatestObserverResults();
 		for (Iterator it = latestResults.keySet().iterator(); it.hasNext();) {
 			Object key = it.next();
 			ArrayList<String> values = latestResults.get(key);
@@ -308,16 +362,22 @@ public class ControlCenter extends JFrame {
 			for (String string : values) {
 				tmpRes += string + ";";
 			}
-			singleExperimentsDm.addRow(new Object[] { nrOfConductedExperiments - 1, key, tmpRes });
+			singleExperimentsDm.addRow(new Object[] {
+					nrOfConductedExperiments - 1, key, tmpRes });
 		}
-		
-		//update also static part of control center
+
+		// update also static part of control center
 		updateStaticTable(nrOfEnsemble, nrOfConductedExperiments);
 	}
-	
-	private void updateStaticTable(int nrOfEnsemble, int nrOfConductedExperiments){
+
+	private void updateStaticTable(int nrOfEnsemble,
+			int nrOfConductedExperiments) {
 		staticInfosDm.removeRow(0);
-		staticInfosDm.addRow(new Object[] { simConf.getRunConfiguration().getGeneral().getRows(), nrOfEnsemble ,simConf.getRunConfiguration().getRows().getExperiments(),nrOfConductedExperiments});
+		staticInfosDm.addRow(new Object[] {
+				simConf.getRunConfiguration().getGeneral().getRows(),
+				nrOfEnsemble,
+				simConf.getRunConfiguration().getRows().getExperiments(),
+				nrOfConductedExperiments });
 	}
 
 	// /**
@@ -335,7 +395,8 @@ public class ControlCenter extends JFrame {
 	// while (it.hasNext()) {
 	// Map.Entry entry = (Map.Entry) it.next();
 	// StreetStatusObject streetObj = (StreetStatusObject) entry.getValue();
-	// String currentStatus, currentCapacity, currentNumberOfVehicles, maxNumberOfVehicles;
+	// String currentStatus, currentCapacity, currentNumberOfVehicles,
+	// maxNumberOfVehicles;
 	// // The last update of the StreetObject can't be older than 12sek
 	// if (streetObj.getTimeStamp() + 12000 < System.currentTimeMillis()) {
 	// currentStatus = "Street Status is not up to date!";
@@ -344,11 +405,15 @@ public class ControlCenter extends JFrame {
 	// maxNumberOfVehicles = "n/a";
 	// } else {
 	// currentStatus = "OK";
-	// currentCapacity = String.valueOf(formatOutput(streetObj.getCurrentCapacity())) + "%";
-	// currentNumberOfVehicles = String.valueOf(streetObj.getCurrentNumberOfVehicles());
+	// currentCapacity =
+	// String.valueOf(formatOutput(streetObj.getCurrentCapacity())) + "%";
+	// currentNumberOfVehicles =
+	// String.valueOf(streetObj.getCurrentNumberOfVehicles());
 	// maxNumberOfVehicles = String.valueOf(streetObj.getMaxNumberOfVehicles());
 	// }
-	// streetsdm.addRow(new Object[] { streetObj.getStreetDirection(), currentStatus, currentCapacity, currentNumberOfVehicles, maxNumberOfVehicles });
+	// streetsdm.addRow(new Object[] { streetObj.getStreetDirection(),
+	// currentStatus, currentCapacity, currentNumberOfVehicles,
+	// maxNumberOfVehicles });
 	// }
 	// }
 
@@ -359,61 +424,76 @@ public class ControlCenter extends JFrame {
 	// private synchronized void createTrafficServiceTable() {
 	// // create TrafficServiceTable
 	// this.trafficServicesdm = new DefaultTableModel(
-	// new String[] { "Traffic Services", "Status", "Current Capacity", "VehicleType", "TrafficType", "StreetType", "Conn to Street", "Conn to Broker" }, 0);
+	// new String[] { "Traffic Services", "Status", "Current Capacity",
+	// "VehicleType", "TrafficType", "StreetType", "Conn to Street",
+	// "Conn to Broker" }, 0);
 	// JTable trafficServicesTable = new JTable(trafficServicesdm);
 	// trafficServicesTable.setAutoCreateRowSorter(true);
-	// trafficServicesTable.setPreferredScrollableViewportSize(new Dimension(400, 180));
-//	 trafficServicesTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-//	 public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column) {
-//	 Component comp = super.getTableCellRendererComponent(table, value, selected, focus, row, column);
-//	 setOpaque(true);
-//	 if (column == 0) {
-//	 setHorizontalAlignment(LEFT);
-//	 } else {
-//	 setHorizontalAlignment(CENTER);
-//	 }
-//	 if (!selected) {
-//	 String status = String.valueOf(trafficServicesdm.getValueAt(row, 1));
-//	 if (status.equals("OK")) {
-//	 String currentCapacity = String.valueOf(trafficServicesdm.getValueAt(row, 2));
-//	 String hasConnToStreet = String.valueOf(trafficServicesdm.getValueAt(row, 6));
-//	 String hasConToBroker = String.valueOf(trafficServicesdm.getValueAt(row, 7));
-//	 // / Is it a double or a String
-//	 if (currentCapacity.indexOf("%") != -1) {
-//	 currentCapacity = currentCapacity.substring(0, currentCapacity.length() - 1);
-//	 double capacity = Double.valueOf(currentCapacity);
-//	 if (capacity != -1.0 && hasConnToStreet.equals("true") && hasConToBroker.equals("true")) {
-//	 // service is working properly
-//	 comp.setBackground(Color.GREEN);
-//	 } else {
-//	 // service is up to date but not working
-//	 // properly
-//	 comp.setBackground(Color.GRAY);
-//	 }
-//	 // Just in case there is an error
-//	 } else {
-//	 comp.setBackground(Color.YELLOW);
-//	 }
-//	 } else {
-//	 comp.setBackground(Color.RED);
-//	 }
-//	 }
-//	 return comp;
-//	 }
-//	 });
+	// trafficServicesTable.setPreferredScrollableViewportSize(new
+	// Dimension(400, 180));
+	// trafficServicesTable.setDefaultRenderer(Object.class, new
+	// DefaultTableCellRenderer() {
+	// public Component getTableCellRendererComponent(JTable table, Object
+	// value, boolean selected, boolean focus, int row, int column) {
+	// Component comp = super.getTableCellRendererComponent(table, value,
+	// selected, focus, row, column);
+	// setOpaque(true);
+	// if (column == 0) {
+	// setHorizontalAlignment(LEFT);
+	// } else {
+	// setHorizontalAlignment(CENTER);
+	// }
+	// if (!selected) {
+	// String status = String.valueOf(trafficServicesdm.getValueAt(row, 1));
+	// if (status.equals("OK")) {
+	// String currentCapacity = String.valueOf(trafficServicesdm.getValueAt(row,
+	// 2));
+	// String hasConnToStreet = String.valueOf(trafficServicesdm.getValueAt(row,
+	// 6));
+	// String hasConToBroker = String.valueOf(trafficServicesdm.getValueAt(row,
+	// 7));
+	// // / Is it a double or a String
+	// if (currentCapacity.indexOf("%") != -1) {
+	// currentCapacity = currentCapacity.substring(0, currentCapacity.length() -
+	// 1);
+	// double capacity = Double.valueOf(currentCapacity);
+	// if (capacity != -1.0 && hasConnToStreet.equals("true") &&
+	// hasConToBroker.equals("true")) {
+	// // service is working properly
+	// comp.setBackground(Color.GREEN);
+	// } else {
+	// // service is up to date but not working
+	// // properly
+	// comp.setBackground(Color.GRAY);
+	// }
+	// // Just in case there is an error
+	// } else {
+	// comp.setBackground(Color.YELLOW);
+	// }
+	// } else {
+	// comp.setBackground(Color.RED);
+	// }
+	// }
+	// return comp;
+	// }
+	// });
 	//
 	// JPanel trafficServicePnl = new JPanel(new BorderLayout());
-	// trafficServicePnl.add(BorderLayout.NORTH, new JLabel("Status of Traffic Service Agents"));
-	// trafficServicePnl.add(BorderLayout.CENTER, new JScrollPane(trafficServicesTable));
+	// trafficServicePnl.add(BorderLayout.NORTH, new
+	// JLabel("Status of Traffic Service Agents"));
+	// trafficServicePnl.add(BorderLayout.CENTER, new
+	// JScrollPane(trafficServicesTable));
 	// refreshTrafficServiceTable();
 	// mainPanel.add(trafficServicePnl);
 	//
 	// // Add IBeliefListener
-	// exta.getBeliefbase().getBelief("listOfTrafficServices").addBeliefListener(new IBeliefListener() {
+	// exta.getBeliefbase().getBelief("listOfTrafficServices").addBeliefListener(new
+	// IBeliefListener() {
 	//
 	// @Override
 	// public void beliefChanged(AgentEvent arg0) {
-	// // System.out.println("\nBELIEFLISTENER for TrafficService ACTIVATED!!!!\n");
+	// //
+	// System.out.println("\nBELIEFLISTENER for TrafficService ACTIVATED!!!!\n");
 	// refreshTrafficServiceTable();
 	// }
 	// }, false);
@@ -432,7 +512,62 @@ public class ControlCenter extends JFrame {
 	// }
 	// });
 	// }
-	//
+
+	private DefaultTableCellRenderer createDefaultCellRenderer() {
+
+		return new DefaultTableCellRenderer() {
+			public Component getTableCellRendererComponent(JTable table,
+					Object value, boolean selected, boolean focus, int row,
+					int column) {
+				Component comp = super.getTableCellRendererComponent(table,
+						value, selected, focus, row, column);
+				setOpaque(true);
+				if (!selected) {
+				if (column >= 0) {
+					setHorizontalAlignment(CENTER);
+				} 
+				if (column == 1 && row==0) {
+					comp.setBackground(Color.GREEN);
+				} 
+				}
+//				if (!selected) {
+//					String status = String.valueOf(trafficServicesdm
+//							.getValueAt(row, 1));
+//					if (status.equals("OK")) {
+//						String currentCapacity = String
+//								.valueOf(trafficServicesdm.getValueAt(row, 2));
+//						String hasConnToStreet = String
+//								.valueOf(trafficServicesdm.getValueAt(row, 6));
+//						String hasConToBroker = String
+//								.valueOf(trafficServicesdm.getValueAt(row, 7));
+//						// / Is it a double or a String
+//						if (currentCapacity.indexOf("%") != -1) {
+//							currentCapacity = currentCapacity.substring(0,
+//									currentCapacity.length() - 1);
+//							double capacity = Double.valueOf(currentCapacity);
+//							if (capacity != -1.0
+//									&& hasConnToStreet.equals("true")
+//									&& hasConToBroker.equals("true")) {
+//								// service is working properly
+//								comp.setBackground(Color.GREEN);
+//							} else {
+//								// service is up to date but not working
+//								// properly
+//								comp.setBackground(Color.GRAY);
+//							}
+//							// Just in case there is an error
+//						} else {
+//							comp.setBackground(Color.YELLOW);
+//						}
+//					} else {
+//						comp.setBackground(Color.RED);
+//					}
+//				}
+				return comp;
+			}
+		};
+	}
+
 	// /**
 	// * Refresh the street table.
 	// */
@@ -442,28 +577,37 @@ public class ControlCenter extends JFrame {
 	// while (trafficServicesdm.getRowCount() > 0)
 	// trafficServicesdm.removeRow(0);
 	// // Add new values
-	// HashMap<String, TrafficServiceObject> trafficServices = env.getRegisteredTrafficServices();
+	// HashMap<String, TrafficServiceObject> trafficServices =
+	// env.getRegisteredTrafficServices();
 	// Set trafficServiceSet = trafficServices.entrySet();
 	// Iterator it = trafficServiceSet.iterator();
 	// while (it.hasNext()) {
 	// Map.Entry entry = (Map.Entry) it.next();
-	// TrafficServiceObject trafficServiceObj = (TrafficServiceObject) entry.getValue();
+	// TrafficServiceObject trafficServiceObj = (TrafficServiceObject)
+	// entry.getValue();
 	// // String trafficServiceInfo;
 	// // The last update of the TrafficServiceObject can't be older than
 	// // 12sek
-	// if (trafficServiceObj.getTimeStamp() + 12000 < System.currentTimeMillis()) {
+	// if (trafficServiceObj.getTimeStamp() + 12000 <
+	// System.currentTimeMillis()) {
 	// // trafficServiceInfo = "TrafficService not up to date!";
 	// // System.out.println("*********\n\n\n" +
 	// // "-->  NOT UP TO DATE");
-	// trafficServicesdm.addRow(new Object[] { trafficServiceObj.getId(), "TrafficService not up to date!", "-1.0%", trafficServiceObj.getVehicleType(), trafficServiceObj.getTrafficType(),
+	// trafficServicesdm.addRow(new Object[] { trafficServiceObj.getId(),
+	// "TrafficService not up to date!", "-1.0%",
+	// trafficServiceObj.getVehicleType(), trafficServiceObj.getTrafficType(),
 	// trafficServiceObj.getStreetType(), false, false });
 	// } else {
 	// // trafficServiceInfo =
 	// // "OK";String.valueOf(formatOutput(streetObj.getCurrentCapacity()))
 	// // + "%";
 	// // System.out.println("*********\n\n\n" + "-->  OK");
-	// trafficServicesdm.addRow(new Object[] { trafficServiceObj.getId(), "OK", String.valueOf(formatOutput(trafficServiceObj.getCurrentcapacity())) + "%",
-	// trafficServiceObj.getVehicleType(), trafficServiceObj.getTrafficType(), trafficServiceObj.getStreetType(), trafficServiceObj.isHasConnectionToStreet(),
+	// trafficServicesdm.addRow(new Object[] { trafficServiceObj.getId(), "OK",
+	// String.valueOf(formatOutput(trafficServiceObj.getCurrentcapacity())) +
+	// "%",
+	// trafficServiceObj.getVehicleType(), trafficServiceObj.getTrafficType(),
+	// trafficServiceObj.getStreetType(),
+	// trafficServiceObj.isHasConnectionToStreet(),
 	// trafficServiceObj.isHasConnectionToBroker() });
 	// }
 	// // trafficServicesdm.addRow(new Object[] {
@@ -486,14 +630,19 @@ public class ControlCenter extends JFrame {
 	// // create BrokerTable
 	// // this.brokersdm = new DefaultTableModel(new String[] { "Position",
 	// // "Registered TrafficServices" }, 0);
-	// this.brokersdm = new DefaultTableModel(new String[] { "Position", "Status", "TrafficService", "Current Capacity", "VehicleType", "TrafficType", "StreetType" }, 0);
+	// this.brokersdm = new DefaultTableModel(new String[] { "Position",
+	// "Status", "TrafficService", "Current Capacity", "VehicleType",
+	// "TrafficType", "StreetType" }, 0);
 	// JTable brokersTable = new JTable(brokersdm);
 	// brokersTable.setAutoCreateRowSorter(true);
 	// // brokersTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 	// brokersTable.setPreferredScrollableViewportSize(new Dimension(400, 180));
-	// brokersTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-	// public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column) {
-	// Component comp = super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+	// brokersTable.setDefaultRenderer(Object.class, new
+	// DefaultTableCellRenderer() {
+	// public Component getTableCellRendererComponent(JTable table, Object
+	// value, boolean selected, boolean focus, int row, int column) {
+	// Component comp = super.getTableCellRendererComponent(table, value,
+	// selected, focus, row, column);
 	// setOpaque(true);
 	// if (column == 0) {
 	// setHorizontalAlignment(LEFT);
@@ -535,7 +684,8 @@ public class ControlCenter extends JFrame {
 	// comp.setBackground(Color.RED);
 	// // Broker is "online", but has no registered
 	// // TraffficServices
-	// } else if (status.equals("No TrafficServices registered at this Broker!")) {
+	// } else if
+	// (status.equals("No TrafficServices registered at this Broker!")) {
 	// comp.setBackground(Color.GRAY);
 	// }
 	// }
@@ -550,7 +700,8 @@ public class ControlCenter extends JFrame {
 	// mainPanel.add(brokerPnl);
 	//
 	// // Add IBeliefListener
-	// exta.getBeliefbase().getBelief("listOfBrokers").addBeliefListener(new IBeliefListener() {
+	// exta.getBeliefbase().getBelief("listOfBrokers").addBeliefListener(new
+	// IBeliefListener() {
 	//
 	// @Override
 	// public void beliefChanged(AgentEvent arg0) {
@@ -598,19 +749,27 @@ public class ControlCenter extends JFrame {
 	// // The last update of the StreetObject can't be older than 12sek
 	// if (brokerObj.getTimestamp() + 12000 < System.currentTimeMillis()) {
 	// // brokerInfo = "BrokerList not up to date!";;
-	// brokersdm.addRow(new Object[] { brokerObj.getPosition(), "BrokerList not up to date!", "--", "--", "--", "--", "--", "--" });
+	// brokersdm.addRow(new Object[] { brokerObj.getPosition(),
+	// "BrokerList not up to date!", "--", "--", "--", "--", "--", "--" });
 	// } else {
-	// ArrayList<TrafficServiceObject> brokerList = (ArrayList<TrafficServiceObject>) brokerObj.getRegisteredTrafficServices();
+	// ArrayList<TrafficServiceObject> brokerList =
+	// (ArrayList<TrafficServiceObject>)
+	// brokerObj.getRegisteredTrafficServices();
 	// // Check if the Broker has registered TrafficServices
 	// if (brokerList.size() > 0) {
 	// // Display all registered services
 	// for (int i = 0; i < brokerList.size(); i++) {
 	// // brokerInfo += brokerList.get(i).toString() + "; ";
-	// brokersdm.addRow(new Object[] { brokerObj.getPosition(), "OK", brokerList.get(i).getId(), formatOutput(brokerList.get(i).getCurrentcapacity()) + "%",
-	// brokerList.get(i).getVehicleType(), brokerList.get(i).getTrafficType(), brokerList.get(i).getStreetType() });
+	// brokersdm.addRow(new Object[] { brokerObj.getPosition(), "OK",
+	// brokerList.get(i).getId(),
+	// formatOutput(brokerList.get(i).getCurrentcapacity()) + "%",
+	// brokerList.get(i).getVehicleType(), brokerList.get(i).getTrafficType(),
+	// brokerList.get(i).getStreetType() });
 	// }
 	// } else {
-	// brokersdm.addRow(new Object[] { brokerObj.getPosition(), "No TrafficServices registered at this Broker!", "--", "--", "--", "--", "--", "--" });
+	// brokersdm.addRow(new Object[] { brokerObj.getPosition(),
+	// "No TrafficServices registered at this Broker!", "--", "--", "--", "--",
+	// "--", "--" });
 	// // tmpdm.addRow(new Object[] {
 	// // "No TrafficServices registered at this Broker!", "--",
 	// // "--", "--", "--" });
@@ -625,20 +784,27 @@ public class ControlCenter extends JFrame {
 	// }
 	//
 	// /**
-	// * Creates the table to show information related to all driving vehicles at
+	// * Creates the table to show information related to all driving vehicles
+	// at
 	// * this moment
 	// */
 	// private synchronized void createDrivingVehiclesTable() {
 	// // create DrivingVehiclesTable
-	// this.drivingVehiclesdm = new DefaultTableModel(new String[] { "Vehicles", "StartPosition", "EndPosition", "CurrentPosition", "StartTime", "EndTime", "SubRouteInfo", "VehicleType",
+	// this.drivingVehiclesdm = new DefaultTableModel(new String[] { "Vehicles",
+	// "StartPosition", "EndPosition", "CurrentPosition", "StartTime",
+	// "EndTime", "SubRouteInfo", "VehicleType",
 	// "TrafficType" }, 0);
 	// JTable vehiclesTable = new JTable(drivingVehiclesdm);
 	// vehiclesTable.setAutoCreateRowSorter(true);
-	// vehiclesTable.setPreferredScrollableViewportSize(new Dimension(400, 180));
+	// vehiclesTable.setPreferredScrollableViewportSize(new Dimension(400,
+	// 180));
 	// // vehiclesTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-	// vehiclesTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-	// public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column) {
-	// Component comp = super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+	// vehiclesTable.setDefaultRenderer(Object.class, new
+	// DefaultTableCellRenderer() {
+	// public Component getTableCellRendererComponent(JTable table, Object
+	// value, boolean selected, boolean focus, int row, int column) {
+	// Component comp = super.getTableCellRendererComponent(table, value,
+	// selected, focus, row, column);
 	// setOpaque(true);
 	// if (column == 0) {
 	// setHorizontalAlignment(LEFT);
@@ -682,17 +848,20 @@ public class ControlCenter extends JFrame {
 	// });
 	//
 	// JPanel vehiclesPnl = new JPanel(new BorderLayout());
-	// vehiclesPnl.add(BorderLayout.NORTH, new JLabel("Status of Driving Vehicles Agents"));
+	// vehiclesPnl.add(BorderLayout.NORTH, new
+	// JLabel("Status of Driving Vehicles Agents"));
 	// vehiclesPnl.add(BorderLayout.CENTER, new JScrollPane(vehiclesTable));
 	// refreshDrivingVehicleTable();
 	// mainVehiclePnl.add(vehiclesPnl);
 	//
 	// // Add IBeliefListener
-	// exta.getBeliefbase().getBelief("listOfDrivingVehicles").addBeliefListener(new IBeliefListener() {
+	// exta.getBeliefbase().getBelief("listOfDrivingVehicles").addBeliefListener(new
+	// IBeliefListener() {
 	//
 	// @Override
 	// public void beliefChanged(AgentEvent arg0) {
-	// // System.out.println("\nBELIEFLISTENER for DrivingVehicles ACTIVATED!!!!\n");
+	// //
+	// System.out.println("\nBELIEFLISTENER for DrivingVehicles ACTIVATED!!!!\n");
 	// refreshDrivingVehicleTable();
 	// }
 	// }, false);
@@ -721,7 +890,9 @@ public class ControlCenter extends JFrame {
 	// // while (drivingVehiclesdm.getRowCount() > 0)
 	// // drivingVehiclesdm.removeRow(0);
 	//		
-	// this.drivingVehiclesdm = new DefaultTableModel(new String[] { "Vehicles", "StartPosition", "EndPosition", "CurrentPosition", "StartTime", "EndTime", "SubRouteInfo", "VehicleType",
+	// this.drivingVehiclesdm = new DefaultTableModel(new String[] { "Vehicles",
+	// "StartPosition", "EndPosition", "CurrentPosition", "StartTime",
+	// "EndTime", "SubRouteInfo", "VehicleType",
 	// "TrafficType" }, 0);
 	//		
 	//		
@@ -749,8 +920,13 @@ public class ControlCenter extends JFrame {
 	// // "OK";String.valueOf(formatOutput(streetObj.getCurrentCapacity()))
 	// // + "%";
 	// // System.out.println("*********\n\n\n" + "-->  OK");
-	// drivingVehiclesdm.addRow(new Object[] { vehicleObj.getId(), vehicleObj.getStartposition(), vehicleObj.getEndposition(), vehicleObj.getCurrentPosition(),
-	// longToDateString(vehicleObj.getStartTime()), longToDateString(vehicleObj.getEndTime()), routeLogListToString(vehicleObj.getRouteLogList()), vehicleObj.getVehicleType(),
+	// drivingVehiclesdm.addRow(new Object[] { vehicleObj.getId(),
+	// vehicleObj.getStartposition(), vehicleObj.getEndposition(),
+	// vehicleObj.getCurrentPosition(),
+	// longToDateString(vehicleObj.getStartTime()),
+	// longToDateString(vehicleObj.getEndTime()),
+	// routeLogListToString(vehicleObj.getRouteLogList()),
+	// vehicleObj.getVehicleType(),
 	// vehicleObj.getTrafficType() });
 	// }
 	// }
@@ -760,14 +936,20 @@ public class ControlCenter extends JFrame {
 	// */
 	// private synchronized void createFinishedVehiclesTable() {
 	// // create FinishedVehiclesTable
-	// this.finishedVehiclesdm = new DefaultTableModel(new String[] { "Vehicles", "StartPosition", "EndPosition", "CurrentPosition", "StartTime", "EndTime", "TravelTime", "SubRouteInfo", "VehicleType",
+	// this.finishedVehiclesdm = new DefaultTableModel(new String[] {
+	// "Vehicles", "StartPosition", "EndPosition", "CurrentPosition",
+	// "StartTime", "EndTime", "TravelTime", "SubRouteInfo", "VehicleType",
 	// "TrafficType" }, 0);
 	// JTable vehiclesTable = new JTable(finishedVehiclesdm);
 	// vehiclesTable.setAutoCreateRowSorter(true);
-	// vehiclesTable.setPreferredScrollableViewportSize(new Dimension(400, 180));
-	// vehiclesTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-	// public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column) {
-	// Component comp = super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+	// vehiclesTable.setPreferredScrollableViewportSize(new Dimension(400,
+	// 180));
+	// vehiclesTable.setDefaultRenderer(Object.class, new
+	// DefaultTableCellRenderer() {
+	// public Component getTableCellRendererComponent(JTable table, Object
+	// value, boolean selected, boolean focus, int row, int column) {
+	// Component comp = super.getTableCellRendererComponent(table, value,
+	// selected, focus, row, column);
 	// setOpaque(true);
 	// if (column == 0) {
 	// setHorizontalAlignment(LEFT);
@@ -811,18 +993,21 @@ public class ControlCenter extends JFrame {
 	// });
 	//
 	// JPanel vehiclesPnl = new JPanel(new BorderLayout());
-	// vehiclesPnl.add(BorderLayout.NORTH, new JLabel("Information about Finished / Terminated Vehicles Agents"));
+	// vehiclesPnl.add(BorderLayout.NORTH, new
+	// JLabel("Information about Finished / Terminated Vehicles Agents"));
 	// vehiclesPnl.add(BorderLayout.CENTER, new JScrollPane(vehiclesTable));
 	// refreshFinishedVehicleTable();
 	// mainVehiclePnl.add(vehiclesPnl);
 	// mainPanel.add(mainVehiclePnl);
 	//
 	// // Add IBeliefListener
-	// exta.getBeliefbase().getBelief("listOfFinishedVehicles").addBeliefListener(new IBeliefListener() {
+	// exta.getBeliefbase().getBelief("listOfFinishedVehicles").addBeliefListener(new
+	// IBeliefListener() {
 	//
 	// @Override
 	// public void beliefChanged(AgentEvent arg0) {
-	// // System.out.println("\nBELIEFLISTENER for FinishedVehicles ACTIVATED!!!!\n");
+	// //
+	// System.out.println("\nBELIEFLISTENER for FinishedVehicles ACTIVATED!!!!\n");
 	// refreshFinishedVehicleTable();
 	// }
 	// }, false);
@@ -874,27 +1059,32 @@ public class ControlCenter extends JFrame {
 	// // "OK";String.valueOf(formatOutput(streetObj.getCurrentCapacity()))
 	// // + "%";
 	// // System.out.println("*********\n\n\n" + "-->  OK");
-	// finishedVehiclesdm.addRow(new Object[] { vehicleObj.getId(), vehicleObj.getStartposition(), vehicleObj.getEndposition(), vehicleObj.getCurrentPosition(),
-	// longToDateString(vehicleObj.getStartTime()), longToDateString(vehicleObj.getEndTime()), vehicleObj.getTravelTime() / 1000 + "sek", routeLogListToString(vehicleObj.getRouteLogList()), vehicleObj.getVehicleType(),
+	// finishedVehiclesdm.addRow(new Object[] { vehicleObj.getId(),
+	// vehicleObj.getStartposition(), vehicleObj.getEndposition(),
+	// vehicleObj.getCurrentPosition(),
+	// longToDateString(vehicleObj.getStartTime()),
+	// longToDateString(vehicleObj.getEndTime()), vehicleObj.getTravelTime() /
+	// 1000 + "sek", routeLogListToString(vehicleObj.getRouteLogList()),
+	// vehicleObj.getVehicleType(),
 	// vehicleObj.getTrafficType() });
 	// }
 	// }
 
-	/**
-	 * Used to format output of currentCapacity
-	 */
-	private String formatOutput(double input) {
-		// TODO: Hack! Formatierung für -1.0 per "Hand" gemacht...
-		if (input == -1.0) {
-			return "-1.0";
-		} else {
-			double tmpRes = input * 100;
-			String res = String.valueOf(tmpRes);
-			// System.out.println("RES: " +
-			// res.substring(0,res.indexOf(".")+2));
-			return res.substring(0, res.indexOf(".") + 2);
-		}
-	}
+	// /**
+	// * Used to format output of currentCapacity
+	// */
+	// private String formatOutput(double input) {
+	// // TODO: Hack! Formatierung für -1.0 per "Hand" gemacht...
+	// if (input == -1.0) {
+	// return "-1.0";
+	// } else {
+	// double tmpRes = input * 100;
+	// String res = String.valueOf(tmpRes);
+	// // System.out.println("RES: " +
+	// // res.substring(0,res.indexOf(".")+2));
+	// return res.substring(0, res.indexOf(".") + 2);
+	// }
+	// }
 
 	/**
 	 * Used to generate DateString from a long-type
