@@ -156,7 +156,7 @@ public class MEnvSpaceType	extends MSpaceType
 		IAttributeConverter atcolconv = new AttributeConverter(colorconv, null);
 		IAttributeConverter attcolconv = new AttributeConverter(tcolorconv, null);
 		IAttributeConverter attintconv = new AttributeConverter(tintconv, null);
-		ISubObjectConverter sunameconv = new SubObjectConverter(null, nameconv);
+		ISubObjectConverter sunameconv = new SubObjectConverter(nameconv, null);
 		ISubObjectConverter suexconv = new SubObjectConverter(new IObjectObjectConverter() 
 		{
 			public Object convertObject(Object val, IContext context) 
@@ -239,8 +239,9 @@ public class MEnvSpaceType	extends MSpaceType
 			new AttributeInfo(new AccessInfo("componenttype", "componenttypes", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			}, 
 			new SubobjectInfo[]{
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "objecttype")}), new AccessInfo(new QName(uri, "objecttype"), "objecttypes", null, null, new BeanAccessInfo(AccessInfo.THIS))),
-			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype")}), new AccessInfo(new QName(uri, "componenttype"), "componenttypes", null, null, new BeanAccessInfo(AccessInfo.THIS)), sunameconv)
+			// fetches the name attribute of the objecttype/componenttype and return it as object
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "objecttypes"), new QName(uri, "objecttype")}), new AccessInfo(new QName(uri, "objecttype"), "objecttypes", null, null, new BeanAccessInfo(AccessInfo.THIS)), sunameconv),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "componenttypes"), new QName(uri, "componenttype")}), new AccessInfo(new QName(uri, "componenttype"), "componenttypes", null, null, new BeanAccessInfo(AccessInfo.THIS)), sunameconv)
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "actiontype")}), new ObjectInfo(MultiCollection.class),

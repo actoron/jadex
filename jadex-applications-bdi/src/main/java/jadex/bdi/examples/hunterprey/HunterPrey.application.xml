@@ -177,7 +177,7 @@
 					</env:property>
 				</env:perceptprocessor>
 				
-				<env:perceptprocessor componenttype="DumbPrey"	class="DefaultBDIVisionProcessor">
+				<env:perceptprocessor componenttype="DumbPrey" class="DefaultBDIVisionProcessor">
 					<env:property name="percepttypes">
 						new Object[]
 						{
@@ -198,7 +198,7 @@
 					</env:property>
 				</env:perceptprocessor>
 				
-				<env:perceptprocessor componenttype="DumbHunter"	class="DefaultBDIVisionProcessor">
+				<env:perceptprocessor componenttype="DumbHunter" class="DefaultBDIVisionProcessor">
 					<env:property name="percepttypes">
 						new Object[]
 						{

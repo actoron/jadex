@@ -211,7 +211,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 	}
 	
 	/**
-	 * 
+	 *  Get meta infos about a percept type.
 	 */
 	protected String[][] getMetaInfos(String percepttype)
 	{

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by hans (kill) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-envspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex-envspace" elementFormDefault="qualified">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-envspace" xmlns="http://jadex.sourceforge.net/jadex-envspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 	<xs:complexType name="envspacetype">
 		<xs:sequence>
 			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded"/>
@@ -115,7 +115,7 @@
 		<xs:attribute name="class" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="avatarmapping">
-		<xs:attribute name="agenttype" type="xs:string" use="required"/>
+		<xs:attribute name="componenttype" type="xs:string" use="required"/>
 		<xs:attribute name="objecttype" type="xs:string" use="required"/>
 	</xs:complexType>
 	<xs:complexType name="spaceexecutor">
@@ -277,17 +277,17 @@
 	</xs:complexType>
 	<xs:complexType name="percepttype">
 		<xs:sequence>
-			<xs:element name="agenttypes" minOccurs="0">
+			<xs:element name="componenttypes" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="agenttype" type="agenttype" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="componenttype" type="componenttype" minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="objecttype" type="xs:string" use="required"/>
-		<xs:attribute name="agenttype" type="xs:string"/>
+		<xs:attribute name="componenttype" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="perceptgenerator">
 		<xs:sequence>
@@ -300,10 +300,10 @@
 		<xs:sequence>
 			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
-		<xs:attribute name="agenttype" type="xs:string" use="required"/>
+		<xs:attribute name="componenttype" type="xs:string" use="required"/>
 		<xs:attribute name="class" type="xs:string" use="required"/>
 	</xs:complexType>
-	<xs:complexType name="agenttype">
+	<xs:complexType name="componenttype">
 		<xs:attribute name="name" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="process">
