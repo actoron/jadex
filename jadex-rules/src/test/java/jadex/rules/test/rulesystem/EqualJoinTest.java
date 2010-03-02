@@ -68,7 +68,7 @@ public class EqualJoinTest extends TestCase
 
 		// Add block of triggered condition to list.
 		ICondition	cond	= new AndCondition(new ICondition[]{cblock, samecolor});
-		IRule	rule	= new Rule("block", cond, new IAction()
+		IRule rule = new Rule("block", cond, new IAction()
 		{
 			public void execute(IOAVState state, IVariableAssignments assigments)
 			{
@@ -82,16 +82,16 @@ public class EqualJoinTest extends TestCase
 		system.getRulebase().addRule(rule);
 		system.init();
 		
-//		RetePanel.createReteFrame("Equal Join Test",
-//			((RetePatternMatcherFunctionality)system.getMatcherFunctionality()).getReteNode(),
-//			((RetePatternMatcherState)system.getMatcherState()).getReteMemory(),
-//			system.getAgenda(), new Object());
-//		synchronized(system){system.wait();}
+		/*RetePanel.createReteFrame("Equal Join Test",
+			((RetePatternMatcherFunctionality)system.getMatcherFunctionality()).getReteNode(),
+			((RetePatternMatcherState)system.getMatcherState()).getReteMemory(),
+			system.getAgenda(), new Object());
+		synchronized(system){system.wait();}*/
 
 		// Add red block and green ball.
-		block	= state.createRootObject(Blocks.block_type);
+		block = state.createRootObject(Blocks.block_type);
 		state.setAttributeValue(block, Blocks.block_has_color, "red");
-		ball	= state.createRootObject(Blocks.ball_type);
+		ball = state.createRootObject(Blocks.ball_type);
 		state.setAttributeValue(ball, Blocks.ball_has_color, "green");
 	}
 	
@@ -229,7 +229,8 @@ public class EqualJoinTest extends TestCase
 		// Change color of block -> should retract activated condition.
 		state.setAttributeValue(block, Blocks.block_has_color, "blue");
 		List	test	= Collections.EMPTY_LIST;
-		system.fireAllRules();
+		system.fireAllRules();		
+		
 		assertEquals("Condition should not trigger for changed block", test, blocks);
 	}
 	

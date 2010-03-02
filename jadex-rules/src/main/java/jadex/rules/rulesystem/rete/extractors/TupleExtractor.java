@@ -6,10 +6,6 @@ import jadex.rules.rulesystem.rete.nodes.VirtualFact;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  *  Extractor for fetching a value from a rete tuple.
  */
@@ -95,8 +91,7 @@ public class TupleExtractor implements IValueExtractor
 	 */
 	public boolean isAffected(int tupleindex, OAVAttributeType attr)
 	{
-		// todo: this.tupleindex?
-		return tupleindex==tupleindex && SUtil.equals(this.attr, attr);
+		return (this.tupleindex==tupleindex || tupleindex==-1) && SUtil.equals(this.attr, attr);
 	}
 	
 	/**

@@ -73,7 +73,7 @@ public class MultifieldExtractor implements IValueExtractor
 	 */
 	public boolean isAffected(int tupleindex, OAVAttributeType attr)
 	{
-		return this.tupleindex==tupleindex && SUtil.equals(this.attr, attr);
+		return (this.tupleindex==tupleindex || tupleindex==-1) && SUtil.equals(this.attr, attr);
 	}
 
 	/**
