@@ -298,11 +298,11 @@ public class WaitqueueFlyweight extends WaitAbstractionFlyweight implements IWai
 		}
 		else if(type.equals(OAVBDIRuntimeModel.internalevent_type))
 		{
-			ret = InternalEventFlyweight.getInternalFlyweight(state, rcapa, elem);
+			ret = InternalEventFlyweight.getInternalEventFlyweight(state, rcapa, elem);
 		}
 		else if(type.equals(OAVBDIRuntimeModel.messageevent_type))
 		{
-			ret = MessageEventFlyweight.getMessageFlyweight(state, rcapa, elem);
+			ret = MessageEventFlyweight.getMessageEventFlyweight(state, rcapa, elem);
 		}
 		else if(type.isSubtype(OAVBDIRuntimeModel.changeevent_type))
 		{

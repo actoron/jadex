@@ -25,7 +25,7 @@ public class InternalEventFlyweight extends ProcessableElementFlyweight implemen
 	 *  Get or create a flyweight.
 	 *  @return The flyweight.
 	 */
-	public static InternalEventFlyweight getInternalFlyweight(IOAVState state, Object scope, Object handle)
+	public static InternalEventFlyweight getInternalEventFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
 		InternalEventFlyweight ret = (InternalEventFlyweight)ip.getFlyweightCache(IInternalEvent.class).get(handle);

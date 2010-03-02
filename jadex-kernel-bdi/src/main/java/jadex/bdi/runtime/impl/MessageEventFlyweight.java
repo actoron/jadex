@@ -29,7 +29,7 @@ public class MessageEventFlyweight extends ProcessableElementFlyweight implement
 	 *  Get or create a flyweight.
 	 *  @return The flyweight.
 	 */
-	public static MessageEventFlyweight getMessageFlyweight(IOAVState state, Object scope, Object handle)
+	public static MessageEventFlyweight getMessageEventFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
 		MessageEventFlyweight ret = (MessageEventFlyweight)ip.getFlyweightCache(IMessageEvent.class).get(handle);

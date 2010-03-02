@@ -20,6 +20,7 @@
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.bridge.IClockService</import>
 		<import>jadex.bdi.planlib.protocols.*</import>
+		<import>jadex.bdi.runtime.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
 	</imports>
 
@@ -30,23 +31,15 @@
 
 	<beliefs>
 		<beliefset name="orders" class="Order" evaluationmode="push">
-			<facts language="clips" variable="$?ret">
+			<facts language="jcl">
 				// select $g.getParameter("order").getValue()
 				// from IGoal $g in $goalbase.getGoals("purchase_book")
 				
-				// collect($order)
-				// {
-				// 	Order $order &amp;&amp;
-				// 	IGoal $g &amp;&amp;
-				// 	Arrays.asList($goalbase.getGoals("purchase_book")).contains($g) &amp;&amp;
-				// 	$g.getParameter("order").getValue()==$order
-				// }
-				
-				?mgoal = (mgoal (melement_has_name "purchase_book"))
-				$?ret = (collect 
-					?order = (Order)
-					?rparam = (parameter (parameter_has_name "order") (parameter_has_value ?order))
-					?rgoal = (goal (element_has_model ?mgoal) (parameterelement_has_parameters contains ?rparam))
+				collect(
+					Order $order &amp;&amp;
+					IGoal $g &amp;&amp;
+					Arrays.asList($goalbase.getGoals("purchase_book")).contains($g) &amp;&amp;
+					$g.getParameter("order").getValue()==$order
 				)
 			</facts>
 		</beliefset>

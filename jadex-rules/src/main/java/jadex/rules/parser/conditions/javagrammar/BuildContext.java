@@ -3,7 +3,7 @@ package jadex.rules.parser.conditions.javagrammar;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.rules.AndCondition;
 import jadex.rules.rulesystem.rules.BoundConstraint;
-import jadex.rules.rulesystem.rules.CollectCondition;
+import jadex.rules.rulesystem.rules.ConstrainableCondition;
 import jadex.rules.rulesystem.rules.FunctionCall;
 import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
@@ -110,9 +110,9 @@ public class BuildContext
 	 *  @return The object condition.
 	 *  @throws RuntimeExcpetion	when no condition was found.
 	 */
-	public ObjectCondition getObjectCondition(Variable var)
+	public ConstrainableCondition getConstrainableCondition(Variable var)
 	{
-		ObjectCondition	ret	= getObjectCondition0(var);
+		ConstrainableCondition	ret	= getConstrainableCondition0(var);
 		if(ret==null)
 		{
 			throw new RuntimeException("No object condition for: "+var);
@@ -127,16 +127,10 @@ public class BuildContext
 	 *  @return The object condition.
 	 *  @throws RuntimeExcpetion	when no condition was found.
 	 */
-	public ObjectCondition getObjectCondition0(Variable var)
+	public ConstrainableCondition getConstrainableCondition0(Variable var)
 	{
-		ObjectCondition	ret	= null;
-		try
-		{
-			ret	= parent!=null ? parent.getObjectCondition(var) : null;
-		}
-		catch(Exception e)
-		{
-		}
+		ConstrainableCondition	ret	= null;
+		ret	= parent!=null ? parent.getConstrainableCondition0(var) : null;
 		if(ret==null)
 		{
 			ret	= (ObjectCondition)bcons.get(var);
@@ -180,7 +174,7 @@ public class BuildContext
 	 *  @param valuesource	The value source.
 	 *  @return	The new variable.
 	 */
-	public Variable	generateVariableBinding(ObjectCondition	condition, Object valuesource)
+	public Variable	generateVariableBinding(ConstrainableCondition condition, Object valuesource)
 	{
 		return generateVariableBinding(condition, generateVariableName(), valuesource);
 	}
@@ -203,7 +197,7 @@ public class BuildContext
 	 *  @param valuesource	The value source.
 	 *  @return	The new variable.
 	 */
-	public Variable	generateVariableBinding(ObjectCondition	condition, String name, Object valuesource)
+	public Variable	generateVariableBinding(ConstrainableCondition condition, String name, Object valuesource)
 	{
 		return generateVariableBinding(condition, name, getReturnType(condition, valuesource, tmodel),	valuesource);
 	}
@@ -215,7 +209,7 @@ public class BuildContext
 	 *  @param valuesource	The value source.
 	 *  @return	The new variable.
 	 */
-	public Variable	generateVariableBinding(ObjectCondition	condition, String name, OAVObjectType type, Object valuesource)
+	public Variable	generateVariableBinding(ConstrainableCondition condition, String name, OAVObjectType type, Object valuesource)
 	{
 		Variable	tmpvar	= new Variable(name, type, false, true);
 		variables.put(name, tmpvar);
@@ -316,29 +310,22 @@ public class BuildContext
 		for(int i=start; i<lcons.size(); i++)
 		{
 			List	bcs	= null;
-			if(lcons.get(i) instanceof ObjectCondition)
+			if(lcons.get(i) instanceof ConstrainableCondition)
 			{
-				bcs	= ((ObjectCondition)lcons.get(i)).getBoundConstraints();
-			}
-			
-			// Todo: support collect conditions like object conditions !?
-//			else if(lcons.get(i) instanceof CollectCondition)
-//			{
-//				bcs	= ((CollectCondition)lcons.get(i)).getBoundConstraints();
-//			}
-			
-			for(int j=0; bcs!=null && j<bcs.size(); j++)
-			{
-				BoundConstraint	bc	= (BoundConstraint)bcs.get(j);
-				List	bvars	= bc.getBindVariables();
-				for(int k=0; k<bvars.size(); k++)
+				bcs	= ((ConstrainableCondition)lcons.get(i)).getBoundConstraints();
+				for(int j=0; bcs!=null && j<bcs.size(); j++)
 				{
-					variables.put(((Variable)bvars.get(k)).getName(), bvars.get(k));
-					// Todo: by multiple ocurrences use the simplest bc.getValueSource() 
-					if(bc.getOperator().equals(IOperator.EQUAL))
+					BoundConstraint	bc	= (BoundConstraint)bcs.get(j);
+					List	bvars	= bc.getBindVariables();
+					for(int k=0; k<bvars.size(); k++)
 					{
-						boundconstraints.put(bvars.get(k), bc);
-						bcons.put(bvars.get(k), lcons.get(i));
+						variables.put(((Variable)bvars.get(k)).getName(), bvars.get(k));
+						// Todo: by multiple ocurrences use the simplest bc.getValueSource() 
+						if(bc.getOperator().equals(IOperator.EQUAL))
+						{
+							boundconstraints.put(bvars.get(k), bc);
+							bcons.put(bvars.get(k), lcons.get(i));
+						}
 					}
 				}
 			}
@@ -353,7 +340,7 @@ public class BuildContext
 	 *  @param tmodel	The type model.
 	 *  @return The object type.
 	 */
-	protected static OAVObjectType	getReturnType(ObjectCondition cond, Object valuesource, OAVTypeModel tmodel)
+	protected static OAVObjectType	getReturnType(ConstrainableCondition cond, Object valuesource, OAVTypeModel tmodel)
 	{
 		OAVObjectType	ret;
 		
@@ -379,9 +366,9 @@ public class BuildContext
 		{
 			ret	= tmodel.getJavaType(((FunctionCall)valuesource).getFunction().getReturnType());
 		}
-		else if(valuesource==null)
+		else if(valuesource==null && cond instanceof ObjectCondition)
 		{
-			ret	= cond.getObjectType();
+			ret	= ((ObjectCondition)cond).getObjectType();
 		}
 		else
 		{
@@ -411,13 +398,21 @@ public class BuildContext
 		{
 			ICondition	con	= (ICondition) lcons.get(i);
 			List	bcs	= null;
-			if(con instanceof ObjectCondition)
+			if(con instanceof ConstrainableCondition)
 			{
-				bcs	= ((ObjectCondition)con).getBoundConstraints();
-			}
-			else if(con instanceof CollectCondition)
-			{
-				bcs	= ((CollectCondition)con).getBoundConstraints();
+				bcs	= ((ConstrainableCondition)con).getBoundConstraints();
+				for(int j=0; bcs!=null && j<bcs.size(); j++)
+				{
+					BoundConstraint	bc	= (BoundConstraint)bcs.get(j);
+					if(bc.getOperator().equals(IOperator.EQUAL))
+					{
+						List	bvars	= bc.getBindVariables();
+						for(int k=0; k<bvars.size(); k++)
+						{
+							ret.add(bvars.get(k));
+						}
+					}
+				}
 			}
 			else if(con instanceof TestCondition)
 			{
@@ -430,20 +425,7 @@ public class BuildContext
 						ret.add(ps.get(0));
 					}
 				}
-			}
-			
-			for(int j=0; bcs!=null && j<bcs.size(); j++)
-			{
-				BoundConstraint	bc	= (BoundConstraint)bcs.get(j);
-				if(bc.getOperator().equals(IOperator.EQUAL))
-				{
-					List	bvars	= bc.getBindVariables();
-					for(int k=0; k<bvars.size(); k++)
-					{
-						ret.add(bvars.get(k));
-					}
-				}
-			}
+			}			
 		}
 		return ret;
 	}
@@ -451,42 +433,24 @@ public class BuildContext
 	/**
 	 *  Push a condition on the stack.
 	 */
-	public void	pushCondition(ObjectCondition con)
+	public void	pushCondition(ConstrainableCondition con)
 	{
 		if(getDefiningScope(con)!=this)
 		{
-			// Create clone of inconsistent condition in inner scope.
-			generateVariableBinding(con, null);	// new null bound constraint to make sure that cloned condition refers to SAME object.
-			con	= createObjectCondition(con.getObjectType(), (IConstraint[])con.getConstraints().toArray(new IConstraint[con.getConstraints().size()]));
-		}
-		
-		// Todo: remove stack (obsolete?)
-		if(oconstack!=null)
-		{
-			// Check stack consistency: inner variables may only be defined in same scope or outside.
-			BuildContext	scope	= getDefiningScope(con);
-			for(int i=0; i<oconstack.size(); i++)
+			if(con instanceof ObjectCondition)
 			{
-				ObjectCondition	ocon	= (ObjectCondition)oconstack.get(i);
-				boolean	consistent	= true;
-				BuildContext	prescope	= getDefiningScope(ocon);
-				consistent	= prescope==scope;
-				while(!consistent && prescope!=null)
-				{
-					prescope	= prescope.getParent();
-					consistent	= prescope==scope;
-				}
-				if(!consistent)
-				{
-					// Create clone of inconsistent condition in inner scope.
-					Variable	var = scope.generateVariableBinding(ocon, null);
-					ocon	= scope.createObjectCondition(ocon.getObjectType(), new IConstraint[]{new BoundConstraint(null, var)});
-					oconstack.set(i, ocon);
-					System.out.println("Clone for consistency: "+oconstack);
-				}
+				// Create clone of inconsistent condition in inner scope.
+				ObjectCondition	ocon	= (ObjectCondition)con;
+				generateVariableBinding(ocon, null);	// new null bound constraint to make sure that cloned condition refers to SAME object.
+				con	= createObjectCondition(ocon.getObjectType(), (IConstraint[])ocon.getConstraints().toArray(new IConstraint[ocon.getConstraints().size()]));
+			}
+			else
+			{
+				throw new RuntimeException("Wrong scope: "+con);
 			}
 		}
-		else
+		
+		if(oconstack==null)
 		{
 			oconstack	= new ArrayList();
 		}
@@ -511,18 +475,18 @@ public class BuildContext
 	/**
 	 *  Get the current condition from the stack.
 	 */
-	public ObjectCondition	getCurrentCondition()
+	public ConstrainableCondition	getCurrentCondition()
 	{
 		if(oconstack==null || oconstack.isEmpty())
 			throw new RuntimeException("Condition stack error: "+oconstack);
 		
-		return (ObjectCondition)oconstack.get(oconstack.size()-1);
+		return (ConstrainableCondition)oconstack.get(oconstack.size()-1);
 	}
 	
 	/**
 	 *  Get the context in which the given condition is defined.
 	 */
-	protected BuildContext	getDefiningScope(ObjectCondition con)
+	protected BuildContext	getDefiningScope(ICondition con)
 	{
 		BuildContext	ret	= null;
 		BuildContext	scope	= this;

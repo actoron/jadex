@@ -53,7 +53,7 @@ public class OAVContentIdState	extends OAVAbstractState
 	{
 		// #ifndef MIDP
 		if(!generator.isId(id))
-			System.out.println("driss");
+			System.out.println("driss: "+id);
 		assert nocheck || generator.isId(id);
 		// #endif
 	}

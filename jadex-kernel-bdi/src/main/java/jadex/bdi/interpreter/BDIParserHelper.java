@@ -1,15 +1,32 @@
 package jadex.bdi.interpreter;
 
+import jadex.bdi.runtime.IBelief;
+import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.ICapability;
+import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.IGoalbase;
+import jadex.bdi.runtime.IInternalEvent;
+import jadex.bdi.runtime.IMessageEvent;
+import jadex.bdi.runtime.IPlan;
+import jadex.bdi.runtime.IPlanbase;
+import jadex.bdi.runtime.impl.BeliefFlyweight;
+import jadex.bdi.runtime.impl.BeliefSetFlyweight;
 import jadex.bdi.runtime.impl.BeliefbaseFlyweight;
 import jadex.bdi.runtime.impl.CapabilityFlyweight;
+import jadex.bdi.runtime.impl.GoalFlyweight;
+import jadex.bdi.runtime.impl.GoalbaseFlyweight;
+import jadex.bdi.runtime.impl.InternalEventFlyweight;
+import jadex.bdi.runtime.impl.MessageEventFlyweight;
+import jadex.bdi.runtime.impl.PlanFlyweight;
+import jadex.bdi.runtime.impl.PlanbaseFlyweight;
 import jadex.commons.SReflect;
 import jadex.rules.parser.conditions.javagrammar.DefaultParserHelper;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.Constant;
+import jadex.rules.rulesystem.rules.ConstrainableCondition;
 import jadex.rules.rulesystem.rules.FunctionCall;
 import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.ILazyValue;
@@ -20,6 +37,8 @@ import jadex.rules.rulesystem.rules.ObjectCondition;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.rulesystem.rules.functions.IFunction;
 import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVJavaType;
+import jadex.rules.state.OAVObjectType;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
@@ -75,7 +94,7 @@ public class BDIParserHelper extends	DefaultParserHelper
 			Variable	capvar	= context.getVariable("?rcapa");
 			if(capvar==null)
 				throw new RuntimeException("Variable '?rcapa' required to build belief (set) condition: "+name);
-			ObjectCondition	rcapcon	= context.getObjectCondition(capvar);
+			ConstrainableCondition	rcapcon	= context.getConstrainableCondition(capvar);
 			if(rcapcon==null)
 				throw new RuntimeException("Capability condition required to build belief (set) condition: "+name);
 			BoundConstraint	bc	= context.getBoundConstraint(capvar);
@@ -230,7 +249,7 @@ public class BDIParserHelper extends	DefaultParserHelper
 			}
 			if(goalvar==null)
 				throw new RuntimeException("Variable '"+varname+"' required to build parameter (set) condition: "+name);
-			ObjectCondition	rgoalcon	= (ObjectCondition)context.getObjectCondition(goalvar);
+			ObjectCondition	rgoalcon	= (ObjectCondition)context.getConstrainableCondition(goalvar);
 			if(rgoalcon==null)
 				throw new RuntimeException("Goal condition required to build parameter (set) condition: "+name);
 			BoundConstraint	bc	= (BoundConstraint)context.getBoundConstraint(goalvar);
@@ -288,7 +307,7 @@ public class BDIParserHelper extends	DefaultParserHelper
 			}
 			if(planvar==null)
 				throw new RuntimeException("Variable '"+varname+"' required to build parameter (set) condition: "+name);
-			ObjectCondition	rplancon	= (ObjectCondition)context.getObjectCondition(planvar);
+			ObjectCondition	rplancon	= (ObjectCondition)context.getConstrainableCondition(planvar);
 			if(rplancon==null)
 				throw new RuntimeException("Plan condition required to build parameter (set) condition: "+name);
 			BoundConstraint	bc	= (BoundConstraint)context.getBoundConstraint(planvar);
@@ -336,7 +355,7 @@ public class BDIParserHelper extends	DefaultParserHelper
 			Variable	capvar	= context.getVariable("?rcapa");
 			if(capvar==null)
 				throw new RuntimeException("Variable '?rcapa' required to build beliefbase constraint: "+name);
-			ObjectCondition	rcapcon	= context.getObjectCondition(capvar);
+			ConstrainableCondition	rcapcon	= context.getConstrainableCondition(capvar);
 			if(rcapcon==null)
 				throw new RuntimeException("Capability condition required to build beliefbase constraint: "+name);
 			Object	valuesource	= new FunctionCall(new IFunction()
@@ -357,12 +376,64 @@ public class BDIParserHelper extends	DefaultParserHelper
 			ret	= context.generateVariableBinding(rcapcon, name, valuesource);
 		}
 
+		else if(ret==null && "$goalbase".equals(name))
+		{
+			Variable	capvar	= context.getVariable("?rcapa");
+			if(capvar==null)
+				throw new RuntimeException("Variable '?rcapa' required to build goalbase constraint: "+name);
+			ConstrainableCondition	rcapcon	= context.getConstrainableCondition(capvar);
+			if(rcapcon==null)
+				throw new RuntimeException("Capability condition required to build goalbase constraint: "+name);
+			Object	valuesource	= new FunctionCall(new IFunction()
+			{
+				public AttributeSet getRelevantAttributes()
+				{
+					return AttributeSet.EMPTY_ATTRIBUTESET;
+				}
+				public Class getReturnType()
+				{
+					return IGoalbase.class;
+				}
+				public Object invoke(Object[] paramvalues, IOAVState state)
+				{
+					return GoalbaseFlyweight.getGoalbaseFlyweight(state, paramvalues[0] instanceof ILazyValue? ((ILazyValue)paramvalues[0]).getValue(): paramvalues[0]);
+				}
+			}, new Object[]{capvar});
+			ret	= context.generateVariableBinding(rcapcon, name, valuesource);
+		}
+
+		else if(ret==null && "$planbase".equals(name))
+		{
+			Variable	capvar	= context.getVariable("?rcapa");
+			if(capvar==null)
+				throw new RuntimeException("Variable '?rcapa' required to build planbase constraint: "+name);
+			ConstrainableCondition	rcapcon	= context.getConstrainableCondition(capvar);
+			if(rcapcon==null)
+				throw new RuntimeException("Capability condition required to build planbase constraint: "+name);
+			Object	valuesource	= new FunctionCall(new IFunction()
+			{
+				public AttributeSet getRelevantAttributes()
+				{
+					return AttributeSet.EMPTY_ATTRIBUTESET;
+				}
+				public Class getReturnType()
+				{
+					return IPlanbase.class;
+				}
+				public Object invoke(Object[] paramvalues, IOAVState state)
+				{
+					return PlanbaseFlyweight.getPlanbaseFlyweight(state, paramvalues[0] instanceof ILazyValue? ((ILazyValue)paramvalues[0]).getValue(): paramvalues[0]);
+				}
+			}, new Object[]{capvar});
+			ret	= context.generateVariableBinding(rcapcon, name, valuesource);
+		}
+
 		else if(ret==null && "$scope".equals(name))
 		{
 			Variable	capvar	= context.getVariable("?rcapa");
 			if(capvar==null)
 				throw new RuntimeException("Variable '?rcapa' required to build beliefbase constraint: "+name);
-			ObjectCondition	rcapcon	= context.getObjectCondition(capvar);
+			ConstrainableCondition	rcapcon	= context.getConstrainableCondition(capvar);
 			if(rcapcon==null)
 				throw new RuntimeException("Capability condition required to build beliefbase constraint: "+name);
 			Object	valuesource	= new FunctionCall(new IFunction()
@@ -395,7 +466,175 @@ public class BDIParserHelper extends	DefaultParserHelper
 	{
 		return "$beliefbase".equals(name) || "$goal".equals(name) || "$plan".equals(name) || "$ref".equals(name);
 	}
-
+	
+	
+	/**
+	 *	Get the replacement type for an object type in an existential declaration
+	 *	E.g. when a flyweight should be replaced by the real state type
+	 *  (IGoal $g instead of goal $g)
+	 *  @param type	The type to be replaced.
+	 *  @return a tuple containing the replacement type and the replacement value source (e.g. a function call recreating the flyweight from the state object).
+	 */
+	public Object[]	getReplacementType(OAVObjectType type)
+	{
+		Object[]	ret	= null;
+		if(type instanceof OAVJavaType)
+		{
+			Class	clazz	= ((OAVJavaType)type).getClazz();
+			if(clazz.equals(IBelief.class))
+			{
+				Variable	capvar	= context.getVariable("?rcapa");
+				if(capvar==null)
+					throw new RuntimeException("Variable '?rcapa' required to build IBelief constraint.");
+				ConstrainableCondition	rcapcon	= context.getConstrainableCondition(capvar);
+				if(rcapcon==null)
+					throw new RuntimeException("Capability condition required to build IBelief  constraint.");
+				ret	= new Object[]{OAVBDIRuntimeModel.belief_type, new FunctionCall(new IFunction()
+				{
+					public AttributeSet getRelevantAttributes()
+					{
+						return AttributeSet.EMPTY_ATTRIBUTESET;
+					}
+					public Class getReturnType()
+					{
+						return IGoal.class;
+					}
+					public Object invoke(Object[] paramvalues, IOAVState state)
+					{
+						return BeliefFlyweight.getBeliefFlyweight(state, paramvalues[0] instanceof ILazyValue? ((ILazyValue)(paramvalues[0])).getValue(): paramvalues[0],
+								paramvalues[1] instanceof ILazyValue? ((ILazyValue)(paramvalues[1])).getValue(): paramvalues[1]);
+					}
+				}, new Object[]{capvar, null})};
+			}
+			else if(clazz.equals(IBeliefSet.class))
+			{
+				Variable	capvar	= context.getVariable("?rcapa");
+				if(capvar==null)
+					throw new RuntimeException("Variable '?rcapa' required to build IBeliefSet constraint.");
+				ConstrainableCondition	rcapcon	= context.getConstrainableCondition(capvar);
+				if(rcapcon==null)
+					throw new RuntimeException("Capability condition required to build IBeliefSet constraint.");
+				ret	= new Object[]{OAVBDIRuntimeModel.beliefset_type, new FunctionCall(new IFunction()
+				{
+					public AttributeSet getRelevantAttributes()
+					{
+						return AttributeSet.EMPTY_ATTRIBUTESET;
+					}
+					public Class getReturnType()
+					{
+						return IBeliefSet.class;
+					}
+					public Object invoke(Object[] paramvalues, IOAVState state)
+					{
+						return BeliefSetFlyweight.getBeliefSetFlyweight(state, paramvalues[0] instanceof ILazyValue? ((ILazyValue)(paramvalues[0])).getValue(): paramvalues[0],
+								paramvalues[1] instanceof ILazyValue? ((ILazyValue)(paramvalues[1])).getValue(): paramvalues[1]);
+					}
+				}, new Object[]{capvar, null})};
+			}
+			else if(clazz.equals(IPlan.class))
+			{
+				Variable	capvar	= context.getVariable("?rcapa");
+				if(capvar==null)
+					throw new RuntimeException("Variable '?rcapa' required to build IPlan constraint.");
+				ConstrainableCondition	rcapcon	= context.getConstrainableCondition(capvar);
+				if(rcapcon==null)
+					throw new RuntimeException("Capability condition required to build IPlan constraint.");
+				ret	= new Object[]{OAVBDIRuntimeModel.plan_type, new FunctionCall(new IFunction()
+				{
+					public AttributeSet getRelevantAttributes()
+					{
+						return AttributeSet.EMPTY_ATTRIBUTESET;
+					}
+					public Class getReturnType()
+					{
+						return IPlan.class;
+					}
+					public Object invoke(Object[] paramvalues, IOAVState state)
+					{
+						return PlanFlyweight.getPlanFlyweight(state, paramvalues[0] instanceof ILazyValue? ((ILazyValue)(paramvalues[0])).getValue(): paramvalues[0],
+								paramvalues[1] instanceof ILazyValue? ((ILazyValue)(paramvalues[1])).getValue(): paramvalues[1]);
+					}
+				}, new Object[]{capvar, null})};
+			}
+			else if(clazz.equals(IMessageEvent.class))
+			{
+				Variable	capvar	= context.getVariable("?rcapa");
+				if(capvar==null)
+					throw new RuntimeException("Variable '?rcapa' required to build IMessageEvent constraint.");
+				ConstrainableCondition	rcapcon	= context.getConstrainableCondition(capvar);
+				if(rcapcon==null)
+					throw new RuntimeException("Capability condition required to build IMessageEvent constraint.");
+				ret	= new Object[]{OAVBDIRuntimeModel.messageevent_type, new FunctionCall(new IFunction()
+				{
+					public AttributeSet getRelevantAttributes()
+					{
+						return AttributeSet.EMPTY_ATTRIBUTESET;
+					}
+					public Class getReturnType()
+					{
+						return IMessageEvent.class;
+					}
+					public Object invoke(Object[] paramvalues, IOAVState state)
+					{
+						return MessageEventFlyweight.getMessageEventFlyweight(state, paramvalues[0] instanceof ILazyValue? ((ILazyValue)(paramvalues[0])).getValue(): paramvalues[0],
+								paramvalues[1] instanceof ILazyValue? ((ILazyValue)(paramvalues[1])).getValue(): paramvalues[1]);
+					}
+				}, new Object[]{capvar, null})};
+			}
+			else if(clazz.equals(IInternalEvent.class))
+			{
+				Variable	capvar	= context.getVariable("?rcapa");
+				if(capvar==null)
+					throw new RuntimeException("Variable '?rcapa' required to build IInternalEvent constraint.");
+				ConstrainableCondition	rcapcon	= context.getConstrainableCondition(capvar);
+				if(rcapcon==null)
+					throw new RuntimeException("Capability condition required to build IInternalEvent constraint.");
+				ret	= new Object[]{OAVBDIRuntimeModel.internalevent_type, new FunctionCall(new IFunction()
+				{
+					public AttributeSet getRelevantAttributes()
+					{
+						return AttributeSet.EMPTY_ATTRIBUTESET;
+					}
+					public Class getReturnType()
+					{
+						return IInternalEvent.class;
+					}
+					public Object invoke(Object[] paramvalues, IOAVState state)
+					{
+						return InternalEventFlyweight.getInternalEventFlyweight(state, paramvalues[0] instanceof ILazyValue? ((ILazyValue)(paramvalues[0])).getValue(): paramvalues[0],
+								paramvalues[1] instanceof ILazyValue? ((ILazyValue)(paramvalues[1])).getValue(): paramvalues[1]);
+					}
+				}, new Object[]{capvar, null})};
+			}
+			else if(clazz.equals(IGoal.class))
+			{
+				Variable	capvar	= context.getVariable("?rcapa");
+				if(capvar==null)
+					throw new RuntimeException("Variable '?rcapa' required to build IGoal constraint.");
+				ConstrainableCondition	rcapcon	= context.getConstrainableCondition(capvar);
+				if(rcapcon==null)
+					throw new RuntimeException("Capability condition required to build IGoal constraint.");
+				ret	= new Object[]{OAVBDIRuntimeModel.goal_type, new FunctionCall(new IFunction()
+				{
+					public AttributeSet getRelevantAttributes()
+					{
+						return AttributeSet.EMPTY_ATTRIBUTESET;
+					}
+					public Class getReturnType()
+					{
+						return IGoal.class;
+					}
+					public Object invoke(Object[] paramvalues, IOAVState state)
+					{
+						return GoalFlyweight.getGoalFlyweight(state, paramvalues[0] instanceof ILazyValue? ((ILazyValue)(paramvalues[0])).getValue(): paramvalues[0],
+								paramvalues[1] instanceof ILazyValue? ((ILazyValue)(paramvalues[1])).getValue(): paramvalues[1]);
+					}
+				}, new Object[]{capvar, null})};
+			}
+		}
+		return ret;
+	}
+	
 	//-------- helper classes --------
 	
 	/**

@@ -296,7 +296,7 @@ public class Gui extends JFrame
 				{
 					public void run()
 					{
-						setVisible(false);
+						dispose();
 					}
 				});
 			}

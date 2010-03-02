@@ -60,6 +60,9 @@ public class OAVJavaType extends OAVObjectType
 	/** The java float type. */
 	public static final OAVJavaType java_float_type;
 	
+	/** The java collection type. */
+	public static final OAVJavaType java_collection_type;
+	
 
 	static
 	{
@@ -73,6 +76,7 @@ public class OAVJavaType extends OAVObjectType
 		java_long_type = java_type_model.createJavaType(Long.class, KIND_VALUE);
 		java_double_type = java_type_model.createJavaType(Double.class, KIND_VALUE);
 		java_float_type = java_type_model.createJavaType(Float.class, KIND_VALUE);
+		java_collection_type = java_type_model.createJavaType(Collection.class, KIND_OBJECT);
 	}
 
 	//-------- attributes --------

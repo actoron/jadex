@@ -27,8 +27,6 @@ public class PickupWasteAction extends SimplePropertyObject implements ISpaceAct
 	 */
 	public Object perform(Map parameters, IEnvironmentSpace space)
 	{	
-		boolean ret = false;
-				
 		Space2D env = (Space2D)space;
 		
 		IComponentIdentifier owner = (IComponentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
@@ -44,22 +42,10 @@ public class PickupWasteAction extends SimplePropertyObject implements ISpaceAct
 			throw new RuntimeException("Not near enough to waste: "+waste+" "+avatar);
 			
 //		System.out.println("pickup waste action: "+so+" "+so.getProperty(Grid2D.POSITION)+" "+waste);
-//		if(Math.random()>0.5)
-		{
-//			System.out.println("pickup: "+waste);
-			avatar.setProperty("waste", waste);
-			env.setPosition(waste.getId(), null);
-			ret = true;
-			//pcs.firePropertyChange("worldObjects", garb, null);
-//				System.out.println("Agent picked up: "+owner+" "+so.getProperty(Space2D.POSITION));
-		}
-//			else
-//			{
-//			System.out.println("Agent picked up failed: "+name+" "+getPosition(name));
-//			}
-
+		avatar.setProperty("waste", waste);
+		env.setPosition(waste.getId(), null);
 //		System.out.println("pickup waste action "+parameters);
 
-		return ret? Boolean.TRUE: Boolean.FALSE;
+		return null;
 	}
 }

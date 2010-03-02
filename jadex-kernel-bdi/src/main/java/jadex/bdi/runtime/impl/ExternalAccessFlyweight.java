@@ -860,11 +860,11 @@ public class ExternalAccessFlyweight extends CapabilityFlyweight implements IBDI
 					}
 					else if(OAVBDIRuntimeModel.internalevent_type.equals(type))
 					{
-						object = InternalEventFlyweight.getInternalFlyweight(getState(), getScope(), de);
+						object = InternalEventFlyweight.getInternalEventFlyweight(getState(), getScope(), de);
 					}
 					else if(OAVBDIRuntimeModel.messageevent_type.equals(type))
 					{
-						object = MessageEventFlyweight.getMessageFlyweight(getState(), getScope(), de);
+						object = MessageEventFlyweight.getMessageEventFlyweight(getState(), getScope(), de);
 					}
 				}
 				getState().removeAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_externalaccesses, ea);

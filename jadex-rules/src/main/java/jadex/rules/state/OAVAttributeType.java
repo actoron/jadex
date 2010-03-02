@@ -18,7 +18,7 @@ public class OAVAttributeType
 	
 	public static final OAVAttributeType OBJECTTYPE = new OAVAttributeType("OBJECTTYPE");
 	
-	/** Constants for queue multiplicity. */
+	/** Constants for no multiplicity. */
 	public static final String NONE = "none";
 	
 	/** Constants for queue multiplicity. */

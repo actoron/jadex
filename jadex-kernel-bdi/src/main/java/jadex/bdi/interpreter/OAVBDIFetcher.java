@@ -111,9 +111,9 @@ public class OAVBDIFetcher extends SimpleValueFetcher
 		else if(name.equals("$goal") && rgoal!=null)
 			ret = GoalFlyweight.getGoalFlyweight(state, rcapa, rgoal);
 		else if(name.equals("$event") && rmessageevent!=null)
-			ret = MessageEventFlyweight.getMessageFlyweight(state, rcapa, rmessageevent);
+			ret = MessageEventFlyweight.getMessageEventFlyweight(state, rcapa, rmessageevent);
 		else if(name.equals("$event") && rinternalevent!=null)
-			ret = InternalEventFlyweight.getInternalFlyweight(state, rcapa, rinternalevent);
+			ret = InternalEventFlyweight.getInternalEventFlyweight(state, rcapa, rinternalevent);
 		else if(name.equals("$plan") && rplan!=null)
 			ret = PlanFlyweight.getPlanFlyweight(state, rcapa, rplan);
 		else

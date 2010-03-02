@@ -63,12 +63,12 @@ public class CleanUpWastePlan extends Plan
 	
 	public void failed()
 	{
-		System.out.println("failed: "+this);
+		System.err.println("failed: "+this+", "+getParameter("waste").getValue());
 		getException().printStackTrace();
 	}
 
-//	public void aborted()
-//	{
-//		System.out.println("aborted: "+this);
-//	}
+	public void aborted()
+	{
+		System.err.println("aborted: "+this+", "+getParameter("waste").getValue());
+	}
 }

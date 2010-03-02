@@ -171,7 +171,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 				{
 					Object[] scope = AgentRules.resolveCapability(ref, OAVBDIMetaModel.internalevent_type, getScope(), getState());
 					Object revent = InternalEventRules.createInternalEvent(getState(), scope[1], (String)scope[0]);
-					object = InternalEventFlyweight.getInternalFlyweight(getState(), scope[1], revent);
+					object = InternalEventFlyweight.getInternalEventFlyweight(getState(), scope[1], revent);
 				}
 			};
 			return (IInternalEvent)invoc.object;
@@ -180,7 +180,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 		{
 			Object[] scope = AgentRules.resolveCapability(ref, OAVBDIMetaModel.internalevent_type, getScope(), getState());
 			Object revent = InternalEventRules.createInternalEvent(getState(), scope[1], (String)scope[0]);
-			return InternalEventFlyweight.getInternalFlyweight(getState(), scope[1], revent);
+			return InternalEventFlyweight.getInternalEventFlyweight(getState(), scope[1], revent);
 		}
 	}
 
@@ -462,7 +462,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 		{
 			Object	mevent = state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_internalevents, scope[0]);
 			Object	revent = InternalEventRules.instantiateInternalEvent(state, scope[1], mevent, null, null, null, null);
-			ret	= InternalEventFlyweight.getInternalFlyweight(state, scope[1], revent);
+			ret	= InternalEventFlyweight.getInternalEventFlyweight(state, scope[1], revent);
 		}
 		else
 		{
@@ -488,7 +488,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 		{
 			Object	mevent = state.getAttributeValue(mscope, OAVBDIMetaModel.capability_has_messageevents, scope[0]);
 			Object	revent = MessageEventRules.instantiateMessageEvent(state, scope[1], mevent, null, null, null, null);
-			ret	= MessageEventFlyweight.getMessageFlyweight(state, scope[1], revent);
+			ret	= MessageEventFlyweight.getMessageEventFlyweight(state, scope[1], revent);
 		}
 		else
 		{

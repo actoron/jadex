@@ -27,8 +27,6 @@ public class DropWasteAction extends SimplePropertyObject implements ISpaceActio
 	 */
 	public Object perform(Map parameters, IEnvironmentSpace space)
 	{	
-		boolean ret = false;
-				
 		Space2D env = (Space2D)space;
 		
 		IComponentIdentifier owner = (IComponentIdentifier)parameters.get(ISpaceAction.ACTOR_ID);
@@ -44,23 +42,17 @@ public class DropWasteAction extends SimplePropertyObject implements ISpaceActio
 		if(env.getDistance((IVector2)wastebin.getProperty(Space2D.PROPERTY_POSITION), (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION)).greater(TOLERANCE))
 			throw new RuntimeException("Not near enough to wastebin: "+wastebin+" "+avatar);
 			
-//		if(Math.random()>0.5)
-		{
-//			System.out.println("drop: "+waste);
-			if(!((Boolean)wastebin.getProperty("full")).booleanValue())
-			{
-				int wastes = ((Integer)wastebin.getProperty("wastes")).intValue();
-				wastebin.setProperty("wastes", new Integer(wastes+1));
-				env.destroySpaceObject(waste.getId());
-				avatar.setProperty("waste", null);
-				ret = true;
-			}
-			//pcs.firePropertyChange("worldObjects", garb, null);
-//				System.out.println("Agent picked up: "+owner+" "+so.getProperty(Space2D.POSITION));
-		}
+//		System.out.println("drop: "+waste);
+		if(((Boolean)wastebin.getProperty("full")).booleanValue())
+			throw new RuntimeException("Wastebin already full: "+wastebin+" "+avatar);
+
+		int wastes = ((Integer)wastebin.getProperty("wastes")).intValue();
+		wastebin.setProperty("wastes", new Integer(wastes+1));
+		env.destroySpaceObject(waste.getId());
+		avatar.setProperty("waste", null);
 
 //		System.out.println("pickup waste action "+parameters);
 
-		return ret? Boolean.TRUE: Boolean.FALSE;
+		return null;
 	}
 }

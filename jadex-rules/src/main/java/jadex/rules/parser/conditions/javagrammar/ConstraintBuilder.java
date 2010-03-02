@@ -8,6 +8,7 @@ import jadex.rules.rulesystem.rules.ArraySelector;
 import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.CollectCondition;
 import jadex.rules.rulesystem.rules.Constant;
+import jadex.rules.rulesystem.rules.ConstrainableCondition;
 import jadex.rules.rulesystem.rules.FunctionCall;
 import jadex.rules.rulesystem.rules.IConstraint;
 import jadex.rules.rulesystem.rules.IOperator;
@@ -48,12 +49,12 @@ public class ConstraintBuilder
 	 *  @param context	The build context.
 	 *  @return The generated condition.
 	 */
-	public static ICondition	buildConstraints(Expression expression, BuildContext context)
+	public static ICondition	buildConstraints(Expression expression, BuildContext context, IParserHelper helper)
 	{
-		// Decompose expression into 1) object conditions, 2) NOT conditions, 3) remaining constraints.
+		// Decompose expression into 1) object conditions, 2) collect conditions, 3) remaining constraints, 4) NOT conditions.
 		List	conditions	= new ArrayList();
-		List	constraints	= new ArrayList();
 		List	nots	= new ArrayList();
+		List	constraints	= new ArrayList();
 		constraints.add(expression);
 		for(int i=0; i<constraints.size(); i++)
 		{
@@ -97,8 +98,8 @@ public class ConstraintBuilder
 				if(notcon)
 				{
 					constraints.remove(i);
-					i--;
 					nots.add(((UnaryExpression)exp).getValue());
+					i--;
 				}
 			}
 			
@@ -117,16 +118,23 @@ public class ConstraintBuilder
 		for(int i=0; i<conditions.size(); i++)
 		{
 			ExistentialDeclaration	edec	= (ExistentialDeclaration)conditions.get(i);
-			context.createObjectCondition(edec.getType(), new IConstraint[]
+			
+			// Test if type needs replacement (e.g. goal vs. IGoal)
+			// Otherwise build normal object condition.
+			Object[]	rep	= helper.getReplacementType(edec.getType());
+			OAVObjectType	type	= rep!=null ? (OAVObjectType)rep[0] : edec.getType();
+			Object	valuesource	= rep!=null ? rep[1] : null;
+			
+			context.createObjectCondition(type, new IConstraint[]
 			{
-				new BoundConstraint(null, edec.getVariable())
+				new BoundConstraint(valuesource, edec.getVariable())
             });
 		}
 
 		// Build remaining constraints.
 		for(int i=0; i<constraints.size(); i++)
 		{
-			buildConstraint((Expression)constraints.get(i), context, false);
+			buildConstraint((Expression)constraints.get(i), context, false, helper);
 			assert context.oconstack==null : "Stack problem: "+(Expression)constraints.get(i);
 		}
 
@@ -134,7 +142,7 @@ public class ConstraintBuilder
 		for(int i=0; i<nots.size(); i++)
 		{
 			BuildContext	newcon	= new BuildContext(context);
-			ICondition	cond	= buildConstraints((Expression)nots.get(i), newcon);
+			ICondition	cond	= buildConstraints((Expression)nots.get(i), newcon, helper);
 			context.addCondition(new NotCondition(cond));
 		}
 
@@ -149,15 +157,15 @@ public class ConstraintBuilder
 			{
 				if(lcons.get(i)==context.getDummyCondition())
 				{
-					ObjectCondition	target;
+					ConstrainableCondition	target;
 					if(i==0 && lcons.size()>1)
 					{
 						// Todo: when adding to next condition, dummy constraints should be first!?
-						target	= (ObjectCondition)lcons.get(i+1);
+						target	= (ConstrainableCondition)lcons.get(i+1);
 					}
 					else if(i>0)
 					{
-						target	= (ObjectCondition)lcons.get(i-1);
+						target	= (ConstrainableCondition)lcons.get(i-1);
 					}
 					else
 					{
@@ -179,7 +187,7 @@ public class ConstraintBuilder
 	/**
 	 *  Build a constraint for a single expression.
 	 */
-	protected static void	buildConstraint(Expression exp, BuildContext context, boolean invert)
+	protected static void	buildConstraint(Expression exp, BuildContext context, boolean invert, IParserHelper helper)
 	{
 		if(exp instanceof OperationExpression)
 		{
@@ -192,16 +200,16 @@ public class ConstraintBuilder
 					IOperator	inverse	= OperationExpression.getInverseOperator0(operator);
 					if(inverse==null)
 					{
-						buildOperatorConstraint(exp, new LiteralExpression(Boolean.TRUE), IOperator.NOTEQUAL, context);
+						buildOperatorConstraint(exp, new LiteralExpression(Boolean.TRUE), IOperator.NOTEQUAL, context, helper);
 					}
 					else
 					{
-						buildOperatorConstraint(opex.getLeftValue(), opex.getRightValue(), inverse, context);
+						buildOperatorConstraint(opex.getLeftValue(), opex.getRightValue(), inverse, context, helper);
 					}
 				}
 				else
 				{
-					buildOperatorConstraint(opex.getLeftValue(), opex.getRightValue(), operator, context);
+					buildOperatorConstraint(opex.getLeftValue(), opex.getRightValue(), operator, context, helper);
 				}
 			}
 //			else if(opex.getOperator() instanceof IFunction)
@@ -218,7 +226,7 @@ public class ConstraintBuilder
 			UnaryExpression	unex	= (UnaryExpression)exp;
 			if(unex.getOperator().equals(UnaryExpression.OPERATOR_NOT))
 			{
-				buildConstraint(unex.getValue(), context, !invert);
+				buildConstraint(unex.getValue(), context, !invert, helper);
 			}
 			else
 			{
@@ -231,21 +239,21 @@ public class ConstraintBuilder
 		// Variable
 		else
 		{
-			buildOperatorConstraint(exp, new LiteralExpression(Boolean.TRUE), invert ? IOperator.NOTEQUAL : IOperator.EQUAL, context);
+			buildOperatorConstraint(exp, new LiteralExpression(Boolean.TRUE), invert ? IOperator.NOTEQUAL : IOperator.EQUAL, context, helper);
 		}
 	}
 
 	/**
 	 *  Build an operator constraint.
 	 */
-	protected static void	buildOperatorConstraint(Expression left, Expression right, IOperator op, BuildContext context)
+	protected static void	buildOperatorConstraint(Expression left, Expression right, IOperator op, BuildContext context, IParserHelper helper)
 	{
 		// Special treatment for unbound variables -> build test condition.
 		// Currently not supported by Rete builder
-		if(left instanceof VariableExpression && context.getObjectCondition0(((VariableExpression)left).getVariable())==null)
+		if(left instanceof VariableExpression && context.getConstrainableCondition0(((VariableExpression)left).getVariable())==null)
 		{
 			// Flatten right side to literal or (temporary) variable.
-			right	= flattenToPrimary(right, context);
+			right	= flattenToPrimary(right, context, helper);
 			Object	rightsource	= right instanceof LiteralExpression
 				? new Constant(((LiteralExpression)right).getValue())
 				: ((VariableExpression)right).getVariable();
@@ -261,10 +269,10 @@ public class ConstraintBuilder
 		else
 		{
 			// Get object condition and value source for left part.
-			Object	valuesource	= getObjectConditionAndValueSource(left, context);
+			Object	valuesource	= getObjectConditionAndValueSource(left, context, helper);
 	
 			// Flatten right side to literal value or (temporary) variable.
-			right	= flattenToPrimary(right, context);
+			right	= flattenToPrimary(right, context, helper);
 	
 			// Build literal constraint for constant values
 			if(right instanceof LiteralExpression)
@@ -294,14 +302,14 @@ public class ConstraintBuilder
 	 *  @param tmodel	The type model.
 	 *  @return	The value source.
 	 */
-	protected static Object getObjectConditionAndValueSource(Expression value, BuildContext context)
+	protected static Object getObjectConditionAndValueSource(Expression value, BuildContext context, IParserHelper helper)
 	{
 		Object	valuesource;
 		int	stacksize	= context.oconstack!=null ? context.oconstack.size() : 0;
 		
 		if(value instanceof VariableExpression)
 		{
-			context.pushCondition(context.getObjectCondition(((VariableExpression)value).getVariable()));
+			context.pushCondition(context.getConstrainableCondition(((VariableExpression)value).getVariable()));
 			valuesource	= context.getBoundConstraint(((VariableExpression)value).getVariable()).getValueSource();
 		}
 		else if(value instanceof PrimaryExpression)
@@ -314,7 +322,7 @@ public class ConstraintBuilder
 				Variable	var	= ((VariableExpression)prim).getVariable();
 				type	= var.getType();
 				valuesource	= context.getBoundConstraint(var).getValueSource();
-				context.pushCondition(context.getObjectCondition(var));
+				context.pushCondition(context.getConstrainableCondition(var));
 			}
 			else if(prim instanceof LiteralExpression)
 			{
@@ -332,7 +340,7 @@ public class ConstraintBuilder
 				context.pushCondition(context.getDummyCondition());
 
 				StaticMethodAccess	sma	= (StaticMethodAccess)prim;
-				MethodCall mc = createMethodCall(sma.getType(), sma.getName(), sma.getParameterValues(), context);
+				MethodCall mc = createMethodCall(sma.getType(), sma.getName(), sma.getParameterValues(), context, helper);
 
 				List	paramsources	= mc.getParameterSources();
 				paramsources.add(0, new Constant(null));	// first param is object to be invoked (use null for static method).
@@ -342,12 +350,35 @@ public class ConstraintBuilder
 			else if(prim instanceof CastExpression)
 			{
 				type	= ((CastExpression)prim).getType();
-				valuesource	= getObjectConditionAndValueSource(((CastExpression)prim).getValue(), context);
+				valuesource	= getObjectConditionAndValueSource(((CastExpression)prim).getValue(), context, helper);
 				// Skip pop/push of same condition.
-			}			
+			}
+			else if(prim instanceof CollectExpression)
+			{
+				CollectExpression	colex	= (CollectExpression)prim;
+				BuildContext	newcon	= new BuildContext(context);
+				ICondition	cond	= buildConstraints(colex.getExpression(), newcon, helper);
+				CollectCondition	colco; 
+				if(cond instanceof ObjectCondition)
+				{
+					colco	= new CollectCondition((ObjectCondition)cond);
+				}
+				else if(cond instanceof AndCondition)
+				{
+					colco	= new CollectCondition(((AndCondition)cond).getConditions(), null);
+				}
+				else
+				{
+					throw new RuntimeException("Cannot collect: "+cond);
+				}
+				context.addCondition(colco);
+				context.pushCondition(colco);
+				type	= OAVJavaType.java_collection_type;
+				valuesource	= null;
+			}
 			else
 			{
-				throw new UnsupportedOperationException("Unsupported start of primary expression: "+value);
+				throw new UnsupportedOperationException("Unsupported start of primary expression: "+prim);
 			}
 			
 			List	suffs	= new ArrayList();
@@ -359,7 +390,10 @@ public class ConstraintBuilder
 					OAVAttributeType	attr	= type.getAttributeType(
 						((FieldAccess)suffixes[i]).getName());
 					suffs.add(attr);
-					type	= attr.getType();
+					if(attr.getMultiplicity().equals(OAVAttributeType.NONE))
+						type	= attr.getType();
+					else
+						type	= OAVJavaType.java_collection_type;
 				}
 				else if(suffixes[i] instanceof MethodAccess)
 				{
@@ -368,7 +402,7 @@ public class ConstraintBuilder
 						MethodAccess	ma	= (MethodAccess)suffixes[i];
 						Expression[]	paramvalues	= ma.getParameterValues();
 						String	name	= ma.getName();
-						MethodCall mc = createMethodCall((OAVJavaType)type, name, paramvalues, context);
+						MethodCall mc = createMethodCall((OAVJavaType)type, name, paramvalues, context, helper);
 						suffs.add(mc);
 						type	= context.getTypeModel().getJavaType(mc.getMethod().getReturnType());
 					}
@@ -379,7 +413,7 @@ public class ConstraintBuilder
 				}
 				else if(suffixes[i] instanceof ArrayAccess)
 				{
-					Expression	index	= flattenToPrimary(((ArrayAccess)suffixes[i]).getIndex(), context);
+					Expression	index	= flattenToPrimary(((ArrayAccess)suffixes[i]).getIndex(), context, helper);
 					Object	indexsource;
 					if(index instanceof VariableExpression)
 					{
@@ -413,9 +447,9 @@ public class ConstraintBuilder
 			else
 				func	= new OperatorFunction((IOperator)opex.getOperator());
 			
-			Object leftsource	= getObjectConditionAndValueSource(opex.getLeftValue(), context);
+			Object leftsource	= getObjectConditionAndValueSource(opex.getLeftValue(), context, helper);
 			// Skip pop/push of same condition.
-			Object	right	= flattenToPrimary(opex.getRightValue(), context);
+			Object	right	= flattenToPrimary(opex.getRightValue(), context, helper);
 			if(right instanceof VariableExpression)
 			{
 				right	= ((VariableExpression)right).getVariable();
@@ -436,10 +470,10 @@ public class ConstraintBuilder
 		else if(value instanceof ConditionalExpression)
 		{
 			ConditionalExpression	coex	= (ConditionalExpression)value;
-			Object	choice	= getObjectConditionAndValueSource(coex.getCondition(), context);
+			Object	choice	= getObjectConditionAndValueSource(coex.getCondition(), context, helper);
 			// Skip pop/push of same condition.
-			Object	first	= flattenToPrimary(coex.getFirstValue(), context);
-			Object	second	= flattenToPrimary(coex.getSecondValue(), context);
+			Object	first	= flattenToPrimary(coex.getFirstValue(), context, helper);
+			Object	second	= flattenToPrimary(coex.getSecondValue(), context, helper);
 			if(first instanceof VariableExpression)
 			{
 				first	= ((VariableExpression)first).getVariable();
@@ -464,12 +498,35 @@ public class ConstraintBuilder
 			context.pushCondition(context.getDummyCondition());
 
 			StaticMethodAccess	sma	= (StaticMethodAccess)value;
-			MethodCall mc = createMethodCall(sma.getType(), sma.getName(), sma.getParameterValues(), context);
+			MethodCall mc = createMethodCall(sma.getType(), sma.getName(), sma.getParameterValues(), context, helper);
 
 			List	paramsources	= mc.getParameterSources();
 			paramsources.add(0, new Constant(null));	// first param is object to be invoked (use null for static method).
 			valuesource	= new FunctionCall(new MethodCallFunction(mc.getMethod()), paramsources);
 		}
+		else if(value instanceof CollectExpression)
+		{
+			CollectExpression	colex	= (CollectExpression)value;
+			BuildContext	newcon	= new BuildContext(context);
+			ICondition	cond	= buildConstraints(colex.getExpression(), newcon, helper);
+			CollectCondition	colco; 
+			if(cond instanceof ObjectCondition)
+			{
+				colco	= new CollectCondition((ObjectCondition)cond);
+			}
+			else if(cond instanceof AndCondition)
+			{
+				colco	= new CollectCondition(((AndCondition)cond).getConditions(), null);
+			}
+			else
+			{
+				throw new RuntimeException("Cannot collect: "+cond);
+			}
+			context.addCondition(colco);
+			context.pushCondition(colco);
+			valuesource	= null;
+		}
+		
 		// Unary
 		// ExistentialDeclaration
 		else
@@ -489,13 +546,13 @@ public class ConstraintBuilder
 	 * @param context	The build context.
 	 * @return	The method call object.
 	 */
-	protected static MethodCall createMethodCall(OAVJavaType type, String name, Expression[] paramvalues, BuildContext context)
+	protected static MethodCall createMethodCall(OAVJavaType type, String name, Expression[] paramvalues, BuildContext context, IParserHelper helper)
 	{
 		Object[]	params	= new Object[paramvalues!=null ? paramvalues.length : 0];
 		Class[]	paramtypes	= new Class[params.length];
 		for(int j=0; j<params.length; j++)
 		{
-			Expression	p	= flattenToPrimary(paramvalues[j], context);
+			Expression	p	= flattenToPrimary(paramvalues[j], context, helper);
 			if(p instanceof VariableExpression)
 			{
 				params[j]	= ((VariableExpression)p).getVariable();
@@ -505,7 +562,9 @@ public class ConstraintBuilder
 				}
 				else
 				{
-					throw new RuntimeException("Cannot build method call: Only Java types supported for parameters: "+paramvalues[j]);
+					// Hack!!! Support state ids as objects? required for conditions based on state objects (e.g. attr.contains($obj))
+					paramtypes[j]	= Object.class;
+//					throw new RuntimeException("Cannot build method call: Only Java types supported for parameters: "+paramvalues[j]);
 				}
 			}
 			else //if(p instanceof LiteralExpression)
@@ -546,7 +605,7 @@ public class ConstraintBuilder
 	 *  @param tmodel	The type model.
 	 *  @return	The primary value (i.e. variable or literal).
 	 */
-	protected static Expression	flattenToPrimary(Expression value, BuildContext context)
+	protected static Expression	flattenToPrimary(Expression value, BuildContext context, IParserHelper helper)
 	{
 		Expression	ret;
 
@@ -560,7 +619,7 @@ public class ConstraintBuilder
 		}
 		else if(value instanceof PrimaryExpression)
 		{
-			Object	valuesource	= getObjectConditionAndValueSource(value, context);
+			Object	valuesource	= getObjectConditionAndValueSource(value, context, helper);
 			ret	= new VariableExpression(context.generateVariableBinding(context.getCurrentCondition(), valuesource));
 			context.popCondition();
 		}
@@ -573,8 +632,8 @@ public class ConstraintBuilder
 			else
 				func	= new OperatorFunction((IOperator)opex.getOperator());
 			
-			Object	left	= getObjectConditionAndValueSource(opex.getLeftValue(), context);
-			Object	right	= flattenToPrimary(opex.getRightValue(), context);
+			Object	left	= getObjectConditionAndValueSource(opex.getLeftValue(), context, helper);
+			Object	right	= flattenToPrimary(opex.getRightValue(), context, helper);
 			if(right instanceof VariableExpression)
 			{
 				right	= ((VariableExpression)right).getVariable();
@@ -590,11 +649,11 @@ public class ConstraintBuilder
 		}
 		else if(value instanceof CastExpression)
 		{
-			Expression	prim	= flattenToPrimary(((CastExpression)value).getValue(), context);
+			Expression	prim	= flattenToPrimary(((CastExpression)value).getValue(), context, helper);
 			if(prim instanceof VariableExpression)
 			{
 				VariableExpression	varex	= (VariableExpression)prim;
-				ObjectCondition	ocon	= context.getObjectCondition(varex.getVariable());
+				ConstrainableCondition	ocon	= context.getConstrainableCondition(varex.getVariable());
 				Object	valuesource	= context.getBoundConstraint(varex.getVariable()).getValueSource();
 				OAVObjectType	type	= ((CastExpression)value).getType();
 				ret	= new VariableExpression(context.generateVariableBinding(ocon, context.generateVariableName(), type, valuesource));
@@ -637,14 +696,21 @@ public class ConstraintBuilder
 
 				// Find variables, which are bound (i.e. operator EQUAL) in this condition.
 				Set	localbound	= new HashSet();
-				List	bcs	= null;
-				if(con instanceof ObjectCondition)
+				if(con instanceof ConstrainableCondition)
 				{
-					bcs	= ((ObjectCondition)con).getBoundConstraints();
-				}
-				else if(con instanceof CollectCondition)
-				{
-					bcs	= ((CollectCondition)con).getBoundConstraints();
+					List	bcs	= ((ConstrainableCondition)con).getBoundConstraints();
+					for(int j=0; bcs!=null && j<bcs.size(); j++)
+					{
+						BoundConstraint	bc	= (BoundConstraint)bcs.get(j);
+						if(bc.getOperator().equals(IOperator.EQUAL))
+						{
+							List	bvars	= bc.getBindVariables();
+							for(int k=0; k<bvars.size(); k++)
+							{
+								localbound.add(bvars.get(k));
+							}
+						}
+					}
 				}
 				else if(con instanceof TestCondition)
 				{
@@ -663,18 +729,6 @@ public class ConstraintBuilder
 					// Put not conditions last.
 					for(int j=i-skipped+1; check && j<lcons.size(); j++)
 						check	= lcons.get(j) instanceof NotCondition;
-				}
-				for(int j=0; bcs!=null && j<bcs.size(); j++)
-				{
-					BoundConstraint	bc	= (BoundConstraint)bcs.get(j);
-					if(bc.getOperator().equals(IOperator.EQUAL))
-					{
-						List	bvars	= bc.getBindVariables();
-						for(int k=0; k<bvars.size(); k++)
-						{
-							localbound.add(bvars.get(k));
-						}
-					}
 				}
 				
 				// Check if all variables are bound.

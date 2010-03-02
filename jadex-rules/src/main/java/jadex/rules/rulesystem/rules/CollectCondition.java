@@ -1,22 +1,17 @@
 package jadex.rules.rulesystem.rules;
 
-import jadex.rules.rulesystem.ICondition;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  *  A condition that contains constraints belonging to a collection of objects.
  */
-public class CollectCondition implements ICondition
+public class CollectCondition extends ConstrainableCondition
 {
 	//-------- attributes --------
 	
 	/** The object condition (contains constraints for objects in the collection). */
 	protected List ocons;
-	
-	/** The constraints on the collection as a whole. */
-	protected List constraints;
 	
 	//-------- constructors --------
 	
@@ -41,8 +36,8 @@ public class CollectCondition implements ICondition
 	 */
 	public CollectCondition(List ocons, List constraints)
 	{
+		super(constraints==null? new ArrayList(): constraints);
 		this.ocons = ocons;
-		this.constraints = constraints==null? new ArrayList(): constraints;
 	}
 	
 	/**
@@ -50,10 +45,10 @@ public class CollectCondition implements ICondition
 	 */
 	public CollectCondition(ObjectCondition[] oconditions, List constraints)
 	{
+		super(constraints==null? new ArrayList(): constraints);
 		this.ocons = new ArrayList();
 		for(int i=0; i<oconditions.length; i++)
 			this.ocons.add(oconditions[i]);
-		this.constraints = constraints==null? new ArrayList(): constraints;
 	}
 	
 	//-------- methods --------
@@ -77,48 +72,16 @@ public class CollectCondition implements ICondition
 	}
 
 	/**
-	 *  Add a constraint.
-	 *  @param constraint The constraint- 
-	 */
-	public void addConstraint(IConstraint con)
-	{
-		constraints.add(con);
-	}
-	
-	/**
-	 *  Get the constraints.
-	 *  @return The constraints.
-	 */
-	public List getConstraints()
-	{
-		return constraints;
-	}
-	
-	/**
-	 *  Get all bound constraints.
-	 *  @return The bound constraints.
-	 */
-	public List getBoundConstraints()
-	{
-		List ret = new ArrayList();
-		for(int i=0; i<constraints.size(); i++)
-		{
-			if(constraints.get(i) instanceof BoundConstraint)
-				ret.add(constraints.get(i));
-		}
-		return ret;
-	}
-		
-	/**
 	 *  Get the variables.
 	 *  @return The declared variables.
-	 */
+	 * /
+	// Todo: include inner variables? no because not visible in outer scope???
 	public List getVariables()
 	{
-		List ret = new ArrayList();
-		for(int i=0; i<constraints.size(); i++)
+		List ret = super.getVariables();
+		for(int i=0; i<ocons.size(); i++)
 		{
-			List tmp = ((IConstraint)constraints.get(i)).getVariables();
+			List tmp = ((ICondition)ocons.get(i)).getVariables();
 			for(int j=0; j<tmp.size(); j++)
 			{
 				if(!ret.contains(tmp.get(j)))
@@ -126,7 +89,7 @@ public class CollectCondition implements ICondition
 			}
 		}
 		return ret;
-	}
+	}*/
 	
 	/**
 	 *  Get the string representation.

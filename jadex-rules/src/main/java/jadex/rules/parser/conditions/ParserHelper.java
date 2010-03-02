@@ -172,15 +172,15 @@ public class ParserHelper
 			if(returnvar!=null && !pexp.containsVariable(returnvar))
 			{
 				// Assign return variable if not already present. (e.g. implicit ?ret variable)
-				ret	= ConstraintBuilder.buildConstraints(new OperationExpression(pexp, new VariableExpression(returnvar), IOperator.EQUAL), helper.getBuildContext());
+				ret	= ConstraintBuilder.buildConstraints(new OperationExpression(pexp, new VariableExpression(returnvar), IOperator.EQUAL), helper.getBuildContext(), helper);
 			}
 			else if(invert)
 			{
-				ret	= ConstraintBuilder.buildConstraints(new UnaryExpression(pexp, UnaryExpression.OPERATOR_NOT), helper.getBuildContext());
+				ret	= ConstraintBuilder.buildConstraints(new UnaryExpression(pexp, UnaryExpression.OPERATOR_NOT), helper.getBuildContext(), helper);
 			}
 			else
 			{
-				ret	= ConstraintBuilder.buildConstraints(pexp, helper.getBuildContext());
+				ret	= ConstraintBuilder.buildConstraints(pexp, helper.getBuildContext(), helper);
 			}
 
 //			if(invert)

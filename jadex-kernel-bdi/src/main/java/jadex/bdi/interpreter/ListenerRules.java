@@ -336,7 +336,7 @@ public class ListenerRules
 				
 				IInternalEventListener lis	= (IInternalEventListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
 //				AgentEvent	ae	= new AgentEvent(InternalEventFlyweight.getInternalFlyweight(state, rcapa, revent), ce);
-				AgentEvent	ae	= new AgentEvent(InternalEventFlyweight.getInternalFlyweight(state, rcapa, revent), 
+				AgentEvent	ae	= new AgentEvent(InternalEventFlyweight.getInternalEventFlyweight(state, rcapa, revent), 
 						state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_value));
 				
 				lis.internalEventOccurred(ae);
@@ -398,7 +398,7 @@ public class ListenerRules
 
 				IMessageEventListener lis	= (IMessageEventListener)state.getAttributeValue(le, OAVBDIRuntimeModel.listenerentry_has_listener);
 //				AgentEvent	ae	= new AgentEvent(MessageEventFlyweight.getMessageFlyweight(state, rcapa, revent), ce);
-				AgentEvent	ae	= new AgentEvent(MessageEventFlyweight.getMessageFlyweight(state, rcapa, revent), 
+				AgentEvent	ae	= new AgentEvent(MessageEventFlyweight.getMessageEventFlyweight(state, rcapa, revent), 
 						state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_value));
 
 				String cetype = (String)state.getAttributeValue(ce, OAVBDIRuntimeModel.changeevent_has_type);

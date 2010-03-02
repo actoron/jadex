@@ -41,11 +41,11 @@ public class ChangeEventFlyweight extends ElementFlyweight implements IChangeEve
 		}
 		else if(type.isSubtype(OAVBDIRuntimeModel.messageevent_type))
 		{
-			ret = MessageEventFlyweight.getMessageFlyweight(getState(), getScope(), elem);
+			ret = MessageEventFlyweight.getMessageEventFlyweight(getState(), getScope(), elem);
 		}
 		else if(type.isSubtype(OAVBDIRuntimeModel.internalevent_type))
 		{
-			ret = InternalEventFlyweight.getInternalFlyweight(getState(), getScope(), elem);
+			ret = InternalEventFlyweight.getInternalEventFlyweight(getState(), getScope(), elem);
 		}
 		else if(type.isSubtype(OAVBDIRuntimeModel.belief_type))
 		{

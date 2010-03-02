@@ -2178,12 +2178,12 @@ public class PlanRules
 			else if(OAVBDIRuntimeModel.internalevent_type.equals(type))
 			{
 				// Todo: Hack!!! wrong scope
-				ret = InternalEventFlyweight.getInternalFlyweight(state, rcapa, de);
+				ret = InternalEventFlyweight.getInternalEventFlyweight(state, rcapa, de);
 			}
 			else if(OAVBDIRuntimeModel.messageevent_type.equals(type))
 			{
 				// Todo: Hack!!! wrong scope
-				ret = MessageEventFlyweight.getMessageFlyweight(state, rcapa, de);
+				ret = MessageEventFlyweight.getMessageEventFlyweight(state, rcapa, de);
 			}
 			else if(OAVBDIRuntimeModel.changeevent_type.equals(type))
 			{

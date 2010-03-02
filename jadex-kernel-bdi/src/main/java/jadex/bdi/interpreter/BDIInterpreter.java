@@ -398,7 +398,8 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 */
 	public Map getResults()
 	{
-		return Collections.unmodifiableMap((Map)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_results));
+		Map	res	= (Map)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_results);
+		return res!=null ? Collections.unmodifiableMap(res) : Collections.EMPTY_MAP;
 	}
 
 	/**

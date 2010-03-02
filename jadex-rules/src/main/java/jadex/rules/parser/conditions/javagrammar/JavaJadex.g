@@ -212,6 +212,7 @@ primaryExpression returns [Expression exp]
 primaryPrefix returns [Expression exp]
 	: '(' tmp = expression ')' {$exp = tmp;}
 	| tmp = literal {$exp = tmp;}
+	| tmp = collectExpression {$exp = tmp;}
 	| {SJavaParser.lookaheadType(JavaJadexParser.this.input, helper.getBuildContext().getTypeModel(), imports)!=-1}? tmp = typePrimary {$exp = tmp;}
 	| {SJavaParser.lookaheadType(JavaJadexParser.this.input, helper.getBuildContext().getTypeModel(), imports)==-1}? tmp = nontypePrimary {$exp = tmp;}
 	;
@@ -277,6 +278,17 @@ existentialDeclaration returns [Expression exp]
 		Variable	var	= new Variable(varname.getText(), otype);
 		$exp	= new ExistentialDeclaration(otype, var);
 		helper.addVariable(var);
+	}
+	;
+
+/**
+ *  Collect objects and return a collection of them.
+ */
+collectExpression returns [Expression exp]
+	: 'collect(' /*varname = IDENTIFIER ','*/ tmp = expression ')'
+	{
+		//Variable	var	= helper.getBuildContext().getVariable(varname.getText());
+		$exp	= new CollectExpression(/*var,*/ tmp);
 	}
 	;
 

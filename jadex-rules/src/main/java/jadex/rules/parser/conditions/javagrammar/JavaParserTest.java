@@ -66,7 +66,7 @@ public class JavaParserTest
 			
 			System.out.println("Predefined condition:\n"+predefined+"\n");
 
-			parser.setParserHelper(new IParserHelper()
+			IParserHelper	helper	= new IParserHelper()
 			{
 				public Variable getVariable(String name)
 				{
@@ -89,13 +89,18 @@ public class JavaParserTest
 				{
 					return context;
 				}
-			});
+				public Object[] getReplacementType(OAVObjectType type)
+				{
+					return null;
+				}
+			};
+			parser.setParserHelper(helper);
 
 			Expression	pexp	= parser.lhs();
 
 			System.out.println("Parsed expression:\n"+pexp+"\n");
 
-			ICondition	result	= ConstraintBuilder.buildConstraints(pexp, new BuildContext(predefined, tmodel));
+			ICondition	result	= ConstraintBuilder.buildConstraints(pexp, new BuildContext(predefined, tmodel), helper);
 			
 			System.out.println("Condition after build:\n"+result+"\n");
 		}

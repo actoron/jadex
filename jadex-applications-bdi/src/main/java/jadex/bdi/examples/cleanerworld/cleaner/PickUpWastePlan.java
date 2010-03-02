@@ -7,6 +7,7 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.commons.SUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +30,11 @@ public class PickUpWastePlan extends Plan
 //		getLogger().info("Moving to waste!");
 		IGoal moveto = createGoal("achievemoveto");
 		IVector2 location = (IVector2)waste.getProperty(Space2D.PROPERTY_POSITION);
+		if(location==null)
+		{
+			System.out.println("wdfuo2: "+this+", "+getParameter("waste").getValue());
+			System.out.println("wastes: "+SUtil.arrayToString(getBeliefbase().getBeliefSet("wastes").getFacts()));
+		}
 		moveto.getParameter("location").setValue(location);
 //		System.out.println("Created puw: "+location+" "+this);
 		dispatchSubgoalAndWait(moveto);
@@ -40,19 +46,25 @@ public class PickUpWastePlan extends Plan
 		params.put(ISpaceAction.OBJECT_ID, getParameter("waste").getValue());
 		SyncResultListener srl	= new SyncResultListener();
 		env.performSpaceAction("pickup_waste", params, srl);
-		if(!((Boolean)srl.waitForResult()).booleanValue()) 
+		try
+		{
+			srl.waitForResult();
+		}
+		catch(RuntimeException e)
+		{
 			fail();
+		}
 		getBeliefbase().getBelief("carriedwaste").setFact(waste);
 //		getBeliefbase().getBeliefSet("wastes").removeFact(waste);
 	}
 	
-//	public void failed()
-//	{
-//		System.out.println("failed: "+this);
-//	}
-//
-//	public void aborted()
-//	{
-//		System.out.println("aborted: "+this);
-//	}
+	public void failed()
+	{
+		System.err.println("failed: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
+	}
+
+	public void aborted()
+	{
+		System.err.println("aborted: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
+	}
 }

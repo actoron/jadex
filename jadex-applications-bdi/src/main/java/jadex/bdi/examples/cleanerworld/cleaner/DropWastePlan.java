@@ -36,6 +36,8 @@ public class DropWastePlan extends Plan
 
 		IVector2 location = (IVector2)wastebin.getProperty(Space2D.PROPERTY_POSITION);
 		IGoal moveto = createGoal("achievemoveto");
+		if(location==null)
+			System.out.println("wdfuo3: "+this+", "+getParameter("waste").getValue());
 		moveto.getParameter("location").setValue(location);
 //		System.out.println("Created dwp: "+location+" "+this);
 		dispatchSubgoalAndWait(moveto);
@@ -49,8 +51,14 @@ public class DropWastePlan extends Plan
 		params.put("waste", getParameter("waste").getValue());
 		SyncResultListener srl	= new SyncResultListener();
 		env.performSpaceAction("drop_waste", params, srl);
-		if(!((Boolean)srl.waitForResult()).booleanValue()) 
-			fail();
+		try
+		{
+			srl.waitForResult();
+		}
+		catch(RuntimeException e)
+		{
+			fail();	// Use plan failure to avoid exception being printed to console.
+		}
 
 		// Update beliefs.
 //		getLogger().info("Dropping waste to wastebin!");
@@ -72,5 +80,15 @@ public class DropWastePlan extends Plan
 		getBeliefbase().getBelief("carriedwaste").setFact(null);
 //		System.out.println("carriedwaste b =null");
 //		endAtomic();
+	}
+
+	public void failed()
+	{
+		System.err.println("failed: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
+	}
+
+	public void aborted()
+	{
+		System.err.println("aborted: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
 	}
 }
