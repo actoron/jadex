@@ -101,7 +101,7 @@
 							<key>
 								<value type="java.lang.String">message_service</value>
 							</key>
-							<bean class="jadex.standalone.MessageService">
+							<bean class="jadex.standalone.service.MessageService">
 								<constructor-arg ref="platform"/>
 								<constructor-arg>
 									<list value-type="jadex.standalone.transport.ITransport">

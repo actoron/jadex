@@ -250,7 +250,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 */
 	public Logger getLogger()
 	{
-		return interpreter.getLogger();
+		return interpreter.getAgentAdapter().getLogger();
 	}	
 	
 	/**

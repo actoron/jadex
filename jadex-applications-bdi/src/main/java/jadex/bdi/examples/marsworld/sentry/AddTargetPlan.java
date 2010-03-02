@@ -18,7 +18,7 @@ public class AddTargetPlan extends Plan
 	 */
 	public AddTargetPlan()
 	{
-		getLogger().info("Created: "+this);
+		getLogger().info("Created: "+this+" "+getLogger().getName());
 	}
 
 	//-------- methods --------

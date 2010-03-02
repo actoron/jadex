@@ -2,6 +2,8 @@ package jadex.bridge;
 
 import jadex.service.IServiceContainer;
 
+import java.util.logging.Logger;
+
 
 /**
  *  The adapter for a specific platform component (e.g. a JADE agent).
@@ -56,6 +58,12 @@ public interface IComponentAdapter
 	 *  messages to this component.
 	 */
 	public IComponentIdentifier getComponentIdentifier() throws ComponentTerminatedException;
+	
+	/**
+	 *  Get the component logger.
+	 *  @return The logger.
+	 */
+	public Logger getLogger();
 	
 //	/**
 //	 *  Get the subcomponents of this component.

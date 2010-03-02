@@ -365,7 +365,7 @@ public class EventProcessingRules
 			if(!state.getType(rpe).isSubtype(OAVBDIRuntimeModel.goal_type)
 				|| state.getAttributeValues(rpe, OAVBDIRuntimeModel.goal_has_triedmplans)==null)
 			{
-				AgentRules.getLogger(state, rcapa).warning("Warning: Event/goal not handled: "+rpe+" "
+				BDIInterpreter.getInterpreter(state).getLogger(rcapa).warning("Warning: Event/goal not handled: "+rpe+" "
 					+state.getAttributeValue(state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
 			}
 		}
@@ -452,7 +452,7 @@ public class EventProcessingRules
 				if(!state.getType(rpe).isSubtype(OAVBDIRuntimeModel.goal_type)
 					|| state.getAttributeValues(rpe, OAVBDIRuntimeModel.goal_has_triedmplans)==null)
 				{
-					AgentRules.getLogger(state, rcapa).warning("Warning: Event/goal not handled: "+rpe+" "
+					AgentRules.BDIInterpreter.getInterpreter(state).getLogger(rcapa).warning("Warning: Event/goal not handled: "+rpe+" "
 						+state.getAttributeValue(state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
 				}
 			}
@@ -827,7 +827,7 @@ public class EventProcessingRules
 				{
 					state.setAttributeValue(rpe, OAVBDIRuntimeModel.processableelement_has_state, 
 						OAVBDIRuntimeModel.PROCESSABLEELEMENT_NOCANDIDATES);
-					AgentRules.getLogger(state, rcapa).severe("Meta-level reasoning did not return a result.");
+					BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Meta-level reasoning did not return a result.");
 				}
 				else
 				{

@@ -1,6 +1,7 @@
 package jadex.bdi.runtime.impl;
 
 import jadex.bdi.interpreter.AgentRules;
+import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
@@ -251,14 +252,14 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					object = AgentRules.getLogger(getState(), getScope());
+					object = BDIInterpreter.getInterpreter(getState()).getLogger(getScope());
 				}
 			};
 			return (Logger)invoc.object;
 		}
 		else
 		{
-			return AgentRules.getLogger(getState(), getScope());
+			return BDIInterpreter.getInterpreter(getState()).getLogger(getScope());
 		}
 	}
 

@@ -551,15 +551,15 @@ public class PlanRules
 					if(!(e instanceof BDIFailureException))
 					{
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
-//						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
+//						AgentRules.BDIInterpreter.getInterpreter(state).getLogger(rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
-						AgentRules.getLogger(state, rcapa).severe(ip.getComponentAdapter().getComponentIdentifier()+
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe(ip.getComponentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+" "+state.getAttributeValue(state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)+"\n"+sw);
 					}
 					else
 					{
-						AgentRules.getLogger(state, rcapa).info(ip.getComponentAdapter().getComponentIdentifier()+
-								": Exception while executing: "+rplan+"\n"+sw);
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).info(ip.getComponentAdapter().getComponentIdentifier()+
+							": Exception while executing: "+rplan+"\n"+sw);
 					}
 				}
 				ip.setCurrentPlan(null);
@@ -635,15 +635,15 @@ public class PlanRules
 					if(!(e instanceof BDIFailureException))
 					{
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
-//						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
+//						AgentRules.BDIInterpreter.getInterpreter(state).getLogger(rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
-						AgentRules.getLogger(state, rcapa).severe(ip.getComponentAdapter().getComponentIdentifier()+
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe(ip.getComponentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 					else
 					{
-						AgentRules.getLogger(state, rcapa).info(ip.getComponentAdapter().getComponentIdentifier()+
-								": Exception while executing: "+rplan+"\n"+sw);
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).info(ip.getComponentAdapter().getComponentIdentifier()+
+							": Exception while executing: "+rplan+"\n"+sw);
 					}
 				}
 				ip.setCurrentPlan(null);
@@ -721,14 +721,14 @@ public class PlanRules
 					if(!(e instanceof BDIFailureException))
 					{
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
-//						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
+//						AgentRules.BDIInterpreter.getInterpreter(state).getLogger(rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
-						AgentRules.getLogger(state, rcapa).severe(ip.getComponentAdapter().getComponentIdentifier()+
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe(ip.getComponentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 					else
 					{
-						AgentRules.getLogger(state, rcapa).info(ip.getComponentAdapter().getComponentIdentifier()+
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).info(ip.getComponentAdapter().getComponentIdentifier()+
 								": Exception while executing: "+rplan+"\n"+sw);
 					}
 				}
@@ -806,15 +806,15 @@ public class PlanRules
 					if(!(e instanceof BDIFailureException))
 					{
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
-//						AgentRules.getLogger(state, rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
+//						AgentRules.BDIInterpreter.getInterpreter(state).getLogger(rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
-						AgentRules.getLogger(state, rcapa).severe(ip.getComponentAdapter().getComponentIdentifier()+
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe(ip.getComponentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 					else
 					{
-						AgentRules.getLogger(state, rcapa).info(ip.getComponentAdapter().getComponentIdentifier()+
-								": Exception while executing: "+rplan+"\n"+sw);
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).info(ip.getComponentAdapter().getComponentIdentifier()+
+							": Exception while executing: "+rplan+"\n"+sw);
 					}
 				}
 				ip.setCurrentPlan(null);

@@ -370,7 +370,7 @@ public class MessageEventRules
 				Object rawmsg = assignments.getVariableValue("?rawmsg");
 
 				String agentname = BDIInterpreter.getInterpreter(state).getComponentAdapter().getComponentIdentifier().getLocalName();
-				AgentRules.getLogger(state, ragent).severe("Agent has received msg and has found no template: "+agentname+" "+rawmsg);
+				BDIInterpreter.getInterpreter(state).getLogger(ragent).severe("Agent has received msg and has found no template: "+agentname+" "+rawmsg);
 			
 				state.removeAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_inbox, rawmsg);
 			}
@@ -1035,7 +1035,7 @@ public class MessageEventRules
 		Collection coll = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_sentmessageevents);
 		if(MESSAGEEVENTS_MAX!=0 && coll!=null && coll.size()>MESSAGEEVENTS_MAX)
 		{
-			AgentRules.getLogger(state, rcapa).severe("Agent does not save conversation due " +
+			BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Agent does not save conversation due " +
 				"to too many outstanding messages. Increase buffer in runtime.xml - storedmessages.size");
 		}
 		else

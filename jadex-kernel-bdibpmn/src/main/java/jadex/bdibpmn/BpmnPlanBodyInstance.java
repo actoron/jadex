@@ -477,7 +477,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public Logger getLogger()
 	{
-		return AgentRules.getLogger(state, rcapa);
+		return BDIInterpreter.getInterpreter(state).getLogger(rcapa);
 	}
 
 	

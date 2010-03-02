@@ -1,10 +1,10 @@
 package jadex.application.runtime.impl;
 
 import jadex.application.model.ApplicationModel;
-import jadex.application.model.MComponentInstance;
-import jadex.application.model.MComponentType;
 import jadex.application.model.MApplicationInstance;
 import jadex.application.model.MApplicationType;
+import jadex.application.model.MComponentInstance;
+import jadex.application.model.MComponentType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
 import jadex.application.runtime.IApplicationExternalAccess;
@@ -12,10 +12,10 @@ import jadex.application.runtime.ISpace;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  *  The application context provides a closed environment for components.
@@ -154,6 +155,15 @@ public class Application	implements IApplication, IComponentInstance
 	public synchronized ISpace getSpace(String name)
 	{
 		return spaces==null? null: (ISpace)spaces.get(name);
+	}
+	
+	/**
+	 *  Get the logger.
+	 *  @return The logger.
+	 */
+	public Logger getLogger()
+	{
+		return adapter.getLogger();
 	}
 	
 	//-------- template methods --------

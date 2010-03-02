@@ -223,7 +223,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public Logger getLogger()
 	{
-		return AgentRules.getLogger(state, rcapa);
+		return BDIInterpreter.getInterpreter(state).getLogger(rcapa);
 	}
 
 	

@@ -15,8 +15,8 @@ import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
@@ -36,13 +36,24 @@ import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  *  Main entry point for the reasoning engine
@@ -229,15 +240,17 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			if(mps!=null)
 				this.microplansteps = mps.booleanValue();
 		}		
+		
+		// This is the clean way to init the logger, but since 
+		// Java 7 the LogManager is a memory leak
+		// Also in Java 7 the memory leak exists :-(
+		// So only access logger if really necessary
+//		Logger logger = adapter.getLogger();
+//		initLogger(ragent, logger);
 	}
-	
-	
 	
 	//-------- IKernelAgent interface --------
 	
-
-
-
 	//	Lock lock = new ReentrantLock(); 
 	/**
 	 *  Main method to perform agent execution.
@@ -452,7 +465,164 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		return isatbreakpoint;
 	}
 
+	boolean inited = false;
+	/**
+	 *  Get the logger.
+	 *  @return The logger.
+	 */
+	public Logger getLogger(Object rcapa)
+	{
+		// http://bugs.sun.com/view_bug.do;jsessionid=bbdb212815ddc52fcd1384b468b?bug_id=4811930
+			
+		Logger ret = adapter.getLogger();
+		if(!inited)
+		{
+//			System.out.println("init: "+ret.getName());
+			initLogger(ragent, ret);
+			inited = true;
+		}
+//		else
+//		{
+//			System.out.println("fetch: "+ret.getName());
+//		}
+		
+		if(ragent!=rcapa)
+		{
+			// get logger with unique capability name
+			// todo: implement getDetailName()
+			//String name = getDetailName();
+			
+			List path = new ArrayList();
+			findSubcapability(ragent, rcapa, path);
+			StringBuffer buf = new StringBuffer();
+			buf.append(ret.getName()).append(".");
+			for(int i=0; i<path.size(); i++)
+			{
+				Object caparef = path.get(i);
+				String name = (String)state.getAttributeValue(caparef, OAVBDIRuntimeModel.capabilityreference_has_name);
+				buf.append(name);
+				if(i+1<path.size())
+					buf.append(".");
+			}
+			String name = buf.toString();
+			ret = LogManager.getLogManager().getLogger(name);
+			
+			// if logger does not already exists, create it
+			if(ret==null)
+			{
+				// Hack!!! Might throw exception in applet / webstart.
+				try
+				{
+					ret = Logger.getLogger(name);
+					initLogger(rcapa, ret);
+					//System.out.println(logger.getParent().getLevel());
+				}
+				catch(SecurityException e)
+				{
+					// Hack!!! For applets / webstart use anonymous logger.
+					ret	= Logger.getAnonymousLogger();
+					initLogger(rcapa, ret);
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Find the path to a subcapability.
+	 *  @param rcapa The start capability.
+	 *  @param targetcapa The target capability.
+	 *  @param path The result path as list of capas.
+	 *  @return True if found.
+	 */
+	protected boolean findSubcapability(Object rcapa, Object targetcapa, List path)
+	{
+		boolean ret = false;
+		
+		Collection coll = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_subcapabilities);
+		if(coll!=null)
+		{
+			for(Iterator it=coll.iterator(); it.hasNext() && !ret; )
+			{
+				Object caparef = it.next();
+				path.add(caparef);
+				Object subcapa = state.getAttributeValue(caparef, OAVBDIRuntimeModel.capabilityreference_has_capability);
+				if(targetcapa==subcapa)
+				{
+					ret = true;
+				}
+				else
+				{
+					ret = findSubcapability(subcapa, targetcapa, path);
+					if(!ret)
+						path.remove(path.size()-1);
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
 	//-------- other methods --------
+	
+	/**
+	 *  Init the logger with capability settings.
+	 *  @param logger The logger.
+	 */
+	protected void initLogger(Object rcapa, Logger logger)
+	{
+		// get logging properties (from ADF)
+		// the level of the logger
+		// can be Integer or Level
+		
+		Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.level");
+		Level level = prop==null? Level.SEVERE: (Level)prop;
+		logger.setLevel(level);
+
+		// if logger should use Handlers of parent (global) logger
+		// the global logger has a ConsoleHandler(Level:INFO) by default
+		prop = AgentRules.getPropertyValue(state, rcapa, "logging.useParentHandlers");
+		if(prop!=null)
+		{
+			logger.setUseParentHandlers(((Boolean)prop).booleanValue());
+		}
+			
+		// add a ConsoleHandler to the logger to print out
+        // logs to the console. Set Level to given property value
+		prop = AgentRules.getPropertyValue(state, rcapa, "addConsoleHandler");
+		if(prop!=null)
+		{
+            ConsoleHandler console = new ConsoleHandler();
+            console.setLevel(Level.parse(prop.toString()));
+            logger.addHandler(console);
+        }
+		
+		// Code adapted from code by Ed Komp: http://sourceforge.net/forum/message.php?msg_id=6442905
+		// if logger should add a filehandler to capture log data in a file. 
+		// The user specifies the directory to contain the log file.
+		// $scope.getAgentName() can be used to have agent-specific log files 
+		//
+		// The directory name can use special patterns defined in the
+		// class, java.util.logging.FileHandler, 
+		// such as "%h" for the user's home directory.
+		// 
+		String logfile =	(String)AgentRules.getPropertyValue(state, rcapa, "logging.file");
+		if(logfile!=null)
+		{
+		    try
+		    {
+			    Handler fh	= new FileHandler(logfile);
+		    	fh.setFormatter(new SimpleFormatter());
+		    	logger.addHandler(fh);
+		    }
+		    catch (IOException e)
+		    {
+		    	System.err.println("I/O Error attempting to create logfile: "
+		    		+ logfile + "\n" + e.getMessage());
+		    }
+		}
+	}
 	
 	/**
 	 *  Get the agent instance reference.

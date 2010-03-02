@@ -18,6 +18,8 @@ import jadex.service.clock.SystemClock;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 /**
  *  Test execution of an agent.
@@ -117,6 +119,11 @@ public class InterpreterTest
 				public boolean isExternalThread()
 				{
 					return false;
+				}
+				
+				public Logger getLogger()
+				{
+					return Logger.getAnonymousLogger();
 				}
 			}, loaded.getState(), loaded, null, null, null, config);
 			

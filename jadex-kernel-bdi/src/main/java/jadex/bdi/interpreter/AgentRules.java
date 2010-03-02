@@ -1415,7 +1415,7 @@ public class AgentRules
 					catch(Exception e)
 					{
 						String name = BDIInterpreter.getInterpreter(state).getComponentAdapter().getComponentIdentifier().getName();
-						getLogger(state, rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content));
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content));
 					}
 	//					// changed *.class to *.TYPE due to javaflow bug
 					state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
@@ -1589,7 +1589,7 @@ public class AgentRules
 					catch(Exception e)
 					{
 						String name = BDIInterpreter.getInterpreter(state).getComponentAdapter().getComponentIdentifier().getName();
-						getLogger(state, rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content));
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content));
 					}
 					// changed *.class to *.TYPE due to javaflow bug
 					state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, ((IClockService)BDIInterpreter.getInterpreter(state)
@@ -2490,97 +2490,6 @@ public class AgentRules
 	}*/
 	
 	/**
-	 *  Get the logger.
-	 *  @return The logger.
-	 */
-	public static Logger getLogger(IOAVState state, Object rcapa)
-	{
-		// get logger with unique capability name
-		// todo: implement getDetailName()
-		//String name = getDetailName();
-		String name = rcapa.toString();
-		Logger ret = LogManager.getLogManager().getLogger(name);
-		
-		// if logger does not already exists, create it
-		if(ret==null)
-		{
-			// Hack!!! Might throw exception in applet / webstart.
-			try
-			{
-				ret = Logger.getLogger(name);
-				initLogger(state, rcapa, ret);
-				//System.out.println(logger.getParent().getLevel());
-			}
-			catch(SecurityException e)
-			{
-				// Hack!!! For applets / webstart use anonymous logger.
-				ret	= Logger.getAnonymousLogger();
-				initLogger(state, rcapa, ret);
-			}
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Init the logger with capability settings.
-	 *  @param logger The logger.
-	 */
-	protected static void initLogger(IOAVState state, Object rcapa, Logger logger)
-	{
-		// get logging properties (from ADF)
-		// the level of the logger
-		// can be Integer or Level
-		
-		Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.level");
-		Level level = prop==null? Level.SEVERE: (Level)prop;
-		logger.setLevel(level);
-
-		// if logger should use Handlers of parent (global) logger
-		// the global logger has a ConsoleHandler(Level:INFO) by default
-		prop = AgentRules.getPropertyValue(state, rcapa, "logging.useParentHandlers");
-		if(prop!=null)
-		{
-			logger.setUseParentHandlers(((Boolean)prop).booleanValue());
-		}
-			
-		// add a ConsoleHandler to the logger to print out
-        // logs to the console. Set Level to given property value
-		prop = AgentRules.getPropertyValue(state, rcapa, "addConsoleHandler");
-		if(prop!=null)
-		{
-            ConsoleHandler console = new ConsoleHandler();
-            console.setLevel(Level.parse(prop.toString()));
-            logger.addHandler(console);
-        }
-		
-		// Code adapted from code by Ed Komp: http://sourceforge.net/forum/message.php?msg_id=6442905
-		// if logger should add a filehandler to capture log data in a file. 
-		// The user specifies the directory to contain the log file.
-		// $scope.getAgentName() can be used to have agent-specific log files 
-		//
-		// The directory name can use special patterns defined in the
-		// class, java.util.logging.FileHandler, 
-		// such as "%h" for the user's home directory.
-		// 
-		String logfile =	(String)AgentRules.getPropertyValue(state, rcapa, "logging.file");
-		if(logfile!=null)
-		{
-		    try
-		    {
-			    Handler fh	= new FileHandler(logfile);
-		    	fh.setFormatter(new SimpleFormatter());
-		    	logger.addHandler(fh);
-		    }
-		    catch (IOException e)
-		    {
-		    	System.err.println("I/O Error attempting to create logfile: "
-		    		+ logfile + "\n" + e.getMessage());
-		    }
-		}
-	}
-
-	/**
 	 *  Fetch an element and its scope by its complex name (e.g. cmscap.cms_create_component).
 	 *  @param name The name.
 	 *  @return An array [restname, scope].
@@ -2824,7 +2733,7 @@ public class AgentRules
 //					if(state.containsObject(ragent))
 //					{
 						// todo: cleanup? or in terminated action?
-						getLogger(state, ragent).info("Forcing termination (timeout): "+interpreter.getComponentAdapter().getComponentIdentifier().getLocalName());
+						BDIInterpreter.getInterpreter(state).getLogger(ragent).info("Forcing termination (timeout): "+interpreter.getComponentAdapter().getComponentIdentifier().getLocalName());
 						state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, 
 							OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED);
 						interpreter.getComponentAdapter().wakeup();

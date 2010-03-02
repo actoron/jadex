@@ -624,31 +624,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	 */
 	public Logger getLogger()
 	{
-		// get logger with unique capability name
-		// todo: implement getDetailName()
-		//String name = getDetailName();
-		String name = adapter.getComponentIdentifier().getLocalName();
-		Logger ret = LogManager.getLogManager().getLogger(name);
-		
-		// if logger does not already exists, create it
-		if(ret==null)
-		{
-			// Hack!!! Might throw exception in applet / webstart.
-			try
-			{
-				ret = Logger.getLogger(name);
-//				initLogger(state, rcapa, ret);
-				//System.out.println(logger.getParent().getLevel());
-			}
-			catch(SecurityException e)
-			{
-				// Hack!!! For applets / webstart use anonymous logger.
-				ret	= Logger.getAnonymousLogger();
-//				initLogger(state, rcapa, ret);
-			}
-		}
-		
-		return ret;
+		return adapter.getLogger();
 	}
 
 	/**

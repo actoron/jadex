@@ -1,4 +1,4 @@
-package jadex.standalone;
+package jadex.standalone.service;
 
 import jadex.base.DefaultResultListener;
 import jadex.bridge.ComponentTerminatedException;
@@ -19,7 +19,8 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.clock.IClockService;
 import jadex.service.execution.IExecutionService;
-import jadex.standalone.service.ComponentManagementService;
+import jadex.standalone.AbstractPlatform;
+import jadex.standalone.StandaloneComponentAdapter;
 import jadex.standalone.transport.ITransport;
 
 import java.util.ArrayList;

@@ -34,7 +34,7 @@
 			</property>
 			
 			  <property type="jadex.bridge.IMessageService" name="message_service">
-			  	new jadex.standalone.MessageService($platform,
+			  	new jadex.standalone.service.MessageService($platform,
                 new jadex.standalone.transport.ITransport[]
                 {
                     new jadex.standalone.transport.localmtp.LocalTransport($platform),

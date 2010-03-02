@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 /**
  *  Component adapter for built-in standalone platform. 
@@ -39,10 +41,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	//-------- attributes --------
 
 	/** The container. */
-	protected transient IServiceContainer	container;
+	protected transient IServiceContainer container;
 
 	/** The component identifier. */
-	protected IComponentIdentifier	cid;
+	protected IComponentIdentifier cid;
 
 	/** The component instance. */
 	protected IComponentInstance component;
@@ -54,8 +56,11 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  (read only! managed by component execution service). */
 	protected IComponentDescription	desc;
 	
+	/** The component logger. */
+	protected Logger logger;
+	
 	/** Flag to indicate a fatal error (component termination will not be passed to instance) */
-	protected boolean	fatalerror;
+	protected boolean fatalerror;
 	
 	//-------- steppable attributes --------
 	
@@ -152,48 +157,6 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	}
 
 	/**
-	 *  Send a message via the adapter.
-	 *  @param message The message (name/value pairs).
-	 *  @param mytpe The message type.
-	 * /
-	public void sendMessage(IMessageAdapter message)
-	{
-		if(IComponentDescription.STATE_TERMINATED.equals(state))
-			throw new AgentTerminatedException(aid.getName());
-
-		Map pmap = message.getParameterMap();
-		
-		// Check and possibly insert sender
-		MessageType mt = message.getMessageType();
-		
-		// Automatically add optional meta information.
-		String sen = mt.getSenderIdentifier();
-		Object sender = message.getValue(sen);
-		if(sender==null)
-			pmap.put(sen, getComponentIdentifier());
-		
-		String idid = mt.getIdIdentifier();
-		Object id = message.getValue(idid);
-		if(id==null)
-			pmap.put(idid, SUtil.createUniqueId(getComponentIdentifier().getLocalName()));
-
-		String sd = mt.getTimestampIdentifier();
-		Object senddate = message.getValue(sd);
-		if(senddate==null)
-			pmap.put(sd, ""+getClock().getTime());
-		
-		IComponentIdentifier[] recs = null;
-		Object tmp = message.getValue(mt.getReceiverIdentifier());
-		if(tmp instanceof Collection)
-			recs = (IComponentIdentifier[])((Collection)tmp).toArray(new IComponentIdentifier[0]);
-		else
-			recs = (IComponentIdentifier[])tmp;
-		
-		IMessageService msgservice = (IMessageService)platform.getService(IMessageService.class);
-		msgservice.sendMessage(pmap, mt, recs);
-	}*/
-
-	/**
 	 *  Return a component-identifier that allows to send
 	 *  messages to this agent.
 	 *  Return a copy of the original.
@@ -209,9 +172,43 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 *  Get the container.
 	 *  @return The container of this component.
 	 */
-	public IServiceContainer	getServiceContainer()
+	public IServiceContainer getServiceContainer()
 	{
 		return container;
+	}
+	
+	/**
+	 *  Get the logger.
+	 *  @return The logger.
+	 */
+	public Logger getLogger()
+	{
+		// todo: problem: if logger is not saved the logger
+		// object can vanish (weak reference) and the internal
+		// component does not know that it has to reinite the logger.
+		
+		String name = getComponentIdentifier().getLocalName();
+		logger = LogManager.getLogManager().getLogger(name);
+		
+		// if logger does not already exists, create it
+		if(logger==null)
+		{
+			// Hack!!! Might throw exception in applet / webstart.
+			try
+			{
+				logger = Logger.getLogger(name);
+//				initLogger(state, rcapa, ret);
+				//System.out.println(logger.getParent().getLevel());
+			}
+			catch(SecurityException e)
+			{
+				// Hack!!! For applets / webstart use anonymous logger.
+				logger = Logger.getAnonymousLogger();
+//				initLogger(state, rcapa, ret);
+			}
+		}
+		
+		return logger;
 	}
 	
 	/**
@@ -256,6 +253,8 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			listener.resultAvailable(this, getComponentIdentifier());
 		}
 			
+		// LogManager causes memory leak till Java 7
+		// No way to remove loggers and no weak references. 
 	}
 
 	/**
