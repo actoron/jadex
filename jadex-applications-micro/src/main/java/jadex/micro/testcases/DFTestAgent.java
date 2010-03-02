@@ -1,11 +1,11 @@
 package jadex.micro.testcases;
 
-import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFComponentDescription;
-import jadex.adapter.base.fipa.IDFServiceDescription;
-import jadex.adapter.base.fipa.SFipa;
-import jadex.adapter.base.test.TestReport;
-import jadex.adapter.base.test.Testcase;
+import jadex.base.fipa.IDF;
+import jadex.base.fipa.IDFComponentDescription;
+import jadex.base.fipa.IDFServiceDescription;
+import jadex.base.fipa.SFipa;
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bridge.Argument;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;

@@ -1,6 +1,6 @@
 package jadex.bdi.examples.marsworld_classic.carrier;
 
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.examples.marsworld_classic.AgentInfo;
 import jadex.bdi.examples.marsworld_classic.Environment;
 import jadex.bdi.examples.marsworld_classic.Location;

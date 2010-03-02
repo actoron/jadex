@@ -12,7 +12,7 @@
 	package="jadex.bdi.testcases.plans">
 
 	<imports>
-		<import>jadex.adapter.base.test.*</import>
+		<import>jadex.base.test.*</import>
 		<import>jadex.bdi.testcases.ResultPlan</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
 	</imports>

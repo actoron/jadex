@@ -7,8 +7,8 @@ import jade.domain.FIPAAgentManagement.Property;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.IAMS;
+import jadex.base.fipa.SFipa;
 import jadex.adapter.jade.fipaimpl.AgentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageType;
@@ -379,7 +379,7 @@ public class SJade
 	/**
 	 *  Convert a Jade AID to a Fipa aid.
 	 */
-	public static DFAgentDescription convertAgentDescriptiontoJade(jadex.adapter.base.fipa.IDFComponentDescription desc)
+	public static DFAgentDescription convertAgentDescriptiontoJade(jadex.base.fipa.IDFComponentDescription desc)
 	{
 		DFAgentDescription ret = new DFAgentDescription();
 		if(desc.getName()!=null)
@@ -393,7 +393,7 @@ public class SJade
 		String[] prots = desc.getProtocols();
 		for(int i=0; i<prots.length; i++)
 			ret.addProtocols(prots[i]);
-		jadex.adapter.base.fipa.IDFServiceDescription[] servs = desc.getServices();
+		jadex.base.fipa.IDFServiceDescription[] servs = desc.getServices();
 		for(int i=0; i<servs.length; i++)
 			ret.addServices(SJade.convertServiceDescriptiontoJade(servs[i]));
 		ret.setLeaseTime(desc.getLeaseTime());
@@ -431,7 +431,7 @@ public class SJade
 	 *  Convert a Jade AID to a Fipa aid.
 	 */
 	public static ServiceDescription
-		convertServiceDescriptiontoJade(jadex.adapter.base.fipa.IDFServiceDescription desc)
+		convertServiceDescriptiontoJade(jadex.base.fipa.IDFServiceDescription desc)
 	{
 		ServiceDescription ret = new ServiceDescription();
 		ret.setName(desc.getName());
@@ -447,7 +447,7 @@ public class SJade
 		String[] prots = desc.getProtocols();
 		for(int i=0; i<prots.length; i++)
 			ret.addProtocols(prots[i]);
-		jadex.adapter.base.fipa.IProperty[] props = desc.getProperties();
+		jadex.base.fipa.IProperty[] props = desc.getProperties();
 		for(int i=0; i<props.length; i++)
 			ret.addProperties(new jade.domain.FIPAAgentManagement.Property(props[i].getName(), props[i].getValue()));
 		return ret;

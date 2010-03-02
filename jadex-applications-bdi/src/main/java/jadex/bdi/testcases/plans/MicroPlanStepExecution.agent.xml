@@ -14,7 +14,7 @@
 	<imports>
 		<import>java.util.logging.*</import>
 		<import>jadex.bdi.testcases.*</import>
-		<import>jadex.adapter.base.test.*</import>
+		<import>jadex.base.test.*</import>
 	</imports>
 
 	<capabilities>

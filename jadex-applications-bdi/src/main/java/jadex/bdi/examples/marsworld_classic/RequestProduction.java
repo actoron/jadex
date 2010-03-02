@@ -4,7 +4,7 @@
  */
 package jadex.bdi.examples.marsworld_classic;
 
-import jadex.adapter.base.fipa.IComponentAction;
+import jadex.base.fipa.IComponentAction;
 
 
 /**

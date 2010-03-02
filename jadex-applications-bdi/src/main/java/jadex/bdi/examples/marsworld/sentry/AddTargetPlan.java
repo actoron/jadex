@@ -2,7 +2,7 @@ package jadex.bdi.examples.marsworld.sentry;
 
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 

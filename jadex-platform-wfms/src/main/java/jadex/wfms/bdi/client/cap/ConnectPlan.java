@@ -2,7 +2,7 @@ package jadex.wfms.bdi.client.cap;
 
 import java.util.Set;
 
-import jadex.adapter.base.fipa.Done;
+import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.wfms.bdi.ontology.RequestAuth;
 import jadex.wfms.bdi.ontology.RequestCapabilities;

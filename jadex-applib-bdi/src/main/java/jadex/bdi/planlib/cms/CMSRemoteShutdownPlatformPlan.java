@@ -1,7 +1,7 @@
 package jadex.bdi.planlib.cms;
 
-import jadex.adapter.base.fipa.CMSShutdownPlatform;
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.CMSShutdownPlatform;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 

@@ -1,6 +1,6 @@
 package jadex.bdi.examples.marsworld.producer;
 
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.SFipa;
 import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.agr.AGRSpace;
 import jadex.application.space.agr.Group;

@@ -1,7 +1,7 @@
 package jadex.bdi.cmsagent;
 
-import jadex.adapter.base.fipa.CMSSuspendComponent;
-import jadex.adapter.base.fipa.Done;
+import jadex.base.fipa.CMSSuspendComponent;
+import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 

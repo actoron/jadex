@@ -11,7 +11,7 @@
 
 	<imports>
 		<import>jadex.bdi.testcases.*</import>
-		<import>jadex.adapter.base.fipa.SFipa</import>
+		<import>jadex.base.fipa.SFipa</import>
 		<import>java.util.logging.Level</import>
 	</imports>
 

@@ -1,7 +1,7 @@
 package jadex.bdibpmn.examples.marsworld;
 
 import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.fipa.IComponentAction;
+import jadex.base.fipa.IComponentAction;
 
 
 /**

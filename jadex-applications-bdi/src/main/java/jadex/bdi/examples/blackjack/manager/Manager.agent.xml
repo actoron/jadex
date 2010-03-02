@@ -15,7 +15,7 @@
 		<import>jadex.bdi.examples.blackjack.player.strategies.*</import>
 		<import>java.awt.*</import>
 		<import>jadex.commons.*</import>
-		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.base.fipa.*</import>
 		<import>java.util.logging.*</import>
 	</imports>
 	

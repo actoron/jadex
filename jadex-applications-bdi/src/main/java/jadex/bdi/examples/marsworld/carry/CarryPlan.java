@@ -2,7 +2,7 @@ package jadex.bdi.examples.marsworld.carry;
 
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.examples.marsworld.RequestCarry;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;

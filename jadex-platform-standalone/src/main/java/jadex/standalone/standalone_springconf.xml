@@ -78,7 +78,7 @@
 				
 				<entry>
 					<key>
-						<value type="java.lang.Class">jadex.adapter.base.fipa.IDF</value>
+						<value type="java.lang.Class">jadex.base.fipa.IDF</value>
 					</key>
 					<map>
 						<entry>
@@ -120,7 +120,7 @@
 								</constructor-arg>
 								<constructor-arg>
 									<list value-type="jadex.bridge.MessageType">
-										<bean class="jadex.adapter.base.fipa.FIPAMessageType"></bean>
+										<bean class="jadex.base.fipa.FIPAMessageType"></bean>
 									</list>
 								</constructor-arg>
 							</bean>
@@ -153,14 +153,14 @@
 				
 				<entry>
 					<key>
-						<value type="java.lang.Class">jadex.adapter.base.ISimulationService</value>
+						<value type="java.lang.Class">jadex.base.ISimulationService</value>
 					</key>
 					<map>
 						<entry>
 							<key>
 								<value type="java.lang.String">simulation_service</value>
 							</key>
-							<bean class="jadex.adapter.base.SimulationService">
+							<bean class="jadex.base.SimulationService">
 								<constructor-arg ref="platform"/>
 							</bean>
 						</entry>
@@ -223,7 +223,7 @@
 											<key>
 												<value>messagetype_fipa</value>
 											</key>
-											<bean class="jadex.adapter.base.fipa.FIPAMessageType"></bean>
+											<bean class="jadex.base.fipa.FIPAMessageType"></bean>
 										</entry>
 										<entry>
 											<key>

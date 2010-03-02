@@ -1,6 +1,6 @@
 package jadex.tools.convcenter;
 
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;

@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import jadex.adapter.base.fipa.Done;
+import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.commons.SReflect;
 import jadex.service.library.ILibraryService;

@@ -1,8 +1,8 @@
 package jadex.tools.dfbrowser;
 
-import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFComponentDescription;
-import jadex.adapter.base.fipa.IDFServiceDescription;
+import jadex.base.fipa.IDF;
+import jadex.base.fipa.IDFComponentDescription;
+import jadex.base.fipa.IDFServiceDescription;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;

@@ -1,6 +1,6 @@
 package jadex.tools.starter;
 
-import jadex.adapter.base.SComponentFactory;
+import jadex.base.SComponentFactory;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ILoadableComponentModel;

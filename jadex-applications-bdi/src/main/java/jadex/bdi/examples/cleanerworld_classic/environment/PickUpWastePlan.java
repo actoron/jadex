@@ -1,6 +1,6 @@
 package jadex.bdi.examples.cleanerworld_classic.environment;
 
-import jadex.adapter.base.fipa.Done;
+import jadex.base.fipa.Done;
 import jadex.bdi.examples.cleanerworld_classic.Environment;
 import jadex.bdi.examples.cleanerworld_classic.RequestPickUpWaste;
 import jadex.bdi.examples.cleanerworld_classic.Waste;

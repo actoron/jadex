@@ -1,9 +1,9 @@
 package jadex.micro.examples.hunterprey_classic;
 
-import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFComponentDescription;
-import jadex.adapter.base.fipa.IDFServiceDescription;
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.IDF;
+import jadex.base.fipa.IDFComponentDescription;
+import jadex.base.fipa.IDFServiceDescription;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.CurrentVision;
 import jadex.bdi.examples.hunterprey_classic.Food;

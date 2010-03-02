@@ -1,6 +1,6 @@
 package jadex.bdi.testcases.planlib;
 
-import jadex.adapter.base.test.TestReport;
+import jadex.base.test.TestReport;
 import jadex.bdi.planlib.protocols.AuctionDescription;
 import jadex.bdi.planlib.protocols.ExponentialPriceCalculator;
 import jadex.bdi.runtime.GoalFailureException;

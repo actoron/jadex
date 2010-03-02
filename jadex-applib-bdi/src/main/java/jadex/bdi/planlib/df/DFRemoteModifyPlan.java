@@ -1,10 +1,10 @@
 package jadex.bdi.planlib.df;
 
-import jadex.adapter.base.fipa.DFModify;
-import jadex.adapter.base.fipa.Done;
-import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFComponentDescription;
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.DFModify;
+import jadex.base.fipa.Done;
+import jadex.base.fipa.IDF;
+import jadex.base.fipa.IDFComponentDescription;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;

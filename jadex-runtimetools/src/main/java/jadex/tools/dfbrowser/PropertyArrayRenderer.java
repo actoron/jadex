@@ -1,6 +1,6 @@
 package jadex.tools.dfbrowser;
 
-import jadex.adapter.base.fipa.IProperty;
+import jadex.base.fipa.IProperty;
 
 import java.awt.Component;
 

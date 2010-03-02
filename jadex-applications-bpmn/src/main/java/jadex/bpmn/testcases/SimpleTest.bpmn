@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_Kpd_YfxtEd6BS97d4w8Gew" iD="_Kpd_YPxtEd6BS97d4w8Gew">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_c6EKYBDQEd-nouu311XMtg" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6EKYRDQEd-nouu311XMtg" key="imports" value="jadex.bpmn.runtime.task.*␟jadex.adapter.base.test.*␟jadex.bridge.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6EKYRDQEd-nouu311XMtg" key="imports" value="jadex.bpmn.runtime.task.*␟jadex.base.test.*␟jadex.bridge.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6EKYhDQEd-nouu311XMtg" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_B9ptoBDYEd-hjJU8_9Katg" key="results" value="testresults␋Test results.␋Testcase␋"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DC4cABaZEd-YccbjZenQqQ" key="Description" value="Test if a testcase works in principle."/>

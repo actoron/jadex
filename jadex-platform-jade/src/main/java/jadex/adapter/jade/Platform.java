@@ -4,22 +4,22 @@ import jade.Boot;
 import jade.core.AID;
 import jade.wrapper.AgentController;
 import jade.wrapper.PlatformController;
-import jadex.adapter.base.DefaultResultListener;
-import jadex.adapter.base.ISimulationService;
-import jadex.adapter.base.SComponentManagementService;
-import jadex.adapter.base.SComponentFactory;
-import jadex.adapter.base.SimulationService;
-import jadex.adapter.base.agr.MAGRSpaceType;
-import jadex.adapter.base.appdescriptor.ApplicationContextFactory;
-import jadex.adapter.base.appdescriptor.ApplicationFactory;
-import jadex.adapter.base.contextservice.BaseContext;
-import jadex.adapter.base.contextservice.ContextService;
-import jadex.adapter.base.contextservice.DefaultContextFactory;
-import jadex.adapter.base.contextservice.IContextFactory;
+import jadex.base.DefaultResultListener;
+import jadex.base.ISimulationService;
+import jadex.base.SComponentManagementService;
+import jadex.base.SComponentFactory;
+import jadex.base.SimulationService;
+import jadex.base.agr.MAGRSpaceType;
+import jadex.base.appdescriptor.ApplicationContextFactory;
+import jadex.base.appdescriptor.ApplicationFactory;
+import jadex.base.contextservice.BaseContext;
+import jadex.base.contextservice.ContextService;
+import jadex.base.contextservice.DefaultContextFactory;
+import jadex.base.contextservice.IContextFactory;
 import jadex.application.space.envsupport.MEnvSpaceType;
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.IAMS;
+import jadex.base.fipa.IDF;
+import jadex.base.fipa.SFipa;
 import jadex.bridge.IAgentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IApplicationContext;
@@ -303,7 +303,7 @@ public class Platform extends BasicServiceContainer implements IPlatform
 					},
 					new Object[]
 					{
-						new jadex.adapter.base.fipa.FIPAMessageType(), 
+						new jadex.base.fipa.FIPAMessageType(), 
 						exe,
 						new java.lang.Long(10000),
 						SReflect.findClass("jadex.tools.introspector.IntrospectorAdapter", null, ls.getClassLoader()),

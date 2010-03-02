@@ -1,6 +1,6 @@
 package jadex.bdi.testcases.planlib;
 
-import jadex.adapter.base.test.TestReport;
+import jadex.base.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.TimeoutException;

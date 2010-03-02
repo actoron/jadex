@@ -1,8 +1,8 @@
 package jadex.bdi.examples.blackjack.player;
 
-import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFComponentDescription;
-import jadex.adapter.base.fipa.IDFServiceDescription;
+import jadex.base.fipa.IDF;
+import jadex.base.fipa.IDFComponentDescription;
+import jadex.base.fipa.IDFServiceDescription;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;

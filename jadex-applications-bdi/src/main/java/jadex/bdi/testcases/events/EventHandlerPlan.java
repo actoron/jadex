@@ -1,6 +1,6 @@
 package jadex.bdi.testcases.events;
 
-import jadex.adapter.base.test.TestReport;
+import jadex.base.test.TestReport;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;

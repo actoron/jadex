@@ -1,6 +1,6 @@
 package jadex.bdi.planlib.protocols.contractnet;
 
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.planlib.protocols.AbstractReceiverPlan;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;

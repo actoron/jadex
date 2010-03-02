@@ -1,6 +1,6 @@
 package jadex.micro.benchmarks;
 
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IArgument;
 import jadex.bridge.MessageType;

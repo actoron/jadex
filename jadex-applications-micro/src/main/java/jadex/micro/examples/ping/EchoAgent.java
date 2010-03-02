@@ -1,6 +1,6 @@
 package jadex.micro.examples.ping;
 
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageType;
 import jadex.micro.MicroAgent;

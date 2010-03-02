@@ -1,6 +1,6 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.adapter.base.test.TestReport;
+import jadex.base.test.TestReport;
 import jadex.bdi.planlib.messaging.EmailAccount;
 import jadex.bdi.planlib.messaging.ICQAccount;
 import jadex.bdi.runtime.IGoal;

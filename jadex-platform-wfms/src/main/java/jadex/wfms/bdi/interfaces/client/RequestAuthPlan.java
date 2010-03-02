@@ -2,8 +2,8 @@ package jadex.wfms.bdi.interfaces.client;
 
 import java.util.Map;
 
-import jadex.adapter.base.fipa.Done;
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.Done;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;

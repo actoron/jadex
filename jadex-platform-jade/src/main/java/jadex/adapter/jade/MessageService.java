@@ -18,19 +18,19 @@ import jade.domain.JADEAgentManagement.CreateAgent;
 import jade.domain.JADEAgentManagement.JADEManagementOntology;
 import jade.domain.JADEAgentManagement.KillAgent;
 import jade.lang.acl.ACLMessage;
-import jadex.adapter.base.fipa.CMSCreateComponent;
-import jadex.adapter.base.fipa.CMSDestroyComponent;
-import jadex.adapter.base.fipa.CMSResumeComponent;
-import jadex.adapter.base.fipa.CMSSearchComponents;
-import jadex.adapter.base.fipa.AMSStartAgent;
-import jadex.adapter.base.fipa.CMSSuspendComponent;
-import jadex.adapter.base.fipa.DFDeregister;
-import jadex.adapter.base.fipa.DFModify;
-import jadex.adapter.base.fipa.DFRegister;
-import jadex.adapter.base.fipa.DFSearch;
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IDFComponentDescription;
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.CMSCreateComponent;
+import jadex.base.fipa.CMSDestroyComponent;
+import jadex.base.fipa.CMSResumeComponent;
+import jadex.base.fipa.CMSSearchComponents;
+import jadex.base.fipa.AMSStartAgent;
+import jadex.base.fipa.CMSSuspendComponent;
+import jadex.base.fipa.DFDeregister;
+import jadex.base.fipa.DFModify;
+import jadex.base.fipa.DFRegister;
+import jadex.base.fipa.DFSearch;
+import jadex.base.fipa.IAMS;
+import jadex.base.fipa.IDFComponentDescription;
+import jadex.base.fipa.SFipa;
 import jadex.bridge.ContentException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IContentCodec;
@@ -59,8 +59,8 @@ public class MessageService implements IMessageService, IService
 	/** The default codecs. */
 	protected static IContentCodec[]	DEFCODECS	= new IContentCodec[]
 	{
-		new jadex.adapter.base.JavaXMLContentCodec(),
-		new jadex.adapter.base.NuggetsXMLContentCodec()
+		new jadex.base.JavaXMLContentCodec(),
+		new jadex.base.NuggetsXMLContentCodec()
 	};
 	
 	//-------- attributes --------

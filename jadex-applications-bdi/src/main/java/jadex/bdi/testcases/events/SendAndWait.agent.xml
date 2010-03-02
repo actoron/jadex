@@ -13,7 +13,7 @@
 
 	<imports>
 		<import>java.util.logging.*</import>
-		<import>jadex.adapter.base.fipa.SFipa</import>
+		<import>jadex.base.fipa.SFipa</import>
 		<import>jadex.bdi.testcases.AnswerPlan</import>
 	</imports>
 

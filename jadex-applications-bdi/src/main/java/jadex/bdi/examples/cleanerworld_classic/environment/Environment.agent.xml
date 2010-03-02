@@ -11,7 +11,7 @@
 	<imports>
 		<import>jadex.bdi.examples.cleanerworld_classic.*</import>
 		<import>jadex.commons.*</import>
-		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.base.fipa.*</import>
 		<import>java.util.logging.Level</import>
 	</imports>
 

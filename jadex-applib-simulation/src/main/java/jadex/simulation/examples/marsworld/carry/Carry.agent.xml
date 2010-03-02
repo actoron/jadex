@@ -14,7 +14,7 @@
 	<imports>
 		<import>java.util.*</import>
 		<import>java.util.logging.*</import>
-		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.base.fipa.*</import>
 		<import>jadex.application.space.envsupport.environment.*</import>
 		<import>jadex.application.space.envsupport.math.*</import>
 		<import>jadex.bdi.examples.marsworld.*</import>

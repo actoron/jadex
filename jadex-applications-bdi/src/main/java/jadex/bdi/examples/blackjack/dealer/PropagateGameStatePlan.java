@@ -1,6 +1,6 @@
 package jadex.bdi.examples.blackjack.dealer;
 
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.examples.blackjack.GameState;
 import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.runtime.IMessageEvent;

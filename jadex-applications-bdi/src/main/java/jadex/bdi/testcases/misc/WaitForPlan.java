@@ -1,7 +1,7 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.adapter.base.fipa.SFipa;
-import jadex.adapter.base.test.TestReport;
+import jadex.base.fipa.SFipa;
+import jadex.base.test.TestReport;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;

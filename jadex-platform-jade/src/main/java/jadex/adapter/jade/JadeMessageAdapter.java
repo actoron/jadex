@@ -2,8 +2,8 @@ package jadex.adapter.jade;
 
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.IAMS;
+import jadex.base.fipa.SFipa;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;
 

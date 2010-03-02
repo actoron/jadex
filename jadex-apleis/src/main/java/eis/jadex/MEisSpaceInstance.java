@@ -1,9 +1,9 @@
 package eis.jadex;
 
 import eis.EnvironmentInterfaceStandard;
-import jadex.adapter.base.appdescriptor.ApplicationContext;
-import jadex.adapter.base.appdescriptor.MApplicationType;
-import jadex.adapter.base.appdescriptor.MSpaceInstance;
+import jadex.base.appdescriptor.ApplicationContext;
+import jadex.base.appdescriptor.MApplicationType;
+import jadex.base.appdescriptor.MSpaceInstance;
 import jadex.bridge.IApplicationContext;
 import jadex.bridge.ISpace;
 

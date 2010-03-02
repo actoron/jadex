@@ -1,6 +1,6 @@
 package jadex.standalone.fipaimpl;
 
-import jadex.adapter.base.fipa.IProperty;
+import jadex.base.fipa.IProperty;
 
 import java.io.Serializable;
 

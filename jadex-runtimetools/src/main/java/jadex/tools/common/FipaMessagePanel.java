@@ -1,6 +1,6 @@
 package jadex.tools.common;
 
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bridge.ComponentTerminatedException;

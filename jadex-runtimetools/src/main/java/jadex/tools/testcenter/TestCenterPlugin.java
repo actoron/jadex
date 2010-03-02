@@ -1,6 +1,6 @@
 package jadex.tools.testcenter;
 
-import jadex.adapter.base.SComponentFactory;
+import jadex.base.SComponentFactory;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;

@@ -12,8 +12,8 @@
 	package="jadex.bdi.examples.garbagecollector">
 
 	<imports>
-		<import>jadex.adapter.base.contextservice.*</import>
-		<import>jadex.adapter.base.appdescriptor.*</import>
+		<import>jadex.base.contextservice.*</import>
+		<import>jadex.base.appdescriptor.*</import>
 		<import>jadex.application.runtime.*</import>
 		<import>jadex.application.space.envsupport.environment.space2d.*</import>
 		<import>jadex.application.space.envsupport.environment.*</import>

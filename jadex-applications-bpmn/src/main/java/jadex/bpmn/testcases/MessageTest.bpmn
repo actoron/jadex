@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_uFG-IRJREd-3Ruc_856dPQ" iD="_uFG-IBJREd-3Ruc_856dPQ">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_jCnb4BJjEd-3Ruc_856dPQ" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jCnb4RJjEd-3Ruc_856dPQ" key="imports" value="jadex.bpmn.runtime.task.*␟jadex.adapter.base.test.*␟jadex.commons.IFilter␟jadex.adapter.base.fipa.SFipa␟jadex.bridge.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jCnb4RJjEd-3Ruc_856dPQ" key="imports" value="jadex.bpmn.runtime.task.*␟jadex.base.test.*␟jadex.commons.IFilter␟jadex.base.fipa.SFipa␟jadex.bridge.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jCnb4hJjEd-3Ruc_856dPQ" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IB5wIBJ6Ed-3Ruc_856dPQ" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5CRSsBaYEd-YccbjZenQqQ" key="Description" value="Test if a message can be sent and received by a process."/>

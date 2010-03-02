@@ -3,7 +3,7 @@
  */
 package jadex.bdi.examples.blackjack;
 
-import jadex.adapter.base.fipa.IComponentAction;
+import jadex.base.fipa.IComponentAction;
 
 
 /**

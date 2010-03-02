@@ -1,6 +1,6 @@
 package jadex.tools.ontology;
 
-import jadex.adapter.base.fipa.IComponentAction;
+import jadex.base.fipa.IComponentAction;
 
 /**
  *  Java class for concept ToolRequest of jadex.tools.introspector ontology.

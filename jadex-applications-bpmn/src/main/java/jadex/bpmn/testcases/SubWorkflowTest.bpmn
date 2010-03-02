@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_V9IEsRV2Ed-yC473XtaJZQ" iD="_V9IEsBV2Ed-yC473XtaJZQ">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_vDB_4BV7Ed-yC473XtaJZQ" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vDB_4RV7Ed-yC473XtaJZQ" key="imports" value="jadex.adapter.base.test.*␟jadex.bpmn.runtime.task.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vDB_4RV7Ed-yC473XtaJZQ" key="imports" value="jadex.base.test.*␟jadex.bpmn.runtime.task.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vDB_4hV7Ed-yC473XtaJZQ" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2zGC4BV7Ed-yC473XtaJZQ" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_g8QfgBaZEd-YccbjZenQqQ" key="Description" value="Test if a subworklow can be started and wait for its results."/>

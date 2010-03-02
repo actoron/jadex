@@ -4,8 +4,8 @@ import java.security.AccessControlException;
 import java.util.Map;
 import java.util.Set;
 
-import jadex.adapter.base.fipa.Done;
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.Done;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;

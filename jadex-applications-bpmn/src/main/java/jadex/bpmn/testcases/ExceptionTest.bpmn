@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_RxIF0RF6Ed-qQOr2ZLx-Mw" iD="_RxIF0BF6Ed-qQOr2ZLx-Mw">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Ekt5cBF7Ed-qQOr2ZLx-Mw" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ekt5cRF7Ed-qQOr2ZLx-Mw" key="imports" value="jadex.bpmn.runtime.task.*␟jadex.adapter.base.test.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ekt5cRF7Ed-qQOr2ZLx-Mw" key="imports" value="jadex.bpmn.runtime.task.*␟jadex.base.test.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ekt5chF7Ed-qQOr2ZLx-Mw" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dGKx0BGCEd-qQOr2ZLx-Mw" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xyPaoBaYEd-YccbjZenQqQ" key="Description" value="Test if an exception can be thrown and catched."/>

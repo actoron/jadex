@@ -1,6 +1,6 @@
 package jadex.tools.starter;
 
-import jadex.adapter.base.SComponentFactory;
+import jadex.base.SComponentFactory;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
 import jadex.tools.common.CombiIcon;

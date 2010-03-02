@@ -1,6 +1,6 @@
 package jadex.bdi.examples.blackjack.manager;
 
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IMessageEvent;

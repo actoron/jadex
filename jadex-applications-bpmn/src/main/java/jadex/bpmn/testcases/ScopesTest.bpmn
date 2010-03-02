@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_sLr4ARS6Ed-3Ruc_856dPQ" iD="_sLr4ABS6Ed-3Ruc_856dPQ">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_x33-wBS6Ed-3Ruc_856dPQ" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x4BIsBS6Ed-3Ruc_856dPQ" key="imports" value="jadex.adapter.base.test.*␟jadex.bpmn.runtime.task.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x4BIsBS6Ed-3Ruc_856dPQ" key="imports" value="jadex.base.test.*␟jadex.bpmn.runtime.task.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x4BIsRS6Ed-3Ruc_856dPQ" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0IQtABS6Ed-3Ruc_856dPQ" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__0sBsBaYEd-YccbjZenQqQ" key="Description" value="Test if parameter scopes work."/>

@@ -1,6 +1,6 @@
 package jadex.wfms.bdi.client.cap;
 
-import jadex.adapter.base.fipa.Done;
+import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.wfms.bdi.ontology.RequestUserActivities;
 

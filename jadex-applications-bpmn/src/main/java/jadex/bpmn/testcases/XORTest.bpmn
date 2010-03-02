@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_aR6-4RVvEd-9a_-KE2TdXg" iD="_aR6-4BVvEd-9a_-KE2TdXg">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_nQAekBVyEd-9a_-KE2TdXg" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nQAekRVyEd-9a_-KE2TdXg" key="imports" value="jadex.adapter.base.test.*␟jadex.bpmn.runtime.task.*␟java.util.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nQAekRVyEd-9a_-KE2TdXg" key="imports" value="jadex.base.test.*␟jadex.bpmn.runtime.task.*␟java.util.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nQAekhVyEd-9a_-KE2TdXg" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zMllUBVyEd-9a_-KE2TdXg" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Bby2ABVzEd-9a_-KE2TdXg" key="parameters" value="in␋list␋List␋new ArrayList()"/>

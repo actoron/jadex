@@ -1,6 +1,6 @@
 package jadex.bdi.testcases.planlib;
 
-import jadex.adapter.base.test.TestReport;
+import jadex.base.test.TestReport;
 import jadex.bdi.planlib.protocols.ICNPHandler;
 import jadex.bdi.planlib.protocols.IProposalEvaluator;
 import jadex.bdi.planlib.protocols.IQueryNextroundInfo;

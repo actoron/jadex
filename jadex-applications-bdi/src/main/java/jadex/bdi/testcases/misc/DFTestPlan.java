@@ -1,10 +1,10 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFComponentDescription;
-import jadex.adapter.base.fipa.IDFServiceDescription;
-import jadex.adapter.base.fipa.SFipa;
-import jadex.adapter.base.test.TestReport;
+import jadex.base.fipa.IDF;
+import jadex.base.fipa.IDFComponentDescription;
+import jadex.base.fipa.IDFServiceDescription;
+import jadex.base.fipa.SFipa;
+import jadex.base.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IEvent;
 import jadex.bdi.runtime.IGoal;

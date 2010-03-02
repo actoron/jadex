@@ -3,7 +3,7 @@
  */
 package jadex.bdi.examples.cleanerworld_classic;
 
-import jadex.adapter.base.fipa.IComponentAction;
+import jadex.base.fipa.IComponentAction;
 
 
 /**

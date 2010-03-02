@@ -1,6 +1,6 @@
 package jadex.tools.common.modeltree;
 
-import jadex.adapter.base.SComponentFactory;
+import jadex.base.SComponentFactory;
 import jadex.bridge.IComponentFactory;
 import jadex.commons.Properties;
 import jadex.commons.Property;

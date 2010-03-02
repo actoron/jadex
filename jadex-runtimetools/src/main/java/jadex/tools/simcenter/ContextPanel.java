@@ -1,6 +1,6 @@
 package jadex.tools.simcenter;
 
-import jadex.adapter.base.ISimulationService;
+import jadex.base.ISimulationService;
 import jadex.commons.SGUI;
 import jadex.service.clock.IClock;
 import jadex.tools.common.ToolTipAction;

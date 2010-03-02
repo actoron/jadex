@@ -13,7 +13,7 @@
 	package="jadex.bdi.tutorial">
 
 	<imports>
-		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.base.fipa.*</import>
 	</imports>
 
 	<plans>

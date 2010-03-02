@@ -1,10 +1,10 @@
 package jadex.simulation.client;
 
-import jadex.adapter.base.ISimulationService;
-import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFComponentDescription;
-import jadex.adapter.base.fipa.IDFServiceDescription;
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.ISimulationService;
+import jadex.base.fipa.IDF;
+import jadex.base.fipa.IDFComponentDescription;
+import jadex.base.fipa.IDFServiceDescription;
+import jadex.base.fipa.SFipa;
 import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.ContinuousSpace2D;

@@ -1,7 +1,7 @@
 package jadex.wfms.bdi.ontology;
 
 import java.util.Map;
-import jadex.adapter.base.fipa.IComponentAction;
+import jadex.base.fipa.IComponentAction;
 
 /**
  * Class representing a request for activities of all users

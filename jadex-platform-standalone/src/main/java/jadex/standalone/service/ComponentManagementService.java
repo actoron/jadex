@@ -1,6 +1,6 @@
 package jadex.standalone.service;
 
-import jadex.adapter.base.DefaultResultListener;
+import jadex.base.DefaultResultListener;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;

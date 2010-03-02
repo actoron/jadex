@@ -1,7 +1,7 @@
 package jadex.bdi.examples.blackjack.dealer;
 
-import jadex.adapter.base.fipa.Done;
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.Done;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.examples.blackjack.Card;
 import jadex.bdi.examples.blackjack.CardSet;
 import jadex.bdi.examples.blackjack.Dealer;

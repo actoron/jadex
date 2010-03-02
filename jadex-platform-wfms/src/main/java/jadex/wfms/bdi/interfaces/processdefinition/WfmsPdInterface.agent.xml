@@ -9,9 +9,9 @@
 	   package="jadex.wfms.bdi.interfaces.processdefinition">
 
 	<imports>
-		<import>jadex.adapter.base.fipa.SFipa</import>
+		<import>jadex.base.fipa.SFipa</import>
 		<import>java.util.*</import>
-		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.base.fipa.*</import>
 		<import>jadex.wfms.bdi.*</import>
 		<import>jadex.wfms.client.IClient</import>
 		<import>jadex.wfms.bdi.ontology.*</import>

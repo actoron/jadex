@@ -1,6 +1,6 @@
 package jadex.bdi.examples.booktrading.buyer;
 
-import jadex.adapter.base.fipa.IDFComponentDescription;
+import jadex.base.fipa.IDFComponentDescription;
 import jadex.bdi.examples.booktrading.common.NegotiationReport;
 import jadex.bdi.examples.booktrading.common.Order;
 import jadex.bdi.planlib.protocols.NegotiationRecord;

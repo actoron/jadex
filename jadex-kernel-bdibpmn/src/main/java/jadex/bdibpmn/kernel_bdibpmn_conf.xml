@@ -23,7 +23,7 @@
 					},
 					new Object[]
 					{
-						new jadex.adapter.base.fipa.FIPAMessageType(), 
+						new jadex.base.fipa.FIPAMessageType(), 
 						new jadex.bdi.runtime.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class)),
 						new java.lang.Long(10000),
 						Boolean.TRUE,

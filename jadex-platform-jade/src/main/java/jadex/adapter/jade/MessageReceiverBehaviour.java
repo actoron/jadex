@@ -21,19 +21,19 @@ import jade.domain.JADEAgentManagement.JADEManagementOntology;
 import jade.domain.JADEAgentManagement.KillAgent;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.List;
-import jadex.adapter.base.fipa.CMSCreateComponent;
-import jadex.adapter.base.fipa.CMSDestroyComponent;
-import jadex.adapter.base.fipa.CMSResumeComponent;
-import jadex.adapter.base.fipa.CMSSearchComponents;
-import jadex.adapter.base.fipa.CMSSuspendComponent;
-import jadex.adapter.base.fipa.DFDeregister;
-import jadex.adapter.base.fipa.DFModify;
-import jadex.adapter.base.fipa.DFRegister;
-import jadex.adapter.base.fipa.DFSearch;
-import jadex.adapter.base.fipa.IAMS;
-import jadex.adapter.base.fipa.IComponentAction;
-import jadex.adapter.base.fipa.IDFComponentDescription;
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.CMSCreateComponent;
+import jadex.base.fipa.CMSDestroyComponent;
+import jadex.base.fipa.CMSResumeComponent;
+import jadex.base.fipa.CMSSearchComponents;
+import jadex.base.fipa.CMSSuspendComponent;
+import jadex.base.fipa.DFDeregister;
+import jadex.base.fipa.DFModify;
+import jadex.base.fipa.DFRegister;
+import jadex.base.fipa.DFSearch;
+import jadex.base.fipa.IAMS;
+import jadex.base.fipa.IComponentAction;
+import jadex.base.fipa.IDFComponentDescription;
+import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IContentCodec;
 import jadex.bridge.IComponentInstance;
@@ -61,8 +61,8 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 	/** The default codecs. */
 	protected static IContentCodec[]	DEFCODECS	= new IContentCodec[]
 	{
-		new jadex.adapter.base.JavaXMLContentCodec(),
-		new jadex.adapter.base.NuggetsXMLContentCodec()
+		new jadex.base.JavaXMLContentCodec(),
+		new jadex.base.NuggetsXMLContentCodec()
 	};
 	
 	// -------- attributes --------
@@ -245,7 +245,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 								{
 									throw new RuntimeException("Action not supported: "+request);
 								}
-								jadexcontent	= new jadex.adapter.base.fipa.Done(jadexaction);
+								jadexcontent	= new jadex.base.fipa.Done(jadexaction);
 							}
 							else if(content instanceof Result)
 							{
@@ -277,7 +277,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 								{
 									throw new RuntimeException("Action not supported: "+request);
 								}
-								jadexcontent	= new jadex.adapter.base.fipa.Done(jadexaction);
+								jadexcontent	= new jadex.base.fipa.Done(jadexaction);
 							}
 							else if(content instanceof ContentElementList)
 							{

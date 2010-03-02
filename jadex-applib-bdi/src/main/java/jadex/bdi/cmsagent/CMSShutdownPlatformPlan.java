@@ -1,7 +1,7 @@
 package jadex.bdi.cmsagent;
 
-import jadex.adapter.base.fipa.CMSShutdownPlatform;
-import jadex.adapter.base.fipa.Done;
+import jadex.base.fipa.CMSShutdownPlatform;
+import jadex.base.fipa.Done;
 import jadex.bdi.runtime.Plan;
 
 /**

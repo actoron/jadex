@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-import jadex.adapter.base.appdescriptor.MApplicationType;
-import jadex.adapter.base.appdescriptor.MSpaceType;
+import jadex.base.appdescriptor.MApplicationType;
+import jadex.base.appdescriptor.MSpaceType;
 import jadex.commons.SReflect;
 import jadex.xmlteInfo;
 import jadex.xmjadex.xml

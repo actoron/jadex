@@ -1,8 +1,8 @@
 package jadex.tools.dfbrowser;
 
-import jadex.adapter.base.fipa.IDFComponentDescription;
-import jadex.adapter.base.fipa.IDFServiceDescription;
-import jadex.adapter.base.fipa.IProperty;
+import jadex.base.fipa.IDFComponentDescription;
+import jadex.base.fipa.IDFServiceDescription;
+import jadex.base.fipa.IProperty;
 import jadex.bridge.IComponentIdentifier;
 
 import java.awt.BorderLayout;

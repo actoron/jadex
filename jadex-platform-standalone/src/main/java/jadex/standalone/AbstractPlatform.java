@@ -1,8 +1,8 @@
 package jadex.standalone;
 
-import jadex.adapter.base.DefaultResultListener;
-import jadex.bridge.IComponentManagementService;
+import jadex.base.DefaultResultListener;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.PropertyServiceContainer;

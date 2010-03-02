@@ -1,6 +1,6 @@
 package jadex.bdi.examples.hunterprey_classic.creature.actsense;
 
-import jadex.adapter.base.fipa.Done;
+import jadex.base.fipa.Done;
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.RequestVision;
 import jadex.bdi.runtime.IGoal;

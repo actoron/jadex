@@ -1,6 +1,6 @@
 package jadex.tools.simcenter;
 
-import jadex.adapter.base.ISimulationService;
+import jadex.base.ISimulationService;
 import jadex.commons.TimeFormat;
 import jadex.service.IServiceContainer;
 

@@ -1,6 +1,6 @@
 package jadex.wfms.bdi.ontology;
 
-import jadex.adapter.base.fipa.IComponentAction;
+import jadex.base.fipa.IComponentAction;
 
 public class RequestProcessStart implements IComponentAction
 {

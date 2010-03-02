@@ -3,7 +3,7 @@
  */
 package jadex.bdi.examples.hunterprey_classic;
 
-import jadex.adapter.base.fipa.IComponentAction;
+import jadex.base.fipa.IComponentAction;
 
 
 /**

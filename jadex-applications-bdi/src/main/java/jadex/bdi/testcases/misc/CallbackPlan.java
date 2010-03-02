@@ -1,7 +1,7 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.adapter.base.fipa.SFipa;
-import jadex.adapter.base.test.TestReport;
+import jadex.base.fipa.SFipa;
+import jadex.base.test.TestReport;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IAgentListener;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_yQl4kdCREd6MVLxz8V9N3w" iD="_yQl4kNCREd6MVLxz8V9N3w">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KRLQcBciEd-OSKK6OfNWqA" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KRLQcRciEd-OSKK6OfNWqA" key="imports" value="jadex.commons.*␟jadex.bridge.*␟jadex.bpmn.runtime.task.*␟jadex.adapter.base.fipa.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KRLQcRciEd-OSKK6OfNWqA" key="imports" value="jadex.commons.*␟jadex.bridge.*␟jadex.bpmn.runtime.task.*␟jadex.base.fipa.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KRLQchciEd-OSKK6OfNWqA" key="Description" value="&lt;h3>Message performance benchmark&lt;/h3> The process sends a number of agents to itself and measures the time it needs for this."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KRVBcBciEd-OSKK6OfNWqA" key="Package" value="jadex.bpmn.benchmarks"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_K7-EcBcjEd-OSKK6OfNWqA" key="parameters" value="inout␋starttime␋long␋$clock.getTime()"/>

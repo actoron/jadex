@@ -15,9 +15,9 @@
 
 	<imports>
 		<import>jadex.bdi.examples.booktrading.common.*</import>
-		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.base.fipa.*</import>
 		<import>java.util.*</import>
-		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.base.fipa.*</import>
 		<import>jadex.bridge.IClockService</import>
 		<import>jadex.bdi.planlib.protocols.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>

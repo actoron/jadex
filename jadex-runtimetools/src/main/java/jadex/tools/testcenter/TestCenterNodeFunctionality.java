@@ -1,6 +1,6 @@
 package jadex.tools.testcenter;
 
-import jadex.adapter.base.SComponentFactory;
+import jadex.base.SComponentFactory;
 import jadex.bridge.IArgument;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;

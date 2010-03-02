@@ -1,6 +1,6 @@
 package jadex.wfms.bdi.ontology;
 
-import jadex.adapter.base.fipa.IComponentAction;
+import jadex.base.fipa.IComponentAction;
 import jadex.bridge.IComponentIdentifier;
 import jadex.wfms.client.IClient;
 

@@ -1,7 +1,7 @@
 package jadex.bdi.dfagent;
 
-import jadex.adapter.base.fipa.DFDeregister;
-import jadex.adapter.base.fipa.Done;
+import jadex.base.fipa.DFDeregister;
+import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 

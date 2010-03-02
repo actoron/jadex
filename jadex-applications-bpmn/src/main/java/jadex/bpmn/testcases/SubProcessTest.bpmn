@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_uPzp4RTQEd-a46HbtL-N3Q" iD="_uPzp4BTQEd-a46HbtL-N3Q">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_18RCcBTUEd-a46HbtL-N3Q" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_18RCcRTUEd-a46HbtL-N3Q" key="imports" value="java.util.*␟jadex.adapter.base.test.*␟jadex.bpmn.runtime.task.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_18RCcRTUEd-a46HbtL-N3Q" key="imports" value="java.util.*␟jadex.base.test.*␟jadex.bpmn.runtime.task.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BeUJUBTVEd-a46HbtL-N3Q" key="Package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LDy10BTVEd-a46HbtL-N3Q" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_d8Mn0BaZEd-YccbjZenQqQ" key="Description" value="Test if a parallel subprocess works."/>

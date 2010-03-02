@@ -1,6 +1,6 @@
 package jadex.tools.ontology;
 
-import jadex.adapter.base.fipa.IComponentAction;
+import jadex.base.fipa.IComponentAction;
 
 
 /**

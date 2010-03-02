@@ -1,7 +1,7 @@
 package jadex.tools.testcenter;
 
-import jadex.adapter.base.SComponentFactory;
-import jadex.adapter.base.test.Testcase;
+import jadex.base.SComponentFactory;
+import jadex.base.test.Testcase;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;

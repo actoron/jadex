@@ -1,6 +1,6 @@
 package jadex.tools.common;
 
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.tools.ontology.CurrentState;

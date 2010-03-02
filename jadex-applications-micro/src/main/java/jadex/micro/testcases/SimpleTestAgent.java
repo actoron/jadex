@@ -1,7 +1,7 @@
 package jadex.micro.testcases;
 
-import jadex.adapter.base.test.TestReport;
-import jadex.adapter.base.test.Testcase;
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bridge.Argument;
 import jadex.bridge.IArgument;
 import jadex.micro.MicroAgent;

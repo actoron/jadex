@@ -1,6 +1,6 @@
 package jadex.bdi.examples.marsworld_classic.sentry;
 
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.examples.marsworld_classic.Environment;
 import jadex.bdi.examples.marsworld_classic.Target;
 import jadex.bdi.runtime.IMessageEvent;

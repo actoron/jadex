@@ -1,6 +1,6 @@
 package jadex.bdi.planlib.protocols.subscribe;
 
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 

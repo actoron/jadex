@@ -18,7 +18,7 @@
 
 	<imports>
 <!--		<import>java.util.logging.*</import>-->
-		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.base.fipa.*</import>
 	</imports>
 
 	<plans>

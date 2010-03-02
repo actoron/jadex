@@ -9,7 +9,7 @@
 	name="Tool">
 
 	<imports>
-		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.base.fipa.*</import>
 		<import>jadex.bridge.IComponentIdentifier</import>
 		<import>jadex.tools.ontology.*</import>
 		<import>jadex.tools.introspector.*</import>

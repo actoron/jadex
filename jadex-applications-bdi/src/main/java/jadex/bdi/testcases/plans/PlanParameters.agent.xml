@@ -11,7 +11,7 @@
 	package="jadex.bdi.testcases.plans">
 
 	<imports>
-		<import>jadex.adapter.base.test.*</import>
+		<import>jadex.base.test.*</import>
 	</imports>
 
 	<capabilities>

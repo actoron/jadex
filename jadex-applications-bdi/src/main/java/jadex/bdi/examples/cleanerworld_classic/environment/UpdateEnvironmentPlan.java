@@ -1,9 +1,9 @@
 package jadex.bdi.examples.cleanerworld_classic.environment;
 
-import jadex.adapter.base.fipa.Done;
-import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFComponentDescription;
-import jadex.adapter.base.fipa.IDFServiceDescription;
+import jadex.base.fipa.Done;
+import jadex.base.fipa.IDF;
+import jadex.base.fipa.IDFComponentDescription;
+import jadex.base.fipa.IDFServiceDescription;
 import jadex.bdi.examples.cleanerworld_classic.Chargingstation;
 import jadex.bdi.examples.cleanerworld_classic.Cleaner;
 import jadex.bdi.examples.cleanerworld_classic.Environment;

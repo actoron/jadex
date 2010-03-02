@@ -1,6 +1,6 @@
 package jadex.tools.comanalyzer;
 
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;

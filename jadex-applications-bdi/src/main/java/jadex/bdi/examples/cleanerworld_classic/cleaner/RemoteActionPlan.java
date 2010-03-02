@@ -1,9 +1,9 @@
 package jadex.bdi.examples.cleanerworld_classic.cleaner;
 
-import jadex.adapter.base.fipa.IComponentAction;
-import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFComponentDescription;
-import jadex.adapter.base.fipa.IDFServiceDescription;
+import jadex.base.fipa.IComponentAction;
+import jadex.base.fipa.IDF;
+import jadex.base.fipa.IDFComponentDescription;
+import jadex.base.fipa.IDFServiceDescription;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;

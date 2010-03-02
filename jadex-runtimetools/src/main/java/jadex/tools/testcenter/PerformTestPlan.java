@@ -1,7 +1,7 @@
 package jadex.tools.testcenter;
 
-import jadex.adapter.base.test.TestReport;
-import jadex.adapter.base.test.Testcase;
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
 import jadex.bridge.IComponentManagementService;

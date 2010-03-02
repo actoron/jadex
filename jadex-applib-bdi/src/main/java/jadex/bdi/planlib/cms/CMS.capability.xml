@@ -11,7 +11,7 @@
 	name="CMS">
 
 	<imports>
-		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.base.fipa.*</import>
 		<import>jadex.bridge.*</import>
 		<import>java.util.*</import>
 	</imports>

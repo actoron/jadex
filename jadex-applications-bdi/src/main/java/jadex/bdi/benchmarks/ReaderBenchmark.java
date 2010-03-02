@@ -37,9 +37,9 @@ public class ReaderBenchmark
 //		IOAVState	state	= new JenaOAVState();
 		
 //		Properties kernelprops = new Properties("", "", "");
-//		kernelprops.addProperty(new Property("", "messagetype", "new jadex.adapter.base.fipa.FIPAMessageType()"));
+//		kernelprops.addProperty(new Property("", "messagetype", "new jadex.base.fipa.FIPAMessageType()"));
 		Map kernelprops = new HashMap();
-		kernelprops.put("messagetype_fipa", new jadex.adapter.base.fipa.FIPAMessageType());
+		kernelprops.put("messagetype_fipa", new jadex.base.fipa.FIPAMessageType());
 		
 		Object	obj	= reader.read(new FileInputStream(args[0]), null, state);
 		

@@ -10,7 +10,7 @@
 	name="DF">
 
 	<imports>
-		<import>jadex.adapter.base.fipa.*</import>
+		<import>jadex.base.fipa.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
 		<import>jadex.bridge.*</import>
 	</imports>

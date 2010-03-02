@@ -1,11 +1,11 @@
 package jadex.standalone.service;
 
-import jadex.adapter.base.DefaultResultListener;
-import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFComponentDescription;
-import jadex.adapter.base.fipa.IDFServiceDescription;
-import jadex.adapter.base.fipa.IProperty;
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.DefaultResultListener;
+import jadex.base.fipa.IDF;
+import jadex.base.fipa.IDFComponentDescription;
+import jadex.base.fipa.IDFServiceDescription;
+import jadex.base.fipa.IProperty;
+import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.collection.IndexMap;

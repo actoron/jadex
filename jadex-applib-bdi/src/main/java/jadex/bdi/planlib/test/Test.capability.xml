@@ -11,7 +11,7 @@
 	name="Test">
 
 	<imports>
-		<import>jadex.adapter.base.test.*</import>
+		<import>jadex.base.test.*</import>
 	</imports>
 
 	<beliefs>

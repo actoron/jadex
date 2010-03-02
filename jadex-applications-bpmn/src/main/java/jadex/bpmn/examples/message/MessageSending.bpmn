@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_RYESUc-fEd6NWbZHdUI2WQ" iD="_RYESUM-fEd6NWbZHdUI2WQ">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_time8BYrEd-yC473XtaJZQ" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_time8RYrEd-yC473XtaJZQ" key="imports" value="jadex.commons.*␟jadex.bridge.*␟jadex.adapter.base.fipa.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_time8RYrEd-yC473XtaJZQ" key="imports" value="jadex.commons.*␟jadex.bridge.*␟jadex.base.fipa.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_time8hYrEd-yC473XtaJZQ" key="Package" value="jadex.bpmn.examples.message"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5-mIwBYvEd-yC473XtaJZQ" key="arguments" value="message_number␋&quot;The number of messages to send.&quot;␋int␋10␟receivers␋&quot;The names of the receivers.&quot;␋Object[]␋new String[]{&quot;MessageReceival&quot;}"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rL4KoBaYEd-YccbjZenQqQ" key="Description" value="&lt;h3>Message sending process&lt;/h3>The Message Sending process waits for a predefined number of messages and then terminates."/>

@@ -2,7 +2,7 @@ package jadex.wfms.bdi.ontology;
 
 import java.util.Set;
 
-import jadex.adapter.base.fipa.IComponentAction;
+import jadex.base.fipa.IComponentAction;
 
 /**
  * Request for a potential set of loadable process models

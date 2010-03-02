@@ -1,7 +1,7 @@
 package jadex.standalone.fipaimpl;
 
-import jadex.adapter.base.fipa.IDFComponentDescription;
-import jadex.adapter.base.fipa.IDFServiceDescription;
+import jadex.base.fipa.IDFComponentDescription;
+import jadex.base.fipa.IDFServiceDescription;
 import jadex.bridge.IComponentIdentifier;
 
 import java.io.Serializable;

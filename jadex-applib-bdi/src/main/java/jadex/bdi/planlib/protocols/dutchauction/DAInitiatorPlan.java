@@ -1,6 +1,6 @@
 package jadex.bdi.planlib.protocols.dutchauction;
 
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.planlib.protocols.AbstractInitiatorPlan;
 import jadex.bdi.planlib.protocols.AuctionDescription;
 import jadex.bdi.runtime.BDIFailureException;

@@ -1,6 +1,6 @@
 package jadex.standalone;
 
-import jadex.adapter.base.DefaultResultListener;
+import jadex.base.DefaultResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.DefaultMessageAdapter;
@@ -45,12 +45,12 @@ public class MessageService implements IMessageService, IService
 	//-------- constants --------
 	
 	/** The default codecs. */
-	protected static IContentCodec[]	DEFCODECS	= new IContentCodec[]
-	{
-		new jadex.adapter.base.JavaXMLContentCodec(),
-		new jadex.adapter.base.JadexXMLContentCodec(),
-		new jadex.adapter.base.NuggetsXMLContentCodec()
-	};
+    protected static IContentCodec[] DEFCODECS = new IContentCodec[]
+    {
+        new jadex.base.JavaXMLContentCodec(),
+        new jadex.base.JadexXMLContentCodec(),
+        new jadex.base.NuggetsXMLContentCodec()
+    };
 	
 	//-------- attributes --------
 

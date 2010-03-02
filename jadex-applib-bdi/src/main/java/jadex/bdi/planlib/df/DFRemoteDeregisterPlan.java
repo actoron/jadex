@@ -1,9 +1,9 @@
 package jadex.bdi.planlib.df;
 
-import jadex.adapter.base.fipa.DFDeregister;
-import jadex.adapter.base.fipa.IDF;
-import jadex.adapter.base.fipa.IDFComponentDescription;
-import jadex.adapter.base.fipa.SFipa;
+import jadex.base.fipa.DFDeregister;
+import jadex.base.fipa.IDF;
+import jadex.base.fipa.IDFComponentDescription;
+import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
