@@ -5,10 +5,12 @@ import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.commons.SUtil;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -68,7 +70,34 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 			{
 				thread.setLastEdge((MSequenceEdge) outgoing.get(0));
 				for(Iterator it=threads.iterator(); it.hasNext(); )
-					thread.getThreadContext().removeThread((ProcessThread) it.next());
+				{
+					ProcessThread pt = (ProcessThread)it.next();
+					
+//					Map data = pt.getData();
+//					for(Iterator keys=data.keySet().iterator(); keys.hasNext(); )
+//					{
+//						String key = (String)keys.next();
+//						Object value = data.get(key);
+//						
+//						
+//						if(thread.hasParameterValue(key))
+//						{
+//							Object origval =thread.getParameterValue(key);
+//							if(!SUtil.equals(origval, value))
+//							{
+//								System.out.println("origact: "+thread.getModelElement());
+//								System.out.println("act: "+pt.getModelElement());
+//								throw new RuntimeException("Inconsistent parameter values from threads cannot be unified: "+key+" "+value+" "+origval);
+//							}
+//						}
+//						else 
+//						{
+//							thread.setParameterValue(key, value);
+//						}
+//					}
+					
+					thread.getThreadContext().removeThread(pt);
+				}
 			}
 			else
 			{

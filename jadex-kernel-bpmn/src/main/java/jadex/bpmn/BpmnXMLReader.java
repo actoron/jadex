@@ -769,21 +769,23 @@ public class BpmnXMLReader
 									String maptext = stok.nextToken();
 									
 									StringTokenizer stok2 = new StringTokenizer(maptext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-									String propname = stok2.nextToken();
-									String proptext = stok2.nextToken();
-									
-									IParsedExpression exp = parser.parseExpression(proptext, dia.getAllImports(), null, context.getClassLoader());
-									IParsedExpression iexp	= null;
-
-									if(propname.endsWith("]") && propname.indexOf("[")!=-1)
+									if(stok2.countTokens()==2)
 									{
-										String	itext	= propname.substring(propname.indexOf("[")+1, propname.length()-1);
-										propname	= propname.substring(0, propname.indexOf("["));
-										iexp	= parser.parseExpression(itext, dia.getAllImports(), null, context.getClassLoader());
+										String propname = stok2.nextToken();
+										String proptext = stok2.nextToken();
+										
+										IParsedExpression exp = parser.parseExpression(proptext, dia.getAllImports(), null, context.getClassLoader());
+										IParsedExpression iexp	= null;
+	
+										if(propname.endsWith("]") && propname.indexOf("[")!=-1)
+										{
+											String	itext	= propname.substring(propname.indexOf("[")+1, propname.length()-1);
+											propname	= propname.substring(0, propname.indexOf("["));
+											iexp	= parser.parseExpression(itext, dia.getAllImports(), null, context.getClassLoader());
+										}
+	
+										edge.addParameterMapping(propname, exp, iexp);
 									}
-
-									edge.addParameterMapping(propname, exp, iexp);
-									
 //									System.out.println("Mapping: "+propname+" "+exp);
 								}
 							}
