@@ -41,15 +41,21 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	/** The platform. */
 	protected IServiceContainer container;
 	
+	/** The properties. */
+	protected Map properties;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new agent factory.
 	 */
-	public MicroAgentFactory(IServiceContainer container)
+	public MicroAgentFactory(IServiceContainer container, Map properties)
 	{
 		this.container = container;
+		this.properties = properties;
 	}
+	
+	//-------- constructors --------
 	
 	/**
 	 *  Start the service.
@@ -193,6 +199,6 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	public Map	getProperties(String type)
 	{
 		return FILETYPE_MICROAGENT.equals(type)
-		? Collections.EMPTY_MAP : null;
+		? properties: null;
 	}
 }

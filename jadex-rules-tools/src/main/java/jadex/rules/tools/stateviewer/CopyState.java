@@ -174,7 +174,7 @@ public class CopyState implements IOAVState
 			 */
 			public void objectRemoved(final Object id, final OAVObjectType type)
 			{
-				if(!(type instanceof OAVJavaType))
+//				if(!(type instanceof OAVJavaType))
 				{
 					CopyState.this.synchronizator.invokeLater(new Runnable()
 					{

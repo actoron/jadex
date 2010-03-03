@@ -1,6 +1,7 @@
 package jadex.tools.debugger;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;
 import jadex.tools.common.plugin.IControlCenter;
 
@@ -23,7 +24,7 @@ public interface IDebuggerPanel
 	 * 	@param id	The component identifier.
 	 * 	@param access	The external access of the component.
 	 */
-	public void init(IControlCenter jcc, IBreakpointPanel bpp, IComponentIdentifier name, Object access);
+	public void init(IControlCenter jcc, IBreakpointPanel bpp, IComponentIdentifier name, IExternalAccess access);
 
 	/**
 	 *  The title of the panel (name of the tab).

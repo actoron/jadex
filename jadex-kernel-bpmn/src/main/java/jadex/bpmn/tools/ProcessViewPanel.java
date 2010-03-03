@@ -260,7 +260,7 @@ public class ProcessViewPanel extends JPanel
 			{
 				ProcessThread pt = (ProcessThread)it.next();
 				ret.add(new ProcessThreadInfo(pt.getId(), pt.getActivity(), //pt.getLastEdge(), 
-					pt.getException(), pt.isWaiting(), new HashMap(pt.getData())));
+					pt.getException(), pt.isWaiting(), pt.getData()==null? new HashMap(): new HashMap(pt.getData())));
 			}
 		}
 		return (ProcessThreadInfo[])ret.toArray(new ProcessThreadInfo[ret.size()]);

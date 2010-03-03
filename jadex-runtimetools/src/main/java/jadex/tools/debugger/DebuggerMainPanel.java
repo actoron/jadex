@@ -9,6 +9,7 @@ import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.plugin.IControlCenter;
+import jadex.tools.debugger.common.ObjectInspectorDebuggerPanel;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -113,14 +114,21 @@ public class DebuggerMainPanel extends JSplitPane
 								{
 									Class	clazz	= SReflect.classForName(classname, libservice.getClassLoader());
 									IDebuggerPanel	panel	= (IDebuggerPanel)clazz.newInstance();
-									panel.init(DebuggerMainPanel.this.jcc, leftpanel, DebuggerMainPanel.this.desc.getName(), result);
+									panel.init(DebuggerMainPanel.this.jcc, leftpanel, DebuggerMainPanel.this.desc.getName(), (IExternalAccess)result);
 									tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
 								}
 								catch(Exception e)
 								{
+									e.printStackTrace();
 									DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panel.", "Debugger panel class: "+classname, e);
 								}
 							}
+						}
+						else
+						{
+							ObjectInspectorDebuggerPanel panel = new ObjectInspectorDebuggerPanel();
+							panel.init(DebuggerMainPanel.this.jcc, leftpanel, DebuggerMainPanel.this.desc.getName(), (IExternalAccess)result);
+							tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
 						}
 					}
 				});				

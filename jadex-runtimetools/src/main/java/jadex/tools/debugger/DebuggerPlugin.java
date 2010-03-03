@@ -102,7 +102,6 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 		Properties ps = props.getSubproperty("components");
 		if(ps!=null)
 			components.setProperties(ps);
-
 	}
 	
 	/**

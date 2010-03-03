@@ -10,7 +10,16 @@
 	<properties type="platform_standalone">
 		<properties type="services">
 			<property type="jadex.bridge.IComponentFactory" name="micro_factory">
-				new jadex.micro.MicroAgentFactory($platform)
+				new jadex.micro.MicroAgentFactory($platform, jadex.commons.SUtil.createHashMap(
+					new String[]
+					{
+						"debugger.panels"
+					},
+					new Object[]
+					{
+						"jadex.tools.debugger.micro.MicroDebuggerPanel, jadex.tools.debugger.common.ObjectInspectorDebuggerPanel"
+					})
+				)
 			</property>
 		</properties>
 	</properties>

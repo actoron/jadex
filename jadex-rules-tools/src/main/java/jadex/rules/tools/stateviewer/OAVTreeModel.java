@@ -134,7 +134,6 @@ public class OAVTreeModel implements TreeModel
 		// if the Agent that was introspected is removed too
 		copy.addStateListener(new IOAVStateListener()
 		{
-
 			/**
 			 *  Notification when an attribute value of an object has been set.
 			 *  @param id The object id.
@@ -151,149 +150,73 @@ public class OAVTreeModel implements TreeModel
 				{
 					for(Iterator it=coll.iterator(); it.hasNext(); )
 					{
-						// Find object and attribute node.
-						ObjectNode	node	= (ObjectNode)it.next();
-						List	children	= node.getChildren();
-						AttributeNode	attrnode	= null;
-						for(int i=0; attrnode==null && i<children.size(); i++)
+						Object tmp	= it.next();;
+						if(tmp instanceof ObjectNode)
 						{
-							if(((AttributeNode)children.get(i)).attribute==attr)
-								attrnode	= (AttributeNode)children.get(i);
-						}
-						
-						// Handle updates
-
-						// Add new attribute node.
-						if(attrnode==null && newvalue!=null)
-						{
-							// Rebuild children to create and find index of new node (hack???) 
-							node.children	= null;
-							List	newchildren	= node.getChildren();
-							node.children	= children;	// Keep old children, as there may be expanded subtrees.
-							for(int i=0; attrnode==null && i<newchildren.size(); i++)
+							// Find object and attribute node.
+							ObjectNode	node	= (ObjectNode)tmp;
+							List	children	= node.getChildren();
+							AttributeNode	attrnode	= null;
+							for(int i=0; attrnode==null && i<children.size(); i++)
 							{
-								if(((AttributeNode)newchildren.get(i)).attribute==attr)
-									attrnode	= (AttributeNode)newchildren.get(i);
-							}
-							int index	= newchildren.indexOf(attrnode);
-							children.add(index, attrnode);	// insert new node into old children. 
-							
-							if(listeners!=null)
-							{
-								TreeModelEvent	event	= new TreeModelEvent(this, node.getPath(), new int[]{index}, new Object[]{attrnode});
-								TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
-								for(int i=0; i<alisteners.length; i++)
-								{
-									alisteners[i].treeNodesInserted(event);
-								}
-							}
-						}
-						
-						else if(attrnode!=null && OAVAttributeType.NONE.equals(attr.getMultiplicity()))
-						{
-							// Update existing node with new value
-							if(newvalue!=null)
-							{
-								
-								attrnode.drop();
-								attrnode.children	= null;
-								
-								if(listeners!=null)
-								{
-									TreeModelEvent	event	= new TreeModelEvent(this, attrnode.getPath());
-									TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
-									for(int i=0; i<alisteners.length; i++)
-									{
-										alisteners[i].treeStructureChanged(event);
-									}
-								}
+								if(((AttributeNode)children.get(i)).attribute==attr)
+									attrnode = (AttributeNode)children.get(i);
 							}
 							
-							// Remove existing node
-							else
+							// Handle updates
+	
+							// Add new attribute node.
+							if(attrnode==null && newvalue!=null)
 							{
-								int index	= children.indexOf(attrnode);
-								children.remove(attrnode);
-								attrnode.drop();
-
+								// Rebuild children to create and find index of new node (hack???) 
+								node.children	= null;
+								List	newchildren	= node.getChildren();
+								node.children	= children;	// Keep old children, as there may be expanded subtrees.
+								for(int i=0; attrnode==null && i<newchildren.size(); i++)
+								{
+									if(((AttributeNode)newchildren.get(i)).attribute==attr)
+										attrnode	= (AttributeNode)newchildren.get(i);
+								}
+								int index	= newchildren.indexOf(attrnode);
+								children.add(index, attrnode);	// insert new node into old children. 
+								
 								if(listeners!=null)
 								{
 									TreeModelEvent	event	= new TreeModelEvent(this, node.getPath(), new int[]{index}, new Object[]{attrnode});
 									TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
 									for(int i=0; i<alisteners.length; i++)
 									{
-										alisteners[i].treeNodesRemoved(event);
+										alisteners[i].treeNodesInserted(event);
 									}
 								}
 							}
-						}
-						
-						else if(attrnode!=null)
-						{
-							if(attrnode.children!=null)	// Otherwise node is not shown and doesn't need update.
+							else if(attrnode!=null && OAVAttributeType.NONE.equals(attr.getMultiplicity()))
 							{
-								assert oldvalue!=newvalue;
-								
-								// Add new value (at the end of children)
+								// Update existing node with new value
 								if(newvalue!=null)
 								{
-									Object	child	= newvalue;
-									if(!(attr.getType() instanceof OAVJavaType))
-										child = new ObjectNode(attrnode, child);
-									else if(isInspectable(newvalue))
-										// objectInspector Node
-										child = new ObjectInspectorNode(attrnode, newvalue.getClass(), null, newvalue);
-									// else use plain value
-		
-									attrnode.children.add(child);
-	
+									
+									attrnode.drop();
+									attrnode.children	= null;
+									
 									if(listeners!=null)
 									{
-										TreeModelEvent	event	= new TreeModelEvent(this, attrnode.getPath(), new int[]{attrnode.children.size()-1}, new Object[]{child});
+										TreeModelEvent	event	= new TreeModelEvent(this, attrnode.getPath());
 										TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
 										for(int i=0; i<alisteners.length; i++)
 										{
-											alisteners[i].treeNodesInserted(event);
+											alisteners[i].treeStructureChanged(event);
 										}
 									}
 								}
 								
-								// Remove child of attribute node.
-								else if(attrnode.children.size()>1)
-								{
-									Object	child	= oldvalue;
-									if(!(attr.getType() instanceof OAVJavaType))
-										child = new ObjectNode(attrnode, child);
-									else if(isInspectable(child))
-										// objectInspector Node
-										child = new ObjectInspectorNode(attrnode, child.getClass(), null, child);
-									// else use plain value
-
-//									int index	= attrnode.children.indexOf(child);
-									int index	= getIndexForChild(attrnode.children, child);
-									
-									if(attrnode.children.get(index) instanceof ObjectNode)
-										((ObjectNode)attrnode.children.get(index)).drop();
-									attrnode.children.remove(index);
-									
-									if(listeners!=null)
-									{
-										TreeModelEvent	event	= new TreeModelEvent(this, attrnode.getPath(), new int[]{index}, new Object[]{child});
-										TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
-										for(int i=0; i<alisteners.length; i++)
-										{
-											alisteners[i].treeNodesRemoved(event);
-										}
-									}
-								}
-
-								// Remove attribute node when last value is removed.
+								// Remove existing node
 								else
 								{
 									int index	= children.indexOf(attrnode);
 									children.remove(attrnode);
 									attrnode.drop();
-
+	
 									if(listeners!=null)
 									{
 										TreeModelEvent	event	= new TreeModelEvent(this, node.getPath(), new int[]{index}, new Object[]{attrnode});
@@ -305,6 +228,88 @@ public class OAVTreeModel implements TreeModel
 									}
 								}
 							}
+							else if(attrnode!=null)
+							{
+								if(attrnode.children!=null)	// Otherwise node is not shown and doesn't need update.
+								{
+									assert oldvalue!=newvalue;
+									
+									// Add new value (at the end of children)
+									if(newvalue!=null)
+									{
+										Object	child	= newvalue;
+										if(!(attr.getType() instanceof OAVJavaType))
+											child = new ObjectNode(attrnode, child);
+										else if(isInspectable(newvalue))
+											// objectInspector Node
+											child = new ObjectInspectorNode(attrnode, newvalue.getClass(), null, newvalue);
+										// else use plain value
+			
+										attrnode.children.add(child);
+		
+										if(listeners!=null)
+										{
+											TreeModelEvent	event	= new TreeModelEvent(this, attrnode.getPath(), new int[]{attrnode.children.size()-1}, new Object[]{child});
+											TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
+											for(int i=0; i<alisteners.length; i++)
+											{
+												alisteners[i].treeNodesInserted(event);
+											}
+										}
+									}
+									
+									// Remove child of attribute node.
+									else if(attrnode.children.size()>1)
+									{
+										Object	child	= oldvalue;
+										if(!(attr.getType() instanceof OAVJavaType))
+											child = new ObjectNode(attrnode, child);
+										else if(isInspectable(child))
+											// objectInspector Node
+											child = new ObjectInspectorNode(attrnode, child.getClass(), null, child);
+										// else use plain value
+	
+	//									int index	= attrnode.children.indexOf(child);
+										int index	= getIndexForChild(attrnode.children, child);
+										
+										if(attrnode.children.get(index) instanceof ObjectNode)
+											((ObjectNode)attrnode.children.get(index)).drop();
+										attrnode.children.remove(index);
+										
+										if(listeners!=null)
+										{
+											TreeModelEvent	event	= new TreeModelEvent(this, attrnode.getPath(), new int[]{index}, new Object[]{child});
+											TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
+											for(int i=0; i<alisteners.length; i++)
+											{
+												alisteners[i].treeNodesRemoved(event);
+											}
+										}
+									}
+	
+									// Remove attribute node when last value is removed.
+									else
+									{
+										int index	= children.indexOf(attrnode);
+										children.remove(attrnode);
+										attrnode.drop();
+	
+										if(listeners!=null)
+										{
+											TreeModelEvent	event	= new TreeModelEvent(this, node.getPath(), new int[]{index}, new Object[]{attrnode});
+											TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
+											for(int i=0; i<alisteners.length; i++)
+											{
+												alisteners[i].treeNodesRemoved(event);
+											}
+										}
+									}
+								}
+							}
+						}
+						else if(tmp instanceof ObjectInspectorNode)
+						{
+							// todo? Or does it automatically handles changes?
 						}
 					}
 				}
@@ -318,16 +323,25 @@ public class OAVTreeModel implements TreeModel
 			public void objectAdded(Object id, OAVObjectType type, boolean root)
 			{
 				Collection	coll	= (Collection)nodes.get(id);
+				
+//				System.out.println("added node: "+id+", "+coll);
+				
 				assert	coll==null : "Added object already used: "+id+", "+coll;
 				if(root)
 				{
 					List	children	= OAVTreeModel.this.root.getChildren();
 					Object	child	= id;
 					if(!(copy.getType(child) instanceof OAVJavaType))
-						child = new ObjectNode(this, child);
+					{
+//						child = new ObjectNode(this, child);
+						child = new ObjectNode(getRoot(), child);
+					}
 					else if(isInspectable(child))
+					{
 						// objectInspector Node
-						child = new ObjectInspectorNode(this, child.getClass(), null, child);
+//						child = new ObjectInspectorNode(this, child.getClass(), null, child);
+						child = new ObjectInspectorNode(getRoot(), child.getClass(), null, child);
+					}
 					children.add(child);
 					
 					if(listeners!=null)
@@ -350,6 +364,7 @@ public class OAVTreeModel implements TreeModel
 			public void objectRemoved(Object id, OAVObjectType type)
 			{
 //				System.out.println("removed: "+id);
+				
 				Collection	coll	= (Collection)nodes.get(id);
 				
 				if(coll!=null)
@@ -360,6 +375,33 @@ public class OAVTreeModel implements TreeModel
 						if(node instanceof ObjectNode)
 						{
 							ObjectNode	onode	= (ObjectNode)node;
+							int index	= getIndexOfChild(onode.parent, onode);
+							Object[]	path	= null;
+							if(onode.parent==OAVTreeModel.this.root)
+							{
+								((RootNode)onode.parent).children.remove(index);
+								path	= new Object[]{OAVTreeModel.this.root};
+							}
+							else if(onode.parent instanceof AttributeNode)
+							{
+								((AttributeNode)onode.parent).children.remove(index);
+								path	= ((AttributeNode)onode.parent).getPath();
+							}
+							onode.drop();
+							
+							if(listeners!=null && path!=null)
+							{
+								TreeModelEvent	event	= new TreeModelEvent(this, path, new int[]{index}, new Object[]{node});
+								TreeModelListener[]	alisteners	= (TreeModelListener[])listeners.toArray(new TreeModelListener[listeners.size()]);
+								for(int i=0; i<alisteners.length; i++)
+								{
+									alisteners[i].treeNodesRemoved(event);
+								}
+							}
+						}
+						else if(node instanceof ObjectInspectorNode)
+						{
+							ObjectInspectorNode onode = (ObjectInspectorNode)node;
 							int index	= getIndexOfChild(onode.parent, onode);
 							Object[]	path	= null;
 							if(onode.parent==OAVTreeModel.this.root)
@@ -1456,9 +1498,8 @@ public class OAVTreeModel implements TreeModel
 	 * @author claas
 	 *
 	 */
-	class ObjectInspectorNode extends AbstractInspectorNode
+	public class ObjectInspectorNode extends AbstractInspectorNode
 	{
-		
 		/** The Class type for this node */
 		protected Class type;
 		
@@ -1495,7 +1536,7 @@ public class OAVTreeModel implements TreeModel
 		 * @param name for this node
 		 * @param object to inspect
 		 */
-		public ObjectInspectorNode(Object parent, Class type, String namePrefix, String name,  Object object)
+		public ObjectInspectorNode(Object parent, Class type, String namePrefix, String name, Object object)
 		{
 			this.parent = parent;
 			this.type = type;
@@ -1505,6 +1546,7 @@ public class OAVTreeModel implements TreeModel
 			
 			getFields();
 			
+			nodes.put(object, this);
 		}
 
 		// --- methods ----
@@ -1523,7 +1565,6 @@ public class OAVTreeModel implements TreeModel
 			{	
 				this.fields = new ArrayList();
 			
-				
 				// find all fields for a class expect strings and null values
 				if (!type.isPrimitive() && !type.isArray() && !type.equals(String.class) && nodeObject != null)
 				{
@@ -1553,8 +1594,6 @@ public class OAVTreeModel implements TreeModel
 		{
 			if(children==null)
 			{
-				
-				
 				children = new ArrayList();
 				Iterator	it	= fields.iterator();
 				while(it.hasNext())
@@ -1611,6 +1650,8 @@ public class OAVTreeModel implements TreeModel
 		 */
 		public void	drop()
 		{
+			nodes.remove(nodeObject);
+			
 			if(children!=null)
 			{
 				for(int i=0; i<children.size(); i++)
@@ -1777,7 +1818,6 @@ public class OAVTreeModel implements TreeModel
 			this.name = (name!=null?name:f.getName());
 
 			inspectors.add(this);
-			
 		}
 
 		// ---- methods ----

@@ -60,7 +60,6 @@ public class ExternalAccess implements IMicroExternalAccess
 		interpreter.getAgentAdapter().invokeLater(runnable);
 	}
 
-
 	/**
 	 *  Get the agent implementation.
 	 *  Operations on the agent object
@@ -87,4 +86,14 @@ public class ExternalAccess implements IMicroExternalAccess
 	{
 		return interpreter.getAgentAdapter().getComponentIdentifier();
 	}
+
+	/**
+	 *  Get the interpreter.
+	 *  @return The interpreter.
+	 */
+	public MicroAgentInterpreter getInterpreter()
+	{
+		return this.interpreter;
+	}
+	
 }

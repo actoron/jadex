@@ -200,7 +200,7 @@ public abstract class MicroAgent implements IMicroAgent
 	 *  @param time The time.
 	 *  @param run The runnable.
 	 */
-	public void waitFor(long time, final Runnable run)
+	public void waitFor(final long time, final Runnable run)
 	{
 		if(timer!=null)
 			throw new RuntimeException("timer should be null");
@@ -214,6 +214,11 @@ public abstract class MicroAgent implements IMicroAgent
 					{
 						timer = null;
 						run.run();
+					}
+					
+					public String toString()
+					{
+						return "microagent.waitForDue("+time+")_#"+this.hashCode();
 					}
 				});
 			}
@@ -230,7 +235,7 @@ public abstract class MicroAgent implements IMicroAgent
 			throw new RuntimeException("timer should be null");
 		this.timer = ((IClockService)getServiceContainer().getService(IClockService.class)).createTickTimer(new ITimedObject()
 		{
-			public void timeEventOccurred(long currenttime)
+			public void timeEventOccurred(final long currenttime)
 			{
 				interpreter.scheduleStep(new Runnable()
 				{
@@ -238,6 +243,11 @@ public abstract class MicroAgent implements IMicroAgent
 					{
 						timer = null;
 						run.run();
+					}
+					
+					public String toString()
+					{
+						return "microagent.waitForTickDue()_#"+this.hashCode();
 					}
 				});
 			}

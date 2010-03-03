@@ -59,5 +59,10 @@
     	<artifactId>jadex-kernel-bpmn</artifactId>
     	<version>2.0-rc1</version>
     </dependency> 
+      <dependency>
+    	<groupId>jadex</groupId>
+    	<artifactId>jadex-kernel-micro</artifactId>
+    	<version>2.0-rc1</version>
+    </dependency> 
   </dependencies>
 </project>
