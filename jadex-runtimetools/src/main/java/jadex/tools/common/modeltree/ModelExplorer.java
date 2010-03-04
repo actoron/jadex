@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -267,6 +268,23 @@ public class ModelExplorer extends JTree
 						e.printStackTrace();
 					}
 				}
+			}
+		});
+		
+		addKeyListener(new KeyListener()
+		{
+			public void keyTyped(KeyEvent e)
+			{
+			}
+			
+			public void keyReleased(KeyEvent e)
+			{
+				if(KeyEvent.VK_F5==e.getKeyCode())
+					REFRESH.actionPerformed(null);
+			}
+			
+			public void keyPressed(KeyEvent e)
+			{
 			}
 		});
 	}
