@@ -100,8 +100,7 @@
 				<module>jadex-platform-base</module>
 				<module>jadex-nuggets</module>
 				<module>jadex-kernel-bdi</module>
-				<module>jadex-applib-bdi</module>
-				<module>jadex-applib-simulation</module>
+				<module>jadex-applib-bdi</module>				
 				<module>jadex-applications-bdi</module>
 				<module>jadex-applications-bpmn</module>
 				<module>jadex-applications-bdibpmn</module>
@@ -123,6 +122,7 @@
 				<module>jadex-platform-wfms</module>
 				<module>jadex-wfms-launch</module>
 				<module>jadex-applications-wfms</module>
+				<module>sodekovs-simulationcontrol</module>				
 		</modules>
   	</profile>
   	<profile>
