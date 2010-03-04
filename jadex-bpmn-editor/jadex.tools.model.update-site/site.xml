@@ -6,5 +6,8 @@
    <feature url="features/jadex.tools.model.feature_1.0.0.201003041512.jar" id="jadex.tools.model.feature" version="1.0.0.201003041512">
       <category name="Jadex"/>
    </feature>
+   <feature url="features/jadex.tools.model.bpmn.feature_1.0.0.201003041702.jar" id="jadex.tools.model.bpmn.feature" version="1.0.0.201003041702">
+      <category name="Jadex"/>
+   </feature>
    <category-def name="Jadex" label="Jadex"/>
 </site>

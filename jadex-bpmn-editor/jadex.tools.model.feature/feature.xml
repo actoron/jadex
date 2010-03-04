@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="jadex.tools.model.feature"
-      label="Jadex model tools"
+      id="jadex.tools.model.gpmn.feature"
+      label="Jadex GPMN model tools"
       version="1.0.0.qualifier"
-      provider-name="Jadex model tools"
+      provider-name="Jadex GPMN model tools"
       exclusive="true"
-      colocation-affinity="jadex.tools.model.feature">
+      colocation-affinity="jadex.tools.model.gpmn.feature">
 
    <description url="http://jadex.informatik.uni-hamburg.de">
-      Model tools for Jadex BPMN and GPMN runtime
+      Model tools for Jadex GPMN runtime
    </description>
 
    <copyright url="http://www.example.com/copyright">
@@ -24,17 +24,13 @@
    </url>
 
    <requires>
-      <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.stp.bpmn" version="1.1.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.stp.bpmn.diagram" version="1.1.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui.ide" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.ui.views.log" version="1.0.100" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.ecore"/>
       <import plugin="org.eclipse.emf.ecore.xmi"/>
+      <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.core.expressions"/>
       <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.ui.ide" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.ui.navigator"/>
       <import plugin="org.eclipse.ui.navigator.resources"/>
@@ -72,13 +68,6 @@
       <import plugin="org.eclipse.wst.xml.ui" version="1.1.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jface.text"/>
    </requires>
-
-   <plugin
-         id="jadex.tools.bpmn.editor"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
    <plugin
          id="jadex.tools.gpmn"
