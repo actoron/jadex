@@ -24,6 +24,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 
 /**
  * Gui, showing details about the simulation setting and the progress.
@@ -80,6 +82,7 @@ public class ControlCenter extends JFrame {
 		// mainPanel = new JPanel(new GridLayout(2, 1));
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+		mainPanel.setOpaque(true);
 
 		// allEnsemblesPanel = new JPanel(new GridLayout(tmpRowNumber, 4));
 		allEnsemblesPanel = new JPanel();
@@ -104,6 +107,8 @@ public class ControlCenter extends JFrame {
 		// createFinishedVehiclesTable();
 
 		setContentPane(mainPanel);
+
+		this.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 
 		pack();
 		setLocation(jadex.commons.SGUI.calculateMiddlePosition(this));
@@ -138,7 +143,17 @@ public class ControlCenter extends JFrame {
 		JTable staticInfosTable = new JTable(staticInfosDm);
 		staticInfosTable.setPreferredScrollableViewportSize(new Dimension(400,
 				30));
-		staticInfosTable.setDefaultRenderer(Object.class, createDefaultCellRenderer());
+//		staticInfosTable.setDefaultRenderer(Object.class, createDefaultCellRenderer());
+//		staticInfosTable.setDefaultRenderer(Color.class, new MyColorRenderer(true));
+		
+		
+		
+		 
+		TableCellRenderer ren = new MyColorRenderer(); 
+		staticInfosTable.setDefaultRenderer( Object.class, ren ); 
+		
+		
+
 		// generalSettingsTable.getColumnModel().getColumn(0).setWidth(30);
 		// generalSettingsTable.getColumnModel().getColumn(1).setWidth(30);
 		staticInfosDm.addRow(new Object[] {
