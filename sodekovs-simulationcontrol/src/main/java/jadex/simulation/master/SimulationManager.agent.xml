@@ -81,7 +81,7 @@
 			This file is parsed on agent start.
 		-->
 		<belief name="simulationDescriptionFile" class="String">
-			<fact>"../jadex-applib-simulation/src/main/java/jadex/simulation/persist/TestXML.xml"
+			<fact>"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/persist/TestXML.xml"
 			</fact>
 		</belief>
 
