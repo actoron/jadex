@@ -20,6 +20,21 @@ import java.util.Set;
  */
 public class HeatbugAgent extends MicroAgent
 {
+	//-------- attributes --------
+	
+	/** The probability of a random move. */
+	protected double randomchance;
+	
+	/** The desired temperature. */
+	protected double ideal_temp;
+	
+	/** The current temperature. */
+	protected double mytemp;
+	
+	/** The current unhappiness. */
+	protected double unhappiness;
+
+
 	//-------- methods --------
 	
 	/**
@@ -32,8 +47,8 @@ public class HeatbugAgent extends MicroAgent
 		ISpaceObject avatar = grid.getAvatar(getComponentIdentifier());
 		
 //		unhappiness = Math.abs(ideal_temp - temp);
-		final double randomchance = ((Number)avatar.getProperty("random_move_chance")).doubleValue();
-		final double ideal_temp = ((Number)avatar.getProperty("ideal_temp")).doubleValue();
+		randomchance = ((Number)avatar.getProperty("random_move_chance")).doubleValue();
+		ideal_temp = ((Number)avatar.getProperty("ideal_temp")).doubleValue();
 //		System.out.println("ideal_temp: "+ideal_temp+" "+getArgument("ideal_temp"));
 		
 		Runnable runnable = new Runnable()
@@ -43,9 +58,9 @@ public class HeatbugAgent extends MicroAgent
 				ISpaceObject avatar = grid.getAvatar(getComponentIdentifier());
 				IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
 				ISpaceObject patch = (ISpaceObject)grid.getSpaceObjectsByGridPosition(mypos, "patch").iterator().next();
-				double mytemp = ((Number)patch.getProperty("heat")).doubleValue();
+				mytemp = ((Number)patch.getProperty("heat")).doubleValue();
 
-				double unhappiness = ((Number)avatar.getProperty("unhappiness")).doubleValue();
+				unhappiness = ((Number)avatar.getProperty("unhappiness")).doubleValue();
 				if(unhappiness>0)
 				{
 					Set tmp = grid.getNearObjects((IVector2)avatar.getProperty(

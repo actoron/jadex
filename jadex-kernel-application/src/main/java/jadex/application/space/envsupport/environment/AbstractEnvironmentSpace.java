@@ -774,7 +774,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		{
 //			System.out.println("remove task: "+taskid+" "+objectid);
 			SpaceObject so = (SpaceObject)getSpaceObject(objectid);
-			so.removeTask(taskid);
+			so.removeTask(taskid, null);
 		}
 	}
 	

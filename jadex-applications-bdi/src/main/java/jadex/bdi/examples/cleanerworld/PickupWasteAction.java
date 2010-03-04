@@ -36,7 +36,7 @@ public class PickupWasteAction extends SimplePropertyObject implements ISpaceAct
 //		if(so.getProperty("garbage")!=null)
 //			System.out.println("pickup failed: "+so);
 		
-		assert avatar.getProperty("waste")==null: avatar;
+		assert avatar.getProperty("waste")==null: avatar+", "+avatar.getProperty("waste")+", "+waste;
 		
 		if(env.getDistance((IVector2)waste.getProperty(Space2D.PROPERTY_POSITION), (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION)).greater(TOLERANCE))
 			throw new RuntimeException("Not near enough to waste: "+waste+" "+avatar);

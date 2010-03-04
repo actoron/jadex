@@ -23,8 +23,6 @@ public class MoveToLocationPlan extends Plan
 		IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
 		ISpaceObject myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
 		IVector2 dest = (IVector2)getParameter("location").getValue();
-		if(dest==null)
-			System.out.println("wdfuo: "+this);
 		
 		SyncResultListener	res	= new SyncResultListener();
 		Map props = new HashMap();

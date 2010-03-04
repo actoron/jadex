@@ -34,9 +34,6 @@ public class DropWasteAction extends SimplePropertyObject implements ISpaceActio
 		ISpaceObject waste = (ISpaceObject)parameters.get("waste");
 		ISpaceObject avatar = env.getAvatar(owner);
 
-//		if(so.getProperty("garbage")!=null)
-//			System.out.println("pickup failed: "+so);
-		
 		assert avatar.getProperty("waste")!=null: avatar;
 		
 		if(env.getDistance((IVector2)wastebin.getProperty(Space2D.PROPERTY_POSITION), (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION)).greater(TOLERANCE))

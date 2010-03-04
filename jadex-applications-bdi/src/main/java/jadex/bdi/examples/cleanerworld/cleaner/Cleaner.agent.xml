@@ -82,8 +82,6 @@
 			<fact language="jcl">$beliefbase.myself.chargestate</fact>
  		</belief>
 
-		<belief name="carriedwaste" class="ISpaceObject"/>
-
 		<beliefset name="patrolpoints" class="IVector2">
 			<fact>new Vector2Double(0.1, 0.1)</fact>
 			<fact>new Vector2Double(0.1, 0.9)</fact>
@@ -135,21 +133,22 @@
 				$beliefbase.daytime
  			</contextcondition>
 			<dropcondition language="jcl">
-				// $beliefbase.carriedwaste==null &amp;&amp;
+				// $beliefbase.myself.waste==null &amp;&amp;
 				// !$beliefbase.getBeliefSet("wastes").containsFact($goal.waste)
 				
-				$beliefbase.carriedwaste==null &amp;&amp;
+				$beliefbase.myself.waste==null &amp;&amp;
 				!Arrays.asList($beliefbase.wastes).contains($goal.waste)
  			</dropcondition>
 			<!-- <deliberation cardinality="1"> -->
 			<deliberation>
 				<inhibits ref="performlookforwaste"/>
 				<inhibits ref="achievecleanup" language="jcl">
-					//$goal.waste==$beliefbase.carriedwaste || 
-					$goal.waste.position==null ||
-					$ref.waste.position!=null &amp;&amp;
+					($goal.waste==$beliefbase.myself.waste || 
+					$ref.waste!=$beliefbase.myself.waste &amp;&amp;
+					$goal.waste.position!=null &amp;&amp;	// Hack!!! should not be required?
+					$ref.waste.position!=null &amp;&amp;	// Hack!!! should not be required?
 					$beliefbase.my_location.getDistance((IVector2)$goal.waste.position)
-						.less($beliefbase.my_location.getDistance((IVector2)$ref.waste.position))
+						.less($beliefbase.my_location.getDistance((IVector2)$ref.waste.position)))
 				</inhibits>
 			</deliberation>
 			<!-- <targetcondition>
@@ -185,19 +184,15 @@
 			<parameter name="wastebin" class="ISpaceObject"/>
 			<parameter name="waste" class="ISpaceObject"/>
 			
-			<!-- The goal has failed when the aimed wastebin is full. - ->
-			<failurecondition>
-				(select one Wastebin $wastebin
- 				from $beliefbase.wastebins
-				where $goal.wastebin.getId().equals($wastebin.getId())).isFull()
-			</failurecondition> -->
-			<!-- <dropcondition language="jcl">
-				$goal.wastebin.isFull()
+			<!-- The goal has failed when the aimed wastebin is full. -->
+			<dropcondition language="jcl">
+				//$goal.wastebin.full
+				$goal.wastebin.wastes >= $goal.wastebin.capacity 
 				
 				// ?rparam = (parameter (parameter_has_name "wastebin") (parameter_has_value ?wastebin))
 				// ?wastebin = (Wastebin (isFull() true)) 
 				// ?rgoal = (goal (parameterelement_has_parameters contains ?rparam))
-			</dropcondition> -->
+			</dropcondition>
 		</achievegoal>
 
 		<!-- Try to move to the specified location. -->
@@ -215,9 +210,14 @@
 		<querygoal name="querywastebin" exclude="never">
 			<parameter name="result" class="ISpaceObject" evaluationmode="push" direction="out">
 				<value language="jcl" variable="$wastebin">
-					ISpaceObject $wastebin &amp;&amp; $wastebin.getType().equals("wastebin") &amp;&amp; !$wastebin.full
+					// ISpaceObject $wastebin &amp;&amp; $wastebin.getType().equals("wastebin") &amp;&amp; !$wastebin.full
+					// &amp;&amp;
+					// !(ISpaceObject $wastebin2 &amp;&amp; $wastebin2.getType().equals("wastebin") &amp;&amp; !$wastebin2.full
+					// 						  &amp;&amp; MoveTask.isGreater($beliefbase.my_location, (IVector2)$wastebin.position, (IVector2)$wastebin2.position))
+					
+					ISpaceObject $wastebin &amp;&amp; $wastebin.getType().equals("wastebin") &amp;&amp; $wastebin.capacity > $wastebin.wastes
 					&amp;&amp;
-					!(ISpaceObject $wastebin2 &amp;&amp; $wastebin2.getType().equals("wastebin") &amp;&amp; !$wastebin2.full
+					!(ISpaceObject $wastebin2 &amp;&amp; $wastebin2.getType().equals("wastebin") &amp;&amp; $wastebin2.capacity > $wastebin2.wastes
 											  &amp;&amp; MoveTask.isGreater($beliefbase.my_location, (IVector2)$wastebin.position, (IVector2)$wastebin2.position))
 				</value>
 			</parameter>
@@ -227,9 +227,9 @@
 		<querygoal name="querychargingstation" exclude="never">
 			<parameter name="result" class="ISpaceObject" evaluationmode="push" direction="out">
 				<value language="jcl" variable="$chargingstation">
-					ISpaceObject $chargingstation &amp;&amp; $chargingstation.getType().equals("chargingstation") &amp;&amp; !$chargingstation.full
+					ISpaceObject $chargingstation &amp;&amp; $chargingstation.getType().equals("chargingstation")
 					&amp;&amp;
-					!(ISpaceObject $chargingstation2 &amp;&amp; $chargingstation2.getType().equals("chargingstation") &amp;&amp; !$chargingstation2.full
+					!(ISpaceObject $chargingstation2 &amp;&amp; $chargingstation2.getType().equals("chargingstation")
 													 &amp;&amp; MoveTask.isGreater($beliefbase.my_location, (IVector2)$chargingstation.position, (IVector2)$chargingstation2.position))
 				</value>
 			</parameter>

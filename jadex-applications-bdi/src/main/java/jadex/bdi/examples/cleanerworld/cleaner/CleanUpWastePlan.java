@@ -19,22 +19,10 @@ public class CleanUpWastePlan extends Plan
 	{
 //		System.out.println("Clean-up waste plan started: "+getParameter("waste").getValue()+" "+getReason());
 
-		if(getBeliefbase().getBelief("carriedwaste").getFact()==null)
-		{
-			ISpaceObject waste = (ISpaceObject)getParameter("waste").getValue();
-			// the following is only for debugging
-			
-//			if(waste==null)
-//			{
-//				RProcessGoal	proc	= (RProcessGoal)((ElementWrapper)getRootGoal()).unwrap();
-//				IRGoal	orig	= proc.getProprietaryGoal();
-//				throw new RuntimeException("Waste is null: " + proc.getParameter("waste") + ", "+orig.getParameter("waste"));
-//			}
-			//System.out.println("Pickup goal created.");
-			IGoal pickup = createGoal("achievepickupwaste");
-			pickup.getParameter("waste").setValue(waste);
-			dispatchSubgoalAndWait(pickup);
-		}
+		ISpaceObject waste = (ISpaceObject)getParameter("waste").getValue();
+		IGoal pickup = createGoal("achievepickupwaste");
+		pickup.getParameter("waste").setValue(waste);
+		dispatchSubgoalAndWait(pickup);
 
 		boolean	dropped	= false;
 		while(!dropped)
@@ -47,14 +35,12 @@ public class CleanUpWastePlan extends Plan
 			// Retry, when wastebin is full in meantime.
 			try
 			{
-				ISpaceObject waste = (ISpaceObject)getParameter("waste").getValue();
 				IGoal drop = createGoal("achievedropwaste");
 				drop.getParameter("waste").setValue(waste);
 				drop.getParameter("wastebin").setValue(wastebin);
 				dispatchSubgoalAndWait(drop);
 				dropped	= true;
 			}
-//			catch(GoalFailureException e){}
 			catch(Exception e)
 			{
 			}
@@ -63,12 +49,12 @@ public class CleanUpWastePlan extends Plan
 	
 	public void failed()
 	{
-		System.err.println("failed: "+this+", "+getParameter("waste").getValue());
-		getException().printStackTrace();
+//		System.err.println("failed: "+this+", "+getParameter("waste").getValue());
+//		getException().printStackTrace();
 	}
 
 	public void aborted()
 	{
-		System.err.println("aborted: "+this+", "+getParameter("waste").getValue());
+//		System.err.println("aborted: "+this+", "+getParameter("waste").getValue());
 	}
 }

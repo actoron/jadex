@@ -56,6 +56,12 @@ public class Blocks
 	/** A block has other blocks as friends. */
 	public static OAVAttributeType block_has_friends;
 	
+	/** A block has a size. */
+	public static OAVAttributeType block_has_size;
+	
+	/** A block has a weight. */
+	public static OAVAttributeType block_has_weight;
+	
 	
 	/** The ball type. */
 	public static OAVObjectType ball_type;
@@ -84,6 +90,8 @@ public class Blocks
 		block_has_color = block_type.createAttributeType("block_has_color", OAVJavaType.java_string_type);
 		block_has_on = block_type.createAttributeType("block_has_on", block_type, OAVAttributeType.LIST);
 		block_has_left = block_type.createAttributeType("block_has_left", block_type, OAVAttributeType.LIST);
+		block_has_size = block_type.createAttributeType("block_has_size", OAVJavaType.java_integer_type);
+		block_has_weight = block_type.createAttributeType("block_has_weight", OAVJavaType.java_integer_type);
 
 		// ball
 		ball_type = blocksworld_type_model.createType("ball");

@@ -187,7 +187,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	 * Removes a task from the object.
 	 * @param task	The task.
 	 */
-	public void removeTask(Object taskid)
+	public void removeTask(Object taskid, Exception e)
 	{
 		synchronized(monitor)
 		{
@@ -196,7 +196,14 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 				Collection	listeners	= tasklisteners.getCollection(taskid);
 				for(Iterator it=listeners.iterator(); it.hasNext(); )
 				{
-					((IResultListener)it.next()).resultAvailable(getId(), taskid);
+					if(e==null)
+					{
+						((IResultListener)it.next()).resultAvailable(getId(), taskid);
+					}
+					else
+					{
+						((IResultListener)it.next()).exceptionOccurred(getId(), e);
+					}
 				}
 				tasklisteners.remove(taskid);
 				
@@ -211,10 +218,10 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 				{
 					task.shutdown(this);
 				}
-				catch (Exception e)
+				catch (Exception e2)
 				{
 					// Todo: logger.
-					e.printStackTrace();
+					e2.printStackTrace();
 				}
 				tasks.remove(taskid);
 			}
@@ -256,7 +263,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 			IObjectTask[] atasks = (IObjectTask[])tasks.values().toArray(new IObjectTask[tasks.size()]);
 			for(int i = 0; i < atasks.length; ++i)
 			{
-				removeTask(atasks[i]);
+				removeTask(atasks[i], null);
 			}
 		}
 	}
@@ -322,13 +329,13 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 					}
 					else
 					{
-						removeTask(atasks[i].getProperty(IObjectTask.PROPERTY_ID));
+						removeTask(atasks[i].getProperty(IObjectTask.PROPERTY_ID), null);
 					}
 				}
 				catch(Exception e)
 				{
 					// Todo: logger.
-					e.printStackTrace();
+//					e.printStackTrace();
 					
 					if(tasklisteners!=null && tasklisteners.containsKey(atasks[i].getProperty(IObjectTask.PROPERTY_ID)))
 					{
@@ -343,7 +350,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 
 					}
 					
-					removeTask(atasks[i].getProperty(IObjectTask.PROPERTY_ID));
+					removeTask(atasks[i].getProperty(IObjectTask.PROPERTY_ID), e);
 				}
 			}
 		}

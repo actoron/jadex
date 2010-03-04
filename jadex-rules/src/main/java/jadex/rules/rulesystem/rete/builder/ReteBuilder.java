@@ -828,9 +828,9 @@ public class ReteBuilder
 				// Add constraint for second occurrence in alpha, if possible (e.g. (Block (has_topcolor ?c) (has_bottomcolor ?c)))
 				else if(context.isAlpha() && context.isConstrainable(var) && isAlphaExecutable(cond, c))
 				{
-					IValueExtractor ex1 = getRightVariableExtractor(context, var);
 					int subindex = bc.isMultiConstraint()? i: -1;
-					IValueExtractor ex2 = createValueExtractor(-1, bc.getValueSource(), subindex, context, false);
+					IValueExtractor ex1 = createValueExtractor(-1, bc.getValueSource(), subindex, context, false);
+					IValueExtractor ex2 = getRightVariableExtractor(context, var);
 					ret.add(new ConstraintEvaluator(bc.getOperator(), ex1, ex2));
 				}
 

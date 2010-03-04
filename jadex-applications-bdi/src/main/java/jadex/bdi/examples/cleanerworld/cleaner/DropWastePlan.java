@@ -24,11 +24,6 @@ public class DropWastePlan extends Plan
 	 */
 	public void body()
 	{
-//		ISpaceObject waste = (ISpaceObject)getBeliefbase().getBelief("carriedwaste").getFact();
-//		System.out.println("carriedwaste a ="+waste);
-//		if(waste==null)
-//			System.out.println("here");
-		
 		// Move to a not full waste-bin
 		ISpaceObject wastebin = (ISpaceObject)getParameter("wastebin").getValue();
 		if(wastebin==null)
@@ -36,8 +31,6 @@ public class DropWastePlan extends Plan
 
 		IVector2 location = (IVector2)wastebin.getProperty(Space2D.PROPERTY_POSITION);
 		IGoal moveto = createGoal("achievemoveto");
-		if(location==null)
-			System.out.println("wdfuo3: "+this+", "+getParameter("waste").getValue());
 		moveto.getParameter("location").setValue(location);
 //		System.out.println("Created dwp: "+location+" "+this);
 		dispatchSubgoalAndWait(moveto);
@@ -57,38 +50,18 @@ public class DropWastePlan extends Plan
 		}
 		catch(RuntimeException e)
 		{
+//			System.out.println("reason: "+getReason());
 			fail();	// Use plan failure to avoid exception being printed to console.
 		}
-
-		// Update beliefs.
-//		getLogger().info("Dropping waste to wastebin!");
-//		wastebin.addWaste(waste);
-
-		// Todo: Find out why atomic is needed.
-//		startAtomic();
-//		IBeliefSet wbs = getBeliefbase().getBeliefSet("wastebins");
-//		if(wbs.containsFact(wastebin))
-//		{
-//			((Wastebin)wbs.getFact(wastebin)).update(wastebin);
-////			wbs.updateFact(wastebin);
-//		}
-//		else
-//		{
-//			wbs.addFact(wastebin);
-//		}
-		//getBeliefbase().getBeliefSet("wastebins").updateOrAddFact(wastebin);
-		getBeliefbase().getBelief("carriedwaste").setFact(null);
-//		System.out.println("carriedwaste b =null");
-//		endAtomic();
 	}
 
 	public void failed()
 	{
-		System.err.println("failed: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
+//		System.err.println("failed: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
 	}
 
 	public void aborted()
 	{
-		System.err.println("aborted: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
+//		System.err.println("aborted: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
 	}
 }

@@ -5,6 +5,8 @@ import jadex.rules.test.rulesystem.CollectNodeTest;
 import jadex.rules.test.rulesystem.DuplicateActivationsTestFail;
 import jadex.rules.test.rulesystem.EqualJoinTest;
 import jadex.rules.test.rulesystem.FunctionTest;
+import jadex.rules.test.rulesystem.GreaterJoinTest;
+import jadex.rules.test.rulesystem.GreaterTest;
 import jadex.rules.test.rulesystem.JavaConditionTest;
 import jadex.rules.test.rulesystem.MethodCallTest;
 import jadex.rules.test.rulesystem.MethodCallTest2;
@@ -21,7 +23,7 @@ import junit.framework.TestSuite;
 /**
  *  JUnit test suite for all rules tests.
  */
-public class MicrokernelTestSuite
+public class RulesTestSuite
 {
 	/**
 	 *  Run a test suite.  
@@ -40,6 +42,8 @@ public class MicrokernelTestSuite
 		suite.addTestSuite(NotNodeJoinTest.class);
 		suite.addTestSuite(NotNodeInitialfactTest.class);
 		suite.addTestSuite(EqualJoinTest.class);
+		suite.addTestSuite(GreaterTest.class);
+		suite.addTestSuite(GreaterJoinTest.class);
 		suite.addTestSuite(DuplicateActivationsTestFail.class);
 		suite.addTestSuite(FunctionTest.class);
 		suite.addTestSuite(MultifieldSplitTest.class);

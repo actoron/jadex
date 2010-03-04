@@ -7,7 +7,6 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.commons.SUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,15 +29,8 @@ public class PickUpWastePlan extends Plan
 //		getLogger().info("Moving to waste!");
 		IGoal moveto = createGoal("achievemoveto");
 		IVector2 location = (IVector2)waste.getProperty(Space2D.PROPERTY_POSITION);
-		if(location==null)
-		{
-			System.out.println("wdfuo2: "+this+", "+getParameter("waste").getValue());
-			System.out.println("wastes: "+SUtil.arrayToString(getBeliefbase().getBeliefSet("wastes").getFacts()));
-		}
 		moveto.getParameter("location").setValue(location);
-//		System.out.println("Created puw: "+location+" "+this);
 		dispatchSubgoalAndWait(moveto);
-//		System.out.println("Reached: "+location+" "+this);
 
 		IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("environment").getFact();
 		Map params = new HashMap();
@@ -54,17 +46,15 @@ public class PickUpWastePlan extends Plan
 		{
 			fail();
 		}
-		getBeliefbase().getBelief("carriedwaste").setFact(waste);
-//		getBeliefbase().getBeliefSet("wastes").removeFact(waste);
 	}
 	
 	public void failed()
 	{
-		System.err.println("failed: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
+//		System.err.println("failed: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
 	}
 
 	public void aborted()
 	{
-		System.err.println("aborted: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
+//		System.err.println("aborted: "+this+", "+(ISpaceObject)getParameter("waste").getValue());
 	}
 }

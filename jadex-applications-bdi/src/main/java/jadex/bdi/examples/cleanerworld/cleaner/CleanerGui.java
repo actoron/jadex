@@ -121,7 +121,7 @@ public class CleanerGui	extends JFrame
 					IVector2 agentloc = (IVector2)agent.getBeliefbase().getBelief("my_location").getFact();
 					double	vision	= ((Double)agent.getBeliefbase().getBelief("my_vision").getFact()).doubleValue();
 					double	charge	= ((Double)agent.getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
-					boolean	waste	= agent.getBeliefbase().getBelief("carriedwaste").getFact()!=null;
+					boolean	waste	= ((ISpaceObject)agent.getBeliefbase().getBelief("myself").getFact()).getProperty("waste")!=null;
 	
 					// Paint agent.
 					Point	p	= onScreenLocation(agentloc, bounds);
@@ -179,11 +179,15 @@ public class CleanerGui	extends JFrame
 					IGoal[] targets = agent.getGoalbase().getGoals("achievemoveto");
 					for(int i=0; i<targets.length; i++)
 					{
-						g.setColor(Color.black);
-						p = onScreenLocation((IVector2)targets[i].getParameter("location").getValue(), bounds);
-						g.drawOval(p.x-5, p.y-5, 10, 10);
-						g.drawLine(p.x-7, p.y, p.x+7, p.y);
-						g.drawLine(p.x, p.y-7, p.x, p.y+7);
+						IVector2	dest	= (IVector2)targets[i].getParameter("location").getValue();
+						if(dest!=null)	// Hack!!! may want to move to null due to asynchronous update of waste position.
+						{
+							p = onScreenLocation(dest, bounds);
+							g.setColor(Color.black);
+							g.drawOval(p.x-5, p.y-5, 10, 10);
+							g.drawLine(p.x-7, p.y, p.x+7, p.y);
+							g.drawLine(p.x, p.y-7, p.x, p.y+7);
+						}
 					}
 				}
 				catch(ComponentTerminatedException e) 
