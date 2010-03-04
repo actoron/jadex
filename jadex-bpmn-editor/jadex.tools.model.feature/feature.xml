@@ -3,7 +3,9 @@
       id="jadex.tools.model.feature"
       label="Jadex model tools"
       version="1.0.0.qualifier"
-      provider-name="Jadex model tools">
+      provider-name="Jadex model tools"
+      exclusive="true"
+      colocation-affinity="jadex.tools.model.feature">
 
    <description url="http://jadex.informatik.uni-hamburg.de">
       Model tools for Jadex BPMN and GPMN runtime
@@ -16,6 +18,10 @@
    <license url="http://www.example.com/license">
       [Enter License Description here.]
    </license>
+
+   <url>
+      <update label="Jadex" url="http://vsis-www.informatik.uni-hamburg.de/projects/jadex/modeltools/update/"/>
+   </url>
 
    <requires>
       <import plugin="org.eclipse.ui"/>
