@@ -1,6 +1,10 @@
 package jadex.bpmn.runtime.handler;
 
+import java.util.List;
+import java.util.Map;
+
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;

@@ -3,10 +3,12 @@ package jadex.bpmn.model;
 import jadex.commons.SReflect;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Base class for all kinds of activities.
@@ -66,7 +68,7 @@ public class MActivity extends MAssociationTarget
 	
 	//-------- added --------
 	
-	/** The parameters. */
+	/** The parameters (name -> MParameter). */
 	protected Map	parameters;
 	
 	//-------- methods --------
@@ -399,11 +401,11 @@ public class MActivity extends MAssociationTarget
 	{
 		return parameters;
 	}
-	
+		
 	/**
 	 *  Get the in and inout parameters.
 	 *  @return The in parameters.
-	 */
+	 * /
 	public List getInParameters()
 	{
 		List inparams = new ArrayList();
@@ -420,12 +422,12 @@ public class MActivity extends MAssociationTarget
 			}
 		}
 		return inparams;
-	}
+	}*/
 	
 	/**
 	 *  Get the out and inout parameters.
 	 *  @return The out parameters.
-	 */
+	 * /
 	public List getOutParameters()
 	{
 		List outparams = new ArrayList();
@@ -442,6 +444,35 @@ public class MActivity extends MAssociationTarget
 			}
 		}
 		return outparams;
+	}*/
+	
+	/**
+	 *  Get parameters of specific direction(s).
+	 *  @return The in parameters.
+	 */
+	public List getParameters(String[] dirs)
+	{
+		Set test = new HashSet();
+		if(dirs!=null)
+		{
+			for(int i=0; i<dirs.length; i++)
+			{
+				test.add(dirs[i]);
+			}
+		}
+		List inparams = new ArrayList();
+		if(parameters!=null)
+		{
+			for(Iterator it=parameters.values().iterator(); it.hasNext(); )
+			{
+				MParameter param = (MParameter)it.next();
+				if(test.contains(param.getDirection()))
+				{
+					inparams.add(param);
+				}
+			}
+		}
+		return inparams;
 	}
 	
 	/**

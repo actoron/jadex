@@ -155,7 +155,7 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 	{
 		TreeNode node = new ModelTreeNode();
 		node.setData(task);
-		List outParams = task.getOutParameters();
+		List outParams = task.getParameters(new String[]{MParameter.DIRECTION_INOUT, MParameter.DIRECTION_OUT});
 		for (Iterator it = outParams.iterator(); it.hasNext(); )
 		{
 			MParameter param = (MParameter) it.next();

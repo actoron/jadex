@@ -25,7 +25,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_h3qmoSbmEd-LGeDmwCGsJg" iD="_h3qmoCbmEd-LGeDmwCGsJg" outgoingEdges="_0rhuQibmEd-LGeDmwCGsJg" incomingEdges="_h3zwkSbmEd-LGeDmwCGsJg" name="D" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_tPUl8CbnEd-LGeDmwCGsJg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tPUl8SbnEd-LGeDmwCGsJg" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nvFbECboEd-LGeDmwCGsJg" key="parameters" value="in␋a␋String␋␟in␋b␋String␋␟in␋text␋String␋&quot;Activity D: a=&quot;+a+&quot;, b=&quot;+b"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nvFbECboEd-LGeDmwCGsJg" key="parameters" value="in␋a␋String␋a␟in␋b␋String␋b␟in␋text␋String␋&quot;Activity D: a=&quot;+a+&quot;, b=&quot;+b"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_0rX9QSbmEd-LGeDmwCGsJg" iD="_0rX9QCbmEd-LGeDmwCGsJg" incomingEdges="_0rhuQibmEd-LGeDmwCGsJg" activityType="EventEndEmpty"/>

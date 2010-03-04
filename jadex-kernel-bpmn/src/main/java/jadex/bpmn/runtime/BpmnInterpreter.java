@@ -2,7 +2,9 @@ package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MSequenceEdge;
+import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.bpmn.runtime.handler.DefaultStepHandler;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler;
@@ -765,7 +767,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 		if(thread!=null)
 		{
 			// Update parameters based on edge inscriptions and initial values.
-			thread.updateParameters(this);
+			thread.updateParametersBeforeStep(this);
 			
 			// Find handler and execute activity.
 			IActivityHandler handler = (IActivityHandler)activityhandlers.get(thread.getActivity().getActivityType());
@@ -774,7 +776,10 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			if(history!=null)
 				history.add(new HistoryEntry(stepnumber++, thread.getId(), thread.getActivity()));
 //			System.out.println("Step: "+thread.getActivity()+" "+thread);
-			handler.execute(thread.getActivity(), this, thread);
+			MActivity act = thread.getActivity();
+			handler.execute(act, this, thread);
+			
+			thread.updateParametersAfterStep(this);
 			
 			// Check if thread now waits for a message and there is at least one in the message queue.
 			if(thread.isWaiting() && messages.size()>0 && MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(thread.getActivity().getActivityType()) 

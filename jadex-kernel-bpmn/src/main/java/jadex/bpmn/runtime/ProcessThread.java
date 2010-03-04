@@ -9,6 +9,7 @@ import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.InterpreterTimedObject;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 
@@ -321,6 +322,15 @@ public class ProcessThread	implements ITaskContext
 	}
 	
 	/**
+	 *  Get the name of all parameters.
+	 *  @return The parameter names.
+	 */
+	public String[] getParameterNames()
+	{
+		return data!=null? (String[])data.keySet().toArray(new String[data.size()]): SUtil.EMPTY_STRING;
+	}
+	
+	/**
 	 *  Get the value of a property.
 	 *  @param name	The property name. 
 	 *  @return	The property value. 
@@ -469,8 +479,10 @@ public class ProcessThread	implements ITaskContext
 	 *  Update parameters based on edge inscriptions and initial values.
 	 *  @param instance	The calling BPMN instance.
 	 */
-	protected  void updateParameters(BpmnInterpreter instance)
+	protected  void updateParametersBeforeStep(BpmnInterpreter instance)
 	{
+//		System.out.println("before: "+getActivity());
+		
 		if(MBpmnModel.TASK.equals(getActivity().getActivityType())
 			|| getActivity() instanceof MSubProcess)
 		{
@@ -597,6 +609,27 @@ public class ProcessThread	implements ITaskContext
 			for(Iterator it=before.iterator(); it.hasNext(); )
 			{
 				data.remove(it.next());
+			}
+		}
+	}
+	
+	/**
+	 *  Remove in parameters after step.
+	 *  @param instance	The calling BPMN instance.
+	 */
+	protected  void updateParametersAfterStep(BpmnInterpreter instance)
+	{
+		// Remove all in paramters
+		MActivity act = getLastEdge().getSource();
+//		System.out.println("after: "+act);
+		if(MBpmnModel.TASK.equals(act.getActivityType()) || act instanceof MSubProcess)
+		{
+			List params = act.getParameters(new String[]{MParameter.DIRECTION_IN});
+			for(int i=0; i<params.size(); i++)
+			{
+				MParameter inp = (MParameter)params.get(i);
+				removeParameterValue(inp.getName());
+				System.out.println("Removed thread param value: "+inp.getName());
 			}
 		}
 	}

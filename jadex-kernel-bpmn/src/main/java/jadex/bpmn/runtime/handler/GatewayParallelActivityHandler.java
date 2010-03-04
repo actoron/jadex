@@ -9,6 +9,7 @@ import jadex.commons.SUtil;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,12 +54,12 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 		{
 			// Try to find threads for all incoming edges.
 			Set	edges	= new HashSet(incoming);
-			Set	threads	= new HashSet();	// Threads to be deleted.
+			Set	threads	= new LinkedHashSet();	// Threads to be deleted.
 			edges.remove(thread.getLastEdge());	// Edge of current thread not required.
 			
 			for(Iterator it=thread.getThreadContext().getThreads().iterator(); !edges.isEmpty() && it.hasNext(); )
 			{
-				ProcessThread	oldthread	= (ProcessThread) it.next();
+				ProcessThread oldthread	= (ProcessThread)it.next();
 				if(edges.contains(oldthread.getLastEdge()))
 				{
 					threads.add(oldthread);
@@ -73,28 +74,27 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 				{
 					ProcessThread pt = (ProcessThread)it.next();
 					
-//					Map data = pt.getData();
-//					for(Iterator keys=data.keySet().iterator(); keys.hasNext(); )
-//					{
-//						String key = (String)keys.next();
-//						Object value = data.get(key);
-//						
-//						
-//						if(thread.hasParameterValue(key))
-//						{
-//							Object origval =thread.getParameterValue(key);
-//							if(!SUtil.equals(origval, value))
-//							{
-//								System.out.println("origact: "+thread.getModelElement());
-//								System.out.println("act: "+pt.getModelElement());
-//								throw new RuntimeException("Inconsistent parameter values from threads cannot be unified: "+key+" "+value+" "+origval);
-//							}
-//						}
-//						else 
-//						{
-//							thread.setParameterValue(key, value);
-//						}
-//					}
+					Map data = pt.getData();
+					for(Iterator keys=data.keySet().iterator(); keys.hasNext(); )
+					{
+						String key = (String)keys.next();
+						Object value = data.get(key);
+						
+						if(thread.hasParameterValue(key))
+						{
+							Object origval =thread.getParameterValue(key);
+							if(!SUtil.equals(origval, value))
+							{
+								System.out.println("origact: "+thread.getModelElement());
+								System.out.println("act: "+pt.getModelElement());
+								throw new RuntimeException("Inconsistent parameter values from threads cannot be unified: "+key+" "+value+" "+origval);
+							}
+						}
+						else 
+						{
+							thread.setParameterValue(key, value);
+						}
+					}
 					
 					thread.getThreadContext().removeThread(pt);
 				}
