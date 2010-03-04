@@ -100,7 +100,7 @@ public class ContextElementItemProvider extends IdentifiableItemProvider
 				 false,
 				 false,
 				 ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -123,7 +123,7 @@ public class ContextElementItemProvider extends IdentifiableItemProvider
 				 false,
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -146,7 +146,7 @@ public class ContextElementItemProvider extends IdentifiableItemProvider
 				 false,
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -169,7 +169,7 @@ public class ContextElementItemProvider extends IdentifiableItemProvider
 				 false,
 				 false,
 				 ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -192,7 +192,7 @@ public class ContextElementItemProvider extends IdentifiableItemProvider
 				 false,
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 

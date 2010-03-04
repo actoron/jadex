@@ -96,7 +96,7 @@ public class ParameterizedEdgeItemProvider extends EdgeItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 

@@ -98,7 +98,7 @@ public class GraphItemProvider extends ArtifactsContainerItemProvider implements
 				 false,
 				 true,
 				 null,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 

@@ -149,7 +149,6 @@ public class GpmnFactoryImpl extends EFactoryImpl implements GpmnFactory
 			case GpmnPackage.PLAN_EDGE: return createPlanEdge();
 			case GpmnPackage.PROCESS: return createProcess();
 			case GpmnPackage.QUERY_GOAL: return createQueryGoal();
-			case GpmnPackage.ROLE: return createRole();
 			case GpmnPackage.SEQUENTIAL_GOAL: return createSequentialGoal();
 			case GpmnPackage.SUB_GOAL_EDGE: return createSubGoalEdge();
 			case GpmnPackage.SUB_PROCESS_GOAL: return createSubProcessGoal();
@@ -597,17 +596,6 @@ public class GpmnFactoryImpl extends EFactoryImpl implements GpmnFactory
 		queryGoal.id = EcoreUtil.generateUUID();
 		queryGoal.goalType = GoalType.QUERY_GOAL;
 		return queryGoal;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Role createRole()
-	{
-		RoleImpl role = new RoleImpl();
-		return role;
 	}
 
 	/**

@@ -99,7 +99,7 @@ public class ContextItemProvider extends ArtifactItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -119,8 +119,6 @@ public class ContextItemProvider extends ArtifactItemProvider implements
 		{
 			super.getChildrenFeatures(object);
 			childrenFeatures.add(GpmnPackage.Literals.CONTEXT__ELEMENTS);
-			childrenFeatures.add(GpmnPackage.Literals.CONTEXT__ROLES);
-			childrenFeatures.add(GpmnPackage.Literals.CONTEXT__GROUPS);
 		}
 		return childrenFeatures;
 	}
@@ -184,8 +182,6 @@ public class ContextItemProvider extends ArtifactItemProvider implements
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 			case GpmnPackage.CONTEXT__ELEMENTS:
-			case GpmnPackage.CONTEXT__ROLES:
-			case GpmnPackage.CONTEXT__GROUPS:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
 		}
@@ -209,16 +205,6 @@ public class ContextItemProvider extends ArtifactItemProvider implements
 			(createChildParameter
 				(GpmnPackage.Literals.CONTEXT__ELEMENTS,
 				 GpmnFactory.eINSTANCE.createContextElement()));
-
-		newChildDescriptors.add
-			(createChildParameter
-				(GpmnPackage.Literals.CONTEXT__ROLES,
-				 GpmnFactory.eINSTANCE.createRole()));
-
-		newChildDescriptors.add
-			(createChildParameter
-				(GpmnPackage.Literals.CONTEXT__GROUPS,
-				 GpmnFactory.eINSTANCE.createGroup()));
 	}
 
 }

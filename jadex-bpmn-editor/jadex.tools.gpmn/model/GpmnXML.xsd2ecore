@@ -60,8 +60,6 @@
     <nested inputs="gpmn.ecore#//Context" outputs="GpmnXML.xsd#//Context;XSDComplexTypeDefinition=5">
       <nested inputs="gpmn.ecore#//Context/types" outputs="GpmnXML.xsd#//Context;XSDComplexTypeDefinition=5/XSDAttributeUse"/>
       <nested inputs="gpmn.ecore#//Context/elements" outputs="GpmnXML.xsd#//Context;XSDComplexTypeDefinition=5/XSDParticle/XSDModelGroup/XSDParticle"/>
-      <nested inputs="gpmn.ecore#//Context/roles" outputs="GpmnXML.xsd#//Context;XSDComplexTypeDefinition=5/XSDParticle/XSDModelGroup/XSDParticle=1"/>
-      <nested inputs="gpmn.ecore#//Context/groups" outputs="GpmnXML.xsd#//Context;XSDComplexTypeDefinition=5/XSDParticle/XSDModelGroup/XSDParticle=2"/>
     </nested>
     <nested inputs="gpmn.ecore#//Context" outputs="GpmnXML.xsd#//Context;XSDElementDeclaration=5"/>
     <nested inputs="gpmn.ecore#//ContextElement" outputs="GpmnXML.xsd#//ContextElement;XSDComplexTypeDefinition=6">
@@ -205,42 +203,37 @@
       <nested inputs="gpmn.ecore#//QueryGoal/failureconditionLanguage" outputs="GpmnXML.xsd#//QueryGoal;XSDComplexTypeDefinition=28/XSDAttributeUse=3"/>
     </nested>
     <nested inputs="gpmn.ecore#//QueryGoal" outputs="GpmnXML.xsd#//QueryGoal;XSDElementDeclaration=28"/>
-    <nested inputs="gpmn.ecore#//Role" outputs="GpmnXML.xsd#//Role;XSDComplexTypeDefinition=29">
-      <nested inputs="gpmn.ecore#//Role/initialPerson" outputs="GpmnXML.xsd#//Role;XSDComplexTypeDefinition=29/XSDAttributeUse"/>
-      <nested inputs="gpmn.ecore#//Role/personType" outputs="GpmnXML.xsd#//Role;XSDComplexTypeDefinition=29/XSDAttributeUse=1"/>
+    <nested inputs="gpmn.ecore#//SequentialGoal" outputs="GpmnXML.xsd#//SequentialGoal;XSDComplexTypeDefinition=29">
+      <nested inputs="gpmn.ecore#//SequentialGoal/targetcondition" outputs="GpmnXML.xsd#//SequentialGoal;XSDComplexTypeDefinition=29/XSDAttributeUse"/>
+      <nested inputs="gpmn.ecore#//SequentialGoal/targetconditionLanguage" outputs="GpmnXML.xsd#//SequentialGoal;XSDComplexTypeDefinition=29/XSDAttributeUse=1"/>
+      <nested inputs="gpmn.ecore#//SequentialGoal/failurecondition" outputs="GpmnXML.xsd#//SequentialGoal;XSDComplexTypeDefinition=29/XSDAttributeUse=2"/>
+      <nested inputs="gpmn.ecore#//SequentialGoal/failureconditionLanguage" outputs="GpmnXML.xsd#//SequentialGoal;XSDComplexTypeDefinition=29/XSDAttributeUse=3"/>
     </nested>
-    <nested inputs="gpmn.ecore#//Role" outputs="GpmnXML.xsd#//Role;XSDElementDeclaration=29"/>
-    <nested inputs="gpmn.ecore#//SequentialGoal" outputs="GpmnXML.xsd#//SequentialGoal;XSDComplexTypeDefinition=30">
-      <nested inputs="gpmn.ecore#//SequentialGoal/targetcondition" outputs="GpmnXML.xsd#//SequentialGoal;XSDComplexTypeDefinition=30/XSDAttributeUse"/>
-      <nested inputs="gpmn.ecore#//SequentialGoal/targetconditionLanguage" outputs="GpmnXML.xsd#//SequentialGoal;XSDComplexTypeDefinition=30/XSDAttributeUse=1"/>
-      <nested inputs="gpmn.ecore#//SequentialGoal/failurecondition" outputs="GpmnXML.xsd#//SequentialGoal;XSDComplexTypeDefinition=30/XSDAttributeUse=2"/>
-      <nested inputs="gpmn.ecore#//SequentialGoal/failureconditionLanguage" outputs="GpmnXML.xsd#//SequentialGoal;XSDComplexTypeDefinition=30/XSDAttributeUse=3"/>
+    <nested inputs="gpmn.ecore#//SequentialGoal" outputs="GpmnXML.xsd#//SequentialGoal;XSDElementDeclaration=29"/>
+    <nested inputs="gpmn.ecore#//SubGoalEdge" outputs="GpmnXML.xsd#//SubGoalEdge;XSDComplexTypeDefinition=30">
+      <nested inputs="gpmn.ecore#//SubGoalEdge/sequentialOrder" outputs="GpmnXML.xsd#//SubGoalEdge;XSDComplexTypeDefinition=30/XSDAttributeUse"/>
     </nested>
-    <nested inputs="gpmn.ecore#//SequentialGoal" outputs="GpmnXML.xsd#//SequentialGoal;XSDElementDeclaration=30"/>
-    <nested inputs="gpmn.ecore#//SubGoalEdge" outputs="GpmnXML.xsd#//SubGoalEdge;XSDComplexTypeDefinition=31">
-      <nested inputs="gpmn.ecore#//SubGoalEdge/sequentialOrder" outputs="GpmnXML.xsd#//SubGoalEdge;XSDComplexTypeDefinition=31/XSDAttributeUse"/>
+    <nested inputs="gpmn.ecore#//SubGoalEdge" outputs="GpmnXML.xsd#//SubGoalEdge;XSDElementDeclaration=30"/>
+    <nested inputs="gpmn.ecore#//SubProcessGoal" outputs="GpmnXML.xsd#//SubProcessGoal;XSDComplexTypeDefinition=31">
+      <nested inputs="gpmn.ecore#//SubProcessGoal/goalref" outputs="GpmnXML.xsd#//SubProcessGoal;XSDComplexTypeDefinition=31/XSDAttributeUse"/>
     </nested>
-    <nested inputs="gpmn.ecore#//SubGoalEdge" outputs="GpmnXML.xsd#//SubGoalEdge;XSDElementDeclaration=31"/>
-    <nested inputs="gpmn.ecore#//SubProcessGoal" outputs="GpmnXML.xsd#//SubProcessGoal;XSDComplexTypeDefinition=32">
-      <nested inputs="gpmn.ecore#//SubProcessGoal/goalref" outputs="GpmnXML.xsd#//SubProcessGoal;XSDComplexTypeDefinition=32/XSDAttributeUse"/>
+    <nested inputs="gpmn.ecore#//SubProcessGoal" outputs="GpmnXML.xsd#//SubProcessGoal;XSDElementDeclaration=31"/>
+    <nested inputs="gpmn.ecore#//TextAnnotation" outputs="GpmnXML.xsd#//TextAnnotation;XSDComplexTypeDefinition=32"/>
+    <nested inputs="gpmn.ecore#//TextAnnotation" outputs="GpmnXML.xsd#//TextAnnotation;XSDElementDeclaration=32"/>
+    <nested inputs="gpmn.ecore#//Vertex" outputs="GpmnXML.xsd#//Vertex;XSDComplexTypeDefinition=33">
+      <nested inputs="gpmn.ecore#//Vertex/outgoingEdges" outputs="GpmnXML.xsd#//Vertex;XSDComplexTypeDefinition=33/XSDAttributeUse=3"/>
+      <nested inputs="gpmn.ecore#//Vertex/incomingEdges" outputs="GpmnXML.xsd#//Vertex;XSDComplexTypeDefinition=33/XSDAttributeUse=4"/>
     </nested>
-    <nested inputs="gpmn.ecore#//SubProcessGoal" outputs="GpmnXML.xsd#//SubProcessGoal;XSDElementDeclaration=32"/>
-    <nested inputs="gpmn.ecore#//TextAnnotation" outputs="GpmnXML.xsd#//TextAnnotation;XSDComplexTypeDefinition=33"/>
-    <nested inputs="gpmn.ecore#//TextAnnotation" outputs="GpmnXML.xsd#//TextAnnotation;XSDElementDeclaration=33"/>
-    <nested inputs="gpmn.ecore#//Vertex" outputs="GpmnXML.xsd#//Vertex;XSDComplexTypeDefinition=34">
-      <nested inputs="gpmn.ecore#//Vertex/outgoingEdges" outputs="GpmnXML.xsd#//Vertex;XSDComplexTypeDefinition=34/XSDAttributeUse=3"/>
-      <nested inputs="gpmn.ecore#//Vertex/incomingEdges" outputs="GpmnXML.xsd#//Vertex;XSDComplexTypeDefinition=34/XSDAttributeUse=4"/>
+    <nested inputs="gpmn.ecore#//NamedObject/description" outputs="GpmnXML.xsd#//Vertex;XSDComplexTypeDefinition=33/XSDAttributeUse"/>
+    <nested inputs="gpmn.ecore#//NamedObject/name" outputs="GpmnXML.xsd#//Vertex;XSDComplexTypeDefinition=33/XSDAttributeUse=1"/>
+    <nested inputs="gpmn.ecore#//NamedObject/ncname" outputs="GpmnXML.xsd#//Vertex;XSDComplexTypeDefinition=33/XSDAttributeUse=2"/>
+    <nested inputs="gpmn.ecore#//Vertex" outputs="GpmnXML.xsd#//Vertex;XSDElementDeclaration=33"/>
+    <nested inputs="gpmn.ecore#//GenericGpmnElement" outputs="GpmnXML.xsd#//GenericGpmnElement;XSDComplexTypeDefinition=34">
+      <nested inputs="gpmn.ecore#//GenericGpmnElement/attributes" outputs="GpmnXML.xsd#//GenericGpmnElement;XSDComplexTypeDefinition=34/XSDParticle/XSDModelGroup/XSDParticle"/>
+      <nested inputs="gpmn.ecore#//GenericGpmnElement/properties" outputs="GpmnXML.xsd#//GenericGpmnElement;XSDComplexTypeDefinition=34/XSDParticle/XSDModelGroup/XSDParticle=1"/>
     </nested>
-    <nested inputs="gpmn.ecore#//NamedObject/description" outputs="GpmnXML.xsd#//Vertex;XSDComplexTypeDefinition=34/XSDAttributeUse"/>
-    <nested inputs="gpmn.ecore#//NamedObject/name" outputs="GpmnXML.xsd#//Vertex;XSDComplexTypeDefinition=34/XSDAttributeUse=1"/>
-    <nested inputs="gpmn.ecore#//NamedObject/ncname" outputs="GpmnXML.xsd#//Vertex;XSDComplexTypeDefinition=34/XSDAttributeUse=2"/>
-    <nested inputs="gpmn.ecore#//Vertex" outputs="GpmnXML.xsd#//Vertex;XSDElementDeclaration=34"/>
-    <nested inputs="gpmn.ecore#//GenericGpmnElement" outputs="GpmnXML.xsd#//GenericGpmnElement;XSDComplexTypeDefinition=35">
-      <nested inputs="gpmn.ecore#//GenericGpmnElement/attributes" outputs="GpmnXML.xsd#//GenericGpmnElement;XSDComplexTypeDefinition=35/XSDParticle/XSDModelGroup/XSDParticle"/>
-      <nested inputs="gpmn.ecore#//GenericGpmnElement/properties" outputs="GpmnXML.xsd#//GenericGpmnElement;XSDComplexTypeDefinition=35/XSDParticle/XSDModelGroup/XSDParticle=1"/>
-    </nested>
-    <nested inputs="gpmn.ecore#//GenericGpmnElement" outputs="GpmnXML.xsd#//GenericGpmnElement;XSDElementDeclaration=35"/>
-    <nested inputs="gpmn.ecore#//GenericGpmnEdge" outputs="GpmnXML.xsd#//GenericGpmnEdge;XSDComplexTypeDefinition=36"/>
-    <nested inputs="gpmn.ecore#//GenericGpmnEdge" outputs="GpmnXML.xsd#//GenericGpmnEdge;XSDElementDeclaration=36"/>
+    <nested inputs="gpmn.ecore#//GenericGpmnElement" outputs="GpmnXML.xsd#//GenericGpmnElement;XSDElementDeclaration=34"/>
+    <nested inputs="gpmn.ecore#//GenericGpmnEdge" outputs="GpmnXML.xsd#//GenericGpmnEdge;XSDComplexTypeDefinition=35"/>
+    <nested inputs="gpmn.ecore#//GenericGpmnEdge" outputs="GpmnXML.xsd#//GenericGpmnEdge;XSDElementDeclaration=35"/>
   </nested>
 </xsd2ecore:XSD2EcoreMappingRoot>

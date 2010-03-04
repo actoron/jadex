@@ -165,7 +165,7 @@ public interface GpmnPackage extends EPackage
 	 * @see jadex.tools.gpmn.impl.GpmnPackageImpl#getVertex()
 	 * @generated
 	 */
-	int VERTEX = 34;
+	int VERTEX = 33;
 
 	/**
 	 * The feature id for the '<em><b>EAnnotations</b></em>' containment reference list.
@@ -1373,31 +1373,13 @@ public interface GpmnPackage extends EPackage
 	int CONTEXT__ELEMENTS = ARTIFACT_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Roles</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int CONTEXT__ROLES = ARTIFACT_FEATURE_COUNT + 1;
-
-	/**
-	 * The feature id for the '<em><b>Groups</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int CONTEXT__GROUPS = ARTIFACT_FEATURE_COUNT + 2;
-
-	/**
 	 * The feature id for the '<em><b>Types</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CONTEXT__TYPES = ARTIFACT_FEATURE_COUNT + 3;
+	int CONTEXT__TYPES = ARTIFACT_FEATURE_COUNT + 1;
 
 	/**
 	 * The number of structural features of the '<em>Context</em>' class.
@@ -1406,7 +1388,7 @@ public interface GpmnPackage extends EPackage
 	 * @generated
 	 * @ordered
 	 */
-	int CONTEXT_FEATURE_COUNT = ARTIFACT_FEATURE_COUNT + 4;
+	int CONTEXT_FEATURE_COUNT = ARTIFACT_FEATURE_COUNT + 2;
 
 	/**
 	 * The meta object id for the '{@link jadex.tools.gpmn.impl.ContextElementImpl <em>Context Element</em>}' class.
@@ -4560,79 +4542,6 @@ public interface GpmnPackage extends EPackage
 	int QUERY_GOAL_FEATURE_COUNT = GOAL_FEATURE_COUNT + 4;
 
 	/**
-	 * The meta object id for the '{@link jadex.tools.gpmn.impl.RoleImpl <em>Role</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see jadex.tools.gpmn.impl.RoleImpl
-	 * @see jadex.tools.gpmn.impl.GpmnPackageImpl#getRole()
-	 * @generated
-	 */
-	int ROLE = 29;
-
-	/**
-	 * The feature id for the '<em><b>EAnnotations</b></em>' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ROLE__EANNOTATIONS = NAMED_OBJECT__EANNOTATIONS;
-
-	/**
-	 * The feature id for the '<em><b>Description</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ROLE__DESCRIPTION = NAMED_OBJECT__DESCRIPTION;
-
-	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ROLE__NAME = NAMED_OBJECT__NAME;
-
-	/**
-	 * The feature id for the '<em><b>Ncname</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ROLE__NCNAME = NAMED_OBJECT__NCNAME;
-
-	/**
-	 * The feature id for the '<em><b>Initial Person</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ROLE__INITIAL_PERSON = NAMED_OBJECT_FEATURE_COUNT + 0;
-
-	/**
-	 * The feature id for the '<em><b>Person Type</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ROLE__PERSON_TYPE = NAMED_OBJECT_FEATURE_COUNT + 1;
-
-	/**
-	 * The number of structural features of the '<em>Role</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ROLE_FEATURE_COUNT = NAMED_OBJECT_FEATURE_COUNT + 2;
-
-	/**
 	 * The meta object id for the '{@link jadex.tools.gpmn.impl.SequentialGoalImpl <em>Sequential Goal</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4640,7 +4549,7 @@ public interface GpmnPackage extends EPackage
 	 * @see jadex.tools.gpmn.impl.GpmnPackageImpl#getSequentialGoal()
 	 * @generated
 	 */
-	int SEQUENTIAL_GOAL = 30;
+	int SEQUENTIAL_GOAL = 29;
 
 	/**
 	 * The feature id for the '<em><b>EAnnotations</b></em>' containment reference list.
@@ -4983,7 +4892,7 @@ public interface GpmnPackage extends EPackage
 	 * @see jadex.tools.gpmn.impl.GpmnPackageImpl#getSubGoalEdge()
 	 * @generated
 	 */
-	int SUB_GOAL_EDGE = 31;
+	int SUB_GOAL_EDGE = 30;
 
 	/**
 	 * The feature id for the '<em><b>EAnnotations</b></em>' containment reference list.
@@ -5110,7 +5019,7 @@ public interface GpmnPackage extends EPackage
 	 * @see jadex.tools.gpmn.impl.GpmnPackageImpl#getSubProcessGoal()
 	 * @generated
 	 */
-	int SUB_PROCESS_GOAL = 32;
+	int SUB_PROCESS_GOAL = 31;
 
 	/**
 	 * The feature id for the '<em><b>EAnnotations</b></em>' containment reference list.
@@ -5426,7 +5335,7 @@ public interface GpmnPackage extends EPackage
 	 * @see jadex.tools.gpmn.impl.GpmnPackageImpl#getTextAnnotation()
 	 * @generated
 	 */
-	int TEXT_ANNOTATION = 33;
+	int TEXT_ANNOTATION = 32;
 
 	/**
 	 * The feature id for the '<em><b>EAnnotations</b></em>' containment reference list.
@@ -5508,7 +5417,7 @@ public interface GpmnPackage extends EPackage
 	 * @see jadex.tools.gpmn.impl.GpmnPackageImpl#getGenericGpmnElement()
 	 * @generated
 	 */
-	int GENERIC_GPMN_ELEMENT = 35;
+	int GENERIC_GPMN_ELEMENT = 34;
 
 	/**
 	 * The feature id for the '<em><b>EAnnotations</b></em>' containment reference list.
@@ -5635,7 +5544,7 @@ public interface GpmnPackage extends EPackage
 	 * @see jadex.tools.gpmn.impl.GpmnPackageImpl#getGenericGpmnEdge()
 	 * @generated
 	 */
-	int GENERIC_GPMN_EDGE = 36;
+	int GENERIC_GPMN_EDGE = 35;
 
 	/**
 	 * The feature id for the '<em><b>EAnnotations</b></em>' containment reference list.
@@ -5753,7 +5662,7 @@ public interface GpmnPackage extends EPackage
 	 * @see jadex.tools.gpmn.impl.GpmnPackageImpl#getDirectionType()
 	 * @generated
 	 */
-	int DIRECTION_TYPE = 37;
+	int DIRECTION_TYPE = 36;
 
 	/**
 	 * The meta object id for the '{@link jadex.tools.gpmn.EdgeType <em>Edge Type</em>}' enum.
@@ -5763,7 +5672,7 @@ public interface GpmnPackage extends EPackage
 	 * @see jadex.tools.gpmn.impl.GpmnPackageImpl#getEdgeType()
 	 * @generated
 	 */
-	int EDGE_TYPE = 38;
+	int EDGE_TYPE = 37;
 
 	/**
 	 * The meta object id for the '{@link jadex.tools.gpmn.ExcludeType <em>Exclude Type</em>}' enum.
@@ -5773,7 +5682,7 @@ public interface GpmnPackage extends EPackage
 	 * @see jadex.tools.gpmn.impl.GpmnPackageImpl#getExcludeType()
 	 * @generated
 	 */
-	int EXCLUDE_TYPE = 39;
+	int EXCLUDE_TYPE = 38;
 
 	/**
 	 * The meta object id for the '{@link jadex.tools.gpmn.GoalType <em>Goal Type</em>}' enum.
@@ -5783,7 +5692,7 @@ public interface GpmnPackage extends EPackage
 	 * @see jadex.tools.gpmn.impl.GpmnPackageImpl#getGoalType()
 	 * @generated
 	 */
-	int GOAL_TYPE = 40;
+	int GOAL_TYPE = 39;
 
 	/**
 	 * The meta object id for the '<em>Direction Type Object</em>' data type.
@@ -5793,7 +5702,7 @@ public interface GpmnPackage extends EPackage
 	 * @see jadex.tools.gpmn.impl.GpmnPackageImpl#getDirectionTypeObject()
 	 * @generated
 	 */
-	int DIRECTION_TYPE_OBJECT = 41;
+	int DIRECTION_TYPE_OBJECT = 40;
 
 	/**
 	 * The meta object id for the '<em>Edge Type Object</em>' data type.
@@ -5803,7 +5712,7 @@ public interface GpmnPackage extends EPackage
 	 * @see jadex.tools.gpmn.impl.GpmnPackageImpl#getEdgeTypeObject()
 	 * @generated
 	 */
-	int EDGE_TYPE_OBJECT = 42;
+	int EDGE_TYPE_OBJECT = 41;
 
 	/**
 	 * The meta object id for the '<em>Exclude Type Object</em>' data type.
@@ -5813,7 +5722,7 @@ public interface GpmnPackage extends EPackage
 	 * @see jadex.tools.gpmn.impl.GpmnPackageImpl#getExcludeTypeObject()
 	 * @generated
 	 */
-	int EXCLUDE_TYPE_OBJECT = 43;
+	int EXCLUDE_TYPE_OBJECT = 42;
 
 	/**
 	 * The meta object id for the '<em>Goal Type Object</em>' data type.
@@ -5823,7 +5732,7 @@ public interface GpmnPackage extends EPackage
 	 * @see jadex.tools.gpmn.impl.GpmnPackageImpl#getGoalTypeObject()
 	 * @generated
 	 */
-	int GOAL_TYPE_OBJECT = 44;
+	int GOAL_TYPE_OBJECT = 43;
 
 	/**
 	 * Returns the meta object for class '{@link jadex.tools.gpmn.AchieveGoal <em>Achieve Goal</em>}'.
@@ -6016,28 +5925,6 @@ public interface GpmnPackage extends EPackage
 	 * @generated
 	 */
 	EReference getContext_Elements();
-
-	/**
-	 * Returns the meta object for the containment reference list '{@link jadex.tools.gpmn.Context#getRoles <em>Roles</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Roles</em>'.
-	 * @see jadex.tools.gpmn.Context#getRoles()
-	 * @see #getContext()
-	 * @generated
-	 */
-	EReference getContext_Roles();
-
-	/**
-	 * Returns the meta object for the containment reference list '{@link jadex.tools.gpmn.Context#getGroups <em>Groups</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the containment reference list '<em>Groups</em>'.
-	 * @see jadex.tools.gpmn.Context#getGroups()
-	 * @see #getContext()
-	 * @generated
-	 */
-	EReference getContext_Groups();
 
 	/**
 	 * Returns the meta object for the attribute '{@link jadex.tools.gpmn.Context#getTypes <em>Types</em>}'.
@@ -7117,38 +7004,6 @@ public interface GpmnPackage extends EPackage
 	EAttribute getQueryGoal_FailureconditionLanguage();
 
 	/**
-	 * Returns the meta object for class '{@link jadex.tools.gpmn.Role <em>Role</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Role</em>'.
-	 * @see jadex.tools.gpmn.Role
-	 * @generated
-	 */
-	EClass getRole();
-
-	/**
-	 * Returns the meta object for the attribute '{@link jadex.tools.gpmn.Role#getInitialPerson <em>Initial Person</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Initial Person</em>'.
-	 * @see jadex.tools.gpmn.Role#getInitialPerson()
-	 * @see #getRole()
-	 * @generated
-	 */
-	EAttribute getRole_InitialPerson();
-
-	/**
-	 * Returns the meta object for the attribute '{@link jadex.tools.gpmn.Role#getPersonType <em>Person Type</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Person Type</em>'.
-	 * @see jadex.tools.gpmn.Role#getPersonType()
-	 * @see #getRole()
-	 * @generated
-	 */
-	EAttribute getRole_PersonType();
-
-	/**
 	 * Returns the meta object for class '{@link jadex.tools.gpmn.SequentialGoal <em>Sequential Goal</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -7605,22 +7460,6 @@ public interface GpmnPackage extends EPackage
 		 * @generated
 		 */
 		EReference CONTEXT__ELEMENTS = eINSTANCE.getContext_Elements();
-
-		/**
-		 * The meta object literal for the '<em><b>Roles</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference CONTEXT__ROLES = eINSTANCE.getContext_Roles();
-
-		/**
-		 * The meta object literal for the '<em><b>Groups</b></em>' containment reference list feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EReference CONTEXT__GROUPS = eINSTANCE.getContext_Groups();
 
 		/**
 		 * The meta object literal for the '<em><b>Types</b></em>' attribute feature.
@@ -8467,32 +8306,6 @@ public interface GpmnPackage extends EPackage
 		 * @generated
 		 */
 		EAttribute QUERY_GOAL__FAILURECONDITION_LANGUAGE = eINSTANCE.getQueryGoal_FailureconditionLanguage();
-
-		/**
-		 * The meta object literal for the '{@link jadex.tools.gpmn.impl.RoleImpl <em>Role</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see jadex.tools.gpmn.impl.RoleImpl
-		 * @see jadex.tools.gpmn.impl.GpmnPackageImpl#getRole()
-		 * @generated
-		 */
-		EClass ROLE = eINSTANCE.getRole();
-
-		/**
-		 * The meta object literal for the '<em><b>Initial Person</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute ROLE__INITIAL_PERSON = eINSTANCE.getRole_InitialPerson();
-
-		/**
-		 * The meta object literal for the '<em><b>Person Type</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute ROLE__PERSON_TYPE = eINSTANCE.getRole_PersonType();
 
 		/**
 		 * The meta object literal for the '{@link jadex.tools.gpmn.impl.SequentialGoalImpl <em>Sequential Goal</em>}' class.

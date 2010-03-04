@@ -100,7 +100,7 @@ public class VertexItemProvider extends AssociationTargetItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -123,7 +123,7 @@ public class VertexItemProvider extends AssociationTargetItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 

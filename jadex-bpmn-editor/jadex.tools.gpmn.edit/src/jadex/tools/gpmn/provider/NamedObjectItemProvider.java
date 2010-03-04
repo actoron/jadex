@@ -103,7 +103,7 @@ public class NamedObjectItemProvider extends EModelElementItemProvider
 				 false,
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -126,7 +126,7 @@ public class NamedObjectItemProvider extends EModelElementItemProvider
 				 false,
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 

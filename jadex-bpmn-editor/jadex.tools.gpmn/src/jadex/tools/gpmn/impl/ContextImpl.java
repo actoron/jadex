@@ -40,8 +40,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * The following features are implemented:
  * <ul>
  *   <li>{@link jadex.tools.gpmn.impl.ContextImpl#getElements <em>Elements</em>}</li>
- *   <li>{@link jadex.tools.gpmn.impl.ContextImpl#getRoles <em>Roles</em>}</li>
- *   <li>{@link jadex.tools.gpmn.impl.ContextImpl#getGroups <em>Groups</em>}</li>
  *   <li>{@link jadex.tools.gpmn.impl.ContextImpl#getTypes <em>Types</em>}</li>
  * </ul>
  * </p>
@@ -66,26 +64,6 @@ public class ContextImpl extends ArtifactImpl implements Context
 	 * @ordered
 	 */
 	protected EList<ContextElement> elements;
-
-	/**
-	 * The cached value of the '{@link #getRoles() <em>Roles</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getRoles()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Role> roles;
-
-	/**
-	 * The cached value of the '{@link #getGroups() <em>Groups</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getGroups()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Group> groups;
 
 	/**
 	 * The default value of the '{@link #getTypes() <em>Types</em>}' attribute.
@@ -147,34 +125,6 @@ public class ContextImpl extends ArtifactImpl implements Context
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Role> getRoles()
-	{
-		if (roles == null)
-		{
-			roles = new EObjectContainmentEList<Role>(Role.class, this, GpmnPackage.CONTEXT__ROLES);
-		}
-		return roles;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<Group> getGroups()
-	{
-		if (groups == null)
-		{
-			groups = new EObjectContainmentEList<Group>(Group.class, this, GpmnPackage.CONTEXT__GROUPS);
-		}
-		return groups;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public String getTypes()
 	{
 		return types;
@@ -224,10 +174,6 @@ public class ContextImpl extends ArtifactImpl implements Context
 		{
 			case GpmnPackage.CONTEXT__ELEMENTS:
 				return ((InternalEList<?>)getElements()).basicRemove(otherEnd, msgs);
-			case GpmnPackage.CONTEXT__ROLES:
-				return ((InternalEList<?>)getRoles()).basicRemove(otherEnd, msgs);
-			case GpmnPackage.CONTEXT__GROUPS:
-				return ((InternalEList<?>)getGroups()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -244,10 +190,6 @@ public class ContextImpl extends ArtifactImpl implements Context
 		{
 			case GpmnPackage.CONTEXT__ELEMENTS:
 				return getElements();
-			case GpmnPackage.CONTEXT__ROLES:
-				return getRoles();
-			case GpmnPackage.CONTEXT__GROUPS:
-				return getGroups();
 			case GpmnPackage.CONTEXT__TYPES:
 				return getTypes();
 		}
@@ -269,14 +211,6 @@ public class ContextImpl extends ArtifactImpl implements Context
 				getElements().clear();
 				getElements().addAll((Collection<? extends ContextElement>)newValue);
 				return;
-			case GpmnPackage.CONTEXT__ROLES:
-				getRoles().clear();
-				getRoles().addAll((Collection<? extends Role>)newValue);
-				return;
-			case GpmnPackage.CONTEXT__GROUPS:
-				getGroups().clear();
-				getGroups().addAll((Collection<? extends Group>)newValue);
-				return;
 			case GpmnPackage.CONTEXT__TYPES:
 				setTypes((String)newValue);
 				return;
@@ -297,12 +231,6 @@ public class ContextImpl extends ArtifactImpl implements Context
 			case GpmnPackage.CONTEXT__ELEMENTS:
 				getElements().clear();
 				return;
-			case GpmnPackage.CONTEXT__ROLES:
-				getRoles().clear();
-				return;
-			case GpmnPackage.CONTEXT__GROUPS:
-				getGroups().clear();
-				return;
 			case GpmnPackage.CONTEXT__TYPES:
 				setTypes(TYPES_EDEFAULT);
 				return;
@@ -322,10 +250,6 @@ public class ContextImpl extends ArtifactImpl implements Context
 		{
 			case GpmnPackage.CONTEXT__ELEMENTS:
 				return elements != null && !elements.isEmpty();
-			case GpmnPackage.CONTEXT__ROLES:
-				return roles != null && !roles.isEmpty();
-			case GpmnPackage.CONTEXT__GROUPS:
-				return groups != null && !groups.isEmpty();
 			case GpmnPackage.CONTEXT__TYPES:
 				return TYPES_EDEFAULT == null ? types != null : !TYPES_EDEFAULT.equals(types);
 		}

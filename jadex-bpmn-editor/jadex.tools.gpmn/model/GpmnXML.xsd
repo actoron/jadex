@@ -107,8 +107,6 @@
       <xsd:extension base="gpmn:Artifact">
         <xsd:sequence>
           <xsd:element maxOccurs="unbounded" minOccurs="0" name="elements" type="gpmn:ContextElement"/>
-          <xsd:element maxOccurs="unbounded" minOccurs="0" name="roles" type="gpmn:Role"/>
-          <xsd:element maxOccurs="unbounded" minOccurs="0" name="groups" type="gpmn:Group"/>
         </xsd:sequence>
         <xsd:attribute name="types" type="xsd:string"/>
       </xsd:extension>
@@ -454,15 +452,6 @@
       <xsd:documentation>A query goal aims at retrieving information.</xsd:documentation>
     </xsd:annotation>
   </xsd:element>
-  <xsd:complexType name="Role">
-    <xsd:complexContent>
-      <xsd:extension base="gpmn:NamedObject">
-        <xsd:attribute name="initialPerson" type="xsd:string"/>
-        <xsd:attribute name="personType" type="xsd:string"/>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-  <xsd:element name="Role" type="gpmn:Role"/>
   <xsd:complexType name="SequentialGoal">
     <xsd:complexContent>
       <xsd:extension base="gpmn:Goal">

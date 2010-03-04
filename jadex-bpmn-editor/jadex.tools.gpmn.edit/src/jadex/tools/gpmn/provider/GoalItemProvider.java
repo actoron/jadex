@@ -111,7 +111,7 @@ public class GoalItemProvider extends ParameterizedVertexItemProvider implements
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
 				 getString("_UI_Goal_unique_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_Goal_unique_feature", "_UI_Goal_type"),
+				 getString("_UI_Goal_unique_description"),
 				 GpmnPackage.Literals.GOAL__UNIQUE,
 				 true,
 				 false,
@@ -140,7 +140,7 @@ public class GoalItemProvider extends ParameterizedVertexItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -186,7 +186,7 @@ public class GoalItemProvider extends ParameterizedVertexItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -232,7 +232,7 @@ public class GoalItemProvider extends ParameterizedVertexItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -278,7 +278,7 @@ public class GoalItemProvider extends ParameterizedVertexItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -301,7 +301,7 @@ public class GoalItemProvider extends ParameterizedVertexItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -393,7 +393,7 @@ public class GoalItemProvider extends ParameterizedVertexItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -439,7 +439,7 @@ public class GoalItemProvider extends ParameterizedVertexItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -462,7 +462,7 @@ public class GoalItemProvider extends ParameterizedVertexItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -485,7 +485,7 @@ public class GoalItemProvider extends ParameterizedVertexItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -508,7 +508,7 @@ public class GoalItemProvider extends ParameterizedVertexItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -531,7 +531,7 @@ public class GoalItemProvider extends ParameterizedVertexItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -554,7 +554,7 @@ public class GoalItemProvider extends ParameterizedVertexItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -577,7 +577,7 @@ public class GoalItemProvider extends ParameterizedVertexItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 
@@ -600,7 +600,7 @@ public class GoalItemProvider extends ParameterizedVertexItemProvider implements
 				 false,
 				 false,
 				 ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 

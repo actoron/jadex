@@ -21,8 +21,6 @@ import org.eclipse.emf.common.util.EList;
  * The following features are supported:
  * <ul>
  *   <li>{@link jadex.tools.gpmn.Context#getElements <em>Elements</em>}</li>
- *   <li>{@link jadex.tools.gpmn.Context#getRoles <em>Roles</em>}</li>
- *   <li>{@link jadex.tools.gpmn.Context#getGroups <em>Groups</em>}</li>
  *   <li>{@link jadex.tools.gpmn.Context#getTypes <em>Types</em>}</li>
  * </ul>
  * </p>
@@ -58,40 +56,6 @@ public interface Context extends Artifact, Identifiable
 	 * @generated
 	 */
 	EList<ContextElement> getElements();
-
-	/**
-	 * Returns the value of the '<em><b>Roles</b></em>' containment reference list.
-	 * The list contents are of type {@link jadex.tools.gpmn.Role}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Roles</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Roles</em>' containment reference list.
-	 * @see jadex.tools.gpmn.GpmnPackage#getContext_Roles()
-	 * @model containment="true"
-	 *        extendedMetaData="kind='element' name='roles'"
-	 * @generated
-	 */
-	EList<Role> getRoles();
-
-	/**
-	 * Returns the value of the '<em><b>Groups</b></em>' containment reference list.
-	 * The list contents are of type {@link jadex.tools.gpmn.Group}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Groups</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Groups</em>' containment reference list.
-	 * @see jadex.tools.gpmn.GpmnPackage#getContext_Groups()
-	 * @model containment="true"
-	 *        extendedMetaData="kind='element' name='groups'"
-	 * @generated
-	 */
-	EList<Group> getGroups();
 
 	/**
 	 * Returns the value of the '<em><b>Types</b></em>' attribute.

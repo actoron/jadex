@@ -286,13 +286,6 @@ public class GpmnPackageImpl extends EPackageImpl implements GpmnPackage
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass roleEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	private EClass sequentialGoalEClass = null;
 
 	/**
@@ -645,29 +638,9 @@ public class GpmnPackageImpl extends EPackageImpl implements GpmnPackage
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getContext_Roles()
-	{
-		return (EReference)contextEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EReference getContext_Groups()
-	{
-		return (EReference)contextEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EAttribute getContext_Types()
 	{
-		return (EAttribute)contextEClass.getEStructuralFeatures().get(3);
+		return (EAttribute)contextEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -1665,36 +1638,6 @@ public class GpmnPackageImpl extends EPackageImpl implements GpmnPackage
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getRole()
-	{
-		return roleEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getRole_InitialPerson()
-	{
-		return (EAttribute)roleEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getRole_PersonType()
-	{
-		return (EAttribute)roleEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EClass getSequentialGoal()
 	{
 		return sequentialGoalEClass;
@@ -1999,8 +1942,6 @@ public class GpmnPackageImpl extends EPackageImpl implements GpmnPackage
 
 		contextEClass = createEClass(CONTEXT);
 		createEReference(contextEClass, CONTEXT__ELEMENTS);
-		createEReference(contextEClass, CONTEXT__ROLES);
-		createEReference(contextEClass, CONTEXT__GROUPS);
 		createEAttribute(contextEClass, CONTEXT__TYPES);
 
 		contextElementEClass = createEClass(CONTEXT_ELEMENT);
@@ -2125,10 +2066,6 @@ public class GpmnPackageImpl extends EPackageImpl implements GpmnPackage
 		createEAttribute(queryGoalEClass, QUERY_GOAL__FAILURECONDITION);
 		createEAttribute(queryGoalEClass, QUERY_GOAL__FAILURECONDITION_LANGUAGE);
 
-		roleEClass = createEClass(ROLE);
-		createEAttribute(roleEClass, ROLE__INITIAL_PERSON);
-		createEAttribute(roleEClass, ROLE__PERSON_TYPE);
-
 		sequentialGoalEClass = createEClass(SEQUENTIAL_GOAL);
 		createEAttribute(sequentialGoalEClass, SEQUENTIAL_GOAL__TARGETCONDITION);
 		createEAttribute(sequentialGoalEClass, SEQUENTIAL_GOAL__TARGETCONDITION_LANGUAGE);
@@ -2242,7 +2179,6 @@ public class GpmnPackageImpl extends EPackageImpl implements GpmnPackage
 		processEClass.getESuperTypes().add(this.getGraph());
 		processEClass.getESuperTypes().add(this.getInterGraphVertex());
 		queryGoalEClass.getESuperTypes().add(this.getGoal());
-		roleEClass.getESuperTypes().add(this.getNamedObject());
 		sequentialGoalEClass.getESuperTypes().add(this.getGoal());
 		subGoalEdgeEClass.getESuperTypes().add(this.getParameterizedEdge());
 		subGoalEdgeEClass.getESuperTypes().add(this.getNamedObject());
@@ -2278,8 +2214,6 @@ public class GpmnPackageImpl extends EPackageImpl implements GpmnPackage
 
 		initEClass(contextEClass, Context.class, "Context", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getContext_Elements(), this.getContextElement(), this.getContextElement_Context(), "elements", null, 0, -1, Context.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getContext_Roles(), this.getRole(), null, "roles", null, 0, -1, Context.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getContext_Groups(), this.getGroup(), null, "groups", null, 0, -1, Context.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getContext_Types(), theXMLTypePackage.getAnyURI(), "types", null, 0, 1, Context.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(contextElementEClass, ContextElement.class, "ContextElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -2403,10 +2337,6 @@ public class GpmnPackageImpl extends EPackageImpl implements GpmnPackage
 		initEAttribute(getQueryGoal_TargetconditionLanguage(), theXMLTypePackage.getString(), "targetconditionLanguage", "jcl", 0, 1, QueryGoal.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getQueryGoal_Failurecondition(), theXMLTypePackage.getString(), "failurecondition", null, 0, 1, QueryGoal.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getQueryGoal_FailureconditionLanguage(), theXMLTypePackage.getString(), "failureconditionLanguage", "jcl", 0, 1, QueryGoal.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(roleEClass, Role.class, "Role", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getRole_InitialPerson(), theXMLTypePackage.getString(), "initialPerson", null, 0, 1, Role.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getRole_PersonType(), theXMLTypePackage.getString(), "personType", null, 0, 1, Role.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(sequentialGoalEClass, SequentialGoal.class, "SequentialGoal", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getSequentialGoal_Targetcondition(), theXMLTypePackage.getString(), "targetcondition", null, 0, 1, SequentialGoal.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -2620,22 +2550,6 @@ public class GpmnPackageImpl extends EPackageImpl implements GpmnPackage
 		   {
 			 "kind", "element",
 			 "name", "elements"
-		   });		
-		addAnnotation
-		  (getContext_Roles(), 
-		   source, 
-		   new String[] 
-		   {
-			 "kind", "element",
-			 "name", "roles"
-		   });		
-		addAnnotation
-		  (getContext_Groups(), 
-		   source, 
-		   new String[] 
-		   {
-			 "kind", "element",
-			 "name", "groups"
 		   });		
 		addAnnotation
 		  (getContext_Types(), 
@@ -3474,30 +3388,6 @@ public class GpmnPackageImpl extends EPackageImpl implements GpmnPackage
 		   {
 			 "kind", "element",
 			 "name", "failurecondition_language"
-		   });		
-		addAnnotation
-		  (roleEClass, 
-		   source, 
-		   new String[] 
-		   {
-			 "name", "Role",
-			 "kind", "elementOnly"
-		   });		
-		addAnnotation
-		  (getRole_InitialPerson(), 
-		   source, 
-		   new String[] 
-		   {
-			 "kind", "attribute",
-			 "name", "initialPerson"
-		   });		
-		addAnnotation
-		  (getRole_PersonType(), 
-		   source, 
-		   new String[] 
-		   {
-			 "kind", "attribute",
-			 "name", "personType"
 		   });		
 		addAnnotation
 		  (sequentialGoalEClass, 

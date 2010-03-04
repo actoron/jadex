@@ -835,31 +835,6 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 	}
 
 	/**
-	 * This keeps track of the one adapter used for all {@link jadex.tools.gpmn.Role} instances.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected RoleItemProvider roleItemProvider;
-
-	/**
-	 * This creates an adapter for a {@link jadex.tools.gpmn.Role}.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Adapter createRoleAdapter()
-	{
-		if (roleItemProvider == null)
-		{
-			roleItemProvider = new RoleItemProvider(this);
-		}
-
-		return roleItemProvider;
-	}
-
-	/**
 	 * This keeps track of the one adapter used for all {@link jadex.tools.gpmn.SequentialGoal} instances.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1204,7 +1179,6 @@ public class GpmnItemProviderAdapterFactory extends GpmnAdapterFactory
 		if (planEdgeItemProvider != null) planEdgeItemProvider.dispose();
 		if (processItemProvider != null) processItemProvider.dispose();
 		if (queryGoalItemProvider != null) queryGoalItemProvider.dispose();
-		if (roleItemProvider != null) roleItemProvider.dispose();
 		if (sequentialGoalItemProvider != null) sequentialGoalItemProvider.dispose();
 		if (subGoalEdgeItemProvider != null) subGoalEdgeItemProvider.dispose();
 		if (subProcessGoalItemProvider != null) subProcessGoalItemProvider.dispose();

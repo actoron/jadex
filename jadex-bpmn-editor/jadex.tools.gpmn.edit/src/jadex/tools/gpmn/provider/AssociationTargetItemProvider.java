@@ -94,7 +94,7 @@ public class AssociationTargetItemProvider extends IdentifiableItemProvider
 				 false,
 				 true,
 				 null,
-				 null,
+				 getString("_UI_StandardPropertyCategory"),
 				 null));
 	}
 

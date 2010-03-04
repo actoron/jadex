@@ -298,15 +298,6 @@ public interface GpmnFactory extends EFactory
 	QueryGoal createQueryGoal();
 
 	/**
-	 * Returns a new object of class '<em>Role</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Role</em>'.
-	 * @generated
-	 */
-	Role createRole();
-
-	/**
 	 * Returns a new object of class '<em>Sequential Goal</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
