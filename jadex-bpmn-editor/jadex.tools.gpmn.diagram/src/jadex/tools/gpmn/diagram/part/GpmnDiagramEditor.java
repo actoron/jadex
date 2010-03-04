@@ -88,6 +88,7 @@ public class GpmnDiagramEditor extends DiagramDocumentEditor implements
 	public static HashSet staticRemovedElementTypes = new HashSet<IElementType>();
 	static
 	{
+		staticRemovedElementTypes.add(GpmnElementTypes.Process_2001);
 		staticRemovedElementTypes.add(GpmnElementTypes.MessageGoal_2008);
 		staticRemovedElementTypes.add(GpmnElementTypes.MessagingEdge_4004);
 	}

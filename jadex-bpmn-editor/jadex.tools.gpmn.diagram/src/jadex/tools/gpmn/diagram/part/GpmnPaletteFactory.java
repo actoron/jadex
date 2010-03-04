@@ -58,7 +58,8 @@ public class GpmnPaletteFactory
 			{
 				PaletteContainer container = (PaletteContainer) obj;
 
-				for (Object toolEntry : container.getChildren())
+				Object[] toolEntries = container.getChildren().toArray(new Object[container.getChildren().size()]);
+				for (Object toolEntry : toolEntries)
 				{
 					if (toolEntry instanceof NodeToolEntry)
 					{
