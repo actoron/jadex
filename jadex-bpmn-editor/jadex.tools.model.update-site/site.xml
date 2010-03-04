@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/jadex.tools.model.feature_1.0.0.201003041404.jar" id="jadex.tools.model.feature" version="1.0.0.201003041404"/>
+   <description name="Jadex model tools update site">
+      Jadex tools to create Jadex BPMN and GPMN models
+   </description>
+   <feature url="features/jadex.tools.model.feature_1.0.0.201003041436.jar" id="jadex.tools.model.feature" version="1.0.0.201003041436">
+      <category name="Jadex"/>
+   </feature>
+   <category-def name="Jadex" label="Jadex">
+      <description>
+         Jadex model tools
+      </description>
+   </category-def>
 </site>

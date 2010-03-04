@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="jadex.tools.model.feature"
-      label="Jadex model tools feature"
-      version="1.0.0.qualifier">
+      label="Jadex model tools"
+      version="1.0.0.qualifier"
+      provider-name="Jadex model tools">
 
-   <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+   <description url="http://jadex.informatik.uni-hamburg.de">
+      Model tools for Jadex BPMN and GPMN runtime
    </description>
 
    <copyright url="http://www.example.com/copyright">
@@ -15,6 +16,56 @@
    <license url="http://www.example.com/license">
       [Enter License Description here.]
    </license>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.stp.bpmn" version="1.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.stp.bpmn.diagram" version="1.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.ide" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.ui.views.log" version="1.0.100" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore"/>
+      <import plugin="org.eclipse.emf.ecore.xmi"/>
+      <import plugin="org.eclipse.core.expressions"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.ui.views"/>
+      <import plugin="org.eclipse.ui.navigator"/>
+      <import plugin="org.eclipse.ui.navigator.resources"/>
+      <import plugin="org.eclipse.emf.edit.ui"/>
+      <import plugin="org.eclipse.gmf.runtime.emf.core"/>
+      <import plugin="org.eclipse.gmf.runtime.emf.commands.core"/>
+      <import plugin="org.eclipse.gmf.runtime.emf.ui.properties"/>
+      <import plugin="org.eclipse.gmf.runtime.diagram.ui"/>
+      <import plugin="org.eclipse.gmf.runtime.diagram.ui.printing"/>
+      <import plugin="org.eclipse.gmf.runtime.diagram.ui.printing.render"/>
+      <import plugin="org.eclipse.gmf.runtime.diagram.ui.properties"/>
+      <import plugin="org.eclipse.gmf.runtime.diagram.ui.providers"/>
+      <import plugin="org.eclipse.gmf.runtime.diagram.ui.providers.ide"/>
+      <import plugin="org.eclipse.gmf.runtime.diagram.ui.render"/>
+      <import plugin="org.eclipse.gmf.runtime.diagram.ui.resources.editor"/>
+      <import plugin="org.eclipse.gmf.runtime.diagram.ui.resources.editor.ide"/>
+      <import plugin="org.eclipse.draw2d"/>
+      <import plugin="org.eclipse.gmf.runtime.draw2d.ui"/>
+      <import plugin="org.eclipse.emf.ecore.edit"/>
+      <import plugin="org.eclipse.ocl.ecore"/>
+      <import plugin="org.eclipse.emf.validation"/>
+      <import plugin="org.eclipse.gef"/>
+      <import plugin="org.eclipse.ui.views.properties.tabbed"/>
+      <import plugin="org.eclipse.ui.workbench"/>
+      <import plugin="org.eclipse.emf.workspace"/>
+      <import plugin="org.eclipse.gmf.runtime.notation"/>
+      <import plugin="org.eclipse.gmf.runtime.notation.edit"/>
+      <import plugin="org.eclipse.stp.bpmn.diagram" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jdt.core" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.edit"/>
+      <import plugin="org.eclipse.wst.common.ui" version="1.1.402" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.wst.sse.core" version="1.1.401" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.wst.sse.ui" version="1.1.101" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.wst.xml.core" version="1.1.401" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.wst.xml.ui" version="1.1.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jface.text"/>
+   </requires>
 
    <plugin
          id="jadex.tools.bpmn.editor"
