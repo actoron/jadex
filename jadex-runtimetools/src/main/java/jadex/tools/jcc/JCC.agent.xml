@@ -34,28 +34,28 @@
 	</beliefs>
 
 	<goals>
-		<achievegoalref name="cms_create_agent">
-			<concrete ref="cms.cms_create_agent" />
+		<achievegoalref name="cms_create_component">
+			<concrete ref="cms.cms_create_component" />
 		</achievegoalref>
 
-		<achievegoalref name="cms_destroy_agent">
-			<concrete ref="cms.cms_destroy_agent" />
+		<achievegoalref name="cms_destroy_component">
+			<concrete ref="cms.cms_destroy_component" />
 		</achievegoalref>
 		
-		<achievegoalref name="cms_suspend_agent">
-			<concrete ref="cms.cms_suspend_agent" />
+		<achievegoalref name="cms_suspend_component">
+			<concrete ref="cms.cms_suspend_component" />
 		</achievegoalref>
 		
-		<achievegoalref name="cms_resume_agent">
-			<concrete ref="cms.cms_resume_agent" />
+		<achievegoalref name="cms_resume_component">
+			<concrete ref="cms.cms_resume_component" />
 		</achievegoalref>
 
 		<achievegoalref name="cms_shutdown_platform">
 			<concrete ref="cms.cms_shutdown_platform" />
 		</achievegoalref>
 
-		<achievegoalref name="cms_search_agents">
-			<concrete ref="cms.cms_search_agents" />
+		<achievegoalref name="cms_search_components">
+			<concrete ref="cms.cms_search_components" />
 		</achievegoalref>
       
         <achievegoalref name="df_register">
