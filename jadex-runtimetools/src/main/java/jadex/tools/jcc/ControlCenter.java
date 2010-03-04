@@ -17,6 +17,7 @@ import jadex.tools.common.plugin.IControlCenterPlugin;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -215,6 +216,8 @@ public class ControlCenter implements IControlCenter
 	 */
 	public void closeProject()
 	{
+//		System.out.println("closePro: "+Thread.currentThread().getName());
+		
 		resetPlugins();
 
 		setCurrentProject(null);
@@ -227,6 +230,8 @@ public class ControlCenter implements IControlCenter
 	 */
 	public void setCurrentProject(File file)
 	{
+//		System.out.println("setCuPro: "+Thread.currentThread().getName());
+		
 		this.project = file;
 		saveLastProject(project);
 		if(file != null)
@@ -248,10 +253,24 @@ public class ControlCenter implements IControlCenter
 	 */
 	public void openProject(File pd) throws Exception
 	{
+//		System.out.println("openPro: "+Thread.currentThread().getName());
+		
 		// Read project properties
 		try
 		{
 			FileInputStream fis = new FileInputStream(pd);
+			
+//			try
+//			{
+//				DataInputStream dis = new DataInputStream(fis);
+//				while(dis.available()!=0)
+//					System.out.println(dis.readLine());
+//			}
+//			catch(Exception e)
+//			{
+//			}
+//			fis = new FileInputStream(pd);
+			
 			props = (Properties)PropertiesXMLHelper.getPropertyReader().read(fis, ((ILibraryService)container
 				.getService(ILibraryService.class)).getClassLoader(), null);
 //			props = XMLPropertiesReader.readProperties(fis,
@@ -344,6 +363,8 @@ public class ControlCenter implements IControlCenter
 	 */
 	public void saveProject()
 	{
+//		System.out.println("savePro: "+Thread.currentThread().getName());
+		
 		if(project != null)
 		{
 			// Write project properties
@@ -368,8 +389,7 @@ public class ControlCenter implements IControlCenter
 			for(Iterator it = chs.keySet().iterator(); it.hasNext();)
 			{
 				String name = (String)it.next();
-				consoleheights.addProperty(new Property(name, "consoleheight",
-						"" + chs.get(name)));
+				consoleheights.addProperty(new Property(name, "consoleheight", "" + chs.get(name)));
 			}
 
 			// Save properties of all plugins.
@@ -427,6 +447,8 @@ public class ControlCenter implements IControlCenter
 	 */
 	protected void saveLastProject(File project)
 	{
+//		System.out.println("saveLastPro: "+Thread.currentThread().getName());
+		
 		try
 		{
 			Writer w = new FileWriter(JCC_PROJECT);
@@ -456,6 +478,8 @@ public class ControlCenter implements IControlCenter
 	 */
 	protected void resetPlugins()
 	{
+//		System.out.println("resetPlu: "+Thread.currentThread().getName());
+		
 		// Reset all plugins, which have a panel associated.
 		for(Iterator it = plugins.keySet().iterator(); it.hasNext();)
 		{
@@ -468,8 +492,7 @@ public class ControlCenter implements IControlCenter
 				}
 				catch(Exception e)
 				{
-					System.err.println("Exception during reset of JCC-Plug-In "
-							+ plugin.getName());
+					System.err.println("Exception during reset of JCC-Plug-In " + plugin.getName());
 					e.printStackTrace();
 				}
 			}
@@ -481,6 +504,8 @@ public class ControlCenter implements IControlCenter
 	 */
 	protected void closePlugins()
 	{
+//		System.out.println("closePlu: "+Thread.currentThread().getName());
+		
 		// Close all plugins, which have a panel associated.
 		for(Iterator it = plugins.keySet().iterator(); it.hasNext();)
 		{
@@ -493,8 +518,7 @@ public class ControlCenter implements IControlCenter
 				}
 				catch(Exception e)
 				{
-					System.err.println("Exception while closing JCC-Plug-In "
-							+ plugin.getName());
+					System.err.println("Exception while closing JCC-Plug-In " + plugin.getName());
 					e.printStackTrace();
 				}
 			}
@@ -506,6 +530,8 @@ public class ControlCenter implements IControlCenter
 	 */
 	protected void setPluginProperties(IControlCenterPlugin plugin)
 	{
+//		System.out.println("setPluProps: "+Thread.currentThread().getName());
+		
 		Properties pluginprops = props.getSubproperty(plugin.getName());
 		if(pluginprops != null)
 		{
@@ -558,6 +584,8 @@ public class ControlCenter implements IControlCenter
 	 */
 	public void activatePlugin(IControlCenterPlugin plugin)
 	{
+//		System.out.println("activatePlu: "+Thread.currentThread().getName()+" "+plugin);
+		
 		window.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
 		// Init the plugin, when not yet inited.
@@ -569,10 +597,12 @@ public class ControlCenter implements IControlCenter
 	}
 	
 	/**
-	 * 
+	 *  Init a plugin.
 	 */
 	protected void initPlugin(IControlCenterPlugin plugin)
 	{
+//		System.out.println("initPlu: "+Thread.currentThread().getName()+" "+plugin);
+		
 		if(plugins.get(plugin) == null)
 		{
 			try

@@ -629,7 +629,7 @@ public class ProcessThread	implements ITaskContext
 			{
 				MParameter inp = (MParameter)params.get(i);
 				removeParameterValue(inp.getName());
-				System.out.println("Removed thread param value: "+inp.getName());
+//				System.out.println("Removed thread param value: "+inp.getName());
 			}
 		}
 	}

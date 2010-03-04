@@ -180,6 +180,7 @@ public class Reader
 				{
 					String attrname = parser.getAttributeLocalName(i);
 					String attrval = parser.getAttributeValue(i);
+					
 					rawattrs.put(attrname, attrval);
 				}
 			}

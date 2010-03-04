@@ -85,9 +85,9 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 							Object origval =thread.getParameterValue(key);
 							if(!SUtil.equals(origval, value))
 							{
-								System.out.println("origact: "+thread.getModelElement());
-								System.out.println("act: "+pt.getModelElement());
-								throw new RuntimeException("Inconsistent parameter values from threads cannot be unified: "+key+" "+value+" "+origval);
+//								System.out.println("origact: "+thread.getModelElement());
+//								System.out.println("act: "+pt.getModelElement());
+								throw new RuntimeException("Inconsistent parameter values from threads cannot be unified in AND join: "+key+" "+value+" "+origval);
 							}
 						}
 						else 

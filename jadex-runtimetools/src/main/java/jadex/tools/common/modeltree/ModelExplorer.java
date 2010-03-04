@@ -1008,7 +1008,7 @@ public class ModelExplorer extends JTree
 	/**
 	 *  Refresh the selected path.
 	 */
-	public final Action REFRESH = new ToolTipAction("Refresh", icons.getIcon("refresh"), null)
+	public final Action REFRESH = new ToolTipAction("Refresh [F5]", icons.getIcon("refresh"), null)
 	{
 		/**
 		 *  Called when action should be performed.
@@ -1029,11 +1029,11 @@ public class ModelExplorer extends JTree
 			String ret = null;
 			Object tmp = getLastSelectedPathComponent();
 			if(tmp instanceof DirNode)
-				ret = "Refresh directory recursively: "+((DirNode)tmp).getFile().getName();
+				ret = "Refresh directory recursively [F5]: "+((DirNode)tmp).getFile().getName();
 			else if(tmp instanceof FileNode)
-				ret = "Refresh file: "+((FileNode)tmp).getFile().getName();
+				ret = "Refresh file [F5]: "+((FileNode)tmp).getFile().getName();
 			else
-				ret = "Refresh all items of tree";
+				ret = "Refresh all items of tree [F5]";
 			return ret;
 		}
 	};

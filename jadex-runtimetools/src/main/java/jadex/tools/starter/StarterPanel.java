@@ -76,6 +76,9 @@ public class StarterPanel extends JPanel
 
 	/** The model. */
 	protected ILoadableComponentModel model;
+	
+	/** The error (last loading). */
+	protected String error;
 
 	/** The last loaded filename. */
 	protected String lastfile;
@@ -387,102 +390,52 @@ public class StarterPanel extends JPanel
 					}
 					else
 					{
-//						if(model instanceof ApplicationModel)
-//						{
-////							IApplicationFactory fac = starter.getJCC().getComponent().getPlatform().getApplicationFactory();
-//							try
-//							{
-//								SComponentFactory.createApplication(starter.getJCC().getServiceContainer(), (String)appname.getSelectedItem(), filename.getText(), configname, args);
-//							}
-//							catch(Exception e)
-//							{
-//								e.printStackTrace();
-//								JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), "Could not start application: "+e, 
-//									"Application Problem", JOptionPane.INFORMATION_MESSAGE);
-//							}
-//						}
-//						else
+						String typename = /*ac!=null? ac.getComponentType(filename.getText()):*/ filename.getText();
+						final String fullname = model.getPackage()+"."+model.getName();
+						IResultListener killlistener = null;
+						final ILoadableComponentModel mymodel = model;
+						if(storeresults!=null && storeresults.isSelected())
 						{
-//							IApplicationContext ac = null;
-//							final String apn = (String)appname.getSelectedItem();
-//							if(apn!=null && apn.length()>0)
-//							{
-//								IContextService cs = (IContextService)starter.getJCC().getServiceContainer().getService(IContextService.class);
-//								if(cs!=null)
-//								{
-//									ac = (IApplicationContext)cs.getContext(apn);
-//								}
-//							}	
-							String typename = /*ac!=null? ac.getComponentType(filename.getText()):*/ filename.getText();
-							final String fullname = model.getPackage()+"."+model.getName();
-//							if(typename==null)
-//							{
-//								JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), "Could not resolve component type: "
-//									+filename.getText()+"\n in application: "+ac.getName(), 
-//									"Component Type Problem", JOptionPane.INFORMATION_MESSAGE);
-//							}
-//							else
+							killlistener = new IResultListener()
 							{
-								IResultListener killlistener = null;
-								final ILoadableComponentModel mymodel = model;
-								if(storeresults!=null && storeresults.isSelected())
+								public void resultAvailable(final Object source, final Object result)
 								{
-									killlistener = new IResultListener()
+									SwingUtilities.invokeLater(new Runnable()
 									{
-										public void resultAvailable(final Object source, final Object result)
+										public void run()
 										{
-											SwingUtilities.invokeLater(new Runnable()
-											{
-												public void run()
-												{
 //													System.out.println("fullname: "+fullname+" "+model.getFilename());
-													String tmp = (String)mymodel.getPackage()+"."+mymodel.getName();
-													resultsets.put(tmp, new Object[]{source, result});
-													if(model!=null && fullname.equals(model.getPackage()+"."+model.getName()))
-													{
-														selectavail.addItem(source);
-														refreshResults();
-													}
-												}
-											});
+											String tmp = (String)mymodel.getPackage()+"."+mymodel.getName();
+											resultsets.put(tmp, new Object[]{source, result});
+											if(model!=null && fullname.equals(model.getPackage()+"."+model.getName()))
+											{
+												selectavail.addItem(source);
+												refreshResults();
+											}
 										}
-										
-										public void exceptionOccurred(Object source, Exception exception)
-										{
-											// todo?!
-//											resultsets.put(typename, exception);
-										}
-									};
+									});
 								}
 								
-								String an = genname.isSelected()?  null: componentname.getText();
-								if(an==null) // i.e. name auto generate
+								public void exceptionOccurred(Object source, Exception exception)
 								{
-									int max = ((Integer)numcomponents.getValue()).intValue();
-									for(int i=0; i<max; i++)
-									{
-//										if(ac!=null)
-//										{
-//											ac.createComponent(an, typename, configname, args, suspend.isSelected(), false, null, null);
-//										}
-//										else
-										{
-											starter.createComponent(typename, an, configname, args, suspend.isSelected(), killlistener);
-										}
-									}
+									// todo?!
+//											resultsets.put(typename, exception);
 								}
-								else
-								{
-//									if(ac!=null)
-//									{
-//										ac.createComponent(an, typename, configname, args, suspend.isSelected(), false, null, null);
-//									}
-//									else
-									{
-										starter.createComponent(typename, an, configname, args, suspend.isSelected(), killlistener);
-									}
-								}
+							};
+						}
+								
+						String an = genname.isSelected()?  null: componentname.getText();
+						if(an==null) // i.e. name auto generate
+						{
+							int max = ((Integer)numcomponents.getValue()).intValue();
+							for(int i=0; i<max; i++)
+							{
+								starter.createComponent(typename, an, configname, args, suspend.isSelected(), killlistener);
 							}
+						}
+						else
+						{
+							starter.createComponent(typename, an, configname, args, suspend.isSelected(), killlistener);
 						}
 					}
 				}
@@ -714,49 +667,15 @@ public class StarterPanel extends JPanel
 			return;
 		
 		//System.out.println("loadModel: "+adf+" "+modelname.getActionListeners().length+" "+SUtil.arrayToString(modelname.getActionListeners()));
-
-		String	error	= null;
+//		String	error	= null;
+		
 		if(adf!=null)
 		{
-//			ClassLoader	oldcl	= Thread.currentThread().getContextClassLoader();
-//			if(starter.getModelExplorer().getClassLoader()!=null)
-//				Thread.currentThread().setContextClassLoader(starter.getModelExplorer().getClassLoader());
-
 			try
 			{
 				if(SComponentFactory.isLoadable(starter.getJCC().getServiceContainer(), adf))
 				{
 					model = SComponentFactory.loadModel(starter.getJCC().getServiceContainer(), adf);
-					updateGuiForNewModel(adf);
-					
-					if(SComponentFactory.isStartable(starter.getJCC().getServiceContainer(), adf))
-					{
-						createArguments();
-						createResults();
-						arguments.setVisible(true);
-						results.setVisible(true);
-						componentpanel.setVisible(true);
-						start.setVisible(true);
-						
-						filenamel.setMinimumSize(confdummy.getMinimumSize());
-						filenamel.setPreferredSize(confdummy.getPreferredSize());
-						confl.setMinimumSize(confdummy.getMinimumSize());
-						confl.setPreferredSize(confdummy.getPreferredSize());
-						componentnamel.setMinimumSize(confdummy.getMinimumSize());
-						componentnamel.setPreferredSize(confdummy.getPreferredSize());
-					}
-					else
-					{
-						arguments.setVisible(false);
-						results.setVisible(false);
-						componentpanel.setVisible(false);
-						start.setVisible(false);
-						
-						filenamel.setMinimumSize(confdummy.getMinimumSize());
-						filenamel.setPreferredSize(confdummy.getPreferredSize());
-						confl.setMinimumSize(confdummy.getMinimumSize());
-						confl.setPreferredSize(confdummy.getPreferredSize());
-					}
 				}
 				else
 				{
@@ -770,81 +689,67 @@ public class StarterPanel extends JPanel
 				model = null;
 				StringWriter sw = new StringWriter();
 				e.printStackTrace(new PrintWriter(sw));
-				error	= sw.toString();
+				error = sw.toString();
 			}
-			
-//			Thread.currentThread().setContextClassLoader(oldcl);
 		}
 		else
 		{
-			model	= null;
+			model = null;
+			error = null;
 		}
 
-		if(model==null)
-		{
-			start.setEnabled(false);
-			config.removeAllItems();
-//			clearArguments();
-//			clearResults();
-			setComponentName("");
-			clearApplicationName();
-			filename.setText("");
-			if(error!=null)
-				modeldesc.addTextContent("Error", null, "No model loaded:\n"+error, "error");
-			else
-				modeldesc.addTextContent("Model", null, "No model loaded.", "model");
-		}
+		updateGuiForNewModel(adf);
 	}
 
+	
 	/**
 	 *  Update the GUI for a new model.
 	 *  @param adf The adf.
 	 */
 	void updateGuiForNewModel(final String adf)
 	{
-		if(model==null)
-			return;
+		System.out.println("updategui "+adf);
 		
-//		ClassLoader	oldcl	= Thread.currentThread().getContextClassLoader();
-//		if(starter.getModelExplorer().getClassLoader()!=null)
-//			Thread.currentThread().setContextClassLoader(starter.getModelExplorer().getClassLoader());
-		
-//		System.out.println("updategui "+model);
-		
+		if(adf!=null && SComponentFactory.isStartable(starter.getJCC().getServiceContainer(), adf))
+		{
+			createArguments();
+			createResults();
+			arguments.setVisible(true);
+			results.setVisible(true);
+			componentpanel.setVisible(true);
+			start.setVisible(true);
+			
+			filenamel.setMinimumSize(confdummy.getMinimumSize());
+			filenamel.setPreferredSize(confdummy.getPreferredSize());
+			confl.setMinimumSize(confdummy.getMinimumSize());
+			confl.setPreferredSize(confdummy.getPreferredSize());
+			componentnamel.setMinimumSize(confdummy.getMinimumSize());
+			componentnamel.setPreferredSize(confdummy.getPreferredSize());
+		}
+		else
+		{
+			arguments.setVisible(false);
+			results.setVisible(false);
+			componentpanel.setVisible(false);
+			start.setVisible(false);
+			
+			filenamel.setMinimumSize(confdummy.getMinimumSize());
+			filenamel.setPreferredSize(confdummy.getPreferredSize());
+			confl.setMinimumSize(confdummy.getMinimumSize());
+			confl.setPreferredSize(confdummy.getPreferredSize());
+		}
+				
 		filename.setText(adf);
 
-//		if(model.getName()!=null && SXML.isComponentFilename(adf))
-		/*if(model.getName()!=null && model instanceof ApplicationModel)
+		if(model!=null && model.isStartable())
 		{
-			appname.setModel(new DefaultComboBoxModel(new String[]{model.getName()}));
-			appname.setEditable(true);
-		}
-		else*/ if(model.isStartable())
-		{
-//			appname.setModel(appmodel);
 			componentname.setText(model.getName());
-//			appname.removeAllItems();
-//			appname.addItem("");
-//			appname.setSelectedItem("");
-//			IContextService cs = (IContextService)starter.getJCC().getComponent().getPlatform().getService(IContextService.class);
-//			if(cs!=null)
-//			{
-//				IContext[] contexts =  cs.getContexts(IApplicationContext.class);
-//				for(int i=0; contexts!=null && i<contexts.length; i++)
-//				{
-//					appname.addItem(contexts[i].getName());
-//				}
-//			}
-//			appname.setEditable(false);
 		}
 		else
 		{
 			componentname.setText("");
-//			appname.setEditable(true);
 		}
 		
-		lastfile = model.getFilename();
-
 		ItemListener[] lis = config.getItemListeners();
 		for(int i=0; i<lis.length; i++)
 			config.removeItemListener(lis[i]);
@@ -852,7 +757,7 @@ public class StarterPanel extends JPanel
 		
 		// Add all known component configuration names to the config chooser.
 		
-		String[] confignames = model.getConfigurations();
+		String[] confignames = model!=null? model.getConfigurations(): SUtil.EMPTY_STRING;
 		for(int i = 0; i<confignames.length; i++)
 		{
 			((DefaultComboBoxModel)config.getModel()).addElement(confignames[i]);
@@ -860,74 +765,44 @@ public class StarterPanel extends JPanel
 		if(confignames.length>0)
 			config.getModel().setSelectedItem(confignames[0]);
 		
-		/*IMConfiguration[] states = model.getConfigurationbase().getConfigurations();
-		for(int i = 0; i<states.length; i++)
-		{
-			((DefaultComboBoxModel)config.getModel()).addElement(states[i].getName());
-		}
-		IMConfiguration defstate = model.getConfigurationbase().getDefaultConfiguration();
-		if(defstate!=null)
-		{
-			config.getModel().setSelectedItem(defstate.getName());
-		}*/
-
-		//		if(modeldesc.getSelectedComponent()==null
-		//			|| !modeldesc.getId(modeldesc.getSelectedComponent()).equals(adf))
+		final IReport report = model!=null? model.getReport(): null;
+		if(report!=null && !report.isEmpty())
 		{
 			String clazz = SReflect.getInnerClassName(model.getClass());
-			if(clazz.endsWith("Data")) clazz = clazz.substring(0, clazz.length()-4);
-
-			final IReport report = model.getReport();
-			if(report!=null && !report.isEmpty())
+			final Icon icon = GuiProperties.getElementIcon(clazz+"_broken");
+			try
 			{
-				final Icon icon = GuiProperties.getElementIcon(clazz+"_broken");
-				try
-				{
-					modeldesc.addHTMLContent(model.getName(), icon, report.toHTMLString(), adf, report.getDocuments());
-				}
-				catch(final Exception e)
-				{
-					//e.printStackTrace();
-//					SwingUtilities.invokeLater(new Runnable()
-//					{
-//						public void run()
-//						{
-							String text = SUtil.wrapText("Could not display HTML content: "+e.getMessage());
-							JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), text, "Display Problem", JOptionPane.INFORMATION_MESSAGE);
-							modeldesc.addTextContent(model.getName(), icon, report.toString(), adf);
-//						}
-//					});
-				}
+				modeldesc.addHTMLContent(model.getName(), icon, report.toHTMLString(), adf, report.getDocuments());
 			}
-			else
+			catch(final Exception e)
 			{
-				final Icon icon = GuiProperties.getElementIcon(clazz);
-				try
-				{
-					modeldesc.addHTMLContent(model.getName(), icon, model.getDescription(), adf, null);
-				}
-				catch(final Exception e)
-				{
-//					SwingUtilities.invokeLater(new Runnable()
-//					{
-//						public void run()
-//						{
-							String text = SUtil.wrapText("Could not display HTML content: "+e.getMessage());
-							JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), text, "Display Problem", JOptionPane.INFORMATION_MESSAGE);
-							modeldesc.addTextContent(model.getName(), icon, model.getDescription(), adf);
-//						}
-//					});
-				}
+				String text = SUtil.wrapText("Could not display HTML content: "+e.getMessage());
+				JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), text, "Display Problem", JOptionPane.INFORMATION_MESSAGE);
+				modeldesc.addTextContent(model.getName(), icon, report.toString(), adf);
 			}
-
-			// Adjust state of start button depending on model checking state.
-//			start.setEnabled(SXML.isComponentFilename(adf) && (report==null || report.isEmpty()));
-			start.setEnabled(model.isStartable() && (report==null || report.isEmpty()));
-		
-			for(int i=0; i<lis.length; i++)
-				config.addItemListener(lis[i]);
 		}
-//		Thread.currentThread().setContextClassLoader(oldcl);
+		else if(model!=null)
+		{
+			String clazz = SReflect.getInnerClassName(model.getClass());
+			final Icon icon = GuiProperties.getElementIcon(clazz);
+			try
+			{
+				modeldesc.addHTMLContent(model.getName(), icon, model.getDescription(), adf, null);
+			}
+			catch(final Exception e)
+			{
+				String text = SUtil.wrapText("Could not display HTML content: "+e.getMessage());
+				JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), text, "Display Problem", JOptionPane.INFORMATION_MESSAGE);
+				modeldesc.addTextContent(model.getName(), icon, model.getDescription(), adf);
+			}
+		}
+
+		// Adjust state of start button depending on model checking state.
+//			start.setEnabled(SXML.isComponentFilename(adf) && (report==null || report.isEmpty()));
+		start.setEnabled(model!=null&& model.isStartable() && (report==null || report.isEmpty()));
+	
+		for(int i=0; i<lis.length; i++)
+			config.addItemListener(lis[i]);
 	}
 
 	/**
@@ -962,15 +837,18 @@ public class StarterPanel extends JPanel
 	 *  Set the properties.
 	 *  @param props The propoerties.
 	 */
-	protected void setProperties(Properties props)
+	public void setProperties(Properties props)
 	{
 		// Settings are invoke later'd due to getting overridden otherwise.!?
 		
-		String mo = props.getStringProperty("model");
+//		System.out.println("setP: "+Thread.currentThread().getName());
+		
+		final String mo = props.getStringProperty("model");
 		if(mo!=null)
 		{
-			loadModel(mo);
+			reloadModel(mo);
 			selectConfiguration(props.getStringProperty("config"));
+			setComponentName(props.getStringProperty("name"));
 		}
 		setStartSuspended(props.getBooleanProperty("startsuspended"));
 
@@ -981,10 +859,8 @@ public class StarterPanel extends JPanel
 			argvals[i] = aargs[i].getValue();
 		}
 		setArguments(argvals);
-
-		setComponentName(props.getStringProperty("name"));
-		setAutoGenerate(props.getBooleanProperty("autogenerate"));
 		
+		setAutoGenerate(props.getBooleanProperty("autogenerate"));
 	}
 
 	/**
