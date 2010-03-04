@@ -123,6 +123,7 @@
 				<module>jadex-wfms-launch</module>
 				<module>jadex-applications-wfms</module>
 				<module>sodekovs-simulationcontrol</module>				
+				<module>sodekovs-coordination</module>
 		</modules>
   	</profile>
   	<profile>
@@ -176,7 +177,7 @@
         </configuration>
       </plugin>
     </plugins>
-  </build>
+  </build>  
   <reporting>
     <plugins>
       <plugin>
