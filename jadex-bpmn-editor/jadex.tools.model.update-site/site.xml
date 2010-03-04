@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/jadex.tools.model.feature_1.0.0.201003041404.jar" id="jadex.tools.model.feature" version="1.0.0.201003041404"/>
+</site>
