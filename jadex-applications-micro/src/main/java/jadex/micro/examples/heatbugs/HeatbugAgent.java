@@ -110,6 +110,11 @@ public class HeatbugAgent extends MicroAgent
 				
 				waitForTick(this);
 			}
+			
+			public String toString()
+			{
+				return "heatbug.body()";
+			}
 		};
 		
 		waitForTick(runnable);

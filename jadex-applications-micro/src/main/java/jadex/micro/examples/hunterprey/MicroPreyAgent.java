@@ -71,6 +71,11 @@ public class MicroPreyAgent extends MicroAgent
 	
 							act();
 						}
+						
+						public String toString()
+						{
+							return "prey.act()";
+						}
 					});
 				}
 				catch(ComponentTerminatedException ate)
@@ -85,6 +90,11 @@ public class MicroPreyAgent extends MicroAgent
 					public void run()
 					{
 						act();
+					}
+					
+					public String toString()
+					{
+						return "prey.act()";
 					}
 				});
 			}

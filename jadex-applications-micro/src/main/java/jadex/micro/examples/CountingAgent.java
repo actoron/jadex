@@ -33,6 +33,11 @@ public class CountingAgent extends MicroAgent
 
 				scheduleStep(this);
 			}
+			
+			public String toString()
+			{
+				return "couter.inc()";
+			}
 		};
 		
 		scheduleStep(step);
