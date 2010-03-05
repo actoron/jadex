@@ -14,19 +14,22 @@ import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IAttributeConverter;
 import jadex.xml.IContext;
+import jadex.xml.IObjectObjectConverter;
 import jadex.xml.IObjectStringConverter;
 import jadex.xml.IPostProcessor;
-import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
+import jadex.xml.SubObjectConverter;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
+import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.IBeanObjectCreator;
 import jadex.xml.reader.Reader;
 import jadex.xml.writer.Writer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -144,9 +147,20 @@ public class OAVBDIXMLReader
 		
 		typeinfos.add(new TypeInfo(new XMLInfo("belief"), new ObjectInfo(OAVBDIMetaModel.belief_type, tepost), 
 			new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("class", OAVBDIMetaModel.typedelement_has_classname)),
-			new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.typedelement_has_class, AccessInfo.IGNORE_WRITE))
+				new AttributeInfo(new AccessInfo("class", OAVBDIMetaModel.typedelement_has_classname)),
+				new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.typedelement_has_class, AccessInfo.IGNORE_WRITE))
+			}, new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo("assignto", OAVBDIMetaModel.referenceableelement_has_assignto), new SubObjectConverter(new IObjectObjectConverter()
+				{
+					public Object convertObject(Object val, IContext context)
+					{
+						return ((Map)val).get("ref");
+					}
+				}, null))
 			})));
+		typeinfos.add(new TypeInfo(new XMLInfo("assignto"), new ObjectInfo(HashMap.class), new MappingInfo(null, new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("ref", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
+		})));
 		typeinfos.add(new TypeInfo(new XMLInfo("beliefref"), new ObjectInfo(OAVBDIMetaModel.beliefreference_type)));
 		
 		TypeInfo ti_belset = new TypeInfo(new XMLInfo("beliefset"), new ObjectInfo(OAVBDIMetaModel.beliefset_type, tepost), 
@@ -310,47 +324,6 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo("endmessageevent/parameter"), new ObjectInfo(OAVBDIMetaModel.configparameter_type)));
 		typeinfos.add(new TypeInfo(new XMLInfo("endmessageevent/parameterset"), new ObjectInfo(OAVBDIMetaModel.configparameterset_type), new MappingInfo(ti_paramset)));
 
-//		Set linkinfos = new HashSet();
-//		linkinfos.add(new LinkInfo("properties/property", OAVBDIMetaModel.capability_has_properties));
-//		linkinfos.add(new LinkInfo("goals/performgoal", OAVBDIMetaModel.capability_has_goals));
-//		linkinfos.add(new LinkInfo("goals/achievegoal", OAVBDIMetaModel.capability_has_goals));
-//		linkinfos.add(new LinkInfo("goals/querygoal", OAVBDIMetaModel.capability_has_goals));
-//		linkinfos.add(new LinkInfo("goals/maintaingoal", OAVBDIMetaModel.capability_has_goals));
-//		linkinfos.add(new LinkInfo("goals/metagoal", OAVBDIMetaModel.capability_has_goals));
-//		linkinfos.add(new LinkInfo("goals/performgoalref", OAVBDIMetaModel.capability_has_goalrefs));
-//		linkinfos.add(new LinkInfo("goals/achievegoalref", OAVBDIMetaModel.capability_has_goalrefs));
-//		linkinfos.add(new LinkInfo("goals/querygoalref", OAVBDIMetaModel.capability_has_goalrefs));
-//		linkinfos.add(new LinkInfo("goals/maintaingoalref", OAVBDIMetaModel.capability_has_goalrefs));
-//		linkinfos.add(new LinkInfo("goals/metagoalref", OAVBDIMetaModel.capability_has_goalrefs));
-//		linkinfos.add(new LinkInfo("events/messageeventref", OAVBDIMetaModel.capability_has_messageeventrefs));
-//		linkinfos.add(new LinkInfo("events/internaleventref", OAVBDIMetaModel.capability_has_internaleventrefs));
-
-//		linkinfos.add(new LinkInfo("plan/parameter", OAVBDIMetaModel.parameterelement_has_parameters));
-//		linkinfos.add(new LinkInfo("plan/parameterset", OAVBDIMetaModel.parameterelement_has_parametersets));
-//		linkinfos.add(new LinkInfo("initialplan/parameter", OAVBDIMetaModel.configparameterelement_has_parameters));
-//		linkinfos.add(new LinkInfo("initialplan/parameterset", OAVBDIMetaModel.configparameterelement_has_parametersets));
-//		linkinfos.add(new LinkInfo("initialgoal/parameter", OAVBDIMetaModel.configparameterelement_has_parameters));
-//		linkinfos.add(new LinkInfo("initialgoal/parameterset", OAVBDIMetaModel.configparameterelement_has_parametersets));
-//		linkinfos.add(new LinkInfo("initialinternalevent/parameter", OAVBDIMetaModel.configparameterelement_has_parameters));
-//		linkinfos.add(new LinkInfo("initialinternalevent/parameterset", OAVBDIMetaModel.configparameterelement_has_parametersets));
-//		linkinfos.add(new LinkInfo("initialmessageevent/parameter", OAVBDIMetaModel.configparameterelement_has_parameters));
-//		linkinfos.add(new LinkInfo("initialmessageevent/parameterset", OAVBDIMetaModel.configparameterelement_has_parametersets));
-//		linkinfos.add(new LinkInfo("endplan/parameter", OAVBDIMetaModel.configparameterelement_has_parameters));
-//		linkinfos.add(new LinkInfo("endplan/parameterset", OAVBDIMetaModel.configparameterelement_has_parametersets));
-//		linkinfos.add(new LinkInfo("endgoal/parameter", OAVBDIMetaModel.configparameterelement_has_parameters));
-//		linkinfos.add(new LinkInfo("endgoal/parameterset", OAVBDIMetaModel.configparameterelement_has_parametersets));
-//		linkinfos.add(new LinkInfo("endinternalevent/parameter", OAVBDIMetaModel.configparameterelement_has_parameters));
-//		linkinfos.add(new LinkInfo("endinternalevent/parameterset", OAVBDIMetaModel.configparameterelement_has_parametersets));
-//		linkinfos.add(new LinkInfo("endmessageevent/parameter", OAVBDIMetaModel.configparameterelement_has_parameters));
-//		linkinfos.add(new LinkInfo("endmessageevent/parameterset", OAVBDIMetaModel.configparameterelement_has_parametersets));
-//		linkinfos.add(new LinkInfo("beliefref", OAVBDIMetaModel.capability_has_beliefrefs));
-//		linkinfos.add(new LinkInfo("beliefsetref", OAVBDIMetaModel.capability_has_beliefsetrefs));
-//		linkinfos.add(new LinkInfo("values", OAVBDIMetaModel.parameterset_has_valuesexpression));
-//		linkinfos.add(new LinkInfo("facts", OAVBDIMetaModel.beliefset_has_factsexpression));
-		
-//		Set ignoredattrs = new HashSet();
-//		ignoredattrs.add("schemaLocation");
-		
 		reader = new Reader(new OAVObjectReaderHandler(typeinfos));
 		writer = new Writer(new OAVObjectWriterHandler(typeinfos));
 	}
