@@ -3,11 +3,11 @@
    <description name="Jadex" url="http://vsis-www.informatik.uni-hamburg.de/projects/jadex/modeltools/update/">
       Jadex tools to create Jadex BPMN and GPMN models
    </description>
-   <feature url="features/jadex.tools.model.feature_1.0.0.201003041512.jar" id="jadex.tools.model.feature" version="1.0.0.201003041512">
-      <category name="Jadex"/>
+   <feature url="features/jadex.tools.model.gpmn.feature_1.0.0.201003051322.jar" id="jadex.tools.model.gpmn.feature" version="1.0.0.201003051322">
+      <category name="Jadex Model Tools"/>
    </feature>
-   <feature url="features/jadex.tools.model.bpmn.feature_1.0.0.201003041702.jar" id="jadex.tools.model.bpmn.feature" version="1.0.0.201003041702">
-      <category name="Jadex"/>
+   <feature url="features/jadex.tools.model.bpmn.feature_1.0.0.201003051322.jar" id="jadex.tools.model.bpmn.feature" version="1.0.0.201003051322">
+      <category name="Jadex Model Tools"/>
    </feature>
-   <category-def name="Jadex" label="Jadex"/>
+   <category-def name="Jadex Model Tools" label="Jadex Model Tools"/>
 </site>
