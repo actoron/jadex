@@ -18,11 +18,15 @@ public class CleanUpWastePlan extends Plan
 	public void body()
 	{
 //		System.out.println("Clean-up waste plan started: "+getParameter("waste").getValue()+" "+getReason());
-
 		ISpaceObject waste = (ISpaceObject)getParameter("waste").getValue();
-		IGoal pickup = createGoal("achievepickupwaste");
-		pickup.getParameter("waste").setValue(waste);
-		dispatchSubgoalAndWait(pickup);
+		
+		// Pickup waste if not already held.
+		if(!waste.equals(((ISpaceObject)getBeliefbase().getBelief("myself").getFact()).getProperty("waste")))
+		{
+			IGoal pickup = createGoal("achievepickupwaste");
+			pickup.getParameter("waste").setValue(waste);
+			dispatchSubgoalAndWait(pickup);
+		}
 
 		boolean	dropped	= false;
 		while(!dropped)
@@ -47,14 +51,19 @@ public class CleanUpWastePlan extends Plan
 		}
 	}
 	
-	public void failed()
-	{
+//	public void passed()
+//	{
+//		System.err.println("passed: "+this+", "+getParameter("waste").getValue());
+//	}
+//	
+//	public void failed()
+//	{
 //		System.err.println("failed: "+this+", "+getParameter("waste").getValue());
 //		getException().printStackTrace();
-	}
-
-	public void aborted()
-	{
+//	}
+//
+//	public void aborted()
+//	{
 //		System.err.println("aborted: "+this+", "+getParameter("waste").getValue());
-	}
+//	}
 }

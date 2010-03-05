@@ -371,8 +371,16 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		
 		// Should the component be executed again?
 		boolean	again = false;
-		if(!extexecuted && (!IComponentDescription.STATE_SUSPENDED.equals(desc.getState()) || dostep))
+		if(!extexecuted && (!IComponentDescription.STATE_SUSPENDED.equals(desc.getState())
+			&& !IComponentDescription.STATE_WAITING.equals(desc.getState()) || dostep))
 		{
+			// Set state to waiting before step. (may be reset by wakup() call in step)
+			if(dostep && IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+			{
+				ComponentManagementService	ces	= (ComponentManagementService)container.getService(IComponentManagementService.class);
+				ces.setComponentState(cid, IComponentDescription.STATE_WAITING);	// I hope this doesn't cause any deadlocks :-/
+			}
+
 			try
 			{
 				//System.out.println("Executing: "+agent);
@@ -392,10 +400,11 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			if(dostep)
 			{
 				dostep	= false;
-				if(!again && IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+				// Set back to suspended if components is still waiting but wants to execute again.
+				if(again && IComponentDescription.STATE_WAITING.equals(desc.getState()))
 				{
 					ComponentManagementService	ces	= (ComponentManagementService)container.getService(IComponentManagementService.class);
-					ces.setComponentState(cid, IComponentDescription.STATE_WAITING);	// I hope this doesn't cause any deadlocks :-/
+					ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
 				}
 				again	= again && IComponentDescription.STATE_ACTIVE.equals(desc.getState());
 				if(steplistener!=null)

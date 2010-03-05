@@ -231,7 +231,7 @@
 					
 					<env:processes>
 						<env:process type="create">
-							<env:property name="timerate">15000</env:property>
+							<env:property name="timerate">30000</env:property>
 						</env:process>
 						<env:process type="empty">
 						</env:process>
@@ -281,7 +281,7 @@
 					
 					<env:processes>
 						<env:process type="create">
-							<env:property name="timerate">7000</env:property>
+							<env:property name="timerate">15000</env:property>
 						</env:process>
 						<env:process type="empty">
 						</env:process>

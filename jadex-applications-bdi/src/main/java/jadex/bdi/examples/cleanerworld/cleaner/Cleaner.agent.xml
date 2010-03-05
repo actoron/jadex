@@ -120,7 +120,7 @@
 		</maintaingoal>
 
 		<!-- Clean up some waste. -->
-		<achievegoal name="achievecleanup" retry="true" exclude="when_failed">
+		<achievegoal name="achievecleanup" retry="true" exclude="never">
 			<parameter name="waste" class="ISpaceObject">
 				<value>$waste</value>
 			</parameter>
