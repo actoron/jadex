@@ -13,39 +13,12 @@
 		<property type="welcome">false</property>
 		<property type="autoshutdown">true</property>
 		
-		<property type="agent" name="WfmsClientInterfaceAgent">jadex/wfms/bdi/interfaces/client/WfmsClientInterface.agent.xml</property>
-		<property type="agent" name="WfmsPdInterfaceAgent">jadex/wfms/bdi/interfaces/processdefinition/WfmsPdInterface.agent.xml</property>
-		<property type="agent" name="WfmsAdminInterfaceAgent">jadex/wfms/bdi/interfaces/admin/WfmsAdminInterface.agent.xml</property>
+		<property type="daemoncomponent" name="WfmsClientInterfaceAgent">jadex/wfms/bdi/interfaces/client/WfmsClientInterface.agent.xml</property>
+		<property type="daemoncomponent" name="WfmsPdInterfaceAgent">jadex/wfms/bdi/interfaces/processdefinition/WfmsPdInterface.agent.xml</property>
+		<property type="daemoncomponent" name="WfmsAdminInterfaceAgent">jadex/wfms/bdi/interfaces/admin/WfmsAdminInterface.agent.xml</property>
 		
 		<!-- Platform services. -->
 		<properties type="services">
-			
-			<property type="jadex.bridge.IComponentFactory" name="bpmn_factory">
-				new jadex.bpmn.BpmnFactory($platform, jadex.commons.SUtil.createHashMap(
-					new String[]
-					{
-						"debugger.panels"
-					},
-					new Object[]
-					{
-						"jadex.tools.debugger.bpmn.BpmnDebuggerPanel, jadex.tools.debugger.common.ObjectInspectorDebuggerPanel"
-					})
-				)
-			</property>
-			
-			<property type="jadex.bridge.IComponentFactory" name="gpmn_factory">
-				new jadex.gpmn.GpmnFactory($platform, jadex.commons.SUtil.createHashMap(
-					new String[]
-					{
-						"debugger.panels"
-					},
-					new Object[]
-					{
-						"jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
-					})
-				)
-			</property>
-			
 			<!-- WFMS Services -->
 			<property type="jadex.wfms.service.IAAAService" name="wfms_AAA_service">
 				jadex.wfms.service.impl.BasicAAAService.getTestService()
