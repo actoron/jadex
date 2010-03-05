@@ -124,6 +124,7 @@
 				<module>jadex-applications-wfms</module>
 				<module>sodekovs-simulationcontrol</module>				
 				<module>sodekovs-coordination</module>
+				<module>jadex-distributed</module>
 		</modules>
   	</profile>
   	<profile>

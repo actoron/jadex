@@ -1,0 +1,16 @@
+<!--
+  Standalone platform properties.
+-->
+<properties xmlns="http://jadex.sourceforge.net/jadexconf"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadexconf 
+	                    http://jadex.sourceforge.net/configuration.xsd"
+	name="standalone_conf">
+	
+	<properties type="platform_standalone" name="lars">
+  		<property type="daemoncomponent" name="cms">jadex/bdi/cmsagent/CMS.agent.xml</property>
+		<property type="daemoncomponent" name="df">jadex/bdi/dfagent/DF.agent.xml</property>
+ 		<!-- <property type="component" name="jcc">jadex/tools/jcc/JCC.agent.xml</property> -->
+ 		<property type="component" name="jcc">jadex/distributed/tools/jcc/JCC.agent.xml</property>
+	</properties>
+</properties>
