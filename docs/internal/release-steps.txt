@@ -9,3 +9,14 @@ Build Distribution:
 - build jadex distribution
 - rebuild applications.jccproject.xml
 - zip distribution dir 
+
+Upload stuff:
+- upload distribution to sourceforge
+- upload schema documents
+- update Jadex download website(s)
+
+Communicate stuff:
+- email to JADE list
+- email to Jadex users on wiki
+- email to Jadex users via jadexlist of VSIS
+- news entry on sourceforge
