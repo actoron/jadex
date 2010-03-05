@@ -176,17 +176,6 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 			<parameter name="target" class="Block" />
 			<targetcondition language="jcl">
 				$goal.block.getLower()==$goal.target
-				// $goal.block.lower==$goal.target
-				
-				// Drools Syntax
-				// $target	: Block()
-				// $block	: Block(lower == $target)-->
-				
-				// Clips
-				// ?block	= (Block (lower ?target))
-				// ?param2	= (parameter (parameter_has_name "block") (parameter_has_value ?block))
-				// ?param1	= (parameter (parameter_has_name "target") (parameter_has_value ?target))
-				// ?rgoal	= (goal (parameterelement_has_parameters contains ?param1) (parameterelement_has_parameters contains ?param2))
 			</targetcondition>
 		</achievegoal>
 		
@@ -215,45 +204,6 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 				!(	Block $block5 &amp;&amp; Arrays.asList($beliefbase.table.getAllBlocks()).contains($block5) &amp;&amp;
 					Block $block6 &amp;&amp; Arrays.asList($goal.configuration.getAllBlocks()).contains($block6) &amp;&amp;
 					$block5.color==$block6.color &amp;&amp; $block5.lower.color!=$block6.lower.color)
-				
-				// ?mbelief = (mbelief (melement_has_name "table"))
-				// ?belief = (belief (element_has_model ?mbelief) (belief_has_fact ?table))
-				// ?param = (parameter (parameter_has_name "configuration") (parameter_has_value ?conf))
-				// ?rgoal = (goal (parameterelement_has_parameters contains ?param))				
-				// (not
-				// 	(and
-				// 		?block1	= (Block (color ?colorb))
-				// 		?table	= (Table (allBlocks contains ?block1))
-				// 		(not
-				// 			(and
-				// 				?block2	= (Block (color ?colorb))
-				// 				?conf	= (Table (allBlocks contains ?block2))
-				// 			)
-				// 		)
-				// 	)
-				// )
-				// (not
-				// 	(and
-				// 		?block1	= (Block (color ?colorb))
-				// 		?conf	= (Table (allBlocks contains ?block1))
-				// 		(not
-				// 			(and
-				// 				?block2	= (Block (color ?colorb))
-				// 				?table	= (Table (allBlocks contains ?block2))
-				// 			)
-				// 		)
-				// 	)
-				// )
-				// (not
-				// 	(and
-				// 		?block1	= (Block (lower ?lower1) (color ?colorb))
-				// 		?table	= (Table (allBlocks contains ?block1))
-				// 		?block2	= (Block (lower ?lower2) (color ?colorb))
-				// 		?conf	= (Table (allBlocks contains ?block2))
-				// 		?lower1	= (Block (color ?colorl))
-				// 		?lower2	= (Block (color != ?colorl))
-				// 	)
-				// )
 			</targetcondition>
 		</achievegoal>
 	</goals>
@@ -262,12 +212,10 @@ P4M 1,5 GHz (Centrino), JADE 3.2/3.3, Java 1.4.2_01
 		<!-- Plan to clear a block, by moving to the table whats on top of it. -->
 		<plan name="clear">
 			<parameter name="block" class="Block">
-				<!-- <bindingoptions> -->
 				<value>
 					select one Block $block from $beliefbase.blocks
 					where $block.getLower()==$goal.block
 				</value>
-				<!-- </bindingoptions> -->
 			</parameter>
 			<parameter name="target" class="Block">
 				<value>$beliefbase.table</value>

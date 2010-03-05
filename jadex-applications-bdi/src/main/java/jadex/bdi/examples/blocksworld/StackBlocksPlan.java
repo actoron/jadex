@@ -64,14 +64,14 @@ public class StackBlocksPlan	extends Plan
 		dispatchSubgoalAndWait(clear);
 
 		// Maybe wait before moving block.
-//		if(mode.equals(MODE_SLOW))
-//		{
-//			waitFor(1000);
-//		}
-//		else if(mode.equals(MODE_STEP))
-//		{
-//			waitFor(new InternalEventFilter("step"));
-//		}
+		if(mode.equals(MODE_SLOW))
+		{
+			waitFor(1000);
+		}
+		else if(mode.equals(MODE_STEP))
+		{
+			waitForInternalEvent("step");
+		}
 
 		// Now move block.
 		if(!quiet)
@@ -79,8 +79,8 @@ public class StackBlocksPlan	extends Plan
 
 		// This operation has to be performed atomic,
 		// because it fires bean changes on several affected blocks. 
-//		startAtomic();
+		startAtomic();
 		block.stackOn(target);
-//		endAtomic();*/
+		endAtomic();
 	}
 }
