@@ -39,11 +39,11 @@ New Features:
 	- The tools are now cross-kernel functional, i.e. you can use the tools without
 	  having to care about its component type.
 
-	XML Changes:
+XML Changes:
 	- In application and envspace descriptors 'agent' has been replaced by 'component' 
 	  to reflect the wider scope of available component types (like workflows).
 
-	Java Changes:
+Java Changes:
 	- Refactoring of package names to comply with kernel and platform conventions.
 	  jadex.adapter.standalone -> jadex.standalone
 	  jadex.adapter.base -> jadex.base

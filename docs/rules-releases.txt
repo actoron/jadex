@@ -1,5 +1,9 @@
 Jadex Rules Releases Overview
 
+Release 2.0 rc1 (JCL Release 03/2010)
+	- Enhanced Java condition language (JCL) support
+	- Minor bug fixes
+
 Release 2.0 beta4 (JCL Release 07/2009)
 	- Java condition language (JCL) support
 	- More efficient garbage collection in OAV state

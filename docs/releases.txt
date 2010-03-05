@@ -1,5 +1,13 @@
 Jadex Releases Overview
 
+Replease 2.0 rc1 (03/2010)
+	- Generic active components infrastructure for agents and other active elements
+	- Support for BPMN workflow modelling and execution
+	- Support for BPMN workflows as BDI plans
+	- Newly introduced component result (start a component and wait for its completion and results)
+	- Cross-component type tool support (tools work with all types of components) 
+	- Enhanced Jadex Java condition language (JCL) support (similar condition description as in V1)
+
 Release 2.0 beta4 (07/2009)
 	- New HeatBugs example based on micro kernel
 	- JADE adapter for JADE 3.7 included
