@@ -42,6 +42,6 @@ public class GenerateGoalPlan extends Plan
 		{
 			report.setReason(gfe.toString());
 		}
-		getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
+		getBeliefbase().getBeliefSet("reports").addFact(report);
 	}
 }

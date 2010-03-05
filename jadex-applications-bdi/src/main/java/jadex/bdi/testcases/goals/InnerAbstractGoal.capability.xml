@@ -1,0 +1,40 @@
+<!--
+	<H3>Test abstract goal dispatched by inner capability.</H3>
+
+	Defines an abstract goal and a test plan dispatching it.
+-->
+<capability xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex 
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="InnerAbstractGoal"
+	package="jadex.bdi.testcases.goals">
+	
+	<beliefs>
+		<beliefsetref name="reports">
+			<abstract/>
+		</beliefsetref>
+	</beliefs>
+
+	<goals>
+		<achievegoalref name="testgoal" exported="true">
+			<abstract/>
+		</achievegoalref>
+	</goals>
+	
+	<plans>
+		<plan name="generate_goal_plan">
+			<body class="GenerateGoalPlan"/>
+		</plan>
+	</plans>
+
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="generate_goal_plan"/>
+			</plans>
+		</configuration>
+	</configurations>
+
+</capability>
+

@@ -29,6 +29,9 @@
 	</capabilities>
 
 	<beliefs>
+		<beliefsetref name="reports">
+			<concrete ref="testcap.reports"/>
+		</beliefsetref>
 		<beliefref name="timeout"  exported="true">
 			<concrete ref="testcap.timeout"/>
 		</beliefref>

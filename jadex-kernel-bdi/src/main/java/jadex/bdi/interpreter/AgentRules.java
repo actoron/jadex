@@ -23,6 +23,7 @@ import jadex.rules.rulesystem.rules.ObjectCondition;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
+import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
@@ -1151,6 +1152,17 @@ public class AgentRules
 				}
 			}
 		}
+
+		// Init assigntos for belief references
+		Collection	mbelrefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_beliefrefs);
+		if(mbelrefs!=null)
+		{
+			for(Iterator it=mbelrefs.iterator(); it.hasNext(); )
+			{
+				Object mbelref = it.next();
+				registerAssignTos(state, rcapa, mbelref, OAVBDIMetaModel.beliefreference_type, OAVBDIMetaModel.capability_has_beliefrefs);
+			}
+		}
 			
 		// Initialize beliefsets.
 		Collection	mbelsets = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_beliefsets);
@@ -1167,6 +1179,83 @@ public class AgentRules
 			}
 		}
 		
+		// Init assigntos for beliefset references
+		Collection	mbelsetrefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_beliefsetrefs);
+		if(mbelsetrefs!=null)
+		{
+			for(Iterator it=mbelsetrefs.iterator(); it.hasNext(); )
+			{
+				Object mbelsetref = it.next();
+				registerAssignTos(state, rcapa, mbelsetref, OAVBDIMetaModel.beliefsetreference_type, OAVBDIMetaModel.capability_has_beliefsetrefs);
+			}
+		}
+
+		// Init assigntos for goals
+		Collection	mgoals = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_goals);
+		if(mgoals!=null)
+		{
+			for(Iterator it=mgoals.iterator(); it.hasNext(); )
+			{
+				Object mgoal = it.next();
+				registerAssignTos(state, rcapa, mgoal, OAVBDIMetaModel.goalreference_type, OAVBDIMetaModel.capability_has_goalrefs);
+			}
+		}
+
+		// Init assigntos for goalreferences
+		Collection	mgoalrefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_goalrefs);
+		if(mgoalrefs!=null)
+		{
+			for(Iterator it=mgoalrefs.iterator(); it.hasNext(); )
+			{
+				Object mgoalref = it.next();
+				registerAssignTos(state, rcapa, mgoalref, OAVBDIMetaModel.goalreference_type, OAVBDIMetaModel.capability_has_goalrefs);
+			}
+		}
+
+		// Init assigntos for internalevents
+		Collection	minternalevents = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_internalevents);
+		if(minternalevents!=null)
+		{
+			for(Iterator it=minternalevents.iterator(); it.hasNext(); )
+			{
+				Object minternalevent = it.next();
+				registerAssignTos(state, rcapa, minternalevent, OAVBDIMetaModel.internaleventreference_type, OAVBDIMetaModel.capability_has_internaleventrefs);
+			}
+		}
+
+		// Init assigntos for internaleventreferences
+		Collection	minternaleventrefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_internaleventrefs);
+		if(minternaleventrefs!=null)
+		{
+			for(Iterator it=minternaleventrefs.iterator(); it.hasNext(); )
+			{
+				Object minternaleventref = it.next();
+				registerAssignTos(state, rcapa, minternaleventref, OAVBDIMetaModel.internaleventreference_type, OAVBDIMetaModel.capability_has_internaleventrefs);
+			}
+		}
+
+		// Init assigntos for messageevents
+		Collection	mmessageevents = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_messageevents);
+		if(mmessageevents!=null)
+		{
+			for(Iterator it=mmessageevents.iterator(); it.hasNext(); )
+			{
+				Object mmessageevent = it.next();
+				registerAssignTos(state, rcapa, mmessageevent, OAVBDIMetaModel.messageeventreference_type, OAVBDIMetaModel.capability_has_messageeventrefs);
+			}
+		}
+
+		// Init assigntos for messageeventreferences
+		Collection	mmessageeventrefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_messageeventrefs);
+		if(mmessageeventrefs!=null)
+		{
+			for(Iterator it=mmessageeventrefs.iterator(); it.hasNext(); )
+			{
+				Object mmessageeventref = it.next();
+				registerAssignTos(state, rcapa, mmessageeventref, OAVBDIMetaModel.messageeventreference_type, OAVBDIMetaModel.capability_has_messageeventrefs);
+			}
+		}
+
 		// Initialize beliefs from subcapas.
 		Collection caparefs = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_subcapabilities);
 		if(caparefs!=null)
@@ -1421,6 +1510,47 @@ public class AgentRules
 				((IClockService)BDIInterpreter.getInterpreter(state).getComponentAdapter().getServiceContainer()
 				.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
 		}
+		
+		registerAssignTos(state, rcapa, mbel, OAVBDIMetaModel.beliefreference_type, OAVBDIMetaModel.capability_has_beliefrefs);
+	}
+
+	/**
+	 * 	Register assigntos.
+	 *  @param state The state.
+	 *  @param rcapa The capability.
+	 *  @param melem	The element
+	 *  @param reftype	The reference type (mbeliefreference etc.).
+	 */
+	protected static void registerAssignTos(IOAVState state, Object rcapa, Object melem, OAVObjectType reftype, OAVAttributeType refattrtype)
+	{
+		Collection	assigntos	= state.getAttributeValues(melem, OAVBDIMetaModel.referenceableelement_has_assignto);
+		if(assigntos!=null)
+		{
+			Object	sourcecapa	= rcapa;
+			Object	sourceelem	= melem;
+			if(state.getType(melem).isSubtype(OAVBDIMetaModel.elementreference_type))
+			{
+				// Todo: resolve to original element directly.
+				// Problem: required information for resolveCapability may not be there, yet. 
+//				String	concrete	= (String)state.getAttributeValue(melem, OAVBDIMetaModel.elementreference_has_concrete);
+//				Object[]	ret	= resolveCapability(concrete, reftype, rcapa, state);
+			}
+			
+			for(Iterator it=assigntos.iterator(); it.hasNext(); )
+			{
+				String	assignto	= (String)it.next();
+				Object[]	ret	= resolveCapability(assignto, reftype, rcapa, state, false);
+				Object	mtargetcapa	= state.getAttributeValue(ret[1], OAVBDIRuntimeModel.element_has_model);
+				Object	mtarget	= state.getAttributeValue(mtargetcapa, refattrtype, ret[0]);
+				if(mtarget==null)
+					throw new RuntimeException("AssignTo element not found: "+assignto);
+				Object	abstractsource	= state.createObject(OAVBDIRuntimeModel.abstractsource_type);
+				state.setAttributeValue(abstractsource, OAVBDIRuntimeModel.abstractsource_has_abstract, mtarget);
+				state.setAttributeValue(abstractsource, OAVBDIRuntimeModel.abstractsource_has_rcapa, sourcecapa);
+				state.setAttributeValue(abstractsource, OAVBDIRuntimeModel.abstractsource_has_source, sourceelem);
+				state.addAttributeValue(ret[1], OAVBDIRuntimeModel.capability_has_abstractsources, abstractsource);
+			}
+		}
 	}
 	
 	/**
@@ -1592,6 +1722,8 @@ public class AgentRules
 			state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, ((IClockService)BDIInterpreter.getInterpreter(state)
 				.getComponentAdapter().getServiceContainer().getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
 		}
+
+		registerAssignTos(state, rcapa, mbelset, OAVBDIMetaModel.beliefsetreference_type, OAVBDIMetaModel.capability_has_beliefsetrefs);
 	}
 	
 	/**
@@ -2510,9 +2642,23 @@ public class AgentRules
 	 *  @param name The name.
 	 *  @param type The object type (belief, beliefset, goal, internalevent, messageevent).
 	 *  @param rcapa The runtime scope.
+	 *  @param forward	resolve only forward (outer to inner).
 	 *  @return An array [restname, scope].
 	 */
 	public static Object[] resolveCapability(String name, OAVObjectType type, Object rcapa, IOAVState state)
+	{
+		return resolveCapability(name, type, rcapa, state, true);
+	}
+
+	/**
+	 *  Fetch an element and its scope by its complex name (e.g. cmscap.cms_create_component).
+	 *  @param name The name.
+	 *  @param type The object type (belief, beliefset, goal, internalevent, messageevent).
+	 *  @param rcapa The runtime scope.
+	 *  @param recurse	recurse (true) or resolve only one level (false).
+	 *  @return An array [restname, scope].
+	 */
+	public static Object[] resolveCapability(String name, OAVObjectType type, Object rcapa, IOAVState state, boolean recurse)
 	{
 		// If name if in dot-notation resolve directly to target.
 		int	idx;
@@ -2532,42 +2678,62 @@ public class AgentRules
 		Object[] ret = new Object[]{name, rcapa};
 		
 		// Check if name is a reference. Then resolve reference further.
-		Object refelem = null;
-		Object mcapa = state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
-		if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.belief_type) || type.isSubtype(OAVBDIMetaModel.beliefreference_type)))
+		if(recurse)
 		{
-			if(state.containsKey(mcapa, OAVBDIMetaModel.capability_has_beliefrefs, name))
-				refelem = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefrefs, name);
-		}
-		if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.beliefset_type) || type.isSubtype(OAVBDIMetaModel.beliefsetreference_type)))
-		{
-			if(state.containsKey(mcapa, OAVBDIMetaModel.capability_has_beliefsetrefs, name))
-				refelem = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefsetrefs, name);
-		}
-		if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.goal_type) || type.isSubtype(OAVBDIMetaModel.goalreference_type)))
-		{
-			if(state.containsKey(mcapa, OAVBDIMetaModel.capability_has_goalrefs, name))
-				refelem = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_goalrefs, name);
-		}
-		if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.internalevent_type) || type.isSubtype(OAVBDIMetaModel.internaleventreference_type)))
-		{
-			if(state.containsKey(mcapa, OAVBDIMetaModel.capability_has_internaleventrefs, name))
-				refelem = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_internaleventrefs, name);
-		}
-		if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.messageevent_type) || type.isSubtype(OAVBDIMetaModel.messageeventreference_type)))
-		{	
-			if(state.containsKey(mcapa, OAVBDIMetaModel.capability_has_messageeventrefs, name))
-				refelem = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_messageeventrefs, name);
-		}
-		if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.condition_type)))// || type.isSubtype(OAVBDIMetaModel.conditionreference_type))
-		{
-			// todo: support me?!
-		}
-
-		if(refelem!=null)
-		{
-			name = (String)state.getAttributeValue(refelem,  OAVBDIMetaModel.elementreference_has_concrete);
-			ret = resolveCapability(name, type, rcapa, state);
+			Object refelem = null;
+			Object mcapa = state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
+			if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.belief_type) || type.isSubtype(OAVBDIMetaModel.beliefreference_type)))
+			{
+				if(state.containsKey(mcapa, OAVBDIMetaModel.capability_has_beliefrefs, name))
+					refelem = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefrefs, name);
+			}
+			if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.beliefset_type) || type.isSubtype(OAVBDIMetaModel.beliefsetreference_type)))
+			{
+				if(state.containsKey(mcapa, OAVBDIMetaModel.capability_has_beliefsetrefs, name))
+					refelem = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefsetrefs, name);
+			}
+			if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.goal_type) || type.isSubtype(OAVBDIMetaModel.goalreference_type)))
+			{
+				if(state.containsKey(mcapa, OAVBDIMetaModel.capability_has_goalrefs, name))
+					refelem = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_goalrefs, name);
+			}
+			if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.internalevent_type) || type.isSubtype(OAVBDIMetaModel.internaleventreference_type)))
+			{
+				if(state.containsKey(mcapa, OAVBDIMetaModel.capability_has_internaleventrefs, name))
+					refelem = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_internaleventrefs, name);
+			}
+			if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.messageevent_type) || type.isSubtype(OAVBDIMetaModel.messageeventreference_type)))
+			{	
+				if(state.containsKey(mcapa, OAVBDIMetaModel.capability_has_messageeventrefs, name))
+					refelem = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_messageeventrefs, name);
+			}
+			if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.condition_type)))// || type.isSubtype(OAVBDIMetaModel.conditionreference_type))
+			{
+				// todo: support me?!
+			}
+	
+			if(refelem!=null)
+			{
+				name = (String)state.getAttributeValue(refelem,  OAVBDIMetaModel.elementreference_has_concrete);
+				if(name!=null)
+				{
+					ret = resolveCapability(name, type, rcapa, state, true);
+				}
+				else
+				{
+					// Abstract element, should be assigned from outer scope.
+					Object	abstractsource	= state.getAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_abstractsources, refelem);
+					if(abstractsource==null)
+					{
+						throw new RuntimeException("Abstract element is not assigned: "+refelem);
+					}
+					Object	sourceelem	= state.getAttributeValue(abstractsource, OAVBDIRuntimeModel.abstractsource_has_source);
+					Object	sourcecapa	= state.getAttributeValue(abstractsource, OAVBDIRuntimeModel.abstractsource_has_rcapa);
+					name	= (String)state.getAttributeValue(sourceelem, OAVBDIMetaModel.modelelement_has_name);
+					ret	= resolveCapability(name, type, sourcecapa, state, true);
+				}
+					
+			}
 		}
 		
 		return ret;

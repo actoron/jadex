@@ -301,6 +301,9 @@ public class OAVBDIRuntimeModel
 	/** The capability has precandidates (prematched mplans created on init). */
 	public static OAVAttributeType capability_has_precandidates;
 		
+	/** The capability has assigntosources (sources for abstract elements, assigned on init). */
+	public static OAVAttributeType capability_has_abstractsources;
+		
 	//-------- capability reference --------
 	
 	/** The capability reference type. */
@@ -600,6 +603,20 @@ public class OAVBDIRuntimeModel
 	/** The precandidate list has precandidates. */
 	public static OAVAttributeType	precandidatelist_has_precandidates;
 	
+	//-------- assigntosource list --------
+	
+	/** The abstractsource is the concrete element (source) for an abstract element. */
+	public static OAVObjectType	abstractsource_type;
+	
+	/** The abstractsource has the abstract element. */
+	public static OAVAttributeType	abstractsource_has_abstract;
+
+	/** The abstractsource has the source scope. */
+	public static OAVAttributeType	abstractsource_has_rcapa;
+
+	/** The abstractsource has the source (original) element. */
+	public static OAVAttributeType	abstractsource_has_source;
+	
 	//-------- event --------
 	
 	/** The event type. */
@@ -746,6 +763,7 @@ public class OAVBDIRuntimeModel
 		waitqueuecandidate_type = bdi_rt_model.createType("waitqueuecandidate", OAVBDIMetaModel.object_type);
 		precandidate_type = bdi_rt_model.createType("precandidate", OAVBDIMetaModel.object_type);
 		precandidatelist_type = bdi_rt_model.createType("precandidatelist", OAVBDIMetaModel.object_type);
+		abstractsource_type = bdi_rt_model.createType("abstractsource", OAVBDIMetaModel.object_type);
 		capabilityreference_type = bdi_rt_model.createType("capabilityreference");
 		capability_type = bdi_rt_model.createType("capability", element_type);
 		agent_type = bdi_rt_model.createType("agent", capability_type);
@@ -836,6 +854,11 @@ public class OAVBDIRuntimeModel
 		precandidatelist_has_processableelement	= precandidatelist_type.createAttributeType("precandidatelist_has_processableelement", OAVBDIMetaModel.processableelement_type); 
 		precandidatelist_has_precandidates	= precandidatelist_type.createAttributeType("precandidatelist_has_precandidates", OAVBDIRuntimeModel.precandidate_type, OAVAttributeType.LIST); 
 
+		// abstractsource
+		abstractsource_has_abstract	= abstractsource_type.createAttributeType("abstractsource_has_abstract", OAVBDIMetaModel.elementreference_type);
+		abstractsource_has_rcapa	= abstractsource_type.createAttributeType("abstractsource_has_rcapa", OAVBDIRuntimeModel.capability_type);
+		abstractsource_has_source	= abstractsource_type.createAttributeType("abstractsource_has_source", OAVBDIMetaModel.referenceableelement_type);
+		
 		// plan
 		plan_has_body = plan_type.createAttributeType("plan_has_body", OAVJavaType.java_object_type);
 		plan_has_step = plan_type.createAttributeType("plan_has_step", OAVJavaType.java_integer_type, OAVAttributeType.NONE, new Integer(0));
@@ -894,6 +917,7 @@ public class OAVBDIRuntimeModel
 		capability_has_outbox = capability_type.createAttributeType("capability_has_outbox", messageevent_type, OAVAttributeType.LIST);
 		capability_has_externalaccesses = capability_type.createAttributeType("capability_has_externalaccesses", externalaccess_type, OAVAttributeType.LIST);
 		capability_has_precandidates = capability_type.createAttributeType("capability_has_precandidates", precandidatelist_type, OAVAttributeType.MAP, null, precandidatelist_has_processableelement);
+		capability_has_abstractsources = capability_type.createAttributeType("capability_has_abstractsources", abstractsource_type, OAVAttributeType.MAP, null, abstractsource_has_abstract);
 		capability_has_properties = capability_type.createAttributeType("capability_has_properties", parameter_type, OAVAttributeType.MAP, null, parameter_has_name);
 		
 		// agent

@@ -2,6 +2,7 @@ package jadex.rules.parser.conditions.javagrammar;
 
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.rules.AndCondition;
+import jadex.rules.rulesystem.rules.ArraySelector;
 import jadex.rules.rulesystem.rules.BoundConstraint;
 import jadex.rules.rulesystem.rules.ConstrainableCondition;
 import jadex.rules.rulesystem.rules.FunctionCall;
@@ -343,15 +344,24 @@ public class BuildContext
 	protected static OAVObjectType	getReturnType(ConstrainableCondition cond, Object valuesource, OAVTypeModel tmodel)
 	{
 		OAVObjectType	ret;
+		int i=1;	// nesting depth for arrays.
 		
 		// For chained access only the last one is relevant.
 		if(valuesource instanceof Object[])
 		{
-			valuesource	= ((Object[])valuesource)[((Object[])valuesource).length-1];
+			while(((Object[])valuesource)[((Object[])valuesource).length-i] instanceof ArraySelector)
+			{
+				i++;
+			}
+			valuesource	= ((Object[])valuesource)[((Object[])valuesource).length-i];
 		}
 		else if(valuesource instanceof List)
 		{
-			valuesource	= ((List)valuesource).get(((List)valuesource).size()-1);
+			while(((List)valuesource).get(((List)valuesource).size()-i) instanceof ArraySelector)
+			{
+				i++;
+			}
+			valuesource	= ((List)valuesource).get(((List)valuesource).size()-i);
 		}
 
 		if(valuesource instanceof OAVAttributeType)
@@ -373,6 +383,15 @@ public class BuildContext
 		else
 		{
 			throw new RuntimeException("Unknown value source type: "+valuesource);
+		}
+		
+		// Unfold arrays.
+		if(i>1)
+		{
+			Class	clazz	= ((OAVJavaType)ret).getClazz();
+			for(int j=1; j<i; j++)
+				clazz	= clazz.getComponentType();
+			ret	= tmodel.getJavaType(clazz);
 		}
 		
 		return ret;
