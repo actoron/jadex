@@ -476,7 +476,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				}
 				
 				String tablename = (String)MEnvSpaceInstance.getProperty(dcol, "name");
-				List subdatas = (List)dcol.get("subdata");
+				List subdatas = (List)dcol.get("data");
 				String[] columnnames = new String[subdatas.size()];
 				IParsedExpression[] exps = new IParsedExpression[subdatas.size()];
 				for(int j=0; j<subdatas.size(); j++)

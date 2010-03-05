@@ -76,21 +76,28 @@
 			<xs:element name="objects" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="object" type="object" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="object" type="object"
+							minOccurs="0" maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="processes" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="process" type="process" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="process" type="process"
+							minOccurs="0" maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name="dataproviders" type="dataprovidersType"
+				maxOccurs="1" minOccurs="0">
+			</xs:element>
+			<xs:element name="dataconsumers" type="dataconsumersType" maxOccurs="1" minOccurs="0"></xs:element>
 			<xs:element name="observers" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="observer" type="observer" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="observer" type="observer"
+							minOccurs="0" maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -319,4 +326,44 @@
 		<xs:attribute name="name" type="xs:string"/>
 		<xs:attribute name="class" type="xs:string"/>
 	</xs:complexType>
+
+	<xs:complexType name="dataprovidersType">
+		<xs:sequence>
+			<xs:element name="dataprovider" type="dataproviderType" maxOccurs="unbounded" minOccurs="0"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="dataType" mixed="true">
+		<xs:attribute name="name" type="xs:string"></xs:attribute>
+	</xs:complexType>
+	
+    <xs:complexType name="dataproviderType">
+    	<xs:sequence>
+            <xs:element name="source" type="sourceType" maxOccurs="unbounded" minOccurs="0"></xs:element>
+            <xs:element name="data" type="dataType"
+    			maxOccurs="unbounded" minOccurs="0">
+    		</xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="name" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="sourceType" mixed="true">
+    	<xs:attribute name="name" type="xs:string"></xs:attribute>
+    	<xs:attribute name="objecttype" type="xs:string"></xs:attribute>
+    	<xs:attribute name="aggregate" type="xs:boolean"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="dataconsumersType">
+    	<xs:sequence>
+    		<xs:element name="dataconsumer" type="dataconsumerType" maxOccurs="unbounded" minOccurs="0"></xs:element>
+    	</xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="dataconsumerType">
+    	<xs:sequence>
+    		<xs:element name="property" type="property" maxOccurs="unbounded" minOccurs="0"></xs:element>
+    	</xs:sequence>
+    	<xs:attribute name="name" type="xs:string"></xs:attribute>
+    	<xs:attribute name="class" type="xs:string"></xs:attribute>
+    </xs:complexType>
 </xs:schema>

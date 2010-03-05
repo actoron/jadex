@@ -131,27 +131,27 @@
 					</env:processes>
 					
 					<env:dataproviders>
-						<env:data name="unhappiness">
+						<env:dataprovider name="unhappiness">
 							<env:source name="$heatbug" objecttype="heatbug" /> <!-- All / one / subset of objects -->
 							<env:source name="$unhappinesses" objecttype="heatbug" aggregate="true">$object.unhappiness</env:source>
 							<env:data name="time">$tick</env:data>
 							<env:data name="id">$heatbug.getId()</env:data>
 							<env:data name="unhappiness">$heatbug.unhappiness</env:data> 
 							<env:data name="avg_unhappiness">SFunction.mean($unhappinesses)</env:data>
-						</env:data>
+						</env:dataprovider>
 						
-						<!-- <env:data name="individual_unhappiness">
+						<!-- <env:dataprovider name="individual_unhappiness">
 							<env:source name="$heatbug" objecttype="heatbug" />
 							<env:data name="time">$time</env:data>
 							<env:data name="id">$heatbug.getId()</env:data>
 							<env:data name="unhappiness">$heatbug.unhappiness</env:data> 
-						</env:data>
+						</env:dataprovider>
 						
-						<env:data name="global_unhappiness">
+						<env:dataprovider name="global_unhappiness">
 							<env:source name="$unhappinesses" objecttype="heatbug" aggregate="true">$object.unhappiness</env:source>
 							<env:data name="time">$time</env:data>
 							<env:data name="unhappiness">SFunction.mean($unhappinesses)</env:data>
-						</env:data>	 -->			
+						</env:dataprovider>	 -->			
 					</env:dataproviders>
 			
 					<env:dataconsumers>
@@ -218,7 +218,7 @@
 			</spaces>
 
 			<components>
-				<agent type="Heatbug" number="10"/>
+				<component type="Heatbug" number="10"/>
 				<!-- <agent type="Heatbug">
 					<arguments>
 						<argument name="ideal_temp">$args.ideal_temp</argument>
@@ -235,14 +235,14 @@
 					</env:processes>
 					
 					<env:dataproviders>
-						<env:data name="unhappiness">
+						<env:dataprovider name="unhappiness">
 							<env:source name="$heatbug" objecttype="heatbug" /> <!-- All / one / subset of objects -->
 							<env:source name="$unhappinesses" objecttype="heatbug" aggregate="true">$object.unhappiness</env:source>
 							<env:data name="time">$time</env:data>
 							<env:data name="id">$heatbug.getId()</env:data>
 							<env:data name="unhappiness">$heatbug.unhappiness</env:data> 
 							<env:data name="avg_unhappiness">SFunction.mean($unhappinesses)</env:data>
-						</env:data>
+						</env:dataprovider>
 					</env:dataproviders>
 			
 					<env:dataconsumers>
@@ -305,7 +305,7 @@
 			</spaces>
 
 			<components>
-				<agent type="Heatbug" number="40"/>
+				<component type="Heatbug" number="40"/>
 			</components>
 		</application>
 		
@@ -317,14 +317,14 @@
 					</env:processes>
 					
 					<env:dataproviders>
-						<env:data name="unhappiness">
+						<env:dataprovider name="unhappiness">
 							<env:source name="$heatbug" objecttype="heatbug" /> <!-- All / one / subset of objects -->
 							<env:source name="$unhappinesses" objecttype="heatbug" aggregate="true">$object.unhappiness</env:source>
 							<env:data name="time">$time</env:data>
 							<env:data name="id">$heatbug.getId()</env:data>
 							<env:data name="unhappiness">$heatbug.unhappiness</env:data> 
 							<env:data name="avg_unhappiness">SFunction.mean($unhappinesses)</env:data>
-						</env:data>
+						</env:dataprovider>
 					</env:dataproviders>
 			
 					<env:dataconsumers>
@@ -358,7 +358,7 @@
 			</spaces>
 
 			<components>
-				<agent type="Heatbug" number="100"/>
+				<component type="Heatbug" number="100"/>
 			</components>
 		</application>
 	</applications>
