@@ -255,6 +255,9 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	{
 		// todo: implement idref!
 		
+//		if(xmlattrname!=null && xmlattrname.getLocalPart().equals("ref"))
+//			System.out.println("ref: "+xmlattrname);
+		
 		// If attrval==null only set if default value available.
 		if(attrval==null && !(attrinfo instanceof AttributeInfo && ((AttributeInfo)attrinfo).getAccessInfo().getDefaultValue()!=null))
 			return;

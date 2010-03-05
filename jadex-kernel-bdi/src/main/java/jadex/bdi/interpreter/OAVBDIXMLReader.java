@@ -149,18 +149,7 @@ public class OAVBDIXMLReader
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", OAVBDIMetaModel.typedelement_has_classname)),
 				new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.typedelement_has_class, AccessInfo.IGNORE_WRITE))
-			}, new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo("assignto", OAVBDIMetaModel.referenceableelement_has_assignto), new SubObjectConverter(new IObjectObjectConverter()
-				{
-					public Object convertObject(Object val, IContext context)
-					{
-						return ((Map)val).get("ref");
-					}
-				}, null))
-			})));
-		typeinfos.add(new TypeInfo(new XMLInfo("assignto"), new ObjectInfo(HashMap.class), new MappingInfo(null, new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("ref", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
-		})));
+			})));	
 		typeinfos.add(new TypeInfo(new XMLInfo("beliefref"), new ObjectInfo(OAVBDIMetaModel.beliefreference_type)));
 		
 		TypeInfo ti_belset = new TypeInfo(new XMLInfo("beliefset"), new ObjectInfo(OAVBDIMetaModel.beliefset_type, tepost), 

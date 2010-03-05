@@ -913,7 +913,7 @@ public class OAVBDIMetaModel
 
 		// referenceable element
 		referenceableelement_has_exported	= referenceableelement_type.createAttributeType("mreferenceableelement_has_exported", OAVJavaType.java_string_type, OAVAttributeType.NONE, EXPORTED_FALSE);
-		referenceableelement_has_assignto	= referenceableelement_type.createAttributeType("referenceableelement_has_assignto", OAVJavaType.java_string_type, OAVAttributeType.LIST);
+		referenceableelement_has_assignto	= referenceableelement_type.createAttributeType("mreferenceableelement_has_assignto", OAVJavaType.java_string_type, OAVAttributeType.LIST);
 		
 		// element reference
 		elementreference_has_concrete	= elementreference_type.createAttributeType("melementreference_has_concrete", OAVJavaType.java_string_type);
