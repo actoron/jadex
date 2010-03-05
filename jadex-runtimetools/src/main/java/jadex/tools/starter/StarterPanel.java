@@ -687,7 +687,7 @@ public class StarterPanel extends JPanel
 	{
 //		System.out.println("updategui "+adf);
 		
-		if(adf!=null && SComponentFactory.isStartable(starter.getJCC().getServiceContainer(), adf))
+		if(model!=null && model.isStartable()) //adf!=null && SComponentFactory.isStartable(starter.getJCC().getServiceContainer(), adf))
 		{
 			createArguments();
 			createResults();
@@ -702,6 +702,8 @@ public class StarterPanel extends JPanel
 			confl.setPreferredSize(confdummy.getPreferredSize());
 			componentnamel.setMinimumSize(confdummy.getMinimumSize());
 			componentnamel.setPreferredSize(confdummy.getPreferredSize());
+			
+			componentname.setText(model.getName());
 		}
 		else
 		{
@@ -714,18 +716,20 @@ public class StarterPanel extends JPanel
 			filenamel.setPreferredSize(confdummy.getPreferredSize());
 			confl.setMinimumSize(confdummy.getMinimumSize());
 			confl.setPreferredSize(confdummy.getPreferredSize());
+			
+			componentname.setText("");
 		}
 				
 		filename.setText(adf);
 
-		if(model!=null && model.isStartable())
-		{
-			componentname.setText(model.getName());
-		}
-		else
-		{
-			componentname.setText("");
-		}
+//		if(model!=null && model.isStartable())
+//		{
+//			componentname.setText(model.getName());
+//		}
+//		else
+//		{
+//			componentname.setText("");
+//		}
 		
 		ItemListener[] lis = config.getItemListeners();
 		for(int i=0; i<lis.length; i++)
@@ -772,6 +776,10 @@ public class StarterPanel extends JPanel
 				JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), text, "Display Problem", JOptionPane.INFORMATION_MESSAGE);
 				modeldesc.addTextContent(model.getName(), icon, model.getDescription(), adf);
 			}
+		}
+		else if(error!=null)
+		{
+			modeldesc.addTextContent("Error", null, error, adf);
 		}
 
 		// Adjust state of start button depending on model checking state.
@@ -930,16 +938,19 @@ public class StarterPanel extends JPanel
 		arguments.removeAll();
 		arguments.setBorder(null);
 		
-		IArgument[] args = model.getArguments();
-		
-		for(int i=0; i<args.length; i++)
+		if(model!=null)
 		{
-			argelems.add(args[i]);
-			createArgumentGui(args[i], i);
+			IArgument[] args = model.getArguments();
+			
+			for(int i=0; i<args.length; i++)
+			{
+				argelems.add(args[i]);
+				createArgumentGui(args[i], i);
+			}
+			
+			if(args.length>0)
+				arguments.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Arguments "));
 		}
-		
-		if(args.length>0)
-			arguments.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Arguments "));
 	}
 	
 	/**
@@ -997,79 +1008,82 @@ public class StarterPanel extends JPanel
 		results.removeAll();
 		results.setBorder(null);
 		
-		final IArgument[] res = model.getResults();
-		
-		for(int i=0; i<res.length; i++)
+		if(model!=null)
 		{
-			reselems.add(res[i]);
-			createResultGui(res[i], i);
-		}
-		
-		if(res.length>0)
-		{
-			results.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Results "));
+			final IArgument[] res = model.getResults();
 			
-			JLabel sr = new JLabel("Store results");
-			storeresults = new JCheckBox();
-			
-			JButton cr = new JButton("Clear results");
-			
-			JLabel sa = new JLabel("Select component instance");
-			selectavail= new FixedJComboBox();
-			
-			selectavail.addItem("- no instance selected -");
-			
-			cr.addActionListener(new ActionListener()
+			for(int i=0; i<res.length; i++)
 			{
-				public void actionPerformed(ActionEvent e)
-				{
-					storeresults.removeAll();
-					selectavail.removeAllItems();
-					selectavail.addItem("- no instance selected -");
-					clearResults();
-				}
-			});
-			
-			List rs = (List)resultsets.get(model.getPackage()+"."+model.getName());
-			if(rs!=null)
-			{
-				for(int i=0; i<rs.size(); i++)
-				{
-					Object[] r = (Object[])rs.get(i);
-					selectavail.addItem(r[0]);
-				}
-				selectavail.setSelectedIndex(0);
+				reselems.add(res[i]);
+				createResultGui(res[i], i);
 			}
 			
-//					selectavail.addItemListener(new ItemListener()
-//					{
-//						public void itemStateChanged(ItemEvent e)
-//						{
-//							System.out.println("here: "+resultsets);
-//							refreshResults();
-//						}
-//					});
-			selectavail.addActionListener(new ActionListener()
+			if(res.length>0)
 			{
-				public void actionPerformed(ActionEvent e)
+				results.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Results "));
+				
+				JLabel sr = new JLabel("Store results");
+				storeresults = new JCheckBox();
+				
+				JButton cr = new JButton("Clear results");
+				
+				JLabel sa = new JLabel("Select component instance");
+				selectavail= new FixedJComboBox();
+				
+				selectavail.addItem("- no instance selected -");
+				
+				cr.addActionListener(new ActionListener()
 				{
-					refreshResults();
+					public void actionPerformed(ActionEvent e)
+					{
+						storeresults.removeAll();
+						selectavail.removeAllItems();
+						selectavail.addItem("- no instance selected -");
+						clearResults();
+					}
+				});
+				
+				List rs = (List)resultsets.get(model.getPackage()+"."+model.getName());
+				if(rs!=null)
+				{
+					for(int i=0; i<rs.size(); i++)
+					{
+						Object[] r = (Object[])rs.get(i);
+						selectavail.addItem(r[0]);
+					}
+					selectavail.setSelectedIndex(0);
 				}
-			});
-			
-			int y = res.length;
-			
-			results.add(sr, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.EAST,
-				GridBagConstraints.BOTH, new Insets(2, 2, 2, 0), 0, 0));
-			results.add(storeresults, new GridBagConstraints(1, y, 2, 1, 0, 0, GridBagConstraints.WEST,
-				GridBagConstraints.BOTH, new Insets(2, 0, 2, 2), 0, 0));
-			results.add(cr, new GridBagConstraints(3, y, 1, 1, 0, 0, GridBagConstraints.EAST,
-				GridBagConstraints.NONE, new Insets(2, 0, 2, 2), 0, 0));
-			y++;
-			results.add(sa, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.EAST,
-				GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-			results.add(selectavail, new GridBagConstraints(1, y, 3, 1, 0, 0, GridBagConstraints.WEST,
-				GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+				
+	//					selectavail.addItemListener(new ItemListener()
+	//					{
+	//						public void itemStateChanged(ItemEvent e)
+	//						{
+	//							System.out.println("here: "+resultsets);
+	//							refreshResults();
+	//						}
+	//					});
+				selectavail.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						refreshResults();
+					}
+				});
+				
+				int y = res.length;
+				
+				results.add(sr, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.EAST,
+					GridBagConstraints.BOTH, new Insets(2, 2, 2, 0), 0, 0));
+				results.add(storeresults, new GridBagConstraints(1, y, 2, 1, 0, 0, GridBagConstraints.WEST,
+					GridBagConstraints.BOTH, new Insets(2, 0, 2, 2), 0, 0));
+				results.add(cr, new GridBagConstraints(3, y, 1, 1, 0, 0, GridBagConstraints.EAST,
+					GridBagConstraints.NONE, new Insets(2, 0, 2, 2), 0, 0));
+				y++;
+				results.add(sa, new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.EAST,
+					GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+				results.add(selectavail, new GridBagConstraints(1, y, 3, 1, 0, 0, GridBagConstraints.WEST,
+					GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+			}
 		}
 	}
 	
