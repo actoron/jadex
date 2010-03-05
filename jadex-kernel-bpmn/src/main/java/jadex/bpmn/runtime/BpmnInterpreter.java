@@ -2,9 +2,7 @@ package jadex.bpmn.runtime;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MSequenceEdge;
-import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.handler.DefaultActivityHandler;
 import jadex.bpmn.runtime.handler.DefaultStepHandler;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler;
@@ -22,9 +20,9 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
@@ -45,7 +43,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**
@@ -779,7 +776,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			MActivity act = thread.getActivity();
 			handler.execute(act, this, thread);
 			
-			thread.updateParametersAfterStep(this);
+			thread.updateParametersAfterStep(act, this);
 			
 			// Check if thread now waits for a message and there is at least one in the message queue.
 			if(thread.isWaiting() && messages.size()>0 && MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(thread.getActivity().getActivityType()) 

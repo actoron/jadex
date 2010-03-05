@@ -140,7 +140,7 @@ public class Environment implements IEnvironment
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 //			System.out.println(e);
 			highscore = new ArrayList();
 		}

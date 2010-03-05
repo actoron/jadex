@@ -1,3 +1,55 @@
+Changes from Jadex V2 beta3 to Jadex V2 rc1
+
+This is a short (probably incomplete) list of
+the major changes regarding the programming
+of Jadex V2 agents. Please look at the
+example sources to learn more about the details.
+Full documentation will be available with the
+final V2 release and is published continuously
+on the Jadex Wiki. 
+
+New Features:
+	Platform features:
+	- The platform is now an active component infrastructure, which means
+	  that not only agents but also other kind of active elements (like workflows)
+	  can be executed. This is done in a way that all kinds of components look
+	  the same for the platform, so that most tools can be used for arbitrary component
+	  types. This does also mean that is easily possibly to construct applications
+	  consisting of heterogeneous types of components, e.g. BDI agent controlling
+	  workflows. 
+	- Components are now a holonic concept. This allows a component to have (a hierarchy)
+	  of subcomponents. Commands like 'kill or suspend' can thus be applied to the 
+	  component itself and all contained subcomponents.
+	
+	Kernel features:
+	- New BPMN kernel for executing BPMN workflows. BPMN workflows can be modelled
+	  using the Jadex BPMN tool for eclipse (or directly by using the eclipse stp
+	  BPMN editor). Annotations in the diagram allow to make the processes directly
+	  executable.
+	- New BPMNBDI kernel allowing BPMN workflows being used as plans for BDI agents.
+	- New application kernel making applications normal components (before they were
+	  treated as special case).  
+	
+	BDI Features:
+	- Enhanced Jadex Condition Language (JCL) support making the usage of CLIPS obsolete.
+	- Support for abstract elements in capabilities.
+
+	Tool features:
+	- Enhanced debugger support (specialized views for micro agents and bpmn workflows).
+	- The tools are now cross-kernel functional, i.e. you can use the tools without
+	  having to care about its component type.
+
+	XML Changes:
+	- In application and envspace descriptors 'agent' has been replaced by 'component' 
+	  to reflect the wider scope of available component types (like workflows).
+
+	Java Changes:
+	- Refactoring of package names to comply with kernel and platform conventions.
+	  jadex.adapter.standalone -> jadex.standalone
+	  jadex.adapter.base -> jadex.base
+	  jadex.microkernel -> jadex.micro
+	- Renaming of several constants containing 'agent' to 'component'.  
+
 Changes from Jadex 0.96 to Jadex V2 beta3
 
 This is a short (probably incomplete) list of
@@ -22,6 +74,7 @@ New Features:
 	  space. This environment space is available (envsupport) that allows for 
 	  designing 2D grid/continuous worlds including an easy way for their presentation
 	  (you may have a look at the examples for further details).
+	  
 	Platform features:
 	- In V2 multi-kernel support has been realized, which means that you can
 	  program heterogenious agent systems consisting of different kinds of agent,

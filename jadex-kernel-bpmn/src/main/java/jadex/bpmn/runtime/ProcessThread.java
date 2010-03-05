@@ -617,14 +617,13 @@ public class ProcessThread	implements ITaskContext
 	 *  Remove in parameters after step.
 	 *  @param instance	The calling BPMN instance.
 	 */
-	protected  void updateParametersAfterStep(BpmnInterpreter instance)
+	protected  void updateParametersAfterStep(MActivity activity, BpmnInterpreter instance)
 	{
 		// Remove all in paramters
-		MActivity act = getLastEdge().getSource();
 //		System.out.println("after: "+act);
-		if(MBpmnModel.TASK.equals(act.getActivityType()) || act instanceof MSubProcess)
+		if(MBpmnModel.TASK.equals(activity.getActivityType()) || activity instanceof MSubProcess)
 		{
-			List params = act.getParameters(new String[]{MParameter.DIRECTION_IN});
+			List params = activity.getParameters(new String[]{MParameter.DIRECTION_IN});
 			for(int i=0; i<params.size(); i++)
 			{
 				MParameter inp = (MParameter)params.get(i);

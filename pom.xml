@@ -56,30 +56,33 @@
   	<profile>
   		<id>jadex-full-dist</id>
 		<modules>
+		 	<module>jadex-commons</module>
+		 	<module>jadex-xml</module>
 		 	<module>jadex-services</module>
-		    <module>jadex-commons</module>
-		    <module>jadex-xml</module>
 		    <module>jadex-javaparser</module>
 		    <module>jadex-bridge</module>
 		    <module>jadex-platform-base</module>
 		    <module>jadex-nuggets</module>
+
+		    <module>jadex-kernel-application</module>
 		    <module>jadex-kernel-bdi</module>
+		    <module>jadex-kernel-micro</module>
+		    <module>jadex-kernel-bpmn</module>
+		    <module>jadex-kernel-bdibpmn</module>
+			<!-- <module>jadex-kernel-gpmn</module> -->
+		    
 		    <module>jadex-applib-bdi</module>
 		    <module>jadex-applications-bdi</module>
-		    <!-- <module>jadex-applib-simulation</module> -->
-		    <module>jadex-runtimetools</module>
-		    <module>jadex-kernel-micro</module>
 		    <module>jadex-applications-micro</module>
-		    <module>jadex-rules</module>
+		    <module>jadex-applications-bpmn</module>
+		    <module>jadex-applications-bdibpmn</module>
+		    <!-- <module>jadex-applications-gpmn</module> -->
+
+			<module>jadex-rules</module>
 		    <module>jadex-rules-applications</module>
 		    <module>jadex-rules-tools</module>
-		    <module>jadex-kernel-application</module>
-		    <module>jadex-kernel-bpmn</module>
-		    <module>jadex-applications-bpmn</module>
-		    <module>jadex-kernel-bdibpmn</module>
-		    <module>jadex-applications-bdibpmn</module>
-		    <module>jadex-kernel-gpmn</module>
-		    <module>jadex-applications-gpmn</module>
+
+		    <module>jadex-runtimetools</module>
 		    <module>jadex-platform-standalone</module>
 		    <module>jadex-launch</module>
 		    <!-- <module>jadex-apleis</module> -->
@@ -95,33 +98,41 @@
 				<!-- <module>jadex-kernel-bdi-continuations</module> -->
 				<module>jadex-commons</module>
 				<module>jadex-xml</module>
+				<module>jadex-services</module>	
 				<module>jadex-javaparser</module>
 				<module>jadex-bridge</module>
 				<module>jadex-platform-base</module>
 				<module>jadex-nuggets</module>
-				<module>jadex-kernel-bdi</module>
-				<module>jadex-applib-bdi</module>				
-				<module>jadex-applications-bdi</module>
-				<module>jadex-applications-bpmn</module>
-				<module>jadex-applications-bdibpmn</module>
-				<module>jadex-applications-gpmn</module>
-				<module>jadex-runtimetools</module>
-				<module>jadex-kernel-micro</module>
-				<module>jadex-applications-micro</module>
-				<module>jadex-rules</module>
-				<module>jadex-rules-applications</module>
-				<module>jadex-rules-tools</module>
+				
 				<module>jadex-kernel-application</module>
-				<module>jadex-platform-standalone</module>
-				<module>jadex-launch</module>
-				<module>jadex-jade-launch</module>
-				<module>jadex-platform-jade</module>
+				<module>jadex-kernel-bdi</module>
+				<module>jadex-kernel-micro</module>
 				<module>jadex-kernel-bdibpmn</module>
 				<module>jadex-kernel-bpmn</module>
 				<module>jadex-kernel-gpmn</module>
+				
+				<module>jadex-applib-bdi</module>				
+				<module>jadex-applications-bdi</module>
+				<module>jadex-applications-micro</module>
+				<module>jadex-applications-bpmn</module>
+				<module>jadex-applications-bdibpmn</module>
+				<module>jadex-applications-gpmn</module>
+				
+				<module>jadex-rules</module>
+				<module>jadex-rules-applications</module>
+				<module>jadex-rules-tools</module>
+				
+				<module>jadex-runtimetools</module>
+				<module>jadex-platform-standalone</module>
+				<module>jadex-launch</module>
+				
 				<module>jadex-platform-wfms</module>
 				<module>jadex-wfms-launch</module>
 				<module>jadex-applications-wfms</module>
+				
+				<module>jadex-platform-jade</module>
+				<module>jadex-jade-launch</module>
+				
 				<module>sodekovs-simulationcontrol</module>				
 				<module>sodekovs-coordination</module>
 				<module>jadex-distributed</module>
