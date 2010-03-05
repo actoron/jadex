@@ -289,29 +289,6 @@ public class StarterPanel extends JPanel
 
 		// The component name.
 		componentname = new JTextField();
-		
-//		// The application name.
-//		appmodel = new DefaultComboBoxModel();
-//		appmodel.addElement("");
-//		IContextService cs = (IContextService)starter.getJCC().getServiceContainer().getService(IContextService.class);
-//		if(cs!=null)
-//		{
-//			cs.addContextListener(new IChangeListener()
-//			{
-//				public void changeOccurred(jadex.commons.ChangeEvent event)
-//				{
-//					if(IContextService.EVENT_TYPE_CONTEXT_CREATED.equals(event.getType()))
-//					{
-//						appmodel.addElement(((IContext)event.getValue()).getName());
-//					}
-//					else if(IContextService.EVENT_TYPE_CONTEXT_DELETED.equals(event.getType()))
-//					{
-//						appmodel.removeElement(((IContext)event.getValue()).getName());
-//					}
-//				}
-//			});
-//		}
-//		appname = new JComboBox();
 
 		// The generate flag for the componentname;
 		genname = new JCheckBox("Auto generate", false);
@@ -404,7 +381,7 @@ public class StarterPanel extends JPanel
 									{
 										public void run()
 										{
-//													System.out.println("fullname: "+fullname+" "+model.getFilename());
+//											System.out.println("fullname: "+fullname+" "+model.getFilename());
 											String tmp = (String)mymodel.getPackage()+"."+mymodel.getName();
 											resultsets.put(tmp, new Object[]{source, result});
 											if(model!=null && fullname.equals(model.getPackage()+"."+model.getName()))
@@ -708,7 +685,7 @@ public class StarterPanel extends JPanel
 	 */
 	void updateGuiForNewModel(final String adf)
 	{
-		System.out.println("updategui "+adf);
+//		System.out.println("updategui "+adf);
 		
 		if(adf!=null && SComponentFactory.isStartable(starter.getJCC().getServiceContainer(), adf))
 		{

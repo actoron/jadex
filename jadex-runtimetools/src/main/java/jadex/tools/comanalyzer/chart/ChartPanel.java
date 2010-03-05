@@ -192,7 +192,7 @@ public class ChartPanel extends ToolTab implements ActionListener
 		color_panel.setBorder(BorderFactory.createTitledBorder("Distribution Of"));
 		ButtonGroup bg_colors = new ButtonGroup();
 		d_message = new JRadioButton("Messages");
-		d_message.setSelected(panelcan.getPaintMode() == PaintMaps.COLOR_AGENT);
+		d_message.setSelected(panelcan.getPaintMode() == PaintMaps.COLOR_COMPONENT);
 		d_message.addActionListener(this);
 		d_convid = new JRadioButton("Converstation");
 		d_convid.setSelected(panelcan.getPaintMode() == PaintMaps.PAINTMODE_CONVERSATION);
@@ -250,7 +250,7 @@ public class ChartPanel extends ToolTab implements ActionListener
 		}
 		else if(source == d_message)
 		{
-			panelcan.setPaintMode(PaintMaps.COLOR_AGENT);
+			panelcan.setPaintMode(PaintMaps.COLOR_COMPONENT);
 		}
 		else if(source == d_convid)
 		{

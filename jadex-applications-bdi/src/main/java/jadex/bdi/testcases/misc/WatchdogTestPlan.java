@@ -36,7 +36,7 @@ public class WatchdogTestPlan extends AbstractMultipleAgentsPlan
 		{
 			try
 			{
-				IGoal observe = createGoal("dogcap.observe_agent");
+				IGoal observe = createGoal("dogcap.observe_component");
 				observe.getParameter("description").setValue(desc);
 				dispatchSubgoalAndWait(observe, 3000);
 			}
@@ -55,7 +55,7 @@ public class WatchdogTestPlan extends AbstractMultipleAgentsPlan
 		tr = new TestReport("#1", "Test observing other agent which has been destroyed.");
 		try
 		{
-			IGoal observe = createGoal("dogcap.observe_agent");
+			IGoal observe = createGoal("dogcap.observe_component");
 			observe.getParameter("description").setValue(desc);
 			dispatchSubgoalAndWait(observe, 30000);
 		}

@@ -118,7 +118,7 @@
 	</plans>
 
 	<events>
-		<messageevent name="fipcmsg" type="fipa" />
+		<messageevent name="fipamsg" type="fipa" />
 
 		<!-- Message to issue a request to an observed component. -->
 		<messageevent name="tool_request" type="fipa" direction="send">

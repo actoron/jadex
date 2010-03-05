@@ -22,6 +22,7 @@ import java.util.StringTokenizer;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -68,9 +69,11 @@ public class DebuggerMainPanel extends JSplitPane
 	 */
 	public DebuggerMainPanel(final IControlCenter jcc, final IComponentDescription desc)
 	{
+		super(JSplitPane.HORIZONTAL_SPLIT, new JPanel(), new JPanel());
 		this.jcc	= jcc;
 		this.desc	= desc;
 		this.setOneTouchExpandable(true);
+		setDividerLocation(150);
 		
 		IComponentManagementService	ces	= ((IComponentManagementService)
 			jcc.getServiceContainer().getService(IComponentManagementService.class));
@@ -98,6 +101,13 @@ public class DebuggerMainPanel extends JSplitPane
 							leftpanel	= new BreakpointPanel(breakpoints, desc, jcc.getServiceContainer());
 							DebuggerMainPanel.this.setLeftComponent(leftpanel);
 							DebuggerMainPanel.this.setDividerLocation(150);	// Hack???
+						}
+						else
+						{
+							JPanel nobreakpoints = new JPanel();
+							nobreakpoints.add(new JLabel("no breakpoints"));
+							DebuggerMainPanel.this.setLeftComponent(nobreakpoints);
+							DebuggerMainPanel.this.setDividerLocation(0);
 						}
 						
 						// Sub panels of right panel.

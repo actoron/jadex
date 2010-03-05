@@ -14,7 +14,7 @@ import java.util.Map;
 public class Component extends ParameterElement
 {	
 	/** The dummy agent */
-	public static final Component DUMMY_AGENT = new Component();
+	public static final Component DUMMY_COMPONENT = new Component();
 
 	/** The name for the dummy agent */
 	public static final String DUMMY_NAME = "Dummy";
@@ -118,7 +118,7 @@ public class Component extends ParameterElement
 	{
 		// calculate message count on access
 		// but skip dummy agent, because this filter doesnt apply to it
-		if(!this.equals(Component.DUMMY_AGENT))
+		if(!this.equals(Component.DUMMY_COMPONENT))
 		{
 			int msg_visible = NO_MESSAGES;
 			List msgs = getMessages();
@@ -127,9 +127,9 @@ public class Component extends ParameterElement
 				if(((Message)msgs.get(i)).isVisible())
 				{
 					// check if the messaqe is redirected and dummy is visible
-					if(Component.DUMMY_AGENT.getMessages().contains(msgs.get(i)))
+					if(Component.DUMMY_COMPONENT.getMessages().contains(msgs.get(i)))
 					{
-						if(Component.DUMMY_AGENT.isVisible())
+						if(Component.DUMMY_COMPONENT.isVisible())
 						{
 							msg_visible++;
 						}
@@ -303,11 +303,11 @@ public class Component extends ParameterElement
 			return 0;
 		}
 		// dummy agent is always the first
-		if(this.equals(Component.DUMMY_AGENT))
+		if(this.equals(Component.DUMMY_COMPONENT))
 		{
 			return -1;
 		}
-		if(o.equals(Component.DUMMY_AGENT))
+		if(o.equals(Component.DUMMY_COMPONENT))
 		{
 			return 1;
 		}

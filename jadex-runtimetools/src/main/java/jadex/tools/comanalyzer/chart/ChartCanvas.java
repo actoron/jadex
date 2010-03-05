@@ -57,8 +57,8 @@ public class ChartCanvas extends ToolCanvas
 	/** The list of messages displayed in the chart */
 	protected List visible_messages;
 
-	/** The list of agents displayed in the chart */
-	protected List visible_agents;
+	/** The list of components displayed in the chart */
+	protected List visible_components;
 
 	/** The dataset for sent messages */
 	protected CategoryPieDataset dataset_sent;
@@ -111,7 +111,7 @@ public class ChartCanvas extends ToolCanvas
 		this.paintMode = PaintMaps.PAINTMODE_CONVERSATION;
 
 		this.visible_messages = new ArrayList();
-		this.visible_agents = new ArrayList();
+		this.visible_components = new ArrayList();
 
 		this.dataset_sent = new CategoryPieDataset();
 		this.dataset_received = new CategoryPieDataset();
@@ -179,7 +179,7 @@ public class ChartCanvas extends ToolCanvas
 				break;
 		}
 
-		if(paintMode == PaintMaps.COLOR_AGENT)
+		if(paintMode == PaintMaps.COLOR_COMPONENT)
 		{
 			dataset_sent.removeElement(message, "sent", message.getSender());
 			dataset_received.removeElement(message, "received", message.getReceiver());
@@ -210,7 +210,7 @@ public class ChartCanvas extends ToolCanvas
 	{
 		if(agent.isVisible())
 		{
-			if(!visible_agents.contains(agent))
+			if(!visible_components.contains(agent))
 			{
 				addAgent(agent);
 			}
@@ -229,7 +229,7 @@ public class ChartCanvas extends ToolCanvas
 	 */
 	public void removeComponent(Component agent)
 	{
-		visible_agents.remove(agent);
+		visible_components.remove(agent);
 	}
 
 	/**
@@ -241,7 +241,7 @@ public class ChartCanvas extends ToolCanvas
 		dataset_received.clear();
 		dataset_total.clear();
 		visible_messages.clear();
-		visible_agents.clear();
+		visible_components.clear();
 	}
 
 	/**
@@ -261,7 +261,7 @@ public class ChartCanvas extends ToolCanvas
 	 */
 	public void addAgent(Component agent)
 	{
-		visible_agents.add(agent);
+		visible_components.add(agent);
 	}
 
 	/**
@@ -286,7 +286,7 @@ public class ChartCanvas extends ToolCanvas
 				break;
 		}
 
-		if(paintMode == PaintMaps.COLOR_AGENT)
+		if(paintMode == PaintMaps.COLOR_COMPONENT)
 		{
 			dataset_sent.addElement(message, "sent", message.getSender());
 			dataset_received.addElement(message, "received", message.getReceiver());
@@ -344,9 +344,9 @@ public class ChartCanvas extends ToolCanvas
 		dataset_total.clear();
 
 		// copy visible items and clear original
-		List agents = new ArrayList(visible_agents);
+		List agents = new ArrayList(visible_components);
 		List messages = new ArrayList(visible_messages);
-		visible_agents.clear();
+		visible_components.clear();
 		visible_messages.clear();
 
 		// add visible items again

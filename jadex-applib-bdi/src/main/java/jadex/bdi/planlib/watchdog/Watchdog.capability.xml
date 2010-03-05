@@ -52,11 +52,11 @@
              <concrete ref="pingcap.pinging"/>
         </achievegoalref>
 
-		<achievegoal name="observe_agent" exported="true">
+		<achievegoal name="observe_component" exported="true">
 			<parameter name="description" class="ObservationDescription"/>
 		</achievegoal>
 
-		<achievegoal name="recover_agent" exported="true">
+		<achievegoal name="recover_component" exported="true">
 			<parameter name="description" class="ObservationDescription"/>
 		</achievegoal>
 
@@ -66,13 +66,13 @@
 	</goals>
 
 	<plans>
-		<plan name="observe_agent_plan">
+		<plan name="observe_component_plan">
 			<parameter name="description" class="ObservationDescription">
-				<goalmapping ref="observe_agent.description"/>
+				<goalmapping ref="observe_component.description"/>
 			</parameter>
 			<body class="ObserveAgentPlan" />
 			<trigger>
-				<goal ref="observe_agent" />
+				<goal ref="observe_component" />
 			</trigger>
 		</plan>
 

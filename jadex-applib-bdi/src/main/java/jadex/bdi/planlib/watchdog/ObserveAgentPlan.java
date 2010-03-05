@@ -35,7 +35,7 @@ public class ObserveAgentPlan extends Plan
 				try
 				{
 					// Try to recover.
-					IGoal recover = createGoal("recover_agent");
+					IGoal recover = createGoal("recover_component");
 					recover.getParameter("description").setValue(desc);
 					dispatchSubgoalAndWait(recover);
 				}

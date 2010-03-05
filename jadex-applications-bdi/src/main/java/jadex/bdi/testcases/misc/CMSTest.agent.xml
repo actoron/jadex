@@ -37,7 +37,7 @@
 	</plans>
 
 	<events>
-		<messageevent name="request_create_agent" type="fipa" direction="send">
+		<messageevent name="request_create_component" type="fipa" direction="send">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.REQUEST</value>
 			</parameter>
@@ -56,7 +56,7 @@
 			<match>$content instanceof CMSCreateComponent</match>
 		</messageevent>
 
-		<messageevent name="request_destroy_agent" type="fipa" direction="send">
+		<messageevent name="request_destroy_component" type="fipa" direction="send">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.REQUEST</value>
 			</parameter>
@@ -75,7 +75,7 @@
 			<match>$content instanceof CMSCreateComponent</match>
 		</messageevent>
 
-		<messageevent name="request_search_agents" type="fipa" direction="send">
+		<messageevent name="request_search_components" type="fipa" direction="send">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.REQUEST</value>
 			</parameter>

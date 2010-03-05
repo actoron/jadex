@@ -259,7 +259,7 @@ public class CMSTestPlan extends Plan
 		ca.setType("jadex.bdi.testcases.benchmarks.AgentCreation");
 		ca.setName("Creator");
 		ca.addArgument(new Integer(5));
-		IMessageEvent rca = createMessageEvent("request_create_agent");
+		IMessageEvent rca = createMessageEvent("request_create_component");
 		rca.getParameterSet(SFipa.RECEIVERS).addValue(SFipa.CMS);
 		rca.setContent(ca);
 		IMessageEvent reply = sendMessageAndWait(rca, 10000);
@@ -268,7 +268,7 @@ public class CMSTestPlan extends Plan
 		/*getLogger().info("Test 2: Destroying an agent per message!");
 		DestroyAgent da = new DestroyAgent();
 		da.setAgentIdentifier(((CreateAgent)((Done)reply.getContent()).getAction()).getAgentIdentifier());
-		IMessageEvent rda = createMessageEvent("request_destroy_agent");
+		IMessageEvent rda = createMessageEvent("request_destroy_component");
 		rda.getParameterSet(SFipa.RECEIVERS).addValue(SFipa.CMS);
 		rda.setContent(da);
 		sendMessageAndWait(rda, 10000);
@@ -281,7 +281,7 @@ public class CMSTestPlan extends Plan
 		constraints.setMaxResults(-1);
 		sa.setAgentDescription(desc);
 		sa.setSearchConstraints(constraints);
-		IMessageEvent sda = createMessageEvent("request_search_agents");
+		IMessageEvent sda = createMessageEvent("request_search_components");
 		sda.getParameterSet(SFipa.RECEIVERS).addValue(SFipa.CMS);
 		sda.setContent(sa);
 		IMessageEvent rep = sendMessageAndWait(sda, 10000);

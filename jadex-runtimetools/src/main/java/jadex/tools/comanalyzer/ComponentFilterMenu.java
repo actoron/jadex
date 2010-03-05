@@ -79,7 +79,7 @@ public class ComponentFilterMenu extends TitlePopupMenu
 				{
 					// exclude dummy since it should always
 					// be hidden by the menu (hide dummy agent)
-					if(!agents[i].equals(Component.DUMMY_AGENT))
+					if(!agents[i].equals(Component.DUMMY_COMPONENT))
 					{
 						filter.addValue(Component.AID, agents[i].getParameter(Component.AID));
 					}
@@ -101,7 +101,7 @@ public class ComponentFilterMenu extends TitlePopupMenu
 				// get agentlist and remove selected and dummy
 				List other = SUtil.arrayToList(plugin.getAgents());
 				other.removeAll(SUtil.arrayToList(agents));
-				other.remove(Component.DUMMY_AGENT);
+				other.remove(Component.DUMMY_COMPONENT);
 				for(int i = 0; i < other.size(); i++)
 				{
 					filter.addValue(Component.AID, ((Component)other.get(i)).getParameter(Component.AID));
@@ -134,7 +134,7 @@ public class ComponentFilterMenu extends TitlePopupMenu
 				// get agentlist and remove group and dummy
 				List other = SUtil.arrayToList(plugin.getAgents());
 				other.removeAll(group);
-				other.remove(Component.DUMMY_AGENT);
+				other.remove(Component.DUMMY_COMPONENT);
 				for(int i = 0; i < other.size(); i++)
 				{
 					filter.addValue(Component.AID, ((Component)other.get(i)).getParameter(Component.AID));
@@ -186,7 +186,7 @@ public class ComponentFilterMenu extends TitlePopupMenu
 		add(menu4);
 
 		// disable the other filter menu items if its only the dummy agent
-		boolean disabled = agents.length == 1 && agents[0].equals(Component.DUMMY_AGENT);
+		boolean disabled = agents.length == 1 && agents[0].equals(Component.DUMMY_COMPONENT);
 		menu1.setEnabled(!disabled);
 		menu2.setEnabled(!disabled);
 		menu3.setEnabled(!disabled);

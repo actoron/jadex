@@ -27,7 +27,7 @@ public class PaintMaps
 	public static final int PAINTMODE_PROTOCOL = 3;
 
 	/** The paint mode for differ agents */
-	public static final int COLOR_AGENT = 4; // used only by the chart
+	public static final int COLOR_COMPONENT = 4; // used only by the chart
 
 	/** The standard default color */
 	public static final Paint DEFAULT_COLOR = Color.BLACK;
@@ -175,7 +175,7 @@ public class PaintMaps
 				return performativPaints;
 			case PAINTMODE_PROTOCOL:
 				return protocolPaints;
-			case COLOR_AGENT:
+			case COLOR_COMPONENT:
 				return agentPaints;
 		}
 
@@ -217,7 +217,7 @@ public class PaintMaps
 			case PAINTMODE_PROTOCOL:
 				paint = (Paint)protocolPaints.get(key);
 				break;
-			case COLOR_AGENT:
+			case COLOR_COMPONENT:
 				paint = (Paint)agentPaints.get(key);
 				break;
 		}

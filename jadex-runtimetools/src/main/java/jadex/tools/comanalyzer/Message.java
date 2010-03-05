@@ -229,10 +229,10 @@ public class Message extends ParameterElement
 
 		// if dummy agent is visible and either one of the participants (XOR)
 		// adjust redirection
-		if(Component.DUMMY_AGENT.isVisible() && (sender.isVisible() ^ receiver.isVisible()))
+		if(Component.DUMMY_COMPONENT.isVisible() && (sender.isVisible() ^ receiver.isVisible()))
 		{
-			sender = sender.isVisible() ? sender : Component.DUMMY_AGENT;
-			receiver = receiver.isVisible() ? receiver : Component.DUMMY_AGENT;
+			sender = sender.isVisible() ? sender : Component.DUMMY_COMPONENT;
+			receiver = receiver.isVisible() ? receiver : Component.DUMMY_COMPONENT;
 			return new Pair(sender, receiver);
 		}
 

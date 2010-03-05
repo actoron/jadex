@@ -199,7 +199,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		};
 		
 		((AgentControlCenter)jcc).getAgent().getEventbase().addMessageEventListener("fipamsg", lis);
-		((AgentControlCenter)jcc).getAgent().getEventbase().addMessageEventListener("agent_inform", lis);
+		((AgentControlCenter)jcc).getAgent().getEventbase().addMessageEventListener("component_inform", lis);
 
 		return split;
 	}

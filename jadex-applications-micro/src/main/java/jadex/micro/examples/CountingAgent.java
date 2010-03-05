@@ -36,8 +36,8 @@ public class CountingAgent extends MicroAgent
 			
 			public String toString()
 			{
-				return "couter.inc()";
-			}
+				return "couter.inc("+cnt+")";
+			}			
 		};
 		
 		scheduleStep(step);

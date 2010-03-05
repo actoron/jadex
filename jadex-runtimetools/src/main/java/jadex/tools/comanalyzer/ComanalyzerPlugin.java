@@ -511,7 +511,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 //		});
 
 		// add dummy agent to agentlist
-		Component dummy = Component.DUMMY_AGENT;
+		Component dummy = Component.DUMMY_COMPONENT;
 		applyAgentFilter(dummy);
 		componentlist.addAgent(dummy);
 		
@@ -711,7 +711,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	 */
 	protected void applyMessageFilter(Message[] messages)
 	{
-		List updated_agents = new ArrayList();
+		List updated_components = new ArrayList();
 		List updated_messages = new ArrayList();
 
 		for(int i=0; i<messages.length; i++)
@@ -726,16 +726,16 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 				Component receiver = messages[i].getReceiver();
 				if(sender.applyFilter(agentfilter, true))
 				{
-					if(!updated_agents.contains(sender))
+					if(!updated_components.contains(sender))
 					{
-						updated_agents.add(sender);
+						updated_components.add(sender);
 					}
 				}
 				if(receiver.applyFilter(agentfilter, true))
 				{
-					if(!updated_agents.contains(receiver))
+					if(!updated_components.contains(receiver))
 					{
-						updated_agents.add(receiver);
+						updated_components.add(receiver);
 					}
 				}
 			}
@@ -743,8 +743,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 
 
 		
-		componentlist.fireAgentsChanged((Component[])updated_agents
-			.toArray(new Component[updated_agents.size()]));
+		componentlist.fireAgentsChanged((Component[])updated_components
+			.toArray(new Component[updated_components.size()]));
 		messagelist.fireMessagesChanged((Message[])updated_messages
 			.toArray(new Message[updated_messages.size()]));
 	}
@@ -829,18 +829,18 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	 * @param agents The agents to apply the filter to.
 	 */
 	protected void applyAgentFilter(Component[] agents) {
-		List updated_agents = new ArrayList();
+		List updated_components = new ArrayList();
 		List updated_messages = new ArrayList();
 
 		// Hack!!!
 		// apply with out zero message filter first
 		for (int i = 0; i < agents.length; i++) {
 			agents[i].applyFilter(agentfilter, false);	
-			if (!agents[i].equals(Component.DUMMY_AGENT) && agents[i].getMessages().size() > 0) {
+			if (!agents[i].equals(Component.DUMMY_COMPONENT) && agents[i].getMessages().size() > 0) {
 				if (agents[i].isVisible()) {
-					Component.DUMMY_AGENT.getMessages().removeAll(agents[i].getMessages());
+					Component.DUMMY_COMPONENT.getMessages().removeAll(agents[i].getMessages());
 				} else {
-					Component.DUMMY_AGENT.getMessages().addAll(agents[i].getMessages());
+					Component.DUMMY_COMPONENT.getMessages().addAll(agents[i].getMessages());
 
 				}
 			}			
@@ -848,22 +848,22 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		
 		for (int i = 0; i < agents.length; i++) {
 			agents[i].applyFilter(agentfilter, true);
-				if (!agents[i].equals(Component.DUMMY_AGENT) && agents[i].getMessages().size() > 0) {
+				if (!agents[i].equals(Component.DUMMY_COMPONENT) && agents[i].getMessages().size() > 0) {
 					if (agents[i].isVisible()) {
-						Component.DUMMY_AGENT.getMessages().removeAll(agents[i].getMessages());
+						Component.DUMMY_COMPONENT.getMessages().removeAll(agents[i].getMessages());
 					} else {
-						Component.DUMMY_AGENT.getMessages().addAll(agents[i].getMessages());
+						Component.DUMMY_COMPONENT.getMessages().addAll(agents[i].getMessages());
 
 					}
 				}
 		}
 		
 
-		updated_agents.addAll(componentlist.getList());		
+		updated_components.addAll(componentlist.getList());		
 		updated_messages.addAll(messagelist.getList());
 
-		componentlist.fireAgentsChanged((Component[]) updated_agents
-				.toArray(new Component[updated_agents.size()]));
+		componentlist.fireAgentsChanged((Component[]) updated_components
+				.toArray(new Component[updated_components.size()]));
 		messagelist.fireMessagesChanged((Message[]) updated_messages
 				.toArray(new Message[updated_messages.size()]));
 	}

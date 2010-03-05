@@ -33,7 +33,7 @@ public class OAVTypeModel
 	protected Map types;
 	
 	/** The contained type models. */
-	protected OAVTypeModel[]	tmodels;
+	protected OAVTypeModel[] tmodels;
 	
 	/** The class loader. */
 	protected ClassLoader classloader;
@@ -55,9 +55,25 @@ public class OAVTypeModel
 	 */
 	public OAVTypeModel(String name, ClassLoader classloader)
 	{
+		this(name, classloader, null);
+	}
+	
+	/**
+	 *  Create a new model.
+	 *  @param name The name.
+	 */
+	public OAVTypeModel(String name, ClassLoader classloader, OAVTypeModel[] subtypemodels)
+	{
 		this.name = name;
 		this.types = new HashMap();
 		this.classloader = classloader;
+		if(subtypemodels!=null)
+		{
+			for(int i=0; i<subtypemodels.length; i++)
+			{
+				addTypeModel(subtypemodels[i]);
+			}
+		}
 	}
 	
 	//-------- type management --------
@@ -270,6 +286,15 @@ public class OAVTypeModel
 		return classloader;
 	}
 	
+	/**
+	 *  Set the classloader.
+	 *  @param classloader The classloader to set.
+	 */
+	public void setClassLoader(ClassLoader classloader)
+	{
+		this.classloader = classloader;
+	}
+
 	/**
 	 *  Test if two types are equal.
 	 *  @return True if equal.

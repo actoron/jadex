@@ -65,7 +65,7 @@ public class ChartGroupedStackedBarRenderer extends GroupedStackedBarRenderer
 		GroupedCategoryDataset dataset = (GroupedCategoryDataset)getPlot().getDataset();
 
 		// if message distribution get key for column (agentname)
-		if(paintMode == PaintMaps.COLOR_AGENT)
+		if(paintMode == PaintMaps.COLOR_COMPONENT)
 		{
 			Comparable key = dataset.getColumnKey(column);
 			// lookup color

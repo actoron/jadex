@@ -157,11 +157,10 @@ public class MicroAgentInterpreter implements IComponentInstance
 			
 			if(!steps.isEmpty())
 			{
-				Runnable step = (Runnable)steps.remove(0);
+				Runnable step = (Runnable)removeStep();
+				String steptext = ""+step;
 				step.run();
-				if(history!=null)
-					history.add(step);
-				notifyListeners(new ChangeEvent(this, "step_executed"));
+				addHistoryEntry(steptext);
 			}
 	
 			this.agentthread = null;
@@ -333,11 +332,11 @@ public class MicroAgentInterpreter implements IComponentInstance
 	/**
 	 *  Get the history.
 	 *  @return The history.
-	 */
+	 * /
 	public List getSteps()
 	{
 		return this.steps;
-	}
+	}*/
 	
 	/**
 	 *  Get the history.
@@ -382,8 +381,39 @@ public class MicroAgentInterpreter implements IComponentInstance
 	protected void addStep(Runnable step)
 	{
 		steps.add(step);
-		notifyListeners(new ChangeEvent(this, "new_step"));
+		notifyListeners(new ChangeEvent(this, "addStep", step));
 	}
+	
+	/**
+	 *  Add a new step.
+	 */
+	protected Object removeStep()
+	{
+		Object ret = steps.remove(0);
+		notifyListeners(new ChangeEvent(this, "removeStep", new Integer(0)));
+		return ret;
+	}
+	
+	/**
+	 *  Add a new step.
+	 */
+	protected void addHistoryEntry(String steptext)
+	{
+		if(history!=null)
+		{
+			history.add(steptext);
+			notifyListeners(new ChangeEvent(this, "addHistoryEntry", steptext));
+		}
+	}
+	
+	/**
+	 *  Clear the history.
+	 * /
+	public void clearHistory()
+	{
+		if(history!=null)
+			history.clear();
+	}*/
 	
 	/**
 	 *  Add an action from external thread.
@@ -619,6 +649,11 @@ public class MicroAgentInterpreter implements IComponentInstance
 		if(listeners==null)
 			listeners = new ArrayList();
 		listeners.add(listener);
+		
+		// Inform new listener of current state.
+		listener.changeOccurred(new ChangeEvent(this, "initialState", new Object[]{
+			steps.toArray(), history.toArray()
+		}));
 	}
 	
 	/**

@@ -76,7 +76,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 	//-------- attributes --------
 	
 	/** The agent table (showing platform DFs). */
-	protected ComponentTreeTable df_agents;
+	protected ComponentTreeTable df_components;
 
 	/** The agent table. */
 	protected DFAgentTable agent_table;
@@ -160,10 +160,10 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 	 */
 	public JComponent createView()
 	{
-		df_agents = new ComponentTreeTable(((AgentControlCenter)getJCC()).getAgent().getServiceContainer());
-		df_agents.setMinimumSize(new Dimension(0, 0));
-		df_agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		df_agents.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(REFRESH_DF);
+		df_components = new ComponentTreeTable(((AgentControlCenter)getJCC()).getAgent().getServiceContainer());
+		df_components.setMinimumSize(new Dimension(0, 0));
+		df_components.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		df_components.getNodeType(ComponentTreeTable.NODE_COMPONENT).addPopupAction(REFRESH_DF);
 
 		service_panel = new ServiceDescriptionPanel();
 		service_table = new DFServiceTable();
@@ -208,7 +208,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 			}
 		});
 		
-		df_agents.getTreetable().getSelectionModel().addListSelectionListener(
+		df_components.getTreetable().getSelectionModel().addListSelectionListener(
 			new ListSelectionListener()
 		{
 			public void valueChanged(ListSelectionEvent e)
@@ -258,7 +258,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 		split1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		split1.setDividerLocation(200);
 		split1.setOneTouchExpandable(true);
-		split1.add(df_agents);
+		split1.add(df_components);
 		split1.add(split2);
 	
 		main_panel.removeAll();
@@ -398,7 +398,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 		
 		Properties ps = props.getSubproperty("agents");
 		if(ps!=null)
-			df_agents.setProperties(ps);
+			df_components.setProperties(ps);
 	}
 
 	/**
@@ -422,7 +422,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 		
 		addSubproperties(props, "agenttable", agent_table.getProperties());
 		addSubproperties(props, "servicetable", service_table.getProperties());
-		addSubproperties(props, "agents", df_agents.getProperties());
+		addSubproperties(props, "agents", df_components.getProperties());
 		
 		return props;
 	}
@@ -513,7 +513,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 		{
 			public void run()
 			{*/
-				df_agents.removeComponent(ad);
+				df_components.removeComponent(ad);
 				//refresh();
 			/*}
 		});*/
@@ -535,9 +535,9 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 				// todo: other agents could be the df and not be named df?)
 				if(ad.getName().getName().startsWith("df@"))
 				{
-					df_agents.addComponent(ad);
+					df_components.addComponent(ad);
 					// Added first df -> select it.
-					if(df_agents.getAllComponents().length==1)
+					if(df_components.getAllComponents().length==1)
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
@@ -545,7 +545,7 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 							{
 //								df_agents.adjustColumnWidths();
 								
-								DefaultTreeTableNode[] nodes = df_agents.getAllComponents();
+								DefaultTreeTableNode[] nodes = df_components.getAllComponents();
 								//System.out.println(SUtil.arrayToString(nodes));
 								for(int i=0; i<nodes.length; i++)
 								{
@@ -553,8 +553,8 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 									if(desc.getName().getName().startsWith("df@"))
 									{
 										TreePath path = new TreePath(nodes[i].getPath());
-								        int row = df_agents.getTreetable().getTree().getRowForPath(path);
-								        df_agents.getTreetable().getSelectionModel().setSelectionInterval(row, row);
+								        int row = df_components.getTreetable().getTree().getRowForPath(path);
+								        df_components.getTreetable().getSelectionModel().setSelectionInterval(row, row);
 								        //System.out.println("seleected: "+row);
 								        break;
 									}
@@ -592,9 +592,9 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 	public IComponentDescription getSelectedDF()
 	{
 		IComponentDescription ret = null;
-		if(df_agents.getTreetable().getTree().getSelectionPath()!=null)
+		if(df_components.getTreetable().getTree().getSelectionPath()!=null)
 		{
-			DefaultTreeTableNode node = (DefaultTreeTableNode)df_agents.getTreetable().getTree()
+			DefaultTreeTableNode node = (DefaultTreeTableNode)df_components.getTreetable().getTree()
 				.getSelectionPath().getLastPathComponent();
 			if(node != null && node.getUserObject() instanceof IComponentDescription)
 				ret = (IComponentDescription)node.getUserObject();
