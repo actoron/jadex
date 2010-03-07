@@ -1,6 +1,6 @@
 Jadex Releases Overview
 
-Replease 2.0 rc1 (03/2010)
+Release 2.0 rc1 (Active components release 03/2010)
 	- Generic active components infrastructure for agents and other active elements
 	- Support for BPMN workflow modelling and execution
 	- Support for BPMN workflows as BDI plans

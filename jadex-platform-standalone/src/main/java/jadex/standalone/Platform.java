@@ -84,6 +84,12 @@ public class Platform extends AbstractPlatform
 	/** The fallback configuration for micro kernel. */
 	public static final String FALLBACK_MICRO_CONFIGURATION = "jadex/micro/kernel_micro_conf.xml";
 
+	/** The fallback configuration for bpmn kernel. */
+	public static final String FALLBACK_BPMN_CONFIGURATION = "jadex/bpmn/kernel_bpmn_conf.xml";
+
+	/** The fallback configuration for bdibpmn kernel. */
+	public static final String FALLBACK_BDIBPMN_CONFIGURATION = "jadex/bdibpmn/kernel_bdibpmn_conf.xml";
+
 	/** The configuration. */
 	protected Properties[] configurations;
 
@@ -413,8 +419,16 @@ public class Platform extends AbstractPlatform
 		}
 		else
 		{
-			conffiles = new String[]{FALLBACK_SERVICES_CONFIGURATION, FALLBACK_AGENTS_CONFIGURATION,
-				FALLBACK_APPLICATION_CONFIGURATION, FALLBACK_BDI_CONFIGURATION, FALLBACK_MICRO_CONFIGURATION};
+			conffiles = new String[]
+			{
+				FALLBACK_SERVICES_CONFIGURATION,
+				FALLBACK_AGENTS_CONFIGURATION,
+				FALLBACK_APPLICATION_CONFIGURATION,
+				FALLBACK_BDI_CONFIGURATION,
+				FALLBACK_MICRO_CONFIGURATION,
+				FALLBACK_BPMN_CONFIGURATION,
+				FALLBACK_BDIBPMN_CONFIGURATION
+			};
 		}
 		
 		// Create an instance of the platform.
