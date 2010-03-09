@@ -108,8 +108,14 @@ public class WorkitemTask implements ITask
 		String role = null;
 		
 		Map workitemMetaProps = (Map) metaProperties.get(null);
+		String name = null;
 		if (workitemMetaProps != null)
+		{
+			name = (String) workitemMetaProps.get("name");
 			role = (String) workitemMetaProps.get("role");
+		}
+		if (name == null)
+			name = context.getModelElement().getName();
 		
 		if (role == null)
 		{
@@ -121,7 +127,7 @@ public class WorkitemTask implements ITask
 		if (role == null)
 			role = IAAAService.ANY_ROLE;
 		
-		Workitem wi = new Workitem(context.getModelElement().getName(), type, role, parameterTypes, parameterValues, metaProperties, readOnlyParameters);
+		Workitem wi = new Workitem(name, type, role, parameterTypes, parameterValues, metaProperties, readOnlyParameters);
 		wi.setId(context.getModelElement().getName() + "_" + String.valueOf(Integer.toHexString(System.identityHashCode(wi))));
 		return wi;
 	}
