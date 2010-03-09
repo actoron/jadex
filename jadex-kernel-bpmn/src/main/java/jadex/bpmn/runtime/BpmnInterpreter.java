@@ -34,6 +34,7 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.service.clock.IClockService;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1030,9 +1031,56 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	 */
 	public void setContextVariable(String name, Object value)
 	{
+		setContextVariable(name, null, value);
+		
+//		if(variables!=null && variables.containsKey(name))
+//		{
+//			variables.put(name, value);			
+//		}
+//		else
+//		{
+//			throw new RuntimeException("Undeclared context variable: "+name+", "+this);
+//		}
+	}
+	
+	/**
+	 *  Set the value of the given context variable.
+	 *  @param name	The variable name.
+	 *  @param value	The variable value.
+	 */
+	public void setContextVariable(String name, Object key, Object value)
+	{
 		if(variables!=null && variables.containsKey(name))
 		{
-			variables.put(name, value);			
+			if(key==null)
+			{
+				variables.put(name, value);	
+			}
+			else
+			{
+				Object coll = variables.get(name);
+				if(coll instanceof List)
+				{
+					int index = key==null? -1: ((Number)key).intValue();
+					if(index>=0)
+						((List)coll).set(index, value);
+					else
+						((List)coll).add(value);
+				}
+				else if(coll.getClass().isArray())
+				{
+					int index = ((Number)key).intValue();
+					Array.set(coll, index, value);
+				}
+				else if(coll instanceof Map)
+				{
+					((Map)coll).put(key, value);
+				}
+				else
+				{
+					throw new RuntimeException("Unsupported collection type: "+coll);
+				}
+			}
 		}
 		else
 		{

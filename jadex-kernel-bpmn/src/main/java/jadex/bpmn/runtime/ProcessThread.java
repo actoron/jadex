@@ -302,10 +302,49 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public void	setParameterValue(String name, Object value)
 	{
+		setParameterValue(name, null, value);
+	}
+	
+	/**
+	 *  Set the value of a parameter.
+	 *  @param name	The parameter name. 
+	 *  @param value	The parameter value. 
+	 */
+	public void	setParameterValue(String name, Object key, Object value)
+	{
 		if(data==null)
 			data = new HashMap();
 			
-		data.put(name, value);
+		
+		if(key==null)
+		{
+			data.put(name, value);	
+		}
+		else
+		{
+			Object coll = data.get(name);
+			if(coll instanceof List)
+			{
+				int index = key==null? -1: ((Number)key).intValue();
+				if(index>=0)
+					((List)coll).set(index, value);
+				else
+					((List)coll).add(value);
+			}
+			else if(coll.getClass().isArray())
+			{
+				int index = ((Number)key).intValue();
+				Array.set(coll, index, value);
+			}
+			else if(coll instanceof Map)
+			{
+				((Map)coll).put(key, value);
+			}
+			else
+			{
+				throw new RuntimeException("Unsupported collection type: "+coll);
+			}
+		}
 	}
 
 	/**
@@ -482,7 +521,7 @@ public class ProcessThread	implements ITaskContext
 	protected  void updateParametersBeforeStep(BpmnInterpreter instance)
 	{
 //		System.out.println("before: "+getActivity());
-		
+
 		if(MBpmnModel.TASK.equals(getActivity().getActivityType())
 			|| getActivity() instanceof MSubProcess)
 		{
@@ -599,8 +638,15 @@ public class ProcessThread	implements ITaskContext
 					}
 					else
 					{
+						try
+						{
 						setParameterValue(param.getName(), param.getInitialValue()==null? null: param.getInitialValue().getValue(fetcher));
 						before.remove(param.getName());
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
 					}
 				}
 			}

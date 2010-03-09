@@ -172,7 +172,7 @@ public class ControlCenter implements IControlCenter
 						}
 					}
 
-					else
+					if(proj==null || proj.length()==0)
 					{
 						// Use default title, location and plugin
 						setCurrentProject(null);

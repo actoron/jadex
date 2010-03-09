@@ -1,6 +1,5 @@
 package jadex.bdibpmn;
 
-import jadex.bdi.interpreter.AgentRules;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.GoalLifecycleRules;
 import jadex.bdi.interpreter.InternalEventRules;

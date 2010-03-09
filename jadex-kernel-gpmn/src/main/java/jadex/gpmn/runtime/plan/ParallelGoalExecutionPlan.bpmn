@@ -1,27 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_xP7ZEX3MEd6VFdlpWzoevQ" iD="_xP7ZEH3MEd6VFdlpWzoevQ" name="SequentialGoalExecutionPlan">
-  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_IzD2wX3OEd6VFdlpWzoevQ" iD="_IzD2wH3OEd6VFdlpWzoevQ" name="package jadex.gpmn.runtime.plan;&#xD;&#xA;&#xD;&#xA;import jadex.bdi.runtime.IGoal;&#xD;&#xA;import jadex.bdibpmn.task.*;">
-    <associations xmi:type="bpmn:Association" xmi:id="_IzNnyX3OEd6VFdlpWzoevQ"/>
-  </artifacts>
-  <pools xmi:type="bpmn:Pool" xmi:id="_xQYFAX3MEd6VFdlpWzoevQ" iD="_xQYFAH3MEd6VFdlpWzoevQ" associations="_IzNnyX3OEd6VFdlpWzoevQ" name="body">
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_xP7ZEX3MEd6VFdlpWzoevQ" iD="_xP7ZEH3MEd6VFdlpWzoevQ" name="SequentialGoalExecutionPlan">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_C9hi8Ct2Ed-9ZqMLV3tO6w" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_C9hi8St2Ed-9ZqMLV3tO6w" key="imports" value="jadex.bdi.runtime.IGoal␟jadex.bdibpmn.task.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_C9hi8it2Ed-9ZqMLV3tO6w" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_C9rT8Ct2Ed-9ZqMLV3tO6w" key="Package" value="jadex.gpmn.runtime.plan"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_xQYFAX3MEd6VFdlpWzoevQ" iD="_xQYFAH3MEd6VFdlpWzoevQ" name="body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_2Yo_UX3MEd6VFdlpWzoevQ" iD="_2Yo_UH3MEd6VFdlpWzoevQ" outgoingEdges="_Mdk2IX3NEd6VFdlpWzoevQ" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_6q0mMX3MEd6VFdlpWzoevQ" iD="_6q0mMH3MEd6VFdlpWzoevQ" outgoingEdges="_BpS-wX3OEd6VFdlpWzoevQ _AEp6MX3kEd6VFdlpWzoevQ" incomingEdges="_NNZwkX3NEd6VFdlpWzoevQ" activityType="GatewayDataBasedExclusive"/>
-    <vertices xmi:type="bpmn:SubProcess" xmi:id="_HVAZ0X3NEd6VFdlpWzoevQ" iD="_HVAZ0H3NEd6VFdlpWzoevQ" outgoingEdges="_NNZwkX3NEd6VFdlpWzoevQ" incomingEdges="_Mdk2IX3NEd6VFdlpWzoevQ _BpS-wX3OEd6VFdlpWzoevQ" name="inout int i = 0&#xD;&#xA;out IGoal[] goals = new IGoal[$plan.subgoals.length]" looping="false">
-      <vertices xmi:type="bpmn:Activity" xmi:id="_HVAZ033NEd6VFdlpWzoevQ" iD="_HVAZ0n3NEd6VFdlpWzoevQ" outgoingEdges="_RMT0Kn3jEd6VFdlpWzoevQ" name="Dispatch Goal&#xD;&#xA;&#xD;&#xA;class = DispatchGoalTask.class&#xD;&#xA;in String type = $plan.subgoals[i]&#xD;&#xA;in boolean wait = false&#xD;&#xA;out IGoal goal"/>
-      <vertices xmi:type="bpmn:Activity" xmi:id="_RMT0IX3jEd6VFdlpWzoevQ" iD="_RMT0IH3jEd6VFdlpWzoevQ" incomingEdges="_RMT0Kn3jEd6VFdlpWzoevQ" name="dummy" activityType="Task" looping="false"/>
-      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_RMT0Kn3jEd6VFdlpWzoevQ" iD="_RMT0KX3jEd6VFdlpWzoevQ" name="goals[i] = goal"/>
-    </vertices>
-    <vertices xmi:type="bpmn:SubProcess" xmi:id="_8jpRkX3jEd6VFdlpWzoevQ" iD="_8jpRkH3jEd6VFdlpWzoevQ" outgoingEdges="_Jdw-qn3kEd6VFdlpWzoevQ" incomingEdges="_AEp6MX3kEd6VFdlpWzoevQ _LIwg0X3kEd6VFdlpWzoevQ" name="inout int i = 0&#xD;&#xA;in IGoal[] goals">
-      <vertices xmi:type="bpmn:Activity" xmi:id="_vccVUX3kEd6VFdlpWzoevQ" iD="_vccVUH3kEd6VFdlpWzoevQ" name="Wait For Goal&#xD;&#xA;&#xD;&#xA;class = WaitForGoalTask.class&#xD;&#xA;in IGoal goal = goals[i]"/>
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_HVAZ0X3NEd6VFdlpWzoevQ" iD="_HVAZ0H3NEd6VFdlpWzoevQ" outgoingEdges="_NNZwkX3NEd6VFdlpWzoevQ" incomingEdges="_Mdk2IX3NEd6VFdlpWzoevQ _BpS-wX3OEd6VFdlpWzoevQ" name="" looping="false">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_bMSNACt2Ed-9ZqMLV3tO6w" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bMSNASt2Ed-9ZqMLV3tO6w" key="class" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_egyDoCt2Ed-9ZqMLV3tO6w" key="parameters" value="inout␋i␋int␋0␟inout␋goals␋IGoal[]␋goals==null? new IGoal[$plan.subgoals.length]: goals"/>
+      </eAnnotations>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_HVAZ033NEd6VFdlpWzoevQ" iD="_HVAZ0n3NEd6VFdlpWzoevQ" outgoingEdges="_RMT0Kn3jEd6VFdlpWzoevQ" name="Dispatch Goal">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_LWHlkCt2Ed-9ZqMLV3tO6w" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LWHlkSt2Ed-9ZqMLV3tO6w" key="class" value="DispatchGoalTask.class"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NCckgCt2Ed-9ZqMLV3tO6w" key="parameters" value="in␋type␋String␋$plan.subgoals[i]␟in␋wait␋boolean␋false␟out␋goal␋IGoal␋"/>
+        </eAnnotations>
+      </vertices>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_RMT0IX3jEd6VFdlpWzoevQ" iD="_RMT0IH3jEd6VFdlpWzoevQ" incomingEdges="_RMT0Kn3jEd6VFdlpWzoevQ" name="Store Created Goal" activityType="Task" looping="false">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_bq-7MCt2Ed-9ZqMLV3tO6w" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bq-7MSt2Ed-9ZqMLV3tO6w" key="class" value="jadex.bpmn.runtime.task.WriteContextTask.class"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5imj0Ct5Ed-9ZqMLV3tO6w" key="parameters" value="in␋variablename␋String␋&quot;goals&quot;␟in␋value␋Object␋goal␟in␋key␋int␋i"/>
+        </eAnnotations>
+      </vertices>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_RMT0Kn3jEd6VFdlpWzoevQ" iD="_RMT0KX3jEd6VFdlpWzoevQ" name="">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_lsVEUCt2Ed-9ZqMLV3tO6w" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lsVEUSt2Ed-9ZqMLV3tO6w" key="imports" value=""/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lsVEUit2Ed-9ZqMLV3tO6w" key="condition" value=""/>
+        </eAnnotations>
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_nJT_sCt2Ed-9ZqMLV3tO6w" source="sequence">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nJT_sSt2Ed-9ZqMLV3tO6w" key="mappings" value=""/>
+        </eAnnotations>
+      </sequenceEdges>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_Jdw-oX3kEd6VFdlpWzoevQ" iD="_Jdw-oH3kEd6VFdlpWzoevQ" outgoingEdges="_KdGUun3kEd6VFdlpWzoevQ _LIwg0X3kEd6VFdlpWzoevQ" incomingEdges="_Jdw-qn3kEd6VFdlpWzoevQ" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_KdGUsX3kEd6VFdlpWzoevQ" iD="_KdGUsH3kEd6VFdlpWzoevQ" incomingEdges="_KdGUun3kEd6VFdlpWzoevQ" activityType="EventEndEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_4vKKISt4Ed-9ZqMLV3tO6w" iD="_4vKKICt4Ed-9ZqMLV3tO6w" outgoingEdges="_Jdw-qn3kEd6VFdlpWzoevQ" incomingEdges="_AEp6MX3kEd6VFdlpWzoevQ _LIwg0X3kEd6VFdlpWzoevQ" name="Wait For Goal">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_4385wCt4Ed-9ZqMLV3tO6w" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4385wSt4Ed-9ZqMLV3tO6w" key="class" value="WaitForGoalTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-T4-ACt4Ed-9ZqMLV3tO6w" key="parameters" value="inout␋i␋int␋0␟inout␋goals␋IGoal[]␋goals␟in␋goal␋IGoal␋goals[i]"/>
+      </eAnnotations>
+    </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Mdk2IX3NEd6VFdlpWzoevQ" iD="_Mdk2IH3NEd6VFdlpWzoevQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_NNZwkX3NEd6VFdlpWzoevQ" iD="_NNZwkH3NEd6VFdlpWzoevQ" name=""/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_BpS-wX3OEd6VFdlpWzoevQ" iD="_BpS-wH3OEd6VFdlpWzoevQ" name="i+1 &lt; $plan.subgoals.length&#xD;&#xA;i=i+1&#xD;&#xA;goals = goals"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_AEp6MX3kEd6VFdlpWzoevQ" iD="_AEp6MH3kEd6VFdlpWzoevQ" name="goals = goals"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Jdw-qn3kEd6VFdlpWzoevQ" iD="_Jdw-qX3kEd6VFdlpWzoevQ"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_KdGUun3kEd6VFdlpWzoevQ" iD="_KdGUuX3kEd6VFdlpWzoevQ"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_LIwg0X3kEd6VFdlpWzoevQ" iD="_LIwg0H3kEd6VFdlpWzoevQ" name="i+1 &lt; goals.length&#xD;&#xA;i=i+1&#xD;&#xA;goals = goals"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_BpS-wX3OEd6VFdlpWzoevQ" iD="_BpS-wH3OEd6VFdlpWzoevQ" name="&#xD;&#xA;">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_51bgkCt2Ed-9ZqMLV3tO6w" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_51bgkSt2Ed-9ZqMLV3tO6w" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_51bgkit2Ed-9ZqMLV3tO6w" key="condition" value="i+1 &lt; $plan.subgoals.length"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_8G3XsCt2Ed-9ZqMLV3tO6w" source="sequence">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8G3XsSt2Ed-9ZqMLV3tO6w" key="mappings" value="i␋i+1"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_AEp6MX3kEd6VFdlpWzoevQ" iD="_AEp6MH3kEd6VFdlpWzoevQ" name="When all goals have been created">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_1iHmYCt4Ed-9ZqMLV3tO6w" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1iHmYSt4Ed-9ZqMLV3tO6w" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1iHmYit4Ed-9ZqMLV3tO6w" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Jdw-qn3kEd6VFdlpWzoevQ" iD="_Jdw-qX3kEd6VFdlpWzoevQ">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_15EGwCt4Ed-9ZqMLV3tO6w" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_15EGwSt4Ed-9ZqMLV3tO6w" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_15EGwit4Ed-9ZqMLV3tO6w" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_KdGUun3kEd6VFdlpWzoevQ" iD="_KdGUuX3kEd6VFdlpWzoevQ" name="When all goals have been finished">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_T_Cb0Ct5Ed-9ZqMLV3tO6w" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_T_Cb0St5Ed-9ZqMLV3tO6w" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_T_Cb0it5Ed-9ZqMLV3tO6w" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_LIwg0X3kEd6VFdlpWzoevQ" iD="_LIwg0H3kEd6VFdlpWzoevQ" name="&#xD;&#xA;">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-cLCMCt2Ed-9ZqMLV3tO6w" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-cLCMSt2Ed-9ZqMLV3tO6w" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-cLCMit2Ed-9ZqMLV3tO6w" key="condition" value="i+1 &lt; goals.length"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_AFYbsCt3Ed-9ZqMLV3tO6w" source="sequence">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AFYbsSt3Ed-9ZqMLV3tO6w" key="mappings" value="i␋i+1"/>
+      </eAnnotations>
+    </sequenceEdges>
   </pools>
 </bpmn:BpmnDiagram>
