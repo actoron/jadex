@@ -264,6 +264,16 @@ public class ProcessThread	implements ITaskContext
 		return ret;
 	}
 	
+	/**
+	 *  Test if a parameter has been set on activity.
+	 *  @param name	The parameter name. 
+	 *  @return	True if parameter is known.
+	 */
+	public boolean hasOwnParameterValue(String name)
+	{
+		return data!=null && data.containsKey(name);
+	}
+	
 	//-------- ITaskContext --------
 	
 	/**
@@ -273,7 +283,8 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public boolean hasParameterValue(String name)
 	{
-		return data!=null && data.containsKey(name);
+		return hasOwnParameterValue(name) || getThreadContext().getInitiator()!=null 
+			&& getThreadContext().getInitiator().hasParameterValue(name);
 	}
 
 	/**
@@ -292,7 +303,9 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public Object getParameterValue(String name)
 	{
-		return data!=null ? data.get(name): null;
+		return hasOwnParameterValue(name)? data.get(name): 
+			getThreadContext().getInitiator()!=null? 
+			getThreadContext().getInitiator().getParameterValue(name): null;
 	}
 
 	/**
@@ -312,9 +325,17 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public void	setParameterValue(String name, Object key, Object value)
 	{
+		if(!getActivity().hasParameter(name))
+		{
+			ProcessThread pt = getThreadContext().getInitiator();
+			if(pt!=null)
+			{
+				pt.setParameterValue(name, key, value);
+			}
+		}
+			
 		if(data==null)
 			data = new HashMap();
-			
 		
 		if(key==null)
 		{
@@ -331,7 +352,7 @@ public class ProcessThread	implements ITaskContext
 				else
 					((List)coll).add(value);
 			}
-			else if(coll.getClass().isArray())
+			else if(coll!=null && coll.getClass().isArray())
 			{
 				int index = ((Number)key).intValue();
 				Array.set(coll, index, value);
@@ -340,10 +361,10 @@ public class ProcessThread	implements ITaskContext
 			{
 				((Map)coll).put(key, value);
 			}
-			else
-			{
-				throw new RuntimeException("Unsupported collection type: "+coll);
-			}
+//			else
+//			{
+//				throw new RuntimeException("Unsupported collection type: "+coll);
+//			}
 		}
 	}
 
@@ -567,24 +588,10 @@ public class ProcessThread	implements ITaskContext
 							found	= true;
 						}
 						
-						if(!found)
+						if(!found && hasParameterValue(name))
 						{
-							for(ProcessThread t=this.getThreadContext().getInitiator(); t!=null && !found; t=t.getThreadContext().getInitiator() )
-							{
-								if(t.getActivity().hasParameter(name))
-								{
-									if(iexp!=null)
-									{
-										Object	array	= t.getParameterValue(name);
-										Array.set(array, ((Number)index).intValue(), value);
-									}
-									else
-									{
-										t.setParameterValue(name, value);
-									}
-									found	= true;
-								}
-							}
+							setParameterValue(name, index, value);
+							found	= true;
 						}
 						
 						if(!found && instance.hasContextVariable(name))

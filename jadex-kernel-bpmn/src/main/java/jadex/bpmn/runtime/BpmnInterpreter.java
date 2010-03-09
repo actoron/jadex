@@ -1067,7 +1067,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 					else
 						((List)coll).add(value);
 				}
-				else if(coll.getClass().isArray())
+				else if(coll!=null && coll.getClass().isArray())
 				{
 					int index = ((Number)key).intValue();
 					Array.set(coll, index, value);

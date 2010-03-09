@@ -40,6 +40,14 @@ public interface ITaskContext
 	 *  @param value	The parameter value. 
 	 */
 	public void	setParameterValue(String name, Object value);
+
+	/**
+	 *  Set the value of a parameter.
+	 *  @param name	The parameter name.
+	 *  @param key An optional helper (index, key etc.) 
+	 *  @param value The parameter value. 
+	 */
+	public void	setParameterValue(String name, Object key, Object value);
 	
 	/**
 	 *  Get the value of a property.
@@ -68,4 +76,5 @@ public interface ITaskContext
 	 *  @param value The result value. 
 	 */
 	public void	setResultValue(String name, Object value);
+	
 }
