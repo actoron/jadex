@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpmn:GpmnDiagram xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" id="_hWX5ECtoEd-cIrzPTxeRYA">
+  <artifacts xsi:type="gpmn:Context" id="_iB3tICtoEd-cIrzPTxeRYA"/>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_iaoycCtoEd-cIrzPTxeRYA" name="MainGoal" sequential="true">
+    <outgoingEdges>_nF5AoCtoEd-cIrzPTxeRYA</outgoingEdges>
+    <outgoingEdges>_n5MF0CtoEd-cIrzPTxeRYA</outgoingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_jSiq0CtoEd-cIrzPTxeRYA" name="FailingGoal">
+    <outgoingEdges>_xQ--0CtsEd-cIrzPTxeRYA</outgoingEdges>
+    <incomingEdges>_nF5AoCtoEd-cIrzPTxeRYA</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:AchieveGoal" id="_kr2AECtoEd-cIrzPTxeRYA" name="NeverUsedGoal">
+    <outgoingEdges>_95ohYCtsEd-cIrzPTxeRYA</outgoingEdges>
+    <incomingEdges>_n5MF0CtoEd-cIrzPTxeRYA</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:Plan" id="_vGDYUCtsEd-cIrzPTxeRYA" name="FailingPlan" bpmnPlan="/jadex/gpmn/examples/patterns/FailingPlan.bpmn">
+    <incomingEdges>_xQ--0CtsEd-cIrzPTxeRYA</incomingEdges>
+  </vertices>
+  <vertices xsi:type="gpmn:Plan" id="_3KM08CtsEd-cIrzPTxeRYA" name="NeverUsedPlan" bpmnPlan="/jadex/gpmn/examples/patterns/FailingPlan.bpmn">
+    <incomingEdges>_95ohYCtsEd-cIrzPTxeRYA</incomingEdges>
+  </vertices>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_nF5AoCtoEd-cIrzPTxeRYA" sequentialOrder="1"/>
+  <sequenceEdges xsi:type="gpmn:SubGoalEdge" id="_n5MF0CtoEd-cIrzPTxeRYA" sequentialOrder="2"/>
+  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_xQ--0CtsEd-cIrzPTxeRYA"/>
+  <sequenceEdges xsi:type="gpmn:PlanEdge" id="_95ohYCtsEd-cIrzPTxeRYA"/>
+</gpmn:GpmnDiagram>
