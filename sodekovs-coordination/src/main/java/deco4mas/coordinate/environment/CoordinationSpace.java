@@ -166,45 +166,94 @@ public class CoordinationSpace extends Grid2D {
 
 	}
 
+//	/**
+//	 * Called when an agent was added.
+//	 */
+//	public void agentAdded(IComponentIdentifier aid) {
+//		synchronized (monitor) {
+//			// Possibly add or create avatar(s) if any.
+//			if (initialavatars != null && initialavatars.containsKey(aid)) {
+//				Object[] ia = (Object[]) initialavatars.get(aid);
+//				String objecttype = (String) ia[0];
+//				Map props = (Map) ia[1];
+//				if (props == null)
+//					props = new HashMap();
+//				props.put(ISpaceObject.PROPERTY_OWNER, aid);
+//				createSpaceObject(objecttype, props, null);
+//			} else {
+////				String agenttype = ((ApplicationContext) getContext()).getAgentType(aid);
+//				String agenttype = ((IApplication) getContext()).getComponentType(aid);
+//				if (agenttype != null && avatarmappings.getCollection(agenttype) != null) {
+//					for (Iterator it = avatarmappings.getCollection(agenttype).iterator(); it.hasNext();) {
+//						AvatarMapping mapping = (AvatarMapping) it.next();
+//						if (mapping.isCreateAvatar()) {
+//							Map props = new HashMap();
+//							props.put(ISpaceObject.PROPERTY_OWNER, aid);
+////							createSpaceObject(mapping.getAvatarType(), props, null);
+//							createSpaceObject(mapping.getObjectType(), props, null);
+//						}
+//					}
+//				}
+//			}
+//
+//			if (perceptgenerators != null) {
+//				for (Iterator it = perceptgenerators.keySet().iterator(); it.hasNext();) {
+//					IPerceptGenerator gen = (IPerceptGenerator) perceptgenerators.get(it.next());
+//					gen.componentAdded(aid, this);
+//				}
+//			}
+//			// init Agent for deco4MAS participation
+//			initParticipatingAgent(aid);
+//		}		
+//	}
+	
 	/**
-	 * Called when an agent was added.
+	 *  Called when an component was added. 
 	 */
-	public void agentAdded(IComponentIdentifier aid) {
-		synchronized (monitor) {
+	public void componentAdded(IComponentIdentifier aid, String type)
+	{
+		synchronized(monitor)
+		{
 			// Possibly add or create avatar(s) if any.
-			if (initialavatars != null && initialavatars.containsKey(aid)) {
-				Object[] ia = (Object[]) initialavatars.get(aid);
-				String objecttype = (String) ia[0];
-				Map props = (Map) ia[1];
-				if (props == null)
-					props = new HashMap();
+			if(initialavatars!=null && initialavatars.containsKey(aid))
+			{
+				Object[]	ia	= (Object[])initialavatars.get(aid);
+				String	objecttype	=	(String)ia[0];
+				Map	props	=	(Map)ia[1];
+				if(props==null)
+					props	= new HashMap();
 				props.put(ISpaceObject.PROPERTY_OWNER, aid);
 				createSpaceObject(objecttype, props, null);
-			} else {
-//				String agenttype = ((ApplicationContext) getContext()).getAgentType(aid);
-				String agenttype = ((IApplication) getContext()).getComponentType(aid);
-				if (agenttype != null && avatarmappings.getCollection(agenttype) != null) {
-					for (Iterator it = avatarmappings.getCollection(agenttype).iterator(); it.hasNext();) {
-						AvatarMapping mapping = (AvatarMapping) it.next();
-						if (mapping.isCreateAvatar()) {
-							Map props = new HashMap();
+			}
+			else
+			{
+				String	componenttype	= context.getComponentType(aid);
+				if(componenttype!=null && avatarmappings.getCollection(componenttype)!=null)
+				{
+					for(Iterator it=avatarmappings.getCollection(componenttype).iterator(); it.hasNext(); )
+					{
+						AvatarMapping mapping = (AvatarMapping)it.next();
+						if(mapping.isCreateAvatar())
+						{
+							Map	props	= new HashMap();
 							props.put(ISpaceObject.PROPERTY_OWNER, aid);
-//							createSpaceObject(mapping.getAvatarType(), props, null);
 							createSpaceObject(mapping.getObjectType(), props, null);
 						}
 					}
 				}
 			}
-
-			if (perceptgenerators != null) {
-				for (Iterator it = perceptgenerators.keySet().iterator(); it.hasNext();) {
-					IPerceptGenerator gen = (IPerceptGenerator) perceptgenerators.get(it.next());
+			
+			if(perceptgenerators!=null)
+			{
+				for(Iterator it=perceptgenerators.keySet().iterator(); it.hasNext(); )
+				{
+					IPerceptGenerator gen = (IPerceptGenerator)perceptgenerators.get(it.next());
 					gen.componentAdded(aid, this);
 				}
 			}
 			// init Agent for deco4MAS participation
 			initParticipatingAgent(aid);
-		}		
+		}
 	}
 	
 	/**
