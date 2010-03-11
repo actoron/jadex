@@ -1076,10 +1076,10 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 				{
 					((Map)coll).put(key, value);
 				}
-				else
-				{
-					throw new RuntimeException("Unsupported collection type: "+coll);
-				}
+//				else
+//				{
+//					throw new RuntimeException("Unsupported collection type: "+coll);
+//				}
 			}
 		}
 		else
