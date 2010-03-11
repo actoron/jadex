@@ -75,6 +75,11 @@ public class GpmnDiagramMessages extends NLS
 	 * @generated NOT
 	 */
 	public static String PlanEditPart_plan_default_name;
+	
+	/**
+	 * @generated NOT
+	 */
+	public static String GenericEditPart_element_default_name;
 
 	//TODO: put accessor fields manually	
 }

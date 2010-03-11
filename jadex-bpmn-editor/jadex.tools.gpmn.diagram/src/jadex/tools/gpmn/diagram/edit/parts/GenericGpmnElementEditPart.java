@@ -8,7 +8,9 @@
  */
 package jadex.tools.gpmn.diagram.edit.parts;
 
+import jadex.tools.gpmn.GenericGpmnElement;
 import jadex.tools.gpmn.diagram.edit.policies.GenericGpmnElementItemSemanticEditPolicy;
+import jadex.tools.gpmn.diagram.part.GpmnDiagramMessages;
 import jadex.tools.gpmn.diagram.part.GpmnVisualIDRegistry;
 import jadex.tools.gpmn.diagram.providers.GpmnElementTypes;
 import jadex.tools.gpmn.figures.GenericFigure;
@@ -18,6 +20,7 @@ import java.util.List;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.Shape;
 import org.eclipse.draw2d.StackLayout;
 import org.eclipse.emf.common.notify.Notification;
@@ -41,9 +44,10 @@ import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.swt.graphics.Color;
 
 /**
- * @generated
+ * @generated NOT
+ * 			extend {@link AbstractEditPartSupport}
  */
-public class GenericGpmnElementEditPart extends ShapeNodeEditPart
+public class GenericGpmnElementEditPart extends AbstractEditPartSupport
 {
 
 	/**
@@ -117,10 +121,78 @@ public class GenericGpmnElementEditPart extends ShapeNodeEditPart
 	/**
 	 * @generated
 	 */
-	protected IFigure createNodeShape()
+	protected IFigure createNodeShapeGen()
 	{
 		GenericGpmnFigure figure = new GenericGpmnFigure();
 		return primaryShape = figure;
+	}
+	
+	/**
+	 * @generated NOT
+	 */
+	protected IFigure createNodeShape()
+	{
+		GenericGpmnFigure figure = new GenericGpmnFigure();
+		GenericGpmnElement element = (GenericGpmnElement) getPrimaryView().getElement();
+		
+		setLabelAndLayout(figure, element);
+		
+		return primaryShape = figure;
+	}
+	
+	/**
+	 * Update the figure with proper label and layout
+	 * 
+	 * @param figure
+	 * @param element
+	 * @return true if refreshVisual is recommended (there was a change)
+	 * 
+	 * @generated NOT
+	 */
+	private boolean setLabelAndLayout(GenericGpmnFigure figure, GenericGpmnElement element)
+	{
+		boolean res = false;
+		WrappingLabel wl = figure.getFigureGenericNameFigure();
+		wl.setTextWrap(true);
+
+		if (element.getName() == null)
+		{
+
+			if (!GpmnDiagramMessages.GenericEditPart_element_default_name.equals(wl
+					.getText()))
+			{
+				wl.setText(GpmnDiagramMessages.GenericEditPart_element_default_name);
+			}
+			res = true;
+		}
+
+		return setAlignments(figure, element, wl, res);
+	}
+	
+	/**
+	 * Align label in figure
+	 * 
+	 * @param figure
+	 * @param plan
+	 * @param wl
+	 * @param res
+	 * @return
+	 */
+	private boolean setAlignments(GenericGpmnFigure figure, GenericGpmnElement plan,
+			WrappingLabel wl, boolean res)
+	{
+
+		if (!(figure.getLayoutManager() instanceof StackLayout))
+		{
+			StackLayout layout = new StackLayout();
+			figure.setLayoutManager(layout);
+			res = true;
+		}
+		wl.setAlignment(PositionConstants.CENTER);
+		wl.setTextJustification(PositionConstants.CENTER);
+
+		figure.invalidate();
+		return res;
 	}
 
 	/**

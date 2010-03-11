@@ -180,26 +180,26 @@ public class PlanEditPart extends AbstractEditPartSupport
 	/**
 	 * Align label in figure
 	 * 
-	 * @param goalFigure
+	 * @param figure
 	 * @param plan
 	 * @param wl
 	 * @param res
 	 * @return
 	 */
-	private boolean setAlignments(PlanFigure goalFigure, Plan plan,
+	private boolean setAlignments(PlanFigure figure, Plan plan,
 			WrappingLabel wl, boolean res)
 	{
 
-		if (!(goalFigure.getLayoutManager() instanceof StackLayout))
+		if (!(figure.getLayoutManager() instanceof StackLayout))
 		{
 			StackLayout layout = new StackLayout();
-			goalFigure.setLayoutManager(layout);
+			figure.setLayoutManager(layout);
 			res = true;
 		}
 		wl.setAlignment(PositionConstants.CENTER);
 		wl.setTextJustification(PositionConstants.CENTER);
 
-		goalFigure.invalidate();
+		figure.invalidate();
 		return res;
 	}
 

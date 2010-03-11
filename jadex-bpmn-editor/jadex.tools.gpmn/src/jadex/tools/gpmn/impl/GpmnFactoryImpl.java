@@ -670,20 +670,22 @@ public class GpmnFactoryImpl extends EFactoryImpl implements GpmnFactory
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	public GenericGpmnElement createGenericGpmnElement() {
 		GenericGpmnElementImpl genericGpmnElement = new GenericGpmnElementImpl();
+		genericGpmnElement.id = EcoreUtil.generateUUID();
 		return genericGpmnElement;
 	}
 
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	public GenericGpmnEdge createGenericGpmnEdge() {
 		GenericGpmnEdgeImpl genericGpmnEdge = new GenericGpmnEdgeImpl();
+		genericGpmnEdge.id = EcoreUtil.generateUUID();
 		return genericGpmnEdge;
 	}
 
