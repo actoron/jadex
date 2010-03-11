@@ -5,7 +5,7 @@
     <styles xmi:type="notation:FontStyle" xmi:id="_8h5DoityEd-cIrzPTxeRYA" fontName="Sans Serif"/>
     <styles xmi:type="notation:FillStyle" xmi:id="_8h5DoytyEd-cIrzPTxeRYA"/>
     <element xmi:type="gpmn:Context" href="FailedPerformGoal.gpmn#_8h4ckCtyEd-cIrzPTxeRYA"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_8h5DpCtyEd-cIrzPTxeRYA" x="11" y="11"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_8h5DpCtyEd-cIrzPTxeRYA" x="-88" y="11"/>
   </children>
   <children xmi:type="notation:Node" xmi:id="_9QpnECtyEd-cIrzPTxeRYA" type="2004">
     <children xmi:type="notation:DecorationNode" xmi:id="_9QqOICtyEd-cIrzPTxeRYA" type="5004"/>

@@ -16,8 +16,8 @@
     <incomingEdges>_New0cCtzEd-cIrzPTxeRYA</incomingEdges>
   </vertices>
   <vertices xsi:type="gpmn:AchieveGoal" id="_5UkM8CwrEd-fR-V1BYdsIg" name="MainGoal" sequential="true">
-    <outgoingEdges>_655MACwrEd-fR-V1BYdsIg</outgoingEdges>
     <outgoingEdges>_7NfdcCwrEd-fR-V1BYdsIg</outgoingEdges>
+    <outgoingEdges>_655MACwrEd-fR-V1BYdsIg</outgoingEdges>
   </vertices>
   <sequenceEdges xsi:type="gpmn:PlanEdge" id="_J6byECtzEd-cIrzPTxeRYA"/>
   <sequenceEdges xsi:type="gpmn:PlanEdge" id="_New0cCtzEd-cIrzPTxeRYA"/>

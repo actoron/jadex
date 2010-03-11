@@ -2,8 +2,8 @@
 <gpmn:GpmnDiagram xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" id="_hWX5ECtoEd-cIrzPTxeRYA">
   <artifacts xsi:type="gpmn:Context" id="_iB3tICtoEd-cIrzPTxeRYA"/>
   <vertices xsi:type="gpmn:AchieveGoal" id="_iaoycCtoEd-cIrzPTxeRYA" name="MainGoal" sequential="true">
-    <outgoingEdges>_nF5AoCtoEd-cIrzPTxeRYA</outgoingEdges>
     <outgoingEdges>_n5MF0CtoEd-cIrzPTxeRYA</outgoingEdges>
+    <outgoingEdges>_nF5AoCtoEd-cIrzPTxeRYA</outgoingEdges>
   </vertices>
   <vertices xsi:type="gpmn:AchieveGoal" id="_jSiq0CtoEd-cIrzPTxeRYA" name="FailingGoal">
     <outgoingEdges>_xQ--0CtsEd-cIrzPTxeRYA</outgoingEdges>

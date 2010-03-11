@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_7YpZACw1Ed-fR-V1BYdsIg" type="Gpmn" name="GoalReactivation.gpmn_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_NO3TACw-Ed-fR-V1BYdsIg" type="2011">
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_NO3TASw-Ed-fR-V1BYdsIg"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_NO3TAiw-Ed-fR-V1BYdsIg" fontName="Sans Serif"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_NO3TAyw-Ed-fR-V1BYdsIg"/>
+    <element xmi:type="gpmn:Context" href="GoalReactivation.gpmn#_NO02wCw-Ed-fR-V1BYdsIg"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_NO3TBCw-Ed-fR-V1BYdsIg" x="22" y="11" width="67"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_N4LVwCw-Ed-fR-V1BYdsIg" type="2002">
+    <children xmi:type="notation:DecorationNode" xmi:id="_N4L80Cw-Ed-fR-V1BYdsIg" type="5002"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_N4LVwSw-Ed-fR-V1BYdsIg"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_N4LVwiw-Ed-fR-V1BYdsIg" fontName="Sans Serif"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_N4LVwyw-Ed-fR-V1BYdsIg"/>
+    <element xmi:type="gpmn:AchieveGoal" href="GoalReactivation.gpmn#_N4KusCw-Ed-fR-V1BYdsIg"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_N4LVxCw-Ed-fR-V1BYdsIg" x="165" y="11"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="__3G3oCxREd-fR-V1BYdsIg" type="2004">
+    <children xmi:type="notation:DecorationNode" xmi:id="__3HesCxREd-fR-V1BYdsIg" type="5004"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="__3G3oSxREd-fR-V1BYdsIg"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="__3G3oixREd-fR-V1BYdsIg" fontName="Sans Serif"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="__3G3oyxREd-fR-V1BYdsIg"/>
+    <element xmi:type="gpmn:PerformGoal" href="GoalReactivation.gpmn#__3FpgCxREd-fR-V1BYdsIg"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="__3G3pCxREd-fR-V1BYdsIg" x="77" y="165"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_HTGIECxSEd-fR-V1BYdsIg" type="2010">
+    <children xmi:type="notation:DecorationNode" xmi:id="_HTGvICxSEd-fR-V1BYdsIg" type="5010"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_HTGIESxSEd-fR-V1BYdsIg"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_HTGIEixSEd-fR-V1BYdsIg" fontName="Sans Serif"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_HTGIEyxSEd-fR-V1BYdsIg"/>
+    <element xmi:type="gpmn:Plan" href="GoalReactivation.gpmn#_HTFhACxSEd-fR-V1BYdsIg"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HTGIFCxSEd-fR-V1BYdsIg" x="77" y="286"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_J89GQCxSEd-fR-V1BYdsIg" type="2002">
+    <children xmi:type="notation:DecorationNode" xmi:id="_J89tUCxSEd-fR-V1BYdsIg" type="5002"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_J89GQSxSEd-fR-V1BYdsIg"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_J89GQixSEd-fR-V1BYdsIg" fontName="Sans Serif"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_J89GQyxSEd-fR-V1BYdsIg"/>
+    <element xmi:type="gpmn:AchieveGoal" href="GoalReactivation.gpmn#_J88fMCxSEd-fR-V1BYdsIg"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_J89GRCxSEd-fR-V1BYdsIg" x="231" y="165"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_G4OUgCxTEd-fR-V1BYdsIg" type="2010">
+    <children xmi:type="notation:DecorationNode" xmi:id="_G4O7kCxTEd-fR-V1BYdsIg" type="5010"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_G4OUgSxTEd-fR-V1BYdsIg"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_G4OUgixTEd-fR-V1BYdsIg" fontName="Sans Serif"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_G4OUgyxTEd-fR-V1BYdsIg"/>
+    <element xmi:type="gpmn:Plan" href="GoalReactivation.gpmn#_G4NtcCxTEd-fR-V1BYdsIg"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_G4OUhCxTEd-fR-V1BYdsIg" x="231" y="286"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_865y8CxWEd-fR-V1BYdsIg" type="2003">
+    <children xmi:type="notation:DecorationNode" xmi:id="_865y9SxWEd-fR-V1BYdsIg" type="5003"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_865y8SxWEd-fR-V1BYdsIg"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_865y8ixWEd-fR-V1BYdsIg" fontName="Sans Serif"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_865y8yxWEd-fR-V1BYdsIg"/>
+    <element xmi:type="gpmn:MaintainGoal" href="GoalReactivation.gpmn#_863WsCxWEd-fR-V1BYdsIg"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_865y9CxWEd-fR-V1BYdsIg" x="374" y="11"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_smnPoCxXEd-fR-V1BYdsIg" type="2010">
+    <children xmi:type="notation:DecorationNode" xmi:id="_smnPpSxXEd-fR-V1BYdsIg" type="5010"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_smnPoSxXEd-fR-V1BYdsIg"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_smnPoixXEd-fR-V1BYdsIg" fontName="Sans Serif"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_smnPoyxXEd-fR-V1BYdsIg"/>
+    <element xmi:type="gpmn:Plan" href="GoalReactivation.gpmn#_smkzYCxXEd-fR-V1BYdsIg"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_smnPpCxXEd-fR-V1BYdsIg" x="374" y="286"/>
+  </children>
+  <styles xmi:type="notation:DiagramStyle" xmi:id="_7YqAECw1Ed-fR-V1BYdsIg"/>
+  <element xmi:type="gpmn:GpmnDiagram" href="GoalReactivation.gpmn#_7Ynj0Cw1Ed-fR-V1BYdsIg"/>
+  <edges xmi:type="notation:Edge" xmi:id="_ItS1MCxSEd-fR-V1BYdsIg" type="4003" source="__3G3oCxREd-fR-V1BYdsIg" target="_HTGIECxSEd-fR-V1BYdsIg">
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_ItS1MSxSEd-fR-V1BYdsIg"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_ItS1MixSEd-fR-V1BYdsIg" fontName="Sans Serif"/>
+    <element xmi:type="gpmn:PlanEdge" href="GoalReactivation.gpmn#_ItRAACxSEd-fR-V1BYdsIg"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_ItS1MyxSEd-fR-V1BYdsIg" points="[-2, 40, -2, -81]$[-7, 161, -7, 40]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_JFHfUCxSEd-fR-V1BYdsIg" type="4002" source="_N4LVwCw-Ed-fR-V1BYdsIg" target="__3G3oCxREd-fR-V1BYdsIg">
+    <children xmi:type="notation:DecorationNode" xmi:id="_JFIGYCxSEd-fR-V1BYdsIg" type="6003">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_JFIGYSxSEd-fR-V1BYdsIg" x="1" y="-8"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_JFHfUSxSEd-fR-V1BYdsIg"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_JFHfUixSEd-fR-V1BYdsIg" fontName="Sans Serif"/>
+    <element xmi:type="gpmn:SubGoalEdge" href="GoalReactivation.gpmn#_JFGRMCxSEd-fR-V1BYdsIg"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_JFHfUyxSEd-fR-V1BYdsIg" points="[-45, 40, 43, -92]$[-148, 131, -60, -1]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_H0SUICxTEd-fR-V1BYdsIg" type="4002" source="_N4LVwCw-Ed-fR-V1BYdsIg" target="_J89GQCxSEd-fR-V1BYdsIg">
+    <children xmi:type="notation:DecorationNode" xmi:id="_H0S7MCxTEd-fR-V1BYdsIg" type="6003">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_H0S7MSxTEd-fR-V1BYdsIg" x="-2" y="12"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_H0SUISxTEd-fR-V1BYdsIg"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_H0SUIixTEd-fR-V1BYdsIg" fontName="Sans Serif"/>
+    <element xmi:type="gpmn:SubGoalEdge" href="GoalReactivation.gpmn#_H0RGACxTEd-fR-V1BYdsIg"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_H0SUIyxTEd-fR-V1BYdsIg" points="[31, 40, -68, -92]$[144, 172, 45, 40]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_R3MjgCxTEd-fR-V1BYdsIg" type="4003" source="_J89GQCxSEd-fR-V1BYdsIg" target="_G4OUgCxTEd-fR-V1BYdsIg">
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_R3MjgSxTEd-fR-V1BYdsIg"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_R3MjgixTEd-fR-V1BYdsIg" fontName="Sans Serif"/>
+    <element xmi:type="gpmn:PlanEdge" href="GoalReactivation.gpmn#_R3LVYCxTEd-fR-V1BYdsIg"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_R3MjgyxTEd-fR-V1BYdsIg" points="[2, 40, -9, -81]$[3, 81, -8, -40]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_umfcsCxXEd-fR-V1BYdsIg" type="4003" source="_865y8CxWEd-fR-V1BYdsIg" target="_smnPoCxXEd-fR-V1BYdsIg">
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_umfcsSxXEd-fR-V1BYdsIg"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_umfcsixXEd-fR-V1BYdsIg" fontName="Sans Serif"/>
+    <element xmi:type="gpmn:PlanEdge" href="GoalReactivation.gpmn#_umeOkCxXEd-fR-V1BYdsIg"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_umfcsyxXEd-fR-V1BYdsIg" points="[0, 40, 0, -147]$[14, 227, 14, 40]"/>
+  </edges>
+</notation:Diagram>
