@@ -6,13 +6,13 @@ import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.IPerceptGenerator;
 import jadex.application.space.envsupport.environment.IPerceptProcessor;
 import jadex.application.space.envsupport.environment.PerceptType;
-import jadex.commons.concurrent.IResultListener;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.JAXBException;
@@ -20,10 +20,8 @@ import javax.xml.bind.JAXBException;
 import deco.lang.dynamics.MASDynamics;
 import deco.lang.dynamics.mechanism.AgentElement;
 import deco.lang.dynamics.mechanism.DecentralizedCausality;
-import deco4mas.coordinate.interpreter.agent_state.BDIBehaviorObservationComponent;
 import deco4mas.coordinate.interpreter.coordination_information.BDICoordinationInformationInterpreter;
 import deco4mas.coordinate.interpreter.coordination_information.DefaultCoordinationEventGenerator;
-import deco4mas.mechanism.CoordinationInfo;
 import deco4mas.mechanism.v2.tspaces.TSpacesMechanism;
 
 /**
@@ -101,10 +99,12 @@ public class InitDeco4mas {
 //		masFileName = space.getProperty("dynamics_configuration").toString();
 		//ToDo: HACK!!!! 
 //		masFileName = "src//deco4mas//examples//V2//tspaces//belief_set.dynamics.xml";		              
-//		masFileName = "//sodekovs-coordination//src//main//java//deco4mas//examples//V2//tspaces//belief_set.dynamics.xml";
-		masFileName = "D:\\Workspaces\\JadexV2-New1\\jadex\\sodekovs-coordination\\src\\main\\java\\deco4mas\\examples\\V2\\tspaces\\belief_set.dynamics.xml";
+//		masFileName = "jadex//sodekovs-coordination//src//main//java//deco4mas//examples//V2//tspaces//belief_set.dynamics.xml";
+		
+		masFileName = "D:\\Workspaces\\Jadex-V2\\jadex\\sodekovs-coordination\\src\\main\\java\\deco4mas\\examples\\V2\\tspaces\\belief_set.dynamics.xml";		
 		System.out.println("#InitCoordinationSpace-Thread# Started processing deco4mas-file: " + masFileName);
 
+		
 		// ------ INIT COORDINATION MEDIA! -----------//
 
 		// TODO: Init media according to the deco4Mas file!
