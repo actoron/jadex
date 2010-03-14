@@ -122,6 +122,8 @@ public final class Text implements IDrawable
 		{
 			SimpleValueFetcher fetcher = new SimpleValueFetcher();
 			fetcher.setValue("$object", obj);
+			fetcher.setValue("$perspective", vp.getPerspective());
+			fetcher.setValue("$space", vp.getPerspective().getObserverCenter().getSpace());
 			draw = ((Boolean)drawcondition.getValue(fetcher)).booleanValue();
 		}
 		
@@ -188,6 +190,8 @@ public final class Text implements IDrawable
 		{
 			SimpleValueFetcher fetcher = new SimpleValueFetcher();
 			fetcher.setValue("$object", obj);
+			fetcher.setValue("$perspective", vp.getPerspective());
+			fetcher.setValue("$space", vp.getPerspective().getObserverCenter().getSpace());
 			draw = ((Boolean)drawcondition.getValue(fetcher)).booleanValue();
 		}
 		

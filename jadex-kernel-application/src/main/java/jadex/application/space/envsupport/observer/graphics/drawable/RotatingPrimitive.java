@@ -130,6 +130,9 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 		{
 			SimpleValueFetcher fetcher = new SimpleValueFetcher();
 			fetcher.setValue("$object", obj);
+			fetcher.setValue("$perspective", vp.getPerspective());
+			fetcher.setValue("$space", vp.getPerspective().getObserverCenter().getSpace());
+
 			draw = ((Boolean)drawcondition.getValue(fetcher)).booleanValue();
 		}
 		
@@ -158,6 +161,8 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 		{
 			SimpleValueFetcher fetcher = new SimpleValueFetcher();
 			fetcher.setValue("$object", obj);
+			fetcher.setValue("$perspective", vp.getPerspective());
+			fetcher.setValue("$space", vp.getPerspective().getObserverCenter().getSpace());
 			draw = ((Boolean)drawcondition.getValue(fetcher)).booleanValue();
 		}
 

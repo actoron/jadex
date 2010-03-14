@@ -175,8 +175,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		
 		if(this instanceof Space2D) // Hack?
 		{
-			Double width = MEnvSpaceInstance.getProperty(properties, "width")!=null? (Double)MEnvSpaceInstance.getProperty(properties, "width"): (Double)MEnvSpaceInstance.getProperty(mspacetype.getProperties(), "width");
-			Double height = MEnvSpaceInstance.getProperty(properties, "height")!=null? (Double)MEnvSpaceInstance.getProperty(properties, "height"): (Double)MEnvSpaceInstance.getProperty(mspacetype.getProperties(), "height");
+			Double width = si.getProperty("width")!=null? (Double)si.getProperty("width"): (Double)mspacetype.getProperty("width");
+			Double height = si.getProperty("height")!=null? (Double)si.getProperty("height"): (Double)mspacetype.getProperty("height");
 			((Space2D)this).setAreaSize(Vector2Double.getVector2(width, height));
 //			System.out.println("areasize: "+width+" "+height);
 		}
@@ -902,7 +902,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						Map viewargs = new HashMap();
 						viewargs.put("sourceview", sourceview);
 						viewargs.put("space", this);
-						viewargs.put("$object", ret);
+						viewargs.put("object", ret);
 						
 						IDataView	view	= (IDataView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs);
 						addDataView((String)MEnvSpaceInstance.getProperty(sourceview, "name")+"_"+id, view);

@@ -12,7 +12,7 @@
 	package="jadex.bdibpmn.examples.execute">
 	
 	<imports>
-		<import>jadex.base/import>
+		<import>jadex.base</import>
 	</imports>
 
 	<beliefs>

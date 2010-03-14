@@ -111,6 +111,23 @@ public class MEnvSpaceType	extends MSpaceType
 	{
 		return properties;
 	}
+	
+	/**
+	 *  Get a property from a (multi)map.
+	 *  @param map The map.
+	 *  @param name The name.
+	 *  @return The property.
+	 */
+	public Object getProperty(String name)
+	{
+		Object ret = null;
+		if(properties!=null)
+		{
+			Object tmp = properties.get(name);
+			ret = (tmp instanceof List)? ((List)tmp).get(0): tmp; 
+		}
+		return ret;
+	}
 
 //	/**
 //	 *  Get a string representation of this AGR space type.

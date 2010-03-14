@@ -34,6 +34,7 @@ public class MEnvSpaceInstance extends MSpaceInstance
 	 */
 	public void addProperty(String key, Object value)
 	{
+//		System.out.println("addP: "+key+" "+value);
 		if(properties==null)
 			properties = new MultiCollection();
 		properties.put(key, value);
@@ -68,6 +69,17 @@ public class MEnvSpaceInstance extends MSpaceInstance
 	{
 		Object tmp = map.get(name);
 		return (tmp instanceof List)? ((List)tmp).get(0): tmp; 
+	}
+	
+	/**
+	 *  Get a property from a (multi)map.
+	 *  @param map The map.
+	 *  @param name The name.
+	 *  @return The property.
+	 */
+	public Object getProperty(String name)
+	{
+		return properties!=null? getProperty(properties, name): null;
 	}
 	
 	/**

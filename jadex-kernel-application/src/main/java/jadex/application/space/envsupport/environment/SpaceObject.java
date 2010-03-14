@@ -95,7 +95,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 			
 			if(ret instanceof IParsedExpression)
 			{
-				ret = ((IParsedExpression) ret).getValue(fetcher);
+				ret = ((IParsedExpression)ret).getValue(fetcher);
 			}
 			
 			return ret;
