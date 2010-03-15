@@ -629,7 +629,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 			{
 				public void run()
 				{
-					listener.resultAvailable(source, exception);
+					listener.exceptionOccurred(source, exception);
 				}
 				
 				public String toString()

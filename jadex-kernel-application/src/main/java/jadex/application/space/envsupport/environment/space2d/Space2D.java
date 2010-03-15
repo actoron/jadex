@@ -7,6 +7,7 @@ import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Double;
 import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.math.Vector2Int;
+import jadex.commons.IFilter;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -322,7 +323,58 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 	 * @param distance
 	 * @return The near objects. 
 	 */
-	public Set getNearObjects(IVector2 position, IVector1 maxdist, String type)
+	public Set getNearObjects(IVector2 position, IVector1 maxdist)
+	{
+		return getNearObjects(position, maxdist, (IFilter)null);
+	}
+	
+	/**
+	 * Retrieve all objects in the distance for a position
+	 * @param position
+	 * @param distance
+	 * @return The near objects. 
+	 */
+	public Set getNearObjects(IVector2 position, IVector1 maxdist, final String type)
+	{
+		return getNearObjects(position, maxdist, new IFilter()
+		{
+			public boolean filter(Object obj)
+			{
+				return type.equals(((ISpaceObject)obj).getType());
+			}
+		});
+//		synchronized(monitor)
+//		{
+//			Set ret = new HashSet();
+//		
+//			Set objects = spaceobjects.entrySet();
+//			for(Iterator it = objects.iterator(); it.hasNext();)
+//			{
+//				Map.Entry entry = (Entry)it.next();
+//				ISpaceObject obj = (ISpaceObject)entry.getValue();
+//				IVector2 pos = (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
+//				
+//				if(pos!=null && (type==null || type.equals(obj.getType())))
+//				{
+//					IVector1 dist = getDistance(pos, position);
+//					if(maxdist==null || !maxdist.less(dist))
+//					{
+//						ret.add(obj);
+//					}
+//				}
+//			}
+//		
+//			return ret;
+//		}
+	}
+	
+	/**
+	 * Retrieve all objects in the distance for a position
+	 * @param position
+	 * @param distance
+	 * @return The near objects. 
+	 */
+	public Set getNearObjects(IVector2 position, IVector1 maxdist, IFilter filter)
 	{
 		synchronized(monitor)
 		{
@@ -335,7 +387,7 @@ public abstract class Space2D extends AbstractEnvironmentSpace
 				ISpaceObject obj = (ISpaceObject)entry.getValue();
 				IVector2 pos = (IVector2)obj.getProperty(Space2D.PROPERTY_POSITION);
 				
-				if(pos!=null && (type==null || type.equals(obj.getType())))
+				if(pos!=null && (filter==null || filter.filter(obj)))
 				{
 					IVector1 dist = getDistance(pos, position);
 					if(maxdist==null || !maxdist.less(dist))

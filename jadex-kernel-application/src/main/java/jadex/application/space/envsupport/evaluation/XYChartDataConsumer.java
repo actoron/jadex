@@ -139,6 +139,6 @@ public class XYChartDataConsumer extends AbstractChartDataConsumer
 		// Add the value.
 		
 //		System.out.println("Added: "+valx+" "+valy);
-		ser.add(((Double)valx).doubleValue(), ((Double)valy).doubleValue(), 0, 0);
+		ser.add(((Number)valx).doubleValue(), ((Number)valy).doubleValue(), 0, 0);
 	}
 }

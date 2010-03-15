@@ -12,10 +12,13 @@ import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Int;
 import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.bridge.IArgument;
+import jadex.commons.IFilter;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,7 +40,6 @@ public class FireflyAgent extends MicroAgent
 //	
 //	/** The current unhappiness. */
 //	protected double unhappiness;
-
 
 	//-------- methods --------
 	
@@ -69,33 +71,25 @@ public class FireflyAgent extends MicroAgent
 				// change direction slightly
 				double factor = 1;
 				double rotchange = Math.random()*Math.PI/factor-Math.PI/2/factor;
+				
 				double newdir = dir+rotchange;
 				if(newdir<0)
 					newdir+=Math.PI*2;
 				else if(newdir>Math.PI*2)
 					newdir-=Math.PI*2;
+				
 				// convert to vector
 				// normally x=cos(dir) and y=sin(dir)
 				// here 0 degree is 12 o'clock and the rotation right
-//				double x = Math.sin(newdir);
-//				double y = -Math.cos(newdir);
 				double x = Math.sin(newdir);
-				double y = Math.cos(newdir);
+				double y = -Math.cos(newdir);
+//				double x = Math.sin(newdir);
+//				double y = Math.cos(newdir);
 				double stepwidth = 1;
 				IVector2 newdirvec = new Vector2Double(x*stepwidth, y*stepwidth);
-				
 				IVector2 newpos = mypos.copy().add(newdirvec);
-				SetPosition setpos = new SetPosition();
-				Map params = new HashMap();
-				params.put(ISpaceAction.OBJECT_ID, avatar.getId());
-				params.put(GetPosition.PARAMETER_POSITION, newpos);
-//				space.performSpaceAction("move", params, null);
-				space.performSpaceAction("move", params);
 				
-				// Hack!!! use action
-				avatar.setProperty("direction", new Double(newdir));
-				
-				// Increment internal counter
+				// Increment clock (internal counter)
 				clock++;
 				if(clock == cyclelength)
 					clock = 0;
@@ -106,24 +100,28 @@ public class FireflyAgent extends MicroAgent
 					// if count turtles in-radius 1 with [color = yellow] >= flashes-to-reset
 				    // [ set clock reset-level ]
 				    Set tmp = space.getNearObjects((IVector2)avatar.getProperty(
-						Space2D.PROPERTY_POSITION), new Vector1Int(2), "firefly");
-					tmp.remove(avatar);
-					ISpaceObject[] neighbors = (ISpaceObject[])tmp.toArray(new ISpaceObject[tmp.size()]); 
-					for(int i=0; i<neighbors.length; i++)
-					{
-						if(!((Boolean)neighbors[i].getProperty("glow")).booleanValue())
+						Space2D.PROPERTY_POSITION), new Vector1Int(1), new IFilter()
 						{
-							tmp.remove(neighbors[i]);
-						}
-					}
+							public boolean filter(Object obj)
+							{
+								ISpaceObject fly = (ISpaceObject)obj;
+								return ((Boolean)fly.getProperty("flashing")).booleanValue();
+							}
+						});
+					tmp.remove(avatar);
 					if(tmp.size()>=flashestoreset)
 					{
 						clock = resetlevel;
+//						System.out.println("Reset: "+avatar.getId());
 					}
 				}
 	
-				// Hack!!! use action
-				avatar.setProperty("clock", new Integer(clock));
+				Map params = new HashMap();
+				params.put(ISpaceAction.OBJECT_ID, avatar.getId());
+				params.put(MoveAction.PARAMETER_POSITION, newpos);
+				params.put(MoveAction.PARAMETER_DIRECTION, new Double(newdir));
+				params.put(MoveAction.PARAMETER_CLOCK, new Integer(clock));
+				space.performSpaceAction("move", params, null);
 				
 				waitForTick(this);
 			}
@@ -197,4 +195,22 @@ public class FireflyAgent extends MicroAgent
 			}
 		}, null, null);
 	}
+
+	/**
+	 *  Get the number of flashing flies.
+	 *  @param flies The collection of flies.
+	 *  @return The number of flashing flies.
+	 */
+	public static int countFlashingFlies(Collection flies)
+	{
+		int ret = 0;
+		for(Iterator it = flies.iterator(); it.hasNext(); )
+		{
+			ISpaceObject fly = (ISpaceObject)it.next();
+			if(((Boolean)fly.getProperty("flashing")).booleanValue())
+				ret++;
+		}
+		return ret;
+	}
+	
 }

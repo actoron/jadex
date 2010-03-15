@@ -97,8 +97,8 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 		if(EnvironmentEvent.OBJECT_PROPERTY_CHANGED.equals(event.getType()) && Space2D.PROPERTY_POSITION.equals(event.getProperty()))
 		{
 			IVector2 oldpos = (IVector2)event.getOldValue();
-			ISpaceObject[] objects = pos==null? EMPTY_SPACEOBJECTS: (ISpaceObject[])space.getNearObjects(pos, maxrange, null).toArray(new ISpaceObject[0]);
-			ISpaceObject[] oldobjects = oldpos==null? EMPTY_SPACEOBJECTS: (ISpaceObject[])space.getNearObjects(oldpos, maxrange, null).toArray(new ISpaceObject[0]);
+			ISpaceObject[] objects = pos==null? EMPTY_SPACEOBJECTS: (ISpaceObject[])space.getNearObjects(pos, maxrange).toArray(new ISpaceObject[0]);
+			ISpaceObject[] oldobjects = oldpos==null? EMPTY_SPACEOBJECTS: (ISpaceObject[])space.getNearObjects(oldpos, maxrange).toArray(new ISpaceObject[0]);
 			
 			// Objects, which are in current range, but maybe not previously seen.
 			for(int i=0; i<objects.length; i++)
@@ -176,7 +176,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 		{
 			if(pos!=null)
 			{
-				ISpaceObject[]	objects	= (ISpaceObject[])space.getNearObjects(pos, maxrange, null).toArray(new ISpaceObject[0]);
+				ISpaceObject[]	objects	= (ISpaceObject[])space.getNearObjects(pos, maxrange).toArray(new ISpaceObject[0]);
 				
 				// Post appearance for object itself (if component) as well as all components in vision range
 				for(int i=0; i<objects.length; i++)
@@ -209,7 +209,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 		{
 			if(pos!=null)
 			{
-				ISpaceObject[]	objects	= (ISpaceObject[])space.getNearObjects(pos, maxrange, null).toArray(new ISpaceObject[0]);
+				ISpaceObject[]	objects	= (ISpaceObject[])space.getNearObjects(pos, maxrange).toArray(new ISpaceObject[0]);
 				
 				// Post disappearance for all components in vision range
 				for(int i=0; i<objects.length; i++)

@@ -131,7 +131,7 @@ public abstract class AbstractChartDataConsumer extends SimplePropertyObject imp
 		Object valx;
 		if(valuex instanceof String)
 		{
-			valx = (Double)row[data.getColumnIndex((String)valuex)]; 
+			valx = (Number)row[data.getColumnIndex((String)valuex)]; 
 		}
 		else //if(valuex instanceof IParsedExpression)
 		{
@@ -141,7 +141,7 @@ public abstract class AbstractChartDataConsumer extends SimplePropertyObject imp
 		Object valy;
 		if(valuey instanceof String)
 		{
-			valy = (Double)row[data.getColumnIndex((String)valuey)]; 
+			valy = (Number)row[data.getColumnIndex((String)valuey)]; 
 		}
 		else //if(valuey instanceof IParsedExpression)
 		{

@@ -101,7 +101,8 @@ public class MBeliefArgument	implements IArgument
 		Object config;
 		if(configname==null)
 		{
-			config = state.getAttributeValue(scope, OAVBDIMetaModel.capability_has_defaultconfiguration);
+			configname = (String)state.getAttributeValue(scope, OAVBDIMetaModel.capability_has_defaultconfiguration);
+			config = state.getAttributeValue(scope, OAVBDIMetaModel.capability_has_configurations, configname);
 		}
 		else
 		{
