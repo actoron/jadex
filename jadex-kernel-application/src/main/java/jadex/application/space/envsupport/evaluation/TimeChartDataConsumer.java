@@ -181,7 +181,7 @@ public class TimeChartDataConsumer extends AbstractChartDataConsumer
 		}
 		
 		// When the same time period is used twice the value will be overridden.
-		ser.addOrUpdate(t, ((Double)valy).doubleValue());
+		ser.addOrUpdate(t, ((Number)valy).doubleValue());
 	}
 	
 }

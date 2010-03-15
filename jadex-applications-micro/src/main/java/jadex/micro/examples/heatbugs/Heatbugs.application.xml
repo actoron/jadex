@@ -47,7 +47,7 @@
 			<!-- <env:property name="max_output_heat">100</env:property> -->
 			<env:property name="diffusion_rate">$args.diffusion_rate</env:property>
 			<env:property name="evaporation_rate">$args.evaporation_rate</env:property>
-			<env:property name="random_move_chance">0.1</env:property>
+			<env:property name="random_move_chance">0.2</env:property>
 			
 			<env:objecttypes>
 				<env:objecttype name="patch">
@@ -352,6 +352,66 @@
 							<env:plugin name="evaluation" class="EvaluationPlugin">
 								<env:property name="component_0">((AbstractChartDataConsumer)$space.getDataConsumer("unhappiness_histogram")).getChartPanel()</env:property>
 							</env:plugin>
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</spaces>
+
+			<components>
+				<component type="Heatbug" number="100"/>
+			</components>
+		</application>
+		
+		<application name="20x20 and 10 bugs without evaluation">
+			<spaces>
+				<env:envspace name="mygc2dspace" type="gc2dspace" width="20" height="20">
+					<env:processes>
+						<env:process type="diffuse"/>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="world" view="view_all" perspective="main">
+							<env:plugin name="evaluation" class="EvaluationPlugin"/>
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</spaces>
+
+			<components>
+				<component type="Heatbug" number="10"/>
+			</components>
+		</application>
+		
+		<application name="30x30 and 40 bugs without evaluation">
+			<spaces>
+				<env:envspace name="mygc2dspace" type="gc2dspace" width="30" height="30">
+					<env:processes>
+						<env:process type="diffuse"/>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="world" view="view_all" perspective="main">
+							<env:plugin name="evaluation" class="EvaluationPlugin"/>
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</spaces>
+
+			<components>
+				<component type="Heatbug" number="40"/>
+			</components>
+		</application>
+		
+		<application name="50x50 and 100 bugs without evaluation">
+			<spaces>
+				<env:envspace name="mygc2dspace" type="gc2dspace" width="50" height="50">
+					<env:processes>
+						<env:process type="diffuse"/>
+					</env:processes>
+					
+					<env:observers>
+						<env:observer name="world" view="view_all" perspective="main">
+							<env:plugin name="evaluation" class="EvaluationPlugin"/>
 						</env:observer>
 					</env:observers>
 				</env:envspace>

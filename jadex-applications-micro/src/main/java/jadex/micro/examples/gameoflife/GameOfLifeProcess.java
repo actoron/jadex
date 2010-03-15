@@ -1,4 +1,4 @@
-package jadex.bdi.examples.gameoflife;
+package jadex.micro.examples.gameoflife;
 
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;

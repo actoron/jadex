@@ -12,7 +12,7 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
-	name="GameOfLife" package="jadex.bdi.examples.gameoflife">
+	name="GameOfLife" package="jadex.micro.examples.gameoflife">
 	
 	<imports>
 		<import>jadex.application.space.envsupport.environment.space2d.*</import>
@@ -20,7 +20,6 @@
 		<import>jadex.application.space.envsupport.math.*</import>
 		<import>jadex.application.space.envsupport.dataview.*</import>
 		<import>jadex.application.space.envsupport.observer.perspective.*</import>
-		<import>jadex.bdi.planlib.*</import>
 	</imports>
 	
 	<spacetypes>

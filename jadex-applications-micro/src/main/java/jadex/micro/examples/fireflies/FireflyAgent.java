@@ -195,22 +195,4 @@ public class FireflyAgent extends MicroAgent
 			}
 		}, null, null);
 	}
-
-	/**
-	 *  Get the number of flashing flies.
-	 *  @param flies The collection of flies.
-	 *  @return The number of flashing flies.
-	 */
-	public static int countFlashingFlies(Collection flies)
-	{
-		int ret = 0;
-		for(Iterator it = flies.iterator(); it.hasNext(); )
-		{
-			ISpaceObject fly = (ISpaceObject)it.next();
-			if(((Boolean)fly.getProperty("flashing")).booleanValue())
-				ret++;
-		}
-		return ret;
-	}
-	
 }

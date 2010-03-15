@@ -471,8 +471,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					String varname = source.get("name")!=null? (String)source.get("name"): "$object";
 					String objecttype = (String)source.get("objecttype");
 					boolean aggregate = source.get("aggregate")!=null? ((Boolean)source.get("aggregate")).booleanValue(): false;
-					IParsedExpression exp = (IParsedExpression)source.get("content");
-					provs[j] = new SpaceObjectSource(varname, this, objecttype, aggregate, exp);
+					IParsedExpression dataexp = (IParsedExpression)source.get("content");
+					IParsedExpression includeexp = (IParsedExpression)source.get("includecondition");
+					provs[j] = new SpaceObjectSource(varname, this, objecttype, aggregate, dataexp, includeexp);
 				}
 				
 				String tablename = (String)MEnvSpaceInstance.getProperty(dcol, "name");

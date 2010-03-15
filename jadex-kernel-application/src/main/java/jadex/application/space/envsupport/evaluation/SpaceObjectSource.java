@@ -29,20 +29,25 @@ public class SpaceObjectSource implements IObjectSource
 	protected boolean aggregate;
 	
 	/** The object expression. */
-	protected IParsedExpression exp;
+	protected IParsedExpression dataexp;
+	
+	/** The object expression. */
+	protected IParsedExpression includeexp;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new row provider.
 	 */
-	public SpaceObjectSource(String varname, AbstractEnvironmentSpace envspace, String objecttype, boolean aggregate, IParsedExpression exp)
+	public SpaceObjectSource(String varname, AbstractEnvironmentSpace envspace, 
+		String objecttype, boolean aggregate, IParsedExpression dataexp, IParsedExpression includeexp)
 	{
 		this.varname = varname;
 		this.envspace = envspace;
 		this.objecttype = objecttype;
 		this.aggregate = aggregate;
-		this.exp = exp;
+		this.dataexp = dataexp;
+		this.includeexp = includeexp;
 	}
 	
 	/**
@@ -53,26 +58,51 @@ public class SpaceObjectSource implements IObjectSource
 		List ret = new ArrayList();
 		
 		Object[] obs = envspace.getSpaceObjectsByType(objecttype);
-		if(obs!=null && exp!=null)
-		{
-			Object[] tmp = new Object[obs.length];
-			SimpleValueFetcher fetcher = new SimpleValueFetcher();
-			for(int i=0; i<obs.length; i++)
-			{
-				fetcher.setValue("$object", obs[i]);
-				tmp[i] = exp.getValue(fetcher);
-			}
-			obs = tmp;
-		}
 		
+		// Replace values with data expression values.
+		if(obs!=null)
+		{
+			if(includeexp!=null)
+			{
+				SimpleValueFetcher fetcher = new SimpleValueFetcher();
+				for(int i=0; i<obs.length; i++)
+				{
+					fetcher.setValue("$object", obs[i]);
+					if(((Boolean)includeexp.getValue(fetcher)).booleanValue())
+					{
+						if(dataexp!=null)
+						{
+							ret.add(dataexp.getValue(fetcher));
+						}
+						else
+						{
+							ret.add(obs[i]);
+						}
+					}
+				}
+			}
+			else if(dataexp!=null)
+			{
+				SimpleValueFetcher fetcher = new SimpleValueFetcher();
+				for(int i=0; i<obs.length; i++)
+				{
+					fetcher.setValue("$object", obs[i]);
+					ret.add(dataexp.getValue(fetcher));
+				}
+			}
+			else
+			{
+				ret = SUtil.arrayToList(obs);
+			}
+		}
+			
 		if(aggregate)
 		{
-			ret.add(SUtil.arrayToList(obs));
+			List tmp = ret;
+			ret = new ArrayList();
+			ret.add(tmp);
 		}
-		else
-		{
-			ret = SUtil.arrayToList(obs);
-		}
+		
 		return ret;
 	}
 

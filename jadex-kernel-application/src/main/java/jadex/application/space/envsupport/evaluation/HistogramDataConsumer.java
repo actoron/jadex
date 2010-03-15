@@ -139,7 +139,7 @@ public class HistogramDataConsumer extends AbstractChartDataConsumer
 		SimpleHistogramDataset dataset = (SimpleHistogramDataset)((XYPlot)getChart().getPlot()).getDataset();
 		try
 		{
-			dataset.addObservation(((Double)valy).doubleValue());
+			dataset.addObservation(((Number)valy).doubleValue());
 		}
 		catch(Exception e)
 		{

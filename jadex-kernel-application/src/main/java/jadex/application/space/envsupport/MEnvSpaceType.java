@@ -1168,7 +1168,9 @@ public class MEnvSpaceType	extends MSpaceType
 			new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new AttributeInfo(new AccessInfo("objecttype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
-			new AttributeInfo(new AccessInfo("aggregate", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			new AttributeInfo(new AccessInfo("aggregate", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))},
+			new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo(new QName(uri, "includecondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)	
 			})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "dataconsumer")}), new ObjectInfo(MultiCollection.class),
