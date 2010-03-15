@@ -71,7 +71,7 @@ public class DiscoveryService implements IService, IDiscoveryService {
 				// ignore comments starting with '#'; ignore empty lines
 				if( line.indexOf("#") == -1 || line.equals("") ) 
 					continue;
-				String ip = line.substring(0, line.indexOf(":"));
+				String ip = line.substring(0, line.indexOf(":")); // TODO here is a bug, fix it
 				String port = line.substring(line.indexOf(":"), line.length());
 				machines.add( new InetSocketAddress(InetAddress.getByName(ip), Integer.valueOf(port)) );
 			}

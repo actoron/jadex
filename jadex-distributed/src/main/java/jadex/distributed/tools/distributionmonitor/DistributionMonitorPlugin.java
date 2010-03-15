@@ -44,7 +44,10 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IDis
 	}
 	
 	private JComponent builtView() {
+		//DistributionMonitorPlatformList left = new DistributionMonitorPlatformList(); // common pattern: use JPanels to group items; use extended JComponent to praint
 		JPanel left = new JPanel();
+		// left mit einzelnen Items füllen
+		
 		JPanel right = new JPanel();
 		
 		// left JPanel lists all found platforms
@@ -101,16 +104,18 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IDis
 	@Override
 	public void addMachine(InetSocketAddress machine) {
 		machines.add(machine);
-		view.repaint(); // refresh view
+		view.repaint();
 	}
 
 	@Override
 	public void addMachines(Set<InetSocketAddress> machines) {
 		this.machines = machines;
+		view.repaint();
 	}
 
 	@Override
 	public void removeMachine(InetSocketAddress machine) {
 		machines.remove(machine);
+		view.repaint();
 	}
 }
