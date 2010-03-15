@@ -35,12 +35,18 @@
 			</property> -->
 			
 			<!-- my new CMS and DF for distributed case; here the server side -->
+			<!-- also a new service 'Discovery Service' is born which highly interacts with the CMS to see which other clients are available -->
 			<property type="jadex.bridge.IComponentManagementService" name="cms_service">
 				new jadex.distributed.service.cms.ComponentManagementService_Server($platform)
 			</property>
 						
 			<property type="jadex.base.fipa.IDF" name="df_service">
 				new jadex.distributed.service.df.DirectoryFacilitatorService_Server($platform)
+			</property>
+			
+			<property type="jadex.distributed.service.DiscoveryService" name="discovery_service">
+				<!-- new jadex.distributed.service.DiscoveryService($platform) --> <!-- I don't need a reference in the DiscoverService (yet) -->
+				new jadex.distributed.service.DiscoveryService()
 			</property>
 			
 			  <property type="jadex.bridge.IMessageService" name="message_service">

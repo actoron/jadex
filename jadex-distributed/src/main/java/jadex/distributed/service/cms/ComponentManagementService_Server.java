@@ -14,6 +14,7 @@ import jadex.bridge.ISearchConstraints;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.distributed.service.IDiscoveryServiceListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.execution.IExecutionService;
@@ -22,6 +23,7 @@ import jadex.standalone.fipaimpl.CMSComponentDescription;
 import jadex.standalone.fipaimpl.ComponentIdentifier;
 import jadex.standalone.fipaimpl.SearchConstraints;
 
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,7 +37,7 @@ import java.util.logging.Logger;
 /**
  *  Standalone implementation of component execution service.
  */
-public class ComponentManagementService_Server implements IComponentManagementService, IService
+public class ComponentManagementService_Server implements IComponentManagementService, IService, IDiscoveryServiceListener
 {
 	//-------- constants --------
 
@@ -68,6 +70,8 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 	/** The result (kill listeners). */
 	protected Map killresultlisteners;
 	
+	protected Set<InetSocketAddress> machines;
+	
     //-------- constructors --------
 
     /**
@@ -84,6 +88,9 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 		this.logger = Logger.getLogger(container.getName()+".cms");
 		this.listeners = SCollection.createMultiCollection();
 		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());
+		
+		// the CMS needs to know the DiscoveryService
+		
     }
     
     //-------- IComponentManagementService interface --------
@@ -923,5 +930,21 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 	{
 		if(listener!=null)
 			listener.resultAvailable(this, null);
+	}
+
+	/*** Three methods to implement the IDiscoveryServiceListener interface ***/
+	@Override
+	public void addMachine(InetSocketAddress machine) {
+		machines.add(machine);
+	}
+
+	@Override
+	public void addMachines(Set<InetSocketAddress> machines) {
+		this.machines = machines;
+	}
+
+	@Override
+	public void removeMachine(InetSocketAddress machine) {
+		machines.remove(machine);
 	}
 }

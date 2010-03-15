@@ -1,17 +1,30 @@
 //Erbt von AbstractJCCPlugin
 package jadex.distributed.tools.distributionmonitor;
 
+import java.net.InetSocketAddress;
+import java.util.Set;
+
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.UIDefaults;
 
+import jadex.bridge.IMessageService;
 import jadex.commons.SGUI;
+import jadex.distributed.service.DiscoveryService;
+import jadex.distributed.service.IDiscoveryService;
+import jadex.distributed.service.IDiscoveryServiceListener;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.libtool.LibraryPlugin;
 import jadex.tools.starter.StarterPlugin;
 
-public class DistributionMonitorPlugin extends AbstractJCCPlugin {
+public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IDiscoveryServiceListener {
 
+	protected Set<InetSocketAddress> machines;
+	protected JComponent view;
+	protected IDiscoveryService discoveryService;
+	
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
@@ -23,6 +36,27 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin {
 		
 	});
 	
+	public DistributionMonitorPlugin() {
+		view = builtView(); // view aufbauen, damit sie zu jeder Zeit durch createView() abgeholt werden kann
+		// beim DiscoverService registrieren, um laufend über Änderungen informiert zu werden
+		discoveryService = (IDiscoveryService) getJCC().getServiceContainer().getService(IDiscoveryService.class);
+		discoveryService.register(this);
+	}
+	
+	private JComponent builtView() {
+		JPanel left = new JPanel();
+		JPanel right = new JPanel();
+		
+		// left JPanel lists all found platforms
+		// get list of platforms and their current resources
+		
+		
+		// right JPanel show ... I don't know yet
+		
+		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, left, right); // true makes the JSplitPane more responsive to the user
+		split.setOneTouchExpandable(true); // ability to collapse and show one side quickly
+		return split;
+	}
 	
 	@Override
 	public boolean isLazy() {
@@ -60,9 +94,23 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin {
 	
 	@Override
 	public JComponent createView() {
-		JComponent jcomp = new JComponent() {
-		};
-		return jcomp;
-		//return super.createView();
+		return this.view;
+	}
+
+	/*** Three methods to implement the IDiscoveryServiceListener interface ***/
+	@Override
+	public void addMachine(InetSocketAddress machine) {
+		machines.add(machine);
+		view.repaint(); // refresh view
+	}
+
+	@Override
+	public void addMachines(Set<InetSocketAddress> machines) {
+		this.machines = machines;
+	}
+
+	@Override
+	public void removeMachine(InetSocketAddress machine) {
+		machines.remove(machine);
 	}
 }
