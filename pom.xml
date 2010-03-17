@@ -175,6 +175,45 @@
 				<module>jadex-platform-jade</module>
 		</modules>
   	</profile>
+  	<profile>
+        <id>jadex-wfms-dist</id>
+        <build>
+  			<finalName>jadex-wfms-${project.version}</finalName>
+		    <plugins>
+		      <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-assembly-plugin</artifactId>
+		        <configuration>
+		          <descriptors>
+		            <descriptor>src/main/assembly/dist-assembly-wfms.xml</descriptor>
+		          </descriptors>
+		        </configuration>
+		      </plugin>
+		    </plugins>
+  		</build>
+        <modules>
+            <module>jadex-services</module>
+            <module>jadex-commons</module>
+            <module>jadex-xml</module>
+            <module>jadex-javaparser</module>
+            <module>jadex-bridge</module>
+            <module>jadex-platform-base</module>
+            <module>jadex-nuggets</module>
+            <module>jadex-kernel-bdi</module>
+            <module>jadex-applib-bdi</module>
+            <module>jadex-runtimetools</module>
+            <module>jadex-kernel-micro</module>
+            <module>jadex-rules</module>
+            <module>jadex-rules-tools</module>
+            <module>jadex-kernel-application</module>
+            <module>jadex-kernel-bpmn</module>
+            <module>jadex-kernel-bdibpmn</module>
+            <module>jadex-kernel-gpmn</module>
+            <module>jadex-platform-standalone</module>
+            <module>jadex-platform-wfms</module>
+            <module>jadex-wfms-launch</module>
+        </modules>
+        </profile>
   </profiles>
   <!-- <url>http://jadex.sourceforge.net</url> -->
   <build>
