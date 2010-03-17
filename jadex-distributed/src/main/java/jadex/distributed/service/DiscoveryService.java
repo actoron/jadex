@@ -69,9 +69,9 @@ public class DiscoveryService implements IService, IDiscoveryService {
 			String line; // line is e.g. '234.12.345.12:1254'
 			while( (line=reader.readLine()) != null ) {
 				// ignore comments starting with '#'; ignore empty lines
-				if( line.indexOf("#") == -1 || line.equals("") ) 
+				if( line.indexOf("#") != -1 || line.equals("") ) 
 					continue;
-				String ip = line.substring(0, line.indexOf(":")); // TODO here is a bug, fix it
+				String ip = line.substring(0, line.indexOf(":"));
 				String port = line.substring(line.indexOf(":"), line.length());
 				machines.add( new InetSocketAddress(InetAddress.getByName(ip), Integer.valueOf(port)) );
 			}

@@ -1,5 +1,7 @@
 package jadex.distributed.tools.distributionmonitor;
 
+import jadex.distributed.service.IMonitorServiceListener;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -14,7 +16,7 @@ import javax.swing.JPanel;
  * @author daniel
  *
  */
-public class DistributionMonitorItem extends JPanel {
+public class DistributionMonitorItem extends JPanel implements IMonitorServiceListener {
 
 	/* IP and Port; should be static through the whole life of this JPanel */
 	private String ip;
