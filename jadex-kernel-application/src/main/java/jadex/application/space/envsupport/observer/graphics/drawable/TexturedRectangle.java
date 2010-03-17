@@ -94,9 +94,9 @@ public class TexturedRectangle extends ColoredPrimitive
 		
 		BufferedImage image = image_;
 		
-		g.translate(-size.getXAsDouble() / 2.0, -size.getYAsDouble() / 2.0);
 		if (!setupMatrix(dc, obj, g, vp))
 			return;
+		g.translate(-size.getXAsDouble() / 2.0, -size.getYAsDouble() / 2.0);
 		
 		currentColor_ = (Color) dc.getBoundValue(obj, color_, vp);
 		
