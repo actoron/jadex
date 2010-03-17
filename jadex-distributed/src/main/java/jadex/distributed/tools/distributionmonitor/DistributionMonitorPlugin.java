@@ -2,6 +2,8 @@
 package jadex.distributed.tools.distributionmonitor;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.Icon;
@@ -15,38 +17,43 @@ import jadex.commons.SGUI;
 import jadex.distributed.service.DiscoveryService;
 import jadex.distributed.service.IDiscoveryService;
 import jadex.distributed.service.IDiscoveryServiceListener;
+import jadex.distributed.service.IMonitorService;
+import jadex.distributed.service.IMonitorServiceListener;
+import jadex.distributed.service.Workload;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.libtool.LibraryPlugin;
 import jadex.tools.starter.StarterPlugin;
 
-public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IDiscoveryServiceListener {
+public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMonitorServiceListener {
 
-	protected Set<InetSocketAddress> machines;
-	protected JComponent view;
-	protected IDiscoveryService discoveryService;
+	protected Map<InetSocketAddress, Workload> machineWorkloads;
+	protected JComponent view; // das Hauptfenster im JCC; hier wird alles gezeichnet: sidebar, main content, ...
+	protected IMonitorService monitorService;
 	
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-//		"conversation",	SGUI.makeIcon(LibraryPlugin.class, "/jadex/tools/common/images/libcenter.png"),
-//		"conversation_sel", SGUI.makeIcon(StarterPlugin.class, "/jadex/tools/common/images/libcenter_sel.png"),
-//		"help",	SGUI.makeIcon(LibraryPlugin.class, "/jadex/tools/common/images/help.gif"),
-		//"icon",	SGUI.makeIcon(DistributionMonitorPlugin.class, "/jadex/distributed/tools/distributionmonitor/images/icon.png")
-		"icon",	SGUI.makeIcon(DistributionMonitorPlugin.class, "/jadex/distributed/tools/distributionmonitor/images/icon.png")
-		
+		"icon",	SGUI.makeIcon(DistributionMonitorPlugin.class, "/jadex/distributed/tools/distributionmonitor/images/icon.png")	
 	});
 	
 	public DistributionMonitorPlugin() {
+		this.machineWorkloads = new HashMap<InetSocketAddress, Workload>(); // unnecessary due monitorService should automatically initiate the variable with a call to updateWorkloadAll(...)
+		
+		// beim IMonitorService registrieren, um laufend über Änderungen informiert zu werden
+		monitorService = (IMonitorService)getJCC().getServiceContainer().getService(IMonitorService.class);
+		monitorService.register(this);
+		
 		view = builtView(); // view aufbauen, damit sie zu jeder Zeit durch createView() abgeholt werden kann
-		// beim DiscoverService registrieren, um laufend über Änderungen informiert zu werden
-		discoveryService = (IDiscoveryService) getJCC().getServiceContainer().getService(IDiscoveryService.class);
-		discoveryService.register(this);
+		//listView = builtView(); // view aufbauen, damit sie zu jeder Zeit durch createView() abgeholt werden kann
 	}
 	
 	private JComponent builtView() {
 		//DistributionMonitorPlatformList left = new DistributionMonitorPlatformList(); // common pattern: use JPanels to group items; use extended JComponent to praint
-		JPanel left = new JPanel();
+		//JPanel left = new JPanel();
+		PlatformList listView = new PlatformList(this.machineWorkloads);
 		// left mit einzelnen Items füllen
+		
+		
 		
 		JPanel right = new JPanel();
 		
@@ -56,7 +63,7 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IDis
 		
 		// right JPanel show ... I don't know yet
 		
-		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, left, right); // true makes the JSplitPane more responsive to the user
+		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, listView, right); // true makes the JSplitPane more responsive to the user
 		split.setOneTouchExpandable(true); // ability to collapse and show one side quickly
 		return split;
 	}
@@ -93,15 +100,31 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IDis
 	 * non of the parts is build and displayed. Besides that, it is ALWAYS a good idea to at least
 	 * provide a own createView():JComponent method to display something useful to the user.
 	 */
-	
-	
+	/** Methods for AbstractJCCPlugin **/
 	@Override
 	public JComponent createView() {
 		return this.view;
 	}
 
-	/*** Three methods to implement the IDiscoveryServiceListener interface ***/
+	
+	/** Methods for IMonitorServiceListener **/
 	@Override
+	public void removeWorkloadSingle(InetSocketAddress machine) {
+		this.machineWorkloads.remove(machine);
+	}
+
+	@Override
+	public void updateWorkloadAll(Map<InetSocketAddress, Workload> machineWorkloads) {
+		this.machineWorkloads = machineWorkloads;
+	}
+
+	@Override
+	public void updateWorkloadSingle(InetSocketAddress machine, Workload workload) {
+		this.machineWorkloads.put(machine, workload); // put is very nice: only updates value when key already present
+	}
+
+	/*** Three methods to implement the IDiscoveryServiceListener interface ***/
+	/*@Override
 	public void addMachine(InetSocketAddress machine) {
 		machines.add(machine);
 		view.repaint();
@@ -117,5 +140,7 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IDis
 	public void removeMachine(InetSocketAddress machine) {
 		machines.remove(machine);
 		view.repaint();
-	}
+	}*/
+	
+	
 }
