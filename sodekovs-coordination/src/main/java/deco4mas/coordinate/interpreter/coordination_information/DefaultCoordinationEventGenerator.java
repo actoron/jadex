@@ -229,7 +229,7 @@ public class DefaultCoordinationEventGenerator extends SimplePropertyObject impl
 			// ISpaceObject[] objects =
 			// (ISpaceObject[])space.getNearObjects(pos, maxrange,
 			// null).toArray(new ISpaceObject[0]);
-			ISpaceObject[] objects = (ISpaceObject[]) space.getNearObjects(new Vector2Double(0.0, 0.0), new Vector1Double(20.0), null).toArray(new ISpaceObject[0]);
+			ISpaceObject[] objects = (ISpaceObject[]) space.getNearObjects(new Vector2Double(0.0, 0.0), new Vector1Double(20.0)).toArray(new ISpaceObject[0]);
 
 			// Object[] tmp = space.getSpaceObjects();
 			// ISpaceObject[] newTmp = new ISpaceObject[tmp.length];
@@ -288,7 +288,7 @@ public class DefaultCoordinationEventGenerator extends SimplePropertyObject impl
 			// ISpaceObject[] objects =
 			// (ISpaceObject[])space.getNearObjects(pos, maxrange,
 			// null).toArray(new ISpaceObject[0]);
-			ISpaceObject[] objects = (ISpaceObject[]) space.getNearObjects(new Vector2Double(0.0, 0.0), new Vector1Double(20.0), null).toArray(new ISpaceObject[0]);
+			ISpaceObject[] objects = (ISpaceObject[]) space.getNearObjects(new Vector2Double(0.0, 0.0), new Vector1Double(20.0)).toArray(new ISpaceObject[0]);
 
 			// Object[] tmp = space.getSpaceObjects();
 			// ISpaceObject[] newTmp = new ISpaceObject[tmp.length];
