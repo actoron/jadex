@@ -4,21 +4,14 @@ import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.envsupport.environment.ISpaceAction;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.ContinuousSpace2D;
-import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
-import jadex.application.space.envsupport.environment.space2d.action.GetPosition;
-import jadex.application.space.envsupport.environment.space2d.action.SetPosition;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Int;
 import jadex.application.space.envsupport.math.Vector2Double;
-import jadex.bridge.IArgument;
 import jadex.commons.IFilter;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,18 +22,6 @@ public class FireflyAgent extends MicroAgent
 {
 	//-------- attributes --------
 	
-//	/** The probability of a random move. */
-//	protected double randomchance;
-//	
-//	/** The desired temperature. */
-//	protected double ideal_temp;
-//	
-//	/** The current temperature. */
-//	protected double mytemp;
-//	
-//	/** The current unhappiness. */
-//	protected double unhappiness;
-
 	//-------- methods --------
 	
 	/**
@@ -139,60 +120,8 @@ public class FireflyAgent extends MicroAgent
 	
 	/**
 	 *  Get the meta information about the agent.
-	 */
+	 * /
 	public static Object getMetaInfo()
 	{
-		// todo: remove arguments, the values are directly taken 
-		// from the avatar.
-		return new MicroAgentMetaInfo("A heat bug emits heat and " +
-			"moves towards a point with ideal temperature.", 
-			new String[0], new IArgument[]{
-			new IArgument()
-			{
-				public Object getDefaultValue(String configname)
-				{
-					return new Double(0.5);
-				}
-				public String getDescription()
-				{
-					return "Ideal temperature.";
-				}
-				public String getName()
-				{
-					return "ideal_temp";
-				}
-				public String getTypename()
-				{
-					return "double";
-				}
-				public boolean validate(String input)
-				{
-					return true;
-				}
-			},
-			new IArgument()
-			{
-				public Object getDefaultValue(String configname)
-				{
-					return new Double(0.1);
-				}
-				public String getDescription()
-				{
-					return "Output heat.";
-				}
-				public String getName()
-				{
-					return "output_heat";
-				}
-				public String getTypename()
-				{
-					return "double";
-				}
-				public boolean validate(String input)
-				{
-					return true;
-				}
-			}
-		}, null, null);
-	}
+	}*/
 }

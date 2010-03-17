@@ -19,6 +19,9 @@ public class MApplicationInstance
 	/** The list of contained components. */
 	protected List components;
 	
+	/** The map of argument default values. */
+	protected List arguments;
+	
 	//-------- constructors --------
 	
 	/**
@@ -28,6 +31,7 @@ public class MApplicationInstance
 	{
 		this.spaces = new ArrayList();
 		this.components = new ArrayList();
+		this.arguments = new ArrayList();
 	}
 	
 	//-------- methods --------
@@ -84,6 +88,43 @@ public class MApplicationInstance
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+
+	/**
+	 *  Set the argument default value.
+	 *  @param name The name.
+	 *  @param defval The default value.
+	 */
+	public void addMArgument(MArgument argument)
+	{
+		this.arguments.add(argument);
+	}
+
+	/**
+	 *  Get the spaces.
+	 *  @return The spaces.
+	 */
+	public List getSpaces()
+	{
+		return this.spaces;
+	}
+
+	/**
+	 *  Get the components.
+	 *  @return The components.
+	 */
+	public List getComponents()
+	{
+		return this.components;
+	}
+
+	/**
+	 *  Get the arguments.
+	 *  @return The arguments.
+	 */
+	public List getArguments()
+	{
+		return this.arguments;
 	}
 	
 }

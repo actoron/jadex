@@ -28,7 +28,7 @@
 	</imports>
 	
 	<arguments>
-		<argument name="number" typename="Integer">1000</argument>
+		<argument name="number" typename="Integer">10</argument>
 		<argument name="strategy_delay" typename="Boolean">true</argument>
 		<argument name="flashes_to_reset" typename="Integer">1</argument>
 		<argument name="flash_length" typename="Integer">1</argument>
@@ -106,8 +106,12 @@
 		<componenttype name="Firefly" filename="jadex/micro/examples/fireflies/FireflyAgent.class"/>
 	</componenttypes>
 	
-	<applications>
+	<applications>	
 		<application name="15x15 and 100 flies">
+			<arguments>
+				<argument name="number">100</argument>
+			</arguments>
+			
 			<spaces>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="15" height="15">
 					<env:dataproviders>
@@ -147,11 +151,15 @@
 			</spaces>
 
 			<components>
-				<component type="Firefly" number="100"/>
+				<component type="Firefly" number="$args.number"/>
 			</components>
 		</application>
 		
 		<application name="15x15 and 100 flies without evaluation">
+			<arguments>
+				<argument name="number">100</argument>
+			</arguments>
+			
 			<spaces>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="15" height="15">
 					<env:observers>
@@ -161,7 +169,25 @@
 			</spaces>
 
 			<components>
-				<component type="Firefly" number="100"/>
+				<component type="Firefly" number="$args.number"/>
+			</components>
+		</application>
+		
+		<application name="15x15 and 200 flies without evaluation">
+			<arguments>
+				<argument name="number">200</argument>
+			</arguments>
+			
+			<spaces>
+				<env:envspace name="mygc2dspace" type="gc2dspace" width="15" height="15">
+					<env:observers>
+						<env:observer name="world" view="view_all" perspective="main" />
+					</env:observers>
+				</env:envspace>
+			</spaces>
+
+			<components>
+				<component type="Firefly" number="$args.number"/>
 			</components>
 		</application>
 	</applications>

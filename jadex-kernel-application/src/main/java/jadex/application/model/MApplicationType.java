@@ -1,6 +1,7 @@
 package jadex.application.model;
 
 import jadex.bridge.Argument;
+import jadex.bridge.IArgument;
 import jadex.commons.SUtil;
 
 import java.util.ArrayList;
@@ -172,6 +173,23 @@ public class MApplicationType
 	public List getArguments()
 	{
 		return this.arguments;
+	}
+	
+	/**
+	 *  Get an argument per name.
+	 *  @param name The name.
+	 *  @return The argument.
+	 */
+	public Argument getArgument(String name)
+	{
+		Argument ret = null;
+		for(int i=0; i<arguments.size() && ret==null; i++)
+		{
+			Argument tmp = (Argument)arguments.get(i);
+			if(tmp.getName().equals(name))
+				ret = tmp;
+		}
+		return ret;
 	}
 
 	/**

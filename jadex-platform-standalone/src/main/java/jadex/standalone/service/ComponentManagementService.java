@@ -225,11 +225,11 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  Create an instance of a component (step 2 of creation process).
 	 */
 	protected void createComponentInstance(String config, Map args,
-			boolean suspend, IResultListener listener,
-			final IResultListener resultlistener, IComponentFactory factory,
-			ILoadableComponentModel lmodel, final ComponentIdentifier cid,
-			StandaloneComponentAdapter adapter, StandaloneComponentAdapter pad,
-			CMSComponentDescription ad, IExternalAccess parent)
+		boolean suspend, IResultListener listener,
+		final IResultListener resultlistener, IComponentFactory factory,
+		ILoadableComponentModel lmodel, final ComponentIdentifier cid,
+		StandaloneComponentAdapter adapter, StandaloneComponentAdapter pad,
+		CMSComponentDescription ad, IExternalAccess parent)
 	{
 		// Create the component instance.
 		IComponentInstance instance = factory.createComponentInstance(adapter, lmodel, config, args, parent);

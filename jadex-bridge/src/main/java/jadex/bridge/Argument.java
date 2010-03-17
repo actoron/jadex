@@ -1,11 +1,21 @@
 package jadex.bridge;
 
+import jadex.commons.SUtil;
+
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  *  Simple default implementation for an argument.
  */
 public class Argument implements IArgument
 {
+	//-------- constants --------
+	
+	/** Constant for no configuration selected. */
+	public static final String ANY_CONFIG = "any_config";
+	
 	//-------- attributes --------
 	
 	/** The name. */
@@ -17,8 +27,8 @@ public class Argument implements IArgument
 	/** The typename. */
 	protected String typename;
 	
-	/** The default value. */
-	protected Object defaultvalue;
+	/** The default values. */
+	protected Map defaultvalues;
 	
 	//-------- constructors --------
 	
@@ -53,10 +63,21 @@ public class Argument implements IArgument
 	 */
 	public Argument(String name, String description, String typename, Object defaultvalue)
 	{
+		this(name, description, typename, SUtil.createHashMap(new Object[]{ANY_CONFIG}, new Object[]{defaultvalue}));
+	}
+	
+	/**
+	 * @param name
+	 * @param description
+	 * @param typename
+	 * @param defaultvalue
+	 */
+	public Argument(String name, String description, String typename, Map defaultvalues)
+	{
 		this.name = name;
 		this.description = description;
 		this.typename = typename;
-		this.defaultvalue = defaultvalue;
+		this.defaultvalues = defaultvalues;
 	}
 	
 	//-------- methods --------
@@ -121,9 +142,12 @@ public class Argument implements IArgument
 	 */
 	public Object getDefaultValue(String configname)
 	{
-		// todo: support configurations
-		
-		return defaultvalue;	
+		Object ret = null;
+		if(defaultvalues!=null)
+		{
+			ret = defaultvalues.get(configname!=null && defaultvalues.containsKey(configname)? configname: ANY_CONFIG);
+		}
+		return ret;
 	}
 	
 	/**
@@ -132,7 +156,20 @@ public class Argument implements IArgument
 	 */
 	public void setDefaultValue(Object defaultvalue)
 	{
-		this.defaultvalue = defaultvalue;
+		if(defaultvalues==null)
+			defaultvalues = new HashMap();
+		defaultvalues.put(ANY_CONFIG, defaultvalue);
+	}
+	
+	/**
+	 *  Set the defaultvalue.
+	 *  @param defaultvalue The defaultvalue to set.
+	 */
+	public void setDefaultValue(String configname, Object defaultvalue)
+	{
+		if(defaultvalues==null)
+			defaultvalues = new HashMap();
+		defaultvalues.put(configname, defaultvalue);
 	}
 
 	/**
@@ -152,7 +189,7 @@ public class Argument implements IArgument
 	 */
 	public String toString()
 	{
-		return "Argument(defaultvalue=" + this.defaultvalue + ", description="
+		return "Argument(defaultvalues=" + this.defaultvalues + ", description="
 			+ this.description + ", name=" + this.name + ", typename="
 			+ this.typename + ")";
 	}

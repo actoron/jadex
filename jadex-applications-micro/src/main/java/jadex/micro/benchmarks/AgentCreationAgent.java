@@ -156,7 +156,8 @@ public class AgentCreationAgent extends MicroAgent
 	public static Object getMetaInfo()
 	{
 		return new MicroAgentMetaInfo("This agents benchmarks agent creation and termination.", 
-			new String[0], new IArgument[]{new IArgument()
+			new String[0],
+			new IArgument[]{new IArgument()
 		{
 			public Object getDefaultValue(String configname)
 			{

@@ -1,5 +1,6 @@
 package jadex.micro.examples;
 
+import jadex.bridge.Argument;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.concurrent.IResultListener;
@@ -55,30 +56,6 @@ public class ResultAgent extends MicroAgent
 	public static Object getMetaInfo()
 	{
 		return new MicroAgentMetaInfo("This agent starts a subagent and fetches its result.", 
-			null, null, new IArgument[]{
-			new IArgument()
-			{
-				public Object getDefaultValue(String configname)
-				{
-					return new Integer(0);
-				}
-				public String getDescription()
-				{
-					return "Result value.";
-				}
-				public String getName()
-				{
-					return "result";
-				}
-				public String getTypename()
-				{
-					return "String";
-				}
-				public boolean validate(String input)
-				{
-					return true;
-				}
-			}
-		}, null);
+			null, null, new IArgument[]{new Argument("result", "Result value.", "String", new Integer(0))}, null);
 	}
 }

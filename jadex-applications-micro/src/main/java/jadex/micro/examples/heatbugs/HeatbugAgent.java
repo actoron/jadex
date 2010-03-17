@@ -7,9 +7,7 @@ import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Int;
-import jadex.bridge.IArgument;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -139,7 +137,7 @@ public class HeatbugAgent extends MicroAgent
 	
 	/**
 	 *  Get the meta information about the agent.
-	 */
+	 * /
 	public static Object getMetaInfo()
 	{
 		// todo: remove arguments, the values are directly taken 
@@ -194,5 +192,5 @@ public class HeatbugAgent extends MicroAgent
 				}
 			}
 		}, null, null);
-	}
+	}*/
 }
