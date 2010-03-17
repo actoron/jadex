@@ -86,8 +86,7 @@ public abstract class SynchronizedPropertyObject extends SimplePropertyObject
 		{
 			if(properties == null)
 				properties = new HashMap();
-			oldval = properties.get(name);
-			properties.put(name, value);
+			oldval = properties.put(name, value);
 		}
 		if(pcs!=null)
 			pcs.firePropertyChange(name, oldval, value);
