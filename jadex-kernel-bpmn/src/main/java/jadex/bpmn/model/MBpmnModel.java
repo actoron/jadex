@@ -130,7 +130,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	protected String packagename;
 	
 	/** The imports. */
-	protected String[] imports;
+	protected List imports;
 	
 	/** The context variables (name -> [class, initexpression]). */
 	protected Map	variables;
@@ -642,16 +642,32 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	 */
 	public String[] getAllImports()
 	{
-		return imports;
+		List ret = new ArrayList();
+		if(getPackage()!=null)
+			ret.add(getPackage());
+		if(imports!=null)
+			ret.addAll(imports);
+		return (String[])ret.toArray(new String[ret.size()]);
 	}
 	
 	/**
 	 *  Set the imports.
 	 *  @param imports The imports.
-	 */
+	 * /
 	public void setImports(String[] imports)
 	{
 		this.imports = imports;
+	}*/
+	
+	/**
+	 *  Add an import.
+	 *  @param import The import statement.
+	 */
+	public void addImport(String imp)
+	{
+		if(imports==null)
+			imports = new ArrayList();
+		this.imports.add(imp);
 	}
 	
 	/**

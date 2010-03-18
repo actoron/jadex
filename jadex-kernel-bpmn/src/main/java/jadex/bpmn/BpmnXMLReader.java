@@ -954,7 +954,6 @@ public class BpmnXMLReader
 				
 				String desc = ((MArtifact)arts.get(0)).getDescription();
 				StringTokenizer	stok = new StringTokenizer(desc, "\r\n");
-				List imports = new ArrayList();
 				while(stok.hasMoreTokens())
 				{
 					String	prop	= stok.nextToken().trim();
@@ -969,14 +968,13 @@ public class BpmnXMLReader
 					else if(prop.startsWith("import"))
 					{
 						String imp = prop.substring(prop.indexOf("imports")+7).trim();
-						imports.add(imp);
+						model.addImport(imp);
 					}
 					else if(prop.startsWith("argument"))
 					{
 						String argstr = prop.substring(prop.indexOf("argument")+8).trim();
 						
-						String[] imps = (String[])imports.toArray(new String[imports.size()]);
-						IArgument arg = (IArgument)parser.parseExpression(argstr, imps, null, 
+						IArgument arg = (IArgument)parser.parseExpression(argstr, model.getAllImports(), null, 
 							context.getClassLoader()).getValue(null);
 						
 						model.addArgument(arg);
@@ -985,8 +983,7 @@ public class BpmnXMLReader
 					{
 						String resstr = prop.substring(prop.indexOf("result")+6).trim();
 						
-						String[] imps = (String[])imports.toArray(new String[imports.size()]);
-						IArgument res = (IArgument)parser.parseExpression(resstr, imps, null, 
+						IArgument res = (IArgument)parser.parseExpression(resstr, model.getAllImports(), null, 
 							context.getClassLoader()).getValue(null);
 						
 						model.addResult(res);
@@ -1006,15 +1003,14 @@ public class BpmnXMLReader
 						if(stok2.countTokens()==2)
 						{
 							String clazzname = stok2.nextToken();
-							String[]	imps	= (String[])imports.toArray(new String[imports.size()]);
-							Class clazz = SReflect.findClass0(clazzname, imps, context.getClassLoader());
+							Class clazz = SReflect.findClass0(clazzname, model.getAllImports(), context.getClassLoader());
 							if(clazz!=null)
 							{
 								String name = stok2.nextToken();
 								IParsedExpression exp = null;
 								if(init!=null)
 								{
-									exp = parser.parseExpression(init, imps, null, context.getClassLoader());
+									exp = parser.parseExpression(init, model.getAllImports(), null, context.getClassLoader());
 								}
 								
 								model.addContextVariable(name, clazz, exp);
@@ -1022,9 +1018,6 @@ public class BpmnXMLReader
 						}
 					}
 				}
-				if(model.getPackage()!=null)
-					imports.add(model.getPackage()+".*");
-				model.setImports((String[])imports.toArray(new String[imports.size()]));
 			}	
 			
 			// Handle the annotations of the model.
@@ -1052,12 +1045,12 @@ public class BpmnXMLReader
 							else if("imports".equals(key))
 							{
 								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
-								String[] imps = new String[stok.countTokens()];
 								for(int k=0; stok.hasMoreElements(); k++)
 								{
-									imps[k] = stok.nextToken();
+									String imp = stok.nextToken().trim();
+									if(imp.length()>0)
+										model.addImport(imp);
 								}
-								model.setImports(imps);
 //								System.out.println("Imports: "+SUtil.arrayToString(imps));
 							}
 							else if("package".equals(key))

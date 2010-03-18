@@ -57,7 +57,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_a23jU-pfEd62vdy0afypXQ"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_a23jVOpfEd62vdy0afypXQ" lineColor="0"/>
     <element xmi:type="bpmn:TextAnnotation" href="Result.bpmn#_a2tyUepfEd62vdy0afypXQ"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_a23jVepfEd62vdy0afypXQ" x="16" y="246"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_a23jVepfEd62vdy0afypXQ" x="6" y="242"/>
   </children>
   <styles xmi:type="notation:PageStyle" xmi:id="_X69y4epfEd62vdy0afypXQ"/>
   <styles xmi:type="notation:GuideStyle" xmi:id="_X69y4upfEd62vdy0afypXQ"/>
