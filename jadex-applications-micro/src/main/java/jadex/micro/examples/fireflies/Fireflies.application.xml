@@ -75,10 +75,10 @@
 						<env:property name="rotation" dynamic="true">
 							new Vector3Double(0,0,$object.direction)
 						</env:property>
-						<env:texturedrectangle layer="2" rotation="rotation" width="0.8" height="0.8" imagepath="jadex/micro/images/micro_agent.png" />
-						<env:ellipse color="color" width="1.0" height="1.0">
+						<env:texturedrectangle layer="2" color="color" rotation="rotation" width="0.8" height="0.8" imagepath="jadex/micro/images/micro_agent.png" />
+						<!-- <env:ellipse color="color" width="1.0" height="1.0">
 							<env:drawcondition>$object.flashing</env:drawcondition>
-						</env:ellipse>
+						</env:ellipse> -->
 					</env:drawable>
 				</env:perspective>
 				

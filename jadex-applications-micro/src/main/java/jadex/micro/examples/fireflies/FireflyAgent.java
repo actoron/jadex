@@ -50,7 +50,7 @@ public class FireflyAgent extends MicroAgent
 				
 				// move
 				// change direction slightly
-				double factor = 1;
+				double factor = 10;
 				double rotchange = Math.random()*Math.PI/factor-Math.PI/2/factor;
 				
 				double newdir = dir+rotchange;
@@ -66,7 +66,7 @@ public class FireflyAgent extends MicroAgent
 				double y = -Math.cos(newdir);
 //				double x = Math.sin(newdir);
 //				double y = Math.cos(newdir);
-				double stepwidth = 1;
+				double stepwidth = 0.1;
 				IVector2 newdirvec = new Vector2Double(x*stepwidth, y*stepwidth);
 				IVector2 newpos = mypos.copy().add(newdirvec);
 				
