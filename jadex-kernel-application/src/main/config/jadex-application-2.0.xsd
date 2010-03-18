@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by hans (kill) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-application" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex-application" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-application" xmlns="http://jadex.sourceforge.net/jadex-application" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 	<xs:element name="applicationtype">
 		<xs:annotation>
 			<xs:documentation>An application type specifies the structure and content of a agent application.</xs:documentation>
@@ -31,10 +31,21 @@
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="arguments" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Container for argument and result specifications.</xs:documentation>
+				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="argument" type="argumenttype" minOccurs="0" maxOccurs="unbounded"/>
-						<xs:element name="result" type="argumenttype" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="argument" type="argumenttype" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>An argument represents an in-parameter for the component.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="result" type="argumenttype" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>An argument represents an out-parameter for the component.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -50,9 +61,16 @@
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="componenttypes" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Container for the used component types.</xs:documentation>
+				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="componenttype" type="componenttype" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="componenttype" type="componenttype" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>A component type is defined by a logical name and an implementation file.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -102,6 +120,20 @@
 			<xs:documentation>A predefined application configuration.</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
+			<xs:element name="arguments" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Container for overridden arguments.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>An argument an the instance level can be used for overriding the default value declared in the argument type.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
 			<xs:element name="spaces" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>The spaces that should available in the application context. These are space instances (or space configurations) usually referring to some defined space type. The details of a space specification are handled in separate XML schemas (e.g. for an AGR space or an evnironment space).</xs:documentation>
@@ -113,9 +145,16 @@
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="components" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Container for component instances.</xs:documentation>
+				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="component" type="component" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="component" type="component" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>A component instance iis used to create a defineable number of components for a declared type.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
