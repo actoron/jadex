@@ -98,7 +98,7 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 		{
 			public Object convertString(String val, IContext context)
 			{
-				return SJavaParser.evaluateExpression((String)val, null);
+				return SJavaParser.evaluateExpression((String)val, ((MApplicationType)context.getRootObject()).getAllImports(), null);
 			}
 		};
 		
@@ -130,7 +130,7 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 					if(arg==null)
 						throw new RuntimeException("Overridden argument not declared in application type: "+overridenarg.getName());
 					
-					Object val = SJavaParser.evaluateExpression(overridenarg.getValue(), null);
+					Object val = SJavaParser.evaluateExpression(overridenarg.getValue(), ((MApplicationType)context.getRootObject()).getAllImports(), null);
 					arg.setDefaultValue(app.getName(), val);
 				}
 				
