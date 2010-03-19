@@ -483,7 +483,7 @@ public abstract class AbstractViewport implements IViewport
 	 * @param pixelY pixel y-coordinate
 	 * @return world coordinates
 	 */
-	private IVector2 getWorldCoordinates(int pixelX, int pixelY)
+	public IVector2 getWorldCoordinates(int pixelX, int pixelY)
 	{
 		if(getInvertX())
 		{

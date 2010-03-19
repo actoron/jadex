@@ -145,6 +145,15 @@ public interface IViewport
 	 * @return true if the IViewport is showing, false otherwise
 	 */
 	public boolean isShowing();
+	
+	/**
+	 * Converts pixel coordinates into world coordinates
+	 * 
+	 * @param pixelX pixel x-coordinate
+	 * @param pixelY pixel y-coordinate
+	 * @return world coordinates
+	 */
+	public IVector2 getWorldCoordinates(int pixelX, int pixelY);
 
 	/**
 	 * Adds a IViewportListener
