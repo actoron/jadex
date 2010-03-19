@@ -84,9 +84,11 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 		}
 		
 		g.translate(position.getXAsDouble(), position.getYAsDouble());
-		g.scale(size.getXAsDouble(), size.getYAsDouble());
-		g.scale(Math.cos(rot.getXAsDouble()), Math.cos(rot.getYAsDouble()));
 		g.rotate(rot.getZAsDouble());
+		g.scale(Math.cos(rot.getXAsDouble()), Math.cos(rot.getYAsDouble()));
+		g.scale(size.getXAsDouble(), size.getYAsDouble());
+		
+		
 		
 		return true;
 	}
@@ -109,10 +111,11 @@ public abstract class RotatingPrimitive extends AbstractVisual2D implements IDra
 		}
 		
 		gl.glTranslatef(position.getXAsFloat(), position.getYAsFloat(), 0.0f);
-		gl.glScalef(size.getXAsFloat(), size.getYAsFloat(), 1.0f);
 		gl.glRotated(Math.toDegrees(rot.getXAsFloat()), 1.0, 0.0, 0.0);
 		gl.glRotated(Math.toDegrees(rot.getYAsFloat()), 0.0, 1.0, 0.0);
 		gl.glRotated(Math.toDegrees(rot.getZAsFloat()), 0.0, 0.0, 1.0);
+		gl.glScalef(size.getXAsFloat(), size.getYAsFloat(), 1.0f);
+		
 		return true;
 	}
 	
