@@ -11,6 +11,7 @@ import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.commons.IFilter;
 import jadex.micro.MicroAgent;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -80,7 +81,9 @@ public class FireflyAgent extends MicroAgent
 					// Look
 					// if count turtles in-radius 1 with [color = yellow] >= flashes-to-reset
 				    // [ set clock reset-level ]
-				    Set tmp = space.getNearObjects((IVector2)avatar.getProperty(
+				    Set tmp = Collections.EMPTY_SET;
+				    
+				    space.getNearObjects((IVector2)avatar.getProperty(
 						Space2D.PROPERTY_POSITION), new Vector1Int(1), new IFilter()
 						{
 							public boolean filter(Object obj)
