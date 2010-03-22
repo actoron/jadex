@@ -28,8 +28,9 @@ public class JadexEditPartFactory extends BpmnEditPartFactory
 			int viewVisualID = BpmnVisualIDRegistry.getVisualID(view);
 			switch (viewVisualID)
 			{
-				case SequenceEdgeEditPart.VISUAL_ID:
-					return new SequenceEdgeEditPartWithCondition(view);
+				// use default EP until preference editor
+				//case SequenceEdgeEditPart.VISUAL_ID:
+				//	return new SequenceEdgeEditPartWithCondition(view);
 
 				case WrappingLabelEditPart.VISUAL_ID:
 					return new WrappingLabelEditPart(view);
