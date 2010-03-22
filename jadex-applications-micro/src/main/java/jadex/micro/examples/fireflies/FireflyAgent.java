@@ -32,7 +32,6 @@ public class FireflyAgent extends MicroAgent
 	{
 		IApplicationExternalAccess	app	= (IApplicationExternalAccess)getParent();
 		final ContinuousSpace2D space = (ContinuousSpace2D)app.getSpace("mygc2dspace");
-		ISpaceObject avatar = space.getAvatar(getComponentIdentifier());
 		
 		Runnable runnable = new Runnable()
 		{

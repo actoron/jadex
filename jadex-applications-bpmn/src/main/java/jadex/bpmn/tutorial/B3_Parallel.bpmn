@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_GuFIYjNWEd-LQLKZfFgXnA" iD="_GuFIYTNWEd-LQLKZfFgXnA">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__mHN4DNaEd-LQLKZfFgXnA" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__mHN4TNaEd-LQLKZfFgXnA" key="Description" value="&lt;h1>Parallel Activities&lt;/h1> This examples shows different forms of parallelism in BPMN."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__mHN4jNaEd-LQLKZfFgXnA" key="Package" value=""/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_GwBCETNWEd-LQLKZfFgXnA" iD="_GwBCEDNWEd-LQLKZfFgXnA" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_GxDj4TNWEd-LQLKZfFgXnA" iD="_GxDj4DNWEd-LQLKZfFgXnA" outgoingEdges="_NMCDQTNWEd-LQLKZfFgXnA" name="Task 1a" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_AZ9ssDNbEd-LQLKZfFgXnA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AZ9ssTNbEd-LQLKZfFgXnA" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Az5PoDNbEd-LQLKZfFgXnA" key="parameters" value="in␋text␋java.lang.String␋&quot;Task 1a executed.&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_JEIZwTNWEd-LQLKZfFgXnA" iD="_JEIZwDNWEd-LQLKZfFgXnA" outgoingEdges="_UhIBijNWEd-LQLKZfFgXnA" name="Task 1b">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Ib6J4DNbEd-LQLKZfFgXnA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ib6J4TNbEd-LQLKZfFgXnA" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IqzhgDNbEd-LQLKZfFgXnA" key="parameters" value="in␋text␋java.lang.String␋&quot;Task 1b executed.&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_NL4SQTNWEd-LQLKZfFgXnA" iD="_NL4SQDNWEd-LQLKZfFgXnA" outgoingEdges="_OM2nGjNWEd-LQLKZfFgXnA _Qr2ZEjNWEd-LQLKZfFgXnA" incomingEdges="_NMCDQTNWEd-LQLKZfFgXnA" name="Gateway 1" activityType="GatewayParallel"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_OM2nETNWEd-LQLKZfFgXnA" iD="_OM2nEDNWEd-LQLKZfFgXnA" outgoingEdges="_e1GLujNWEd-LQLKZfFgXnA" incomingEdges="_OM2nGjNWEd-LQLKZfFgXnA" name="Task 2a I" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_DLSk0DNbEd-LQLKZfFgXnA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DLSk0TNbEd-LQLKZfFgXnA" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DmG4kDNbEd-LQLKZfFgXnA" key="parameters" value="in␋text␋java.lang.String␋&quot;Task 2a I executed.&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_QrsoETNWEd-LQLKZfFgXnA" iD="_QrsoEDNWEd-LQLKZfFgXnA" outgoingEdges="_gAyiwTNWEd-LQLKZfFgXnA" incomingEdges="_Qr2ZEjNWEd-LQLKZfFgXnA" name="Task 2a II" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_FF7FgDNbEd-LQLKZfFgXnA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FF7FgTNbEd-LQLKZfFgXnA" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FdUR0DNbEd-LQLKZfFgXnA" key="parameters" value="in␋text␋java.lang.String␋&quot;Task 2a II executed.&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_UhIBgTNWEd-LQLKZfFgXnA" iD="_UhIBgDNWEd-LQLKZfFgXnA" outgoingEdges="_1ETY2jNWEd-LQLKZfFgXnA" incomingEdges="_UhIBijNWEd-LQLKZfFgXnA" name="Task 2b" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_J2NksDNbEd-LQLKZfFgXnA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_J2NksTNbEd-LQLKZfFgXnA" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KFQtUDNbEd-LQLKZfFgXnA" key="parameters" value="in␋text␋java.lang.String␋&quot;Task 2b executed.&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_e1GLsTNWEd-LQLKZfFgXnA" iD="_e1GLsDNWEd-LQLKZfFgXnA" outgoingEdges="_34TxijNWEd-LQLKZfFgXnA" incomingEdges="_e1GLujNWEd-LQLKZfFgXnA _gAyiwTNWEd-LQLKZfFgXnA" name="Gateway 2" activityType="GatewayParallel"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_1ETY0TNWEd-LQLKZfFgXnA" iD="_1ETY0DNWEd-LQLKZfFgXnA" incomingEdges="_1ETY2jNWEd-LQLKZfFgXnA" name="Task 3b" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_LB57wDNbEd-LQLKZfFgXnA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LB57wTNbEd-LQLKZfFgXnA" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LZJ-IDNbEd-LQLKZfFgXnA" key="parameters" value="in␋text␋java.lang.String␋&quot;Task 3b executed.&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_34TxgTNWEd-LQLKZfFgXnA" iD="_34TxgDNWEd-LQLKZfFgXnA" incomingEdges="_34TxijNWEd-LQLKZfFgXnA" name="Task 3a" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_HSJFcDNbEd-LQLKZfFgXnA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HSJFcTNbEd-LQLKZfFgXnA" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HkLQoDNbEd-LQLKZfFgXnA" key="parameters" value="in␋text␋java.lang.String␋&quot;Task 3a executed.&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_NMCDQTNWEd-LQLKZfFgXnA" iD="_NMCDQDNWEd-LQLKZfFgXnA"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_OM2nGjNWEd-LQLKZfFgXnA" iD="_OM2nGTNWEd-LQLKZfFgXnA"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Qr2ZEjNWEd-LQLKZfFgXnA" iD="_Qr2ZETNWEd-LQLKZfFgXnA"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_UhIBijNWEd-LQLKZfFgXnA" iD="_UhIBiTNWEd-LQLKZfFgXnA"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_e1GLujNWEd-LQLKZfFgXnA" iD="_e1GLuTNWEd-LQLKZfFgXnA"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_gAyiwTNWEd-LQLKZfFgXnA" iD="_gAyiwDNWEd-LQLKZfFgXnA"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_1ETY2jNWEd-LQLKZfFgXnA" iD="_1ETY2TNWEd-LQLKZfFgXnA"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_34TxijNWEd-LQLKZfFgXnA" iD="_34TxiTNWEd-LQLKZfFgXnA"/>
+  </pools>
+</bpmn:BpmnDiagram>

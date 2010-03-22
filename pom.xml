@@ -69,14 +69,14 @@
 		    <module>jadex-kernel-micro</module>
 		    <module>jadex-kernel-bpmn</module>
 		    <module>jadex-kernel-bdibpmn</module>
-			<!-- <module>jadex-kernel-gpmn</module> -->
+			<module>jadex-kernel-gpmn</module>
 		    
 		    <module>jadex-applib-bdi</module>
 		    <module>jadex-applications-bdi</module>
 		    <module>jadex-applications-micro</module>
 		    <module>jadex-applications-bpmn</module>
 		    <module>jadex-applications-bdibpmn</module>
-		    <!-- <module>jadex-applications-gpmn</module> -->
+		    <module>jadex-applications-gpmn</module>
 
 			<module>jadex-rules</module>
 		    <module>jadex-rules-applications</module>

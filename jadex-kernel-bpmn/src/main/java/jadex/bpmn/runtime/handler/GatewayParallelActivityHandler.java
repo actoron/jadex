@@ -75,24 +75,27 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 					ProcessThread pt = (ProcessThread)it.next();
 					
 					Map data = pt.getData();
-					for(Iterator keys=data.keySet().iterator(); keys.hasNext(); )
+					if(data!=null)
 					{
-						String key = (String)keys.next();
-						Object value = data.get(key);
-						
-						if(thread.hasParameterValue(key))
+						for(Iterator keys=data.keySet().iterator(); keys.hasNext(); )
 						{
-							Object origval =thread.getParameterValue(key);
-							if(!SUtil.equals(origval, value))
+							String key = (String)keys.next();
+							Object value = data.get(key);
+							
+							if(thread.hasParameterValue(key))
 							{
-//								System.out.println("origact: "+thread.getModelElement());
-//								System.out.println("act: "+pt.getModelElement());
-								throw new RuntimeException("Inconsistent parameter values from threads cannot be unified in AND join: "+key+" "+value+" "+origval);
+								Object origval =thread.getParameterValue(key);
+								if(!SUtil.equals(origval, value))
+								{
+	//								System.out.println("origact: "+thread.getModelElement());
+	//								System.out.println("act: "+pt.getModelElement());
+									throw new RuntimeException("Inconsistent parameter values from threads cannot be unified in AND join: "+key+" "+value+" "+origval);
+								}
 							}
-						}
-						else 
-						{
-							thread.setParameterValue(key, value);
+							else 
+							{
+								thread.setParameterValue(key, value);
+							}
 						}
 					}
 					
