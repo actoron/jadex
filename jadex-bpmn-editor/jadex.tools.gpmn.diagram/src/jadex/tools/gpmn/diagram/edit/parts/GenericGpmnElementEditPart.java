@@ -9,6 +9,7 @@
 package jadex.tools.gpmn.diagram.edit.parts;
 
 import jadex.tools.gpmn.GenericGpmnElement;
+import jadex.tools.gpmn.NamedObject;
 import jadex.tools.gpmn.diagram.edit.policies.GenericGpmnElementItemSemanticEditPolicy;
 import jadex.tools.gpmn.diagram.part.GpmnDiagramMessages;
 import jadex.tools.gpmn.diagram.part.GpmnVisualIDRegistry;
@@ -133,7 +134,7 @@ public class GenericGpmnElementEditPart extends AbstractEditPartSupport
 	protected IFigure createNodeShape()
 	{
 		GenericGpmnFigure figure = new GenericGpmnFigure();
-		GenericGpmnElement element = (GenericGpmnElement) getPrimaryView().getElement();
+		NamedObject element = (NamedObject) getPrimaryView().getElement();
 		
 		setLabelAndLayout(figure, element);
 		
@@ -149,7 +150,7 @@ public class GenericGpmnElementEditPart extends AbstractEditPartSupport
 	 * 
 	 * @generated NOT
 	 */
-	private boolean setLabelAndLayout(GenericGpmnFigure figure, GenericGpmnElement element)
+	private boolean setLabelAndLayout(GenericGpmnFigure figure, NamedObject element)
 	{
 		boolean res = false;
 		WrappingLabel wl = figure.getFigureGenericNameFigure();
@@ -166,7 +167,7 @@ public class GenericGpmnElementEditPart extends AbstractEditPartSupport
 			res = true;
 		}
 
-		return setAlignments(figure, element, wl, res);
+		return setAlignments(figure, wl, res);
 	}
 	
 	/**
@@ -178,7 +179,7 @@ public class GenericGpmnElementEditPart extends AbstractEditPartSupport
 	 * @param res
 	 * @return
 	 */
-	private boolean setAlignments(GenericGpmnFigure figure, GenericGpmnElement plan,
+	private boolean setAlignments(GenericGpmnFigure figure,
 			WrappingLabel wl, boolean res)
 	{
 
