@@ -116,11 +116,13 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMon
 	@Override
 	public void updateWorkloadAll(Map<InetSocketAddress, Workload> machineWorkloads) {
 		this.machineWorkloads = machineWorkloads;
+		// repaint an Liste der Plattformen ausführen
 	}
 
 	@Override
 	public void updateWorkloadSingle(InetSocketAddress machine, Workload workload) {
 		this.machineWorkloads.put(machine, workload); // put is very nice: only updates value when key already present
+		
 	}
 
 	/*** Three methods to implement the IDiscoveryServiceListener interface ***/
