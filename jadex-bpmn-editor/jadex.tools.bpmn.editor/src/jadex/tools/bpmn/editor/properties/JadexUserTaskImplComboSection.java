@@ -226,6 +226,8 @@ public class JadexUserTaskImplComboSection extends
 		info.append(taskMetaInfo.getDescription() + "\n");
 		
 		ParameterMetaInfo[] params = taskMetaInfo.getParameterMetaInfos();
+		if (params == null)
+			return info.toString();
 		for (int i = 0; i < params.length; i++)
 		{
 			info.append("\n" + "Parameter: " + params[i].getName() + "\n");
