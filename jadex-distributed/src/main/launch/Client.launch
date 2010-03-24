@@ -14,5 +14,5 @@
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-conf jadex/distributed/config/services_conf_client.xml&#13;&#10;jadex/distributed/config/platformagents_conf_client.xml&#13;&#10;jadex/application/kernel_application_conf.xml&#13;&#10;jadex/bdi/kernel_bdi_conf.xml&#13;&#10;jadex/micro/kernel_micro_conf.xml"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jadex-distributed"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.maven.ide.eclipse.launchconfig.sourcepathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea&#13;&#10;-Dswing.defaultllaf=com.sun.java.swing.plaf.windows.WindowsLookAndFeel&#13;&#10;-Dagentlib:jprofilerti&#10;-Dcom.sun.management.config.file=src/main/java/jadex/distributed/config/jmx/management.properties&#10;-Dcom.sun.management.jmxremote.authenticate=false"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea&#13;&#10;-Dswing.defaultllaf=com.sun.java.swing.plaf.windows.WindowsLookAndFeel&#13;&#10;-Dagentlib:jprofilerti&#10;-Dcom.sun.management.jmxremote.authenticate=false"/>
 </launchConfiguration>
