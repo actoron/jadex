@@ -404,6 +404,22 @@ public class Platform extends AbstractPlatform
 	 */
 	public static void main(String[] args) throws Exception
 	{
+		//System.out.println(System.getProperty("user.dir"));
+		/* TODO der Pfad zur management.properties für JMX durch die JVM Option -D in der Client.launch
+		      funktioniert zwar in diesem develope environment, muss aber noch für ein production
+		      environment angepasst werden; das mit target/... ist einfach nur ugly
+		      
+		      mit diesem ugly weg gibt es zwei möglichkeiten der JVM die JMX config file zu geben
+		       - -Dcom.sun.management.config.file=target/classes/jadex/distributed/config/jmx/management.properties
+		       - -Dcom.sun.management.config.file=src/main/java/jadex/distributed/config/jmx/management.properties
+		       
+		       die management.properties kümmert sich um die komplette konfiguration von JMX,
+		       inklusive -Dcom.sun.management.jmxremote.port=<port-number> und andere
+		   
+		   TODO die zweite:
+		   man kann bei JMX die Passwortabfrage über SSL deaktivieren, was ich hier in dem
+		   development environment nun auch getan habe
+		*/
 		// Absolute start time (for testing and benchmarking).
 		long starttime = System.currentTimeMillis();
 		

@@ -6,6 +6,20 @@ import java.util.Set;
 
 public class MonitorService implements IMonitorService, IDiscoveryServiceListener {
 
+	/*
+	 
+	 Die Klasse kümmert sich darum dem Server alle notwendigen Informationen
+	 zur Verfügung zu stellen. Der MonitorService kümmert sich also um die
+	 Managementinformationen. Dementsprechend wird der CMS, oder eine andere
+	 Klasse die der CMS per Komposition(=Instanvariable) kennt (vorzugsweise
+	 durch dependency injection), die Managementmethode(n) zur Verfügung stellen.
+	 
+	 Es kommt darauf an was JMX schon alle leistet. Darauf basieren dann die
+	 Aufgaben, die der MonitorService zu leisten hat. Diese sind
+	  - 
+	  
+	 */
+	
 	private Set<IMonitorServiceListener> listeners;
 	private Set<InetSocketAddress> machines;
 	
