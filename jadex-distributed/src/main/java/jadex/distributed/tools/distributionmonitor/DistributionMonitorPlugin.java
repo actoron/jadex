@@ -109,7 +109,7 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMon
 	
 	/** Methods for IMonitorServiceListener **/
 	@Override
-	public void removeWorkloadSingle(InetSocketAddress machine) {
+	public void removeWorkloadSingle(InetSocketAddress machine, Workload workload) {
 		this.machineWorkloads.remove(machine);
 	}
 

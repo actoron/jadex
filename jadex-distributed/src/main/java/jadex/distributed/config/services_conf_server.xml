@@ -44,9 +44,13 @@
 				new jadex.distributed.service.df.DirectoryFacilitatorService_Server($platform)
 			</property>
 			
-			<property type="jadex.distributed.service.DiscoveryService" name="discovery_service">
+			<property type="jadex.distributed.service.DiscoveryService" name="discovery_service"> <!-- TODO wieso als Typ nicht IDiscoveryService angeben? -->
 				<!-- new jadex.distributed.service.DiscoveryService($platform) --> <!-- I don't need a reference in the DiscoverService (yet) -->
 				new jadex.distributed.service.DiscoveryService()
+			</property>
+			
+			<property type="jadex.distributed.service.IMonitorService" name="discovery_service">
+				new jadex.distributed.service.IMonitorService($platform)
 			</property>
 			
 			  <property type="jadex.bridge.IMessageService" name="message_service">

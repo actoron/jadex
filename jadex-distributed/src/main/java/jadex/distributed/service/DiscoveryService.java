@@ -39,12 +39,10 @@ public class DiscoveryService implements IService, IDiscoveryService {
 	protected Set<InetSocketAddress> machines; // List of known machines
 	protected Set<IDiscoveryServiceListener> listeners; // List of listernes to inform when the set of available machines changes
 	
-	protected IServiceContainer container; // For wft do I need the container !?! the logger is not used right now 
+	protected IServiceContainer container; // wft do I need the container for!?! the logger is not used right now 
 	
 	public DiscoveryService(IServiceContainer container) { // wtf !?! I don't need the container (yet); how knows, maybe someday ...
 		this.container = container;
-		//this.machines = new ArrayList<URI>();
-		//this.machines = new ArrayList<InetSocketAddress>();
 		this.machines = new HashSet<InetSocketAddress>();
 	}
 	
@@ -132,10 +130,11 @@ public class DiscoveryService implements IService, IDiscoveryService {
 	 *                   when the set of available machines changes
 	 */
 	public void register(IDiscoveryServiceListener listener) {
-		if(listener!=null) // is does not make sense to register null; even worse: is a error, becaue in Java it is not possible to call anything on null; well, in Objective-C this is possible due to the dynamic nature of the language
+		if(listener!=null) { // is does not make sense to register null; even worse: is a error, becaue in Java it is not possible to call anything on null; well, in Objective-C this is possible due to the dynamic nature of the language
 			this.listeners.add(listener);
+			listener.addMachines(machines);
+		}
 		// send new listener object the current list of machines
-		listener.addMachines(machines);
 	}
 	
 	/**

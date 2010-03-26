@@ -14,6 +14,7 @@ import jadex.bridge.ISearchConstraints;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.distributed.jmx.Agents;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.execution.IExecutionService;
@@ -22,6 +23,7 @@ import jadex.standalone.fipaimpl.CMSComponentDescription;
 import jadex.standalone.fipaimpl.ComponentIdentifier;
 import jadex.standalone.fipaimpl.SearchConstraints;
 
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +33,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
 
 /**
  *  Standalone implementation of component execution service.
@@ -84,6 +93,34 @@ public class ComponentManagementService_Client implements IComponentManagementSe
 		this.logger = Logger.getLogger(container.getName()+".cms");
 		this.listeners = SCollection.createMultiCollection();
 		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());
+		
+		/* alles für remote JMX einrichten, damit auch Client-Plattform spezifische Daten verfügbar sind wie Anzahl der Agenten usw.
+		 * durch die Übergabe der -Dcom.sun.management.jmxremote.* jvm-parameter in der launc configuration Client.launch wird zwar
+		 * JMX schon gestartet, es werden so aber zunächst nur MXBeans zur Verfügung gestellt, die ein monitoring der JVM ermöglichen;
+		 * um weitere eigene MBeans zu monitoren, müssen diese hier seperat erstellt und registriert werden 
+		 */
+		MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
+		ObjectName objectName = null;
+		try {
+			objectName = new ObjectName("my.mbeans:type=FirstMBean");
+		} catch (MalformedObjectNameException e) { // actually this exception will never occur
+			System.err.println( new StringBuilder().append("The expression my.mbeans:type=FirstMBean is not a valid ObjectName") );
+			e.printStackTrace();
+		} catch (NullPointerException e) { 
+			System.err.println("Tried to create a new ObjectName object, but an NullPointerException occured; the ObjectName is my.mbeans:type=FirstMBean");
+			e.printStackTrace();
+		}
+		
+		try {
+			mbeanServer.registerMBean( new Agents(this) , objectName);
+		} catch (InstanceAlreadyExistsException e) {
+			e.printStackTrace();
+		} catch (MBeanRegistrationException e) {
+			e.printStackTrace();
+		} catch (NotCompliantMBeanException e) {
+			e.printStackTrace();
+		}
+		
     }
     
     //-------- IComponentManagementService interface --------

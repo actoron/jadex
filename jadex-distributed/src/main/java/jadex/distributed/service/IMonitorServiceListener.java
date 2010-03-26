@@ -36,7 +36,8 @@ public interface IMonitorServiceListener {
 	 * A currently known machine may is not available anymore. In that case the
 	 * IMonitorService needs to inform the listener about this.
 	 * @param machine - the machine which is no longer available
+	 * @param workload TODO
 	 */
-	public void removeWorkloadSingle(InetSocketAddress machine);
+	public void removeWorkloadSingle(InetSocketAddress machine, Workload workload);
 	
 }
