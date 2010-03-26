@@ -98,7 +98,6 @@ public class EnglishGermanTranslateSentencePlanF4 extends Plan
 				try
 				{
 					dispatchSubgoalAndWait(tw);
-					//twords[i] = (String)tw.getResult();
 					twords[i] = (String)tw.getParameter("result").getValue();
 				}
 				catch(GoalFailureException gfe)

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-bdi" xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by hans (kill) -->
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-bdi" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://jadex.sourceforge.net/jadex-bdi" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 	<xs:element name="agent">
 		<xs:annotation>
 			<xs:documentation>Defines a new agent type.</xs:documentation>
@@ -633,7 +634,7 @@
 	<xs:complexType name="MPlanBody" mixed="true">
 		<xs:annotation>
 			<xs:documentation>The plan body contains the code (actions) to execute.</xs:documentation>
-		</xs:annotation>
+		</xs:annotation>
 		<xs:attribute name="type" use="optional">
 			<xs:annotation>
 				<xs:documentation>
@@ -644,11 +645,11 @@
 				</xs:documentation>
 			</xs:annotation>
 			<xs:simpleType>
-				<xs:restriction base="xs:string" />
+				<xs:restriction base="xs:string"/>
 			</xs:simpleType>
-		</xs:attribute>
-		<xs:attribute name="class" type="xs:string"></xs:attribute>
-		<xs:attribute name="impl" type="xs:string"></xs:attribute>
+		</xs:attribute>
+		<xs:attribute name="class" type="xs:string"/>
+		<xs:attribute name="impl" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="MTypedElement" abstract="true" mixed="true">
 		<xs:annotation>
@@ -671,13 +672,12 @@
 						<xs:documentation>Transient beliefs or prameter values are not retained, when persisting or migrating an agent. This is useful e.g. when a value class is not serializable.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
-				<xs:attribute name="evaluationmode" use="optional"
-					default="static">
+				<xs:attribute name="evaluationmode" use="optional" default="static">
 					<xs:simpleType>
 						<xs:restriction base="xs:string">
-							<xs:enumeration value="static"></xs:enumeration>
-							<xs:enumeration value="push"></xs:enumeration>
-							<xs:enumeration value="pull"></xs:enumeration>
+							<xs:enumeration value="static"/>
+							<xs:enumeration value="push"/>
+							<xs:enumeration value="pull"/>
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:attribute>
@@ -705,13 +705,12 @@
 						<xs:documentation>Transient beliefs or prameter values are not retained, when persisting or migrating an agent. This is useful e.g. when a value class is not serializable.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
-				<xs:attribute name="evaluationmode" use="optional"
-					default="static">
+				<xs:attribute name="evaluationmode" use="optional" default="static">
 					<xs:simpleType>
 						<xs:restriction base="xs:string">
-							<xs:enumeration value="static"></xs:enumeration>
-							<xs:enumeration value="push"></xs:enumeration>
-							<xs:enumeration value="pull"></xs:enumeration>
+							<xs:enumeration value="static"/>
+							<xs:enumeration value="push"/>
+							<xs:enumeration value="pull"/>
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:attribute>
@@ -738,11 +737,7 @@
 								<xs:documentation>An expression that represents the default value. Per default it is static, i.e. it is only evalued only once on creation. </xs:documentation>
 							</xs:annotation>
 						</xs:element>
-						<xs:element name="bindingoptions" type="MInternalExpression" minOccurs="0">
-							<xs:annotation>
-								<xs:documentation>From a set of binding option values one concrete is selected per instance.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
+						<xs:element name="bindingoptions" type="MInternalExpression" minOccurs="0"/>
 					</xs:choice>
 				</xs:sequence>
 			</xs:restriction>
@@ -788,20 +783,14 @@
 		<xs:complexContent mixed="true">
 			<xs:extension base="MTypedElement">
 				<xs:sequence>
-					<xs:element name="fact" type="MInternalExpression"
-						minOccurs="0">
+					<xs:element name="fact" type="MInternalExpression" minOccurs="0">
 						<xs:annotation>
-							<xs:documentation>
-								An expression that represents the
-								default value. Per default it is static,
-								i.e. it is only evalued only once on
-								creation.
-							</xs:documentation>
+							<xs:documentation>Initial value for a belief. Per default it is static, i.e. it is only evalued only once on creation.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
 				</xs:sequence>
-				<xs:attribute name="argument" type="xs:boolean"></xs:attribute>
-				<xs:attribute name="result" type="xs:boolean"></xs:attribute>
+				<xs:attribute name="argument" type="xs:boolean"/>
+				<xs:attribute name="result" type="xs:boolean"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -814,31 +803,19 @@
 		<xs:complexContent mixed="true">
 			<xs:extension base="MTypedElementSet">
 				<xs:choice>
-					<xs:element name="fact" type="MStaticValue"
-						minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="fact" type="MStaticValue" minOccurs="0" maxOccurs="unbounded">
 						<xs:annotation>
-							<xs:documentation>
-								An expression that evaluated to a
-								default value. Only static values are
-								allowed, i.e. it is only evaluated once
-								on creation.
-							</xs:documentation>
+							<xs:documentation>An expression that is evaluated to a default value. Only static values are allowed, i.e. it is only evaluated once on agent creation.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="facts" type="MInternalExpression"
-						minOccurs="0">
+					<xs:element name="facts" type="MInternalExpression" minOccurs="0">
 						<xs:annotation>
-							<xs:documentation>
-								An expression that is evaluated to a set
-								of default values. Per default it is
-								static, i.e. it is only evalued only
-								once on creation.
-							</xs:documentation>
+							<xs:documentation>An expression that is evaluated to a set of default value. Only static values are allowed, i.e. it is only evaluated once on agent creation.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
 				</xs:choice>
-				<xs:attribute name="argument" type="xs:boolean"></xs:attribute>
-				<xs:attribute name="result" type="xs:boolean"></xs:attribute>
+				<xs:attribute name="argument" type="xs:boolean"/>
+				<xs:attribute name="result" type="xs:boolean"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -849,16 +826,14 @@
 		<xs:complexContent mixed="true">
 			<xs:extension base="MTypedElement">
 				<xs:choice>
-					<xs:element name="value" type="MInternalExpression"
-						minOccurs="0">
+					<xs:element name="value" type="MInternalExpression" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>
 								An expression that is the default value.
 							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="bindingoptions"
-						type="MInternalExpression" minOccurs="0">
+					<xs:element name="bindingoptions" type="MInternalExpression" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>
 								From a set of binding option values one
@@ -868,8 +843,9 @@
 								a new plan instance is created.
 							</xs:documentation>
 						</xs:annotation>
-					</xs:element>
-					<xs:choice maxOccurs="unbounded" minOccurs="0"><xs:element name="goalmapping" type="MAssign" minOccurs="0" maxOccurs="1">
+					</xs:element>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="goalmapping" type="MAssign" minOccurs="0">
 							<xs:annotation>
 								<xs:documentation>
 									This parameter is considered as a
@@ -877,7 +853,8 @@
 									parameter in a goal.
 								</xs:documentation>
 							</xs:annotation>
-						</xs:element><xs:element name="internaleventmapping" type="MAssign" minOccurs="0" maxOccurs="1">
+						</xs:element>
+						<xs:element name="internaleventmapping" type="MAssign" minOccurs="0">
 							<xs:annotation>
 								<xs:documentation>
 									This parameter is considered as a
@@ -885,7 +862,8 @@
 									parameter in an internal event.
 								</xs:documentation>
 							</xs:annotation>
-						</xs:element><xs:element name="messageeventmapping" type="MAssign" minOccurs="0" maxOccurs="1">
+						</xs:element>
+						<xs:element name="messageeventmapping" type="MAssign" minOccurs="0">
 							<xs:annotation>
 								<xs:documentation>
 									This parameter is considered as a
@@ -893,8 +871,9 @@
 									parameter in a message event.
 								</xs:documentation>
 							</xs:annotation>
-						</xs:element></xs:choice>
-                </xs:choice>
+						</xs:element>
+					</xs:choice>
+				</xs:choice>
 				<xs:attribute name="optional" type="xs:boolean" use="optional" default="false">
 					<xs:annotation>
 						<xs:documentation>If a parameter is declared optional (default is false), it need not to have a value (can null).</xs:documentation>
@@ -961,7 +940,7 @@
 									</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:extension base="MReferenceableElement">
+			<xs:extension base="MReferenceableElement">
 				<xs:attribute name="class" type="xs:string" use="optional">
 					<xs:annotation>
 						<xs:documentation>
@@ -983,6 +962,7 @@
 					</xs:annotation>
 				</xs:attribute>
 				<xs:attribute name="language" type="xs:string" use="optional"/>
+				<xs:attribute name="variable" type="xs:string" use="optional"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -1005,7 +985,7 @@
 			<xs:documentation>For expressions that are not conatined in the expressionbase. Cannot be exported.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:restriction base="MExpression">
+			<xs:restriction base="MExpression">
 				<xs:attribute name="exported" use="prohibited"/>
 			</xs:restriction>
 		</xs:complexContent>
@@ -1015,8 +995,7 @@
 			<xs:documentation>An expression that is monitored.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:extension base="MExpression">
-			</xs:extension>
+			<xs:extension base="MExpression"/>
 		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="MInternalCondition" mixed="true">
@@ -1024,9 +1003,9 @@
 			<xs:documentation>For conditions that are not conatined in the expressionbase. Cannot be exported.</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent mixed="true">
-			<xs:restriction base="MCondition">
-				<xs:attribute name="exported" use="prohibited"/>
-				<xs:attribute name="class" use="prohibited"/>
+			<xs:restriction base="MCondition">
+				<xs:attribute name="exported" use="prohibited"/>
+				<xs:attribute name="class" use="prohibited"/>
 			</xs:restriction>
 		</xs:complexContent>
 	</xs:complexType>
@@ -1168,29 +1147,33 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="MElement">
-				<xs:sequence>
-					<xs:choice maxOccurs="unbounded" minOccurs="0"><xs:element name="internalevent" type="MReference" minOccurs="0" maxOccurs="1">
-						<xs:annotation>
-							<xs:documentation>
+				<xs:sequence>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="internalevent" type="MReference" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>
 								Any number of internal events that are
 								triggers.
 							</xs:documentation>
-						</xs:annotation>
-					</xs:element><xs:element name="messageevent" type="MReference" minOccurs="0" maxOccurs="1">
-						<xs:annotation>
-							<xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="messageevent" type="MReference" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>
 								Any number of message events that are
 								triggers.
 							</xs:documentation>
-						</xs:annotation>
-					</xs:element><xs:element name="goalfinished" type="MReference" minOccurs="0" maxOccurs="1">
-						<xs:annotation>
-							<xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="goalfinished" type="MReference" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>
 								Any number of goals that are triggers.
 							</xs:documentation>
-						</xs:annotation>
-					</xs:element></xs:choice>
-                    <xs:element name="filter" type="MStaticValue" minOccurs="0">
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
+					<xs:element name="filter" type="MStaticValue" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>
 								Deprecated. Can be used to specify an
@@ -1200,7 +1183,7 @@
 							</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-                </xs:sequence>
+				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -1403,8 +1386,8 @@
 		</xs:annotation>
 		<xs:complexContent mixed="true">
 			<xs:extension base="MTypedElementReference">
-				<xs:attribute name="argument" type="xs:boolean"></xs:attribute>
-				<xs:attribute name="result" type="xs:boolean"></xs:attribute>
+				<xs:attribute name="argument" type="xs:boolean"/>
+				<xs:attribute name="result" type="xs:boolean"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -1416,8 +1399,8 @@
 		</xs:annotation>
 		<xs:complexContent mixed="true">
 			<xs:extension base="MTypedElementSetReference">
-				<xs:attribute name="argument" type="xs:boolean"></xs:attribute>
-				<xs:attribute name="result" type="xs:boolean"></xs:attribute>
+				<xs:attribute name="argument" type="xs:boolean"/>
+				<xs:attribute name="result" type="xs:boolean"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -1884,22 +1867,27 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="MTrigger">
-				<xs:sequence>
+				<xs:sequence>
 					<xs:element name="condition" minOccurs="0">
 						<xs:complexType mixed="true">
 							<xs:complexContent mixed="true">
-								<xs:extension base="MBindingCondition" />
+								<xs:extension base="MBindingCondition"/>
 							</xs:complexContent>
 						</xs:complexType>
-					</xs:element>
-					<xs:choice maxOccurs="unbounded" minOccurs="0"><xs:element name="goal" type="MReference" minOccurs="0" maxOccurs="1">
-						<xs:annotation>
-							<xs:documentation>
+					</xs:element>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="goal" type="MReference" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>
 								Any number of goals that are triggers.
 							</xs:documentation>
-						</xs:annotation>
-					</xs:element><xs:element name="factadded" type="MAssign" minOccurs="0" maxOccurs="1" /><xs:element name="factremoved" type="MAssign" minOccurs="0" maxOccurs="1" /><xs:element name="factchanged" type="MAssign" minOccurs="0" maxOccurs="1" /></xs:choice>
-                </xs:sequence>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="factadded" type="MAssign" minOccurs="0"/>
+						<xs:element name="factremoved" type="MAssign" minOccurs="0"/>
+						<xs:element name="factchanged" type="MAssign" minOccurs="0"/>
+					</xs:choice>
+				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>

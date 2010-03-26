@@ -112,7 +112,7 @@
 			element of a belief set tuple. -->
 		<expression name="query_egword">
 			select one $wordpair.get(1)
-			from Tuple $wordpair in $beliefbase.getBeliefSet("egwords").getFacts()
+			from Tuple $wordpair in $beliefbase.egwords
 			where $wordpair.get(0).equals($eword)
 			<!-- <parameter name="$eword" class="String"/> -->
 		</expression>
@@ -121,7 +121,7 @@
 			element of a belief set tuple. -->
 		<expression name="query_efword">
 			select one $wordpair.get(1)
-			from Tuple $wordpair in $beliefbase.getBeliefSet("efwords").getFacts()
+			from Tuple $wordpair in $beliefbase.efwords
 			where $wordpair.get(0).equals($eword)
 			<!-- <parameter name="$eword" class="String"/> -->
 		</expression>

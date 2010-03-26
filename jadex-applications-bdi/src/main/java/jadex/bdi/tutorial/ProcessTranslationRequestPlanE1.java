@@ -55,7 +55,6 @@ public class ProcessTranslationRequestPlanE1 extends Plan
 					dispatchSubgoalAndWait(goal);
 					getLogger().info("Translated from "+goal+" "+
 						word+" - "+goal.getParameter("result").getValue());
-					//	word+" - "+goal.getResult());
 				}
 				catch(GoalFailureException e)
 				{

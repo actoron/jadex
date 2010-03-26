@@ -26,9 +26,9 @@
 	<beliefs>
 		<!-- Include a belief which is orininally defined in
 			the translation capability. -->
-		<!-- <beliefsetref name="egwords">
+		<beliefsetref name="egwords">
 			<concrete ref="transcap.egwords" />
-		</beliefsetref> -->
+		</beliefsetref>
 	</beliefs>
 	
 	<plans>

@@ -32,12 +32,20 @@ public class FindEnglishSynonymsPlanD2 extends Plan
 		getLogger().info("Created: "+this);
 
 		// Create precompiled queries.
+//		String	translate	= "select one $wordpair.get(1) "
+//			+"from Tuple $wordpair in $beliefbase.getBeliefSet(\"transcap.egwords\").getFacts() "
+//			+"where $wordpair.get(0).equals($eword)";
+		
 		String	translate	= "select one $wordpair.get(1) "
-			+"from Tuple $wordpair in $beliefbase.getBeliefSet(\"transcap.egwords\").getFacts() "
+			+"from Tuple $wordpair in $beliefbase.egwords "
 			+"where $wordpair.get(0).equals($eword)";
 
+//		String	find	= "select $wordpair.get(0) "
+//			+"from Tuple $wordpair in $beliefbase.getBeliefSet(\"transcap.egwords\").getFacts() "
+//			+"where $wordpair.get(1).equals($gword) && !$wordpair.get(0).equals($eword)";
+		
 		String	find	= "select $wordpair.get(0) "
-			+"from Tuple $wordpair in $beliefbase.getBeliefSet(\"transcap.egwords\").getFacts() "
+			+"from Tuple $wordpair in $beliefbase.egwords "
 			+"where $wordpair.get(1).equals($gword) && !$wordpair.get(0).equals($eword)";
 
 		this.querytranslate	= createExpression(translate, new String[]{"$eword"}, new Class[]{String.class});

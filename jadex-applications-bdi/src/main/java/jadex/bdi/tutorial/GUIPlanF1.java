@@ -67,11 +67,11 @@ public class GUIPlanF1 extends Plan
 			}
 		});
 		
-		/*while(true)
-		{
-			IInternalEvent event = waitForInternalEvent("gui_update");
-			gui.addRow((String[])event.getParameter("content").getValue());
-		}*/
+//		while(true)
+//		{
+//			IInternalEvent event = waitForInternalEvent("gui_update");
+//			gui.addRow((String[])event.getParameter("content").getValue());
+//		}
 	}
 
 	/**

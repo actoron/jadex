@@ -362,7 +362,11 @@ public class OAVBDIXMLReader
 					
 //					System.out.println("Found condition: "+se.object);
 
-					if("clips".equals(lang))
+					if(lang==null || lang.equals("jcl"))
+					{
+						// Java conditions parsed later in createAgentModelEntry()
+					}
+					else if("clips".equals(lang))
 					{
 						List	errors	= null;//new ArrayList();
 						try
@@ -382,10 +386,6 @@ public class OAVBDIXMLReader
 //								report.put(se, errors.get(i));
 //							}
 //						}
-					}
-					else if(lang==null || lang.equals("jcl"))
-					{
-						// Java conditions parsed later in createAgentModelEntry()
 					}
 					else
 					{

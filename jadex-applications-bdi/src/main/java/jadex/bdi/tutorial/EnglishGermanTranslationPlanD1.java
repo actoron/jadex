@@ -63,7 +63,7 @@ public class EnglishGermanTranslationPlanD1 extends Plan
 			cont = "Sorry format not correct.";
 			reply = "failure";
 		}
-		IMessageEvent	replymsg	= getEventbase().createReply((IMessageEvent)getReason(), reply);
+		IMessageEvent	replymsg = getEventbase().createReply((IMessageEvent)getReason(), reply);
 		replymsg.getParameter(SFipa.CONTENT).setValue(cont);
 		sendMessage(replymsg);
 	}

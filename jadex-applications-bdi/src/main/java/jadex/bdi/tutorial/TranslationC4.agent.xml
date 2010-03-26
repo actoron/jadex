@@ -29,7 +29,7 @@
 			<fact>new Tuple("dog", "Hund")</fact>
 		</beliefset>
 		<!-- This belief stores the number of translation requests already processed. -->
-		<belief name="transcnt" class="int" exported="true">
+		<belief name="transcnt" class="int" argument="true">
 			<fact>0</fact>
 		</belief>
 	</beliefs>
