@@ -19,16 +19,20 @@ import jadex.service.execution.IExecutionService;
 import jadex.standalone.fipaimpl.ComponentIdentifier;
 import jadex.standalone.service.ComponentManagementService;
 
-import java.io.PrintWriter;
+import java.io.IOException;
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  *  Component adapter for built-in standalone platform. 
@@ -158,7 +162,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 
 	/**
 	 *  Return a component-identifier that allows to send
-	 *  messages to this agent.
+	 *  messages to this component.
 	 *  Return a copy of the original.
 	 */
 	public IComponentIdentifier getComponentIdentifier()
@@ -183,10 +187,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 */
 	public Logger getLogger()
 	{
-		// todo: problem: if logger is not saved the logger
-		// object can vanish (weak reference) and the internal
-		// component does not know that it has to reinite the logger.
+		// todo: problem: loggers can cause memory leaks
+		// http://bugs.sun.com/view_bug.do;jsessionid=bbdb212815ddc52fcd1384b468b?bug_id=4811930
 		
+		// Todo: include parent name for nested loggers.
 		String name = getComponentIdentifier().getLocalName();
 		logger = LogManager.getLogManager().getLogger(name);
 		
@@ -197,20 +201,78 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			try
 			{
 				logger = Logger.getLogger(name);
-//				initLogger(state, rcapa, ret);
+				initLogger(logger);
 				//System.out.println(logger.getParent().getLevel());
 			}
 			catch(SecurityException e)
 			{
 				// Hack!!! For applets / webstart use anonymous logger.
 				logger = Logger.getAnonymousLogger();
-//				initLogger(state, rcapa, ret);
+				initLogger(logger);
 			}
 		}
 		
 		return logger;
 	}
 	
+	/**
+	 *  Init the logger with capability settings.
+	 *  @param logger The logger.
+	 */
+	protected void initLogger(Logger logger)
+	{
+		// get logging properties (from ADF)
+		// the level of the logger
+		// can be Integer or Level
+		
+		Object prop = model.getProperties().get("logging.level");
+		Level level = prop==null? Level.SEVERE: (Level)prop;
+		logger.setLevel(level);
+
+		// if logger should use Handlers of parent (global) logger
+		// the global logger has a ConsoleHandler(Level:INFO) by default
+		prop = model.getProperties().get("logging.useParentHandlers");
+		if(prop!=null)
+		{
+			logger.setUseParentHandlers(((Boolean)prop).booleanValue());
+		}
+			
+		// add a ConsoleHandler to the logger to print out
+        // logs to the console. Set Level to given property value
+		prop = model.getProperties().get("addConsoleHandler");
+		if(prop!=null)
+		{
+            ConsoleHandler console = new ConsoleHandler();
+            console.setLevel(Level.parse(prop.toString()));
+            logger.addHandler(console);
+        }
+		
+		// Code adapted from code by Ed Komp: http://sourceforge.net/forum/message.php?msg_id=6442905
+		// if logger should add a filehandler to capture log data in a file. 
+		// The user specifies the directory to contain the log file.
+		// $scope.getAgentName() can be used to have agent-specific log files 
+		//
+		// The directory name can use special patterns defined in the
+		// class, java.util.logging.FileHandler, 
+		// such as "%h" for the user's home directory.
+		// 
+		String logfile =	(String)model.getProperties().get("logging.file");
+		if(logfile!=null)
+		{
+		    try
+		    {
+			    Handler fh	= new FileHandler(logfile);
+		    	fh.setFormatter(new SimpleFormatter());
+		    	logger.addHandler(fh);
+		    }
+		    catch (IOException e)
+		    {
+		    	System.err.println("I/O Error attempting to create logfile: "
+		    		+ logfile + "\n" + e.getMessage());
+		    }
+		}
+	}
+
 	/**
 	 *  String representation of the component.
 	 */
@@ -303,15 +365,10 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			if(!(ext_entries.isEmpty()))
 			{
 				entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
-//				for(int i=0; i<ext_entries.size(); i++)
-//					state.addAttributeValue(rcomponent, OAVBDIRuntimeModel.agent_has_actions, ext_entries.get(i));
 				ext_entries.clear();
 				
 				extexecuted	= true;
 			}
-//			String agentstate = (String)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
-//			if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED.equals(agentstate))
-//				ext_forbidden = true;
 		}
 		for(int i=0; entries!=null && i<entries.length; i++)
 		{
@@ -325,10 +382,17 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 					}
 					catch(Exception e)
 					{
-						StringWriter	sw	= new StringWriter();
-						e.printStackTrace(new PrintWriter(sw));
-						System.err.println("Execution of action led to exeception: "+sw);
-//						AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
+						// Fatal error!
+						fatalerror	= true;
+						e.printStackTrace();
+						getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
+							
+						// Remove component from platform.
+						((IComponentManagementService)container.getService(IComponentManagementService.class)).destroyComponent(cid, null);
+
+//						StringWriter	sw	= new StringWriter();
+//						e.printStackTrace(new PrintWriter(sw));
+//						getLogger().severe("Execution of action led to exception: "+sw);
 					}
 				}
 				try
@@ -337,10 +401,17 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 				}
 				catch(Exception e)
 				{
-					StringWriter	sw	= new StringWriter();
-					e.printStackTrace(new PrintWriter(sw));
-					System.err.println("Execution of action led to exeception: "+sw);
-//					AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
+					// Fatal error!
+					fatalerror	= true;
+					e.printStackTrace();
+					getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
+						
+					// Remove component from platform.
+					((IComponentManagementService)container.getService(IComponentManagementService.class)).destroyComponent(cid, null);
+
+//					StringWriter	sw	= new StringWriter();
+//					e.printStackTrace(new PrintWriter(sw));
+//					getLogger().severe("Execution of action led to exception: "+sw);
 				}
 			}
 			else //if(entries[i] instanceof Runnable)
@@ -351,10 +422,17 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 				}
 				catch(Exception e)
 				{
-					StringWriter	sw	= new StringWriter();
-					e.printStackTrace(new PrintWriter(sw));
-					System.err.println("Execution of action led to exeception: "+sw);
-//					AgentRules.getLogger(state, ragent).severe("Execution of action led to exeception: "+sw);
+					// Fatal error!
+					fatalerror	= true;
+					e.printStackTrace();
+					getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
+						
+					// Remove component from platform.
+					((IComponentManagementService)container.getService(IComponentManagementService.class)).destroyComponent(cid, null);
+
+//					StringWriter	sw	= new StringWriter();
+//					e.printStackTrace(new PrintWriter(sw));
+//					getLogger().severe("Execution of action led to exception: "+sw);
 				}
 			}
 		}
@@ -383,7 +461,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 
 			try
 			{
-				//System.out.println("Executing: "+agent);
+				//System.out.println("Executing: "+component);
 				again	= component.executeStep();
 			}
 			catch(Throwable e)
@@ -391,8 +469,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 				// Fatal error!
 				fatalerror	= true;
 				e.printStackTrace();
-				//agent.getLogger().severe("Fatal error, agent '"+aid+"' will be removed.");
-				System.out.println("Fatal error, agent '"+cid+"' will be removed.");
+				getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
 					
 				// Remove component from platform.
 				((IComponentManagementService)container.getService(IComponentManagementService.class)).destroyComponent(cid, null);

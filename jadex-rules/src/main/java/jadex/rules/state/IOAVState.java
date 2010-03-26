@@ -176,6 +176,14 @@ public interface IOAVState
 	public Collection getAttributeValues(Object object, OAVAttributeType attribute);
 	
 	/**
+	 *  Get the keys of an attribute of an object.
+	 *  @param object	The identifier of the object.
+	 *  @param attribute	The attribute identifier.
+	 *  @return	The keys for which values are stored.
+	 */
+	public Collection getAttributeKeys(Object object, OAVAttributeType attribute);
+	
+	/**
 	 *  Get an attribute value of an object. Method only applicable for
 	 *  map attribute type.
 	 *  @param object	The identifier of the object.

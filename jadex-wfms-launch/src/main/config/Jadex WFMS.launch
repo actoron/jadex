@@ -21,7 +21,7 @@
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.maven.ide.eclipse.launchconfig.classpathProvider"/>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jadex.standalone.Platform"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-conf jadex/standalone/services_conf.xml&#13;&#10;jadex/standalone/platformagents_conf.xml&#13;&#10;jadex/application/kernel_application_conf.xml&#13;&#10;jadex/bdi/kernel_bdi_conf.xml&#13;&#10;jadex/micro/kernel_micro_conf.xml&#13;&#10;jadex/bpmn/kernel_bpmn_conf.xml&#13;&#10;jadex/gpmn/kernel_gpmn_conf.xml&#13;&#10;jadex/bdibpmn/kernel_bdibpmn_conf.xml&#13;&#10;jadex/wfms/wfms_conf.xml"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-conf jadex/standalone/services_conf.xml&#13;&#10;jadex/standalone/platformcomponents_conf.xml&#13;&#10;jadex/application/kernel_application_conf.xml&#13;&#10;jadex/bdi/kernel_bdi_conf.xml&#13;&#10;jadex/micro/kernel_micro_conf.xml&#13;&#10;jadex/bpmn/kernel_bpmn_conf.xml&#13;&#10;jadex/gpmn/kernel_gpmn_conf.xml&#13;&#10;jadex/bdibpmn/kernel_bdibpmn_conf.xml&#13;&#10;jadex/wfms/wfms_conf.xml"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jadex-wfms-launch"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.maven.ide.eclipse.launchconfig.sourcepathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea&#13;&#10;-Dswing.defaultllaf=com.sun.java.swing.plaf.windows.WindowsLookAndFeel&#13;&#10;-DXbootclasspath/a:C:\Programme\jprofiler5\bin\agent.jar&#13;&#10;-Dagentlib:jprofilerti"/>

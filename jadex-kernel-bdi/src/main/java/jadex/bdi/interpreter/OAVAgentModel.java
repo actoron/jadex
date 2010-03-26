@@ -1,11 +1,13 @@
 package jadex.bdi.interpreter;
 
+import jadex.javaparser.IParsedExpression;
 import jadex.rules.rulesystem.IPatternMatcherFunctionality;
 import jadex.rules.rulesystem.IRule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVTypeModel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -89,11 +91,36 @@ public class OAVAgentModel	extends OAVCapabilityModel
 		if(properties==null)
 		{
 			Map props	= new HashMap();
+
+			// Debugger breakpoints for BDI and user rules.
 			List	names	= new ArrayList();
 			for(Iterator it=matcherfunc.getRulebase().getRules().iterator(); it.hasNext(); )
 				names.add(((IRule)it.next()).getName());
 			props.put("debugger.breakpoints", names);
 			this.properties	= props;
+
+			// Properties from loaded model.
+			Collection	oprops	= state.getAttributeKeys(handle, OAVBDIMetaModel.capability_has_properties);
+			if(oprops!=null)
+			{
+				for(Iterator it=oprops.iterator(); it.hasNext(); )
+				{
+					Object	key	= it.next();
+					Object	mexp	= state.getAttributeValue(handle, OAVBDIMetaModel.capability_has_properties, key);
+					IParsedExpression	pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_content);
+					try
+					{
+						Object	value	= pex.getValue(null);
+						props.put(key, value);
+					}
+					catch(Exception e)
+					{
+						// Hack!!! Exception should be propagated.
+						System.err.println(pex.getExpressionText());
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 		return properties;
 	}

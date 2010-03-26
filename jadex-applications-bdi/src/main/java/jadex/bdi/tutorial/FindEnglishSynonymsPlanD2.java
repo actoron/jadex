@@ -66,12 +66,12 @@ public class FindEnglishSynonymsPlanD2 extends Plan
 //			queryfind.setParameter("$eword", eword);
 			List syns = (List)queryfind.execute(new String[]{"$gword", "$eword"},  new Object[]{gword, eword});
 			getLogger().info("Synonyms for eword: "+syns);
-			reply	= "transcap.inform";
+			reply	= "inform";
 			cont	= "Synonyms for "+eword+" : "+syns;
 		}
 		else
 		{
-			reply	= "transcap.failure";
+			reply	= "failure";
 			cont	= "Request format not correct.";
 		}
 		IMessageEvent re = getEventbase().createReply(me, reply);

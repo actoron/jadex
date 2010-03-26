@@ -71,7 +71,7 @@
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_sPP50dCUEd6MVLxz8V9N3w" iD="_sPP50NCUEd6MVLxz8V9N3w"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_JRsVUdCVEd6MVLxz8V9N3w" iD="_JRsVUNCVEd6MVLxz8V9N3w"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Wzz2gNCVEd6MVLxz8V9N3w" iD="_WzzPcNCVEd6MVLxz8V9N3w"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_cZ5VQNCVEd6MVLxz8V9N3w" iD="_cZ4uMNCVEd6MVLxz8V9N3w"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_cZ5VQNCVEd6MVLxz8V9N3w" iD="_cZ4uMNCVEd6MVLxz8V9N3w" conditionType="Default" isDefault="true"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_kaUIcdCVEd6MVLxz8V9N3w" iD="_kaUIcNCVEd6MVLxz8V9N3w"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_wuf24dCVEd6MVLxz8V9N3w" iD="_wuf24NCVEd6MVLxz8V9N3w" name="For the defined number of messages ">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_0LJtIBckEd-OSKK6OfNWqA" source="jadex">
@@ -82,7 +82,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7qX3wRckEd-OSKK6OfNWqA" key="mappings" value="i␋i+1"/>
       </eAnnotations>
     </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_H6HXAdCYEd6MVLxz8V9N3w" iD="_H6HXANCYEd6MVLxz8V9N3w"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_H6HXAdCYEd6MVLxz8V9N3w" iD="_H6HXANCYEd6MVLxz8V9N3w" conditionType="Default" isDefault="true"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_XNtAYNCZEd6MVLxz8V9N3w" iD="_XNsZUNCZEd6MVLxz8V9N3w"/>
   </pools>
 </bpmn:BpmnDiagram>

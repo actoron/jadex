@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_qET4YXakEd6l0pFqo-bUbg" iD="_qET4YHakEd6l0pFqo-bUbg">
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_qET4YXakEd6l0pFqo-bUbg" iD="_qET4YHakEd6l0pFqo-bUbg">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__GIuEDZfEd-GR8OzZk56OA" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__GIuETZfEd-GR8OzZk56OA" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__GIuEjZfEd-GR8OzZk56OA" key="Package" value=""/>
+  </eAnnotations>
   <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_hg9acXaoEd6l0pFqo-bUbg" iD="_hg9acHaoEd6l0pFqo-bUbg" name="package jadex.bpmn.examples.execute;&#xD;&#xA;import jadex.bpmn.runtime.task.*;">
     <associations xmi:type="bpmn:Association" xmi:id="_hhQ8cHaoEd6l0pFqo-bUbg"/>
   </artifacts>
@@ -9,7 +13,11 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_XJFdIXanEd6l0pFqo-bUbg" iD="_XJFdIHanEd6l0pFqo-bUbg" incomingEdges="_YViCIXanEd6l0pFqo-bUbg" name="Finished&#xD;&#xA;class = PrintTask.class&#xD;&#xA;in String text = &quot;Finished&quot;" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_x6pksXazEd6l0pFqo-bUbg" iD="_x6pksHazEd6l0pFqo-bUbg" outgoingEdges="_yMFS8XazEd6l0pFqo-bUbg" activityType="EventStartEmpty"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_OLZJananEd6l0pFqo-bUbg" iD="_OLZJaXanEd6l0pFqo-bUbg"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_YViCIXanEd6l0pFqo-bUbg" iD="_YViCIHanEd6l0pFqo-bUbg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_YViCIXanEd6l0pFqo-bUbg" iD="_YViCIHanEd6l0pFqo-bUbg" conditionType="Default" isDefault="true">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_B3KEMDZgEd-GR8OzZk56OA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_B3KEMTZgEd-GR8OzZk56OA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Yv5p8XanEd6l0pFqo-bUbg" iD="_Yv5p8HanEd6l0pFqo-bUbg" name="i+1&lt;texts.length&#xD;&#xA;i=i+1"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_yMFS8XazEd6l0pFqo-bUbg" iD="_yMFS8HazEd6l0pFqo-bUbg"/>
   </pools>

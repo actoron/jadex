@@ -692,7 +692,32 @@ public class OAVWeakState	implements IOAVState
 		
 		return (ret instanceof Map)? ((Map)ret).values(): (Collection)ret;
 	}
+
+	/**
+	 *  Get the keys of an attribute of an object.
+	 *  @param object	The identifier of the object.
+	 *  @param attribute	The attribute identifier.
+	 *  @return	The keys for which values are stored.
+	 */
+	public Collection getAttributeKeys(Object object, OAVAttributeType attribute)
+	{
+		assert nocheck || checkTypeHasAttribute(object, attribute);
+		assert nocheck || checkMultiplicity(object, attribute, 
+			OAVAttributeType.MULTIPLICITIES_MAPS);
+		assert nocheck || checkValidStateObject(object);
+		assert object instanceof OAVExternalObjectId;
+		
+		Map theobject = getObject(object);
+		
+		Object ret	= theobject.get(attribute);
+		if(ret==null && !theobject.containsKey(attribute))
+			ret = attribute.getDefaultValue();
+		
+		return ((Map)ret).keySet();
+	}
+
 	
+
 	/**
 	 *  Get an attribute value of an object. Method only applicable for
 	 *  map attribute type.

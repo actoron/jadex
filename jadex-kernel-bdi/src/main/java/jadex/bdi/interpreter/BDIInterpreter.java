@@ -466,26 +466,13 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		return isatbreakpoint;
 	}
 
-	boolean inited = false;
 	/**
 	 *  Get the logger.
 	 *  @return The logger.
 	 */
 	public Logger getLogger(Object rcapa)
 	{
-		// http://bugs.sun.com/view_bug.do;jsessionid=bbdb212815ddc52fcd1384b468b?bug_id=4811930
-			
 		Logger ret = adapter.getLogger();
-		if(!inited)
-		{
-//			System.out.println("init: "+ret.getName());
-			initLogger(ragent, ret);
-			inited = true;
-		}
-//		else
-//		{
-//			System.out.println("fetch: "+ret.getName());
-//		}
 		
 		if(ragent!=rcapa)
 		{

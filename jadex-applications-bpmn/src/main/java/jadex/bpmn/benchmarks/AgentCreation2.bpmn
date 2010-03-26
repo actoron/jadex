@@ -58,7 +58,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8qJFcdtJEd6x4pN6Y6csZw" key="mappings" value=""/>
       </eAnnotations>
     </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_TQs9otkQEd6KRaQAf_IpCg" iD="_TQs9odkQEd6KRaQAf_IpCg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_TQs9otkQEd6KRaQAf_IpCg" iD="_TQs9odkQEd6KRaQAf_IpCg" conditionType="Default" isDefault="true"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Ue8niNkSEd6KRaQAf_IpCg" iD="_Ue8nh9kSEd6KRaQAf_IpCg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_YrA_WtkSEd6KRaQAf_IpCg" iD="_YrA_WdkSEd6KRaQAf_IpCg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_cVaNcdkSEd6KRaQAf_IpCg" iD="_cVaNcNkSEd6KRaQAf_IpCg"/>
@@ -71,7 +71,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DgFpkdtKEd6x4pN6Y6csZw" key="mappings" value="i␋i-1"/>
       </eAnnotations>
     </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Zokh0dkUEd6KRaQAf_IpCg" iD="_Zokh0NkUEd6KRaQAf_IpCg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Zokh0dkUEd6KRaQAf_IpCg" iD="_Zokh0NkUEd6KRaQAf_IpCg" conditionType="Default" isDefault="true"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_j7yeEdkUEd6KRaQAf_IpCg" iD="_j7yeENkUEd6KRaQAf_IpCg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_e4HL8RblEd-yC473XtaJZQ" iD="_e4HL8BblEd-yC473XtaJZQ"/>
   </pools>

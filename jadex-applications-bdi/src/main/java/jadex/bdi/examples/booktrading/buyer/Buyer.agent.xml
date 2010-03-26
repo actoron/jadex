@@ -152,11 +152,6 @@
 	</expressions>
 
 	<properties>
-		<property name="service_seller">
-			((IDF)$scope.getServiceContainer().getService(IDF.class))
-				.createDFComponentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
-					.createDFServiceDescription(null, "service_seller", null))
-		</property>
 		<!-- <property name="logging.level">java.util.logging.Level.FINE</property> -->
 		<property name="debugging">false</property>
 	</properties>

@@ -18,7 +18,7 @@
 
 	<capabilities>
 		<!-- Include the translation capability under the name transcap. -->
-		<capability name="transcap" file="jadex/bdi/tutorial/TranslationD1.capability.xml"/>
+		<capability name="transcap" file="TranslationD1"/>
 	</capabilities>
 
 	<properties>

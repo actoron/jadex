@@ -17,12 +17,12 @@
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_2jKY8dQeEd6ZgonVFJzeWg" iD="_2jKY8NQeEd6ZgonVFJzeWg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_WJi0AdQjEd6ZgonVFJzeWg" iD="_WJi0ANQjEd6ZgonVFJzeWg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ZB1PwdQjEd6ZgonVFJzeWg" iD="_ZB1PwNQjEd6ZgonVFJzeWg" name="num.intValue()&lt;max"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_PYI8MdQkEd6ZgonVFJzeWg" iD="_PYI8MNQkEd6ZgonVFJzeWg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_PYI8MdQkEd6ZgonVFJzeWg" iD="_PYI8MNQkEd6ZgonVFJzeWg" conditionType="Default" isDefault="true"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_D9m9IdQlEd6ZgonVFJzeWg" iD="_D9m9INQlEd6ZgonVFJzeWg" name=""/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_jdMVStXtEd6ZgonVFJzeWg" iD="_jdMVSdXtEd6ZgonVFJzeWg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_oJRdgdYnEd6H3v0lpmo8zA" iD="_oJRdgNYnEd6H3v0lpmo8zA"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_reiwMdYnEd6H3v0lpmo8zA" iD="_reiwMNYnEd6H3v0lpmo8zA" name="i > 1&#xD;&#xA;i = i-1"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_jQa50dg4Ed6ZgonVFJzeWg" iD="_jQa50Ng4Ed6ZgonVFJzeWg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_jQa50dg4Ed6ZgonVFJzeWg" iD="_jQa50Ng4Ed6ZgonVFJzeWg" conditionType="Default" isDefault="true"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_qyK0Adg4Ed6ZgonVFJzeWg" iD="_qyK0ANg4Ed6ZgonVFJzeWg"/>
   </pools>
 </bpmn:BpmnDiagram>

@@ -96,6 +96,10 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6AeCQhTVEd-a46HbtL-N3Q" key="condition" value="Arrays.equals(list.toArray(), new String[]{&quot;1a&quot;, &quot;1b&quot;, &quot;2a&quot;, &quot;3a&quot;, &quot;2b&quot;})"/>
       </eAnnotations>
     </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_8FgRkRTUEd-a46HbtL-N3Q" iD="_8FgRkBTUEd-a46HbtL-N3Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_8FgRkRTUEd-a46HbtL-N3Q" iD="_8FgRkBTUEd-a46HbtL-N3Q" conditionType="Default" isDefault="true">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_uOtd8DZfEd-GR8OzZk56OA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uOtd8TZfEd-GR8OzZk56OA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
   </pools>
 </bpmn:BpmnDiagram>

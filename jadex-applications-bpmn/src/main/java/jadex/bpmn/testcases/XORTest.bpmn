@@ -57,10 +57,18 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FR_PAhV0Ed-9a_-KE2TdXg" key="condition" value="true"/>
       </eAnnotations>
     </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_vc8gSBVxEd-9a_-KE2TdXg" iD="_vc8gRxVxEd-9a_-KE2TdXg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_vc8gSBVxEd-9a_-KE2TdXg" iD="_vc8gRxVxEd-9a_-KE2TdXg" conditionType="Default" isDefault="true">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_zgNz0DZfEd-GR8OzZk56OA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zgNz0TZfEd-GR8OzZk56OA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_0kxVsRVxEd-9a_-KE2TdXg" iD="_0kxVsBVxEd-9a_-KE2TdXg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_1OC8MRVxEd-9a_-KE2TdXg" iD="_1OC8MBVxEd-9a_-KE2TdXg"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_5ZOjMhVxEd-9a_-KE2TdXg" iD="_5ZOjMRVxEd-9a_-KE2TdXg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_5ZOjMhVxEd-9a_-KE2TdXg" iD="_5ZOjMRVxEd-9a_-KE2TdXg" conditionType="Default" isDefault="true">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ylqQEDZfEd-GR8OzZk56OA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ylqQETZfEd-GR8OzZk56OA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_6ZJvKBVxEd-9a_-KE2TdXg" iD="_6ZJvJxVxEd-9a_-KE2TdXg" name="true">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_HG0CoBV0Ed-9a_-KE2TdXg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HG0CoRV0Ed-9a_-KE2TdXg" key="imports" value=""/>
@@ -77,6 +85,10 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BJfvohV0Ed-9a_-KE2TdXg" key="condition" value="Arrays.equals(list.toArray(), new String[]{&quot;A&quot;, &quot;D&quot;})"/>
       </eAnnotations>
     </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Xuss2BVyEd-9a_-KE2TdXg" iD="_Xuss1xVyEd-9a_-KE2TdXg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Xuss2BVyEd-9a_-KE2TdXg" iD="_Xuss1xVyEd-9a_-KE2TdXg" conditionType="Default" isDefault="true">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_3ZDtoDZfEd-GR8OzZk56OA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3ZDtoTZfEd-GR8OzZk56OA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
   </pools>
 </bpmn:BpmnDiagram>

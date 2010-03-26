@@ -1155,7 +1155,57 @@ public abstract class OAVAbstractState	implements IOAVState
 		
 		return ret;
 	}
+
+	/**
+	 *  Get the keys of an attribute of an object.
+	 *  @param id	The identifier of the object.
+	 *  @param attribute	The attribute identifier.
+	 *  @return	The keys for which values are stored.
+	 */
+	public Collection getAttributeKeys(Object id, OAVAttributeType attribute)
+	{
+//		if(!generator.isId(id))
+//			System.out.println("dflb");
+		// #ifndef MIDP
+		assert nocheck || generator.isId(id);
+		assert nocheck || checkValidStateObjectRead(id);
+		assert nocheck || checkTypeHasAttribute(id, attribute);
+		assert nocheck || checkMultiplicity(id, attribute, 
+				OAVAttributeType.MULTIPLICITIES_MAPS);
+		// #endif
+		
+		Collection	ret	= null;
+		
+		Map theobject = getObject0(id);
+		
+		if(theobject!=null)
+		{
+			Object	val	= theobject.get(attribute);
+			if(val==null && !theobject.containsKey(attribute))
+				val = attribute.getDefaultValue();
+			
+			ret	= val!=null ? ((Map)val).keySet() : null;
+		}
+		else if(substates!=null)
+		{
+			boolean	found	= false;
+			for(int i=0; !found && i<substates.length; i++)
+			{
+				if(substates[i].containsObject(id))
+				{
+					ret	= substates[i].getAttributeKeys(id, attribute);
+					found	= true;
+				}
+			}
+			
+			if(!found)
+				throw new IllegalArgumentException("Object "+id+" does not exist.");
+		}
+		
+		return ret;
+	}
 	
+
 	/**
 	 *  Get an attribute value of an object (oid).
 	 *  Method only applicable for map attribute type.

@@ -127,18 +127,6 @@
 	</plans>
 
 	<properties>
-		<property name="fipa.servicedescription.service_dispatch_vision">
-			<!-- SFipa.createServiceDescription("service_dispatch_vision",
- 				"dispatch vision", "University of Hamburg") -->
- 			((IDF)$scope.getServiceContainer().getService(IDF.class))
-				.createDFServiceDescription("dispatch vision", "dispatch vision", "University of Hamburg")
-		</property>
-
-		<property name="fipa.agentdescription.environment">
-			((IDF)$scope.getServiceContainer().getService(IDF.class))
-				.createDFComponentDescription(null, (IDFServiceDescription)$propertybase.getProperty("fipa.servicedescription.service_dispatch_vision"))
-		</property>
-
 <!--		<property name="logging.level">Level.INFO</property>-->
 	</properties>
 
@@ -155,7 +143,11 @@
 						<value>new AgentIdentifier("df@vsispro3:1099/JADE", new String[]{"http://134.100.11.53:7778/acc"})</value>
 					</parameter>
 -->					<parameter ref="description">
-						<value>(IDFComponentDescription)$propertybase.getProperty("fipa.agentdescription.environment")</value>
+						<value>
+							((IDF)$scope.getServiceContainer().getService(IDF.class))
+								.createDFComponentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
+									.createDFServiceDescription("dispatch vision", "dispatch vision", "University of Hamburg"))
+						</value>
 					</parameter>
 				</initialgoal>	
 				<endgoal ref="df_deregister"/>

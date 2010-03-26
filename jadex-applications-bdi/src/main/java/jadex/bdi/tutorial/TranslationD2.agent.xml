@@ -52,12 +52,12 @@
 			<match>$content instanceof String &amp;&amp; ((String)$content).startsWith("find_synonyms english")</match>
 		</messageevent>
 
-		<!-- <messageeventref name="inform">
+		<messageeventref name="inform">
 			<concrete ref="transcap.inform"/>
 		</messageeventref>
 		<messageeventref name="failure">
 			<concrete ref="transcap.failure"/>
-		</messageeventref> -->
+		</messageeventref>
 	</events>
 
 	<properties>

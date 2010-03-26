@@ -96,7 +96,7 @@ public class SpringPlatform extends AbstractPlatform
 						{
 							public void resultAvailable(Object result)
 							{
-								if(((Integer)result).intValue() <= daemonagents.size())
+								if(((Integer)result).intValue() <= daemoncomponents.size())
 									shutdown(null);
 							}
 	

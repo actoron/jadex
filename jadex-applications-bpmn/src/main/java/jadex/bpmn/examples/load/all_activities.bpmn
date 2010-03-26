@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_wmlFwWZBEd69fIOIR1mR4w" iD="_wmlFwGZBEd69fIOIR1mR4w">
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_wmlFwWZBEd69fIOIR1mR4w" iD="_wmlFwGZBEd69fIOIR1mR4w">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_8E3VcDZfEd-GR8OzZk56OA" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8E3VcTZfEd-GR8OzZk56OA" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8E3VcjZfEd-GR8OzZk56OA" key="Package" value=""/>
+  </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_wmlFx2ZBEd69fIOIR1mR4w" iD="_wmlFxmZBEd69fIOIR1mR4w" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_wmlFyWZBEd69fIOIR1mR4w" iD="_wmlFyGZBEd69fIOIR1mR4w" outgoingEdges="_x9J3IWZBEd69fIOIR1mR4w" incomingEdges="_4MOPEWfOEd6wnMj69c-ZtQ" name="Task" activityType="Task"/>
     <vertices xmi:type="bpmn:SubProcess" xmi:id="_x8GuQWZBEd69fIOIR1mR4w" iD="_x8GuQGZBEd69fIOIR1mR4w" outgoingEdges="_fQdVGmfOEd6wnMj69c-ZtQ" incomingEdges="_x9J3IWZBEd69fIOIR1mR4w" name="SubProcess" activityType="SubProcess"/>
@@ -42,10 +46,18 @@
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_L4GWOmZCEd69fIOIR1mR4w" iD="_L4GWOWZCEd69fIOIR1mR4w"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_cOjfwWfNEd6wnMj69c-ZtQ" iD="_cOjfwGfNEd6wnMj69c-ZtQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_epreYWfNEd6wnMj69c-ZtQ" iD="_epreYGfNEd6wnMj69c-ZtQ"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_fcWRcWfNEd6wnMj69c-ZtQ" iD="_fcWRcGfNEd6wnMj69c-ZtQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_fcWRcWfNEd6wnMj69c-ZtQ" iD="_fcWRcGfNEd6wnMj69c-ZtQ" conditionType="Default" isDefault="true">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_8XpHgDZfEd-GR8OzZk56OA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8XpHgTZfEd-GR8OzZk56OA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_g2DPUWfNEd6wnMj69c-ZtQ" iD="_g2DPUGfNEd6wnMj69c-ZtQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_iSvPwWfNEd6wnMj69c-ZtQ" iD="_iSvPwGfNEd6wnMj69c-ZtQ"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_jJbAIWfNEd6wnMj69c-ZtQ" iD="_jJbAIGfNEd6wnMj69c-ZtQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_jJbAIWfNEd6wnMj69c-ZtQ" iD="_jJbAIGfNEd6wnMj69c-ZtQ" conditionType="Default" isDefault="true">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_8-iIYDZfEd-GR8OzZk56OA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8-iIYTZfEd-GR8OzZk56OA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_jvapIWfNEd6wnMj69c-ZtQ" iD="_jvapIGfNEd6wnMj69c-ZtQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_kGN_kWfNEd6wnMj69c-ZtQ" iD="_kGN_kGfNEd6wnMj69c-ZtQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ldiX0WfNEd6wnMj69c-ZtQ" iD="_ldiX0GfNEd6wnMj69c-ZtQ"/>

@@ -466,9 +466,23 @@ public class CopyState implements IOAVState
 	 */
 	public Collection getAttributeValues(Object object, OAVAttributeType attribute)
 	{
+		// Todo: map attribute?
 		return (Collection)((Map)copy.get(object)).get(attribute);
 	}
+
+	/**
+	 *  Get the keys of an attribute of an object.
+	 *  @param object	The identifier of the object.
+	 *  @param attribute	The attribute identifier.
+	 *  @return	The keys for which values are stored.
+	 */
+	public Collection getAttributeKeys(Object object, OAVAttributeType attribute)
+	{
+		// Todo: map attribute?
+		return ((Map)((Map)copy.get(object)).get(attribute)).keySet();		
+	}
 	
+
 	/**
 	 *  Get an attribute value of an object. Method only applicable for
 	 *  map attribute type.

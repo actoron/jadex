@@ -69,7 +69,7 @@
     </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_0zT72CbnEd-LGeDmwCGsJg" iD="_0zT71ybnEd-LGeDmwCGsJg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_2FtX0SbnEd-LGeDmwCGsJg" iD="_2FtX0CbnEd-LGeDmwCGsJg"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_qrUGEShxEd-LGeDmwCGsJg" iD="_qrUGEChxEd-LGeDmwCGsJg">
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_qrUGEShxEd-LGeDmwCGsJg" iD="_qrUGEChxEd-LGeDmwCGsJg" conditionType="Default" isDefault="true">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dONLQChyEd-LGeDmwCGsJg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dONLQShyEd-LGeDmwCGsJg" key="imports" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dONLQihyEd-LGeDmwCGsJg" key="condition" value=""/>

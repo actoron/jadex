@@ -14,10 +14,6 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -53,6 +49,7 @@ public class UserInteractionTask implements ITask
 		{
 			public void run()
 			{
+				final JOptionPane	pane;
 				JComponent	message;
 				MActivity	task	= context.getModelElement();
 				Map	parameters	= task.getParameters();
@@ -64,6 +61,9 @@ public class UserInteractionTask implements ITask
 					message.add(new JLabel("Please enter values for task "+context.getModelElement().getName()),
 						new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 					
+					pane	= new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+					pane.setValue(JOptionPane.UNINITIALIZED_VALUE);
+
 					int i=0;
 					for(Iterator it=parameters.values().iterator(); it.hasNext(); i++)
 					{
@@ -80,12 +80,15 @@ public class UserInteractionTask implements ITask
 							}
 							else
 							{
-								cb.addActionListener(new ActionListener()
-								{
-									public void actionPerformed(ActionEvent e)
-									{
-										context.setParameterValue(param.getName(), new Boolean(cb.isSelected()));
-									}
+						        pane.addPropertyChangeListener(new PropertyChangeListener()
+						        {
+						            public void propertyChange(PropertyChangeEvent event)
+						            {
+						            	if(pane.getValue()!=JOptionPane.UNINITIALIZED_VALUE)
+						            	{
+						            		context.setParameterValue(param.getName(), new Boolean(cb.isSelected()));
+						            	}
+						            }
 								});
 							}
 							comp	= cb;
@@ -99,20 +102,28 @@ public class UserInteractionTask implements ITask
 							}
 							else
 							{
-								tf.addKeyListener(new KeyAdapter()
-								{
-									public void keyTyped(KeyEvent e)
-									{
-										try
-										{
+						        pane.addPropertyChangeListener(new PropertyChangeListener()
+						        {
+						            public void propertyChange(PropertyChangeEvent event)
+						            {
+						            	if(pane.getValue()!=JOptionPane.UNINITIALIZED_VALUE)
+						            	{
 											String	text	= tf.getText();
-											// Todo: access thread context for imports etc.!?
-											IParsedExpression	pex	= new JavaCCExpressionParser().parseExpression(text, null, null, null);
-											context.setParameterValue(param.getName(), pex.getValue(null));
-										}
-										catch(Exception ex)
-										{
-										}
+											try
+											{
+												// Todo: access thread context for imports etc.!?
+												IParsedExpression	pex	= new JavaCCExpressionParser().parseExpression(text, null, null, null);
+												context.setParameterValue(param.getName(), pex.getValue(null));
+											}
+											catch(Exception ex)
+											{
+												// Hack!!! Fallback: if no expression entered for string, use value directly.
+												if(param.getClazz().equals(String.class))
+												{
+													context.setParameterValue(param.getName(), text);
+												}
+											}
+						            	}
 									}
 								});
 							}
@@ -127,9 +138,9 @@ public class UserInteractionTask implements ITask
 				else
 				{
 					message = new JLabel("Please perform task "+context.getModelElement().getName());
+					pane	= new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+					pane.setValue(JOptionPane.UNINITIALIZED_VALUE);
 				}
-				final JOptionPane	pane	= new JOptionPane(message, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
-				pane.setValue(JOptionPane.UNINITIALIZED_VALUE);
 				
 				final JDialog	dialog	= new JDialog((JFrame)null, context.getModelElement().getName());
 				dialog.getContentPane().setLayout(new BorderLayout());

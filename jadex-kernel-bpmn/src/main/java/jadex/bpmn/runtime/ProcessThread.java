@@ -6,7 +6,6 @@ import jadex.bpmn.model.MLane;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
-import jadex.bridge.InterpreterTimedObject;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -502,16 +501,6 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public boolean belongsTo(String pool, String lane)
 	{
-		// Test pool.
-		try
-		{
-			boolean	ret	= pool==null || pool.equals(getActivity().getPool().getName());
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		
 		boolean	ret	= pool==null || pool.equals(getActivity().getPool().getName());
 		
 		// Test lane
@@ -645,15 +634,8 @@ public class ProcessThread	implements ITaskContext
 					}
 					else
 					{
-						try
-						{
 						setParameterValue(param.getName(), param.getInitialValue()==null? null: param.getInitialValue().getValue(fetcher));
 						before.remove(param.getName());
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
-						}
 					}
 				}
 			}

@@ -51,6 +51,10 @@
     </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="__TzdkdBMEd6NWbZHdUI2WQ" iD="__TzdkNBMEd6NWbZHdUI2WQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_AACcAdBOEd6NWbZHdUI2WQ" iD="_AACcANBOEd6NWbZHdUI2WQ"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_NvMVsRZBEd-yC473XtaJZQ" iD="_NvMVsBZBEd-yC473XtaJZQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_NvMVsRZBEd-yC473XtaJZQ" iD="_NvMVsBZBEd-yC473XtaJZQ" conditionType="Default" isDefault="true">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_7FimcDZfEd-GR8OzZk56OA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7FimcTZfEd-GR8OzZk56OA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
   </pools>
 </bpmn:BpmnDiagram>

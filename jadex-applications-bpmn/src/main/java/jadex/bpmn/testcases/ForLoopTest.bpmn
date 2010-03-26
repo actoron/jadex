@@ -52,7 +52,11 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_kt_fERDjEd-hjJU8_9Katg" key="mappings" value="i␋i+1"/>
       </eAnnotations>
     </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_r_9Q0RDjEd-hjJU8_9Katg" iD="_r_9Q0BDjEd-hjJU8_9Katg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_r_9Q0RDjEd-hjJU8_9Katg" iD="_r_9Q0BDjEd-hjJU8_9Katg" conditionType="Default" isDefault="true">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_q1KvQDZfEd-GR8OzZk56OA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q1KvQTZfEd-GR8OzZk56OA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_IcnCMRDlEd-qQOr2ZLx-Mw" iD="_IcnCMBDlEd-qQOr2ZLx-Mw"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_cq9VYRDmEd-qQOr2ZLx-Mw" iD="_cq9VYBDmEd-qQOr2ZLx-Mw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_3BqQABFtEd-qQOr2ZLx-Mw" source="jadex">
@@ -61,6 +65,10 @@
       </eAnnotations>
     </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_gBYeoRDmEd-qQOr2ZLx-Mw" iD="_gBYeoBDmEd-qQOr2ZLx-Mw"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_t9_3IRFtEd-qQOr2ZLx-Mw" iD="_t9_3IBFtEd-qQOr2ZLx-Mw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_t9_3IRFtEd-qQOr2ZLx-Mw" iD="_t9_3IBFtEd-qQOr2ZLx-Mw" conditionType="Default" isDefault="true">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_rh3dMDZfEd-GR8OzZk56OA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rh3dMTZfEd-GR8OzZk56OA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
   </pools>
 </bpmn:BpmnDiagram>
