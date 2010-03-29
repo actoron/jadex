@@ -426,9 +426,9 @@ public class MessageService implements IMessageService, IService
 							// Conversion via platform specific codecs
 							for(Iterator it=message.keySet().iterator(); it.hasNext(); )
 							{
-								String	name	= (String)it.next();
-								Object	value	= message.get(name);
-								IContentCodec	codec	= messagetype.findContentCodec(DEFCODECS, message, name);
+								String name = (String)it.next();
+								Object value = message.get(name);
+								IContentCodec codec = messagetype.findContentCodec(DEFCODECS, message, name);
 								if(codec!=null)
 								{
 									message.put(name, codec.decode((String)value, cl));

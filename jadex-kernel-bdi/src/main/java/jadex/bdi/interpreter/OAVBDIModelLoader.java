@@ -173,9 +173,9 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	public void	createAgentModelEntry(OAVCapabilityModel model, Report report)	throws Exception
 	{
 		IRulebase rb = model.getRulebase();
-		IOAVState	state	= model.getState();
-		Object	mcapa	= model.getHandle();
-		String[]	imports	= OAVBDIMetaModel.getImports(state, mcapa);
+		IOAVState state	= model.getState();
+		Object mcapa = model.getHandle();
+		String[] imports = OAVBDIMetaModel.getImports(state, mcapa);
 		
 		// Load subcapabilities.
 		Collection mcaparefs = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs);

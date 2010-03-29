@@ -101,7 +101,8 @@ public class ParameterFlyweight extends ElementFlyweight implements IParameter
 					{
 						Object mparamelem = getState().getAttributeValue(parameterelement, OAVBDIRuntimeModel.element_has_model);	
 						Object mparam = getState().getAttributeValue(mparamelem, OAVBDIMetaModel.parameterelement_has_parameters, name);
-						setHandle(BeliefRules.createParameter(getState(), name, null, resolveClazz(), parameterelement, mparam, getScope()));
+						Class clazz = resolveClazz(getState(), mparamelem, name);
+						setHandle(BeliefRules.createParameter(getState(), name, null, clazz, parameterelement, mparam, getScope()));
 					}
 
 					String	direction 	= resolveDirection();
@@ -126,7 +127,8 @@ public class ParameterFlyweight extends ElementFlyweight implements IParameter
 			{
 				Object mparamelem = getState().getAttributeValue(parameterelement, OAVBDIRuntimeModel.element_has_model);	
 				Object mparam = getState().getAttributeValue(mparamelem, OAVBDIMetaModel.parameterelement_has_parameters, name);
-				setHandle(BeliefRules.createParameter(getState(), name, null, resolveClazz(), parameterelement, mparam, getScope()));
+				Class clazz = resolveClazz(getState(), mparamelem, name);
+				setHandle(BeliefRules.createParameter(getState(), name, null, clazz, parameterelement, mparam, getScope()));
 			}
 			
 			String	direction 	= resolveDirection();
@@ -240,22 +242,22 @@ public class ParameterFlyweight extends ElementFlyweight implements IParameter
 			return ret;
 		}
 	}*/
-	
+
 	/**
 	 *  Resolve the parameter class.
 	 */
-	protected Class resolveClazz()
+	public static Class resolveClazz(IOAVState state, Object mparamelem, String name)
 	{
 		Class clazz = null;
-		Object mparamelem = getState().getAttributeValue(parameterelement, OAVBDIRuntimeModel.element_has_model);	
-		Object mparam = getState().getAttributeValue(mparamelem, OAVBDIMetaModel.parameterelement_has_parameters, name);
+//		Object mparamelem = state.getAttributeValue(parameterelement, OAVBDIRuntimeModel.element_has_model);	
+		Object mparam = state.getAttributeValue(mparamelem, OAVBDIMetaModel.parameterelement_has_parameters, name);
 		if(mparam!=null)
 		{
-			clazz = (Class)getState().getAttributeValue(mparam, OAVBDIMetaModel.typedelement_has_class);
+			clazz = (Class)state.getAttributeValue(mparam, OAVBDIMetaModel.typedelement_has_class);
 		}
-		else if(getState().getType(mparamelem).isSubtype(OAVBDIMetaModel.messageevent_type))
+		else if(state.getType(mparamelem).isSubtype(OAVBDIMetaModel.messageevent_type))
 		{
-			MessageType mt = MessageEventRules.getMessageEventType(getState(), mparamelem);
+			MessageType mt = MessageEventRules.getMessageEventType(state, mparamelem);
 			ParameterSpecification ps = mt.getParameter(name);
 			clazz = ps.getClazz();
 		}

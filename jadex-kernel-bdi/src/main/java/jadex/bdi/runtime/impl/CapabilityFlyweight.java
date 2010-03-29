@@ -1,6 +1,5 @@
 package jadex.bdi.runtime.impl;
 
-import jadex.bdi.interpreter.AgentRules;
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.IAgentListener;

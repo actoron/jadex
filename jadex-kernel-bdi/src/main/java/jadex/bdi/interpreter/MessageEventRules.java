@@ -41,6 +41,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  *  Rules for handling message events.
@@ -489,6 +490,7 @@ public class MessageEventRules
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
 				Object ragent = assignments.getVariableValue("?ragent");
+				Logger logger = BDIInterpreter.getInterpreter(state).getComponentAdapter().getLogger();
 				IMessageAdapter message = (IMessageAdapter)assignments.getVariableValue("?msg");
 				String agentname = BDIInterpreter.getInterpreter(state).getComponentAdapter().getComponentIdentifier().getLocalName();
 //				System.out.println("Agent has received msg: "+agentname+" "+message);
@@ -504,8 +506,8 @@ public class MessageEventRules
 					Object rep = getInReplyMessageEvent(state, message, capas.get(i));
 					if(rep!=null && original!=null)
 					{
-						System.out.println("Reply message problem: "+rep+" "+original);
-						// agent.getLogger().severe("Cannot match reply message (multiple capabilities "+rep.getScope().getName()+", "+original.getScope().getName()+") for: "+message);
+//						System.out.println("Reply message problem: "+rep+" "+original);
+						logger.severe("Cannot match reply message (multiple capabilities "+rep+", "+original+") for: "+message);
 						return;	// Hack!!! Ignore message?
 					}
 					else if(rep!=null)
@@ -540,7 +542,7 @@ public class MessageEventRules
 //				// todo
 				else
 				{
-					System.out.println("Found reply :-) todo matching in capa "+original);
+//					System.out.println("Found reply :-) todo matching in capa "+original);
 					
 					// todo: support original.getScope()
 					Object capa = capas.get(0);
@@ -558,26 +560,26 @@ public class MessageEventRules
 
 				if(events.size()==0)
 				{
-					System.out.println(agentname+" cannot process message, no message event matches: "+message.getMessage());
-//					agent.getLogger().warning(agent.getAgentName()+" cannot process message, no message event matches: "+message.getMessage());
+//					System.out.println(agentname+" cannot process message, no message event matches: "+message.getMessage());
+					logger.warning(agentname+" cannot process message, no message event matches: "+message.getMessage());
 				}
 				else
 				{
 					if(events.size()>1)
 					{
 						// Multiple matches of highest degree.
-						System.out.println(agentname+" cannot decide which event matches message, " +
-							"using first: "+message.getMessage()+", "+events);
-//						agent.getLogger().severe(agent.getAgentName()+" cannot decide which event matches message, " +
+//						System.out.println(agentname+" cannot decide which event matches message, " +
 //							"using first: "+message.getMessage()+", "+events);
+						logger.severe(agentname+" cannot decide which event matches message, " +
+							"using first: "+message.getMessage()+", "+events);
 					}
 					else if(matched.size()>1)
 					{
 						// Multiple matches but different degrees.
-						System.out.println(agentname+" multiple events matching message, using " +
-							"message event with highest specialization degree: "+message+" ("+degree+"), "+events.get(0)+", "+matched);
-//						agent.getLogger().info(agent.getAgentName()+" multiple events matching message, using " +
+//						System.out.println(agentname+" multiple events matching message, using " +
 //							"message event with highest specialization degree: "+message+" ("+degree+"), "+events.get(0)+", "+matched);
+						logger.info(agentname+" multiple events matching message, using " +
+							"message event with highest specialization degree: "+message+" ("+degree+"), "+events.get(0)+", "+matched);
 					}
 
 					Object mevent = ((Object[])events.get(0))[0];
@@ -1290,7 +1292,7 @@ public class MessageEventRules
 			for(Iterator it=rprops.iterator(); ret==null && it.hasNext();)
 			{
 				Object param = it.next();
-				String	name	= (String)state.getAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name);
+				String	name = (String)state.getAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name);
 				if(name.startsWith("contentcodec."))
 				{
 					if(ret==null)

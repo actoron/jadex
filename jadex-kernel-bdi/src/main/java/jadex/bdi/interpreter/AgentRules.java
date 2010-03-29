@@ -2,6 +2,7 @@ package jadex.bdi.interpreter;
 
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
+import jadex.bdi.runtime.impl.ParameterFlyweight;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.IArgument;
 import jadex.bridge.InterpreterTimedObject;
@@ -2285,7 +2286,8 @@ public class AgentRules
 					Object mparam = state.getAttributeValue(mparamelem, OAVBDIMetaModel.parameterelement_has_parameters, pname);
 					if(!doneparams.contains(pname))
 					{
-						Class clazz = (Class)state.getAttributeValue(mparam, OAVBDIMetaModel.typedelement_has_class);
+//						Class clazz = (Class)state.getAttributeValue(mparam, OAVBDIMetaModel.typedelement_has_class);
+						Class clazz = ParameterFlyweight.resolveClazz(state, mparamelem, (String)pname);
 						
 						Object value = null;
 						if(bindings!=null && bindings.containsKey(pname))
@@ -2314,7 +2316,8 @@ public class AgentRules
 					Object cparamset	= it.next();
 					String pname	= (String)state.getAttributeValue(cparamset, OAVBDIMetaModel.configparameterset_has_ref);
 					Object mparamset = state.getAttributeValue(mparamelem, OAVBDIMetaModel.parameterelement_has_parametersets, pname);
-					Class clazz = (Class)state.getAttributeValue(mparamset, OAVBDIMetaModel.typedelement_has_class);
+//					Class clazz = (Class)state.getAttributeValue(mparamset, OAVBDIMetaModel.typedelement_has_class);
+					Class clazz = ParameterFlyweight.resolveClazz(state, mparamelem, (String)pname);
 
 					Object rparamset = BeliefRules.createParameterSet(state, pname, null, clazz, rparamelem, mparamset, rcapa);
 					doneparams.add(pname);
