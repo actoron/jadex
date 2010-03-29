@@ -25,6 +25,8 @@ public class AgentControlCenter extends ControlCenter
 	public AgentControlCenter(IServiceContainer container, String plugins_prop, final IBDIExternalAccess agent)
 	{
 		super(container, plugins_prop);
+	
+		System.out.println("Hi, ich wurde erzeugt :)");
 		
 		this.agent = agent;
 

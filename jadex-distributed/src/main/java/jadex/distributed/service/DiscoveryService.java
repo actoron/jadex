@@ -48,6 +48,7 @@ public class DiscoveryService implements IService, IDiscoveryService {
 	
 	public DiscoveryService() {
 		this.machines = new HashSet<InetSocketAddress>();
+		this.listeners = new HashSet<IDiscoveryServiceListener>();
 	}
 
 	@Override
@@ -70,7 +71,7 @@ public class DiscoveryService implements IService, IDiscoveryService {
 				if( line.indexOf("#") != -1 || line.equals("") ) 
 					continue;
 				String ip = line.substring(0, line.indexOf(":"));
-				String port = line.substring(line.indexOf(":"), line.length());
+				String port = line.substring(line.indexOf(":")+1, line.length());
 				machines.add( new InetSocketAddress(InetAddress.getByName(ip), Integer.valueOf(port)) );
 			}
 		} catch (FileNotFoundException e) { // try-catch behandlung hier noch sehr ugyl, aber egal

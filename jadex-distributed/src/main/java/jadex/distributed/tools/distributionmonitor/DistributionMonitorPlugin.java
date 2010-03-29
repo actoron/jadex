@@ -1,28 +1,22 @@
-//Erbt von AbstractJCCPlugin
 package jadex.distributed.tools.distributionmonitor;
+
+import jadex.commons.SGUI;
+import jadex.distributed.service.IMonitorService;
+import jadex.distributed.service.IMonitorServiceListener;
+import jadex.distributed.service.Workload;
+import jadex.service.IServiceContainer;
+import jadex.tools.common.plugin.AbstractJCCPlugin;
+import jadex.tools.common.plugin.IControlCenter;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.UIDefaults;
-
-import jadex.bridge.IMessageService;
-import jadex.commons.SGUI;
-import jadex.distributed.service.DiscoveryService;
-import jadex.distributed.service.IDiscoveryService;
-import jadex.distributed.service.IDiscoveryServiceListener;
-import jadex.distributed.service.IMonitorService;
-import jadex.distributed.service.IMonitorServiceListener;
-import jadex.distributed.service.Workload;
-import jadex.tools.common.plugin.AbstractJCCPlugin;
-import jadex.tools.libtool.LibraryPlugin;
-import jadex.tools.starter.StarterPlugin;
 
 public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMonitorServiceListener {
 
@@ -38,11 +32,8 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMon
 	
 	public DistributionMonitorPlugin() {
 		this.machineWorkloads = new HashMap<InetSocketAddress, Workload>(); // unnecessary due monitorService should automatically initiate the variable with a call to updateWorkloadAll(...)
-		
-		// beim IMonitorService registrieren, um laufend über Änderungen informiert zu werden
-		monitorService = (IMonitorService)getJCC().getServiceContainer().getService(IMonitorService.class);
-		monitorService.register(this);
-		
+		//monitorService = (IMonitorService)getJCC().getServiceContainer().getService(IMonitorService.class); // TODO hier wird eine NullPointerException während der Laufzeit geworfen
+		// TODO vielleicht war das Kopieren vom StarterPlugin Block völlig unnötig gewessen; wenn das NullPointerException-Problem gelöst ist mal ohne das kopierte Pendant überprüfen
 		view = builtView(); // view aufbauen, damit sie zu jeder Zeit durch createView() abgeholt werden kann
 		//listView = builtView(); // view aufbauen, damit sie zu jeder Zeit durch createView() abgeholt werden kann
 	}
@@ -52,7 +43,6 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMon
 		//JPanel left = new JPanel();
 		PlatformList listView = new PlatformList(this.machineWorkloads);
 		// left mit einzelnen Items füllen
-		
 		
 		
 		JPanel right = new JPanel();
@@ -68,6 +58,15 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMon
 		return split;
 	}
 	
+	@Override
+	public void init(IControlCenter jcc) {
+		super.init(jcc);
+		
+		// beim IMonitorService anmelden, um aktuelle Managementinformationen zu erhalten
+		this.monitorService = (IMonitorService)getJCC().getServiceContainer().getService(IMonitorService.class);
+		this.monitorService.register(this);
+	}
+
 	@Override
 	public boolean isLazy() {
 		return false; // während einer Demo soll alles gut und schnell laufen

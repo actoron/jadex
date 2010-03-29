@@ -207,8 +207,10 @@ public class ComponentManagementService_Client implements IComponentManagementSe
 		
 				IComponentDescription padesc = parent!=null? (IComponentDescription)descs.get(parent): null;
 				ad	= new CMSComponentDescription(cid, type, parent, master);
-				// Suspend when set to suspend or when parent is also suspended.
-				if(suspend || (padesc!=null && IComponentDescription.STATE_SUSPENDED.equals(padesc.getState())))
+				// Suspend when set to suspend or when parent is also suspended or when specified in model.
+				Object	debugging 	= lmodel.getProperties().get("debugging");
+				if(suspend || (padesc!=null && IComponentDescription.STATE_SUSPENDED.equals(padesc.getState()))
+					|| debugging instanceof Boolean && ((Boolean)debugging).booleanValue())
 				{
 					ad.setState(IComponentDescription.STATE_SUSPENDED);
 				}

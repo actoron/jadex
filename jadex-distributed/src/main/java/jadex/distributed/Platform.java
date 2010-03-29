@@ -73,8 +73,8 @@ public class Platform extends AbstractPlatform
 	/** The fallback configuration for basic services. */
 	public static final String FALLBACK_SERVICES_CONFIGURATION = "jadex/standalone/services_conf.xml";
 
-	/** The fallback configuration for standard agents (cms/df/jcc). */
-	public static final String FALLBACK_AGENTS_CONFIGURATION = "jadex/standalone/platformagents_conf.xml";
+	/** The fallback configuration for standard components (cms/df/jcc). */
+	public static final String FALLBACK_STANDARDCOMPONENTS_CONFIGURATION = "jadex/standalone/platformcomponents_conf.xml";
 
 	/** The fallback configuration for application kernel. */
 	public static final String FALLBACK_APPLICATION_CONFIGURATION = "jadex/application/kernel_application_conf.xml";
@@ -278,7 +278,7 @@ public class Platform extends AbstractPlatform
 						{
 							public void resultAvailable(Object result)
 							{
-								if(((Integer)result).intValue() <= daemonagents.size())
+								if(((Integer)result).intValue() <= daemoncomponents.size())
 									shutdown(null);
 							}
 	
@@ -439,7 +439,7 @@ public class Platform extends AbstractPlatform
 			conffiles = new String[]
 			{
 				FALLBACK_SERVICES_CONFIGURATION,
-				FALLBACK_AGENTS_CONFIGURATION,
+				FALLBACK_STANDARDCOMPONENTS_CONFIGURATION,
 				FALLBACK_APPLICATION_CONFIGURATION,
 				FALLBACK_BDI_CONFIGURATION,
 				FALLBACK_MICRO_CONFIGURATION,

@@ -3,12 +3,43 @@
 
 	Main platform administration user interface.
 -->
+
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	name="JCC" package="jadex.tools.jcc">
 
+<!--
+	Ist schon witzig das mit dem JCC und den Plugins die dieser lädt. Schau mal nach oben was bei 'package=..' steht :)
+	Diese Jcc.agent.xml liegt zwar im distributed Ordner, aber die Komponente die diese xml Datei interpretiert setzt den
+	'Kontext' dieser xml datei auf den runtimes ordner. Das hat enorme Auswirkungen:
+	 - Ganz unten wird ein 'new new AgentControlCenter(...)' ausgeführt. Dabei wird das AgentControlCenter aus runtimetools,
+	   und nicht aus distributed geladen;
+	   ergo: das Kopieren von AgentControlCenter, ControlCenter, und ControlCenterWindow in den distributed Ordner war unnötig,
+	   denn es werden nur die runtimetools Varianten verwendet; schon lustig :)
+	 - Die JCC.agnt.xml erfüllt aber ihren Zweck, da ich eigene Pluings laden kann, vor allem 
+	   jadex.distributed.tools.distributionmonitor.DistributionMonitorPlugin
+	   und durch die package Angabe jadex.distributed.tools.distributionmonitor wird auch genau festgelegt welche Klasse es in
+	   welchem Ordner ist
+	- natürlich gilt das gleich auf für das StarterPanel Plugin in distributed, von dem ich am Anfang dachte, dass es dafür
+	  verantwortlich war, dass der DistributionMonitor nicht geladen werden konnte, was nicht der Fall war; der Grund wieso der
+	  Distribution Monitor nicht geladen werden konnte war ... hab ich vergessen ...
+	  auf jeden fall wird das StarterPanel aus runtimetools und nicht aus distributed geladen
+	
+	Kurz: alles ist ok und läuft wie es soll. Es gibt zwar ein paar redundante Klassen, die entfernet werden können, aber
+	      das kann noch etwas warten bzw. ist nicht für Umsetzung wichtig.
+	      
+
+-->
+
+<!--
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="JCC" package="jadex.distributed.tools.jcc"> -->
+	<!-- auf den eigenen JCC in distributed umstellen, damit dort auch das richtige AgentControlCenter und ControlCenter gefunden werden kann --> 
    <imports>
       <import>jadex.base.fipa.*</import>
    </imports>
@@ -25,7 +56,7 @@
 		<belief name="jcc" class="AgentControlCenter" />
 
 		<beliefsetref name="agents">
-			<concrete ref="cms.agents"/>
+			<concrete ref="cms.agents"/> <!-- kein package identifier, sondern einfach nur ein Name; der Punkt hat keine runtime Bedeutung, sondern ist nur syntaktischer Zucker; wie wäre es mit einem | oder $ oder & oder % um dies besser deutlich zu machen? -->
 		</beliefsetref>
 
 		<beliefref name="testcase_timeout">
@@ -174,8 +205,10 @@
 				<initialbelief ref="jcc">
 					<!-- @me: ich habe den distributionmonitor zusätzlich eingefügt, den die Sever-Plattform braucht, um den momentanen Zustand der verteilen Plattform anzeigen zu können. Eine Client-Plattform braucht keine GUI, lädt also auch keinen JCC.agent.xml Agenten, der eine GUI für einen menschlichen Benutzer aufbauen würde. -->
 					<fact>
+						<!-- new jadex.distributed.tools.jcc.AgentControlCenter($scope.getServiceContainer(), --> <!-- TODO evtl. kann der package prefix wegfallen, wenn ich den jadex/tool/startet aus runtimetools nach distributed kopiert habe -->
 						new AgentControlCenter($scope.getServiceContainer(),
-						"jadex.tools.starter.StarterPlugin"
+						"jadex.tools.starter.StarterPlugin" <!-- eigenes StarterPlugin nötig, damit das AgentControlCenter aus distributed, und nicht aus runtime-tools geladen wird; das AgentControlCenter aus distributed nutzt dann auch das ControlCenter aus distributed beim extends -->
+						<!--"jadex.distributed.tools.starter.StarterPlugin" -->
 						+" jadex.tools.dfbrowser.DFBrowserPlugin"
 						+" jadex.tools.convcenter.ConversationPlugin"
 						+" jadex.tools.comanalyzer.ComanalyzerPlugin"
