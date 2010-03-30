@@ -708,9 +708,8 @@ public class MessageEventRules
 				IMessageAdapter msg = new DefaultMessageAdapter(message, mtype);
 				
 				BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
-				((IMessageService)interpreter.getComponentAdapter().getServiceContainer()
-					.getService(IMessageService.class)).sendMessage(msg.getParameterMap(),
-						msg.getMessageType(), interpreter.getComponentAdapter().getComponentIdentifier(), interpreter.getModel().getTypeModel().getClassLoader());
+				IMessageService ms = ((IMessageService)interpreter.getComponentAdapter().getServiceContainer().getService(IMessageService.class));
+				ms.sendMessage(msg.getParameterMap(), msg.getMessageType(), interpreter.getComponentAdapter(), interpreter.getModel().getTypeModel().getClassLoader());
 
 //				interpreter.getComponentAdapter().sendMessage(message, mtype);
 				
@@ -1283,7 +1282,7 @@ public class MessageEventRules
 	 *  @param props The properties.
 	 *  @return The content codec.
 	 */
-	public static IContentCodec[]	getContentCodecs(Object rcapa, IOAVState state)
+	public static IContentCodec[] getContentCodecs(Object rcapa, IOAVState state)
 	{
 		List ret	= null;
 		Collection rprops = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_properties);

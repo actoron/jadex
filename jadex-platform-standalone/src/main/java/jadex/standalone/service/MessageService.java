@@ -4,6 +4,7 @@ import jadex.base.DefaultResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.DefaultMessageAdapter;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IContentCodec;
@@ -105,8 +106,10 @@ public class MessageService implements IMessageService, IService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	public void sendMessage(Map msg, MessageType type, IComponentIdentifier sender, ClassLoader cl)
+//	public void sendMessage(Map msg, MessageType type, IComponentIdentifier sender, ClassLoader cl)
+	public void sendMessage(Map msg, MessageType type, IComponentAdapter adapter, ClassLoader cl)
 	{
+		IComponentIdentifier sender = adapter.getComponentIdentifier();
 		if(sender==null)
 			throw new RuntimeException("Sender must not be null: "+msg);
 	
@@ -147,11 +150,16 @@ public class MessageService implements IMessageService, IService
 		}
 
 		// Conversion via platform specific codecs
+		IContentCodec[] compcodecs = getContentCodecs((StandaloneComponentAdapter)adapter);
 		for(Iterator it=msgcopy.keySet().iterator(); it.hasNext(); )
 		{
 			String	name	= (String)it.next();
 			Object	value	= msgcopy.get(name);
-			IContentCodec	codec	= type.findContentCodec(DEFCODECS, msgcopy, name);
+			
+			IContentCodec codec = type.findContentCodec(compcodecs, msg, name);
+			if(codec==null)
+				codec = type.findContentCodec(DEFCODECS, msg, name);
+			
 			if(codec!=null)
 			{
 				msgcopy.put(name, codec.encode(value, cl));
@@ -175,6 +183,32 @@ public class MessageService implements IMessageService, IService
 		}
 		
 		sendmsg.addMessage(msgcopy, type.getName(), receivers);
+	}
+	
+	/**
+	 *  Get a matching content codec.
+	 *  @param props The properties.
+	 *  @return The content codec.
+	 */
+	public static IContentCodec[] getContentCodecs(StandaloneComponentAdapter adapter)
+	{
+		List ret = null;
+		Map props = adapter.getModel().getProperties();
+		if(props!=null)
+		{
+			for(Iterator it=props.keySet().iterator(); ret==null && it.hasNext();)
+			{
+				String name = (String)it.next();
+				if(name.startsWith("contentcodec."))
+				{
+					if(ret==null)
+						ret	= new ArrayList();
+					ret.add(props.get(name));
+				}
+			}
+		}
+
+		return ret!=null? (IContentCodec[])ret.toArray(new IContentCodec[ret.size()]): null;
 	}
 
 	/**
@@ -424,11 +458,16 @@ public class MessageService implements IMessageService, IService
 							}
 
 							// Conversion via platform specific codecs
+							IContentCodec[] compcodecs = getContentCodecs(component);
 							for(Iterator it=message.keySet().iterator(); it.hasNext(); )
 							{
 								String name = (String)it.next();
 								Object value = message.get(name);
-								IContentCodec codec = messagetype.findContentCodec(DEFCODECS, message, name);
+								
+								IContentCodec codec = messagetype.findContentCodec(compcodecs, message, name);
+								if(codec==null)
+									codec = messagetype.findContentCodec(DEFCODECS, message, name);
+								
 								if(codec!=null)
 								{
 									message.put(name, codec.decode((String)value, cl));

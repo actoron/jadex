@@ -272,6 +272,15 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		    }
 		}
 	}
+	
+	/**
+	 *  Get the model.
+	 *  @return The model.
+	 */
+	public ILoadableComponentModel getModel()
+	{
+		return this.model;
+	}
 
 	/**
 	 *  String representation of the component.

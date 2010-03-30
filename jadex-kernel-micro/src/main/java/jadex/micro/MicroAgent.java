@@ -281,7 +281,8 @@ public abstract class MicroAgent implements IMicroAgent
 	public void sendMessage(Map me, MessageType mt)
 	{
 		((IMessageService)getServiceContainer().getService(IMessageService.class)).
-			sendMessage(me, mt, getComponentIdentifier(), interpreter.getAgentModel().getClassLoader());
+			sendMessage(me, mt, interpreter.getAgentAdapter(), interpreter.getAgentModel().getClassLoader());
+//			sendMessage(me, mt, getComponentIdentifier(), interpreter.getAgentModel().getClassLoader());
 	}
 	
 	/**

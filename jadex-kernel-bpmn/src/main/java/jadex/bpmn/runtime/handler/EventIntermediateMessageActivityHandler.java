@@ -130,7 +130,8 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 			}
 		}
 		
-		ms.sendMessage(msg, mt, instance.getComponentAdapter().getComponentIdentifier(), instance.getClassLoader());
+//		ms.sendMessage(msg, mt, instance.getComponentAdapter().getComponentIdentifier(), instance.getClassLoader());
+		ms.sendMessage(msg, mt, instance.getComponentAdapter(), instance.getClassLoader());
 		instance.getStepHandler(activity).step(activity, instance, thread, null);
 	}
 	

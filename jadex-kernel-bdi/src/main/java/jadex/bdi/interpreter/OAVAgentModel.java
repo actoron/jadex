@@ -90,39 +90,60 @@ public class OAVAgentModel	extends OAVCapabilityModel
 	{
 		if(properties==null)
 		{
-			Map props	= new HashMap();
+			this.properties = new HashMap();
 
 			// Debugger breakpoints for BDI and user rules.
-			List	names	= new ArrayList();
+			List names = new ArrayList();
 			for(Iterator it=matcherfunc.getRulebase().getRules().iterator(); it.hasNext(); )
 				names.add(((IRule)it.next()).getName());
-			props.put("debugger.breakpoints", names);
-			this.properties	= props;
-
-			// Properties from loaded model.
-			Collection	oprops	= state.getAttributeKeys(handle, OAVBDIMetaModel.capability_has_properties);
-			if(oprops!=null)
+			properties.put("debugger.breakpoints", names);
+			
+			addCapabilityProperties(properties, handle);
+		}
+		return properties;
+	}
+	
+	/**
+	 *  Add the properties of a capability.
+	 *  @param props The map to add the properties.
+	 *  @param capa The start capability.
+	 */
+	public void addCapabilityProperties(Map props, Object capa)
+	{
+		// Properties from loaded model.
+		Collection	oprops	= state.getAttributeKeys(capa, OAVBDIMetaModel.capability_has_properties);
+		if(oprops!=null)
+		{
+			for(Iterator it=oprops.iterator(); it.hasNext(); )
 			{
-				for(Iterator it=oprops.iterator(); it.hasNext(); )
+				Object	key	= it.next();
+				Object	mexp	= state.getAttributeValue(capa, OAVBDIMetaModel.capability_has_properties, key);
+				IParsedExpression	pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_content);
+				try
 				{
-					Object	key	= it.next();
-					Object	mexp	= state.getAttributeValue(handle, OAVBDIMetaModel.capability_has_properties, key);
-					IParsedExpression	pex = (IParsedExpression)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_content);
-					try
-					{
-						Object	value	= pex.getValue(null);
-						props.put(key, value);
-					}
-					catch(Exception e)
-					{
-						// Hack!!! Exception should be propagated.
-						System.err.println(pex.getExpressionText());
-						e.printStackTrace();
-					}
+					Object	value	= pex.getValue(null);
+					props.put(key, value);
+				}
+				catch(Exception e)
+				{
+					// Hack!!! Exception should be propagated.
+					System.err.println(pex.getExpressionText());
+					e.printStackTrace();
 				}
 			}
 		}
-		return properties;
+		
+		// Merge with subproperties
+		Collection subcaparefs = state.getAttributeValues(capa, OAVBDIMetaModel.capability_has_capabilityrefs);
+		if(subcaparefs!=null)
+		{
+			for(Iterator it=subcaparefs.iterator(); it.hasNext(); )
+			{
+				Object subcaparef = it.next();
+				Object subcapa = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
+				addCapabilityProperties(props, subcapa);
+			}
+		}
 	}
 
 	/**
