@@ -4,7 +4,6 @@ import jadex.commons.SGUI;
 import jadex.distributed.service.IMonitorService;
 import jadex.distributed.service.IMonitorServiceListener;
 import jadex.distributed.service.Workload;
-import jadex.service.IServiceContainer;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.common.plugin.IControlCenter;
 
@@ -22,7 +21,7 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMon
 
 	protected Map<InetSocketAddress, Workload> machineWorkloads;
 	protected JComponent view; // das Hauptfenster im JCC; hier wird alles gezeichnet: sidebar, main content, ...
-	protected IMonitorService monitorService;
+	protected IMonitorService monitorService; // erst bei init(...) gesetzt, denn erst ab da ist der jcc verfügbar, der dann den Container/Platform geben kann
 	
 	/** The image icons. */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
@@ -32,26 +31,14 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMon
 	
 	public DistributionMonitorPlugin() {
 		this.machineWorkloads = new HashMap<InetSocketAddress, Workload>(); // unnecessary due monitorService should automatically initiate the variable with a call to updateWorkloadAll(...)
-		//monitorService = (IMonitorService)getJCC().getServiceContainer().getService(IMonitorService.class); // TODO hier wird eine NullPointerException während der Laufzeit geworfen
-		// TODO vielleicht war das Kopieren vom StarterPlugin Block völlig unnötig gewessen; wenn das NullPointerException-Problem gelöst ist mal ohne das kopierte Pendant überprüfen
-		view = builtView(); // view aufbauen, damit sie zu jeder Zeit durch createView() abgeholt werden kann
-		//listView = builtView(); // view aufbauen, damit sie zu jeder Zeit durch createView() abgeholt werden kann
+		view = builtView(); // view schon hier aufbauen, damit zu jeder Zeit createView() aufgerufen werden kann
 	}
 	
 	private JComponent builtView() {
-		//DistributionMonitorPlatformList left = new DistributionMonitorPlatformList(); // common pattern: use JPanels to group items; use extended JComponent to praint
-		//JPanel left = new JPanel();
-		PlatformList listView = new PlatformList(this.machineWorkloads);
-		// left mit einzelnen Items füllen
+		PlatformList listView = new PlatformList(this.machineWorkloads); // left shows found platforms and their current resources status
+		// here non-sense, because no workload is currently listed
 		
-		
-		JPanel right = new JPanel();
-		
-		// left JPanel lists all found platforms
-		// get list of platforms and their current resources
-		
-		
-		// right JPanel show ... I don't know yet
+		JPanel right = new JPanel(); // common pattern: use JPanels to group items; use extended JComponent to praint
 		
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, listView, right); // true makes the JSplitPane more responsive to the user
 		split.setOneTouchExpandable(true); // ability to collapse and show one side quickly
@@ -62,30 +49,30 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMon
 	public void init(IControlCenter jcc) {
 		super.init(jcc);
 		
-		// beim IMonitorService anmelden, um aktuelle Managementinformationen zu erhalten
 		this.monitorService = (IMonitorService)getJCC().getServiceContainer().getService(IMonitorService.class);
-		this.monitorService.register(this);
+		this.monitorService.register(this); // register at IMonitorService to recieve up to date management information
 	}
 
 	@Override
 	public boolean isLazy() {
-		return false; // während einer Demo soll alles gut und schnell laufen
+		return false; // so everything will run as fast as possible in a demo
 	}
 
 	@Override
 	public String getHelpID() {
-		return "tools.distributionmonitor"; // TODO ist wahrscheinlich nicht so wichtig, aber: wofür wird das benötigt?
+		return "tools.distributionmonitor"; // probably not so important, but for what is this good for?
 	}
 
 	@Override
 	public String getName() {
-		return "Distribution Monitor";
+		return "Distribution Monitor"; // and what is this good for?
 	}
 
 	@Override
 	public Icon getToolIcon(boolean selected) {
 		//return selected? icons.getIcon("icon"): icons.getIcon("icon");
-		return icons.getIcon("icon");
+		// two different icons can be supplied; one when this plug in is currently selected, and one when it is not selected
+		return icons.getIcon("icon"); // for now just one icon
 	}
 	
 	
@@ -94,9 +81,9 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMon
 	 *  - tool bar: created by method createToolBar():JComponent[]
 	 *  - menu bar: created by method createMenuBar():JMenu[]
 	 *  - view: created by method createView():JComponent
-	 * If you only want a view, but no tool bar or menu bar, then just don't write them!
-	 * The class AbstractJCCPlugin implements all of them with a return of null, which means that
-	 * non of the parts is build and displayed. Besides that, it is ALWAYS a good idea to at least
+	 * If you only want a view, but no tool bar or menu bar, then just don't overwrite the methods!
+	 * The class AbstractJCCPlugin implements all of them with a return value of null, which means that
+	 * the part in question isn't build and displayed. Besides that, it is ALWAYS a good idea to at least
 	 * provide a own createView():JComponent method to display something useful to the user.
 	 */
 	/** Methods for AbstractJCCPlugin **/
@@ -106,7 +93,7 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMon
 	}
 
 	
-	/** Methods for IMonitorServiceListener **/
+	/** Three methods for IMonitorServiceListener **/
 	@Override
 	public void removeWorkloadSingle(InetSocketAddress machine, Workload workload) {
 		this.machineWorkloads.remove(machine);
@@ -114,7 +101,15 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMon
 
 	@Override
 	public void updateWorkloadAll(Map<InetSocketAddress, Workload> machineWorkloads) {
-		this.machineWorkloads = machineWorkloads;
+		/*
+		   Unfortunately the constructor calls builtView, which in turn creates a PlatformList, which
+		   keeps a reference on the empty machineWorkloads set, created in the constructor.
+		   Changing the reference in PlatformList is possible, but not an elegant solution.
+		   Here we go another way: copy the entries to the workload variable
+		 */
+		//this.machineWorkloads = machineWorkloads;
+		
+		
 		// repaint an Liste der Plattformen ausführen
 	}
 
@@ -141,7 +136,5 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMon
 	public void removeMachine(InetSocketAddress machine) {
 		machines.remove(machine);
 		view.repaint();
-	}*/
-	
-	
+	}*/	
 }

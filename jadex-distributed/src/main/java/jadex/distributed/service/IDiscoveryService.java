@@ -1,5 +1,8 @@
 package jadex.distributed.service;
 
+import java.net.InetSocketAddress;
+import java.util.Set;
+
 public interface IDiscoveryService {
 	
 	/**
@@ -18,4 +21,11 @@ public interface IDiscoveryService {
 	 *                   IDiscoveryService.
 	 */
 	public void unregister(IDiscoveryServiceListener listener);
+	
+	/**
+	 * Usually called by a registered IDiscoveryListener to get the current
+	 * list of known machines. But of course can also be called by an arbitrary object/class.
+	 * @return a Set of known machines
+	 */
+	public Set<InetSocketAddress> getMachineAddresses();
 }

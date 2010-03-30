@@ -10,19 +10,17 @@ import java.util.Set;
  * @author daniel
  */
 public interface IDiscoveryServiceListener {
-	
 	/**
 	 * Called when a new machine is available
 	 * @param machine - the newly available machine
 	 */
-	public void addMachine(InetSocketAddress machine);
+	/*public void addMachine(InetSocketAddress machine);*/
 	
 	/**
 	 * Called when a machine is not available anymore
 	 * @param machine - the machine which is not available anymore
 	 */
-	public void removeMachine(InetSocketAddress machine);
-	
+	/*public void removeMachine(InetSocketAddress machine);*/
 	
 	/**
 	 * Called when a listener just registered itself. The DiscoveryService
@@ -31,6 +29,11 @@ public interface IDiscoveryServiceListener {
 	 * arbitrary times.
 	 * @param machines - the set of machines already known
 	 */
-	public void addMachines(Set<InetSocketAddress> machines);
+	/*public void addMachines(Set<InetSocketAddress> machines);*/
 	
+	/**
+	 * Notify a registered listener of type IDiscoveryListener that the list of known
+	 * machines changed, so the listener can read it.
+	 */
+	public void notifyIDiscoveryListener();
 }
