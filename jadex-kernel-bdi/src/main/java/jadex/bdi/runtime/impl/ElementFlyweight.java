@@ -48,7 +48,7 @@ public abstract class ElementFlyweight implements IElement
 		assert !(scope instanceof ElementFlyweight);
 //		if(handle==null && !(this instanceof ParameterFlyweight || this instanceof ParameterSetFlyweight))
 //			Thread.dumpStack();
-		assert handle!=null || this instanceof ParameterFlyweight || this instanceof ParameterSetFlyweight: this;
+		assert handle!=null || this instanceof ParameterFlyweight || this instanceof ParameterSetFlyweight || this instanceof ProcessableElementFlyweight: this;
 		
 		this.state = state;
 		this.scope = scope;
@@ -79,7 +79,7 @@ public abstract class ElementFlyweight implements IElement
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((getHandle() == null) ? 0 : getHandle().hashCode());
+		result = prime * result + (!hasHandle() ? 0 : getHandle().hashCode());
 		result = prime * result + ((getScope() == null) ? 0 : getScope().hashCode());
 		result = prime * result + ((getState() == null) ? 0 : getState().hashCode());
 		return result;
@@ -109,6 +109,14 @@ public abstract class ElementFlyweight implements IElement
 	{
 		return state;
 	}
+	
+	/**
+	 *  Test, if the handle has already been set.
+	 */
+	public boolean	hasHandle()
+	{
+		return handle!=null;
+	}
 
 	/**
 	 *  Get the handle.
@@ -116,6 +124,8 @@ public abstract class ElementFlyweight implements IElement
 	 */
 	public Object getHandle()
 	{
+		if(handle==null)
+			throw new UnsupportedOperationException("Cannot get handle before it is set: "+this.getClass());
 		return handle;
 	}
 	
@@ -260,7 +270,7 @@ public abstract class ElementFlyweight implements IElement
 		String ret = "unknown";
 		try
 		{
-			if(getHandle()!=null && state.getType(getHandle()).isSubtype(OAVBDIRuntimeModel.element_type))
+			if(hasHandle() && state.getType(getHandle()).isSubtype(OAVBDIRuntimeModel.element_type))
 			{
 				Object me = state.getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
 				if(me!=null)

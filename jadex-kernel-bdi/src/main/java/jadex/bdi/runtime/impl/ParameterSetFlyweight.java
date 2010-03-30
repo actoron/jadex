@@ -76,13 +76,13 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 			{
 				public void run()
 				{
-					if(getHandle()==null && getState().containsKey(pe, 
+					if(!hasHandle() && getState().containsKey(pe, 
 						OAVBDIRuntimeModel.parameterelement_has_parametersets, name))
 					{
 						setHandle(getState().getAttributeValue(pe, 
 							OAVBDIRuntimeModel.parameterelement_has_parametersets, name));
 					}
-					if(getHandle()==null)
+					if(!hasHandle())
 					{
 						Object mparamelem = getState().getAttributeValue(pe, OAVBDIRuntimeModel.element_has_model);	
 						Object mparamset = getState().getAttributeValue(mparamelem, OAVBDIMetaModel.parameterelement_has_parametersets, name);
@@ -101,13 +101,13 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 		}
 		else
 		{
-			if(getHandle()==null && getState().containsKey(pe, 
+			if(!hasHandle() && getState().containsKey(pe, 
 				OAVBDIRuntimeModel.parameterelement_has_parametersets, name))
 			{
 				setHandle(getState().getAttributeValue(pe, 
 					OAVBDIRuntimeModel.parameterelement_has_parametersets, name));
 			}
-			if(getHandle()==null)
+			if(!hasHandle())
 			{
 				Object mparamelem = getState().getAttributeValue(pe, OAVBDIRuntimeModel.element_has_model);	
 				Object mparamset = getState().getAttributeValue(mparamelem, OAVBDIMetaModel.parameterelement_has_parametersets, name);
@@ -138,7 +138,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 			{
 				public void run()
 				{
-					if(getHandle()==null && getState().containsKey(pe, 
+					if(!hasHandle() && getState().containsKey(pe, 
 						OAVBDIRuntimeModel.parameterelement_has_parametersets, name))
 					{
 						setHandle(getState().getAttributeValue(pe, 
@@ -151,7 +151,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 						throw new RuntimeException("Write access not allowed to parameter set: "
 							+direction+" "+getName());
 
-					if(getHandle()==null)
+					if(!hasHandle())
 						throw new RuntimeException("Value not contained: "+value);
 					BeliefRules.removeParameterSetValue(getState(), getHandle(), value);
 				}
@@ -159,7 +159,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 		}
 		else
 		{
-			if(getHandle()==null && getState().containsKey(pe, 
+			if(!hasHandle() && getState().containsKey(pe, 
 				OAVBDIRuntimeModel.parameterelement_has_parametersets, name))
 			{
 				setHandle(getState().getAttributeValue(pe, 
@@ -172,7 +172,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 				throw new RuntimeException("Write access not allowed to parameter set: "
 					+direction+" "+getName());
 
-			if(getHandle()==null)
+			if(!hasHandle())
 				throw new RuntimeException("Value not contained: "+value);
 			
 			getInterpreter().startMonitorConsequences();
@@ -195,13 +195,13 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 			{
 				public void run()
 				{
-					if(getHandle()==null && getState().containsKey(pe, 
+					if(!hasHandle() && getState().containsKey(pe, 
 							OAVBDIRuntimeModel.parameterelement_has_parametersets, name))
 					{
 						setHandle(getState().getAttributeValue(pe, 
 							OAVBDIRuntimeModel.parameterelement_has_parametersets, name));
 					}
-					if(getHandle()==null)
+					if(!hasHandle())
 					{
 						Object mparamelem = getState().getAttributeValue(pe, OAVBDIRuntimeModel.element_has_model);	
 						Object mparamset = getState().getAttributeValue(mparamelem, OAVBDIMetaModel.parameterelement_has_parametersets, name);
@@ -222,13 +222,13 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 		}
 		else
 		{
-			if(getHandle()==null && getState().containsKey(pe, 
+			if(!hasHandle() && getState().containsKey(pe, 
 					OAVBDIRuntimeModel.parameterelement_has_parametersets, name))
 			{
 				setHandle(getState().getAttributeValue(pe, 
 					OAVBDIRuntimeModel.parameterelement_has_parametersets, name));
 			}
-			if(getHandle()==null)
+			if(!hasHandle())
 			{
 				Object mparamelem = getState().getAttributeValue(pe, OAVBDIRuntimeModel.element_has_model);	
 				Object mparamset = getState().getAttributeValue(mparamelem, OAVBDIMetaModel.parameterelement_has_parametersets, name);
@@ -259,7 +259,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 			{
 				public void run()
 				{
-					if(getHandle()==null && getState().containsKey(pe, 
+					if(!hasHandle() && getState().containsKey(pe, 
 						OAVBDIRuntimeModel.parameterelement_has_parametersets, name))
 					{
 						setHandle(getState().getAttributeValue(pe, 
@@ -272,7 +272,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 						throw new RuntimeException("Write access not allowed to parameter set: "
 							+direction+" "+getName());
 
-					if(getHandle()!=null)
+					if(hasHandle())
 					{
 						Collection vals = getState().getAttributeValues(getHandle(), OAVBDIRuntimeModel.parameterset_has_values);
 						if(vals!=null)
@@ -287,7 +287,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 		}
 		else
 		{
-			if(getHandle()==null && getState().containsKey(pe, 
+			if(!hasHandle() && getState().containsKey(pe, 
 				OAVBDIRuntimeModel.parameterelement_has_parametersets, name))
 			{
 				setHandle(getState().getAttributeValue(pe, 
@@ -300,7 +300,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 				throw new RuntimeException("Write access not allowed to parameter set: "
 					+direction+" "+getName());
 
-			if(getHandle()!=null)
+			if(hasHandle())
 			{
 				Collection vals = getState().getAttributeValues(getHandle(), OAVBDIRuntimeModel.parameterset_has_values);
 				if(vals!=null)
@@ -327,13 +327,13 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 			{
 				public void run()
 				{
-					if(getHandle()==null && getState().containsKey(pe, 
+					if(!hasHandle() && getState().containsKey(pe, 
 						OAVBDIRuntimeModel.parameterelement_has_parametersets, name))
 					{
 						setHandle(getState().getAttributeValue(pe, 
 							OAVBDIRuntimeModel.parameterelement_has_parametersets, name));
 					}
-					if(getHandle()==null)
+					if(!hasHandle())
 					{
 						setHandle(getState().createObject(OAVBDIRuntimeModel.parameterset_type));
 						getState().setAttributeValue(getHandle(), OAVBDIRuntimeModel.parameterset_has_name, name);
@@ -354,13 +354,13 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 		}
 		else
 		{
-			if(getHandle()==null && getState().containsKey(pe, 
+			if(!hasHandle() && getState().containsKey(pe, 
 				OAVBDIRuntimeModel.parameterelement_has_parametersets, name))
 			{
 				setHandle(getState().getAttributeValue(pe, 
 					OAVBDIRuntimeModel.parameterelement_has_parametersets, name));
 			}
-			if(getHandle()==null)
+			if(!hasHandle())
 			{
 				setHandle(getState().createObject(OAVBDIRuntimeModel.parameterset_type));
 				getState().setAttributeValue(getHandle(), OAVBDIRuntimeModel.parameterset_has_name, name);
@@ -385,7 +385,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 			{
 				public void run()
 				{
-					if(getHandle()==null && getState().containsKey(pe, 
+					if(!hasHandle() && getState().containsKey(pe, 
 						OAVBDIRuntimeModel.parameterelement_has_parametersets, name))
 					{
 						setHandle(getState().getAttributeValue(pe, 
@@ -394,7 +394,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 					
 					Collection vals	= null;
 					Object newval = value;
-					if(getHandle()!=null)
+					if(hasHandle())
 					{
 //						Class clazz = (Class)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.typedelement_has_class);
 						newval = SReflect.convertWrappedValue(value, resolveClazz());
@@ -407,7 +407,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 		}
 		else
 		{
-			if(getHandle()==null && getState().containsKey(pe, 
+			if(!hasHandle() && getState().containsKey(pe, 
 				OAVBDIRuntimeModel.parameterelement_has_parametersets, name))
 			{
 				setHandle(getState().getAttributeValue(pe, 
@@ -416,7 +416,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 			
 			Collection vals	= null;
 			Object newval = value;
-			if(getHandle()!=null)
+			if(hasHandle())
 			{
 				//Class clazz = (Class)getState().getAttributeValue(getHandle(), OAVBDIMetaModel.typedelement_has_class);
 				newval = SReflect.convertWrappedValue(value, resolveClazz());
@@ -439,13 +439,13 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 				public void run()
 				{
 					Collection vals = null;
-					if(getHandle()==null && getState().containsKey(pe, 
+					if(!hasHandle() && getState().containsKey(pe, 
 						OAVBDIRuntimeModel.parameterelement_has_parametersets, name))
 					{
 						setHandle(getState().getAttributeValue(pe, 
 							OAVBDIRuntimeModel.parameterelement_has_parametersets, name));
 					}
-					if(getHandle()!=null)
+					if(hasHandle())
 					{
 						vals = getState().getAttributeValues(getHandle(), OAVBDIRuntimeModel.parameterset_has_values);
 					}
@@ -459,13 +459,13 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 		else
 		{
 			Collection vals = null;
-			if(getHandle()==null && getState().containsKey(pe, 
+			if(!hasHandle() && getState().containsKey(pe, 
 				OAVBDIRuntimeModel.parameterelement_has_parametersets, name))
 			{
 				setHandle(getState().getAttributeValue(pe, 
 					OAVBDIRuntimeModel.parameterelement_has_parametersets, name));
 			}
-			if(getHandle()!=null)
+			if(hasHandle())
 			{
 				vals = getState().getAttributeValues(getHandle(), OAVBDIRuntimeModel.parameterset_has_values);
 			}
@@ -489,13 +489,13 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 				public void run()
 				{
 					integer = 0;
-					if(getHandle()==null && getState().containsKey(pe, 
+					if(!hasHandle() && getState().containsKey(pe, 
 						OAVBDIRuntimeModel.parameterelement_has_parametersets, name))
 					{
 						setHandle(getState().getAttributeValue(pe, 
 							OAVBDIRuntimeModel.parameterelement_has_parametersets, name));
 					}
-					if(getHandle()!=null)
+					if(hasHandle())
 					{
 						Collection coll = getState().getAttributeValues(getHandle(), OAVBDIRuntimeModel.parameterset_has_values);
 						if(coll!=null)
@@ -508,13 +508,13 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 		else
 		{
 			int ret = 0;
-			if(getHandle()==null && getState().containsKey(pe, 
+			if(!hasHandle() && getState().containsKey(pe, 
 				OAVBDIRuntimeModel.parameterelement_has_parametersets, name))
 			{
 				setHandle(getState().getAttributeValue(pe, 
 					OAVBDIRuntimeModel.parameterelement_has_parametersets, name));
 			}
-			if(getHandle()!=null)
+			if(hasHandle())
 			{
 				Collection coll = getState().getAttributeValues(getHandle(), OAVBDIRuntimeModel.parameterset_has_values);
 				if(coll!=null)

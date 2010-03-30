@@ -25,7 +25,7 @@
 
 	<beliefs>
 		<belief name="runs" class="int" exported="true">
-			<fact>500</fact>
+			<fact>10000</fact>
 			<!-- Todo: support old (v1) number of runs. -->
 			<!-- <fact>10000</fact> -->
 		</belief>
@@ -81,7 +81,7 @@
 	<properties>
 		<property name="debugging">false</property>
 		<!-- <property name="profiling">true</property>-->
-		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
+		<property name="logging.level">java.util.logging.Level.INFO</property>
 	</properties>
 
 

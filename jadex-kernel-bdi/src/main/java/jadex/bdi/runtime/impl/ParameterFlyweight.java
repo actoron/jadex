@@ -92,12 +92,12 @@ public class ParameterFlyweight extends ElementFlyweight implements IParameter
 			{
 				public void run()
 				{
-					if(getHandle()==null)
+					if(!hasHandle())
 					{
 						setHandle(getState().getAttributeValue(parameterelement, 
 							OAVBDIRuntimeModel.parameterelement_has_parameters, name));
 					}
-					if(getHandle()==null)
+					if(!hasHandle())
 					{
 						Object mparamelem = getState().getAttributeValue(parameterelement, OAVBDIRuntimeModel.element_has_model);	
 						Object mparam = getState().getAttributeValue(mparamelem, OAVBDIMetaModel.parameterelement_has_parameters, name);
@@ -118,12 +118,12 @@ public class ParameterFlyweight extends ElementFlyweight implements IParameter
 		}
 		else
 		{
-			if(getHandle()==null)
+			if(!hasHandle())
 			{
 				setHandle(getState().getAttributeValue(parameterelement, 
 					OAVBDIRuntimeModel.parameterelement_has_parameters, name));
 			}
-			if(getHandle()==null)
+			if(!hasHandle())
 			{
 				Object mparamelem = getState().getAttributeValue(parameterelement, OAVBDIRuntimeModel.element_has_model);	
 				Object mparam = getState().getAttributeValue(mparamelem, OAVBDIMetaModel.parameterelement_has_parameters, name);
@@ -156,13 +156,13 @@ public class ParameterFlyweight extends ElementFlyweight implements IParameter
 			{
 				public void run()
 				{
-					if(getHandle()==null && getState().containsKey(parameterelement, 
+					if(!hasHandle() && getState().containsKey(parameterelement, 
 						OAVBDIRuntimeModel.parameterelement_has_parameters, name))
 					{
 						setHandle(getState().getAttributeValue(parameterelement, 
 							OAVBDIRuntimeModel.parameterelement_has_parameters, name));
 					}
-					if(getHandle()!=null)
+					if(hasHandle())
 					{
 						object	= getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.parameter_has_value);
 					}
@@ -173,13 +173,13 @@ public class ParameterFlyweight extends ElementFlyweight implements IParameter
 		else
 		{
 			Object	ret	= null;
-			if(getHandle()==null && getState().containsKey(parameterelement, 
+			if(!hasHandle() && getState().containsKey(parameterelement, 
 				OAVBDIRuntimeModel.parameterelement_has_parameters, name))
 			{
 				setHandle(getState().getAttributeValue(parameterelement, 
 					OAVBDIRuntimeModel.parameterelement_has_parameters, name));
 			}
-			if(getHandle()!=null)
+			if(hasHandle())
 			{
 				ret	= getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.parameter_has_value);
 			}

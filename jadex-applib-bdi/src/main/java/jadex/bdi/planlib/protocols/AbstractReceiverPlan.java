@@ -33,7 +33,7 @@ public abstract class AbstractReceiverPlan extends Plan
 		// Store interaction description
 		if(hasParameter("interaction_description") && hasParameter("message"))
 		{
-			getParameter("interaction_description").setValue(((IMessageEvent)getParameter("message").getValue()).getParameter(SFipa.CONTENT));
+			getParameter("interaction_description").setValue(((IMessageEvent)getParameter("message").getValue()).getParameter(SFipa.CONTENT).getValue());
 		}
 		
 		// Create cancel handler
