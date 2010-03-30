@@ -2742,6 +2742,110 @@ public class AgentRules
 		return ret;
 	}
 	
+	
+	/**
+	 *  Fetch an element and its scope by its complex name (e.g. cmscap.cms_create_component).
+	 *  @param name The name.
+	 *  @param type The object type (belief, beliefset, goal, internalevent, messageevent).
+	 *  @param rcapa The runtime scope.
+	 *  @param forward	resolve only forward (outer to inner).
+	 *  @return An array [restname, scope].
+	 */
+	public static Object[] resolveMCapability(String name, OAVObjectType type, Object mcapa, IOAVState state)
+	{
+		return resolveMCapability(name, type, mcapa, state, true);
+	}
+
+	/**
+	 *  Fetch an element and its scope by its complex name (e.g. cmscap.cms_create_component).
+	 *  @param name The name.
+	 *  @param type The object type (belief, beliefset, goal, internalevent, messageevent).
+	 *  @param rcapa The runtime scope.
+	 *  @param recurse	recurse (true) or resolve only one level (false).
+	 *  @return An array [restname, scope].
+	 */
+	public static Object[] resolveMCapability(String name, OAVObjectType type, Object mcapa, IOAVState state, boolean recurse)
+	{
+		int	idx;
+		if((idx=name.indexOf('.'))!=-1)
+		{
+			String	capname	= name.substring(0, idx);
+			name = name.substring(idx+1);
+			if(name.indexOf('.')!=-1)
+				throw new RuntimeException("Character '.' not allowed in element names.");
+
+			Object mcaparef	= state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs, capname);
+			if(mcaparef==null)
+				throw new RuntimeException("No such capability: "+capname);
+			mcapa = state.getAttributeValue(mcaparef, OAVBDIMetaModel.capabilityref_has_capability);
+		}
+		
+		Object[] ret = new Object[]{name, mcapa};
+		
+		// Check if name is a reference. Then resolve reference further.
+		if(recurse)
+		{
+			Object refelem = null;
+			if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.belief_type) || type.isSubtype(OAVBDIMetaModel.beliefreference_type)))
+			{
+				if(state.containsKey(mcapa, OAVBDIMetaModel.capability_has_beliefrefs, name))
+					refelem = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefrefs, name);
+			}
+			if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.beliefset_type) || type.isSubtype(OAVBDIMetaModel.beliefsetreference_type)))
+			{
+				if(state.containsKey(mcapa, OAVBDIMetaModel.capability_has_beliefsetrefs, name))
+					refelem = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefsetrefs, name);
+			}
+			if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.goal_type) || type.isSubtype(OAVBDIMetaModel.goalreference_type)))
+			{
+				if(state.containsKey(mcapa, OAVBDIMetaModel.capability_has_goalrefs, name))
+					refelem = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_goalrefs, name);
+			}
+			if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.internalevent_type) || type.isSubtype(OAVBDIMetaModel.internaleventreference_type)))
+			{
+				if(state.containsKey(mcapa, OAVBDIMetaModel.capability_has_internaleventrefs, name))
+					refelem = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_internaleventrefs, name);
+			}
+			if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.messageevent_type) || type.isSubtype(OAVBDIMetaModel.messageeventreference_type)))
+			{	
+				if(state.containsKey(mcapa, OAVBDIMetaModel.capability_has_messageeventrefs, name))
+					refelem = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_messageeventrefs, name);
+			}
+			if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.condition_type)))// || type.isSubtype(OAVBDIMetaModel.conditionreference_type))
+			{
+				// todo: support me?!
+			}
+	
+			if(refelem!=null)
+			{
+				name = (String)state.getAttributeValue(refelem, OAVBDIMetaModel.elementreference_has_concrete);
+				if(name!=null)
+				{
+					ret = resolveCapability(name, type, mcapa, state, true);
+				}
+				else
+				{
+					throw new UnsupportedOperationException("todo: abstract at model?!");
+					
+					// Abstract element, should be assigned from outer scope.
+//					Object	abstractsource	= state.getAttributeValue(mcapa, OAVBDIRuntimeModel.capability_has_abstractsources, refelem);
+//					if(abstractsource==null)
+//					{
+//						throw new RuntimeException("Abstract element is not assigned: "+refelem);
+//					}
+//					
+//					Object	sourceelem	= state.getAttributeValue(abstractsource, OAVBDIRuntimeModel.abstractsource_has_source);
+//					Object	sourcecapa	= state.getAttributeValue(abstractsource, OAVBDIRuntimeModel.abstractsource_has_rcapa);
+//					name	= (String)state.getAttributeValue(sourceelem, OAVBDIMetaModel.modelelement_has_name);
+//					ret	= resolveCapability(name, type, sourcecapa, state, true);
+				}
+					
+			}
+		}
+		
+		return ret;	
+	}
+	
 	/**
 	 * 
 	 * /

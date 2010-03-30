@@ -5,6 +5,7 @@ import jadex.commons.SReflect;
 import jadex.javaparser.IParsedExpression;
 import jadex.rules.state.IOAVState;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -92,7 +93,7 @@ public class MBeliefArgument	implements IArgument
 	/**
 	 *  Find the belief/ref value.
 	 */
-	protected Object findDefaultValue(Object scope, Object handle, String configname)
+	protected Object findDefaultValue(Object mcapa, Object handle, String configname)
 	{
 		Object ret = null;
 		boolean found = false;
@@ -101,23 +102,37 @@ public class MBeliefArgument	implements IArgument
 		Object config;
 		if(configname==null)
 		{
-			configname = (String)state.getAttributeValue(scope, OAVBDIMetaModel.capability_has_defaultconfiguration);
-			config = state.getAttributeValue(scope, OAVBDIMetaModel.capability_has_configurations, configname);
+			configname = (String)state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_defaultconfiguration);
+			config = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_configurations, configname);
 		}
 		else
 		{
-			config = state.getAttributeValue(scope, OAVBDIMetaModel.capability_has_configurations, configname);
+			config = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_configurations, configname);
 		}
 	
 		if(config!=null)
 		{
+			Object[] belres;
+			if(OAVBDIMetaModel.beliefreference_type.equals(state.getType(handle)))
+			{
+				String ref = (String)state.getAttributeValue(handle, OAVBDIMetaModel.elementreference_has_concrete);
+				belres = AgentRules.resolveMCapability(ref, OAVBDIMetaModel.belief_type, mcapa, state);
+			}
+			else
+			{
+				belres = new Object[]{getName(), mcapa};
+			}
+			
 			Collection inibels = state.getAttributeValues(config, OAVBDIMetaModel.configuration_has_initialbeliefs);
 			if(inibels!=null)
 			{
 				for(Iterator it=inibels.iterator(); it.hasNext(); )
 				{
 					Object inibel = it.next();
-					if(state.getAttributeValue(inibel, OAVBDIMetaModel.configbelief_has_ref).equals(handle))
+					String ref = (String)state.getAttributeValue(inibel, OAVBDIMetaModel.configbelief_has_ref);
+					Object[] inibelres = AgentRules.resolveMCapability(ref, OAVBDIMetaModel.belief_type, mcapa, state);
+					
+					if(Arrays.equals(inibelres, belres))
 					{	
 						Object exp = state.getAttributeValue(inibel, OAVBDIMetaModel.belief_has_fact);
 						// todo: string rep?
@@ -151,13 +166,13 @@ public class MBeliefArgument	implements IArgument
 				int idx = name.indexOf(".");
 				if(idx==-1)
 				{
-					belref = state.getAttributeValue(scope, OAVBDIMetaModel.capability_has_beliefrefs, name);
+					belref = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_beliefrefs, name);
 					name = (String)state.getAttributeValue(belref, OAVBDIMetaModel.elementreference_has_concrete);
 				}
 				String capaname = name.substring(0, idx);
 				String belname = name.substring(idx+1);
 				
-				Object subcaparef = state.getAttributeValue(scope, OAVBDIMetaModel.capability_has_capabilityrefs, capaname);
+				Object subcaparef = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_capabilityrefs, capaname);
 				Object subcapa  = state.getAttributeValue(subcaparef, OAVBDIMetaModel.capabilityref_has_capability);
 				
 				belref = state.getAttributeValue(subcapa, OAVBDIMetaModel.capability_has_beliefs, belname);
@@ -173,6 +188,7 @@ public class MBeliefArgument	implements IArgument
 						for(Iterator it=inicapas.iterator(); subconfigname==null && it.hasNext(); )
 						{
 							Object inicapa = it.next();
+							
 							if(state.getAttributeValue(inicapa, OAVBDIMetaModel.configelement_has_ref).equals(subcaparef))
 							{	
 								subconfigname = (String)state.getAttributeValue(inicapa, OAVBDIMetaModel.initialcapability_has_configuration);

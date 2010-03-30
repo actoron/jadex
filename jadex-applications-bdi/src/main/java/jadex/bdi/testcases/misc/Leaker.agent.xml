@@ -35,11 +35,11 @@
 		<beliefref name="testresults"  result="true">
 			<concrete ref="testcap.testresults"/>
 		</beliefref>
-		<belief name="test" class="int" exported="true"
+		<belief name="test" class="int" argument="true"
 			description="The test to run (1=goals, 2=conditions, 3=internal events, 4=message events, 0=all tests).">
 			<fact>0</fact>
 		</belief>
-		<beliefref name="testcase_cnt"  exported="true" description="Set to 1 when not running all tests.">
+		<beliefref name="testcase_cnt" argument="true" description="Set to 1 when not running all tests.">
 			<concrete ref="testcap.testcase_cnt"/>
 		</beliefref>
 	</beliefs>

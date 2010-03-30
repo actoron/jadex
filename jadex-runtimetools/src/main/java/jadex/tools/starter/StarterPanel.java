@@ -687,6 +687,21 @@ public class StarterPanel extends JPanel
 	{
 //		System.out.println("updategui "+adf);
 		
+		ItemListener[] lis = config.getItemListeners();
+		for(int i=0; i<lis.length; i++)
+			config.removeItemListener(lis[i]);
+		config.removeAllItems();
+		
+		// Add all known component configuration names to the config chooser.
+		
+		String[] confignames = model!=null? model.getConfigurations(): SUtil.EMPTY_STRING;
+		for(int i = 0; i<confignames.length; i++)
+		{
+			((DefaultComboBoxModel)config.getModel()).addElement(confignames[i]);
+		}
+		if(confignames.length>0)
+			config.getModel().setSelectedItem(confignames[0]);
+		
 		if(model!=null && model.isStartable()) //adf!=null && SComponentFactory.isStartable(starter.getJCC().getServiceContainer(), adf))
 		{
 			createArguments();
@@ -730,21 +745,6 @@ public class StarterPanel extends JPanel
 //		{
 //			componentname.setText("");
 //		}
-		
-		ItemListener[] lis = config.getItemListeners();
-		for(int i=0; i<lis.length; i++)
-			config.removeItemListener(lis[i]);
-		config.removeAllItems();
-		
-		// Add all known component configuration names to the config chooser.
-		
-		String[] confignames = model!=null? model.getConfigurations(): SUtil.EMPTY_STRING;
-		for(int i = 0; i<confignames.length; i++)
-		{
-			((DefaultComboBoxModel)config.getModel()).addElement(confignames[i]);
-		}
-		if(confignames.length>0)
-			config.getModel().setSelectedItem(confignames[0]);
 		
 		final IReport report = model!=null? model.getReport(): null;
 		if(report!=null && !report.isEmpty())
