@@ -35,11 +35,15 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
+import javax.management.ReflectionException;
 
 /**
  *  Standalone implementation of component execution service.
@@ -951,6 +955,36 @@ public class ComponentManagementService_Client implements IComponentManagementSe
 	 */
 	public void startService()
 	{
+		// Enable JMX OpenJDMK Discovery
+		// TODO neuen service Client Plattformen erzeugen, in dem ein Responder für die discoverability der client platform sorgt
+		MBeanServer mbeanServer = MBeanServerFactory.createMBeanServer();
+		ObjectName dr = null;
+		try {
+			dr = new ObjectName("mybeans:name=DiscoveryResponder");
+		} catch (MalformedObjectNameException e) { // should never occur
+			e.printStackTrace();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			mbeanServer.createMBean("com.sun.jdmk.discovery.DiscoveryResponder", dr);
+			mbeanServer.invoke(dr, "start", null, null);
+		} catch (InstanceAlreadyExistsException e) {
+			e.printStackTrace();
+		} catch (NotCompliantMBeanException e) {
+			e.printStackTrace();
+		} catch (MBeanRegistrationException e) {
+			e.printStackTrace();
+		} catch (ReflectionException e) {
+			e.printStackTrace();
+		} catch (InstanceNotFoundException e) { // invoke
+			e.printStackTrace();
+		} catch (MBeanException e) { // invoke
+			e.printStackTrace();
+		}
+		
+		// DiscoveryResponder started
 		
 	}
 
