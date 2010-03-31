@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 	<H3>The hunter prey application descriptor</H3>
 
@@ -5,7 +6,6 @@
 	Hunters try to catch the prey, while prey
 	moves around looking for food.
 -->
-
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
 	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

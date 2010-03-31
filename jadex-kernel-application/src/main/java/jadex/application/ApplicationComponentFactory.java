@@ -1,11 +1,11 @@
 package jadex.application;
 
 import jadex.application.model.ApplicationModel;
-import jadex.application.model.MComponentInstance;
-import jadex.application.model.MComponentType;
 import jadex.application.model.MApplicationInstance;
 import jadex.application.model.MApplicationType;
 import jadex.application.model.MArgument;
+import jadex.application.model.MComponentInstance;
+import jadex.application.model.MComponentType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.model.MSpaceType;
 import jadex.application.runtime.impl.Application;
@@ -20,7 +20,6 @@ import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.SJavaParser;
-import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
@@ -36,7 +35,6 @@ import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
-import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.Reader;
 
@@ -102,18 +100,20 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 			}
 		};
 		
-		types.add(new TypeInfo(new XMLInfo("applicationtype"), new ObjectInfo(MApplicationType.class), 
+		String uri = "http://jadex.sourceforge.net/jadex-application";
+		
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "applicationtype")), new ObjectInfo(MApplicationType.class), 
 			new MappingInfo(null, "description", null,
 			new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE))
 			}, 
 			new SubobjectInfo[]{
-			new SubobjectInfo(new XMLInfo("arguments/argument"), new AccessInfo("argument", "argument")),
-			new SubobjectInfo(new XMLInfo("arguments/result"), new AccessInfo("result", "result"))
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "argument")}), new AccessInfo(new QName(uri, "argument"), "argument")),
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "arguments"), new QName(uri, "result")}), new AccessInfo(new QName(uri, "result"), "result"))
 			})));
-		types.add(new TypeInfo(new XMLInfo("spacetype"), new ObjectInfo(MSpaceType.class)));
-		types.add(new TypeInfo(new XMLInfo("agenttype"), new ObjectInfo(MComponentType.class)));
-		types.add(new TypeInfo(new XMLInfo("application"), new ObjectInfo(MApplicationInstance.class, new IPostProcessor()
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "spacetype")), new ObjectInfo(MSpaceType.class)));
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "agenttype")), new ObjectInfo(MComponentType.class)));
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "application")), new ObjectInfo(MApplicationInstance.class, new IPostProcessor()
 		{
 			JavaCCExpressionParser parser = new JavaCCExpressionParser();
 			
@@ -143,27 +143,27 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 			}
 		}), 
 			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("type", "typeName"))})));
-		types.add(new TypeInfo(new XMLInfo("space"), new ObjectInfo(MSpaceInstance.class)));
-		types.add(new TypeInfo(new XMLInfo("agent"), new ObjectInfo(MComponentInstance.class),
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "space")), new ObjectInfo(MSpaceInstance.class)));
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "agent")), new ObjectInfo(MComponentInstance.class),
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("type", "typeName")),
 			new AttributeInfo(new AccessInfo("number", "numberText"))
 			}, null)));
-		types.add(new TypeInfo(new XMLInfo("agent/arguments/argument"), new ObjectInfo(MArgument.class), 
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "agent"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(MArgument.class), 
 			new MappingInfo(null, null, "value")));
-		types.add(new TypeInfo(new XMLInfo("applicationtype/arguments/argument"), new ObjectInfo(Argument.class), 
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "applicationtype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class), 
 			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)))));
-		types.add(new TypeInfo(new XMLInfo("import"), new ObjectInfo(String.class)));
-		types.add(new TypeInfo(new XMLInfo("application/arguments/argument"), new ObjectInfo(MArgument.class), 
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "import")), new ObjectInfo(String.class)));
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "application"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(MArgument.class), 
 			new MappingInfo(null, null, "value")));
 		
-		types.add(new TypeInfo(new XMLInfo("componenttype"), new ObjectInfo(MComponentType.class)));
-		types.add(new TypeInfo(new XMLInfo("component"), new ObjectInfo(MComponentInstance.class),
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "componenttype")), new ObjectInfo(MComponentType.class)));
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "component")), new ObjectInfo(MComponentInstance.class),
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("type", "typeName")),
 			new AttributeInfo(new AccessInfo("number", "numberText"))
 			}, null)));
-		types.add(new TypeInfo(new XMLInfo("component/arguments/argument"), new ObjectInfo(MArgument.class), 
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "component"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(MArgument.class), 
 			new MappingInfo(null, null, "value")));
 				
 		for(int i=0; mappings!=null && i<mappings.length; i++)

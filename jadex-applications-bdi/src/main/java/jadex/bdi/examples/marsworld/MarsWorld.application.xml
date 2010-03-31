@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 	<H3>The mars world application descriptor</H3>
 
@@ -237,9 +238,9 @@
 	 			</env:envspace>
 			</spaces>
 			<components>
-				<agent type="Sentry" number="1"/>
-  				<agent type="Producer" number="2"/>
-				<agent type="Carry" number="3"/>
+				<component type="Sentry" number="1"/>
+  				<component type="Producer" number="2"/>
+				<component type="Carry" number="3"/>
 			</components>
  		</application>
 
@@ -271,9 +272,9 @@
 	 			</env:envspace>
 			</spaces>
 			<components>
-				<agent type="Sentry" number="2"/>
-  				<agent type="Producer" number="5"/>
-				<agent type="Carry" number="10"/>
+				<component type="Sentry" number="2"/>
+  				<component type="Producer" number="5"/>
+				<component type="Carry" number="10"/>
 			</components>
  		</application>
 	</applications>

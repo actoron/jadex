@@ -1,9 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 	<H3>Test the plan's passed() method.</H3>
 	Tests if waitFor() and subgoals in the passed() method
 	work as expected.
 -->
-
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi

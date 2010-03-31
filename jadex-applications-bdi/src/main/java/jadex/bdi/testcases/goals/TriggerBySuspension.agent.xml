@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 	<H3>Test if goal suspension can trigger a plan.</H3>
 
@@ -8,7 +9,6 @@
 	goal succeeds when it has count till 10.
 	It will be suspended when it is 5.
 -->
-
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi

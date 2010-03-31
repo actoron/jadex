@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-agrspace"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	xmlns="http://jadex.sourceforge.net/jadex-agrspace"
-	elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
-
-<!-- 	
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by hans (kill) -->
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex-agrspace" xmlns="http://jadex.sourceforge.net/jadex-agrspace" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+	<!-- 	
 	<xs:import namespace="http://jadex.sourceforge.net/jadex-application" schemaLocation="http://jadex.sourceforge.net/jadex-application-2.0.xsd"/>
 	
 	<xs:complexType name="spacetype">
@@ -17,39 +14,41 @@
 		</xs:complexContent>
 	</xs:complexType>
  -->
- 
 	<xs:complexType name="agrspacetype">
-        <xs:annotation>
-        	<xs:documentation>Define an AGR space type.</xs:documentation></xs:annotation>
-        <xs:sequence>
+		<xs:annotation>
+			<xs:documentation>Define an AGR space type.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
 			<xs:element name="grouptype" type="grouptype">
 				<xs:annotation>
 					<xs:documentation>A group type defines the structure of a group.</xs:documentation>
-				</xs:annotation></xs:element>
+				</xs:annotation>
+			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required">
 			<xs:annotation>
 				<xs:documentation>The name of the AGR space type.</xs:documentation>
-			</xs:annotation></xs:attribute>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
-
 	<xs:complexType name="grouptype">
-        <xs:annotation>
-        	<xs:documentation>A group type defines the structure of a group.</xs:documentation></xs:annotation>
-        <xs:sequence>
-			<xs:element name="roles" minOccurs="0" maxOccurs="1">
-                <xs:annotation>
-                	<xs:documentation>A group type may contain arbitrary roles.</xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:annotation>
-                    	<xs:documentation>A role is the specification (i.e. type) of a position in a group and playing a role usually implies certain rights and obligations for an agent.</xs:documentation>
-                    </xs:annotation>
-                    <xs:sequence>
-						<xs:element name="role"
-							type="role" minOccurs="1" maxOccurs="unbounded">
-                            <xs:annotation>
-                            	<xs:documentation>A role is the specification (i.e. type) of a position in a group and playing a role usually implies certain rights and obligations for an agent.</xs:documentation></xs:annotation>
+		<xs:annotation>
+			<xs:documentation>A group type defines the structure of a group.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="roles" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>A group type may contain arbitrary roles.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:annotation>
+						<xs:documentation>A role is the specification (i.e. type) of a position in a group and playing a role usually implies certain rights and obligations for an agent.</xs:documentation>
+					</xs:annotation>
+					<xs:sequence>
+						<xs:element name="role" type="role" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>A role is the specification (i.e. type) of a position in a group and playing a role usually implies certain rights and obligations for an agent.</xs:documentation>
+							</xs:annotation>
 						</xs:element>
 					</xs:sequence>
 				</xs:complexType>
@@ -58,89 +57,96 @@
 		<xs:attribute name="name" type="xs:string" use="required">
 			<xs:annotation>
 				<xs:documentation>The name of the group type.</xs:documentation>
-			</xs:annotation></xs:attribute>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
-
 	<xs:complexType name="role">
-        <xs:annotation>
-        	<xs:documentation>A role is the specification (i.e. type) of a position in a group and playing a role usually implies certain rights and obligations for an agent.</xs:documentation></xs:annotation>
-        <xs:attribute name="name" type="xs:string" use="required">
-        	<xs:annotation>
-        		<xs:documentation>The name of the role.</xs:documentation>
-        	</xs:annotation></xs:attribute>
+		<xs:annotation>
+			<xs:documentation>A role is the specification (i.e. type) of a position in a group and playing a role usually implies certain rights and obligations for an agent.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="name" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>The name of the role.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="min" type="xs:int" use="optional" default="0">
 			<xs:annotation>
 				<xs:documentation>The minimum number of agents that must play this role for the group to be operational (default: 0). </xs:documentation>
-			</xs:annotation></xs:attribute>
-		<xs:attribute name="max" type="xs:int" default="-1" use="optional">
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="max" type="xs:int" use="optional" default="-1">
 			<xs:annotation>
 				<xs:documentation>The maximum number of agents that are allowed to play this role simultaneously. -1 indicates no restriction (default).</xs:documentation>
-			</xs:annotation></xs:attribute>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
-
-
-    <xs:element name="agrspace" type="agrspace">
-    	<xs:annotation>
-    		<xs:documentation>Instance of an AGR space. Use in &lt;spaces> section of application descriptor.</xs:documentation>
-    	</xs:annotation></xs:element>
-
-    <xs:complexType name="agrspace">
-        <xs:annotation>
-        	<xs:documentation>Instance of an AGR space.</xs:documentation>
-        </xs:annotation>
-        <xs:sequence>
-    		<xs:element name="group" type="group" minOccurs="0" maxOccurs="unbounded">
-    			<xs:annotation>
-    				<xs:documentation>A group instance of the AGR space.</xs:documentation>
-    			</xs:annotation></xs:element>
-    	</xs:sequence>
-    	<xs:attribute name="name" type="xs:string" use="required">
-    		<xs:annotation>
-    			<xs:documentation>The name of the space instance. The name can be used by the agents of the application to get access to a specific space.</xs:documentation>
-    		</xs:annotation></xs:attribute>
-    	<xs:attribute name="type" type="xs:string" use="required">
-    		<xs:annotation>
-    			<xs:documentation>The type of the space. Should match with the name of an AGR space type declared in the &lt;sapcetypes> section.</xs:documentation>
-    		</xs:annotation></xs:attribute>
-    </xs:complexType>
-
-    <xs:element name="agrspacetype" type="agrspacetype">
-    	<xs:annotation>
-    		<xs:documentation>Define an AGR space type. Use in &lt;spacetypes> section of application descriptor.</xs:documentation>
-    	</xs:annotation></xs:element>
-
-    <xs:complexType name="group">
-        <xs:annotation>
-        	<xs:documentation>A group instance of the AGR space.</xs:documentation></xs:annotation>
-        <xs:sequence>
-    		<xs:element name="position" minOccurs="0" maxOccurs="unbounded">
-                <xs:annotation>
-                	<xs:documentation>A position in the group specifies how to assign agents to roles. Currently, only automatic assignment based on the agent type is supported. This might be extended in the future.</xs:documentation>
-                </xs:annotation>
-                <xs:complexType>
-                    <xs:annotation>
-                    	<xs:documentation>A position in the group specifies how to assign agents to roles. Currently, only automatic assignment based on the agent type is supported. This might be extended in the future.</xs:documentation></xs:annotation>
-                    <xs:attribute name="role" type="xs:string"
-    					use="required">
-                        <xs:annotation>
-                        	<xs:documentation>The role to be assigned.</xs:documentation>
-                        </xs:annotation>
-                    </xs:attribute>
-    				<xs:attribute name="agenttype"
-    					type="xs:string" use="required">
-                        <xs:annotation>
-                        	<xs:documentation>The type of agent, that should play the role.</xs:documentation>
-                        </xs:annotation>
-    				</xs:attribute>
-    			</xs:complexType></xs:element>
-    	</xs:sequence>
-    	<xs:attribute name="name" type="xs:string" use="required">
-    		<xs:annotation>
-    			<xs:documentation>The name of the group instance. Can be used by agents to find a specific group.</xs:documentation>
-    		</xs:annotation></xs:attribute>
-    	<xs:attribute name="type" type="xs:string" use="required">
-    		<xs:annotation>
-    			<xs:documentation>The type of the group. Has to match a group type name of the corresponding AGR spaxce type as defined in the &lt;spacetypes> section.</xs:documentation>
-    		</xs:annotation></xs:attribute>
-    </xs:complexType>
+	<xs:element name="agrspace" type="agrspace">
+		<xs:annotation>
+			<xs:documentation>Instance of an AGR space. Use in &lt;spaces> section of application descriptor.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="agrspace">
+		<xs:annotation>
+			<xs:documentation>Instance of an AGR space.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="group" type="group" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>A group instance of the AGR space.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>The name of the space instance. The name can be used by the agents of the application to get access to a specific space.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="type" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>The type of the space. Should match with the name of an AGR space type declared in the &lt;sapcetypes> section.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:element name="agrspacetype" type="agrspacetype">
+		<xs:annotation>
+			<xs:documentation>Define an AGR space type. Use in &lt;spacetypes> section of application descriptor.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="group">
+		<xs:annotation>
+			<xs:documentation>A group instance of the AGR space.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="position" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>A position in the group specifies how to assign agents to roles. Currently, only automatic assignment based on the agent type is supported. This might be extended in the future.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:annotation>
+						<xs:documentation>A position in the group specifies how to assign agents to roles. Currently, only automatic assignment based on the agent type is supported. This might be extended in the future.</xs:documentation>
+					</xs:annotation>
+					<xs:attribute name="role" type="xs:string" use="required">
+						<xs:annotation>
+							<xs:documentation>The role to be assigned.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="componenttype" type="xs:string" use="required">
+						<xs:annotation>
+							<xs:documentation>The type of agent, that should play the role.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>The name of the group instance. Can be used by agents to find a specific group.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="type" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>The type of the group. Has to match a group type name of the corresponding AGR spaxce type as defined in the &lt;spacetypes> section.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
 </xs:schema>

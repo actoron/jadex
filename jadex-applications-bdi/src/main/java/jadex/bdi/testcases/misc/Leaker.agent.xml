@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 	<H3>Test, if cleaning up works properly.</H3>
 
@@ -6,7 +7,6 @@
 	The test(s) to run can be selected: 1=goals, 2=conditions, 3=internal events, 4=message events, 0=all tests.
 	todo: how to determine success of testcases? memory consumption is not meaningful
 -->
-
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi

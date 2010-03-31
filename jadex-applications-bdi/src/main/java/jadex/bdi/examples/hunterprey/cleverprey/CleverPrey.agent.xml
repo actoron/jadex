@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 	<H3>The clever prey.</H3>
 
@@ -8,7 +9,6 @@
 	- Eating food if discovered (achieve eat_food).<br>
 	- Searching for food (perform wander around).
 -->
-
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi

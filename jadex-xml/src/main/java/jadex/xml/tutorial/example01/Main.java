@@ -12,9 +12,7 @@ import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.reader.Reader;
 import jadex.xml.writer.Writer;
 
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 

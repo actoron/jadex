@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 	<H3>The hunter prey application descriptor</H3>
 
@@ -16,7 +17,6 @@
 	see them. Every creature can see all objects and creatues in a
 	certain range around them.
 -->
-
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 

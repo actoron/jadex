@@ -37,7 +37,15 @@ public class XMLInfo
 	{
 		this(xmlpath, null);
 	}
-
+	
+	/**
+	 *  Create a new xml info.
+	 */
+	public XMLInfo(QName xmltag)
+	{
+		this(new QName[]{xmltag}, null);
+	}
+	
 	/**
 	 *  Create a new xml info.
 	 */
@@ -52,6 +60,14 @@ public class XMLInfo
 	public XMLInfo(String xmlpath, IFilter filter)
 	{
 		this(xmlpath, filter, false);
+	}
+	
+	/**
+	 *  Create a new xml info.
+	 */
+	public XMLInfo(QName xmltag, IFilter filter)
+	{
+		this(new QName[]{xmltag}, filter, false);
 	}
 	
 	/**
@@ -72,6 +88,14 @@ public class XMLInfo
 		this.createfromtag = createfromtag;
 	}
 
+	/**
+	 *  Create a new xml info.
+	 */
+	public XMLInfo(QName xmltag, IFilter filter, boolean createfromtag)
+	{
+		this(new QName[]{xmltag}, filter, createfromtag);
+	}
+	
 	/**
 	 *  Create a new xml info.
 	 */

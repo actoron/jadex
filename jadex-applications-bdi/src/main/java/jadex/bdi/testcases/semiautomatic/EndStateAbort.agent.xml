@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 	<H3>Test Endless Plan Cleaup</H3>
 	The agent has a plan, which performs a long
@@ -5,7 +6,6 @@
 	When the agent gets killed, the plan will not finish and has to be
 	terminated forcefully.
 -->
-
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi

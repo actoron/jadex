@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   <H3>Garbage collector agent.</H3>
 
@@ -6,7 +7,6 @@
   it tries to pick it up and brings it to one of the available
   garbage burners (chosen randomly).
 -->
-
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi

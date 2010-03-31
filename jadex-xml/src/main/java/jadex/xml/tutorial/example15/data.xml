@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+
 <invoice xmlns="http://jadex.informatik.uni-hamburg.de/ns1">
 	<name>Jadex agent software suite.</name>
 	<description>Special update offer.</description>

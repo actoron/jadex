@@ -186,8 +186,12 @@ public class Reader
 			}
 			
 			Object object = null;
-			QName localname = parser.getPrefix()==null || parser.getPrefix()==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
-				: new QName(parser.getNamespaceURI(), parser.getLocalName(), parser.getPrefix());
+			
+//			System.out.println("here: "+parser.getPrefix()+" "+parser.getNamespaceURI()+" "+parser.getLocalName()+" "+parser.getName());
+			QName localname = parser.getName();
+			
+//			QName localname = parser.getPrefix()==null || parser.getPrefix()==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
+//				: new QName(parser.getNamespaceURI(), parser.getLocalName(), parser.getPrefix());
 			
 			QName[] fullpath = getXMLPath(stack, localname);
 			
@@ -361,8 +365,10 @@ public class Reader
 			StackElement topse = readcontext.getTopStackElement();
 			
 	//		System.out.println("end: "+parser.getLocalName());
-			QName localname = parser.getPrefix()==null || parser.getPrefix()==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
-				: new QName(parser.getNamespaceURI(), parser.getLocalName(), parser.getPrefix());
+//			QName localname = parser.getPrefix()==null || parser.getPrefix()==XMLConstants.DEFAULT_NS_PREFIX? new QName(parser.getLocalName())
+//				: new QName(parser.getNamespaceURI(), parser.getLocalName(), parser.getPrefix());
+			
+			QName localname = parser.getName();
 			QName[] fullpath = getXMLPath(stack);
 			final TypeInfo typeinfo = handler.getTypeInfo(localname, fullpath, topse.getRawAttributes());
 	

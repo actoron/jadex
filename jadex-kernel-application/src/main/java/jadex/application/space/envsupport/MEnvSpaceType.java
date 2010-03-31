@@ -327,7 +327,9 @@ public class MEnvSpaceType	extends MSpaceType
 					if(lprops!=null)
 					{
 						SimpleValueFetcher	fetcher	= new SimpleValueFetcher();
-						fetcher.setValues(args);
+						fetcher.setValue("$space", space);
+						fetcher.setValue("$object", args.get("object"));
+						fetcher.setValue("$view", args.get(ret));
 						props = MEnvSpaceInstance.convertProperties(lprops, fetcher);
 					}
 					

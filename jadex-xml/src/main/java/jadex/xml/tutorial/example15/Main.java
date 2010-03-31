@@ -45,7 +45,7 @@ public class Main
 		String uri2 = "http://jadex.informatik.uni-hamburg.de/ns2";
 		
 		Set typeinfos = new HashSet();
-		typeinfos.add(new TypeInfo(new XMLInfo("invoice"), new ObjectInfo(Invoice.class)));
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri1, "invoice")}), new ObjectInfo(Invoice.class)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri2, "product")}), new ObjectInfo(Product.class))); 
 		
 		// Create an xml reader with standard bean object reader and the

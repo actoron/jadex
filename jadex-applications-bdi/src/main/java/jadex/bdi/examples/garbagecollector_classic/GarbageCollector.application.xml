@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 	<H3>The garbage collector application descriptor</H3>
 
@@ -5,7 +6,6 @@
 	This example is inspired by the "robot" example
 	of the Jason BDI agent engine.
 -->
-
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 

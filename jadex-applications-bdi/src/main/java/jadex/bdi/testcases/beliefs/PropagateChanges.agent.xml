@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 	<H3>This agent tests change propagation of beliefs (and goal parameters)</H3>
 
@@ -8,7 +9,6 @@
 	is deleted the dependent belief "react_on_values"
 	should have the value "magic".
 -->
-
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi

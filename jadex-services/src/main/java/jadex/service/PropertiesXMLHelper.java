@@ -9,7 +9,6 @@ import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.XMLInfo;
-import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.reader.Reader;
@@ -42,18 +41,19 @@ public class PropertiesXMLHelper
 	{
 		typeinfos = new HashSet();
 		
-//		typeinfos.add(new TypeInfo(null, new QName[]{new QName("http://jadex.sourceforge.net/jadexconf", "properties")}, Properties.class, null, null, 
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName("properties")}), new ObjectInfo(Properties.class), 
+		String uri = "http://jadex.sourceforge.net/jadexconf";
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "properties")), new ObjectInfo(Properties.class), 
 			new MappingInfo(null, 
 			new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE))},
 			new SubobjectInfo[]{
-				new SubobjectInfo(new XMLInfo("property"), new AccessInfo("property", "properties"), null, true), 
-				new SubobjectInfo(new XMLInfo("properties"), new AccessInfo("properties", "subproperties"), null, true)
+				new SubobjectInfo(new XMLInfo(new QName(uri, "property")), new AccessInfo(new QName(uri, "property"), "properties"), null, true), 
+				new SubobjectInfo(new XMLInfo(new QName(uri, "properties")), new AccessInfo(new QName(uri, "properties"), "subproperties"), null, true)
 			})));
 		
 //		typeinfos.add(new TypeInfo(null, new QName[]{new QName("http://jadex.sourceforge.net/jadexconf", "property")}, Property.class, null, new BeanAttributeInfo(null, "value")));
-		typeinfos.add(new TypeInfo(new XMLInfo(new QName[]{new QName("property")}), 
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), 
 			new ObjectInfo(Property.class), new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, "value")))));
 	}
 	

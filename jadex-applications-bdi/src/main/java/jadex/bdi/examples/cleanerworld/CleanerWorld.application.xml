@@ -1,9 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 	<H3>The cleaner world application descriptor</H3>
 
 	It can be started to launch a cleaner world scenario.
 -->
-
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
 	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

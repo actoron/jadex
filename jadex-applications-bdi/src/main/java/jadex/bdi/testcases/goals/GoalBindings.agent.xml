@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 	<H3>Test the creation of goals with binding parameters.</H3>
 
@@ -5,7 +6,6 @@
 	Due to several binding options, three instances of the goal
 	are created and dispatched.
 -->
-
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
@@ -39,9 +39,6 @@
 			</parameter>
 			<creationcondition language="jcl">
  				$beliefbase.create
-
-				// ?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
-				// ?mbel	= (mbelief (melement_has_name "create"))
  			</creationcondition>
 		</performgoal>
 	</goals>
