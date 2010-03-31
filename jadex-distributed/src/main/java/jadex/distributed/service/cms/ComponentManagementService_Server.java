@@ -34,6 +34,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.management.MBeanServerFactory;
+
 /**
  *  Standalone implementation of component execution service.
  */
@@ -934,19 +936,9 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 			listener.resultAvailable(this, null);
 	}
 
-	/*** Three methods to implement the IDiscoveryServiceListener interface ***/
 	@Override
-	public void addMachine(InetSocketAddress machine) {
-		machines.add(machine);
+	public void notifyIDiscoveryListener() {
+		// hell, wozu braucht der CMS_Server die Liste der aktuellen Clients?
 	}
 
-	@Override
-	public void addMachines(Set<InetSocketAddress> machines) {
-		this.machines = machines;
-	}
-
-	@Override
-	public void removeMachine(InetSocketAddress machine) {
-		machines.remove(machine);
-	}
 }

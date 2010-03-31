@@ -45,6 +45,8 @@ import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
+import com.sun.jdmk.discovery.DiscoveryResponder;
+
 /**
  *  Standalone implementation of component execution service.
  */
@@ -968,7 +970,10 @@ public class ComponentManagementService_Client implements IComponentManagementSe
 		}
 		
 		try {
-			mbeanServer.createMBean("com.sun.jdmk.discovery.DiscoveryResponder", dr);
+			//mbeanServer.createMBean("com.sun.jdmk.discovery.DiscoveryResponder", dr);
+			DiscoveryResponder responder = new DiscoveryResponder();
+			responder.setTimeToLive(16);
+			mbeanServer.registerMBean(responder, dr);
 			mbeanServer.invoke(dr, "start", null, null);
 		} catch (InstanceAlreadyExistsException e) {
 			e.printStackTrace();

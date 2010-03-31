@@ -11,10 +11,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+
+import com.sun.jdmk.discovery.DiscoveryClient;
+import com.sun.jdmk.discovery.DiscoveryResponse;
 
 public class MonitorService implements IMonitorService, IDiscoveryServiceListener, IService {
 
@@ -111,7 +115,30 @@ public class MonitorService implements IMonitorService, IDiscoveryServiceListene
 	/** Methoden um dem IService interface zu genügen **/
 	@Override
 	public void startService() {
-		// 
+		// nac JMX Agenten ausschau halten
+		// com.sun.jdmk.discovery.DiscoveryClient
+		DiscoveryClient discoveryClient = new DiscoveryClient();
+		try {
+			discoveryClient.setTimeToLive(16);
+		} catch (IllegalArgumentException e1) { // should never occur, becaus 0 < 16 < 255
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		try {
+			discoveryClient.start();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println("HI");
+		Vector<DiscoveryResponse> v = discoveryClient.findMBeanServers();
+		for (DiscoveryResponse response : v) {
+			System.out.println( response.getHost() );
+		}
+		System.out.println("HO");
+		
+		
 	}
 	
 	@Override
