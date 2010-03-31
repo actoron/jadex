@@ -25,8 +25,8 @@
 				<structuring name="env" type="env_type"/>
 			</structurings> -->
 			<components>
-				<agent type="EnvironmentLocal" master="true"/>
-				<agent type="CleanerLocal" number="2"/>
+				<component type="EnvironmentLocal" master="true"/>
+				<component type="CleanerLocal" number="2"/>
 			</components>
 		</application>
 		<application name="One cleaner local">
@@ -34,8 +34,8 @@
 				<structuring name="env" type="env_type"/>
 			</structurings>-->
 			<components>
-				<agent type="EnvironmentLocal" master="true"/>
-				<agent type="CleanerLocal"/>
+				<component type="EnvironmentLocal" master="true"/>
+				<component type="CleanerLocal"/>
 			</components>
 		</application>
 		<application name="Two cleaners remote">
@@ -43,8 +43,8 @@
 				<structuring name="env" type="env_type"/>
 			</structurings>-->
 			<components>
-				<agent type="EnvironmentRemote" master="true"/>
-				<agent type="CleanerRemote" number="2"/>
+				<component type="EnvironmentRemote" master="true"/>
+				<component type="CleanerRemote" number="2"/>
 			</components>
 		</application>
 		<application name="One cleaner remote">
@@ -52,8 +52,8 @@
 				<structuring name="env" type="env_type"/>
 			</structurings>-->
 			<components>
-				<agent type="EnvironmentRemote" master="true"/>
-				<agent type="CleanerRemote"/>
+				<component type="EnvironmentRemote" master="true"/>
+				<component type="CleanerRemote"/>
 			</components>
 		</application>
 	</applications>

@@ -243,7 +243,7 @@
 				</env:envspace>
 			</spaces>
 			<components>
-				<agent type="Cleaner"/>
+				<component type="Cleaner"/>
 			</components>
 		</application>
 		
@@ -294,7 +294,7 @@
 			</spaces>
 
 			<components>
-				<agent type="Cleaner" number="2"/>
+				<component type="Cleaner" number="2"/>
 			</components>
 		</application>
 	</applications>

@@ -25,7 +25,7 @@
 	<applications>
 		<application name="One buyer and one seller">
 			<components>
-				<agent type="Buyer" >
+				<component type="Buyer" >
 					<arguments>
 						<argument name="initial_orders">
 							new Order[]
@@ -37,8 +37,8 @@
 							}
 						</argument>
 					</arguments>
-				</agent>
-				<agent type="Seller">
+				</component>
+				<component type="Seller">
 					<arguments>
 						<argument name="initial_orders">
 							new Order[]
@@ -50,12 +50,12 @@
 							}
 						</argument>
 					</arguments>
-				</agent>
+				</component>
 			</components>
 		</application>
 		<application name="One buyer and one seller (one order)">
 			<components>
-				<agent type="Buyer" >
+				<component type="Buyer" >
 					<arguments>
 						<argument name="initial_orders">
 							new Order[]
@@ -64,8 +64,8 @@
 							}
 						</argument>
 					</arguments>
-				</agent>
-				<agent type="Seller">
+				</component>
+				<component type="Seller">
 					<arguments>
 						<argument name="initial_orders">
 							new Order[]
@@ -74,12 +74,12 @@
 							}
 						</argument>
 					</arguments>
-				</agent>
+				</component>
 			</components>
 		</application>
 		<application name="Two buyers and one seller">
 			<components>
-				<agent type="Buyer" number="3">
+				<component type="Buyer" number="3">
 					<arguments>
 						<argument name="initial_orders">
 							new Order[]
@@ -91,8 +91,8 @@
 							}
 						</argument>
 					</arguments>
-				</agent>
-				<agent type="Seller">
+				</component>
+				<component type="Seller">
 					<arguments>
 						<argument name="initial_orders">
 							new Order[]
@@ -104,7 +104,7 @@
 							}
 						</argument>
 					</arguments>
-				</agent>
+				</component>
 			</components>
 		</application>
 	</applications>

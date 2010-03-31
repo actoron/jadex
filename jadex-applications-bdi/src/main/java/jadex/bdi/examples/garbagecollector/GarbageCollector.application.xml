@@ -233,8 +233,8 @@
 			</spaces>
 
 			<components>
-				<agent type="Collector"/>
-				<agent type="Burner"/>
+				<component type="Collector"/>
+				<component type="Burner"/>
 			</components>			
 		</application>
 		
@@ -255,11 +255,11 @@
 			
 			<components>
 				<!-- Using names for agents is problemat -->
-				<!-- <agent name="Collector2" type="Collector"/>
-				<agent name="Collector1" type="Collector"/>
-				<agent name="Burner1" type="Burner"/> -->
-				<agent type="Collector" number="2"/>
-				<agent type="Burner" number="1"/>
+				<!-- <component name="Collector2" type="Collector"/>
+				<component name="Collector1" type="Collector"/>
+				<component name="Burner1" type="Burner"/> -->
+				<component type="Collector" number="2"/>
+				<component type="Burner" number="1"/>
 			</components>
 		</application>
 		
@@ -279,8 +279,8 @@
 			</spaces>
 
 			<components>
-				<agent type="Collector" number="3"/>
-				<agent type="Burner" number="2"/>
+				<component type="Collector" number="3"/>
+				<component type="Burner" number="2"/>
 			</components>
 		</application>
 		
@@ -300,8 +300,8 @@
 			</spaces>
 
 			<components>
-				<agent type="Collector" number="30"/>
-				<agent type="Burner" number="5"/>
+				<component type="Collector" number="30"/>
+				<component type="Burner" number="5"/>
 			</components>
 		</application>
 		

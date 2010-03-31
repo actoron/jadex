@@ -46,17 +46,17 @@
 			<spaces>
 				<agr:agrspace name="myagrspace" type="marsagrspace">
 					<agr:group name="mymarsteam" type="marsteam">
-						<agr:position role="sentry" componenttype="Sentry" />
-						<agr:position role="producer" componenttype="Producer" />
-						<agr:position role="carrier" componenttype="Carrier" />
+						<agr:position role="sentry" agenttype="Sentry" />
+						<agr:position role="producer" agenttype="Producer" />
+						<agr:position role="carrier" agenttype="Carrier" />
 					</agr:group>
 				</agr:agrspace>
 			</spaces>
 			<components>
-				<agent type="Environment" master="true"/>
-				<agent type="Sentry"/>
-				<agent type="Producer" number="2"/>
-				<agent type="Carrier" number="3"/>
+				<component type="Environment" master="true"/>
+				<component type="Sentry"/>
+				<component type="Producer" number="2"/>
+				<component type="Carrier" number="3"/>
 			</components>
 		</application>
 	</applications>	

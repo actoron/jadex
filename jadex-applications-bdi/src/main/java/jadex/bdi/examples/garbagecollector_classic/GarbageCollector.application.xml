@@ -21,23 +21,23 @@
 	<applications>
 		<application name="Two Burners / Two Collectors">
 			<components>
-				<agent type="Environment" master="true"/>
-				<agent type="Collector" number="2"/>
-				<agent type="Burner" number="2" />
+				<component type="Environment" master="true"/>
+				<component type="Collector" number="2"/>
+				<component type="Burner" number="2" />
 			</components>
 		</application>
 		<application name="One Burner / One Collector">
 			<components>
-				<agent type="Environment" master="true"/>
-				<agent type="Collector"/>
-				<agent type="Burner"/>
+				<component type="Environment" master="true"/>
+				<component type="Collector"/>
+				<component type="Burner"/>
 			</components>
 		</application>
 		<application name="Two Burners / Six Collectors">
 			<components>
-				<agent type="Environment" master="true"/>
-				<agent type="Collector" number="6"/>
-				<agent type="Burner" number="2" />
+				<component type="Environment" master="true"/>
+				<component type="Collector" number="6"/>
+				<component type="Burner" number="2" />
 			</components>
 		</application>
 	</applications>

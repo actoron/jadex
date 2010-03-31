@@ -38,17 +38,17 @@
 	<applications>
 		<application name="Some hunters and preys">
 			<components>
-				<agent type="Environment" />
-				<agent type="DumbPrey" number="2"/>
-				<agent type="CleverPrey" number="2" />
-				<agent type="DumbHunter" number="2" />
-				<agent type="CleverHunter" number="1" />
+				<component type="Environment" />
+				<component type="DumbPrey" number="2"/>
+				<component type="CleverPrey" number="2" />
+				<component type="DumbHunter" number="2" />
+				<component type="CleverHunter" number="1" />
 			</components>
 		</application>
 		<application name="Willy">
 			<components>
-				<agent type="Environment" />
-				<agent type="CleverHunter" number="1" />
+				<component type="Environment" />
+				<component type="CleverHunter" number="1" />
 			</components>
 		</application>
 	</applications>

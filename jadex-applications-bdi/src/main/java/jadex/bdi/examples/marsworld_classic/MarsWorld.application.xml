@@ -29,16 +29,16 @@
 	<applications>
 		<application name="1 Sentry / 2 Producers / 3 Carriers">
 			<components>
-				<agent type="Environment" master="true"/>
-				<agent type="Sentry"/>
-				<agent type="Producer" number="2" />
-				<agent type="Carrier" number="3" />
+				<component type="Environment" master="true"/>
+				<component type="Sentry"/>
+				<component type="Producer" number="2" />
+				<component type="Carrier" number="3" />
 			</components>
 		</application>
 		<application name="Sentry only">
 			<components>
-				<agent type="Environment" master="true"/>
-				<agent type="Sentry" number="1" />
+				<component type="Environment" master="true"/>
+				<component type="Sentry" number="1" />
 			</components>
 		</application>
 	</applications>

@@ -335,17 +335,17 @@
 	 			</env:envspace>
 			</spaces>
  			<components>
-				<agent type="DumbPrey" name="Dumbo"/>
-				<!-- <agent type="DumbPrey" name="Duffy"/> -->
-				<agent type="CleverPrey" name="Heinz" configuration="Lazy"/>
-				<!-- <agent type="CleverPrey" name="Harald" configuration="Lazy"/> -->
-				<agent type="CleverPrey" name="Otto" configuration="Opportunistic"/>
-				<agent type="CleverPrey" name="Clever" configuration="Clever"/>
-				<!-- <agent type="CleverPrey" name="Charlton" configuration="Clever"/> -->
-				<agent type="DumbHunter" name="Lenny"/>
-				<agent type="DumbHunter" name="Louis"/>
-				<agent type="LAHunter" name="Willy"/>
-				<!-- <agent type="LAHunter" name="Wolfram"/> -->
+				<component type="DumbPrey" name="Dumbo"/>
+				<!-- <component type="DumbPrey" name="Duffy"/> -->
+				<component type="CleverPrey" name="Heinz" configuration="Lazy"/>
+				<!-- <component type="CleverPrey" name="Harald" configuration="Lazy"/> -->
+				<component type="CleverPrey" name="Otto" configuration="Opportunistic"/>
+				<component type="CleverPrey" name="Clever" configuration="Clever"/>
+				<!-- <component type="CleverPrey" name="Charlton" configuration="Clever"/> -->
+				<component type="DumbHunter" name="Lenny"/>
+				<component type="DumbHunter" name="Louis"/>
+				<component type="LAHunter" name="Willy"/>
+				<!-- <component type="LAHunter" name="Wolfram"/> -->
 			</components>
  		</application>
 
@@ -368,9 +368,9 @@
 	 			</env:envspace>
 			</spaces>
 			<components>
-				<agent type="DumbPrey" number="50"/>
-				<agent type="CleverPrey" number="40" configuration="Clever"/>
-				<agent type="CleverPrey" number="10" configuration="Opportunistic"/>
+				<component type="DumbPrey" number="50"/>
+				<component type="CleverPrey" number="40" configuration="Clever"/>
+				<component type="CleverPrey" number="10" configuration="Opportunistic"/>
 			</components>
  		</application>
  		
@@ -393,11 +393,11 @@
 	 			</env:envspace>
 			</spaces>
 			<components>
-				<agent type="DumbPrey" number="80"/>
-				<agent type="CleverPrey" number="10" configuration="Clever"/>
-				<agent type="CleverPrey" number="5" configuration="Opportunistic"/>
-				<agent type="CleverPrey" number="5" configuration="Lazy"/>
-				<agent name="Lupo" type="DumbHunter"/>
+				<component type="DumbPrey" number="80"/>
+				<component type="CleverPrey" number="10" configuration="Clever"/>
+				<component type="CleverPrey" number="5" configuration="Opportunistic"/>
+				<component type="CleverPrey" number="5" configuration="Lazy"/>
+				<component name="Lupo" type="DumbHunter"/>
 			</components>
  		</application>
 
@@ -420,12 +420,12 @@
 	 			</env:envspace>
 			</spaces>
 			<components>
-				<agent type="DumbPrey" number="100"/>
-				<agent type="CleverPrey" number="50" configuration="Clever"/>
-				<agent type="CleverPrey" number="25" configuration="Opportunistic"/>
-				<agent type="CleverPrey" number="25" configuration="Lazy"/>
-				<agent type="DumbHunter" number="25"/>
-				<agent type="LAHunter" number="5"/>
+				<component type="DumbPrey" number="100"/>
+				<component type="CleverPrey" number="50" configuration="Clever"/>
+				<component type="CleverPrey" number="25" configuration="Opportunistic"/>
+				<component type="CleverPrey" number="25" configuration="Lazy"/>
+				<component type="DumbHunter" number="25"/>
+				<component type="LAHunter" number="5"/>
 			</components>
  		</application>
 
@@ -451,8 +451,8 @@
 		<!-- 
 		<application name="debug">
 			<components>
-				<agent type="CleverPrey" name="testprey" />
-				<agent type="CleverPrey" name="foodprey" />
+				<component type="CleverPrey" name="testprey" />
+				<component type="CleverPrey" name="foodprey" />
 			</components>
 
 			<env:envspace name="my2dspace" type="2dspace">
