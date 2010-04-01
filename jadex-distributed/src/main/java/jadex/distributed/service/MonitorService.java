@@ -36,6 +36,8 @@ public class MonitorService implements IMonitorService, IDiscoveryServiceListene
 	  - 
 	 */
 	
+	private DiscoveryClient discoveryClient;
+	
 	private Set<IMonitorServiceListener> listeners; /** get informed when new management information is available **/
 	//private Map<InetSocketAddress, MBeanServerConnection> remoteMBeanServers;
 	private Map<InetSocketAddress, JMXConnector> remoteMBeanServers;
@@ -117,7 +119,7 @@ public class MonitorService implements IMonitorService, IDiscoveryServiceListene
 	public void startService() {
 		// nac JMX Agenten ausschau halten
 		// com.sun.jdmk.discovery.DiscoveryClient
-		DiscoveryClient discoveryClient = new DiscoveryClient();
+		// discoveryClient = new DiscoveryClient();
 		try {
 			discoveryClient.setTimeToLive(16);
 		} catch (IllegalArgumentException e1) { // should never occur, becaus 0 < 16 < 255
@@ -143,7 +145,8 @@ public class MonitorService implements IMonitorService, IDiscoveryServiceListene
 	
 	@Override
 	public void shutdownService(IResultListener listener) {
-		
+		// DiscoveryClient stoppen, um Multicast socket zu lösen
+		discoveryClient.stop();
 	}
 
 
