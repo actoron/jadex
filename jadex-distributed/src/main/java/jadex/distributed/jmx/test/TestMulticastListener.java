@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.Arrays;
 
 public class TestMulticastListener {
 
@@ -20,8 +21,8 @@ public class TestMulticastListener {
 		
 		while(true) {
 			msocket.receive(recv); // buffer filled with message content
-			System.out.println(buf);
+			System.out.println( new String(buf).toString() );
+			Arrays.fill(buf, (byte)0);
 		}
 	}
-
 }
