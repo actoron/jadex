@@ -552,7 +552,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 //			System.out.println("CleanupCommand: "+result);
 			IComponentDescription ad = (IComponentDescription)descs.get(cid);
 			Map results = null;
-			StandaloneComponentAdapter	adapter;
+			StandaloneComponentAdapter adapter;
+			StandaloneComponentAdapter pad = null;
+			CMSComponentDescription desc;
 			synchronized(adapters)
 			{
 				synchronized(descs)
@@ -564,7 +566,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 					
 					results = adapter.getComponentInstance().getResults();
 					
-					CMSComponentDescription	desc	= (CMSComponentDescription)descs.get(cid);
+					desc = (CMSComponentDescription)descs.get(cid);
 					desc.setState(IComponentDescription.STATE_TERMINATED);
 					descs.remove(cid);
 					ccs.remove(cid);
@@ -576,16 +578,20 @@ public class ComponentManagementService implements IComponentManagementService, 
 					if(desc.getParent()!=null)
 					{
 						children.remove(desc.getParent(), desc.getName());
-
-						StandaloneComponentAdapter	pad	= (StandaloneComponentAdapter)adapters.get(desc.getParent());
-						if(pad!=null)
-						{
-							pad.getComponentInstance().componentDestroyed(desc);
-						}
-						// else parent has just been killed.
+						pad	= (StandaloneComponentAdapter)adapters.get(desc.getParent());
+						
 					}
 				}
 			}
+			
+			// Must be executed out of sync block due to deadlocks
+			// agent->cleanupcommand->space.componentRemoved (holds adapter mon -> needs space mone)
+			// space executor->general loop->distributed percepts->(holds space mon -> needs adapter mon for getting external access)
+			if(pad!=null)
+			{
+				pad.getComponentInstance().componentDestroyed(desc);
+			}
+			// else parent has just been killed.
 			
 //			// Deregister killed component at contexts.
 //			IContextService	cs	= (IContextService)container.getService(IContextService.class);

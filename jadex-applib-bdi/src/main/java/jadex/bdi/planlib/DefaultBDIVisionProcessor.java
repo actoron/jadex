@@ -95,9 +95,6 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 				}
 				public void resultAvailable(Object source, Object result)
 				{
-					if(!(result instanceof IBDIExternalAccess))
-						System.out.println("here");
-					
 					final IBDIExternalAccess exta = (IBDIExternalAccess)result;
 					exta.invokeLater(new Runnable()
 					{
