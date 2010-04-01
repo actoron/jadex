@@ -21,8 +21,6 @@ public class TestMulticastSender {
 		InetAddress group = InetAddress.getByName("224.224.224.224"); 
 		msocket.joinGroup( group );
 		
-		//String message = "Hallo, hier bin ich!";
-		
 		Scanner in = new Scanner(System.in);
 		while(true){
 			System.out.println("Welche Nachricht senden?");
