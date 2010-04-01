@@ -38,6 +38,8 @@
 		<import>jadex.bdi.examples.marsworld.producer.*</import>
 		<import>jadex.bdi.examples.marsworld.sentry.*</import>
 		<import>jadex.bdi.examples.marsworld.movement.*</import>
+		<import>jadex.application.space.envsupport.evaluation.*</import>
+		<import>jadex.application.space.envsupport.observer.gui.plugin.*</import>
 	</imports>
 	
 	<spacetypes>
@@ -232,8 +234,38 @@
 							<env:property name="ore">25</env:property>
 						</env:object>
 					</env:objects>
+					
+					<env:dataproviders>
+						<env:dataprovider name="homebase_ore">
+							<env:source name="$homebase" objecttype="homebase">
+							</env:source>
+							<env:data name="time">$time</env:data>
+							<env:data name="ore_amount">$homebase.ore</env:data>
+						</env:dataprovider>
+					</env:dataproviders>
+			
+					<env:dataconsumers>
+						<env:dataconsumer name="ore_chart" class="XYChartDataConsumer">
+							<env:property name="dataprovider">"homebase_ore"</env:property>
+							<env:property name="title">"Ore in homebase"</env:property>
+							<env:property name="labelx">"Time"</env:property>
+							<env:property name="labely">"Ore"</env:property>
+							<env:property name="maxitemcount">500</env:property>
+							<env:property name="legend">false</env:property>
+							
+							<!-- Defines a normal series. -->
+							<env:property name="seriesname">"Ore"</env:property>
+							<env:property name="valuex">"time"</env:property>
+							<env:property name="valuey">"ore_amount"</env:property>
+						</env:dataconsumer>
+					</env:dataconsumers>
+					
 					<env:observers>
-						<env:observer name="MarsWorld" view="view_all" perspective="icons"/>
+						<env:observer name="MarsWorld" view="view_all" perspective="icons">
+							<env:plugin name="evaluation" class="EvaluationPlugin">
+								<env:property name="component_0">((AbstractChartDataConsumer)$space.getDataConsumer("ore_chart")).getChartPanel()</env:property>
+							</env:plugin>
+						</env:observer>
 					</env:observers>
 	 			</env:envspace>
 			</spaces>
