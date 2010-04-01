@@ -119,7 +119,7 @@ public class MonitorService implements IMonitorService, IDiscoveryServiceListene
 	public void startService() {
 		// nac JMX Agenten ausschau halten
 		// com.sun.jdmk.discovery.DiscoveryClient
-		// discoveryClient = new DiscoveryClient();
+		discoveryClient = new DiscoveryClient();
 		try {
 			discoveryClient.setTimeToLive(16);
 		} catch (IllegalArgumentException e1) { // should never occur, becaus 0 < 16 < 255
@@ -134,9 +134,13 @@ public class MonitorService implements IMonitorService, IDiscoveryServiceListene
 		}
 		
 		System.out.println("HI");
-		Vector<DiscoveryResponse> v = discoveryClient.findMBeanServers();
-		for (DiscoveryResponse response : v) {
-			System.out.println( response.getHost() );
+		//Vector<DiscoveryResponse> v = discoveryClient.findMBeanServers();
+		Vector v = discoveryClient.findMBeanServers();
+		System.out.println( v.size() );
+		//for (DiscoveryResponse response : v) {
+		for(int i=0; i<v.size(); i++) {
+			//System.out.println( response.getHost() );
+			System.out.println( v.get(i).toString() );
 		}
 		System.out.println("HO");
 		
