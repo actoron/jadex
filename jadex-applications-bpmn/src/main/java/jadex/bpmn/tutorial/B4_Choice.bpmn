@@ -2,7 +2,7 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_bAa4ojWlEd-9zZVZikzkWw" iD="_bAa4oTWlEd-9zZVZikzkWw">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_EsGQEDWnEd-9zZVZikzkWw" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EsQBEDWnEd-9zZVZikzkWw" key="Description" value="&lt;h1>Choice Gateway&lt;/h1> This process follows one of two branches based on random choice.&lt;br/> It shows how to use XOR gateways."/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EsQBETWnEd-9zZVZikzkWw" key="Package" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EsQBETWnEd-9zZVZikzkWw" key="Package" value="jadex.bpmn.tutorial"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_bCNBUTWlEd-9zZVZikzkWw" iD="_bCNBUDWlEd-9zZVZikzkWw" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_bDGZMTWlEd-9zZVZikzkWw" iD="_bDGZMDWlEd-9zZVZikzkWw" outgoingEdges="_iph_ETWlEd-9zZVZikzkWw" name="Toss a Coin" activityType="EventStartEmpty" looping="false">

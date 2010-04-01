@@ -14,7 +14,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_Irv5QTZnEd-86tAf5dPynA" iD="_Irv5QDZnEd-86tAf5dPynA" outgoingEdges="_6bs26jZtEd-86tAf5dPynA" incomingEdges="_Irv5SjZnEd-86tAf5dPynA" name="Start Shipping" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_PMg3kDZnEd-86tAf5dPynA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PMg3kTZnEd-86tAf5dPynA" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PcAsIDZnEd-86tAf5dPynA" key="parameters" value="in␋text␋java.lang.String␋&quot;Shipping to: &quot;+address"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PcAsIDZnEd-86tAf5dPynA" key="parameters" value="in␋text␋java.lang.String␋&quot;Shipping to: &quot;+address␟inout␋address␋String␋"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_6bs24TZtEd-86tAf5dPynA" iD="_6bs24DZtEd-86tAf5dPynA" incomingEdges="_6bs26jZtEd-86tAf5dPynA" name="Shipping&#xD;&#xA;Finished" activityType="Task">

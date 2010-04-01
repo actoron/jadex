@@ -2,7 +2,7 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_1aHQ0TKSEd-MwJoRTfcdNQ" iD="_1aHQ0DKSEd-MwJoRTfcdNQ">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-FH5IDKSEd-MwJoRTfcdNQ" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-FH5ITKSEd-MwJoRTfcdNQ" key="Description" value="&lt;h1>Sequence of Tasks&lt;/h1> An example with tasks being executed one after another.&lt;br/> Also useful for trying out the debugger."/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-FH5IjKSEd-MwJoRTfcdNQ" key="Package" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-FH5IjKSEd-MwJoRTfcdNQ" key="Package" value="jadex.bpmn.tutorial"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_1aHQ1zKSEd-MwJoRTfcdNQ" iD="_1aHQ1jKSEd-MwJoRTfcdNQ" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_1aHQ2TKSEd-MwJoRTfcdNQ" iD="_1aHQ2DKSEd-MwJoRTfcdNQ" outgoingEdges="_MXDtsTKTEd-MwJoRTfcdNQ" name="Task 1" activityType="Task">

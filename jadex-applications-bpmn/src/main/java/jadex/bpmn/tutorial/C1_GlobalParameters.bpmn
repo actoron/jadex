@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_qYXzoTZhEd-86tAf5dPynA" iD="_qYXzoDZhEd-86tAf5dPynA">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_q01GIDZhEd-86tAf5dPynA" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q01GITZhEd-86tAf5dPynA" key="Description" value="&lt;h1>Global Parameter&lt;/h1> This process prints out a customized welcome message based on the global parameter 'customer'."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q01GIjZhEd-86tAf5dPynA" key="Package" value="jadex.bpmn.tutorial"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5FXzkDZhEd-86tAf5dPynA" key="parameters" value="inout␋customer␋String␋&quot;Carl Customer&quot;␟inout␋logins␋int␋0"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_qY9pgTZhEd-86tAf5dPynA" iD="_qY9pgDZhEd-86tAf5dPynA" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_qY9pgzZhEd-86tAf5dPynA" iD="_qY9pgjZhEd-86tAf5dPynA" outgoingEdges="_s1v_kTZiEd-86tAf5dPynA" name="Welcome" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_JKmKsDZiEd-86tAf5dPynA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_JKmKsTZiEd-86tAf5dPynA" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KAiUMDZiEd-86tAf5dPynA" key="parameters" value="in␋text␋java.lang.String␋&quot;Welcome &quot;+customer+&quot;!&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_s1m1oTZiEd-86tAf5dPynA" iD="_s1m1oDZiEd-86tAf5dPynA" incomingEdges="_s1v_kTZiEd-86tAf5dPynA" name="Status" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ul9Y8DZiEd-86tAf5dPynA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ul9Y8TZiEd-86tAf5dPynA" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vcpJUDZiEd-86tAf5dPynA" key="parameters" value="in␋text␋java.lang.String␋&quot;Customer &quot;+customer+&quot; has logged in &quot;+logins+&quot; times.&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_s1v_kTZiEd-86tAf5dPynA" iD="_s1v_kDZiEd-86tAf5dPynA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_RzdogDZjEd-86tAf5dPynA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RzdogTZjEd-86tAf5dPynA" key="condition" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_TDLj8DZjEd-86tAf5dPynA" source="sequence">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TDLj8TZjEd-86tAf5dPynA" key="mappings" value="logins␋logins + 1"/>
+      </eAnnotations>
+    </sequenceEdges>
+  </pools>
+</bpmn:BpmnDiagram>

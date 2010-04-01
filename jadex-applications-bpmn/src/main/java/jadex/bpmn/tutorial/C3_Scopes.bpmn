@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_qiZkcTaEEd-TIJeIzj-S2A" iD="_qiZkcDaEEd-TIJeIzj-S2A">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_q730YDaEEd-TIJeIzj-S2A" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q730YTaEEd-TIJeIzj-S2A" key="Description" value="&lt;h1>Scopes&lt;/h1> Process showing how to use a sub process for parameter scoping."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q730YjaEEd-TIJeIzj-S2A" key="Package" value="jadex.bpmn.turorial"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_qiZkdzaEEd-TIJeIzj-S2A" iD="_qiZkdjaEEd-TIJeIzj-S2A" name="Pool">
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_sMyCoTaEEd-TIJeIzj-S2A" iD="_sMyCoDaEEd-TIJeIzj-S2A" name="Handle Shipping">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_s2DCEDaEEd-TIJeIzj-S2A" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_s2DCETaEEd-TIJeIzj-S2A" key="class" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_K93KMDaFEd-TIJeIzj-S2A" key="parameters" value="inout␋shipto␋String␋&quot;Default Address&quot;"/>
+      </eAnnotations>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_w3NxkzaEEd-TIJeIzj-S2A" iD="_w3NxezaEEd-TIJeIzj-S2A" outgoingEdges="_w3NxoDaEEd-TIJeIzj-S2A" name="Enter Address" activityType="Task">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_w3NxlDaEEd-TIJeIzj-S2A" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3NxlTaEEd-TIJeIzj-S2A" key="class" value="jadex.bpmn.runtime.task.UserInteractionTask.class"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3NxljaEEd-TIJeIzj-S2A" key="parameters" value="inout␋address␋String␋shipto"/>
+        </eAnnotations>
+      </vertices>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_w3NxlzaEEd-TIJeIzj-S2A" iD="_w3NxgzaEEd-TIJeIzj-S2A" outgoingEdges="_w3NxrzaEEd-TIJeIzj-S2A" incomingEdges="_w3NxoDaEEd-TIJeIzj-S2A" name="Start Shipping" activityType="Task">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_w3NxmDaEEd-TIJeIzj-S2A" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3NxmTaEEd-TIJeIzj-S2A" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3NxmjaEEd-TIJeIzj-S2A" key="parameters" value="inout␋text␋String␋&quot;Shipping to: &quot;+shipto"/>
+        </eAnnotations>
+      </vertices>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_w3NxmzaEEd-TIJeIzj-S2A" iD="_w3NxizaEEd-TIJeIzj-S2A" incomingEdges="_w3NxrzaEEd-TIJeIzj-S2A" name="Shipping&#xD;&#xA;Finished" activityType="Task">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_w3NxnDaEEd-TIJeIzj-S2A" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3NxnTaEEd-TIJeIzj-S2A" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3NxnjaEEd-TIJeIzj-S2A" key="parameters" value="in␋text␋java.lang.String␋&quot;Arrived at: &quot;+shipto"/>
+        </eAnnotations>
+      </vertices>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_w3NxoDaEEd-TIJeIzj-S2A" iD="_w3NxnzaEEd-TIJeIzj-S2A">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_w3NxoTaEEd-TIJeIzj-S2A" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3NxojaEEd-TIJeIzj-S2A" key="condition" value=""/>
+        </eAnnotations>
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_w3NxozaEEd-TIJeIzj-S2A" source="sequence">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3NxpDaEEd-TIJeIzj-S2A" key="mappings" value="shipto␋address"/>
+        </eAnnotations>
+      </sequenceEdges>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_w3NxrzaEEd-TIJeIzj-S2A" iD="_w3NxrjaEEd-TIJeIzj-S2A"/>
+    </vertices>
+  </pools>
+</bpmn:BpmnDiagram>

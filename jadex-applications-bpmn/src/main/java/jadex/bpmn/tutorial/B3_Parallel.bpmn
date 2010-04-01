@@ -2,7 +2,7 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_GuFIYjNWEd-LQLKZfFgXnA" iD="_GuFIYTNWEd-LQLKZfFgXnA">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__mHN4DNaEd-LQLKZfFgXnA" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__mHN4TNaEd-LQLKZfFgXnA" key="Description" value="&lt;h1>Parallel Activities&lt;/h1> This examples shows different forms of parallelism in BPMN."/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__mHN4jNaEd-LQLKZfFgXnA" key="Package" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__mHN4jNaEd-LQLKZfFgXnA" key="Package" value="jadex.bpmn.tutorial"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_GwBCETNWEd-LQLKZfFgXnA" iD="_GwBCEDNWEd-LQLKZfFgXnA" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_GxDj4TNWEd-LQLKZfFgXnA" iD="_GxDj4DNWEd-LQLKZfFgXnA" outgoingEdges="_NMCDQTNWEd-LQLKZfFgXnA" name="Task 1a" activityType="Task">
