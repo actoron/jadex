@@ -9,16 +9,18 @@ public interface IComponentDescription
 {
 	//-------- constants --------
 	
-//	/** Predefined value "initiated" for slot state. */
-//	public static String  STATE_INITIATED  = "initiated";
+	// todo: remove? needed for JADE
+	/** Predefined value "initiated" for slot state. */
+	public static String  STATE_INITIATED  = "initiated";
+	/** Predefined value "transit" for slot state. */
+	public static String  STATE_TRANSIT  = "transit";	
+	
 	/** Predefined value "active" for slot state. */
 	public static String  STATE_ACTIVE  = "active";
 	/** Predefined value "suspended" for slot state. */
 	public static String  STATE_SUSPENDED  = "suspended";
 	/** Predefined value "waiting" for slot state. */
 	public static String  STATE_WAITING  = "waiting";
-//	/** Predefined value "transit" for slot state. */
-//	public static String  STATE_TRANSIT  = "transit";
 //	/** Predefined value "terminating" for slot state. */
 //	public static String  STATE_TERMINATING  = "terminating";
 	/** Predefined value "terminated" for slot state. */

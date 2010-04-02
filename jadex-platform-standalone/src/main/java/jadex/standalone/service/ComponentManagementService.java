@@ -1,6 +1,9 @@
 package jadex.standalone.service;
 
 import jadex.base.DefaultResultListener;
+import jadex.base.fipa.CMSComponentDescription;
+import jadex.base.fipa.ComponentIdentifier;
+import jadex.base.fipa.SearchConstraints;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
@@ -18,9 +21,6 @@ import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.execution.IExecutionService;
 import jadex.standalone.StandaloneComponentAdapter;
-import jadex.standalone.fipaimpl.CMSComponentDescription;
-import jadex.standalone.fipaimpl.ComponentIdentifier;
-import jadex.standalone.fipaimpl.SearchConstraints;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -221,7 +221,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 			createComponentInstance(config, args, suspend, listener,
 				resultlistener, factory, lmodel, cid, adapter, null, ad, null);
 		}
-}
+	}
 
 	/**
 	 *  Create an instance of a component (step 2 of creation process).

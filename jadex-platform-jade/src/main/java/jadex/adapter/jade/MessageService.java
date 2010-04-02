@@ -22,28 +22,32 @@ import jadex.base.fipa.CMSCreateComponent;
 import jadex.base.fipa.CMSDestroyComponent;
 import jadex.base.fipa.CMSResumeComponent;
 import jadex.base.fipa.CMSSearchComponents;
-import jadex.base.fipa.AMSStartAgent;
 import jadex.base.fipa.CMSSuspendComponent;
 import jadex.base.fipa.DFDeregister;
 import jadex.base.fipa.DFModify;
 import jadex.base.fipa.DFRegister;
 import jadex.base.fipa.DFSearch;
-import jadex.base.fipa.IAMS;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.SFipa;
 import jadex.bridge.ContentException;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IContentCodec;
+import jadex.bridge.IMessageListener;
 import jadex.bridge.IMessageService;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
+import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.clock.IClockService;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -71,6 +75,9 @@ public class MessageService implements IMessageService, IService
 	/** The transports. */
 //	protected List transports;
 
+	/** The message types. */
+	protected Map messagetypes;
+
 	/** All addresses of this platform. */
 	private String[] addresses;
 
@@ -83,16 +90,23 @@ public class MessageService implements IMessageService, IService
 	/** The logger. */
 	protected Logger logger;
 
+	/** The listeners. */
+	protected List listeners;
+	
 	//-------- constructors --------
 
 	/**
 	 *  Constructor for Outbox.
 	 *  @param platform
 	 */
-	public MessageService(Platform platform)
+	public MessageService(Platform platform, MessageType[] messagetypes)
 	{
 		this.platform = platform;
 		this.logger = Logger.getLogger("JADE_Platform.mts");
+		
+		this.messagetypes	= SCollection.createHashMap();
+		for(int i=0; i<messagetypes.length; i++)
+			this.messagetypes.put(messagetypes[i].getName(), messagetypes[i]);		
 	}
 	
 	//-------- interface methods --------
@@ -101,8 +115,10 @@ public class MessageService implements IMessageService, IService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	public void sendMessage(Map message, MessageType type, IComponentIdentifier sender, ClassLoader cl)
+//	public void sendMessage(Map message, MessageType type, IComponentIdentifier sender, ClassLoader cl)
+	public void sendMessage(Map message, MessageType type, IComponentAdapter adapter, ClassLoader cl)
 	{
+		IComponentIdentifier sender = adapter.getComponentIdentifier();
 		if(sender==null)
 			throw new RuntimeException("Sender must not be null: "+message);
 		
@@ -191,7 +207,7 @@ public class MessageService implements IMessageService, IService
 					CMSCreateComponent	aca	= (CMSCreateComponent)content;
 					if(aca.getName()==null)
 					{
-						AMS	ams	= (AMS)platform.getService(IAMS.class);
+						AMS	ams	= (AMS)platform.getService(IComponentManagementService.class);
 						aca.setName(ams.generateAgentName(ams.getShortName(aca.getType())));
 					}
 					CreateAgent	create	= new CreateAgent();
@@ -209,7 +225,8 @@ public class MessageService implements IMessageService, IService
 					request	= create;
 					ontology	= JADEManagementOntology.NAME;
 				}
-				else if(content instanceof AMSStartAgent)
+				// todo: start?
+				/*else if(content instanceof CMSStartComponent)
 				{
 					IComponentIdentifier	amsaid	= ((AMSStartAgent)content).getComponentIdentifier();
 					Modify	start	= new Modify();
@@ -218,7 +235,7 @@ public class MessageService implements IMessageService, IService
 					adesc.setState(AMSAgentDescription.ACTIVE);
 					start.setDescription(adesc);
 					request	= start;
-				}
+				}*/
 				else if(content instanceof CMSDestroyComponent)
 				{
 					IComponentIdentifier	amsaid	= ((CMSDestroyComponent)content).getComponentIdentifier();
@@ -229,7 +246,7 @@ public class MessageService implements IMessageService, IService
 				}
 				else if(content instanceof CMSSuspendComponent)
 				{
-					IComponentIdentifier	amsaid	= ((CMSSuspendComponent)content).getAgentIdentifier();
+					IComponentIdentifier	amsaid	= ((CMSSuspendComponent)content).getComponentIdentifier();
 					Modify	suspend	= new Modify();
 					AMSAgentDescription	adesc	= new AMSAgentDescription();
 					adesc.setName(SJade.convertAIDtoJade(amsaid));
@@ -250,7 +267,7 @@ public class MessageService implements IMessageService, IService
 				else if(content instanceof CMSSearchComponents)
 				{
 					Search	search	= new Search();
-					AMSAgentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoJade(((CMSSearchComponents)content).getAgentDescription());
+					AMSAgentDescription	amsadesc	= SJade.convertAMSAgentDescriptiontoJade(((CMSSearchComponents)content).getComponentDescription());
 					// Hack !!! Strip addresses/resolvers from aid before search (JADE doesn't store these in AMS and therefore finds no matches, grrr).
 					if(amsadesc.getName()!=null)
 						amsadesc.setName(new AID(amsadesc.getName().getName(), AID.ISGUID));
@@ -316,16 +333,16 @@ public class MessageService implements IMessageService, IService
 		final ACLMessage msg = SJade.convertMessagetoJade(message, type);
 		
 		// Send message over Jade.
-		IAMS ams = (IAMS)platform.getService(IAMS.class);
+		AMS ams = (AMS)platform.getService(IComponentManagementService.class);
 		ams.getAgentAdapter(sender, new IResultListener()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Object source, Object result)
 			{
 				JadeAgentAdapter adapter = (JadeAgentAdapter)result;
 				adapter.send(msg);
 //				System.out.println("message sent: "+msg);
 			}
-			public void exceptionOccurred(Exception exception)
+			public void exceptionOccurred(Object source, Exception exception)
 			{
 			}
 		});
@@ -352,6 +369,36 @@ public class MessageService implements IMessageService, IService
 	{
 		// Hack! Should be looked up dynamically.
 		return platform.getPlatformAgent().getAddressesArray();
+	}
+	
+	/**
+	 *  Add a message listener.
+	 *  @param listener The change listener.
+	 */
+	public synchronized void addMessageListener(IMessageListener listener)
+	{
+		if(listeners==null)
+			listeners = new ArrayList();
+		listeners.add(listener);
+	}
+	
+	/**
+	 *  Remove a message listener.
+	 *  @param listener The change listener.
+	 */
+	public synchronized void removeMessageListener(IMessageListener listener)
+	{
+		listeners.remove(listener);
+	}
+	
+	/**
+	 *  Get the message type.
+	 *  @param type The type name.
+	 *  @return The message type.
+	 */
+	public MessageType getMessageType(String type)
+	{
+		return (MessageType)messagetypes.get(type);
 	}
 
 	//-------- IPlatformService interface --------

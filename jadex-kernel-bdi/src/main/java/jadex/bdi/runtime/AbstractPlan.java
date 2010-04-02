@@ -674,7 +674,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 		// Hack!!! Should be configurable.
 		IExpressionParser	exp_parser	= new JavaCCExpressionParser();
 		Object mcapa = state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
-		String[]	imports	= OAVBDIMetaModel.getImports(state, mcapa);
+		String[] imports	= OAVBDIMetaModel.getImports(state, mcapa);
 		
 		Map	params	= null;
 		if(paramnames!=null)

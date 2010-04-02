@@ -1,5 +1,6 @@
 package jadex.standalone.transport.niotcpmtp;
 
+import jadex.base.fipa.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageService;
 import jadex.commons.SUtil;
@@ -14,7 +15,6 @@ import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
 import jadex.service.library.ILibraryService;
 import jadex.service.threadpool.ThreadPoolService;
-import jadex.standalone.fipaimpl.ComponentIdentifier;
 import jadex.standalone.transport.ITransport;
 import jadex.standalone.transport.MessageEnvelope;
 import jadex.standalone.transport.codecs.CodecFactory;

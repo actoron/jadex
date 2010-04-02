@@ -1,11 +1,17 @@
 package jadex.bdi.runtime.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.interpreter.OAVBDIMetaModel;
 import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.IExpressionbase;
 import jadex.commons.Tuple;
+import jadex.javaparser.IExpressionParser;
+import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.state.IOAVState;
 
 /**
@@ -82,17 +88,67 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 	 *  @param expression	The expression string.
 	 *  @return The precompiled expression.
 	 */
-//	public IExpression	createExpression(String expression);
+	public IExpression	createExpression(String expression)
+	{
+		return createExpression(expression, null, null);
+	}
 
 	/**
 	 *  Create a precompiled expression.
 	 *  @param expression	The expression string.
-	 *  @param paramnames The parameter names.
-	 *  @param paramtypes The parameter types.
 	 *  @return The precompiled expression.
 	 */
-//	public IExpression	createExpression(String expression, String[] paramnames, Class[] paramtypes);
-
+	public IExpression	createExpression(final String expression, final String[] paramnames, final Class[] paramtypes)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					// Hack!!! Should be configurable.
+					IExpressionParser	exp_parser	= new JavaCCExpressionParser();
+					Object mcapa = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
+					String[] imports	= OAVBDIMetaModel.getImports(getState(), mcapa);
+					
+					Map	params	= null;
+					if(paramnames!=null)
+					{
+						params	= new HashMap();
+						for(int i=0; i<paramnames.length; i++)
+						{
+							params.put(paramnames[i], getState().getTypeModel().getJavaType(paramtypes[i]));
+						}
+					}
+					
+					IParsedExpression pex = exp_parser.parseExpression(expression, imports, params, Thread.currentThread().getContextClassLoader());
+					object = new ExpressionNoModel(getState(), getScope(), pex);
+				}
+			};
+			return (IExpression)invoc.object;
+		}
+		else
+		{
+			// Hack!!! Should be configurable.
+			IExpressionParser	exp_parser	= new JavaCCExpressionParser();
+			Object mcapa = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
+			String[] imports	= OAVBDIMetaModel.getImports(getState(), mcapa);
+			
+			Map	params	= null;
+			if(paramnames!=null)
+			{
+				params	= new HashMap();
+				for(int i=0; i<paramnames.length; i++)
+				{
+					params.put(paramnames[i], getState().getTypeModel().getJavaType(paramtypes[i]));
+				}
+			}
+			
+			IParsedExpression pex = exp_parser.parseExpression(expression, imports, params, Thread.currentThread().getContextClassLoader());
+			return new ExpressionNoModel(getState(), getScope(), pex);
+		}
+	}
+	
 	/**
 	 *  Get a condition, that is triggered whenever the expression
 	 *  value changes to true.

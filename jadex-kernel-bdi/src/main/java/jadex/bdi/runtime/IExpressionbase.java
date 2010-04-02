@@ -21,7 +21,7 @@ public interface IExpressionbase extends IElement
 	 *  @param expression	The expression string.
 	 *  @return The precompiled expression.
 	 */
-//	public IExpression	createExpression(String expression);
+	public IExpression	createExpression(String expression);
 
 	/**
 	 *  Create a precompiled expression.
@@ -30,7 +30,7 @@ public interface IExpressionbase extends IElement
 	 *  @param paramtypes The parameter types.
 	 *  @return The precompiled expression.
 	 */
-//	public IExpression	createExpression(String expression, String[] paramnames, Class[] paramtypes);
+	public IExpression	createExpression(String expression, String[] paramnames, Class[] paramtypes);
 
 	/**
 	 *  Get a condition, that is triggered whenever the expression

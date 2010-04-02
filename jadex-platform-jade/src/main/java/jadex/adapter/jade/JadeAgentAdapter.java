@@ -4,17 +4,15 @@ import jade.content.ContentElement;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
-import jadex.base.SComponentManagementService;
 import jadex.base.SComponentFactory;
-import jadex.base.fipa.IAMS;
 import jadex.base.fipa.SFipa;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
-import jadex.bridge.IPlatform;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
@@ -22,6 +20,7 @@ import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 import jadex.service.library.ILibraryService;
 
@@ -108,7 +107,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 				
 //		this.platform = (IPlatform)args[0];
 		this.platform = Platform.getPlatform();
-		AMS ams = (AMS)platform.getService(IAMS.class);
+		AMS ams = (AMS)platform.getService(IComponentManagementService.class);
 		ams.getAgentAdapterMap().put(getComponentIdentifier(), this);
 		
 		// Initialize the agent from model.
@@ -153,8 +152,8 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 					argsmap.putAll((Map)args2[i]);
 				}
 			}
-//			this.agent = platform.getAgentFactory().createKernelAgent(this, (String)args[0], (String)args[1], argsmap);
-			this.agent = SComponentFactory.createKernelAgent(platform, this, (String)args[0], (String)args[1], argsmap);
+//			this.agent = SComponentFactory.createKernelAgent(platform, this, (String)args[0], (String)args[1], argsmap);
+			this.agent = SComponentFactory.createKernelComponent(platform, this, (String)args[0], (String)args[1], argsmap);
 		}
 		else //if(args[0] instanceof IMBDIAgent)
 		{
@@ -190,7 +189,8 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		addBehaviour(agendacontrol);
 //		this.timing	= new TimingBehaviour(agent, clock);
 //		addBehaviour(timing);
-		this.mesrec	= new MessageReceiverBehaviour(platform, agent, (IAMS)platform.getService(IAMS.class));
+		this.mesrec	= new MessageReceiverBehaviour(platform, agent, 
+			(IComponentManagementService)platform.getService(IComponentManagementService.class));
 		addBehaviour(mesrec);
 
 		//try{Thread.sleep(20000);}catch(Exception e){}
@@ -295,14 +295,14 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	 */
 	public IComponentIdentifier getComponentIdentifier()
 	{
-		return SJade.convertAIDtoFipa(getAID(), (IAMS)getServiceContainer().getService(IAMS.class));
+		return SJade.convertAIDtoFipa(getAID(), (IComponentManagementService)getServiceContainer().getService(IComponentManagementService.class));
 	}
 	
 	/**
 	 *  Get the platform.
 	 *  @return the platform of this agent
 	 */
-	public IPlatform	getServiceContainer()
+	public IServiceContainer getServiceContainer()
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
 			throw new ComponentTerminatedException(getComponentIdentifier().getName());
@@ -370,7 +370,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		if(!fatalerror)
 			agent.killComponent(listener);
 		else if(listener!=null)
-			listener.resultAvailable(getComponentIdentifier());
+			listener.resultAvailable(this, getComponentIdentifier());
 			
 	}
 
@@ -537,11 +537,11 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		// super.doDelete() would interrupt agent thread (while e.g. waiting for plan).
 		agent.killComponent(new IResultListener()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Object source, Object result)
 			{
 				JadeAgentAdapter.super.doDelete();
 			}
-			public void exceptionOccurred(Exception e)
+			public void exceptionOccurred(Object source, Exception e)
 			{
 				e.printStackTrace();
 			}

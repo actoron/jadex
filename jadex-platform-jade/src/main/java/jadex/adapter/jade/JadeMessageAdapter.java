@@ -2,8 +2,8 @@ package jadex.adapter.jade;
 
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
-import jadex.base.fipa.IAMS;
 import jadex.base.fipa.SFipa;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;
 
@@ -23,7 +23,7 @@ public class JadeMessageAdapter implements IMessageAdapter
 	/** The message. */
 	protected ACLMessage message;
 	
-	protected IAMS ams;
+	protected IComponentManagementService ams;
 	
 	protected Map decvals;
 
@@ -32,7 +32,7 @@ public class JadeMessageAdapter implements IMessageAdapter
 	/**
 	 *  Create a new message adapter.
 	 */
-	public JadeMessageAdapter(ACLMessage message, IAMS ams)//, IJadexAgent agent)
+	public JadeMessageAdapter(ACLMessage message, IComponentManagementService ams)//, IJadexAgent agent)
 	{
 		this.message = message;
 		this.ams = ams;

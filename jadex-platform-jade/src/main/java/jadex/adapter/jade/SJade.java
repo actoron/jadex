@@ -7,10 +7,11 @@ import jade.domain.FIPAAgentManagement.Property;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
-import jadex.base.fipa.IAMS;
+import jadex.base.fipa.CMSComponentDescription;
+import jadex.base.fipa.DFComponentDescription;
 import jadex.base.fipa.SFipa;
-import jadex.adapter.jade.fipaimpl.AgentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.MessageType;
 import jadex.commons.collection.SCollection;
 
@@ -132,26 +133,26 @@ public class SJade
 		
 		STATES_MAP_TO_FIPA = SCollection.createHashMap();
 		STATES_MAP_TO_FIPA.put(jade.domain.FIPAAgentManagement.AMSAgentDescription.ACTIVE, 
-			jadex.adapter.jade.fipaimpl.AMSAgentDescription.STATE_ACTIVE);
+			CMSComponentDescription.STATE_ACTIVE);
 		STATES_MAP_TO_FIPA.put(jade.domain.FIPAAgentManagement.AMSAgentDescription.SUSPENDED, 
-			jadex.adapter.jade.fipaimpl.AMSAgentDescription.STATE_SUSPENDED);
+			CMSComponentDescription.STATE_SUSPENDED);
 		STATES_MAP_TO_FIPA.put(jade.domain.FIPAAgentManagement.AMSAgentDescription.INITIATED, 
-			jadex.adapter.jade.fipaimpl.AMSAgentDescription.STATE_INITIATED);
+			CMSComponentDescription.STATE_INITIATED);
 		STATES_MAP_TO_FIPA.put(jade.domain.FIPAAgentManagement.AMSAgentDescription.WAITING, 
-			jadex.adapter.jade.fipaimpl.AMSAgentDescription.STATE_WAITING);
+			CMSComponentDescription.STATE_WAITING);
 		STATES_MAP_TO_FIPA.put(jade.domain.FIPAAgentManagement.AMSAgentDescription.TRANSIT, 
-			jadex.adapter.jade.fipaimpl.AMSAgentDescription.STATE_TRANSIT);
+			CMSComponentDescription.STATE_TRANSIT);
 		
 		STATES_MAP_TO_JADE = SCollection.createHashMap();
-		STATES_MAP_TO_JADE.put(jadex.adapter.jade.fipaimpl.AMSAgentDescription.STATE_ACTIVE, 
+		STATES_MAP_TO_JADE.put(CMSComponentDescription.STATE_ACTIVE, 
 			jade.domain.FIPAAgentManagement.AMSAgentDescription.ACTIVE);
-		STATES_MAP_TO_JADE.put(jadex.adapter.jade.fipaimpl.AMSAgentDescription.STATE_SUSPENDED,
+		STATES_MAP_TO_JADE.put(CMSComponentDescription.STATE_SUSPENDED,
 			jade.domain.FIPAAgentManagement.AMSAgentDescription.SUSPENDED);
-		STATES_MAP_TO_JADE.put(jadex.adapter.jade.fipaimpl.AMSAgentDescription.STATE_INITIATED,
+		STATES_MAP_TO_JADE.put(CMSComponentDescription.STATE_INITIATED,
 			jade.domain.FIPAAgentManagement.AMSAgentDescription.INITIATED);
-		STATES_MAP_TO_JADE.put(jadex.adapter.jade.fipaimpl.AMSAgentDescription.STATE_WAITING,
+		STATES_MAP_TO_JADE.put(CMSComponentDescription.STATE_WAITING,
 			jade.domain.FIPAAgentManagement.AMSAgentDescription.WAITING);
-		STATES_MAP_TO_JADE.put(jadex.adapter.jade.fipaimpl.AMSAgentDescription.STATE_TRANSIT,
+		STATES_MAP_TO_JADE.put(CMSComponentDescription.STATE_TRANSIT,
 			jade.domain.FIPAAgentManagement.AMSAgentDescription.TRANSIT);
 	}
 	
@@ -272,7 +273,7 @@ public class SJade
 	/**
 	 *  Convert a Jade AID to a Fipa aid.
 	 */
-	public static IComponentIdentifier convertAIDtoFipa(AID aid, IAMS ams)
+	public static IComponentIdentifier convertAIDtoFipa(AID aid, IComponentManagementService ams)
 //	public static AgentIdentifier convertAIDtoFipa(AID aid)
 	{
 //		AgentIdentifier ret = new AgentIdentifier(aid.getName(), false);
@@ -322,9 +323,9 @@ public class SJade
 	/**
 	 *  Convert search constraints to Jadex fipa.
 	 */
-	public static jadex.adapter.jade.fipaimpl.SearchConstraints convertSearchConstraintstoFipa(SearchConstraints con)
+	public static jadex.base.fipa.SearchConstraints convertSearchConstraintstoFipa(SearchConstraints con)
 	{
-		jadex.adapter.jade.fipaimpl.SearchConstraints constraints = new jadex.adapter.jade.fipaimpl.SearchConstraints();
+		jadex.base.fipa.SearchConstraints constraints = new jadex.base.fipa.SearchConstraints();
 		constraints.setMaxDepth(con.getMaxDepth().intValue());
 		constraints.setMaxResults(con.getMaxResults().intValue());
 		constraints.setSearchId(con.getSearchId());
@@ -336,9 +337,9 @@ public class SJade
 	 */
 	public static AID getAID(Object val)
 	{
-		if(!(val instanceof AID || val instanceof AgentIdentifier))
+		if(!(val instanceof AID || val instanceof IComponentIdentifier))
 			throw new RuntimeException("Value must be AgentIdentifier or AID: "+val);
-		return val instanceof AID? (AID)val: SJade.convertAIDtoJade((AgentIdentifier)val);
+		return val instanceof AID? (AID)val: SJade.convertAIDtoJade((IComponentIdentifier)val);
 	}
 
 	/**
@@ -355,10 +356,10 @@ public class SJade
 	/**
 	 *  Convert a Jade AID to a Fipa aid.
 	 */
-	public static jadex.adapter.jade.fipaimpl.DFAgentDescription convertAgentDescriptiontoFipa(DFAgentDescription desc, IAMS ams)
+	public static DFComponentDescription convertAgentDescriptiontoFipa(DFAgentDescription desc, IComponentManagementService ams)
 	{
 		IComponentIdentifier	aid	= desc.getName()!=null ? SJade.convertAIDtoFipa(desc.getName(), ams) : null;
-		jadex.adapter.jade.fipaimpl.DFAgentDescription ret = new jadex.adapter.jade.fipaimpl.DFAgentDescription(aid);
+		DFComponentDescription ret = new DFComponentDescription(aid);
 		Iterator it = desc.getAllLanguages();
 		while(it.hasNext())
 			ret.addLanguage((String)it.next());
@@ -383,7 +384,7 @@ public class SJade
 	{
 		DFAgentDescription ret = new DFAgentDescription();
 		if(desc.getName()!=null)
-			ret.setName(SJade.convertAIDtoJade((AgentIdentifier)desc.getName())); // cast ok?
+			ret.setName(SJade.convertAIDtoJade((IComponentIdentifier)desc.getName())); // cast ok?
 		String[] langs = desc.getLanguages();
 		for(int i=0; i<langs.length; i++)
 			ret.addLanguages(langs[i]);
@@ -404,10 +405,10 @@ public class SJade
 	/**
 	 *  Convert a Jade AID to a Fipa aid.
 	 */
-	public static jadex.adapter.jade.fipaimpl.DFServiceDescription
+	public static jadex.base.fipa.DFServiceDescription
 		convertServiceDescriptiontoFipa(ServiceDescription desc)
 	{
-		jadex.adapter.jade.fipaimpl.DFServiceDescription ret = new jadex.adapter.jade.fipaimpl.DFServiceDescription(
+		jadex.base.fipa.DFServiceDescription ret = new jadex.base.fipa.DFServiceDescription(
 			desc.getName(), desc.getType(), desc.getOwnership());
 		Iterator it = desc.getAllLanguages();
 		while(it.hasNext())
@@ -419,7 +420,7 @@ public class SJade
 		while(it.hasNext())
 		{
 			jade.domain.FIPAAgentManagement.Property	prop	= (jade.domain.FIPAAgentManagement.Property)it.next();
-			ret.addProperty(new jadex.adapter.jade.fipaimpl.Property(prop.getName(), prop.getValue()));
+			ret.addProperty(new jadex.base.fipa.Property(prop.getName(), prop.getValue()));
 		}
 		it = desc.getAllProtocols();
 		while(it.hasNext())
@@ -469,9 +470,9 @@ public class SJade
 	/**
 	 *  Convert an AMS AD to FIPA.
 	 */
-	public static jadex.adapter.jade.fipaimpl.AMSAgentDescription  convertAMSAgentDescriptiontoFipa(AMSAgentDescription desc, IAMS ams)
+	public static CMSComponentDescription  convertAMSAgentDescriptiontoFipa(AMSAgentDescription desc, IComponentManagementService ams)
 	{
-		jadex.adapter.jade.fipaimpl.AMSAgentDescription ret = new jadex.adapter.jade.fipaimpl.AMSAgentDescription();
+		CMSComponentDescription ret = new CMSComponentDescription();
 		if(desc.getName()!=null)
 			ret.setName(SJade.convertAIDtoFipa(desc.getName(), ams));
 		ret.setOwnership(desc.getOwnership());

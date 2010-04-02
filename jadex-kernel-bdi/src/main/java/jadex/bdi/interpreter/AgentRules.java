@@ -2938,7 +2938,7 @@ public class AgentRules
 					if(bo!=null)
 					{
 						if(bindingparams==null)
-							bindingparams	= new HashMap();
+							bindingparams = new HashMap();
 						bindingparams.put(state.getAttributeValue(param, OAVBDIMetaModel.modelelement_has_name),
 							AgentRules.evaluateExpression(state, bo, fetcher));
 					}

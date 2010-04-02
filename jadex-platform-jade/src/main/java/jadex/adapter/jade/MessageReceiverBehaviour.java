@@ -26,17 +26,18 @@ import jadex.base.fipa.CMSDestroyComponent;
 import jadex.base.fipa.CMSResumeComponent;
 import jadex.base.fipa.CMSSearchComponents;
 import jadex.base.fipa.CMSSuspendComponent;
+import jadex.base.fipa.DFComponentDescription;
 import jadex.base.fipa.DFDeregister;
 import jadex.base.fipa.DFModify;
 import jadex.base.fipa.DFRegister;
 import jadex.base.fipa.DFSearch;
-import jadex.base.fipa.IAMS;
 import jadex.base.fipa.IComponentAction;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IContentCodec;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IContentCodec;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +75,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 	protected IComponentInstance		agent;
 
 	/** The ams. */
-	protected IAMS ams;
+	protected IComponentManagementService ams;
 	
 	/** The positive Jadex filter. Those messages that are forwarded to the Jadex system. */
 //	protected MessageTemplate	antiposfilter;
@@ -91,7 +92,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 	 * Create the message receiver behaviour.
 	 * @param agent The bdi agent.
 	 */
-	public MessageReceiverBehaviour(Platform platform, IComponentInstance agent, IAMS ams)
+	public MessageReceiverBehaviour(Platform platform, IComponentInstance agent, IComponentManagementService ams)
 	{
 		this.platform = platform;
 		this.agent = agent;
@@ -203,12 +204,12 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 								IComponentAction	jadexaction	= null;
 								if(request instanceof Register)
 								{
-									IDFComponentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Register)request).getDescription(), ams);
+									IDFComponentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription)((Register)request).getDescription(), ams);
 									jadexaction	= new DFRegister(dfadesc, dfadesc);
 								}
 								else if(request instanceof Deregister)
 								{
-									IDFComponentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription) ((Deregister)request).getDescription(), ams);
+									IDFComponentDescription	dfadesc	= SJade.convertAgentDescriptiontoFipa((DFAgentDescription)((Deregister)request).getDescription(), ams);
 									jadexaction	= new DFDeregister(dfadesc);
 								}
 								else if(request instanceof Modify)

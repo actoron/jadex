@@ -14,6 +14,7 @@ import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
 import jadex.base.DefaultResultListener;
 import jadex.base.SComponentFactory;
+import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.fipa.IAMS;
 import jadex.adapter.jade.fipaimpl.AMSAgentDescription;
 import jadex.adapter.jade.fipaimpl.AgentIdentifier;
@@ -23,6 +24,7 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageService;
 import jadex.bridge.ISearchConstraints;
@@ -244,16 +246,17 @@ public class AMS implements IAMS, IService
 			AID tmp = (AID)platform.getPlatformAgent().clone();
 			int idx = tmp.getName().indexOf("@");
 			tmp.setName(name + tmp.getName().substring(idx));
-			aid = SJade.convertAIDtoFipa(tmp, (IAMS)platform.getService(IAMS.class));
+			aid = SJade.convertAIDtoFipa(tmp, (IComponentManagementService)platform.getService(IComponentManagementService.class));
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
-			listener.exceptionOccurred(e);
+			listener.exceptionOccurred(this, e);
 			return;
 		}
 		
-		ad	= new AMSAgentDescription(aid);
+//		ad	= new AMSAgentDescription(aid);
+		ad = new CMSComponentDescription(aid, type, parent, master);
 		ad.setState(IComponentDescription.STATE_INITIATED);
 		
 //		System.out.println("added: "+agentdescs.size()+", "+aid);
@@ -270,7 +273,7 @@ public class AMS implements IAMS, IService
 		}
 		
 //		System.out.println("Created agent: "+aid);
-		listener.resultAvailable(aid); 
+		listener.resultAvailable(this, aid); 
 	}
 
 	/**

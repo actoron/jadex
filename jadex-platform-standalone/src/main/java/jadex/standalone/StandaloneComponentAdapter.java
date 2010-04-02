@@ -1,5 +1,6 @@
 package jadex.standalone;
 
+import jadex.base.fipa.ComponentIdentifier;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
@@ -16,7 +17,6 @@ import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.execution.IExecutionService;
-import jadex.standalone.fipaimpl.ComponentIdentifier;
 import jadex.standalone.service.ComponentManagementService;
 
 import java.io.IOException;
