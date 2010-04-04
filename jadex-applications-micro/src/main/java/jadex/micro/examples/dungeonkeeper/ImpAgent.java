@@ -3,23 +3,16 @@ package jadex.micro.examples.dungeonkeeper;
 import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.space.envsupport.environment.ISpaceAction;
 import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.environment.space2d.action.GetPosition;
-import jadex.application.space.envsupport.environment.space2d.action.SetPosition;
 import jadex.application.space.envsupport.math.IVector2;
-import jadex.application.space.envsupport.math.Vector1Int;
 import jadex.application.space.envsupport.math.Vector2Double;
-import jadex.application.space.envsupport.math.Vector2Int;
-import jadex.commons.IFilter;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  The imp agent.
@@ -44,34 +37,30 @@ public class ImpAgent extends MicroAgent
 				IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
 				double dir = ((Number)avatar.getProperty("direction")).doubleValue();
 
-				// Turn per random chance
-				if(Math.random()>0.7)
-				{
-					dir = dir - Math.PI/2;
-					if(dir<0)
-						dir += Math.PI*2;
-				}
+				// move
+				// change direction slightly
+				double factor = 10;
+				double rotchange = Math.random()*Math.PI/factor-Math.PI/2/factor;
 				
-				IVector2 newpos;
+				double newdir = dir+rotchange;
+				if(newdir<0)
+					newdir+=Math.PI*2;
+				else if(newdir>Math.PI*2)
+					newdir-=Math.PI*2;
 				
-				int px = mypos.getXAsInteger();
-				int py = mypos.getYAsInteger();
-				if(dir==0)
-				{
-					newpos = new Vector2Int(px, py-1);
-				}
-				else if(dir==Math.PI/2)
-				{
-					newpos = new Vector2Int(px, py+1);
-				}
-				else if(dir==Math.PI)
-				{
-					newpos = new Vector2Int(px-1, py);
-				}
-				else //if(dir==Math.PI*3/2)
-				{
-					newpos = new Vector2Int(px+1, py);
-				}
+				// convert to vector
+				// normally x=cos(dir) and y=sin(dir)
+				// here 0 degree is 12 o'clock and the rotation right
+				double x = Math.sin(newdir);
+				double y = -Math.cos(newdir);
+//				double x = Math.sin(newdir);
+//				double y = Math.cos(newdir);
+				double stepwidth = 0.2;
+				IVector2 newdirvec = new Vector2Double(x*stepwidth, y*stepwidth);
+				IVector2 newpos = mypos.copy().add(newdirvec);
+				
+				// hack
+				avatar.setProperty("direction", new Double(newdir));
 				
 				Map params = new HashMap();
 				params.put(ISpaceAction.OBJECT_ID, avatar.getId());
@@ -89,6 +78,7 @@ public class ImpAgent extends MicroAgent
 						dir = dir + Math.PI/2;
 						if(dir>=Math.PI*2)
 							dir -= Math.PI*2;
+//						System.out.println("newdir: "+dir);
 						avatar.setProperty("direction", new Double(dir));
 					}
 				}));

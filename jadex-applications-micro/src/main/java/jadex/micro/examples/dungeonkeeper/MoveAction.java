@@ -8,6 +8,7 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.environment.space2d.action.GetPosition;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Int;
+import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.commons.SimplePropertyObject;
 
 import java.util.HashMap;

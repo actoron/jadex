@@ -6,6 +6,7 @@ import jadex.application.space.envsupport.environment.ISpaceProcess;
 import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.Vector1Int;
+import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
@@ -118,6 +119,7 @@ public class InitMapProcess extends SimplePropertyObject implements ISpaceProces
 	    					props.put("type", type);
 	    					props.put(Space2D.PROPERTY_POSITION, new Vector2Int(x, y));
 	    					grid.createSpaceObject("field", props, null);
+//	    					System.out.println(x+" "+y+" "+type);
 	    				}
 	    			}
 		        }
@@ -125,6 +127,7 @@ public class InitMapProcess extends SimplePropertyObject implements ISpaceProces
 		        if("CREATURES".equals(data))
 		        {
 		        	int cnt = Integer.parseInt(br.readLine().trim());
+//		        	cnt = 1;
 		        	for(int i=0; i<cnt; i++)
 		        	{
 		        		StringTokenizer stok = new StringTokenizer(br.readLine());
@@ -138,7 +141,7 @@ public class InitMapProcess extends SimplePropertyObject implements ISpaceProces
 		        			
 		        			HashMap props = new HashMap();
 		        			props.put("type", type);
-		        			props.put(Space2D.PROPERTY_POSITION, new Vector2Int(x, y));
+		        			props.put(Space2D.PROPERTY_POSITION, new Vector2Double(x, y));
 		        			// todo: level, owner
 		        			
 		        			grid.createSpaceObject(type, props, null);

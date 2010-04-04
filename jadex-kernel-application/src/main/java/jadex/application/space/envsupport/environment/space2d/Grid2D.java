@@ -212,7 +212,7 @@ public class Grid2D extends Space2D
 			}
 			
 			IVector2 newpos = adjustPosition(pos);
-			objectsygridpos.put(newpos, obj);
+			objectsygridpos.put(new Vector2Int(pos.getXAsInteger(), pos.getYAsInteger()), obj);
 //			System.out.println("add: "+newpos+" "+obj);
 			
 			super.setPosition(id, newpos);
@@ -289,6 +289,7 @@ public class Grid2D extends Space2D
 	
 			int x = position.getXAsInteger();
 			int y = position.getYAsInteger();
+			IVector2 pos = new Vector2Int(x, y);
 			
 			int range = distance.getAsInteger();
 			
@@ -298,12 +299,12 @@ public class Grid2D extends Space2D
 			int miny = y - range >= 0 || getBorderMode().equals(BORDER_TORUS) ? y - range : 0;
 			int maxy = y + range <= sizey || getBorderMode().equals(BORDER_TORUS) ? y + range : sizey;
 
-			for (int i = minx; i <= maxx; i++)
+			for(int i = minx; i <= maxx; i++)
 			{
-				for (int j = miny; j <= maxy; j++)
+				for(int j = miny; j <= maxy; j++)
 				{
 					Vector2Int testpos = new Vector2Int((i + sizex) % sizex, (j + sizey) % sizey);
-					if(!getDistance(testpos, position).greater(distance))
+					if(!getDistance(testpos, pos).greater(distance))
 					{
 						Collection tmp = objectsygridpos.getCollection(testpos);
 						if(tmp != null)
@@ -316,7 +317,7 @@ public class Grid2D extends Space2D
 							{
 								for(Iterator it=tmp.iterator(); it.hasNext(); )
 								{
-									ISpaceObject	obj	= (ISpaceObject)it.next();
+									ISpaceObject obj = (ISpaceObject)it.next();
 									if(obj.getType().equals(type))
 										ret.add(obj);
 								}
