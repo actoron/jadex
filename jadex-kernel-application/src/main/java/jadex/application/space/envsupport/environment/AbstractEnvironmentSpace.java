@@ -42,6 +42,7 @@ import java.util.Set;
  */
 public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObject implements IEnvironmentSpace, ISpace
 {
+
 	//-------- attributes --------
 	
 	/** The space name. */
@@ -89,7 +90,6 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/** Types of EnvironmentObjects and lists of EnvironmentObjects of that type (typed view). */
 	protected Map spaceobjectsbytype;
 	
-	/** Space object by owner, owner can null (owner view). */
 	protected Map spaceobjectsbyowner;
 	
 	/** Object id counter for new ids. */
@@ -272,12 +272,12 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		}
 		
 		// Create process types.
-		List processes = mspacetype.getPropertyList("processtypes");
-		if(processes!=null)
+		List processtypes = mspacetype.getPropertyList("processtypes");
+		if(processtypes!=null)
 		{
-			for(int i=0; i<processes.size(); i++)
+			for(int i=0; i<processtypes.size(); i++)
 			{
-				Map mprocess = (Map)processes.get(i);
+				Map mprocess = (Map)processtypes.get(i);
 //				ISpaceProcess process = (ISpaceProcess)((Class)MEnvSpaceInstance.getProperty(mprocess, "clazz")).newInstance();
 				List props = (List)mprocess.get("properties");
 				String name = (String)MEnvSpaceInstance.getProperty(mprocess, "name");
@@ -683,6 +683,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					}
 				}
 				
+				process.setProperty(ISpaceProcess.ID, id);
 				processes.put(id, process);
 			}
 			catch(Exception e)
@@ -929,32 +930,29 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //					String	name	= null;
 					if(mapping.getComponentName()!=null)
 					{
-						SimpleValueFetcher	fetch	= new SimpleValueFetcher();
+						SimpleValueFetcher fetch = new SimpleValueFetcher();
 						fetch.setValue("$space", this);
 						fetch.setValue("$object", ret);
-						name	= (String) mapping.getComponentName().getValue(fetch);
+						name = (String) mapping.getComponentName().getValue(fetch);
 					}
 					
-					throw new UnsupportedOperationException();
-					
-//					// todo: what about arguments etc.?
-//					((ApplicationContext)getContext()).createAgent(name, componenttype, null, null, false, false, new IResultListener() {
-//						
-//						public void resultAvailable(Object source, Object result)
-//						{
-//							IComponentIdentifier	component	= (IComponentIdentifier)result;
-//							
-//							setOwner(fid, component);
-//							
-//							((IComponentManagementService)((ApplicationContext)getContext()).getServiceContainer().getService(IComponentManagementService.class)).resumeComponent(component, null);
-////							SComponentManagementService.startComponent(((ApplicationContext)getContext()).getPlatform(), component, null);
-//						}
-//						
-//						public void exceptionOccurred(Object source, Exception exception)
-//						{
-//							exception.printStackTrace();
-//						}
-//					}, null);
+					// todo: what about arguments etc.?
+					final Object fid = id;
+					IResultListener lis = new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							IComponentIdentifier component = (IComponentIdentifier)result;
+							setOwner(fid, component);
+						}
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+						}
+					};
+					IComponentManagementService cms = (IComponentManagementService)getContext().getServiceContainer().getService(IComponentManagementService.class);
+					IComponentIdentifier cid = cms.generateComponentIdentifier(typename);
+					setOwner(fid, cid);
+					cms.createComponent(cid.getLocalName(), getContext().getComponentFilename(componenttype), null, null, false, lis, getContext().getComponentIdentifier(), null, false);
 				}
 			}
 		}
@@ -1566,8 +1564,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					for(Iterator it=avatarmappings.getCollection(componenttype).iterator(); it.hasNext(); )
 					{
 						AvatarMapping mapping = (AvatarMapping)it.next();
-						if(mapping.isCreateAvatar())
-						{
+						// Only create avatar if it has none
+						if(mapping.isCreateAvatar() && getAvatar(aid)==null)
+						{							
 							Map	props	= new HashMap();
 							props.put(ISpaceObject.PROPERTY_OWNER, aid);
 							createSpaceObject(mapping.getObjectType(), props, null);
@@ -1700,7 +1699,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/**
 	 *  Get the processes.
 	 */
-	public Collection	getProcesses()
+	public Collection getProcesses()
 	{
 		return processes.values();
 	}

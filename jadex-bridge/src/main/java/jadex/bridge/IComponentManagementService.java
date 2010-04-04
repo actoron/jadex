@@ -133,6 +133,13 @@ public interface IComponentManagementService
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses);
 	
 	/**
+	 *  Create a component identifier that is allowed on the platform.
+	 *  @param name The base name.
+	 *  @return The component identifier.
+	 */
+	public IComponentIdentifier generateComponentIdentifier(String name);
+	
+	/**
 	 * Create a component description.
 	 * @param id The component identifier.
 	 * @param state The state.

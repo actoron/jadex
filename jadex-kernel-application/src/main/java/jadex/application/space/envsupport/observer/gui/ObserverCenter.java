@@ -82,7 +82,7 @@ public class ObserverCenter
 	
 	//TODO: move to Perspective!
 	/** Area size of the space */
-	private IVector2 areasize;
+//	private IVector2 areasize;
 	
 	/** Selected object listeners */
 	protected List selectedObjectListeners;
@@ -105,7 +105,6 @@ public class ObserverCenter
 		selectedObjectListeners = Collections.synchronizedList(new ArrayList());
 		this.space = (Space2D) space;
 		this.killonexit	= killonexit;
-		areasize = ((Space2D)space).getAreaSize().copy();
 		perspectives = Collections.synchronizedMap(new HashMap());
 		externaldataviews = Collections.synchronizedMap(new HashMap());
 		final List cplugins = plugins == null? new ArrayList(): plugins;
@@ -219,7 +218,8 @@ public class ObserverCenter
 	 */
 	public IVector2 getAreaSize()
 	{
-		return areasize;
+		return ((Space2D)space).getAreaSize().copy();
+
 	}
 	
 	/**

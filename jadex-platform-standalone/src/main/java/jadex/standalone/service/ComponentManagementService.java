@@ -153,7 +153,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 			{
 				if(name==null)
 				{
-					cid = generateComponentIdentifier(lmodel.getName());
+					cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName());
 				}
 				else
 				{
@@ -855,7 +855,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  @param name The base name.
 	 *  @return The component identifier.
 	 */
-	protected ComponentIdentifier generateComponentIdentifier(String name)
+	public IComponentIdentifier generateComponentIdentifier(String name)
 	{
 		ComponentIdentifier ret = null;
 

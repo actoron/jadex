@@ -9,6 +9,8 @@ import jadex.service.clock.IClockService;
  */
 public interface ISpaceProcess extends IPropertyObject
 {
+	public static final String ID = "##_id"; 
+	
 	/**
 	 *  This method will be executed by the object before the process gets added
 	 *  to the execution queue.
