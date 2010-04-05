@@ -208,7 +208,8 @@ public class MessageService implements IMessageService, IService
 					if(aca.getName()==null)
 					{
 						AMS	ams	= (AMS)platform.getService(IComponentManagementService.class);
-						aca.setName(ams.generateAgentName(ams.getShortName(aca.getType())));
+//						aca.setName(ams.generateAgentName(ams.getShortName(aca.getType())));
+						aca.setName(ams.generateComponentIdentifier(aca.getType()).getLocalName());
 					}
 					CreateAgent	create	= new CreateAgent();
 					create.setAgentName(aca.getName());
@@ -334,7 +335,7 @@ public class MessageService implements IMessageService, IService
 		
 		// Send message over Jade.
 		AMS ams = (AMS)platform.getService(IComponentManagementService.class);
-		ams.getAgentAdapter(sender, new IResultListener()
+		ams.getComponentAdapter(sender, new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

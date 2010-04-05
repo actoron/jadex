@@ -1,4 +1,4 @@
-package jadex.standalone;
+package jadex.base;
 
 import jadex.base.DefaultResultListener;
 import jadex.bridge.IComponentIdentifier;
@@ -20,14 +20,11 @@ import java.util.logging.Logger;
 
 
 /**
- *  Abstract base class for standalone platform.
+ *  Abstract base class for platforms.
  */
 public abstract class AbstractPlatform extends PropertyServiceContainer
 {
 	//-------- constants --------
-
-	/** The configuration file. */
-	public static final String CONFIGURATION = "conf";
 
 	/** The maximum shutdown time. */
 	public static final long MAX_SHUTDOWM_TIME = 3000;

@@ -1,5 +1,6 @@
 package jadex.standalone;
 
+import jadex.base.AbstractPlatform;
 import jadex.bridge.IComponentListener;
 import jadex.commons.collection.SCollection;
 import jadex.service.IService;
@@ -21,6 +22,9 @@ public class SpringPlatform extends AbstractPlatform
 {
 	//-------- constants --------
 
+	/** The configuration file. */
+	public static final String CONFIGURATION = "conf";
+	
 	/** The fallback configuration. */
 	public static final String FALLBACK_CONFIGURATION = "jadex/standaloneone_springconf.xml";
 	

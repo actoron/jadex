@@ -1,5 +1,6 @@
 package jadex.standalone.service;
 
+import jadex.base.AbstractPlatform;
 import jadex.base.DefaultResultListener;
 import jadex.base.fipa.ComponentIdentifier;
 import jadex.base.fipa.DFComponentDescription;
@@ -16,7 +17,6 @@ import jadex.commons.collection.IndexMap;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.clock.IClockService;
-import jadex.standalone.AbstractPlatform;
 
 import java.util.ArrayList;
 import java.util.Date;

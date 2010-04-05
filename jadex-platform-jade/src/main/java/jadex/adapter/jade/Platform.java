@@ -2,201 +2,70 @@ package jadex.adapter.jade;
 
 import jade.Boot;
 import jade.core.AID;
-import jade.wrapper.AgentController;
 import jade.wrapper.PlatformController;
-import jadex.base.DefaultResultListener;
-import jadex.base.ISimulationService;
-import jadex.base.SComponentManagementService;
-import jadex.base.SComponentFactory;
-import jadex.base.SimulationService;
-import jadex.base.agr.MAGRSpaceType;
-import jadex.base.appdescriptor.ApplicationContextFactory;
-import jadex.base.appdescriptor.ApplicationFactory;
-import jadex.base.contextservice.BaseContext;
-import jadex.base.contextservice.ContextService;
-import jadex.base.contextservice.DefaultContextFactory;
-import jadex.base.contextservice.IContextFactory;
-import jadex.application.space.envsupport.MEnvSpaceType;
-import jadex.base.fipa.IAMS;
-import jadex.base.fipa.IDF;
-import jadex.base.fipa.SFipa;
-import jadex.bridge.IAgentFactory;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IApplicationContext;
-import jadex.bridge.IApplicationFactory;
-import jadex.bridge.IContext;
-import jadex.bridge.IContextService;
-import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IMessageService;
-import jadex.bridge.IPlatform;
-import jadex.bridge.MessageType;
-import jadex.commons.ICommand;
-import jadex.commons.SReflect;
-import jadex.commons.SUtil;
-import jadex.commons.concurrent.IExecutable;
-import jadex.commons.concurrent.IResultListener;
-import jadex.commons.concurrent.IThreadPool;
-import jadex.commons.concurrent.ThreadPoolFactory;
-import jadex.service.BasicServiceContainer;
-import jadex.service.IService;
-import jadex.service.clock.ClockService;
-import jadex.service.clock.IClockService;
-import jadex.service.clock.SystemClock;
-import jadex.service.execution.IExecutionService;
-import jadex.service.library.ILibraryService;
-import jadex.service.library.LibraryService;
-import jadex.service.threadpool.ThreadPoolService;
-
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
-
+import jadex.commons.Properties;
+import jadex.service.IServiceContainer;
 
 /**
- *  Built-in standalone agent platform, with onyl basic features.
+ *  Built-in JADE platform.
  */
-public class Platform extends BasicServiceContainer implements IPlatform
+public class Platform extends jadex.base.Platform
 {
-	/** The services. */
-//	protected Map services;
-	
-	/** The threadpool. */
-	protected IThreadPool threadpool;
-	
-	/** The agent factory. */
-//	protected IAgentFactory agentfactory;
-	
-	/** The application factory. */
-	protected IApplicationFactory appfactory;
-	
-	/** The logger. */
-	protected Logger logger;
+	//-------- constants --------
+
+	/** The fallback configuration for basic services. */
+	public static final String FALLBACK_SERVICES_CONFIGURATION = "jadex/adapter/jade/services_conf.xml";
+
+	/** The fallback configuration for standard components (cms/df/jcc). */
+	public static final String FALLBACK_STANDARDCOMPONENTS_CONFIGURATION = "jadex/adapter/jade/platformcomponents_conf.xml";
+
+	//-------- attributes --------
 	
 	/** The platform agent. */
 	protected AID platformagent;
 	
-	/** The platform agent controller. */
-	protected AgentController pacontroller;
-	
+	//-------- constructors --------
+
+	/**
+	 *  Create a new Platform.
+	 */
+	public Platform(String conffile, ClassLoader classloader) throws Exception
+	{
+		this(new String[]{conffile}, classloader);
+	}
 	
 	/**
 	 *  Create a new Platform.
 	 */
-	public Platform()
+	public Platform(String[] conffiles, ClassLoader classloader) throws Exception
 	{
-		// Hack!!!
-		platform = this;
-		
-		this.threadpool = ThreadPoolFactory.createThreadPool();
-		this.logger = Logger.getLogger("JADE_Platform");
-		this.services = new LinkedHashMap();
-		this.appfactory = new ApplicationFactory(this,
-			new Set[]
-  			{
-  				MAGRSpaceType.getXMLMapping(),
-  				MEnvSpaceType.getXMLMapping()
-  			}
-//			, 
-//  			new Set[]
-//  			{
-//  				MEnvSpaceType.getXMLLinkInfos()
-//  			}
-		);
-		
-		services.put(ILibraryService.class, new LibraryService());
-		services.put(ThreadPoolService.class, new ThreadPoolService(threadpool));
-		services.put(IAMS.class, new AMS(this));
-		services.put(IDF.class, new DF(this));
-		services.put(IClockService.class, new ClockService(new SystemClock("system", 1000, threadpool)));
-		services.put(ISimulationService.class, new SimulationService(this));
-		services.put(IMessageService.class, new MessageService(this));
-		services.put(IContextService.class, new ContextService(
-			new Class[]
-			{
-				IContext.class,
-				BaseContext.class,
-				IApplicationContext.class
-			},
-			new IContextFactory[]
-			{
-				new DefaultContextFactory(),
-				new DefaultContextFactory(),
-				new ApplicationContextFactory(this)
-			}
-		));
-		// Dummy execution service required for simulation service.
-		services.put(IExecutionService.class, new IExecutionService()
-		{
-			public void addIdleCommand(ICommand command)
-			{
-				// nop
-			}
-			
-			public void removeIdleCommand(ICommand command)
-			{
-				// nop
-			}
-			
-			public boolean isIdle()
-			{
-				return true; // Hack!!!
-			}
-			
-			public void cancel(IExecutable task, IResultListener listener)
-			{
-				throw new UnsupportedOperationException(); 
-			}
-			
-			public void execute(final IExecutable task)
-			{
-				// Hack!!! Required for environment executors.
-				threadpool.execute(new Runnable()
-				{
-					public void run()
-					{
-						while(task.execute());
-					}
-				});
-			}
-			
-			public void shutdown(IResultListener listener)
-			{
-				// nop
-				if(listener!=null)
-					listener.resultAvailable(null);
-			}
-			
-			public void startService()
-			{
-				// nop
-			}
-			
-			public void stop(IResultListener listener)
-			{
-				// nop
-				if(listener!=null)
-					listener.resultAvailable(null);
-			}
-		});
+		this(readProperties(conffiles, classloader));
+	}
+	
+	/**
+	 *  Create a new Platform.
+	 */
+	public Platform(Properties[] configurations)
+	{
+		this(configurations, null);
+	}
+	
+	/**
+	 *  Create a new Platform.
+	 */
+	public Platform(Properties[] configurations, IServiceContainer parent)
+	{
+		super(configurations, parent);
 	}
 
-	//-------- IPlatform methods --------
-
+	//-------- methods --------
+	
 	/**
 	 *  Start the platform.
 	 */
-	public void startService()
+	public void start()
 	{
-		for(Iterator it=services.keySet().iterator(); it.hasNext(); )
-		{
-			IService service = (IService)services.get(it.next());
-			service.startService();
-		}
+		super.start();
 		
 		// Start Jade platform with platform agent
 		// This agent make accessible the platform controller
@@ -213,137 +82,57 @@ public class Platform extends BasicServiceContainer implements IPlatform
 			{
 			}
 		}
+	}
+	
+	/**
+	 *  Keep platform from being garbage collected, when created using main().
+	 *  Useful for debugging, profiling etc.
+	 */
+	private static Platform	platform;
+	
+	/**
+	 *  Main for starting the platform (with meaningful fallbacks)
+	 *  @param args The arguments.
+	 *  @throws Exception
+	 */
+	public static void main(String[] args) throws Exception
+	{
+		// Absolute start time (for testing and benchmarking).
+		long starttime = System.currentTimeMillis();
 		
-		SComponentManagementService.createComponent(this, "jcc", "jadex/tools/jcc/JCC.agent.xml", 
-			null, null, new DefaultResultListener(getLogger())
+		// Initialize platform configuration from args.
+		String[] conffiles;
+		if(args.length>0 && args[0].equals("-"+CONFIGURATION))
 		{
-			public void resultAvailable(Object result)
-			{
-				SComponentManagementService.startComponent(platform, result, null);
-			}
-		}, null);
-		
-//		ams.createAgent("jcc", "jadex/tools/jcc/JCC.agent.xml", null, null, new DefaultResultListener(getLogger())
-//		{
-//			public void resultAvailable(Object result)
-//			{
-//				ams.startAgent((IComponentIdentifier)result, null);
-//			}
-//		}, null);
-	}
-	
-	/**
-	 *  Get the name of the platform
-	 *  @return The name of this platform.
-	 */
-	public String getName()
-	{
-		return platformagent.getHap();
-	}
-	
-	/**
-	 *  Get a platform service.
-	 *  @param type The class.
-	 *  @return The corresponding platform services.
-	 * /
-	public Collection getServices(Class type)
-	{
-	}*/
-	
-	/**
-	 *  Get a platform service.
-	 *  @param name The name.
-	 *  @return The corresponding platform service.
-	 */
-	public Object getService(Class type, String name)
-	{
-		// Hack!
-		return services.get(type);
-	}
-	
-	/**
-	 *  Get a platform service.
-	 *  @param type The service interface/type.
-	 *  @return The corresponding platform service.
-	 */
-	public Object getService(Class type)
-	{
-		return services.get(type);
-	}
-		
-	/**
-	 *  Get the agent factory.
-	 *  @return The agent factory.
-	 * /
-	// Todo: remove from external platform interface
-	public IAgentFactory getAgentFactory()
-	{
-		if(agentfactory==null)
+			conffiles = new String[args.length-1];
+			System.arraycopy(args, 1, conffiles, 0, args.length-1);
+		}
+		else if(args.length>0)
 		{
-			List facs = new ArrayList();
-		
-			ILibraryService ls = (ILibraryService)getService(ILibraryService.class); 
-			try
+			conffiles = args;
+		}
+		else
+		{
+			conffiles = new String[]
 			{
-				Class bdifac = SReflect.findClass("jadex.bdi.interpreter.BDIAgentFactory", 
-					null, ls.getClassLoader());
-				Constructor con = bdifac.getConstructor(new Class[]{Map.class, IPlatform.class});
-				Class execl = SReflect.findClass("jadex.bdi.runtime.JavaStandardPlanExecutor", 
-					null, ls.getClassLoader());
-				Constructor execon = execl.getConstructor(new Class[]{IThreadPool.class});
-				Object exe = execon.newInstance(new Object[]{threadpool});
-				Map args = SUtil.createHashMap(
-					new String[]
-					{
-						"messagetype_fipa", 
-						"planexecutor_standard", 
-						"standard.timeout", 
-						"tooladapter.introspector",
-						"microplansteps"
-					},
-					new Object[]
-					{
-						new jadex.base.fipa.FIPAMessageType(), 
-						exe,
-						new java.lang.Long(10000),
-						SReflect.findClass("jadex.tools.introspector.IntrospectorAdapter", null, ls.getClassLoader()),
-						Boolean.TRUE
-					}
-				);
-				
-				IAgentFactory af = (IAgentFactory)con.newInstance(new Object[]{args, this});
-				facs.add(af);
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		
-			agentfactory = new MetaAgentFactory(facs);
+				FALLBACK_SERVICES_CONFIGURATION,
+				FALLBACK_STANDARDCOMPONENTS_CONFIGURATION,
+				FALLBACK_APPLICATION_CONFIGURATION,
+				FALLBACK_BDI_CONFIGURATION,
+				FALLBACK_MICRO_CONFIGURATION,
+				FALLBACK_BPMN_CONFIGURATION,
+				FALLBACK_BDIBPMN_CONFIGURATION
+			};
 		}
 		
-		return agentfactory;
-	}*/
-
-	/**
-	 *  Get the agent factory.
-	 *  @return The agent factory.
-	 * /
-	// Todo: remove from external platform interface
-	public IApplicationFactory getApplicationFactory()
-	{
-		return appfactory;
-	}*/
-	
-	/**
-	 *  Get the message type.
-	 *  @param type The type name.
-	 *  @return The message type.
-	 */
-	// Todo: move to message service?
-	public MessageType getMessageType(String type)
-	{
-		return SFipa.FIPA_MESSAGE_TYPE.getName().equals(type)? SFipa.FIPA_MESSAGE_TYPE: null;
+		// Create an instance of the platform.
+		// Hack as long as no loader is present.
+		ClassLoader cl = Platform.class.getClassLoader();
+		platform = new Platform(conffiles, cl);
+		platform.start();
+		
+		long startup = System.currentTimeMillis() - starttime;
+		platform.logger.info("Platform startup time: " + startup + " ms.");
 	}
 	
 	//-------- Static part --------
@@ -351,12 +140,6 @@ public class Platform extends BasicServiceContainer implements IPlatform
 	/** The container controller. */
 	protected PlatformController controller;
 	
-	/**
-	 *  Keep platform from being garbage collected, when created using main().
-	 *  Useful for debugging, profiling etc.
-	 */
-	private static Platform	platform;
-
 	/**
 	 *  Get the container.
 	 *  @return The container.
@@ -413,15 +196,6 @@ public class Platform extends BasicServiceContainer implements IPlatform
 	}*/
 
 	/**
-	 *  Get the logger.
-	 *  @return The logger.
-	 */
-	public Logger getLogger()
-	{
-		return this.logger;
-	}
-
-	/**
 	 *  Get platform.
 	 *  @param name The name.
 	 *  @return The platform
@@ -435,47 +209,12 @@ public class Platform extends BasicServiceContainer implements IPlatform
 	/**
 	 *  Set the platform.
 	 *  @param platform The platform.
-	 */
+	 * /
 	public static void setPlatform(Platform platform)
 	{
 		Platform.platform = platform;
-	}
-	
-	/**
-	 *  Start a platform with the agents specified
-	 *  by the arguments in the form "name:model" or just "model".
-	 */
-	public static void main(String[] args) throws Exception
-	{
-		// Absolute start time (for testing and benchmarking).
-		long starttime = System.currentTimeMillis();
-		
-		platform = new Platform();
-		platform.startService();
-		
-		long startup = System.currentTimeMillis() - starttime;
-		platform.logger.info("Platform startup time: " + startup + " ms.");
-				
-		Thread	gc	= new Thread(new Runnable()
-		{
-			public void run()
-			{
-				while(true)
-				{
-					try
-					{
-						Thread.sleep(1100);
-						System.gc();
-						Thread.sleep(1100);
-						System.runFinalization();
-					}
-					catch(Exception e){}
-				}
-			}
-		});
-		gc.setDaemon(true);
-		gc.start();
-	}
+	}*/
 }
+
 
 

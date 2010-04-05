@@ -15,16 +15,15 @@ import jade.lang.acl.MessageTemplate;
 import jade.util.Event;
 import jade.wrapper.AgentController;
 import jadex.base.DefaultResultListener;
-import jadex.base.fipa.IAMS;
+import jadex.base.fipa.DFComponentDescription;
+import jadex.base.fipa.DFServiceDescription;
 import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.IDFServiceDescription;
 import jadex.base.fipa.IProperty;
-import jadex.adapter.jade.fipaimpl.AgentIdentifier;
-import jadex.adapter.jade.fipaimpl.DFAgentDescription;
-import jadex.adapter.jade.fipaimpl.DFServiceDescription;
-import jadex.adapter.jade.fipaimpl.SearchConstraints;
+import jadex.base.fipa.SearchConstraints;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
@@ -91,18 +90,18 @@ public class DF implements IDF, IService
 							{
 								Done done = (Done)myAgent.getContentManager().extractContent(reply);
 								Register reg = (Register)((Action)done.getAction()).getAction();
-								listener.resultAvailable(SJade.convertAgentDescriptiontoFipa(
+								listener.resultAvailable(this, SJade.convertAgentDescriptiontoFipa(
 									(jade.domain.FIPAAgentManagement.DFAgentDescription)reg.getDescription(), 
-									(IAMS)platform.getService(IAMS.class)));
+									(IComponentManagementService)platform.getService(IComponentManagementService.class)));
 							}
 							catch(Exception e)
 							{
-								listener.exceptionOccurred(e);
+								listener.exceptionOccurred(this, e);
 							}
 						}
 						else
 						{
-							listener.exceptionOccurred(new RuntimeException("Register failed."));
+							listener.exceptionOccurred(this, new RuntimeException("Register failed."));
 						}
 						done = true;
 					}
@@ -151,7 +150,7 @@ public class DF implements IDF, IService
 		}
 		catch(Exception ex)
 		{
-			listener.exceptionOccurred(ex);
+			listener.exceptionOccurred(this, ex);
 		}
 	}
 
@@ -184,16 +183,16 @@ public class DF implements IDF, IService
 						{
 							try
 							{
-								listener.resultAvailable(null);
+								listener.resultAvailable(this, null);
 							}
 							catch(Exception e)
 							{
-								listener.exceptionOccurred(e);
+								listener.exceptionOccurred(this, e);
 							}
 						}
 						else
 						{
-							listener.exceptionOccurred(new RuntimeException("Deregister failed."));
+							listener.exceptionOccurred(this, new RuntimeException("Deregister failed."));
 						}
 						done = true;
 					}
@@ -242,7 +241,7 @@ public class DF implements IDF, IService
 		}
 		catch(Exception ex)
 		{
-			listener.exceptionOccurred(ex);
+			listener.exceptionOccurred(this, ex);
 		}
 	}
 
@@ -277,18 +276,18 @@ public class DF implements IDF, IService
 							{
 								Done done = (Done)myAgent.getContentManager().extractContent(reply);
 								Modify mod = (Modify)((Action)done.getAction()).getAction();
-								listener.resultAvailable(SJade.convertAgentDescriptiontoFipa(
+								listener.resultAvailable(this, SJade.convertAgentDescriptiontoFipa(
 									(jade.domain.FIPAAgentManagement.DFAgentDescription)mod.getDescription(), 
-									(IAMS)platform.getService(IAMS.class)));
+									(IComponentManagementService)platform.getService(IComponentManagementService.class)));
 							}
 							catch(Exception e)
 							{
-								listener.exceptionOccurred(e);
+								listener.exceptionOccurred(this, e);
 							}
 						}
 						else
 						{
-							listener.exceptionOccurred(new RuntimeException("Modify failed."));
+							listener.exceptionOccurred(this, new RuntimeException("Modify failed."));
 						}
 						done = true;
 					}
@@ -337,7 +336,7 @@ public class DF implements IDF, IService
 		}
 		catch(Exception ex)
 		{
-			listener.exceptionOccurred(ex);
+			listener.exceptionOccurred(this, ex);
 		}
 	}
 
@@ -373,22 +372,22 @@ public class DF implements IDF, IService
 								Result res = (Result)myAgent.getContentManager().extractContent(reply);
 								jade.util.leap.List descs = res.getItems();
 								IDFComponentDescription[] ret = new IDFComponentDescription[descs.size()];
-								IAMS ams = (IAMS)platform.getService(IAMS.class);
+								IComponentManagementService ams = (IComponentManagementService)platform.getService(IComponentManagementService.class);
 								for(int i=0; i<ret.length; i++)
 								{
 									ret[i] = SJade.convertAgentDescriptiontoFipa(
 										(jade.domain.FIPAAgentManagement.DFAgentDescription)descs.get(i), ams);
 								}
-								listener.resultAvailable(ret);
+								listener.resultAvailable(this, ret);
 							}
 							catch(Exception e)
 							{
-								listener.exceptionOccurred(e);
+								listener.exceptionOccurred(this, e);
 							}
 						}
 						else
 						{
-							listener.exceptionOccurred(new RuntimeException("Search failed."));
+							listener.exceptionOccurred(this, new RuntimeException("Search failed."));
 						}
 						done = true;
 					}
@@ -439,7 +438,7 @@ public class DF implements IDF, IService
 		}
 		catch(Exception ex)
 		{
-			listener.exceptionOccurred(ex);
+			listener.exceptionOccurred(this, ex);
 		}
 	}
 
@@ -489,7 +488,7 @@ public class DF implements IDF, IService
 	 */
 	public IDFComponentDescription createDFComponentDescription(IComponentIdentifier agent, IDFServiceDescription service)
 	{
-		DFAgentDescription	ret	= new DFAgentDescription();
+		DFComponentDescription	ret	= new DFComponentDescription();
 		ret.setName(agent);
 		if(service!=null)
 			ret.addService(service);
@@ -508,7 +507,7 @@ public class DF implements IDF, IService
 	public IDFComponentDescription	createDFComponentDescription(IComponentIdentifier agent, IDFServiceDescription[] services,
 		String[] languages, String[] ontologies, String[] protocols, Date leasetime)
 	{
-		DFAgentDescription	ret	= new DFAgentDescription();
+		DFComponentDescription ret = new DFComponentDescription();
 		ret.setName(agent);
 		ret.setLeaseTime(leasetime);
 		for(int i=0; services!=null && i<services.length; i++)
@@ -530,7 +529,7 @@ public class DF implements IDF, IService
 	 */
 	public ISearchConstraints createSearchConstraints(int maxresults, int maxdepth)
 	{
-		SearchConstraints	ret	= new SearchConstraints();
+		SearchConstraints ret	= new SearchConstraints();
 		ret.setMaxResults(maxresults);
 		ret.setMaxDepth(maxdepth);
 		return ret;
@@ -544,9 +543,12 @@ public class DF implements IDF, IService
 	 */
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
 	{
-		if(local)
-			name = name + "@" + platform.getName();
-		return new AgentIdentifier(name);
+		IComponentManagementService cms = (IComponentManagementService)platform.getService(IComponentManagementService.class);
+		return cms.createComponentIdentifier(name, local, null);
+		
+//		if(local)
+//			name = name + "@" + platform.getName();
+//		return new AgentIdentifier(name);
 	}
 	
 	/**
@@ -557,9 +559,12 @@ public class DF implements IDF, IService
 	 */
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
-		if(local)
-			name = name + "@" + platform.getName();
-		return new AgentIdentifier(name, addresses, null);
+		IComponentManagementService cms = (IComponentManagementService)platform.getService(IComponentManagementService.class);
+		return cms.createComponentIdentifier(name, local, addresses);
+
+//		if(local)
+//			name = name + "@" + platform.getName();
+//		return new AgentIdentifier(name, addresses, null);
 	}
 
 	//-------- IPlatformService interface methods --------
@@ -581,7 +586,7 @@ public class DF implements IDF, IService
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
-		listener.resultAvailable(null);
+		listener.resultAvailable(this, null);
 	}
 
 	//-------- helper methods --------

@@ -26,21 +26,15 @@
 			</property>
 						
 			<property type="jadex.bridge.IComponentManagementService" name="cms_service">
-				new jadex.standalone.service.ComponentManagementService($platform)
+				new jadex.adapter.jade.AMS($platform)
 			</property> 			
 						
 			<property type="jadex.base.fipa.IDF" name="df_service">
-				new jadex.standalone.service.DirectoryFacilitatorService($platform)
+				new jadex.adapter.jade.DF($platform)
 			</property>
 			
-			  <property type="jadex.bridge.IMessageService" name="message_service">
-			  	new jadex.standalone.service.MessageService($platform,
-                new jadex.standalone.transport.ITransport[]
-                {
-                    new jadex.standalone.transport.localmtp.LocalTransport($platform),
-                    new jadex.standalone.transport.tcpmtp.TCPTransport($platform, 9876),
-                    new jadex.standalone.transport.niotcpmtp.NIOTCPTransport($platform, 8765)
-                },
+			<property type="jadex.bridge.IMessageService" name="message_service">
+			  	new jadex.adapter.jade.MessageService($platform,
                 new jadex.bridge.MessageType[]
                 {
                     new jadex.base.fipa.FIPAMessageType()

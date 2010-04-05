@@ -13,8 +13,10 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
+import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
@@ -24,13 +26,22 @@ import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 import jadex.service.library.ILibraryService;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  *  Agent adapter for built-in standalone platform. 
@@ -46,16 +57,26 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	protected transient Platform	platform;
 
 	/** The agent identifier. */
-//	protected IComponentIdentifier	aid;
+	protected IComponentIdentifier	cid;
 
 	/** The kernel agent. */
 	protected IComponentInstance	agent;
+	
+	/** The component model. */
+	protected ILoadableComponentModel model;
+	
+	/** The description holding the execution state of the component
+	 *  (read only! managed by component execution service). */
+	protected IComponentDescription	desc;
 
 	/** The state of the agent (according to FIPA, managed by AMS). */
 	protected String	state;
 	
 	/** Flag to indicate a fatal error (agent termination will not be passed to kernel) */
 	protected boolean	fatalerror;
+	
+	/** The component logger. */
+	protected Logger logger;
 	
 	//-------- attributes --------
 
@@ -70,6 +91,28 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 
 	/** The agent thread (hack!!!). */
 	protected transient	Thread	agentthread;
+	
+	// todo: ensure that entries are empty when saving
+	/** The entries added from external threads. */
+	protected List	ext_entries;
+
+	/** The flag if external entries are forbidden. */
+	protected boolean ext_forbidden;
+	
+	//-------- steppable attributes --------
+	
+	/** The flag for a scheduled step (true when a step is allowed in stepwise execution). */
+	protected boolean	dostep;
+	
+	/** The listener to be informed, when the requested step is finished. */
+	protected IResultListener	steplistener;
+	
+	/** The selected breakpoints (component will change to step mode, when a breakpoint is reached). */
+	protected Set	breakpoints;
+	
+	/** The breakpoint commands (executed, when a breakpoint triggers). */
+	protected ICommand[]	breakpointcommands;
+
 
 	//-------- constructors --------
 
@@ -108,10 +151,11 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 //		this.platform = (IPlatform)args[0];
 		this.platform = Platform.getPlatform();
 		AMS ams = (AMS)platform.getService(IComponentManagementService.class);
-		ams.getAgentAdapterMap().put(getComponentIdentifier(), this);
+//		ams.getAgentAdapterMap().put(getComponentIdentifier(), this);
+		ams.adapters.put(getComponentIdentifier(), this);
 		
 		// Initialize the agent from model.
-		if(args[0] instanceof String)
+		/*if(args[0] instanceof String)
 		{
 			// Parse the arguments.
 			Map argsmap = SCollection.createHashMap();
@@ -160,7 +204,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 			throw new RuntimeException("todo?");
 //			this.agent = JadexAgentFactory.createJadexAgent(getName(), getLocalName(),
 //				(IMBDIAgent)args[0], (String)args[1], params, this, "jadex.adapter.jade.jade_adapter");
-		}
+		}*/
 
 //		// Initialize Jade specific properties.
 //		String mmax = Configuration.getConfiguration().getProperty(MESSAGE_QUEUE_MAX);
@@ -182,6 +226,21 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 
 //		this.clock	= new JadeAgentClock("JADE clock for agent "+getLocalName());
 
+	
+
+		//try{Thread.sleep(20000);}catch(Exception e){}
+//		System.out.println("Agent is starting: "+this.getName());
+	}
+
+	/**
+	 *  Set the component.
+	 *  @param component The component to set.
+	 */
+	public void setComponent(IComponentInstance component, ILoadableComponentModel model)
+	{
+		this.agent = component;
+		this.model = model;
+		
 		// Start the required jade behaviours.
 		// Hack!!! Add action execution behaviour first,
 		// because it has to execute agent init action before other behaviours.
@@ -192,11 +251,8 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		this.mesrec	= new MessageReceiverBehaviour(platform, agent, 
 			(IComponentManagementService)platform.getService(IComponentManagementService.class));
 		addBehaviour(mesrec);
-
-		//try{Thread.sleep(20000);}catch(Exception e){}
-//		System.out.println("Agent is starting: "+this.getName());
-	}
-
+	}	
+	
 	//-------- IAgentAdapter methods --------
 	
 	/**
@@ -352,8 +408,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	 */
 	public void killComponent()
 	{
-		SComponentManagementService.destroyComponent(platform, getComponentIdentifier(), null);
-//		((IAMS)platform.getService(IAMS.class)).destroyAgent(getAgentIdentifier(), null);
+		((IComponentManagementService)platform.getService(IComponentManagementService.class)).destroyComponent(getComponentIdentifier(), null);
 	}
 
 	/**
@@ -1046,6 +1101,162 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		// set message id for the tracer
 		message.addUserDefinedParameter("message-id", agent.getLocalName()+":"+msgevent.getName());
    	}*/
+	
+	/**
+	 *  Check if the external thread is accessing.
+	 *  @return True, if called from an external (i.e. non-synchronized) thread.
+	 */
+	public boolean isExternalThread()
+	{
+		return Thread.currentThread()!=agentthread;
+	}
+	
+	//-------- external access --------
+	
+	/**
+	 *  Execute an action on the component thread.
+	 *  May be safely called from any (internal or external) thread.
+	 *  The contract of this method is as follows:
+	 *  The component adapter ensures the execution of the external action, otherwise
+	 *  the method will throw a terminated exception.
+	 *  @param action The action to be executed on the component thread.
+	 */
+	public void invokeLater(Runnable action)
+	{
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
+			throw new ComponentTerminatedException(cid.getName());
+
+		synchronized(ext_entries)
+		{
+			if(ext_forbidden)
+				throw new ComponentTerminatedException("External actions cannot be accepted " +
+					"due to terminated component state: "+this);
+			{
+				ext_entries.add(action);
+			}
+		}
+		wakeup();
+	}
+	
+	//-------- test methods --------
+	
+	/**
+	 *  Make kernel component available.
+	 */
+	public IComponentInstance	getComponentInstance()
+	{
+		return agent;
+	}
+
+	//-------- step handling --------
+	
+	/**
+	 *  Set the step mode.
+	 */
+	public void	doStep(IResultListener listener)
+	{
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
+			throw new ComponentTerminatedException(cid.getName());
+
+		if(dostep)
+			listener.exceptionOccurred(this, new RuntimeException("Only one step allowed at a time."));
+			
+		this.dostep	= true;		
+		this.steplistener	= listener;
+	}
+	
+	
+	/**
+	 *  Get the logger.
+	 *  @return The logger.
+	 */
+	public Logger getLogger()
+	{
+		// todo: problem: loggers can cause memory leaks
+		// http://bugs.sun.com/view_bug.do;jsessionid=bbdb212815ddc52fcd1384b468b?bug_id=4811930
+		
+		// Todo: include parent name for nested loggers.
+		String name = getComponentIdentifier().getLocalName();
+		logger = LogManager.getLogManager().getLogger(name);
+		
+		// if logger does not already exists, create it
+		if(logger==null)
+		{
+			// Hack!!! Might throw exception in applet / webstart.
+			try
+			{
+				logger = Logger.getLogger(name);
+				initLogger(logger);
+				//System.out.println(logger.getParent().getLevel());
+			}
+			catch(SecurityException e)
+			{
+				// Hack!!! For applets / webstart use anonymous logger.
+				logger = Logger.getAnonymousLogger();
+				initLogger(logger);
+			}
+		}
+		
+		return logger;
+	}
+	
+	/**
+	 *  Init the logger with capability settings.
+	 *  @param logger The logger.
+	 */
+	protected void initLogger(Logger logger)
+	{
+		// get logging properties (from ADF)
+		// the level of the logger
+		// can be Integer or Level
+		
+		Object prop = model.getProperties().get("logging.level");
+		Level level = prop==null? Level.SEVERE: (Level)prop;
+		logger.setLevel(level);
+
+		// if logger should use Handlers of parent (global) logger
+		// the global logger has a ConsoleHandler(Level:INFO) by default
+		prop = model.getProperties().get("logging.useParentHandlers");
+		if(prop!=null)
+		{
+			logger.setUseParentHandlers(((Boolean)prop).booleanValue());
+		}
+			
+		// add a ConsoleHandler to the logger to print out
+        // logs to the console. Set Level to given property value
+		prop = model.getProperties().get("addConsoleHandler");
+		if(prop!=null)
+		{
+            ConsoleHandler console = new ConsoleHandler();
+            console.setLevel(Level.parse(prop.toString()));
+            logger.addHandler(console);
+        }
+		
+		// Code adapted from code by Ed Komp: http://sourceforge.net/forum/message.php?msg_id=6442905
+		// if logger should add a filehandler to capture log data in a file. 
+		// The user specifies the directory to contain the log file.
+		// $scope.getAgentName() can be used to have agent-specific log files 
+		//
+		// The directory name can use special patterns defined in the
+		// class, java.util.logging.FileHandler, 
+		// such as "%h" for the user's home directory.
+		// 
+		String logfile =	(String)model.getProperties().get("logging.file");
+		if(logfile!=null)
+		{
+		    try
+		    {
+			    Handler fh	= new FileHandler(logfile);
+		    	fh.setFormatter(new SimpleFormatter());
+		    	logger.addHandler(fh);
+		    }
+		    catch (IOException e)
+		    {
+		    	System.err.println("I/O Error attempting to create logfile: "
+		    		+ logfile + "\n" + e.getMessage());
+		    }
+		}
+	}
 }
 
 

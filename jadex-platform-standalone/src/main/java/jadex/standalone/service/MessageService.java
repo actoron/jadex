@@ -1,5 +1,6 @@
 package jadex.standalone.service;
 
+import jadex.base.AbstractPlatform;
 import jadex.base.DefaultResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
@@ -20,7 +21,6 @@ import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.clock.IClockService;
 import jadex.service.execution.IExecutionService;
-import jadex.standalone.AbstractPlatform;
 import jadex.standalone.StandaloneComponentAdapter;
 import jadex.standalone.transport.ITransport;
 

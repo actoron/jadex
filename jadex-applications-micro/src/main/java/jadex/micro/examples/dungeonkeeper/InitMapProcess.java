@@ -127,7 +127,7 @@ public class InitMapProcess extends SimplePropertyObject implements ISpaceProces
 		        if("CREATURES".equals(data))
 		        {
 		        	int cnt = Integer.parseInt(br.readLine().trim());
-//		        	cnt = 1;
+		        	cnt = 1;
 		        	for(int i=0; i<cnt; i++)
 		        	{
 		        		StringTokenizer stok = new StringTokenizer(br.readLine());

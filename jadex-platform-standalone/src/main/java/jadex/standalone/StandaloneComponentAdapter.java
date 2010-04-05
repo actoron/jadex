@@ -57,7 +57,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	protected ILoadableComponentModel model;
 
 	/** The description holding the execution state of the component
-	 *  (read only! managed by component execution service). */
+	   (read only! managed by component execution service). */
 	protected IComponentDescription	desc;
 	
 	/** The component logger. */
