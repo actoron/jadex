@@ -64,9 +64,7 @@ public class Platform extends jadex.base.Platform
 	 *  Start the platform.
 	 */
 	public void start()
-	{
-		super.start();
-		
+	{		
 		// Start Jade platform with platform agent
 		// This agent make accessible the platform controller
 		new Boot(new String[]{"-gui", "platform:jadex.adapter.jade.PlatformAgent"});
@@ -82,6 +80,8 @@ public class Platform extends jadex.base.Platform
 			{
 			}
 		}
+		
+		super.start();
 	}
 	
 	/**
