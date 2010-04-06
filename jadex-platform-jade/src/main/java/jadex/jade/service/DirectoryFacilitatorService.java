@@ -1,4 +1,4 @@
-package jadex.adapter.jade;
+package jadex.jade.service;
 
 import jade.content.onto.basic.Action;
 import jade.content.onto.basic.Done;
@@ -27,6 +27,8 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
+import jadex.jade.Platform;
+import jadex.jade.SJade;
 import jadex.service.IService;
 
 import java.util.Date;
@@ -36,7 +38,7 @@ import java.util.Set;
 /**
  *  Directory facilitator implementation for standalone platform.
  */
-public class DF implements IDF, IService
+public class DirectoryFacilitatorService implements IDF, IService
 {
 	//-------- attributes --------
 
@@ -51,7 +53,7 @@ public class DF implements IDF, IService
 	/**
 	 *  Create a standalone df.
 	 */
-	public DF(Platform platform)
+	public DirectoryFacilitatorService(Platform platform)
 	{
 		this.platform = platform;
 		//this.logger = Logger.getLogger("DF" + this);

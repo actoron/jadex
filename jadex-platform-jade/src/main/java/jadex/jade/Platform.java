@@ -1,4 +1,4 @@
-package jadex.adapter.jade;
+package jadex.jade;
 
 import jade.Boot;
 import jade.core.AID;
@@ -14,10 +14,10 @@ public class Platform extends jadex.base.Platform
 	//-------- constants --------
 
 	/** The fallback configuration for basic services. */
-	public static final String FALLBACK_SERVICES_CONFIGURATION = "jadex/adapter/jade/services_conf.xml";
+	public static final String FALLBACK_SERVICES_CONFIGURATION = "jadex/jade/services_conf.xml";
 
 	/** The fallback configuration for standard components (cms/df/jcc). */
-	public static final String FALLBACK_STANDARDCOMPONENTS_CONFIGURATION = "jadex/adapter/jade/platformcomponents_conf.xml";
+	public static final String FALLBACK_STANDARDCOMPONENTS_CONFIGURATION = "jadex/jade/platformcomponents_conf.xml";
 
 	//-------- attributes --------
 	
@@ -67,7 +67,7 @@ public class Platform extends jadex.base.Platform
 	{		
 		// Start Jade platform with platform agent
 		// This agent make accessible the platform controller
-		new Boot(new String[]{"-gui", "platform:jadex.adapter.jade.PlatformAgent"});
+		new Boot(new String[]{"-gui", "platform:jadex.jade.PlatformAgent"});
 		// Hack! Busy waiting for platform agent init finished.
 		while(platformagent==null)
 		{

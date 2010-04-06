@@ -26,15 +26,15 @@
 			</property>
 						
 			<property type="jadex.bridge.IComponentManagementService" name="cms_service">
-				new jadex.adapter.jade.AMS($platform)
+				new jadex.jade.service.ComponentManagementService($platform)
 			</property> 			
 						
 			<property type="jadex.base.fipa.IDF" name="df_service">
-				new jadex.adapter.jade.DF($platform)
+				new jadex.jade.service.DirectoryFacilitatorService($platform)
 			</property>
 			
 			<property type="jadex.bridge.IMessageService" name="message_service">
-			  	new jadex.adapter.jade.MessageService($platform,
+			  	new jadex.jade.service.MessageService($platform,
                 new jadex.bridge.MessageType[]
                 {
                     new jadex.base.fipa.FIPAMessageType()

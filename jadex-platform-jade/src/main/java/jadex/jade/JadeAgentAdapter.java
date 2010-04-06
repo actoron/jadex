@@ -1,4 +1,4 @@
-package jadex.adapter.jade;
+package jadex.jade;
 
 import jade.content.ContentElement;
 import jade.core.Agent;
@@ -19,6 +19,7 @@ import jadex.bridge.MessageType;
 import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
+import jadex.jade.service.ComponentManagementService;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 
@@ -162,9 +163,8 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		System.arraycopy(args, 2, args2, 0, args2.length);
 				
 		this.platform = Platform.getPlatform();
-		AMS ams = (AMS)platform.getService(IComponentManagementService.class);
-//		ams.getAgentAdapterMap().put(getComponentIdentifier(), this);
-		ams.adapters.put(getComponentIdentifier(), this);
+		ComponentManagementService ams = (ComponentManagementService)platform.getService(IComponentManagementService.class);
+		ams.getComponentAdapterMap().put(getComponentIdentifier(), this);
 		
 //		this.platform = (IPlatform)args[0];
 
@@ -1386,7 +1386,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		{
 			if(agent.isAtBreakpoint(desc.getBreakpoints()))
 			{
-				AMS	ces	= (AMS)platform.getService(IComponentManagementService.class);
+				ComponentManagementService	ces	= (ComponentManagementService)platform.getService(IComponentManagementService.class);
 				ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
 			}
 		}
@@ -1399,7 +1399,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 			// Set state to waiting before step. (may be reset by wakup() call in step)
 			if(dostep && IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
 			{
-				AMS	ces	= (AMS)platform.getService(IComponentManagementService.class);
+				ComponentManagementService	ces	= (ComponentManagementService)platform.getService(IComponentManagementService.class);
 				ces.setComponentState(cid, IComponentDescription.STATE_WAITING);	// I hope this doesn't cause any deadlocks :-/
 			}
 
@@ -1424,7 +1424,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 				// Set back to suspended if components is still waiting but wants to execute again.
 				if(again && IComponentDescription.STATE_WAITING.equals(desc.getState()))
 				{
-					AMS	ces	= (AMS)platform.getService(IComponentManagementService.class);
+					ComponentManagementService	ces	= (ComponentManagementService)platform.getService(IComponentManagementService.class);
 					ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
 				}
 				again	= again && IComponentDescription.STATE_ACTIVE.equals(desc.getState());
@@ -1438,7 +1438,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		{
 			if(agent.isAtBreakpoint(desc.getBreakpoints()))
 			{
-				AMS	ces	= (AMS)platform.getService(IComponentManagementService.class);
+				ComponentManagementService	ces	= (ComponentManagementService)platform.getService(IComponentManagementService.class);
 				ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
 			}
 		}

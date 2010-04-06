@@ -1,4 +1,4 @@
-package jadex.adapter.jade;
+package jadex.jade.service;
 
 import jade.content.Concept;
 import jade.content.ContentManager;
@@ -41,6 +41,9 @@ import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.jade.JadeAgentAdapter;
+import jadex.jade.Platform;
+import jadex.jade.SJade;
 import jadex.service.IService;
 import jadex.service.clock.IClockService;
 
@@ -207,7 +210,7 @@ public class MessageService implements IMessageService, IService
 					CMSCreateComponent	aca	= (CMSCreateComponent)content;
 					if(aca.getName()==null)
 					{
-						AMS	ams	= (AMS)platform.getService(IComponentManagementService.class);
+						ComponentManagementService	ams	= (ComponentManagementService)platform.getService(IComponentManagementService.class);
 //						aca.setName(ams.generateAgentName(ams.getShortName(aca.getType())));
 						aca.setName(ams.generateComponentIdentifier(aca.getType()).getLocalName());
 					}
@@ -334,7 +337,7 @@ public class MessageService implements IMessageService, IService
 		final ACLMessage msg = SJade.convertMessagetoJade(message, type);
 		
 		// Send message over Jade.
-		AMS ams = (AMS)platform.getService(IComponentManagementService.class);
+		ComponentManagementService ams = (ComponentManagementService)platform.getService(IComponentManagementService.class);
 		ams.getComponentAdapter(sender, new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)

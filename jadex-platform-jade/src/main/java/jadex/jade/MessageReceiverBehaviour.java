@@ -1,4 +1,4 @@
-package jadex.adapter.jade;
+package jadex.jade;
 
 import jade.content.Concept;
 import jade.content.ContentElementList;

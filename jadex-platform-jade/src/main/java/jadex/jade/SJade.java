@@ -1,4 +1,4 @@
-package jadex.adapter.jade;
+package jadex.jade;
 
 import jade.core.AID;
 import jade.domain.FIPAAgentManagement.AMSAgentDescription;
