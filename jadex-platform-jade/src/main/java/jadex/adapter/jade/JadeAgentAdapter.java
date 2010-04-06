@@ -4,7 +4,6 @@ import jade.content.ContentElement;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
-import jadex.base.SComponentFactory;
 import jadex.base.fipa.SFipa;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
@@ -18,18 +17,16 @@ import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
 import jadex.commons.ICommand;
 import jadex.commons.SUtil;
-import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
-import jadex.javaparser.IExpressionParser;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
-import jadex.service.library.ILibraryService;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -117,6 +114,20 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	//-------- constructors --------
 
 	/**
+	 *  Create the agent adapter
+	 */
+	// Cannot be done in constructor because AID is still null
+	// Cannot be done in setAID() etc. because invisble 
+	// :-(
+//	public JadeAgentAdapter()
+//	{
+//		this.platform = Platform.getPlatform();
+//		AMS ams = (AMS)platform.getService(IComponentManagementService.class);
+////		ams.getAgentAdapterMap().put(getComponentIdentifier(), this);
+//		ams.adapters.put(getComponentIdentifier(), this);
+//	}
+	
+	/**
 	 *  The setup method.
 	 *  Automatically called when agents is born.
 	 */
@@ -125,6 +136,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		// super "constructor"
 		super.setup();
 		this.agentthread	= Thread.currentThread();
+		this.ext_entries = Collections.synchronizedList(new ArrayList());
 		
 //		this.platform	= platform;
 //		this.aid	= aid;
@@ -148,12 +160,13 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		Object[] args2	= new Object[args.length-2];
 		System.arraycopy(args, 2, args2, 0, args2.length);
 				
-//		this.platform = (IPlatform)args[0];
 		this.platform = Platform.getPlatform();
 		AMS ams = (AMS)platform.getService(IComponentManagementService.class);
 //		ams.getAgentAdapterMap().put(getComponentIdentifier(), this);
 		ams.adapters.put(getComponentIdentifier(), this);
 		
+//		this.platform = (IPlatform)args[0];
+
 		// Initialize the agent from model.
 		/*if(args[0] instanceof String)
 		{
@@ -226,8 +239,6 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 
 //		this.clock	= new JadeAgentClock("JADE clock for agent "+getLocalName());
 
-	
-
 		//try{Thread.sleep(20000);}catch(Exception e){}
 //		System.out.println("Agent is starting: "+this.getName());
 	}
@@ -240,7 +251,22 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	{
 		this.agent = component;
 		this.model = model;
-		
+	}	
+	
+	/**
+	 *  Set the component description.
+	 *  @param desc The component description.
+	 */
+	public void setComponentDescription(IComponentDescription desc)
+	{
+		this.desc = desc;
+	}
+	
+	/**
+	 *  Start the agent by adding the behaviours.
+	 */
+	public void start()
+	{
 		// Start the required jade behaviours.
 		// Hack!!! Add action execution behaviour first,
 		// because it has to execute agent init action before other behaviours.
@@ -251,7 +277,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		this.mesrec	= new MessageReceiverBehaviour(platform, agent, 
 			(IComponentManagementService)platform.getService(IComponentManagementService.class));
 		addBehaviour(mesrec);
-	}	
+	}
 	
 	//-------- IAgentAdapter methods --------
 	

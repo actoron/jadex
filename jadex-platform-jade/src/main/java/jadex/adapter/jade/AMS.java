@@ -105,7 +105,7 @@ public class AMS implements IComponentManagementService, IService
 			
 			final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
 			IComponentIdentifier aid = null;
-			CMSComponentDescription ad = null;
+			
 			
 			// Load the model with fitting factory.
 			
@@ -150,14 +150,15 @@ public class AMS implements IComponentManagementService, IService
 			try
 			{
 				AgentController ac = platform.getPlatformController().createNewAgent(name, "jadex.adapter.jade.JadeAgentAdapter", argus.toArray());
-				if(!suspend)
-					ac.start();
 				// Hack!!! Bug in JADE not returning created agent's AID.
 				// Should do ams_search do get correct AID?
 				AID tmp = (AID)platform.getPlatformAgent().clone();
 				int idx = tmp.getName().indexOf("@");
 				tmp.setName(name + tmp.getName().substring(idx));
 				aid = SJade.convertAIDtoFipa(tmp, (IComponentManagementService)platform.getService(IComponentManagementService.class));
+				
+				// Must use start to call setup and make the agnet
+				ac.start();
 			}
 			catch(Exception e)
 			{
@@ -166,10 +167,27 @@ public class AMS implements IComponentManagementService, IService
 				return;
 			}
 			
-			ad = new CMSComponentDescription(aid, type, parent, master);
-			ad.setState(IComponentDescription.STATE_INITIATED);
+			final CMSComponentDescription ad = new CMSComponentDescription(aid, type, parent, master);
 			
 //			System.out.println("added: "+agentdescs.size()+", "+aid);
+			
+			IComponentDescription padesc = parent!=null? (IComponentDescription)descs.get(parent): null;
+			// Suspend when set to suspend or when parent is also suspended or when specified in model.
+			Object debugging  = lmodel.getProperties().get("debugging");
+			if(suspend || (padesc!=null && IComponentDescription.STATE_SUSPENDED.equals(padesc.getState()))
+				|| debugging instanceof Boolean && ((Boolean)debugging).booleanValue())
+			{
+				ad.setState(IComponentDescription.STATE_SUSPENDED);
+			}
+			else
+			{
+				ad.setState(IComponentDescription.STATE_ACTIVE);
+			}
+			descs.put(aid, ad);
+			if(parent!=null)
+			{
+				children.put(parent, aid);
+			}
 			
 			// Hack! Busy waiting for platform agent init finished.
 			while(!adapters.containsKey(aid))
@@ -183,27 +201,40 @@ public class AMS implements IComponentManagementService, IService
 				{
 				}
 			}
-			JadeAgentAdapter adapter = (JadeAgentAdapter)adapters.get(aid);
-			
-			createComponentInstance(config, args, suspend, listener, 
-				resultlistener, factory, lmodel, (ComponentIdentifier)aid, adapter, null, ad, null);
-//				resultlistener, factory, lmodel, aid, adapter, pad, ad, parent);
-			
-			// todo!
-			
-//			IComponentListener[]	alisteners;
-//			synchronized(listeners)
-//			{
-//				alisteners	= (IComponentListener[])listeners.toArray(new IComponentListener[listeners.size()]);
-//			}
-//			// todo: can be called after listener has (concurrently) deregistered
-//			for(int i=0; i<alisteners.length; i++)
-//			{
-//				alisteners[i].componentAdded(ad);
-//			}
-			
-//			System.out.println("Created agent: "+aid);
-			listener.resultAvailable(this, aid);
+			final JadeAgentAdapter adapter = (JadeAgentAdapter)adapters.get(aid);
+			adapter.setComponentDescription(ad);
+
+			JadeAgentAdapter pad = null;
+			if(parent!=null)
+			{
+				pad	= (JadeAgentAdapter)adapters.get(parent);
+			}
+
+			if(pad!=null)
+			{
+				final IResultListener rl = listener;
+				final IComponentFactory	cf = factory;
+				final JadeAgentAdapter fpad = pad;
+				final ComponentIdentifier faid = (ComponentIdentifier)aid;
+				pad.getComponentInstance().getExternalAccess(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						createComponentInstance(config, args, suspend, rl,
+							resultlistener, cf, lmodel, faid, adapter, fpad, ad, (IExternalAccess)result);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						rl.exceptionOccurred(source, exception);
+					}
+				});
+			}
+			else
+			{
+				createComponentInstance(config, args, suspend, listener,
+					resultlistener, factory, lmodel, (ComponentIdentifier)aid, adapter, null, ad, null);
+			}
 		}	
 			
 		/**
@@ -245,6 +276,9 @@ public class AMS implements IComponentManagementService, IService
 				killresultlisteners.put(cid, resultlistener);
 			
 			listener.resultAvailable(this, cid.clone());
+			
+			if(!suspend)
+				adapter.start();
 		}
 		
 		/**
