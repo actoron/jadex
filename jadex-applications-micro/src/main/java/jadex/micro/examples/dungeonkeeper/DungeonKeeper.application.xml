@@ -88,6 +88,15 @@
 						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/dungeonheart.png">
 							<env:drawcondition>InitMapProcess.DUNGEONHEART.equals($object.type)</env:drawcondition> 
 						</env:texturedrectangle>
+						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/treasury.png">
+							<env:drawcondition>InitMapProcess.TREASURY.equals($object.type)</env:drawcondition> 
+						</env:texturedrectangle>
+						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/hatchery.png">
+							<env:drawcondition>InitMapProcess.HATCHERY.equals($object.type)</env:drawcondition> 
+						</env:texturedrectangle>
+						<env:texturedrectangle imagepath="jadex/micro/examples/dungeonkeeper/images/lair.png">
+							<env:drawcondition>InitMapProcess.LAIR.equals($object.type)</env:drawcondition> 
+						</env:texturedrectangle>
 					</env:drawable>
 					<env:drawable objecttype="imp" width="1.0" height="1.0">
 						<env:ellipse color="yellow" width="0.5" height="0.5"></env:ellipse>

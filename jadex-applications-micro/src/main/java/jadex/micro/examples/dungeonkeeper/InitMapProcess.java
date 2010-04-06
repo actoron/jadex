@@ -1,11 +1,8 @@
 package jadex.micro.examples.dungeonkeeper;
 
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.ISpaceProcess;
-import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
-import jadex.application.space.envsupport.math.Vector1Int;
 import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.commons.SUtil;
@@ -13,18 +10,12 @@ import jadex.commons.SimplePropertyObject;
 import jadex.service.clock.IClockService;
 import jadex.service.library.ILibraryService;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
-
-import com.sun.mail.mbox.SolarisMailbox;
 
 /**
  *  Environment process for creating wastes.
@@ -43,6 +34,9 @@ public class InitMapProcess extends SimplePropertyObject implements ISpaceProces
 	public static final String LAVA = "lava";
 	
 	public static final String DUNGEONHEART = "dungeonheart";
+	public static final String TREASURY = "treasury";
+	public static final String HATCHERY = "hatchery";
+	public static final String LAIR = "lair";
 	
 	public static Map imagenames;
 	
@@ -63,6 +57,9 @@ public class InitMapProcess extends SimplePropertyObject implements ISpaceProces
 		imagenames.put("Of", LAVA);
 		
 		imagenames.put("1G", DUNGEONHEART);
+		imagenames.put("1C", TREASURY);
+		imagenames.put("1F", HATCHERY);
+		imagenames.put("1D", LAIR);
 	}
 	
 	//-------- attributes --------
@@ -127,7 +124,7 @@ public class InitMapProcess extends SimplePropertyObject implements ISpaceProces
 		        if("CREATURES".equals(data))
 		        {
 		        	int cnt = Integer.parseInt(br.readLine().trim());
-		        	cnt = 1;
+//		        	cnt = 1;
 		        	for(int i=0; i<cnt; i++)
 		        	{
 		        		StringTokenizer stok = new StringTokenizer(br.readLine());
