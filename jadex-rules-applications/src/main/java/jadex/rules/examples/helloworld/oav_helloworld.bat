@@ -1,2 +1,2 @@
 cd ..\..\..\..\..\..\..\..\lib
-java -cp jadex-rules-applications-2.0-rc1.jar jadex.rules.examples.helloworld.OAVHelloWorld
+java -cp jadex-rules-applications-2.0-rc2.jar jadex.rules.examples.helloworld.OAVHelloWorld

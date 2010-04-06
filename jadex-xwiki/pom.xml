@@ -5,12 +5,12 @@
   <artifactId>jadex-xwiki</artifactId>
   <packaging>jar</packaging>
   <name>jadex-xwiki</name>
-  <version>2.0-rc1</version>
+  <version>2.0-rc2</version>
   <!-- <url>http://jadex.sourceforge.net</url> -->
   <parent>
     <groupId>jadex</groupId>
     <artifactId>jadex-settings</artifactId>
-    <version>2.0-rc1</version>
+    <version>2.0-rc2</version>
     <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
   </parent>
   <repositories>

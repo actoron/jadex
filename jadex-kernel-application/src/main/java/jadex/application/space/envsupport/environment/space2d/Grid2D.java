@@ -205,15 +205,22 @@ public class Grid2D extends Space2D
 			ISpaceObject obj = getSpaceObject(id);
 			
 			IVector2 oldpos = (IVector2)obj.getProperty(PROPERTY_POSITION);
-			if(objectsygridpos.containsKey(oldpos) && oldpos!=null)
+			if(oldpos!=null)
 			{
-//				System.out.println("remove: "+oldpos+" "+obj);
-				objectsygridpos.remove(oldpos, obj);
+				oldpos	= new Vector2Int(oldpos.getXAsInteger(), oldpos.getYAsInteger());
+				if(objectsygridpos.containsKey(oldpos))
+				{
+	//				System.out.println("remove: "+oldpos+" "+obj);
+					objectsygridpos.remove(oldpos, obj);
+				}
 			}
 			
 			IVector2 newpos = adjustPosition(pos);
-			objectsygridpos.put(new Vector2Int(pos.getXAsInteger(), pos.getYAsInteger()), obj);
-//			System.out.println("add: "+newpos+" "+obj);
+			if(newpos!=null)
+			{
+				objectsygridpos.put(new Vector2Int(newpos.getXAsInteger(), newpos.getYAsInteger()), obj);
+//				System.out.println("add: "+newpos+" "+obj);
+			}
 			
 			super.setPosition(id, newpos);
 		}
