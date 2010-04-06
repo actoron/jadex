@@ -293,56 +293,56 @@ public class ComponentManagementService implements IComponentManagementService, 
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
-		/*CMSComponentDescription	desc;
-			synchronized(adapters)
+		CMSComponentDescription	desc;
+		synchronized(adapters)
+		{
+			synchronized(descs)
 			{
-				synchronized(descs)
+				// Kill subcomponents
+				Object[]	achildren	= children.getCollection(cid).toArray();	// Use copy as children may change on destroy.
+				for(int i=0; i<achildren.length; i++)
 				{
-					// Kill subcomponents
-					Object[]	achildren	= children.getCollection(cid).toArray();	// Use copy as children may change on destroy.
-					for(int i=0; i<achildren.length; i++)
-					{
-						destroyComponent((IComponentIdentifier)achildren[i], null);	// todo: cascading delete with wait.
-					}
-					
+					destroyComponent((IComponentIdentifier)achildren[i], null);	// todo: cascading delete with wait.
+				}
+				
 //					System.out.println("killing: "+cid);
-					
-					JadeAgentAdapter component = (JadeAgentAdapter)adapters.get(cid);
-					if(component==null)
-					{
-						listener.exceptionOccurred(this, new RuntimeException("Component "+cid+" does not exist."));
-						return;
+				
+				JadeAgentAdapter component = (JadeAgentAdapter)adapters.get(cid);
+				if(component==null)
+				{
+					listener.exceptionOccurred(this, new RuntimeException("Component "+cid+" does not exist."));
+					return;
 
-						//System.out.println(componentdescs);
-						//throw new RuntimeException("Component "+aid+" does not exist.");
-					}
-					
-					// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
-					// todo: killcomponent should only be called once for each component?
-					desc	= (CMSComponentDescription)descs.get(cid);
-					if(desc!=null)
+					//System.out.println(componentdescs);
+					//throw new RuntimeException("Component "+aid+" does not exist.");
+				}
+				
+				// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
+				// todo: killcomponent should only be called once for each component?
+				desc = (CMSComponentDescription)descs.get(cid);
+				if(desc!=null)
+				{
+					if(!ccs.containsKey(cid))
 					{
-						if(!ccs.containsKey(cid))
+						CleanupCommand	cc	= new CleanupCommand(cid);
+						ccs.put(cid, cc);
+						if(listener!=null)
+							cc.addKillListener(listener);
+						component.killComponent(cc);						
+					}
+					else
+					{
+						if(listener!=null)
 						{
-							CleanupCommand	cc	= new CleanupCommand(cid);
-							ccs.put(cid, cc);
-							if(listener!=null)
-								cc.addKillListener(listener);
-							component.killComponent(cc);						
-						}
-						else
-						{
-							if(listener!=null)
-							{
-								CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
-								if(cc==null)
-									listener.exceptionOccurred(this, new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
-								cc.addKillListener(listener);
-							}
+							CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
+							if(cc==null)
+								listener.exceptionOccurred(this, new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
+							cc.addKillListener(listener);
 						}
 					}
 				}
-			}*/
+			}
+		}
 	}
 
 	/**
@@ -354,7 +354,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
-		/*CMSComponentDescription ad;
+		CMSComponentDescription ad;
 		synchronized(adapters)
 		{
 			synchronized(descs)
@@ -375,15 +375,28 @@ public class ComponentManagementService implements IComponentManagementService, 
 					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
 					//throw new RuntimeException("Component Identifier not registered in CES: "+aid);
 				if(!IComponentDescription.STATE_ACTIVE.equals(ad.getState())
-					/ *&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState())* /)
+					/*&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState())*/)
 				{
 					listener.exceptionOccurred(this, new RuntimeException("Only active components can be suspended: "+componentid+" "+ad.getState()));
 					//throw new RuntimeException("Only active components can be suspended: "+aid+" "+ad.getState());
 				}
 				
 				ad.setState(IComponentDescription.STATE_SUSPENDED);
-				IExecutionService exe = (IExecutionService)container.getService(IExecutionService.class);
-				exe.cancel(adapter, listener);
+				
+				try
+				{
+					AgentController ac = platform.getPlatformController().getAgent(((IComponentIdentifier)componentid).getLocalName());
+					ac.suspend();
+//					listener.resultAvailable(null);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+//					listener.exceptionOccurred(e);
+				}
+				
+//				IExecutionService exe = (IExecutionService)container.getService(IExecutionService.class);
+//				exe.cancel(adapter, listener);
 			}
 		}
 		
@@ -398,7 +411,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		for(int i=0; i<alisteners.length; i++)
 		{
 			alisteners[i].componentChanged(ad);
-		}*/
+		}
 	}
 	
 	/**
@@ -410,7 +423,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
-	/*	CMSComponentDescription ad;
+		CMSComponentDescription ad;
 		
 		synchronized(adapters)
 		{
@@ -438,7 +451,20 @@ public class ComponentManagementService implements IComponentManagementService, 
 					//throw new RuntimeException("Only suspended components can be resumed: "+aid+" "+ad.getState());
 				
 				ad.setState(IComponentDescription.STATE_ACTIVE);
-				adapter.wakeup();
+				
+				try
+				{
+					AgentController ac = platform.getPlatformController().getAgent(((IComponentIdentifier)componentid).getLocalName());
+					ac.activate();
+//					listener.resultAvailable(null);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+//					listener.exceptionOccurred(e);
+				}
+				
+//				adapter.wakeup();
 			}
 		}
 		
@@ -455,7 +481,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 			alisteners[i].componentChanged(ad);
 		}
 	
-		listener.resultAvailable(this, ad);*/
+		listener.resultAvailable(this, ad);
 	}
 	
 	/**
@@ -467,7 +493,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
-	/*	synchronized(adapters)
+		synchronized(adapters)
 		{
 			synchronized(descs)
 			{
@@ -481,10 +507,14 @@ public class ComponentManagementService implements IComponentManagementService, 
 					//throw new RuntimeException("Only suspended components can be resumed: "+aid+" "+ad.getState());
 				
 				adapter.doStep(listener);
-				IExecutionService exe = (IExecutionService)platform.getService(IExecutionService.class);
-				exe.execute(adapter);
+				resumeComponent(componentid, listener);
+//				suspendComponent(componentid, listener);
+//				adapter.wakeup();
+				
+//				IExecutionService exe = (IExecutionService)platform.getService(IExecutionService.class);
+//				exe.execute(adapter);
 			}
-		}*/
+		}
 	}
 
 	/**
@@ -567,13 +597,14 @@ public class ComponentManagementService implements IComponentManagementService, 
 		
 		public CleanupCommand(IComponentIdentifier cid)
 		{
-//				System.out.println("CleanupCommand created");
+//			System.out.println("CleanupCommand created");
 			this.cid = cid;
 		}
 		
 		public void resultAvailable(Object source, Object result)
 		{
-//				System.out.println("CleanupCommand: "+result);
+//			System.out.println("CleanupCommand: "+result);
+			
 			IComponentDescription ad = (IComponentDescription)descs.get(cid);
 			Map results = null;
 			JadeAgentAdapter adapter;
@@ -596,15 +627,14 @@ public class ComponentManagementService implements IComponentManagementService, 
 					ccs.remove(cid);
 					
 					// Stop execution of component.
-					// todo: ?
-//						((IExecutionService)platform.getService(IExecutionService.class)).cancel(adapter, null);
+//					((IExecutionService)platform.getService(IExecutionService.class)).cancel(adapter, null);
+					adapter.cleanupAgent();
 					
 					// Deregister destroyed component at parent.
 					if(desc.getParent()!=null)
 					{
 						children.remove(desc.getParent(), desc.getName());
 						pad	= (JadeAgentAdapter)adapters.get(desc.getParent());
-						
 					}
 				}
 			}
@@ -960,8 +990,6 @@ public class ComponentManagementService implements IComponentManagementService, 
 	
 }
 
-	
-	
 	
 	
 //	//-------- constants --------

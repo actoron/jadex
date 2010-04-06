@@ -432,18 +432,18 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	/**
 	 *  Gracefully terminate the agent.
 	 *  This method is called from the reasoning engine and delegated to the ams.
-	 */
+	 * /
 	public void killComponent()
 	{
 		((IComponentManagementService)platform.getService(IComponentManagementService.class)).destroyComponent(getComponentIdentifier(), null);
-	}
+	}*/
 
 	/**
 	 *  Gracefully terminate the agent.
 	 *  This method is called from ams and delegated to the reasoning engine,
 	 *  which might perform arbitrary cleanup actions, goals, etc.
 	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
-	 */
+	 * /
 	public void killAgent(IResultListener listener)
 	{
 		if(IComponentDescription.STATE_TERMINATED.equals(state))
@@ -454,6 +454,42 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		else if(listener!=null)
 			listener.resultAvailable(this, getComponentIdentifier());
 			
+	}*/
+	
+	/**
+	 *  Gracefully terminate the component.
+	 *  This method is called from ams and delegated to the reasoning engine,
+	 *  which might perform arbitrary cleanup actions, goals, etc.
+	 *  @param listener	When cleanup of the component is finished, the listener must be notified.
+	 */
+	public void killComponent(final IResultListener listener)
+	{
+//		System.out.println("killComponent: "+listener);
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
+			throw new ComponentTerminatedException(cid.getName());
+
+		if(!fatalerror)
+		{
+			agent.killComponent(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					listener.resultAvailable(this, getComponentIdentifier());
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					listener.resultAvailable(this, getComponentIdentifier());
+				}
+			});
+		}
+		else if(listener!=null)
+		{
+			listener.resultAvailable(this, getComponentIdentifier());
+		}
+			
+		// LogManager causes memory leak till Java 7
+		// No way to remove loggers and no weak references. 
 	}
 
 	/**
@@ -606,7 +642,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	 */
 	public void cleanupAgent()
 	{
-		agent = null;
+//		agent = null;
 		super.doDelete();
 	}
 
@@ -1436,10 +1472,17 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		// Suspend when breakpoint is triggered.
 		if(!dostep && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
 		{
+			try
+			{
 			if(agent.isAtBreakpoint(desc.getBreakpoints()))
 			{
 				ComponentManagementService	ces	= (ComponentManagementService)platform.getService(IComponentManagementService.class);
 				ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
+			}
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
 			}
 		}
 

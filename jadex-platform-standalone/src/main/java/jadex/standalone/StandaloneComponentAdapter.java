@@ -574,6 +574,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		if(dostep)
 			listener.exceptionOccurred(this, new RuntimeException("Only one step allowed at a time."));
 			
-		this.dostep	= true;		this.steplistener	= listener;
+		this.dostep	= true;		
+		this.steplistener	= listener;
 	}
 }

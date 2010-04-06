@@ -82,9 +82,9 @@ public class AboutDialog extends JAutoPositionDialog
 	 */
 	public String generateText()
 	{
-		infotext = "<head/><body>(c) 2002-2007<br>"
+		infotext = "<head/><body>(c) 2002-2010<br>"
 			+ "Alexander Pokahr, Lars Braubach<br>"
-			+ "Artwork by Dirk Bade<br>"
+//			+ "Artwork by Dirk Bade<br>"
 			+ "All rights reserved<br>";
 		String rn = IVersionInfo.RELEASE_NUMBER;
 		String rd = IVersionInfo.RELEASE_DATE;
