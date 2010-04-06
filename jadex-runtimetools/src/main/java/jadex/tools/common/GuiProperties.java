@@ -1,7 +1,6 @@
 package jadex.tools.common;
 
 import jadex.commons.SGUI;
-import jadex.commons.SUtil;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -138,8 +137,8 @@ public class GuiProperties
 			// Create main help set and broker
 			try
 			{
-				ClassLoader cl = SUtil.class.getClassLoader();
-				URL url = HelpSet.findHelpSet(cl, "jadex/help/jhelpset");
+				ClassLoader cl = GuiProperties.class.getClassLoader();
+				URL url = HelpSet.findHelpSet(cl, "jadex/tools/help/jhelpset");
 				ExtendedHelpSet hs =  new ExtendedHelpSet(cl, url);
 				Dimension sd = Toolkit.getDefaultToolkit().getScreenSize();
 				int w = (int)(sd.getWidth()*0.8);

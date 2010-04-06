@@ -1,0 +1,57 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>9.6.&nbsp;Options</title><link rel="stylesheet" href="javahelp.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.69.1"><link rel="start" href="index.html" title="Jadex - The BDI Reasoning Engine"><link rel="up" href="tools.jadexdoc.html" title="Chapter&nbsp;9.&nbsp;Jadexdoc Tool"><link rel="prev" href="jadexdoc.comments.html" title="9.5.&nbsp;Documentation Comments"><link rel="next" href="jadexdoc.doclet_options.html" title="9.6.2.&nbsp;Options Provided by the Standard Doclet"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="jadexdoc.options"></a>9.6.&nbsp;Options</h2></div></div></div><p>
+			The Jadexdoc tool uses a standard doclet to determine its output. The Jadexdoc
+			tool provides a set of command-line options that can be used with any doclet.
+			These options are described below under the sub-heading
+			<a href="jadexdoc.options.html#jadexdoc.options_jadexdoc" title="9.6.1.&nbsp;Jadexdoc Options">Section&nbsp;9.6.1, &#8220;Jadexdoc Options&#8221;</a>. The standard doclet provides an
+ 			additional set of command-line options that are described below under the
+ 			sub-heading Options Provided by the Standard Doclet. All option names are
+ 			case-insensitive, though their arguments can be case-sensitive.
+		</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="jadexdoc.options_jadexdoc"></a>9.6.1.&nbsp;Jadexdoc Options</h3></div></div></div><p>
+				</p><div class="variablelist"><dl><dt><span class="term">
+							<code class="option">-subpackages
+								<em class="replaceable"><code>pck1:pck2:...</code></em>
+							</code>
+						</span></dt><dd><p>
+								Generates documentation from source files in the specified packages and recursively
+ 								in their subpackages. This option is useful when adding new subpackages
+								to the source code, as they are automatically included. Each package argument is
+								any top-level subpackage (such as <code class="classname">jadex</code>) or fully qualified package (such as
+								<code class="classname">jadex.examples</code>) that does not need to contain source files. Arguments are
+								separated by colons (on all operating systems). Wildcards are not needed or allowed.
+								</p><p>
+									<span><strong class="command">
+										java jadex.tools.jadexdoc.Main -d docs -subpackages
+										jadex.examples.hunterprey:jadex.examples.cleanerworld
+									</strong></span>
+								</p><p>
+	                       		You can use <code class="option">-subpackages</code> in conjunction with
+								<code class="option">-exclude</code> to exclude specific packages.
+							</p></dd><dt><span class="term">
+							<code class="option">-exclude
+								<em class="replaceable"><code>pck1:pck2:...</code></em>
+							</code>
+						</span></dt><dd><p>
+								Unconditionally excludes the specified packages and their subpackages from the
+								list formed by <code class="option">-subpackages</code>. It excludes those packages even if they would
+								otherwise be included by some previous or later <code class="option">-subpackages</code> option.
+								</p><p>
+									<span><strong class="command">
+										java jadex.tools.jadexdoc.Main -d docs
+										-subpackages jadex
+										-exclude jadex.planlib:jadex.examples.testcases
+									</strong></span>
+								</p><p>
+							</p></dd><dt><span class="term">
+							<code class="option">-help</code>
+						</span></dt><dd><p>
+								Displays the online help, which lists these Jadexdoc and doclet command line
+								options.
+							</p></dd><dt><span class="term">
+							<code class="option">-quiet</code>
+						</span></dt><dd><p>
+								Shuts off non-error and non-warning messages, leaving only the warnings and
+								errors appear, making them easier to view. Also suppresses the version string.
+							</p></dd></dl></div><p>
+			</p></div></div></body></html>

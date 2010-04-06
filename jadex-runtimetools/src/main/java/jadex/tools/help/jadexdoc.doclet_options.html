@@ -1,0 +1,375 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>9.6.2.&nbsp;Options Provided by the Standard Doclet</title><link rel="stylesheet" href="javahelp.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.69.1"><link rel="start" href="index.html" title="Jadex - The BDI Reasoning Engine"><link rel="up" href="jadexdoc.options.html" title="9.6.&nbsp;Options"><link rel="prev" href="jadexdoc.options.html" title="9.6.&nbsp;Options"><link rel="next" href="tools.beanynizer.html" title="Chapter&nbsp;10.&nbsp;Beanynizer"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="jadexdoc.doclet_options"></a>9.6.2.&nbsp;Options Provided by the Standard Doclet</h3></div></div></div><p>
+				</p><div class="variablelist"><dl><dt><span class="term">
+							<code class="option">-d
+								<em class="replaceable"><code>directory</code></em>
+							</code>
+						</span></dt><dd><p>
+								Specifies the destination directory where Jadexdoc saves the generated
+								HTML files. Omitting this option
+								causes the files to be saved to the current directory. The value directory can
+								be absolute, or relative to the current working directory. The destination
+								directory is automatically created when Jadexdoc is run. For example, the
+								following generates the documentation for the package
+								<code class="classname">jadex.examples.testcases</code>
+								and saves the results in the <code class="filename">user/doc</code> directory:
+								<span><strong class="command">
+									java jadex.tools.jadexdoc.Main -d user/doc jadex.examples.testcases
+								</strong></span>
+							</p></dd><dt><span class="term">
+							<code class="option">-overview
+								<em class="replaceable"><code>path/filename</code></em>
+							</code>
+						</span></dt><dd><p>
+								Specifies that Jadexdoc should retrieve the text for the overview documentation
+								from the "source" file specified by <em class="replaceable"><code>path/filename</code></em> and place it
+								on the Overview page (<code class="filename">overview-summary.html</code>). While you can use any name you
+								want for filename and place it anywhere you want for path, a typical thing to do
+								is to name it <code class="filename">overview.html</code> and place it in the source tree at the directory
+								that contains the topmost package directories. Note that the overview page is
+								created only if you pass into Jadexdoc two or more package names. The title on
+								the overview page is set by <code class="option">-doctitle</code>.
+							</p></dd><dt><span class="term">
+							<code class="option">-splitindex</code>
+						</span></dt><dd><p>
+								Splits the index file into multiple files, alphabetically, one file per letter,
+								plus a file for any index entries that start with non-alphabetical characters.
+							</p></dd><dt><span class="term">
+							<code class="option">-windowtitle
+								<em class="replaceable"><code>title</code></em>
+							</code>
+						</span></dt><dd><p>
+								Specifies the title to be placed in the	HTML <code class="computeroutput">&lt;title&gt;</code> tag.
+								This appears in the window title and in any browser bookmarks (favorite places) that someone
+								creates for this page. This title should not contain any HTML tags, as the
+								browser will not properly interpret them. Any internal quotation marks within
+								title may have to be escaped. If <code class="option">-windowtitle</code> is omitted, the Jadexdoc tool uses
+								the value of <code class="option">-doctitle</code> for this option.
+								</p><p>
+								<span><strong class="command">
+									java jadex.tools.jadexdoc.Main -windowtitle "Jadex Examples" jadex.examples
+								</strong></span>
+								</p><p>
+							</p></dd><dt><span class="term">
+							<code class="option">-doctitle
+								<em class="replaceable"><code>title</code></em>
+							</code>
+						</span></dt><dd><p>
+								Specifies the title to be placed near the top of the overview summary file. The
+								title will be placed as a centered, level-one heading directly beneath the upper
+								navigation bar. The title may contain html tags and white space, though if it
+								does, it must be enclosed in quotes. Any internal quotation marks within title
+								may have to be escaped.
+								</p><p>
+									<span><strong class="command">
+										java jadex.tools.jadexdoc.Main -doctitle "&lt;b&gt;Jadex Agent Dokumentation&lt;b&gt;"
+										jadex.examples.testcases
+									</strong></span>
+								</p><p>
+							</p></dd><dt><span class="term">
+							<code class="option">-header
+								<em class="replaceable"><code>header</code></em>
+							</code>
+						</span></dt><dd><p>
+								Specifies the header text to be placed at the top of each output file. The
+								header will be placed to the right of the upper navigation bar.
+								<em class="replaceable"><code>header</code></em> may contain HTML tags
+ 								and white space, though if it does, it must be enclosed in quotes. Any internal
+ 								quotation marks within header may have to be escaped.
+								</p><p>
+									<span><strong class="command">
+										java jadex.tools.jadexdoc.Main -header "&lt;b&gt;Jadex Platform&lt;/b&gt;&lt;br&gt;0.96"
+ 										jadex.examples.testcases
+									</strong></span>
+								</p><p>
+							</p></dd><dt><span class="term">
+							<code class="option">-footer
+								<em class="replaceable"><code>footer</code></em>
+							</code>
+						</span></dt><dd><p>
+								Specifies the footer text to be placed at the bottom of each output file. The
+								footer will be placed to the right of the lower navigation bar. <em class="replaceable"><code>footer</code></em> may
+								contain html tags and white space, though if it does, it must be enclosed in quotes.
+ 								Any internal quotation  marks within footer may have to be escaped.
+							</p></dd><dt><span class="term">
+							<code class="option">-bottom
+								<em class="replaceable"><code>text</code></em>
+							</code>
+						</span></dt><dd><p>
+								Specifies the text to be placed at the bottom of each output file. The text will
+								be placed at the bottom of the page, below the lower navigation bar. The text
+								may contain HTML tags and white space, though if it does, it must be enclosed in
+								quotes. Any internal quotation marks within text may have to be escaped.
+							</p></dd><dt><span class="term">
+							<code class="option">-link
+								<em class="replaceable"><code>extdocURL</code></em>
+							</code>
+						</span></dt><dd><p>
+								The <code class="option">-link</code> option enables you to link to java classes referenced to by your members
+ 								in the agent description file. For these links to go to valid pages, you
+								must know where those HTML pages are located, and specify that location with
+								extdocURL. This allows, for instance, a jadex doc file to link to java.*
+								documentation on <a href="http://java.sun.com" target="_top">http://java.sun.com</a>.
+								When Jadexdoc is run without the <code class="option">-link</code>
+								option, when it encounters a java class, it prints the fully qualified name with
+								no link. However, when the <code class="option">-link</code> option is used, the Jadexdoc tool searches
+								the <code class="option">package-list</code> file at the specified <em class="replaceable"><code>extdocURL</code></em> location for that
+								package name. If it finds the package name, it creates a link to the external
+								Javadoc location.
+							</p><p><a name="jadexdoc.extdocURL"></a>
+								<em class="replaceable"><code>extdocURL</code></em> is the absolute or relative
+								URL of the directory containing the external javadoc-generated
+								documentation you want to link to. Examples are shown below. The package-list
+								file must be found in this directory (otherwise, use <code class="option">-linkoffline</code>).
+								The Jadexdoc tool reads the package names from the
+								package-list file and then links to those packages at that
+								URL. When the Jadexdoc tool is run, the
+								<em class="replaceable"><code>extdocURL</code></em> value is copied literally into the
+								&lt;A HREF&gt; links that are created. Therefore, <em class="replaceable"><code>extdocURL</code></em> must be the
+								URL to the directory, not to a file. You can use an absolute link for extdocURL
+								to enable your docs to link to a document on any website, or can use a relative
+								link to link only to a relative location. If relative, the value you pass in
+								should be the relative path from the destination directory (specified with
+								<code class="option">-d</code>)
+								to the directory containing the packages being linked to. In all cases, and on
+								all operating systems, you should use a forward slash as the separator, whether
+								the URL is absolute or relative, and "http:" or "file:"
+								based (as specified in theURL Memo).
+							</p><p>
+								Absolute
+								<span class="emphasis"><em>http:</em></span> based link:
+								</p><p>
+									<code class="option">
+										-link http://&lt;host&gt;/&lt;directory&gt;/&lt;directory&gt;/.../&lt;name&gt;
+									</code>
+								</p><p>
+
+								Absolute
+								<span class="emphasis"><em>file:</em></span> based link:
+								</p><p>
+									<code class="option">
+										-link file://&lt;host&gt;/&lt;directory&gt;/&lt;directory&gt;/.../&lt;name&gt;
+									</code>
+								</p><p>
+
+								Relative link:
+								</p><p>
+									<code class="option">
+										-link &lt;directory&gt;/&lt;directory&gt;/.../&lt;name&gt;
+									</code>
+								</p><p>
+							</p><p>
+								You can specify multiple <code class="option">-link</code> options in a given
+ 								Jadexdoc run to link to multiple documents.
+							</p><p><b>Choosing between <code class="option">-linkoffline</code> and <code class="option">-link</code>.&nbsp;</b>
+									Use <code class="option">-link</code>: when using a relative path to the external API document,
+									or when using an absolute URL to the external API document,
+									if your shell allows a program to open a connection to that URL for reading.
+								</p><p>
+								Use <code class="option">-linkoffline</code>: when using an absolute
+								URL to the external API document,
+								if your shell does not allow a program to open a connection to that
+								URL for reading. This can occur if
+								you are behind a firewall and the document you want to link to is on
+ 								the other side.
+							</p><div class="example"><a name="d0e2638"></a><p class="title"><b>Example&nbsp;9.1.&nbsp;Example using absolute links to the external docs</b></p><p>
+									Let's say you want to link to the Java 2 Platform packages at
+									<a href="http://java.sun.com/javase/6/docs/api/" target="_top">http://java.sun.com/javase/6/docs/api/</a>.
+									The following command generates documentation for the package
+									<code class="option">jadex.examples</code>
+									with links to the Java 2 Platform packages.
+									</p><p>
+										<span><strong class="command">
+											java jadex.tools.jadexdoc.Main -link http://java.sun.com/javase/6/docs/api/
+											-subpackages jadex.examples
+										</strong></span>
+									</p><p>
+								</p></div><div class="example"><a name="d0e2654"></a><p class="title"><b>Example&nbsp;9.2.&nbsp;Example using relative links to the external docs</b></p><p>
+									Let's say you have user defined java packages whose docs are
+ 									generated with the Javadoc tool. Then you use the Jadexdoc tool to
+ 									document the corresponding agent description files and those docs
+ 									are separated by a relative path. In this example, the API
+									(Application Programming Interface) packages reside in
+									<code class="filename">docs/api/jadex/examples</code>
+									and the ADF (agent description files) packages in
+									<code class="filename">docs/adf/jadex/examples</code>.
+									Assuming the API package documentation is already generated, and that docs is
+									the current directory, you would document the ADF package with links to the API
+									documentation by running:
+									</p><p>
+										<span><strong class="command">
+ 											java jadex.tools.jadexdoc.Main -d ../adf -link ../api -subpackages jadex.examples
+										</strong></span>
+									</p><p>
+								</p></div><p>
+								The <code class="option">-link</code> argument is relative to the destination directory.
+								In order to avoid broken links, all of the documentation for the external references
+								must exist at the specified URLs. The Jadexdoc tool will not check that
+								these pages exist only that the package-list exists.
+							</p><p><b>Multiple Links.&nbsp;</b>
+ 									You can supply multiple <code class="option">-link</code> options to link to any
+									number of external generated documents. Specify a different link option for
+									each external document to link to:
+									</p><p>
+										<span><strong class="command">
+											java jadex.tools.jadexdoc.Main -link <em class="replaceable"><code>extdocURL1</code></em>
+ 											-link <em class="replaceable"><code>extdocURL2</code></em> ... -subpackages jadex.examples
+										</strong></span>
+									</p><p>
+									where <em class="replaceable"><code>extdocURL1</code></em>, <em class="replaceable"><code>extdocURL2</code></em>,
+ 									... point respectively to the roots of external documents, each of which contains a file named
+									<code class="filename">package-list</code>.
+								</p></dd><dt><span class="term">
+							<code class="option">-linkoffline
+								<em class="replaceable"><code>extdocURL packagelistLoc</code></em>
+							</code>
+						</span></dt><dd><p>
+								This option is a variation of <code class="option">-link</code>; they both create links to javadoc-generated
+								documentation for external referenced classes. Use the <code class="option">-linkoffline</code> option
+								when linking to a document on the web when the Javadoc tool itself is
+								"offline" that is, it cannot access the document through a web
+								connection.
+							</p><p>
+								The <code class="option">-linkoffline</code> option takes two arguments the first for the string to be
+								embedded in the &lt;a href&gt; links, the second telling it where to find package-list:
+								</p><div class="itemizedlist"><ul type="disc"><li><p>
+											<em class="replaceable"><code>extdocURL</code></em> is the absolute or relative
+											URL of the directory containing the external javadoc-generated
+ 											documentation you want to link to. If relative, the value should be the relative path
+ 											from the destination directory (specified with <code class="option">-d</code>)
+											to the root of the packages being linked to. For more details, see
+											<a href="jadexdoc.doclet_options.html#jadexdoc.extdocURL">
+												<em class="replaceable"><code>extdocURL</code></em>
+											</a> in the
+											<code class="option">-link</code> option.
+										</p></li><li><p>
+											<em class="replaceable"><code>packagelistLoc</code></em> is the path or
+											URL to the directory containing the
+											package-list file for the external documentation. This can be a
+											URL (http: or file:) or file path, and can be absolute
+ 											or relative. If relative, make it relative to the current directory
+ 											from where Javadoc was run. Do not include the
+											<code class="filename">package-list</code> filename.
+										</p></li></ul></div><p>
+								You can specify multiple <code class="option">-linkoffline</code> options in a given
+								Jadexdoc run.
+							</p></dd><dt><span class="term">
+							<code class="option">-group
+								<em class="replaceable"><code>groupheading packagepattern:packagepattern:...</code></em>
+							</code>
+						</span></dt><dd><p>
+								Separates packages on the overview page into whatever groups you specify, one
+								group per table. You specify each group with a different
+								<code class="option">-group</code> option. The groups appear on the page in the order specified
+								on the command line; packages are alphabetized within a group. For a given
+								<code class="option">-group</code> option, the packages matching the list of packagepattern
+ 								expressions appear in a table with the heading
+								<em class="replaceable"><code>groupheading</code></em>.
+							</p><p>
+								<em class="replaceable"><code>groupheading</code></em> can be any text, and can include white
+								space. This text is placed in the table heading for the group.
+							</p><p>
+								<em class="replaceable"><code>packagepattern</code></em> can be any package name, or can be the
+								start of any package name followed by an asterisk (*). The asterisk is a wildcard
+								meaning "match any characters". This is the only wildcard allowed. Multiple
+								patterns can be included in a group by separating them with colons (:).
+								</p><p>
+									If using an asterisk in a pattern or pattern list, the pattern list must be
+									inside quotes, such as "jadex.examples*"
+								</p><p>
+								If you do not supply any <code class="option">-group</code> option, all packages are placed in one group
+								with the heading <span class="emphasis"><em>Packages</em></span>. If the groups do not include all
+								documented packages, any leftover packages appear in a separate group with the heading
+								<span class="emphasis"><em>Other Packages</em></span>.
+								</p><p>
+									<span><strong class="command">
+										java jadex.tools.jadexdoc.Main -group "Core Packages" "jadex.planlib"
+     									-group "Hunterprey Packages" "jadex.examples.hunterprey*" -subpackages jadex.examples
+									</strong></span>
+								</p><p>
+							</p></dd><dt><span class="term">
+							<code class="option">-notree</code>
+						</span></dt><dd><p>
+								Omits the agent/capability hierarchy pages from the generated docs. These are
+								the pages you reach using the "Tree" button in the navigation bar. The
+								hierarchy is produced by default.
+							</p></dd><dt><span class="term">
+							<code class="option">-noindex</code>
+						</span></dt><dd><p>
+                         		Omits the index from the generated docs. The index is produced by default.
+							</p></dd><dt><span class="term">
+							<code class="option">-nohelp</code>
+						</span></dt><dd><p>
+								Omits the "Help" link in the navigation bars at the top and bottom of each page of output.
+							</p></dd><dt><span class="term">
+							<code class="option">-nonavbar</code>
+						</span></dt><dd><p>
+								Prevents the generation of the navigation bar, header and footer, otherwise
+								found at the top and bottom of the generated pages. Has no affect on the
+								"bottom" option. The <code class="option">-nonavbar</code> option is useful when you are
+								interested only in the content and have no need for navigation.
+							</p></dd><dt><span class="term">
+							<code class="option">-helpfile
+								<em class="replaceable"><code>path/filename</code></em>
+							</code>
+						</span></dt><dd><p>
+								Specifies the path of an alternate help file <em class="replaceable"><code>path/filename </code></em>that the
+								"Help" link in the top and bottom navigation bars link to. Without this option,
+								the Jadexdoc tool automatically creates a help file <code class="filename">help-doc.html</code>.
+								This option enables you to override this default. The filename can be any name.
+								The Jadexdoc tool will adjust the links in the navigation bar accordingly.
+								</p><p>
+									<span><strong class="command">
+										java jadex.tools.jadexdoc.Main -helpfile C:\user\myhelp.html -subpackages jadex.examples
+									</strong></span>
+								</p><p>
+
+							</p></dd><dt><span class="term">
+							<code class="option">-stylesheetfile
+								<em class="replaceable"><code>path/filename</code></em>
+							</code>
+						</span></dt><dd><p>
+								Specifies the path of an alternate HTML stylesheet file. Without this option,
+								the Jadexdoc tool automatically creates a stylesheet file <code class="filename">stylesheet.css</code>. This
+								option enables you to override this default. The filename can be any name.
+								</p><p>
+								<span><strong class="command">
+									java jadex.tools.jadexdoc.Main -stylesheetfile C:\user\mystylesheet.css
+     								-subpackages jadex.examples
+								</strong></span>
+								</p><p>
+							</p></dd><dt><span class="term">
+							<code class="option">-docfilessubdirs</code>
+						</span></dt><dd><p>
+								Enables deep copying of "doc-files" directories. In other words,
+								subdirectories and all contents are recursively copied to the destination. For
+								example, the directory
+								<code class="filename">doc-files/example/images</code> and all its contents would now
+								be copied. There is also an option to exclude subdirectories.
+							</p></dd><dt><span class="term">
+							<code class="option">-excludedocfilessubdir
+								<em class="replaceable"><code>name1:name2...</code></em>
+							</code>
+						</span></dt><dd><p>
+								Excludes any
+								<code class="filename">doc-files</code> subdirectories with the given names.
+							</p></dd><dt><span class="term">
+							<code class="option">-noqualifier
+								<em class="replaceable"><code>all | packagename1:packagename2:...</code></em>
+							</code>
+						</span></dt><dd><p>
+								Omits qualifying package name from ahead of agent/capability
+								<em class="replaceable"><code>and</code></em>
+								class/interface names in output. The argument to
+								<code class="option">-noqualifier</code> is either
+								<code class="option">all</code> (all package qualifiers are omitted) or a colon-separated list of
+								packages, with wildcards, to be removed as qualifiers. The package name is
+								removed from places where agent/capability or class/interface names appear.
+							</p></dd><dt><span class="term">
+							<code class="option">-nocomment</code>
+						</span></dt><dd><p>
+								Suppress the entire comment body, including the main description, generating
+								only declarations.
+							</p></dd></dl></div><p>
+			</p></div></body></html>

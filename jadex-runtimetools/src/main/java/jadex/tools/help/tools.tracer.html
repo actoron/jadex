@@ -1,0 +1,181 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;7.&nbsp;BDI Tracer</title><link rel="stylesheet" href="javahelp.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.69.1"><link rel="start" href="index.html" title="Jadex - The BDI Reasoning Engine"><link rel="up" href="index.html" title="Jadex - The BDI Reasoning Engine"><link rel="prev" href="introspector.debugger_panel.html" title="6.2.&nbsp;Debugger Panel"><link rel="next" href="tracer.menus.html" title="7.2.&nbsp;Menus"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="tools.tracer"></a>Chapter&nbsp;7.&nbsp;BDI Tracer</h2></div></div></div><p>
+		<span class="inlinemediaobject"><img src="images/tracer/new_tracer.png"></span>
+
+		The BDI Tracer is accessible from the Jadex Control Center tool
+		bar. It is a tool inspired by
+		<a href="http://dnaelam.googlepages.com/index.html" target="_top">
+			the Ph.D. work of Dung N. Lam
+		</a>
+		working on agent software comprehension with abductive
+		reasoning.
+
+		The tracer provides basically an interface and means to log the
+		internal state of a BDI agent, and to analyze and visualize the
+		logged information. It is made of two components. The first one
+		is the TracerAdapter placed in front of an agent as a tool
+		adapter. It is responsible for filtering messages concerning the
+		tracing process away from the message queue of an agent and it
+		collects the information about agent's internal state changes
+		and other occurrences in the system. The information is then
+		sent to the Tracer Agent, if an instance is present on the
+		platform. The latter has the duty to analyze the traces, store
+		them, and to present them to the user in a graphical form.
+	</p><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="tracer.main_window"></a>7.1.&nbsp;Main Window</h2></div></div></div><p>
+			The main window of the tracer agent may be seen in
+			<a href="tools.tracer.html#tracer.fig_main_frame" title="Figure&nbsp;7.1.&nbsp;Tracer Main Window">Figure&nbsp;7.1, &#8220;Tracer Main Window&#8221;</a>. 
+		</p><div class="figure"><a name="tracer.fig_main_frame"></a><div class="screenshot"><div class="mediaobject"><img src="images/tracer/tracer_overview.png" alt="Tracer Main Window"></div></div><p class="title"><b>Figure&nbsp;7.1.&nbsp;Tracer Main Window</b></p></div><p>
+			The traces presented above are from the Blocksworld
+			example. In order to indicate a type of traces, they are marked with icons
+			and their different meaning is explained in <a href="tools.tracer.html#tracer.tbl_traces_types" title="Table&nbsp;7.1.&nbsp;Information logged by the tracer">Table&nbsp;7.1, &#8220;Information logged by the tracer&#8221;</a>:		
+		</p><div class="table"><a name="tracer.tbl_traces_types"></a><p class="title"><b>Table&nbsp;7.1.&nbsp;Information logged by the tracer</b></p><table summary="Information logged by the tracer" border="1"><colgroup><col><col></colgroup><tbody><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/tracer/Action.png"></span>
+							</p>
+						</td><td>
+							<p>
+								Actions describe internal processes (i.e.
+								internal agenda meta actions) of an agent and are 
+								by default ignored by the tracer.
+							</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/tracer/bulb2.png"></span>
+								<span class="inlinemediaobject"><img src="images/tracer/bulb1.png"></span>
+							</p>
+						</td><td>
+							<p>
+								Beliefs are meta traces that collect
+								all traces concerning the use of beliefs
+								and their change.
+								Belief read and write access indicate
+								that an agent or one of its plans have accessed
+								a belief and possibly changed it.
+							</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/tracer/new_received_message.png"></span>
+								<span class="inlinemediaobject"><img src="images/tracer/new_sent_message.png"></span>
+							</p>
+						</td><td>
+							<p>
+								The icons stand for message reception or
+								send events respectively.
+							</p>
+						</td></tr><tr><td>
+							<p>
+								
+								<span class="inlinemediaobject"><img src="images/tracer/cloud2a.png"></span>
+								<span class="inlinemediaobject"><img src="images/tracer/cloud2p.png"></span>
+								<span class="inlinemediaobject"><img src="images/tracer/cloud2q.png"></span>
+								<span class="inlinemediaobject"><img src="images/tracer/cloud2m.png"></span>
+								<span class="inlinemediaobject"><img src="images/tracer/cloud2meta.png"></span>
+							</p>
+						</td><td>
+							<p>
+								Goals are traced when they are adopted
+								by the agent. The icons on the left side represent different goals: 
+								achieve goal, perform goal, query goal, maintain goal, meta goal.
+							</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/tracer/plan2.png"></span>
+							</p>
+						</td><td>
+							<p>
+								Plans are shown, when created in
+								response to a goal or event.
+							</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/tracer/Event.png"></span>
+							</p>
+						</td><td>
+							<p>
+								Internal events are traced whenever they are dispatched
+								within the agent.
+							</p>
+						</td></tr></tbody></table></div><p>
+			The tracer perspective is split into four views
+			including a tree view of agents and traces, a tabular view of
+			traces, tracing settings and a 2D trace space exploring panel.
+		</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="tracer.tree"></a>7.1.1.&nbsp;Trace Tree</h3></div></div></div><p>
+				At the left there is a tree view showing all agents 
+				known to the tracer. The meaning of a particular
+				icon depicting an agent is shown in
+				<a href="tools.tracer.html#tracer.tbl_agent_icons" title="Table&nbsp;7.2.&nbsp;State of an agent">Table&nbsp;7.2, &#8220;State of an agent&#8221;</a>. 
+				Descending from the BDI agents, all traces are linked
+				beneath nodes identified to be their cause.
+
+				</p><div class="table"><a name="tracer.tbl_agent_icons"></a><p class="title"><b>Table&nbsp;7.2.&nbsp;State of an agent</b></p><table summary="State of an agent" border="1"><colgroup><col><col></colgroup><tbody><tr><td>
+									<p>
+										<span class="inlinemediaobject"><img src="images/tracer/new_agent.png"></span>
+									</p>
+								</td><td>
+									<p>
+										The agent is ignored by the tracer.
+									</p>
+								</td></tr><tr><td>
+									<p>
+										<span class="inlinemediaobject"><img src="images/tracer/new_agent_introspected.png"></span>
+									</p>
+								</td><td>
+									<p>
+										The agent sends its traces to the tracer.
+									</p>
+								</td></tr><tr><td>
+									<p>
+										<span class="inlinemediaobject"><img src="images/tracer/new_agent_broken.png"></span>
+									</p>
+								</td><td>
+									<p>The agent has died.</p>
+								</td></tr></tbody></table></div><p>
+			</p><p><a name="tracer.tree_popup"></a>
+				The functionality provided by the
+				<a href="tools.tracer.html#tracer.fig_tree_popup" title="Figure&nbsp;7.2.&nbsp;Tree Popup Menu">
+					tree popup menu
+				</a>
+				is similar to the functionality from the <span class="guimenu">Agent</span> menu
+				(<a href="tracer.menus.html#tracer.menu_agent" title="7.2.1.&nbsp;Agent Menu">Section&nbsp;7.2.1, &#8220;Agent Menu&#8221;</a>) and
+				concerns the currently selected trace or agent. In
+				the case of an agent the user may choose to observe it
+				and to adjust the trace filter and history limit 
+				(<span class="guimenuitem">Filter</span>). 
+				The other options allow to show or hide traces in the
+				graph or table. With the last menu item the trace or the
+				agent may be removed from the tracer perspective.
+			</p><div class="figure"><a name="tracer.fig_tree_popup"></a><div class="screenshot"><div class="mediaobject"><img src="images/tracer/tracer_tree_popup.png" alt="Tree Popup Menu"></div></div><p class="title"><b>Figure&nbsp;7.2.&nbsp;Tree Popup Menu</b></p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="tracer.table"></a>7.1.2.&nbsp;Trace Table</h3></div></div></div><p>
+				On the right side there are three views. The upper one in the middle shows a tabular view of
+				the traces, as can be seen in <a href="tools.tracer.html#tracer.trace_table" title="Figure&nbsp;7.3.&nbsp;Trace Table">Figure&nbsp;7.3, &#8220;Trace Table&#8221;</a>:
+				
+				</p><div class="figure"><a name="tracer.trace_table"></a><div class="screenshot"><div class="mediaobject"><img src="images/tracer/trace_table.png" alt="Trace Table"></div></div><p class="title"><b>Figure&nbsp;7.3.&nbsp;Trace Table</b></p></div><p>
+				
+				The traces are ordered in the sequence they arrive. The table shows
+				information like a unique trace id, the agent name, the event name,
+				The event name and the content are closely related and explain
+				which kind of event occurrence has happened. The cause describes
+				the reason for the event occurrence and the time shows when the
+				event has happened.
+				
+				
+			</p><p>
+				The user may select traces in the table based on different criteria, remove them
+				from the table, show them in the graph panel or delete from the tracer perspective.
+				All the fuctionality is accessible under the <span class="guimenu">Table Menu</span>
+				(<a href="tracer.menu_table.html" title="7.2.2.&nbsp;Table Menu and Tracing Settings">Section&nbsp;7.2.2, &#8220;Table Menu and Tracing Settings&#8221;</a>) and a corresponding popup menu.
+			</p><p>
+				The view on the upper right side, offers some tracing settings, as can be seen in 
+				<a href="tools.tracer.html#tracer.fig_tracing_settings" title="Figure&nbsp;7.4.&nbsp;Tracing Settings">Figure&nbsp;7.4, &#8220;Tracing Settings&#8221;</a>:
+				</p><div class="figure"><a name="tracer.fig_tracing_settings"></a><div class="screenshot"><div class="mediaobject"><img src="images/tracer/tracing_settings.png" alt="Tracing Settings"></div></div><p class="title"><b>Figure&nbsp;7.4.&nbsp;Tracing Settings</b></p></div><p>
+				
+				Check boxes let the user specify what to trace and above the number of traces to show 
+				can be chosen from a pull down menu. The changes can be applied by the button 
+				&#8220;<span class="quote">apply</span>&#8221; and the other button labled with 
+				&#8220;<span class="quote">clear</span>&#8221; clears the trace table.
+			</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="tracer.graph"></a>7.1.3.&nbsp;Trace Exploration Graph</h3></div></div></div><p>
+				The lower one of the three right views is the graph panel allowing to explore the space of traces.
+				It also provides multiple presentation options e.g. for selection of and correletion and between the traces.
+				All this functionality may be accessed  from the "Graph" and the graph popup menu.
+				(see <a href="tracer.menu_graph.html" title="7.2.3.&nbsp;Graph Menu">Section&nbsp;7.2.3, &#8220;Graph Menu&#8221;</a>).
+			</p></div></div></div></body></html>

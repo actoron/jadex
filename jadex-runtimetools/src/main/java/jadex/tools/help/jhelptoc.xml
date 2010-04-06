@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+
+<!DOCTYPE toc
+  PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 1.0//EN" "http://java.sun.com/products/javahelp/toc_1_0.dtd">
+<toc version="1.0">
+   <tocitem target="top" text="Jadex - The BDI Reasoning Engine">
+      <tocitem target="tools.intro" text="Introduction"/>
+      <tocitem target="tools.controlcenter" text="Jadex Control Center">
+         <tocitem target="tools.controlcenter.usage" text="Using the JCC"/>
+         <tocitem target="tools.controlcenter.settings" text="Platform Settings"/>
+      </tocitem>
+      <tocitem target="tools.starter" text="Jadex Starter">
+         <tocitem target="tools.starter.modeltree" text="Model Tree"/>
+         <tocitem target="d0e337" text="Running Agents"/>
+         <tocitem target="d0e372" text="Model Panel"/>
+      </tocitem>
+      <tocitem target="tools.dfbrowser" text="DF Browser">
+         <tocitem target="d0e440" text="Center View"/>
+      </tocitem>
+      <tocitem target="tools.conversationcenter" text="Conversation Center">
+         <tocitem target="tools.conversationcenter.send" text="Sending Messages">
+            <tocitem target="conversationcenter.aidselector" text="Agent Selector Dialog"/>
+         </tocitem>
+         <tocitem target="tools.conversationcenter.receive" text="Receiving Messages"/>
+      </tocitem>
+      <tocitem target="tools.introspector" text="Introspector">
+         <tocitem target="introspector.base_panels" text="Base Panels"/>
+         <tocitem target="introspector.debugger_panel" text="Debugger Panel"/>
+      </tocitem>
+      <tocitem target="tools.tracer" text="BDI Tracer">
+         <tocitem target="tracer.main_window" text="Main Window">
+            <tocitem target="tracer.tree" text="Trace Tree"/>
+            <tocitem target="tracer.table" text="Trace Table"/>
+            <tocitem target="tracer.graph" text="Trace Exploration Graph"/>
+         </tocitem>
+         <tocitem target="tracer.menus" text="Menus">
+            <tocitem target="tracer.menu_agent" text="Agent Menu"/>
+            <tocitem target="tracer.menu_table" text="Table Menu and Tracing Settings"/>
+            <tocitem target="tracer.menu_graph" text="Graph Menu"/>
+         </tocitem>
+      </tocitem>
+      <tocitem target="tools.testcenter" text="Test Center">
+         <tocitem target="tools.testcenter.use" text="Using the Test Center">
+            <tocitem target="tools.testcenter.modeltree" text="Model Tree Panel"/>
+            <tocitem target="tools.testcenter.settings" text="Settings Panel"/>
+            <tocitem target="tools.testcenter.execution" text="Test Suite Execution Panel"/>
+            <tocitem target="tools.testcenter.details" text="Details Panel"/>
+         </tocitem>
+         <tocitem target="tools.testcenter.write" text="Writing Testcases"/>
+      </tocitem>
+      <tocitem target="tools.jadexdoc" text="Jadexdoc Tool">
+         <tocitem target="jadexdoc.gui" text="Graphical tool">
+            <tocitem target="jadexdoc.modeltree" text="Model Tree"/>
+            <tocitem target="jadexdoc.packages" text="Package Selection Panel"/>
+            <tocitem target="jadexdoc.settings" text="Settings Panel"/>
+            <tocitem target="jadexdoc.cons_output" text="Console Output Panel"/>
+         </tocitem>
+         <tocitem target="jadexdoc.synopsis" text="Jadexdoc Commandline Usage"/>
+         <tocitem target="jadexdoc.srcs" text="Source Files"/>
+         <tocitem target="jadexdoc.out" text="Generated Files"/>
+         <tocitem target="jadexdoc.comments" text="Documentation Comments"/>
+         <tocitem target="jadexdoc.options" text="Options">
+            <tocitem target="jadexdoc.options_jadexdoc" text="Jadexdoc Options"/>
+            <tocitem target="jadexdoc.doclet_options" text="Options Provided by the Standard Doclet"/>
+         </tocitem>
+      </tocitem>
+      <tocitem target="tools.beanynizer" text="Beanynizer">
+         <tocitem target="beanynizer.installation" text="Installation"/>
+         <tocitem target="beanynizer.ontology" text="Creating an Ontology"/>
+         <tocitem target="beanynizer.ontology_options" text="Ontology Options"/>
+         <tocitem target="beanynizer.class_options" text="Class Options"/>
+         <tocitem target="beanynizer.slot_options" text="Slot Options"/>
+         <tocitem target="beanynizer.converting_ontology" text="Converting an Existing Ontology"/>
+         <tocitem target="beanynizer.final_notes" text="Final Notes"/>
+      </tocitem>
+      <tocitem target="tools.rma" text="JADE RMA Plugin"/>
+   </tocitem>
+</toc>

@@ -1,0 +1,64 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>9.4.&nbsp;Generated Files</title><link rel="stylesheet" href="javahelp.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.69.1"><link rel="start" href="index.html" title="Jadex - The BDI Reasoning Engine"><link rel="up" href="tools.jadexdoc.html" title="Chapter&nbsp;9.&nbsp;Jadexdoc Tool"><link rel="prev" href="jadexdoc.srcs.html" title="9.3.&nbsp;Source Files"><link rel="next" href="jadexdoc.comments.html" title="9.5.&nbsp;Documentation Comments"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="jadexdoc.out"></a>9.4.&nbsp;Generated Files</h2></div></div></div><p>
+			By default, Jadexdoc uses a standard doclet that generates HTML-formatted
+			documentation. This doclet generates the following kinds of files (where each
+			HTML "page" corresponds to a separate file). Note that Jadexdoc
+			generates files with two types of names:
+			those named after agents/capabilities, and those that are not (such as
+			<code class="filename">package-summary.html</code>).
+			Files in the latter group contain hyphens to prevent
+			filename conflicts with those in the former group.
+		</p><p><b>Basic Content Pages.&nbsp;</b>
+				</p><div class="itemizedlist"><ul type="disc"><li><p>
+							One agent (<code class="filename">agentname.agent.html</code>)
+							or capability (<code class="filename">capabilityname.capability.html</code>)
+ 							page for each agent or capability is documented.
+						</p></li><li><p>
+							One package page (<code class="filename">package-summary.html</code>)
+							for each package it is documenting. The Jadexdoc tool will include any
+							HTML text provided in a file named
+							<code class="filename">package.html</code> in the package directory of the source tree.
+						</p></li><li><p>
+							One overview page (<code class="filename">overview-summary.html</code>) for
+							the entire set of packages.
+							This is the front page of the generated document. The Jadexdoc tool will include
+							any HTML text provided in a file specified with the
+							<code class="option">-overview</code> option. Note that this file is created only if you pass
+							into Jadexdoc two or more package names.
+						</p></li></ul></div><p>
+			</p><p><b>Cross-Reference Pages.&nbsp;</b>
+				</p><div class="itemizedlist"><ul type="disc"><li><p>
+							One <span class="emphasis"><em>agent/capability</em></span> hierarchy page for the
+							<span class="emphasis"><em>entire set of packages</em></span> (<code class="filename">overview-tree.html</code>).
+							To view this, click on "Overview" in the navigation bar, then click on
+							"Tree".
+						</p></li><li><p>
+							One <span class="emphasis"><em>agent/capability</em></span> hierarchy page for <span class="emphasis"><em>each package</em></span>
+							(<code class="filename">package-tree.html</code>). To view this, go to a particular package, agent or
+							capability page; click "Tree" to display the hierarchy for that package.
+						</p></li><li><p>
+							An index (<code class="filename">index-*.html</code>) of all agent,
+							capabilities, beliefs, plans, goals, events and expressions names,
+							alphabetically arranged.
+						</p></li></ul></div><p>
+			</p><p><b>Support Files.&nbsp;</b>
+				</p><div class="itemizedlist"><ul type="disc"><li><p>
+							A <span class="emphasis"><em>help page</em></span> (<code class="filename">help-doc.html</code>) that
+							describes the navigation bar and the above pages. You can provide your own custom help file to
+							override the default using <code class="option">-helpfile</code>.
+						</p></li><li><p>
+							One <code class="filename">index.html</code> file
+							which creates the HTML frames for display. This
+							is the file you load to display the front page with frames. This file itself contains
+							no text content. Several frame files (<code class="filename">*-frame.html</code>) containing lists of
+							packages, agents and capabilities, used when HTML frames are being displayed.
+						</p></li><li><p>
+ 							A <span class="emphasis"><em>style sheet file</em></span> (<code class="filename">stylesheet.css</code>)
+ 							that controls a limited amount of color, font family, font size, font style
+ 							and positioning on the generated pages.
+						</p></li><li><p>
+ 							A <code class="filename">doc-files</code> directory that holds any image, example,
+ 							source code or other files that you want copied to the destination directory.
+						</p></li></ul></div><p>
+			</p></div></body></html>

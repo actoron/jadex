@@ -1,0 +1,257 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;6.&nbsp;Introspector</title><link rel="stylesheet" href="javahelp.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.69.1"><link rel="start" href="index.html" title="Jadex - The BDI Reasoning Engine"><link rel="up" href="index.html" title="Jadex - The BDI Reasoning Engine"><link rel="prev" href="tools.conversationcenter.receive.html" title="5.2.&nbsp;Receiving Messages"><link rel="next" href="introspector.debugger_panel.html" title="6.2.&nbsp;Debugger Panel"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="tools.introspector"></a>Chapter&nbsp;6.&nbsp;Introspector</h2></div></div></div><p>
+		<span class="inlinemediaobject"><img src="images/introspector/new_introspector.png"></span>
+
+		In the introspector perspective you can observe and manipulate
+		the internal state of agents.
+		In <a href="tools.introspector.html#introspector.fig_overview" title="Figure&nbsp;6.1.&nbsp;Introspector overview">Figure&nbsp;6.1, &#8220;Introspector overview&#8221;</a> the introspector
+		is shown while observing an agent from the marsworld example.
+		You can use the agent tree at the left side to select agents you want to observe
+		(by double clicking or using the popup menu).
+		The observation view for the selected agent is shown
+		on the right side. In the observation views four different panels can be seen
+		and chosen.
+		The "Beliefbase", "Goalbase" and
+		"Planbase" tabs show the contents of the belief, goal
+		and plan base, respectively. Alle these panels are described in
+		<a href="tools.introspector.html#introspector.base_panels" title="6.1.&nbsp;Base Panels">Section&nbsp;6.1, &#8220;Base Panels&#8221;</a>. The
+		"Debugger" tab allows to observe and control the event processing,
+		consisting of plan selection and execution in the
+		<a href="introspector.debugger_panel.html" title="6.2.&nbsp;Debugger Panel">debugger panel</a>.
+	</p><p>
+		<span class="inlinemediaobject"><img src="images/introspector/start.png"></span>
+		<span class="inlinemediaobject"><img src="images/introspector/stop.png"></span>
+		When an agent is chosen for observation only those panels are initially
+		active that have been defined in the "Default Options" menu (active here
+		means that the views are continuously refreshed). If you want to activate
+		or deactivate a specific panel this can be done by using the start and
+		stop buttons from the menu bar. For making the state difference obvious
+		in a deactivated panel the background color will switch from white to light grey.
+	</p><p>
+		Below the tabs in the observation window,
+		a details panel shows details of elements (e.g. beliefs or events)
+		selected with double click.
+		This details panel is shared by all activated tabs,
+		and therefore shows the last elements selected in any tab.
+	</p><div class="figure"><a name="introspector.fig_overview"></a><div class="screenshot"><div class="mediaobject"><img src="images/introspector/introspector_overview.jpg" alt="Introspector overview"></div></div><p class="title"><b>Figure&nbsp;6.1.&nbsp;Introspector overview</b></p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="introspector.base_panels"></a>6.1.&nbsp;Base Panels</h2></div></div></div><p>
+			Three base panels show the beliefs (<span class="inlinemediaobject"><img src="images/introspector/bulb2.png"></span>), goals (<span class="inlinemediaobject"><img src="images/introspector/cloud2.png"></span>), and plans (<span class="inlinemediaobject"><img src="images/introspector/plan2.png"></span>) of the selected agent.
+			They are very similar in their usage (see
+			<a href="tools.introspector.html#introspector.fig_beliefs_panel" title="Figure&nbsp;6.2.&nbsp;The Beliefs Panel of Introspector">Figure&nbsp;6.2, &#8220;The Beliefs Panel of Introspector&#8221;</a>).
+			All elements are shown in a tree structure
+			representing the containment hierarchy of the elements
+			in the capabilities of the agent.
+		</p><div class="figure"><a name="introspector.fig_beliefs_panel"></a><div class="screenshot"><div class="mediaobject"><img src="images/introspector/introspector_beliefs.jpg" alt="The Beliefs Panel of Introspector"></div></div><p class="title"><b>Figure&nbsp;6.2.&nbsp;The Beliefs Panel of Introspector</b></p></div><p>
+			The different elements of the agent are shown with different icons
+			as explained in
+			<a href="tools.introspector.html#introspector.base_panel_elements" title="Table&nbsp;6.1.&nbsp;Introspector Base Panel Elements">Table&nbsp;6.1, &#8220;Introspector Base Panel Elements&#8221;</a>.
+			For each element the most important attributes are displayed directly
+			in the tree/table structure. The content of the base panels will automatically be updated
+			when changes occur inside the agent.
+		</p><div class="table"><a name="introspector.base_panel_elements"></a><p class="title"><b>Table&nbsp;6.1.&nbsp;Introspector Base Panel Elements</b></p><table summary="Introspector Base Panel Elements" border="1"><colgroup><col><col></colgroup><thead><tr><th>Element</th><th>Description</th></tr></thead><tbody><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/new_agent.png"></span> Agent
+							</p>
+						</td><td>
+							<p>The agent containing all other elements</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/new_capability_small.png"></span> Capability
+							</p>
+						</td><td>
+							<p>The capability with its contained elements</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/beliefbase2.png"></span> Belief Base
+							</p>
+						</td><td>
+							<p>The beliefbase containing all beliefs of a capability</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/bulb2.png"></span> Belief
+							</p>
+						</td><td>
+							<p>A single fact belief, or fact contained in a belief set</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/bulbs2.png"></span> Belief Set
+							</p>
+						</td><td>
+							<p>A belief set containing a number of facts</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/bulb2ref.png"></span> Referenced Belief
+							</p>
+						</td><td>
+							<p>A belief visible in this capability, but declared elsewhere</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/bulbs2ref.png"></span> Referenced Belief Set
+							</p>
+						</td><td>
+							<p>A belief set visible in this capability, but declared elsewhere</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/planbase2.png"></span> Plan Base
+							</p>
+						</td><td>
+							<p>The plan base containing all plans of a capability</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/plan2.png"></span> Plan
+							</p>
+						</td><td>
+							<p>A currently running plan</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/goalbase2.png"></span> Goal Base
+							</p>
+						</td><td>
+							<p>The goalbase containing all goals of a capability</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/cloud2p.png"></span> Perform Goal
+							</p>
+						</td><td>
+							<p>A currently adopted perform goal for executing actions.</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/cloud2refp.png"></span> Perform Goal Reference
+							</p>
+						</td><td>
+							<p>A perform goal reference on a currently adopted perform goal.</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/cloud2a.png"></span> Achieve Goal
+							</p>
+						</td><td>
+							<p>A currently adopted achieve goal that aims at establishing a specified world state.</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/cloud2refa.png"></span> Achieve Goal Reference
+							</p>
+						</td><td>
+							<p>An achieve goal reference on a currently adopted achieve goal.</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/cloud2q.png"></span> Query Goal
+							</p>
+						</td><td>
+							<p>A currently adopted query goal that aims at fetching some information.</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/cloud2refq.png"></span> Query Goal Reference
+							</p>
+						</td><td>
+							<p>A query goal reference on a currently adopted query goal.</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/cloud2m.png"></span> Maintain Goal
+							</p>
+						</td><td>
+							<p>A currently adopted maintain goal that aims at monitoring 
+								and re-establishing a specified world state.</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/cloud2refm.png"></span> Maintain Goal Reference
+							</p>
+						</td><td>
+							<p>A maintain goal reference on a currently adopted maintain goal.</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/cloud2meta.png"></span> Meta Goal
+							</p>
+						</td><td>
+							<p>A meta goal that is used for deciding 
+								among different applicable plans for one goal or event.</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/cloud2refmeta.png"></span> Meta Goal Reference
+							</p>
+						</td><td>
+							<p>A reference to a meta goal.</p>
+						</td></tr></tbody></table></div><p>
+			The tree component allows nodes to be closed to focus on interesting subsets
+			of the agent's functionality.
+			The column widths can be (auto-) adjusted by dragging or
+			double-clicking between the column headers.
+			The table headers also provide a popup-&gt;menu (opened with right-click)
+			that allows to hide some of the columns for better readability.
+			You can double click on the elements to see more detailed information.
+			The details panel is not automatically updated,
+			you may have to double click the element again,
+			to see up to date information.
+		</p><p>
+			You can to some extent manipulate the elements shown in the base panels.
+			E.g. you can alter the values of facts in the beliefbase.
+			Double click on the fact value you wish to change (in the value column),
+			and then enter the new value as Java expression (i.e "text" for a string value).
+			The expressions are evaluated using the imports as specified
+			in the ADF (of the corresponding capability)
+			therefore you can write expressions just as you would do that in
+			a <span class="markup">&lt;fact&gt;</span> tag of the ADF.
+			In addition, popup menus are available e.g. to remove beliefs,
+			terminate plans or change the state of goals.
+		</p><p>
+			Some options are available to influence the appearance of the base panels
+			(see <a href="tools.introspector.html#introspector.base_panel_options" title="Table&nbsp;6.2.&nbsp;Introspector Base Panel Options">Table&nbsp;6.2, &#8220;Introspector Base Panel Options&#8221;</a>).
+			
+		</p><div class="table"><a name="introspector.base_panel_options"></a><p class="title"><b>Table&nbsp;6.2.&nbsp;Introspector Base Panel Options</b></p><table summary="Introspector Base Panel Options" border="1"><colgroup><col><col></colgroup><tbody><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/resize.png"></span>
+							</p>
+						</td><td>
+							<p>Resize all columns to fit to length of contained entries</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/keepold.png"></span>
+								<span class="inlinemediaobject"><img src="images/introspector/removeold.png"></span>
+							</p>
+						</td><td>
+							<p>Show / hide removed elements (e.g. finished plans)</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/litter2.png"></span>
+							</p>
+						</td><td>
+							<p>Flush removed elements from memory</p>
+						</td></tr><tr><td>
+							<p>
+								<span class="inlinemediaobject"><img src="images/introspector/toggle_goalview.png"></span>
+								<span class="inlinemediaobject"><img src="images/introspector/toggle_planview.png"></span>
+							</p>
+						</td><td>
+							<p>Toggle goalview / planview (only for goalbase tab)</p>
+						</td></tr></tbody></table></div><p>
+			The resize icon allows to auto-adjust the widths of the table columns
+			to fit the	displayed content.
+			The next two icons are concerned with the presentation of removed elements.
+			Because the final state of a goal or a plan may be of interest
+			after the goal has been dropped or the plan has terminated,
+			the panels have an option not to remove those elements from the representation,
+			but just visually mark them as removed.
+			This is especially useful for debugging your agents,
+			e.g. in conjunction with the debugger view described in the next section.
+			To flush removed beliefs, goals and plans from the representation,
+			you can use the waste bin icon.
+		</p><p>
+			The last icon is only available in the goalbase panel.
+			It allows to switch between the goalview and the planview representation
+			of the agent's current goals.
+			The goalview, shown by default, displays only the goals and goal
+			references in the context of their containing capabilities.
+			
+			In the planview the global goal-plan hierarchy of the agent is
+			displayed. This means that the causal relationships of the
+			agent's goal structure are visible. Starting with some top-level
+			element, which can be a top-level goal or plan, it is shown which
+			subelements are connected with it, i.e. which plan is currently executed
+			for a goal, which subgoal the plan has dispatched and so forth.
+			
+			
+			
+			Both views are compared in <a href="tools.introspector.html#introspector.fig_goalview_planview" title="Figure&nbsp;6.3.&nbsp;Goalview and planview">Figure&nbsp;6.3, &#8220;Goalview and planview&#8221;</a>.
+			In the planview you can see that the <code class="literal">move_dest#11</code> achieve 
+			goal was actually created by a plan as a subgoal of the 
+			<code class="literal">carry_ore#1</code> achieve goal.
+		</p><div class="figure"><a name="introspector.fig_goalview_planview"></a><div class="screenshot"><div class="mediaobject"><img src="images/introspector/introspector_goalplanview.jpg" alt="Goalview and planview"></div></div><p class="title"><b>Figure&nbsp;6.3.&nbsp;Goalview and planview</b></p></div></div></div></body></html>

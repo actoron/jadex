@@ -1,0 +1,45 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>9.5.&nbsp;Documentation Comments</title><link rel="stylesheet" href="javahelp.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.69.1"><link rel="start" href="index.html" title="Jadex - The BDI Reasoning Engine"><link rel="up" href="tools.jadexdoc.html" title="Chapter&nbsp;9.&nbsp;Jadexdoc Tool"><link rel="prev" href="jadexdoc.out.html" title="9.4.&nbsp;Generated Files"><link rel="next" href="jadexdoc.options.html" title="9.6.&nbsp;Options"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="jadexdoc.comments"></a>9.5.&nbsp;Documentation Comments</h2></div></div></div><p><b>Commenting the Source Code.&nbsp;</b>
+				You can include documentation comments in the agent description files, ahead of
+				declarations for any agent, capability, plan, goal, event or expression, etc.
+				You can also create comments for each package and another one for the overview,
+				though their syntax is slightly different. The comments in the agent description
+				files are regular xml-comments consisting of the characters between the
+				characters <code class="option">&lt;!-- that begin the comment and the characters --&gt;</code>
+				that end it. The text in a comment can continue onto multiple lines.
+			
+				</p><pre class="programlisting">&lt;!--
+    This is the typical format of a simple documentation
+    comment that spans multiple lines.
+--&gt;
+
+&lt;!-- To save space you can also put a comment on one line. --&gt;</pre><p>
+			</p><p><b>Placement of comments.&nbsp;</b>
+				Documentation comments are recognized only when placed immediately before agent,
+				capability, belief, goal, plan, event or expression declarations. Only one
+				documentation comment per declaration statement is recognized by the Jadexdoc
+				tool.
+				</p><pre class="programlisting">&lt;!-- This is the comment for the agent 'MyAgent' --&gt;
+&lt;agent name="MyAgent" package="jadex.examples.myagents"&gt;
+    &lt;beliefs&gt;
+        &lt;!-- The comment for the belief 'MyBelief' --&gt;
+        &lt;belief name="MyBelief" class="Object"/&gt;
+    &lt;/beliefs&gt;
+&lt;/agent&gt;		</pre><p>
+			</p><p><b>Comments are written in HTML.&nbsp;</b>
+				The texts can be written in HTML, in that they should use
+				HTML entities and can use HTML tags. You can
+				use whichever version of HTML your browser supports. The
+				bold HTML tag <code class="computeroutput">&lt;b&gt;</code> is shown in the following example.
+				</p><p>
+					</p><pre class="programlisting">&lt;!-- This is a &lt;b&gt;documentation&lt;/b&gt; comment. --&gt;</pre><p>
+				</p><p>
+			</p><p><b>First sentence.&nbsp;</b>
+				The first sentence of each documentation comment should be a summary sentence,
+				containing a concise but complete description of the declared member. This
+				sentence ends at the first period that is followed by a blank, tab, or line
+				terminator. The Jadexdoc tool copies this first sentence to the member summary
+				at the top of the HTML page. For convenience, Jadexdoc
+				strips any html tags from this sentence, when it is displayed in a summary table.
+			</p></div></body></html>

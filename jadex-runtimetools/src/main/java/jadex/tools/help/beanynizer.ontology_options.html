@@ -1,0 +1,27 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>10.3.&nbsp;Ontology Options</title><link rel="stylesheet" href="javahelp.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.69.1"><link rel="start" href="index.html" title="Jadex - The BDI Reasoning Engine"><link rel="up" href="tools.beanynizer.html" title="Chapter&nbsp;10.&nbsp;Beanynizer"><link rel="prev" href="beanynizer.ontology.html" title="10.2.&nbsp;Creating an Ontology"><link rel="next" href="beanynizer.class_options.html" title="10.4.&nbsp;Class Options"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="beanynizer.ontology_options"></a>10.3.&nbsp;Ontology Options</h2></div></div></div><p>The general options for the ontology are available from the code generation panel (see
+                <a href="beanynizer.ontology_options.html#beanynizer.fig_code_generation_panel" title="Figure&nbsp;10.2.&nbsp;Jadex Beanynizer tab">Figure&nbsp;10.2, &#8220;Jadex Beanynizer tab&#8221;</a>). The ontology name is the
+            name, that will appear in the "ontology" slot of an ACL messages.
+            From Java this is available with the
+                <em class="replaceable"><code>ontologyclass</code></em>.<code class="constant">ONTOLOGY_NAME</code>
+            constant. A package can be specified, where the ontology class file should be generated.
+            This package is also the default for other generated classes. The class name is the
+            Javaclass name to be used for the ontology (without package). The output directory is
+            the root directory for the package hierarchy to be generated. You can use relative paths
+            here, which will be expanded relative to the saving-location of the
+            Prot&eacute;g&eacute; project. When subdirectories for some packages do not
+            exist, they will be created on-the-fly.</p><div class="figure"><a name="beanynizer.fig_code_generation_panel"></a><div class="screenshot"><div class="mediaobject"><img src="images/beanynizer/generate.png" alt="Jadex Beanynizer tab"></div></div><p class="title"><b>Figure&nbsp;10.2.&nbsp;Jadex Beanynizer tab</b></p></div><p>The "Files to Generate" option specifies which kind of Java files
+            should be generated for your ontology classes. Note that this option only represents a
+            default, that can be overridden individually for each ontology class as described in the
+            next section. </p><div class="variablelist"><dl><dt><span class="term">External</span></dt><dd><p>means that the ontology uses Java classes that already exist and do
+                            not have to be generated. In this case, only the single ontology class
+                            file will be generated.</p></dd><dt><span class="term">Editable</span></dt><dd><p>(which is the default) creates two files for any ontologyclass: A
+                                    <code class="filename"><em class="replaceable"><code>classname</code></em>Data.java</code>
+                            file, which contains the required fields and getter/setter methods, and
+                            a <code class="filename"><em class="replaceable"><code>classname</code></em>.java</code> file,
+                            which extends the data file, but is more or less empty. While the data
+                            file is overwritten each time you newly generate code from the ontology,
+                            the other file can be edited (e.g., to add custom methods), because
+                            changes will be preserved.</p></dd><dt><span class="term">Fixed</span></dt><dd><p>option only creates one file for each ontology class. This file should
+                            not be edited, because changes are lost, when regenerating code.</p></dd></dl></div></div></body></html>

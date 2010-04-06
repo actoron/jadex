@@ -1,0 +1,70 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;2.&nbsp;Jadex Control Center</title><link rel="stylesheet" href="javahelp.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.69.1"><link rel="start" href="index.html" title="Jadex - The BDI Reasoning Engine"><link rel="up" href="index.html" title="Jadex - The BDI Reasoning Engine"><link rel="prev" href="tools.intro.html" title="Chapter&nbsp;1.&nbsp;Introduction"><link rel="next" href="tools.controlcenter.settings.html" title="2.2.&nbsp;Platform Settings"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="tools.controlcenter"></a>Chapter&nbsp;2.&nbsp;Jadex Control Center</h2></div></div></div><p>
+		The Jadex Control Center (JCC) represents the main access point for all available
+		Jadex runtime tools. The JCC itself provides its functionalities via plugins and is
+		therefore quite easily extensible. Currently the following plugins are shipped with
+		the standard distribution of Jadex: Starter, DF Browser, Conversation Center, Introspector,
+		Tracer, Test Center and Jadexdoc. Each tool provides its own perspective in the JCC and is 
+		described in subsequent chapters.
+	</p><div class="figure"><a name="tools.controlcenter.fig_overview"></a><div class="screenshot"><div class="mediaobject"><img src="images/controlcenter/controlcenter_overview.jpg" alt="JCC window"></div></div><p class="title"><b>Figure&nbsp;2.1.&nbsp;JCC window</b></p></div><p>
+		Main aspect of the JCC is the project handling. A project is used to store user
+		settings made in the JCC itself (like window sizes or user settings) and the settings
+		from the various plugins. Project files consist of a main project file (ending ".jpr"
+		for Jadex project) and additional property files for each plugin.
+		In addition, the JCC uses a startup configuration, taken from the configuration under
+		the key <code class="filename">jcc.plugins</code> which is will be taken from the path specified
+		in the startup argument (-conf in Standalone resp. -Dconf= when using JADE). 
+		If the platform has been started without the conf option Jadex will search first
+		in the current start directory for <code class="filename">jadex.properties</code> and if there are no properties
+		available the properties will be loaded from the jar file (e.g. from
+		<code class="filename">jadex_standalone.jar</code> in case of the standalone platform).
+		In addition to the plugin list the configuration also contains a
+		pointer to the last project the user worked with (<code class="filename">jcc.project</code>). 
+		At the launch time of JCC the last project will be automatically reopened.
+	</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p> 
+			The Control Center is realized as Jadex agent
+			<code class="filename">jadex/tools/jcc/JCC.agent.xml</code> and is started per default
+			when the Standalone platform is launched. To prevent the Control Center being
+			started the <code class="option">-nogui</code> option can be used for the Standalone
+			platform. Using other adapters the Control Center can be launched by simply starting
+			the corresponding JCC agent mentioned above.
+		</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="tools.controlcenter.usage"></a>2.1.&nbsp;Using the JCC</h2></div></div></div><p>
+			The Jadex Control Center provides different graphical areas that are partly
+			customized by some of the plugins. Basically the JCC offers:
+			</p><div class="itemizedlist"><ul type="disc"><li><p>
+						a <span class="emphasis"><em>menu bar</em></span> for invoking basica actions. Concretely,
+						the "File" menu provides options for loading/saving the current project
+						settings. In addition, the currently opened project name is displayed in the JCC
+						window's title bar (see <a href="tools.controlcenter.html#tools.controlcenter.fig_overview" title="Figure&nbsp;2.1.&nbsp;JCC window">Figure&nbsp;2.1, &#8220;JCC window&#8221;</a>).
+						The "File-&gt;Settings" menu item allows to open the platform settings dialog
+						described in <a href="tools.controlcenter.settings.html" title="2.2.&nbsp;Platform Settings">Section&nbsp;2.2, &#8220;Platform Settings&#8221;</a>.
+						The "File-&gt;Exit" menu item allows to close the GUI and kill the JCC agent,
+						and optionally shutdown the whole platform.
+						The "Help" menu provides access to the Jadex help system and the Jadex homepage.
+						Besides this menus plugins may add additional entries that can be used
+						for executing plugin-specific actions.
+					</p></li><li><p>
+						a <span class="emphasis"><em>tool bar</em></span> that offers shortcuts for often used actions.
+						The toolbar is thereby devided into two parts. On the left hand side plugin-
+						specific actions are displayed. On the right hand side the available plugins
+						are shown. The buttons at the right side of the toolbar 
+						allow to switch between the perspectives each provided by a plugin 
+						(Starter, DF Browser, Conversation Center, Introspector, Tracer, Test Center 
+						or Jadexdoc).
+						<span class="inlinemediaobject"><img src="images/controlcenter/perspectives.png"></span> 
+					</p></li><li><p>
+						a <span class="emphasis"><em>console</em></span> window nearly at the bottom of the JCC window.
+						The console simply shows all output that is written to the System.out (black font
+						color) and System.err (red font color) streams. The buttons on the right hand
+						side allow to turn off the console and to clear the current output.
+					</p><span class="inlinemediaobject"><img src="images/controlcenter/consolebuttons.png"></span></li><li><p>
+						a <span class="emphasis"><em>status bar</em></span> at the bottom of the JCC window. This bar
+						fulfills two functionalities. On the left hand side currently relevant information
+						is printed out, e.g. when a project was successfully loaded or an agent file
+						was scanned for errors. On the right hand side small animated icons appear
+						whenever some activity is performed in the background (e.g. scanning files
+						for agent testcases). 
+					</p></li></ul></div><p>
+			
+		</p></div></div></body></html>

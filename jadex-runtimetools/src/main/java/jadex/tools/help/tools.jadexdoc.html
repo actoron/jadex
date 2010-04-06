@@ -1,0 +1,161 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter&nbsp;9.&nbsp;Jadexdoc Tool</title><link rel="stylesheet" href="javahelp.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.69.1"><link rel="start" href="index.html" title="Jadex - The BDI Reasoning Engine"><link rel="up" href="index.html" title="Jadex - The BDI Reasoning Engine"><link rel="prev" href="tools.testcenter.write.html" title="8.2.&nbsp;Writing Testcases"><link rel="next" href="jadexdoc.synopsis.html" title="9.2.&nbsp;Jadexdoc Commandline Usage"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="tools.jadexdoc"></a>Chapter&nbsp;9.&nbsp;Jadexdoc Tool</h2></div></div></div><p>
+		The Jadexdoc Tool is a documentation tool similar to the Javadoc tool.
+ 		It provides the ability to generate HTML pages for
+ 		ADF (Agent Description File) documentation from Jadex source files.
+ 		The Jadexdoc tool parses the declarations and documentation comments
+ 		in a set of agent description files and produces a corresponding set of
+		HTML pages describing the agents, capabilities, beliefs,
+		goals, plans, events and expressions. You can use it to generate the ADF
+		documentation or the implementation documentation for a set of agents and
+		capabilities. The Jadexdoc tools can be run together with the Javadoc
+		tool in order to document the agents as well as the used Java classes.
+		Jadexdoc will use the generated Javadoc documentation and generate links for 
+		the corresponding classes.
+		You can run the Jadexdoc tool on entire packages, individual
+		source files, or both. When documenting entire packages, you can either traverse
+		recursively down from a top-level directory, or pass in an explicit list of
+		package names. When documenting individual source files, you pass in a list of
+		source (<code class="filename">.agent.xml</code> or <code class="filename">.capability.xml</code>)
+ 		filenames. 
+	</p><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="jadexdoc.gui"></a>9.1.&nbsp;Graphical tool</h2></div></div></div><p>
+ 			The easiest way to use the Jadexdoc tool is via the plugin which
+ 			provides a gui simplifying the documentation task: 
+ 			
+	 		</p><div class="figure"><a name="tools.jadexdoc.fig_overview"></a><div class="screenshot"><div class="mediaobject"><img src="images/jadexdoc/jadexdoc_overview.png" alt="Jadexdoc tool overview"></div></div><p class="title"><b>Figure&nbsp;9.1.&nbsp;Jadexdoc tool overview</b></p></div><p>
+ 			
+ 			There are three basic panels in this graphical tool. The model tree on the
+ 			left hand side, the package panel and the settings panel. They will be described
+ 			in detail below.
+ 		</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="jadexdoc.modeltree"></a>9.1.1.&nbsp;Model Tree</h3></div></div></div><p>
+	 			On the left upper side there is the model tree which is already known 
+	 			from other tools such as the starter tool (see 
+	 			<a href="tools.starter.html#tools.starter.modeltree" title="3.1.&nbsp;Model Tree">Section&nbsp;3.1, &#8220;Model Tree&#8221;</a>):
+	 			
+	 			</p><div class="figure"><a name="tools.jadexdoc.modeltree"></a><div class="screenshot"><div class="mediaobject"><img src="images/jadexdoc/model_tree.png" alt="Model Tree"></div></div><p class="title"><b>Figure&nbsp;9.2.&nbsp;Model Tree</b></p></div><p>
+	 			
+	 			With this panel you can manage adding packages or single files to your 
+	 			selection of files of which you want to create the Javadoc/Jadexdoc. For
+	 			this purpose the following actions are available via popup (and also
+	 			partially via the tool bar above):
+	 			</p><div class="itemizedlist"><ul type="disc"><li><p>
+			 				<span class="inlinemediaobject"><img src="images/jadexdoc/new_add_package.png"></span>
+			 				For adding the selected package to the list of packages to document.
+		 				</p></li><li><p>
+			 				<span class="inlinemediaobject"><img src="images/jadexdoc/new_add_all_packages.png"></span>
+			 				For adding the selected package and all recursivly contained subpackages 
+			 				to the list of packages to document.
+		 				</p></li><li><p>
+			 				<span class="inlinemediaobject"><img src="images/jadexdoc/new_remove_package.png"></span>
+			 				For removing the selected package to the list of packages to document.
+		 				</p></li><li><p>
+			 				<span class="inlinemediaobject"><img src="images/jadexdoc/new_remove_all_packages.png"></span>
+			 				For removing the selected package and all recursivly contained subpackages 
+			 				to the list of packages to document.
+		 				</p></li></ul></div><p>
+			</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="jadexdoc.packages"></a>9.1.2.&nbsp;Package Selection Panel</h3></div></div></div><p>
+	 			In the middle you can find a panel which displays selections of &#8220;<span class="quote">Packages</span>&#8221;, 
+	 			&#8220;<span class="quote">Source Paths</span>&#8221;, &#8220;<span class="quote">Class Paths</span>&#8221; and &#8220;<span class="quote">URL Links</span>&#8221;:
+	 			
+	 			</p><div class="figure"><a name="tools.jadexdoc.packages"></a><div class="screenshot"><div class="mediaobject"><img src="images/jadexdoc/packages.png" alt="The panel for adding packages etc."></div></div><p class="title"><b>Figure&nbsp;9.3.&nbsp;The panel for adding packages etc.</b></p></div><p>
+	 		</p><div class="itemizedlist"><ul type="disc"><li><p>
+			 			The&#8220;<span class="quote">Packages</span>&#8221; tab shows the packages and files that should be documented 
+			 			by the Jadexdoc and Javadoc tools.
+	 				</p></li><li><p>
+			 			In the &#8220;<span class="quote">Source Paths</span>&#8221; tab the path(s) to the sources of the 
+			 			packages and files to document can be defined. In case of Jadexdoc source
+			 			paths are normally not that important because the ADF files are contained in
+			 			the "classes" folder, too. With respect to Javadoc source path are more
+			 			important as Javadoc always needs the Java source files for accessing the
+			 			Javadoc comments which are not present in the compiled classes any more.  
+	 				</p></li><li><p>
+	 					In the &#8220;<span class="quote">Class Paths</span>&#8221; tab the class path can be edited. This
+	 					can be done either by hand or by clicking on the &#8220;<span class="quote">Fetch</span>&#8221; button  
+	 					which results in fetching the currently used class paths.
+	 				</p></li><li><p>
+	 					If you finally choose the tab &#8220;<span class="quote">URL Links</span>&#8221; you can specify 
+	 					locations you want to cross-link to in your doc-files. 
+	 					If you click on fetch this will insert an entry for 
+	 					the URL to the Standard JDK Java API. This will enable Javadoc and Jadexdoc
+	 					to generate links for the standard Java classes such as String, Integer etc.
+	 				</p></li></ul></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="jadexdoc.settings"></a>9.1.3.&nbsp;Settings Panel</h3></div></div></div><p>
+				On the right hand side you can find the settings panel, 
+				where some detailed settings for Javadoc and Jadexdoc and be defined:
+				
+				</p><div class="figure"><a name="tools.jadexdoc.settings"></a><div class="screenshot"><div class="mediaobject"><img src="images/jadexdoc/settings.png" alt="The settings panel"></div></div><p class="title"><b>Figure&nbsp;9.4.&nbsp;The settings panel</b></p></div><p>
+			</p><div class="itemizedlist"><ul type="disc"><li><p>
+			 			The "Include subpackes" check box can be used for automatically
+			 			including subpackages. This means if this option is checked the
+			 			tools will generate documentation for all selected packages (and files)
+			 			and all of the recursively contained subpackages.	
+	 				</p></li><li><p>
+	 					Via the "Output directory" textfield it can be defined to which
+	 					directory the documentation should be generated.
+						The standard output directory is the current directory.
+						The <span class="guibutton">"..."</span> button can be used to select
+						another appropriate target directory.
+	 				</p></li><li><p>
+			 			The "Overview page" represents the top-level page for the
+						whole generated documentation and contains information about
+						the contained packages. The <span class="guibutton">"..."</span> button
+ 						can be used to select a custom overview HTML page. The overview
+						page will only be included when the corresponding check box is
+						selected.
+	 				</p></li><li><p>
+	 					The "Document title" option can be used for specifying the title to 
+	 					be placed near the top of the overview summary file. The title will 
+	 					be placed as a centered, level-one heading directly beneath the upper 
+	 					navigation bar. The title will only be included when the corresponding 
+	 					check box is selected.
+	 				</p></li><li><p>
+	 					The "Basic options" can be used to turn on/off several generation
+						features. The hierarchy tree is a page containing agents and
+						capabilities displayed in usage relationships. The navigation bar
+						offers possibilities to refer to related documentation pages. It can
+						be turned off if you are interested only in the content and have
+						no need for navigation, e.g. when converting the files to PostScript
+						or PDF for print only. The index holds an alphabetical list of elements.
+						It can be adjusted with an options in a way that only one letter per
+						page is generated.
+	 				</p></li><li><p>
+	 					The "Generate Javadoc" check box can be used to turn on/off the
+	 					invocation of the Javadoc tool.
+	 				</p></li><li><p>
+	 					In the extra options text field an arbitrary number of additional
+						Javadoc command line options can be specified.
+	 				</p></li><li><p>
+	 					The "Javadoc program location" option allows for specifying the program
+	 					location of the Javadoc tool, which belongs to the standard JDK edition.
+	 					
+	 				</p></li><li><p>
+	 					The "Generate Jadexdoc" check box can be used to turn on/off the
+	 					invocation of the Jadexdoc tool.
+	 				</p></li><li><p>
+	 					In the extra options text field an arbitrary number of additional
+						Jadexdoc command line options can be specified.
+	 				</p></li><li><p>
+	 					The "Java program location" option allows for specifying the program
+	 					location of the Java program (e.g. java.exe on Windows systems), 
+	 					which belongs to the standard JDK edition and is required for the
+	 					invocation of the Jadexdoc tool.
+	 					
+	 				</p></li></ul></div><p>
+				During the documentation generation, there will appear an animated icon in the bottom 
+				right corner. While running Javadoc, it shows a Java icon scanned by a red bar
+				<span class="inlinemediaobject"><img src="images/jadexdoc/new_javadoc_anim.gif"></span>
+				, while running Jadexdoc, an icon with an agent scanned by a red bar is displayed
+				<span class="inlinemediaobject"><img src="images/jadexdoc/new_jadexdoc_anim.gif"></span>
+				.
+			</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="jadexdoc.cons_output"></a>9.1.4.&nbsp;Console Output Panel</h3></div></div></div><p>
+				The Jadexdoc and Javadoc tools both use the standard Java output and
+				error streams (System.out and System.err) for printing out information
+				about the generation progress. The console panel of the JCC allows
+				for inspecting these outputs directly in the tool (see also <a href="tools.controlcenter.html#tools.controlcenter.usage" title="2.1.&nbsp;Using the JCC">Section&nbsp;2.1, &#8220;Using the JCC&#8221;</a>).
+				
+				</p><div class="figure"><a name="tools.jadexdoc.console_output"></a><div class="screenshot"><div class="mediaobject"><img src="images/jadexdoc/console_output.png" alt="The console output panel"></div></div><p class="title"><b>Figure&nbsp;9.5.&nbsp;The console output panel</b></p></div><p>
+				
+				On the top right of the console outputs, there are two buttons. With the left one, 
+				you can turn on and off the console output during a run, with the right one you can 
+				clear the console.
+			</p></div></div></div></body></html>

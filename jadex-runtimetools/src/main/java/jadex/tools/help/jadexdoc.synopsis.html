@@ -1,0 +1,29 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>9.2.&nbsp;Jadexdoc Commandline Usage</title><link rel="stylesheet" href="javahelp.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.69.1"><link rel="start" href="index.html" title="Jadex - The BDI Reasoning Engine"><link rel="up" href="tools.jadexdoc.html" title="Chapter&nbsp;9.&nbsp;Jadexdoc Tool"><link rel="prev" href="tools.jadexdoc.html" title="Chapter&nbsp;9.&nbsp;Jadexdoc Tool"><link rel="next" href="jadexdoc.srcs.html" title="9.3.&nbsp;Source Files"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="jadexdoc.synopsis"></a>9.2.&nbsp;Jadexdoc Commandline Usage</h2></div></div></div><p>
+ 			You can start the Jadexdoc tool from a console via:
+		</p><span><strong class="command">
+			java jadex.tools.jadexdoc.Main [options] [packagenames] [sourcefilenames] [-subpackage pck1:..]
+		</strong></span><p><b>Description.&nbsp;</b>
+			   Arguments can be in any order. See processing of Source Files for details on how
+			   the Jadexdoc tool determines which source files to process.
+				</p><div class="itemizedlist"><ul type="disc"><li><p><b>options.&nbsp;</b>
+								Command-line options, as specified in this document. The section options below
+								contains examples of Jadexdoc options.
+							</p></li><li><p><b>packagenames.&nbsp;</b>
+								A series of names of packages, separated by spaces, such as
+								<code class="option">jadex.examples jadex.planlib</code>.
+								You must separately specify each package you want to document.
+								Wildcards are not allowed; use <code class="option">-subpackages</code> for recursion.
+								For further details see the section <a href="jadexdoc.options.html" title="9.6.&nbsp;Options">Section&nbsp;9.6, &#8220;Options&#8221;</a>.
+							</p></li><li><p><b>sourcefilenames.&nbsp;</b>
+								A series of source file names, separated by spaces, each of which can begin with
+								a path and contain a wildcard such as asterisk (*). The Jadexdoc tool
+								will process every file whose name ends with ".agent.xml" or
+								".capability.xml".
+							</p></li><li><p><b>-subpackages <em class="replaceable"><code>pck1:pck2:...</code></em>&nbsp;</b>
+								Generates documentation from source files in the specified packages and
+								recursively in their subpackages as an alternative to supplying packagenames or
+								sourcefilenames.
+							</p></li></ul></div><p>
+			</p></div></body></html>

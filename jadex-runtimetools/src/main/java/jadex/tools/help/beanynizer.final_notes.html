@@ -1,0 +1,18 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>10.7.&nbsp;Final Notes</title><link rel="stylesheet" href="javahelp.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.69.1"><link rel="start" href="index.html" title="Jadex - The BDI Reasoning Engine"><link rel="up" href="tools.beanynizer.html" title="Chapter&nbsp;10.&nbsp;Beanynizer"><link rel="prev" href="beanynizer.converting_ontology.html" title="10.6.&nbsp;Converting an Existing Ontology"><link rel="next" href="tools.rma.html" title="Appendix&nbsp;A.&nbsp;JADE RMA Plugin"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="beanynizer.final_notes"></a>10.7.&nbsp;Final Notes</h2></div></div></div><p>Prot&eacute;g&eacute; is a complex tool in itself, therefore a basic
+            understanding of it is essential before you can effectively use the Beanynizer plugin.
+            The Beanynizer is still an early staged development based on our specific requirements,
+            and does not try to be a general purpose code generation environment. If you encounter
+            problems or miss some features please drop us a note, such that we can improve the
+            Beanynizer for upcoming releases.</p><p>Usages of the Beanynizer can be found in the cleanerworld, marsworld and hunterprey
+            examples (look for an "ontology" package). Also, some Jadex tools use a Beanynizer
+            generated ontology for communication (e.g., introspector, and tracer). Their
+                Prot&eacute;g&eacute; ontology files can be found in the
+                <code class="filename">jadex/onto</code> directory.</p><p>The Beanynizer was designed for flexible code generation. The code for the Java
+            classes is based on templates processed with the Velocity template engine. The
+            templates for the Java and Jade generation modes can be found in the <code class="filename">src/jadex/tools/beanynizer/genjava</code> and
+			<code class="filename">src/jadex/tools/beanynizer/genjade</code> directories.
+            If you want to change the way Beanynizer generates code, you may try to alter these
+            templates to suit your needs. See <a href="http://jakarta.apache.org/velocity/" target="_top">http://jakarta.apache.org/velocity/</a> for more information about the Velocity
+            template language.</p></div></body></html>

@@ -1,0 +1,37 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>6.2.&nbsp;Debugger Panel</title><link rel="stylesheet" href="javahelp.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.69.1"><link rel="start" href="index.html" title="Jadex - The BDI Reasoning Engine"><link rel="up" href="tools.introspector.html" title="Chapter&nbsp;6.&nbsp;Introspector"><link rel="prev" href="tools.introspector.html" title="Chapter&nbsp;6.&nbsp;Introspector"><link rel="next" href="tools.tracer.html" title="Chapter&nbsp;7.&nbsp;BDI Tracer"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="introspector.debugger_panel"></a>6.2.&nbsp;Debugger Panel</h2></div></div></div><p>
+			<span class="inlinemediaobject"><img src="images/introspector/bug_small.png"></span>
+
+			The debugger panel allows watching the internal
+			processing inside an agent. The window is made up of the agenda area,
+			the agenda control area in the middle and the details view at bottom (see
+			<a href="introspector.debugger_panel.html#introspector.fig_debugger_panel" title="Figure&nbsp;6.4.&nbsp;The Debugger Panel of Introspector">Figure&nbsp;6.4, &#8220;The Debugger Panel of Introspector&#8221;</a>.
+		</p><div class="figure"><a name="introspector.fig_debugger_panel"></a><div class="screenshot"><div class="mediaobject"><img src="images/introspector/introspector_debugger.jpg" alt="The Debugger Panel of Introspector"></div></div><p class="title"><b>Figure&nbsp;6.4.&nbsp;The Debugger Panel of Introspector</b></p></div><p>
+			The agenda contains all current action entries of the agent,
+			whereby entries in light-grey denote already processed actions.
+			In addition it can be seen whether entries currently have
+			a valid precondition and thus can subsequently be executed;
+			otherwise they are marked as (invalid). Such invalid actions will not be executed,
+			but just ignored by the execution mechanism.
+			To see some more information about an agenda action you can
+			double-click on it and inspect its values in the details view.
+			In addition to observing the agent's internal behavior the tool also allows you
+			to control the agenda execution by performing actions in step mode.
+			If the execution mode is set to
+			"step" or "cycle" you can use the
+			"forward" button to execute as many steps as shown in the
+			"execute &lt;n&gt; agenda actions" choice.
+			The difference between step and cycle mode concerns only the execution
+			of ProcessEventActions that are decomposed to finer-grained sub steps
+			(FindApplicableCandidatesAction, SelectCandidatesAction and
+			ScheduleCandidatesAction) when the
+			"step" mode is activated.
+			Therefore, the step mode allows you to examine the details of
+			the BDI plan selection process what can be helpful in
+			understanding and explaining unexpected application behavior.
+			The "open steps" status bar shows the progress of the action execution
+			by highlighting the number of steps the agent still has to perform
+			whereas in the the "processing state" line it can be seen
+			if a step is currently requested or has been finished.
+		</p></div></body></html>

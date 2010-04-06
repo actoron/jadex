@@ -1,0 +1,92 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>9.3.&nbsp;Source Files</title><link rel="stylesheet" href="javahelp.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.69.1"><link rel="start" href="index.html" title="Jadex - The BDI Reasoning Engine"><link rel="up" href="tools.jadexdoc.html" title="Chapter&nbsp;9.&nbsp;Jadexdoc Tool"><link rel="prev" href="jadexdoc.synopsis.html" title="9.2.&nbsp;Jadexdoc Commandline Usage"><link rel="next" href="jadexdoc.out.html" title="9.4.&nbsp;Generated Files"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="jadexdoc.srcs"></a>9.3.&nbsp;Source Files</h2></div></div></div><p>
+			 The Jadexdoc tool will generate output originating from four different types of
+			 "source" files: Agent and Capability source files, package comment
+			 files, overview comment files, and miscellaneous unprocessed files.
+		</p><p><b>Processing of source files.&nbsp;</b>
+				The Jadexdoc tool processes files that end with ".agent.xml" and ".capability.xml"
+				plus other files described below. If you run the Jadexdoc tool by explicitly
+				passing in individual source filenames, you can determine exactly which ADF
+				files are processed. However, that is not how most developers want to work, as
+				it is simpler to pass in package names.
+			</p><p><b>Package Comment Files.&nbsp;</b>
+				Each package can have its own documentation comment, contained in its own
+				"source" file, that the Jadexdoc tool will merge into the package
+				summary page that it generates. You typically include in this comment any
+				documentation that applies to the entire package.
+			</p><p>
+			To create a package comment file, you must name it
+			<code class="filename">package.html</code> and place it
+			in the package directory in the source tree along with the agent description
+			files. The Jadexdoc tool will automatically look for this filename in this
+			location. Notice that the filename is identical for all packages.
+		</p><p>
+			The content of the package comment file is one big documentation comment, written
+ 			in HTML, like all other comments. When writing the comment,
+			you should make the first sentence a summary about the package, and not put a title
+			or any other text between <code class="computeroutput">&lt;body&gt;</code> and the
+ 			first sentence.
+		</p><p>
+			When the Jadexdoc tool runs, it will automatically look for this file; if found,
+			the Jadexdoc tool does the following:
+			</p><div class="itemizedlist"><ul type="disc"><li><p>Copies all content between
+						<code class="computeroutput">&lt;body&gt;</code> and
+						<code class="computeroutput">&lt;/body&gt;</code> tags for
+						processing.
+					</p></li><li><p>
+						Inserts the processed text at the bottom of the package summary page it
+						generates, as shown in Package Summary.
+					</p></li><li><p>
+						Copies the first sentence of the package comment to the top of the package
+						summary page. It also adds the package name and this first sentence to the list of
+						packages on the overview page.
+					</p></li></ul></div><p>
+		</p><p><b>Overview Comment File.&nbsp;</b>
+				Each application or set of packages that you are documenting can have its own
+				overview documentation comment, kept in its own "source" file, that
+				the Jadexdoc tool will merge into the overview page that it generates. You
+				typically include in this comment any documentation that applies to the entire
+				application or set of packages.
+			</p><p>
+			To create an overview comment file, you can name the file anything you want,
+			typically <code class="filename">overview.html</code> and place it anywhere, typically at the top
+ 			level of the source tree. The content of the overview comment file is one big documentation comment,
+			written in HTML, like the package comment file described previously.
+			When you run the Jadexdoc tool, you specify the overview comment file name with
+			the <code class="option">-overview</code> option. The file is then processed similar to that of a package
+			comment file.
+
+			</p><div class="itemizedlist"><ul type="disc"><li><p>Copies all content between <code class="computeroutput">&lt;body&gt;</code> and
+						<code class="computeroutput">&lt;/body&gt;</code> tags for processing.
+					</p></li><li><p>Inserts the processed text at the bottom of the overview page it generates.</p></li><li><p>
+ 						Copies the first sentence of the overview comment to the top of the
+						overview summary page.
+					</p></li></ul></div><p>
+		</p><p><b>Miscellaneous Unprocessed Files.&nbsp;</b>
+				You can also include in your source any miscellaneous files that you want the
+				Jadexdoc tool to copy to the destination directory. These typically includes
+				graphic files, example agent description files, and self-standing HTML files
+				whose content would overwhelm the documentation comment of a normal agent
+				description file.
+			</p><p>
+			To include unprocessed files, put them in a directory called <code class="filename">doc-files</code> which
+			can be a subdirectory of any package directory that contains source files. You can
+			have one such subdirectory for each package. For example, if you want to include
+			the image of a creature <code class="filename">Creature.png</code> in the
+			<code class="filename">jadex.examples.hunterprey.creature.CleverPrey</code> agent documentation, you place
+			that file in the <code class="filename">jadex/examples/hunterprey/creature/doc-files/</code> directory.
+			Notice the <code class="filename">doc-files</code> directory should not be located at
+			<code class="filename">jadex/examples/doc-files/</code> because <code class="filename">examples</code> does not
+			directly contain any source files.
+		</p><p>
+			All links to these unprocessed files must be hard-coded, because the Jadexdoc
+			tool does not look at the files, it simply copies the directory and all its
+			contents to the destination. For example, the link in the
+			<code class="filename">CleverPrey.agent.xml</code>
+			doc comment might look like:
+			</p><p>
+				</p><pre class="programlisting">
+&lt;!-- The image of the CleverPrey agent: &lt;img src="doc-files/Creature.png"&gt; --&gt;</pre><p>
+			</p><p>
+		</p></div></body></html>
