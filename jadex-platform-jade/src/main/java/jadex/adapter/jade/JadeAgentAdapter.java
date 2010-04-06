@@ -5,6 +5,7 @@ import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.lang.acl.ACLMessage;
 import jadex.base.fipa.SFipa;
+import jadex.bridge.CheckedAction;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.IComponentAdapter;
@@ -270,7 +271,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		// Start the required jade behaviours.
 		// Hack!!! Add action execution behaviour first,
 		// because it has to execute agent init action before other behaviours.
-		this.agendacontrol	= new ActionExecutionBehaviour(agent);
+		this.agendacontrol	= new ActionExecutionBehaviour(this);
 		addBehaviour(agendacontrol);
 //		this.timing	= new TimingBehaviour(agent, clock);
 //		addBehaviour(timing);
@@ -312,7 +313,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 //			((IExecutionService)platform.getService(IExecutionService.class)).execute(this);
 		}
 	}
-
+	
 	/**
 	 *  Send a message via the adapter.
 	 *  @param message The message (name/value pairs).
@@ -1282,6 +1283,171 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 		    		+ logfile + "\n" + e.getMessage());
 		    }
 		}
+	}
+	
+	/**
+	 *  Executable code for running the component
+	 *  in the platforms executor service.
+	 */
+	public boolean	execute()
+	{
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || fatalerror)
+			throw new ComponentTerminatedException(cid.getName());
+
+		// Remember execution thread.
+		this.agentthread	= Thread.currentThread();
+		
+		ClassLoader	cl	= agentthread.getContextClassLoader();
+		agentthread.setContextClassLoader(model.getClassLoader());
+
+		// Copy actions from external threads into the state.
+		// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
+		boolean	extexecuted	= false;
+		Runnable[]	entries	= null;
+		synchronized(ext_entries)
+		{
+			if(!(ext_entries.isEmpty()))
+			{
+				entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
+				ext_entries.clear();
+				
+				extexecuted	= true;
+			}
+		}
+		for(int i=0; entries!=null && i<entries.length; i++)
+		{
+			if(entries[i] instanceof CheckedAction)
+			{
+				if(((CheckedAction)entries[i]).isValid())
+				{
+					try
+					{
+						entries[i].run();
+					}
+					catch(Exception e)
+					{
+						// Fatal error!
+						fatalerror	= true;
+						e.printStackTrace();
+						getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
+							
+						// Remove component from platform.
+						((IComponentManagementService)platform.getService(IComponentManagementService.class)).destroyComponent(cid, null);
+
+//						StringWriter	sw	= new StringWriter();
+//						e.printStackTrace(new PrintWriter(sw));
+//						getLogger().severe("Execution of action led to exception: "+sw);
+					}
+				}
+				try
+				{
+					((CheckedAction)entries[i]).cleanup();
+				}
+				catch(Exception e)
+				{
+					// Fatal error!
+					fatalerror	= true;
+					e.printStackTrace();
+					getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
+						
+					// Remove component from platform.
+					((IComponentManagementService)platform.getService(IComponentManagementService.class)).destroyComponent(cid, null);
+
+//					StringWriter	sw	= new StringWriter();
+//					e.printStackTrace(new PrintWriter(sw));
+//					getLogger().severe("Execution of action led to exception: "+sw);
+				}
+			}
+			else //if(entries[i] instanceof Runnable)
+			{
+				try
+				{
+					entries[i].run();
+				}
+				catch(Exception e)
+				{
+					// Fatal error!
+					fatalerror	= true;
+					e.printStackTrace();
+					getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
+						
+					// Remove component from platform.
+					((IComponentManagementService)platform.getService(IComponentManagementService.class)).destroyComponent(cid, null);
+
+//					StringWriter	sw	= new StringWriter();
+//					e.printStackTrace(new PrintWriter(sw));
+//					getLogger().severe("Execution of action led to exception: "+sw);
+				}
+			}
+		}
+
+		// Suspend when breakpoint is triggered.
+		if(!dostep && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+		{
+			if(agent.isAtBreakpoint(desc.getBreakpoints()))
+			{
+				AMS	ces	= (AMS)platform.getService(IComponentManagementService.class);
+				ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
+			}
+		}
+		
+		// Should the component be executed again?
+		boolean	again = false;
+		if(!extexecuted && (!IComponentDescription.STATE_SUSPENDED.equals(desc.getState())
+			&& !IComponentDescription.STATE_WAITING.equals(desc.getState()) || dostep))
+		{
+			// Set state to waiting before step. (may be reset by wakup() call in step)
+			if(dostep && IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+			{
+				AMS	ces	= (AMS)platform.getService(IComponentManagementService.class);
+				ces.setComponentState(cid, IComponentDescription.STATE_WAITING);	// I hope this doesn't cause any deadlocks :-/
+			}
+
+			try
+			{
+				//System.out.println("Executing: "+component);
+				again	= agent.executeStep();
+			}
+			catch(Throwable e)
+			{
+				// Fatal error!
+				fatalerror	= true;
+				e.printStackTrace();
+				getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
+					
+				// Remove component from platform.
+				((IComponentManagementService)platform.getService(IComponentManagementService.class)).destroyComponent(cid, null);
+			}
+			if(dostep)
+			{
+				dostep	= false;
+				// Set back to suspended if components is still waiting but wants to execute again.
+				if(again && IComponentDescription.STATE_WAITING.equals(desc.getState()))
+				{
+					AMS	ces	= (AMS)platform.getService(IComponentManagementService.class);
+					ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
+				}
+				again	= again && IComponentDescription.STATE_ACTIVE.equals(desc.getState());
+				if(steplistener!=null)
+					steplistener.resultAvailable(this, desc);
+			}
+		}
+
+		// Suspend when breakpoint is triggered.
+		if(!dostep && !IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
+		{
+			if(agent.isAtBreakpoint(desc.getBreakpoints()))
+			{
+				AMS	ces	= (AMS)platform.getService(IComponentManagementService.class);
+				ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
+			}
+		}
+
+		// Reset execution thread.
+		agentthread.setContextClassLoader(cl);
+		this.agentthread = null;
+		
+		return again || extexecuted;
 	}
 }
 
