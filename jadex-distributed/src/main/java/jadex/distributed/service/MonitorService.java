@@ -117,8 +117,7 @@ public class MonitorService implements IMonitorService, IDiscoveryServiceListene
 	/** Methoden um dem IService interface zu genügen **/
 	@Override
 	public void startService() {
-		// nac JMX Agenten ausschau halten
-		// com.sun.jdmk.discovery.DiscoveryClient
+		// actively look for JMX agents with com.sun.jdmk.discovery.DiscoveryClient; those JMX agents need a DiscoveryResponder to be discoverable 
 		discoveryClient = new DiscoveryClient();
 		try {
 			discoveryClient.setTimeToLive(16);
@@ -135,12 +134,14 @@ public class MonitorService implements IMonitorService, IDiscoveryServiceListene
 		
 		System.out.println("HI");
 		//Vector<DiscoveryResponse> v = discoveryClient.findMBeanServers();
-		Vector v = discoveryClient.findMBeanServers();
+		//Vector v = discoveryClient.findMBeanServers();
+		Vector<DiscoveryResponse> v = discoveryClient.findMBeanServers();
 		System.out.println( v.size() );
-		//for (DiscoveryResponse response : v) {
-		for(int i=0; i<v.size(); i++) {
-			//System.out.println( response.getHost() );
-			System.out.println( v.get(i).toString() );
+		for (DiscoveryResponse response : v) {
+		//for(int i=0; i<v.size(); i++) {
+			System.out.println( response.getHost() );
+			System.out.println( response );
+			//System.out.println( v.get(i).toString() );
 		}
 		System.out.println("HO");
 		
