@@ -25,8 +25,11 @@ public class CMSCreateComponent implements IComponentAction
 	/** Attribute for slot arguments. */
 	protected java.util.Map arguments;
 
-	/** Attribute for slot start. */
-	protected boolean start = true;
+	/** Attribute for slot suspend. */
+	protected boolean suspend = false;
+
+	/** Attribute for slot master. */
+	protected boolean master = false;
 
 	/** Attribute for slot parent. */
 	protected IComponentIdentifier parent;
@@ -160,21 +163,39 @@ public class CMSCreateComponent implements IComponentAction
 	}
 
 	/**
-	 *  Get the start of this AMSCreateComponent.
-	 * @return start
+	 *  Get the suspend flag.
+	 * @return suspend.
 	 */
-	public boolean isStart()
+	public boolean isSuspend()
 	{
-		return this.start;
+		return this.suspend;
 	}
 
 	/**
-	 *  Set the start of this AMSCreateComponent.
-	 * @param start the value to be set
+	 *  Set the suspend flag.
+	 * @param suspend the value to be set
 	 */
-	public void setStart(boolean start)
+	public void setSuspend(boolean suspend)
 	{
-		this.start = start;
+		this.suspend = suspend;
+	}
+
+	/**
+	 *  Get the master flag.
+	 * @return master.
+	 */
+	public boolean isMaster()
+	{
+		return this.master;
+	}
+
+	/**
+	 *  Set the master flag.
+	 * @param master the value to be set
+	 */
+	public void setMaster(boolean master)
+	{
+		this.master = master;
 	}
 
 	//-------- additional methods --------

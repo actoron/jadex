@@ -1,19 +1,18 @@
 package jadex.wfms.service.impl;
 
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.concurrent.IResultListener;
-import jadex.gpmn.GpmnXMLReader;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
-import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IAdministrationService;
-import jadex.wfms.service.IWfmsClientService;
+import jadex.wfms.service.IExecutionService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -127,7 +126,7 @@ public class GpmnProcessService implements IExecutionService, IService
 		try
 		{
 			IComponentFactory factory = (IComponentFactory) wfms.getService(IComponentFactory.class, "gpmn_factory");
-			ret = factory.loadModel(ls.getClassLoader().getResource(filename).getPath());
+			ret = factory.loadModel(ls.getClassLoader().getResource(filename).getPath(), imports);
 		}
 		catch(Exception e)
 		{
@@ -147,7 +146,7 @@ public class GpmnProcessService implements IExecutionService, IService
 	{
 		final String name = id.toString();
 		final IComponentManagementService ces = (IComponentManagementService)wfms.getService(IComponentManagementService.class);
-		ces.createComponent(String.valueOf(id), modelname, null, arguments, true, new IResultListener()
+		ces.createComponent(String.valueOf(id), modelname, new CreationInfo(null, arguments, null, true, false), new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -180,7 +179,7 @@ public class GpmnProcessService implements IExecutionService, IService
 			{
 				Logger.getLogger("Wfms").log(Level.SEVERE, "Failed to start model: " + name);
 			}
-		}, null, null, false);
+		}, null);
 		
 		
 		/*ams.createAgent(name, modelname, null, null, new IResultListener()

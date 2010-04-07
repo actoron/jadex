@@ -221,7 +221,7 @@ public class MessageService implements IMessageService, IService
 					if(aca.getArguments()!=null)
 						create.addArguments(aca.getArguments());
 					create.setClassName(JadeAgentAdapter.class.getName());
-					if(!aca.isStart())
+					if(aca.isSuspend())
 						throw new RuntimeException("Delayed agent start not yet supported.");
 
 					create.setContainer(new ContainerID("Main-Container", null));

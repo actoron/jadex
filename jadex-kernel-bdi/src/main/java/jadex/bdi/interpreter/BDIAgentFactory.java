@@ -140,17 +140,19 @@ public class BDIAgentFactory implements IComponentFactory, IService
 	}
 	
 	/**
-	 *  Load an agent model.
-	 *  @param filename The filename.
+	 *  Load a  model.
+	 *  @param filename The model (e.g. file name).
+	 *  @param The imports (if any).
+	 *  @return The loaded model.
 	 */
-	public ILoadableComponentModel loadModel(String filename)
+	public ILoadableComponentModel loadModel(String filename, String[] imports)
 	{
 		init();
 		
 		try
 		{
 //			System.out.println("loading bdi: "+filename);
-			OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, null);
+			OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports);
 			return loaded;
 		}
 		catch(Exception e)
@@ -162,11 +164,11 @@ public class BDIAgentFactory implements IComponentFactory, IService
 	
 	/**
 	 *  Test if a model can be loaded by the factory.
-	 *  @param model The model.
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	// Todo: support imports when loading models.
-	public boolean	isLoadable(String model)
+	public boolean isLoadable(String model, String[] imports)
 	{
 		init();
 
@@ -183,11 +185,12 @@ public class BDIAgentFactory implements IComponentFactory, IService
 	}
 	
 	/**
-	 *  Test if a model is startable (e.g. an agent).
-	 *  @param model The model.
+	 *  Test if a model is startable (e.g. an component).
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public boolean isStartable(String model)
+	public boolean isStartable(String model, String[] imports)
 	{
 		return model!=null && model.toLowerCase().endsWith(".agent.xml");
 //		return SXML.isAgentFilename(model);
@@ -212,9 +215,11 @@ public class BDIAgentFactory implements IComponentFactory, IService
 	}
 
 	/**
-	 *  Get the file type of a model.
+	 *  Get the component type of a model.
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 */
-	public String getComponentType(String model)
+	public String getComponentType(String model, String[] imports)
 	{
 		return model.toLowerCase().endsWith(".agent.xml") ? FILETYPE_BDIAGENT
 			: model.toLowerCase().endsWith(".capability.xml") ? FILETYPE_BDICAPABILITY

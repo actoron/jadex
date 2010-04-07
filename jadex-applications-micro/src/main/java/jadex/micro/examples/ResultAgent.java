@@ -1,6 +1,7 @@
 package jadex.micro.examples;
 
 import jadex.bridge.Argument;
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.concurrent.IResultListener;
@@ -31,7 +32,7 @@ public class ResultAgent extends MicroAgent
 			IComponentManagementService ces = (IComponentManagementService)getServiceContainer()
 				.getService(IComponentManagementService.class);
 			
-			ces.createComponent(null, getClass().getName()+".class", null, null, false, null, getComponentIdentifier(), createResultListener(new IResultListener()
+			ces.createComponent(null, getClass().getName()+".class", new CreationInfo(getComponentIdentifier()), null, createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -44,7 +45,7 @@ public class ResultAgent extends MicroAgent
 					System.out.println("exception occurred: "+exception);
 					killAgent();
 				}
-			}), false);
+			}));
 		}
 	}
 	

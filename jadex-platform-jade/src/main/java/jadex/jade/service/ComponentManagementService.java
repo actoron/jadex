@@ -6,6 +6,7 @@ import jadex.base.DefaultResultListener;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.fipa.ComponentIdentifier;
 import jadex.base.fipa.SearchConstraints;
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
@@ -95,17 +96,14 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  Create a new component on the platform.
 	 *  @param name The component name.
 	 *  @param model The model identifier (e.g. file name).
-	 *  @param config The configuration to use for initializing the component (null for default).
-	 *  @param args The arguments for the component (if any).
-	 *  @param suspend Create the component in suspended mode (i.e. do not run until resume() is called).
-	 *  @param listener The result listener (if any). Will receive the id of the component as result.
-	 *  @param parent The parent (if any).
+	 *  @param lis The result listener (if any). Will receive the id of the component as result, when the component has been created.
+	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
-	public void	createComponent(String name, String model, final String config, final Map args, final boolean suspend, 
-		IResultListener lis, IComponentIdentifier parent, final IResultListener resultlistener, boolean master)
+	public void	createComponent(String name, String model, CreationInfo cinfo, IResultListener lis, final IResultListener killlistener)
 	{
 		System.out.println("Create agent: "+name);
 		
+		final CreationInfo info	= cinfo!=null ? cinfo : new CreationInfo();	// Dummy default info, if null.
 		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
 		IComponentIdentifier aid = null;
 		
@@ -120,16 +118,16 @@ public class ComponentManagementService implements IComponentManagementService, 
 			for(Iterator it=facts.iterator(); factory==null && it.hasNext(); )
 			{
 				IComponentFactory	cf	= (IComponentFactory)it.next();
-				if(cf.isLoadable(model))
+				if(cf.isLoadable(model, info.getImports()))
 				{
 					factory	= cf;
-					type	= factory.getComponentType(model);
+					type	= factory.getComponentType(model, info.getImports());
 				}
 			}
 		}
 		if(factory==null)
 			throw new RuntimeException("No factory found for component: "+model);
-		final ILoadableComponentModel lmodel = factory.loadModel(model);
+		final ILoadableComponentModel lmodel = factory.loadModel(model, info.getImports());
 		
 		if(name!=null && name.indexOf('@')!=-1)
 		{
@@ -146,9 +144,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 
 		List argus = new ArrayList();
 		argus.add(lmodel);
-		argus.add(config);//==null? "default": config);
-		if(args!=null)
-			argus.add(args);	// Jadex argument map is supplied as 3rd index in JADE argument array.  
+		argus.add(info.getConfiguration());//==null? "default": config);
+		if(info.getArguments()!=null)
+			argus.add(info.getArguments());	// Jadex argument map is supplied as 3rd index in JADE argument array.  
 				
 		try
 		{
@@ -170,14 +168,14 @@ public class ComponentManagementService implements IComponentManagementService, 
 			return;
 		}
 		
-		final CMSComponentDescription ad = new CMSComponentDescription(aid, type, parent, master);
+		final CMSComponentDescription ad = new CMSComponentDescription(aid, type, info.getParent(), info.isMaster());
 		
 //			System.out.println("added: "+agentdescs.size()+", "+aid);
 		
-		IComponentDescription padesc = parent!=null? (IComponentDescription)descs.get(parent): null;
+		IComponentDescription padesc = info.getParent()!=null? (IComponentDescription)descs.get(info.getParent()): null;
 		// Suspend when set to suspend or when parent is also suspended or when specified in model.
 		Object debugging  = lmodel.getProperties().get("debugging");
-		if(suspend || (padesc!=null && IComponentDescription.STATE_SUSPENDED.equals(padesc.getState()))
+		if(info.isSuspend() || (padesc!=null && IComponentDescription.STATE_SUSPENDED.equals(padesc.getState()))
 			|| debugging instanceof Boolean && ((Boolean)debugging).booleanValue())
 		{
 			ad.setState(IComponentDescription.STATE_SUSPENDED);
@@ -187,9 +185,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 			ad.setState(IComponentDescription.STATE_ACTIVE);
 		}
 		descs.put(aid, ad);
-		if(parent!=null)
+		if(info.getParent()!=null)
 		{
-			children.put(parent, aid);
+			children.put(info.getParent(), aid);
 		}
 		
 		// Hack! Busy waiting for platform agent init finished.
@@ -208,9 +206,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 		adapter.setComponentDescription(ad);
 
 		JadeAgentAdapter pad = null;
-		if(parent!=null)
+		if(info.getParent()!=null)
 		{
-			pad	= (JadeAgentAdapter)adapters.get(parent);
+			pad	= (JadeAgentAdapter)adapters.get(info.getParent());
 		}
 
 		if(pad!=null)
@@ -223,8 +221,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					createComponentInstance(config, args, suspend, rl,
-						resultlistener, cf, lmodel, faid, adapter, fpad, ad, (IExternalAccess)result);
+					createComponentInstance(info.getConfiguration(), info.getArguments(), info.isSuspend(), rl,
+						killlistener, cf, lmodel, faid, adapter, fpad, ad, (IExternalAccess)result);
 				}
 				
 				public void exceptionOccurred(Object source, Exception exception)
@@ -235,8 +233,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 		}
 		else
 		{
-			createComponentInstance(config, args, suspend, listener,
-				resultlistener, factory, lmodel, (ComponentIdentifier)aid, adapter, null, ad, null);
+			createComponentInstance(info.getConfiguration(), info.getArguments(), info.isSuspend(), listener,
+				killlistener, factory, lmodel, (ComponentIdentifier)aid, adapter, null, ad, null);
 		}
 	}	
 		

@@ -48,9 +48,13 @@
 			<parameter name="arguments" class="Map" optional="true"/>
 			<!-- Class loader to be used (only supported for local requests). -->
 			<parameter name="classloader" class="ClassLoader" optional="true"/>
-			<!-- Flag indicating if the component should be started after creation. -->
-			<parameter name="start" class="boolean">
-				<value>true</value>
+			<!-- Flag indicating if the component should be suspended after creation. -->
+			<parameter name="suspend" class="boolean">
+				<value>false</value>
+			</parameter>
+			<!-- Flag indicating if the component should be a master (i.e. when killed, the parent dies also). -->
+			<parameter name="master" class="boolean">
+				<value>false</value>
 			</parameter>
 			<!-- Context the component should be started in (defaults to starting component's parent). -->
 			<parameter name="parent" class="jadex.bridge.IComponentIdentifier">
@@ -141,8 +145,11 @@
 			<parameter name="classloader" class="ClassLoader">
  				<goalmapping ref="cms_create_component.classloader"/>
 			</parameter>
-			<parameter name="start" class="boolean">
- 				<goalmapping ref="cms_create_component.start"/>
+			<parameter name="suspend" class="boolean">
+ 				<goalmapping ref="cms_create_component.suspend"/>
+			</parameter>
+			<parameter name="master" class="boolean">
+ 				<goalmapping ref="cms_create_component.master"/>
 			</parameter>
 			<parameter name="parent" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="cms_create_component.parent"/>
@@ -272,8 +279,11 @@
 			<parameter name="arguments" class="Map">
  				<goalmapping ref="cms_create_component.arguments"/>
 			</parameter>
-			<parameter name="start" class="boolean">
- 				<goalmapping ref="cms_create_component.start"/>
+			<parameter name="suspend" class="boolean">
+ 				<goalmapping ref="cms_create_component.suspend"/>
+			</parameter>
+			<parameter name="master" class="boolean">
+ 				<goalmapping ref="cms_create_component.master"/>
 			</parameter>
 			<parameter name="parent" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="cms_create_component.parent"/>

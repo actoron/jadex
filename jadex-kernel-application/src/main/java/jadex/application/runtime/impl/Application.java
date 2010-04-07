@@ -9,6 +9,7 @@ import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
 import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.runtime.ISpace;
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentDescription;
@@ -268,13 +269,13 @@ public class Application	implements IApplication, IComponentInstance
 				for(Iterator it=facts.iterator(); factory==null && it.hasNext(); )
 				{
 					IComponentFactory	cf	= (IComponentFactory)it.next();
-					if(cf.isLoadable(atype.getFilename()))
+					if(cf.isLoadable(atype.getFilename(), this.model.getApplicationType().getAllImports()))
 					{
 						factory	= cf;
 					}
 				}
 			}
-			ILoadableComponentModel amodel = factory.loadModel(atype.getFilename());
+			ILoadableComponentModel amodel = factory.loadModel(atype.getFilename(), this.model.getApplicationType().getAllImports());
 			
 			if(SUtil.equals(amodel.getPackage(), model.getPackage()) && amodel.getName().equals(model.getName()))
 //			if(amodel.getFilename().equals(model.getFilename()))
@@ -709,8 +710,9 @@ public class Application	implements IApplication, IComponentInstance
 				for(int j=0; j<num; j++)
 				{
 					IComponentManagementService	ces	= (IComponentManagementService)adapter.getServiceContainer().getService(IComponentManagementService.class);
-					ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(), component.getConfiguration(), 
-						component.getArguments(this, cl), component.isSuspended(), null, adapter.getComponentIdentifier(), null, component.isMaster());					
+					ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(),
+						new CreationInfo(component.getConfiguration(), component.getArguments(this, cl), adapter.getComponentIdentifier(),
+								component.isSuspended(), component.isMaster(), model.getApplicationType().getAllImports()), null, null);					
 	//				context.createComponent(component.getName(), component.getTypeName(),
 	//					component.getConfiguration(), component.getArguments(container, apptype, cl), component.isStart(), component.isMaster(),
 	//					DefaultResultListener.getInstance(), null);	

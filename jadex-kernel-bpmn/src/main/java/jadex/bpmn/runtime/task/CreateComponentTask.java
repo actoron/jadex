@@ -1,18 +1,18 @@
 package jadex.bpmn.runtime.task;
 
+import jadex.bpmn.model.MParameter;
+import jadex.bpmn.runtime.BpmnInterpreter;
+import jadex.bpmn.runtime.ITask;
+import jadex.bpmn.runtime.ITaskContext;
+import jadex.bridge.CreationInfo;
+import jadex.bridge.IComponentManagementService;
+import jadex.commons.concurrent.IResultListener;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import jadex.bpmn.model.MParameter;
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.ITask;
-import jadex.bpmn.runtime.ITaskContext;
-import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IComponentIdentifier;
-import jadex.commons.concurrent.IResultListener;
 
 /**
  *  Task for creating a component.
@@ -101,7 +101,9 @@ public class CreateComponentTask implements ITask
 			};
 		}
 		
-		ces.createComponent(name, model, config, args, suspend, null, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, lis, master);
+		ces.createComponent(name, model,
+			new CreationInfo(config, args, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, suspend, master, instance.getModelElement().getAllImports()),
+			null, lis);
 
 		if(!wait)
 			listener.resultAvailable(this, null);

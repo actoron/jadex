@@ -16,7 +16,7 @@ public class CMSRemoteCreateComponentPlan extends Plan
 {
 	/**
 	 * The body method is called on the
-	 * instatiated plan instance from the scheduler.
+	 * instantiated plan instance from the scheduler.
 	 */
 	public void body()
 	{
@@ -25,7 +25,8 @@ public class CMSRemoteCreateComponentPlan extends Plan
 		ca.setName((String)getParameter("name").getValue());
 		ca.setConfiguration((String)getParameter("configuration").getValue());
 		ca.setArguments((Map)getParameter("arguments").getValue());
-		ca.setStart(((Boolean)getParameter("start").getValue()).booleanValue());
+		ca.setSuspend(((Boolean)getParameter("suspend").getValue()).booleanValue());
+		ca.setMaster(((Boolean)getParameter("master").getValue()).booleanValue());
 		ca.setParent((IComponentIdentifier)getParameter("parent").getValue());
 
 		IGoal req = createGoal("rp_initiate");

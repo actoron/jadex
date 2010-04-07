@@ -1,10 +1,11 @@
 package jadex.tools.starter;
 
 import jadex.base.SComponentFactory;
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -915,7 +916,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	public void createComponent(String type, String name, String configname, Map arguments, boolean suspend, IResultListener killlistener)
 	{
 		final IComponentManagementService	ces	= (IComponentManagementService)getJCC().getServiceContainer().getService(IComponentManagementService.class);
-		ces.createComponent(name, type, configname, arguments, suspend, new IResultListener()
+		ces.createComponent(name, type, new CreationInfo(configname, arguments, spanel.parent, suspend, false), new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -926,6 +927,6 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 			{
 				getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
 			}
-		}, spanel.parent, killlistener, false);
+		}, killlistener);
 	}
 }

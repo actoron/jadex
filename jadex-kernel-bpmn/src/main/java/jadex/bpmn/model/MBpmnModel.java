@@ -644,7 +644,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	{
 		List ret = new ArrayList();
 		if(getPackage()!=null)
-			ret.add(getPackage());
+			ret.add(getPackage()+".*");
 		if(imports!=null)
 			ret.addAll(imports);
 		return (String[])ret.toArray(new String[ret.size()]);

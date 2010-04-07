@@ -110,6 +110,9 @@ public abstract class AbstractModelLoader
 		ResourceInfo ret = SUtil.getResourceInfo0(resstr, classloader);
 		if(ret!=null && !ret.getFilename().endsWith(extension))
 			ret	= null;
+		
+		if(name.endsWith(extension))
+			name	= name.substring(0, name.length()-extension.length());
 
 		if(ret==null || ret.getInputStream()==null)
 		{
@@ -257,7 +260,7 @@ public abstract class AbstractModelLoader
 	 *  Tests if the resource is a file that matches the supported file extensions
 	 *  or if the resource is a logical name, tests if a corresponding file exist.
 	 *  The file is not actually loaded, i.e. the content of the file is not checked.
-	 */
+	 * /
 	public boolean	isLoadable(String name, String[] imports)
 	{
 		boolean	loadable	= false;
@@ -271,7 +274,7 @@ public abstract class AbstractModelLoader
 			}
 		}
 		return loadable;
-	}
+	}*/
 
 	/**
 	 * 

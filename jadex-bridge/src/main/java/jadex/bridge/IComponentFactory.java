@@ -16,23 +16,33 @@ public interface IComponentFactory
 	/**
 	 *  Load a  model.
 	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public ILoadableComponentModel loadModel(String model);
+	public ILoadableComponentModel loadModel(String model, String[] imports);
 
 	/**
 	 *  Test if a model can be loaded by the factory.
 	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String model);
+	public boolean isLoadable(String model, String[] imports);
 	
 	/**
 	 *  Test if a model is startable (e.g. an component).
 	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public boolean isStartable(String model);
+	public boolean isStartable(String model, String[] imports);
+
+	/**
+	 *  Get the component type of a model.
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
+	 */
+	public String getComponentType(String model, String[] imports);
 
 	/**
 	 *  Get the names of component types supported by this factory.
@@ -43,12 +53,6 @@ public interface IComponentFactory
 	 *  Get a default icon for a component type.
 	 */
 	public Icon getComponentTypeIcon(String type);
-
-	/**
-	 *  Get the component type of a model.
-	 *  @param model The model (e.g. file name).
-	 */
-	public String getComponentType(String model);
 	
 	/**
 	 * Create a component instance.

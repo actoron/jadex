@@ -149,16 +149,18 @@ public class GpmnFactory implements IComponentFactory, IService
 	}
 	
 	/**
-	 *  Load a process model.
-	 *  @param filename The file name.
-	 *  @return The process model.
+	 *  Load a  model.
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
+	 *  @return The loaded model.
 	 */
-	public ILoadableComponentModel loadModel(String filename)
+	public ILoadableComponentModel loadModel(String model, String[] imports)
 	{
+		// Todo: support imports for GPMN models (-> use abstract model loader). 
 		MGpmnModel ret = null;
 		try
 		{
-			ret = GpmnXMLReader.read(filename, ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader(), null);
+			ret = GpmnXMLReader.read(model, ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader(), null);
 			ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 			ClassLoader	cl = libservice.getClassLoader();
 			ret.setClassloader(cl);
@@ -200,20 +202,22 @@ public class GpmnFactory implements IComponentFactory, IService
 	
 	/**
 	 *  Test if a model can be loaded by the factory.
-	 *  @param modelname The model name.
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String modelname)
+	public boolean isLoadable(String model, String[] imports)
 	{
-		return modelname.endsWith(".gpmn");
+		return model.endsWith(".gpmn");
 	}
 	
 	/**
-	 *  Test if a model is startable (e.g. an agent).
-	 *  @param model The model.
+	 *  Test if a model is startable (e.g. an component).
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public boolean isStartable(String model)
+	public boolean isStartable(String model, String[] imports)
 	{
 		return model.endsWith(".gpmn");
 	}
@@ -235,9 +239,11 @@ public class GpmnFactory implements IComponentFactory, IService
 	}
 
 	/**
-	 *  Get the file type of a model.
+	 *  Get the component type of a model.
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 */
-	public String getComponentType(String model)
+	public String getComponentType(String model, String[] imports)
 	{
 		return model.toLowerCase().endsWith(".gpmn") ? FILETYPE_GPMNPROCESS: null;
 	}

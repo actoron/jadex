@@ -101,17 +101,18 @@ public class BpmnFactory implements IComponentFactory, IService
 	}
 	
 	/**
-	 *  Load a process model.
-	 *  @param filename The file name.
-	 *  @return The process model.
+	 *  Load a  model.
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
+	 *  @return The loaded model.
 	 */
-	public ILoadableComponentModel loadModel(String filename)
+	public ILoadableComponentModel loadModel(String model, String[] imports)
 	{
 		MBpmnModel ret = null;
 //		System.out.println("filename: "+filename);
 		try
 		{
-			ret = loader.loadBpmnModel(filename, null);
+			ret = loader.loadBpmnModel(model, imports);
 			ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 			ClassLoader	cl = libservice.getClassLoader();
 			ret.setClassloader(cl);
@@ -168,20 +169,22 @@ public class BpmnFactory implements IComponentFactory, IService
 	
 	/**
 	 *  Test if a model can be loaded by the factory.
-	 *  @param modelname The model name.
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String modelname)
+	public boolean isLoadable(String model, String[] imports)
 	{
-		return modelname.endsWith(".bpmn");
+		return model.endsWith(".bpmn");
 	}
 
 	/**
-	 *  Test if a model is startable (e.g. an agent).
-	 *  @param model The model.
+	 *  Test if a model is startable (e.g. an component).
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public boolean isStartable(String model)
+	public boolean isStartable(String model, String[] imports)
 	{
 		return model.endsWith(".bpmn");
 	}
@@ -203,9 +206,11 @@ public class BpmnFactory implements IComponentFactory, IService
 	}
 
 	/**
-	 *  Get the file type of a model.
+	 *  Get the component type of a model.
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 */
-	public String getComponentType(String model)
+	public String getComponentType(String model, String[] imports)
 	{
 		return model.toLowerCase().endsWith(".bpmn") ? FILETYPE_BPMNPROCESS: null;
 	}

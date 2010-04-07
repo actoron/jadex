@@ -235,25 +235,27 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 				
 		return context;
 	}
-	
+		
 	/**
-	 *  Load an agent model.
-	 *  @param filename The filename.
+	 *  Load a  model.
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
+	 *  @return The loaded model.
 	 */
-	public ILoadableComponentModel loadModel(String filename)
+	public ILoadableComponentModel loadModel(String model, String[] imports)
 	{
 		ILoadableComponentModel ret = null;
 		
-		if(filename!=null && filename.toLowerCase().endsWith(FILE_EXTENSION_APPLICATION))
+		if(model!=null && model.toLowerCase().endsWith(FILE_EXTENSION_APPLICATION))
 		{
 			MApplicationType apptype = null;
 			ResourceInfo	rinfo	= null;
 			try
 			{
 				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
-				rinfo	= getResourceInfo(filename, FILE_EXTENSION_APPLICATION, null, cl);
+				rinfo	= getResourceInfo(model, FILE_EXTENSION_APPLICATION, imports, cl);
 				apptype = (MApplicationType)reader.read(rinfo.getInputStream(), cl, null);
-				ret = new ApplicationModel(apptype, filename, cl);
+				ret = new ApplicationModel(apptype, rinfo.getFilename(), cl);
 //				System.out.println("Loaded application type: "+apptype);
 			
 			}
@@ -274,20 +276,22 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 	
 	/**
 	 *  Test if a model can be loaded by the factory.
-	 *  @param model The model.
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean isLoadable(String model)
+	public boolean isLoadable(String model, String[] imports)
 	{
 		return model.endsWith(FILE_EXTENSION_APPLICATION);
 	}
 	
 	/**
-	 *  Test if a model is startable (e.g. an agent).
-	 *  @param model The model.
-	 *  @return True, if startable (and should therefore also be loadable).
+	 *  Test if a model is startable (e.g. an component).
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
+	 *  @return True, if startable (and loadable).
 	 */
-	public boolean isStartable(String model)
+	public boolean isStartable(String model, String[] imports)
 	{
 		return model.endsWith(FILE_EXTENSION_APPLICATION);
 	}
@@ -308,11 +312,12 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 		return type.equals(FILETYPE_APPLICATION)? icons.getIcon("application"): null;
 	}
 
-
 	/**
-	 *  Get the file type of a model.
+	 *  Get the component type of a model.
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 */
-	public String getComponentType(String model)
+	public String getComponentType(String model, String[] imports)
 	{
 		return model.toLowerCase().endsWith(FILE_EXTENSION_APPLICATION)? FILETYPE_APPLICATION: null;
 	}

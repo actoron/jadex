@@ -4,6 +4,7 @@ import jadex.base.DefaultResultListener;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.fipa.ComponentIdentifier;
 import jadex.base.fipa.SearchConstraints;
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
@@ -92,15 +93,13 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  Create a new component on the platform.
 	 *  @param name The component name.
 	 *  @param model The model identifier (e.g. file name).
-	 *  @param config The configuration to use for initializing the component (null for default).
-	 *  @param args The arguments for the component (if any).
-	 *  @param suspend Create the component in suspended mode (i.e. do not run until resume() is called).
-	 *  @param listener The result listener (if any). Will receive the id of the component as result.
-	 *  @param parent The parent (if any).
+	 *  @param info	The creation info, if any.
+	 *  @param listener The result listener (if any). Will receive the id of the component as result, when the component has been created.
+	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
-	public void	createComponent(String name, String model, final String config, final Map args, final boolean suspend, 
-		IResultListener listener, IComponentIdentifier parent, final IResultListener resultlistener, boolean master)
+	public void	createComponent(String name, String model, CreationInfo info, IResultListener listener, final IResultListener killlistener)
 	{
+		final CreationInfo cinfo	= info!=null ? info : new CreationInfo();	// Dummy default info, if null.
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
@@ -130,16 +129,16 @@ public class ComponentManagementService implements IComponentManagementService, 
 			for(Iterator it=facts.iterator(); factory==null && it.hasNext(); )
 			{
 				IComponentFactory	cf	= (IComponentFactory)it.next();
-				if(cf.isLoadable(model))
+				if(cf.isLoadable(model, info.getImports()))
 				{
 					factory	= cf;
-					type	= factory.getComponentType(model);
+					type	= factory.getComponentType(model, info.getImports());
 				}
 			}
 		}
 		if(factory==null)
 			throw new RuntimeException("No factory found for component: "+model);
-		final ILoadableComponentModel lmodel = factory.loadModel(model);
+		final ILoadableComponentModel lmodel = factory.loadModel(model, info.getImports());
 
 		// Create id and adapter.
 		
@@ -168,12 +167,12 @@ public class ComponentManagementService implements IComponentManagementService, 
 						cid.setAddresses(ms.getAddresses());
 				}
 		
-				ad	= new CMSComponentDescription(cid, type, parent, master);	
-				CMSComponentDescription padesc = (CMSComponentDescription)descs.get(parent);
+				ad	= new CMSComponentDescription(cid, type, cinfo.getParent(), cinfo.isMaster());	
+				CMSComponentDescription padesc = (CMSComponentDescription)descs.get(cinfo.getParent());
 				
 				// Suspend when set to suspend or when parent is also suspended or when specified in model.
 				Object	debugging 	= lmodel.getProperties().get("debugging");
-				if(suspend || (padesc!=null && IComponentDescription.STATE_SUSPENDED.equals(padesc.getState()))
+				if(cinfo.isSuspend() || (padesc!=null && (IComponentDescription.STATE_SUSPENDED.equals(padesc.getState()) || IComponentDescription.STATE_WAITING.equals(padesc.getState())))
 					|| debugging instanceof Boolean && ((Boolean)debugging).booleanValue())
 				{
 					ad.setState(IComponentDescription.STATE_SUSPENDED);
@@ -183,7 +182,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 					ad.setState(IComponentDescription.STATE_ACTIVE);
 				}
 				descs.put(cid, ad);
-				if(parent!=null)
+				if(cinfo.getParent()!=null)
 				{
 //					children.put(parent, cid);
 					padesc.addChild(cid);
@@ -193,9 +192,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 			adapter = new StandaloneComponentAdapter(container, ad);
 			adapters.put(cid, adapter);
 
-			if(parent!=null)
+			if(cinfo.getParent()!=null)
 			{
-				pad	= (StandaloneComponentAdapter)adapters.get(parent);
+				pad	= (StandaloneComponentAdapter)adapters.get(cinfo.getParent());
 			}
 		}
 
@@ -208,8 +207,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					createComponentInstance(config, args, suspend, rl,
-						resultlistener, cf, lmodel, cid, adapter, fpad, ad, (IExternalAccess)result);
+					createComponentInstance(cinfo.getConfiguration(), cinfo.getArguments(), cinfo.isSuspend(), rl,
+						killlistener, cf, lmodel, cid, adapter, fpad, ad, (IExternalAccess)result);
 				}
 				
 				public void exceptionOccurred(Object source, Exception exception)
@@ -220,8 +219,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 		}
 		else
 		{
-			createComponentInstance(config, args, suspend, listener,
-				resultlistener, factory, lmodel, cid, adapter, null, ad, null);
+			createComponentInstance(cinfo.getConfiguration(), cinfo.getArguments(), cinfo.isSuspend(), listener,
+				killlistener, factory, lmodel, cid, adapter, null, ad, null);
 		}
 	}
 
@@ -785,14 +784,14 @@ public class ComponentManagementService implements IComponentManagementService, 
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
 		
-		IComponentDescription ret = (IComponentDescription)((CMSComponentDescription)descs.get(cid)).clone();	// Todo: synchronize?
+		IComponentDescription ret = (IComponentDescription)descs.get(cid);
 		
-//			if(ret!=null)
-//			{
-//				// Todo: addresses required for communication across platforms.
-////				ret.setName(refreshComponentIdentifier(aid));
-//				ret	= (IComponentDescription)ret.clone();
-//			}
+		if(ret!=null)
+		{
+				// Todo: addresses required for communication across platforms.
+//				ret.setName(refreshComponentIdentifier(aid));
+			ret	= (IComponentDescription)((CMSComponentDescription)ret).clone();	// Todo: synchronize?
+		}
 		
 		listener.resultAvailable(this, ret);
 	}

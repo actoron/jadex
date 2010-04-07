@@ -4,7 +4,6 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

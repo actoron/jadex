@@ -4,8 +4,9 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
-import jadex.bridge.IComponentManagementService;
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.HashMap;
@@ -41,7 +42,7 @@ public class PerformTestPlan extends Plan
 			SyncResultListener	res	= new SyncResultListener();
 			Map	args	= new HashMap();
 			args.put("timeout", timeout);
-			ces.createComponent(null, testcase.getType(), null, args, false, id, getComponentIdentifier(), res, false);
+			ces.createComponent(null, testcase.getType(), new CreationInfo(args, getComponentIdentifier()), id, res);
 			testagent	= (IComponentIdentifier)id.waitForResult();
 			Testcase	result	= (Testcase)((Map)res.waitForResult(timeout)).get("testresults");
 			if(result!=null)

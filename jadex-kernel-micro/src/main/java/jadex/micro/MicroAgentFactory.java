@@ -12,7 +12,6 @@ import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 
-import java.util.Collections;
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -78,11 +77,12 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	//-------- IAgentFactory interface --------
 	
 	/**
-	 *  Load an agent model.
-	 *  @param model The model.
+	 *  Load a  model.
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public ILoadableComponentModel loadModel(String model)
+	public ILoadableComponentModel loadModel(String model, String[] imports)
 	{
 //		System.out.println("loading micro: "+model);
 		ILoadableComponentModel ret = null;
@@ -97,13 +97,13 @@ public class MicroAgentFactory implements IComponentFactory, IService
 		clname = clname.replace('/', '.');
 		
 		ClassLoader	cl	= libservice.getClassLoader();
-		Class cma = SReflect.findClass0(clname, null, cl);
+		Class cma = SReflect.findClass0(clname, imports, cl);
 //		System.out.println(clname+" "+cma+" "+ret);
 		int idx;
 		while(cma==null && (idx=clname.indexOf('.'))!=-1)
 		{
 			clname	= clname.substring(idx+1);
-			cma = SReflect.findClass0(clname, null, cl);
+			cma = SReflect.findClass0(clname, imports, cl);
 //			System.out.println(clname+" "+cma+" "+ret);
 		}
 		if(cma==null)// || !cma.isAssignableFrom(IMicroAgent.class))
@@ -114,10 +114,11 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	
 	/**
 	 *  Test if a model can be loaded by the factory.
-	 *  @param model The model.
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public boolean	isLoadable(String model)
+	public boolean isLoadable(String model, String[] imports)
 	{
 		boolean ret = model.toLowerCase().endsWith("agent.class");
 //		if(model.toLowerCase().endsWith("Agent.class"))
@@ -132,13 +133,14 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	}
 	
 	/**
-	 *  Test if a model is startable (e.g. an agent).
-	 *  @param model The model.
+	 *  Test if a model is startable (e.g. an component).
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public boolean isStartable(String model)
+	public boolean isStartable(String model, String[] imports)
 	{
-		return isLoadable(model);
+		return isLoadable(model, imports);
 	}
 
 	/**
@@ -158,9 +160,11 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	}
 
 	/**
-	 *  Get the file type of a model.
+	 *  Get the component type of a model.
+	 *  @param model The model (e.g. file name).
+	 *  @param The imports (if any).
 	 */
-	public String getComponentType(String model)
+	public String getComponentType(String model, String[] imports)
 	{
 		return model.toLowerCase().endsWith("agent.class") ? FILETYPE_MICROAGENT
 			: null;

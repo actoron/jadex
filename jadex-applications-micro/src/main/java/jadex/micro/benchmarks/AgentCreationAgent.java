@@ -1,8 +1,9 @@
 package jadex.micro.benchmarks;
 
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
@@ -53,7 +54,7 @@ public class AgentCreationAgent extends MicroAgent
 //				System.out.println("Args: "+num+" "+args);
 
 			final IComponentManagementService ces = (IComponentManagementService)getServiceContainer().getService(IComponentManagementService.class);
-			ces.createComponent(createPeerName(num+1), getClass().getName()+".class", null, args, false, null, null, null, false);		
+			ces.createComponent(createPeerName(num+1), getClass().getName()+".class", new CreationInfo(args), null, null);		
 		}
 		else
 		{

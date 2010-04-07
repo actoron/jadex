@@ -1,6 +1,6 @@
 package jadex.base;
 
-import jadex.base.DefaultResultListener;
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.concurrent.IResultListener;
@@ -147,7 +147,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 	protected void createComponent(String name, String model, String config, Map args, final boolean daemon)
 	{
 		IComponentManagementService	ces	= (IComponentManagementService)getService(IComponentManagementService.class);
-		ces.createComponent(name, model, config, args, false, null, null, null, false);
+		ces.createComponent(name, model, new CreationInfo(config, args), null, null);
 	}
 
 	/**

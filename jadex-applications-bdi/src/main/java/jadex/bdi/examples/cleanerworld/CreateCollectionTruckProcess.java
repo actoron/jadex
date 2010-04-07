@@ -7,8 +7,9 @@ import jadex.application.space.envsupport.environment.ISpaceProcess;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bridge.IComponentManagementService;
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.clock.IClockService;
@@ -79,7 +80,8 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 				params.put("wastebins", todo.toArray());
 				ongoing.addAll(todo);
 				IComponentManagementService	ces	= (IComponentManagementService)app.getServiceContainer().getService(IComponentManagementService.class);
-				ces.createComponent(null, app.getComponentFilename("Truck"), null, params, false, new IResultListener()
+				ces.createComponent(null, app.getComponentFilename("Truck"),
+					new CreationInfo(null, params, app.getComponentIdentifier(), false, false, app.getAllImports()), new IResultListener()
 				{
 					public void exceptionOccurred(Object source, Exception exception)
 					{
@@ -111,7 +113,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 						});
 						
 					}
-				}, app.getComponentIdentifier(), null, false);
+				}, null);
 			}
 		}
 	}

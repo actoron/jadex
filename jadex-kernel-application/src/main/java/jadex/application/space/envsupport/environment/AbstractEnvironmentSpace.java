@@ -16,10 +16,11 @@ import jadex.application.space.envsupport.evaluation.SpaceObjectSource;
 import jadex.application.space.envsupport.math.Vector2Double;
 import jadex.application.space.envsupport.observer.gui.ObserverCenter;
 import jadex.application.space.envsupport.observer.perspective.IPerspective;
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.IPropertyObject;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.IResultListener;
@@ -952,7 +953,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					IComponentManagementService cms = (IComponentManagementService)getContext().getServiceContainer().getService(IComponentManagementService.class);
 					IComponentIdentifier cid = cms.generateComponentIdentifier(typename);
 					setOwner(fid, cid);
-					cms.createComponent(cid.getLocalName(), getContext().getComponentFilename(componenttype), null, null, false, lis, getContext().getComponentIdentifier(), null, false);
+					cms.createComponent(cid.getLocalName(), getContext().getComponentFilename(componenttype),
+						new CreationInfo(null, null, getContext().getComponentIdentifier(), false, false, getContext().getAllImports()), lis, null);
 				}
 			}
 		}

@@ -5,6 +5,9 @@ import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
+import jadex.bridge.CreationInfo;
+import jadex.bridge.IComponentManagementService;
+import jadex.commons.concurrent.IResultListener;
 
 import java.util.List;
 
@@ -19,20 +22,63 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	public void execute(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
 		MSubProcess	proc	= (MSubProcess) activity;
-//		thread.setWaitingState(ProcessThread.WAITING_FOR_SUBPROCESS);
-		thread.setWaiting(true);
-		ThreadContext	subcontext	= new ThreadContext(proc, thread);
-		thread.getThreadContext().addSubcontext(subcontext);
-		
 		List start = proc.getStartActivities();
-		for(int i=0; i<start.size(); i++)
+		String	file	= (String)thread.getPropertyValue("file");
+		
+		// Internal subprocess.
+		if(start!=null && file==null)
 		{
-			ProcessThread	newthread	= new ProcessThread((MActivity)start.get(i), subcontext, instance);
-			subcontext.addThread(newthread);
+//			thread.setWaitingState(ProcessThread.WAITING_FOR_SUBPROCESS);
+			thread.setWaiting(true);
+			ThreadContext	subcontext	= new ThreadContext(proc, thread);
+			thread.getThreadContext().addSubcontext(subcontext);
+			for(int i=0; i<start.size(); i++)
+			{
+				ProcessThread	newthread	= new ProcessThread((MActivity)start.get(i), subcontext, instance);
+				subcontext.addThread(newthread);
+			}
 		}
 		
+		// External subprocess
+		else if((start==null || start.isEmpty()) && file!=null)
+		{
+			thread.setWaiting(true);
+			IComponentManagementService	cms	= (IComponentManagementService)instance.getComponentAdapter()
+				.getServiceContainer().getService(IComponentManagementService.class);
+			
+			cms.createComponent(null, file,
+				new CreationInfo(null, null, instance.getComponentIdentifier(), false, false, instance.getModelElement().getAllImports()), null, new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					// Todo: store results.
+					thread.setNonWaiting();
+					instance.getStepHandler(activity).step(activity, instance, thread, null);
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					thread.setNonWaiting();
+					thread.setException(exception);
+					instance.getStepHandler(activity).step(activity, instance, thread, null);
+				}
+			});
+		}
+		
+		// Empty subprocess.
+		else if((start==null || start.isEmpty()) && file==null)
+		{
+			// If no activity in sub process, step immediately. 
+			instance.getStepHandler(activity).step(activity, instance, thread, null);
+		}
+		
+		// Inconsistent subprocess.
+		else
+		{
+			throw new RuntimeException("External subprocess may not have inner activities: "+activity+", "+instance);
+		}
 	}
 }

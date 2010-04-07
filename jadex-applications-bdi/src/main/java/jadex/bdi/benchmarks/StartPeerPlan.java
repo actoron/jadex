@@ -2,8 +2,9 @@ package jadex.bdi.benchmarks;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentManagementService;
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.collection.SCollection;
 
 import java.util.Map;
@@ -160,7 +161,7 @@ public class StartPeerPlan extends Plan
 	{
 		final IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
 		SyncResultListener lis = new SyncResultListener();
-		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", null, args, false, lis, null, null, false);
+		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(args), lis, null);
 		IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
 		return aid;
 	}

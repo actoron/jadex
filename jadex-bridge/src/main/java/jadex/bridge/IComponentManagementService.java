@@ -2,8 +2,6 @@ package jadex.bridge;
 
 import jadex.commons.concurrent.IResultListener;
 
-import java.util.Map;
-
 /**
  *  General interface for components that the container can execute.
  */
@@ -15,14 +13,10 @@ public interface IComponentManagementService
 	 *  Create a new component on the platform.
 	 *  @param name The component name.
 	 *  @param model The model identifier (e.g. file name).
-	 *  @param config The configuration to use for initializing the component (null for default).
-	 *  @param args The arguments for the component (if any).
-	 *  @param suspend Create the component in suspended mode (i.e. do not run until resum() is called).
-	 *  @param listener The result listener (if any). Will receive the id of the component as result.
-	 *  @param parent The parent component (if any).
+	 *  @param listener The result listener (if any). Will receive the id of the component as result, when the component has been created.
+	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
-	public void	createComponent(String name, String model, String config, Map args, boolean suspend, 
-		IResultListener listener, IComponentIdentifier parent, IResultListener killlistener, boolean master);
+	public void	createComponent(String name, String model, CreationInfo info, IResultListener listener, IResultListener killlistener);
 		
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.
