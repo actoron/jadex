@@ -1,9 +1,9 @@
 package jadex.distributed.tools.distributionmonitor;
 
 import jadex.commons.SGUI;
-import jadex.distributed.service.IMonitorService;
-import jadex.distributed.service.IMonitorServiceListener;
-import jadex.distributed.service.Workload;
+import jadex.distributed.service.monitor.IMonitorService;
+import jadex.distributed.service.monitor.IMonitorServiceListener;
+import jadex.distributed.service.monitor.Workload;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.common.plugin.IControlCenter;
 

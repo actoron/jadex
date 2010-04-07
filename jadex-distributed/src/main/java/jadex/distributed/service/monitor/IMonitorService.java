@@ -1,4 +1,5 @@
-package jadex.distributed.service;
+package jadex.distributed.service.monitor;
+
 
 public interface IMonitorService {
 

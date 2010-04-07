@@ -1,4 +1,4 @@
-package jadex.distributed.service;
+package jadex.distributed.service.monitor;
 
 /**
  * A class representing the current workload of a machine

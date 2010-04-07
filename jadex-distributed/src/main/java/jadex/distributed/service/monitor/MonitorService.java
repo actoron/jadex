@@ -1,6 +1,8 @@
-package jadex.distributed.service;
+package jadex.distributed.service.monitor;
 
 import jadex.commons.concurrent.IResultListener;
+import jadex.distributed.service.discovery.IDiscoveryService;
+import jadex.distributed.service.discovery.IDiscoveryServiceListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 

@@ -1,6 +1,6 @@
 package jadex.distributed.tools.distributionmonitor;
 
-import jadex.distributed.service.Workload;
+import jadex.distributed.service.monitor.Workload;
 
 import java.awt.Dimension;
 import java.net.InetSocketAddress;

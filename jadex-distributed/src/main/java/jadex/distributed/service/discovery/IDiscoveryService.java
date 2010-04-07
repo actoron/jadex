@@ -1,4 +1,5 @@
-package jadex.distributed.service;
+package jadex.distributed.service.discovery;
+
 
 import java.net.InetSocketAddress;
 import java.util.Set;

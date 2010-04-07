@@ -1,4 +1,4 @@
-package jadex.distributed.service;
+package jadex.distributed.service.discovery;
 
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
@@ -58,7 +58,7 @@ public class DiscoveryService implements IService, IDiscoveryService {
 		// also, dass die Plattform sagt 'so jetzt gehe ich', damit die Anwendung auf andere Platformen verteilt werden kann
 
 		// Datei mit IP und Port Daten öffnen
-		File file = new File("src/main/java/jadex/distributed/service/discovery_config.txt"); // TODO pfad für production environment anpassen
+		File file = new File("src/main/java/jadex/distributed/service/discovery/discovery_config.txt"); // TODO pfad für production environment anpassen
 
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), Charset.forName("UTF-8")));
