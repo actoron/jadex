@@ -16,7 +16,7 @@ public class TestMulticastSender {
 	 * @throws UnknownHostException 
 	 */
 	public static void main(String[] args) throws UnknownHostException, IOException {
-		int port = 9000;
+		int port = 9001;
 		MulticastSocket msocket = new MulticastSocket( port );
 		InetAddress group = InetAddress.getByName("224.224.224.224"); 
 		msocket.joinGroup( group );

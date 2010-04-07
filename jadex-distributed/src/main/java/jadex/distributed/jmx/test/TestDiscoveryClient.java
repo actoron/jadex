@@ -44,11 +44,19 @@ public class TestDiscoveryClient {
 		mbeanServer.invoke(dc, "start", null, null);
 		
 		// selber aktiv werden; danach wird der discoveryClient nie mehr gebraucht; es sei denn es wird ein refrech button eingebaut ...
+		System.out.println("Suche nach bestehenden Plattformen...");
 		Vector servers = discoveryClient.findMBeanServers();
 		for (int i = 0; i < servers.size(); i++) {
 			DiscoveryResponse response = (DiscoveryResponse)servers.get(i);
-			System.out.println("Aktiv Plattform gefunden: response.toString()");
+			System.out.println( new StringBuilder().append("Aktiv Plattform gefunden: ").append(response.toString()) );
 		}
+		System.out.println("Zweiter Versuch");
+		Vector communicators = discoveryClient.findCommunicators();
+		for (int i = 0; i < communicators.size(); i++) {
+			DiscoveryResponse response = (DiscoveryResponse)communicators.get(i);
+			System.out.println( new StringBuilder().append("Aktiv Plattform gefunden: ").append(response.toString()) );
+		}
+		// TODO wieso antworten die DiscoveryResponder nicht, wenn ich aktiv nach denen suche?
 		
 		// passiv nach neuen platformen lauschen, mit einem Monitor
 		DiscoveryMonitor discoveryMonitor = new DiscoveryMonitor(); // Multicast address is 224.224.224.224:9000

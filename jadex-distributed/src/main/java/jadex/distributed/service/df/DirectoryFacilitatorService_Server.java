@@ -1,22 +1,22 @@
 package jadex.distributed.service.df;
 
+import jadex.base.AbstractPlatform;
 import jadex.base.DefaultResultListener;
+import jadex.base.fipa.ComponentIdentifier;
+import jadex.base.fipa.DFComponentDescription;
+import jadex.base.fipa.DFServiceDescription;
 import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.IDFServiceDescription;
 import jadex.base.fipa.IProperty;
 import jadex.base.fipa.SFipa;
+import jadex.base.fipa.SearchConstraints;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.clock.IClockService;
-import jadex.standalone.AbstractPlatform;
-import jadex.standalone.fipaimpl.ComponentIdentifier;
-import jadex.standalone.fipaimpl.DFComponentDescription;
-import jadex.standalone.fipaimpl.DFServiceDescription;
-import jadex.standalone.fipaimpl.SearchConstraints;
 
 import java.util.ArrayList;
 import java.util.Date;

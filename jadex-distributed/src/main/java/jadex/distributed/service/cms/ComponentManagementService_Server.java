@@ -1,6 +1,9 @@
 package jadex.distributed.service.cms;
 
 import jadex.base.DefaultResultListener;
+import jadex.base.fipa.CMSComponentDescription;
+import jadex.base.fipa.ComponentIdentifier;
+import jadex.base.fipa.SearchConstraints;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentIdentifier;
@@ -14,16 +17,11 @@ import jadex.bridge.ISearchConstraints;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
-import jadex.distributed.service.IDiscoveryServiceListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.execution.IExecutionService;
 import jadex.standalone.StandaloneComponentAdapter;
-import jadex.standalone.fipaimpl.CMSComponentDescription;
-import jadex.standalone.fipaimpl.ComponentIdentifier;
-import jadex.standalone.fipaimpl.SearchConstraints;
 
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,12 +32,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.management.MBeanServerFactory;
-
 /**
  *  Standalone implementation of component execution service.
  */
-public class ComponentManagementService_Server implements IComponentManagementService, IService, IDiscoveryServiceListener
+public class ComponentManagementService_Server implements IComponentManagementService, IService
 {
 	//-------- constants --------
 
@@ -61,7 +57,7 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 	protected Map ccs;
 	
 	/** The children of a component (component id -> children ids). */
-	protected MultiCollection	children;
+//	protected MultiCollection	children;
 	
 	/** The logger. */
 	protected Logger logger;
@@ -71,8 +67,6 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 	
 	/** The result (kill listeners). */
 	protected Map killresultlisteners;
-	
-	protected Set<InetSocketAddress> machines;
 	
     //-------- constructors --------
 
@@ -86,13 +80,10 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 		this.adapters = Collections.synchronizedMap(SCollection.createHashMap());
 		this.descs = Collections.synchronizedMap(SCollection.createLinkedHashMap());
 		this.ccs = SCollection.createLinkedHashMap();
-		this.children	= SCollection.createMultiCollection();
+//		this.children	= SCollection.createMultiCollection();
 		this.logger = Logger.getLogger(container.getName()+".cms");
 		this.listeners = SCollection.createMultiCollection();
 		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());
-		
-		// the CMS needs to know the DiscoveryService
-		
     }
     
     //-------- IComponentManagementService interface --------
@@ -162,7 +153,7 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 			{
 				if(name==null)
 				{
-					cid = generateComponentIdentifier(lmodel.getName());
+					cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName());
 				}
 				else
 				{
@@ -177,8 +168,9 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 						cid.setAddresses(ms.getAddresses());
 				}
 		
-				IComponentDescription padesc = parent!=null? (IComponentDescription)descs.get(parent): null;
-				ad	= new CMSComponentDescription(cid, type, parent, master);
+				ad	= new CMSComponentDescription(cid, type, parent, master);	
+				CMSComponentDescription padesc = (CMSComponentDescription)descs.get(parent);
+				
 				// Suspend when set to suspend or when parent is also suspended or when specified in model.
 				Object	debugging 	= lmodel.getProperties().get("debugging");
 				if(suspend || (padesc!=null && IComponentDescription.STATE_SUSPENDED.equals(padesc.getState()))
@@ -193,7 +185,8 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 				descs.put(cid, ad);
 				if(parent!=null)
 				{
-					children.put(parent, cid);
+//					children.put(parent, cid);
+					padesc.addChild(cid);
 				}
 			}
 
@@ -230,23 +223,23 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 			createComponentInstance(config, args, suspend, listener,
 				resultlistener, factory, lmodel, cid, adapter, null, ad, null);
 		}
-}
+	}
 
 	/**
 	 *  Create an instance of a component (step 2 of creation process).
 	 */
 	protected void createComponentInstance(String config, Map args,
-			boolean suspend, IResultListener listener,
-			final IResultListener resultlistener, IComponentFactory factory,
-			ILoadableComponentModel lmodel, final ComponentIdentifier cid,
-			StandaloneComponentAdapter adapter, StandaloneComponentAdapter pad,
-			CMSComponentDescription ad, IExternalAccess parent)
+		boolean suspend, IResultListener listener,
+		final IResultListener resultlistener, IComponentFactory factory,
+		ILoadableComponentModel lmodel, final ComponentIdentifier cid,
+		StandaloneComponentAdapter adapter, StandaloneComponentAdapter pad,
+		CMSComponentDescription ad, IExternalAccess parent)
 	{
 		// Create the component instance.
 		IComponentInstance instance = factory.createComponentInstance(adapter, lmodel, config, args, parent);
 		adapter.setComponent(instance, lmodel);
 		
-//		System.out.println("added: "+agentdescs.size()+", "+aid);
+//		System.out.println("added: "+descs.size()+", "+aid);
 		
 		// Register component at parent.
 		if(pad!=null)
@@ -293,10 +286,12 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 			synchronized(descs)
 			{
 				// Kill subcomponents
-				Object[]	achildren	= children.getCollection(cid).toArray();	// Use copy as children may change on destroy.
+//				Object[] achildren	= children.getCollection(cid).toArray();	// Use copy as children may change on destroy.
+				desc = (CMSComponentDescription)descs.get(cid);
+				IComponentIdentifier[] achildren = desc.getChildren();
 				for(int i=0; i<achildren.length; i++)
 				{
-					destroyComponent((IComponentIdentifier)achildren[i], null);	// todo: cascading delete with wait.
+					destroyComponent(achildren[i], null);	// todo: cascading delete with wait.
 				}
 				
 //				System.out.println("killing: "+cid);
@@ -313,7 +308,6 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 				
 				// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
 				// todo: killcomponent should only be called once for each component?
-				desc	= (CMSComponentDescription)descs.get(cid);
 				if(desc!=null)
 				{
 					if(!ccs.containsKey(cid))
@@ -354,12 +348,15 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 			synchronized(descs)
 			{
 				// Suspend subcomponents
-				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
+				CMSComponentDescription desc = (CMSComponentDescription)descs.get(componentid);
+				IComponentIdentifier[] achildren = desc.getChildren();
+//				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
+				for(int i=0; i<achildren.length; i++)
 				{
-					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
-					if(IComponentDescription.STATE_ACTIVE.equals(((IComponentDescription)descs.get(child)).getState()))
+//					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
+					if(IComponentDescription.STATE_ACTIVE.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
 					{
-						suspendComponent(child, null);	// todo: cascading resume with wait.
+						suspendComponent(achildren[i], null);	// todo: cascading resume with wait.
 					}
 				}
 
@@ -411,13 +408,16 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 			synchronized(descs)
 			{
 				// Resume subcomponents
-				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
+				CMSComponentDescription desc = (CMSComponentDescription)descs.get(componentid);
+				IComponentIdentifier[] achildren = desc.getChildren();
+//				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
+				for(int i=0; i<achildren.length; i++)
 				{
-					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
-					if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(child)).getState())
-						|| IComponentDescription.STATE_WAITING.equals(((IComponentDescription)descs.get(child)).getState()))
+//					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
+					if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(achildren[i])).getState())
+						|| IComponentDescription.STATE_WAITING.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
 					{
-						resumeComponent(child, null);	// todo: cascading resume with wait.
+						resumeComponent(achildren[i], null);	// todo: cascading resume with wait.
 					}
 				}
 
@@ -561,7 +561,9 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 //			System.out.println("CleanupCommand: "+result);
 			IComponentDescription ad = (IComponentDescription)descs.get(cid);
 			Map results = null;
-			StandaloneComponentAdapter	adapter;
+			StandaloneComponentAdapter adapter;
+			StandaloneComponentAdapter pad = null;
+			CMSComponentDescription desc;
 			synchronized(adapters)
 			{
 				synchronized(descs)
@@ -573,7 +575,7 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 					
 					results = adapter.getComponentInstance().getResults();
 					
-					CMSComponentDescription	desc	= (CMSComponentDescription)descs.get(cid);
+					desc = (CMSComponentDescription)descs.get(cid);
 					desc.setState(IComponentDescription.STATE_TERMINATED);
 					descs.remove(cid);
 					ccs.remove(cid);
@@ -584,17 +586,23 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 					// Deregister destroyed component at parent.
 					if(desc.getParent()!=null)
 					{
-						children.remove(desc.getParent(), desc.getName());
-
-						StandaloneComponentAdapter	pad	= (StandaloneComponentAdapter)adapters.get(desc.getParent());
-						if(pad!=null)
-						{
-							pad.getComponentInstance().componentDestroyed(desc);
-						}
-						// else parent has just been killed.
+//						children.remove(desc.getParent(), desc.getName());
+						CMSComponentDescription padesc = (CMSComponentDescription)descs.get(desc.getParent());
+						if(padesc!=null)
+							padesc.removeChild(desc.getName());
+						pad	= (StandaloneComponentAdapter)adapters.get(desc.getParent());
 					}
 				}
 			}
+			
+			// Must be executed out of sync block due to deadlocks
+			// agent->cleanupcommand->space.componentRemoved (holds adapter mon -> needs space mone)
+			// space executor->general loop->distributed percepts->(holds space mon -> needs adapter mon for getting external access)
+			if(pad!=null)
+			{
+				pad.getComponentInstance().componentDestroyed(desc);
+			}
+			// else parent has just been killed.
 			
 //			// Deregister killed component at contexts.
 //			IContextService	cs	= (IContextService)container.getService(IContextService.class);
@@ -695,6 +703,30 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 		else
 			adapter.getComponentInstance().getExternalAccess(listener);
 	}
+	
+	//-------- parent/child component accessors --------
+	
+	/**
+	 *  Get the parent component of a component.
+	 *  @param cid The component identifier.
+	 *  @return The parent component identifier.
+	 */
+	public IComponentIdentifier getParent(IComponentIdentifier cid)
+	{
+		CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
+		return desc!=null? desc.getParent(): null;
+	}
+	
+	/**
+	 *  Get the children components of a component.
+	 *  @param cid The component identifier.
+	 *  @return The children component identifiers.
+	 */
+	public IComponentIdentifier[] getChildren(IComponentIdentifier cid)
+	{
+		CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
+		return desc!=null? desc.getChildren(): null;
+	}
 
 	/**
 	 *  Create component identifier.
@@ -753,7 +785,8 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
 		
-		IComponentDescription	ret = (IComponentDescription)descs.get(cid);	// Todo: synchronize?
+		IComponentDescription ret = (IComponentDescription)((CMSComponentDescription)descs.get(cid)).clone();	// Todo: synchronize?
+		
 //			if(ret!=null)
 //			{
 //				// Todo: addresses required for communication across platforms.
@@ -773,7 +806,18 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
 		
-		listener.resultAvailable(this, descs.values().toArray(new IComponentDescription[0]));	// Todo: synchronize?
+		IComponentDescription[] ret;
+		synchronized(descs)
+		{
+			ret = new IComponentDescription[descs.size()];
+			int i=0;
+			for(Iterator it=descs.values().iterator(); i<ret.length; i++)
+			{
+				ret[i] = (IComponentDescription)((CMSComponentDescription)it.next()).clone();
+			}
+		}
+		
+		listener.resultAvailable(this, ret);	// Todo: synchronize?
 	}
 	
 	/**
@@ -858,7 +902,7 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 	 *  @param name The base name.
 	 *  @return The component identifier.
 	 */
-	protected ComponentIdentifier generateComponentIdentifier(String name)
+	public IComponentIdentifier generateComponentIdentifier(String name)
 	{
 		ComponentIdentifier ret = null;
 
@@ -935,10 +979,4 @@ public class ComponentManagementService_Server implements IComponentManagementSe
 		if(listener!=null)
 			listener.resultAvailable(this, null);
 	}
-
-	@Override
-	public void notifyIDiscoveryListener() {
-		// hell, wozu braucht der CMS_Server die Liste der aktuellen Clients?
-	}
-
 }
