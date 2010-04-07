@@ -747,6 +747,31 @@ public class ComponentManagementService implements IComponentManagementService, 
 		else
 			adapter.getComponentInstance().getExternalAccess(listener);
 	}
+	
+	/**
+	 *  Get the parent component of a component.
+	 *  @param cid The component identifier.
+	 *  @return The parent component identifier.
+	 */
+	public IComponentIdentifier getParent(IComponentIdentifier cid)
+	{
+		CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
+		return desc!=null? desc.getParent(): null;
+	}
+	
+	/**
+	 *  Get the children components of a component.
+	 *  @param cid The component identifier.
+	 *  @return The children component identifiers.
+	 */
+	public IComponentIdentifier[] getChildren(IComponentIdentifier cid)
+	{
+		List ret = (List)children.get(cid);
+		return ret!=null? (IComponentIdentifier[])ret.toArray(new IComponentIdentifier[0]): new IComponentIdentifier[0];
+			
+//		CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
+//		return desc!=null? desc.getChildren(): null;
+	}
 
 	/**
 	 *  Create component identifier.

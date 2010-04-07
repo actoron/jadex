@@ -4,6 +4,9 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 
 /**
@@ -22,6 +25,9 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 
 	/** Attribute for slot parent. */
 	protected IComponentIdentifier parent;
+	
+	/** Attribute for children. */
+	protected Set children;
 
 	/** Attribute for slot ownership. */
 	protected String ownership;
@@ -111,6 +117,47 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	public void setParent(IComponentIdentifier parent)
 	{
 		this.parent = parent;
+	}
+	
+	// CMS / external access / component may access description concurrently?!
+	Object childmon = new Object();
+	/**
+	 *  Add a child component.
+	 *  @param child The child component.
+	 */
+	public void addChild(IComponentIdentifier child)
+	{
+		synchronized(childmon)
+		{
+			if(children==null)
+				children = new LinkedHashSet();
+			children.add(child);
+		}
+	}
+	
+	/**
+	 *  Remove a child component.
+	 *  @param child The child component.
+	 */
+	public void removeChild(IComponentIdentifier child)
+	{
+		synchronized(childmon)
+		{
+			if(children!=null)
+				children.remove(child);
+		}
+	}
+	
+	/**
+	 *  Get the children.
+	 *  @return The children.
+	 */
+	public IComponentIdentifier[] getChildren()
+	{
+		synchronized(childmon)
+		{
+			return children==null? new IComponentIdentifier[0]: (IComponentIdentifier[])children.toArray(new IComponentIdentifier[children.size()]);
+		}
 	}
 	
 	/**
@@ -220,6 +267,11 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		{
 			CMSComponentDescription ret = (CMSComponentDescription)super.clone();
 			ret.setName((ComponentIdentifier)((ComponentIdentifier)name).clone());
+			if(children!=null)
+			{
+				ret.children = new LinkedHashSet(); 
+				ret.children.addAll(children);
+			}
 			return ret;
 		}
 		catch(CloneNotSupportedException e)

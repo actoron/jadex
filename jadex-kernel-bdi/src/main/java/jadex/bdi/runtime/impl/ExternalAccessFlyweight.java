@@ -10,6 +10,8 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.TimeoutException;
+import jadex.bdi.runtime.impl.ElementFlyweight.AgentInvocation;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.InterpreterTimedObject;
 import jadex.rules.state.IOAVState;
@@ -913,5 +915,28 @@ public class ExternalAccessFlyweight extends CapabilityFlyweight implements IBDI
 	public ILoadableComponentModel	getModel()
 	{
 		return getInterpreter().getModel();
+	}
+	
+	/**
+	 *  Get the parent (if any).
+	 *  @return The parent.
+	 */
+	public IExternalAccess getParent()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = getInterpreter().getParent();
+				}
+			};
+			return (IExternalAccess)invoc.object;
+		}
+		else
+		{
+			return getInterpreter().getParent();
+		}
 	}
 }

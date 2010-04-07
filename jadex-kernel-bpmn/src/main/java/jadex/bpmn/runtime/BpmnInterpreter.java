@@ -655,6 +655,15 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	}
 	
 	/**
+	 *  Get the parent component.
+	 *  @return The parent component.
+	 */
+	public IExternalAccess getParent()
+	{
+		return parent;
+	}
+	
+	/**
 	 *  Get the arguments.
 	 *  @return The arguments.
 	 */

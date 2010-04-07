@@ -88,7 +88,7 @@ public interface IPlanExecutor
 	 *  In this case the execution should be terminated
 	 *  (without further abort) and all resources be freed. 
 	 */
-	public void	cleanup(Object rplan);
+	public void	cleanup(BDIInterpreter interpreter, Object rplan);
 
 	/**
 	 *  Get the executing thread of a plan.

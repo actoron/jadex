@@ -17,4 +17,18 @@ public interface IExternalAccess
 	 *  @return	The component id.
 	 */
 	public IComponentIdentifier	getComponentIdentifier();
+	
+	/**
+	 *  Get the parent (if any).
+	 *  @return The parent.
+	 */
+	public IExternalAccess getParent();
+	
+	// todo:?!
+//	/**
+//	 *  Get the children (if any).
+//	 *  @return The children.
+//	 */
+//	public IComponentIdentifier[] getChildren();
+	
 }

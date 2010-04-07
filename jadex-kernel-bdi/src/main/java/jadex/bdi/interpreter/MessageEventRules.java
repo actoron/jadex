@@ -55,6 +55,11 @@ import java.util.logging.Logger;
  */
 public class MessageEventRules
 {
+	//-------- constants --------
+	
+	/** The maximum number of outstanding messages. */
+	public static String MESSAGEEVENTS_MAX = "storedmessages.size";
+		
 	/**
      * The Class object representing the class corresponding to
      * the this Class. Need due to JavaFlow Bug:
@@ -62,6 +67,8 @@ public class MessageEventRules
      */
 	public static final Class TYPE = MessageEventRules.class;
 	
+	//-------- methods --------
+
 	/**
 	 *  Instantiate an message event.
 	 *  @param state	The state
@@ -1020,10 +1027,6 @@ public class MessageEventRules
 		return ret;
 	}
 	
-	// todo: make agent scope instead of static values
-	/** The maximum number of outstanding messages. */
-	public static long MESSAGEEVENTS_MAX = 0;
-	
 	/**
 	 *  Register a conversation or reply_with to be able
 	 *  to send back answers to the source capability.
@@ -1034,10 +1037,11 @@ public class MessageEventRules
 	{
 		// todo: is not the global value :-(
 		Collection coll = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_sentmessageevents);
-		if(MESSAGEEVENTS_MAX!=0 && coll!=null && coll.size()>MESSAGEEVENTS_MAX)
+		int smz = getStoredMessagesSize(BDIInterpreter.getInterpreter(state));
+		if(smz!=0 && coll!=null && coll.size()>smz)
 		{
 			BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Agent does not save conversation due " +
-				"to too many outstanding messages. Increase buffer in runtime.xml - storedmessages.size");
+				"to too many outstanding messages. Increase buffer in properties - storedmessages.size");
 		}
 		else
 		{
@@ -1047,6 +1051,17 @@ public class MessageEventRules
 //				.getComponentIdentifier()+" has open conversations: "+coll.size()+" "+coll);
 //			Thread.dumpStack();
 		}
+	}
+	
+	/**
+	 *  Get the maximum execution time.
+	 *  0 indicates no maximum execution time.
+	 *  @return The max execution time.
+	 */
+	protected static int getStoredMessagesSize(BDIInterpreter interpreter)
+	{
+		Number ret = (Number)interpreter.getState().getAttributeValue(interpreter.getAgent(), OAVBDIRuntimeModel.capability_has_properties, MESSAGEEVENTS_MAX);
+		return ret!=null? ret.intValue(): 0;
 	}
 	
 	/**

@@ -57,7 +57,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	protected Map ccs;
 	
 	/** The children of a component (component id -> children ids). */
-	protected MultiCollection	children;
+//	protected MultiCollection	children;
 	
 	/** The logger. */
 	protected Logger logger;
@@ -80,7 +80,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		this.adapters = Collections.synchronizedMap(SCollection.createHashMap());
 		this.descs = Collections.synchronizedMap(SCollection.createLinkedHashMap());
 		this.ccs = SCollection.createLinkedHashMap();
-		this.children	= SCollection.createMultiCollection();
+//		this.children	= SCollection.createMultiCollection();
 		this.logger = Logger.getLogger(container.getName()+".cms");
 		this.listeners = SCollection.createMultiCollection();
 		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());
@@ -168,8 +168,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 						cid.setAddresses(ms.getAddresses());
 				}
 		
-				IComponentDescription padesc = parent!=null? (IComponentDescription)descs.get(parent): null;
-				ad	= new CMSComponentDescription(cid, type, parent, master);
+				ad	= new CMSComponentDescription(cid, type, parent, master);	
+				CMSComponentDescription padesc = (CMSComponentDescription)descs.get(parent);
+				
 				// Suspend when set to suspend or when parent is also suspended or when specified in model.
 				Object	debugging 	= lmodel.getProperties().get("debugging");
 				if(suspend || (padesc!=null && IComponentDescription.STATE_SUSPENDED.equals(padesc.getState()))
@@ -184,7 +185,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 				descs.put(cid, ad);
 				if(parent!=null)
 				{
-					children.put(parent, cid);
+//					children.put(parent, cid);
+					padesc.addChild(cid);
 				}
 			}
 
@@ -284,10 +286,12 @@ public class ComponentManagementService implements IComponentManagementService, 
 			synchronized(descs)
 			{
 				// Kill subcomponents
-				Object[]	achildren	= children.getCollection(cid).toArray();	// Use copy as children may change on destroy.
+//				Object[] achildren	= children.getCollection(cid).toArray();	// Use copy as children may change on destroy.
+				desc = (CMSComponentDescription)descs.get(cid);
+				IComponentIdentifier[] achildren = desc.getChildren();
 				for(int i=0; i<achildren.length; i++)
 				{
-					destroyComponent((IComponentIdentifier)achildren[i], null);	// todo: cascading delete with wait.
+					destroyComponent(achildren[i], null);	// todo: cascading delete with wait.
 				}
 				
 //				System.out.println("killing: "+cid);
@@ -304,7 +308,6 @@ public class ComponentManagementService implements IComponentManagementService, 
 				
 				// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
 				// todo: killcomponent should only be called once for each component?
-				desc	= (CMSComponentDescription)descs.get(cid);
 				if(desc!=null)
 				{
 					if(!ccs.containsKey(cid))
@@ -345,12 +348,15 @@ public class ComponentManagementService implements IComponentManagementService, 
 			synchronized(descs)
 			{
 				// Suspend subcomponents
-				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
+				CMSComponentDescription desc = (CMSComponentDescription)descs.get(componentid);
+				IComponentIdentifier[] achildren = desc.getChildren();
+//				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
+				for(int i=0; i<achildren.length; i++)
 				{
-					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
-					if(IComponentDescription.STATE_ACTIVE.equals(((IComponentDescription)descs.get(child)).getState()))
+//					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
+					if(IComponentDescription.STATE_ACTIVE.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
 					{
-						suspendComponent(child, null);	// todo: cascading resume with wait.
+						suspendComponent(achildren[i], null);	// todo: cascading resume with wait.
 					}
 				}
 
@@ -402,13 +408,16 @@ public class ComponentManagementService implements IComponentManagementService, 
 			synchronized(descs)
 			{
 				// Resume subcomponents
-				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
+				CMSComponentDescription desc = (CMSComponentDescription)descs.get(componentid);
+				IComponentIdentifier[] achildren = desc.getChildren();
+//				for(Iterator it=children.getCollection(componentid).iterator(); it.hasNext(); )
+				for(int i=0; i<achildren.length; i++)
 				{
-					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
-					if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(child)).getState())
-						|| IComponentDescription.STATE_WAITING.equals(((IComponentDescription)descs.get(child)).getState()))
+//					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
+					if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(achildren[i])).getState())
+						|| IComponentDescription.STATE_WAITING.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
 					{
-						resumeComponent(child, null);	// todo: cascading resume with wait.
+						resumeComponent(achildren[i], null);	// todo: cascading resume with wait.
 					}
 				}
 
@@ -577,9 +586,11 @@ public class ComponentManagementService implements IComponentManagementService, 
 					// Deregister destroyed component at parent.
 					if(desc.getParent()!=null)
 					{
-						children.remove(desc.getParent(), desc.getName());
+//						children.remove(desc.getParent(), desc.getName());
+						CMSComponentDescription padesc = (CMSComponentDescription)descs.get(desc.getParent());
+						if(padesc!=null)
+							padesc.removeChild(desc.getName());
 						pad	= (StandaloneComponentAdapter)adapters.get(desc.getParent());
-						
 					}
 				}
 			}
@@ -692,6 +703,30 @@ public class ComponentManagementService implements IComponentManagementService, 
 		else
 			adapter.getComponentInstance().getExternalAccess(listener);
 	}
+	
+	//-------- parent/child component accessors --------
+	
+	/**
+	 *  Get the parent component of a component.
+	 *  @param cid The component identifier.
+	 *  @return The parent component identifier.
+	 */
+	public IComponentIdentifier getParent(IComponentIdentifier cid)
+	{
+		CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
+		return desc!=null? desc.getParent(): null;
+	}
+	
+	/**
+	 *  Get the children components of a component.
+	 *  @param cid The component identifier.
+	 *  @return The children component identifiers.
+	 */
+	public IComponentIdentifier[] getChildren(IComponentIdentifier cid)
+	{
+		CMSComponentDescription desc = (CMSComponentDescription)descs.get(cid);
+		return desc!=null? desc.getChildren(): null;
+	}
 
 	/**
 	 *  Create component identifier.
@@ -750,7 +785,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
 		
-		IComponentDescription	ret = (IComponentDescription)descs.get(cid);	// Todo: synchronize?
+		IComponentDescription ret = (IComponentDescription)((CMSComponentDescription)descs.get(cid)).clone();	// Todo: synchronize?
+		
 //			if(ret!=null)
 //			{
 //				// Todo: addresses required for communication across platforms.
@@ -770,7 +806,18 @@ public class ComponentManagementService implements IComponentManagementService, 
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
 		
-		listener.resultAvailable(this, descs.values().toArray(new IComponentDescription[0]));	// Todo: synchronize?
+		IComponentDescription[] ret;
+		synchronized(descs)
+		{
+			ret = new IComponentDescription[descs.size()];
+			int i=0;
+			for(Iterator it=descs.values().iterator(); i<ret.length; i++)
+			{
+				ret[i] = (IComponentDescription)((CMSComponentDescription)it.next()).clone();
+			}
+		}
+		
+		listener.resultAvailable(this, ret);	// Todo: synchronize?
 	}
 	
 	/**

@@ -104,16 +104,8 @@ public interface IComponentManagementService
      */
     public void removeComponentListener(IComponentIdentifier comp, IComponentListener listener);
 
-    //-------- internal methods --------
+    //-------- external access methods --------
     
-	/**
-	 *  Get the component adapter for a component identifier.
-	 *  @param cid The component identifier.
-	 *  @param listener The result listener.
-	 * /
-    // Todo: Hack!!! remove?
-	public void getComponentAdapter(IComponentIdentifier cid, IResultListener listener);*/
-		
 	/**
 	 *  Get the external access of a component.
 	 *  @param cid The component identifier.
@@ -121,6 +113,22 @@ public interface IComponentManagementService
 	 */
 	public void getExternalAccess(IComponentIdentifier cid, IResultListener listener);
 
+	//-------- parent/child component accessors --------
+	
+	/**
+	 *  Get the parent component of a component.
+	 *  @param cid The component identifier.
+	 *  @return The parent component identifier.
+	 */
+	public IComponentIdentifier getParent(IComponentIdentifier cid);
+	
+	/**
+	 *  Get the children components of a component.
+	 *  @param cid The component identifier.
+	 *  @return The children component identifiers.
+	 */
+	public IComponentIdentifier[] getChildren(IComponentIdentifier cid);
+	
 	//-------- create methods for cms objects --------
 	
 	/**

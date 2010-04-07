@@ -379,7 +379,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 	 *  Called on termination of a plan.
 	 *  Free all associated ressources, stop threads, etc.
 	 */
-	public void cleanup(Object rplan)
+	public void cleanup(BDIInterpreter interpreter, Object rplan)
 	{
 		// TODO: implement cleanup if needed 
 	}

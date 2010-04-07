@@ -31,7 +31,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	//protected BDIInterpreter interpreter;
 	
 	/** The maximum execution time per plan step in millis. */
-	protected Number	maxexetime;
+//	protected Number maxexetime;
 
 	/** The pool for the planinstances -> execution tasks. */
 	protected Map	tasks;
@@ -152,10 +152,10 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 				// and awakens the plan thread which needs
 				// the monitor to execute
 //				System.out.println("wait: "+rplan);
-				if(getMaxExecutionTime()==0)
+				if(getMaxExecutionTime(interpreter)==0)
 					monitor.wait();
 				else
-					monitor.wait(getMaxExecutionTime());
+					monitor.wait(getMaxExecutionTime(interpreter));
 //				System.out.println("resumed: "+rplan);
 			}
 			catch(InterruptedException e)
@@ -283,7 +283,7 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	 *  Called on termination of a plan.
 	 *  Free all associated ressources, stop threads, etc.
 	 */
-	public void cleanup(Object rplan)
+	public void cleanup(BDIInterpreter interpreter, Object rplan)
 	{
 		PlanExecutionTask task = (PlanExecutionTask)tasks.get(rplan);
 		if(task!=null)
@@ -303,10 +303,10 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 					// Wait causes to free the monitor
 					// and awakens the plan thread which needs
 					// the monitor to execute
-					if(getMaxExecutionTime()==0)
+					if(getMaxExecutionTime(interpreter)==0)
 						monitor.wait();
 					else
-						monitor.wait(getMaxExecutionTime());
+						monitor.wait(getMaxExecutionTime(interpreter));
 				}
 				catch(InterruptedException e)
 				{
@@ -451,19 +451,19 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	 *  0 indicates no maximum execution time.
 	 *  @return The max execution time.
 	 */
-	protected long getMaxExecutionTime()
+	protected long getMaxExecutionTime(BDIInterpreter interpreter)
 	{
-		return 0;
+		Number max = (Number)interpreter.getState().getAttributeValue(interpreter.getAgent(), OAVBDIRuntimeModel.capability_has_properties, MAX_PLANSTEP_TIME);
+		return max!=null? max.longValue(): 0;
 		
-		// todo:
-		/*
-		if(maxexetime==null)
-		{
-			maxexetime = (Number)agent.getPropertybase().getProperty(MAX_PLANSTEP_TIME);
-			if(maxexetime==null)
-				maxexetime = new Long(0);
-		}
-		return maxexetime.longValue();*/
+//		if(maxexetime==null)
+//		{
+//			maxexetime = (Number)interpreter.getState().getAttributeValue(interpreter.getAgent(), OAVBDIRuntimeModel.capability_has_properties, MAX_PLANSTEP_TIME);
+////			maxexetime = (Number)component.getPropertybase().getProperty(MAX_PLANSTEP_TIME);
+//			if(maxexetime==null)
+//				maxexetime = new Long(0);
+//		}
+//		return maxexetime.longValue();
 	}
 
 	//-------- The thread for a plan instance ---------

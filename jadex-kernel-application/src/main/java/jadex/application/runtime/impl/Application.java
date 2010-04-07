@@ -781,6 +781,16 @@ public class Application	implements IApplication, IComponentInstance
 			{
 				return Application.this.getSpace(name);
 			}
+			
+			public IExternalAccess getParent()
+			{
+				return parent;
+			}
+			
+//			public IComponentIdentifier[] getChildren()
+//			{
+//				
+//			}
 		});
 	}
 

@@ -377,7 +377,7 @@ public class AgentRules
 				Object rplan = it.next();
 				IPlanExecutor executor = BDIInterpreter.getInterpreter(state).getPlanExecutor(rplan);
 				if(executor!=null)
-					executor.cleanup(rplan);
+					executor.cleanup(BDIInterpreter.getInterpreter(state), rplan);
 				PlanRules.cleanupPlanWait(state, rcapa, rplan, true);
 			}
 		}

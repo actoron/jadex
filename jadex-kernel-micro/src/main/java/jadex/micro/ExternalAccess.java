@@ -1,6 +1,7 @@
 package jadex.micro;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.MessageType;
 
@@ -85,6 +86,15 @@ public class ExternalAccess implements IMicroExternalAccess
 	public IComponentIdentifier	getComponentIdentifier()
 	{
 		return interpreter.getAgentAdapter().getComponentIdentifier();
+	}
+	
+	/**
+	 *  Get the parent component.
+	 *  @return The parent component.
+	 */
+	public IExternalAccess getParent()
+	{
+		return interpreter.getParent();
 	}
 
 	/**
