@@ -19,7 +19,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_jX9DV0IyEd-lXM2_JTGF5Q"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_jX9DWEIyEd-lXM2_JTGF5Q" lineColor="0"/>
         <element xmi:type="bpmn:SubProcess" href="B5_Subprocess.bpmn#_jX9DUUIyEd-lXM2_JTGF5Q"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_jX9DWUIyEd-lXM2_JTGF5Q" x="156" y="43" width="192"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_jX9DWUIyEd-lXM2_JTGF5Q" x="26" y="43" width="192"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_2QERcEI1Ed-Y29i2KJopdA" type="2001">
         <children xmi:type="notation:Node" xmi:id="_2QERdkI1Ed-Y29i2KJopdA" type="4001"/>
@@ -28,7 +28,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_2QERc0I1Ed-Y29i2KJopdA"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_2QERdEI1Ed-Y29i2KJopdA" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="B5_Subprocess.bpmn#_2PebkUI1Ed-Y29i2KJopdA"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_2QERdUI1Ed-Y29i2KJopdA" x="420" y="60" width="134"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_2QERdUI1Ed-Y29i2KJopdA" x="292" y="60" width="134"/>
       </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_hPwAskIyEd-lXM2_JTGF5Q"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_hPwAs0IyEd-lXM2_JTGF5Q"/>
@@ -39,7 +39,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_hPm2w0IyEd-lXM2_JTGF5Q" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_hPm2xEIyEd-lXM2_JTGF5Q" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="B5_Subprocess.bpmn#_hOaj8UIyEd-lXM2_JTGF5Q"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_hPwAtUIyEd-lXM2_JTGF5Q" x="16" y="16" width="1500" height="200"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_hPwAtUIyEd-lXM2_JTGF5Q" x="16" y="16" width="480" height="200"/>
   </children>
   <styles xmi:type="notation:PageStyle" xmi:id="_hN0HAUIyEd-lXM2_JTGF5Q"/>
   <styles xmi:type="notation:GuideStyle" xmi:id="_hN0HAkIyEd-lXM2_JTGF5Q"/>

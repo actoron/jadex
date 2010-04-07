@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_-wEWEUJVEd-lXM2_JTGF5Q" iD="_-wEWEEJVEd-lXM2_JTGF5Q">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__GHekEJVEd-lXM2_JTGF5Q" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__GHekUJVEd-lXM2_JTGF5Q" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__GHekkJVEd-lXM2_JTGF5Q" key="Package" value=""/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_-wEWF0JVEd-lXM2_JTGF5Q" iD="_-wEWFkJVEd-lXM2_JTGF5Q" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_-wEWGUJVEd-lXM2_JTGF5Q" iD="_-wEWGEJVEd-lXM2_JTGF5Q" outgoingEdges="_GvBwukJWEd-lXM2_JTGF5Q" name="Preparation" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__VBdQEJVEd-lXM2_JTGF5Q" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__VBdQUJVEd-lXM2_JTGF5Q" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BuWsIEJWEd-lXM2_JTGF5Q" key="parameters" value="in␋text␋java.lang.String␋&quot;Send this process a message using the conversation center.&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_GvBwsUJWEd-lXM2_JTGF5Q" iD="_GvBwsEJWEd-lXM2_JTGF5Q" outgoingEdges="_WoxQmkJWEd-lXM2_JTGF5Q" incomingEdges="_GvBwukJWEd-lXM2_JTGF5Q" activityType="EventIntermediateMessage">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_HjxnYEJWEd-lXM2_JTGF5Q" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HjxnYUJWEd-lXM2_JTGF5Q" key="mode" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HjxnYkJWEd-lXM2_JTGF5Q" key="msgtype" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HjxnY0JWEd-lXM2_JTGF5Q" key="message" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HjxnZEJWEd-lXM2_JTGF5Q" key="filter" value=""/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_WoxQkUJWEd-lXM2_JTGF5Q" iD="_WoxQkEJWEd-lXM2_JTGF5Q" incomingEdges="_WoxQmkJWEd-lXM2_JTGF5Q" name="Order Received" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WxkAMEJWEd-lXM2_JTGF5Q" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WxkAMUJWEd-lXM2_JTGF5Q" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z4DQAEJWEd-lXM2_JTGF5Q" key="parameters" value="in␋text␋java.lang.String␋&quot;Received order: &quot;+content"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_GvBwukJWEd-lXM2_JTGF5Q" iD="_GvBwuUJWEd-lXM2_JTGF5Q"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_WoxQmkJWEd-lXM2_JTGF5Q" iD="_WoxQmUJWEd-lXM2_JTGF5Q"/>
+  </pools>
+</bpmn:BpmnDiagram>
