@@ -1,5 +1,6 @@
-package jadex.bdi.interpreter;
+package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.InterpreterTimedObject;
 import jadex.commons.SReflect;
@@ -173,7 +174,7 @@ public class BeliefRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param model The belief model element.
 	 */
-	protected static Object[]	createDynamicBeliefUserRule(Object model, final Variable var)
+	public static Object[]	createDynamicBeliefUserRule(Object model, final Variable var)
 	{
 		Variable rbelief = new Variable("?rbelief", OAVBDIRuntimeModel.belief_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -205,7 +206,7 @@ public class BeliefRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param model The belief set model element.
 	 */
-	protected static Object[]	createDynamicBeliefSetUserRule(Object model, final Variable var)
+	public static Object[]	createDynamicBeliefSetUserRule(Object model, final Variable var)
 	{
 		Variable rbeliefset = new Variable("?rbeliefset", OAVBDIRuntimeModel.beliefset_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -238,7 +239,7 @@ public class BeliefRules
 	 *  @param usercond The user condition.
 	 *  @param mcond The condition's model element. 
 	 */
-	protected static Object[]	createConditionUserRule(Object mcondition)
+	public static Object[]	createConditionUserRule(Object mcondition)
 	{
 		Variable mcond = new Variable("?mcondition", OAVBDIMetaModel.condition_type);
 //		Variable wa = new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
@@ -301,7 +302,7 @@ public class BeliefRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param ptname The parameter type name (e.g. "location").
 	 */
-	protected static Object[]	createDynamicParameterUserRule(Object mpe, String ptname, final Variable var)
+	public static Object[]	createDynamicParameterUserRule(Object mpe, String ptname, final Variable var)
 	{
 		Variable rparam = new Variable("?rparameter", OAVBDIRuntimeModel.parameter_type);
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.parameterelement_type);
@@ -501,7 +502,7 @@ public class BeliefRules
 	 *  @param usercond	The ADF part of the dynamic condition.
 	 *  @param ptname The parameter type name (e.g. "location").
 	 */
-	protected static Object[]	createDynamicParameterSetUserRule(Object mpe, String ptname, final Variable var)
+	public static Object[]	createDynamicParameterSetUserRule(Object mpe, String ptname, final Variable var)
 	{
 		Variable rparam = new Variable("?rparameterset", OAVBDIRuntimeModel.parameterset_type);
 		Variable rpe = new Variable("?rpe", OAVBDIRuntimeModel.parameterelement_type);

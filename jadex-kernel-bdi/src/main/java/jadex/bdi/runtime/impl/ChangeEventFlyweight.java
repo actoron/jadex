@@ -1,7 +1,7 @@
 package jadex.bdi.runtime.impl;
 
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.IChangeEvent;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVObjectType;
 

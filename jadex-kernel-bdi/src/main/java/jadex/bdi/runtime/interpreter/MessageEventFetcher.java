@@ -1,4 +1,4 @@
-package jadex.bdi.interpreter;
+package jadex.bdi.runtime.interpreter;
 
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;

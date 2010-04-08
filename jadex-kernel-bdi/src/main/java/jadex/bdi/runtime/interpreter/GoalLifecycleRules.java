@@ -1,5 +1,6 @@
-package jadex.bdi.interpreter;
+package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.javaparser.IParsedExpression;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
@@ -264,7 +265,7 @@ public class GoalLifecycleRules
 	 *  Create a goal, when the ADF creation condition triggers.
 	 *  @param model	The goal model element.
 	 */
-	protected static Object[] createGoalCreationUserRule(Object model)
+	public static Object[] createGoalCreationUserRule(Object model)
 	{
 		Variable ragent = new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -292,7 +293,7 @@ public class GoalLifecycleRules
 	 *  Create a goal, when the ADF creation condition triggers and no similar goal exists (according to unique flags)
 	 *  @param model	The goal model element.
 	 */
-	protected static Object[] createGoalCreationUniqueUserRule(Object model, IOAVState state)
+	public static Object[] createGoalCreationUniqueUserRule(Object model, IOAVState state)
 	{
 		Variable ragent = new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -362,7 +363,7 @@ public class GoalLifecycleRules
 	 *  @param usercond	The ADF condition part.
 	 *  @param model	The goal model element.
 	 */
-	protected static Object[]	createGoalOptionUserRule(Object model)
+	public static Object[]	createGoalOptionUserRule(Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -386,7 +387,7 @@ public class GoalLifecycleRules
 	 *  @param usercond	The ADF part of the context condition (will be negated automatically).
 	 *  @param model	The goal model element.
 	 */
-	protected static Object[]	createGoalSuspendUserRule(Object model)
+	public static Object[]	createGoalSuspendUserRule(Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -411,7 +412,7 @@ public class GoalLifecycleRules
 	/**
 	 *  Start dropping a goal that is succeeded or failed.
 	 */
-	protected static Rule createGoalDroppingRule()
+	public static Rule createGoalDroppingRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
@@ -440,7 +441,7 @@ public class GoalLifecycleRules
 	 *  @param usercond	The ADF part of the context condition.
 	 *  @param model	The goal model element.
 	 */
-	protected static Object[]	createGoalDroppingUserRule(Object model)
+	public static Object[]	createGoalDroppingUserRule(Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);

@@ -1,18 +1,18 @@
 package jadex.bdi.runtime.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.interpreter.OAVBDIMetaModel;
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.IExpressionbase;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.rules.state.IOAVState;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *  Flyweight for the expression base.

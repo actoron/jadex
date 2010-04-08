@@ -1,8 +1,8 @@
 package jadex.bdi.runtime.impl;
 
-import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.interpreter.OAVBDIFetcher;
 import jadex.bdi.runtime.IExpression;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.javaparser.IParsedExpression;
 import jadex.rules.state.IOAVState;
 

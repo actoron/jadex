@@ -1,6 +1,6 @@
 package jadex.bdi.runtime;
 
-import jadex.bdi.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
 
 
 /**

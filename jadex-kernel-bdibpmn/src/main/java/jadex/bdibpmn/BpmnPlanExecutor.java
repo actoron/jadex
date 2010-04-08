@@ -1,12 +1,12 @@
 package jadex.bdibpmn;
 
-import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.interpreter.EventProcessingRules;
-import jadex.bdi.interpreter.OAVBDIMetaModel;
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
-import jadex.bdi.interpreter.PlanRules;
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.PlanFailureException;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.EventProcessingRules;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MPool;

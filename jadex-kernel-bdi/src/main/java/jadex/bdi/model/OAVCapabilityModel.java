@@ -1,5 +1,8 @@
-package jadex.bdi.interpreter;
+package jadex.bdi.model;
 
+import jadex.bdi.runtime.interpreter.MBeliefArgument;
+import jadex.bdi.runtime.interpreter.MBeliefSetArgument;
+import jadex.bdi.runtime.interpreter.Report;
 import jadex.bridge.IArgument;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IReport;

@@ -1,12 +1,6 @@
 package jadex.bdi.runtime;
 
-import jadex.bdi.interpreter.AgentRules;
-import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.interpreter.GoalLifecycleRules;
-import jadex.bdi.interpreter.InternalEventRules;
-import jadex.bdi.interpreter.MessageEventRules;
-import jadex.bdi.interpreter.OAVBDIMetaModel;
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.impl.BeliefbaseFlyweight;
 import jadex.bdi.runtime.impl.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.EventbaseFlyweight;
@@ -24,6 +18,11 @@ import jadex.bdi.runtime.impl.PlanFlyweight;
 import jadex.bdi.runtime.impl.PlanbaseFlyweight;
 import jadex.bdi.runtime.impl.PropertybaseFlyweight;
 import jadex.bdi.runtime.impl.WaitqueueFlyweight;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
+import jadex.bdi.runtime.interpreter.InternalEventRules;
+import jadex.bdi.runtime.interpreter.MessageEventRules;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;

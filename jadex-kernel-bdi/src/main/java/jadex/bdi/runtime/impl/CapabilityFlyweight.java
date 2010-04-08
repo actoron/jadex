@@ -1,7 +1,5 @@
 package jadex.bdi.runtime.impl;
 
-import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBeliefbase;
@@ -11,6 +9,8 @@ import jadex.bdi.runtime.IExpressionbase;
 import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;

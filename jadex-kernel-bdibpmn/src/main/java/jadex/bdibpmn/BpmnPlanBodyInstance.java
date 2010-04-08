@@ -1,12 +1,6 @@
 package jadex.bdibpmn;
 
-import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.interpreter.GoalLifecycleRules;
-import jadex.bdi.interpreter.InternalEventRules;
-import jadex.bdi.interpreter.MessageEventRules;
-import jadex.bdi.interpreter.OAVBDIFetcher;
-import jadex.bdi.interpreter.OAVBDIMetaModel;
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.ICapability;
@@ -44,6 +38,12 @@ import jadex.bdi.runtime.impl.PlanbaseFlyweight;
 import jadex.bdi.runtime.impl.PropertybaseFlyweight;
 import jadex.bdi.runtime.impl.WaitAbstractionFlyweight;
 import jadex.bdi.runtime.impl.WaitqueueFlyweight;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
+import jadex.bdi.runtime.interpreter.InternalEventRules;
+import jadex.bdi.runtime.interpreter.MessageEventRules;
+import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdibpmn.handler.EventIntermediateMessageActivityHandler;
 import jadex.bdibpmn.handler.EventIntermediateRuleActicityHandler;
 import jadex.bdibpmn.handler.EventIntermediateSignalActivityHandler;

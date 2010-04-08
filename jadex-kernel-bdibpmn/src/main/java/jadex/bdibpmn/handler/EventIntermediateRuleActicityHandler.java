@@ -1,6 +1,6 @@
 package jadex.bdibpmn.handler;
 
-import jadex.bdi.interpreter.OAVBDIMetaModel;
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.impl.ElementFlyweight;
 import jadex.bdi.runtime.impl.MessageEventFlyweight;
 import jadex.bdibpmn.BpmnPlanBodyInstance;

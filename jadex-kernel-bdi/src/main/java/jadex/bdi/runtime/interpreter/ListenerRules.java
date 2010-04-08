@@ -1,7 +1,8 @@
-package jadex.bdi.interpreter;
+package jadex.bdi.runtime.interpreter;
 
 import java.util.Collection;
 
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBeliefListener;

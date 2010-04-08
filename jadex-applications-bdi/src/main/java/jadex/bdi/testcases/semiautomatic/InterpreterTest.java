@@ -1,8 +1,8 @@
 package jadex.bdi.testcases.semiautomatic;
 
-import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.interpreter.OAVAgentModel;
-import jadex.bdi.interpreter.OAVBDIModelLoader;
+import jadex.bdi.OAVBDIModelLoader;
+import jadex.bdi.model.OAVAgentModel;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.concurrent.Executor;
@@ -18,7 +18,6 @@ import jadex.service.clock.SystemClock;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**

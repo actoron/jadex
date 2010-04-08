@@ -1,12 +1,12 @@
 package jadex.bdi.runtime.impl;
 
-import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
-import jadex.bdi.interpreter.PlanRules;
 import jadex.bdi.runtime.IElement;
 import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.IWaitqueue;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.rules.state.IOAVState;
 
 /**

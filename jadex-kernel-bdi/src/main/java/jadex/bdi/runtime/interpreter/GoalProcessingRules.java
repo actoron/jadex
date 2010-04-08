@@ -1,5 +1,6 @@
-package jadex.bdi.interpreter;
+package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.InterpreterTimedObject;
 import jadex.rules.rulesystem.IAction;
@@ -253,7 +254,7 @@ public class GoalProcessingRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param model The goal model element.
 	 */
-	protected static Object[]	createAchievegoalSucceededUserRule(Object model)
+	public static Object[]	createAchievegoalSucceededUserRule(Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -802,7 +803,7 @@ public class GoalProcessingRules
 	 *  @param usercond	The ADF part of the maintain condition (will be negated to trigger maintenance).
 	 *  @param model The goal model element.
 	 */
-	protected static Object[]	createMaintaingoalProcessingUserRule(Object model)
+	public static Object[]	createMaintaingoalProcessingUserRule(Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -830,7 +831,7 @@ public class GoalProcessingRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param model The goal model element.
 	 */
-	protected static Object[]	createMaintaingoalSucceededUserRule(Object model)
+	public static Object[]	createMaintaingoalSucceededUserRule(Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -889,7 +890,7 @@ public class GoalProcessingRules
 	/**
 	 *  Create the maintaingoal failed rule (when the last plan has failed).
 	 */
-	protected static Rule createMaintaingoalFailedRule()
+	public static Rule createMaintaingoalFailedRule()
 	{
 		Variable rgoal	= new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
@@ -1004,7 +1005,7 @@ public class GoalProcessingRules
 	 *  Create the goal retry rule.
 	 *  !achievegoal, retry=true, posttoall=false, (rebuild || apl!=null), plan=finished, procstate=candselected
 	 */
-	protected static Rule createGoalRetryRule()
+	public static Rule createGoalRetryRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
@@ -1366,7 +1367,7 @@ public class GoalProcessingRules
 	 *  @param usercond	The ADF part of the context condition.
 	 *  @param model	The goal model element.
 	 */
-	protected static Object[]	createGoalRecurUserRule(Object model)
+	public static Object[]	createGoalRecurUserRule(Object model)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);

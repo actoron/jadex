@@ -1,10 +1,10 @@
 package jadex.bdi.runtime;
 
-import jadex.bdi.interpreter.MessageEventRules;
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
-import jadex.bdi.interpreter.PlanRules;
 import jadex.bdi.runtime.impl.ElementFlyweight;
 import jadex.bdi.runtime.impl.WaitAbstractionFlyweight;
+import jadex.bdi.runtime.interpreter.MessageEventRules;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.commons.concurrent.IResultListener;
 
 import java.beans.PropertyChangeListener;
@@ -90,14 +90,11 @@ public abstract class Plan extends AbstractPlan
 	/**
 	 *  Wait for a clock tick.
 	 *  todo: @param num The number of ticks?
-	 * /
+	 */
 	public void	waitForTick()
 	{
-		getCapability().checkThreadAccess();
-		WaitAbstraction wa = new WaitAbstraction(getRCapability());
-		wa.setTickTimeout(1, getRPlan());
-		eventWaitFor(wa);
-	}*/
+		PlanRules.waitForWaitAbstraction(null, PlanRules.TICK_TIMER, getState(), getRCapability(), getRPlan());
+	}
 
 	/**
 	 *  Wait for a condition to be satisfied.

@@ -1,4 +1,4 @@
-package jadex.bdi.interpreter;
+package jadex.bdi.model;
 
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
@@ -20,6 +20,8 @@ import jadex.bdi.runtime.impl.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.MessageEventFlyweight;
 import jadex.bdi.runtime.impl.PlanFlyweight;
 import jadex.bdi.runtime.impl.PlanbaseFlyweight;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.runtime.interpreter.ResolvesTo;
 import jadex.commons.SReflect;
 import jadex.rules.parser.conditions.javagrammar.DefaultParserHelper;
 import jadex.rules.rulesystem.ICondition;

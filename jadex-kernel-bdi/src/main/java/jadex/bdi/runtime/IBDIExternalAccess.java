@@ -72,7 +72,7 @@ public interface IBDIExternalAccess extends ICapability, IExternalAccess
 	/**
 	 *  Wait for a tick.
 	 */
-//	public void	waitForTick();
+	public void	waitForTick();
 
 	/**
 	 *  Wait for a condition to be satisfied.

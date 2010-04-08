@@ -1,6 +1,6 @@
 package jadex.tools.ruleprofiler;
 
-import jadex.bdi.interpreter.BDIAgentFactory;
+import jadex.bdi.BDIAgentFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentListener;

@@ -1,7 +1,7 @@
 package jadex.bdi.runtime.impl;
 
-import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.IInternalEvent;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.rules.state.IOAVState;
 
 /**

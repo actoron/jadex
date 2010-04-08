@@ -1,5 +1,6 @@
-package jadex.bdi.interpreter;
+package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.BDIFailureException;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IPlanExecutor;
@@ -67,6 +68,11 @@ import java.util.Set;
  */
 public class PlanRules
 {
+	//-------- constants --------
+	
+	/** Tick timer constant. */
+	public static final long TICK_TIMER = -2;
+	
 	//-------- helper methods --------
 	
 	/**
@@ -487,7 +493,7 @@ public class PlanRules
 	/**
 	 *  Create the plan execution rule.
 	 */
-	protected static Rule createPlanBodyExecutionRule()
+	public static Rule createPlanBodyExecutionRule()
 	{
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -582,7 +588,7 @@ public class PlanRules
 	/**
 	 *  Create the plan execution rule.
 	 */
-	protected static Rule createPlanPassedExecutionRule()
+	public static Rule createPlanPassedExecutionRule()
 	{
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -668,7 +674,7 @@ public class PlanRules
 	/**
 	 *  Create the plan execution rule.
 	 */
-	protected static Rule createPlanFailedExecutionRule()
+	public static Rule createPlanFailedExecutionRule()
 	{
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -752,7 +758,7 @@ public class PlanRules
 	/**
 	 *  Create the plan execution rule.
 	 */
-	protected static Rule createPlanAbortedExecutionRule()
+	public static Rule createPlanAbortedExecutionRule()
 	{
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -837,7 +843,7 @@ public class PlanRules
 	/**
 	 *  Reactivate a plan when goal cleanup is finished.
 	 */
-	protected static Rule createPlanInstanceCleanupFinishedRule()
+	public static Rule createPlanInstanceCleanupFinishedRule()
 	{
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		
@@ -864,7 +870,7 @@ public class PlanRules
 	/**
 	 *  Reactivate a plan when the goal it waits for is finished.
 	 */
-	protected static Rule createPlanInstanceGoalFinishedRule()
+	public static Rule createPlanInstanceGoalFinishedRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rgoals = new Variable("$?rgoal", OAVBDIRuntimeModel.goal_type, true, false);
@@ -938,7 +944,7 @@ public class PlanRules
 	/**
 	 *  Add a goal to the waitqueue of a plan when the goal it waits for is finished.
 	 */
-	protected static Rule createPlanWaitqueueGoalFinishedRule()
+	public static Rule createPlanWaitqueueGoalFinishedRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.goal_type);
@@ -1006,7 +1012,7 @@ public class PlanRules
 	/**
 	 *  Create the plan instance maintain goal finished rule.
 	 */
-	protected static Rule createPlanInstanceMaintainGoalFinishedRule()
+	public static Rule createPlanInstanceMaintainGoalFinishedRule()
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable mgoal = new Variable("?mgoal", OAVBDIMetaModel.maintaingoal_type);
@@ -1068,7 +1074,7 @@ public class PlanRules
 	 *  Create the plan removal rule.
 	 *  Removes a plan from its capability, when execution has finished.
 	 */
-	protected static Rule createPlanRemovalRule()
+	public static Rule createPlanRemovalRule()
 	{
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -1306,7 +1312,7 @@ public class PlanRules
 	/**
 	 *  Rule to abort a plan when the corresponding goal was deactivated.
 	 */
-	protected static Rule createPlanInstanceAbortRule()
+	public static Rule createPlanInstanceAbortRule()
 	{
 		Variable	rgoal	= new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
@@ -1336,7 +1342,7 @@ public class PlanRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param mplan	The plan model element.
 	 */
-	protected static Object[]	createPlanCreationUserRule(Object mplan)
+	public static Object[]	createPlanCreationUserRule(Object mplan)
 	{
 		Variable ragent = new Variable("?ragent", OAVBDIRuntimeModel.agent_type);
 		Variable mplanvar = new Variable("?mplan", OAVBDIMetaModel.plan_type);
@@ -1360,7 +1366,7 @@ public class PlanRules
 	/**
 	 *  Trigger plan creation on fact changed event.
 	 */
-	protected static Rule createPlanInstanceFactChangedTriggerRule()
+	public static Rule createPlanInstanceFactChangedTriggerRule()
 	{
 		Variable	rplan	= new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 //		Variable	wa	= new Variable("?wa", OAVBDIRuntimeModel.waitabstraction_type);
@@ -1848,7 +1854,7 @@ public class PlanRules
 	 *  @param usercond	The ADF part of the target condition.
 	 *  @param mplan	The plan model element.
 	 */
-	protected static Object[]	createPlanContextInvalidUserRule(Object mplan)
+	public static Object[]	createPlanContextInvalidUserRule(Object mplan)
 	{
 		Variable rplan = new Variable("?rplan", OAVBDIRuntimeModel.plan_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -2088,42 +2094,26 @@ public class PlanRules
 
 			if(timeout>-1)
 			{
-	//			final long start = System.currentTimeMillis();
 				// todo: what happens when timer is immediately due?! can this lead to problems?
 				// timer runs on other thread.
-				final	ITimer[]	thetimer	= new ITimer[1];
-				ITimer timer = ((IClockService)BDIInterpreter.getInterpreter(state).getComponentAdapter().getServiceContainer()
-					.getService(IClockService.class)).createTimer(timeout, new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getComponentAdapter(), new CheckedAction()
-				{
-					public boolean isValid()
-					{
-						return state.containsObject(rplan)
-							&& thetimer[0].equals(state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer))
-							&& super.isValid();
-					}
-						
-					public void run()
-					{
-//						System.out.println("Timer occurred: "+start);
-
-						to[0] = true;
-						
-//						state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, 
-//							OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
-//						System.out.println("initializeWait: Setting plan to ready: "
-//								+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName()
-//								+", "+rplan);
-//						state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer, null);
-//						cleanupPlanWait(state, rcapa, rplan, false);
-						
-						EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
-						
-						BDIInterpreter.getInterpreter(state).getComponentAdapter().wakeup();
-					}
-				}));
+				TimeoutAction toa = new TimeoutAction(state, rplan, rcapa, to);
 				
-				thetimer[0]	= timer;
+				ITimer timer = ((IClockService)BDIInterpreter.getInterpreter(state).getComponentAdapter().getServiceContainer()
+					.getService(IClockService.class)).createTimer(timeout, new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getComponentAdapter(), toa));
+				toa.setTimer(timer); // This works because isValid() will always be executed on agent thread (InterpreterTimedObject).
+				
 	//			System.out.println("Timer created: "+start);
+				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer, timer);
+			}
+			else if(timeout==TICK_TIMER)
+			{
+				TimeoutAction toa = new TimeoutAction(state, rplan, rcapa, to);
+				
+				ITimer timer = ((IClockService)BDIInterpreter.getInterpreter(state).getComponentAdapter().getServiceContainer()
+					.getService(IClockService.class)).createTickTimer(new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getComponentAdapter(), toa));
+				toa.setTimer(timer); // This works because isValid() will always be executed on agent thread (InterpreterTimedObject).
+
+				System.out.println("Tick timer created: "+timer);
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer, timer);
 			}
 		}
@@ -2299,5 +2289,76 @@ public class PlanRules
 				BDIInterpreter.getInterpreter(state).getEventReificator().removeObservedElement(it.next());
 			}
 		}
+	}
+}
+
+/**
+ *  Action to be executed on timeout wait.
+ */
+class TimeoutAction extends CheckedAction
+{
+	//-------- attributes --------
+	
+	/** The state. */
+	protected IOAVState state;
+	
+	/** The plan. */
+	protected Object rplan;
+	
+	/** The capability. */
+	protected Object rcapa;
+	
+	/** The timer. */
+	protected ITimer timer;
+	
+	/** The result timeout occurred. */
+	protected boolean[] to;
+	
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new timeout action.
+	 *  @param state The state.
+	 *  @param rplan The rplan
+	 *  @param to The timeout result array.
+	 */
+	public TimeoutAction(IOAVState state, Object rplan, Object rcapa, boolean[] to)
+	{
+		this.state = state;
+		this.rplan = rplan;
+		this.rcapa = rcapa;
+		this.to = to;
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Set the timer.
+	 *  @param timer The timer to set.
+	 */
+	public void setTimer(ITimer timer)
+	{
+		this.timer = timer;
+	}
+
+	/**
+	 *  Test if the action is valid.
+	 */
+	public boolean isValid()
+	{
+		return state.containsObject(rplan)
+			&& timer.equals(state.getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer))
+			&& super.isValid();
+	}
+	
+	/**
+	 *  Execute the action.
+	 */
+	public void run()
+	{
+//			System.out.println("Timer occurred: "+start);
+		to[0] = true;
+		EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
+		BDIInterpreter.getInterpreter(state).getComponentAdapter().wakeup();
 	}
 }

@@ -216,7 +216,7 @@
 							<key>
 								<value type="java.lang.String">bdi_factory</value>
 							</key>
-							<bean class="jadex.bdi.interpreter.BDIAgentFactory">
+							<bean class="jadex.bdi.BDIAgentFactory">
 								<constructor-arg>
 									<map>
 										<entry>

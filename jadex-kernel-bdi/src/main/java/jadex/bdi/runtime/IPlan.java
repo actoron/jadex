@@ -1,6 +1,6 @@
 package jadex.bdi.runtime;
 
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 
 
 /**

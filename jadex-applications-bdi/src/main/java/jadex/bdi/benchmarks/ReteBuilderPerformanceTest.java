@@ -1,6 +1,6 @@
 package jadex.bdi.benchmarks;
 
-import jadex.bdi.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.rules.rulesystem.rete.RetePatternMatcherFunctionality;
 import jadex.rules.rulesystem.rete.builder.BuildReport;
 import jadex.rules.rulesystem.rete.builder.ReteBuilder;

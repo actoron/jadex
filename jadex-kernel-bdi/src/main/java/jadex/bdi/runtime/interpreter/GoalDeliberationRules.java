@@ -1,5 +1,6 @@
-package jadex.bdi.interpreter;
+package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
 import jadex.rules.rulesystem.IVariableAssignments;
@@ -175,7 +176,7 @@ public class GoalDeliberationRules
 	 *  a) there is an inhibiting rgoal on type level
 	 *  b) the inhibition condition triggers.
 	 */
-	protected static Object[]	createAddInhibitionLinkUserRule(Object model, String inmode, String ref)
+	public static Object[]	createAddInhibitionLinkUserRule(Object model, String inmode, String ref)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);
@@ -224,7 +225,7 @@ public class GoalDeliberationRules
 	 *  Remove an inhibition entry (the inhibitor) from a goal when
 	 *  b) the negated inhibition condition triggers.
 	 */
-	protected static Object[]	createRemoveInhibitionLinkUserRule(Object model, String inmode, String ref)
+	public static Object[]	createRemoveInhibitionLinkUserRule(Object model, String inmode, String ref)
 	{
 		Variable rgoal = new Variable("?rgoal", OAVBDIRuntimeModel.goal_type);
 		Variable rcapa = new Variable("?rcapa", OAVBDIRuntimeModel.capability_type);

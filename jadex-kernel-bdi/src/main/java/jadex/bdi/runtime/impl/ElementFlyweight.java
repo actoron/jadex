@@ -1,9 +1,9 @@
 package jadex.bdi.runtime.impl;
 
-import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.interpreter.OAVBDIMetaModel;
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IElement;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;

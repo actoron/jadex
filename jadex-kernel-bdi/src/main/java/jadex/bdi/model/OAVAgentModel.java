@@ -1,5 +1,6 @@
-package jadex.bdi.interpreter;
+package jadex.bdi.model;
 
+import jadex.bdi.runtime.interpreter.Report;
 import jadex.javaparser.IParsedExpression;
 import jadex.rules.rulesystem.IPatternMatcherFunctionality;
 import jadex.rules.rulesystem.IRule;
@@ -75,7 +76,7 @@ public class OAVAgentModel	extends OAVCapabilityModel
 	 *  Get the matcherfunc.
 	 *  @return The matcherfunc.
 	 */
-	protected void setMatcherFunctionality(IPatternMatcherFunctionality matcherfunc)
+	public void setMatcherFunctionality(IPatternMatcherFunctionality matcherfunc)
 	{
 		this.matcherfunc	= matcherfunc;
 	}

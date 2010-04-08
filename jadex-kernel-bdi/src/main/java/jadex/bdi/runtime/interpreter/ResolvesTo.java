@@ -1,5 +1,6 @@
-package jadex.bdi.interpreter;
+package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.rules.rulesystem.rete.extractors.AttributeSet;
 import jadex.rules.rulesystem.rules.ILazyValue;
 import jadex.rules.rulesystem.rules.functions.IFunction;

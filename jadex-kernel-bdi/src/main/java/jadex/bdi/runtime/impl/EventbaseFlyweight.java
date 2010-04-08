@@ -1,16 +1,16 @@
 package jadex.bdi.runtime.impl;
 
-import jadex.bdi.interpreter.AgentRules;
-import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.interpreter.InternalEventRules;
-import jadex.bdi.interpreter.MessageEventRules;
-import jadex.bdi.interpreter.OAVBDIMetaModel;
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IEventbase;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IInternalEventListener;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
+import jadex.bdi.runtime.interpreter.AgentRules;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.InternalEventRules;
+import jadex.bdi.runtime.interpreter.MessageEventRules;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 

@@ -1,5 +1,6 @@
-package jadex.bdi.interpreter;
+package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IContentCodec;
 import jadex.bridge.IMessageAdapter;

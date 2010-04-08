@@ -1,5 +1,9 @@
-package jadex.bdi.interpreter;
+package jadex.bdi;
 
+import jadex.bdi.model.OAVAgentModel;
+import jadex.bdi.model.OAVCapabilityModel;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;

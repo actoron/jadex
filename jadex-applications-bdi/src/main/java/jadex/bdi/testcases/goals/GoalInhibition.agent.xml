@@ -87,15 +87,9 @@
 	<expressions>
 		<condition name="countis5" language="jcl">
 			$beliefbase.count==5
-			
-			// ?rbel	= (belief (element_has_model ?mbel) (belief_has_fact 5))
-			// ?mbel	= (mbelief (melement_has_name "count"))
 		</condition>
 		<condition name="countis6" language="jcl">
 			$beliefbase.count==6
-			
-			// ?rbel	= (belief (element_has_model ?mbel) (belief_has_fact 6))
-			// ?mbel	= (mbelief (melement_has_name "count"))
 		</condition>
 	</expressions>
 	

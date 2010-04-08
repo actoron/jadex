@@ -1,10 +1,10 @@
 package jadex.bdi.runtime.impl;
 
-import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.interpreter.MessageEventRules;
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.MessageEventRules;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.MessageType;
 import jadex.rules.state.IOAVState;
 

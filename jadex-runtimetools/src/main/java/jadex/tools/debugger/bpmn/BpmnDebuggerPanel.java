@@ -1,7 +1,5 @@
 package jadex.tools.debugger.bpmn;
 
-import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.runtime.impl.ElementFlyweight;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.tools.ProcessViewPanel;
 import jadex.bridge.IComponentIdentifier;

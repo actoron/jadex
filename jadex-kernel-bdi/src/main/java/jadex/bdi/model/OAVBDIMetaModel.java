@@ -1,4 +1,4 @@
-package jadex.bdi.interpreter;
+package jadex.bdi.model;
 
 import java.util.Collection;
 

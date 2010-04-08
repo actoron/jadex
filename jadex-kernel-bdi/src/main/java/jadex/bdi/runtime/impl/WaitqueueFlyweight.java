@@ -1,10 +1,10 @@
 package jadex.bdi.runtime.impl;
 
-import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IWaitAbstraction;
 import jadex.bdi.runtime.IWaitqueue;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVObjectType;

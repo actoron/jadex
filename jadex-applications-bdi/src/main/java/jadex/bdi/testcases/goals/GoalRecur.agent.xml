@@ -38,9 +38,6 @@
 		<performgoal name="perf2" recur="true">
 			<recurcondition language="jcl">
 				$beliefbase.context
-
-				// ?rbel	= (belief (element_has_model ?mbel) (belief_has_fact true))
-				// ?mbel	= (mbelief (melement_has_name "context"))
 			</recurcondition>
 		</performgoal>	
 	</goals>

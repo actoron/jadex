@@ -1,7 +1,7 @@
 package jadex.gpmn;
 
-import jadex.bdi.interpreter.BDIAgentFactory;
-import jadex.bdi.interpreter.OAVAgentModel;
+import jadex.bdi.BDIAgentFactory;
+import jadex.bdi.model.OAVAgentModel;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;

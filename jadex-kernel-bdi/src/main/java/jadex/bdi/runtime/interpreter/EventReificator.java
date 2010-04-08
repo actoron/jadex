@@ -1,4 +1,4 @@
-package jadex.bdi.interpreter;
+package jadex.bdi.runtime.interpreter;
 
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;

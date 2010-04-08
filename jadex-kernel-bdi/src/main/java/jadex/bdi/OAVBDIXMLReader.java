@@ -1,5 +1,6 @@
-package jadex.bdi.interpreter;
+package jadex.bdi;
 
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.commons.SReflect;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;

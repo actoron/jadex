@@ -1,13 +1,11 @@
 package jadex.gpmn;
 
-import jadex.bdi.interpreter.OAVAgentModel;
-import jadex.bdi.interpreter.OAVBDIMetaModel;
-import jadex.bdi.interpreter.OAVBDIModelLoader;
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
-import jadex.bdi.interpreter.OAVBDIXMLReader;
-import jadex.bdi.interpreter.Report;
-import jadex.xml.IContext;
-import jadex.xml.IPostProcessor;
+import jadex.bdi.OAVBDIModelLoader;
+import jadex.bdi.OAVBDIXMLReader;
+import jadex.bdi.model.OAVAgentModel;
+import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.runtime.interpreter.Report;
 import jadex.gpmn.model.MAchieveGoal;
 import jadex.gpmn.model.MArtifact;
 import jadex.gpmn.model.MContext;
@@ -26,6 +24,8 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 import jadex.rules.state.javaimpl.OAVStateFactory;
+import jadex.xml.IContext;
+import jadex.xml.IPostProcessor;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,16 +1,15 @@
 package jadex.bdi.runtime.impl;
 
-import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.interpreter.OAVBDIMetaModel;
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
-import jadex.bdi.interpreter.PlanRules;
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.TimeoutException;
-import jadex.bdi.runtime.impl.ElementFlyweight.AgentInvocation;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.runtime.interpreter.PlanRules;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.InterpreterTimedObject;
@@ -124,11 +123,18 @@ public class ExternalAccessFlyweight extends CapabilityFlyweight implements IBDI
 	
 	/**
 	 *  Wait for a tick.
-	 * /
+	 */
 	public void	waitForTick()
 	{
-		throw new UnsupportedOperationException();
-	}*/
+		if(!getInterpreter().isPlanThread())
+		{
+			waitForExternalAccessWaitAbstraction(null, PlanRules.TICK_TIMER);
+		}
+		else
+		{
+			PlanRules.waitForWaitAbstraction(null, PlanRules.TICK_TIMER, getState(), getScope(), getInterpreter().getCurrentPlan());
+		}
+	}
 
 	/**
 	 *  Wait for a condition to be satisfied.
@@ -763,6 +769,11 @@ public class ExternalAccessFlyweight extends CapabilityFlyweight implements IBDI
 //					System.out.println("Timer created: "+start);
 					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer, ((IClockService)getInterpreter()
 						.getComponentAdapter().getServiceContainer().getService(IClockService.class)).createTimer(timeout, new InterpreterTimedObject(BDIInterpreter.getInterpreter(getState()).getComponentAdapter(), wakeup)));
+				}
+				else if(timeout==PlanRules.TICK_TIMER)
+				{
+					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer, ((IClockService)getInterpreter()
+						.getComponentAdapter().getServiceContainer().getService(IClockService.class)).createTickTimer(new InterpreterTimedObject(BDIInterpreter.getInterpreter(getState()).getComponentAdapter(), wakeup)));
 				}
 			
 				object = ea;

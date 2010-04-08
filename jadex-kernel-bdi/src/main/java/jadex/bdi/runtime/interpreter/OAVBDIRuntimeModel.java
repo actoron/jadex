@@ -1,5 +1,6 @@
-package jadex.bdi.interpreter;
+package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IExternalCondition;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.concurrent.IResultListener;
@@ -726,7 +727,7 @@ public class OAVBDIRuntimeModel
 	
 	
 	/** The runtime element to model element mapping (OAV type -> OAV type). */
-	protected static Map	modelmap;
+	public static Map modelmap;
 	
 	static
 	{

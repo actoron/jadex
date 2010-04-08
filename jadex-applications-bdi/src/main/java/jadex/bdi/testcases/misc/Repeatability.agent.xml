@@ -93,9 +93,6 @@
 				<condition language="jcl">
 					// "test".equals($beliefbase.a)
 					$beliefbase.a.equals("test")
-					
-					// ?rbel_a	= (belief (element_has_model ?mbel_a) (belief_has_fact "test"))
-					// ?mbel_a	= (mbelief (melement_has_name "a"))
 				</condition>
 			</trigger>
 		</plan>
@@ -111,9 +108,6 @@
 				<condition language="jcl">
 					// "test".equals($beliefbase.b)
 					$beliefbase.b.equals("test")
-					
-					// ?rbel_b	= (belief (element_has_model ?mbel_b) (belief_has_fact "test"))
-					// ?mbel_b	= (mbelief (melement_has_name "b"))
 				</condition>
 			</trigger>
 		</plan>
@@ -129,9 +123,6 @@
 				<condition language="jcl">
 					// $beliefbase.c.length>0 &amp;&amp; "test".equals($beliefbase.c[0])
 					$beliefbase.c.length>0 &amp;&amp; $beliefbase.c[0].equals("test")
-					
-					// ?rbelset_c	= (beliefset (element_has_model ?mbelset_c) (beliefset_has_facts contains "test"))
-					// ?mbelset_c	= (mbeliefset (melement_has_name "c"))
 				</condition>
 			</trigger>
 		</plan>
@@ -147,9 +138,6 @@
 				<condition language="jcl">
 					// $beliefbase.d.length>0 &amp;&amp; "test".equals($beliefbase.d[0])
 					$beliefbase.d.length>0 &amp;&amp; $beliefbase.d[0].equals("test")
-					
-					// ?rbelset_d	= (beliefset (element_has_model ?mbelset_d) (beliefset_has_facts contains "test"))
-					// ?mbelset_d	= (mbeliefset (melement_has_name "d"))
 				</condition>
 			</trigger>
 		</plan>

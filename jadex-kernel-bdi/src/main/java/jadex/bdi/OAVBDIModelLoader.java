@@ -1,5 +1,17 @@
-package jadex.bdi.interpreter;
+package jadex.bdi;
 
+import jadex.bdi.model.BDIParserHelper;
+import jadex.bdi.model.OAVAgentModel;
+import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.model.OAVCapabilityModel;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.BeliefRules;
+import jadex.bdi.runtime.interpreter.GoalDeliberationRules;
+import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
+import jadex.bdi.runtime.interpreter.GoalProcessingRules;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bdi.runtime.interpreter.PlanRules;
+import jadex.bdi.runtime.interpreter.Report;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;

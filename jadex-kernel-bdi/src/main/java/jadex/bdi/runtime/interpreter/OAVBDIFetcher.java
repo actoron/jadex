@@ -1,5 +1,6 @@
-package jadex.bdi.interpreter;
+package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bdi.runtime.IParameterElement;
 import jadex.bdi.runtime.impl.BeliefbaseFlyweight;

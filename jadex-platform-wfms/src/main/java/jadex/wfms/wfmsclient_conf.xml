@@ -101,7 +101,7 @@
 			</property>
 			
 			<property type="jadex.bridge.IComponentFactory" name="bdi_factory">
-				new jadex.bdi.interpreter.BDIAgentFactory(
+				new jadex.bdi.BDIAgentFactory(
 					jadex.commons.SUtil.createHashMap(
 					new String[]
 					{

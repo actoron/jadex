@@ -1,5 +1,6 @@
-package jadex.bdi.interpreter;
+package jadex.bdi.runtime.interpreter;
 
+import jadex.bdi.model.OAVCapabilityModel;
 import jadex.bridge.IReport;
 import jadex.commons.SUtil;
 import jadex.commons.collection.IndexMap;

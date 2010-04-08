@@ -1,10 +1,8 @@
 package jadex.bdibpmn.handler;
 
-import jadex.bdi.interpreter.OAVBDIMetaModel;
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
-import jadex.bdi.runtime.IInternalEvent;
+import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.impl.ElementFlyweight;
-import jadex.bdi.runtime.impl.InternalEventFlyweight;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdibpmn.BpmnPlanBodyInstance;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;

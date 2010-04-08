@@ -1,10 +1,10 @@
 package jadex.tools.ruleprofiler;
 
-import jadex.bdi.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.impl.ElementFlyweight;
-import jadex.bridge.IComponentManagementService;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
 import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.IResultListener;

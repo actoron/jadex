@@ -1,9 +1,9 @@
 package jadex.bdi.runtime.impl;
 
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.IParameter;
 import jadex.bdi.runtime.IParameterElement;
 import jadex.bdi.runtime.IParameterSet;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.rules.state.IOAVState;
 
 import java.util.Collection;
