@@ -36,20 +36,10 @@ public class Grid2D extends Space2D
 	/** The neighborhood property. */
 	public static final String PROPERTY_NEIGHBORHOOD = "neighborhood";
 	
+	//-------- attributes --------
+	
 	/** All simobject id's accessible per position. */
 	protected MultiCollection objectsygridpos;
-	
-	/** Standard vector for left movement. */
-//	public static final IVector2	LEFT	= new Vector2Int(-1, 0);
-	
-	/** Standard vector for right movement. */
-//	public static final IVector2	RIGHT	= new Vector2Int(1, 0);
-	
-	/** Standard vector for up movement. */
-//	public static final IVector2	UP	= new Vector2Int(0, 1);
-	
-	/** Standard vector for down movement. */
-//	public static final IVector2	DOWN	= new Vector2Int(0, -1);
 	
 	//-------- constructors --------
 	
@@ -119,35 +109,38 @@ public class Grid2D extends Space2D
 	 */
 	public Collection getSpaceObjectsByGridPosition(IVector2 position, Object type)
 	{
+		Collection ret = null;
 		synchronized(monitor)
 		{
 			if(position!=null)
-				position	= adjustPosition(position);
-			Collection ret = null;
-			Collection simobjs = objectsygridpos.getCollection(position);
-			if(null == type)
 			{
-				ret = simobjs;
-			}
-			else
-			{
-				ArrayList tmp = new ArrayList();
-				for(Iterator objs = simobjs.iterator(); objs.hasNext();)
-				{
-					ISpaceObject curobj = (ISpaceObject)objs.next();
-					if(type.equals(curobj.getType()))
-					{
-						tmp.add(curobj);
-					}
-				}
-				if(tmp.size()>0)
-					ret = tmp;
-			}
+				position = adjustPosition(position);
+				IVector2 fieldpos = new Vector2Int(position.getXAsInteger(), position.getYAsInteger());
 			
+				Collection simobjs = objectsygridpos.getCollection(fieldpos);
+				if(null == type)
+				{
+					ret = simobjs;
+				}
+				else
+				{
+					ArrayList tmp = new ArrayList();
+					for(Iterator objs = simobjs.iterator(); objs.hasNext();)
+					{
+						ISpaceObject curobj = (ISpaceObject)objs.next();
+						if(type.equals(curobj.getType()))
+						{
+							tmp.add(curobj);
+						}
+					}
+					if(tmp.size()>0)
+						ret = tmp;
+				}
+			}
 //			System.out.println("getSpaceObs: "+position+" "+type+" "+ret+" "+simobjs);
 			
-			return ret;
 		}
+		return ret;
 	}
 		
 	/**
@@ -267,8 +260,12 @@ public class Grid2D extends Space2D
 				// remove the object from grid
 				IVector2 pos = (IVector2)getSpaceObject(id).getProperty(Space2D.PROPERTY_POSITION);
 				if(pos!=null)
-					objectsygridpos.remove(pos, spaceobjects.get(id));
-				
+				{
+					int x = pos.getXAsInteger();
+					int y = pos.getYAsInteger();
+					IVector2 fieldpos = new Vector2Int(x, y);
+					objectsygridpos.remove(fieldpos, spaceobjects.get(id));
+				}
 				super.destroySpaceObject(id);
 			}
 		}
