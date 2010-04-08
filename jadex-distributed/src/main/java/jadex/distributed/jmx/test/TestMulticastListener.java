@@ -48,6 +48,7 @@ public class TestMulticastListener {
 		while (true) { // listen loop for 9000
 			msocket1.receive(recv1); // buffer filled with message content
 			System.out.println( new StringBuilder().append("9000: ").append(new String(buf1).toString()) );
+			System.out.println( new StringBuilder().append("Sender IP ist ").append(recv1.getAddress()).append(" und Port ist ").append(recv1.getPort()) );
 			Arrays.fill(buf1, (byte) 0);
 		}
 	}
