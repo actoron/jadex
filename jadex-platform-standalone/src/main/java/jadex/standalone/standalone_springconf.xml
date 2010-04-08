@@ -209,6 +209,16 @@
 							</key>
 							<bean class="jadex.micro.MicroAgentFactory">
 								<constructor-arg ref="platform"/>
+								<constructor-arg>
+									<map>
+										<entry>
+											<key>
+												<value>debugger.panels</value>
+											</key>
+											<value type="java.lang.String">"jadex.tools.debugger.micro.MicroDebuggerPanel, jadex.tools.debugger.common.ObjectInspectorDebuggerPanel"</value>
+										</entry>
+									</map>
+								</constructor-arg>
 							</bean>
 						</entry>
 					
