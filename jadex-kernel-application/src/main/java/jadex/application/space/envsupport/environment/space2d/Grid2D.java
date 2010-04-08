@@ -261,9 +261,7 @@ public class Grid2D extends Space2D
 				IVector2 pos = (IVector2)getSpaceObject(id).getProperty(Space2D.PROPERTY_POSITION);
 				if(pos!=null)
 				{
-					int x = pos.getXAsInteger();
-					int y = pos.getYAsInteger();
-					IVector2 fieldpos = new Vector2Int(x, y);
+					IVector2 fieldpos = new Vector2Int(pos.getXAsInteger(), pos.getYAsInteger());
 					objectsygridpos.remove(fieldpos, spaceobjects.get(id));
 				}
 				super.destroySpaceObject(id);
