@@ -4,10 +4,12 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -141,11 +143,39 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	protected void receiveMessage(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	protected void receiveMessage(final MActivity activity, BpmnInterpreter instance, final ProcessThread thread)
 	{
 		thread.setWaiting(true);
 //		thread.setWaitInfo(type);
 		IFilter filter = (IFilter)thread.getPropertyValue(PROPERTY_FILTER, activity);
+		if(filter==null)
+		{
+			filter	= new IFilter()
+			{
+				public boolean filter(Object obj)
+				{
+					boolean	ret	= obj instanceof IMessageAdapter;
+					if(ret)
+					{
+						try
+						{
+							IMessageAdapter	msg	= (IMessageAdapter)obj;
+							String[]	params	= activity.getPropertyNames();
+							for(int i=0; ret && params!=null && i<params.length; i++)
+							{
+								ret	= SUtil.equals(thread.getPropertyValue(params[i]), msg.getValue(params[i]));
+							}
+						}
+						catch(RuntimeException e)
+						{
+							e.printStackTrace();
+							ret	= false;
+						}
+					}
+					return ret;
+				}
+			};
+		}
 		thread.setWaitFilter(filter);
 		
 //		System.out.println("Waiting for message: "+filter);

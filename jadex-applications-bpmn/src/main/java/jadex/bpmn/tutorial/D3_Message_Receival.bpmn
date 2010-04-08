@@ -18,11 +18,14 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HjxnY0JWEd-lXM2_JTGF5Q" key="message" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HjxnZEJWEd-lXM2_JTGF5Q" key="filter" value=""/>
       </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-TF6YEL-Ed-1Spke1QkQhw" source="activity">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-TF6YUL-Ed-1Spke1QkQhw" key="parameters" value="performative␋&quot;request&quot;"/>
+      </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_WoxQkUJWEd-lXM2_JTGF5Q" iD="_WoxQkEJWEd-lXM2_JTGF5Q" incomingEdges="_WoxQmkJWEd-lXM2_JTGF5Q" name="Order Received" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WxkAMEJWEd-lXM2_JTGF5Q" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WxkAMUJWEd-lXM2_JTGF5Q" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z4DQAEJWEd-lXM2_JTGF5Q" key="parameters" value="in␋text␋java.lang.String␋&quot;Received order: &quot;+content"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z4DQAEJWEd-lXM2_JTGF5Q" key="parameters" value="in␋text␋java.lang.String␋&quot;Received order: &quot;+$event.content"/>
       </eAnnotations>
     </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_GvBwukJWEd-lXM2_JTGF5Q" iD="_GvBwuUJWEd-lXM2_JTGF5Q"/>

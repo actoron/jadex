@@ -10,7 +10,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_-wEWKUJVEd-lXM2_JTGF5Q"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_-wEWKkJVEd-lXM2_JTGF5Q" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="D3_Message_Receival.bpmn#_-wEWGUJVEd-lXM2_JTGF5Q"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_-wEWLUJVEd-lXM2_JTGF5Q" x="55" y="70" width="111" height="61"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_-wEWLUJVEd-lXM2_JTGF5Q" x="29" y="47" width="111" height="61"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_GvBwskJWEd-lXM2_JTGF5Q" type="2001">
         <children xmi:type="notation:Node" xmi:id="_GvBwuEJWEd-lXM2_JTGF5Q" type="4001"/>
@@ -19,7 +19,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_GvBwtUJWEd-lXM2_JTGF5Q"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_GvBwtkJWEd-lXM2_JTGF5Q" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="D3_Message_Receival.bpmn#_GvBwsUJWEd-lXM2_JTGF5Q"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_GvBwt0JWEd-lXM2_JTGF5Q" x="208" y="84"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_GvBwt0JWEd-lXM2_JTGF5Q" x="182" y="61"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_WoxQkkJWEd-lXM2_JTGF5Q" type="2001">
         <children xmi:type="notation:Node" xmi:id="_WoxQmEJWEd-lXM2_JTGF5Q" type="4001"/>
@@ -28,7 +28,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_WoxQlUJWEd-lXM2_JTGF5Q"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_WoxQlkJWEd-lXM2_JTGF5Q" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="D3_Message_Receival.bpmn#_WoxQkUJWEd-lXM2_JTGF5Q"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_WoxQl0JWEd-lXM2_JTGF5Q" x="278" y="70"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_WoxQl0JWEd-lXM2_JTGF5Q" x="252" y="47"/>
       </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_-wEWIkJVEd-lXM2_JTGF5Q"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_-wEWI0JVEd-lXM2_JTGF5Q"/>
@@ -39,7 +39,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_-wEWHUJVEd-lXM2_JTGF5Q" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_-wEWHkJVEd-lXM2_JTGF5Q" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="D3_Message_Receival.bpmn#_-wEWF0JVEd-lXM2_JTGF5Q"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_-wEWJUJVEd-lXM2_JTGF5Q" x="16" y="16" width="1500" height="200"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_-wEWJUJVEd-lXM2_JTGF5Q" x="16" y="16" width="417" height="179"/>
   </children>
   <styles xmi:type="notation:PageStyle" xmi:id="_-wEWE0JVEd-lXM2_JTGF5Q"/>
   <styles xmi:type="notation:GuideStyle" xmi:id="_-wEWFEJVEd-lXM2_JTGF5Q"/>
