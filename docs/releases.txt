@@ -1,5 +1,9 @@
 Jadex Releases Overview
 
+Release 2.0 rc2 (Bugfix release 04/2010)
+	- New Fireflies example based on micro kernel
+	- Numerous bug fixes
+	
 Release 2.0 rc1 (Active components release 03/2010)
 	- Generic active components infrastructure for agents and other active elements
 	- Support for BPMN workflow modelling and execution

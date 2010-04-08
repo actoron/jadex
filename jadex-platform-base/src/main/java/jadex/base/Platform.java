@@ -1,9 +1,14 @@
 package jadex.base;
 
+import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -261,30 +266,82 @@ public class Platform extends AbstractPlatform
 			}
 		}
 		
-//		IAMS ams = (IAMS)getService(IAMS.class);
-//		if(getAMSService()!=null)
+		// Create daemon components.
+		this.daemoncomponents = SCollection.createLinkedHashSet();
+		Property[] props = Properties.getProperties(configurations, DAEMONCOMPONENT);
+//		System.out.println("starting: "+props.length);
+		for(int i = 0; i < props.length; i++)
 		{
-			/*
-			// Add ams listener if auto shutdown.
-			if(platconf.getBooleanProperty(AUTOSHUTDOWN))
+//			System.out.println("starting: "+props[i].getName());
+			createComponent(props[i].getName(), props[i].getValue(), null, null, true);
+		}
+		Properties[] subprops = Properties.getSubproperties(configurations, DAEMONCOMPONENT);
+		for(int i = 0; i < subprops.length; i++)
+		{
+			Map args = getArguments(subprops[i]);
+			Property model = subprops[i].getProperty(MODEL);
+			Property config = subprops[i].getProperty(CONFIG);
+			createComponent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, true);
+		}
+		
+
+		// Create application components.
+		props = Properties.getProperties(configurations, COMPONENT);
+		for(int i = 0; i < props.length; i++)
+		{
+			createComponent(props[i].getName(), props[i].getValue(), null, null, false);
+		}
+		subprops = Properties.getSubproperties(configurations, COMPONENT);
+		for(int i = 0; i < subprops.length; i++)
+		{
+			Map args = getArguments(subprops[i]);
+			Property model = subprops[i].getProperty(MODEL);
+			Property config = subprops[i].getProperty(CONFIG);
+			createComponent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, false);
+		}
+		
+		// Create applications.
+		props = Properties.getProperties(configurations, APPLICATION);
+		for(int i = 0; i < props.length; i++)
+		{
+			createComponent(props[i].getName(), props[i].getValue(), null, null, false);
+		}
+		subprops = Properties.getSubproperties(configurations, APPLICATION);
+		for(int i = 0; i < subprops.length; i++)
+		{
+			Map args = getArguments(subprops[i]);
+			Property model = subprops[i].getProperty(MODEL);
+			Property config = subprops[i].getProperty(CONFIG);
+			createComponent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, false);
+		}
+		
+		// Add cms listener if auto shutdown.
+		if(Properties.getBooleanProperty(configurations, AUTOSHUTDOWN))
+		{
+			final IComponentManagementService	cms	= (IComponentManagementService)getService(IComponentManagementService.class);
+			if(cms!=null)
 			{
-				getAMSService().addComponentListener(new IComponentListener()
+				cms.addComponentListener(null, new IComponentListener()
 				{
-					public void componentAdded(Object desc)
+					public void componentChanged(IComponentDescription desc)
+					{
+					}
+					
+					public void componentAdded(IComponentDescription desc)
 					{
 					}
 	
-					public void componentRemoved(Object desc)
+					public void componentRemoved(IComponentDescription desc, Map results)
 					{
-						((IAMS)getService(IAMS.class)).getAgentCount(new IResultListener()
+						cms.getComponentIdentifiers(new IResultListener()
 						{
-							public void resultAvailable(Object result)
+							public void resultAvailable(Object source, Object result)
 							{
-								if(((Integer)result).intValue() <= daemoncomponents.size())
+								if(((IComponentIdentifier[])result).length <= daemoncomponents.size())
 									shutdown(null);
 							}
 	
-							public void exceptionOccurred(Exception exception)
+							public void exceptionOccurred(Object source, Exception exception)
 							{
 								getLogger().severe("Exception occurred: " + exception);
 							}
@@ -292,58 +349,8 @@ public class Platform extends AbstractPlatform
 					}
 				});
 			}
-			*/
-	
-			// Create daemon components.
-			this.daemoncomponents = SCollection.createLinkedHashSet();
-			Property[] props = Properties.getProperties(configurations, DAEMONCOMPONENT);
-//			System.out.println("starting: "+props.length);
-			for(int i = 0; i < props.length; i++)
-			{
-//				System.out.println("starting: "+props[i].getName());
-				createComponent(props[i].getName(), props[i].getValue(), null, null, true);
-			}
-			Properties[] subprops = Properties.getSubproperties(configurations, DAEMONCOMPONENT);
-			for(int i = 0; i < subprops.length; i++)
-			{
-				Map args = getArguments(subprops[i]);
-				Property model = subprops[i].getProperty(MODEL);
-				Property config = subprops[i].getProperty(CONFIG);
-				createComponent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, true);
-			}
-			
-	
-			// Create application components.
-			props = Properties.getProperties(configurations, COMPONENT);
-			for(int i = 0; i < props.length; i++)
-			{
-				createComponent(props[i].getName(), props[i].getValue(), null, null, false);
-			}
-			subprops = Properties.getSubproperties(configurations, COMPONENT);
-			for(int i = 0; i < subprops.length; i++)
-			{
-				Map args = getArguments(subprops[i]);
-				Property model = subprops[i].getProperty(MODEL);
-				Property config = subprops[i].getProperty(CONFIG);
-				createComponent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, false);
-			}
-			
-			// Create applications.
-			props = Properties.getProperties(configurations, APPLICATION);
-			for(int i = 0; i < props.length; i++)
-			{
-				createComponent(props[i].getName(), props[i].getValue(), null, null, false);
-			}
-			subprops = Properties.getSubproperties(configurations, APPLICATION);
-			for(int i = 0; i < subprops.length; i++)
-			{
-				Map args = getArguments(subprops[i]);
-				Property model = subprops[i].getProperty(MODEL);
-				Property config = subprops[i].getProperty(CONFIG);
-				createComponent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, false);
-			}
 		}
-		
+
 		configurations = null;
 	}
 	

@@ -1,8 +1,12 @@
 package jadex.standalone;
 
 import jadex.base.AbstractPlatform;
+import jadex.bridge.IComponentDescription;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 
 import java.net.InetAddress;
@@ -83,47 +87,37 @@ public class SpringPlatform extends AbstractPlatform
 	 */
 	public void setAutoshutDown(boolean autoshutdown)
 	{
-		/*
-		if(autoshutdown && !this.autoshutdown)
+		final IComponentManagementService	cms	= (IComponentManagementService)getService(IComponentManagementService.class);
+		if(cms!=null)
 		{
-			if(amslistener==null)
+			cms.addComponentListener(null, new IComponentListener()
 			{
-				amslistener = new IComponentListener()
+				public void componentChanged(IComponentDescription desc)
 				{
-					public void componentAdded(Object desc)
+				}
+				
+				public void componentAdded(IComponentDescription desc)
+				{
+				}
+
+				public void componentRemoved(IComponentDescription desc, Map results)
+				{
+					cms.getComponentIdentifiers(new IResultListener()
 					{
-					}
-	
-					public void componentRemoved(Object desc)
-					{
-						((IAMS)getService(IAMS.class)).getAgentCount(new IResultListener()
+						public void resultAvailable(Object source, Object result)
 						{
-							public void resultAvailable(Object result)
-							{
-								if(((Integer)result).intValue() <= daemoncomponents.size())
-									shutdown(null);
-							}
-	
-							public void exceptionOccurred(Exception exception)
-							{
-								getLogger().severe("Exception occurred: " + exception);
-							}
-						});
-					}
-				};
-			}
-			
-			if(getAMSService() != null)
-				getAMSService().addComponentListener(amslistener);
+							if(((IComponentIdentifier[])result).length <= daemoncomponents.size())
+								shutdown(null);
+						}
+
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							getLogger().severe("Exception occurred: " + exception);
+						}
+					});
+				}
+			});
 		}
-		else if(!autoshutdown && this.autoshutdown)
-		{
-			if(getAMSService() != null)
-				getAMSService().removeComponentListener(amslistener);
-		}
-		
-		this.autoshutdown = autoshutdown;
-		*/
 	}
 
 	/**
