@@ -225,7 +225,7 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		// Check for errors / exception / final state
 		if(throwable==null && !BpmnPlanBodyInstance.POOL_UNDEFINED.equals(pool) && !bodyinstance.isFinished(pool, null))
 		{
-			long	timeout	= bodyinstance.getTimeout();
+			long timeout = bodyinstance.getTimeout();
 			Object	wa	= bodyinstance.getWaitAbstraction();
 			
 			if(bodyinstance.isReady(pool, null))

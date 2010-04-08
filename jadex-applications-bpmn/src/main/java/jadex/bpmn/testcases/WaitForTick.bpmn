@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_JopMoUMbEd-aDdXkLqEWvQ" iD="_JopMoEMbEd-aDdXkLqEWvQ">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KOMJsEMbEd-aDdXkLqEWvQ" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KOMJsUMbEd-aDdXkLqEWvQ" key="imports" value="jadex.base.test.*␟jadex.bpmn.runtime.task.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KOMJskMbEd-aDdXkLqEWvQ" key="Description" value="Test if waiting for a tick works."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KOV6sEMbEd-aDdXkLqEWvQ" key="Package" value="jadex.bpmn.testcases"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DI4ecEMcEd-aDdXkLqEWvQ" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_JpPCgUMbEd-aDdXkLqEWvQ" iD="_JpPCgEMbEd-aDdXkLqEWvQ" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_JpPCg0MbEd-aDdXkLqEWvQ" iD="_JpPCgkMbEd-aDdXkLqEWvQ" outgoingEdges="_vHP8IUMbEd-aDdXkLqEWvQ" name="Before wait" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KYn4EEMbEd-aDdXkLqEWvQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KYn4EUMbEd-aDdXkLqEWvQ" key="class" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DSNnUEMhEd-aDdXkLqEWvQ" key="parameters" value="inout␋start␋long␋System.currentTimeMillis()"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ur1LcUMbEd-aDdXkLqEWvQ" iD="_ur1LcEMbEd-aDdXkLqEWvQ" outgoingEdges="_50yOIUMhEd-aDdXkLqEWvQ" incomingEdges="_vHP8IUMbEd-aDdXkLqEWvQ" name="first tick" activityType="EventIntermediateTimer">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_uyZGcEMbEd-aDdXkLqEWvQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uyZGcUMbEd-aDdXkLqEWvQ" key="timer" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uyZGckMbEd-aDdXkLqEWvQ" key="duration" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_w2RCsEMbEd-aDdXkLqEWvQ" source="activity">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w2aMoEMbEd-aDdXkLqEWvQ" key="parameters" value="tick␋true"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_vg4kIUMbEd-aDdXkLqEWvQ" iD="_vg4kIEMbEd-aDdXkLqEWvQ" incomingEdges="_NLD7wUMhEd-aDdXkLqEWvQ" name="Success" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_HlyuoEMcEd-aDdXkLqEWvQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HlyuoUMcEd-aDdXkLqEWvQ" key="class" value="jadex.bpmn.runtime.task.StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TJBhQEMcEd-aDdXkLqEWvQ" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Wait for tick.&quot;, true, null)})"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_LACOoUMhEd-aDdXkLqEWvQ" iD="_LACOoEMhEd-aDdXkLqEWvQ" outgoingEdges="_NLD7wUMhEd-aDdXkLqEWvQ _RDT_sUMhEd-aDdXkLqEWvQ" incomingEdges="_6IAsIUMhEd-aDdXkLqEWvQ" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_QaMKMUMhEd-aDdXkLqEWvQ" iD="_QaMKMEMhEd-aDdXkLqEWvQ" incomingEdges="_RDT_sUMhEd-aDdXkLqEWvQ" name="Fail">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_QhCZEEMhEd-aDdXkLqEWvQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QhCZEUMhEd-aDdXkLqEWvQ" key="class" value="jadex.bpmn.runtime.task.StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZLg14EMhEd-aDdXkLqEWvQ" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Wait for tick.&quot;, false,  &quot;needed: &quot;+(System.currentTimeMillis()-start))})"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_3hkOUUMhEd-aDdXkLqEWvQ" iD="_3hkOUEMhEd-aDdXkLqEWvQ" outgoingEdges="_6IAsIUMhEd-aDdXkLqEWvQ" incomingEdges="_50yOIUMhEd-aDdXkLqEWvQ" name="second tick" activityType="EventIntermediateTimer">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_44lroEMhEd-aDdXkLqEWvQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_44lroUMhEd-aDdXkLqEWvQ" key="timer" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_44lrokMhEd-aDdXkLqEWvQ" key="duration" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_VURMoEMjEd-aDdXkLqEWvQ" source="activity">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VURMoUMjEd-aDdXkLqEWvQ" key="parameters" value="tick␋true"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_vHP8IUMbEd-aDdXkLqEWvQ" iD="_vHP8IEMbEd-aDdXkLqEWvQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_NLD7wUMhEd-aDdXkLqEWvQ" iD="_NLD7wEMhEd-aDdXkLqEWvQ">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_R78Q0EMhEd-aDdXkLqEWvQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_R78Q0UMhEd-aDdXkLqEWvQ" key="imports" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_R78Q0kMhEd-aDdXkLqEWvQ" key="condition" value="System.currentTimeMillis()-start>=100"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_RDT_sUMhEd-aDdXkLqEWvQ" iD="_RDT_sEMhEd-aDdXkLqEWvQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_50yOIUMhEd-aDdXkLqEWvQ" iD="_50yOIEMhEd-aDdXkLqEWvQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_6IAsIUMhEd-aDdXkLqEWvQ" iD="_6IAsIEMhEd-aDdXkLqEWvQ"/>
+  </pools>
+</bpmn:BpmnDiagram>

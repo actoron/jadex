@@ -25,13 +25,24 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	public Object doWait(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, long duration)
 	{
 		IClockService cs = (IClockService)instance.getComponentAdapter().getServiceContainer().getService(IClockService.class);
-		Object ret = cs.createTimer(duration, new InterpreterTimedObject(instance.getComponentAdapter(), new CheckedAction()
+		
+		CheckedAction ta = new CheckedAction()
 		{
 			public void run()
 			{
 				instance.notify(activity, thread, null);
 			}
-		}));
+		};
+		
+		Object ret; 
+		if(duration==TICK_TIMER)
+		{
+			ret = cs.createTickTimer(new InterpreterTimedObject(instance.getComponentAdapter(), ta));
+		}
+		else
+		{
+			ret = cs.createTimer(duration, new InterpreterTimedObject(instance.getComponentAdapter(), ta));
+		}
 		return ret;
 	}
 	

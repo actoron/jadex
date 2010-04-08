@@ -198,11 +198,16 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public void addTimer(ProcessThread thread, long duration)
 	{
-		assert duration>=0;
+		assert duration==EventIntermediateTimerActivityHandler.TICK_TIMER || duration>=0;
+		
 		if(waittimes==null)
 			waittimes	= new HashMap();
 
-		IClockService	clock	= (IClockService)interpreter.getComponentAdapter().getServiceContainer().getService(IClockService.class);
+		// how to support tick timer?
+		if(duration==EventIntermediateTimerActivityHandler.TICK_TIMER)
+			throw new UnsupportedOperationException("Tick timers for bdi-bpmn have to be implemented.");
+		
+		IClockService clock = (IClockService)interpreter.getComponentAdapter().getServiceContainer().getService(IClockService.class);
 		Long ret = new Long(clock.getTime()+duration);
 		waittimes.put(thread, ret);
 	}

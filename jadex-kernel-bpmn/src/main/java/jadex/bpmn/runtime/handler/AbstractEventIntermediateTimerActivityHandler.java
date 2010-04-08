@@ -10,6 +10,8 @@ import jadex.bpmn.runtime.ProcessThread;
  */
 public abstract class AbstractEventIntermediateTimerActivityHandler	extends DefaultActivityHandler
 {
+	public static final int TICK_TIMER = -2;
+	
 	/**
 	 *  Execute an activity.
 	 *  @param activity	The activity to execute.
@@ -20,7 +22,9 @@ public abstract class AbstractEventIntermediateTimerActivityHandler	extends Defa
 	{
 //		Number dur = (Number)getPropertyValue(activity, instance, thread, "duration");
 		Number dur = (Number)thread.getPropertyValue("duration", activity);
-		long duration = dur==null? -1: dur.longValue(); 
+		Boolean tmp = (Boolean)thread.getPropertyValue("tick", activity);
+		boolean tick = tmp!=null? tmp.booleanValue(): false;
+		long duration = dur==null? tick? TICK_TIMER: -1: dur.longValue(); 
 //		thread.setWaitingState(ProcessThread.WAITING_FOR_TIME);
 		thread.setWaiting(true);
 		Object handle = doWait(activity, instance, thread, duration);
