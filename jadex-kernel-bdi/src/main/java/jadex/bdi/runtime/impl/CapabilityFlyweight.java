@@ -46,7 +46,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	{
 		super(state, scope, scope);
 		this.agent = getInterpreter().getAgent();
-		this.adapter = getInterpreter().getComponentAdapter();
+		this.adapter = getInterpreter().getAgentAdapter();
 	}
 	
 	//-------- methods concerning beliefs --------

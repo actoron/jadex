@@ -377,9 +377,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				IComponentIdentifier	ownerid	= null;
 				IComponentManagementService ces = ((IComponentManagementService)context.getServiceContainer().getService(IComponentManagementService.class));
 				if(owner.indexOf("@")!=-1)
-					ownerid	= ces.createComponentIdentifier((String)owner, false, null);
+					ownerid	= ces.createComponentIdentifier((String)owner, false);
 				else
-					ownerid	= ces.createComponentIdentifier((String)owner, true, null);
+					ownerid	= ces.createComponentIdentifier((String)owner, true);
 				
 				Map props = MEnvSpaceInstance.convertProperties(mprops, fetcher);
 				this.addInitialAvatar(ownerid, (String)MEnvSpaceInstance.getProperty(mobj, "type"), props);

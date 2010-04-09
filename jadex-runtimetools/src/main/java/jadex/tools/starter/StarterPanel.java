@@ -469,20 +469,20 @@ public class StarterPanel extends JPanel
 		tmp2.add(numcomponents, BorderLayout.EAST);
 		tmp.add(tmp2, BorderLayout.EAST);
 		componentpanel.add(tmp, new GridBagConstraints(1, 0, 4, 1, 1, 0, GridBagConstraints.EAST,
-				GridBagConstraints.BOTH, new Insets(0, 2, 2, 2), 0, 0));
+			GridBagConstraints.BOTH, new Insets(0, 2, 2, 2), 0, 0));
 			
 		componentpanel.add(new JLabel("Parent"), new GridBagConstraints(0, 1, 1, 1, 0, 0, GridBagConstraints.WEST,
-				GridBagConstraints.BOTH, new Insets(2, 0, 0, 2), 0, 0));
+			GridBagConstraints.BOTH, new Insets(2, 0, 0, 2), 0, 0));
 		parenttf	= new JTextField();
 		parenttf.setEditable(false);
 		componentpanel.add(parenttf, new GridBagConstraints(1, 1, 2, 1, 1, 0, GridBagConstraints.EAST,
-				GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
+			GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
 		
 		JButton	chooseparent	= new JButton(icons.getIcon("Browse"));
 		chooseparent.setMargin(new Insets(0,0,0,0));
 		chooseparent.setToolTipText("Choose parent");
 		componentpanel.add(chooseparent, new GridBagConstraints(3, 1, 1, 1, 0, 0, GridBagConstraints.EAST,
-				GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
+			GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
 		final AgentSelectorDialog	agentselector	= new AgentSelectorDialog(this, ((AgentControlCenter)starter.getJCC()).getAgent());
 		chooseparent.addActionListener(new ActionListener()
 		{
@@ -497,7 +497,7 @@ public class StarterPanel extends JPanel
 		clearparent.setMargin(new Insets(0,0,0,0));
 		clearparent.setToolTipText("Clear parent");
 		componentpanel.add(clearparent, new GridBagConstraints(4, 1, 1, 1, 0, 0, GridBagConstraints.EAST,
-				GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
+			GridBagConstraints.BOTH, new Insets(2, 2, 0, 2), 0, 0));
 		clearparent.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -658,7 +658,6 @@ public class StarterPanel extends JPanel
 				{
 					model = null;
 				}
-				lastfile = adf;
 			}
 			catch(Exception e)
 			{
@@ -668,6 +667,7 @@ public class StarterPanel extends JPanel
 				e.printStackTrace(new PrintWriter(sw));
 				error = sw.toString();
 			}
+			lastfile = adf;
 		}
 		else
 		{

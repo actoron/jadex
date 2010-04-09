@@ -58,7 +58,7 @@ public class ThreadContext
 	 *  Get the model element.
 	 *  @return	The process or sub process element.
 	 */
-	public MIdElement	getModelElement()
+	public MIdElement getModelElement()
 	{
 		return model;
 	}
@@ -67,7 +67,7 @@ public class ThreadContext
 	 *  Get the parent context.
 	 *  @return	The parent context, if any.
 	 */
-	public ThreadContext	getParent()
+	public ThreadContext getParent()
 	{
 		return initiator!=null ? initiator.getThreadContext() : null;
 	}
@@ -76,7 +76,7 @@ public class ThreadContext
 	 *  Get the initiating thread.
 	 *  @return	The initiator, if any.
 	 */
-	public ProcessThread	getInitiator()
+	public ProcessThread getInitiator()
 	{
 		return initiator;
 	}
@@ -220,7 +220,7 @@ public class ThreadContext
 	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.
 	 *  @return	An executable thread (if any).
 	 */
-	public ProcessThread	getExecutableThread(String pool, String lane)
+	public ProcessThread getExecutableThread(String pool, String lane)
 	{
 		ProcessThread	ret	= null;
 		if(threads!=null)
@@ -242,7 +242,6 @@ public class ThreadContext
 		return ret;
 	}
 	
-
 	/**
 	 *  Get the string representation.
 	 *  @return The string representation.

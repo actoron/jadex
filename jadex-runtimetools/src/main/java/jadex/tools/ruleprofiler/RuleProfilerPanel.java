@@ -113,7 +113,7 @@ public class RuleProfilerPanel	extends JPanel
 						{
 							tmp	= new Profiler(null);
 							final IProfiler prof	= tmp;
-							bdii.getComponentAdapter().invokeLater(new Runnable()
+							bdii.getAgentAdapter().invokeLater(new Runnable()
 							{
 								public void run()
 								{

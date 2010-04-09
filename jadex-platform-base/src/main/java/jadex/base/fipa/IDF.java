@@ -92,9 +92,9 @@ public interface IDF
 	 *  @param name The name.
 	 *  @param local True for local name.
 	 *  @return The new component identifier.
-	 */
+	 * /
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local);
-	
+*/	
 	/**
 	 *  Create an component identifier.
 	 *  @param name The name.
@@ -102,6 +102,7 @@ public interface IDF
 	 *  @param addresses The addresses.
 	 *  @param resolvers The resolvers.
 	 *  @return The new component identifier.
-	 */
+	 * /
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses);
+*/
 }

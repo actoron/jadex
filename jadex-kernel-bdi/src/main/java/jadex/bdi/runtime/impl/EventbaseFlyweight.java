@@ -11,6 +11,8 @@ import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
 
@@ -414,6 +416,58 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 				throw new RuntimeException("Event not found: "+type);
 			
 			removeEventListener(listener, mevent, false);
+		}
+	}
+	
+	/**
+	 *  Create component identifier.
+	 *  @param name The name.
+	 *  @param local True for local name.
+	 *  @param addresses The addresses.
+	 *  @return The new component identifier.
+	 */
+	public IComponentIdentifier createComponentIdentifier(String name)
+	{
+		return createComponentIdentifier(name, true, null);
+	}
+	
+	/**
+	 *  Create component identifier.
+	 *  @param name The name.
+	 *  @param local True for local name.
+	 *  @param addresses The addresses.
+	 *  @return The new component identifier.
+	 */
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
+	{
+		return createComponentIdentifier(name, local, null);
+	}
+	
+	/**
+	 *  Create component identifier.
+	 *  @param name The name.
+	 *  @param local True for local name.
+	 *  @param addresses The addresses.
+	 *  @return The new component identifier.
+	 */
+	public IComponentIdentifier createComponentIdentifier(final String name, final boolean local, final String[] addresses)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation ai = new AgentInvocation()
+			{
+				public void run()
+				{
+					IComponentManagementService cms = (IComponentManagementService)getInterpreter().getAgentAdapter().getServiceContainer().getService(IComponentManagementService.class);	
+					object = cms.createComponentIdentifier(name, local, addresses);
+				}
+			};
+			return (IComponentIdentifier)ai.object;
+		}
+		else
+		{
+			IComponentManagementService cms = (IComponentManagementService)getInterpreter().getAgentAdapter().getServiceContainer().getService(IComponentManagementService.class);	
+			return cms.createComponentIdentifier(name, local, addresses);
 		}
 	}
 	

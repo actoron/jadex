@@ -274,36 +274,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 		try
 		{
 			this.thread = Thread.currentThread();
-			
-			// Copy actions from external threads into the state.
-			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
-	//		boolean	extexecuted	= false;
-//			Runnable[]	entries	= null;
-//			synchronized(ext_entries)
-//			{
-//				if(!(ext_entries.isEmpty()))
-//				{
-//					entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
-//	//				for(int i=0; i<ext_entries.size(); i++)
-//	//					state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, ext_entries.get(i));
-//					ext_entries.clear();
-//					
-//	//				extexecuted	= true;
-//				}
-//			}
-//			for(int i=0; entries!=null && i<entries.length; i++)
-//			{
-//				try
-//				{
-//					entries[i].run();
-//				}
-//				catch(Exception e)
-//				{
-//					e.printStackTrace();
-//					getLogger().severe("Execution of agent led to exeception: "+e);
-//				}
-//			}
-	
+				
 			if(!isFinished(null, null) && isReady(null, null))
 				executeStep(null, null);
 			
@@ -1097,6 +1068,43 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 		}
 	}
 
+	/**
+	 *  Create component identifier.
+	 *  @param name The name.
+	 *  @param local True for local name.
+	 *  @param addresses The addresses.
+	 *  @return The new component identifier.
+	 */
+	public IComponentIdentifier createComponentIdentifier(String name)
+	{
+		return createComponentIdentifier(name, true, null);
+	}
+	
+	/**
+	 *  Create component identifier.
+	 *  @param name The name.
+	 *  @param local True for local name.
+	 *  @param addresses The addresses.
+	 *  @return The new component identifier.
+	 */
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
+	{
+		return createComponentIdentifier(name, local, null);
+	}
+	
+	/**
+	 *  Create component identifier.
+	 *  @param name The name.
+	 *  @param local True for local name.
+	 *  @param addresses The addresses.
+	 *  @return The new component identifier.
+	 */
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
+	{
+		IComponentManagementService cms = (IComponentManagementService)adapter.getServiceContainer().getService(IComponentManagementService.class);
+		return cms.createComponentIdentifier(name, local, addresses);
+	}
+	
 	/**
 	 *  Called when a component has been created as a subcomponent of this component.
 	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.

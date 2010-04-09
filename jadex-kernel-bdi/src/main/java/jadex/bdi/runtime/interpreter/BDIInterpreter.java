@@ -190,7 +190,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			
 			public void invokeLater(Runnable action)
 			{
-				getComponentAdapter().invokeLater(action);
+				getAgentAdapter().invokeLater(action);
 			}
 		});
 				
@@ -320,7 +320,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 		// Handle normal messages.
 //		if(!toolmsg)
 //		{
-			getComponentAdapter().invokeLater(new Runnable()
+			getAgentAdapter().invokeLater(new Runnable()
 			{
 				public void run()
 				{
@@ -337,7 +337,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 */
 	public void killComponent(final IResultListener listener)
 	{
-		getComponentAdapter().invokeLater(new Runnable()
+		getAgentAdapter().invokeLater(new Runnable()
 		{
 			public void run()
 			{
@@ -361,7 +361,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 */
 	public void getExternalAccess(final IResultListener listener)
 	{
-		getComponentAdapter().invokeLater(new Runnable()
+		getAgentAdapter().invokeLater(new Runnable()
 		{
 			public void run()
 			{
@@ -375,7 +375,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 					}
 					else
 					{
-						listener.resultAvailable(getComponentAdapter().getComponentIdentifier(), new ExternalAccessFlyweight(state, ragent));
+						listener.resultAvailable(getAgentAdapter().getComponentIdentifier(), new ExternalAccessFlyweight(state, ragent));
 					}
 				}
 			}
@@ -418,7 +418,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			Throwable[]	exception	= (Throwable[])it.next();
 			synchronized(exception)
 			{
-				exception[0] = new ComponentTerminatedException(getComponentAdapter().getComponentIdentifier().getName());
+				exception[0] = new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier().getName());
 				exception[0].fillInStackTrace();
 				exception.notify();
 				it.remove();
@@ -711,7 +711,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 *  Get the adapter agent.
 	 *  @return The adapter agent.
 	 */
-	public IComponentAdapter getComponentAdapter()
+	public IComponentAdapter getAgentAdapter()
 	{
 		return this.adapter;
 	}
@@ -757,7 +757,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			
 			// Add external will throw exception if action execution cannot be done.
 //			System.err.println("invokeSynchonized("+code+"): adding");
-			getComponentAdapter().invokeLater(new Runnable()
+			getAgentAdapter().invokeLater(new Runnable()
 			{
 				public void run()
 				{
@@ -805,7 +805,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 						}
 						else
 						{
-							throw new ComponentTerminatedException(getComponentAdapter().getComponentIdentifier().getName());
+							throw new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier().getName());
 						}
 					}
 				}

@@ -25,14 +25,14 @@ public interface ITaskContext
 	 *  @param name	The parameter name. 
 	 *  @return	True, if the parameter is set to some value. 
 	 */
-	public boolean	hasParameterValue(String name);
+	public boolean hasParameterValue(String name);
 
 	/**
 	 *  Get the value of a parameter.
 	 *  @param name	The parameter name. 
 	 *  @return	The parameter value. 
 	 */
-	public Object	getParameterValue(String name);
+	public Object getParameterValue(String name);
 
 	/**
 	 *  Set the value of a parameter.
@@ -61,7 +61,7 @@ public interface ITaskContext
 	 *  @param name	The result name. 
 	 *  @return	True, if the result is set to some value. 
 	 */
-	public boolean	hasResultValue(String name);
+	public boolean hasResultValue(String name);
 
 	/**
 	 *  Get the value of a result.

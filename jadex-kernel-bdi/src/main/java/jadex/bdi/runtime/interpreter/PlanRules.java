@@ -559,12 +559,12 @@ public class PlanRules
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
 //						AgentRules.BDIInterpreter.getInterpreter(state).getLogger(rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe(ip.getComponentAdapter().getComponentIdentifier()+
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe(ip.getAgentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+" "+state.getAttributeValue(state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)+"\n"+sw);
 					}
 					else
 					{
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).info(ip.getComponentAdapter().getComponentIdentifier()+
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).info(ip.getAgentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 				}
@@ -643,12 +643,12 @@ public class PlanRules
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
 //						AgentRules.BDIInterpreter.getInterpreter(state).getLogger(rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe(ip.getComponentAdapter().getComponentIdentifier()+
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe(ip.getAgentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 					else
 					{
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).info(ip.getComponentAdapter().getComponentIdentifier()+
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).info(ip.getAgentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 				}
@@ -729,12 +729,12 @@ public class PlanRules
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
 //						AgentRules.BDIInterpreter.getInterpreter(state).getLogger(rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe(ip.getComponentAdapter().getComponentIdentifier()+
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe(ip.getAgentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 					else
 					{
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).info(ip.getComponentAdapter().getComponentIdentifier()+
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).info(ip.getAgentAdapter().getComponentIdentifier()+
 								": Exception while executing: "+rplan+"\n"+sw);
 					}
 				}
@@ -814,12 +814,12 @@ public class PlanRules
 //						Level level = (Level)cap.getPropertybase().getProperty(PROPERTY_LOGGING_LEVEL_EXCEPTIONS);
 //						AgentRules.BDIInterpreter.getInterpreter(state).getLogger(rcapa).log(level, ip.getAgentAdapter().getComponentIdentifier()+
 //							": Exception while executing: "+rplan+"\n"+sw);
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe(ip.getComponentAdapter().getComponentIdentifier()+
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe(ip.getAgentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 					else
 					{
-						BDIInterpreter.getInterpreter(state).getLogger(rcapa).info(ip.getComponentAdapter().getComponentIdentifier()+
+						BDIInterpreter.getInterpreter(state).getLogger(rcapa).info(ip.getAgentAdapter().getComponentIdentifier()+
 							": Exception while executing: "+rplan+"\n"+sw);
 					}
 				}
@@ -2098,8 +2098,8 @@ public class PlanRules
 				// timer runs on other thread.
 				TimeoutAction toa = new TimeoutAction(state, rplan, rcapa, to);
 				
-				ITimer timer = ((IClockService)BDIInterpreter.getInterpreter(state).getComponentAdapter().getServiceContainer()
-					.getService(IClockService.class)).createTimer(timeout, new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getComponentAdapter(), toa));
+				ITimer timer = ((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer()
+					.getService(IClockService.class)).createTimer(timeout, new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), toa));
 				toa.setTimer(timer); // This works because isValid() will always be executed on agent thread (InterpreterTimedObject).
 				
 	//			System.out.println("Timer created: "+start);
@@ -2109,8 +2109,8 @@ public class PlanRules
 			{
 				TimeoutAction toa = new TimeoutAction(state, rplan, rcapa, to);
 				
-				ITimer timer = ((IClockService)BDIInterpreter.getInterpreter(state).getComponentAdapter().getServiceContainer()
-					.getService(IClockService.class)).createTickTimer(new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getComponentAdapter(), toa));
+				ITimer timer = ((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer()
+					.getService(IClockService.class)).createTickTimer(new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), toa));
 				toa.setTimer(timer); // This works because isValid() will always be executed on agent thread (InterpreterTimedObject).
 
 				System.out.println("Tick timer created: "+timer);
@@ -2359,6 +2359,6 @@ class TimeoutAction extends CheckedAction
 //			System.out.println("Timer occurred: "+start);
 		to[0] = true;
 		EventProcessingRules.schedulePlanInstanceCandidate(state, null, rplan, rcapa);
-		BDIInterpreter.getInterpreter(state).getComponentAdapter().wakeup();
+		BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();
 	}
 }

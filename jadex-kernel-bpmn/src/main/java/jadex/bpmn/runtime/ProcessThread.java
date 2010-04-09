@@ -247,7 +247,7 @@ public class ProcessThread	implements ITaskContext
 	 *  Get the thread context
 	 *  @return	The thread context.
 	 */
-	public ThreadContext	getThreadContext()
+	public ThreadContext getThreadContext()
 	{
 		return context;
 	}
@@ -255,7 +255,7 @@ public class ProcessThread	implements ITaskContext
 	/**
 	 *  Create a copy of this thread (e.g. for a parallel split).
 	 */
-	public ProcessThread	createCopy()
+	public ProcessThread createCopy()
 	{
 		ProcessThread	ret	= new ProcessThread(activity, context, instance);
 		ret.edge	= edge;

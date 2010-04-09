@@ -23,7 +23,7 @@
 
 	<beliefs>
 		<belief name="cms" class="IComponentIdentifier">
-			<fact>((IComponentManagementService)$scope.getServiceContainer().getService(IComponentManagementService.class)).createComponentIdentifier("cms@horst", false, new String[]{"nio-mtp://134.100.11.203:8888"})</fact>
+			<fact>$scope.getEventbase().createComponentIdentifier("cms@horst", false, new String[]{"nio-mtp://134.100.11.203:8888"})</fact>
 		</belief>
 	</beliefs>
 	

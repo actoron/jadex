@@ -3,6 +3,7 @@ package jadex.base.fipa;
 import jadex.base.JadexXMLContentCodec;
 import jadex.base.NuggetsXMLContentCodec;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
@@ -239,7 +240,7 @@ public class SFipa
 	 *  @param source The source df component description.
 	 *  @param df The df service.
 	 */
-	public static IDFComponentDescription cloneDFComponentDescription(IDFComponentDescription source, IDF df)
+	public static IDFComponentDescription cloneDFComponentDescription(IDFComponentDescription source, IComponentManagementService cms, IDF df)
 	{
 		IDFServiceDescription[] sds = source.getServices();
 		IDFServiceDescription[] tds = null;
@@ -253,7 +254,7 @@ public class SFipa
 		}
 		
 		IComponentIdentifier id = source.getName();
-		id	= df.createComponentIdentifier(id.getName(), false, id.getAddresses());
+		id	= cms.createComponentIdentifier(id.getName(), false, id.getAddresses());
 		
 		return df.createDFComponentDescription(id, tds, source.getLanguages(), source.getOntologies(), source.getProtocols(), source.getLeaseTime());
 	}

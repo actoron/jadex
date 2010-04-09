@@ -122,7 +122,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public BpmnPlanBodyInstance(MBpmnModel model, final BDIInterpreter interpreter, final Object rcapa, final Object rplan)
 	{
-		super(interpreter.getComponentAdapter(), model, null, null, null, PLAN_ACTIVITY_HANDLERS, null, new OAVBDIFetcher(interpreter.getState(), rcapa, rplan));
+		super(interpreter.getAgentAdapter(), model, null, null, null, PLAN_ACTIVITY_HANDLERS, null, new OAVBDIFetcher(interpreter.getState(), rcapa, rplan));
 		this.interpreter	= interpreter;
 		this.state = interpreter.getState();
 		this.rcapa = rcapa;
@@ -207,7 +207,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 		if(duration==EventIntermediateTimerActivityHandler.TICK_TIMER)
 			throw new UnsupportedOperationException("Tick timers for bdi-bpmn have to be implemented.");
 		
-		IClockService clock = (IClockService)interpreter.getComponentAdapter().getServiceContainer().getService(IClockService.class);
+		IClockService clock = (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
 		Long ret = new Long(clock.getTime()+duration);
 		waittimes.put(thread, ret);
 	}
@@ -231,7 +231,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	{
 		if(waittimes!=null)
 		{
-			IClockService clock = (IClockService)interpreter.getComponentAdapter().getServiceContainer().getService(IClockService.class);
+			IClockService clock = (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
 			
 			for(Iterator it=waittimes.keySet().iterator(); it.hasNext(); )
 			{
@@ -281,7 +281,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 			String pool	= getPool(getLastState());
 			if(!POOL_UNDEFINED.equals(pool))
 			{
-				IClockService	clock	= (IClockService)interpreter.getComponentAdapter().getServiceContainer().getService(IClockService.class);
+				IClockService	clock	= (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
 				for(Iterator it=waittimes.keySet().iterator(); it.hasNext(); )
 				{
 					ProcessThread	thread	= (ProcessThread) it.next();
@@ -643,7 +643,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public IComponentIdentifier	getAgentIdentifier()
 	{
-		return interpreter.getComponentAdapter().getComponentIdentifier();
+		return interpreter.getAgentAdapter().getComponentIdentifier();
 	}
 
 	/**
@@ -742,7 +742,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public IClockService getClock()
 	{
-		return (IClockService)interpreter.getComponentAdapter().getServiceContainer().getService(IClockService.class);
+		return (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
 	}
 
 	/**

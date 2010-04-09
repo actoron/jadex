@@ -768,12 +768,12 @@ public class ExternalAccessFlyweight extends CapabilityFlyweight implements IBDI
 					
 //					System.out.println("Timer created: "+start);
 					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer, ((IClockService)getInterpreter()
-						.getComponentAdapter().getServiceContainer().getService(IClockService.class)).createTimer(timeout, new InterpreterTimedObject(BDIInterpreter.getInterpreter(getState()).getComponentAdapter(), wakeup)));
+						.getAgentAdapter().getServiceContainer().getService(IClockService.class)).createTimer(timeout, new InterpreterTimedObject(BDIInterpreter.getInterpreter(getState()).getAgentAdapter(), wakeup)));
 				}
 				else if(timeout==PlanRules.TICK_TIMER)
 				{
 					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer, ((IClockService)getInterpreter()
-						.getComponentAdapter().getServiceContainer().getService(IClockService.class)).createTickTimer(new InterpreterTimedObject(BDIInterpreter.getInterpreter(getState()).getComponentAdapter(), wakeup)));
+						.getAgentAdapter().getServiceContainer().getService(IClockService.class)).createTickTimer(new InterpreterTimedObject(BDIInterpreter.getInterpreter(getState()).getAgentAdapter(), wakeup)));
 				}
 			
 				object = ea;
@@ -917,7 +917,7 @@ public class ExternalAccessFlyweight extends CapabilityFlyweight implements IBDI
 	 */
 	public void invokeLater(Runnable runnable)
 	{
-		getInterpreter().getComponentAdapter().invokeLater(runnable);
+		getInterpreter().getAgentAdapter().invokeLater(runnable);
 	}
 
 	/**

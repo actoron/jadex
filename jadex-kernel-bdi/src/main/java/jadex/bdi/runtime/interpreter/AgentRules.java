@@ -95,7 +95,7 @@ public class AgentRules
 				{
 					for(Iterator it=bdii.eal.iterator(); it.hasNext(); )
 					{
-						((IResultListener)it.next()).resultAvailable(bdii.getComponentAdapter().getComponentIdentifier(), new ExternalAccessFlyweight(state, ragent));
+						((IResultListener)it.next()).resultAvailable(bdii.getAgentAdapter().getComponentIdentifier(), new ExternalAccessFlyweight(state, ragent));
 					}
 					bdii.eal	= null;
 				}
@@ -338,7 +338,7 @@ public class AgentRules
 				{
 					for(Iterator it=killlisteners.iterator(); it.hasNext(); )
 					{
-						((IResultListener)it.next()).resultAvailable(interpreter.getComponentAdapter().getComponentIdentifier(), interpreter.getComponentAdapter().getComponentIdentifier());
+						((IResultListener)it.next()).resultAvailable(interpreter.getAgentAdapter().getComponentIdentifier(), interpreter.getAgentAdapter().getComponentIdentifier());
 					}
 				}
 				
@@ -1483,7 +1483,7 @@ public class AgentRules
 		{
 			final ITimedObject[]	to	= new ITimedObject[1];
 			final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
-			to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getComponentAdapter(), new CheckedAction()
+			to[0] = new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
 			{
 				public void run()
 				{
@@ -1497,19 +1497,19 @@ public class AgentRules
 					}
 					catch(Exception e)
 					{
-						String name = BDIInterpreter.getInterpreter(state).getComponentAdapter().getComponentIdentifier().getName();
+						String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
 						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content));
 					}
 	//					// changed *.class to *.TYPE due to javaflow bug
 					state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
-						((IClockService)BDIInterpreter.getInterpreter(state).getComponentAdapter().getServiceContainer()
+						((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer()
 						.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
 				}
 			});
 			
 	//			// changed *.class to *.TYPE due to javaflow bug
 			state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
-				((IClockService)BDIInterpreter.getInterpreter(state).getComponentAdapter().getServiceContainer()
+				((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer()
 				.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
 		}
 		
@@ -1700,7 +1700,7 @@ public class AgentRules
 			final ITimedObject[]	to	= new ITimedObject[1];
 			
 			final OAVBDIFetcher fet = new OAVBDIFetcher(state, rcapa);
-			to[0]	= new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getComponentAdapter(), new CheckedAction()
+			to[0]	= new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
 			{
 				public void run()
 				{
@@ -1712,17 +1712,17 @@ public class AgentRules
 					}
 					catch(Exception e)
 					{
-						String name = BDIInterpreter.getInterpreter(state).getComponentAdapter().getComponentIdentifier().getName();
+						String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getName();
 						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content));
 					}
 					// changed *.class to *.TYPE due to javaflow bug
 					state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, ((IClockService)BDIInterpreter.getInterpreter(state)
-						.getComponentAdapter().getServiceContainer().getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
+						.getAgentAdapter().getServiceContainer().getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
 				}
 			});
 //			// changed *.class to *.TYPE due to javaflow bug
 			state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, ((IClockService)BDIInterpreter.getInterpreter(state)
-				.getComponentAdapter().getServiceContainer().getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
+				.getAgentAdapter().getServiceContainer().getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
 		}
 
 		registerAssignTos(state, rcapa, mbelset, OAVBDIMetaModel.beliefsetreference_type, OAVBDIMetaModel.capability_has_beliefsetrefs);
@@ -2985,8 +2985,8 @@ public class AgentRules
 		long tt = prop!=null? prop.longValue(): 10000;
 		
 		// changed *.class to *.TYPE due to javaflow bug
-		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_timer, ((IClockService)interpreter.getComponentAdapter().getServiceContainer()
-			.getService(IClockService.TYPE)).createTimer(tt, new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getComponentAdapter(), new CheckedAction()
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_timer, ((IClockService)interpreter.getAgentAdapter().getServiceContainer()
+			.getService(IClockService.TYPE)).createTimer(tt, new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
 			{
 				public boolean isValid()
 				{
@@ -2999,10 +2999,10 @@ public class AgentRules
 //					if(state.containsObject(ragent))
 //					{
 						// todo: cleanup? or in terminated action?
-						BDIInterpreter.getInterpreter(state).getLogger(ragent).info("Forcing termination (timeout): "+interpreter.getComponentAdapter().getComponentIdentifier().getLocalName());
+						BDIInterpreter.getInterpreter(state).getLogger(ragent).info("Forcing termination (timeout): "+interpreter.getAgentAdapter().getComponentIdentifier().getLocalName());
 						state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, 
 							OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED);
-						interpreter.getComponentAdapter().wakeup();
+						interpreter.getAgentAdapter().wakeup();
 //					}
 				}
 			})));

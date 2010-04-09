@@ -1,8 +1,8 @@
 package jadex.micro;
 
 import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageType;
@@ -283,6 +283,43 @@ public abstract class MicroAgent implements IMicroAgent
 		((IMessageService)getServiceContainer().getService(IMessageService.class)).
 			sendMessage(me, mt, interpreter.getAgentAdapter(), interpreter.getAgentModel().getClassLoader());
 //			sendMessage(me, mt, getComponentIdentifier(), interpreter.getAgentModel().getClassLoader());
+	}
+	
+	/**
+	 *  Create component identifier.
+	 *  @param name The name.
+	 *  @param local True for local name.
+	 *  @param addresses The addresses.
+	 *  @return The new component identifier.
+	 */
+	public IComponentIdentifier createComponentIdentifier(String name)
+	{
+		return createComponentIdentifier(name, true, null);
+	}
+	
+	/**
+	 *  Create component identifier.
+	 *  @param name The name.
+	 *  @param local True for local name.
+	 *  @param addresses The addresses.
+	 *  @return The new component identifier.
+	 */
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
+	{
+		return createComponentIdentifier(name, local, null);
+	}
+	
+	/**
+	 *  Create component identifier.
+	 *  @param name The name.
+	 *  @param local True for local name.
+	 *  @param addresses The addresses.
+	 *  @return The new component identifier.
+	 */
+	public IComponentIdentifier createComponentIdentifier(final String name, final boolean local, final String[] addresses)
+	{
+		IComponentManagementService cms = (IComponentManagementService)interpreter.getAgentAdapter().getServiceContainer().getService(IComponentManagementService.class);	
+		return cms.createComponentIdentifier(name, local, addresses);
 	}
 	
 	/**

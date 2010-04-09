@@ -63,6 +63,6 @@ public class InternalEventRules
 		state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_internalevents, rinternalevent);
 		
 		// Hack!!! Only needed for external access!
-		BDIInterpreter.getInterpreter(state).getComponentAdapter().wakeup();
+		BDIInterpreter.getInterpreter(state).getAgentAdapter().wakeup();
 	}
 }
