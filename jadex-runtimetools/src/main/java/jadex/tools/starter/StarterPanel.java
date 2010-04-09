@@ -318,7 +318,7 @@ public class StarterPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
-				reloadModel(lastfile);
+				reloadModel();
 			}
 		});
 
@@ -619,14 +619,10 @@ public class StarterPanel extends JPanel
 	 *  Reload the model.
 	 *  @param adf The adf.
 	 */
-	public void reloadModel(String adf)
+	public void reloadModel()
 	{
 		if(lastfile==null)
 			return;
-		
-		// todo: remove this hack
-//		String cachename = lastfile.substring(0, lastfile.length()-3)+"cam";
-//		SXML.clearModelCache(cachename);
 		
 		String toload = lastfile;
 		lastfile = null;
@@ -831,7 +827,8 @@ public class StarterPanel extends JPanel
 		final String mo = props.getStringProperty("model");
 		if(mo!=null)
 		{
-			reloadModel(mo);
+			lastfile = mo;
+			reloadModel();
 			selectConfiguration(props.getStringProperty("config"));
 			setComponentName(props.getStringProperty("name"));
 		}
