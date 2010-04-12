@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_-wEWEUJVEd-lXM2_JTGF5Q" iD="_-wEWEEJVEd-lXM2_JTGF5Q">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__GHekEJVEd-lXM2_JTGF5Q" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__GHekUJVEd-lXM2_JTGF5Q" key="Description" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__GHekkJVEd-lXM2_JTGF5Q" key="Package" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__GHekUJVEd-lXM2_JTGF5Q" key="Description" value="&lt;h1>Message Receival&lt;/h1> This process waits for a request message and then prints the content."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__GHekkJVEd-lXM2_JTGF5Q" key="Package" value="jadex.bpmn.tutorial"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_-wEWF0JVEd-lXM2_JTGF5Q" iD="_-wEWFkJVEd-lXM2_JTGF5Q" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_-wEWGUJVEd-lXM2_JTGF5Q" iD="_-wEWGEJVEd-lXM2_JTGF5Q" outgoingEdges="_GvBwukJWEd-lXM2_JTGF5Q" name="Preparation" activityType="Task">

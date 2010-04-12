@@ -54,16 +54,28 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					// Todo: store results.
-					thread.setNonWaiting();
-					instance.getStepHandler(activity).step(activity, instance, thread, null);
+					instance.getComponentAdapter().invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							// Todo: store results.
+							thread.setNonWaiting();
+							instance.getStepHandler(activity).step(activity, instance, thread, null);
+						}
+					});
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
+				public void exceptionOccurred(Object source, final Exception exception)
 				{
-					thread.setNonWaiting();
-					thread.setException(exception);
-					instance.getStepHandler(activity).step(activity, instance, thread, null);
+					instance.getComponentAdapter().invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							thread.setNonWaiting();
+							thread.setException(exception);
+							instance.getStepHandler(activity).step(activity, instance, thread, null);
+						}
+					});
 				}
 			});
 		}

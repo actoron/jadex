@@ -110,10 +110,15 @@ public class EventReificator implements IOAVStateListener
 //					System.out.println("fact added: "+id+", "+newvalue);
 					createChangeEvent(id, null, OAVBDIRuntimeModel.CHANGEEVENT_FACTADDED, newvalue);
 				}
-				else
+				else if(newvalue==null)
 				{
 //					System.out.println("fact removed: "+id+", "+oldvalue);
 					createChangeEvent(id, null, OAVBDIRuntimeModel.CHANGEEVENT_FACTREMOVED, oldvalue);
+				}
+				else
+				{
+//					System.out.println("fact removed: "+id+", "+oldvalue);
+					createChangeEvent(id, null, OAVBDIRuntimeModel.CHANGEEVENT_FACTCHANGED, newvalue);
 				}
 			}
 			else if(OAVBDIRuntimeModel.capability_has_internalevents.equals(attr) && newvalue!=null)

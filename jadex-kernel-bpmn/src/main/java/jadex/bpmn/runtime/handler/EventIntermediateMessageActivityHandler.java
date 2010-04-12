@@ -163,7 +163,8 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 							String[]	params	= activity.getPropertyNames();
 							for(int i=0; ret && params!=null && i<params.length; i++)
 							{
-								ret	= SUtil.equals(thread.getPropertyValue(params[i]), msg.getValue(params[i]));
+								// Fetch property from message event activity, because current activity might be mutliple event.
+								ret	= SUtil.equals(thread.getPropertyValue(params[i], activity), msg.getValue(params[i]));
 							}
 						}
 						catch(RuntimeException e)

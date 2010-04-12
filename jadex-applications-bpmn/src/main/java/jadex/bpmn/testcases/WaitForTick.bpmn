@@ -51,7 +51,11 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_R78Q0kMhEd-aDdXkLqEWvQ" key="condition" value="System.currentTimeMillis()-start>=100"/>
       </eAnnotations>
     </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_RDT_sUMhEd-aDdXkLqEWvQ" iD="_RDT_sEMhEd-aDdXkLqEWvQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_RDT_sUMhEd-aDdXkLqEWvQ" iD="_RDT_sEMhEd-aDdXkLqEWvQ" conditionType="Default" isDefault="true">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_CKX1QEYxEd-3iKqz0F2Flw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_CKX1QUYxEd-3iKqz0F2Flw" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_50yOIUMhEd-aDdXkLqEWvQ" iD="_50yOIEMhEd-aDdXkLqEWvQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_6IAsIUMhEd-aDdXkLqEWvQ" iD="_6IAsIEMhEd-aDdXkLqEWvQ"/>
   </pools>

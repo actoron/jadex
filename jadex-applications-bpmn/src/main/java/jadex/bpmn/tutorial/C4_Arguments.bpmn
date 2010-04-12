@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_VqUXEUZCEd-3iKqz0F2Flw" iD="_VqUXEEZCEd-3iKqz0F2Flw">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WLiNwEZCEd-3iKqz0F2Flw" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WLiNwUZCEd-3iKqz0F2Flw" key="Description" value="&lt;h1>Inventory Process&lt;/h1> The process counts items. The item type is supplied as arguments. The item count is provided as return value."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WLr-wEZCEd-3iKqz0F2Flw" key="Package" value="jadex.bpmn.tutorial"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_kxcRwEZDEd-3iKqz0F2Flw" key="arguments" value="item_type␋Type of item to be counted.␋String␋&quot;all&quot;"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uaokIEZEEd-3iKqz0F2Flw" key="results" value="item_count␋The number of items␋int␋"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_VqUXF0ZCEd-3iKqz0F2Flw" iD="_VqUXFkZCEd-3iKqz0F2Flw" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_VqUXGUZCEd-3iKqz0F2Flw" iD="_VqUXGEZCEd-3iKqz0F2Flw" outgoingEdges="_LB8_WkZEEd-3iKqz0F2Flw" name="Count Items" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_5k9kAEZDEd-3iKqz0F2Flw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5k9kAUZDEd-3iKqz0F2Flw" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7GF_kEZDEd-3iKqz0F2Flw" key="parameters" value="in␋text␋java.lang.String␋&quot;Counting items: &quot;+$args.get(&quot;item_type&quot;)"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_LB8_UUZEEd-3iKqz0F2Flw" iD="_LB8_UEZEEd-3iKqz0F2Flw" incomingEdges="_LB8_WkZEEd-3iKqz0F2Flw" name="Provide Result" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_LVniMEZEEd-3iKqz0F2Flw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LVniMUZEEd-3iKqz0F2Flw" key="class" value="jadex.bpmn.runtime.task.StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MNe-UEZEEd-3iKqz0F2Flw" key="parameters" value="inout␋name␋String␋&quot;item_count&quot;␟inout␋value␋int␋(int)(Math.random()*100)"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_LB8_WkZEEd-3iKqz0F2Flw" iD="_LB8_WUZEEd-3iKqz0F2Flw"/>
+  </pools>
+</bpmn:BpmnDiagram>

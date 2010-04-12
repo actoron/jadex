@@ -760,9 +760,10 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			thread.updateParametersAfterStep(act, this);
 			
 			// Check if thread now waits for a message and there is at least one in the message queue.
-			if(thread.isWaiting() && messages.size()>0 && MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(thread.getActivity().getActivityType()) 
+			// Todo: check if thread directly or indirectly (multiple events!) waits for a message event before checking waitqueue
+			if(thread.isWaiting() && messages.size()>0 /*&& MBpmnModel.EVENT_INTERMEDIATE_MESSAGE.equals(thread.getActivity().getActivityType()) 
 				&& (thread.getPropertyValue(EventIntermediateMessageActivityHandler.PROPERTY_MODE)==null 
-					|| EventIntermediateMessageActivityHandler.MODE_RECEIVE.equals(thread.getPropertyValue(EventIntermediateMessageActivityHandler.PROPERTY_MODE))))
+					|| EventIntermediateMessageActivityHandler.MODE_RECEIVE.equals(thread.getPropertyValue(EventIntermediateMessageActivityHandler.PROPERTY_MODE)))*/)
 			{
 				boolean processed = false;
 				for(int i=0; i<messages.size() && !processed; i++)

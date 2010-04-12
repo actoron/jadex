@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_j8aFUT1-Ed-Jdb7I0xLn6A" iD="_j8aFUD1-Ed-Jdb7I0xLn6A">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_kocr8D1-Ed-Jdb7I0xLn6A" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_kocr8T1-Ed-Jdb7I0xLn6A" key="Description" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_kocr8j1-Ed-Jdb7I0xLn6A" key="Package" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_kocr8T1-Ed-Jdb7I0xLn6A" key="Description" value="&lt;h1>Exception Process&lt;/h1> This process requests user input for credit approval.&lt;br/> If the user clicks 'OK' the process continues and the credit is granted. If the user clicks 'Cancel' an exception occurs and the credit is denied."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_kocr8j1-Ed-Jdb7I0xLn6A" key="Package" value="jadex.bpmn.tutorial"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_j82xQT1-Ed-Jdb7I0xLn6A" iD="_j82xQD1-Ed-Jdb7I0xLn6A" name="Pool">
     <vertices xmi:type="bpmn:SubProcess" xmi:id="_ojTX8T1-Ed-Jdb7I0xLn6A" iD="_ojTX8D1-Ed-Jdb7I0xLn6A" outgoingEdges="_yCzYSj1-Ed-Jdb7I0xLn6A">
