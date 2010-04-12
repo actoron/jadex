@@ -49,6 +49,7 @@ public class CreateComponentTask implements ITask
 		final String[] resultmapping = (String[])context.getParameterValue("resultmapping");
 		boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): resultmapping!=null;
 		boolean master = context.getParameterValue("master")!=null? ((Boolean)context.getParameterValue("master")).booleanValue(): false;
+		boolean daemon = context.getParameterValue("daemon")!=null? ((Boolean)context.getParameterValue("daemon")).booleanValue(): false;
 		
 		Map args = (Map)context.getParameterValue("arguments");
 		if(args==null)
@@ -102,7 +103,7 @@ public class CreateComponentTask implements ITask
 		}
 		
 		ces.createComponent(name, model,
-			new CreationInfo(config, args, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, suspend, master, instance.getModelElement().getAllImports()),
+			new CreationInfo(config, args, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, suspend, master, daemon, instance.getModelElement().getAllImports()),
 			null, lis);
 
 		if(!wait)

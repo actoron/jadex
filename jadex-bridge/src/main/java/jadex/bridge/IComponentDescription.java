@@ -66,7 +66,16 @@ public interface IComponentDescription
 	
 	/**
 	 *  Is the component a master.
+	 *  When a master component is killed the parent component will be killed two.
 	 *  @return True, if master component.
 	 */
 	public boolean isMaster();
+
+	/**
+	 *  Is the component a daemon.
+	 *  When platform is in autoshutdown mode and the last non-daemon component is killed
+	 *  the platform will also be shutdowned.
+	 *  @return True, if daemon component.
+	 */
+	public boolean isDaemon();
 }

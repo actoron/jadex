@@ -954,7 +954,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					IComponentIdentifier cid = cms.generateComponentIdentifier(typename);
 					setOwner(fid, cid);
 					cms.createComponent(cid.getLocalName(), getContext().getComponentFilename(componenttype),
-						new CreationInfo(null, null, getContext().getComponentIdentifier(), false, false, getContext().getAllImports()), lis, null);
+						new CreationInfo(null, null, getContext().getComponentIdentifier(), false, false, false, getContext().getAllImports()), lis, null);
 				}
 			}
 		}

@@ -1,7 +1,7 @@
 package jadex.base;
 
-import jadex.bridge.CreationInfo;
-import jadex.bridge.IComponentIdentifier;
+import jadex.base.fipa.CMSComponentDescription;
+import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
@@ -12,10 +12,7 @@ import jadex.service.clock.ITimer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -30,9 +27,6 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 	public static final long MAX_SHUTDOWM_TIME = 3000;
 
 	//-------- attributes --------
-
-	/** The optional system components (ams, df). */
-	protected Set daemoncomponents;
 
 	/** The logger. */
 	protected Logger logger;
@@ -86,27 +80,29 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 		
 		// Step 1: Find existing components.
 		final IComponentManagementService	ces	= (IComponentManagementService)getService(IComponentManagementService.class);
-		ces.getComponentIdentifiers(new IResultListener()
+		ces.getComponentDescriptions(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				// Step 2: Kill existing components excepts daemons.
-				final List comps = new ArrayList(Arrays.asList((IComponentIdentifier[])result));
-				for(Iterator it=daemoncomponents.iterator(); it.hasNext(); )
+				final List comps = new ArrayList(Arrays.asList((IComponentDescription[])result));
+				for(int i=comps.size()-1; i>-1; i--)
 				{
-					comps.remove(it.next());
+					if(((CMSComponentDescription)comps.get(i)).isDaemon())
+						comps.remove(i);
 				}
+				
 				killComponents(comps, shutdowntime!=0 ? shutdowntime : MAX_SHUTDOWM_TIME, new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
 						// Step 3: Find remaining components.
-						ces.getComponentIdentifiers(new IResultListener()
+						ces.getComponentDescriptions(new IResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
 								// Step 4: Kill remaining components.
-								killComponents(Arrays.asList((IComponentIdentifier[])result), shutdowntime!=0 ? shutdowntime : MAX_SHUTDOWM_TIME, new IResultListener()
+								killComponents(Arrays.asList((IComponentDescription[])result), shutdowntime!=0 ? shutdowntime : MAX_SHUTDOWM_TIME, new IResultListener()
 								{
 									public void resultAvailable(Object source, Object result)
 									{
@@ -142,15 +138,6 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 	}
 	
 	/**
-	 *  Create a component.
-	 */
-	protected void createComponent(String name, String model, String config, Map args, final boolean daemon)
-	{
-		IComponentManagementService	ces	= (IComponentManagementService)getService(IComponentManagementService.class);
-		ces.createComponent(name, model, new CreationInfo(config, args), null, null);
-	}
-
-	/**
 	 *  Kill the given components within the specified timeout.
 	 *  @param comps	The component ids.
 	 *  @param timeout	The time after which to inform the listener anyways.
@@ -164,7 +151,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 		// Timer entry to notify lister after timeout.
 		final	boolean	notified[]	= new boolean[1];
 		IClockService clock	= (IClockService)getService(IClockService.class);
-		final ITimer	killtimer	= clock.createTimer(timeout, new ITimedObject()
+		final ITimer killtimer	= clock.createTimer(timeout, new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{
@@ -218,11 +205,13 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 				}
 			}
 		};
+		
 		IComponentManagementService	ces	= (IComponentManagementService)getService(IComponentManagementService.class);
 		for(int i=0; i < comps.size(); i++)
 		{
 			//System.out.println("Killing component: "+comps.get(i));
-			ces.destroyComponent((IComponentIdentifier)comps.get(i), rl);
+			CMSComponentDescription desc = (CMSComponentDescription)comps.get(i);
+			ces.destroyComponent(desc.getName(), rl);
 		}
 	}
 

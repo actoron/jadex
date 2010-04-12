@@ -1,14 +1,10 @@
 package jadex.base;
 
-import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentListener;
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
-import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -23,7 +19,6 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -48,15 +43,9 @@ public class Platform extends AbstractPlatform
 	/** A lib path. */
 	public static final String LIBPATH = PLATFORM+SEPARATOR+"libpath";
 	
-	/** A daemon component. */
-	public static final String DAEMONCOMPONENT = PLATFORM+SEPARATOR+"daemoncomponent";
-
 	/** An application component. */
 	public static final String COMPONENT = PLATFORM+SEPARATOR+"component";
 
-	/** An application component. */
-	public static final String APPLICATION = PLATFORM+SEPARATOR+"application";
-	
 	/** An component argument. */
 	public static final String ARGUMENT = "argument";
 
@@ -68,6 +57,18 @@ public class Platform extends AbstractPlatform
 	
 	/** An component config. */
 	public static final String CONFIG = "config";
+	
+	/** An component number. */
+	public static final String NUMBER = "number";
+	
+	/** An component master flag. */
+	public static final String MASTER = "master";
+	
+	/** An component daemon flag. */
+	public static final String DAEMON = "daemon";
+	
+	/** An component suspend flag. */
+	public static final String SUSPEND = "suspend";
 	
 	/** Shut down the platform, when the last component is killed. */
 	public static final String AUTOSHUTDOWN = PLATFORM+SEPARATOR+"autoshutdown";
@@ -267,92 +268,39 @@ public class Platform extends AbstractPlatform
 			}
 		}
 		
-		// Create daemon components.
-		this.daemoncomponents = SCollection.createLinkedHashSet();
-		Property[] props = Properties.getProperties(configurations, DAEMONCOMPONENT);
-//		System.out.println("starting: "+props.length);
+		IComponentManagementService	ces	= (IComponentManagementService)getService(IComponentManagementService.class);
+		
+		// Create components.
+		Property[] props = Properties.getProperties(configurations, COMPONENT);
 		for(int i = 0; i < props.length; i++)
 		{
-//			System.out.println("starting: "+props[i].getName());
-			createComponent(props[i].getName(), props[i].getValue(), null, null, true);
+			ces.createComponent(props[i].getName(), props[i].getValue(), null, null, null);
 		}
-		Properties[] subprops = Properties.getSubproperties(configurations, DAEMONCOMPONENT);
+		Properties[] subprops = Properties.getSubproperties(configurations, COMPONENT);
 		for(int i = 0; i < subprops.length; i++)
 		{
 			Map args = getArguments(subprops[i]);
 			Property model = subprops[i].getProperty(MODEL);
 			Property config = subprops[i].getProperty(CONFIG);
-			createComponent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, true);
-		}
-		
-
-		// Create application components.
-		props = Properties.getProperties(configurations, COMPONENT);
-		for(int i = 0; i < props.length; i++)
-		{
-			createComponent(props[i].getName(), props[i].getValue(), null, null, false);
-		}
-		subprops = Properties.getSubproperties(configurations, COMPONENT);
-		for(int i = 0; i < subprops.length; i++)
-		{
-			Map args = getArguments(subprops[i]);
-			Property model = subprops[i].getProperty(MODEL);
-			Property config = subprops[i].getProperty(CONFIG);
-			createComponent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, false);
-		}
-		
-		// Create applications.
-		props = Properties.getProperties(configurations, APPLICATION);
-		for(int i = 0; i < props.length; i++)
-		{
-			createComponent(props[i].getName(), props[i].getValue(), null, null, false);
-		}
-		subprops = Properties.getSubproperties(configurations, APPLICATION);
-		for(int i = 0; i < subprops.length; i++)
-		{
-			Map args = getArguments(subprops[i]);
-			Property model = subprops[i].getProperty(MODEL);
-			Property config = subprops[i].getProperty(CONFIG);
-			createComponent(subprops[i].getName(), model.getValue(), config!=null? config.getValue(): null, args, false);
-		}
-		
-		// Add cms listener if auto shutdown.
-		if(Properties.getBooleanProperty(configurations, AUTOSHUTDOWN))
-		{
-			final IComponentManagementService	cms	= (IComponentManagementService)getService(IComponentManagementService.class);
-			if(cms!=null)
+			int number = subprops[i].getIntProperty(NUMBER);
+			boolean master = subprops[i].getBooleanProperty(MASTER);
+			boolean suspend = subprops[i].getBooleanProperty(SUSPEND);
+			boolean daemon = subprops[i].getBooleanProperty(DAEMON);
+			
+			CreationInfo cinfo = new CreationInfo(config!=null? config.getValue(): null, args, null, suspend, master, daemon);
+			if(number>1)
 			{
-				cms.addComponentListener(null, new IComponentListener()
+				for(int j=0; j<number; j++)
 				{
-					public void componentChanged(IComponentDescription desc)
-					{
-					}
-					
-					public void componentAdded(IComponentDescription desc)
-					{
-					}
-	
-					public void componentRemoved(IComponentDescription desc, Map results)
-					{
-						cms.getComponentIdentifiers(new IResultListener()
-						{
-							public void resultAvailable(Object source, Object result)
-							{
-								if(((IComponentIdentifier[])result).length <= daemoncomponents.size())
-//								if(((Set)result).size() <= daemoncomponents.size())
-									shutdown(null);
-							}
-	
-							public void exceptionOccurred(Object source, Exception exception)
-							{
-								getLogger().severe("Exception occurred: " + exception);
-							}
-						});
-					}
-				});
+					ces.createComponent(null, model.getValue(), cinfo, null, null);
+				}
+			}
+			else
+			{
+				ces.createComponent(subprops[i].getName(), model.getValue(), cinfo, null, null);
 			}
 		}
-
+		
 		configurations = null;
 	}
 	
@@ -401,76 +349,14 @@ public class Platform extends AbstractPlatform
 		return arguments.size()>0? arguments: null;
 	}
 
-	//-------- Static part --------
-	
 	/**
-	 *  Keep platform from being garbage collected, when created using main().
-	 *  Useful for debugging, profiling etc.
+	 *  Test if platform is in autoshutdown mode.
+	 *  @return True, if autoshutdown.
 	 */
-//	private static Platform	platform;
-
-	/**
-	 *  Start a platform with the components specified
-	 *  by the arguments in the form "name:model" or just "model".
-	 * /
-	public static void main(String[] args) throws Exception
+	public boolean isAutoShutdown()
 	{
-		// Absolute start time (for testing and benchmarking).
-		long starttime = System.currentTimeMillis();
-		
-		// Initialize platform configuration from args.
-		String[] conffiles;
-		if(args.length>0 && args[0].equals("-"+CONFIGURATION))
-		{
-			conffiles = new String[args.length-1];
-			System.arraycopy(args, 1, conffiles, 0, args.length-1);
-		}
-		else if(args.length>0)
-		{
-			conffiles = args;
-		}
-		else
-		{
-			conffiles = new String[]
-			{
-				FALLBACK_SERVICES_CONFIGURATION,
-				FALLBACK_STANDARDCOMPONENTS_CONFIGURATION,
-				FALLBACK_APPLICATION_CONFIGURATION,
-				FALLBACK_BDI_CONFIGURATION,
-				FALLBACK_MICRO_CONFIGURATION,
-				FALLBACK_BPMN_CONFIGURATION,
-				FALLBACK_BDIBPMN_CONFIGURATION
-			};
-		}
-		
-		// Create an instance of the platform.
-		// Hack as long as no loader is present.
-		ClassLoader cl = Platform.class.getClassLoader();
-		platform = new Platform(conffiles, cl);
-		platform.start();
-		
-		long startup = System.currentTimeMillis() - starttime;
-		platform.logger.info("Platform startup time: " + startup + " ms.");
-		
-//		Thread	gc	= new Thread(new Runnable()
-//		{
-//			public void run()
-//			{
-//				while(true)
-//				{
-//					try
-//					{
-//						Thread.sleep(5000);
-//						System.gc();
-//						Thread.sleep(1000);
-//						System.runFinalization();
-//					}
-//					catch(Exception e){}
-//				}
-//			}
-//		});
-//		gc.setDaemon(true);
-//		gc.start();
-	}*/
+//		System.out.println("test: "+Properties.getBooleanProperty(configurations, AUTOSHUTDOWN));
+		return Properties.getBooleanProperty(configurations, AUTOSHUTDOWN);
+	}
 }
 

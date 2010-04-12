@@ -31,7 +31,7 @@
 				<messageevent ref="request_translation"/>
 			</trigger>
 			<precondition>
-				EnglishGermanTranslationPlanB4.containsWord((String)$event.getParameter("content").getValue())
+				EnglishGermanTranslationPlanB4.containsWord((String)$event.getParameter(SFipa.CONTENT).getValue())
 			</precondition>
 		</plan>
 

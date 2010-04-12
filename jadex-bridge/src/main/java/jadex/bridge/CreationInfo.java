@@ -27,6 +27,9 @@ public class CreationInfo
 	/** The master flag (default: false). */
 	protected boolean	master;
 	
+	/** The daemon flag (default: false). */
+	protected boolean daemon;
+	
 	/** The imports. */
 	protected String[]	imports;
 	
@@ -99,7 +102,20 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map args, IComponentIdentifier parent, boolean suspend, boolean master)
 	{
-		this(config, args, parent, suspend, master, null);
+		this(config, args, parent, suspend, master, false);
+	}
+	
+	/**
+	 *  Create a new creation info.
+	 *  @param config	The configuration.
+	 *  @param args	The arguments.
+	 *  @param parent	The parent of the component to be created.
+	 *  @param suspend	The suspend flag.
+	 *  @param master	The master flag.
+	 */
+	public CreationInfo(String config, Map args, IComponentIdentifier parent, boolean suspend, boolean master, boolean daemon)
+	{
+		this(config, args, parent, suspend, master, daemon, null);
 	}
 	
 	/**
@@ -111,12 +127,14 @@ public class CreationInfo
 	 *  @param master	The master flag.
 	 *  @param imports	The imports.
 	 */
-	public CreationInfo(String config, Map args, IComponentIdentifier parent, boolean suspend, boolean master, String[] imports)
+	public CreationInfo(String config, Map args, IComponentIdentifier parent, boolean suspend, boolean master, boolean daemon, String[] imports)
 	{
 		this.config	= config;
 		this.args	= args;
 		this.parent	= parent;
 		this.suspend	= suspend;
+		this.master = master;
+		this.daemon = daemon;
 		this.imports	= imports;
 	}
 	
@@ -211,6 +229,25 @@ public class CreationInfo
 	{
 		this.master = master;
 	}
+	
+	/**
+	 *  Get the daemon.
+	 *  @return The daemon.
+	 */
+	public boolean isDaemon()
+	{
+		return this.daemon;
+	}
+
+	/**
+	 *  Set the daemon.
+	 *  @param daemon The daemon to set.
+	 */
+	public void setDaemon(boolean daemon)
+	{
+		this.daemon = daemon;
+	}
+
 	/**
 	 *  Get the imports.
 	 *  @return the imports.

@@ -105,6 +105,7 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "applicationtype")), new ObjectInfo(MApplicationType.class), 
 			new MappingInfo(null, "description", null,
 			new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown")),
 			new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE))
 			}, 
 			new SubobjectInfo[]{

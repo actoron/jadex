@@ -38,6 +38,9 @@ public class MComponentInstance
 	/** The suspended flag. */
 	protected boolean suspended;
 	
+	/** The daemon flag. */
+	protected boolean daemon;
+	
 	/** The list of contained arguments. */
 	protected List arguments;
 	
@@ -148,6 +151,24 @@ public class MComponentInstance
 		this.master = master;
 	}
 	
+	/**
+	 *  Get the daemon.
+	 *  @return The daemon.
+	 */
+	public boolean isDaemon()
+	{
+		return this.daemon;
+	}
+
+	/**
+	 *  Set the daemon.
+	 *  @param daemon The daemon to set.
+	 */
+	public void setDaemon(boolean daemon)
+	{
+		this.daemon = daemon;
+	}
+
 	/**
 	 *  Get the suspended.
 	 *  @return The suspended.

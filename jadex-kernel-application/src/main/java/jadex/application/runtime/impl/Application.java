@@ -67,13 +67,16 @@ public class Application	implements IApplication, IComponentInstance
 	protected boolean	terminating;
 	
 	/** Component type mapping (cid -> logical type name). */
-	protected Map	ctypes;
+	protected Map ctypes;
 	
 	/** The arguments. */
 	protected Map arguments;
 	
 	/** The arguments. */
 	protected Map results;
+	
+	/** The children cnt (without daemons). */
+	protected int children;
 
 	//-------- constructors --------
 	
@@ -311,6 +314,9 @@ public class Application	implements IApplication, IComponentInstance
 				aspaces[i].componentAdded(comp, type);
 			}
 		}
+		
+		if(!desc.isDaemon())
+			children++;
 	}
 	
 	/**
@@ -348,6 +354,12 @@ public class Application	implements IApplication, IComponentInstance
 		}
 		
 		if(desc.isMaster())
+			killApplication();
+		
+		if(!desc.isDaemon())
+			children--;
+		
+		if(children==0 && model.getApplicationType().isAutoShutdown())
 			killApplication();
 	}
 	
@@ -712,7 +724,7 @@ public class Application	implements IApplication, IComponentInstance
 					IComponentManagementService	ces	= (IComponentManagementService)adapter.getServiceContainer().getService(IComponentManagementService.class);
 					ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(),
 						new CreationInfo(component.getConfiguration(), component.getArguments(this, cl), adapter.getComponentIdentifier(),
-								component.isSuspended(), component.isMaster(), model.getApplicationType().getAllImports()), null, null);					
+							component.isSuspended(), component.isMaster(), component.isDaemon(), model.getApplicationType().getAllImports()), null, null);					
 	//				context.createComponent(component.getName(), component.getTypeName(),
 	//					component.getConfiguration(), component.getArguments(container, apptype, cl), component.isStart(), component.isMaster(),
 	//					DefaultResultListener.getInstance(), null);	

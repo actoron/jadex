@@ -27,7 +27,7 @@
 			</property>
 						
 			<property type="jadex.bridge.IComponentManagementService" name="cms_service">
-				new jadex.standalone.service.ComponentManagementService($platform)
+				new jadex.standalone.service.ComponentManagementService($platform, $platform.isAutoShutdown())
 			</property> 			
 						
 			<property type="jadex.base.fipa.IDF" name="df_service">

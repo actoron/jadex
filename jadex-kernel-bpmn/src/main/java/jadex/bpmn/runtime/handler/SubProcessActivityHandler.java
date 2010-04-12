@@ -50,7 +50,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				.getServiceContainer().getService(IComponentManagementService.class);
 			
 			cms.createComponent(null, file,
-				new CreationInfo(null, null, instance.getComponentIdentifier(), false, false, instance.getModelElement().getAllImports()), null, new IResultListener()
+				new CreationInfo(null, null, instance.getComponentIdentifier(), false, false, false, instance.getModelElement().getAllImports()), null, new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{

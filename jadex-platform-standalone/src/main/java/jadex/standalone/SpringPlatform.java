@@ -1,10 +1,12 @@
 package jadex.standalone;
 
 import jadex.base.AbstractPlatform;
+import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.Properties;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
@@ -37,11 +39,8 @@ public class SpringPlatform extends AbstractPlatform
 	/** The ams listener. */
 	protected IComponentListener amslistener;
 	
-	/** The daemon components. */
-	protected Map daemcomponents;
-	
 	/** The application components. */
-	protected Map appcomponents;
+	protected Map components;
 	
 	/** Flag indicating if autoshutdown. */
 	protected boolean autoshutdown;
@@ -85,41 +84,20 @@ public class SpringPlatform extends AbstractPlatform
 	 *  Set the autoshutdown.
 	 *  @param autoshutdown The autoshutdown to set.
 	 */
-	public void setAutoshutDown(boolean autoshutdown)
+	public void setAutoShutdown(boolean autoshutdown)
 	{
-		final IComponentManagementService	cms	= (IComponentManagementService)getService(IComponentManagementService.class);
-		if(cms!=null)
-		{
-			cms.addComponentListener(null, new IComponentListener()
-			{
-				public void componentChanged(IComponentDescription desc)
-				{
-				}
-				
-				public void componentAdded(IComponentDescription desc)
-				{
-				}
-
-				public void componentRemoved(IComponentDescription desc, Map results)
-				{
-					cms.getComponentIdentifiers(new IResultListener()
-					{
-						public void resultAvailable(Object source, Object result)
-						{
-							if(((IComponentIdentifier[])result).length <= daemoncomponents.size())
-								shutdown(null);
-						}
-
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-							getLogger().severe("Exception occurred: " + exception);
-						}
-					});
-				}
-			});
-		}
+		this.autoshutdown = autoshutdown;
 	}
-
+	
+	/**
+	 *  Test if platform is in autoshutdown mode.
+	 *  @return True, if autoshutdown.
+	 */
+	public boolean isAutoShutdown()
+	{
+		return autoshutdown;
+	}
+	
 	/**
 	 *  Set the shutdowntime.
 	 *  @param shutdowntime The shutdowntime to set.
@@ -132,11 +110,11 @@ public class SpringPlatform extends AbstractPlatform
 	/**
 	 *  Set the daemon components.
 	 *  @param daemoncomponents The daemon components.
-	 */
+	 * /
 	public void setDaemonComponents(Map daemoncomponents)
 	{
 		this.daemcomponents = daemoncomponents;
-	}
+	}*/
 
 	/**
 	 *  Set the components.
@@ -144,7 +122,7 @@ public class SpringPlatform extends AbstractPlatform
 	 */
 	public void setComponents(Map appcomponents)
 	{
-		this.appcomponents = appcomponents;
+		this.components = appcomponents;
 	}
 	
 	/**
@@ -169,40 +147,45 @@ public class SpringPlatform extends AbstractPlatform
 		}
 		
 		// Create daemon components.
-		this.daemoncomponents = SCollection.createLinkedHashSet();
-		if(daemcomponents != null)
-		{
-			for(Iterator it = daemcomponents.keySet().iterator(); it.hasNext();)
-			{
-				String name = (String)it.next();
-				String model;
-				String config = null;
-				Map args = null;
-				Object tmp = daemcomponents.get(name);
-				if(tmp instanceof String)
-				{
-					model = (String)tmp;
-				}
-				else
-				{
-					args = (Map)tmp;
-					model = (String)args.remove("model");
-					config = (String)args.remove("config");
-				}
-				createComponent(name, model, config, args, true);
-			}
-		}
+//		this.daemoncomponents = SCollection.createLinkedHashSet();
+//		if(daemcomponents != null)
+//		{
+//			for(Iterator it = daemcomponents.keySet().iterator(); it.hasNext();)
+//			{
+//				String name = (String)it.next();
+//				String model;
+//				String config = null;
+//				Map args = null;
+//				Object tmp = daemcomponents.get(name);
+//				if(tmp instanceof String)
+//				{
+//					model = (String)tmp;
+//				}
+//				else
+//				{
+//					args = (Map)tmp;
+//					model = (String)args.remove("model");
+//					config = (String)args.remove("config");
+//				}
+//				createComponent(name, model, config, args, true);
+//			}
+//		}
 		
 		// Create application components.
-		if(appcomponents != null)
+		IComponentManagementService	ces	= (IComponentManagementService)getService(IComponentManagementService.class);
+		if(components != null)
 		{
-			for(Iterator it = appcomponents.keySet().iterator(); it.hasNext();)
+			for(Iterator it = components.keySet().iterator(); it.hasNext();)
 			{
 				String name = (String)it.next();
 				String model;
 				String config = null;
+				int number = 1;
+				boolean master = false;
+				boolean daemon = false;
+				boolean suspend = false;
 				Map args = null;
-				Object tmp = appcomponents.get(name);
+				Object tmp = components.get(name);
 				if(tmp instanceof String)
 				{
 					model = (String)tmp;
@@ -212,8 +195,31 @@ public class SpringPlatform extends AbstractPlatform
 					args = (Map)tmp;
 					model = (String)args.remove("model");
 					config = (String)args.remove("config");
+					Number num = (Number)args.remove("number");
+					if(num!=null)
+						number = num.intValue();
+					Boolean mas = (Boolean)args.remove("master");
+					if(mas!=null)
+						master = mas.booleanValue();
+					Boolean dae = (Boolean)args.remove("daemon");
+					if(dae!=null)
+						daemon = dae.booleanValue();
+					Boolean sus = (Boolean)args.remove("suspend");
+					if(sus!=null)
+						suspend = sus.booleanValue();
 				}
-				createComponent(name, model, config, args, false);
+				CreationInfo cinfo = new CreationInfo(config, args, null, suspend, master, daemon);
+				if(number>1)
+				{
+					for(int j=0; j<number; j++)
+					{
+						ces.createComponent(null, model, cinfo, null, null);
+					}
+				}
+				else
+				{
+					ces.createComponent(name, model, cinfo, null, null);
+				}
 			}
 		}
 	}

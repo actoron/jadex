@@ -8,6 +8,10 @@
 		<constructor-arg type="java.lang.String"><value>lars</value></constructor-arg>
 	</bean>
 	
+	<bean name="autoShutdown" class="java.lang.Boolean">
+		<constructor-arg type="boolean" value="true"></constructor-arg>
+	</bean>
+	
 	<bean name="threadPool" class="jadex.commons.concurrent.ThreadPool">
 		<constructor-arg>
 			<bean class="jadex.commons.concurrent.DefaultThreadPoolStrategy">
@@ -23,6 +27,8 @@
 	<bean id="platform" class="jadex.standalone.SpringPlatform">
 		
 		<property name="platformName" ref="platformName" />
+		
+		<property name="autoShutdown" ref="autoShutdown"/>
 		
 		<property name="shutdownTime">
 			<value type="long">10000</value>
@@ -71,6 +77,9 @@
 							</key>
 							<bean class="jadex.standalone.service.ComponentManagementService">
 								<constructor-arg ref="platform"/>
+								<constructor-arg ref="autoShutdown">
+									<!-- <bean id="autoshutdown" factory-bean="platform" factory-method="isAutoShutdown"/>  -->
+								</constructor-arg>
 							</bean>
 						</entry>
 					</map>
@@ -271,21 +280,54 @@
 			</map>
 		</property>
 		
-		<property name="daemonComponents">
+		<property name="components">
 			<map>
 				<entry>
 					<key><value>ams</value></key>
-					<value type="java.lang.String">jadex/bdi/cmsagent/CMS.agent.xml</value>
+					<map>
+						<entry>
+							<key>
+								<value type="java.lang.String">model</value>
+							</key>
+							<value type="java.lang.String">jadex/bdi/cmsagent/CMS.agent.xml</value>
+						</entry>
+						<entry>
+							<key>
+								<value type="java.lang.String">daemon</value>
+							</key>
+							<value type="boolean">true</value>
+						</entry>
+						<entry>
+							<key>
+								<value type="java.lang.String">master</value>
+							</key>
+							<value type="boolean">true</value>
+						</entry>
+					</map>
 				</entry>
 				<entry>
 					<key><value>df</value></key>
-					<value type="java.lang.String">jadex/bdi/dfagent/DF.agent.xml</value>
+					<map>
+						<entry>
+							<key>
+								<value type="java.lang.String">model</value>
+							</key>
+							<value type="java.lang.String">jadex/bdi/dfagent/DF.agent.xml</value>
+						</entry>
+						<entry>
+							<key>
+								<value type="java.lang.String">daemon</value>
+							</key>
+							<value type="boolean">true</value>
+						</entry>
+						<entry>
+							<key>
+								<value type="java.lang.String">master</value>
+							</key>
+							<value type="boolean">true</value>
+						</entry>
+					</map>
 				</entry>
-			</map>
-		</property>
-		
-		<property name="components">
-			<map>
 				<entry>
 					<key><value>jcc</value></key>
 					<value type="java.lang.String">jadex/tools/jcc/JCC.agent.xml</value>

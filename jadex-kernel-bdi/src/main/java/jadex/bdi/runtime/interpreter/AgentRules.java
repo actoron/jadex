@@ -212,7 +212,10 @@ public class AgentRules
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
 				BDIInterpreter	interpreter	= BDIInterpreter.getInterpreter(state);
-//				System.out.println("Terminated agent: "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName());
+				
+//				String name = BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName();
+//				if(name.indexOf("jcc")!=-1)
+//				System.out.println("Terminated agent: "+name);
 
 				// Todo: no more rules should trigger -> No dropping of agent object!? 
 				Object ragent = assignments.getVariableValue("?ragent");
@@ -371,6 +374,7 @@ public class AgentRules
 		
 		// Cleanup plans.
 		Collection plans = state.getAttributeValues(rcapa, OAVBDIRuntimeModel.capability_has_plans);
+//		System.out.println("here: "+rcapa+" "+plans);
 		if(plans!=null)
 		{
 			for(Iterator it=plans.iterator(); it.hasNext(); )

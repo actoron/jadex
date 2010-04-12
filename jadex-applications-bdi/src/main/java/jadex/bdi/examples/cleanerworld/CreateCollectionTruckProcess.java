@@ -81,7 +81,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 				ongoing.addAll(todo);
 				IComponentManagementService	ces	= (IComponentManagementService)app.getServiceContainer().getService(IComponentManagementService.class);
 				ces.createComponent(null, app.getComponentFilename("Truck"),
-					new CreationInfo(null, params, app.getComponentIdentifier(), false, false, app.getAllImports()), new IResultListener()
+					new CreationInfo(null, params, app.getComponentIdentifier(), false, false, false, app.getAllImports()), new IResultListener()
 				{
 					public void exceptionOccurred(Object source, Exception exception)
 					{

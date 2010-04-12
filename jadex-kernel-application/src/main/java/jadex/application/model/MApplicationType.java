@@ -1,7 +1,6 @@
 package jadex.application.model;
 
 import jadex.bridge.Argument;
-import jadex.bridge.IArgument;
 import jadex.commons.SUtil;
 
 import java.util.ArrayList;
@@ -19,6 +18,9 @@ public class MApplicationType
 	
 	/** The package. */
 	protected String packagename;
+	
+	/** The autoshutdown flag. */
+	protected boolean autoshutdown;
 	
 	/** The imports. */
 	protected List imports;
@@ -54,6 +56,7 @@ public class MApplicationType
 		this.applications = new ArrayList();
 		this.arguments = new ArrayList();
 		this.results = new ArrayList();
+		this.autoshutdown = true;
 	}
 	
 	//-------- methods --------
@@ -110,6 +113,24 @@ public class MApplicationType
 	public void setDescription(String description)
 	{
 		this.description = description;
+	}
+	
+	/**
+	 *  Get the autoshutdown.
+	 *  @return The autoshutdown.
+	 */
+	public boolean isAutoShutdown()
+	{
+		return this.autoshutdown;
+	}
+
+	/**
+	 *  Set the autoshutdown.
+	 *  @param autoshutdown The autoshutdown to set.
+	 */
+	public void setAutoShutdown(boolean autoshutdown)
+	{
+		this.autoshutdown = autoshutdown;
 	}
 
 	/**

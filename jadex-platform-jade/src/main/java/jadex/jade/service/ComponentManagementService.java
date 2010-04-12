@@ -72,13 +72,19 @@ public class ComponentManagementService implements IComponentManagementService, 
 	/** The result (kill listeners). */
 	protected Map killresultlisteners;
 	
+	/** The daemon counter. */
+	protected int daemons;
+	
+	/** The autoshutdown flag. */
+	protected boolean autoshutdown;
+	
     //-------- constructors --------
 
     /**
      *  Create a new component execution service.#
      *  @param container	The service container.
      */
-    public ComponentManagementService(Platform platform)
+    public ComponentManagementService(Platform platform, boolean autoshutdown)
 	{
 		this.platform = platform;
 		this.adapters = Collections.synchronizedMap(SCollection.createHashMap());
@@ -88,7 +94,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 		this.logger = Logger.getLogger(platform.getName()+".cms");
 		this.listeners = SCollection.createMultiCollection();
 		this.killresultlisteners = Collections.synchronizedMap(SCollection.createHashMap());
-    }
+		this.autoshutdown = autoshutdown;
+	}
     
     //-------- IComponentManagementService interface --------
 
@@ -101,7 +108,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 */
 	public void	createComponent(String name, String model, CreationInfo cinfo, IResultListener lis, final IResultListener killlistener)
 	{
-		System.out.println("Create agent: "+name);
+//		System.out.println("Create agent: "+name);
 		
 		final CreationInfo info	= cinfo!=null ? cinfo : new CreationInfo();	// Dummy default info, if null.
 		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
@@ -168,9 +175,13 @@ public class ComponentManagementService implements IComponentManagementService, 
 			return;
 		}
 		
-		final CMSComponentDescription ad = new CMSComponentDescription(aid, type, info.getParent(), info.isMaster());
+		final CMSComponentDescription ad = new CMSComponentDescription(aid, type, info.getParent(), info.isMaster(), info.isDaemon());
 		
-//			System.out.println("added: "+agentdescs.size()+", "+aid);
+		// Increase daemon cnt
+		if(cinfo.isDaemon())
+			daemons++;
+		
+//		System.out.println("added: "+agentdescs.size()+", "+aid);
 		
 		IComponentDescription padesc = info.getParent()!=null? (IComponentDescription)descs.get(info.getParent()): null;
 		// Suspend when set to suspend or when parent is also suspended or when specified in model.
@@ -608,20 +619,25 @@ public class ComponentManagementService implements IComponentManagementService, 
 			JadeAgentAdapter adapter;
 			JadeAgentAdapter pad = null;
 			CMSComponentDescription desc;
+			boolean shutdown = false;
 			synchronized(adapters)
 			{
 				synchronized(descs)
 				{
-//						System.out.println("CleanupCommand remove called for: "+cid);
+//					System.out.println("CleanupCommand remove called for: "+cid);
 					adapter = (JadeAgentAdapter)adapters.remove(cid);
 					if(adapter==null)
 						throw new RuntimeException("Component Identifier not registered: "+cid);
 					
 					results = adapter.getComponentInstance().getResults();
 					
-					desc = (CMSComponentDescription)descs.get(cid);
+					desc = (CMSComponentDescription)descs.remove(cid);
 					desc.setState(IComponentDescription.STATE_TERMINATED);
-					descs.remove(cid);
+					if(desc.isDaemon())
+						daemons--;
+					if(adapters.size()-daemons==0)
+						shutdown = true;
+			
 					ccs.remove(cid);
 					
 					// Stop execution of component.
@@ -694,6 +710,10 @@ public class ComponentManagementService implements IComponentManagementService, 
 					((IResultListener)killlisteners.get(i)).resultAvailable(source, result);
 				}
 			}
+			
+			// Shudown platform when last (non-daemon) component was destroyed
+			if(shutdown)
+				platform.shutdown(null);
 		}
 		
 		public void exceptionOccurred(Object source, Exception exception)
@@ -834,7 +854,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 */
 	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, IComponentIdentifier parent)
 	{
-		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, parent, false);
+		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, parent, false, false);
 		ret.setState(state);
 		ret.setOwnership(ownership);
 		return ret;

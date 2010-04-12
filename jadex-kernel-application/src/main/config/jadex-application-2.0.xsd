@@ -99,6 +99,7 @@
 				<xs:documentation>The package of the application type. The package should correspond to the directory structure, the application descriptor is contained in (like the package of a Java class). The package is also used for lookup of classes and other files (e.g. agent descriptors).</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
+		<xs:attribute name="autoshutdown" type="xs:boolean" use="optional" default="true"/>
 	</xs:complexType>
 	<xs:complexType name="componenttype">
 		<xs:annotation>
@@ -200,11 +201,6 @@
 				<xs:documentation>The configuration of the agent (as specified in the agent's ADF).</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
-		<xs:attribute name="start" type="xs:boolean" use="optional" default="true">
-			<xs:annotation>
-				<xs:documentation>Per default, each created agent is also started (i.e. will immidiately start to execute any actions). Set the start flag to false, if the agent should be started later manually.</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
 		<xs:attribute name="number" type="xs:string" use="optional" default="1">
 			<xs:annotation>
 				<xs:documentation>Allows the create multiple agent instances at once. If omitted only one agent is created.</xs:documentation>
@@ -216,6 +212,7 @@
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="suspend" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="daemon" type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="argument" mixed="true">
 		<xs:annotation>
