@@ -1070,7 +1070,7 @@ public class BpmnXMLReader
 									/*String dir =*/ stok2.nextToken();	// Todo: consider direction.
 									String name = stok2.nextToken();
 									String clazzname = stok2.nextToken();
-									String val = stok2.nextToken();
+									String val = stok2.hasMoreTokens() ? stok2.nextToken() : null;
 									
 									// context variable
 									Class clazz = SReflect.findClass0(clazzname, model.getAllImports(), context.getClassLoader());

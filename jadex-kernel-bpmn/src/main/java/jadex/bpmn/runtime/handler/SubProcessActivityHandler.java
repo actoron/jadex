@@ -1,6 +1,7 @@
 package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
@@ -9,7 +10,9 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.concurrent.IResultListener;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Handler for (embedded) sub processes.
@@ -45,20 +48,46 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 		// External subprocess
 		else if((start==null || start.isEmpty()) && file!=null)
 		{
+			// Extract arguments from in/inout parameters.
+			Map	args	= null;
+			List	params	= activity.getParameters(new String[]{MParameter.DIRECTION_IN, MParameter.DIRECTION_INOUT});
+			if(params!=null && !params.isEmpty())
+			{
+				args	= new HashMap();
+				for(int i=0; i<params.size(); i++)
+				{
+					MParameter	param	= (MParameter)params.get(i);
+					args.put(param.getName(), thread.getParameterValue(param.getName()));
+				}
+			}
+
 			thread.setWaiting(true);
 			IComponentManagementService	cms	= (IComponentManagementService)instance.getComponentAdapter()
 				.getServiceContainer().getService(IComponentManagementService.class);
 			
 			cms.createComponent(null, file,
-				new CreationInfo(null, null, instance.getComponentIdentifier(), false, false, false, instance.getModelElement().getAllImports()), null, new IResultListener()
+				new CreationInfo(null, args, instance.getComponentIdentifier(), false, false, false, instance.getModelElement().getAllImports()), null, new IResultListener()
 			{
-				public void resultAvailable(Object source, Object result)
+				public void resultAvailable(Object source, final Object result)
 				{
 					instance.getComponentAdapter().invokeLater(new Runnable()
 					{
 						public void run()
 						{
-							// Todo: store results.
+							// Store results in out parameters.
+							Map	results	= (Map)result;
+							List	params	= activity.getParameters(new String[]{MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT});
+							if(params!=null && !params.isEmpty())
+							{
+								for(int i=0; i<params.size(); i++)
+								{
+									MParameter	param	= (MParameter)params.get(i);
+									if(results.containsKey(param.getName()))
+									{
+										thread.setParameterValue(param.getName(), results.get(param.getName()));
+									}
+								}
+							}
 							thread.setNonWaiting();
 							instance.getStepHandler(activity).step(activity, instance, thread, null);
 						}

@@ -25,7 +25,7 @@
 
 	<beliefs>
 		<belief name="runs" class="int" exported="true">
-			<fact>10000</fact>
+			<fact>1000</fact>
 			<!-- Todo: support old (v1) number of runs. -->
 			<!-- <fact>10000</fact> -->
 		</belief>
