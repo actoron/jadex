@@ -23,6 +23,7 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -338,6 +339,7 @@ public class Platform extends AbstractPlatform
 							public void resultAvailable(Object source, Object result)
 							{
 								if(((IComponentIdentifier[])result).length <= daemoncomponents.size())
+//								if(((Set)result).size() <= daemoncomponents.size())
 									shutdown(null);
 							}
 	

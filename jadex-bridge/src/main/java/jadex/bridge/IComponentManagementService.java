@@ -59,6 +59,8 @@ public interface IComponentManagementService
 	/**
 	 *  Get the component identifiers.
 	 *  @return The component identifiers.
+	 *  
+	 *  This method should be used with caution when the agent population is large.
 	 */
 	public void getComponentIdentifiers(IResultListener listener);
 	
