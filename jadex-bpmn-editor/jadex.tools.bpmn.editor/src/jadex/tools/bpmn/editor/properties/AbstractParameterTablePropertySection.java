@@ -190,7 +190,7 @@ public class AbstractParameterTablePropertySection extends
 		// register the table viewer for new element
 		addParameterTableViewerFor(modelElement, tableViewer);
 		
-		System.out.println(tableViewerMap.size());
+		//System.out.println(tableViewerMap.size());
 	}
 
 	/**

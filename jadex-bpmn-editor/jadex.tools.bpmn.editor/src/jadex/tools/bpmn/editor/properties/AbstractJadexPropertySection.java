@@ -3,6 +3,10 @@
  */
 package jadex.tools.bpmn.editor.properties;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import jadex.tools.bpmn.diagram.Messages;
 import jadex.tools.bpmn.editor.JadexBpmnPlugin;
 
@@ -105,6 +109,8 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	/** The EAnnotations detail that contains the information */
 	protected String annotationDetailName;
 
+	/** all controls for this section */
+	protected List<Control> controls;
 	
 	
 	// ---- constructor ----
@@ -123,6 +129,8 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 		
 		this.containerEAnnotationName = containerEAnnotationName;
 		this.annotationDetailName = annotationDetailName;
+		
+		this.controls = new ArrayList<Control>();
 	}
 
 
@@ -150,6 +158,11 @@ public abstract class AbstractJadexPropertySection extends AbstractPropertySecti
 	@Override
 	public void dispose()
 	{
+		for (Control control : controls)
+		{
+			control.dispose();
+		}
+		
 		if (sectionComposite != null)
 			sectionComposite.dispose();
 		
