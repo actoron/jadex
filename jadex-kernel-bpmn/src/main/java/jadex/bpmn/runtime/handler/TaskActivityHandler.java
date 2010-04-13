@@ -19,8 +19,7 @@ public class TaskActivityHandler extends DefaultActivityHandler
 	 */
 	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
-//		Class taskimpl = (Class)getPropertyValue(activity, instance, thread, "class");
-		Class taskimpl = (Class)thread.getPropertyValue("class");
+		Class taskimpl = activity.getClazz();
 		if(taskimpl!=null)
 		{
 //			thread.setWaitingState(ProcessThread.WAITING_FOR_TASK);

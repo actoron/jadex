@@ -11,7 +11,7 @@
       </eAnnotations>
       <vertices xmi:type="bpmn:Activity" xmi:id="_ojTX8z1-Ed-Jdb7I0xLn6A" iD="_ojTX8j1-Ed-Jdb7I0xLn6A" name="Credit Check">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_rzdhID1-Ed-Jdb7I0xLn6A" source="jadex">
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rzdhIT1-Ed-Jdb7I0xLn6A" key="class" value="jadex.bpmn.runtime.task.UserInteractionTask.class"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rzdhIT1-Ed-Jdb7I0xLn6A" key="class" value="jadex.bpmn.runtime.task.UserInteractionTask"/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_8zGSED1-Ed-Jdb7I0xLn6A" key="parameters" value=""/>
         </eAnnotations>
       </vertices>
@@ -24,13 +24,13 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_yCzYQT1-Ed-Jdb7I0xLn6A" iD="_yCzYQD1-Ed-Jdb7I0xLn6A" incomingEdges="_yCzYSj1-Ed-Jdb7I0xLn6A" name="Credit Approved" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ybgMID1-Ed-Jdb7I0xLn6A" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ybgMIT1-Ed-Jdb7I0xLn6A" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ybgMIT1-Ed-Jdb7I0xLn6A" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__ezDUD1-Ed-Jdb7I0xLn6A" key="parameters" value="in␋text␋java.lang.String␋&quot;Credit Approved!&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_02_XIT1-Ed-Jdb7I0xLn6A" iD="_02_XID1-Ed-Jdb7I0xLn6A" incomingEdges="_03IhEj1-Ed-Jdb7I0xLn6A" name="Credit Denied" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2kfawD1-Ed-Jdb7I0xLn6A" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2kpLwD1-Ed-Jdb7I0xLn6A" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2kpLwD1-Ed-Jdb7I0xLn6A" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BtoSYD1_Ed-Jdb7I0xLn6A" key="parameters" value="in␋text␋java.lang.String␋&quot;Credit Denied!&quot;"/>
       </eAnnotations>
     </vertices>

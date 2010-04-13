@@ -24,14 +24,14 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_Dze68RDlEd-qQOr2ZLx-Mw" iD="_Dze68BDlEd-qQOr2ZLx-Mw" outgoingEdges="_IcnCMRDlEd-qQOr2ZLx-Mw" incomingEdges="_cq9VYRDmEd-qQOr2ZLx-Mw" name="Success">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ZiDgMBDlEd-qQOr2ZLx-Mw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZiDgMRDlEd-qQOr2ZLx-Mw" key="class" value="StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZiDgMRDlEd-qQOr2ZLx-Mw" key="class" value="StoreResultsTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_eQtAoBDlEd-qQOr2ZLx-Mw" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Object␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;For loop testcase.&quot;, true, null)})"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_zfsG4RDlEd-qQOr2ZLx-Mw" iD="_zfsG4BDlEd-qQOr2ZLx-Mw" outgoingEdges="_gBYeoRDmEd-qQOr2ZLx-Mw" incomingEdges="_t9_3IRFtEd-qQOr2ZLx-Mw" name="Failure">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_9OLcoBFtEd-qQOr2ZLx-Mw" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9OLcoRFtEd-qQOr2ZLx-Mw" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;For loop testcase.&quot;, false, &quot;Wrong number of loops performed.&quot;)})"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QktFEBFxEd-qQOr2ZLx-Mw" key="class" value="StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QktFEBFxEd-qQOr2ZLx-Mw" key="class" value="StoreResultsTask"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_Z2Dk0RDmEd-qQOr2ZLx-Mw" iD="_Z2Dk0BDmEd-qQOr2ZLx-Mw" outgoingEdges="_cq9VYRDmEd-qQOr2ZLx-Mw _t9_3IRFtEd-qQOr2ZLx-Mw" incomingEdges="_r_9Q0RDjEd-hjJU8_9Katg" activityType="GatewayDataBasedExclusive"/>

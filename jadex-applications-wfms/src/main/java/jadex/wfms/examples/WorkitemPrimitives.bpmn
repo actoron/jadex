@@ -7,7 +7,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_4FnHYRogEd-ylKS_uyVCzg" iD="_4FnHYBogEd-ylKS_uyVCzg" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_4FnucRogEd-ylKS_uyVCzg" iD="_4FnucBogEd-ylKS_uyVCzg" outgoingEdges="_6DhBsRokEd-ylKS_uyVCzg" incomingEdges="_yRzY4RokEd-ylKS_uyVCzg" name="Primitive_Parameters_Demo" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_xNQLoBokEd-ylKS_uyVCzg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xNQLoRokEd-ylKS_uyVCzg" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xNQLoRokEd-ylKS_uyVCzg" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-R-mMBokEd-ylKS_uyVCzg" key="parameters" value="in␋ReadOnly_String_Parameter␋String␋&quot;This is a read-only String parameter&quot;␟in␋ReadOnly_Numeric_Parameter␋int␋1883␟out␋Writable_String_Parameter␋String␋␟out␋Writable_Numeric_Parameter␋int␋␟out␋Writable_Boolean_Parameter␋boolean␋"/>
       </eAnnotations>
     </vertices>

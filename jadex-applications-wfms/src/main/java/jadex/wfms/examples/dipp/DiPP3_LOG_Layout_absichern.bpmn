@@ -7,14 +7,14 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_bPs3wBfKEd--f9rCzIALWw" iD="_bPsQsBfKEd--f9rCzIALWw" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_bP2BsRfKEd--f9rCzIALWw" iD="_bP2BsBfKEd--f9rCzIALWw" outgoingEdges="_2TRy0RfKEd--f9rCzIALWw" incomingEdges="_fyBMYRfKEd--f9rCzIALWw" name="Einrichtungsplanung_absichern" lanes="_eId0oBfKEd--f9rCzIALWw" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_mBN5kBfKEd--f9rCzIALWw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mBOgoBfKEd--f9rCzIALWw" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mBOgoBfKEd--f9rCzIALWw" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rcOJsBfKEd--f9rCzIALWw" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP3 - Absicherung Layout &lt;/H2> &lt;br> &lt;H3> Absichern der Einrichtungsplanung, inkl. Lager &lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_fmi8MRfKEd--f9rCzIALWw" iD="_fmi8MBfKEd--f9rCzIALWw" outgoingEdges="_fyBMYRfKEd--f9rCzIALWw" lanes="_eId0oBfKEd--f9rCzIALWw" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_1xCocRfKEd--f9rCzIALWw" iD="_1xCocBfKEd--f9rCzIALWw" outgoingEdges="__EMO0RfKEd--f9rCzIALWw" incomingEdges="_2TRy0RfKEd--f9rCzIALWw" name="Foerdereinrichtungen_absichern" lanes="_eId0oBfKEd--f9rCzIALWw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_12VYIBfKEd--f9rCzIALWw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_12VYIRfKEd--f9rCzIALWw" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_12VYIRfKEd--f9rCzIALWw" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2k5HQBfKEd--f9rCzIALWw" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP3 - Absicherung Layout &lt;/H2> &lt;br> &lt;H3>nochmaliges Absichern F&amp;ouml;rdertechnik &lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)"/>
       </eAnnotations>
     </vertices>

@@ -9,13 +9,13 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_dfcE4RZNEd-3x875FMiSmQ" iD="_dfcE4BZNEd-3x875FMiSmQ" outgoingEdges="_HjdKMBZXEd-xN_GMKM5g9Q" lanes="_cbk0IRZNEd-3x875FMiSmQ" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_4i2n4RZNEd-3x875FMiSmQ" iD="_4i2n4BZNEd-3x875FMiSmQ" outgoingEdges="_PhK6gRcOEd-4T9k5IgEFpw" incomingEdges="_KjTSURcOEd-4T9k5IgEFpw" name="LogPlaene_100Prozent_speichern" lanes="_cbk0IRZNEd-3x875FMiSmQ">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_4pdmMBZNEd-3x875FMiSmQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4peNQBZNEd-3x875FMiSmQ" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4peNQBZNEd-3x875FMiSmQ" key="class" value="jadex.bdibpmn.task.WriteBeliefTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_R3ukcBZZEd-xN_GMKM5g9Q" key="parameters" value="in␋beliefname␋String␋&quot;LogPlaene_100Prozent&quot;␟in␋value␋Object␋␟inout␋counter␋int␋"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_sTLh0RZUEd-xN_GMKM5g9Q" iD="_sTLh0BZUEd-xN_GMKM5g9Q" outgoingEdges="_KjTSURcOEd-4T9k5IgEFpw" incomingEdges="_jSM0ARcZEd-4T9k5IgEFpw" name="Pruefen_Status_Mengengeruest" lanes="_cbk0IRZNEd-3x875FMiSmQ">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_sgtngBZUEd-xN_GMKM5g9Q" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sguOkBZUEd-xN_GMKM5g9Q" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_sguOkBZUEd-xN_GMKM5g9Q" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5DSP4BZXEd-xN_GMKM5g9Q" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP2 - Absicherung Prozessplanung &lt;/H2> &lt;BR> &lt;H3> Status Mengenger&amp;uuml;st &lt;BR> &lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)␟inout␋Logistikplaene_angelegt␋boolean␋$beliefbase.LogPlaene_100Prozent␟inout␋Teilefamilen_definiert␋boolean␋$beliefbase.TF_100Prozent␟inout␋PositionsVarianten_verknuepft␋boolean␋$beliefbase.PosV_100Prozent␟inout␋IGNORE_counter␋int␋"/>
       </eAnnotations>
     </vertices>
@@ -23,19 +23,19 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_Lopd8RZXEd-xN_GMKM5g9Q" iD="_Lopd8BZXEd-xN_GMKM5g9Q" incomingEdges="_MipoERZXEd-xN_GMKM5g9Q" lanes="_cbk0IRZNEd-3x875FMiSmQ" activityType="EventEndEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_9XZT8RZYEd-xN_GMKM5g9Q" iD="_9XZT8BZYEd-xN_GMKM5g9Q" outgoingEdges="_QeyZURcOEd-4T9k5IgEFpw" incomingEdges="_P-5_YRcOEd-4T9k5IgEFpw" name="PosV_100Prozent_speichern" lanes="_cbk0IRZNEd-3x875FMiSmQ">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-jzcsBZYEd-xN_GMKM5g9Q" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-j0DwBZYEd-xN_GMKM5g9Q" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-j0DwBZYEd-xN_GMKM5g9Q" key="class" value="jadex.bdibpmn.task.WriteBeliefTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_eN2zoBZZEd-xN_GMKM5g9Q" key="parameters" value="in␋beliefname␋String␋&quot;PosV_100Prozent&quot;␟in␋value␋Object␋␟inout␋counter␋int␋"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_9jLtMRZYEd-xN_GMKM5g9Q" iD="_9jLtMBZYEd-xN_GMKM5g9Q" outgoingEdges="_P-5_YRcOEd-4T9k5IgEFpw" incomingEdges="_PhK6gRcOEd-4T9k5IgEFpw" name="TF_100Prozent_speichern" lanes="_cbk0IRZNEd-3x875FMiSmQ">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_My_fQBZZEd-xN_GMKM5g9Q" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_My_fQRZZEd-xN_GMKM5g9Q" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_My_fQRZZEd-xN_GMKM5g9Q" key="class" value="jadex.bdibpmn.task.WriteBeliefTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VwjQIBZZEd-xN_GMKM5g9Q" key="parameters" value="in␋beliefname␋String␋&quot;TF_100Prozent&quot;␟in␋value␋Object␋␟inout␋counter␋int␋"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_tN32MRZZEd-xN_GMKM5g9Q" iD="_tN32MBZZEd-xN_GMKM5g9Q" outgoingEdges="_paCycRcNEd-4T9k5IgEFpw" incomingEdges="_QeyZURcOEd-4T9k5IgEFpw" name="Durchfuehren_Ablaufsimulation_ModelMix" lanes="_cbk0IRZNEd-3x875FMiSmQ">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ttJzMBZZEd-xN_GMKM5g9Q" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ttJzMRZZEd-xN_GMKM5g9Q" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ttJzMRZZEd-xN_GMKM5g9Q" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5p-KgBZZEd-xN_GMKM5g9Q" key="parameters" value="in␋IGNORE_counter␋int␋␟in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP2 - Absicherung Prozessplanung &lt;/H2> &lt;br> &lt;H3> Ablaufsimulation Werk &quot; + zielwerke[IGNORE_counter] + &quot; zur Absicherung im &lt;u> ModelMix &lt;/u>&lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)"/>
       </eAnnotations>
     </vertices>

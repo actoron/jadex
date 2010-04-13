@@ -3,7 +3,7 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Cn3ScEZFEd-3iKqz0F2Flw" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Cn3ScUZFEd-3iKqz0F2Flw" key="Description" value="&lt;h1>Pizza Counter&lt;/h1>The process usages the external inventory process to count tomatoes and cheese and prints out how many pizzas can be made."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Cn3SckZFEd-3iKqz0F2Flw" key="Package" value="jadex.bpmn.tutorial"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZWbbcEZNEd-3iKqz0F2Flw" key="parameters" value="inout␋tomatoe_count␋int␋␟inout␋cheese_count␋int␋"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZWbbcEZNEd-3iKqz0F2Flw" key="parameters" value=""/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_BaQP10ZFEd-3iKqz0F2Flw" iD="_BaQP1kZFEd-3iKqz0F2Flw" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_D-kmsUZFEd-3iKqz0F2Flw" iD="_D-kmsEZFEd-3iKqz0F2Flw" outgoingEdges="_E94HmkZFEd-3iKqz0F2Flw" activityType="EventStartEmpty"/>
@@ -11,19 +11,19 @@
     <vertices xmi:type="bpmn:SubProcess" xmi:id="_F972YUZFEd-3iKqz0F2Flw" iD="_F972YEZFEd-3iKqz0F2Flw" outgoingEdges="_OwKhCkZFEd-3iKqz0F2Flw" incomingEdges="_F-PYYUZFEd-3iKqz0F2Flw" name="Count Tomatoes&#xD;&#xA;file = &quot;C4_Arguments.bpmn&quot;" activityType="SubProcess">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_GUlb0EZFEd-3iKqz0F2Flw" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GUlb0UZFEd-3iKqz0F2Flw" key="class" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aXFg0EZFEd-3iKqz0F2Flw" key="parameters" value="in␋item_type␋String␋&quot;Tomatoes&quot;␟out␋item_count␋int␋"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aXFg0EZFEd-3iKqz0F2Flw" key="parameters" value="in␋item_type␋String␋&quot;Tomatoes&quot;␟out␋tomatoe_count␋int␋$results.get(&quot;item_count&quot;)"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:SubProcess" xmi:id="_KBJ0MUZFEd-3iKqz0F2Flw" iD="_KBJ0MEZFEd-3iKqz0F2Flw" outgoingEdges="_PFnMkUZFEd-3iKqz0F2Flw" incomingEdges="_KBJ0SkZFEd-3iKqz0F2Flw" name="Count Cheese&#xD;&#xA;file = &quot;C4_Arguments.bpmn&quot;" activityType="SubProcess">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KbXrAEZFEd-3iKqz0F2Flw" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KbXrAUZFEd-3iKqz0F2Flw" key="class" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fbi5MEZFEd-3iKqz0F2Flw" key="parameters" value="in␋item_type␋String␋&quot;Cheese&quot;␟out␋item_count␋int␋"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fbi5MEZFEd-3iKqz0F2Flw" key="parameters" value="in␋item_type␋String␋&quot;Cheese&quot;␟out␋cheese_count␋int␋$results.get(&quot;item_count&quot;)"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_OwKhAUZFEd-3iKqz0F2Flw" iD="_OwKhAEZFEd-3iKqz0F2Flw" outgoingEdges="_Q3uqekZFEd-3iKqz0F2Flw" incomingEdges="_OwKhCkZFEd-3iKqz0F2Flw _PFnMkUZFEd-3iKqz0F2Flw" activityType="GatewayParallel"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_Q3uqcUZFEd-3iKqz0F2Flw" iD="_Q3uqcEZFEd-3iKqz0F2Flw" incomingEdges="_Q3uqekZFEd-3iKqz0F2Flw" name="Print Pizza Count" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Q9PckEZFEd-3iKqz0F2Flw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Q9PckUZFEd-3iKqz0F2Flw" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Q9PckUZFEd-3iKqz0F2Flw" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_o9SRAEZMEd-3iKqz0F2Flw" key="parameters" value="in␋text␋java.lang.String␋&quot;Ingredients available for &quot;+Math.min(tomatoe_count, cheese_count)+&quot; pizzas.&quot;"/>
       </eAnnotations>
     </vertices>
@@ -35,7 +35,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gU5pcUZNEd-3iKqz0F2Flw" key="condition" value=""/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hOGiUEZNEd-3iKqz0F2Flw" source="sequence">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hOGiUUZNEd-3iKqz0F2Flw" key="mappings" value="tomatoe_count␋item_count"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hOGiUUZNEd-3iKqz0F2Flw" key="mappings" value=""/>
       </eAnnotations>
     </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_PFnMkUZFEd-3iKqz0F2Flw" iD="_PFnMkEZFEd-3iKqz0F2Flw">
@@ -43,7 +43,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jGBtQUZNEd-3iKqz0F2Flw" key="condition" value=""/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_jWkDoEZNEd-3iKqz0F2Flw" source="sequence">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jWkDoUZNEd-3iKqz0F2Flw" key="mappings" value="cheese_count␋item_count"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jWkDoUZNEd-3iKqz0F2Flw" key="mappings" value=""/>
       </eAnnotations>
     </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Q3uqekZFEd-3iKqz0F2Flw" iD="_Q3uqeUZFEd-3iKqz0F2Flw">

@@ -7,20 +7,20 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_rkvhoRfMEd-uLKn09PqHSg" iD="_rkvhoBfMEd-uLKn09PqHSg" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_rk1oQRfMEd-uLKn09PqHSg" iD="_rk1oQBfMEd-uLKn09PqHSg" outgoingEdges="_XEIu4RfNEd-uLKn09PqHSg" incomingEdges="__zTFoRfMEd-uLKn09PqHSg" name="Simulation_Planer_informieren" lanes="_6Yfp0RfMEd-uLKn09PqHSg" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2xoQ0BfMEd-uLKn09PqHSg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2xoQ0RfMEd-uLKn09PqHSg" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2xoQ0RfMEd-uLKn09PqHSg" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Q34A8BfNEd-uLKn09PqHSg" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> &lt;font color=red> DiPP - Simulation hat Fehler aufgedeckt &lt;/H2> &lt;BR> &lt;H3> Bei der Durchf&amp;uuml;hrung der DiPP 3 Simulation wurden Fehler aufgedeckt. &lt;br> Bitte notwendige &amp;Auml;nderungen veranlassen und die DiPP-3 Simulation wiederholen. &lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_3mSn8BfMEd-uLKn09PqHSg" iD="_3mSA4BfMEd-uLKn09PqHSg" outgoingEdges="__zTFoRfMEd-uLKn09PqHSg" lanes="_6Yfp0RfMEd-uLKn09PqHSg" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_WhWK4RfNEd-uLKn09PqHSg" iD="_WhWK4BfNEd-uLKn09PqHSg" outgoingEdges="_d4cIsRfXEd-uLKn09PqHSg" incomingEdges="_XEIu4RfNEd-uLKn09PqHSg" name="Ruecksetzen_Kontext" lanes="_6Yfp0RfMEd-uLKn09PqHSg">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WnB8IBfNEd-uLKn09PqHSg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WnB8IRfNEd-uLKn09PqHSg" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WnB8IRfNEd-uLKn09PqHSg" key="class" value="jadex.bdibpmn.task.WriteBeliefTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZedcQBfNEd-uLKn09PqHSg" key="parameters" value="in␋beliefname␋String␋&quot;Simulation_Ergebnis&quot;␟in␋value␋Object␋&quot;Repeat&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_bUzuURfXEd-uLKn09PqHSg" iD="_bUzuUBfXEd-uLKn09PqHSg" outgoingEdges="_xgOnoRfXEd-uLKn09PqHSg" incomingEdges="_d4cIsRfXEd-uLKn09PqHSg" name="Simulation_reaktivieren" lanes="_6Yfp0RfMEd-uLKn09PqHSg">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_bbp9MBfXEd-uLKn09PqHSg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bbp9MRfXEd-uLKn09PqHSg" key="class" value="jadex.bdibpmn.task.DispatchGoalTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bbp9MRfXEd-uLKn09PqHSg" key="class" value="jadex.bdibpmn.task.DispatchGoalTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_njf4wBfXEd-uLKn09PqHSg" key="parameters" value="in␋type␋String␋&quot;DiPP3_LOG_Logistik_intern_absichern&quot;␟in␋wait␋boolean␋true"/>
       </eAnnotations>
     </vertices>

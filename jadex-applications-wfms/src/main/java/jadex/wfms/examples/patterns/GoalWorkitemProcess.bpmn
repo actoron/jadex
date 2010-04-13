@@ -7,7 +7,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_K3waYShcEd-nnsAadsvZUA" iD="_K3waYChcEd-nnsAadsvZUA" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_K3waYyhcEd-nnsAadsvZUA" iD="_K3waYihcEd-nnsAadsvZUA" outgoingEdges="_NqSMYShcEd-nnsAadsvZUA" incomingEdges="_NY_oEShcEd-nnsAadsvZUA" name="GoalTask" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_L6BIoChcEd-nnsAadsvZUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_L6BvsChcEd-nnsAadsvZUA" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_L6BvsChcEd-nnsAadsvZUA" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QibeMChcEd-nnsAadsvZUA" key="parameters" value="in␋META_name␋String␋String.valueOf($plan.getReason().getType())"/>
       </eAnnotations>
     </vertices>

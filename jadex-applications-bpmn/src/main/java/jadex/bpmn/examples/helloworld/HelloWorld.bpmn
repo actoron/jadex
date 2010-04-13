@@ -8,7 +8,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_1cEzRxZEEd-yC473XtaJZQ" iD="_1cEzRhZEEd-yC473XtaJZQ" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_1cOkQRZEEd-yC473XtaJZQ" iD="_1cOkQBZEEd-yC473XtaJZQ" outgoingEdges="_fEUmwRZHEd-yC473XtaJZQ" incomingEdges="_WwWlcRZHEd-yC473XtaJZQ" name="Print Hello" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_MsBZwBZHEd-yC473XtaJZQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MsBZwRZHEd-yC473XtaJZQ" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_MsBZwRZHEd-yC473XtaJZQ" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NLT90BZHEd-yC473XtaJZQ" key="parameters" value="in␋text␋String␋&quot;Hello world, this is a Jadex bpmn process.&quot;"/>
       </eAnnotations>
     </vertices>
@@ -21,7 +21,7 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_gCdC8RZHEd-yC473XtaJZQ" iD="_gCdC8BZHEd-yC473XtaJZQ" outgoingEdges="_3ZpL0RZHEd-yC473XtaJZQ" incomingEdges="_gCmz8RZHEd-yC473XtaJZQ" name="Print Good Bye" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_xxB9gBZHEd-yC473XtaJZQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xxB9gRZHEd-yC473XtaJZQ" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xxB9gRZHEd-yC473XtaJZQ" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yNf3EBZHEd-yC473XtaJZQ" key="parameters" value="in␋text␋String␋&quot;Good bye world.&quot;"/>
       </eAnnotations>
     </vertices>

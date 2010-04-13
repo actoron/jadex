@@ -7,7 +7,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_2G7C53eaEd6uv6EsxGS0Yg" iD="_2G7C5neaEd6uv6EsxGS0Yg" name="body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_2G7C6XeaEd6uv6EsxGS0Yg" iD="_2G7C6HeaEd6uv6EsxGS0Yg" outgoingEdges="_fXtDinebEd6uv6EsxGS0Yg" incomingEdges="_hYAHWnebEd6uv6EsxGS0Yg" name="DiPP1_LOG_Prozessplanung_durchfuehren" lanes="_O8Dg0RTVEd-pLK0AZ_MMug" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_BoEvsBY9Ed-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BoEvsRY9Ed-jGLD5OCZpUA" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BoEvsRY9Ed-jGLD5OCZpUA" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_C2RoMBY9Ed-jGLD5OCZpUA" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP1 - Absicherung Prozessplanung &lt;/H2> &lt;br> &lt;H3> Bibliothek f&amp;uuml;r LP mit MTM-Zeiten  gef&amp;uuml;llt und abgenommen? &lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)"/>
       </eAnnotations>
     </vertices>

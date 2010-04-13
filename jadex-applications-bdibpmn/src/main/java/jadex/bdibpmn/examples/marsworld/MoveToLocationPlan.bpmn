@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_JerAoXz_Ed6Ya8z0CnMcMA" iD="_JerAoHz_Ed6Ya8z0CnMcMA">
-  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_jVa_YX0DEd6Ya8z0CnMcMA" iD="_jVa_YH0DEd6Ya8z0CnMcMA" name="package jadex.bdibpmn.examples.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.bdibpmn.task.*;&#xD;&#xA;import jadex.application.space.envsupport.environment.*;&#xD;&#xA;import java.util.Map;&#xD;&#xA;import jadex.commons.SUtil;&#xD;&#xA;import jadex.bdi.planlib.*;&#xD;&#xA;&#xD;&#xA;Object _taskid;">
-    <associations xmi:type="bpmn:Association" xmi:id="_jVa_aX0DEd6Ya8z0CnMcMA"/>
-  </artifacts>
-  <pools xmi:type="bpmn:Pool" xmi:id="_Je0xoXz_Ed6Ya8z0CnMcMA" iD="_Je0xoHz_Ed6Ya8z0CnMcMA" associations="_jVa_aX0DEd6Ya8z0CnMcMA" name="Body">
-    <vertices xmi:type="bpmn:Activity" xmi:id="_Je0xo3z_Ed6Ya8z0CnMcMA" iD="_Je0xonz_Ed6Ya8z0CnMcMA" name="Create Move Task&#xD;&#xA;&#xD;&#xA;class = CreateSpaceObjectTaskTask.class&#xD;&#xA;in IEnvironmentSpace space = $beliefbase.environment&#xD;&#xA;in String type = MoveTask.PROPERTY_TYPENAME&#xD;&#xA;in Object objectid = $beliefbase.myself.getId()&#xD;&#xA;in Map properties = SUtil.createHashMap(new String[]{MoveTask.PROPERTY_DESTINATION, MoveTask.PROPERTY_SCOPE, MoveTask.PROPERTY_CONDITION}, new Object[]{$plan.destination, $scope.getExternalAccess(), new PlanFinishedTaskCondition($plan)})&#xD;&#xA;" activityType="Task"/>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_JerAoXz_Ed6Ya8z0CnMcMA" iD="_JerAoHz_Ed6Ya8z0CnMcMA">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_XaGmgEbuEd-qm5VDdIP35A" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XaGmgUbuEd-qm5VDdIP35A" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XaGmgkbuEd-qm5VDdIP35A" key="Package" value="jadex.bdibpmn.examples.marsworld"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_o3KEgEb0Ed-qm5VDdIP35A" key="imports" value="jadex.application.space.envsupport.environment.*␟jadex.commons.SUtil␟jadex.bdi.planlib.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_se1V0Eb0Ed-qm5VDdIP35A" key="parameters" value="inout␋_taskid␋Object␋"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_Je0xoXz_Ed6Ya8z0CnMcMA" iD="_Je0xoHz_Ed6Ya8z0CnMcMA" name="Body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Je0xo3z_Ed6Ya8z0CnMcMA" iD="_Je0xonz_Ed6Ya8z0CnMcMA" name="Create Move Task" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_tt80UEb0Ed-qm5VDdIP35A" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tt80UUb0Ed-qm5VDdIP35A" key="class" value="jadex.bdibpmn.task.CreateSpaceObjectTaskTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_uXhVwEb0Ed-qm5VDdIP35A" key="parameters" value="in␋type␋java.lang.String␋MoveTask.PROPERTY_TYPENAME␟in␋space␋java.lang.Object␋$beliefbase.environment␟in␋objectid␋java.lang.Object␋$beliefbase.myself.getId()␟in␋properties␋java.util.Map␋SUtil.createHashMap(new String[]{MoveTask.PROPERTY_DESTINATION, MoveTask.PROPERTY_SCOPE, MoveTask.PROPERTY_CONDITION}, new Object[]{$plan.destination, $scope.getExternalAccess(), new PlanFinishedTaskCondition($plan)})"/>
+      </eAnnotations>
+    </vertices>
   </pools>
 </bpmn:BpmnDiagram>

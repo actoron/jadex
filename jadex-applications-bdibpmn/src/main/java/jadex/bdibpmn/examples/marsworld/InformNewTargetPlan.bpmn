@@ -1,16 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="__dlOkYAREd6N8dR31QwQkg" iD="__dlOkIAREd6N8dR31QwQkg">
-  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_em8d0YATEd6N8dR31QwQkg" iD="_em8d0IATEd6N8dR31QwQkg" name="package jadex.bdibpmn.examples.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.bridge.IComponentIdentifier;&#xD;&#xA;import jadex.application.space.agr.AGRSpace;&#xD;&#xA;import jadex.application.runtime.*;">
-    <associations xmi:type="bpmn:Association" xmi:id="_em8d2YATEd6N8dR31QwQkg"/>
-  </artifacts>
-  <pools xmi:type="bpmn:Pool" xmi:id="__d4JgYAREd6N8dR31QwQkg" iD="__d4JgIAREd6N8dR31QwQkg" associations="_em8d2YATEd6N8dR31QwQkg" name="Body">
-    <vertices xmi:type="bpmn:Activity" xmi:id="__d4Jg4AREd6N8dR31QwQkg" iD="__d4JgoAREd6N8dR31QwQkg" outgoingEdges="_Z_RkmoASEd6N8dR31QwQkg" name="Find Sentries&#xD;&#xA;&#xD;&#xA;in AGRSpace agrs = ((IApplicationExternalAccess)$scope.getParent()).getSpace(&quot;myagrspace&quot;)&#xD;&#xA;out IComponentIdentifier[] sentries = agrs.getGroup(&quot;mymarsteam&quot;).getAgentsForRole(&quot;sentry&quot;)" activityType="Task"/>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="__dlOkYAREd6N8dR31QwQkg" iD="__dlOkIAREd6N8dR31QwQkg">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__EeU4EbsEd-qm5VDdIP35A" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__EeU4UbsEd-qm5VDdIP35A" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__EeU4kbsEd-qm5VDdIP35A" key="Package" value="jadex.bdibpmn.examples.marsworld"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_E-p6sEb1Ed-qm5VDdIP35A" key="imports" value="jadex.bridge.IComponentIdentifier␟jadex.application.space.agr.AGRSpace␟jadex.application.runtime.*"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="__d4JgYAREd6N8dR31QwQkg" iD="__d4JgIAREd6N8dR31QwQkg" name="Body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="__d4Jg4AREd6N8dR31QwQkg" iD="__d4JgoAREd6N8dR31QwQkg" outgoingEdges="_Z_RkmoASEd6N8dR31QwQkg" name="Find Sentries" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_HogR0Eb1Ed-qm5VDdIP35A" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HogR0Ub1Ed-qm5VDdIP35A" key="class" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IlllIEb1Ed-qm5VDdIP35A" key="parameters" value="in␋agrs␋AGRSpace␋((IApplicationExternalAccess)$scope.getParent()).getSpace(&quot;myagrspace&quot;)␟out␋sentries␋IComponentIdentifier[]␋agrs.getGroup(&quot;mymarsteam&quot;).getAgentsForRole(&quot;sentry&quot;)"/>
+      </eAnnotations>
+    </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_Z_RkkYASEd6N8dR31QwQkg" iD="_Z_RkkIASEd6N8dR31QwQkg" outgoingEdges="_vmPtAYASEd6N8dR31QwQkg _x02SkYASEd6N8dR31QwQkg" incomingEdges="_Z_RkmoASEd6N8dR31QwQkg" activityType="GatewayDataBasedExclusive"/>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_raeQIYASEd6N8dR31QwQkg" iD="_raeQIIASEd6N8dR31QwQkg" outgoingEdges="_v5n8AYASEd6N8dR31QwQkg" incomingEdges="_vmPtAYASEd6N8dR31QwQkg" name="mode = &quot;send&quot;&#xD;&#xA;type = &quot;inform_target&quot;&#xD;&#xA;receivers = sentries&#xD;&#xA;content = $plan.getReason().getValue()" activityType="EventIntermediateMessage"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_raeQIYASEd6N8dR31QwQkg" iD="_raeQIIASEd6N8dR31QwQkg" outgoingEdges="_v5n8AYASEd6N8dR31QwQkg" incomingEdges="_vmPtAYASEd6N8dR31QwQkg" name="" activityType="EventIntermediateMessage">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_S84wIEb1Ed-qm5VDdIP35A" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_S84wIUb1Ed-qm5VDdIP35A" key="mode" value="&quot;send&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_S84wIkb1Ed-qm5VDdIP35A" key="msgtype" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_S84wI0b1Ed-qm5VDdIP35A" key="message" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_S84wJEb1Ed-qm5VDdIP35A" key="filter" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_T_yXkEb1Ed-qm5VDdIP35A" source="activity">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_T_yXkUb1Ed-qm5VDdIP35A" key="parameters" value="receivers␋sentries␟content␋$plan.getReason().getValue()␟type␋&quot;inform_target&quot;"/>
+      </eAnnotations>
+    </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_u93eYYASEd6N8dR31QwQkg" iD="_u93eYIASEd6N8dR31QwQkg" incomingEdges="_v5n8AYASEd6N8dR31QwQkg _x02SkYASEd6N8dR31QwQkg" activityType="EventEndEmpty"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Z_RkmoASEd6N8dR31QwQkg" iD="_Z_RkmYASEd6N8dR31QwQkg"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_vmPtAYASEd6N8dR31QwQkg" iD="_vmPtAIASEd6N8dR31QwQkg" name="sentries!=null"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_v5n8AYASEd6N8dR31QwQkg" iD="_v5n8AIASEd6N8dR31QwQkg"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_x02SkYASEd6N8dR31QwQkg" iD="_x02SkIASEd6N8dR31QwQkg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_x02SkYASEd6N8dR31QwQkg" iD="_x02SkIASEd6N8dR31QwQkg" conditionType="Default" isDefault="true">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__n8OUEbsEd-qm5VDdIP35A" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__n8OUUbsEd-qm5VDdIP35A" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
   </pools>
 </bpmn:BpmnDiagram>

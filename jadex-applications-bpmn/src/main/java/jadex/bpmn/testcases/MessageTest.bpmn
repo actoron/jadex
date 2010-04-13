@@ -19,7 +19,7 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_-btJYRJiEd-3Ruc_856dPQ" iD="_-btJYBJiEd-3Ruc_856dPQ" incomingEdges="_5VX00RJ6Ed-3Ruc_856dPQ" name="Succeeded" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_FD8BoBJjEd-3Ruc_856dPQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FD8BoRJjEd-3Ruc_856dPQ" key="class" value="StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FD8BoRJjEd-3Ruc_856dPQ" key="class" value="StoreResultsTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IxnNQBJjEd-3Ruc_856dPQ" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Message sending testcase.&quot;, true, null)})"/>
       </eAnnotations>
     </vertices>
@@ -32,7 +32,7 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_jMIFwRJ6Ed-3Ruc_856dPQ" iD="_jMIFwBJ6Ed-3Ruc_856dPQ" incomingEdges="_jMIFyhJ6Ed-3Ruc_856dPQ" name="Failed" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_6goHABJ6Ed-3Ruc_856dPQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6goHARJ6Ed-3Ruc_856dPQ" key="class" value="StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6goHARJ6Ed-3Ruc_856dPQ" key="class" value="StoreResultsTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7_i8EBJ6Ed-3Ruc_856dPQ" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Message sending test.&quot;, false, &quot;Message did not arrive.&quot;)})"/>
       </eAnnotations>
     </vertices>

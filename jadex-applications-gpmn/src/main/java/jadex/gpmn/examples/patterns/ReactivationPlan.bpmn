@@ -7,7 +7,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_x8ZBhSxXEd-fR-V1BYdsIg" iD="_x8ZBhCxXEd-fR-V1BYdsIg" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_x8aPoCxXEd-fR-V1BYdsIg" iD="_x8ZokCxXEd-fR-V1BYdsIg" outgoingEdges="_1SvSQCxXEd-fR-V1BYdsIg" incomingEdges="_0X1wQSxXEd-fR-V1BYdsIg" name="ReactivationTask" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_yyVyECxXEd-fR-V1BYdsIg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yyVyESxXEd-fR-V1BYdsIg" key="class" value="jadex.bdibpmn.task.DispatchGoalTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yyVyESxXEd-fR-V1BYdsIg" key="class" value="jadex.bdibpmn.task.DispatchGoalTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3nIWwCxXEd-fR-V1BYdsIg" key="parameters" value="in␋type␋java.lang.String␋&quot;RepeatableSubGoal&quot;␟in␋wait␋boolean␋true"/>
       </eAnnotations>
     </vertices>

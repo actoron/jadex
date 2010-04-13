@@ -12,7 +12,7 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_2PebkUI1Ed-Y29i2KJopdA" iD="_2PebkEI1Ed-Y29i2KJopdA" incomingEdges="_2Qg9YUI1Ed-Y29i2KJopdA" name="Subprocess Finished" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_IjTYQEI2Ed-Y29i2KJopdA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IjTYQUI2Ed-Y29i2KJopdA" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IjTYQUI2Ed-Y29i2KJopdA" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_JyRs0EI2Ed-Y29i2KJopdA" key="parameters" value="in␋text␋java.lang.String␋&quot;Subprocess has finished.&quot;"/>
       </eAnnotations>
     </vertices>

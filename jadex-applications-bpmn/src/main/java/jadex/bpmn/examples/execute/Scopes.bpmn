@@ -9,7 +9,7 @@
       <vertices xmi:type="bpmn:Activity" xmi:id="_bRj-IX3pEd6VFdlpWzoevQ" iD="_bRj-IH3pEd6VFdlpWzoevQ" incomingEdges="_bRj-Kn3pEd6VFdlpWzoevQ" name="Inner Task 2&#xD;&#xA;&#xD;&#xA;in String c" activityType="Task"/>
       <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_bRj-Kn3pEd6VFdlpWzoevQ" iD="_bRj-KX3pEd6VFdlpWzoevQ" name="a = b&#xD;&#xA;c = a+b"/>
     </vertices>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_eqEyEX3pEd6VFdlpWzoevQ" iD="_eqEyEH3pEd6VFdlpWzoevQ" incomingEdges="_eqOjGH3pEd6VFdlpWzoevQ" name="Result Task&#xD;&#xA;&#xD;&#xA;class = PrintTask.class&#xD;&#xA;in String text" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_eqEyEX3pEd6VFdlpWzoevQ" iD="_eqEyEH3pEd6VFdlpWzoevQ" incomingEdges="_eqOjGH3pEd6VFdlpWzoevQ" name="Result Task&#xD;&#xA;&#xD;&#xA;class = PrintTask&#xD;&#xA;in String text" activityType="Task"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_eqOjGH3pEd6VFdlpWzoevQ" iD="_eqOjF33pEd6VFdlpWzoevQ" name="text = a"/>
   </pools>
 </bpmn:BpmnDiagram>

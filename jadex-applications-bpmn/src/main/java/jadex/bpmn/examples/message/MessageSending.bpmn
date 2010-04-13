@@ -33,7 +33,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="__uTy0dBNEd6NWbZHdUI2WQ" iD="__uTy0NBNEd6NWbZHdUI2WQ" outgoingEdges="_AACcAdBOEd6NWbZHdUI2WQ" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_NvCksRZBEd-yC473XtaJZQ" iD="_NvCksBZBEd-yC473XtaJZQ" outgoingEdges="__TzdkdBMEd6NWbZHdUI2WQ" incomingEdges="_NvMVsRZBEd-yC473XtaJZQ" name="Print results" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_RZ4ewBZBEd-yC473XtaJZQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RZ4ewRZBEd-yC473XtaJZQ" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RZ4ewRZBEd-yC473XtaJZQ" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_SD5sIBZBEd-yC473XtaJZQ" key="parameters" value="in␋text␋String␋((String)$interpreter.getComponentIdentifier().getLocalName())+&quot; sent &quot;+$args.get(&quot;message_number&quot;)+&quot; messages.&quot;"/>
       </eAnnotations>
     </vertices>

@@ -32,7 +32,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_SL21oRY-Ed-yC473XtaJZQ" iD="_SL21oBY-Ed-yC473XtaJZQ" outgoingEdges="_yNhxcRY1Ed-yC473XtaJZQ" incomingEdges="_SMJwkRY-Ed-yC473XtaJZQ" name="Print results" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YKhMcBY-Ed-yC473XtaJZQ" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YKhMcRY-Ed-yC473XtaJZQ" key="parameters" value="in␋text␋String␋$interpreter.getComponentIdentifier().getLocalName()+&quot; received &quot;+$args.get(&quot;message_number&quot;)+&quot; messages.&quot;"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fy-yoBY-Ed-yC473XtaJZQ" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fy-yoBY-Ed-yC473XtaJZQ" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
       </eAnnotations>
     </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_bjpHwc-aEd6NWbZHdUI2WQ" iD="_bjpHwM-aEd6NWbZHdUI2WQ"/>

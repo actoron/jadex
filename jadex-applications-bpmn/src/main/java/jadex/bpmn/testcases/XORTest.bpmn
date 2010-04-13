@@ -12,13 +12,13 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_l7CsMRVxEd-9a_-KE2TdXg" iD="_l7CsMBVxEd-9a_-KE2TdXg" outgoingEdges="_mnmQOhVxEd-9a_-KE2TdXg _vc8gSBVxEd-9a_-KE2TdXg" incomingEdges="_l7MdMRVxEd-9a_-KE2TdXg" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_mnmQMRVxEd-9a_-KE2TdXg" iD="_mnmQMBVxEd-9a_-KE2TdXg" outgoingEdges="_0kxVsRVxEd-9a_-KE2TdXg" incomingEdges="_mnmQOhVxEd-9a_-KE2TdXg" name="A" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_X7GUoBVzEd-9a_-KE2TdXg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X7GUoRVzEd-9a_-KE2TdXg" key="class" value="jadex.bpmn.runtime.task.InvokeMethodTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X7GUoRVzEd-9a_-KE2TdXg" key="class" value="jadex.bpmn.runtime.task.InvokeMethodTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YcntUBVzEd-9a_-KE2TdXg" key="parameters" value="in␋object␋List␋list␟in␋methodname␋String␋&quot;add&quot;␟in␋param␋Object␋&quot;A&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_vcyvQRVxEd-9a_-KE2TdXg" iD="_vcyvQBVxEd-9a_-KE2TdXg" outgoingEdges="_1OC8MRVxEd-9a_-KE2TdXg" incomingEdges="_vc8gSBVxEd-9a_-KE2TdXg" name="B" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_gNSNQBVzEd-9a_-KE2TdXg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gNSNQRVzEd-9a_-KE2TdXg" key="class" value="jadex.bpmn.runtime.task.InvokeMethodTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gNSNQRVzEd-9a_-KE2TdXg" key="class" value="jadex.bpmn.runtime.task.InvokeMethodTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_g3TaoBVzEd-9a_-KE2TdXg" key="parameters" value="in␋object␋List␋list␟in␋methodname␋String␋&quot;add&quot;␟in␋param␋Object␋&quot;B&quot;"/>
       </eAnnotations>
     </vertices>
@@ -26,13 +26,13 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_33eckRVxEd-9a_-KE2TdXg" iD="_33eckBVxEd-9a_-KE2TdXg" outgoingEdges="_5ZOjMhVxEd-9a_-KE2TdXg _6ZJvKBVxEd-9a_-KE2TdXg" incomingEdges="_L1GooRVyEd-9a_-KE2TdXg" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_5ZEyMRVxEd-9a_-KE2TdXg" iD="_5ZEyMBVxEd-9a_-KE2TdXg" outgoingEdges="_DPPmGhVyEd-9a_-KE2TdXg" incomingEdges="_5ZOjMhVxEd-9a_-KE2TdXg" name="C" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ouNsgBVzEd-9a_-KE2TdXg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ouNsgRVzEd-9a_-KE2TdXg" key="class" value="jadex.bpmn.runtime.task.InvokeMethodTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ouNsgRVzEd-9a_-KE2TdXg" key="class" value="jadex.bpmn.runtime.task.InvokeMethodTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pL344BVzEd-9a_-KE2TdXg" key="parameters" value="in␋object␋List␋list␟in␋methodname␋String␋&quot;add&quot;␟in␋param␋Object␋&quot;C&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_6Y_-IRVxEd-9a_-KE2TdXg" iD="_6Y_-IBVxEd-9a_-KE2TdXg" outgoingEdges="_EHuGMRVyEd-9a_-KE2TdXg" incomingEdges="_6ZJvKBVxEd-9a_-KE2TdXg" name="D" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_0YdtIBVzEd-9a_-KE2TdXg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0YdtIRVzEd-9a_-KE2TdXg" key="class" value="jadex.bpmn.runtime.task.InvokeMethodTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0YdtIRVzEd-9a_-KE2TdXg" key="class" value="jadex.bpmn.runtime.task.InvokeMethodTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_06liwBVzEd-9a_-KE2TdXg" key="parameters" value="in␋object␋List␋list␟in␋methodname␋String␋&quot;add&quot;␟in␋param␋Object␋&quot;D&quot;"/>
       </eAnnotations>
     </vertices>
@@ -40,13 +40,13 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_QVu7MRVyEd-9a_-KE2TdXg" iD="_QVu7MBVyEd-9a_-KE2TdXg" outgoingEdges="_VC4m2BVyEd-9a_-KE2TdXg _Xuss2BVyEd-9a_-KE2TdXg" incomingEdges="_QVu7OhVyEd-9a_-KE2TdXg" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_VCvc4RVyEd-9a_-KE2TdXg" iD="_VCvc4BVyEd-9a_-KE2TdXg" incomingEdges="_VC4m2BVyEd-9a_-KE2TdXg" name="Success" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_VudogBV0Ed-9a_-KE2TdXg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VudogRV0Ed-9a_-KE2TdXg" key="class" value="StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VudogRV0Ed-9a_-KE2TdXg" key="class" value="StoreResultsTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XYs8wBV0Ed-9a_-KE2TdXg" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Test xor execution.&quot;, true, null)})"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_Xui70RVyEd-9a_-KE2TdXg" iD="_Xui70BVyEd-9a_-KE2TdXg" incomingEdges="_Xuss2BVyEd-9a_-KE2TdXg" name="Failure" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WNTgoBV0Ed-9a_-KE2TdXg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WNTgoRV0Ed-9a_-KE2TdXg" key="class" value="StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WNTgoRV0Ed-9a_-KE2TdXg" key="class" value="StoreResultsTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fGrVEBV0Ed-9a_-KE2TdXg" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value1␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Test xor execution.&quot;, false, &quot;Wrong task execution&quot;)})"/>
       </eAnnotations>
     </vertices>

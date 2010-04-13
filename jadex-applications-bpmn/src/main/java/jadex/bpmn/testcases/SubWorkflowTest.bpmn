@@ -9,7 +9,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_V9uhoRV2Ed-yC473XtaJZQ" iD="_V9uhoBV2Ed-yC473XtaJZQ" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_V9uhoxV2Ed-yC473XtaJZQ" iD="_V9uhohV2Ed-yC473XtaJZQ" outgoingEdges="_mdPj4RV9Ed-yC473XtaJZQ" incomingEdges="_YXpmYRV2Ed-yC473XtaJZQ" name="Start subworkflow &#xD;&#xA;and wait for result" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Z-6fIBV2Ed-yC473XtaJZQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z-6fIRV2Ed-yC473XtaJZQ" key="class" value="jadex.bpmn.runtime.task.CreateComponentTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z-6fIRV2Ed-yC473XtaJZQ" key="class" value="jadex.bpmn.runtime.task.CreateComponentTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_M-uXkBV8Ed-yC473XtaJZQ" key="parameters" value="in␋model␋String␋&quot;jadex/bpmn/testcases/Result.bpmn&quot;␟in␋subcomponent␋boolean␋true␟out␋taskresult␋String␋␟in␋resultmapping␋String[]␋new String[]{&quot;out&quot;, &quot;taskresult&quot;}␟in␋in␋String␋&quot;my_result&quot;"/>
       </eAnnotations>
     </vertices>
@@ -17,14 +17,14 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_l-P6wRV9Ed-yC473XtaJZQ" iD="_l-P6wBV9Ed-yC473XtaJZQ" outgoingEdges="_m6JiWhV9Ed-yC473XtaJZQ _o1ra4RV9Ed-yC473XtaJZQ" incomingEdges="_mdPj4RV9Ed-yC473XtaJZQ" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_m6JiURV9Ed-yC473XtaJZQ" iD="_m6JiUBV9Ed-yC473XtaJZQ" incomingEdges="_m6JiWhV9Ed-yC473XtaJZQ" name="Success" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_SaSWcBV-Ed-yC473XtaJZQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_SaSWcRV-Ed-yC473XtaJZQ" key="class" value="StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_SaSWcRV-Ed-yC473XtaJZQ" key="class" value="StoreResultsTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_T17OABV-Ed-yC473XtaJZQ" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Test subworkflow with results.&quot;, true, null)})"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_o1iQ8RV9Ed-yC473XtaJZQ" iD="_o1iQ8BV9Ed-yC473XtaJZQ" incomingEdges="_o1ra4RV9Ed-yC473XtaJZQ" name="Failure" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_kxiakBV-Ed-yC473XtaJZQ" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_kxiakRV-Ed-yC473XtaJZQ" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Test subworkflow with results.&quot;, false, &quot;Wrong result received.&quot;)})"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0ZQWUBV-Ed-yC473XtaJZQ" key="class" value="StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0ZQWUBV-Ed-yC473XtaJZQ" key="class" value="StoreResultsTask"/>
       </eAnnotations>
     </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_YXpmYRV2Ed-yC473XtaJZQ" iD="_YXpmYBV2Ed-yC473XtaJZQ"/>

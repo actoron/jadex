@@ -7,7 +7,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_5u7rZ3eaEd6uv6EsxGS0Yg" iD="_5u7rZneaEd6uv6EsxGS0Yg" name="body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_5u7raXeaEd6uv6EsxGS0Yg" iD="_5u7raHeaEd6uv6EsxGS0Yg" outgoingEdges="_X7w2anebEd6uv6EsxGS0Yg" incomingEdges="_YhwfanebEd6uv6EsxGS0Yg" name="DiPP1_LOG_Lieferantenstandort_pruefen" lanes="_SaaeERTVEd-pLK0AZ_MMug" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-mvQMBY9Ed-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-mvQMRY9Ed-jGLD5OCZpUA" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-mvQMRY9Ed-jGLD5OCZpUA" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__aUCMBY9Ed-jGLD5OCZpUA" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP1 - Absicherung Lieferanten &lt;/H2> &lt;br> &lt;H3>Durchrechnen von Logistikkosten mit potentiellen Lieferanten (genannt von Einkauf) &lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)"/>
       </eAnnotations>
     </vertices>

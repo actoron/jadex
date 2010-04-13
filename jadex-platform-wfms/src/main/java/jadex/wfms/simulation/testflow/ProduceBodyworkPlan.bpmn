@@ -4,7 +4,7 @@
     <associations xmi:type="bpmn:Association" xmi:id="_7M-twKatEd6kg8fxk-W9OA"/>
   </artifacts>
   <pools xmi:type="bpmn:Pool" xmi:id="_xIuakaatEd6kg8fxk-W9OA" iD="_xIuakKatEd6kg8fxk-W9OA" associations="_7M-twKatEd6kg8fxk-W9OA" name="Pool">
-    <vertices xmi:type="bpmn:Activity" xmi:id="_xIvBoaatEd6kg8fxk-W9OA" iD="_xIvBoKatEd6kg8fxk-W9OA" outgoingEdges="_26T-saatEd6kg8fxk-W9OA" incomingEdges="_3s1AwaatEd6kg8fxk-W9OA" name="ProduceBodywork&#xA;class = WorkitemTask.class" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_xIvBoaatEd6kg8fxk-W9OA" iD="_xIvBoKatEd6kg8fxk-W9OA" outgoingEdges="_26T-saatEd6kg8fxk-W9OA" incomingEdges="_3s1AwaatEd6kg8fxk-W9OA" name="ProduceBodywork&#xA;class = WorkitemTask" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_26N4EaatEd6kg8fxk-W9OA" iD="_26N4EKatEd6kg8fxk-W9OA" incomingEdges="_26T-saatEd6kg8fxk-W9OA" activityType="EventEndEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_3swIQaatEd6kg8fxk-W9OA" iD="_3swIQKatEd6kg8fxk-W9OA" outgoingEdges="_3s1AwaatEd6kg8fxk-W9OA" activityType="EventStartEmpty"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_26T-saatEd6kg8fxk-W9OA" iD="_26T-sKatEd6kg8fxk-W9OA"/>

@@ -7,7 +7,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_yzBpN3eaEd6uv6EsxGS0Yg" iD="_yzBpNneaEd6uv6EsxGS0Yg" name="body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_yzBpOXeaEd6uv6EsxGS0Yg" iD="_yzBpOHeaEd6uv6EsxGS0Yg" outgoingEdges="_QzfMKnebEd6uv6EsxGS0Yg" incomingEdges="_PuDOEXebEd6uv6EsxGS0Yg" name="DiPP1_LOG_Ladungstraeger_absichern" lanes="_KiEBwRTVEd-pLK0AZ_MMug" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Kbg6cBGLEd-iAJhQaWu0kA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KblL4BGLEd-iAJhQaWu0kA" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KblL4BGLEd-iAJhQaWu0kA" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4CDdMBYnEd-jGLD5OCZpUA" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP1 - Ladungstr&amp;auml;ger absichern &lt;/H2>&lt;/CENTER>&lt;/HTML>&quot;)"/>
       </eAnnotations>
     </vertices>

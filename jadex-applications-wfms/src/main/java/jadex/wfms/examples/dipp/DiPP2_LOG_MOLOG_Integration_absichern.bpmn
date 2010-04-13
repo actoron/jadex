@@ -7,20 +7,20 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_Zg1RgRciEd-4T9k5IgEFpw" iD="_Zg1RgBciEd-4T9k5IgEFpw" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_Zg2foRciEd-4T9k5IgEFpw" iD="_Zg2foBciEd-4T9k5IgEFpw" outgoingEdges="_Ci1Z0RckEd-4T9k5IgEFpw" incomingEdges="_jXZRgRcjEd-4T9k5IgEFpw" name="Feinplanung_MaZo" lanes="_dRPLkRcjEd-4T9k5IgEFpw" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_a1wnoBcjEd-4T9k5IgEFpw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_a1xOsBcjEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_a1xOsBcjEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vCnigBcjEd-4T9k5IgEFpw" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP2 - Absicherung MOLOG &lt;/H2> &lt;br>  &lt;H3> Feinplanung Materialzonen&lt;br>&lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_areqQRcjEd-4T9k5IgEFpw" iD="_areqQBcjEd-4T9k5IgEFpw" outgoingEdges="_jXZRgRcjEd-4T9k5IgEFpw" lanes="_dRPLkRcjEd-4T9k5IgEFpw" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_9FSzERcjEd-4T9k5IgEFpw" iD="_9FSzEBcjEd-4T9k5IgEFpw" outgoingEdges="_QV5hERckEd-4T9k5IgEFpw" incomingEdges="_Ci1Z0RckEd-4T9k5IgEFpw" name="Absicherung_3D" lanes="_dRPLkRcjEd-4T9k5IgEFpw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_9LWXwBcjEd-4T9k5IgEFpw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9LW-0BcjEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9LW-0BcjEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_9_4zEBcjEd-4T9k5IgEFpw" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP2 - Absicherung MOLOG &lt;/H2> &lt;br>  &lt;H3> Absicherung Materialzonen in 3D &lt;br>&lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_Krb4oRckEd-4T9k5IgEFpw" iD="_Krb4oBckEd-4T9k5IgEFpw" outgoingEdges="_SMNicRckEd-4T9k5IgEFpw" incomingEdges="_QV5hERckEd-4T9k5IgEFpw" name="Absichern_Set_Komm_VM" lanes="_dRPLkRcjEd-4T9k5IgEFpw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_K0K94BckEd-4T9k5IgEFpw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_K0K94RckEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_K0K94RckEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LV5K4BckEd-4T9k5IgEFpw" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP2 - Absicherung MOLOG  &lt;/H2> &lt;br> &lt;H3> Absicherung Set- und Kommissionierfl&amp;auml;chen und Vormontagen (gemeinsam mit Montage)  &lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)"/>
       </eAnnotations>
     </vertices>

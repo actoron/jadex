@@ -33,12 +33,12 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_deRL4RS7Ed-3Ruc_856dPQ" iD="_deRL4BS7Ed-3Ruc_856dPQ" incomingEdges="_dekG0RS7Ed-3Ruc_856dPQ" name="Success" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_nK8EgBTGEd-a46HbtL-N3Q" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nK8EgRTGEd-a46HbtL-N3Q" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Scope test.&quot;, true, null)})"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qAIwABTGEd-a46HbtL-N3Q" key="class" value="StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qAIwABTGEd-a46HbtL-N3Q" key="class" value="StoreResultsTask"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_lQkDgRS7Ed-3Ruc_856dPQ" iD="_lQkDgBS7Ed-3Ruc_856dPQ" incomingEdges="_zzc5oRTFEd-a46HbtL-N3Q" name="Failure">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_0ohrABTGEd-a46HbtL-N3Q" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0ohrARTGEd-a46HbtL-N3Q" key="class" value="StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0ohrARTGEd-a46HbtL-N3Q" key="class" value="StoreResultsTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_19KisBTGEd-a46HbtL-N3Q" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Scope test.&quot;, false, &quot;Wrong parameter value: &quot;+a)})"/>
       </eAnnotations>
     </vertices>

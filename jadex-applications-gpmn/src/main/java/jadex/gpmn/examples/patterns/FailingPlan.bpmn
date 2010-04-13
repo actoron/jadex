@@ -7,7 +7,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_cta0IStsEd-cIrzPTxeRYA" iD="_cta0ICtsEd-cIrzPTxeRYA" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_ctcCQStsEd-cIrzPTxeRYA" iD="_ctcCQCtsEd-cIrzPTxeRYA" outgoingEdges="_jPL4AStsEd-cIrzPTxeRYA" incomingEdges="_indwsStsEd-cIrzPTxeRYA" name="FailureWarning" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dafVgCtsEd-cIrzPTxeRYA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_daf8kCtsEd-cIrzPTxeRYA" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_daf8kCtsEd-cIrzPTxeRYA" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mHjzUCtsEd-cIrzPTxeRYA" key="parameters" value="in␋text␋java.lang.String␋&quot;This plan triggered by &quot; + String.valueOf($plan.getReason().getType()) + &quot; will now fail.&quot;"/>
       </eAnnotations>
     </vertices>

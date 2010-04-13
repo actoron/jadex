@@ -9,7 +9,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_Kp6EQfxtEd6BS97d4w8Gew" iD="_Kp6EQPxtEd6BS97d4w8Gew" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_aZp6qfxtEd6BS97d4w8Gew" iD="_aZp6ofxtEd6BS97d4w8Gew" name="Save results" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_LFyigBaZEd-YccbjZenQqQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LFyigRaZEd-YccbjZenQqQ" key="class" value="StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LFyigRaZEd-YccbjZenQqQ" key="class" value="StoreResultsTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ODoMoBaZEd-YccbjZenQqQ" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Object␋ new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Simple BPMN testcase.&quot;, true, null)})"/>
       </eAnnotations>
     </vertices>

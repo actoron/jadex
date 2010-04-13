@@ -7,19 +7,19 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_1aHQ1zKSEd-MwJoRTfcdNQ" iD="_1aHQ1jKSEd-MwJoRTfcdNQ" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_1aHQ2TKSEd-MwJoRTfcdNQ" iD="_1aHQ2DKSEd-MwJoRTfcdNQ" outgoingEdges="_MXDtsTKTEd-MwJoRTfcdNQ" name="Task 1" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_IVv0YDKTEd-MwJoRTfcdNQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IVv0YTKTEd-MwJoRTfcdNQ" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IVv0YTKTEd-MwJoRTfcdNQ" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hcZTQDKUEd-MwJoRTfcdNQ" key="parameters" value="in␋text␋java.lang.String␋&quot;The first task has been executed.&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_KjvV8TKTEd-MwJoRTfcdNQ" iD="_KjvV8DKTEd-MwJoRTfcdNQ" outgoingEdges="_y9_-QTKTEd-MwJoRTfcdNQ" incomingEdges="_MXDtsTKTEd-MwJoRTfcdNQ" name="Task 2" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Kke80DKTEd-MwJoRTfcdNQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Kke80TKTEd-MwJoRTfcdNQ" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Kke80TKTEd-MwJoRTfcdNQ" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_i621UDKUEd-MwJoRTfcdNQ" key="parameters" value="in␋text␋java.lang.String␋&quot;The second task has been executed.&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_yqfMYTKTEd-MwJoRTfcdNQ" iD="_yqfMYDKTEd-MwJoRTfcdNQ" incomingEdges="_y9_-QTKTEd-MwJoRTfcdNQ" name="Task 3">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_zKErYDKTEd-MwJoRTfcdNQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zKErYTKTEd-MwJoRTfcdNQ" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zKErYTKTEd-MwJoRTfcdNQ" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jrSMsDKUEd-MwJoRTfcdNQ" key="parameters" value="in␋text␋java.lang.String␋&quot;The third task has been executed.&quot;"/>
       </eAnnotations>
     </vertices>

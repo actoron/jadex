@@ -11,7 +11,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_EG1iwX3PEd6VFdlpWzoevQ" iD="_EG1iwH3PEd6VFdlpWzoevQ" incomingEdges="_EG-ssn3PEd6VFdlpWzoevQ" activityType="EventEndEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_Vl4ZYSwfEd-9ZqMLV3tO6w" iD="_Vl4ZYCwfEd-9ZqMLV3tO6w" outgoingEdges="_NNZwkX3NEd6VFdlpWzoevQ" incomingEdges="_BpS-wX3OEd6VFdlpWzoevQ _Mdk2IX3NEd6VFdlpWzoevQ" name="Dispath Goal &#xD;&#xA;and Wait">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_V1PEACwfEd-9ZqMLV3tO6w" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_V1PEASwfEd-9ZqMLV3tO6w" key="class" value="DispatchGoalTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_V1PEASwfEd-9ZqMLV3tO6w" key="class" value="DispatchGoalTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bACU8CwfEd-9ZqMLV3tO6w" key="parameters" value="inout␋i␋int␋0␟in␋type␋String␋$plan.subgoals[i]"/>
       </eAnnotations>
     </vertices>

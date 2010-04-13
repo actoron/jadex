@@ -7,7 +7,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_gpRawTJ0Ed-MwJoRTfcdNQ" iD="_gpRawDJ0Ed-MwJoRTfcdNQ" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_gqdtkTJ0Ed-MwJoRTfcdNQ" iD="_gqdtkDJ0Ed-MwJoRTfcdNQ" name="Task" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__UlKIDJ3Ed-MwJoRTfcdNQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__UlKITJ3Ed-MwJoRTfcdNQ" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__UlKITJ3Ed-MwJoRTfcdNQ" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ADznoDJ4Ed-MwJoRTfcdNQ" key="parameters" value="in␋text␋java.lang.String␋&quot;The task has been executed.&quot;"/>
       </eAnnotations>
     </vertices>

@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_iq2zsHzoEd6zCuIqBrMhmQ" iD="_iqtCsHzoEd6zCuIqBrMhmQ" name="RandomWalkPlan">
-  <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_8JfKMXzoEd6zCuIqBrMhmQ" iD="_8JfKMHzoEd6zCuIqBrMhmQ" name="package jadex.bdibpmn.examples.marsworld;&#xD;&#xA;&#xD;&#xA;import jadex.bdibpmn.task.*;&#xD;&#xA;import jadex.application.space.envsupport.math.*;&#xD;&#xA;import jadex.commons.SUtil;&#xD;&#xA;import java.util.Map;">
-    <associations xmi:type="bpmn:Association" xmi:id="_8JysMHzoEd6zCuIqBrMhmQ"/>
-  </artifacts>
-  <pools xmi:type="bpmn:Pool" xmi:id="_isytYXzoEd6zCuIqBrMhmQ" iD="_isytYHzoEd6zCuIqBrMhmQ" associations="_8JysMHzoEd6zCuIqBrMhmQ" name="Body">
-    <vertices xmi:type="bpmn:Activity" xmi:id="_iuIxMXzoEd6zCuIqBrMhmQ" iD="_iuIxMHzoEd6zCuIqBrMhmQ" name="Move&#xD;&#xA;&#xD;&#xA;class = DispatchGoalTask.class&#xD;&#xA;in String type = &quot;move_dest&quot;&#xD;&#xA;in Map parameters = SUtil.createHashMap(new String[]{&quot;destination&quot;}, new Object[]{$beliefbase.environment.getRandomPosition(Vector2Int.ZERO)})" activityType="Task"/>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_iq2zsHzoEd6zCuIqBrMhmQ" iD="_iqtCsHzoEd6zCuIqBrMhmQ" name="RandomWalkPlan">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Xy1PkEbuEd-qm5VDdIP35A" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Xy1PkUbuEd-qm5VDdIP35A" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Xy_AkEbuEd-qm5VDdIP35A" key="Package" value="jadex.bdibpmn.examples.marsworld"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cuRO0EbuEd-qm5VDdIP35A" key="results" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_d76GoEbuEd-qm5VDdIP35A" key="imports" value="jadex.application.space.envsupport.math.*␟jadex.commons.SUtil"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_isytYXzoEd6zCuIqBrMhmQ" iD="_isytYHzoEd6zCuIqBrMhmQ" name="Body">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_iuIxMXzoEd6zCuIqBrMhmQ" iD="_iuIxMHzoEd6zCuIqBrMhmQ" name="Move" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_nNPIEEbuEd-qm5VDdIP35A" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nNPIEUbuEd-qm5VDdIP35A" key="class" value="jadex.bdibpmn.task.DispatchGoalTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oCIIsEbuEd-qm5VDdIP35A" key="parameters" value="in␋type␋java.lang.String␋&quot;move_dest&quot;␟in␋parameters␋java.util.Map␋SUtil.createHashMap(new String[]{&quot;destination&quot;}, new Object[]{$beliefbase.environment.getRandomPosition(Vector2Int.ZERO)})"/>
+      </eAnnotations>
+    </vertices>
   </pools>
 </bpmn:BpmnDiagram>

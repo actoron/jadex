@@ -46,7 +46,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_jeq_kdCVEd6MVLxz8V9N3w" iD="_jeq_kNCVEd6MVLxz8V9N3w" outgoingEdges="_wuf24dCVEd6MVLxz8V9N3w _H6HXAdCYEd6MVLxz8V9N3w" incomingEdges="_kaUIcdCVEd6MVLxz8V9N3w" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_HR6ukdCYEd6MVLxz8V9N3w" iD="_HR6ukNCYEd6MVLxz8V9N3w" outgoingEdges="_XNtAYNCZEd6MVLxz8V9N3w" incomingEdges="_H6HXAdCYEd6MVLxz8V9N3w" name="Compute Time">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_XurFcBckEd-OSKK6OfNWqA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XurFcRckEd-OSKK6OfNWqA" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XurFcRckEd-OSKK6OfNWqA" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZVpDQBckEd-OSKK6OfNWqA" key="parameters" value="in␋text␋String␋&quot;Needed: &quot;+($clock.getTime() - starttime)"/>
       </eAnnotations>
     </vertices>

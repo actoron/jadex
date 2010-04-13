@@ -24,14 +24,14 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_vg4kIUMbEd-aDdXkLqEWvQ" iD="_vg4kIEMbEd-aDdXkLqEWvQ" incomingEdges="_NLD7wUMhEd-aDdXkLqEWvQ" name="Success" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_HlyuoEMcEd-aDdXkLqEWvQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HlyuoUMcEd-aDdXkLqEWvQ" key="class" value="jadex.bpmn.runtime.task.StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HlyuoUMcEd-aDdXkLqEWvQ" key="class" value="jadex.bpmn.runtime.task.StoreResultsTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TJBhQEMcEd-aDdXkLqEWvQ" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Wait for tick.&quot;, true, null)})"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_LACOoUMhEd-aDdXkLqEWvQ" iD="_LACOoEMhEd-aDdXkLqEWvQ" outgoingEdges="_NLD7wUMhEd-aDdXkLqEWvQ _RDT_sUMhEd-aDdXkLqEWvQ" incomingEdges="_6IAsIUMhEd-aDdXkLqEWvQ" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_QaMKMUMhEd-aDdXkLqEWvQ" iD="_QaMKMEMhEd-aDdXkLqEWvQ" incomingEdges="_RDT_sUMhEd-aDdXkLqEWvQ" name="Fail">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_QhCZEEMhEd-aDdXkLqEWvQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QhCZEUMhEd-aDdXkLqEWvQ" key="class" value="jadex.bpmn.runtime.task.StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QhCZEUMhEd-aDdXkLqEWvQ" key="class" value="jadex.bpmn.runtime.task.StoreResultsTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZLg14EMhEd-aDdXkLqEWvQ" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Wait for tick.&quot;, false,  &quot;needed: &quot;+(System.currentTimeMillis()-start))})"/>
       </eAnnotations>
     </vertices>

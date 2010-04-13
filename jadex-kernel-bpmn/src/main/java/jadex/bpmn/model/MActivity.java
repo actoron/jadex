@@ -71,6 +71,9 @@ public class MActivity extends MAssociationTarget
 	/** The parameters (name -> MParameter). */
 	protected Map	parameters;
 	
+	/** The class. */
+	protected Class	clazz;
+	
 	//-------- methods --------
 	
 	/**
@@ -589,6 +592,25 @@ public class MActivity extends MAssociationTarget
 	public void setEventHandler(boolean eventhandler)
 	{
 		this.eventhandler = eventhandler;
+	}
+	
+
+	/**
+	 *  Get the class.
+	 *  @return The class.
+	 */
+	public Class getClazz()
+	{
+		return this.clazz;
+	}
+
+	/**
+	 *  Set the class.
+	 *  @param clazz The class to set.
+	 */
+	public void setClazz(Class clazz)
+	{
+		this.clazz = clazz;
 	}
 	
 }

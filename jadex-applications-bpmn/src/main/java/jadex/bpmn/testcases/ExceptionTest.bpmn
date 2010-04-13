@@ -24,12 +24,12 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_9c_IIRGCEd-qQOr2ZLx-Mw" iD="_9c_IIBGCEd-qQOr2ZLx-Mw" outgoingEdges="_Ph6tMRGDEd-qQOr2ZLx-Mw" incomingEdges="_AeQgwRGDEd-qQOr2ZLx-Mw" name="Success">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_7N_2IBGEEd-qQOr2ZLx-Mw" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7N_2IRGEEd-qQOr2ZLx-Mw" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Exception test.&quot;, true, null)})"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AlKvIBGFEd-qQOr2ZLx-Mw" key="class" value="StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AlKvIBGFEd-qQOr2ZLx-Mw" key="class" value="StoreResultsTask"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_BnHmQRGDEd-qQOr2ZLx-Mw" iD="_BnHmQBGDEd-qQOr2ZLx-Mw" outgoingEdges="_O7BFQRGDEd-qQOr2ZLx-Mw" incomingEdges="_BnHmShGDEd-qQOr2ZLx-Mw" name="Failure" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_pJOCEBGEEd-qQOr2ZLx-Mw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pJOCERGEEd-qQOr2ZLx-Mw" key="class" value="StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pJOCERGEEd-qQOr2ZLx-Mw" key="class" value="StoreResultsTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rgnXQBGEEd-qQOr2ZLx-Mw" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Exception test.&quot;, false, &quot;Exception did not occur.&quot;)})"/>
       </eAnnotations>
     </vertices>

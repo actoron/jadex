@@ -7,14 +7,14 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_CUGFNSxXEd-fR-V1BYdsIg" iD="_CUGFNCxXEd-fR-V1BYdsIg" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_CUGsQSxXEd-fR-V1BYdsIg" iD="_CUGsQCxXEd-fR-V1BYdsIg" outgoingEdges="_HYz8QSxXEd-fR-V1BYdsIg" incomingEdges="_EPjFQSxXEd-fR-V1BYdsIg" name="PrintTask" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_C-wy0CxXEd-fR-V1BYdsIg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_C-wy0SxXEd-fR-V1BYdsIg" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_C-wy0SxXEd-fR-V1BYdsIg" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LWhvACxXEd-fR-V1BYdsIg" key="parameters" value="in␋text␋java.lang.String␋&quot;RepeatedPlan activated by &quot; + String.valueOf($plan.getReason().getType()) + &quot; counter is &quot; + String.valueOf($beliefbase.counter)"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_DwMPwSxXEd-fR-V1BYdsIg" iD="_DwMPwCxXEd-fR-V1BYdsIg" outgoingEdges="_EPjFQSxXEd-fR-V1BYdsIg" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_GuOuMSxXEd-fR-V1BYdsIg" iD="_GuOuMCxXEd-fR-V1BYdsIg" outgoingEdges="_XO32ASxXEd-fR-V1BYdsIg" incomingEdges="_HYz8QSxXEd-fR-V1BYdsIg" name="WriteCounter">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_G0B0MCxXEd-fR-V1BYdsIg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_G0B0MSxXEd-fR-V1BYdsIg" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_G0B0MSxXEd-fR-V1BYdsIg" key="class" value="jadex.bdibpmn.task.WriteBeliefTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Y5_UACxXEd-fR-V1BYdsIg" key="parameters" value="in␋beliefname␋java.lang.String␋&quot;counter&quot;␟in␋value␋java.lang.Object␋$beliefbase.counter+1"/>
       </eAnnotations>
     </vertices>

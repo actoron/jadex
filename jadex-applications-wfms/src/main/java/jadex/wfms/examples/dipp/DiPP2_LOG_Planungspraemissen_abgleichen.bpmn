@@ -7,7 +7,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_dti95RZDEd-jGLD5OCZpUA" iD="_dti95BZDEd-jGLD5OCZpUA" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_dtjk8RZDEd-jGLD5OCZpUA" iD="_dtjk8BZDEd-jGLD5OCZpUA" outgoingEdges="_CoaHIRZEEd-jGLD5OCZpUA" incomingEdges="_nxPQYRZDEd-jGLD5OCZpUA" name="DiPP2_LOG_Abgleichen_Planungspraemissen" lanes="_g-AhsRZGEd-jGLD5OCZpUA" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_nS35YBZDEd-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nS35YRZDEd-jGLD5OCZpUA" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nS35YRZDEd-jGLD5OCZpUA" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pSV2wBZDEd-jGLD5OCZpUA" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP2 - Absicherung Pr&amp;auml;missen &lt;/H2> &lt;br> &lt;H3>Abgleichen der Logistik-Planungspr&amp;auml;missen zu DiPP2 &lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)␟inout␋Teilebedarfe_abgeleitet␋boolean␋$beliefbase.Teilebedarfe_abgeleitet"/>
       </eAnnotations>
     </vertices>
@@ -15,7 +15,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_6bTi0RZDEd-jGLD5OCZpUA" iD="_6bTi0BZDEd-jGLD5OCZpUA" incomingEdges="_M14AsRZEEd-jGLD5OCZpUA" lanes="_g-AhsRZGEd-jGLD5OCZpUA" activityType="EventEndEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_BZv7oRZEEd-jGLD5OCZpUA" iD="_BZv7oBZEEd-jGLD5OCZpUA" outgoingEdges="_M14AsRZEEd-jGLD5OCZpUA" incomingEdges="_CoaHIRZEEd-jGLD5OCZpUA" name="Praemissen_speichern" lanes="_g-AhsRZGEd-jGLD5OCZpUA">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_BsDzoBZEEd-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BsDzoRZEEd-jGLD5OCZpUA" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BsDzoRZEEd-jGLD5OCZpUA" key="class" value="jadex.bdibpmn.task.WriteBeliefTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I7-W8BZEEd-jGLD5OCZpUA" key="parameters" value="in␋beliefname␋String␋&quot;Teilebedarfe_abgeleitet&quot;␟in␋value␋Object␋"/>
       </eAnnotations>
     </vertices>

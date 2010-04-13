@@ -7,7 +7,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_WJsx9RZDEd-jGLD5OCZpUA" iD="_WJsx9BZDEd-jGLD5OCZpUA" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_WJtZARZDEd-jGLD5OCZpUA" iD="_WJtZABZDEd-jGLD5OCZpUA" outgoingEdges="_YNoGoRZFEd-jGLD5OCZpUA" incomingEdges="_ROQWMRZEEd-jGLD5OCZpUA" name="DiPP2_LOG_Festlegen_Ladungstraeger" lanes="_dqErwRZGEd-jGLD5OCZpUA" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_QJV8kBZEEd-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QJWjoBZEEd-jGLD5OCZpUA" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QJWjoBZEEd-jGLD5OCZpUA" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qI4nwBZEEd-jGLD5OCZpUA" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP2 - Absicherung Ladunstr&amp;auml;ger &lt;/H2> &lt;br> &lt;H3>Ladungstr&amp;auml;ger SLT-Vorentwicklung abgeschlossen und 100% ULT festgelegt &lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)␟inout␋SonderLadungstraeger_Vorentwicklung_abgeschlossen␋boolean␋$beliefbase.SLT_Vorentwicklung␟inout␋UniversalLadungstraeger_festgelegt␋boolean␋$beliefbase.ULT_Festlegung"/>
       </eAnnotations>
     </vertices>
@@ -15,13 +15,13 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_XJLAARZFEd-jGLD5OCZpUA" iD="_XJLAABZFEd-jGLD5OCZpUA" outgoingEdges="_gAaGcRZFEd-jGLD5OCZpUA _gi-oARZFEd-jGLD5OCZpUA" incomingEdges="_YNoGoRZFEd-jGLD5OCZpUA" lanes="_dqErwRZGEd-jGLD5OCZpUA" activityType="GatewayParallel"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_edPDgRZFEd-jGLD5OCZpUA" iD="_edPDgBZFEd-jGLD5OCZpUA" outgoingEdges="_20N1cRZFEd-jGLD5OCZpUA" incomingEdges="_gAaGcRZFEd-jGLD5OCZpUA" name="SLT_Vorentwicklung_speichern" lanes="_dqErwRZGEd-jGLD5OCZpUA">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_iH0e4BZFEd-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iH1F8BZFEd-jGLD5OCZpUA" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_iH1F8BZFEd-jGLD5OCZpUA" key="class" value="jadex.bdibpmn.task.WriteBeliefTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ppZZ8BZFEd-jGLD5OCZpUA" key="parameters" value="in␋beliefname␋String␋&quot;SLT_Vorentwicklung&quot;␟in␋value␋Object␋"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_er5xoBZFEd-jGLD5OCZpUA" iD="_er5KkBZFEd-jGLD5OCZpUA" outgoingEdges="_3PMhQRZFEd-jGLD5OCZpUA" incomingEdges="_gi-oARZFEd-jGLD5OCZpUA" name="ULT_Festlegung_speichern" lanes="_dqErwRZGEd-jGLD5OCZpUA">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ex-kcBZFEd-jGLD5OCZpUA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ex_LgBZFEd-jGLD5OCZpUA" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ex_LgBZFEd-jGLD5OCZpUA" key="class" value="jadex.bdibpmn.task.WriteBeliefTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_stSowBZFEd-jGLD5OCZpUA" key="parameters" value="in␋beliefname␋String␋&quot;ULT_Festlegung&quot;␟in␋value␋Object␋"/>
       </eAnnotations>
     </vertices>

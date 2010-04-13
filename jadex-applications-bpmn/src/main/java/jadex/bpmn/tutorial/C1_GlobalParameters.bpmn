@@ -8,13 +8,13 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_qY9pgTZhEd-86tAf5dPynA" iD="_qY9pgDZhEd-86tAf5dPynA" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_qY9pgzZhEd-86tAf5dPynA" iD="_qY9pgjZhEd-86tAf5dPynA" outgoingEdges="_s1v_kTZiEd-86tAf5dPynA" name="Welcome" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_JKmKsDZiEd-86tAf5dPynA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_JKmKsTZiEd-86tAf5dPynA" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_JKmKsTZiEd-86tAf5dPynA" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KAiUMDZiEd-86tAf5dPynA" key="parameters" value="in␋text␋java.lang.String␋&quot;Welcome &quot;+customer+&quot;!&quot;"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_s1m1oTZiEd-86tAf5dPynA" iD="_s1m1oDZiEd-86tAf5dPynA" incomingEdges="_s1v_kTZiEd-86tAf5dPynA" name="Status" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ul9Y8DZiEd-86tAf5dPynA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ul9Y8TZiEd-86tAf5dPynA" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ul9Y8TZiEd-86tAf5dPynA" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vcpJUDZiEd-86tAf5dPynA" key="parameters" value="in␋text␋java.lang.String␋&quot;Customer &quot;+customer+&quot; has logged in &quot;+logins+&quot; times.&quot;"/>
       </eAnnotations>
     </vertices>

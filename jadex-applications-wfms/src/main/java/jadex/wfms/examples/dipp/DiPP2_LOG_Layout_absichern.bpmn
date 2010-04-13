@@ -7,26 +7,26 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_m9dcdhcnEd-4T9k5IgEFpw" iD="_m9dcdRcnEd-4T9k5IgEFpw" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_m9eDgRcnEd-4T9k5IgEFpw" iD="_m9eDgBcnEd-4T9k5IgEFpw" outgoingEdges="_XMRmMRcoEd-4T9k5IgEFpw" incomingEdges="_vGIMsRcnEd-4T9k5IgEFpw" name="Absichern_SetKomm_VM_Flaechen" lanes="_spZrkRcnEd-4T9k5IgEFpw" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_riEQEBcnEd-4T9k5IgEFpw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_riEQERcnEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_riEQERcnEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4S-90BcnEd-4T9k5IgEFpw" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP2 - Absicherung Layout &lt;/H2> &lt;BR> &lt;H3> Absicherung Set Komm. VM Fl&amp;auml;chen &lt;BR> &lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)␟inout␋Setflaechen_und_Kommissiornierflaechen_abgesichert␋boolean␋$beliefbase.Set_Komm_abgesichert"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_rYbL4RcnEd-4T9k5IgEFpw" iD="_rYbL4BcnEd-4T9k5IgEFpw" outgoingEdges="_vGIMsRcnEd-4T9k5IgEFpw" lanes="_spZrkRcnEd-4T9k5IgEFpw" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_WsWwARcoEd-4T9k5IgEFpw" iD="_WsWwABcoEd-4T9k5IgEFpw" outgoingEdges="_4MKHoRcoEd-4T9k5IgEFpw" incomingEdges="_XMRmMRcoEd-4T9k5IgEFpw" name="Set_Komm_abgesichert_speichern" lanes="_spZrkRcnEd-4T9k5IgEFpw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_XSbRgBcoEd-4T9k5IgEFpw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XSbRgRcoEd-4T9k5IgEFpw" key="class" value="jadex.bdibpmn.task.WriteBeliefTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XSbRgRcoEd-4T9k5IgEFpw" key="class" value="jadex.bdibpmn.task.WriteBeliefTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Zx3vcBcoEd-4T9k5IgEFpw" key="parameters" value="in␋beliefname␋String␋&quot;Set_Komm_abgesichert&quot;␟in␋value␋Object␋"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_xd3DoRcoEd-4T9k5IgEFpw" iD="_xd3DoBcoEd-4T9k5IgEFpw" outgoingEdges="__laNIRcoEd-4T9k5IgEFpw" incomingEdges="_4MKHoRcoEd-4T9k5IgEFpw" name="Foerdereinrichtungen_abgesichern" lanes="_spZrkRcnEd-4T9k5IgEFpw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_xw1C8BcoEd-4T9k5IgEFpw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xw1qABcoEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xw1qABcoEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yA5fQBcoEd-4T9k5IgEFpw" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP2 - Absicherung Layout &lt;/H2> &lt;BR> &lt;H3> Absicherung F&amp;ouml;rdereinrichtungen&lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_-Z3AARcoEd-4T9k5IgEFpw" iD="_-Z3AABcoEd-4T9k5IgEFpw" outgoingEdges="_Kiu2URcpEd-4T9k5IgEFpw" incomingEdges="__laNIRcoEd-4T9k5IgEFpw" name="Absichern_Fahrstrassen" lanes="_spZrkRcnEd-4T9k5IgEFpw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-ftJUBcoEd-4T9k5IgEFpw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-ftwYBcoEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-ftwYBcoEd-4T9k5IgEFpw" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GMi5MBcpEd-4T9k5IgEFpw" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP2 - Absicherung Layout &lt;/H2> &lt;BR> &lt;H3> Absichern Fahrstrassen&lt;/H3>&lt;/CENTER>&lt;/HTML>&quot;)"/>
       </eAnnotations>
     </vertices>

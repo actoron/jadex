@@ -7,7 +7,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_bXbjUUOvEd-QxpvkIvmXIg" iD="_bXbjUEOvEd-QxpvkIvmXIg" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_bXbjU0OvEd-QxpvkIvmXIg" iD="_bXbjUkOvEd-QxpvkIvmXIg" outgoingEdges="_lWXRoUOvEd-QxpvkIvmXIg" name="Preparation" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_cKn60EOvEd-QxpvkIvmXIg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cKxEwEOvEd-QxpvkIvmXIg" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cKxEwEOvEd-QxpvkIvmXIg" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_gEWlcEOvEd-QxpvkIvmXIg" key="parameters" value="in␋text␋java.lang.String␋&quot;Waiting 5 seconds for a message.&quot;"/>
       </eAnnotations>
     </vertices>
@@ -30,13 +30,13 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_qZ1ykUOvEd-QxpvkIvmXIg" iD="_qZ1ykEOvEd-QxpvkIvmXIg" incomingEdges="_qZ1ymkOvEd-QxpvkIvmXIg" name="Order Received" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_zV_1QEOvEd-QxpvkIvmXIg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zV_1QUOvEd-QxpvkIvmXIg" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zV_1QUOvEd-QxpvkIvmXIg" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zvX-kEOvEd-QxpvkIvmXIg" key="parameters" value="in␋text␋java.lang.String␋&quot;Received order: &quot;+$event.content"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_rgBXgUOvEd-QxpvkIvmXIg" iD="_rgBXgEOvEd-QxpvkIvmXIg" incomingEdges="_rgBXikOvEd-QxpvkIvmXIg" name="Timeout Occurred" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_tPTj0EOvEd-QxpvkIvmXIg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tPTj0UOvEd-QxpvkIvmXIg" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tPTj0UOvEd-QxpvkIvmXIg" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3rYsEOvEd-QxpvkIvmXIg" key="parameters" value="in␋text␋java.lang.String␋&quot;Received no order within timeframe&quot;"/>
       </eAnnotations>
     </vertices>

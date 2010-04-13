@@ -7,7 +7,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_zEB_sRe2Ed-cUJRTmkeIHQ" iD="_zEB_sBe2Ed-cUJRTmkeIHQ" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_zECmwRe2Ed-cUJRTmkeIHQ" iD="_zECmwBe2Ed-cUJRTmkeIHQ" outgoingEdges="_6pHFQRe3Ed-cUJRTmkeIHQ" incomingEdges="_9BDpgRe2Ed-cUJRTmkeIHQ" name="DiPP3_LOG_Abgleichen_Planungspraemissen" lanes="_0wUiYRe2Ed-cUJRTmkeIHQ" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_0Kss0Be2Ed-cUJRTmkeIHQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0Kss0Re2Ed-cUJRTmkeIHQ" key="class" value="jadex.wfms.client.task.WorkitemTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0Kss0Re2Ed-cUJRTmkeIHQ" key="class" value="jadex.wfms.client.task.WorkitemTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_SZu3QBe3Ed-cUJRTmkeIHQ" key="parameters" value="in␋Information␋Text␋new Text(&quot;&lt;HTML>&lt;CENTER> &lt;H2> DiPP3 - Absicherung Pr&amp;auml;missen &lt;/H2> &lt;br> &lt;H2> Abgleichen der Logistik-Planungspr&amp;auml;missen &lt;/H2>&lt;/CENTER>&lt;/HTML>&quot;)␟inout␋Daten_aus_DIA_E_nach_DIA_P_uebertragen␋boolean␋$beliefbase.DIAP_befuellt"/>
       </eAnnotations>
     </vertices>

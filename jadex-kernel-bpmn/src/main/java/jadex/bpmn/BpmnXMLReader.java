@@ -415,7 +415,7 @@ public class BpmnXMLReader
 			if(act.getDescription()!=null)
 			{
 				// first line: name
-				// lines with = in it: properties
+				// lines with = in it: properties or class
 				// lines starting with in/out/inout: parameters
 				
 				StringTokenizer	stok = new StringTokenizer(act.getDescription(), "\r\n");
@@ -447,11 +447,27 @@ public class BpmnXMLReader
 					}
 					else if(idx!=-1)
 					{
-						// property
+						// property or class
 						String propname = prop.substring(0, idx).trim();
 						String proptext = prop.substring(idx+1).trim();
-						IParsedExpression propval = parser.parseExpression(proptext, dia.getAllImports(), null, context.getClassLoader());
-						act.setPropertyValue(propname, propval);
+						if(propname.equals("class"))
+						{
+							try
+							{
+								Class	clazz	= SReflect.findClass(proptext, dia.getAllImports(), context.getClassLoader());
+								act.setClazz(clazz);
+							}
+							catch(ClassNotFoundException cnfe)
+							{
+								cnfe.printStackTrace();
+								throw new RuntimeException(cnfe);
+							}
+						}
+						else
+						{
+							IParsedExpression propval = parser.parseExpression(proptext, dia.getAllImports(), null, context.getClassLoader());
+							act.setPropertyValue(propname, propval);
+						}
 					}
 					else
 					{
@@ -539,16 +555,23 @@ public class BpmnXMLReader
 								// Skip empty string (cannot be parsed to anything), for parsing empty string "" need to be used
 								if(!"".equals(value))
 								{
-									try
+									if(key.equals("class"))
+									{
+										try
+										{
+											Class	clazz	= SReflect.findClass(value, dia.getAllImports(), context.getClassLoader());
+											act.setClazz(clazz);
+										}
+										catch(ClassNotFoundException cnfe)
+										{
+											cnfe.printStackTrace();
+											throw new RuntimeException(cnfe);
+										}
+									}
+									else
 									{
 										IParsedExpression propval = parser.parseExpression(value, dia.getAllImports(), null, context.getClassLoader());
 										act.setPropertyValue(key, propval);
-	//									System.out.println("Property: "+key+" "+value);
-									}
-									catch(Exception e)
-									{
-										System.out.println("Property: "+key+" "+value);
-										e.printStackTrace();
 									}
 								}
 							}

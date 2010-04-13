@@ -7,7 +7,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_HXWOkSxVEd-fR-V1BYdsIg" iD="_HXWOkCxVEd-fR-V1BYdsIg" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_HXW1oSxVEd-fR-V1BYdsIg" iD="_HXW1oCxVEd-fR-V1BYdsIg" outgoingEdges="_LLX50SxVEd-fR-V1BYdsIg" incomingEdges="_KMG1MSxVEd-fR-V1BYdsIg" name="PrintGoalTask" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_I94HgCxVEd-fR-V1BYdsIg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I94ukCxVEd-fR-V1BYdsIg" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I94ukCxVEd-fR-V1BYdsIg" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NCaT8CxVEd-fR-V1BYdsIg" key="parameters" value="in␋text␋java.lang.String␋String.valueOf($plan.getReason().getType())"/>
       </eAnnotations>
     </vertices>

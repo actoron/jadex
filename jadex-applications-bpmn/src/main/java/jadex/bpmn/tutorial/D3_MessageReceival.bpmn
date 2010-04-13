@@ -7,7 +7,7 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_-wEWF0JVEd-lXM2_JTGF5Q" iD="_-wEWFkJVEd-lXM2_JTGF5Q" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_-wEWGUJVEd-lXM2_JTGF5Q" iD="_-wEWGEJVEd-lXM2_JTGF5Q" outgoingEdges="_GvBwukJWEd-lXM2_JTGF5Q" name="Preparation" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__VBdQEJVEd-lXM2_JTGF5Q" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__VBdQUJVEd-lXM2_JTGF5Q" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__VBdQUJVEd-lXM2_JTGF5Q" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BuWsIEJWEd-lXM2_JTGF5Q" key="parameters" value="in␋text␋java.lang.String␋&quot;Send this process a message using the conversation center.&quot;"/>
       </eAnnotations>
     </vertices>
@@ -24,7 +24,7 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_WoxQkUJWEd-lXM2_JTGF5Q" iD="_WoxQkEJWEd-lXM2_JTGF5Q" incomingEdges="_WoxQmkJWEd-lXM2_JTGF5Q" name="Order Received" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WxkAMEJWEd-lXM2_JTGF5Q" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WxkAMUJWEd-lXM2_JTGF5Q" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WxkAMUJWEd-lXM2_JTGF5Q" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z4DQAEJWEd-lXM2_JTGF5Q" key="parameters" value="in␋text␋java.lang.String␋&quot;Received order: &quot;+$event.content"/>
       </eAnnotations>
     </vertices>

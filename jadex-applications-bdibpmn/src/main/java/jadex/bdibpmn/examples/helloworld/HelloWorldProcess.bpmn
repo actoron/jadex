@@ -3,8 +3,8 @@
   <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_w0PbcWWKEd66n90-5WZehg" iD="_w0PbcGWKEd66n90-5WZehg" name="package jadex.bdibpmn.examples.helloworld;&#xD;&#xA;import jadex.commons.SUtil;"/>
   <pools xmi:type="bpmn:Pool" xmi:id="_SjfUYWV3Ed6rasIGpuxRsw" iD="_SjfUYGV3Ed6rasIGpuxRsw" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_TsXA8WV3Ed6rasIGpuxRsw" iD="_TsXA8GV3Ed6rasIGpuxRsw" outgoingEdges="_U7ftkWV3Ed6rasIGpuxRsw" activityType="EventStartEmpty"/>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_U7V8kWV3Ed6rasIGpuxRsw" iD="_U7V8kGV3Ed6rasIGpuxRsw" outgoingEdges="_SkSD8WWKEd66n90-5WZehg" incomingEdges="_U7ftkWV3Ed6rasIGpuxRsw" name="SayHello&#xD;&#xA;class = SayHelloTask.class&#xD;&#xA;inout int x = 5" activityType="Task"/>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_XiioUWV3Ed6rasIGpuxRsw" iD="_XiioUGV3Ed6rasIGpuxRsw" outgoingEdges="_fJ-60WV3Ed6rasIGpuxRsw" incomingEdges="_Vrg6oWWKEd66n90-5WZehg" name="SayGoodbye&#xD;&#xA;class = SayGoodbyeTask.class&#xD;&#xA;in int y" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_U7V8kWV3Ed6rasIGpuxRsw" iD="_U7V8kGV3Ed6rasIGpuxRsw" outgoingEdges="_SkSD8WWKEd66n90-5WZehg" incomingEdges="_U7ftkWV3Ed6rasIGpuxRsw" name="SayHello&#xD;&#xA;class = SayHelloTask&#xD;&#xA;inout int x = 5" activityType="Task"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_XiioUWV3Ed6rasIGpuxRsw" iD="_XiioUGV3Ed6rasIGpuxRsw" outgoingEdges="_fJ-60WV3Ed6rasIGpuxRsw" incomingEdges="_Vrg6oWWKEd66n90-5WZehg" name="SayGoodbye&#xD;&#xA;class = SayGoodbyeTask&#xD;&#xA;in int y" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_eQwz0WV3Ed6rasIGpuxRsw" iD="_eQwz0GV3Ed6rasIGpuxRsw" incomingEdges="_fJ-60WV3Ed6rasIGpuxRsw" activityType="EventEndEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_SkIS8WWKEd66n90-5WZehg" iD="_SkIS8GWKEd66n90-5WZehg" outgoingEdges="_Vrg6oWWKEd66n90-5WZehg" incomingEdges="_SkSD8WWKEd66n90-5WZehg" name="Wait for 2 secs&#xD;&#xA;duration = 2000" activityType="EventIntermediateTimer"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_U7ftkWV3Ed6rasIGpuxRsw" iD="_U7ftkGV3Ed6rasIGpuxRsw" name=""/>

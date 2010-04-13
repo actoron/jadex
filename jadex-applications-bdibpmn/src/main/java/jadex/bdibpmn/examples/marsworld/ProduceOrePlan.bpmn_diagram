@@ -10,7 +10,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_Hdghc4AxEd6N8dR31QwQkg"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_HdghdIAxEd6N8dR31QwQkg" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="ProduceOrePlan.bpmn#_HdXXiYAxEd6N8dR31QwQkg"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Hdghd4AxEd6N8dR31QwQkg" x="39" y="7" width="285" height="147"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Hdghd4AxEd6N8dR31QwQkg" x="24" y="46" width="116" height="70"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_OCBXUoAxEd6N8dR31QwQkg" type="2001">
         <children xmi:type="notation:Node" xmi:id="_OCBXWIAxEd6N8dR31QwQkg" type="4001"/>
@@ -19,7 +19,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_OCBXVYAxEd6N8dR31QwQkg"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_OCBXVoAxEd6N8dR31QwQkg" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="ProduceOrePlan.bpmn#_OCBXUYAxEd6N8dR31QwQkg"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_OCBXV4AxEd6N8dR31QwQkg" x="353" y="7" width="331" height="147"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_OCBXV4AxEd6N8dR31QwQkg" x="183" y="46" width="116" height="70"/>
       </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_HdXXkoAxEd6N8dR31QwQkg"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_HdXXk4AxEd6N8dR31QwQkg"/>
@@ -30,28 +30,12 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_HdXXjYAxEd6N8dR31QwQkg" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_HdXXjoAxEd6N8dR31QwQkg" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="ProduceOrePlan.bpmn#_HdXXh4AxEd6N8dR31QwQkg"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HdXXlYAxEd6N8dR31QwQkg" x="16" y="16" width="1022" height="176"/>
-  </children>
-  <children xmi:type="notation:Node" xmi:id="_cSRJ0oAxEd6N8dR31QwQkg" type="1002">
-    <children xmi:type="notation:Node" xmi:id="_cSRJ2IAxEd6N8dR31QwQkg" type="4009"/>
-    <styles xmi:type="notation:FontStyle" xmi:id="_cSRJ04AxEd6N8dR31QwQkg" fontName="Arial"/>
-    <styles xmi:type="notation:DescriptionStyle" xmi:id="_cSRJ1IAxEd6N8dR31QwQkg"/>
-    <styles xmi:type="notation:FillStyle" xmi:id="_cSRJ1YAxEd6N8dR31QwQkg"/>
-    <styles xmi:type="notation:LineStyle" xmi:id="_cSRJ1oAxEd6N8dR31QwQkg" lineColor="0"/>
-    <element xmi:type="bpmn:TextAnnotation" href="ProduceOrePlan.bpmn#_cSRJ0YAxEd6N8dR31QwQkg"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_cSRJ14AxEd6N8dR31QwQkg" x="16" y="206"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HdXXlYAxEd6N8dR31QwQkg" x="16" y="16" width="353" height="169"/>
   </children>
   <styles xmi:type="notation:PageStyle" xmi:id="_HdXXg4AxEd6N8dR31QwQkg"/>
   <styles xmi:type="notation:GuideStyle" xmi:id="_HdXXhIAxEd6N8dR31QwQkg"/>
   <styles xmi:type="notation:DescriptionStyle" xmi:id="_HdXXhYAxEd6N8dR31QwQkg"/>
   <element xmi:type="bpmn:BpmnDiagram" href="ProduceOrePlan.bpmn#_HdXXgYAxEd6N8dR31QwQkg"/>
-  <edges xmi:type="notation:Edge" xmi:id="_cSRJ2oAxEd6N8dR31QwQkg" type="3003" source="_cSRJ0oAxEd6N8dR31QwQkg" target="_HdXXioAxEd6N8dR31QwQkg">
-    <styles xmi:type="notation:RoutingStyle" xmi:id="_cSRJ24AxEd6N8dR31QwQkg"/>
-    <styles xmi:type="notation:FontStyle" xmi:id="_cSRJ3IAxEd6N8dR31QwQkg" fontName="Arial"/>
-    <styles xmi:type="notation:LineStyle" xmi:id="_cSRJ3YAxEd6N8dR31QwQkg" lineColor="0"/>
-    <element xmi:type="bpmn:Association" href="ProduceOrePlan.bpmn#_cSRJ2YAxEd6N8dR31QwQkg"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_cSRJ3oAxEd6N8dR31QwQkg" points="[0, 0, -766, -116]$[105, 16, -661, -100]"/>
-  </edges>
   <edges xmi:type="notation:Edge" xmi:id="_ESK78oAzEd6N8dR31QwQkg" type="3001" source="_HdghcIAxEd6N8dR31QwQkg" target="_OCBXUoAxEd6N8dR31QwQkg">
     <children xmi:type="notation:Node" xmi:id="_ESK794AzEd6N8dR31QwQkg" type="4012">
       <styles xmi:type="notation:FillStyle" xmi:id="_ESK7-IAzEd6N8dR31QwQkg" fillColor="16776959"/>

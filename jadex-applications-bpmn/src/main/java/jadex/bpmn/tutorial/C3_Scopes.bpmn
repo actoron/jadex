@@ -12,19 +12,19 @@
       </eAnnotations>
       <vertices xmi:type="bpmn:Activity" xmi:id="_w3NxkzaEEd-TIJeIzj-S2A" iD="_w3NxezaEEd-TIJeIzj-S2A" outgoingEdges="_w3NxoDaEEd-TIJeIzj-S2A" name="Enter Address" activityType="Task">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_w3NxlDaEEd-TIJeIzj-S2A" source="jadex">
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3NxlTaEEd-TIJeIzj-S2A" key="class" value="jadex.bpmn.runtime.task.UserInteractionTask.class"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3NxlTaEEd-TIJeIzj-S2A" key="class" value="jadex.bpmn.runtime.task.UserInteractionTask"/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3NxljaEEd-TIJeIzj-S2A" key="parameters" value="inout␋address␋String␋shipto"/>
         </eAnnotations>
       </vertices>
       <vertices xmi:type="bpmn:Activity" xmi:id="_w3NxlzaEEd-TIJeIzj-S2A" iD="_w3NxgzaEEd-TIJeIzj-S2A" outgoingEdges="_w3NxrzaEEd-TIJeIzj-S2A" incomingEdges="_w3NxoDaEEd-TIJeIzj-S2A" name="Start Shipping" activityType="Task">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_w3NxmDaEEd-TIJeIzj-S2A" source="jadex">
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3NxmTaEEd-TIJeIzj-S2A" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3NxmTaEEd-TIJeIzj-S2A" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3NxmjaEEd-TIJeIzj-S2A" key="parameters" value="inout␋text␋String␋&quot;Shipping to: &quot;+shipto"/>
         </eAnnotations>
       </vertices>
       <vertices xmi:type="bpmn:Activity" xmi:id="_w3NxmzaEEd-TIJeIzj-S2A" iD="_w3NxizaEEd-TIJeIzj-S2A" incomingEdges="_w3NxrzaEEd-TIJeIzj-S2A" name="Shipping&#xD;&#xA;Finished" activityType="Task">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_w3NxnDaEEd-TIJeIzj-S2A" source="jadex">
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3NxnTaEEd-TIJeIzj-S2A" key="class" value="jadex.bpmn.runtime.task.PrintTask.class"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3NxnTaEEd-TIJeIzj-S2A" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w3NxnjaEEd-TIJeIzj-S2A" key="parameters" value="in␋text␋java.lang.String␋&quot;Arrived at: &quot;+shipto"/>
         </eAnnotations>
       </vertices>
