@@ -69,15 +69,22 @@ public class ComponentManagementService_Client implements IComponentManagementSe
 	/** The result (kill listeners). */
 	protected Map killresultlisteners;
 	
+	/** The daemon counter. */
+	protected int daemons;
+	
+	/** The autoshutdown flag. */
+	protected boolean autoshutdown;
+	
     //-------- constructors --------
 
     /**
      *  Create a new component execution service.#
      *  @param container	The service container.
      */
-    public ComponentManagementService_Client(IServiceContainer container)
+    public ComponentManagementService_Client(IServiceContainer container, boolean autoshutdown)
 	{
 		this.container = container;
+		this.autoshutdown = autoshutdown;
 		this.adapters = Collections.synchronizedMap(SCollection.createHashMap());
 		this.descs = Collections.synchronizedMap(SCollection.createLinkedHashMap());
 		this.ccs = SCollection.createLinkedHashMap();
@@ -99,7 +106,7 @@ public class ComponentManagementService_Client implements IComponentManagementSe
 	 */
 	public void	createComponent(String name, String model, CreationInfo info, IResultListener listener, final IResultListener killlistener)
 	{
-		final CreationInfo cinfo	= info!=null ? info : new CreationInfo();	// Dummy default info, if null.
+		final CreationInfo cinfo = info!=null? info: new CreationInfo();	// Dummy default info, if null.
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
 		
@@ -129,16 +136,16 @@ public class ComponentManagementService_Client implements IComponentManagementSe
 			for(Iterator it=facts.iterator(); factory==null && it.hasNext(); )
 			{
 				IComponentFactory	cf	= (IComponentFactory)it.next();
-				if(cf.isLoadable(model, info.getImports()))
+				if(cf.isLoadable(model, cinfo.getImports()))
 				{
 					factory	= cf;
-					type	= factory.getComponentType(model, info.getImports());
+					type	= factory.getComponentType(model, cinfo.getImports());
 				}
 			}
 		}
 		if(factory==null)
 			throw new RuntimeException("No factory found for component: "+model);
-		final ILoadableComponentModel lmodel = factory.loadModel(model, info.getImports());
+		final ILoadableComponentModel lmodel = factory.loadModel(model, cinfo.getImports());
 
 		// Create id and adapter.
 		
@@ -167,7 +174,12 @@ public class ComponentManagementService_Client implements IComponentManagementSe
 						cid.setAddresses(ms.getAddresses());
 				}
 		
-				ad	= new CMSComponentDescription(cid, type, cinfo.getParent(), cinfo.isMaster());	
+				ad	= new CMSComponentDescription(cid, type, cinfo.getParent(), cinfo.isMaster(), cinfo.isDaemon());
+				
+				// Increase daemon cnt
+				if(cinfo.isDaemon())
+					daemons++;
+				
 				CMSComponentDescription padesc = (CMSComponentDescription)descs.get(cinfo.getParent());
 				
 				// Suspend when set to suspend or when parent is also suspended or when specified in model.
@@ -563,6 +575,7 @@ public class ComponentManagementService_Client implements IComponentManagementSe
 			StandaloneComponentAdapter adapter;
 			StandaloneComponentAdapter pad = null;
 			CMSComponentDescription desc;
+			boolean shutdown = false;
 			synchronized(adapters)
 			{
 				synchronized(descs)
@@ -574,9 +587,13 @@ public class ComponentManagementService_Client implements IComponentManagementSe
 					
 					results = adapter.getComponentInstance().getResults();
 					
-					desc = (CMSComponentDescription)descs.get(cid);
+					desc = (CMSComponentDescription)descs.remove(cid);
 					desc.setState(IComponentDescription.STATE_TERMINATED);
-					descs.remove(cid);
+					if(desc.isDaemon())
+						daemons--;
+					if((autoshutdown && adapters.size()-daemons==0) || desc.isMaster())
+						shutdown = true;
+					
 					ccs.remove(cid);
 					
 					// Stop execution of component.
@@ -651,6 +668,10 @@ public class ComponentManagementService_Client implements IComponentManagementSe
 					((IResultListener)killlisteners.get(i)).resultAvailable(source, result);
 				}
 			}
+			
+			// Shudown platform when last (non-daemon) component was destroyed
+			if(shutdown)
+				container.shutdown(null);
 		}
 		
 		public void exceptionOccurred(Object source, Exception exception)
@@ -734,6 +755,30 @@ public class ComponentManagementService_Client implements IComponentManagementSe
 	 *  @param addresses The addresses.
 	 *  @return The new component identifier.
 	 */
+	public IComponentIdentifier createComponentIdentifier(String name)
+	{
+		return createComponentIdentifier(name, true, null);
+	}
+	
+	/**
+	 *  Create component identifier.
+	 *  @param name The name.
+	 *  @param local True for local name.
+	 *  @param addresses The addresses.
+	 *  @return The new component identifier.
+	 */
+	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
+	{
+		return createComponentIdentifier(name, local, null);
+	}
+	
+	/**
+	 *  Create component identifier.
+	 *  @param name The name.
+	 *  @param local True for local name.
+	 *  @param addresses The addresses.
+	 *  @return The new component identifier.
+	 */
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
 		if(local)
@@ -766,7 +811,7 @@ public class ComponentManagementService_Client implements IComponentManagementSe
 	 */
 	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, IComponentIdentifier parent)
 	{
-		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, parent, false);
+		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, parent, false, false);
 		ret.setState(state);
 		ret.setOwnership(ownership);
 		return ret;
@@ -822,6 +867,8 @@ public class ComponentManagementService_Client implements IComponentManagementSe
 	/**
 	 *  Get the component identifiers.
 	 *  @return The component identifiers.
+	 *  
+	 *  This method should be used with caution when the agent population is large.
 	 */
 	public void getComponentIdentifiers(IResultListener listener)
 	{

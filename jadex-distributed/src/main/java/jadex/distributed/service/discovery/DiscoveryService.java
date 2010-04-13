@@ -1,153 +1,138 @@
 package jadex.distributed.service.discovery;
 
-import jadex.commons.concurrent.IResultListener;
-import jadex.service.IService;
-import jadex.service.IServiceContainer;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Logger;
-
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.URI;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Erstmal nur einen dummy discovery service erzeugen, der einfach nur eine feste Liste von IP:Port Daten übergibt. Wenn du dann noch Zeit hast, kannst du dich um eine richtige ZeroConf konfiguration
- * kümmern. Jede Plattform braucht einen discovery service, egal ob Server oder Client
+ * This services encapsulates a automatic discovery service for a master platform. Slaves can be discovered in a active
+ * or passive way. You can start() or stop() the discovery at any time. A active discovery can be issued with a
+ * call on findSlaves().
  * 
+ * The passive discovery is achieved with HELLO and BYE message, which are send over the
+ * multicast address 224.224.224.224:9000. New slaves send a HELLO message. Slaves leaving send a BYE message.
+ * 
+ * The active discovery uses PING and PONG messages to discovery current slaves. A findSlaves() call initiates the
+ * sending of a PING message. Slaves receiving this messages send back a PONG, the InetAddress of them is extracted
+ * from the received DatagramPacket.
+ *  
  * @author daniel
- * 
  */
-public class DiscoveryService implements IService, IDiscoveryService {
+public class DiscoveryService implements IDiscoveryService, DiscoveryMonitorListener {
 
-	private Set<InetSocketAddress> machines; // List of known machines
-	private Set<IDiscoveryServiceListener> listeners; // List of listeners to inform when the set of available machines changed
-	
-	private IServiceContainer container; // wft do I need the container for!?! the logger is not used right now
+	private final Set<IDiscoveryServiceListener> _listener;
+	private final Set<InetAddress> _slaves; // currently found platforms
 
-	public DiscoveryService(IServiceContainer container) { // wtf !?! I don't need the container (yet); how knows, maybe someday ...
-		this.container = container;
-		this.machines = new HashSet<InetSocketAddress>();
-	}
-
-	public DiscoveryService() {
-		this.machines = new HashSet<InetSocketAddress>();
-		this.listeners = new HashSet<IDiscoveryServiceListener>();
-	}
-
-	@Override
-	public void startService() {
-		// TODO mit discover andere Platformen finden
-		// dazu einen seperaten thread starten, der die Liste der machines laufend up to date hält
-		// also nicht nur hinzufügen, sondern es müssen plattformen auch entfernet werden, wenn Plattformen nicht mehr verfügbar sind
-		// wie? durch einen leasetime ansatz oder durch einen heartbeat Mechanismus
-		// => beide nicht adäquat, denn eine Plattform darf nicht einfach verschwinden; es muss eine 'graceful degradation' geben
-		// also, dass die Plattform sagt 'so jetzt gehe ich', damit die Anwendung auf andere Platformen verteilt werden kann
-
-		// Datei mit IP und Port Daten öffnen
-		File file = new File("src/main/java/jadex/distributed/service/discovery/discovery_config.txt"); // TODO pfad für production environment anpassen
-
-		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), Charset.forName("UTF-8")));
-			String line; // line is e.g. '234.12.345.12:1254'
-			while ((line = reader.readLine()) != null) {
-				// ignore comments starting with '#'; ignore empty lines
-				if (line.indexOf("#") != -1 || line.equals(""))
-					continue;
-				String ip = line.substring(0, line.indexOf(":"));
-				String port = line.substring(line.indexOf(":") + 1, line.length());
-				machines.add(new InetSocketAddress(InetAddress.getByName(ip), Integer.valueOf(port)));
-			}
-		} catch (FileNotFoundException e) { // try-catch behandlung hier noch sehr ugyl, aber egal
-			System.out.println("File not found beim discovery service");
-			e.printStackTrace();
-			System.exit(1); // hard, but ok
-		} catch (IOException e) {
-			System.out.println("File not found beim discovery service; ein kleiner IO-Fehler");
-			e.printStackTrace();
-			System.exit(1); // hard, but ok
-		}
-		
-		// NOTFALL LÖSUNG FÜR JETZT
-		// 
-	}
-
-	@Override
-	public void shutdownService(IResultListener listener) {
-		// Is here something special needed to do? I don't know yet...
-	}
-
-	// TODO ein Thread muss addMachine() und removeMachine() aufrufen, um Liste laufend abzudaten
-	// natürlich nicht zu vergessen: multithread programming erfordert nebenläufigkeits-schutz!!! machines variable muss kontrolliert manipuliert werden
-	private void addMachine(InetSocketAddress machine) {
-		// mache allen listenern die neue machine bekannt
-		/*
-		Iterator<IDiscoveryServiceListener> it = this.listeners.iterator();
-		while (it.hasNext()) {
-			it.next().addMachine(machine);
-		}
-		*/
-		
-		for (IDiscoveryServiceListener listener : this.listeners) {
-			listener.notifyIDiscoveryListener();
-		}
-		
-	}
-
-	private void removeMachine(InetSocketAddress machine) {
-		// eine List und eine ArrayList bringen schon passende Methoden um ein Element einfach zu entfernen
-		// wieso eigentlich eine List? Muss es wirklich eine geordnete Datenstruktur sein? Eine Set würde schon reichen
-		// ausserdem wird ein element nie doppelt vorkommen, bzw. dies würde keinen sinn machen, wäre also auch ein zusätzlicher konsistenzschutz gewessen
-		// dann muss aber natürlich verhindert werden, dass diese nebenläufig gelesen+geschrieben wird, da das zu einem inkonsistenten zustand führen kann
-
-		for (IDiscoveryServiceListener listener : this.listeners) {
-			listener.notifyIDiscoveryListener();
-		}
-	}
-
+	private boolean _running = false;
+	private final DiscoveryClient _dclient;
+	private final DiscoveryMonitor _dmonitor;
 	
 	/**
-	 * A listener uses this method to registers itself. The listener is automatically notified when the set of available machines changes.
-	 * 
-	 * @param listener
-	 *            - the object which is interested in getting notified when the set of available machines changes
+	 * Default constructor to find client with multicast address 224.224.224.224, listening on port 9000
+	 * @throws IOException 
 	 */
+	public DiscoveryService() throws IOException {
+		this._listener = new HashSet<IDiscoveryServiceListener>();
+		this._slaves = new HashSet<InetAddress>();
+		
+		this._dclient = new DiscoveryClient();
+		this._dmonitor = new DiscoveryMonitor(); // TODO gibt es überhaupt einen service der in seinem Konstruktor etwas wirft?
+		this._dmonitor.register(this);
+	}
+
+	/**
+	 * Starts the passive listening of new slaves; prepares the active listening of slaves. 
+	 * @throws IOException 
+	 */
+	public synchronized void start() throws IOException {
+		if( !this._running ) {
+			this._dmonitor.start();
+			this._dclient.start();
+			Set<InetAddress> slaves = this._dclient.findSlaves();
+			this._dmonitor.stop(); // DiscoveryMonitor is only onced to get a list of initial slaves, TODO move to stop() if DiscoveryService.findSlaves() is revived again
+			for (InetAddress slave : slaves) {
+				this._slaves.add(slave); // set automatically eliminates duplicates, nice :)
+			}
+			informListeners();
+			
+			this._running = true;
+		}
+	}
+	
+	/**
+	 * Stops the passive listening of new slaves and disables the active discovery of clients.  
+	 */
+	public synchronized void stop() throws IOException {
+		if( this._running ) {
+			this._dclient.stop();
+			this._running = false;
+		}
+	}
+	
+	/**
+	 * Initiate a active discovery of present slaves and return their InetAddresses.
+	 * It doesn't make any sense at all for a listener to call this method, because the DiscoveryService
+	 * will take care of making an up to date listeners of current slaves available.
+	 * @return
+	 */
+	/*
+	public Set<InetAddress> findSlaves() { // TODO remove !!!
+		if( !this._running ) { // shame on you: trying to initiate a active discovery without calling start() first
+			
+			return null; // TODO the 'correct' to achieve this would be to throw a FirstCallStartException
+		}
+		
+		return null;
+	}*/
+	// OK vielleicht wenn es eine Art Refresh-Button bei der GUI gibt, aber selbst das könnte mit einem fake refresh button ok sein
+	// denn es kann NIE sein, dass durch ein zusätzliches findSlaves im laufenden Betrieb weitere Platformen gefunden werden; oder etwa doch?...
+	
+	private void informListeners() {
+		for (IDiscoveryServiceListener listener : this._listener) {
+			listener.notifyIDiscoveryListener();
+		}
+	}
+	
+	/*** For IDiscoveryService: getMaschineAddresses(), register(), unregister() ***/
+	@Override
+	public Set<InetAddress> getMachineAddresses() {
+		// return a read-only snapshot of the actual data set to prevent concurrent read and write
+		return Collections.unmodifiableSet(new HashSet<InetAddress>(this._slaves));
+	}
+
+	@Override
 	public void register(IDiscoveryServiceListener listener) {
-		if (listener != null) { // is does not make sense to register null; even worse: is a error, becaue in Java it is not possible to call anything on null; well, in Objective-C this is possible
-								// due to the dynamic nature of the language
-			synchronized (this.listeners) {
-				this.listeners.add(listener);
+		if(listener!=null) {
+			synchronized (this._listener) {
+				this._listener.add(listener);
 			}
 		}
 	}
 
-	/**
-	 * A listener uses this method to unregister, so it is no longer informed, when the list of machines changes.
-	 * 
-	 * @param listener
-	 *            - listener object which doesn't want to be informed anymore when the list of known machines changes
-	 */
+	@Override
 	public void unregister(IDiscoveryServiceListener listener) {
-		synchronized (this.listeners) {
-			this.listeners.remove(listener); // works also when listener is not a memeber of this.listeners			
+		synchronized (this._listener) {
+			this._listener.remove(listener);
 		}
 	}
 
+	/*** For DiscoveryMonitorListener ***/
 	@Override
-	public Set<InetSocketAddress> getMachineAddresses() {
-		return this.machines;
+	public void handleSlaveBye(InetAddress addr) {
+		synchronized(this._slaves) {
+			this._slaves.remove(addr);
+		}
+		informListeners(); // inform listeners that slave leaved the group of platforms
 	}
+
+	@Override
+	public void handleSlaveHello(InetAddress addr) {
+		synchronized(this._slaves) {
+			this._slaves.add(addr);
+		}
+		informListeners(); // inform listeners that a new slave is available
+	}
+
 }

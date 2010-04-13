@@ -5,7 +5,7 @@ import java.util.Set;
 
 /**
  * Interface which has to implemented by a object, which wants to be notified
- * by the DiscoveryService when new machines are available.
+ * by the DummyDiscoveryService when new machines are available.
  * 
  * @author daniel
  */
@@ -23,7 +23,7 @@ public interface IDiscoveryServiceListener {
 	/*public void removeMachine(InetSocketAddress machine);*/
 	
 	/**
-	 * Called when a listener just registered itself. The DiscoveryService
+	 * Called when a listener just registered itself. The DummyDiscoveryService
 	 * transmits the whole list at ones.
 	 * But of course it could be also possible that this method is called on
 	 * arbitrary times.

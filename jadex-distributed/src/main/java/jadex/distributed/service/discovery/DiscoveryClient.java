@@ -61,7 +61,11 @@ public class DiscoveryClient {
 		return this._timeout;
 	}
 	
-	public Set<InetAddress> findSlaves() { // all active discovery stuff here
+	public synchronized Set<InetAddress> findSlaves() { // all active discovery stuff here
+		if( !this._running ) { // shame on you: trying to initiate a active discovery without calling start() first
+			return null; // TODO the 'correct' to achieve this would be to throw a FirstCallStartException
+		}
+		
 		Set<InetAddress> slaves = new  HashSet<InetAddress>();
 		
 		// start thread to receive PONGs

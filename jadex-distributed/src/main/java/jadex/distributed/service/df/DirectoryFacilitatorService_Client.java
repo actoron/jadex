@@ -1,8 +1,6 @@
 package jadex.distributed.service.df;
 
-import jadex.base.AbstractPlatform;
 import jadex.base.DefaultResultListener;
-import jadex.base.fipa.ComponentIdentifier;
 import jadex.base.fipa.DFComponentDescription;
 import jadex.base.fipa.DFServiceDescription;
 import jadex.base.fipa.IDF;
@@ -12,10 +10,12 @@ import jadex.base.fipa.IProperty;
 import jadex.base.fipa.SFipa;
 import jadex.base.fipa.SearchConstraints;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.ISearchConstraints;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
+import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class DirectoryFacilitatorService_Client implements IDF, IService
 	//-------- attributes --------
 
 	/** The platform. */
-	protected AbstractPlatform platform;
+	protected IServiceContainer platform;
 	
 	/** The registered components. */
 	protected IndexMap	components;
@@ -42,7 +42,7 @@ public class DirectoryFacilitatorService_Client implements IDF, IService
 	/**
 	 *  Create a standalone df.
 	 */
-	public DirectoryFacilitatorService_Client(AbstractPlatform platform)
+	public DirectoryFacilitatorService_Client(IServiceContainer platform)
 	{
 		this.platform = platform;
 		this.components	= new IndexMap();
@@ -60,7 +60,7 @@ public class DirectoryFacilitatorService_Client implements IDF, IService
 			listener = DefaultResultListener.getInstance();
 		
 		//System.out.println("Registered: "+adesc.getName()+" "+adesc.getLeaseTime());
-		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, this);
+		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, (IComponentManagementService)platform.getService(IComponentManagementService.class), this);
 
 		// Add description, when valid.
 		IClockService clock = (IClockService)platform.getService(IClockService.class);
@@ -121,7 +121,7 @@ public class DirectoryFacilitatorService_Client implements IDF, IService
 			listener = DefaultResultListener.getInstance();
 		
 		// Use clone to avoid caller manipulating object after insertion.
-		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, this);
+		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, (IComponentManagementService)platform.getService(IComponentManagementService.class), this);
 
 		// Change description, when valid.
 		IClockService clock = (IClockService)platform.getService(IClockService.class);
@@ -303,26 +303,26 @@ public class DirectoryFacilitatorService_Client implements IDF, IService
 	 *  @param name The name.
 	 *  @param local True for local name ().
 	 *  @return The new component identifier.
-	 */
+	 * /
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
 	{
 		if(local)
 			name = name + "@" + platform.getName();
 		return new ComponentIdentifier(name);
-	}
+	}*/
 	
 	/**
 	 *  Create a component identifier.
 	 *  @param name The name.
 	 *  @param local True for local name.
 	 *  @param addresses The addresses.
-	 */
+	 * /
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
 		if(local)
 			name = name + "@" + platform.getName();
 		return new ComponentIdentifier(name, addresses, null);
-	}
+	}*/
 
 	//-------- IPlatformService interface methods --------
 	
