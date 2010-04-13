@@ -23,6 +23,9 @@ public class DefaultStepHandler implements IStepHandler
 	 */
 	public void step(MActivity activity, BpmnInterpreter instance, ProcessThread thread, Object event)
 	{
+		// Hack!!! Should be in interpreter/thread?
+		thread.updateParametersAfterStep(activity, instance);
+		
 		MNamedIdElement	next	= null;
 		Exception	ex	= thread.getException();
 		

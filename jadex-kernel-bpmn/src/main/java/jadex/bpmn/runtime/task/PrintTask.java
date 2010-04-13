@@ -4,7 +4,7 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 
 /**
- *  Print out some text stored in variable test.
+ *  Print out some text stored in variable text.
  */
 public class PrintTask extends AbstractTask
 {

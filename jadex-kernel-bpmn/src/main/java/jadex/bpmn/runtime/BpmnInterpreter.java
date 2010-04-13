@@ -756,8 +756,9 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 //			System.out.println("Step: "+thread.getActivity()+" "+thread);
 			MActivity act = thread.getActivity();
 			handler.execute(act, this, thread);
-			
-			thread.updateParametersAfterStep(act, this);
+	
+			// Moved to StepHandler
+//			thread.updateParametersAfterStep(act, this);
 			
 			// Check if thread now waits for a message and there is at least one in the message queue.
 			// Todo: check if thread directly or indirectly (multiple events!) waits for a message event before checking waitqueue

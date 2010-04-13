@@ -226,7 +226,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		// can be Integer or Level
 		
 		Object prop = model.getProperties().get("logging.level");
-		Level level = prop==null? Level.SEVERE: (Level)prop;
+		Level level = prop==null? Level.WARNING: (Level)prop;
 		logger.setLevel(level);
 
 		// if logger should use Handlers of parent (global) logger

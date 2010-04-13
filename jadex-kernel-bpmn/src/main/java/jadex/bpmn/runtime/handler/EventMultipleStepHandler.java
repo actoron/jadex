@@ -22,6 +22,9 @@ public class EventMultipleStepHandler implements IStepHandler
 	 */
 	public void step(MActivity activity, BpmnInterpreter instance, ProcessThread thread, Object event)
 	{
+		// Hack!!! Should be in interpreter/thread?
+		thread.updateParametersAfterStep(activity, instance);
+
 		MSequenceEdge next	= null;
 		
 		List outgoing = activity.getOutgoingSequenceEdges();

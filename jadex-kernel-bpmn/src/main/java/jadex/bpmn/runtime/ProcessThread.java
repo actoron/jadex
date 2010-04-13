@@ -652,7 +652,7 @@ public class ProcessThread	implements ITaskContext
 	 *  Remove in parameters after step.
 	 *  @param instance	The calling BPMN instance.
 	 */
-	protected  void updateParametersAfterStep(MActivity activity, BpmnInterpreter instance)
+	public  void updateParametersAfterStep(MActivity activity, BpmnInterpreter instance)
 	{
 		// Remove all in paramters
 //		System.out.println("after: "+act);

@@ -120,15 +120,6 @@
     <element xmi:type="bpmn:Pool" href="Exception.bpmn#_y65Nd2pBEd6JtKkNrnCCNQ"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_y7CXampBEd6JtKkNrnCCNQ" x="16" y="16" width="1219" height="231"/>
   </children>
-  <children xmi:type="notation:Node" xmi:id="_8fqS0GpCEd6JtKkNrnCCNQ" type="1002">
-    <children xmi:type="notation:Node" xmi:id="_8fqS1mpCEd6JtKkNrnCCNQ" type="4009"/>
-    <styles xmi:type="notation:FontStyle" xmi:id="_8fqS0WpCEd6JtKkNrnCCNQ" fontName="Arial"/>
-    <styles xmi:type="notation:DescriptionStyle" xmi:id="_8fqS0mpCEd6JtKkNrnCCNQ"/>
-    <styles xmi:type="notation:FillStyle" xmi:id="_8fqS02pCEd6JtKkNrnCCNQ"/>
-    <styles xmi:type="notation:LineStyle" xmi:id="_8fqS1GpCEd6JtKkNrnCCNQ" lineColor="0"/>
-    <element xmi:type="bpmn:TextAnnotation" href="Exception.bpmn#_8fgh0WpCEd6JtKkNrnCCNQ"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_8fqS1WpCEd6JtKkNrnCCNQ" x="281" y="267" width="329" height="40"/>
-  </children>
   <styles xmi:type="notation:PageStyle" xmi:id="_y65Nc2pBEd6JtKkNrnCCNQ"/>
   <styles xmi:type="notation:GuideStyle" xmi:id="_y65NdGpBEd6JtKkNrnCCNQ"/>
   <styles xmi:type="notation:DescriptionStyle" xmi:id="_y65NdWpBEd6JtKkNrnCCNQ"/>
@@ -192,13 +183,6 @@
     <styles xmi:type="notation:LineStyle" xmi:id="_YI_bzGpCEd6JtKkNrnCCNQ" lineColor="0"/>
     <element xmi:type="bpmn:SequenceEdge" href="Exception.bpmn#_YI_byGpCEd6JtKkNrnCCNQ"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_YI_bzWpCEd6JtKkNrnCCNQ" points="[-53, -9, 357, 59]$[-408, -68, 2, 0]"/>
-  </edges>
-  <edges xmi:type="notation:Edge" xmi:id="_8fqS2GpCEd6JtKkNrnCCNQ" type="3003" source="_8fqS0GpCEd6JtKkNrnCCNQ" target="_y65NempBEd6JtKkNrnCCNQ">
-    <styles xmi:type="notation:RoutingStyle" xmi:id="_8fqS2WpCEd6JtKkNrnCCNQ"/>
-    <styles xmi:type="notation:FontStyle" xmi:id="_8fqS2mpCEd6JtKkNrnCCNQ" fontName="Arial"/>
-    <styles xmi:type="notation:LineStyle" xmi:id="_8fqS22pCEd6JtKkNrnCCNQ" lineColor="0"/>
-    <element xmi:type="bpmn:Association" href="Exception.bpmn#_8fqS12pCEd6JtKkNrnCCNQ"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_8fqS3GpCEd6JtKkNrnCCNQ" points="[0, 0, -334, -116]$[46, 16, -288, -100]"/>
   </edges>
   <edges xmi:type="notation:Edge" xmi:id="_6y2VAmrtEd6CydnA5mdgEg" type="3001" source="_2lSIYGrtEd6CydnA5mdgEg" target="_6yskAmrtEd6CydnA5mdgEg">
     <children xmi:type="notation:Node" xmi:id="_6y2VB2rtEd6CydnA5mdgEg" type="4012">
