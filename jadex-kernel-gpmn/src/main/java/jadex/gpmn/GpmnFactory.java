@@ -9,7 +9,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
-import jadex.gpmn.model.MGpmnModel;
+import jadex.gpmn.model2.MGpmnModel;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
@@ -49,7 +49,7 @@ public class GpmnFactory implements IComponentFactory, IService
 	protected GpmnModelLoader loader;
 
 	/** The gpmn 2 bdiagent converter. */
-	protected GpmnBDIConverter converter;
+	protected GpmnBDIConverter2 converter;
 	
 	/** The bdi agent factory. */
 	protected BDIAgentFactory factory;
@@ -67,7 +67,7 @@ public class GpmnFactory implements IComponentFactory, IService
 		this.properties	= properties;
 		this.container = container;
 		this.loader = new GpmnModelLoader();
-		this.converter = new GpmnBDIConverter();
+		this.converter = new GpmnBDIConverter2();
 		
 		for(Iterator it=container.getServices(IComponentFactory.class).iterator(); 
 			it.hasNext() && factory==null; )
@@ -160,7 +160,7 @@ public class GpmnFactory implements IComponentFactory, IService
 		MGpmnModel ret = null;
 		try
 		{
-			ret = GpmnXMLReader.read(model, ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader(), null);
+			ret = GpmnXMLReader2.read(model, ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader(), null);
 			ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 			ClassLoader	cl = libservice.getClassLoader();
 			ret.setClassloader(cl);

@@ -46,6 +46,6 @@ public class GpmnModelLoader extends AbstractModelLoader
 	 */
 	protected ICacheableModel doLoadModel(String name, ResourceInfo info) throws Exception
 	{
-		return (ICacheableModel)GpmnXMLReader.read(info, classloader);
+		return (ICacheableModel)GpmnXMLReader2.read(info, classloader);
 	}
 }
