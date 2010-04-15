@@ -1,5 +1,6 @@
 package jadex.distributed.service.discovery;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Set;
 
@@ -10,30 +11,27 @@ import java.util.Set;
  * @author daniel
  */
 public interface IDiscoveryServiceListener {
-	/**
-	 * Called when a new machine is available
-	 * @param machine - the newly available machine
-	 */
-	/*public void addMachine(InetSocketAddress machine);*/
-	
-	/**
-	 * Called when a machine is not available anymore
-	 * @param machine - the machine which is not available anymore
-	 */
-	/*public void removeMachine(InetSocketAddress machine);*/
-	
-	/**
-	 * Called when a listener just registered itself. The DummyDiscoveryService
-	 * transmits the whole list at ones.
-	 * But of course it could be also possible that this method is called on
-	 * arbitrary times.
-	 * @param machines - the set of machines already known
-	 */
-	/*public void addMachines(Set<InetSocketAddress> machines);*/
 	
 	/**
 	 * Notify a registered listener of type IDiscoveryListener that the list of known
-	 * machines changed, so the listener can read it.
+	 * machines changed, so the listener should get a new snapshot to read it.
 	 */
 	public void notifyIDiscoveryListener();
+	
+	/**
+	 * Notify a registered listener of type IDiscoveryListner that a new slave
+	 * platform is available. The InetAddress of the new available slave is
+	 * supplied with the <code>parameter</code>.
+	 * @param addr
+	 */
+	public void notifyIDiscoveryListenerAdd(InetAddress addr);
+	
+	/**
+	 * Notify a registered listener of type IDiscoveryListner that a old slave
+	 * platform is not available anymore; the slave platform leaved the group of
+	 * platforms. The InetAddress of the disappearing slave is
+	 * supplied with the <code>parameter</code>.
+	 * @param addr
+	 */
+	public void notifyIDiscoveryListenerRemove(InetAddress addr);
 }

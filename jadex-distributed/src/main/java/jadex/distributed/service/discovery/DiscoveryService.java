@@ -22,7 +22,7 @@ import java.util.Set;
  */
 public class DiscoveryService implements IDiscoveryService, DiscoveryMonitorListener {
 
-	private final Set<IDiscoveryServiceListener> _listener;
+	private final Set<IDiscoveryServiceListener> _listeners;
 	private final Set<InetAddress> _slaves; // currently found platforms
 
 	private boolean _running = false;
@@ -34,7 +34,7 @@ public class DiscoveryService implements IDiscoveryService, DiscoveryMonitorList
 	 * @throws IOException 
 	 */
 	public DiscoveryService() throws IOException {
-		this._listener = new HashSet<IDiscoveryServiceListener>();
+		this._listeners = new HashSet<IDiscoveryServiceListener>();
 		this._slaves = new HashSet<InetAddress>();
 		
 		this._dclient = new DiscoveryClient();
@@ -89,9 +89,33 @@ public class DiscoveryService implements IDiscoveryService, DiscoveryMonitorList
 	// OK vielleicht wenn es eine Art Refresh-Button bei der GUI gibt, aber selbst das könnte mit einem fake refresh button ok sein
 	// denn es kann NIE sein, dass durch ein zusätzliches findSlaves im laufenden Betrieb weitere Platformen gefunden werden; oder etwa doch?...
 	
+	/**
+	 * Informs every listener that the set of known slave platforms IPs changed
+	 * *dramatically*. New IPs could be added or old one removed.
+	 */
 	private void informListeners() {
-		for (IDiscoveryServiceListener listener : this._listener) {
+		for (IDiscoveryServiceListener listener : this._listeners) {
 			listener.notifyIDiscoveryListener();
+		}
+	}
+	
+	/**
+	 * Notifies all current listeners that a new slave platform is
+	 * available/found OR that a slave platform just leaved.
+	 * @param addr the IP-Address of the platform just entering or leaving the group platforms
+	 * @param newSlave true if the slave platform is just entering, false if the slave platform is leaving
+	 */
+	private void informListeners(InetAddress addr, boolean newSlave) {
+		// how to be sure that no thread mutates the state of the InetAddress object?
+		// well, build a wrapper class; Or even better why not so much work: inherit InetAddress and just overwrite all mutating methods so they don't do anything
+		if(newSlave) { // new slave, so informa listeners that they connect
+			for (IDiscoveryServiceListener listener : this._listeners) {
+				listener.notifyIDiscoveryListenerAdd(addr);
+			}
+		} else { // slave (wants to) disappear, so inform listeners to close any pending connections or don't try to reconnect
+			for (IDiscoveryServiceListener listener : this._listeners) {
+				listener.notifyIDiscoveryListenerRemove(addr);
+			}
 		}
 	}
 	
@@ -99,28 +123,30 @@ public class DiscoveryService implements IDiscoveryService, DiscoveryMonitorList
 	@Override
 	public Set<InetAddress> getMachineAddresses() {
 		// return a read-only snapshot of the actual data set to prevent concurrent read and write
-		return Collections.unmodifiableSet(new HashSet<InetAddress>(this._slaves));
+		synchronized (this._dclient) {
+			return Collections.unmodifiableSet(new HashSet<InetAddress>(this._slaves));
+		}
 	}
 
 	@Override
 	public void register(IDiscoveryServiceListener listener) {
 		if(listener!=null) {
-			synchronized (this._listener) {
-				this._listener.add(listener);
+			synchronized (this._listeners) {
+				this._listeners.add(listener);
 			}
 		}
 	}
 
 	@Override
 	public void unregister(IDiscoveryServiceListener listener) {
-		synchronized (this._listener) {
-			this._listener.remove(listener);
+		synchronized (this._listeners) {
+			this._listeners.remove(listener);
 		}
 	}
 
 	/*** For DiscoveryMonitorListener ***/
 	@Override
-	public void handleSlaveBye(InetAddress addr) {
+	public void handleSlaveBye(InetAddress addr) { // called by the internal DiscoveryMonitor to announce the disappearing of a platform
 		synchronized(this._slaves) {
 			this._slaves.remove(addr);
 		}
@@ -128,11 +154,14 @@ public class DiscoveryService implements IDiscoveryService, DiscoveryMonitorList
 	}
 
 	@Override
-	public void handleSlaveHello(InetAddress addr) {
+	public void handleSlaveHello(InetAddress addr) { // called for each found slave
 		synchronized(this._slaves) {
 			this._slaves.add(addr);
 		}
-		informListeners(); // inform listeners that a new slave is available
+		//informListeners(); // inform listeners that a new slave is available
+		/** Ist schon blöd, aber für eine Model-Listener-ARchitektur muss man sich ja einigen; grob oder feingranular?
+		 * Ich gehe hier mal jetzt auf fein, spart einfach ein wenig performance; wobei grob wäre einfach und direkter umzusetzen... **/
+		informListeners(addr, true);
 	}
 
 }
