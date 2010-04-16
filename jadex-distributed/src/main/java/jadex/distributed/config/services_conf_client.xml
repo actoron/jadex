@@ -77,7 +77,7 @@
 			</property>
 			
 			<property type="jadex.distributed.service.discovery.DiscoverableService" name="discoverable_service">
-				new jadex.distributed.service.discovery.DiscoverableService();
+				new jadex.distributed.service.discovery.DiscoverableService()
 			</property>
 			
 			<!-- <property type="jadex.bridge.IComponentFactory" name="application_factory">

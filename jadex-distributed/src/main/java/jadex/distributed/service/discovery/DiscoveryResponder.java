@@ -66,7 +66,7 @@ public class DiscoveryResponder {
 			this._socket.setTimeToLive(this._ttl);
 			this._socket.joinGroup(this._group);
 			String hello = "HELLO";
-			DatagramPacket packet = new DatagramPacket(hello.getBytes(), hello.getBytes().length);
+			DatagramPacket packet = new DatagramPacket(hello.getBytes(), hello.getBytes().length, this._group, this._port);
 			this._socket.send(packet); // say HELLO to other platforms
 			System.out.println("DISCOVERYRESPONDER eine HELLO message geschickt, um sich bemerkbar zu machen");
 			
