@@ -36,7 +36,7 @@
 			
 			<!-- my new CMS and DF for distributed case; here the client side -->
 			<property type="jadex.bridge.IComponentManagementService" name="cms_service">
-				new jadex.distributed.service.cms.ComponentManagementService_Client($platform)
+				new jadex.distributed.service.cms.ComponentManagementService_Client($platform, $platform.isAutoShutdown())
 			</property>
 						
 			<property type="jadex.base.fipa.IDF" name="df_service">

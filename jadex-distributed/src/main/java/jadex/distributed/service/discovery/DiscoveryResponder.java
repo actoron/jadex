@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 
 public class DiscoveryResponder {
@@ -11,22 +12,57 @@ public class DiscoveryResponder {
 	private MulticastSocket _socket;
 	private int _port;
 	private InetAddress _group;
+	private int _ttl;
 	
 	private boolean _running = false;
 	
-	public DiscoveryResponder() throws IOException {
-		this._group = InetAddress.getByName("224.224.224.224");
+	/**
+	 * Create a default DiscoveryResponder listening on multicast address
+	 * 224.224.224.224 on port 9000. TimeToLive is set to 16.
+	 * @throws UnknownHostException should never happen
+	 */
+	public DiscoveryResponder() throws UnknownHostException {
+		this._group = InetAddress.getByAddress( new byte[] {(byte)224, (byte)224, (byte)224, (byte)224} );
 		this._port = 9000;
+		this._ttl = 16;
 	}
 	
-	public DiscoveryResponder(InetAddress group, int port) throws IOException {
+	/**
+	 * Create a DiscoveryResponder listening on multicast address
+	 * <code>group</code> on port <code>port</code>. TimeToLive is
+	 * set to 16.
+	 * @param group the multicast address to listen on in the range
+	 * 224.0.0.0 to 239.255.255.255, inclusive. The address 224.0.0.0
+	 * is reserved and should not be used.
+	 * @param port the port to listen on
+	 */
+	public DiscoveryResponder(InetAddress group, int port) {
 		this._group = group;
 		this._port = port;
+		this._ttl = 16;
+	}
+	
+	/**
+	 * Create a DiscoveryResponder listening on multicast address
+	 * <code>group</code> on port <code>port</code>. TimeToLive is
+	 * set to 16.
+	 * @param group the multicast address to listen on in the range
+	 * 224.0.0.0 to 239.255.255.255, inclusive. The address 224.0.0.0
+	 * is reserved and should not be used.
+	 * @param port the port to listen on
+	 * @param ttl TimeToLive value to determine how many hops a multicast
+	 *            packet can travel through the network.
+	 */
+	public DiscoveryResponder(InetAddress group, int port, int ttl) {
+		this._group = group;
+		this._port = port;
+		this._ttl = ttl;
 	}
 	
 	public synchronized void start() throws IOException {
 		if( !this._running ) {
 			this._socket = new MulticastSocket(this._port);
+			this._socket.setTimeToLive(this._ttl);
 			this._socket.joinGroup(this._group);
 			String hello = "HELLO";
 			DatagramPacket packet = new DatagramPacket(hello.getBytes(), hello.getBytes().length);

@@ -1,5 +1,8 @@
 package jadex.distributed.service.discovery;
 
+import jadex.commons.concurrent.IResultListener;
+import jadex.service.IService;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Collections;
@@ -20,7 +23,7 @@ import java.util.Set;
  *  
  * @author daniel
  */
-public class DiscoveryService implements IDiscoveryService, DiscoveryMonitorListener {
+public class DiscoveryService implements IService, IDiscoveryService, DiscoveryMonitorListener {
 
 	private final Set<IDiscoveryServiceListener> _listeners;
 	private final Set<InetAddress> _slaves; // currently found platforms
@@ -164,4 +167,15 @@ public class DiscoveryService implements IDiscoveryService, DiscoveryMonitorList
 		informListeners(addr, true);
 	}
 
+	/*** For IService: startService, shutdownService ***/
+	@Override
+	public void startService() {
+		// not used; every startup related things are in the constructor and in start();
+		// so use the eclipse shortcut Shift+Alt+Q,O and have a look at start() and the constructor
+	}
+	
+	@Override
+	public void shutdownService(IResultListener listener) {
+		
+	}
 }

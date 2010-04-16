@@ -15,29 +15,34 @@ public class DiscoveryClient {
 	private MulticastSocket _socket;
 	private InetAddress _group;
 	private int _port;
+	private int _ttl;
 	
 	private boolean _running = false;
 	private int _timeout; // how long to wait for PONG messages; in seconds
 	
 	public DiscoveryClient() throws UnknownHostException {
-		this._group = InetAddress.getByName("224.224.224.224");
-		this._port = 9000;
-		this._timeout = 1;
+		this(InetAddress.getByName("224.224.224.224"), 9000, 1, 16);
+	}
+	
+	public DiscoveryClient(InetAddress group, int port) {
+		this(group, port, 1, 16);
 	}
 	
 	public DiscoveryClient(InetAddress group, int port, int timeout) {
+		this(group, port, timeout, 16);
+	}
+	
+	public DiscoveryClient(InetAddress group, int port, int timeout, int ttl) {
 		this._group = group;
 		this._port = port;
 		this._timeout = timeout;
-	}
-
-	public DiscoveryClient(InetAddress group, int port) {
-		this(group, port, 1);
+		this._ttl = ttl;
 	}
 	
 	public synchronized void start() throws IOException { // join multicast group
 		if( !this._running ) {
-			this._socket = new MulticastSocket(this._port);
+			//this._socket = new MulticastSocket(this._port);
+			this._socket.setTimeToLive(this._ttl);
 			this._running = true;
 		}
 	}
@@ -61,15 +66,26 @@ public class DiscoveryClient {
 		return this._timeout;
 	}
 	
+	public int getTtl() {
+		return this._ttl;
+	}
+
+	public void setTtl(int ttl) {
+		this._ttl = ttl;
+	}
+
 	public synchronized Set<InetAddress> findSlaves() { // all active discovery stuff here
 		if( !this._running ) { // shame on you: trying to initiate a active discovery without calling start() first
-			return null; // TODO the 'correct' to achieve this would be to throw a FirstCallStartException
+			return null; // TODO the 'correct' to achieve this would be to throw a CallStartFirstException
+		}
+		try {
+			this._socket = new MulticastSocket(this._port);
+		} catch (IOException e2) {
+			e2.printStackTrace();
 		}
 		
-		Set<InetAddress> slaves = new  HashSet<InetAddress>();
-		
-		// start thread to receive PONGs
-		Thread t = new Thread() {
+		Set<InetAddress> slaves = new HashSet<InetAddress>();
+		Thread t = new Thread() { // start thread to receive PONGs
 			@Override
 			public void run() {
 				try {
@@ -78,13 +94,17 @@ public class DiscoveryClient {
 					e.printStackTrace();
 				}
 				_socket.close(); // stop listening for PONG messages
-			}
-			
+			}		
 		};
 		
 		// send a PING
 		String ping = "PING";
 		DatagramPacket packet = new DatagramPacket(ping.getBytes(), ping.getBytes().length);
+		try {
+			this._socket.joinGroup(this._group);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		try {
 			this._socket.send(packet);
 		} catch (IOException e) { // never happens
@@ -109,5 +129,4 @@ public class DiscoveryClient {
 		}
 		return slaves;
 	}
-	
 }

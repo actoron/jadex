@@ -232,4 +232,18 @@ public class OldMonitorService implements IMonitorService, IDiscoveryServiceList
 		}
 	}
 
+
+	@Override
+	public void notifyIDiscoveryListenerAdd(InetAddress addr) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void notifyIDiscoveryListenerRemove(InetAddress addr) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -148,6 +148,7 @@ public class DummyDiscoveryService implements IService, IDiscoveryService {
 
 	@Override
 	public Set<InetAddress> getMachineAddresses() {
-		return this.machines;
+		//return this.machines;
+		return null;
 	}
 }

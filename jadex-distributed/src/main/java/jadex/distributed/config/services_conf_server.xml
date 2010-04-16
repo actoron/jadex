@@ -37,7 +37,7 @@
 			<!-- my new CMS and DF for distributed case; here the server side -->
 			<!-- also a new service 'Discovery Service' is born which highly interacts with the CMS to see which other clients are available -->
 			<property type="jadex.bridge.IComponentManagementService" name="cms_service">
-				new jadex.distributed.service.cms.ComponentManagementService_Server($platform)
+				new jadex.distributed.service.cms.ComponentManagementService_Server($platform, $platform.isAutoShutdown())
 			</property>
 						
 			<property type="jadex.base.fipa.IDF" name="df_service">
@@ -45,12 +45,12 @@
 			</property>
 			
 			<property type="jadex.distributed.service.discovery.IDiscoveryService" name="discovery_service">
-				<!-- new jadex.distributed.service.discovery.DummyDiscoveryService($platform) --> <!-- I don't need a reference in the DiscoverService (yet) -->
-				new jadex.distributed.service.discovery.DummyDiscoveryService()
+				<!-- new jadex.distributed.service.discovery.DiscoveryService($platform) --> <!-- I don't need a reference in the DiscoverService (yet) -->
+				new jadex.distributed.service.discovery.DiscoveryService()
 			</property>
 			
 			<property type="jadex.distributed.service.monitor.IMonitorService" name="discovery_service"> <!-- interface -->
-				new jadex.distributed.service.monitor.OldMonitorService($platform) <!-- concrete implementation -->
+				new jadex.distributed.service.monitor.MonitorService($platform) <!-- concrete implementation -->
 			</property>
 			
 			  <property type="jadex.bridge.IMessageService" name="message_service">

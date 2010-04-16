@@ -1,7 +1,9 @@
 package jadex.distributed.service.monitor;
 
+import jadex.commons.concurrent.IResultListener;
 import jadex.distributed.service.discovery.IDiscoveryService;
 import jadex.distributed.service.discovery.IDiscoveryServiceListener;
+import jadex.service.IService;
 import jadex.service.IServiceContainer;
 
 import java.io.IOException;
@@ -17,7 +19,7 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
-public class MonitorService implements IMonitorService, IDiscoveryServiceListener {
+public class MonitorService implements IService, IMonitorService, IDiscoveryServiceListener {
 
 	private final IDiscoveryService _dservice;
 	
@@ -161,4 +163,17 @@ public class MonitorService implements IMonitorService, IDiscoveryServiceListene
 		}
 		this._connections.remove(addr);
 	}
+
+	/*** For IService: startService(), shutdownService(IResultListener) ***/
+	@Override
+	public void startService() {
+		
+	}
+	
+	@Override
+	public void shutdownService(IResultListener listener) {
+		
+	}
+	
 }
+
