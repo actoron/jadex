@@ -38,6 +38,7 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 		this._dservice = (IDiscoveryService) container.getService(IDiscoveryService.class);
 		this._dservice.register(this);
 		this._port = 4711;
+		System.out.println("MONITORSERVICE constructor finished");
 	}
 	
 	/**
@@ -167,7 +168,7 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 	/*** For IService: startService(), shutdownService(IResultListener) ***/
 	@Override
 	public void startService() {
-		
+		System.out.println("MONITORSERVICE startService run, tut aber nichts ...");
 	}
 	
 	@Override

@@ -42,14 +42,18 @@ public class DiscoveryClient {
 	public synchronized void start() throws IOException { // join multicast group
 		if( !this._running ) {
 			//this._socket = new MulticastSocket(this._port);
-			this._socket.setTimeToLive(this._ttl);
+			//this._socket.setTimeToLive(this._ttl); // socket null pointer here because findSlaves sets this._socket
 			this._running = true;
 		}
 	}
 	
-	public synchronized void stop() throws IOException { // leave multicast group
+	public synchronized void stop() { // leave multicast group
 		if( this._running ) {
-			this._socket.leaveGroup(this._group);
+			try {
+				this._socket.leaveGroup(this._group);
+			} catch (IOException e) { // _socket wurde schon davor von dem TimerThread closed()
+				//e.printStackTrace();
+			}
 			this._running = false;
 		}
 	}
@@ -80,6 +84,7 @@ public class DiscoveryClient {
 		}
 		try {
 			this._socket = new MulticastSocket(this._port);
+			this._socket.setTimeToLive(this._ttl);
 		} catch (IOException e2) {
 			e2.printStackTrace();
 		}
@@ -99,14 +104,14 @@ public class DiscoveryClient {
 		
 		// send a PING
 		String ping = "PING";
-		DatagramPacket packet = new DatagramPacket(ping.getBytes(), ping.getBytes().length);
+		DatagramPacket packet = new DatagramPacket(ping.getBytes(), ping.getBytes().length, this._group, this._port);
 		try {
 			this._socket.joinGroup(this._group);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 		try {
-			this._socket.send(packet);
+			this._socket.send(packet); // NullPointerException; null buffer, null address
 		} catch (IOException e) { // never happens
 			e.printStackTrace();
 		}
@@ -123,6 +128,7 @@ public class DiscoveryClient {
 			String response = new String(data).toUpperCase().trim();
 			if( response.equals("PONG") ) {
 				InetAddress addr = packet.getAddress();
+				System.out.println("DCLIENT slave gefunden "+addr);
 				slaves.add(addr);
 			} // ignore other messages
 			Arrays.fill(data, (byte)0); // reset for future messages

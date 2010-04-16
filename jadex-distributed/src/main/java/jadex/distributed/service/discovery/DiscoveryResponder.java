@@ -25,6 +25,7 @@ public class DiscoveryResponder {
 		this._group = InetAddress.getByAddress( new byte[] {(byte)224, (byte)224, (byte)224, (byte)224} );
 		this._port = 9000;
 		this._ttl = 16;
+		System.out.println("DISCOVERYRESPONDER constructor finished");
 	}
 	
 	/**
@@ -67,6 +68,7 @@ public class DiscoveryResponder {
 			String hello = "HELLO";
 			DatagramPacket packet = new DatagramPacket(hello.getBytes(), hello.getBytes().length);
 			this._socket.send(packet); // say HELLO to other platforms
+			System.out.println("DISCOVERYRESPONDER eine HELLO message geschickt, um sich bemerkbar zu machen");
 			
 			// listen for PING messages
 			Runnable r = new SocketThread(this._socket);
@@ -101,12 +103,15 @@ public class DiscoveryResponder {
 			DatagramPacket packet = new DatagramPacket(data, data.length);
 			while(true) {
 				try {
+					System.out.println("DISCOVERYRESPONDER waiting for PING message");
 					this._socket.receive(packet);
+					System.out.println("DISCOVERYRESPONDER multicast message received");
 				} catch (IOException e) { // socket.close() executed, which means that stop() has been executed; BYE already sent
 					break;
 				}
 				String message = new String(data).toUpperCase().trim();
 				if( message.equals("PING") ) { // respond with a PONG
+					System.out.println("DISCOVERYRESPONDER received a PING message");
 					String pong = "PONG";
 					DatagramPacket response = new DatagramPacket(pong.getBytes(), pong.getBytes().length);
 					try {

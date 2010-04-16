@@ -43,6 +43,7 @@ public class DiscoveryService implements IService, IDiscoveryService, DiscoveryM
 		this._dclient = new DiscoveryClient();
 		this._dmonitor = new DiscoveryMonitor(); // TODO gibt es überhaupt einen service der in seinem Konstruktor etwas wirft?
 		this._dmonitor.register(this);
+		System.out.println("DISCOVERYSERVICE constructor finished");
 	}
 
 	/**
@@ -54,18 +55,21 @@ public class DiscoveryService implements IService, IDiscoveryService, DiscoveryM
 			this._dmonitor.start();
 			this._dclient.start();
 			Set<InetAddress> slaves = this._dclient.findSlaves();
-			this._dmonitor.stop(); // DiscoveryMonitor is only onced to get a list of initial slaves, TODO move to stop() if DiscoveryService.findSlaves() is revived again
+			System.out.println("DISCOVERYSERVICE count von findSlaves() ist "+slaves.size());
+			this._dclient.stop(); // DiscoveryClient is used only once to get a list of initial slaves, TODO move to stop() if DiscoveryService.findSlaves() is revived again
 			for (InetAddress slave : slaves) {
 				this._slaves.add(slave); // set automatically eliminates duplicates, nice :)
 			}
 			informListeners();
 			
 			this._running = true;
+			System.out.println("DISCOVERYSERVICE start() fertig");
 		}
 	}
 	
 	/**
-	 * Stops the passive listening of new slaves and disables the active discovery of clients.  
+	 * Stops the passive listening of new slaves and disables the active discovery of clients.
+	 * The DiscoveryService can be stopped and restarted at any time with start() and stop()  
 	 */
 	public synchronized void stop() throws IOException {
 		if( this._running ) {
@@ -170,12 +174,22 @@ public class DiscoveryService implements IService, IDiscoveryService, DiscoveryM
 	/*** For IService: startService, shutdownService ***/
 	@Override
 	public void startService() {
-		// not used; every startup related things are in the constructor and in start();
-		// so use the eclipse shortcut Shift+Alt+Q,O and have a look at start() and the constructor
+		// initialie start() to make the DiscoveryService run
+		try {
+			this.start();
+		} catch (IOException e) {
+			System.err.println("DISCOVERYSERVISE oops, something went wrong; it was not possible to start me up");
+			e.printStackTrace();
+		}
+		System.out.println("DISCOVERYSERVICE startService run");
 	}
 	
 	@Override
 	public void shutdownService(IResultListener listener) {
-		
+		try {
+			this.stop(); // TODO should I also inform my listeners that I am not available anymore !?!
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -103,6 +103,7 @@ public class DiscoveryMonitor {
 					String message = new String(data).toUpperCase().trim(); // TODO WARNING systems default character set used here; ok here, because all message are based on ASCII characters ???
 					if( message.equals("HELLO") ) { // notify listener about new slave
 						InetAddress addr = packet.getAddress();
+						System.out.println("DMONITOR slave gefunden: "+addr);
 						for (DiscoveryMonitorListener l : _listeners) {
 							l.handleSlaveHello(addr);
 						}
