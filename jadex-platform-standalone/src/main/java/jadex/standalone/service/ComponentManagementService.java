@@ -868,7 +868,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  Get the component identifiers.
 	 *  @return The component identifiers.
 	 *  
-	 *  This method should be used with caution when the agent population is large.
+	 *  This method should be used with caution when the agent population is large. <- TODO and the reason is...?
 	 */
 	public void getComponentIdentifiers(IResultListener listener)
 	{

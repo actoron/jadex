@@ -125,7 +125,8 @@ public class DiscoveryClient {
 			} catch (IOException e) { // timer thread closed() socket
 				break;
 			}
-			String response = new String(data).toUpperCase().trim();
+			//String response = new String(data).toUpperCase().trim();
+			String response = new String(data).trim();
 			if( response.equals("PONG") ) {
 				InetAddress addr = packet.getAddress();
 				System.out.println("DCLIENT slave gefunden "+addr);

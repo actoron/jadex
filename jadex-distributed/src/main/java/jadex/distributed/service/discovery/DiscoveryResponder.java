@@ -109,11 +109,12 @@ public class DiscoveryResponder {
 				} catch (IOException e) { // socket.close() executed, which means that stop() has been executed; BYE already sent
 					break;
 				}
-				String message = new String(data).toUpperCase().trim();
+				//String message = new String(data).toUpperCase().trim();
+				String message = new String(data).trim();
 				if( message.equals("PING") ) { // respond with a PONG
 					System.out.println("DISCOVERYRESPONDER received a PING message");
 					String pong = "PONG";
-					DatagramPacket response = new DatagramPacket(pong.getBytes(), pong.getBytes().length);
+					DatagramPacket response = new DatagramPacket(pong.getBytes(), pong.getBytes().length, _group, _port);
 					try {
 						this._socket.send(response);
 					} catch (IOException e) { // should never happen

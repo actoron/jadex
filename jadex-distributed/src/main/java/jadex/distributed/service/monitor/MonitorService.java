@@ -83,13 +83,19 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 		// 	A \ B   = platforms which are in the old snapshot, but not in the new snapshot = platforms which are not available anymore
 		// 	B \ A   = platforms which are in the new snapsho, but not in the old snapshot = platforms which are new, so connect to them
 		Set <InetAddress> snapshot = this._dservice.getMachineAddresses(); // get a snapshot of the currently known platforms
-		Set<InetAddress> A = new HashSet<InetAddress>(snapshot);
+		
+		//Set<InetAddress> A = new HashSet<InetAddress>(snapshot);
+		Set<InetAddress> A = new HashSet<InetAddress>(this._connections.keySet());
+		
 		// A is a shallow copy of snapshot: both have REFERENCES to the same objects; but thats OK, because when you add new object REFERENCES to A,
 		// snapshot wan't care; also remove A is OK, because snapshot won't care
 		// the only thing to care of: when the references objects are themselves manipulated, then you say: hey, they aren't 'real' copies
 		
 		//Set<InetAddress> B = this._connections.keySet();
-		Set<InetAddress> B = new HashSet<InetAddress>(this._connections.keySet());
+		
+		//Set<InetAddress> B = new HashSet<InetAddress>(this._connections.keySet());
+		Set<InetAddress> B = new HashSet<InetAddress>(snapshot);
+		
 		
 		// leider so schön nicht ausdrückbar, da removeAll() und retainAll() mutating operations sind und das Ergebniss nicht returnen
 		// Set<InetAddress> connectTo = B.removeAll(A);
@@ -97,17 +103,19 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 		
 		A.removeAll(B);
 		Set<InetAddress> disconnectFrom = A; // which are old and I can disconnect and remove from the map 
-		A = new HashSet<InetAddress>(snapshot); // A muss wieder resetet werden, da die Set-Methoden leider mutating sind; autsch: könnte sich geändert haben in der Zwischenzeit
+		//A = new HashSet<InetAddress>(snapshot); // A muss wieder resetet werden, da die Set-Methoden leider mutating sind; autsch: könnte sich geändert haben in der Zwischenzeit
+		A = new HashSet<InetAddress>(this._connections.keySet());
 		
 		B.removeAll(A);
 		Set<InetAddress> connectTo = B; // which machines are new and I have to connectTo
-		B = new HashSet<InetAddress>(this._connections.keySet());
+		//B = new HashSet<InetAddress>(this._connections.keySet());
+		B = new HashSet<InetAddress>(snapshot);
 		// A and B did their duty; so why not delete the above line for B= ?
 		
 		// connect, disconnect, and modify this._connectors appropriately
 		for (InetAddress caddr : connectTo) { // connect to all new platforms and put entry to _connections-map
-			byte[] ip = caddr.getAddress(); // "service:jmx:rmi:///jndi/rmi://134.100.11.94:4711/jmxrmi"
-			String url = new StringBuilder().append("service:jmx:rmi:///jndi/rmi://").append(ip[0]).append(".").append(ip[1]).append(".").append(ip[2]).append(".").append(ip[3]).append(":").append(this._port).append("/jmxrmi").toString();
+			//byte[] ip = caddr.getAddress(); // "service:jmx:rmi:///jndi/rmi://134.100.11.94:4711/jmxrmi"
+			String url = new StringBuilder().append("service:jmx:rmi:///jndi/rmi://").append(caddr.getHostAddress()).append(":").append(this._port).append("/jmxrmi").toString();
 			try {
 				JMXServiceURL jmxUrl = new JMXServiceURL(url);
 				JMXConnector connector = JMXConnectorFactory.connect(jmxUrl);
@@ -122,7 +130,8 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 		
 		for (InetAddress daddr : disconnectFrom) { // disconnect to old platforms and remove entry from _connections-map
 			try {
-				this._connections.get(daddr).close();
+				JMXConnector connector = this._connections.get(daddr);
+				connector.close();
 				this._connections.remove(daddr);
 			} catch (IOException e) {
 				System.out.println("MONITOR Don't worry, the connection to the slave platform is closed, just not in a 'clean' manner.");e.printStackTrace();

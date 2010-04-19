@@ -100,7 +100,8 @@ public class DiscoveryMonitor {
 			while(true) {
 				try {
 					_socket.receive(packet); // empty the message queue for new messages
-					String message = new String(data).toUpperCase().trim(); // TODO WARNING systems default character set used here; ok here, because all message are based on ASCII characters ???
+					//String message = new String(data).toUpperCase().trim(); // TODO WARNING systems default character set used here; ok here, because all message are based on ASCII characters ???
+					String message = new String(data).trim(); // TODO WARNING systems default character set used here; ok here, because all message are based on ASCII characters ???
 					if( message.equals("HELLO") ) { // notify listener about new slave
 						InetAddress addr = packet.getAddress();
 						System.out.println("DMONITOR slave gefunden: "+addr);
