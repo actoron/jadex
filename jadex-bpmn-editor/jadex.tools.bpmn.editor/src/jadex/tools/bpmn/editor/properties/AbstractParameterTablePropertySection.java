@@ -4,10 +4,12 @@
 package jadex.tools.bpmn.editor.properties;
 
 import jadex.tools.bpmn.diagram.Messages;
-import jadex.tools.table.MultiColumnTable.MultiColumnTableRow;
+import jadex.tools.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
 
 import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
@@ -15,6 +17,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IWorkbenchPart;
 
 /**
@@ -22,48 +25,43 @@ import org.eclipse.ui.IWorkbenchPart;
  *
  */
 public class AbstractParameterTablePropertySection extends
-		AbstractMultiColumnTablePropertySection
+		AbstractBpmnMultiColumnTablePropertySection
 {
 
-	/**
-	 * the name column label
-	 */
+	// ---- constants ----
+	
+	/** the name column label */
 	protected final static String NAME_COLUMN = "Name"; //$NON-NLS-1$
 	
-	/**
-	 * the type column label
-	 */
+	/** the type column label */
 	protected final static String TYPE_COLUMN = "Type"; //$NON-NLS-1$
 	
-	/**
-	 * the value column label
-	 */
+	/** the value column label */
 	protected final static String VALUE_COLUMN = "Value"; //$NON-NLS-1$
 	
-	/**
-	 * the direction column label
-	 */
+	/** the direction column label */
 	protected final static String DIRECTION_COLUMN = "Direction"; //$NON-NLS-1$
 	
-	/**
-	 * parameter direction values 
-	 */
+	/**  parameter direction values */
 	protected final static String[] DIRECTION_VALUES = new String[] {"inout", "in", "out"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
-	/**
-	 * default parameter direction
-	 */
+	/** default parameter direction */
 	protected final static String DEFAULT_DIRECTION = "inout"; //$NON-NLS-1$
 	
 	
+	// ---- defaults ----
+	
+	/** default parameter column names */
 	protected final static String[] DEFAULT_PARAMTER_COLUMN_NAMES
 		= new String[] { DIRECTION_COLUMN, NAME_COLUMN, TYPE_COLUMN, VALUE_COLUMN  };
 	
-	protected final static int[] DEFAULT_PARAMETER_COLUMN_WEIGHT = new int[] { 1, 1, 1, 8 };
+	/** default parameter column weights */
+	protected final static int[] DEFAULT_PARAMETER_COLUMN_WEIGHTS = new int[] { 1, 1, 1, 8 };
 	
-
-	public static final String[] DEFAULT_PARAMETER_ROWATTRIBUTE_VALUES = new String[]{DEFAULT_DIRECTION, "name", "Object", ""};
+	/** default parameter element attributes */
+	public static final String[] DEFAULT_PARAMETER_LISTELEMENT_ATTRIBUTE_VALUES = new String[]{DEFAULT_DIRECTION, "name", "Object", ""};
 	
+	/** default unique attribute index */
 	public static final int UNIQUE_PARAMETER_ROW_ATTRIBUTE = 1;
 	
 	
@@ -83,7 +81,7 @@ public class AbstractParameterTablePropertySection extends
 	 */
 	public AbstractParameterTablePropertySection(String containerEAnnotationName, String annotationDetailName)
 	{
-		this(containerEAnnotationName, annotationDetailName, DEFAULT_PARAMETER_COLUMN_WEIGHT);
+		this(containerEAnnotationName, annotationDetailName, DEFAULT_PARAMETER_COLUMN_WEIGHTS);
 	}
 	
 	/**
@@ -92,10 +90,7 @@ public class AbstractParameterTablePropertySection extends
 	public AbstractParameterTablePropertySection(String containerEAnnotationName, String annotationDetailName, int[] columnWeights)
 	{
 		super(containerEAnnotationName, annotationDetailName,
-				Messages.JadexCommonParameterListSection_ParameterTable_Label, DEFAULT_PARAMTER_COLUMN_NAMES, 
-				columnWeights, DEFAULT_PARAMETER_ROWATTRIBUTE_VALUES, UNIQUE_PARAMETER_ROW_ATTRIBUTE);
-		
-		
+				"Parameter", UNIQUE_PARAMETER_ROW_ATTRIBUTE);
 	}
 	
 	 // ---- static methods ----
@@ -162,6 +157,8 @@ public class AbstractParameterTablePropertySection extends
 		return -1;
 	}
 	
+	
+	
 	// ---- methods ----
 
 	/* (non-Javadoc)
@@ -189,8 +186,23 @@ public class AbstractParameterTablePropertySection extends
 		
 		// register the table viewer for new element
 		addParameterTableViewerFor(modelElement, tableViewer);
+	}
+	
+	@Override
+	protected String[] getDefaultListElementAttributeValues()
+	{
+		return DEFAULT_PARAMETER_LISTELEMENT_ATTRIBUTE_VALUES;
+	}
+
+	@Override
+	protected int[] getColumnWeights(TableColumn[] columns)
+	{
+		if (columns.length == DEFAULT_PARAMETER_COLUMN_WEIGHTS.length)
+		{
+			return DEFAULT_PARAMETER_COLUMN_WEIGHTS;
+		}
 		
-		//System.out.println(tableViewerMap.size());
+		return super.getColumnWeights(columns);
 	}
 
 	/**

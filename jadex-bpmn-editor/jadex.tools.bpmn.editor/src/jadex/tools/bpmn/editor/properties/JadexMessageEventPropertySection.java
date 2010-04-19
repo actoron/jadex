@@ -21,7 +21,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * 
  *
  */
-public class JadexMessageEventPropertySection extends AbstractJadexPropertySection
+public class JadexMessageEventPropertySection extends AbstractBpmnPropertySection
 {
 	// ---- constants ----
 	
@@ -52,7 +52,7 @@ public class JadexMessageEventPropertySection extends AbstractJadexPropertySecti
 	 */
 	public JadexMessageEventPropertySection()
 	{
-		super(JADEX_GLOBAL_ANNOTATION, JADEX_EVENT_MESSAGE_DETAIL);
+		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_EVENT_MESSAGE_DETAIL);
 	}
 
 	// ---- methods ----
@@ -63,7 +63,7 @@ public class JadexMessageEventPropertySection extends AbstractJadexPropertySecti
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
 		
-		Group sectionGroup = getWidgetFactory().createGroup(sectionComposite, JADEX_EVENT_MESSAGE_DETAIL);
+		Group sectionGroup = getWidgetFactory().createGroup(sectionComposite, JadexBpmnPropertiesUtil.JADEX_EVENT_MESSAGE_DETAIL);
 		controls.add(sectionGroup);
 		sectionComposite = sectionGroup;
 		
@@ -158,7 +158,7 @@ public class JadexMessageEventPropertySection extends AbstractJadexPropertySecti
 		super.setInput(part, selection);
 		if (modelElement != null)
 		{
-			EAnnotation ea = modelElement.getEAnnotation(containerEAnnotationName);
+			EAnnotation ea = modelElement.getEAnnotation(util.containerEAnnotationName);
 			if (ea != null)
 			{
 				String comboValue = (String) ea.getDetails().get("mode");

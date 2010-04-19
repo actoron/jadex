@@ -3,7 +3,7 @@
  */
 package jadex.tools.bpmn.diagram.edit.parts;
 
-import jadex.tools.bpmn.editor.properties.AbstractJadexPropertySection;
+import jadex.tools.bpmn.editor.properties.JadexBpmnPropertiesUtil;
 import jadex.tools.bpmn.editor.properties.JadexSequencePropertiesSection;
 
 import org.eclipse.draw2d.ColorConstants;
@@ -69,7 +69,7 @@ public class SequenceEdgeEditPartWithCondition extends SequenceEdgeEditPart
 		if (edgeModel != null && edgeModel instanceof SequenceEdge)
 		{
 			SequenceEdge edge = (SequenceEdge) edgeModel;
-			condition = AbstractJadexPropertySection.getJadexEAnnotationDetail(edge, JadexSequencePropertiesSection.SEQUENCE_PROPERTIES_ANNOTATION_IDENTIFIER, JadexSequencePropertiesSection.SEQUENCE_PROPERTIES_CONDITION_DETAIL_IDENTIFIER);
+			condition = JadexBpmnPropertiesUtil.getJadexEAnnotationDetail(edge, JadexSequencePropertiesSection.SEQUENCE_PROPERTIES_ANNOTATION_IDENTIFIER, JadexSequencePropertiesSection.SEQUENCE_PROPERTIES_CONDITION_DETAIL_IDENTIFIER);
 		}
 		return condition;
 	}

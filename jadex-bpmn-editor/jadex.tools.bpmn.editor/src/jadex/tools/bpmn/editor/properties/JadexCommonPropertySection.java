@@ -16,7 +16,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * 
  * @author Claas Altschaffel
  */
-public class JadexCommonPropertySection extends AbstractJadexPropertySection
+public class JadexCommonPropertySection extends AbstractBpmnPropertySection
 {
 
 	// ---- attributes ----
@@ -31,7 +31,7 @@ public class JadexCommonPropertySection extends AbstractJadexPropertySection
 	 */
 	public JadexCommonPropertySection()
 	{
-		super(JADEX_COMMON_ANNOTATION, null);
+		super(JadexBpmnPropertiesUtil.JADEX_COMMON_ANNOTATION, null);
 	}
 
 	// ---- methods ----

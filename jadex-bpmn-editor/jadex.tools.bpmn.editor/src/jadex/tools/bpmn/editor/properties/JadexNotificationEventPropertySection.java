@@ -17,7 +17,7 @@ public class JadexNotificationEventPropertySection extends AbstractMultiTextfiel
 	 */
 	public JadexNotificationEventPropertySection()
 	{
-		super(JADEX_GLOBAL_ANNOTATION, JADEX_EVENT_RULE_DETAIL,
+		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
 				textFieldNames);
 	}
 }

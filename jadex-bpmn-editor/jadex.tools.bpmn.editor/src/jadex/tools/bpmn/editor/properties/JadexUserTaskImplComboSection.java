@@ -7,8 +7,8 @@ import jadex.tools.bpmn.runtime.task.IRuntimeTaskProvider;
 import jadex.tools.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.tools.bpmn.runtime.task.StaticJadexRuntimeTaskProvider;
 import jadex.tools.bpmn.runtime.task.TaskMetaInfo;
-import jadex.tools.table.MultiColumnTable;
-import jadex.tools.table.MultiColumnTable.MultiColumnTableRow;
+import jadex.tools.model.common.properties.table.MultiColumnTable;
+import jadex.tools.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression;
 import org.eclipse.jface.viewers.ISelection;
@@ -56,7 +56,7 @@ public class JadexUserTaskImplComboSection extends
 	 */
 	public JadexUserTaskImplComboSection()
 	{
-		super(JADEX_GLOBAL_ANNOTATION, JADEX_ACTIVITY_CLASS_DETAIL);
+		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_ACTIVITY_CLASS_DETAIL);
 		this.taskProvider = new StaticJadexRuntimeTaskProvider();
 	}
 
@@ -248,17 +248,17 @@ public class JadexUserTaskImplComboSection extends
 		ParameterMetaInfo[] taskParameter = metaInfo.getParameterMetaInfos();
 
 		MultiColumnTable parameterTable;
-		String currentParameterString = getJadexEAnnotationDetail(
+		String currentParameterString = JadexBpmnPropertiesUtil.getJadexEAnnotationDetail(
 				modelElement,
-				JadexCommonDiagramParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
-				JadexCommonDiagramParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER);
+				JadexCommonParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
+				JadexCommonParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER);
 		if (currentParameterString != null && !currentParameterString.isEmpty())
 		{
 			parameterTable = MultiColumnTable
 					.convertMultiColumnTableString(
 							currentParameterString,
-							JadexCommonDiagramParameterSection.DEFAULT_PARAMTER_COLUMN_NAMES.length,
-							JadexCommonDiagramParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE);
+							JadexCommonParameterSection.DEFAULT_PARAMTER_COLUMN_NAMES.length,
+							JadexCommonParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE);
 			parameterTable = updateTaskParamterTable(parameterTable, taskParameter);
 		}
 		else
@@ -266,10 +266,10 @@ public class JadexUserTaskImplComboSection extends
 			parameterTable = createNewParameterTable(taskParameter);
 		}
 
-		updateJadexEAnnotationDetail(
+		JadexBpmnPropertiesUtil.updateJadexEAnnotationDetail(
 				modelElement,
-				JadexCommonDiagramParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
-				JadexCommonDiagramParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER,
+				JadexCommonParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
+				JadexCommonParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER,
 				MultiColumnTable.convertMultiColumnRowList(parameterTable));
 
 		//Composite sectionRoot = findSectionRootComposite(this.sectionComposite);
@@ -280,7 +280,7 @@ public class JadexUserTaskImplComboSection extends
 		//	group.redraw();
 		//}
 		
-		TableViewer viewer = JadexCommonDiagramParameterSection.getParameterTableViewerFor(modelElement);
+		TableViewer viewer = JadexCommonParameterSection.getParameterTableViewerFor(modelElement);
 		if (viewer != null)
 		{
 			viewer.refresh();
@@ -304,7 +304,7 @@ public class JadexUserTaskImplComboSection extends
 					parameterMetaInfo[i].getInitialValue() };
 			newTable.add(newTable.new MultiColumnTableRow(
 					columnValues,
-					JadexCommonDiagramParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE));
+					JadexCommonParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE));
 
 		}
 		

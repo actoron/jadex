@@ -29,7 +29,7 @@ public class JadexBpmnDiagramPropertiesSection extends
 	 */
 	public JadexBpmnDiagramPropertiesSection()
 	{
-		super(JADEX_GLOBAL_ANNOTATION, JADEX_IMPORT_LIST_DETAIL,
+		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
 				textFieldNames);
 	}
 

@@ -24,7 +24,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * 
  * @author Claas Altschaffel
  */
-public abstract class AbstractComboPropertySection extends AbstractJadexPropertySection
+public abstract class AbstractComboPropertySection extends AbstractBpmnPropertySection
 {
 	
 	// ---- attributes ----
@@ -116,10 +116,10 @@ public abstract class AbstractComboPropertySection extends AbstractJadexProperty
 			
 			cCombo.setItems(predefinedItems);
 			
-			EAnnotation ea = modelElement.getEAnnotation(containerEAnnotationName);
-			if (ea != null && ea.getDetails().get(annotationDetailName) != null)
+			EAnnotation ea = modelElement.getEAnnotation(util.containerEAnnotationName);
+			if (ea != null && ea.getDetails().get(util.annotationDetailName) != null)
 			{
-				String value = (String) ea.getDetails().get(annotationDetailName);
+				String value = (String) ea.getDetails().get(util.annotationDetailName);
 				
 				int valueIndex = -1;
 				// search value in items
@@ -218,7 +218,7 @@ public abstract class AbstractComboPropertySection extends AbstractJadexProperty
 			@Override
 			public void modifyText(ModifyEvent e)
 			{
-				updateJadexEAnnotation(annotationDetailName, combo.getText());
+				updateJadexEAnnotation(util.annotationDetailName, combo.getText());
 			}
 		});
 		

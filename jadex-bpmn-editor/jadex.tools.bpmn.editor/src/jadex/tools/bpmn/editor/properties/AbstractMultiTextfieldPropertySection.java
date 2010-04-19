@@ -21,7 +21,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * 
  */
 public abstract class AbstractMultiTextfieldPropertySection extends
-		AbstractJadexPropertySection
+		AbstractBpmnPropertySection
 {
 	// ---- constants ----
 	
@@ -42,10 +42,10 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 	 * @param textFields
 	 */
 	protected AbstractMultiTextfieldPropertySection(
-			String containerEAnnotationName, String annotationDetailName,
+			String containerEAnnotationName,
 			String[] textFieldNames)
 	{
-		super(containerEAnnotationName, annotationDetailName);
+		super(containerEAnnotationName, null);
 		this.textFieldNames = textFieldNames != null ? textFieldNames : DEFAULT_NAMES;
 	}
 
@@ -118,7 +118,7 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 		super.setInput(part, selection);
 		if (modelElement != null)
 		{
-			EAnnotation ea = modelElement.getEAnnotation(containerEAnnotationName);
+			EAnnotation ea = modelElement.getEAnnotation(util.containerEAnnotationName);
 			if (ea != null)
 			{
 				for (int i = 0; i < textFieldNames.length; i++)

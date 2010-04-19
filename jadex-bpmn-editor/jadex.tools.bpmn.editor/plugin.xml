@@ -58,20 +58,6 @@
      </propertySections>
    </extension>
    
-   <!-- the jadex user task activity property section - ->
-	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
-     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
-        <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexUserTaskActivityPropertySection"
-              filter="jadex.tools.bpmn.editor.properties.JadexUserTaskActivityFilter"
-              id="jadex.tools.bpmn.editor.propertySection.UserTaskActivity"
-              tab="Jadex"
-              afterSection="jadex.tools.bpmn.editor.properties.JadexCommonPropertySection">
-           <input type="org.eclipse.stp.bpmn.Activity"/>
-        </propertySection>
-     </propertySections>
-   </extension> -->
-   
    <!-- the jadex user task activity class implementation property section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
@@ -90,7 +76,7 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexCommonDiagramParameterSection"
+              class="jadex.tools.bpmn.editor.properties.JadexCommonParameterSection"
               filter="jadex.tools.bpmn.editor.properties.JadexUserTaskActivityFilter"
               id="jadex.tools.bpmn.editor.properties.JadexCommonDiagramParameterSection"
               tab="Jadex"
@@ -289,40 +275,15 @@
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexCommonDiagramParameterSection"
-              id="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramParameterSection"
+              class="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramParameterSection"
+              id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramParameterSection"
               tab="Jadex"
-              afterSection="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramImportsSection">
+              afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramImportsSection">
            <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
         </propertySection>
      </propertySections>
    </extension>
    
-    <!-- the jadex bpmndiagram arguments section -->
-	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
-     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
-        <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramArgumentsSection"
-              id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramArgumentsSection"
-              tab="Jadex"
-              afterSection="jadex.tools.bpmn.editor.properties.JadexGlobalDiagramParameterSection">
-           <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
-        </propertySection>
-     </propertySections>
-   </extension>
-   
-   <!-- the jadex bpmndiagram results section -->
-	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
-     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
-        <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramResultsSection"
-              id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramResultsSection"
-              tab="Jadex"
-              afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramArgumentsSection">
-           <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
-        </propertySection>
-     </propertySections>
-   </extension>
    
    <!-- annotation decorator in diagram -->
 	<!--

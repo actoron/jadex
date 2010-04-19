@@ -20,7 +20,7 @@ public class JadexTimerEventPropertySection extends AbstractMultiTextfieldProper
 	 */
 	public JadexTimerEventPropertySection()
 	{
-		super(JADEX_GLOBAL_ANNOTATION, JADEX_EVENT_TIMER_DETAIL,
+		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
 				textFieldNames);
 	}
 

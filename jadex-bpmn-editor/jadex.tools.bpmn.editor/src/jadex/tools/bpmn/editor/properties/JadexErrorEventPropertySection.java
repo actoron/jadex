@@ -17,6 +17,6 @@ public class JadexErrorEventPropertySection extends AbstractMultiTextfieldProper
 	 */
 	public JadexErrorEventPropertySection()
 	{
-		super(JADEX_GLOBAL_ANNOTATION, JADEX_EVENT_ERROR_DETAIL, textFieldNames);
+		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, textFieldNames);
 	}
 }

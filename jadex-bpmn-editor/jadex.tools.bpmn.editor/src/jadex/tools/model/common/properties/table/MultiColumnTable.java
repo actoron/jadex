@@ -1,9 +1,9 @@
 /**
  * 
  */
-package jadex.tools.table;
+package jadex.tools.model.common.properties.table;
 
-import jadex.tools.bpmn.editor.properties.AbstractJadexPropertySection;
+import jadex.tools.bpmn.editor.properties.AbstractBpmnPropertySection;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -264,7 +264,7 @@ public class MultiColumnTable
 
 	/**
 	 * Convert a list of MultiColumnTableRow into a string representation using  
-	 * <code>LIST_ELEMENT_DELIMITER</code> from {@link AbstractJadexPropertySection}
+	 * <code>LIST_ELEMENT_DELIMITER</code> from {@link AbstractBpmnPropertySection}
 	 * as delimiter
 	 * 
 	 * @param table (the table)
@@ -288,7 +288,7 @@ public class MultiColumnTable
 	/**
 	 * Convert a row of the table to a String representation using 
 	 * <code>LIST_ELEMENT_ATTRIBUTE_DELIMITER</code> from 
-	 * {@link AbstractJadexPropertySection} as delimiter
+	 * {@link AbstractBpmnPropertySection} as delimiter
 	 * @param row to convert
 	 * @return String representation of row
 	 */

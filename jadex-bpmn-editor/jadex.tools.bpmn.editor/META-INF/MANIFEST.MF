@@ -13,3 +13,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.views.log;bundle-version="1.0.100"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: jadex.tools.model.common.properties,
+ jadex.tools.model.common.properties.table
