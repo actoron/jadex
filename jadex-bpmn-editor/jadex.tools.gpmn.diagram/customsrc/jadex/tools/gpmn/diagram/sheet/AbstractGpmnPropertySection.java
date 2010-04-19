@@ -1,6 +1,7 @@
 package jadex.tools.gpmn.diagram.sheet;
 
 import jadex.tools.gpmn.diagram.part.GpmnDiagramEditorPlugin;
+import jadex.tools.model.common.properties.ModifyEObjectCommand;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -17,7 +18,6 @@ import org.eclipse.emf.transaction.util.TransactionUtil;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.properties.sections.AbstractModelerPropertySection;
-import org.eclipse.gmf.runtime.emf.commands.core.command.AbstractTransactionalCommand;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ISelection;
@@ -214,77 +214,9 @@ public class AbstractGpmnPropertySection extends AbstractModelerPropertySection 
 	
 	
 	
-	/**
-	 * Utility class thats simplify the execution of
-	 * AbstractTransactionalCommand.
-	 * 
-	 * @generated NOT
-	 */
-	protected abstract class AbstractGpmnEditingSupport extends EditingSupport
-	{
-		private CellEditor editor;
-
-		public AbstractGpmnEditingSupport(TableViewer viewer)
-		{
-			super(viewer);
-			this.editor = new TextCellEditor(viewer.getTable());
-		}
-
-		public AbstractGpmnEditingSupport(TableViewer viewer, CellEditor editor)
-		{
-			super(viewer);
-			this.editor = editor;
-		}
-
-		protected boolean canEdit(Object element)
-		{
-			return (element instanceof EObject);
-			// return true;
-		}
-
-		protected CellEditor getCellEditor(Object element)
-		{
-			return editor;
-		}
-
-		protected void setValue(Object element, Object value)
-		{
-			ModifyGpmnElementCommand command = getTransactionalEditCommand(element,
-					value);
-
-			try
-			{
-				command.execute(null, null);
-			}
-			catch (ExecutionException ex)
-			{
-				GpmnDiagramEditorPlugin.getInstance().getLog().log(
-						new Status(IStatus.ERROR, GpmnDiagramEditorPlugin.ID,
-								IStatus.ERROR, ex.getMessage(), ex));
-			}
-
-			getViewer().update(element, null);
-			refreshSelectedEditPart();
-		}
-
-		protected abstract ModifyGpmnElementCommand getTransactionalEditCommand(
-				Object element, Object value);
-	}
 	
 	
-	/**
-	 * Utility class thats simplify the creation of AbstractTransactionalCommand.
-	 * @generated NOT
-	 */
-	protected abstract class ModifyGpmnElementCommand extends
-			AbstractTransactionalCommand
-	{
-		public ModifyGpmnElementCommand(EObject element, String label)
-		{
-			super((TransactionalEditingDomain) AdapterFactoryEditingDomain
-					.getEditingDomainFor(element), label,
-					getWorkspaceFiles(element));
-		}
-	}
+	
+	
 	
 }

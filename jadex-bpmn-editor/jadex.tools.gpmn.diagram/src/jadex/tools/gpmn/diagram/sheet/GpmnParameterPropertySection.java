@@ -13,6 +13,8 @@ import jadex.tools.gpmn.GpmnFactory;
 import jadex.tools.gpmn.Parameter;
 import jadex.tools.gpmn.ParameterizedVertex;
 import jadex.tools.gpmn.diagram.part.GpmnDiagramMessages;
+import jadex.tools.model.common.properties.ModifyEObjectCommand;
+import jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection;
 
 import java.util.List;
 
@@ -35,7 +37,7 @@ import org.eclipse.swt.widgets.TableColumn;
 /**
  * @generated NOT
  */
-public class GpmnParameterPropertySection extends AbstractGpmnTablePropertySection
+public class GpmnParameterPropertySection extends AbstractCommonTablePropertySection
 {
 	/**
 	 * @generated NOT
@@ -106,7 +108,7 @@ public class GpmnParameterPropertySection extends AbstractGpmnTablePropertySecti
 			}
 
 			@Override
-			protected ModifyGpmnElementCommand getTransactionalEditCommand(
+			protected ModifyEObjectCommand getTransactionalEditCommand(
 					Object element, Object value)
 			{
 				return new ModifyParamterCommand((EObject)element, DIRECTION_COLUMN, value);
@@ -133,7 +135,7 @@ public class GpmnParameterPropertySection extends AbstractGpmnTablePropertySecti
 			}
 
 			@Override
-			protected ModifyGpmnElementCommand getTransactionalEditCommand(
+			protected ModifyEObjectCommand getTransactionalEditCommand(
 					Object element, Object value)
 			{
 				return new ModifyParamterCommand((EObject)element, NAME_COLUMN, value);
@@ -158,7 +160,7 @@ public class GpmnParameterPropertySection extends AbstractGpmnTablePropertySecti
 			}
 
 			@Override
-			protected ModifyGpmnElementCommand getTransactionalEditCommand(
+			protected ModifyEObjectCommand getTransactionalEditCommand(
 					Object element, Object value)
 			{
 				return new ModifyParamterCommand((EObject)element, TYPE_COLUMN, value);
@@ -183,7 +185,7 @@ public class GpmnParameterPropertySection extends AbstractGpmnTablePropertySecti
 			}
 
 			@Override
-			protected ModifyGpmnElementCommand getTransactionalEditCommand(
+			protected ModifyEObjectCommand getTransactionalEditCommand(
 					Object element, Object value)
 			{
 				return new ModifyParamterCommand((EObject)element, VALUE_COLUMN, value);
@@ -202,10 +204,10 @@ public class GpmnParameterPropertySection extends AbstractGpmnTablePropertySecti
 	 * @see jadex.tools.gpmn.diagram.sheet.AbstractGpmnTablePropertySection#getAddCommand()
 	 */
 	@Override
-	protected ModifyGpmnElementCommand getAddCommand()
+	protected ModifyEObjectCommand getAddCommand()
 	{
 		// modify the ContextElement
-		ModifyGpmnElementCommand command = new ModifyGpmnElementCommand(
+		ModifyEObjectCommand command = new ModifyEObjectCommand(
 				modelElement,
 				GpmnDiagramMessages.GpmnParamterListSection_add_element_command_name)
 		{
@@ -226,13 +228,13 @@ public class GpmnParameterPropertySection extends AbstractGpmnTablePropertySecti
 	}
 
 	/**
-	 * @see jadex.tools.gpmn.diagram.sheet.AbstractGpmnTablePropertySection#getDeleteCommand()
+	 * @see jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection#getDeleteCommand()
 	 */
 	@Override
-	protected ModifyGpmnElementCommand getDeleteCommand()
+	protected ModifyEObjectCommand getDeleteCommand()
 	{
 		// modify the ContextElement
-		ModifyGpmnElementCommand command = new ModifyGpmnElementCommand(
+		ModifyEObjectCommand command = new ModifyEObjectCommand(
 				modelElement,
 				GpmnDiagramMessages.GpmnParamterListSection_remove_element_command_name)
 		{
@@ -255,7 +257,7 @@ public class GpmnParameterPropertySection extends AbstractGpmnTablePropertySecti
 	
 
 	/**
-	 * @see jadex.tools.gpmn.diagram.sheet.AbstractGpmnTablePropertySection#getTableContentProvider()
+	 * @see jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection#getTableContentProvider()
 	 */
 	@Override
 	protected IStructuredContentProvider getTableContentProvider()
@@ -293,7 +295,7 @@ public class GpmnParameterPropertySection extends AbstractGpmnTablePropertySecti
 	}
 	
 	
-	protected class ModifyParamterCommand extends ModifyGpmnElementCommand
+	protected class ModifyParamterCommand extends ModifyEObjectCommand
 	{
 
 		private EObject elementToUpdate;

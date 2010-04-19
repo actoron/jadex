@@ -47,6 +47,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.workspace,
  org.eclipse.gmf.runtime.notation,
  org.eclipse.gmf.runtime.notation.edit,
+ org.eclipse.jdt.core;bundle-version="3.5.0",
  org.eclipse.stp.bpmn.diagram;bundle-version="1.0.0",
- org.eclipse.jdt.core;bundle-version="3.5.0"
+ jadex.tools.bpmn.editor;bundle-version="0.0.1"
 Eclipse-LazyStart: true

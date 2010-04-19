@@ -12,6 +12,8 @@ import jadex.tools.gpmn.Context;
 import jadex.tools.gpmn.ContextElement;
 import jadex.tools.gpmn.GpmnFactory;
 import jadex.tools.gpmn.diagram.part.GpmnDiagramMessages;
+import jadex.tools.model.common.properties.ModifyEObjectCommand;
+import jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection;
 
 import java.util.List;
 
@@ -34,7 +36,7 @@ import org.eclipse.swt.widgets.TableColumn;
 /**
  * @generated NOT
  */
-public class GpmnContextElementsPropertySection extends AbstractGpmnTablePropertySection
+public class GpmnContextElementsPropertySection extends AbstractCommonTablePropertySection
 {
 
 	/**
@@ -97,7 +99,7 @@ public class GpmnContextElementsPropertySection extends AbstractGpmnTablePropert
 			}
 
 			@Override
-			protected ModifyGpmnElementCommand getTransactionalEditCommand(
+			protected ModifyEObjectCommand getTransactionalEditCommand(
 					Object element, Object value)
 			{
 				return new ModifyContextElementCommand((EObject)element, NAME_COLUMN, value);
@@ -122,7 +124,7 @@ public class GpmnContextElementsPropertySection extends AbstractGpmnTablePropert
 			}
 
 			@Override
-			protected ModifyGpmnElementCommand getTransactionalEditCommand(
+			protected ModifyEObjectCommand getTransactionalEditCommand(
 					Object element, Object value)
 			{
 				return new ModifyContextElementCommand((EObject)element, TYPE_COLUMN, value);
@@ -147,7 +149,7 @@ public class GpmnContextElementsPropertySection extends AbstractGpmnTablePropert
 			}
 
 			@Override
-			protected ModifyGpmnElementCommand getTransactionalEditCommand(
+			protected ModifyEObjectCommand getTransactionalEditCommand(
 					Object element, Object value)
 			{
 				return new ModifyContextElementCommand((EObject)element, VALUE_COLUMN, value);
@@ -188,7 +190,7 @@ public class GpmnContextElementsPropertySection extends AbstractGpmnTablePropert
 			}
 
 			@Override
-			protected ModifyGpmnElementCommand getTransactionalEditCommand(
+			protected ModifyEObjectCommand getTransactionalEditCommand(
 					Object element, Object value)
 			{
 				
@@ -230,7 +232,7 @@ public class GpmnContextElementsPropertySection extends AbstractGpmnTablePropert
 			}
 
 			@Override
-			protected ModifyGpmnElementCommand getTransactionalEditCommand(
+			protected ModifyEObjectCommand getTransactionalEditCommand(
 					Object element, Object value)
 			{
 				return new ModifyContextElementCommand((EObject)element, DYNAMIC_COLUMN, BOOLEAN_VALUES[((Integer) value).intValue()]);
@@ -263,10 +265,10 @@ public class GpmnContextElementsPropertySection extends AbstractGpmnTablePropert
 	 * @see jadex.tools.gpmn.diagram.sheet.AbstractGpmnTablePropertySection#getAddCommand()
 	 */
 	@Override
-	protected ModifyGpmnElementCommand getAddCommand()
+	protected ModifyEObjectCommand getAddCommand()
 	{
 		// modify the ContextElement
-		ModifyGpmnElementCommand command = new ModifyGpmnElementCommand(
+		ModifyEObjectCommand command = new ModifyEObjectCommand(
 				modelElement,
 				GpmnDiagramMessages.GpmnContextElementsListSection_add_element_command_name)
 		{
@@ -287,13 +289,13 @@ public class GpmnContextElementsPropertySection extends AbstractGpmnTablePropert
 	}
 
 	/**
-	 * @see jadex.tools.gpmn.diagram.sheet.AbstractGpmnTablePropertySection#getDeleteCommand()
+	 * @see jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection#getDeleteCommand()
 	 */
 	@Override
-	protected ModifyGpmnElementCommand getDeleteCommand()
+	protected ModifyEObjectCommand getDeleteCommand()
 	{
 		// modify the ContextElement
-		ModifyGpmnElementCommand command = new ModifyGpmnElementCommand(
+		ModifyEObjectCommand command = new ModifyEObjectCommand(
 				modelElement,
 				GpmnDiagramMessages.GpmnContextElementsListSection_remove_element_command_name)
 		{
@@ -316,7 +318,7 @@ public class GpmnContextElementsPropertySection extends AbstractGpmnTablePropert
 	
 
 	/**
-	 * @see jadex.tools.gpmn.diagram.sheet.AbstractGpmnTablePropertySection#getTableContentProvider()
+	 * @see jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection#getTableContentProvider()
 	 */
 	@Override
 	protected IStructuredContentProvider getTableContentProvider()
@@ -354,7 +356,7 @@ public class GpmnContextElementsPropertySection extends AbstractGpmnTablePropert
 	}
 	
 	
-	protected class ModifyContextElementCommand extends ModifyGpmnElementCommand
+	protected class ModifyContextElementCommand extends ModifyEObjectCommand
 	{
 
 		private EObject elementToUpdate;
