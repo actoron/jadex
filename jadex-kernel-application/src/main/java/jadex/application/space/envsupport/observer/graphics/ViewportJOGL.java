@@ -387,8 +387,8 @@ public class ViewportJOGL extends AbstractViewport
 		Graphics2D g = (Graphics2D)image.getGraphics();
 		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);		
 		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, width, height);
 		g.setComposite(AlphaComposite.Src);
+		g.fillRect(0, 0, width, height);
 		g.drawImage(inputImage, 0, 0, width, height, 0, 0, inputImage.getWidth(), inputImage.getHeight(), null);
 
 		g.dispose();
@@ -400,6 +400,7 @@ public class ViewportJOGL extends AbstractViewport
 		buffer.order(ByteOrder.nativeOrder());
 		buffer.put(imgData, 0, imgData.length);
 		buffer.flip();
+		//buffer.rewind();
 
 		// Prepare texture
 		int[] texId = new int[1];
@@ -424,9 +425,12 @@ public class ViewportJOGL extends AbstractViewport
 		}
 		else
 		{
-			gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, intFormat, image
+			/*gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, intFormat, image
 				.getWidth(), image.getHeight(), 0, GL.GL_RGBA,
-				GL.GL_UNSIGNED_BYTE, buffer);
+				GL.GL_UNSIGNED_BYTE, buffer);*/
+			GLU glu = new GLU();
+			glu.gluBuild2DMipmaps(GL.GL_TEXTURE_2D, intFormat, image
+					.getWidth(), image.getHeight(), GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, buffer);
 		}
 
 		gl.glDisable(GL.GL_TEXTURE_2D);
