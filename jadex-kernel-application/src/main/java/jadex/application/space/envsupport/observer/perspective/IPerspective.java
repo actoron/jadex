@@ -71,6 +71,17 @@ public interface IPerspective extends IPropertyObject
 	public void refresh();
 	
 	/**
+	 * Gets whether to try to use OpenGL.
+	 * @return true, if attempt should be made to use OpenGL
+	 */
+	public boolean getOpenGl();
+	
+	/**
+	 * Resets the perspective.
+	 */
+	public void reset();
+	
+	/**
 	 *  Sets whether to try to use OpenGL.
 	 *  @param opengl true, if attempt should be made to use OpenGL
 	 */

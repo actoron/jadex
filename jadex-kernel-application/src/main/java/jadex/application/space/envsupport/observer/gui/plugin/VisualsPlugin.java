@@ -19,6 +19,7 @@ import java.util.Set;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -28,12 +29,16 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableModel;
 
 public class VisualsPlugin implements IObserverCenterPlugin
 {
@@ -47,7 +52,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 	
 	/** The perspectives
 	 */
-	private JList perspectivelist;
+	private JTable perspectivelist;
 	
 	/** The dataviews
 	 */
@@ -95,14 +100,54 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		perspectivePanel.setBorder(new TitledBorder("Perspective"));
 		persViewPane.setTopComponent(perspectivePanel);
 		
-		perspectivelist = new JList(new DefaultComboBoxModel());
+		DefaultTableModel perspectiveModel = new DefaultTableModel(new String[]{"Perspective", "OpenGL"}, 0)
+		{
+			@Override
+			public Class getColumnClass(int columnIndex)
+			{
+				if (columnIndex == 1)
+					return Boolean.class;
+				return super.getColumnClass(columnIndex);
+			}
+			
+			public boolean isCellEditable(int row, int column)
+			{
+				return (column == 1);
+			}
+		};
+		perspectiveModel.addTableModelListener(new TableModelListener()
+		{
+			public void tableChanged(TableModelEvent e)
+			{
+				if (e.getColumn() == 1)
+				{
+					int row = perspectivelist.getSelectedRow();
+					String selection = null;
+					if (row != -1)
+						selection = (String) ((DefaultTableModel) perspectivelist.getModel()).getValueAt(row, 0);
+					if (selection != null)
+					{
+						Boolean opengl = (Boolean) ((DefaultTableModel) perspectivelist.getModel()).getValueAt(row, 1);
+						observerCenter_.setOpenGLMode(selection, opengl.booleanValue());
+					}
+				}
+			}
+		});
+		perspectivelist = new JTable(perspectiveModel);
+		perspectivelist.setSelectionModel(new DefaultListSelectionModel());
 		JScrollPane perspectiveScrollPane = new JScrollPane(perspectivelist);
 		perspectiveController_ = new ListSelectionListener()
 		{
 			public void valueChanged(ListSelectionEvent e)
 			{
-				String selection = (String) perspectivelist.getSelectedValue();
-				observerCenter_.setSelectedPerspective(selection);
+				int row = perspectivelist.getSelectedRow();
+				String selection = null;
+				if (row != -1)
+					selection = (String) ((DefaultTableModel) perspectivelist.getModel()).getValueAt(row, 0);
+				if (selection != null)
+				{
+					observerCenter_.setSelectedPerspective(selection);
+				}
 			}
 		};
 		GridBagConstraints c = new GridBagConstraints();
@@ -339,15 +384,17 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		Map perspectives = observerCenter_.getPerspectives();
 		synchronized(perspectives)
 		{
-			Set themeNames = perspectives.keySet();
+			Set themeNames = perspectives.entrySet();
 			for (Iterator it = themeNames.iterator(); it.hasNext(); )
 			{
-				String name = (String) it.next();
-				((DefaultComboBoxModel) perspectivelist.getModel()).addElement(name);
+				Map.Entry entry = (Map.Entry) it.next();
+				String name = (String) entry.getKey();
+				Boolean opengl = new Boolean(((IPerspective) entry.getValue()).getOpenGl());
+				((DefaultTableModel) perspectivelist.getModel()).addRow(new Object[]{name, opengl});
 			}
 		}
 		
-		perspectivelist.addListSelectionListener(perspectiveController_);
+		perspectivelist.getSelectionModel().addListSelectionListener(perspectiveController_);
 		
 		Map dataviews = observerCenter_.getDataViews();
 		synchronized(dataviews)
@@ -372,8 +419,9 @@ public class VisualsPlugin implements IObserverCenterPlugin
 	 */
 	public void shutdown()
 	{
-		perspectivelist.removeListSelectionListener(perspectiveController_);
-		((DefaultComboBoxModel) perspectivelist.getModel()).removeAllElements();
+		perspectivelist.getSelectionModel().removeListSelectionListener(perspectiveController_);
+		while (((DefaultTableModel) perspectivelist.getModel()).getRowCount() > 0)
+			((DefaultTableModel) perspectivelist.getModel()).removeRow(0);
 		dataviewlist.removeListSelectionListener(dataviewController_);
 		((DefaultComboBoxModel) dataviewlist.getModel()).removeAllElements();
 	}
@@ -410,8 +458,9 @@ public class VisualsPlugin implements IObserverCenterPlugin
 	public void refresh()
 	{
 		String selection = observerCenter_.getSelectedPerspective().getName();
-		Map perspectives = observerCenter_.getPerspectives();
-		perspectivelist.removeListSelectionListener(perspectiveController_);
+		//TODO: FIXME
+		/*Map perspectives = observerCenter_.getPerspectives();
+		perspectivelist.getSelectionModel().removeListSelectionListener(perspectiveController_);
 		((DefaultComboBoxModel) perspectivelist.getModel()).removeAllElements();
 		synchronized(perspectives)
 		{
@@ -421,9 +470,11 @@ public class VisualsPlugin implements IObserverCenterPlugin
 				String name = (String) it.next();
 				((DefaultComboBoxModel) perspectivelist.getModel()).addElement(name);
 			}
-		}
-		perspectivelist.setSelectedValue(selection, true);
-		perspectivelist.addListSelectionListener(perspectiveController_);
+		}*/
+		
+		/*int row = ((DefaultTableModel) perspectivelist.getModel());
+		perspectivelist.getSelectionModel().// setSelectedValue(selection, true);*/
+		//perspectivelist.getSelectionModel().addListSelectionListener(perspectiveController_);
 		
 		selection = observerCenter_.getSelectedDataViewName();
 		Map dataviews = observerCenter_.getDataViews();

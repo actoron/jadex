@@ -398,6 +398,31 @@ public class ObserverCenter
 	}
 	
 	/**
+	 * Sets the OpenGL mode for a perspective
+	 * @param name name of the perspective
+	 * @param opengl true to activate OpenGL mode
+	 */
+	public void setOpenGLMode(final String name, final boolean opengl)
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run() 
+			{
+				synchronized(perspectives)
+				{
+					IPerspective perspective = (IPerspective)perspectives.get(name);
+					perspective.setOpenGl(opengl);
+					if (name.equals(selectedperspective.getName()))
+					{
+						mainwindow.setPerspectiveView(selectedperspective.getView());
+						selectedperspective.reset();
+					}
+				}
+			}
+		});
+	}
+	
+	/**
 	 * Returns the space.
 	 * @return the space
 	 */

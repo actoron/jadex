@@ -307,12 +307,26 @@ public class Perspective2D extends SimplePropertyObject implements IPerspective
 	}
 	
 	/**
+	 * Gets whether to try to use OpenGL.
+	 * @return true, if attempt should be made to use OpenGL
+	 */
+	public boolean getOpenGl()
+	{
+		return tryopengl;
+	}
+	
+	/**
 	 * Sets whether to try to use OpenGL.
 	 * @param opengl true, if attempt should be made to use OpenGL
 	 */
 	public void setOpenGl(boolean opengl)
 	{
 		this.tryopengl = opengl;
+		if (viewport != null)
+		{
+			viewport = null;
+			getView();
+		}
 	}
 	
 	/**
