@@ -3,13 +3,10 @@
  */
 package jadex.tools.bpmn.editor.properties;
 
-import jadex.tools.bpmn.diagram.Messages;
 import jadex.tools.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
 
 import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
@@ -219,7 +216,7 @@ public class AbstractParameterTablePropertySection extends
 		
 		ComboBoxCellEditor editor = new ComboBoxCellEditor(((TableViewer) viewer)
 				.getTable(), DIRECTION_VALUES, SWT.READ_ONLY);
-		column0.setEditingSupport(new MultiColumnTableEditingSupport(viewer, 0, editor)
+		column0.setEditingSupport(new BpmnMultiColumnTableEditingSupport(viewer, 0, editor)
 		{
 			protected Object getValue(Object element)
 			{
@@ -257,7 +254,7 @@ public class AbstractParameterTablePropertySection extends
 		{
 			TableViewerColumn column1 = new TableViewerColumn(viewer, SWT.LEFT);
 			column1.getColumn().setText(DEFAULT_PARAMTER_COLUMN_NAMES[columnIndex]);
-			column1.setEditingSupport(new MultiColumnTableEditingSupport(viewer, columnIndex));
+			column1.setEditingSupport(new BpmnMultiColumnTableEditingSupport(viewer, columnIndex));
 			column1.setLabelProvider(new MultiColumnTableLabelProvider(columnIndex));
 		}
 //		

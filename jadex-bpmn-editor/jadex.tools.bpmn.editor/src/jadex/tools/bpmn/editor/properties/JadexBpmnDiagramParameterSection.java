@@ -46,7 +46,7 @@ public class JadexBpmnDiagramParameterSection extends
 	{
 		TableViewerColumn column0 = new TableViewerColumn(viewer, SWT.LEFT);
 		column0.getColumn().setText(COLUMN_NAMES[0]);
-		column0.setEditingSupport(new MultiColumnTableEditingSupport(viewer, 0));
+		column0.setEditingSupport(new BpmnMultiColumnTableEditingSupport(viewer, 0));
 		column0.setLabelProvider(new MultiColumnTableLabelProvider(0));
 		
 		
@@ -55,7 +55,7 @@ public class JadexBpmnDiagramParameterSection extends
 		
 		CheckboxCellEditor editor = new CheckboxCellEditor(((TableViewer) viewer)
 				.getTable(), SWT.ARROW );
-		column1.setEditingSupport(new MultiColumnTableEditingSupport(viewer, 1, editor)
+		column1.setEditingSupport(new BpmnMultiColumnTableEditingSupport(viewer, 1, editor)
 		{
 			protected Object getValue(Object element)
 			{
@@ -104,7 +104,7 @@ public class JadexBpmnDiagramParameterSection extends
 		
 		editor = new CheckboxCellEditor(((TableViewer) viewer)
 				.getTable(), SWT.ARROW);
-		column2.setEditingSupport(new MultiColumnTableEditingSupport(viewer, 2, editor)
+		column2.setEditingSupport(new BpmnMultiColumnTableEditingSupport(viewer, 2, editor)
 		{
 			protected Object getValue(Object element)
 			{
@@ -152,7 +152,7 @@ public class JadexBpmnDiagramParameterSection extends
 		{
 			TableViewerColumn columnX = new TableViewerColumn(viewer, SWT.LEFT);
 			columnX.getColumn().setText(COLUMN_NAMES[columnIndex]);
-			columnX.setEditingSupport(new MultiColumnTableEditingSupport(viewer, columnIndex));
+			columnX.setEditingSupport(new BpmnMultiColumnTableEditingSupport(viewer, columnIndex));
 			columnX.setLabelProvider(new MultiColumnTableLabelProvider(columnIndex));
 		}	
 	}

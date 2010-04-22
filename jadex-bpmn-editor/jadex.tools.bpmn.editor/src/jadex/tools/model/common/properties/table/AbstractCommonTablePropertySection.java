@@ -6,27 +6,34 @@ package jadex.tools.model.common.properties.table;
 import jadex.tools.bpmn.editor.JadexBpmnEditor;
 import jadex.tools.model.common.properties.AbstractCommonPropertySection;
 import jadex.tools.model.common.properties.ModifyEObjectCommand;
+import jadex.tools.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.FigureUtilities;
+import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TableViewerFocusCellManager;
+import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.stp.bpmn.diagram.part.BpmnDiagramEditorPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -44,6 +51,8 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 public abstract class AbstractCommonTablePropertySection extends
 		AbstractCommonPropertySection
 {
+
+	
 
 	/** The label string for the tableViewer */
 	protected String tableViewerLabel;
@@ -427,6 +436,203 @@ public abstract class AbstractCommonTablePropertySection extends
 			weights[i] = 1;
 		}
 		return weights;
+	}
+	
+	// ---- internal used classes ----
+	
+	/**
+	 * Label provider in charge of rendering the keys and columnValues of the annotation
+	 * attached to the object. Currently based on CommonLabelProvider.
+	 */
+	protected class MultiColumnTableLabelProvider extends ColumnLabelProvider
+			implements ITableLabelProvider
+	{
+	
+		// ---- attributes ----
+		
+		/** 
+		 * The index for this column
+		 */
+		private int columIndex;
+		
+		// ---- constructors ----
+		
+		/**
+		 * empty constructor, sets column index to -1
+		 */
+		public MultiColumnTableLabelProvider()
+		{
+			super();
+			this.columIndex = -1;
+		}
+		
+		/**
+		 * @param columIndex the column index to provide the label for
+		 */
+		public MultiColumnTableLabelProvider(int columIndex)
+		{
+			super();
+			assert columIndex >= 0 : "column index < 0";
+			this.columIndex = columIndex;
+		}
+		
+		// ---- ColumnLabelProvider overrides ----
+		
+		@Override
+		public Image getImage(Object element)
+		{
+			if (columIndex >= 0)
+			{
+				return this.getColumnImage(element, columIndex);
+			}
+			else
+			{
+				return super.getImage(element);
+			}
+		}
+	
+		@Override
+		public String getText(Object element)
+		{
+			if (columIndex >= 0)
+			{
+				return this.getColumnText(element, columIndex);
+			}
+			else
+			{
+				return super.getText(element);
+			}
+		}
+		
+		// ---- ITableLabelProvider implementation ----
+		
+		/**
+		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
+		 */
+		public Image getColumnImage(Object element, int columnIndex)
+		{
+			return super.getImage(element);
+		}
+	
+		/**
+		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
+		 */
+		public String getColumnText(Object element, int columnIndex)
+		{
+			if (element instanceof MultiColumnTableRow)
+			{
+				return ((MultiColumnTableRow) element).getColumnValues()[columnIndex];
+			}
+			return super.getText(element);
+		}
+		
+	}
+	
+	/**
+	 * Abstract EditingSupport in charge of edit the table 
+	 * cell and update the corresponding model
+	 * 
+	 * @author Claas
+	 *
+	 */
+	protected abstract class MultiColumnTableEditingSupport extends EditingSupport {
+		
+		protected CellEditor editor;
+		protected int attributeIndex;
+
+		protected MultiColumnTableEditingSupport(TableViewer viewer, int attributeIndex)
+		{
+			super(viewer);
+			this.editor = new TextCellEditor(viewer.getTable());
+			this.attributeIndex = attributeIndex;
+		}
+		
+		protected MultiColumnTableEditingSupport(TableViewer viewer, int attributeIndex, CellEditor editor)
+		{
+			super(viewer);
+			this.editor = editor;
+			this.attributeIndex = attributeIndex;
+		}
+
+		/**
+		 * Can edit all columns.
+		 * @generated NOT
+		 */
+		public boolean canEdit(Object element)
+		{
+			if (element instanceof MultiColumnTableRow)
+			{
+				return true;
+			}
+			return false;
+		}
+		
+		protected CellEditor getCellEditor(Object element)
+		{
+			return editor;
+		}
+
+		protected void setValue(Object element, Object value)
+		{
+			doSetValue(element, value);
+			// refresh the table viewer element
+			getViewer().update(element, null);
+			// refresh the graphical edit part
+			refreshSelectedEditPart();
+		}
+
+		/**
+		 * Get the value for atttributeIndex
+		 * @param element to get the value from
+		 */
+		protected Object getValue(Object element)
+		{
+			return ((MultiColumnTableRow) element).getColumnValues()[attributeIndex];
+		}
+		
+		/**
+		 * Create the transactional command to update the model
+		 * @param tableViewerRow
+		 * @param value
+		 * @return command to execute
+		 */
+		protected abstract ModifyEObjectCommand getSetValueCommand(final MultiColumnTableRow tableViewerRow, final Object value);
+		
+		/**
+		 * Update the element value with transactional command
+		 * @param element to update
+		 * @param value to set
+		 */
+		protected void doSetValue(Object element, Object value)
+		{
+			
+			final MultiColumnTableRow tableViewerRow = (MultiColumnTableRow) element;
+			final String newValue = value.toString();
+
+			// modify the Model
+			ModifyEObjectCommand command = getSetValueCommand(tableViewerRow, newValue);
+			
+			try
+			{
+				command.setReuseParentTransaction(true);
+				command.execute(null, null);
+				
+			}
+			catch (ExecutionException e)
+			{
+				BpmnDiagramEditorPlugin
+						.getInstance()
+						.getLog()
+						.log(
+								new Status(
+										IStatus.ERROR,
+										JadexBpmnEditor.ID,
+										IStatus.ERROR, e
+												.getMessage(),
+										e));
+			}
+
+		}
 	}
 	
 }
