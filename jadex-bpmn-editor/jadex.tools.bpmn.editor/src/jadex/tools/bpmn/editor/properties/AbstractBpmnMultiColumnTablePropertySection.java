@@ -182,6 +182,81 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 	}
 
 	@Override
+	protected ModifyEObjectCommand getUpCommand()
+	{
+		// modify the EModelElement annotation
+		ModifyEObjectCommand command = new ModifyEObjectCommand(
+				modelElement,
+				"Move parameter element up")
+		{
+			@Override
+			protected CommandResult doExecuteWithResult(
+					IProgressMonitor monitor, IAdaptable info)
+					throws ExecutionException
+			{
+				HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
+				synchronized (uniqueValueCash)
+				{
+					MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
+							.getSelection()).getFirstElement();
+					
+					MultiColumnTable tableRowList = getTableRowList();
+					
+					int index = tableRowList.indexOf(rowToMove);
+					if (0 < index && index < tableRowList.size())
+					{
+						MultiColumnTableRow tableRow = tableRowList.get(index);
+						tableRowList.remove(index);
+						tableRowList.add(index-1, tableRow);
+						updateTableRowList(tableRowList);
+					}
+				}
+
+				return CommandResult.newOKCommandResult(null);
+			}
+		};
+		return command;
+	}
+
+	
+	@Override
+	protected ModifyEObjectCommand getDownCommand()
+	{
+		// modify the EModelElement annotation
+		ModifyEObjectCommand command = new ModifyEObjectCommand(
+				modelElement,
+				"Move parameter element down")
+		{
+			@Override
+			protected CommandResult doExecuteWithResult(
+					IProgressMonitor monitor, IAdaptable info)
+					throws ExecutionException
+			{
+				HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
+				synchronized (uniqueValueCash)
+				{
+					MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
+							.getSelection()).getFirstElement();
+					
+					MultiColumnTable tableRowList = getTableRowList();
+					
+					int index = tableRowList.indexOf(rowToMove);
+					if (0 <= index && index < tableRowList.size()-1)
+					{
+						MultiColumnTableRow tableRow = tableRowList.get(index);
+						tableRowList.remove(index);
+						tableRowList.add(index+1, tableRow);
+						updateTableRowList(tableRowList);
+					}
+				}
+
+				return CommandResult.newOKCommandResult(null);
+			}
+		};
+		return command;
+	}
+	
+	@Override
 	protected IStructuredContentProvider getTableContentProvider()
 	{
 		return new MultiColumnTableContentProvider();

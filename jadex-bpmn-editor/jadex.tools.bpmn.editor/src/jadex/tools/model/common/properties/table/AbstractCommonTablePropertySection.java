@@ -52,8 +52,6 @@ public abstract class AbstractCommonTablePropertySection extends
 		AbstractCommonPropertySection
 {
 
-	
-
 	/** The label string for the tableViewer */
 	protected String tableViewerLabel;
 	
@@ -66,7 +64,11 @@ public abstract class AbstractCommonTablePropertySection extends
 	/** The table delete element button */
 	protected Button delButton;
 	
+	/** The table up button */
+	protected Button upButton;
 	
+	/** The table down button */
+	protected Button downButton;
 
 	/**
 	 * @param tableViewerLabel
@@ -83,6 +85,8 @@ public abstract class AbstractCommonTablePropertySection extends
 	
 	protected abstract ModifyEObjectCommand getAddCommand();
 	protected abstract ModifyEObjectCommand getDeleteCommand();
+	protected abstract ModifyEObjectCommand getUpCommand();
+	protected abstract ModifyEObjectCommand getDownCommand();
 	protected abstract IStructuredContentProvider getTableContentProvider();
 	
 	/**
@@ -99,19 +103,7 @@ public abstract class AbstractCommonTablePropertySection extends
 	@Override
 	public void dispose()
 	{
-		if (tableViewer != null)
-		{
-			tableViewer.getControl().dispose();
-		}
-		if (addButton != null)
-		{
-			addButton.dispose();
-		}
-		if (delButton != null)
-		{
-			delButton.dispose();
-		}
-
+		// dispose of buttons is handled in superclass via control list
 		super.dispose();
 	}
 	
@@ -128,7 +120,8 @@ public abstract class AbstractCommonTablePropertySection extends
 			tableViewer.setInput(modelElement);
 			addButton.setEnabled(true);
 			delButton.setEnabled(true);
-
+			upButton.setEnabled(true);
+			downButton.setEnabled(true);
 			return;
 		}
 
@@ -136,7 +129,8 @@ public abstract class AbstractCommonTablePropertySection extends
 		tableViewer.setInput(null);
 		addButton.setEnabled(false);
 		delButton.setEnabled(false);
-
+		upButton.setEnabled(false);
+		downButton.setEnabled(false);
 	}
 
 
@@ -170,7 +164,9 @@ public abstract class AbstractCommonTablePropertySection extends
 		
 		Group sectionGroup = getWidgetFactory().createGroup(sectionComposite, tableViewerLabel);
 		sectionGroup.setLayout(new FillLayout(SWT.VERTICAL));
+		
 		createTableViewer(sectionGroup);
+	
 	}
 	
 	/**
@@ -184,9 +180,9 @@ public abstract class AbstractCommonTablePropertySection extends
 	protected TableViewer createTableViewer(Composite parent)
 	{
 		Composite tableComposite = getWidgetFactory().createComposite(parent/*, SWT.BORDER*/);
-
+		
 		// The layout of the table composite
-		GridLayout layout = new GridLayout(3, false);
+		GridLayout layout = new GridLayout(6, false);
 		tableComposite.setLayout(layout);
 		
 		GridData tableLayoutData = new GridData(GridData.FILL_BOTH);
@@ -194,13 +190,13 @@ public abstract class AbstractCommonTablePropertySection extends
 		tableLayoutData.grabExcessVerticalSpace = true;
 		tableLayoutData.minimumHeight = 150;
 		tableLayoutData.heightHint = 150;
-		tableLayoutData.horizontalSpan = 3;
+		tableLayoutData.horizontalSpan = 6;
 
 		// create the table
 		TableViewer viewer = createTable(tableComposite, tableLayoutData);
-
 		setupTableLayout(viewer);
-
+		
+		// get content provider from implementation class
 		viewer.setContentProvider(getTableContentProvider());
 		
 		// create cell modifier command
@@ -210,7 +206,7 @@ public abstract class AbstractCommonTablePropertySection extends
 		createButtons(tableComposite);
 		
 		return tableViewer = viewer;
-
+		
 	}
 
 
@@ -223,6 +219,7 @@ public abstract class AbstractCommonTablePropertySection extends
 		int[] columnWeights = getColumnWeights(columns);
 
 		Font tableFont = viewer.getTable().getFont();
+		
 		TableLayout tableLayout = new TableLayout();
 		for (int columnIndex = 0; columnIndex < columns.length; columnIndex++)
 		{
@@ -243,13 +240,15 @@ public abstract class AbstractCommonTablePropertySection extends
 		// the displayed table
 		TableViewer viewer = new TableViewer(getWidgetFactory().createTable(parent,
 				SWT.FULL_SELECTION | SWT.BORDER));
-
+		
 		viewer.getTable().setLinesVisible(true);
 		viewer.getTable().setHeaderVisible(true);
 		viewer.getTable().setLayoutData(tableLayoutData);
 
 		createColumns(viewer);
 
+		controls.add(viewer.getControl());
+		
 		return viewer;
 	}
 	
@@ -289,7 +288,7 @@ public abstract class AbstractCommonTablePropertySection extends
 //				}
 		
 		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(viewer,new FocusCellOwnerDrawHighlighter(viewer));
-		
+
 		ColumnViewerEditorActivationStrategy editorActivationSupport = new ColumnViewerEditorActivationStrategy(
 				viewer)
 		{
@@ -304,7 +303,7 @@ public abstract class AbstractCommonTablePropertySection extends
 						;
 			}
 		};
-
+		
 		TableViewerEditor.create(viewer, focusCellManager, editorActivationSupport,
 				TableViewerEditor.TABBING_HORIZONTAL | TableViewerEditor.TABBING_VERTICAL
 						| TableViewerEditor.KEYBOARD_ACTIVATION
@@ -384,6 +383,7 @@ public abstract class AbstractCommonTablePropertySection extends
 			}
 		});
 		addButton = add;
+		controls.add(add);
 
 		// Create and configure the "Delete" button
 		Button delete = new Button(parent, SWT.PUSH | SWT.CENTER);
@@ -419,8 +419,81 @@ public abstract class AbstractCommonTablePropertySection extends
 				}
 			}
 		});
-		
 		delButton = delete;
+		controls.add(delete);
+		
+		// Create and configure the "UP / Down" buttons3
+		Button up = new Button(parent, SWT.PUSH | SWT.CENTER);
+		up.setText("Up");
+		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		gridData.widthHint = 40;
+		delete.setLayoutData(gridData);
+		delete.addSelectionListener(new SelectionAdapter()
+		{
+			/** 
+			 * Remove selected ContextElement from the Context and refresh the view
+			 * @generated NOT 
+			 */
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				
+				ModifyEObjectCommand command = getUpCommand();
+				
+				try
+				{
+					command.execute(null, null);
+					
+					refresh();
+					refreshSelectedEditPart();
+				}
+				catch (ExecutionException ex)
+				{
+					BpmnDiagramEditorPlugin.getInstance().getLog().log(
+							new Status(IStatus.ERROR,
+									JadexBpmnEditor.ID, IStatus.ERROR,
+									ex.getMessage(), ex));
+				}
+			}
+		});
+		upButton = up;
+		controls.add(up);
+		
+		Button down = new Button(parent, SWT.PUSH | SWT.CENTER);
+		down.setText("Down");
+		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		gridData.widthHint = 40;
+		delete.setLayoutData(gridData);
+		delete.addSelectionListener(new SelectionAdapter()
+		{
+			/** 
+			 * Remove selected ContextElement from the Context and refresh the view
+			 * @generated NOT 
+			 */
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				
+				ModifyEObjectCommand command = getDownCommand();
+				
+				try
+				{
+					command.execute(null, null);
+					
+					refresh();
+					refreshSelectedEditPart();
+				}
+				catch (ExecutionException ex)
+				{
+					BpmnDiagramEditorPlugin.getInstance().getLog().log(
+							new Status(IStatus.ERROR,
+									JadexBpmnEditor.ID, IStatus.ERROR,
+									ex.getMessage(), ex));
+				}
+			}
+		});
+		downButton = down;
+		controls.add(down);
 	}
 	
 	/**
@@ -542,9 +615,7 @@ public abstract class AbstractCommonTablePropertySection extends
 
 		protected MultiColumnTableEditingSupport(TableViewer viewer, int attributeIndex)
 		{
-			super(viewer);
-			this.editor = new TextCellEditor(viewer.getTable());
-			this.attributeIndex = attributeIndex;
+			this(viewer, attributeIndex, new TextCellEditor(viewer.getTable()));
 		}
 		
 		protected MultiColumnTableEditingSupport(TableViewer viewer, int attributeIndex, CellEditor editor)
@@ -553,7 +624,7 @@ public abstract class AbstractCommonTablePropertySection extends
 			this.editor = editor;
 			this.attributeIndex = attributeIndex;
 		}
-
+		
 		/**
 		 * Can edit all columns.
 		 * @generated NOT
@@ -616,7 +687,6 @@ public abstract class AbstractCommonTablePropertySection extends
 			{
 				command.setReuseParentTransaction(true);
 				command.execute(null, null);
-				
 			}
 			catch (ExecutionException e)
 			{

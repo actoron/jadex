@@ -21,7 +21,7 @@ import org.eclipse.ui.IWorkbenchPart;
  * @author Claas
  *
  */
-public class AbstractParameterTablePropertySection extends
+public abstract class AbstractParameterTablePropertySection extends
 		AbstractBpmnMultiColumnTablePropertySection
 {
 

@@ -3,7 +3,7 @@
  */
 package jadex.tools.bpmn.editor.properties;
 
-import jadex.tools.model.common.EmulatedNativeCheckBoxLabelProvider;
+import jadex.tools.eclipse.ui.EmulatedNativeCheckBoxLabelProvider;
 import jadex.tools.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import org.eclipse.jface.viewers.CheckboxCellEditor;
@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.TableColumn;
  * @author Claas Altschaffel
  * 
  */
-public class JadexBpmnDiagramParameterSection extends
+public abstract class JadexBpmnDiagramParameterSection extends
 		AbstractBpmnMultiColumnTablePropertySection
 {
 

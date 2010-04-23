@@ -19,6 +19,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.stp.bpmn.diagram.part.BpmnDiagramEditorPlugin;
+import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -41,6 +42,9 @@ public abstract class AbstractCommonPropertySection extends
 	
 	/** all controls for this section */
 	protected List<Control> controls;
+	
+	/** all resources from this section */
+	protected List<Resource> resources;
 
 	// ---- constructor ----
 	
@@ -61,8 +65,11 @@ public abstract class AbstractCommonPropertySection extends
 		
 		sectionComposite = getWidgetFactory().createComposite(parent);
 		sectionComposite.setLayout(new FillLayout());
-		
+
 		this.controls = new ArrayList<Control>();
+		this.resources = new ArrayList<Resource>();
+		
+		controls.add(sectionComposite);
 	}
 
 	/**
@@ -73,11 +80,28 @@ public abstract class AbstractCommonPropertySection extends
 	{
 		for (Control control : controls)
 		{
-			control.dispose();
+			if (control != null && !control.isDisposed()) 
+			{
+				control.dispose();
+			}
+			control = null;
 		}
+		controls.clear();
 		
-		if (sectionComposite != null)
+		for (Resource resource : resources)
+		{
+			if (resource != null && !resource.isDisposed()) 
+			{
+				resource.dispose();
+			}
+			resource = null;
+		}
+		resources.clear();
+		
+		if (sectionComposite != null && !sectionComposite.isDisposed())
+		{
 			sectionComposite.dispose();
+		}
 		
 		super.dispose();
 	}
@@ -161,15 +185,17 @@ public abstract class AbstractCommonPropertySection extends
 	{
 		// The layout of the section composite
 		Layout sectionLayout = sectionComposite.getLayout();
-		Control[] controls = sectionComposite.getParent().getChildren();
+		Control[] children = sectionComposite.getParent().getChildren();
 		Group sectionGroup = getWidgetFactory().createGroup(
 				sectionComposite.getParent(), groupLabel);
 		sectionGroup.setLayout(sectionLayout);
 		sectionComposite = sectionGroup;
-		for (int i = 0; i < controls.length; i++)
+		for (int i = 0; i < children.length; i++)
 		{
-			controls[i].setParent(sectionGroup);
+			children[i].setParent(sectionGroup);
 		}
+		
+		controls.add(sectionGroup);
 		return sectionGroup;
 	}
 
