@@ -452,6 +452,11 @@ public class BpmnXMLReader
 						String proptext = prop.substring(idx+1).trim();
 						if(propname.equals("class"))
 						{
+							// Compatibility hack: strip ".class" from value, if present.
+							if(proptext.endsWith(".class"))
+							{
+								proptext	= proptext.substring(0, proptext.length()-6);
+							}
 							try
 							{
 								Class	clazz	= SReflect.findClass(proptext, dia.getAllImports(), context.getClassLoader());
@@ -514,10 +519,9 @@ public class BpmnXMLReader
 										String clazzname = stok2.nextToken();
 										String val = stok2.hasMoreTokens()? stok2.nextToken(): null;
 										
-										// context variable
-										Class clazz = SReflect.findClass0(clazzname, dia.getAllImports(), context.getClassLoader());
-										if(clazz!=null)
+										try
 										{
+											Class clazz = SReflect.findClass(clazzname, dia.getAllImports(), context.getClassLoader());
 											IParsedExpression exp = null;
 											if(val!=null)
 											{
@@ -526,6 +530,10 @@ public class BpmnXMLReader
 											MParameter param = new MParameter(dir, clazz, name, exp);
 											act.addParameter(param);
 //											System.out.println("Parameter: "+param);
+										}
+										catch(ClassNotFoundException cnfe)
+										{
+											throw new RuntimeException(cnfe);
 										}
 									}
 									
@@ -557,6 +565,11 @@ public class BpmnXMLReader
 								{
 									if(key.equals("class"))
 									{
+										// Compatibility hack: strip ".class" from value, if present.
+										if(value.endsWith(".class"))
+										{
+											value	= value.substring(0, value.length()-6);
+										}
 										try
 										{
 											Class	clazz	= SReflect.findClass(value, dia.getAllImports(), context.getClassLoader());
@@ -564,7 +577,6 @@ public class BpmnXMLReader
 										}
 										catch(ClassNotFoundException cnfe)
 										{
-											cnfe.printStackTrace();
 											throw new RuntimeException(cnfe);
 										}
 									}

@@ -99,7 +99,7 @@
 						</env:texturedrectangle>
 					</env:drawable>
 					<env:drawable objecttype="imp" width="1.0" height="1.0">
-						<env:ellipse color="yellow" width="0.5" height="0.5"></env:ellipse>
+						<env:ellipse color="yellow" width="0.5" height="0.5" x="-0.5" y="-0.5"></env:ellipse>
 					</env:drawable>
 				</env:perspective>
 			</env:perspectives>

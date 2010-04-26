@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_rEC40U4FEd-h4K8oRzpwEg" iD="_rEC40E4FEd-h4K8oRzpwEg">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_tmm8ME4FEd-h4K8oRzpwEg" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tmm8MU4FEd-h4K8oRzpwEg" key="Description" value="&lt;h1>A checklist process&lt;/h1> The process shows some information requesters and terminates afterwards."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tmwtME4FEd-h4K8oRzpwEg" key="Package" value="jadex.bpmn.tutorial"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_rEfkwU4FEd-h4K8oRzpwEg" iD="_rEfkwE4FEd-h4K8oRzpwEg" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_rEfkw04FEd-h4K8oRzpwEg" iD="_rEfkwk4FEd-h4K8oRzpwEg" name="Drinks" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ttUBIE4FEd-h4K8oRzpwEg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ttUBIU4FEd-h4K8oRzpwEg" key="class" value="OKTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DkhFgE4oEd-h4K8oRzpwEg" key="parameters" value="inout␋message␋String␋&quot;Remember to get drinks for your party.&quot;␟inout␋title␋String␋&quot;Party Planner&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_G106sU4nEd-h4K8oRzpwEg" iD="_G106sE4nEd-h4K8oRzpwEg" name="Music">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_G6vP4E4nEd-h4K8oRzpwEg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_G6vP4U4nEd-h4K8oRzpwEg" key="class" value="OKTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KLOTwE4oEd-h4K8oRzpwEg" key="parameters" value="inout␋message␋String␋&quot;Remember to have some good music at your party.&quot;␟inout␋title␋String␋&quot;Party Planner&quot;"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_Xr9KUU4nEd-h4K8oRzpwEg" iD="_Xr9KUE4nEd-h4K8oRzpwEg" name="People">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YutAwE4nEd-h4K8oRzpwEg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YutAwU4nEd-h4K8oRzpwEg" key="class" value="OKTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LqkmoE4oEd-h4K8oRzpwEg" key="parameters" value="inout␋message␋String␋&quot;Remember to invite nice people to your party.&quot;␟inout␋title␋String␋&quot;Party Planner&quot;"/>
+      </eAnnotations>
+    </vertices>
+  </pools>
+</bpmn:BpmnDiagram>

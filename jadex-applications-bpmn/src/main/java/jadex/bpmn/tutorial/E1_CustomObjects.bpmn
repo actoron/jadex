@@ -2,7 +2,7 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_UdLmwUcMEd-EYsKM4dybJQ" iD="_UdLmwEcMEd-EYsKM4dybJQ">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_VZYJQEcMEd-EYsKM4dybJQ" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VZYJQUcMEd-EYsKM4dybJQ" key="Description" value="&lt;h1>Insurance Contract&lt;/h1> The process sells an insurance contract based on a business rule encoded in a custom Java object.&lt;br/> High risk contracts are sold to single males of age below 40."/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VZYJQkcMEd-EYsKM4dybJQ" key="Package" value="jadex.bpmn"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VZYJQkcMEd-EYsKM4dybJQ" key="Package" value="jadex.bpmn.tutorial"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qNFBsEcMEd-EYsKM4dybJQ" key="parameters" value="inout␋customer␋Customer␋"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_UdVXwUcMEd-EYsKM4dybJQ" iD="_UdVXwEcMEd-EYsKM4dybJQ" name="Pool">
