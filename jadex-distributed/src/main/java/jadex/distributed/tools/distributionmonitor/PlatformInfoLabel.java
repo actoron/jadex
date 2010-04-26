@@ -1,5 +1,6 @@
 package jadex.distributed.tools.distributionmonitor;
 
+import jadex.distributed.service.monitor.PlatformInfo;
 import jadex.distributed.service.monitor.Workload;
 
 import java.awt.Color;
@@ -14,15 +15,12 @@ import java.net.InetSocketAddress;
 
 import javax.swing.JLabel;
 
-public class PlatformInfo extends JLabel { // JPanel wäre zu viel, da keine input events verarbeitet werden
-
-	private InetSocketAddress machine;
-	private Workload workload;
+public class PlatformInfoLabel extends JLabel { // JPanel wäre zu viel, da keine input events verarbeitet werden
 	
-	public PlatformInfo(InetSocketAddress machine, Workload workload) {
-		super(); // I know, das würde der compiler schon automatisch einfügen; aber so wird es noch einmal explizit deutlich was im background abläuft
-		this.machine = machine;
-		this.workload = workload;
+	private PlatformInfo _platformInfo;
+	
+	public PlatformInfoLabel(PlatformInfo platformInfo) {
+		_platformInfo = platformInfo;
 	}
 	
 	@Override
@@ -33,7 +31,7 @@ public class PlatformInfo extends JLabel { // JPanel wäre zu viel, da keine inp
 		Font font = new Font(Font.SANS_SERIF, Font.BOLD, 12);
 		g.setFont(font);
 		
-		// TODO man wird es doch wohl in Java schaffen einen monospace font zu laden der schön aussieht
+		// TODO man wird es doch wohl in Java schaffen einen monospace font zu laden der schön aussieht >_<
 		/*
 		Font font = null;
 		try {
@@ -55,19 +53,20 @@ public class PlatformInfo extends JLabel { // JPanel wäre zu viel, da keine inp
 		
 		/* IP:Port */
 		StringBuilder sb = new StringBuilder(21); // ALWAYS use StringBuilder
-		sb.append(machine.getHostName()).append(":").append(machine.getPort());
+		//sb.append(machine.getHostName()).append(":").append(machine.getPort());
+		sb.append(_platformInfo.getIp().getHostAddress()).append(":4711"); // Which port should I enter here? The RMI port? Or the the multicast port?
 		g.setPaint(Color.black);
 		g.drawString(sb.toString(), 3, 15);
 		
 		/* CPU usage */
 		g.setPaint(Color.black);
 		g.drawRect(2, 19, 100+1, 15+1);
-		g.setPaint(getPaint(workload.getCpuUsage()));
-		g.fillRect(3, 20, workload.getCpuUsage(), 15);
+		g.setPaint(getPaint( (int) _platformInfo.getCpuLoad() ));
+		g.fillRect(3, 20, (int) _platformInfo.getCpuLoad(), 15);
 		g.setPaint(new Color(0, 0, 0));
 		sb = new StringBuilder(4);
-		sb.append(workload.getCpuUsage()).append("%");
-		int length = String.valueOf(workload.getCpuUsage()).length();
+		sb.append( (int) _platformInfo.getCpuLoad() ).append("%");
+		int length = String.valueOf( (int) _platformInfo.getCpuLoad() ).length();
 		if(length == 1)
 			sb.insert(0, "  ");
 		else if(length == 2)
@@ -81,12 +80,12 @@ public class PlatformInfo extends JLabel { // JPanel wäre zu viel, da keine inp
 		//g.setPaint(new Color(0, 255, 0)); // R, G, B; red, green, blue
 		g.setPaint(Color.black);
 		g.drawRect(2, 39, 100+1, 15+1);
-		g.setPaint( getPaint(workload.getRamUsage()) );
-		g.fillRect(3, 40, workload.getRamUsage(), 15);
+		g.setPaint( getPaint( _platformInfo.getHeapUsage() ) );
+		g.fillRect(3, 40, _platformInfo.getHeapUsage(), 15);
 		g.setPaint(new Color(0, 0, 0));
 		sb = new StringBuilder(4);
-		sb.append(workload.getRamUsage()).append("%");
-		length = String.valueOf(workload.getRamUsage()).length();
+		sb.append( _platformInfo.getHeapUsage() ).append("%");
+		length = String.valueOf( _platformInfo.getHeapUsage() ).length();
 		if(length == 1)
 			sb.insert(0, "  ");
 		else if(length == 2)

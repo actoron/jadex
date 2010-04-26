@@ -8,10 +8,9 @@ import jadex.standalone.service.ComponentManagementService;
 public class Agents implements AgentsMBean {
 	
 	private IComponentManagementService _platform;
+	private IComponentIdentifier[] _resultAgentCount;
 	
 	private Thread _current;
-	
-	private int agentCount;
 	
 	public Agents(IComponentManagementService platform) {
 		super(); // javac automatically inserts this, but ok
@@ -22,8 +21,7 @@ public class Agents implements AgentsMBean {
 	@Override
 	public int getAgentCount() {
 		// background thread called getComponentDescriptions, dieser thread hat callback, und hier wird .join() an diesem thread aufgerufen um das Ergebniss abzugreifen
-		IComponentIdentifier[] identifiers = null; // gets set by ResultThread
-		Thread t = new ResultThread(identifiers);
+		Thread t = new ResultThread(this._platform, Thread.currentThread());
 		t.start();
 		try {
 			t.join();
@@ -33,39 +31,49 @@ public class Agents implements AgentsMBean {
 		
 		// I want the information NOW, so I transform the non-blocking call back way into a blocking version
 		// block until count is availble; then return the value
-		this._current = Thread.currentThread();
 		try {
-			this._current.wait(); // current thread gets notified by resultAvailable when the result from the IComponentManagementService is available
+			Thread.sleep(Long.MAX_VALUE); // sleep and wait for a interrupt(); Long.MAX_VALUE = 2^63-1 = 9*10^15 Sekunden; das sollte reichen
+			// TODO welcher Thread führt eigentlich getAgentCount() aus? hoffentlich legt der obere sleep() nicht das gesamte System lahm
+			// getAgentCount() wird wohl vom MBeanServer-Thread oder vom JMXAgent-Thread ausgeführt; platform sollte also nicht blockiert werden
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			System.out.println("AGENTS jemand rufte interrupt() an mir auf, Ergebnis ist verfügbar");
 		}
 		
-		return this.agentCount;
+		return _resultAgentCount.length;
 	}
 	
 	
 	private class ResultThread extends Thread implements IResultListener {
-		private IComponentIdentifier[] _identifiers;
 		
-		ResultThread(IComponentIdentifier[] identifiers) {
-			this._identifiers = identifiers;
+		private IComponentManagementService _platform;
+		private Thread _thread;
+		
+		ResultThread(IComponentManagementService platform, Thread thread) {
+			this._platform = platform;
+			this._thread = thread;
 		}
 		
 		@Override
 		public void run() {
-			_platform.getComponentDescriptions(this); // call back mechanism
+			// TODO wieso ist _platform hier null? etwa weil kein final? oder Referenz per Konstruktor zu übergeben?
+			//this._platform.getComponentDescriptions(this); // call back mechanism
+			this._platform.getComponentIdentifiers(this); // call back mechanism
+			// irgendwann wird resultAvailable() von einem unbekannten Thread ausgerufen
+			// Thread muss nicht bekannst sein; wichtig ist nur, dass dieser den oberen thread interrupted
 		}
 
+		@Override
+		public void resultAvailable(Object source, Object result) { // called by IComponentManagementService when result is available 
+			// the source can only be the IComponentManagementService, so no instanceof check is available; and btw: this hurts duck-typing, which is not supported by Java...btw...instead we have to deal with interface-iditis, a terrible disease
+			_resultAgentCount = (IComponentIdentifier[]) result;
+			_thread.interrupt(); // interrupt() thread to signal him that the result is available
+		}
+		
 		/*** For IResultListener: exceptionOccured and resultAvailable ***/
 		@Override
 		public void exceptionOccurred(Object source, Exception exception) {
 			
 		}
 
-		@Override
-		public void resultAvailable(Object source, Object result) { // called by IComponentManagementService when result is available 
-			// the source can only be the IComponentManagementService, so no instanceof check is available; and btw: this hurts duck-typing, which is not supported by Java...btw...instead we have to deal with interface-iditis, a terrible disease
-			this._identifiers = (IComponentIdentifier[]) result;
-		}
 	};
 }

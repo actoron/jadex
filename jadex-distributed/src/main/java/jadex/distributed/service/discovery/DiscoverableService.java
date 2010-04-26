@@ -24,12 +24,13 @@ public class DiscoverableService implements IService {
 	private IComponentManagementService _platform;
 	private DiscoveryResponder _drespoonder;
 	
-	public DiscoverableService(IServiceContainer platform) {
+	public DiscoverableService(IServiceContainer serviceContainer) {
 		try {
 			this._drespoonder = new DiscoveryResponder();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
+		this._platform = (IComponentManagementService) serviceContainer.getService(IComponentManagementService.class); // loading order of services is of importance
 	}
 
 	/*** For IService: startService, shutdownService(IResultListener) ***/
@@ -44,6 +45,10 @@ public class DiscoverableService implements IService {
 
 	@Override
 	public void startService() {
+		// test: create an agent to test getAgentCount()
+		//this._platform.createComponent("boring", "jadex/distributed/agents/Boring.agent.xml", null, null, null); // nice, works
+		// TODO hat mal geklappt, jetzt eine NullPointerException? im MessageService
+		
 		// 1. register all MBeans to make them available for JMX clients
 		MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer(); // creates MBeanServer and registeres MXBeans in the background
 		
@@ -69,7 +74,7 @@ public class DiscoverableService implements IService {
 		// 2. start the DiscoveryResponder to be visible for other platforms, specifically for the master platform
 		try {
 			this._drespoonder.start();
-			System.out.println("DISCOVERABLESERVICE gestartet, DiscoveryResponder aktiv");
+			//System.out.println("DISCOVERABLESERVICE gestartet, DiscoveryResponder aktiv");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

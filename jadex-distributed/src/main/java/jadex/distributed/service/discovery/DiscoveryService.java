@@ -43,7 +43,7 @@ public class DiscoveryService implements IService, IDiscoveryService, DiscoveryM
 		this._dclient = new DiscoveryClient();
 		this._dmonitor = new DiscoveryMonitor(); // TODO gibt es überhaupt einen service der in seinem Konstruktor etwas wirft?
 		this._dmonitor.register(this);
-		System.out.println("DISCOVERYSERVICE constructor finished");
+		//System.out.println("DISCOVERYSERVICE constructor finished");
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class DiscoveryService implements IService, IDiscoveryService, DiscoveryM
 			this._dmonitor.start();
 			this._dclient.start();
 			Set<InetAddress> slaves = this._dclient.findSlaves();
-			System.out.println("DISCOVERYSERVICE count von findSlaves() ist "+slaves.size());
+			//System.out.println("DISCOVERYSERVICE count von findSlaves() ist "+slaves.size());
 			this._dclient.stop(); // DiscoveryClient is used only once to get a list of initial slaves, TODO move to stop() if DiscoveryService.findSlaves() is revived again
 			for (InetAddress slave : slaves) {
 				this._slaves.add(slave); // set automatically eliminates duplicates, nice :)
@@ -63,7 +63,7 @@ public class DiscoveryService implements IService, IDiscoveryService, DiscoveryM
 			informListeners();
 			
 			this._running = true;
-			System.out.println("DISCOVERYSERVICE start() fertig");
+			//System.out.println("DISCOVERYSERVICE start() fertig");
 		}
 	}
 	
@@ -178,10 +178,10 @@ public class DiscoveryService implements IService, IDiscoveryService, DiscoveryM
 		try {
 			this.start();
 		} catch (IOException e) {
-			System.err.println("DISCOVERYSERVISE oops, something went wrong; it was not possible to start me up");
+			//System.err.println("DISCOVERYSERVISE oops, something went wrong; it was not possible to start me up");
 			e.printStackTrace();
 		}
-		System.out.println("DISCOVERYSERVICE startService run");
+		//System.out.println("DISCOVERYSERVICE startService run");
 	}
 	
 	@Override

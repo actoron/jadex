@@ -246,4 +246,11 @@ public class OldMonitorService implements IMonitorService, IDiscoveryServiceList
 		
 	}
 
+
+	@Override
+	public Set<PlatformInfo> getMachineAddresses() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

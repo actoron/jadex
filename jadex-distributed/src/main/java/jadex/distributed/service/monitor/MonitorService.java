@@ -9,6 +9,7 @@ import jadex.service.IServiceContainer;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -20,12 +21,14 @@ import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
 public class MonitorService implements IService, IMonitorService, IDiscoveryServiceListener {
-
+	
 	private final IDiscoveryService _dservice;
 	
 	private final Set<IMonitorServiceListener> _listener;
 	private final Map<InetAddress,JMXConnector> _connections; // TODO das geht doch bestimmt schöner; ich brauche eine Liste der schon bekannten InetAddress's bei notifyDiscoveryListener()
 	private final int _port;
+	
+	private Set<PlatformInfo> _platformInfos;
 	
 	/**
 	 * Creates a new MonitorService. Establishes JMX connections on the default
@@ -33,12 +36,7 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 	 * @param container a reference to the IServiceContainer where all platform services are stored and available
 	 */
 	public MonitorService(IServiceContainer container) {
-		this._listener = new HashSet<IMonitorServiceListener>();
-		this._connections = new HashMap<InetAddress,JMXConnector>();
-		this._dservice = (IDiscoveryService) container.getService(IDiscoveryService.class);
-		this._dservice.register(this);
-		this._port = 4711;
-		System.out.println("MONITORSERVICE constructor finished");
+		this(container, 4711);
 	}
 	
 	/**
@@ -49,6 +47,7 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 	public MonitorService(IServiceContainer container, int port) {
 		this._listener = new HashSet<IMonitorServiceListener>();
 		this._connections = new HashMap<InetAddress,JMXConnector>();
+		this._platformInfos = new HashSet<PlatformInfo>();
 		this._dservice = (IDiscoveryService) container.getService(IDiscoveryService.class);
 		this._dservice.register(this);
 		this._port = port;
@@ -56,7 +55,7 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 	
 	
 	
-	/*** For IMonitorService: register, unregister ***/
+	/*** For IMonitorService: register(IMonitorServiceListener), unregister(IMonitorServiceListener), getMachineAddresses() ***/
 	@Override
 	public void register(IMonitorServiceListener listener) {
 		if(listener != null) {
@@ -73,6 +72,11 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 		}
 	}
 
+	@Override
+	public Set<PlatformInfo> getMachineAddresses() {
+		return Collections.unmodifiableSet(new HashSet<PlatformInfo>(_platformInfos));
+	}
+	
 	/*** For IDiscoveryServiceListener: notifyIDiscoveryListener(), notifyIDiscoveryListener(InetAddress) ***/
 	@Override
 	public void notifyIDiscoveryListener() { // the list of known machines/slaves changed; new machines are available or present are not available anymore	
@@ -95,7 +99,6 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 		
 		//Set<InetAddress> B = new HashSet<InetAddress>(this._connections.keySet());
 		Set<InetAddress> B = new HashSet<InetAddress>(snapshot);
-		
 		
 		// leider so schön nicht ausdrückbar, da removeAll() und retainAll() mutating operations sind und das Ergebniss nicht returnen
 		// Set<InetAddress> connectTo = B.removeAll(A);
@@ -177,13 +180,11 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 	/*** For IService: startService(), shutdownService(IResultListener) ***/
 	@Override
 	public void startService() {
-		System.out.println("MONITORSERVICE startService run, tut aber nichts ...");
+		//System.out.println("MONITORSERVICE startService run, tut aber nichts ...");
 	}
 	
 	@Override
 	public void shutdownService(IResultListener listener) {
 		
 	}
-	
 }
-

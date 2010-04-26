@@ -1,44 +1,29 @@
 package jadex.distributed.service.monitor;
 
-
-import java.net.InetSocketAddress;
-import java.util.Map;
-
 public interface IMonitorServiceListener {
 	
 	/**
-	 * Called by the IMonitorService to update the current workload
-	 * information of a single machine.
-	 * 
-	 * WARNING: the purpose of this method is not only to update current
-	 * information, but also to publish the current workload of a newly
-	 * discovered machine. So it must be checked if the <code>machine</code>
-	 * is in the list of known machines or not.
-	 * 
-	 * @param machine - the (possibly new) machine
-	 * @param workload - the current workload of the (possibly new) machine
+	 * Notify a registered listener of type IMonitorServiceListener that
+	 * current state of the platforms changed and the PlatformInfo objects
+	 * reflect those new changes.
 	 */
-	public void updateWorkloadSingle(InetSocketAddress machine, Workload workload);
+	public void notifyIMonitorListener();
 	
 	/**
-	 * Called by the IMonitorService to update the current workload information
-	 * of every currently known machine.
-	 * 
-	 * This method has the purpose of a bootstrap method give the listener a
-	 * initial list of currently known machines and the workload of those
-	 * machines.
-	 * 
-	 * @param machineWorkloads - map collection of the currently known machines
-	 *                           with their current workloads
+	 * Notify a registered listener of type IMonitorServoceListner that a new slave
+	 * platform is available. The current state of the new slave is represented with
+	 * the passed PlatformInfo.
+	 * @param addr
 	 */
-	public void updateWorkloadAll(Map<InetSocketAddress, Workload> machineWorkloads);
+	public void notifyIMonitorListenerAdd(PlatformInfo platformInfo);
 	
 	/**
-	 * A currently known machine may is not available anymore. In that case the
-	 * IMonitorService needs to inform the listener about this.
-	 * @param machine - the machine which is no longer available
-	 * @param workload TODO
+	 * Notify a registered listener of type IMonitorServiceListner that a old slave
+	 * platform is not available anymore; the slave platform leaved the group of
+	 * platforms. The reference of the PlatformInfo representing the current state
+	 * of the slave platform is passed, so the IMonitorServiceListener can
+	 * perform any necessary steps.
+	 * @param addr
 	 */
-	public void removeWorkloadSingle(InetSocketAddress machine, Workload workload);
-	
+	public void notifyIMonitorListenerRemove(PlatformInfo platformInfo);
 }
