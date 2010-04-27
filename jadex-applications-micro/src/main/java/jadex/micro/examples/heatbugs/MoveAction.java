@@ -15,6 +15,8 @@ import java.util.Map;
  */
 public class MoveAction extends SimplePropertyObject implements ISpaceAction
 {
+	//-------- constants --------
+	
 	/** The constant identifier for this action. */
 	public static final String EMIT_HEAT = "set_position";
 	
@@ -23,6 +25,8 @@ public class MoveAction extends SimplePropertyObject implements ISpaceAction
 
 	/** The position parameter. */
 	public static final String PARAMETER_POSITION = "position";
+	
+	//-------- methods --------
 	
 	/**
 	 *  Perform an action.

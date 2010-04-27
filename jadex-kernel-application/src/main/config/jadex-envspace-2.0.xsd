@@ -15,222 +15,222 @@
 		<xs:annotation>
 			<xs:documentation>Declaration of an environment space. The concrete type of the space can be defined using the class.</xs:documentation>
 		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Property for customizing the element.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="objecttypes" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Container for object types.</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="objecttype" type="objecttype" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>An objecttype is used to define the kind of object in an environment including available properties. Is like a struct definition.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="avatarmappings" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Container for avatar mappings.</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="avatarmapping" type="avatarmapping" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>The avatarmapping represents the connection between components and space objects. The mapping allows to define different creation and deletion semantics, e.g. kill also the avatar when the agent dies.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="actiontypes" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Container for action types.</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="actiontype" type="actiontype" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>An action type defines how a component can act in the environment. </xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="tasktypes" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Container for task types.</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="tasktype" type="tasktype" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>A task is a piece of behaviour that can be attached to a space object. It will then be executed until it decides to be finished.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="processtypes" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Container for process types.</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="processtype" type="processtype" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>A process type can be used for representing environmental processes continually happening in the environment space.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="percepttypes" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Container for percept types.</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="percepttype" type="percepttype" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>A percept type is a special domain-level form of event that is propagated from the environment space to components.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="perceptgenerator" type="perceptgenerator" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>A percept generators can be used to create percepts based on e.g. simple events occurring in the space.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="perceptprocessor" type="perceptprocessor" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>A percept processor has the task to bring a percept into the knowlegde of a component.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="views" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Container for views.</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="view" type="view" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>A view is a defineable cutout of the space. It allows to restrict the perception of the envspace e.g. for displaying local views of avatars in an observer. </xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="perspectives" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Container for perspectives.</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="perspective" type="perspective" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>A perspective is used to define the visual representation of space objects.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="spaceexecutor" type="spaceexecutor" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>The space executor determines th execution logic of the space.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="name" type="xs:string"/>
-		<xs:attribute name="class" type="xs:string"/>
-		<xs:attribute name="width" type="xs:double"/>
-		<xs:attribute name="height" type="xs:double"/>
-		<xs:attribute name="depth" type="xs:double"/>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:sequence>
+					<xs:element name="objecttypes" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for object types.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="objecttype" type="objecttype" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>An objecttype is used to define the kind of object in an environment including available properties. Is like a struct definition.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="tasktypes" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for task types.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="tasktype" type="tasktype" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>A task is a piece of behaviour that can be attached to a space object. It will then be executed until it decides to be finished.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="processtypes" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for process types.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="processtype" type="processtype" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>A process type can be used for representing environmental processes continually happening in the environment space.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="dataviews" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for views.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="dataview" type="dataview" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>A view is a defineable cutout of the space. It allows to restrict the perception of the envspace e.g. for displaying local views of avatars in an observer. </xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="avatarmappings" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for avatar mappings.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="avatarmapping" type="avatarmapping" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>The avatarmapping represents the connection between components and space objects. The mapping allows to define different creation and deletion semantics, e.g. kill also the avatar when the agent dies.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="percepttypes" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for percept types.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="percepttype" type="percepttype" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>A percept type is a special domain-level form of event that is propagated from the environment space to components.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="perceptgenerator" type="perceptgenerator" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>A percept generators can be used to create percepts based on e.g. simple events occurring in the space.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="perceptprocessor" type="perceptprocessor" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>A percept processor has the task to bring a percept into the knowlegde of a component.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="actiontypes" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for action types.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="actiontype" type="actiontype" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>An action type defines how a component can act in the environment. </xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="perspectives" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for perspectives.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="perspective" type="perspective" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>A perspective is used to define the visual representation of space objects.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="spaceexecutor" type="spaceexecutor" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The space executor determines th execution logic of the space.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string" use="required"/>
+				<xs:attribute name="width" type="xs:string"/>
+				<xs:attribute name="height" type="xs:string"/>
+				<xs:attribute name="depth" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="envspace">
 		<xs:annotation>
 			<xs:documentation>Instance element for a declared space type.</xs:documentation>
 		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="objects" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Container for object instances.</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="object" type="object" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>Instance of a specific object type.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="processes" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Container for process instances.</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="process" type="process" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>Instance of a process type.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="dataproviders" type="dataproviders" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Container for data provider definitions.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="dataconsumers" type="dataconsumers" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Container for data consumer definitions.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="observers" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Container for observers.</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="observer" type="observer" minOccurs="0" maxOccurs="unbounded">
-							<xs:annotation>
-								<xs:documentation>An observer is an entity that watches the space via a gui. The gui can be extended using custom plugins.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="name" type="xs:string" use="required"/>
-		<xs:attribute name="type" type="xs:string" use="required"/>
-		<xs:attribute name="width" type="xs:double"/>
-		<xs:attribute name="height" type="xs:double"/>
-		<xs:attribute name="depth" type="xs:double"/>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:sequence>
+					<xs:element name="objects" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for object instances.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="object" type="object" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>Instance of a specific object type.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="processes" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for process instances.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="process" type="process" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>Instance of a process type.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="dataproviders" type="dataproviders" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for data provider definitions.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="dataconsumers" type="dataconsumers" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for data consumer definitions.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="observers" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Container for observers.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="observer" type="observer" minOccurs="0" maxOccurs="unbounded">
+									<xs:annotation>
+										<xs:documentation>An observer is an entity that watches the space via a gui. The gui can be extended using custom plugins.</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="type" type="xs:string" use="required"/>
+				<xs:attribute name="width" type="xs:string"/>
+				<xs:attribute name="height" type="xs:string"/>
+				<xs:attribute name="depth" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="objecttype">
 		<xs:annotation>
 			<xs:documentation>An objecttype is used to define the kind of object in an environment including available properties. Is like a struct definition.</xs:documentation>
 		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Property for customizing the element.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="name" type="xs:string"/>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="property" mixed="true">
 		<xs:annotation>
@@ -256,122 +256,111 @@
 		<xs:annotation>
 			<xs:documentation>The space executor is the central control entity of an envspace. It controls the way the space advances its internal state by executing actions and distributing percepts.</xs:documentation>
 		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Property for customizing the element.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="class" type="xs:string" use="required"/>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="class" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="tasktype">
 		<xs:annotation>
 			<xs:documentation>A task is a piece of behaviour that can be attached to a space object. It will then be executed until it decides to be finished.</xs:documentation>
 		</xs:annotation>
-		<xs:attribute name="name" type="xs:string" use="required"/>
-		<xs:attribute name="class" type="xs:string" use="required"/>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
-	<xs:complexType name="view">
+	<xs:complexType name="dataview">
 		<xs:annotation>
 			<xs:documentation>A view is a defineable cutout of the space. It allows to restrict the perception of the envspace e.g. for displaying local views of avatars in an observer. </xs:documentation>
 		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Property for customizing the element.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="name" type="xs:string" use="required"/>
-		<xs:attribute name="class" type="xs:string" use="required"/>
-		<xs:attribute name="objecttype" type="xs:string"/>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string" use="required"/>
+				<xs:attribute name="objecttype" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="perspective">
 		<xs:annotation>
 			<xs:documentation>A perspective is used to define the visual representation of space objects.</xs:documentation>
 		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Property for customizing the element.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="drawable" type="drawable" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Drawable definition for representation of space objects.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="prelayers" type="layers" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Layers that are shown behind the space objects (drawn before). </xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="postlayers" type="layers" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Layers that are shown before the space objects (drawn after). </xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="name" type="xs:string" use="required"/>
-		<xs:attribute name="class" type="xs:string" use="required"/>
-		<xs:attribute name="opengl" type="xs:boolean" default="true"/>
-		<xs:attribute name="objectplacement" default="border">
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="border"/>
-					<xs:enumeration value="center"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
-		<xs:attribute name="invertxaxis" type="xs:boolean"/>
-		<xs:attribute name="invertyaxis" type="xs:boolean"/>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:sequence>
+					<xs:element name="drawable" type="drawable" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Drawable definition for representation of space objects.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="prelayers" type="layers" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Layers that are shown behind the space objects (drawn before). </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="postlayers" type="layers" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Layers that are shown before the space objects (drawn after). </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string" use="required"/>
+				<xs:attribute name="opengl" type="xs:boolean" default="true"/>
+				<xs:attribute name="objectplacement" type="xs:string" default="border"/>
+				<xs:attribute name="invertxaxis" type="xs:boolean"/>
+				<xs:attribute name="invertyaxis" type="xs:boolean"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="drawable">
 		<xs:annotation>
 			<xs:documentation>Container element for the definition of how a space object should look like.</xs:documentation>
 		</xs:annotation>
-		<xs:choice minOccurs="0" maxOccurs="unbounded">
-			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Property for customizing the element.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="triangle" type="drawableelement" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Triangle display element.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="rectangle" type="drawableelement" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Rectangle display element.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="ellipse" type="drawableelement" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Ellipse display element.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="regularpolygon" type="regularpolygon" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>A regular polygon for displaying simple polygons.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="texturedrectangle" type="texturedrectangle" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>A textured rectangle can be used display images.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="text" type="text" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Text for displaying textual information about the object. </xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:choice>
-		<xs:attribute name="objecttype" type="xs:string" use="required"/>
-		<xs:attribute name="width" type="xs:double" use="required"/>
-		<xs:attribute name="height" type="xs:double" use="required"/>
-		<xs:attribute name="rotation" type="xs:string"/>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:choice minOccurs="0">
+					<xs:element name="triangle" type="drawableelement" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Triangle display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="rectangle" type="drawableelement" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Rectangle display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ellipse" type="drawableelement" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Ellipse display element.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="regularpolygon" type="regularpolygon" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>A regular polygon for displaying simple polygons.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="texturedrectangle" type="texturedrectangle" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>A textured rectangle can be used display images.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="text" type="text" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Text for displaying textual information about the object. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:choice>
+				<xs:attribute name="objecttype" type="xs:string" use="required"/>
+				<xs:attribute name="width" type="xs:string" use="required"/>
+				<xs:attribute name="height" type="xs:string" use="required"/>
+				<xs:attribute name="rotation" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="drawableelement">
 		<xs:annotation>
@@ -506,43 +495,34 @@
 		<xs:annotation>
 			<xs:documentation>Instance of a specific object type.</xs:documentation>
 		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Property for customizing the element.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="type" type="xs:string" use="required"/>
-		<xs:attribute name="number" type="xs:int" default="1"/>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="type" type="xs:string"/>
+				<xs:attribute name="number" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="actiontype">
 		<xs:annotation>
 			<xs:documentation>An action type defines how a component can act in the environment. </xs:documentation>
 		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Property for customizing the element.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="name" type="xs:string" use="required"/>
-		<xs:attribute name="class" type="xs:string" use="required"/>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="processtype">
 		<xs:annotation>
 			<xs:documentation>A process type can be used for representing environmental processes continually happening in the environment space.</xs:documentation>
 		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Property for customizing the element.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="name" type="xs:string" use="required"/>
-		<xs:attribute name="class" type="xs:string" use="required"/>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="percepttype">
 		<xs:annotation>
@@ -582,56 +562,45 @@
 		<xs:annotation>
 			<xs:documentation>A percept generators can be used to create percepts based on e.g. simple events occurring in the space.</xs:documentation>
 		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Property for customizing the element.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="name" type="xs:string" use="required"/>
-		<xs:attribute name="class" type="xs:string" use="required"/>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="perceptprocessor">
 		<xs:annotation>
 			<xs:documentation>A percept processor has the task to bring a percept into the knowlegde of a component.</xs:documentation>
 		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Property for customizing the element.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="componenttype" type="xs:string" use="required"/>
-		<xs:attribute name="class" type="xs:string" use="required"/>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="componenttype" type="xs:string"/>
+				<xs:attribute name="class" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="process">
 		<xs:annotation>
 			<xs:documentation>Instance of a process type.</xs:documentation>
 		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Property for customizing the element.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="type" type="xs:string" use="required"/>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="type" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="plugin">
 		<xs:annotation>
 			<xs:documentation>User interface plugin. Can be used for extending the plugins shown in the observer.</xs:documentation>
 		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Property for customizing the element.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="name" type="xs:string"/>
-		<xs:attribute name="class" type="xs:string"/>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="name" type="xs:string"/>
+				<xs:attribute name="class" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="data" mixed="true">
 		<xs:annotation>
@@ -696,20 +665,25 @@
 		<xs:annotation>
 			<xs:documentation>A data consumer is used for evaluation purposes. They come in very different flavors, e.g. a chart display or a file writer. Takes input data from a data provider and processes it somehow.</xs:documentation>
 		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Property for customizing the concrete data consumer.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-		<xs:attribute name="name" type="xs:string"/>
-		<xs:attribute name="class" type="xs:string"/>
+		<xs:complexContent>
+			<xs:extension base="propertyobject">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="class" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<xs:complexType name="componenttype">
 		<xs:annotation>
 			<xs:documentation>Name of a component type for percepts.</xs:documentation>
 		</xs:annotation>
 		<xs:attribute name="name" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="propertyobject">
+		<xs:annotation>
+			<xs:documentation>Base class for objects with properties.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
 	</xs:complexType>
 </xs:schema>

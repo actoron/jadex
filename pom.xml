@@ -111,6 +111,8 @@
 				<module>jadex-kernel-bpmn</module>
 				<module>jadex-kernel-gpmn</module>
 				
+				<module>jadex-kernel-bdi-continuations</module>
+				
 				<module>jadex-applib-bdi</module>				
 				<module>jadex-applications-bdi</module>
 				<module>jadex-applications-micro</module>

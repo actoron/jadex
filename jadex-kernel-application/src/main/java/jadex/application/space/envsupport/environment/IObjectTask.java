@@ -8,8 +8,12 @@ import jadex.service.clock.IClockService;
  */
 public interface IObjectTask extends IPropertyObject
 {
+	//-------- constants --------
+	
 	/** The property for holding the task id. */
 	public static final String PROPERTY_ID = "task_id";
+	
+	//-------- methods --------
 	
 	/**
 	 *  This method will be executed by the object before the task gets added to
@@ -17,7 +21,7 @@ public interface IObjectTask extends IPropertyObject
 	 *  @param space	The environment in which the task is executing.
 	 *  @param obj	The object that is executing the task.
 	 */
-	public void start(/*IEnvironmentSpace space,*/ ISpaceObject obj);
+	public void start(ISpaceObject obj);
 	
 	/**
 	 *  This method will be executed by the object before the task is removed
@@ -25,7 +29,7 @@ public interface IObjectTask extends IPropertyObject
 	 *  @param space	The environment in which the task is executing.
 	 *  @param obj	The object that is executing the task.
 	 */
-	public void shutdown(/*IEnvironmentSpace space,*/ ISpaceObject obj);
+	public void shutdown(ISpaceObject obj);
 
 	/**
 	 *  Executes the task.

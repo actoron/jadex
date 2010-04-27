@@ -9,8 +9,10 @@ import java.util.Map;
  */
 public interface IDataView
 {
-	// View Types //
+	// view types
 	public static final String SIMPLE_VIEW_2D = "Simple 2D View";
+	
+	//-------- methods --------
 	
 	/**
 	 *  Initialize the view.

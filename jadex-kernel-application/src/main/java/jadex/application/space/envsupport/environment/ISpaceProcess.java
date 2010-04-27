@@ -11,6 +11,8 @@ public interface ISpaceProcess extends IPropertyObject
 {
 	public static final String ID = "##_id"; 
 	
+	//-------- methods --------
+	
 	/**
 	 *  This method will be executed by the object before the process gets added
 	 *  to the execution queue.

@@ -1,7 +1,8 @@
 package jadex.bdi.runtime;
 
-import jadex.bdi.interpreter.BDIInterpreter;
-import jadex.bdi.interpreter.OAVBDIRuntimeModel;
+
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 
 import org.apache.commons.javaflow.Continuation;
 

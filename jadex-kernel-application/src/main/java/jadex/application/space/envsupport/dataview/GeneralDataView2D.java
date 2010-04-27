@@ -32,7 +32,7 @@ public class GeneralDataView2D implements IDataView
 	}
 	
 	/**
-	 * 
+	 *  Init the space.
 	 */
 	public void init(IEnvironmentSpace space, Map props)
 	{
