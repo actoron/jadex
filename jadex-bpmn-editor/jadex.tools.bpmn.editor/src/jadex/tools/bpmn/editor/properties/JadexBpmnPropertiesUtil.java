@@ -142,29 +142,39 @@ public class JadexBpmnPropertiesUtil
 		}
 		
 		
-		// create the TransactionalCommand
-		ModifyEObjectCommand command = new ModifyEObjectCommand(
-				element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
-		{
-			@Override
-			protected CommandResult doExecuteWithResult(
-					IProgressMonitor arg0, IAdaptable arg1)
-					throws ExecutionException
+			// update or create the annotation / detail
+			ModifyEObjectCommand command = new ModifyEObjectCommand(
+					element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
 			{
-				EAnnotation annotation = element.getEAnnotation(annotationIdentifier);
-				if (annotation == null)
+				@Override
+				protected CommandResult doExecuteWithResult(
+						IProgressMonitor arg0, IAdaptable arg1)
+						throws ExecutionException
 				{
-					annotation = EcoreFactory.eINSTANCE.createEAnnotation();
-					annotation.setSource(annotationIdentifier);
-					annotation.setEModelElement(element);
-					annotation.getDetails().put(annotationDetail, ""); //$NON-NLS-1$
+					
+					EAnnotation annotation = element.getEAnnotation(annotationIdentifier);
+					if (annotation == null)
+					{
+						annotation = EcoreFactory.eINSTANCE.createEAnnotation();
+						annotation.setSource(annotationIdentifier);
+						annotation.setEModelElement(element);
+						annotation.getDetails().put(annotationDetail, ""); //$NON-NLS-1$
+					}
+					
+					if (value != null)
+					{
+						annotation.getDetails().put(annotationDetail, value);
+					}
+					else
+					{
+						annotation.getDetails().removeKey(annotationDetail);
+					}
+					
+					return CommandResult.newOKCommandResult();
 				}
-				
-				annotation.getDetails().put(annotationDetail, value);
-				
-				return CommandResult.newOKCommandResult();
-			}
-		};
+			};
+
+		
 		// execute command
 		try
 		{
@@ -198,7 +208,11 @@ public class JadexBpmnPropertiesUtil
 		EAnnotation annotation = element.getEAnnotation(annotationIdentifier);
 		if (annotation != null)
 		{
-			return annotation.getDetails().get(annotationDetail);
+			Object detail = annotation.getDetails().get(annotationDetail);
+			if (detail != null)
+				return detail.toString();
+			
+			return "";
 		}
 	
 		return null;

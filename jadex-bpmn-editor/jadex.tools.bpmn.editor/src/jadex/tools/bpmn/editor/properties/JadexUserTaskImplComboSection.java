@@ -15,6 +15,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.TraverseEvent;
@@ -24,6 +25,7 @@ import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Text;
@@ -48,6 +50,9 @@ public class JadexUserTaskImplComboSection extends
 	protected Text taskMetaInfoText;
 	
 	protected IRuntimeTaskProvider taskProvider;
+	
+	/** The table add default parameter button */
+	protected Button addDefaultButton;
 
 	// ---- constructor ----
 
@@ -68,7 +73,7 @@ public class JadexUserTaskImplComboSection extends
 	@Override
 	public void dispose()
 	{
-		if (taskMetaInfoText != null)
+		if (taskMetaInfoText != null && !taskMetaInfoText.isDisposed())
 			taskMetaInfoText.dispose();
 
 		super.dispose();
@@ -109,7 +114,7 @@ public class JadexUserTaskImplComboSection extends
 		
 		super.createControls(parent, tabbedPropertySheetPage);
 
-		addUserTaskMetaInfo();
+		addUserTaskMetaInfoText();
 		
 		// Add some listeners to the abstract combo
 		
@@ -160,8 +165,6 @@ public class JadexUserTaskImplComboSection extends
 			{
 				String taskClassName = ((CCombo) e.getSource()).getText();
 				updateTaskMetaInfo(taskClassName);
-				generateTaskParameterTable(taskClassName);
-				
 			}
 			
 			@Override
@@ -172,11 +175,35 @@ public class JadexUserTaskImplComboSection extends
 		});
 		
 		
+		//GridData gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		//gridData.widthHint = 80;
+
+		// Create and configure the "Add" button
+		Button addDefaultParameter = new Button(parent, SWT.PUSH | SWT.CENTER);
+		addDefaultParameter.setText("Add default Parameter");
+		addDefaultParameter.setToolTipText("Adds default parameter for selected class at end of parameter table");
+		//addDefaultParameter.setLayoutData(gridData);
+		addDefaultParameter.addSelectionListener(new SelectionAdapter()
+		{
+			/** 
+			 * Add a list of default parameter to the parameter table
+			 * @generated NOT 
+			 */
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				String taskClassName = cCombo.getText();
+				updateTaskParameterTable(taskClassName);
+			}
+		});
+		addDefaultButton = addDefaultParameter;
+		controls.add(addDefaultParameter);
+
 	}
 
 	// ---- methods ----
 	
-	protected void addUserTaskMetaInfo()
+	protected void addUserTaskMetaInfoText()
 	{
 		
 		sectionComposite = groupExistingControls(ACTIVITY_TASK_IMPLEMENTATION_GROUP);
@@ -188,10 +215,6 @@ public class JadexUserTaskImplComboSection extends
 		
 		if (sectionLayout instanceof GridLayout)
 		{
-
-			// extend the section layout with a new column
-			//((GridLayout) sectionLayout).numColumns = ((GridLayout) sectionLayout).numColumns +1;
-			
 			GridData labelData = new GridData();
 			labelData.horizontalSpan = ((GridLayout) sectionLayout).numColumns;
 			
@@ -199,7 +222,6 @@ public class JadexUserTaskImplComboSection extends
 			labelData.horizontalAlignment = SWT.FILL;
 			labelData.heightHint = 100;
 
-			//taskMetaInfoLabel.setLayoutData(labelData);
 			taskMetaInfoText.setLayoutData(labelData);
 		}
 
@@ -211,7 +233,6 @@ public class JadexUserTaskImplComboSection extends
 		String metaInfo;
 		metaInfo = createTaskMetaInfoString(taskProvider.getTaskMetaInfoFor(taskClassName));
 		
-		//taskMetaInfoLabel.setText(metaInfo);
 		taskMetaInfoText.setText(metaInfo);
 	}
 	
@@ -242,7 +263,7 @@ public class JadexUserTaskImplComboSection extends
 		return info.toString();
 	}
 	
-	protected void generateTaskParameterTable(String taskClassName)
+	protected void updateTaskParameterTable(String taskClassName)
 	{
 		TaskMetaInfo metaInfo = taskProvider.getTaskMetaInfoFor(taskClassName);
 		ParameterMetaInfo[] taskParameter = metaInfo.getParameterMetaInfos();
@@ -259,7 +280,7 @@ public class JadexUserTaskImplComboSection extends
 							currentParameterString,
 							JadexCommonParameterSection.DEFAULT_PARAMTER_COLUMN_NAMES.length,
 							JadexCommonParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE);
-			parameterTable = updateTaskParamterTable(parameterTable, taskParameter);
+			parameterTable = addTaskParamterTable(parameterTable, taskParameter);
 		}
 		else
 		{
@@ -271,14 +292,6 @@ public class JadexUserTaskImplComboSection extends
 				JadexCommonParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
 				JadexCommonParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER,
 				MultiColumnTable.convertMultiColumnRowList(parameterTable));
-
-		//Composite sectionRoot = findSectionRootComposite(this.sectionComposite);
-		//List<Group> paramterGroups = findSectionGroupComposite(rootPropertyComposite, Messages.JadexCommonParameterListSection_ParameterTable_Label);
-		
-		//for (Group group : paramterGroups)
-		//{
-		//	group.redraw();
-		//}
 		
 		TableViewer viewer = JadexCommonParameterSection.getParameterTableViewerFor(modelElement);
 		if (viewer != null)
@@ -341,6 +354,24 @@ public class JadexUserTaskImplComboSection extends
 		
 		
 		return newTable;
+	}
+	
+	/**
+	 * Update the table with meta info
+	 * 
+	 * @param table
+	 * @param metaInfo
+	 */
+	protected MultiColumnTable addTaskParamterTable(MultiColumnTable table, ParameterMetaInfo[] metaInfo)
+	{
+		MultiColumnTable newTable = createNewParameterTable(metaInfo);
+		
+		for (MultiColumnTableRow row : newTable.getRowList())
+		{
+			table.add(row);
+		}
+		
+		return table;
 	}
 	
 	

@@ -69,6 +69,9 @@ public abstract class AbstractCommonTablePropertySection extends
 	
 	/** The table down button */
 	protected Button downButton;
+	
+	/** The table clear button */
+	protected Button clearButton;
 
 	/**
 	 * @param tableViewerLabel
@@ -87,6 +90,7 @@ public abstract class AbstractCommonTablePropertySection extends
 	protected abstract ModifyEObjectCommand getDeleteCommand();
 	protected abstract ModifyEObjectCommand getUpCommand();
 	protected abstract ModifyEObjectCommand getDownCommand();
+	protected abstract ModifyEObjectCommand getClearCommand();
 	protected abstract IStructuredContentProvider getTableContentProvider();
 	
 	/**
@@ -122,6 +126,7 @@ public abstract class AbstractCommonTablePropertySection extends
 			delButton.setEnabled(true);
 			upButton.setEnabled(true);
 			downButton.setEnabled(true);
+			clearButton.setEnabled(true);
 			return;
 		}
 
@@ -131,6 +136,7 @@ public abstract class AbstractCommonTablePropertySection extends
 		delButton.setEnabled(false);
 		upButton.setEnabled(false);
 		downButton.setEnabled(false);
+		clearButton.setEnabled(false);
 	}
 
 
@@ -355,31 +361,12 @@ public abstract class AbstractCommonTablePropertySection extends
 		Button add = new Button(parent, SWT.PUSH | SWT.CENTER);
 		add.setText("Add");
 		add.setLayoutData(gridData);
-		add.addSelectionListener(new SelectionAdapter()
+		add.addSelectionListener(new TableButtonSelectionAdapter()
 		{
-			/** 
-			 * Add a ContextElement to the Context and refresh the view
-			 * @generated NOT 
-			 */
 			@Override
-			public void widgetSelected(SelectionEvent e)
+			protected ModifyEObjectCommand getButtonCommand()
 			{
-				ModifyEObjectCommand command = getAddCommand();
-				
-				try
-				{
-					command.execute(null, null);
-					
-					refresh();
-					refreshSelectedEditPart();
-				}
-				catch (ExecutionException ex)
-				{
-					BpmnDiagramEditorPlugin.getInstance().getLog().log(
-							new Status(IStatus.ERROR,
-									JadexBpmnEditor.ID, IStatus.ERROR,
-									ex.getMessage(), ex));
-				}
+				return getAddCommand();
 			}
 		});
 		addButton = add;
@@ -391,32 +378,13 @@ public abstract class AbstractCommonTablePropertySection extends
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		gridData.widthHint = 80;
 		delete.setLayoutData(gridData);
-		delete.addSelectionListener(new SelectionAdapter()
+		delete.addSelectionListener(new TableButtonSelectionAdapter()
 		{
-			/** 
-			 * Remove selected ContextElement from the Context and refresh the view
-			 * @generated NOT 
-			 */
+			
 			@Override
-			public void widgetSelected(SelectionEvent e)
+			protected ModifyEObjectCommand getButtonCommand()
 			{
-				
-				ModifyEObjectCommand command = getDeleteCommand();
-				
-				try
-				{
-					command.execute(null, null);
-					
-					refresh();
-					refreshSelectedEditPart();
-				}
-				catch (ExecutionException ex)
-				{
-					BpmnDiagramEditorPlugin.getInstance().getLog().log(
-							new Status(IStatus.ERROR,
-									JadexBpmnEditor.ID, IStatus.ERROR,
-									ex.getMessage(), ex));
-				}
+				return getDeleteCommand();
 			}
 		});
 		delButton = delete;
@@ -428,32 +396,12 @@ public abstract class AbstractCommonTablePropertySection extends
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		gridData.widthHint = 40;
 		up.setLayoutData(gridData);
-		up.addSelectionListener(new SelectionAdapter()
+		up.addSelectionListener(new TableButtonSelectionAdapter()
 		{
-			/** 
-			 * Remove selected ContextElement from the Context and refresh the view
-			 * @generated NOT 
-			 */
 			@Override
-			public void widgetSelected(SelectionEvent e)
+			protected ModifyEObjectCommand getButtonCommand()
 			{
-				
-				ModifyEObjectCommand command = getUpCommand();
-				
-				try
-				{
-					command.execute(null, null);
-					
-					refresh();
-					refreshSelectedEditPart();
-				}
-				catch (ExecutionException ex)
-				{
-					BpmnDiagramEditorPlugin.getInstance().getLog().log(
-							new Status(IStatus.ERROR,
-									JadexBpmnEditor.ID, IStatus.ERROR,
-									ex.getMessage(), ex));
-				}
+				return getUpCommand();
 			}
 		});
 		upButton = up;
@@ -464,36 +412,32 @@ public abstract class AbstractCommonTablePropertySection extends
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		gridData.widthHint = 40;
 		down.setLayoutData(gridData);
-		down.addSelectionListener(new SelectionAdapter()
+		down.addSelectionListener(new TableButtonSelectionAdapter()
 		{
-			/** 
-			 * Remove selected ContextElement from the Context and refresh the view
-			 * @generated NOT 
-			 */
 			@Override
-			public void widgetSelected(SelectionEvent e)
+			protected ModifyEObjectCommand getButtonCommand()
 			{
-				
-				ModifyEObjectCommand command = getDownCommand();
-				
-				try
-				{
-					command.execute(null, null);
-					
-					refresh();
-					refreshSelectedEditPart();
-				}
-				catch (ExecutionException ex)
-				{
-					BpmnDiagramEditorPlugin.getInstance().getLog().log(
-							new Status(IStatus.ERROR,
-									JadexBpmnEditor.ID, IStatus.ERROR,
-									ex.getMessage(), ex));
-				}
+				return getDownCommand();
 			}
 		});
 		downButton = down;
 		controls.add(down);
+		
+		Button clear = new Button(parent, SWT.PUSH | SWT.CENTER);
+		clear.setText("Clear");
+		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+		gridData.widthHint = 40;
+		clear.setLayoutData(gridData);
+		clear.addSelectionListener(new TableButtonSelectionAdapter()
+		{
+			@Override
+			protected ModifyEObjectCommand getButtonCommand()
+			{
+				return getClearCommand();
+			}
+		});
+		clearButton = clear;
+		controls.add(clear);
 	}
 	
 	/**
@@ -702,6 +646,46 @@ public abstract class AbstractCommonTablePropertySection extends
 										e));
 			}
 
+		}
+	}
+	
+	/**
+	 * Helper to ease the command execution for Buttons
+	 * @author Claas
+	 *
+	 */
+	protected abstract class TableButtonSelectionAdapter extends SelectionAdapter
+	{
+		/**
+		 * Have to be overridden in implementations to configure the button action
+		 * @return command to execute on button click
+		 */
+		protected abstract ModifyEObjectCommand getButtonCommand();
+		
+		/** 
+		 * Get the execute command, execute it and refresh the view
+		 * @generated NOT 
+		 */
+		@Override
+		public void widgetSelected(SelectionEvent e)
+		{
+			ModifyEObjectCommand command = getButtonCommand();
+			if (command != null)
+			{
+				try
+				{
+					command.execute(null, null);
+
+					refresh();
+					refreshSelectedEditPart();
+				}
+				catch (ExecutionException ex)
+				{
+					BpmnDiagramEditorPlugin.getInstance().getLog().log(
+							new Status(IStatus.ERROR, JadexBpmnEditor.ID,
+									IStatus.ERROR, ex.getMessage(), ex));
+				}
+			}
 		}
 	}
 	

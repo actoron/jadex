@@ -260,6 +260,32 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 	}
 	
 	@Override
+	protected ModifyEObjectCommand getClearCommand()
+	{
+		// modify the EModelElement annotation
+		ModifyEObjectCommand command = new ModifyEObjectCommand(
+				modelElement,
+				"Clear parameter")
+		{
+			@Override
+			protected CommandResult doExecuteWithResult(
+					IProgressMonitor monitor, IAdaptable info)
+					throws ExecutionException
+			{
+				HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
+				synchronized (uniqueValueCash)
+				{
+					updateTableRowList(null);
+					uniqueValueCash.clear();
+				}
+
+				return CommandResult.newOKCommandResult(null);
+			}
+		};
+		return command;
+	}
+	
+	@Override
 	protected IStructuredContentProvider getTableContentProvider()
 	{
 		return new MultiColumnTableContentProvider();

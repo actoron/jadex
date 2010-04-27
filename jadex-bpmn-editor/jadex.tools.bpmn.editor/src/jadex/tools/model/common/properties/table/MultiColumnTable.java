@@ -272,6 +272,9 @@ public class MultiColumnTable
 	 */
 	public static String convertMultiColumnRowList(MultiColumnTable table)
 	{
+		if (null == table)
+			return null;
+		
 		StringBuffer buffer = new StringBuffer();
 		for (MultiColumnTableRow multiColumnTableRow : table.getRowList())
 		{
