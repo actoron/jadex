@@ -427,8 +427,8 @@ public abstract class AbstractCommonTablePropertySection extends
 		up.setText("Up");
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		gridData.widthHint = 40;
-		delete.setLayoutData(gridData);
-		delete.addSelectionListener(new SelectionAdapter()
+		up.setLayoutData(gridData);
+		up.addSelectionListener(new SelectionAdapter()
 		{
 			/** 
 			 * Remove selected ContextElement from the Context and refresh the view
@@ -463,8 +463,8 @@ public abstract class AbstractCommonTablePropertySection extends
 		down.setText("Down");
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 		gridData.widthHint = 40;
-		delete.setLayoutData(gridData);
-		delete.addSelectionListener(new SelectionAdapter()
+		down.setLayoutData(gridData);
+		down.addSelectionListener(new SelectionAdapter()
 		{
 			/** 
 			 * Remove selected ContextElement from the Context and refresh the view

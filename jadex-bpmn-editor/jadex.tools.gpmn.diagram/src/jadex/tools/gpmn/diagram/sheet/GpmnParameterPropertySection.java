@@ -8,6 +8,7 @@
  */
 package jadex.tools.gpmn.diagram.sheet;
 
+import jadex.tools.gpmn.Context;
 import jadex.tools.gpmn.DirectionType;
 import jadex.tools.gpmn.GpmnFactory;
 import jadex.tools.gpmn.Parameter;
@@ -16,11 +17,10 @@ import jadex.tools.gpmn.diagram.part.GpmnDiagramMessages;
 import jadex.tools.model.common.properties.ModifyEObjectCommand;
 import jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection;
 
-import java.util.List;
-
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.jface.viewers.CellEditor;
@@ -255,6 +255,80 @@ public class GpmnParameterPropertySection extends AbstractCommonTablePropertySec
 	}
 	
 	
+	/**
+	 * @see jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection#getDeleteCommand()
+	 */
+	@Override
+	protected ModifyEObjectCommand getUpCommand()
+	{
+		// modify the ContextElement
+		ModifyEObjectCommand command = new ModifyEObjectCommand(
+				modelElement,
+				"Parameter MoveUp command")
+		{
+			@Override
+			protected CommandResult doExecuteWithResult(
+					IProgressMonitor monitor, IAdaptable info)
+					throws ExecutionException
+			{
+				Parameter param = (Parameter) ((IStructuredSelection) tableViewer
+						.getSelection()).getFirstElement();
+				
+				EList<Parameter> parameters = ((ParameterizedVertex) modelElement).getParameter();
+				int index = parameters.indexOf(param);
+				if (0 < index && index < parameters.size())
+				{
+					parameters.move(index-1, param);
+				}
+				
+				((Context) modelElement).getElements(). remove(param);
+				
+				
+				return CommandResult.newOKCommandResult(null);
+			}
+		};
+		
+		return command;
+	}
+	
+	/**
+	 * @see jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection#getDeleteCommand()
+	 */
+	@Override
+	protected ModifyEObjectCommand getDownCommand()
+	{
+		// modify the ContextElement
+		ModifyEObjectCommand command = new ModifyEObjectCommand(
+				modelElement,
+				"Parameter MoveUp command")
+		{
+			@Override
+			protected CommandResult doExecuteWithResult(
+					IProgressMonitor monitor, IAdaptable info)
+					throws ExecutionException
+			{
+				Parameter param = (Parameter) ((IStructuredSelection) tableViewer
+						.getSelection()).getFirstElement();
+				
+				EList<Parameter> parameters = ((ParameterizedVertex) modelElement).getParameter();
+				int index = parameters.indexOf(param);
+				if (0 <= index && index < parameters.size()-1)
+				{
+					parameters.move(index+1, param);
+				}
+				
+				((Context) modelElement).getElements(). remove(param);
+				
+				
+				return CommandResult.newOKCommandResult(null);
+			}
+		};
+		
+		return command;
+	}
+	
+	
+	
 
 	/**
 	 * @see jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection#getTableContentProvider()
@@ -372,7 +446,7 @@ public class GpmnParameterPropertySection extends AbstractCommonTablePropertySec
 		{
 			if (inputElement instanceof ParameterizedVertex)
 			{
-				List parameter = ((ParameterizedVertex) inputElement).getParameter();
+				EList<Parameter> parameter = ((ParameterizedVertex) inputElement).getParameter();
 				return parameter.toArray(new Object[parameter.size()]);
 			}
 			return new Object[] { null };

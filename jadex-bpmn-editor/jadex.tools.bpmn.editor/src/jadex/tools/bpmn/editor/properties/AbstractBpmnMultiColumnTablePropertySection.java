@@ -194,15 +194,18 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 					IProgressMonitor monitor, IAdaptable info)
 					throws ExecutionException
 			{
+				
+				System.out.println("DO EXECUTE UP COMMAND");
+				
 				HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
 				synchronized (uniqueValueCash)
 				{
 					MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
 							.getSelection()).getFirstElement();
-					
+				
 					MultiColumnTable tableRowList = getTableRowList();
-					
 					int index = tableRowList.indexOf(rowToMove);
+
 					if (0 < index && index < tableRowList.size())
 					{
 						MultiColumnTableRow tableRow = tableRowList.get(index);
@@ -239,8 +242,8 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 							.getSelection()).getFirstElement();
 					
 					MultiColumnTable tableRowList = getTableRowList();
-					
 					int index = tableRowList.indexOf(rowToMove);
+
 					if (0 <= index && index < tableRowList.size()-1)
 					{
 						MultiColumnTableRow tableRow = tableRowList.get(index);

@@ -15,11 +15,10 @@ import jadex.tools.gpmn.diagram.part.GpmnDiagramMessages;
 import jadex.tools.model.common.properties.ModifyEObjectCommand;
 import jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection;
 
-import java.util.List;
-
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gmf.runtime.common.core.command.CommandResult;
 import org.eclipse.jface.viewers.CellEditor;
@@ -315,7 +314,73 @@ public class GpmnContextElementsPropertySection extends AbstractCommonTablePrope
 		return command;
 	}
 	
+	/**
+	 * @see jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection#getDeleteCommand()
+	 */
+	@Override
+	protected ModifyEObjectCommand getUpCommand()
+	{
+		// modify the ContextElement
+		ModifyEObjectCommand command = new ModifyEObjectCommand(
+				modelElement,
+				"ContextElement MoveUp command")
+		{
+			@Override
+			protected CommandResult doExecuteWithResult(
+					IProgressMonitor monitor, IAdaptable info)
+					throws ExecutionException
+			{
+				ContextElement element = (ContextElement) ((IStructuredSelection) tableViewer
+						.getSelection()).getFirstElement();
+				
+				EList<ContextElement> elements = ((Context) modelElement).getElements();
+				int index = elements.indexOf(element);
+				if (0 < index && index < elements.size())
+				{
+					elements.move(index-1, element);
+				}
+				
+				((Context) modelElement).getElements(). remove(element);
+				
+				
+				return CommandResult.newOKCommandResult(null);
+			}
+		};
+		
+		return command;
+	}
 	
+	protected ModifyEObjectCommand getDownCommand()
+	{
+		// modify the ContextElement
+		ModifyEObjectCommand command = new ModifyEObjectCommand(
+				modelElement,
+				"ContextElement MoveUp command")
+		{
+			@Override
+			protected CommandResult doExecuteWithResult(
+					IProgressMonitor monitor, IAdaptable info)
+					throws ExecutionException
+			{
+				ContextElement element = (ContextElement) ((IStructuredSelection) tableViewer
+						.getSelection()).getFirstElement();
+				
+				EList<ContextElement> elements = ((Context) modelElement).getElements();
+				int index = elements.indexOf(element);
+				if (0 <= index && index < elements.size()-1)
+				{
+					elements.move(index+1, element);
+				}
+				
+				((Context) modelElement).getElements(). remove(element);
+				
+				
+				return CommandResult.newOKCommandResult(null);
+			}
+		};
+		
+		return command;
+	}
 
 	/**
 	 * @see jadex.tools.model.common.properties.table.AbstractCommonTablePropertySection#getTableContentProvider()
@@ -431,7 +496,7 @@ public class GpmnContextElementsPropertySection extends AbstractCommonTablePrope
 		{
 			if (inputElement instanceof Context)
 			{
-				List contextElements = ((Context) inputElement).getElements();
+				EList<ContextElement> contextElements = ((Context) inputElement).getElements();
 				return contextElements.toArray(new Object[contextElements.size()]);
 			}
 			return new Object[] { null };
