@@ -295,7 +295,7 @@ public class MessageService implements IMessageService, IService
 			for(int i = 0; i < trans.length; i++)
 			{
 				String[] traddrs = trans[i].getAddresses();
-				for(int j = 0; j < traddrs.length; j++)
+				for(int j = 0; traddrs!=null && j<traddrs.length; j++)
 					addrs.add(traddrs[j]);
 			}
 			addresses = (String[])addrs.toArray(new String[addrs.size()]);
