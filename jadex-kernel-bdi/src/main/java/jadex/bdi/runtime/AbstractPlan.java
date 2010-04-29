@@ -4,7 +4,6 @@ import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.impl.BeliefbaseFlyweight;
 import jadex.bdi.runtime.impl.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.EventbaseFlyweight;
-import jadex.bdi.runtime.impl.ExpressionFlyweight;
 import jadex.bdi.runtime.impl.ExpressionNoModel;
 import jadex.bdi.runtime.impl.ExpressionbaseFlyweight;
 import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
@@ -18,6 +17,7 @@ import jadex.bdi.runtime.impl.PlanFlyweight;
 import jadex.bdi.runtime.impl.PlanbaseFlyweight;
 import jadex.bdi.runtime.impl.PropertybaseFlyweight;
 import jadex.bdi.runtime.impl.WaitqueueFlyweight;
+import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
@@ -625,11 +625,8 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public IExpression	getExpression(String name)
 	{
-		Object mcapa = state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
-		Object mexp = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_expressions, name);
-		if(mexp==null)
-			throw new RuntimeException("Unknown expression: "+name);
-		return ExpressionFlyweight.getExpressionFlyweight(state, rcapa, mexp);
+		Object[] scope = AgentRules.resolveCapability(name, OAVBDIMetaModel.expression_type, getRCapability(), getState());
+		return ExpressionbaseFlyweight.createExpression(getState(), scope[1], (String)scope[0]);
 	}
 
 	/**

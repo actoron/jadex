@@ -36,9 +36,9 @@ public class FindEnglishSynonymsPlanD2 extends Plan
 //			+"from Tuple $wordpair in $beliefbase.getBeliefSet(\"transcap.egwords\").getFacts() "
 //			+"where $wordpair.get(0).equals($eword)";
 		
-		String	translate	= "select one $wordpair.get(1) "
-			+"from Tuple $wordpair in $beliefbase.egwords "
-			+"where $wordpair.get(0).equals($eword)";
+//		String	translate	= "select one $wordpair.get(1) "
+//			+"from Tuple $wordpair in $beliefbase.egwords "
+//			+"where $wordpair.get(0).equals($eword)";
 
 //		String	find	= "select $wordpair.get(0) "
 //			+"from Tuple $wordpair in $beliefbase.getBeliefSet(\"transcap.egwords\").getFacts() "
@@ -48,7 +48,10 @@ public class FindEnglishSynonymsPlanD2 extends Plan
 			+"from Tuple $wordpair in $beliefbase.egwords "
 			+"where $wordpair.get(1).equals($gword) && !$wordpair.get(0).equals($eword)";
 
-		this.querytranslate	= createExpression(translate, new String[]{"$eword"}, new Class[]{String.class});
+//		this.querytranslate	= createExpression(translate, new String[]{"$eword"}, new Class[]{String.class});
+//		this.querytranslate	= getExpression("transcap.query_egword");
+		this.querytranslate	= getExpression("query_egword");
+		
 		this.queryfind	= createExpression(find, new String[]{"$gword", "$eword"}
 			, new Class[]{String.class, String.class});
 	}

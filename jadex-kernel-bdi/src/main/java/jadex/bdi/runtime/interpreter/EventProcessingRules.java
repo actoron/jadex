@@ -366,7 +366,8 @@ public class EventProcessingRules
 			if(!state.getType(rpe).isSubtype(OAVBDIRuntimeModel.goal_type)
 				|| state.getAttributeValues(rpe, OAVBDIRuntimeModel.goal_has_triedmplans)==null)
 			{
-				BDIInterpreter.getInterpreter(state).getLogger(rcapa).warning("Warning: Event/goal not handled: "+rpe+" "
+				BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+				ip.getLogger(rcapa).warning("Warning: Event/goal not handled: "+ip.getAgentAdapter().getComponentIdentifier().getLocalName()+rpe+" "
 					+state.getAttributeValue(state.getAttributeValue(rpe, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
 				
 				// Remove unprocessable event from agent.

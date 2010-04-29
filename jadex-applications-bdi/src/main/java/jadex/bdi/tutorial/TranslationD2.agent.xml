@@ -61,9 +61,15 @@
 		</messageeventref>
 	</events>
 
+	<expressions>
+		<expressionref name="query_egword">
+			<concrete ref="transcap.query_egword"/>
+		</expressionref>
+	</expressions>
+
 	<properties>
  		<!-- Only log outputs >= level are printed. -->
-       <property name="logging.level">Level.INFO</property>
+        <property name="logging.level">Level.INFO</property>
  		<!-- The default parent handler prints out log messages on the console. -->
        <property name="logging.useParentHandlers">true</property>
         <!--<property name="debugging">true</property>-->

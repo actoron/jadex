@@ -298,6 +298,9 @@ public class OAVBDIMetaModel
 	/** The expression type. */
 	public static OAVObjectType expression_type;
 
+	/** The expression ref type. */
+	public static OAVObjectType expressionreference_type;
+	
 	/** Expression has language. */
 	public static OAVAttributeType expression_has_language;
 
@@ -418,7 +421,10 @@ public class OAVBDIMetaModel
 	
 	/** Capability has expressions attribute. */
 	public static OAVAttributeType capability_has_expressions;
-	
+
+	/** Capability has expressionrefs attribute. */
+	public static OAVAttributeType capability_has_expressionrefs;
+
 	/** Capability has conditions attribute. */
 	public static OAVAttributeType capability_has_conditions;
 				
@@ -845,6 +851,7 @@ public class OAVBDIMetaModel
 		elementreference_type	= bdimm_type_model.createType("melementreference", referenceableelement_type);
 //		expressionparameter_type = bdimm_type_model.createType("mexpressionparameter", modelelement_type);
 		expression_type = bdimm_type_model.createType("mexpression", referenceableelement_type);
+		expressionreference_type = bdimm_type_model.createType("mexpressionreference", elementreference_type);
 		condition_type = bdimm_type_model.createType("mcondition", expression_type);
 //		relevantbelief_type = bdimm_type_model.createType("mrelevantbelief", expressionrelevant_type);
 //		relevantbeliefset_type = bdimm_type_model.createType("mrelevantbeliefset", expressionrelevant_type);
@@ -1138,6 +1145,7 @@ public class OAVBDIMetaModel
 		capability_has_internalevents = capability_type.createAttributeType("mcapability_has_minternalevents", internalevent_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_messageeventrefs = capability_type.createAttributeType("mcapability_has_mmessageeventrefs", messageeventreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_internaleventrefs = capability_type.createAttributeType("mcapability_has_minternaleventrefs", internaleventreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
+		capability_has_expressionrefs = capability_type.createAttributeType("mcapability_has_mexpressionrefs", expressionreference_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_expressions = capability_type.createAttributeType("mcapability_has_mexpressions", expression_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_conditions = capability_type.createAttributeType("mcapability_has_mconditions", condition_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);
 		capability_has_properties = capability_type.createAttributeType("mcapability_has_mproperties", expression_type, OAVAttributeType.ORDEREDMAP, null, modelelement_has_name);

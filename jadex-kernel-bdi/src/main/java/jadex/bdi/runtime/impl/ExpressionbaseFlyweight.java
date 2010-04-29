@@ -3,7 +3,9 @@ package jadex.bdi.runtime.impl;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.IExpressionbase;
+import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.Tuple;
 import jadex.javaparser.IExpressionParser;
@@ -50,13 +52,29 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 	//-------- methods --------
 	
 	/**
+	 *  Create an expression of a given type but does not add to state.
+	 *  @param state The state.
+	 *  @param rcapa The scope.
+	 *  @param type The type.
+	 *  @param rplan The plan (if created from plan).
+	 */
+	public static IExpression createExpression(IOAVState state, Object rcapa, String type)
+	{
+		Object mcapa = state.getAttributeValue(rcapa, OAVBDIRuntimeModel.element_has_model);
+		if(!state.containsKey(mcapa, OAVBDIMetaModel.capability_has_expressions, type))
+			throw new RuntimeException("Unknown expression: "+type);
+		Object mexp = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_expressions, type);
+		return ExpressionFlyweight.getExpressionFlyweight(state, rcapa, mexp);
+	}
+	
+	/**
 	 *  Get a predefined expression. 
 	 *  Creates a new instance on every call.
 	 *  @param name	The name of an expression defined in the ADF.
 	 *  @return The expression object.
 	 */
 	// changed signature for javaflow, removed final
-	public IExpression	getExpression(String name)
+	public IExpression	getExpression(final String name)
 	{
 		if(getInterpreter().isExternalThread())
 		{
@@ -64,22 +82,16 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 			{
 				public void run()
 				{
-					Object mcapa = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
-					Object mexp = getState().getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_expressions, arg);
-					if(mexp==null)
-						throw new RuntimeException("Unknown expression: "+arg);
-					object = ExpressionFlyweight.getExpressionFlyweight(getState(), getScope(), mexp);
+					Object[] scope = AgentRules.resolveCapability(name, OAVBDIMetaModel.expression_type, getScope(), getState());
+					object = createExpression(getState(), scope[1], (String)scope[0]);
 				}
 			};
 			return (IExpression)invoc.object;
 		}
 		else
 		{
-			Object mcapa = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
-			Object mexp = getState().getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_expressions, name);
-			if(mexp==null)
-				throw new RuntimeException("Unknown expression: "+name);
-			return ExpressionFlyweight.getExpressionFlyweight(getState(), getScope(), mexp);
+			Object[] scope = AgentRules.resolveCapability(name, OAVBDIMetaModel.expression_type, getScope(), getState());
+			return createExpression(getState(), scope[1], (String)scope[0]);
 		}
 	}
 

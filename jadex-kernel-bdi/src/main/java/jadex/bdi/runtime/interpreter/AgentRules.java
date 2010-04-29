@@ -2715,6 +2715,11 @@ public class AgentRules
 				if(state.containsKey(mcapa, OAVBDIMetaModel.capability_has_messageeventrefs, name))
 					refelem = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_messageeventrefs, name);
 			}
+			if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.expression_type) || type.isSubtype(OAVBDIMetaModel.expressionreference_type)))
+			{	
+				if(state.containsKey(mcapa, OAVBDIMetaModel.capability_has_expressionrefs, name))
+					refelem = state.getAttributeValue(mcapa, OAVBDIMetaModel.capability_has_expressionrefs, name);
+			}
 			if(refelem==null && (type==null || type.isSubtype(OAVBDIMetaModel.condition_type)))// || type.isSubtype(OAVBDIMetaModel.conditionreference_type))
 			{
 				// todo: support me?!
