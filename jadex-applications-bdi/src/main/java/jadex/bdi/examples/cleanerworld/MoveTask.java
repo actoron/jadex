@@ -20,10 +20,6 @@ public class MoveTask extends AbstractTask
 	/** The destination property. */
 	public static final String	PROPERTY_DESTINATION = "destination";
 
-	/** The scope property. */
-//	public static final String	PROPERTY_SCOPE = "scope";
-	
-	
 	/** The speed property (units per second). */
 	public static final String	PROPERTY_SPEED	= "speed";
 	
