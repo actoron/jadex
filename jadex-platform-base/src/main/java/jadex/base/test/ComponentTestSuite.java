@@ -71,6 +71,16 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(File path, File root) throws Exception
 	{
+		this(path, root, null);
+	}
+	
+	/**
+	 * Create a component test suite for components contained in a given path.
+	 * @param path	The path to look for test cases in.
+	 * @param root	The classpath root corresponding to the path.
+	 */
+	public ComponentTestSuite(File path, File root, String[] excludes) throws Exception
+	{
 		this(path.getName(), new String[0]);
 		
 		IComponentManagementService cms = (IComponentManagementService)platform
@@ -84,37 +94,47 @@ public class ComponentTestSuite extends TestSuite
 		while(!todo.isEmpty())
 		{
 			File	file	= (File)todo.remove(0);
-			boolean	istest	= false;
-
-			if(file.isDirectory())
+			String	abspath	= file.getAbsolutePath();
+			boolean	exclude	= false;
+			for(int i=0; !exclude && excludes!=null && i<excludes.length; i++)
 			{
-				File[]	subs	= file.listFiles();
-				todo.addAll(Arrays.asList(subs));
-			}
-			else if(SComponentFactory.isLoadable(platform,  file.getAbsolutePath()))
-			{
-				try
-				{
-					ILoadableComponentModel model = SComponentFactory.loadModel(platform,  file.getAbsolutePath());
-					
-					if(model!=null && model.getReport().isEmpty())
-					{
-						IArgument[]	results	= model.getResults();
-						for(int i=0; !istest && i<results.length; i++)
-						{
-							if(results[i].getName().equals("testresults") && results[i].getTypename().equals("Testcase"))
-								istest	= true;
-						}
-					}
-				}
-				catch(Exception e)
-				{
-				}
+				exclude	= abspath.indexOf(excludes[i])!=-1;
 			}
 			
-			if(istest)
+			if(!exclude)
 			{
-				addTest(new ComponentTest(cms, file.getAbsolutePath()));
+				boolean	istest	= false;
+	
+				if(file.isDirectory())
+				{
+					File[]	subs	= file.listFiles();
+					todo.addAll(Arrays.asList(subs));
+				}
+				else if(SComponentFactory.isLoadable(platform,  abspath))
+				{
+					try
+					{
+						ILoadableComponentModel model = SComponentFactory.loadModel(platform,  abspath);
+						
+						if(model!=null && model.getReport().isEmpty())
+						{
+							IArgument[]	results	= model.getResults();
+							for(int i=0; !istest && i<results.length; i++)
+							{
+								if(results[i].getName().equals("testresults") && results[i].getTypename().equals("Testcase"))
+									istest	= true;
+							}
+						}
+					}
+					catch(Exception e)
+					{
+					}
+				}
+				
+				if(istest)
+				{
+					addTest(new ComponentTest(cms, abspath));
+				}
 			}
 		}
 	}

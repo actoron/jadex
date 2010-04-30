@@ -76,7 +76,7 @@ public class WaitForPlan extends Plan	implements Runnable
 			if(!Arrays.equals(oldfacts, newfacts))
 				report.setSucceeded(true);
 			else
-				report.setReason("No removal in beliefset detected: "+oldfacts+" "+newfacts);
+				report.setReason("No addition in beliefset detected: "+oldfacts+" "+newfacts);
 		}
 		catch(TimeoutException e)
 		{

@@ -12,7 +12,7 @@ import junit.framework.Test;
 public class BPMNTest	extends ComponentTestSuite
 {
 	/**
-	 *  Static method called by JUnit.
+	 *  Constructor called by Maven JUnit runner.
 	 */
 	public BPMNTest()	throws Exception
 	{
@@ -23,7 +23,7 @@ public class BPMNTest	extends ComponentTestSuite
 	}
 	
 	/**
-	 *  Static method called by JUnit.
+	 *  Static method called by eclipse JUnit runner.
 	 */
 	public static Test suite() throws Exception
 	{
