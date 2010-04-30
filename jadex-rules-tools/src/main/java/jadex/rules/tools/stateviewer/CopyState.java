@@ -147,7 +147,7 @@ public class CopyState implements IOAVState
 					tmp	= id;
 				}
 				final Object	obj	= tmp;
-
+				
 				CopyState.this.synchronizator.invokeLater(new Runnable()
 				{
 					public void run()
