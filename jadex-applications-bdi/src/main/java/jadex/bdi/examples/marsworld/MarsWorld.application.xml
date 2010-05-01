@@ -100,9 +100,9 @@
 				<env:tasktype name="load" class="LoadOreTask" />
 			</env:tasktypes>
 
-			<env:views>
-				<env:view name="all_view" class="GeneralDataView2D" />
-			</env:views>
+			<env:dataviews>
+				<env:dataview name="all_view" class="GeneralDataView2D" />
+			</env:dataviews>
 
 			<env:perspectives>
 				<env:perspective name="icons" class="Perspective2D" opengl="true">
@@ -261,7 +261,7 @@
 					</env:dataconsumers>
 					
 					<env:observers>
-						<env:observer name="MarsWorld" view="view_all" perspective="icons">
+						<env:observer name="MarsWorld" dataview="view_all" perspective="icons">
 							<env:plugin name="evaluation" class="EvaluationPlugin">
 								<env:property name="component_0">((AbstractChartDataConsumer)$space.getDataConsumer("ore_chart")).getChartPanel()</env:property>
 							</env:plugin>
@@ -299,7 +299,7 @@
 						</env:object>
 					</env:objects>
 					<env:observers>
-						<env:observer name="MarsWorld" view="view_all" perspective="icons"/>
+						<env:observer name="MarsWorld" dataview="view_all" perspective="icons"/>
 					</env:observers>
 	 			</env:envspace>
 			</spaces>

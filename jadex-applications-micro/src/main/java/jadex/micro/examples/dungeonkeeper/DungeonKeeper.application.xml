@@ -49,9 +49,9 @@
 				<env:processtype name="init" class="InitMapProcess" />
 			</env:processtypes>
 			
-			<env:views>
-				<env:view name="view_all" class="GeneralDataView2D" />
-			</env:views>
+			<env:dataviews>
+				<env:dataview name="view_all" class="GeneralDataView2D" />
+			</env:dataviews>
 			
 			<env:perspectives>
 				<env:perspective name="main" class="Perspective2D" opengl="true" objectplacement="center">
@@ -125,7 +125,7 @@
 					</env:processes>
 					
 					<env:observers>
-						<env:observer name="world" view="view_all" perspective="main"/>
+						<env:observer name="world" dataview="view_all" perspective="main"/>
 					</env:observers>
 				</env:envspace>
 			</spaces>

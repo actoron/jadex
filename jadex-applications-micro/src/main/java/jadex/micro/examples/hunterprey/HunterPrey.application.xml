@@ -231,18 +231,18 @@
 				</env:perceptprocessor>
 			</env:percepttypes>
 
-			<env:views>
-				<env:view name="all_view" class="GeneralDataView2D" />
-				<!-- <env:view name="prey_view" objecttype="prey">new LocalDataView2D($object, 2)</env:view> -->
-				<env:view name="prey_view" class="LocalDataView2D" objecttype="prey">
+			<env:dataviews>
+				<env:dataview name="all_view" class="GeneralDataView2D" />
+				<!-- <env:dataview name="prey_view" objecttype="prey">new LocalDataView2D($object, 2)</env:dataview> -->
+				<env:dataview name="prey_view" class="LocalDataView2D" objecttype="prey">
 					<env:property name="object">$object</env:property>
 					<env:property name="range">2</env:property>
-				</env:view>
-				<env:view name="hunter_view" class="LocalDataView2D" objecttype="hunter">
+				</env:dataview>
+				<env:dataview name="hunter_view" class="LocalDataView2D" objecttype="hunter">
 					<env:property name="object">$object</env:property>
 					<env:property name="range">2</env:property>
-				</env:view>
-			</env:views>
+				</env:dataview>
+			</env:dataviews>
 
 			<env:perspectives>
 				<env:perspective name="icons" class="Perspective2D" objectplacement="center">
@@ -328,13 +328,13 @@
 					</env:processes>
 		
 					<env:observers>
-						<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
 					</env:observers>
 				</env:envspace>
 			</spaces>
  			
  			<components>
-				<agent name="Mickey" type="MicroPrey"/>
+				<component name="Mickey" type="MicroPrey"/>
 			</components>			
  		</application>
 
@@ -352,14 +352,14 @@
 					</env:processes>
 	
 					<env:observers>
-						<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
 					</env:observers>
 	 			</env:envspace>
 			</spaces>
 			
  			<components>
-				<agent name="Dumbo" type="DumbPrey"/>
-				<agent name="Lupo" type="DumbHunter"/>
+				<component name="Dumbo" type="DumbPrey"/>
+				<component name="Lupo" type="DumbHunter"/>
 			</components>
  		</application>
 
@@ -377,7 +377,7 @@
 					</env:processes>
 	
 					<env:observers>
-						<env:observer name="HunterPrey World" view="view_all" perspective="icons"/>
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons"/>
 					</env:observers>
 	 			</env:envspace>
 			</spaces>	
@@ -397,7 +397,7 @@
 					</env:processes>
 	
 					<env:observers>
-						<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
 					</env:observers>
 	 			</env:envspace>
 			</spaces>
@@ -421,7 +421,7 @@
 					</env:processes>
 	
 					<env:observers>
-						<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
 					</env:observers>
 	 			</env:envspace>
 			</spaces>
@@ -446,7 +446,7 @@
 					</env:processes>
 	
 					<env:observers>
-						<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
 					</env:observers>
 	 			</env:envspace>
 			</spaces>
@@ -471,17 +471,17 @@
 					</env:processes>
 	
 					<env:observers>
-						<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
 					</env:observers>
 	 			</env:envspace>
 			</spaces>
 
  			<components>
-				<agent name="Duffy" type="DumbPrey"/>
-				<agent name="Dumbo" type="DumbPrey"/>
-				<agent name="Dimitri" type="DumbPrey"/>
-				<agent name="Dork" type="DumbPrey"/>
-				<agent name="Django" type="DumbPrey"/>
+				<component name="Duffy" type="DumbPrey"/>
+				<component name="Dumbo" type="DumbPrey"/>
+				<component name="Dimitri" type="DumbPrey"/>
+				<component name="Dork" type="DumbPrey"/>
+				<component name="Django" type="DumbPrey"/>
 			</components>
  		</application>
 	</applications>

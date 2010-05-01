@@ -21,9 +21,6 @@ public class MoveTask extends AbstractTask
 	//-------- constants --------
 	
 	/** The destination property. */
-	public static final String	PROPERTY_TYPENAME = "move";
-	
-	/** The destination property. */
 	public static final String	PROPERTY_DESTINATION = "destination";
 
 	/** The scope property. */

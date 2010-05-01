@@ -76,9 +76,9 @@
 				</env:processtype>
 			</env:processtypes>
 			
-			<env:views>
-				<env:view name="view_all" class="GeneralDataView2D" />
-			</env:views>
+			<env:dataviews>
+				<env:dataview name="view_all" class="GeneralDataView2D" />
+			</env:dataviews>
 			
 			<env:perspectives>
 				<env:perspective name="main" class="Perspective2D" opengl="true" objectplacement="center">
@@ -207,7 +207,7 @@
 					</env:dataconsumers>
 					
 					<env:observers>
-						<env:observer name="world" view="view_all" perspective="main">
+						<env:observer name="world" dataview="view_all" perspective="main">
 							<env:plugin name="evaluation" class="EvaluationPlugin">
 								<env:property name="component_0">((AbstractChartDataConsumer)$space.getDataConsumer("unhappiness_chart")).getChartPanel()</env:property>
 								<env:property name="component_1">((AbstractChartDataConsumer)$space.getDataConsumer("unhappiness_histogram")).getChartPanel()</env:property>
@@ -294,7 +294,7 @@
 					</env:dataconsumers>
 					
 					<env:observers>
-						<env:observer name="world" view="view_all" perspective="main">
+						<env:observer name="world" dataview="view_all" perspective="main">
 							<env:plugin name="evaluation" class="EvaluationPlugin">
 								<env:property name="component_0">((AbstractChartDataConsumer)$space.getDataConsumer("unhappiness_chart")).getChartPanel()</env:property>
 								<env:property name="component_1">((AbstractChartDataConsumer)$space.getDataConsumer("unhappiness_histogram")).getChartPanel()</env:property>
@@ -348,7 +348,7 @@
 					</env:dataconsumers>
 					
 					<env:observers>
-						<env:observer name="world" view="view_all" perspective="main">
+						<env:observer name="world" dataview="view_all" perspective="main">
 							<env:plugin name="evaluation" class="EvaluationPlugin">
 								<env:property name="component_0">((AbstractChartDataConsumer)$space.getDataConsumer("unhappiness_histogram")).getChartPanel()</env:property>
 							</env:plugin>
@@ -370,7 +370,7 @@
 					</env:processes>
 					
 					<env:observers>
-						<env:observer name="world" view="view_all" perspective="main">
+						<env:observer name="world" dataview="view_all" perspective="main">
 							<env:plugin name="evaluation" class="EvaluationPlugin"/>
 						</env:observer>
 					</env:observers>
@@ -390,7 +390,7 @@
 					</env:processes>
 					
 					<env:observers>
-						<env:observer name="world" view="view_all" perspective="main">
+						<env:observer name="world" dataview="view_all" perspective="main">
 							<env:plugin name="evaluation" class="EvaluationPlugin"/>
 						</env:observer>
 					</env:observers>
@@ -410,7 +410,7 @@
 					</env:processes>
 					
 					<env:observers>
-						<env:observer name="world" view="view_all" perspective="main">
+						<env:observer name="world" dataview="view_all" perspective="main">
 							<env:plugin name="evaluation" class="EvaluationPlugin"/>
 						</env:observer>
 					</env:observers>

@@ -132,17 +132,17 @@
 			</env:percepttypes>
 			
 			<!-- Data views for defining cut outs of the world objects. -->
-			<env:views>
-				<env:view name="view_all" class="GeneralDataView2D" />
-				<env:view name="collector_view" class="LocalDataView2D" objecttype="collector">
+			<env:dataviews>
+				<env:dataview name="view_all" class="GeneralDataView2D" />
+				<env:dataview name="collector_view" class="LocalDataView2D" objecttype="collector">
 					<env:property name="object">$object</env:property>
 					<env:property name="range">$object.vision_range</env:property>
-				</env:view>
-				<env:view name="burner_view" class="LocalDataView2D" objecttype="burner">
+				</env:dataview>
+				<env:dataview name="burner_view" class="LocalDataView2D" objecttype="burner">
 					<env:property name="object">$object</env:property>
 					<env:property name="range">$object.vision_range</env:property>
-				</env:view>
-			</env:views>
+				</env:dataview>
+			</env:dataviews>
 			
 			<!-- Perspectives define the user-interface appearance. -->
 			<env:perspectives>
@@ -224,7 +224,7 @@
 					</env:processes>
 					
 					<env:observers>
-						<env:observer name="world" view="view_all" perspective="abstract"/>
+						<env:observer name="world" dataview="view_all" perspective="abstract"/>
 					</env:observers>
 				</env:envspace>
 			</spaces>

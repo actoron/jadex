@@ -64,9 +64,9 @@
 				<env:actiontype name="move" class="MoveAction" />
 			</env:actiontypes>
 		
-			<env:views>
-				<env:view name="view_all" class="GeneralDataView2D" />
-			</env:views>
+			<env:dataviews>
+				<env:dataview name="view_all" class="GeneralDataView2D" />
+			</env:dataviews>
 			
 			<env:perspectives>
 				<env:perspective name="icon" class="Perspective2D" opengl="true" objectplacement="center">
@@ -141,7 +141,7 @@
 					</env:dataconsumers>
 				
 					<env:observers>
-						<env:observer name="world" view="view_all" perspective="main">
+						<env:observer name="world" dataview="view_all" perspective="main">
 							<env:plugin name="evaluation" class="EvaluationPlugin">
 								<env:property name="component_0">((AbstractChartDataConsumer)$space.getDataConsumer("flashes_chart")).getChartPanel()</env:property>
 							</env:plugin>
@@ -163,7 +163,7 @@
 			<spaces>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="15" height="15">
 					<env:observers>
-						<env:observer name="world" view="view_all" perspective="main" />
+						<env:observer name="world" dataview="view_all" perspective="main" />
 					</env:observers>
 				</env:envspace>
 			</spaces>
@@ -181,7 +181,7 @@
 			<spaces>
 				<env:envspace name="mygc2dspace" type="gc2dspace" width="15" height="15">
 					<env:observers>
-						<env:observer name="world" view="view_all" perspective="main" />
+						<env:observer name="world" dataview="view_all" perspective="main" />
 					</env:observers>
 				</env:envspace>
 			</spaces>

@@ -232,18 +232,18 @@
 				</env:perceptprocessor>
 			</env:percepttypes>
 			
-			<env:views>
-				<env:view name="all_view" class="GeneralDataView2D" />
-				<!-- <env:view name="prey_view" objecttype="prey">new LocalDataView2D($object, 2)</env:view> -->
-				<env:view name="prey_view" class="LocalDataView2D" objecttype="prey">
+			<env:dataviews>
+				<env:dataview name="all_view" class="GeneralDataView2D" />
+				<!-- <env:dataview name="prey_view" objecttype="prey">new LocalDataView2D($object, 2)</env:dataview> -->
+				<env:dataview name="prey_view" class="LocalDataView2D" objecttype="prey">
 					<env:property name="object">$object</env:property>
 					<env:property name="range">2</env:property>
-				</env:view>
-				<env:view name="hunter_view" class="LocalDataView2D" objecttype="hunter">
+				</env:dataview>
+				<env:dataview name="hunter_view" class="LocalDataView2D" objecttype="hunter">
 					<env:property name="object">$object</env:property>
 					<env:property name="range">2</env:property>
-				</env:view>
-			</env:views>
+				</env:dataview>
+			</env:dataviews>
 
 			<env:perspectives>
 				<env:perspective name="icons" class="Perspective2D" objectplacement="center">
@@ -330,7 +330,7 @@
 					</env:processes>
 	
 					<env:observers>
-						<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
 					</env:observers>
 	 			</env:envspace>
 			</spaces>
@@ -363,7 +363,7 @@
 					</env:processes>
 	
 					<env:observers>
-						<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
 					</env:observers>
 	 			</env:envspace>
 			</spaces>
@@ -388,7 +388,7 @@
 					</env:processes>
 	
 					<env:observers>
-						<env:observer name="HunterPrey World" view="view_all" perspective="icons" />
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" />
 					</env:observers>
 	 			</env:envspace>
 			</spaces>
@@ -415,7 +415,7 @@
 					</env:processes>
 	
 					<env:observers>
-						<env:observer name="HunterPrey World" view="view_all" perspective="icons" killonexit="true"/>
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons" killonexit="true"/>
 					</env:observers>
 	 			</env:envspace>
 			</spaces>
@@ -443,7 +443,7 @@
 					</env:processes>
 	
 					<env:observers>
-						<env:observer name="HunterPrey World" view="view_all" perspective="icons"/>
+						<env:observer name="HunterPrey World" dataview="view_all" perspective="icons"/>
 					</env:observers>
 	 			</env:envspace>
 			</spaces>
@@ -479,7 +479,7 @@
 				</env:objects>
 
 				<env:observers>
-					<env:observer name="HunterPrey World" view="view_all" perspective="icons"/>
+					<env:observer name="HunterPrey World" dataview="view_all" perspective="icons"/>
 				</env:observers>
  			</env:envspace>
  		</application>

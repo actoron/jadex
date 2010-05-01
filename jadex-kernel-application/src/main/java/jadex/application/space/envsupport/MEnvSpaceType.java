@@ -210,7 +210,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new SubobjectInfo(new AccessInfo(new QName(uri, "tasktype"), "tasktypes", null, null, new BeanAccessInfo("property"))),
 			new SubobjectInfo(new AccessInfo(new QName(uri, "perceptgenerator"), "perceptgenerators", null, null, new BeanAccessInfo("property"))),
 			new SubobjectInfo(new AccessInfo(new QName(uri, "perceptprocessor"), "perceptprocessors", null, null, new BeanAccessInfo("property"))),
-			new SubobjectInfo(new AccessInfo(new QName(uri, "view"), "views", null, null, new BeanAccessInfo("property"))),
+			new SubobjectInfo(new AccessInfo(new QName(uri, "dataview"), "dataviews", null, null, new BeanAccessInfo("property"))),
 			new SubobjectInfo(new AccessInfo(new QName(uri, "spaceexecutor"), null, null, null, new BeanAccessInfo("property"))),
 			new SubobjectInfo(new AccessInfo(new QName(uri, "perspective"), "perspectives", null, null, new BeanAccessInfo("property"))),
 			new SubobjectInfo(new AccessInfo(new QName(uri, "percepttype"), "percepttypes", null, null, new BeanAccessInfo("property"))),
@@ -309,7 +309,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "view")}), new ObjectInfo(MultiCollection.class),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "dataview")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
 			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
@@ -967,7 +967,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "view"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "dataview"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
 			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
 			new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
@@ -1131,7 +1131,7 @@ public class MEnvSpaceType	extends MSpaceType
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "observer")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
-			new AttributeInfo(new AccessInfo("view", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			new AttributeInfo(new AccessInfo("dataview", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new AttributeInfo(new AccessInfo("perspective", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new AttributeInfo(new AccessInfo("killonexit", null, null, Boolean.TRUE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			},

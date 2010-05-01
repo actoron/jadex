@@ -128,13 +128,13 @@
 				</env:perceptprocessor>
 			</env:percepttypes>
 			
-			<env:views>
-				<env:view name="view_all" class="GeneralDataView2D" />
-				<env:view name="cleaner_view" class="LocalDataView2D" objecttype="collector">
+			<env:dataviews>
+				<env:dataview name="view_all" class="GeneralDataView2D" />
+				<env:dataview name="cleaner_view" class="LocalDataView2D" objecttype="collector">
 					<env:property name="object">$object</env:property>
 					<env:property name="range">$object.vision_range</env:property>
-				</env:view>
-			</env:views>
+				</env:dataview>
+			</env:dataviews>
 			
 			<env:perspectives>			
 				<env:perspective name="icons" class="Perspective2D" opengl="true" invertyaxis="false">
@@ -238,7 +238,7 @@
 					</env:processes>
 					
 					<env:observers>
-						<env:observer name="Observer" view="view_all" perspective="abstract" />
+						<env:observer name="Observer" dataview="view_all" perspective="abstract" />
 					</env:observers>
 				</env:envspace>
 			</spaces>
@@ -288,7 +288,7 @@
 					</env:processes>
 					
 					<env:observers>
-						<env:observer name="Observer" view="view_all" perspective="abstract" />
+						<env:observer name="Observer" dataview="view_all" perspective="abstract" />
 					</env:observers>
 				</env:envspace>
 			</spaces>
