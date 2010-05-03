@@ -261,8 +261,8 @@ public class ObserverCenter
 	public IDataView getSelectedDataView()
 	{
 		IDataView dataview = space.getDataView(selecteddataviewname);
-		if (dataview == null)
-			dataview = (IDataView) externaldataviews.get(selecteddataviewname);
+		if(dataview == null)
+			dataview = (IDataView)externaldataviews.get(selecteddataviewname);
 		return dataview;
 	}
 	
@@ -301,7 +301,7 @@ public class ObserverCenter
 				perspective.setObserverCenter(this);
 				perspective.setName(name);
 				perspectives.put(name, perspective);
-				if (perspectives.size() == 1)
+				if(perspectives.size() == 1)
 				{
 					setSelectedPerspective(name);
 				}

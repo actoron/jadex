@@ -328,6 +328,8 @@ public class IntrospectorPlugin implements IObserverCenterPlugin
 		}
 		
 		IPerspective p = observerCenter_.getSelectedPerspective();
+//		if(p==null)
+//			System.out.println("h");
 		Object observedObj = p.getSelectedObject();
 		if(observedObj == null)
 		{

@@ -98,8 +98,14 @@
 				<env:tasktype name="load" class="LoadOreTask" />
 			</env:tasktypes>
 
+<<<<<<< .mine
+			<env:dataviewviews>
+<env:dataviewdataview name="all_view" class="GeneralDataView2D" />
+			</env:views>
+=======
 			<env:dataviewviews>
 	env:dataviewdataview name="all_view" class="GeneralDataView2D" /env:dataviewenv:dataviews>
+>>>>>>> .r1858
 
 			<env:perspectives>
 				<env:perspective name="icons" class="Perspective2D" opengl="true">

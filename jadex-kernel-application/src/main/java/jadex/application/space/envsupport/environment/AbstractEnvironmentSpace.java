@@ -426,7 +426,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		}
 		
 //		Map themes = new HashMap();
-		List sourceviews = mspacetype.getPropertyList("views");
+		List sourceviews = mspacetype.getPropertyList("dataviews");
 		if(sourceviews!=null)
 		{
 			for(int i=0; i<sourceviews.size(); i++)
