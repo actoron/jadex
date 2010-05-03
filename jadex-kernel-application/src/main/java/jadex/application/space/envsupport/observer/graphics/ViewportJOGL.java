@@ -15,10 +15,7 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.color.ColorSpace;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
@@ -60,10 +57,13 @@ public class ViewportJOGL extends AbstractViewport
 	private static final int MIN_SIZE = 32;
 	
 	/** Clamped texture cache. */
-	private Map					clampedTextureCache_;
+	//private Map					clampedTextureCache_;
 
 	/** Repeating texture cache. */
-	private Map					repeatingTextureCache_;
+	//private Map					repeatingTextureCache_;
+	
+	/** Repeating texture cache. */
+	private Map					textureCache_;
 
 	/** Display lists. */
 	private Map					displayLists_;
@@ -103,8 +103,9 @@ public class ViewportJOGL extends AbstractViewport
 		uninitialized_ = true;
 		valid_ = false;
 		npot_ = false;
-		clampedTextureCache_ = Collections.synchronizedMap(new HashMap());
-		repeatingTextureCache_ = Collections.synchronizedMap(new HashMap());
+		//clampedTextureCache_ = Collections.synchronizedMap(new HashMap());
+		//repeatingTextureCache_ = Collections.synchronizedMap(new HashMap());
+		textureCache_ = Collections.synchronizedMap(new HashMap());
 		displayLists_ = Collections.synchronizedMap(new HashMap());
 		textRenderers_ = Collections.synchronizedMap(new TextRendererLRUMap(15));
 		glQueue_ = Collections.synchronizedList(new ArrayList());
@@ -201,7 +202,7 @@ public class ViewportJOGL extends AbstractViewport
 	 * @param path resource path of the texture
 	 * @return the texture
 	 */
-	public int getRepeatingTexture(GL gl, String path)
+	/*public int getRepeatingTexture(GL gl, String path)
 	{
 		Integer texture = (Integer)repeatingTextureCache_.get(path);
 		if(texture == null)
@@ -213,7 +214,7 @@ public class ViewportJOGL extends AbstractViewport
 		}
 
 		return texture.intValue();
-	}
+	}*/
 
 	/**
 	 * Returns a clamped texture.
@@ -222,7 +223,7 @@ public class ViewportJOGL extends AbstractViewport
 	 * @param path resource path of the texture
 	 * @return the texture
 	 */
-	public int getClampedTexture(GL gl, String path)
+	/*public int getClampedTexture(GL gl, String path)
 	{
 
 		Integer texture = (Integer)clampedTextureCache_.get(path);
@@ -230,6 +231,27 @@ public class ViewportJOGL extends AbstractViewport
 		{
 			texture = loadTexture(gl, path, GL.GL_CLAMP_TO_EDGE, GL.GL_LINEAR);
 			clampedTextureCache_.put(path, texture);
+		}
+
+		return texture.intValue();
+	}*/
+	
+	/**
+	 * Returns a texture.
+	 * 
+	 * @param gl OpenGL interface
+	 * @param path resource path of the texture
+	 * @return the texture
+	 */
+	public int getTexture(GL gl, String path)
+	{
+		Integer texture = (Integer)textureCache_.get(path);
+		if(texture == null)
+		{
+			// Disable dodgy MipMapping in JOGL (AssertionError), use plain bilinear interpolation
+			//texture = loadTexture(gl, path, GL.GL_REPEAT, GL.GL_LINEAR_MIPMAP_LINEAR);
+			texture = loadTexture(gl, path, GL.GL_LINEAR);
+			textureCache_.put(path, texture);
 		}
 
 		return texture.intValue();
@@ -320,8 +342,8 @@ public class ViewportJOGL extends AbstractViewport
 	{
 		gl.glMatrixMode(GL.GL_TEXTURE);
 		gl.glLoadIdentity();
-		gl.glTranslatef(inversionFlag_.getXAsInteger(), inversionFlag_.getYAsInteger(), 0.0f);
-		gl.glScalef(-((inversionFlag_.getXAsInteger() << 1) - 1), -((inversionFlag_.getYAsInteger() << 1) - 1), 1.0f);
+		gl.glTranslatef(inversionFlag_.getXAsInteger(), (~inversionFlag_.getYAsInteger()) & 1, 0.0f);
+		gl.glScalef(-((inversionFlag_.getXAsInteger() << 1) - 1), ((inversionFlag_.getYAsInteger() << 1) - 1), 1.0f);
 		gl.glMatrixMode(GL.GL_MODELVIEW);
 	}
 
@@ -332,7 +354,7 @@ public class ViewportJOGL extends AbstractViewport
 	 * @param path texture resource path
 	 * @param wrapParam wrap parameter
 	 */
-	private synchronized Integer loadTexture(GL gl, String path, int wrapMode, int ipMode)
+	private synchronized Integer loadTexture(GL gl, String path, int ipMode)
 	{
 		// Load image
 		ClassLoader cl = libService_.getClassLoader();
@@ -341,11 +363,11 @@ public class ViewportJOGL extends AbstractViewport
 		try
 		{
 			tmpImage = ImageIO.read(SUtil.getResource(path, cl));
-			AffineTransform tf = AffineTransform.getScaleInstance(1, -1);
+			/*AffineTransform tf = AffineTransform.getScaleInstance(1, -1);
 			tf.translate(0, -tmpImage.getHeight());
 			AffineTransformOp op = new AffineTransformOp(tf,
 					AffineTransformOp.TYPE_BILINEAR);
-			tmpImage = op.filter(tmpImage, null);
+			tmpImage = op.filter(tmpImage, null);*/
 		}
 		catch(Exception e)
 		{
@@ -354,7 +376,7 @@ public class ViewportJOGL extends AbstractViewport
 		}
 //		System.out.println(tmpImage);
 //		return prepareTexture(gl, tmpImage, GL.GL_COMPRESSED_RGBA, wrapMode, GL.GL_LINEAR_MIPMAP_LINEAR);
-		return prepareTexture(gl, tmpImage, GL.GL_COMPRESSED_RGBA, wrapMode, ipMode);
+		return prepareTexture(gl, tmpImage, GL.GL_RGBA, ipMode);
 	}
 	
 	/**
@@ -364,7 +386,7 @@ public class ViewportJOGL extends AbstractViewport
 	 * @param inputImage the image being converted to a texture
 	 * @param wrapParam wrap parameter
 	 */
-	private Integer prepareTexture(GL gl, BufferedImage inputImage, int intFormat, int wrapMode, int ipMode)
+	private Integer prepareTexture(GL gl, BufferedImage inputImage, int intFormat, int ipMode)
 	{
 		int width = inputImage.getWidth();
 		int height = inputImage.getHeight();
@@ -385,15 +407,14 @@ public class ViewportJOGL extends AbstractViewport
 		BufferedImage image = new BufferedImage(colorModel, raster, false,
 				new Hashtable());
 		Graphics2D g = (Graphics2D)image.getGraphics();
-		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);		
+		//g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 		g.setColor(Color.BLACK);
 		g.setComposite(AlphaComposite.Src);
 		g.fillRect(0, 0, width, height);
 		g.drawImage(inputImage, 0, 0, width, height, 0, 0, inputImage.getWidth(), inputImage.getHeight(), null);
-
 		g.dispose();
 		inputImage = null;
-
+		
 		byte[] imgData = ((DataBufferByte)image.getRaster().getDataBuffer())
 				.getData();
 		ByteBuffer buffer = ByteBuffer.allocateDirect(imgData.length);
@@ -410,8 +431,8 @@ public class ViewportJOGL extends AbstractViewport
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texId[0]);
 
-		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, wrapMode);
-		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, wrapMode);
+		//gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, wrapMode);
+		//gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, wrapMode);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER,
 				ipMode);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER,
@@ -425,12 +446,11 @@ public class ViewportJOGL extends AbstractViewport
 		}
 		else
 		{
-			/*gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, intFormat, image
+			gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, intFormat, image
 				.getWidth(), image.getHeight(), 0, GL.GL_RGBA,
-				GL.GL_UNSIGNED_BYTE, buffer);*/
-			GLU glu = new GLU();
-			glu.gluBuild2DMipmaps(GL.GL_TEXTURE_2D, intFormat, image
-					.getWidth(), image.getHeight(), GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, buffer);
+				GL.GL_UNSIGNED_BYTE, buffer);
+			/*glu.gluBuild2DMipmaps(GL.GL_TEXTURE_2D, intFormat, image
+					.getWidth(), image.getHeight(), GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, buffer);*/
 		}
 
 		gl.glDisable(GL.GL_TEXTURE_2D);
@@ -571,8 +591,9 @@ public class ViewportJOGL extends AbstractViewport
 			 * } else { }
 			 */
 
-			clampedTextureCache_.clear();
-			repeatingTextureCache_.clear();
+			//clampedTextureCache_.clear();
+			//repeatingTextureCache_.clear();
+			textureCache_.clear();
 			displayLists_.clear();
 
 			drawObjects_.clear();

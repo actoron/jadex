@@ -87,7 +87,7 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		mainPane.setOneTouchExpandable(true);
 		mainPane.setDividerLocation(160);
 		mainPane.setResizeWeight(0.5);
-		mainPane.setMinimumSize(new Dimension(200, 200));
+		mainPane.setMinimumSize(new Dimension(250, 400));
 		
 		JSplitPane persViewPane = new JSplitPane();
 		persViewPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
@@ -140,6 +140,9 @@ public class VisualsPlugin implements IObserverCenterPlugin
 		{
 			public void valueChanged(ListSelectionEvent e)
 			{
+				/*int col = perspectivelist.getSelectedColumn();
+				if (col == 1)
+					return;*/
 				int row = perspectivelist.getSelectedRow();
 				String selection = null;
 				if (row != -1)
@@ -392,6 +395,11 @@ public class VisualsPlugin implements IObserverCenterPlugin
 				Boolean opengl = new Boolean(((IPerspective) entry.getValue()).getOpenGl());
 				((DefaultTableModel) perspectivelist.getModel()).addRow(new Object[]{name, opengl});
 			}
+			String perspname = observerCenter_.getSelectedPerspective().getName();
+			int row = 0;
+			while (!perspectivelist.getValueAt(row, 0).equals(perspname))
+				++row;
+			perspectivelist.getSelectionModel().setSelectionInterval(row, row);
 		}
 		
 		perspectivelist.getSelectionModel().addListSelectionListener(perspectiveController_);

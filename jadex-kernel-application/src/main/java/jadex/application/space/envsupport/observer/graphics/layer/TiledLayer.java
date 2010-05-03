@@ -106,7 +106,8 @@ public class TiledLayer implements ILayer
 	 */
 	public void init(ViewportJOGL vp, GL gl)
 	{
-		texture_ = vp.getRepeatingTexture(gl, texturePath_);
+		//texture_ = vp.getRepeatingTexture(gl, texturePath_);
+		texture_ = vp.getTexture(gl, texturePath_);
 	}
 
 	/**
@@ -163,6 +164,8 @@ public class TiledLayer implements ILayer
 	{
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture_);
+		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_REPEAT);
+		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_REPEAT);
 
 		Map prevals = new HashMap();
 		prevals.put("$space", perspective.getObserverCenter().getSpace());

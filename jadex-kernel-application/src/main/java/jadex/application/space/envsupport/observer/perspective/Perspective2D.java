@@ -503,7 +503,7 @@ public class Perspective2D extends SimplePropertyObject implements IPerspective
 	 */
 	public void reset()
 	{
-		viewport.setAreaSize(viewport.getAreaSize());
+		viewport.setAreaSize(obscenter.getAreaSize());
 	}
 	
 	/**

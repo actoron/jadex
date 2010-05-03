@@ -83,7 +83,8 @@ public class TexturedRectangle extends ColoredPrimitive
 
 	public void init(ViewportJOGL vp)
 	{
-		texture_ = vp.getClampedTexture(vp.getContext(), texturePath_);
+		//texture_ = vp.getClampedTexture(vp.getContext(), texturePath_);
+		texture_ = vp.getTexture(vp.getContext(), texturePath_);
 	}
 
 	public synchronized void doDraw(DrawableCombiner dc, Object obj, ViewportJ2D vp)
@@ -94,9 +95,9 @@ public class TexturedRectangle extends ColoredPrimitive
 		
 		BufferedImage image = image_;
 		
+		g.translate(-size.getXAsDouble() / 2.0, -size.getYAsDouble() / 2.0);
 		if (!setupMatrix(dc, obj, g, vp))
 			return;
-		g.translate(-size.getXAsDouble() / 2.0, -size.getYAsDouble() / 2.0);
 		
 		currentColor_ = (Color) dc.getBoundValue(obj, color_, vp);
 		
@@ -120,6 +121,9 @@ public class TexturedRectangle extends ColoredPrimitive
 		GL gl = vp.getContext();
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, texture_);
+		
+		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE);
+		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE);
 		
 		currentColor_ = (Color) dc.getBoundValue(obj, color_, vp);
 		
