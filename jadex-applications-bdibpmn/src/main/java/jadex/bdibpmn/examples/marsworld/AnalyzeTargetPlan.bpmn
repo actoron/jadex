@@ -15,13 +15,16 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_mVvyAYKDEd6rVea0-FiZ3Q" iD="_mVvyAIKDEd6rVea0-FiZ3Q" outgoingEdges="_nxPfqoKDEd6rVea0-FiZ3Q _Po8_EYKFEd6rVea0-FiZ3Q" incomingEdges="_lYEdQYKNEd6rVea0-FiZ3Q" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_nxPfoYKDEd6rVea0-FiZ3Q" iD="_nxPfoIKDEd6rVea0-FiZ3Q" outgoingEdges="_SiLO8YKFEd6rVea0-FiZ3Q" incomingEdges="_jX8HoYKEEd6rVea0-FiZ3Q" name="" activityType="EventIntermediateMessage" looping="false">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_GRVjMEb4Ed-qm5VDdIP35A" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GRVjMUb4Ed-qm5VDdIP35A" key="mode" value="&quot;send&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GRVjMUb4Ed-qm5VDdIP35A" key="mode" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GRVjMkb4Ed-qm5VDdIP35A" key="msgtype" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GRVjM0b4Ed-qm5VDdIP35A" key="message" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GRVjNEb4Ed-qm5VDdIP35A" key="filter" value=""/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_LBuJAEb4Ed-qm5VDdIP35A" source="activity">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LBuJAUb4Ed-qm5VDdIP35A" key="parameters" value="content␋new RequestProduction($plan.target)␟receivers␋new IComponentIdentifier[]{producers[Math.random()*producers.length]}␟type␋&quot;request_producer&quot;"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-Ep08Fa2Ed-1RJ7RXx1qjA" source="isThrowing">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-Ep08Va2Ed-1RJ7RXx1qjA" key="isThrowing" value="true"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_RRrF0YKEEd6rVea0-FiZ3Q" iD="_RRrF0IKEEd6rVea0-FiZ3Q" outgoingEdges="_ieRUuoKEEd6rVea0-FiZ3Q" incomingEdges="_nxPfqoKDEd6rVea0-FiZ3Q" name="Find Producer">

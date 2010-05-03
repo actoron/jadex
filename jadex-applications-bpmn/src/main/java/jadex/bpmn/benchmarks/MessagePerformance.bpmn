@@ -17,12 +17,15 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_7W3rIdCSEd6MVLxz8V9N3w" iD="_7W3rINCSEd6MVLxz8V9N3w" outgoingEdges="_b9-qwdCUEd6MVLxz8V9N3w" incomingEdges="_7XGUodCSEd6MVLxz8V9N3w" name="Send Message&#xD;&#xA;" activityType="EventIntermediateMessage">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_abftgBcjEd-OSKK6OfNWqA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_abftgRcjEd-OSKK6OfNWqA" key="message" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_abftghcjEd-OSKK6OfNWqA" key="mode" value="&quot;send&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_abftghcjEd-OSKK6OfNWqA" key="mode" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_abpegBcjEd-OSKK6OfNWqA" key="msgtype" value="&quot;fipa&quot;"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_abpegRcjEd-OSKK6OfNWqA" key="filter" value=""/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_a2dyQBcjEd-OSKK6OfNWqA" source="activity">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_a2dyQRcjEd-OSKK6OfNWqA" key="parameters" value="performative␋SFipa.INFORM␟receivers␋new IComponentIdentifier[]{$interpreter.getComponentIdentifier()}␟content␋&quot;message&quot;+i"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_O5gSMFa3Ed-1RJ7RXx1qjA" source="isThrowing">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O5gSMVa3Ed-1RJ7RXx1qjA" key="isThrowing" value="true"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_SHVVwdCUEd6MVLxz8V9N3w" iD="_SHVVwNCUEd6MVLxz8V9N3w" outgoingEdges="_JRsVUdCVEd6MVLxz8V9N3w" incomingEdges="_Wzz2gNCVEd6MVLxz8V9N3w _wuf24dCVEd6MVLxz8V9N3w" name="PreReceive" activityType="Task">

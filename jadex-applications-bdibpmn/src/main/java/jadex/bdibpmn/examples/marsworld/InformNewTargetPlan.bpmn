@@ -15,13 +15,16 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_Z_RkkYASEd6N8dR31QwQkg" iD="_Z_RkkIASEd6N8dR31QwQkg" outgoingEdges="_vmPtAYASEd6N8dR31QwQkg _x02SkYASEd6N8dR31QwQkg" incomingEdges="_Z_RkmoASEd6N8dR31QwQkg" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_raeQIYASEd6N8dR31QwQkg" iD="_raeQIIASEd6N8dR31QwQkg" outgoingEdges="_v5n8AYASEd6N8dR31QwQkg" incomingEdges="_vmPtAYASEd6N8dR31QwQkg" name="" activityType="EventIntermediateMessage">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_S84wIEb1Ed-qm5VDdIP35A" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_S84wIUb1Ed-qm5VDdIP35A" key="mode" value="&quot;send&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_S84wIUb1Ed-qm5VDdIP35A" key="mode" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_S84wIkb1Ed-qm5VDdIP35A" key="msgtype" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_S84wI0b1Ed-qm5VDdIP35A" key="message" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_S84wJEb1Ed-qm5VDdIP35A" key="filter" value=""/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_T_yXkEb1Ed-qm5VDdIP35A" source="activity">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_T_yXkUb1Ed-qm5VDdIP35A" key="parameters" value="receivers␋sentries␟content␋$plan.getReason().getValue()␟type␋&quot;inform_target&quot;"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_DTw-IFa3Ed-1RJ7RXx1qjA" source="isThrowing">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DTw-IVa3Ed-1RJ7RXx1qjA" key="isThrowing" value="true"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_u93eYYASEd6N8dR31QwQkg" iD="_u93eYIASEd6N8dR31QwQkg" incomingEdges="_v5n8AYASEd6N8dR31QwQkg _x02SkYASEd6N8dR31QwQkg" activityType="EventEndEmpty"/>

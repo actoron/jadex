@@ -18,24 +18,11 @@ import jadex.rules.state.IOAVState;
 public class EventIntermediateMessageActivityHandler	extends DefaultActivityHandler
 {
 	//-------- constants --------
+		
+	/** The isThrowing property name (distinguishes send/receive events). */
+	public static final String	PROPERTY_THROWING	= "isThrowing";
 	
-	/** The type property name (identifies message type). */
-	// Hack!!! Required, because eclipse STP does not distinguish send/receive intermediate events.
-	public static final String	PROPERTY_TYPE	= "type";
-	
-	/** The mode property name (distinguishes send/receive events). */
-	// Hack!!! Required, because eclipse STP does not distinguish send/receive intermediate events.
-	public static final String	PROPERTY_MODE	= "mode";
-	
-	/** The 'send' mode property value. */
-	// Hack!!! Required, because eclipse STP does not distinguish send/receive intermediate events.
-	public static final String	MODE_SEND	= "send";
-	
-	/** The 'receive' mode property value (default). */
-	// Hack!!! Required, because eclipse STP does not distinguish send/receive intermediate events.
-	public static final String	MODE_RECEIVE	= "receive";
-	
-	
+	//-------- methods --------
 	
 	/**
 	 *  Execute an activity.
@@ -45,7 +32,9 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	 */
 	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
-		if(thread.hasPropertyValue(PROPERTY_MODE) && MODE_SEND.equals(thread.getPropertyValue(PROPERTY_MODE)))
+		boolean	send = thread.hasPropertyValue(PROPERTY_THROWING)? ((Boolean)thread.getPropertyValue(PROPERTY_THROWING)).booleanValue() : false;
+
+		if(send)
 		{
 			String	type	= (String)thread.getPropertyValue("type", activity);
 			BpmnPlanBodyInstance inst = (BpmnPlanBodyInstance)instance;
@@ -70,7 +59,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 			inst.sendMessage(me);
 			instance.getStepHandler(activity).step(activity, instance, thread, null);
 		}
-		else if(!thread.hasPropertyValue(PROPERTY_MODE) || MODE_RECEIVE.equals(thread.getPropertyValue(PROPERTY_MODE)))
+		else 
 		{
 			// Just set thread to waiting.
 	//		thread.setWaitingState(ProcessThread.WAITING_FOR_MESSAGE);
@@ -98,11 +87,6 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 					return ret; 
 				}
 			});
-		}
-		else
-		{
-			throw new RuntimeException("Invalid mode: "+thread.getPropertyValue(PROPERTY_MODE)+", "+thread);
-		}
-		
+		}		
 	}
 }

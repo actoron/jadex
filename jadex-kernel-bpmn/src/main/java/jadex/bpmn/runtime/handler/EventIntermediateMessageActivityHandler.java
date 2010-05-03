@@ -24,18 +24,8 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 {
 	//-------- constants --------
 	
-	/** The mode property name (distinguishes send/receive events). */
-	// Hack!!! Required, because eclipse STP does not distinguish send/receive intermediate events.
-	public static final String	PROPERTY_MODE	= "mode";
-	
-	/** The 'send' mode property value. */
-	// Hack!!! Required, because eclipse STP does not distinguish send/receive intermediate events.
-	public static final String	MODE_SEND	= "send";
-	
-	/** The 'receive' mode property value (default). */
-	// Hack!!! Required, because eclipse STP does not distinguish send/receive intermediate events.
-	public static final String	MODE_RECEIVE	= "receive";
-	
+	/** The isThrowing property name (distinguishes send/receive events). */
+	public static final String	PROPERTY_THROWING	= "isThrowing";	
 	
 	/** The type property message type identifies the meta type (e.g. fipa). */
 	public static final String	PROPERTY_MESSAGETYPE	= "messagetype";
@@ -56,13 +46,13 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	 */
 	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
-		String mode = thread.hasPropertyValue(PROPERTY_MODE)? (String)thread.getPropertyValue(PROPERTY_MODE): MODE_RECEIVE;
+		boolean	send = thread.hasPropertyValue(PROPERTY_THROWING)? ((Boolean)thread.getPropertyValue(PROPERTY_THROWING)).booleanValue() : false;
 				
-		if(MODE_SEND.equals(mode))
+		if(send)
 		{
 			sendMessage(activity, instance, thread);
 		}
-		else if(MODE_RECEIVE.equals(mode))
+		else
 		{
 			receiveMessage(activity, instance, thread);
 		}

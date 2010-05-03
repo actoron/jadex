@@ -8,13 +8,16 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_p4OoYUYiEd-3iKqz0F2Flw" iD="_p4OoYEYiEd-3iKqz0F2Flw" outgoingEdges="_q6FG-kYiEd-3iKqz0F2Flw" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_q6FG8UYiEd-3iKqz0F2Flw" iD="_q6FG8EYiEd-3iKqz0F2Flw" incomingEdges="_q6FG-kYiEd-3iKqz0F2Flw" name="Send Order" activityType="EventIntermediateMessage">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_rVMVoEYiEd-3iKqz0F2Flw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rVMVoUYiEd-3iKqz0F2Flw" key="mode" value="&quot;send&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rVMVoUYiEd-3iKqz0F2Flw" key="mode" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rVMVokYiEd-3iKqz0F2Flw" key="msgtype" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rVMVo0YiEd-3iKqz0F2Flw" key="message" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rVMVpEYiEd-3iKqz0F2Flw" key="filter" value=""/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_tjmt8EYiEd-3iKqz0F2Flw" source="activity">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_tjmt8UYiEd-3iKqz0F2Flw" key="parameters" value="performative␋&quot;request&quot;␟content␋&quot;Order sent by D5&quot;␟receivers␋$interpreter.createComponentIdentifier(&quot;D3_MessageReceival&quot;)"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Jxev0Fa0Ed-1RJ7RXx1qjA" source="isThrowing">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Jxev0Va0Ed-1RJ7RXx1qjA" key="isThrowing" value="true"/>
       </eAnnotations>
     </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_q6FG-kYiEd-3iKqz0F2Flw" iD="_q6FG-UYiEd-3iKqz0F2Flw"/>
