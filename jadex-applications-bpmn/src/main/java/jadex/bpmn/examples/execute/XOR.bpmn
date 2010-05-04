@@ -2,7 +2,7 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_kGQJ4WpAEd6JtKkNrnCCNQ" iD="_kGQJ4GpAEd6JtKkNrnCCNQ">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__VVAoDZfEd-GR8OzZk56OA" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__VVAoTZfEd-GR8OzZk56OA" key="Description" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__VVAojZfEd-GR8OzZk56OA" key="Package" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__VVAojZfEd-GR8OzZk56OA" key="Package" value="jadex.bpmn.examples.execute"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_kGs10WpAEd6JtKkNrnCCNQ" iD="_kGs10GpAEd6JtKkNrnCCNQ" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_kGs102pAEd6JtKkNrnCCNQ" iD="_kGs10mpAEd6JtKkNrnCCNQ" outgoingEdges="_feMkOmpBEd6JtKkNrnCCNQ" incomingEdges="_DvxVUWpBEd6JtKkNrnCCNQ" name="Head" activityType="Task"/>

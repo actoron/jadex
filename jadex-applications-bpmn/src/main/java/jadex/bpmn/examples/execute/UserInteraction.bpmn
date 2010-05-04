@@ -2,7 +2,7 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_GhqvwW1jEd6B3oAuT8wltw" iD="_GhqvwG1jEd6B3oAuT8wltw">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="__OVAwDZfEd-GR8OzZk56OA" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__OVAwTZfEd-GR8OzZk56OA" key="Description" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__OVAwjZfEd-GR8OzZk56OA" key="Package" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__OVAwjZfEd-GR8OzZk56OA" key="Package" value="jadex.bpmn.examples.execute"/>
   </eAnnotations>
   <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_oCuPIW1kEd6B3oAuT8wltw" iD="_oCuPIG1kEd6B3oAuT8wltw" name="import jadex.bpmn.runtime.task.UserInteractionTask;">
     <associations xmi:type="bpmn:Association" xmi:id="_oC3ZEW1kEd6B3oAuT8wltw"/>

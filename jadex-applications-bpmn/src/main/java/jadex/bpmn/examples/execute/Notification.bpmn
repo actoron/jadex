@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_H3j4AdXXEd6ZgonVFJzeWg" iD="_H3j4ANXXEd6ZgonVFJzeWg">
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_H3j4AdXXEd6ZgonVFJzeWg" iD="_H3j4ANXXEd6ZgonVFJzeWg">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_14xM0FdfEd-gpfWhYqU7MQ" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_14xM0VdfEd-gpfWhYqU7MQ" key="imports" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_14xM0ldfEd-gpfWhYqU7MQ" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_14xM01dfEd-gpfWhYqU7MQ" key="Package" value="jadex.bpmn.examples.execute"/>
+  </eAnnotations>
   <artifacts xmi:type="bpmn:TextAnnotation" xmi:id="_IBbV8dXoEd6ZgonVFJzeWg" iD="_IBbV8NXoEd6ZgonVFJzeWg" name="package jadex.bpmn.examples.execute&#xD;&#xA;">
     <associations xmi:type="bpmn:Association" xmi:id="_K5jZoNXoEd6ZgonVFJzeWg"/>
   </artifacts>
