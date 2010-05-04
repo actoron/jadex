@@ -4,9 +4,11 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.BpmnInterpreter;
+import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
 import jadex.bridge.CreationInfo;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.concurrent.IResultListener;
 
@@ -31,17 +33,38 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 		List start = proc.getStartActivities();
 		String	file	= (String)thread.getPropertyValue("file");
 		
+		IActivityHandler timerhandler = null;
+		List handlers = activity.getEventHandlers();
+		for(int i=0; handlers!=null && i<handlers.size(); i++)
+		{
+			MActivity	handler	= (MActivity)handlers.get(i);
+			if(handler.getActivityType().equals("EventIntermediateTimer"))
+			{
+				final IActivityHandler th = instance.getActivityHandler(handler);
+				break; // todo: support more than one timer?
+			}
+		}
+		
 		// Internal subprocess.
 		if(start!=null && file==null)
 		{
 //			thread.setWaitingState(ProcessThread.WAITING_FOR_SUBPROCESS);
-			thread.setWaiting(true);
-			ThreadContext	subcontext	= new ThreadContext(proc, thread);
+//			thread.setWaiting(true);
+			ThreadContext subcontext = new ThreadContext(proc, thread);
 			thread.getThreadContext().addSubcontext(subcontext);
 			for(int i=0; i<start.size(); i++)
 			{
-				ProcessThread	newthread	= new ProcessThread((MActivity)start.get(i), subcontext, instance);
-				subcontext.addThread(newthread);
+				ProcessThread subthread = new ProcessThread((MActivity)start.get(i), subcontext, instance);
+				subcontext.addThread(subthread);
+			}
+			
+			if(timerhandler!=null)
+			{
+				timerhandler.execute(activity, instance, thread);
+			}
+			else
+			{
+				thread.setWaiting(true);
 			}
 		}
 		
@@ -50,7 +73,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 		{
 			// Extract arguments from in/inout parameters.
 			Map	args	= null;
-			List	params	= activity.getParameters(new String[]{MParameter.DIRECTION_IN, MParameter.DIRECTION_INOUT});
+			List params	= activity.getParameters(new String[]{MParameter.DIRECTION_IN, MParameter.DIRECTION_INOUT});
 			if(params!=null && !params.isEmpty())
 			{
 				args	= new HashMap();
@@ -61,12 +84,24 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				}
 			}
 
-			thread.setWaiting(true);
-			IComponentManagementService	cms	= (IComponentManagementService)instance.getComponentAdapter()
+			IComponentManagementService cms = (IComponentManagementService)instance.getComponentAdapter()
 				.getServiceContainer().getService(IComponentManagementService.class);
 			
+//			thread.setWaiting(true);
 			cms.createComponent(null, file,
-				new CreationInfo(null, args, instance.getComponentIdentifier(), false, false, false, instance.getModelElement().getAllImports()), null, new IResultListener()
+				new CreationInfo(null, args, instance.getComponentIdentifier(), false, false, false, instance.getModelElement().getAllImports()), 
+			new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					// todo: save component id
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+				}
+			} , 
+			new IResultListener()
 			{
 				public void resultAvailable(Object source, final Object result)
 				{
@@ -121,5 +156,6 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 		{
 			throw new RuntimeException("External subprocess may not have inner activities: "+activity+", "+instance);
 		}
+		
 	}
 }

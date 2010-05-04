@@ -5,6 +5,7 @@ import java.util.List;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MNamedIdElement;
 import jadex.bpmn.model.MSequenceEdge;
+import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IStepHandler;
 import jadex.bpmn.runtime.ProcessThread;
@@ -27,7 +28,7 @@ public class DefaultStepHandler implements IStepHandler
 		thread.updateParametersAfterStep(activity, instance);
 		
 		MNamedIdElement	next	= null;
-		Exception	ex	= thread.getException();
+		Exception ex = thread.getException();
 		
 		// Store event (if any).
 		if(event!=null)
@@ -45,16 +46,41 @@ public class DefaultStepHandler implements IStepHandler
 			// Normal flow
 			if(ex==null)
 			{
-				List	outgoing	= activity.getOutgoingSequenceEdges();
-				if(outgoing!=null && outgoing.size()==1)
+				// Timer occurred flow
+				if(event==null && activity instanceof MSubProcess)
 				{
-					next	= (MSequenceEdge)outgoing.get(0);
+					// Cancel subflows.
+					remove = thread.getThreadContext();
+					
+					// Continue with timer edge.
+					List	handlers	= activity.getEventHandlers();
+					for(int i=0; handlers!=null && next==null && i<handlers.size(); i++)
+					{
+						MActivity handler	= (MActivity) handlers.get(i);
+						if(handler.getActivityType().equals("EventIntermediateTimer"))
+						{
+							List outedges = handler.getOutgoingSequenceEdges();
+							if(outedges==null || outedges.size()!=1)
+							{
+								throw new RuntimeException("Cannot determine outgoing edge: "+handler);
+							}
+							next = (MSequenceEdge)outedges.get(0);
+						}
+					}	
 				}
-				else if(outgoing!=null && outgoing.size()>1)
+				else
 				{
-					throw new UnsupportedOperationException("Activity has more than one one outgoing edge. Please overridge step() for disambiguation: "+activity);
+					List	outgoing	= activity.getOutgoingSequenceEdges();
+					if(outgoing!=null && outgoing.size()==1)
+					{
+						next	= (MSequenceEdge)outgoing.get(0);
+					}
+					else if(outgoing!=null && outgoing.size()>1)
+					{
+						throw new UnsupportedOperationException("Activity has more than one one outgoing edge. Please overridge step() for disambiguation: "+activity);
+					}
+					// else no outgoing edge -> check parent context, if any.
 				}
-				// else no outgoing edge -> check parent context, if any.
 			}
 		
 			// Exception flow.

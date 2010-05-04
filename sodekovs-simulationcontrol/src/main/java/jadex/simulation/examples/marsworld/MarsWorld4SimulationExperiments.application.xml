@@ -123,8 +123,8 @@
 				<env:tasktype name="load" class="LoadOreTask" />
 			</env:tasktypes>
 
-			<env:views>
-				<env:view name="all_view" class="GeneralDataView2D" />
+			<env:dataviews>
+				<env:dataview name="all_view" class="GeneralDataView2D" />
 			</env:views>
 
 			<env:perspectives>

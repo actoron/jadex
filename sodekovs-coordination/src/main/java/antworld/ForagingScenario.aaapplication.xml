@@ -176,9 +176,9 @@
 
 
 			<!-- Data views for defining cut outs of the world objects. -->
-			<env:views>
-				<env:view name="view_all" class="GeneralDataView2D" />
-				<env:view name="ant_view" class="LocalDataView2D"
+			<env:dataviews>
+				<env:dataview name="view_all" class="GeneralDataView2D" />
+				<env:dataview name="ant_view" class="LocalDataView2D"
 					objecttype="ant">
 					<env:property name="object">$object</env:property>
 					<env:property name="range">$object.vision_range

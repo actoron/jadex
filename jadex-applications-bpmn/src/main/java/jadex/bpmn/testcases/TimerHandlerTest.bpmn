@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_RxIF0RF6Ed-qQOr2ZLx-Mw" iD="_RxIF0BF6Ed-qQOr2ZLx-Mw">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Ekt5cBF7Ed-qQOr2ZLx-Mw" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ekt5cRF7Ed-qQOr2ZLx-Mw" key="imports" value="jadex.bpmn.runtime.task.*␟jadex.base.test.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ekt5chF7Ed-qQOr2ZLx-Mw" key="Package" value="jadex.bpmn.testcases"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dGKx0BGCEd-qQOr2ZLx-Mw" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xyPaoBaYEd-YccbjZenQqQ" key="Description" value="Test if a timer can interrupt a subprocess."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rVBjcFduEd-gpfWhYqU7MQ" key="parameters" value="inout␋success␋boolean␋true"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_RyeJoRF6Ed-qQOr2ZLx-Mw" iD="_RyeJoBF6Ed-qQOr2ZLx-Mw" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_kU2mERGCEd-qQOr2ZLx-Mw" iD="_kU2mEBGCEd-qQOr2ZLx-Mw" outgoingEdges="_vLsMwRGCEd-qQOr2ZLx-Mw" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_omlhARGCEd-qQOr2ZLx-Mw" iD="_omlhABGCEd-qQOr2ZLx-Mw" outgoingEdges="_BnHmShGDEd-qQOr2ZLx-Mw" incomingEdges="_vLsMwRGCEd-qQOr2ZLx-Mw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_xaohsFdsEd-gpfWhYqU7MQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xaohsVdsEd-gpfWhYqU7MQ" key="class" value=""/>
+      </eAnnotations>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_omlhAxGCEd-qQOr2ZLx-Mw" iD="_omlhAhGCEd-qQOr2ZLx-Mw" outgoingEdges="_DPd1SFdtEd-gpfWhYqU7MQ" name="Sub 1">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Ah2_gFdtEd-gpfWhYqU7MQ" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ah2_gVdtEd-gpfWhYqU7MQ" key="class" value=""/>
+        </eAnnotations>
+      </vertices>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_1E1xcRGCEd-qQOr2ZLx-Mw" iD="_1E1xcBGCEd-qQOr2ZLx-Mw" incomingEdges="_IMtLUVdtEd-gpfWhYqU7MQ" name="Sub 3" activityType="Task">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_H736AFdtEd-gpfWhYqU7MQ" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_H736AVdtEd-gpfWhYqU7MQ" key="class" value="jadex.bpmn.runtime.task.WriteContextTask"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6AGQwFduEd-gpfWhYqU7MQ" key="parameters" value="inout␋name␋String␋&quot;success&quot;␟inout␋value␋boolean␋false"/>
+        </eAnnotations>
+      </vertices>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_DPUEQVdtEd-gpfWhYqU7MQ" iD="_DPUEQFdtEd-gpfWhYqU7MQ" outgoingEdges="_IMtLUVdtEd-gpfWhYqU7MQ" incomingEdges="_DPd1SFdtEd-gpfWhYqU7MQ" name="Wait for  2 secs" activityType="EventIntermediateTimer">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_EZYDoFdtEd-gpfWhYqU7MQ" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EZYDoVdtEd-gpfWhYqU7MQ" key="timer" value=""/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EZYDoldtEd-gpfWhYqU7MQ" key="duration" value="2000"/>
+        </eAnnotations>
+      </vertices>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_DPd1SFdtEd-gpfWhYqU7MQ" iD="_DPd1R1dtEd-gpfWhYqU7MQ"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_IMtLUVdtEd-gpfWhYqU7MQ" iD="_IMtLUFdtEd-gpfWhYqU7MQ"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_VdDxoVduEd-gpfWhYqU7MQ" iD="_VdDxoFduEd-gpfWhYqU7MQ" name="">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_aeVTIFduEd-gpfWhYqU7MQ" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aeVTIVduEd-gpfWhYqU7MQ" key="imports" value=""/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aeVTIlduEd-gpfWhYqU7MQ" key="condition" value=""/>
+        </eAnnotations>
+      </sequenceEdges>
+      <eventHandlers xmi:type="bpmn:Activity" xmi:id="_JsEsUVdtEd-gpfWhYqU7MQ" iD="_JsEsUFdtEd-gpfWhYqU7MQ" outgoingEdges="_VdDxoVduEd-gpfWhYqU7MQ" name="Canel after 1 sec" activityType="EventIntermediateTimer">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_JtQ_IFdtEd-gpfWhYqU7MQ" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_JtQ_IVdtEd-gpfWhYqU7MQ" key="timer" value=""/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_JtQ_IldtEd-gpfWhYqU7MQ" key="duration" value="1000"/>
+        </eAnnotations>
+      </eventHandlers>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_9c_IIRGCEd-qQOr2ZLx-Mw" iD="_9c_IIBGCEd-qQOr2ZLx-Mw" outgoingEdges="_Ph6tMRGDEd-qQOr2ZLx-Mw" incomingEdges="_TbuMAVduEd-gpfWhYqU7MQ" name="Possibly Success">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_7N_2IBGEEd-qQOr2ZLx-Mw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7N_2IRGEEd-qQOr2ZLx-Mw" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Timer test.&quot;, success, null)})"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AlKvIBGFEd-qQOr2ZLx-Mw" key="class" value="StoreResultsTask"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_BnHmQRGDEd-qQOr2ZLx-Mw" iD="_BnHmQBGDEd-qQOr2ZLx-Mw" outgoingEdges="_O7BFQRGDEd-qQOr2ZLx-Mw" incomingEdges="_BnHmShGDEd-qQOr2ZLx-Mw" name="Failure" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_pJOCEBGEEd-qQOr2ZLx-Mw" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pJOCERGEEd-qQOr2ZLx-Mw" key="class" value="StoreResultsTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rgnXQBGEEd-qQOr2ZLx-Mw" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Timer handler  test.&quot;, false, &quot;Timer did not interrupt flow.&quot;)})"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_NyTJsRGDEd-qQOr2ZLx-Mw" iD="_NyTJsBGDEd-qQOr2ZLx-Mw" incomingEdges="_O7BFQRGDEd-qQOr2ZLx-Mw _Ph6tMRGDEd-qQOr2ZLx-Mw" activityType="EventEndEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_RFhJoVduEd-gpfWhYqU7MQ" iD="_RFhJoFduEd-gpfWhYqU7MQ" outgoingEdges="_TbuMAVduEd-gpfWhYqU7MQ" incomingEdges="_VdDxoVduEd-gpfWhYqU7MQ" name="Wait for 2 secs" activityType="EventIntermediateTimer">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_RN3NUFduEd-gpfWhYqU7MQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RN3NUVduEd-gpfWhYqU7MQ" key="timer" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RN3NUlduEd-gpfWhYqU7MQ" key="duration" value="2000"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_vLsMwRGCEd-qQOr2ZLx-Mw" iD="_vLsMwBGCEd-qQOr2ZLx-Mw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_BnHmShGDEd-qQOr2ZLx-Mw" iD="_BnHmSRGDEd-qQOr2ZLx-Mw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_O7BFQRGDEd-qQOr2ZLx-Mw" iD="_O7BFQBGDEd-qQOr2ZLx-Mw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Ph6tMRGDEd-qQOr2ZLx-Mw" iD="_Ph6tMBGDEd-qQOr2ZLx-Mw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_TbuMAVduEd-gpfWhYqU7MQ" iD="_TbuMAFduEd-gpfWhYqU7MQ"/>
+  </pools>
+</bpmn:BpmnDiagram>
