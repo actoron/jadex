@@ -245,4 +245,10 @@
       </plugin>      
     </plugins>
   </reporting>
+  
+  <scm>
+	<connection>scm:svn:svn+ssh:braubach:WEISSNICH@rzrepository.informatik.uni-hamburg.de/informatik/viks/vsis/repositories/projects/jadexv2/trunk:jadex</connection>
+	<developerConnection>scm:svn:svn+ssh:braubach:WEISSNICH@rzrepository.informatik.uni-hamburg.de/informatik/viks/vsis/repositories/projects/jadexv2/trunk:jadex</developerConnection>
+	<!-- <url>http://192.168.1.10/cvsrepo/${artifactId}</url> -->
+  </scm>
 </project>

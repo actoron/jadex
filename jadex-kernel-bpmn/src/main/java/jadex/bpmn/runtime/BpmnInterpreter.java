@@ -1014,15 +1014,6 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	public void setContextVariable(String name, Object value)
 	{
 		setContextVariable(name, null, value);
-		
-//		if(variables!=null && variables.containsKey(name))
-//		{
-//			variables.put(name, value);			
-//		}
-//		else
-//		{
-//			throw new RuntimeException("Undeclared context variable: "+name+", "+this);
-//		}
 	}
 	
 	/**

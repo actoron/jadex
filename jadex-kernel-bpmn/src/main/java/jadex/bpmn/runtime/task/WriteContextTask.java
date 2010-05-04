@@ -18,7 +18,7 @@ public class WriteContextTask extends AbstractTask
 			String name = (String)context.getParameterValue("variablename");
 			Object val = context.getParameterValue("value");
 			Object key = context.getParameterValue("key");
-			context.setParameterValue(name, key, val);
+			instance.setContextVariable(name, key, val);
 		}
 		
 		for(int i=0; ; i++)
@@ -28,7 +28,7 @@ public class WriteContextTask extends AbstractTask
 				String name = (String)context.getParameterValue("variablename"+i);
 				Object val = context.getParameterValue("value"+i);
 				Object key = context.getParameterValue("key"+i);
-				context.setParameterValue(name, key, val);
+				instance.setContextVariable(name, key, val);
 			}
 			else
 			{
