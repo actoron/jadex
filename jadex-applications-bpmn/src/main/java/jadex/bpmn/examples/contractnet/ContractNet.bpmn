@@ -8,7 +8,7 @@
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_cNIeoVT6Ed-32983CGnnJA" iD="_cNIeoFT6Ed-32983CGnnJA" name="Initiator">
     <vertices xmi:type="bpmn:Activity" xmi:id="_cOd7YVT6Ed-32983CGnnJA" iD="_cOd7YFT6Ed-32983CGnnJA" outgoingEdges="_y8pRoVapEd-1RJ7RXx1qjA" name="Initiate" activityType="EventStartEmpty" looping="false"/>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_L4JXwVT7Ed-32983CGnnJA" iD="_L4JXwFT7Ed-32983CGnnJA" outgoingEdges="_3S3gcVaoEd-1RJ7RXx1qjA" incomingEdges="_xfIcsVanEd-1RJ7RXx1qjA" name="Evaluate&#xD;&#xA;Proposals" activityType="Task">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_L4JXwVT7Ed-32983CGnnJA" iD="_L4JXwFT7Ed-32983CGnnJA" outgoingEdges="_3S3gcVaoEd-1RJ7RXx1qjA" incomingEdges="_xfIcsVanEd-1RJ7RXx1qjA" name="Evaluate&#xD;&#xA;Proposals" activityType="Task" looping="false">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_3CxO8FaoEd-1RJ7RXx1qjA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3CxO8VaoEd-1RJ7RXx1qjA" key="class" value=""/>
       </eAnnotations>
@@ -40,7 +40,7 @@
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wH7jxFaoEd-1RJ7RXx1qjA" key="filter" value=""/>
         </eAnnotations>
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ywQOoFddEd-_rc0-j01YLA" source="activity">
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ywQOoVddEd-_rc0-j01YLA" key="parameters" value="performative␋&quot;reject-proposal&quot;␟receivers␋$interpreter.createComponentIdentifier($args.get(&quot;participant&quot;))"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ywQOoVddEd-_rc0-j01YLA" key="parameters" value="performative␋&quot;accept-proposal&quot;␟receivers␋$interpreter.createComponentIdentifier($args.get(&quot;participant&quot;))"/>
         </eAnnotations>
         <outgoingMessages xmi:type="bpmn:MessagingEdge" href="#_lG1NwVT7Ed-32983CGnnJA"/>
       </vertices>
@@ -116,7 +116,7 @@
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_qQDqEFarEd-1RJ7RXx1qjA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qQDqEVarEd-1RJ7RXx1qjA" key="class" value=""/>
       </eAnnotations>
-      <vertices xmi:type="bpmn:Activity" xmi:id="_z9jqIVarEd-1RJ7RXx1qjA" iD="_z9jqIFarEd-1RJ7RXx1qjA" outgoingEdges="_1Qi8ClarEd-1RJ7RXx1qjA _6fXKSlarEd-1RJ7RXx1qjA" activityType="EventStartMultiple"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_z9jqIVarEd-1RJ7RXx1qjA" iD="_z9jqIFarEd-1RJ7RXx1qjA" outgoingEdges="_1Qi8ClarEd-1RJ7RXx1qjA _6fXKSlarEd-1RJ7RXx1qjA" incomingEdges="_ONRnqldiEd-_rc0-j01YLA" activityType="EventIntermediateMultiple" looping="false"/>
       <vertices xmi:type="bpmn:Activity" xmi:id="_1Qi8AVarEd-1RJ7RXx1qjA" iD="_1Qi8AFarEd-1RJ7RXx1qjA" incomingEdges="_1Qi8ClarEd-1RJ7RXx1qjA" activityType="EventIntermediateMessage">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_49w0oFarEd-1RJ7RXx1qjA" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_49w0oVarEd-1RJ7RXx1qjA" key="mode" value=""/>
@@ -141,16 +141,22 @@
         </eAnnotations>
         <incomingMessages xmi:type="bpmn:MessagingEdge" href="#_7iQxsVarEd-1RJ7RXx1qjA"/>
       </vertices>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_ONRnoVdiEd-_rc0-j01YLA" iD="_ONRnoFdiEd-_rc0-j01YLA" outgoingEdges="_ONRnqldiEd-_rc0-j01YLA" activityType="EventStartEmpty"/>
       <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_1Qi8ClarEd-1RJ7RXx1qjA" iD="_1Qi8CVarEd-1RJ7RXx1qjA"/>
       <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_6fXKSlarEd-1RJ7RXx1qjA" iD="_6fXKSVarEd-1RJ7RXx1qjA"/>
-      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_mSCYilavEd-1RJ7RXx1qjA" iD="_mSCYiVavEd-1RJ7RXx1qjA"/>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_mSCYilavEd-1RJ7RXx1qjA" iD="_mSCYiVavEd-1RJ7RXx1qjA">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ZeaaIFdhEd-_rc0-j01YLA" source="jadex">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZekLIFdhEd-_rc0-j01YLA" key="condition" value=""/>
+        </eAnnotations>
+      </sequenceEdges>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ONRnqldiEd-_rc0-j01YLA" iD="_ONRnqVdiEd-_rc0-j01YLA"/>
       <eventHandlers xmi:type="bpmn:Activity" xmi:id="_AhyfYVavEd-1RJ7RXx1qjA" iD="_AhyfYFavEd-1RJ7RXx1qjA" outgoingEdges="_mSCYilavEd-1RJ7RXx1qjA" activityType="EventIntermediateTimer">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Akd_8FavEd-1RJ7RXx1qjA" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Akd_8VavEd-1RJ7RXx1qjA" key="duration" value="$args.get(&quot;timeout&quot;)"/>
         </eAnnotations>
       </eventHandlers>
     </vertices>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_mSCYgVavEd-1RJ7RXx1qjA" iD="_mSCYgFavEd-1RJ7RXx1qjA" incomingEdges="_mSCYilavEd-1RJ7RXx1qjA _ncPh0VavEd-1RJ7RXx1qjA _pKWpcVavEd-1RJ7RXx1qjA" activityType="EventEndTerminate"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_mSCYgVavEd-1RJ7RXx1qjA" iD="_mSCYgFavEd-1RJ7RXx1qjA" incomingEdges="_mSCYilavEd-1RJ7RXx1qjA _ncPh0VavEd-1RJ7RXx1qjA _pKWpcVavEd-1RJ7RXx1qjA" activityType="EventEndEmpty" looping="false"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_xfIcsVanEd-1RJ7RXx1qjA" iD="_xfIcsFanEd-1RJ7RXx1qjA" conditionType="Default" isDefault="true">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2kZtYFanEd-1RJ7RXx1qjA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2kZtYVanEd-1RJ7RXx1qjA" key="condition" value=""/>
@@ -158,14 +164,26 @@
     </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_3S3gcVaoEd-1RJ7RXx1qjA" iD="_3S3gcFaoEd-1RJ7RXx1qjA"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_y8pRoVapEd-1RJ7RXx1qjA" iD="_y8pRoFapEd-1RJ7RXx1qjA"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_yBSKsVarEd-1RJ7RXx1qjA" iD="_yBSKsFarEd-1RJ7RXx1qjA"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_9R7RIVauEd-1RJ7RXx1qjA" iD="_9R7RIFauEd-1RJ7RXx1qjA"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_yBSKsVarEd-1RJ7RXx1qjA" iD="_yBSKsFarEd-1RJ7RXx1qjA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ItrycFdiEd-_rc0-j01YLA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ItrycVdiEd-_rc0-j01YLA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_9R7RIVauEd-1RJ7RXx1qjA" iD="_9R7RIFauEd-1RJ7RXx1qjA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_pr5mUFdqEd-_rc0-j01YLA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pr5mUVdqEd-_rc0-j01YLA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ncPh0VavEd-1RJ7RXx1qjA" iD="_ncPh0FavEd-1RJ7RXx1qjA" name="No Proposals">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_pppNgFavEd-1RJ7RXx1qjA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pppNgVavEd-1RJ7RXx1qjA" key="condition" value="false"/>
       </eAnnotations>
     </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_pKWpcVavEd-1RJ7RXx1qjA" iD="_pKWpcFavEd-1RJ7RXx1qjA"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_pKWpcVavEd-1RJ7RXx1qjA" iD="_pKWpcFavEd-1RJ7RXx1qjA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Js2wcFdiEd-_rc0-j01YLA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Js2wcVdiEd-_rc0-j01YLA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
   </pools>
   <pools xmi:type="bpmn:Pool" xmi:id="_mTY88VT6Ed-32983CGnnJA" iD="_mTY88FT6Ed-32983CGnnJA" name="Participant">
     <vertices xmi:type="bpmn:Activity" xmi:id="_uWrd8VT6Ed-32983CGnnJA" iD="_uWrd8FT6Ed-32983CGnnJA" outgoingEdges="_3piJalT6Ed-32983CGnnJA" incomingEdges="_wU91Cla6Ed-1RJ7RXx1qjA" activityType="EventIntermediateMessage" looping="false">
@@ -221,6 +239,9 @@
       <incomingMessages xmi:type="bpmn:MessagingEdge" href="#_n04IYVT7Ed-32983CGnnJA"/>
     </vertices>
     <vertices xmi:type="bpmn:SubProcess" xmi:id="_trpHcVT7Ed-32983CGnnJA" iD="_trpHcFT7Ed-32983CGnnJA" outgoingEdges="_1XO6KlT7Ed-32983CGnnJA" incomingEdges="_ts_LQVT7Ed-32983CGnnJA" activityType="SubProcess">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_lJymsFdiEd-_rc0-j01YLA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lJymsVdiEd-_rc0-j01YLA" key="class" value=""/>
+      </eAnnotations>
       <vertices xmi:type="bpmn:Activity" xmi:id="_trpHc1T7Ed-32983CGnnJA" iD="_trpHclT7Ed-32983CGnnJA" name="Execute&#xD;&#xA;Request">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Z_p5gFayEd-1RJ7RXx1qjA" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z_p5gVayEd-1RJ7RXx1qjA" key="class" value=""/>
@@ -253,7 +274,7 @@
       </eAnnotations>
       <outgoingMessages xmi:type="bpmn:MessagingEdge" href="#_7iQxsVarEd-1RJ7RXx1qjA"/>
     </vertices>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_GCv1MVT8Ed-32983CGnnJA" iD="_GCv1MFT8Ed-32983CGnnJA" incomingEdges="_rc4w4VT7Ed-32983CGnnJA _GCv1OlT8Ed-32983CGnnJA _HOvuQVT8Ed-32983CGnnJA _eYyVYVaQEd-1RJ7RXx1qjA _sgKN0VaSEd-1RJ7RXx1qjA" activityType="EventEndTerminate"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_GCv1MVT8Ed-32983CGnnJA" iD="_GCv1MFT8Ed-32983CGnnJA" incomingEdges="_rc4w4VT7Ed-32983CGnnJA _GCv1OlT8Ed-32983CGnnJA _HOvuQVT8Ed-32983CGnnJA _eYyVYVaQEd-1RJ7RXx1qjA _sgKN0VaSEd-1RJ7RXx1qjA" activityType="EventEndEmpty" looping="false"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_J5MEsVaQEd-1RJ7RXx1qjA" iD="_J5MEsFaQEd-1RJ7RXx1qjA" outgoingEdges="_eYyVYVaQEd-1RJ7RXx1qjA" incomingEdges="_-n97KFT6Ed-32983CGnnJA" name="Refuse" activityType="EventIntermediateMessage">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Uu3rcFapEd-1RJ7RXx1qjA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Uu3rcVapEd-1RJ7RXx1qjA" key="mode" value=""/>
@@ -310,7 +331,11 @@
     </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_t40p4VaSEd-1RJ7RXx1qjA" iD="_t40p4FaSEd-1RJ7RXx1qjA"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_uUFpkVaSEd-1RJ7RXx1qjA" iD="_uUFpkFaSEd-1RJ7RXx1qjA"/>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_wU91Cla6Ed-1RJ7RXx1qjA" iD="_wU91CVa6Ed-1RJ7RXx1qjA"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_wU91Cla6Ed-1RJ7RXx1qjA" iD="_wU91CVa6Ed-1RJ7RXx1qjA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_0jtn8FdrEd-_rc0-j01YLA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0jtn8VdrEd-_rc0-j01YLA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
   </pools>
   <messages xmi:type="bpmn:MessagingEdge" xmi:id="_zydxMVT6Ed-32983CGnnJA" iD="_zydxMFT6Ed-32983CGnnJA" source="_rTd5wVapEd-1RJ7RXx1qjA" target="_uWrd8VT6Ed-32983CGnnJA"/>
   <messages xmi:type="bpmn:MessagingEdge" xmi:id="_lG1NwVT7Ed-32983CGnnJA" iD="_lG1NwFT7Ed-32983CGnnJA" source="_uk_xYVaoEd-1RJ7RXx1qjA" target="_kEXrMVT7Ed-32983CGnnJA"/>

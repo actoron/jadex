@@ -197,7 +197,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 		this.config = config;
 		
 		// Extract pool/lane from config.
-		if("All".equals(config))
+		if(config==null || "All".equals(config))
 		{
 			this.pool	= null;
 			this.lane	= null;

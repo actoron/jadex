@@ -19,7 +19,7 @@
         <children xmi:type="notation:Node" xmi:id="_L4JXyFT7Ed-32983CGnnJA" type="4001"/>
         <styles xmi:type="notation:FontStyle" xmi:id="_L4JXw1T7Ed-32983CGnnJA" fontName="Arial"/>
         <styles xmi:type="notation:DescriptionStyle" xmi:id="_L4JXxFT7Ed-32983CGnnJA"/>
-        <styles xmi:type="notation:FillStyle" xmi:id="_L4JXxVT7Ed-32983CGnnJA" fillColor="8905185"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_L4JXxVT7Ed-32983CGnnJA"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_L4JXxlT7Ed-32983CGnnJA" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="ContractNet.bpmn#_L4JXwVT7Ed-32983CGnnJA"/>
         <layoutConstraint xmi:type="notation:Bounds" xmi:id="_L4JXx1T7Ed-32983CGnnJA" x="552" y="97"/>
@@ -173,7 +173,7 @@
             <styles xmi:type="notation:FillStyle" xmi:id="_z9jqJVarEd-1RJ7RXx1qjA"/>
             <styles xmi:type="notation:LineStyle" xmi:id="_z9jqJlarEd-1RJ7RXx1qjA" lineColor="0"/>
             <element xmi:type="bpmn:Activity" href="ContractNet.bpmn#_z9jqIVarEd-1RJ7RXx1qjA"/>
-            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_z9jqJ1arEd-1RJ7RXx1qjA" x="5" y="47"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_z9jqJ1arEd-1RJ7RXx1qjA" x="54" y="47" width="30" height="30"/>
           </children>
           <children xmi:type="notation:Node" xmi:id="_1Qi8AlarEd-1RJ7RXx1qjA" type="2001">
             <children xmi:type="notation:Node" xmi:id="_1Qi8CFarEd-1RJ7RXx1qjA" type="4001"/>
@@ -182,7 +182,7 @@
             <styles xmi:type="notation:FillStyle" xmi:id="_1Qi8BVarEd-1RJ7RXx1qjA"/>
             <styles xmi:type="notation:LineStyle" xmi:id="_1Qi8BlarEd-1RJ7RXx1qjA" lineColor="0"/>
             <element xmi:type="bpmn:Activity" href="ContractNet.bpmn#_1Qi8AVarEd-1RJ7RXx1qjA"/>
-            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_1Qi8B1arEd-1RJ7RXx1qjA" x="69" y="47"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_1Qi8B1arEd-1RJ7RXx1qjA" x="98" y="47"/>
           </children>
           <children xmi:type="notation:Node" xmi:id="_6fXKQlarEd-1RJ7RXx1qjA" type="2001">
             <children xmi:type="notation:Node" xmi:id="_6fXKSFarEd-1RJ7RXx1qjA" type="4001"/>
@@ -191,7 +191,16 @@
             <styles xmi:type="notation:FillStyle" xmi:id="_6fXKRVarEd-1RJ7RXx1qjA"/>
             <styles xmi:type="notation:LineStyle" xmi:id="_6fXKRlarEd-1RJ7RXx1qjA" lineColor="0"/>
             <element xmi:type="bpmn:Activity" href="ContractNet.bpmn#_6fXKQVarEd-1RJ7RXx1qjA"/>
-            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_6fXKR1arEd-1RJ7RXx1qjA" x="91" y="9"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_6fXKR1arEd-1RJ7RXx1qjA" x="120" y="9"/>
+          </children>
+          <children xmi:type="notation:Node" xmi:id="_ONRnoldiEd-_rc0-j01YLA" type="2001">
+            <children xmi:type="notation:Node" xmi:id="_ONRnqFdiEd-_rc0-j01YLA" type="4001"/>
+            <styles xmi:type="notation:FontStyle" xmi:id="_ONRno1diEd-_rc0-j01YLA" fontName="Arial"/>
+            <styles xmi:type="notation:DescriptionStyle" xmi:id="_ONRnpFdiEd-_rc0-j01YLA"/>
+            <styles xmi:type="notation:FillStyle" xmi:id="_ONRnpVdiEd-_rc0-j01YLA"/>
+            <styles xmi:type="notation:LineStyle" xmi:id="_ONRnpldiEd-_rc0-j01YLA" lineColor="0"/>
+            <element xmi:type="bpmn:Activity" href="ContractNet.bpmn#_ONRnoVdiEd-_rc0-j01YLA"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ONRnp1diEd-_rc0-j01YLA" x="4" y="47"/>
           </children>
           <styles xmi:type="notation:DrawerStyle" xmi:id="_pv3uLFarEd-1RJ7RXx1qjA"/>
           <styles xmi:type="notation:SortingStyle" xmi:id="_pv3uLVarEd-1RJ7RXx1qjA"/>
@@ -215,7 +224,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_pv3uJ1arEd-1RJ7RXx1qjA"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_pv3uKFarEd-1RJ7RXx1qjA" lineColor="0"/>
         <element xmi:type="bpmn:SubProcess" href="ContractNet.bpmn#_pv3uIVarEd-1RJ7RXx1qjA"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_pv3uKVarEd-1RJ7RXx1qjA" x="980" y="58" width="138" height="139"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_pv3uKVarEd-1RJ7RXx1qjA" x="951" y="58" width="167" height="139"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_mSCYglavEd-1RJ7RXx1qjA" type="2001">
         <children xmi:type="notation:Node" xmi:id="_mSCYiFavEd-1RJ7RXx1qjA" type="4001"/>
@@ -224,7 +233,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_mSCYhVavEd-1RJ7RXx1qjA"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_mSCYhlavEd-1RJ7RXx1qjA" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="ContractNet.bpmn#_mSCYgVavEd-1RJ7RXx1qjA"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_mSCYh1avEd-1RJ7RXx1qjA" x="1130" y="29"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_mSCYh1avEd-1RJ7RXx1qjA" x="1130" y="29" width="30" height="30"/>
       </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_cO6nUlT6Ed-32983CGnnJA"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_cO6nU1T6Ed-32983CGnnJA"/>
@@ -235,7 +244,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_cOxdY1T6Ed-32983CGnnJA" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_cOxdZFT6Ed-32983CGnnJA" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="ContractNet.bpmn#_cNIeoVT6Ed-32983CGnnJA"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_cPEYUFT6Ed-32983CGnnJA" x="16" y="16" width="1239" height="247"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_cPEYUFT6Ed-32983CGnnJA" x="16" y="16" width="1382" height="247"/>
   </children>
   <children xmi:type="notation:Node" xmi:id="_mTY88lT6Ed-32983CGnnJA" type="1001">
     <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_6Hts0FaLEd-1RJ7RXx1qjA" source="Pool_Annotation">
@@ -256,7 +265,7 @@
         <children xmi:type="notation:Node" xmi:id="_3piJaFT6Ed-32983CGnnJA" type="4001"/>
         <styles xmi:type="notation:FontStyle" xmi:id="_3piJY1T6Ed-32983CGnnJA" fontName="Arial"/>
         <styles xmi:type="notation:DescriptionStyle" xmi:id="_3piJZFT6Ed-32983CGnnJA"/>
-        <styles xmi:type="notation:FillStyle" xmi:id="_3piJZVT6Ed-32983CGnnJA" fillColor="10011046"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_3piJZVT6Ed-32983CGnnJA"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_3piJZlT6Ed-32983CGnnJA" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="ContractNet.bpmn#_3piJYVT6Ed-32983CGnnJA"/>
         <layoutConstraint xmi:type="notation:Bounds" xmi:id="_3piJZ1T6Ed-32983CGnnJA" x="177" y="17"/>
@@ -313,10 +322,10 @@
             <children xmi:type="notation:Node" xmi:id="_asaIRlamEd-1RJ7RXx1qjA" type="4001"/>
             <styles xmi:type="notation:FontStyle" xmi:id="_asaIQVamEd-1RJ7RXx1qjA" fontName="Arial"/>
             <styles xmi:type="notation:DescriptionStyle" xmi:id="_asaIQlamEd-1RJ7RXx1qjA"/>
-            <styles xmi:type="notation:FillStyle" xmi:id="_asaIQ1amEd-1RJ7RXx1qjA" fillColor="10011046"/>
+            <styles xmi:type="notation:FillStyle" xmi:id="_asaIQ1amEd-1RJ7RXx1qjA"/>
             <styles xmi:type="notation:LineStyle" xmi:id="_asaIRFamEd-1RJ7RXx1qjA" lineColor="0"/>
             <element xmi:type="bpmn:Activity" href="ContractNet.bpmn#_trpHc1T7Ed-32983CGnnJA"/>
-            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_asaIRVamEd-1RJ7RXx1qjA"/>
+            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_asaIRVamEd-1RJ7RXx1qjA" x="3" width="74"/>
           </children>
           <styles xmi:type="notation:DrawerStyle" xmi:id="_tr8CaFT7Ed-32983CGnnJA"/>
           <styles xmi:type="notation:SortingStyle" xmi:id="_tr8CaVT7Ed-32983CGnnJA"/>
@@ -340,7 +349,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_tr8CY1T7Ed-32983CGnnJA"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_tr8CZFT7Ed-32983CGnnJA" lineColor="0"/>
         <element xmi:type="bpmn:SubProcess" href="ContractNet.bpmn#_trpHcVT7Ed-32983CGnnJA"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tr8CZVT7Ed-32983CGnnJA" x="892" y="1"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_tr8CZVT7Ed-32983CGnnJA" x="875" y="1" width="169"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_1XO6IlT7Ed-32983CGnnJA" type="2001">
         <children xmi:type="notation:Node" xmi:id="_1XO6KFT7Ed-32983CGnnJA" type="4001"/>
@@ -367,7 +376,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_GCv1NVT8Ed-32983CGnnJA"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_GCv1NlT8Ed-32983CGnnJA" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="ContractNet.bpmn#_GCv1MVT8Ed-32983CGnnJA"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_GCv1N1T8Ed-32983CGnnJA" x="1136" y="140"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_GCv1N1T8Ed-32983CGnnJA" x="1136" y="140" width="30" height="30"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_J5MEslaQEd-1RJ7RXx1qjA" type="2001">
         <children xmi:type="notation:Node" xmi:id="_J5MEuFaQEd-1RJ7RXx1qjA" type="4001"/>
@@ -405,7 +414,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_mTY89VT6Ed-32983CGnnJA" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_mTY89lT6Ed-32983CGnnJA" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="ContractNet.bpmn#_mTY88VT6Ed-32983CGnnJA"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_mTY891T6Ed-32983CGnnJA" x="16" y="300" width="1239" height="245"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_mTY891T6Ed-32983CGnnJA" x="16" y="300" width="1382" height="245"/>
   </children>
   <styles xmi:type="notation:PageStyle" xmi:id="_cMPGwVT6Ed-32983CGnnJA"/>
   <styles xmi:type="notation:GuideStyle" xmi:id="_cMPGwlT6Ed-32983CGnnJA"/>
@@ -914,5 +923,17 @@
     <styles xmi:type="notation:LineStyle" xmi:id="_wU91Dla6Ed-1RJ7RXx1qjA" lineColor="0"/>
     <element xmi:type="bpmn:SequenceEdge" href="ContractNet.bpmn#_wU91Cla6Ed-1RJ7RXx1qjA"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_wU91D1a6Ed-1RJ7RXx1qjA" points="[2, 0, -138, -48]$[125, 42, -15, -6]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_ONRnq1diEd-_rc0-j01YLA" type="3001" source="_ONRnoldiEd-_rc0-j01YLA" target="_z9jqIlarEd-1RJ7RXx1qjA">
+    <children xmi:type="notation:Node" xmi:id="_ONRnsFdiEd-_rc0-j01YLA" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="_ONRnsVdiEd-_rc0-j01YLA" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="_ONRnsldiEd-_rc0-j01YLA" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_ONRns1diEd-_rc0-j01YLA" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_ONRnrFdiEd-_rc0-j01YLA" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_ONRnrVdiEd-_rc0-j01YLA" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_ONRnrldiEd-_rc0-j01YLA" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="ContractNet.bpmn#_ONRnqldiEd-_rc0-j01YLA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_ONRnr1diEd-_rc0-j01YLA" points="[2, 2, -69, -62]$[56, 50, -15, -14]"/>
   </edges>
 </notation:Diagram>

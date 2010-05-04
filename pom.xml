@@ -20,6 +20,15 @@
 		            <descriptor>src/main/assembly/dist-assembly-xml.xml</descriptor>
 		          </descriptors>
 		        </configuration>
+		        <executions>
+		        	<execution>
+		        		<id>make-assembly</id>
+		        		<phase>package</phase>
+		        		<goals>
+		        			<goal>single</goal>
+		        		</goals>
+		        	</execution>
+		        </executions>
 		      </plugin>
 		    </plugins>
   		</build>
@@ -41,11 +50,19 @@
 		            <descriptor>src/main/assembly/dist-assembly-rules.xml</descriptor>
 		          </descriptors>
 		        </configuration>
+		        <executions>
+		        	<execution>
+		        		<id>make-assembly</id>
+		        		<phase>package</phase>
+		        		<goals>
+		        			<goal>single</goal>
+		        		</goals>
+		        	</execution>
+		        </executions>
 		      </plugin>
 		    </plugins>
   		</build>
 		<modules>
-			<module>jadex-services</module>
 		    <module>jadex-commons</module>
 		    <module>jadex-xml</module>
 		    <module>jadex-rules</module>
@@ -55,6 +72,23 @@
   	</profile>
   	<profile>
   		<id>jadex-full-dist</id>
+  		<build>
+		    <plugins>
+		      <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-assembly-plugin</artifactId>
+		        <executions>
+		        	<execution>
+		        		<id>make-assembly</id>
+		        		<phase>package</phase>
+		        		<goals>
+		        			<goal>single</goal>
+		        		</goals>
+		        	</execution>
+		        </executions>
+		      </plugin>
+		    </plugins>
+  		</build>
 		<modules>
 		 	<module>jadex-commons</module>
 		 	<module>jadex-xml</module>

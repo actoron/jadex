@@ -114,6 +114,15 @@ public class SimulationService implements ISimulationService, IService
 	 */
 	public void startService()
 	{
+		IClockService	cs	= (IClockService)container.getService(IClockService.class);
+		String	type	= cs.getClockType();
+		
+		if(IClock.TYPE_EVENT_DRIVEN.equals(type)
+			|| IClock.TYPE_TIME_DRIVEN.equals(type))
+		{
+			getExecutorService().addIdleCommand(simcommand);
+		}
+
 		boolean dorun = false;
 		synchronized(this)
 		{

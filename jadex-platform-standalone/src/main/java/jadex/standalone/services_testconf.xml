@@ -49,10 +49,8 @@
 			<!-- Clock service. -->
 			<property type="jadex.service.clock.IClockService" name="clock_service">
 				new jadex.service.clock.ClockService(
-					new jadex.service.clock.SystemClock("system_clock", 100,
-					$platform.getService(jadex.service.threadpool.ThreadPoolService.class)))
-//				new jadex.base.clock.SimulationEventClock("simulation_clock",
-//					System.currentTimeMillis(), 200))
+					new jadex.service.clock.SimulationEventClock("simulation_clock",
+						System.currentTimeMillis(), 100))
 			</property>
 
 			<property type="jadex.base.ISimulationService" name="simulation_service">
@@ -60,7 +58,7 @@
 			</property>
 		
 			<property type="jadex.service.execution.IExecutionService" name="execution_service">
-				new jadex.service.execution.AsyncExecutionService(
+				new jadex.service.execution.SyncExecutionService(
 					$platform.getService(jadex.service.threadpool.ThreadPoolService.class))
 			</property>
 		</properties>

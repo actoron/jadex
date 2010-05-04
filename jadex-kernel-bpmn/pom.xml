@@ -2,6 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>jadex</groupId>
   <artifactId>jadex-kernel-bpmn</artifactId>
+  <name>jadex-kernel-bpmn</name>
   <version>2.0-rc2</version>
    <parent>
     <groupId>jadex</groupId>

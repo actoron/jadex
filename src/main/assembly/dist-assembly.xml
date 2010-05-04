@@ -3,7 +3,7 @@
   <id>dist</id>
   
   <formats>
-    <format>dir</format>
+    <!-- <format>dir</format> -->
     <format>zip</format>
   </formats>
   
@@ -25,14 +25,14 @@
         <includeModuleDirectory>false</includeModuleDirectory>
         <fileSets>
           <fileSet>
-            <outputDirectory>sources/${artifactId}</outputDirectory>
+            <outputDirectory>sources/${module.artifactId}</outputDirectory>
             <includes>
               <include>src/**</include>
               <include>pom.xml</include>
             </includes>
           </fileSet>
           <fileSet>
-            <outputDirectory>sources/${artifactId}</outputDirectory>
+            <outputDirectory>sources/${module.artifactId}</outputDirectory>
             <includes>
               <include>lib/**</include>
             </includes>
@@ -61,6 +61,10 @@
     <file>
       <source>/src/main/config/jadex-settings-pom.xml</source>
       <outputDirectory>sources/src/main/config</outputDirectory>
+    </file>
+    <file>
+      <source>/src/main/assembly/dist-assembly.xml</source>
+      <outputDirectory>sources/src/main/assembly</outputDirectory>
     </file>
     <file>
       <source>docs/readme.txt</source>

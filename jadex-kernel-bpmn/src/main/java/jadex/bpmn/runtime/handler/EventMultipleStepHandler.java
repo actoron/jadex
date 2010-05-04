@@ -26,34 +26,37 @@ public class EventMultipleStepHandler implements IStepHandler
 		thread.updateParametersAfterStep(activity, instance);
 
 		MSequenceEdge next	= null;
+		Object	wi	= null;	
 		
 		List outgoing = activity.getOutgoingSequenceEdges();
 		OrFilter filter = (OrFilter)thread.getWaitFilter();
 		IFilter[] filters = filter.getFilters();
 		Object[] waitinfos = (Object[])thread.getWaitInfo();
 		
-		// Remove the timer entry.
-		// todo: how to remove timer generically
-		
-		for(int i=0; i<outgoing.size() && next==null; i++)
+		for(int i=0; i<outgoing.size(); i++)
 		{
+			MSequenceEdge	tmp = (MSequenceEdge)outgoing.get(i);
+
 			// Timeout edge has event=null and filter=null.
-			if((event==null && filters[i]==null))
+			if(event==null && filters[i]==null
+				|| filters[i]!=null && filters[i].filter(event))
 			{
-				next = (MSequenceEdge)outgoing.get(i);
-				MActivity act = next.getTarget();
-				thread.setWaitInfo(waitinfos[i]);
-				instance.getActivityHandler(act).cancel(act, instance, thread);
+				next = tmp;
+				wi = waitinfos[i];
 			}
-			else if(filters[i]!=null && filters[i].filter(event))
+			else
 			{
-				next = (MSequenceEdge)outgoing.get(i);
+				MActivity act = tmp.getTarget();
+				thread.setWaitInfo(waitinfos[i]);	// Hack!!! change wait infos for cancel() call
+				instance.getActivityHandler(act).cancel(act, instance, thread);
+				thread.setWaitInfo(waitinfos);
 			}
 		}
 		
 		if(next==null)
 			throw new RuntimeException("Could not determine next edge: "+this);
 		
+		thread.setWaitInfo(wi);
 		instance.getStepHandler(next.getTarget()).step(next.getTarget(), instance, thread, event);
 	}
 }

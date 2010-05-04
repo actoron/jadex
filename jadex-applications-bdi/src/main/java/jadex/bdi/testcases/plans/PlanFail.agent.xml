@@ -81,10 +81,9 @@
 	</plans>
 
 	<properties>
-        <!--<property name="debugging">true</property>-->
-        <!--<property name="logging.level">java.util.logging.Level.FINE</property>-->
-        <property name="logging.useParentHandlers">true</property>
-    </properties>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
+		<property name="debugging">false</property>
+	</properties>
 
 	<configurations>
 		<configuration name="default">

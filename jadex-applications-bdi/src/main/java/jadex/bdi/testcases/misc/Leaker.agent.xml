@@ -79,11 +79,9 @@
 	</events>
 
 	<properties>
+		<property name="logging.level">java.util.logging.Level.SEVERE</property>
 		<property name="debugging">false</property>
-		<!-- <property name="profiling">true</property>-->
-		<property name="logging.level">java.util.logging.Level.INFO</property>
 	</properties>
-
 
 	<configurations>
 		<configuration name="default">

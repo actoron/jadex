@@ -40,6 +40,8 @@ public class GatewayXORActivityHandler implements IActivityHandler
 				IParsedExpression exp = edge.getCondition();
 				if(exp!=null)
 				{
+					if(edge.isDefault())
+						throw new RuntimeException("Default edge must not have a condition: "+activity+", "+instance+", "+thread+", "+exp);
 					if(isValid(exp, fetcher))
 					{
 						thread.setLastEdge(edge);
