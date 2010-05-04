@@ -183,8 +183,11 @@ public class ComponentTreeTable extends JScrollPane
 			values.put("address", addresses[0]);
 		
 		DefaultTreeTableNode node = parent.getChild(desc);
-		node.setValues(values);
-		node.setUserObject(desc);
+		if(node!=null)	// Might be removed in meantime.
+		{
+			node.setValues(values);
+			node.setUserObject(desc);
+		}
 		
 		//System.out.println("update for: "+node);
 		

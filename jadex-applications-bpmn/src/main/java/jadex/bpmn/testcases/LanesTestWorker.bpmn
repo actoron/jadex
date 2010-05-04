@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_oUHuUVdaEd-_rc0-j01YLA" iD="_oUHuUFdaEd-_rc0-j01YLA">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_o9h3sFdaEd-_rc0-j01YLA" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_o9h3sVdaEd-_rc0-j01YLA" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_o9h3sldaEd-_rc0-j01YLA" key="Package" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x5a0oFdaEd-_rc0-j01YLA" key="results" value="result␋The executed pools and lanes.␋String␋&quot;&quot;"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_oURfVVdaEd-_rc0-j01YLA" iD="_oURfVFdaEd-_rc0-j01YLA" name="Pool1">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_--UOUVdaEd-_rc0-j01YLA" iD="_--UOUFdaEd-_rc0-j01YLA" outgoingEdges="__-qRCldaEd-_rc0-j01YLA" lanes="_22t1EVdaEd-_rc0-j01YLA" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="__-qRAVdaEd-_rc0-j01YLA" iD="__-qRAFdaEd-_rc0-j01YLA" incomingEdges="__-qRCldaEd-_rc0-j01YLA" lanes="_22t1EVdaEd-_rc0-j01YLA" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Jn41EFdbEd-_rc0-j01YLA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Jn41EVdbEd-_rc0-j01YLA" key="class" value=""/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="__-qRCldaEd-_rc0-j01YLA" iD="__-qRCVdaEd-_rc0-j01YLA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_AstCwFdbEd-_rc0-j01YLA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AstCwVdbEd-_rc0-j01YLA" key="condition" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_BIaHUFdbEd-_rc0-j01YLA" source="sequence">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BIaHUVdbEd-_rc0-j01YLA" key="mappings" value="result␋result+&quot;A&quot;"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_22t1EVdaEd-_rc0-j01YLA" iD="_22t1EFdaEd-_rc0-j01YLA" name="LaneA" activities="_--UOUVdaEd-_rc0-j01YLA __-qRAVdaEd-_rc0-j01YLA"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_3GWzkVdaEd-_rc0-j01YLA" iD="_3GWzkFdaEd-_rc0-j01YLA" name="LaneB"/>
+  </pools>
+  <pools xmi:type="bpmn:Pool" xmi:id="_qESrcVdaEd-_rc0-j01YLA" iD="_qESrcFdaEd-_rc0-j01YLA" name="Pool2">
+    <lanes xmi:type="bpmn:Lane" xmi:id="_3TnMcVdaEd-_rc0-j01YLA" iD="_3TnMcFdaEd-_rc0-j01YLA" name="LaneC"/>
+    <lanes xmi:type="bpmn:Lane" xmi:id="_3eyhsVdaEd-_rc0-j01YLA" iD="_3eyhsFdaEd-_rc0-j01YLA" name="LaneD"/>
+  </pools>
+</bpmn:BpmnDiagram>

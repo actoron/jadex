@@ -72,7 +72,7 @@ public class SUtil
 	};
 	
 	/** An empty string array. */
-	public static final String[] EMPTY_STRING = new String[0];
+	public static final String[] EMPTY_STRING_ARRAY = new String[0];
 
 	static
 	{

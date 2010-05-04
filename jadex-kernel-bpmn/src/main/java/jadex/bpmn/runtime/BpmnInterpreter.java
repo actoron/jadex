@@ -126,6 +126,12 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	/** The configuration. */
 	protected String config;
 	
+	/** The configuration. */
+	protected String pool;
+	
+	/** The configuration. */
+	protected String lane;
+	
 	/** The arguments. */
 	protected Map arguments;
 	
@@ -189,6 +195,28 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 		this.adapter = adapter;
 		this.model = model;
 		this.config = config;
+		
+		// Extract pool/lane from config.
+		if("All".equals(config))
+		{
+			this.pool	= null;
+			this.lane	= null;
+		}
+		else
+		{
+			int idx	= config.indexOf('.');
+			if(idx==-1)
+			{
+				this.pool	= config;
+				this.lane	= null;
+			}
+			else
+			{
+				this.pool	= config.substring(0, idx);
+				this.lane	= config.substring(idx+1);
+			}
+		}
+		
 		this.arguments = arguments;
 		this.results = new HashMap();
 		this.parent	= parent;
@@ -275,12 +303,12 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 		{
 			this.thread = Thread.currentThread();
 				
-			if(!isFinished(null, null) && isReady(null, null))
-				executeStep(null, null);
+			if(!isFinished(pool, lane) && isReady(pool, lane))
+				executeStep(pool, lane);
 			
 			this.thread = null;
 			
-			if(!finishing && isFinished(null, null))
+			if(!finishing && isFinished(pool, lane))
 			{
 				((IComponentManagementService)adapter.getServiceContainer()
 					.getService(IComponentManagementService.class))
@@ -290,7 +318,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			
 //			System.out.println("Process wants: "+this.getComponentAdapter().getComponentIdentifier().getLocalName()+" "+!isFinished(null, null)+" "+isReady(null, null));
 			
-			return !isFinished(null, null) && isReady(null, null);
+			return !isFinished(pool, lane) && isReady(pool, lane);
 		}
 		catch(ComponentTerminatedException ate)
 		{

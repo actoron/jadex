@@ -120,7 +120,7 @@ public class OAVCapabilityModel implements ILoadableComponentModel, ICacheableMo
 	 */
 	public String[] getConfigurations()
 	{
-		String[] ret = SUtil.EMPTY_STRING;
+		String[] ret = SUtil.EMPTY_STRING_ARRAY;
 		
 		Collection configs = state.getAttributeValues(handle, OAVBDIMetaModel.capability_has_configurations);
 		if(configs!=null)

@@ -268,7 +268,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 					}
 					else
 					{
-						sarray = SUtil.EMPTY_STRING;
+						sarray = SUtil.EMPTY_STRING_ARRAY;
 					}
 				}
 			};
@@ -291,7 +291,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 			}
 			else
 			{
-				ret = SUtil.EMPTY_STRING;
+				ret = SUtil.EMPTY_STRING_ARRAY;
 			}
 			return ret;
 		}
@@ -323,7 +323,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 					}
 					else
 					{
-						sarray = SUtil.EMPTY_STRING;
+						sarray = SUtil.EMPTY_STRING_ARRAY;
 					}
 				}
 			};
@@ -346,7 +346,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 			}
 			else
 			{
-				ret = SUtil.EMPTY_STRING;
+				ret = SUtil.EMPTY_STRING_ARRAY;
 			}
 			return ret;
 		}

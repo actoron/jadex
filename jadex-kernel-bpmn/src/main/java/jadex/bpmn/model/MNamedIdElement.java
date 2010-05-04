@@ -98,6 +98,6 @@ public class MNamedIdElement extends MAnnotationElement
 	 */
 	public String[] getPropertyNames()
 	{
-		return properties!=null? (String[])properties.keySet().toArray(new String[properties.size()]): SUtil.EMPTY_STRING;
+		return properties!=null? (String[])properties.keySet().toArray(new String[properties.size()]): SUtil.EMPTY_STRING_ARRAY;
 	}
 }

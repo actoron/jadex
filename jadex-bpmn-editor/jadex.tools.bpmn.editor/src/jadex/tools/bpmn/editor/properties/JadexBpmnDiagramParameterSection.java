@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.TableColumn;
  * @author Claas Altschaffel
  * 
  */
-public abstract class JadexBpmnDiagramParameterSection extends
+public class JadexBpmnDiagramParameterSection extends
 		AbstractBpmnMultiColumnTablePropertySection
 {
 

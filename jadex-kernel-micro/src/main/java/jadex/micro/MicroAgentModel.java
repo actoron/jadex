@@ -158,7 +158,7 @@ public class MicroAgentModel implements ILoadableComponentModel
 		if(metainfo!=null)
 			ret = metainfo.getConfigurations();
 		else
-			ret = SUtil.EMPTY_STRING;
+			ret = SUtil.EMPTY_STRING_ARRAY;
 		return ret;
 	}
 	

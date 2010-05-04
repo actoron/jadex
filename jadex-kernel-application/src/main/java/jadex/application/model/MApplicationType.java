@@ -298,7 +298,7 @@ public class MApplicationType
 	 */
 	public String[] getAllImports()
 	{
-		String[] ret = SUtil.EMPTY_STRING;
+		String[] ret = SUtil.EMPTY_STRING_ARRAY;
 		
 		if(imports!=null)
 		{

@@ -21,6 +21,9 @@ public class MSequenceEdge extends MAssociationTarget
 	/** The type. */
 	protected String type;
 	
+	/** The default flag. */
+	protected boolean	def;
+	
 	//-------- additions --------
 	
 	/** The condition. */
@@ -83,6 +86,24 @@ public class MSequenceEdge extends MAssociationTarget
 	public void setType(String type)
 	{
 		this.type = type;
+	}
+
+	/**
+	 *  Get the default flag. 
+	 *  @return The default flag.
+	 */
+	public boolean	isDefault()
+	{
+		return this.def;
+	}
+
+	/**
+	 *  Set the default flag.
+	 *  @param def The default flag.
+	 */
+	public void setDefault(boolean def)
+	{
+		this.def = def;
 	}
 
 	//-------- additions --------

@@ -67,11 +67,11 @@ public class PushingAgent extends MicroAgent
 					//ei.performAction(id, new Item("enter"));
 					// perceive
 					List percepts = null;
-					percepts = eis.getAllPercepts(getComponentIdentifier().getName(), SUtil.EMPTY_STRING);
+					percepts = eis.getAllPercepts(getComponentIdentifier().getName(), SUtil.EMPTY_STRING_ARRAY);
 					say("I believe the carriage is at " + percepts);
 
 					// act
-					eis.performAction(getComponentIdentifier().getName(), new Action("push", new Parameter[0]), SUtil.EMPTY_STRING);
+					eis.performAction(getComponentIdentifier().getName(), new Action("push", new Parameter[0]), SUtil.EMPTY_STRING_ARRAY);
 				
 					waitFor(950, this);
 				}

@@ -252,8 +252,8 @@ public class BpmnXMLReader
 			new AttributeInfo(new AccessInfo("name", "description")), 
 			new AttributeInfo(new AccessInfo("associations", "associationsDescription")),
 			new AttributeInfo(new AccessInfo("iD", null, AccessInfo.IGNORE_READWRITE)),
-			new AttributeInfo(new AccessInfo("conditionType", null, AccessInfo.IGNORE_READWRITE)),	// Todo: support e.g. default edges?
-			new AttributeInfo(new AccessInfo("isDefault", null, AccessInfo.IGNORE_READWRITE))	// Todo: support e.g. default edges?
+			new AttributeInfo(new AccessInfo("conditionType", null, AccessInfo.IGNORE_READWRITE)),
+			new AttributeInfo(new AccessInfo("isDefault", "default"))
 			},
 			new SubobjectInfo[]{
 			new SubobjectInfo(new XMLInfo("eAnnotations"), new AccessInfo("eAnnotations", "annotation"))

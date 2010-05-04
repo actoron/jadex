@@ -67,18 +67,18 @@ public class AlternatingAgent extends MicroAgent
 				{
 					// perceive
 					List percepts = null;
-					percepts = eis.getAllPercepts(getComponentIdentifier().getName(), SUtil.EMPTY_STRING);
+					percepts = eis.getAllPercepts(getComponentIdentifier().getName(), SUtil.EMPTY_STRING_ARRAY);
 					say("I believe the carriage is at " + percepts);
 
 					// act
-					eis.performAction(getComponentIdentifier().getName(), new Action("push", new Parameter[0]), SUtil.EMPTY_STRING);
+					eis.performAction(getComponentIdentifier().getName(), new Action("push", new Parameter[0]), SUtil.EMPTY_STRING_ARRAY);
 
 					// perceive
-					percepts = eis.getAllPercepts(getComponentIdentifier().getName(), SUtil.EMPTY_STRING);
+					percepts = eis.getAllPercepts(getComponentIdentifier().getName(), SUtil.EMPTY_STRING_ARRAY);
 					say("I believe the carriage is at " + percepts);
 
 					// act
-					eis.performAction(getComponentIdentifier().getName(), new Action("wait", new Parameter[0]), SUtil.EMPTY_STRING);
+					eis.performAction(getComponentIdentifier().getName(), new Action("wait", new Parameter[0]), SUtil.EMPTY_STRING_ARRAY);
 
 					waitFor(950, this);
 				}

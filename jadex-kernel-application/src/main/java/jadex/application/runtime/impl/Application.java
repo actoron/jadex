@@ -631,7 +631,7 @@ public class Application	implements IApplication, IComponentInstance
 	public String[] getComponentTypes()
 	{
 		List atypes = model.getApplicationType().getMComponentTypes();
-		String[] ret = atypes!=null? new String[atypes.size()]: SUtil.EMPTY_STRING;
+		String[] ret = atypes!=null? new String[atypes.size()]: SUtil.EMPTY_STRING_ARRAY;
 		
 		for(int i=0; i<ret.length; i++)
 		{

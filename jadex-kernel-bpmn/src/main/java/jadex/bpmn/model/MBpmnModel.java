@@ -852,9 +852,47 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel, I
 	 */
 	public String[] getConfigurations()
 	{
-		// todo: implement me
+		// Todo: more in configuration than just pools/lanes?
+		String[]	ret;
+		List	pools	= getPools();
+		if(pools!=null)
+		{
+			List	aret	= new ArrayList();
+			if(pools.size()>1)
+			{
+				aret.add("All");
+			}
+			
+			for(int i=0; i<pools.size(); i++)
+			{
+				MPool	pool	= (MPool)pools.get(i);
+				aret.add(pool.getName());
+				
+				List	lanes	= pool.getLanes();
+				if(lanes!=null)
+				{
+					for(int j=0; j<lanes.size(); j++)
+					{
+						MLane	lane	= (MLane)lanes.get(j);
+						String	name	= lane.getName();
+						while(lane.getLane()!=null)
+						{
+							lane	= lane.getLane();
+							name	= lane.getName() + "." + name;
+						}
+						
+						aret.add(pool.getName()+"."+name);
+					}
+					ret	= (String[])aret.toArray(new String[aret.size()]);
+				}
+			}			
+			ret	= (String[])aret.toArray(new String[aret.size()]);
+		}
+		else
+		{
+			ret	= SUtil.EMPTY_STRING_ARRAY;
+		}
 		
-		String[] ret = SUtil.EMPTY_STRING;
 		return ret;
 	}
 	

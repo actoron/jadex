@@ -315,7 +315,7 @@ public class MGpmnModel extends MProcess implements ICacheableModel, ILoadableCo
 	{
 		// todo: implement me
 		
-		String[] ret = SUtil.EMPTY_STRING;
+		String[] ret = SUtil.EMPTY_STRING_ARRAY;
 		return ret;
 	}
 	

@@ -386,7 +386,7 @@ public class ProcessThread	implements ITaskContext
 	 */
 	public String[] getParameterNames()
 	{
-		return data!=null? (String[])data.keySet().toArray(new String[data.size()]): SUtil.EMPTY_STRING;
+		return data!=null? (String[])data.keySet().toArray(new String[data.size()]): SUtil.EMPTY_STRING_ARRAY;
 	}
 	
 	/**

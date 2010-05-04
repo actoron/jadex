@@ -6,7 +6,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IB5wIBJ6Ed-3Ruc_856dPQ" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5CRSsBaYEd-YccbjZenQqQ" key="Description" value="Test if a message can be sent and received by a process."/>
   </eAnnotations>
-  <pools xmi:type="bpmn:Pool" xmi:id="_uFjqERJREd-3Ruc_856dPQ" iD="_uFjqEBJREd-3Ruc_856dPQ" name="Pool">
+  <pools xmi:type="bpmn:Pool" xmi:id="_uFjqERJREd-3Ruc_856dPQ" iD="_uFjqEBJREd-3Ruc_856dPQ" name="Receiver">
     <vertices xmi:type="bpmn:Activity" xmi:id="_uFjqExJREd-3Ruc_856dPQ" iD="_uFjqEhJREd-3Ruc_856dPQ" outgoingEdges="_atklERJ6Ed-3Ruc_856dPQ" name="Pre Message Receival" activityType="Task"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_93ja0RJfEd-3Ruc_856dPQ" iD="_93ja0BJfEd-3Ruc_856dPQ" outgoingEdges="_5VX00RJ6Ed-3Ruc_856dPQ" incomingEdges="_93ja2hJfEd-3Ruc_856dPQ" name="Receive Message" activityType="EventIntermediateMessage">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_FK_zQBJgEd-3Ruc_856dPQ" source="jadex">
@@ -42,7 +42,7 @@
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_jMIFyhJ6Ed-3Ruc_856dPQ" iD="_jMIFyRJ6Ed-3Ruc_856dPQ"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_5VX00RJ6Ed-3Ruc_856dPQ" iD="_5VX00BJ6Ed-3Ruc_856dPQ"/>
   </pools>
-  <pools xmi:type="bpmn:Pool" xmi:id="_v3aCMRJREd-3Ruc_856dPQ" iD="_v3aCMBJREd-3Ruc_856dPQ" name="Pool0">
+  <pools xmi:type="bpmn:Pool" xmi:id="_v3aCMRJREd-3Ruc_856dPQ" iD="_v3aCMBJREd-3Ruc_856dPQ" name="Sender">
     <vertices xmi:type="bpmn:Activity" xmi:id="_eQvvsRJgEd-3Ruc_856dPQ" iD="_eQvvsBJgEd-3Ruc_856dPQ" outgoingEdges="_2dIbOhJgEd-3Ruc_856dPQ" name="Pre Message&#xD;&#xA;Sending"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_2dIbMRJgEd-3Ruc_856dPQ" iD="_2dIbMBJgEd-3Ruc_856dPQ" outgoingEdges="_4D8oChJgEd-3Ruc_856dPQ" incomingEdges="_2dIbOhJgEd-3Ruc_856dPQ" name="Send Message" activityType="EventIntermediateMessage">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_K2eS4BJhEd-3Ruc_856dPQ" source="jadex">

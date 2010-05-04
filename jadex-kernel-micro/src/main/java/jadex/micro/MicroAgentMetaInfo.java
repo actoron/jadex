@@ -34,7 +34,7 @@ public class MicroAgentMetaInfo
 	{
 //		this.name = name;
 		this.description = description;
-		this.configs = configs == null? SUtil.EMPTY_STRING: configs;
+		this.configs = configs == null? SUtil.EMPTY_STRING_ARRAY: configs;
 		this.args = args == null? new IArgument[0]: args;
 		this.results = results == null? new IArgument[0]: results;
 		this.breakpoints = breakpoints == null? new String[0]: breakpoints;

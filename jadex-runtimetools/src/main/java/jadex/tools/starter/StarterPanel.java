@@ -690,7 +690,7 @@ public class StarterPanel extends JPanel
 		
 		// Add all known component configuration names to the config chooser.
 		
-		String[] confignames = model!=null? model.getConfigurations(): SUtil.EMPTY_STRING;
+		String[] confignames = model!=null? model.getConfigurations(): SUtil.EMPTY_STRING_ARRAY;
 		for(int i = 0; i<confignames.length; i++)
 		{
 			((DefaultComboBoxModel)config.getModel()).addElement(confignames[i]);
