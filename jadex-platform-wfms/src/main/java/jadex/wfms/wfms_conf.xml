@@ -14,9 +14,10 @@
 		<property type="welcome">false</property>
 		<property type="autoshutdown">true</property>
 		
-		<property type="daemoncomponent" name="WfmsClientInterfaceAgent">jadex/wfms/bdi/interfaces/client/WfmsClientInterface.agent.xml</property>
-		<property type="daemoncomponent" name="WfmsPdInterfaceAgent">jadex/wfms/bdi/interfaces/processdefinition/WfmsPdInterface.agent.xml</property>
-		<property type="daemoncomponent" name="WfmsAdminInterfaceAgent">jadex/wfms/bdi/interfaces/admin/WfmsAdminInterface.agent.xml</property>
+		<property type="component" name="WorkflowManagementSystem">jadex/wfms/WfMS.application.xml</property>
+		<!-- <property type="component" name="WfmsClientInterfaceAgent">jadex/wfms/bdi/interfaces/client/WfmsClientInterface.agent.xml</property> -->
+		<!-- <property type="component" name="WfmsPdInterfaceAgent">jadex/wfms/bdi/interfaces/processdefinition/WfmsPdInterface.agent.xml</property> -->
+		<!-- <property type="component" name="WfmsAdminInterfaceAgent">jadex/wfms/bdi/interfaces/admin/WfmsAdminInterface.agent.xml</property> -->
 		<property type="component" name="WfmsStandardApplication">jadex/wfms/bdi/client/standard/StandardClientApplication.agent.xml</property>
 		
 		<!-- Platform services. -->

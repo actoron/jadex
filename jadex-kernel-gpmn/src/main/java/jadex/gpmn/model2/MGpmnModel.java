@@ -459,4 +459,13 @@ public class MGpmnModel implements ICacheableModel, ILoadableComponentModel
 	{
 		return bpmnplans;
 	}
+	
+	/**
+	 *  Get the subprocesses.
+	 *  @return The subprocesses.
+	 */
+	public Map getSubprocesses()
+	{
+		return subprocesses;
+	}
 }

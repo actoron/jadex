@@ -13,6 +13,8 @@ import jadex.gpmn.model2.MBpmnPlan;
 import jadex.gpmn.model2.MGoal;
 import jadex.gpmn.model2.MGpmnModel;
 import jadex.gpmn.model2.MPlanEdge;
+import jadex.gpmn.model2.MSubprocess;
+import jadex.gpmn.runtime.plan.ActivationTarget;
 import jadex.xml.IContext;
 import jadex.xml.IPostProcessor;
 import jadex.rules.state.IOAVState;
@@ -276,10 +278,18 @@ public class GpmnBDIConverter2
 					
 					// Create subgoals parameter set
 					// TODO: Support Subprocesses
-					String[] goalnames = new String[activationedges.size()];
+					String[] activationtargets = new String[activationedges.size()];
 					for(int j=0; j<activationedges.size(); j++)
-						goalnames[j] = "\""+((MGoal) model.getGoals().get(((MActivationEdge)activationedges.get(j)).getTargetId())).getName()+"\"";
-					createParameterSet(planhandle, state, "subgoals", "String", goalnames, null, true);
+					{
+						MActivationEdge edge = (MActivationEdge)activationedges.get(j);
+						if (model.getGoals().containsKey(edge.getTargetId()))
+							activationtargets[j] = "new jadex.gpmn.runtime.plan.ActivationTarget(jadex.gpmn.runtime.plan.ActivationTarget.Types.GOAL,"+"\""+
+									((MGoal) model.getGoals().get(edge.getTargetId())).getName()+"\")";
+						else
+							activationtargets[j] = "new jadex.gpmn.runtime.plan.ActivationTarget(jadex.gpmn.runtime.plan.ActivationTarget.Types.SUBPROCESS,"+"\""+
+									((MSubprocess) model.getSubprocesses().get(edge.getTargetId())).getName()+"\")";
+					}
+					createParameterSet(planhandle, state, "activationtargets", "jadex.gpmn.runtime.plan.ActivationTarget", activationtargets, null, true);
 				}
 			}
 		}
@@ -289,7 +299,7 @@ public class GpmnBDIConverter2
 		for(Iterator it = bpmnplans.values().iterator(); it.hasNext(); )
 		{
 			MBpmnPlan plan = (MBpmnPlan)it.next();
-			Object planhandle = createPlan(scopehandle, state, plan.getName(), plan.getBpmnPlan(), plan.getPreCondition(), plan.getContextCondition(), "bpmn");
+			Object planhandle = createPlan(scopehandle, state, plan.getName(), plan.getPlanref(), plan.getPreCondition(), plan.getContextCondition(), "bpmn");
 			List goalnames = new ArrayList();
 			List plangoals = (List)userplanmap.get(plan.getId());
 			// null check for orphaned plans
@@ -615,7 +625,7 @@ public class GpmnBDIConverter2
 	/**
 	 *  Create a parameter set.
 	 */
-	protected Object createParameterSet(Object paramelemhandle, IOAVState state, String name, String classname, String[] values, String valuesexp, boolean planparamset)
+	protected Object createParameterSet(Object paramelemhandle, IOAVState state, String name, String classname, Object[] values, String valuesexp, boolean planparamset)
 	{
 		Object paramsethandle = planparamset? state.createObject(OAVBDIMetaModel.planparameterset_type): 
 			state.createObject(OAVBDIMetaModel.parameterset_type); 

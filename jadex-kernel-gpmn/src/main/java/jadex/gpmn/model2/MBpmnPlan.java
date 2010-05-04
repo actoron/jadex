@@ -9,7 +9,7 @@ public class MBpmnPlan
 	protected String name;
 	
 	/** The BPMN plan. */
-	protected String bpmnplan;
+	protected String planref;
 	
 	/** The precondition. */
 	protected String precondition;
@@ -52,25 +52,25 @@ public class MBpmnPlan
 	{
 		this.name = name;
 	}
-
-	/**
-	 *  Get the bpmnplan.
-	 *  @return The bpmnplan.
-	 */
-	public String getBpmnPlan()
-	{
-		return bpmnplan;
-	}
-
-	/**
-	 *  Set the bpmnplan.
-	 *  @param bpmnplan The bpmnplan to set.
-	 */
-	public void setBpmnPlan(String bpmnplan)
-	{
-		this.bpmnplan = bpmnplan;
-	}
 	
+	/**
+	 *  Get the planref.
+	 *  @return The planref.
+	 */
+	public String getPlanref()
+	{
+		return planref;
+	}
+
+	/**
+	 *  Set the planref.
+	 *  @param planref The planref to set.
+	 */
+	public void setPlanref(String planref)
+	{
+		this.planref = planref;
+	}
+
 	/**
 	 *  Get the precondition.
 	 *  @return The precondition.

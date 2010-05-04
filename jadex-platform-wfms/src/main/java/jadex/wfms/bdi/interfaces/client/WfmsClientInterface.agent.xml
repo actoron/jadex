@@ -326,15 +326,6 @@
 	</expressions>
 
 	<properties>
-		<property name="servicedescription">
- 			((IDF)$scope.getServiceContainer().getService(IDF.class))
-				.createDFServiceDescription(SWfms.SERVICE_NAME_CLIENT_INTERFACE, SWfms.SERVICE_TYPE_EXTERNAL, "")
-		</property>
-
-		<property name="agentdescription">
-			((IDF)$scope.getServiceContainer().getService(IDF.class))
-				.createDFComponentDescription(null, (IDFServiceDescription)$propertybase.getProperty("servicedescription"))	
-		</property>
 	</properties>
 
 	<configurations>
@@ -349,7 +340,9 @@
 				<initialgoal ref="dfcap.df_keep_registered">
 					<parameter ref="description">
 						<value>
-							(IDFComponentDescription)$propertybase.getProperty("agentdescription")
+							((IDF)$scope.getServiceContainer().getService(IDF.class))
+							.createDFComponentDescription(null, ((IDF)$scope.getServiceContainer().getService(IDF.class))
+							.createDFServiceDescription(SWfms.SERVICE_NAME_CLIENT_INTERFACE, SWfms.SERVICE_TYPE_EXTERNAL, ""))	
 						</value>
 					</parameter>
 				</initialgoal>

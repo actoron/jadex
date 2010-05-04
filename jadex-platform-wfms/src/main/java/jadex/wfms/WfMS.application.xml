@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Workflow Management System</H3>
+
+	Can be used to launch the workflow management system.<br>
+-->
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+	xmlns:agr="http://jadex.sourceforge.net/jadex-agrspace"
+	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
+	                    http://jadex.sourceforge.net/jadex-agrspace 
+	                    http://jadex.sourceforge.net/jadex-agrspace-2.0.xsd
+	                    http://jadex.sourceforge.net/jadex-envspace 
+	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
+	name="WorkflowManagementSystem" package="jadex.wfms">
+	
+	<imports>
+	</imports>
+
+	<componenttypes>
+		<componenttype name="processdefinitioninterface" filename="jadex/wfms/bdi/interfaces/processdefinition/WfmsPdInterface.agent.xml"/>
+		<componenttype name="clientapplicationinterface" filename="jadex/wfms/bdi/interfaces/client/WfmsClientInterface.agent.xml"/>
+		<componenttype name="administrationinterface" filename="jadex/wfms/bdi/interfaces/admin/WfmsAdminInterface.agent.xml"/>
+	</componenttypes>
+
+	<applications>
+		<application name="Workflow Management System">
+			<components>
+				<component type="clientapplicationinterface" name="ClientApplicationInterface"/>
+				<component type="processdefinitioninterface" name="ProcessDefinitionInterface"/>
+				<component type="administrationinterface" name="AdministrationInterface"/>
+			</components>
+ 		</application>
+	</applications>
+
+</applicationtype>
