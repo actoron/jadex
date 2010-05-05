@@ -1,4 +1,4 @@
-package jadex.bdi.planlib.protocols;
+package jadex.bpmn.examples.contractnet;
 
 
 import jadex.bridge.IComponentIdentifier;
@@ -6,7 +6,7 @@ import jadex.bridge.IComponentIdentifier;
 /**
  *  An object containing information about
  *  a proposal made in a negotiation, i.e.,
- *  the component identifier of the participant
+ *  the agent identifier of the participant
  *  and the content object of the proposal
  *  message.
  *  When the proposal is evaluated the
@@ -19,7 +19,7 @@ public class ParticipantProposal
 {
 	//-------- attributes --------
 	
-	/** The participants component identifier. */
+	/** The participants agent identifier. */
 	protected IComponentIdentifier	participant;
 	
 	/** The proposal object. */
@@ -41,15 +41,16 @@ public class ParticipantProposal
 	/**
 	 *  Create a participant proposal for a given participant.
 	 */
-	public ParticipantProposal(IComponentIdentifier participant)
+	public ParticipantProposal(IComponentIdentifier participant, Object proposal)
 	{
 		this.participant	= participant;
+		this.proposal	= proposal;
 	}
 	
 	//-------- methods --------
 	
 	/**
-	 *	Get the participants component identifier.
+	 *	Get the participants agent identifier.
 	 */
 	public IComponentIdentifier	getParticipant()
 	{
@@ -58,7 +59,7 @@ public class ParticipantProposal
 	
 	
 	/**
-	 *	Set the participants component identifier.
+	 *	Set the participants agent identifier.
 	 */
 	public void	setParticipant(IComponentIdentifier participant)
 	{

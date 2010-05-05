@@ -1,0 +1,41 @@
+<!--
+	<H3>The contract net application</H3>
+
+	It can be started to launch a contract net scenario.
+-->
+
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
+	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
+	                    http://jadex.sourceforge.net/jadex-envspace 
+	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
+	name="ContractNet" package="jadex.bpmn.examples.contractnet" autoshutdown="true">
+	
+	<imports>
+		<import>jadex.commons.*</import>
+	</imports>
+	
+	<componenttypes>
+		<!-- Todo: preselect config already here? -->
+		<componenttype name="Initiator" filename="jadex/bpmn/examples/contractnet/ContractNet.bpmn"/>
+		<componenttype name="Participant" filename="jadex/bpmn/examples/contractnet/ContractNet.bpmn"/>
+	</componenttypes>
+	
+	<applications>
+		<application name="One Initiator and Three Participants">
+			<components>
+				<component type="Participant" name="Participant_1" configuration="Participant"/>
+				<component type="Participant" name="Participant_2" configuration="Participant"/>
+				<component type="Participant" name="Participant_3" configuration="Participant"/>
+				<component type="Initiator" name="Initiatior" configuration="Initiator">
+					<arguments>
+						<argument name="participants">new String[]{"Participant_1", "Participant_2", "Participant_3"}</argument>
+					</arguments>
+				</component>
+			</components>
+		</application>
+	</applications>
+
+</applicationtype>

@@ -28,6 +28,7 @@ public class DefaultStepHandler implements IStepHandler
 		thread.updateParametersAfterStep(activity, instance);
 		
 		MNamedIdElement	next	= null;
+		ThreadContext	remove	= null;	// Context that needs to be removed (if any).
 		Exception ex = thread.getException();
 		
 		// Store event (if any).
@@ -37,38 +38,38 @@ public class DefaultStepHandler implements IStepHandler
 //			System.out.println("Event: "+activity+" "+thread+" "+event);
 		}
 		
-		// Find next element and context(s) to be removed.
-		boolean	outside	= false;
-		ThreadContext	remove	= null;	// Context that needs to be removed (if any).
-		ThreadContext	context	= thread.getThreadContext();
-		while(next==null && !outside)
+		// Timer occurred flow
+		if(event==null && ex==null && activity instanceof MSubProcess)
 		{
-			// Normal flow
-			if(ex==null)
+			// Cancel subflows.
+			remove = thread.getThreadContext();
+			
+			// Continue with timer edge.
+			List	handlers	= activity.getEventHandlers();
+			for(int i=0; handlers!=null && next==null && i<handlers.size(); i++)
 			{
-				// Timer occurred flow
-				if(event==null && activity instanceof MSubProcess)
+				MActivity handler	= (MActivity) handlers.get(i);
+				if(handler.getActivityType().equals("EventIntermediateTimer"))
 				{
-					// Cancel subflows.
-					remove = thread.getThreadContext();
-					
-					// Continue with timer edge.
-					List	handlers	= activity.getEventHandlers();
-					for(int i=0; handlers!=null && next==null && i<handlers.size(); i++)
+					List outedges = handler.getOutgoingSequenceEdges();
+					if(outedges==null || outedges.size()!=1)
 					{
-						MActivity handler	= (MActivity) handlers.get(i);
-						if(handler.getActivityType().equals("EventIntermediateTimer"))
-						{
-							List outedges = handler.getOutgoingSequenceEdges();
-							if(outedges==null || outedges.size()!=1)
-							{
-								throw new RuntimeException("Cannot determine outgoing edge: "+handler);
-							}
-							next = (MSequenceEdge)outedges.get(0);
-						}
-					}	
+						throw new RuntimeException("Cannot determine outgoing edge: "+handler);
+					}
+					next = (MSequenceEdge)outedges.get(0);
 				}
-				else
+			}	
+		}
+		
+		// Find next element and context(s) to be removed.
+		else
+		{
+			boolean	outside	= false;
+			ThreadContext	context	= thread.getThreadContext();
+			while(next==null && !outside)
+			{
+				// Normal flow
+				if(ex==null)
 				{
 					List	outgoing	= activity.getOutgoingSequenceEdges();
 					if(outgoing!=null && outgoing.size()==1)
@@ -81,39 +82,39 @@ public class DefaultStepHandler implements IStepHandler
 					}
 					// else no outgoing edge -> check parent context, if any.
 				}
-			}
-		
-			// Exception flow.
-			else
-			{
-				List	handlers	= activity.getEventHandlers();
-				for(int i=0; handlers!=null && next==null && i<handlers.size(); i++)
+			
+				// Exception flow.
+				else
 				{
-					MActivity	handler	= (MActivity) handlers.get(i);
-					if(handler.getActivityType().equals("EventIntermediateError"))
+					List	handlers	= activity.getEventHandlers();
+					for(int i=0; handlers!=null && next==null && i<handlers.size(); i++)
 					{
-						// Todo: match exception types.
-//						Class	clazz	= handler.getName()!=null ? SReflect.findClass0(clname, imports, classloader);
-						next	= handler;
+						MActivity	handler	= (MActivity) handlers.get(i);
+						if(handler.getActivityType().equals("EventIntermediateError"))
+						{
+							// Todo: match exception types.
+	//						Class	clazz	= handler.getName()!=null ? SReflect.findClass0(clname, imports, classloader);
+							next	= handler;
+						}
 					}
 				}
-			}
 			
-			outside	= context.getParent()==null;
-			if(next==null && !outside)
-			{
-				// When last thread or exception, mark current context for removal.
-				if(context.getThreads().size()==1 || ex!=null)
+				outside	= context.getParent()==null;
+				if(next==null && !outside)
 				{
-					activity	= (MActivity)context.getModelElement();
-					remove	= context;
-					context	= context.getParent();
-				}
-				
-				// If more threads are available in current context just exit loop.
-				else if(context.getThreads().size()>1)
-				{
-					outside	= true;
+					// When last thread or exception, mark current context for removal.
+					if(context.getThreads().size()==1 || ex!=null)
+					{
+						activity	= (MActivity)context.getModelElement();
+						remove	= context;
+						context	= context.getParent();
+					}
+					
+					// If more threads are available in current context just exit loop.
+					else if(context.getThreads().size()>1)
+					{
+						outside	= true;
+					}
 				}
 			}
 		}

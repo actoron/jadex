@@ -8,11 +8,12 @@ import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
 import jadex.bridge.CreationInfo;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -50,12 +51,33 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 		{
 //			thread.setWaitingState(ProcessThread.WAITING_FOR_SUBPROCESS);
 //			thread.setWaiting(true);
+			
 			ThreadContext subcontext = new ThreadContext(proc, thread);
 			thread.getThreadContext().addSubcontext(subcontext);
-			for(int i=0; i<start.size(); i++)
+			
+			if(thread.hasPropertyValue("parallel"))
 			{
-				ProcessThread subthread = new ProcessThread((MActivity)start.get(i), subcontext, instance);
-				subcontext.addThread(subthread);
+				// Todo: use subcontext?
+				Iterator	it	= SReflect.getIterator(thread.getPropertyValue("parallel"));
+				String	param	= (String)thread.getPropertyValue("parameter");
+				while(it.hasNext())
+				{
+					Object	value	= it.next();
+					for(int i=0; i<start.size(); i++)
+					{
+						ProcessThread subthread = new ProcessThread((MActivity)start.get(i), subcontext, instance);
+						subthread.setParameterValue(param, value);	// Hack!!! parameter not declared?
+						subcontext.addThread(subthread);
+					}
+				}
+			}
+			else
+			{
+				for(int i=0; i<start.size(); i++)
+				{
+					ProcessThread subthread = new ProcessThread((MActivity)start.get(i), subcontext, instance);
+					subcontext.addThread(subthread);
+				}
 			}
 			
 			if(timerhandler!=null)
