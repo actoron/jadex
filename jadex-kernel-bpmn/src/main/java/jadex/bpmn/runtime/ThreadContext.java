@@ -196,6 +196,16 @@ public class ThreadContext
 	}
 	
 	/**
+	 *  Get the subcontext of a thread.
+	 *  @param thread The thread which owns the subcontext.
+	 *  @return	The subcontext (if any).
+	 */
+	public ThreadContext getSubcontext(ProcessThread thread)
+	{
+		return (ThreadContext)threads.get(thread);
+	}
+	
+	/**
 	 *  The context is finished, when there are no (more) threads to execute.
 	 *  @param pool	The pool to be executed or null for any.
 	 *  @param lane	The lane to be executed or null for any. Nested lanes may be addressed by dot-notation, e.g. 'OuterLane.InnerLane'.

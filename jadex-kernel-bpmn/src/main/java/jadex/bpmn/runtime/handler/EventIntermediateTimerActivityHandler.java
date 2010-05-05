@@ -30,7 +30,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 		{
 			public void run()
 			{
-				instance.notify(activity, thread, null);
+				instance.notify(activity, thread, TIMER_EVENT);
 			}
 		};
 		

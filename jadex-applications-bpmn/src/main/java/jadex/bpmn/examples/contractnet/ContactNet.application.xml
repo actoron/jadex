@@ -32,6 +32,7 @@
 				<component type="Initiator" name="Initiatior" configuration="Initiator">
 					<arguments>
 						<argument name="participants">new String[]{"Participant_1", "Participant_2", "Participant_3"}</argument>
+						<argument name="cfp">"Hello?"</argument>
 					</arguments>
 				</component>
 			</components>

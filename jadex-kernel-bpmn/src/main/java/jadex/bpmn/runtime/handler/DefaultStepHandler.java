@@ -1,15 +1,14 @@
 package jadex.bpmn.runtime.handler;
 
-import java.util.List;
-
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MNamedIdElement;
 import jadex.bpmn.model.MSequenceEdge;
-import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IStepHandler;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.ThreadContext;
+
+import java.util.List;
 
 /**
  *  Handles the transition of steps.
@@ -24,6 +23,8 @@ public class DefaultStepHandler implements IStepHandler
 	 */
 	public void step(MActivity activity, BpmnInterpreter instance, ProcessThread thread, Object event)
 	{
+//		System.out.println(instance.getComponentIdentifier().getLocalName()+": step "+activity+", data "+thread.getData());
+		
 		// Hack!!! Should be in interpreter/thread?
 		thread.updateParametersAfterStep(activity, instance);
 		
@@ -39,26 +40,18 @@ public class DefaultStepHandler implements IStepHandler
 		}
 		
 		// Timer occurred flow
-		if(event==null && ex==null && activity instanceof MSubProcess)
+		if(AbstractEventIntermediateTimerActivityHandler.TIMER_EVENT.equals(event))
 		{
 			// Cancel subflows.
-			remove = thread.getThreadContext();
+			remove = thread.getThreadContext().getSubcontext(thread);
 			
 			// Continue with timer edge.
-			List	handlers	= activity.getEventHandlers();
-			for(int i=0; handlers!=null && next==null && i<handlers.size(); i++)
+			List outedges = activity.getOutgoingSequenceEdges();
+			if(outedges==null || outedges.size()!=1)
 			{
-				MActivity handler	= (MActivity) handlers.get(i);
-				if(handler.getActivityType().equals("EventIntermediateTimer"))
-				{
-					List outedges = handler.getOutgoingSequenceEdges();
-					if(outedges==null || outedges.size()!=1)
-					{
-						throw new RuntimeException("Cannot determine outgoing edge: "+handler);
-					}
-					next = (MSequenceEdge)outedges.get(0);
-				}
-			}	
+				throw new RuntimeException("Cannot determine outgoing edge: "+activity);
+			}
+			next = (MSequenceEdge)outedges.get(0);
 		}
 		
 		// Find next element and context(s) to be removed.

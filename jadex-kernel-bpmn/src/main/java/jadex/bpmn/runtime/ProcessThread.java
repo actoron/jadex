@@ -412,7 +412,14 @@ public class ProcessThread	implements ITaskContext
 		Object ret	= activity.getPropertyValue(name);
 		if(ret instanceof IParsedExpression)
 		{
-			ret = ((IParsedExpression)ret).getValue(new ProcessThreadValueFetcher(this, true, instance.getValueFetcher()));
+			try
+			{
+				ret = ((IParsedExpression)ret).getValue(new ProcessThreadValueFetcher(this, true, instance.getValueFetcher()));
+			}
+			catch(RuntimeException e)
+			{
+				throw new RuntimeException("Error parsing property: "+instance+", "+this+", "+name+", "+ret, e);
+			}
 		}
 		return ret;
 	}
@@ -550,8 +557,24 @@ public class ProcessThread	implements ITaskContext
 						String	name	= (String)it.next();
 						IParsedExpression exp = (IParsedExpression)((Object[])mappings.get(name))[0];
 						IParsedExpression iexp = (IParsedExpression)((Object[])mappings.get(name))[1];
-						Object value = exp.getValue(fetcher);
-						Object index	= iexp!=null ? iexp.getValue(fetcher) : null;
+						Object value;
+						Object index;
+						try
+						{
+							value	= exp.getValue(fetcher);
+						}
+						catch(RuntimeException e)
+						{
+							throw new RuntimeException("Error parsing parameter value: "+instance+", "+this+", "+name+", "+exp, e);
+						}
+						try
+						{
+							index	= iexp!=null ? iexp.getValue(fetcher) : null;
+						}
+						catch(RuntimeException e)
+						{
+							throw new RuntimeException("Error parsing parameter index: "+instance+", "+this+", "+name+", "+iexp, e);
+						}
 												
 						if(getActivity().hasParameter(name))
 						{
@@ -634,8 +657,15 @@ public class ProcessThread	implements ITaskContext
 					}
 					else
 					{
-						setParameterValue(param.getName(), param.getInitialValue()==null? null: param.getInitialValue().getValue(fetcher));
-						before.remove(param.getName());
+						try
+						{
+							setParameterValue(param.getName(), param.getInitialValue()==null? null: param.getInitialValue().getValue(fetcher));
+							before.remove(param.getName());
+						}
+						catch(RuntimeException e)
+						{
+							throw new RuntimeException("Error parsing parameter value: "+instance+", "+this+", "+param.getName()+", "+param.getInitialValue(), e);
+						}
 					}
 				}
 			}

@@ -122,6 +122,10 @@ public class UserInteractionTask implements ITask
 												{
 													context.setParameterValue(param.getName(), text);
 												}
+												else
+												{
+													ex.printStackTrace();
+												}
 											}
 						            	}
 									}

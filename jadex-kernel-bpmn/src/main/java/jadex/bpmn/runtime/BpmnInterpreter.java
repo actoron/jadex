@@ -270,7 +270,14 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			IParsedExpression	exp	= model.getContextVariableExpression(name);
 			if(exp!=null)
 			{
-				value	= exp.getValue(this.fetcher);
+				try
+				{
+					value	= exp.getValue(this.fetcher);
+				}
+				catch(RuntimeException e)
+				{
+					throw new RuntimeException("Error parsing context variable: "+this+", "+name+", "+exp, e);
+				}
 			}
 			variables.put(name, value);
 		}
@@ -879,9 +886,10 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	/**
 	 *  Test if the notification is relevant for the current thread.
 	 *  The normal test is if thread.getActivity().equals(activity).
-	 *  This method must handle the additional case that the current
-	 *  activity of the thread is a multiple event activity. In this case
-	 *  the notification could be for one of the child events. 
+	 *  This method must handle the additional cases that the current
+	 *  activity of the thread is a multiple event activity or
+	 *  when the activity is a subprocess with an attached timer event.
+	 *  In this case the notification could be for one of the child/attached events. 
 	 */
 	protected boolean isCurrentActivity(final MActivity activity, final ProcessThread thread)
 	{
@@ -893,6 +901,15 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			{
 				MSequenceEdge edge = (MSequenceEdge)outedges.get(i);
 				ret = edge.getTarget().equals(activity);
+			}
+		}
+		if(!ret && MBpmnModel.SUBPROCESS.equals(thread.getActivity().getActivityType()))
+		{
+			List handlers = thread.getActivity().getEventHandlers();
+			for(int i=0; !ret && handlers!=null && i<handlers.size(); i++)
+			{
+				MActivity	handler	= (MActivity)handlers.get(i);
+				ret	= activity.equals(handler) && handler.getActivityType().equals("EventIntermediateTimer");
 			}
 		}
 		return ret;

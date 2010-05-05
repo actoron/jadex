@@ -64,7 +64,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_OwKhBUZFEd-3iKqz0F2Flw"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_OwKhBkZFEd-3iKqz0F2Flw" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="C5_ResultUsage.bpmn#_OwKhAUZFEd-3iKqz0F2Flw"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_OwKhB0ZFEd-3iKqz0F2Flw" x="338" y="81"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_OwKhB0ZFEd-3iKqz0F2Flw" x="327" y="81"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_Q3uqckZFEd-3iKqz0F2Flw" type="2001">
         <children xmi:type="notation:Node" xmi:id="_Q3uqeEZFEd-3iKqz0F2Flw" type="4001"/>

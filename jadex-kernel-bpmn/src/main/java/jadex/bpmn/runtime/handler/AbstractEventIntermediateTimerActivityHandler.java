@@ -11,6 +11,8 @@ import jadex.bpmn.runtime.ProcessThread;
 public abstract class AbstractEventIntermediateTimerActivityHandler	extends DefaultActivityHandler
 {
 	public static final int TICK_TIMER = -2;
+
+	public static final String	TIMER_EVENT	= "timer-event";
 	
 	/**
 	 *  Execute an activity.

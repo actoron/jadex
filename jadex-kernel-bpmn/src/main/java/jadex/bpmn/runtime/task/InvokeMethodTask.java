@@ -4,6 +4,7 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,9 +55,17 @@ public class InvokeMethodTask extends AbstractTask
 				context.setParameterValue(returnname, ret);
 			}
 		}
+		catch(InvocationTargetException e)
+		{
+			throw e.getTargetException() instanceof RuntimeException ? (RuntimeException)e.getTargetException() : new RuntimeException(e.getTargetException());
+		}
+		catch(RuntimeException e)
+		{
+			throw e;
+		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 	

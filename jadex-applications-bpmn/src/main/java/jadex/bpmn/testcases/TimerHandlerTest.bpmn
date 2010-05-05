@@ -24,7 +24,7 @@
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6AGQwFduEd-gpfWhYqU7MQ" key="parameters" value="inout␋name␋String␋&quot;success&quot;␟inout␋value␋boolean␋false"/>
         </eAnnotations>
       </vertices>
-      <vertices xmi:type="bpmn:Activity" xmi:id="_DPUEQVdtEd-gpfWhYqU7MQ" iD="_DPUEQFdtEd-gpfWhYqU7MQ" outgoingEdges="_IMtLUVdtEd-gpfWhYqU7MQ" incomingEdges="_DPd1SFdtEd-gpfWhYqU7MQ" name="Wait for  2 secs" activityType="EventIntermediateTimer">
+      <vertices xmi:type="bpmn:Activity" xmi:id="_DPUEQVdtEd-gpfWhYqU7MQ" iD="_DPUEQFdtEd-gpfWhYqU7MQ" outgoingEdges="_IMtLUVdtEd-gpfWhYqU7MQ" incomingEdges="_DPd1SFdtEd-gpfWhYqU7MQ" name="Wait for 2 secs" activityType="EventIntermediateTimer">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_EZYDoFdtEd-gpfWhYqU7MQ" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EZYDoVdtEd-gpfWhYqU7MQ" key="timer" value=""/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EZYDoldtEd-gpfWhYqU7MQ" key="duration" value="2000"/>
@@ -38,7 +38,7 @@
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aeVTIlduEd-gpfWhYqU7MQ" key="condition" value=""/>
         </eAnnotations>
       </sequenceEdges>
-      <eventHandlers xmi:type="bpmn:Activity" xmi:id="_JsEsUVdtEd-gpfWhYqU7MQ" iD="_JsEsUFdtEd-gpfWhYqU7MQ" outgoingEdges="_VdDxoVduEd-gpfWhYqU7MQ" name="Canel after 1 sec" activityType="EventIntermediateTimer">
+      <eventHandlers xmi:type="bpmn:Activity" xmi:id="_JsEsUVdtEd-gpfWhYqU7MQ" iD="_JsEsUFdtEd-gpfWhYqU7MQ" outgoingEdges="_VdDxoVduEd-gpfWhYqU7MQ" name="Cancel after 1 sec" activityType="EventIntermediateTimer">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_JtQ_IFdtEd-gpfWhYqU7MQ" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_JtQ_IVdtEd-gpfWhYqU7MQ" key="timer" value=""/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_JtQ_IldtEd-gpfWhYqU7MQ" key="duration" value="1000"/>

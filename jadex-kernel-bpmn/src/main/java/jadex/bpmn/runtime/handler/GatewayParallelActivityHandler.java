@@ -13,6 +13,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 
 /**
@@ -69,6 +70,20 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 			
 			if(edges.isEmpty())
 			{
+				Set	ignore	= null;
+				if(thread.hasPropertyValue("ignore"))
+				{
+					ignore	= new HashSet();
+					String	ignores	= (String)thread.getPropertyValue("ignore");
+					StringTokenizer	stok	= new StringTokenizer(ignores, ", \t\r\n");
+					while(stok.hasMoreTokens())
+					{
+						String	ign	= stok.nextToken();
+						ignore.add(ign);
+						thread.removeParameterValue(ign);
+					}
+				}
+				
 				thread.setLastEdge((MSequenceEdge) outgoing.get(0));
 				for(Iterator it=threads.iterator(); it.hasNext(); )
 				{
@@ -80,21 +95,24 @@ public class GatewayParallelActivityHandler implements IActivityHandler
 						for(Iterator keys=data.keySet().iterator(); keys.hasNext(); )
 						{
 							String key = (String)keys.next();
-							Object value = data.get(key);
-							
-							if(thread.hasParameterValue(key))
+							if(ignore==null || !ignore.contains(key))
 							{
-								Object origval =thread.getParameterValue(key);
-								if(!SUtil.equals(origval, value))
+								Object value = data.get(key);
+								
+								if(thread.hasParameterValue(key))
 								{
-	//								System.out.println("origact: "+thread.getModelElement());
-	//								System.out.println("act: "+pt.getModelElement());
-									throw new RuntimeException("Inconsistent parameter values from threads cannot be unified in AND join: "+key+" "+value+" "+origval);
+									Object origval =thread.getParameterValue(key);
+									if(!SUtil.equals(origval, value))
+									{
+		//								System.out.println("origact: "+thread.getModelElement());
+		//								System.out.println("act: "+pt.getModelElement());
+										throw new RuntimeException("Inconsistent parameter values from threads cannot be unified in AND join: "+key+" "+value+" "+origval);
+									}
 								}
-							}
-							else 
-							{
-								thread.setParameterValue(key, value);
+								else
+								{
+									thread.setParameterValue(key, value);
+								}
 							}
 						}
 					}

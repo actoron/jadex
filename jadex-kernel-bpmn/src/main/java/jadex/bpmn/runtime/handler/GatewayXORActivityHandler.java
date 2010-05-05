@@ -42,7 +42,7 @@ public class GatewayXORActivityHandler implements IActivityHandler
 				{
 					if(edge.isDefault())
 						throw new RuntimeException("Default edge must not have a condition: "+activity+", "+instance+", "+thread+", "+exp);
-					if(isValid(exp, fetcher))
+					if(isValid(thread, exp, fetcher))
 					{
 						thread.setLastEdge(edge);
 						def = null;
@@ -88,7 +88,7 @@ public class GatewayXORActivityHandler implements IActivityHandler
 	/**
 	 *  Safely evaluate a branch expression.
 	 */
-	protected boolean isValid(IParsedExpression exp, IValueFetcher fetcher)
+	protected boolean isValid(ProcessThread thread, IParsedExpression exp, IValueFetcher fetcher)
 	{
 		boolean ret = false;
 		try
@@ -97,8 +97,8 @@ public class GatewayXORActivityHandler implements IActivityHandler
 		}
 		catch(Exception e)
 		{
-			System.out.println("Error in branch condition: "+exp);
-			e.printStackTrace();
+			thread.getInstance().getLogger().warning("Error in branch condition: "+thread+", "+exp+", "+e);
+//			e.printStackTrace();
 		}
 		return ret;
 	}

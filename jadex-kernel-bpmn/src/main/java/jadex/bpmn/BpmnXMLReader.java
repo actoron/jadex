@@ -467,7 +467,6 @@ public class BpmnXMLReader
 							}
 							catch(ClassNotFoundException cnfe)
 							{
-								cnfe.printStackTrace();
 								throw new RuntimeException(cnfe);
 							}
 						}
@@ -944,9 +943,17 @@ public class BpmnXMLReader
 					{
 						String propname = prop.substring(0, idx).trim();
 						String proptext = prop.substring(idx+1).trim();
-						Object propval = parser.parseExpression(proptext, dia.getAllImports(), 
-							null, context.getClassLoader()).getValue(null);
-						namedelem.setPropertyValue(propname, propval);
+						try
+						{
+							Object propval = parser.parseExpression(proptext, dia.getAllImports(), 
+								null, context.getClassLoader()).getValue(null);
+							namedelem.setPropertyValue(propname, propval);
+						}
+						catch(RuntimeException e)
+						{
+							throw new RuntimeException("Error parsing property: "+dia+", "+propname+", "+proptext, e);
+						}
+							
 					}
 					else
 					{
@@ -1014,19 +1021,31 @@ public class BpmnXMLReader
 					{
 						String argstr = prop.substring(prop.indexOf("argument")+8).trim();
 						
-						IArgument arg = (IArgument)parser.parseExpression(argstr, model.getAllImports(), null, 
-							context.getClassLoader()).getValue(null);
-						
-						model.addArgument(arg);
+						try
+						{
+							IArgument arg = (IArgument)parser.parseExpression(argstr, model.getAllImports(), null, 
+								context.getClassLoader()).getValue(null);							
+							model.addArgument(arg);
+						}
+						catch(RuntimeException e)
+						{
+							throw new RuntimeException("Error parsing argument: "+model+", "+argstr, e);
+						}
 					}
 					else if(prop.startsWith("result"))
 					{
 						String resstr = prop.substring(prop.indexOf("result")+6).trim();
 						
-						IArgument res = (IArgument)parser.parseExpression(resstr, model.getAllImports(), null, 
-							context.getClassLoader()).getValue(null);
-						
-						model.addResult(res);
+						try
+						{
+							IArgument res = (IArgument)parser.parseExpression(resstr, model.getAllImports(), null, 
+								context.getClassLoader()).getValue(null);
+							model.addResult(res);
+						}
+						catch(RuntimeException e)
+						{
+							throw new RuntimeException("Error parsing result: "+model+", "+resstr, e);
+						}
 					}
 					else
 					{
@@ -1138,7 +1157,16 @@ public class BpmnXMLReader
 									
 									Object val = null;
 									if(valtext!=null)
-										val = parser.parseExpression(valtext, model.getAllImports(), null, context.getClassLoader()).getValue(null);
+									{
+										try
+										{
+											val = parser.parseExpression(valtext, model.getAllImports(), null, context.getClassLoader()).getValue(null);
+										}
+										catch(RuntimeException e)
+										{
+											throw new RuntimeException("Error parsing argument: "+model+", "+name+", "+valtext, e);
+										}
+									}
 									IArgument arg = new Argument(name, desc, typename, val);
 									
 									model.addArgument(arg);
@@ -1159,7 +1187,16 @@ public class BpmnXMLReader
 									
 									Object val = null;
 									if(valtext!=null)
-										val = parser.parseExpression(valtext, model.getAllImports(), null, context.getClassLoader()).getValue(null);
+									{
+										try
+										{
+											val = parser.parseExpression(valtext, model.getAllImports(), null, context.getClassLoader()).getValue(null);
+										}
+										catch(RuntimeException e)
+										{
+											throw new RuntimeException("Error parsing result: "+model+", "+name+", "+valtext, e);
+										}
+									}											
 									IArgument res = new Argument(name, desc, typename, val);
 									
 									model.addResult(res);

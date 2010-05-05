@@ -133,7 +133,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	protected void receiveMessage(final MActivity activity, BpmnInterpreter instance, final ProcessThread thread)
+	protected void receiveMessage(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
 		thread.setWaiting(true);
 //		thread.setWaitInfo(type);
@@ -159,7 +159,7 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 						}
 						catch(RuntimeException e)
 						{
-							e.printStackTrace();
+							instance.getLogger().warning("Error during message matching: "+instance+", "+thread+", "+obj+", "+e);
 							ret	= false;
 						}
 					}

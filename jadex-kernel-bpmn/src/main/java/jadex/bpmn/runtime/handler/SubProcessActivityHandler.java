@@ -4,13 +4,14 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.runtime.IActivityHandler;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bpmn.runtime.ThreadContext;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
+import jadex.javaparser.IValueFetcher;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,49 +31,52 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 	 */
 	public void execute(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
+//		System.out.println(instance.getComponentIdentifier().getLocalName()+": sub "+activity);
+
 		MSubProcess	proc	= (MSubProcess) activity;
 		List start = proc.getStartActivities();
 		String	file	= (String)thread.getPropertyValue("file");
 		
-		IActivityHandler timerhandler = null;
-		List handlers = activity.getEventHandlers();
-		for(int i=0; handlers!=null && i<handlers.size(); i++)
-		{
-			MActivity	handler	= (MActivity)handlers.get(i);
-			if(handler.getActivityType().equals("EventIntermediateTimer"))
-			{
-				final IActivityHandler th = instance.getActivityHandler(handler);
-				break; // todo: support more than one timer?
-			}
-		}
-		
+	
 		// Internal subprocess.
+		// Todo: cancel timer on normal/exception exit
 		if(start!=null && file==null)
 		{
 //			thread.setWaitingState(ProcessThread.WAITING_FOR_SUBPROCESS);
 //			thread.setWaiting(true);
 			
-			ThreadContext subcontext = new ThreadContext(proc, thread);
-			thread.getThreadContext().addSubcontext(subcontext);
+			boolean	wait	= true;
 			
 			if(thread.hasPropertyValue("parallel"))
 			{
 				// Todo: use subcontext?
 				Iterator	it	= SReflect.getIterator(thread.getPropertyValue("parallel"));
 				String	param	= (String)thread.getPropertyValue("parameter");
-				while(it.hasNext())
+				// If empty parallel activity (i.e. no items at all) continue process.
+				if(!it.hasNext())
 				{
-					Object	value	= it.next();
-					for(int i=0; i<start.size(); i++)
+					wait	= false;
+				}
+				else
+				{
+					ThreadContext subcontext = new ThreadContext(proc, thread);
+					thread.getThreadContext().addSubcontext(subcontext);
+					while(it.hasNext())
 					{
-						ProcessThread subthread = new ProcessThread((MActivity)start.get(i), subcontext, instance);
-						subthread.setParameterValue(param, value);	// Hack!!! parameter not declared?
-						subcontext.addThread(subthread);
+						Object	value	= it.next();
+						for(int i=0; i<start.size(); i++)
+						{
+							ProcessThread subthread = new ProcessThread((MActivity)start.get(i), subcontext, instance);
+							subthread.setParameterValue(param, value);	// Hack!!! parameter not declared?
+							subcontext.addThread(subthread);
+						}
 					}
 				}
 			}
 			else
 			{
+				ThreadContext subcontext = new ThreadContext(proc, thread);
+				thread.getThreadContext().addSubcontext(subcontext);
 				for(int i=0; i<start.size(); i++)
 				{
 					ProcessThread subthread = new ProcessThread((MActivity)start.get(i), subcontext, instance);
@@ -80,13 +84,34 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				}
 			}
 			
-			if(timerhandler!=null)
+			if(wait)
 			{
-				timerhandler.execute(activity, instance, thread);
+				// todo: support more than one timer?
+				MActivity	timer	= null;
+				List handlers = activity.getEventHandlers();
+				for(int i=0; timer==null && handlers!=null && i<handlers.size(); i++)
+				{
+					MActivity	handler	= (MActivity)handlers.get(i);
+					if(handler.getActivityType().equals("EventIntermediateTimer"))
+					{
+						timer	= handler;
+					}
+				}
+				
+				if(timer!=null)
+				{
+					instance.getActivityHandler(timer)
+						.execute(timer, instance, thread);
+				}
+				else
+				{
+					thread.setWaiting(true);
+				}
 			}
 			else
 			{
-				thread.setWaiting(true);
+				thread.setNonWaiting();
+				instance.getStepHandler(activity).step(activity, instance, thread, null);				
 			}
 		}
 		
@@ -109,7 +134,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			IComponentManagementService cms = (IComponentManagementService)instance.getComponentAdapter()
 				.getServiceContainer().getService(IComponentManagementService.class);
 			
-//			thread.setWaiting(true);
+			thread.setWaiting(true);
 			cms.createComponent(null, file,
 				new CreationInfo(null, args, instance.getComponentIdentifier(), false, false, false, instance.getModelElement().getAllImports()), 
 			new IResultListener()
@@ -133,13 +158,30 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						{
 							// Store results in out parameters.
 							Map	results	= (Map)result;
+							thread.setParameterValue("$results", results);	// Hack???
+							
 							List	params	= activity.getParameters(new String[]{MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT});
 							if(params!=null && !params.isEmpty())
 							{
+								IValueFetcher fetcher	=null;
+
 								for(int i=0; i<params.size(); i++)
 								{
 									MParameter	param	= (MParameter)params.get(i);
-									if(results.containsKey(param.getName()))
+									if(param.getInitialValue()!=null)
+									{
+										if(fetcher==null)
+											fetcher	= new ProcessThreadValueFetcher(thread, false, instance.getValueFetcher());
+										try
+										{
+											thread.setParameterValue(param.getName(), param.getInitialValue().getValue(fetcher));
+										}
+										catch(RuntimeException e)
+										{
+											throw new RuntimeException("Error evaluating parameter value: "+instance+", "+activity+", "+param.getName()+", "+param.getInitialValue(), e);
+										}
+									}
+									else if(results.containsKey(param.getName()))
 									{
 										thread.setParameterValue(param.getName(), results.get(param.getName()));
 									}

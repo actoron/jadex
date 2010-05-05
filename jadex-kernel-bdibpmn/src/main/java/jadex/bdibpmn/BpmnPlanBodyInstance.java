@@ -54,6 +54,7 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.runtime.handler.AbstractEventIntermediateTimerActivityHandler;
 import jadex.bridge.IComponentIdentifier;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
@@ -240,7 +241,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 				{
 					it.remove();
 					assert thread.isWaiting();
-					BpmnPlanBodyInstance.this.notify(thread.getActivity(), thread, null);
+					BpmnPlanBodyInstance.this.notify(thread.getActivity(), thread, AbstractEventIntermediateTimerActivityHandler.TIMER_EVENT);
 				}
 			}
 		}
