@@ -25,9 +25,11 @@ import org.eclipse.swt.widgets.TreeItem;
 public abstract class EmulatedNativeCheckBoxLabelProvider extends
 		OwnerDrawLabelProvider
 {
+	
+	
 	private static final String CHECKED_KEY = "CHECKED";
 	private static final String UNCHECK_KEY = "UNCHECKED";
-
+	
 	public EmulatedNativeCheckBoxLabelProvider(ColumnViewer viewer)
 	{
 		if (JFaceResources.getImageRegistry().getDescriptor(CHECKED_KEY) == null)
@@ -43,7 +45,8 @@ public abstract class EmulatedNativeCheckBoxLabelProvider extends
 	{
 		// Hopefully no platform uses exactly this color because we'll make
 		// it transparent in the image.
-		Color greenScreen = new Color(control.getDisplay(), 222, 223, 224);
+		//Color greenScreen = new Color(control.getDisplay(), 222, 223, 224);
+		Color greenScreen = new Color(control.getDisplay(), 111, 112, 113);
 
 		Shell shell = new Shell(control.getShell(), SWT.NO_TRIM);
 
@@ -62,9 +65,12 @@ public abstract class EmulatedNativeCheckBoxLabelProvider extends
 			button2.setLocation(100, 100);
 		}
 
+		
+		
 		Button button = new Button(shell, SWT.CHECK);
 		button.setBackground(greenScreen);
 		button.setSelection(type);
+
 
 		// otherwise an image is located in a corner
 		button.setLocation(1, 1);

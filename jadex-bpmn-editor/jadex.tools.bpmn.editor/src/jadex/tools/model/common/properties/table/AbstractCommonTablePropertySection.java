@@ -4,6 +4,7 @@
 package jadex.tools.model.common.properties.table;
 
 import jadex.tools.bpmn.editor.JadexBpmnEditor;
+import jadex.tools.eclipse.ui.CheckboxImages;
 import jadex.tools.model.common.properties.AbstractCommonPropertySection;
 import jadex.tools.model.common.properties.ModifyEObjectCommand;
 import jadex.tools.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
@@ -13,6 +14,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.FigureUtilities;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
@@ -42,6 +44,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -293,7 +296,9 @@ public abstract class AbstractCommonTablePropertySection extends
 //					e.printStackTrace();
 //				}
 		
-		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(viewer,new FocusCellOwnerDrawHighlighter(viewer));
+		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(
+				viewer,
+				new FocusCellOwnerDrawHighlighter(viewer));
 
 		ColumnViewerEditorActivationStrategy editorActivationSupport = new ColumnViewerEditorActivationStrategy(
 				viewer)
@@ -472,6 +477,11 @@ public abstract class AbstractCommonTablePropertySection extends
 		 */
 		private int columIndex;
 		
+		/**
+		 * The image provider for checkboxes
+		 */
+		protected CheckboxImages checkboxImageProvider;
+		
 		// ---- constructors ----
 		
 		/**
@@ -491,6 +501,7 @@ public abstract class AbstractCommonTablePropertySection extends
 			super();
 			assert columIndex >= 0 : "column index < 0";
 			this.columIndex = columIndex;
+			this.checkboxImageProvider = new CheckboxImages(JFaceResources.getImageRegistry(), PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
 		}
 		
 		// ---- ColumnLabelProvider overrides ----

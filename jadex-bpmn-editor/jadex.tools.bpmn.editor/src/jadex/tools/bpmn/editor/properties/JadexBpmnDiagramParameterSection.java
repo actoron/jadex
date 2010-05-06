@@ -3,13 +3,14 @@
  */
 package jadex.tools.bpmn.editor.properties;
 
-import jadex.tools.eclipse.ui.EmulatedNativeCheckBoxLabelProvider;
 import jadex.tools.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
 
+import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TableColumn;
 
 
@@ -52,10 +53,14 @@ public class JadexBpmnDiagramParameterSection extends
 		
 		TableViewerColumn column1 = new TableViewerColumn(viewer, SWT.CENTER);
 		column1.getColumn().setText(COLUMN_NAMES[1]);
-		
-		CheckboxCellEditor editor = new CheckboxCellEditor(((TableViewer) viewer)
+
+		CellEditor editor1;
+		editor1 = new CheckboxCellEditor(((TableViewer) viewer)
 				.getTable(), SWT.ARROW );
-		column1.setEditingSupport(new BpmnMultiColumnTableEditingSupport(viewer, 1, editor)
+//		editor1 = new SelectableCheckboxCellEditor(
+//				(TableViewer) viewer, 1);
+		
+		column1.setEditingSupport(new BpmnMultiColumnTableEditingSupport(viewer, 1, editor1)
 		{
 			protected Object getValue(Object element)
 			{
@@ -68,43 +73,50 @@ public class JadexBpmnDiagramParameterSection extends
 				super.doSetValue(element, ((Boolean) value).toString());
 			}
 		});
-		column1.setLabelProvider(new EmulatedNativeCheckBoxLabelProvider(viewer)
-		{
-			@Override
-			protected boolean isChecked(Object element)
-			{
-				return Boolean.valueOf(((MultiColumnTableRow) element)
-						.getColumnValueAt(1));
-			}
-		});
 		
-//		column1.setLabelProvider(new MultiColumnTableLabelProvider(1){
-//
+		// This version doesn't work properly 
+		// (blue background after toggle)
+//		column1.setLabelProvider(new EmulatedNativeCheckBoxLabelProvider(viewer)
+//		{
 //			@Override
-//			public Image getColumnImage(Object element, int columnIndex)
+//			protected boolean isChecked(Object element)
 //			{
-//				if(Boolean.valueOf(((MultiColumnTableRow) element)
-//						.getColumnValueAt(1)))
-//				{
-//					return CHECKED;
-//				}
-//				return UNCHECKED;
-//			}
-//			
-//			@Override
-//			public String getColumnText(Object element, int columnIndex)
-//			{
-//				return null;
+//				return Boolean.valueOf(((MultiColumnTableRow) element)
+//						.getColumnValueAt(1));
 //			}
 //		});
 		
+		column1.setLabelProvider(new MultiColumnTableLabelProvider(1)
+		{
+			@Override
+			public Image getColumnImage(Object element, int columnIndex)
+			{
+				if (Boolean.valueOf(((MultiColumnTableRow) element)
+						.getColumnValueAt(1)))
+				{
+					return checkboxImageProvider.getCheckboxImage(true, true);
+				}
+				return checkboxImageProvider.getCheckboxImage(false, true);
+			}
+
+			@Override
+			public String getColumnText(Object element, int columnIndex)
+			{
+				return null;
+			}
+		});
 		
-		TableViewerColumn column2 = new TableViewerColumn(viewer, SWT.LEFT);
-		column2.getColumn().setText(COLUMN_NAMES[1]);
 		
-		editor = new CheckboxCellEditor(((TableViewer) viewer)
+		TableViewerColumn column2 = new TableViewerColumn(viewer, SWT.CENTER);
+		column2.getColumn().setText(COLUMN_NAMES[2]);
+		
+		CellEditor editor2;
+		editor2 = new CheckboxCellEditor(((TableViewer) viewer)
 				.getTable(), SWT.ARROW);
-		column2.setEditingSupport(new BpmnMultiColumnTableEditingSupport(viewer, 2, editor)
+//		editor2 = new SelectableCheckboxCellEditor(
+//				(TableViewer) viewer, 2);
+
+		column2.setEditingSupport(new BpmnMultiColumnTableEditingSupport(viewer, 2, editor2)
 		{
 			protected Object getValue(Object element)
 			{
@@ -117,36 +129,39 @@ public class JadexBpmnDiagramParameterSection extends
 				super.doSetValue(element, ((Boolean) value).toString());
 			}
 		});
-		column2.setLabelProvider(new EmulatedNativeCheckBoxLabelProvider(viewer)
-		{
-			
-			@Override
-			protected boolean isChecked(Object element)
-			{
-				return Boolean.valueOf(((MultiColumnTableRow) element)
-						.getColumnValueAt(2));
-			}
-		});
 		
-//		column2.setLabelProvider(new MultiColumnTableLabelProvider(2){
-//
-//			@Override
-//			public Image getColumnImage(Object element, int columnIndex)
-//			{
-//				if(Boolean.valueOf(((MultiColumnTableRow) element)
-//						.getColumnValueAt(2)))
-//				{
-//					return CHECKED;
-//				}
-//				return UNCHECKED;
-//			}
+		// This version doesn't work properly
+		// (blue background after toggle)
+//		column2.setLabelProvider(new EmulatedNativeCheckBoxLabelProvider(viewer)
+//		{
 //			
 //			@Override
-//			public String getColumnText(Object element, int columnIndex)
+//			protected boolean isChecked(Object element)
 //			{
-//				return null;
+//				return Boolean.valueOf(((MultiColumnTableRow) element)
+//						.getColumnValueAt(2));
 //			}
 //		});
+		
+		column2.setLabelProvider(new MultiColumnTableLabelProvider(1)
+		{
+			@Override
+			public Image getColumnImage(Object element, int columnIndex)
+			{
+				if (Boolean.valueOf(((MultiColumnTableRow) element)
+						.getColumnValueAt(2)))
+				{
+					return checkboxImageProvider.getCheckboxImage(true, true);
+				}
+				return checkboxImageProvider.getCheckboxImage(false, true);
+			}
+
+			@Override
+			public String getColumnText(Object element, int columnIndex)
+			{
+				return null;
+			}
+		});
 		
 		for (int columnIndex = 3; columnIndex < COLUMN_NAMES.length; columnIndex++)
 		{

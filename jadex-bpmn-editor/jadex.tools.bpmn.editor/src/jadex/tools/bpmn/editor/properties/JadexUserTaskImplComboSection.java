@@ -179,9 +179,9 @@ public class JadexUserTaskImplComboSection extends
 		//gridData.widthHint = 80;
 
 		// Create and configure the "Add" button
-		Button addDefaultParameter = new Button(parent, SWT.PUSH | SWT.CENTER);
+		Button addDefaultParameter = new Button(sectionComposite, SWT.PUSH | SWT.CENTER);
 		addDefaultParameter.setText("Add default Parameter");
-		addDefaultParameter.setToolTipText("Adds default parameter for selected class at end of parameter table");
+		addDefaultParameter.setToolTipText("Adds default parameter for selected class at parameter tables end");
 		//addDefaultParameter.setLayoutData(gridData);
 		addDefaultParameter.addSelectionListener(new SelectionAdapter()
 		{

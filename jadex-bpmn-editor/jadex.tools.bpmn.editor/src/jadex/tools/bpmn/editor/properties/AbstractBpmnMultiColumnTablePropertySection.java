@@ -195,8 +195,6 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 					throws ExecutionException
 			{
 				
-				System.out.println("DO EXECUTE UP COMMAND");
-				
 				HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
 				synchronized (uniqueValueCash)
 				{
