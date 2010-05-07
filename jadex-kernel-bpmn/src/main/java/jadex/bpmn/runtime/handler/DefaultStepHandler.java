@@ -3,6 +3,7 @@ package jadex.bpmn.runtime.handler;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MNamedIdElement;
 import jadex.bpmn.model.MSequenceEdge;
+import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.IStepHandler;
 import jadex.bpmn.runtime.ProcessThread;
@@ -98,9 +99,20 @@ public class DefaultStepHandler implements IStepHandler
 					// When last thread or exception, mark current context for removal.
 					if(context.getThreads().size()==1 || ex!=null)
 					{
-						activity	= (MActivity)context.getModelElement();
+						activity = (MActivity)context.getModelElement();
 						remove	= context;
 						context	= context.getParent();
+						
+						// Cancel subprocess handlers.
+						if(activity instanceof MSubProcess)
+						{
+							List	handlers	= activity.getEventHandlers();
+							for(int i=0; handlers!=null && i<handlers.size(); i++)
+							{
+								MActivity handler = (MActivity) handlers.get(i);
+								instance.getActivityHandler(handler).cancel(handler, instance, remove.getInitiator());
+							}
+						}
 					}
 					
 					// If more threads are available in current context just exit loop.

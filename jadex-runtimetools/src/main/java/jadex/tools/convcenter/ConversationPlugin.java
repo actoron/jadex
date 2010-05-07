@@ -89,7 +89,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		{
 			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable().getTree().getSelectionPath().getLastPathComponent();
 			IComponentDescription desc = (IComponentDescription)node.getUserObject();
-			// Use clone, as added agent id might be modified by user.
+			// Use clone, as added component id might be modified by user.
 			IComponentManagementService ces  = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
 			IComponentIdentifier	receiver	= desc.getName();
 			receiver = ces.createComponentIdentifier(receiver.getName(), false, receiver.getAddresses());
@@ -131,10 +131,6 @@ public class ConversationPlugin extends AbstractJCCPlugin
 
 		agents.getTreetable().addMouseListener(new MouseAdapter()
 		{
-			/**
-			 * invoke SEND_MESSAGE action
-			 * @param e
-			 */
 			public void mouseClicked(MouseEvent e)
 			{
 				if(e.getClickCount()==2)

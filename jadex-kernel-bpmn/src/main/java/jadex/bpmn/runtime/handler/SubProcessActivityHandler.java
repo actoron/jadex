@@ -100,8 +100,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				
 				if(timer!=null)
 				{
-					instance.getActivityHandler(timer)
-						.execute(timer, instance, thread);
+					instance.getActivityHandler(timer).execute(timer, instance, thread);
 				}
 				else
 				{
