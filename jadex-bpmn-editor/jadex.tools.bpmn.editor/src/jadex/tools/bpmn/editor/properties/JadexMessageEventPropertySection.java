@@ -1,8 +1,16 @@
 package jadex.tools.bpmn.editor.properties;
 
+import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EAnnotation;
+import org.eclipse.emf.ecore.EModelElement;
+import org.eclipse.emf.ecore.EcoreFactory;
+import org.eclipse.emf.ecore.util.EcoreAdapterFactory;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.gmf.runtime.diagram.core.listener.NotificationListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.SWT;
+import org.eclipse.stp.bpmn.Activity;
+import org.eclipse.stp.bpmn.ActivityType;
+import org.eclipse.stp.bpmn.diagram.actions.SetAsThrowingOrCatchingAction;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ModifyEvent;
@@ -23,15 +31,8 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  */
 public class JadexMessageEventPropertySection extends AbstractBpmnPropertySection
 {
-	// ---- constants ----
-	
-	//private static final String[] textFieldNames = new String[]{"msgtype", "message", "expression"};
-	
-	private static String[] cComboItems = new String[]{"send", "receive"};
-	
-	// ---- attributes ----
 
-	
+	// ---- attributes ----
 	
 	private CLabel msgtypeLabel;
 	private Text msgtypeText;
@@ -41,9 +42,6 @@ public class JadexMessageEventPropertySection extends AbstractBpmnPropertySectio
 	
 	private CLabel expressionLabel;
 	private Text expressionText;
-	
-	private CLabel cComboLabel;
-	private CCombo combo;
 	
 	// ---- constructor ----
 	
@@ -78,43 +76,23 @@ public class JadexMessageEventPropertySection extends AbstractBpmnPropertySectio
 		GridData textGridData = new GridData();
 		textGridData.minimumWidth = 500;
 		textGridData.widthHint = 500;
-		
-		GridData comboGridData = new GridData();
-		comboGridData.minimumWidth = 80;
-		comboGridData.widthHint = 80;
-		
-		cComboLabel = getWidgetFactory().createCLabel(sectionComposite, "mode"+":"); // //$NON-NLS-0$
-		cComboLabel.setLayoutData(labelGridData);
-		controls.add(cComboLabel);
-		
-		combo = getWidgetFactory().createCCombo(sectionComposite, SWT.BORDER | SWT.READ_ONLY);
-		combo.setLayoutData(comboGridData);
-		combo.setItems(cComboItems);
-		combo.setText(combo.getItem(0));
-		combo.addSelectionListener(new SelectionListener()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				int selectionIndex = ((CCombo) e.getSource()).getSelectionIndex();
-				updateControls(selectionIndex);
-			}
 
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e)
-			{
-				widgetSelected(e);
-			}
-		});
-		combo.addModifyListener(new ModifyListener()
-		{
-			@Override
-			public void modifyText(ModifyEvent e)
-			{
-				updateJadexEAnnotation("mode", combo.getText());
-			}
-		});
-		controls.add(combo);
+		// FIXME: !!! 
+//		combo.addSelectionListener(new SelectionListener()
+//		{
+//			@Override
+//			public void widgetSelected(SelectionEvent e)
+//			{
+//				int selectionIndex = ((CCombo) e.getSource()).getSelectionIndex();
+//				updateControls(selectionIndex);
+//			}
+//
+//			@Override
+//			public void widgetDefaultSelected(SelectionEvent e)
+//			{
+//				widgetSelected(e);
+//			}
+//		});
 		
 		msgtypeLabel = getWidgetFactory().createCLabel(sectionComposite, "msgtype"+":"); // //$NON-NLS-0$
 		msgtypeLabel.setLayoutData(labelGridData);
@@ -132,11 +110,11 @@ public class JadexMessageEventPropertySection extends AbstractBpmnPropertySectio
 		controls.add(messageLabel);
 		controls.add(messageText);
 		
-		expressionLabel = getWidgetFactory().createCLabel(sectionComposite, "expression"+":"); // //$NON-NLS-0$
+		expressionLabel = getWidgetFactory().createCLabel(sectionComposite, "match expression"+":"); // //$NON-NLS-0$
 		expressionLabel.setLayoutData(labelGridData);
 		expressionText = getWidgetFactory().createText(sectionComposite, "");
 		expressionText.setLayoutData(textGridData);
-		expressionText.addModifyListener(new ModifyJadexEAnnotation("expression", expressionText));
+		expressionText.addModifyListener(new ModifyJadexEAnnotation("match expression", expressionText));
 		controls.add(expressionLabel);
 		controls.add(expressionText);
 	}
@@ -161,21 +139,6 @@ public class JadexMessageEventPropertySection extends AbstractBpmnPropertySectio
 			EAnnotation ea = modelElement.getEAnnotation(util.containerEAnnotationName);
 			if (ea != null)
 			{
-				String comboValue = (String) ea.getDetails().get("mode");
-				comboValue = comboValue != null ? comboValue : cComboItems[0];
-				
-				int valueIndex = 0;
-				// search value in items
-				String[] items = combo.getItems();
-				for (int i = 0; i < items.length; i++)
-				{
-					if (items[i].equals(comboValue))
-					{
-						valueIndex = i;
-					}
-				}
-				combo.select(valueIndex);
-				
 				String tmpValue;
 				
 				tmpValue = (String) ea.getDetails().get("msgtype");
@@ -186,37 +149,59 @@ public class JadexMessageEventPropertySection extends AbstractBpmnPropertySectio
 				
 				tmpValue = (String) ea.getDetails().get("expression");
 				expressionText.setText(tmpValue != null ? tmpValue : "");
-				
-				
+
 			}
 			else
 			{
-				combo.select(0);
 				msgtypeText.setText("");
 				messageText.setText("");
 				expressionText.setText("");
 			}
 			
-			updateControls(combo.getSelectionIndex());
+			updateControls(isModelElementThrowing(modelElement));
 			return;
 		}
 	}
 
+	
+
 	// ---- methods ----
 	
-	private void updateControls(int selectionIndex)
+	private boolean isModelElementThrowing(EModelElement modelElement)
 	{
+		if (modelElement instanceof Activity)
+		{
+			// we have an activity with message type
+			Activity model = (Activity) modelElement;
+			if (ActivityType.EVENT_INTERMEDIATE_MESSAGE_LITERAL.equals(model
+					.getActivityType())
+					|| ActivityType.EVENT_START_MESSAGE_LITERAL.equals(model
+							.getActivityType())
+					|| ActivityType.EVENT_END_MESSAGE_LITERAL.equals(model
+							.getActivityType()))
+			{
+
+				String annotation = EcoreUtil
+						.getAnnotation(
+								model,
+								SetAsThrowingOrCatchingAction.IS_THROWING_ANNOTATION_SOURCE_AND_KEY_ID,
+								SetAsThrowingOrCatchingAction.IS_THROWING_ANNOTATION_SOURCE_AND_KEY_ID);
+
+				if (annotation != null && annotation.equals("true")) { //$NON-NLS-1$
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	private void updateControls(boolean isThrowing)
+	{
+		messageLabel.setEnabled(isThrowing);
+		messageText.setEnabled(isThrowing);
 		
-		//messageLabel.setVisible(selectionIndex == 0);
-		messageLabel.setEnabled(selectionIndex == 0);
-		//messageText.setVisible(selectionIndex == 0);
-		messageText.setEnabled(selectionIndex == 0);
-		
-		//expressionLabel.setVisible(selectionIndex != 0);
-		expressionLabel.setEnabled(selectionIndex != 0);
-		//expressionText.setVisible(selectionIndex != 0);
-		expressionText.setEnabled(selectionIndex != 0);
-		
+		expressionLabel.setEnabled( ! isThrowing);
+		expressionText.setEnabled( ! isThrowing);
 	}
 	
 	// ---- internal classes ----

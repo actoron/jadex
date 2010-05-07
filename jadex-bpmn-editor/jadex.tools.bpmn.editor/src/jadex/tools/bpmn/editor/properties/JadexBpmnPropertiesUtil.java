@@ -33,6 +33,9 @@ public class JadexBpmnPropertiesUtil
 	/** Key for the annotation from the flow connector. */
 	public static final String JADEX_SEQUENCE_ANNOTATION = "sequence";
 	
+	/** Key for the annotation from the sub process. */
+	public static final String JADEX_SUBPROCESS_ANNOTATION = "subProcess";
+	
 	/** Key for the package of a BPMN diagram. */
 	public static final String JADEX_PACKAGE_DETAIL = "package";
 	
@@ -50,6 +53,9 @@ public class JadexBpmnPropertiesUtil
 	
 	/** Key for the parameter map of a activity. */
 	public static final String JADEX_PARAMETER_LIST_DETAIL = "parameters";
+	
+	/** Key for the properties map of a SubProcess. */
+	public static final String JADEX_PROPERTIES_LIST_DETAIL = "properties";
 	
 	/** Key for the mapping map of a sequence edge. */
 	public static final String JADEX_MAPPING_LIST_DETAIL = "mappings";
