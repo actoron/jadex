@@ -79,9 +79,12 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 		else
 		{
 			msg = new HashMap();
+		}
 			
-			// Convenience conversion of strings to component identifiers for receivers.
-			String ri = mt.getReceiverIdentifier();
+		// Convenience conversion of strings to component identifiers for receivers.
+		String ri = mt.getReceiverIdentifier();
+		if(thread.hasPropertyValue(ri))
+		{
 			Object recs = thread.getPropertyValue(ri);
 			if(SReflect.isIterable(recs))
 			{
@@ -102,23 +105,23 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 				recs = newrecs;
 			}
 			msg.put(ri, recs);
-			
-			String[] params	= mt.getParameterNames();
-			for(int i=0; params!=null && i<params.length; i++)
+		}
+		
+		String[] params	= mt.getParameterNames();
+		for(int i=0; params!=null && i<params.length; i++)
+		{
+			if(thread.hasPropertyValue(params[i]) && !params[i].equals(ri))
 			{
-				if(thread.hasPropertyValue(params[i]) && !params[i].equals(ri))
-				{
-					msg.put(params[i], thread.getPropertyValue(params[i]));
-				}
+				msg.put(params[i], thread.getPropertyValue(params[i]));
 			}
-			
-			String[] paramsets	= mt.getParameterSetNames();
-			for(int i=0; paramsets!=null && i<paramsets.length; i++)
+		}
+		
+		String[] paramsets	= mt.getParameterSetNames();
+		for(int i=0; paramsets!=null && i<paramsets.length; i++)
+		{
+			if(thread.hasPropertyValue(paramsets[i]) && !paramsets[i].equals(ri))
 			{
-				if(thread.hasPropertyValue(paramsets[i]) && !paramsets[i].equals(ri))
-				{
-					msg.put(paramsets[i], thread.getPropertyValue(paramsets[i]));
-				}
+				msg.put(paramsets[i], thread.getPropertyValue(paramsets[i]));
 			}
 		}
 		

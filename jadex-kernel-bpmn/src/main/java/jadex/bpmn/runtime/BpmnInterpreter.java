@@ -26,6 +26,8 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.IMessageService;
+import jadex.bridge.MessageType;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.IFilter;
@@ -1141,6 +1143,27 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	{
 		IComponentManagementService cms = (IComponentManagementService)adapter.getServiceContainer().getService(IComponentManagementService.class);
 		return cms.createComponentIdentifier(name, local, addresses);
+	}
+	
+	/**
+	 *  Create a reply to this message event.
+	 *  @param msgeventtype	The message event type.
+	 *  @return The reply event.
+	 */
+	public Map createReply(IMessageAdapter msg)
+	{
+		return createReply(msg.getParameterMap(), msg.getMessageType());
+	}
+	
+	/**
+	 *  Create a reply to this message event.
+	 *  @param msgeventtype	The message event type.
+	 *  @return The reply event.
+	 */
+	public Map createReply(Map msg, MessageType mt)
+	{
+		IMessageService ms = (IMessageService)getComponentAdapter().getServiceContainer().getService(IMessageService.class);	
+		return ms.createReply(msg, mt);
 	}
 	
 	/**

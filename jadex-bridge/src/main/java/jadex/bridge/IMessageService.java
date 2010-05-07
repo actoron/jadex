@@ -21,6 +21,14 @@ public interface IMessageService
 	public void deliverMessage(Map message, String msgtype, IComponentIdentifier[] receivers);
 	
 	/**
+	 *  Create a reply to a message.
+	 *  @param msg	The message.
+	 *  @param mt	The message type.
+	 *  @return The reply event.
+	 */
+	public Map createReply(Map msg, MessageType mt);
+
+	/**
 	 *  Get addresses of all transports.
 	 *  @return The addresses of all transports.
 	 */

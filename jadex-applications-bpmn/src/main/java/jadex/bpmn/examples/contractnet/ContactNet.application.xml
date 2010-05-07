@@ -13,26 +13,33 @@
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
 	name="ContractNet" package="jadex.bpmn.examples.contractnet" autoshutdown="true">
 	
-	<imports>
-		<import>jadex.commons.*</import>
-	</imports>
-	
 	<componenttypes>
-		<!-- Todo: preselect config already here? -->
-		<componenttype name="Initiator" filename="jadex/bpmn/examples/contractnet/ContractNet.bpmn"/>
-		<componenttype name="Participant" filename="jadex/bpmn/examples/contractnet/ContractNet.bpmn"/>
+		<componenttype name="CNPProtocol" filename="jadex/bpmn/examples/contractnet/ContractNet.bpmn"/>
 	</componenttypes>
 	
 	<applications>
 		<application name="One Initiator and Three Participants">
 			<components>
-				<component type="Participant" name="Participant_1" configuration="Participant"/>
-				<component type="Participant" name="Participant_2" configuration="Participant"/>
-				<component type="Participant" name="Participant_3" configuration="Participant"/>
-				<component type="Initiator" name="Initiatior" configuration="Initiator">
+				<component name="Participant_1"	type="CNPProtocol" configuration="Participant">
+					<arguments>
+						<argument name="mpp">"MakeProposalRandom.bpmn"</argument>
+					</arguments>
+				</component>
+				<component name="Participant_2"	type="CNPProtocol" configuration="Participant">
+					<arguments>
+						<argument name="mpp">"MakeProposalRandom.bpmn"</argument>
+					</arguments>
+				</component>
+				<component name="Participant_3"	type="CNPProtocol" configuration="Participant">
+					<arguments>
+						<argument name="mpp">"MakeProposalRandom.bpmn"</argument>
+					</arguments>
+				</component>
+				<component name="Initiatior"	type="CNPProtocol" configuration="Initiator">
 					<arguments>
 						<argument name="participants">new String[]{"Participant_1", "Participant_2", "Participant_3"}</argument>
 						<argument name="cfp">"Hello?"</argument>
+						<argument name="epp">"EvaluateProposalsRandom.bpmn"</argument>
 					</arguments>
 				</component>
 			</components>

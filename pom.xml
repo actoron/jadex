@@ -16,6 +16,9 @@
 		        <groupId>org.apache.maven.plugins</groupId>
 		        <artifactId>maven-assembly-plugin</artifactId>
 		        <configuration>
+				  <archiverConfig>
+				    <duplicateBehavior>skip</duplicateBehavior>
+				  </archiverConfig> 
 		          <descriptors>
 		            <descriptor>src/main/assembly/dist-assembly-xml.xml</descriptor>
 		          </descriptors>
@@ -46,6 +49,9 @@
 		        <groupId>org.apache.maven.plugins</groupId>
 		        <artifactId>maven-assembly-plugin</artifactId>
 		        <configuration>
+				  <archiverConfig>
+				    <duplicateBehavior>skip</duplicateBehavior>
+				  </archiverConfig> 
 		          <descriptors>
 		            <descriptor>src/main/assembly/dist-assembly-rules.xml</descriptor>
 		          </descriptors>
@@ -77,6 +83,11 @@
 		      <plugin>
 		        <groupId>org.apache.maven.plugins</groupId>
 		        <artifactId>maven-assembly-plugin</artifactId>
+		        <configuration>
+				  <archiverConfig>
+				    <duplicateBehavior>skip</duplicateBehavior>
+				  </archiverConfig>
+				</configuration> 
 		        <executions>
 		        	<execution>
 		        		<id>make-assembly</id>
@@ -183,6 +194,9 @@
 		        <groupId>org.apache.maven.plugins</groupId>
 		        <artifactId>maven-assembly-plugin</artifactId>
 		        <configuration>
+				  <archiverConfig>
+				    <duplicateBehavior>skip</duplicateBehavior>
+				  </archiverConfig>
 		          <descriptors>
 		            <descriptor>src/main/assembly/dist-assembly-jade.xml</descriptor>
 		          </descriptors>
@@ -220,6 +234,9 @@
 		        <groupId>org.apache.maven.plugins</groupId>
 		        <artifactId>maven-assembly-plugin</artifactId>
 		        <configuration>
+				  <archiverConfig>
+				    <duplicateBehavior>skip</duplicateBehavior>
+				  </archiverConfig>
 		          <descriptors>
 		            <descriptor>src/main/assembly/dist-assembly-wfms.xml</descriptor>
 		          </descriptors>
@@ -258,6 +275,9 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
+		  <archiverConfig>
+		    <duplicateBehavior>skip</duplicateBehavior>
+		  </archiverConfig>
           <descriptors>
             <descriptor>src/main/assembly/dist-assembly.xml</descriptor>
           </descriptors>

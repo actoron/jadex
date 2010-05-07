@@ -233,6 +233,48 @@ public class MessageService implements IMessageService, IService
 		
 		delivermsg.addMessage(message, msgtype, receivers);
 	}
+	
+	/**
+	 *  Create a reply to this message event.
+	 *  @param msgeventtype	The message event type.
+	 *  @return The reply event.
+	 */
+	public Map createReply(Map msg, MessageType mt)
+	{
+		Map reply = new HashMap();
+		
+		MessageType.ParameterSpecification[] params	= mt.getParameters();
+		for(int i=0; i<params.length; i++)
+		{
+			String sourcename = params[i].getSource();
+			if(sourcename!=null)
+			{
+				Object sourceval = msg.get(sourcename);
+				if(sourceval!=null)
+				{
+					reply.put(params[i].getName(), sourceval);
+				}
+			}
+		}
+		
+		MessageType.ParameterSpecification[] paramsets = mt.getParameterSets();
+		for(int i=0; i<paramsets.length; i++)
+		{
+			String sourcename = paramsets[i].getSource();
+			if(sourcename!=null)
+			{
+				Object sourceval = msg.get(sourcename);
+				if(sourceval!=null)
+				{
+					List tmp = new ArrayList();
+					tmp.add(sourceval);
+					reply.put(paramsets[i].getName(), tmp);	
+				}
+			}
+		}
+		
+		return reply;
+	}
 
 	/**
 	 *  Adds a transport for this outbox.

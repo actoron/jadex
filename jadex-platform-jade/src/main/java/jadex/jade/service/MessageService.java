@@ -49,6 +49,7 @@ import jadex.service.clock.IClockService;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -81,13 +82,13 @@ public class MessageService implements IMessageService, IService
 	/** The message types. */
 	protected Map messagetypes;
 
-	/** All addresses of this platform. */
-	private String[] addresses;
+//	/** All addresses of this platform. */
+//	private String[] addresses;
 
-	/** The send message action executed by platform executor. */
+//	/** The send message action executed by platform executor. */
 //	protected SendMessage sendmsg;
 	
-	/** The deliver message action executed by platform executor. */
+//	/** The deliver message action executed by platform executor. */
 //	protected DeliverMessage delivermsg;
 	
 	/** The logger. */
@@ -363,6 +364,48 @@ public class MessageService implements IMessageService, IService
 	{	
 		// Not necessary in JADE.
 		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Create a reply to this message event.
+	 *  @param msgeventtype	The message event type.
+	 *  @return The reply event.
+	 */
+	public Map createReply(Map msg, MessageType mt)
+	{
+		Map reply = new HashMap();
+		
+		MessageType.ParameterSpecification[] params	= mt.getParameters();
+		for(int i=0; i<params.length; i++)
+		{
+			String sourcename = params[i].getSource();
+			if(sourcename!=null)
+			{
+				Object sourceval = msg.get(sourcename);
+				if(sourceval!=null)
+				{
+					reply.put(params[i].getName(), sourceval);
+				}
+			}
+		}
+		
+		MessageType.ParameterSpecification[] paramsets = mt.getParameterSets();
+		for(int i=0; i<paramsets.length; i++)
+		{
+			String sourcename = paramsets[i].getSource();
+			if(sourcename!=null)
+			{
+				Object sourceval = msg.get(sourcename);
+				if(sourceval!=null)
+				{
+					List tmp = new ArrayList();
+					tmp.add(sourceval);
+					reply.put(paramsets[i].getName(), tmp);	
+				}
+			}
+		}
+		
+		return reply;
 	}
 
 	/**

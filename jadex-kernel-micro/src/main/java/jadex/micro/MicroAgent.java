@@ -12,9 +12,6 @@ import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -323,6 +320,17 @@ public abstract class MicroAgent implements IMicroAgent
 	}
 	
 	/**
+	 *  Create a reply to this message event.
+	 *  @param msgeventtype	The message event type.
+	 *  @return The reply event.
+	 */
+	public Map createReply(Map msg, MessageType mt)
+	{
+		IMessageService ms = (IMessageService)interpreter.getAgentAdapter().getServiceContainer().getService(IMessageService.class);	
+		return ms.createReply(msg, mt);
+	}
+	
+	/**
 	 *  Get the agent name.
 	 *  @return The agent name.
 	 */
@@ -339,49 +347,7 @@ public abstract class MicroAgent implements IMicroAgent
 	{
 		return interpreter.getAgentAdapter().getComponentIdentifier();
 	}
-	
-	/**
-	 *  Create a reply to this message event.
-	 *  @param msgeventtype	The message event type.
-	 *  @return The reply event.
-	 */
-	public Map createReply(Map msg, MessageType mt)
-	{
-		Map reply = new HashMap();
 		
-		MessageType.ParameterSpecification[] params	= mt.getParameters();
-		for(int i=0; i<params.length; i++)
-		{
-			String sourcename = params[i].getSource();
-			if(sourcename!=null)
-			{
-				Object sourceval = msg.get(sourcename);
-				if(sourceval!=null)
-				{
-					reply.put(params[i].getName(), sourceval);
-				}
-			}
-		}
-		
-		MessageType.ParameterSpecification[] paramsets = mt.getParameterSets();
-		for(int i=0; i<paramsets.length; i++)
-		{
-			String sourcename = paramsets[i].getSource();
-			if(sourcename!=null)
-			{
-				Object sourceval = msg.get(sourcename);
-				if(sourceval!=null)
-				{
-					List tmp = new ArrayList();
-					tmp.add(sourceval);
-					reply.put(paramsets[i].getName(), tmp);	
-				}
-			}
-		}
-		
-		return reply;
-	}
-	
 	/**
 	 *  Schedule a step of the agent.
 	 *  May safely be called from external threads.

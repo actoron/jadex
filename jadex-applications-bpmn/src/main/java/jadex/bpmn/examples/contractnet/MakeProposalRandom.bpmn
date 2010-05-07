@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_5q6OQVm7Ed-CVtZr0hfiVg" iD="_5q6OQFm7Ed-CVtZr0hfiVg">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_6Aqb0Fm7Ed-CVtZr0hfiVg" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6Aqb0Vm7Ed-CVtZr0hfiVg" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6Aqb0lm7Ed-CVtZr0hfiVg" key="Package" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6ujckFm7Ed-CVtZr0hfiVg" key="arguments" value="cfp␋The call for proposals.␋Object␋␟initiator␋The component id of the initiator.␋IComponentIdentifier␋"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PeZvwFm8Ed-CVtZr0hfiVg" key="imports" value="jadex.bridge.IComponentIdentifier"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_5q6OR1m7Ed-CVtZr0hfiVg" iD="_5q6ORlm7Ed-CVtZr0hfiVg" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_5q6OSVm7Ed-CVtZr0hfiVg" iD="_5q6OSFm7Ed-CVtZr0hfiVg" outgoingEdges="_eKz52lm8Ed-CVtZr0hfiVg" incomingEdges="_ZHwPqlm8Ed-CVtZr0hfiVg" name="Make Proposal" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YcGDgFm8Ed-CVtZr0hfiVg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YcGDgVm8Ed-CVtZr0hfiVg" key="class" value="jadex.bpmn.runtime.task.StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h-mUgFm8Ed-CVtZr0hfiVg" key="parameters" value="in␋name␋Object␋&quot;proposal&quot;␟in␋value␋Object␋&quot;Proposal from &quot;+$interpreter.getParent().getComponentIdentifier().getLocalName()"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_ZHwPoVm8Ed-CVtZr0hfiVg" iD="_ZHwPoFm8Ed-CVtZr0hfiVg" outgoingEdges="_ZHwPqlm8Ed-CVtZr0hfiVg _cpWuKlm8Ed-CVtZr0hfiVg" incomingEdges="_aS2w2lm8Ed-CVtZr0hfiVg" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_aS2w0Vm8Ed-CVtZr0hfiVg" iD="_aS2w0Fm8Ed-CVtZr0hfiVg" outgoingEdges="_aS2w2lm8Ed-CVtZr0hfiVg" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_cpWuIVm8Ed-CVtZr0hfiVg" iD="_cpWuIFm8Ed-CVtZr0hfiVg" outgoingEdges="_eaAzcVm8Ed-CVtZr0hfiVg" incomingEdges="_cpWuKlm8Ed-CVtZr0hfiVg" name="No Proposal" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dAKEkFm8Ed-CVtZr0hfiVg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dAKEkVm8Ed-CVtZr0hfiVg" key="class" value=""/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_eKz50Vm8Ed-CVtZr0hfiVg" iD="_eKz50Fm8Ed-CVtZr0hfiVg" outgoingEdges="_e4jwolm8Ed-CVtZr0hfiVg" incomingEdges="_eKz52lm8Ed-CVtZr0hfiVg _eaAzcVm8Ed-CVtZr0hfiVg" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_e4Z_oVm8Ed-CVtZr0hfiVg" iD="_e4Z_oFm8Ed-CVtZr0hfiVg" incomingEdges="_e4jwolm8Ed-CVtZr0hfiVg" activityType="EventEndEmpty"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_ZHwPqlm8Ed-CVtZr0hfiVg" iD="_ZHwPqVm8Ed-CVtZr0hfiVg">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_aq2aEFm8Ed-CVtZr0hfiVg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aq2aEVm8Ed-CVtZr0hfiVg" key="condition" value="Math.random()&lt;0.666666"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_aS2w2lm8Ed-CVtZr0hfiVg" iD="_aS2w2Vm8Ed-CVtZr0hfiVg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_cpWuKlm8Ed-CVtZr0hfiVg" iD="_cpWuKVm8Ed-CVtZr0hfiVg" conditionType="Default" isDefault="true">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_wVQRAFm8Ed-CVtZr0hfiVg" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_wVQRAVm8Ed-CVtZr0hfiVg" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_eKz52lm8Ed-CVtZr0hfiVg" iD="_eKz52Vm8Ed-CVtZr0hfiVg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_eaAzcVm8Ed-CVtZr0hfiVg" iD="_eaAzcFm8Ed-CVtZr0hfiVg"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_e4jwolm8Ed-CVtZr0hfiVg" iD="_e4jwoVm8Ed-CVtZr0hfiVg"/>
+  </pools>
+</bpmn:BpmnDiagram>

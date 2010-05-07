@@ -991,99 +991,41 @@ public class BpmnXMLReader
 			MBpmnModel model = (MBpmnModel)context.getRootObject();
 			JavaCCExpressionParser parser = new JavaCCExpressionParser();
 
-			// Read information from artifact text (normal stp modeller)
-			
-			List arts = model.getArtifacts();
-			if(arts!=null)
+			// Handle the annotations of the model (Jadex BPMN Editor).
+			List annos = model.getAnnotations();
+			if(annos!=null)
 			{
-				if(arts.size()>1)
-					throw new RuntimeException("Diagram must have one artifact for imports/package");
-				
-				String desc = ((MArtifact)arts.get(0)).getDescription();
-				StringTokenizer	stok = new StringTokenizer(desc, "\r\n");
-				while(stok.hasMoreTokens())
+				// Parse imports/package first (editor saves annotations in arbitrary order, grrr.)
+				for(int i=0; i<annos.size(); i++)
 				{
-					String	prop	= stok.nextToken().trim();
-					if(prop.endsWith(";"))
-						prop = prop.substring(0, prop.length()-1);
-					
-					if(prop.startsWith("package"))
+					MAnnotation anno = (MAnnotation)annos.get(i);
+					List details = anno.getDetails();
+					if(details!=null)
 					{
-						String packagename = prop.substring(prop.indexOf("package")+8).trim();
-						model.setPackage(packagename);
-					}
-					else if(prop.startsWith("import"))
-					{
-						String imp = prop.substring(prop.indexOf("imports")+7).trim();
-						model.addImport(imp);
-					}
-					else if(prop.startsWith("argument"))
-					{
-						String argstr = prop.substring(prop.indexOf("argument")+8).trim();
-						
-						try
+						for(int j=0; j<details.size(); j++)
 						{
-							IArgument arg = (IArgument)parser.parseExpression(argstr, model.getAllImports(), null, 
-								context.getClassLoader()).getValue(null);							
-							model.addArgument(arg);
-						}
-						catch(RuntimeException e)
-						{
-							throw new RuntimeException("Error parsing argument: "+model+", "+argstr, e);
-						}
-					}
-					else if(prop.startsWith("result"))
-					{
-						String resstr = prop.substring(prop.indexOf("result")+6).trim();
-						
-						try
-						{
-							IArgument res = (IArgument)parser.parseExpression(resstr, model.getAllImports(), null, 
-								context.getClassLoader()).getValue(null);
-							model.addResult(res);
-						}
-						catch(RuntimeException e)
-						{
-							throw new RuntimeException("Error parsing result: "+model+", "+resstr, e);
-						}
-					}
-					else
-					{
-						// context variable
-						
-						String	init	= null;
-						int	idx	= prop.indexOf("=");
-						if(idx!=-1)
-						{
-							init	= prop.substring(idx+1);
-							prop	= prop.substring(0, idx);
-						}
-						StringTokenizer stok2 = new StringTokenizer(prop, " \t");
-						if(stok2.countTokens()==2)
-						{
-							String clazzname = stok2.nextToken();
-							Class clazz = SReflect.findClass0(clazzname, model.getAllImports(), context.getClassLoader());
-							if(clazz!=null)
+							MAnnotationDetail detail = (MAnnotationDetail)details.get(j);
+							String key = detail.getKey().toLowerCase();
+							String value = detail.getValue();							
+							if("imports".equals(key))
 							{
-								String name = stok2.nextToken();
-								IParsedExpression exp = null;
-								if(init!=null)
+								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
+								for(int k=0; stok.hasMoreElements(); k++)
 								{
-									exp = parser.parseExpression(init, model.getAllImports(), null, context.getClassLoader());
+									String imp = stok.nextToken().trim();
+									if(imp.length()>0)
+										model.addImport(imp);
 								}
-								
-								model.addContextVariable(name, clazz, exp);
+//								System.out.println("Imports: "+SUtil.arrayToString(imps));
+							}
+							else if("package".equals(key))
+							{
+								model.setPackage(value);
+//								System.out.println("Package: "+value);
 							}
 						}
 					}
 				}
-			}	
-			
-			// Handle the annotations of the model.
-			
-			List annos = model.getAnnotations();
-			if(annos!=null)
-			{
 				for(int i=0; i<annos.size(); i++)
 				{
 					MAnnotation anno = (MAnnotation)annos.get(i);
@@ -1100,22 +1042,6 @@ public class BpmnXMLReader
 							if("description".equals(key))
 							{
 								model.setDescription(value);
-							}
-							else if("imports".equals(key))
-							{
-								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
-								for(int k=0; stok.hasMoreElements(); k++)
-								{
-									String imp = stok.nextToken().trim();
-									if(imp.length()>0)
-										model.addImport(imp);
-								}
-//								System.out.println("Imports: "+SUtil.arrayToString(imps));
-							}
-							else if("package".equals(key))
-							{
-								model.setPackage(value);
-//								System.out.println("Package: "+value);
 							}
 							else if("parameters".equals(key))
 							{
@@ -1203,15 +1129,102 @@ public class BpmnXMLReader
 //									System.out.println("Argument: "+arg);
 								}
 							}
-							else
+							else if(!"package".equals(key) && !"imports".equals(key))
 							{
-								System.out.println("Unknown: "+key+" "+value);
+								throw new RuntimeException("Error parsing annotation: "+key+", "+value);
 							}
 						}
 					}
 				}
 			}
-			
+
+			// Read information from artifact text (normal stp modeller)
+			List arts = model.getArtifacts();
+			if(arts!=null)
+			{
+				if(arts.size()>1)
+					throw new RuntimeException("Diagram must have one artifact for imports/package");
+				
+				String desc = ((MArtifact)arts.get(0)).getDescription();
+				StringTokenizer	stok = new StringTokenizer(desc, "\r\n");
+				while(stok.hasMoreTokens())
+				{
+					String	prop	= stok.nextToken().trim();
+					if(prop.endsWith(";"))
+						prop = prop.substring(0, prop.length()-1);
+					
+					if(prop.startsWith("package"))
+					{
+						String packagename = prop.substring(prop.indexOf("package")+8).trim();
+						model.setPackage(packagename);
+					}
+					else if(prop.startsWith("import"))
+					{
+						String imp = prop.substring(prop.indexOf("imports")+7).trim();
+						model.addImport(imp);
+					}
+					else if(prop.startsWith("argument"))
+					{
+						String argstr = prop.substring(prop.indexOf("argument")+8).trim();
+						
+						try
+						{
+							IArgument arg = (IArgument)parser.parseExpression(argstr, model.getAllImports(), null, 
+								context.getClassLoader()).getValue(null);							
+							model.addArgument(arg);
+						}
+						catch(RuntimeException e)
+						{
+							throw new RuntimeException("Error parsing argument: "+model+", "+argstr, e);
+						}
+					}
+					else if(prop.startsWith("result"))
+					{
+						String resstr = prop.substring(prop.indexOf("result")+6).trim();
+						
+						try
+						{
+							IArgument res = (IArgument)parser.parseExpression(resstr, model.getAllImports(), null, 
+								context.getClassLoader()).getValue(null);
+							model.addResult(res);
+						}
+						catch(RuntimeException e)
+						{
+							throw new RuntimeException("Error parsing result: "+model+", "+resstr, e);
+						}
+					}
+					else
+					{
+						// context variable
+						
+						String	init	= null;
+						int	idx	= prop.indexOf("=");
+						if(idx!=-1)
+						{
+							init	= prop.substring(idx+1);
+							prop	= prop.substring(0, idx);
+						}
+						StringTokenizer stok2 = new StringTokenizer(prop, " \t");
+						if(stok2.countTokens()==2)
+						{
+							String clazzname = stok2.nextToken();
+							Class clazz = SReflect.findClass0(clazzname, model.getAllImports(), context.getClassLoader());
+							if(clazz!=null)
+							{
+								String name = stok2.nextToken();
+								IParsedExpression exp = null;
+								if(init!=null)
+								{
+									exp = parser.parseExpression(init, model.getAllImports(), null, context.getClassLoader());
+								}
+								
+								model.addContextVariable(name, clazz, exp);
+							}
+						}
+					}
+				}
+			}	
+						
 			return null;
 		}
 		
