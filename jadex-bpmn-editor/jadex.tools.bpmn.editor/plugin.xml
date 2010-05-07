@@ -22,45 +22,7 @@
       </editpartProvider>
    </extension>
    
-   <!-- define custom commands -->
-	<extension point="org.eclipse.ui.commands">
-		<?gmfgen generated="false"?>
-		<category 
-			name="GPMN" 
-			description="Commands related to GPMN diagrams." 
-			id="jadex.tools.gpmn.diagram.category.gpmn"/>
-		<command 
-			categoryId="jadex.tools.gpmn.diagram.category.gpmn" 
-			description="Select BPMN plan file" 
-			id="jadex.tools.gpmn.commands.bpmn.selectPlanFile" 
-			name="Select BPMN Plan">
-		</command>
-	</extension>
    
-   <!-- add custom commands to menu -->
-	<extension point="org.eclipse.ui.popupMenus">
-	<?gmfgen generated="false"?>
-	  <!-- BPMN Menu -->
-	  <objectContribution
-	    adaptable="false"
-	    id="jadex.tools.bpmn.diagram.ui.objectContribution.SubProcessEditPart"
-	    objectClass="org.eclipse.stp.bpmn.diagram.edit.parts.SubProcessEditPart">
-		 <menu 
-		    id="BPMN" 
-		    label="BPMN" 
-		    path="additions"> 
-		    <separator name="group1"/>
-		 </menu>
-		 <action
-		       class="jadex.tools.bpmn.diagram.actions.ToggleParallelAction"
-		       definitionId="jadex.tools.gpmn.commands.bpmn.selectPlanFile"
-		       enablesFor="1"
-		       id="jadex.tools.bpmn.commands.toggleParallelActionID"
-		       label="getText()"
-		       menubarPath="/additionsGroup">
-		 </action>
-	 </objectContribution>
-	</extension>
    
    <!-- add a jadex property tab to the editor-->
    <extension
@@ -127,7 +89,7 @@
    </extension>
    
   
-   <!-- the jadex sub process properties section -->
+   <!-- the jadex sub process file property section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
      <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
         <propertySection
@@ -140,6 +102,18 @@
      </propertySections>
    </extension>
    
+   <!-- the jadex sub process file property section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertySection
+              class="jadex.tools.bpmn.editor.properties.JadexSubProcessParallelSectionTEMP"
+              id="jadex.tools.bpmn.editor.properties.JadexSubProcessParallelSectionTEMP"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexSubProcessPropertySection">
+           <input type="org.eclipse.stp.bpmn.SubProcess"/>
+        </propertySection>
+     </propertySections>
+   </extension>
    
    <!-- the jadex sub process parameter section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
@@ -148,7 +122,7 @@
               class="jadex.tools.bpmn.editor.properties.JadexCommonParameterSection"
               id="jadex.tools.bpmn.editor.properties.JadexSubProcessParameterSection"
               tab="Jadex"
-              afterSection="jadex.tools.bpmn.editor.properties.JadexSubProcessPropertySection">
+              afterSection="jadex.tools.bpmn.editor.properties.JadexSubProcessParallelSectionTEMP">
            <input type="org.eclipse.stp.bpmn.SubProcess"/>
         </propertySection>
      </propertySections>
