@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_exQBUVrFEd-ircvS5nprxA" iD="_exQBUFrFEd-ircvS5nprxA">
+  <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_fZoP8FrFEd-ircvS5nprxA" source="jadex">
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fZoP8VrFEd-ircvS5nprxA" key="Description" value="&lt;h1>Execute a Request&lt;/h1> This process randomly produces a result or fails."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fZoP8lrFEd-ircvS5nprxA" key="Package" value="jadex.bpmn.examples.contractnet"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ViTJAFrGEd-ircvS5nprxA" key="arguments" value="proposal␋The proposal.␋Object␋"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YHaKEFrGEd-ircvS5nprxA" key="results" value="result␋The result of the execution␋Object␋"/>
+  </eAnnotations>
+  <pools xmi:type="bpmn:Pool" xmi:id="_eyJZMVrFEd-ircvS5nprxA" iD="_eyJZMFrFEd-ircvS5nprxA" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_eySjIVrFEd-ircvS5nprxA" iD="_eySjIFrFEd-ircvS5nprxA" incomingEdges="_gYXwIVrFEd-ircvS5nprxA" name="Write Result" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_ftwF0FrFEd-ircvS5nprxA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ftwF0VrFEd-ircvS5nprxA" key="class" value="jadex.bpmn.runtime.task.StoreResultsTask.class"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OdKSUFrGEd-ircvS5nprxA" key="parameters" value="in␋name␋Object␋&quot;result&quot;␟in␋value␋Object␋&quot;Executed: &quot;+$args.get(&quot;proposal&quot;)"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_gYN_IVrFEd-ircvS5nprxA" iD="_gYN_IFrFEd-ircvS5nprxA" outgoingEdges="_gYXwIVrFEd-ircvS5nprxA _iYEXCFrFEd-ircvS5nprxA" incomingEdges="_hVdqgVrFEd-ircvS5nprxA" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_hVT5gVrFEd-ircvS5nprxA" iD="_hVT5gFrFEd-ircvS5nprxA" outgoingEdges="_hVdqgVrFEd-ircvS5nprxA" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_iX7NEVrFEd-ircvS5nprxA" iD="_iX7NEFrFEd-ircvS5nprxA" incomingEdges="_iYEXCFrFEd-ircvS5nprxA" activityType="EventEndError">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_D9aV8FrGEd-ircvS5nprxA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_D9aV8VrGEd-ircvS5nprxA" key="exception" value="new RuntimeException(&quot;Failed to execute: &quot;+$args.get(&quot;proposal&quot;))"/>
+      </eAnnotations>
+    </vertices>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_gYXwIVrFEd-ircvS5nprxA" iD="_gYXwIFrFEd-ircvS5nprxA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_K8JpsFrGEd-ircvS5nprxA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_K8JpsVrGEd-ircvS5nprxA" key="condition" value="Math.random()&lt;0.66666"/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_hVdqgVrFEd-ircvS5nprxA" iD="_hVdqgFrFEd-ircvS5nprxA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_jsHY0FrFEd-ircvS5nprxA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jsHY0VrFEd-ircvS5nprxA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_iYEXCFrFEd-ircvS5nprxA" iD="_iYEXB1rFEd-ircvS5nprxA" conditionType="Default" isDefault="true">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KSRmQFrGEd-ircvS5nprxA" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KSRmQVrGEd-ircvS5nprxA" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
+  </pools>
+</bpmn:BpmnDiagram>

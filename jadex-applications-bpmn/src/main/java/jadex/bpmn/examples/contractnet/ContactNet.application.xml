@@ -23,16 +23,19 @@
 				<component name="Participant_1"	type="CNPProtocol" configuration="Participant">
 					<arguments>
 						<argument name="mpp">"MakeProposalRandom.bpmn"</argument>
+						<argument name="erp">"ExecuteRequestRandom.bpmn"</argument>
 					</arguments>
 				</component>
 				<component name="Participant_2"	type="CNPProtocol" configuration="Participant">
 					<arguments>
 						<argument name="mpp">"MakeProposalRandom.bpmn"</argument>
+						<argument name="erp">"ExecuteRequestRandom.bpmn"</argument>
 					</arguments>
 				</component>
 				<component name="Participant_3"	type="CNPProtocol" configuration="Participant">
 					<arguments>
 						<argument name="mpp">"MakeProposalRandom.bpmn"</argument>
+						<argument name="erp">"ExecuteRequestRandom.bpmn"</argument>
 					</arguments>
 				</component>
 				<component name="Initiatior"	type="CNPProtocol" configuration="Initiator">

@@ -336,15 +336,6 @@
       <children xmi:type="notation:Node" xmi:id="_tr8CYFT7Ed-32983CGnnJA" type="2002">
         <children xmi:type="notation:Node" xmi:id="_tr8CZlT7Ed-32983CGnnJA" type="4006"/>
         <children xmi:type="notation:Node" xmi:id="_tr8CZ1T7Ed-32983CGnnJA" type="5002">
-          <children xmi:type="notation:Node" xmi:id="_asaIQFamEd-1RJ7RXx1qjA" type="2001">
-            <children xmi:type="notation:Node" xmi:id="_asaIRlamEd-1RJ7RXx1qjA" type="4001"/>
-            <styles xmi:type="notation:FontStyle" xmi:id="_asaIQVamEd-1RJ7RXx1qjA" fontName="Arial"/>
-            <styles xmi:type="notation:DescriptionStyle" xmi:id="_asaIQlamEd-1RJ7RXx1qjA"/>
-            <styles xmi:type="notation:FillStyle" xmi:id="_asaIQ1amEd-1RJ7RXx1qjA"/>
-            <styles xmi:type="notation:LineStyle" xmi:id="_asaIRFamEd-1RJ7RXx1qjA" lineColor="0"/>
-            <element xmi:type="bpmn:Activity" href="ContractNet.bpmn#_trpHc1T7Ed-32983CGnnJA"/>
-            <layoutConstraint xmi:type="notation:Bounds" xmi:id="_asaIRVamEd-1RJ7RXx1qjA" x="3" width="110"/>
-          </children>
           <styles xmi:type="notation:DrawerStyle" xmi:id="_tr8CaFT7Ed-32983CGnnJA"/>
           <styles xmi:type="notation:SortingStyle" xmi:id="_tr8CaVT7Ed-32983CGnnJA"/>
           <styles xmi:type="notation:FilteringStyle" xmi:id="_tr8CalT7Ed-32983CGnnJA"/>
