@@ -391,17 +391,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 					}
 					catch(Exception e)
 					{
-						// Fatal error!
-						fatalerror	= true;
-						e.printStackTrace();
-						getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
-							
-						// Remove component from platform.
-						((IComponentManagementService)container.getService(IComponentManagementService.class)).destroyComponent(cid, null);
-
-//						StringWriter	sw	= new StringWriter();
-//						e.printStackTrace(new PrintWriter(sw));
-//						getLogger().severe("Execution of action led to exception: "+sw);
+						fatalError(e);
 					}
 				}
 				try
@@ -410,17 +400,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 				}
 				catch(Exception e)
 				{
-					// Fatal error!
-					fatalerror	= true;
-					e.printStackTrace();
-					getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
-						
-					// Remove component from platform.
-					((IComponentManagementService)container.getService(IComponentManagementService.class)).destroyComponent(cid, null);
-
-//					StringWriter	sw	= new StringWriter();
-//					e.printStackTrace(new PrintWriter(sw));
-//					getLogger().severe("Execution of action led to exception: "+sw);
+					fatalError(e);
 				}
 			}
 			else //if(entries[i] instanceof Runnable)
@@ -431,17 +411,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 				}
 				catch(Exception e)
 				{
-					// Fatal error!
-					fatalerror	= true;
-					e.printStackTrace();
-					getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
-						
-					// Remove component from platform.
-					((IComponentManagementService)container.getService(IComponentManagementService.class)).destroyComponent(cid, null);
-
-//					StringWriter	sw	= new StringWriter();
-//					e.printStackTrace(new PrintWriter(sw));
-//					getLogger().severe("Execution of action led to exception: "+sw);
+					fatalError(e);
 				}
 			}
 		}
@@ -473,15 +443,9 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 				//System.out.println("Executing: "+component);
 				again	= component.executeStep();
 			}
-			catch(Throwable e)
+			catch(Exception e)
 			{
-				// Fatal error!
-				fatalerror	= true;
-				e.printStackTrace();
-				getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
-					
-				// Remove component from platform.
-				((IComponentManagementService)container.getService(IComponentManagementService.class)).destroyComponent(cid, null);
+				fatalError(e);
 			}
 			if(dostep)
 			{
@@ -513,6 +477,25 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		this.componentthread = null;
 		
 		return again || extexecuted;
+	}
+
+	/**
+	 * 	Called when an error occurs during component execution.
+	 *  @param e	The error.
+	 */
+	protected void fatalError(Exception e)
+	{
+		// Fatal error!
+		fatalerror	= true;
+		
+		// Todo: delegate printing to parent component (if any).
+		e.printStackTrace();
+		getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
+			
+		// Remove component from platform.
+		ComponentManagementService	cms	= (ComponentManagementService)container.getService(IComponentManagementService.class);
+		cms.setComponentException(cid, e);
+		cms.destroyComponent(cid, null);
 	}
 	
 	/**

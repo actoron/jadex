@@ -26,6 +26,7 @@ import jadex.standalone.StandaloneComponentAdapter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -74,6 +75,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 	
 	/** The autoshutdown flag. */
 	protected boolean autoshutdown;
+
+	/** The exception of a component during execution (if any). */
+	protected Map	exceptions;
 	
     //-------- constructors --------
 
@@ -656,7 +660,15 @@ public class ComponentManagementService implements IComponentManagementService, 
 			if(reslis!=null)
 			{
 //				System.out.println("result: "+cid+" "+results);
-				reslis.resultAvailable(cid, results);
+				if(exceptions!=null && exceptions.containsKey(cid))
+				{
+					reslis.exceptionOccurred(cid, (Exception)exceptions.get(cid));
+					exceptions.remove(cid);
+				}
+				else
+				{
+					reslis.resultAvailable(cid, results);
+				}
 			}
 			
 //			System.out.println("CleanupCommand end.");
@@ -1003,6 +1015,22 @@ public class ComponentManagementService implements IComponentManagementService, 
 			{
 				System.out.println("WARNING: Exception when changing component state: "+desc+", "+e);
 			}
+		}
+	}
+
+	/**
+	 *  Set the exception of a component.
+	 *  @param comp	The component.
+	 *  @param e	The exception.
+	 */
+	public void setComponentException(IComponentIdentifier comp, Exception e)
+	{
+		synchronized(descs)
+		{
+			if(exceptions==null)
+				exceptions	= new HashMap();
+			
+			exceptions.put(comp, e);
 		}
 	}
 	
