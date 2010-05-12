@@ -31,4 +31,9 @@ public interface IMicroExternalAccess	extends IExternalAccess
 	 *  should be properly synchronized with invokeLater()!
 	 */
 	public IMicroAgent	getAgent();
+	
+	/**
+	 *  Get the domain interfaces of the component.
+	 */
+//	public Class[] getDomainInterfaces();
 }
