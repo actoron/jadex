@@ -1,0 +1,130 @@
+
+	<!--
+		<H3>service agent</H3>
+	-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="ServiceAgent" package="deco4mas.examples.agentNegotiation.sa">
+
+	<imports>
+		<import>jadex.bdi.planlib.df.*</import>
+		<import>jadex.base.fipa.*</import>
+		<import>jadex.bdi.planlib.protocols.*</import>
+		<import>jadex.adapter.base.contextservice.*</import>
+		<import>jadex.adapter.base.appdescriptor.*</import>
+		<import>jadex.application.space.envsupport.environment.space2d.*</import>
+		<import>jadex.application.space.envsupport.environment.*</import>
+		<import>jadex.application.space.envsupport.math.*</import>
+		<import>jadex.application.runtime.*</import>
+		<import>deco4mas.examples.agentNegotiation.deco.*</import>
+		<import>deco4mas.coordinate.environment.*</import>
+		<import>deco4mas.coordinate.*</import>
+		<import>jadex.commons.IFilter</import>
+	</imports>
+
+	<capabilities>
+		<capability name="logcap"
+			file="deco4mas/examples/agentNegotiation/evaluate/Logging.capability.xml" />
+		<capability name="reqcap"
+			file="jadex.bdi.planlib.protocols.request.Request" />
+<!--			<capability name="ping" file="deco4mas.examples.agentNegotiation.sma.ping.Ping"/>-->
+	</capabilities>
+
+	<beliefs>
+		<belief name="env" class="CoordinationSpace">
+			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")
+			</fact>
+		</belief>
+
+		<belief name="myself" class="ISpaceObject" exported="true">
+			<fact>$beliefbase.env.getAvatar($scope.getComponentIdentifier())
+			</fact>
+		</belief>
+
+		<belief name="providedService" class="String" exported="true"></belief>
+		<belief name="serviceLength" class="Integer" exported="true"></belief>
+		<belief name="proposalBase" class="Integer" exported="true" />
+		<belief name="blackout" class="boolean">
+			<fact>false</fact>
+		</belief>
+	</beliefs>
+
+	<goals>
+		<!-- logging -->
+		<achievegoalref name="informLogger">
+			<concrete ref="logcap.informLogger" />
+		</achievegoalref>
+
+		<!-- Deco -->
+		<achievegoal name="offer">
+			<parameter name="offer" class="ServiceOffer"></parameter>
+		</achievegoal>
+	</goals>
+
+	<plans>
+		<!-- service request -->
+		<plan name="rp_decide_request_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="reqcap.rp_decide_request.action" />
+			</parameter>
+			<parameter name="accept" class="Boolean" direction="out">
+				<goalmapping ref="reqcap.rp_decide_request.accept" />
+			</parameter>
+			<body class="ServiceDecitePlan" />
+			<trigger>
+				<goal ref="reqcap.rp_decide_request" />
+			</trigger>
+		</plan>
+		<plan name="rp_execute_request_plan">
+			<parameter name="action" class="Object">
+				<goalmapping ref="reqcap.rp_execute_request.action" />
+			</parameter>
+			<parameter name="result" class="Object" direction="out"
+				optional="true">
+				<goalmapping ref="reqcap.rp_execute_request.result" />
+			</parameter>
+			<body class="ExecuteServicePlan" />
+			<trigger>
+				<goal ref="reqcap.rp_execute_request" />
+			</trigger>
+		</plan>
+
+		<!-- deco proposal -->
+		<plan name="deliverProposal">
+			<body class="DeliverProposalPlan"></body>
+			<trigger>
+				<goal ref="offer"></goal>
+			</trigger>
+			<precondition>!$beliefbase.blackout</precondition>
+		</plan>
+
+		<!-- blackout -->
+		<plan name="blackout">
+			<body class="BlackoutPlan"></body>
+		</plan>
+	</plans>
+
+	<events>
+		<!-- Deco -->
+		<internalevent name="announceProposal">
+			<parameter name="task" class="String"></parameter>
+			<parameter name="proposal" class="ServiceProposal"></parameter>
+		</internalevent>
+	</events>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief ref="reqcap.rp_filter">
+					<fact>IFilter.ALWAYS</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="blackout"></initialplan>
+			</plans>
+		</configuration>
+	</configurations>
+</agent>
+

@@ -1,0 +1,130 @@
+
+	<!--
+		<H3>A agent negotiation application</H3> It can be started to launch a
+		agent negotiation scenario.
+	-->
+
+<applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
+	xmlns:env="http://jadex.sourceforge.net/jadex-envspace" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application-2.0.xsd
+						http://jadex.sourceforge.net/jadex-application
+	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd
+	                    http://jadex.sourceforge.net/jadex-envspace"
+	name="AgentNegotiation" package="jadex.agentbpmn.examples.agentNegotiation">
+
+
+	<imports>
+		<import>jadex.application.space.envsupport.environment.*</import>
+		<import>jadex.adapter.base.envsupport.environment.*</import>
+		<import>jadex.application.space.envsupport.math.*</import>
+		<import>jadex.service.clock.IClockService</import>
+		<import>jadex.adapter.base.envsupport.dataview.GeneralDataView2D
+		</import>
+		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
+		<import>jadex.bdi.planlib.*</import>
+		<import>jadex.application.space.envsupport.dataview.*</import>
+		<import>deco4mas.examples.agentNegotiation.deco.negMedium.*</import>
+		<import>deco4mas.examples.agentNegotiation.evaluate.logger.*</import>
+		<import>deco4mas.coordinate.interpreter.coordination_information.*
+		</import>
+		<import>deco4mas.coordinate.environment.*</import>
+		<import>deco4mas.annotation.agent.*</import>
+		<import>deco4mas.coordinate.*</import>
+	</imports>
+
+	<spacetypes>
+		<env:envspacetype name="coordspace" width="11"
+			height="11" class="CoordinationSpace">
+
+			<env:property name="dynamics_configuration">"src//jadex//deco4mas//examples//agentNegotiation//deco//belief_set.dynamics.xml"
+			</env:property>
+
+			<env:processtypes>
+				<env:processtype name="MediumTime" class="MediumTimeProcess">
+				</env:processtype>
+			</env:processtypes>
+
+			<env:spaceexecutor class="DeltaTimeExecutor">
+				<env:property name="space">$space</env:property>
+				<env:property name="tick">true</env:property>
+			</env:spaceexecutor>
+
+
+		</env:envspacetype>
+	</spacetypes>
+
+	<componenttypes>
+		<componenttype
+			filename="deco4mas/examples/agentNegotiation/provider/WorkflowProvider.agent.xml"
+			name="WorkflowProvider" />
+		<componenttype
+			filename="deco4mas/examples/agentNegotiation/sa/masterSa/MasterServiceCreator.agent.xml"
+			name="MasterServiceCreator" />
+		<componenttype
+			filename="deco4mas/examples/agentNegotiation/sa/ServiceAgent.agent.xml"
+			name="ServiceAgent" />
+		<componenttype
+			filename="deco4mas/examples/agentNegotiation/sma/ServiceManagementAgent.agent.xml"
+			name="ServiceManagementAgent" />
+		<componenttype
+			filename="deco4mas/examples/agentNegotiation/evaluate/logger/Logger.agent.xml"
+			name="Logger" />
+	</componenttypes>
+
+	<applications>
+		<application name="agentNegotiation">
+			<spaces>
+				<env:envspace name="mycoordspace" type="coordspace"
+					width="2" height="2">
+					<env:processes>
+						<env:process type="MediumTime">
+						</env:process>
+					</env:processes>
+				</env:envspace>
+
+			</spaces>
+			<components>
+				<component type="MasterServiceCreator">
+					<arguments>
+						<argument name="names">
+							new String[]
+							{
+							new String("Chassisbau"),
+							new
+							String("Reifenhersteller"),
+							new String("Endmontage")
+							}
+											</argument>
+						<argument name="length">
+							new Integer[]
+							{
+							2500,
+							2000,
+							1000
+							}	
+						</argument>
+						<argument name="quantities">
+							new Integer[]
+							{
+							6,
+							7,
+							6
+							}	
+						</argument>
+					</arguments>
+				</component>
+				<component type="Logger"></component>
+				<component type="WorkflowProvider" number="10">
+					<arguments>
+						<argument name="workflowName">
+							new String("workflow2")
+						</argument>
+					</arguments>
+				</component>
+			</components>
+		</application>
+	</applications>
+
+
+
+</applicationtype>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+	Log Capability
+	Using to log information
+-->
+<capability xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="Logging" package="deco4mas.examples.agentNegotiation.evaluate">
+
+	<imports>
+		<import>jadex.bridge.IComponentIdentifier</import>
+		<import>jadex.base.fipa.*</import>
+		<import>jadex.commons.*</import>
+	</imports>
+
+	<beliefs>
+		<belief name="logger" class="IComponentIdentifier" />
+		<beliefset name="LogData" class="LogInformation" />
+	</beliefs>
+
+	<goals>
+		<achievegoal name="getLogger"></achievegoal>
+	</goals>
+
+	<plans>
+		<plan name="informLogger">
+			<body class="InformLoggerPlan">
+			</body>
+			<trigger>
+				<internalevent ref="logInformation"></internalevent>
+			</trigger>
+		</plan>
+		<plan name="getLogger">
+			<body class="GetLoggerPlan"></body>
+			<trigger>
+				<goal ref="getLogger"></goal>
+			</trigger>
+		</plan>
+		<plan name="Evaluate">
+			<body class="EvaluateLoggerPlan"></body>
+			<trigger>
+				<internalevent ref="evaluateLogger"></internalevent>
+			</trigger>
+		</plan>
+	</plans>
+
+	<events>
+		<messageevent name="InformLoggerAboutEnd" direction="send"
+			type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+		</messageevent>
+		<internalevent name="logInformation">
+			<parameter name="id" class="String"></parameter>
+			<parameter name="value" class="Long"></parameter>
+		</internalevent>
+		<internalevent name="evaluateLogger">
+		</internalevent>
+	</events>
+
+</capability>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<MASDynamic name="negotiation">
+	<system_properties>
+		<role_occupations>
+			<role_occupation name="ServiceManagementAgent"
+				multiple="true">
+				<agent id="ServiceManagementAgent">
+					<elements>
+						<element id="assignSa" type="INTERNAL_EVENT" />
+						<element id="assignSaReply" type="INTERNAL_EVENT" />
+					</elements>
+				</agent>
+			</role_occupation>
+			<role_occupation name="ServiceAgent" multiple="true">
+				<agent id="ServiceAgent">
+					<elements>
+						<element id="makeProposal" type="INTERNAL_EVENT" />
+						<element id="offer" type="BDI_GOAL" />
+					</elements>
+				</agent>
+			</role_occupation>
+
+		</role_occupations>
+	</system_properties>
+
+	<causalities>
+		<deco_links>
+			<deco_link realization="by_cpn" type="POSITIVE" name="cpn">
+				<froms>
+					<from>ServiceManagementAgent</from>
+					<from>ServiceAgent</from>
+				</froms>
+				<tos>
+					<to>ServiceManagementAgent</to>
+					<to>ServiceAgent</to>
+				</tos>
+			</deco_link>
+		</deco_links>
+
+		<!-- The detailed configuration of interdependency enactment. -->
+		<deco-link-realizations>
+			<realization id="by_cpn">
+				<from>
+					<agent_element element="assignSa" agent_id="ServiceManagementAgent"
+						type="INTERNAL_EVENT">
+						<parameter_mappings>
+							<mapping class="String" ref="task" name="task" />
+							<mapping class="AssignRequest" ref="request" name="request" />
+						</parameter_mappings>
+					</agent_element>
+					<agent_element element="announceProposal" agent_id="ServiceAgent"
+						type="INTERNAL_EVENT">
+						<parameter_mappings>
+							<mapping class="String" ref="task" name="task" />
+							<mapping class="ServiceProposal" ref="proposal" name="proposal" />
+						</parameter_mappings>
+					</agent_element>
+				</from>
+				<mechanism_configuration mechanism_id="cpn"
+					agent_type="JADEX">
+				</mechanism_configuration>
+				<to>
+					<agent_element element="assignSaReply" agent_id="ServiceManagementAgent"
+						type="INTERNAL_EVENT">
+						<parameter_mappings>
+							<mapping class="AssignReply" ref="reply" name="reply" />
+						</parameter_mappings>
+					</agent_element>
+					<agent_element element="offer" agent_id="ServiceAgent"
+						type="BDI_GOAL">
+						<parameter_mappings>
+							<mapping class="ServiceOffer" ref="offer" name="offer">
+							</mapping>
+						</parameter_mappings>
+					</agent_element>
+				</to>
+			</realization>
+		</deco-link-realizations>
+	</causalities>
+</MASDynamic>

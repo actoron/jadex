@@ -1,0 +1,105 @@
+
+	<!--
+	<H3>A workflow provider agent</H3>
+-->
+
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="workflowProvider" package="deco4mas.examples.agentNegotiation.provider">
+	<imports>
+		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
+	</imports>
+
+	<capabilities>
+		<capability name="logcap"
+			file="deco4mas/examples/agentNegotiation/evaluate/Logging.capability.xml" />
+	</capabilities>
+
+	<beliefs>
+		<beliefset name="smas" class="IComponentIdentifier" />
+		<belief name="workflow" class="IComponentIdentifier" />
+		<belief name="executionPhase" class="boolean">
+			<fact>false</fact>
+		</belief>
+		<beliefset name="smaReady" class="String" />
+		<belief name="workflowName" class="String" exported="true"></belief>
+	</beliefs>
+
+	<goals>
+		<achievegoal name="preInstantiateWorkflow"></achievegoal>
+		<achievegoal name="createSmaForWorkflow">
+			<parameter name="workflow" class="IComponentIdentifier"></parameter>
+		</achievegoal>
+		<achievegoal name="startWorkflow">
+		</achievegoal>
+		<achievegoal name="restartWorkflow"></achievegoal>
+	</goals>
+
+	<plans>
+		<plan name="preInstantiateWorkflow">
+			<body class="PreInstantiateWorkflowPlan"></body>
+			<trigger>
+				<goal ref="preInstantiateWorkflow"></goal>
+			</trigger>
+			<precondition>!$beliefbase.executionPhase</precondition>
+		</plan>
+		<plan name="createSmaForWorkflow">
+			<parameter name="workflow" class="IComponentIdentifier" />
+			<body class="CreateSmaForWorkflowPlan"></body>
+			<trigger>
+				<goal ref="createSmaForWorkflow"></goal>
+			</trigger>
+			<precondition>!$beliefbase.executionPhase</precondition>
+		</plan>
+		<plan name="startWorkflow">
+			<body class="StartWorkflowPlan"></body>
+			<trigger>
+				<goal ref="startWorkflow"></goal>
+			</trigger>
+		</plan>
+		<plan name="smaReady">
+			<body class="SmaReadyPlan"></body>
+			<trigger>
+				<messageevent ref="smaReady"></messageevent>
+			</trigger>
+		</plan>
+		<plan name="restartWorkflow">
+			<body class="RestartWorkflowPlan">
+			</body>
+			<trigger>
+				<goal ref="restartWorkflow"></goal>
+			</trigger>
+		</plan>
+	</plans>
+
+
+	<events>
+		<messageevent name="smaReady" type="fipa" direction="receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+		</messageevent>
+
+		<internalevent name="workflowExecuted"></internalevent>
+
+		<internaleventref name="logInformation">
+			<concrete ref="logcap.logInformation" />
+		</internaleventref>
+
+		<internaleventref name="evaluateLogger">
+			<concrete ref="logcap.evaluateLogger" />
+		</internaleventref>
+	</events>
+
+	<configurations>
+		<configuration name="One workflow with SMAs">
+			<goals>
+				<initialgoal ref="preInstantiateWorkflow" />
+			</goals>
+		</configuration>
+	</configurations>
+
+</agent>
+
