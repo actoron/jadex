@@ -2,6 +2,7 @@ package deco4mas.coordinate.environment;
 
 
 
+import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
 import jadex.application.space.envsupport.environment.AvatarMapping;
 import jadex.application.space.envsupport.environment.EnvironmentEvent;
@@ -47,8 +48,18 @@ public class CoordinationSpace extends Grid2D {
 	 */
 	public CoordinationSpace() {		
 		super(CoordinationSpace.class.getName(), null);
-		initSpace();
+		initSpaces();
 		initDeco4mas();
+	}
+	
+	@Override
+	public void initSpace(IApplication context, MSpaceInstance config) throws Exception
+	{
+		super.initSpace(context, config);
+		for (ICoordinationMechanism icord : activeCoordinationMechanisms)
+		{
+			icord.start();
+		}
 	}
 
 	/**
@@ -121,7 +132,7 @@ public class CoordinationSpace extends Grid2D {
 	/**
 	 * Responsible to initialize the space itself.
 	 */
-	private void initSpace() {
+	private void initSpaces() {
 		// this object type is used within the deco4mas coordination.
 		this.addSpaceObjectType("CoordinationSpaceObject", null);
 	}

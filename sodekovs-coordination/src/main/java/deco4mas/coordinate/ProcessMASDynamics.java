@@ -9,8 +9,6 @@ import java.util.ArrayList;
 
 import javax.xml.bind.JAXBException;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.MethodAccessor_Double;
-
 import deco.lang.dynamics.MASDynamics;
 import deco.lang.dynamics.causalities.DecentralMechanismLink;
 import deco.lang.dynamics.causalities.DirectLink;

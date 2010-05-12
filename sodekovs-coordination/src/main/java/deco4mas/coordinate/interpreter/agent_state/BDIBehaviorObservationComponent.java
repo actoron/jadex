@@ -15,6 +15,7 @@ import jadex.bdi.runtime.IPlanListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,7 +75,7 @@ public class BDIBehaviorObservationComponent {
 	private void publishEvent(Object value, HashMap<String, Object> parameterDataMappings, String dmlRealizationName) {
 
 		CoordinationInfo coordInfo = new CoordinationInfo();
-		coordInfo.setName("Test-Coord-Info");
+		coordInfo.setName("Test-Coord-Info-" + new Date().getTime());
 		coordInfo.setType(CoordinationSpaceObject.COORDINATION_INFORMATION_TYPE);
 		coordInfo.addValue(CoordinationSpaceObject.AGENT_ARCHITECTURE, "BDI");
 		coordInfo.addValue(Constants.VALUE, value);

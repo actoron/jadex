@@ -3,7 +3,7 @@
  */
 package deco4mas.coordinate.interpreter.coordination_information;
 
-import jadex.bdi.interpreter.OAVBDIFetcher;
+import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBelief;

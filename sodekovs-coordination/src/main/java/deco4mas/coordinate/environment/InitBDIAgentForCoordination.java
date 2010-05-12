@@ -55,8 +55,8 @@ public class InitBDIAgentForCoordination {
 		this.space = space;
 		this.context = context;
 		
-		initAvatar();
-		initExternalAccess();		
+		boolean exeption = initAvatar();
+		if (!exeption) initExternalAccess();		
 	}
 
 	/**
@@ -161,7 +161,8 @@ public class InitBDIAgentForCoordination {
 		}
 	}
 
-	private void initAvatar() {
+	private boolean initAvatar() {
+		boolean exeption = false; 
 		// Object[] obj = ((Space2D)space).getSpaceObjects();
 		// System.out.println("Got SpaceObjects. Before...: Nr: " + obj.length);
 		// for (int i = 0; i < obj.length; i++) {
@@ -179,14 +180,23 @@ public class InitBDIAgentForCoordination {
 			// // AvatarMapping avatarMapping = new AvatarMapping("Receiver",
 			// // "receiver");
 			// // space.addAvatarMappings(avatarMapping);
-			Map props = new HashMap();
-			props.put(ISpaceObject.PROPERTY_OWNER, ai);
-			space.createSpaceObject(((IApplication) space.getContext()).getComponentType(ai), props, null);
+			try
+			{
+				Map props = new HashMap();
+				props.put(ISpaceObject.PROPERTY_OWNER, ai);
+				space.createSpaceObject(((IApplication) space.getContext()).getComponentType(ai), props, null);
+			} catch (Exception e)
+			{
+				//e.printStackTrace();
+				exeption =true;
+			}
+			
 			// } else {
 			// ISpaceObject[] avatars = space.getAvatars(aif[i]);
 			// // System.out.println(agentName + " has " + avatars.length +
 			// " -  avatars. Avatar: " + avatars[0].toString());
 		}
+		return exeption;
 		// }
 		// }
 	}
