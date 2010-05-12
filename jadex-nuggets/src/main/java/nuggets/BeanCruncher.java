@@ -10,6 +10,9 @@
  */
 package nuggets;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import nuggets.util.IdHashMap;
 
 
@@ -17,9 +20,6 @@ import nuggets.util.IdHashMap;
  * BeanCruncher - transforms beans into parts and attributes. To be used on one
  * communication line. Uses references to minimize the number of items send over
  * the wire or to disk.
- * 
- * @author walczak
- * @since Dec 2, 2005
  */
 public class BeanCruncher implements ICruncher
 {
@@ -30,6 +30,8 @@ public class BeanCruncher implements ICruncher
 
 	final private IdHashMap	ids					= new IdHashMap();
 
+	private Map idstodo = new HashMap();
+	
 	static final int		MAX_VALUE_LENGTH	= 256;
 
 	/**
@@ -86,7 +88,8 @@ public class BeanCruncher implements ICruncher
 		}
 		else if(value.length() > MAX_VALUE_LENGTH)
 		{
-			codec.put(attr, Integer.toHexString(getID(value)));
+			put(attr, getID(value));
+//			codec.put(attr, Integer.toHexString(getID(value)));
 		}
 		else
 		{
@@ -150,6 +153,12 @@ public class BeanCruncher implements ICruncher
 
 		codec.start(ontology);
 		persist_recursive(root, classloader);
+		Object[] todo = idstodo.keySet().toArray();
+		for(int i=0; i<todo.length; i++)
+		{
+			int key = ((Integer)idstodo.get(todo[i])).intValue();
+			persist_recursive(key, todo[i], classloader);
+		}
 		codec.end();
 	}
 
@@ -160,6 +169,7 @@ public class BeanCruncher implements ICruncher
 	{
 		ontology=null;
 		ids.clear();
+		idstodo.clear();
 		seq = 1;
 	}
 
@@ -173,6 +183,7 @@ public class BeanCruncher implements ICruncher
 		if(id==0)
 		{
 			ids.put(o, id=seq++);
+			idstodo.remove(o);
 			Class clazz = o.getClass();
 
 			// find delegate
@@ -188,6 +199,29 @@ public class BeanCruncher implements ICruncher
 			}
 		}
 		return id;
+	}
+	
+	/**
+	 * @param o
+	 * @return the id of this object
+	 */
+	protected void persist_recursive(int id, Object o, ClassLoader classloader)
+	{
+		ids.put(o, id);
+		idstodo.remove(o);
+		Class clazz = o.getClass();
+
+		// find delegate
+		IDelegate m = PersistenceHelper.getDelegate(clazz, classloader);
+		try
+		{
+			m.persist(o, this, classloader);
+			codec.end(getTag(clazz));
+		}
+		catch(Exception e)
+		{
+			throw new PersistenceException(e);
+		}
 	}
 
 	/**
@@ -222,8 +256,12 @@ public class BeanCruncher implements ICruncher
 	{
 		if(o == null) return 0;
 		int id = ids.get(o);
-		if(id == 0) ids.put(o, id = seq++);
-
+		if(id == 0) 
+		{	
+			id = seq++;
+//			ids.put(o, id = seq++);
+			idstodo.put(o, new Integer(id));
+		}
 		return id;
 	}
 	

@@ -314,30 +314,3 @@ public class JavaXMLWriter implements IWriter {
 
 
 }
-
-/* 
- * $Log$
- * Revision 1.7  2006/02/17 12:48:54  walczak
- * yet even faster
- *
- * Revision 1.6  2006/02/16 17:41:08  walczak
- * no reference to strings in Maps but a direct inclusion.
- *
- * Revision 1.5  2006/02/16 10:08:29  walczak
- * codding of XML text contents schould be better now
- *
- * Revision 1.4  2006/02/15 10:42:31  walczak
- * removed StringBuffer from XMLReader,
- * removed "new" from XMLReadr,
- * made generated Delegates use set method,
- *
- * Revision 1.3  2006/02/14 17:39:05  walczak
- * new version of nuggets
- *
- * Revision 1.2  2006/01/20 18:11:02  walczak
- * ------------------------
- *
- * Revision 1.1  2006/01/18 13:59:47  walczak
- * Introduced the nuggets package.
- *
- */
