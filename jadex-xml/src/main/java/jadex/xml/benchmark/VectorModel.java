@@ -41,6 +41,11 @@ public class VectorModel
 		v1.add(o);
 	}
 	
+	public void addToV2(Object o)
+	{
+		v2.add(o);
+	}
+	
 	public int hashCode()
 	{
 		final int prime = 31;

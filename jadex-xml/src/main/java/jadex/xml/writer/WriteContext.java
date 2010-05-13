@@ -4,7 +4,7 @@ import jadex.commons.collection.MultiCollection;
 import jadex.xml.IContext;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +45,7 @@ public class WriteContext implements IContext
 	 */
 	public WriteContext(XMLStreamWriter writer, Object usercontext, Object rootobject, ClassLoader classloader)
 	{
-		this(writer, usercontext, rootobject, classloader, new HashMap(), new ArrayList(), new MultiCollection());
+		this(writer, usercontext, rootobject, classloader, new IdentityHashMap(), new ArrayList(), new MultiCollection());
 	}
 		
 	/**
