@@ -20,7 +20,7 @@
         <outputDirectory>lib</outputDirectory>
         <unpack>false</unpack>
       </binaries>
-      
+      <!-- 
       <sources>
         <includeModuleDirectory>false</includeModuleDirectory>
         <fileSets>
@@ -39,10 +39,10 @@
           </fileSet>
         </fileSets>
       </sources>
- 
+  -->
     </moduleSet>
   </moduleSets>
-
+<!-- 
   <fileSets>
     <fileSet>
       <directory>/target/site/</directory>
@@ -97,5 +97,5 @@
       <outputDirectory>/</outputDirectory>
     </file>
   </files>
-
+ -->
 </assembly>

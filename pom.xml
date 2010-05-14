@@ -78,28 +78,6 @@
   	</profile>
   	<profile>
   		<id>jadex-full-dist</id>
-  		<build>
-		    <plugins>
-		      <plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-assembly-plugin</artifactId>
-		        <configuration>
-				  <archiverConfig>
-				    <duplicateBehavior>skip</duplicateBehavior>
-				  </archiverConfig>
-				</configuration> 
-		        <executions>
-		        	<execution>
-		        		<id>make-assembly</id>
-		        		<phase>package</phase>
-		        		<goals>
-		        			<goal>single</goal>
-		        		</goals>
-		        	</execution>
-		        </executions>
-		      </plugin>
-		    </plugins>
-  		</build>
 		<modules>
 		 	<module>jadex-commons</module>
 		 	<module>jadex-xml</module>
@@ -274,14 +252,24 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-		  <archiverConfig>
-		    <duplicateBehavior>skip</duplicateBehavior>
+        <version>2.2-beta-3</version>
+         <configuration>
+ 		  <archiverConfig>
+		    <duplicateBehavior>add</duplicateBehavior>
 		  </archiverConfig>
           <descriptors>
             <descriptor>src/main/assembly/dist-assembly.xml</descriptor>
           </descriptors>
         </configuration>
+        <executions>
+        	<execution>
+        		<id>make-assembly</id>
+        		<phase>package</phase>
+        		<goals>
+        			<goal>single</goal>
+        		</goals>
+        	</execution>
+        </executions>
       </plugin>
     </plugins>
   </build>  

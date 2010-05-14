@@ -22,7 +22,7 @@
     </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_gYXwIVrFEd-ircvS5nprxA" iD="_gYXwIFrFEd-ircvS5nprxA">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_K8JpsFrGEd-ircvS5nprxA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_K8JpsVrGEd-ircvS5nprxA" key="condition" value="Math.random()&lt;0.66666"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_K8JpsVrGEd-ircvS5nprxA" key="condition" value="Math.random()&lt;0.75"/>
       </eAnnotations>
     </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_hVdqgVrFEd-ircvS5nprxA" iD="_hVdqgFrFEd-ircvS5nprxA">
