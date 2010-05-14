@@ -644,6 +644,8 @@ public class Perspective2D extends SimplePropertyObject implements IPerspective
 			for (int i = 0; i < objects.length; ++i)
 			{
 				DrawableCombiner dc = (DrawableCombiner)visuals.get(SObjectInspector.getType(objects[i]));
+				if (dc == null)
+					continue;
 				IVector2 objPos = (IVector2)dc.getBoundValue(objects[i], dc.getPosition(), viewport); 
 				if (objPos == null)
 				{
