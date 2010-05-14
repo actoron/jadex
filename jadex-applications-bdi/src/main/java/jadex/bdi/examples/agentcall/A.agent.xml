@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	<H3>Agent that invokes another agent via a method call.</H3>
+-->
+<agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="A"
+	package="jadex.bdi.examples.agentcall">
+
+	<plans>
+		<plan name="testplan">
+			<body class="InvokeAgentPlan"></body>
+		</plan>
+	</plans>
+	
+	<configurations>
+		<configuration name="default">
+			<plans>
+				<initialplan ref="testplan"></initialplan>
+			</plans>
+		</configuration>
+	</configurations>
+
+</agent>

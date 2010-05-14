@@ -183,8 +183,8 @@
 					<env:property name="object">$object</env:property>
 					<env:property name="range">$object.vision_range
 					</env:property>
-				</env:view>
-			</env:views>
+				</env:dataview>
+			</env:dataviews>
 
 			<env:perspectives>
 				<env:perspective name="icons" class="Perspective2D"

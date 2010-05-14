@@ -4,10 +4,6 @@ import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  *  Future that includes mechanisms for callback notification.
@@ -15,7 +11,7 @@ import java.util.concurrent.TimeoutException;
  *  a) a blocking call to get() should be used
  *  b) a callback shall be invoked
  */
-public class CallbackFuture implements Future
+public class Future implements IFuture
 {
 	//-------- attributes --------
 	
@@ -25,6 +21,9 @@ public class CallbackFuture implements Future
 	/** Flag indicating if result is available. */
 	protected boolean resultavailable;
 	
+	/** The blocked callers. */
+	protected List callers;
+	
 	/** The listeners. */
 	protected List listeners;
 	
@@ -33,35 +32,17 @@ public class CallbackFuture implements Future
 	/**
 	 *  Create a new future.
 	 */
-	public CallbackFuture()
+	public Future()
 	{
-//		this.threads = new ArrayList();
 		this.listeners = new ArrayList();
+		this.callers = new ArrayList();
 	}
 	
 	//-------- methods --------
 
-	
 	/**
-	 *  Try to cancel.
-	 */
-    public synchronized boolean cancel(boolean mayInterruptIfRunning)
-    {
-    	// todo: cancel?
-    	return false;
-    }
-
-    /**
-     *  Test if cancelled.
-     */
-    public synchronized boolean isCancelled()
-    {
-    	// todo: cancel?
-    	return false;
-    }
-
-    /**
-     *  Test if done.
+     *  Test if done, i.e. result is available.
+     *  @return True, if done.
      */
     public synchronized boolean isDone()
     {
@@ -70,25 +51,27 @@ public class CallbackFuture implements Future
 
     /**
      *  Get the result - blocking call.
+     *  @return The future result.
      */
-    public synchronized Object get() throws InterruptedException, ExecutionException
+    public synchronized Object get(ISuspendable caller)
     {
-    	if(!resultavailable)
-    	{
-    		this.wait();
-    	}
-    	return result;
+    	return get(caller, -1);
     }
 
     /**
      *  Get the result - blocking call.
+     *  @param timeout The timeout in millis.
+     *  @return The future result.
      */
-    public synchronized Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException
+    public synchronized Object get(ISuspendable caller, long timeout)
     {
     	if(!resultavailable)
     	{
-//    		threads.add(Thread.currentThread());
-    		Thread.currentThread().wait(unit.toMillis(timeout));
+    	   	if(caller==null)
+        		caller = new ThreadSuspendable(this);
+     
+    	   	callers.add(caller);
+    		caller.suspend(timeout);
     	}
     	return result;
     }
@@ -96,6 +79,7 @@ public class CallbackFuture implements Future
     /**
      *  Set the result. 
      *  Listener notifications occur on calling thread of this method.
+     *  @param result The result.
      */
     public synchronized void setResult(Object result)
     {
@@ -105,7 +89,10 @@ public class CallbackFuture implements Future
     	this.result = result;
     	resultavailable = true;
     	
-    	this.notifyAll();
+    	for(int i=0; i<callers.size(); i++)
+    	{
+    		((ISuspendable)callers.get(i)).resume();
+    	}
     	for(int i=0; i<listeners.size(); i++)
     	{
     		notifyListener((IResultListener)listeners.get(i));
@@ -114,6 +101,7 @@ public class CallbackFuture implements Future
     
     /**
      *  Add a result listener.
+     *  @param listsner The listener.
      */
     public synchronized void addResultListener(IResultListener listener)
     {
@@ -129,15 +117,20 @@ public class CallbackFuture implements Future
     
     /**
      *  Notify a result listener.
+     *  @param listener The listener.
      */
     protected void notifyListener(IResultListener listener)
     {
     	// todo: source?
     	// hack!
 		if(result instanceof Exception)
+		{
 			listener.exceptionOccurred(this, (Exception)result);
+		}
 		else
+		{
 			listener.resultAvailable(this, result); 
+		}
     }
     
     /**
@@ -145,7 +138,7 @@ public class CallbackFuture implements Future
      */
     public static void main(String[] args) throws Exception
     {
-    	final CallbackFuture f = new CallbackFuture();
+    	final Future f = new Future();
     
     	f.addResultListener(new IResultListener()
 		{
@@ -179,7 +172,7 @@ public class CallbackFuture implements Future
     	t.start();
     	
     	System.out.println(Thread.currentThread().getName()+": waiting for result");
-    	Object result = f.get();
+    	Object result = f.get(null);
     	System.out.println(Thread.currentThread().getName()+": result is: "+result);
     }
 }
