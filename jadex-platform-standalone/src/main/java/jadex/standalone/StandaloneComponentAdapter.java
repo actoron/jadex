@@ -495,7 +495,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		// Remove component from platform.
 		ComponentManagementService	cms	= (ComponentManagementService)container.getService(IComponentManagementService.class);
 		cms.setComponentException(cid, e);
-		cms.destroyComponent(cid, null);
+		cms.destroyComponent(cid);
 	}
 	
 	/**

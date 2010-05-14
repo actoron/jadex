@@ -296,7 +296,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					
 					public void resultAvailable(Object source, Object result)
 					{
-						ces.destroyComponent(((IComponentDescription)result).getParent(), null);
+						ces.destroyComponent(((IComponentDescription)result).getParent());
 					}
 					
 					public void exceptionOccurred(Object source, Exception exception)

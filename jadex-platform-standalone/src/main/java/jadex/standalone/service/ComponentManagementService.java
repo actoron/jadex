@@ -15,6 +15,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageService;
 import jadex.bridge.ISearchConstraints;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
@@ -108,16 +110,17 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  @param listener The result listener (if any). Will receive the id of the component as result, when the component has been created.
 	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
-	public void	createComponent(String name, String model, CreationInfo info, IResultListener listener, final IResultListener killlistener)
+	public IFuture createComponent(String name, String model, CreationInfo info, final IResultListener killlistener)
 	{
+		final Future ret = new Future();
+		
 		final CreationInfo cinfo = info!=null? info: new CreationInfo();	// Dummy default info, if null.
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
 		
 		if(name!=null && name.indexOf('@')!=-1)
 		{
-			listener.exceptionOccurred(this, new RuntimeException("No '@' allowed in component name."));
-			return;
+			ret.setResult(new RuntimeException("No '@' allowed in component name."));
+//			listener.exceptionOccurred(this, new RuntimeException("No '@' allowed in component name."));
+			return ret;
 			//throw new RuntimeException("No '@' allowed in component name.");
 		}
 
@@ -170,8 +173,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 					cid = new ComponentIdentifier(name+"@"+container.getName()); // Hack?!
 					if(adapters.containsKey(cid))
 					{
-						listener.exceptionOccurred(this, new RuntimeException("Component name already exists on platform: "+cid));
-						return;
+						ret.setResult(new RuntimeException("Component name already exists on platform: "+cid));
+//						listener.exceptionOccurred(this, new RuntimeException("Component name already exists on platform: "+cid));
+						return ret;
 					}
 					IMessageService	ms	= (IMessageService)container.getService(IMessageService.class);
 					if(ms!=null)
@@ -216,36 +220,39 @@ public class ComponentManagementService implements IComponentManagementService, 
 
 		if(pad!=null)
 		{
-			final IResultListener	rl	= listener;
+//			final IResultListener	rl	= listener;
 			final IComponentFactory	cf	= factory;
 			final StandaloneComponentAdapter	fpad	= pad;
 			pad.getComponentInstance().getExternalAccess(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					createComponentInstance(cinfo.getConfiguration(), cinfo.getArguments(), cinfo.isSuspend(), rl,
+					createComponentInstance(cinfo.getConfiguration(), cinfo.getArguments(), cinfo.isSuspend(), ret,
 						killlistener, cf, lmodel, cid, adapter, fpad, ad, (IExternalAccess)result);
 				}
 				
 				public void exceptionOccurred(Object source, Exception exception)
 				{
-					rl.exceptionOccurred(source, exception);
+					ret.setResult(exception);
+//					rl.exceptionOccurred(source, exception);
 				}
 			});
 		}
 		else
 		{
-			createComponentInstance(cinfo.getConfiguration(), cinfo.getArguments(), cinfo.isSuspend(), listener,
+			createComponentInstance(cinfo.getConfiguration(), cinfo.getArguments(), cinfo.isSuspend(), ret,
 				killlistener, factory, lmodel, cid, adapter, null, ad, null);
 		}
+		
+		return ret;
 	}
 
 	/**
 	 *  Create an instance of a component (step 2 of creation process).
 	 */
 	protected void createComponentInstance(String config, Map args,
-		boolean suspend, IResultListener listener,
-		final IResultListener resultlistener, IComponentFactory factory,
+		boolean suspend, Future ret,
+		final IResultListener killlistener, IComponentFactory factory,
 		ILoadableComponentModel lmodel, final ComponentIdentifier cid,
 		StandaloneComponentAdapter adapter, StandaloneComponentAdapter pad,
 		CMSComponentDescription ad, IExternalAccess parent)
@@ -275,10 +282,11 @@ public class ComponentManagementService implements IComponentManagementService, 
 			alisteners[i].componentAdded(ad);
 		}
 		
-		if(resultlistener!=null)
-			killresultlisteners.put(cid, resultlistener);
+		if(killlistener!=null)
+			killresultlisteners.put(cid, killlistener);
 		
-		listener.resultAvailable(this, cid.clone());
+		ret.setResult(cid.clone());
+//		listener.resultAvailable(this, cid.clone());
 		
 		if(!suspend)
 		{
@@ -290,10 +298,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  Destroy (forcefully terminate) an component on the platform.
 	 *  @param cid	The component to destroy.
 	 */
-	public void destroyComponent(IComponentIdentifier cid, IResultListener listener)
+	public IFuture destroyComponent(IComponentIdentifier cid)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		Future ret = new Future();
 		
 		CMSComponentDescription	desc;
 		synchronized(adapters)
@@ -306,7 +313,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 				IComponentIdentifier[] achildren = desc.getChildren();
 				for(int i=0; i<achildren.length; i++)
 				{
-					destroyComponent(achildren[i], null);	// todo: cascading delete with wait.
+					destroyComponent(achildren[i]);	// todo: cascading delete with wait.
 				}
 				
 //				System.out.println("killing: "+cid);
@@ -314,8 +321,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 				StandaloneComponentAdapter component = (StandaloneComponentAdapter)adapters.get(cid);
 				if(component==null)
 				{
-					listener.exceptionOccurred(this, new RuntimeException("Component "+cid+" does not exist."));
-					return;
+					ret.setResult(new RuntimeException("Component "+cid+" does not exist."));
+//					listener.exceptionOccurred(this, new RuntimeException("Component "+cid+" does not exist."));
+					return ret;
 
 					//System.out.println(componentdescs);
 					//throw new RuntimeException("Component "+aid+" does not exist.");
@@ -329,33 +337,40 @@ public class ComponentManagementService implements IComponentManagementService, 
 					{
 						CleanupCommand	cc	= new CleanupCommand(cid);
 						ccs.put(cid, cc);
-						if(listener!=null)
-							cc.addKillListener(listener);
+//						if(listener!=null)
+//							cc.addKillListener(listener);
+						cc.addKillFuture(ret);
 						component.killComponent(cc);						
 					}
 					else
 					{
-						if(listener!=null)
-						{
-							CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
-							if(cc==null)
-								listener.exceptionOccurred(this, new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
-							cc.addKillListener(listener);
-						}
+//						if(listener!=null)
+//						{
+//							CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
+//							if(cc==null)
+//								listener.exceptionOccurred(this, new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
+//							cc.addKillListener(listener);
+//						}
+						
+						CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
+						if(cc==null)
+							ret.setResult(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
+						cc.addKillFuture(ret);
 					}
 				}
 			}
 		}
+		
+		return ret;
 	}
 
 	/**
 	 *  Suspend the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public void suspendComponent(IComponentIdentifier componentid, IResultListener listener)
+	public IFuture suspendComponent(IComponentIdentifier componentid)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		final Future ret = new Future();
 		
 		CMSComponentDescription ad;
 		synchronized(adapters)
@@ -371,25 +386,38 @@ public class ComponentManagementService implements IComponentManagementService, 
 //					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
 					if(IComponentDescription.STATE_ACTIVE.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
 					{
-						suspendComponent(achildren[i], null);	// todo: cascading resume with wait.
+						suspendComponent(achildren[i]);	// todo: cascading resume with wait.
 					}
 				}
 
 				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
 				ad = (CMSComponentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
-					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
+					ret.setResult(new RuntimeException("Component identifier not registered: "+componentid));
+//					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
 					//throw new RuntimeException("Component Identifier not registered in CES: "+aid);
 				if(!IComponentDescription.STATE_ACTIVE.equals(ad.getState())
 					/*&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState())*/)
 				{
-					listener.exceptionOccurred(this, new RuntimeException("Only active components can be suspended: "+componentid+" "+ad.getState()));
+					ret.setResult(new RuntimeException("Component identifier not registered: "+componentid));
+//					listener.exceptionOccurred(this, new RuntimeException("Only active components can be suspended: "+componentid+" "+ad.getState()));
 					//throw new RuntimeException("Only active components can be suspended: "+aid+" "+ad.getState());
 				}
 				
 				ad.setState(IComponentDescription.STATE_SUSPENDED);
 				IExecutionService exe = (IExecutionService)container.getService(IExecutionService.class);
-				exe.cancel(adapter, listener);
+				exe.cancel(adapter, new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						ret.setResult(result);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setResult(exception);
+					}
+				});
 			}
 		}
 		
@@ -405,16 +433,17 @@ public class ComponentManagementService implements IComponentManagementService, 
 		{
 			alisteners[i].componentChanged(ad);
 		}
+		
+		return ret;
 	}
 	
 	/**
 	 *  Resume the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public void resumeComponent(IComponentIdentifier componentid, IResultListener listener)
+	public IFuture resumeComponent(IComponentIdentifier componentid)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		Future ret = new Future();
 		
 		CMSComponentDescription ad;
 		
@@ -432,18 +461,20 @@ public class ComponentManagementService implements IComponentManagementService, 
 					if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(achildren[i])).getState())
 						|| IComponentDescription.STATE_WAITING.equals(((IComponentDescription)descs.get(achildren[i])).getState()))
 					{
-						resumeComponent(achildren[i], null);	// todo: cascading resume with wait.
+						resumeComponent(achildren[i]);	// todo: cascading resume with wait.
 					}
 				}
 
 				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
 				ad = (CMSComponentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
-					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
+					ret.setResult(new RuntimeException("Component identifier not registered: "+componentid));
+//					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
 					//throw new RuntimeException("Component Identifier not registered in CES: "+aid);
 				if(!IComponentDescription.STATE_SUSPENDED.equals(ad.getState())
 					&& !IComponentDescription.STATE_WAITING.equals(ad.getState()))
-					listener.exceptionOccurred(this, new RuntimeException("Only suspended/waiting components can be resumed: "+componentid+" "+ad.getState()));
+					ret.setResult(new RuntimeException("Component identifier not registered: "+componentid));
+//					listener.exceptionOccurred(this, new RuntimeException("Only suspended/waiting components can be resumed: "+componentid+" "+ad.getState()));
 					//throw new RuntimeException("Only suspended components can be resumed: "+aid+" "+ad.getState());
 				
 				ad.setState(IComponentDescription.STATE_ACTIVE);
@@ -464,7 +495,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 			alisteners[i].componentChanged(ad);
 		}
 	
-		listener.resultAvailable(this, ad);
+		ret.setResult(ad);
+		return ret;
+//		listener.resultAvailable(this, ad);
 	}
 	
 	/**
@@ -563,7 +596,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 	class CleanupCommand implements IResultListener
 	{
 		protected IComponentIdentifier cid;
-		protected List killlisteners;
+//		protected List killlisteners;
+		protected List killfutures;
 		
 		public CleanupCommand(IComponentIdentifier cid)
 		{
@@ -673,11 +707,19 @@ public class ComponentManagementService implements IComponentManagementService, 
 			
 //			System.out.println("CleanupCommand end.");
 			
-			if(killlisteners!=null)
+//			if(killlisteners!=null)
+//			{
+//				for(int i=0; i<killlisteners.size(); i++)
+//				{
+//					((IResultListener)killlisteners.get(i)).resultAvailable(source, result);
+//				}
+//			}
+			
+			if(killfutures!=null)
 			{
-				for(int i=0; i<killlisteners.size(); i++)
+				for(int i=0; i<killfutures.size(); i++)
 				{
-					((IResultListener)killlisteners.get(i)).resultAvailable(source, result);
+					((Future)killfutures.get(i)).setResult(result);
 				}
 			}
 			
@@ -694,12 +736,23 @@ public class ComponentManagementService implements IComponentManagementService, 
 		/**
 		 *  Add a listener to be informed, when the component has terminated.
 		 * @param listener
-		 */
+		 * /
 		public void	addKillListener(IResultListener listener)
 		{
 			if(killlisteners==null)
 				killlisteners	= new ArrayList();
 			killlisteners.add(listener);
+		}*/
+		
+		/**
+		 *  Add a listener to be informed, when the component has terminated.
+		 * @param listener
+		 */
+		public void	addKillFuture(Future killfuture)
+		{
+			if(killfutures==null)
+				killfutures = new ArrayList();
+			killfutures.add(killfuture);
 		}
 	}
 	

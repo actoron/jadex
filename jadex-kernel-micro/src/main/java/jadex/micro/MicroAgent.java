@@ -267,7 +267,7 @@ public abstract class MicroAgent implements IMicroAgent
 	{
 		((IComponentManagementService)interpreter.getAgentAdapter().getServiceContainer()
 			.getService(IComponentManagementService.class))
-			.destroyComponent(interpreter.getAgentAdapter().getComponentIdentifier(), null);
+			.destroyComponent(interpreter.getAgentAdapter().getComponentIdentifier());
 	}
 		
 	/**

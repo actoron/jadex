@@ -53,7 +53,7 @@ public class ComponentTest implements	Test
 		
 		// Start the component.
 		TestResultListener	trl	= new TestResultListener();
-		cms.createComponent(null, comp, null, null, trl);
+		cms.createComponent(null, comp, null, trl);
 
 		// Evaluate the results.
 		try

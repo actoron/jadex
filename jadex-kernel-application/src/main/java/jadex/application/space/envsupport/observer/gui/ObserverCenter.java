@@ -675,7 +675,7 @@ public class ObserverCenter
 			{
 				IComponentManagementService	ces	= (IComponentManagementService)space.getContext()
 					.getServiceContainer().getService(IComponentManagementService.class);
-				ces.destroyComponent(space.getContext().getComponentIdentifier(), null);
+				ces.destroyComponent(space.getContext().getComponentIdentifier());
 			}
 		}
 		

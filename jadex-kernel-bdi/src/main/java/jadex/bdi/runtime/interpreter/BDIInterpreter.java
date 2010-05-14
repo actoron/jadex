@@ -723,7 +723,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	{
 		((IComponentManagementService)adapter.getServiceContainer()
 			.getService(IComponentManagementService.class))
-			.destroyComponent(adapter.getComponentIdentifier(), null);
+			.destroyComponent(adapter.getComponentIdentifier());
 	}
 	/**
 	 *  Get the agent state.

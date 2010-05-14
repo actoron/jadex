@@ -370,7 +370,7 @@ public class Application	implements IApplication, IComponentInstance
 	{
 		((IComponentManagementService)getComponentAdapter().getServiceContainer()
 			.getService(IComponentManagementService.class))
-			.destroyComponent(getComponentAdapter().getComponentIdentifier(), null);
+			.destroyComponent(getComponentAdapter().getComponentIdentifier());
 	}
 	
 	
@@ -724,7 +724,7 @@ public class Application	implements IApplication, IComponentInstance
 					IComponentManagementService	ces	= (IComponentManagementService)adapter.getServiceContainer().getService(IComponentManagementService.class);
 					ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(),
 						new CreationInfo(component.getConfiguration(), component.getArguments(this, cl), adapter.getComponentIdentifier(),
-							component.isSuspended(), component.isMaster(), component.isDaemon(), model.getApplicationType().getAllImports()), null, null);					
+							component.isSuspended(), component.isMaster(), component.isDaemon(), model.getApplicationType().getAllImports()), null);					
 	//				context.createComponent(component.getName(), component.getTypeName(),
 	//					component.getConfiguration(), component.getArguments(container, apptype, cl), component.isStart(), component.isMaster(),
 	//					DefaultResultListener.getInstance(), null);	

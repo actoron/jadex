@@ -7,6 +7,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -489,7 +490,8 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
 					IComponentManagementService ces = (IComponentManagementService)getJCC().getServiceContainer().getService(IComponentManagementService.class);
-					ces.suspendComponent(((IComponentDescription)node.getUserObject()).getName(), new IResultListener()
+					IFuture ret = ces.suspendComponent(((IComponentDescription)node.getUserObject()).getName());
+					ret.addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
@@ -535,7 +537,8 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
 					IComponentManagementService ces = (IComponentManagementService)getJCC().getServiceContainer().getService(IComponentManagementService.class);
-					ces.resumeComponent(((IComponentDescription)node.getUserObject()).getName(), new IResultListener()
+					IFuture ret = ces.resumeComponent(((IComponentDescription)node.getUserObject()).getName());
+					ret.addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
@@ -583,7 +586,8 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
 					IComponentManagementService ces = (IComponentManagementService)getJCC().getServiceContainer().getService(IComponentManagementService.class);
-					ces.destroyComponent(((IComponentDescription)node.getUserObject()).getName(), new IResultListener()
+					
+					IResultListener lis = new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
@@ -593,7 +597,10 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 						{
 							getJCC().displayError("Problem Killing Component", "Component could not be killed.", exception);
 						}
-					});
+					};
+					
+					IFuture ret = ces.destroyComponent(((IComponentDescription)node.getUserObject()).getName());
+					ret.addResultListener(lis);
 				}
 			}
 		}
@@ -916,7 +923,8 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	public void createComponent(String type, String name, String configname, Map arguments, boolean suspend, IResultListener killlistener)
 	{
 		final IComponentManagementService	ces	= (IComponentManagementService)getJCC().getServiceContainer().getService(IComponentManagementService.class);
-		ces.createComponent(name, type, new CreationInfo(configname, arguments, spanel.parent, suspend, false), new IResultListener()
+		
+		IResultListener lis = new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -927,6 +935,8 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 			{
 				getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
 			}
-		}, killlistener);
+		};
+		IFuture ret = ces.createComponent(name, type, new CreationInfo(configname, arguments, spanel.parent, suspend, false), killlistener);
+		ret.addResultListener(lis);
 	}
 }

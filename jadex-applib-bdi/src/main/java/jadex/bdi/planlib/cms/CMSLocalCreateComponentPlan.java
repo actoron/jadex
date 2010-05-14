@@ -4,6 +4,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
 import jadex.service.IServiceContainer;
 
 import java.util.Map;
@@ -30,11 +31,10 @@ public class CMSLocalCreateComponentPlan extends Plan
 
 		try
 		{
-			SyncResultListener lis = new SyncResultListener();
 			// todo: support parent/master etc.
-			((IComponentManagementService)plat.getService(IComponentManagementService.class))
-				.createComponent(name, type, new CreationInfo(config, args, parent, suspend, master), lis, null);
-			IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
+			IFuture ret = ((IComponentManagementService)plat.getService(IComponentManagementService.class))
+				.createComponent(name, type, new CreationInfo(config, args, parent, suspend, master), null);
+			IComponentIdentifier aid = (IComponentIdentifier)ret.get(this);
 			getParameter("componentidentifier").setValue(aid);
 		}
 		catch(Exception e)

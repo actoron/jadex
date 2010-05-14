@@ -3,6 +3,7 @@ package jadex.base;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.PropertyServiceContainer;
@@ -211,7 +212,8 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 		{
 			//System.out.println("Killing component: "+comps.get(i));
 			CMSComponentDescription desc = (CMSComponentDescription)comps.get(i);
-			ces.destroyComponent(desc.getName(), rl);
+			IFuture ret = ces.destroyComponent(desc.getName());
+			ret.addResultListener(rl);
 		}
 	}
 

@@ -4,6 +4,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.IFuture;
 
 /**
  *  Plan for suspending a Jadex component on the platform.
@@ -15,11 +16,10 @@ public class CMSLocalSuspendComponentPlan extends Plan
 	 */
 	public void body()
 	{
-		IComponentIdentifier	aid	= (IComponentIdentifier)getParameter("componentidentifier").getValue();
+		IComponentIdentifier	cid	= (IComponentIdentifier)getParameter("componentidentifier").getValue();
 	
-		SyncResultListener lis = new SyncResultListener();
-		((IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class)).suspendComponent(aid, lis);
-		IComponentDescription desc = (IComponentDescription)lis.waitForResult();
+		IFuture ret =((IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class)).suspendComponent(cid);
+		IComponentDescription desc = (IComponentDescription)ret.get(this);
 		
 		getParameter("componentdescription").setValue(desc);
 	}

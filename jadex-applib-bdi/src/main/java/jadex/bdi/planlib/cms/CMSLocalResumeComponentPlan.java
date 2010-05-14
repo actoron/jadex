@@ -2,8 +2,9 @@ package jadex.bdi.planlib.cms;
 
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
 
 /**
  *  Plan for resuming a Jadex component on the platform.
@@ -17,9 +18,8 @@ public class CMSLocalResumeComponentPlan extends Plan
 	{	
 		IComponentIdentifier	aid	= (IComponentIdentifier)getParameter("componentidentifier").getValue();
 		
-		SyncResultListener lis = new SyncResultListener();
-		((IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class)).resumeComponent(aid, lis);
-		IComponentDescription desc =  (IComponentDescription)lis.waitForResult();
+		IFuture ret = ((IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class)).resumeComponent(aid);
+		IComponentDescription desc =  (IComponentDescription) ret.get(this);
 		
 		getParameter("componentdescription").setValue(desc);
 	}

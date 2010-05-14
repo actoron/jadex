@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 
 /**
@@ -16,25 +17,25 @@ public interface IComponentManagementService
 	 *  @param listener The result listener (if any). Will receive the id of the component as result, when the component has been created.
 	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
-	public void	createComponent(String name, String model, CreationInfo info, IResultListener listener, IResultListener killlistener);
+	public IFuture createComponent(String name, String model, CreationInfo info, IResultListener killlistener);
 		
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.
 	 *  @param componentid	The component to destroy.
 	 */
-	public void destroyComponent(IComponentIdentifier componentid, IResultListener listener);
+	public IFuture destroyComponent(IComponentIdentifier componentid);
 
 	/**
 	 *  Suspend the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public void suspendComponent(IComponentIdentifier componentid, IResultListener listener);
+	public IFuture suspendComponent(IComponentIdentifier componentid);
 	
 	/**
 	 *  Resume the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public void resumeComponent(IComponentIdentifier componentid, IResultListener listener);
+	public IFuture resumeComponent(IComponentIdentifier componentid);
 	
 	//-------- debugging methods --------
 	

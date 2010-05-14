@@ -103,8 +103,7 @@ public class CreateComponentTask implements ITask
 		}
 		
 		ces.createComponent(name, model,
-			new CreationInfo(config, args, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, suspend, master, daemon, instance.getModelElement().getAllImports()),
-			null, lis);
+			new CreationInfo(config, args, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, suspend, master, daemon, instance.getModelElement().getAllImports()), lis);
 
 		if(!wait)
 			listener.resultAvailable(this, null);

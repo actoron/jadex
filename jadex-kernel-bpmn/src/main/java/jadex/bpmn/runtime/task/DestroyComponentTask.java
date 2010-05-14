@@ -5,6 +5,7 @@ import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 
 /**
@@ -50,7 +51,8 @@ public class DestroyComponentTask implements ITask
 		}
 		
 //		System.out.println("Destroy component: "+cid.getName());
-		ces.destroyComponent(cid, lis);
+		IFuture ret = ces.destroyComponent(cid);
+		ret.addResultListener(lis);
 		
 		if(!wait)
 			listener.resultAvailable(this, null);

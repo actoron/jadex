@@ -42,7 +42,7 @@ public class DispatchSubprocessTask	implements ITask
 			ResultFuture rf = new ResultFuture();
 			if (params == null)
 				params = new HashMap();
-			cms.createComponent(null, processref, new CreationInfo(params), null, rf);
+			cms.createComponent(null, processref, new CreationInfo(params), rf);
 			
 			if(context.getModelElement().hasParameter("resultfuture"))
 				context.setParameterValue("resultfuture", rf);

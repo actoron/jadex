@@ -68,7 +68,8 @@ public class Future implements IFuture
     	if(!resultavailable)
     	{
     	   	if(caller==null)
-        		caller = new ThreadSuspendable(this);
+    	   		throw new RuntimeException("No suspendable element.");
+//        		caller = new ThreadSuspendable(this);
      
     	   	callers.add(caller);
     		caller.suspend(timeout);

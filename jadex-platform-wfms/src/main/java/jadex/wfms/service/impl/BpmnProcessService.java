@@ -8,6 +8,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
@@ -106,7 +107,8 @@ public class BpmnProcessService implements IExecutionService, IService
 			final IComponentManagementService ces = (IComponentManagementService)wfms.getService(IComponentManagementService.class);
 			//instance.setWfms(wfms);
 			//BpmnExecutor executor = new BpmnExecutor(instance, true);
-			ces.createComponent(String.valueOf(id), modelname, new CreationInfo(null, arguments, null, true, false), new IResultListener()
+			
+			IResultListener lis = new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -132,14 +134,17 @@ public class BpmnProcessService implements IExecutionService, IService
 						{
 						}
 					});
-					ces.resumeComponent((IComponentIdentifier) result, null);
+					ces.resumeComponent((IComponentIdentifier) result);
 				}
 				
 				public void exceptionOccurred(Object source, Exception exception)
 				{
 					Logger.getLogger("Wfms").log(Level.SEVERE, "Failed to start model: " + model.getFilename());
 				}
-			}, null);
+			};
+			
+			IFuture ret = ces.createComponent(String.valueOf(id), modelname, new CreationInfo(null, arguments, null, true, false), null);
+			ret.addResultListener(lis);
 		}
 		catch(Exception e)
 		{

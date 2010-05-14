@@ -6,6 +6,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 
 /**
@@ -22,10 +23,9 @@ public class GetExternalAccessPlan extends Plan
 	{
 		// Create component.
 		IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
-		SyncResultListener lis = new SyncResultListener();
-		ces.createComponent(null, "jadex/bdi/testcases/misc/ExternalAccess.agent.xml",
-			new CreationInfo("donothing", null, getComponentIdentifier(), true, false), lis, null);
-		IComponentIdentifier cid	= (IComponentIdentifier)lis.waitForResult();
+		IFuture ret = ces.createComponent(null, "jadex/bdi/testcases/misc/ExternalAccess.agent.xml",
+			new CreationInfo("donothing", null, getComponentIdentifier(), true, false), null);
+		IComponentIdentifier cid = (IComponentIdentifier)ret.get(this);
 		
 		// Get external access.
 		IResultListener lis2 = new IResultListener()
@@ -57,7 +57,7 @@ public class GetExternalAccessPlan extends Plan
 		
 		// External access should be made available after component has resumed.
 		tr	= new TestReport("#2", "External access after resume.");
-		ces.resumeComponent(cid, null);
+		ces.resumeComponent(cid);
 		waitFor(300);
 		if(gotexta)
 			tr.setSucceeded(true);

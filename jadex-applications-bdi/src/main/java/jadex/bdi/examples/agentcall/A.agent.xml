@@ -16,10 +16,12 @@
 	</plans>
 	
 	<configurations>
-		<configuration name="default">
+		<configuration name="plan">
 			<plans>
 				<initialplan ref="testplan"></initialplan>
 			</plans>
+		</configuration>
+		<configuration name="no_plan">
 		</configuration>
 	</configurations>
 

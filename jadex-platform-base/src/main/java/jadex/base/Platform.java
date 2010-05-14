@@ -274,7 +274,7 @@ public class Platform extends AbstractPlatform
 		Property[] props = Properties.getProperties(configurations, COMPONENT);
 		for(int i = 0; i < props.length; i++)
 		{
-			ces.createComponent(props[i].getName(), props[i].getValue(), null, null, null);
+			ces.createComponent(props[i].getName(), props[i].getValue(), null, null);
 		}
 		Properties[] subprops = Properties.getSubproperties(configurations, COMPONENT);
 		for(int i = 0; i < subprops.length; i++)
@@ -292,12 +292,12 @@ public class Platform extends AbstractPlatform
 			{
 				for(int j=0; j<number; j++)
 				{
-					ces.createComponent(null, model.getValue(), cinfo, null, null);
+					ces.createComponent(null, model.getValue(), cinfo, null);
 				}
 			}
 			else
 			{
-				ces.createComponent(subprops[i].getName(), model.getValue(), cinfo, null, null);
+				ces.createComponent(subprops[i].getName(), model.getValue(), cinfo, null);
 			}
 		}
 		

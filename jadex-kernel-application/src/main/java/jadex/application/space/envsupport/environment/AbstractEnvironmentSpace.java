@@ -21,6 +21,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
 import jadex.commons.IPropertyObject;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.IResultListener;
@@ -953,8 +954,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					IComponentManagementService cms = (IComponentManagementService)getContext().getServiceContainer().getService(IComponentManagementService.class);
 					IComponentIdentifier cid = cms.generateComponentIdentifier(typename);
 					setOwner(fid, cid);
-					cms.createComponent(cid.getLocalName(), getContext().getComponentFilename(componenttype),
-						new CreationInfo(null, null, getContext().getComponentIdentifier(), false, false, false, getContext().getAllImports()), lis, null);
+					IFuture fut = cms.createComponent(cid.getLocalName(), getContext().getComponentFilename(componenttype),
+						new CreationInfo(null, null, getContext().getComponentIdentifier(), false, false, false, getContext().getAllImports()), null);
+					fut.addResultListener(lis);
 				}
 			}
 		}
@@ -1029,7 +1031,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 				if(mapping.isKillComponent())
 				{
 					IComponentManagementService ces = (IComponentManagementService)getContext().getServiceContainer().getService(IComponentManagementService.class);
-					ces.destroyComponent(component, null);
+					ces.destroyComponent(component);
 				}
 			}
 			

@@ -7,6 +7,7 @@ import jadex.bdi.runtime.TimeoutException;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.HashMap;
@@ -38,12 +39,13 @@ public class PerformTestPlan extends Plan
 		IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
 		try
 		{
-			SyncResultListener	id	= new SyncResultListener();
+//			SyncResultListener	id	= new SyncResultListener();
 			SyncResultListener	res	= new SyncResultListener();
 			Map	args	= new HashMap();
 			args.put("timeout", timeout);
-			ces.createComponent(null, testcase.getType(), new CreationInfo(args, getComponentIdentifier()), id, res);
-			testagent	= (IComponentIdentifier)id.waitForResult();
+			IFuture ret = ces.createComponent(null, testcase.getType(), new CreationInfo(args, getComponentIdentifier()), res);
+//			testagent	= (IComponentIdentifier)id.waitForResult();
+			testagent = (IComponentIdentifier)ret.get(this);
 			Testcase	result	= (Testcase)((Map)res.waitForResult(timeout)).get("testresults");
 			if(result!=null)
 			{
@@ -58,7 +60,7 @@ public class PerformTestPlan extends Plan
 		}
 		catch(TimeoutException te)
 		{
-			ces.destroyComponent(testagent, null);
+			ces.destroyComponent(testagent);
 			testagent	= null;
 			testcase.setReports(new TestReport[]{new TestReport("answer", 
 				"Test center report", false, "Test agent did not finish in time.")});
@@ -68,7 +70,7 @@ public class PerformTestPlan extends Plan
 			cause.printStackTrace();
 			if(testagent!=null)
 			{
-				ces.destroyComponent(testagent, null);
+				ces.destroyComponent(testagent);
 				testagent	= null;
 			}
 			testcase.setReports(new TestReport[]{new TestReport("creation", "Test center report", 
@@ -87,7 +89,9 @@ public class PerformTestPlan extends Plan
 		{
 			IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
 			// Empty listener avoids failures printed to console.
-			ces.destroyComponent(testagent, new IResultListener()
+			IFuture ret = ces.destroyComponent(testagent);
+			ret.get(this);
+			/*, new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -95,7 +99,7 @@ public class PerformTestPlan extends Plan
 				public void exceptionOccurred(Object source, Exception exception)
 				{
 				}
-			});
+			});*/
 		}
 	}
 }

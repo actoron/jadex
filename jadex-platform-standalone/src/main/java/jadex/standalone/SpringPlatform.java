@@ -213,12 +213,12 @@ public class SpringPlatform extends AbstractPlatform
 				{
 					for(int j=0; j<number; j++)
 					{
-						ces.createComponent(null, model, cinfo, null, null);
+						ces.createComponent(null, model, cinfo, null);
 					}
 				}
 				else
 				{
-					ces.createComponent(name, model, cinfo, null, null);
+					ces.createComponent(name, model, cinfo, null);
 				}
 			}
 		}

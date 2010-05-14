@@ -5,6 +5,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
 import jadex.commons.collection.SCollection;
 
 import java.util.Map;
@@ -160,9 +161,12 @@ public class StartPeerPlan extends Plan
 	protected IComponentIdentifier serviceCreateAgent(String name, Map args)
 	{
 		final IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
-		SyncResultListener lis = new SyncResultListener();
-		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(args), lis, null);
-		IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
+//		SyncResultListener lis = new SyncResultListener();
+//		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(args), lis, null);
+//		IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
+		
+		IFuture ret = ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(args), null);
+		IComponentIdentifier aid = (IComponentIdentifier)ret.get(this);
 		return aid;
 	}
 	
@@ -191,10 +195,14 @@ public class StartPeerPlan extends Plan
 	protected void serviceDestroyAgent(String name)
 	{
 		final IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
-		SyncResultListener lis = new SyncResultListener();
+//		SyncResultListener lis = new SyncResultListener();
+//		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
+//		ces.destroyComponent(aid, lis);
+//		lis.waitForResult();
+		
 		IComponentIdentifier aid = ces.createComponentIdentifier(name, true, null);
-		ces.destroyComponent(aid, lis);
-		lis.waitForResult();
+		IFuture ret = ces.destroyComponent(aid);
+		ret.get(this);
 	}
 	
 	/**

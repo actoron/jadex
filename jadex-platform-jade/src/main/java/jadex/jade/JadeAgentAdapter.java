@@ -1368,7 +1368,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 						getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
 							
 						// Remove component from platform.
-						((IComponentManagementService)platform.getService(IComponentManagementService.class)).destroyComponent(cid, null);
+						((IComponentManagementService)platform.getService(IComponentManagementService.class)).destroyComponent(cid);
 
 //						StringWriter	sw	= new StringWriter();
 //						e.printStackTrace(new PrintWriter(sw));
@@ -1387,7 +1387,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 					getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
 						
 					// Remove component from platform.
-					((IComponentManagementService)platform.getService(IComponentManagementService.class)).destroyComponent(cid, null);
+					((IComponentManagementService)platform.getService(IComponentManagementService.class)).destroyComponent(cid);
 
 //					StringWriter	sw	= new StringWriter();
 //					e.printStackTrace(new PrintWriter(sw));
@@ -1408,7 +1408,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 					getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
 						
 					// Remove component from platform.
-					((IComponentManagementService)platform.getService(IComponentManagementService.class)).destroyComponent(cid, null);
+					((IComponentManagementService)platform.getService(IComponentManagementService.class)).destroyComponent(cid);
 
 //					StringWriter	sw	= new StringWriter();
 //					e.printStackTrace(new PrintWriter(sw));
@@ -1452,7 +1452,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 				getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
 					
 				// Remove component from platform.
-				((IComponentManagementService)platform.getService(IComponentManagementService.class)).destroyComponent(cid, null);
+				((IComponentManagementService)platform.getService(IComponentManagementService.class)).destroyComponent(cid);
 			}
 			if(dostep)
 			{

@@ -5,6 +5,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
+import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.library.ILibraryService;
@@ -195,7 +196,8 @@ public class DebuggerMainPanel extends JSplitPane
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						ces.resumeComponent(DebuggerMainPanel.this.desc.getName(), new IResultListener()
+						IFuture ret = ces.resumeComponent(DebuggerMainPanel.this.desc.getName()); 
+						ret.addResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
@@ -215,7 +217,8 @@ public class DebuggerMainPanel extends JSplitPane
 									}
 								});
 							}
-						});					}
+						});
+					}
 					
 					public void exceptionOccurred(Object source, Exception exception)
 					{
@@ -243,11 +246,11 @@ public class DebuggerMainPanel extends JSplitPane
 					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentManagementService.class);
 				if(stepmode.isSelected())
 				{
-					ces.suspendComponent(DebuggerMainPanel.this.desc.getName(), null);
+					ces.suspendComponent(DebuggerMainPanel.this.desc.getName());
 				}
 				else
 				{
-					ces.resumeComponent(DebuggerMainPanel.this.desc.getName(), null);
+					ces.resumeComponent(DebuggerMainPanel.this.desc.getName());
 				}
 				step.setEnabled(stepmode.isSelected());		
 				run.setEnabled(stepmode.isSelected());		

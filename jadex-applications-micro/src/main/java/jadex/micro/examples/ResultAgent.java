@@ -32,7 +32,7 @@ public class ResultAgent extends MicroAgent
 			IComponentManagementService ces = (IComponentManagementService)getServiceContainer()
 				.getService(IComponentManagementService.class);
 			
-			ces.createComponent(null, getClass().getName()+".class", new CreationInfo(getComponentIdentifier()), null, createResultListener(new IResultListener()
+			ces.createComponent(null, getClass().getName()+".class", new CreationInfo(getComponentIdentifier()), createResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{

@@ -6,6 +6,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
 import jadex.commons.collection.SCollection;
 
 import java.util.List;
@@ -64,10 +65,10 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //				dispatchSubgoalAndWait(ca);
 //				agents.add(ca.getParameter("componentidentifier").getValue());
 				
-				SyncResultListener	listener	= new SyncResultListener();
+//				SyncResultListener	listener	= new SyncResultListener();
 				IComponentManagementService ces = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
-				ces.createComponent(null, type, new CreationInfo(config, args[i]), listener, null);
-				IComponentIdentifier aid = (IComponentIdentifier)listener.waitForResult();
+				IFuture ret = ces.createComponent(null, type, new CreationInfo(config, args[i]), null);
+				IComponentIdentifier aid = (IComponentIdentifier)ret.get(this);
 				agents.add(aid);
 			}
 		}
@@ -96,11 +97,11 @@ public abstract class AbstractMultipleAgentsPlan extends Plan
 //				da.getParameter("componentidentifier").setValue(agents.get(i));
 //				dispatchSubgoalAndWait(da);
 				
-				SyncResultListener	listener	= new SyncResultListener();
+//				SyncResultListener	listener	= new SyncResultListener();
 				IComponentManagementService ces	= (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
-				ces.destroyComponent((IComponentIdentifier)agents.get(i), listener);
-//				IComponentIdentifier	aid	= (IComponentIdentifier)
-					listener.waitForResult();
+				IFuture ret = ces.destroyComponent((IComponentIdentifier)agents.get(i));
+				ret.get(this);
+//				listener.waitForResult();
 			}
 			catch(GoalFailureException e)
 			{

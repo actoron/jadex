@@ -9,6 +9,7 @@ import jadex.bpmn.runtime.ProcessThreadValueFetcher;
 import jadex.bpmn.runtime.ThreadContext;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IValueFetcher;
@@ -134,9 +135,68 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				.getServiceContainer().getService(IComponentManagementService.class);
 			
 			thread.setWaiting(true);
-			cms.createComponent(null, file,
+			IFuture ret = cms.createComponent(null, file,
 				new CreationInfo(null, args, instance.getComponentIdentifier(), false, false, false, instance.getModelElement().getAllImports()), 
-			new IResultListener()
+				new IResultListener()
+				{
+					public void resultAvailable(Object source, final Object result)
+					{
+						instance.getComponentAdapter().invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								// Store results in out parameters.
+								Map	results	= (Map)result;
+								thread.setParameterValue("$results", results);	// Hack???
+								
+								List	params	= activity.getParameters(new String[]{MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT});
+								if(params!=null && !params.isEmpty())
+								{
+									IValueFetcher fetcher	=null;
+	
+									for(int i=0; i<params.size(); i++)
+									{
+										MParameter	param	= (MParameter)params.get(i);
+										if(param.getInitialValue()!=null)
+										{
+											if(fetcher==null)
+												fetcher	= new ProcessThreadValueFetcher(thread, false, instance.getValueFetcher());
+											try
+											{
+												thread.setParameterValue(param.getName(), param.getInitialValue().getValue(fetcher));
+											}
+											catch(RuntimeException e)
+											{
+												throw new RuntimeException("Error evaluating parameter value: "+instance+", "+activity+", "+param.getName()+", "+param.getInitialValue(), e);
+											}
+										}
+										else if(results.containsKey(param.getName()))
+										{
+											thread.setParameterValue(param.getName(), results.get(param.getName()));
+										}
+									}
+								}
+								thread.setNonWaiting();
+								instance.getStepHandler(activity).step(activity, instance, thread, null);
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Object source, final Exception exception)
+					{
+						instance.getComponentAdapter().invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								thread.setNonWaiting();
+								thread.setException(exception);
+								instance.getStepHandler(activity).step(activity, instance, thread, null);
+							}
+						});
+					}
+				});
+			
+			IResultListener lis = new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -146,65 +206,9 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				public void exceptionOccurred(Object source, Exception exception)
 				{
 				}
-			} , 
-			new IResultListener()
-			{
-				public void resultAvailable(Object source, final Object result)
-				{
-					instance.getComponentAdapter().invokeLater(new Runnable()
-					{
-						public void run()
-						{
-							// Store results in out parameters.
-							Map	results	= (Map)result;
-							thread.setParameterValue("$results", results);	// Hack???
-							
-							List	params	= activity.getParameters(new String[]{MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT});
-							if(params!=null && !params.isEmpty())
-							{
-								IValueFetcher fetcher	=null;
-
-								for(int i=0; i<params.size(); i++)
-								{
-									MParameter	param	= (MParameter)params.get(i);
-									if(param.getInitialValue()!=null)
-									{
-										if(fetcher==null)
-											fetcher	= new ProcessThreadValueFetcher(thread, false, instance.getValueFetcher());
-										try
-										{
-											thread.setParameterValue(param.getName(), param.getInitialValue().getValue(fetcher));
-										}
-										catch(RuntimeException e)
-										{
-											throw new RuntimeException("Error evaluating parameter value: "+instance+", "+activity+", "+param.getName()+", "+param.getInitialValue(), e);
-										}
-									}
-									else if(results.containsKey(param.getName()))
-									{
-										thread.setParameterValue(param.getName(), results.get(param.getName()));
-									}
-								}
-							}
-							thread.setNonWaiting();
-							instance.getStepHandler(activity).step(activity, instance, thread, null);
-						}
-					});
-				}
-				
-				public void exceptionOccurred(Object source, final Exception exception)
-				{
-					instance.getComponentAdapter().invokeLater(new Runnable()
-					{
-						public void run()
-						{
-							thread.setNonWaiting();
-							thread.setException(exception);
-							instance.getStepHandler(activity).step(activity, instance, thread, null);
-						}
-					});
-				}
-			});
+			};
+			
+			ret.addResultListener(lis);
 		}
 		
 		// Empty subprocess.

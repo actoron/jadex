@@ -5,6 +5,7 @@ import jadex.bdi.runtime.impl.WaitAbstractionFlyweight;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
+import jadex.commons.ISuspendable;
 import jadex.commons.concurrent.IResultListener;
 
 import java.beans.PropertyChangeListener;
@@ -15,7 +16,7 @@ import java.util.Collection;
  *  A plan (in our context more a plan body) contains
  *  actions e.g. for accomplishing a target state.
  */
-public abstract class Plan extends AbstractPlan
+public abstract class Plan extends AbstractPlan implements ISuspendable, IExternalCondition
 {
 	//-------- methods --------
 
@@ -508,6 +509,56 @@ public abstract class Plan extends AbstractPlan
 		return PlanRules.waitForWaitAbstraction(((ElementFlyweight)waitabs).getHandle(), timeout, getState(), getRCapability(), getRPlan());
 	}
 		
+	//-------- ISuspendable --------
+	
+	/** Property change listener handling support. */
+    private PropertyChangeSupport pcs	= new PropertyChangeSupport(this);
+
+	/**
+	 *  Suspend the execution of the plan.
+	 *  @param timeout The timeout.
+	 */
+	public void suspend(long timeout)
+	{
+		if(!getInterpreter().isPlanThread())
+			throw new RuntimeException("SyncResultListener may only be used from plan thread.");
+		
+		waitForExternalCondition(this, timeout);
+	}
+	
+	/**
+	 *  Resume the execution of the plan.
+	 */
+	public void resume()
+	{
+	   	pcs.firePropertyChange("true", Boolean.FALSE, Boolean.TRUE);
+	}
+    
+	/**
+	 *  Test if the condition holds.
+	 */
+	public boolean	isTrue()
+	{
+		return true;
+	}
+
+	/**
+	 *  Add a property change listener.
+	 */
+	public void addPropertyChangeListener(PropertyChangeListener listener)
+	{
+        pcs.addPropertyChangeListener(listener);
+    }
+
+	/**
+	 *  Remove a property change listener.
+	 */
+    public void removePropertyChangeListener(PropertyChangeListener listener)
+    {
+        pcs.removePropertyChangeListener(listener);
+    }
+	
+	
 	//-------- sync result listener --------
 
 	/**

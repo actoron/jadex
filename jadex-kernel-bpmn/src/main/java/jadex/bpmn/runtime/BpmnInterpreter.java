@@ -321,7 +321,7 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			{
 				((IComponentManagementService)adapter.getServiceContainer()
 					.getService(IComponentManagementService.class))
-					.destroyComponent(adapter.getComponentIdentifier(), null);
+					.destroyComponent(adapter.getComponentIdentifier());
 				finishing = true;
 			}
 			

@@ -16,13 +16,13 @@ public class CMSLocalDestroyComponentPlan extends Plan
 	 */
 	public void body()
 	{	
-		IComponentIdentifier	aid	= (IComponentIdentifier)getParameter("componentidentifier").getValue();
+		IComponentIdentifier cid = (IComponentIdentifier)getParameter("componentidentifier").getValue();
 
 		final IServiceContainer plat	= getScope().getServiceContainer();
 		try
 		{
 			SyncResultListener lis = new SyncResultListener();
-			((IComponentManagementService)plat.getService(IComponentManagementService.class)).destroyComponent(aid, lis);
+			((IComponentManagementService)plat.getService(IComponentManagementService.class)).destroyComponent(cid);
 			lis.waitForResult();
 		}
 		catch(Exception e)

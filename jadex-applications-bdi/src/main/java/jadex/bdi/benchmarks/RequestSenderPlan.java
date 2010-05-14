@@ -52,6 +52,6 @@ public class RequestSenderPlan extends Plan
 		
 		// Kill the receiver (i.e. the request performance master agent.
 		IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
-		ces.destroyComponent(receiver, null);
+		ces.destroyComponent(receiver);
 	}
 }
