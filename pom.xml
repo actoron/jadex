@@ -255,7 +255,7 @@
         <version>2.2-beta-3</version>
          <configuration>
  		  <archiverConfig>
-		    <duplicateBehavior>add</duplicateBehavior>
+		    <duplicateBehavior>skip</duplicateBehavior>
 		  </archiverConfig>
           <descriptors>
             <descriptor>src/main/assembly/dist-assembly.xml</descriptor>
