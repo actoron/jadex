@@ -2,7 +2,10 @@ package jadex.simulation.master;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.CreationInfo;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.concurrent.IResultListener;
 import jadex.service.clock.IClockService;
 import jadex.simulation.controlcenter.ControlCenter;
 import jadex.simulation.helper.Constants;
@@ -180,7 +183,8 @@ public class StartSimulationExperimentsPlan extends Plan {
 		try {
 			IComponentManagementService executionService = (IComponentManagementService) getScope().getServiceContainer().getService(IComponentManagementService.class);
 
-			executionService.createComponent(appName, fileName, configName, args, false, null, null, null, false);
+//			executionService.createComponent(appName, fileName, configName, args, false, null, null, null, false);
+			executionService.createComponent(appName, fileName, new CreationInfo(configName, args, null, false, false), null, null);						
 
 		} catch (Exception e) {
 			// JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this),
