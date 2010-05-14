@@ -51,6 +51,8 @@ public abstract class AbstractCommonPropertySection extends
 	public AbstractCommonPropertySection()
 	{
 		super();
+		this.controls = new ArrayList<Control>();
+		this.resources = new ArrayList<Resource>();
 	}
 
 	// ---- method overrides ----
@@ -65,9 +67,6 @@ public abstract class AbstractCommonPropertySection extends
 		
 		sectionComposite = getWidgetFactory().createComposite(parent);
 		sectionComposite.setLayout(new FillLayout());
-
-		this.controls = new ArrayList<Control>();
-		this.resources = new ArrayList<Resource>();
 		
 		controls.add(sectionComposite);
 	}
