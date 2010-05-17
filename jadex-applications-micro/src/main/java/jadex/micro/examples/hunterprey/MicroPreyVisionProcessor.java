@@ -7,6 +7,7 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.IFuture;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.IMicroExternalAccess;
@@ -28,7 +29,8 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 	public void processPercept(final IEnvironmentSpace space, final String type, final Object percept, final IComponentIdentifier agent, final ISpaceObject avatar)
 	{
 		IComponentManagementService ces = (IComponentManagementService)space.getContext().getServiceContainer().getService(IComponentManagementService.class);
-		ces.getExternalAccess(agent, new IResultListener()
+		IFuture ret = ces.getExternalAccess(agent);
+		ret.addResultListener(new IResultListener()
 		{
 			public void exceptionOccurred(Object source, Exception exception)
 			{

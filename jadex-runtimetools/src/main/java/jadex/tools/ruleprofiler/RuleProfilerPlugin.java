@@ -4,6 +4,7 @@ import jadex.bdi.BDIAgentFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentListener;
+import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
@@ -215,7 +216,8 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 		// todo: ?! is this ok?
 		
 		IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
-		ces.getComponentDescriptions(new IResultListener()
+		IFuture ret = ces.getComponentDescriptions();
+		ret.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

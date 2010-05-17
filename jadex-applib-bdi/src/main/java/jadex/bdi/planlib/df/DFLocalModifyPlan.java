@@ -4,6 +4,7 @@ import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.IFuture;
 
 import java.util.Date;
 
@@ -34,11 +35,10 @@ public class DFLocalModifyPlan extends Plan
 		getLogger().info("Trying to modify: "+desc);
 
 		// Throws exception, when not registered.
-		SyncResultListener lis = new SyncResultListener();
 		try
 		{
-			((IDF)getScope().getServiceContainer().getService(IDF.class)).modify(desc, lis);
-			lis.waitForResult();
+			IFuture ret = ((IDF)getScope().getServiceContainer().getService(IDF.class)).modify(desc);
+			ret.get(this);
 		}
 		catch(Exception e)
 		{

@@ -81,7 +81,8 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 		
 		// Step 1: Find existing components.
 		final IComponentManagementService	ces	= (IComponentManagementService)getService(IComponentManagementService.class);
-		ces.getComponentDescriptions(new IResultListener()
+		IFuture ret = ces.getComponentDescriptions();
+		ret.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -98,7 +99,8 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 					public void resultAvailable(Object source, Object result)
 					{
 						// Step 3: Find remaining components.
-						ces.getComponentDescriptions(new IResultListener()
+						IFuture ret = ces.getComponentDescriptions();
+						ret.addResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
@@ -135,7 +137,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 			{
 				listener.exceptionOccurred(source, exception);
 			}
-		});		
+		});
 	}
 	
 	/**

@@ -2,7 +2,7 @@ package jadex.base.fipa;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.IFuture;
 
 import java.util.Date;
 
@@ -16,25 +16,25 @@ public interface IDF
 	 *  Register an component description.
 	 *  @throws RuntimeException when the component is already registered.
 	 */
-	public void	register(IDFComponentDescription adesc, IResultListener listener);
+	public IFuture register(IDFComponentDescription adesc);
 	
 	/**
 	 *  Deregister an component description.
 	 *  @throws RuntimeException when the component is not registered.
 	 */
-	public void	deregister(IDFComponentDescription adesc, IResultListener listener);
+	public IFuture deregister(IDFComponentDescription adesc);
 	
 	/**
 	 *  Modify an component description.
 	 *  @throws RuntimeException when the component is not registered.
 	 */
-	public void	modify(IDFComponentDescription adesc, IResultListener listener);
+	public IFuture modify(IDFComponentDescription adesc);
 	
 	/**
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions. 
 	 */
-	public void search(IDFComponentDescription adesc, ISearchConstraints con, IResultListener listener);
+	public IFuture search(IDFComponentDescription adesc, ISearchConstraints con);
 
 	/**
 	 *  Create a df service description.

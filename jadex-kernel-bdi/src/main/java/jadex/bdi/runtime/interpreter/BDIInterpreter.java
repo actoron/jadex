@@ -148,10 +148,10 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	protected Map planexecutors;
 	
 	/** The externally synchronized threads to be notified on cleanup. */
-	protected Set	externalthreads;
+	protected Set externalthreads;
 	
 	/** The get-external-access listeners to be notified after init. */
-	protected Set	eal;
+	protected Set eal;
 	
 	//-------- constructors --------
 	
@@ -1051,6 +1051,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	
 	/**
 	 *  Get the parent of the agent.
+	 *  @return The external access of the parent.
 	 */
 	public IExternalAccess getParent()
 	{

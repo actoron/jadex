@@ -4,6 +4,7 @@ import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.IFuture;
 
 import java.util.Date;
 
@@ -34,9 +35,9 @@ public class DFLocalRegisterPlan extends Plan
 		getLogger().info("Trying to register: "+desc);
 
 		SyncResultListener lis = new SyncResultListener();
-		((IDF)getScope().getServiceContainer().getService(IDF.class)).register(desc, lis);
+		IFuture ret = ((IDF)getScope().getServiceContainer().getService(IDF.class)).register(desc);
 		// todo: supply return value or throw exception?
-		desc = (IDFComponentDescription)lis.waitForResult();
+		desc = (IDFComponentDescription)ret.get(this);
 
 		getParameter("result").setValue(desc);
 	}

@@ -34,9 +34,8 @@ public class TestKilim extends Task implements PauseReason
 		TestKilim t2 = new TestKilim();
 		t1.setTask(t2);
 		t2.setTask(t1);
-		Scheduler s = new Scheduler(1);
-		t1.setScheduler(s);
-		t2.setScheduler(s);
+		t1.setScheduler(MainScheduler.MAIN_SCHEDULER);
+		t2.setScheduler(MainScheduler.MAIN_SCHEDULER);
 		t1.resume();
 	}
 }

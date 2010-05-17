@@ -3,6 +3,7 @@ package jadex.bdi.planlib.df;
 import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.Plan;
+import jadex.commons.IFuture;
 
 
 /**
@@ -30,8 +31,7 @@ public class DFLocalDeregisterPlan extends Plan
 				desc.getOntologies(), desc.getProtocols(), desc.getLeaseTime());
 		}
 
-		SyncResultListener lis = new SyncResultListener();
-		dfservice.deregister(desc, lis);
-		lis.waitForResult();
+		IFuture ret = dfservice.deregister(desc);
+		ret.get(this);
 	}
 }

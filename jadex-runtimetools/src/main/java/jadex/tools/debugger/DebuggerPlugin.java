@@ -3,6 +3,7 @@ package jadex.tools.debugger;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentListener;
+import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
@@ -242,7 +243,8 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 		});
 
 		IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
-		ces.getComponentDescriptions(new IResultListener()
+		IFuture ret = ces.getComponentDescriptions();
+		ret.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

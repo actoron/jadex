@@ -323,7 +323,8 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		// todo: ?! is this ok?
 		
 		IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
-		ces.getComponentDescriptions(new IResultListener()
+		IFuture ret = ces.getComponentDescriptions();
+		ret.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

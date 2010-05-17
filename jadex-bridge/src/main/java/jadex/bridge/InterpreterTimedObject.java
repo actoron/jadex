@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.clock.ITimedObject;
 
@@ -45,7 +46,8 @@ public class InterpreterTimedObject implements ITimedObject
 	 */
 	public void timeEventOccurred(long currenttime)
 	{
-		ces.getComponentDescription(cid, new IResultListener()
+		IFuture ret = ces.getComponentDescription(cid);
+		ret.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

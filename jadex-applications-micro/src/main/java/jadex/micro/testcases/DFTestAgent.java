@@ -11,6 +11,7 @@ import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.MessageType;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
@@ -26,8 +27,12 @@ import java.util.Map;
  */
 public class DFTestAgent extends MicroAgent
 {
+	//-------- attributes --------
+	
 	/** The reports of executed tests, used as result. */
 	protected List	reports;
+	
+	//-------- methods --------
 	
 	/**
 	 *  At startup register the agent at the DF.
@@ -49,7 +54,7 @@ public class DFTestAgent extends MicroAgent
 		// Deregister agent.
 		IDF df = (IDF)getServiceContainer().getService(IDF.class);
 		IDFComponentDescription ad = df.createDFComponentDescription(getComponentIdentifier(), null);
-		df.deregister(ad, null);
+		df.deregister(ad);
 	}
 	
 	/**
@@ -64,7 +69,8 @@ public class DFTestAgent extends MicroAgent
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "testType", null);
 		IDFComponentDescription ad = df.createDFComponentDescription(getComponentIdentifier(), sd);
 
-		df.register(ad, createResultListener(new IResultListener()
+		IFuture ret = df.register(ad); 
+		ret.addResultListener(createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -96,8 +102,9 @@ public class DFTestAgent extends MicroAgent
 		IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 		ISearchConstraints	cons = df.createSearchConstraints(-1, 0);
 		
-		df.search(ad, cons, createResultListener(new IResultListener() {
-			
+		IFuture ret = df.search(ad, cons); 
+		ret.addResultListener(createResultListener(new IResultListener() 
+		{
 			public void resultAvailable(Object sourcem, Object result)
 			{
 				IDFComponentDescription[] agentDesc = (IDFComponentDescription[])result;

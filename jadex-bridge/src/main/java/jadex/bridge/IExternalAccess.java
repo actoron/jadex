@@ -24,6 +24,18 @@ public interface IExternalAccess
 	 */
 	public IExternalAccess getParent();
 	
+//	/**
+//	 *  Get service.
+//	 *  @return The service implementation.
+//	 */
+//	public Object getService(Class type);
+	
+	/**
+	 *  Get service interfaces.
+	 *  @return Array of provided services.
+	 * /
+	public Class[] getServiceInterfaces();*/
+	
 	// todo:?!
 //	/**
 //	 *  Get the children (if any).

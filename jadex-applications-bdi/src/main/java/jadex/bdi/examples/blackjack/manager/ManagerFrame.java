@@ -10,6 +10,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
 
@@ -291,9 +292,9 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			if(n==JOptionPane.YES_OPTION)
 			{
 				final IComponentManagementService	ces	= (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
-				ces.getComponentDescription(dealeraid, new IResultListener()
+				IFuture ret = ces.getComponentDescription(dealeraid);
+				ret.addResultListener(new IResultListener()
 				{
-					
 					public void resultAvailable(Object source, Object result)
 					{
 						ces.destroyComponent(((IComponentDescription)result).getParent());

@@ -9,6 +9,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
+import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
@@ -141,7 +142,8 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		});
 
 		IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
-		ces.getComponentDescriptions(new IResultListener()
+		IFuture ret = ces.getComponentDescriptions();
+		ret.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -154,6 +156,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			{
 			}
 		});
+		
 		ces.addComponentListener(null, new IComponentListener()
 		{
 			public void componentRemoved(IComponentDescription desc, java.util.Map results)

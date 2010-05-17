@@ -1,6 +1,5 @@
 package jadex.standalone.service;
 
-import jadex.base.DefaultResultListener;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.fipa.ComponentIdentifier;
 import jadex.base.fipa.SearchConstraints;
@@ -234,7 +233,6 @@ public class ComponentManagementService implements IComponentManagementService, 
 				public void exceptionOccurred(Object source, Exception exception)
 				{
 					ret.setResult(exception);
-//					rl.exceptionOccurred(source, exception);
 				}
 			});
 		}
@@ -286,7 +284,6 @@ public class ComponentManagementService implements IComponentManagementService, 
 			killresultlisteners.put(cid, killlistener);
 		
 		ret.setResult(cid.clone());
-//		listener.resultAvailable(this, cid.clone());
 		
 		if(!suspend)
 		{
@@ -322,11 +319,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 				if(component==null)
 				{
 					ret.setResult(new RuntimeException("Component "+cid+" does not exist."));
-//					listener.exceptionOccurred(this, new RuntimeException("Component "+cid+" does not exist."));
 					return ret;
-
-					//System.out.println(componentdescs);
-					//throw new RuntimeException("Component "+aid+" does not exist.");
 				}
 				
 				// todo: does not work always!!! A search could be issued before components had enough time to kill itself!
@@ -337,21 +330,11 @@ public class ComponentManagementService implements IComponentManagementService, 
 					{
 						CleanupCommand	cc	= new CleanupCommand(cid);
 						ccs.put(cid, cc);
-//						if(listener!=null)
-//							cc.addKillListener(listener);
 						cc.addKillFuture(ret);
 						component.killComponent(cc);						
 					}
 					else
 					{
-//						if(listener!=null)
-//						{
-//							CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
-//							if(cc==null)
-//								listener.exceptionOccurred(this, new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
-//							cc.addKillListener(listener);
-//						}
-						
 						CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
 						if(cc==null)
 							ret.setResult(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
@@ -393,15 +376,15 @@ public class ComponentManagementService implements IComponentManagementService, 
 				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
 				ad = (CMSComponentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
+				{
 					ret.setResult(new RuntimeException("Component identifier not registered: "+componentid));
-//					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
-					//throw new RuntimeException("Component Identifier not registered in CES: "+aid);
+					return ret;
+				}
 				if(!IComponentDescription.STATE_ACTIVE.equals(ad.getState())
 					/*&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState())*/)
 				{
 					ret.setResult(new RuntimeException("Component identifier not registered: "+componentid));
-//					listener.exceptionOccurred(this, new RuntimeException("Only active components can be suspended: "+componentid+" "+ad.getState()));
-					//throw new RuntimeException("Only active components can be suspended: "+aid+" "+ad.getState());
+					return ret;
 				}
 				
 				ad.setState(IComponentDescription.STATE_SUSPENDED);
@@ -468,14 +451,16 @@ public class ComponentManagementService implements IComponentManagementService, 
 				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
 				ad = (CMSComponentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
+				{
 					ret.setResult(new RuntimeException("Component identifier not registered: "+componentid));
-//					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
-					//throw new RuntimeException("Component Identifier not registered in CES: "+aid);
+					return ret;
+				}
 				if(!IComponentDescription.STATE_SUSPENDED.equals(ad.getState())
 					&& !IComponentDescription.STATE_WAITING.equals(ad.getState()))
+				{
 					ret.setResult(new RuntimeException("Component identifier not registered: "+componentid));
-//					listener.exceptionOccurred(this, new RuntimeException("Only suspended/waiting components can be resumed: "+componentid+" "+ad.getState()));
-					//throw new RuntimeException("Only suspended components can be resumed: "+aid+" "+ad.getState());
+					return ret;
+				}
 				
 				ad.setState(IComponentDescription.STATE_ACTIVE);
 				adapter.wakeup();
@@ -504,10 +489,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  Execute a step of a suspended component.
 	 *  @param componentid The component identifier.
 	 */
-	public void stepComponent(IComponentIdentifier componentid, IResultListener listener)
+	public IFuture stepComponent(IComponentIdentifier componentid)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		final Future ret = new Future();
 		
 		synchronized(adapters)
 		{
@@ -516,17 +500,34 @@ public class ComponentManagementService implements IComponentManagementService, 
 				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
 				IComponentDescription cd = (IComponentDescription)descs.get(componentid);
 				if(adapter==null || cd==null)
-					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
-					//throw new RuntimeException("Component Identifier not registered in CES: "+aid);
+				{
+					ret.setResult(new RuntimeException("Component identifier not registered: "+componentid));
+					return ret;
+				}
 				if(!IComponentDescription.STATE_SUSPENDED.equals(cd.getState()))
-					listener.exceptionOccurred(this, new RuntimeException("Only suspended components can be stepped: "+componentid+" "+cd.getState()));
-					//throw new RuntimeException("Only suspended components can be resumed: "+aid+" "+ad.getState());
+				{
+					ret.setResult(new RuntimeException("Only suspended components can be stepped: "+componentid+" "+cd.getState()));
+					return ret;
+				}
 				
-				adapter.doStep(listener);
+				adapter.doStep(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						ret.setResult(result);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setResult(exception);
+					}
+				});
 				IExecutionService exe = (IExecutionService)container.getService(IExecutionService.class);
 				exe.execute(adapter);
 			}
 		}
+		
+		return ret;
 	}
 
 	/**
@@ -777,16 +778,32 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  @param cid The component identifier.
 	 *  @param listener The result listener.
 	 */
-	public void getExternalAccess(IComponentIdentifier cid, IResultListener listener)
+	public IFuture getExternalAccess(IComponentIdentifier cid)
 	{
-		if(listener==null)
-			throw new RuntimeException("Result listener required.");
-	
+		final Future ret = new Future();
+		
 		StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(cid);
 		if(adapter==null)
-			listener.exceptionOccurred(this, new RuntimeException("No local component found for component identifier: "+cid));
+		{
+			ret.setResult(new RuntimeException("No local component found for component identifier: "+cid));
+		}
 		else
-			adapter.getComponentInstance().getExternalAccess(listener);
+		{
+			adapter.getComponentInstance().getExternalAccess(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					ret.setResult(result);
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setResult(exception);
+				}
+			});
+		}
+		
+		return ret;
 	}
 	
 	//-------- parent/child component accessors --------
@@ -889,31 +906,31 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  @param cid The component identifier.
 	 *  @return The component description of this component.
 	 */
-	public void getComponentDescription(IComponentIdentifier cid, IResultListener listener)
+	public Future getComponentDescription(IComponentIdentifier cid)
 	{
-		if(listener==null)
-			throw new RuntimeException("Result listener required.");
+		Future ret = new Future();
 		
-		IComponentDescription ret = (IComponentDescription)descs.get(cid);
+		IComponentDescription desc = (IComponentDescription)descs.get(cid);
 		
 		if(ret!=null)
 		{
 				// Todo: addresses required for communication across platforms.
 //				ret.setName(refreshComponentIdentifier(aid));
-			ret	= (IComponentDescription)((CMSComponentDescription)ret).clone();	// Todo: synchronize?
+			desc = (IComponentDescription)((CMSComponentDescription)desc).clone();	// Todo: synchronize?
 		}
 		
-		listener.resultAvailable(this, ret);
+		ret.setResult(desc);
+		
+		return ret;
 	}
 	
 	/**
 	 *  Get the component descriptions.
 	 *  @return The component descriptions.
 	 */
-	public void getComponentDescriptions(IResultListener listener)
+	public Future getComponentDescriptions()
 	{
-		if(listener==null)
-			throw new RuntimeException("Result listener required.");
+		Future fut = new Future();
 		
 		IComponentDescription[] ret;
 		synchronized(descs)
@@ -926,7 +943,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 			}
 		}
 		
-		listener.resultAvailable(this, ret);	// Todo: synchronize?
+		fut.setResult(ret);
+		return fut;
 	}
 	
 	/**
@@ -935,10 +953,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  
 	 *  This method should be used with caution when the agent population is large. <- TODO and the reason is...?
 	 */
-	public void getComponentIdentifiers(IResultListener listener)
+	public Future getComponentIdentifiers()
 	{
-		if(listener==null)
-			throw new RuntimeException("Result listener required.");
+		Future fut = new Future();
 		
 		IComponentIdentifier[] ret;
 		
@@ -950,17 +967,17 @@ public class ComponentManagementService implements IComponentManagementService, 
 //				ret[i] = refreshComponentIdentifier(ret[i]); // Hack!
 		}
 		
-		listener.resultAvailable(this, ret);
+		fut.setResult(ret);
+		return fut;
 	}
 	
 	/**
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions.
 	 */
-	public void	searchComponents(IComponentDescription adesc, ISearchConstraints con, IResultListener listener)
+	public Future searchComponents(IComponentDescription adesc, ISearchConstraints con)
 	{
-		if(listener==null)
-			throw new RuntimeException("Result listener required.");
+		Future fut = new Future();
 		
 //		System.out.println("search: "+components);
 		CMSComponentDescription[] ret;
@@ -1005,7 +1022,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 		}
 
 		//System.out.println("searched: "+ret);
-		listener.resultAvailable(this, ret);
+		
+		fut.setResult(ret);
+		return fut;
 	}
 	
 	/**
@@ -1106,4 +1125,20 @@ public class ComponentManagementService implements IComponentManagementService, 
 		if(listener!=null)
 			listener.resultAvailable(this, null);
 	}
+	
+	//-------- service handling --------
+	
+	/**
+	 *  Get a component service of a specific type.
+	 *  @param type The type.
+	 *  @return The service object. 
+	 * /
+	public IFuture getComponentService(Class type)
+	{
+		Future ret = new Future();
+		Object service = services.get(type);
+		
+		ret.setResult(service);
+		return ret;
+	}*/
 }

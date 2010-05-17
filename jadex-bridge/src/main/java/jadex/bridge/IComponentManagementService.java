@@ -44,7 +44,7 @@ public interface IComponentManagementService
 	 *  @param componentid The component identifier.
 	 *  @param listener Called when the step is finished (result will be the component description).
 	 */
-	public void stepComponent(IComponentIdentifier componentid, IResultListener listener);
+	public IFuture stepComponent(IComponentIdentifier componentid);
 	
 	/**
 	 *  Set breakpoints for a component.
@@ -63,26 +63,26 @@ public interface IComponentManagementService
 	 *  
 	 *  This method should be used with caution when the agent population is large.
 	 */
-	public void getComponentIdentifiers(IResultListener listener);
+	public IFuture getComponentIdentifiers();
 	
 	/**
 	 *  Get the component description of a single component.
 	 *  @param cid The component identifier.
 	 *  @return The component description of this component.
 	 */
-	public void getComponentDescription(IComponentIdentifier cid, IResultListener listener);
+	public IFuture getComponentDescription(IComponentIdentifier cid);
 	
 	/**
 	 *  Get all component descriptions.
 	 *  @return The component descriptions of this component.
 	 */
-	public void getComponentDescriptions(IResultListener listener);
+	public IFuture getComponentDescriptions();
 	
 	/**
 	 * Search for components matching the given description.
 	 * @return An array of matching component descriptions.
 	 */
-	public void searchComponents(IComponentDescription adesc, ISearchConstraints con, IResultListener listener);
+	public IFuture searchComponents(IComponentDescription adesc, ISearchConstraints con);
 
 	//-------- listener methods --------
 	
@@ -108,7 +108,7 @@ public interface IComponentManagementService
 	 *  @param cid The component identifier.
 	 *  @param listener The result listener (recieves an IExternalAccess object).
 	 */
-	public void getExternalAccess(IComponentIdentifier cid, IResultListener listener);
+	public IFuture getExternalAccess(IComponentIdentifier cid);
 
 	//-------- parent/child component accessors --------
 	
@@ -181,4 +181,12 @@ public interface IComponentManagementService
 	*/
 	public ISearchConstraints createSearchConstraints(int maxresults, int maxdepth);
 	
+	//-------- methods for component services --------
+	
+	/**
+	 *  Get a component service of a specific type.
+	 *  @param type The type.
+	 *  @return The service object. 
+	 * /
+	public IFuture getComponentService(Class type);*/
 }

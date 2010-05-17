@@ -7,6 +7,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentListener;
+import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
@@ -178,7 +179,8 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 //		jcc.addAgentListListener(this);
 
 		IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
-		ces.getComponentDescriptions(new IResultListener()
+		IFuture ret = ces.getComponentDescriptions();
+		ret.addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{

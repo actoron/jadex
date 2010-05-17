@@ -44,7 +44,8 @@ public class GetExternalAccessPlan extends Plan
 				exception.printStackTrace();
 			}
 		};
-		ces.getExternalAccess(cid, lis2);
+		IFuture fut = ces.getExternalAccess(cid);
+		fut.addResultListener(lis2);
 
 		// External access should not be made available before component has resumed.
 		TestReport	tr	= new TestReport("#1", "No external access before resume.");

@@ -85,7 +85,8 @@ public class DebuggerMainPanel extends JSplitPane
 		rightpanel.setLayout(new GridBagLayout());
 		
 		final JTabbedPane	tabs	= new JTabbedPane();		
-		ces.getExternalAccess(desc.getName(), new IResultListener()
+		IFuture ret = ces.getExternalAccess(desc.getName());
+		ret.addResultListener(new IResultListener()
 		{			
 			public void resultAvailable(Object source, final Object result)
 			{
@@ -159,7 +160,8 @@ public class DebuggerMainPanel extends JSplitPane
 				run.setEnabled(false);
 				IComponentManagementService	ces	= (IComponentManagementService)
 					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentManagementService.class);
-				ces.stepComponent(DebuggerMainPanel.this.desc.getName(), new IResultListener()
+				IFuture ret = ces.stepComponent(DebuggerMainPanel.this.desc.getName());
+				ret.addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -192,7 +194,8 @@ public class DebuggerMainPanel extends JSplitPane
 				stepmode.setSelected(false);
 				final IComponentManagementService	ces	= (IComponentManagementService)
 					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentManagementService.class);
-				ces.stepComponent(DebuggerMainPanel.this.desc.getName(), new IResultListener()
+				IFuture ret = ces.stepComponent(DebuggerMainPanel.this.desc.getName());
+				ret.addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{

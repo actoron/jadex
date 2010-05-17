@@ -3,6 +3,7 @@ package jadex.bdi.planlib.cms;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.IFuture;
 import jadex.service.IServiceContainer;
 
 /**
@@ -20,9 +21,8 @@ public class CMSLocalGetExternalAccessPlan extends Plan
 		final IServiceContainer plat = getScope().getServiceContainer();
 		try
 		{
-			SyncResultListener lis = new SyncResultListener();
-			((IComponentManagementService)plat.getService(IComponentManagementService.class)).getExternalAccess(aid, lis);
-			Object ret = lis.waitForResult();
+			IFuture fut = ((IComponentManagementService)plat.getService(IComponentManagementService.class)).getExternalAccess(aid);
+			Object ret = fut.get(this);
 			getParameter("result").setValue(ret);
 		}
 		catch(Exception e)
