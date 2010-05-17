@@ -3,13 +3,16 @@ package jadex.bdi.runtime;
 
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import kilim.Pausable;
+import kilim.PauseReason;
+import kilim.Task;
 
 
 /**
  *  The task for executing a plan instance. Will
  *  be executed in its own thread.
  */
-public class KilimPlanExecutionTask implements Runnable
+public class KilimPlanExecutionTask extends Task implements PauseReason
 {
 	//-------- constants --------
 
@@ -42,8 +45,10 @@ public class KilimPlanExecutionTask implements Runnable
 	protected transient Thread thread;
 	
 	/** The executor executing this task */
-	protected transient FlowPlanExecutor flowPlanExecutor;
+	protected transient KilimPlanExecutor planexe;
 
+	/** The task scheduler. */
+	protected NoThreadScheduler scheduler;
 	
 	/** Flag indicating that the plan should terminate immediately (set from agent thread). */
 	protected boolean	terminate;
@@ -52,24 +57,41 @@ public class KilimPlanExecutionTask implements Runnable
 
 	/**
 	 *  Create a new plan exeution thread.
-	 *  @param rplan The plan instance info.
-	 * @param flowPlanExecutor TODO
 	 */
-	public KilimPlanExecutionTask(FlowPlanExecutor flowPlanExecutor, BDIInterpreter interpreter, Object rcapability, Object rplan)
+	public KilimPlanExecutionTask(KilimPlanExecutor planexe, BDIInterpreter interpreter, Object rcapability, Object rplan)
 	{
-		this.flowPlanExecutor = flowPlanExecutor;
+		this.planexe = planexe;
 		assert rcapability!=null;
 		this.interpreter = interpreter;
 		this.rcapability = rcapability;
 		this.rplan = rplan;
+		this.scheduler = new NoThreadScheduler();
+		setScheduler(scheduler);
+		resume();
 	}
 
 	//-------- methods --------
 
 	/**
+	 *  Test if pause is valid.
+	 */
+	public boolean isValid(Task t)
+	{
+		return true;
+	}
+	
+	/**
+	 *  Execute a plan step.
+	 */
+	public void executeStep()
+	{
+		scheduler.executeStep();
+	}
+	
+	/**
 	 *  The thread method.
 	 */
-	public void run()
+	public void execute() throws Pausable
 	{
 		// When the thread is new it has to wait till the
 		// scheduler is finished (called wait).
@@ -79,7 +101,7 @@ public class KilimPlanExecutionTask implements Runnable
 		// whenever the planstep execution time of the plan
 		// thread exceeds.
 		
-		FlowPlanExecutor.debug(this, "Method: run() - START", this, null);
+		KilimPlanExecutor.debug(this, "Method: run() - START", this);
 					
 		// Save the execution thread for this task.
 		this.thread = Thread.currentThread();
@@ -97,7 +119,7 @@ public class KilimPlanExecutionTask implements Runnable
 		{
 			Object	tmp	= interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body);
 			if(tmp==null)
-				tmp = this.flowPlanExecutor.createPlanBody(interpreter, rcapability, rplan);
+				tmp = this.planexe.createPlanBody(interpreter, rcapability, rplan);
 			pi = (Plan)tmp;
 			pi.body();
 		}
@@ -112,10 +134,6 @@ public class KilimPlanExecutionTask implements Runnable
 			// Plan is interrupted (e.g. due to excessive step length)
 			// -> ignore and cleanup.
 			interrupted	= true;
-		}
-		catch (VerifyError ve)
-		{
-			System.err.println("caught = " + ve);
 		}
 		catch(Throwable t)
 		{
@@ -137,9 +155,16 @@ public class KilimPlanExecutionTask implements Runnable
 				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_lifecyclestate,
 					this.throwable==null? OAVBDIRuntimeModel.PLANLIFECYCLESTATE_PASSED : OAVBDIRuntimeModel.PLANLIFECYCLESTATE_FAILED);
 				
-//					if(throwable!=null)
-//						throwable.printStackTrace();
-				giveBackControl(STATE_WAITING, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+//				if(throwable!=null)
+//					throwable.printStackTrace();
+				try
+				{
+					giveBackControl(STATE_WAITING, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 			
 			// Execute cleanup code.
@@ -179,14 +204,14 @@ public class KilimPlanExecutionTask implements Runnable
 		interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_processingstate, OAVBDIRuntimeModel.PLANPROCESSINGTATE_FINISHED);
 		
 		// Cleanup the plan execution thread.
-		this.flowPlanExecutor.tasks.remove(rplan);
+		this.planexe.tasks.remove(rplan);
 		exestate	= KilimPlanExecutionTask.STATE_TERMINATED;
 
 		
 		// Finally, transfer execution back to PlanExececutor and exit continuation.
-		Continuation.exit();
+//		Continuation.exit();
 		
-		FlowPlanExecutor.debug(this, "Method: run() - RETURN", this, null);
+		KilimPlanExecutor.debug(this, "Method: run() - RETURN", this);
 	}
 
 //		/**
@@ -203,14 +228,9 @@ public class KilimPlanExecutionTask implements Runnable
 	 *  Stop and notify the scheduler.
 	 *  Continues when monitor is notified from the scheduler again.
 	 */
-	public void	giveBackControl(String exestate, String procstate)
+	public void	giveBackControl(String exestate, String procstate) throws Pausable
 	{
-		
-//		// HACK! Dont use this method! Move Continuation.suspend to plan helper class.
-//		throw new RuntimeException("Unsupported Operation. Cannot suspend a JavaStandardPlan");
-		
-		
-		FlowPlanExecutor.debug(this, "Method: giveBackControl() - START", this, null);
+		KilimPlanExecutor.debug(this, "Method: giveBackControl() - START", this);
 		
 		// Remember current step type (might get overwritten from agent thread).
 		String planstate	= steptype;
@@ -225,14 +245,13 @@ public class KilimPlanExecutionTask implements Runnable
 		{
 			interpreter.setPlanThread(null);
 			
-			FlowPlanExecutor.debug(this, "Method: giveBackControl() - Calling suspend", this, null);
+			KilimPlanExecutor.debug(this, "Method: giveBackControl() - Calling suspend", this);
 			
 			// suspend the execution, all methods on the call-stack down to ContinuationPlanExecutor.executeStep() return immediately
 			// the current thread state will thereby be stored in a continuation-object for later reinvokements.
-			Continuation.suspend();
+			Task.pause(this);
 			
-			
-			FlowPlanExecutor.debug(this, "Method: giveBackControl() - Continuation resumed after suspend", this, null);
+			KilimPlanExecutor.debug(this, "Method: giveBackControl() - Continuation resumed after suspend", this);
 		}
 		catch(Throwable e)
 		{
@@ -328,7 +347,7 @@ public class KilimPlanExecutionTask implements Runnable
 	 */
 	public String	toString()
 	{
-		return "FlowPlanExecutionTask("+rplan+")";
+		return "KilimPlanExecutionTask("+rplan+")";
 	}
 	
 	// ------ getter / setter for transient fields ------
@@ -357,23 +376,21 @@ public class KilimPlanExecutionTask implements Runnable
 	 * Get the (current) executor. The executor is a transient field that
 	 * have to be be set for each step.
 	 * @return the IExecutor executing this Task.
-	 */
+	 * /
 	public FlowPlanExecutor getFlowPlanExecutor()
 	{
 		return flowPlanExecutor;
-	}
+	}*/
 
 	/**
 	 * Set the executor. The executor is a transient field that
 	 * have to be be set for each step.
 	 * @param flowPlanExecutor
 	 */
-	public void setFlowPlanExecutor(FlowPlanExecutor flowPlanExecutor)
+	public void setFlowPlanExecutor(KilimPlanExecutor planexe)
 	{
-		this.flowPlanExecutor = flowPlanExecutor;
+		this.planexe = planexe;
 	}
-	
-	
 	
 	/**
 	 *  An error thrown to abort the execution of the plan body.
@@ -397,6 +414,7 @@ public class KilimPlanExecutionTask implements Runnable
 	 */
 	public static class PlanTerminated	extends	ThreadDeath 
 	{
+		
 	}
 	
 }

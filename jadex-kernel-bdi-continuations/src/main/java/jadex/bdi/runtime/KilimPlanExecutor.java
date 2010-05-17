@@ -3,15 +3,17 @@ package jadex.bdi.runtime;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.ThreadPool;
 import jadex.commons.concurrent.ThreadPoolFactory;
+import jadex.rules.state.IOAVState;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
-import org.apache.commons.javaflow.Continuation;
+import kilim.Pausable;
 
 /**
  *  A plan executor for plans that run on their own thread
@@ -30,7 +32,7 @@ public class KilimPlanExecutor	implements IPlanExecutor, Serializable
 	//-------- constants --------
 	
 	/** debug this PlanExecutor */
-	protected static final boolean DEBUG = false;
+	protected static final boolean DEBUG = true;
 
 	public static final String MAX_PLANSTEP_TIME = "max_planstep_time";
 	
@@ -41,9 +43,6 @@ public class KilimPlanExecutor	implements IPlanExecutor, Serializable
 
 	/** The pool for the planinstances -> execution tasks. */
 	protected Map	tasks;
-	
-	/** The pool for the tasks -> continuations. */
-	protected Map	continuations;
 	
 	/** The executing thread. */
 	protected transient Thread thread;
@@ -57,15 +56,15 @@ public class KilimPlanExecutor	implements IPlanExecutor, Serializable
 	public KilimPlanExecutor()
 	{
 		this.tasks = Collections.synchronizedMap(SCollection.createHashMap());
-		this.continuations = Collections.synchronizedMap(SCollection.createHashMap());
+//		this.continuations = Collections.synchronizedMap(SCollection.createHashMap());
 	}
 
 	//-------- Simple debug Infos ----------
 	
 	/** private simple debug method - use logger?*/
-	protected static void debug(Object caller, String msg, FlowPlanExecutionTask task, Continuation cont)
+	protected static void debug(Object caller, String msg, KilimPlanExecutionTask task)
 	{
-		if (DEBUG)
+		if(DEBUG)
 		{
 			final String line = "-----------------------------------------";
 			
@@ -74,16 +73,6 @@ public class KilimPlanExecutor	implements IPlanExecutor, Serializable
 			b.append(caller + ":" + "\n");
 			b.append("\t" + "Message: " + "\t" + msg + "\n");
 			b.append("\t" + "Task: " + "\t" + task + "\n");
-			if (null != task && task.getExecutionThread() != null)
-			{
-				b.append("\t\t" + "Task-Thread: " + "\t" + task.getExecutionThread().toString() + "\n");
-			}
-			b.append("\t" + "Continuation: " + "\t" + cont + "\n");
-			if (null != cont)
-			{
-				b.append("\t\t" + "Continuation: " + "\t" + cont.hashCode() + "\n");
-			}
-			
 			System.out.println(b.toString());
 			
 			b = null;
@@ -106,9 +95,15 @@ public class KilimPlanExecutor	implements IPlanExecutor, Serializable
 		String refname= ""+Thread.currentThread()+"_"+Thread.currentThread().hashCode();
 		AbstractPlan.planinit.put(refname, new Object[]{interpreter, rplan, rcapability});
 
-		Object	mplan	= interpreter.getState().getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model);
-		Object	mbody	= interpreter.getState().getAttributeValue(mplan, OAVBDIMetaModel.plan_has_body);
-		Class	clazz	= (Class)interpreter.getState().getAttributeValue(mbody, OAVBDIMetaModel.body_has_class);
+		IOAVState state = interpreter.getState();
+		Object	mplan	= state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model);
+		Object	mbody	= state.getAttributeValue(mplan, OAVBDIMetaModel.plan_has_body);
+//		Class	clazz	= (Class)interpreter.getState().getAttributeValue(mbody, OAVBDIMetaModel.body_has_impl);
+		String clname = (String)state.getAttributeValue(mbody, OAVBDIMetaModel.body_has_impl);
+		if(clname==null)
+			throw new RuntimeException("Classname must not be null: "+state.getAttributeValue(state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+		Class clazz = SReflect.findClass(clname, OAVBDIMetaModel.getImports(interpreter.getState(), interpreter.getState().getAttributeValue
+			(rcapability, OAVBDIRuntimeModel.element_has_model)), state.getTypeModel().getClassLoader());
 		
 		Object	body = null;
 		if(clazz!=null)
@@ -124,11 +119,6 @@ public class KilimPlanExecutor	implements IPlanExecutor, Serializable
 			{
 				// Use only RuntimeException from below
 				e.printStackTrace();
-			}
-			catch (VerifyError ve)
-			{
-				System.out.println("JVM verification of continuable class failed!");
-				ve.printStackTrace();
 			}
 		}
 
@@ -149,50 +139,33 @@ public class KilimPlanExecutor	implements IPlanExecutor, Serializable
 	 */
 	public boolean	executeStep(BDIInterpreter interpreter, Object rcapability, Object rplan, String steptype)	throws Exception
 	{
-		debug(this, "Method: executeStep() - START", null, null);
+		debug(this, "Method: executeStep() - START", null);
 		
 		// Save the execution thread for this task. - need this?
 		this.thread = Thread.currentThread();
 		
 		// Get or create new a continuation for the plan instance info.
-		boolean newcontinuation = false;
 		KilimPlanExecutionTask task = (KilimPlanExecutionTask)tasks.get(rplan);
 		if(task==null)
 		{
 			task = new KilimPlanExecutionTask(this, interpreter, rcapability, rplan);
 			tasks.put(rplan, task);
-			newcontinuation = true;
 		}
 
 		task.setStepType(steptype);
-		task.setState(FlowPlanExecutionTask.STATE_RUNNING);
+		task.setState(KilimPlanExecutionTask.STATE_RUNNING);
 		task.setFlowPlanExecutor(this);
 		//task.setThread(Thread.currentThread());
-		Continuation cont = null;
 		
-		if(newcontinuation)
-		{
-			cont = Continuation.startSuspendedWith(task);
-			continuations.put(task, cont);
-			debug(this, "Method: executeStep() - created new suspended contiunation", task, cont);
-		}
-		else
-		{
-			cont = (Continuation)continuations.get(task);
-			debug(this, "Method: executeStep() - prepare to continue a contiunation", task,cont);
-		}
-
 		// execute the continuation
 		try
 		{
-			debug(this, "Method: executeStep() - continue a contiunation", task, cont);
+			debug(this, "Method: executeStep() - continue a contiunation", task);
 			
 			// Start (or resume) the excution of the task
-			Continuation c = Continuation.continueWith(cont);
-			cont = c;
+			task.executeStep();
 			
-			debug(this, "Method: executeStep() - continuation finished/suspended", task, cont);
-			
+			debug(this, "Method: executeStep() - continuation finished/suspended", task);
 		}
 		catch(Throwable e)
 		{
@@ -201,27 +174,17 @@ public class KilimPlanExecutor	implements IPlanExecutor, Serializable
 			e.printStackTrace(System.err);
 		}
 		
-		// save continuation after executing the task
-		// cont == null only if plan execution finished
-		if (cont != null)
-		{
-			debug(this, "Method: executeStep() - saving new continuation for task", task, cont);
-			
-			// update map with new continuation
-			continuations.put(task, cont); 
-		}
-		
 		if(task.getThrowable() instanceof Exception)
     		throw (Exception)task.getThrowable();
     	else if(task.getThrowable()!=null)
     		throw new RuntimeException(task.getThrowable());
 
-		debug(this, "Method: executeStep() - RETURN", null, null);
+		debug(this, "Method: executeStep() - RETURN", null);
 
 		// reset thread - need this?
 		this.thread = null;
 		
-		return task.getState().equals(FlowPlanExecutionTask.STATE_INTERRUPTED);
+		return task.getState().equals(KilimPlanExecutionTask.STATE_INTERRUPTED);
 	}
 
 	/**
@@ -293,57 +256,49 @@ public class KilimPlanExecutor	implements IPlanExecutor, Serializable
 	 *  taking place. If the method is not implemented the
 	 *  plan step will be NOT be interrupted.
 	 */
-	public void	interruptPlanStep(Object rplan)
+	public void	interruptPlanStep(Object rplan) throws Pausable
 	{
 		// TODO: check use, implement continuable version!
 		
-		FlowPlanExecutionTask task = (FlowPlanExecutionTask)tasks.get(rplan);
+		KilimPlanExecutionTask task = (KilimPlanExecutionTask)tasks.get(rplan);
 		assert task!=null;
 //		assert task.getExecutionThread()==Thread.currentThread() : rplan+", "+Thread.currentThread();
-		task.giveBackControl(FlowPlanExecutionTask.STATE_INTERRUPTED, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+		try
+		{
+			task.giveBackControl(KilimPlanExecutionTask.STATE_INTERRUPTED, OAVBDIRuntimeModel.PLANPROCESSINGTATE_READY);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	/**
 	 *  Called on termination of a plan.
 	 *  Free all associated ressources, stop threads, etc.
 	 */
-	public void cleanup(Object rplan)
+	public void cleanup(BDIInterpreter interpreter, Object rplan)
 	{
 		// Save the execution thread for this task. - need this?
 		this.thread = Thread.currentThread();
 		
-		debug(this, "Method: cleanup() - START", null, null);
+		debug(this, "Method: cleanup() - START", null);
 		
-		FlowPlanExecutionTask task = (FlowPlanExecutionTask)tasks.get(rplan);
+		KilimPlanExecutionTask task = (KilimPlanExecutionTask)tasks.get(rplan);
 		if(task!=null)
 		{
 			
-			task.setState(FlowPlanExecutionTask.STATE_RUNNING);
+			task.setState(KilimPlanExecutionTask.STATE_RUNNING);
 			task.setTerminate(true);
 			task.setFlowPlanExecutor(this);
 			
-			Continuation cont = null;
-
 			try
 			{
-				cont = (Continuation)continuations.get(task);
-				if (null != cont)
-				{
-					debug(this, "Method: cleanup() - Running cleanup for task", task, cont);
-					
-					cont = Continuation.continueWith(cont);
-					// assert cont == null ?
-					
-					// TODO: implement maxExecutionTime
-					//if(getMaxExecutionTime()==0)
-					//	monitor.wait();
-					//else
-					//	monitor.wait(getMaxExecutionTime());
-					
-					debug(this, "Method: cleanup() - Cleanup for task finished", task, cont);
-				}
-				// print warning when no continuation was resumed?
+				debug(this, "Method: cleanup() - Running cleanup for task", task);
 				
+				task.executeStep();
+				
+				debug(this, "Method: cleanup() - Cleanup for task finished", task);
 			}
 			catch(Throwable e)
 			{
@@ -352,17 +307,7 @@ public class KilimPlanExecutor	implements IPlanExecutor, Serializable
 				e.printStackTrace(System.err);
 			}
 
-			if(FlowPlanExecutionTask.STATE_RUNNING.equals(task.getState()))
-			{
-				// todo
-				//task.getPlan().getRootGoal().fail(null);
-				
-				// Todo: wait for plan termination
-				// (otherwise there are two threads running at once).
-			}
-			
 			// remove references from maps
-			continuations.remove(task);
 			tasks.remove(rplan);
 			
 			// reset thread
@@ -378,7 +323,7 @@ public class KilimPlanExecutor	implements IPlanExecutor, Serializable
 	 */
 	public Object getExecutionTask(Object rplan)
 	{
-		FlowPlanExecutionTask task =  (FlowPlanExecutionTask)tasks.get(rplan);
+		KilimPlanExecutionTask task = (KilimPlanExecutionTask)tasks.get(rplan);
 		return task==null ? null : task;
 	}
 	
@@ -387,9 +332,8 @@ public class KilimPlanExecutor	implements IPlanExecutor, Serializable
 	 *  Registers the plan to wait for a event.
 	 *  Returns the 
 	 */
-	public void	eventWaitFor(BDIInterpreter interpreter, Object rplan)
+	public void	eventWaitFor(BDIInterpreter interpreter, Object rplan) throws Pausable
 	{
-		
 		//throw new RuntimeException("Unsupported operation! Cannot suspend a JavaStandardPlan");
 		
 		// moved to "FlowPlanRules.doWait()"
@@ -403,11 +347,18 @@ public class KilimPlanExecutor	implements IPlanExecutor, Serializable
 
 
 		boolean failure = false;
-		FlowPlanExecutionTask task = (FlowPlanExecutionTask)tasks.get(rplan);
+		KilimPlanExecutionTask task = (KilimPlanExecutionTask)tasks.get(rplan);
      	if(task.getExecutionThread()==Thread.currentThread())
 		{
      		// Transfer execution to agent thread and wait until the plan is scheduled again.
-			task.giveBackControl(FlowPlanExecutionTask.STATE_WAITING, OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING);
+			try
+			{
+				task.giveBackControl(KilimPlanExecutionTask.STATE_WAITING, OAVBDIRuntimeModel.PLANPROCESSINGTATE_WAITING);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 		else
 		{
@@ -427,16 +378,6 @@ public class KilimPlanExecutor	implements IPlanExecutor, Serializable
 	protected long getMaxExecutionTime()
 	{
 		return 0;
-		
-		// todo:
-		/*
-		if(maxexetime==null)
-		{
-			maxexetime = (Number)agent.getPropertybase().getProperty(MAX_PLANSTEP_TIME);
-			if(maxexetime==null)
-				maxexetime = new Long(0);
-		}
-		return maxexetime.longValue();*/
 	}
 
 	
