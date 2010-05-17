@@ -1,21 +1,30 @@
 package jadex.distributed.service.monitor;
 
 import jadex.commons.concurrent.IResultListener;
+import jadex.distributed.jmx.SysMonMBean;
 import jadex.distributed.service.discovery.IDiscoveryService;
 import jadex.distributed.service.discovery.IDiscoveryServiceListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
+import java.lang.management.OperatingSystemMXBean;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.util.Collections;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.management.JMX;
 import javax.management.MBeanServerConnection;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
@@ -28,7 +37,8 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 	private final Map<InetAddress,JMXConnector> _connections; // TODO das geht doch bestimmt schöner; ich brauche eine Liste der schon bekannten InetAddress's bei notifyDiscoveryListener()
 	private final int _port;
 	
-	private Set<PlatformInfo> _platformInfos;
+	private Map<JMXConnector, PlatformInfo> _platformInfos;
+	private Thread _polling;
 	
 	/**
 	 * Creates a new MonitorService. Establishes JMX connections on the default
@@ -47,12 +57,14 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 	public MonitorService(IServiceContainer container, int port) {
 		this._listener = new HashSet<IMonitorServiceListener>();
 		this._connections = new HashMap<InetAddress,JMXConnector>();
-		this._platformInfos = new HashSet<PlatformInfo>();
+		this._platformInfos = new HashMap<JMXConnector,PlatformInfo>(); // TODO wird nie gefüllt !!! füllen wenn JMCConnector aufgebaut wurde
 		this._dservice = (IDiscoveryService) container.getService(IDiscoveryService.class);
 		this._dservice.register(this);
 		this._port = port;
+
+		this._polling = new Thread(new Polling(_platformInfos, _listener)); // TODO looks kinda ugly+inefficient, but should work as expected
+		this._polling.start();
 	}
-	
 	
 	
 	/*** For IMonitorService: register(IMonitorServiceListener), unregister(IMonitorServiceListener), getMachineAddresses() ***/
@@ -61,6 +73,9 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 		if(listener != null) {
 			synchronized(this._listener) {
 				this._listener.add(listener);
+				Collection<PlatformInfo> view = _platformInfos.values();
+				PlatformInfo[] infos = view.toArray(new PlatformInfo[view.size()]);
+				listener.notifyIMonitorListenerAdd(infos);
 			}
 		}
 	}
@@ -72,10 +87,10 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 		}
 	}
 
-	@Override
+	/*@Override
 	public Set<PlatformInfo> getMachineAddresses() {
 		return Collections.unmodifiableSet(new HashSet<PlatformInfo>(_platformInfos));
-	}
+	}*/
 	
 	/*** For IDiscoveryServiceListener: notifyIDiscoveryListener(), notifyIDiscoveryListener(InetAddress) ***/
 	@Override
@@ -122,7 +137,11 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 			try {
 				JMXServiceURL jmxUrl = new JMXServiceURL(url);
 				JMXConnector connector = JMXConnectorFactory.connect(jmxUrl);
+				MBeanServerConnection mbeanServer = connector.getMBeanServerConnection();
+				OperatingSystemMXBean osBean = ManagementFactory.newPlatformMXBeanProxy(mbeanServer, "java.lang:type=OperatingSystem", OperatingSystemMXBean.class);
 				this._connections.put(caddr, connector); // save JMXConnector to get information from the slave platform
+				PlatformInfo info = new PlatformInfo(caddr, osBean.getName());
+				this._platformInfos.put(connector, info);
 			} catch (MalformedURLException e) {
 				System.out.println("This should never happen."); e.printStackTrace();
 			} catch (IOException e) {
@@ -145,13 +164,18 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 	@Override
 	public void notifyIDiscoveryListenerAdd(InetAddress addr) { // a single new machine is available
 		// try to establish a JMX connection
-		byte[] ip = addr.getAddress(); // "service:jmx:rmi:///jndi/rmi://134.100.11.94:4711/jmxrmi"
+		//byte[] ip = addr.getAddress(); // "service:jmx:rmi:///jndi/rmi://134.100.11.94:4711/jmxrmi"
+		String[] ip = addr.getHostAddress().split("\\.");
 		String url = new StringBuilder().append("service:jmx:rmi:///jndi/rmi://").append(ip[0]).append(".").append(ip[1]).append(".").append(ip[2]).append(".").append(ip[3]).append(":").append(this._port).append("/jmxrmi").toString();
 		
 		try {
 			JMXServiceURL jmxUrl = new JMXServiceURL(url);
 			JMXConnector connector = JMXConnectorFactory.connect(jmxUrl);
 			this._connections.put(addr, connector); // save JMXConnector to get information from the slave platform
+			MBeanServerConnection mbeanServer = connector.getMBeanServerConnection();
+			OperatingSystemMXBean osBean = ManagementFactory.newPlatformMXBeanProxy(mbeanServer, "java.lang:type=OperatingSystem", OperatingSystemMXBean.class);
+			PlatformInfo info = new PlatformInfo(addr, osBean.getName());
+			this._platformInfos.put(connector, info);
 			
 			// test query
 			MBeanServerConnection server = connector.getMBeanServerConnection();
@@ -174,7 +198,9 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 		} catch (IOException e) { // someone killed the slave platform?
 			System.out.println("MONITOR Don't worry, the connection to the slave platform is closed, just not in a 'clean' manner.");e.printStackTrace();
 		}
-		this._connections.remove(addr);
+		JMXConnector conn = this._connections.get(addr); //  InetAddress -> JMXConnector -> PlatformInfo
+		this._connections.remove(addr);                  //   |_  _connections _|  |_ _platformInfos _|
+		this._platformInfos.remove(conn);
 	}
 
 	/*** For IService: startService(), shutdownService(IResultListener) ***/
@@ -186,5 +212,74 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 	@Override
 	public void shutdownService(IResultListener listener) {
 		
+	}
+	
+	private static class Polling implements Runnable {
+		private Set<IMonitorServiceListener> _listener;
+		private int _timeout = 2; // poll every _timeout seconds; can be changed dynamically at runtime with setTimeout(int)
+		private Map<JMXConnector, PlatformInfo> _platformInfos; // TODO synchronize to prevent concurrent read/write on Map; ambesten die Maps in MonitorService kapseln und synchronized get-methoden davorschalten
+		
+		public Polling(Map<JMXConnector, PlatformInfo> platformInfos, Set<IMonitorServiceListener> listener) {
+			_platformInfos = platformInfos;
+			_listener = listener;
+		}
+		
+		public int getTimeout() {
+			return _timeout;
+		}
+
+		public void setTimeout(int timeout) {
+			_timeout = timeout;
+		}
+		
+		@Override
+		public void run() {
+			while(true) { // poll data every _timeout seconds
+				// 1. update data
+				for (JMXConnector conn : _platformInfos.keySet()) {
+					//System.out.println("MONITORSERVICE verarbeite einen JMXConnector");  // WIRD NIE AUFGERUFEN -> _platformInfos ist kaputt
+					PlatformInfo info = _platformInfos.get(conn);
+					try {
+						// get MBeans and MXBeans
+						MBeanServerConnection mbeanServer = conn.getMBeanServerConnection();
+						MemoryMXBean memoryBean = ManagementFactory.newPlatformMXBeanProxy(mbeanServer, "java.lang:type=Memory", MemoryMXBean.class); //MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean(); // VORSICHT ist die MemoryMXBean der lokalen JVM, und nicht der remote JVM
+						
+						//OperatingSystemMXBean osbean = ManagementFactory.newPlatformMXBeanProxy(mbeanServer, "java.lang:type=OperatingSystem", OperatingSystemMXBean.class); //OperatingSystemMXBean osbean = ManagementFactory.getOperatingSystemMXBean();
+						// there is no native way in java to get the current cpu usage; but there is JavaSysMon ;)
+						
+						ObjectName sysmonName = new ObjectName("daniel:name=sysmon");
+						SysMonMBean sysmon = JMX.newMBeanProxy(mbeanServer, sysmonName, SysMonMBean.class); // there is also a Notification Emitter/Broadcaster version for this
+						float cpuUsage = sysmon.getCpuUsage();
+						
+						MemoryUsage hmem = memoryBean.getHeapMemoryUsage();
+						info.setHeapCommited( hmem.getCommitted() );
+						info.setHeapUsed( hmem.getUsed() );
+						//info.setCpuLoad( osbean.getSystemLoadAverage() );
+						info.setCpuLoad( cpuUsage );
+						//System.out.println("MONITORSERVICE osbean.getSystemLoadAverage() is "+osbean.getSystemLoadAverage());
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (MalformedObjectNameException e) {
+						e.printStackTrace();
+					} catch (NullPointerException e) {
+						e.printStackTrace();
+					}
+				}
+				
+				// 2. notify IMonitorServiceListener
+				for (IMonitorServiceListener listener : _listener) {
+					//System.out.println("MONITORSERVICE verarbeite einen IMonitorServiceListener"); // OK, GUI hat sich registriert und wird genotified
+					listener.notifyIMonitorListenerChange();
+				}
+				
+				// 3. sleep until next timeout
+				System.out.println(new Date().toString()+"POLLING sleep");
+				try {
+					Thread.sleep(_timeout*1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 }

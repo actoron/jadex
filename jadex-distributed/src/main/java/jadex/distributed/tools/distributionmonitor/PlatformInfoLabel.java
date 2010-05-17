@@ -4,6 +4,7 @@ import jadex.distributed.service.monitor.PlatformInfo;
 import jadex.distributed.service.monitor.Workload;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
@@ -14,13 +15,16 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 
-public class PlatformInfoLabel extends JLabel { // JPanel wäre zu viel, da keine input events verarbeitet werden
+public class PlatformInfoLabel extends JLabel implements ListCellRenderer { // JPanel wäre zu viel, da keine input events verarbeitet werden
 	
 	private PlatformInfo _platformInfo;
 	
-	public PlatformInfoLabel(PlatformInfo platformInfo) {
-		_platformInfo = platformInfo;
+	public PlatformInfoLabel() {
+		//setOpaque(true);
+		//setBackground(Color.white);
 	}
 	
 	@Override
@@ -30,10 +34,7 @@ public class PlatformInfoLabel extends JLabel { // JPanel wäre zu viel, da kein
 
 		Font font = new Font(Font.SANS_SERIF, Font.BOLD, 12);
 		g.setFont(font);
-		
-		// TODO man wird es doch wohl in Java schaffen einen monospace font zu laden der schön aussieht >_<
-		/*
-		Font font = null;
+		/*Font font = null; // TODO man wird es doch wohl in Java schaffen einen monospace font zu laden der schön aussieht >_<
 		try {
 			font = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("fonts/FreeMonoBold.ttf"));
 			//font = font.deriveFont(Font.BOLD, (float) 14);
@@ -46,27 +47,24 @@ public class PlatformInfoLabel extends JLabel { // JPanel wäre zu viel, da kein
 			font = new Font(Font.SANS_SERIF, Font.BOLD, 12);
 			e.printStackTrace();
 		}
-		g.setFont(font);
-		*/
-		
-		
+		g.setFont(font);*/
 		
 		/* IP:Port */
-		StringBuilder sb = new StringBuilder(21); // ALWAYS use StringBuilder
-		//sb.append(machine.getHostName()).append(":").append(machine.getPort());
+		StringBuilder sb = new StringBuilder(21);
 		sb.append(_platformInfo.getIp().getHostAddress()).append(":4711"); // Which port should I enter here? The RMI port? Or the the multicast port?
 		g.setPaint(Color.black);
 		g.drawString(sb.toString(), 3, 15);
 		
 		/* CPU usage */
+		int load = (int) (_platformInfo.getCpuLoad()*100);
 		g.setPaint(Color.black);
 		g.drawRect(2, 19, 100+1, 15+1);
-		g.setPaint(getPaint( (int) _platformInfo.getCpuLoad() ));
-		g.fillRect(3, 20, (int) _platformInfo.getCpuLoad(), 15);
+		g.setPaint(getPaint( load ));
+		g.fillRect(3, 20, load, 15);
 		g.setPaint(new Color(0, 0, 0));
 		sb = new StringBuilder(4);
-		sb.append( (int) _platformInfo.getCpuLoad() ).append("%");
-		int length = String.valueOf( (int) _platformInfo.getCpuLoad() ).length();
+		sb.append( load ).append("%");
+		int length = String.valueOf( load ).length();
 		if(length == 1)
 			sb.insert(0, "  ");
 		else if(length == 2)
@@ -77,7 +75,6 @@ public class PlatformInfoLabel extends JLabel { // JPanel wäre zu viel, da kein
 		// AttributedCharacterIterator http://www.fh-wedel.de/~si/seminare/ws00/Ausarbeitung/11.java2d/java2d7.htm
 		
 		/* RAM usage */
-		//g.setPaint(new Color(0, 255, 0)); // R, G, B; red, green, blue
 		g.setPaint(Color.black);
 		g.drawRect(2, 39, 100+1, 15+1);
 		g.setPaint( getPaint( _platformInfo.getHeapUsage() ) );
@@ -102,7 +99,7 @@ public class PlatformInfoLabel extends JLabel { // JPanel wäre zu viel, da kein
 	/**
 	 * Return paint green, yellow or red depending on the value of <code>value</code>
 	 * @param value - typically a value between 0 and 100 inclusively
-	 * @return
+	 * @return the Paint green, yellow, or red depending the given input value
 	 */
 	private Paint getPaint(int value) {
 		Paint paint;
@@ -113,5 +110,11 @@ public class PlatformInfoLabel extends JLabel { // JPanel wäre zu viel, da kein
 		else
 			paint = Color.red; // this also applies to a int value bigger then 100
 		return paint;
+	}
+
+	@Override
+	public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		this._platformInfo = (PlatformInfo) value;
+		return this;
 	}
 }

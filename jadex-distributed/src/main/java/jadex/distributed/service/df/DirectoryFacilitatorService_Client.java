@@ -12,6 +12,8 @@ import jadex.base.fipa.SearchConstraints;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.ISearchConstraints;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
@@ -54,10 +56,9 @@ public class DirectoryFacilitatorService_Client implements IDF, IService
 	 *  Register a component description.
 	 *  @throws RuntimeException when the component description is already registered.
 	 */
-	public void	register(IDFComponentDescription cdesc, IResultListener listener)
+	public IFuture register(IDFComponentDescription cdesc)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		Future ret = new Future();
 		
 		//System.out.println("Registered: "+adesc.getName()+" "+adesc.getLeaseTime());
 		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, (IComponentManagementService)platform.getService(IComponentManagementService.class), this);
@@ -75,50 +76,50 @@ public class DirectoryFacilitatorService_Client implements IDF, IService
 //				System.out.println("registered: "+clone.getName());
 			}
 			
-			listener.resultAvailable(this, clone);
+			ret.setResult(clone);
 		}
 		else
 		{
-			listener.exceptionOccurred(this, new RuntimeException("Componentomponent not registered: "+clone.getName()));
-			
+			ret.setResult(new RuntimeException("Componentomponent not registered: "+clone.getName()));
 //			System.out.println("not registered: "+clone.getName());			
 		}
 		
-		
+		return ret;
 	}
 
 	/**
 	 *  Deregister a component description.
 	 *  @throws RuntimeException when the component is not registered.
 	 */
-	public void	deregister(IDFComponentDescription cdesc, IResultListener listener)
+	public IFuture deregister(IDFComponentDescription cdesc)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		Future ret = new Future();
 		
 		synchronized(components)
 		{
 			if(!components.containsKey(cdesc.getName()))
 			{
 				//throw new RuntimeException("Component not registered: "+adesc.getName());
-				listener.exceptionOccurred(this, new RuntimeException("Component not registered: "+cdesc.getName()));
-				return;
+				ret.setResult(new RuntimeException("Component not registered: "+cdesc.getName()));
 			}
-			components.removeKey(cdesc.getName());
-			//System.out.println("deregistered: "+adesc.getName());
+			else
+			{
+				components.removeKey(cdesc.getName());
+				ret.setResult(null);
+				//System.out.println("deregistered: "+adesc.getName());
+			}
 		}
 		
-		listener.resultAvailable(this, null);
+		return ret;
 	}
 
 	/**
 	 *  Modify a component description.
 	 *  @throws RuntimeException when the component is not registered.
 	 */
-	public void	modify(IDFComponentDescription cdesc, IResultListener listener)
+	public IFuture modify(IDFComponentDescription cdesc)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		Future ret = new Future();
 		
 		// Use clone to avoid caller manipulating object after insertion.
 		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, (IComponentManagementService)platform.getService(IComponentManagementService.class), this);
@@ -133,27 +134,28 @@ public class DirectoryFacilitatorService_Client implements IDF, IService
 				components.replace(clone.getName(), clone);
 			}
 			//System.out.println("modified: "+clone.getName());
-			listener.resultAvailable(this, clone);
+			ret.setResult(clone);
 		}
 		else
 		{
 			//throw new RuntimeException("Invalid lease time: "+clone.getLeaseTime());
-			listener.exceptionOccurred(this, new RuntimeException("Invalid lease time: "+clone.getLeaseTime()));
+			ret.setResult(new RuntimeException("Invalid lease time: "+clone.getLeaseTime()));
 		}
+		
+		return ret;
 	}
 
 	/**
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions. 
 	 */
-	public void	search(IDFComponentDescription adesc, ISearchConstraints con, IResultListener listener)
+	public IFuture search(IDFComponentDescription adesc, ISearchConstraints con)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		Future fut = new Future();
 		
 		//System.out.println("Searching: "+adesc.getName());
 
-		List	ret	= new ArrayList();
+		List ret = new ArrayList();
 
 		// If name is supplied, just lookup description.
 		if(adesc.getName()!=null)
@@ -202,7 +204,8 @@ public class DirectoryFacilitatorService_Client implements IDF, IService
 		//System.out.println("Searched: "+ret);
 		//return (ComponentDescription[])ret.toArray(new ComponentDescription[ret.size()]);
 		
-		listener.resultAvailable(this, ret.toArray(new DFComponentDescription[ret.size()]));
+		fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
+		return fut;
 	}
 
 	/**

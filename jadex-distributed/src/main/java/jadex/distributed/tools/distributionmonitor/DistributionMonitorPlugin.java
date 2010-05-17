@@ -7,23 +7,23 @@ import jadex.distributed.service.monitor.PlatformInfo;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
 import jadex.tools.common.plugin.IControlCenter;
 
-import java.awt.Dimension;
-import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
 
+import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.UIDefaults;
 
 public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMonitorServiceListener {
 
-	//protected Map<InetSocketAddress, Workload> machineWorkloads;
-	private Map<PlatformInfo, PlatformInfoLabel> _platformInfoLabels;
-	private IMonitorService _monitorService; // not in constructor, but in init(jcc) method
+	private MyDefaultListModel _model;
+	
+	private IMonitorService _monitorService; // not set in constructor, but in init(jcc) method
 	
 	private JComponent _view; // main _view of the distribution plug in; it contains the sidebar/leftView and the right main content _view
 	private JPanel _listView; // the left sidebar of the mein _view
@@ -36,35 +36,30 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMon
 	
 	// TODO why not give a plugin a reference to the IControlCenter in the constructor? why defer this step to the init(IControlCenter) method?
 	public DistributionMonitorPlugin() {
-		this._platformInfoLabels = new HashMap<PlatformInfo, PlatformInfoLabel>();
+		//this._platformInfos = new HashSet<PlatformInfo>();
 		_view = buildView(); // I don't when createView() will be called, so initialize the _view now to prevent any complications
 		// GOTO init(IControlCenter), the initialization finishes there
 	}
 	
 	private JComponent buildView() {
-		_listView = new JPanel(); // flow layout used; OK of the width of every PlatformInfoLabel is sufficient wide
-		// TODO _listView.setPreferredSize(new Dimension(160, variable));
-		JPanel right = new JPanel(); // common pattern: use JPanels to group items; use extended JComponent to paint
+		JPanel right = new JPanel();
 		
-		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, _listView, right); // true makes the JSplitPane more responsive to the user
+		_model = new MyDefaultListModel(); // call later model.addElement(Object) when new PlatformInfo objects are available, and call model.platformChanged(...) to notify listeners about this
+		JList list = new JList(_model);
+		list.setCellRenderer(new PlatformInfoLabel());
+		JScrollPane scroll = new JScrollPane(list);
+		
+		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, scroll, right); // true makes the JSplitPane more responsive to the user
 		split.setOneTouchExpandable(true); // ability to collapse and show one side quickly
-		return split;
+		return split; // to set main _view
 	}
 	
 	@Override
 	public void init(IControlCenter jcc) {
 		super.init(jcc); // calls the three create-methods createView(), createMenuBar(), and createToolBar()
 		this._monitorService = (IMonitorService)getJCC().getServiceContainer().getService(IMonitorService.class);
-		this._monitorService.register(this); // register at IMonitorService to receive up to date management information
-		
-		// get initial PlatformInfo list and include them into the _listView
-		Set<PlatformInfo> infos = _monitorService.getMachineAddresses();
-		for (PlatformInfo info : infos) {
-			PlatformInfoLabel infoLabel = new PlatformInfoLabel(info);
-			_platformInfoLabels.put(info, infoLabel);
-		}
-		// force a (re-)paint of the left sidebar
-		
+		this._monitorService.register(this); // _monitorService calls this.notifyIMonitorListenerAdd(PlatformInfo[]) in the background
+		_model.platformChanged(); // force a (re-)paint of the left sidebar
 	}
 
 	@Override
@@ -106,20 +101,45 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMon
 		return this._view;
 	}
 
-	/** For IMonitorServiceListener: notifyIMonitorListener() + notifyIMonitorListenerAdd(InetAddress) + notifyIMonitorListenerRemove(InetAddress) **/
+	/** For IMonitorServiceListener: notifyIMonitorListenerChange() + notifyIMonitorListenerChange(PlatformInfo) + notifyIMonitorListenerAdd(PlatformInfo) + notifyIMonitorListenerAdd(PlatformInfo[]) + notifyIMonitorListenerRemove(PlatformInfo) **/
 	@Override
-	public void notifyIMonitorListener() { // called by the MonitorService to indicate that the state one, some, or all platforms changed; and these changes are reflected by changed field values in the PlatformInfo objects
-		
+	public void notifyIMonitorListenerChange() { // called by the MonitorService to indicate that the state one, some, or all platforms changed; and these changes are reflected by changed field values in the PlatformInfo objects
+		System.out.println("GUI wurde notified");
+		_model.platformChanged();
 	}
 
 	@Override
-	public void notifyIMonitorListenerAdd(PlatformInfo platformInfo) { // called by the MonitorService to indicate that a new slave platform joined the group of platforms and its current state is represented by the passed PlatformInfo object
-		
-	}
-
-	@Override
-	public void notifyIMonitorListenerRemove(PlatformInfo platformInfo) { // called by the MonitorService to indicate that a slave leaved the group; the PlatformInfo object formerly representing the state of the slave is now obsolete and can be removed from the IMonitorServiceListener
-		
+	public void notifyIMonitorListenerChange(PlatformInfo platformInfo) {
+		_model.platformChanged(platformInfo);
 	}
 	
+	@Override
+	public void notifyIMonitorListenerAdd(PlatformInfo platformInfo) { // called by the MonitorService to indicate that a new slave platform joined the group of platforms and its current state is represented by the passed PlatformInfo object
+		_model.addElement(platformInfo);
+	}
+
+	@Override
+	public void notifyIMonitorListenerAdd(PlatformInfo[] platformInfo) {
+		for (PlatformInfo info : platformInfo) {
+			_model.addElement(info);
+		}
+	}
+	
+	@Override
+	public void notifyIMonitorListenerRemove(PlatformInfo platformInfo) { // called by the MonitorService to indicate that a slave leaved the group; the PlatformInfo object formerly representing the state of the slave is now obsolete and can be removed from the IMonitorServiceListener
+		_model.removeElement(platformInfo);
+	}
+	
+	private static class MyDefaultListModel extends DefaultListModel {
+		public void platformChanged(PlatformInfo platform) {
+			int index = this.indexOf(platform);
+			this.fireContentsChanged(this, index, index);
+		}
+		
+		public void platformChanged() {
+			int index = this.getSize();
+			System.out.println("MYLIST im platformChanged");
+			this.fireContentsChanged(this, 0, index);
+		}
+	}
 }

@@ -3,6 +3,7 @@ package jadex.distributed.service.discovery;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.concurrent.IResultListener;
 import jadex.distributed.jmx.Agents;
+import jadex.distributed.jmx.SysMon;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 
@@ -51,12 +52,15 @@ public class DiscoverableService implements IService {
 		
 		// 1. register all MBeans to make them available for JMX clients
 		MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer(); // creates MBeanServer and registeres MXBeans in the background
-		
-		// register AgentsMBean
 		try {
 			Agents agents = new Agents(this._platform);
 			ObjectName agentsName = new ObjectName("daniel:name=agents");
+			
+			SysMon sysmon = new SysMon();
+			ObjectName sysmonName = new ObjectName("daniel:name=sysmon");
+			
 			mbeanServer.registerMBean(agents, agentsName);
+			mbeanServer.registerMBean(sysmon, sysmonName);
 		} catch (MalformedObjectNameException e1) { // never happens
 			e1.printStackTrace();
 		} catch (NullPointerException e1) { // never happens
@@ -68,8 +72,6 @@ public class DiscoverableService implements IService {
 		} catch (NotCompliantMBeanException e) {
 			e.printStackTrace();
 		}
-		
-		
 		
 		// 2. start the DiscoveryResponder to be visible for other platforms, specifically for the master platform
 		try {

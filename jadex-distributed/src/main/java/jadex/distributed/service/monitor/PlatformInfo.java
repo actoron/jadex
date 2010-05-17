@@ -45,6 +45,11 @@ public class PlatformInfo {
 		return _cpuLoad;
 	}
 
+	/**
+	 * Set the current cpu load of the platform represented by this
+	 * PlatformInfo object.
+	 * @param cpuLoad current cpu load between 0.0 and 1.0
+	 */
 	public void setCpuLoad(double cpuLoad) {
 		_cpuLoad = cpuLoad;
 	}

@@ -12,13 +12,22 @@ public class Agents implements AgentsMBean {
 	
 	private Thread _current;
 	
+	
+	//private IResultListener _countListener;
+	
 	public Agents(IComponentManagementService platform) {
 		super(); // javac automatically inserts this, but ok
 		this._platform = platform;
 		this._current = null; // unnecessary
+		
+		//this._countListener = new CountListener();
 	}
 	
-	@Override
+	
+	/**
+	 * There is a problem: a call to IComponentManagementService.
+	 */
+	/*@Override
 	public int getAgentCount() {
 		// background thread called getComponentDescriptions, dieser thread hat callback, und hier wird .join() an diesem thread aufgerufen um das Ergebniss abzugreifen
 		Thread t = new ResultThread(this._platform, Thread.currentThread());
@@ -40,7 +49,17 @@ public class Agents implements AgentsMBean {
 		}
 		
 		return _resultAgentCount.length;
-	}
+	}*/
+
+	@Override
+	public int getAgentCount() {
+		//this._platform.getComponentIdentifiers(this._countListener);
+		
+		
+		
+		return 0;
+	};
+	
 	
 	
 	private class ResultThread extends Thread implements IResultListener {
@@ -57,7 +76,7 @@ public class Agents implements AgentsMBean {
 		public void run() {
 			// TODO wieso ist _platform hier null? etwa weil kein final? oder Referenz per Konstruktor zu übergeben?
 			//this._platform.getComponentDescriptions(this); // call back mechanism
-			this._platform.getComponentIdentifiers(this); // call back mechanism
+			//TODO this._platform.getComponentIdentifiers(this); // call back mechanism
 			// irgendwann wird resultAvailable() von einem unbekannten Thread ausgerufen
 			// Thread muss nicht bekannst sein; wichtig ist nur, dass dieser den oberen thread interrupted
 		}
@@ -75,5 +94,25 @@ public class Agents implements AgentsMBean {
 			
 		}
 
-	};
+	}
+	
+	/*
+	private class CountListener implements IResultListener {
+
+		
+		
+		@Override
+		public void exceptionOccurred(Object source, Exception exception) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void resultAvailable(Object source, Object result) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+	*/
 }

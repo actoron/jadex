@@ -31,5 +31,5 @@ public interface IMonitorService {
 	 * set to enable concurrent modification of the actual set while other objects read from
 	 * the snapshot; the returned copy prevents any bad thread-based issues.
 	 */
-	public Set<PlatformInfo> getMachineAddresses();
+	//public Set<PlatformInfo> getMachineAddresses();
 }
