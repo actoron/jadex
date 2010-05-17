@@ -1,22 +1,16 @@
 package jadex.tools.bpmn.editor.properties;
 
-import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EModelElement;
-import org.eclipse.emf.ecore.EcoreFactory;
-import org.eclipse.emf.ecore.util.EcoreAdapterFactory;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.gmf.runtime.diagram.core.listener.NotificationListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.stp.bpmn.Activity;
 import org.eclipse.stp.bpmn.ActivityType;
 import org.eclipse.stp.bpmn.diagram.actions.SetAsThrowingOrCatchingAction;
-import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -96,7 +90,7 @@ public class JadexMessageEventPropertySection extends AbstractBpmnPropertySectio
 		
 		msgtypeLabel = getWidgetFactory().createCLabel(sectionComposite, "msgtype"+":"); // //$NON-NLS-0$
 		msgtypeLabel.setLayoutData(labelGridData);
-		msgtypeText = getWidgetFactory().createText(sectionComposite, "");
+		msgtypeText = getWidgetFactory().createText(sectionComposite, "", SWT.BORDER_SOLID);
 		msgtypeText.setLayoutData(textGridData);
 		msgtypeText.addModifyListener(new ModifyJadexEAnnotation("msgtype", msgtypeText));
 		controls.add(msgtypeLabel);
@@ -104,7 +98,7 @@ public class JadexMessageEventPropertySection extends AbstractBpmnPropertySectio
 		
 		messageLabel = getWidgetFactory().createCLabel(sectionComposite, "message"+":"); // //$NON-NLS-0$
 		messageLabel.setLayoutData(labelGridData);
-		messageText = getWidgetFactory().createText(sectionComposite, "");
+		messageText = getWidgetFactory().createText(sectionComposite, "", SWT.BORDER_SOLID);
 		messageText.setLayoutData(textGridData);
 		messageText.addModifyListener(new ModifyJadexEAnnotation("message", messageText));
 		controls.add(messageLabel);
@@ -112,7 +106,7 @@ public class JadexMessageEventPropertySection extends AbstractBpmnPropertySectio
 		
 		expressionLabel = getWidgetFactory().createCLabel(sectionComposite, "match expression"+":"); // //$NON-NLS-0$
 		expressionLabel.setLayoutData(labelGridData);
-		expressionText = getWidgetFactory().createText(sectionComposite, "");
+		expressionText = getWidgetFactory().createText(sectionComposite, "", SWT.BORDER_SOLID);
 		expressionText.setLayoutData(textGridData);
 		expressionText.addModifyListener(new ModifyJadexEAnnotation("match expression", expressionText));
 		controls.add(expressionLabel);
@@ -187,9 +181,12 @@ public class JadexMessageEventPropertySection extends AbstractBpmnPropertySectio
 								SetAsThrowingOrCatchingAction.IS_THROWING_ANNOTATION_SOURCE_AND_KEY_ID,
 								SetAsThrowingOrCatchingAction.IS_THROWING_ANNOTATION_SOURCE_AND_KEY_ID);
 
-				if (annotation != null && annotation.equals("true")) { //$NON-NLS-1$
+				if (annotation != null && annotation.equals("true")  //$NON-NLS-1$
+						|| !model.getOutgoingMessages().isEmpty())
+				{ 
 					return true;
 				}
+				
 			}
 		}
 		return false;
