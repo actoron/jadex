@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.TableColumn;
  * @author Claas Altschaffel
  * 
  */
-public class JadexSubProcessPropertiesSection extends
+public class JadexBpmnDiagramPropertiesTableSection extends
 		AbstractBpmnMultiColumnTablePropertySection
 {
 
@@ -23,7 +23,7 @@ public class JadexSubProcessPropertiesSection extends
 	/**
 	 * Default constructor, initializes super class
 	 */
-	public JadexSubProcessPropertiesSection()
+	public JadexBpmnDiagramPropertiesTableSection()
 	{
 		super(JadexBpmnPropertiesUtil.JADEX_SUBPROCESS_ANNOTATION, JadexBpmnPropertiesUtil.JADEX_PROPERTIES_LIST_DETAIL,
 				"Properties", UNIQUE_LIST_ELEMENT_ATTRIBUTE_INDEX);

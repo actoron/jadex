@@ -141,18 +141,7 @@
      </propertySections>
    </extension>
    
-   <!-- the jadex sub process properties section -->
-	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
-     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
-        <propertySection
-              class="jadex.tools.bpmn.editor.properties.JadexSubProcessPropertiesSection"
-              id="jadex.tools.bpmn.editor.properties.JadexSubProcessPropertiesSection"
-              tab="Jadex"
-              afterSection="jadex.tools.bpmn.editor.properties.JadexSubProcessParameterSection">
-           <input type="org.eclipse.stp.bpmn.SubProcess"/>
-        </propertySection>
-     </propertySections>
-   </extension>
+  
     
     <!-- timer event property section -->
 	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
@@ -350,6 +339,18 @@
      </propertySections>
    </extension>
    
+    <!-- the jadex bpmndiagram properties section -->
+	<extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+     <propertySections contributorId="jadex.tools.bpmn.editor.JadexBpmnEditorID">
+        <propertySection
+              class="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesTableSection"
+              id="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramPropertiesTableSection"
+              tab="Jadex"
+              afterSection="jadex.tools.bpmn.editor.properties.JadexBpmnDiagramParameterSection">
+           <input type="org.eclipse.stp.bpmn.BpmnDiagram"/>
+        </propertySection>
+     </propertySections>
+   </extension>
    
    <!-- annotation decorator in diagram -->
 	<!--
