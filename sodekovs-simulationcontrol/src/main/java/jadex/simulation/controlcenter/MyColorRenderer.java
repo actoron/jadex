@@ -14,15 +14,16 @@ public class MyColorRenderer extends DefaultTableCellRenderer
 { 
 	  @Override 
 	  public void setValue( Object value ) 
-	  { 
-	    if ( value instanceof Integer ) 
+	  { 		  
+	    if ( (value instanceof Integer) || (value instanceof Long)) 
 	    { 
 //	      setForeground( (Long) value % 2 == 0 ? Color.BLUE : Color.GRAY ); 
 	    	setForeground(Color.BLUE);	 
 	      setText( value.toString() ); 
 	    } 
-	    else 
+	    else{ 
 	      super.setValue( value ); 
 	    setForeground(Color.YELLOW);
+	    }
 	  } 
 	}

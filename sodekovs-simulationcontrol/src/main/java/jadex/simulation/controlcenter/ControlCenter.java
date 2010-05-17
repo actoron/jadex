@@ -157,8 +157,8 @@ public class ControlCenter extends JFrame {
 		// generalSettingsTable.getColumnModel().getColumn(0).setWidth(30);
 		// generalSettingsTable.getColumnModel().getColumn(1).setWidth(30);
 		staticInfosDm.addRow(new Object[] {
-				simConf.getRunConfiguration().getGeneral().getRows(), 0,
-				simConf.getRunConfiguration().getRows().getExperiments(), 0 });
+				simConf.getRunConfiguration().getGeneral().getRows(), 1,
+				simConf.getRunConfiguration().getRows().getExperiments(), 1 });
 		// tmp.add(new
 		// JLabel(String.valueOf(facts.getRunConfiguration().getGeneral().getRows())));
 		// tmp.add(new JLabel("Current: "));
@@ -310,7 +310,7 @@ public class ControlCenter extends JFrame {
 		// mainPanel.add(allEnsemblesPanel);
 
 		// update also static part
-		updateStaticTable(ensemleNr, 0);
+//		updateStaticTable(ensemleNr, 1);
 
 		// // Add IBeliefListener
 		// exta.getBeliefbase().getBelief("listOfStreets").addBeliefListener(new
@@ -344,7 +344,7 @@ public class ControlCenter extends JFrame {
 	 */
 	public void updateCurrentEnsembleTable(int nrOfEnsemble,
 			int nrOfConductedExperiments, IntermediateResult interRes) {
-
+		
 		// update general settings
 		generalSettingsDm.removeRow(0);
 		generalSettingsDm.addRow(new Object[] { nrOfEnsemble,
@@ -382,15 +382,15 @@ public class ControlCenter extends JFrame {
 		}
 
 		// update also static part of control center
-		updateStaticTable(nrOfEnsemble, nrOfConductedExperiments);
+//		updateStaticTable(nrOfEnsemble, nrOfConductedExperiments+1);
 	}
 
-	private void updateStaticTable(int nrOfEnsemble,
+	public void updateStaticTable(int nrOfEnsemble,
 			int nrOfConductedExperiments) {
 		staticInfosDm.removeRow(0);
 		staticInfosDm.addRow(new Object[] {
 				simConf.getRunConfiguration().getGeneral().getRows(),
-				nrOfEnsemble,
+				nrOfEnsemble+1,
 				simConf.getRunConfiguration().getRows().getExperiments(),
 				nrOfConductedExperiments });
 	}
