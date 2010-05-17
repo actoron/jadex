@@ -1,17 +1,20 @@
 package jadex.application.space.envsupport.environment;
 
 import jadex.commons.SimplePropertyObject;
+import jadex.commons.meta.IPropertyMetaDataSet;
+import jadex.commons.meta.TypedPropertyObject;
 
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 
 /**
  * Basic synchronized IPropertyObject implementation.
  */
-public abstract class SynchronizedPropertyObject extends SimplePropertyObject
+public abstract class SynchronizedPropertyObject extends TypedPropertyObject
 {
 	// -------- attributes --------
 
@@ -25,8 +28,10 @@ public abstract class SynchronizedPropertyObject extends SimplePropertyObject
 	 * 
 	 * @param monitor the monitor
 	 */
-	public SynchronizedPropertyObject(Object monitor)
+	public SynchronizedPropertyObject(IPropertyMetaDataSet propertiesMeta, Object monitor)
 	{
+		super(propertiesMeta);
+		
 		this.monitor = monitor;
 	}
 
@@ -90,6 +95,16 @@ public abstract class SynchronizedPropertyObject extends SimplePropertyObject
 		}
 		if(pcs!=null)
 			pcs.firePropertyChange(name, oldval, value);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see jadex.commons.SimplePropertyObject#hasProperty(java.lang.String)
+	 */
+	public boolean hasProperty(String name) {
+		synchronized (monitor) {
+			return super.hasProperty(name);
+		}
 	}
 
 	/**

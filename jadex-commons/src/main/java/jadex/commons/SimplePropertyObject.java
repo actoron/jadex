@@ -64,6 +64,14 @@ public class SimplePropertyObject implements IPropertyObject
 			pcs.firePropertyChange(name, oldval, value);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see jadex.commons.IPropertyObject#hasProperty(java.lang.String)
+	 */
+	public boolean hasProperty(String name) {
+		return properties != null && properties.containsKey(name);
+	}
+	
 	//-------- bean accessors --------
 	
 	/**
@@ -71,6 +79,7 @@ public class SimplePropertyObject implements IPropertyObject
 	 */
 	public Map	getProperties()
 	{
+		
 		return this.properties;
 	}
 

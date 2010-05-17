@@ -6,6 +6,8 @@ import jadex.application.runtime.ISpace;
 import jadex.application.space.envsupport.IObjectCreator;
 import jadex.application.space.envsupport.MEnvSpaceInstance;
 import jadex.application.space.envsupport.MEnvSpaceType;
+import jadex.application.space.envsupport.MObjectType;
+import jadex.application.space.envsupport.MObjectTypeProperty;
 import jadex.application.space.envsupport.dataview.IDataView;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.evaluation.DefaultDataProvider;
@@ -25,6 +27,8 @@ import jadex.commons.IFuture;
 import jadex.commons.IPropertyObject;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.meta.IPropertyMetaData;
+import jadex.commons.meta.IPropertyMetaDataSet;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.service.library.ILibraryService;
@@ -55,6 +59,9 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	
 	/** The space object types. */
 	protected Map objecttypes;
+	
+	/** The space object meta data **/
+	protected Map objecttypesMeta;
 	
 	/** The object task types. */
 	protected Map tasktypes;
@@ -128,7 +135,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 */
 	public AbstractEnvironmentSpace()
 	{
-		super(new Object());
+		super(null, new Object());
 		this.views = new HashMap();
 		this.avatarmappings = new MultiCollection();
 		this.dataviewmappings = new MultiCollection();
@@ -140,6 +147,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		this.perceptgenerators = new HashMap();
 		this.perceptprocessors = new MultiCollection();
 		this.objecttypes = new HashMap();
+		this.objecttypesMeta = new HashMap();
 		this.spaceobjects = new HashMap();
 		this.spaceobjectsbytype = new HashMap();
 		this.spaceobjectsbyowner = new HashMap();
@@ -189,21 +197,26 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		{
 			for(int i=0; i<objecttypes.size(); i++)
 			{
-				Map mobjecttype = (Map)objecttypes.get(i);
-				List props = (List)mobjecttype.get("properties");
-				Map	properties	= null;
-				if(props!=null)
-				{
-					properties	= new LinkedHashMap();
-					for(int j=0; j<props.size(); j++)
-					{
-						Map	prop	= (Map)props.get(j);
-						properties.put(prop.get("name"), prop);
-					}
-				}
+				MObjectType mobjecttype = (MObjectType)objecttypes.get(i);
+//				List props = (List)mobjecttype.get("properties");
+//				Map	properties = null;
+//				if(props!=null)
+//				{
+//					properties	= new LinkedHashMap();
+//					Map propertiesMetaData = new HashMap();
+//					for(int j=0; j<props.size(); j++)
+//					{
+//						Map	prop	= (Map)props.get(j);
+//						properties.put(prop.get("name"), prop);
+//					}
+//				}
 //				Map properties = convertProperties(props, fetcher);
 //				System.out.println("Adding environment object type: "+(String)getProperty(mobjecttype, "name")+" "+props);
-				this.addSpaceObjectType((String)MEnvSpaceInstance.getProperty(mobjecttype, "name"), properties);
+				
+				for (Iterator it = mobjecttype.iterator(); it.hasNext(); )
+					System.out.println(((MObjectTypeProperty)it.next()).getType());
+				
+				this.addSpaceObjectType(mobjecttype.getName(), mobjecttype);
 			}
 		}
 		
@@ -603,13 +616,13 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/**
 	 *  Add a space type.
 	 *  @param typename The type name.
-	 *  @param properties The properties.
+	 *  @param properties The MobjectType.
 	 */
-	public void addSpaceObjectType(String typename, Map properties)
+	public void addSpaceObjectType(String typename, IPropertyMetaDataSet mobjecttype)
 	{
 		synchronized(monitor)
 		{
-			objecttypes.put(typename, properties);
+			objecttypes.put(typename, mobjecttype);
 		}
 	}
 	
@@ -867,10 +880,11 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			while(spaceobjects.containsKey(id));
 			
 			// Prepare properties (runtime props override type props).
-			properties = mergeProperties(objecttypes.get(typename)!=null ? ((Map)objecttypes.get(typename)).values() : null, properties);
+			MObjectType mObjectType = (MObjectType)objecttypes.get(typename);
+			properties = mergeProperties(mObjectType, properties);
 			
 			// Create the object.
-			ret = new SpaceObject(id, typename, properties, tasks, monitor, this);
+			ret = new SpaceObject(id, mObjectType, properties, tasks, monitor, this);
 			spaceobjects.put(id, ret);
 
 			// Store in type objects.
@@ -1001,6 +1015,37 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 							properties.put(propname, exp);
 						else
 							properties.put(propname, exp.getValue(fetcher));
+					}
+				}
+			}
+		}
+		return properties;
+	}
+	
+	/**
+	 *  Add type properties to runtime properties.
+	 *  Runtime properties have precedence if specified.
+	 *  @param typeprops	The type 
+	 *  @param properties	The runtime properties or null.
+	 *  @return	The merged runtime properties.
+	 */
+	protected Map mergeProperties(IPropertyMetaDataSet mObjectType, Map properties)
+	{
+		if (mObjectType != null) {
+			if (properties == null)
+				properties = new HashMap();
+			
+			for (Iterator it = mObjectType.iterator(); it.hasNext(); ) {
+				MObjectTypeProperty	property = (MObjectTypeProperty)it.next();
+//				System.out.println(property.getName());
+				if (!properties.containsKey(property.getName())) {
+					IParsedExpression exp = (IParsedExpression)property.getValue();
+					
+					if (exp != null) {
+						if (property.isDynamic())
+							properties.put(property.getName(), exp);
+						else
+							properties.put(property.getName(), exp.getValue(fetcher));
 					}
 				}
 			}
@@ -1762,18 +1807,14 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	 */
 	protected void fireObjectEvent(SpaceObject object, String property, Object value)
 	{
-		boolean	fire	= false;
+		boolean	fire = false;
 		synchronized(monitor)
 		{
-			Map	props	= (Map)objecttypes.get(object.getType());
-			if(props!=null)
-			{
-				Map	prop	= (Map)props.get(property);
-				if(prop!=null)
-				{
-					Object	event	= prop.get("event");
-					fire	= event!=null && ((Boolean)event).booleanValue();
-				}
+			MObjectType	props = (MObjectType)objecttypes.get(object.getType());
+			
+			if (props != null) {
+				MObjectTypeProperty prop = (MObjectTypeProperty)props.getProperty(property);
+				fire = prop != null && prop.isEvent();
 			}
 		}
 		if(fire)

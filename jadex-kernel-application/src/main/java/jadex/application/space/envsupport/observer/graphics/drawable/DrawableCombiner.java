@@ -339,4 +339,12 @@ public class DrawableCombiner extends AbstractVisual2D implements IPropertyObjec
 			properties = new HashMap();
 		properties.put(name, value);
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see jadex.commons.IPropertyObject#hasProperty(java.lang.String)
+	 */
+	public boolean hasProperty(String name) {
+		return properties != null && properties.containsKey(name);
+	}
 }

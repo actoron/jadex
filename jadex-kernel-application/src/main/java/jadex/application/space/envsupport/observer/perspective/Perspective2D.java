@@ -16,6 +16,7 @@ import jadex.application.space.envsupport.observer.graphics.layer.ILayer;
 import jadex.application.space.envsupport.observer.gui.ObserverCenter;
 import jadex.application.space.envsupport.observer.gui.SObjectInspector;
 import jadex.commons.SimplePropertyObject;
+import jadex.commons.meta.TypedPropertyObject;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.service.library.ILibraryService;
@@ -37,7 +38,7 @@ import javax.swing.JFrame;
 /**
  *  Perspective for viewing in 2D.
  */
-public class Perspective2D extends SimplePropertyObject implements IPerspective
+public class Perspective2D extends TypedPropertyObject implements IPerspective
 {
 	/** Name of the presentation */
 	protected String name;
@@ -104,6 +105,9 @@ public class Perspective2D extends SimplePropertyObject implements IPerspective
 	 */
 	public Perspective2D()
 	{
+		// TODO: give the perspective the right meta information about his properties
+		super(null);
+		
 		zoomlimit = 20.0;
 		setBackground(null);
 		this.visuals = Collections.synchronizedMap(new HashMap());

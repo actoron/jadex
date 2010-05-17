@@ -1,11 +1,11 @@
 package jadex.application.space.envsupport.environment;
 
-import jadex.commons.IPropertyObject;
+import jadex.commons.meta.ITypedPropertyObject;
 
 /**
  *  Interface for a space object.
  */
-public interface ISpaceObject extends IPropertyObject
+public interface ISpaceObject extends ITypedPropertyObject
 {
 	//-------- constants --------
 	

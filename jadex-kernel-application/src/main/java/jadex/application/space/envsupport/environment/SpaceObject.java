@@ -1,5 +1,6 @@
 package jadex.application.space.envsupport.environment;
 
+import jadex.application.space.envsupport.MObjectType;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.concurrent.IResultListener;
@@ -8,6 +9,7 @@ import jadex.javaparser.SimpleValueFetcher;
 import jadex.service.clock.IClockService;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,7 +25,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	/** The object's ID. */
 	protected Object id;
 
-	/** The object's type. */
+	/** The object's typename. */
 	protected String typename;
 	
 	/** The object's tasks. */
@@ -46,14 +48,15 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	 * @param objectId the object's ID
 	 * @param typename the object's type
 	 * @param properties initial properties (may be null)
+	 * @param propertiesMeta the meta data of the properties
 	 * @param tasks initial task list (may be null)
 	 */
-	public SpaceObject(Object id, String typename, Map properties, List tasks, Object monitor, AbstractEnvironmentSpace space)
+	public SpaceObject(Object id, MObjectType type, Map properties, List tasks, Object monitor, AbstractEnvironmentSpace space)
 	{
-		super(monitor);
+		super(type, monitor);
 		
 		this.id = id;
-		this.typename = typename;
+		this.typename = type.getName();
 		this.properties = properties;
 		this.space = space;
 		
@@ -76,7 +79,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	 */
 	public SpaceObject()
 	{
-		super(new Object());
+		super(null, new Object());
 	}
 	
 	//-------- methods --------
@@ -164,7 +167,7 @@ public class SpaceObject extends SynchronizedPropertyObject implements ISpaceObj
 	{
 		synchronized(monitor)
 		{
-			this.typename	= type;
+			typename = type;
 		}
 	}
 

@@ -2,13 +2,14 @@ package jadex.application.space.envsupport.observer.perspective;
 
 import jadex.application.space.envsupport.observer.gui.ObserverCenter;
 import jadex.commons.IPropertyObject;
+import jadex.commons.meta.ITypedPropertyObject;
 
 import java.awt.Component;
 
 /**
  * A perspective responsible for displaying information gathered using a view.
  */
-public interface IPerspective extends IPropertyObject
+public interface IPerspective extends ITypedPropertyObject
 {
 	/**
 	 *  Returns the name of the perspective

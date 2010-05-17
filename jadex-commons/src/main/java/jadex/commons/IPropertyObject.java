@@ -32,6 +32,15 @@ public interface IPropertyObject
 	 */
 	public void setProperty(String name, Object value);
 	
+	/**
+	 * tests if the given property name exists
+	 * if an property is <code>null</code> it exists
+	 * 
+	 * @param name the name of the property to test
+	 * @return <code>true</code> if and only if the property exists
+	 */
+	public boolean hasProperty(String name);
+	
 	//-------- property methods --------
 
 	/**

@@ -6,6 +6,7 @@ import jadex.application.space.envsupport.dataview.IDataView;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IPropertyObject;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.meta.IPropertyMetaDataSet;
 
 import java.util.List;
 import java.util.Map;
@@ -95,7 +96,7 @@ public interface IEnvironmentSpace extends IPropertyObject
 	 *  @param typename The type name.
 	 *  @param properties The properties (map of maps with name->name/value/dynamic/event).
 	 */
-	public void addSpaceObjectType(String typename, Map properties);
+	public void addSpaceObjectType(String typename, IPropertyMetaDataSet properties);
 	
 	/**
 	 *  Remove a space object type.

@@ -189,8 +189,7 @@ public class MEnvSpaceType	extends MSpaceType
 			new SubobjectInfo(new AccessInfo(new QName(uri, "property"), "properties", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			}));		
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "objecttype")}), new ObjectInfo(MultiCollection.class),
-			new MappingInfo(ti_po, new AttributeInfo[]{new AttributeInfo(new AccessInfo(new QName("name"), "name", null, null, new BeanAccessInfo(AccessInfo.THIS)))}, null)));
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "objecttype")}), new ObjectInfo(MObjectType.class)));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "envspacetype")}), new ObjectInfo(MEnvSpaceType.class),
 			new MappingInfo(null, new AttributeInfo[]{
@@ -1007,14 +1006,21 @@ public class MEnvSpaceType	extends MSpaceType
 			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "objecttype"), new QName(uri, "property")}), new ObjectInfo(HashMap.class),
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
-			new AttributeInfo[]{
-			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
-			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
-			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
-			new AttributeInfo(new AccessInfo("event", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
-			})));
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "objecttype"), new QName(uri, "property")}), new ObjectInfo(MObjectTypeProperty.class),
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value"), atexconv),
+			new AttributeInfo[] {
+				new AttributeInfo(new AccessInfo("class", "type", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+				new AttributeInfo(new AccessInfo("dynamic"), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("event"), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+			}
+//			
+//			new AttributeInfo[]{
+//			new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+//			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+//			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+//			new AttributeInfo(new AccessInfo("event", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+//			}
+		)));
 
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "drawable"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
 			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
