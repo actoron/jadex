@@ -3,8 +3,8 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_jCnb4BJjEd-3Ruc_856dPQ" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jCnb4RJjEd-3Ruc_856dPQ" key="imports" value="jadex.bpmn.runtime.task.*␟jadex.base.test.*␟jadex.commons.IFilter␟jadex.base.fipa.SFipa␟jadex.bridge.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jCnb4hJjEd-3Ruc_856dPQ" key="Package" value="jadex.bpmn.testcases"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IB5wIBJ6Ed-3Ruc_856dPQ" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5CRSsBaYEd-YccbjZenQqQ" key="Description" value="Test if a message can be sent and received by a process."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__5nGsGKDEd-Q9q1HfsZXQw" key="arguments" value="testresults␋false␋true␋The test results.␋Testcase␋"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_uFjqERJREd-3Ruc_856dPQ" iD="_uFjqEBJREd-3Ruc_856dPQ" name="Receiver">
     <vertices xmi:type="bpmn:Activity" xmi:id="_uFjqExJREd-3Ruc_856dPQ" iD="_uFjqEhJREd-3Ruc_856dPQ" outgoingEdges="_atklERJ6Ed-3Ruc_856dPQ" name="Pre Message Receival" activityType="Task"/>
@@ -19,7 +19,7 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_-btJYRJiEd-3Ruc_856dPQ" iD="_-btJYBJiEd-3Ruc_856dPQ" incomingEdges="_5VX00RJ6Ed-3Ruc_856dPQ" name="Succeeded" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_FD8BoBJjEd-3Ruc_856dPQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FD8BoRJjEd-3Ruc_856dPQ" key="class" value="StoreResultsTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FD8BoRJjEd-3Ruc_856dPQ" key="class" value="WriteContextTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IxnNQBJjEd-3Ruc_856dPQ" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Message sending testcase.&quot;, true, null)})"/>
       </eAnnotations>
     </vertices>
@@ -32,7 +32,7 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_jMIFwRJ6Ed-3Ruc_856dPQ" iD="_jMIFwBJ6Ed-3Ruc_856dPQ" incomingEdges="_jMIFyhJ6Ed-3Ruc_856dPQ" name="Failed" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_6goHABJ6Ed-3Ruc_856dPQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6goHARJ6Ed-3Ruc_856dPQ" key="class" value="StoreResultsTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6goHARJ6Ed-3Ruc_856dPQ" key="class" value="WriteContextTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7_i8EBJ6Ed-3Ruc_856dPQ" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Message sending test.&quot;, false, &quot;Message did not arrive.&quot;)})"/>
       </eAnnotations>
     </vertices>

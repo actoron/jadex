@@ -3,9 +3,8 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Ekt5cBF7Ed-qQOr2ZLx-Mw" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ekt5cRF7Ed-qQOr2ZLx-Mw" key="imports" value="jadex.bpmn.runtime.task.*␟jadex.base.test.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ekt5chF7Ed-qQOr2ZLx-Mw" key="Package" value="jadex.bpmn.testcases"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dGKx0BGCEd-qQOr2ZLx-Mw" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xyPaoBaYEd-YccbjZenQqQ" key="Description" value="Test if a timer is cancelled when subprocess normally continues."/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rVBjcFduEd-gpfWhYqU7MQ" key="parameters" value="inout␋success␋boolean␋true"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XYFjUGKEEd-Q9q1HfsZXQw" key="arguments" value="testresults␋false␋true␋The test results.␋Testcase␋␟success␋false␋false␋Flag␋boolean␋true"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_RyeJoRF6Ed-qQOr2ZLx-Mw" iD="_RyeJoBF6Ed-qQOr2ZLx-Mw" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_kU2mERGCEd-qQOr2ZLx-Mw" iD="_kU2mEBGCEd-qQOr2ZLx-Mw" outgoingEdges="_vLsMwRGCEd-qQOr2ZLx-Mw" activityType="EventStartEmpty"/>
@@ -43,12 +42,12 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_9c_IIRGCEd-qQOr2ZLx-Mw" iD="_9c_IIBGCEd-qQOr2ZLx-Mw" outgoingEdges="_Ph6tMRGDEd-qQOr2ZLx-Mw" incomingEdges="_O7RRsVm1Ed-z1-rEjWjEeQ" name="Failure">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_7N_2IBGEEd-qQOr2ZLx-Mw" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7N_2IRGEEd-qQOr2ZLx-Mw" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Timer test.&quot;, false, &quot;Timer occurred although should have been cancelled.&quot;)})"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AlKvIBGFEd-qQOr2ZLx-Mw" key="class" value="StoreResultsTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AlKvIBGFEd-qQOr2ZLx-Mw" key="class" value="WriteContextTask"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_BnHmQRGDEd-qQOr2ZLx-Mw" iD="_BnHmQBGDEd-qQOr2ZLx-Mw" outgoingEdges="_O7BFQRGDEd-qQOr2ZLx-Mw" incomingEdges="_eYGzIVm1Ed-z1-rEjWjEeQ" name="Success" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_pJOCEBGEEd-qQOr2ZLx-Mw" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pJOCERGEEd-qQOr2ZLx-Mw" key="class" value="StoreResultsTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pJOCERGEEd-qQOr2ZLx-Mw" key="class" value="WriteContextTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_rgnXQBGEEd-qQOr2ZLx-Mw" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Timer handler  test.&quot;, true, null)})"/>
       </eAnnotations>
     </vertices>

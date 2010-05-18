@@ -4,7 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_o8WnMUbsEd-qm5VDdIP35A" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_o8WnMkbsEd-qm5VDdIP35A" key="Package" value="jadex.bdibpmn.examples.marsworld"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FNJNMEb2Ed-qm5VDdIP35A" key="imports" value="jadex.application.space.envsupport.environment.space2d.*␟jadex.application.space.envsupport.environment.*␟jadex.commons.SUtil␟jadex.bdi.planlib.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_J5p_oEb2Ed-qm5VDdIP35A" key="parameters" value="inout␋finished␋boolean␋false␟inout␋homebase␋ISpaceObject␋$beliefbase.environment.getSpaceObjectsByType(&quot;homebase&quot;)[0]"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5paS8GKOEd-Q9q1HfsZXQw" key="arguments" value="homebase␋false␋false␋description␋ISpaceObject␋$beliefbase.environment.getSpaceObjectsByType(&quot;homebase&quot;)[0]␟finished␋false␋false␋description␋boolean␋false"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_HdXXh4AxEd6N8dR31QwQkg" iD="_HdXXhoAxEd6N8dR31QwQkg" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_HdXXiYAxEd6N8dR31QwQkg" iD="_HdXXiIAxEd6N8dR31QwQkg" outgoingEdges="_ESK78YAzEd6N8dR31QwQkg" incomingEdges="_J1gTkYAxEd6N8dR31QwQkg _ZsuD4YAxEd6N8dR31QwQkg" name="Move to Target" activityType="Task">

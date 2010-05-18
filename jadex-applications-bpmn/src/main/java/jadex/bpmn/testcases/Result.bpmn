@@ -4,14 +4,13 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RzTbkRcWEd-OSKK6OfNWqA" key="imports" value="jadex.bpmn.runtime.task.*␟jadex.bpmn.model.*␟jadex.bridge.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RzTbkhcWEd-OSKK6OfNWqA" key="Description" value="Simple process that fowards an argument as its result."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RzclgBcWEd-OSKK6OfNWqA" key="Package" value=" jadex.bpmn.examples.testcases"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w90W0BcWEd-OSKK6OfNWqA" key="arguments" value="in␋&quot;Argument value.&quot;␋String␋&quot;default value&quot;"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_2H4n8BcWEd-OSKK6OfNWqA" key="results" value="out␋&quot;Result value.&quot;␋String␋null"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_w90W0BcWEd-OSKK6OfNWqA" key="arguments" value="in␋true␋String␋Argument value.␋String␋&quot;default value&quot;␟out␋false␋true␋Result value.␋String␋"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_QZvnoRcWEd-OSKK6OfNWqA" iD="_QZvnoBcWEd-OSKK6OfNWqA" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_QZvnoxcWEd-OSKK6OfNWqA" iD="_QZvnohcWEd-OSKK6OfNWqA" outgoingEdges="_lAOuChcXEd-OSKK6OfNWqA" incomingEdges="_kPgbsRcXEd-OSKK6OfNWqA" name="Save the result" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_NAXbkBcXEd-OSKK6OfNWqA" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NAXbkRcXEd-OSKK6OfNWqA" key="class" value="StoreResultsTask"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_b6hRQBcYEd-OSKK6OfNWqA" key="parameters" value="in␋name␋String␋&quot;out&quot;␟in␋value␋Object␋$args.get(&quot;in&quot;)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NAXbkRcXEd-OSKK6OfNWqA" key="class" value="WriteContextTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_b6hRQBcYEd-OSKK6OfNWqA" key="parameters" value="in␋name␋String␋&quot;out&quot;␟in␋value␋Object␋in"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_jUWbARcXEd-OSKK6OfNWqA" iD="_jUWbABcXEd-OSKK6OfNWqA" outgoingEdges="_kPgbsRcXEd-OSKK6OfNWqA" activityType="EventStartEmpty"/>

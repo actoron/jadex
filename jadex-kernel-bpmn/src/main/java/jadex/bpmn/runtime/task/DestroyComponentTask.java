@@ -20,7 +20,7 @@ public class DestroyComponentTask implements ITask
 	{
 		IComponentManagementService ces = (IComponentManagementService)instance.getComponentAdapter().getServiceContainer().getService(IComponentManagementService.class);
 		final IResultListener resultlistener = (IResultListener)context.getParameterValue("resultlistener");
-		boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): false;
+		final boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): false;
 		
 		IComponentIdentifier cid = (IComponentIdentifier)context.getParameterValue("componentid");
 		if(cid==null)
@@ -29,33 +29,33 @@ public class DestroyComponentTask implements ITask
 			cid = ces.createComponentIdentifier(name, true, null);
 		}
 		
-		IResultListener lis = resultlistener;
-		if(wait)
+		IFuture ret = ces.destroyComponent(cid);
+		if(wait || resultlistener!=null)
 		{
-			lis = new IResultListener()
+			ret.addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
 					if(resultlistener!=null)
 						resultlistener.resultAvailable(DestroyComponentTask.this, result);
-					listener.resultAvailable(DestroyComponentTask.this, result);
+					if(wait)
+						listener.resultAvailable(DestroyComponentTask.this, result);
 				}
 				
 				public void exceptionOccurred(Object source, Exception exception)
 				{
 					if(resultlistener!=null)
 						resultlistener.exceptionOccurred(DestroyComponentTask.this, exception);
-					listener.exceptionOccurred(DestroyComponentTask.this, exception);
+					if(wait)
+						listener.exceptionOccurred(DestroyComponentTask.this, exception);
 				}
-			};
+			});
 		}
-		
-//		System.out.println("Destroy component: "+cid.getName());
-		IFuture ret = ces.destroyComponent(cid);
-		ret.addResultListener(lis);
-		
+
 		if(!wait)
+		{
 			listener.resultAvailable(this, null);
+		}
 	}
 	
 	//-------- static methods --------

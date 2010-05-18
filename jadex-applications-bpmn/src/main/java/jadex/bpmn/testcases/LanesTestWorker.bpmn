@@ -3,7 +3,7 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_o9h3sFdaEd-_rc0-j01YLA" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_o9h3sVdaEd-_rc0-j01YLA" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_o9h3sldaEd-_rc0-j01YLA" key="Package" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x5a0oFdaEd-_rc0-j01YLA" key="results" value="result␋The executed pools and lanes.␋String␋&quot;&quot;"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X3t24GKKEd-Q9q1HfsZXQw" key="arguments" value="result␋false␋false␋The executed pools and lanes.␋String␋"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_oURfVVdaEd-_rc0-j01YLA" iD="_oURfVFdaEd-_rc0-j01YLA" name="Pool1">
     <vertices xmi:type="bpmn:Activity" xmi:id="_--UOUVdaEd-_rc0-j01YLA" iD="_--UOUFdaEd-_rc0-j01YLA" outgoingEdges="__-qRCldaEd-_rc0-j01YLA" lanes="_22t1EVdaEd-_rc0-j01YLA" activityType="EventStartEmpty"/>

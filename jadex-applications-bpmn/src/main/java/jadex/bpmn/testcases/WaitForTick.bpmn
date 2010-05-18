@@ -4,7 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KOMJsUMbEd-aDdXkLqEWvQ" key="imports" value="jadex.base.test.*␟jadex.bpmn.runtime.task.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KOMJskMbEd-aDdXkLqEWvQ" key="Description" value="Test if waiting for a tick works."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KOV6sEMbEd-aDdXkLqEWvQ" key="Package" value="jadex.bpmn.testcases"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DI4ecEMcEd-aDdXkLqEWvQ" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_expx4GKEEd-Q9q1HfsZXQw" key="arguments" value="testresults␋false␋true␋The test results.␋Testcase␋"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_JpPCgUMbEd-aDdXkLqEWvQ" iD="_JpPCgEMbEd-aDdXkLqEWvQ" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_JpPCg0MbEd-aDdXkLqEWvQ" iD="_JpPCgkMbEd-aDdXkLqEWvQ" outgoingEdges="_vHP8IUMbEd-aDdXkLqEWvQ" name="Before wait" activityType="Task">
@@ -24,14 +24,14 @@
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_vg4kIUMbEd-aDdXkLqEWvQ" iD="_vg4kIEMbEd-aDdXkLqEWvQ" incomingEdges="_NLD7wUMhEd-aDdXkLqEWvQ" name="Success" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_HlyuoEMcEd-aDdXkLqEWvQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HlyuoUMcEd-aDdXkLqEWvQ" key="class" value="jadex.bpmn.runtime.task.StoreResultsTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_HlyuoUMcEd-aDdXkLqEWvQ" key="class" value="jadex.bpmn.runtime.task.WriteContextTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TJBhQEMcEd-aDdXkLqEWvQ" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Wait for tick.&quot;, true, null)})"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_LACOoUMhEd-aDdXkLqEWvQ" iD="_LACOoEMhEd-aDdXkLqEWvQ" outgoingEdges="_NLD7wUMhEd-aDdXkLqEWvQ _RDT_sUMhEd-aDdXkLqEWvQ" incomingEdges="_6IAsIUMhEd-aDdXkLqEWvQ" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_QaMKMUMhEd-aDdXkLqEWvQ" iD="_QaMKMEMhEd-aDdXkLqEWvQ" incomingEdges="_RDT_sUMhEd-aDdXkLqEWvQ" name="Fail">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_QhCZEEMhEd-aDdXkLqEWvQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QhCZEUMhEd-aDdXkLqEWvQ" key="class" value="jadex.bpmn.runtime.task.StoreResultsTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QhCZEUMhEd-aDdXkLqEWvQ" key="class" value="jadex.bpmn.runtime.task.WriteContextTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZLg14EMhEd-aDdXkLqEWvQ" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Wait for tick.&quot;, false,  &quot;needed: &quot;+(System.currentTimeMillis()-start))})"/>
       </eAnnotations>
     </vertices>

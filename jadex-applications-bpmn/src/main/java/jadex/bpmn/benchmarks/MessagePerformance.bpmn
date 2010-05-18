@@ -4,7 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KRLQcRciEd-OSKK6OfNWqA" key="imports" value="jadex.commons.*␟jadex.bridge.*␟jadex.bpmn.runtime.task.*␟jadex.base.fipa.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KRLQchciEd-OSKK6OfNWqA" key="Description" value="&lt;h3>Message performance benchmark&lt;/h3> The process sends a number of agents to itself and measures the time it needs for this."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KRVBcBciEd-OSKK6OfNWqA" key="Package" value="jadex.bpmn.benchmarks"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_K7-EcBcjEd-OSKK6OfNWqA" key="parameters" value="inout␋starttime␋long␋$clock.getTime()"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_TxWB8GKLEd-Q9q1HfsZXQw" key="arguments" value="starttime␋false␋false␋starttime␋long␋$clock.getTime()"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_ySq8MdCREd6MVLxz8V9N3w" iD="_ySq8MNCREd6MVLxz8V9N3w" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_yTuFEdCREd6MVLxz8V9N3w" iD="_yTuFENCREd6MVLxz8V9N3w" outgoingEdges="_7XGUodCSEd6MVLxz8V9N3w" incomingEdges="_DtIWAdCUEd6MVLxz8V9N3w _23xCkdCSEd6MVLxz8V9N3w" name="PreSend" activityType="Task">

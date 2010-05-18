@@ -4,7 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2BLAUbtEd-qm5VDdIP35A" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_A2BLAkbtEd-qm5VDdIP35A" key="Package" value="jadex.bdibpmn.examples.marsworld"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FnqDIEbvEd-qm5VDdIP35A" key="imports" value="jadex.commons.SUtil␟jadex.bridge.IComponentIdentifier␟jadex.application.space.agr.AGRSpace␟jadex.application.runtime.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_KZkS8EbvEd-qm5VDdIP35A" key="parameters" value="inout␋target␋Object␋"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_UhS7YGKPEd-Q9q1HfsZXQw" key="arguments" value="target␋false␋false␋description␋Object␋"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_Gdz1d4AlEd6N8dR31QwQkg" iD="_Gdz1doAlEd6N8dR31QwQkg" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_Gdz1eYAlEd6N8dR31QwQkg" iD="_Gdz1eIAlEd6N8dR31QwQkg" outgoingEdges="_-qM_CoHAEd6iKJCjTAMfBQ" incomingEdges="_Jgj0wYAlEd6N8dR31QwQkg" name="Produce Ore" activityType="Task">

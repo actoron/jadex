@@ -13,9 +13,9 @@ public class WriteContextTask extends AbstractTask
 	 */
 	public void doExecute(ITaskContext context, BpmnInterpreter instance) throws Exception
 	{
-		if(context.hasParameterValue("variablename"))
+		if(context.hasParameterValue("name"))
 		{
-			String name = (String)context.getParameterValue("variablename");
+			String name = (String)context.getParameterValue("name");
 			Object val = context.getParameterValue("value");
 			Object key = context.getParameterValue("key");
 			instance.setContextVariable(name, key, val);
@@ -23,9 +23,9 @@ public class WriteContextTask extends AbstractTask
 		
 		for(int i=0; ; i++)
 		{
-			if(context.hasParameterValue("variablename"+i))
+			if(context.hasParameterValue("name"+i))
 			{
-				String name = (String)context.getParameterValue("variablename"+i);
+				String name = (String)context.getParameterValue("name"+i);
 				Object val = context.getParameterValue("value"+i);
 				Object key = context.getParameterValue("key"+i);
 				instance.setContextVariable(name, key, val);
@@ -45,7 +45,7 @@ public class WriteContextTask extends AbstractTask
 	{
 		String desc = "The write context task can be used to write values to context variables.";
 		ParameterMetaInfo vnamemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
-			String.class, "variablename", null, "The name of the context variable that is the target of the write operation.");
+			String.class, "name", null, "The name of the context variable that is the target of the write operation.");
 		ParameterMetaInfo valuemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN, 
 				Object.class, "value", null, "The value that is written to the context variable.");
 		

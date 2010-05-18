@@ -8,6 +8,17 @@ import java.util.List;
  */
 public class MSubProcess extends MActivity
 {
+	//-------- constants --------
+	
+	/** The default subprocess type. */
+	public static final String	SUBPROCESSTYPE_NONE	= "none";
+	
+	/** The parallel subprocess type. */
+	public static final String	SUBPROCESSTYPE_PARALLEL	= "parallel";
+	
+	/** The looping subprocess type. */
+	public static final String	SUBPROCESSTYPE_LOOPING	= "looping";
+	
 	//-------- attributes --------
 	
 	/** The vertices. */
@@ -18,6 +29,11 @@ public class MSubProcess extends MActivity
 	
 	/** The artifacts. */
 	protected List artifacts;
+	
+	//-------- added --------
+	
+	/** The subprocess type (e.g. looping). */
+	protected String	subprocesstype;
 	
 	//-------- methods --------
 	
@@ -119,4 +135,25 @@ public class MSubProcess extends MActivity
 		if(artifacts!=null)
 			artifacts.remove(artifact);
 	}
+	
+	/**
+	 *  Get the subprocess type.
+	 */
+	public String	getSubprocessType()
+	{
+		return subprocesstype!=null ? subprocesstype : SUBPROCESSTYPE_NONE;
+	}
+	
+	/**
+	 *  Set the subprocess type.
+	 */
+	public void	setSubprocessType(String subprocesstype)
+	{
+		assert SUBPROCESSTYPE_NONE.equals(subprocesstype)
+			|| SUBPROCESSTYPE_PARALLEL.equals(subprocesstype)
+			|| SUBPROCESSTYPE_LOOPING.equals(subprocesstype) : subprocesstype+", "+this;
+
+		this.subprocesstype	= subprocesstype;
+	}
+
 }

@@ -134,12 +134,6 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	/** The configuration. */
 	protected String lane;
 	
-	/** The arguments. */
-	protected Map arguments;
-	
-	/** The results. */
-	protected Map results;
-	
 	/** The parent. */
 	protected IExternalAccess	parent;
 	
@@ -219,8 +213,6 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 			}
 		}
 		
-		this.arguments = arguments;
-		this.results = new HashMap();
 		this.parent	= parent;
 //		this.ext_entries = Collections.synchronizedList(new ArrayList());
 		this.activityhandlers = activityhandlers!=null? activityhandlers: DEFAULT_ACTIVITY_HANDLERS;
@@ -228,60 +220,48 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 		this.fetcher = fetcher!=null? fetcher: new BpmnInstanceFetcher(this, fetcher);
 		this.context = new ThreadContext(model);
 		this.messages = new ArrayList();
+		this.variables	= new HashMap();
 		
 		// Init the arguments with default values.
 		IArgument[] args = model.getArguments();
 		for(int i=0; i<args.length; i++)
 		{
-			if(args[i].getDefaultValue(config)!=null)
+			if(arguments!=null && arguments.containsKey(args[i].getName()))
 			{
-				if(this.arguments==null)
-					this.arguments = new HashMap();
-			
-				if(this.arguments.get(args[i].getName())==null)
-				{
-					this.arguments.put(args[i].getName(), args[i].getDefaultValue(config));
-				}
+				this.variables.put(args[i].getName(), arguments.get(args[i].getName()));
 			}
-		}
-		
-		// Init the results with default values.
-		IArgument[] res = model.getResults();
-		for(int i=0; i<res.length; i++)
-		{
-			if(res[i].getDefaultValue(config)!=null)
+			else if(args[i].getDefaultValue(config)!=null)
 			{
-				this.results.put(res[i].getName(), res[i].getDefaultValue(config));
+				this.variables.put(args[i].getName(), args[i].getDefaultValue(config));
 			}
 		}
 		
 		// Initialize context variables.
-//		if(variables==null)
-		variables	= new HashMap();
 		variables.put("$platform", getComponentAdapter().getServiceContainer());
 		variables.put("$clock", getComponentAdapter().getServiceContainer().getService(IClockService.class));
-		variables.put("$args", this.arguments);
-		variables.put("$results", this.results);
 		variables.put("$interpreter", this);
 		
 		Set	vars	= model.getContextVariables();
 		for(Iterator it=vars.iterator(); it.hasNext(); )
 		{
 			String	name	= (String)it.next();
-			Object	value	= null;
-			IParsedExpression	exp	= model.getContextVariableExpression(name);
-			if(exp!=null)
+			if(!variables.containsKey(name))	// Don't overwrite arguments.
 			{
-				try
+				Object	value	= null;
+				IParsedExpression	exp	= model.getContextVariableExpression(name);
+				if(exp!=null)
 				{
-					value	= exp.getValue(this.fetcher);
+					try
+					{
+						value	= exp.getValue(this.fetcher);
+					}
+					catch(RuntimeException e)
+					{
+						throw new RuntimeException("Error parsing context variable: "+this+", "+name+", "+exp, e);
+					}
 				}
-				catch(RuntimeException e)
-				{
-					throw new RuntimeException("Error parsing context variable: "+this+", "+name+", "+exp, e);
-				}
+				variables.put(name, value);
 			}
-			variables.put(name, value);
 		}
 				
 		// Create initial thread(s). 
@@ -467,7 +447,18 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	 */
 	public Map getResults()
 	{
-		return Collections.unmodifiableMap(results);
+		IArgument[] results = getModel().getResults();
+		Map res = new HashMap();
+		
+		for(int i=0; i<results.length; i++)
+		{
+			String resname = results[i].getName();
+			if(variables.containsKey(resname))
+			{
+				res.put(resname, variables.get(resname));
+			}
+		}
+		return res;
 	}
 	
 	/**
@@ -489,35 +480,35 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 		return isatbreakpoint;
 	}
 	
-	/**
-	 *  Check if the value of a result is set.
-	 *  @param name	The result name. 
-	 *  @return	True, if the result is set to some value. 
-	 */
-	public boolean hasResultValue(String name)
-	{
-		return results.containsKey(name);
-	}
-
-	/**
-	 *  Get the value of a result.
-	 *  @param name	The result name. 
-	 *  @return	The result value. 
-	 */
-	public Object getResultValue(String name)
-	{
-		return results.get(name);
-	}
-	
-	/**
-	 *  Set the value of a result.
-	 *  @param name	The result name. 
-	 *  @param value The result value. 
-	 */
-	public void	setResultValue(String name, Object value)
-	{
-		results.put(name, value);
-	}
+//	/**
+//	 *  Check if the value of a result is set.
+//	 *  @param name	The result name. 
+//	 *  @return	True, if the result is set to some value. 
+//	 */
+//	public boolean hasResultValue(String name)
+//	{
+//		return results.containsKey(name);
+//	}
+//
+//	/**
+//	 *  Get the value of a result.
+//	 *  @param name	The result name. 
+//	 *  @return	The result value. 
+//	 */
+//	public Object getResultValue(String name)
+//	{
+//		return results.get(name);
+//	}
+//	
+//	/**
+//	 *  Set the value of a result.
+//	 *  @param name	The result name. 
+//	 *  @param value The result value. 
+//	 */
+//	public void	setResultValue(String name, Object value)
+//	{
+//		results.put(name, value);
+//	}
 	
 	//-------- helpers --------
 	
@@ -669,24 +660,6 @@ public class BpmnInterpreter implements IComponentInstance, IExternalAccess // H
 	public IExternalAccess getParent()
 	{
 		return parent;
-	}
-	
-	/**
-	 *  Get the arguments.
-	 *  @return The arguments.
-	 */
-	public Map getArguments()
-	{
-		return arguments;
-	}
-	
-	/**
-	 *  Get the configuration.
-	 *  @return The configuration.
-	 */
-	public String getConfiguration()
-	{
-		return this.config;
 	}
 
 	/**

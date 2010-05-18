@@ -470,6 +470,11 @@ public class BpmnXMLReader
 								throw new RuntimeException(cnfe);
 							}
 						}
+						else if(act	instanceof MSubProcess && propname.equals("parallel"))
+						{
+							IParsedExpression propval = parser.parseExpression(proptext, dia.getAllImports(), null, context.getClassLoader());
+							((MSubProcess)act).setSubprocessType(((Boolean)propval.getValue(null)).booleanValue() ? MSubProcess.SUBPROCESSTYPE_PARALLEL : MSubProcess.SUBPROCESSTYPE_NONE);
+						}
 						else
 						{
 							IParsedExpression propval = parser.parseExpression(proptext, dia.getAllImports(), null, context.getClassLoader());
@@ -581,6 +586,11 @@ public class BpmnXMLReader
 										{
 											throw new RuntimeException(cnfe);
 										}
+									}
+									else if(act	instanceof MSubProcess && "parallel".equals(key))
+									{
+										IParsedExpression propval = parser.parseExpression(value, dia.getAllImports(), null, context.getClassLoader());
+										((MSubProcess)act).setSubprocessType(((Boolean)propval.getValue(null)).booleanValue() ? MSubProcess.SUBPROCESSTYPE_PARALLEL : MSubProcess.SUBPROCESSTYPE_NONE);
 									}
 									else
 									{
@@ -1045,29 +1055,30 @@ public class BpmnXMLReader
 							}
 							else if("parameters".equals(key))
 							{
-								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
-								while(stok.hasMoreTokens())
-								{
-									String paramtext = stok.nextToken();
-									StringTokenizer stok2 = new StringTokenizer(paramtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-									/*String dir =*/ stok2.nextToken();	// Todo: consider direction.
-									String name = stok2.nextToken();
-									String clazzname = stok2.nextToken();
-									String val = stok2.hasMoreTokens() ? stok2.nextToken() : null;
-									
-									// context variable
-									Class clazz = SReflect.findClass0(clazzname, model.getAllImports(), context.getClassLoader());
-									if(clazz!=null)
-									{
-										IParsedExpression exp = null;
-										if(val!=null)
-										{
-											exp = parser.parseExpression(val, model.getAllImports(), null, context.getClassLoader());
-										}
-										model.addContextVariable(name, clazz, exp);
-//										System.out.println("Context variable: "+name);
-									}
-								}
+								throw new RuntimeException("parameters no longer separately");
+//								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
+//								while(stok.hasMoreTokens())
+//								{
+//									String paramtext = stok.nextToken();
+//									StringTokenizer stok2 = new StringTokenizer(paramtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+//									/*String dir =*/ stok2.nextToken();	// Todo: consider direction.
+//									String name = stok2.nextToken();
+//									String clazzname = stok2.nextToken();
+//									String val = stok2.hasMoreTokens() ? stok2.nextToken() : null;
+//									
+//									// context variable
+//									Class clazz = SReflect.findClass0(clazzname, model.getAllImports(), context.getClassLoader());
+//									if(clazz!=null)
+//									{
+//										IParsedExpression exp = null;
+//										if(val!=null)
+//										{
+//											exp = parser.parseExpression(val, model.getAllImports(), null, context.getClassLoader());
+//										}
+//										model.addContextVariable(name, clazz, exp);
+////										System.out.println("Context variable: "+name);
+//									}
+//								}
 							}
 							else if("arguments".equals(key))
 							{
@@ -1077,57 +1088,91 @@ public class BpmnXMLReader
 									String argtext = stok.nextToken();
 									StringTokenizer stok2 = new StringTokenizer(argtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
 									String name = stok2.nextToken();
+									String isarg = stok2.nextToken();
+									String isres = stok2.nextToken();
 									String desc = stok2.nextToken();
 									String typename = stok2.nextToken();
-									String valtext = stok2.hasMoreTokens()? stok2.nextToken(): null;
-									
-									Object val = null;
-									if(valtext!=null)
+									String val = stok2.hasMoreTokens()? stok2.nextToken(): null;
+									IParsedExpression exp = null;
+
+									// context variable
+									Class clazz = SReflect.findClass0(typename, model.getAllImports(), context.getClassLoader());
+									if(clazz!=null)
 									{
+										
+										if(val!=null)
+										{
+											exp = parser.parseExpression(val, model.getAllImports(), null, context.getClassLoader());
+										}
+										model.addContextVariable(name, clazz, exp);
+//										System.out.println("Context variable: "+name);
+									}
+									
+									IArgument arg	= null;
+									if(isarg!=null && Boolean.parseBoolean(isarg))
+									{
+										Object	argval	= null;
 										try
 										{
-											val = parser.parseExpression(valtext, model.getAllImports(), null, context.getClassLoader()).getValue(null);
+											argval	= exp!=null ? exp.getValue(null) : null;
 										}
 										catch(RuntimeException e)
 										{
-											throw new RuntimeException("Error parsing argument: "+model+", "+name+", "+valtext, e);
+											// Hack!!! initial value for context variable might not be accessible statically.
 										}
+										arg = new Argument(name, desc, typename, argval);
+										model.addArgument(arg);
 									}
-									IArgument arg = new Argument(name, desc, typename, val);
-									
-									model.addArgument(arg);
-//									System.out.println("Argument: "+arg);
+									if(isres!=null && Boolean.parseBoolean(isres))
+									{
+										if(arg==null)
+										{
+											Object	argval	= null;
+											try
+											{
+												argval	= exp!=null ? exp.getValue(null) : null;
+											}
+											catch(RuntimeException e)
+											{
+												// Hack!!! initial value for context variable might not be accessible statically.
+											}
+											arg = new Argument(name, desc, typename, argval);
+										}
+										model.addResult(arg);
+									}
+//										System.out.println("Argument: "+arg);
 								}
 							}
 							else if("results".equals(key))
 							{
-								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
-								while(stok.hasMoreTokens())
-								{
-									String argtext = stok.nextToken();
-									StringTokenizer stok2 = new StringTokenizer(argtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
-									String name = stok2.nextToken();
-									String desc = stok2.nextToken();
-									String typename = stok2.nextToken();
-									String valtext = stok2.hasMoreTokens()? stok2.nextToken(): null;
-									
-									Object val = null;
-									if(valtext!=null)
-									{
-										try
-										{
-											val = parser.parseExpression(valtext, model.getAllImports(), null, context.getClassLoader()).getValue(null);
-										}
-										catch(RuntimeException e)
-										{
-											throw new RuntimeException("Error parsing result: "+model+", "+name+", "+valtext, e);
-										}
-									}											
-									IArgument res = new Argument(name, desc, typename, val);
-									
-									model.addResult(res);
-//									System.out.println("Argument: "+arg);
-								}
+								throw new RuntimeException("results no longer separately");
+//								StringTokenizer stok = new StringTokenizer(value, LIST_ELEMENT_DELIMITER);
+//								while(stok.hasMoreTokens())
+//								{
+//									String argtext = stok.nextToken();
+//									StringTokenizer stok2 = new StringTokenizer(argtext, LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+//									String name = stok2.nextToken();
+//									String desc = stok2.nextToken();
+//									String typename = stok2.nextToken();
+//									String valtext = stok2.hasMoreTokens()? stok2.nextToken(): null;
+//									
+//									Object val = null;
+//									if(valtext!=null)
+//									{
+//										try
+//										{
+//											val = parser.parseExpression(valtext, model.getAllImports(), null, context.getClassLoader()).getValue(null);
+//										}
+//										catch(RuntimeException e)
+//										{
+//											throw new RuntimeException("Error parsing result: "+model+", "+name+", "+valtext, e);
+//										}
+//									}											
+//									IArgument res = new Argument(name, desc, typename, val);
+//									
+//									model.addResult(res);
+////									System.out.println("Argument: "+arg);
+//								}
 							}
 							else if(!"package".equals(key) && !"imports".equals(key))
 							{
@@ -1172,8 +1217,10 @@ public class BpmnXMLReader
 							IArgument arg = (IArgument)parser.parseExpression(argstr, model.getAllImports(), null, 
 								context.getClassLoader()).getValue(null);							
 							model.addArgument(arg);
+							// Hack!!! Add context variable for argument too.
+							model.addContextVariable(arg.getName(), SReflect.findClass(arg.getTypename(), model.getAllImports(), context.getClassLoader()), null);
 						}
-						catch(RuntimeException e)
+						catch(Exception e)
 						{
 							throw new RuntimeException("Error parsing argument: "+model+", "+argstr, e);
 						}
@@ -1187,8 +1234,10 @@ public class BpmnXMLReader
 							IArgument res = (IArgument)parser.parseExpression(resstr, model.getAllImports(), null, 
 								context.getClassLoader()).getValue(null);
 							model.addResult(res);
+							// Hack!!! Add context variable for result too.
+							model.addContextVariable(res.getName(), SReflect.findClass(res.getTypename(), model.getAllImports(), context.getClassLoader()), null);
 						}
-						catch(RuntimeException e)
+						catch(Exception e)
 						{
 							throw new RuntimeException("Error parsing result: "+model+", "+resstr, e);
 						}

@@ -48,11 +48,10 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			
 			boolean	wait	= true;
 			
-			if(thread.hasPropertyValue("parallel"))
+			if(MSubProcess.SUBPROCESSTYPE_PARALLEL.equals(proc.getSubprocessType()))
 			{
 				// Todo: use subcontext?
-				Iterator	it	= SReflect.getIterator(thread.getPropertyValue("parallel"));
-				String	param	= (String)thread.getPropertyValue("parameter");
+				Iterator	it	= SReflect.getIterator(thread.getPropertyValue("items"));
 				// If empty parallel activity (i.e. no items at all) continue process.
 				if(!it.hasNext())
 				{
@@ -68,11 +67,15 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						for(int i=0; i<start.size(); i++)
 						{
 							ProcessThread subthread = new ProcessThread((MActivity)start.get(i), subcontext, instance);
-							subthread.setParameterValue(param, value);	// Hack!!! parameter not declared?
+							subthread.setParameterValue("item", value);	// Hack!!! parameter not declared?
 							subcontext.addThread(subthread);
 						}
 					}
 				}
+			}
+			else if(MSubProcess.SUBPROCESSTYPE_LOOPING.equals(proc.getSubprocessType()))
+			{
+				throw new UnsupportedOperationException("Looping subprocess not yet supported: "+activity+", "+instance);
 			}
 			else
 			{

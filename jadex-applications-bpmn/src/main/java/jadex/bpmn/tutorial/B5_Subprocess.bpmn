@@ -5,9 +5,14 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lJy0YkIyEd-lXM2_JTGF5Q" key="Package" value="jadex.bpmn.tutorial"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_hOaj8UIyEd-lXM2_JTGF5Q" iD="_hOaj8EIyEd-lXM2_JTGF5Q" name="Pool">
-    <vertices xmi:type="bpmn:SubProcess" xmi:id="_jX9DUUIyEd-lXM2_JTGF5Q" iD="_jX9DUEIyEd-lXM2_JTGF5Q" outgoingEdges="_2Qg9YUI1Ed-Y29i2KJopdA" name="file = &quot;B2_Sequence.bpmn&quot;">
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_jX9DUUIyEd-lXM2_JTGF5Q" iD="_jX9DUEIyEd-lXM2_JTGF5Q" outgoingEdges="_2Qg9YUI1Ed-Y29i2KJopdA" name="Subprocess">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_lpr1YEIyEd-lXM2_JTGF5Q" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_lpr1YUIyEd-lXM2_JTGF5Q" key="class" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_O_Rn0GKQEd-Q9q1HfsZXQw" source="subProcess">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O_Rn0WKQEd-Q9q1HfsZXQw" key="file" value="&quot;B2_Sequence.bpmn&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O_Rn0mKQEd-Q9q1HfsZXQw" key="parallel" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O_Rn02KQEd-Q9q1HfsZXQw" key="items" value=""/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_2PebkUI1Ed-Y29i2KJopdA" iD="_2PebkEI1Ed-Y29i2KJopdA" incomingEdges="_2Qg9YUI1Ed-Y29i2KJopdA" name="Subprocess Finished" activityType="Task">

@@ -3,8 +3,8 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_x33-wBS6Ed-3Ruc_856dPQ" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x4BIsBS6Ed-3Ruc_856dPQ" key="imports" value="jadex.base.test.*␟jadex.bpmn.runtime.task.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x4BIsRS6Ed-3Ruc_856dPQ" key="Package" value="jadex.bpmn.testcases"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0IQtABS6Ed-3Ruc_856dPQ" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__0sBsBaYEd-YccbjZenQqQ" key="Description" value="Test if parameter scopes work."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_H0134GKEEd-Q9q1HfsZXQw" key="arguments" value="testresults␋false␋true␋The test results.␋Testcase␋"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_sLr4BxS6Ed-3Ruc_856dPQ" iD="_sLr4BhS6Ed-3Ruc_856dPQ" name="Pool">
     <vertices xmi:type="bpmn:SubProcess" xmi:id="_MGoxsRS7Ed-3Ruc_856dPQ" iD="_MGoxsBS7Ed-3Ruc_856dPQ" outgoingEdges="_zdsFARTFEd-a46HbtL-N3Q" name="Outer Task">
@@ -33,12 +33,12 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_deRL4RS7Ed-3Ruc_856dPQ" iD="_deRL4BS7Ed-3Ruc_856dPQ" incomingEdges="_dekG0RS7Ed-3Ruc_856dPQ" name="Success" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_nK8EgBTGEd-a46HbtL-N3Q" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nK8EgRTGEd-a46HbtL-N3Q" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Scope test.&quot;, true, null)})"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qAIwABTGEd-a46HbtL-N3Q" key="class" value="StoreResultsTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qAIwABTGEd-a46HbtL-N3Q" key="class" value="WriteContextTask"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_lQkDgRS7Ed-3Ruc_856dPQ" iD="_lQkDgBS7Ed-3Ruc_856dPQ" incomingEdges="_zzc5oRTFEd-a46HbtL-N3Q" name="Failure">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_0ohrABTGEd-a46HbtL-N3Q" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0ohrARTGEd-a46HbtL-N3Q" key="class" value="StoreResultsTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0ohrARTGEd-a46HbtL-N3Q" key="class" value="WriteContextTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_19KisBTGEd-a46HbtL-N3Q" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Scope test.&quot;, false, &quot;Wrong parameter value: &quot;+a)})"/>
       </eAnnotations>
     </vertices>

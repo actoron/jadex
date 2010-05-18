@@ -3,28 +3,25 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-yILQFmxEd-CVtZr0hfiVg" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-yILQVmxEd-CVtZr0hfiVg" key="Description" value="&lt;h1>Standard Proposal Evaluation Process&lt;/h1> This process randomly selects some of the available proposals."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-yILQlmxEd-CVtZr0hfiVg" key="Package" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IiqRMFmyEd-CVtZr0hfiVg" key="arguments" value="proposals␋The available proposals.␋Collection␋"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NHuX0FmyEd-CVtZr0hfiVg" key="results" value="proposals␋The evaluated proposals.␋Collection␋"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_IiqRMFmyEd-CVtZr0hfiVg" key="arguments" value="proposals␋true␋true␋The proposals to be evaluated.␋Collection␋"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_S2pCcFmyEd-CVtZr0hfiVg" key="imports" value="java.util.Collection"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_-CVGAVmxEd-CVtZr0hfiVg" iD="_-CVGAFmxEd-CVtZr0hfiVg" name="Pool">
-    <vertices xmi:type="bpmn:SubProcess" xmi:id="_WIdYgVmyEd-CVtZr0hfiVg" iD="_WIdYgFmyEd-CVtZr0hfiVg" outgoingEdges="_z62qSlmyEd-CVtZr0hfiVg" name="For all Proposals&#xD;&#xA;parallel = $args.get(&quot;proposals&quot;)&#xD;&#xA;parameter = &quot;proposal&quot;">
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_WIdYgVmyEd-CVtZr0hfiVg" iD="_WIdYgFmyEd-CVtZr0hfiVg" name="For all Proposals">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WToGsFmyEd-CVtZr0hfiVg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WToGsVmyEd-CVtZr0hfiVg" key="class" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_pVi5IGJdEd-Q9q1HfsZXQw" source="subProcess">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pVi5IWJdEd-Q9q1HfsZXQw" key="file" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pVi5ImJdEd-Q9q1HfsZXQw" key="parallel" value="true"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pVi5I2JdEd-Q9q1HfsZXQw" key="items" value="proposals"/>
       </eAnnotations>
       <vertices xmi:type="bpmn:Activity" xmi:id="_WIdYg1myEd-CVtZr0hfiVg" iD="_WIdYglmyEd-CVtZr0hfiVg">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_W1bMMFmyEd-CVtZr0hfiVg" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_W1bMMVmyEd-CVtZr0hfiVg" key="class" value="jadex.bpmn.runtime.task.InvokeMethodTask.class"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_d35wcFmyEd-CVtZr0hfiVg" key="parameters" value="in␋object␋java.lang.Object␋proposal␟in␋methodname␋java.lang.String␋&quot;setEvaluation&quot;␟in␋param␋java.lang.Object␋Math.random()&lt;0.5 ? Boolean.TRUE : Boolean.FALSE"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_d35wcFmyEd-CVtZr0hfiVg" key="parameters" value="in␋object␋java.lang.Object␋item␟in␋methodname␋java.lang.String␋&quot;setEvaluation&quot;␟in␋param␋java.lang.Object␋Math.random()&lt;0.5 ? Boolean.TRUE : Boolean.FALSE"/>
         </eAnnotations>
       </vertices>
     </vertices>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_z62qQVmyEd-CVtZr0hfiVg" iD="_z62qQFmyEd-CVtZr0hfiVg" incomingEdges="_z62qSlmyEd-CVtZr0hfiVg" name="Write Results" activityType="Task">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_1Ok78FmyEd-CVtZr0hfiVg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_1Ok78VmyEd-CVtZr0hfiVg" key="class" value="jadex.bpmn.runtime.task.StoreResultsTask.class"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_16EwAFmyEd-CVtZr0hfiVg" key="parameters" value="in␋name␋String␋&quot;proposals&quot;␟in␋value␋Collection␋$args.get(&quot;proposals&quot;)"/>
-      </eAnnotations>
-    </vertices>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_z62qSlmyEd-CVtZr0hfiVg" iD="_z62qSVmyEd-CVtZr0hfiVg"/>
   </pools>
 </bpmn:BpmnDiagram>

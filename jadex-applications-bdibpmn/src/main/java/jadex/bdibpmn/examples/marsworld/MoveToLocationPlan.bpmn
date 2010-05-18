@@ -4,7 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XaGmgUbuEd-qm5VDdIP35A" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XaGmgkbuEd-qm5VDdIP35A" key="Package" value="jadex.bdibpmn.examples.marsworld"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_o3KEgEb0Ed-qm5VDdIP35A" key="imports" value="jadex.application.space.envsupport.environment.*␟jadex.commons.SUtil␟jadex.bdi.planlib.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_se1V0Eb0Ed-qm5VDdIP35A" key="parameters" value="inout␋_taskid␋Object␋"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GVqjIGKPEd-Q9q1HfsZXQw" key="arguments" value="_taskid␋false␋false␋description␋Object␋"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_Je0xoXz_Ed6Ya8z0CnMcMA" iD="_Je0xoHz_Ed6Ya8z0CnMcMA" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_Je0xo3z_Ed6Ya8z0CnMcMA" iD="_Je0xonz_Ed6Ya8z0CnMcMA" name="Create Move Task" activityType="Task">

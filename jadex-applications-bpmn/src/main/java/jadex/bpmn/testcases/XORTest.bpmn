@@ -3,9 +3,8 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_nQAekBVyEd-9a_-KE2TdXg" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nQAekRVyEd-9a_-KE2TdXg" key="imports" value="jadex.base.test.*␟jadex.bpmn.runtime.task.*␟java.util.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_nQAekhVyEd-9a_-KE2TdXg" key="Package" value="jadex.bpmn.testcases"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zMllUBVyEd-9a_-KE2TdXg" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Bby2ABVzEd-9a_-KE2TdXg" key="parameters" value="in␋list␋List␋new ArrayList()"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mrbo0BaZEd-YccbjZenQqQ" key="Description" value="Test if xor gateway works."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jWdZ0GKEEd-Q9q1HfsZXQw" key="arguments" value="testresults␋false␋true␋The test results.␋Testcase␋␟name␋false␋false␋description␋Object␋␟list␋false␋false␋A list␋List␋new ArrayList()"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_aSXq0RVvEd-9a_-KE2TdXg" iD="_aSXq0BVvEd-9a_-KE2TdXg" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_bdeMARVvEd-9a_-KE2TdXg" iD="_bdeMABVvEd-9a_-KE2TdXg" outgoingEdges="_l7MdMRVxEd-9a_-KE2TdXg" activityType="EventStartEmpty"/>
@@ -40,13 +39,13 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_QVu7MRVyEd-9a_-KE2TdXg" iD="_QVu7MBVyEd-9a_-KE2TdXg" outgoingEdges="_VC4m2BVyEd-9a_-KE2TdXg _Xuss2BVyEd-9a_-KE2TdXg" incomingEdges="_QVu7OhVyEd-9a_-KE2TdXg" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_VCvc4RVyEd-9a_-KE2TdXg" iD="_VCvc4BVyEd-9a_-KE2TdXg" incomingEdges="_VC4m2BVyEd-9a_-KE2TdXg" name="Success" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_VudogBV0Ed-9a_-KE2TdXg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VudogRV0Ed-9a_-KE2TdXg" key="class" value="StoreResultsTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VudogRV0Ed-9a_-KE2TdXg" key="class" value="WriteContextTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XYs8wBV0Ed-9a_-KE2TdXg" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Test xor execution.&quot;, true, null)})"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_Xui70RVyEd-9a_-KE2TdXg" iD="_Xui70BVyEd-9a_-KE2TdXg" incomingEdges="_Xuss2BVyEd-9a_-KE2TdXg" name="Failure" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WNTgoBV0Ed-9a_-KE2TdXg" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WNTgoRV0Ed-9a_-KE2TdXg" key="class" value="StoreResultsTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WNTgoRV0Ed-9a_-KE2TdXg" key="class" value="WriteContextTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fGrVEBV0Ed-9a_-KE2TdXg" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value1␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Test xor execution.&quot;, false, &quot;Wrong task execution&quot;)})"/>
       </eAnnotations>
     </vertices>

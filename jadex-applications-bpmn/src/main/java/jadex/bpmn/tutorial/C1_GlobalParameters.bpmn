@@ -3,7 +3,7 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_q01GIDZhEd-86tAf5dPynA" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q01GITZhEd-86tAf5dPynA" key="Description" value="&lt;h1>Global Parameter&lt;/h1> This process prints out a customized welcome message based on the global parameter 'customer'."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_q01GIjZhEd-86tAf5dPynA" key="Package" value="jadex.bpmn.tutorial"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5FXzkDZhEd-86tAf5dPynA" key="parameters" value="inout␋customer␋String␋&quot;Carl Customer&quot;␟inout␋logins␋int␋0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RKHIsGKFEd-Q9q1HfsZXQw" key="arguments" value="customer␋false␋false␋The customer.␋String␋&quot;Carl Customer&quot;␟logins␋false␋false␋The number of logins␋int␋0"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_qY9pgTZhEd-86tAf5dPynA" iD="_qY9pgDZhEd-86tAf5dPynA" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_qY9pgzZhEd-86tAf5dPynA" iD="_qY9pgjZhEd-86tAf5dPynA" outgoingEdges="_s1v_kTZiEd-86tAf5dPynA" name="Welcome" activityType="Task">

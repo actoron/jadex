@@ -3,7 +3,7 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_hjfBkBYrEd-yC473XtaJZQ" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hjfBkRYrEd-yC473XtaJZQ" key="imports" value="jadex.bpmn.examples.execute␟jadex.commons.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hjfBkhYrEd-yC473XtaJZQ" key="Package" value="jadex.bpmn.examples.message"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WezAkBY1Ed-yC473XtaJZQ" key="arguments" value="message_number␋&quot;The number of messages to receive.&quot;␋int␋10"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WezAkBY1Ed-yC473XtaJZQ" key="arguments" value="message_number␋true␋int␋The number of messages to receive.␋int␋10"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hpToMBaYEd-YccbjZenQqQ" key="Description" value="&lt;h3>Message receival process&lt;/h3>The Message Receival process waits for a predefined number of messages and then terminates."/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_Q5erIc-aEd6NWbZHdUI2WQ" iD="_Q5erIM-aEd6NWbZHdUI2WQ" name="Pool">
@@ -18,6 +18,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_m6N1shYrEd-yC473XtaJZQ" key="filter" value="IFilter.ALWAYS"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qRFq4BYrEd-yC473XtaJZQ" key="mode" value=""/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qRO00BYrEd-yC473XtaJZQ" key="msgtype" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_eSwVwGKMEd-Q9q1HfsZXQw" key="match expression" value=""/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_ZDrIkc-eEd6NWbZHdUI2WQ" iD="_ZDrIkM-eEd6NWbZHdUI2WQ" outgoingEdges="_whyoYRY1Ed-yC473XtaJZQ" incomingEdges="_ZD05kc-eEd6NWbZHdUI2WQ" name="MessageReceived" activityType="Task">
@@ -31,7 +32,7 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_yNYAcRY1Ed-yC473XtaJZQ" iD="_yNYAcBY1Ed-yC473XtaJZQ" incomingEdges="_yNhxcRY1Ed-yC473XtaJZQ" activityType="EventEndEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_SL21oRY-Ed-yC473XtaJZQ" iD="_SL21oBY-Ed-yC473XtaJZQ" outgoingEdges="_yNhxcRY1Ed-yC473XtaJZQ" incomingEdges="_SMJwkRY-Ed-yC473XtaJZQ" name="Print results" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YKhMcBY-Ed-yC473XtaJZQ" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YKhMcRY-Ed-yC473XtaJZQ" key="parameters" value="in␋text␋String␋$interpreter.getComponentIdentifier().getLocalName()+&quot; received &quot;+$args.get(&quot;message_number&quot;)+&quot; messages.&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YKhMcRY-Ed-yC473XtaJZQ" key="parameters" value="in␋text␋String␋$interpreter.getComponentIdentifier().getLocalName()+&quot; received &quot;+message_number+&quot; messages.&quot;"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fy-yoBY-Ed-yC473XtaJZQ" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>
       </eAnnotations>
     </vertices>
@@ -41,7 +42,7 @@
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_b0-_QdByEd6NWbZHdUI2WQ" iD="_b0-_QNByEd6NWbZHdUI2WQ" name="For the expected number of messages to receive">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_mrB-oBY1Ed-yC473XtaJZQ" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mrB-oRY1Ed-yC473XtaJZQ" key="imports" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mrB-ohY1Ed-yC473XtaJZQ" key="condition" value="i+1 &lt; $args.get(&quot;message_number&quot;)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mrB-ohY1Ed-yC473XtaJZQ" key="condition" value="i+1 &lt; message_number"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_J4LvQBY-Ed-yC473XtaJZQ" source="sequence">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_J4LvQRY-Ed-yC473XtaJZQ" key="mappings" value="i␋i+1"/>

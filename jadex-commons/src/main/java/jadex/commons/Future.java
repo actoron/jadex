@@ -134,6 +134,8 @@ public class Future implements IFuture
      */
     public synchronized void addResultListener(IResultListener listener)
     {
+    	if(listener==null)
+    		throw new RuntimeException(); 
     	if(resultavailable)
     	{
     		notifyListener(listener);

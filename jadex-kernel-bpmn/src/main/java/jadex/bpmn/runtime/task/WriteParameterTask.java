@@ -13,9 +13,9 @@ public class WriteParameterTask extends AbstractTask
 	 */
 	public void doExecute(ITaskContext context, BpmnInterpreter instance) throws Exception
 	{
-		if(context.hasParameterValue("variablename"))
+		if(context.hasParameterValue("name"))
 		{
-			String name = (String)context.getParameterValue("variablename");
+			String name = (String)context.getParameterValue("name");
 			Object val = context.getParameterValue("value");
 			Object key = context.getParameterValue("key");
 			context.setParameterValue(name, key, val);
@@ -23,9 +23,9 @@ public class WriteParameterTask extends AbstractTask
 		
 		for(int i=0; ; i++)
 		{
-			if(context.hasParameterValue("variablename"+i))
+			if(context.hasParameterValue("name"+i))
 			{
-				String name = (String)context.getParameterValue("variablename"+i);
+				String name = (String)context.getParameterValue("name"+i);
 				Object val = context.getParameterValue("value"+i);
 				Object key = context.getParameterValue("key"+i);
 				context.setParameterValue(name, key, val);

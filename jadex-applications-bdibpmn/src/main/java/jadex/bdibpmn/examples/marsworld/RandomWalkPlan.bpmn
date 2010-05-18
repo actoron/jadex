@@ -3,7 +3,6 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Xy1PkEbuEd-qm5VDdIP35A" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Xy1PkUbuEd-qm5VDdIP35A" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Xy_AkEbuEd-qm5VDdIP35A" key="Package" value="jadex.bdibpmn.examples.marsworld"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_cuRO0EbuEd-qm5VDdIP35A" key="results" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_d76GoEbuEd-qm5VDdIP35A" key="imports" value="jadex.application.space.envsupport.math.*␟jadex.commons.SUtil"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_isytYXzoEd6zCuIqBrMhmQ" iD="_isytYHzoEd6zCuIqBrMhmQ" name="Body">

@@ -4,7 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jPS9wUbsEd-qm5VDdIP35A" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jPS9wkbsEd-qm5VDdIP35A" key="Package" value="jadex.bdibpmn.examples.marsworld"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dbDQwEb4Ed-qm5VDdIP35A" key="imports" value="jadex.application.space.envsupport.environment.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fK76AEb4Ed-qm5VDdIP35A" key="parameters" value="inout␋target␋ISpaceObject␋$beliefbase.environment.getSpaceObject($plan.getReason().content.getId())"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vIeDwGKOEd-Q9q1HfsZXQw" key="arguments" value="target␋false␋false␋description␋ISpaceObject␋$beliefbase.environment.getSpaceObject($plan.getReason().content.getId())"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_ZpetAYJ-Ed6rVea0-FiZ3Q" iD="_ZpetAIJ-Ed6rVea0-FiZ3Q" name="Body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_ZpetA4J-Ed6rVea0-FiZ3Q" iD="_ZpetAoJ-Ed6rVea0-FiZ3Q" outgoingEdges="_9bCr4YJ-Ed6rVea0-FiZ3Q" incomingEdges="_w1VvoYJ-Ed6rVea0-FiZ3Q" name="Add Target" activityType="Task">

@@ -3,8 +3,8 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_18RCcBTUEd-a46HbtL-N3Q" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_18RCcRTUEd-a46HbtL-N3Q" key="imports" value="java.util.*␟jadex.base.test.*␟jadex.bpmn.runtime.task.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BeUJUBTVEd-a46HbtL-N3Q" key="Package" value="jadex.bpmn.testcases"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LDy10BTVEd-a46HbtL-N3Q" key="results" value="testresults␋&quot;Test results.&quot;␋Testcase␋"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_d8Mn0BaZEd-YccbjZenQqQ" key="Description" value="Test if a parallel subprocess works."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ODvqIGKEEd-Q9q1HfsZXQw" key="arguments" value="testresults␋false␋true␋The test results.␋Testcase␋"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_uQZfwRTQEd-a46HbtL-N3Q" iD="_uQZfwBTQEd-a46HbtL-N3Q" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_uSXZMRTREd-a46HbtL-N3Q" iD="_uSXZMBTREd-a46HbtL-N3Q" outgoingEdges="_wXlZQhTREd-a46HbtL-N3Q" activityType="EventStartEmpty"/>
@@ -78,14 +78,14 @@
     <vertices xmi:type="bpmn:Activity" xmi:id="_57hGQRTUEd-a46HbtL-N3Q" iD="_57hGQBTUEd-a46HbtL-N3Q" outgoingEdges="_7DMgChTUEd-a46HbtL-N3Q _8FgRkRTUEd-a46HbtL-N3Q" incomingEdges="_57q3SBTUEd-a46HbtL-N3Q" activityType="GatewayDataBasedExclusive"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_7DMgARTUEd-a46HbtL-N3Q" iD="_7DMgABTUEd-a46HbtL-N3Q" incomingEdges="_7DMgChTUEd-a46HbtL-N3Q" name="Success" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_PmN4IBTVEd-a46HbtL-N3Q" source="jadex">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PmN4IRTVEd-a46HbtL-N3Q" key="class" value="StoreResultsTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_PmN4IRTVEd-a46HbtL-N3Q" key="class" value="WriteContextTask"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QAv4ABTVEd-a46HbtL-N3Q" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Test subprocess execution.&quot;, true, null)})"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_8FWgkRTUEd-a46HbtL-N3Q" iD="_8FWgkBTUEd-a46HbtL-N3Q" incomingEdges="_8FgRkRTUEd-a46HbtL-N3Q" name="Failure" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_j4Q1ABTVEd-a46HbtL-N3Q" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_j4Q1ARTVEd-a46HbtL-N3Q" key="parameters" value="in␋name␋String␋&quot;testresults&quot;␟in␋value␋Testcase␋new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;, &quot;Test subprocess execution.&quot;, false, &quot;Wrong execution order.&quot;)})"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mLCI4BTVEd-a46HbtL-N3Q" key="class" value="StoreResultsTask"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mLCI4BTVEd-a46HbtL-N3Q" key="class" value="WriteContextTask"/>
       </eAnnotations>
     </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_wXlZQhTREd-a46HbtL-N3Q" iD="_wXlZQRTREd-a46HbtL-N3Q"/>
