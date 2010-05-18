@@ -100,6 +100,10 @@ public class Future implements IFuture
     	
 //    	if(result==null)
 //    		System.out.println(this+" here: "+caller);
+    	
+    	if(result instanceof RuntimeException)
+    		throw (RuntimeException)result;
+    	
     	return result;
     }
     
