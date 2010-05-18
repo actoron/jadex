@@ -2,6 +2,7 @@ package jadex.bdi.runtime;
 
 import jadex.bdi.runtime.impl.ElementFlyweight;
 import jadex.bdi.runtime.impl.WaitAbstractionFlyweight;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
@@ -532,6 +533,16 @@ public abstract class Plan extends AbstractPlan implements ISuspendable, IExtern
 	public void resume()
 	{
 	   	pcs.firePropertyChange("true", Boolean.FALSE, Boolean.TRUE);
+	}
+	
+	/**
+	 *  Get the monitor for waiting.
+	 *  @return The monitor.
+	 */
+	public Object getMonitor()
+	{
+		IPlanExecutor exe = BDIInterpreter.getInterpreter(getState()).getPlanExecutor(getRPlan());
+		return exe.getMonitor(getRPlan());
 	}
     
 	/**

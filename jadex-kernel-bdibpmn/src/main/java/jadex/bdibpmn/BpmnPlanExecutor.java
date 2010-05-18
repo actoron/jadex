@@ -410,4 +410,13 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		// BPMN plan step isn't interruptible
 		return 0;
 	}
+	
+	/**
+	 *  Get the monitor of a plan.
+	 *  @return The monitor.
+	 */
+	public Object getMonitor(Object rplan)
+	{
+		return null;
+	}
 }

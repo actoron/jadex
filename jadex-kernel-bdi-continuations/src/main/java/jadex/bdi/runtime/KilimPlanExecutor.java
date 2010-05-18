@@ -1,6 +1,7 @@
 package jadex.bdi.runtime;
 
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.runtime.JavaStandardPlanExecutor.PlanExecutionTask;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.commons.SReflect;
@@ -380,6 +381,13 @@ public class KilimPlanExecutor	implements IPlanExecutor, Serializable
 		return 0;
 	}
 
-	
+	/**
+	 *  Get the monitor of a plan.
+	 *  @return The monitor.
+	 */
+	public Object getMonitor(Object rplan)
+	{
+		return null;
+	}
 	
 }

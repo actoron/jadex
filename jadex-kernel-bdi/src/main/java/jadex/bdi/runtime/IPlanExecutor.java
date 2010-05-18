@@ -17,7 +17,7 @@ public interface IPlanExecutor
 	 *  @return	The created body.
 	 *  May throw any kind of exception, when the body creation fails
 	 */
-	public Object	createPlanBody(BDIInterpreter interpreter, Object rplan, Object rcapability) throws Exception;
+	public Object createPlanBody(BDIInterpreter interpreter, Object rplan, Object rcapability) throws Exception;
 
 	/**
 	 *  Execute a step of a plan.
@@ -101,4 +101,10 @@ public interface IPlanExecutor
 	 *  Only used for standard plans, which block during execution.
 	 */
 	public void eventWaitFor(BDIInterpreter interpreter, Object rplan);
+	
+	/**
+	 *  Get the monitor of a plan.
+	 *  @return The monitor.
+	 */
+	public Object getMonitor(Object rplan);
 }

@@ -16,4 +16,10 @@ public interface ISuspendable
 	 *  Resume the execution of the suspendable.
 	 */
 	public void resume();
+	
+	/**
+	 *  Get the monitor for waiting.
+	 *  @return The monitor.
+	 */
+	public Object getMonitor();
 }

@@ -20,7 +20,7 @@
 	<plans>
 		<!-- Plan which prints out a message and kills the agent. -->
 		<plan name="hello">
-			<body impl="HelloWorldPlan"/>
+			<body impl="HelloWorldPlan" type="continuations"/>
 		</plan>
 	</plans>
 	

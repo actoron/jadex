@@ -329,6 +329,16 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 			}
 		}
 	}
+	
+	/**
+	 *  Get the monitor of a plan.
+	 *  @return The monitor.
+	 */
+	public Object getMonitor(Object rplan)
+	{
+		PlanExecutionTask task =  (PlanExecutionTask)tasks.get(rplan);
+		return task==null? null: task.getMonitor();
+	}
 
 	/**
 	 *  Get the executing thread of a plan.
@@ -828,5 +838,5 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	}
 	
 	// todo remove me
-	public static int n;
+//	public static int n;
 }

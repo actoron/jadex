@@ -3,7 +3,11 @@ package jadex.commons;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Future that includes mechanisms for callback notification.
@@ -22,7 +26,7 @@ public class Future implements IFuture
 	protected boolean resultavailable;
 	
 	/** The blocked callers. */
-	protected List callers;
+	protected Map callers;
 	
 	/** The listeners. */
 	protected List listeners;
@@ -35,7 +39,7 @@ public class Future implements IFuture
 	public Future()
 	{
 		this.listeners = new ArrayList();
-		this.callers = new ArrayList();
+		this.callers = Collections.synchronizedMap(new HashMap());
 	}
 	
 	//-------- methods --------
@@ -53,7 +57,7 @@ public class Future implements IFuture
      *  Get the result - blocking call.
      *  @return The future result.
      */
-    public synchronized Object get(ISuspendable caller)
+    public Object get(ISuspendable caller)
     {
     	return get(caller, -1);
     }
@@ -63,17 +67,35 @@ public class Future implements IFuture
      *  @param timeout The timeout in millis.
      *  @return The future result.
      */
-    public synchronized Object get(ISuspendable caller, long timeout)
+    public Object get(ISuspendable caller, long timeout)
     {
-    	if(!resultavailable)
+    	boolean suspend = false;
+    	synchronized(this)
     	{
-    	   	if(caller==null)
-    	   		throw new RuntimeException("No suspendable element.");
-//        		caller = new ThreadSuspendable(this);
-     
-    	   	callers.add(caller);
-    		caller.suspend(timeout);
+	    	if(!resultavailable)
+	    	{
+	    	   	if(caller==null)
+	    	   		throw new RuntimeException("No suspendable element.");
+	//        		caller = new ThreadSuspendable(this);
+	     
+	    	   	callers.put(caller, Boolean.FALSE);
+	    	   	suspend = true;
+	    	}
     	}
+    	
+    	Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
+    	synchronized(mon)
+    	{
+    		if(suspend)
+    		{
+    			boolean resumed = ((Boolean)callers.get(caller)).booleanValue();
+    			if(!resumed)
+    			{
+    				caller.suspend(timeout);
+    			}
+    		}
+    	}
+    	
     	return result;
     }
     
@@ -90,9 +112,15 @@ public class Future implements IFuture
     	this.result = result;
     	resultavailable = true;
     	
-    	for(int i=0; i<callers.size(); i++)
+    	for(Iterator it=callers.keySet().iterator(); it.hasNext(); )
     	{
-    		((ISuspendable)callers.get(i)).resume();
+    		ISuspendable caller = (ISuspendable)it.next();
+    		Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
+    		synchronized(mon)
+			{
+    			caller.resume();
+    			callers.put(caller, Boolean.TRUE);
+			}
     	}
     	for(int i=0; i<listeners.size(); i++)
     	{

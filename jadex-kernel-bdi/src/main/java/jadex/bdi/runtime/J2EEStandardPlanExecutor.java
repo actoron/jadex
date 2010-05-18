@@ -480,6 +480,15 @@ public class J2EEStandardPlanExecutor	implements IPlanExecutor, Serializable
 		}
 		return maxexetime.longValue();*/
 	}
+	
+	/**
+	 *  Get the monitor of a plan.
+	 *  @return The monitor.
+	 */
+	public Object getMonitor(Object rplan)
+	{
+		return null;
+	}
 
 	//-------- The thread for a plan instance ---------
 
@@ -818,5 +827,5 @@ public class J2EEStandardPlanExecutor	implements IPlanExecutor, Serializable
 	}
 	
 	// todo remove me
-	public static int n;
+//	public static int n;
 }
