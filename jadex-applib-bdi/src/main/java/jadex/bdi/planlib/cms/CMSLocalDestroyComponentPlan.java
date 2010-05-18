@@ -3,6 +3,7 @@ package jadex.bdi.planlib.cms;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.IFuture;
 import jadex.service.IServiceContainer;
 
 
@@ -21,13 +22,12 @@ public class CMSLocalDestroyComponentPlan extends Plan
 		final IServiceContainer plat	= getScope().getServiceContainer();
 		try
 		{
-			SyncResultListener lis = new SyncResultListener();
-			((IComponentManagementService)plat.getService(IComponentManagementService.class)).destroyComponent(cid);
-			lis.waitForResult();
+			IFuture ret = ((IComponentManagementService)plat.getService(IComponentManagementService.class)).destroyComponent(cid);
+			ret.get(this);
 		}
 		catch(Exception e)
 		{
-//			e.printStackTrace();
+			e.printStackTrace();
 			fail(e); // Do not show exception on console. 
 		}
 	}

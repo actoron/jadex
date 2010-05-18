@@ -78,6 +78,7 @@ public class Future implements IFuture
 	    	   		throw new RuntimeException("No suspendable element.");
 	//        		caller = new ThreadSuspendable(this);
 	     
+//	    	   	System.out.println(this+" suspend: "+caller);
 	    	   	callers.put(caller, Boolean.FALSE);
 	    	   	suspend = true;
 	    	}
@@ -92,10 +93,13 @@ public class Future implements IFuture
     			if(!resumed)
     			{
     				caller.suspend(timeout);
+//    				System.out.println(this+" caller awoke: "+caller+" "+mon);
     			}
     		}
     	}
     	
+//    	if(result==null)
+//    		System.out.println(this+" here: "+caller);
     	return result;
     }
     
@@ -109,6 +113,7 @@ public class Future implements IFuture
     	if(resultavailable)
     		throw new RuntimeException();
     	
+//    	System.out.println(this+" setResult: "+result);
     	this.result = result;
     	resultavailable = true;
     	
@@ -116,10 +121,11 @@ public class Future implements IFuture
     	{
     		ISuspendable caller = (ISuspendable)it.next();
     		Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
+//    		System.out.println(this+" resume: "+caller+" "+mon);
     		synchronized(mon)
 			{
-    			caller.resume();
     			callers.put(caller, Boolean.TRUE);
+    			caller.resume();
 			}
     	}
     	for(int i=0; i<listeners.size(); i++)
@@ -203,7 +209,7 @@ public class Future implements IFuture
     	t.start();
     	
     	System.out.println(Thread.currentThread().getName()+": waiting for result");
-    	Object result = f.get(null);
+    	Object result = f.get(new ThreadSuspendable(new Object()));
     	System.out.println(Thread.currentThread().getName()+": result is: "+result);
     }
 }

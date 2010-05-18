@@ -71,7 +71,7 @@ public class EndStatePlan extends Plan
 		create	= createGoal("cmscap.cms_create_component");
 		create.getParameter("type").setValue("/jadex/bdi/testcases/misc/EndStateDeregister.agent.xml");
 		dispatchSubgoalAndWait(create);
-		IComponentIdentifier	deregister	= (IComponentIdentifier)create.getParameter("componentidentifier").getValue();
+		IComponentIdentifier deregister	= (IComponentIdentifier)create.getParameter("componentidentifier").getValue();
 
 		// Check if deregister agent is registered.
 		waitFor(100);	// Hack!!! how to ensure that agent has time to register itself?
