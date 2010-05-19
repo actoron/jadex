@@ -912,14 +912,17 @@ public class ComponentManagementService implements IComponentManagementService, 
 		
 		IComponentDescription desc = (IComponentDescription)descs.get(cid);
 		
-		if(ret!=null)
+		// Todo: addresses required for communication across platforms.
+//		ret.setName(refreshComponentIdentifier(aid));
+		if(desc!=null)
 		{
-				// Todo: addresses required for communication across platforms.
-//				ret.setName(refreshComponentIdentifier(aid));
 			desc = (IComponentDescription)((CMSComponentDescription)desc).clone();	// Todo: synchronize?
+			ret.setResult(desc);
 		}
-		
-		ret.setResult(desc);
+		else
+		{
+			ret.setResult(new RuntimeException("No description available for: "+cid));
+		}
 		
 		return ret;
 	}

@@ -546,8 +546,9 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	 */
 	public Object getMonitor()
 	{
-		IPlanExecutor exe = BDIInterpreter.getInterpreter(getState()).getPlanExecutor(getRPlan());
-		return exe.getMonitor(getRPlan());
+		BDIInterpreter pi = BDIInterpreter.getInterpreter(getState());
+		IPlanExecutor exe = pi==null? null: pi.getPlanExecutor(getRPlan());
+		return exe==null? null: exe.getMonitor(getRPlan());
 	}
     
 //	/**
