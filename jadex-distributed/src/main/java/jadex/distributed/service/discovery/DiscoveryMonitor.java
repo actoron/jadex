@@ -55,6 +55,7 @@ public class DiscoveryMonitor {
 			_socket.joinGroup(this._group); // all multicast messages are received from now
 			Runnable r = new SocketThread(this._socket, this._listeners); // TODO one-thread-one-task architecture to prevent overhead from thread creation http://www.ibm.com/developerworks/library/j-jtp0730.html
 			t = new Thread(r);
+			t.setDaemon(true); // make daemon thread, so the thread ends when the platform is shutdown as a whole
 			t.start();
 			this.running = true;
 		}

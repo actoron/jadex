@@ -63,6 +63,7 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 		this._port = port;
 
 		this._polling = new Thread(new Polling(_platformInfos, _listener)); // TODO looks kinda ugly+inefficient, but should work as expected
+		this._polling.setDaemon(true); // make this a daemon thread, so the thread ends when the platform is shutdown as a whole
 		this._polling.start();
 	}
 	
@@ -73,9 +74,9 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 		if(listener != null) {
 			synchronized(this._listener) {
 				this._listener.add(listener);
-				Collection<PlatformInfo> view = _platformInfos.values();
+				Collection<PlatformInfo> view = this._platformInfos.values();
 				PlatformInfo[] infos = view.toArray(new PlatformInfo[view.size()]);
-				listener.notifyIMonitorListenerAdd(infos);
+				listener.notifyIMonitorListenerAdd(infos); // erste Liste von Platformen übergeben
 			}
 		}
 	}
@@ -141,13 +142,20 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 				OperatingSystemMXBean osBean = ManagementFactory.newPlatformMXBeanProxy(mbeanServer, "java.lang:type=OperatingSystem", OperatingSystemMXBean.class);
 				this._connections.put(caddr, connector); // save JMXConnector to get information from the slave platform
 				PlatformInfo info = new PlatformInfo(caddr, osBean.getName());
-				this._platformInfos.put(connector, info);
+				this._platformInfos.put(connector, info);		
 			} catch (MalformedURLException e) {
 				System.out.println("This should never happen."); e.printStackTrace();
 			} catch (IOException e) {
 				// ignore InetAddress and don't put it into this._connections
 				System.err.println("Unable to establish JMX connection with remote slave. Did you active remote JMX on the slave platform?"); e.printStackTrace();
 			}
+		}
+		
+		// inform listeners about new platforms
+		Collection<PlatformInfo> view = this._platformInfos.values();
+		PlatformInfo[] infos = view.toArray(new PlatformInfo[view.size()]);
+		for( IMonitorServiceListener listener : this._listener ) {
+			listener.notifyIMonitorListenerAdd(infos);
 		}
 		
 		for (InetAddress daddr : disconnectFrom) { // disconnect to old platforms and remove entry from _connections-map
@@ -176,6 +184,13 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 			OperatingSystemMXBean osBean = ManagementFactory.newPlatformMXBeanProxy(mbeanServer, "java.lang:type=OperatingSystem", OperatingSystemMXBean.class);
 			PlatformInfo info = new PlatformInfo(addr, osBean.getName());
 			this._platformInfos.put(connector, info);
+			
+			// inform listeners about new platform
+			Collection<PlatformInfo> view = this._platformInfos.values();
+			PlatformInfo[] infos = view.toArray(new PlatformInfo[view.size()]);
+			for( IMonitorServiceListener listener : this._listener ) {
+				listener.notifyIMonitorListenerAdd(infos);
+			}
 			
 			// test query
 			MBeanServerConnection server = connector.getMBeanServerConnection();
@@ -222,6 +237,7 @@ public class MonitorService implements IService, IMonitorService, IDiscoveryServ
 		public Polling(Map<JMXConnector, PlatformInfo> platformInfos, Set<IMonitorServiceListener> listener) {
 			_platformInfos = platformInfos;
 			_listener = listener;
+			
 		}
 		
 		public int getTimeout() {

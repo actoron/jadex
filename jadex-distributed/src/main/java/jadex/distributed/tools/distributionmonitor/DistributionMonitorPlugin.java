@@ -105,29 +105,29 @@ public class DistributionMonitorPlugin extends AbstractJCCPlugin implements IMon
 	@Override
 	public void notifyIMonitorListenerChange() { // called by the MonitorService to indicate that the state one, some, or all platforms changed; and these changes are reflected by changed field values in the PlatformInfo objects
 		System.out.println("GUI wurde notified");
-		_model.platformChanged();
+		_model.platformChanged(); // a JList model automatically notifies a JList that it needs to repaint
 	}
 
 	@Override
 	public void notifyIMonitorListenerChange(PlatformInfo platformInfo) {
-		_model.platformChanged(platformInfo);
+		_model.platformChanged(platformInfo); // a JList model automatically notifies a JList that it needs to repaint
 	}
 	
 	@Override
 	public void notifyIMonitorListenerAdd(PlatformInfo platformInfo) { // called by the MonitorService to indicate that a new slave platform joined the group of platforms and its current state is represented by the passed PlatformInfo object
-		_model.addElement(platformInfo);
+		_model.addElement(platformInfo); // a JList model automatically notifies a JList that it needs to repaint
 	}
 
 	@Override
 	public void notifyIMonitorListenerAdd(PlatformInfo[] platformInfo) {
 		for (PlatformInfo info : platformInfo) {
-			_model.addElement(info);
+			_model.addElement(info); // a JList model automatically notifies a JList that it needs to repaint
 		}
 	}
 	
 	@Override
 	public void notifyIMonitorListenerRemove(PlatformInfo platformInfo) { // called by the MonitorService to indicate that a slave leaved the group; the PlatformInfo object formerly representing the state of the slave is now obsolete and can be removed from the IMonitorServiceListener
-		_model.removeElement(platformInfo);
+		_model.removeElement(platformInfo); // a JList model automatically notifies a JList that it needs to repaint
 	}
 	
 	private static class MyDefaultListModel extends DefaultListModel {

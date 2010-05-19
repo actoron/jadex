@@ -40,7 +40,6 @@ public class DirectoryFacilitatorService_Client implements IDF, IService
 	protected IndexMap	components;
 	
 	//-------- constructors --------
-
 	/**
 	 *  Create a standalone df.
 	 */
