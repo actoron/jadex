@@ -14,6 +14,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.concurrent.IResultListener;
@@ -126,7 +127,8 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 			// space.getContext()).getPlatform().getService(IComponentManagementService.class);
 			IComponentManagementService ams = (IComponentManagementService) ((AbstractEnvironmentSpace) space).getContext()
 				.getServiceContainer().getService(IComponentManagementService.class);
-			ams.getExternalAccess(agent, new IResultListener()
+			IFuture fut = ams.getExternalAccess(agent);
+			fut.addResultListener(new IResultListener()
 			{
 				public void exceptionOccurred(Exception exception)
 				{
@@ -524,6 +526,7 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 
 				}
 			});
+				
 		}
 	}
 

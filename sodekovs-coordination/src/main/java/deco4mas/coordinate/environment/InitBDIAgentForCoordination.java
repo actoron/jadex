@@ -1,18 +1,16 @@
 package deco4mas.coordinate.environment;
 
-
 import jadex.application.runtime.IApplication;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 import jadex.xml.IContext;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import deco.lang.dynamics.AgentElementType;
 import deco.lang.dynamics.MASDynamics;
 import deco.lang.dynamics.mechanism.AgentElement;
@@ -23,13 +21,14 @@ import deco4mas.coordinate.interpreter.agent_state.BDIBehaviorObservationCompone
 import deco4mas.helper.Constants;
 
 /**
- * This Class is used to init the observer for the agents in order to do the publications and perceptions.
- * 
+ * This Class is used to init the observer for the agents in order to do the
+ * publications and perceptions.
  * 
  * @author Ante Vilenica
  */
 
-public class InitBDIAgentForCoordination {
+public class InitBDIAgentForCoordination
+{
 
 	private BDIBehaviorObservationComponent behObserver = null;
 	private IBDIExternalAccess exta = null;
@@ -41,22 +40,26 @@ public class InitBDIAgentForCoordination {
 	private int numberOfPublishPercepts = 0;
 	private int numberOfPerceivePercepts = 0;
 
-	// public InitBDIAgentForCoordination(IAgentIdentifier ai, IContext context, AbstractEnvironmentSpace space, MASDynamics masDyn) {
+	// public InitBDIAgentForCoordination(IAgentIdentifier ai, IContext context,
+	// AbstractEnvironmentSpace space, MASDynamics masDyn) {
 	// startInits(ai, context, space, masDyn);
 	// }
 
 	/**
 	 * @return the RoleDefinitionsForPerceive
 	 */
-//	public Map<String, Object[]> startInits(IAgentIdentifier ai, IContext context, AbstractEnvironmentSpace space, MASDynamics masDyn) {
-	public void startInits(IComponentIdentifier ai, IApplication context, AbstractEnvironmentSpace space, MASDynamics masDyn) {
+	// public Map<String, Object[]> startInits(IAgentIdentifier ai, IContext
+	// context, AbstractEnvironmentSpace space, MASDynamics masDyn) {
+	public void startInits(IComponentIdentifier ai, IApplication context, AbstractEnvironmentSpace space, MASDynamics masDyn)
+	{
 		this.ai = ai;
 		this.masDyn = masDyn;
 		this.space = space;
 		this.context = context;
-		
+
 		boolean exeption = initAvatar();
-		if (!exeption) initExternalAccess();		
+		if (!exeption)
+			initExternalAccess();
 	}
 
 	/**
@@ -64,20 +67,25 @@ public class InitBDIAgentForCoordination {
 	 * 
 	 * @param coordInfo
 	 */
-	private void initPublishAndPercept() {
+	private void initPublishAndPercept()
+	{
 		// System.out.println("#InitBDIAgentCoordinationPlan-" +
 		// this.getAgentName() + "# Started initialization.");
 
-		// MASDynamics dynamicsModel = (MASDynamics) coordInfo.get("MASDynamics");
+		// MASDynamics dynamicsModel = (MASDynamics)
+		// coordInfo.get("MASDynamics");
 		ProcessMASDynamics processMASDynamics = new ProcessMASDynamics(exta, masDyn);
 		processMASDynamics.process();
 
 		// init the publications
-		for (DecentralCoordinationInformation dci : processMASDynamics.getPublications()) {
+		for (DecentralCoordinationInformation dci : processMASDynamics.getPublications())
+		{
 
 			DecentralizedCausality causality = masDyn.getCausalities().getDCMRealizationByName(dci.getDml().getRealization());
-			for (AgentElement ae : causality.getFrom_agents()) {
-				if (ae.getAgent_id().equals(agentType)) {
+			for (AgentElement ae : causality.getFrom_agents())
+			{
+				if (ae.getAgent_id().equals(agentType))
+				{
 					// initListener(ae, causality.getTo_agents());
 					initListener(ae, dci.getDml().getRealization());
 
@@ -90,10 +98,13 @@ public class InitBDIAgentForCoordination {
 		}
 
 		// init perceptions.....
-		for (DecentralCoordinationInformation dci : processMASDynamics.getPerceptions()) {
+		for (DecentralCoordinationInformation dci : processMASDynamics.getPerceptions())
+		{
 			DecentralizedCausality causality = masDyn.getCausalities().getDCMRealizationByName(dci.getDml().getRealization());
-			for (AgentElement ae : causality.getTo_agents()) {
-				if (ae.getAgent_id().equals(agentType)) {
+			for (AgentElement ae : causality.getTo_agents())
+			{
+				if (ae.getAgent_id().equals(agentType))
+				{
 					updateMappings(ae, dci, Constants.PERCEIVE);
 					// behObserver.setDecentralCoordInfoMapping(dci);
 					numberOfPerceivePercepts++;
@@ -103,18 +114,22 @@ public class InitBDIAgentForCoordination {
 
 		// store role definitions and DecentralCoordinationInfoMappings
 		// Map<String, Object> decom4MasMap = new HashMap<String, Object>();
-		// decom4MasMap.put(Constants.ROLE_DEFINITIONS_FOR_PUBLISH, behObserver.getRoleDefinitionsForPublish());
-		// decom4MasMap.put(Constants.ROLE_DEFINITIONS_FOR_PERCEIVE, behObserver.getRoleDefinitionsForPerceive());
-		// decom4MasMap.put(Constants.PARAMETER_DATA_MAPPING, behObserver.getParameterAndDataMappings());
+		// decom4MasMap.put(Constants.ROLE_DEFINITIONS_FOR_PUBLISH,
+		// behObserver.getRoleDefinitionsForPublish());
+		// decom4MasMap.put(Constants.ROLE_DEFINITIONS_FOR_PERCEIVE,
+		// behObserver.getRoleDefinitionsForPerceive());
+		// decom4MasMap.put(Constants.PARAMETER_DATA_MAPPING,
+		// behObserver.getParameterAndDataMappings());
 		// decom4MasMap.put(Constants.IOAV_STATE, this.getState());
 		// decom4MasMap.put(Constants.R_CAPABILITY, this.getRCapability());
 
-		System.out.println("#InitBDIAgentCoordinationPlan-" + exta.getAgentName() + "# Completed initialization: " + numberOfPublishPercepts + " PublishPercepts and " + numberOfPerceivePercepts
-				+ " PerceivePercepts");
+		System.out.println("#InitBDIAgentCoordinationPlan-" + exta.getAgentName() + "# Completed initialization: "
+			+ numberOfPublishPercepts + " PublishPercepts and " + numberOfPerceivePercepts + " PerceivePercepts");
 
-//		agentData.put(getAgentType(ai, this.getContext()), res);
-		((CoordinationSpace) space).getAgentData().put(((IApplication) context).getComponentType(ai), behObserver.getRoleDefinitionsForPerceive());
-//		return behObserver.getRoleDefinitionsForPerceive();
+		// agentData.put(getAgentType(ai, this.getContext()), res);
+		((CoordinationSpace) space).getAgentData().put(((IApplication) context).getComponentType(ai),
+			behObserver.getRoleDefinitionsForPerceive());
+		// return behObserver.getRoleDefinitionsForPerceive();
 		// getBeliefbase().getBelief(Constants.DECO4MAS_BELIEF_NAME).setFact(decom4MasMap);
 	}
 
@@ -125,44 +140,59 @@ public class InitBDIAgentForCoordination {
 	 */
 	// private void initListener(AgentElement ae, ArrayList<AgentElement>
 	// toAgents) {
-	private void initListener(AgentElement ae, String mechanismRealizationId) {
-		if (ae.getAgentElementType().equals(AgentElementType.BDI_BELIEFSET.toString())) {
+	private void initListener(AgentElement ae, String mechanismRealizationId)
+	{
+		if (ae.getAgentElementType().equals(AgentElementType.BDI_BELIEFSET.toString()))
+		{
 			// System.out.println("#InitBDIAgentCoordinationPlan# Init Belief_Set-Listener");
 			behObserver.initBeliefSetListener(ae, mechanismRealizationId);
-		} else if (ae.getAgentElementType().equals(AgentElementType.BDI_BELIEF.toString())) {
+		} else if (ae.getAgentElementType().equals(AgentElementType.BDI_BELIEF.toString()))
+		{
 			// System.out.println("#InitBDIAgentCoordinationPlan# Init Belief-Listener");
 			behObserver.initBeliefListener(ae, mechanismRealizationId);
-		} else if (ae.getAgentElementType().equals(AgentElementType.BDI_GOAL.toString())) {
+		} else if (ae.getAgentElementType().equals(AgentElementType.BDI_GOAL.toString()))
+		{
 			// System.out.println("#InitBDIAgentCoordinationPlan# Init Goal-Listener");
 			behObserver.initGoalListener(ae, mechanismRealizationId);
-		} else if (ae.getAgentElementType().equals(AgentElementType.BDI_PLAN.toString())) {
+		} else if (ae.getAgentElementType().equals(AgentElementType.BDI_PLAN.toString()))
+		{
 			// System.out.println("#InitBDIAgentCoordinationPlan# Init Goal-Listener");
 			behObserver.initPlanListener(ae, mechanismRealizationId);
-		} else if (ae.getAgentElementType().equals(AgentElementType.INTERNAL_EVENT.toString())) {
+		} else if (ae.getAgentElementType().equals(AgentElementType.INTERNAL_EVENT.toString()))
+		{
 			// System.out.println("#InitBDIAgentCoordinationPlan# Init Goal-Listener");
 			behObserver.initInternalEventListener(ae, mechanismRealizationId);
 		}
 	}
 
 	/**
-	 * Updates all the necessary mappings for "PUBLISH" or "PERCEIVE": 1) the Role Mappings for this Agent. Means: Which event belongs to which role 2) the parameter and data mappings
+	 * Updates all the necessary mappings for "PUBLISH" or "PERCEIVE": 1) the
+	 * Role Mappings for this Agent. Means: Which event belongs to which role 2)
+	 * the parameter and data mappings
 	 * 
 	 * @param ae
 	 * @param agentReference
 	 */
 	// private void updateMappings(AgentElement ae, AgentReference
 	// agentReference, String perceptType) {
-	private void updateMappings(AgentElement ae, DecentralCoordinationInformation dci, String perceptType) {
-		if (perceptType.equals(Constants.PUBLISH)) {
-			behObserver.getRoleDefinitionsForPublish().put(perceptType + "::" + dci.getDml().getRealization() + "::" + ae.getElement_id() + "::" + ae.getAgentElementType(), dci.getRef());
-			behObserver.getParameterAndDataMappings().put(perceptType + "::" + dci.getDml().getRealization() + "::" + ae.getElement_id() + "::" + ae.getAgentElementType(), ae);
-		} else {
+	private void updateMappings(AgentElement ae, DecentralCoordinationInformation dci, String perceptType)
+	{
+		if (perceptType.equals(Constants.PUBLISH))
+		{
+			behObserver.getRoleDefinitionsForPublish().put(
+				perceptType + "::" + dci.getDml().getRealization() + "::" + ae.getElement_id() + "::" + ae.getAgentElementType(),
+				dci.getRef());
+			behObserver.getParameterAndDataMappings().put(
+				perceptType + "::" + dci.getDml().getRealization() + "::" + ae.getElement_id() + "::" + ae.getAgentElementType(), ae);
+		} else
+		{
 			behObserver.getRoleDefinitionsForPerceive().put(dci.getDml().getRealization(), (Object[]) new Object[] { dci, ae });
 		}
 	}
 
-	private boolean initAvatar() {
-		boolean exeption = false; 
+	private boolean initAvatar()
+	{
+		boolean exeption = false;
 		// Object[] obj = ((Space2D)space).getSpaceObjects();
 		// System.out.println("Got SpaceObjects. Before...: Nr: " + obj.length);
 		// for (int i = 0; i < obj.length; i++) {
@@ -171,7 +201,8 @@ public class InitBDIAgentForCoordination {
 
 		// // Create Avatar for those agent that haven't one yet.
 		// String agentName = aif.getName();
-		if (space.getAvatar(ai) == null) {
+		if (space.getAvatar(ai) == null)
+		{
 			// // System.out.println("No avatar for: " + agentName + " - " +
 			// ((IApplicationContext) space.getContext()).getAgentType(aif[i]));
 			// // TODO: add those mappings that doesn't exit yet, i.e those
@@ -185,12 +216,17 @@ public class InitBDIAgentForCoordination {
 				Map props = new HashMap();
 				props.put(ISpaceObject.PROPERTY_OWNER, ai);
 				space.createSpaceObject(((IApplication) space.getContext()).getComponentType(ai), props, null);
-			} catch (Exception e)
+			} catch (RuntimeException e)
 			{
-				//e.printStackTrace();
-				exeption =true;
+				if (e.getMessage().contains("Unknown space object type"))
+				{
+					exeption = true;
+				} else
+				{
+					e.printStackTrace();
+				}
 			}
-			
+
 			// } else {
 			// ISpaceObject[] avatars = space.getAvatars(aif[i]);
 			// // System.out.println(agentName + " has " + avatars.length +
@@ -201,31 +237,43 @@ public class InitBDIAgentForCoordination {
 		// }
 	}
 
-	private void initExternalAccess() {
-		IComponentManagementService cms = (IComponentManagementService) context.getServiceContainer().getService(IComponentManagementService.class);
-//		IApplicationContext applicationContext = (IApplicationContext) context;
-//		IComponentManagementService cms = ((IComponentManagementService)context.getServiceContainer().getService(IComponentManagementService.class)).getExternalAccess(aid, lis);
-//		IAMS ams = ((IAMS) applicationContext.getPlatform().getService(IAMS.class));
-		cms.getExternalAccess(ai, new IResultListener() {
-			public void exceptionOccurred(Exception exception) {
+	private void initExternalAccess()
+	{
+		IComponentManagementService cms = (IComponentManagementService) context.getServiceContainer().getService(
+			IComponentManagementService.class);
+		// IApplicationContext applicationContext = (IApplicationContext)
+		// context;
+		// IComponentManagementService cms =
+		// ((IComponentManagementService)context.getServiceContainer().getService(IComponentManagementService.class)).getExternalAccess(aid,
+		// lis);
+		// IAMS ams = ((IAMS)
+		// applicationContext.getPlatform().getService(IAMS.class));
+		IFuture fut = cms.getExternalAccess(ai);
+		fut.addResultListener(new IResultListener()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
 				exception.printStackTrace();
 			}
 
-			public void resultAvailable(Object source, Object result) {
+			public void resultAvailable(Object source, Object result)
+			{
 				exta = (IBDIExternalAccess) result;
 				behObserver = new BDIBehaviorObservationComponent(exta);
-//				agentType = exta.getApplicationContext().getAgentType(ai);
-				agentType = context.getComponentType(ai); 				
+				// agentType = exta.getApplicationContext().getAgentType(ai);
+				agentType = context.getComponentType(ai);
 				initPublishAndPercept();
 			}
 
 			@Override
-			public void exceptionOccurred(Object source, Exception exception) {
+			public void exceptionOccurred(Object source, Exception exception)
+			{
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 		});
+
 	}
 
 	// private void newStuff() {

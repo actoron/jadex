@@ -1,6 +1,7 @@
 package deco4mas.coordinate.environment;
 
 
+import jadex.application.space.envsupport.MObjectType;
 import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.application.space.envsupport.environment.IEnvironmentSpace;
 import jadex.application.space.envsupport.environment.IPerceptGenerator;
@@ -102,7 +103,7 @@ public class InitDeco4mas {
 //		masFileName = "src//deco4mas//examples//V2//tspaces//belief_set.dynamics.xml";		              
 //		masFileName = "jadex//sodekovs-coordination//src//main//java//deco4mas//examples//V2//tspaces//belief_set.dynamics.xml";
 		
-		masFileName = "C://Dokumente und Einstellungen//Christopher//Desktop//neu 1105//WS Jadex2//jadex//sodekovs-coordination//src//main//java//deco4mas//examples//agentNegotiation//deco/negotiation.dynamics.xml";		
+		masFileName = "C://Dokumente und Einstellungen//Christopher//Desktop//neu 1105//WS Jadex2//jadex//sodekovs-coordination//src//main//java//deco4mas//examples//agentNegotiation//deco//negotiation.dynamics.xml";		
 		System.out.println("#InitCoordinationSpace-Thread# Started processing deco4mas-file: " + masFileName);
 
 		
@@ -144,7 +145,9 @@ public class InitDeco4mas {
 		// -------------------- INIT Space Object TYPES ------------------------------//
 		// Init all types that may be needed for the deco4mas coordination.
 		for (String typeName : allReferencedAgentTypesList) {
-			space.addSpaceObjectType(typeName, null);
+			MObjectType mobject = new MObjectType();
+			mobject.setName(typeName);
+			space.addSpaceObjectType(typeName, mobject);
 		}
 
 		

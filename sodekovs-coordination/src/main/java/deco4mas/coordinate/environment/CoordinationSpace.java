@@ -4,6 +4,7 @@ package deco4mas.coordinate.environment;
 
 import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
+import jadex.application.space.envsupport.MObjectType;
 import jadex.application.space.envsupport.environment.AvatarMapping;
 import jadex.application.space.envsupport.environment.EnvironmentEvent;
 import jadex.application.space.envsupport.environment.IPerceptGenerator;
@@ -134,7 +135,9 @@ public class CoordinationSpace extends Grid2D {
 	 */
 	private void initSpaces() {
 		// this object type is used within the deco4mas coordination.
-		this.addSpaceObjectType("CoordinationSpaceObject", null);
+		MObjectType mobject = new MObjectType();
+		mobject.setName("CoordinationSpaceObject");
+		this.addSpaceObjectType("CoordinationSpaceObject", mobject);
 	}
 
 	/**
