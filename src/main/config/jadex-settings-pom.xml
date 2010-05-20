@@ -29,6 +29,8 @@
         <configuration>
           <source>1.4</source>
           <target>1.4</target>
+	      <showDeprecation>true</showDeprecation>
+    	  <showWarnings>true</showWarnings>
         </configuration>
       </plugin>
     </plugins>
