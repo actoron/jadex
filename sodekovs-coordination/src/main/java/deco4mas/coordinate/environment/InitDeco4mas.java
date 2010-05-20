@@ -101,23 +101,23 @@ public class InitDeco4mas {
 //		masFileName = space.getProperty("dynamics_configuration").toString();
 		//ToDo: HACK!!!! 
 //		masFileName = "src//deco4mas//examples//V2//tspaces//belief_set.dynamics.xml";		              
-//		masFileName = "jadex//sodekovs-coordination//src//main//java//deco4mas//examples//V2//tspaces//belief_set.dynamics.xml";
+		masFileName = "D://Workspaces//Jadex-V2//jadex//sodekovs-coordination//src//main//java//deco4mas//examples//V2//tspaces//belief_set.dynamics.xml";
 		
-		masFileName = "C://Dokumente und Einstellungen//Christopher//Desktop//neu 1105//WS Jadex2//jadex//sodekovs-coordination//src//main//java//deco4mas//examples//agentNegotiation//deco//negotiation.dynamics.xml";		
+//		masFileName = "C://Dokumente und Einstellungen//Christopher//Desktop//neu 1105//WS Jadex2//jadex//sodekovs-coordination//src//main//java//deco4mas//examples//agentNegotiation//deco//negotiation.dynamics.xml";		
 		System.out.println("#InitCoordinationSpace-Thread# Started processing deco4mas-file: " + masFileName);
 
 		
 		// ------ INIT COORDINATION MEDIA! -----------//
 
 		// TODO: Init media according to the deco4Mas file!
-//		TSpacesMechanism tspaceMechanism = new TSpacesMechanism((CoordinationSpace) space);
-//		tspaceMechanism.start();
-//		CpnSpaceMechanism cpnMechanism = new CpnSpaceMechanism((CoordinationSpace) space);
+		TSpacesMechanism coordMechanism = new TSpacesMechanism((CoordinationSpace) space);
+		coordMechanism.start();
+//		CpnSpaceMechanism coordMechanism = new CpnSpaceMechanism((CoordinationSpace) space);
 //		cpnMechanism.start();
-		NegSpaceMechanism negMechanism = new NegSpaceMechanism((CoordinationSpace) space);
+//		NegSpaceMechanism coordMechanism = new NegSpaceMechanism((CoordinationSpace) space);
 		
 
-		((CoordinationSpace) space).activeCoordinationMechanisms.add(negMechanism);
+		((CoordinationSpace) space).activeCoordinationMechanisms.add(coordMechanism);
 
 		// Process deco4MAS-File:
 		try {
