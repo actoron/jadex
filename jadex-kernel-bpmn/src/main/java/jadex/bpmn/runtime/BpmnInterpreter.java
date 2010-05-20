@@ -34,6 +34,7 @@ import jadex.commons.IFilter;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
+import jadex.service.BasicServiceProvider;
 import jadex.service.clock.IClockService;
 
 import java.lang.reflect.Array;
@@ -52,7 +53,7 @@ import java.util.logging.Logger;
  *  The micro agent interpreter is the connection between the agent platform 
  *  and a user-written micro agent. 
  */
-public class BpmnInterpreter implements IComponentInstance, IExternalAccess // Hack!!!
+public class BpmnInterpreter extends BasicServiceProvider implements IComponentInstance, IExternalAccess // Hack!!!
 {	
 	//-------- static part --------
 

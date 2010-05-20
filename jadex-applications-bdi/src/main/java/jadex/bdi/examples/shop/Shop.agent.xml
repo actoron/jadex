@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	<H3>Shop agent that sells goods.</H3>
+	<H3>Agent that invokes another agent via a method call.</H3>
 -->
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
-	name="Shop"
+	name="Customer"
 	package="jadex.bdi.examples.shop">
 
 	<plans>
-		<plan name="sellplan">
-			<body class="SellItemPlan"></body>
+		<plan name="buyplan">
+			<body class="BuyItemPlan"></body>
 		</plan>
 	</plans>
 	
-	<services>
-		<service name="shopservice" type="IShop">new Shop($scope.getExternalAccess())</service>
-	</services>
-	
+	<configurations>
+		<configuration name="plan">
+			<plans>
+				<initialplan ref="buyplan"></initialplan>
+			</plans>
+		</configuration>
+		<configuration name="no_plan">
+		</configuration>
+	</configurations>
+
 </agent>

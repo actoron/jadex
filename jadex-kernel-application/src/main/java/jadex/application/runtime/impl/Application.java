@@ -7,7 +7,6 @@ import jadex.application.model.MComponentInstance;
 import jadex.application.model.MComponentType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
-import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.runtime.ISpace;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
@@ -23,6 +22,7 @@ import jadex.bridge.IMessageAdapter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.BasicServiceProvider;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 
@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  *  When the context is deleted all components will be destroyed.
  *  An component must only be in one application context.
  */
-public class Application	implements IApplication, IComponentInstance
+public class Application extends BasicServiceProvider implements IApplication, IComponentInstance
 {
 	//-------- attributes --------
 	
@@ -779,33 +779,7 @@ public class Application	implements IApplication, IComponentInstance
 	 */
 	public void getExternalAccess(IResultListener listener)
 	{
-		listener.resultAvailable(this, new IApplicationExternalAccess()
-		{
-			public ILoadableComponentModel getModel()
-			{
-				return model;
-			}
-			
-			public IComponentIdentifier getComponentIdentifier()
-			{
-				return adapter.getComponentIdentifier();
-			}
-			
-			public Object getSpace(String name)
-			{
-				return Application.this.getSpace(name);
-			}
-			
-			public IExternalAccess getParent()
-			{
-				return parent;
-			}
-			
-//			public IComponentIdentifier[] getChildren()
-//			{
-//				
-//			}
-		});
+		listener.resultAvailable(this, this);
 	}
 
 	/**
@@ -878,5 +852,13 @@ public class Application	implements IApplication, IComponentInstance
 	public String	getComponentFilename(String type)
 	{
 		return model.getApplicationType().getMComponentType(type).getFilename();
+	}
+	
+	/**
+	 *  Get the parent.
+	 */
+	public IExternalAccess getParent()
+	{
+		return parent;
 	}
 }

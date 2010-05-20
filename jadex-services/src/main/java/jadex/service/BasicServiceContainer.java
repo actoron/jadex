@@ -2,9 +2,6 @@ package jadex.service;
 
 import jadex.commons.concurrent.IResultListener;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -16,15 +13,12 @@ import java.util.Map;
  *  The configuration of services is not handled here but can be done
  *  e.g. in subclasses like the PropertyServiceContainer.
  */
-public class BasicServiceContainer implements IServiceContainer
+public class BasicServiceContainer extends BasicServiceProvider implements IServiceContainer
 {	
 	//-------- attributes --------
 	
-	/** The map of platform services. */
-	protected Map services;
-
 	/** The platform name. */
-	private String name;
+	protected String name;
 
 	//-------- interface methods --------
 		
@@ -36,57 +30,6 @@ public class BasicServiceContainer implements IServiceContainer
 	{
 		return name;
 	}
-	
-	/**
-	 *  Get a platform service.
-	 *  @param type The class.
-	 *  @return The corresponding platform services.
-	 */
-	public Collection getServices(Class type)
-	{
-		Collection	ret	= null;
-		Map tmp = getServiceMap(type);
-		if(tmp != null)
-			ret	= tmp.values();
-		else
-			ret	= Collections.EMPTY_SET;
-//			throw new RuntimeException("No services found of type: " + type);
-
-		return ret;
-	}
-
-	/**
-	 *  Get a platform service.
-	 *  @param name The name.
-	 *  @return The corresponding platform service.
-	 */
-	public Object getService(Class type, String name)
-	{
-		Object ret	= null;
-		Map tmp = getServiceMap(type);
-		if(tmp != null)
-		 ret = tmp.get(name);
-//		if(ret == null)
-//			throw new RuntimeException("Service not found");
-		return ret;
-	}
-
-	/**
-	 *  Get the first declared platform service of a given type.
-	 *  @param type The type.
-	 *  @return The corresponding platform service.
-	 */
-	public Object getService(Class type)
-	{
-		Object ret	= null;
-		Map tmp = getServiceMap(type);
-		if(tmp != null && !tmp.isEmpty())
-			ret = tmp.values().iterator().next();
-//		if(ret == null)
-//			throw new RuntimeException("Service not found");
-		return ret;
-	}
-	
 	
 	/**
 	 *  Start the service.
@@ -157,7 +100,7 @@ public class BasicServiceContainer implements IServiceContainer
 	 *  the old one is removed and shutdowned.
 	 *  @param name The name.
 	 *  @param service The service.
-	 */
+	 * /
 	public void addService(Class type, String name, IService service)
 	{
 //		System.out.println("Adding service: " + name + " " + type + " " + service);
@@ -172,13 +115,13 @@ public class BasicServiceContainer implements IServiceContainer
 		IService old = (IService)tmp.put(name, service);
 		if(old!=null)
 			old.shutdownService(null);
-	}
+	}*/
 
 	/**
 	 *  Removes a service from the platform (shutdowns also the service).
 	 *  @param name The name.
 	 *  @param service The service.
-	 */
+	 * /
 	public void removeService(Class type, IService service)
 	{
 		//		System.out.println("Removing service: " + type + " " + service);
@@ -212,14 +155,5 @@ public class BasicServiceContainer implements IServiceContainer
 
 		if(tmp.size() == 0)
 			services.remove(type);
-	}
-	
-	/**
-	 *  Get a service map for a type.
-	 *  @param type The type.
-	 */
-	protected Map getServiceMap(Class type)
-	{
-		return services==null? null: (Map)services.get(type);
-	}
+	}*/
 }

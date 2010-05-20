@@ -335,8 +335,6 @@ public class KilimPlanExecutor	implements IPlanExecutor, Serializable
 	 */
 	public void	eventWaitFor(BDIInterpreter interpreter, Object rplan) throws Pausable
 	{
-		//throw new RuntimeException("Unsupported operation! Cannot suspend a JavaStandardPlan");
-		
 		// moved to "FlowPlanRules.doWait()"
 		
 		if(interpreter.isAtomic())

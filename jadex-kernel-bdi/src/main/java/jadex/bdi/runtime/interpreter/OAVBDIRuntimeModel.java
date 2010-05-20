@@ -8,6 +8,7 @@ import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
+import jadex.service.IServiceProvider;
 import jadex.service.clock.ITimer;
 
 import java.beans.PropertyChangeListener;
@@ -191,6 +192,9 @@ public class OAVBDIRuntimeModel
 	/** The external condition type. */
 	public static OAVJavaType java_externalcondition_type;
 	
+	/** The service provider type. */
+	public static OAVJavaType java_serviceprovider_type;
+	
 	//-------- element --------
 	
 	/** The element (model) type. */
@@ -305,6 +309,9 @@ public class OAVBDIRuntimeModel
 	/** The capability has assigntosources (sources for abstract elements, assigned on init). */
 	public static OAVAttributeType capability_has_abstractsources;
 		
+	/** The capability has a service provider. */
+	public static OAVAttributeType capability_has_serviceprovider;
+	
 	//-------- capability reference --------
 	
 	/** The capability reference type. */
@@ -740,6 +747,7 @@ public class OAVBDIRuntimeModel
 		java_timer_type	= createJavaType(ITimer.class, OAVJavaType.KIND_VALUE);
 		java_resultlistener_type	= createJavaType(IResultListener.class, OAVJavaType.KIND_OBJECT);
 		java_externalcondition_type	= createJavaType(IExternalCondition.class, OAVJavaType.KIND_BEAN);
+		java_serviceprovider_type	= createJavaType(IServiceProvider.class, OAVJavaType.KIND_OBJECT);
 		//java_planexecutor_type = createJavaType(IPlanExecutor.class);
 		//java_waitabstraction_type = bdirt_model_type.createJavaType(WaitAbstraction.class);
 //		java_runnable_type = createJavaType(Runnable.class, OAVJavaType.KIND_OBJECT);

@@ -15,6 +15,7 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.InterpreterTimedObject;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVObjectType;
+import jadex.service.IServiceProvider;
 import jadex.service.clock.IClockService;
 
 import java.util.ArrayList;
@@ -948,6 +949,109 @@ public class ExternalAccessFlyweight extends CapabilityFlyweight implements IBDI
 		else
 		{
 			return getInterpreter().getParent();
+		}
+	}
+	
+	/**
+	 *  Get the first declared service of a given type.
+	 *  @param type The type.
+	 *  @return The corresponding service.
+	 */
+	public Object getService(final Class type)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
+					object = sp.getService(type);
+				}
+			};
+			return invoc.object;
+		}
+		else
+		{
+			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
+			return sp.getService(type);
+		}
+	}
+	
+	/**
+	 *  Get a service.
+	 *  @param type The class.
+	 *  @return The corresponding services.
+	 */
+	public Collection getServices(final Class type)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(object, OAVBDIRuntimeModel.capability_has_abstractsources);
+					object = sp.getServices(type);
+				}
+			};
+			return (Collection)invoc.object;
+		}
+		else
+		{
+			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
+			return sp.getServices(type);
+		}
+	}
+	
+	/**
+	 *  Get a service.
+	 *  @param name The name.
+	 *  @return The corresponding service.
+	 */
+	public Object getService(final Class type, final String name)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
+					object = sp.getService(type, name);
+				}
+			};
+			return (Collection)invoc.object;
+		}
+		else
+		{
+			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
+			return sp.getService(type, name);
+		}
+	}
+	
+	/**
+	 *  Get the available service types.
+	 *  @return The service types.
+	 */
+	public Class[] getServicesTypes()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
+					object = sp.getServicesTypes();
+				}
+			};
+			return (Class[])invoc.object;
+		}
+		else
+		{
+			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
+			return sp.getServicesTypes();
 		}
 	}
 }
