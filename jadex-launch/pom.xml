@@ -100,12 +100,12 @@
     	<groupId>jadex</groupId>
     	<artifactId>jadex-kernel-gpmn</artifactId>
     	<version>2.0-rc2</version>
-    </dependency>
+    </dependency><!-- 
     <dependency>
     	<groupId>jadex</groupId>
     	<artifactId>jadex-kernel-bdi-continuations</artifactId>
     	<version>2.0-rc2</version>
-    </dependency>
+    </dependency> -->
     
     <!-- <dependency>
     	<groupId>jadex</groupId>
