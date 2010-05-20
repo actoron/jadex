@@ -87,7 +87,7 @@
 		</Data>
 		<!-- Important: Number of sweeps has to be equal with number of rows!-->
 		<ParameterSweeping tpye="increment"> <!-- or: values-->
-			<Configuration start="1" end="4" step="1" class="int" />
+			<Configuration start="10" end="10" step="1" class="int" />
 			<!-- or: values="11;19;26;100"/>-->
 		</ParameterSweeping>
 		<Algorithm>
@@ -97,7 +97,7 @@
 	</Optimization>
 
 	<RunConfiguration>
-		<General rows="20" parallelRuns="2" delta="true"><!-- For all runs.-->
+		<General rows="1" parallelRuns="2" delta="true"><!-- For all runs.-->
 			<StartTime value="113000" type="relative" />
 			<!--
 				Absolute or relative
@@ -110,10 +110,11 @@
 				<Time value="120000" type="absolute" />
 			</TerminateCondition>
 		</General>
-		<Rows experiments="7">
+		<Rows experiments="25">
 			<TerminateCondition>
-				<Time value="7000" type="relative" />
-				<!-- <TargetFunction function="$object.money &gt; 5"/>-->
+				<!-- <Time value="7000" type="relative" /> -->
+				<!-- Hack: Terminate Condition is hard coded! -->
+				<TargetFunction function="$object.money &gt; 5"/>
 			</TerminateCondition>
 		</Rows>
 	</RunConfiguration>

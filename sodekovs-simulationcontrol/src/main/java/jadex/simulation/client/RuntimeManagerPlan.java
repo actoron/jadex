@@ -154,7 +154,7 @@ public class RuntimeManagerPlan extends Plan {
 		System.out.println("Trying to kill component....");
 		// getExternalAccess().killAgent();
 		IComponentManagementService ces = (IComponentManagementService) spaceTMP.getContext().getServiceContainer().getService(IComponentManagementService.class);
-//		ces.destroyComponent(spaceTMP.getContext().getComponentIdentifier());
+		ces.destroyComponent(spaceTMP.getContext().getComponentIdentifier());
 		// getExternalAccess().getApplicationContext().killComponent(null);
 
 	}

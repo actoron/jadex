@@ -23,26 +23,18 @@ import java.util.Map;
 public class StartSimulationExperimentsPlan extends Plan {
 
 	public void body() {
-		System.out
-				.println("#StartSimulationExpPlan# Start Simulation Experiments at Master.");
+		System.out.println("#StartSimulationExpPlan# Start Simulation Experiments at Master.");
 
-		HashMap beliefbaseFacts = (HashMap) getBeliefbase().getBelief(
-				"generalSimulationFacts").getFact();
-		SimulationConfiguration simConf = (SimulationConfiguration) getBeliefbase()
-				.getBelief("simulationConf").getFact();
+		HashMap beliefbaseFacts = (HashMap) getBeliefbase().getBelief("generalSimulationFacts").getFact();
+		SimulationConfiguration simConf = (SimulationConfiguration) getBeliefbase().getBelief("simulationConf").getFact();
 
-		System.out.println("#StartSimulationExpPlan# Path: "
-				+ simConf.getApplicationReference());
+		System.out.println("#StartSimulationExpPlan# Path: " + simConf.getApplicationReference());
 
 		// how many experiments to do within this row
-		long experimentsPerRowToMake = ((Long) beliefbaseFacts
-				.get(Constants.EXPERIMENTS_PER_ROW_TO_DO)).longValue();
-		int totalRuns = ((Integer) beliefbaseFacts
-				.get(Constants.TOTAL_EXPERIMENT_COUNTER)).intValue();
-		int expInRow = ((Integer) beliefbaseFacts
-				.get(Constants.ROW_EXPERIMENT_COUNTER)).intValue();
-		int rowCounter = ((Integer) beliefbaseFacts
-				.get(Constants.EXPERIMENT_ROW_COUNTER)).intValue();
+		long experimentsPerRowToMake = ((Long) beliefbaseFacts.get(Constants.EXPERIMENTS_PER_ROW_TO_DO)).longValue();
+		int totalRuns = ((Integer) beliefbaseFacts.get(Constants.TOTAL_EXPERIMENT_COUNTER)).intValue();
+		int expInRow = ((Integer) beliefbaseFacts.get(Constants.ROW_EXPERIMENT_COUNTER)).intValue();
+		int rowCounter = ((Integer) beliefbaseFacts.get(Constants.EXPERIMENT_ROW_COUNTER)).intValue();
 
 		// Prepare values for the experiments of this row
 		String fileName = simConf.getApplicationReference();
@@ -74,8 +66,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 		}
 
 		// update GUI: create new panel/table for new ensemble
-		ControlCenter gui = (ControlCenter) getBeliefbase().getBelief("tmpGUI")
-				.getFact();
+		ControlCenter gui = (ControlCenter) getBeliefbase().getBelief("tmpGUI").getFact();
 		gui.createNewEnsembleTable(rowCounter);
 
 		for (long i = 0; i < experimentsPerRowToMake; i++) {
@@ -88,21 +79,12 @@ public class StartSimulationExperimentsPlan extends Plan {
 			// experiment
 			long tmp_start_time = getClock().getTime();
 			args.put("tmp_start_time", tmp_start_time);
-			((HashMap) args.get(Constants.SIMULATION_FACTS_FOR_CLIENT)).put(
-					Constants.EXPERIMENT_ID, experimentID);
+			((HashMap) args.get(Constants.SIMULATION_FACTS_FOR_CLIENT)).put(Constants.EXPERIMENT_ID, experimentID);
 
 			startApplication(appName, fileName, configName, args);
 
-			System.out
-					.println("#StartSimulationExpPlan# Started new Simulation Experiment. Nr.:"
-							+ experimentID
-							+ "("
-							+ totalRuns
-							+ ") with Optimization Values: "
-							+ simConf.getOptimization().getData().getName()
-							+ " = "
-							+ simConf.getOptimization().getParameterSweeping()
-									.getCurrentValue());
+			System.out.println("#StartSimulationExpPlan# Started new Simulation Experiment. Nr.:" + experimentID + "(" + totalRuns + ") with Optimization Values: "
+					+ simConf.getOptimization().getData().getName() + " = " + simConf.getOptimization().getParameterSweeping().getCurrentValue());
 			totalRuns++;
 			expInRow++;
 
@@ -110,41 +92,33 @@ public class StartSimulationExperimentsPlan extends Plan {
 			gui.updateStaticTable(rowCounter, expInRow);
 
 			waitForInternalEvent("triggerNewExperiment");
-			System.out
-					.println("#StartSimulationExpPlan# Received Results of Client!!!!");
+			System.out.println("#StartSimulationExpPlan# Received Results of Client!!!!");
 			// HACK: Ein warten scheint notwendig zu sein..., damit Ausführung
 			// korrekt läuft.
 			waitFor(2000);
 			// System.out.println("2Received Results!!!!");
-			beliefbaseFacts.put(Constants.TOTAL_EXPERIMENT_COUNTER,
-					new Integer(totalRuns));
-			beliefbaseFacts.put(Constants.ROW_EXPERIMENT_COUNTER, new Integer(
-					expInRow));
-			getBeliefbase().getBelief("generalSimulationFacts").setFact(
-					beliefbaseFacts);
+			beliefbaseFacts.put(Constants.TOTAL_EXPERIMENT_COUNTER, new Integer(totalRuns));
+			beliefbaseFacts.put(Constants.ROW_EXPERIMENT_COUNTER, new Integer(expInRow));
+			getBeliefbase().getBelief("generalSimulationFacts").setFact(beliefbaseFacts);
 
 			// update experiment counter in intermediate results
-			IntermediateResult interRes = (IntermediateResult) getBeliefbase()
-					.getBelief("intermediateResults").getFact();
+			IntermediateResult interRes = (IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact();
 			interRes.setCurrentExperimentNumber(expInRow);
 			getBeliefbase().getBelief("intermediateResults").setFact(interRes);
 		}
 
 		// Increment row counter
 		rowCounter++;
-		beliefbaseFacts.put(Constants.EXPERIMENT_ROW_COUNTER, new Integer(
-				rowCounter));
-		getBeliefbase().getBelief("generalSimulationFacts").setFact(
-				beliefbaseFacts);
+		beliefbaseFacts.put(Constants.EXPERIMENT_ROW_COUNTER, new Integer(rowCounter));
+		getBeliefbase().getBelief("generalSimulationFacts").setFact(beliefbaseFacts);
 
 		// store results of row
-		HashMap<Integer, ExperimentResult> experimentResults = (HashMap<Integer, ExperimentResult>) getBeliefbase()
-				.getBelief("experimentResults").getFact();// contains the
-															// results of the
-															// experiments done
-															// in this row
-		HashMap rowResults = (HashMap) getBeliefbase().getBelief("rowResults")
-				.getFact();
+		HashMap<Integer, ExperimentResult> experimentResults = (HashMap<Integer, ExperimentResult>) getBeliefbase().getBelief("experimentResults").getFact();// contains
+																																								// the
+		// results of the
+		// experiments done
+		// in this row
+		HashMap rowResults = (HashMap) getBeliefbase().getBelief("rowResults").getFact();
 
 		// System.out.println("#StartSimEx# tttttttttttttttttttttttttt.");
 		// for(ExperimentResult ttt : experimentResults.values()){
@@ -152,21 +126,17 @@ public class StartSimulationExperimentsPlan extends Plan {
 		// XMLHandler.writeXML(ttt, "rowRes.xml", ExperimentResult.class);
 		// }
 		//		
-		ArrayList<ExperimentResult> experimentList = new ArrayList<ExperimentResult>(
-				experimentResults.values());
+		ArrayList<ExperimentResult> experimentList = new ArrayList<ExperimentResult>(experimentResults.values());
 		rowResult.setExperimentsResults(experimentList);
 		rowResult.setEndtime(getClock().getTime());
 		rowResult.setName("Tmp-Test");
-		rowResult.setOptimizationName(experimentList.get(0)
-				.getOptimizationParameterName());
-		rowResult.setOptimizationValue(experimentList.get(0)
-				.getOptimizationValue());
+		rowResult.setOptimizationName(experimentList.get(0).getOptimizationParameterName());
+		rowResult.setOptimizationValue(experimentList.get(0).getOptimizationValue());
 
 		rowResults.put(rowResult.getId(), rowResult);
 
 		getBeliefbase().getBelief("experimentResults").setFact(new HashMap());
-		getBeliefbase().getBelief("intermediateResults").setFact(
-				new IntermediateResult(rowCounter, 0, simConf));
+		getBeliefbase().getBelief("intermediateResults").setFact(new IntermediateResult(rowCounter, 0, simConf));
 		getBeliefbase().getBelief("rowResults").setFact(rowResults);
 
 		// System.out.println("#StartSimEx# Try to write RowResult to XML-File.");
@@ -207,19 +177,14 @@ public class StartSimulationExperimentsPlan extends Plan {
 		dispatchSubgoalAndWait(ca);
 	}
 
-	private void startApplication(String appName, String fileName,
-			String configName, Map args) {
+	private void startApplication(String appName, String fileName, String configName, Map args) {
 
 		try {
-			IComponentManagementService executionService = (IComponentManagementService) getScope()
-					.getServiceContainer().getService(
-							IComponentManagementService.class);
+			IComponentManagementService executionService = (IComponentManagementService) getScope().getServiceContainer().getService(IComponentManagementService.class);
 
 			// executionService.createComponent(appName, fileName, configName,
 			// args, false, null, null, null, false);
-			executionService.createComponent(appName, fileName,
-					new CreationInfo(configName, args, null, false, false),
-					null);
+			executionService.createComponent(appName, fileName, new CreationInfo(configName, args, null, false, false), null);
 
 		} catch (Exception e) {
 			// JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this),
