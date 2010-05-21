@@ -70,10 +70,10 @@ public class TableDialogEditDemo extends JPanel {
         JScrollPane scrollPane = new JScrollPane(table);
 
         //Set up renderer and editor for the Favorite Color column.
-        table.setDefaultRenderer(Color.class,
-                                 new ColorRenderer(true));
-        table.setDefaultEditor(Color.class,
-                               new ColorEditor());
+//        table.setDefaultRenderer(Color.class,
+//                                 new ColorRenderer(true));
+//        table.setDefaultEditor(Color.class,
+//                               new ColorEditor());
 
         //Add the scroll pane to this panel.
         add(scrollPane);

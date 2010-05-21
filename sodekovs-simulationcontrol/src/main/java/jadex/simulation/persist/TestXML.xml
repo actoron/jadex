@@ -87,7 +87,7 @@
 		</Data>
 		<!-- Important: Number of sweeps has to be equal with number of rows!-->
 		<ParameterSweeping tpye="increment"> <!-- or: values-->
-			<Configuration start="10" end="10" step="1" class="int" />
+			<Configuration start="3" end="14" step="1" class="int" />
 			<!-- or: values="11;19;26;100"/>-->
 		</ParameterSweeping>
 		<Algorithm>
@@ -112,7 +112,7 @@
 		</General>
 		<Rows experiments="25">
 			<TerminateCondition>
-				<!-- <Time value="7000" type="relative" /> -->
+				<!-- <Time value="8300" type="relative" />-->
 				<!-- Hack: Terminate Condition is hard coded! -->
 				<TargetFunction function="$object.money &gt; 5"/>
 			</TerminateCondition>
