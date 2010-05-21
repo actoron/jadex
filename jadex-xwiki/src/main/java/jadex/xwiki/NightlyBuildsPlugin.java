@@ -1,0 +1,167 @@
+package jadex.xwiki;
+
+import java.io.File;
+import java.util.Date;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
+
+/**
+ *  XWiki plugin for browsing files of jadex nightly builds.
+ */
+public class NightlyBuildsPlugin implements XWikiPluginInterface
+{
+	//-------- constructors --------
+	
+	/**
+	 *  Create a plugin instance.
+	 */
+	public NightlyBuildsPlugin(String name, String classname, XWikiContext context)
+	{
+//		System.out.println("NightlyBuildsPlugin: "+name+", "+classname+", "+context);
+	}
+	
+	//-------- plugin methods --------
+	
+	/**
+	 *  Get information for the latest (i.e. newest build).
+	 *  @return The information of the latest build.
+	 */
+	protected NightlyBuild	getLatestBuild(XWikiContext context)
+	{
+		return new NightlyBuild(getName(), null, getClassName());
+	}
+	
+	/**
+	 *  Get all builds sorted by date (newest first).
+	 *  @return NightlyBuild objects.
+	 */
+	protected NightlyBuild[]	getAllBuilds(XWikiContext context)
+	{
+		File	dir	= new File("C:/Programme/Apache Software Foundation/Tomcat 6.0/webapps/jadex-nightlybuilds");
+		File[]	dirs	= dir.listFiles();
+		NightlyBuild[]	builds	= new NightlyBuild[dirs.length];
+		for(int i=0; i<dirs.length; i++)
+		{
+			builds[i]	= new NightlyBuild(dirs[i].getName(), new Date(dirs[i].lastModified()), dirs[i].getAbsolutePath());
+		}
+		return builds;
+	}
+
+	//-------- XWikiPluginInterface management --------
+	
+	public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context)
+	{
+//		System.out.println("downloadAttachment: "+attachment+","+context);
+		return attachment;
+	}
+	public void flushCache()
+	{
+//		System.out.println("flushCache");
+	}
+	public void flushCache(XWikiContext context)
+	{
+//		System.out.println("flushCache: "+context);
+	}
+	public String getClassName()
+	{
+//		System.out.println("getClassName");
+		return getClass().getName();
+	}
+	public String getName()
+	{
+//		System.out.println("getName");
+		return "nightlybuilds";
+	}
+	public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
+	{
+//		System.out.println("getPluginApi"+plugin+","+context);
+		return new NightlyBuildsPluginApi((NightlyBuildsPlugin)plugin, context);
+	}
+	public void init(XWikiContext context) throws XWikiException
+	{
+//		System.out.println("init: "+context);
+	}
+	public void setClassName(String name)
+	{
+//		System.out.println("setClassName: "+name);
+	}
+	public void setName(String name)
+	{
+//		System.out.println("setName: "+name);
+	}
+	public void virtualInit(XWikiContext context)
+	{
+//		System.out.println("virtualInit: "+context);
+	}
+
+	//-------- XWikiPluginInterface page rendering --------
+	
+	/**
+	 *  Called once for each document(?).
+	 */
+	public void beginParsing(XWikiContext context)
+	{
+//		System.out.println("beginParsing: "+context.getDoc().getFullName());
+	}
+	
+	/**
+	 *  Called once for each document(?).
+	 */
+	public String endParsing(String content, XWikiContext context)
+	{
+//		System.out.println("endParsing: "+context.getDoc().getFullName());
+		return content;
+	}
+
+	public void beginRendering(XWikiContext context)
+	{
+//		System.out.println("beginRendering: "+context.getDoc().getFullName());
+	}
+	public void endRendering(XWikiContext context)
+	{
+//		System.out.println("endRendering: "+context.getDoc().getFullName());
+	}
+
+	public String commonTagsHandler(String line, XWikiContext context)
+	{
+//		System.out.println("commonTagsHandler: "+line+","+context);
+		return line;
+	}
+	public String endRenderingHandler(String line, XWikiContext context)
+	{
+//		System.out.println("endRenderingHandler: "+line+","+context);
+		return line;
+	}
+	public String insidePREHandler(String line, XWikiContext context)
+	{
+//		System.out.println("insidePREHandler: "+line+","+context);
+		return line;
+	}
+	public String outsidePREHandler(String line, XWikiContext context)
+	{
+//		System.out.println("outsidePREHandler: "+line+","+context);
+		return line;
+	}
+	public String startRenderingHandler(String line, XWikiContext context)
+	{
+//		System.out.println("startRenderingHandler: "+line+","+context);
+		return line;
+	}
+
+	/**
+	 *  Main for testing.
+	 */
+	public static void	main(String[] args)
+	{
+		NightlyBuildsPlugin	plug	= new NightlyBuildsPlugin(null, null, null);
+		NightlyBuild[]	builds	= plug.getAllBuilds(null);
+		for(int i=0; i<builds.length; i++)
+		{
+			System.out.println("Build "+i+": "+builds[i]);
+		}
+	}
+}

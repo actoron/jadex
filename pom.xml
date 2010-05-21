@@ -117,7 +117,7 @@
     	    <activeByDefault>true</activeByDefault>
     	</activation>
 		  <modules>
-				<!-- <module>jadex-xwiki</module> -->
+				<module>jadex-xwiki</module>
 				<!-- <module>jadex-kernel-bdi-continuations</module> -->
 				<module>jadex-commons</module>
 				<module>jadex-xml</module>
