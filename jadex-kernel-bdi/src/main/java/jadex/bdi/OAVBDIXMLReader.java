@@ -226,6 +226,9 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "condition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost),
 			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
 		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "service")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
+			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
+		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
 			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
 		

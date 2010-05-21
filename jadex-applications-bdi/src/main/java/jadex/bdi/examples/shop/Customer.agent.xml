@@ -1,22 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	<H3>Shop agent that sells goods.</H3>
+	<H3>Customer agent that buys items.</H3>
 -->
 <agent xmlns="http://jadex.sourceforge.net/jadex-bdi"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-bdi
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
-	name="Shop"
+	name="Customer"
 	package="jadex.bdi.examples.shop">
 
+	<goals>
+		<achievegoal name="buy">
+			<parameter name="name" class="String"></parameter>
+			<parameter name="result" class="Object" description="out"></parameter>
+		</achievegoal>
+	</goals>
+	
 	<plans>
-		<plan name="sellplan">
-			<body class="SellItemPlan"></body>
+		<plan name="buyplan">
+			<parameter name="name" class="String">
+				<goalmapping ref="sell.name"/>
+			</parameter>
+			<parameter name="result" class="Object" description="out">
+				<goalmapping ref="sell.result"/>
+			</parameter>
+			<body class="BuyItemPlan"></body>
+			<trigger>
+				<goal ref="buy"></goal>
+			</trigger>
 		</plan>
 	</plans>
 	
-	<services>
-		<service name="shopservice" type="IShop">new Shop($scope.getExternalAccess())</service>
-	</services>
+	<configurations>
+		<configuration name="buy">
+			<goals>
+				<initialgoal ref="buy">
+					<parameter ref="name">
+						<value>"cookie"</value>
+					</parameter>
+				</initialgoal>
+			</goals>
+		</configuration>
+	</configurations>
 	
 </agent>

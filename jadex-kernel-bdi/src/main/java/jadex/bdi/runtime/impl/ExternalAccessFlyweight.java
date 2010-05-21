@@ -965,7 +965,7 @@ public class ExternalAccessFlyweight extends CapabilityFlyweight implements IBDI
 			{
 				public void run()
 				{
-					IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
+					IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_serviceprovider);
 					object = sp.getService(type);
 				}
 			};
@@ -973,7 +973,7 @@ public class ExternalAccessFlyweight extends CapabilityFlyweight implements IBDI
 		}
 		else
 		{
-			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_abstractsources);
+			IServiceProvider sp = (IServiceProvider)getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.capability_has_serviceprovider);
 			return sp.getService(type);
 		}
 	}

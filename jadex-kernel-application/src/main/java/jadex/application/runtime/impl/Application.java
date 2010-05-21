@@ -7,6 +7,7 @@ import jadex.application.model.MComponentInstance;
 import jadex.application.model.MComponentType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
+import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.runtime.ISpace;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
@@ -40,7 +41,7 @@ import java.util.logging.Logger;
  *  When the context is deleted all components will be destroyed.
  *  An component must only be in one application context.
  */
-public class Application extends BasicServiceProvider implements IApplication, IComponentInstance
+public class Application extends BasicServiceProvider implements IApplication, IComponentInstance, IApplicationExternalAccess
 {
 	//-------- attributes --------
 	

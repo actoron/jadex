@@ -22,18 +22,21 @@ public class BuyItemPlan extends Plan
 		IDF df = (IDF)getScope().getServiceContainer().getService(IDF.class);
 		IDFServiceDescription sd = df.createDFServiceDescription(null, "shop", null);
 		IDFComponentDescription cd = df.createDFComponentDescription(null, sd);
-		IFuture fut = df.search(cd, null);
-		IDFComponentDescription[] ret = (IDFComponentDescription[])fut.get(this);
+		IDFComponentDescription[] ret = (IDFComponentDescription[])df.search(cd, null).get(this);
 		
-		if(ret.length>1)
+		if(ret.length>0)
 		{
 			IComponentManagementService cms = (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
 			IComponentIdentifier cid = ret[0].getName();
-			IExternalAccess exa = (IExternalAccess)cms.getExternalAccess(cid);
+			IExternalAccess exa = (IExternalAccess)cms.getExternalAccess(cid).get(this);
 			IShop shop = (IShop)exa.getService(IShop.class);
-			fut = shop.buyItem("cookie");
-			Object cookie = fut.get(this);
-			System.out.println("Bought cookie: "+cookie);
+			Object item = shop.buyItem((String)getParameter("name").getValue()).get(this);
+			System.out.println("Bought item: "+item);
+			getParameter("result").setValue(item);
+		}
+		else
+		{
+			System.out.println("No seller found.");
 		}
 	}
 }
