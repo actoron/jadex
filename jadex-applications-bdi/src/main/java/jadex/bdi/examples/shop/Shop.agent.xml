@@ -20,7 +20,7 @@
 	<goals>
 		<achievegoal name="sell">
 			<parameter name="name" class="String"></parameter>
-			<parameter name="result" class="Object" description="out"></parameter>
+			<parameter name="result" class="Object" direction="out"></parameter>
 		</achievegoal>
 		
 		<achievegoalref name="df_register">
@@ -37,10 +37,13 @@
 			<parameter name="name" class="String">
 				<goalmapping ref="sell.name"/>
 			</parameter>
-			<parameter name="result" class="Object" description="out">
+			<parameter name="result" class="Object" direction="out">
 				<goalmapping ref="sell.result"/>
 			</parameter>
 			<body class="SellItemPlan"></body>
+			<trigger>
+				<goal ref="sell"></goal>
+			</trigger>
 		</plan>
 	</plans>
 	

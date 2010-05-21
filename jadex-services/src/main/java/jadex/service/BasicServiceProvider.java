@@ -10,7 +10,7 @@ import java.util.Map;
  *  Basic service provider implementation.
  *  Allows for fetching services by type.
  */
-public class BasicServiceProvider
+public class BasicServiceProvider implements IServiceProvider
 {
 	//-------- attributes --------
 	

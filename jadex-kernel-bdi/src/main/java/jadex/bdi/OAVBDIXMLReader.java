@@ -138,10 +138,19 @@ public class OAVBDIXMLReader
 			
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "properties"), new QName(uri, "property")}), new AccessInfo(new QName(uri, "property"), OAVBDIMetaModel.capability_has_properties)),
 
+			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "services"), new QName(uri, "service")}), new AccessInfo(new QName(uri, "service"), OAVBDIMetaModel.capability_has_services)),
+
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "configurations"), new QName(uri, "configuration")}), new AccessInfo(new QName(uri, "configuration"), OAVBDIMetaModel.capability_has_configurations)),
 			}));
 		
 		typeinfos.add(ti_capability);
+		
+		TypeInfo ti_expression = new TypeInfo(null, new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
+			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.expression_has_content), exatconv), 
+			new AttributeInfo[]{
+			new AttributeInfo(new AccessInfo("class", OAVBDIMetaModel.expression_has_classname)),
+			new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.expression_has_class, AccessInfo.IGNORE_WRITE)),
+			}));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "agent")), new ObjectInfo(OAVBDIMetaModel.agent_type), 
 			new MappingInfo(ti_capability, OAVBDIMetaModel.modelelement_has_description, null)));
@@ -165,10 +174,14 @@ public class OAVBDIXMLReader
 		
 		typeinfos.add(ti_belset);
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "beliefsetref")), new ObjectInfo(OAVBDIMetaModel.beliefsetreference_type)));
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "fact")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
+//			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.expression_has_content), exatconv))));
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "facts")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
+//			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.expression_has_content), exatconv))));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "fact")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.expression_has_content), exatconv))));
+			new MappingInfo(ti_expression)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "facts")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.expression_has_content), exatconv))));
+			new MappingInfo(ti_expression)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "plan")), new ObjectInfo(OAVBDIMetaModel.plan_type), 
 			new MappingInfo(null, OAVBDIMetaModel.modelelement_has_description, null, null,
@@ -181,11 +194,15 @@ public class OAVBDIXMLReader
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("class", OAVBDIMetaModel.body_has_impl, AccessInfo.IGNORE_WRITE)), 
 			new AttributeInfo(new AccessInfo("impl", OAVBDIMetaModel.body_has_impl))}, null)));//, bopost));
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "precondition")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
+//			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "contextcondition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost), 
+//			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "precondition")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
+			new MappingInfo(ti_expression)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "contextcondition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost), 
-			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
-		
+			new MappingInfo(ti_expression)));
+			
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "trigger")), new ObjectInfo(OAVBDIMetaModel.plantrigger_type), 
 			new MappingInfo(null, 
 			new SubobjectInfo[]{
@@ -216,21 +233,28 @@ public class OAVBDIXMLReader
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "messageevent")), new ObjectInfo(OAVBDIMetaModel.messageevent_type)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "messageeventref")), new ObjectInfo(OAVBDIMetaModel.messageeventreference_type)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "match")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
+			new MappingInfo(ti_expression)));
 		
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "expression")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
+//			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "expression")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
-			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
+			new MappingInfo(ti_expression)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "expressionref")), new ObjectInfo(OAVBDIMetaModel.expressionreference_type)));
 
 //		typeinfos.add(new TypeInfo(null, "expression/parameter", OAVBDIMetaModel.expressionparameter_type));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "condition")), new ObjectInfo(OAVBDIMetaModel.condition_type, expost),
 			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
 		
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "service")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
+//			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "service")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
-			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
+			new MappingInfo(ti_expression)));
+				
 		
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
+//			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
-			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
+			new MappingInfo(ti_expression)));
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "parameter")), new ObjectInfo(OAVBDIMetaModel.parameter_type, tepost), 
 			new MappingInfo(null, new AttributeInfo[]{
@@ -263,16 +287,23 @@ public class OAVBDIXMLReader
 			new SubobjectInfo(new AccessInfo(new QName(uri, "values"), OAVBDIMetaModel.parameterset_has_valuesexpression)),	
 			new SubobjectInfo(new AccessInfo(new QName(uri, "value"), OAVBDIMetaModel.parameterset_has_values))	
 			})));
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "value")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
+//			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.expression_has_content), exatconv))));
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "values")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
+//			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.expression_has_content), exatconv))));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "value")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.expression_has_content), exatconv))));
+			new MappingInfo(ti_expression)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "values")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-			new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.expression_has_content), exatconv))));
+			new MappingInfo(ti_expression)));
+
 //		typeinfos.add(new TypeInfo(null, "goalmapping", OAVJavaType.java_string_type));
 //		typeinfos.add(new TypeInfo(null, "messageeventmapping", OAVJavaType.java_string_type));
 //		typeinfos.add(new TypeInfo(null, "internaleventmapping", OAVJavaType.java_string_type));
+//		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "bindingoptions")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
+//			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "bindingoptions")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost), 
-			new MappingInfo(null, null, OAVBDIMetaModel.expression_has_content)));
-				
+			new MappingInfo(ti_expression)));
+					
 //		typeinfos.add(new TypeInfo(null, "concrete", OAVJavaType.java_string_type));
 
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "configurations")), null, 
@@ -349,11 +380,15 @@ public class OAVBDIXMLReader
 		// Hack!!! Should be configurable.
 		protected static IExpressionParser	exp_parser	= new JavaCCExpressionParser();
 
+		protected ClassPostProcessor clpost = new ClassPostProcessor(OAVBDIMetaModel.expression_has_classname, OAVBDIMetaModel.expression_has_class);
+		
 		/**
 		 *  Parse expression text.
 		 */
 		public Object postProcess(IContext context, Object object)
 		{
+			clpost.postProcess(context, object);
+			
 			IOAVState state = (IOAVState)context.getUserContext();
 			Object	ret	= null;
 			String	value	= (String)state.getAttributeValue(object, OAVBDIMetaModel.expression_has_content);

@@ -15,6 +15,6 @@ public class SellItemPlan extends Plan
 		String name = (String)getParameter("name").getValue();
 		System.out.println("Sell item: "+name);
 		
-		getParameter("result").setValue("Bought item: "+name);
+		getParameter("result").setValue("Sold item: "+name);
 	}
 }

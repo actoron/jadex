@@ -12,7 +12,7 @@
 	<goals>
 		<achievegoal name="buy">
 			<parameter name="name" class="String"></parameter>
-			<parameter name="result" class="Object" description="out"></parameter>
+			<parameter name="result" class="Object" direction="out"></parameter>
 		</achievegoal>
 	</goals>
 	
@@ -21,7 +21,7 @@
 			<parameter name="name" class="String">
 				<goalmapping ref="sell.name"/>
 			</parameter>
-			<parameter name="result" class="Object" description="out">
+			<parameter name="result" class="Object" direction="out">
 				<goalmapping ref="sell.result"/>
 			</parameter>
 			<body class="BuyItemPlan"></body>

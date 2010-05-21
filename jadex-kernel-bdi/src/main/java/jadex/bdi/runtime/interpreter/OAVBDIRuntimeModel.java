@@ -290,6 +290,7 @@ public class OAVBDIRuntimeModel
 	/** Capability has properties attribute. */
 	public static OAVAttributeType capability_has_properties;
 
+	
 
 	/** The capability has listeners. */
 	public static OAVAttributeType capability_has_listeners;
@@ -928,6 +929,7 @@ public class OAVBDIRuntimeModel
 		capability_has_precandidates = capability_type.createAttributeType("capability_has_precandidates", precandidatelist_type, OAVAttributeType.MAP, null, precandidatelist_has_processableelement);
 		capability_has_abstractsources = capability_type.createAttributeType("capability_has_abstractsources", abstractsource_type, OAVAttributeType.MAP, null, abstractsource_has_abstract);
 		capability_has_properties = capability_type.createAttributeType("capability_has_properties", parameter_type, OAVAttributeType.MAP, null, parameter_has_name);
+		capability_has_serviceprovider = capability_type.createAttributeType("capability_has_serviceprovider", java_serviceprovider_type, OAVAttributeType.NONE);
 		
 		// agent
 		agent_has_name = agent_type.createAttributeType("agent_has_name", OAVJavaType.java_string_type);

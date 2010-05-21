@@ -27,6 +27,7 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
+import jadex.service.BasicServiceProvider;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
@@ -1003,6 +1004,23 @@ public class AgentRules
 				state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_name, name);
 				state.setAttributeValue(param, OAVBDIRuntimeModel.parameter_has_value, val);
 				state.addAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_properties, param);
+			}
+		}
+		
+		// Initialize services.
+		Collection	mservices = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_services);
+		if(mservices!=null)
+		{
+			BasicServiceProvider sp = new BasicServiceProvider();
+			state.setAttributeValue(rcapa, OAVBDIRuntimeModel.capability_has_serviceprovider, sp);
+			for(Iterator it=mservices.iterator(); it.hasNext(); )
+			{
+				Object mexp = it.next();
+				String name = (String)state.getAttributeValue(mexp, OAVBDIMetaModel.modelelement_has_name);
+				Object val = evaluateExpression(state, mexp, new OAVBDIFetcher(state, rcapa));
+				Class type = (Class)state.getAttributeValue(mexp, OAVBDIMetaModel.expression_has_class);
+				sp.addService(type, name, val);
+				System.out.println("Service: "+name+" "+val+" "+type);
 			}
 		}
 		
