@@ -98,23 +98,36 @@ public class InitDeco4mas {
 		
 
 		// Get dynamics_configuration file
-//		masFileName = space.getProperty("dynamics_configuration").toString();
+//		System.out.println(space.getPropertyNames().toString());
+//		System.out.println(space.getProperty("name").toString());
+//		System.out.println(new File("test.txt").getAbsolutePath());
+//		System.out.println(new File(""));
+		
+		try
+		{
+			masFileName = new File("..").getCanonicalPath() + new File("/sodekovs-coordination/src/main/java/" + (String)space.getProperty("dynamics_configuration")).getPath();
+		} catch (IOException e1)
+		{
+			System.out.println("#ProcessMASDynamics#" + ":");
+			System.out.println("\t canonical path of jadex home directory could not be created ...");
+		}
+		
+		
+		
 		//ToDo: HACK!!!! 
 //		masFileName = "src//deco4mas//examples//V2//tspaces//belief_set.dynamics.xml";		              
-		masFileName = "D://Workspaces//Jadex-V2//jadex//sodekovs-coordination//src//main//java//deco4mas//examples//V2//tspaces//belief_set.dynamics.xml";
+//		masFileName = "D://Workspaces//Jadex-V2//jadex//sodekovs-coordination//src//main//java//deco4mas//examples//V2//tspaces//belief_set.dynamics.xml";
 		
-//		masFileName = "C://Dokumente und Einstellungen//Christopher//Desktop//neu 1105//WS Jadex2//jadex//sodekovs-coordination//src//main//java//deco4mas//examples//agentNegotiation//deco//negotiation.dynamics.xml";		
+//		masFileName = jadexCoordinationPath + "deco4mas//examples//agentNegotiation//deco//negotiation.dynamics.xml";		
 		System.out.println("#InitCoordinationSpace-Thread# Started processing deco4mas-file: " + masFileName);
 
 		
 		// ------ INIT COORDINATION MEDIA! -----------//
 
 		// TODO: Init media according to the deco4Mas file!
-		TSpacesMechanism coordMechanism = new TSpacesMechanism((CoordinationSpace) space);
-		coordMechanism.start();
-//		CpnSpaceMechanism coordMechanism = new CpnSpaceMechanism((CoordinationSpace) space);
-//		cpnMechanism.start();
-//		NegSpaceMechanism coordMechanism = new NegSpaceMechanism((CoordinationSpace) space);
+//		TSpacesMechanism coordMechanism = new TSpacesMechanism((CoordinationSpace) space);
+//		coordMechanism.start();
+		NegSpaceMechanism coordMechanism = new NegSpaceMechanism((CoordinationSpace) space);
 		
 
 		((CoordinationSpace) space).activeCoordinationMechanisms.add(coordMechanism);

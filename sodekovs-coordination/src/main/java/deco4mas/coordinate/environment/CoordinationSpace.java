@@ -4,6 +4,8 @@ package deco4mas.coordinate.environment;
 
 import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
+import jadex.application.space.envsupport.MEnvSpaceInstance;
+import jadex.application.space.envsupport.MEnvSpaceType;
 import jadex.application.space.envsupport.MObjectType;
 import jadex.application.space.envsupport.environment.AvatarMapping;
 import jadex.application.space.envsupport.environment.EnvironmentEvent;
@@ -12,10 +14,12 @@ import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Grid2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.bridge.IComponentIdentifier;
+import jadex.javaparser.SimpleValueFetcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import test.GetPropertyThread;
@@ -49,18 +53,21 @@ public class CoordinationSpace extends Grid2D {
 	 */
 	public CoordinationSpace() {		
 		super(CoordinationSpace.class.getName(), null);
-		initSpaces();
-		initDeco4mas();
+		
 	}
 	
 	@Override
 	public void initSpace(IApplication context, MSpaceInstance config) throws Exception
 	{
 		super.initSpace(context, config);
+		
+		initSpaces();
+		initDeco4mas();
 		for (ICoordinationMechanism icord : activeCoordinationMechanisms)
 		{
 			icord.start();
 		}
+		
 	}
 
 	/**
