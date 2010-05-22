@@ -19,7 +19,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_RKBLdSpFEd-sHNUsLb1C_w"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_RKBLdipFEd-sHNUsLb1C_w" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="workflow.bpmn#_RKBLcSpFEd-sHNUsLb1C_w"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_RKBLdypFEd-sHNUsLb1C_w" x="306" y="93"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_RKBLdypFEd-sHNUsLb1C_w" x="265" y="93"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_A6tLYC7_Ed-L-IF5Nky85A" type="2001">
         <children xmi:type="notation:Node" xmi:id="_A6tLZi7_Ed-L-IF5Nky85A" type="4001"/>

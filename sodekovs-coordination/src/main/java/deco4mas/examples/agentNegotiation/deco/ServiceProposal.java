@@ -1,16 +1,18 @@
 package deco4mas.examples.agentNegotiation.deco;
 
+import deco4mas.examples.agentNegotiation.ServiceType;
 import jadex.bridge.IComponentIdentifier;
 
 public class ServiceProposal
 {
 	private Integer id;
 	private IComponentIdentifier owner = null;
-	private String serviceType = "default";
-	private Double bid = 0.0;
+	private ServiceType serviceType;
+	private Bid bid;
+
 	private Double evaluation = 0.0;
 
-	public ServiceProposal(Integer id, String service, IComponentIdentifier owner, Double bid)
+	public ServiceProposal(Integer id, ServiceType service, IComponentIdentifier owner, Bid bid)
 	{
 		this.id = id;
 		serviceType = service;
@@ -28,16 +30,16 @@ public class ServiceProposal
 		return owner;
 	}
 
-	public String getServiceType()
+	public ServiceType getServiceType()
 	{
 		return serviceType;
 	}
 
-	public Double getBid()
+	public Bid getBid()
 	{
 		return bid;
 	}
-	
+
 	public void setEvaluation(Double evaluation)
 	{
 		this.evaluation = evaluation;

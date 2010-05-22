@@ -1,41 +1,67 @@
 package deco4mas.examples.agentNegotiation.deco;
 
+import deco4mas.examples.agentNegotiation.ServiceType;
+import deco4mas.examples.agentNegotiation.sma.strategy.ISelectionStrategy;
+import deco4mas.examples.agentNegotiation.sma.strategy.IUtilityFunction;
+import deco4mas.examples.agentNegotiation.sma.strategy.SimpleSelectionStrategy;
+import deco4mas.examples.agentNegotiation.sma.strategy.WeightFactorUtilityFunction;
 import jadex.bridge.IComponentIdentifier;
+
+//TODO Medium configuration like Deadline
 
 public class AssignRequest
 {
 	private IComponentIdentifier owner;
-	private String serviceType = "default";
-	private Evaluator evaluator;
+	private ServiceType serviceType;
+	private IUtilityFunction utilityFunction;
+	private ISelectionStrategy selector;
 	private String medium;
+	private RequestInformation informations;
 
-	public AssignRequest(IComponentIdentifier owner, String serviceType, Evaluator evaluator, String medium)
+	public AssignRequest(IComponentIdentifier owner, IUtilityFunction utilityFunction, ISelectionStrategy selector, ServiceType serviceType, String medium)
 	{
 		this.owner = owner;
+		this.utilityFunction = utilityFunction;
 		this.serviceType = serviceType;
-		this.evaluator = evaluator;
+		this.selector = selector;
 		this.medium = medium;
+	}
+	
+	public AssignRequest(IComponentIdentifier owner, ServiceType serviceType, IUtilityFunction utilityFunction, ISelectionStrategy selector, String medium, RequestInformation information)
+	{
+		this(owner, utilityFunction,selector, serviceType, medium);
+		this.informations = information;
 	}
 
 	public IComponentIdentifier getOwner()
 	{
 		return owner;
 	}
-
-	public String getServiceType()
+	
+	public IUtilityFunction getUtilityFunction()
 	{
-		return serviceType;
+		return utilityFunction;
 	}
 
-	public Evaluator getEvaluator()
+	public ServiceType getServiceType()
 	{
-		return evaluator;
+		return serviceType;
 	}
 
 	public String getMedium()
 	{
 		return medium;
 	}
-
 	
+
+	public ISelectionStrategy getSelector()
+	{
+		return selector;
+	}
+
+	public Object get(String information)
+	{
+		return informations.get(information);
+	}
+
 }

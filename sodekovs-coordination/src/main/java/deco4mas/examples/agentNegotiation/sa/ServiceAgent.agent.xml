@@ -19,14 +19,13 @@
 		<import>jadex.application.space.envsupport.math.*</import>
 		<import>jadex.application.runtime.*</import>
 		<import>deco4mas.examples.agentNegotiation.deco.*</import>
+		<import>deco4mas.examples.agentNegotiation.*</import>
 		<import>deco4mas.coordinate.environment.*</import>
 		<import>deco4mas.coordinate.*</import>
 		<import>jadex.commons.IFilter</import>
 	</imports>
 
 	<capabilities>
-		<capability name="logcap"
-			file="deco4mas/examples/agentNegotiation/evaluate/Logging.capability.xml" />
 		<capability name="reqcap"
 			file="jadex.bdi.planlib.protocols.request.Request" />
 <!--			<capability name="ping" file="deco4mas.examples.agentNegotiation.sma.ping.Ping"/>-->
@@ -43,20 +42,15 @@
 			</fact>
 		</belief>
 
-		<belief name="providedService" class="String" exported="true"></belief>
-		<belief name="serviceLength" class="Integer" exported="true"></belief>
-		<belief name="proposalBase" class="Integer" exported="true" />
+		<belief name="providedService" class="ServiceType" exported="true"></belief>
+		<belief name="agentType" class="AgentType" exported="true" />
+		
 		<belief name="blackout" class="boolean">
 			<fact>false</fact>
 		</belief>
 	</beliefs>
 
 	<goals>
-		<!-- logging -->
-		<achievegoalref name="informLogger">
-			<concrete ref="logcap.informLogger" />
-		</achievegoalref>
-
 		<!-- Deco -->
 		<achievegoal name="offer">
 			<parameter name="offer" class="ServiceOffer"></parameter>

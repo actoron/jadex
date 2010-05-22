@@ -36,11 +36,16 @@ public class AllocateServicePlan extends Plan
 			if (result)
 			{
 				getParameter("result").setValue(Boolean.TRUE);
+				// more trust to Sa
+				ServiceAgentHistory history = (ServiceAgentHistory) getBeliefbase().getBelief("history").getFact();
+				history.addEvent(currentSa, getClock().getTime(), 0.5);
 			}
 			else
 			{
 				System.out.println(this.getComponentIdentifier().getLocalName() + " Sa: " + currentSa + " no/false response! Assign new!");
 //				getParameter("result").setValue(Boolean.FALSE);
+				ServiceAgentHistory history = (ServiceAgentHistory) getBeliefbase().getBelief("history").getFact();
+				history.addEvent(currentSa, getClock().getTime(), -1.0);
 				
 				startAtomic();
 				getBeliefbase().getBelief("currentSa").setFact(null);

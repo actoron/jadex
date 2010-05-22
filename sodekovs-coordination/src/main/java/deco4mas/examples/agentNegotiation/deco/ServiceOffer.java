@@ -1,17 +1,21 @@
 package deco4mas.examples.agentNegotiation.deco;
 
+import deco4mas.examples.agentNegotiation.ServiceType;
+
+//TODO Negotiation Details
+
 public class ServiceOffer
 {
 	private Integer id;
 
-	private Long deadline = 0l;
+//	private Long deadline = 0l;
 
-	private String serviceType = "default";
+	private ServiceType serviceType;
 
-	public ServiceOffer(Integer id, Long deadline, String service)
+	public ServiceOffer(Integer id, Long deadline, ServiceType service)
 	{
 		this.id = id;
-		this.deadline = deadline;
+//		this.deadline = deadline;
 		this.serviceType = service;
 	}
 
@@ -25,24 +29,18 @@ public class ServiceOffer
 		this.id = id;
 	}
 
-	public Long getDeadline()
-	{
-		return deadline;
-	}
+//	public Long getDeadline()
+//	{
+//		return deadline;
+//	}
+//
+//	public void setDeadline(Long deadline)
+//	{
+//		this.deadline = deadline;
+//	}
 
-	public void setDeadline(Long deadline)
-	{
-		this.deadline = deadline;
-	}
-
-	public String getServiceType()
+	public ServiceType getServiceType()
 	{
 		return serviceType;
 	}
-
-	public void setServiceType(String serviceType)
-	{
-		this.serviceType = serviceType;
-	}
-
 }

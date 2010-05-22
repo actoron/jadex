@@ -50,7 +50,10 @@ public class MediumTimeProcess extends SimplePropertyObject implements ISpacePro
 	public void execute(IClockService clock, IEnvironmentSpace space)
 	{
 		CoordinationSpace env = (CoordinationSpace) space;
-		NegSpaceMechanism mechanism = (NegSpaceMechanism) env.activeCoordinationMechanisms.get(0);
-		mechanism.nextTick();
+		if (env.activeCoordinationMechanisms.size() > 0)
+		{
+			NegSpaceMechanism mechanism = (NegSpaceMechanism) env.activeCoordinationMechanisms.get(0);
+			mechanism.nextTick();
+		}
 	}
 }

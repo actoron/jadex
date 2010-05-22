@@ -5,6 +5,7 @@ import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +21,7 @@ public class ExecuteServiceByAgentTask implements ITask
 	{
 		try
 		{
-			System.out.println("Bpmn task (" + context.getActivity().getName() + ") start");
+			System.out.println("Bpmn task (" + context.getActivity().getName() + "/" +context.getParameterValue("serviceType") + ") start");
 
 			IComponentManagementService cms = (IComponentManagementService) instance.getComponentAdapter().getServiceContainer().getService(
 				IComponentManagementService.class);
@@ -48,7 +49,8 @@ public class ExecuteServiceByAgentTask implements ITask
 			args.put("taskName", context.getParameterValue("serviceType"));
 			args.put("workflow", instance.getComponentIdentifier());
 
-			cms.createComponent(name, model, new CreationInfo(null, args, instance.getComponentIdentifier()), null, null);
+			cms.createComponent(name, model, new CreationInfo(null, args, instance.getComponentIdentifier()), lis);
+			
 		} catch (Exception e)
 		{
 			System.out.println("ExecuteServiceByAgentTask");

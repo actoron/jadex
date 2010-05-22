@@ -36,6 +36,12 @@
 			<body class="ExecuteTaskPlan" />
 		</plan>
 	</plans>
+	
+	<expressions>
+		<condition name="taskListenerPresent" language="jcl">
+			$beliefbase.taskListener!=null
+			</condition>
+	</expressions>
 
 	<configurations>
 		<configuration name="default">

@@ -1,5 +1,6 @@
 package deco4mas.examples.agentNegotiation.sma;
 
+import deco4mas.examples.agentNegotiation.ServiceType;
 import jadex.bdi.runtime.Plan;
 
 /**
@@ -9,9 +10,10 @@ public class ServiceDecitePlan extends Plan
 {
 	public void body()
 	{
-		String myService = (String) getBeliefbase().getBelief("allocatedService").getFact();
+		ServiceType myService = (ServiceType) getBeliefbase().getBelief("allocatedService").getFact();
+		String myServiceName = myService.getName();
 		String actionService = (String) getParameter("action").getValue();
-		if (!myService.equals(actionService))
+		if (!myServiceName.equals(actionService))
 		{
 			getParameter("accept").setValue(Boolean.FALSE);
 		} else

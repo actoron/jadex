@@ -15,7 +15,7 @@ public class RestartWorkflowPlan extends Plan
 
 		try
 		{
-			if (restarttimer < 10)
+			if (restarttimer <= 30)
 			{
 				getBeliefbase().getBelief("workflow").setFact(null);
 				getBeliefbase().getBelief("executionPhase").setFact(new Boolean(false));

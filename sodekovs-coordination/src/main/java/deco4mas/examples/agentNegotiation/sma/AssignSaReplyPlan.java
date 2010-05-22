@@ -1,6 +1,5 @@
 package deco4mas.examples.agentNegotiation.sma;
 
-import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import deco4mas.examples.agentNegotiation.deco.AssignReply;
@@ -18,7 +17,7 @@ public class AssignSaReplyPlan extends Plan
 		// test if my request
 		if ((reply.getInitiator()).equals(this.getComponentIdentifier()))
 		{
-			System.out.println(this.getComponentName() + "signed with " + reply.getChosenOne());
+			System.out.println(this.getComponentName() + " signed with " + reply.getChosenOne());
 			startAtomic();
 			// set signed Sa
 			getBeliefbase().getBelief("currentSa").setFact(reply.getChosenOne());
@@ -32,7 +31,6 @@ public class AssignSaReplyPlan extends Plan
 			
 			// inform Provider
 			dispatchSubgoalAndWait(createGoal("informProvideraboutSign"));
-			
 		}
 	}
 }

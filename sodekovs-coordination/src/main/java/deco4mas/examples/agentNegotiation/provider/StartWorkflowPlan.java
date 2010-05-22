@@ -17,7 +17,7 @@ public class StartWorkflowPlan extends Plan
 			IComponentManagementService cms = (IComponentManagementService) interpreter.getAgentAdapter().getServiceContainer().getService(
 				IComponentManagementService.class);
 
-			cms.resumeComponent((IComponentIdentifier) getBeliefbase().getBelief("workflow").getFact(), null);
+			cms.resumeComponent((IComponentIdentifier) getBeliefbase().getBelief("workflow").getFact());
 		} catch (Exception e)
 		{
 			System.out.println(this.getType());

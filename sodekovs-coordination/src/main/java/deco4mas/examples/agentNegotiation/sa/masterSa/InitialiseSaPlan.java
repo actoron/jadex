@@ -6,45 +6,49 @@ import jadex.bridge.IComponentManagementService;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import deco4mas.examples.agentNegotiation.ServiceType;
+import deco4mas.examples.agentNegotiation.sa.AgentType;
 
 /**
- * Init Sas
+ * Init SAs
  */
 public class InitialiseSaPlan extends Plan
 {
-	static Integer id = new Integer(0);
-
+	private static Integer id = new Integer(0);
+	
 	public void body()
 	{
-		String[] names = (String[]) getBeliefbase().getBeliefSet("names").getFacts();
-		Integer[] quantities = (Integer[]) getBeliefbase().getBeliefSet("quantities").getFacts();
-		Integer[] length = (Integer[]) getBeliefbase().getBeliefSet("length").getFacts();
+		ServiceType[] servicesArray = (ServiceType[]) getBeliefbase().getBeliefSet("services").getFacts();
+		Map<String, ServiceType> services = new HashMap<String, ServiceType>();
+		for (ServiceType serviceType : servicesArray)
+		{
+			services.put(serviceType.getName(), serviceType);
+		}
+
+		AgentType[] agentTypesArray = (AgentType[]) getBeliefbase().getBeliefSet("agentTypes").getFacts();
+		Map<String, AgentType> agentTypes = new HashMap<String, AgentType>();
+		for (AgentType serviceAgentType : agentTypesArray)
+		{
+			agentTypes.put(serviceAgentType.getTypeName(), serviceAgentType);
+		}
+		ServiceAgentConfig[] configs = (ServiceAgentConfig[]) getBeliefbase().getBeliefSet("serviceAgentConfigs").getFacts();
 
 		IComponentManagementService cms = (IComponentManagementService) interpreter.getAgentAdapter().getServiceContainer().getService(
 			IComponentManagementService.class);
-		Random rnd = new Random();
-	
-		if (names.length == quantities.length)
+
+		for (ServiceAgentConfig serviceAgentConfig : configs)
 		{
-			for (int i = 0; i < names.length; i++)
-			{
-				for (int j = 0; j < (Integer) quantities[i]; j++)
-				{
-					Map args = new HashMap();
-					args.put("providedService", names[i]);
-					args.put("serviceLength", length[i]);
-	
-					Double proposal = 1000.0;
-	
-					args.put("proposalBase", proposal.intValue());
-					cms.createComponent("SA" + id, "deco4mas/examples/AgentNegotiation/sa/serviceAgent.agent.xml", new CreationInfo(
-						null, args, interpreter.getParent().getComponentIdentifier()), null, null);
-					id++;
-				}
-			}
-		} else
-		{
-			fail();
+			ServiceType serviceType = services.get(serviceAgentConfig.getServiceType());
+			AgentType agentType = agentTypes.get(serviceAgentConfig.getAgentType());
+
+			Map args = new HashMap();
+			args.put("providedService", serviceType);
+			args.put("agentType", agentType);
+
+			cms.createComponent("SA" + "(" + serviceType.getName() + "-" + agentType.getTypeName() + ")" + id,
+				"deco4mas/examples/AgentNegotiation/sa/serviceAgent.agent.xml", new CreationInfo(null, args, interpreter.getParent()
+					.getComponentIdentifier()), null);
+			id++;
 		}
 		killAgent();
 	}

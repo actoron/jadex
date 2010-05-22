@@ -2,10 +2,9 @@
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_NllbYSpFEd-sHNUsLb1C_w" iD="_NllbYCpFEd-sHNUsLb1C_w">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_OLlEYCpFEd-sHNUsLb1C_w" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OLlEYSpFEd-sHNUsLb1C_w" key="Description" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OLu1YCpFEd-sHNUsLb1C_w" key="Package" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VJnd4C7BEd-Gmq9Ka500yQ" key="imports" value="jadex.*␟jadex.bridge.*␟java.util.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XRz5cC7BEd-Gmq9Ka500yQ" key="parameters" value="in␋provider␋IComponentIdentifier␋$args.get(&quot;provider&quot;)␟in␋smas␋Map␋new HashMap()"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_514xgC7BEd-Gmq9Ka500yQ" key="arguments" value="provider␋&quot;workflow Provider&quot;␋IComponentIdentifier␋&quot;none&quot;␟smas␋description␋javaj.util.HashMap␋&quot;none&quot;"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OLu1YCpFEd-sHNUsLb1C_w" key="Package" value="deco4mas.examples.agentNegotiation.provider.workflow"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VJnd4C7BEd-Gmq9Ka500yQ" key="imports" value="jadex.*␟jadex.bridge.*␟java.util.*␟deco4mas.examples.agentNegotiation.provider.workflow.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_514xgC7BEd-Gmq9Ka500yQ" key="arguments" value="provider␋true␋IComponentIdentifier␋&quot;none&quot;␋IComponentIdentifier␋&quot;none&quot;␟smas␋true␋javaj.util.HashMap␋&quot;none&quot;␋Map␋&quot;none&quot;"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_NmezQSpFEd-sHNUsLb1C_w" iD="_NmezQCpFEd-sHNUsLb1C_w" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_POMX8SpFEd-sHNUsLb1C_w" iD="_POMX8CpFEd-sHNUsLb1C_w" outgoingEdges="_A6tLaC7_Ed-L-IF5Nky85A" activityType="EventStartEmpty"/>

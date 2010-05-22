@@ -10,7 +10,7 @@
 						http://jadex.sourceforge.net/jadex-application
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace"
-	name="AgentNegotiation" package="jadex.agentbpmn.examples.agentNegotiation">
+	name="AgentNegotiation" package="deco4mas.examples.agentNegotiation">
 
 
 	<imports>
@@ -24,20 +24,21 @@
 		<import>jadex.bdi.planlib.*</import>
 		<import>jadex.application.space.envsupport.dataview.*</import>
 		<import>deco4mas.examples.agentNegotiation.deco.negMedium.*</import>
-		<import>deco4mas.examples.agentNegotiation.evaluate.logger.*</import>
 		<import>deco4mas.coordinate.interpreter.coordination_information.*
 		</import>
 		<import>deco4mas.coordinate.environment.*</import>
 		<import>deco4mas.annotation.agent.*</import>
 		<import>deco4mas.coordinate.*</import>
+		<import>deco4mas.examples.agentNegotiation.*</import>
+		<import>deco4mas.examples.agentNegotiation.sa.*</import>
+		<import>deco4mas.examples.agentNegotiation.sa.masterSa.*</import>
 	</imports>
 
 	<spacetypes>
 		<env:envspacetype name="coordspace" width="11"
 			height="11" class="CoordinationSpace">
 
-			<env:property name="dynamics_configuration">"src//jadex//deco4mas//examples//agentNegotiation//deco//belief_set.dynamics.xml"
-			</env:property>
+			<env:property name="dynamics_configuration">"deco4mas/examples/agentNegotiation/deco/negotiation.dynamics.xml"</env:property>
 
 			<env:processtypes>
 				<env:processtype name="MediumTime" class="MediumTimeProcess">
@@ -66,9 +67,6 @@
 		<componenttype
 			filename="deco4mas/examples/agentNegotiation/sma/ServiceManagementAgent.agent.xml"
 			name="ServiceManagementAgent" />
-		<componenttype
-			filename="deco4mas/examples/agentNegotiation/evaluate/logger/Logger.agent.xml"
-			name="Logger" />
 	</componenttypes>
 
 	<applications>
@@ -86,35 +84,44 @@
 			<components>
 				<component type="MasterServiceCreator">
 					<arguments>
-						<argument name="names">
-							new String[]
+					<!-- WARNING: Hack / TODO in CreatesmaforWorkflow: taskTypes - ServiceTypes -->
+						<argument name="services">
+							new ServiceType[]
 							{
-							new String("Chassisbau"),
-							new
-							String("Reifenhersteller"),
-							new String("Endmontage")
+							new ServiceType("Chassisbau",1000.0,300.0,700.0,5000.0,1000.0,3000.0),
+							new ServiceType("Reifenhersteller",300.0,50.0,150.0,1000.0,500.0,700.0),
+							new ServiceType("Endmontage",500.0,100.0,300.0,3000.0,500.0,1000.0)
 							}
-											</argument>
-						<argument name="length">
-							new Integer[]
-							{
-							2500,
-							2000,
-							1000
-							}	
 						</argument>
-						<argument name="quantities">
-							new Integer[]
+						<argument name="agentTypes">
+							new AgentType[]
 							{
-							6,
-							7,
-							6
+							new AgentType("normal",0.5,0.5,0.3),
+							new AgentType("billig",0.3,0.6,0.6),
+							new AgentType("teuer",0.8,0.2,0.0),
+							new AgentType("ausfall",0.2,0.7,1.0)
+							}
+						</argument>
+						<argument name="serviceAgentConfigs">
+							new ServiceAgentConfig[]
+							{
+							new ServiceAgentConfig("Chassisbau", "normal"),
+							new ServiceAgentConfig("Chassisbau", "billig"),
+							new ServiceAgentConfig("Chassisbau", "teuer"),
+							new ServiceAgentConfig("Chassisbau", "ausfall"),
+							new ServiceAgentConfig("Reifenhersteller", "normal"),
+							new ServiceAgentConfig("Reifenhersteller", "billig"),
+							new ServiceAgentConfig("Reifenhersteller", "teuer"),
+							new ServiceAgentConfig("Reifenhersteller", "ausfall"),
+							new ServiceAgentConfig("Endmontage", "normal"),
+							new ServiceAgentConfig("Endmontage", "billig"),
+							new ServiceAgentConfig("Endmontage", "teuer"),
+							new ServiceAgentConfig("Endmontage", "ausfall")
 							}	
 						</argument>
 					</arguments>
 				</component>
-				<component type="Logger"></component>
-				<component type="WorkflowProvider" number="10">
+				<component type="WorkflowProvider" number="1">
 					<arguments>
 						<argument name="workflowName">
 							new String("workflow2")

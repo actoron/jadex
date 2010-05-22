@@ -12,11 +12,6 @@
 		<import>jadex.bridge.IComponentIdentifier</import>
 	</imports>
 
-	<capabilities>
-		<capability name="logcap"
-			file="deco4mas/examples/agentNegotiation/evaluate/Logging.capability.xml" />
-	</capabilities>
-
 	<beliefs>
 		<beliefset name="smas" class="IComponentIdentifier" />
 		<belief name="workflow" class="IComponentIdentifier" />
@@ -81,16 +76,7 @@
 				<value>SFipa.INFORM</value>
 			</parameter>
 		</messageevent>
-
 		<internalevent name="workflowExecuted"></internalevent>
-
-		<internaleventref name="logInformation">
-			<concrete ref="logcap.logInformation" />
-		</internaleventref>
-
-		<internaleventref name="evaluateLogger">
-			<concrete ref="logcap.evaluateLogger" />
-		</internaleventref>
 	</events>
 
 	<configurations>
