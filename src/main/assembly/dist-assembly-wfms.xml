@@ -3,7 +3,7 @@
   <id>dist</id>
   
   <formats>
-    <format>dir</format>
+    <format>zip</format>
   </formats>
   
   <includeBaseDirectory>true</includeBaseDirectory>
@@ -16,6 +16,7 @@
       </includes>
       
       <binaries>
+      	<outputFileNameMapping>${artifact.artifactId}-${artifact.version}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
         <outputDirectory>lib</outputDirectory>
         <unpack>false</unpack>
       </binaries>
