@@ -211,7 +211,6 @@ public class StandardClientApplication
 		
 		if (capabilities.containsAll(SCapReqs.WORKITEM_LIST))
 		{
-			System.out.println("Adding WL");
 			toolPane.add(WORKITEM_LIST_TAB_NAME, wlComponent);
 			setupWorkitemListComponent();
 		}
