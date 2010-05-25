@@ -7,10 +7,11 @@ import jadex.bpmn.model.MParameter;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.collection.Tree;
 import jadex.commons.collection.TreeNode;
-import jadex.gpmn.model.MGpmnModel;
-import jadex.gpmn.model.MPlan;
+import jadex.gpmn.model2.MBpmnPlan;
+import jadex.gpmn.model2.MGpmnModel;
+import jadex.gpmn.model2.MSubprocess;
 import jadex.javaparser.javaccimpl.ReflectNode;
-import jadex.wfms.simulation.stateholder.ActivityStateController;
+import jadex.wfms.client.task.WorkitemTask;
 import jadex.wfms.simulation.stateholder.IParameterStateSet;
 import jadex.wfms.simulation.stateholder.ParameterStateSetFactory;
 import jadex.wfms.simulation.stateholder.ProcessStateController;
@@ -26,46 +27,41 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.naming.OperationNotSupportedException;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-public class ClientProcessMetaModel extends Tree implements TreeModel
+public class ClientMetaProcessModel extends Tree implements TreeModel
 {
 	private String mainProcessName;
-	
-	private BpmnModelLoader bpmnLoader;
 	
 	private Map processes;
 	
 	private List tasks;
 	
-	private List parameterSets;
-	
-	public ClientProcessMetaModel()
+	public ClientMetaProcessModel()
 	{
-		bpmnLoader = new BpmnModelLoader();
 	}
 	
-	public void setRootModel(String processName, ILoadableComponentModel model) throws Exception
+	public void setRootModel(ClientSimulator sim, String processName, ILoadableComponentModel model) throws Exception
 	{
 		mainProcessName = processName;
 		processes = new HashMap();
 		tasks = new ArrayList();
-		parameterSets = new ArrayList();
 		root = new ModelTreeNode();
 		processes.put(resolveProcessName(model), root);
-		TreeNode tmpRoot = buildTree(model);
+		TreeNode tmpRoot = buildTree(sim, model);
 		root.setChildren(tmpRoot.getChildren());
 		root.setData(tmpRoot.getData());
 	}
 	
-	public TreeNode buildTree(ILoadableComponentModel processModel) throws Exception
+	public TreeNode buildTree(ClientSimulator sim, ILoadableComponentModel processModel) throws Exception
 	{
 		TreeNode node = new ModelTreeNode();
 		node.setData(processModel);
-		List subProcesses = getSubProcessModels(processModel);
+		List subProcesses = getSubProcessModels(sim, processModel);
 		
 		// Remove subprocesses that are already known
 		for (Iterator it = subProcesses.iterator(); it.hasNext(); )
@@ -87,7 +83,7 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 			ILoadableComponentModel subModel = (ILoadableComponentModel) it.next();
 			ModelTreeNode tmpNode = new ModelTreeNode();
 			processes.put(resolveProcessName(subModel), tmpNode);
-			TreeNode subTree = buildTree(subModel);
+			TreeNode subTree = buildTree(sim, subModel);
 			tmpNode.setChildren(subTree.getChildren());
 			tmpNode.setData(subTree.getData());
 			node.addChild(tmpNode);
@@ -106,7 +102,27 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 		return node;
 	}
 	
-	public ProcessStateController createProcessStateController()
+	public Scenario createScenario(String name)
+	{
+		Map taskMap = new HashMap();
+		for (Iterator it = tasks.iterator(); it.hasNext(); )
+		{
+			ModelTreeNode task = (ModelTreeNode) it.next();
+			Map paramMap = new HashMap();
+			for (Iterator it2 = task.getChildren().iterator(); it2.hasNext(); )
+			{
+				MParameter param = (MParameter) ((ModelTreeNode) it2.next()).getData();
+				paramMap.put(param.getName(), ParameterStateSetFactory.createStateHolder(param));
+			}
+			
+			taskMap.put(((MActivity) task.getData()).getName(), paramMap);
+		}
+		
+		return new Scenario(name, taskMap);
+	}
+	
+	//TODO: PSController
+	/*public ProcessStateController createProcessStateController()
 	{
 		ProcessStateController pController = new ProcessStateController();
 		
@@ -130,9 +146,9 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 		}
 		
 		return pController;
-	}
+	}*/
 	
-	public List getParameterSets()
+	/*public List getParameterSets()
 	{
 		List pSets = new ArrayList();
 		for (Iterator it = tasks.iterator(); it.hasNext(); )
@@ -149,7 +165,7 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 			}
 		}
 		return pSets;
-	}
+	}*/
 	
 	private TreeNode getTaskNode(MActivity task)
 	{
@@ -159,14 +175,12 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 		for (Iterator it = outParams.iterator(); it.hasNext(); )
 		{
 			MParameter param = (MParameter) it.next();
-			IParameterStateSet stateSet = ParameterStateSetFactory.createStateHolder(param);
-			node.addChild(new ModelTreeNode(stateSet));
-			parameterSets.add(stateSet);
+			node.addChild(new ModelTreeNode(param));
 		}
 		return node;
 	}
 	
-	private List getSubProcessModels(ILoadableComponentModel processModel) throws Exception
+	private List getSubProcessModels(ClientSimulator sim, ILoadableComponentModel processModel) throws Exception
 	{
 		List ret = new LinkedList();
 		//ret.add(processModel);
@@ -174,18 +188,30 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 		{
 			
 			MGpmnModel gpmnModel = (MGpmnModel) processModel;
-			for (Iterator it = gpmnModel.getPlans().iterator(); it.hasNext(); )
+			for (Iterator it = gpmnModel.getBpmnPlans().values().iterator(); it.hasNext(); )
 			{
-				MPlan plan = (MPlan) it.next();
-				MBpmnModel bpmnModel = bpmnLoader.loadBpmnModel(plan.getBpmnPlan(), gpmnModel.getImports());
+				MBpmnPlan plan = (MBpmnPlan) it.next();
+				MBpmnModel bpmnModel = (MBpmnModel) sim.loadModelFromPath(plan.getPlanref());
 				if (bpmnModel != null)
 					ret.add(bpmnModel);
+			}
+			
+			for (Iterator it = gpmnModel.getSubprocesses().values().iterator(); it.hasNext(); )
+			{
+				String processref = ((MSubprocess) it.next()).getProcessReference();
+				if (processref.endsWith(".bpmn"))
+				{
+					MBpmnModel bpmnModel = (MBpmnModel) sim.loadModelFromPath(processref);
+					if (bpmnModel != null)
+						ret.add(bpmnModel);
+				}
 			}
 		}
 		else if (processModel instanceof MBpmnModel)
 		{
 			//TODO: Add subprocess search
 		}
+
 		
 		return ret;
 	}
@@ -198,15 +224,15 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 		{
 			MBpmnModel bpmnModel = (MBpmnModel) processModel;
 			Collection activities = (bpmnModel.getAllActivities().values());
-			System.out.println("Activities: " + activities.toString());
 			for (Iterator it = activities.iterator(); it.hasNext(); )
 			{
 				MActivity activity = (MActivity) it.next();
-				ReflectNode classNode = ((ReflectNode) activity.getPropertyValue("class"));
-				if (classNode != null)
+				//ReflectNode classNode = ((ReflectNode) activity.getPropertyValue("class"));
+				Class clazz = activity.getClazz();
+				if (WorkitemTask.class.equals(clazz))
 				{
 					// TODO: Check for "in"-only parameters
-					if (activity.getParameters().size() > 0)
+					if ((activity.getParameters() != null) && (activity.getParameters().size() > 0))
 						ret.add(activity);
 				}
 			}
@@ -267,27 +293,27 @@ public class ClientProcessMetaModel extends Tree implements TreeModel
 	 * Adds a change listener for state set changes.
 	 * @param listener the listener
 	 */
-	public void addStateChangeListener(ChangeListener listener)
+	/*public void addStateChangeListener(ChangeListener listener)
 	{
 		for (Iterator it = parameterSets.iterator(); it.hasNext(); )
 		{
 			IParameterStateSet stateSet = (IParameterStateSet) it.next();
 			stateSet.addStateChangeListener(listener);
 		}
-	}
+	}*/
 	
 	/**
 	 * Removes a change listener for state set changes.
 	 * @param listener the listener
 	 */
-	public void removeStateChangeListener(ChangeListener listener)
+	/*public void removeStateChangeListener(ChangeListener listener)
 	{
 		for (Iterator it = parameterSets.iterator(); it.hasNext(); )
 		{
 			IParameterStateSet stateSet = (IParameterStateSet) it.next();
 			stateSet.removeStateChangeListener(listener);
 		}
-	}
+	}*/
 	
 	public static final String resolveProcessName(ILoadableComponentModel model)
 	{

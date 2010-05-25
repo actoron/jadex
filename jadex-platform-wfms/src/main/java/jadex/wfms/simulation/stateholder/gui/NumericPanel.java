@@ -15,6 +15,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import jadex.wfms.simulation.gui.SimulationWindow;
 import jadex.wfms.simulation.stateholder.AbstractNumericStateSet;
 import jadex.wfms.simulation.stateholder.NumberRange;
 
@@ -22,13 +23,17 @@ public class NumericPanel extends JPanel implements IStatePanel
 {
 	private static final Pattern RANGE_PATTERN = Pattern.compile("-?[0-9]+( *- *-?[0-9]+)?");
 	
-	private AbstractNumericStateSet stateHolder;
-	
 	private JList rangeList;
 	
-	public NumericPanel(AbstractNumericStateSet stateHolder)
+	private String taskName;
+	private String parameterName;
+	private SimulationWindow simWindow;
+	
+	public NumericPanel(String tskName, String paramtrName, SimulationWindow simWdw)
 	{
-		this.stateHolder = stateHolder;
+		this.taskName = tskName;
+		this.parameterName = paramtrName;
+		this.simWindow = simWdw;
 		setLayout(new GridBagLayout());
 		
 		rangeList = new JList(new DefaultListModel());
@@ -49,6 +54,8 @@ public class NumericPanel extends JPanel implements IStatePanel
 			
 			public void actionPerformed(ActionEvent e)
 			{
+				if (simWindow.getSelectedScenario() == null)
+					return;
 				NumberRange range = null;
 				try
 				{
@@ -63,15 +70,15 @@ public class NumericPanel extends JPanel implements IStatePanel
 				if (range == null)
 					return;
 				
-				AbstractNumericStateSet stateHolder = NumericPanel.this.stateHolder;
+				AbstractNumericStateSet stateSet = (AbstractNumericStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName);
 				try
 				{
-					stateHolder.addRange(range);
+					stateSet.addRange(range);
 				}
 				catch(IllegalArgumentException e1)
 				{
 					JOptionPane.showMessageDialog(NumericPanel.this,
-												  "The range specified is outside the range of valid values for this type (" + String.valueOf(stateHolder.getLowerBound()) + " - " + String.valueOf(stateHolder.getUpperBound()) + ")",
+												  "The range specified is outside the range of valid values for this type (" + String.valueOf(stateSet.getLowerBound()) + " - " + String.valueOf(stateSet.getUpperBound()) + ")",
 												  "Type Range Exceeded",
 												  JOptionPane.ERROR_MESSAGE);
 				}
@@ -92,7 +99,10 @@ public class NumericPanel extends JPanel implements IStatePanel
 			
 			public void actionPerformed(ActionEvent e)
 			{
-				NumericPanel.this.stateHolder.removeRange(rangeList.getSelectedIndex());
+				if (simWindow.getSelectedScenario() == null)
+					return;
+				AbstractNumericStateSet stateSet = (AbstractNumericStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName);
+				stateSet.removeRange(rangeList.getSelectedIndex());
 				refreshPanel();
 			}
 		});
@@ -112,7 +122,9 @@ public class NumericPanel extends JPanel implements IStatePanel
 	public void refreshPanel()
 	{
 		((DefaultListModel) rangeList.getModel()).clear();
-		List ranges = stateHolder.getRanges();
+		if (simWindow.getSelectedScenario() == null)
+			return;
+		List ranges = ((AbstractNumericStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName)).getRanges();
 		for (Iterator it = ranges.iterator(); it.hasNext(); )
 			((DefaultListModel) rangeList.getModel()).addElement(it.next().toString());
 	}

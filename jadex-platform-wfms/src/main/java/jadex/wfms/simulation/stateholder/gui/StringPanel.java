@@ -1,5 +1,6 @@
 package jadex.wfms.simulation.stateholder.gui;
 
+import jadex.wfms.simulation.gui.SimulationWindow;
 import jadex.wfms.simulation.stateholder.StringStateSet;
 
 import java.awt.GridBagConstraints;
@@ -17,13 +18,17 @@ import javax.swing.JPanel;
 
 public class StringPanel extends JPanel implements IStatePanel
 {
-	private StringStateSet stateHolder;
-	
 	private JList stringList;
 	
-	public StringPanel(StringStateSet stateHolder)
+	private String taskName;
+	private String parameterName;
+	private SimulationWindow simWindow;
+	
+	public StringPanel(String tskName, String paramtrName, SimulationWindow simWdw)
 	{
-		this.stateHolder = stateHolder;
+		this.taskName = tskName;
+		this.parameterName = paramtrName;
+		this.simWindow = simWdw;
 		setLayout(new GridBagLayout());
 		
 		stringList = new JList(new DefaultListModel());
@@ -44,18 +49,20 @@ public class StringPanel extends JPanel implements IStatePanel
 			
 			public void actionPerformed(ActionEvent e)
 			{
-				String inputString = (String) JOptionPane.showInputDialog(StringPanel.this,
-						  "Please enter a new string:",
-						  "New String",
-						  JOptionPane.PLAIN_MESSAGE,
-						  null,
-						  null,
-						  null);
-				if (inputString == null)
-					return;
-				
-				StringStateSet stateHolder = StringPanel.this.stateHolder;
-				stateHolder.addString(inputString);
+				if (simWindow.getSelectedScenario() != null)
+				{
+					String inputString = (String) JOptionPane.showInputDialog(StringPanel.this,
+							  "Please enter a new string:",
+							  "New String",
+							  JOptionPane.PLAIN_MESSAGE,
+							  null,
+							  null,
+							  null);
+					if (inputString == null)
+						return;
+					
+					((StringStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName)).addString(inputString);
+				}
 				
 				refreshPanel();
 			}
@@ -74,7 +81,8 @@ public class StringPanel extends JPanel implements IStatePanel
 			
 			public void actionPerformed(ActionEvent e)
 			{
-				StringPanel.this.stateHolder.removeString((String) stringList.getSelectedValue());
+				if (simWindow.getSelectedScenario() != null)
+					((StringStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName)).removeString((String) stringList.getSelectedValue());
 				refreshPanel();
 			}
 		});
@@ -94,8 +102,11 @@ public class StringPanel extends JPanel implements IStatePanel
 	public void refreshPanel()
 	{
 		((DefaultListModel) stringList.getModel()).clear();
-		List strings = stateHolder.getStrings();
-		for (Iterator it = strings.iterator(); it.hasNext(); )
-			((DefaultListModel) stringList.getModel()).addElement(it.next());
+		if (simWindow.getSelectedScenario() != null)
+		{
+			List strings = ((StringStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName)).getStrings();
+			for (Iterator it = strings.iterator(); it.hasNext(); )
+				((DefaultListModel) stringList.getModel()).addElement(it.next());
+		}
 	}
 }

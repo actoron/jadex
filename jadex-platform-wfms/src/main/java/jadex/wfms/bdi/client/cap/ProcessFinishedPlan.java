@@ -9,19 +9,19 @@ import jadex.bdi.runtime.Plan;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
 
-public class AddActivityPlan extends Plan
+public class ProcessFinishedPlan extends Plan
 {
 	public void body()
 	{
-		final Action acAdded = (Action) getBeliefbase().getBelief("add_activity_controller").getFact();
-		if (acAdded == null)
+		final Action procFin = (Action) getBeliefbase().getBelief("process_finished_controller").getFact();
+		if (procFin == null)
 			return;
-		final IClientActivity act = (IClientActivity) getParameter("activity").getValue();
+		final String id = (String) getParameter("instance_id").getValue();
 		EventQueue.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				acAdded.actionPerformed(new ActionEvent(act, 0, null));
+				procFin.actionPerformed(new ActionEvent(id, 0, null));
 			}
 		});
 	}

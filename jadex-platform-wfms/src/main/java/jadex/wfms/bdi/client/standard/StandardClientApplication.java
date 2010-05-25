@@ -60,7 +60,7 @@ public class StandardClientApplication
 	
 	private WorkitemListComponent wlComponent;
 	
-	private ProcessModelComponent pmComponent;
+	private ProcessModelTreeComponent pmComponent;
 	
 	private AdminActivitiesComponent aaComponent;
 	
@@ -142,7 +142,7 @@ public class StandardClientApplication
 				mainSplitPane.setDividerLocation(0.45);
 				
 				wlComponent = new WorkitemListComponent();
-				pmComponent = new ProcessModelComponent();
+				pmComponent = new ProcessModelTreeComponent();
 				aaComponent = new AdminActivitiesComponent();
 				
 				showConnectDialog();

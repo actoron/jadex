@@ -1,19 +1,15 @@
 package jadex.wfms.simulation.gui;
 
 import jadex.bpmn.model.MActivity;
-import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MParameter;
 import jadex.commons.SGUI;
 import jadex.commons.collection.TreeNode;
-import jadex.gpmn.model.MGpmnModel;
-import jadex.wfms.simulation.ClientProcessMetaModel;
 import jadex.wfms.simulation.ModelTreeNode;
-import jadex.wfms.simulation.stateholder.IParameterStateSet;
+import jadex.wfms.simulation.Scenario;
 import jadex.wfms.simulation.stateholder.gui.IStatePanel;
 import jadex.wfms.simulation.stateholder.gui.StatePanelFactory;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -24,12 +20,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -40,15 +38,21 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeSelectionModel;
+import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
@@ -57,27 +61,31 @@ public class SimulationWindow extends JFrame
 {
 	private static final String PROCESS_MENU_NAME = "Process";
 	private static final String SIMULATION_MENU_NAME = "Simulation";
-	private static final String TEST_MENU_NAME = "Test";
 	
 	public static final String OPEN_MENU_ITEM_NAME = "Open...";
-	public static final String AUTO_FILL_MENU_ITEM_NAME = "Autofill States";
 	public static final String CLOSE_MENU_ITEM_NAME = "Close";
 	public static final String EXIT_MENU_ITEM_NAME = "Exit";
 	
 	public static final String START_MENU_ITEM_NAME = "Start";
 	public static final String STOP_MENU_ITEM_NAME = "Stop";
+	public static final String ADD_SCENARIO_ITEM_NAME = "Add Scenario";
+	public static final String RENAME_SCENARIO_ITEM_NAME = "Rename Scenario";
+	public static final String REMOVE_SCENARIO_ITEM_NAME = "Remove Scenario";
+	public static final String AUTO_FILL_MENU_ITEM_NAME = "Autofill States";
 	
 	private static final String IMAGE_PATH = "/" + SimulationWindow.class.getPackage().getName().replaceAll("\\.", "/") + "/images/";
-	private static final ImageIcon GPMN_ICON = createImageIcon(IMAGE_PATH + "gpmnicon.png");
-	private static final ImageIcon BPMN_ICON = createImageIcon(IMAGE_PATH + "bpmnicon.png");
-	private static final ImageIcon TASK_ICON = createImageIcon(IMAGE_PATH + "taskicon.png");
-	private static final ImageIcon PARAM_ICON = createImageIcon(IMAGE_PATH + "paramicon.png");
+	public static final ImageIcon GPMN_ICON = createImageIcon(IMAGE_PATH + "gpmnicon.png");
+	public static final ImageIcon BPMN_ICON = createImageIcon(IMAGE_PATH + "bpmnicon.png");
+	public static final ImageIcon TASK_ICON = createImageIcon(IMAGE_PATH + "taskicon.png");
+	public static final ImageIcon PARAM_ICON = createImageIcon(IMAGE_PATH + "paramicon.png");
 	
 	//new ImageIcon(SimulationWindow.class.getPackage().getName().replaceAll("\\.", "/") + "/images/gpmnicon.png");
 	
 	private static final JPanel EMPTY_PANEL = new JPanel();
 	
 	private static final TreeModel EMPTY_MODEL = new DefaultTreeModel(new DefaultMutableTreeNode("No Process"));
+	
+	private JSplitPane scenarioPane;
 	
 	private JSplitPane mainPane;
 	
@@ -89,9 +97,11 @@ public class SimulationWindow extends JFrame
 	
 	private JTree processModelTree;
 	
+	private JTable scenarioTable;
+	
 	private JMenuBar menuBar;
 	
-	public SimulationWindow()
+	public SimulationWindow(final TableModel scenarios)
 	{
 		super("Process Simulator");
 		
@@ -124,40 +134,18 @@ public class SimulationWindow extends JFrame
 		mainPane.setOneTouchExpandable(true);
 		logPane.setTopComponent(mainPane);
 		
+		scenarioPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		scenarioPane.setOneTouchExpandable(true);
+		mainPane.setLeftComponent(scenarioPane);
+		
 		processModelTree = new JTree(EMPTY_MODEL);
 		processModelTree.setSelectionModel(new DefaultTreeSelectionModel());
 		processModelTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-		processModelTree.setCellRenderer(new DefaultTreeCellRenderer()
-		{
-			public Component getTreeCellRendererComponent(JTree tree,
-					Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
-			{
-				super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-				if (value instanceof TreeNode)
-				{
-					Object data = ((TreeNode) value).getData();
-					if (data instanceof MGpmnModel)
-						setIcon(GPMN_ICON);
-					else if (data instanceof MBpmnModel)
-						setIcon(BPMN_ICON);
-					else if (data instanceof MActivity)
-						setIcon(TASK_ICON);
-					else if (data instanceof IParameterStateSet)
-					{
-						setIcon(PARAM_ICON);
-						if (((IParameterStateSet) data).getStateCount() == 0)
-							setForeground(new Color(128,128,128));
-					}
-					else if (data instanceof TreeNode)
-						setForeground(new Color(128,128,128));
-				}
-				
-				return this;
-			}
-		});
+		
 		processModelTree.addTreeSelectionListener(new TreeSelectionListener() {
 		    public void valueChanged(TreeSelectionEvent e)
 		    {
+		    	int loc = mainPane.getDividerLocation();
 		    	Object selection = processModelTree.getLastSelectedPathComponent();
 		    	if ((selection == null) || !(selection instanceof TreeNode))
 		    		return;
@@ -174,9 +162,10 @@ public class SimulationWindow extends JFrame
 		        	processModelTree.scrollPathToVisible(path);
 		        	processModelTree.setSelectionPath(path);
 		        }
-		        else if (node.getData() instanceof IParameterStateSet)
+		        else if (node.getData() instanceof MParameter)
 		        {
-		        	JPanel statePanel = StatePanelFactory.createStatePanel(((IParameterStateSet) node.getData()));
+		        	MActivity activity = (MActivity) ((ModelTreeNode) node).getParent().getData();
+		        	JPanel statePanel = StatePanelFactory.createStatePanel(activity, ((MParameter) node.getData()), SimulationWindow.this);
 		        	if (statePanel == null)
 		        		statePanel = EMPTY_PANEL;
 		        	mainPane.setRightComponent(statePanel);
@@ -185,24 +174,41 @@ public class SimulationWindow extends JFrame
 		        {
 		        	mainPane.setRightComponent(EMPTY_PANEL);
 		        }
+		        mainPane.setDividerLocation(loc);
 		    }
 		});
 
 		
 		JScrollPane treePane = new JScrollPane(processModelTree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		mainPane.setLeftComponent(treePane);
-		//mainPane.setLeftComponent(processModelTree);
+		scenarioPane.setRightComponent(treePane);
+		
+		scenarioTable = new JTable(scenarios);
+		DefaultListSelectionModel selectionModel = new DefaultListSelectionModel();
+		selectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		scenarioTable.setSelectionModel(selectionModel);
+		selectionModel.addListSelectionListener(new ListSelectionListener()
+		{
+			public void valueChanged(ListSelectionEvent e)
+			{
+				if (!mainPane.getRightComponent().equals(EMPTY_PANEL))
+					((IStatePanel) mainPane.getRightComponent()).refreshPanel();
+			}
+		});
+		scenarioTable.setEnabled(false);
+		JScrollPane scenarioScrollPane = new JScrollPane(scenarioTable);
+		scenarioPane.setLeftComponent(scenarioScrollPane);
 		
 		mainPane.setRightComponent(EMPTY_PANEL);
 		
 		buildMenuBar();
 		
 		pack();
-		setSize(600,400);
+		setSize(900,600);
 		setLocation(SGUI.calculateMiddlePosition(this));
 		setVisible(true);
 		logPane.setDividerLocation(0.8);
-		mainPane.setDividerLocation(0.4);
+		mainPane.setDividerLocation(0.5);
+		scenarioPane.setDividerLocation(0.3);
 		addLogMessage("Client Simulator started.");
 	}
 	
@@ -273,9 +279,20 @@ public class SimulationWindow extends JFrame
 		simMenu.add(stopMenuItem);
 		menuItems.put(STOP_MENU_ITEM_NAME, stopMenuItem);
 		
-		JMenu testMenu = new JMenu(TEST_MENU_NAME);
-		testMenu.setMnemonic(KeyEvent.VK_T);
-		menuBar.add(testMenu);
+		JMenuItem addScenarioMenuItem = new JMenuItem();
+		addScenarioMenuItem.setText(ADD_SCENARIO_ITEM_NAME);
+		simMenu.add(addScenarioMenuItem);
+		menuItems.put(ADD_SCENARIO_ITEM_NAME, addScenarioMenuItem);
+		
+		JMenuItem renameScenarioMenuItem = new JMenuItem();
+		renameScenarioMenuItem.setText(RENAME_SCENARIO_ITEM_NAME);
+		simMenu.add(renameScenarioMenuItem);
+		menuItems.put(RENAME_SCENARIO_ITEM_NAME, renameScenarioMenuItem);
+		
+		JMenuItem removeScenarioMenuItem = new JMenuItem();
+		removeScenarioMenuItem.setText(REMOVE_SCENARIO_ITEM_NAME);
+		simMenu.add(removeScenarioMenuItem);
+		menuItems.put(REMOVE_SCENARIO_ITEM_NAME, removeScenarioMenuItem);
 		
 		JMenuItem quickFillMenuItem = new JMenuItem();
 		quickFillMenuItem.setAction(new AbstractAction()
@@ -286,7 +303,7 @@ public class SimulationWindow extends JFrame
 			}
 		});
 		quickFillMenuItem.setText(AUTO_FILL_MENU_ITEM_NAME);
-		testMenu.add(quickFillMenuItem);
+		simMenu.add(quickFillMenuItem);
 		menuItems.put(AUTO_FILL_MENU_ITEM_NAME, quickFillMenuItem);
 	}
 	
@@ -313,6 +330,11 @@ public class SimulationWindow extends JFrame
 			setMenuItemAction(item, action);
 	}
 	
+	public void setCellRenderer(TreeCellRenderer renderer)
+	{		
+		processModelTree.setCellRenderer(renderer);
+	}
+	
 	public void addLogMessage(String msg)
 	{
 		logArea.append(msg + "\n");
@@ -331,11 +353,61 @@ public class SimulationWindow extends JFrame
 		processModelTree.repaint();
 	}
 	
+	public Scenario getSelectedScenario()
+	{
+		int row = scenarioTable.getSelectedRow();
+		int column = scenarioTable.getSelectedColumn();
+		if (row >= 0 && column >= 0)
+			return (Scenario) scenarioTable.getValueAt(row, column);
+		return null;
+	}
+	
+	public void selectFirstScenario()
+	{
+		if (scenarioTable.getRowCount() > 0)
+		{
+			scenarioTable.setRowSelectionInterval(0, 0);
+			scenarioTable.setColumnSelectionInterval(0, 0);
+		}
+	}
+	
+	public void selectNextScenario()
+	{
+		if (scenarioTable.getSelectedRow() >= 0 && scenarioTable.getSelectedRow() < scenarioTable.getRowCount() - 1)
+		{
+			int row = scenarioTable.getSelectedRow() + 1;
+			scenarioTable.setRowSelectionInterval(row, row);
+			scenarioTable.setColumnSelectionInterval(0, 0);
+		}
+	}
+	
+	public boolean isLastScenario()
+	{
+		return (scenarioTable.getSelectedRow() >= 0 && scenarioTable.getSelectedRow() == scenarioTable.getRowCount() - 1);
+	}
+	
+	public void setSelectedScenario(Scenario scenario)
+	{
+		int row = 0;
+		while ((row < scenarioTable.getRowCount()) && (!scenarioTable.getValueAt(row, 0).equals(scenario)))
+			++row;
+		if (row < scenarioTable.getRowCount())
+		{
+			scenarioTable.setRowSelectionInterval(row, row);
+			scenarioTable.setColumnSelectionInterval(0, 0);
+		}
+	}
+	
 	public void enableMenuItem(String name, boolean enable)
 	{
 		JMenuItem item = (JMenuItem) menuItems.get(name);
 		if (item != null)
 			item.setEnabled(enable);
+	}
+	
+	public void enableScenarioTable(boolean enable)
+	{
+		scenarioTable.setEnabled(enable);
 	}
 	
 	public void setProcessTreeModel(TreeModel model)

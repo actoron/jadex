@@ -1,52 +1,72 @@
 package jadex.wfms.simulation.stateholder.gui;
 
+import jadex.wfms.simulation.gui.SimulationWindow;
+import jadex.wfms.simulation.stateholder.BooleanStateSet;
+
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
-import jadex.wfms.simulation.stateholder.BooleanStateSet;
-
 public class BooleanStatePanel extends JPanel implements IStatePanel
 {
 	private JCheckBox falseBox;
 	private JCheckBox trueBox;
 	
-	private BooleanStateSet stateSet;
+	private String taskName;
+	private String parameterName;
+	private SimulationWindow simWindow;
 	
-	public BooleanStatePanel(final BooleanStateSet stateSet)
+	public BooleanStatePanel(String tskName, String paramtrName, SimulationWindow simWdw)
 	{
-		this.stateSet = stateSet;
+		this.taskName = tskName;
+		this.parameterName = paramtrName;
+		this.simWindow = simWdw;
 		falseBox = new JCheckBox();
-		falseBox.setSelected(stateSet.hasState(Boolean.FALSE));
+		
+		BooleanStateSet stateSet =  null;
+		if (simWindow.getSelectedScenario() != null)
+			stateSet = (BooleanStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName);
+		
+		if (stateSet != null)
+			falseBox.setSelected(stateSet.hasState(Boolean.FALSE));
 		falseBox.setAction(new AbstractAction("Include \"False\" state")
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if (((JCheckBox) e.getSource()).isSelected())
-					stateSet.addState(Boolean.FALSE);
-				else
-					stateSet.removeState(Boolean.FALSE);
+				if (simWindow.getSelectedScenario() != null)
+				{
+					if (((JCheckBox) e.getSource()).isSelected())
+						((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName)).addState(Boolean.FALSE);
+					else
+						((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName)).removeState(Boolean.FALSE);
+				}
 			}
 		});
 		
 		add(falseBox);
 		
 		trueBox = new JCheckBox();
-		trueBox.setSelected(stateSet.hasState(Boolean.TRUE));
+		if (stateSet != null)
+			falseBox.setSelected(stateSet.hasState(Boolean.TRUE));
 		trueBox.setAction(new AbstractAction("Include \"True\" state")
 		{
 			
 			public void actionPerformed(ActionEvent e)
 			{
-				if (((JCheckBox) e.getSource()).isSelected())
-					stateSet.addState(Boolean.TRUE);
-				else
-					stateSet.removeState(Boolean.TRUE);
+				if (simWindow.getSelectedScenario() != null)
+				{
+					if (((JCheckBox) e.getSource()).isSelected())
+						((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName)).addState(Boolean.TRUE);
+					else
+						((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName)).removeState(Boolean.TRUE);
+				}
 			}
 		});
 		add(trueBox);
+		
+		refreshPanel();
 	}
 	
 	/**
@@ -54,7 +74,19 @@ public class BooleanStatePanel extends JPanel implements IStatePanel
 	 */
 	public void refreshPanel()
 	{
-		falseBox.setSelected(stateSet.hasState(Boolean.FALSE));
-		trueBox.setSelected(stateSet.hasState(Boolean.TRUE));
+		if (simWindow.getSelectedScenario() != null)
+		{
+			falseBox.setEnabled(true);
+			trueBox.setEnabled(true);
+			falseBox.setSelected(((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName)).hasState(Boolean.FALSE));
+			trueBox.setSelected(((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName)).hasState(Boolean.TRUE));
+		}
+		else
+		{
+			falseBox.setSelected(false);
+			trueBox.setSelected(false);
+			falseBox.setEnabled(false);
+			trueBox.setEnabled(false);
+		}
 	}
 }

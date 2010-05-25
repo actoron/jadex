@@ -12,12 +12,19 @@ public class ModelNamesPlan extends AbstractWfmsPlan
 	public void body()
 	{
 		RequestModelNames reqMn = new RequestModelNames();
-		
-		IGoal authGoal = createGoal("reqcap.rp_initiate");
-		authGoal.getParameter("action").setValue(reqMn);
-		authGoal.getParameter("receiver").setValue(getPdInterface());
-		dispatchSubgoalAndWait(authGoal);
-		Done done = (Done) authGoal.getParameter("result").getValue();
+		IGoal reqGoal = createGoal("reqcap.rp_initiate");
+		reqGoal.getParameter("action").setValue(reqMn);
+		reqGoal.getParameter("receiver").setValue(getPdInterface());
+		try
+		{
+			dispatchSubgoalAndWait(reqGoal);
+		}
+		catch (GoalFailureException e)
+		{
+			e.printStackTrace();
+			throw e;
+		}
+		Done done = (Done) reqGoal.getParameter("result").getValue();
 		Set modelNames = ((RequestModelNames) done.getAction()).getModelNames();
 		getParameter("model_names").setValue(modelNames);
 	}

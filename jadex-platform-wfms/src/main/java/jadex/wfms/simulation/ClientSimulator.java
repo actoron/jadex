@@ -1,17 +1,20 @@
 package jadex.wfms.simulation;
 
-import jadex.wfms.client.IClient;
+import jadex.bdi.runtime.AgentEvent;
+import jadex.bdi.runtime.GoalFailureException;
+import jadex.bdi.runtime.IAgentListener;
+import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IGoal;
+import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
+import jadex.bpmn.model.MParameter;
+import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.SGUI;
+import jadex.commons.collection.TreeNode;
+import jadex.gpmn.model2.MGpmnModel;
+import jadex.wfms.bdi.client.standard.LoginDialog;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
-import jadex.wfms.listeners.ActivityEvent;
-import jadex.wfms.listeners.IActivityListener;
-import jadex.wfms.listeners.ILogListener;
-import jadex.wfms.listeners.IProcessListener;
-import jadex.wfms.listeners.IWorkitemListener;
-import jadex.wfms.listeners.LogEvent;
-import jadex.wfms.listeners.ProcessEvent;
-import jadex.wfms.listeners.WorkitemEvent;
-import jadex.wfms.service.IClientService;
 import jadex.wfms.simulation.gui.SimulationWindow;
 import jadex.wfms.simulation.stateholder.AbstractNumericStateSet;
 import jadex.wfms.simulation.stateholder.BooleanStateSet;
@@ -20,6 +23,8 @@ import jadex.wfms.simulation.stateholder.NumberRange;
 import jadex.wfms.simulation.stateholder.ProcessStateController;
 import jadex.wfms.simulation.stateholder.StringStateSet;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
@@ -30,153 +35,302 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
-import javax.swing.Timer;
+import javax.swing.JTree;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.tree.DefaultTreeCellRenderer;
 
-public class ClientSimulator implements IClient
+public class ClientSimulator
 {
-	private IClientService clientService;
+	private IBDIExternalAccess agent;
 	
 	private SimulationWindow simWindow;
 	
-	private String userName;
-	
 	private ProcessStateController activeStateController;
 	
-	private ClientProcessMetaModel clientProcessMetaModel;
+	private ClientMetaProcessModel clientMetaProcessModel;
 	
-	public ClientSimulator(IClientService clientService)
-	{
-		this(clientService, "TestUser");
-	}
+	private DefaultTableModel scenarios;
 	
-	public ClientSimulator(IClientService clientSrv, String userName)
+	public ClientSimulator(final IBDIExternalAccess agent)
 	{
-		this.activeStateController = null;
-		this.clientService = clientSrv;
-		this.userName = userName;
-		clientService.authenticate(this);
-		simWindow = new SimulationWindow();
-		
-		setupActions();
-		
-		this.clientService.getMonitoringService(this).addLogListener(this, new ILogListener()
+		Runnable init = new Runnable()
 		{
-			public void logMessage(final LogEvent event)
+			
+			public void run()
 			{
-				if (EventQueue.isDispatchThread())
-					simWindow.addLogMessage(event.getMessage());
-				else
+				ClientSimulator.this.agent = agent;
+				ClientSimulator.this.activeStateController = null;
+				ClientSimulator.this.scenarios = new DefaultTableModel(new Object[] { "Scenarios" }, 0)
 				{
-					EventQueue.invokeLater(new Runnable()
+					public void addRow(final Object[] rowData)
 					{
+						super.addRow(rowData);
+						((Scenario) rowData[0]).addStateChangeListener(new ChangeListener()
+						{
+							public void stateChanged(ChangeEvent e)
+							{
+								int row = 0;
+								while (row < getRowCount() && (!getValueAt(row, 0).equals(rowData[0])))
+									++row;
+								if (row < getRowCount())
+									fireTableRowsUpdated(row, row);
+							}
+						});
+					}
 					
-						public void run()
-						{
-							simWindow.addLogMessage(event.getMessage());
-						}
-					});
-				}
-			}
-			
-			
-		});
-		
-		this.clientService.getMonitoringService(this).addProcessListener(this, new IProcessListener()
-		{
-			public void processFinished(ProcessEvent event)
-			{
-				if ((activeStateController == null) || (activeStateController.finalState()))
-				{
-					EventQueue.invokeLater(new Runnable()
+					public void removeRow(int row)
 					{
-						public void run()
-						{
-							simWindow.enableMenuItem(SimulationWindow.STOP_MENU_ITEM_NAME, false);
-							simWindow.enableMenuItem(SimulationWindow.START_MENU_ITEM_NAME, true);
-							activeStateController = null;
-							simWindow.addLogMessage("Finished Simulation");
-						}
-					});
-				}
-				else
+						((Scenario) getValueAt(row, 0)).clearStateChangeListeners();
+						super.removeRow(row);
+					}
+				};
+				scenarios.addTableModelListener(new TableModelListener()
 				{
-					EventQueue.invokeLater(new Runnable()
+					public void tableChanged(TableModelEvent e)
 					{
-						public void run()
+						updateGui();
+					}
+				});
+				simWindow = new SimulationWindow(scenarios);
+				agent.addAgentListener(new IAgentListener()
+				{
+					public void agentTerminating(AgentEvent ae)
+					{
+					}
+					
+					public void agentTerminated(AgentEvent ae)
+					{
+						EventQueue.invokeLater(new Runnable()
 						{
-							activeStateController.nextState();
-							simWindow.addLogMessage("Setting new process state: " + activeStateController.toString());
-							clientService.startProcess(ClientSimulator.this, clientProcessMetaModel.getMainProcessName());
-						}
-					});
-				}
-			}
-		});
-		
-		clientService.addWorkitemListener(this, new IWorkitemListener()
-		{
-			
-			public void workitemRemoved(WorkitemEvent event)
-			{
-			}
-			
-			public void workitemAdded(WorkitemEvent event)
-			{
-				System.out.println("New workitem: " + event.getWorkitem().getName());
-				int type = event.getWorkitem().getType();
-				clientService.beginActivity(ClientSimulator.this, event.getWorkitem());
-			}
-		});
-		
-		clientService.addActivityListener(this, new IActivityListener()
-		{
-			public void activityAdded(ActivityEvent event)
-			{
-				IClientActivity activity = event.getActivity();
-				if (activity.getType() == IWorkitem.TEXT_INFO_WORKITEM_TYPE)
+							
+							public void run()
+							{
+								simWindow.dispose();
+							}
+						});
+					}
+				});
+				
+				boolean connected = false;
+				while (!connected)
 				{
-					simWindow.addLogMessage("Processing Info Activity: " + activity.getName());
-				}
-				else if (activity.getType() == IWorkitem.DATA_FETCH_WORKITEM_TYPE)
-				{
-					Map parameterStates = activeStateController.getActivityState(activity.getName());
-					activity.setMultipleParameterValues(parameterStates);
+					LoginDialog loginDialog = new LoginDialog(simWindow);
+					loginDialog.setLocation(SGUI.calculateMiddlePosition(loginDialog));
+					loginDialog.setVisible(true);
+					try
+					{
+						IGoal connect = agent.createGoal("clientcap.connect");
+						connect.getParameter("user_name").setValue(loginDialog.getUserName());
+						connect.getParameter("auth_token").setValue(loginDialog.getPassword());
+						agent.dispatchTopLevelGoalAndWait(connect);
+						connected = true;
+					}
+					catch (GoalFailureException e)
+					{
+						e.printStackTrace();
+					}
 				}
 				
-				clientService.finishActivity(ClientSimulator.this, activity);
+				setupActions();
+				
+				
+				//TODO: Add Log
+				/*this.clientService.getMonitoringService(this).addLogListener(this, new ILogListener()
+				{
+					public void logMessage(final LogEvent event)
+					{
+						if (EventQueue.isDispatchThread())
+							simWindow.addLogMessage(event.getMessage());
+						else
+						{
+							EventQueue.invokeLater(new Runnable()
+							{
+							
+								public void run()
+								{
+									simWindow.addLogMessage(event.getMessage());
+								}
+							});
+						}
+					}
+					
+					
+				});*/
+				
+				/*this.clientService.getMonitoringService(this).addProcessListener(this, new IProcessListener()
+				{
+					public void processFinished(ProcessEvent event)
+					{
+						if ((activeStateController == null) || (activeStateController.finalState()))
+						{
+							EventQueue.invokeLater(new Runnable()
+							{
+								public void run()
+								{
+									simWindow.enableMenuItem(SimulationWindow.STOP_MENU_ITEM_NAME, false);
+									simWindow.enableMenuItem(SimulationWindow.START_MENU_ITEM_NAME, true);
+									activeStateController = null;
+									simWindow.addLogMessage("Finished Simulation");
+								}
+							});
+						}
+						else
+						{
+							EventQueue.invokeLater(new Runnable()
+							{
+								public void run()
+								{
+									activeStateController.nextState();
+									simWindow.addLogMessage("Setting new process state: " + activeStateController.toString());
+									clientService.startProcess(ClientSimulator.this, clientProcessMetaModel.getMainProcessName());
+								}
+							});
+						}
+					}
+				});*/
+				
+				agent.getBeliefbase().getBelief("clientcap.process_finished_controller").setFact(new AbstractAction()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						if ((activeStateController == null) || (activeStateController.finalState()))
+						{
+							if (simWindow.isLastScenario())
+								EventQueue.invokeLater(new Runnable()
+								{
+									public void run()
+									{
+										editMode();
+										activeStateController = null;
+										simWindow.addLogMessage("Finished Simulation");
+									}
+								});
+							else
+								EventQueue.invokeLater(new Runnable()
+								{
+									public void run()
+									{
+										simWindow.selectNextScenario();
+										while (simWindow.getSelectedScenario().createProcessStateController().getStateCount() == 0)
+											simWindow.selectNextScenario();
+										simWindow.addLogMessage("Selecting scenario: " + simWindow.getSelectedScenario().getName());
+										activeStateController = simWindow.getSelectedScenario().createProcessStateController();
+										startProcess();
+									}
+								});
+						}
+						else
+						{
+							EventQueue.invokeLater(new Runnable()
+							{
+								public void run()
+								{
+									activeStateController.nextState();
+									simWindow.addLogMessage("Setting new process state: " + activeStateController.toString());
+									startProcess();
+								}
+							});
+						}
+					}
+				});
+				IGoal subscrgoal = agent.createGoal("clientcap.start_process_event_subscription");
+				agent.dispatchTopLevelGoal(subscrgoal);
+				
+				agent.getBeliefbase().getBelief("clientcap.add_workitem_controller").setFact(new AbstractAction()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						IWorkitem workitem = (IWorkitem) e.getSource();
+						IGoal beginActivity = agent.createGoal("clientcap.begin_activity");
+						beginActivity.getParameter("workitem").setValue(workitem);
+						agent.dispatchTopLevelGoal(beginActivity);
+					}
+				});
+				subscrgoal = agent.createGoal("clientcap.start_workitem_subscription");
+				agent.dispatchTopLevelGoal(subscrgoal);
+				
+				agent.getBeliefbase().getBelief("clientcap.add_activity_controller").setFact(new AbstractAction()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						IClientActivity activity = (IClientActivity) e.getSource();
+						simWindow.addLogMessage("Processing Activity: " + activity.getName());
+						Map parameterStates = activeStateController.getActivityState(activity.getName());
+						if (parameterStates != null)
+							activity.setMultipleParameterValues(parameterStates);
+						
+						IGoal finishActivity = agent.createGoal("clientcap.finish_activity");
+						finishActivity.getParameter("activity").setValue(activity);
+						agent.dispatchTopLevelGoal(finishActivity);
+					}
+				});
+				subscrgoal = agent.createGoal("clientcap.start_activity_subscription");
+				agent.dispatchTopLevelGoal(subscrgoal);
+				
+				simWindow.setCellRenderer(new DefaultTreeCellRenderer()
+				{
+					public Component getTreeCellRendererComponent(JTree tree,
+							Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
+					{
+						super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+						if (value instanceof TreeNode)
+						{
+							Object data = ((TreeNode) value).getData();
+							if (data instanceof MGpmnModel)
+								setIcon(SimulationWindow.GPMN_ICON);
+							else if (data instanceof MBpmnModel)
+								setIcon(SimulationWindow.BPMN_ICON);
+							else if (data instanceof MActivity)
+								setIcon(SimulationWindow.TASK_ICON);
+							else if (data instanceof MParameter)
+							{
+								setIcon(SimulationWindow.PARAM_ICON);
+								MActivity task = (MActivity) ((ModelTreeNode)((ModelTreeNode)value).getParent()).getData();
+								if ((simWindow.getSelectedScenario() == null) || ((IParameterStateSet) simWindow.getSelectedScenario().getTaskParameters(task.getName()).get(((MParameter) data).getName())).getStateCount() == 0)
+									setForeground(new Color(128,128,128));
+							}
+							else if (data instanceof TreeNode)
+								setForeground(new Color(128,128,128));
+						}
+						
+						return this;
+					}
+				});
+				
+				updateGui();
 			}
-			
-			public void activityRemoved(ActivityEvent event)
-			{
-			}
-		});
+		};
+		
+		EventQueue.invokeLater(init);
 	}
 	
-	public IClientService getClientService()
+	protected ILoadableComponentModel loadModelFromPath(String path)
 	{
-		return clientService;
-	}
-	
-	public String getUserName()
-	{
-		return userName;
+		IGoal reqMod = agent.createGoal("request_model");
+		reqMod.getParameter("model_name").setValue(path);
+		reqMod.getParameter("model_name_path").setValue(Boolean.TRUE);
+		agent.dispatchTopLevelGoalAndWait(reqMod);
+		return (ILoadableComponentModel) reqMod.getParameter("model").getValue();
 	}
 	
 	private void updateGui()
 	{
-		if (clientProcessMetaModel != null)
+		if (simWindow.getSelectedScenario() != null)
 		{
-			long stateCount = clientProcessMetaModel.createProcessStateController().getStateCount();
-			if (stateCount > 0)
-				simWindow.enableMenuItem(SimulationWindow.START_MENU_ITEM_NAME, true);
-			else
-				simWindow.enableMenuItem(SimulationWindow.START_MENU_ITEM_NAME, false);
-			simWindow.setStatusBar("Process States: " + String.valueOf(stateCount));
+			simWindow.setStatusBar("Process States: " + String.valueOf(getStateCount()));
 		}
 		else
 			simWindow.setStatusBar(" ");
+		
+		if (activeStateController == null)
+			editMode();
+		else
+			simMode();
+		
 		simWindow.refreshParameterStates();
 	}
 	
@@ -187,24 +341,26 @@ public class ClientSimulator implements IClient
 			
 			public void actionPerformed(ActionEvent e)
 			{
-				Set modelNames = clientService.getModelNames(ClientSimulator.this);
+				IGoal reqMod = agent.createGoal("clientcap.request_model_names");
+				agent.dispatchTopLevelGoalAndWait(reqMod);
+				Set modelNames = (Set) reqMod.getParameter("model_names").getValue();
 				String modelName = simWindow.showProcessPickerDialog(modelNames);
-				System.out.println(modelName);
 				if (modelName == null)
 					return;
-				ClientProcessMetaModel model = new ClientProcessMetaModel();
+				ClientMetaProcessModel model = new ClientMetaProcessModel();
 				try
 				{
-					model.setRootModel(modelName, clientService.getProcessDefinitionService(ClientSimulator.this).getProcessModel(ClientSimulator.this, modelName));
+					IGoal modelReq = agent.createGoal("clientcap.request_model");
+					modelReq.getParameter("model_name").setValue(modelName);
+					agent.dispatchTopLevelGoalAndWait(modelReq);
+					model.setRootModel(ClientSimulator.this, modelName, (ILoadableComponentModel) modelReq.getParameter("model").getValue());
 					simWindow.setProcessTreeModel(model);
-					model.addStateChangeListener(new ChangeListener()
-					{
-						public void stateChanged(ChangeEvent e)
-						{
-							updateGui();
-						}
-					});
-					clientProcessMetaModel = model;
+					clientMetaProcessModel = model;
+					while (scenarios.getRowCount() > 0)
+						scenarios.removeRow(0);
+					Scenario scenario = clientMetaProcessModel.createScenario("Unnamed_Scenario");
+					scenarios.addRow(new Object[] {scenario} );
+					simWindow.setSelectedScenario(scenario);
 					updateGui();
 				}
 				catch (Exception e1)
@@ -219,8 +375,11 @@ public class ClientSimulator implements IClient
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				while (scenarios.getRowCount() > 0)
+					scenarios.removeRow(0);
 				simWindow.setProcessTreeModel(null);
-				clientProcessMetaModel = null;
+				clientMetaProcessModel = null;
+				updateGui();
 			}
 		});
 		
@@ -228,12 +387,70 @@ public class ClientSimulator implements IClient
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				simWindow.enableMenuItem(SimulationWindow.START_MENU_ITEM_NAME, false);
-				simWindow.enableMenuItem(SimulationWindow.STOP_MENU_ITEM_NAME, true);
-				activeStateController = clientProcessMetaModel.createProcessStateController();
+				simMode();
+				simWindow.selectFirstScenario();
+				while (simWindow.getSelectedScenario().createProcessStateController().getStateCount() == 0)
+					simWindow.selectNextScenario();
+				activeStateController = simWindow.getSelectedScenario().createProcessStateController();
 				simWindow.addLogMessage("Starting Simulation");
 				simWindow.addLogMessage("Setting process state: " + activeStateController.toString());
-				clientService.startProcess(ClientSimulator.this, clientProcessMetaModel.getMainProcessName());
+				startProcess();
+			}
+		});
+		
+		simWindow.setMenuItemAction(SimulationWindow.ADD_SCENARIO_ITEM_NAME, new AbstractAction()
+		{
+			
+			public void actionPerformed(ActionEvent e)
+			{
+				String name = "Unnamed Scenario";
+				if (hasScenario(name))
+				{
+					String base = name;
+					long count = 1;
+					do
+						name = base + String.valueOf(count++);
+					while (hasScenario(name));
+				}
+				name = JOptionPane.showInputDialog(simWindow, "Scenario Name", name);
+				if (hasScenario(name))
+					JOptionPane.showMessageDialog(simWindow,
+						    "Duplicate Scenario Name: " + name,
+						    "Error",
+						    JOptionPane.ERROR_MESSAGE);
+				else
+					scenarios.addRow(new Object[] {clientMetaProcessModel.createScenario(name)});
+			}
+		});
+		
+		simWindow.setMenuItemAction(SimulationWindow.RENAME_SCENARIO_ITEM_NAME, new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (simWindow.getSelectedScenario() == null)
+					return;
+				
+				String name = JOptionPane.showInputDialog(simWindow, "Scenario Name", simWindow.getSelectedScenario().getName());
+				if (hasScenario(name))
+					JOptionPane.showMessageDialog(simWindow,
+						    "Duplicate Scenario Name: " + name,
+						    "Error",
+						    JOptionPane.ERROR_MESSAGE);
+				else
+					simWindow.getSelectedScenario().setName(name);
+			}
+		});
+		
+		simWindow.setMenuItemAction(SimulationWindow.REMOVE_SCENARIO_ITEM_NAME, new AbstractAction()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (simWindow.getSelectedScenario() == null)
+					return;
+				int row = 0;
+				while (!scenarios.getValueAt(row, 0).equals(simWindow.getSelectedScenario()))
+						++row;
+				scenarios.removeRow(row);
 			}
 		});
 		
@@ -245,9 +462,9 @@ public class ClientSimulator implements IClient
 			{
 				if (random == null)
 					random = new Random();
-				if (clientProcessMetaModel != null)
+				if (simWindow.getSelectedScenario() != null)
 				{
-					List pSets = clientProcessMetaModel.getParameterSets();
+					List pSets = simWindow.getSelectedScenario().getParameterSets();
 					for (Iterator it = pSets.iterator(); it.hasNext(); )
 					{
 						IParameterStateSet pSet = (IParameterStateSet) it.next();
@@ -270,5 +487,57 @@ public class ClientSimulator implements IClient
 			}
 		});
 	}
-	private Timer timer;
+	
+	private void editMode()
+	{
+		simWindow.enableMenuItem(SimulationWindow.STOP_MENU_ITEM_NAME, false);
+		if (getStateCount() > 0)
+			simWindow.enableMenuItem(SimulationWindow.START_MENU_ITEM_NAME, true);
+		else
+			simWindow.enableMenuItem(SimulationWindow.START_MENU_ITEM_NAME, false);
+		
+		boolean enableScenarioMgmt = clientMetaProcessModel != null;
+		simWindow.enableMenuItem(SimulationWindow.ADD_SCENARIO_ITEM_NAME, enableScenarioMgmt);
+		simWindow.enableMenuItem(SimulationWindow.RENAME_SCENARIO_ITEM_NAME, enableScenarioMgmt);
+		simWindow.enableMenuItem(SimulationWindow.REMOVE_SCENARIO_ITEM_NAME, enableScenarioMgmt);
+		
+		simWindow.enableMenuItem(SimulationWindow.AUTO_FILL_MENU_ITEM_NAME, simWindow.getSelectedScenario() != null);
+		
+		simWindow.enableScenarioTable(true);
+	}
+	
+	private void simMode()
+	{
+		simWindow.enableMenuItem(SimulationWindow.STOP_MENU_ITEM_NAME, true);
+		simWindow.enableMenuItem(SimulationWindow.START_MENU_ITEM_NAME, false);
+		simWindow.enableScenarioTable(false);
+		
+		simWindow.enableMenuItem(SimulationWindow.ADD_SCENARIO_ITEM_NAME, false);
+		simWindow.enableMenuItem(SimulationWindow.RENAME_SCENARIO_ITEM_NAME, false);
+		simWindow.enableMenuItem(SimulationWindow.REMOVE_SCENARIO_ITEM_NAME, false);
+		simWindow.enableMenuItem(SimulationWindow.AUTO_FILL_MENU_ITEM_NAME, false);
+	}
+	
+	private long getStateCount()
+	{
+		long stateCount = 0;
+		for (int i = 0; i < scenarios.getRowCount(); ++i)
+			stateCount += ((Scenario) scenarios.getValueAt(i, 0)).createProcessStateController().getStateCount();
+		return stateCount;
+	}
+	
+	private void startProcess()
+	{
+		IGoal startProcess = agent.createGoal("clientcap.start_process");
+		startProcess.getParameter("process_name").setValue(clientMetaProcessModel.getMainProcessName());
+		agent.dispatchTopLevelGoal(startProcess);
+	}
+	
+	private boolean hasScenario(String name)
+	{
+		for (int i = 0; i < scenarios.getRowCount(); ++i)
+			if (((Scenario) scenarios.getValueAt(i, 0)).getName().equals(name))
+					return true;
+		return false;
+	}
 }

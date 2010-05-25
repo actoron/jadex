@@ -99,6 +99,23 @@
 				</goal>
 			</trigger>
 		</plan>
+		
+		<!-- Handle process event subscription requests. -->
+		<plan name="start_process_event_subscription_plan">
+			<!-- The requesting agent. -->
+			<parameter name="initiator" class="jadex.bridge.IComponentIdentifier">
+				<goalmapping ref="sp_start_subscription.initiator"/>
+			</parameter>
+			<parameter name="subscription_id" class="Object">
+				<goalmapping ref="sp_start_subscription.subscription_id"/>
+			</parameter>
+			<body class="StartProcessEventSubscriptionPlan" />
+			<trigger>
+				<goal ref="subcap.sp_start_subscription">
+					<match>$goal.getParameter("subscription").getValue() instanceof SubscribeProcessEvents</match>
+				</goal>
+			</trigger>
+		</plan>
 	</plans>
 
 	<events>

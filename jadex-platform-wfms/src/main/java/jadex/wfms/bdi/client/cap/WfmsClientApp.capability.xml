@@ -13,6 +13,7 @@
 		<import>jadex.wfms.bdi.*</import>
 		<import>jadex.wfms.bdi.ontology.*</import>
 		<import>jadex.wfms.client.*</import>
+		<import>jadex.bridge.ILoadableComponentModel</import>
 	</imports>
 	
 	<capabilities>
@@ -36,6 +37,7 @@
 		<belief name="remove_process_model_controller" class="javax.swing.Action" />
 		<belief name="add_user_activity_controller" class="javax.swing.Action" />
 		<belief name="remove_user_activity_controller" class="javax.swing.Action" />
+		<belief name="process_finished_controller" class="javax.swing.Action" />
 		<belief name="lost_connection_controller" class="javax.swing.Action" />
 	</beliefs>
 	
@@ -104,6 +106,12 @@
 			<parameter name="model_names" class="Set" direction="out" />
 		</achievegoal>
 		
+		<achievegoal name="request_model" exported="true">
+			<parameter name="model_name" class="String" direction="in" />
+			<parameter name="model_name_path" class="boolean" direction="in" optional="true"/>
+			<parameter name="model" class="ILoadableComponentModel" direction="out" />
+		</achievegoal>
+		
 		<achievegoal name="request_loadable_model_paths" exported="true">
 			<parameter name="loadable_model_paths" class="Set" direction="out" />
 		</achievegoal>
@@ -139,6 +147,8 @@
 		
 		<achievegoal name="start_user_activities_subscription" exported="true" />
 		
+		<achievegoal name="start_process_event_subscription" exported="true" />
+		
 			<!-- Subscription Events (optional: use controllers) -->
 		<achievegoal name="add_user_activity" exported="true">
 			<parameter name="user_name" class="String" exported="true" />
@@ -148,6 +158,10 @@
 		<achievegoal name="remove_user_activity" exported="true">
 			<parameter name="user_name" class="String" exported="true" />
 			<parameter name="activity" class="IClientActivity" exported="true"/>
+		</achievegoal>
+		
+		<achievegoal name="handle_process_finished" exported="true">
+			<parameter name="instance_id" class="String" exported="true" />
 		</achievegoal>
 		
 		
@@ -314,6 +328,19 @@
 			</trigger>
 		</plan>
 		
+		<plan name="request_model_plan">
+			<parameter name="model_name" class="String" direction="in">
+				<goalmapping ref="request_model.model_name"/>
+			</parameter>
+			<parameter name="model" class="ILoadableComponentModel" direction="out">
+				<goalmapping ref="request_model.model"/>
+			</parameter>
+			<body class="ModelPlan" />
+			<trigger>
+				<goal ref="request_model" />
+			</trigger>
+		</plan>
+		
 		<plan name="request_loadable_model_paths_plan">
 			<parameter name="loadable_model_paths" class="Set" direction="out">
 				<goalmapping ref="request_loadable_model_paths.loadable_model_paths"/>
@@ -402,6 +429,13 @@
 			</trigger>
 		</plan>
 		
+		<plan name="start_process_event_subscription_plan">
+			<body class="ProcessEventSubscriptionPlan" />
+			<trigger>
+				<goal ref="start_process_event_subscription" />
+			</trigger>
+		</plan>
+		
 			<!-- Subscription controller plans -->
 		<plan name="add_user_activity_plan" priority="-1">
 			<parameter name="user_name" class="String">
@@ -429,6 +463,18 @@
 			</trigger>
 		</plan>
 		
+		<plan name="add_process_finished_plan" priority="-1">
+			<parameter name="user_name" class="String">
+				<goalmapping ref="add_user_activity.user_name"/>
+			</parameter>
+			<parameter name="instance_id" class="String">
+				<goalmapping ref="handle_process_finished.instance_id"/>
+			</parameter>
+			<body class="ProcessFinishedPlan" />
+			<trigger>
+				<goal ref="handle_process_finished" />
+			</trigger>
+		</plan>
 		
 		
 		<!-- Misc -->

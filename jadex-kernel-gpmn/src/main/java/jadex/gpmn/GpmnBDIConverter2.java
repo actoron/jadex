@@ -10,6 +10,8 @@ import jadex.commons.SUtil;
 import jadex.gpmn.model2.MActivationEdge;
 import jadex.gpmn.model2.MActivationPlan;
 import jadex.gpmn.model2.MBpmnPlan;
+import jadex.gpmn.model2.MContext;
+import jadex.gpmn.model2.MContextElement;
 import jadex.gpmn.model2.MGoal;
 import jadex.gpmn.model2.MGpmnModel;
 import jadex.gpmn.model2.MPlanEdge;
@@ -127,43 +129,31 @@ public class GpmnBDIConverter2
 	public void doConvert(MGpmnModel model, final ClassLoader classloader, final IOAVState state, final Object scopehandle)
 	{		
 		// Handle package and imports here?!
-		// todo:
+		// TODO:
 		
 		// Create default configuration
 		Object confighandle = state.createObject(OAVBDIMetaModel.configuration_type);
 		state.setAttributeValue(confighandle, OAVBDIMetaModel.modelelement_has_name, "default");
 		state.addAttributeValue(scopehandle, OAVBDIMetaModel.capability_has_configurations, confighandle);
 		
-		// TODO: Handle beliefs
-		/*List artifacts = proc.getArtifacts();
-		if(artifacts!=null)
+		MContext modelcontext = model.getContext();
+		if(modelcontext!=null)
 		{
-			for(int i=0; i<artifacts.size(); i++)
+			List elements = modelcontext.getElements();
+			for(int i=0; i<elements.size(); i++)
 			{
-				MArtifact art = (MArtifact)artifacts.get(i);
-				if(art instanceof MContext)
+				MContextElement element = (MContextElement)elements.get(i);
+				
+				if(!element.isSet())
 				{
-					MContext cont = (MContext)art;
-					List params = cont.getParameters();
-					if(params!=null)
-					{
-						for(int j=0; j<params.size(); j++)
-						{
-							MParameter param = (MParameter)params.get(j);
-							
-							if(!param.isSet())
-							{
-								createBelief(state, scopehandle, param.getName(), param.getClassName(), param.getInitialValueDescription());
-							}
-							else
-							{
-								createBeliefSet(state, scopehandle, param.getName(), param.getClassName(), null, param.getInitialValueDescription());
-							}
-						}
-					}
+					createBelief(state, scopehandle, element.getName(), element.getType(), element.getValue());
+				}
+				else
+				{
+					createBeliefSet(state, scopehandle, element.getName(), element.getType(), null, element.getValue());
 				}
 			}
-		}*/
+		}
 		
 		// --- Plan Edge representation ---
 		// Prepare goal->activation_plan map

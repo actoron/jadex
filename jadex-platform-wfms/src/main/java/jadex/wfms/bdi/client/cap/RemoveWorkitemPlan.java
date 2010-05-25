@@ -13,6 +13,8 @@ public class RemoveWorkitemPlan extends Plan
 	public void body()
 	{
 		final Action wiRemoved = (Action) getBeliefbase().getBelief("remove_workitem_controller").getFact();
+		if (wiRemoved == null)
+			return;
 		final IWorkitem wi = (IWorkitem) getParameter("workitem").getValue();
 		EventQueue.invokeLater(new Runnable()
 		{

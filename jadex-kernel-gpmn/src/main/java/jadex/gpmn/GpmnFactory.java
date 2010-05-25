@@ -7,7 +7,9 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.gpmn.model2.MGpmnModel;
 import jadex.service.IService;
@@ -15,6 +17,8 @@ import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
@@ -47,6 +51,9 @@ public class GpmnFactory implements IComponentFactory, IService
 
 	/** The gpmn loader. */
 	protected GpmnModelLoader loader;
+	
+	/** The legacy gpmn bdiagent converter. */
+	protected GpmnBDIConverter legacyconverter;
 
 	/** The gpmn 2 bdiagent converter. */
 	protected GpmnBDIConverter2 converter;
@@ -67,6 +74,7 @@ public class GpmnFactory implements IComponentFactory, IService
 		this.properties	= properties;
 		this.container = container;
 		this.loader = new GpmnModelLoader();
+		this.legacyconverter = new GpmnBDIConverter();
 		this.converter = new GpmnBDIConverter2();
 		
 		for(Iterator it=container.getServices(IComponentFactory.class).iterator(); 
@@ -157,13 +165,25 @@ public class GpmnFactory implements IComponentFactory, IService
 	public ILoadableComponentModel loadModel(String model, String[] imports)
 	{
 		// Todo: support imports for GPMN models (-> use abstract model loader). 
-		MGpmnModel ret = null;
+		ILoadableComponentModel ret = null;
 		try
 		{
-			ret = GpmnXMLReader2.read(model, ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader(), null);
 			ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 			ClassLoader	cl = libservice.getClassLoader();
-			ret.setClassloader(cl);
+			ResourceInfo rinfo = SUtil.getResourceInfo0(model, cl);
+			BufferedReader br = new BufferedReader(new InputStreamReader(rinfo.getInputStream()));
+			br.readLine();
+			if (br.readLine().contains("version=\"2.0\""))
+			{
+				ret = GpmnXMLReader2.read(model, cl, null);
+				((jadex.gpmn.model2.MGpmnModel) ret).setClassloader(cl);
+			}
+			else
+			{
+				ret = GpmnXMLReader.read(model, cl, null);
+				((jadex.gpmn.model.MGpmnModel) ret).setClassloader(cl);
+			}
+			
 		}
 		catch(Exception e)
 		{
@@ -261,8 +281,12 @@ public class GpmnFactory implements IComponentFactory, IService
 	{
 		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 		
-		MGpmnModel gmodel = (MGpmnModel)model;
-		OAVAgentModel amodel	= converter.convertGpmnModelToBDIAgents(gmodel, libservice.getClassLoader());
+		//MGpmnModel gmodel = (MGpmnModel)model;
+		OAVAgentModel amodel = null;
+		if (model instanceof jadex.gpmn.model2.MGpmnModel)
+			amodel	= converter.convertGpmnModelToBDIAgents((jadex.gpmn.model2.MGpmnModel)model, libservice.getClassLoader());
+		else
+			amodel	= legacyconverter.convertGpmnModelToBDIAgents((jadex.gpmn.model.MGpmnModel)model, libservice.getClassLoader());
 
 		return factory.createComponentInstance(adapter, amodel, config, arguments, parent);
 		

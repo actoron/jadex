@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_HW0qISxVEd-fR-V1BYdsIg" iD="_HW0qICxVEd-fR-V1BYdsIg">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_H1s-gCxVEd-fR-V1BYdsIg" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_H1s-gSxVEd-fR-V1BYdsIg" key="Description" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_H1s-gSxVEd-fR-V1BYdsIg" key="Description" value="Prints the goal"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_H1wB0CxVEd-fR-V1BYdsIg" key="Package" value=""/>
   </eAnnotations>
-  <pools xmi:type="bpmn:Pool" xmi:id="_HXWOkSxVEd-fR-V1BYdsIg" iD="_HXWOkCxVEd-fR-V1BYdsIg" name="Body">
+  <pools xmi:type="bpmn:Pool" xmi:id="_HXWOkSxVEd-fR-V1BYdsIg" iD="_HXWOkCxVEd-fR-V1BYdsIg" name="body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_HXW1oSxVEd-fR-V1BYdsIg" iD="_HXW1oCxVEd-fR-V1BYdsIg" outgoingEdges="_LLX50SxVEd-fR-V1BYdsIg" incomingEdges="_KMG1MSxVEd-fR-V1BYdsIg" name="PrintGoalTask" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_I94HgCxVEd-fR-V1BYdsIg" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_I94ukCxVEd-fR-V1BYdsIg" key="class" value="jadex.bpmn.runtime.task.PrintTask"/>

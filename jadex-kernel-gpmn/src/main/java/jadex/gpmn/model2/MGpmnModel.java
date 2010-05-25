@@ -58,6 +58,9 @@ public class MGpmnModel implements ICacheableModel, ILoadableComponentModel
 	/** The plan edges. */
 	protected List planedges;
 	
+	/** The context. */
+	protected MContext context;
+	
 	public MGpmnModel()
 	{
 		this.imports = new ArrayList();
@@ -467,5 +470,23 @@ public class MGpmnModel implements ICacheableModel, ILoadableComponentModel
 	public Map getSubprocesses()
 	{
 		return subprocesses;
+	}
+
+	/**
+	 *  Get the context.
+	 *  @return The context.
+	 */
+	public MContext getContext()
+	{
+		return context;
+	}
+
+	/**
+	 *  Set the context.
+	 *  @param context The context to set.
+	 */
+	public void setContext(MContext context)
+	{
+		this.context = context;
 	}
 }

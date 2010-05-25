@@ -127,7 +127,7 @@ public class GpmnProcessService implements IExecutionService, IService
 		try
 		{
 			IComponentFactory factory = (IComponentFactory) wfms.getService(IComponentFactory.class, "gpmn_factory");
-			ret = factory.loadModel(ls.getClassLoader().getResource(filename).getPath(), imports);
+			ret = factory.loadModel(filename, imports);
 		}
 		catch(Exception e)
 		{

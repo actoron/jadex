@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MParameter;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.collection.TreeNode;
 import jadex.wfms.simulation.stateholder.IParameterStateSet;
@@ -59,14 +60,14 @@ public class ModelTreeNode extends TreeNode
 			if (ret == null)
 			{
 				ret = model.getFilename();
-				ret = ClientProcessMetaModel.resolveProcessName(model);
+				ret = ClientMetaProcessModel.resolveProcessName(model);
 			}
 			return ret;
 		}
 		else if (data instanceof MActivity)
 			return ((MActivity) data).getName();
-		else if (data instanceof IParameterStateSet)
-			return ((IParameterStateSet) data).getParameterName() + " (" + ((IParameterStateSet) data).getParameterType().getSimpleName() + ")";
+		else if (data instanceof MParameter)
+			return ((MParameter) data).getName() + " (" + ((MParameter) data).getClazz().getSimpleName() + ")";
 		else
 			return String.valueOf(data);
 	}

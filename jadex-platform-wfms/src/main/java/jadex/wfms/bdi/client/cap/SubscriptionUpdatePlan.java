@@ -4,6 +4,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.wfms.bdi.ontology.InformActivityAdded;
 import jadex.wfms.bdi.ontology.InformActivityRemoved;
+import jadex.wfms.bdi.ontology.InformProcessFinished;
 import jadex.wfms.bdi.ontology.InformProcessModelAdded;
 import jadex.wfms.bdi.ontology.InformProcessModelRemoved;
 import jadex.wfms.bdi.ontology.InformUserActivityAdded;
@@ -74,6 +75,13 @@ public class SubscriptionUpdatePlan extends Plan
 			IGoal pmRemovedGoal = createGoal("remove_process_model");
 			pmRemovedGoal.getParameter("model_name").setValue(pmRemoved.getModelName());
 			dispatchSubgoalAndWait(pmRemovedGoal);
+		}
+		else if (update instanceof InformProcessFinished)
+		{
+			InformProcessFinished ipf = (InformProcessFinished) update;
+			IGoal ipfGoal = createGoal("handle_process_finished");
+			ipfGoal.getParameter("instance_id").setValue(ipf.getInstanceId());
+			dispatchSubgoalAndWait(ipfGoal);
 		}
 	}
 }

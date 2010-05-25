@@ -6,6 +6,8 @@ import jadex.commons.SUtil;
 import jadex.gpmn.model2.MActivationEdge;
 import jadex.gpmn.model2.MActivationPlan;
 import jadex.gpmn.model2.MBpmnPlan;
+import jadex.gpmn.model2.MContext;
+import jadex.gpmn.model2.MContextElement;
 import jadex.gpmn.model2.MGoal;
 import jadex.gpmn.model2.MGpmnModel;
 import jadex.gpmn.model2.MPlanEdge;
@@ -146,6 +148,21 @@ public class GpmnXMLReader2
 			new SubobjectInfo(new AccessInfo("planEdge")),
 			new SubobjectInfo(new AccessInfo("artifacts", "artifact")),
 		})));
+		
+		types.add(new TypeInfo(new XMLInfo("context"), 
+				new ObjectInfo(MContext.class),
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("id", null, AccessInfo.IGNORE_READWRITE))},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo("element", "contextElement")),
+				})));
+		
+		types.add(new TypeInfo(new XMLInfo("element"), new ObjectInfo(MContextElement.class),
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("id", null, AccessInfo.IGNORE_READWRITE))},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo("value"))
+				})));
 		
 		types.add(new TypeInfo(new XMLInfo("goal"), 
 			new ObjectInfo(MGoal.class),

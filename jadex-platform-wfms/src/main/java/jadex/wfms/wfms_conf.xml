@@ -83,7 +83,7 @@
 			</property>
 			
 			<property type="jadex.wfms.service.IModelRepositoryService" name="wfms_model_repository">
-				new jadex.wfms.service.impl.BasicModelRepositoryService($platform)
+				new jadex.wfms.service.impl.LinkedModelRepositoryService($platform)
 			</property>
 		</properties>
 	</properties>

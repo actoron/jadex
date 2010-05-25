@@ -13,6 +13,8 @@ public class AddWorkitemPlan extends Plan
 	public void body()
 	{
 		final Action wiAdded = (Action) getBeliefbase().getBelief("add_workitem_controller").getFact();
+		if (wiAdded == null)
+			return;
 		final IWorkitem wi = (IWorkitem) getParameter("workitem").getValue();
 		EventQueue.invokeLater(new Runnable()
 		{

@@ -42,10 +42,7 @@ public class ProcessStateController
 		for (Iterator it = activityControllers.iterator(); it.hasNext(); )
 		{
 			ActivityStateController controller = (ActivityStateController) it.next();
-			System.out.print(controller.finalState());
-			System.out.print(" ");
 		}
-		System.out.println();
 	}
 	
 	/**
@@ -79,6 +76,8 @@ public class ProcessStateController
 	public Map getActivityState(String activityName)
 	{
 		ActivityStateController controller = (ActivityStateController) activityControllers.get(activityName);
+		if (controller == null)
+			return null;
 		return controller.getActivityState();
 	}
 	

@@ -13,13 +13,15 @@ public class RemoveActivityPlan extends Plan
 {
 	public void body()
 	{
-		final Action wiAdded = (Action) getBeliefbase().getBelief("remove_activity_controller").getFact();
+		final Action acRemoved = (Action) getBeliefbase().getBelief("remove_activity_controller").getFact();
+		if (acRemoved == null)
+			return;
 		final IClientActivity act = (IClientActivity) getParameter("activity").getValue();
 		EventQueue.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				wiAdded.actionPerformed(new ActionEvent(act, 0, null));
+				acRemoved.actionPerformed(new ActionEvent(act, 0, null));
 			}
 		});
 	}

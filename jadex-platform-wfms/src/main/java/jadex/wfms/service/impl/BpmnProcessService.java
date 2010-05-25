@@ -77,7 +77,7 @@ public class BpmnProcessService implements IExecutionService, IService
 		ILibraryService ls = (ILibraryService) wfms.getService(ILibraryService.class);
 		try
 		{
-			ret = factory.loadModel(ls.getClassLoader().getResource(filename).getPath(), imports);
+			ret = factory.loadModel(filename, imports);
 		}
 		catch(Exception e)
 		{
