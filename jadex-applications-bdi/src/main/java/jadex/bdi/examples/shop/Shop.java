@@ -36,6 +36,7 @@ public class Shop implements IShop
 		{
 			public void goalFinished(AgentEvent ae)
 			{
+				System.out.println(comp.getComponentIdentifier().getLocalName()+" setting: "+buy.getParameter("result").getValue());
 				ret.setResult(buy.getParameter("result").getValue());
 			}
 			

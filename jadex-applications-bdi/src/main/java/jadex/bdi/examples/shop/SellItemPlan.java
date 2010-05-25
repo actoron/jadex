@@ -13,7 +13,7 @@ public class SellItemPlan extends Plan
 	public void body()
 	{
 		String name = (String)getParameter("name").getValue();
-		System.out.println("Sell item: "+name);
+		System.out.println(getComponentName()+" sell item: "+name);
 		
 		getParameter("result").setValue("Sold item: "+name);
 	}

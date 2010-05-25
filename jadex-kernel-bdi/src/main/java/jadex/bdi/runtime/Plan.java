@@ -523,11 +523,15 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 	public void suspend(long timeout)
 	{
 		if(lis==null)
+		{
 			lis = new SyncResultListener();
+		}
+
 		if(!getInterpreter().isPlanThread())
 			throw new RuntimeException("SyncResultListener may only be used from plan thread.");
 		
-		waitForExternalCondition(lis, timeout);
+		waitForExternalCondition(lis, timeout);	// Don't use waitForResult(), because of exception being thrown.
+		lis.reset();
 	}
 	
 	/**
@@ -655,13 +659,9 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 				waitForExternalCondition(this, timeout);
 			}
 			
-			// Reset to allow listener being reused
 			Exception	ex	= exception;
 			Object	res	= result;
-			alreadysuspended	= false;
-			alreadyresumed	= false;
-			exception	= null;
-			result	= null;
+			reset();
 			
 //			if(ex instanceof RuntimeException)
 //				throw (RuntimeException)ex;
@@ -669,6 +669,19 @@ public abstract class Plan extends AbstractPlan implements ISuspendable//, IExte
 				throw new RuntimeException(ex);
 
 			return res;
+		}
+
+		/**
+		 *  Reset to allow listener being reused
+		 */
+		protected void reset()
+		{
+//			System.out.println("resetting: "+this+", "+exception);
+			alreadysuspended	= false;
+			alreadyresumed	= false;
+			exception	= null;
+			result	= null;
+			pcs.firePropertyChange("true", Boolean.TRUE, Boolean.FALSE);
 		}
 
 		//-------- IExternalCondition --------

@@ -92,6 +92,7 @@ public class Future implements IFuture
     			boolean resumed = ((Boolean)callers.get(caller)).booleanValue();
     			if(!resumed)
     			{
+//    				System.out.println(this+" caller suspending: "+caller+" "+mon);
     				caller.suspend(timeout);
 //    				System.out.println(this+" caller awoke: "+caller+" "+mon);
     			}

@@ -30,8 +30,12 @@ public class BuyItemPlan extends Plan
 			IComponentIdentifier cid = ret[0].getName();
 			IExternalAccess exa = (IExternalAccess)cms.getExternalAccess(cid).get(this);
 			IShop shop = (IShop)exa.getService(IShop.class);
-			Object item = shop.buyItem((String)getParameter("name").getValue()).get(this);
-			System.out.println("Bought item: "+item);
+			String name	= (String)getParameter("name").getValue();
+			System.out.println(getComponentName()+" buying item: "+name);
+			IFuture	future	= shop.buyItem(name);
+			System.out.println(getComponentName()+" getting item: "+future);
+			Object item = future.get(this);
+			System.out.println(getComponentName()+" bought item: "+item);
 			getParameter("result").setValue(item);
 		}
 		else
