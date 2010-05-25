@@ -2,9 +2,14 @@ package jadex.wfms.bdi.client.standard;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -19,11 +24,14 @@ public class StatusBar extends JPanel
 	
 	private Map icons;
 	
+	private Map iconPaths;
+	
 	public StatusBar()
 	{
 		super(new GridBagLayout());
 		
 		icons = new HashMap();
+		this.iconPaths = new HashMap();
 		
 		statusTextLabel = new JLabel();
 		GridBagConstraints g = new GridBagConstraints();
@@ -58,6 +66,7 @@ public class StatusBar extends JPanel
 		ImageIcon icon = new ImageIcon(getClass().getClassLoader().getResource(path));
 		JLabel label = new JLabel(icon);
 		icons.put(name, label);
+		iconPaths.put(name, path);
 		
 		iconPanel.add(label);
 	}
@@ -66,11 +75,29 @@ public class StatusBar extends JPanel
 	{
 		JLabel label = (JLabel) icons.get(name);
 		label.setIcon(new ImageIcon(getClass().getClassLoader().getResource(path)));
+		iconPaths.put(name, path);
 	}
 	
 	public void removeIcon(String name)
 	{
 		JLabel label = (JLabel) icons.remove(name);
+		iconPaths.remove(name);
 		iconPanel.remove(label);
+	}
+	
+	public void setIconAction(final String name, final Action action)
+	{
+		final JLabel label = (JLabel) icons.get(name);
+		MouseListener[] listeners = label.getMouseListeners();
+		for (int i = 0; i < listeners.length; ++i)
+			label.removeMouseListener(listeners[i]);
+		label.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent e)
+			{
+				if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1)
+					action.actionPerformed(new ActionEvent(label, 0, (String) iconPaths.get(name)));
+			}
+		});
 	}
 }

@@ -9,7 +9,12 @@ public class DisconnectPlan extends AbstractWfmsPlan
 	{
 		RequestDeAuth reqDeAuth = new RequestDeAuth((String) getParameter("user_name").getValue()); 
 		
-		getGoalbase().getGoals("keep_sending_heartbeats")[0].drop();
+		while (getGoalbase().getGoals("keep_sending_heartbeats").length != 0)
+		{
+			IGoal goal = getGoalbase().getGoals("keep_sending_heartbeats")[0];
+			goal.drop();
+			waitForGoal(goal);
+		}
 		
 		IGoal deAuthGoal = createGoal("reqcap.rp_initiate");
 		deAuthGoal.getParameter("action").setValue(reqDeAuth);

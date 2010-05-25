@@ -18,13 +18,11 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -145,7 +143,16 @@ public class StandardClientApplication
 				pmComponent = new ProcessModelTreeComponent();
 				aaComponent = new AdminActivitiesComponent();
 				
-				showConnectDialog();
+				statusBar.setIconAction(CONNECT_ICON_NAME, new AbstractAction()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						if (e.getActionCommand().equals(CONNECT_OFF_ICON_PATH))
+							showConnectDialog();
+						else
+							disconnect();
+					}
+				});
 			}
 		});
 		
@@ -158,7 +165,7 @@ public class StandardClientApplication
 		toolPane.removeAll();
 		flushActions();
 		
-		mainSplitPane.setLeftComponent(new JTabbedPane());
+		//mainSplitPane.setLeftComponent(new JTabbedPane());
 		
 		if (mainSplitPane.getRightComponent() instanceof JTabbedPane)
 			mainSplitPane.setRightComponent(new JTabbedPane());
@@ -204,6 +211,7 @@ public class StandardClientApplication
 		
 		if (capabilities.containsAll(SCapReqs.WORKITEM_LIST))
 		{
+			System.out.println("Adding WL");
 			toolPane.add(WORKITEM_LIST_TAB_NAME, wlComponent);
 			setupWorkitemListComponent();
 		}
@@ -231,6 +239,9 @@ public class StandardClientApplication
 		catch (GoalFailureException e)
 		{
 		}
+		cleanUp();
+		statusBar.replaceIcon(CONNECT_ICON_NAME, CONNECT_OFF_ICON_PATH);
+		connected = false;
 	}
 	
 	private ActivityComponent createActivityComponent(IClientActivity activity)
