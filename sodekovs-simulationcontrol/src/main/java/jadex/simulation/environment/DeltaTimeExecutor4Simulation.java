@@ -252,9 +252,9 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 					}
 
 					// Send the percepts to the agents.
-					space.getPerceptList().processPercepts(null);
-					return false;
+					space.getPerceptList().processPercepts(null);					
 				}
+				return false;
 			}
 		};
 

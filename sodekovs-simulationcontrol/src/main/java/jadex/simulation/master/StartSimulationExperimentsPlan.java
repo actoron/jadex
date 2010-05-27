@@ -83,6 +83,11 @@ public class StartSimulationExperimentsPlan extends Plan {
 
 			startApplication(appName, fileName, configName, args);
 
+			System.out.println("#*****************************************************************.");
+			System.out.print("total: " + Runtime.getRuntime().totalMemory() /1024 + " of "  +  " ");
+			System.out.println("total: " + Runtime.getRuntime().maxMemory() / 1024);
+			System.out.println("#*****************************************************************.");
+			
 			System.out.println("#StartSimulationExpPlan# Started new Simulation Experiment. Nr.:" + experimentID + "(" + totalRuns + ") with Optimization Values: "
 					+ simConf.getOptimization().getData().getName() + " = " + simConf.getOptimization().getParameterSweeping().getCurrentValue());
 			totalRuns++;
