@@ -22,6 +22,7 @@ public class TSpacesMechanism extends ICoordinationMechanism {
 
 	public void start() {
 		// Init TSpacesServer
+		// ToDo: The server is started, but without a tuple space with that name.  
 		StartTSpacesServer.startServer("cooordination_tspace");
 
 		tsClient = new TSpacesClient(space);

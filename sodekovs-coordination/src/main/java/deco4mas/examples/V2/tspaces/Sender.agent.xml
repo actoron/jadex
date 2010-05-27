@@ -12,30 +12,35 @@
 	<imports>
 		<import>jadex.adapter.base.contextservice.*</import>
 		<import>jadex.adapter.base.appdescriptor.*</import>
-		<import>jadex.application.space.envsupport.environment.space2d.*</import>
+		<import>jadex.application.space.envsupport.environment.space2d.*
+		</import>
 		<import>jadex.application.space.envsupport.environment.*</import>
 		<import>jadex.application.runtime.*</import>
 		<import>jadex.application.space.envsupport.math.*</import>
 		<import>java.util.*</import>
 		<import>deco4mas.coordinate.environment.*</import>
 		<import>deco4mas.coordinate.*</import>
-		<import>jadex.application.space.envsupport.environment.ISpaceObject</import>
+		<import>jadex.application.space.envsupport.environment.ISpaceObject
+		</import>
 	</imports>
 
 
 	<capabilities>
 		<!-- The deco4mas capability. -->
-		<!-- <capability name="deco4mas" file="deco4mas.coordinate.Coordinate" /> -->
+		<!--
+			<capability name="deco4mas" file="deco4mas.coordinate.Coordinate" />
+		-->
 	</capabilities>
 
 	<beliefs>
 
-		
-			<!--   mycoordspace -->
+
+		<!--   mycoordspace -->
 		<!-- Environment. DO NOT CHANGE the name "env".-->
-			<!-- Environment. -->
+		<!-- Environment. -->
 		<belief name="env" class="CoordinationSpace">
-			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")</fact>
+			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")
+			</fact>
 		</belief>
 
 		<!-- Myself. -->
@@ -48,66 +53,82 @@
 		<belief name="pos" class="IVector2" evaluationmode="push">
 			<fact language="jcl"> $beliefbase.myself.position </fact>
 		</belief>
-	
-		<!--  Stores information that is needed for the decom4mas coordination. -->
-		<!-- <belief name="deco4masInfo" class="Map"/> -->		
-	
+
+		<!--
+			Stores information that is needed for the decom4mas coordination.
+		-->
+		<!-- <belief name="deco4masInfo" class="Map"/> -->
+
 		<beliefset name="testBelief" class="int">
 			<fact>-1</fact>
 		</beliefset>
-		
-			<belief name="conditionBelief" class="boolean">
+
+		<belief name="conditionBelief" class="boolean">
 			<fact>true</fact>
 		</belief>
-		
-		<!-- <belief name="forListenerTest" class="int">
-			<fact>0</fact>
-		</belief> -->
+
+		<!--
+			<belief name="forListenerTest" class="int"> <fact>0</fact> </belief>
+		-->
 
 	</beliefs>
 
-	 <goals>
+	<goals>
 		<achievegoal name="testGoal">
 		</achievegoal>
-	</goals> 
+	</goals>
 
 	<plans>
-		<plan name="counterTMP">
-			<body class="SenderActivityPlan" />
+		<plan name="initCounter">
+			<body class="SenderActivityPlan" />			
 		</plan>
-		
-		<!-- Used to initialize the agent for participation in the deco4mas coordination.-->
-		<!-- <plan name="initCoordination">
-			<parameter name="deco4masInfo" class="HashMap">
-				<internaleventmapping
-					ref="init_deco4mas_coordination.deco4mas_info"/>
-			</parameter>			
-			<body class="InitBDIAgentCoordinationPlan"/>
-			  <trigger> 
-				<internalevent ref="init_deco4mas_coordination"/>								
-			</trigger>
-		</plan> -->
-		
-		<!-- A translation plan, from which an instance is created
-			when the agent is born. Reacts on translation request messages.--> 
+
+		<!--
+			Used to initialize the agent for participation in the deco4mas
+			coordination.
+		-->
+		<!--
+			<plan name="initCoordination"> <parameter name="deco4masInfo"
+			class="HashMap"> <internaleventmapping
+			ref="init_deco4mas_coordination.deco4mas_info"/> </parameter> <body
+			class="InitBDIAgentCoordinationPlan"/> <trigger> <internalevent
+			ref="init_deco4mas_coordination"/> </trigger> </plan>
+		-->
+
+		<!--
+			A translation plan, from which an instance is created when the agent
+			is born. Reacts on translation request messages.
+		-->
 		<plan name="testPlan">
-			<body class="TestPlan"/>
-			<trigger> 
-				<goal ref="testGoal"/>								
+			<body class="TestPlan" />
+			<trigger>
+				<goal ref="testGoal" />
 			</trigger>
 		</plan>
 		
+		<!--  Plan to handle the internal event. -->
+		<plan name="internalEventPlan">
+			<body class="InternalEventPlan" />
+			<trigger>
+				<internalevent ref="testEvent" />
+			</trigger>
+		</plan>
+
 	</plans>
 
-<events>
-	<!-- Used to initialize the agent for participation in the deco4mas coordination.-->
-		<!-- <internalevent name="init_deco4mas_coordination">
-		<parameter name="deco4mas_info" class="HashMap"/> 
-		</internalevent>-->
-		<internalevent name="testEvent">		 
-		</internalevent> 				
-		</events> 
-		
+	<events>
+		<!--
+			Used to initialize the agent for participation in the deco4mas
+			coordination.
+		-->
+		<!--
+			<internalevent name="init_deco4mas_coordination"> <parameter
+			name="deco4mas_info" class="HashMap"/> </internalevent>
+		-->
+		<internalevent name="testEvent">
+		</internalevent>
+	</events>
+
 	<properties>
 		<!--
 			The environment may throw exceptions when executing property
@@ -123,11 +144,11 @@
 		<configuration name="default">
 			<goals>
 				<!-- Initial goal for searching for garbage. -->
-			<!-- 	<initialgoal ref="testGoal"/> --> 
+				<!-- 	<initialgoal ref="testGoal"/> -->
 			</goals>
 			<plans>
-				   <!-- <initialplan ref="initCoordination" /> -->
-				<initialplan ref="counterTMP" />
+				<!-- <initialplan ref="initCoordination" /> -->
+				<initialplan ref="initCounter" />
 			</plans>
 		</configuration>
 	</configurations>
