@@ -13,22 +13,26 @@ import jadex.wfms.client.IWorkitem;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.FileDialog;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.util.Map;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.filechooser.FileFilter;
 
 public class StandardClientApplication
 {
@@ -418,7 +422,7 @@ public class StandardClientApplication
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				IGoal modelGoal = agent.createGoal("clientcap.request_loadable_model_paths");
+				/*IGoal modelGoal = agent.createGoal("clientcap.request_loadable_model_paths");
 				agent.dispatchTopLevelGoalAndWait(modelGoal);
 				Set modelSet = (Set) modelGoal.getParameter("loadable_model_paths").getValue();
 				AddProcessModelDialog dialog = new AddProcessModelDialog(mainFrame, modelSet);
@@ -438,6 +442,27 @@ public class StandardClientApplication
 				catch (GoalFailureException e1)
 				{
 					JOptionPane.showMessageDialog(mainFrame, "Adding process failed.");
+				}*/
+				
+				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setFileFilter(new FileFilter()
+				{
+					public String getDescription()
+					{
+						return "*.jar";
+					}
+					
+					public boolean accept(File f)
+					{
+						return f.getName().toLowerCase().endsWith(".jar");
+					}
+				});
+				int result = fileChooser.showOpenDialog(mainFrame);
+				if (result == JFileChooser.APPROVE_OPTION)
+				{
+					IGoal addResource = agent.createGoal("clientcap.add_model_resource");
+					addResource.getParameter("resource_path").setValue(fileChooser.getSelectedFile().getAbsolutePath());
+					agent.dispatchTopLevelGoalAndWait(addResource);
 				}
 			}
 		});

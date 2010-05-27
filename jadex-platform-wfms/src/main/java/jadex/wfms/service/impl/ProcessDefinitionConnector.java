@@ -12,6 +12,7 @@ import jadex.wfms.service.IExecutionService;
 import jadex.wfms.service.IModelRepositoryService;
 import jadex.wfms.service.IProcessDefinitionService;
 
+import java.net.URL;
 import java.security.AccessControlException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,29 +52,29 @@ public class ProcessDefinitionConnector implements IProcessDefinitionService, IS
 	}
 	
 	/**
-	 * Adds a process model to the repository
+	 * Adds a process model resource to the repository
 	 * @param client the client
-	 * @param path path to the model
+	 * @param url url to the model resource
 	 */
-	public synchronized void addProcessModel(IClient client, String path)
+	public synchronized void addProcessResource(IClient client, URL url)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.PD_ADD_PROCESS_MODEL))
 			throw new AccessControlException("Not allowed: "+client);
-		BasicModelRepositoryService mr = (BasicModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		mr.addProcessModel(path);
+		IModelRepositoryService mr = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		mr.addProcessResource(url);
 	}
 	
 	/**
-	 * Removes a process model from the repository
+	 * Removes a process model resource from the repository
 	 * @param client the client
-	 * @param name name of the model
+	 * @param url url of the model resource
 	 */
-	public synchronized void removeProcessModel(IClient client, String name)
+	public synchronized void removeProcessResource(IClient client, URL url)
 	{
 		if (!((IAAAService) wfms.getService(IAAAService.class)).accessAction(client, IAAAService.PD_REMOVE_PROCESS_MODEL))
 			throw new AccessControlException("Not allowed: "+client);
-		BasicModelRepositoryService mr = (BasicModelRepositoryService) wfms.getService(IModelRepositoryService.class);
-		mr.removeProcessModel(name);
+		IModelRepositoryService mr = (IModelRepositoryService) wfms.getService(IModelRepositoryService.class);
+		mr.removeProcessResource(url);
 	}
 	
 	/**

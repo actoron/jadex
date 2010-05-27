@@ -13,6 +13,7 @@ import jadex.wfms.service.IModelRepositoryService;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
@@ -118,40 +119,23 @@ public class LinkedModelRepositoryService implements IModelRepositoryService, IS
 	}
 	
 	/**
-	 *  Add a process model.
-	 *  @param client The client.
-	 *  @param name The name of the model.
-	 *  @param path The path to the model.
+	 *  Add a process model resource.
+	 *  @param url The URL of the model resource.
 	 */
-	public void addProcessModel(String filename)
+	public void addProcessResource(URL url)
 	{
-		/*String modelName = loadProcessModel(filename);
-		synchronized (model)
-		{
-			if (modelName != null)
-			{
-				writeRepository();
-				fireModelAddedEvent(modelName);
-			}
-		}*/
+		ILibraryService ls = (ILibraryService) wfms.getService(ILibraryService.class);
+		ls.addURL(url);
 	}
 	
 	/**
-	 *  Remove a process model.
-	 *  @param name The name of the model.
+	 *  Remove a process model resource.
+	 *  @param url The URL of the model resource.
 	 */
-	public void removeProcessModel(String name)
+	public void removeProcessResource(URL url)
 	{
-		/*synchronized (models)
-		{
-			if (models.containsKey(name))
-			{
-				models.remove(name);
-				modelPaths.remove(name);
-				writeRepository();
-				fireModelRemovedEvent(name);
-			}
-		}*/
+		ILibraryService ls = (ILibraryService) wfms.getService(ILibraryService.class);
+		ls.removeURL(url);
 	}
 	
 	/**

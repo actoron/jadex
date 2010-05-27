@@ -1,24 +1,21 @@
 package jadex.wfms.bdi.interfaces.processdefinition;
 
-import java.security.AccessControlException;
-import java.util.Set;
-
 import jadex.base.fipa.Done;
-import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.IMessageEvent;
-import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
-import jadex.wfms.bdi.ontology.RequestAddProcess;
-import jadex.wfms.bdi.ontology.RequestModelNames;
+import jadex.wfms.bdi.ontology.RequestAddModelResource;
 import jadex.wfms.bdi.ontology.RequestProxy;
 import jadex.wfms.client.IClient;
-import jadex.wfms.service.IAAAService;
 import jadex.wfms.service.IProcessDefinitionService;
-import jadex.wfms.service.impl.ProcessDefinitionConnector;
 
-public class RequestAddProcessPlan extends AbstractWfmsPlan
+import java.io.File;
+import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel.MapMode;
+import java.security.AccessControlException;
+
+public class RequestAddModelResourcePlan extends AbstractWfmsPlan
 {
 	public void body()
 	{
@@ -30,18 +27,25 @@ public class RequestAddProcessPlan extends AbstractWfmsPlan
 		try
 		{
 			IProcessDefinitionService pd = (IProcessDefinitionService) getScope().getServiceContainer().getService(IProcessDefinitionService.class);
-			RequestAddProcess rap = (RequestAddProcess) getParameter("action").getValue();
-			pd.addProcessModel(proxy, rap.getProcessPath());
+			RequestAddModelResource ramr = (RequestAddModelResource) getParameter("action").getValue();
+			File resourceFile = File.createTempFile(ramr.getResourceName().substring(0, ramr.getResourceName().length() - 4), ".jar");
+			byte[] resource = ramr.decodeResource();
+			MappedByteBuffer buffer = (new RandomAccessFile(resourceFile, "rws")).getChannel().map(MapMode.READ_WRITE, 0, resource.length);
+			buffer.put(resource);
+			buffer = null;
+			resourceFile.deleteOnExit();
+			
+			pd.addProcessResource(proxy, resourceFile.toURI().toURL());
 			
 			Done done = new Done();
-			done.setAction(rap);
+			done.setAction(ramr);
 			getParameter("result").setValue(done);
 		}
 		catch (AccessControlException e)
 		{
 			fail("Unauthorized Access.", e);
 		}
-		catch (RuntimeException e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 			fail(e.getMessage(), e);

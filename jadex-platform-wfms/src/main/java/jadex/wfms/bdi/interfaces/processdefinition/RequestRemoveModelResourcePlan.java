@@ -5,13 +5,13 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentIdentifier;
 import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.RequestProxy;
-import jadex.wfms.bdi.ontology.RequestRemoveProcess;
+import jadex.wfms.bdi.ontology.RequestRemoveModelResource;
 import jadex.wfms.client.IClient;
 import jadex.wfms.service.IProcessDefinitionService;
 
 import java.security.AccessControlException;
 
-public class RequestRemoveProcessPlan extends AbstractWfmsPlan
+public class RequestRemoveModelResourcePlan extends AbstractWfmsPlan
 {
 	public void body()
 	{
@@ -23,11 +23,11 @@ public class RequestRemoveProcessPlan extends AbstractWfmsPlan
 		try
 		{
 			IProcessDefinitionService pd = (IProcessDefinitionService) getScope().getServiceContainer().getService(IProcessDefinitionService.class);
-			RequestRemoveProcess rrp = (RequestRemoveProcess) getParameter("action").getValue();
-			pd.removeProcessModel(proxy, rrp.getProcessName());
+			RequestRemoveModelResource rrmr = (RequestRemoveModelResource) getParameter("action").getValue();
+			pd.removeProcessResource(proxy, rrmr.getUrl());
 			
 			Done done = new Done();
-			done.setAction(rrp);
+			done.setAction(rrmr);
 			getParameter("result").setValue(done);
 		}
 		catch (AccessControlException e)

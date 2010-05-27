@@ -1,10 +1,10 @@
 package jadex.wfms.service;
 
 import jadex.bridge.ILoadableComponentModel;
-import jadex.service.IService;
 import jadex.wfms.client.IClient;
 import jadex.wfms.listeners.IProcessRepositoryListener;
 
+import java.net.URL;
 import java.util.Set;
 
 /**
@@ -14,18 +14,18 @@ import java.util.Set;
 public interface IProcessDefinitionService
 {
 	/**
-	 * Adds a process model to the repository
+	 * Adds a process model resource to the repository
 	 * @param client the client
-	 * @param path path to the model
+	 * @param url url to the model resource
 	 */
-	public void addProcessModel(IClient client, String path);
+	public void addProcessResource(IClient client, URL url);
 	
 	/**
-	 * Removes a process model from the repository
+	 * Removes a process model resource from the repository
 	 * @param client the client
-	 * @param name name of the model
+	 * @param url url of the model resource
 	 */
-	public void removeProcessModel(IClient client, String name);
+	public void removeProcessResource(IClient client, URL url);
 	
 	/**
 	 * Gets a process model.

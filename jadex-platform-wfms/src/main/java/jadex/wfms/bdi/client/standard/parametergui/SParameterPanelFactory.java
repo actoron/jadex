@@ -24,6 +24,10 @@ public class SParameterPanelFactory
 				return new TextParameterPanel(parameterName, new Text((String) parameterValue), metaProperties, readOnly);
 			return new StringParameterPanel(parameterName, (String) parameterValue, readOnly);
 		}
+		else if (parameterType.equals(String[].class))
+		{
+			return new StringArrayParameterPanel(parameterName, (String[]) parameterValue, metaProperties, readOnly); 
+		}
 		else if (parameterType.equals(Boolean.class))
 		{
 			return new BooleanParameterPanel(parameterName, (Boolean) parameterValue, readOnly);

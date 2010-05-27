@@ -1,9 +1,9 @@
 package jadex.wfms.service;
 
 import jadex.bridge.ILoadableComponentModel;
-import jadex.service.IService;
 import jadex.wfms.listeners.IProcessRepositoryListener;
 
+import java.net.URL;
 import java.util.Collection;
 import java.util.Set;
 /**
@@ -12,10 +12,16 @@ import java.util.Set;
 public interface IModelRepositoryService
 {
 	/**
-	 *  Add a process model.
-	 *  @param filename The file name of the model.
+	 *  Add a process model resource.
+	 *  @param url The URL of the model resource.
 	 */
-	public void addProcessModel(String filename);
+	public void addProcessResource(URL url);
+	
+	/**
+	 *  Remove a process model resource.
+	 *  @param url The URL of the model resource.
+	 */
+	public void removeProcessResource(URL url);
 	
 	/**
 	 * Gets all available models.
@@ -29,12 +35,6 @@ public interface IModelRepositoryService
 	 * @return set of model paths
 	 */
 	public Set getLoadableModels();
-	
-	/**
-	 *  Remove a process model.
-	 *  @param name The name of the model.
-	 */
-	public void removeProcessModel(String name);
 	
 	/**
 	 *  Get a process model of a specific name.

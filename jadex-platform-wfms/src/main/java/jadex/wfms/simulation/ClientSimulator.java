@@ -358,9 +358,6 @@ public class ClientSimulator
 					clientMetaProcessModel = model;
 					while (scenarios.getRowCount() > 0)
 						scenarios.removeRow(0);
-					Scenario scenario = clientMetaProcessModel.createScenario("Unnamed_Scenario");
-					scenarios.addRow(new Object[] {scenario} );
-					simWindow.setSelectedScenario(scenario);
 					updateGui();
 				}
 				catch (Exception e1)

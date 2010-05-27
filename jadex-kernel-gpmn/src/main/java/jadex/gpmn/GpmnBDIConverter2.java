@@ -577,8 +577,6 @@ public class GpmnBDIConverter2
 		
 		if(precond!=null)
 		{
-			// TODO: HACK!! Braindead attribute xml-encoding
-			precond = precond.replaceAll("&amp;", "&");
 			Object condhandle = state.createObject(OAVBDIMetaModel.expression_type);
 			state.setAttributeValue(planhandle, OAVBDIMetaModel.plan_has_precondition, condhandle);
 			state.setAttributeValue(condhandle, OAVBDIMetaModel.expression_has_content, precond);

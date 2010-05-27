@@ -116,12 +116,12 @@
 			<parameter name="loadable_model_paths" class="Set" direction="out" />
 		</achievegoal>
 		
-		<achievegoal name="add_process" exported="true">
-			<parameter name="process_path" class="String" />
+		<achievegoal name="add_model_resource" exported="true">
+			<parameter name="resource_path" class="String" />
 		</achievegoal>
 		
-		<achievegoal name="remove_process" exported="true">
-			<parameter name="process_name" class="String" />
+		<achievegoal name="remove_model_resource" exported="true">
+			<parameter name="resource_url" class="java.net.URL" />
 		</achievegoal>
 		
 		<achievegoal name="start_model_repository_subscription" exported="true" />
@@ -351,23 +351,23 @@
 			</trigger>
 		</plan>
 		
-		<plan name="add_process_plan">
-			<parameter name="process_path" class="String">
-				<goalmapping ref="add_process.process_path"/>
+		<plan name="add_model_resource_plan">
+			<parameter name="resource_path" class="String">
+				<goalmapping ref="add_resource.resource_path"/>
 			</parameter>
-			<body class="AddProcessPlan" />
+			<body class="AddModelResourcePlan" />
 			<trigger>
-				<goal ref="add_process" />
+				<goal ref="add_model_resource" />
 			</trigger>
 		</plan>
 		
-		<plan name="remove_process_plan">
-			<parameter name="process_name" class="String">
-				<goalmapping ref="remove_process.process_name"/>
+		<plan name="remove_model_resource_plan">
+			<parameter name="resource_url" class="java.net.URL">
+				<goalmapping ref="remove_model_resource.resource_url"/>
 			</parameter>
-			<body class="RemoveProcessPlan" />
+			<body class="RemoveModelResourcePlan" />
 			<trigger>
-				<goal ref="remove_process" />
+				<goal ref="remove_model_resource" />
 			</trigger>
 		</plan>
 		

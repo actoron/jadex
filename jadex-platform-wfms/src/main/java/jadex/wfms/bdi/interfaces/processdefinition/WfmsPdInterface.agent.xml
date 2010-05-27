@@ -103,8 +103,8 @@
 			</trigger>
 		</plan>
 		
-		<!-- Handle model addition requests. -->
-		<plan name="request_add_process_plan">
+		<!-- Handle resource addition requests. -->
+		<plan name="request_add_model_resource_plan">
 			<parameter name="action" class="Object">
 				<goalmapping ref="rp_execute_request.action"/>
 			</parameter>
@@ -115,16 +115,16 @@
 			<parameter name="result" class="Object" direction="out">
 				<goalmapping ref="rp_execute_request.result"/>
 			</parameter>
-			<body class="RequestAddProcessPlan" />
+			<body class="RequestAddModelResourcePlan" />
 			<trigger>
 				<goal ref="rp_execute_request">
-					<match>$goal.getParameter("action").getValue() instanceof RequestAddProcess</match>
+					<match>$goal.getParameter("action").getValue() instanceof RequestAddModelResource</match>
 				</goal>
 			</trigger>
 		</plan>
 		
 		<!-- Handle model removal requests. -->
-		<plan name="request_remove_process_plan">
+		<plan name="request_remove_resource_plan">
 			<parameter name="action" class="Object">
 				<goalmapping ref="rp_execute_request.action"/>
 			</parameter>
@@ -135,10 +135,10 @@
 			<parameter name="result" class="Object" direction="out">
 				<goalmapping ref="rp_execute_request.result"/>
 			</parameter>
-			<body class="RequestRemoveProcessPlan" />
+			<body class="RequestRemoveModelResourcePlan" />
 			<trigger>
 				<goal ref="rp_execute_request">
-					<match>$goal.getParameter("action").getValue() instanceof RequestRemoveProcess</match>
+					<match>$goal.getParameter("action").getValue() instanceof RequestRemoveModelResource</match>
 				</goal>
 			</trigger>
 		</plan>
