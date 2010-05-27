@@ -1,7 +1,10 @@
 package jadex.xwiki;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -27,28 +30,39 @@ public class NightlyBuildsPlugin implements XWikiPluginInterface
 	//-------- plugin methods --------
 	
 	/**
-	 *  Get information for the latest (i.e. newest build).
-	 *  @return The information of the latest build.
+	 *  Get builds sorted by date (newest first).
+	 *  @return NightlyBuild objects for each project.
 	 */
-	protected NightlyBuild	getLatestBuild(XWikiContext context)
+	protected NightlyBuild[]	getAllBuilds(XWikiContext context, File dir)
 	{
-		return new NightlyBuild(getName(), null, getClassName());
-	}
-	
-	/**
-	 *  Get all builds sorted by date (newest first).
-	 *  @return NightlyBuild objects.
-	 */
-	protected NightlyBuild[]	getAllBuilds(XWikiContext context)
-	{
-		File	dir	= new File("C:/Programme/Apache Software Foundation/Tomcat 6.0/webapps/jadex-nightlybuilds");
+		Map	builds	= new HashMap();
+
 		File[]	dirs	= dir.listFiles();
-		NightlyBuild[]	builds	= new NightlyBuild[dirs.length];
 		for(int i=0; i<dirs.length; i++)
 		{
-			builds[i]	= new NightlyBuild(dirs[i].getName(), new Date(dirs[i].lastModified()), dirs[i].getAbsolutePath());
+			if(dirs[i].isDirectory() && !dirs[i].getName().toLowerCase().equals("web-inf"))
+			{
+				String[]	files	= dirs[i].list();
+
+				for(int j=0; j<files.length; j++)
+				{
+					File	file	= new File(dirs[i], files[j]);
+					NightlyBuild	build	= new NightlyBuild(files[j], new Date(file.lastModified()), (file.length()*10/1024/1024)/10.0,
+						"/"+dir.getName()+"/"+dirs[i].getName()+"/"+files[j]);
+					if(builds.containsKey(build.getName()))
+					{
+						((NightlyBuild)builds.get(build.getName())).addBuild(build);
+					}
+					else
+					{
+						builds.put(build.getName(), build);
+					}
+				}
+			}
 		}
-		return builds;
+		NightlyBuild[]	ret	= (NightlyBuild[])builds.values().toArray(new NightlyBuild[builds.size()]);
+		Arrays.sort(ret, new NightlyBuild.BuildComparator());
+		return ret;
 	}
 
 	//-------- XWikiPluginInterface management --------
@@ -158,10 +172,11 @@ public class NightlyBuildsPlugin implements XWikiPluginInterface
 	public static void	main(String[] args)
 	{
 		NightlyBuildsPlugin	plug	= new NightlyBuildsPlugin(null, null, null);
-		NightlyBuild[]	builds	= plug.getAllBuilds(null);
+		File	dir	= new File("C:/Programme/Apache Software Foundation/Tomcat 6.0/webapps/jadex-nightlybuilds");
+		NightlyBuild[] builds	= plug.getAllBuilds(null, dir);
 		for(int i=0; i<builds.length; i++)
 		{
-			System.out.println("Build "+i+": "+builds[i]);
+			System.out.println(builds[i]);
 		}
 	}
 }

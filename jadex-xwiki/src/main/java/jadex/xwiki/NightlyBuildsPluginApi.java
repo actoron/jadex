@@ -1,5 +1,7 @@
 package jadex.xwiki;
 
+import java.io.File;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 
@@ -27,20 +29,11 @@ public class NightlyBuildsPluginApi extends Api
 	//-------- methods --------
 	
 	/**
-	 *  Get information for the latest (i.e. newest build).
-	 *  @return The information of the latest build.
-	 */
-	protected NightlyBuild	getLatestBuild()
-	{
-		return plugin.getLatestBuild(getXWikiContext());
-	}
-	
-	/**
 	 *  Get all builds sorted by date (newest first).
 	 *  @return NightlyBuild objects.
 	 */
-	public NightlyBuild[]	getAllBuilds()
+	public NightlyBuild[]	getAllBuilds(String dir)
 	{
-		return plugin.getAllBuilds(getXWikiContext());
+		return plugin.getAllBuilds(getXWikiContext(), new File(dir));
 	}
 }
