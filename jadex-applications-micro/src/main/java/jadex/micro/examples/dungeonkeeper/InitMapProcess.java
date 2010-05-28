@@ -133,8 +133,8 @@ public class InitMapProcess extends SimplePropertyObject implements ISpaceProces
 		        			String type = stok.nextToken().toLowerCase();
 		        			int x = Integer.parseInt(stok.nextToken());
 		        			int y = Integer.parseInt(stok.nextToken());
-		        			String level = stok.nextToken();
-		        			String owner = stok.nextToken();
+		        			/*String level =*/ stok.nextToken();
+		        			/*String owner =*/ stok.nextToken();
 		        			
 		        			HashMap props = new HashMap();
 		        			props.put("type", type);
