@@ -61,7 +61,7 @@ public class NightlyBuildsPlugin implements XWikiPluginInterface
 			}
 		}
 		NightlyBuild[]	ret	= (NightlyBuild[])builds.values().toArray(new NightlyBuild[builds.size()]);
-		Arrays.sort(ret, new NightlyBuild.BuildComparator());
+		Arrays.sort(ret, new NightlyBuild.BuildNameComparator());
 		return ret;
 	}
 

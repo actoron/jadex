@@ -100,7 +100,7 @@ public class NightlyBuild
 		
 		if(previous==null)
 		{
-			previous	= new TreeSet(new BuildComparator());
+			previous	= new TreeSet(new BuildDateComparator());
 		}
 		
 		previous.add(build);
@@ -147,11 +147,22 @@ public class NightlyBuild
 	/**
 	 * Compare builds based on date.
 	 */
-	public static class BuildComparator implements Comparator
+	public static class BuildDateComparator implements Comparator
 	{
 		public int compare(Object obj1, Object obj2)
 		{
 			return ((NightlyBuild)obj2).getDate().compareTo(((NightlyBuild)obj1).getDate());
+		}
+	}
+
+	/**
+	 * Compare builds based on date.
+	 */
+	public static class BuildNameComparator implements Comparator
+	{
+		public int compare(Object obj1, Object obj2)
+		{
+			return ((NightlyBuild)obj1).getName().compareTo(((NightlyBuild)obj2).getName());
 		}
 	}
 }
