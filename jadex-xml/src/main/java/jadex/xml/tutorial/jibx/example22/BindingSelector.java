@@ -1,8 +1,6 @@
 
 package jadex.xml.tutorial.jibx.example22;
 
-import java.io.OutputStream;
-import java.io.Writer;
 
 //import org.jibx.runtime.BindingDirectory;
 //import org.jibx.runtime.IBindingFactory;

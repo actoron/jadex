@@ -14,8 +14,6 @@ import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.xml.namespace.QName;
-
 /**
  *  Main class to execute tutorial lesson.
  */

@@ -1,6 +1,5 @@
 package jadex.xml.tutorial.example15;
 
-import java.util.Date;
 
 /**
  *  Product example class.

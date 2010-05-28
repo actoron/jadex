@@ -9,8 +9,6 @@ import jadex.xml.TypeInfo;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -90,9 +88,6 @@ public class Writer
  	 */
 	public void write(Object object, OutputStream out, ClassLoader classloader, final Object context) throws Exception
 	{
-		Map writtenobs = new IdentityHashMap();
-		List stack = new ArrayList();
-		
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 //		factory.setProperty("javax.xml.stream.isRepairingNamespaces", Boolean.TRUE);
 		XMLStreamWriter	writer	= factory.createXMLStreamWriter(out);
@@ -102,6 +97,8 @@ public class Writer
 		
 		WriteContext wc = new WriteContext(writer, context, object, classloader);
 		writeObject(wc, object, null);
+//		Map writtenobs = new IdentityHashMap();
+//		List stack = new ArrayList();
 //		writeObject(writer, object, writtenobs, null, stack, context, classloader);
 		writer.writeEndDocument();
 		writer.close();

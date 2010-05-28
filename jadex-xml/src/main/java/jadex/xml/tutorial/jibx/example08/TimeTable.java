@@ -5,9 +5,12 @@ import java.util.List;
 
 public class TimeTable
 {
-    private List carriers;
-    private List airports;
-    private String[] notes;
+    @SuppressWarnings("unused")
+	private List carriers;
+    @SuppressWarnings("unused")
+	private List airports;
+    @SuppressWarnings("unused")
+	private String[] notes;
     
 //    public void addCarrier(Carrier carrier)
 //    {

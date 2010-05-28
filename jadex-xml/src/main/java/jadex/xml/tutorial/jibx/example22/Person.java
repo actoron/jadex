@@ -2,7 +2,10 @@
 package jadex.xml.tutorial.jibx.example22;
 
 public class Person {
-    private String firstName;
-    private String lastName;
-    private int customerNumber;
+	@SuppressWarnings("unused")
+	private String firstName;
+	@SuppressWarnings("unused")
+	private String lastName;
+	@SuppressWarnings("unused")
+	private int customerNumber;
 }

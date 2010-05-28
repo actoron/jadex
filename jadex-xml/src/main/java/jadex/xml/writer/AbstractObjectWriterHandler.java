@@ -243,16 +243,16 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 					Object property = getProperty(soinfo);
 					if(property!=null)
 					{
-						doneprops.add(getPropertyName(property));
+						String propname = getPropertyName(property);
+						doneprops.add(propname);
 						if(!(ai!=null && ai.isIgnoreWrite()))
 						{	
-							String propname = getPropertyName(property);
 							Object value = getValue(object, property, context, soinfo);
 							if(value!=null)
 							{
 								QName[] xmlpath = soinfo.getXMLPathElements();
 								if(xmlpath==null)
-									xmlpath = new QName[]{QName.valueOf(getPropertyName(property))};
+									xmlpath = new QName[]{QName.valueOf(propname)};
 								
 								// Fetch elements directly if it is a multi subobject
 //								if(soinfo.getMulti()!=null && soinfo.getMulti().booleanValue())

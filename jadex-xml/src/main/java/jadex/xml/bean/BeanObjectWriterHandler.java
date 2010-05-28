@@ -173,8 +173,6 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	public QName getTagName(Object object, IContext context)
 	{
-		Object[] ret = new Object[2];
-		
 		String pck;
 		String tag;
 		if(object!=null)

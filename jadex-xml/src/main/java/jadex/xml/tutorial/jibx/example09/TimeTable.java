@@ -6,9 +6,11 @@ import java.util.List;
 
 public class TimeTable
 {
-    private List children;
+	@SuppressWarnings("unused")
+	private List children;
     
-    private static List listFactory() {
+	@SuppressWarnings("unused")
+	private static List listFactory() {
       return new LinkedList();
     }
 }

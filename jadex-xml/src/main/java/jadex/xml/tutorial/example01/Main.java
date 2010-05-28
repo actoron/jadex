@@ -47,7 +47,7 @@ public class Main
 		
 		// Write the xml to the output file.
 		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(typeinfos, false, true), false);
-		String xml = xmlwriter.objectToXML(xmlwriter, object, null);
+		String xml = Writer.objectToXML(xmlwriter, object, null);
 //		OutputStream os = new FileOutputStream("out.xml");
 //		xmlwriter.write(object, os, null, null);
 //		os.close();
@@ -68,7 +68,7 @@ public class Main
 		
 		// Write the xml to the output file.
 		xmlwriter = new Writer(new BeanObjectWriterHandler(typeinfos, false, true), false);
-		xml = xmlwriter.objectToXML(xmlwriter, object, null);
+		xml = Writer.objectToXML(xmlwriter, object, null);
 	
 		System.out.println("Wrote xml: "+xml);
 	}

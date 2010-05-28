@@ -1,6 +1,5 @@
 package jadex.xml.writer;
 
-import jadex.commons.SUtil;
 import jadex.commons.collection.Tree;
 import jadex.commons.collection.TreeNode;
 

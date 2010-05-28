@@ -444,7 +444,6 @@ public class Reader
 					else
 					{
 						final Object object = topse.getObject();
-						final Object ro = readcontext.getRootObject();
 						readcontext.getPostProcessors().put(new Integer(postproc.getPass()), new Runnable()
 						{
 							public void run()

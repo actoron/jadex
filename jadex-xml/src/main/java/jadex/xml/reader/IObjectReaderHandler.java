@@ -1,7 +1,6 @@
 package jadex.xml.reader;
 
 
-import jadex.xml.IContext;
 import jadex.xml.TypeInfo;
 
 import java.util.List;

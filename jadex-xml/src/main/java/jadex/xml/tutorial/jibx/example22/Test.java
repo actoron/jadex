@@ -1,13 +1,6 @@
 
 package jadex.xml.tutorial.jibx.example22;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.InputStreamReader;
 
 //import org.jibx.extras.DocumentComparator;
 //import org.jibx.runtime.*;
@@ -30,16 +23,20 @@ import java.io.InputStreamReader;
 public class Test {
     
     // definitions for version attribute on document root element
-    private static final String VERSION_URI = null;
-    private static final String VERSION_NAME = "version";
+	@SuppressWarnings("unused")
+	private static final String VERSION_URI = null;
+	@SuppressWarnings("unused")
+	private static final String VERSION_NAME = "version";
     
     // attribute text strings used for different document versions
-    private static String[] VERSION_TEXTS = {
+	@SuppressWarnings("unused")
+	private static String[] VERSION_TEXTS = {
         "1.0", "1.1", "1.2"
     };
     
     // binding names corresponding to text strings
-    private static String[] VERSION_BINDINGS = {
+	@SuppressWarnings("unused")
+	private static String[] VERSION_BINDINGS = {
         "binding0", "binding1", "binding2"
     };
 

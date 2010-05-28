@@ -4,7 +4,6 @@ import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 
 import java.util.Comparator;
-import java.util.StringTokenizer;
 
 import javax.xml.namespace.QName;
 

@@ -15,9 +15,7 @@ import jadex.xml.tutorial.example09.Invoice;
 import jadex.xml.tutorial.example09.InvoiceList;
 import jadex.xml.writer.Writer;
 
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -64,7 +62,7 @@ public class Main
 		
 		// Write the xml to the output file.
 		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(typeinfos, false, true), false);
-		String xml = xmlwriter.objectToXML(xmlwriter, object, null);
+		String xml = Writer.objectToXML(xmlwriter, object, null);
 //		OutputStream os = new FileOutputStream("out.xml");
 //		xmlwriter.write(object, os, null, null);
 //		os.close();
