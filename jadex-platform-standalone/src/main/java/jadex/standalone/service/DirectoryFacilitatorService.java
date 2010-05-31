@@ -80,7 +80,7 @@ public class DirectoryFacilitatorService implements IDF, IService
 		}
 		else
 		{
-			ret.setResult(new RuntimeException("Componentomponent not registered: "+clone.getName()));
+			ret.setException(new RuntimeException("Componentomponent not registered: "+clone.getName()));
 //			System.out.println("not registered: "+clone.getName());			
 		}
 		
@@ -100,7 +100,7 @@ public class DirectoryFacilitatorService implements IDF, IService
 			if(!components.containsKey(cdesc.getName()))
 			{
 				//throw new RuntimeException("Component not registered: "+adesc.getName());
-				ret.setResult(new RuntimeException("Component not registered: "+cdesc.getName()));
+				ret.setException(new RuntimeException("Component not registered: "+cdesc.getName()));
 			}
 			else
 			{
@@ -139,7 +139,7 @@ public class DirectoryFacilitatorService implements IDF, IService
 		else
 		{
 			//throw new RuntimeException("Invalid lease time: "+clone.getLeaseTime());
-			ret.setResult(new RuntimeException("Invalid lease time: "+clone.getLeaseTime()));
+			ret.setException(new RuntimeException("Invalid lease time: "+clone.getLeaseTime()));
 		}
 		
 		return ret;

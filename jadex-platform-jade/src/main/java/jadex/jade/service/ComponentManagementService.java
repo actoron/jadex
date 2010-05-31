@@ -17,6 +17,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageService;
 import jadex.bridge.ISearchConstraints;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
@@ -103,17 +105,14 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  Create a new component on the platform.
 	 *  @param name The component name.
 	 *  @param model The model identifier (e.g. file name).
-	 *  @param lis The result listener (if any). Will receive the id of the component as result, when the component has been created.
+	 *  @param listener The result listener (if any). Will receive the id of the component as result, when the component has been created.
 	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
-	public void	createComponent(String name, String model, CreationInfo cinfo, IResultListener lis, final IResultListener killlistener)
+	public IFuture createComponent(String name, String model, CreationInfo cinfo, final IResultListener killlistener)
 	{
-//		System.out.println("Create agent: "+name);
-		
+		final Future ret = new Future();
 		final CreationInfo info	= cinfo!=null ? cinfo : new CreationInfo();	// Dummy default info, if null.
-		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
 		IComponentIdentifier aid = null;
-		
 		
 		// Load the model with fitting factory.
 		
@@ -138,122 +137,125 @@ public class ComponentManagementService implements IComponentManagementService, 
 		
 		if(name!=null && name.indexOf('@')!=-1)
 		{
-			listener.exceptionOccurred(this, new RuntimeException("No '@' allowed in agent name."));
-			return;
+			ret.setException( new RuntimeException("No '@' allowed in agent name."));
 			//throw new RuntimeException("No '@' allowed in agent name.");
-		}
-		
-		if(name==null)
-		{
-//				name = generateAgentName(getShortName(model));
-			name = generateComponentIdentifier(lmodel.getName()).getLocalName();
-		}
-
-		List argus = new ArrayList();
-		argus.add(lmodel);
-		argus.add(info.getConfiguration());//==null? "default": config);
-		if(info.getArguments()!=null)
-			argus.add(info.getArguments());	// Jadex argument map is supplied as 3rd index in JADE argument array.  
-				
-		try
-		{
-			AgentController ac = platform.getPlatformController().createNewAgent(name, "jadex.jade.JadeAgentAdapter", argus.toArray());
-			// Hack!!! Bug in JADE not returning created agent's AID.
-			// Should do ams_search do get correct AID?
-			AID tmp = (AID)platform.getPlatformAgent().clone();
-			int idx = tmp.getName().indexOf("@");
-			tmp.setName(name + tmp.getName().substring(idx));
-			aid = SJade.convertAIDtoFipa(tmp, (IComponentManagementService)platform.getService(IComponentManagementService.class));
-			
-			// Must use start to call setup and make the agnet
-			ac.start();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			listener.exceptionOccurred(this, e);
-			return;
-		}
-		
-		final CMSComponentDescription ad = new CMSComponentDescription(aid, type, info.getParent(), info.isMaster(), info.isDaemon());
-		
-		// Increase daemon cnt
-		if(cinfo.isDaemon())
-			daemons++;
-		
-//		System.out.println("added: "+agentdescs.size()+", "+aid);
-		
-		IComponentDescription padesc = info.getParent()!=null? (IComponentDescription)descs.get(info.getParent()): null;
-		// Suspend when set to suspend or when parent is also suspended or when specified in model.
-		Object debugging  = lmodel.getProperties().get("debugging");
-		if(info.isSuspend() || (padesc!=null && IComponentDescription.STATE_SUSPENDED.equals(padesc.getState()))
-			|| debugging instanceof Boolean && ((Boolean)debugging).booleanValue())
-		{
-			ad.setState(IComponentDescription.STATE_SUSPENDED);
 		}
 		else
 		{
-			ad.setState(IComponentDescription.STATE_ACTIVE);
-		}
-		descs.put(aid, ad);
-		if(info.getParent()!=null)
-		{
-			children.put(info.getParent(), aid);
-		}
-		
-		// Hack! Busy waiting for platform agent init finished.
-		while(!adapters.containsKey(aid))
-		{
-			System.out.print(".");
+			
+			if(name==null)
+			{
+	//				name = generateAgentName(getShortName(model));
+				name = generateComponentIdentifier(lmodel.getName()).getLocalName();
+			}
+	
+			List argus = new ArrayList();
+			argus.add(lmodel);
+			argus.add(info.getConfiguration());//==null? "default": config);
+			if(info.getArguments()!=null)
+				argus.add(info.getArguments());	// Jadex argument map is supplied as 3rd index in JADE argument array.  
+					
 			try
 			{
-				Thread.currentThread().sleep(100);
+				AgentController ac = platform.getPlatformController().createNewAgent(name, "jadex.jade.JadeAgentAdapter", argus.toArray());
+				// Hack!!! Bug in JADE not returning created agent's AID.
+				// Should do ams_search do get correct AID?
+				AID tmp = (AID)platform.getPlatformAgent().clone();
+				int idx = tmp.getName().indexOf("@");
+				tmp.setName(name + tmp.getName().substring(idx));
+				aid = SJade.convertAIDtoFipa(tmp, (IComponentManagementService)platform.getService(IComponentManagementService.class));
+				
+				// Must use start to call setup and make the agnet
+				ac.start();
 			}
 			catch(Exception e)
 			{
+				e.printStackTrace();
+				ret.setException(e);
+				return ret;
+			}
+			
+			final CMSComponentDescription ad = new CMSComponentDescription(aid, type, info.getParent(), info.isMaster(), info.isDaemon());
+			
+			// Increase daemon cnt
+			if(cinfo.isDaemon())
+				daemons++;
+			
+	//		System.out.println("added: "+agentdescs.size()+", "+aid);
+			
+			IComponentDescription padesc = info.getParent()!=null? (IComponentDescription)descs.get(info.getParent()): null;
+			// Suspend when set to suspend or when parent is also suspended or when specified in model.
+			Object debugging  = lmodel.getProperties().get("debugging");
+			if(info.isSuspend() || (padesc!=null && IComponentDescription.STATE_SUSPENDED.equals(padesc.getState()))
+				|| debugging instanceof Boolean && ((Boolean)debugging).booleanValue())
+			{
+				ad.setState(IComponentDescription.STATE_SUSPENDED);
+			}
+			else
+			{
+				ad.setState(IComponentDescription.STATE_ACTIVE);
+			}
+			descs.put(aid, ad);
+			if(info.getParent()!=null)
+			{
+				children.put(info.getParent(), aid);
+			}
+			
+			// Hack! Busy waiting for platform agent init finished.
+			while(!adapters.containsKey(aid))
+			{
+				System.out.print(".");
+				try
+				{
+					Thread.currentThread().sleep(100);
+				}
+				catch(Exception e)
+				{
+				}
+			}
+			final JadeAgentAdapter adapter = (JadeAgentAdapter)adapters.get(aid);
+			adapter.setComponentDescription(ad);
+	
+			JadeAgentAdapter pad = null;
+			if(info.getParent()!=null)
+			{
+				pad	= (JadeAgentAdapter)adapters.get(info.getParent());
+			}
+	
+			if(pad!=null)
+			{
+				final IComponentFactory	cf = factory;
+				final JadeAgentAdapter fpad = pad;
+				final ComponentIdentifier faid = (ComponentIdentifier)aid;
+				pad.getComponentInstance().getExternalAccess(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						createComponentInstance(info.getConfiguration(), info.getArguments(), info.isSuspend(), ret,
+							killlistener, cf, lmodel, faid, adapter, fpad, ad, (IExternalAccess)result);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+			}
+			else
+			{
+				createComponentInstance(info.getConfiguration(), info.getArguments(), info.isSuspend(), ret,
+					killlistener, factory, lmodel, (ComponentIdentifier)aid, adapter, null, ad, null);
 			}
 		}
-		final JadeAgentAdapter adapter = (JadeAgentAdapter)adapters.get(aid);
-		adapter.setComponentDescription(ad);
-
-		JadeAgentAdapter pad = null;
-		if(info.getParent()!=null)
-		{
-			pad	= (JadeAgentAdapter)adapters.get(info.getParent());
-		}
-
-		if(pad!=null)
-		{
-			final IResultListener rl = listener;
-			final IComponentFactory	cf = factory;
-			final JadeAgentAdapter fpad = pad;
-			final ComponentIdentifier faid = (ComponentIdentifier)aid;
-			pad.getComponentInstance().getExternalAccess(new IResultListener()
-			{
-				public void resultAvailable(Object source, Object result)
-				{
-					createComponentInstance(info.getConfiguration(), info.getArguments(), info.isSuspend(), rl,
-						killlistener, cf, lmodel, faid, adapter, fpad, ad, (IExternalAccess)result);
-				}
-				
-				public void exceptionOccurred(Object source, Exception exception)
-				{
-					rl.exceptionOccurred(source, exception);
-				}
-			});
-		}
-		else
-		{
-			createComponentInstance(info.getConfiguration(), info.getArguments(), info.isSuspend(), listener,
-				killlistener, factory, lmodel, (ComponentIdentifier)aid, adapter, null, ad, null);
-		}
+		
+		return ret;
 	}	
 		
 	/**
 	 *  Create an instance of a component (step 2 of creation process).
 	 */
 	protected void createComponentInstance(String config, Map args,
-		boolean suspend, IResultListener listener,
+		boolean suspend, Future ret,
 		final IResultListener resultlistener, IComponentFactory factory,
 		ILoadableComponentModel lmodel, final ComponentIdentifier cid,
 		JadeAgentAdapter adapter, JadeAgentAdapter pad,
@@ -287,7 +289,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		if(resultlistener!=null)
 			killresultlisteners.put(cid, resultlistener);
 		
-		listener.resultAvailable(this, cid.clone());
+		ret.setResult(cid.clone());
 		
 		if(!suspend)
 			adapter.start();
@@ -295,12 +297,11 @@ public class ComponentManagementService implements IComponentManagementService, 
 	
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.
-	 *  @param cid	The component to destroy.
+	 *  @param componentid	The component to destroy.
 	 */
-	public void destroyComponent(IComponentIdentifier cid, IResultListener listener)
+	public IFuture destroyComponent(IComponentIdentifier cid)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		final Future ret = new Future();
 		
 		CMSComponentDescription	desc;
 		synchronized(adapters)
@@ -311,7 +312,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 				Object[]	achildren	= children.getCollection(cid).toArray();	// Use copy as children may change on destroy.
 				for(int i=0; i<achildren.length; i++)
 				{
-					destroyComponent((IComponentIdentifier)achildren[i], null);	// todo: cascading delete with wait.
+					destroyComponent((IComponentIdentifier)achildren[i]);	// todo: cascading delete with wait.
 				}
 				
 //					System.out.println("killing: "+cid);
@@ -319,8 +320,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 				JadeAgentAdapter component = (JadeAgentAdapter)adapters.get(cid);
 				if(component==null)
 				{
-					listener.exceptionOccurred(this, new RuntimeException("Component "+cid+" does not exist."));
-					return;
+					ret.setException(new RuntimeException("Component "+cid+" does not exist."));
+					return ret;
 
 					//System.out.println(componentdescs);
 					//throw new RuntimeException("Component "+aid+" does not exist.");
@@ -358,7 +359,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  Suspend the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public void suspendComponent(IComponentIdentifier componentid, IResultListener listener)
+	public IFuture suspendComponent(IComponentIdentifier componentid)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
@@ -427,7 +428,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  Resume the execution of an component.
 	 *  @param componentid The component identifier.
 	 */
-	public void resumeComponent(IComponentIdentifier componentid, IResultListener listener)
+	public IFuture resumeComponent(IComponentIdentifier componentid)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
@@ -496,8 +497,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 	/**
 	 *  Execute a step of a suspended component.
 	 *  @param componentid The component identifier.
+	 *  @param listener Called when the step is finished (result will be the component description).
 	 */
-	public void stepComponent(IComponentIdentifier componentid, IResultListener listener)
+	public IFuture stepComponent(IComponentIdentifier componentid)
 	{
 		if(listener==null)
 			listener = DefaultResultListener.getInstance();
@@ -752,9 +754,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 	/**
 	 *  Get the external access of a component.
 	 *  @param cid The component identifier.
-	 *  @param listener The result listener.
+	 *  @param listener The result listener (recieves an IExternalAccess object).
 	 */
-	public void getExternalAccess(IComponentIdentifier cid, IResultListener listener)
+	public IFuture getExternalAccess(IComponentIdentifier cid)
 	{
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
@@ -867,7 +869,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  @param cid The component identifier.
 	 *  @return The component description of this component.
 	 */
-	public void getComponentDescription(IComponentIdentifier cid, IResultListener listener)
+	public IFuture getComponentDescription(IComponentIdentifier cid)
 	{
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
@@ -884,10 +886,10 @@ public class ComponentManagementService implements IComponentManagementService, 
 	}
 	
 	/**
-	 *  Get the component descriptions.
-	 *  @return The component descriptions.
+	 *  Get all component descriptions.
+	 *  @return The component descriptions of this component.
 	 */
-	public void getComponentDescriptions(IResultListener listener)
+	public IFuture getComponentDescriptions()
 	{
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
@@ -898,8 +900,10 @@ public class ComponentManagementService implements IComponentManagementService, 
 	/**
 	 *  Get the component identifiers.
 	 *  @return The component identifiers.
+	 *  
+	 *  This method should be used with caution when the agent population is large.
 	 */
-	public void getComponentIdentifiers(IResultListener listener)
+	public IFuture getComponentIdentifiers()
 	{
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");
@@ -918,10 +922,10 @@ public class ComponentManagementService implements IComponentManagementService, 
 	}
 	
 	/**
-	 *  Search for components matching the given description.
-	 *  @return An array of matching component descriptions.
+	 * Search for components matching the given description.
+	 * @return An array of matching component descriptions.
 	 */
-	public void	searchComponents(IComponentDescription adesc, ISearchConstraints con, IResultListener listener)
+	public IFuture searchComponents(IComponentDescription adesc, ISearchConstraints con)
 	{
 		if(listener==null)
 			throw new RuntimeException("Result listener required.");

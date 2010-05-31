@@ -180,8 +180,6 @@ public class WaitForPlan extends Plan	implements Runnable
 		
 		Thread t = new Thread(this);
 		t.start();
-		waitFor(4000000);
-		//System.err.println("?");
 	}
 
 	/**
@@ -189,7 +187,7 @@ public class WaitForPlan extends Plan	implements Runnable
 	 */
 	public void run()
 	{
-		TestReport	report	= new TestReport("x-time", "Waiting for 100 ms.");
+		TestReport	report	= new TestReport("x-time", "Waiting for external 100 ms.");
 		getExternalAccess().waitFor(100);
 		report.setSucceeded(true);
 		getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
@@ -208,7 +206,7 @@ public class WaitForPlan extends Plan	implements Runnable
 		getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 		*/
 		
-		report	= new TestReport("x-beliefchange", "Waiting for belief 'time' to change.");
+		report	= new TestReport("x-beliefchange", "Waiting for external belief 'time' to change.");
 		try
 		{
 			// It can happen that we are just before the belief change scheduled.
@@ -229,7 +227,7 @@ public class WaitForPlan extends Plan	implements Runnable
 		}
 		getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 
-		report	= new TestReport("x-beliefsetadd", "Waiting for addition in beliefset 'belset'.");
+		report	= new TestReport("x-beliefsetadd", "Waiting for external addition in beliefset 'belset'.");
 		try
 		{
 			Object[] oldfacts = getExternalAccess().getBeliefbase().getBeliefSet("belset").getFacts();
@@ -246,7 +244,7 @@ public class WaitForPlan extends Plan	implements Runnable
 		}
 		getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 
-		report	= new TestReport("x-beliefsetremove", "Waiting for removal in beliefset 'belset'.");
+		report	= new TestReport("x-beliefsetremove", "Waiting for external removal in beliefset 'belset'.");
 		try
 		{
 			Object[] oldfacts = getExternalAccess().getBeliefbase().getBeliefSet("belset").getFacts();
@@ -294,7 +292,7 @@ public class WaitForPlan extends Plan	implements Runnable
 //		}
 //		getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 
-		report	= new TestReport("x-goal", "Waiting for a goal to complete.");
+		report	= new TestReport("x-goal", "Waiting for an external goal to complete.");
 		IGoal goal = getExternalAccess().getGoalbase().createGoal("test");
 		try
 		{
@@ -311,7 +309,7 @@ public class WaitForPlan extends Plan	implements Runnable
 		}
 		getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 
-		report	= new TestReport("x-message", "Waiting for a message reply.");
+		report	= new TestReport("x-message", "Waiting for an external message reply.");
 		IMessageEvent me = getExternalAccess().createMessageEvent("default_query_ping");
 		me.getParameterSet(SFipa.RECEIVERS).addValue(getExternalAccess().getComponentIdentifier());
 		try
@@ -325,7 +323,7 @@ public class WaitForPlan extends Plan	implements Runnable
 		}
 		getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 		
-		report	= new TestReport("x-timeout", "Waiting for a timeout.");
+		report	= new TestReport("x-timeout", "Waiting for an external timeout.");
 		try
 		{
 			IMessageEvent rep = getExternalAccess().waitForMessageEvent("default_query_ping", 1000);

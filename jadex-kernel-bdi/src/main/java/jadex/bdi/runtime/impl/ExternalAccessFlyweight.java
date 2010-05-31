@@ -524,9 +524,15 @@ public class ExternalAccessFlyweight extends CapabilityFlyweight implements IBDI
 						getState().addExternalObjectUsage(wa, ExternalAccessFlyweight.this);
 					}
 				};
+//				System.err.println("waitforbug: initialize wait");
+//				Thread.dumpStack();
 				Object[] tmp = initializeWait(invoc.object, timeout);
+//				System.err.println("waitforbug: dispatch");
+//				Thread.dumpStack();
 				dispatchTopLevelGoal(goal);
 				doWait();
+//				System.err.println("waitforbug: after wait");
+//				Thread.dumpStack();
 				afterWait(invoc.object, tmp[0], (WakeupAction)tmp[1]);
 			}
 		}

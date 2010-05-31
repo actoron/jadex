@@ -46,7 +46,16 @@ public class WakeupAction extends CheckedAction
 				synchronized(callerthread)
 				{
 					if(callerthread.isAlive())
+					{
 						callerthread.notify();
+//						System.err.println("waitforbug: notify");
+//						Thread.dumpStack();
+					}
+//					else
+//					{
+//						System.err.println("waitforbug: no notify");
+//						Thread.dumpStack();						
+//					}
 				}
 			}
 		}).start();

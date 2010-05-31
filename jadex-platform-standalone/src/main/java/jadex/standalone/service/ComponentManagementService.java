@@ -117,10 +117,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 		
 		if(name!=null && name.indexOf('@')!=-1)
 		{
-			ret.setResult(new RuntimeException("No '@' allowed in component name."));
-//			listener.exceptionOccurred(this, new RuntimeException("No '@' allowed in component name."));
+			ret.setException(new RuntimeException("No '@' allowed in component name."));
 			return ret;
-			//throw new RuntimeException("No '@' allowed in component name.");
 		}
 
 		/*
@@ -172,8 +170,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 					cid = new ComponentIdentifier(name+"@"+container.getName()); // Hack?!
 					if(adapters.containsKey(cid))
 					{
-						ret.setResult(new RuntimeException("Component name already exists on platform: "+cid));
-//						listener.exceptionOccurred(this, new RuntimeException("Component name already exists on platform: "+cid));
+						ret.setException(new RuntimeException("Component name already exists on platform: "+cid));
 						return ret;
 					}
 					IMessageService	ms	= (IMessageService)container.getService(IMessageService.class);
@@ -232,7 +229,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 				
 				public void exceptionOccurred(Object source, Exception exception)
 				{
-					ret.setResult(exception);
+					ret.setException(exception);
 				}
 			});
 		}
@@ -318,7 +315,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 				StandaloneComponentAdapter component = (StandaloneComponentAdapter)adapters.get(cid);
 				if(component==null)
 				{
-					ret.setResult(new RuntimeException("Component "+cid+" does not exist."));
+					ret.setException(new RuntimeException("Component "+cid+" does not exist."));
 					return ret;
 				}
 				
@@ -337,7 +334,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 					{
 						CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
 						if(cc==null)
-							ret.setResult(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
+							ret.setException(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
 						cc.addKillFuture(ret);
 					}
 				}
@@ -377,13 +374,13 @@ public class ComponentManagementService implements IComponentManagementService, 
 				ad = (CMSComponentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
 				{
-					ret.setResult(new RuntimeException("Component identifier not registered: "+componentid));
+					ret.setException(new RuntimeException("Component identifier not registered: "+componentid));
 					return ret;
 				}
 				if(!IComponentDescription.STATE_ACTIVE.equals(ad.getState())
 					/*&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState())*/)
 				{
-					ret.setResult(new RuntimeException("Component identifier not registered: "+componentid));
+					ret.setException(new RuntimeException("Component identifier not registered: "+componentid));
 					return ret;
 				}
 				
@@ -398,7 +395,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 					
 					public void exceptionOccurred(Object source, Exception exception)
 					{
-						ret.setResult(exception);
+						ret.setException(exception);
 					}
 				});
 			}
@@ -452,13 +449,13 @@ public class ComponentManagementService implements IComponentManagementService, 
 				ad = (CMSComponentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
 				{
-					ret.setResult(new RuntimeException("Component identifier not registered: "+componentid));
+					ret.setException(new RuntimeException("Component identifier not registered: "+componentid));
 					return ret;
 				}
 				if(!IComponentDescription.STATE_SUSPENDED.equals(ad.getState())
 					&& !IComponentDescription.STATE_WAITING.equals(ad.getState()))
 				{
-					ret.setResult(new RuntimeException("Component identifier not registered: "+componentid));
+					ret.setException(new RuntimeException("Component identifier not registered: "+componentid));
 					return ret;
 				}
 				
@@ -501,12 +498,12 @@ public class ComponentManagementService implements IComponentManagementService, 
 				IComponentDescription cd = (IComponentDescription)descs.get(componentid);
 				if(adapter==null || cd==null)
 				{
-					ret.setResult(new RuntimeException("Component identifier not registered: "+componentid));
+					ret.setException(new RuntimeException("Component identifier not registered: "+componentid));
 					return ret;
 				}
 				if(!IComponentDescription.STATE_SUSPENDED.equals(cd.getState()))
 				{
-					ret.setResult(new RuntimeException("Only suspended components can be stepped: "+componentid+" "+cd.getState()));
+					ret.setException(new RuntimeException("Only suspended components can be stepped: "+componentid+" "+cd.getState()));
 					return ret;
 				}
 				
@@ -519,7 +516,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 					
 					public void exceptionOccurred(Object source, Exception exception)
 					{
-						ret.setResult(exception);
+						ret.setException(exception);
 					}
 				});
 				IExecutionService exe = (IExecutionService)container.getService(IExecutionService.class);
@@ -785,7 +782,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(cid);
 		if(adapter==null)
 		{
-			ret.setResult(new RuntimeException("No local component found for component identifier: "+cid));
+			ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
 		}
 		else
 		{
@@ -798,7 +795,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 				
 				public void exceptionOccurred(Object source, Exception exception)
 				{
-					ret.setResult(exception);
+					ret.setException(exception);
 				}
 			});
 		}
@@ -921,7 +918,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		}
 		else
 		{
-			ret.setResult(new RuntimeException("No description available for: "+cid));
+			ret.setException(new RuntimeException("No description available for: "+cid));
 		}
 		
 		return ret;

@@ -22,6 +22,9 @@ public class Future implements IFuture
 	/** The result. */
 	protected Object result;
 	
+	/** The exception (if any). */
+	protected Exception exception;
+	
 	/** Flag indicating if result is available. */
 	protected boolean resultavailable;
 	
@@ -102,12 +105,33 @@ public class Future implements IFuture
 //    	if(result==null)
 //    		System.out.println(this+" here: "+caller);
     	
-    	if(result instanceof RuntimeException)
-    		throw (RuntimeException)result;
-    	
-    	return result;
+    	if(exception!=null)
+    	{
+    		throw exception instanceof RuntimeException ? (RuntimeException)exception : new RuntimeException(exception);
+    	}
+    	else
+    	{
+    	   	return result;
+    	}
     }
     
+    /**
+     *  Set the exception. 
+     *  Listener notifications occur on calling thread of this method.
+     *  @param exception The exception.
+     */
+    public synchronized void setException(Exception exception)
+    {
+    	if(resultavailable)
+    		throw new RuntimeException();
+    	
+//    	System.out.println(this+" setResult: "+result);
+    	this.exception = exception;
+    	resultavailable = true;
+    	
+    	resume();
+    }
+
     /**
      *  Set the result. 
      *  Listener notifications occur on calling thread of this method.
@@ -122,7 +146,15 @@ public class Future implements IFuture
     	this.result = result;
     	resultavailable = true;
     	
-    	for(Iterator it=callers.keySet().iterator(); it.hasNext(); )
+    	resume();
+    }
+
+	/**
+	 *  Resume after result or exception has been set.
+	 */
+	protected void resume()
+	{
+		for(Iterator it=callers.keySet().iterator(); it.hasNext(); )
     	{
     		ISuspendable caller = (ISuspendable)it.next();
     		Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
@@ -137,7 +169,7 @@ public class Future implements IFuture
     	{
     		notifyListener((IResultListener)listeners.get(i));
     	}
-    }
+	}
     
     /**
      *  Add a result listener.
@@ -164,10 +196,9 @@ public class Future implements IFuture
     protected void notifyListener(IResultListener listener)
     {
     	// todo: source?
-    	// hack!
-		if(result instanceof Exception)
+		if(exception!=null)
 		{
-			listener.exceptionOccurred(this, (Exception)result);
+			listener.exceptionOccurred(this, exception);
 		}
 		else
 		{

@@ -98,8 +98,8 @@ public abstract class AbstractCheckboxPropertySection extends
 				@Override
 				public void widgetSelected(SelectionEvent e)
 				{
-					((Button) e.getSource()).
-					updateJadexEAnnotation(util.annotationDetailName, );
+//					((Button) e.getSource()).
+//					updateJadexEAnnotation(util.annotationDetailName, );
 					
 				}
 			});
@@ -122,33 +122,33 @@ public abstract class AbstractCheckboxPropertySection extends
 			EAnnotation ea = modelElement.getEAnnotation(util.containerEAnnotationName);
 			if (ea != null)
 			{
-				for (int i = 0; i < textFieldNames.length; i++)
-				{
-					String tmpName = textFieldNames[i];
-					Text tmpField = textFields[i];
-					String tmpValue = (String) ea.getDetails().get(tmpName);
-					tmpField.setText(tmpValue != null ? tmpValue : "");
-					tmpField.setEnabled(true);
-				}
+//				for (int i = 0; i < textFieldNames.length; i++)
+//				{
+//					String tmpName = textFieldNames[i];
+//					Text tmpField = textFields[i];
+//					String tmpValue = (String) ea.getDetails().get(tmpName);
+//					tmpField.setText(tmpValue != null ? tmpValue : "");
+//					tmpField.setEnabled(true);
+//				}
 			}
 			else
 			{
-				for (int i = 0; i < textFieldNames.length; i++)
-				{
-					textFields[i].setText("");
-					textFields[i].setEnabled(true);
-				}
+//				for (int i = 0; i < textFieldNames.length; i++)
+//				{
+//					textFields[i].setText("");
+//					textFields[i].setEnabled(true);
+//				}
 			}
 
 			return;
 		}
 		
 		// fall through
-		for (int i = 0; i < textFieldNames.length; i++)
-		{
-			Text tmpField = textFields[i];
-			tmpField.setEnabled(false);
-		}
+//		for (int i = 0; i < textFieldNames.length; i++)
+//		{
+//			Text tmpField = textFields[i];
+//			tmpField.setEnabled(false);
+//		}
 		
 		
 	}
