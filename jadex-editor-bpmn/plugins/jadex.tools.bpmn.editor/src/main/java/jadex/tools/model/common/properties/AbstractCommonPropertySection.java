@@ -163,7 +163,6 @@ public abstract class AbstractCommonPropertySection extends
 						final EditPart part = (EditPart) selElt;
 						Display.getCurrent().asyncExec(new Runnable()
 						{
-							@Override
 							public void run()
 							{
 								part.refresh();

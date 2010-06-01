@@ -18,19 +18,16 @@ import org.eclipse.ui.PlatformUI;
 public class JadexActivityAnnotationDecorator extends BpmnEAnnotationDecoratorProvider implements IEAnnotationDecorator 
 {
 
-	@Override
 	public String getAssociatedAnnotationSource() 
 	{
 		return JadexBpmnPropertiesUtil.JADEX_ACTIVITY_ANNOTATION;
 	}
 
-	@Override
 	public Direction getDirection(EditPart arg0, EModelElement arg1, EAnnotation arg2) 
 	{
 		return Direction.SOUTH_WEST;
 	}
 
-	@Override
 	public Image getImage(EditPart arg0, EModelElement arg1, EAnnotation arg2) 
 	{
 		 return PlatformUI.getWorkbench().getSharedImages().
@@ -39,7 +36,6 @@ public class JadexActivityAnnotationDecorator extends BpmnEAnnotationDecoratorPr
 //        return desc == null ? null : desc.createImage();
 	}
 
-	@Override
 	public IFigure getToolTip(EditPart part, EModelElement element, EAnnotation annotation) 
 	{
 //		String impl = (String) annotation.getDetails(). get(JadexProptertyConstants.JADEX_TASK_IMPL);

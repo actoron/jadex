@@ -215,7 +215,6 @@ public abstract class AbstractComboPropertySection extends AbstractBpmnPropertyS
 		
 		combo.addModifyListener(new ModifyListener()
 		{
-			@Override
 			public void modifyText(ModifyEvent e)
 			{
 				updateJadexEAnnotation(util.annotationDetailName, combo.getText());

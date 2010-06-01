@@ -25,7 +25,6 @@ public class JadexUserTaskActivityFilter implements IFilter
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IFilter#select(java.lang.Object)
 	 */
-	@Override
 	public boolean select(Object toTest)
 	{
 //		if(toTest instanceof SubProcessEditPart || toTest instanceof SubProcessNameEditPart

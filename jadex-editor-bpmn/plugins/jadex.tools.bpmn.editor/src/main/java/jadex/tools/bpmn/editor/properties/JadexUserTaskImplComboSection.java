@@ -160,14 +160,12 @@ public class JadexUserTaskImplComboSection extends
 		cCombo.addSelectionListener(new SelectionListener()
 		{
 			
-			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
 				String taskClassName = ((CCombo) e.getSource()).getText();
 				updateTaskMetaInfo(taskClassName);
 			}
 			
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e)
 			{
 				widgetSelected(e);

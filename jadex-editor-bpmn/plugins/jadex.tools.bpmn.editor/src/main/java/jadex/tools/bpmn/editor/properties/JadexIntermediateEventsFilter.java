@@ -21,7 +21,6 @@ public class JadexIntermediateEventsFilter implements IFilter
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IFilter#select(java.lang.Object)
 	 */
-	@Override
 	public boolean select(Object toTest)
 	{
 		if (toTest instanceof ActivityEditPart || toTest instanceof Activity2EditPart)
