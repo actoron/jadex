@@ -1,10 +1,10 @@
 build dist.zip with 'mvn package'
 
 zip does not work as is :-(
-put site.xml in zip (add feature with corresponding version)
-in zip: build jar files for the feature and plugin (omit base dir)
+- put site.xml in zip (add feature with corresponding version)
+- in zip: build jar files for the feature and plugin (omit base dir)
 
 todo:
 - automatically generate site.xml
-- build jars instead of directories for plugin/feature
+- build jars instead of directories for plugin and feature
 - place generated files (.zip, build.xml, ...) in target
