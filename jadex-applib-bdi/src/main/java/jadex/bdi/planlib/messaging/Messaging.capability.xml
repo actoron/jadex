@@ -27,7 +27,7 @@
 		</achievegoal>
 	
 		<achievegoal name="send_icq" exported="true">
-			<parameter name="account" class="ICQAccount">
+			<parameter name="account" class="IMAccount">
 				<value>$beliefbase.icqaccount</value>
 			</parameter>
 			<parameter name="content" class="String"></parameter>
@@ -35,7 +35,7 @@
 		</achievegoal>
 		
 		<achievegoal name="send_xmpp" exported="true">
-			<parameter name="account" class="ICQAccount">
+			<parameter name="account" class="IMAccount">
 				<value>$beliefbase.xmppaccount</value>
 			</parameter>
 			<parameter name="content" class="String"></parameter>
@@ -118,7 +118,7 @@
 		</plan>
 		
 		<plan name="send_icq_plan">
-			<parameter name="account" class="ICQAccount">
+			<parameter name="account" class="IMAccount">
 				<goalmapping ref="send_icq.account" />
 			</parameter>
 			<parameter name="content" class="String">
@@ -134,7 +134,7 @@
 		</plan>
 		
 		<plan name="send_xmpp_plan">
-			<parameter name="account" class="ICQAccount">
+			<parameter name="account" class="IMAccount">
 				<goalmapping ref="send_xmpp.account" />
 			</parameter>
 			<parameter name="content" class="String">
