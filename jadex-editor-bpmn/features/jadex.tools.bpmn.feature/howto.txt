@@ -8,3 +8,19 @@ todo:
 - automatically generate site.xml
 - build jars instead of directories for plugin and feature
 - place generated files (.zip, build.xml, ...) in target
+
+Example for site.xml:
+-----------------
+<?xml version="1.0" encoding="UTF-8"?>
+
+<site>
+  <feature url="features/jadex.tools.bpmn.feature_1.0.0.201006011554.jar" id="jadex.tools.bpmn.feature" version="1.0.0.201006011554">
+    <category name="Jadex"/>
+  </feature>
+  <feature url="features/jadex.tools.bpmn.feature_1.0.0.201006021112.jar" id="jadex.tools.bpmn.feature" version="1.0.0.201006021112">
+    <category name="Jadex"/>
+  </feature>
+  <category-def name="Jadex" label="Jadex"/>
+</site>
+
+----------------
