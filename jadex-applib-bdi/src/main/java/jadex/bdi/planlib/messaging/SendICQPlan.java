@@ -2,14 +2,14 @@ package jadex.bdi.planlib.messaging;
 
 import jadex.bdi.runtime.Plan;
 
-import org.jcq2k.MessagingNetwork;
-import org.jcq2k.MessagingNetworkException;
-import org.jcq2k.icq2k.ICQ2KMessagingNetwork;
+//import org.jcq2k.MessagingNetwork;
+//import org.jcq2k.MessagingNetworkException;
+//import org.jcq2k.icq2k.ICQ2KMessagingNetwork;
 
 /**
  *  Send an instant message.
  */
-public class SendIMPlan extends Plan
+public class SendICQPlan extends Plan
 {
 	/**
 	 * The body method is called on the
@@ -17,8 +17,11 @@ public class SendIMPlan extends Plan
 	 */
 	public void body()
 	{
+		// No maven ICQ library available. Runs ok with jcq. 
+		fail();
+		
 		// Account settings.
-		ICQAccount account = (ICQAccount)getParameter("account").getValue();
+		IMAccount account = (IMAccount)getParameter("account").getValue();
 		if(account==null)
 			fail();
 		
@@ -41,20 +44,20 @@ public class SendIMPlan extends Plan
 //			OscarInterface.sendBasicMessage(con, receivers[i], content);
 //		}
 		
-		try
-		{
-			ICQ2KMessagingNetwork nw = new ICQ2KMessagingNetwork();
-			nw.login(account.getId(), account.getPassword(), null, MessagingNetwork.STATUS_ONLINE);
-			for(int i=0; i<receivers.length; i++) 
-			{
-				nw.sendMessage(account.getId(), receivers[i], content);
-			}
-			nw.logout(account.getId());
-		}
-		catch(MessagingNetworkException e)
-		{
-			e.printStackTrace();
-			fail(e);
-		}
+//		try
+//		{
+//			ICQ2KMessagingNetwork nw = new ICQ2KMessagingNetwork();
+//			nw.login(account.getId(), account.getPassword(), null, MessagingNetwork.STATUS_ONLINE);
+//			for(int i=0; i<receivers.length; i++) 
+//			{
+//				nw.sendMessage(account.getId(), receivers[i], content);
+//			}
+//			nw.logout(account.getId());
+//		}
+//		catch(MessagingNetworkException e)
+//		{
+//			e.printStackTrace();
+//			fail(e);
+//		}
 	}
 }

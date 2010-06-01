@@ -34,6 +34,10 @@
         <beliefref name="icqaccount" exported="true">
             <concrete ref="messagingcap.icqaccount"/>
         </beliefref>
+        
+         <beliefref name="xmppaccount" exported="true">
+            <concrete ref="messagingcap.xmppaccount"/>
+        </beliefref>
 	</beliefs>
 
 	<goals>
@@ -45,8 +49,12 @@
 			<concrete ref="messagingcap.send_email"/>
 		</achievegoalref>
       
-        <achievegoalref name="send_im">
-             <concrete ref="messagingcap.send_im"/>
+        <achievegoalref name="send_icq">
+             <concrete ref="messagingcap.send_icq"/>
+        </achievegoalref>
+        
+         <achievegoalref name="send_xmpp">
+             <concrete ref="messagingcap.send_xmpp"/>
         </achievegoalref>
         
         <achievegoalref name="pinging">

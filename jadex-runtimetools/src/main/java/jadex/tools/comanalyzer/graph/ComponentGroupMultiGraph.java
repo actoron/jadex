@@ -1045,6 +1045,14 @@ public class ComponentGroupMultiGraph implements Graph
 		edge_weights.remove(edge);
 	}
 
+	/**
+	 * 
+	 */
+	public EdgeType getDefaultEdgeType()
+	{
+		return null;
+	}
+	
 	//-------- inner classes --------
 
 	/**

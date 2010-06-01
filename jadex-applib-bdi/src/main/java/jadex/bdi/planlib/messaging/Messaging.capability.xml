@@ -15,7 +15,9 @@
 	<beliefs>
 		<belief name="emailaccount" class="EmailAccount" exported="true" />
 	
-		<belief name="icqaccount" class="ICQAccount" exported="true" />
+		<belief name="icqaccount" class="IMAccount" exported="true" />
+		
+		<belief name="xmppaccount" class="IMAccount" exported="true" />
 	</beliefs>
 	
 	<goals>
@@ -24,9 +26,17 @@
 			<parameterset name="receivers" class="String"></parameterset>
 		</achievegoal>
 	
-		<achievegoal name="send_im" exported="true">
+		<achievegoal name="send_icq" exported="true">
 			<parameter name="account" class="ICQAccount">
 				<value>$beliefbase.icqaccount</value>
+			</parameter>
+			<parameter name="content" class="String"></parameter>
+			<parameterset name="receivers" class="String"></parameterset>
+		</achievegoal>
+		
+		<achievegoal name="send_xmpp" exported="true">
+			<parameter name="account" class="ICQAccount">
+				<value>$beliefbase.xmppaccount</value>
 			</parameter>
 			<parameter name="content" class="String"></parameter>
 			<parameterset name="receivers" class="String"></parameterset>
@@ -75,19 +85,67 @@
 			</trigger>
 		</plan>
 		
-		<plan name="send_im_plan">
-			<parameter name="account" class="ICQAccount">
-				<goalmapping ref="send_im.account" />
+		<plan name="send_icq_plan">
+			<parameter name="account" class="IMAccount">
+				<goalmapping ref="send_icq.account" />
 			</parameter>
 			<parameter name="content" class="String">
-				<goalmapping ref="send_im.content" />
+				<goalmapping ref="send_icq.content" />
 			</parameter>
 			<parameterset name="receivers" class="String">
-				<goalmapping ref="send_im.receivers" />
+				<goalmapping ref="send_icq.receivers" />
 			</parameterset>
-			<body class="SendIMPlan" />
+			<body class="SendICQPlan" />
 			<trigger>
-				<goal ref="send_im" />
+				<goal ref="send_icq" />
+			</trigger>
+		</plan>
+		
+		<plan name="send_xmpp_plan">
+			<parameter name="account" class="IMAccount">
+				<goalmapping ref="send_xmpp.account" />
+			</parameter>
+			<parameter name="content" class="String">
+				<goalmapping ref="send_xmpp.content" />
+			</parameter>
+			<parameterset name="receivers" class="String">
+				<goalmapping ref="send_xmpp.receivers" />
+			</parameterset>
+			<body class="SendxmppPlan" />
+			<trigger>
+				<goal ref="send_xmpp" />
+			</trigger>
+		</plan>
+		
+		<plan name="send_icq_plan">
+			<parameter name="account" class="ICQAccount">
+				<goalmapping ref="send_icq.account" />
+			</parameter>
+			<parameter name="content" class="String">
+				<goalmapping ref="send_icq.content" />
+			</parameter>
+			<parameterset name="receivers" class="String">
+				<goalmapping ref="send_icq.receivers" />
+			</parameterset>
+			<body class="SendICQPlan" />
+			<trigger>
+				<goal ref="send_icq" />
+			</trigger>
+		</plan>
+		
+		<plan name="send_xmpp_plan">
+			<parameter name="account" class="ICQAccount">
+				<goalmapping ref="send_xmpp.account" />
+			</parameter>
+			<parameter name="content" class="String">
+				<goalmapping ref="send_xmpp.content" />
+			</parameter>
+			<parameterset name="receivers" class="String">
+				<goalmapping ref="send_xmpp.receivers" />
+			</parameterset>
+			<body class="SendxmppPlan" />
+			<trigger>
+				<goal ref="send_xmpp" />
 			</trigger>
 		</plan>
 	</plans>

@@ -34,8 +34,12 @@
 			<concrete ref="msgcap.send_email" />
 		</achievegoalref>
 		
-		<achievegoalref name="send_im">
-			<concrete ref="msgcap.send_im" />
+		<achievegoalref name="send_icq">
+			<concrete ref="msgcap.send_icq" />
+		</achievegoalref>
+		
+		<achievegoalref name="send_xmpp">
+			<concrete ref="msgcap.send_xmpp" />
 		</achievegoalref>
 	</goals>
 

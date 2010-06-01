@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.uci.ics.jung.algorithms.layout.CircleLayout;
-import edu.uci.ics.jung.algorithms.util.RandomLocationTransformer;
+import edu.uci.ics.jung.algorithms.layout.util.RandomLocationTransformer;
 import edu.uci.ics.jung.graph.Graph;
 
 

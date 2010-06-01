@@ -2,7 +2,7 @@ package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
 import jadex.bdi.planlib.messaging.EmailAccount;
-import jadex.bdi.planlib.messaging.ICQAccount;
+import jadex.bdi.planlib.messaging.IMAccount;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 
@@ -22,7 +22,9 @@ public class MessagingTestPlan extends Plan
 	 */
 	public void	body()
 	{
-		testICQ();
+		testXMPP();
+		
+//		testICQ();
 		
 		testEMail();
 	}
@@ -132,9 +134,9 @@ public class MessagingTestPlan extends Plan
 		{
 			try
 			{
-				ICQAccount iacc = new ICQAccount(icqnumber, icqpass);
+				IMAccount iacc = new IMAccount(icqnumber, icqpass);
 		
-				IGoal sendim = createGoal("send_im");
+				IGoal sendim = createGoal("send_icq");
 				sendim.getParameter("account").setValue(iacc);
 				sendim.getParameter("content").setValue("hi from a jadex agent");
 				StringTokenizer	stok	= new StringTokenizer(icqreceivers, ",");
@@ -156,6 +158,71 @@ public class MessagingTestPlan extends Plan
 				props.setProperty("icqnumber", "<icq account number>");
 				props.setProperty("icqpass", "<password for icq account>");
 				props.setProperty("icqreceivers", "<comma-separated list of icq numbers to send to>");
+				props.store(new FileOutputStream(file), "Account settings used by jadex.bdi.testcases.MessagingTestPlan.\n#Please edit if you want to make the test case work.");
+				tr2.setReason("No accountsettings found. Please edit "+file.getAbsolutePath());
+			}
+			catch(Exception e)
+			{
+				tr2.setReason("Error accessing settings: "+e+". Please create "+file.getAbsolutePath());
+			}
+		}
+		getBeliefbase().getBeliefSet("testcap.reports").addFact(tr2);
+	}
+	
+	/**
+	 *  Test sending an jabber message.
+	 */
+	protected void testXMPP()
+	{
+		String	xmppnumber	= null;
+		String	xmpppass	= null;
+		String	xmppreceivers	= null;
+		
+		File	file	= new File("./messagingtest.xmpp.properties");
+		boolean	haveprops;
+		Properties	props	= new Properties();
+		try
+		{
+			props.load(new FileInputStream(file));
+			xmppnumber	= props.getProperty("xmppnumber");
+			xmpppass	= props.getProperty("xmpppass");
+			xmppreceivers	= props.getProperty("xmppreceivers");
+			haveprops	= true;
+		}
+		catch(Exception e)
+		{
+			haveprops	= false;
+		}
+
+		TestReport tr2 = new TestReport("#2", "Test sending instant message.");
+		if(haveprops)
+		{
+			try
+			{
+				IMAccount iacc = new IMAccount(xmppnumber, xmpppass);
+		
+				IGoal sendim = createGoal("send_xmpp");
+				sendim.getParameter("account").setValue(iacc);
+				sendim.getParameter("content").setValue("hi from a jadex agent");
+				StringTokenizer	stok	= new StringTokenizer(xmppreceivers, ",");
+				while(stok.hasMoreTokens())
+					sendim.getParameterSet("receivers").addValue(stok.nextToken().trim());
+
+				dispatchSubgoalAndWait(sendim);
+				tr2.setSucceeded(true);
+			}
+			catch(Exception e)
+			{
+				tr2.setReason("Exception occurred: "+e);
+			}
+		}
+		else
+		{
+			try
+			{
+				props.setProperty("xmppnumber", "<xmpp account number>");
+				props.setProperty("xmpppass", "<password for xmpp account>");
+				props.setProperty("xmppreceivers", "<comma-separated list of xmpp numbers to send to>");
 				props.store(new FileOutputStream(file), "Account settings used by jadex.bdi.testcases.MessagingTestPlan.\n#Please edit if you want to make the test case work.");
 				tr2.setReason("No accountsettings found. Please edit "+file.getAbsolutePath());
 			}

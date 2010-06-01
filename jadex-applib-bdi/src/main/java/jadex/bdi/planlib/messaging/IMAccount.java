@@ -3,7 +3,7 @@ package jadex.bdi.planlib.messaging;
 /** 
  *  Account for icq.
  */
-public class ICQAccount
+public class IMAccount
 {
 	//-------- attributes --------
 	
@@ -16,19 +16,19 @@ public class ICQAccount
 	//-------- constructors --------
 	
 	/** 
-	 * Constructor for ICQAccount.
+	 * Constructor for IMAccount.
 	 */
-	public ICQAccount()
+	public IMAccount()
 	{
 		/* default */
 	}
 
 	/** 
-	 * Constructor for ICQAccount.
+	 * Constructor for IMAccount.
 	 * @param id
 	 * @param password
 	 */
-	public ICQAccount(String id, String password)
+	public IMAccount(String id, String password)
 	{
 		this.id = id;
 		this.password = password;

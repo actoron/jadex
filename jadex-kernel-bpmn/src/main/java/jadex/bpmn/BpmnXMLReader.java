@@ -96,7 +96,7 @@ public class BpmnXMLReader
 	 *  @param info	The resource info.
 	 *  @param classloader The classloader.
  	 */
-	protected static MBpmnModel read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
+	public static MBpmnModel read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
 	{
 		MBpmnModel ret = (MBpmnModel)reader.read(rinfo.getInputStream(), classloader, null);
 		ret.setFilename(rinfo.getFilename());

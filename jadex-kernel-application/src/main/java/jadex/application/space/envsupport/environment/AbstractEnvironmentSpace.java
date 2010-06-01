@@ -213,8 +213,8 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 //				Map properties = convertProperties(props, fetcher);
 //				System.out.println("Adding environment object type: "+(String)getProperty(mobjecttype, "name")+" "+props);
 				
-				for (Iterator it = mobjecttype.iterator(); it.hasNext(); )
-					System.out.println(((MObjectTypeProperty)it.next()).getType());
+//				for(Iterator it = mobjecttype.iterator(); it.hasNext();)
+//					System.out.println(((MObjectTypeProperty)it.next()).getType());
 				
 				this.addSpaceObjectType(mobjecttype.getName(), mobjecttype);
 			}
