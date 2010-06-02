@@ -6,6 +6,15 @@
   <packaging>pom</packaging>
   <version>2.0-rc2</version>
   <name>jadex</name>
+  
+  <!-- <distributionManagement>
+    <snapshotRepository>
+      <id>sonatype-nexus-snapshots</id>
+      <name>Sonatype Nexus Snapshots</name>
+      <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>-->
+
   <profiles>
   	<profile>
   		<id>jadex-xml-dist</id>
@@ -269,6 +278,20 @@
         			<goal>single</goal>
         		</goals>
         	</execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
     </plugins>
