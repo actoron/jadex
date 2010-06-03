@@ -7,7 +7,7 @@ zip does not work as is :-(
 todo:
 - automatically generate site.xml
 - build jars instead of directories for plugin and feature
-- place generated files (.zip, build.xml, ...) in target
+- place temporary files (build.xml, ...) in target directory (out of svn sight)
 
 Example for site.xml:
 -----------------

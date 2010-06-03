@@ -15,10 +15,15 @@
         <extensions>true</extensions>
         <configuration>
           <eclipseInstall>C:/Files/Programs/eclipse-jee-galileo-win32</eclipseInstall>
-			<buildProperties>
-			  <javacSource>1.5</javacSource>
-			  <javacTarget>1.5</javacTarget>
-			</buildProperties>
+		  <antDebug>true</antDebug>
+		  <antVerbose>true</antVerbose>
+		  <buildProperties>
+		    <javacSource>1.5</javacSource>
+		    <javacTarget>1.5</javacTarget>
+		    <feature.destination>target</feature.destination>
+		    <generate.p2.metadata>true</generate.p2.metadata>
+		    <p2.publish.artifacts>true</p2.publish.artifacts>
+		  </buildProperties>
         </configuration>
       </plugin>
     </plugins>
