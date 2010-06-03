@@ -6,6 +6,7 @@
 <booleanAttribute key="M2_OFFLINE" value="false"/>
 <stringAttribute key="M2_PROFILES" value="jadex-full-dist"/>
 <listAttribute key="M2_PROPERTIES">
+<listEntry value="gpg.homedir=docs/keys"/>
 <listEntry value="gpg.passphrase=lax"/>
 </listAttribute>
 <stringAttribute key="M2_RUNTIME" value="C:\Files\Programs\apache-maven-2.2.1"/>
