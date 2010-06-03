@@ -8,6 +8,7 @@
 <listAttribute key="M2_PROPERTIES">
 <listEntry value="gpg.passphrase=lax"/>
 <listEntry value="gpg.homedir=docs/keys"/>
+<listEntry value="-s=src/main/config/settings.xml"/>
 </listAttribute>
 <stringAttribute key="M2_RUNTIME" value="C:\Files\Programs\apache-maven-2.2.1"/>
 <booleanAttribute key="M2_SKIP_TESTS" value="false"/>
