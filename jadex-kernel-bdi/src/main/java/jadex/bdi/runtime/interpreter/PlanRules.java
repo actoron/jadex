@@ -2113,7 +2113,7 @@ public class PlanRules
 					.getService(IClockService.class)).createTickTimer(new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), toa));
 				toa.setTimer(timer); // This works because isValid() will always be executed on agent thread (InterpreterTimedObject).
 
-				System.out.println("Tick timer created: "+timer);
+//				System.out.println("Tick timer created: "+timer);
 				state.setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_timer, timer);
 			}
 		}
