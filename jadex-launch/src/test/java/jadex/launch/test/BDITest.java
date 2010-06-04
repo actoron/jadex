@@ -33,6 +33,7 @@ public class BDITest	extends	ComponentTestSuite
 				"Watchdog",	// Prints ugly warnings but works.
 				"CMSTest",	// missing cms agent?
 				"DFTest",	// missing df agent?
+				"WaitFor",	// Missing synchronization between simulation clock and external clock
 				"MessagingTest"	// wrong email configuration?
 			});
 	}
