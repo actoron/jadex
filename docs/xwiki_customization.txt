@@ -55,10 +55,12 @@ http://localhost/xwiki/bin/edit/XWiki/XWikiPreferences?editor=object
 
 Appearance
 ----------
-
-- customize / edit skin as desired. (preferences/presentation)
-- attach logo to xwiki/bin/view/XWiki/DefaultSkin and edit to refer to logo (make sure to remove leading/trailing spaces around file name)
-- attach go.png image to xwiki/bin/view/XWiki/DefaultSkin to alter search button (if desired)
+- jadex skin
+	- customize / edit skin as desired. (preferences/presentation)
+		- images: shadebar.png, bar.png, nav-inner.png, bg-blue-right-30.png, bg-blue-left-230.png
+		- for colors search for 'jadex-color' in jadex-processes toucan.css 
+	- attach logo to xwiki/bin/view/XWiki/DefaultSkin and edit to refer to logo (make sure to remove leading/trailing spaces around file name)
+	- attach go.png image to xwiki/bin/view/XWiki/DefaultSkin to alter search button (if desired)
 - Adapt layout (preferences/panels)
 - change class="globalsearch" to id="globalsearch" in search panel for css backwards compatibility
 - change copyright notice (preferences/presentation) to: Copyright (C) 2002-2010 Lars Braubach, Alexander Pokahr - University of Hamburg
