@@ -10,10 +10,6 @@
   
   <moduleSets>
     <moduleSet>
- 
-      <includes>
-        <include>jadex:*</include>
-      </includes>
       
       <binaries>
       	<outputFileNameMapping>${artifact.artifactId}-${artifact.version}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
@@ -25,14 +21,14 @@
         <includeModuleDirectory>false</includeModuleDirectory>
         <fileSets>
           <fileSet>
-            <outputDirectory>sources/${artifactId}</outputDirectory>
+            <outputDirectory>sources/${module.artifactId}</outputDirectory>
             <includes>
               <include>src/**</include>
               <include>pom.xml</include>
             </includes>
           </fileSet>
           <fileSet>
-            <outputDirectory>sources/${artifactId}</outputDirectory>
+            <outputDirectory>sources/${module.artifactId}</outputDirectory>
             <includes>
               <include>lib/**</include>
             </includes>
@@ -59,8 +55,12 @@
       <outputDirectory>sources</outputDirectory>
     </file>
     <file>
-      <source>src/main/config/jadex-settings-pom.xml</source>
+      <source>/src/main/config/jadex-settings-pom.xml</source>
       <outputDirectory>sources/src/main/config</outputDirectory>
+    </file>
+    <file>
+      <source>/src/main/assembly/dist-assembly-wfms.xml</source>
+      <outputDirectory>sources/src/main/assembly</outputDirectory>
     </file>
     <file>
       <source>docs/readme.txt</source>

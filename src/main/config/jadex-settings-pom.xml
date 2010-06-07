@@ -17,7 +17,6 @@
       <resource>
         <directory>src/test/resources</directory>
         <excludes>
-          <exclude>**/*.java</exclude>
           <exclude>**/.svn/*</exclude>
         </excludes>
       </resource>
