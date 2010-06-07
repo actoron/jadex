@@ -90,13 +90,13 @@ public class ComputeSingleResultPlan extends Plan {
 		// store result
 		HashMap experimentResults = (HashMap) getBeliefbase().getBelief("experimentResults").getFact();
 		//HACK! - 26-5-10
-//		experimentResults.put(totalRuns, experimentRes);
+		experimentResults.put(totalRuns, experimentRes);
 		getBeliefbase().getBelief("experimentResults").setFact(experimentResults);
 
 		// do evaluation of intermediate results of an ensemble, i.e. the results of the already conducted experiments of this ensemble.
 		
 		//HACK! - 26-5-10
-		experimentRes.setEvents(new ArrayList<ObservedEvent> ());
+//		experimentRes.setEvents(new ArrayList<ObservedEvent> ());
 		
 		IntermediateResult interRes = IntermediateEvaluation.updateIntermediateResults(simConf, (IntermediateResult) getBeliefbase().getBelief("intermediateResults").getFact(), experimentRes);
 		getBeliefbase().getBelief("intermediateResults").setFact(interRes);

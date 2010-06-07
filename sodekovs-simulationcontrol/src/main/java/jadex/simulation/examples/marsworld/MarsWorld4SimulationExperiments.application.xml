@@ -339,8 +339,8 @@
 			</spaces>
 			<components>
 				<component type="Sentry" number="$args.NumberOfSentries" />
-				<component type="Producer" number="1" />
-				<component type="Carry" number="3" />
+				<component type="Producer" number="4" />
+				<component type="Carry" number="1" />
 				<component type="ClientSimulator">
 					<arguments>
 						<!-- The mission time. -->

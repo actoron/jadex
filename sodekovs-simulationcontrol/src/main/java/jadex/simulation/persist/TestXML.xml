@@ -87,7 +87,7 @@
 		</Data>
 		<!-- Important: Number of sweeps has to be equal with number of rows!-->
 		<ParameterSweeping tpye="increment"> <!-- or: values-->
-			<Configuration start="2" end="10" step="1" class="int" />
+			<Configuration start="5" end="10" step="1" class="int" />
 			<!-- or: values="11;19;26;100"/>-->
 		</ParameterSweeping>
 		<Algorithm>
