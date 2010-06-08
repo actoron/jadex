@@ -4,13 +4,13 @@
   <groupId>net.sourceforge.jadex</groupId>
   <artifactId>jadex-jade-launch</artifactId>
   <packaging>jar</packaging>
-  <version>2.0-rc2</version>
+  <version>${jadexVersion}</version>
   <name>jadex-jade-launch</name>
   <!-- <url>http://jadex.sourceforge.net</url> -->
   <parent>
     <groupId>net.sourceforge.jadex</groupId>
     <artifactId>jadex-settings</artifactId>
-    <version>2.0-rc2</version>
+    <version>${jadexVersion}</version>
     <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
   </parent>
   <build>
@@ -64,42 +64,42 @@
        <dependency>
     	<groupId>net.sourceforge.jadex</groupId>
     	<artifactId>jadex-runtimetools</artifactId>
-    	<version>2.0-rc2</version>
+    	 <version>${jadexVersion}</version>
     </dependency>
     <dependency>
     	<groupId>net.sourceforge.jadex</groupId>
     	<artifactId>jadex-kernel-micro</artifactId>
-    	<version>2.0-rc2</version>
+    	 <version>${jadexVersion}</version>
     </dependency>
     <dependency>
     	<groupId>net.sourceforge.jadex</groupId>
     	<artifactId>jadex-rules-tools</artifactId>
-    	<version>2.0-rc2</version>
+    	 <version>${jadexVersion}</version>
     </dependency>
   	<dependency>
     	<groupId>net.sourceforge.jadex</groupId>
     	<artifactId>jadex-kernel-bpmn</artifactId>
-    	<version>2.0-rc2</version>
+    	 <version>${jadexVersion}</version>
     </dependency>
   	<dependency>
     	<groupId>net.sourceforge.jadex</groupId>
     	<artifactId>jadex-kernel-bdibpmn</artifactId>
-    	<version>2.0-rc2</version>
+    	 <version>${jadexVersion}</version>
     </dependency>
   	<dependency>
     	<groupId>net.sourceforge.jadex</groupId>
     	<artifactId>jadex-kernel-application</artifactId>
-    	<version>2.0-rc2</version>
+    	 <version>${jadexVersion}</version>
     </dependency>
     <dependency>
     	<groupId>net.sourceforge.jadex</groupId>
     	<artifactId>jadex-kernel-gpmn</artifactId>
-    	<version>2.0-rc2</version>
+    	 <version>${jadexVersion}</version>
     </dependency>
     <dependency>
     	<groupId>net.sourceforge.jadex</groupId>
     	<artifactId>jadex-platform-jade</artifactId>
-    	<version>2.0-rc2</version>
+    	 <version>${jadexVersion}</version>
     </dependency>
   </dependencies>
 </project>

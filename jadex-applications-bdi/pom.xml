@@ -4,13 +4,13 @@
   <groupId>net.sourceforge.jadex</groupId>
   <artifactId>jadex-applications-bdi</artifactId>
   <packaging>jar</packaging>
-  <version>2.0-rc2</version>
+  <version>${jadexVersion}</version>
   <name>jadex-applications-bdi</name>
   <!-- <url>http://jadex.sourceforge.net</url> -->
   <parent>
     <groupId>net.sourceforge.jadex</groupId>
     <artifactId>jadex-settings</artifactId>
-    <version>2.0-rc2</version>
+    <version>${jadexVersion}</version>
     <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
   </parent>
   <dependencies>
@@ -23,7 +23,7 @@
     <dependency>
       <groupId>net.sourceforge.jadex</groupId>
       <artifactId>jadex-applib-bdi</artifactId>
-      <version>2.0-rc2</version>
+      <version>${jadexVersion}</version>
     </dependency>
     <dependency>
       <groupId>com.toedter</groupId>
@@ -33,7 +33,7 @@
     <dependency>
     	<groupId>net.sourceforge.jadex</groupId>
     	<artifactId>jadex-kernel-application</artifactId>
-    	<version>2.0-rc2</version>
+    	 <version>${jadexVersion}</version>
     </dependency> 
     <dependency>
 		<groupId>de.huxhorn.sulky</groupId>

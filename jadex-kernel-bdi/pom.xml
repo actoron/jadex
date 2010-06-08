@@ -4,13 +4,13 @@
   <groupId>net.sourceforge.jadex</groupId>
   <artifactId>jadex-kernel-bdi</artifactId>
   <packaging>jar</packaging>
-  <version>2.0-rc2</version>
+  <version>${jadexVersion}</version>
   <name>jadex-kernel-bdi</name>
   <!-- <url>http://jadex.sourceforge.net</url> -->
   <parent>
     <groupId>net.sourceforge.jadex</groupId>
     <artifactId>jadex-settings</artifactId>
-    <version>2.0-rc2</version>
+    <version>${jadexVersion}</version>
     <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
   </parent>
   <build>
@@ -36,17 +36,17 @@
     <dependency>
     	<groupId>net.sourceforge.jadex</groupId>
     	<artifactId>jadex-rules</artifactId>
-    	<version>2.0-rc2</version>
+    	 <version>${jadexVersion}</version>
     </dependency>
     <dependency>
     	<groupId>net.sourceforge.jadex</groupId>
     	<artifactId>jadex-javaparser</artifactId>
-    	<version>2.0-rc2</version>
+    	 <version>${jadexVersion}</version>
     </dependency>
     <dependency>
     	<groupId>net.sourceforge.jadex</groupId>
     	<artifactId>jadex-bridge</artifactId>
-    	<version>2.0-rc2</version>
+    	 <version>${jadexVersion}</version>
     </dependency>
     <!-- <dependency>
 		<groupId>piccolo</groupId>

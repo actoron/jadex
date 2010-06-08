@@ -6,7 +6,7 @@
   <artifactId>jadex-bpmn-editor-plugin</artifactId>
   <packaging>zip</packaging>
   <name>jadex-bpmn-editor-plugin</name>
-  <version>2.0-rc2</version>
+  <version>${jadexVersion}</version>
   <build>
     <plugins>
       <plugin>

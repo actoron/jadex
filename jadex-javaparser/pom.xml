@@ -5,12 +5,12 @@
   <artifactId>jadex-javaparser</artifactId>
   <packaging>jar</packaging>
   <name>jadex-javaparser</name>
-  <version>2.0-rc2</version>
+  <version>${jadexVersion}</version>
   <!-- <url>http://jadex.sourceforge.net</url> -->
   <parent>
     <groupId>net.sourceforge.jadex</groupId>
     <artifactId>jadex-settings</artifactId>
-    <version>2.0-rc2</version>
+    <version>${jadexVersion}</version>
     <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
   </parent>
   <dependencies>
@@ -22,7 +22,7 @@
   	<dependency>
   		<groupId>net.sourceforge.jadex</groupId>
   		<artifactId>jadex-commons</artifactId>
-  		<version>2.0-rc2</version>
+  		 <version>${jadexVersion}</version>
   	</dependency>
   </dependencies>
 </project>

@@ -4,13 +4,13 @@
   <groupId>net.sourceforge.jadex</groupId>
   <artifactId>jadex-applib-bdi</artifactId>
   <packaging>jar</packaging>
-  <version>2.0-rc2</version>
+  <version>${jadexVersion}</version>
   <name>jadex-applib-bdi</name>
   <!-- <url>http://jadex.sourceforge.net</url> -->
   <parent>
     <groupId>net.sourceforge.jadex</groupId>
     <artifactId>jadex-settings</artifactId>
-    <version>2.0-rc2</version>
+    <version>${jadexVersion}</version>
     <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
   </parent>
   <repositories>
@@ -30,12 +30,12 @@
     <dependency>
     	<groupId>net.sourceforge.jadex</groupId>
     	<artifactId>jadex-platform-base</artifactId>
-    	<version>2.0-rc2</version>
+    	 <version>${jadexVersion}</version>
     </dependency>
     <dependency>
     	<groupId>net.sourceforge.jadex</groupId>
     	<artifactId>jadex-kernel-bdi</artifactId>
-    	<version>2.0-rc2</version>
+    	 <version>${jadexVersion}</version>
     </dependency>
     <dependency>
       <groupId>javax.mail</groupId>
@@ -60,7 +60,7 @@
     <dependency>
       <groupId>net.sourceforge.jadex</groupId>
       <artifactId>jadex-kernel-application</artifactId>
-      <version>2.0-rc2</version>
+      <version>${jadexVersion}</version>
     </dependency>
   </dependencies>
 </project>

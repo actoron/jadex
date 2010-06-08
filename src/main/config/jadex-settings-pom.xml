@@ -1,10 +1,31 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <properties>
+    <jadexVersion>2.0-rc3</jadexVersion>
+  </properties>
+  
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.sourceforge.jadex</groupId>
   <artifactId>jadex-settings</artifactId>
-  <version>2.0-rc2</version>
+  <version>${jadexVersion}</version>
   <packaging>pom</packaging>
   <url>jadex.sourceforge.net</url>
+  
+  <!-- <distributionManagement>
+    <snapshotRepository>
+      <id>sonatype-nexus-snapshots</id>
+      <name>Sonatype Nexus Snapshots</name>
+      <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>-->
+
+  <!-- <distributionManagement>
+    <snapshotRepository>
+      <id>sonatype-nexus-releases</id>
+      <name>Sonatype Nexus Releases</name>
+      <url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+    </snapshotRepository>
+  </distributionManagement>-->
+  
   <build>
     <resources>
       <resource>

@@ -5,29 +5,29 @@
   <artifactId>jadex-bridge</artifactId>
   <packaging>jar</packaging>
   <name>jadex-bridge</name>
-  <version>2.0-rc2</version>
+  <version>${jadexVersion}</version>
   <!-- <url>http://jadex.sourceforge.net</url> -->
   <parent>
     <groupId>net.sourceforge.jadex</groupId>
     <artifactId>jadex-settings</artifactId>
-    <version>2.0-rc2</version>
+    <version>${jadexVersion}</version>
     <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
   </parent>
   <dependencies>
   	<dependency>
   		<groupId>net.sourceforge.jadex</groupId>
   		<artifactId>jadex-commons</artifactId>
-  		<version>2.0-rc2</version>
+  		 <version>${jadexVersion}</version>
   	</dependency>
   	<dependency>
   		<groupId>net.sourceforge.jadex</groupId>
   		<artifactId>jadex-javaparser</artifactId>
-  		<version>2.0-rc2</version>
+  		 <version>${jadexVersion}</version>
   	</dependency>
   	<dependency>
   		<groupId>net.sourceforge.jadex</groupId>
   		<artifactId>jadex-services</artifactId>
-  		<version>2.0-rc2</version>
+  		 <version>${jadexVersion}</version>
   	</dependency>
   	<!-- <dependency>
   		<groupId>stax</groupId>
