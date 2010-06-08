@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_Xw8YMHLrEd-hPeB9PqFcpw" type="Gpmn" name="CleanerManufacturing.gpmn_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_aMz9sHLrEd-hPeB9PqFcpw" type="2002">
+    <children xmi:type="notation:DecorationNode" xmi:id="_aMz9tXLrEd-hPeB9PqFcpw" type="5002"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_aMz9sXLrEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_aMz9snLrEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_aMz9s3LrEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:AchieveGoal" href="CleanerManufacturing.gpmn#_aMqMsHLrEd-hPeB9PqFcpw"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_aMz9tHLrEd-hPeB9PqFcpw" x="375" y="15"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_zMS6EXLrEd-hPeB9PqFcpw" type="2002">
+    <children xmi:type="notation:DecorationNode" xmi:id="_zMS6FnLrEd-hPeB9PqFcpw" type="5002"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_zMS6EnLrEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_zMS6E3LrEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_zMS6FHLrEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:AchieveGoal" href="CleanerManufacturing.gpmn#_zMS6EHLrEd-hPeB9PqFcpw"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_zMS6FXLrEd-hPeB9PqFcpw" x="220" y="130"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_Abk-0XLsEd-hPeB9PqFcpw" type="2005">
+    <children xmi:type="notation:DecorationNode" xmi:id="_Abk-1nLsEd-hPeB9PqFcpw" type="5005"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_Abk-0nLsEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_Abk-03LsEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_Abk-1HLsEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:QueryGoal" href="CleanerManufacturing.gpmn#_Abk-0HLsEd-hPeB9PqFcpw"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Abk-1XLsEd-hPeB9PqFcpw" x="95" y="245"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_yqD6QXLsEd-hPeB9PqFcpw" type="2002">
+    <children xmi:type="notation:DecorationNode" xmi:id="_yqD6RnLsEd-hPeB9PqFcpw" type="5002"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_yqD6QnLsEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_yqD6Q3LsEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_yqD6RHLsEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:AchieveGoal" href="CleanerManufacturing.gpmn#_yqD6QHLsEd-hPeB9PqFcpw"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_yqD6RXLsEd-hPeB9PqFcpw" x="350" y="245"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_-E9QQXLsEd-hPeB9PqFcpw" type="2010">
+    <children xmi:type="notation:DecorationNode" xmi:id="_-E9QRnLsEd-hPeB9PqFcpw" type="5010"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_-E9QQnLsEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_-E9QQ3LsEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_-E9QRHLsEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:Plan" href="CleanerManufacturing.gpmn#_-E9QQHLsEd-hPeB9PqFcpw"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_-E9QRXLsEd-hPeB9PqFcpw" x="15" y="380"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_FJNWIXLtEd-hPeB9PqFcpw" type="2009">
+    <children xmi:type="notation:DecorationNode" xmi:id="_FJNWJnLtEd-hPeB9PqFcpw" type="5009"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_FJNWInLtEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_FJNWI3LtEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_FJNWJHLtEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:SubProcessGoal" href="CleanerManufacturing.gpmn#_FJNWIHLtEd-hPeB9PqFcpw"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_FJNWJXLtEd-hPeB9PqFcpw" x="180" y="380"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_P-Q0IXLtEd-hPeB9PqFcpw" type="2010">
+    <children xmi:type="notation:DecorationNode" xmi:id="_P-Q0JnLtEd-hPeB9PqFcpw" type="5010"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_P-Q0InLtEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_P-Q0I3LtEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_P-Q0JHLtEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:Plan" href="CleanerManufacturing.gpmn#_P-Q0IHLtEd-hPeB9PqFcpw"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_P-Q0JXLtEd-hPeB9PqFcpw" x="350" y="380"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_flY6AXLtEd-hPeB9PqFcpw" type="2003">
+    <children xmi:type="notation:DecorationNode" xmi:id="_flY6BnLtEd-hPeB9PqFcpw" type="5003"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_flY6AnLtEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_flY6A3LtEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_flY6BHLtEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:MaintainGoal" href="CleanerManufacturing.gpmn#_flY6AHLtEd-hPeB9PqFcpw"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_flY6BXLtEd-hPeB9PqFcpw" x="715" y="245"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_uHEawXLtEd-hPeB9PqFcpw" type="2002">
+    <children xmi:type="notation:DecorationNode" xmi:id="_uHEaxnLtEd-hPeB9PqFcpw" type="5002"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_uHEawnLtEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_uHEaw3LtEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_uHEaxHLtEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:AchieveGoal" href="CleanerManufacturing.gpmn#_uHEawHLtEd-hPeB9PqFcpw"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_uHEaxXLtEd-hPeB9PqFcpw" x="525" y="130"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_1PMUAXLtEd-hPeB9PqFcpw" type="2010">
+    <children xmi:type="notation:DecorationNode" xmi:id="_1PMUBnLtEd-hPeB9PqFcpw" type="5010"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_1PMUAnLtEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_1PMUA3LtEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_1PMUBHLtEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:Plan" href="CleanerManufacturing.gpmn#_1PMUAHLtEd-hPeB9PqFcpw"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_1PMUBXLtEd-hPeB9PqFcpw" x="525" y="380"/>
+  </children>
+  <children xmi:type="notation:Node" xmi:id="_6SP-MXLtEd-hPeB9PqFcpw" type="2010">
+    <children xmi:type="notation:DecorationNode" xmi:id="_6SP-NnLtEd-hPeB9PqFcpw" type="5010"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_6SP-MnLtEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_6SP-M3LtEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_6SP-NHLtEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:Plan" href="CleanerManufacturing.gpmn#_6SP-MHLtEd-hPeB9PqFcpw"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_6SP-NXLtEd-hPeB9PqFcpw" x="715" y="380"/>
+  </children>
+  <styles xmi:type="notation:DiagramStyle" xmi:id="_Xw8YMXLrEd-hPeB9PqFcpw"/>
+  <element xmi:type="gpmn:GpmnDiagram" href="CleanerManufacturing.gpmn#_XwynMHLrEd-hPeB9PqFcpw"/>
+  <edges xmi:type="notation:Edge" xmi:id="_zMS6GHLrEd-hPeB9PqFcpw" type="4002" source="_aMz9sHLrEd-hPeB9PqFcpw" target="_zMS6EXLrEd-hPeB9PqFcpw">
+    <children xmi:type="notation:DecorationNode" xmi:id="_zMcrEHLrEd-hPeB9PqFcpw" type="6003">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_zMcrEXLrEd-hPeB9PqFcpw" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_zMS6GXLrEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_zMS6GnLrEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:SubGoalEdge" href="CleanerManufacturing.gpmn#_zMS6F3LrEd-hPeB9PqFcpw"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_zMS6G3LrEd-hPeB9PqFcpw" points="[-60, -16, 205, 54]$[-265, -70, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_JB4GQXLsEd-hPeB9PqFcpw" type="4002" source="_zMS6EXLrEd-hPeB9PqFcpw" target="_Abk-0XLsEd-hPeB9PqFcpw">
+    <children xmi:type="notation:DecorationNode" xmi:id="_JB4GRXLsEd-hPeB9PqFcpw" visible="false" type="6003">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_JB4GRnLsEd-hPeB9PqFcpw" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_JB4GQnLsEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_JB4GQ3LsEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:SubGoalEdge" href="CleanerManufacturing.gpmn#_JB4GQHLsEd-hPeB9PqFcpw"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_JB4GRHLsEd-hPeB9PqFcpw" points="[-21, 40, 39, -70]$[-59, 150, 1, 40]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_yqD6SHLsEd-hPeB9PqFcpw" type="4002" source="_zMS6EXLrEd-hPeB9PqFcpw" target="_yqD6QXLsEd-hPeB9PqFcpw">
+    <children xmi:type="notation:DecorationNode" xmi:id="_yqD6THLsEd-hPeB9PqFcpw" visible="false" type="6003">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_yqD6TXLsEd-hPeB9PqFcpw" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_yqD6SXLsEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_yqD6SnLsEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:SubGoalEdge" href="CleanerManufacturing.gpmn#_yqD6R3LsEd-hPeB9PqFcpw"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_yqD6S3LsEd-hPeB9PqFcpw" points="[-44, -40, 146, 135]$[-190, -175, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_-E9QSHLsEd-hPeB9PqFcpw" type="4003" source="_Abk-0XLsEd-hPeB9PqFcpw" target="_-E9QQXLsEd-hPeB9PqFcpw">
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_-E9QSXLsEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_-E9QSnLsEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:PlanEdge" href="CleanerManufacturing.gpmn#_-E9QR3LsEd-hPeB9PqFcpw"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_-E9QS3LsEd-hPeB9PqFcpw" points="[-17, -40, 98, 245]$[-115, -285, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_FJNWKHLtEd-hPeB9PqFcpw" type="4003" source="_Abk-0XLsEd-hPeB9PqFcpw" target="_FJNWIXLtEd-hPeB9PqFcpw">
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_FJNWKXLtEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_FJNWKnLtEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:PlanEdge" href="CleanerManufacturing.gpmn#_FJNWJ3LtEd-hPeB9PqFcpw"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_FJNWK3LtEd-hPeB9PqFcpw" points="[-17, -40, 98, 245]$[-115, -285, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_P-Q0KHLtEd-hPeB9PqFcpw" type="4003" source="_yqD6QXLsEd-hPeB9PqFcpw" target="_P-Q0IXLtEd-hPeB9PqFcpw">
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_P-Q0KXLtEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_P-Q0KnLtEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:PlanEdge" href="CleanerManufacturing.gpmn#_P-Q0J3LtEd-hPeB9PqFcpw"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_P-Q0K3LtEd-hPeB9PqFcpw" points="[-50, -40, 300, 245]$[-350, -285, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_uHEayHLtEd-hPeB9PqFcpw" type="4002" source="_aMz9sHLrEd-hPeB9PqFcpw" target="_uHEawXLtEd-hPeB9PqFcpw">
+    <children xmi:type="notation:DecorationNode" xmi:id="_uHEazHLtEd-hPeB9PqFcpw" type="6003">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_uHEazXLtEd-hPeB9PqFcpw" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_uHEayXLtEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_uHEaynLtEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:SubGoalEdge" href="CleanerManufacturing.gpmn#_uHEax3LtEd-hPeB9PqFcpw"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_uHEay3LtEd-hPeB9PqFcpw" points="[-60, -8, 375, 47]$[-435, -55, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_1PMUCHLtEd-hPeB9PqFcpw" type="4003" source="_uHEawXLtEd-hPeB9PqFcpw" target="_1PMUAXLtEd-hPeB9PqFcpw">
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_1PMUCXLtEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_1PMUCnLtEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:PlanEdge" href="CleanerManufacturing.gpmn#_1PMUB3LtEd-hPeB9PqFcpw"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_1PMUC3LtEd-hPeB9PqFcpw" points="[-60, -18, 505, 147]$[-565, -165, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_6SP-OHLtEd-hPeB9PqFcpw" type="4003" source="_flY6AXLtEd-hPeB9PqFcpw" target="_6SP-MXLtEd-hPeB9PqFcpw">
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_6SP-OXLtEd-hPeB9PqFcpw"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_6SP-OnLtEd-hPeB9PqFcpw"/>
+    <element xmi:type="gpmn:PlanEdge" href="CleanerManufacturing.gpmn#_6SP-N3LtEd-hPeB9PqFcpw"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_6SP-O3LtEd-hPeB9PqFcpw" points="[-60, -23, 715, 262]$[-775, -285, 0, 0]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_J_F_oXLwEd-2b-xkrl-imA" type="4005" source="_flY6AXLtEd-hPeB9PqFcpw" target="_yqD6QXLsEd-hPeB9PqFcpw">
+    <children xmi:type="notation:DecorationNode" xmi:id="_J_F_pXLwEd-2b-xkrl-imA" type="6004">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_J_F_pnLwEd-2b-xkrl-imA" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_J_F_onLwEd-2b-xkrl-imA"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_J_F_o3LwEd-2b-xkrl-imA"/>
+    <element xmi:type="gpmn:GenericGpmnEdge" href="CleanerManufacturing.gpmn#_J_F_oHLwEd-2b-xkrl-imA"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_J_F_pHLwEd-2b-xkrl-imA" points="[-60, 1, 305, 1]$[-305, 9, 60, 9]"/>
+  </edges>
+</notation:Diagram>

@@ -74,7 +74,7 @@ public class Platform extends jadex.base.Platform
 			System.out.print(".");
 			try
 			{
-				Thread.currentThread().sleep(100);
+				Thread.sleep(100);
 			}
 			catch(Exception e)
 			{

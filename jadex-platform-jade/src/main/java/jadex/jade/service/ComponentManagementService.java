@@ -2,7 +2,6 @@ package jadex.jade.service;
 
 import jade.core.AID;
 import jade.wrapper.AgentController;
-import jadex.base.DefaultResultListener;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.fipa.ComponentIdentifier;
 import jadex.base.fipa.SearchConstraints;
@@ -178,7 +177,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 			final CMSComponentDescription ad = new CMSComponentDescription(aid, type, info.getParent(), info.isMaster(), info.isDaemon());
 			
 			// Increase daemon cnt
-			if(cinfo.isDaemon())
+			if(info.isDaemon())
 				daemons++;
 			
 	//		System.out.println("added: "+agentdescs.size()+", "+aid);
@@ -207,7 +206,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 				System.out.print(".");
 				try
 				{
-					Thread.currentThread().sleep(100);
+					Thread.sleep(100);
 				}
 				catch(Exception e)
 				{
@@ -336,23 +335,21 @@ public class ComponentManagementService implements IComponentManagementService, 
 					{
 						CleanupCommand	cc	= new CleanupCommand(cid);
 						ccs.put(cid, cc);
-						if(listener!=null)
-							cc.addKillListener(listener);
+						cc.addKillFuture(ret);
 						component.killComponent(cc);						
 					}
 					else
 					{
-						if(listener!=null)
-						{
-							CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
-							if(cc==null)
-								listener.exceptionOccurred(this, new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
-							cc.addKillListener(listener);
-						}
+						CleanupCommand	cc	= (CleanupCommand)ccs.get(cid);
+						if(cc==null)
+							ret.setException(new RuntimeException("No cleanup command for component "+cid+": "+desc.getState()));
+						cc.addKillFuture(ret);
 					}
 				}
 			}
 		}
+		
+		return ret;
 	}
 
 	/**
@@ -361,8 +358,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 */
 	public IFuture suspendComponent(IComponentIdentifier componentid)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		final Future ret = new Future();
 		
 		CMSComponentDescription ad;
 		synchronized(adapters)
@@ -375,19 +371,23 @@ public class ComponentManagementService implements IComponentManagementService, 
 					IComponentIdentifier	child	= (IComponentIdentifier)it.next();
 					if(IComponentDescription.STATE_ACTIVE.equals(((IComponentDescription)descs.get(child)).getState()))
 					{
-						suspendComponent(child, null);	// todo: cascading resume with wait.
+						suspendComponent(child);	// todo: cascading resume with wait.
 					}
 				}
 
 				JadeAgentAdapter adapter = (JadeAgentAdapter)adapters.get(componentid);
 				ad = (CMSComponentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
-					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
+				{
+					ret.setException(new RuntimeException("Component identifier not registered: "+componentid));
+					return ret;
+				}
 					//throw new RuntimeException("Component Identifier not registered in CES: "+aid);
 				if(!IComponentDescription.STATE_ACTIVE.equals(ad.getState())
 					/*&& !IComponentDescription.STATE_TERMINATING.equals(ad.getState())*/)
 				{
-					listener.exceptionOccurred(this, new RuntimeException("Only active components can be suspended: "+componentid+" "+ad.getState()));
+					ret.setException(new RuntimeException("Only active components can be suspended: "+componentid+" "+ad.getState()));
+					return ret;
 					//throw new RuntimeException("Only active components can be suspended: "+aid+" "+ad.getState());
 				}
 				
@@ -397,16 +397,12 @@ public class ComponentManagementService implements IComponentManagementService, 
 				{
 					AgentController ac = platform.getPlatformController().getAgent(((IComponentIdentifier)componentid).getLocalName());
 					ac.suspend();
-//					listener.resultAvailable(null);
+					ret.setResult(null);
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
-//					listener.exceptionOccurred(e);
+					ret.setException(e);
 				}
-				
-//				IExecutionService exe = (IExecutionService)container.getService(IExecutionService.class);
-//				exe.cancel(adapter, listener);
 			}
 		}
 		
@@ -422,6 +418,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 		{
 			alisteners[i].componentChanged(ad);
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -430,8 +428,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 */
 	public IFuture resumeComponent(IComponentIdentifier componentid)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		final Future ret = new Future();
 		
 		CMSComponentDescription ad;
 		
@@ -446,19 +443,25 @@ public class ComponentManagementService implements IComponentManagementService, 
 					if(IComponentDescription.STATE_SUSPENDED.equals(((IComponentDescription)descs.get(child)).getState())
 						|| IComponentDescription.STATE_WAITING.equals(((IComponentDescription)descs.get(child)).getState()))
 					{
-						resumeComponent(child, null);	// todo: cascading resume with wait.
+						resumeComponent(child);	// todo: cascading resume with wait.
 					}
 				}
 
 				JadeAgentAdapter adapter = (JadeAgentAdapter)adapters.get(componentid);
 				ad = (CMSComponentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
-					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
+				{
+					ret.setException(new RuntimeException("Component identifier not registered: "+componentid));
+					return ret;
 					//throw new RuntimeException("Component Identifier not registered in CES: "+aid);
+				}
 				if(!IComponentDescription.STATE_SUSPENDED.equals(ad.getState())
 					&& !IComponentDescription.STATE_WAITING.equals(ad.getState()))
-					listener.exceptionOccurred(this, new RuntimeException("Only suspended/waiting components can be resumed: "+componentid+" "+ad.getState()));
+				{
+					ret.setException(new RuntimeException("Only suspended/waiting components can be resumed: "+componentid+" "+ad.getState()));
+					return ret;
 					//throw new RuntimeException("Only suspended components can be resumed: "+aid+" "+ad.getState());
+				}
 				
 				ad.setState(IComponentDescription.STATE_ACTIVE);
 				
@@ -466,15 +469,12 @@ public class ComponentManagementService implements IComponentManagementService, 
 				{
 					AgentController ac = platform.getPlatformController().getAgent(((IComponentIdentifier)componentid).getLocalName());
 					ac.activate();
-//					listener.resultAvailable(null);
+					ret.setResult(null);
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
-//					listener.exceptionOccurred(e);
+					ret.setException(e);
 				}
-				
-//				adapter.wakeup();
 			}
 		}
 		
@@ -491,7 +491,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 			alisteners[i].componentChanged(ad);
 		}
 	
-		listener.resultAvailable(this, ad);
+		return ret;
 	}
 	
 	/**
@@ -501,8 +501,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 */
 	public IFuture stepComponent(IComponentIdentifier componentid)
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
+		final Future ret = new Future();
 		
 		synchronized(adapters)
 		{
@@ -511,21 +510,33 @@ public class ComponentManagementService implements IComponentManagementService, 
 				JadeAgentAdapter adapter = (JadeAgentAdapter)adapters.get(componentid);
 				IComponentDescription cd = (IComponentDescription)descs.get(componentid);
 				if(adapter==null || cd==null)
-					listener.exceptionOccurred(this, new RuntimeException("Component identifier not registered: "+componentid));
+				{
+					ret.setException(new RuntimeException("Component identifier not registered: "+componentid));
 					//throw new RuntimeException("Component Identifier not registered in CES: "+aid);
+				}
 				if(!IComponentDescription.STATE_SUSPENDED.equals(cd.getState()))
-					listener.exceptionOccurred(this, new RuntimeException("Only suspended components can be stepped: "+componentid+" "+cd.getState()));
+				{
+					ret.setException(new RuntimeException("Only suspended components can be stepped: "+componentid+" "+cd.getState()));
 					//throw new RuntimeException("Only suspended components can be resumed: "+aid+" "+ad.getState());
+				}
 				
-				adapter.doStep(listener);
-				resumeComponent(componentid, listener);
-//				suspendComponent(componentid, listener);
-//				adapter.wakeup();
-				
-//				IExecutionService exe = (IExecutionService)platform.getService(IExecutionService.class);
-//				exe.execute(adapter);
+				adapter.doStep(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						ret.setResult(result);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
+					}
+				});
+				resumeComponent(componentid);
 			}
 		}
+		
+		return ret;
 	}
 
 	/**
@@ -604,7 +615,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	class CleanupCommand implements IResultListener
 	{
 		protected IComponentIdentifier cid;
-		protected List killlisteners;
+		protected List killfutures;
 		
 		public CleanupCommand(IComponentIdentifier cid)
 		{
@@ -705,11 +716,11 @@ public class ComponentManagementService implements IComponentManagementService, 
 			
 //				System.out.println("CleanupCommand end.");
 			
-			if(killlisteners!=null)
+			if(killfutures!=null)
 			{
-				for(int i=0; i<killlisteners.size(); i++)
+				for(int i=0; i<killfutures.size(); i++)
 				{
-					((IResultListener)killlisteners.get(i)).resultAvailable(source, result);
+					((Future)killfutures.get(i)).setResult(result);
 				}
 			}
 			
@@ -727,11 +738,11 @@ public class ComponentManagementService implements IComponentManagementService, 
 		 *  Add a listener to be informed, when the component has terminated.
 		 * @param listener
 		 */
-		public void	addKillListener(IResultListener listener)
+		public void	addKillFuture(Future killfuture)
 		{
-			if(killlisteners==null)
-				killlisteners	= new ArrayList();
-			killlisteners.add(listener);
+			if(killfutures==null)
+				killfutures = new ArrayList();
+			killfutures.add(killfuture);
 		}
 	}
 	
@@ -758,14 +769,25 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 */
 	public IFuture getExternalAccess(IComponentIdentifier cid)
 	{
-		if(listener==null)
-			throw new RuntimeException("Result listener required.");
-	
+		final Future ret = new Future();	
 		JadeAgentAdapter adapter = (JadeAgentAdapter)adapters.get(cid);
 		if(adapter==null)
-			listener.exceptionOccurred(this, new RuntimeException("No local component found for component identifier: "+cid));
+			ret.setException(new RuntimeException("No local component found for component identifier: "+cid));
 		else
-			adapter.getComponentInstance().getExternalAccess(listener);
+			adapter.getComponentInstance().getExternalAccess(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					ret.setResult(result);
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
+		
+		return ret;
 	}
 	
 	/**
@@ -871,18 +893,15 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 */
 	public IFuture getComponentDescription(IComponentIdentifier cid)
 	{
-		if(listener==null)
-			throw new RuntimeException("Result listener required.");
-		
-		IComponentDescription	ret = (IComponentDescription)descs.get(cid);	// Todo: synchronize?
+		Future ret = new Future();		
+		ret.setResult(descs.get(cid));	// Todo: synchronize?
 //				if(ret!=null)
 //				{
 //					// Todo: addresses required for communication across platforms.
 ////					ret.setName(refreshComponentIdentifier(aid));
 //					ret	= (IComponentDescription)ret.clone();
 //				}
-		
-		listener.resultAvailable(this, ret);
+		return ret;
 	}
 	
 	/**
@@ -891,10 +910,9 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 */
 	public IFuture getComponentDescriptions()
 	{
-		if(listener==null)
-			throw new RuntimeException("Result listener required.");
-		
-		listener.resultAvailable(this, descs.values().toArray(new IComponentDescription[0]));	// Todo: synchronize?
+		Future ret = new Future();
+		ret.setResult(descs.values().toArray(new IComponentDescription[0]));	// Todo: synchronize?
+		return ret;
 	}
 	
 	/**
@@ -905,8 +923,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 */
 	public IFuture getComponentIdentifiers()
 	{
-		if(listener==null)
-			throw new RuntimeException("Result listener required.");
+		Future fut = new Future();
 		
 		IComponentIdentifier[] ret;
 		
@@ -918,7 +935,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 //					ret[i] = refreshComponentIdentifier(ret[i]); // Hack!
 		}
 		
-		listener.resultAvailable(this, ret);
+		fut.setResult(ret);
+		return fut;
 	}
 	
 	/**
@@ -927,11 +945,10 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 */
 	public IFuture searchComponents(IComponentDescription adesc, ISearchConstraints con)
 	{
-		if(listener==null)
-			throw new RuntimeException("Result listener required.");
+		Future ret = new Future();
 		
 //			System.out.println("search: "+components);
-		CMSComponentDescription[] ret;
+		CMSComponentDescription[] cret;
 
 		// If name is supplied, just lookup description.
 		if(adesc!=null && adesc.getName()!=null)
@@ -942,11 +959,11 @@ public class ComponentManagementService implements IComponentManagementService, 
 				// Todo: addresses reuqired for interplatform comm.
 //					ad.setName(refreshComponentIdentifier(ad.getName()));
 				CMSComponentDescription	desc	= (CMSComponentDescription)ad.clone();
-				ret = new CMSComponentDescription[]{desc};
+				cret = new CMSComponentDescription[]{desc};
 			}
 			else
 			{
-				ret	= new CMSComponentDescription[0];
+				cret	= new CMSComponentDescription[0];
 			}
 		}
 
@@ -969,11 +986,11 @@ public class ComponentManagementService implements IComponentManagementService, 
 					}
 				}
 			}
-			ret	= (CMSComponentDescription[])tmp.toArray(new CMSComponentDescription[tmp.size()]);
+			cret	= (CMSComponentDescription[])tmp.toArray(new CMSComponentDescription[tmp.size()]);
 		}
 
-		//System.out.println("searched: "+ret);
-		listener.resultAvailable(this, ret);
+		ret.setResult(cret);
+		return ret;
 	}
 	
 	/**

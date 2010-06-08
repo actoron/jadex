@@ -5,7 +5,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadexconf 
 	                    http://jadex.sourceforge.net/configuration.xsd"
-	name="standalone_conf">
+	name="services_conf">
 	
 	<properties type="platform_standalone" name="lars">
 		<property type="platformname">lars</property>
@@ -26,9 +26,9 @@
 			</property>
 						
 			<property type="jadex.bridge.IComponentManagementService" name="cms_service">
-				new jadex.jade.service.ComponentManagementService($platform)
+				new jadex.jade.service.ComponentManagementService($platform, false)
 			</property> 			
-						
+			
 			<property type="jadex.base.fipa.IDF" name="df_service">
 				new jadex.jade.service.DirectoryFacilitatorService($platform)
 			</property>

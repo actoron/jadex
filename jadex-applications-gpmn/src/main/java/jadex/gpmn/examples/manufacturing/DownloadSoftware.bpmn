@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmi:id="_EUhe8XLvEd-2b-xkrl-imA" iD="_EUhe8HLvEd-2b-xkrl-imA">
+  <pools xmi:type="bpmn:Pool" xmi:id="_EU0Z4XLvEd-2b-xkrl-imA" iD="_EU0Z4HLvEd-2b-xkrl-imA" name="Pool">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_EU-K4XLvEd-2b-xkrl-imA" iD="_EU-K4HLvEd-2b-xkrl-imA" name="Task" activityType="Task"/>
+  </pools>
+</bpmn:BpmnDiagram>

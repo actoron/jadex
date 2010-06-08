@@ -1,14 +1,13 @@
 Bump Revision:
 - set release number in poms and in jadex.bridge.IVersionInfo
-- do maven install (for artifacts being locally available)
-- clean dependent projects (and iterate from previous step)
+- update maven project configuration for all projects in eclipse
+- rebuild applications.jccproject.xml
+	- check that jcc.project does not contain absolute paths
 
 Build Distribution:
 - remove target directories in jadex and all projects (to avoid eclipse generated stuff in classes like .svn dirs)
 (- build jadex maven javadoc) no more!?
 - build jadex distribution
-- rebuild applications.jccproject.xml
-- check that jcc.project does not contain absolute paths
 - zip distribution dir 
 
 Upload stuff:

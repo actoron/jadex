@@ -26,7 +26,6 @@ import jadex.base.fipa.CMSDestroyComponent;
 import jadex.base.fipa.CMSResumeComponent;
 import jadex.base.fipa.CMSSearchComponents;
 import jadex.base.fipa.CMSSuspendComponent;
-import jadex.base.fipa.DFComponentDescription;
 import jadex.base.fipa.DFDeregister;
 import jadex.base.fipa.DFModify;
 import jadex.base.fipa.DFRegister;
@@ -38,9 +37,6 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IContentCodec;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -157,7 +153,6 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 //				IMessageAdapter ma = new DefaultMessageAdapter();
 //				agent.messageArrived(ma);
 				
-				Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
 				JadeMessageAdapter ma = new JadeMessageAdapter(msg, ams);
 				
 				// Conversion via platform specific codecs

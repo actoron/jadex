@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:gpmn="http://jadex.sourceforge.net/gpmn" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_RBrHAXLvEd-2b-xkrl-imA" type="Gpmn" name="DevelopNewSoftware.gpmn_diagram" measurementUnit="Pixel">
+  <styles xmi:type="notation:DiagramStyle" xmi:id="_RBrHAnLvEd-2b-xkrl-imA"/>
+  <element xmi:type="gpmn:GpmnDiagram" href="DevelopNewSoftware.gpmn#_RBrHAHLvEd-2b-xkrl-imA"/>
+</notation:Diagram>

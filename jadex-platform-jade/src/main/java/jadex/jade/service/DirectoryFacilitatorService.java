@@ -25,6 +25,8 @@ import jadex.base.fipa.SearchConstraints;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.ISearchConstraints;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 import jadex.jade.Platform;
@@ -62,12 +64,12 @@ public class DirectoryFacilitatorService implements IDF, IService
 	//-------- IDF interface methods --------
 
 	/**
-	 *  Register an agent description.
-	 *  @throws RuntimeException when the agent is already registered.
+	 *  Register an component description.
+	 *  @throws RuntimeException when the component is already registered.
 	 */
-	public void	register(final IDFComponentDescription adesc, IResultListener lis)
+	public IFuture register(final IDFComponentDescription adesc)
 	{
-		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
+		final Future ret	= new Future();
 		
 		Event e = new Event(-1, new SimpleBehaviour()
 		{
@@ -92,18 +94,18 @@ public class DirectoryFacilitatorService implements IDF, IService
 							{
 								Done done = (Done)myAgent.getContentManager().extractContent(reply);
 								Register reg = (Register)((Action)done.getAction()).getAction();
-								listener.resultAvailable(this, SJade.convertAgentDescriptiontoFipa(
+								ret.setResult(SJade.convertAgentDescriptiontoFipa(
 									(jade.domain.FIPAAgentManagement.DFAgentDescription)reg.getDescription(), 
 									(IComponentManagementService)platform.getService(IComponentManagementService.class)));
 							}
 							catch(Exception e)
 							{
-								listener.exceptionOccurred(this, e);
+								ret.setException(e);
 							}
 						}
 						else
 						{
-							listener.exceptionOccurred(this, new RuntimeException("Register failed."));
+							ret.setException(new RuntimeException("Register failed."));
 						}
 						done = true;
 					}
@@ -152,17 +154,19 @@ public class DirectoryFacilitatorService implements IDF, IService
 		}
 		catch(Exception ex)
 		{
-			listener.exceptionOccurred(this, ex);
+			ret.setException(ex);
 		}
+		
+		return ret;
 	}
 
 	/**
-	 *  Deregister an agent description.
-	 *  @throws RuntimeException when the agent is not registered.
+	 *  Deregister an component description.
+	 *  @throws RuntimeException when the component is not registered.
 	 */
-	public void	deregister(final IDFComponentDescription adesc, IResultListener lis)
+	public IFuture deregister(final IDFComponentDescription adesc)
 	{
-		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
+		final Future ret	= new Future();
 		
 		Event e = new Event(-1, new SimpleBehaviour()
 		{
@@ -185,16 +189,16 @@ public class DirectoryFacilitatorService implements IDF, IService
 						{
 							try
 							{
-								listener.resultAvailable(this, null);
+								ret.setResult(null);
 							}
 							catch(Exception e)
 							{
-								listener.exceptionOccurred(this, e);
+								ret.setException(e);
 							}
 						}
 						else
 						{
-							listener.exceptionOccurred(this, new RuntimeException("Deregister failed."));
+							ret.setException(new RuntimeException("Deregister failed."));
 						}
 						done = true;
 					}
@@ -243,17 +247,19 @@ public class DirectoryFacilitatorService implements IDF, IService
 		}
 		catch(Exception ex)
 		{
-			listener.exceptionOccurred(this, ex);
+			ret.setResult(ex);
 		}
+		
+		return ret;
 	}
 
 	/**
-	 *  Modify an agent description.
-	 *  @throws RuntimeException when the agent is not registered.
+	 *  Modify an component description.
+	 *  @throws RuntimeException when the component is not registered.
 	 */
-	public void	modify(final IDFComponentDescription adesc, IResultListener lis)
+	public IFuture modify(final IDFComponentDescription adesc)
 	{
-		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
+		final Future ret	= new Future();
 		
 		Event e = new Event(-1, new SimpleBehaviour()
 		{
@@ -278,18 +284,18 @@ public class DirectoryFacilitatorService implements IDF, IService
 							{
 								Done done = (Done)myAgent.getContentManager().extractContent(reply);
 								Modify mod = (Modify)((Action)done.getAction()).getAction();
-								listener.resultAvailable(this, SJade.convertAgentDescriptiontoFipa(
+								ret.setResult(SJade.convertAgentDescriptiontoFipa(
 									(jade.domain.FIPAAgentManagement.DFAgentDescription)mod.getDescription(), 
 									(IComponentManagementService)platform.getService(IComponentManagementService.class)));
 							}
 							catch(Exception e)
 							{
-								listener.exceptionOccurred(this, e);
+								ret.setException(e);
 							}
 						}
 						else
 						{
-							listener.exceptionOccurred(this, new RuntimeException("Modify failed."));
+							ret.setException(new RuntimeException("Modify failed."));
 						}
 						done = true;
 					}
@@ -338,17 +344,19 @@ public class DirectoryFacilitatorService implements IDF, IService
 		}
 		catch(Exception ex)
 		{
-			listener.exceptionOccurred(this, ex);
+			ret.setException(ex);
 		}
+		
+		return ret;
 	}
 
 	/**
-	 *  Search for agents matching the given description.
-	 *  @return An array of matching agent descriptions. 
+	 *  Search for components matching the given description.
+	 *  @return An array of matching component descriptions. 
 	 */
-	public void	search(final IDFComponentDescription adesc, final ISearchConstraints con, IResultListener lis)
+	public IFuture search(final IDFComponentDescription adesc, final ISearchConstraints con)
 	{
-		final IResultListener listener = lis!=null? lis: DefaultResultListener.getInstance();
+		final Future ret	= new Future();
 		
 		Event e = new Event(-1, new SimpleBehaviour()
 		{
@@ -373,23 +381,23 @@ public class DirectoryFacilitatorService implements IDF, IService
 							{
 								Result res = (Result)myAgent.getContentManager().extractContent(reply);
 								jade.util.leap.List descs = res.getItems();
-								IDFComponentDescription[] ret = new IDFComponentDescription[descs.size()];
+								IDFComponentDescription[] cret = new IDFComponentDescription[descs.size()];
 								IComponentManagementService ams = (IComponentManagementService)platform.getService(IComponentManagementService.class);
-								for(int i=0; i<ret.length; i++)
+								for(int i=0; i<cret.length; i++)
 								{
-									ret[i] = SJade.convertAgentDescriptiontoFipa(
+									cret[i] = SJade.convertAgentDescriptiontoFipa(
 										(jade.domain.FIPAAgentManagement.DFAgentDescription)descs.get(i), ams);
 								}
-								listener.resultAvailable(this, ret);
+								ret.setResult(cret);
 							}
 							catch(Exception e)
 							{
-								listener.exceptionOccurred(this, e);
+								ret.setException(e);
 							}
 						}
 						else
 						{
-							listener.exceptionOccurred(this, new RuntimeException("Search failed."));
+							ret.setException(new RuntimeException("Search failed."));
 						}
 						done = true;
 					}
@@ -440,8 +448,10 @@ public class DirectoryFacilitatorService implements IDF, IService
 		}
 		catch(Exception ex)
 		{
-			listener.exceptionOccurred(this, ex);
+			ret.setException(ex);
 		}
+		
+		return ret;
 	}
 
 	/**
