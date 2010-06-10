@@ -13,6 +13,10 @@
   <packaging>pom</packaging>
   <version>${jadexVersion}</version>
   <name>jadex</name>
+  
+  <scm>
+  	<developerConnection>scm:svn:svn+ssh://rzrepository.informatik.uni-hamburg.de/informatik/viks/vsis/repositories/projects/jadexv2/trunk</developerConnection>
+  </scm>
    
   <profiles>
   	

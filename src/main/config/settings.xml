@@ -1,7 +1,7 @@
 <settings>
 	<servers>
 		<server>
-			<id>sonatype-nexus-releases</id>
+			<id>sonatype-nexus-staging</id>
 			<username>Lars</username>
 			<password>lax</password>
 		</server>
