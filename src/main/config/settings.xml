@@ -1,9 +1,9 @@
 <settings>
- <servers>
-    <server>
-      <id>sonatype-nexus-releases</id>
-      <username>Lars</username>
-      <password>lax</password>
-    </server>
-  </servers>
+	<servers>
+		<server>
+			<id>sonatype-nexus-releases</id>
+			<username>Lars</username>
+			<password>lax</password>
+		</server>
+	</servers>
 </settings> 

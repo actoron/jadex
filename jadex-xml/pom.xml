@@ -6,7 +6,7 @@
   <packaging>jar</packaging>
   <version>${jadexVersion}</version>
   <name>jadex-xml</name>
-  <!-- <url>http://jadex.sourceforge.net</url> -->
+  <url>http://jadex.sourceforge.net</url>
   <parent>
     <groupId>net.sourceforge.jadex</groupId>
     <artifactId>jadex-settings</artifactId>

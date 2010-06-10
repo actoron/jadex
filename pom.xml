@@ -15,6 +15,41 @@
   <name>jadex</name>
    
   <profiles>
+  	
+  	<profile>
+  		<id>jadex-xml-artifact</id>
+  		<build>
+  			<finalName>jadex-xml-${project.version}</finalName>
+		    <plugins>
+		      <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-assembly-plugin</artifactId>
+		        <configuration>
+				  <archiverConfig>
+				    <duplicateBehavior>skip</duplicateBehavior>
+				  </archiverConfig> 
+		          <descriptors>
+		            <descriptor>src/main/assembly/dist-assembly-xml.xml</descriptor>
+		          </descriptors>
+		        </configuration>
+		        <executions>
+		        	<execution>
+		        		<id>make-assembly</id>
+		        		<phase>package</phase>
+		        		<goals>
+		        			<goal>single</goal>
+		        		</goals>
+		        	</execution>
+		        </executions>
+		      </plugin>
+		    </plugins>
+  		</build>
+		<modules>
+		    <module>jadex-commons</module>
+		    <module>jadex-xml</module>
+		</modules>
+  	</profile>
+  	
   	<profile>
   		<id>jadex-xml-dist</id>
   		<build>
@@ -48,6 +83,7 @@
 		    <module>jadex-xml</module>
 		</modules>
   	</profile>
+  	
   	<profile>
   		<id>jadex-rules-dist</id>
   		<build>
@@ -84,6 +120,7 @@
 		    <module>jadex-rules-tools</module>
 		</modules>
   	</profile>
+  	
   	<profile>
   		<id>jadex-full-dist</id>
 		<modules>
@@ -119,6 +156,7 @@
 		    <!-- <module>jadex-apleis</module> -->
 		</modules>
   	</profile>
+  	
   	<profile>
   		<id>jadex-eclipse-projects</id>
 	    <activation>
@@ -171,6 +209,7 @@
 				<module>jadex-distributed</module>
 		</modules>
   	</profile>
+  	
   	<profile>
   		<id>jadex-jade-dist</id>
   		<build>
@@ -211,6 +250,7 @@
 				<module>jadex-platform-jade</module>
 		</modules>
   	</profile>
+  	
   	<profile>
         <id>jadex-wfms-dist</id>
         <build>
@@ -254,6 +294,7 @@
         </modules>
         </profile>
   </profiles>
+  
   <!-- <url>http://jadex.sourceforge.net</url> -->
   <build>
     <plugins>
@@ -277,20 +318,6 @@
         			<goal>single</goal>
         		</goals>
         	</execution>
-        </executions>
-      </plugin>
-      
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>sign-artifacts</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>sign</goal>
-            </goals>
-          </execution>
         </executions>
       </plugin>
     </plugins>
