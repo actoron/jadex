@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -47,7 +48,8 @@ public class NightlyBuildsPlugin implements XWikiPluginInterface
 				for(int j=0; j<files.length; j++)
 				{
 					File	file	= new File(dirs[i], files[j]);
-					NightlyBuild	build	= new NightlyBuild(files[j], new Date(file.lastModified()), (file.length()*10/1024/1024)/10.0,
+					String	name	= extractName(files[j]);
+					NightlyBuild	build	= new NightlyBuild(name, files[j], new Date(file.lastModified()), (file.length()*10/1024/1024)/10.0,
 						"/"+dir.getName()+"/"+dirs[i].getName()+"/"+files[j]);
 					if(builds.containsKey(build.getName()))
 					{
@@ -167,12 +169,52 @@ public class NightlyBuildsPlugin implements XWikiPluginInterface
 	}
 
 	/**
+	 *  Extract the project name (e.g. jadex-xml) out of a
+	 *  file name (e.g. jadex-xml-2.0-rc2-dist.zip).
+	 */
+	protected String	extractName(String filename)
+	{
+		StringBuffer	ret	= new StringBuffer();
+		StringTokenizer	stok	= new StringTokenizer(filename, ".-", true);
+		while(stok.hasMoreTokens())
+		{
+			String	tok	= stok.nextToken();
+			if(tok.equals("."))
+			{
+				break;
+			}
+			else if(tok.equals("-"))
+			{
+				if(stok.hasMoreTokens())
+				{
+					String	tok2	= stok.nextToken();
+					if(Character.isDigit(tok2.charAt(0)))
+					{
+						break;
+					}
+					else
+					{
+						ret.append(tok);
+						ret.append(tok2);
+					}
+				}
+			}
+			else
+			{
+				ret.append(tok);
+			}
+		}
+		return ret.toString();
+	}
+	
+	/**
 	 *  Main for testing.
 	 */
 	public static void	main(String[] args)
 	{
 		NightlyBuildsPlugin	plug	= new NightlyBuildsPlugin(null, null, null);
-		File	dir	= new File("C:/Programme/Apache Software Foundation/Tomcat 6.0/webapps/jadex-nightlybuilds");
+		File	dir	= new File("C:/Files/Programs/apache-tomcat-6.0.26/webapps/jadex-nightly-builds");
+//		File	dir	= new File("C:/Programme/Apache Software Foundation/Tomcat 6.0/webapps/jadex-nightlybuilds");
 		NightlyBuild[] builds	= plug.getAllBuilds(null, dir);
 		for(int i=0; i<builds.length; i++)
 		{

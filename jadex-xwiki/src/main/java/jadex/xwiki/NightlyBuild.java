@@ -13,8 +13,11 @@ public class NightlyBuild
 {
 	//-------- attributes --------
 	
-	/** The file name of the build. */
+	/** The name of the build (e.g. jadex-xml). */
 	protected String	name;
+	
+	/** The file name of the build (e.g. jadex-xml-2.0-rc3-dist.zip). */
+	protected String	filename;
 	
 	/** The date of the build. */
 	protected Date	date;
@@ -33,9 +36,10 @@ public class NightlyBuild
 	/**
 	 *  Create a new nightly build object.
 	 */
-	public NightlyBuild(String name, Date date, double size, String url)
+	public NightlyBuild(String name, String filename, Date date, double size, String url)
 	{
 		this.name	= name;
+		this.filename	= filename;
 		this.date	= date;
 		this.size	= size;
 		this.url	= url;
@@ -49,6 +53,14 @@ public class NightlyBuild
 	public String	getName()
 	{
 		return name;
+	}
+	
+	/**
+	 *  Get the filename of the build.
+	 */
+	public String	getFilename()
+	{
+		return filename;
 	}
 	
 	/**
@@ -87,12 +99,15 @@ public class NightlyBuild
 		// Swap if build is newer.
 		if(getDate().before(build.getDate()))
 		{
+			String	tmpfile	= filename;
 			Date	tmpdate	= date;
 			double	tmpsize	= size;
 			String	tmpurl	= url;
+			filename	= build.getFilename();
 			date	= build.getDate();
 			size	= build.getSize();
 			url	= build.getUrl();
+			build.filename	= tmpfile;
 			build.date	= tmpdate;
 			build.size	= tmpsize;
 			build.url	= tmpurl;
@@ -122,6 +137,8 @@ public class NightlyBuild
 		StringBuffer	ret	= new StringBuffer();
 		ret.append("NightlyBuild(");
 		ret.append(name);
+		ret.append(", ");
+		ret.append(filename);
 		ret.append(", ");
 		ret.append(date);
 		ret.append(", ");
