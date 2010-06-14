@@ -7,12 +7,14 @@
   <version>${jadexVersion}</version>
   <name>jadex-jade-launch</name>
   <!-- <url>http://jadex.sourceforge.net</url> -->
+  
   <parent>
     <groupId>net.sourceforge.jadex</groupId>
     <artifactId>jadex-settings</artifactId>
     <version>${jadexVersion}</version>
     <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
   </parent>
+  
   <build>
     <plugins>
      <!-- Make jar executable (cannot do this in jade, because maven claims cyclic reference) -->

@@ -6,4 +6,14 @@
 			<password>lax</password>
 		</server>
 	</servers>
+
+	<!-- <profiles>
+		<profile>
+			<id>jadex-xml-artifacts</id>
+			<properties>
+				<!- - <gpg.homedir>docs/keys</gpg.homedir>- ->
+				<gpg.passphrase>lax</gpg.passphrase>
+			</properties>
+		</profile>
+	</profiles> -->
 </settings> 

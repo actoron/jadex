@@ -106,6 +106,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
+				<!-- <configuration>
+					<homedir>${basedir}/../docs/keys</homedir>
+					<passphrase>${gpg.passphrase}</passphrase>
+				</configuration> -->
 				<executions>
 					<execution>
 						<id>sign-artifacts</id>
@@ -129,7 +133,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 		</plugins>
 	</build>
 

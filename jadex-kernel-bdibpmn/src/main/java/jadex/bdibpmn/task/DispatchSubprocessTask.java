@@ -1,8 +1,5 @@
 package jadex.bdibpmn.task;
 
-import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.GoalFailureException;
-import jadex.bdi.runtime.IGoalListener;
 import jadex.bdibpmn.BpmnPlanBodyInstance;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
