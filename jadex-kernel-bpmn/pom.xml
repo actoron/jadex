@@ -3,6 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-kernel-bpmn</artifactId>
+	<name>jadex-kernel-bpmn</name>
 	<version>2.0-rc3</version>
 	<url>http://jadex.sourceforge.net</url>
 
