@@ -311,6 +311,17 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 	}
 	
 	/**
+	 * Gets the viewport
+	 * @return the viewport
+	 */
+	public IViewport getViewport()
+	{
+		if(viewport == null)
+			getView();
+		return viewport;
+	}
+	
+	/**
 	 * Gets whether to try to use OpenGL.
 	 * @return true, if attempt should be made to use OpenGL
 	 */

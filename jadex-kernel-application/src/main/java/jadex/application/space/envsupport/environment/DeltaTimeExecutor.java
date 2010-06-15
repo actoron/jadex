@@ -90,6 +90,9 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 	
 				synchronized(space.getMonitor())
 				{
+					// Enable queueing
+					space.setEnableQueueing(true);
+					
 					// Update the environment objects.
 					Object[] objs = space.getSpaceObjectsCollection().toArray();
 					for(int i=0; i<objs.length; i++)
@@ -126,6 +129,10 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 					// Send the percepts to the components.
 					space.getPerceptList().processPercepts(null);
 				}
+				
+				// Disable queueing
+				space.setEnableQueueing(false);
+				
 				return false;
 			}
 		};
