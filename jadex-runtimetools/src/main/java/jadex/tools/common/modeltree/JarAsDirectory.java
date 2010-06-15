@@ -16,21 +16,12 @@ import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-import nuggets.PersistenceHelper;
-
 
 /**
  *  A directory-like representation of a jar file.
  */
 public class JarAsDirectory	extends File
 {
-	//-------- static part --------
-	
-	static
-	{
-		PersistenceHelper.registerDelegate(JarAsDirectory.class, new DJarAsDirectory());
-	}
-	
 	//-------- attributes --------
 	
 	/** The path of the jar file. */
