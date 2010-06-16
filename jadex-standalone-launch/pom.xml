@@ -2,15 +2,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sourceforge.jadex</groupId>
-	<artifactId>jadex-launch</artifactId>
+	<artifactId>jadex-standalone-launch</artifactId>
 	<packaging>jar</packaging>
-	<name>jadex-launch</name>
+	<name>jadex-standalone-launch</name>
 	<version>2.0-rc3</version>
 	<url>http://jadex.sourceforge.net</url>
 
 	<description>
 		The Jadex launch package facilitates
-		executing the Jadex platform.
+		executing the Jadex standalone platform.
 	</description>
 
 	<licenses>

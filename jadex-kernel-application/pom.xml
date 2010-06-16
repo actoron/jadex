@@ -135,6 +135,15 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+	<repositories>
+		<repository>
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net Repository for Maven</name>
+			<url>http://download.java.net/maven/2/</url>
+			<layout>default</layout>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<dependency>
@@ -161,6 +170,18 @@
 			<artifactId>jadex-services</artifactId>
 			<version>2.0-rc3</version>
 		</dependency>
+
+		<!-- <dependency>
+			<groupId>net.java.dev.jogl</groupId>
+			<artifactId>jogl</artifactId>
+			<version>1.1.1-rc6</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.java.dev.gluegen</groupId>
+			<artifactId>gluegen-rt</artifactId>
+			<version>1.0b05</version>
+		</dependency>-->
 
 		<dependency>
 			<groupId>jogl</groupId>
