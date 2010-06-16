@@ -189,6 +189,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 			protected synchronized void testFinished()
 			{
 				cnt++;
+//				System.out.println("here: "+cnt+" "+comps.size());
 				if(cnt==comps.size())
 				{
 					killtimer.cancel();

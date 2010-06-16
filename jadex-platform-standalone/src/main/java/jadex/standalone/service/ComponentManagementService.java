@@ -304,6 +304,11 @@ public class ComponentManagementService implements IComponentManagementService, 
 				// Kill subcomponents
 //				Object[] achildren	= children.getCollection(cid).toArray();	// Use copy as children may change on destroy.
 				desc = (CMSComponentDescription)descs.get(cid);
+				if(desc==null)
+				{
+					ret.setException(new RuntimeException("Component "+cid+" does not exist."));
+					return ret;
+				}
 				IComponentIdentifier[] achildren = desc.getChildren();
 				for(int i=0; i<achildren.length; i++)
 				{
@@ -594,7 +599,6 @@ public class ComponentManagementService implements IComponentManagementService, 
 	class CleanupCommand implements IResultListener
 	{
 		protected IComponentIdentifier cid;
-//		protected List killlisteners;
 		protected List killfutures;
 		
 		public CleanupCommand(IComponentIdentifier cid)

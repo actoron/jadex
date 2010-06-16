@@ -189,7 +189,7 @@
 
 				<module>jadex-runtimetools</module>
 				<module>jadex-platform-standalone</module>
-				<module>jadex-launch</module>
+				<module>jadex-standalone-launch</module>
 				<!-- <module>jadex-apleis</module> -->
 			</modules>
 		</profile>
@@ -237,7 +237,7 @@
 
 				<module>jadex-runtimetools</module>
 				<module>jadex-platform-standalone</module>
-				<module>jadex-launch</module>
+				<module>jadex-standalone-launch</module>
 				<!-- <module>jadex-apleis</module> -->
 			</modules>
 		</profile>
@@ -372,7 +372,7 @@
 
 				<module>jadex-runtimetools</module>
 				<module>jadex-platform-standalone</module>
-				<module>jadex-launch</module>
+				<module>jadex-standalone-launch</module>
 
 				<module>jadex-platform-wfms</module>
 				<module>jadex-wfms-launch</module>
