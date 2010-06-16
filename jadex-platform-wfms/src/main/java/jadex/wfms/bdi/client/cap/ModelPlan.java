@@ -6,6 +6,7 @@ import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.gpmn.GpmnModelLoader;
+import jadex.service.library.ILibraryService;
 import jadex.wfms.bdi.ontology.RequestModel;
 
 import java.io.File;
@@ -40,11 +41,17 @@ public class ModelPlan extends AbstractWfmsPlan
 				buffer = null;
 				if (reqM.getFileName().endsWith(".bpmn"))
 				{
-					model = (new BpmnModelLoader()).loadBpmnModel(tmpFile.getAbsolutePath(), new String[0]);
+					BpmnModelLoader ml = new BpmnModelLoader();
+					ml.setClassLoader(((ILibraryService) getScope().getServiceContainer().getService(ILibraryService.class)).getClassLoader());
+					model = ml.loadBpmnModel(tmpFile.getAbsolutePath(), new String[0]);
 					((MBpmnModel) model).setName(reqM.getFileName().substring(0, reqM.getFileName().length() - 5));
 				}
 				else
-					model = (new GpmnModelLoader()).loadBpmnModel(tmpFile.getAbsolutePath(), new String[0]);
+				{
+					GpmnModelLoader ml = new GpmnModelLoader();
+					ml.setClassLoader(((ILibraryService) getScope().getServiceContainer().getService(ILibraryService.class)).getClassLoader());
+					model = ml.loadGpmnModel(tmpFile.getAbsolutePath(), new String[0]);
+				}
 				tmpFile.delete();
 			}
 			else

@@ -25,9 +25,18 @@ public interface IParameterStateSet
 	/**
 	 * Returns a specific state.
 	 * @param index index of the state
+	 * @param initialState initial state of the parameter
 	 * @return the specified state
 	 */
-	public Object getState(long index);
+	public Object getState(long index, Object initialState);
+	
+	/**
+	 * Returns a description of the given state.
+	 * 
+	 * @param index index of the state
+	 * @return description
+	 */
+	public String getStateDescription(long index);
 	
 	/**
 	 * Adds a change listener for state set changes.

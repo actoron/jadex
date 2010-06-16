@@ -139,13 +139,13 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 				
 				synchronized(space.getMonitor())
 				{
-					space.setEnableQueueing(true);
 					if(!first)
 					{
 						// Update the environment objects.
-						for(Iterator it = space.getSpaceObjectsCollection().iterator(); it.hasNext(); )
+						Object[] objs = space.getSpaceObjectsCollection().toArray();
+						for(int i = 0; i < objs.length; ++i)
 						{
-							SpaceObject obj = (SpaceObject)it.next();
+							SpaceObject obj = (SpaceObject)objs[i];
 							obj.updateObject(space, progress, clockservice);
 						}
 						
@@ -184,8 +184,6 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 					first = false;
 				}
 //				System.out.println("-------------------------------------------");
-
-				space.setEnableQueueing(false);
 				
 				return false;
 			}

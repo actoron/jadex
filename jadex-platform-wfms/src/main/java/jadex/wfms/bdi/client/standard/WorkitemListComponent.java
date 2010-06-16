@@ -1,6 +1,7 @@
 package jadex.wfms.bdi.client.standard;
 
 import jadex.wfms.client.IWorkitem;
+import jadex.wfms.guicomponents.SGuiHelper;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;

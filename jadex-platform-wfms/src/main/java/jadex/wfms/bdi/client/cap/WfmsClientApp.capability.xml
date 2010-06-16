@@ -332,6 +332,9 @@
 			<parameter name="model_name" class="String" direction="in">
 				<goalmapping ref="request_model.model_name"/>
 			</parameter>
+			<parameter name="model_name_path" class="boolean" direction="in" optional="true">
+				<goalmapping ref="request_model.model_name_path"/>
+			</parameter>
 			<parameter name="model" class="ILoadableComponentModel" direction="out">
 				<goalmapping ref="request_model.model"/>
 			</parameter>

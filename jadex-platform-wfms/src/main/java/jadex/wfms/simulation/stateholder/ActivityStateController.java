@@ -104,13 +104,13 @@ public class ActivityStateController
 	 * Returns the current state for the activity.
 	 * @return current state of the activity
 	 */
-	public Map getActivityState()
+	public Map getActivityState(Map parameterValues)
 	{
 		Map ret = new HashMap();
 		for (int i = 0; i < currentStates.length; ++i)
 		{
 			IParameterStateSet stateSet = (IParameterStateSet) stateSets.get(i);
-			ret.put(stateSet.getParameterName(), stateSet.getState(currentStates[i]));
+			ret.put(stateSet.getParameterName(), stateSet.getState(currentStates[i], parameterValues.get(stateSet.getParameterName())));
 		}
 		return ret;
 	}
@@ -121,7 +121,7 @@ public class ActivityStateController
 		for (int i = 0; i < currentStates.length; ++i)
 		{
 			IParameterStateSet stateSet = (IParameterStateSet) stateSets.get(i);
-			buffer.append(String.valueOf(stateSet.getState(currentStates[i])));
+			buffer.append(stateSet.getStateDescription(currentStates[i]));
 			buffer.append(", ");
 		}
 		buffer.setLength(buffer.length() - 2);

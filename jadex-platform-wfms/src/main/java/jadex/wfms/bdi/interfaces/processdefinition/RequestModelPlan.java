@@ -7,6 +7,7 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.gpmn.GpmnModelLoader;
+import jadex.service.library.ILibraryService;
 import jadex.wfms.bdi.client.cap.AbstractWfmsPlan;
 import jadex.wfms.bdi.ontology.RequestModel;
 import jadex.wfms.bdi.ontology.RequestProxy;
@@ -39,9 +40,17 @@ public class RequestModelPlan extends AbstractWfmsPlan
 				try
 				{
 					if (rqm.getModelName().endsWith(".bpmn"))
-						model = (new BpmnModelLoader()).loadBpmnModel(rqm.getModelName(), new String[0]);
+					{
+						BpmnModelLoader bpmnLoader = new BpmnModelLoader();
+						bpmnLoader.setClassLoader(((ILibraryService)getScope().getServiceContainer().getService(ILibraryService.class)).getClassLoader());
+						model = bpmnLoader.loadBpmnModel(rqm.getModelName(), new String[0]);
+					}
 					else
-						model = (new GpmnModelLoader()).loadBpmnModel(rqm.getModelName(), new String[0]);
+					{
+						GpmnModelLoader gpmnLoader = new GpmnModelLoader();
+						gpmnLoader.setClassLoader(((ILibraryService)getScope().getServiceContainer().getService(ILibraryService.class)).getClassLoader());
+						model = gpmnLoader.loadGpmnModel(rqm.getModelName(), new String[0]);
+					}
 				}
 				catch (Exception e)
 				{

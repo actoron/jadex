@@ -45,6 +45,39 @@ public abstract class AbstractParameterStateSet implements IParameterStateSet
 		listeners.remove(listener);
 	}
 	
+	/**
+	 * Returns a specific state.
+	 * @param index index of the state
+	 * @return the specified state
+	 */
+	public Object getState(long index)
+	{
+		return null;
+	}
+	
+	/**
+	 * Returns a specific state.
+	 * @param index index of the state
+	 * @param initialState initial state of the parameter
+	 * @return the specified state
+	 */
+	public Object getState(long index, Object initialState)
+	{
+		return getState(index);
+		
+	}
+	
+	/**
+	 * Returns a description of the given state.
+	 * 
+	 * @param index index of the state
+	 * @return description
+	 */
+	public String getStateDescription(long index)
+	{
+		return String.valueOf(getState(index));
+	}
+	
 	protected void fireStateChange(Object source)
 	{
 		for (Iterator it = listeners.iterator(); it.hasNext(); )

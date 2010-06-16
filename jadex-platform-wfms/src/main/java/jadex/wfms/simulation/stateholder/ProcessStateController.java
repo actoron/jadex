@@ -39,10 +39,10 @@ public class ProcessStateController
 	public void nextState()
 	{
 		incrementActRec(new ArrayList(activityControllers.getAsList()));
-		for (Iterator it = activityControllers.iterator(); it.hasNext(); )
+		/*for (Iterator it = activityControllers.iterator(); it.hasNext(); )
 		{
 			ActivityStateController controller = (ActivityStateController) it.next();
-		}
+		}*/
 	}
 	
 	/**
@@ -73,12 +73,12 @@ public class ProcessStateController
 		return ret;
 	}
 	
-	public Map getActivityState(String activityName)
+	public Map getActivityState(String activityName, Map parameterValues)
 	{
 		ActivityStateController controller = (ActivityStateController) activityControllers.get(activityName);
 		if (controller == null)
 			return null;
-		return controller.getActivityState();
+		return controller.getActivityState(parameterValues);
 	}
 	
 	public String toString()

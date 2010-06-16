@@ -93,9 +93,6 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/** The environment processes. */
 	protected Map processes;
 	
-	/** Space object add queue */
-	protected Map spaceobjectaddqueue;
-	
 	/** Long/ObjectIDs (keys) and environment objects (values). */
 	protected Map spaceobjects;
 	
@@ -151,7 +148,6 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		this.perceptprocessors = new MultiCollection();
 		this.objecttypes = new HashMap();
 		this.objecttypesMeta = new HashMap();
-		this.spaceobjectaddqueue = null;
 		this.spaceobjects = new HashMap();
 		this.spaceobjectsbytype = new HashMap();
 		this.spaceobjectsbyowner = new HashMap();
@@ -881,7 +877,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			{
 				id = objectidcounter.getNext();
 			}
-			while(spaceobjects.containsKey(id) || (spaceobjectaddqueue != null && spaceobjectaddqueue.containsKey(id)));
+			while(spaceobjects.containsKey(id));
 			
 			// Prepare properties (runtime props override type props).
 			MObjectType mObjectType = (MObjectType)objecttypes.get(typename);
@@ -889,37 +885,17 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			
 			// Create the object.
 			ret = new SpaceObject(id, mObjectType, properties, tasks, monitor, this);
-		}
-		
-		if (spaceobjectaddqueue == null)
-			mergeSpaceObject(ret);
-		else
-			spaceobjectaddqueue.put(ret.getId(), ret);
-		
-		return ret;
-	}
-	
-	/**
-	 *  Merges a space object into the space.
-	 *  @param so The space object.
-	 */
-	protected void mergeSpaceObject(ISpaceObject so)
-	{
-		synchronized (monitor)
-		{
-			Object id = so.getId();
-			String typename = so.getType();
 			
-			spaceobjects.put(id, so);
+			spaceobjects.put(id, ret);
 
 			// Store in type objects.
-			List typeobjects = (List)spaceobjectsbytype.get(so.getType());
+			List typeobjects = (List)spaceobjectsbytype.get(ret.getType());
 			if(typeobjects == null)
 			{
 				typeobjects = new ArrayList();
-				spaceobjectsbytype.put(so.getType(), typeobjects);
+				spaceobjectsbytype.put(ret.getType(), typeobjects);
 			}
-			typeobjects.add(so);
+			typeobjects.add(ret);
 			
 			// Store in owner objects.
 			if(properties!=null && properties.get(ISpaceObject.PROPERTY_OWNER)!=null)
@@ -931,7 +907,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					ownerobjects = new ArrayList();
 					spaceobjectsbyowner.put(owner, ownerobjects);
 				}
-				ownerobjects.add(so);
+				ownerobjects.add(ret);
 			}
 			
 			// Create view(s) for the object if any.
@@ -945,7 +921,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 						Map viewargs = new HashMap();
 						viewargs.put("sourceview", sourceview);
 						viewargs.put("space", this);
-						viewargs.put("object", so);
+						viewargs.put("object", ret);
 						
 						IDataView	view	= (IDataView)((IObjectCreator)MEnvSpaceInstance.getProperty(sourceview, "creator")).createObject(viewargs);
 						addDataView((String)MEnvSpaceInstance.getProperty(sourceview, "name")+"_"+id, view);
@@ -973,7 +949,7 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					{
 						SimpleValueFetcher fetch = new SimpleValueFetcher();
 						fetch.setValue("$space", this);
-						fetch.setValue("$object", so);
+						fetch.setValue("$object", ret);
 						name = (String) mapping.getComponentName().getValue(fetch);
 					}
 					
@@ -1002,33 +978,15 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 		
 		if(listeners!=null)
 		{
-			EnvironmentEvent event = new EnvironmentEvent(EnvironmentEvent.OBJECT_CREATED, this, so, null, null);
+			EnvironmentEvent event = new EnvironmentEvent(EnvironmentEvent.OBJECT_CREATED, this, ret, null, null);
 			for(int i=0; i<listeners.size(); i++)
 			{
 				IEnvironmentListener lis = (IEnvironmentListener)listeners.get(i);
 				lis.dispatchEnvironmentEvent(event);
 			}
 		}
-	}
-	
-	/**
-	 *  Enables/Disables creation queueing.
-	 *  
-	 *  @param enable Set true to enable queueing.
-	 */
-	public void setEnableQueueing(boolean enable)
-	{
-		synchronized (monitor)
-		{
-			if (enable)
-				spaceobjectaddqueue = new HashMap();
-			else
-			{
-				for (Iterator it = spaceobjectaddqueue.values().iterator(); it.hasNext(); )
-					mergeSpaceObject((ISpaceObject) it.next());
-				spaceobjectaddqueue = null;
-			}
-		}
+		
+		return ret;
 	}
 
 	/**

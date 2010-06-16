@@ -1,6 +1,5 @@
 package jadex.wfms.simulation;
 
-import jadex.bpmn.BpmnModelLoader;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
@@ -10,11 +9,8 @@ import jadex.commons.collection.TreeNode;
 import jadex.gpmn.model2.MBpmnPlan;
 import jadex.gpmn.model2.MGpmnModel;
 import jadex.gpmn.model2.MSubprocess;
-import jadex.javaparser.javaccimpl.ReflectNode;
 import jadex.wfms.client.task.WorkitemTask;
-import jadex.wfms.simulation.stateholder.IParameterStateSet;
 import jadex.wfms.simulation.stateholder.ParameterStateSetFactory;
-import jadex.wfms.simulation.stateholder.ProcessStateController;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,8 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.naming.OperationNotSupportedException;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -175,7 +169,8 @@ public class ClientMetaProcessModel extends Tree implements TreeModel
 		for (Iterator it = outParams.iterator(); it.hasNext(); )
 		{
 			MParameter param = (MParameter) it.next();
-			node.addChild(new ModelTreeNode(param));
+			if (!param.getName().startsWith("IGNORE_"))
+				node.addChild(new ModelTreeNode(param));
 		}
 		return node;
 	}
@@ -233,7 +228,17 @@ public class ClientMetaProcessModel extends Tree implements TreeModel
 				{
 					// TODO: Check for "in"-only parameters
 					if ((activity.getParameters() != null) && (activity.getParameters().size() > 0))
-						ret.add(activity);
+					{
+						for (Iterator it2 = activity.getParameters(new String[]{MParameter.DIRECTION_INOUT, MParameter.DIRECTION_OUT}).iterator(); it2.hasNext(); )
+						{
+							MParameter param = (MParameter) it2.next();
+							if (!param.getName().startsWith("IGNORE_"))
+							{
+								ret.add(activity);
+								break;
+							}
+						}
+					}
 				}
 			}
 		}

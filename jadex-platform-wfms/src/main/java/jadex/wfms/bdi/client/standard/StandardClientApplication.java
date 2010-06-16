@@ -10,6 +10,8 @@ import jadex.commons.SGUI;
 import jadex.wfms.bdi.client.standard.parametergui.ActivityComponent;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
+import jadex.wfms.guicomponents.LoginDialog;
+import jadex.wfms.guicomponents.SGuiHelper;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;

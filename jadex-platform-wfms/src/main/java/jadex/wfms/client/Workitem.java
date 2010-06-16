@@ -111,6 +111,16 @@ public class Workitem implements IWorkitem, IClientActivity
 	}
 	
 	/**
+	 * Gets the parameter values.
+	 * 
+	 * @return values of the parameters.
+	 */
+	public Map getParameterValues()
+	{
+		return parameterValues;
+	}
+	
+	/**
 	 * Returns the Meta-properties of the workitem
 	 * @return the Meta-properties
 	 */
@@ -185,10 +195,6 @@ public class Workitem implements IWorkitem, IClientActivity
 	
 	public Map getParameterTypes() {
 		return parameterTypes;
-	}
-	
-	public Map getParameterValues() {
-		return parameterValues;
 	}
 	
 	public Set getReadOnlyParameters() {

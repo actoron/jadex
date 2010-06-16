@@ -1,7 +1,7 @@
 package jadex.wfms.bdi.client.standard.parametergui;
 
-import jadex.wfms.bdi.client.standard.SGuiHelper;
 import jadex.wfms.client.IClientActivity;
+import jadex.wfms.guicomponents.SGuiHelper;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

@@ -27,7 +27,7 @@ public class BooleanStatePanel extends JPanel implements IStatePanel
 		
 		BooleanStateSet stateSet =  null;
 		if (simWindow.getSelectedScenario() != null)
-			stateSet = (BooleanStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName);
+			stateSet = (BooleanStateSet) simWindow.getSelectedScenario().getTaskParameter(taskName, parameterName);
 		
 		if (stateSet != null)
 			falseBox.setSelected(stateSet.hasState(Boolean.FALSE));
@@ -38,9 +38,9 @@ public class BooleanStatePanel extends JPanel implements IStatePanel
 				if (simWindow.getSelectedScenario() != null)
 				{
 					if (((JCheckBox) e.getSource()).isSelected())
-						((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName)).addState(Boolean.FALSE);
+						((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameter(taskName, parameterName)).addState(Boolean.FALSE);
 					else
-						((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName)).removeState(Boolean.FALSE);
+						((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameter(taskName, parameterName)).removeState(Boolean.FALSE);
 				}
 			}
 		});
@@ -58,9 +58,9 @@ public class BooleanStatePanel extends JPanel implements IStatePanel
 				if (simWindow.getSelectedScenario() != null)
 				{
 					if (((JCheckBox) e.getSource()).isSelected())
-						((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName)).addState(Boolean.TRUE);
+						((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameter(taskName, parameterName)).addState(Boolean.TRUE);
 					else
-						((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName)).removeState(Boolean.TRUE);
+						((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameter(taskName, parameterName)).removeState(Boolean.TRUE);
 				}
 			}
 		});
@@ -78,8 +78,8 @@ public class BooleanStatePanel extends JPanel implements IStatePanel
 		{
 			falseBox.setEnabled(true);
 			trueBox.setEnabled(true);
-			falseBox.setSelected(((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName)).hasState(Boolean.FALSE));
-			trueBox.setSelected(((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName)).hasState(Boolean.TRUE));
+			falseBox.setSelected(((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameter(taskName, parameterName)).hasState(Boolean.FALSE));
+			trueBox.setSelected(((BooleanStateSet) simWindow.getSelectedScenario().getTaskParameter(taskName, parameterName)).hasState(Boolean.TRUE));
 		}
 		else
 		{

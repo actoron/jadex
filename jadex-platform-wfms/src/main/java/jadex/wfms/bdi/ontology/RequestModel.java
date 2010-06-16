@@ -16,7 +16,7 @@ public class RequestModel implements IComponentAction
 	
 	/** The file name */
 	private String fileName;
-
+	
 	/**
 	 *  Get the modelName.
 	 *  @return The modelName.

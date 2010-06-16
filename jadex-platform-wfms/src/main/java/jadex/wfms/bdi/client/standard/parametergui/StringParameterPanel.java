@@ -1,12 +1,7 @@
 package jadex.wfms.bdi.client.standard.parametergui;
 
-import java.awt.Color;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.util.HashMap;
-import java.util.Map;
 
-import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 public class StringParameterPanel extends AbstractParameterPanel

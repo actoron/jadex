@@ -70,7 +70,7 @@ public class NumericPanel extends JPanel implements IStatePanel
 				if (range == null)
 					return;
 				
-				AbstractNumericStateSet stateSet = (AbstractNumericStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName);
+				AbstractNumericStateSet stateSet = (AbstractNumericStateSet) simWindow.getSelectedScenario().getTaskParameter(taskName, parameterName);
 				try
 				{
 					stateSet.addRange(range);
@@ -101,7 +101,7 @@ public class NumericPanel extends JPanel implements IStatePanel
 			{
 				if (simWindow.getSelectedScenario() == null)
 					return;
-				AbstractNumericStateSet stateSet = (AbstractNumericStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName);
+				AbstractNumericStateSet stateSet = (AbstractNumericStateSet) simWindow.getSelectedScenario().getTaskParameter(taskName, parameterName);
 				stateSet.removeRange(rangeList.getSelectedIndex());
 				refreshPanel();
 			}
@@ -124,7 +124,7 @@ public class NumericPanel extends JPanel implements IStatePanel
 		((DefaultListModel) rangeList.getModel()).clear();
 		if (simWindow.getSelectedScenario() == null)
 			return;
-		List ranges = ((AbstractNumericStateSet) simWindow.getSelectedScenario().getTaskParameters(taskName).get(parameterName)).getRanges();
+		List ranges = ((AbstractNumericStateSet) simWindow.getSelectedScenario().getTaskParameter(taskName, parameterName)).getRanges();
 		for (Iterator it = ranges.iterator(); it.hasNext(); )
 			((DefaultListModel) rangeList.getModel()).addElement(it.next().toString());
 	}

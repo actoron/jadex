@@ -10,28 +10,37 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
+import jadex.commons.SUtil;
+import jadex.commons.collection.SCollection;
 import jadex.commons.collection.TreeNode;
 import jadex.gpmn.model2.MGpmnModel;
-import jadex.wfms.bdi.client.standard.LoginDialog;
 import jadex.wfms.client.IClientActivity;
 import jadex.wfms.client.IWorkitem;
+import jadex.wfms.guicomponents.LoginDialog;
+import jadex.wfms.guicomponents.SGuiHelper;
 import jadex.wfms.simulation.gui.SimulationWindow;
 import jadex.wfms.simulation.stateholder.AbstractNumericStateSet;
 import jadex.wfms.simulation.stateholder.BooleanStateSet;
+import jadex.wfms.simulation.stateholder.DocumentStateSet;
 import jadex.wfms.simulation.stateholder.IParameterStateSet;
 import jadex.wfms.simulation.stateholder.NumberRange;
 import jadex.wfms.simulation.stateholder.ProcessStateController;
+import jadex.wfms.simulation.stateholder.ResolvableListChoiceStateSet;
+import jadex.wfms.simulation.stateholder.ResolvableMultiListChoiceStateSet;
+import jadex.wfms.simulation.stateholder.StringArrayStateSet;
 import jadex.wfms.simulation.stateholder.StringStateSet;
 
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
@@ -259,7 +268,7 @@ public class ClientSimulator
 					{
 						IClientActivity activity = (IClientActivity) e.getSource();
 						simWindow.addLogMessage("Processing Activity: " + activity.getName());
-						Map parameterStates = activeStateController.getActivityState(activity.getName());
+						Map parameterStates = activeStateController.getActivityState(activity.getName(), activity.getParameterValues());
 						if (parameterStates != null)
 							activity.setMultipleParameterValues(parameterStates);
 						
@@ -290,7 +299,7 @@ public class ClientSimulator
 							{
 								setIcon(SimulationWindow.PARAM_ICON);
 								MActivity task = (MActivity) ((ModelTreeNode)((ModelTreeNode)value).getParent()).getData();
-								if ((simWindow.getSelectedScenario() == null) || ((IParameterStateSet) simWindow.getSelectedScenario().getTaskParameters(task.getName()).get(((MParameter) data).getName())).getStateCount() == 0)
+								if ((simWindow.getSelectedScenario() == null) || simWindow.getSelectedScenario().getTaskParameter(task.getName(), ((MParameter) data).getName()).getStateCount() == 0)
 									setForeground(new Color(128,128,128));
 							}
 							else if (data instanceof TreeNode)
@@ -310,7 +319,7 @@ public class ClientSimulator
 	
 	protected ILoadableComponentModel loadModelFromPath(String path)
 	{
-		IGoal reqMod = agent.createGoal("request_model");
+		IGoal reqMod = agent.createGoal("clientcap.request_model");
 		reqMod.getParameter("model_name").setValue(path);
 		reqMod.getParameter("model_name_path").setValue(Boolean.TRUE);
 		agent.dispatchTopLevelGoalAndWait(reqMod);
@@ -343,7 +352,7 @@ public class ClientSimulator
 			{
 				IGoal reqMod = agent.createGoal("clientcap.request_model_names");
 				agent.dispatchTopLevelGoalAndWait(reqMod);
-				Set modelNames = (Set) reqMod.getParameter("model_names").getValue();
+				Set modelNames = new TreeSet((Set) reqMod.getParameter("model_names").getValue());
 				String modelName = simWindow.showProcessPickerDialog(modelNames);
 				if (modelName == null)
 					return;
@@ -416,7 +425,11 @@ public class ClientSimulator
 						    "Error",
 						    JOptionPane.ERROR_MESSAGE);
 				else
+				{
 					scenarios.addRow(new Object[] {clientMetaProcessModel.createScenario(name)});
+					simWindow.setSelectedScenario((Scenario) scenarios.getValueAt(scenarios.getRowCount() - 1, 0));
+					simWindow.refreshParameterStates();
+				}
 			}
 		});
 		
@@ -479,6 +492,22 @@ public class ClientSimulator
 						}
 						else if (pSet instanceof StringStateSet)
 							((StringStateSet) pSet).addString("Quick Fill Test " + String.valueOf(random.nextLong()));
+						else if (pSet instanceof DocumentStateSet)
+							((DocumentStateSet) pSet).addRandom();
+						else if (pSet instanceof StringArrayStateSet)
+							((StringArrayStateSet) pSet).addString(new String[] {"Quick Fill Test", String.valueOf(random.nextLong())});
+						else if (pSet instanceof ResolvableListChoiceStateSet)
+							for (Iterator it2 = Arrays.asList(((ResolvableListChoiceStateSet) pSet).getChoices()).iterator(); it2.hasNext(); )
+							{
+								Object selection = it2.next();
+								if (!((ResolvableListChoiceStateSet) pSet).hasSelection(selection));
+								{
+									((ResolvableListChoiceStateSet) pSet).addSelection(selection);
+									break;
+								}
+							}
+						else if (pSet instanceof ResolvableMultiListChoiceStateSet)
+							((ResolvableMultiListChoiceStateSet) pSet).addSelectionSet(SGuiHelper.selectFromArray(((ResolvableMultiListChoiceStateSet)pSet).getChoices(), random.nextLong()));
 					}
 				}
 			}

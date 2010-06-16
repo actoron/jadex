@@ -27,24 +27,37 @@ public class StringStateSet extends AbstractParameterStateSet
 	 * Adds a new String to the set.
 	 * @param string the new String
 	 */
-	public void addString(String string)
+	public boolean addString(String string)
 	{
 		if (!strings.contains(string))
 		{
 			strings.add(string);
 			Collections.sort(strings);
 			fireStateChange(string);
+			return true;
 		}
+		return false;
 	}
 	
 	/**
 	 * Removes a String from the set.
-	 * @param string the String
+	 * @param index index of the String
 	 */
-	public void removeString(String string)
+	public void removeString(int index)
 	{
-		strings.remove(string);
+		String string = (String) strings.remove(index);
 		fireStateChange(string);
+	}
+	
+	/**
+	 *  Attempts to set a string in the set.
+	 * 	@param index index of the string
+	 *  @param string the new string
+	 */
+	public void setString(int index, String string)
+	{
+		if (!strings.contains(string))
+			strings.set(index, string);
 	}
 	
 	public List getStrings()

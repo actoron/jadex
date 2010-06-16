@@ -1,6 +1,6 @@
 package jadex.wfms.bdi.client.standard.parametergui;
 
-import jadex.wfms.bdi.client.standard.SGuiHelper;
+import jadex.wfms.guicomponents.SGuiHelper;
 import jadex.wfms.parametertypes.Text;
 
 import java.awt.Dimension;

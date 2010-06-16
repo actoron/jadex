@@ -57,6 +57,15 @@ public class Scenario implements ChangeListener
 	}
 	
 	/**
+	 * Returns the specified parameter set of a task.
+	 * @return parameter set of a task
+	 */
+	public IParameterStateSet getTaskParameter(String taskName, String parameterName)
+	{
+		return (IParameterStateSet) getTaskParameters(taskName).get(parameterName); 
+	}
+	
+	/**
 	 * Returns a list of all parameter sets
 	 * @return list of all parameter sets
 	 */

@@ -23,6 +23,13 @@ public interface IClientActivity extends IWorkitem
 	public void setParameterValue(String parameterName, Object value);
 	
 	/**
+	 * Gets the parameter values.
+	 * 
+	 * @return values of the parameters.
+	 */
+	public Map getParameterValues();
+	
+	/**
 	 * Sets the value of multiple parameters.
 	 * 
 	 * @param parameters the parameters

@@ -13,7 +13,7 @@ import java.nio.channels.FileChannel.MapMode;
 /**
  * Class representing a generic binary document used in workflows.
  */
-public class Document
+public class Document implements Comparable
 {
 	/** File name of the document */
 	private String fileName;
@@ -44,7 +44,19 @@ public class Document
 		encodeContent(content);
 	}
 	
-	public byte[] retrieveContent()
+	public void encodeContent(byte[] content)
+	{
+		try
+		{
+			contString = new String(Base64.encode(content), "US-ASCII");
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public byte[] decodeContent()
 	{
 		try
 		{
@@ -76,15 +88,25 @@ public class Document
 		this.contString = contString;
 	}
 	
-	private void encodeContent(byte[] content)
+	public boolean equals(Object obj)
 	{
-		try
+		if (obj instanceof Document && fileName != null)// && contString != null)
 		{
-			contString = new String(Base64.encode(content), "US-ASCII");
+			Document other = (Document) obj;
+			return fileName.equals(other.fileName);// && contString.equals(other.contString);
 		}
-		catch (UnsupportedEncodingException e)
-		{
-			throw new RuntimeException(e);
-		}
+		return false;
+	}
+	
+	public int compareTo(Object other)
+	{
+		if (other instanceof Document && fileName != null)
+			return fileName.compareTo(((Document) other).fileName);
+		return 0;
+	}
+	
+	public String toString()
+	{
+		return fileName;
 	}
 }

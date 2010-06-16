@@ -92,12 +92,6 @@ public interface IEnvironmentSpace extends IPropertyObject
 	public ISpaceObject createSpaceObject(String typename, Map properties, List tasks);
 	
 	/**
-	 *  Enables and disables queueing of creation operations.
-	 *  @param enable Set true to enable queueing.
-	 */
-	public void setEnableQueueing(boolean enable);
-	
-	/**
 	 *  Add a space object type.
 	 *  @param typename The type name.
 	 *  @param properties The properties (map of maps with name->name/value/dynamic/event).

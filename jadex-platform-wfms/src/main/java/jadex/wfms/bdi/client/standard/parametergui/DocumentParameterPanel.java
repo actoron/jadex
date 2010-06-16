@@ -1,6 +1,6 @@
 package jadex.wfms.bdi.client.standard.parametergui;
 
-import jadex.wfms.bdi.client.standard.SGuiHelper;
+import jadex.wfms.guicomponents.SGuiHelper;
 import jadex.wfms.parametertypes.Document;
 
 import java.awt.Component;
@@ -110,7 +110,7 @@ public class DocumentParameterPanel extends AbstractParameterPanel
 						File docFile = fc.getSelectedFile();
 						try
 						{
-							(new FileOutputStream(docFile)).write(document.retrieveContent());
+							(new FileOutputStream(docFile)).write(document.decodeContent());
 						}
 						catch (IOException e1)
 						{
@@ -211,7 +211,7 @@ public class DocumentParameterPanel extends AbstractParameterPanel
 				BufferedImage tmpImage = null;
 				try
 				{
-					tmpImage = ImageIO.read(new ByteArrayInputStream(document.retrieveContent()));
+					tmpImage = ImageIO.read(new ByteArrayInputStream(document.decodeContent()));
 				}
 				catch (IOException e)
 				{
