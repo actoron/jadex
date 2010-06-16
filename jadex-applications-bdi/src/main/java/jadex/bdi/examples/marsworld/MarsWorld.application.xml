@@ -291,7 +291,7 @@
 						<env:object type="homebase">
 							<env:property name="space">$space</env:property><!-- hack!!! -->
 							<env:property name="missiontime">
-								300000 + $space.getContext().getServiceContainer().getService(IClockService.class).getTime()
+								3000000 + $space.getContext().getServiceContainer().getService(IClockService.class).getTime()
 							</env:property>
 						</env:object>
 						<env:object type="target" number="20">
@@ -304,7 +304,7 @@
 	 			</env:envspace>
 			</spaces>
 			<components>
-				<component type="Sentry" number="2"/>
+				<component type="Sentry" number="1"/> <!-- todo: support more than one sentry (requires coordination between sentries) -->
   				<component type="Producer" number="5"/>
 				<component type="Carry" number="10"/>
 			</components>

@@ -160,6 +160,62 @@
 
 		<profile>
 			<id>jadex-full-dist</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.2-beta-3</version>
+						<configuration>
+							<archiverConfig>
+								<duplicateBehavior>skip</duplicateBehavior>
+							</archiverConfig>
+							<descriptors>
+								<descriptor>src/main/assembly/dist-assembly.xml</descriptor>
+							</descriptors>
+						</configuration>
+						<executions>
+							<execution>
+								<id>make-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>wagon-maven-plugin</artifactId>
+						<version>1.0-beta-3</version>
+						<configuration>
+							<serverId>central</serverId>
+						</configuration>
+						<executions>
+							<execution>
+								<id>http-download-single</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>download-single</goal>
+								</goals>
+								<configuration>
+									<!-- <url>http://jadex.informatik.uni-hamburg.de/nightlybuilds/2010-05-28/</url>
+									<fromFile>jadex-xml-2.0-rc2-xml-dist.zip</fromFile>
+									<toFile>${basedir}/target/test.zip</toFile> -->
+									
+									<url>http://jadex-agents.informatik.uni-hamburg.de/xwiki/bin/view/Links+to+PDFs</url>
+									<fromFile>Standalone+Platform+Guide</fromFile>
+									<toFile>${basedir}/target/standalone_platform_guide.pdf</toFile>
+									<!-- 
+									<url>http://jadex-agents.informatik.uni-hamburg.de/xwiki/bin/export/Standalone+Platform+Guide/</url>
+									<fromFile>Standalone+Platform+Guide?format=pdf&amp;pages=Standalone%20Platform%20Guide.01%20Introduction&amp;pages=Standalone%20Platform%20Guide.02%20Starting%20the%20Platform&amp;pages=Standalone%20Platform%20Guide.03%20Configuring%20the%20Platform&amp;pages=Standalone%20Platform%20Guide.04%20Platform%20Services</fromFile>
+									<toFile>${basedir}/target/standalone_platform_guide.pdf</toFile> -->
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 			<modules>
 				<module>jadex-commons</module>
 				<module>jadex-xml</module>
@@ -389,18 +445,6 @@
 	</profiles>
 
 	<!-- <url>http://jadex.sourceforge.net</url> -->
-	<!--
-		<build> <plugins> <plugin> <groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-assembly-plugin</artifactId>
-		<version>2.2-beta-3</version> <configuration> <archiverConfig>
-		<duplicateBehavior>skip</duplicateBehavior> </archiverConfig>
-		<descriptors>
-		<descriptor>src/main/assembly/dist-assembly.xml</descriptor>
-		</descriptors> </configuration> <executions> <execution>
-		<id>make-assembly</id> <phase>package</phase> <goals>
-		<goal>single</goal> </goals> </execution> </executions> </plugin>
-		</plugins> </build>
-	-->
 
 	<reporting>
 		<plugins>
