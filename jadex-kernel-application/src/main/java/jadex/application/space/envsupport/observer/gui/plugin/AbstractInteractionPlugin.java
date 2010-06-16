@@ -6,6 +6,7 @@ import jadex.application.space.envsupport.observer.graphics.IViewport;
 import jadex.application.space.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.application.space.envsupport.observer.gui.ObserverCenter;
 import jadex.application.space.envsupport.observer.perspective.Perspective2D;
+import jadex.commons.SimplePropertyObject;
 
 import java.awt.Canvas;
 import java.awt.Point;
@@ -18,7 +19,7 @@ import java.util.List;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-public abstract class AbstractInteractionPlugin implements IObserverCenterPlugin
+public abstract class AbstractInteractionPlugin extends SimplePropertyObject implements IObserverCenterPlugin
 {
 	private DrawableCombiner marker;
 	
