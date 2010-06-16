@@ -1,9 +1,9 @@
 package jadex.gpmn;
 
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
-import jadex.gpmn.model.MGpmnModel;
 
 /**
  *  Loader for eclipse STP GPMN models (.gpmn files).
@@ -32,9 +32,9 @@ public class GpmnModelLoader extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public MGpmnModel	loadBpmnModel(String name, String[] imports) throws Exception
+	public ILoadableComponentModel	loadGpmnModel(String name, String[] imports) throws Exception
 	{
-		return (MGpmnModel)loadModel(name, FILE_EXTENSION_GPMN, imports);
+		return (ILoadableComponentModel)loadModel(name, FILE_EXTENSION_GPMN, imports);
 	}
 	
 	//-------- AbstractModelLoader methods --------

@@ -95,7 +95,7 @@ public class GpmnBDIConverter2
 		state.addStateListener(listener, false);
 		
 		Object handle = state.createRootObject(OAVBDIMetaModel.agent_type); 
-		doConvert(model, classloader, state, handle);
+		
 		state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_name, model.getName());
 		//TODO: Add process description
 		//state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_description, model.getDescription());
@@ -108,7 +108,7 @@ public class GpmnBDIConverter2
 				state.addAttributeValue(handle, OAVBDIMetaModel.capability_has_imports, imports[i]);
 			}
 		}
-		
+		doConvert(model, classloader, state, handle);
 		state.removeStateListener(listener);
 		agentmodel =  new OAVAgentModel(state, handle, typemodel, types, model.getFilename(), model.getLastModified(), report);
 		try
@@ -319,7 +319,7 @@ public class GpmnBDIConverter2
 			{
 				Object goalhandle = state.getAttributeValue(scopehandle, OAVBDIMetaModel.capability_has_goals, goal.getName());
 				String goalname = (String)state.getAttributeValue(goalhandle, OAVBDIMetaModel.modelelement_has_name);
-
+				
 				if(state.getType(goalhandle).isSubtype(OAVBDIMetaModel.achievegoal_type))
 				{
 					agoalnames.add("\""+goalname+"\"");

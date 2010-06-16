@@ -10,7 +10,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_2YywU33MEd6VFdlpWzoevQ"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_2YywVH3MEd6VFdlpWzoevQ" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="ParallelGoalExecutionPlan.bpmn#_2Yo_UX3MEd6VFdlpWzoevQ"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_2YywVX3MEd6VFdlpWzoevQ" x="7" y="103"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_2YywVX3MEd6VFdlpWzoevQ" x="15" y="134"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_HVAZ1H3NEd6VFdlpWzoevQ" type="2002">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WQjxIH3jEd6VFdlpWzoevQ" source="SubProcess_Annotation">
@@ -77,7 +77,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_HVAZ133NEd6VFdlpWzoevQ"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_HVAZ2H3NEd6VFdlpWzoevQ" lineColor="0"/>
         <element xmi:type="bpmn:SubProcess" href="ParallelGoalExecutionPlan.bpmn#_HVAZ0X3NEd6VFdlpWzoevQ"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HVAZ2X3NEd6VFdlpWzoevQ" x="112" y="14" width="571" height="211"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HVAZ2X3NEd6VFdlpWzoevQ" x="164" y="14" width="571" height="211"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_Jdw-on3kEd6VFdlpWzoevQ" type="2001">
         <children xmi:type="notation:Node" xmi:id="_Jdw-qH3kEd6VFdlpWzoevQ" type="4001"/>
@@ -86,7 +86,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_Jdw-pX3kEd6VFdlpWzoevQ"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_Jdw-pn3kEd6VFdlpWzoevQ" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="ParallelGoalExecutionPlan.bpmn#_Jdw-oX3kEd6VFdlpWzoevQ"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Jdw-p33kEd6VFdlpWzoevQ" x="1429" y="103"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Jdw-p33kEd6VFdlpWzoevQ" x="1481" y="103"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_KdGUsn3kEd6VFdlpWzoevQ" type="2001">
         <children xmi:type="notation:Node" xmi:id="_KdGUuH3kEd6VFdlpWzoevQ" type="4001"/>
@@ -95,7 +95,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_KdGUtX3kEd6VFdlpWzoevQ"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_KdGUtn3kEd6VFdlpWzoevQ" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="ParallelGoalExecutionPlan.bpmn#_KdGUsX3kEd6VFdlpWzoevQ"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_KdGUt33kEd6VFdlpWzoevQ" x="1713" y="113"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_KdGUt33kEd6VFdlpWzoevQ" x="1765" y="113"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_gKdm4El1Ed-fQf2bUxHuqg" type="2002">
         <children xmi:type="notation:Node" xmi:id="_gKe1AEl1Ed-fQf2bUxHuqg" type="4006"/>
@@ -149,7 +149,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_gKdm40l1Ed-fQf2bUxHuqg"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_gKdm5El1Ed-fQf2bUxHuqg" lineColor="0"/>
         <element xmi:type="bpmn:SubProcess" href="ParallelGoalExecutionPlan.bpmn#_gKajkUl1Ed-fQf2bUxHuqg"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_gKdm5Ul1Ed-fQf2bUxHuqg" x="895" y="13" width="427" height="233"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_gKdm5Ul1Ed-fQf2bUxHuqg" x="947" y="13" width="427" height="233"/>
       </children>
       <children xmi:type="notation:Node" xmi:id="_-MXQYVa_Ed-6weTaKk_gvA" type="2001">
         <children xmi:type="notation:Node" xmi:id="_-MX3cFa_Ed-6weTaKk_gvA" type="4001"/>
@@ -158,7 +158,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_-MXQZFa_Ed-6weTaKk_gvA"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_-MXQZVa_Ed-6weTaKk_gvA" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="ParallelGoalExecutionPlan.bpmn#_-MXQYFa_Ed-6weTaKk_gvA"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_-MXQZla_Ed-6weTaKk_gvA" x="743" y="33"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_-MXQZla_Ed-6weTaKk_gvA" x="795" y="33"/>
       </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_xQhO-H3MEd6VFdlpWzoevQ"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_xQhO-X3MEd6VFdlpWzoevQ"/>
@@ -169,24 +169,12 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_xQhO833MEd6VFdlpWzoevQ" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_xQhO9H3MEd6VFdlpWzoevQ" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="ParallelGoalExecutionPlan.bpmn#_xQYFAX3MEd6VFdlpWzoevQ"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_xQhO-33MEd6VFdlpWzoevQ" x="16" y="16" width="2085" height="524"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_xQhO-33MEd6VFdlpWzoevQ" x="16" y="16" width="2137" height="524"/>
   </children>
   <styles xmi:type="notation:PageStyle" xmi:id="_xQOUAX3MEd6VFdlpWzoevQ"/>
   <styles xmi:type="notation:GuideStyle" xmi:id="_xQOUAn3MEd6VFdlpWzoevQ"/>
   <styles xmi:type="notation:DescriptionStyle" xmi:id="_xQOUA33MEd6VFdlpWzoevQ"/>
   <element xmi:type="bpmn:BpmnDiagram" href="ParallelGoalExecutionPlan.bpmn#_xP7ZEX3MEd6VFdlpWzoevQ"/>
-  <edges xmi:type="notation:Edge" xmi:id="_Mdk2In3NEd6VFdlpWzoevQ" type="3001" source="_2YywUH3MEd6VFdlpWzoevQ" target="_HVAZ1H3NEd6VFdlpWzoevQ">
-    <children xmi:type="notation:Node" xmi:id="_Mdk2J33NEd6VFdlpWzoevQ" type="4012">
-      <styles xmi:type="notation:FillStyle" xmi:id="_Mdk2KH3NEd6VFdlpWzoevQ" fillColor="16776959"/>
-      <styles xmi:type="notation:LineStyle" xmi:id="_Mdk2KX3NEd6VFdlpWzoevQ" lineColor="16776959"/>
-      <layoutConstraint xmi:type="notation:Location" xmi:id="_Mdk2Kn3NEd6VFdlpWzoevQ" y="-10"/>
-    </children>
-    <styles xmi:type="notation:RoutingStyle" xmi:id="_Mdk2I33NEd6VFdlpWzoevQ" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
-    <styles xmi:type="notation:FontStyle" xmi:id="_Mdk2JH3NEd6VFdlpWzoevQ" fontName="Arial"/>
-    <styles xmi:type="notation:LineStyle" xmi:id="_Mdk2JX3NEd6VFdlpWzoevQ" lineColor="0"/>
-    <element xmi:type="bpmn:SequenceEdge" href="ParallelGoalExecutionPlan.bpmn#_Mdk2IX3NEd6VFdlpWzoevQ"/>
-    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Mdk2Jn3NEd6VFdlpWzoevQ" points="[15, 3, -214, -8]$[168, 47, -61, 36]"/>
-  </edges>
   <edges xmi:type="notation:Edge" xmi:id="_RMT0K33jEd6VFdlpWzoevQ" type="3001" source="_HVcesH3NEd6VFdlpWzoevQ" target="_RMT0In3jEd6VFdlpWzoevQ">
     <children xmi:type="notation:Node" xmi:id="_RMT0MH3jEd6VFdlpWzoevQ" type="4012">
       <styles xmi:type="notation:FillStyle" xmi:id="_RMT0MX3jEd6VFdlpWzoevQ" fillColor="16776959"/>
@@ -311,7 +299,7 @@
     <children xmi:type="notation:Node" xmi:id="_NDhOsFa8Ed-217QnlHazgg" type="4012">
       <styles xmi:type="notation:FillStyle" xmi:id="_NDhOsVa8Ed-217QnlHazgg" fillColor="16776959"/>
       <styles xmi:type="notation:LineStyle" xmi:id="_NDhOsla8Ed-217QnlHazgg" lineColor="16776959"/>
-      <layoutConstraint xmi:type="notation:Location" xmi:id="_NDhOs1a8Ed-217QnlHazgg" y="40"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_NDhOs1a8Ed-217QnlHazgg" y="-10"/>
     </children>
     <styles xmi:type="notation:RoutingStyle" xmi:id="_NDgnoVa8Ed-217QnlHazgg" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
     <styles xmi:type="notation:FontStyle" xmi:id="_NDgnola8Ed-217QnlHazgg" fontName="Arial"/>
@@ -335,7 +323,7 @@
     <children xmi:type="notation:Node" xmi:id="_-qpu4Fa_Ed-6weTaKk_gvA" type="4012">
       <styles xmi:type="notation:FillStyle" xmi:id="_-qpu4Va_Ed-6weTaKk_gvA" fillColor="16776959"/>
       <styles xmi:type="notation:LineStyle" xmi:id="_-qpu4la_Ed-6weTaKk_gvA" lineColor="16776959"/>
-      <layoutConstraint xmi:type="notation:Location" xmi:id="_-qpu41a_Ed-6weTaKk_gvA" y="40"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_-qpu41a_Ed-6weTaKk_gvA" y="-10"/>
     </children>
     <styles xmi:type="notation:RoutingStyle" xmi:id="_-qpH0Va_Ed-6weTaKk_gvA" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
     <styles xmi:type="notation:FontStyle" xmi:id="_-qpH0la_Ed-6weTaKk_gvA" fontName="Arial"/>
@@ -347,12 +335,24 @@
     <children xmi:type="notation:Node" xmi:id="__beu4Fa_Ed-6weTaKk_gvA" type="4012">
       <styles xmi:type="notation:FillStyle" xmi:id="__beu4Va_Ed-6weTaKk_gvA" fillColor="16776959"/>
       <styles xmi:type="notation:LineStyle" xmi:id="__beu4la_Ed-6weTaKk_gvA" lineColor="16776959"/>
-      <layoutConstraint xmi:type="notation:Location" xmi:id="__beu41a_Ed-6weTaKk_gvA" y="40"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="__beu41a_Ed-6weTaKk_gvA" y="-10"/>
     </children>
     <styles xmi:type="notation:RoutingStyle" xmi:id="__beH0Va_Ed-6weTaKk_gvA" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
     <styles xmi:type="notation:FontStyle" xmi:id="__beH0la_Ed-6weTaKk_gvA" fontName="Arial"/>
     <styles xmi:type="notation:LineStyle" xmi:id="__beH01a_Ed-6weTaKk_gvA" lineColor="0"/>
     <element xmi:type="bpmn:SequenceEdge" href="ParallelGoalExecutionPlan.bpmn#__bdgwVa_Ed-6weTaKk_gvA"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="__beH1Fa_Ed-6weTaKk_gvA" points="[24, -1, -314, -70]$[160, -45, -178, -114]"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="___wbQGylEd-IYe-ZhKpt-A" type="3001" source="_2YywUH3MEd6VFdlpWzoevQ" target="_HVAZ1H3NEd6VFdlpWzoevQ">
+    <children xmi:type="notation:Node" xmi:id="___wbRWylEd-IYe-ZhKpt-A" type="4012">
+      <styles xmi:type="notation:FillStyle" xmi:id="___wbRmylEd-IYe-ZhKpt-A" fillColor="16776959"/>
+      <styles xmi:type="notation:LineStyle" xmi:id="___wbR2ylEd-IYe-ZhKpt-A" lineColor="16776959"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="___wbSGylEd-IYe-ZhKpt-A" y="-10"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="___wbQWylEd-IYe-ZhKpt-A" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="___wbQmylEd-IYe-ZhKpt-A" fontName="Arial"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="___wbQ2ylEd-IYe-ZhKpt-A" lineColor="0"/>
+    <element xmi:type="bpmn:SequenceEdge" href="ParallelGoalExecutionPlan.bpmn#___vNIWylEd-IYe-ZhKpt-A"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="___wbRGylEd-IYe-ZhKpt-A" points="[9, -28, -327, 212]$[53, -234, -283, 6]"/>
   </edges>
 </notation:Diagram>

@@ -8,12 +8,17 @@
   <pools xmi:type="bpmn:Pool" xmi:id="_xQYFAX3MEd6VFdlpWzoevQ" iD="_xQYFAH3MEd6VFdlpWzoevQ" name="body">
     <vertices xmi:type="bpmn:Activity" xmi:id="_2Yo_UX3MEd6VFdlpWzoevQ" iD="_2Yo_UH3MEd6VFdlpWzoevQ" outgoingEdges="_6q-VsVN8Ed-JBsCeEiDQnA" activityType="EventStartEmpty"/>
     <vertices xmi:type="bpmn:Activity" xmi:id="_EG1iwX3PEd6VFdlpWzoevQ" iD="_EG1iwH3PEd6VFdlpWzoevQ" incomingEdges="__5paAVN8Ed-JBsCeEiDQnA" activityType="EventEndEmpty"/>
-    <vertices xmi:type="bpmn:SubProcess" xmi:id="_QPkVAVN8Ed-JBsCeEiDQnA" iD="_QPkVAFN8Ed-JBsCeEiDQnA" outgoingEdges="_osZQQVN8Ed-JBsCeEiDQnA" incomingEdges="_6q-VsVN8Ed-JBsCeEiDQnA _AfB_AVN9Ed-JBsCeEiDQnA">
+    <vertices xmi:type="bpmn:SubProcess" xmi:id="_QPkVAVN8Ed-JBsCeEiDQnA" iD="_QPkVAFN8Ed-JBsCeEiDQnA" outgoingEdges="_osZQQVN8Ed-JBsCeEiDQnA" incomingEdges="_AfB_AVN9Ed-JBsCeEiDQnA _4mZk4WyhEd-IYe-ZhKpt-A">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_QZ58wFN8Ed-JBsCeEiDQnA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_QZ58wVN8Ed-JBsCeEiDQnA" key="class" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6omhsFN9Ed-JBsCeEiDQnA" key="parameters" value="inout␋i␋int␋0"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_6omhsFN9Ed-JBsCeEiDQnA" key="parameters" value="inout␋i␋int␋i"/>
       </eAnnotations>
-      <vertices xmi:type="bpmn:Activity" xmi:id="_fcF_AVN7Ed-JBsCeEiDQnA" iD="_fcF_AFN7Ed-JBsCeEiDQnA" outgoingEdges="_jg6p4VN8Ed-JBsCeEiDQnA _j2DzcVN8Ed-JBsCeEiDQnA" incomingEdges="_i81scVN8Ed-JBsCeEiDQnA" activityType="GatewayDataBasedExclusive"/>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_xQsioGyhEd-IYe-ZhKpt-A" source="subProcess">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xQsioWyhEd-IYe-ZhKpt-A" key="file" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xQtwwGyhEd-IYe-ZhKpt-A" key="parallel" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xQuX0GyhEd-IYe-ZhKpt-A" key="items" value=""/>
+      </eAnnotations>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_fcF_AVN7Ed-JBsCeEiDQnA" iD="_fcF_AFN7Ed-JBsCeEiDQnA" outgoingEdges="_jg6p4VN8Ed-JBsCeEiDQnA _j2DzcVN8Ed-JBsCeEiDQnA" incomingEdges="_59pu4GylEd-IYe-ZhKpt-A" activityType="GatewayDataBasedExclusive"/>
       <vertices xmi:type="bpmn:Activity" xmi:id="_7FdHsVN7Ed-JBsCeEiDQnA" iD="_7FdHsFN7Ed-JBsCeEiDQnA" incomingEdges="_jg6p4VN8Ed-JBsCeEiDQnA" name="Dispatch Subprocess &#xD;&#xA;and Wait">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_7K3zMFN7Ed-JBsCeEiDQnA" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_7K3zMVN7Ed-JBsCeEiDQnA" key="class" value="jadex.bdibpmn.task.DispatchSubprocessTask.class"/>
@@ -26,8 +31,7 @@
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bACU8CwfEd-9ZqMLV3tO6w" key="parameters" value="in␋type␋java.lang.String␋($plan.activationtargets[i]).getTarget()␟in␋subgoal␋boolean␋true␟in␋wait␋boolean␋true"/>
         </eAnnotations>
       </vertices>
-      <vertices xmi:type="bpmn:Activity" xmi:id="_is-EcVN8Ed-JBsCeEiDQnA" iD="_is-EcFN8Ed-JBsCeEiDQnA" outgoingEdges="_i81scVN8Ed-JBsCeEiDQnA" activityType="EventStartEmpty"/>
-      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_i81scVN8Ed-JBsCeEiDQnA" iD="_i81scFN8Ed-JBsCeEiDQnA"/>
+      <vertices xmi:type="bpmn:Activity" xmi:id="_is-EcVN8Ed-JBsCeEiDQnA" iD="_is-EcFN8Ed-JBsCeEiDQnA" outgoingEdges="_59pu4GylEd-IYe-ZhKpt-A" activityType="EventStartEmpty"/>
       <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_jg6p4VN8Ed-JBsCeEiDQnA" iD="_jg6p4FN8Ed-JBsCeEiDQnA" conditionType="Default" isDefault="true">
         <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_CfASsFN9Ed-JBsCeEiDQnA" source="jadex">
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_CfASsVN9Ed-JBsCeEiDQnA" key="condition" value=""/>
@@ -38,14 +42,25 @@
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DILLgFN9Ed-JBsCeEiDQnA" key="condition" value="ActivationTarget.Types.GOAL.equals($plan.activationtargets[i].getType())"/>
         </eAnnotations>
       </sequenceEdges>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_59pu4GylEd-IYe-ZhKpt-A" iD="_59pH0GylEd-IYe-ZhKpt-A"/>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_oF3bwVN8Ed-JBsCeEiDQnA" iD="_oF3bwFN8Ed-JBsCeEiDQnA" outgoingEdges="__5paAVN8Ed-JBsCeEiDQnA _AfB_AVN9Ed-JBsCeEiDQnA" incomingEdges="_osZQQVN8Ed-JBsCeEiDQnA" activityType="GatewayDataBasedExclusive"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_3hqKYWyhEd-IYe-ZhKpt-A" iD="_3hqKYGyhEd-IYe-ZhKpt-A" outgoingEdges="_4mZk4WyhEd-IYe-ZhKpt-A" incomingEdges="_6q-VsVN8Ed-JBsCeEiDQnA" name="dummy">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_4FGOoGyhEd-IYe-ZhKpt-A" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4FG1sGyhEd-IYe-ZhKpt-A" key="class" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5wKCQGyhEd-IYe-ZhKpt-A" key="parameters" value="inout␋i␋int␋0"/>
+      </eAnnotations>
+    </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_osZQQVN8Ed-JBsCeEiDQnA" iD="_osZQQFN8Ed-JBsCeEiDQnA">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_48XCUFN9Ed-JBsCeEiDQnA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_48XCUVN9Ed-JBsCeEiDQnA" key="condition" value=""/>
       </eAnnotations>
     </sequenceEdges>
-    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_6q-VsVN8Ed-JBsCeEiDQnA" iD="_6q-VsFN8Ed-JBsCeEiDQnA"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_6q-VsVN8Ed-JBsCeEiDQnA" iD="_6q-VsFN8Ed-JBsCeEiDQnA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_3PRZ4GyhEd-IYe-ZhKpt-A" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_3PRZ4WyhEd-IYe-ZhKpt-A" key="condition" value=""/>
+      </eAnnotations>
+    </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="__5paAVN8Ed-JBsCeEiDQnA" iD="__5paAFN8Ed-JBsCeEiDQnA" conditionType="Default" isDefault="true">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_BpCUAFN9Ed-JBsCeEiDQnA" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BpCUAVN9Ed-JBsCeEiDQnA" key="condition" value=""/>
@@ -59,5 +74,6 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-j-LEVN9Ed-JBsCeEiDQnA" key="mappings" value="i␋i+1"/>
       </eAnnotations>
     </sequenceEdges>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_4mZk4WyhEd-IYe-ZhKpt-A" iD="_4mZk4GyhEd-IYe-ZhKpt-A"/>
   </pools>
 </bpmn:BpmnDiagram>
