@@ -42,9 +42,7 @@ public class JadexCommonPropertySection extends AbstractBpmnPropertySection
 	@Override
 	public void dispose()
 	{
-		if (commonLabel != null)
-			commonLabel.dispose();
-
+		// dispose is done in superclass, see addDisposable
 		super.dispose();
 	}
 	
@@ -56,6 +54,7 @@ public class JadexCommonPropertySection extends AbstractBpmnPropertySection
 	{
 		super.createControls(parent, aTabbedPropertySheetPage);
 		commonLabel = getWidgetFactory().createLabel(sectionComposite, Messages.CommonSection_label_text);
+		addDisposable(commonLabel);
 	}
 
 }

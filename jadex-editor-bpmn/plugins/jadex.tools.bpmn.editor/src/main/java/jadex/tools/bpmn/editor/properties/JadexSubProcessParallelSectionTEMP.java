@@ -1,5 +1,10 @@
 package jadex.tools.bpmn.editor.properties;
 
+/**
+ * This is only a temp solution until the abstract 
+ * checkbox section is ready to use
+ *
+ */
 public class JadexSubProcessParallelSectionTEMP extends
 		AbstractComboPropertySection
 {

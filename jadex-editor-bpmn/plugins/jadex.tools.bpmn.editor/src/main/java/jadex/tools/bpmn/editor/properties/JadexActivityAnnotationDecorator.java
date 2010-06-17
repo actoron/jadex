@@ -27,7 +27,7 @@ public class JadexActivityAnnotationDecorator extends BpmnEAnnotationDecoratorPr
 	{
 		return Direction.SOUTH_WEST;
 	}
-
+	
 	public Image getImage(EditPart arg0, EModelElement arg1, EAnnotation arg2) 
 	{
 		 return PlatformUI.getWorkbench().getSharedImages().

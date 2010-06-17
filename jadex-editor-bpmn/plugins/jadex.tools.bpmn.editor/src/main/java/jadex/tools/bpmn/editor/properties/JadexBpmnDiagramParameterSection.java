@@ -51,6 +51,7 @@ public class JadexBpmnDiagramParameterSection extends
 		column0.setLabelProvider(new MultiColumnTableLabelProvider(0));
 		
 		
+		
 		TableViewerColumn column1 = new TableViewerColumn(viewer, SWT.CENTER);
 		column1.getColumn().setText(COLUMN_NAMES[1]);
 

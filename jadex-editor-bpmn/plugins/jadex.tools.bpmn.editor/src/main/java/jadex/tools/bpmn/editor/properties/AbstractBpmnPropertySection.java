@@ -3,12 +3,7 @@
  */
 package jadex.tools.bpmn.editor.properties;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import jadex.tools.model.common.properties.AbstractCommonPropertySection;
-
-import org.eclipse.swt.widgets.Control;
 
 /**
  * @author Claas
@@ -35,8 +30,17 @@ public abstract class AbstractBpmnPropertySection extends AbstractCommonProperty
 		
 	}
 
-
 	// ---- methods ----
+	
+	/* (non-Javadoc)
+	 * @see jadex.tools.model.common.properties.AbstractCommonPropertySection#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		// nothing to dispose here, use addDisposable(Object) instead
+		super.dispose();
+	}
 
 	/**
 	 * Update 

@@ -17,24 +17,41 @@ import java.util.StringTokenizer;
  */
 public class MultiColumnTable
 {
-
+	/*
+	public static final void main(String[] args) 
+	{
+		try
+		{
+			int i = 0;
+			for (byte b = 0; b < 32; b++)
+			{
+				System.out.println(i+": " + new String(new byte[] { b }, "US-ASCII"));
+				i++;
+			}
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	*/
+	
 	// ---- constants ----
 	
 	/** 
-	 * String delimiter for element attributes  <p>
-	 * <p><code>0x240B</code>	(9227)	SYMBOL FOR VERTICAL TABULATION</p>
-	 */
-	public static final String LIST_ELEMENT_ATTRIBUTE_DELIMITER = "\u240B"; //"#|#";
-	//public static final String LIST_ELEMENT_ATTRIBUTE_DELIMITER = "|"; //"#|#";
-	
-	/** 
 	 * String delimiter for list elements <p>
-	 * <p><code>0x241F</code>	(9247)	SYMBOL FOR UNIT SEPARATOR</p>
+	 * <p><code>\u001E</code> RS 	Record Separator</p>
 	 */
 	public static final String LIST_ELEMENT_DELIMITER = "\u241F"; // "<*>";
-	//public static final String LIST_ELEMENT_DELIMITER = "#"; // "<*>";
+	public static final String DEPRECATED_LIST_ELEMENT_DELIMITER = "\u241F"; // "<*>";
 	
-	
+	/** 
+	 * String delimiter for element attributes  <p>
+	 * <p><code>\u001F</code> US 	Unit Separator </p>
+	 */
+	public static final String LIST_ELEMENT_ATTRIBUTE_DELIMITER = "\u240B";
+	public static final String DEPRECATED_LIST_ELEMENT_ATTRIBUTE_DELIMITER = "\u240B"; //"#|#";
+
 	// ---- attributes ----
 	
 	/** The list of rows in this table */
@@ -309,7 +326,7 @@ public class MultiColumnTable
 		//System.out.println(buffer.toString());
 		return buffer.toString();
 	}
-
+	
 	/**
 	 * Convert a string representation of a MultiColumnTableRow list into a
 	 * MultiColumnTableRow list
@@ -322,15 +339,22 @@ public class MultiColumnTable
 	public static MultiColumnTable convertMultiColumnTableString(
 			String stringToConvert, int columnCount, int uniqueColumn)
 	{
-		StringTokenizer listTokens = new StringTokenizer(stringToConvert, LIST_ELEMENT_DELIMITER);
-		MultiColumnTable tableRowList = new MultiColumnTable(listTokens.countTokens());
-		while (listTokens.hasMoreTokens())
+		// replace the old deprecated delimiter with the new one used
+		stringToConvert = convertDeprecatedDelimiter(stringToConvert);
+		
+		StringTokenizer listTokens = new StringTokenizer(stringToConvert, LIST_ELEMENT_DELIMITER, false);
+		
+		//MultiColumnTable tableRowList = new MultiColumnTable(listTokens.countTokens());
+		
+		long countTokens = listTokens.countTokens();
+		MultiColumnTable tableRowList = new MultiColumnTable((int)countTokens/2);
+		
+		while (listTokens.hasMoreElements())
 		{
 			String parameterElement = listTokens.nextToken();
 			StringTokenizer parameterTokens = new StringTokenizer(
 					parameterElement,
-					LIST_ELEMENT_ATTRIBUTE_DELIMITER,
-					true);
+					LIST_ELEMENT_ATTRIBUTE_DELIMITER, true);
 	
 			// number of columns is the index that will be used.
 			// initialize array with empty strings because we 
@@ -344,7 +368,7 @@ public class MultiColumnTable
 			int attributeIndexCounter = 0;	
 			String lastToken = null;
 	
-			while (parameterTokens.hasMoreTokens())
+			while (parameterTokens.hasMoreElements())
 			{
 				String attributeToken = parameterTokens.nextToken();
 	
@@ -359,7 +383,7 @@ public class MultiColumnTable
 					if (	// we found a delimiter at the first position
 							lastToken == null 
 							// we found a delimiter at the last position, 
-							|| !parameterTokens.hasMoreTokens()
+							|| !parameterTokens.hasMoreElements()
 							// we found two delimiter without any content between
 							|| attributeToken.equals(lastToken))
 					{
@@ -383,7 +407,30 @@ public class MultiColumnTable
 		return tableRowList;
 	}
 
+	/**
+	 * Convert delimiters in a table string
+	 * @param stringToConvert a String with old delimiters used
+	 * @return toConvert with replaced delimiters
+	 */
+	public static String convertDeprecatedDelimiter(String stringToConvert)
+	{
+		if (stringToConvert.indexOf(DEPRECATED_LIST_ELEMENT_ATTRIBUTE_DELIMITER) > -1)
+		{
+			stringToConvert = stringToConvert.replaceAll(
+					DEPRECATED_LIST_ELEMENT_ATTRIBUTE_DELIMITER,
+					LIST_ELEMENT_ATTRIBUTE_DELIMITER);
+		}
 
+		if (stringToConvert.indexOf(DEPRECATED_LIST_ELEMENT_DELIMITER) > -1)
+		{
+			stringToConvert = stringToConvert.replaceAll(DEPRECATED_LIST_ELEMENT_DELIMITER,
+					LIST_ELEMENT_DELIMITER);
+		}
+
+		return stringToConvert;
+	}
+	
+	
 	/**
 	 * Representation of a MultiColumnTableRow
 	 * 

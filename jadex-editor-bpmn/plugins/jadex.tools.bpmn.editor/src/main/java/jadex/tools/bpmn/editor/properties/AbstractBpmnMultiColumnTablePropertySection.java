@@ -79,6 +79,16 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 
 	// ---- methods ----
 
+	/* (non-Javadoc)
+	 * @see jadex.tools.model.common.properties.AbstractCommonPropertySection#dispose()
+	 */
+	@Override
+	public void dispose()
+	{
+		// nothing to dispose here, use addDisposable(Object) instead
+		super.dispose();
+	}
+	
 	/**
 	 * Manages the input.
 	 */
@@ -286,7 +296,9 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 	@Override
 	protected IStructuredContentProvider getTableContentProvider()
 	{
-		return new MultiColumnTableContentProvider();
+		MultiColumnTableContentProvider contentProvider = new MultiColumnTableContentProvider();
+		addDisposable(contentProvider);
+		return contentProvider;
 	}
 	
 	
@@ -371,7 +383,8 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 				return table;
 			}
 		}
-
+		
+		// fall through
 		return new MultiColumnTable(0);
 	}
 	
@@ -418,6 +431,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 					
 			}
 			
+			// fall through
 			return new Object[] {};
 		}
 
@@ -474,8 +488,6 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 					MultiColumnTable tableRowList = getTableRowList();
 					MultiColumnTableRow rowToEdit = (MultiColumnTableRow) tableRowList.get(tableRowList.indexOf(tableViewerRow));
 
-					
-					
 					if (attributeIndex == uniqueColumnIndex)
 					{
 						if (!newValue.equals(rowToEdit.getColumnValues()[attributeIndex]))
@@ -513,6 +525,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 			
 			return command;
 		}
+		
 	}
 
 }

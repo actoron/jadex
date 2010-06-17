@@ -30,6 +30,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.stp.bpmn.diagram.part.BpmnDiagramEditorPlugin;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -189,6 +190,7 @@ public abstract class AbstractCommonTablePropertySection extends
 	protected TableViewer createTableViewer(Composite parent)
 	{
 		Composite tableComposite = getWidgetFactory().createComposite(parent/*, SWT.BORDER*/);
+		addDisposable(tableComposite);
 		
 		// The layout of the table composite
 		GridLayout layout = new GridLayout(6, false);
@@ -204,9 +206,18 @@ public abstract class AbstractCommonTablePropertySection extends
 		// create the table
 		TableViewer viewer = createTable(tableComposite, tableLayoutData);
 		setupTableLayout(viewer);
+		// add table to disposable
+		addDisposable(viewer.getTable());
+		for (TableColumn column : viewer.getTable().getColumns())
+		{
+			addDisposable(column);
+			// TODO: add Editors as well?
+		}
+		
 		
 		// get content provider from implementation class
 		viewer.setContentProvider(getTableContentProvider());
+		addDisposable(viewer.getContentProvider());
 		
 		// create cell modifier command
 		setupTableNavigation(viewer);
@@ -250,13 +261,12 @@ public abstract class AbstractCommonTablePropertySection extends
 		TableViewer viewer = new TableViewer(getWidgetFactory().createTable(parent,
 				SWT.FULL_SELECTION | SWT.BORDER));
 		
+		
 		viewer.getTable().setLinesVisible(true);
 		viewer.getTable().setHeaderVisible(true);
 		viewer.getTable().setLayoutData(tableLayoutData);
 
 		createColumns(viewer);
-
-		controls.add(viewer.getControl());
 		
 		return viewer;
 	}
@@ -375,7 +385,7 @@ public abstract class AbstractCommonTablePropertySection extends
 			}
 		});
 		addButton = add;
-		controls.add(add);
+		addDisposable(addButton);
 
 		// Create and configure the "Delete" button
 		Button delete = new Button(parent, SWT.PUSH | SWT.CENTER);
@@ -393,7 +403,7 @@ public abstract class AbstractCommonTablePropertySection extends
 			}
 		});
 		delButton = delete;
-		controls.add(delete);
+		addDisposable(delButton);
 		
 		// Create and configure the "UP / Down" buttons3
 		Button up = new Button(parent, SWT.PUSH | SWT.CENTER);
@@ -410,7 +420,7 @@ public abstract class AbstractCommonTablePropertySection extends
 			}
 		});
 		upButton = up;
-		controls.add(up);
+		addDisposable(upButton);
 		
 		Button down = new Button(parent, SWT.PUSH | SWT.CENTER);
 		down.setText("Down");
@@ -426,7 +436,7 @@ public abstract class AbstractCommonTablePropertySection extends
 			}
 		});
 		downButton = down;
-		controls.add(down);
+		addDisposable(downButton);
 		
 		Button clear = new Button(parent, SWT.PUSH | SWT.CENTER);
 		clear.setText("Clear");
@@ -442,7 +452,7 @@ public abstract class AbstractCommonTablePropertySection extends
 			}
 		});
 		clearButton = clear;
-		controls.add(clear);
+		addDisposable(clearButton);
 	}
 	
 	/**

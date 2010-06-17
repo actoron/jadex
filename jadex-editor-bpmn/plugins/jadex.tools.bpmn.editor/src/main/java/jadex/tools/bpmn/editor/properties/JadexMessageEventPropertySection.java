@@ -56,8 +56,8 @@ public class JadexMessageEventPropertySection extends AbstractBpmnPropertySectio
 		super.createControls(parent, aTabbedPropertySheetPage);
 		
 		Group sectionGroup = getWidgetFactory().createGroup(sectionComposite, JadexBpmnPropertiesUtil.JADEX_EVENT_MESSAGE_DETAIL);
-		controls.add(sectionGroup);
 		sectionComposite = sectionGroup;
+		addDisposable(sectionComposite);
 		
 		// The layout of the section composite
 		GridLayout layout = new GridLayout(2, false);
@@ -93,24 +93,24 @@ public class JadexMessageEventPropertySection extends AbstractBpmnPropertySectio
 		msgtypeText = getWidgetFactory().createText(sectionComposite, "", SWT.BORDER_SOLID);
 		msgtypeText.setLayoutData(textGridData);
 		msgtypeText.addModifyListener(new ModifyJadexEAnnotation("msgtype", msgtypeText));
-		controls.add(msgtypeLabel);
-		controls.add(msgtypeText);
+		addDisposable(msgtypeLabel);
+		addDisposable(msgtypeText);
 		
 		messageLabel = getWidgetFactory().createCLabel(sectionComposite, "message"+":"); // //$NON-NLS-0$
 		messageLabel.setLayoutData(labelGridData);
 		messageText = getWidgetFactory().createText(sectionComposite, "", SWT.BORDER_SOLID);
 		messageText.setLayoutData(textGridData);
 		messageText.addModifyListener(new ModifyJadexEAnnotation("message", messageText));
-		controls.add(messageLabel);
-		controls.add(messageText);
+		addDisposable(messageLabel);
+		addDisposable(messageText);
 		
 		expressionLabel = getWidgetFactory().createCLabel(sectionComposite, "match expression"+":"); // //$NON-NLS-0$
 		expressionLabel.setLayoutData(labelGridData);
 		expressionText = getWidgetFactory().createText(sectionComposite, "", SWT.BORDER_SOLID);
 		expressionText.setLayoutData(textGridData);
 		expressionText.addModifyListener(new ModifyJadexEAnnotation("match expression", expressionText));
-		controls.add(expressionLabel);
-		controls.add(expressionText);
+		addDisposable(expressionLabel);
+		addDisposable(expressionText);
 	}
 	
 
@@ -120,6 +120,7 @@ public class JadexMessageEventPropertySection extends AbstractBpmnPropertySectio
 	@Override
 	public void dispose()
 	{
+		// dispose is done in superclass, see addDisposable
 		super.dispose();
 	}
 

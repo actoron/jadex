@@ -2,8 +2,8 @@ package jadex.tools.model.common.properties;
 
 import jadex.tools.bpmn.editor.JadexBpmnEditor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IStatus;
@@ -14,6 +14,8 @@ import org.eclipse.gef.EditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.IBaseLabelProvider;
+import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -26,6 +28,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -40,19 +43,16 @@ public abstract class AbstractCommonPropertySection extends
 	/** The modelElement, may be null. */
 	protected EModelElement modelElement;
 	
-	/** all controls for this section */
-	protected List<Control> controls;
+	/** all controls/resources/... for this section */
+	private Set<Object> disposableObjects;
 	
-	/** all resources from this section */
-	protected List<Resource> resources;
 
 	// ---- constructor ----
 	
 	public AbstractCommonPropertySection()
 	{
 		super();
-		this.controls = new ArrayList<Control>();
-		this.resources = new ArrayList<Resource>();
+		this.disposableObjects = new HashSet<Object>();
 	}
 
 	// ---- method overrides ----
@@ -68,39 +68,80 @@ public abstract class AbstractCommonPropertySection extends
 		sectionComposite = getWidgetFactory().createComposite(parent);
 		sectionComposite.setLayout(new FillLayout());
 		
-		controls.add(sectionComposite);
+		disposableObjects.add(sectionComposite);
 	}
 
+	/**
+	 * Add a object to dispose on dispose of this control
+	 * @param toDispose
+	 */
+	protected void addDisposable(Object toDispose)
+	{
+		synchronized (disposableObjects)
+		{
+			disposableObjects.add(toDispose);
+		}
+	}
+	
 	/**
 	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#dispose()
 	 */
 	@Override
 	public void dispose()
 	{
-		for (Control control : controls)
+		for (Object toDispose : disposableObjects)
 		{
-			if (control != null && !control.isDisposed()) 
+			if (toDispose instanceof Control)
 			{
-				control.dispose();
+				Control control = (Control) toDispose;
+				if (control != null && !control.isDisposed()) 
+				{
+					control.dispose();
+				}
 			}
-			control = null;
-		}
-		controls.clear();
-		
-		for (Resource resource : resources)
-		{
-			if (resource != null && !resource.isDisposed()) 
+			
+			else if (toDispose instanceof Resource)
 			{
-				resource.dispose();
+				Resource resource = (Resource) toDispose;
+				if (resource != null && !resource.isDisposed()) 
+				{
+					resource.dispose();
+				}
 			}
-			resource = null;
+			
+			else if (toDispose instanceof Widget)
+			{
+				Widget widget = (Widget) toDispose;
+				if (widget != null && !widget.isDisposed())
+				{
+					widget.dispose();
+				}
+			}
+			
+			else if (toDispose instanceof IBaseLabelProvider)
+			{
+				IBaseLabelProvider provider = (IBaseLabelProvider) toDispose;
+				if (provider != null)
+				{
+					provider.dispose();
+				}
+			}
+			
+			else if (toDispose instanceof IContentProvider)
+			{
+				IContentProvider provider = (IContentProvider) toDispose;
+				if (provider != null)
+				{
+					provider.dispose();
+				}
+			}
+			
+			else
+			{
+				throw new RuntimeException("Unsupported class to dispose: " + toDispose);
+			}
 		}
-		resources.clear();
-		
-		if (sectionComposite != null && !sectionComposite.isDisposed())
-		{
-			sectionComposite.dispose();
-		}
+		disposableObjects.clear();
 		
 		super.dispose();
 	}
@@ -193,7 +234,7 @@ public abstract class AbstractCommonPropertySection extends
 			children[i].setParent(sectionGroup);
 		}
 		
-		controls.add(sectionGroup);
+		addDisposable(sectionGroup);
 		return sectionGroup;
 	}
 

@@ -74,15 +74,13 @@ public abstract class AbstractComboPropertySection extends AbstractBpmnPropertyS
 	
 	// ---- methods ----
 	
-	/**
-	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#dispose()
+	/* (non-Javadoc)
+	 * @see jadex.tools.model.common.properties.AbstractCommonPropertySection#dispose()
 	 */
 	@Override
 	public void dispose()
 	{
-		if (cCombo != null)
-			cCombo.dispose();
-
+		// nothing to dispose here, use addDisposable(Object) instead
 		super.dispose();
 	}
 	
@@ -184,9 +182,11 @@ public abstract class AbstractComboPropertySection extends AbstractBpmnPropertyS
 		labelGridData.widthHint = 60;
 		
 		CLabel cLabel = getWidgetFactory().createCLabel(sectionComposite, cComboLabel+":"); // //$NON-NLS-1$
+		addDisposable(cLabel);
 		cLabel.setLayoutData(labelGridData);
 		
 		final CCombo combo = getWidgetFactory().createCCombo(sectionComposite, SWT.NONE);
+		addDisposable(combo);
 		combo.setLayoutData(comboGridData);
 		
 		//String[] items = this.cComboItems;

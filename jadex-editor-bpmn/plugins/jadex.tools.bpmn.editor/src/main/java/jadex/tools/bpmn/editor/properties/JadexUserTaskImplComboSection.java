@@ -73,9 +73,8 @@ public class JadexUserTaskImplComboSection extends
 	@Override
 	public void dispose()
 	{
-		if (taskMetaInfoText != null && !taskMetaInfoText.isDisposed())
-			taskMetaInfoText.dispose();
-
+		this.taskProvider = null;
+		// dispose is done in superclass, see addDisposable
 		super.dispose();
 	}
 
@@ -177,11 +176,11 @@ public class JadexUserTaskImplComboSection extends
 		//gridData.widthHint = 80;
 
 		// Create and configure the "Add" button
-		Button addDefaultParameter = new Button(sectionComposite, SWT.PUSH | SWT.CENTER);
-		addDefaultParameter.setText("Add default Parameter");
-		addDefaultParameter.setToolTipText("Adds default parameter for selected class at parameter tables end");
+		Button addDefaultParameterButton = new Button(sectionComposite, SWT.PUSH | SWT.CENTER);
+		addDefaultParameterButton.setText("Add default Parameter");
+		addDefaultParameterButton.setToolTipText("Adds default parameter for selected class at parameter tables end");
 		//addDefaultParameter.setLayoutData(gridData);
-		addDefaultParameter.addSelectionListener(new SelectionAdapter()
+		addDefaultParameterButton.addSelectionListener(new SelectionAdapter()
 		{
 			/** 
 			 * Add a list of default parameter to the parameter table
@@ -194,8 +193,8 @@ public class JadexUserTaskImplComboSection extends
 				updateTaskParameterTable(taskClassName);
 			}
 		});
-		addDefaultButton = addDefaultParameter;
-		controls.add(addDefaultParameter);
+		addDefaultButton = addDefaultParameterButton;
+		addDisposable(addDefaultParameterButton);
 
 	}
 
@@ -210,6 +209,7 @@ public class JadexUserTaskImplComboSection extends
 		
 		//taskMetaInfoLabel = getWidgetFactory().createCLabel(sectionComposite, "test", SWT.WRAP | SWT.MULTI );
 		taskMetaInfoText = getWidgetFactory().createText(sectionComposite, "", SWT.READ_ONLY | SWT.MULTI | SWT.V_SCROLL );
+		addDisposable(taskMetaInfoText);
 		
 		if (sectionLayout instanceof GridLayout)
 		{

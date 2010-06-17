@@ -52,20 +52,13 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 
 	// ---- methods ----
 
-	/**
-	 * @see org.eclipse.ui.views.properties.tabbed.AbstractPropertySection#dispose()
+	/* (non-Javadoc)
+	 * @see jadex.tools.model.common.properties.AbstractCommonPropertySection#dispose()
 	 */
 	@Override
 	public void dispose()
 	{
-		if (textFields != null)
-		{
-			for (int i = 0; i < textFields.length; i++)
-			{
-				textFields[i].dispose();
-			}
-		}
-
+		// nothing to dispose here, use addDisposable(Object) instead
 		super.dispose();
 	}
 
@@ -95,17 +88,18 @@ public abstract class AbstractMultiTextfieldPropertySection extends
 		{
 			// TODO: use group?
 			Composite cComposite = getWidgetFactory().createComposite(sectionComposite);
+			addDisposable(cComposite);
 			cComposite.setLayout(new GridLayout(2, false));
 			
 			Label cLabel = getWidgetFactory().createLabel(cComposite, textFieldNames[i]+":"); // //$NON-NLS-1$
-//			Text cTextfield = getWidgetFactory().createText(cComposite, textFieldNames[i]);
+			addDisposable(cLabel);
 			Text cTextfield = getWidgetFactory().createText(cComposite, "");
+			addDisposable(cTextfield);
 			textFields[i] = cTextfield;
 			cTextfield.addModifyListener(new ModifyJadexEAnnotation(textFieldNames[i], cTextfield));
 			cLabel.setLayoutData(labelGridData);
 			cTextfield.setLayoutData(textGridData);
 		}
-
 	}
 
 	

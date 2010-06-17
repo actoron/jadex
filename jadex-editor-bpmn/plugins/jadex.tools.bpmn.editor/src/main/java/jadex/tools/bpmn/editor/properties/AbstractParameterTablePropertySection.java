@@ -101,7 +101,11 @@ public abstract class AbstractParameterTablePropertySection extends
 	{
 		if (tableViewerMap != null)
 		{
-			return tableViewerMap.get(element);
+			synchronized (tableViewerMap)
+			{
+				return tableViewerMap.get(element);
+			}
+			
 		}
 		return null;
 	}
@@ -118,7 +122,13 @@ public abstract class AbstractParameterTablePropertySection extends
 		{
 			tableViewerMap = new HashMap<EModelElement, TableViewer>();
 		}
-		return tableViewerMap.put(element, viewer);
+		TableViewer replacedViewer;
+		synchronized (tableViewerMap)
+		{
+			replacedViewer = tableViewerMap.put(element, viewer);
+		}
+		
+		return replacedViewer;
 	}
 	
 	/**
@@ -132,7 +142,10 @@ public abstract class AbstractParameterTablePropertySection extends
 		// remove the table viewer from register
 		if (tableViewerMap != null)
 		{
-			return tableViewerMap.remove(element);
+			synchronized (tableViewerMap)
+			{
+				return tableViewerMap.remove(element);
+			}
 		}
 		return null;
 	}
@@ -210,7 +223,7 @@ public abstract class AbstractParameterTablePropertySection extends
 	@Override
 	protected void createColumns(TableViewer viewer) 
 	{
-		
+
 		TableViewerColumn column0 = new TableViewerColumn(viewer, SWT.LEFT);
 		column0.getColumn().setText(DIRECTION_COLUMN);
 		
@@ -239,16 +252,7 @@ public abstract class AbstractParameterTablePropertySection extends
 						.intValue()]);
 			}
 		});
-		
 		column0.setLabelProvider(new MultiColumnTableLabelProvider(0));
-		
-//		column0.setLabelProvider(new ColumnLabelProvider()
-//		{
-//			public String getText(Object element)
-//			{
-//				return ((Person) element).email;
-//			}
-//		});
 		
 		for (int columnIndex = 1; columnIndex < DEFAULT_PARAMTER_COLUMN_NAMES.length; columnIndex++)
 		{
@@ -257,22 +261,7 @@ public abstract class AbstractParameterTablePropertySection extends
 			column1.setEditingSupport(new BpmnMultiColumnTableEditingSupport(viewer, columnIndex));
 			column1.setLabelProvider(new MultiColumnTableLabelProvider(columnIndex));
 		}
-//		
-//		
-//
-//		TableViewerColumn column2 = new TableViewerColumn(viewer, SWT.LEFT);
-//		column2.getColumn().setText(TYPE_COLUMN);
-//		column2.setEditingSupport(new MultiColumnTableEditingSupport(viewer, 2));
-//		column2.setLabelProvider(new MultiColumnTableLabelProvider(2));
-//		
-//		TableViewerColumn column3 = new TableViewerColumn(viewer, SWT.LEFT);
-//		column3.getColumn().setText(TYPE_COLUMN);
-//		column3.setEditingSupport(new MultiColumnTableEditingSupport(viewer, 3));
-//		column3.setLabelProvider(new MultiColumnTableLabelProvider(3));
-		
+
 	}
 
-	
-	
-	
 }
