@@ -1,7 +1,5 @@
 <assembly>
   
-  <id>rules-dist</id>
-  
   <formats>
     <format>zip</format>
   </formats>
@@ -58,10 +56,6 @@
       <outputDirectory>sources</outputDirectory>
     </file>
     <file>
-      <source>/src/main/config/jadex-settings-pom.xml</source>
-      <outputDirectory>sources/src/main/config</outputDirectory>
-    </file>
-    <file>
       <source>/src/main/assembly/dist-assembly-rules.xml</source>
       <outputDirectory>sources/src/main/assembly</outputDirectory>
     </file>
@@ -77,6 +71,10 @@
     </file>
     <file>
       <source>docs/license.txt</source>
+      <outputDirectory>/</outputDirectory>
+    </file>
+    <file>
+      <source>target/rules_guide.pdf</source>
       <outputDirectory>/</outputDirectory>
     </file>
 <!--<file>

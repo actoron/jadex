@@ -1,7 +1,5 @@
 <assembly>
   
-  <id>xml-dist</id>
-  
   <formats>
     <format>zip</format>
   </formats>
@@ -12,13 +10,6 @@
     <moduleSet>
  
  	  <includeSubModules>true</includeSubModules>
-
-      <!-- Selected by profile.  
-      <includes>
-        <include>jadex:jadex-commons</include>
-        <include>jadex:jadex-xml</include>
-      </includes>
-      -->
       
       <binaries>
       	<outputFileNameMapping>${artifact.artifactId}-${artifact.version}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
@@ -64,10 +55,6 @@
       <outputDirectory>sources</outputDirectory>
     </file>
     <file>
-      <source>/src/main/config/jadex-settings-pom.xml</source>
-      <outputDirectory>sources/src/main/config</outputDirectory>
-    </file>
-    <file>
       <source>/src/main/assembly/dist-assembly-xml.xml</source>
       <outputDirectory>sources/src/main/assembly</outputDirectory>
     </file>
@@ -83,6 +70,10 @@
     </file>
     <file>
       <source>docs/license.txt</source>
+      <outputDirectory>/</outputDirectory>
+    </file>
+    <file>
+      <source>target/xml_guide.pdf</source>
       <outputDirectory>/</outputDirectory>
     </file>
 <!--<file>
