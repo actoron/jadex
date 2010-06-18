@@ -37,6 +37,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IContentCodec;
+import jadex.jade.service.MessageService;
 
 
 /**
@@ -55,13 +56,6 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 	/** The message preprocessors property identifier. */
 //	public static final String	PROPERTY_TOOL_ADAPTERS	= "tooladapter";
 
-	/** The default codecs. */
-	protected static IContentCodec[]	DEFCODECS	= new IContentCodec[]
-	{
-		new jadex.base.JavaXMLContentCodec(),
-		new jadex.base.NuggetsXMLContentCodec()
-	};
-	
 	// -------- attributes --------
 
 	/** The platform. */
@@ -159,7 +153,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 				String[] params = ma.getMessageType().getParameterNames();
 				for(int i=0; i<params.length; i++)
 				{
-					IContentCodec codec = ma.getMessageType().findContentCodec(DEFCODECS, ma, params[i]);
+					IContentCodec codec = ma.getMessageType().findContentCodec(MessageService.DEFCODECS, ma, params[i]);
 					if(codec!=null)
 					{
 						try

@@ -65,8 +65,9 @@ public class MessageService implements IMessageService, IService
 	//-------- constants --------
 	
 	/** The default codecs. */
-	protected static IContentCodec[]	DEFCODECS	= new IContentCodec[]
+	public static IContentCodec[]	DEFCODECS	= new IContentCodec[]
 	{
+		new jadex.base.JadexXMLContentCodec(),
 		new jadex.base.JavaXMLContentCodec(),
 		new jadex.base.NuggetsXMLContentCodec()
 	};
