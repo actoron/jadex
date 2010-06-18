@@ -18,28 +18,28 @@
 	<applications>
 		<application name="Simple Pinging">
 			<components>
-				<agent type="Ping" name="Ping" />
-				<agent type="Pinging" name="Pinging" />
+				<component type="Ping" name="Ping" />
+				<component type="Pinging" name="Pinging" />
 			</components>
 		</application>
 
 		<application name="Multi Pinging">
 			<components>
-				<agent type="Ping" name="Ping"/>
-				<agent type="Pinging" number="2"/>
+				<component type="Ping" name="Ping"/>
+				<component type="Pinging" number="2"/>
 			</components>
 		</application>
 
 		<application name="Fast Pinging">
 			<components>
-				<agent type="Ping" name="Ping"/>
-				<agent type="Pinging" name="FastPinging">
+				<component type="Ping" name="Ping"/>
+				<component type="Pinging" name="FastPinging">
 					<arguments>
 						<argument name="ping_delay">
 							500
 						</argument>
 					</arguments>
-				</agent>
+				</component>
 			</components>
 		</application>
 	</applications>
