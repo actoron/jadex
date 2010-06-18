@@ -401,8 +401,9 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		java.util.List	ret	= new ArrayList();
 
 		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
+		ClassLoader	cl	= ls.getClassLoader();
 		
-		List cps = SUtil.getClasspathURLs(ls.getClassLoader().getParent());	// todo: classpath?
+		List cps = SUtil.getClasspathURLs(cl!=null ? cl.getParent() : null);	// todo: classpath?
 		for(int i=0; i<cps.size(); i++)
 		{
 			URL	url	= (URL)cps.get(i);
