@@ -37,6 +37,11 @@
 		<beliefref name="missionend">
 			<concrete ref="move.missionend"/>
 		</beliefref>
+		
+		<beliefref name="environment">
+			<concrete ref="move.environment"/>
+		</beliefref>
+		
 	</beliefs>
 
   	<goals>
@@ -53,7 +58,10 @@
 			<!-- The parameter target is bound to one
 				of the facts in the belief my_targets. -->
 			<parameter name="target" class="Target">
-				<value>$target</value>
+				<value>
+					// Hack!!! Condition can also match target object from message
+					$beliefbase.environment.getTarget($target.getId())
+				</value>
 			</parameter>
 			<unique/>
 			<!-- Create a new goal when a target was added
