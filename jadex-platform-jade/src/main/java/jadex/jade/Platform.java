@@ -80,6 +80,7 @@ public class Platform extends jadex.base.Platform
 			{
 			}
 		}
+		setName(platformagent.getHap());
 		
 		super.start();
 	}
