@@ -84,10 +84,10 @@ public class StartSimulationExperimentsPlan extends Plan {
 			startApplication(appName, fileName, configName, args);
 
 			System.out.println("#*****************************************************************.");
-			System.out.print("total: " + Runtime.getRuntime().totalMemory() /1024 + " of "  +  " ");
-			System.out.println("total: " + Runtime.getRuntime().maxMemory() / 1024);
+			System.out.print(Runtime.getRuntime().totalMemory() / 1024000 + " of " + " ");
+			System.out.println("total: " + Runtime.getRuntime().maxMemory() / 1024000);
 			System.out.println("#*****************************************************************.");
-			
+
 			System.out.println("#StartSimulationExpPlan# Started new Simulation Experiment. Nr.:" + experimentID + "(" + totalRuns + ") with Optimization Values: "
 					+ simConf.getOptimization().getData().getName() + " = " + simConf.getOptimization().getParameterSweeping().getCurrentValue());
 			totalRuns++;
@@ -100,7 +100,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 			System.out.println("#StartSimulationExpPlan# Received Results of Client!!!!");
 			// HACK: Ein warten scheint notwendig zu sein..., damit Ausführung
 			// korrekt läuft.
-			waitFor(2000);
+			// waitFor(2000);
 			// System.out.println("2Received Results!!!!");
 			beliefbaseFacts.put(Constants.TOTAL_EXPERIMENT_COUNTER, new Integer(totalRuns));
 			beliefbaseFacts.put(Constants.ROW_EXPERIMENT_COUNTER, new Integer(expInRow));
@@ -119,7 +119,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 
 		// store results of row
 		HashMap<Integer, ExperimentResult> experimentResults = (HashMap<Integer, ExperimentResult>) getBeliefbase().getBelief("experimentResults").getFact();// contains
-																																								// the
+		// the
 		// results of the
 		// experiments done
 		// in this row

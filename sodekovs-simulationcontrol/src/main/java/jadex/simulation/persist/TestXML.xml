@@ -17,14 +17,12 @@
 		applicationConfiguration="1 Sentry / 2 Producers / 3 Carries">
 	-->
 	<Observers>
-		<!-- <Observer>
-			<Data name="StepLogger">
-				<ObjectSource type="BDI_Agent" name="Sentry" />
-				<ElementSource type="BDI_BELIEF" name="myPos" class="String" />				
-			</Data>
-			<Evaluation mode="periodical" value="1000" />			
-			<Filter mode="all" /> 
-		</Observer>-->
+		<!--
+			<Observer> <Data name="StepLogger"> <ObjectSource type="BDI_Agent"
+			name="Sentry" /> <ElementSource type="BDI_BELIEF" name="myPos"
+			class="String" /> </Data> <Evaluation mode="periodical" value="1000"
+			/> <Filter mode="all" /> </Observer>
+		-->
 		<Observer>
 			<Data name="HomebaseLogger"><!-- TODO: How to deal with Strings, Lists? -->
 				<ObjectSource type="ISpaceObject" name="homebase" />
@@ -44,7 +42,10 @@
 			<Evaluation mode="onChange" />
 			<!-- If perdiocal, all have to have the same value-->
 			<Filter mode="last" /> <!-- All / one / subset of objects-JavaCondLanguage -->
-			<!--  "last" denotes, that only the last value is of interest, like for the duration time. -->
+			<!--
+				"last" denotes, that only the last value is of interest, like for
+				the duration time.
+			-->
 		</Observer>
 		<!--
 			<Observer> <Data name="11HomebaseLogger"> <ObjectSource
@@ -107,14 +108,14 @@
 				Randoms gleich sind.
 			-->
 			<TerminateCondition>
-				<Time value="120000" type="absolute" />
+				<Time value="7000" type="absolute" />
 			</TerminateCondition>
 		</General>
 		<Rows experiments="25">
 			<TerminateCondition>
-				<!-- <Time value="8300" type="relative" />-->
+				<Time value="5000" type="relative" />
 				<!-- Hack: Terminate Condition is hard coded! -->
-				<TargetFunction function="$object.money &gt; 5"/>
+				<!--<TargetFunction function="$object.money &gt; 5"/>-->
 			</TerminateCondition>
 		</Rows>
 	</RunConfiguration>
