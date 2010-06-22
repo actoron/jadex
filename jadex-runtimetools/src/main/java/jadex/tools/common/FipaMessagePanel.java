@@ -1,14 +1,16 @@
 package jadex.tools.common;
 
+import jadex.base.DefaultResultListener;
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAMessageEvent;
-import jadex.bdi.runtime.IMessageEvent;
-import jadex.bridge.ComponentTerminatedException;
+import jadex.bdi.runtime.IEAParameter;
+import jadex.bdi.runtime.IEAParameterSet;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
+import jadex.service.IServiceContainer;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -27,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -88,7 +91,7 @@ public class FipaMessagePanel extends JPanel
 	/**
 	 *  Create the panel with an initial message.
 	 */
-	public FipaMessagePanel(IMessageEvent message, IBDIExternalAccess agent)
+	public FipaMessagePanel(IEAMessageEvent message, IBDIExternalAccess agent, IServiceContainer container)
 	{
 		super(new GridBagLayout());
 		this.editable	= true;
@@ -295,7 +298,7 @@ public class FipaMessagePanel extends JPanel
 
 
 		// Actions for agent selection.
-		final AgentSelectorDialog	agentselector	= new AgentSelectorDialog(this, agent);
+		final AgentSelectorDialog	agentselector	= new AgentSelectorDialog(this, agent, container);
 		setsender.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -365,7 +368,13 @@ public class FipaMessagePanel extends JPanel
 			{
 				receivers	= null;
 				tfreceivers.setText("");
-				FipaMessagePanel.this.message.getParameterSet("receivers").removeValues();
+				FipaMessagePanel.this.message.getParameterSet("receivers").addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result) 
+					{
+						((IEAParameterSet)result).removeValues();
+					}	
+				});
 			}
 		});
 	}
@@ -380,50 +389,194 @@ public class FipaMessagePanel extends JPanel
 		this.message = message;
 
 		// Extract parameter values.
-		performative.setSelectedItem(getParameter(SFipa.PERFORMATIVE));
-		tfsender.setText(getParameter(SFipa.SENDER));
-		tfreplyto.setText(getParameter(SFipa.REPLY_TO));
-		content.setText(getParameter(SFipa.CONTENT));
-		language.setText(getParameter(SFipa.LANGUAGE));
-		encoding.setText(getParameter(SFipa.ENCODING));
-		ontology.setText(getParameter(SFipa.ONTOLOGY));
-		protocol.setSelectedItem(getParameter(SFipa.PROTOCOL));
-		convid.setText(getParameter(SFipa.CONVERSATION_ID));
-		inreplyto.setText(getParameter(SFipa.IN_REPLY_TO));
-		replywith.setText(getParameter(SFipa.REPLY_WITH));
-		replyby.setText(getParameter(SFipa.REPLY_BY));
+		message.getParameter(SFipa.PERFORMATIVE).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				performative.setSelectedItem(result!=null ? result.toString(): "");
+			};
+		});
+		message.getParameter(SFipa.SENDER).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				tfsender.setText(result!=null ? result.toString(): "");
+				tfsender.setCaretPosition(0);
+			};
+		});
+		message.getParameter(SFipa.REPLY_TO).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				tfreplyto.setText(result!=null ? result.toString(): "");
+				tfreplyto.setCaretPosition(0);
+			};
+		});
+		message.getParameter(SFipa.CONTENT).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				content.setText(result!=null ? result.toString(): "");
+				content.setCaretPosition(0);
+			};
+		});
+		message.getParameter(SFipa.LANGUAGE).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				language.setText(result!=null ? result.toString(): "");
+				language.setCaretPosition(0);
+			};
+		});
+		message.getParameter(SFipa.ENCODING).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				encoding.setText(result!=null ? result.toString(): "");
+				encoding.setCaretPosition(0);
+			};
+		});
+		message.getParameter(SFipa.ONTOLOGY).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				ontology.setText(result!=null ? result.toString(): "");
+				ontology.setCaretPosition(0);
+			};
+		});
+		message.getParameter(SFipa.PROTOCOL).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				protocol.setSelectedItem(result!=null ? result.toString(): "");
+			};
+		});
+		message.getParameter(SFipa.CONVERSATION_ID).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				convid.setText(result!=null ? result.toString(): "");
+				convid.setCaretPosition(0);
+			};
+		});
+		message.getParameter(SFipa.IN_REPLY_TO).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				inreplyto.setText(result!=null ? result.toString(): "");
+				inreplyto.setCaretPosition(0);
+			};
+		});
+		message.getParameter(SFipa.REPLY_WITH).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				replywith.setText(result!=null ? result.toString(): "");
+				replywith.setCaretPosition(0);
+			};
+		});
+		message.getParameter(SFipa.REPLY_BY).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				replyby.setText(result!=null ? result.toString(): "");
+				replyby.setCaretPosition(0);
+			};
+		});
+		
+//		performative.setSelectedItem(getParameter(SFipa.PERFORMATIVE));
+//		tfsender.setText(getParameter(SFipa.SENDER));
+//		tfreplyto.setText(getParameter(SFipa.REPLY_TO));
+//		content.setText(getParameter(SFipa.CONTENT));
+//		language.setText(getParameter(SFipa.LANGUAGE));
+//		encoding.setText(getParameter(SFipa.ENCODING));
+//		ontology.setText(getParameter(SFipa.ONTOLOGY));
+//		protocol.setSelectedItem(getParameter(SFipa.PROTOCOL));
+//		convid.setText(getParameter(SFipa.CONVERSATION_ID));
+//		inreplyto.setText(getParameter(SFipa.IN_REPLY_TO));
+//		replywith.setText(getParameter(SFipa.REPLY_WITH));
+//		replyby.setText(getParameter(SFipa.REPLY_BY));
 
 		// Beautify appearance of text fields.
-		tfsender.setCaretPosition(0);
-		tfreplyto.setCaretPosition(0);
-		content.setCaretPosition(0);
-		language.setCaretPosition(0);
-		encoding.setCaretPosition(0);
-		ontology.setCaretPosition(0);
-		convid.setCaretPosition(0);
-		inreplyto.setCaretPosition(0);
-		replywith.setCaretPosition(0);
-		replyby.setCaretPosition(0);
+//		tfsender.setCaretPosition(0);
+//		tfreplyto.setCaretPosition(0);
+//		content.setCaretPosition(0);
+//		language.setCaretPosition(0);
+//		encoding.setCaretPosition(0);
+//		ontology.setCaretPosition(0);
+//		convid.setCaretPosition(0);
+//		inreplyto.setCaretPosition(0);
+//		replywith.setCaretPosition(0);
+//		replyby.setCaretPosition(0);
 		
 		// Extract sender / replyto
-		sender	= (IComponentIdentifier)message.getParameter(SFipa.SENDER).getValue();
-		replyto	= (IComponentIdentifier)message.getParameter(SFipa.REPLY_TO).getValue();
+		message.getParameter(SFipa.SENDER).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				((IEAParameter)result).getValue().addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result) 
+					{
+						sender	= (IComponentIdentifier)result;	
+					}
+				});
+			}
+		});
+		message.getParameter(SFipa.REPLY_TO).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				((IEAParameter)result).getValue().addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result) 
+					{
+						replyto = (IComponentIdentifier)result;	
+					}
+				});
+			}
+		});
+		
+//		replyto	= (IComponentIdentifier)message.getParameter(SFipa.REPLY_TO).getValue();
 
 		// Extract receivers.
 		/*Object[] tmp = message.getParameterSet(SFipa.RECEIVERS).getValues();
 		receivers = new AgentIdentifier[tmp.length];
 		for(int i=0; i<receivers.length; i++)
 			receivers[i] = (AgentIdentifier)tmp[i];*/
-		receivers  = (IComponentIdentifier[])message.getParameterSet(SFipa.RECEIVERS).getValues();
-		if(receivers.length>0)
+		
+		message.getParameterSet(SFipa.RECEIVERS).addResultListener(new DefaultResultListener()
 		{
-			tfreceivers.setText(SUtil.arrayToString(receivers));
-		}
-		else
-		{
-			receivers   = null;
-			tfreceivers.setText("");
-		} 
+			public void resultAvailable(Object source, Object result) 
+			{
+				((IEAParameterSet)result).getValues().addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, final Object result) 
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run() 
+							{
+								receivers  = (IComponentIdentifier[])result;	
+								
+								if(receivers.length>0)
+								{
+									tfreceivers.setText(SUtil.arrayToString(receivers));
+								}
+								else
+								{
+									receivers   = null;
+									tfreceivers.setText("");
+								} 
+							}
+						});
+					}
+				});
+			}
+		});
+		
+//		receivers  = (IComponentIdentifier[])message.getParameterSet(SFipa.RECEIVERS).getValues();
+		
 	}
   
 	/**
@@ -516,49 +669,48 @@ public class FipaMessagePanel extends JPanel
 
 	/**
 	 *  Get a message parameter value as string.
-	 */
+	 * /
 	protected String getParameter(String name)
 	{
 		Object	val	= message.getParameter(name).getValue();
 		return val!=null ? val.toString(): "";
-	}
+	}*/
 
 	/**
 	 *  Set a message parameter from string.
 	 */
-	protected void setParameter(String name, Object value)
+	protected void setParameter(String name, final Object value)
 	{
 		// Replace empty string with null.
 		Object oval = value==null || value.equals("") ? null : value;
 		
-		try
+		message.getParameter(name).addResultListener(new DefaultResultListener()
 		{
-			message.getParameter(name).setValue(oval);
-		}
-		catch(ComponentTerminatedException e)
-		{
-			// Hack!!! If agent has died, external access no longer works.
-			// Write into message directly.
-//			((IRMessageEvent)((ElementWrapper)message).unwrap()).getParameter(name).setValue(oval);
-			
-			// todo: fix me
-			e.printStackTrace();
-		}
+			public void resultAvailable(Object source, Object result) 
+			{
+				((IEAParameter)result).setValue(value);
+			}
+		});
+		
+		// todo: fix exception
 	}
 
 	/**
 	 *  Set a message parameter set.
 	 */
-	protected void	setParameterSet(String name, Object[] values)
+	protected void	setParameterSet(String name, final Object[] values)
 	{
-		try
+		message.getParameterSet(name).addResultListener(new DefaultResultListener()
 		{
-			message.getParameterSet(name).removeValues();
-			for(int i=0; values!=null && i<values.length; i++)
-				message.getParameterSet(name).addValue(values[i]);	
-		}
-		catch(ComponentTerminatedException e)
-		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				((IEAParameterSet)result).removeValues();
+				for(int i=0; values!=null && i<values.length; i++)
+					((IEAParameterSet)result).addValue(values[i]);
+			}
+		});
+		
+		// todo: exception catching
 			// Hack!!! If agent has died, external access no longer works.
 			// Write into message directly.
 //			IRMessageEvent	message	= (IRMessageEvent)((ElementWrapper)this.message).unwrap();
@@ -566,9 +718,6 @@ public class FipaMessagePanel extends JPanel
 //			for(int i=0; values!=null && i<values.length; i++)
 //				message.getParameterSet(name).addValue(values[i]);
 			
-			// todo: fix me
-			e.printStackTrace();
-		}
 	}
 
 }

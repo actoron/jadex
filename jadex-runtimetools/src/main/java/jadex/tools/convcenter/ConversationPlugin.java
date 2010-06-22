@@ -1,7 +1,11 @@
 package jadex.tools.convcenter;
 
+import jadex.base.DefaultResultListener;
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.AgentEvent;
+import jadex.bdi.runtime.IEAEventbase;
+import jadex.bdi.runtime.IEAMessageEvent;
+import jadex.bdi.runtime.IEAParameterSet;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.IParameterSet;
@@ -92,19 +96,48 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			IComponentDescription desc = (IComponentDescription)node.getUserObject();
 			// Use clone, as added component id might be modified by user.
 			IComponentManagementService ces  = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
-			IComponentIdentifier	receiver	= desc.getName();
-			receiver = ces.createComponentIdentifier(receiver.getName(), false, receiver.getAddresses());
-			IMessageEvent	message	= convcenter.getMessagePanel().getMessage();
-			IParameterSet rcvs = message.getParameterSet(SFipa.RECEIVERS);
-			if(rcvs.containsValue(receiver))
+			IComponentIdentifier rec = desc.getName();
+			final IComponentIdentifier receiver = ces.createComponentIdentifier(rec.getName(), false, rec.getAddresses());
+			final IEAMessageEvent	message	= convcenter.getMessagePanel().getMessage();
+			message.getParameterSet(SFipa.RECEIVERS).addResultListener(new DefaultResultListener()
 			{
-				rcvs.removeValue(receiver);
-			}
-			else
-			{
-				rcvs.addValue(receiver);
-			}
-			convcenter.getMessagePanel().setMessage(message);
+				public void resultAvailable(Object source, Object result) 
+				{
+					final IEAParameterSet rcvs = (IEAParameterSet)result;
+					
+					rcvs.containsValue(receiver).addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object source, Object result) 
+						{
+							if(((Boolean)result).booleanValue())
+							{
+								rcvs.removeValue(receiver);
+							}
+							else
+							{
+								rcvs.addValue(receiver);
+							}
+							
+							SwingUtilities.invokeLater(new Runnable()
+							{
+								public void run() 
+								{
+									convcenter.getMessagePanel().setMessage(message);
+								};
+							});
+						}
+					});
+				};
+			});
+			
+//			if(rcvs.containsValue(receiver))
+//			{
+//				rcvs.removeValue(receiver);
+//			}
+//			else
+//			{
+//				rcvs.addValue(receiver);
+//			}
 		}
 	};
 	
@@ -117,7 +150,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		agents = new ComponentTreeTable(((AgentControlCenter)getJCC()).getAgent().getServiceContainer());
+		agents = new ComponentTreeTable(((AgentControlCenter)getJCC()).getServiceContainer());
 		agents.setMinimumSize(new Dimension(0, 0));
 		split.add(agents);
 		agents.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -184,7 +217,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		
 //		jcc.addMessageListener(this);
 		
-		IMessageEventListener lis = new IMessageEventListener()
+		final IMessageEventListener lis = new IMessageEventListener()
 		{
 			public void messageEventSent(AgentEvent ae)
 			{
@@ -197,8 +230,23 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			}
 		};
 		
-		((AgentControlCenter)jcc).getAgent().getEventbase().addMessageEventListener("fipamsg", lis);
-		((AgentControlCenter)jcc).getAgent().getEventbase().addMessageEventListener("component_inform", lis);
+		((AgentControlCenter)jcc).getAgent().getEventbase().addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				((IEAEventbase)result).addMessageEventListener("fipamsg", lis);
+			}
+		});
+		((AgentControlCenter)jcc).getAgent().getEventbase().addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				((IEAEventbase)result).addMessageEventListener("component_inform", lis);
+			}
+		});
+		
+		
+//		((AgentControlCenter)jcc).getAgent().getEventbase().addMessageEventListener("component_inform", lis);
 
 		return split;
 	}

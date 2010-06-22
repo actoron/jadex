@@ -5,7 +5,7 @@ import jadex.commons.IFuture;
 /**
  *  The interface for all message events (concrete and referenced).
  */
-public interface IEAMessageEvent extends IEAElement
+public interface IEAMessageEvent extends IEAProcessableElement
 {
 	//-------- methods --------
 

@@ -71,7 +71,10 @@ public class AgentSelectorDialog
 	protected Component	parent;
 	
 	/** The agent access. */
-	protected IBDIExternalAccess	agent;
+	protected IBDIExternalAccess agent;
+	
+	/** The service container. */
+	protected IServiceContainer container;
 
 	/** The element tree table. */
 	protected ComponentTreeTable	tree;
@@ -117,10 +120,11 @@ public class AgentSelectorDialog
 	 *  @param agent
 	 *  @throws java.awt.HeadlessException
 	 */
-	public AgentSelectorDialog(Component parent, IBDIExternalAccess agent)
+	public AgentSelectorDialog(Component parent, IBDIExternalAccess agent, IServiceContainer container)
 	{
 		this.parent	= parent;
 		this.agent	= agent;
+		this.container = container;
 		this.sellist = new LinkedList();
 	}
 
@@ -429,12 +433,12 @@ public class AgentSelectorDialog
 		removeall.setEnabled(sellist.size()>0);
 		ok.setEnabled(!singleselection || sellist.size()>0);
 
-		IComponentManagementService ces = (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
+		IComponentManagementService ces = (IComponentManagementService)container.getService(IComponentManagementService.class);
 		
-		this.tree = new ComponentTreeTable(agent.getServiceContainer());
+		this.tree = new ComponentTreeTable(container);
 		this.tree.setPreferredSize(new Dimension(200, 100));
 		tree.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.seltree = new ComponentTreeTable(agent.getServiceContainer());
+		this.seltree = new ComponentTreeTable(container);
 		this.seltree.setPreferredSize(new Dimension(200, 100));
 		seltree.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		seltree.getTreetable().getTree().setRootVisible(false);	// Don't show platform node.

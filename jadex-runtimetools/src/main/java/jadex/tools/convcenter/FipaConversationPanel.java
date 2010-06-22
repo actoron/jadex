@@ -2,6 +2,7 @@ package jadex.tools.convcenter;
 
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IEAMessageEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IParameter;
 import jadex.bdi.runtime.IParameterSet;
@@ -13,6 +14,7 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.FipaMessagePanel;
 import jadex.tools.common.GuiProperties;
@@ -74,6 +76,9 @@ public class FipaConversationPanel extends JSplitPane
 	
 	/** The agent to dispatch events to. */
 	protected IBDIExternalAccess	agent;
+	
+	/** The service container. */
+	protected IServiceContainer container;
 
 	/** The default receiver (if any). */
 	protected IComponentIdentifier	receiver;
@@ -98,21 +103,22 @@ public class FipaConversationPanel extends JSplitPane
 	/**
 	 *  Create the gui.
 	 */
-	public FipaConversationPanel(final IBDIExternalAccess agent, IComponentIdentifier default_receiver)
+	public FipaConversationPanel(final IBDIExternalAccess agent, IComponentIdentifier default_receiver, final IServiceContainer container)
 	{
 		super(JSplitPane.HORIZONTAL_SPLIT, true);
 		setOneTouchExpandable(true);
 
 		this.agent	= agent;
+		this.container = container;
 		this.receiver	= default_receiver;
 		this.regmsgs = new ArrayList();
 		
 		// Right side starts with initial send panel only.
-		IMessageEvent	msg	= agent.getEventbase().createMessageEvent("fipamsg");
+		IEAMessageEvent	msg	= agent.getEventbase().createMessageEvent("fipamsg");
 		msg.getParameter(SFipa.SENDER).setValue(agent.getComponentIdentifier());
 		if(default_receiver!=null)
 			msg.getParameterSet(SFipa.RECEIVERS).addValue(default_receiver);
-		this.sendpanel	= new FipaMessagePanel(msg, agent);
+		this.sendpanel	= new FipaMessagePanel(msg, agent, container);
 
 		JButton send = new JButton("Send");
 		send.setToolTipText("Send the specified message");
@@ -213,10 +219,10 @@ public class FipaConversationPanel extends JSplitPane
 			{
 				if(e.getClickCount()==2 && sentmsgs.locationToIndex(e.getPoint())!=-1)
 				{
-					final IMessageEvent	msg	= (IMessageEvent)sentmsgs.getModel()
+					final IEAMessageEvent msg	= (IEAMessageEvent)sentmsgs.getModel()
 						.getElementAt(sentmsgs.locationToIndex(e.getPoint()));
 					final JPanel	msgtab	= new JPanel(new BorderLayout());
-					final FipaMessagePanel	msgpanel	= new FipaMessagePanel(msg, agent);
+					final FipaMessagePanel	msgpanel = new FipaMessagePanel(msg, agent, container);
 					msgpanel.setEditable(false);
 					final JScrollPane	scroll	= new JScrollPane(msgtab);
 					scroll.setBorder(null);
@@ -297,9 +303,9 @@ public class FipaConversationPanel extends JSplitPane
 					int	idx	= receivedmsgs.locationToIndex(e.getPoint());
 					if(idx!=-1)
 					{
-						final IMessageEvent	msg	= (IMessageEvent)receivedmsgs.getModel().getElementAt(idx);
+						final IEAMessageEvent	msg	= (IEAMessageEvent)receivedmsgs.getModel().getElementAt(idx);
 						final JPanel msgtab	= new JPanel(new BorderLayout());
-						final FipaMessagePanel	msgpanel = new FipaMessagePanel(msg, agent);
+						final FipaMessagePanel	msgpanel = new FipaMessagePanel(msg, agent, container);
 						msgpanel.setEditable(false);
 						final JScrollPane	scroll	= new JScrollPane(msgtab);
 						scroll.setBorder(null);
@@ -454,7 +460,7 @@ public class FipaConversationPanel extends JSplitPane
 	 */
 	public void	resetMessage()
 	{
-		IMessageEvent	msg	= agent.getEventbase().createMessageEvent("fipamsg");
+		IEAMessageEvent	msg	= agent.getEventbase().createMessageEvent("fipamsg");
 		msg.getParameter(SFipa.SENDER).setValue(agent.getComponentIdentifier());
 		if(receiver!=null)
 			msg.getParameterSet(SFipa.RECEIVERS).addValue(receiver);
@@ -687,7 +693,7 @@ public class FipaConversationPanel extends JSplitPane
 			{
 				map.put(paramsets[i].getName(), paramsets[i].getValues());
 			}
-			ClassLoader cl = ((ILibraryService)agent.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
+			ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
 			String	msg	= JavaWriter.objectToXML(map, cl);
 			return msg;
 		}
