@@ -1,6 +1,7 @@
 package jadex.bdi.runtime;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.IFuture;
 
 import java.util.logging.Logger;
@@ -21,7 +22,7 @@ public interface IEACapability extends IEAElement
 	 *  Get the parent (if any).
 	 *  @return The parent.
 	 */
-	public IFuture getParent();
+	public IExternalAccess	getParent();
 
 	/**
 	 *  Get the belief base.

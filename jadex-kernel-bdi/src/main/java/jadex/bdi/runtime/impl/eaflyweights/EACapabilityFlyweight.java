@@ -13,6 +13,7 @@ import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.rules.state.IOAVState;
@@ -92,26 +93,9 @@ public abstract class EACapabilityFlyweight extends ElementFlyweight implements 
 	 *  Get the parent (if any).
 	 *  @return The parent.
 	 */
-	public IFuture getParent()
+	public IExternalAccess	getParent()
 	{
-		final Future ret = new Future();
-		
-		if(getInterpreter().isExternalThread())
-		{
-			adapter.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					ret.setResult(getInterpreter().getParent());
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(getInterpreter().getParent());
-		}
-		
-		return ret;
+		return getInterpreter().getParent();
 	}
 
 	/**

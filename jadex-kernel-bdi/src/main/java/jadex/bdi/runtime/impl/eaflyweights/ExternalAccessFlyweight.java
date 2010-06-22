@@ -15,6 +15,7 @@ import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.InterpreterTimedObject;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
@@ -1116,52 +1117,9 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	/**
 	 *  Get the model of the component.
 	 */
-	public IFuture getModel()
+	public ILoadableComponentModel	getModel()
 	{
-		final Future ret = new Future();
-		
-		if(!getInterpreter().isPlanThread())
-		{
-			getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
-			{
-				public void run() 
-				{
-					ret.setResult(getInterpreter().getModel());
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(getInterpreter().getModel());
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Get the parent (if any).
-	 *  @return The parent.
-	 */
-	public IFuture getParent()
-	{
-		final Future ret = new Future();
-		
-		if(!getInterpreter().isPlanThread())
-		{
-			getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
-			{
-				public void run() 
-				{
-					ret.setResult(getInterpreter().getParent());
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(getInterpreter().getParent());
-		}
-		
-		return ret;
+		return getInterpreter().getModel();
 	}
 	
 	/**

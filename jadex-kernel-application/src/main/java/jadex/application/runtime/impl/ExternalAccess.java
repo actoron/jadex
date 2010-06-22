@@ -2,6 +2,9 @@ package jadex.application.runtime.impl;
 
 import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.service.BasicServiceProvider;
@@ -36,51 +39,17 @@ public class ExternalAccess extends BasicServiceProvider implements IApplication
 	 *  Get the model.
 	 *  @return The model.
 	 */
-	public IFuture getModel()
+	public ILoadableComponentModel getModel()
 	{
-		final Future ret = new Future();
-		
-		if(adapter.isExternalThread())
-		{
-			adapter.invokeLater(new Runnable() 
-			{
-				public void run() 
-				{
-					ret.setResult(application.getModel());
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(application.getModel());
-		}
-		
-		return ret;
+		return application.getModel();
 	}
 	
 	/**
 	 *  Get the component identifier.
 	 */
-	public IFuture getComponentIdentifier()
+	public IComponentIdentifier	getComponentIdentifier()
 	{
-		final Future ret = new Future();
-		
-		if(adapter.isExternalThread())
-		{
-			adapter.invokeLater(new Runnable() 
-			{
-				public void run() 
-				{
-					ret.setResult(adapter.getComponentIdentifier());
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(adapter.getComponentIdentifier());
-		}
-		
-		return ret;
+		return adapter.getComponentIdentifier();
 	}
 	
 	/**
@@ -113,25 +82,8 @@ public class ExternalAccess extends BasicServiceProvider implements IApplication
 	/**
 	 *  Get the parent.
 	 */
-	public IFuture getParent()
+	public IExternalAccess getParent()
 	{
-		final Future ret = new Future();
-		
-		if(adapter.isExternalThread())
-		{
-			adapter.invokeLater(new Runnable() 
-			{
-				public void run() 
-				{
-					ret.setResult(application.getParent());
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(application.getParent());
-		}
-		
-		return ret;
+		return application.getParent();
 	}
 }

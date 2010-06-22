@@ -164,7 +164,8 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 				
 		this.platform = Platform.getPlatform();
 		ComponentManagementService ams = (ComponentManagementService)platform.getService(IComponentManagementService.class);
-		ams.getComponentAdapterMap().put(getComponentIdentifier(), this);
+		this.cid	= SJade.convertAIDtoFipa(getAID(), ams);
+		ams.getComponentAdapterMap().put(cid, this);
 		
 //		this.platform = (IPlatform)args[0];
 
@@ -378,7 +379,7 @@ public class JadeAgentAdapter extends Agent implements IComponentAdapter, Serial
 	 */
 	public IComponentIdentifier getComponentIdentifier()
 	{
-		return SJade.convertAIDtoFipa(getAID(), (IComponentManagementService)getServiceContainer().getService(IComponentManagementService.class));
+		return cid;
 	}
 	
 	/**

@@ -34,7 +34,6 @@ import jadex.commons.IFilter;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
-import jadex.service.BasicServiceProvider;
 import jadex.service.clock.IClockService;
 
 import java.lang.reflect.Array;

@@ -1,6 +1,9 @@
 package jadex.micro;
 
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.MessageType;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
@@ -87,51 +90,27 @@ public class ExternalAccess extends BasicServiceProvider implements IMicroExtern
 	/**
 	 *  Get the model of the component.
 	 */
-	public IFuture getModel()
+	public ILoadableComponentModel	getModel()
 	{
-		final Future ret = new Future();
-		adapter.invokeLater(new Runnable() 
-		{
-			public void run() 
-			{
-				ret.setResult(interpreter.getAgentModel());
-			}
-		});
-		return ret;
+		return interpreter.getAgentModel();
 	}
 	
 	/**
 	 *  Get the id of the component.
 	 *  @return	The component id.
 	 */
-	public IFuture getComponentIdentifier()
+	public IComponentIdentifier	getComponentIdentifier()
 	{
-		final Future ret = new Future();
-		adapter.invokeLater(new Runnable() 
-		{
-			public void run() 
-			{
-				ret.setResult(interpreter.getAgentAdapter().getComponentIdentifier());
-			}
-		});
-		return ret;
+		return interpreter.getAgentAdapter().getComponentIdentifier();
 	}
 	
 	/**
 	 *  Get the parent component.
 	 *  @return The parent component.
 	 */
-	public IFuture getParent()
+	public IExternalAccess	getParent()
 	{
-		final Future ret = new Future();
-		adapter.invokeLater(new Runnable() 
-		{
-			public void run() 
-			{
-				ret.setResult(interpreter.getParent());
-			}
-		});
-		return ret;
+		return interpreter.getParent();
 	}
 
 	/**
