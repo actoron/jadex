@@ -105,7 +105,7 @@ public class AllocateServicePlan extends Plan
 					trustFunction.logTrust(getTime());
 
 					startAtomic();
-					getBeliefbase().getBelief("currentSa").setFact(null);
+//					getBeliefbase().getBelief("currentSa").setFact(null);
 					if (!(Boolean) getBeliefbase().getBelief("searchingSa").getFact())
 					{
 						getBeliefbase().getBelief("searchingSa").setFact(Boolean.TRUE);
