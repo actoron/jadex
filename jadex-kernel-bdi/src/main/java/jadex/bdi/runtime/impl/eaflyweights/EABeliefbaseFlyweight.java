@@ -1,5 +1,9 @@
 package jadex.bdi.runtime.impl.eaflyweights;
 
+import jadex.bdi.runtime.IBelief;
+import jadex.bdi.runtime.IBeliefListener;
+import jadex.bdi.runtime.IBeliefSet;
+import jadex.bdi.runtime.IBeliefSetListener;
 import jadex.bdi.runtime.IEABeliefbase;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
@@ -425,4 +429,293 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 //		
 //		return new BeliefSetReferenceFlyweight(state, mbelset, new BeliefSetFlyweight(state, refcapa, beliefsetref));
 //	}
+	
+	//-------- convenience methods --------
+	
+	/**
+	 *  Get the fact of a belief.
+	 *  @return The fact.
+	 */
+	public IFuture getBeliefFact(final String belief)
+	{
+		final Future ret = new Future();
+		
+		if(getInterpreter().isExternalThread())
+		{
+			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
+					ret.setResult(bel.getFact());
+				}
+			});
+		}
+		else
+		{
+			IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
+			ret.setResult(bel.getFact());
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Set the belief fact.
+	 *  @param belief The belief name.
+	 *  @param fact The fact.
+	 */
+	public void setBeliefFact(final String belief, final Object fact)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
+					bel.setFact(fact);
+				}
+			});
+		}
+		else
+		{
+			IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
+			bel.setFact(fact);
+		}
+		
+	}
+	
+	/**
+	 *  Get the facts of a beliefset.
+	 *  @return The facts.
+	 */
+	public IFuture getBeliefSetFacts(final String beliefset)
+	{
+		final Future ret = new Future();
+		
+		if(getInterpreter().isExternalThread())
+		{
+			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					ret.setResult(belset.getFacts());
+				}
+			});
+		}
+		else
+		{
+			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			ret.setResult(belset.getFacts());
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Add a belief listener.
+	 *  @param listener The belief listener.
+	 */
+	public void addBeliefListener(final String belief, final IBeliefListener listener)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
+					bel.addBeliefListener(listener);
+				}
+			});
+		}
+		else
+		{
+			IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
+			bel.addBeliefListener(listener);
+		}
+	}
+	
+	/**
+	 *  Remove a belief listener.
+	 *  @param listener The belief listener.
+	 */
+	public void removeBeliefListener(final String belief, final IBeliefListener listener)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
+					bel.removeBeliefListener(listener);
+				}
+			});
+		}
+		else
+		{
+			IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
+			bel.removeBeliefListener(listener);
+		}
+	}
+	
+	/**
+	 *  Add a fact to a beliefset.
+	 *  @param beliefset The beliefset name.
+	 *  @param fact The fact.
+	 */
+	public void addBeliefSetFact(final String beliefset, final Object fact)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					belset.addFact(fact);
+				}
+			});
+		}
+		else
+		{
+			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			belset.addFact(fact);
+		}
+	}
+	
+	/**
+	 *  Remove a fact to a beliefset.
+	 *  @param beliefset The beliefset name.
+	 *  @param fact The fact.
+	 */
+	public void removeBeliefSetFact(final String beliefset, final Object fact)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					belset.removeFact(fact);
+				}
+			});
+		}
+		else
+		{
+			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			belset.removeFact(fact);
+		}
+	}
+	
+	/**
+	 *  Remove a fact to a beliefset.
+	 *  @param beliefset The beliefset name.
+	 *  @param fact The fact.
+	 */
+	public IFuture containsBeliefSetFact(final String beliefset, final Object fact)
+	{
+		final Future ret = new Future();
+		
+		if(getInterpreter().isExternalThread())
+		{
+			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					ret.setResult(belset.containsFact(fact)? Boolean.TRUE: Boolean.FALSE);
+				}
+			});
+		}
+		else
+		{
+			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			ret.setResult(belset.containsFact(fact)? Boolean.TRUE: Boolean.FALSE);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the number of values currently
+	 *  contained in this set.
+	 *  @return The values count.
+	 */
+	public IFuture getBeliefSetSize(final String beliefset)
+	{
+		final Future ret = new Future();
+		
+		if(getInterpreter().isExternalThread())
+		{
+			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					ret.setResult(new Integer(belset.size()));
+				}
+			});
+		}
+		else
+		{
+			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			ret.setResult(new Integer(belset.size()));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Add a belief listener.
+	 *  @param listener The belief listener.
+	 */
+	public void addBeliefSetListener(final String beliefset, final IBeliefSetListener listener)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					belset.addBeliefSetListener(listener);
+				}
+			});
+		}
+		else
+		{
+			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			belset.addBeliefSetListener(listener);
+		}
+	}
+	
+	/**
+	 *  Remove a belief listener.
+	 *  @param listener The belief listener.
+	 */
+	public void removeBeliefSetListener(final String beliefset, final IBeliefSetListener listener)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					belset.removeBeliefSetListener(listener);
+				}
+			});
+		}
+		else
+		{
+			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			belset.removeBeliefSetListener(listener);
+		}
+	}
+	
 }

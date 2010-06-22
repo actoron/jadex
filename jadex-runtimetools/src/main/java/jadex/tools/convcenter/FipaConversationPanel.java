@@ -77,9 +77,6 @@ public class FipaConversationPanel extends JSplitPane
 	/** The agent to dispatch events to. */
 	protected IBDIExternalAccess	agent;
 	
-	/** The service container. */
-	protected IServiceContainer container;
-
 	/** The default receiver (if any). */
 	protected IComponentIdentifier	receiver;
 
@@ -103,7 +100,7 @@ public class FipaConversationPanel extends JSplitPane
 	/**
 	 *  Create the gui.
 	 */
-	public FipaConversationPanel(final IBDIExternalAccess agent, IComponentIdentifier default_receiver, final IServiceContainer container)
+	public FipaConversationPanel(final IBDIExternalAccess agent, IComponentIdentifier default_receiver)
 	{
 		super(JSplitPane.HORIZONTAL_SPLIT, true);
 		setOneTouchExpandable(true);

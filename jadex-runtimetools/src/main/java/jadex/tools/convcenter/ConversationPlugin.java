@@ -230,20 +230,8 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			}
 		};
 		
-		((AgentControlCenter)jcc).getAgent().getEventbase().addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result) 
-			{
-				((IEAEventbase)result).addMessageEventListener("fipamsg", lis);
-			}
-		});
-		((AgentControlCenter)jcc).getAgent().getEventbase().addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result) 
-			{
-				((IEAEventbase)result).addMessageEventListener("component_inform", lis);
-			}
-		});
+		((AgentControlCenter)jcc).getAgent().getEventbase().addMessageEventListener("fipamsg", lis);
+		((AgentControlCenter)jcc).getAgent().getEventbase().addMessageEventListener("component_inform", lis);
 		
 		
 //		((AgentControlCenter)jcc).getAgent().getEventbase().addMessageEventListener("component_inform", lis);

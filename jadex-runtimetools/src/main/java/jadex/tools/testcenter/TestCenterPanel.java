@@ -865,30 +865,32 @@ public class TestCenterPanel extends JSplitPane
 		try
 		{
 			final Integer to = new Integer(text);
-			((AgentControlCenter)plugin.getJCC()).getAgent().getBeliefbase().addResultListener(new IResultListener()
-			{
-				public void resultAvailable(Object source, Object result)
-				{
-					((IEABeliefbase)result).getBelief("testcase_timeout").addResultListener(new IResultListener()
-					{
-						
-						public void resultAvailable(Object source, Object result)
-						{
-							((IEABelief)result).setFact(to);							
-						}
-						
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-							showTimoutValueWarning(exception);
-						}
-					});
-					
-				}
-				public void exceptionOccurred(Object source, Exception exception)
-				{
-					showTimoutValueWarning(exception);
-				}
-			});
+			
+			((AgentControlCenter)plugin.getJCC()).getAgent().getBeliefbase().setBeliefFact("testcase_timeout", to);
+			
+//			((AgentControlCenter)plugin.getJCC()).getAgent().getBeliefbase().addResultListener(new IResultListener()
+//			{
+//				public void resultAvailable(Object source, Object result)
+//				{
+//					((IEABeliefbase)result).getBelief("testcase_timeout").addResultListener(new IResultListener()
+//					{
+//						public void resultAvailable(Object source, Object result)
+//						{
+//							((IEABelief)result).setFact(to);							
+//						}
+//						
+//						public void exceptionOccurred(Object source, Exception exception)
+//						{
+//							showTimoutValueWarning(exception);
+//						}
+//					});
+//					
+//				}
+//				public void exceptionOccurred(Object source, Exception exception)
+//				{
+//					showTimoutValueWarning(exception);
+//				}
+//			});
 		}
 		catch(Exception e)
 		{
