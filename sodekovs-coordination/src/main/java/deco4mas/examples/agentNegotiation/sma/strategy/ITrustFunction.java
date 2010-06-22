@@ -6,8 +6,10 @@ public interface ITrustFunction
 {
 	/**
 	 * returns the trust for the given identifier
-	 * @param sa the componentIdentifier to get trust for
+	 * 
+	 * @param sa
+	 *            the componentIdentifier to get trust for
 	 * @return the trust ( 0.0 - 1.0
 	 */
-	public Double getTrust(IComponentIdentifier sa);
+	public Double getTrust(IComponentIdentifier sa, Long time);
 }

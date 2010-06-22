@@ -42,12 +42,14 @@
 			<fact>$beliefbase.env.getAvatar($scope.getComponentIdentifier())
 			</fact>
 		</belief>
+		
+<!--		<belief name="startTime" class="long"><fact>$scope.getClock().getStarttime()</fact></belief>-->
 
 		<belief name="provider" class="IComponentIdentifier" exported="true" />
 		<belief name="allocatedService" class="ServiceType" exported="true" />
 		<belief name="currentSa" class="IComponentIdentifier" />
 		<belief name="history" class="ServiceAgentHistory">
-			<fact>new ServiceAgentHistory()</fact>
+<!--			<fact>new ServiceAgentHistory($scope.getComponentIdentifier(), $beliefbase.startTime)</fact>-->
 		</belief>
 		<belief name="searchingSa" class="Boolean">
 			<fact>true</fact>
@@ -121,7 +123,7 @@
 
 	<events>
 		<!-- execution phase decision-->
-		<messageevent name="informProviderAboutSign" direction="send"
+		<messageevent name="informMessage" direction="send"
 			type="fipa">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.INFORM</value>
@@ -151,7 +153,7 @@
 					<fact>IFilter.ALWAYS</fact>
 				</initialbelief>
 				<initialbelief ref="reqcap.timeout">
-					<fact>10000L</fact>
+					<fact>2000L</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>

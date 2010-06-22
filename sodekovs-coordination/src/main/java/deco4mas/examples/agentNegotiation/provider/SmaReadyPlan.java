@@ -1,9 +1,9 @@
 package deco4mas.examples.agentNegotiation.provider;
 
-import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import java.util.Date;
+import java.util.logging.Logger;
+import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 
 /**
  * All SMAs are ready
@@ -13,6 +13,7 @@ public class SmaReadyPlan extends Plan
 
 	public void body()
 	{
+		final Logger smaLogger = AgentLogger.getTimeEvent(this.getComponentName());
 		try
 		{
 			startAtomic();
@@ -21,14 +22,13 @@ public class SmaReadyPlan extends Plan
 
 			getBeliefbase().getBeliefSet("smaReady").addFact(smaName);
 
+			smaLogger.info("sma ready [" + me.getParameter("sender").getValue().toString() + "]");
 			if (getBeliefbase().getBeliefSet("smaReady").size() == getBeliefbase().getBeliefSet("smas").size()
 				&& !((Boolean) getBeliefbase().getBelief("executionPhase").getFact()))
 			{
+				smaLogger.info("all sma ready");
 				getBeliefbase().getBelief("executionPhase").setFact(new Boolean(true));
-				System.out.println();
-				System.out.println("---- Execution phase" + this.getComponentName() + "started! ----");
-				System.out.println();
-				
+
 				dispatchTopLevelGoal(createGoal("startWorkflow"));
 				endAtomic();
 				aborted();
@@ -36,10 +36,10 @@ public class SmaReadyPlan extends Plan
 			{
 				endAtomic();
 			}
-			
+
 		} catch (Exception e)
 		{
-			System.out.println(this.getType());
+			e.printStackTrace();
 			fail(e);
 		}
 	}

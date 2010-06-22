@@ -7,8 +7,9 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.IResultListener;
 import java.util.Map;
+import java.util.logging.Logger;
+import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 
 /**
  * Execute a service
@@ -17,6 +18,8 @@ public class ExecuteTaskPlan extends Plan
 {
 	public void body()
 	{
+		Logger workflowLogger = AgentLogger.getTimeEvent(((IComponentIdentifier) getBeliefbase().getBelief("workflow").getFact())
+			.getLocalName());
 		try
 		{
 			String taskName = (String) getBeliefbase().getBelief("taskName").getFact();
@@ -35,11 +38,12 @@ public class ExecuteTaskPlan extends Plan
 
 			// ask sma for allocate
 			Boolean success = false;
-			
+
 			try
 			{
 				IGoal serviceAllocate = createGoal("rp_initiate");
-				serviceAllocate.getParameter("action").setValue(taskName);
+				serviceAllocate.getParameter("action").setValue(
+					((IComponentIdentifier) getBeliefbase().getBelief("workflow").getFact()).getLocalName());
 				serviceAllocate.getParameter("receiver").setValue(sma);
 				dispatchSubgoalAndWait(serviceAllocate);
 				Boolean result = (Boolean) serviceAllocate.getParameter("result").getValue();
@@ -47,21 +51,25 @@ public class ExecuteTaskPlan extends Plan
 					success = result;
 			} catch (GoalFailureException gfe)
 			{
+				gfe.printStackTrace();
 				success = false;
 			}
 			if (!success)
 			{
-				System.out.println("*** TASK FAIL! ***");
+				workflowLogger.warning("TASK " + taskName + " FAIL!");
+				System.out.println("TASK " + taskName + " FAIL!");
+				body();
+				aborted();
 			}
-//			waitForCondition("taskListenerPresent");
-//			
-//			IResultListener lis = ((IResultListener) getBeliefbase().getBelief("taskListener").getFact());
-//			lis.resultAvailable(this, success);
+			// waitForCondition("taskListenerPresent");
+			//			
+			// IResultListener lis = ((IResultListener)
+			// getBeliefbase().getBelief("taskListener").getFact());
+			// lis.resultAvailable(this, success);
 			killAgent();
 		} catch (Exception e)
 		{
-			System.out.println(this.getType());
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 			fail(e);
 		}
 

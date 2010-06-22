@@ -3,12 +3,12 @@ package deco4mas.examples.agentNegotiation.sa;
 public class AgentType
 {
 	private String typeName;
-	
-	private Double blackoutCharacter;	
+
+	private Double blackoutCharacter;
 	private Double costCharacter;
 	private Double durationCharacter;
-	
-	public AgentType(String typeName, Double blackoutCharacter, Double costCharacter, Double durationCharacter)
+
+	public AgentType(String typeName, Double costCharacter, Double durationCharacter, Double blackoutCharacter)
 	{
 		this.typeName = typeName;
 		this.blackoutCharacter = blackoutCharacter;
@@ -35,8 +35,5 @@ public class AgentType
 	{
 		return durationCharacter;
 	}
-	
-	
-	
-	
+
 }

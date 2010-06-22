@@ -7,7 +7,9 @@ public interface ISelectionStrategy
 {
 	/**
 	 * select a propsal from the sorted Map
-	 * @param orderedProposal sorted Map
+	 * 
+	 * @param orderedProposal
+	 *            sorted Map
 	 * @return selected IComponentIdentifier
 	 */
 	public IComponentIdentifier selectProposal(SortedMap<Double, IComponentIdentifier> orderedProposal);

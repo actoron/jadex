@@ -9,7 +9,7 @@ import java.util.Map;
 public class RequestInformation
 {
 	private Map<String, Object> informations = new HashMap<String, Object>();;
-	
+
 	public RequestInformation(Map<String, Object> information)
 	{
 		informations = information;

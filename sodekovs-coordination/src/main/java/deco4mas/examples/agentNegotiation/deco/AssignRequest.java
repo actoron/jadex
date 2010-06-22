@@ -1,13 +1,10 @@
 package deco4mas.examples.agentNegotiation.deco;
 
-import deco4mas.examples.agentNegotiation.ServiceType;
+import jadex.bridge.IComponentIdentifier;
 import deco4mas.examples.agentNegotiation.sma.strategy.ISelectionStrategy;
 import deco4mas.examples.agentNegotiation.sma.strategy.IUtilityFunction;
-import deco4mas.examples.agentNegotiation.sma.strategy.SimpleSelectionStrategy;
-import deco4mas.examples.agentNegotiation.sma.strategy.WeightFactorUtilityFunction;
-import jadex.bridge.IComponentIdentifier;
 
-//TODO Medium configuration like Deadline
+// TODO Medium configuration like Deadline
 
 public class AssignRequest
 {
@@ -18,7 +15,8 @@ public class AssignRequest
 	private String medium;
 	private RequestInformation informations;
 
-	public AssignRequest(IComponentIdentifier owner, IUtilityFunction utilityFunction, ISelectionStrategy selector, ServiceType serviceType, String medium)
+	public AssignRequest(IComponentIdentifier owner, IUtilityFunction utilityFunction, ISelectionStrategy selector,
+		ServiceType serviceType, String medium)
 	{
 		this.owner = owner;
 		this.utilityFunction = utilityFunction;
@@ -26,10 +24,11 @@ public class AssignRequest
 		this.selector = selector;
 		this.medium = medium;
 	}
-	
-	public AssignRequest(IComponentIdentifier owner, ServiceType serviceType, IUtilityFunction utilityFunction, ISelectionStrategy selector, String medium, RequestInformation information)
+
+	public AssignRequest(IComponentIdentifier owner, ServiceType serviceType, IUtilityFunction utilityFunction,
+		ISelectionStrategy selector, String medium, RequestInformation information)
 	{
-		this(owner, utilityFunction,selector, serviceType, medium);
+		this(owner, utilityFunction, selector, serviceType, medium);
 		this.informations = information;
 	}
 
@@ -37,7 +36,7 @@ public class AssignRequest
 	{
 		return owner;
 	}
-	
+
 	public IUtilityFunction getUtilityFunction()
 	{
 		return utilityFunction;
@@ -52,7 +51,6 @@ public class AssignRequest
 	{
 		return medium;
 	}
-	
 
 	public ISelectionStrategy getSelector()
 	{

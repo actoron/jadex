@@ -9,51 +9,33 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
-import java.io.IOException;
-import java.util.Date;
+import jadex.service.IServiceContainer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.FileHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import deco4mas.examples.agentNegotiation.evaluate.logger.GnuFormatter;
+import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
+import deco4mas.examples.agentNegotiation.evaluate.ValueLogger;
 
 /**
  * Creates a workflow
  */
 public class PreInstantiateWorkflowPlan extends Plan
 {
-	static Integer id = new Integer(0);
+	private static Integer id = new Integer(0);
 
 	public void body()
 	{
-		final Logger workflowExe = Logger.getAnonymousLogger();
-		try
-		{
-			FileHandler fh = new FileHandler("workflow_execution"
-				+ this.getComponentName().substring(this.getComponentName().length() - 1) + ".log",true);
-			fh.setFormatter(new GnuFormatter());
+		IServiceContainer container = interpreter.getAgentAdapter().getServiceContainer();
 
-			workflowExe.addHandler(fh);
-			workflowExe.setLevel(Level.FINEST);
-			
-//			getInterpreter().getModel().getProperties().put("logging.file", this.getComponentName() + ".log");
-//			getInterpreter().getModel().getProperties().put("addConsoleHandler", null);
-		} catch (SecurityException e)
-		{
-			e.printStackTrace();
-		} catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		final String workflowName = "workflowNet" + id + "(" + getComponentName() + ")";
+		final Logger workflowLogger = AgentLogger.getTimeEvent(workflowName);
+		final Logger providerLogger = AgentLogger.getTimeEvent(this.getComponentName());
+		final Logger workflowTime = AgentLogger.getTimeEvent("workflowTimes (" + this.getComponentName() + ")");
 
 		final IBDIExternalAccess myself = this.getExternalAccess();
-		IComponentManagementService cms = (IComponentManagementService) interpreter.getAgentAdapter().getServiceContainer()
-			.getService(IComponentManagementService.class);
+		IComponentManagementService cms = (IComponentManagementService) container.getService(IComponentManagementService.class);
 		try
 		{
-			// create workflow
 			Map args = new HashMap();
 			args.put("provider", getComponentIdentifier());
 
@@ -63,8 +45,17 @@ public class PreInstantiateWorkflowPlan extends Plan
 				@Override
 				public void resultAvailable(Object source, Object result)
 				{
-					//LOG
-					workflowExe.finest("End " + getClock().getTime());
+					// LOG
+					workflowLogger.info("workflow executed");
+					providerLogger.info("*** workflow executed ***");
+
+					Long executionTime = getTime() - (Long) getBeliefbase().getBelief("statExetime").getFact();
+					Long allTime = getTime() - (Long) getBeliefbase().getBelief("statNegtime").getFact();
+					workflowTime.info("Execution time: " + executionTime);
+					ValueLogger.addValue("workflowTime", allTime.doubleValue());
+					workflowTime.info("Complete time: " + allTime);
+					workflowTime.info("---");
+
 					System.out.println("*** workflow executed ***");
 					IInternalEvent workflowExe = myself.createInternalEvent("workflowExecuted");
 					myself.dispatchInternalEvent(workflowExe);
@@ -73,23 +64,22 @@ public class PreInstantiateWorkflowPlan extends Plan
 				@Override
 				public void exceptionOccurred(Object source, Exception exception)
 				{
-					System.out.println("Workflow not finished");
+					workflowLogger.severe("workflow not finished");
+					providerLogger.severe("workflow not finished");
+					System.out.println("workflow not finished");
 				}
 			};
-			String workflowName = "workflowNet" + id + "(" + getComponentName() + ")";
 			String workflowType = "deco4mas/examples/agentNegotiation/provider/workflow/"
 				+ (String) getBeliefbase().getBelief("workflowName").getFact() + ".bpmn";
 			IFuture fut = cms.createComponent(workflowName, workflowType, new CreationInfo(null, args, this.getComponentIdentifier(), true,
 				false), killLis);
-//			waitFor(1000); //HACK!!!
+			// waitFor(1000); //HACK!!!
 			IComponentIdentifier workflowId = (IComponentIdentifier) fut.get(this);
-
-			IFuture fut2 = cms.createComponent(workflowName + "asd", workflowType, new CreationInfo(null, args, this.getComponentIdentifier(), true,
-				false), killLis);
-			IComponentIdentifier workflowId2 = (IComponentIdentifier) fut2.get(this);
 			getBeliefbase().getBelief("workflow").setFact(workflowId);
-			//LOG
-			workflowExe.finest("Creation " + getClock().getTime());
+
+			// LOG
+			providerLogger.info("workflow [" + workflowName + "] created");
+			workflowLogger.info("workflow created");
 
 			// create smas
 			IGoal goal = createGoal("createSmaForWorkflow");
@@ -103,7 +93,6 @@ public class PreInstantiateWorkflowPlan extends Plan
 			dispatchTopLevelGoal(restart);
 		} catch (Exception e)
 		{
-			System.out.println(this.getType());
 			e.printStackTrace();
 			fail(e);
 		}

@@ -3,10 +3,17 @@ package deco4mas.examples.agentNegotiation.sa.masterSa;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import deco4mas.examples.agentNegotiation.ServiceType;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+import deco4mas.examples.agentNegotiation.deco.ServiceType;
+import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
+import deco4mas.examples.agentNegotiation.evaluate.TimeEventFormatter;
 import deco4mas.examples.agentNegotiation.sa.AgentType;
 
 /**
@@ -37,18 +44,24 @@ public class InitialiseSaPlan extends Plan
 			IComponentManagementService.class);
 
 		for (ServiceAgentConfig serviceAgentConfig : configs)
-		{
+		{	
 			ServiceType serviceType = services.get(serviceAgentConfig.getServiceType());
 			AgentType agentType = agentTypes.get(serviceAgentConfig.getAgentType());
+			String saName = "SA" + id + "(" + serviceType.getName() + "-" + agentType.getTypeName() + ")";
 
+			Logger saLogger = AgentLogger.getTimeEvent(saName);
+			AgentLogger.addSa(saName);
+			
+			saLogger.info(serviceType.getName() + " with charakter " + agentType.getTypeName()+ " C(" + agentType.getCostCharacter() + "), D(" + agentType.getDurationCharacter() + "), B(" + agentType.getBlackoutCharacter()+  ")");
 			Map args = new HashMap();
 			args.put("providedService", serviceType);
 			args.put("agentType", agentType);
-
-			cms.createComponent("SA" + "(" + serviceType.getName() + "-" + agentType.getTypeName() + ")" + id,
+			
+			cms.createComponent(saName,
 				"deco4mas/examples/AgentNegotiation/sa/serviceAgent.agent.xml", new CreationInfo(null, args, interpreter.getParent()
 					.getComponentIdentifier()), null);
 			id++;
+			saLogger.info("Agent start");			
 		}
 		killAgent();
 	}

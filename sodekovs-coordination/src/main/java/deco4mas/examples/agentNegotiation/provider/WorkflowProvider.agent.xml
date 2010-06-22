@@ -14,6 +14,11 @@
 
 	<beliefs>
 		<beliefset name="smas" class="IComponentIdentifier" />
+		<belief name="statNegtime" class="Long"/>
+		<belief name="statExetime" class="Long"/>
+		
+<!--		<belief name="startTime" class="Long"><fact>$scope.getTime()</fact></belief>-->
+		
 		<belief name="workflow" class="IComponentIdentifier" />
 		<belief name="executionPhase" class="boolean">
 			<fact>false</fact>
@@ -59,6 +64,7 @@
 			<trigger>
 				<messageevent ref="smaReady"></messageevent>
 			</trigger>
+			<precondition>!$beliefbase.executionPhase</precondition>
 		</plan>
 		<plan name="restartWorkflow">
 			<body class="RestartWorkflowPlan">

@@ -31,6 +31,7 @@
 		<import>deco4mas.coordinate.*</import>
 		<import>deco4mas.examples.agentNegotiation.*</import>
 		<import>deco4mas.examples.agentNegotiation.sa.*</import>
+		<import>deco4mas.examples.agentNegotiation.deco.*</import>
 		<import>deco4mas.examples.agentNegotiation.sa.masterSa.*</import>
 	</imports>
 
@@ -82,53 +83,53 @@
 
 			</spaces>
 			<components>
-				<component type="MasterServiceCreator">
+				<component type="WorkflowProvider" number="1">
+					<arguments>
+						<argument name="workflowName">
+							new String("workflow")
+						</argument>
+					</arguments>
+				</component>
+			</components>
+			<component type="MasterServiceCreator">
 					<arguments>
 					<!-- WARNING: Hack / TODO in CreatesmaforWorkflow: taskTypes - ServiceTypes -->
 						<argument name="services">
 							new ServiceType[]
 							{
-							new ServiceType("Chassisbau",1000.0,300.0,700.0,5000.0,1000.0,3000.0),
-							new ServiceType("Reifenhersteller",300.0,50.0,150.0,1000.0,500.0,700.0),
-							new ServiceType("Endmontage",500.0,100.0,300.0,3000.0,500.0,1000.0)
+							new ServiceType("Chassisbau",600.0,300.0)
+<!--							new ServiceType("Reifenhersteller",200.0,200.0),-->
+<!--							new ServiceType("Endmontage",400.0,200.0)-->
 							}
 						</argument>
 						<argument name="agentTypes">
 							new AgentType[]
 							{
-							new AgentType("normal",0.5,0.5,0.3),
-							new AgentType("billig",0.3,0.6,0.6),
-							new AgentType("teuer",0.8,0.2,0.0),
-							new AgentType("ausfall",0.2,0.7,1.0)
+							new AgentType("normal",0.5,0.5,0.5),
+							new AgentType("billig",0.3,0.3,0.9),
+							new AgentType("teuer",0.7,0.7,0.1)
+<!--							new AgentType("ausfall",0.2,0.2,1.0)-->
 							}
 						</argument>
 						<argument name="serviceAgentConfigs">
 							new ServiceAgentConfig[]
 							{
-							new ServiceAgentConfig("Chassisbau", "normal"),
+<!--							new ServiceAgentConfig("Chassisbau", "ausfall"),-->
 							new ServiceAgentConfig("Chassisbau", "billig"),
-							new ServiceAgentConfig("Chassisbau", "teuer"),
-							new ServiceAgentConfig("Chassisbau", "ausfall"),
-							new ServiceAgentConfig("Reifenhersteller", "normal"),
-							new ServiceAgentConfig("Reifenhersteller", "billig"),
-							new ServiceAgentConfig("Reifenhersteller", "teuer"),
-							new ServiceAgentConfig("Reifenhersteller", "ausfall"),
-							new ServiceAgentConfig("Endmontage", "normal"),
-							new ServiceAgentConfig("Endmontage", "billig"),
-							new ServiceAgentConfig("Endmontage", "teuer"),
-							new ServiceAgentConfig("Endmontage", "ausfall")
+							new ServiceAgentConfig("Chassisbau", "normal"),
+							new ServiceAgentConfig("Chassisbau", "teuer")						
+<!--							new ServiceAgentConfig("Reifenhersteller", "normal"),-->
+<!--							new ServiceAgentConfig("Reifenhersteller", "billig"),-->
+<!--							new ServiceAgentConfig("Reifenhersteller", "teuer"),-->
+<!--							new ServiceAgentConfig("Reifenhersteller", "ausfall"),-->
+<!--							new ServiceAgentConfig("Endmontage", "normal"),-->
+<!--							new ServiceAgentConfig("Endmontage", "billig"),-->
+<!--							new ServiceAgentConfig("Endmontage", "teuer"),-->
+<!--							new ServiceAgentConfig("Endmontage", "ausfall")-->
 							}	
 						</argument>
 					</arguments>
 				</component>
-				<component type="WorkflowProvider" number="1">
-					<arguments>
-						<argument name="workflowName">
-							new String("workflow2")
-						</argument>
-					</arguments>
-				</component>
-			</components>
 		</application>
 	</applications>
 

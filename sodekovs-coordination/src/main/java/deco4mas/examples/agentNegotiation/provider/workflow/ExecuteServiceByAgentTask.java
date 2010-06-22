@@ -5,10 +5,11 @@ import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
+import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 
 /**
  * Task executed by agent
@@ -19,12 +20,15 @@ public class ExecuteServiceByAgentTask implements ITask
 
 	public void execute(final ITaskContext context, BpmnInterpreter instance, final IResultListener listener)
 	{
+		final Logger workflowLogger = AgentLogger.getTimeEvent(instance.getComponentIdentifier().getLocalName());
 		try
 		{
-			System.out.println("Bpmn task (" + context.getActivity().getName() + "/" +context.getParameterValue("serviceType") + ") start");
+			workflowLogger.info(context.getActivity().getName() + "[" + context.getParameterValue("serviceType") + "]" + " start");
+			System.out
+				.println("Bpmn task (" + context.getActivity().getName() + "/" + context.getParameterValue("serviceType") + ") start");
 
-			IComponentManagementService cms = (IComponentManagementService) instance.getComponentAdapter().getServiceContainer().getService(
-				IComponentManagementService.class);
+			IComponentManagementService cms = (IComponentManagementService) instance.getComponentAdapter().getServiceContainer()
+				.getService(IComponentManagementService.class);
 
 			String name = context.getActivity().getName() + "_ID" + id;
 			id++;
@@ -36,6 +40,7 @@ public class ExecuteServiceByAgentTask implements ITask
 			{
 				public void resultAvailable(Object source, Object result)
 				{
+					workflowLogger.info(context.getActivity().getName() + "[" + context.getParameterValue("serviceType") + "]" + " end");
 					listener.resultAvailable(ExecuteServiceByAgentTask.this, result);
 				}
 
@@ -50,7 +55,7 @@ public class ExecuteServiceByAgentTask implements ITask
 			args.put("workflow", instance.getComponentIdentifier());
 
 			cms.createComponent(name, model, new CreationInfo(null, args, instance.getComponentIdentifier()), lis);
-			
+
 		} catch (Exception e)
 		{
 			System.out.println("ExecuteServiceByAgentTask");

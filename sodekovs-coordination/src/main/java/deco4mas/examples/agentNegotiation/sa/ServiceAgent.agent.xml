@@ -14,7 +14,8 @@
 		<import>jadex.bdi.planlib.protocols.*</import>
 		<import>jadex.adapter.base.contextservice.*</import>
 		<import>jadex.adapter.base.appdescriptor.*</import>
-		<import>jadex.application.space.envsupport.environment.space2d.*</import>
+		<import>jadex.application.space.envsupport.environment.space2d.*
+		</import>
 		<import>jadex.application.space.envsupport.environment.*</import>
 		<import>jadex.application.space.envsupport.math.*</import>
 		<import>jadex.application.runtime.*</import>
@@ -28,10 +29,15 @@
 	<capabilities>
 		<capability name="reqcap"
 			file="jadex.bdi.planlib.protocols.request.Request" />
-<!--			<capability name="ping" file="deco4mas.examples.agentNegotiation.sma.ping.Ping"/>-->
+		<!--
+			<capability name="ping"
+			file="deco4mas.examples.agentNegotiation.sma.ping.Ping"/>
+		-->
 	</capabilities>
 
 	<beliefs>
+		<beliefset name="contracts" class="ServiceOffer">
+		</beliefset>
 		<belief name="env" class="CoordinationSpace">
 			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")
 			</fact>
@@ -42,10 +48,19 @@
 			</fact>
 		</belief>
 
+<!--		<belief name="startTime" class="Long">-->
+<!--			<fact>$scope.getClock().getStarttime()</fact>-->
+<!--		</belief>-->
+
+
 		<belief name="providedService" class="ServiceType" exported="true"></belief>
 		<belief name="agentType" class="AgentType" exported="true" />
-		
+
 		<belief name="blackout" class="boolean">
+			<fact>false</fact>
+		</belief>
+
+		<belief name="signed" class="boolean">
 			<fact>false</fact>
 		</belief>
 	</beliefs>
@@ -54,6 +69,9 @@
 		<!-- Deco -->
 		<achievegoal name="offer">
 			<parameter name="offer" class="ServiceOffer"></parameter>
+		</achievegoal>
+		<achievegoal name="reward">
+			<parameter name="reward" class="Reward"></parameter>
 		</achievegoal>
 	</goals>
 
@@ -85,6 +103,22 @@
 			</trigger>
 		</plan>
 
+		<plan name="rewardReceive">
+			<body class="ProposalRewardPlan"></body>
+			<trigger>
+				<goal ref="reward"></goal>
+			</trigger>
+			<!--			<precondition>!$beliefbase.blackout</precondition>-->
+		</plan>
+
+		<plan name="signEnd">
+			<body class="SignEndPlan"></body>
+			<trigger>
+				<messageevent ref="signEnd">
+				</messageevent>
+			</trigger>
+		</plan>
+
 		<!-- deco proposal -->
 		<plan name="deliverProposal">
 			<body class="DeliverProposalPlan"></body>
@@ -92,6 +126,7 @@
 				<goal ref="offer"></goal>
 			</trigger>
 			<precondition>!$beliefbase.blackout</precondition>
+			<precondition>!$beliefbase.signed</precondition>
 		</plan>
 
 		<!-- blackout -->
@@ -106,6 +141,15 @@
 			<parameter name="task" class="String"></parameter>
 			<parameter name="proposal" class="ServiceProposal"></parameter>
 		</internalevent>
+		<internalevent name="rewardReply">
+			<parameter name="reward" class="Reward"></parameter>
+			<parameter name="task" class="String"></parameter>
+		</internalevent>
+		<messageevent name="signEnd" type="fipa" direction="receive">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+		</messageevent>
 	</events>
 
 	<configurations>

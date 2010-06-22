@@ -4,7 +4,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OLlEYSpFEd-sHNUsLb1C_w" key="Description" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_OLu1YCpFEd-sHNUsLb1C_w" key="Package" value=""/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VJnd4C7BEd-Gmq9Ka500yQ" key="imports" value="jadex.*␟jadex.bridge.*␟java.util.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_514xgC7BEd-Gmq9Ka500yQ" key="arguments" value="provider␋true␋false␋&quot;provider&quot;␋IComponentIdentifier␋&quot;none&quot;␟smas␋true␋false␋&quot;Smas&quot;␋Map␋&quot;none&quot;"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_514xgC7BEd-Gmq9Ka500yQ" key="arguments" value="provider␋true␋false␋&quot;provider&quot;␋IComponentIdentifier␋␟smas␋true␋false␋&quot;Smas&quot;␋Map␋"/>
   </eAnnotations>
   <pools xmi:type="bpmn:Pool" xmi:id="_NmezQSpFEd-sHNUsLb1C_w" iD="_NmezQCpFEd-sHNUsLb1C_w" name="Pool">
     <vertices xmi:type="bpmn:Activity" xmi:id="_POMX8SpFEd-sHNUsLb1C_w" iD="_POMX8CpFEd-sHNUsLb1C_w" outgoingEdges="_A6tLaC7_Ed-L-IF5Nky85A" activityType="EventStartEmpty"/>

@@ -4,18 +4,15 @@ import jadex.bridge.IComponentIdentifier;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
-import deco4mas.examples.agentNegotiation.ServiceType;
-import deco4mas.examples.agentNegotiation.deco.RequestInformation;
 import deco4mas.examples.agentNegotiation.deco.ServiceProposal;
+import deco4mas.examples.agentNegotiation.deco.ServiceType;
 import deco4mas.examples.agentNegotiation.sma.strategy.ISelectionStrategy;
 import deco4mas.examples.agentNegotiation.sma.strategy.IUtilityFunction;
-import deco4mas.examples.agentNegotiation.sma.strategy.SimpleSelectionStrategy;
 import deco4mas.examples.agentNegotiation.sma.strategy.WeightFactorUtilityFunction;
 
 public class AgentNegotiation
 {
-	/** Agent Negotiation phase*/
+	/** Agent Negotiation phase */
 	public static String EXPLORATORY_PHASE = "exploratory phase";
 	public static String INTERMEDIATE_PHASE = "intermediate phase";
 	public static String FINAL_PHASE = "final phase";
@@ -27,12 +24,13 @@ public class AgentNegotiation
 	private Long deadline;
 	private IUtilityFunction utilityFunction;
 	private ISelectionStrategy selector;
-	
+
 	private Long phaseEnd = Long.MAX_VALUE;
 	private Set<ServiceProposal> proposals = new HashSet<ServiceProposal>();
 	private IComponentIdentifier selected = null;
 
-	public AgentNegotiation(int id, IComponentIdentifier owner, ServiceType serviceType, IUtilityFunction utilityFunction, ISelectionStrategy selector, Long deadline)
+	public AgentNegotiation(int id, IComponentIdentifier owner, ServiceType serviceType, IUtilityFunction utilityFunction,
+		ISelectionStrategy selector, Long deadline)
 	{
 		this.owner = owner;
 		this.id = id;
@@ -42,17 +40,31 @@ public class AgentNegotiation
 		this.deadline = deadline;
 	}
 
+	public Long getDeadline()
+	{
+		return deadline;
+	}
+
 	public void addProposal(ServiceProposal proposal)
 	{
 		proposals.add(proposal);
 	}
 
-	public Boolean evaluateRound()
+	public Boolean evaluateRound(Long thetime)
 	{
-		SortedMap<Double, IComponentIdentifier> orderedProposal = utilityFunction.benchmarkProposals(proposals);
+		SortedMap<Double, IComponentIdentifier> orderedProposal = utilityFunction.benchmarkProposals(proposals, thetime);
 		selected = selector.selectProposal(orderedProposal);
+		// Hack!
+		for (ServiceProposal pro : proposals)
+		{
+			if (pro.getOwner().equals(selected))
+			{
+				((WeightFactorUtilityFunction) utilityFunction).logWinner(pro, thetime);
+			}
+		}
 		Boolean nextRound = false;
-		if (selected == null) nextRound = true;
+		if (selected == null)
+			nextRound = true;
 		return nextRound;
 	}
 
@@ -83,6 +95,7 @@ public class AgentNegotiation
 		if (state.equals(INTERMEDIATE_PHASE))
 		{
 			proposals = new HashSet<ServiceProposal>();
+			selected = null;
 		}
 	}
 
@@ -95,10 +108,5 @@ public class AgentNegotiation
 	{
 		return selected;
 
-	}
-
-	public long getDeadline()
-	{
-		return deadline;
 	}
 }

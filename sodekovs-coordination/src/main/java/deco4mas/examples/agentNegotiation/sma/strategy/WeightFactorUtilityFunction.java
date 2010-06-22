@@ -6,41 +6,63 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.logging.Logger;
 import deco4mas.examples.agentNegotiation.deco.ServiceProposal;
+import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
+import deco4mas.examples.agentNegotiation.evaluate.ParameterLogger;
+import deco4mas.examples.agentNegotiation.evaluate.ValueLogger;
+import deco4mas.examples.agentNegotiation.sma.ServiceAgentHistory;
 
 public class WeightFactorUtilityFunction implements IUtilityFunction
 {
+	Logger utilLogger = AgentLogger.getTimeEvent("UtilityOutcome");
+	final ParameterLogger utilSaLogger;
+
 	Map<String, Map<String, Double>> factorMap = new HashMap<String, Map<String, Double>>();
 
-	private ITrustFunction trustFunction;
-	
-	// just for testing
-	private String sysout;
+	public ITrustFunction trustFunction;
+	private IComponentIdentifier owner;
 
-	public WeightFactorUtilityFunction(ITrustFunction trustFunction)
+	// just for testing
+	private String statUtility;
+
+	public WeightFactorUtilityFunction(IComponentIdentifier owner, ITrustFunction trustFunction)
 	{
+		this.owner = owner;
 		this.trustFunction = trustFunction;
+		utilSaLogger = (ParameterLogger)AgentLogger.getTimeDiffEventForSa("Utility_"
+			+ owner.getLocalName().substring(0, owner.getLocalName().indexOf("(")));
 	}
 
 	/**
 	 * Evaluate
 	 */
-	public SortedMap<Double, IComponentIdentifier> benchmarkProposals(Set<ServiceProposal> participants)
+	public synchronized SortedMap<Double, IComponentIdentifier> benchmarkProposals(Set<ServiceProposal> participants, Long thetime)
 	{
 		SortedMap<Double, IComponentIdentifier> ordered = new TreeMap<Double, IComponentIdentifier>();
-		for (ServiceProposal serviceProposal : participants)
+		if (!participants.isEmpty())
 		{
-			Map<String, Double> bid = new HashMap<String, Double>();
-			bid.put("cost", serviceProposal.getBid().getBidFactor("cost"));
-			bid.put("duration", serviceProposal.getBid().getBidFactor("duration"));
-			bid.put("trust", trustFunction.getTrust(serviceProposal.getOwner()));
-			sysout = "-> " + serviceProposal.getOwner().getName() + " Score: ";
-			ordered.put(evaluate(bid), serviceProposal.getOwner());
+			for (ServiceProposal serviceProposal : participants)
+			{
+				Map<String, Double> bid = new HashMap<String, Double>();
+				bid.put("cost", serviceProposal.getBid().getBidFactor("cost"));
+				bid.put("duration", serviceProposal.getBid().getBidFactor("duration"));
+				bid.put("trust", trustFunction.getTrust(serviceProposal.getOwner(), thetime));
+				statUtility = "-> " + serviceProposal.getOwner().getName() + " Score: ";
+				Double utility = evaluate(bid);
+				ordered.put(utility, serviceProposal.getOwner());
+				
+				Object[] param = new Object[3];
+				param[0] = ((HistorytimeTrustFunction)trustFunction).getHistory().getStartTime();
+				param[1] = thetime;
+				param[2] = serviceProposal.getOwner();
+				utilSaLogger.gnuInfo(param, utility.toString());
+			}
 		}
 		return ordered;
 	}
 
-	public Double evaluate(Map<String, Double> evaluateVector)
+	public synchronized Double evaluate(Map<String, Double> evaluateVector)
 	{
 		Double utility = 0.0;
 		for (Map.Entry<String, Double> entry : evaluateVector.entrySet())
@@ -51,14 +73,14 @@ public class WeightFactorUtilityFunction implements IUtilityFunction
 				{
 					Map<String, Double> valueMap = factorMap.get(entry.getKey());
 
-					double value = valueMap.get("multi") * entry.getValue() + valueMap.get("add");
+					double value = (valueMap.get("multi") * entry.getValue() + valueMap.get("add"))*100;
 					if (valueMap.get("more") == 0.0)
 					{
-						value = 1.0 - value;
+						value = 100.0 - value;
 					}
 					Double weightValue = value * valueMap.get("weight");
 					utility += weightValue;
-					sysout = sysout.concat(entry.getKey() + " "+ weightValue + "(" + value + ") ");
+					statUtility = statUtility.concat(entry.getKey() + " " + weightValue + "(" + value + ") ");
 				} catch (Exception e)
 				{
 					e.printStackTrace();
@@ -70,8 +92,10 @@ public class WeightFactorUtilityFunction implements IUtilityFunction
 				System.out.println("Factor not known");
 			}
 		}
-		sysout = sysout.concat("utility " + utility);
-		System.out.println(sysout);
+		statUtility = statUtility.concat("utility " + utility);
+		System.out.println(statUtility);
+		utilLogger.info(statUtility);
+		
 		return utility;
 	}
 
@@ -100,5 +124,50 @@ public class WeightFactorUtilityFunction implements IUtilityFunction
 		}
 		return valueMap;
 	}
+
+	public IComponentIdentifier getOwner()
+	{
+		return owner;
+	}
+
+	//HACK!
+	public void logWinner(ServiceProposal pro, Long thetime)
+	{
+		Map<String, Double> bid = new HashMap<String, Double>();
+		bid.put("cost", pro.getBid().getBidFactor("cost"));
+		bid.put("duration", pro.getBid().getBidFactor("duration"));
+		bid.put("trust", trustFunction.getTrust(pro.getOwner(), thetime));
+		log(bid);
+		
+	}
+	public synchronized void log(Map<String, Double> evaluateVector)
+	{
+		Double utility = 0.0;
+		for (Map.Entry<String, Double> entry : evaluateVector.entrySet())
+		{
+			if (factorMap.containsKey(entry.getKey()))
+			{
+				try
+				{
+					Map<String, Double> valueMap = factorMap.get(entry.getKey());
+
+					double value = (valueMap.get("multi") * entry.getValue() + valueMap.get("add"))*100;
+					if (valueMap.get("more") == 0.0)
+					{
+						value = 100.0 - value;
+					}
+					Double weightValue = value * valueMap.get("weight");
+					utility += weightValue;
+					ValueLogger.addValue(entry.getKey(), weightValue);
+				} catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+
+			}
+		}
+		ValueLogger.addValue("Utility", utility);
+	}
+
 
 }

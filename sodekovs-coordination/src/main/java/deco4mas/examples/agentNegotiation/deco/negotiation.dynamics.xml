@@ -8,6 +8,7 @@
 					<elements>
 						<element id="assignSa" type="INTERNAL_EVENT" />
 						<element id="assignSaReply" type="INTERNAL_EVENT" />
+						<element id="reward" type="INTERNAL_EVENT" />
 					</elements>
 				</agent>
 			</role_occupation>
@@ -16,6 +17,7 @@
 					<elements>
 						<element id="makeProposal" type="INTERNAL_EVENT" />
 						<element id="offer" type="BDI_GOAL" />
+						<element id="reward" type="BDI_GOAL" />
 					</elements>
 				</agent>
 			</role_occupation>
@@ -55,6 +57,13 @@
 							<mapping class="ServiceProposal" ref="proposal" name="proposal" />
 						</parameter_mappings>
 					</agent_element>
+					<agent_element element="rewardReply" agent_id="ServiceAgent"
+						type="INTERNAL_EVENT">
+						<parameter_mappings>
+							<mapping class="String" ref="task" name="task" />
+							<mapping class="Reward" ref="reward" name="reward" />
+						</parameter_mappings>
+					</agent_element>
 				</from>
 				<mechanism_configuration mechanism_id="neg"
 					agent_type="JADEX">
@@ -70,6 +79,13 @@
 						type="BDI_GOAL">
 						<parameter_mappings>
 							<mapping class="ServiceOffer" ref="offer" name="offer">
+							</mapping>
+						</parameter_mappings>
+					</agent_element>
+					<agent_element element="reward" agent_id="ServiceAgent"
+						type="BDI_GOAL">
+						<parameter_mappings>
+							<mapping class="Reward" ref="reward" name="reward">
 							</mapping>
 						</parameter_mappings>
 					</agent_element>

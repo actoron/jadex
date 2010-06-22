@@ -9,11 +9,11 @@ public class SimpleSelectionStrategy implements ISelectionStrategy
 	public IComponentIdentifier selectProposal(SortedMap<Double, IComponentIdentifier> orderedProposal)
 	{
 		IComponentIdentifier selected = null;
-		
-		//just select the best
+
+		// just select the best
 		if (!orderedProposal.isEmpty())
 		{
-			selected = orderedProposal.get(orderedProposal.firstKey());
+			selected = orderedProposal.get(orderedProposal.lastKey());
 		}
 		return selected;
 	}

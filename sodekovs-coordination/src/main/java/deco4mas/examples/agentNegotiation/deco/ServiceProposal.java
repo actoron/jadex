@@ -1,6 +1,5 @@
 package deco4mas.examples.agentNegotiation.deco;
 
-import deco4mas.examples.agentNegotiation.ServiceType;
 import jadex.bridge.IComponentIdentifier;
 
 public class ServiceProposal

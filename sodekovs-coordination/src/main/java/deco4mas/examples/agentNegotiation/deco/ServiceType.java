@@ -1,4 +1,4 @@
-package deco4mas.examples.agentNegotiation;
+package deco4mas.examples.agentNegotiation.deco;
 
 public class ServiceType
 {
@@ -22,6 +22,17 @@ public class ServiceType
 		this.medCost = medCost;
 		this.maxDuration = maxDuration;
 		this.minDuration = minDuration;
+		this.medDuration = medDuration;
+	}
+
+	public ServiceType(String name, Double medCost, Double medDuration)
+	{
+		this.name = name;
+		this.maxCost = 1.5 * medCost;
+		this.minCost = 0.5 * medCost;
+		this.medCost = medCost;
+		this.maxDuration = 1.5 * medDuration;
+		this.minDuration = 0.5 * medDuration;
 		this.medDuration = medDuration;
 	}
 

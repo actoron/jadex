@@ -10,6 +10,7 @@
 
 	<imports>
 		<import>deco4mas.examples.agentNegotiation.*</import>
+		<import>deco4mas.examples.agentNegotiation.deco.*</import>
 		<import>deco4mas.examples.agentNegotiation.sa.*</import>
 	</imports>
 
