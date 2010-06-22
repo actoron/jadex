@@ -1,28 +1,58 @@
 package jadex.bdi.runtime.impl.eaflyweights;
 
 import jadex.bdi.runtime.IAgentListener;
+import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IEABeliefbase;
 import jadex.bdi.runtime.IEACapability;
+import jadex.bdi.runtime.IEAEventbase;
+import jadex.bdi.runtime.IEAExpressionbase;
+import jadex.bdi.runtime.IEAGoalbase;
+import jadex.bdi.runtime.IEAPlanbase;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentAdapter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.rules.state.IOAVState;
 import jadex.service.clock.IClockService;
 
+import java.util.logging.Logger;
+
 /**
  *  Flyweight for a capability.
  */
-public class EACapabilityFlyweight extends ElementFlyweight implements IEACapability
+public abstract class EACapabilityFlyweight extends ElementFlyweight implements IEACapability
 {
-//-------- attributes --------
+	//-------- attributes --------
 	
 	/** The agent handle. */
 	protected Object agent;
 	
 	/** The agent adapter. */
 	protected IComponentAdapter adapter;
+	
+	/** The belief base. */
+	protected IEABeliefbase	beliefbase;
+	
+	/** The goal base. */
+	protected IEAGoalbase	goalbase;
+	
+	/** The plan base. */
+	protected IEAPlanbase	planbase;
+	
+	/** The event base. */
+	protected IEAEventbase	eventbase;
+	
+	/** The expression base. */
+	protected IEAExpressionbase	expressionbase;
+	
+	/** The logger. */
+	protected Logger	logger;
+	
+	/** The component identifier. */
+	protected IComponentIdentifier	cid;
 	
 	//-------- constructors --------
 	
@@ -38,6 +68,13 @@ public class EACapabilityFlyweight extends ElementFlyweight implements IEACapabi
 		super(state, scope, scope);
 		this.agent = getInterpreter().getAgent();
 		this.adapter = getInterpreter().getAgentAdapter();
+		this.beliefbase	= EABeliefbaseFlyweight.getBeliefbaseFlyweight(getState(), getScope());
+		this.goalbase	= EAGoalbaseFlyweight.getGoalbaseFlyweight(getState(), getScope());
+		this.planbase	= EAPlanbaseFlyweight.getPlanbaseFlyweight(getState(), getScope());
+		this.eventbase	= EAEventbaseFlyweight.getEventbaseFlyweight(getState(), getScope());
+		this.expressionbase	= EAExpressionbaseFlyweight.getExpressionbaseFlyweight(getState(), getScope());
+		this.logger	= BDIInterpreter.getInterpreter(getState()).getLogger(getScope());
+		this.cid	= adapter.getComponentIdentifier();
 	}
 	
 	//-------- methods concerning beliefs --------
@@ -46,26 +83,9 @@ public class EACapabilityFlyweight extends ElementFlyweight implements IEACapabi
 	 *  Get the scope.
 	 *  @return The scope.
 	 */
-	public IFuture getExternalAccess()
+	public IBDIExternalAccess	getExternalAccess()
 	{
-		final Future ret = new Future();
-		
-		if(getInterpreter().isExternalThread())
-		{
-			adapter.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					ret.setResult(new ExternalAccessFlyweight(getState(), getScope()));
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(new ExternalAccessFlyweight(getState(), getScope()));
-		}
-		
-		return ret;
+		return (IBDIExternalAccess)this;
 	}
 
 	/**
@@ -98,226 +118,63 @@ public class EACapabilityFlyweight extends ElementFlyweight implements IEACapabi
 	 *  Get the belief base.
 	 *  @return The belief base.
 	 */
-	public IFuture getBeliefbase()
+	public IEABeliefbase	getBeliefbase()
 	{
-		final Future ret = new Future();
-		
-		if(getInterpreter().isExternalThread())
-		{
-			adapter.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					ret.setResult(EABeliefbaseFlyweight.getBeliefbaseFlyweight(getState(), getScope()));
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(EABeliefbaseFlyweight.getBeliefbaseFlyweight(getState(), getScope()));
-		}
-		
-		return ret;
+		return beliefbase;
 	}
 
 	/**
 	 *  Get the goal base.
 	 *  @return The goal base.
 	 */
-	public IFuture getGoalbase()
+	public IEAGoalbase getGoalbase()
 	{
-		final Future ret = new Future();
-		
-		if(getInterpreter().isExternalThread())
-		{
-			adapter.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					ret.setResult(EAGoalbaseFlyweight.getGoalbaseFlyweight(getState(), getScope()));
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(EAGoalbaseFlyweight.getGoalbaseFlyweight(getState(), getScope()));
-		}
-		
-		return ret;
+		return goalbase;
 	}
 
 	/**
 	 *  Get the plan base.
 	 *  @return The plan base.
 	 */
-	public IFuture getPlanbase()
+	public IEAPlanbase	getPlanbase()
 	{
-		final Future ret = new Future();
-		
-		if(getInterpreter().isExternalThread())
-		{
-			adapter.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					ret.setResult(EAPlanbaseFlyweight.getPlanbaseFlyweight(getState(), getScope()));
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(EAPlanbaseFlyweight.getPlanbaseFlyweight(getState(), getScope()));
-		}
-		
-		return ret;
+		return planbase;
 	}
 
 	/**
 	 *  Get the event base.
 	 *  @return The event base.
 	 */
-	public IFuture getEventbase()
+	public IEAEventbase	getEventbase()
 	{
-		final Future ret = new Future();
-		
-		if(getInterpreter().isExternalThread())
-		{
-			adapter.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					ret.setResult(EAEventbaseFlyweight.getEventbaseFlyweight(getState(), getScope()));
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(EAEventbaseFlyweight.getEventbaseFlyweight(getState(), getScope()));
-		}
-		
-		return ret;
+		return eventbase;
 	}
 
 	/**
 	 * Get the expression base.
 	 * @return The expression base.
 	 */
-	public IFuture getExpressionbase()
+	public IEAExpressionbase getExpressionbase()
 	{
-		final Future ret = new Future();
-		
-		if(getInterpreter().isExternalThread())
-		{
-			adapter.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					ret.setResult(EAExpressionbaseFlyweight.getExpressionbaseFlyweight(getState(), getScope()));
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(EAExpressionbaseFlyweight.getExpressionbaseFlyweight(getState(), getScope()));
-		}
-		
-		return ret;
+		return expressionbase;
 	}
-
-	/**
-	 *  Get the property base.
-	 *  @return The property base.
-	 */
-	public IFuture getPropertybase()
-	{
-		final Future ret = new Future();
-		
-		if(getInterpreter().isExternalThread())
-		{
-			adapter.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					ret.setResult(EAPropertybaseFlyweight.getPropertybaseFlyweight(getState(), getScope()));
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(EAPropertybaseFlyweight.getPropertybaseFlyweight(getState(), getScope()));
-		}
-		
-		return ret;
-	}
-
-	/**
-	 *  Register a subcapability.
-	 *  @param subcap	The subcapability.
-	 * /
-	public void	registerSubcapability(IMCapabilityReference subcap)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 *  Deregister a subcapability.
-	 *  @param subcap	The subcapability.
-	 * /
-	public void	deregisterSubcapability(IMCapabilityReference subcap)
-	{
-		throw new UnsupportedOperationException();
-	}*/
 
 	/**
 	 *  Get the logger.
 	 *  @return The logger.
 	 */
-	public IFuture getLogger()
+	public Logger getLogger()
 	{
-		final Future ret = new Future();
-		
-		if(getInterpreter().isExternalThread())
-		{
-			adapter.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					ret.setResult(BDIInterpreter.getInterpreter(getState()).getLogger(getScope()));
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(BDIInterpreter.getInterpreter(getState()).getLogger(getScope()));
-		}
-		
-		return ret;
+		return logger;
 	}
 
 	/**
-	 * Get the agent name.
-	 * @return The agent name.
+	 * Get the component name.
+	 * @return The component name.
 	 */
-	public IFuture getAgentName()
+	public String	getComponentName()
 	{
-		final Future ret = new Future();
-		
-		if(getInterpreter().isExternalThread())
-		{
-			adapter.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					ret.setResult(adapter.getComponentIdentifier().getLocalName());
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(adapter.getComponentIdentifier().getLocalName());
-		}
-		
-		return ret;
+		return getComponentIdentifier().getLocalName();
 	}
 
 	/**
@@ -352,26 +209,9 @@ public class EACapabilityFlyweight extends ElementFlyweight implements IEACapabi
 	 * Get the agent identifier.
 	 * @return The agent identifier.
 	 */
-	public IFuture getComponentIdentifier()
+	public IComponentIdentifier	getComponentIdentifier()
 	{
-		final Future ret = new Future();
-		
-		if(getInterpreter().isExternalThread())
-		{
-			adapter.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					ret.setResult(adapter.getComponentIdentifier());
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(adapter.getComponentIdentifier());
-		}
-		
-		return ret;
+		return cid;
 	}
 	
 	/**
@@ -563,43 +403,6 @@ public class EACapabilityFlyweight extends ElementFlyweight implements IEACapabi
 		}
 	}
 	
-//	/**
-//	 *  Get the application context.
-//	 *  @return The application context (or null).
-//	 */
-//	public IApplicationContext getApplicationContext()
-//	{
-//		if(getInterpreter().isExternalThread())
-//		{
-//			AgentInvocation invoc = new AgentInvocation()
-//			{
-//				public void run()
-//				{
-//					IContextService cs = (IContextService)adapter.getServiceContainer().getService(IContextService.class);
-//					if(cs!=null)
-//					{
-//						IContext[] tmp = cs.getContexts(getComponentIdentifier(), IApplicationContext.class);
-//						if(tmp!=null && tmp.length==1)
-//							object = tmp[0];
-//					}
-//				}
-//			};
-//			return (IApplicationContext)invoc.object;
-//		}
-//		else
-//		{
-//			IApplicationContext ret = null;
-//			IContextService cs = (IContextService)adapter.getServiceContainer().getService(IContextService.class);
-//			if(cs!=null)
-//			{
-//				IContext[] tmp = cs.getContexts(getComponentIdentifier(), IApplicationContext.class);
-//				if(tmp!=null && tmp.length==1)
-//					ret = (IApplicationContext)tmp[0];
-//			}
-//			return ret;
-//		}
-//	}
-	
 	//-------- element methods --------
 	
 	/**
@@ -610,29 +413,4 @@ public class EACapabilityFlyweight extends ElementFlyweight implements IEACapabi
 	{
 		return adapter;
 	}
-	
-	/**
-	 *  Get the model element.
-	 *  @return The model element.
-	 * /
-	public IMElement getModelElement()
-	{
-		if(getInterpreter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
-					object = new MCapabilityFlyweight(getState(), mscope);
-				}
-			};
-			return (IMElement)invoc.object;
-		}
-		else
-		{
-			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
-			return new MCapabilityFlyweight(getState(), mscope);
-		}
-	}*/
 }

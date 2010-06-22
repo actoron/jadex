@@ -40,7 +40,7 @@ public class CleanerGui	extends JFrame
 	 */
 	public CleanerGui(final IBDIExternalAccess agent)
 	{
-		super(agent.getAgentName());
+		super(agent.getComponentName());
 		final JPanel map = new JPanel()
 		{
 			protected IExpression	query_max_quantity;
@@ -131,7 +131,7 @@ public class CleanerGui	extends JFrame
 					g.fillOval(p.x-w, p.y-h, w*2, h*2);
 					g.setColor(Color.black);	// Agent
 					g.fillOval(p.x-3, p.y-3, 7, 7);
-					g.drawString(agent.getAgentName(),
+					g.drawString(agent.getComponentName(),
 						p.x+5, p.y-5);
 					g.drawString("battery: " + (int)(charge*100.0) + "%",
 						p.x+5, p.y+5);

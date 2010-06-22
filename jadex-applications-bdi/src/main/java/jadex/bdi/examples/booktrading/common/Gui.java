@@ -151,7 +151,7 @@ public class Gui extends JFrame
 	 */
 	public Gui(final IBDIExternalAccess agent, final boolean buy)
 	{
-		super((buy? "Buyer: ": "Seller: ")+agent.getAgentName());
+		super((buy? "Buyer: ": "Seller: ")+agent.getComponentName());
 		this.agent = agent;
 		
 		if(buy)

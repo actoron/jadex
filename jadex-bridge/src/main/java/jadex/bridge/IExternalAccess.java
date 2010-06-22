@@ -20,8 +20,7 @@ public interface IExternalAccess extends IServiceProvider
 	 *  Get the id of the component.
 	 *  @return	The component id.
 	 */
-//	public IComponentIdentifier	getComponentIdentifier();
-	public IFuture getComponentIdentifier();
+	public IComponentIdentifier	getComponentIdentifier();
 	
 	/**
 	 *  Get the parent (if any).

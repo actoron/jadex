@@ -1,6 +1,9 @@
 package jadex.bdi.runtime;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.IFuture;
+
+import java.util.logging.Logger;
 
 /**
  *  A capability is a self-contained agent module
@@ -12,7 +15,7 @@ public interface IEACapability extends IEAElement
 	 *  Get the scope.
 	 *  @return The scope.
 	 */
-	public IFuture getExternalAccess();
+	public IBDIExternalAccess	getExternalAccess();
 
 	/**
 	 *  Get the parent (if any).
@@ -24,61 +27,43 @@ public interface IEACapability extends IEAElement
 	 *  Get the belief base.
 	 *  @return The belief base.
 	 */
-	public IFuture getBeliefbase();
+	public IEABeliefbase	getBeliefbase();
 
 	/**
 	 *  Get the goal base.
 	 *  @return The goal base.
 	 */
-	public IFuture getGoalbase();
+	public IEAGoalbase	getGoalbase();
 
 	/**
 	 *  Get the plan base.
 	 *  @return The plan base.
 	 */
-	public IFuture getPlanbase();
+	public IEAPlanbase	getPlanbase();
 
 	/**
 	 *  Get the event base.
 	 *  @return The event base.
 	 */
-	public IFuture getEventbase();
+	public IEAEventbase	getEventbase();
 
 	/**
 	 * Get the expression base.
 	 * @return The expression base.
 	 */
-	public IFuture getExpressionbase();
-
-	/**
-	 * Get the property base.
-	 * @return The property base.
-	 */
-//		public IPropertybase getPropertybase();
-
-	/**
-	 *  Register a subcapability.
-	 *  @param subcap	The subcapability.
-	 * /
-	public void	registerSubcapability(IMCapabilityReference subcap);
-
-	/**
-	 *  Deregister a subcapability.
-	 *  @param subcap	The subcapability.
-	 * /
-	public void	deregisterSubcapability(IMCapabilityReference subcap);*/
+	public IEAExpressionbase	getExpressionbase();
 
 	/**
 	 *  Get the logger.
 	 *  @return The logger.
 	 */
-	public IFuture getLogger();
+	public Logger	getLogger();
 
 	/**
 	 * Get the agent name.
 	 * @return The agent name.
 	 */
-	public IFuture getAgentName();
+	public String	getComponentName();
 
 	/**
 	 * Get the configuration name.
@@ -90,7 +75,7 @@ public interface IEACapability extends IEAElement
 	 * Get the agent identifier.
 	 * @return The agent identifier.
 	 */
-	public IFuture getComponentIdentifier();
+	public IComponentIdentifier	getComponentIdentifier();
 
 	/**
 	 *  Get the platform specific agent object.
@@ -127,16 +112,9 @@ public interface IEACapability extends IEAElement
 	 */
 	public void killAgent();
 	
-//		/**
-//		 *  Get the application context.
-//		 *  @return The application context (or null).
-//		 */
-//		public IApplicationContext getApplicationContext();
-
 	/**
 	 *  Add an agent listener
 	 *  @param listener The listener.
-	 *  @param async True, if the notification should be done on a separate thread.
 	 */
 	public void addAgentListener(IAgentListener listener);
 	

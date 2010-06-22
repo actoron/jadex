@@ -80,7 +80,7 @@ public class BlocksworldGui	extends JFrame
 		{
 		}
 		
-		setTitle(agent.getAgentName());
+		setTitle(agent.getComponentName());
 		
 		Block[]	blocks	= (Block[])agent.getBeliefbase().getBeliefSet("blocks").getFacts();
 

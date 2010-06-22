@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 /**
  *  The adapter for a specific platform component (e.g. a JADE agent).
  *  These are the methods a kernel components needs to call on its host component.
+ *  Implementations of this interface should be thread safe.
  */
 public interface IComponentAdapter
 {
@@ -64,11 +65,5 @@ public interface IComponentAdapter
 	 *  @return The logger.
 	 */
 	public Logger getLogger();
-	
-//	/**
-//	 *  Get the subcomponents of this component.
-//	 *  @return The current subcomponents of this component.
-//	 */
-//	public IComponentIdentifier[]	getSubcomponents(); 
 }
 

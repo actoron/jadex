@@ -78,7 +78,7 @@ public class EnvironmentGui	extends JFrame
 	 */
 	public EnvironmentGui(final IBDIExternalAccess agent)
 	{
-		super(agent.getAgentName());
+		super(agent.getComponentName());
 
 		final Environment env = (Environment)agent.getBeliefbase().getBelief("environment").getFact();
 		//System.out.println("Now accessing env, GUIPlan: "+env.hashCode());
