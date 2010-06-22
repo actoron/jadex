@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import test.GetPropertyThread;
 import deco.lang.dynamics.MASDynamics;
@@ -35,7 +36,7 @@ public class CoordinationSpace extends Grid2D {
 	public ArrayList<ICoordinationMechanism> activeCoordinationMechanisms = new ArrayList<ICoordinationMechanism>();
 	private MASDynamics masDnyModel = null;
 	// Contains the "RoleDefinitionsForPerceive" for each agent type.
-	private Map<String, Map<String, Object[]>> agentData = new HashMap<String, Map<String, Object[]>>();
+	private Map<String, Map<String, Set<Object[]>>> agentData = new HashMap<String, Map<String, Set<Object[]>>>();
 
 	// private ArrayList<IAgentIdentifier> agentIdentifierList = new ArrayList<IAgentIdentifier>();
 
@@ -280,7 +281,7 @@ public class CoordinationSpace extends Grid2D {
 	/**
 	 * @return the agentData
 	 */
-	public Map<String, Map<String, Object[]>> getAgentData() {
+	public Map<String, Map<String, Set<Object[]>>> getAgentData() {
 		return agentData;
 	}
 }

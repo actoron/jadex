@@ -22,7 +22,9 @@ import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import deco.lang.dynamics.AgentElementType;
 import deco.lang.dynamics.mechanism.AgentElement;
 import deco4mas.annotation.agent.ParameterMapping;
@@ -181,7 +183,7 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 										// applicablePerceiveRoles =
 										// (Map<String, Object[]>)
 										// decom4MasMap.get(Constants.ROLE_DEFINITIONS_FOR_PERCEIVE);
-										Map<String, Map<String, Object[]>> applicableAgentTypes = (Map<String, Map<String, Object[]>>) coordinationSpaceObj
+										Map<String, Map<String, Set<Object[]>>> applicableAgentTypes = (Map<String, Map<String, Set<Object[]>>>) coordinationSpaceObj
 											.getProperty(Constants.ROLE_DEFINITIONS_FOR_PERCEIVE);
 										// coordInfo.addValue(Constants.VALUE,
 										// value);
@@ -196,7 +198,8 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 										// definition for this agentType
 										if (applicableAgentTypes.get(getAgentType(exta)) != null)
 										{
-											Map<String, Object[]> applicablePerceiveRoles = applicableAgentTypes.get(getAgentType(exta));
+											Map<String, Set<Object[]>> applicablePerceiveRoles = applicableAgentTypes
+												.get(getAgentType(exta));
 											String dcmName = (String) coordinationSpaceObj.getProperty(Constants.DML_REALIZATION_NAME);
 											// Check whether this percept should
 											// be processed by this agent, i.e.
@@ -205,265 +208,317 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 											// perceive-event?
 											if (applicablePerceiveRoles.get(dcmName) != null)
 											{
-												Object[] agentData = applicablePerceiveRoles.get(dcmName);
-												DecentralCoordinationInformation dci = (DecentralCoordinationInformation) agentData[0];
-												AgentElement ae = (AgentElement) agentData[1];
-												if (CheckRole.checkForPerceive(dci.getRef(), exta))
-												{ // check role
-													String elementType = ae.getAgentElementType();
-													String elementId = ae.getElement_id();
-													if ((coordinationSpaceObj.getProperty(CoordinationInfo.AGENT_ELEMENT_TYPE)).equals(elementType))
-													{
-														if (((String) coordinationSpaceObj.getProperty(CoordinationInfo.AGENT_ELEMENT_NAME))
-															.equals(elementId))
-														{
-															HashMap<String, Object> receivedParamDataMappings = (HashMap<String, Object>) coordinationSpaceObj
-																.getProperty(Constants.PARAMETER_DATA_MAPPING);
-
-															// TODO:
-															// ParameterMappings
-															// for PERCEIVE
-
-															// DecentralCoordinationInformation
-															// decentralCoordInfo
-															// =
-															// ((DecentralCoordinationInformation)
-															// decom4MasMap
-															// .get(Constants.DECENTRAL_COORDINATION_INFO_MAPPING));
-															//
-															if (elementType.equals(AgentElementType.BDI_BELIEFSET.toString()))
+												Set<Object[]> agentDataSet = applicablePerceiveRoles.get(dcmName);
+												Iterator<Object[]> agentDataIterator = agentDataSet.iterator();
+												while (agentDataIterator.hasNext())
+												{
+													Object[] agentData = agentDataIterator.next();
+													
+													DecentralCoordinationInformation dci = (DecentralCoordinationInformation) agentData[0];
+													AgentElement ae = (AgentElement) agentData[1];
+													if (CheckRole.checkForPerceive(dci.getRef(), exta))
+													{ // check role
+														String elementType = ae.getAgentElementType();
+														String elementId = ae.getElement_id();
+														if ((coordinationSpaceObj.getProperty(CoordinationInfo.AGENT_ELEMENT_TYPE))
+															.equals(elementType) || coordinationSpaceObj.getProperty(CoordinationInfo.AGENT_ELEMENT_TYPE) == null)
+														{ // when null, go for all!
+															if (((String) coordinationSpaceObj
+																.getProperty(CoordinationInfo.AGENT_ELEMENT_NAME)).equals(elementId) || coordinationSpaceObj.getProperty(CoordinationInfo.AGENT_ELEMENT_TYPE) == null)
 															{
-																// System.out.println("BDICoordInfInterpreter# RECEIVED BELIEF_SET TO MANIPULATE:  "
-																// + elementId +
-																// " for " +
-																// exta.getAgentName());
+																HashMap<String, Object> receivedParamDataMappings = (HashMap<String, Object>) coordinationSpaceObj
+																	.getProperty(Constants.PARAMETER_DATA_MAPPING);
 
-																// check
-																// direction
-																// (POSITIVE ->
-																// add fact to
-																// beliefset /
-																// NEGATIVE ->
-																// remove fact
-																// from
-																// beliefset)
-																if (dci.getCoordinationType().equals(CoordinationType.NEGATIVE))
-																{
+																// TODO:
+																// ParameterMappings
+																// for PERCEIVE
 
-																	// IBeliefSet
-																	// belset =
-																	// exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
-																	IBeliefSet belset = exta.getBeliefbase().getBeliefSet(elementId);
-																	Object[] facts = belset.getFacts();
-																	belset.removeFact(facts[facts.length - 1]); // remove
-																	// the
-																	// last
-																	// fact
-																	System.out
-																		.println("#BDICoordInfInterpreter# Removed last fact from BELIEF_SET: "
-																			+ elementId + " for " + exta.getAgentName());
-																} else
+																// DecentralCoordinationInformation
+																// decentralCoordInfo
+																// =
+																// ((DecentralCoordinationInformation)
+																// decom4MasMap
+																// .get(Constants.DECENTRAL_COORDINATION_INFO_MAPPING));
+																//
+																if (elementType.equals(AgentElementType.BDI_BELIEFSET.toString()))
 																{
-																	// TODO:
-																	// Distinguish
-																	// between
-																	// 'UPDATE
-																	// Values'
-																	// and 'ADD
-																	// Values'
-																	// System.out.println("#tmp# percept: "
+																	// System.out.println("BDICoordInfInterpreter# RECEIVED BELIEF_SET TO MANIPULATE:  "
 																	// +
-																	// percept);
-																	// IBeliefSet
-																	// belset =
-																	// exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
-																	IBeliefSet belset = exta.getBeliefbase().getBeliefSet(elementId);
-																	// belset.addFact(percept);
-																	belset.addFact(coordinationSpaceObj.getProperty(Constants.VALUE)
-																		.toString());
-																	System.out.println("#BDICoordInfInterpreter# Added "
-																		+ coordinationSpaceObj.getProperty(Constants.VALUE).toString()
-																		+ " to BELIEF_SET: " + elementId + " for " + exta.getAgentName());
-																}
-															} else if (elementType.equals(AgentElementType.BDI_BELIEF.toString()))
-															{
-																// System.out.println("BDICoordInfInterpreter# RECEIVED BELIEF TO MANIPULATE:  "
-																// +
-																// nameOfElement
-																// + " for " +
-																// exta.getAgentName());
+																	// elementId
+																	// +
+																	// " for " +
+																	// exta.getAgentName());
 
-																// check
-																// direction
-																// (POSITIVE ->
-																// add fact to
-																// belief /
-																// NEGATIVE ->
-																// remove fact
-																// from belief):
-																if (dci.getCoordinationType().equals(CoordinationType.NEGATIVE))
+																	// check
+																	// direction
+																	// (POSITIVE
+																	// ->
+																	// add fact
+																	// to
+																	// beliefset
+																	// /
+																	// NEGATIVE
+																	// ->
+																	// remove
+																	// fact
+																	// from
+																	// beliefset)
+																	if (dci.getCoordinationType().equals(CoordinationType.NEGATIVE))
+																	{
+
+																		// IBeliefSet
+																		// belset
+																		// =
+																		// exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
+																		IBeliefSet belset = exta.getBeliefbase().getBeliefSet(elementId);
+																		Object[] facts = belset.getFacts();
+																		belset.removeFact(facts[facts.length - 1]); // remove
+																		// the
+																		// last
+																		// fact
+																		System.out
+																			.println("#BDICoordInfInterpreter# Removed last fact from BELIEF_SET: "
+																				+ elementId + " for " + exta.getAgentName());
+																	} else
+																	{
+																		// TODO:
+																		// Distinguish
+																		// between
+																		// 'UPDATE
+																		// Values'
+																		// and
+																		// 'ADD
+																		// Values'
+																		// System.out.println("#tmp# percept: "
+																		// +
+																		// percept);
+																		// IBeliefSet
+																		// belset
+																		// =
+																		// exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
+																		IBeliefSet belset = exta.getBeliefbase().getBeliefSet(elementId);
+																		// belset.addFact(percept);
+																		belset.addFact(coordinationSpaceObj.getProperty(Constants.VALUE)
+																			.toString());
+																		System.out.println("#BDICoordInfInterpreter# Added "
+																			+ coordinationSpaceObj.getProperty(Constants.VALUE).toString()
+																			+ " to BELIEF_SET: " + elementId + " for "
+																			+ exta.getAgentName());
+																	}
+																} else if (elementType.equals(AgentElementType.BDI_BELIEF.toString()))
 																{
-																	// IBelief
-																	// bel =
-																	// exta.getBeliefbase().getBelief(metainfos[i][1]);
-																	IBelief bel = exta.getBeliefbase().getBelief(elementId);
-																	bel.setFact(new Object()); // TODO
-																	// better
-																	// default
-																	// value...
+																	// System.out.println("BDICoordInfInterpreter# RECEIVED BELIEF TO MANIPULATE:  "
+																	// +
+																	// nameOfElement
+																	// + " for "
+																	// +
+																	// exta.getAgentName());
+
+																	// check
+																	// direction
+																	// (POSITIVE
+																	// ->
+																	// add fact
+																	// to
+																	// belief /
+																	// NEGATIVE
+																	// ->
+																	// remove
+																	// fact
+																	// from
+																	// belief):
+																	if (dci.getCoordinationType().equals(CoordinationType.NEGATIVE))
+																	{
+																		// IBelief
+																		// bel =
+																		// exta.getBeliefbase().getBelief(metainfos[i][1]);
+																		IBelief bel = exta.getBeliefbase().getBelief(elementId);
+																		bel.setFact(new Object()); // TODO
+																		// better
+																		// default
+																		// value...
+																		System.out
+																			.println("#BDICoordInfInterpreter# Removed fact from BELIEF : "
+																				+ elementId);
+																	} else
+																	{
+																		IBelief bel = exta.getBeliefbase().getBelief(elementId);
+																		bel.setFact(coordinationSpaceObj.getProperty(Constants.VALUE)
+																			.toString());
+																		System.out.println("#BDICoordInfInterpreter# Added "
+																			+ coordinationSpaceObj.getProperty(Constants.VALUE).toString()
+																			+ " to BELIEF : " + elementId + " for " + exta.getAgentName());
+																	}
+																} else if (elementType.equals(AgentElementType.BDI_GOAL.toString()))
+																{
+																	// System.out.println("BDICoordInfInterpreter# RECEIVED GOAL TO MANIPULATE:  "
+																	// +
+																	// nameOfElement
+																	// + " for "
+																	// +
+																	// exta.getAgentName());
+
+																	// check
+																	// direction
+																	// (POSITIVE
+																	// ->
+																	// dispatch
+																	// goal
+																	// /
+																	// NEGATIVE
+																	// ->
+																	// remove
+																	// goal
+																	if (dci.getCoordinationType().equals(CoordinationType.NEGATIVE))
+																	{
+																		IGoal[] goals = exta.getGoalbase().getGoals(elementId);
+																		goals[goals.length - 1].drop(); // TODO:
+																		// heuristic
+																		// for
+																		// selection
+																		System.out
+																			.println("#BDICoordInfInterpreter# Removed GOAL from GOALBASE : "
+																				+ elementId + " for " + exta.getAgentName());
+																	} else
+																	{
+																		IGoal g = exta.getGoalbase().createGoal(elementId);
+																		// TODO:
+																		// Implement
+																		// the
+																		// add
+																		// parameters:
+																		// add
+																		// parameters:
+																		for (ParameterMapping pm : ae.getParameter_mappings())
+																		{
+																			g.getParameter(pm.getLocalName()).setValue(
+																				receivedParamDataMappings.get(pm.getRef()));
+																		}
+																		exta.getGoalbase().dispatchTopLevelGoal(g);
+																		System.out.println("#BDICoordInfInterpreter# Dispatched new GOAL: "
+																			+ elementId + " for " + exta.getAgentName());
+																	}
+
+																} else if (elementType.equals(AgentElementType.BDI_PLAN.toString()))
+																{
 																	System.out
-																		.println("#BDICoordInfInterpreter# Removed fact from BELIEF : "
-																			+ elementId);
-																} else
-																{
-																	IBelief bel = exta.getBeliefbase().getBelief(elementId);
-																	bel.setFact(coordinationSpaceObj.getProperty(Constants.VALUE)
-																		.toString());
-																	System.out.println("#BDICoordInfInterpreter# Added "
-																		+ coordinationSpaceObj.getProperty(Constants.VALUE).toString()
-																		+ " to BELIEF : " + elementId + " for " + exta.getAgentName());
-																}
-															} else if (elementType.equals(AgentElementType.BDI_GOAL.toString()))
-															{
-																// System.out.println("BDICoordInfInterpreter# RECEIVED GOAL TO MANIPULATE:  "
-																// +
-																// nameOfElement
-																// + " for " +
-																// exta.getAgentName());
+																		.println("#BDICoordInfInterpreter# Error!!! RECEIVED PLAN TO MANIPULATE:  "
+																			+ elementId
+																			+ " for "
+																			+ exta.getAgentName()
+																			+ " Currently unable to process IPlan due limits of used jadex-version");
 
-																// check
-																// direction
-																// (POSITIVE ->
-																// dispatch goal
-																// / NEGATIVE ->
-																// remove goal
-																if (dci.getCoordinationType().equals(CoordinationType.NEGATIVE))
-																{
-																	IGoal[] goals = exta.getGoalbase().getGoals(elementId);
-																	goals[goals.length - 1].drop(); // TODO:
+																	// check
+																	// direction
+																	// (POSITIVE
+																	// ->
+																	// dispatch
+																	// goal
+																	// /
+																	// NEGATIVE
+																	// ->
+																	// remove
+																	// goal
+																	// // if
+																	// (decentralCoordInfo.getCoordinationType().equals(CoordinationType.NEGATIVE))
+																	// {
+																	// //
+																	// IGoal[]
+																	// goals =
+																	// exta.getGoalbase().getGoals(metainfos[i][1]);
+																	// //
+																	// goals[goals.length
+																	// -
+																	// 1].drop();
+																	// // TODO:
 																	// heuristic
 																	// for
 																	// selection
-																	System.out
-																		.println("#BDICoordInfInterpreter# Removed GOAL from GOALBASE : "
-																			+ elementId + " for " + exta.getAgentName());
-																} else
-																{
-																	IGoal g = exta.getGoalbase().createGoal(elementId);
+																	// //
+																	// System.out.println("BDICoordInfInterpreter# Removed GOAL from GOALBASE : "
+																	// +
+																	// nameOfElement
+																	// + " for "
+																	// +
+																	// exta.getAgentName());
+																	// // } else
+																	// {
+																	// // IGoal
+																	// g =
+																	// exta.getGoalbase().createGoal(nameOfElement);
+																	// // //
 																	// TODO:
 																	// Implement
-																	// the add
-																	// parameters:
+																	// the
+																	// parameters
 																	// add
 																	// parameters:
-																	for (ParameterMapping pm : ae.getParameter_mappings())
-																	{
-																		g.getParameter(pm.getLocalName()).setValue(
-																			receivedParamDataMappings.get(pm.getRef()));
-																	}
-																	exta.getGoalbase().dispatchTopLevelGoal(g);
-																	System.out.println("#BDICoordInfInterpreter# Dispatched new GOAL: "
-																		+ elementId + " for " + exta.getAgentName());
-																}
-
-															} else if (elementType.equals(AgentElementType.BDI_PLAN.toString()))
-															{
-																System.out
-																	.println("#BDICoordInfInterpreter# Error!!! RECEIVED PLAN TO MANIPULATE:  "
-																		+ elementId
-																		+ " for "
-																		+ exta.getAgentName()
-																		+ " Currently unable to process IPlan due limits of used jadex-version");
-
-																// check
-																// direction
-																// (POSITIVE ->
-																// dispatch goal
-																// / NEGATIVE ->
-																// remove goal
-																// // if
-																// (decentralCoordInfo.getCoordinationType().equals(CoordinationType.NEGATIVE))
-																// {
-																// // IGoal[]
-																// goals =
-																// exta.getGoalbase().getGoals(metainfos[i][1]);
-																// //
-																// goals[goals.length
-																// - 1].drop();
-																// // TODO:
-																// heuristic for
-																// selection
-																// //
-																// System.out.println("BDICoordInfInterpreter# Removed GOAL from GOALBASE : "
-																// +
-																// nameOfElement
-																// + " for " +
-																// exta.getAgentName());
-																// // } else {
-																// // IGoal g =
-																// exta.getGoalbase().createGoal(nameOfElement);
-																// // // TODO:
-																// Implement the
-																// parameters
-																// add
-																// parameters:
-																// // // for
-																// (ParameterMapping
-																// pm :
-																// // //
-																// ca.getParameter_mappings()){
-																// // //
-																// g.getParameter(pm.getLocalName()).setValue(item.getValueByName(pm.getRef()));
-																// // // }
-																// //
-																// exta.getGoalbase().dispatchTopLevelGoal(g);
-																// //
-																// System.out.println("BDICoordInfInterpreter# Dispatched new GOAL: "
-																// +
-																// nameOfElement
-																// + " for " +
-																// exta.getAgentName());
-																// // }
-																// }
-															} else if (elementType.equals(AgentElementType.INTERNAL_EVENT.toString()))
-															{
-																// System.out.println("BDICoordInfInterpreter# RECEIVED GOAL TO MANIPULATE:  "
-																// +
-																// nameOfElement
-																// + " for " +
-																// exta.getAgentName());
-
-																// check
-																// direction
-																// (POSITIVE ->
-																// event
-																// addition /
-																// NEGATIVE ->
-																// element
-																// removal):
-																if (dci.getCoordinationType().equals(CoordinationType.NEGATIVE))
+																	// // // for
+																	// (ParameterMapping
+																	// pm :
+																	// // //
+																	// ca.getParameter_mappings()){
+																	// // //
+																	// g.getParameter(pm.getLocalName()).setValue(item.getValueByName(pm.getRef()));
+																	// // // }
+																	// //
+																	// exta.getGoalbase().dispatchTopLevelGoal(g);
+																	// //
+																	// System.out.println("BDICoordInfInterpreter# Dispatched new GOAL: "
+																	// +
+																	// nameOfElement
+																	// + " for "
+																	// +
+																	// exta.getAgentName());
+																	// // }
+																	// }
+																} else if (elementType.equals(AgentElementType.INTERNAL_EVENT.toString()))
 																{
-																	System.out.println(exta.getAgentName() + ":");
-																	System.out
-																		.println("\t ERROR: can not remove internal events from execution context.");
-																	// TODO make
-																	// exception
-																	// for this
-																	// incident.
-																} else
-																{
-																	IInternalEvent ie = exta.getEventbase().createInternalEvent(elementId);
-																	// add
-																	// parameters:
-																	for (ParameterMapping pm : ae.getParameter_mappings())
+																	// System.out.println("BDICoordInfInterpreter# RECEIVED GOAL TO MANIPULATE:  "
+																	// +
+																	// nameOfElement
+																	// + " for "
+																	// +
+																	// exta.getAgentName());
+
+																	// check
+																	// direction
+																	// (POSITIVE
+																	// ->
+																	// event
+																	// addition
+																	// /
+																	// NEGATIVE
+																	// ->
+																	// element
+																	// removal):
+																	if (dci.getCoordinationType().equals(CoordinationType.NEGATIVE))
 																	{
-																		ie.getParameter(pm.getLocalName()).setValue(
-																			receivedParamDataMappings.get(pm.getRef()));
+																		System.out.println(exta.getAgentName() + ":");
+																		System.out
+																			.println("\t ERROR: can not remove internal events from execution context.");
+																		// TODO
+																		// make
+																		// exception
+																		// for
+																		// this
+																		// incident.
+																	} else
+																	{
+																		IInternalEvent ie = exta.getEventbase().createInternalEvent(
+																			elementId);
+																		// add
+																		// parameters:
+																		for (ParameterMapping pm : ae.getParameter_mappings())
+																		{
+																			ie.getParameter(pm.getLocalName()).setValue(
+																				receivedParamDataMappings.get(pm.getRef()));
+																		}
+																		exta.getEventbase().dispatchInternalEvent(ie);
+																		System.out
+																			.println("#BDICoordInfInterpreter# Dispatched new InternalEvent: "
+																				+ elementId + " for " + exta.getAgentName());
 																	}
-																	exta.getEventbase().dispatchInternalEvent(ie);
-																	System.out
-																		.println("#BDICoordInfInterpreter# Dispatched new InternalEvent: "
-																			+ elementId + " for " + exta.getAgentName());
 																}
 															}
 														}
@@ -471,6 +526,7 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 												}
 											}
 										}
+
 									}
 									// else if
 									// (COORDINATE_INIT_PARTICIPANTS.equals(metainfos[i][0]))
@@ -526,7 +582,6 @@ public class BDICoordinationInformationInterpreter extends SimplePropertyObject 
 
 				}
 			});
-				
 		}
 	}
 

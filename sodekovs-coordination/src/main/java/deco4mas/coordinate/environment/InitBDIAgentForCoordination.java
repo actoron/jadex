@@ -10,7 +10,9 @@ import jadex.commons.IFuture;
 import jadex.commons.concurrent.IResultListener;
 import jadex.xml.IContext;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import deco.lang.dynamics.AgentElementType;
 import deco.lang.dynamics.MASDynamics;
 import deco.lang.dynamics.mechanism.AgentElement;
@@ -186,7 +188,14 @@ public class InitBDIAgentForCoordination
 				perceptType + "::" + dci.getDml().getRealization() + "::" + ae.getElement_id() + "::" + ae.getAgentElementType(), ae);
 		} else
 		{
-			behObserver.getRoleDefinitionsForPerceive().put(dci.getDml().getRealization(), (Object[]) new Object[] { dci, ae });
+			//System.out.println(ae.getElement_id());
+			//Add support for more perceive per role CH
+			if (!behObserver.getRoleDefinitionsForPerceive().containsKey(dci.getDml().getRealization()))
+			{
+				behObserver.getRoleDefinitionsForPerceive().put(dci.getDml().getRealization(), new HashSet<Object[]>());
+			}
+			Set<Object[]> dciSet = behObserver.getRoleDefinitionsForPerceive().get(dci.getDml().getRealization());
+			dciSet.add((Object[]) new Object[] { dci, ae });
 		}
 	}
 

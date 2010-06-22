@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import deco.lang.dynamics.AgentElementType;
 import deco.lang.dynamics.mechanism.AgentElement;
@@ -49,7 +50,7 @@ public class BDIBehaviorObservationComponent {
 	private Map<String, AgentReference> roleDefinitionsForPublish = new HashMap<String, AgentReference>();
 
 	/** Maps the roles that are used within "PERCEIVE". The String is the name of the DCM. The array holds the corresponding DecentralCoordinationInformation (position 0) and AgentElement (position 1). */
-	private Map<String, Object[]> roleDefinitionsForPerceive = new HashMap<String, Object[]>();
+	private Map<String, Set<Object[]>> roleDefinitionsForPerceive = new HashMap<String, Set<Object[]>>();
 
 	/** This mapping contains the parameter and data mappings of the deco-link-realization. */
 	private Map<String, AgentElement> parameterAndDataMappings = new HashMap<String, AgentElement>();
@@ -361,7 +362,7 @@ public class BDIBehaviorObservationComponent {
 	 * 
 	 * @return the roleDefinitions
 	 */
-	public Map<String, Object[]> getRoleDefinitionsForPerceive() {
+	public Map<String, Set<Object[]>> getRoleDefinitionsForPerceive() {
 		return roleDefinitionsForPerceive;
 	}
 
