@@ -14,6 +14,7 @@ import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.clock.IClockService;
 import jadex.service.library.ILibraryService;
 import jadex.tools.comanalyzer.chart.ChartPanel;
 import jadex.tools.comanalyzer.diagram.DiagramPanel;
@@ -1000,6 +1001,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	 */
 	protected boolean isDuplicate(IMessageAdapter newmsg, IComponentIdentifier rec)
 	{
+		IClockService cs = (IClockService)((AgentControlCenter)getJCC()).getServiceContainer().getService(IClockService.class);
+		
 		boolean ret = false;
 		Message[] messages = messagelist.getMessages();
 		for(int i=0; i<messages.length && !ret; i++)
@@ -1015,7 +1018,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 					String start = (String)messages[i].getParameter(Message.DATE);
 					if(start!=null)
 					{
-						long duration = ((AgentControlCenter)getJCC()).getAgent().getTime() - new Long(start).longValue();
+						long duration = cs.getTime() - new Long(start).longValue();
+//						long duration = ((AgentControlCenter)getJCC()).getAgent().getTime() - new Long(start).longValue();
 //						long duration = getJCC().getAgent().getTime() - start.getTime();
 						messages[i].setDuration(duration);
 					}

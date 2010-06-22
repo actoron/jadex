@@ -7,7 +7,6 @@ import jadex.application.model.MComponentInstance;
 import jadex.application.model.MComponentType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
-import jadex.application.runtime.IApplicationExternalAccess;
 import jadex.application.runtime.ISpace;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
@@ -41,7 +40,7 @@ import java.util.logging.Logger;
  *  When the context is deleted all components will be destroyed.
  *  An component must only be in one application context.
  */
-public class Application extends BasicServiceProvider implements IApplication, IComponentInstance, IApplicationExternalAccess
+public class Application implements IApplication, IComponentInstance
 {
 	//-------- attributes --------
 	
@@ -95,7 +94,7 @@ public class Application extends BasicServiceProvider implements IApplication, I
 		
 		// Init the arguments with default values.
 		String configname = config!=null? config.getName(): null;
-		IArgument[] args = getModel().getArguments();
+		IArgument[] args = model.getArguments();
 		for(int i=0; i<args.length; i++)
 		{
 			if(args[i].getDefaultValue(configname)!=null)
@@ -469,9 +468,17 @@ public class Application extends BasicServiceProvider implements IApplication, I
 	 *  Get the model.
 	 *  @return The model.
 	 */
-	public ApplicationModel getModel()
+	public ILoadableComponentModel getModel()
 	{
-		return this.model;
+		return model;
+	}
+	
+	/**
+	 *  Get the component identifier.
+	 */
+	public IComponentIdentifier getComponentIdentifier()
+	{
+		return adapter.getComponentIdentifier();
 	}
 	
 	/**
@@ -485,17 +492,9 @@ public class Application extends BasicServiceProvider implements IApplication, I
 	/**
 	 *  Get the service container.
 	 */
-	public IServiceContainer	getServiceContainer()
+	public IServiceContainer getServiceContainer()
 	{
 		return adapter.getServiceContainer();
-	}
-	
-	/**
-	 *  Get the component identifier.
-	 */
-	public IComponentIdentifier	getComponentIdentifier()
-	{
-		return adapter.getComponentIdentifier();
 	}
 	
 	/**
@@ -780,7 +779,7 @@ public class Application extends BasicServiceProvider implements IApplication, I
 	 */
 	public void getExternalAccess(IResultListener listener)
 	{
-		listener.resultAvailable(this, this);
+		listener.resultAvailable(this, new ExternalAccess(this));
 	}
 
 	/**

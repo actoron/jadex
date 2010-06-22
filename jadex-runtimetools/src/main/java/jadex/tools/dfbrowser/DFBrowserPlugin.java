@@ -1,8 +1,12 @@
 package jadex.tools.dfbrowser;
 
+import jadex.base.DefaultResultListener;
 import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.IDFServiceDescription;
+import jadex.bdi.runtime.IEAGoal;
+import jadex.bdi.runtime.IEAParameter;
+import jadex.bdi.runtime.IEAParameterSet;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
@@ -13,6 +17,7 @@ import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
+import jadex.service.IServiceContainer;
 import jadex.tools.common.ComponentTreeTable;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
@@ -443,44 +448,84 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 	protected void refresh()
 	{
 //		System.out.println("refresh: "+getSelectedDF());
-		IDFComponentDescription[] ads = new IDFComponentDescription[0];
+		
 		
 		if(getSelectedDF() != null)
 		{
-			IDF	df	= (IDF)((AgentControlCenter)getJCC()).getAgent().getServiceContainer().getService(IDF.class);
-
-			// Use a subgoal to search
-			IGoal ft = ((AgentControlCenter)getJCC()).getAgent().createGoal("df_search");
-			ft.getParameter("description").setValue(df.createDFComponentDescription(null, null));
-			ft.getParameter("constraints").setValue(df.createSearchConstraints(-1, 0));
-			ft.getParameter("df").setValue(getSelectedDF().getName());
-
-			try
+			((AgentControlCenter)getJCC()).getAgent().getServiceContainer().addResultListener(new DefaultResultListener()
 			{
-				((AgentControlCenter)getJCC()).getAgent().dispatchTopLevelGoalAndWait(ft);
-				ads = (IDFComponentDescription[])ft.getParameterSet("result").getValues();
-//				System.out.println("Found: "+SUtil.arrayToString(ads));
-			}
-			catch(Exception e)
-			{
-				//e.printStackTrace();
-				final String text = SUtil.wrapText("Could not refresh descriptions: "+e.getMessage());
-				SwingUtilities.invokeLater(new Runnable()
+				public void resultAvailable(Object source, Object result) 
 				{
-					public void run()
+					IServiceContainer sc = (IServiceContainer)result;
+					final IDF df = (IDF)sc.getService(IDF.class);
+					
+					// Use a subgoal to search
+					((AgentControlCenter)getJCC()).getAgent().createGoal("df_search").addResultListener(new DefaultResultListener()
 					{
-						JOptionPane.showMessageDialog(SGUI.getWindowParent(getView()), text, "Refresh Problem", JOptionPane.INFORMATION_MESSAGE);
-					}
-				});
-			}
-		}
-		
-		if(old_ads == null || !Arrays.equals(old_ads, ads))
-		{
-			agent_table.setAgentDescriptions(ads);
-			updateServices(ads);
-			updateDetailedService();
-			old_ads = ads;
+						public void resultAvailable(Object source, Object result) 
+						{
+							final IEAGoal ft = (IEAGoal)result; 
+							ft.getParameter("description").addResultListener(new DefaultResultListener()
+							{
+								public void resultAvailable(Object source, Object result) 
+								{
+									((IEAParameter)result).setValue(df.createDFComponentDescription(null, null));
+								}
+							});
+							ft.getParameter("df").addResultListener(new DefaultResultListener()
+							{
+								public void resultAvailable(Object source, Object result) 
+								{
+									((IEAParameter)result).setValue(getSelectedDF().getName());
+								}
+							});
+							
+							((AgentControlCenter)getJCC()).getAgent().dispatchTopLevelGoalAndWait(ft).addResultListener(new DefaultResultListener()
+							{
+								public void resultAvailable(Object source, Object result) 
+								{
+									ft.getParameterSet("result").addResultListener(new DefaultResultListener()
+									{
+										public void resultAvailable(Object source, Object result)
+										{
+											((IEAParameterSet)result).getValues().addResultListener(new DefaultResultListener()
+											{
+												public void resultAvailable(Object source, Object result)
+												{
+													IDFComponentDescription[] ads = (IDFComponentDescription[])result;
+													System.out.println("Found: "+SUtil.arrayToString(ads));
+													
+													if(old_ads == null || !Arrays.equals(old_ads, ads))
+													{
+														agent_table.setAgentDescriptions(ads);
+														updateServices(ads);
+														updateDetailedService();
+														old_ads = ads;
+													}
+												}
+											});
+										}
+									});
+								}	
+							});
+								
+							// todo: catch
+//							catch(Exception e)
+//							{
+//								//e.printStackTrace();
+//								final String text = SUtil.wrapText("Could not refresh descriptions: "+e.getMessage());
+//								SwingUtilities.invokeLater(new Runnable()
+//								{
+//									public void run()
+//									{
+//										JOptionPane.showMessageDialog(SGUI.getWindowParent(getView()), text, "Refresh Problem", JOptionPane.INFORMATION_MESSAGE);
+//									}
+//								});
+//							}
+						}
+					});
+				}
+			});
 		}
 	}
 	
@@ -664,20 +709,50 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 	/**
 	 * @param description
 	 */
-	protected void removeAgentRegistration(IDFComponentDescription description)
+	protected void removeAgentRegistration(final IDFComponentDescription description)
 	{
-		try
+		((AgentControlCenter)getJCC()).getAgent().createGoal("df_deregister").addResultListener(new DefaultResultListener()
 		{
-			IGoal deregister = ((AgentControlCenter)getJCC()).getAgent().createGoal("df_deregister");
-			deregister.getParameter("description").setValue(description);
-			deregister.getParameter("df").setValue(getSelectedDF().getName());
-			((AgentControlCenter)getJCC()).getAgent().dispatchTopLevelGoalAndWait(deregister, 100);
-			refresh();
-		}
-		catch(Exception e)
-		{
-			// NOP
-		}
+			public void resultAvailable(Object source, Object result) 
+			{
+				final IEAGoal ft = (IEAGoal)result; 
+				ft.getParameter("description").addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result) 
+					{
+						((IEAParameter)result).setValue(description);
+					}
+				});
+				ft.getParameter("df").addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result) 
+					{
+						((IEAParameter)result).setValue(getSelectedDF().getName());
+					}
+				});
+				
+				((AgentControlCenter)getJCC()).getAgent().dispatchTopLevelGoalAndWait(ft, 100).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result) 
+					{
+						refresh();
+					}
+				});
+			}
+		});
+		
+//		try
+//		{
+//			IGoal deregister = ((AgentControlCenter)getJCC()).getAgent().createGoal("df_deregister");
+//			deregister.getParameter("description").setValue(description);
+//			deregister.getParameter("df").setValue(getSelectedDF().getName());
+//			((AgentControlCenter)getJCC()).getAgent().dispatchTopLevelGoalAndWait(deregister, 100);
+//			refresh();
+//		}
+//		catch(Exception e)
+//		{
+//			// NOP
+//		}
 	}
 	
 	/**

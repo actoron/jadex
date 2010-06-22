@@ -1,0 +1,214 @@
+package jadex.bdi.runtime.impl.flyweights;
+
+import jadex.bdi.runtime.IBelief;
+import jadex.bdi.runtime.IBeliefListener;
+import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.interpreter.BDIInterpreter;
+import jadex.bdi.runtime.interpreter.BeliefRules;
+import jadex.rules.state.IOAVState;
+
+/**
+ *  Flyeight for a belief.
+ */
+public class BeliefFlyweight extends ElementFlyweight implements IBelief
+{
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new belief flyweight.
+	 *  @param state	The state.
+	 *  @param scope	The scope handle.
+	 */
+	private BeliefFlyweight(IOAVState state, Object scope, Object handle)
+	{
+		super(state, scope, handle);
+	}
+	
+	/**
+	 *  Get or create a flyweight.
+	 *  @return The flyweight.
+	 */
+	public static BeliefFlyweight getBeliefFlyweight(IOAVState state, Object scope, Object handle)
+	{
+		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+		BeliefFlyweight ret = (BeliefFlyweight)ip.getFlyweightCache(IBelief.class).get(handle);
+		if(ret==null)
+		{
+			ret = new BeliefFlyweight(state, scope, handle);
+			ip.getFlyweightCache(IBelief.class).put(handle, ret);
+		}
+		return ret;
+	}
+	
+	//-------- methods --------
+
+	/**
+	 *  Set a fact of a belief.
+	 *  @param fact The new fact.
+	 */
+	public void setFact(final Object fact)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					FlyweightFunctionality.setFact(getState(), getHandle(), fact);
+				}
+			};
+		}
+		else
+		{
+			getInterpreter().startMonitorConsequences();
+			FlyweightFunctionality.setFact(getState(), getHandle(), fact);
+			getInterpreter().endMonitorConsequences();
+		}
+	}
+
+	/**
+	 *  Get the fact of a belief.
+	 *  @return The fact.
+	 */
+	public Object getFact()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = BeliefRules.getBeliefValue(getState(), getHandle(), getScope());
+				}
+			};
+			return invoc.object;
+		}
+		else
+		{
+			return BeliefRules.getBeliefValue(getState(), getHandle(), getScope());
+		}
+	}
+
+	/**
+	 *  Indicate that the fact of this belief was modified.
+	 *  Calling this method causes an internal fact changed
+	 *  event that might cause dependent actions.
+	 */
+	public void modified()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					FlyweightFunctionality.modified(getState(), getHandle(), getInterpreter());
+				}
+			};
+		}
+		else
+		{
+			getInterpreter().startMonitorConsequences();
+			FlyweightFunctionality.modified(getState(), getHandle(), getInterpreter());
+			getInterpreter().endMonitorConsequences();
+		}
+	}
+	
+	/**
+	 *  Get the value class.
+	 *  @return The valuec class.
+	 */
+	public Class getClazz()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					clazz = FlyweightFunctionality.getClazz(getState(), getHandle());
+				}
+			};
+			return invoc.clazz;
+		}
+		else
+		{
+			return FlyweightFunctionality.getClazz(getState(), getHandle());
+		}
+	}
+
+	//-------- listeners --------
+	
+	/**
+	 *  Add a belief listener.
+	 *  @param listener The belief listener.
+	 */
+	public void addBeliefListener(final IBeliefListener listener)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					addEventListener(listener, getHandle());
+				}
+			};
+		}
+		else
+		{
+			addEventListener(listener, getHandle());
+		}
+	}
+	
+	/**
+	 *  Remove a belief listener.
+	 *  @param listener The belief listener.
+	 */
+	public void removeBeliefListener(final IBeliefListener listener)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			new AgentInvocation()
+			{
+				public void run()
+				{
+					removeEventListener(listener, getHandle(), false);
+				}
+			};
+		}
+		else
+		{
+			removeEventListener(listener, getHandle(), false);
+		}
+	}
+	
+	//-------- element interface --------
+	
+	/**
+	 *  Get the model element.
+	 *  @return The model element.
+	 * /
+	public IMElement getModelElement()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					Object me = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
+					Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
+					object = new MBeliefFlyweight(getState(), mscope, me);
+				}
+			};
+			return (IMElement)invoc.object;
+		}
+		else
+		{
+			Object me = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
+			Object mscope = getState().getAttributeValue(getScope(), OAVBDIRuntimeModel.element_has_model);
+			return new MBeliefFlyweight(getState(), mscope, me);
+		}
+	}*/
+}

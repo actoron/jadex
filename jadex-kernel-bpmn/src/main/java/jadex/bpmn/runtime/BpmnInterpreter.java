@@ -53,7 +53,7 @@ import java.util.logging.Logger;
  *  The micro agent interpreter is the connection between the agent platform 
  *  and a user-written micro agent. 
  */
-public class BpmnInterpreter extends BasicServiceProvider implements IComponentInstance, IExternalAccess // Hack!!!
+public class BpmnInterpreter implements IComponentInstance
 {	
 	//-------- static part --------
 

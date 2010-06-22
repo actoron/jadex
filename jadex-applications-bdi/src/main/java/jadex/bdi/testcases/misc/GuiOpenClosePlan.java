@@ -1,11 +1,14 @@
 package jadex.bdi.testcases.misc;
 
 import jadex.base.test.TestReport;
+import jadex.bdi.runtime.IEAEventbase;
+import jadex.bdi.runtime.IEAInternalEvent;
 import jadex.bdi.runtime.IEventbase;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.IResultListener;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,8 +46,18 @@ public class GuiOpenClosePlan extends Plan
 			{
 				try
 				{
-					IEventbase eb = getExternalAccess().getEventbase();
-					eb.dispatchInternalEvent(eb.createInternalEvent("gui_closed"));
+					getExternalAccess().createInternalEvent("gui_closed").addResultListener(new IResultListener() 
+					{
+						public void resultAvailable(Object source, Object result) 
+						{
+							getExternalAccess().dispatchInternalEvent((IEAInternalEvent)result);
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception) 
+						{
+						}
+					});
+					
 				}
 				catch(ComponentTerminatedException cte)
 				{

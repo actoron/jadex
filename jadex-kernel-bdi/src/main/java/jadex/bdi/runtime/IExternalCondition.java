@@ -13,7 +13,7 @@ public interface IExternalCondition
 	/**
 	 *  Test if the condition holds.
 	 */
-	public boolean	isTrue();
+	public boolean isTrue();
 	
 	/**
 	 *  Add a property change listener.

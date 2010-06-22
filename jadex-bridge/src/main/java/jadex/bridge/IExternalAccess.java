@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.commons.IFuture;
 import jadex.service.IServiceProvider;
 
 /**
@@ -12,19 +13,22 @@ public interface IExternalAccess extends IServiceProvider
 	 *  Get the model of the component.
 	 *  @return	The model.
 	 */
-	public ILoadableComponentModel	getModel();
+//	public ILoadableComponentModel	getModel();
+	public IFuture	getModel();
 
 	/**
 	 *  Get the id of the component.
 	 *  @return	The component id.
 	 */
-	public IComponentIdentifier	getComponentIdentifier();
+//	public IComponentIdentifier	getComponentIdentifier();
+	public IFuture getComponentIdentifier();
 	
 	/**
 	 *  Get the parent (if any).
 	 *  @return The parent.
 	 */
-	public IExternalAccess getParent();
+//	public IExternalAccess getParent();
+	public IFuture getParent();
 	
 //	/**
 //	 *  Get service.

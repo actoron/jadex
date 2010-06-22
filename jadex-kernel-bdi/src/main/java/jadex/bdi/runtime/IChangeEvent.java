@@ -1,6 +1,6 @@
 package jadex.bdi.runtime;
 
-import jadex.bdi.runtime.impl.ElementFlyweight;
+import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 
 /**
  *  A change event indicates (important) state changes.

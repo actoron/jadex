@@ -2,12 +2,16 @@ package jadex.bdi.tutorial;
 
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
+import jadex.bdi.runtime.IEAGoal;
+import jadex.bdi.runtime.IEAParameter;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.commons.ThreadSuspendable;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Logger;
 
 
 /**
@@ -21,6 +25,9 @@ public class ServerPlanG1 extends Plan	implements Runnable
 	/** The server socket. */
 	protected ServerSocket	server;
 	
+	/** The logger. */
+	protected Logger logger;
+	
 	//-------- constructors --------
 
 	/**
@@ -29,6 +36,7 @@ public class ServerPlanG1 extends Plan	implements Runnable
 	public ServerPlanG1()	//throws IOException
 	{
 		int port = ((Integer)getParameter("port").getValue()).intValue();
+		this.logger = getLogger();
 		
 		try
 		{
@@ -49,7 +57,7 @@ public class ServerPlanG1 extends Plan	implements Runnable
 	{
 		try
 		{
-			getExternalAccess().getLogger().info("Closing: "+server);
+			logger.info("Closing: "+server);
 			server.close();
 		}
 		catch(IOException e)
@@ -105,7 +113,8 @@ public class ServerPlanG1 extends Plan	implements Runnable
 	 */
 	public void	run()
 	{
-		getExternalAccess().getLogger().info("Created: "+Thread.currentThread());
+		ThreadSuspendable sus = new ThreadSuspendable(new Object());
+		logger.info("Created: "+Thread.currentThread());
 
 		// Repeatedly listen for connections, until the server has been closed.
 		try
@@ -114,16 +123,16 @@ public class ServerPlanG1 extends Plan	implements Runnable
 			while(true)
 			{
 				Socket	client	= server.accept();
-				IGoal goal = getExternalAccess().getGoalbase().createGoal("translate");
-				goal.getParameter("client").setValue(client);
-				getExternalAccess().getGoalbase().dispatchTopLevelGoal(goal);
+				IEAGoal goal = (IEAGoal)getExternalAccess().createGoal("translate").get(sus);
+				((IEAParameter)goal.getParameter("client").get(sus)).setValue(client);
+				getExternalAccess().dispatchTopLevelGoal(goal);
 			}
 		}
 		catch(IOException e)
 		{
 			//e.printStackTrace();
 			// Server has been closed.
-			getExternalAccess().getLogger().info("Exited: "+Thread.currentThread());
+			logger.info("Exited: "+Thread.currentThread());
 		}
 		catch(Exception e)
 //		catch(AgentDeathException e)

@@ -20,24 +20,25 @@ import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.IWaitqueue;
 import jadex.bdi.runtime.PlanFailureException;
-import jadex.bdi.runtime.impl.BeliefbaseFlyweight;
-import jadex.bdi.runtime.impl.CapabilityFlyweight;
-import jadex.bdi.runtime.impl.EventbaseFlyweight;
-import jadex.bdi.runtime.impl.ExpressionFlyweight;
-import jadex.bdi.runtime.impl.ExpressionNoModel;
-import jadex.bdi.runtime.impl.ExpressionbaseFlyweight;
-import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
-import jadex.bdi.runtime.impl.GoalFlyweight;
-import jadex.bdi.runtime.impl.GoalbaseFlyweight;
-import jadex.bdi.runtime.impl.InternalEventFlyweight;
-import jadex.bdi.runtime.impl.MessageEventFlyweight;
-import jadex.bdi.runtime.impl.ParameterFlyweight;
-import jadex.bdi.runtime.impl.ParameterSetFlyweight;
-import jadex.bdi.runtime.impl.PlanFlyweight;
-import jadex.bdi.runtime.impl.PlanbaseFlyweight;
-import jadex.bdi.runtime.impl.PropertybaseFlyweight;
-import jadex.bdi.runtime.impl.WaitAbstractionFlyweight;
-import jadex.bdi.runtime.impl.WaitqueueFlyweight;
+import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
+import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
+import jadex.bdi.runtime.impl.flyweights.EventbaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.ExpressionFlyweight;
+import jadex.bdi.runtime.impl.flyweights.ExpressionNoModel;
+import jadex.bdi.runtime.impl.flyweights.ExpressionbaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
+import jadex.bdi.runtime.impl.flyweights.GoalbaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
+import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
+import jadex.bdi.runtime.impl.flyweights.ParameterFlyweight;
+import jadex.bdi.runtime.impl.flyweights.ParameterSetFlyweight;
+import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
+import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.PropertybaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.WaitAbstractionFlyweight;
+import jadex.bdi.runtime.impl.flyweights.WaitqueueFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
@@ -321,7 +322,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 						String type = (String)pt.getWaitInfo();
 						if(type==null)
 							throw new RuntimeException("Message type not specified: "+type);
-						WaitAbstractionFlyweight.addMessageEvent(ret, type, state, rcapa);
+						FlyweightFunctionality.addMessageEvent(ret, type, state, rcapa);
 						empty = false;
 					}
 					else if(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL.equals(act.getActivityType()))
@@ -329,7 +330,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 						String type = (String)pt.getWaitInfo();
 						if(type==null)
 							throw new RuntimeException("Internal event type not specified: "+type);
-						WaitAbstractionFlyweight.addInternalEvent(ret, type, state, rcapa);
+						FlyweightFunctionality.addInternalEvent(ret, type, state, rcapa);
 						empty = false;
 					}
 					else if(MBpmnModel.EVENT_INTERMEDIATE_RULE.equals(act.getActivityType()))
@@ -337,7 +338,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 						String type = (String)pt.getWaitInfo();
 						if(type==null)
 							throw new RuntimeException("Rule type not specified: "+type);
-						WaitAbstractionFlyweight.addCondition(ret, type, state, rcapa);
+						FlyweightFunctionality.addCondition(ret, type, state, rcapa);
 						empty = false;
 					}
 					else if(MBpmnModel.EVENT_INTERMEDIATE_MULTIPLE.equals(act.getActivityType()))
@@ -354,7 +355,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 								String type = (String)was[i];
 								if(type==null)
 									throw new RuntimeException("Message type not specified: "+type);
-								WaitAbstractionFlyweight.addMessageEvent(ret, type, state, rcapa);
+								FlyweightFunctionality.addMessageEvent(ret, type, state, rcapa);
 								empty = false;
 							}
 							else if(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL.equals(nextact.getActivityType()))
@@ -362,7 +363,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 								String type = (String)was[i];
 								if(type==null)
 									throw new RuntimeException("Internal event type not specified: "+type);
-								WaitAbstractionFlyweight.addInternalEvent(ret, type, state, rcapa);
+								FlyweightFunctionality.addInternalEvent(ret, type, state, rcapa);
 								empty = false;
 							}
 							else if(MBpmnModel.EVENT_INTERMEDIATE_RULE.equals(nextact.getActivityType()))
@@ -370,7 +371,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 								String type = (String)was[i];
 								if(type==null)
 									throw new RuntimeException("Rule type not specified: "+type);
-								WaitAbstractionFlyweight.addCondition(ret, type, state, rcapa);
+								FlyweightFunctionality.addCondition(ret, type, state, rcapa);
 								empty = false;
 							}
 							else if(MBpmnModel.EVENT_INTERMEDIATE_TIMER.equals(nextact.getActivityType()))
@@ -470,7 +471,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 		if(elem!=null)
 		{
 			// todo: wrong scope
-			ret = WaitqueueFlyweight.getFlyweight(state, rcapa, elem);
+			ret = FlyweightFunctionality.getFlyweight(state, rcapa, elem, false);
 		}
 		
 		return ret;
@@ -784,7 +785,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public IGoal createGoal(String type)
 	{
-		return GoalbaseFlyweight.createGoal(type, rcapa, state);
+		return (IGoal)FlyweightFunctionality.createGoal(state, rcapa, false, type);
 	}
 
 	//-------- eventbase shortcut methods --------
@@ -823,7 +824,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public IMessageEvent createMessageEvent(String type)
 	{
-		return EventbaseFlyweight.createMessageEvent(state, rcapa, type);
+		return (IMessageEvent)FlyweightFunctionality.createMessageEvent(state, rcapa, type, false);
 	}
 
 	/**
@@ -832,7 +833,7 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	 */
 	public IInternalEvent createInternalEvent(String type)
 	{
-		return EventbaseFlyweight.createInternalEvent(state, rcapa, type);
+		return (IInternalEvent)FlyweightFunctionality.createInternalEvent(state, rcapa, type, false);
 	}
 
 	/**

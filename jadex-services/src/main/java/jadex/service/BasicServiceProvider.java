@@ -47,7 +47,7 @@ public class BasicServiceProvider implements IServiceProvider
 		Object ret	= null;
 		Map tmp = getServiceMap(type);
 		if(tmp != null)
-		 ret = tmp.get(name);
+			ret = tmp.get(name);
 //		if(ret == null)
 //			throw new RuntimeException("Service not found");
 		return ret;
@@ -143,6 +143,8 @@ public class BasicServiceProvider implements IServiceProvider
 		if(tmp.size() == 0)
 			services.remove(type);
 	}
+	
+	//-------- internal methods --------
 	
 	/**
 	 *  Get a service map for a type.

@@ -15,5 +15,4 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jadex.standalone.Platform"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-conf  jadex/standalone/services_conf.xml &#13;&#10;jadex/bdi/kernel_bdi_conf.xml&#13;&#10;../jadex-applications-bdi/src/main/java/jadex/bdi/examples/blocksworld/blocksworld_conf.xml"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jadex-standalone-launch"/>
-<stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.maven.ide.eclipse.launchconfig.sourcepathProvider"/>
 </launchConfiguration>

@@ -1,10 +1,12 @@
 package jadex.tools.debugger;
 
+import jadex.base.DefaultResultListener;
 import jadex.base.SComponentFactory;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
@@ -90,58 +92,66 @@ public class DebuggerMainPanel extends JSplitPane
 		{			
 			public void resultAvailable(Object source, final Object result)
 			{
-				SwingUtilities.invokeLater(new Runnable()
+				// The left panel (breakpoints)
+				final IExternalAccess exta = (IExternalAccess)result;
+				final BreakpointPanel[] leftpanel = new BreakpointPanel[1];
+				((IExternalAccess)result).getModel().addResultListener(new DefaultResultListener()
 				{
-					public void run()
+					public void resultAvailable(Object source, Object result) 
 					{
-						// The left panel (breakpoints)
-						BreakpointPanel	leftpanel	= null;
-						Map	props	= ((IExternalAccess)result).getModel().getProperties();
-						if(props!=null && props.containsKey(KEY_DEBUGGER_BREAKPOINTS))
-						{
-							Collection	breakpoints	= (Collection)props.get(KEY_DEBUGGER_BREAKPOINTS);
-							leftpanel	= new BreakpointPanel(breakpoints, desc, jcc.getServiceContainer());
-							DebuggerMainPanel.this.setLeftComponent(leftpanel);
-							DebuggerMainPanel.this.setDividerLocation(150);	// Hack???
-						}
-						else
-						{
-							JPanel nobreakpoints = new JPanel();
-							nobreakpoints.add(new JLabel("no breakpoints"));
-							DebuggerMainPanel.this.setLeftComponent(nobreakpoints);
-							DebuggerMainPanel.this.setDividerLocation(0);
-						}
+						final Map props = ((ILoadableComponentModel)result).getProperties();
 						
-						// Sub panels of right panel.
-						props	= SComponentFactory.getProperties(DebuggerMainPanel.this.jcc.getServiceContainer(), DebuggerMainPanel.this.desc.getType());
-						if(props!=null && props.containsKey(KEY_DEBUGGER_PANELS))
+						SwingUtilities.invokeLater(new Runnable()
 						{
-							final ILibraryService	libservice	= (ILibraryService)DebuggerMainPanel.this.jcc.getServiceContainer().getService(ILibraryService.class);
-							String	panels	= (String)props.get(KEY_DEBUGGER_PANELS);
-							StringTokenizer	stok	= new StringTokenizer(panels, ", \t\n\r\f");
-							while(stok.hasMoreTokens())
+							public void run()
 							{
-								String classname	= stok.nextToken();
-								try
+								if(props!=null && props.containsKey(KEY_DEBUGGER_BREAKPOINTS))
 								{
-									Class	clazz	= SReflect.classForName(classname, libservice.getClassLoader());
-									IDebuggerPanel	panel	= (IDebuggerPanel)clazz.newInstance();
-									panel.init(DebuggerMainPanel.this.jcc, leftpanel, DebuggerMainPanel.this.desc.getName(), (IExternalAccess)result);
+									Collection	breakpoints	= (Collection)props.get(KEY_DEBUGGER_BREAKPOINTS);
+									leftpanel[0] = new BreakpointPanel(breakpoints, desc, jcc.getServiceContainer());
+									DebuggerMainPanel.this.setLeftComponent(leftpanel[0]);
+									DebuggerMainPanel.this.setDividerLocation(150);	// Hack???
+								}
+								else
+								{
+									JPanel nobreakpoints = new JPanel();
+									nobreakpoints.add(new JLabel("no breakpoints"));
+									DebuggerMainPanel.this.setLeftComponent(nobreakpoints);
+									DebuggerMainPanel.this.setDividerLocation(0);
+								}
+								
+								// Sub panels of right panel.
+								Map props2	= SComponentFactory.getProperties(DebuggerMainPanel.this.jcc.getServiceContainer(), DebuggerMainPanel.this.desc.getType());
+								if(props2!=null && props2.containsKey(KEY_DEBUGGER_PANELS))
+								{
+									final ILibraryService	libservice	= (ILibraryService)DebuggerMainPanel.this.jcc.getServiceContainer().getService(ILibraryService.class);
+									String	panels	= (String)props2.get(KEY_DEBUGGER_PANELS);
+									StringTokenizer	stok	= new StringTokenizer(panels, ", \t\n\r\f");
+									while(stok.hasMoreTokens())
+									{
+										String classname	= stok.nextToken();
+										try
+										{
+											Class clazz	= SReflect.classForName(classname, libservice.getClassLoader());
+											IDebuggerPanel	panel	= (IDebuggerPanel)clazz.newInstance();
+											panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
+											tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
+										}
+										catch(Exception e)
+										{
+											e.printStackTrace();
+											DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panel.", "Debugger panel class: "+classname, e);
+										}
+									}
+								}
+								else
+								{
+									ObjectInspectorDebuggerPanel panel = new ObjectInspectorDebuggerPanel();
+									panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
 									tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
 								}
-								catch(Exception e)
-								{
-									e.printStackTrace();
-									DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panel.", "Debugger panel class: "+classname, e);
-								}
 							}
-						}
-						else
-						{
-							ObjectInspectorDebuggerPanel panel = new ObjectInspectorDebuggerPanel();
-							panel.init(DebuggerMainPanel.this.jcc, leftpanel, DebuggerMainPanel.this.desc.getName(), (IExternalAccess)result);
-							tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
-						}
+						});
 					}
 				});				
 			}

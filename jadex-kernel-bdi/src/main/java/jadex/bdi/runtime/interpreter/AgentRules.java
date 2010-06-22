@@ -2,8 +2,8 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IPlanExecutor;
-import jadex.bdi.runtime.impl.ExternalAccessFlyweight;
-import jadex.bdi.runtime.impl.ParameterFlyweight;
+import jadex.bdi.runtime.impl.eaflyweights.ExternalAccessFlyweight;
+import jadex.bdi.runtime.impl.flyweights.ParameterFlyweight;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.IArgument;
 import jadex.bridge.InterpreterTimedObject;

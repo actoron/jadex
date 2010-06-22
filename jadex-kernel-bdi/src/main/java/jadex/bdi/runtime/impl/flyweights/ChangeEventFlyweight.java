@@ -1,0 +1,95 @@
+package jadex.bdi.runtime.impl.flyweights;
+
+import jadex.bdi.runtime.IChangeEvent;
+import jadex.bdi.runtime.impl.FlyweightFunctionality;
+import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.rules.state.IOAVState;
+
+/**
+ *  Flyweight for change events.
+ */
+public class ChangeEventFlyweight extends ElementFlyweight implements IChangeEvent
+{
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new change event flyweight.
+	 *  @param state	The state.
+	 *  @param scope	The scope handle.
+	 */
+	public ChangeEventFlyweight(IOAVState state, Object scope, Object handle)
+	{
+		super(state, scope, handle);
+	}
+	
+	//-------- methods --------
+	
+	/**
+	 *  Get the element that caused the event.
+	 *  @return The element.
+	 */
+	public ElementFlyweight getElement()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = FlyweightFunctionality.getElement(getState(), getHandle(), getScope(), false);
+				}
+			};
+			return (ElementFlyweight)invoc.object;
+		}
+		else
+		{
+			return FlyweightFunctionality.getElement(getState(), getHandle(), getScope(), false);
+		}
+	}
+	
+	/**
+	 *  Get the changeevent value.
+	 *  @return The value (can be null).
+	 */
+	public Object getValue()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.changeevent_has_value);
+				}
+			};
+			return invoc.object;
+		}
+		else
+		{
+			return getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.changeevent_has_value);
+		}
+	}
+	
+	/**
+	 *  Get the type.
+	 *  @return The type.
+	 */
+	public String getType()
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.changeevent_has_type);
+				}
+			};
+			return (String)invoc.object;
+		}
+		else
+		{
+			return (String)getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.changeevent_has_type);
+		}
+	}
+}

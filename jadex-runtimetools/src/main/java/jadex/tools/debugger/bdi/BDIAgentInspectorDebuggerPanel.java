@@ -1,6 +1,6 @@
 package jadex.tools.debugger.bdi;
 
-import jadex.bdi.runtime.impl.ElementFlyweight;
+import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;

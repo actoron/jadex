@@ -2,9 +2,9 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.ICandidateInfo;
-import jadex.bdi.runtime.impl.PlanFlyweight;
-import jadex.bdi.runtime.impl.PlanInfoFlyweight;
-import jadex.bdi.runtime.impl.PlanInstanceInfoFlyweight;
+import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
+import jadex.bdi.runtime.impl.flyweights.PlanInfoFlyweight;
+import jadex.bdi.runtime.impl.flyweights.PlanInstanceInfoFlyweight;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.javaparser.IValueFetcher;

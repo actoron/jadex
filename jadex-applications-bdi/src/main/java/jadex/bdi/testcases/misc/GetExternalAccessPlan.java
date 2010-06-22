@@ -1,7 +1,10 @@
 package jadex.bdi.testcases.misc;
 
+import jadex.base.DefaultResultListener;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IEABelief;
+import jadex.bdi.runtime.IEABeliefbase;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
@@ -28,15 +31,40 @@ public class GetExternalAccessPlan extends Plan
 		IComponentIdentifier cid = (IComponentIdentifier)ret.get(this);
 		
 		// Get external access.
-		IResultListener lis2 = new IResultListener()
+		IResultListener lis2 = new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				IBDIExternalAccess exta = (IBDIExternalAccess)result;
 //				System.out.println("Got external access: "+exta);
-				String	somevalue	= (String)exta.getBeliefbase().getBelief("somebelief").getFact();
+				exta.getBeliefbase().addResultListener(new DefaultResultListener() 
+				{
+					public void resultAvailable(Object source, Object result) 
+					{
+						((IEABeliefbase)result).getBelief("somebelief").addResultListener(new DefaultResultListener() 
+						{
+							public void resultAvailable(Object source, Object result) 
+							{
+								((IEABelief)result).getFact().addResultListener(new DefaultResultListener()
+								{
+									public void resultAvailable(Object source, Object result) 
+									{
+										gotexta	= "some value".equals(result);
+									}
+								});
+							}
+						}); 
+					}
+				});
+	
+				// alternative with blocking calls
+//				ThreadSuspendable sus = new ThreadSuspendable(new Object());
+//				String	somevalue	= (String)((IEBelief)((IEBeliefbase)exta.getBeliefbase().get(sus))
+//					.getBelief("somebelief").get(sus)).getFact().get(sus);
+				
+//				String	somevalue	= (String)exta.getBeliefbase().getBelief("somebelief").getFact();
 //				System.out.println("Got fact: "+somevalue);	
-				gotexta	= "some value".equals(somevalue);
+//				gotexta	= "some value".equals(somevalue);
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)

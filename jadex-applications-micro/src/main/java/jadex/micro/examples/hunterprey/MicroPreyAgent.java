@@ -52,7 +52,7 @@ public class MicroPreyAgent extends MicroAgent
 //				e.printStackTrace();
 				try
 				{
-					getExternalAccess().invokeLater(new Runnable()
+					getExternalAccess().scheduleStep(new Runnable()
 					{
 						public void run()
 						{
@@ -85,7 +85,7 @@ public class MicroPreyAgent extends MicroAgent
 			
 			public void resultAvailable(Object source, Object result)
 			{
-				getExternalAccess().invokeLater(new Runnable()
+				getExternalAccess().scheduleStep(new Runnable()
 				{
 					public void run()
 					{

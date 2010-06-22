@@ -1,9 +1,9 @@
 package jadex.micro;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
+import jadex.bridge.IComponentAdapter;
 import jadex.bridge.MessageType;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.service.BasicServiceProvider;
 
 import java.util.Map;
@@ -20,6 +20,9 @@ public class ExternalAccess extends BasicServiceProvider implements IMicroExtern
 
 	/** The interpreter. */
 	protected MicroAgentInterpreter interpreter;
+	
+	/** The agent adapter. */
+	protected IComponentAdapter adapter;
 
 	// -------- constructors --------
 
@@ -30,6 +33,7 @@ public class ExternalAccess extends BasicServiceProvider implements IMicroExtern
 	{
 		this.agent = agent;
 		this.interpreter = interpreter;
+		this.adapter = interpreter.getAgentAdapter();
 	}
 
 	// -------- eventbase shortcut methods --------
@@ -42,7 +46,7 @@ public class ExternalAccess extends BasicServiceProvider implements IMicroExtern
 	 */
 	public void sendMessage(final Map me, final MessageType mt)
 	{
-		invokeLater(new Runnable()
+		adapter.invokeLater(new Runnable()
 		{
 			public void run()
 			{
@@ -51,15 +55,15 @@ public class ExternalAccess extends BasicServiceProvider implements IMicroExtern
 			}
 		});
 	}
-
+	
 	/**
-	 * Invoke some code on the agent thread. This method queues the runnable in
-	 * the agent and immediately return (i.e. probably before the runnable has
-	 * been executed).
+	 *  Schedule a step of the agent.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public void invokeLater(Runnable runnable)
+	public void	scheduleStep(Runnable step)
 	{
-		interpreter.getAgentAdapter().invokeLater(runnable);
+		interpreter.scheduleStep(step);
 	}
 
 	/**
@@ -67,35 +71,67 @@ public class ExternalAccess extends BasicServiceProvider implements IMicroExtern
 	 *  Operations on the agent object
 	 *  should be properly synchronized with invokeLater()!
 	 */
-	public IMicroAgent	getAgent()
+	public IFuture getAgent()
 	{
-		return agent;
+		final Future ret = new Future();
+		adapter.invokeLater(new Runnable() 
+		{
+			public void run() 
+			{
+				ret.setResult(agent);
+			}
+		});
+		return ret;
 	}
 	
 	/**
 	 *  Get the model of the component.
 	 */
-	public ILoadableComponentModel getModel()
+	public IFuture getModel()
 	{
-		return interpreter.getAgentModel();
+		final Future ret = new Future();
+		adapter.invokeLater(new Runnable() 
+		{
+			public void run() 
+			{
+				ret.setResult(interpreter.getAgentModel());
+			}
+		});
+		return ret;
 	}
 	
 	/**
 	 *  Get the id of the component.
 	 *  @return	The component id.
 	 */
-	public IComponentIdentifier	getComponentIdentifier()
+	public IFuture getComponentIdentifier()
 	{
-		return interpreter.getAgentAdapter().getComponentIdentifier();
+		final Future ret = new Future();
+		adapter.invokeLater(new Runnable() 
+		{
+			public void run() 
+			{
+				ret.setResult(interpreter.getAgentAdapter().getComponentIdentifier());
+			}
+		});
+		return ret;
 	}
 	
 	/**
 	 *  Get the parent component.
 	 *  @return The parent component.
 	 */
-	public IExternalAccess getParent()
+	public IFuture getParent()
 	{
-		return interpreter.getParent();
+		final Future ret = new Future();
+		adapter.invokeLater(new Runnable() 
+		{
+			public void run() 
+			{
+				ret.setResult(interpreter.getParent());
+			}
+		});
+		return ret;
 	}
 
 	/**
@@ -106,5 +142,4 @@ public class ExternalAccess extends BasicServiceProvider implements IMicroExtern
 	{
 		return this.interpreter;
 	}
-	
 }

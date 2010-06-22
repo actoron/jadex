@@ -1,8 +1,8 @@
 package jadex.bdibpmn.handler;
 
 import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.runtime.impl.ElementFlyweight;
-import jadex.bdi.runtime.impl.MessageEventFlyweight;
+import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
+import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
 import jadex.bdibpmn.BpmnPlanBodyInstance;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;

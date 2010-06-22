@@ -1,19 +1,15 @@
 package jadex.tools.debugger.micro;
 
-import jadex.bpmn.runtime.BpmnInterpreter;
-import jadex.bpmn.tools.ProcessViewPanel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;
 import jadex.commons.SGUI;
 import jadex.micro.ExternalAccess;
-import jadex.micro.MicroAgentInterpreter;
 import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.debugger.IDebuggerPanel;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.UIDefaults;
 
 /**
@@ -48,6 +44,7 @@ public class MicroDebuggerPanel	implements IDebuggerPanel
 	 */
 	public void init(IControlCenter jcc, IBreakpointPanel bpp, IComponentIdentifier name, IExternalAccess access)
 	{
+		// Hack!!! Do not cast to ExternalAccess
 		this.micropanel	= new MicroAgentViewPanel(((ExternalAccess)access).getInterpreter(), bpp);
 	}
 

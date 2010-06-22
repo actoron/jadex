@@ -10,16 +10,16 @@ import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IPlan;
 import jadex.bdi.runtime.IPlanbase;
-import jadex.bdi.runtime.impl.BeliefFlyweight;
-import jadex.bdi.runtime.impl.BeliefSetFlyweight;
-import jadex.bdi.runtime.impl.BeliefbaseFlyweight;
-import jadex.bdi.runtime.impl.CapabilityFlyweight;
-import jadex.bdi.runtime.impl.GoalFlyweight;
-import jadex.bdi.runtime.impl.GoalbaseFlyweight;
-import jadex.bdi.runtime.impl.InternalEventFlyweight;
-import jadex.bdi.runtime.impl.MessageEventFlyweight;
-import jadex.bdi.runtime.impl.PlanFlyweight;
-import jadex.bdi.runtime.impl.PlanbaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.BeliefFlyweight;
+import jadex.bdi.runtime.impl.flyweights.BeliefSetFlyweight;
+import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
+import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
+import jadex.bdi.runtime.impl.flyweights.GoalbaseFlyweight;
+import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
+import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
+import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
+import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.ResolvesTo;
 import jadex.commons.SReflect;
@@ -554,7 +554,7 @@ public class BDIParserHelper extends	DefaultParserHelper
 					public Object invoke(Object[] paramvalues, IOAVState state)
 					{
 						return PlanFlyweight.getPlanFlyweight(state, paramvalues[0] instanceof ILazyValue? ((ILazyValue)(paramvalues[0])).getValue(): paramvalues[0],
-								paramvalues[1] instanceof ILazyValue? ((ILazyValue)(paramvalues[1])).getValue(): paramvalues[1]);
+							paramvalues[1] instanceof ILazyValue? ((ILazyValue)(paramvalues[1])).getValue(): paramvalues[1]);
 					}
 				}, new Object[]{capvar, null})};
 			}

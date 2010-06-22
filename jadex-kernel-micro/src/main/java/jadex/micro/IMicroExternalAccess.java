@@ -2,6 +2,7 @@ package jadex.micro;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.MessageType;
+import jadex.commons.IFuture;
 
 import java.util.Map;
 
@@ -18,19 +19,19 @@ public interface IMicroExternalAccess	extends IExternalAccess
 	public void	sendMessage(Map me, MessageType mt);
 
 	/**
-	 *  Invoke some code on the agent thread.
-	 *  This method queues the runnable in the agent
-	 *  and immediately return (i.e. probably before
-	 *  the runnable has been executed).
+	 *  Schedule a step of the agent.
+	 *  May safely be called from external threads.
+	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public void invokeLater(Runnable runnable);
-
+	public void	scheduleStep(Runnable step);
+	
 	/**
 	 *  Get the agent implementation.
 	 *  Operations on the agent object
 	 *  should be properly synchronized with invokeLater()!
 	 */
-	public IMicroAgent	getAgent();
+//	public IMicroAgent getAgent();
+	public IFuture getAgent();
 	
 	/**
 	 *  Get the domain interfaces of the component.

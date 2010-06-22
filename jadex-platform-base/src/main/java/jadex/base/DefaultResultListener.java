@@ -2,6 +2,7 @@ package jadex.base;
 
 import jadex.commons.concurrent.IResultListener;
 
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**
@@ -19,6 +20,15 @@ public class DefaultResultListener implements IResultListener
 	protected static IResultListener instance;
 	
 	//-------- constructors --------
+	
+	/**
+	 *  Create a new listener.
+	 *  @param logger The logger.
+	 */
+	public DefaultResultListener()
+	{
+		this.logger = LogManager.getLogManager().getLogger(""+this);
+	}
 	
 	/**
 	 *  Create a new listener.

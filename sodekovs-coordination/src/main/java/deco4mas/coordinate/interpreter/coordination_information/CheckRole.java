@@ -9,12 +9,12 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IPlan;
-import jadex.bdi.runtime.impl.BeliefFlyweight;
-import jadex.bdi.runtime.impl.BeliefSetFlyweight;
-import jadex.bdi.runtime.impl.ElementFlyweight;
-import jadex.bdi.runtime.impl.GoalFlyweight;
-import jadex.bdi.runtime.impl.InternalEventFlyweight;
-import jadex.bdi.runtime.impl.PlanFlyweight;
+import jadex.bdi.runtime.impl.flyweights.BeliefFlyweight;
+import jadex.bdi.runtime.impl.flyweights.BeliefSetFlyweight;
+import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
+import jadex.bdi.runtime.impl.flyweights.GoalFlyweight;
+import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
+import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
 import jadex.rules.state.IOAVState;
 
 import java.util.ArrayList;

@@ -1,6 +1,8 @@
 package jadex.bdi.planlib.cms;
 
 import jadex.bdi.runtime.IBeliefSet;
+import jadex.bdi.runtime.IEABeliefSet;
+import jadex.bdi.runtime.IEABeliefbase;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentDescription;
@@ -25,7 +27,10 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 	 */
 	public void body()
 	{
-		final IBeliefSet components = getExternalAccess().getBeliefbase().getBeliefSet("components");
+		IEABeliefbase bb = (IEABeliefbase)getExternalAccess().getBeliefbase().get(this);
+		final IEABeliefSet components = (IEABeliefSet)bb.getBeliefSet("components").get(this);
+		
+//		final IEBeliefSet components = getExternalAccess().getBeliefbase().getBeliefSet("components");
 		
 		final Object mon = new Object();
 		synchronized(mon)
@@ -36,17 +41,19 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 				{
 					try
 					{
+						components.addFact(desc);
+						
 						// Decouple threads to avoid deadlocks (e.g. with sync executor)
-						getExternalAccess().invokeLater(new Runnable()
-						{
-							public void run()
-							{
-	//							synchronized(mon)
-								{
-									components.addFact(desc);
-								}
-							}
-						});
+//						getExternalAccess().invokeLater(new Runnable()
+//						{
+//							public void run()
+//							{
+//	//							synchronized(mon)
+//								{
+//									components.addFact(desc);
+//								}
+//							}
+//						});
 					}
 					catch(ComponentTerminatedException ate)
 					{
@@ -57,17 +64,19 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 				{
 					try
 					{
+						components.removeFact(desc);
+						
 						// Decouple threads to avoid deadlocks (e.g. with sync executor)
-						getExternalAccess().invokeLater(new Runnable()
-						{
-							public void run()
-							{
-	//							synchronized(mon)
-								{
-									components.removeFact(desc);
-								}
-							}
-						});
+//						getExternalAccess().invokeLater(new Runnable()
+//						{
+//							public void run()
+//							{
+//	//							synchronized(mon)
+//								{
+//									components.removeFact(desc);
+//								}
+//							}
+//						});
 					}
 					catch(ComponentTerminatedException ate)
 					{

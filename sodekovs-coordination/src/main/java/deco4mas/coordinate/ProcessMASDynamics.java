@@ -1,7 +1,7 @@
 package deco4mas.coordinate;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.impl.AgentFlyweight;
+import jadex.bdi.runtime.impl.flyweights.AgentFlyweight;
 import jadex.bridge.IComponentManagementService;
 
 import java.io.FileNotFoundException;

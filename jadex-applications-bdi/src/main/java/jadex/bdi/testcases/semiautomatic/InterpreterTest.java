@@ -55,7 +55,7 @@ public class InterpreterTest
 			
 			Map config = new HashMap();
 			config.put("messagetype_fipa", new jadex.base.fipa.FIPAMessageType());
-			config.put("planexecutor_standard", new jadex.bdi.runtime.JavaStandardPlanExecutor(
+			config.put("planexecutor_standard", new jadex.bdi.runtime.impl.JavaStandardPlanExecutor(
 				jadex.commons.concurrent.ThreadPoolFactory.createThreadPool()));
 			
 			OAVBDIModelLoader loader = new OAVBDIModelLoader();

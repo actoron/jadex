@@ -2,11 +2,13 @@ package jadex.tools.common;
 
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IEAMessageEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.ThreadSuspendable;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -50,7 +52,7 @@ public class FipaMessagePanel extends JPanel
 	//-------- attributes --------
 
 	/** The displayed message. */
-	protected IMessageEvent	message;
+	protected IEAMessageEvent	message;
 
 	/** Flag indicating if editing is allowed. */
 	protected boolean	editable;
@@ -373,9 +375,9 @@ public class FipaMessagePanel extends JPanel
 	/**
 	 *  Set the message to be displayed.
 	 */
-	public void	setMessage(IMessageEvent message)
+	public void	setMessage(IEAMessageEvent message)
 	{
-		this.message	= message;
+		this.message = message;
 
 		// Extract parameter values.
 		performative.setSelectedItem(getParameter(SFipa.PERFORMATIVE));
@@ -429,12 +431,12 @@ public class FipaMessagePanel extends JPanel
 	 *  Should be called to ensure that uptodate values are
 	 *  contained in the message parameters.
 	 */
-	public IMessageEvent	getMessage()
+	public IEAMessageEvent getMessage()
 	{
 		if(!editable)
 			return this.message;
 		else
-			this.message = agent.createMessageEvent("fipamsg");
+			this.message = (IEAMessageEvent)agent.createMessageEvent("fipamsg").get(new ThreadSuspendable(new Object()));
 		
 		// Set parameter values.
 		setParameter(SFipa.PERFORMATIVE, (String)performative.getSelectedItem());
@@ -487,7 +489,7 @@ public class FipaMessagePanel extends JPanel
 			// When setting to not-editable, make snapshot of message.
 			if(!editable)
 			{
-				this.message	= getMessage();
+				this.message = getMessage();
 			}
 			
 			this.editable	= editable;
@@ -515,7 +517,7 @@ public class FipaMessagePanel extends JPanel
 	/**
 	 *  Get a message parameter value as string.
 	 */
-	protected String	getParameter(String name)
+	protected String getParameter(String name)
 	{
 		Object	val	= message.getParameter(name).getValue();
 		return val!=null ? val.toString(): "";
@@ -524,7 +526,7 @@ public class FipaMessagePanel extends JPanel
 	/**
 	 *  Set a message parameter from string.
 	 */
-	protected void	setParameter(String name, Object value)
+	protected void setParameter(String name, Object value)
 	{
 		// Replace empty string with null.
 		Object oval = value==null || value.equals("") ? null : value;

@@ -41,7 +41,7 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 			{
 				final Space2D	space2d	= (Space2D)space;
 				final IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
-				exta.invokeLater(new Runnable()
+				exta.scheduleStep(new Runnable()
 				{
 					public void run()
 					{

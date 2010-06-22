@@ -13,5 +13,4 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="jadex.standalone.Platform"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-conf  jadex/standalone/services_conf.xml &#13;&#10;jadex/micro/kernel_micro_conf.xml&#13;&#10;../jadex-applications-micro/src/main/java/jadex/micro/benchmarks/creation_conf.xml"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jadex-standalone-launch"/>
-<stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.maven.ide.eclipse.launchconfig.sourcepathProvider"/>
 </launchConfiguration>

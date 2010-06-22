@@ -1,11 +1,12 @@
 package jadex.bdi.runtime;
 
 import jadex.bridge.IExternalAccess;
+import jadex.commons.IFuture;
 
 /**
  *  The interface for external threads.
  */
-public interface IBDIExternalAccess extends ICapability, IExternalAccess
+public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 {
 	//-------- goalbase shortcut methods --------
 
@@ -14,7 +15,7 @@ public interface IBDIExternalAccess extends ICapability, IExternalAccess
 	 *  @param goal The new goal.
 	 *  Note: plan step is interrupted after call.
 	 */
-	public void dispatchTopLevelGoal(IGoal goal);
+	public void dispatchTopLevelGoal(IEAGoal goal);
 
 	/**
 	 *  Create a goal from a template goal.
@@ -23,7 +24,8 @@ public interface IBDIExternalAccess extends ICapability, IExternalAccess
 	 *  @param type	The template goal name as specified in the ADF.
 	 *  @return The created goal.
 	 */
-	public IGoal createGoal(String type);
+//	public IGoal createGoal(String type);
+	public IFuture createGoal(String type);
 
 	//-------- eventbase shortcut methods --------
 
@@ -32,26 +34,28 @@ public interface IBDIExternalAccess extends ICapability, IExternalAccess
 	 *  @param me	The message event.
 	 *  @return The filter to wait for an answer.
 	 */
-	public void	sendMessage(IMessageEvent me);
+	public void	sendMessage(IEAMessageEvent me);
 
 	/**
 	 *  Dispatch an internal event.
 	 *  @param event The event.
 	 *  Note: plan step is interrupted after call.
 	 */
-	public void dispatchInternalEvent(IInternalEvent event);
+	public void dispatchInternalEvent(IEAInternalEvent event);
 
 	/**
 	 *  Create a new message event.
 	 *  @return The new message event.
 	 */
-	public IMessageEvent createMessageEvent(String type);
+//	public IMessageEvent createMessageEvent(String type);
+	public IFuture createMessageEvent(String type);
 
 	/**
 	 *  Create a new intenal event.
 	 *  @return The new intenal event.
 	 */
-	public IInternalEvent createInternalEvent(String type);
+//	public IInternalEvent createInternalEvent(String type);
+	public IFuture createInternalEvent(String type);
 
 	/**
 	 *  Create a new intenal event.
@@ -67,12 +71,12 @@ public interface IBDIExternalAccess extends ICapability, IExternalAccess
 	 *  Wait for a some time.
 	 *  @param duration The duration.
 	 */
-	public void	waitFor(long duration);
+	public IFuture waitFor(long duration);
 	
 	/**
 	 *  Wait for a tick.
 	 */
-	public void	waitForTick();
+	public IFuture waitForTick();
 
 	/**
 	 *  Wait for a condition to be satisfied.
@@ -103,21 +107,24 @@ public interface IBDIExternalAccess extends ICapability, IExternalAccess
 	 *  Wait for an internal event.
 	 *  @param type The internal event type.
 	 */
-	public IInternalEvent waitForInternalEvent(String type);
+//	public IInternalEvent waitForInternalEvent(String type);
+	public IFuture waitForInternalEvent(String type);
 
 	/**
 	 *  Wait for an internal event.
 	 *  @param type The internal event type.
 	 *  @param timeout The timeout.
 	 */
-	public IInternalEvent waitForInternalEvent(String type, long timeout);
+//	public IInternalEvent waitForInternalEvent(String type, long timeout);
+	public IFuture waitForInternalEvent(String type, long timeout);
 
 	/**
 	 *  Send a message and wait for the answer.
 	 *  @param me The message event.
 	 *  @return The result event.
 	 */
-	public IMessageEvent sendMessageAndWait(IMessageEvent me);
+//	public IMessageEvent sendMessageAndWait(IMessageEvent me);
+	public IFuture sendMessageAndWait(IEAMessageEvent me);
 
 	/**
 	 *  Send a message and wait for the answer.
@@ -126,52 +133,60 @@ public interface IBDIExternalAccess extends ICapability, IExternalAccess
 	 *  @param timeout The timeout.
 	 *  @return The result event.
 	 */
-	public IMessageEvent sendMessageAndWait(IMessageEvent me, long timeout);
+//	public IMessageEvent sendMessageAndWait(IMessageEvent me, long timeout);
+	public IFuture sendMessageAndWait(IEAMessageEvent me, long timeout);
 
 	/**
 	 *  Wait for a message event.
 	 *  @param type The message event type.
 	 */
-	public IMessageEvent waitForMessageEvent(String type);
+//	public IMessageEvent waitForMessageEvent(String type);
+	public IFuture waitForMessageEvent(String type);
 
 	/**
 	 *  Wait for a message event.
 	 *  @param type The message event type.
 	 *  @param timeout The timeout.
 	 */
-	public IMessageEvent waitForMessageEvent(String type, long timeout);
+//	public IMessageEvent waitForMessageEvent(String type, long timeout);
+	public IFuture waitForMessageEvent(String type, long timeout);
 
 	/**
 	 *  Wait for a message.
 	 *  @param msgevent The message event.
 	 */
-	public IMessageEvent	waitForReply(IMessageEvent msgevent);
+//	public IMessageEvent	waitForReply(IMessageEvent msgevent);
+	public IFuture waitForReply(IEAMessageEvent msgevent);
 
 	/**
 	 *  Wait for a message.
 	 *  @param msgevent The message event.
 	 */
-	public IMessageEvent	waitForReply(IMessageEvent msgevent, long timeout);
+//	public IMessageEvent waitForReply(IMessageEvent msgevent, long timeout);
+	public IFuture waitForReply(IEAMessageEvent msgevent, long timeout);
 
 	/**
 	 *  Wait for a goal.
 	 *  @param type The goal type.
 	 */
-	public void waitForGoal(String type);
+//	public void waitForGoal(String type);
+	public IFuture waitForGoal(String type);
 
 	/**
 	 *  Wait for a goal.
 	 *  @param type The goal type.
 	 *  @param timeout The timeout.
 	 */
-	public void waitForGoal(String type, long timeout);
+//	public void waitForGoal(String type, long timeout);
+	public IFuture waitForGoal(String type, long timeout);
 
 	/**
 	 *  Wait for a belief (set) fact change.
 	 *  @param belief The belief (set) type.
 	 *  @return The changed fact value.
 	 */
-	public Object waitForFactChanged(String belief);
+//	public Object waitForFactChanged(String belief);
+	public IFuture waitForFactChanged(String belief);
 
 	/**
 	 *  Wait for a belief (set) fact change.
@@ -179,29 +194,16 @@ public interface IBDIExternalAccess extends ICapability, IExternalAccess
 	 *  @param timeout The timeout.
 	 *  @return The changed fact.
 	 */
-	public Object waitForFactChanged(String belief, long timeout);
+//	public Object waitForFactChanged(String belief, long timeout);
+	public IFuture waitForFactChanged(String belief, long timeout);
 
 	/**
 	 *  Wait for a belief set change.
 	 *  @param type The belief set type.
 	 *  @return The fact that was added.
 	 */
-	public Object waitForFactAdded(String type);
-
-	/**
-	 *  Wait for a belief set change.
-	 *  @param type The belief set type.
-	 *  @param timeout The timeout.
-	 *  @return The fact that was added.
-	 */
-	public Object waitForFactAdded(String type, long timeout);
-
-	/**
-	 *  Wait for a belief set change.
-	 *  @param type The belief set type.
-	 *  @return The fact that was added.
-	 */
-	public Object waitForFactRemoved(String type);
+//	public Object waitForFactAdded(String type);
+	public IFuture waitForFactAdded(String type);
 
 	/**
 	 *  Wait for a belief set change.
@@ -209,19 +211,39 @@ public interface IBDIExternalAccess extends ICapability, IExternalAccess
 	 *  @param timeout The timeout.
 	 *  @return The fact that was added.
 	 */
-	public Object waitForFactRemoved(String type, long timeout);
+//	public Object waitForFactAdded(String type, long timeout);
+	public IFuture waitForFactAdded(String type, long timeout);
+
+	/**
+	 *  Wait for a belief set change.
+	 *  @param type The belief set type.
+	 *  @return The fact that was added.
+	 */
+//	public Object waitForFactRemoved(String type);
+	public IFuture waitForFactRemoved(String type);
+
+	/**
+	 *  Wait for a belief set change.
+	 *  @param type The belief set type.
+	 *  @param timeout The timeout.
+	 *  @return The fact that was added.
+	 */
+//	public Object waitForFactRemoved(String type, long timeout);
+	public IFuture waitForFactRemoved(String type, long timeout);
 
 	/**
 	 *  Dispatch a top level goal and wait for the result.
 	 *  @param goal The goal.
 	 */
-	public void dispatchTopLevelGoalAndWait(IGoal goal);
+//	public void dispatchTopLevelGoalAndWait(IEGoal goal);
+	public IFuture dispatchTopLevelGoalAndWait(IEAGoal goal);
 
 	/**
 	 *  Dispatch a top level goal and wait for the result.
 	 *  @param goal The goal.
 	 */
-	public void dispatchTopLevelGoalAndWait(IGoal goal, long timeout);
+//	public void dispatchTopLevelGoalAndWait(IEGoal goal, long timeout);
+	public IFuture dispatchTopLevelGoalAndWait(IEAGoal goal, long timeout);
 	
 	/**
 	 *  Wait for the agent to terminate.
@@ -241,7 +263,7 @@ public interface IBDIExternalAccess extends ICapability, IExternalAccess
 	 *  and immediately return (i.e. probably before
 	 *  the runnable has been executed).
 	 */
-	public void invokeLater(Runnable runnable);
+//	public void invokeLater(Runnable runnable);
 
 	/**
 	 *  Start an external thread to the set of threads which
