@@ -2,10 +2,9 @@ package jadex.bdi.benchmarks;
 
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
-import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBeliefListener;
 import jadex.bdi.runtime.IEABelief;
-import jadex.bdi.runtime.IEABeliefbase;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
 
@@ -29,45 +28,15 @@ public class MessageGui extends JFrame
 		final JLabel rec = new JLabel("Received: [0]");
 		
 		
-		agent.getBeliefbase().addResultListener(new IResultListener() 
+		agent.getBeliefbase().getBelief("sent").addResultListener(new IResultListener() 
 		{
 			public void resultAvailable(Object source, Object result) 
 			{
-				IEABeliefbase bb = (IEABeliefbase)result;
-				
-				bb.getBelief("sent").addResultListener(new IResultListener() 
+				((IEABelief)result).addBeliefListener(new IBeliefListener()
 				{
-					public void resultAvailable(Object source, Object result) 
+					public void beliefChanged(AgentEvent ae)
 					{
-						((IEABelief)result).addBeliefListener(new IBeliefListener()
-						{
-							public void beliefChanged(AgentEvent ae)
-							{
-								sent.setText("Sent: ["+ae.getValue()+"]");
-							}
-						});
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception) 
-					{
-					}
-				});
-				
-				bb.getBelief("received").addResultListener(new IResultListener() 
-				{
-					public void resultAvailable(Object source, Object result) 
-					{
-						((IEABelief)result).addBeliefListener(new IBeliefListener()
-						{
-							public void beliefChanged(AgentEvent ae)
-							{
-								rec.setText("Received: ["+ae.getValue()+"]");
-							}
-						});
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception) 
-					{
+						sent.setText("Sent: ["+ae.getValue()+"]");
 					}
 				});
 			}
@@ -77,20 +46,24 @@ public class MessageGui extends JFrame
 			}
 		});
 		
-//		agent.getBeliefbase().getBelief("sent").addBeliefListener(new IBeliefListener()
-//		{
-//			public void beliefChanged(AgentEvent ae)
-//			{
-//				sent.setText("Sent: ["+ae.getValue()+"]");
-//			}
-//		});
-//		agent.getBeliefbase().getBelief("received").addBeliefListener(new IBeliefListener()
-//		{
-//			public void beliefChanged(AgentEvent ae)
-//			{
-//				rec.setText("Received: ["+ae.getValue()+"]");
-//			}
-//		});
+		agent.getBeliefbase().getBelief("received").addResultListener(new IResultListener() 
+		{
+			public void resultAvailable(Object source, Object result) 
+			{
+				((IEABelief)result).addBeliefListener(new IBeliefListener()
+				{
+					public void beliefChanged(AgentEvent ae)
+					{
+						rec.setText("Received: ["+ae.getValue()+"]");
+					}
+				});
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception) 
+			{
+			}
+		});
+		
 		agent.addAgentListener(new IAgentListener()
 		{
 			public void agentTerminating(AgentEvent ae)
