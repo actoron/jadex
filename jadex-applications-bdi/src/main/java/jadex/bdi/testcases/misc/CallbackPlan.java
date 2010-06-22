@@ -16,6 +16,8 @@ import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.Plan;
 
+import java.util.logging.Logger;
+
 /**
  *  Test agent callbacks.
  */
@@ -23,7 +25,7 @@ public class CallbackPlan extends Plan
 {
 	/**
 	 *  The body method is called on the
-	 *  instatiated plan instance from the scheduler.
+	 *  instantiated plan instance from the scheduler.
 	 */
 	public void body()
 	{
@@ -32,14 +34,15 @@ public class CallbackPlan extends Plan
 //		int start = getInterpreter().getEventDispatcher().getListenerCount();
 			
 		// Belief (set) tests
+		final Logger	logger	= getLogger();
 		
 		final TestReport tr1 = new TestReport("#1", "Test if belief changes can be observed in a listener.");
 		getBeliefbase().getBelief("bel").addBeliefListener(new IBeliefListener()
 		{
 			public void beliefChanged(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("belief changed: "+ae);
-				getExternalAccess().getBeliefbase().getBelief("bel").removeBeliefListener(this);
+				logger.info("belief changed: "+ae);
+				getBeliefbase().getBelief("bel").removeBeliefListener(this);
 				tr1.setSucceeded(true);
 			}
 		});
@@ -54,19 +57,19 @@ public class CallbackPlan extends Plan
 		{
 			public void factAdded(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("fact added: "+ae);
-				getExternalAccess().getBeliefbase().getBeliefSet("belset").removeBeliefSetListener(this);
+				logger.info("fact added: "+ae);
+				getBeliefbase().getBeliefSet("belset").removeBeliefSetListener(this);
 				tr2.setSucceeded(true);
 			}
 			
 			public void factRemoved(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("fact removed: "+ae);
+				logger.info("fact removed: "+ae);
 			}
 			
 			public void factChanged(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("fact changed: "+ae);			
+				logger.info("fact changed: "+ae);			
 			}
 		});
 		getBeliefbase().getBeliefSet("belset").addFact(new Integer(1));
@@ -81,19 +84,19 @@ public class CallbackPlan extends Plan
 		{
 			public void factAdded(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("fact added: "+ae);
+				logger.info("fact added: "+ae);
 			}
 			
 			public void factRemoved(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("fact removed: "+ae);
-				getExternalAccess().getBeliefbase().getBeliefSet("belset").removeBeliefSetListener(this);
+				logger.info("fact removed: "+ae);
+				getBeliefbase().getBeliefSet("belset").removeBeliefSetListener(this);
 				tr2b.setSucceeded(true);
 			}
 			
 			public void factChanged(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("fact changed: "+ae);			
+				logger.info("fact changed: "+ae);			
 			}
 		});
 		getBeliefbase().getBeliefSet("belset").removeFact(new Integer(1));
@@ -110,13 +113,13 @@ public class CallbackPlan extends Plan
 		{
 			public void goalAdded(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("Goal added called");
+				logger.info("Goal added called");
 				//tr3.setSucceeded(true);
 			}
 
 			public void goalFinished(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("Goal finished called");
+				logger.info("Goal finished called");
 				tr3.setSucceeded(true);
 			}
 		};
@@ -141,7 +144,7 @@ public class CallbackPlan extends Plan
 		{
 			public void goalAdded(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("Goal added called");
+				logger.info("Goal added called");
 				tr4.setSucceeded(true);
 			}
 
@@ -161,8 +164,8 @@ public class CallbackPlan extends Plan
 							started.notify();
 						}
 
-						getExternalAccess().getLogger().info("Goal finished called");
-						getExternalAccess().getGoalbase().removeGoalListener("goal", t);
+						logger.info("Goal finished called");
+						getGoalbase().removeGoalListener("goal", t);
 						tr5.setSucceeded(true);
 						try
 						{
@@ -213,8 +216,8 @@ public class CallbackPlan extends Plan
 		{
 			public void internalEventOccurred(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("Internal event occurred called");
-				getExternalAccess().getEventbase().removeInternalEventListener("internal_event", this);
+				logger.info("Internal event occurred called");
+				getEventbase().removeInternalEventListener("internal_event", this);
 				tr6.setSucceeded(true);
 			}
 		});
@@ -243,7 +246,7 @@ public class CallbackPlan extends Plan
 
 			public void messageEventSent(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("Message event sent");
+				logger.info("Message event sent");
 				tr8.setSucceeded(true);
 			}
 		};
@@ -251,14 +254,14 @@ public class CallbackPlan extends Plan
 		{
 			public void messageEventReceived(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("Message event received");
-				getExternalAccess().getEventbase().removeMessageEventListener("message_event", this);
+				logger.info("Message event received");
+				getEventbase().removeMessageEventListener("message_event", this);
 				tr7.setSucceeded(true);
 			}
 
 			public void messageEventSent(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("Message event sent");
+				logger.info("Message event sent");
 				tr9.setSucceeded(true);
 			}
 		});
@@ -329,13 +332,13 @@ public class CallbackPlan extends Plan
 		{
 			public void planAdded(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("Plan added");
+				logger.info("Plan added");
 				tr12.setSucceeded(true);
 			}
 
 			public void planFinished(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("Plan removed");
+				logger.info("Plan removed");
 				tr13.setSucceeded(true);
 			}
 		};
@@ -367,9 +370,9 @@ public class CallbackPlan extends Plan
 
 			public void planFinished(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("Plan removed");
+				logger.info("Plan removed");
 				tr14.setSucceeded(true);
-				getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(tr14);
+				getBeliefbase().getBeliefSet("testcap.reports").addFact(tr14);
 				getPlanElement().removePlanListener(this);
 			}
 		});
@@ -379,16 +382,16 @@ public class CallbackPlan extends Plan
 		{
 			public void agentTerminating(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("Agent terminating invoked");
+				logger.info("Agent terminating invoked");
 //				getExternalAccess().removeAgentListener(this);
-				getExternalAccess().getLogger().info("Agent died invoked");
+				logger.info("Agent died invoked");
 				tr16.setSucceeded(true);
-				getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(tr16);
+				getBeliefbase().getBeliefSet("testcap.reports").addFact(tr16);
 			}
 			
 			public void agentTerminated(AgentEvent ae)
 			{
-				getExternalAccess().getLogger().info("Agent terminated invoked");
+				logger.info("Agent terminated invoked");
 			}
 		});
 		

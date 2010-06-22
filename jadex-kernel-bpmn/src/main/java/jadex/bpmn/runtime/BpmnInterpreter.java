@@ -425,7 +425,7 @@ public class BpmnInterpreter implements IComponentInstance
 			{
 				// todo: develop external access
 				// Hack!!! Shouldn't return instance directly.
-				listener.resultAvailable(BpmnInterpreter.this, BpmnInterpreter.this);
+				listener.resultAvailable(BpmnInterpreter.this, new ExternalAccess(BpmnInterpreter.this));
 			}
 		});
 	}

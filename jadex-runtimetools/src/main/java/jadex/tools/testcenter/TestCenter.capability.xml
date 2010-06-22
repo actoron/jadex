@@ -22,9 +22,7 @@
 		</capabilities>
 
 		<beliefs>
-			<belief name="timeout" class="long" exported="true">
-				<fact>20000L</fact>
-			</belief>
+			<belief name="timeout" class="long" exported="true"/>
 		</beliefs>
 
 		<goals>

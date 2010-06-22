@@ -11,7 +11,6 @@ import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
-import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.Tuple;
@@ -139,7 +138,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 				public void run()
 				{
 					ElementFlyweight reply = (ElementFlyweight)FlyweightFunctionality.createMessageEvent(getState(), getScope(), msgeventtype, false);
-					object = MessageEventRules.initializeReply(getState(), getScope(), ((ElementFlyweight)event).getHandle(), ((ElementFlyweight)reply).getHandle());
+					object = MessageEventFlyweight.getMessageEventFlyweight(getState(), getScope(), MessageEventRules.initializeReply(getState(), getScope(), ((ElementFlyweight)event).getHandle(), ((ElementFlyweight)reply).getHandle()));
 				}
 			};
 			return (IMessageEvent)invoc.object;
@@ -147,7 +146,7 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 		else
 		{
 			ElementFlyweight reply = (ElementFlyweight)FlyweightFunctionality.createMessageEvent(getState(), getScope(), msgeventtype, false);
-			return (IMessageEvent)MessageEventRules.initializeReply(getState(), getScope(), ((ElementFlyweight)event).getHandle(), ((ElementFlyweight)reply).getHandle());
+			return MessageEventFlyweight.getMessageEventFlyweight(getState(), getScope(), MessageEventRules.initializeReply(getState(), getScope(), ((ElementFlyweight)event).getHandle(), ((ElementFlyweight)reply).getHandle()));
 		}
 	}
 	

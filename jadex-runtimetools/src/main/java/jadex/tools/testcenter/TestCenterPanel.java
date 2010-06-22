@@ -3,6 +3,9 @@ package jadex.tools.testcenter;
 import jadex.base.SComponentFactory;
 import jadex.base.test.Testcase;
 import jadex.bdi.runtime.AgentEvent;
+import jadex.bdi.runtime.IEABelief;
+import jadex.bdi.runtime.IEABeliefbase;
+import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.ComponentTerminatedException;
@@ -10,6 +13,7 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.IResultListener;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.BrowserPane;
 import jadex.tools.common.EditableList;
@@ -180,20 +184,20 @@ public class TestCenterPanel extends JSplitPane
 		
 		JScrollPane	scroll	= new JScrollPane(teststable);
 		teststable.setPreferredScrollableViewportSize(new Dimension(400, 200)); // todo: hack
-		tfto = new JTextField(""+((AgentControlCenter)plugin.getJCC()).getAgent().getBeliefbase().getBelief("testcase_timeout").getFact(), 6);
+		tfto = new JTextField("", 6);
 		tfto.setMinimumSize(tfto.getPreferredSize());
 		tfto.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
-				extractTimeoutValue(tfto.getText());
+				setTimeoutBelief(tfto.getText());
 			}
 		});
 		tfto.addFocusListener(new FocusAdapter()
 		{
 			public void focusLost(FocusEvent fe)
 			{
-				extractTimeoutValue(tfto.getText());
+				setTimeoutBelief(tfto.getText());
 			}
 		});
 		this.tfpar = new JComboBox(new String[]{"1", "5", "10", "all"});
@@ -480,12 +484,16 @@ public class TestCenterPanel extends JSplitPane
 		for(int i=0; i<entries.length; i++)
 			teststable.addEntry(entries[i].getValue());
 		
-		String timeout	= ""+((AgentControlCenter)plugin.getJCC()).getAgent().getBeliefbase().getBelief("testcase_timeout").getFact();
+		String timeout;
 		if(props.getProperty("timeout")!=null)
 		{
 			timeout	= props.getStringProperty("timeout");
-			((AgentControlCenter)plugin.getJCC()).getAgent().getBeliefbase().getBelief("testcase_timeout").setFact(new Integer(timeout));
 		}
+		else
+		{
+			timeout	= "20000";
+		}
+		setTimeoutBelief(timeout);
 		tfto.setText(timeout);
 
 		if(props.getProperty("concurrency")!=null)
@@ -836,7 +844,8 @@ public class TestCenterPanel extends JSplitPane
 		teststable.setAllowDuplicates(false);
 		allowduplicates.setSelected(false);
 		
-		// tfto.setText(???); // Can't reset as value from belief is overwritten.
+		tfto.setText("20000");
+		setTimeoutBelief("20000");
 	}
 
 	/**
@@ -851,26 +860,57 @@ public class TestCenterPanel extends JSplitPane
 	/**
 	 *  Extract the timeout value taken from the textfield. 
 	 */
-	protected void extractTimeoutValue(String text)
+	protected void setTimeoutBelief(String text)
 	{
 		try
 		{
-			Integer to = new Integer(text);
-			((AgentControlCenter)plugin.getJCC()).getAgent().getBeliefbase().getBelief("testcase_timeout").setFact(to);
-		}
-		catch(final Exception e)
-		{
-			//e.printStackTrace();
-			SwingUtilities.invokeLater(new Runnable()
+			final Integer to = new Integer(text);
+			((AgentControlCenter)plugin.getJCC()).getAgent().getBeliefbase().addResultListener(new IResultListener()
 			{
-				public void run()
+				public void resultAvailable(Object source, Object result)
 				{
-					String msg = SUtil.wrapText("No integer timeout: "+e.getMessage());
-					JOptionPane.showMessageDialog(SGUI.getWindowParent(TestCenterPanel.this),
-						msg, "Settings problem", JOptionPane.INFORMATION_MESSAGE);
+					((IEABeliefbase)result).getBelief("testcase_timeout").addResultListener(new IResultListener()
+					{
+						
+						public void resultAvailable(Object source, Object result)
+						{
+							((IEABelief)result).setFact(to);							
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							showTimoutValueWarning(exception);
+						}
+					});
+					
+				}
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					showTimoutValueWarning(exception);
 				}
 			});
 		}
+		catch(Exception e)
+		{
+			showTimoutValueWarning(e);
+		}
+	}
+	
+	/**
+	 *  Show a warning message that a wrong timeout value was entered.
+	 */
+	protected void	showTimoutValueWarning(final Exception e)
+	{
+		//e.printStackTrace();
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				String msg = SUtil.wrapText("No integer timeout: "+e.getMessage());
+				JOptionPane.showMessageDialog(SGUI.getWindowParent(TestCenterPanel.this),
+					msg, "Settings problem", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});		
 	}
 
 	/**
@@ -1056,12 +1096,21 @@ public class TestCenterPanel extends JSplitPane
 				{
 					// Create testcase and dispatch goal.
 					testcases[i]	= new Testcase(names[i]);
-					IGoal pt = ((AgentControlCenter)plugin.getJCC()).getAgent().createGoal("perform_test");
-					pt.getParameter("testcase").setValue(testcases[i]);
-					pt.addGoalListener(this);
-					goals.add(pt);
-					((AgentControlCenter)plugin.getJCC()).getAgent().dispatchTopLevelGoal(pt);
-					plugin.getJCC().setStatusText("Performing test "+names[i]);
+					((AgentControlCenter)plugin.getJCC()).getAgent().createGoal("perform_test").addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							IEAGoal	pt	= (IEAGoal)result;
+							pt.getParameter("testcase").setValue(testcases[i]);
+							pt.addGoalListener(this);
+							goals.add(pt);
+							((AgentControlCenter)plugin.getJCC()).getAgent().dispatchTopLevelGoal(pt);
+							plugin.getJCC().setStatusText("Performing test "+names[i]);
+						}
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+						}
+					});
 				}
 			}			
 		}
