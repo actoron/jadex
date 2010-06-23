@@ -1098,16 +1098,17 @@ public class TestCenterPanel extends JSplitPane
 				{
 					// Create testcase and dispatch goal.
 					testcases[i]	= new Testcase(names[i]);
+					final int num = i;
 					((AgentControlCenter)plugin.getJCC()).getAgent().createGoal("perform_test").addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
 							IEAGoal	pt	= (IEAGoal)result;
-							pt.getParameter("testcase").setValue(testcases[i]);
-							pt.addGoalListener(this);
+							pt.setParameterValue("testcase", testcases[num]);
+							pt.addGoalListener(TestSuite.this);
 							goals.add(pt);
 							((AgentControlCenter)plugin.getJCC()).getAgent().dispatchTopLevelGoal(pt);
-							plugin.getJCC().setStatusText("Performing test "+names[i]);
+							plugin.getJCC().setStatusText("Performing test "+names[num]);
 						}
 						public void exceptionOccurred(Object source, Exception exception)
 						{

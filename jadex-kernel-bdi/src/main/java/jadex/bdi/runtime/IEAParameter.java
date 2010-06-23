@@ -26,7 +26,7 @@ public interface IEAParameter extends IEAElement
 	 *  Get the name.
 	 *  @return The name.
 	 */
-	public IFuture getName();
+	public String getName();
 	
 	/**
 	 *  Get the value class.

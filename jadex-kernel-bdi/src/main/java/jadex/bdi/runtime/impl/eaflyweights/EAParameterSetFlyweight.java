@@ -46,6 +46,10 @@ public class EAParameterSetFlyweight extends ElementFlyweight implements IEAPara
 	{
 		super(state, scope, handle);
 		this.name	= name;
+		
+		if(name==null)
+			throw new RuntimeException("fixme");
+		
 		this.pe = pe;
 	}
 	
@@ -544,26 +548,28 @@ public class EAParameterSetFlyweight extends ElementFlyweight implements IEAPara
 	 *  Get the name.
 	 *  @return The name.
 	 */
-	public IFuture getName()
+	public String getName()
 	{
-		final Future ret = new Future();
+		return name;
 		
-		if(getInterpreter().isExternalThread())
-		{
-			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					ret.setResult(getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.parameterset_has_name));
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.parameterset_has_name));
-		}
-		
-		return ret;
+//		final Future ret = new Future();
+//		
+//		if(getInterpreter().isExternalThread())
+//		{
+//			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+//			{
+//				public void run()
+//				{
+//					ret.setResult(getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.parameterset_has_name));
+//				}
+//			});
+//		}
+//		else
+//		{
+//			ret.setResult(getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.parameterset_has_name));
+//		}
+//		
+//		return ret;
 	}
 	
 	//-------- IElement interface --------

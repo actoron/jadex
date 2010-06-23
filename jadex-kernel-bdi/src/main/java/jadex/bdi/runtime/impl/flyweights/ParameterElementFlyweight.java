@@ -12,6 +12,11 @@ import jadex.rules.state.IOAVState;
  */
 public abstract class ParameterElementFlyweight extends ElementFlyweight implements IParameterElement
 {
+	//-------- attributes --------
+	
+	/** The cached type. */
+	protected String type;
+	
 	//-------- constructors --------
 	
 	/**
@@ -23,6 +28,7 @@ public abstract class ParameterElementFlyweight extends ElementFlyweight impleme
 	protected ParameterElementFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		super(state, scope, handle);
+		this.type = FlyweightFunctionality.getTypeName(state, handle);
 	}
 	
 	//-------- methods ---------
@@ -186,22 +192,8 @@ public abstract class ParameterElementFlyweight extends ElementFlyweight impleme
 	 *  Get the element type (i.e. the name declared in the ADF).
 	 *  @return The element type.
 	 */
-	public String	getType()
+	public String getType()
 	{
-		if(getInterpreter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					string = getTypeName();
-				}
-			};
-			return invoc.string;
-		}
-		else
-		{
-			return getTypeName();
-		}
+		return type;
 	}
 }

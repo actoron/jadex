@@ -1,7 +1,9 @@
 package jadex.bdi.examples.alarmclock;
 
+import jadex.base.DefaultResultListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.jtable.ObjectTableModel;
+import jadex.service.clock.IClockService;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -83,7 +85,8 @@ public class AlarmsGui extends JFrame
 				if (!isRowSelected(row))
 				{
 					Alarm alarm = (Alarm)tadata.getObjectForRow(row);
-					if(alarm.getAlarmtime()<agent.getTime())
+					IClockService cs = (IClockService)agent.getServiceContainer().getService(IClockService.class);
+					if(alarm.getAlarmtime()<cs.getTime())
 					{
 						c.setBackground(new Color(255, 211, 156));
 					}
@@ -165,14 +168,21 @@ public class AlarmsGui extends JFrame
 		{
 			public void run()
 			{
-				Alarm[] alarms = (Alarm[])agent.getBeliefbase().getBeliefSet("alarms").getFacts();
-				for(int i=0; i<alarms.length; i++)
+				agent.getBeliefbase().getBeliefSetFacts("alarms").addResultListener(new DefaultResultListener()
 				{
-					// Cannot use add row as beliefset already contains alarm.
-					tadata.addRow(new Object[]{alarms[i].getMessage(), alarms[i].getMode(),
-						new Boolean(alarms[i].isActive())}, alarms[i]);
-					alarms[i].addPropertyChangeListener(plis);
-				}
+					
+					public void resultAvailable(Object source, Object result)
+					{
+						Alarm[] alarms = (Alarm[])result;
+						for(int i=0; i<alarms.length; i++)
+						{
+							// Cannot use add row as beliefset already contains alarm.
+							tadata.addRow(new Object[]{alarms[i].getMessage(), alarms[i].getMode(),
+								new Boolean(alarms[i].isActive())}, alarms[i]);
+							alarms[i].addPropertyChangeListener(plis);
+						}
+					}
+				});
 			}
 		});
 
@@ -215,7 +225,7 @@ public class AlarmsGui extends JFrame
 	{
 //		System.out.println("Adding:"+alarm);
 		alarm.addPropertyChangeListener(plis);
-		agent.getBeliefbase().getBeliefSet("alarms").addFact(alarm);
+		agent.getBeliefbase().addBeliefSetFact("alarms", alarm);
 		ObjectTableModel tadata = (ObjectTableModel)alarms.getModel();
 		tadata.insertRow(rowcnt, new Object[]{alarm.getMessage(),
 			alarm.getMode(), new Boolean(alarm.isActive())}, alarm);
@@ -231,7 +241,7 @@ public class AlarmsGui extends JFrame
 	public void removeRow(Alarm alarm)
 	{
 //		System.out.println("Removing:"+alarm);
-		agent.getBeliefbase().getBeliefSet("alarms").removeFact(alarm);
+		agent.getBeliefbase().removeBeliefSetFact("alarms", alarm);
 		ObjectTableModel tadata = (ObjectTableModel)alarms.getModel();
 		tadata.removeRow(alarm);
 		alarm.removePropertyChangeListener(plis);

@@ -83,12 +83,6 @@ public interface IGoal	extends IProcessableElement
 	public void drop();
 
 	/**
-	 *  Get the goal type.
-	 *  @return The goal type.
-	 */
-	public String	getType();
-
-	/**
 	 *  Get the exception (if any).
 	 *  When the goal has failed, the exception can be inspected.
 	 *  If more than one plan has been executed for a goal

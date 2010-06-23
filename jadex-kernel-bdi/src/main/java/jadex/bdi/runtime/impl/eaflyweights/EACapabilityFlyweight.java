@@ -17,6 +17,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.rules.state.IOAVState;
+import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 
 import java.util.logging.Logger;
@@ -55,6 +56,9 @@ public abstract class EACapabilityFlyweight extends ElementFlyweight implements 
 	/** The component identifier. */
 	protected IComponentIdentifier	cid;
 	
+	/** The service container. */
+	protected IServiceContainer container;
+	
 	//-------- constructors --------
 	
 	/**
@@ -76,6 +80,7 @@ public abstract class EACapabilityFlyweight extends ElementFlyweight implements 
 		this.expressionbase	= EAExpressionbaseFlyweight.getExpressionbaseFlyweight(getState(), getScope());
 		this.logger	= BDIInterpreter.getInterpreter(getState()).getLogger(getScope());
 		this.cid	= adapter.getComponentIdentifier();
+		this.container = adapter.getServiceContainer();
 	}
 	
 	//-------- methods concerning beliefs --------
@@ -229,26 +234,9 @@ public abstract class EACapabilityFlyweight extends ElementFlyweight implements 
 	 *  Get the agent platform
 	 *  @return The agent platform.
 	 */
-	public IFuture getServiceContainer()
+	public IServiceContainer getServiceContainer()
 	{
-		final Future ret = new Future();
-		
-		if(getInterpreter().isExternalThread())
-		{
-			adapter.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					ret.setResult(adapter.getServiceContainer());
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(adapter.getServiceContainer());
-		}
-		
-		return ret;
+		return container;
 	}
 	
 	/**

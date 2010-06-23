@@ -1,5 +1,6 @@
 package jadex.bdi.runtime;
 
+import jadex.bridge.MessageType;
 import jadex.commons.IFuture;
 
 /**
@@ -19,6 +20,7 @@ public interface IEAMessageEvent extends IEAProcessableElement
 	 *  Get the message type.
 	 *  @return The message type.
 	 */
+	public MessageType getMessageType();
 	
 	/**
 	 *  Get the message direction.

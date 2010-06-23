@@ -89,5 +89,5 @@ public interface IEAParameterSet extends IEAElement
 	 *  Get the name.
 	 *  @return The name.
 	 */
-	public IFuture getName();
+	public String getName();
 }

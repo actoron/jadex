@@ -1,9 +1,11 @@
 package jadex.bdi.examples.alarmclock;
 
+import jadex.base.DefaultResultListener;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
+import jadex.service.clock.IClockService;
 
 import java.awt.AWTException;
 import java.awt.MenuItem;
@@ -168,20 +170,27 @@ public class ClockFrame extends JFrame
 				if(alarms_gui!=null)
 					alarms_gui.dispose();
 				dispose();
-				Settings sets = (Settings)ClockFrame.this.agent.getBeliefbase().getBelief("settings").getFact();
-				if(sets.isAutosave())
+				ClockFrame.this.agent.getBeliefbase().getBeliefFact("settings").addResultListener(new DefaultResultListener()
 				{
-					try
+					public void resultAvailable(Object source, Object result)
 					{
-						sets.save();
+						Settings sets = (Settings)result;
+						if(sets.isAutosave())
+						{
+							try
+							{
+								sets.save();
+							}
+							catch(Exception ex)
+							{
+								JOptionPane.showMessageDialog(ClockFrame.this, "Cannot save settings. The file: \n"
+									+sets.getFilename()+"\n could not be written", "Settings error",
+									JOptionPane.ERROR_MESSAGE);
+							}
+						}
 					}
-					catch(Exception ex)
-					{
-						JOptionPane.showMessageDialog(ClockFrame.this, "Cannot save settings. The file: \n"
-							+sets.getFilename()+"\n could not be written", "Settings error",
-							JOptionPane.ERROR_MESSAGE);
-					}
-				}
+				});
+				
 				ClockFrame.this.agent.killAgent(); // Use -autoshutdown to kill standalone platform as well
 				//IGoal kp = agent.createGoal("cms_shutdown_platform");
 				//agent.dispatchTopLevelGoal(kp);
@@ -316,27 +325,38 @@ public class ClockFrame extends JFrame
 		final boolean[] firsttime = new boolean[]{true};
 		try
 		{
-			Date	current	= new Date(agent.getTime());
-			Settings sets = (Settings)agent.getBeliefbase().getBelief("settings").getFact();
-			if(sets.isAMPM()!=last_ampm || sets.getFontsize()!=last_fontsize || firsttime[0] )
+			
+			
+			agent.getBeliefbase().getBeliefFact("settings").addResultListener(new DefaultResultListener()
 			{
-				if(sets.isAMPM())
-					format.applyPattern("hh:mm:ss a");
-				else
-					format.applyPattern("HH:mm:ss");
-				firsttime[0] = false;
-				time.setFont(time.getFont().deriveFont((float)sets.getFontsize()));
-				time.setText(format.format(current));
-				pack();
-				last_ampm = sets.isAMPM();
-				last_fontsize = sets.getFontsize();
-			}
-			else
-			{
-				time.setText(format.format(current));
-			}
-			if(ti!=null)
-				ti.setToolTip(format.format(current));
+				public void resultAvailable(Object source, Object result)
+				{
+					Settings sets = (Settings)result;
+					IClockService cs = (IClockService)agent.getServiceContainer().getService(IClockService.class);
+					Date current = new Date(cs.getTime());
+					
+					if(sets.isAMPM()!=last_ampm || sets.getFontsize()!=last_fontsize || firsttime[0] )
+					{
+						if(sets.isAMPM())
+							format.applyPattern("hh:mm:ss a");
+						else
+							format.applyPattern("HH:mm:ss");
+						firsttime[0] = false;
+						time.setFont(time.getFont().deriveFont((float)sets.getFontsize()));
+						time.setText(format.format(current));
+						pack();
+						last_ampm = sets.isAMPM();
+						last_fontsize = sets.getFontsize();
+					}
+					else
+					{
+						time.setText(format.format(current));
+					}
+					if(ti!=null)
+						ti.setToolTip(format.format(current));
+				}
+			});
+			
 		}
 		catch(Exception e)
 		{

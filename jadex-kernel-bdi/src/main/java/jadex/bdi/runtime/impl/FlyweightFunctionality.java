@@ -42,6 +42,7 @@ import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.IExpressionParser;
@@ -59,6 +60,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *  Shared functionality of ea and normal flyweights.
+ *  Helps to avoid code copying.
+ */
 public class FlyweightFunctionality 
 {
 	//-------- beliefbase --------
@@ -786,6 +791,54 @@ public class FlyweightFunctionality
 			ret = ea? new IEAParameterSet[0]: new IParameterSet[0];
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 *  Get the parameter.
+	 *  @param name The name.
+	 *  @return The param.
+	 */
+	public static Object getParameter(IOAVState state, Object scope, Object handle, final String name, boolean ea)
+	{
+		Object param = state.getAttributeValue(handle, 
+			OAVBDIRuntimeModel.parameterelement_has_parameters, name);
+		return ea? EAParameterFlyweight.getParameterFlyweight(state, scope, param, name, handle)
+			: ParameterFlyweight.getParameterFlyweight(state, scope, param, name, handle);
+	}
+	
+	/**
+	 *  Get the parameter set element.
+ 	 *  @param name The name.
+	 *  @return The param set.
+	 */
+	public static Object getParameterSet(IOAVState state, Object scope, Object handle, final String name, boolean ea)
+	{
+		Object paramset = state.getAttributeValue(handle, 
+			OAVBDIRuntimeModel.parameterelement_has_parametersets, name);
+		return ea? EAParameterSetFlyweight.getParameterSetFlyweight(state, scope, paramset, name, handle)
+			: ParameterSetFlyweight.getParameterSetFlyweight(state, scope, paramset, name, handle);
+	}
+	
+	/**
+	 *  Get the type name (name of the modelelement).
+	 */
+	public static String getTypeName(IOAVState state, Object handle)
+	{
+		// Only called from synchronized code -> no agent invocation necessary 
+		String ret = "unknown";
+		try
+		{
+			if(handle!=null && state.getType(handle).isSubtype(OAVBDIRuntimeModel.element_type))
+			{
+				Object me = state.getAttributeValue(handle, OAVBDIRuntimeModel.element_has_model);
+				if(me!=null)
+					ret = (String)state.getAttributeValue(me, OAVBDIMetaModel.modelelement_has_name);
+			}
+		}
+		catch(RuntimeException e)
+		{
+		}
 		return ret;
 	}
 	

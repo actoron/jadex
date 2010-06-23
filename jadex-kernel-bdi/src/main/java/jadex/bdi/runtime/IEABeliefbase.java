@@ -1,7 +1,5 @@
 package jadex.bdi.runtime;
 
-import jadex.bdi.runtime.impl.FlyweightFunctionality;
-import jadex.commons.Future;
 import jadex.commons.IFuture;
 
 /**
@@ -16,13 +14,13 @@ public interface IEABeliefbase extends IEAElement
 	 *  Get a belief for a name.
 	 *  @param name	The belief name.
 	 */
-//	public IFuture getBelief(String name);
+	public IFuture getBelief(String name);
 
 	/**
 	 *  Get a belief set for a name.
 	 *  @param name	The belief set name.
 	 */
-//	public IFuture getBeliefSet(String name);
+	public IFuture getBeliefSet(String name);
 
 	/**
 	 *  Returns <tt>true</tt> if this beliefbase contains a belief with the
@@ -32,7 +30,7 @@ public interface IEABeliefbase extends IEAElement
 	 *          the specified name refer to a belief set.
 	 *  @see #containsBeliefSet(java.lang.String)
 	 */
-//	public IFuture containsBelief(String name);
+	public IFuture containsBelief(String name);
 
 	/**
 	 *  Returns <tt>true</tt> if this beliefbase contains a belief set with the
@@ -42,7 +40,7 @@ public interface IEABeliefbase extends IEAElement
 	 *          the specified name refer to a belief.
 	 *  @see #containsBelief(java.lang.String)
 	 */
-//	public IFuture containsBeliefSet(String name);
+	public IFuture containsBeliefSet(String name);
 
 	/**
 	 *  Returns the names of all beliefs.
@@ -174,11 +172,25 @@ public interface IEABeliefbase extends IEAElement
 	public void addBeliefSetFact(final String beliefset, final Object fact);
 	
 	/**
+	 *  Add a fact to a beliefset.
+	 *  @param beliefset The beliefset name.
+	 *  @param facts The facts.
+	 */
+	public void addBeliefSetFacts(final String beliefset, final Object[] facts);
+
+	/**
 	 *  Remove a fact to a beliefset.
 	 *  @param beliefset The beliefset name.
 	 *  @param fact The fact.
 	 */
 	public void removeBeliefSetFact(final String beliefset, final Object fact);
+	
+	/**
+	 *  Remove a fact to a beliefset.
+	 *  @param beliefset The beliefset name.
+	 *  @param fact The fact.
+	 */
+	public void removeBeliefSetFacts(final String beliefset);
 	
 	/**
 	 *  Remove a fact to a beliefset.

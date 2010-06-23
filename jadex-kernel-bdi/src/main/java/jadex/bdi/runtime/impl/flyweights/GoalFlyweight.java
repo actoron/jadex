@@ -339,31 +339,6 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	}
 
 	/**
-	 *  Get the goal type.
-	 *  @return The goal type.
-	 */
-	public String	getType()
-	{
-		if(getInterpreter().isExternalThread())
-		{
-			AgentInvocation invoc = new AgentInvocation()
-			{
-				public void run()
-				{
-					Object me = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
-					string = (String)getState().getAttributeValue(me, OAVBDIMetaModel.modelelement_has_name);
-				}
-			};
-			return invoc.string;
-		}
-		else
-		{
-			Object me = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
-			return (String)getState().getAttributeValue(me, OAVBDIMetaModel.modelelement_has_name);
-		}
-	}
-
-	/**
 	 *  Get the exception (if any).
 	 *  When the goal has failed, the exception can be inspected.
 	 *  If more than one plan has been executed for a goal

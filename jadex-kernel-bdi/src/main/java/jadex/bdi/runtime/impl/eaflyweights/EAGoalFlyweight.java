@@ -409,34 +409,6 @@ public class EAGoalFlyweight extends EAProcessableElementFlyweight implements IE
 	}
 
 	/**
-	 *  Get the goal type.
-	 *  @return The goal type.
-	 */
-	public IFuture getType()
-	{
-		final Future ret = new Future();
-		
-		if(getInterpreter().isExternalThread())
-		{
-			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					Object me = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
-					ret.setResult(getState().getAttributeValue(me, OAVBDIMetaModel.modelelement_has_name));
-				}
-			});
-		}
-		else
-		{
-			Object me = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
-			ret.setResult(getState().getAttributeValue(me, OAVBDIMetaModel.modelelement_has_name));
-		}
-		
-		return ret;
-	}
-
-	/**
 	 *  Get the exception (if any).
 	 *  When the goal has failed, the exception can be inspected.
 	 *  If more than one plan has been executed for a goal

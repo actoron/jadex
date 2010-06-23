@@ -276,28 +276,6 @@ public abstract class ElementFlyweight implements IElement
 	}
 	
 	/**
-	 *  Get the type name (name of the modelelement).
-	 */
-	protected String	getTypeName()
-	{
-		// Only called from synchronized code -> no agent invocation necessary 
-		String ret = "unknown";
-		try
-		{
-			if(hasHandle() && state.getType(getHandle()).isSubtype(OAVBDIRuntimeModel.element_type))
-			{
-				Object me = state.getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model);
-				if(me!=null)
-					ret = (String)state.getAttributeValue(me, OAVBDIMetaModel.modelelement_has_name);
-			}
-		}
-		catch(RuntimeException e)
-		{
-		}
-		return ret;
-	}
-	
-	/**
 	 *  Add an event listener.
 	 *  @param listener The listener.
 	 *  @param handle The handle.

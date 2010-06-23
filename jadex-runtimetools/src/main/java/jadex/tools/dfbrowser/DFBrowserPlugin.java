@@ -452,64 +452,42 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 		
 		if(getSelectedDF() != null)
 		{
-			((AgentControlCenter)getJCC()).getAgent().getServiceContainer().addResultListener(new DefaultResultListener()
+			IServiceContainer sc = (IServiceContainer)((AgentControlCenter)getJCC()).getAgent().getServiceContainer();
+			final IDF df = (IDF)sc.getService(IDF.class);
+					
+			// Use a subgoal to search
+			((AgentControlCenter)getJCC()).getAgent().createGoal("df_search").addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result) 
 				{
-					IServiceContainer sc = (IServiceContainer)result;
-					final IDF df = (IDF)sc.getService(IDF.class);
+					final IEAGoal ft = (IEAGoal)result; 
+					ft.setParameterValue("description", df.createDFComponentDescription(null, null));
+					ft.setParameterValue("df", getSelectedDF().getName());
 					
-					// Use a subgoal to search
-					((AgentControlCenter)getJCC()).getAgent().createGoal("df_search").addResultListener(new DefaultResultListener()
+					((AgentControlCenter)getJCC()).getAgent().dispatchTopLevelGoalAndWait(ft).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result) 
 						{
-							final IEAGoal ft = (IEAGoal)result; 
-							ft.getParameter("description").addResultListener(new DefaultResultListener()
+							ft.getParameterSetValues("result").addResultListener(new DefaultResultListener()
 							{
-								public void resultAvailable(Object source, Object result) 
+								public void resultAvailable(Object source, Object result)
 								{
-									((IEAParameter)result).setValue(df.createDFComponentDescription(null, null));
-								}
-							});
-							ft.getParameter("df").addResultListener(new DefaultResultListener()
-							{
-								public void resultAvailable(Object source, Object result) 
-								{
-									((IEAParameter)result).setValue(getSelectedDF().getName());
-								}
-							});
-							
-							((AgentControlCenter)getJCC()).getAgent().dispatchTopLevelGoalAndWait(ft).addResultListener(new DefaultResultListener()
-							{
-								public void resultAvailable(Object source, Object result) 
-								{
-									ft.getParameterSet("result").addResultListener(new DefaultResultListener()
+									IDFComponentDescription[] ads = (IDFComponentDescription[])result;
+									System.out.println("Found: "+SUtil.arrayToString(ads));
+									
+									if(old_ads == null || !Arrays.equals(old_ads, ads))
 									{
-										public void resultAvailable(Object source, Object result)
-										{
-											((IEAParameterSet)result).getValues().addResultListener(new DefaultResultListener()
-											{
-												public void resultAvailable(Object source, Object result)
-												{
-													IDFComponentDescription[] ads = (IDFComponentDescription[])result;
-													System.out.println("Found: "+SUtil.arrayToString(ads));
-													
-													if(old_ads == null || !Arrays.equals(old_ads, ads))
-													{
-														agent_table.setAgentDescriptions(ads);
-														updateServices(ads);
-														updateDetailedService();
-														old_ads = ads;
-													}
-												}
-											});
-										}
-									});
-								}	
+										agent_table.setAgentDescriptions(ads);
+										updateServices(ads);
+										updateDetailedService();
+										old_ads = ads;
+									}
+								}
 							});
-								
-							// todo: catch
+						}	
+					});
+						
+					// todo: catch
 //							catch(Exception e)
 //							{
 //								//e.printStackTrace();
@@ -522,8 +500,6 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 //									}
 //								});
 //							}
-						}
-					});
 				}
 			});
 		}

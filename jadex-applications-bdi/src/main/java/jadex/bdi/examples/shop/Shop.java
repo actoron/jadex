@@ -1,7 +1,9 @@
 package jadex.bdi.examples.shop;
 
+import jadex.base.DefaultResultListener;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.IExternalAccess;
@@ -27,24 +29,32 @@ public class Shop implements IShop
 	/**
 	 * 
 	 */
-	public IFuture buyItem(String item)
+	public IFuture buyItem(final String item)
 	{
 		final Future ret = new Future();
-		final IGoal buy = comp.createGoal("sell");
-		buy.getParameter("name").setValue(item);
-		buy.addGoalListener(new IGoalListener()
+		
+		comp.createGoal("sell").addResultListener(new DefaultResultListener()
 		{
-			public void goalFinished(AgentEvent ae)
+			public void resultAvailable(Object source, Object result)
 			{
-				System.out.println(comp.getComponentIdentifier().getLocalName()+" setting: "+buy.getParameter("result").getValue());
-				ret.setResult(buy.getParameter("result").getValue());
-			}
-			
-			public void goalAdded(AgentEvent ae)
-			{
+				final IEAGoal buy = (IEAGoal)result;
+				buy.setParameterValue("name", item);
+				comp.dispatchTopLevelGoalAndWait(buy).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						buy.getParameterValue("result").addResultListener(new DefaultResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								System.out.println(comp.getComponentIdentifier().getLocalName()+" setting: "+result);
+								ret.setResult(result);
+							}
+						});
+					}
+				});
 			}
 		});
-		comp.dispatchTopLevelGoal(buy);
 		
 		return ret;
 	}

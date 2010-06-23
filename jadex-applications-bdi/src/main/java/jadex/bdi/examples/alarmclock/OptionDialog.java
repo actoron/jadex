@@ -1,5 +1,6 @@
 package jadex.bdi.examples.alarmclock;
 
+import jadex.base.DefaultResultListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
 
@@ -59,231 +60,238 @@ public class OptionDialog extends JDialog
 		super(parent, true);
 		this.agent = agent;
 		setTitle("Options");
-		final Settings orig_sets = (Settings)agent.getBeliefbase().getBelief("settings").getFact();
-		final Settings sets = (Settings)orig_sets.clone();
-		final JRadioButton ampm = new JRadioButton("AM/PM");
-		ampm.setSelected(sets.isAMPM());
-		final JRadioButton hrs = new JRadioButton("24 hours");
-		hrs.setSelected(!sets.isAMPM());
-		ButtonGroup bg = new ButtonGroup();
-		bg.add(ampm);
-		bg.add(hrs);
-
-		JButton save = new JButton("Save");
-		JButton load = new JButton("Load");
-		save.setMargin(new Insets(0,0,0,0));
-		load.setMargin(new Insets(0,0,0,0));
-		final JTextField deffile = new JTextField(sets.getFilename());
-		final JCheckBox autosave = new JCheckBox();
-		autosave.setSelected(sets.isAutosave());
-		JButton browse = new JButton(icons.getIcon("Browse"));
-		browse.setMargin(new Insets(0,0,0,0));
-		final JButton ok = new JButton("OK");
-		final JButton apply = new JButton("Apply");
-		final JButton cancel = new JButton("Cancel");
-		Dimension md = cancel.getMinimumSize();
-		Dimension pd = cancel.getPreferredSize();
-		ok.setMinimumSize(md);
-		ok.setPreferredSize(pd);
-		apply.setMinimumSize(md);
-		apply.setPreferredSize(md);
-
-		final JFileChooser filechooser = new JFileChooser(".");
-		filechooser.setAcceptAllFileFilterUsed(true);
-		final javax.swing.filechooser.FileFilter load_filter = new javax.swing.filechooser.FileFilter()
+		agent.getBeliefbase().getBeliefFact("settings").addResultListener(new DefaultResultListener()
 		{
-			public String getDescription()
+			public void resultAvailable(Object source, Object result)
 			{
-				return "XMLs (*.xml)";
-			}
+				final Settings orig_sets = (Settings)result;
+				final Settings sets = (Settings)orig_sets.clone();
+				
+				final JRadioButton ampm = new JRadioButton("AM/PM");
+				ampm.setSelected(sets.isAMPM());
+				final JRadioButton hrs = new JRadioButton("24 hours");
+				hrs.setSelected(!sets.isAMPM());
+				ButtonGroup bg = new ButtonGroup();
+				bg.add(ampm);
+				bg.add(hrs);
+				
+				JButton save = new JButton("Save");
+				JButton load = new JButton("Load");
+				save.setMargin(new Insets(0,0,0,0));
+				load.setMargin(new Insets(0,0,0,0));
+				final JTextField deffile = new JTextField(sets.getFilename());
+				final JCheckBox autosave = new JCheckBox();
+				autosave.setSelected(sets.isAutosave());
+				JButton browse = new JButton(icons.getIcon("Browse"));
+				browse.setMargin(new Insets(0,0,0,0));
+				final JButton ok = new JButton("OK");
+				final JButton apply = new JButton("Apply");
+				final JButton cancel = new JButton("Cancel");
+				Dimension md = cancel.getMinimumSize();
+				Dimension pd = cancel.getPreferredSize();
+				ok.setMinimumSize(md);
+				ok.setPreferredSize(pd);
+				apply.setMinimumSize(md);
+				apply.setPreferredSize(md);
 
-			public boolean accept(File f)
-			{
-				String name = f.getName();
-				return f.isDirectory() || (name.endsWith(".xml"));
-			}
-		};
-		filechooser.addChoosableFileFilter(load_filter);
-		final JSpinner fontsize = new JSpinner();
-		fontsize.setValue(new Integer(sets.getFontsize()));
-
-		JPanel tf = new JPanel(new GridBagLayout());
-		tf.setBorder(BorderFactory.createTitledBorder(
-			BorderFactory.createEtchedBorder(), "Layout"));
-		tf.add(new JLabel("Time format:"), new GridBagConstraints(0,0,1,1,0,0,GridBagConstraints.NORTHEAST,
-			GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
-		tf.add(ampm, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
-		tf.add(hrs, new GridBagConstraints(2,0,1,1,1,0,GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
-		tf.add(new JLabel("Font size:"), new GridBagConstraints(0,1,1,1,0,0,GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
-		tf.add(fontsize, new GridBagConstraints(1,1,1,1,1,0,GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
-
-		JPanel sett = new JPanel(new GridBagLayout());
-		sett.setBorder(BorderFactory.createTitledBorder(
-			BorderFactory.createEtchedBorder(), "Load/Save Settings"));
-		sett.add(new JLabel("Settings file:"), new GridBagConstraints(0,0,1,1,0,0,GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
-		sett.add(deffile, new GridBagConstraints(1,0,1,1,1,0,GridBagConstraints.NORTHWEST,
-			GridBagConstraints.HORIZONTAL, new Insets(4,2,2,4),0,0));
-		sett.add(browse, new GridBagConstraints(2,0,1,1,0,0,GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
-		sett.add(save, new GridBagConstraints(3,0,1,1,0,0,GridBagConstraints.NORTHWEST,
-				GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
-		sett.add(load, new GridBagConstraints(4,0,1,1,0,0,GridBagConstraints.NORTHWEST,
-				GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
-
-		sett.add(new JLabel("Autosave:"), new GridBagConstraints(0,1,1,1,0,0,GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
-		sett.add(autosave, new GridBagConstraints(1,1,GridBagConstraints.REMAINDER,1,1,0,GridBagConstraints.NORTHWEST,
-			GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
-
-		JPanel buts = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		buts.add(ok);
-		buts.add(apply);
-		buts.add(cancel);
-		sett.add(buts, new GridBagConstraints(0,3,GridBagConstraints.REMAINDER,1,1,1,GridBagConstraints.NORTHEAST,
-			GridBagConstraints.BOTH, new Insets(0,0,0,0),0,0));
-
-		ampm.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				sets.setAMPM(true);
-			}
-		});
-		fontsize.addChangeListener(new ChangeListener()
-		{
-			public void stateChanged(ChangeEvent e)
-			{
-				sets.setFontsize(((Integer)fontsize.getValue()).intValue());
-			}
-		});
-		hrs.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				sets.setAMPM(false);
-			}
-		});
-		browse.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				if(filechooser.showDialog(SGUI.getWindowParent(OptionDialog.this)
-					, "Load")==JFileChooser.APPROVE_OPTION)
+				final JFileChooser filechooser = new JFileChooser(".");
+				filechooser.setAcceptAllFileFilterUsed(true);
+				final javax.swing.filechooser.FileFilter load_filter = new javax.swing.filechooser.FileFilter()
 				{
-					File file = filechooser.getSelectedFile();
-					//System.out.println("File is: "+file);
-					deffile.setText(""+file);
-					sets.setFilename(""+file);
-				}
-			}
-		});
-		deffile.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				sets.setFilename(deffile.getText());
-			}
-		});
-		save.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				File f = new File(deffile.getText());
-				//if(f.exists())
-				filechooser.setSelectedFile(f);
-				if(filechooser.showDialog(SGUI.getWindowParent(OptionDialog.this)
-					, "Save")==JFileChooser.APPROVE_OPTION)
-				{
-					try
+					public String getDescription()
 					{
-						File file = filechooser.getSelectedFile();
-						sets.setFilename(file.getAbsolutePath());
-						sets.save();
-						deffile.setText(file.getAbsolutePath());
+						return "XMLs (*.xml)";
 					}
-					catch(Exception ex)
-					{
-						JOptionPane.showMessageDialog(OptionDialog.this, "Cannot save settings. The file: \n"
-							+filechooser.getSelectedFile().getAbsolutePath()+"\n could not be written", "Settings error",
-							JOptionPane.ERROR_MESSAGE);
-						//System.out.println("Could not save settings: "+ex);
-					}
-				}
-			}
-		});
-		load.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				File f = new File(deffile.getText());
-				if(f.exists())
-					filechooser.setSelectedFile(f);
-				if(filechooser.showDialog(SGUI.getWindowParent(OptionDialog.this)
-					, "Load")==JFileChooser.APPROVE_OPTION)
-				{
-					try
-					{
-						File file = filechooser.getSelectedFile();
-						Settings ns = Settings.loadSettings(file.getAbsolutePath(), agent);
-						agent.getBeliefbase().getBelief("settings").setFact(ns);
-						agent.getBeliefbase().getBeliefSet("alarms").removeFacts();
-						agent.getBeliefbase().getBeliefSet("alarms").addFacts(ns.getAlarms());
-						// Refresh gui
-						autosave.setSelected(ns.isAutosave());
-						ampm.setSelected(ns.isAMPM());
-						hrs.setSelected(!ns.isAMPM());
-						deffile.setText(file.getAbsolutePath());
-					}
-					catch(Exception ex)
-					{
-						JOptionPane.showMessageDialog(OptionDialog.this, "Cannot load settings. The file: \n"
-							+filechooser.getSelectedFile().getAbsolutePath()+"\n could not be read", "Settings error",
-							JOptionPane.ERROR_MESSAGE);
-						//System.out.println("Could not load settings: "+ex);
-					}
-				}
-			}
-		});
-		autosave.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				sets.setAutosave(autosave.isSelected());
-			}
-		});
-		ok.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				OptionDialog.this.dispose();
-				copySettings(sets, orig_sets);
-			}
-		});
-		apply.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				copySettings(sets, orig_sets);
-			}
-		});
-		cancel.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				OptionDialog.this.dispose();
-			}
-		});
 
-		JPanel pan = new JPanel(new BorderLayout());
-		pan.add(tf, "North");
-		pan.add(sett, "Center");
+					public boolean accept(File f)
+					{
+						String name = f.getName();
+						return f.isDirectory() || (name.endsWith(".xml"));
+					}
+				};
+				filechooser.addChoosableFileFilter(load_filter);
+				final JSpinner fontsize = new JSpinner();
+				fontsize.setValue(new Integer(sets.getFontsize()));
 
-		this.getContentPane().add("Center", pan);
+				JPanel tf = new JPanel(new GridBagLayout());
+				tf.setBorder(BorderFactory.createTitledBorder(
+					BorderFactory.createEtchedBorder(), "Layout"));
+				tf.add(new JLabel("Time format:"), new GridBagConstraints(0,0,1,1,0,0,GridBagConstraints.NORTHEAST,
+					GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
+				tf.add(ampm, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.NORTHWEST,
+					GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
+				tf.add(hrs, new GridBagConstraints(2,0,1,1,1,0,GridBagConstraints.NORTHWEST,
+					GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
+				tf.add(new JLabel("Font size:"), new GridBagConstraints(0,1,1,1,0,0,GridBagConstraints.NORTHWEST,
+					GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
+				tf.add(fontsize, new GridBagConstraints(1,1,1,1,1,0,GridBagConstraints.NORTHWEST,
+					GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
+
+				JPanel sett = new JPanel(new GridBagLayout());
+				sett.setBorder(BorderFactory.createTitledBorder(
+					BorderFactory.createEtchedBorder(), "Load/Save Settings"));
+				sett.add(new JLabel("Settings file:"), new GridBagConstraints(0,0,1,1,0,0,GridBagConstraints.NORTHWEST,
+					GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
+				sett.add(deffile, new GridBagConstraints(1,0,1,1,1,0,GridBagConstraints.NORTHWEST,
+					GridBagConstraints.HORIZONTAL, new Insets(4,2,2,4),0,0));
+				sett.add(browse, new GridBagConstraints(2,0,1,1,0,0,GridBagConstraints.NORTHWEST,
+					GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
+				sett.add(save, new GridBagConstraints(3,0,1,1,0,0,GridBagConstraints.NORTHWEST,
+						GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
+				sett.add(load, new GridBagConstraints(4,0,1,1,0,0,GridBagConstraints.NORTHWEST,
+						GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
+
+				sett.add(new JLabel("Autosave:"), new GridBagConstraints(0,1,1,1,0,0,GridBagConstraints.NORTHWEST,
+					GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
+				sett.add(autosave, new GridBagConstraints(1,1,GridBagConstraints.REMAINDER,1,1,0,GridBagConstraints.NORTHWEST,
+					GridBagConstraints.NONE, new Insets(4,2,2,4),0,0));
+
+				JPanel buts = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+				buts.add(ok);
+				buts.add(apply);
+				buts.add(cancel);
+				sett.add(buts, new GridBagConstraints(0,3,GridBagConstraints.REMAINDER,1,1,1,GridBagConstraints.NORTHEAST,
+					GridBagConstraints.BOTH, new Insets(0,0,0,0),0,0));
+
+				ampm.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						sets.setAMPM(true);
+					}
+				});
+				fontsize.addChangeListener(new ChangeListener()
+				{
+					public void stateChanged(ChangeEvent e)
+					{
+						sets.setFontsize(((Integer)fontsize.getValue()).intValue());
+					}
+				});
+				hrs.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						sets.setAMPM(false);
+					}
+				});
+				browse.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						if(filechooser.showDialog(SGUI.getWindowParent(OptionDialog.this)
+							, "Load")==JFileChooser.APPROVE_OPTION)
+						{
+							File file = filechooser.getSelectedFile();
+							//System.out.println("File is: "+file);
+							deffile.setText(""+file);
+							sets.setFilename(""+file);
+						}
+					}
+				});
+				deffile.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						sets.setFilename(deffile.getText());
+					}
+				});
+				save.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						File f = new File(deffile.getText());
+						//if(f.exists())
+						filechooser.setSelectedFile(f);
+						if(filechooser.showDialog(SGUI.getWindowParent(OptionDialog.this)
+							, "Save")==JFileChooser.APPROVE_OPTION)
+						{
+							try
+							{
+								File file = filechooser.getSelectedFile();
+								sets.setFilename(file.getAbsolutePath());
+								sets.save();
+								deffile.setText(file.getAbsolutePath());
+							}
+							catch(Exception ex)
+							{
+								JOptionPane.showMessageDialog(OptionDialog.this, "Cannot save settings. The file: \n"
+									+filechooser.getSelectedFile().getAbsolutePath()+"\n could not be written", "Settings error",
+									JOptionPane.ERROR_MESSAGE);
+								//System.out.println("Could not save settings: "+ex);
+							}
+						}
+					}
+				});
+				load.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						File f = new File(deffile.getText());
+						if(f.exists())
+							filechooser.setSelectedFile(f);
+						if(filechooser.showDialog(SGUI.getWindowParent(OptionDialog.this)
+							, "Load")==JFileChooser.APPROVE_OPTION)
+						{
+							try
+							{
+								File file = filechooser.getSelectedFile();
+								Settings ns = Settings.loadSettings(file.getAbsolutePath(), agent);
+								agent.getBeliefbase().setBeliefFact("settings", ns);
+								agent.getBeliefbase().removeBeliefSetFacts("alarms");
+								agent.getBeliefbase().addBeliefSetFacts("alarms", ns.getAlarms());
+								// Refresh gui
+								autosave.setSelected(ns.isAutosave());
+								ampm.setSelected(ns.isAMPM());
+								hrs.setSelected(!ns.isAMPM());
+								deffile.setText(file.getAbsolutePath());
+							}
+							catch(Exception ex)
+							{
+								JOptionPane.showMessageDialog(OptionDialog.this, "Cannot load settings. The file: \n"
+									+filechooser.getSelectedFile().getAbsolutePath()+"\n could not be read", "Settings error",
+									JOptionPane.ERROR_MESSAGE);
+								//System.out.println("Could not load settings: "+ex);
+							}
+						}
+					}
+				});
+				autosave.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						sets.setAutosave(autosave.isSelected());
+					}
+				});
+				ok.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						OptionDialog.this.dispose();
+						copySettings(sets, orig_sets);
+					}
+				});
+				apply.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						copySettings(sets, orig_sets);
+					}
+				});
+				cancel.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						OptionDialog.this.dispose();
+					}
+				});
+
+				JPanel pan = new JPanel(new BorderLayout());
+				pan.add(tf, "North");
+				pan.add(sett, "Center");
+
+				getContentPane().add("Center", pan);
+			}
+		});
 	}
 
 	/**

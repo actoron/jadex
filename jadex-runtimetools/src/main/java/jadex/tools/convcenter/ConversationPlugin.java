@@ -6,9 +6,7 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IEAEventbase;
 import jadex.bdi.runtime.IEAMessageEvent;
 import jadex.bdi.runtime.IEAParameterSet;
-import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IMessageEventListener;
-import jadex.bdi.runtime.IParameterSet;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
@@ -226,7 +224,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			
 			public void messageEventReceived(AgentEvent ae)
 			{
-				processMessage((IMessageEvent)ae.getSource());
+				processMessage((IEAMessageEvent)ae.getSource());
 			}
 		};
 		
@@ -243,26 +241,48 @@ public class ConversationPlugin extends AbstractJCCPlugin
 	 * @param me
 	 * @return true if the message event is not from tool_management ontology
 	 */
-	public boolean processMessage(IMessageEvent message)
+	public void processMessage(final IEAMessageEvent message)
 	{
-		boolean	processed = false;
-		try
+		message.hasParameter(SFipa.ONTOLOGY).addResultListener(new DefaultResultListener()
 		{
-			String onto = message.hasParameter(SFipa.ONTOLOGY)? 
-				(String)message.getParameter(SFipa.ONTOLOGY).getValue(): null;
-			if(onto==null || !onto.startsWith("jadex.tools"))
+			public void resultAvailable(Object source, Object result)
 			{
-				convcenter.addMessage(message);
-				processed	= true;
+				if(((Boolean)result).booleanValue())
+				{
+					message.getParameterValue(SFipa.ONTOLOGY).addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							String onto = (String)result;
+							if(onto==null || !onto.startsWith("jadex.tools"))
+							{
+								SwingUtilities.invokeLater(new Runnable()
+								{
+									public void run()
+									{
+										convcenter.addMessage(message);										
+									}
+								});
+							}
+						}
+					});
+				}
 			}
-		}
-		catch(Exception e)
-		{
-		}
-		return processed;
+		});
+		
+//		try
+//		{
+//			String onto = message.hasParameter(SFipa.ONTOLOGY)? 
+//				(String)message.getParameter(SFipa.ONTOLOGY).getValue(): null;
+//			if(onto==null || !onto.startsWith("jadex.tools"))
+//			{
+//				convcenter.addMessage(message);
+//			}
+//		}
+//		catch(Exception e)
+//		{
+//		}
 	}
-	
-
 
 	/**
 	 *  Set properties loaded from project.

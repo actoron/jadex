@@ -5,6 +5,7 @@ import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bridge.MessageType;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.rules.state.IOAVState;
@@ -14,6 +15,11 @@ import jadex.rules.state.IOAVState;
  */
 public class EAMessageEventFlyweight extends EAProcessableElementFlyweight implements IEAMessageEvent
 {
+	//-------- attributes --------
+	
+	/** The cached message type. */
+	protected MessageType mt;
+	
 	//-------- constructors --------
 	
 	/**
@@ -24,6 +30,8 @@ public class EAMessageEventFlyweight extends EAProcessableElementFlyweight imple
 	private EAMessageEventFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		super(state, scope, handle);
+		this.mt = MessageEventRules.getMessageEventType(getState(),
+			getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model));
 	}
 	
 	/**
@@ -73,28 +81,30 @@ public class EAMessageEventFlyweight extends EAProcessableElementFlyweight imple
 	 *  Get the message type.
 	 *  @return The message type.
 	 */
-	public IFuture getMessageType()
+	public MessageType getMessageType()
 	{
-		final Future ret = new Future();
+		return mt;
 		
-		if(getInterpreter().isExternalThread())
-		{
-			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					ret.setResult(MessageEventRules.getMessageEventType(getState(),
-						getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model)));
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(MessageEventRules.getMessageEventType(getState(),
-				getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model)));
-		}
-		
-		return ret;
+//		final Future ret = new Future();
+//		
+//		if(getInterpreter().isExternalThread())
+//		{
+//			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+//			{
+//				public void run()
+//				{
+//					ret.setResult(MessageEventRules.getMessageEventType(getState(),
+//						getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model)));
+//				}
+//			});
+//		}
+//		else
+//		{
+//			ret.setResult(MessageEventRules.getMessageEventType(getState(),
+//				getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.element_has_model)));
+//		}
+//		
+//		return ret;
 	}
 	
 	/**

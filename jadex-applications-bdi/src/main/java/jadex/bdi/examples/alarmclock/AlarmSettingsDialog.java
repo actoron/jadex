@@ -2,7 +2,7 @@ package jadex.bdi.examples.alarmclock;
 
 import jadex.base.DefaultResultListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.IEAGoal;
 import jadex.commons.SGUI;
 import jadex.service.clock.IClockService;
 
@@ -73,7 +73,7 @@ public class AlarmSettingsDialog extends JDialog
 	protected boolean state_ok;
 
 	/** Playing state. */
-	protected IGoal playing;
+	protected IEAGoal playing;
 	
 	/** The agent. */
 	protected IBDIExternalAccess	agent;
@@ -216,29 +216,45 @@ public class AlarmSettingsDialog extends JDialog
 					try
 					{
 						play.setIcon(icons.getIcon("Stop"));
-						URL song = new URL("file:///"+alarmtf.getText());
+						final URL song = new URL("file:///"+alarmtf.getText());
 						//System.out.println("Song is: "+song);
-						playing = agent.createGoal("play_song");
-						playing.getParameter("song").setValue(song);
-						// todo: can this be done without a thread?
-						// todo: use a call back
-						Thread t = new Thread(new Runnable()
+						agent.createGoal("play_song").addResultListener(new DefaultResultListener()
 						{
-							public void run()
+							public void resultAvailable(Object source, Object result)
 							{
-								try
+								playing = (IEAGoal)result;
+								playing.setParameterValue("song", song);
+								
+								agent.dispatchTopLevelGoalAndWait(playing).addResultListener(new DefaultResultListener()
 								{
-									agent.dispatchTopLevelGoalAndWait(playing);
-								}
-								catch(Exception e)
-								{
-									System.out.println("Song could not be played: "+e);
-								}
-								play.setIcon(icons.getIcon("Play"));
-								stopPlaying();
+									public void resultAvailable(Object source, Object result)
+									{
+										play.setIcon(icons.getIcon("Play"));
+										stopPlaying();
+									}
+								});
+								
+								// todo: can this be done without a thread?
+								// todo: use a call back
+//								Thread t = new Thread(new Runnable()
+//								{
+//									public void run()
+//									{
+//										try
+//										{
+//											agent.dispatchTopLevelGoalAndWait(playing);
+//										}
+//										catch(Exception e)
+//										{
+//											System.out.println("Song could not be played: "+e);
+//										}
+//										play.setIcon(icons.getIcon("Play"));
+//										stopPlaying();
+//									}
+//								});
+//								t.start();
 							}
 						});
-						t.start();
 					}
 					catch(Exception ex)
 					{
@@ -331,7 +347,8 @@ public class AlarmSettingsDialog extends JDialog
 		if(alarm==null)
 		{
 			alarm = new Alarm();
-			alarm.setTime(new Time(new Date(agent.getTime())));
+			IClockService cs = (IClockService)agent.getServiceContainer().getService(IClockService.class);
+			alarm.setTime(new Time(new Date(cs.getTime())));
 			alarm.setClock((IClockService)agent.getServiceContainer().getService(IClockService.class));
 		}
 		else
@@ -449,9 +466,18 @@ public class AlarmSettingsDialog extends JDialog
 	 */
 	public synchronized void stopPlaying()
 	{
-		if(playing!=null && !playing.isFinished())
-			playing.drop();
-		playing = null;
+		if(playing!=null)
+		{
+			playing.isFinished().addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					if(!((Boolean)result).booleanValue())
+						playing.drop();
+					playing = null;
+				}
+			});
+		}
 	}
 
 	/**

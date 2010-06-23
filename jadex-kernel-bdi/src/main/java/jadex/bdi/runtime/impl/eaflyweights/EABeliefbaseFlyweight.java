@@ -588,6 +588,31 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 	}
 	
 	/**
+	 *  Add a fact to a beliefset.
+	 *  @param beliefset The beliefset name.
+	 *  @param facts The facts.
+	 */
+	public void addBeliefSetFacts(final String beliefset, final Object[] facts)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					belset.addFacts(facts);
+				}
+			});
+		}
+		else
+		{
+			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			belset.addFacts(facts);
+		}
+	}
+	
+	/**
 	 *  Remove a fact to a beliefset.
 	 *  @param beliefset The beliefset name.
 	 *  @param fact The fact.
@@ -609,6 +634,30 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		{
 			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 			belset.removeFact(fact);
+		}
+	}
+	
+	/**
+	 *  Remove fact from a beliefset.
+	 *  @param beliefset The beliefset name.
+	 */
+	public void removeBeliefSetFacts(final String beliefset)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+					belset.removeFacts();
+				}
+			});
+		}
+		else
+		{
+			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
+			belset.removeFacts();
 		}
 	}
 	

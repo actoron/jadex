@@ -9,7 +9,7 @@ import java.util.logging.Logger;
  *  The default listener for just printing out result information.
  *  Is used as fallback when no other listener is available.
  */
-public class DefaultResultListener implements IResultListener
+public abstract class DefaultResultListener implements IResultListener
 {
 	//-------- attributes --------
 	
@@ -47,7 +47,14 @@ public class DefaultResultListener implements IResultListener
 	{
 		// Hack! Implement that logger can be passed
 		if(instance==null)
-			instance = new DefaultResultListener(Logger.getLogger("default"));
+		{
+			instance = new DefaultResultListener(Logger.getLogger("default"))
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+				}
+			};
+		}
 		return instance;
 	}
 	
@@ -56,11 +63,11 @@ public class DefaultResultListener implements IResultListener
 	/**
 	 *  Called when the result is available.
 	 *  @param result The result.
-	 */
+	 * /
 	public void resultAvailable(Object source, Object result)
 	{
 		//logger.info(""+result);
-	}
+	}*/
 	
 	/**
 	 *  Called when an exception occurred.
