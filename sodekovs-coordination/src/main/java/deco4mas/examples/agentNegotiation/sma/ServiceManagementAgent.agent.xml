@@ -8,9 +8,6 @@
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
 	name="ServiceManagementAgent" package="deco4mas.examples.agentNegotiation.sma">
 	<imports>
-		<import>jadex.bridge.IComponentIdentifier</import>
-		<import>jadex.base.fipa.*</import>
-		<import>jadex.bdi.planlib.protocols.*</import>
 		<import>jadex.adapter.base.contextservice.*</import>
 		<import>jadex.adapter.base.appdescriptor.*</import>
 		<import>jadex.application.space.envsupport.environment.space2d.*
@@ -18,8 +15,23 @@
 		<import>jadex.application.space.envsupport.environment.*</import>
 		<import>jadex.application.space.envsupport.math.*</import>
 		<import>jadex.application.runtime.*</import>
-		<import>deco4mas.examples.agentNegotiation.deco.*</import>
-		<import>deco4mas.examples.agentNegotiation.*</import>
+		<import>jadex.base.fipa.*</import>
+		<import>jadex.bdi.planlib.protocols.*</import>
+		<import>jadex.bridge.IComponentIdentifier</import>
+		<import>deco4mas.examples.agentNegotiation.decoMAS.*</import>
+		<import>deco4mas.examples.agentNegotiation.decoMAS.medium.*</import>
+		<import>deco4mas.examples.agentNegotiation.decoMAS.dataObjects.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.sma.behaviour.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.sma.negotiationStrategy.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.sma.negotiationStrategy.history.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.sma.workflow.implementation.*
+		</import>
+		<import>deco4mas.examples.agentNegotiation.sma.workflow.management.*
+		</import>
 		<import>deco4mas.coordinate.environment.*</import>
 		<import>deco4mas.coordinate.*</import>
 		<import>jadex.commons.IFilter</import>
@@ -28,43 +40,72 @@
 	<capabilities>
 		<capability name="reqcap"
 			file="jadex.bdi.planlib.protocols.request.Request" />
-		<!--		<capability name="ping"-->
-		<!--			file="deco4mas.examples.agentNegotiation.sma.ping.Ping" />-->
 	</capabilities>
 
 	<beliefs>
+		<belief name="history" class="ServiceAgentHistory">
+			<!--
+				<fact>new ServiceAgentHistory($scope.getComponentIdentifier(),
+				$beliefbase.startTime)</fact>
+			-->
+		</belief>
+		<belief name="trustFunction" class="HistorytimeTrustFunction"></belief>
+
+		<belief name="executionPhase" class="boolean">
+			<fact>false</fact>
+		</belief>
+
+		<!--	needed services for current workflow	-->
+		<beliefset name="neededServices" class="NeededService"></beliefset>
+
+		<!--	workflow	-->
+		<belief name="workflow" class="IComponentIdentifier" />
+		<belief name="workflowName" class="String" exported="true"></belief>
+
+		<!--	statistik	-->
+		<belief name="statNegtime" class="Long" />
+		<belief name="statExetime" class="Long" />
+
+		<!--    decoMAS     -->
 		<belief name="env" class="CoordinationSpace">
 			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")
 			</fact>
 		</belief>
-
 		<belief name="myself" class="ISpaceObject" exported="true">
 			<fact>$beliefbase.env.getAvatar($scope.getComponentIdentifier())
 			</fact>
 		</belief>
-		
-<!--		<belief name="startTime" class="long"><fact>$scope.getClock().getStarttime()</fact></belief>-->
 
-		<belief name="provider" class="IComponentIdentifier" exported="true" />
-		<belief name="allocatedService" class="ServiceType" exported="true" />
-		<belief name="currentSa" class="IComponentIdentifier" />
-		<belief name="history" class="ServiceAgentHistory">
-<!--			<fact>new ServiceAgentHistory($scope.getComponentIdentifier(), $beliefbase.startTime)</fact>-->
-		</belief>
-		<belief name="searchingSa" class="Boolean">
-			<fact>true</fact>
-		</belief>
+		<!--	ServiceTypes in MAS	-->
+		<beliefset name="services" class="ServiceType" exported="true" />
 	</beliefs>
 
 	<goals>
+		<!--  request protocol	-->
 		<achievegoalref name="rp_initiate">
 			<concrete ref="reqcap.rp_initiate" />
 		</achievegoalref>
-		<!--		<achievegoalref name="ping">-->
-		<!--			<concrete ref="ping.ping" />-->
-		<!--		</achievegoalref>-->
-		<achievegoal name="informProvideraboutSign"></achievegoal>
-		<achievegoal name="assignSa"></achievegoal>
+
+		<!--	Create new workflow	-->
+		<achievegoal name="preInstantiateWorkflow"></achievegoal>
+
+		<!-- define necessary offers for workflow -->
+		<achievegoal name="defineOffers">
+			<parameter name="workflow" class="IComponentIdentifier"></parameter>
+		</achievegoal>
+
+		<!-- start negotiation for all needed services-->
+		<achievegoal name="startNegotiation"></achievegoal>
+
+		<!-- assign a Sa for this needed services-->
+		<achievegoal name="assignSa">
+			<parameter name="service" class="NeededService"></parameter>
+		</achievegoal>
+
+		<!--start workflow-->
+		<achievegoal name="startWorkflow"></achievegoal>
+
+		<achievegoal name="restartWorkflow"></achievegoal>
 
 	</goals>
 
@@ -96,13 +137,40 @@
 			</trigger>
 		</plan>
 
-		<!-- Deco -->
+		<!--	Create new workflow	-->
+		<plan name="preInstantiateWorkflow">
+			<body class="PreInstantiateWorkflowPlan"></body>
+			<trigger>
+				<goal ref="preInstantiateWorkflow"></goal>
+			</trigger>
+			<precondition>!$beliefbase.executionPhase</precondition>
+		</plan>
+
+		<!-- define necessary offers for workflow -->
+		<plan name="defineOffers">
+			<body class="DefineOffersPlan"></body>
+			<trigger>
+				<goal ref="defineOffers"></goal>
+			</trigger>
+			<precondition>!$beliefbase.executionPhase</precondition>
+		</plan>
+
+		<!-- start negotiation for all needed services -->
+		<plan name="startNegotiation">
+			<body class="StartNegotiationPlan"></body>
+			<trigger>
+				<goal ref="startNegotiation"></goal>
+			</trigger>
+		</plan>
+
+		<!-- start one single assign-->
 		<plan name="assignSa">
-			<body class="AssignSaDecoPlan"></body>
+			<body class="AssignSaPlan"></body>
 			<trigger>
 				<goal ref="assignSa"></goal>
 			</trigger>
 		</plan>
+		
 		<plan name="assignSaReply">
 			<body class="AssignSaReplyPlan">
 			</body>
@@ -112,23 +180,39 @@
 		</plan>
 
 		<!-- execution phase decision-->
-		<plan name="informProvider">
-			<body class="InformProviderPlan">
+		<plan name="testExecuteWorkflow">
+			<body class="TestExecuteWorkflowPlan">
 			</body>
 			<trigger>
-				<goal ref="informProvideraboutSign"></goal>
+				<internalevent ref="serviceFound"></internalevent>
+			</trigger>
+			<precondition>!$beliefbase.executionPhase</precondition>
+		</plan>
+
+		<!--start workflow-->
+		<plan name="startWorkflow">
+			<body class="StartWorkflowPlan"></body>
+			<trigger>
+				<goal ref="startWorkflow"></goal>
+			</trigger>
+		</plan>
+
+		<!--Test if workflow should reinit-->
+		<plan name="restartWorkflow">
+			<body class="RestartWorkflowPlan">
+			</body>
+			<trigger>
+				<goal ref="restartWorkflow"></goal>
 			</trigger>
 		</plan>
 	</plans>
 
 	<events>
+		<!--	workflow is executed	-->
+		<internalevent name="workflowExecuted"></internalevent>
+
 		<!-- execution phase decision-->
-		<messageevent name="informMessage" direction="send"
-			type="fipa">
-			<parameter name="performative" class="String" direction="fixed">
-				<value>SFipa.INFORM</value>
-			</parameter>
-		</messageevent>
+		<internalevent name="serviceFound"></internalevent>
 
 		<!-- deco -->
 		<internalevent name="assignSa">
@@ -138,13 +222,20 @@
 		<internalevent name="assignSaReply">
 			<parameter name="reply" class="AssignReply"></parameter>
 		</internalevent>
+		
+		<messageevent name="informMessage" direction="send"
+			type="fipa">
+			<parameter name="performative" class="String" direction="fixed">
+				<value>SFipa.INFORM</value>
+			</parameter>
+		</messageevent>
 	</events>
 
-	<expressions>
-		<condition name="currentSaPresent" language="jcl">
-			$beliefbase.currentSa!=null
-			</condition>
-	</expressions>
+	<!--	<expressions>-->
+	<!--		<condition name="currentSaPresent" language="jcl">-->
+	<!--			$beliefbase.currentSa!=null-->
+	<!--			</condition>-->
+	<!--	</expressions>-->
 
 	<configurations>
 		<configuration name="default">
@@ -157,8 +248,7 @@
 				</initialbelief>
 			</beliefs>
 			<plans>
-				<initialplan ref="assignSa"></initialplan>
-
+				<initialplan ref="preInstantiateWorkflow"></initialplan>
 			</plans>
 		</configuration>
 	</configurations>

@@ -12,7 +12,6 @@
 	                    http://jadex.sourceforge.net/jadex-envspace"
 	name="AgentNegotiation" package="deco4mas.examples.agentNegotiation">
 
-
 	<imports>
 		<import>jadex.application.space.envsupport.environment.*</import>
 		<import>jadex.adapter.base.envsupport.environment.*</import>
@@ -23,7 +22,6 @@
 		<import>jadex.adapter.base.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.planlib.*</import>
 		<import>jadex.application.space.envsupport.dataview.*</import>
-		<import>deco4mas.examples.agentNegotiation.deco.negMedium.*</import>
 		<import>deco4mas.coordinate.interpreter.coordination_information.*
 		</import>
 		<import>deco4mas.coordinate.environment.*</import>
@@ -31,7 +29,9 @@
 		<import>deco4mas.coordinate.*</import>
 		<import>deco4mas.examples.agentNegotiation.*</import>
 		<import>deco4mas.examples.agentNegotiation.sa.*</import>
-		<import>deco4mas.examples.agentNegotiation.deco.*</import>
+		<import>deco4mas.examples.agentNegotiation.sma.*</import>
+		<import>deco4mas.examples.agentNegotiation.decoMAS.dataObjects.*</import>
+		<import>deco4mas.examples.agentNegotiation.decoMAS.medium.*</import>
 		<import>deco4mas.examples.agentNegotiation.sa.masterSa.*</import>
 	</imports>
 
@@ -39,7 +39,7 @@
 		<env:envspacetype name="coordspace" width="11"
 			height="11" class="CoordinationSpace">
 
-			<env:property name="dynamics_configuration">"deco4mas/examples/agentNegotiation/deco/negotiation.dynamics.xml"</env:property>
+			<env:property name="dynamics_configuration">"deco4mas/examples/agentNegotiation/decoMAS/negotiation.dynamics.xml"</env:property>
 
 			<env:processtypes>
 				<env:processtype name="MediumTime" class="MediumTimeProcess">
@@ -50,15 +50,13 @@
 				<env:property name="space">$space</env:property>
 				<env:property name="tick">true</env:property>
 			</env:spaceexecutor>
-
-
 		</env:envspacetype>
 	</spacetypes>
 
 	<componenttypes>
-		<componenttype
-			filename="deco4mas/examples/agentNegotiation/provider/WorkflowProvider.agent.xml"
-			name="WorkflowProvider" />
+<!--		<componenttype-->
+<!--			filename="deco4mas/examples/agentNegotiation/provider/WorkflowProvider.agent.xml"-->
+<!--			name="WorkflowProvider" />-->
 		<componenttype
 			filename="deco4mas/examples/agentNegotiation/sa/masterSa/MasterServiceCreator.agent.xml"
 			name="MasterServiceCreator" />
@@ -80,11 +78,18 @@
 						</env:process>
 					</env:processes>
 				</env:envspace>
-
 			</spaces>
 			<components>
-				<component type="WorkflowProvider" number="1">
+				<component type="ServiceManagementAgent" number="1">
 					<arguments>
+						<argument name="services">
+							new ServiceType[]
+							{
+							new ServiceType("Chassisbau",600.0,300.0)
+<!--						new ServiceType("Reifenhersteller",200.0,200.0),-->
+<!--						new ServiceType("Endmontage",400.0,200.0)-->
+							}
+						</argument>
 						<argument name="workflowName">
 							new String("workflow")
 						</argument>
@@ -132,7 +137,4 @@
 				</component>
 		</application>
 	</applications>
-
-
-
 </applicationtype>

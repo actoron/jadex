@@ -4,7 +4,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import java.util.logging.Logger;
-import deco4mas.examples.agentNegotiation.deco.Reward;
+import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.Reward;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 
 /**

@@ -19,8 +19,8 @@
 		<import>jadex.application.space.envsupport.environment.*</import>
 		<import>jadex.application.space.envsupport.math.*</import>
 		<import>jadex.application.runtime.*</import>
-		<import>deco4mas.examples.agentNegotiation.deco.*</import>
-		<import>deco4mas.examples.agentNegotiation.*</import>
+		<import>deco4mas.examples.agentNegotiation.decoMAS.*</import>
+		<import>deco4mas.examples.agentNegotiation.decoMAS.dataObjects.*</import>
 		<import>deco4mas.coordinate.environment.*</import>
 		<import>deco4mas.coordinate.*</import>
 		<import>jadex.commons.IFilter</import>
@@ -29,10 +29,6 @@
 	<capabilities>
 		<capability name="reqcap"
 			file="jadex.bdi.planlib.protocols.request.Request" />
-		<!--
-			<capability name="ping"
-			file="deco4mas.examples.agentNegotiation.sma.ping.Ping"/>
-		-->
 	</capabilities>
 
 	<beliefs>
@@ -47,11 +43,6 @@
 			<fact>$beliefbase.env.getAvatar($scope.getComponentIdentifier())
 			</fact>
 		</belief>
-
-<!--		<belief name="startTime" class="Long">-->
-<!--			<fact>$scope.getClock().getStarttime()</fact>-->
-<!--		</belief>-->
-
 
 		<belief name="providedService" class="ServiceType" exported="true"></belief>
 		<belief name="agentType" class="AgentType" exported="true" />

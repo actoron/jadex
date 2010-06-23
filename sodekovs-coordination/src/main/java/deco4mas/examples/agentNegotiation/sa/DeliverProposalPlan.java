@@ -4,10 +4,10 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
 import java.util.logging.Logger;
-import deco4mas.examples.agentNegotiation.deco.Bid;
-import deco4mas.examples.agentNegotiation.deco.ServiceOffer;
-import deco4mas.examples.agentNegotiation.deco.ServiceProposal;
-import deco4mas.examples.agentNegotiation.deco.ServiceType;
+import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.Bid;
+import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.ServiceOffer;
+import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.ServiceProposal;
+import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.ServiceType;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 
 /**

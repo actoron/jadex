@@ -4,7 +4,7 @@ public class ServiceAgentConfig
 {
 	private String serviceType;
 	private String agentType;
-	
+
 	public ServiceAgentConfig(String serviceType, String agentType)
 	{
 		super();
@@ -21,6 +21,5 @@ public class ServiceAgentConfig
 	{
 		return agentType;
 	}
-	
-	
+
 }

@@ -3,7 +3,7 @@ package deco4mas.examples.agentNegotiation.sa;
 import jadex.bdi.runtime.Plan;
 import java.util.Random;
 import java.util.logging.Logger;
-import deco4mas.examples.agentNegotiation.deco.ServiceType;
+import deco4mas.examples.agentNegotiation.decoMAS.dataObjects.ServiceType;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 import deco4mas.examples.agentNegotiation.evaluate.ClockTime;
 import deco4mas.examples.agentNegotiation.evaluate.ParameterLogger;
