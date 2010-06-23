@@ -27,7 +27,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 	 */
 	public void body()
 	{
-		final IEABeliefSet components = (IEABeliefSet)(IEABeliefbase)getExternalAccess().getBeliefbase().getBeliefSet("components").get(this);
+		final IEABeliefSet components = (IEABeliefSet)getExternalAccess().getBeliefbase().getBeliefSet("components").get(this);
 		
 //		final IEBeliefSet components = getExternalAccess().getBeliefbase().getBeliefSet("components");
 		

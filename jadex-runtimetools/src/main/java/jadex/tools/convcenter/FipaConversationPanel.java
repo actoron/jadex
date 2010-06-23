@@ -140,6 +140,7 @@ public class FipaConversationPanel extends JSplitPane
 								MessageType mt = msgevent.getMessageType();
 								String ri = mt.getReceiverIdentifier();
 								ParameterSpecification ris = mt.getParameter(ri);
+								
 								if((ris.isSet() && msgevent.getParameterSet(ri).getValues().length==0)
 									|| (!ris.isSet() && msgevent.getParameter(ri).getValue()==null))
 								{
