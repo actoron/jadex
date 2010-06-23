@@ -46,6 +46,9 @@ public abstract class AbstractCommonPropertySection extends
 	/** all controls/resources/... for this section */
 	private Set<Object> disposableObjects;
 	
+	/** The composite that holds the root section composite */
+	private Composite rootComposite;
+	
 
 	// ---- constructor ----
 	
@@ -67,8 +70,10 @@ public abstract class AbstractCommonPropertySection extends
 		
 		sectionComposite = getWidgetFactory().createComposite(parent);
 		sectionComposite.setLayout(new FillLayout());
-		
+
 		disposableObjects.add(sectionComposite);
+		// save a reference to the first section composite
+		rootComposite = sectionComposite;
 	}
 
 	/**
@@ -89,59 +94,64 @@ public abstract class AbstractCommonPropertySection extends
 	@Override
 	public void dispose()
 	{
-		for (Object toDispose : disposableObjects)
+		synchronized (disposableObjects)
 		{
-			if (toDispose instanceof Control)
+			for (Object toDispose : disposableObjects)
 			{
-				Control control = (Control) toDispose;
-				if (control != null && !control.isDisposed()) 
+				if (toDispose instanceof Control)
 				{
-					control.dispose();
+					Control control = (Control) toDispose;
+					if (control != null && !control.isDisposed())
+					{
+						control.dispose();
+					}
+				}
+
+				else if (toDispose instanceof Resource)
+				{
+					Resource resource = (Resource) toDispose;
+					if (resource != null && !resource.isDisposed())
+					{
+						resource.dispose();
+					}
+				}
+
+				else if (toDispose instanceof Widget)
+				{
+					Widget widget = (Widget) toDispose;
+					if (widget != null && !widget.isDisposed())
+					{
+						widget.dispose();
+					}
+				}
+
+				else if (toDispose instanceof IBaseLabelProvider)
+				{
+					IBaseLabelProvider provider = (IBaseLabelProvider) toDispose;
+					if (provider != null)
+					{
+						provider.dispose();
+					}
+				}
+
+				else if (toDispose instanceof IContentProvider)
+				{
+					IContentProvider provider = (IContentProvider) toDispose;
+					if (provider != null)
+					{
+						provider.dispose();
+					}
+				}
+
+				else
+				{
+					throw new RuntimeException("Unsupported class to dispose: "
+							+ toDispose);
 				}
 			}
-			
-			else if (toDispose instanceof Resource)
-			{
-				Resource resource = (Resource) toDispose;
-				if (resource != null && !resource.isDisposed()) 
-				{
-					resource.dispose();
-				}
-			}
-			
-			else if (toDispose instanceof Widget)
-			{
-				Widget widget = (Widget) toDispose;
-				if (widget != null && !widget.isDisposed())
-				{
-					widget.dispose();
-				}
-			}
-			
-			else if (toDispose instanceof IBaseLabelProvider)
-			{
-				IBaseLabelProvider provider = (IBaseLabelProvider) toDispose;
-				if (provider != null)
-				{
-					provider.dispose();
-				}
-			}
-			
-			else if (toDispose instanceof IContentProvider)
-			{
-				IContentProvider provider = (IContentProvider) toDispose;
-				if (provider != null)
-				{
-					provider.dispose();
-				}
-			}
-			
-			else
-			{
-				throw new RuntimeException("Unsupported class to dispose: " + toDispose);
-			}
+			disposableObjects.clear();
+
 		}
-		disposableObjects.clear();
 		
 		super.dispose();
 	}
@@ -181,7 +191,7 @@ public abstract class AbstractCommonPropertySection extends
 
 	protected void changed(Control[] changed)
 	{
-		sectionComposite.changed(changed);
+		rootComposite.changed(changed);
 	}
 
 	// ---- helper methods ----

@@ -57,15 +57,17 @@ public class MultiColumnTable
 	/** The list of rows in this table */
 	private List<MultiColumnTableRow> rows;
 	
+	private int uniqueColumn = 0;
 	
 	// ---- constructor ----
 	
 	/**
 	 * 
 	 */
-	public MultiColumnTable(int rowCount)
+	public MultiColumnTable(int rowCount, int uniqueColumn)
 	{
 		super();
+		this.uniqueColumn = uniqueColumn;
 		this.rows = new ArrayList<MultiColumnTableRow>(rowCount);
 	}
 
@@ -77,7 +79,30 @@ public class MultiColumnTable
 		return rows;
 	}
 	
+	public int getRowSize()
+	{
+		if (!rows.isEmpty())
+		{
+			// ensure an element is found (don't use index 0 statically)
+			for (MultiColumnTableRow row : rows)
+			{
+				return row.size();
+			}
+		}
+		
+		return 0;
+	}
+	
+	/**
+	 * @return the uniqueColumnIndex
+	 */
+	public int getUniqueColumn()
+	{
+		return uniqueColumn;
+	}
+	
 	// ---- List delegations ----
+	
 	
 	/**
 	 * @param index
@@ -277,7 +302,8 @@ public class MultiColumnTable
 	}
 	
 	
-	// ---- static conversion methods ----
+	
+	// ---- @deprecated static conversion methods ----
 
 	/**
 	 * Convert a list of MultiColumnTableRow into a string representation using  
@@ -286,6 +312,7 @@ public class MultiColumnTable
 	 * 
 	 * @param table (the table)
 	 * @return String representation of rowList
+	 * @deprecated We use a annotation as table now
 	 */
 	public static String convertMultiColumnRowList(MultiColumnTable table)
 	{
@@ -311,6 +338,7 @@ public class MultiColumnTable
 	 * {@link AbstractBpmnPropertySection} as delimiter
 	 * @param row to convert
 	 * @return String representation of row
+	 * @deprecated We use a annotation as table now
 	 */
 	public static String convertMultiColumnRowToString(MultiColumnTableRow row)
 	{
@@ -335,19 +363,20 @@ public class MultiColumnTable
 	 * @param columnCount number of columns to expect in the table (e.g. attribute count)
 	 * @param uniqueColumn, set to -1 for no unique column (beware, someone could get confused!)
 	 * @return List of column rows from String, each column rows has set the unique column attribute
+	 * @deprecated We use a annotation as table now
 	 */
 	public static MultiColumnTable convertMultiColumnTableString(
 			String stringToConvert, int columnCount, int uniqueColumn)
 	{
 		// replace the old deprecated delimiter with the new one used
-		stringToConvert = convertDeprecatedDelimiter(stringToConvert);
+		//stringToConvert = convertDeprecatedDelimiter(stringToConvert);
 		
 		StringTokenizer listTokens = new StringTokenizer(stringToConvert, LIST_ELEMENT_DELIMITER, false);
 		
 		//MultiColumnTable tableRowList = new MultiColumnTable(listTokens.countTokens());
 		
 		long countTokens = listTokens.countTokens();
-		MultiColumnTable tableRowList = new MultiColumnTable((int)countTokens/2);
+		MultiColumnTable tableRowList = new MultiColumnTable((int)countTokens/2, uniqueColumn);
 		
 		while (listTokens.hasMoreElements())
 		{
@@ -411,6 +440,7 @@ public class MultiColumnTable
 	 * Convert delimiters in a table string
 	 * @param stringToConvert a String with old delimiters used
 	 * @return toConvert with replaced delimiters
+	 * @deprecated We use a annotation as table now
 	 */
 	public static String convertDeprecatedDelimiter(String stringToConvert)
 	{
@@ -543,6 +573,15 @@ public class MultiColumnTable
 			return buffer.toString();
 		}
 		
+		/**
+		 * Convenience method to access the length of this {@link MultiColumnTableRow}
+		 * @return the number of values in a row
+		 */
+		public int size()
+		{
+			return columnValues.length;
+		}
+		
 		// ---- getter / setter ----
 		
 		/**
@@ -580,6 +619,13 @@ public class MultiColumnTable
 			this.columnValues[columnIndex] = value;
 		}
 
+		/**
+		 * @return the uniqueColumnIndex
+		 */
+		public int getUniqueColumnIndex()
+		{
+			return uniqueColumnIndex;
+		}
 	}
 
 }

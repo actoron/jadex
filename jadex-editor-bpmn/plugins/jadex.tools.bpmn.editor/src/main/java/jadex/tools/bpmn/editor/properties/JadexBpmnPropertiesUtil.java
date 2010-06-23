@@ -4,6 +4,8 @@ import jadex.tools.bpmn.diagram.Messages;
 import jadex.tools.bpmn.editor.JadexBpmnPlugin;
 import jadex.tools.model.common.properties.AbstractCommonPropertySection;
 import jadex.tools.model.common.properties.ModifyEObjectCommand;
+import jadex.tools.model.common.properties.table.MultiColumnTable;
+import jadex.tools.model.common.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -75,7 +77,22 @@ public class JadexBpmnPropertiesUtil
 	/** Key for the implementing error. */
 	public static final String JADEX_EVENT_ERROR_DETAIL = "error";
 	
-
+	/** Key for the table dimension. */
+	public static final String JADEX_TABLE_DIMESION_DETAIL = "dimension";
+	
+	/** Key for the table dimension. */
+	public static final String JADEX_TABLE_UNIQUE_COLUMN_DETAIL = "dimension";
+	
+	/** Key for the parameter table */
+	public static final String JADEX_COMBINED_KEY_DELIMITER = "_";
+	
+	public static final String JADEX_TABLE_DIMENSION_DELIMITER = ":";
+	
+	/** Key for the parameter table */
+	public static final String JADEX_PARAMETER_TABLE_ANNOTATION_COMBINED_KEY = 
+		JADEX_GLOBAL_ANNOTATION+JADEX_COMBINED_KEY_DELIMITER+JADEX_PARAMETER_LIST_DETAIL+JADEX_COMBINED_KEY_DELIMITER+"table";
+	
+	
 	
 	/** The modelElement, may NOT be null. */
 	protected AbstractCommonPropertySection section;
@@ -226,4 +243,204 @@ public class JadexBpmnPropertiesUtil
 	}
 	
 	
+	/**
+	 * Update annotation detail
+	 * @param element
+	 * @param annotationIdentifier
+	 * @param annotationDetail
+	 * @param value
+	 * @return
+	 */
+	public static boolean updateJadexEAnnotationTable(final EModelElement element, final String annotationIdentifier, final MultiColumnTable table)
+	{
+		if(element == null)
+		{
+			return false;
+		}
+		
+		
+			// update or create the annotation / detail
+			ModifyEObjectCommand command = new ModifyEObjectCommand(
+					element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
+			{
+				@Override
+				protected CommandResult doExecuteWithResult(
+						IProgressMonitor arg0, IAdaptable arg1)
+						throws ExecutionException
+				{
+					
+					EAnnotation annotation = element.getEAnnotation(annotationIdentifier);
+					if (annotation == null && table != null)
+					{
+						annotation = EcoreFactory.eINSTANCE.createEAnnotation();
+						annotation.setSource(annotationIdentifier);
+						annotation.setEModelElement(element);
+					}
+					
+					if (table != null && !table.isEmpty())
+					{
+						String tableDimension = table.size()+JADEX_TABLE_DIMENSION_DELIMITER+table.getRowSize();
+						annotation.getDetails().put(JADEX_TABLE_DIMESION_DETAIL, tableDimension);
+						annotation.getDetails().put(JADEX_TABLE_UNIQUE_COLUMN_DETAIL, String.valueOf(table.getUniqueColumn()));
+						int rowIndex = 0;
+						for (MultiColumnTableRow row : table.getRowList())
+						{
+							for (int columnIndex = 0; columnIndex < row.getColumnValues().length; columnIndex++)
+							{
+								annotation.getDetails().put(rowIndex+JADEX_TABLE_DIMENSION_DELIMITER+columnIndex, row.getColumnValueAt(columnIndex));
+							}
+							rowIndex++;
+						}
+					}
+					else
+					{
+						element.getEAnnotations().remove(annotation);
+					}
+					
+					return CommandResult.newOKCommandResult();
+				}
+			};
+
+		
+		// execute command
+		try
+		{
+			IStatus status = command.execute(new NullProgressMonitor(), null);
+			return status.isOK();
+		}
+		catch (ExecutionException exception)
+		{
+			JadexBpmnPlugin.getDefault().getLog().log(
+					new Status(IStatus.ERROR, JadexBpmnPlugin.PLUGIN_ID,
+							IStatus.ERROR, exception.getMessage(),
+							exception));
+			
+			return false;
+		}
+	}
+	/**
+	 * Get annotation detail
+	 * @param element
+	 * @param annotationIdentifier
+	 * @param annotationDetail
+	 * @return
+	 */
+	public static MultiColumnTable getJadexEAnnotationTable(final EModelElement element, final String annotationIdentifier)
+	{
+		if(element == null)
+		{
+			return null;
+		}
+	
+		EAnnotation annotation = element.getEAnnotation(annotationIdentifier);
+		if (annotation != null)
+		{
+			String dimension = annotation.getDetails().get(JADEX_TABLE_DIMESION_DETAIL);
+			int uniqueColumn = Integer.valueOf(annotation.getDetails().get(JADEX_TABLE_UNIQUE_COLUMN_DETAIL));
+			if (dimension != null) 
+			{
+				TableCellIndex tableDimension = new TableCellIndex(dimension);
+				MultiColumnTable newTable = new MultiColumnTable(tableDimension.getRowCount(), uniqueColumn);
+				for (int rowIndex = 0; rowIndex < tableDimension.rowCount; rowIndex++)
+				{
+					String[] newRow = new String[tableDimension.columnCount];
+					for (int columnIndex = 0; columnIndex < tableDimension.columnCount; columnIndex++)
+					{
+						newRow[columnIndex] = annotation.getDetails().get((new TableCellIndex(rowIndex, columnIndex)).toString());
+					}
+					newTable.add(newTable.new MultiColumnTableRow(newRow, uniqueColumn));
+				}
+			}
+				
+			// fall through
+			return new MultiColumnTable(0, 0);
+		}
+	
+		return null;
+		
+	}
+	
+	
+}
+
+/**
+ * The dimension tuple of a table
+ * @author Claas
+ */
+class TableCellIndex
+{
+	/** row dimension */
+	int rowCount;
+	
+	/** column dimension */
+	int columnCount;
+	
+	/**
+	 * @param rowCount
+	 * @param columnCount
+	 */
+	protected TableCellIndex(int rowCount, int columnCount)
+	{
+		super();
+		this.rowCount = rowCount;
+		this.columnCount = columnCount;
+	}
+
+	/**
+	 * @param dimension as string generated by toString() method
+	 */
+	protected TableCellIndex(String dimensionString)
+	{
+		String[] dimension = dimensionString.split(JadexBpmnPropertiesUtil.JADEX_TABLE_DIMENSION_DELIMITER);
+		this.rowCount = Integer.valueOf(dimension[0]);
+		this.columnCount = Integer.valueOf(dimension[1]);
+	}
+	
+	// ---- methods ----
+	
+	
+
+
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString()
+	{
+		return rowCount+JadexBpmnPropertiesUtil.JADEX_TABLE_DIMENSION_DELIMITER+columnCount;
+	}
+
+	/**
+	 * @return the rowCount
+	 */
+	public int getRowCount()
+	{
+		return rowCount;
+	}
+
+	/**
+	 * @param rowCount the rowCount to set
+	 */
+	public void setRowCount(int rowCount)
+	{
+		this.rowCount = rowCount;
+	}
+
+	/**
+	 * @return the columnCount
+	 */
+	public int getColumnCount()
+	{
+		return columnCount;
+	}
+
+	/**
+	 * @param columnCount the columnCount to set
+	 */
+	public void setColumnCount(int columnCount)
+	{
+		this.columnCount = columnCount;
+	}
+
 }

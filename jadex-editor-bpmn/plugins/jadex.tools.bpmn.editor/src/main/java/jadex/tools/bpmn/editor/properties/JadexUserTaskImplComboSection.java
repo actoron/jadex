@@ -305,7 +305,7 @@ public class JadexUserTaskImplComboSection extends
 	 */
 	protected MultiColumnTable createNewParameterTable(ParameterMetaInfo[] parameterMetaInfo)
 	{
-		MultiColumnTable newTable = new MultiColumnTable(parameterMetaInfo.length);
+		MultiColumnTable newTable = new MultiColumnTable(parameterMetaInfo.length, JadexCommonParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE);
 		for (int i = 0; i < parameterMetaInfo.length; i++)
 		{
 			String[] columnValues = new String[] {

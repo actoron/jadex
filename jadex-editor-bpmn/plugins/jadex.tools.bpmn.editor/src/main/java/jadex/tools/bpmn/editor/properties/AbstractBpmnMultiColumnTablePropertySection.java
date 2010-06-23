@@ -385,7 +385,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 		}
 		
 		// fall through
-		return new MultiColumnTable(0);
+		return new MultiColumnTable(0, 0);
 	}
 	
 	/**
