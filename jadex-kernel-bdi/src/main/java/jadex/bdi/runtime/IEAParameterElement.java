@@ -84,6 +84,13 @@ public interface IEAParameterElement extends IEAElement
 	public void addParameterSetValue(String parameterset, Object value);
 	
 	/**
+	 *  Add values to a parameterset.
+	 *  @param parameterset The parameterset name.
+	 *  @param values The values.
+	 */
+	public void addParameterSetValues(String parameterset, Object[] values);
+	
+	/**
 	 *  Remove a value to a parameterset.
 	 *  @param parameterset The parameterset name.
 	 *  @param value The value.

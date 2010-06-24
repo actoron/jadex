@@ -324,6 +324,31 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 	}
 	
 	/**
+	 *  Add values to a parameterset.
+	 *  @param parameterset The parameterset name.
+	 *  @param values The values.
+	 */
+	public void addParameterSetValues(final String parameterset, final Object[] values)
+	{
+		if(getInterpreter().isExternalThread())
+		{
+			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getHandle(), getScope(), parameterset, false);
+					paramset.addValues(values);
+				}
+			});
+		}
+		else
+		{
+			IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getHandle(), getScope(), parameterset, false);
+			paramset.addValues(values);
+		}
+	}
+	
+	/**
 	 *  Remove a value to a parameterset.
 	 *  @param parameterset The parameterset name.
 	 *  @param value The value.
