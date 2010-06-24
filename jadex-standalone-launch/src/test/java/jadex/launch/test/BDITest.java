@@ -34,6 +34,7 @@ public class BDITest	extends	ComponentTestSuite
 				"CMSTest",	// missing cms agent?
 				"DFTest",	// missing df agent?
 				"WaitFor",	// Missing synchronization between simulation clock and external clock
+				"Callback",	// Unclear threading issues -> refactor test (are listeners called on agent thread?)
 				"MessagingTest"	// wrong email configuration?
 			});
 	}

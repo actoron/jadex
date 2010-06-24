@@ -1,9 +1,13 @@
 package jadex.base;
 
+import jadex.commons.SGUI;
+import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
 
+import java.awt.Component;
 import java.util.logging.Logger;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 /**
@@ -16,14 +20,25 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 	/** The static instance. */
 	private static IResultListener instance;
 	
+	/** The component. */
+	protected Component parent;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new listener.
-	 *  @param logger The logger.
 	 */
 	public SwingDefaultResultListener()
 	{
+	}
+	
+	/**
+	 *  Create a new listener.
+	 *  @param parent The parent component (when errors should be shown as dialog).
+	 */
+	public SwingDefaultResultListener(Component parent)
+	{
+		this.parent	= parent;
 	}
 	
 	/**
@@ -98,6 +113,15 @@ public abstract class SwingDefaultResultListener extends DefaultResultListener
 	 */
 	public void customExceptionOccurred(Object source, Exception exception)
 	{
-		super.exceptionOccurred(source, exception);
+		if(parent!=null)
+		{
+			String text = SUtil.wrapText("A problem occurred while performing the requested action: "+exception.getMessage());
+			JOptionPane.showMessageDialog(SGUI.getWindowParent(parent), text,
+				"Problem Occurred", JOptionPane.INFORMATION_MESSAGE);
+		}
+		else
+		{
+			super.exceptionOccurred(source, exception);
+		}
 	}
 }

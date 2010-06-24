@@ -12,12 +12,13 @@ import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
-import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.Tuple;
 import jadex.rules.state.IOAVState;
+
+import java.util.Map;
 
 /**
  *  Flyweight for the eventbase.
@@ -43,7 +44,8 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 	public static EAEventbaseFlyweight getEventbaseFlyweight(IOAVState state, Object scope)
 	{
 		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
-		EAEventbaseFlyweight ret = (EAEventbaseFlyweight)ip.getFlyweightCache(IEAEventbase.class).get(new Tuple(IEAEventbase.class, scope));
+		Map fwc = ip.getFlyweightCache(IEAEventbase.class);
+		EAEventbaseFlyweight ret = (EAEventbaseFlyweight)fwc.get(new Tuple(IEAEventbase.class, scope));
 		if(ret==null)
 		{
 			ret = new EAEventbaseFlyweight(state, scope);

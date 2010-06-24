@@ -2,10 +2,15 @@ package jadex.bdi.testcases.misc;
 
 import jadex.base.fipa.SFipa;
 import jadex.base.test.TestReport;
+import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IEAGoal;
+import jadex.bdi.runtime.IEAMessageEvent;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
+import jadex.commons.ISuspendable;
+import jadex.commons.ThreadSuspendable;
 
 import java.util.Arrays;
 
@@ -16,6 +21,9 @@ public class WaitForPlan extends Plan	implements Runnable
 {
 	/** Boolean that indicates if the thread is finished. */
 	//boolean thread_finished;
+	
+	/** The external access. */
+	protected IBDIExternalAccess	extaccess;
 
 	/**
 	 * The body method is called on the
@@ -178,6 +186,7 @@ public class WaitForPlan extends Plan	implements Runnable
 		// Test external access.
 //		getExternalAccess().startSynchronizedExternalThread(this);
 		
+		this.extaccess	= getExternalAccess();
 		Thread t = new Thread(this);
 		t.start();
 	}
@@ -187,10 +196,12 @@ public class WaitForPlan extends Plan	implements Runnable
 	 */
 	public void run()
 	{
+		ISuspendable	sus	= new ThreadSuspendable(this);
+		
 		TestReport	report	= new TestReport("x-time", "Waiting for external 100 ms.");
-		getExternalAccess().waitFor(100);
+		extaccess.waitFor(100).get(sus);
 		report.setSucceeded(true);
-		getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
+		extaccess.getBeliefbase().addBeliefSetFact("testcap.reports", report);
 
 		/*
 		report	= new TestReport("x-ticktime", "Waiting for tick.");
@@ -211,11 +222,11 @@ public class WaitForPlan extends Plan	implements Runnable
 		{
 			// It can happen that we are just before the belief change scheduled.
 			// Therefore we have to ensure that we are in a fresh period.
-			getExternalAccess().waitForFactChanged("time", 1000);
+			extaccess.waitForFactChanged("time", 1000).get(sus);
 
-			long oldt = ((Long)getExternalAccess().getBeliefbase().getBelief("time").getFact()).longValue();
-			getExternalAccess().waitForFactChanged("time", 2000);
-			long newt = ((Long)getExternalAccess().getBeliefbase().getBelief("time").getFact()).longValue();
+			long oldt = ((Long)extaccess.getBeliefbase().getBeliefFact("time").get(sus)).longValue();
+			extaccess.waitForFactChanged("time", 2000).get(sus);
+			long newt = ((Long)extaccess.getBeliefbase().getBeliefFact("time").get(sus)).longValue();
 			if(newt!=oldt)
 				report.setSucceeded(true);
 			else
@@ -225,14 +236,14 @@ public class WaitForPlan extends Plan	implements Runnable
 		{
 			report.setReason("Timeout occurred.");
 		}
-		getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
+		extaccess.getBeliefbase().addBeliefSetFact("testcap.reports", report);
 
 		report	= new TestReport("x-beliefsetadd", "Waiting for external addition in beliefset 'belset'.");
 		try
 		{
-			Object[] oldfacts = getExternalAccess().getBeliefbase().getBeliefSet("belset").getFacts();
-			getExternalAccess().waitForFactAdded("belset", 2000);
-			Object[] newfacts = getExternalAccess().getBeliefbase().getBeliefSet("belset").getFacts();
+			Object[] oldfacts = (Object[])extaccess.getBeliefbase().getBeliefSetFacts("belset").get(sus);
+			extaccess.waitForFactAdded("belset", 2000).get(sus);
+			Object[] newfacts = (Object[])extaccess.getBeliefbase().getBeliefSetFacts("belset").get(sus);
 			if(!Arrays.equals(oldfacts, newfacts))
 				report.setSucceeded(true);
 			else
@@ -242,14 +253,14 @@ public class WaitForPlan extends Plan	implements Runnable
 		{
 			report.setReason("Timeout occurred.");
 		}
-		getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
+		extaccess.getBeliefbase().addBeliefSetFact("testcap.reports", report);
 
 		report	= new TestReport("x-beliefsetremove", "Waiting for external removal in beliefset 'belset'.");
 		try
 		{
-			Object[] oldfacts = getExternalAccess().getBeliefbase().getBeliefSet("belset").getFacts();
-			getExternalAccess().waitForFactRemoved("belset", 2000);
-			Object[] newfacts = getExternalAccess().getBeliefbase().getBeliefSet("belset").getFacts();
+			Object[] oldfacts = (Object[])extaccess.getBeliefbase().getBeliefSetFacts("belset").get(sus);
+			extaccess.waitForFactRemoved("belset", 2000).get(sus);
+			Object[] newfacts = (Object[])extaccess.getBeliefbase().getBeliefSetFacts("belset").get(sus);
 			if(!Arrays.equals(oldfacts, newfacts))
 				report.setSucceeded(true);
 			else
@@ -259,7 +270,7 @@ public class WaitForPlan extends Plan	implements Runnable
 		{
 			report.setReason("Timeout occurred.");
 		}
-		getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
+		extaccess.getBeliefbase().addBeliefSetFact("testcap.reports", report);
 
 		
 		
@@ -293,10 +304,10 @@ public class WaitForPlan extends Plan	implements Runnable
 //		getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
 
 		report	= new TestReport("x-goal", "Waiting for an external goal to complete.");
-		IGoal goal = getExternalAccess().getGoalbase().createGoal("test");
+		IEAGoal goal = (IEAGoal)extaccess.getGoalbase().createGoal("test").get(sus);
 		try
 		{
-			getExternalAccess().dispatchTopLevelGoalAndWait(goal, 1000);
+			extaccess.dispatchTopLevelGoalAndWait(goal, 1000).get(sus);
 			report.setSucceeded(true);
 		}
 		catch(TimeoutException e)
@@ -307,33 +318,33 @@ public class WaitForPlan extends Plan	implements Runnable
 		{
 			report.setReason("Exception occurred.");
 		}
-		getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
+		extaccess.getBeliefbase().addBeliefSetFact("testcap.reports", report);
 
 		report	= new TestReport("x-message", "Waiting for an external message reply.");
-		IMessageEvent me = getExternalAccess().createMessageEvent("default_query_ping");
-		me.getParameterSet(SFipa.RECEIVERS).addValue(getExternalAccess().getComponentIdentifier());
+		IEAMessageEvent me = (IEAMessageEvent)extaccess.createMessageEvent("default_query_ping").get(sus);
+		me.addParameterSetValue(SFipa.RECEIVERS, extaccess.getComponentIdentifier());
 		try
 		{
-			getExternalAccess().sendMessageAndWait(me, 1000);
+			extaccess.sendMessageAndWait(me, 1000).get(sus);
 			report.setSucceeded(true);
 		}
 		catch(TimeoutException e)
 		{
 			report.setReason("Timeout occurred.");
 		}
-		getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
+		extaccess.getBeliefbase().addBeliefSetFact("testcap.reports", report);
 		
 		report	= new TestReport("x-timeout", "Waiting for an external timeout.");
 		try
 		{
-			IMessageEvent rep = getExternalAccess().waitForMessageEvent("default_query_ping", 1000);
+			IEAMessageEvent rep = (IEAMessageEvent)extaccess.waitForMessageEvent("default_query_ping", 1000).get(sus);
 			report.setReason("Received message: "+rep);
 		}
 		catch(TimeoutException e)
 		{
 			report.setSucceeded(true);
 		}
-		getExternalAccess().getBeliefbase().getBeliefSet("testcap.reports").addFact(report);
+		extaccess.getBeliefbase().addBeliefSetFact("testcap.reports", report);
 
 //		System.err.println("thread end");
 		//getExternalAccess().removeSynchronizedExternalThread(Thread.currentThread());
