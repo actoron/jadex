@@ -201,7 +201,10 @@ public class ComputeSingleResultPlan extends Plan {
 			Object key = it.next();
 			ArrayList<ObservedEvent> list = eventsToFilter.get(key);
 			sortList(list);
+			//hack: to avoid arrayOutOfBoundsException if list empty
+			if(list.size() > 0){
 			resultList.add(list.get(list.size()-1));
+			}
 		}
 		return resultList;
 	}
