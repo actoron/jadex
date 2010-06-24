@@ -208,7 +208,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 //			public void run()
 //			{
 				// create new Player Panels with the properties as specified in the Manager.xml
-				access.getBeliefbase().getBeliefSet("players").addResultListener(new SwingDefaultResultListener()
+				access.getBeliefbase().getBeliefSetFacts("players").addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -657,8 +657,15 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 						args.put("dealer", dealeraid);
 						start.setParameterValue("arguments", args);
 						agent.dispatchTopLevelGoalAndWait(start);
-						IComponentIdentifier playerid = (IComponentIdentifier)start.getParameterValue("componentidentifier");
-						player.setAgentID(playerid);
+						start.getParameterValue("componentidentifier").addResultListener(new DefaultResultListener()
+						{
+							
+							public void resultAvailable(Object source, Object result)
+							{
+								IComponentIdentifier playerid = (IComponentIdentifier)result;
+								player.setAgentID(playerid);
+							}
+						});
 					}
 					catch(Exception e)
 					{
