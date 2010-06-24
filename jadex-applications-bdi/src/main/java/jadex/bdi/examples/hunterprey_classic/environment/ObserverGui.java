@@ -1,5 +1,6 @@
 package jadex.bdi.examples.hunterprey_classic.environment;
 
+import jadex.base.DefaultResultListener;
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.CurrentVision;
 import jadex.bdi.examples.hunterprey_classic.Vision;
@@ -94,44 +95,52 @@ public class ObserverGui	extends EnvironmentGui
 	{
 		// Read highscore list from resource.
 		BufferedReader reader = null;
-		try
-		{
-			// read as serialized object
-			//ObjectInputStream is = new ObjectInputStream(
-			//	SUtil.getResource((String)agent.getBeliefbase().getBelief("highscore").getFact(), ObserverGui.class.getClassLoader()));
-			//Creature[]	hscreatures	= (Creature[])is.readObject();
-			
-			// read as xml file
-			reader = new BufferedReader(new InputStreamReader(SUtil.getResource((String)agent.getBeliefbase().getBelief("highscore").getFact(), ObserverGui.class.getClassLoader())));
-			StringBuffer fileData = new StringBuffer(1000);
-			char[] buf = new char[1024];
-			int numRead=0;
-			while((numRead=reader.read(buf)) != -1){
-				fileData.append(buf, 0, numRead);
-			}
-			reader.close();
-			Creature[]	hscreatures	= (Creature[]) JavaReader.objectFromXML(fileData.toString(), this.getClass().getClassLoader());
+	
+		// read as serialized object
+		//ObjectInputStream is = new ObjectInputStream(
+		//	SUtil.getResource((String)agent.getBeliefbase().getBelief("highscore").getFact(), ObserverGui.class.getClassLoader()));
+		//Creature[]	hscreatures	= (Creature[])is.readObject();
 		
-			highscore.update(hscreatures);
-		}
-		catch(Exception e)
+		// read as xml file
+		agent.getBeliefbase().getBeliefFact("highscore").addResultListener(new DefaultResultListener()
 		{
-			System.out.print("Error loading highscore: ");
-			e.printStackTrace();
-		}
-		finally
-		{
-			if(reader!=null)
+			public void resultAvailable(Object source, Object result)
 			{
+				BufferedReader reader = null;
 				try
 				{
+					reader = new BufferedReader(new InputStreamReader(SUtil.getResource((String)result, ObserverGui.class.getClassLoader())));
+					StringBuffer fileData = new StringBuffer(1000);
+					char[] buf = new char[1024];
+					int numRead=0;
+					while((numRead=reader.read(buf)) != -1){
+						fileData.append(buf, 0, numRead);
+					}
 					reader.close();
+					Creature[]	hscreatures	= (Creature[]) JavaReader.objectFromXML(fileData.toString(), this.getClass().getClassLoader());
+				
+					highscore.update(hscreatures);
 				}
 				catch(Exception e)
 				{
+					System.out.print("Error loading highscore: ");
+					e.printStackTrace();
+				}
+				finally
+				{
+					if(reader!=null)
+					{
+						try
+						{
+							reader.close();
+						}
+						catch(Exception e)
+						{
+						}
+					}
 				}
 			}
-		}
+		});
 	}
 
 	/**
@@ -139,27 +148,33 @@ public class ObserverGui	extends EnvironmentGui
 	 */
 	protected void	enableGuiUpdate(final IBDIExternalAccess agent)
 	{
-		agent.getBeliefbase().getBelief("vision").addBeliefListener(new IBeliefListener()
+		agent.getBeliefbase().addBeliefListener("vision", new IBeliefListener()
 		{
 			public void beliefChanged(AgentEvent ae)
 			{
-				Vision	vision	= (Vision)ae.getValue(); 
-				Creature	me	= (Creature)agent.getBeliefbase().getBelief("my_self").getFact();
-				if(vision!=null)
+				final Vision vision = (Vision)ae.getValue(); 
+				agent.getBeliefbase().getBeliefFact("my_self").addResultListener(new DefaultResultListener()
 				{
-					// Update map and creature list from vision.
-					map.update(new CurrentVision(me, vision));
-					creatures.update(vision.getCreatures());
-					observers.update(vision.getCreatures());
-				}
+					public void resultAvailable(Object source, Object result)
+					{
+						Creature me = (Creature)result;
+						if(vision!=null)
+						{
+							// Update map and creature list from vision.
+							map.update(new CurrentVision(me, vision));
+							creatures.update(vision.getCreatures());
+							observers.update(vision.getCreatures());
+						}
 
-				// Refresh highscore.
-				long	time	= System.currentTimeMillis();
-				if(refreshinterval>=0 && refreshtime+refreshinterval<=time)
-				{
-					refreshHighscore(agent);
-					refreshtime	= time;
-				}
+						// Refresh highscore.
+						long	time	= System.currentTimeMillis();
+						if(refreshinterval>=0 && refreshtime+refreshinterval<=time)
+						{
+							refreshHighscore(agent);
+							refreshtime	= time;
+						}
+					}
+				});
 			}
 		});
 	}

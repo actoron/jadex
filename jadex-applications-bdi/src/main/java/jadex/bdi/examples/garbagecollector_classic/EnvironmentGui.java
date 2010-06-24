@@ -1,9 +1,11 @@
 package jadex.bdi.examples.garbagecollector_classic;
 
+import jadex.base.DefaultResultListener;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
@@ -28,35 +30,56 @@ public class EnvironmentGui	extends JFrame
 	{
 		super("Garbage Collector Environment");
 
-		MapPanel	map = new MapPanel((Environment)agent.getBeliefbase().getBelief("env").getFact());
-		getContentPane().add("Center", map);
-
-		setSize(400, 400);
-		setLocation(SGUI.calculateMiddlePosition(this));
-		setVisible(true);
+		agent.getBeliefbase().getBeliefFact("env").addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				MapPanel map = new MapPanel((Environment)result);
+				getContentPane().add("Center", map);
+				
+				setSize(400, 400);
+				setLocation(SGUI.calculateMiddlePosition(EnvironmentGui.this));
+				setVisible(true);
+			}
+		});
 		
 		addWindowListener(new WindowAdapter()
 		{
 			public void windowClosing(WindowEvent e)
 			{
 				// On exit kill all known agents.
-				Environment	env	= (Environment)agent.getBeliefbase().getBelief("env").getFact();
-				WorldObject[]	wobs	= env.getWorldObjects();
-				for(int i=0; i<wobs.length; i++)
+				agent.getBeliefbase().getBeliefFact("env").addResultListener(new DefaultResultListener()
 				{
-					if(wobs[i].getType().equals(Environment.BURNER)
-						|| wobs[i].getType().equals(Environment.COLLECTOR))
+					public void resultAvailable(Object source, Object result)
 					{
-						try
+						Environment	env	= (Environment)result;
+						final WorldObject[]	wobs = env.getWorldObjects();
+						for(int i=0; i<wobs.length; i++)
 						{
-							IGoal kill = agent.createGoal("cms_destroy_component");
-							IComponentManagementService ces = (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
-							kill.getParameter("componentidentifier").setValue(ces.createComponentIdentifier(wobs[i].getName(), true, null));
-							agent.dispatchTopLevelGoalAndWait(kill);
+							final int num = i;
+							if(wobs[i].getType().equals(Environment.BURNER)
+								|| wobs[i].getType().equals(Environment.COLLECTOR))
+							{
+								agent.createGoal("cms_destroy_component").addResultListener(new DefaultResultListener()
+								{
+									public void resultAvailable(Object source, Object result)
+									{
+										try
+										{
+											IEAGoal kill = (IEAGoal)result;
+											IComponentManagementService ces = (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
+											kill.setParameterValue("componentidentifier", ces.createComponentIdentifier(wobs[num].getName(), true, null));
+											agent.dispatchTopLevelGoalAndWait(kill);
+										}
+										catch(GoalFailureException gfe) 
+										{
+										}
+									}
+								});
+							}
 						}
-						catch(GoalFailureException gfe) {}
 					}
-				}
+				});
 				
 				// Finally shutdown environment agent.
 				agent.killAgent();
