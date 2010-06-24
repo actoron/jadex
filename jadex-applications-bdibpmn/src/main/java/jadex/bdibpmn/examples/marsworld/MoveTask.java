@@ -6,6 +6,7 @@ import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Double;
+import jadex.base.DefaultResultListener;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.service.clock.IClockService;
@@ -63,22 +64,41 @@ public class MoveTask extends AbstractTask
 		final Set objects	= ((Space2D)space).getNearObjects((IVector2)obj.getProperty(Space2D.PROPERTY_POSITION), new Vector1Double(vision));
 		if(objects!=null)
 		{
-			scope.invokeLater(new Runnable()
+			for(Iterator it=objects.iterator(); it.hasNext(); )
 			{
-				public void run()
+				final ISpaceObject so = (ISpaceObject)it.next();
+				if(so.getType().equals("target"))
 				{
-					IBeliefSet	targetsbel	= scope.getBeliefbase().getBeliefSet("my_targets");
-					for(Iterator it=objects.iterator(); it.hasNext(); )
+					scope.getBeliefbase().containsBeliefSetFact("my_targets", so).addResultListener(new DefaultResultListener()
 					{
-						ISpaceObject so = (ISpaceObject)it.next();
-						if(so.getType().equals("target") && !targetsbel.containsFact(so))
+						public void resultAvailable(Object source, Object result)
 						{
-//							System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
-							targetsbel.addFact(so);
+							if(!((Boolean)result).booleanValue())
+							{
+								scope.getBeliefbase().addBeliefSetFact("my_targets", so);
+							//	System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
+							}
 						}
-					}
+					});
 				}
-			});
+			}
+			
+//			scope.invokeLater(new Runnable()
+//			{
+//				public void run()
+//				{
+//					IBeliefSet	targetsbel	= scope.getBeliefbase().getBeliefSet("my_targets");
+//					for(Iterator it=objects.iterator(); it.hasNext(); )
+//					{
+//						ISpaceObject so = (ISpaceObject)it.next();
+//						if(so.getType().equals("target") && !targetsbel.containsFact(so))
+//						{
+////							System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
+//							targetsbel.addFact(so);
+//						}
+//					}
+//				}
+//			});
 		}
 		
 		if(newloc==destination)
