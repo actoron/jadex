@@ -1,4 +1,4 @@
-package jadex.base;
+package jadex.commons.concurrent;
 
 import jadex.commons.concurrent.IResultListener;
 

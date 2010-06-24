@@ -1,6 +1,5 @@
 package jadex.standalone.service;
 
-import jadex.base.DefaultResultListener;
 import jadex.base.fipa.DFComponentDescription;
 import jadex.base.fipa.DFServiceDescription;
 import jadex.base.fipa.IDF;
@@ -15,6 +14,7 @@ import jadex.bridge.ISearchConstraints;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.collection.IndexMap;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;

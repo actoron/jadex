@@ -1,7 +1,7 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.base.DefaultResultListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.jtable.ObjectTableModel;
 import jadex.service.clock.IClockService;
 
@@ -168,10 +168,9 @@ public class AlarmsGui extends JFrame
 		{
 			public void run()
 			{
-				agent.getBeliefbase().getBeliefSetFacts("alarms").addResultListener(new DefaultResultListener()
+				agent.getBeliefbase().getBeliefSetFacts("alarms").addResultListener(new SwingDefaultResultListener(AlarmsGui.this)
 				{
-					
-					public void resultAvailable(Object source, Object result)
+					public void customResultAvailable(Object source, Object result)
 					{
 						Alarm[] alarms = (Alarm[])result;
 						for(int i=0; i<alarms.length; i++)

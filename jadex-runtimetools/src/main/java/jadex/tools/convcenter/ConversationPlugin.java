@@ -1,6 +1,5 @@
 package jadex.tools.convcenter;
 
-import jadex.base.DefaultResultListener;
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IEAMessageEvent;
@@ -14,6 +13,7 @@ import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.tools.common.ComponentTreeTable;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
@@ -96,15 +96,15 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			IComponentIdentifier rec = desc.getName();
 			final IComponentIdentifier receiver = ces.createComponentIdentifier(rec.getName(), false, rec.getAddresses());
 			final IEAMessageEvent	message	= convcenter.getMessagePanel().getMessage();
-			message.getParameterSet(SFipa.RECEIVERS).addResultListener(new DefaultResultListener()
+			message.getParameterSet(SFipa.RECEIVERS).addResultListener(new SwingDefaultResultListener(convcenter)
 			{
-				public void resultAvailable(Object source, Object result) 
+				public void customResultAvailable(Object source, Object result) 
 				{
 					final IEAParameterSet rcvs = (IEAParameterSet)result;
 					
-					rcvs.containsValue(receiver).addResultListener(new DefaultResultListener()
+					rcvs.containsValue(receiver).addResultListener(new SwingDefaultResultListener(convcenter)
 					{
-						public void resultAvailable(Object source, Object result) 
+						public void customResultAvailable(Object source, Object result) 
 						{
 							if(((Boolean)result).booleanValue())
 							{
@@ -114,14 +114,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 							{
 								rcvs.addValue(receiver);
 							}
-							
-							SwingUtilities.invokeLater(new Runnable()
-							{
-								public void run() 
-								{
-									convcenter.getMessagePanel().setMessage(message);
-								};
-							});
+							convcenter.getMessagePanel().setMessage(message);
 						}
 					});
 				};
@@ -242,26 +235,20 @@ public class ConversationPlugin extends AbstractJCCPlugin
 	 */
 	public void processMessage(final IEAMessageEvent message)
 	{
-		message.hasParameter(SFipa.ONTOLOGY).addResultListener(new DefaultResultListener()
+		message.hasParameter(SFipa.ONTOLOGY).addResultListener(new SwingDefaultResultListener(convcenter)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				if(((Boolean)result).booleanValue())
 				{
-					message.getParameterValue(SFipa.ONTOLOGY).addResultListener(new DefaultResultListener()
+					message.getParameterValue(SFipa.ONTOLOGY).addResultListener(new SwingDefaultResultListener(convcenter)
 					{
-						public void resultAvailable(Object source, Object result)
+						public void customResultAvailable(Object source, Object result)
 						{
 							String onto = (String)result;
 							if(onto==null || !onto.startsWith("jadex.tools"))
 							{
-								SwingUtilities.invokeLater(new Runnable()
-								{
-									public void run()
-									{
-										convcenter.addMessage(message);										
-									}
-								});
+								convcenter.addMessage(message);										
 							}
 						}
 					});

@@ -1,19 +1,13 @@
 package jadex.tools.common;
 
-import jadex.base.DefaultResultListener;
-import jadex.bdi.runtime.BDIFailureException;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
-import jadex.bdi.runtime.IEAParameter;
-import jadex.bdi.runtime.IEAParameterSet;
-import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
-import jadex.commons.SUtil;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.jtable.ResizeableTableHeader;
-import jadex.service.IServiceContainer;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 
 import java.awt.BorderLayout;
@@ -38,7 +32,6 @@ import javax.help.HelpBroker;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;

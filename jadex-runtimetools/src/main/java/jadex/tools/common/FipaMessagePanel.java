@@ -1,6 +1,5 @@
 package jadex.tools.common;
 
-import jadex.base.DefaultResultListener;
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAMessageEvent;
@@ -10,6 +9,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -28,7 +28,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -367,13 +366,7 @@ public class FipaMessagePanel extends JPanel
 			{
 				receivers	= null;
 				tfreceivers.setText("");
-				FipaMessagePanel.this.message.getParameterSet("receivers").addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result) 
-					{
-						((IEAParameterSet)result).removeValues();
-					}	
-				});
+				FipaMessagePanel.this.message.removeParameterSetValues("receivers");
 			}
 		});
 	}
@@ -388,171 +381,99 @@ public class FipaMessagePanel extends JPanel
 		this.message = message;
 
 		// Extract parameter values.
-		message.getParameterValue(SFipa.PERFORMATIVE).addResultListener(new DefaultResultListener()
+		message.getParameterValue(SFipa.PERFORMATIVE).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, final Object result) 
+			public void customResultAvailable(Object source, final Object result) 
 			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run() 
-					{
-						performative.setSelectedItem(result!=null ? result.toString(): "");
-					}
-				});
-			};
+				performative.setSelectedItem(result!=null ? result.toString(): "");
+			}
 		});
-		message.getParameterValue(SFipa.SENDER).addResultListener(new DefaultResultListener()
+		message.getParameterValue(SFipa.SENDER).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, final Object result) 
+			public void customResultAvailable(Object source, final Object result) 
 			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run() 
-					{
-						tfsender.setText(result!=null ? result.toString(): "");
-						tfsender.setCaretPosition(0);
-					}
-				});
-			};
+				tfsender.setText(result!=null ? result.toString(): "");
+				tfsender.setCaretPosition(0);
+			}
 		});
-		message.getParameterValue(SFipa.REPLY_TO).addResultListener(new DefaultResultListener()
+		message.getParameterValue(SFipa.REPLY_TO).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, final Object result) 
+			public void customResultAvailable(Object source, final Object result) 
 			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run() 
-					{
-						tfreplyto.setText(result!=null ? result.toString(): "");
-						tfreplyto.setCaretPosition(0);
-					}
-				});
-			};
+				tfreplyto.setText(result!=null ? result.toString(): "");
+				tfreplyto.setCaretPosition(0);
+			}
 		});
-		message.getParameterValue(SFipa.CONTENT).addResultListener(new DefaultResultListener()
+		message.getParameterValue(SFipa.CONTENT).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, final Object result) 
+			public void customResultAvailable(Object source, final Object result) 
 			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run() 
-					{
-						content.setText(result!=null ? result.toString(): "");
-						content.setCaretPosition(0);
-					}
-				});
-			};
+				content.setText(result!=null ? result.toString(): "");
+				content.setCaretPosition(0);
+			}
 		});
-		message.getParameterValue(SFipa.LANGUAGE).addResultListener(new DefaultResultListener()
+		message.getParameterValue(SFipa.LANGUAGE).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, final Object result) 
+			public void customResultAvailable(Object source, final Object result) 
 			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run() 
-					{
-						language.setText(result!=null ? result.toString(): "");
-						language.setCaretPosition(0);
-					}
-				});
-			};
+				language.setText(result!=null ? result.toString(): "");
+				language.setCaretPosition(0);
+			}
 		});
-		message.getParameterValue(SFipa.ENCODING).addResultListener(new DefaultResultListener()
+		message.getParameterValue(SFipa.ENCODING).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, final Object result) 
+			public void customResultAvailable(Object source, final Object result) 
 			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run() 
-					{
-						encoding.setText(result!=null ? result.toString(): "");
-						encoding.setCaretPosition(0);
-					}
-				});
-			};
+				encoding.setText(result!=null ? result.toString(): "");
+				encoding.setCaretPosition(0);
+			}
 		});
-		message.getParameterValue(SFipa.ONTOLOGY).addResultListener(new DefaultResultListener()
+		message.getParameterValue(SFipa.ONTOLOGY).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, final Object result) 
+			public void customResultAvailable(Object source, final Object result) 
 			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run() 
-					{
-						ontology.setText(result!=null ? result.toString(): "");
-						ontology.setCaretPosition(0);
-					}
-				});
-			};
+				ontology.setText(result!=null ? result.toString(): "");
+				ontology.setCaretPosition(0);
+			}
 		});
-		message.getParameterValue(SFipa.PROTOCOL).addResultListener(new DefaultResultListener()
+		message.getParameterValue(SFipa.PROTOCOL).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, final Object result) 
+			public void customResultAvailable(Object source, final Object result) 
 			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run() 
-					{
-						protocol.setSelectedItem(result!=null ? result.toString(): "");
-					}
-				});
-			};
+				protocol.setSelectedItem(result!=null ? result.toString(): "");
+			}
 		});
-		message.getParameterValue(SFipa.CONVERSATION_ID).addResultListener(new DefaultResultListener()
+		message.getParameterValue(SFipa.CONVERSATION_ID).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, final Object result) 
+			public void customResultAvailable(Object source, final Object result) 
 			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run() 
-					{
-						convid.setText(result!=null ? result.toString(): "");
-						convid.setCaretPosition(0);
-					}
-				});
-			};
+				convid.setText(result!=null ? result.toString(): "");
+				convid.setCaretPosition(0);
+			}
 		});
-		message.getParameterValue(SFipa.IN_REPLY_TO).addResultListener(new DefaultResultListener()
+		message.getParameterValue(SFipa.IN_REPLY_TO).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, final Object result) 
+			public void customResultAvailable(Object source, final Object result) 
 			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run() 
-					{
-						inreplyto.setText(result!=null ? result.toString(): "");
-						inreplyto.setCaretPosition(0);
-					}
-				});
-			};
+				inreplyto.setText(result!=null ? result.toString(): "");
+				inreplyto.setCaretPosition(0);
+			}
 		});
-		message.getParameterValue(SFipa.REPLY_WITH).addResultListener(new DefaultResultListener()
+		message.getParameterValue(SFipa.REPLY_WITH).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, final Object result) 
+			public void customResultAvailable(Object source, final Object result) 
 			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run() 
-					{
-						replywith.setText(result!=null ? result.toString(): "");
-						replywith.setCaretPosition(0);
-					}
-				});
-			};
+				replywith.setText(result!=null ? result.toString(): "");
+				replywith.setCaretPosition(0);
+			}
 		});
-		message.getParameterValue(SFipa.REPLY_BY).addResultListener(new DefaultResultListener()
+		message.getParameterValue(SFipa.REPLY_BY).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, final Object result) 
+			public void customResultAvailable(Object source, final Object result) 
 			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run() 
-					{
-						replyby.setText(result!=null ? result.toString(): "");
-						replyby.setCaretPosition(0);
-					}
-				});
-			};
+				replyby.setText(result!=null ? result.toString(): "");
+				replyby.setCaretPosition(0);
+			}
 		});
 		
 //		performative.setSelectedItem(getParameter(SFipa.PERFORMATIVE));
@@ -581,30 +502,18 @@ public class FipaMessagePanel extends JPanel
 //		replyby.setCaretPosition(0);
 		
 		// Extract sender / replyto
-		message.getParameterValue(SFipa.SENDER).addResultListener(new DefaultResultListener()
+		message.getParameterValue(SFipa.SENDER).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, final Object result) 
+			public void customResultAvailable(Object source, final Object result) 
 			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run() 
-					{
-						sender	= (IComponentIdentifier)result;	
-					}
-				});
+				sender	= (IComponentIdentifier)result;	
 			}
 		});
-		message.getParameterValue(SFipa.REPLY_TO).addResultListener(new DefaultResultListener()
+		message.getParameterValue(SFipa.REPLY_TO).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, final Object result) 
+			public void customResultAvailable(Object source, final Object result) 
 			{
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run() 
-					{
-						replyto = (IComponentIdentifier)result;	
-					}
-				});
+				replyto = (IComponentIdentifier)result;	
 			}
 		});
 		
@@ -616,27 +525,21 @@ public class FipaMessagePanel extends JPanel
 		for(int i=0; i<receivers.length; i++)
 			receivers[i] = (AgentIdentifier)tmp[i];*/
 		
-		message.getParameterSetValues(SFipa.RECEIVERS).addResultListener(new DefaultResultListener()
+		message.getParameterSetValues(SFipa.RECEIVERS).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, final Object result) 
+			public void customResultAvailable(Object source, final Object result) 
 			{
-				SwingUtilities.invokeLater(new Runnable()
+				receivers  = (IComponentIdentifier[])result;	
+				
+				if(receivers.length>0)
 				{
-					public void run() 
-					{
-						receivers  = (IComponentIdentifier[])result;	
-						
-						if(receivers.length>0)
-						{
-							tfreceivers.setText(SUtil.arrayToString(receivers));
-						}
-						else
-						{
-							receivers   = null;
-							tfreceivers.setText("");
-						} 
-					}
-				});
+					tfreceivers.setText(SUtil.arrayToString(receivers));
+				}
+				else
+				{
+					receivers   = null;
+					tfreceivers.setText("");
+				} 
 			}
 		});
 		
@@ -749,9 +652,9 @@ public class FipaMessagePanel extends JPanel
 		// Replace empty string with null.
 		final Object oval = value==null || value.equals("") ? null : value;
 		
-		message.getParameter(name).addResultListener(new DefaultResultListener()
+		message.getParameter(name).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, Object result) 
+			public void customResultAvailable(Object source, Object result) 
 			{
 				((IEAParameter)result).setValue(oval);
 			}
@@ -765,9 +668,9 @@ public class FipaMessagePanel extends JPanel
 	 */
 	protected void	setParameterSet(String name, final Object[] values)
 	{
-		message.getParameterSet(name).addResultListener(new DefaultResultListener()
+		message.getParameterSet(name).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, Object result) 
+			public void customResultAvailable(Object source, Object result) 
 			{
 				((IEAParameterSet)result).removeValues();
 				for(int i=0; values!=null && i<values.length; i++)

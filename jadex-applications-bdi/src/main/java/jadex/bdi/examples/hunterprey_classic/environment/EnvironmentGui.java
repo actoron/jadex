@@ -1,6 +1,5 @@
 package jadex.bdi.examples.hunterprey_classic.environment;
 
-import jadex.base.DefaultResultListener;
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.CurrentVision;
 import jadex.bdi.examples.hunterprey_classic.Prey;
@@ -10,6 +9,8 @@ import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -130,9 +131,9 @@ public class EnvironmentGui	extends JFrame
 				
 				dispose();
 				
-				agent.createGoal("end_agent").addResultListener(new DefaultResultListener()
+				agent.createGoal("end_agent").addResultListener(new SwingDefaultResultListener(EnvironmentGui.this)
 				{
-					public void resultAvailable(Object source, Object result)
+					public void customResultAvailable(Object source, Object result)
 					{
 						agent.dispatchTopLevelGoal((IEAGoal)result);
 					}
@@ -170,9 +171,9 @@ public class EnvironmentGui	extends JFrame
 	{
 		final JPanel options = new JPanel(new GridBagLayout());
 
-		agent.getBeliefbase().getBeliefFact("environment").addResultListener(new DefaultResultListener()
+		agent.getBeliefbase().getBeliefFact("environment").addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				final Environment env = (Environment)result;
 				
@@ -253,9 +254,9 @@ public class EnvironmentGui	extends JFrame
 	 */
 	protected void	enableGuiUpdate(IBDIExternalAccess agent)
 	{
-		agent.getBeliefbase().getBeliefFact("environment").addResultListener(new DefaultResultListener()
+		agent.getBeliefbase().getBeliefFact("environment").addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				final Environment env = (Environment)result;
 				env.addPropertyChangeListener(new PropertyChangeListener()

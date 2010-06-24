@@ -1,9 +1,10 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.base.DefaultResultListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.clock.IClockService;
 
 import java.awt.Dialog;
@@ -29,8 +30,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIDefaults;
-
-import org.jivesoftware.smackx.muc.DeafOccupantInterceptor;
 
 import com.toedter.calendar.JDateChooser;
 
@@ -176,9 +175,9 @@ public class AlarmSettingsDialog extends JDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.getTime().addResultListener(new DefaultResultListener()
+				agent.getTime().addResultListener(new SwingDefaultResultListener(AlarmSettingsDialog.this)
 				{
-					public void resultAvailable(Object source, Object result) 
+					public void customResultAvailable(Object source, Object result) 
 					{
 						Date now = new Date(((Long)result).longValue());
 						date.setDate(now);

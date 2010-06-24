@@ -1,10 +1,11 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.base.DefaultResultListener;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.clock.IClockService;
 
 import java.awt.AWTException;
@@ -170,9 +171,9 @@ public class ClockFrame extends JFrame
 				if(alarms_gui!=null)
 					alarms_gui.dispose();
 				dispose();
-				ClockFrame.this.agent.getBeliefbase().getBeliefFact("settings").addResultListener(new DefaultResultListener()
+				ClockFrame.this.agent.getBeliefbase().getBeliefFact("settings").addResultListener(new SwingDefaultResultListener(ClockFrame.this)
 				{
-					public void resultAvailable(Object source, Object result)
+					public void customResultAvailable(Object source, Object result)
 					{
 						Settings sets = (Settings)result;
 						if(sets.isAutosave())

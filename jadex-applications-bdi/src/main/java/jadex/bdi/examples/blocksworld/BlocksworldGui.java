@@ -1,13 +1,13 @@
 package jadex.bdi.examples.blocksworld;
 
-import jadex.base.DefaultResultListener;
-import jadex.base.SwingDefaultResultListener;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IEAInternalEvent;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -85,9 +85,9 @@ public class BlocksworldGui	extends JFrame
 		
 		setTitle(agent.getComponentName());
 		
-		agent.getBeliefbase().getBeliefSetFacts("blocks").addResultListener(new DefaultResultListener()
+		agent.getBeliefbase().getBeliefSetFacts("blocks").addResultListener(new SwingDefaultResultListener(BlocksworldGui.this)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				final Block[] blocks = (Block[])result;
 				

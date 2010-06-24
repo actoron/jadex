@@ -44,7 +44,10 @@ public class GUIPlanF1 extends Plan
 		{
 			public void internalEventOccurred(AgentEvent ae)
 			{
-				((IEAInternalEvent)ae.getSource()).getParameterValue("content");
+				((IEAInternalEvent)ae.getSource()).getParameterValue("content").addResultListener(new SwingDefaultResultListener()
+				{
+					
+				});
 //				gui.addRow((String[]));
 			}
 		});

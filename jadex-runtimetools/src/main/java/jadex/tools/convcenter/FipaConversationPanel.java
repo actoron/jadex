@@ -1,7 +1,5 @@
 package jadex.tools.convcenter;
 
-import jadex.base.DefaultResultListener;
-import jadex.base.SwingDefaultResultListener;
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
@@ -21,6 +19,8 @@ import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.FipaMessagePanel;
 import jadex.tools.common.GuiProperties;
@@ -489,14 +489,14 @@ public class FipaConversationPanel extends JSplitPane
 	{
 		final Future ret = new Future();
 		
-		mevent.getParameterValue(SFipa.PERFORMATIVE).addResultListener(new DefaultResultListener() 
+		mevent.getParameterValue(SFipa.PERFORMATIVE).addResultListener(new SwingDefaultResultListener(this) 
 		{
-			public void resultAvailable(Object source, Object result) 
+			public void customResultAvailable(Object source, Object result) 
 			{
 				final String perf = (String)result;
-				mevent.getParameterValue(SFipa.CONTENT).addResultListener(new DefaultResultListener() 
+				mevent.getParameterValue(SFipa.CONTENT).addResultListener(new SwingDefaultResultListener(FipaConversationPanel.this) 
 				{
-					public void resultAvailable(Object source, Object result) 
+					public void customResultAvailable(Object source, Object result) 
 					{
 						String cont = (String)result;
 						
@@ -564,9 +564,9 @@ public class FipaConversationPanel extends JSplitPane
 	 */
 	public void	resetMessage()
 	{
-		agent.getEventbase().createMessageEvent("fipamsg").addResultListener(new DefaultResultListener() 
+		agent.getEventbase().createMessageEvent("fipamsg").addResultListener(new SwingDefaultResultListener(this) 
 		{
-			public void resultAvailable(Object source, Object result) 
+			public void customResultAvailable(Object source, Object result) 
 			{
 				final IEAMessageEvent msg = (IEAMessageEvent)result;
 				msg.setParameterValue(SFipa.SENDER, agent.getComponentIdentifier());
@@ -593,9 +593,9 @@ public class FipaConversationPanel extends JSplitPane
 	{
 		final Future ret = new Future();
 		
-		agent.createMessageEvent(msg.getType()).addResultListener(new DefaultResultListener()
+		agent.createMessageEvent(msg.getType()).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, Object result) 
+			public void customResultAvailable(Object source, Object result) 
 			{
 				final IEAMessageEvent clone = (IEAMessageEvent)result;
 				
@@ -742,9 +742,9 @@ public class FipaConversationPanel extends JSplitPane
 		
 		if(msg!=null)
 		{
-			decodeMessage(msg).addResultListener(new DefaultResultListener()
+			decodeMessage(msg).addResultListener(new SwingDefaultResultListener(this)
 			{
-				public void resultAvailable(Object source, Object result)
+				public void customResultAvailable(Object source, Object result)
 				{
 					IEAMessageEvent	message	= (IEAMessageEvent)result;
 					
@@ -783,9 +783,9 @@ public class FipaConversationPanel extends JSplitPane
 		for(int i=0; i<sents.length; i++)
 		{
 			final boolean last = i == sents.length-1;
-			decodeMessage(sents[i].getValue()).addResultListener(new DefaultResultListener()
+			decodeMessage(sents[i].getValue()).addResultListener(new SwingDefaultResultListener(this)
 			{
-				public void resultAvailable(Object source, Object result)
+				public void customResultAvailable(Object source, Object result)
 				{
 					IEAMessageEvent message = (IEAMessageEvent)result;
 					// Update sender.
@@ -823,9 +823,9 @@ public class FipaConversationPanel extends JSplitPane
 		
 		ClassLoader cl = ((ILibraryService)agent.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
 		final Map map = (Map)JavaReader.objectFromXML(msg, cl);
-		agent.createMessageEvent((String)map.get(ConversationPlugin.ENCODED_MESSAGE_TYPE)).addResultListener(new DefaultResultListener()
+		agent.createMessageEvent((String)map.get(ConversationPlugin.ENCODED_MESSAGE_TYPE)).addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				IEAMessageEvent	message	= (IEAMessageEvent)result;	
 				
@@ -899,9 +899,9 @@ public class FipaConversationPanel extends JSplitPane
 		for(int i=0; i<params.length; i++)
 		{
 			final String name = params[i];
-			message.getParameterValue(params[i]).addResultListener(new DefaultResultListener()
+			message.getParameterValue(params[i]).addResultListener(new SwingDefaultResultListener(this)
 			{
-				public void resultAvailable(Object source, Object result)
+				public void customResultAvailable(Object source, Object result)
 				{
 					map.put(name, result);
 				}
@@ -912,9 +912,9 @@ public class FipaConversationPanel extends JSplitPane
 		{
 			final boolean last = i==paramsets.length-1;
 			final String name = paramsets[i];
-			message.getParameterSetValues(params[i]).addResultListener(new DefaultResultListener()
+			message.getParameterSetValues(params[i]).addResultListener(new SwingDefaultResultListener(this)
 			{
-				public void resultAvailable(Object source, Object result)
+				public void customResultAvailable(Object source, Object result)
 				{
 					map.put(name, result);
 					

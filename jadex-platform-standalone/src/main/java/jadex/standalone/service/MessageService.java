@@ -1,7 +1,6 @@
 package jadex.standalone.service;
 
 import jadex.base.AbstractPlatform;
-import jadex.base.DefaultResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.DefaultMessageAdapter;
@@ -16,6 +15,7 @@ import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;

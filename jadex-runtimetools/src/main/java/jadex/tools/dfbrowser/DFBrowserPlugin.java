@@ -1,22 +1,20 @@
 package jadex.tools.dfbrowser;
 
-import jadex.base.DefaultResultListener;
 import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.IDFServiceDescription;
 import jadex.bdi.runtime.IEAGoal;
-import jadex.bdi.runtime.IEAParameter;
-import jadex.bdi.runtime.IEAParameterSet;
-import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceContainer;
 import jadex.tools.common.ComponentTreeTable;
 import jadex.tools.common.GuiProperties;
@@ -456,17 +454,17 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 			final IDF df = (IDF)sc.getService(IDF.class);
 					
 			// Use a subgoal to search
-			((AgentControlCenter)getJCC()).getAgent().createGoal("df_search").addResultListener(new DefaultResultListener()
+			((AgentControlCenter)getJCC()).getAgent().createGoal("df_search").addResultListener(new SwingDefaultResultListener(split1)
 			{
-				public void resultAvailable(Object source, Object result) 
+				public void customResultAvailable(Object source, Object result) 
 				{
 					final IEAGoal ft = (IEAGoal)result; 
 					ft.setParameterValue("description", df.createDFComponentDescription(null, null));
 					ft.setParameterValue("df", getSelectedDF().getName());
 					
-					((AgentControlCenter)getJCC()).getAgent().dispatchTopLevelGoalAndWait(ft).addResultListener(new DefaultResultListener()
+					((AgentControlCenter)getJCC()).getAgent().dispatchTopLevelGoalAndWait(ft).addResultListener(new SwingDefaultResultListener(split1)
 					{
-						public void resultAvailable(Object source, Object result) 
+						public void customResultAvailable(Object source, Object result) 
 						{
 							ft.getParameterSetValues("result").addResultListener(new DefaultResultListener()
 							{
@@ -486,20 +484,6 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 							});
 						}	
 					});
-						
-					// todo: catch
-//							catch(Exception e)
-//							{
-//								//e.printStackTrace();
-//								final String text = SUtil.wrapText("Could not refresh descriptions: "+e.getMessage());
-//								SwingUtilities.invokeLater(new Runnable()
-//								{
-//									public void run()
-//									{
-//										JOptionPane.showMessageDialog(SGUI.getWindowParent(getView()), text, "Refresh Problem", JOptionPane.INFORMATION_MESSAGE);
-//									}
-//								});
-//							}
 				}
 			});
 		}
@@ -687,29 +671,17 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 	 */
 	protected void removeAgentRegistration(final IDFComponentDescription description)
 	{
-		((AgentControlCenter)getJCC()).getAgent().createGoal("df_deregister").addResultListener(new DefaultResultListener()
+		((AgentControlCenter)getJCC()).getAgent().createGoal("df_deregister").addResultListener(new SwingDefaultResultListener(split1)
 		{
-			public void resultAvailable(Object source, Object result) 
+			public void customResultAvailable(Object source, Object result) 
 			{
 				final IEAGoal ft = (IEAGoal)result; 
-				ft.getParameter("description").addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result) 
-					{
-						((IEAParameter)result).setValue(description);
-					}
-				});
-				ft.getParameter("df").addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result) 
-					{
-						((IEAParameter)result).setValue(getSelectedDF().getName());
-					}
-				});
+				ft.setParameterValue("description", description);
+				ft.setParameterValue("df", getSelectedDF().getName());
 				
-				((AgentControlCenter)getJCC()).getAgent().dispatchTopLevelGoalAndWait(ft, 100).addResultListener(new DefaultResultListener()
+				((AgentControlCenter)getJCC()).getAgent().dispatchTopLevelGoalAndWait(ft, 100).addResultListener(new SwingDefaultResultListener(split1)
 				{
-					public void resultAvailable(Object source, Object result) 
+					public void customResultAvailable(Object source, Object result) 
 					{
 						refresh();
 					}

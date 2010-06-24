@@ -1,13 +1,12 @@
 package jadex.bdi.examples.blackjack.dealer;
 
-import jadex.base.DefaultResultListener;
-import jadex.base.SwingDefaultResultListener;
 import jadex.bdi.examples.blackjack.GameStatistics;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.gui.StatisticGraph;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAInternalEvent;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -23,7 +22,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSpinner;
-import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -59,9 +57,6 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 	/** the spinner, that adjusts the seconds to wait until dealer or 
 	    player may draw the next card */
 	private JSpinner cardWaitSpinner;
-	
-	/** the timer firing the timing-events for the progressBar */
-	private Timer progressBarTimer;
 	
 	/** singleStep-checkBox, if 'selected' dealer and players receive 
 	    their cards after pressing the single-step button. */
@@ -120,7 +115,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.getBeliefbase().getBeliefFact("statistics").addResultListener(new SwingDefaultResultListener()
+				agent.getBeliefbase().getBeliefFact("statistics").addResultListener(new SwingDefaultResultListener(DealerOptionPanel.this)
 				{
 					public void customResultAvailable(Object source, Object result)
 					{
@@ -146,9 +141,9 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.createInternalEvent("step").addResultListener(new DefaultResultListener()
+				agent.createInternalEvent("step").addResultListener(new SwingDefaultResultListener(DealerOptionPanel.this)
 				{
-					public void resultAvailable(Object source, Object result)
+					public void customResultAvailable(Object source, Object result)
 					{
 						agent.dispatchInternalEvent((IEAInternalEvent)result);
 					}
@@ -219,21 +214,21 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		this.add(progressPanel, BorderLayout.CENTER);
 		this.add(buttonPanel, BorderLayout.SOUTH);
 
-		agent.getBeliefbase().getBeliefFact("singleStepMode").addResultListener(new SwingDefaultResultListener()
+		agent.getBeliefbase().getBeliefFact("singleStepMode").addResultListener(new SwingDefaultResultListener(DealerOptionPanel.this)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
 				singleStepCheckBox.setSelected(((Boolean)result).booleanValue());
 			}
 		});
-		agent.getBeliefbase().getBeliefFact("stepdelay").addResultListener(new SwingDefaultResultListener()
+		agent.getBeliefbase().getBeliefFact("stepdelay").addResultListener(new SwingDefaultResultListener(DealerOptionPanel.this)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
 				cardWaitSpinner.setValue(result);
 			}
 		});
-		agent.getBeliefbase().getBeliefFact("restartdelay").addResultListener(new SwingDefaultResultListener()
+		agent.getBeliefbase().getBeliefFact("restartdelay").addResultListener(new SwingDefaultResultListener(DealerOptionPanel.this)
 		{
 			public void customResultAvailable(Object source, Object result)
 			{

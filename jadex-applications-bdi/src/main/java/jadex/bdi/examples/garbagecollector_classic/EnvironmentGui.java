@@ -1,14 +1,14 @@
 package jadex.bdi.examples.garbagecollector_classic;
 
-import jadex.base.DefaultResultListener;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
-import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -30,9 +30,9 @@ public class EnvironmentGui	extends JFrame
 	{
 		super("Garbage Collector Environment");
 
-		agent.getBeliefbase().getBeliefFact("env").addResultListener(new DefaultResultListener()
+		agent.getBeliefbase().getBeliefFact("env").addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				MapPanel map = new MapPanel((Environment)result);
 				getContentPane().add("Center", map);
@@ -48,9 +48,9 @@ public class EnvironmentGui	extends JFrame
 			public void windowClosing(WindowEvent e)
 			{
 				// On exit kill all known agents.
-				agent.getBeliefbase().getBeliefFact("env").addResultListener(new DefaultResultListener()
+				agent.getBeliefbase().getBeliefFact("env").addResultListener(new SwingDefaultResultListener(EnvironmentGui.this)
 				{
-					public void resultAvailable(Object source, Object result)
+					public void customResultAvailable(Object source, Object result)
 					{
 						Environment	env	= (Environment)result;
 						final WorldObject[]	wobs = env.getWorldObjects();
