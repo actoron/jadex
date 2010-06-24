@@ -6,10 +6,13 @@ import jadex.application.space.envsupport.math.IVector2;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IEAExpression;
+import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.commons.SGUI;
+import jadex.commons.ThreadSuspendable;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -43,7 +46,7 @@ public class CleanerGui	extends JFrame
 		super(agent.getComponentName());
 		final JPanel map = new JPanel()
 		{
-			protected IExpression	query_max_quantity;
+			protected IEAExpression	query_max_quantity;
 			protected boolean printed;
 			
 			// overridden paint method.
@@ -52,9 +55,13 @@ public class CleanerGui	extends JFrame
 				try
 				{
 					//System.out.println("++++++++++++++ GUI repaint from: "+Thread.currentThread());
-	
+					
+					// As paint components is called on swing thread there is no chance to use
+					// callbacks. Instead blocking calls are used.
+					ThreadSuspendable sus = new ThreadSuspendable(new Object());
+					
 					// Get world state from beliefs.
-					boolean	daytime	= ((Boolean)agent.getBeliefbase().getBelief("daytime").getFact()).booleanValue();
+					boolean	daytime	= ((Boolean)agent.getBeliefbase().getBeliefFact("daytime").get(sus)).booleanValue();
 	
 					// Paint background (dependent on daytime).
 					Rectangle	bounds	= getBounds();
@@ -62,14 +69,14 @@ public class CleanerGui	extends JFrame
 					g.fillRect(0, 0, bounds.width, bounds.height);
 	
 					// Paint map points
-					MapPoint[] mps = (MapPoint[])agent.getBeliefbase().getBeliefSet("visited_positions").getFacts();
+					MapPoint[] mps = (MapPoint[])agent.getBeliefbase().getBeliefSetFacts("visited_positions").get(sus);
 					if(query_max_quantity==null)
-						query_max_quantity	= agent.getExpressionbase().getExpression("query_max_quantity");
+						query_max_quantity	= (IEAExpression)agent.getExpressionbase().getExpression("query_max_quantity").get(sus);
 					double max = ((MapPoint)query_max_quantity.execute()).getQuantity();
 					//int xcnt = ((int[])getBeliefbase().getBelief("???").getFact("raster"))[0];
 					//int ycnt = ((int[])getBeliefbase().getBelief("???").getFact("raster"))[1];
-					int xcnt = ((Integer[])agent.getBeliefbase().getBeliefSet("raster").getFacts())[0].intValue();
-					int ycnt = ((Integer[])agent.getBeliefbase().getBeliefSet("raster").getFacts())[1].intValue();
+					int xcnt = ((Integer[])agent.getBeliefbase().getBeliefSetFacts("raster").get(sus))[0].intValue();
+					int ycnt = ((Integer[])agent.getBeliefbase().getBeliefSetFacts("raster").get(sus))[1].intValue();
 					double cellh = 1/(double)ycnt;
 					double cellw = 1/(double)xcnt;
 					for(int i=0; i<mps.length; i++)
@@ -97,7 +104,7 @@ public class CleanerGui	extends JFrame
 					}
 	
 					// Paint the cleaners.
-					ISpaceObject[] cleaners = (ISpaceObject[])agent.getBeliefbase().getBeliefSet("cleaners").getFacts();
+					ISpaceObject[] cleaners = (ISpaceObject[])agent.getBeliefbase().getBeliefSetFacts("cleaners").get(sus);
 					for(int i=0; i<cleaners.length; i++)
 					{
 						// Paint agent.
@@ -118,10 +125,10 @@ public class CleanerGui	extends JFrame
 	
 					// Draw me additionally.
 					// Get world state from beliefs.
-					IVector2 agentloc = (IVector2)agent.getBeliefbase().getBelief("my_location").getFact();
-					double	vision	= ((Double)agent.getBeliefbase().getBelief("my_vision").getFact()).doubleValue();
-					double	charge	= ((Double)agent.getBeliefbase().getBelief("my_chargestate").getFact()).doubleValue();
-					boolean	waste	= ((ISpaceObject)agent.getBeliefbase().getBelief("myself").getFact()).getProperty("waste")!=null;
+					IVector2 agentloc = (IVector2)agent.getBeliefbase().getBeliefFact("my_location").get(sus);
+					double	vision	= ((Double)agent.getBeliefbase().getBelief("my_vision").get(sus)).doubleValue();
+					double	charge	= ((Double)agent.getBeliefbase().getBelief("my_chargestate").get(sus)).doubleValue();
+					boolean	waste	= ((ISpaceObject)agent.getBeliefbase().getBelief("myself").get(sus)).getProperty("waste")!=null;
 	
 					// Paint agent.
 					Point	p	= onScreenLocation(agentloc, bounds);
@@ -140,7 +147,7 @@ public class CleanerGui	extends JFrame
 	
 					// Paint charge Stations.
 					ISpaceObject[] stations = (ISpaceObject[])agent.getBeliefbase()
-						.getBeliefSet("chargingstations").getFacts();
+						.getBeliefSetFacts("chargingstations").get(sus);
 					for(int i=0; i<stations.length; i++)
 					{
 						g.setColor(Color.blue);
@@ -151,7 +158,7 @@ public class CleanerGui	extends JFrame
 					}
 	
 					// Paint waste bins.
-					ISpaceObject[] wastebins = (ISpaceObject[])agent.getBeliefbase().getBeliefSet("wastebins").getFacts();
+					ISpaceObject[] wastebins = (ISpaceObject[])agent.getBeliefbase().getBeliefSetFacts("wastebins").get(sus);
 					for(int i=0; i<wastebins.length; i++)
 					{
 						g.setColor(Color.red);
@@ -163,7 +170,7 @@ public class CleanerGui	extends JFrame
 					}
 	
 					// Paint waste.
-					ISpaceObject[] wastes = (ISpaceObject[])agent.getBeliefbase().getBeliefSet("wastes").getFacts();
+					ISpaceObject[] wastes = (ISpaceObject[])agent.getBeliefbase().getBeliefSetFacts("wastes").get(sus);
 					for(int i=0; i<wastes.length; i++)
 					{
 						g.setColor(Color.red);
@@ -176,10 +183,10 @@ public class CleanerGui	extends JFrame
 					}
 	
 					// Paint movement targets.
-					IGoal[] targets = agent.getGoalbase().getGoals("achievemoveto");
+					IEAGoal[] targets = (IEAGoal[])agent.getGoalbase().getGoals("achievemoveto").get(sus);
 					for(int i=0; i<targets.length; i++)
 					{
-						IVector2	dest	= (IVector2)targets[i].getParameter("location").getValue();
+						IVector2	dest	= (IVector2)targets[i].getParameterValue("location").get(sus);
 						if(dest!=null)	// Hack!!! may want to move to null due to asynchronous update of waste position.
 						{
 							p = onScreenLocation(dest, bounds);
