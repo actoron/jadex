@@ -1,11 +1,14 @@
 package jadex.bdi.examples.blackjack.manager;
 
+import jadex.base.DefaultResultListener;
+import jadex.base.SwingDefaultResultListener;
 import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.player.strategies.AbstractStrategy;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
@@ -195,35 +198,40 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 
 		this.setLocation(SGUI.calculateMiddlePosition(this));
 		this.setVisible(true);
-		EventQueue.invokeLater(new Runnable()
-		{
-			/**
-			 * creates the Panel, where the player-information is shown.
-			 * This method handles some special cases, i.e. a player - once created - should
-			 * be shown as long as it is stopped, even if the dealer is killed,
-			 * so don't take a look too close at all these for-loops, most of them
-			 * are really just for gui-convenience purposes ;-)
-			 */
-			public void run()
-			{
+//		EventQueue.invokeLater(new Runnable()
+//		{
+//			/**
+//			 * creates the Panel, where the player-information is shown.
+//			 * This method handles some special cases, i.e. a player - once created - should
+//			 * be shown as long as it is stopped, even if the dealer is killed,
+//			 * so don't take a look too close at all these for-loops, most of them
+//			 * are really just for gui-convenience purposes ;-)
+//			 */
+//			public void run()
+//			{
 				// create new Player Panels with the properties as specified in the Manager.xml
-				Player[] players = (Player[])access.getBeliefbase().getBeliefSet("players").getFacts();
-
-				// get the 'old' master-panel on which player-panels are shown
-				JPanel playerDealerPanel = (JPanel)getContentPane().getComponent(1);
-				JPanel playerPanel = (JPanel)playerDealerPanel.getComponent(0);
-				playerPanel.setLayout(new GridLayout(players.length, 1, 0, 0));
-				playerPanel.setBackground(Color.WHITE);
-
-				for(int i = 0; i<players.length; i++)
+				access.getBeliefbase().getBeliefSet("players").addResultListener(new SwingDefaultResultListener()
 				{
-					playerPanel.add(new ManagerPlayerPanel(i+1, players[i]));
-				}
+					public void customResultAvailable(Object source, Object result)
+					{
+						Player[] players = (Player[])result;
+						// get the 'old' master-panel on which player-panels are shown
+						JPanel playerDealerPanel = (JPanel)getContentPane().getComponent(1);
+						JPanel playerPanel = (JPanel)playerDealerPanel.getComponent(0);
+						playerPanel.setLayout(new GridLayout(players.length, 1, 0, 0));
+						playerPanel.setBackground(Color.WHITE);
 
-				getContentPane().add(playerDealerPanel, 1);
-				getContentPane().validate();
-			}
-		});
+						for(int i = 0; i<players.length; i++)
+						{
+							playerPanel.add(new ManagerPlayerPanel(i+1, players[i]));
+						}
+
+						getContentPane().add(playerDealerPanel, 1);
+						getContentPane().validate();
+					}
+				});
+//			}
+//		});
 	}
 
 	/**
@@ -386,27 +394,48 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	 */
 	protected void startLocalDealer()
 	{
-		// start dealer-agent
-		try
+		agent.getGoalbase().createGoal("cms_create_component").addResultListener(new DefaultResultListener()
 		{
-			IGoal start = agent.getGoalbase().createGoal("cms_create_component");
-//			IContextService	cs	= (IContextService) agent.getServiceContainer().getService(IContextService.class);
-//			IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
-//			// Hack! remove cast to ApplicationContext
-//			String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Dealer").getFilename();
-//			start.getParameter("type").setValue(type);
-			start.getParameter("type").setValue("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml");
-			start.getParameter("name").setValue("BlackjackDealer");
-			agent.dispatchTopLevelGoalAndWait(start);
-			IComponentIdentifier	dealer	= (IComponentIdentifier)start.getParameter("componentidentifier").getValue();
-			agent.getLogger().info("local DealerAgent started: "+dealer);
-			//access.getBeliefbase().getBelief("localDealerAID").setFact(start.getResult());
-			agent.getBeliefbase().getBelief("localDealerAID").setFact(dealer);
-		}
-		catch(Exception e)
-		{
-			agent.getLogger().warning("DealerAgent could not be created: "+e);
-		}
+			public void resultAvailable(Object source, Object result)
+			{
+				final IEAGoal start = (IEAGoal)result;
+				
+//					IContextService	cs	= (IContextService)agent.getServiceContainer().getService(IContextService.class);
+//					IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
+//					// Hack! remove cast to ApplicationContext
+//					String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Dealer").getFilename();
+//					start.getParameter("type").setValue(type);
+				start.setParameterValue("type", "jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml");
+				start.setParameterValue("name", "BlackjackDealer");
+				agent.dispatchTopLevelGoalAndWait(start).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						start.getParameterValue("componentidentifier").addResultListener(new DefaultResultListener()
+						{
+							
+							public void resultAvailable(Object source, Object result)
+							{
+								IComponentIdentifier dealer	= (IComponentIdentifier)result;
+								agent.getLogger().info("local DealerAgent started: "+dealer);
+								//access.getBeliefbase().getBelief("localDealerAID").setFact(start.getResult());
+								agent.getBeliefbase().setBeliefFact("localDealerAID", dealer);
+							}
+						});
+					}
+				});
+			}
+		});
+
+		// todo!
+//		// start dealer-agent
+//		try
+//		{
+//		}
+//		catch(Exception e)
+//		{
+//			agent.getLogger().warning("DealerAgent could not be created: "+e);
+//		}
 	}
 
 	/**
@@ -414,14 +443,26 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	 */
 	protected void stopLocalDealer()
 	{
-		IComponentIdentifier dealer = (IComponentIdentifier)agent.getBeliefbase().getBelief("localDealerAID").getFact();
-		if(dealer!=null)
+		agent.getBeliefbase().getBeliefFact("localDealerAID").addResultListener(new DefaultResultListener()
 		{
-			IGoal destroy = agent.getGoalbase().createGoal("cms_destroy_component");
-			destroy.getParameter("componentidentifier").setValue(dealer);
-			agent.dispatchTopLevelGoalAndWait(destroy);
-			agent.getBeliefbase().getBelief("localDealerAID").setFact(null);
-		}
+			public void resultAvailable(Object source, Object result)
+			{
+				final IComponentIdentifier dealer = (IComponentIdentifier)result;
+				if(dealer!=null)
+				{
+					agent.getGoalbase().createGoal("cms_destroy_component").addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							IEAGoal destroy = (IEAGoal)result;
+							destroy.setParameterValue("componentidentifier", dealer);
+							agent.dispatchTopLevelGoalAndWait(destroy);
+							agent.getBeliefbase().setBeliefFact("localDealerAID", null);
+						}
+					});
+				}
+			}
+		});
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package jadex.bdi.examples.blackjack.dealer;
 
+import jadex.base.SwingDefaultResultListener;
 import jadex.bdi.examples.blackjack.Dealer;
 import jadex.bdi.examples.blackjack.GameState;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
@@ -90,7 +91,13 @@ public class DealerFrame extends GameStateFrame
 		{
 			public void run()
 			{
-				DealerFrame.this.setGameState((GameState)agent.getBeliefbase().getBelief("gamestate").getFact());
+				agent.getBeliefbase().getBeliefFact("gamestate").addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						DealerFrame.this.setGameState((GameState)result);
+					}
+				});
 			}
 		});
 		setControlPanel(new DealerOptionPanel(agent, DealerFrame.this));

@@ -17,7 +17,7 @@ public abstract class DefaultResultListener implements IResultListener
 	protected Logger logger;
 	
 	/** The static instance. */
-	protected static IResultListener instance;
+	private static IResultListener instance;
 	
 	//-------- constructors --------
 	

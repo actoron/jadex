@@ -4,6 +4,7 @@ import jadex.base.DefaultResultListener;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IEAInternalEvent;
 import jadex.bdi.runtime.IGoal;
 import jadex.commons.SGUI;
 
@@ -282,8 +283,13 @@ public class BlocksworldGui	extends JFrame
 				{
 					public void	actionPerformed(ActionEvent ae)
 					{
-						agent.getEventbase().dispatchInternalEvent(
-							agent.getEventbase().createInternalEvent("step"));
+						agent.getEventbase().createInternalEvent("step").addResultListener(new DefaultResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								agent.getEventbase().dispatchInternalEvent((IEAInternalEvent)result);
+							}
+						});
 					}
 				});
 				// Bucket components

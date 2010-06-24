@@ -1,9 +1,12 @@
 package jadex.bdi.examples.blackjack.dealer;
 
+import jadex.base.DefaultResultListener;
+import jadex.base.SwingDefaultResultListener;
 import jadex.bdi.examples.blackjack.GameStatistics;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.gui.StatisticGraph;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IEAInternalEvent;
 import jadex.commons.SGUI;
 
 import java.awt.BorderLayout;
@@ -20,7 +23,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSpinner;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -98,7 +100,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		{
 			public void stateChanged(ChangeEvent e)
 			{
-				agent.getBeliefbase().getBelief("singleStepMode").setFact(new Boolean(singleStepCheckBox.isSelected()));
+				agent.getBeliefbase().setBeliefFact("singleStepMode", new Boolean(singleStepCheckBox.isSelected()));
 		
 				// Change state of button and trigger next step, if agent currently waiting.
 				if(singleStepCheckBox.isSelected())
@@ -118,16 +120,23 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				GameStatistics	stats	= (GameStatistics)agent.getBeliefbase().getBelief("statistics").getFact();
-				JFrame statsgui	= new JFrame("Blackjack Statistics");
+				agent.getBeliefbase().getBeliefFact("statistics").addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						GameStatistics stats = (GameStatistics)result;
+						
+						JFrame statsgui	= new JFrame("Blackjack Statistics");
 
-				// set the icon to be displayed for the frame
-				statsgui.setIconImage(GUIImageLoader.getImage("statistics").getImage());				
-				statsgui.getContentPane().add(new StatisticGraph(stats));
-				statsgui.setSize(400, 300);
-				statsgui.setLocation(SGUI.calculateMiddlePosition(statsgui));
-				statsgui.setVisible(true);
-				frame.addChildWindow(statsgui);
+						// set the icon to be displayed for the frame
+						statsgui.setIconImage(GUIImageLoader.getImage("statistics").getImage());				
+						statsgui.getContentPane().add(new StatisticGraph(stats));
+						statsgui.setSize(400, 300);
+						statsgui.setLocation(SGUI.calculateMiddlePosition(statsgui));
+						statsgui.setVisible(true);
+						frame.addChildWindow(statsgui);
+					}
+				});
 			}
 		});
 		
@@ -137,7 +146,13 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.dispatchInternalEvent(agent.createInternalEvent("step"));
+				agent.createInternalEvent("step").addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						agent.dispatchInternalEvent((IEAInternalEvent)result);
+					}
+				});
 			}
 		});
 		
@@ -155,7 +170,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 				Integer value = new Integer(Math.max(0, Math.min(MAX_SECONDS,
 					((Integer)cardWaitSpinner.getValue()).intValue())));
 				cardWaitSpinner.setValue(value);
-				agent.getBeliefbase().getBelief("stepdelay").setFact(value);
+				agent.getBeliefbase().setBeliefFact("stepdelay", value);
 			}
 		});
 		
@@ -168,7 +183,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 					((Integer)restartWaitSpinner.getValue()).intValue()));
 				restartWaitSpinner.setValue(new Integer(value));
 
-				agent.getBeliefbase().getBelief("restartdelay").setFact(new Integer(value));
+				agent.getBeliefbase().setBeliefFact("restartdelay", new Integer(value));
 				
 				// todo
 //				IGoal[]	play	= agent.getGoalbase().getGoals("play_game");
@@ -204,16 +219,30 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		this.add(progressPanel, BorderLayout.CENTER);
 		this.add(buttonPanel, BorderLayout.SOUTH);
 
-		// Init on awt thread.
-		SwingUtilities.invokeLater(new Runnable()
+		agent.getBeliefbase().getBeliefFact("singleStepMode").addResultListener(new SwingDefaultResultListener()
 		{
-			public void run()
+			public void customResultAvailable(Object source, Object result)
 			{
-				singleStepCheckBox.setSelected(((Boolean)agent.getBeliefbase().getBelief("singleStepMode").getFact()).booleanValue());
-				cardWaitSpinner.setValue(agent.getBeliefbase().getBelief("stepdelay").getFact());
-				restartWaitSpinner.setValue((Integer)agent.getBeliefbase().getBelief("restartdelay").getFact());
+				singleStepCheckBox.setSelected(((Boolean)result).booleanValue());
 			}
 		});
+		agent.getBeliefbase().getBeliefFact("stepdelay").addResultListener(new SwingDefaultResultListener()
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				cardWaitSpinner.setValue(result);
+			}
+		});
+		agent.getBeliefbase().getBeliefFact("restartdelay").addResultListener(new SwingDefaultResultListener()
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				restartWaitSpinner.setValue(result);
+			}
+		});
+//				singleStepCheckBox.setSelected(((Boolean)agent.getBeliefbase().getBelief("singleStepMode").getFact()).booleanValue());
+//				cardWaitSpinner.setValue(agent.getBeliefbase().getBelief("stepdelay").getFact());
+//				restartWaitSpinner.setValue((Integer)agent.getBeliefbase().getBelief("restartdelay").getFact());
 	}
 
 	//-------- methods --------
