@@ -1,6 +1,7 @@
 package jadex.bdi.examples.booktrading.common;
 
 import jadex.base.DefaultResultListener;
+import jadex.base.SwingDefaultResultListener;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
@@ -540,14 +541,14 @@ public class Gui extends JFrame
 			{
 				public void resultAvailable(Object source, final Object result)
 				{
-					SwingUtilities.invokeLater(new Runnable()
+					IEAExpression exp = (IEAExpression)result;
+					
+					exp.execute("$order", order).addResultListener(new SwingDefaultResultListener()
 					{
-						public void run()
+						public void customResultAvailable(Object source, Object result)
 						{
-							IEAExpression exp = (IEAExpression)result;
-							
-							List res = (List)exp.execute("$order", order);
-		//					for(int i=0; i<res.size(); i++)
+							List res = (List)result;
+							for(int i=0; i<res.size(); i++)
 		//						System.out.println(""+i+res.get(i));
 							
 							while(detailsdm.getRowCount()>0)

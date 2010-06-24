@@ -4,6 +4,7 @@ import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
+import jadex.commons.SUtil;
 import jadex.javaparser.IParsedExpression;
 import jadex.rules.state.IOAVState;
 
@@ -138,14 +139,14 @@ public class ExpressionNoModel implements IExpression
 			{
 				public void run()
 				{
-					object = FlyweightFunctionality.execute(state, null, scope, true, names, values);
+					object = FlyweightFunctionality.execute(state, expression, scope, true, names, values);
 				}
 			};
 			return invoc.object;
 		}
 		else
 		{
-			return FlyweightFunctionality.execute(state, null, scope, true, names, values);
+			return FlyweightFunctionality.execute(state, expression, scope, true, names, values);
 		}
 	}
 	

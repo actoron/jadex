@@ -148,13 +148,13 @@ public class EAExpressionNoModel implements IEAExpression
 			{
 				public void run()
 				{
-					ret.setResult(FlyweightFunctionality.execute(state, null, scope, true, names, values));
+					ret.setResult(FlyweightFunctionality.execute(state, expression, scope, true, names, values));
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(FlyweightFunctionality.execute(state, null, scope, true, names, values));
+			ret.setResult(FlyweightFunctionality.execute(state, expression, scope, true, names, values));
 		}
 		
 		return ret;

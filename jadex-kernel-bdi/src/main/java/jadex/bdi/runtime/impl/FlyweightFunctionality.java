@@ -46,7 +46,9 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.SJavaParser;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.rules.parser.conditions.javagrammar.JavaParserTest;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
@@ -594,6 +596,24 @@ public class FlyweightFunctionality
 		for(int i=0; i<names.length; i++)
 			fetcher.setValue(names[i], values[i]);
 		return AgentRules.evaluateExpression(state, handle, fetcher);
+	}
+	
+	/**
+	 * 
+	 * @param state
+	 * @param exptxt
+	 * @param scope
+	 * @param ea
+	 * @param names
+	 * @param values
+	 * @return
+	 */
+	public static Object execute(IOAVState state, IParsedExpression exp, Object scope, boolean ea, String[] names, Object[] values)
+	{
+		OAVBDIFetcher fetcher = new OAVBDIFetcher(state, scope);
+		for(int i=0; i<names.length; i++)
+			fetcher.setValue(names[i], values[i]);
+		return exp.getValue(fetcher);
 	}
 
 	//-------- goalbase --------
