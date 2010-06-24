@@ -6,9 +6,8 @@ import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Double;
-import jadex.base.DefaultResultListener;
-import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.clock.IClockService;
 
 import java.util.Iterator;

@@ -1,22 +1,18 @@
 package jadex.tools.ruleprofiler;
 
-import jadex.base.DefaultResultListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IExternalAccess;
-import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.TreeExpansionHandler;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.jtable.ResizeableTableHeader;
 import jadex.rules.state.IProfiler;
 import jadex.rules.state.IProfiler.ProfilingInfo;
 import jadex.rules.tools.profiler.Profiler;
 import jadex.rules.tools.stateviewer.OAVTreeModel;
-import jadex.service.IServiceContainer;
 import jadex.tools.common.GuiProperties;
 import jadex.tools.common.jtreetable.AbstractTreeTableModel;
 import jadex.tools.common.jtreetable.DefaultTreeTableModel;
@@ -36,7 +32,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIDefaults;
 import javax.swing.table.TableCellRenderer;
@@ -82,150 +77,144 @@ public class RuleProfilerPanel	extends JPanel
 
         // Hack!?!?!
 		IComponentManagementService cms = (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
-		cms.getExternalAccess(observed).addResultListener(new DefaultResultListener()
+		cms.getExternalAccess(observed).addResultListener(new SwingDefaultResultListener()
 		{
-			public void resultAvailable(Object source, final Object result)
+			public void customResultAvailable(Object source, final Object result)
 			{
-				SwingUtilities.invokeLater(new Runnable()
+//				StandaloneAgentAdapter	adapter	= (StandaloneAgentAdapter)result;
+//				final BDIInterpreter	bdii	= (BDIInterpreter)adapter.getJadexAgent();
+				// Hack!!!
+				final BDIInterpreter bdii = ((ElementFlyweight)result).getInterpreter();
+
+				// Load profiling info.
+				IProfiler	tmp	= bdii.getState().getProfiler();
+//				try
+//				{
+//					File	file	= new File("./"+adapter.getAgentIdentifier().getLocalName()+".profile.ser");
+//					ObjectInputStream	ois	= new ObjectInputStream(new FileInputStream(file));
+//					tmp	= (IProfiler)ois.readObject();
+//					ois.close();
+//				}
+//				catch(Exception e)
+//				{
+//					e.printStackTrace();
+//				}
+//				if(tmp instanceof NoProfiler)	// hack!!!
 				{
-					public void run()
+					tmp	= new Profiler(null);
+					final IProfiler prof	= tmp;
+					bdii.getAgentAdapter().invokeLater(new Runnable()
 					{
-		//				StandaloneAgentAdapter	adapter	= (StandaloneAgentAdapter)result;
-		//				final BDIInterpreter	bdii	= (BDIInterpreter)adapter.getJadexAgent();
-						// Hack!!!
-						final BDIInterpreter bdii = ((ElementFlyweight)result).getInterpreter();
-		
-						// Load profiling info.
-						IProfiler	tmp	= bdii.getState().getProfiler();
-		//				try
-		//				{
-		//					File	file	= new File("./"+adapter.getAgentIdentifier().getLocalName()+".profile.ser");
-		//					ObjectInputStream	ois	= new ObjectInputStream(new FileInputStream(file));
-		//					tmp	= (IProfiler)ois.readObject();
-		//					ois.close();
-		//				}
-		//				catch(Exception e)
-		//				{
-		//					e.printStackTrace();
-		//				}
-		//				if(tmp instanceof NoProfiler)	// hack!!!
+						public void run()
 						{
-							tmp	= new Profiler(null);
-							final IProfiler prof	= tmp;
-							bdii.getAgentAdapter().invokeLater(new Runnable()
-							{
-								public void run()
-								{
-									bdii.getState().setProfiler(prof);
-								}
-							});
+							bdii.getState().setProfiler(prof);
 						}
-						final IProfiler	profiler	= tmp;
-						
-						final ProfileNode	root	= new ProfileNode(null, IProfiler.TYPE_ROOT, null);
-						final Map	nodes	= new HashMap();
-						nodes.put(root, root);
-		
-						final AbstractTreeTableModel	model	= new DefaultTreeTableModel(root,
-							new String[]{"Name", "Time", "Inherent", "Occurrences"});
-						final JTreeTable	tree	= new JTreeTable(model);
-						new TreeExpansionHandler(tree.getTree());
-						tree.getTree().setCellRenderer(new DefaultTreeCellRenderer()
+					});
+				}
+				final IProfiler	profiler	= tmp;
+				
+				final ProfileNode	root	= new ProfileNode(null, IProfiler.TYPE_ROOT, null);
+				final Map	nodes	= new HashMap();
+				nodes.put(root, root);
+
+				final AbstractTreeTableModel	model	= new DefaultTreeTableModel(root,
+					new String[]{"Name", "Time", "Inherent", "Occurrences"});
+				final JTreeTable	tree	= new JTreeTable(model);
+				new TreeExpansionHandler(tree.getTree());
+				tree.getTree().setCellRenderer(new DefaultTreeCellRenderer()
+				{
+					public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
+					{
+						ProfileNode	node	= (ProfileNode)value;
+						Icon	icon	= icons.getIcon(node.getType());
+						if(icon!=null)
 						{
-							public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
-							{
-								ProfileNode	node	= (ProfileNode)value;
-								Icon	icon	= icons.getIcon(node.getType());
-								if(icon!=null)
-								{
-									setClosedIcon(icon);
-									setOpenIcon(icon);
-									setLeafIcon(icon);
-								}
-								else
-								{
-									setClosedIcon(getDefaultClosedIcon());
-									setOpenIcon(getDefaultOpenIcon());
-									setLeafIcon(getDefaultLeafIcon());
-								}
-								return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-							}
-						});
-						
-						TableCellRenderer	progressbarrenderer	= new TableCellRenderer()
+							setClosedIcon(icon);
+							setOpenIcon(icon);
+							setLeafIcon(icon);
+						}
+						else
 						{
-							JProgressBar	prog	= new JProgressBar(0, 1000);
-							public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
-							{
-								String	string	= (String)value;
-								int	left	= string.indexOf('(');
-								int	right	= string.indexOf(')');
-								if(left!=-1 && right!=-1 && left<right)
-								{
-									double	val	= Double.parseDouble(string.substring(left+1, right-1));
-									prog.setValue((int)(val*10));
-								}
-								else
-								{
-									prog.setValue(0);
-								}
-								prog.setStringPainted(true);
-								prog.setString(string);
-								return prog;
-							}
-						};
-						tree.getColumnModel().getColumn(1).setCellRenderer(progressbarrenderer);
-						tree.getColumnModel().getColumn(2).setCellRenderer(progressbarrenderer);
-		
-						// Make headers resizable.
-						ResizeableTableHeader header = new ResizeableTableHeader();
-						header.setColumnModel(tree.getColumnModel());
-						header.setAutoResizingEnabled(false); //default
-						header.setIncludeHeaderWidth(false); //default
-						tree.setTableHeader(header);
-						// Set the preferred, minimum and maximum column widths
-						header.setAllColumnWidths(145, -1, -1);
-						header.setColumnWidths(tree.getColumnModel().getColumn(0), 200, 100, -1);
-						
-						// Required, otherwise column sizes are reset on every update.
-						tree.setAutoCreateColumnsFromModel(false);
-						
-						JScrollPane	scroll	= new JScrollPane(tree);
-						RuleProfilerPanel.this.setLayout(new BorderLayout());
-						RuleProfilerPanel.this.add(BorderLayout.CENTER, scroll);
-						
-						RuleProfilerPanel.this.invalidate();
-						RuleProfilerPanel.this.doLayout();
-						RuleProfilerPanel.this.repaint();
-		
-						Timer	timer	= new Timer(2000, new ActionListener()
-						{
-							int	start	= 0;
-							Comparator	comp	= new TimeComparator();
-							
-							public void actionPerformed(ActionEvent e)
-							{
-								((Timer)e.getSource()).stop();
-								
-								ProfilingInfo[]	infos	= profiler.getProfilingInfos(start);
-								if(infos.length>0)
-								{
-									start	+= infos.length;
-									updateProfileTree(root, nodes, infos);
-									root.sort(comp);
-									model.reload(root);
-		//							invalidate();
-		//							doLayout();
-		//							repaint();
-		//							System.out.println("++++ Updated "+infos.length+" profiling infos.");
-								}
-								
-								((Timer)e.getSource()).start();
-							}
-						});
-						timer.start();
+							setClosedIcon(getDefaultClosedIcon());
+							setOpenIcon(getDefaultOpenIcon());
+							setLeafIcon(getDefaultLeafIcon());
+						}
+						return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 					}
 				});
+				
+				TableCellRenderer	progressbarrenderer	= new TableCellRenderer()
+				{
+					JProgressBar	prog	= new JProgressBar(0, 1000);
+					public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
+					{
+						String	string	= (String)value;
+						int	left	= string.indexOf('(');
+						int	right	= string.indexOf(')');
+						if(left!=-1 && right!=-1 && left<right)
+						{
+							double	val	= Double.parseDouble(string.substring(left+1, right-1));
+							prog.setValue((int)(val*10));
+						}
+						else
+						{
+							prog.setValue(0);
+						}
+						prog.setStringPainted(true);
+						prog.setString(string);
+						return prog;
+					}
+				};
+				tree.getColumnModel().getColumn(1).setCellRenderer(progressbarrenderer);
+				tree.getColumnModel().getColumn(2).setCellRenderer(progressbarrenderer);
+
+				// Make headers resizable.
+				ResizeableTableHeader header = new ResizeableTableHeader();
+				header.setColumnModel(tree.getColumnModel());
+				header.setAutoResizingEnabled(false); //default
+				header.setIncludeHeaderWidth(false); //default
+				tree.setTableHeader(header);
+				// Set the preferred, minimum and maximum column widths
+				header.setAllColumnWidths(145, -1, -1);
+				header.setColumnWidths(tree.getColumnModel().getColumn(0), 200, 100, -1);
+				
+				// Required, otherwise column sizes are reset on every update.
+				tree.setAutoCreateColumnsFromModel(false);
+				
+				JScrollPane	scroll	= new JScrollPane(tree);
+				RuleProfilerPanel.this.setLayout(new BorderLayout());
+				RuleProfilerPanel.this.add(BorderLayout.CENTER, scroll);
+				
+				RuleProfilerPanel.this.invalidate();
+				RuleProfilerPanel.this.doLayout();
+				RuleProfilerPanel.this.repaint();
+
+				Timer	timer	= new Timer(2000, new ActionListener()
+				{
+					int	start	= 0;
+					Comparator	comp	= new TimeComparator();
+					
+					public void actionPerformed(ActionEvent e)
+					{
+						((Timer)e.getSource()).stop();
+						
+						ProfilingInfo[]	infos	= profiler.getProfilingInfos(start);
+						if(infos.length>0)
+						{
+							start	+= infos.length;
+							updateProfileTree(root, nodes, infos);
+							root.sort(comp);
+							model.reload(root);
+//							invalidate();
+//							doLayout();
+//							repaint();
+//							System.out.println("++++ Updated "+infos.length+" profiling infos.");
+						}
+						
+						((Timer)e.getSource()).start();
+					}
+				});
+				timer.start();
 			}
 		});
 	}	

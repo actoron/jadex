@@ -1,8 +1,8 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.base.DefaultResultListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Dialog;
@@ -60,9 +60,9 @@ public class OptionDialog extends JDialog
 		super(parent, true);
 		this.agent = agent;
 		setTitle("Options");
-		agent.getBeliefbase().getBeliefFact("settings").addResultListener(new DefaultResultListener()
+		agent.getBeliefbase().getBeliefFact("settings").addResultListener(new SwingDefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				final Settings orig_sets = (Settings)result;
 				final Settings sets = (Settings)orig_sets.clone();

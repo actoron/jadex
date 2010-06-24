@@ -1,6 +1,5 @@
 package jadex.bdi.examples.hunterprey_classic.environment;
 
-import jadex.base.DefaultResultListener;
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.CurrentVision;
 import jadex.bdi.examples.hunterprey_classic.Vision;
@@ -8,6 +7,7 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBeliefListener;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.xml.bean.JavaReader;
 
 import java.awt.GridBagConstraints;

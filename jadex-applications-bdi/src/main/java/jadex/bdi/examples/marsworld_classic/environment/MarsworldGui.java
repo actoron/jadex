@@ -1,6 +1,5 @@
 package jadex.bdi.examples.marsworld_classic.environment;
 
-import jadex.base.DefaultResultListener;
 import jadex.bdi.examples.marsworld_classic.AgentInfo;
 import jadex.bdi.examples.marsworld_classic.Environment;
 import jadex.bdi.examples.marsworld_classic.Homebase;
@@ -10,6 +9,7 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -120,9 +120,9 @@ public class MarsworldGui	extends JFrame
 		});
 
 		// Create the gui.
-		agent.getBeliefbase().getBeliefFact("environment").addResultListener(new DefaultResultListener()
+		agent.getBeliefbase().getBeliefFact("environment").addResultListener(new SwingDefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				Environment	env	= (Environment)result;
 				

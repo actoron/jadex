@@ -1,12 +1,10 @@
 package jadex.tools.debugger;
 
-import jadex.base.DefaultResultListener;
 import jadex.base.SComponentFactory;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;

@@ -1,7 +1,5 @@
 package jadex.bdi.examples.booktrading.common;
 
-import jadex.base.DefaultResultListener;
-import jadex.base.SwingDefaultResultListener;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
@@ -9,6 +7,8 @@ import jadex.bdi.runtime.IBeliefSetListener;
 import jadex.bdi.runtime.IEAExpression;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.clock.IClockService;
 
 import java.awt.BorderLayout;
@@ -333,7 +333,6 @@ public class Gui extends JFrame
 						
 						agent.createGoal(goalname).addResultListener(new DefaultResultListener()
 						{
-							
 							public void resultAvailable(Object source, Object result)
 							{
 								IEAGoal purchase = (IEAGoal)result;
@@ -384,16 +383,6 @@ public class Gui extends JFrame
 						{
 							IEAGoal[] goals = (IEAGoal[])result;
 							dropGoal(goals, 0, order);
-							
-//							for(int i = 0; i < goals.length; i++)
-//							{
-//								goals[i].getParameter("order")
-//								if(order.equals(.getValue()))
-//								{
-//									goals[i].drop();
-//									break;
-//								}
-//							}
 						}
 					});
 				}
@@ -504,26 +493,19 @@ public class Gui extends JFrame
 	 */
 	public void refresh()
 	{
-		agent.getBeliefbase().getBeliefSetFacts("orders").addResultListener(new DefaultResultListener()
+		agent.getBeliefbase().getBeliefSetFacts("orders").addResultListener(new SwingDefaultResultListener()
 		{
-			public void resultAvailable(Object source, final Object result)
+			public void customResultAvailable(Object source, final Object result)
 			{
-				// Use invoke later as refresh() is called from plan thread.
-				SwingUtilities.invokeLater(new Runnable()
+				Order[]	aorders = (Order[])result;
+				for(int i = 0; i < aorders.length; i++)
 				{
-					public void run()
+					if(!orders.contains(aorders[i]))
 					{
-						Order[]	aorders = (Order[])result;
-						for(int i = 0; i < aorders.length; i++)
-						{
-							if(!orders.contains(aorders[i]))
-							{
-								orders.add(aorders[i]);
-							}
-						}
-						items.fireTableDataChanged();
+						orders.add(aorders[i]);
 					}
-				});
+				}
+				items.fireTableDataChanged();
 			}
 		});
 	}

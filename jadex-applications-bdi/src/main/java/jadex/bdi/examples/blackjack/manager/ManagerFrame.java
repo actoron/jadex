@@ -1,7 +1,5 @@
 package jadex.bdi.examples.blackjack.manager;
 
-import jadex.base.DefaultResultListener;
-import jadex.base.SwingDefaultResultListener;
 import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.player.strategies.AbstractStrategy;
@@ -14,7 +12,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -411,7 +411,6 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					{
 						start.getParameterValue("componentidentifier").addResultListener(new DefaultResultListener()
 						{
-							
 							public void resultAvailable(Object source, Object result)
 							{
 								IComponentIdentifier dealer	= (IComponentIdentifier)result;

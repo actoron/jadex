@@ -1,6 +1,5 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.base.DefaultResultListener;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEABelief;
@@ -9,6 +8,7 @@ import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 
 /**

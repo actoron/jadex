@@ -1,6 +1,5 @@
 package jadex.bdi.examples.blackjack.dealer;
 
-import jadex.base.SwingDefaultResultListener;
 import jadex.bdi.examples.blackjack.Dealer;
 import jadex.bdi.examples.blackjack.GameState;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
@@ -9,6 +8,7 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 
 import java.awt.Window;
 import java.awt.event.WindowAdapter;

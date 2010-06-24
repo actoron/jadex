@@ -1,6 +1,5 @@
 package jadex.bdi.examples.cleanerworld_classic.environment;
 
-import jadex.base.SwingDefaultResultListener;
 import jadex.bdi.examples.cleanerworld_classic.Chargingstation;
 import jadex.bdi.examples.cleanerworld_classic.Cleaner;
 import jadex.bdi.examples.cleanerworld_classic.Environment;
@@ -11,6 +10,7 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

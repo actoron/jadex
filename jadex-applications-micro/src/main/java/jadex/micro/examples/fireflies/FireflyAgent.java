@@ -8,8 +8,8 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Int;
 import jadex.application.space.envsupport.math.Vector2Double;
-import jadex.base.DefaultResultListener;
 import jadex.commons.IFilter;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.micro.MicroAgent;
 
 import java.util.Collections;
