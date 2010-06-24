@@ -7,7 +7,6 @@ import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IEAInternalEvent;
-import jadex.bdi.runtime.IGoal;
 import jadex.commons.SGUI;
 
 import java.awt.BorderLayout;
@@ -245,11 +244,16 @@ public class BlocksworldGui	extends JFrame
 						{
 							public void	actionPerformed(ActionEvent ae)
 							{
-								Block	block	= new Block(showcol.getBackground(),
-									(Block)agent.getBeliefbase().getBelief("table").getFact());
-								delblocks.addElement(block);
-								newblocks.addElement(new Block(block.number, showcol.getBackground(), null));
-								agent.getBeliefbase().getBeliefSet("blocks").addFact(block);
+								agent.getBeliefbase().getBeliefFact("table").addResultListener(new SwingDefaultResultListener()
+								{
+									public void customResultAvailable(Object source, Object result)
+									{
+										Block block = new Block(showcol.getBackground(), (Block)result);
+										delblocks.addElement(block);
+										newblocks.addElement(new Block(block.number, showcol.getBackground(), null));
+										agent.getBeliefbase().addBeliefSetFact("blocks", block);
+									}
+								});
 							}
 						});
 						final JButton	color	= new JButton("choose...");
@@ -281,14 +285,20 @@ public class BlocksworldGui	extends JFrame
 									upper.setLower(lower);
 								}
 								delblocks.removeElement(block);
-								agent.getBeliefbase().getBeliefSet("blocks").removeFact(block);
+								agent.getBeliefbase().removeBeliefSetFact("blocks", block);
 								clear.doClick();	// Hack!!! Reads blocks from beliefbase.
 							}
 						});
 						// Execution mode components
 						final JComboBox	mode	= new JComboBox(new String[]
 							{StackBlocksPlan.MODE_NORMAL, StackBlocksPlan.MODE_STEP, StackBlocksPlan.MODE_SLOW});
-						mode.setSelectedItem(agent.getBeliefbase().getBelief("mode").getFact());
+						agent.getBeliefbase().getBeliefFact("mode").addResultListener(new SwingDefaultResultListener()
+						{
+							public void customResultAvailable(Object source, Object result)
+							{
+								mode.setSelectedItem(result);
+							}
+						});
 						final JButton	step	= new JButton("step");
 						step.setEnabled(mode.getSelectedItem().equals(StackBlocksPlan.MODE_STEP));
 						mode.addItemListener(new ItemListener()
@@ -296,7 +306,7 @@ public class BlocksworldGui	extends JFrame
 							public void	itemStateChanged(ItemEvent ie)
 							{
 								step.setEnabled(mode.getSelectedItem().equals(StackBlocksPlan.MODE_STEP));
-								agent.getBeliefbase().getBelief("mode").setFact(mode.getSelectedItem());
+								agent.getBeliefbase().setBeliefFact("mode", mode.getSelectedItem());
 							}
 						});
 						step.addActionListener(new ActionListener()
@@ -313,8 +323,14 @@ public class BlocksworldGui	extends JFrame
 							}
 						});
 						// Bucket components
-						JList	bucket	= new JList(new BlocksListModel(
-							(Table)agent.getBeliefbase().getBelief("bucket").getFact()));
+						final JList bucket = new JList();
+						agent.getBeliefbase().getBeliefFact("bucket").addResultListener(new SwingDefaultResultListener()
+						{
+							public void customResultAvailable(Object source, Object result)
+							{
+								bucket.setModel(new BlocksListModel((Table)result));
+							}
+						});
 						bucket.setVisibleRowCount(3);
 						bucket.setCellRenderer(new BlockCellRenderer());
 						JScrollPane	bsp	= new JScrollPane(bucket);
