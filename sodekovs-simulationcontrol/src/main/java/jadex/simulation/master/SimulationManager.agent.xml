@@ -78,14 +78,9 @@
 
 		<!--
 			Reference to the XML file that contains the simulation description.
-			This file is parsed on agent start.
+			This file is parsed on agent start. The reference to the file is passes by the surrounding application file description.
 		-->
-		<belief name="simulationDescriptionFile" class="String">
-			<fact>
-				"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/persist/TestXML.xml"
-			</fact>
-		</belief>
-
+		<belief name="simulationDescriptionFile" class="String"/>			
 
 		<!--  The parsed simulation configuration xml file. -->
 		<belief name="tmpGUI" class="ControlCenter" />

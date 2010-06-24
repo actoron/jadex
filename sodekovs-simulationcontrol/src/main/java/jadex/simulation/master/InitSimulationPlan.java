@@ -15,7 +15,7 @@ import java.util.Map;
 public class InitSimulationPlan extends Plan{
 
 	public void body() {			
-		System.out.println("#InitSim# Init Master Simulation Agent.");		
+		System.out.println("#InitSim# Init Master Simulation Agent with configuration file: " + (String) getBeliefbase().getBelief("simulationDescriptionFile").getFact());		
 		String simulationDescription = (String) getBeliefbase().getBelief("simulationDescriptionFile").getFact();
 		SimulationConfiguration simConf = (SimulationConfiguration) XMLHandler.parseXML(simulationDescription, SimulationConfiguration.class);
 		initSettings(simConf);

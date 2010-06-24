@@ -1,21 +1,26 @@
-<!--
-	<H3>BlackJack application descriptor</H3>
--->
+
+	<!--
+		<H3>This application shows how the automated simulation management
+		works.</H3>
+	-->
 <applicationtype xmlns="http://jadex.sourceforge.net/jadex-application"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex-application 
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd"
 	name="AutomatedSimulationCenter" package="jadex.simulation">
-	
-	<componenttypes>		
-		<componenttype name="SimulationManager" filename="jadex/simulation/master/SimulationManager.agent.xml"/>
+
+	<componenttypes>
+		<componenttype name="SimulationManager"
+			filename="jadex/simulation/master/SimulationManager.agent.xml" />
 	</componenttypes>
 	
 	<applications>
-		<application name="First Configuration">
+		<application name="Default Configuration">
 			<components>
 				<component type="SimulationManager" master="true">
-				<!-- <argument name="diffusion">§.property.name</argument>-->
+					<arguments>
+						<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/Configuration1.xml"</argument>
+					</arguments>
 				</component>
 			</components>
 		</application>
