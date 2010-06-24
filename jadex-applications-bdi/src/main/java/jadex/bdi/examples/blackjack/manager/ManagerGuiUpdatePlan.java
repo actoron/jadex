@@ -1,5 +1,6 @@
 package jadex.bdi.examples.blackjack.manager;
 
+import jadex.base.DefaultResultListener;
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
@@ -67,16 +68,22 @@ public class ManagerGuiUpdatePlan extends Plan
 	{
 		// Use invoke later to avoid deadlocks,
 		// when killAgent was issued by AWT thread.
-		final JFrame	gui	= (JFrame)getExternalAccess().getBeliefbase().getBelief("GUI").getFact();
-		if(gui!=null)
+		getExternalAccess().getBeliefbase().getBeliefFact("GUI").addResultListener(new DefaultResultListener()
 		{
-			SwingUtilities.invokeLater(new Runnable()
+			public void resultAvailable(Object source, Object result)
 			{
-				public void run()
+				final JFrame gui = (JFrame)result;
+				if(gui!=null)
 				{
-					gui.dispose();
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							gui.dispose();
+						}
+					});
 				}
-			});
-		}
+			}
+		});
 	}
 }

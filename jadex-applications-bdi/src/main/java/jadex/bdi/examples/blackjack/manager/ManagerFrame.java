@@ -9,10 +9,9 @@ import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
-import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
@@ -21,7 +20,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -634,44 +632,58 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		/**
 		 * Start a player agent.
 		 */
-		protected void startPlayer(Player player)
+		protected void startPlayer(final Player player)
 		{
 			// try to start player-Agent.
-			try
+			
+			agent.getLogger().info("starting playerAgent: "+player.getName());
+			agent.getGoalbase().createGoal("cms_create_component").addResultListener(new DefaultResultListener()
 			{
-				agent.getLogger().info("starting playerAgent: "+player.getName());
-				IGoal start = agent.getGoalbase().createGoal("cms_create_component");
-//				IContextService	cs	= (IContextService) agent.getServiceContainer().getService(IContextService.class);
-//				IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
-//				// Hack! remove cast to ApplicationContext
-//				String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Player").getFilename();
-//				start.getParameter("type").setValue(type);
-				start.getParameter("type").setValue("jadex/bdi/examples/blackjack/player/Player.agent.xml");
-				start.getParameter("name").setValue(player.getName());
-				Map args = new HashMap();
-				args.put("myself", player);
-				args.put("dealer", dealeraid);
-				start.getParameter("arguments").setValue(args);
-				agent.dispatchTopLevelGoalAndWait(start);
-				IComponentIdentifier	playerid	= (IComponentIdentifier)start.getParameter("componentidentifier").getValue();
-				player.setAgentID(playerid);
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-				agent.getLogger().warning("PlayerAgent "+player+" could not be created: "+e);
-			}
+				public void resultAvailable(Object source, Object result)
+				{
+					try
+					{
+						IEAGoal start = (IEAGoal)result;
+						
+//						IContextService	cs	= (IContextService) agent.getServiceContainer().getService(IContextService.class);
+//						IContext[]	contexts	= cs.getContexts(agent.getComponentIdentifier(), IApplicationContext.class);
+//						// Hack! remove cast to ApplicationContext
+//						String	type	= ((ApplicationContext)contexts[0]).getApplicationType().getMAgentType("Player").getFilename();
+//						start.getParameter("type").setValue(type);
+						start.setParameterValue("type", "jadex/bdi/examples/blackjack/player/Player.agent.xml");
+						start.setParameterValue("name", player.getName());
+						Map args = new HashMap();
+						args.put("myself", player);
+						args.put("dealer", dealeraid);
+						start.setParameterValue("arguments", args);
+						agent.dispatchTopLevelGoalAndWait(start);
+						IComponentIdentifier playerid = (IComponentIdentifier)start.getParameterValue("componentidentifier");
+						player.setAgentID(playerid);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+						agent.getLogger().warning("PlayerAgent "+player+" could not be created: "+e);
+					}
+				}
+			});
 		}
 
 		/**
 		 * Stop a player agent.
 		 */
-		protected void stopPlayer(Player player)
+		protected void stopPlayer(final Player player)
 		{
-			IGoal destroy = agent.getGoalbase().createGoal("cms_destroy_component");
-			destroy.getParameter("componentidentifier").setValue(player.getAgentID());
-			agent.dispatchTopLevelGoalAndWait(destroy);
-			player.setAgentID(null);
+			agent.getGoalbase().createGoal("cms_destroy_component").addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					IEAGoal destroy = (IEAGoal)result;
+					destroy.setParameterValue("componentidentifier", player.getAgentID());
+					agent.dispatchTopLevelGoalAndWait(destroy);
+					player.setAgentID(null);
+				}
+			});
 		}
 	}
 }
