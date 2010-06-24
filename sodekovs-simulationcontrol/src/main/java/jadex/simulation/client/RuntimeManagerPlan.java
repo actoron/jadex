@@ -1,19 +1,20 @@
 package jadex.simulation.client;
 
+import jadex.application.runtime.IApplicationExternalAccess;
+import jadex.application.space.envsupport.environment.ISpaceObject;
+import jadex.application.space.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.base.ISimulationService;
 import jadex.base.fipa.IDF;
 import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.IDFServiceDescription;
 import jadex.base.fipa.SFipa;
-import jadex.application.runtime.IApplicationExternalAccess;
-import jadex.application.space.envsupport.environment.ISpaceObject;
-import jadex.application.space.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.concurrent.IResultListener;
+import jadex.bridge.IComponentManagementService;
+import jadex.javaparser.SJavaParser;
+import jadex.javaparser.SimpleValueFetcher;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 import jadex.simulation.helper.Constants;
@@ -55,9 +56,12 @@ public class RuntimeManagerPlan extends Plan {
 
 		// TEST
 		ContinuousSpace2D spaceTMP = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace");
-		// IExecutionService exeservice = (IExecutionService) space.getContext().getServiceContainer().getService(IExecutionService.class);
+		// IExecutionService exeservice = (IExecutionService)
+		// space.getContext().getServiceContainer().getService(IExecutionService.class);
 		IServiceContainer exeservice = spaceTMP.getContext().getServiceContainer();
-		// DeltaTimeExecutor4Simulation exeservice = (DeltaTimeExecutor4Simulation) spaceTMP.getContext().getServiceContainer().getService(DeltaTimeExecutor4Simulation.class);
+		// DeltaTimeExecutor4Simulation exeservice =
+		// (DeltaTimeExecutor4Simulation)
+		// spaceTMP.getContext().getServiceContainer().getService(DeltaTimeExecutor4Simulation.class);
 		// System.out.println(exeservice.getName());
 
 		init();
@@ -88,24 +92,54 @@ public class RuntimeManagerPlan extends Plan {
 
 			TargetFunction targetFunct = simConf.getRunConfiguration().getRows().getTerminateCondition().getTargetFunction();
 
-			// HACK
+			// HACK: Need a observer / listener instead evaluating expression
+			// every 1000ms
 			while (true) {
 				waitFor(1000);
+
 				ContinuousSpace2D space = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace");
-				// ContinuousSpace2D space = (ContinuousSpace2D) getExternalAccess()
-				// .getApplicationContext().getSpace("my2dspace");
-				ISpaceObject object = space.getSpaceObjectsByType("homebase")[0];
-				Integer ore = (Integer) object.getProperty("ore");
-				if (ore.intValue() == 55) {
+
+				//Hack: Works right now only for ISpaceObjects and only for single objects not all of that type...
+				if (targetFunct.getObjectSource().getType().equalsIgnoreCase(Constants.ISPACE_OBJECT)) {
+					ISpaceObject object = space.getSpaceObjectsByType(targetFunct.getObjectSource().getName())[0];
+//					Integer ore = (Integer) object.getProperty("ore");
+
+					// **********************TEST**********************
+					SimpleValueFetcher fetcher = new SimpleValueFetcher();
+					fetcher.setValue("$object",object);
+					fetcher.setValue("$space", space);
+
+//					String expression = "$object.getProperty(\"ore\") >= 10";
+					String expression = targetFunct.getFunction();
+					Object val = SJavaParser.evaluateExpression(expression, fetcher);
+
+					if (val instanceof Boolean) {
+						if ((Boolean) val) {
+							System.out.println("#Client:RuntimeManagerPlan# Terminate experiment: Semantic termination condition has been evaluated being true.");
+							// Experiment has reached Target Function. Terminate
+							break;
+						}
+					} else {
+						System.err.println("#Client:RuntimeManagerPlan# Could not evaluate semantic termination condition due invalid expression: " + val);
+					}
+					// **********************TEST**********************
+
+					// if (ore.intValue() == 55) {
 					// Experiment has reached Target Function. Terminate
+					// break;
+					// }
+					// long currentTime = System.currentTimeMillis();
+					// Long.valueOf(currentTime);
+					// if (missiontime.compareTo(Long.valueOf(currentTime)) <=
+					// 0) {
+					// Long missiontime = (Long)
+					// object.getProperty("missiontime");
+					// break;
+					// }
+				} else {
+					System.err.println("#RunTimeManagerPlan# Terminate Condition for BDIAgents can not be evaluated right now " + targetFunct);
 					break;
 				}
-				// long currentTime = System.currentTimeMillis();
-				// Long.valueOf(currentTime);
-				// if (missiontime.compareTo(Long.valueOf(currentTime)) <= 0) {
-				// Long missiontime = (Long) object.getProperty("missiontime");
-				// break;
-				// }
 			}
 
 		} else {
@@ -149,7 +183,7 @@ public class RuntimeManagerPlan extends Plan {
 
 		sendResult();
 		// simServ.start();
-//		 waitFor(2000);
+		// waitFor(2000);
 		// simServ.shutdown(null);
 		System.out.println("Trying to kill component....");
 		// getExternalAccess().killAgent();
@@ -247,28 +281,34 @@ public class RuntimeManagerPlan extends Plan {
 	 */
 	private void init() {
 
-		// final IClockService clockservice = (IClockService)container.getService(IClockService.class);
+		// final IClockService clockservice =
+		// (IClockService)container.getService(IClockService.class);
 
-		// ContinuousSpace2D space = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace");
+		// ContinuousSpace2D space = (ContinuousSpace2D)
+		// ((IApplicationExternalAccess)
+		// getScope().getParent()).getSpace("my2dspace");
 
 		IClockService clockservice = (IClockService) getScope().getServiceContainer().getService(IClockService.class);
 		// long clockService = clockservice.getTime();
 		// long systemTime = new Long(System.currentTimeMillis());
 
-		// System.out.println("***********************************************************" + clockService + " - " + systemTime);
+		// System.out.println("***********************************************************"
+		// + clockService + " - " + systemTime);
 
 		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
 		facts.put(Constants.EXPERIMENT_START_TIME, new Long(clockservice.getTime()));
 		getBeliefbase().getBelief("simulationFacts").setFact(facts);
-		//Hack: Synchronize start time! 
+		// Hack: Synchronize start time!
 		((ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace")).getSpaceObjectsByType("homebase")[0].setProperty("start_time", clockservice.getTime());
-		
+
 	}
 
 	/**
-	 * Compute Termination: Input: Mode=0 ->relative Time; Mode=1 ->absolute Time
+	 * Compute Termination: Input: Mode=0 ->relative Time; Mode=1 ->absolute
+	 * Time
 	 * 
-	 * @return the termination time as relative time, e.g. the time the simulation has to run.
+	 * @return the termination time as relative time, e.g. the time the
+	 *         simulation has to run.
 	 */
 	private Long getTerminationTime(int mode, long value) {
 		Long currentTime = new Long(getCurrentTime());

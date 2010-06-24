@@ -13,7 +13,7 @@
 	applicationConfiguration="1 Sentry / 2 Producers / 3 Carries">
 	<!--
 		<SimulationConfiguration name="MarsWorldExperiments"
-		applicationReference="..\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\\MarsWorld4SimulationExperiments.application.xml"
+		applicationReference="..\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\marsworld\MarsWorld.application.xml"
 		applicationConfiguration="1 Sentry / 2 Producers / 3 Carries">
 	-->
 	<Observers>
@@ -113,9 +113,11 @@
 		</General>
 		<Rows experiments="25">
 			<TerminateCondition>
-				<Time value="5000" type="relative" />
-				<!-- Hack: Terminate Condition is hard coded! -->
-				<!--<TargetFunction function="$object.money &gt; 5"/>-->
+				<!-- <Time value="5000" type="relative" /> -->
+				<!-- Hack: Terminate Condition does not work for BDIAgents and for more than one object yet.-->
+				<TargetFunction function="$object.getProperty(&quot;ore&quot;) >= 10">
+					<ObjectSource type="ISpaceObject" name="homebase" />
+				</TargetFunction>
 			</TerminateCondition>
 		</Rows>
 	</RunConfiguration>
