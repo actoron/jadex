@@ -1,4 +1,3 @@
-
 package jadex.tools.bpmn.editor.properties;
 
 import jadex.tools.model.common.properties.ModifyEObjectCommand;
@@ -32,55 +31,69 @@ import org.eclipse.ui.IWorkbenchPart;
  * 
  * @author Claas Altschaffel
  */
-public abstract class AbstractBpmnMultiColumnTablePropertySection extends AbstractCommonTablePropertySection
+public abstract class AbstractBpmnMultiColumnTablePropertySection extends
+		AbstractCommonTablePropertySection
 {
 
 	// ---- attributes ----
-	
+
 	/** Utility class to hold attribute an element reference */
 	protected JadexBpmnPropertiesUtil util;
-	
+
 	private int uniqueColumnIndex;
-	
+
 	private Map<EModelElement, HashSet<String>> uniqueColumnValuesMap;
 
 	// ---- constructor ----
-	
+
 	/**
 	 * Protected constructor for subclasses
-	 * @param containerEAnnotationName @see {@link AbstractBpmnPropertySection}
-	 * @param annotationDetailName @see {@link AbstractBpmnPropertySection}
-	 * @param tableLabel the name of table
-	 * @param columns the column of table
-	 * @param columnsWeight the weight of columns
-	 * @param defaultListElementAttributeValues default columnValues for new elements, may be <code>null</code>
+	 * 
+	 * @param containerEAnnotationName
+	 *            @see {@link AbstractBpmnPropertySection}
+	 * @param annotationDetailName
+	 *            @see {@link AbstractBpmnPropertySection}
+	 * @param tableLabel
+	 *            the name of table
+	 * @param uniqueColumnIndex
+	 *            the unique value column of the table
 	 */
-	protected AbstractBpmnMultiColumnTablePropertySection(String containerEAnnotationName, String annotationDetailName, String tableLabel, int uniqueColumnIndex)
+	protected AbstractBpmnMultiColumnTablePropertySection(
+			String containerEAnnotationName, String annotationDetailName,
+			String tableLabel, int uniqueColumnIndex)
 	{
 		super(tableLabel);
-		
-		assert containerEAnnotationName != null && !containerEAnnotationName.isEmpty() : this.getClass() + ": containerEAnnotationName not set";
-		assert annotationDetailName != null && !annotationDetailName.isEmpty() : this.getClass() + ": annotationDetailName not set";
-		
-		this.util = new JadexBpmnPropertiesUtil(containerEAnnotationName, annotationDetailName, this);
+
+		assert containerEAnnotationName != null
+				&& !containerEAnnotationName.isEmpty() : this.getClass()
+				+ ": containerEAnnotationName not set";
+		assert annotationDetailName != null && !annotationDetailName.isEmpty() : this
+				.getClass()
+				+ ": annotationDetailName not set";
+
+		this.util = new JadexBpmnPropertiesUtil(containerEAnnotationName,
+				annotationDetailName, this);
 
 		//assert (uniqueColumnIndex != -1 && uniqueColumnIndex < columns.length);
 		this.uniqueColumnValuesMap = new HashMap<EModelElement, HashSet<String>>();
-		
+
 		this.uniqueColumnIndex = uniqueColumnIndex;
 
 	}
 
 	// ---- abstract methods ----
-	
+
 	/** Retrieve the default values for a new row */
 	protected abstract String[] getDefaultListElementAttributeValues();
-	
 
 	// ---- methods ----
 
-	/* (non-Javadoc)
-	 * @see jadex.tools.model.common.properties.AbstractCommonPropertySection#dispose()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * jadex.tools.model.common.properties.AbstractCommonPropertySection#dispose
+	 * ()
 	 */
 	@Override
 	public void dispose()
@@ -88,7 +101,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 		// nothing to dispose here, use addDisposable(Object) instead
 		super.dispose();
 	}
-	
+
 	/**
 	 * Manages the input.
 	 */
@@ -103,9 +116,10 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 			return;
 		}
 	}
-	
+
 	/**
 	 * Updates the uniqueColumnValueCash for modelElement
+	 * 
 	 * @param element
 	 * @return
 	 */
@@ -124,33 +138,33 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 	}
 
 	// ---- control creation methods ----
-	
+
 	@Override
 	protected ModifyEObjectCommand getAddCommand()
 	{
 		// modify the EModelElement annotation
-		ModifyEObjectCommand command = new ModifyEObjectCommand(
-				modelElement,
-				"Add EModelElement parameter element")
+		ModifyEObjectCommand command = new ModifyEObjectCommand(modelElement,
+				"Add EModelElement annotation element")
 		{
 			@Override
 			protected CommandResult doExecuteWithResult(
 					IProgressMonitor monitor, IAdaptable info)
 					throws ExecutionException
 			{
-				
+
 				MultiColumnTableRow newRow;
 				HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
 				synchronized (uniqueValueCash)
 				{
-					MultiColumnTable table = getTableRowList();
+					MultiColumnTable table = getTableFromAnnotation();
 					newRow = table.new MultiColumnTableRow(
-							getDefaultListElementAttributeValues(), uniqueColumnIndex);
+							getDefaultListElementAttributeValues(),
+							uniqueColumnIndex);
 					String uniqueValue = createUniqueRowValue(newRow, table);
 					newRow.getColumnValues()[uniqueColumnIndex] = uniqueValue;
 					addUniqueRowValue(uniqueValue);
 					table.add(newRow);
-					updateTableRowList(table);
+					updateTableAnnotation(table);
 				}
 
 				return CommandResult.newOKCommandResult(newRow);
@@ -163,9 +177,8 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 	protected ModifyEObjectCommand getDeleteCommand()
 	{
 		// modify the EModelElement annotation
-		ModifyEObjectCommand command = new ModifyEObjectCommand(
-				modelElement,
-				"Delete EModelElement parameter element")
+		ModifyEObjectCommand command = new ModifyEObjectCommand(modelElement,
+				"Delete EModelElement annotation element")
 		{
 			@Override
 			protected CommandResult doExecuteWithResult(
@@ -177,12 +190,12 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 				{
 					MultiColumnTableRow rowToRemove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
 							.getSelection()).getFirstElement();
-					
-					MultiColumnTable tableRowList = getTableRowList();
-					//modelElementUniqueColumnValueCash.remove(rowToRemove.columnValues[uniqueColumnIndex]);
-					uniqueValueCash.remove(rowToRemove.getColumnValues()[uniqueColumnIndex]);
+
+					MultiColumnTable tableRowList = getTableFromAnnotation();
+					uniqueValueCash
+							.remove(rowToRemove.getColumnValues()[uniqueColumnIndex]);
 					tableRowList.remove(rowToRemove);
-					updateTableRowList(tableRowList);
+					updateTableAnnotation(tableRowList);
 				}
 
 				return CommandResult.newOKCommandResult(null);
@@ -195,8 +208,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 	protected ModifyEObjectCommand getUpCommand()
 	{
 		// modify the EModelElement annotation
-		ModifyEObjectCommand command = new ModifyEObjectCommand(
-				modelElement,
+		ModifyEObjectCommand command = new ModifyEObjectCommand(modelElement,
 				"Move parameter element up")
 		{
 			@Override
@@ -204,22 +216,22 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 					IProgressMonitor monitor, IAdaptable info)
 					throws ExecutionException
 			{
-				
+
 				HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
 				synchronized (uniqueValueCash)
 				{
 					MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
 							.getSelection()).getFirstElement();
-				
-					MultiColumnTable tableRowList = getTableRowList();
+
+					MultiColumnTable tableRowList = getTableFromAnnotation();
 					int index = tableRowList.indexOf(rowToMove);
 
 					if (0 < index && index < tableRowList.size())
 					{
 						MultiColumnTableRow tableRow = tableRowList.get(index);
 						tableRowList.remove(index);
-						tableRowList.add(index-1, tableRow);
-						updateTableRowList(tableRowList);
+						tableRowList.add(index - 1, tableRow);
+						updateTableAnnotation(tableRowList);
 					}
 				}
 
@@ -229,13 +241,11 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 		return command;
 	}
 
-	
 	@Override
 	protected ModifyEObjectCommand getDownCommand()
 	{
 		// modify the EModelElement annotation
-		ModifyEObjectCommand command = new ModifyEObjectCommand(
-				modelElement,
+		ModifyEObjectCommand command = new ModifyEObjectCommand(modelElement,
 				"Move parameter element down")
 		{
 			@Override
@@ -248,16 +258,16 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 				{
 					MultiColumnTableRow rowToMove = (MultiColumnTableRow) ((IStructuredSelection) tableViewer
 							.getSelection()).getFirstElement();
-					
-					MultiColumnTable tableRowList = getTableRowList();
+
+					MultiColumnTable tableRowList = getTableFromAnnotation();
 					int index = tableRowList.indexOf(rowToMove);
 
-					if (0 <= index && index < tableRowList.size()-1)
+					if (0 <= index && index < tableRowList.size() - 1)
 					{
 						MultiColumnTableRow tableRow = tableRowList.get(index);
 						tableRowList.remove(index);
-						tableRowList.add(index+1, tableRow);
-						updateTableRowList(tableRowList);
+						tableRowList.add(index + 1, tableRow);
+						updateTableAnnotation(tableRowList);
 					}
 				}
 
@@ -266,13 +276,12 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 		};
 		return command;
 	}
-	
+
 	@Override
 	protected ModifyEObjectCommand getClearCommand()
 	{
 		// modify the EModelElement annotation
-		ModifyEObjectCommand command = new ModifyEObjectCommand(
-				modelElement,
+		ModifyEObjectCommand command = new ModifyEObjectCommand(modelElement,
 				"Clear parameter")
 		{
 			@Override
@@ -283,7 +292,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 				HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
 				synchronized (uniqueValueCash)
 				{
-					updateTableRowList(null);
+					updateTableAnnotation(null);
 					uniqueValueCash.clear();
 				}
 
@@ -292,7 +301,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 		};
 		return command;
 	}
-	
+
 	@Override
 	protected IStructuredContentProvider getTableContentProvider()
 	{
@@ -300,9 +309,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 		addDisposable(contentProvider);
 		return contentProvider;
 	}
-	
-	
-	
+
 	// ---- converter and help methods ----
 
 	/**
@@ -315,16 +322,19 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 			TableViewerColumn column = new TableViewerColumn(viewer, SWT.LEFT);
 			column.getColumn().setText(columnNames[columnIndex]);
 
-			column.setEditingSupport(new BpmnMultiColumnTableEditingSupport(viewer, columnIndex));
-			column.setLabelProvider(new MultiColumnTableLabelProvider(columnIndex));
+			column.setEditingSupport(new BpmnMultiColumnTableEditingSupport(
+					viewer, columnIndex));
+			column.setLabelProvider(new MultiColumnTableLabelProvider(
+					columnIndex));
 		}
 
 	}
-	
-	private String createUniqueRowValue(MultiColumnTableRow row, MultiColumnTable table)
+
+	private String createUniqueRowValue(MultiColumnTableRow row,
+			MultiColumnTable table)
 	{
 		assert (row != null && table != null);
-		
+
 		HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
 		synchronized (uniqueValueCash)
 		{
@@ -342,7 +352,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 		}
 
 	}
-	
+
 	private boolean addUniqueRowValue(String uniqueValue)
 	{
 		HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
@@ -351,7 +361,7 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 			return uniqueValueCash.add(uniqueValue);
 		}
 	}
-	
+
 	private boolean removeUniqueRowValue(String uniqueValue)
 	{
 		HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
@@ -360,50 +370,113 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 			return uniqueValueCash.remove(uniqueValue);
 		}
 	}
-	
+
 	/**
-	 * Retrieve the EAnnotation from the modelElement and converts it to a {@link MultiColumnTableRow} list
+	 * Retrieve the EAnnotation from the modelElement and converts it to a
+	 * {@link MultiColumnTableRow} list
+	 * 
 	 * @param act
 	 * @return
 	 */
-	private MultiColumnTable getTableRowList()
+	private MultiColumnTable getTableFromAnnotation()
 	{
-		EAnnotation ea = modelElement.getEAnnotation(util.containerEAnnotationName);
-		if (ea != null)
+		checkAnnotationConversion();
+
+		MultiColumnTable table = JadexBpmnPropertiesUtil
+				.getJadexEAnnotationTable(modelElement,
+						getTableAnnotationIdentifier());
+		if (table != null)
 		{
-			String value = (String) ea.getDetails().get(util.annotationDetailName);
-			if (value != null)
+			for (MultiColumnTableRow multiColumnTableRow : table.getRowList())
 			{
-				TableColumn[] columns = tableViewer.getTable().getColumns();
-				MultiColumnTable table = MultiColumnTable.convertMultiColumnTableString(value, columns.length , uniqueColumnIndex);
-				for (MultiColumnTableRow multiColumnTableRow : table.getRowList())
-				{
-					addUniqueRowValue(multiColumnTableRow.getColumnValueAt(uniqueColumnIndex));
-				}
-				return table;
+				addUniqueRowValue(multiColumnTableRow
+						.getColumnValueAt(uniqueColumnIndex));
 			}
+			return table;
 		}
-		
+
 		// fall through
 		return new MultiColumnTable(0, 0);
 	}
-	
+
 	/**
 	 * Updates the EAnnotation for the modelElement with table data
+	 * 
 	 * @param table
 	 */
-	private void updateTableRowList(MultiColumnTable table)
+	private void updateTableAnnotation(MultiColumnTable table)
 	{
-		util.updateJadexEAnnotation(util.annotationDetailName, MultiColumnTable.convertMultiColumnRowList(table));
+		JadexBpmnPropertiesUtil.updateJadexEAnnotationTable(modelElement,
+				getTableAnnotationIdentifier(), table);
+	}
+
+	/**
+	 * Check if have to convert the annotation to new format
+	 * 
+	 * @return true if a conversion is done
+	 */
+	private boolean checkAnnotationConversion()
+	{
+		EAnnotation ea = modelElement
+				.getEAnnotation(util.containerEAnnotationName);
+		if (ea != null)
+		{
+			String value = (String) ea.getDetails().get(
+					util.annotationDetailName);
+			if (value != null)
+			{
+				// This is the old format, so convert to new format an remove
+				// detail.
+				TableColumn[] columns = tableViewer.getTable().getColumns();
+				MultiColumnTable table = MultiColumnTable
+						.convertMultiColumnTableString(value, columns.length,
+								uniqueColumnIndex);
+				// save the new annotation
+				JadexBpmnPropertiesUtil.updateJadexEAnnotationTable(
+						modelElement, getTableAnnotationIdentifier(), table);
+				// remove the old detail, this removes annotation if details are
+				// empty too
+				util.updateJadexEAnnotation(util.annotationDetailName, null);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Create the annotation identifier from util values
+	 * 
+	 * @return
+	 */
+	private String getTableAnnotationIdentifier()
+	{
+		return getTableAnnotationIdentifier(util.containerEAnnotationName,
+				util.annotationDetailName);
 	}
 	
-	// ---- internal used classes ----
-	
 	/**
-	 * Simple content provider that reflects the table values  
-	 * of the specified annotation detail given as value from containing class.
+	 * Create the annotation identifier from util values
+	 * 
+	 * @return
 	 */
-	protected class MultiColumnTableContentProvider implements IStructuredContentProvider {
+	protected static String getTableAnnotationIdentifier(String annotationID, String detailID)
+	{
+		return annotationID
+				+ JadexBpmnPropertiesUtil.JADEX_COMBINED_KEY_DELIMITER
+				+ detailID
+				+ JadexBpmnPropertiesUtil.JADEX_COMBINED_KEY_DELIMITER
+				+ JadexBpmnPropertiesUtil.JADEX_TABLE_KEY_EXTENSION;
+	}
+
+	// ---- internal used classes ----
+
+	/**
+	 * Simple content provider that reflects the table values of the specified
+	 * annotation detail given as value from containing class.
+	 */
+	protected class MultiColumnTableContentProvider implements
+			IStructuredContentProvider
+	{
 
 		/**
 		 * Generate the content for the table.
@@ -413,24 +486,18 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 		 */
 		public Object[] getElements(Object inputElement)
 		{
+			if (util.annotationDetailName.equals("parameters"))
+				System.out.println("STOP");
+			
+			checkAnnotationConversion();
+			
 			if (inputElement instanceof EModelElement)
 			{
-				EAnnotation ea = ((EModelElement)inputElement).getEAnnotation(util.containerEAnnotationName);
-				inputElement = ea;
+				MultiColumnTable table = JadexBpmnPropertiesUtil.getJadexEAnnotationTable((EModelElement)inputElement, getTableAnnotationIdentifier());
+				if (table != null)
+					return table.toArray();
 			}
-			
-			if (inputElement instanceof EAnnotation)
-			{
-				String tableString = ((EAnnotation) inputElement).getDetails().get(util.annotationDetailName);
-				if(tableString!=null)
-				{
-					TableColumn[] columns = tableViewer.getTable().getColumns();
-					return MultiColumnTable.convertMultiColumnTableString(tableString, columns.length, uniqueColumnIndex).toArray();
-					// add to unique map not need, its only a content provider
-				}
-					
-			}
-			
+
 			// fall through
 			return new Object[] {};
 		}
@@ -453,16 +520,20 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 		}
 
 	}
-	
-	protected class BpmnMultiColumnTableEditingSupport extends MultiColumnTableEditingSupport {
-		
-		public BpmnMultiColumnTableEditingSupport(TableViewer viewer, int attributeIndex)
+
+	protected class BpmnMultiColumnTableEditingSupport extends
+			MultiColumnTableEditingSupport
+	{
+
+		public BpmnMultiColumnTableEditingSupport(TableViewer viewer,
+				int attributeIndex)
 		{
 			super(viewer, attributeIndex);
 
 		}
-		
-		public BpmnMultiColumnTableEditingSupport(TableViewer viewer, int attributeIndex, CellEditor editor)
+
+		public BpmnMultiColumnTableEditingSupport(TableViewer viewer,
+				int attributeIndex, CellEditor editor)
 		{
 			super(viewer, attributeIndex, editor);
 		}
@@ -472,38 +543,40 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 				final MultiColumnTableRow tableViewerRow, final Object value)
 		{
 			final String newValue = value.toString();
-			
+
 			// modify the Model
 			ModifyEObjectCommand command = new ModifyEObjectCommand(
-					modelElement,
-					"Update EModelElement parameter list")
+					modelElement, "Update EModelElement parameter list")
 			{
 				@Override
 				protected CommandResult doExecuteWithResult(
-						IProgressMonitor monitor,
-						IAdaptable info)
+						IProgressMonitor monitor, IAdaptable info)
 						throws ExecutionException
 				{
 
-					MultiColumnTable tableRowList = getTableRowList();
-					MultiColumnTableRow rowToEdit = (MultiColumnTableRow) tableRowList.get(tableRowList.indexOf(tableViewerRow));
+					MultiColumnTable tableRowList = getTableFromAnnotation();
+					MultiColumnTableRow rowToEdit = (MultiColumnTableRow) tableRowList
+							.get(tableRowList.indexOf(tableViewerRow));
 
 					if (attributeIndex == uniqueColumnIndex)
 					{
-						if (!newValue.equals(rowToEdit.getColumnValues()[attributeIndex]))
+						if (!newValue
+								.equals(rowToEdit.getColumnValues()[attributeIndex]))
 						{
 							HashSet<String> uniqueValueCash = getUniqueColumnValueCash(modelElement);
 							synchronized (uniqueValueCash)
 							{
-								removeUniqueRowValue(rowToEdit.getColumnValues()[uniqueColumnIndex]);
-								
+								removeUniqueRowValue(rowToEdit
+										.getColumnValues()[uniqueColumnIndex]);
+
 								rowToEdit.getColumnValues()[attributeIndex] = newValue;
-								String newUniqueValue = createUniqueRowValue(rowToEdit, tableRowList);
+								String newUniqueValue = createUniqueRowValue(
+										rowToEdit, tableRowList);
 								rowToEdit.getColumnValues()[attributeIndex] = newUniqueValue;
-								
+
 								addUniqueRowValue(newUniqueValue);
-								
-								updateTableRowList(tableRowList);
+
+								updateTableAnnotation(tableRowList);
 
 								// update the corresponding table element
 								tableViewerRow.getColumnValues()[attributeIndex] = newUniqueValue;
@@ -512,22 +585,20 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends Abstra
 							return CommandResult.newOKCommandResult();
 						}
 					}
-					
+
 					rowToEdit.getColumnValues()[attributeIndex] = newValue;
-					updateTableRowList(tableRowList);
-					
+					updateTableAnnotation(tableRowList);
+
 					// update the corresponding table element
 					tableViewerRow.getColumnValues()[attributeIndex] = newValue;
-										
+
 					return CommandResult.newOKCommandResult();
 				}
 			};
-			
+
 			return command;
 		}
-		
+
 	}
 
 }
-
-

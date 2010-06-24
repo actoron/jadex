@@ -77,20 +77,22 @@ public class JadexBpmnPropertiesUtil
 	/** Key for the implementing error. */
 	public static final String JADEX_EVENT_ERROR_DETAIL = "error";
 	
+	/** Key for the table unique column index. */
+	public static final String JADEX_TABLE_KEY_EXTENSION = "table";
+	
 	/** Key for the table dimension. */
 	public static final String JADEX_TABLE_DIMESION_DETAIL = "dimension";
 	
-	/** Key for the table dimension. */
-	public static final String JADEX_TABLE_UNIQUE_COLUMN_DETAIL = "dimension";
+	/** Key for the table unique column index. */
+	public static final String JADEX_TABLE_UNIQUE_COLUMN_DETAIL = "uniqueColumnIndex";
 	
-	/** Key for the parameter table */
-	public static final String JADEX_COMBINED_KEY_DELIMITER = "_";
-	
+	/** Delimiter for the table cell index and dimension */
 	public static final String JADEX_TABLE_DIMENSION_DELIMITER = ":";
 	
-	/** Key for the parameter table */
-	public static final String JADEX_PARAMETER_TABLE_ANNOTATION_COMBINED_KEY = 
-		JADEX_GLOBAL_ANNOTATION+JADEX_COMBINED_KEY_DELIMITER+JADEX_PARAMETER_LIST_DETAIL+JADEX_COMBINED_KEY_DELIMITER+"table";
+	
+	/** Delimiter for combined keys (e.g. "annotationIdentifier + annotaionDetailIdentifier" for e.g. tables) */
+	public static final String JADEX_COMBINED_KEY_DELIMITER = "_";
+	
 	
 	
 	
@@ -163,8 +165,7 @@ public class JadexBpmnPropertiesUtil
 		{
 			return false;
 		}
-		
-		
+
 			// update or create the annotation / detail
 			ModifyEObjectCommand command = new ModifyEObjectCommand(
 					element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
@@ -191,6 +192,10 @@ public class JadexBpmnPropertiesUtil
 					else
 					{
 						annotation.getDetails().removeKey(annotationDetail);
+						if (annotation.getDetails().isEmpty())
+						{
+							element.getEAnnotations().remove(annotation);
+						}
 					}
 					
 					return CommandResult.newOKCommandResult();
@@ -257,8 +262,7 @@ public class JadexBpmnPropertiesUtil
 		{
 			return false;
 		}
-		
-		
+
 			// update or create the annotation / detail
 			ModifyEObjectCommand command = new ModifyEObjectCommand(
 					element, Messages.JadexCommonPropertySection_update_eannotation_command_name)
@@ -279,7 +283,7 @@ public class JadexBpmnPropertiesUtil
 					
 					if (table != null && !table.isEmpty())
 					{
-						String tableDimension = table.size()+JADEX_TABLE_DIMENSION_DELIMITER+table.getRowSize();
+						String tableDimension =  (new TableCellIndex(table.size(), table.getRowSize())).toString();
 						annotation.getDetails().put(JADEX_TABLE_DIMESION_DETAIL, tableDimension);
 						annotation.getDetails().put(JADEX_TABLE_UNIQUE_COLUMN_DETAIL, String.valueOf(table.getUniqueColumn()));
 						int rowIndex = 0;
@@ -287,7 +291,7 @@ public class JadexBpmnPropertiesUtil
 						{
 							for (int columnIndex = 0; columnIndex < row.getColumnValues().length; columnIndex++)
 							{
-								annotation.getDetails().put(rowIndex+JADEX_TABLE_DIMENSION_DELIMITER+columnIndex, row.getColumnValueAt(columnIndex));
+								annotation.getDetails().put(new TableCellIndex(rowIndex, columnIndex).toString(), row.getColumnValueAt(columnIndex));
 							}
 							rowIndex++;
 						}
@@ -350,10 +354,14 @@ public class JadexBpmnPropertiesUtil
 					}
 					newTable.add(newTable.new MultiColumnTableRow(newRow, uniqueColumn));
 				}
-			}
 				
+				return newTable;
+			}
+			
 			// fall through
-			return new MultiColumnTable(0, 0);
+			MultiColumnTable table = new MultiColumnTable(0,0);
+			// set parameter
+			return table;
 		}
 	
 		return null;
@@ -364,7 +372,8 @@ public class JadexBpmnPropertiesUtil
 }
 
 /**
- * The dimension tuple of a table
+ * A cell index data type
+ * @TODO: replace with "toString" overridden existing java class * Point?
  * @author Claas
  */
 class TableCellIndex
@@ -398,10 +407,6 @@ class TableCellIndex
 	
 	// ---- methods ----
 	
-	
-
-
-
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */

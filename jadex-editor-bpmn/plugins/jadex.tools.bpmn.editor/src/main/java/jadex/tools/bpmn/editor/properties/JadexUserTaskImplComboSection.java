@@ -266,18 +266,15 @@ public class JadexUserTaskImplComboSection extends
 		TaskMetaInfo metaInfo = taskProvider.getTaskMetaInfoFor(taskClassName);
 		ParameterMetaInfo[] taskParameter = metaInfo.getParameterMetaInfos();
 
-		MultiColumnTable parameterTable;
-		String currentParameterString = JadexBpmnPropertiesUtil.getJadexEAnnotationDetail(
-				modelElement,
-				JadexCommonParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
-				JadexCommonParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER);
-		if (currentParameterString != null && !currentParameterString.isEmpty())
-		{
-			parameterTable = MultiColumnTable
-					.convertMultiColumnTableString(
-							currentParameterString,
-							JadexCommonParameterSection.DEFAULT_PARAMTER_COLUMN_NAMES.length,
-							JadexCommonParameterSection.UNIQUE_PARAMETER_ROW_ATTRIBUTE);
+		MultiColumnTable parameterTable = JadexBpmnPropertiesUtil
+					.getJadexEAnnotationTable(
+							modelElement,
+							AbstractBpmnMultiColumnTablePropertySection
+									.getTableAnnotationIdentifier(
+											JadexCommonParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
+											JadexCommonParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER)); 
+		if (parameterTable != null) 
+		{	
 			parameterTable = addTaskParamterTable(parameterTable, taskParameter);
 		}
 		else
@@ -285,11 +282,14 @@ public class JadexUserTaskImplComboSection extends
 			parameterTable = createNewParameterTable(taskParameter);
 		}
 
-		JadexBpmnPropertiesUtil.updateJadexEAnnotationDetail(
-				modelElement,
-				JadexCommonParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
-				JadexCommonParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER,
-				MultiColumnTable.convertMultiColumnRowList(parameterTable));
+		JadexBpmnPropertiesUtil
+				.updateJadexEAnnotationTable(
+						modelElement,
+						AbstractBpmnMultiColumnTablePropertySection
+								.getTableAnnotationIdentifier(
+										JadexCommonParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
+										JadexCommonParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER),
+						parameterTable);
 		
 		TableViewer viewer = JadexCommonParameterSection.getParameterTableViewerFor(modelElement);
 		if (viewer != null)
