@@ -8,8 +8,6 @@ import jadex.bdi.runtime.IAgentListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAExpression;
 import jadex.bdi.runtime.IEAGoal;
-import jadex.bdi.runtime.IExpression;
-import jadex.bdi.runtime.IGoal;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.commons.SGUI;
 import jadex.commons.ThreadSuspendable;
