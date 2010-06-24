@@ -46,7 +46,7 @@ public class MemoryLoggerPlan extends Plan {
 					FileOutputStream fout = new FileOutputStream("MemoryUsage.txt", true);
 
 					// Print a line of text
-					new PrintStream(fout).println(getExperimentNumber()  + "\t" + Runtime.getRuntime().totalMemory() / 1024000 + "\t" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024000);
+					new PrintStream(fout).println(getExperimentNumber()  + "\t" + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1024000);
 					// Close our output stream
 					fout.close();
 					getBeliefbase().getBelief("memoryLoggerCounter").setFact((Integer) getBeliefbase().getBelief("memoryLoggerCounter").getFact() + 1);
