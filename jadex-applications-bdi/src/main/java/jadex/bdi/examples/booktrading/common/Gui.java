@@ -1,11 +1,12 @@
 package jadex.bdi.examples.booktrading.common;
 
+import jadex.base.DefaultResultListener;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IAgentListener;
-import jadex.bdi.runtime.IBeliefSetListener;
-import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.IBeliefSetListener;
+import jadex.bdi.runtime.IEAExpression;
+import jadex.bdi.runtime.IEAGoal;
 import jadex.commons.SGUI;
 import jadex.service.clock.IClockService;
 
@@ -247,7 +248,7 @@ public class Gui extends JFrame
 		getContentPane().add(BorderLayout.CENTER, splitter);
 		getContentPane().add(BorderLayout.SOUTH, south);
 
-		agent.getBeliefbase().getBeliefSet("orders").addBeliefSetListener(new IBeliefSetListener()
+		agent.getBeliefbase().addBeliefSetListener("orders", new IBeliefSetListener()
 		{
 			public void factChanged(AgentEvent ae)
 			{
@@ -267,8 +268,7 @@ public class Gui extends JFrame
 			}
 		});
 		
-		agent.getBeliefbase().getBeliefSet("negotiation_reports")
-			.addBeliefSetListener(new IBeliefSetListener()
+		agent.getBeliefbase().addBeliefSetListener("negotiation_reports", new IBeliefSetListener()
 		{
 			public void factAdded(AgentEvent ae)
 			{
@@ -319,7 +319,7 @@ public class Gui extends JFrame
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				while(dia.requestInput(agent.getTime()))
+				while(dia.requestInput(((IClockService)agent.getServiceContainer().getService(IClockService.class)).getTime()))
 				{
 					try
 					{
@@ -327,11 +327,19 @@ public class Gui extends JFrame
 						int limit = Integer.parseInt(dia.limit.getText());
 						int start = Integer.parseInt(dia.start.getText());
 						Date deadline = dformat.parse(dia.deadline.getText());
-						Order order = new Order(title, deadline, start, limit, buy, 
+						final Order order = new Order(title, deadline, start, limit, buy, 
 							(IClockService)agent.getServiceContainer().getService(IClockService.class));
-						IGoal purchase = Gui.this.agent.createGoal(goalname);
-						purchase.getParameter("order").setValue(order);
-						Gui.this.agent.dispatchTopLevelGoal(purchase);
+						
+						agent.createGoal(goalname).addResultListener(new DefaultResultListener()
+						{
+							
+							public void resultAvailable(Object source, Object result)
+							{
+								IEAGoal purchase = (IEAGoal)result;
+								purchase.setParameterValue("order", order);
+								agent.dispatchTopLevelGoal(purchase);
+							}
+						});
 						orders.add(order);
 						items.fireTableDataChanged();
 						break;
@@ -362,23 +370,31 @@ public class Gui extends JFrame
 
 		remove.addActionListener(new ActionListener()
 		{
-
 			public void actionPerformed(ActionEvent e)
 			{
 				int row = table.getSelectedRow();
 				if(row >= 0 && row < orders.size())
 				{
-					Order order = (Order)orders.remove(row);
+					final Order order = (Order)orders.remove(row);
 					items.fireTableRowsDeleted(row, row);
-					IGoal[] goals = Gui.this.agent.getGoalbase().getGoals(goalname);
-					for(int i = 0; i < goals.length; i++)
+					agent.getGoalbase().getGoals(goalname).addResultListener(new DefaultResultListener()
 					{
-						if(order.equals(goals[i].getParameter("order").getValue()))
+						public void resultAvailable(Object source, Object result)
 						{
-							goals[i].drop();
-							break;
+							IEAGoal[] goals = (IEAGoal[])result;
+							dropGoal(goals, 0, order);
+							
+//							for(int i = 0; i < goals.length; i++)
+//							{
+//								goals[i].getParameter("order")
+//								if(order.equals(.getValue()))
+//								{
+//									goals[i].drop();
+//									break;
+//								}
+//							}
 						}
-					}
+					});
 				}
 			}
 		});
@@ -392,13 +408,13 @@ public class Gui extends JFrame
 				int row = table.getSelectedRow();
 				if(row >= 0 && row < orders.size())
 				{
-					Order order = (Order)orders.get(row);
+					final Order order = (Order)orders.get(row);
 					edit_dialog.title.setText(order.getTitle());
 					edit_dialog.limit.setText(Integer.toString(order.getLimit()));
 					edit_dialog.start.setText(Integer.toString(order.getStartPrice()));
 					edit_dialog.deadline.setText(dformat.format(order.getDeadline()));
 
-					while(edit_dialog.requestInput(agent.getTime()))
+					while(edit_dialog.requestInput(((IClockService)agent.getServiceContainer().getService(IClockService.class)).getTime()))
 					{
 						try
 						{
@@ -411,18 +427,24 @@ public class Gui extends JFrame
 							order.setStartPrice(start);
 							order.setDeadline(deadline);
 							items.fireTableDataChanged();
-							IGoal[] goals = Gui.this.agent.getGoalbase().getGoals(goalname);
-							for(int i = 0; i < goals.length; i++)
+							
+							agent.getGoalbase().getGoals(goalname).addResultListener(new DefaultResultListener()
 							{
-								if(order.equals(goals[i].getParameter("order").getValue()))
+								public void resultAvailable(Object source, Object result)
 								{
-									goals[i].drop();
-									break;
+									IEAGoal[] goals = (IEAGoal[])result;
+									dropGoal(goals, 0, order);
 								}
-							}
-							IGoal goal = Gui.this.agent.createGoal(goalname);
-							goal.getParameter("order").setValue(order);
-							Gui.this.agent.dispatchTopLevelGoal(goal);
+							});
+							agent.createGoal(goalname).addResultListener(new DefaultResultListener()
+							{
+								public void resultAvailable(Object source, Object result)
+								{
+									IEAGoal goal = (IEAGoal)result;
+									goal.setParameterValue("order", order);
+									agent.dispatchTopLevelGoal(goal);
+								}
+							});
 							break;
 						}
 						catch(NumberFormatException e1)
@@ -450,6 +472,29 @@ public class Gui extends JFrame
 			}
 		});
 	}
+
+	/**
+	 *  Helper method for dropping a goal.
+	 *  @param goals
+	 *  @param num
+	 */
+	protected void dropGoal(final IEAGoal[] goals, final int num, final Order order)
+	{
+		goals[num].getParameterValue("order").addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				if(order.equals(result))
+				{
+					goals[num].drop();
+				}
+				else if(num+1<goals.length)
+				{
+					dropGoal(goals, num+1, order);
+				}
+			}
+		});
+	}
 	
 	//-------- methods --------
 
@@ -458,20 +503,26 @@ public class Gui extends JFrame
 	 */
 	public void refresh()
 	{
-		// Use invoke later as refresh() is called from plan thread.
-		SwingUtilities.invokeLater(new Runnable()
+		agent.getBeliefbase().getBeliefSetFacts("orders").addResultListener(new DefaultResultListener()
 		{
-			public void run()
+			public void resultAvailable(Object source, final Object result)
 			{
-				Order[]	aorders = (Order[])agent.getBeliefbase().getBeliefSet("orders").getFacts();
-				for(int i = 0; i < aorders.length; i++)
+				// Use invoke later as refresh() is called from plan thread.
+				SwingUtilities.invokeLater(new Runnable()
 				{
-					if(!orders.contains(aorders[i]))
+					public void run()
 					{
-						orders.add(aorders[i]);
+						Order[]	aorders = (Order[])result;
+						for(int i = 0; i < aorders.length; i++)
+						{
+							if(!orders.contains(aorders[i]))
+							{
+								orders.add(aorders[i]);
+							}
+						}
+						items.fireTableDataChanged();
 					}
-				}
-				items.fireTableDataChanged();
+				});
 			}
 		});
 	}
@@ -484,17 +535,30 @@ public class Gui extends JFrame
 		int sel = table.getSelectedRow();
 		if(sel!=-1)
 		{
-			Order order = (Order)orders.get(sel);
-			IExpression exp = agent.getExpressionbase().getExpression("search_reports");
-			List res = (List)exp.execute("$order", order);
-//			for(int i=0; i<res.size(); i++)
-//				System.out.println(""+i+res.get(i));
-			
-			while(detailsdm.getRowCount()>0)
-				detailsdm.removeRow(0);
-			for(int i=0; i<res.size(); i++)
-				detailsdm.addRow(new Object[]{res.get(i)});
-				//System.out.println(""+i+res.get(i));
+			final Order order = (Order)orders.get(sel);
+			agent.getExpressionbase().getExpression("search_reports").addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, final Object result)
+				{
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							IEAExpression exp = (IEAExpression)result;
+							
+							List res = (List)exp.execute("$order", order);
+		//					for(int i=0; i<res.size(); i++)
+		//						System.out.println(""+i+res.get(i));
+							
+							while(detailsdm.getRowCount()>0)
+								detailsdm.removeRow(0);
+							for(int i=0; i<res.size(); i++)
+								detailsdm.addRow(new Object[]{res.get(i)});
+								//System.out.println(""+i+res.get(i));
+						}
+					});
+				}
+			});
 		}
 	}
 
