@@ -20,7 +20,7 @@
 	<beliefs>
 		<!-- Environment. -->
 		<belief name="environment" class="ContinuousSpace2D">
- 			<fact>(ContinuousSpace2D)((IApplicationExternalAccess)$scope.getParent()).getSpace("my2dspace")</fact>
+ 			<fact>(ContinuousSpace2D)((IApplicationExternalAccess)$scope.getParent()).getSpace("my2dspace").get(new jadex.commons.ThreadSuspendable(new Object()))</fact>
  		</belief>
  		
  		<!-- Myself. -->

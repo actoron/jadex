@@ -23,7 +23,7 @@
 	<beliefs>
 		<!-- Environment. -->
 		<belief name="env" class="Grid2D">
- 			<fact>(Grid2D)((IApplicationExternalAccess)$scope.getParent()).getSpace("my2dspace")</fact>
+ 			<fact>(Grid2D)((IApplicationExternalAccess)$scope.getParent()).getSpace("my2dspace").get(new jadex.commons.ThreadSuspendable(new Object()))</fact>
  		</belief>
  		
  		<!-- Myself. -->

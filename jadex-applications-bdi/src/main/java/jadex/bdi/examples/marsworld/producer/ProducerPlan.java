@@ -65,7 +65,7 @@ public class ProducerPlan extends Plan
 	 */
 	protected void callCarryAgent(ISpaceObject target)
 	{
-		AGRSpace agrs = (AGRSpace)((IApplicationExternalAccess)getScope().getParent()).getSpace("myagrspace");
+		AGRSpace agrs = (AGRSpace)((IApplicationExternalAccess)getScope().getParent()).getSpace("myagrspace").get(this);
 		Group group = agrs.getGroup("mymarsteam");
 		IComponentIdentifier[]	carriers	= group.getAgentsForRole("carrier");
 		

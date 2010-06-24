@@ -70,7 +70,7 @@ public class CleanerGui	extends JFrame
 					MapPoint[] mps = (MapPoint[])agent.getBeliefbase().getBeliefSetFacts("visited_positions").get(sus);
 					if(query_max_quantity==null)
 						query_max_quantity	= (IEAExpression)agent.getExpressionbase().getExpression("query_max_quantity").get(sus);
-					double max = ((MapPoint)query_max_quantity.execute()).getQuantity();
+					double max = ((MapPoint)query_max_quantity.execute().get(sus)).getQuantity();
 					//int xcnt = ((int[])getBeliefbase().getBelief("???").getFact("raster"))[0];
 					//int ycnt = ((int[])getBeliefbase().getBelief("???").getFact("raster"))[1];
 					int xcnt = ((Integer[])agent.getBeliefbase().getBeliefSetFacts("raster").get(sus))[0].intValue();
@@ -124,9 +124,9 @@ public class CleanerGui	extends JFrame
 					// Draw me additionally.
 					// Get world state from beliefs.
 					IVector2 agentloc = (IVector2)agent.getBeliefbase().getBeliefFact("my_location").get(sus);
-					double	vision	= ((Double)agent.getBeliefbase().getBelief("my_vision").get(sus)).doubleValue();
-					double	charge	= ((Double)agent.getBeliefbase().getBelief("my_chargestate").get(sus)).doubleValue();
-					boolean	waste	= ((ISpaceObject)agent.getBeliefbase().getBelief("myself").get(sus)).getProperty("waste")!=null;
+					double	vision	= ((Double)agent.getBeliefbase().getBeliefFact("my_vision").get(sus)).doubleValue();
+					double	charge	= ((Double)agent.getBeliefbase().getBeliefFact("my_chargestate").get(sus)).doubleValue();
+					boolean	waste	= ((ISpaceObject)agent.getBeliefbase().getBeliefFact("myself").get(sus)).getProperty("waste")!=null;
 	
 					// Paint agent.
 					Point	p	= onScreenLocation(agentloc, bounds);

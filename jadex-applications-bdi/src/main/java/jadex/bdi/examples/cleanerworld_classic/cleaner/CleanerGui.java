@@ -73,8 +73,8 @@ public class CleanerGui	extends JFrame
 					// Paint map points
 					MapPoint[] mps = (MapPoint[])agent.getBeliefbase().getBeliefSetFacts("visited_positions").get(sus);
 					if(query_max_quantity==null)
-						query_max_quantity	= (IEAExpression)agent.getExpressionbase().getExpression("query_max_quantity");
-					double max = ((MapPoint)query_max_quantity.execute()).getQuantity();
+						query_max_quantity	= (IEAExpression)agent.getExpressionbase().getExpression("query_max_quantity").get(sus);
+					double max = ((MapPoint)query_max_quantity.execute().get(sus)).getQuantity();
 					//int xcnt = ((int[])getBeliefbase().getBelief("???").getFact("raster"))[0];
 					//int ycnt = ((int[])getBeliefbase().getBelief("???").getFact("raster"))[1];
 					int xcnt = ((Integer[])agent.getBeliefbase().getBeliefSetFacts("raster").get(sus))[0].intValue();
