@@ -10,7 +10,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
-import jadex.service.IServiceContainer;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -748,13 +747,13 @@ public class FipaMessagePanel extends JPanel
 	protected void setParameter(String name, final Object value)
 	{
 		// Replace empty string with null.
-		Object oval = value==null || value.equals("") ? null : value;
+		final Object oval = value==null || value.equals("") ? null : value;
 		
 		message.getParameter(name).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result) 
 			{
-				((IEAParameter)result).setValue(value);
+				((IEAParameter)result).setValue(oval);
 			}
 		});
 		

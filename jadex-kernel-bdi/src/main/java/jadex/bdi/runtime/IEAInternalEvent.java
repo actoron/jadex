@@ -3,7 +3,7 @@ package jadex.bdi.runtime;
 /**
  * 
  */
-public interface IEAInternalEvent extends IEAElement
+public interface IEAInternalEvent extends IEAParameterElement
 {
 
 }

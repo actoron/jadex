@@ -42,7 +42,6 @@ import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
-import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.javaparser.IExpressionParser;
@@ -775,7 +774,7 @@ public class FlyweightFunctionality
 			OAVBDIRuntimeModel.parameterelement_has_parametersets);
 		if(paramsets!=null)
 		{
-			Object[] oarray = ea? new IEAParameter[paramsets.size()]: new IParameter[paramsets.size()];
+			Object[] oarray = ea? new IEAParameterSet[paramsets.size()]: new IParameterSet[paramsets.size()];
 			int i=0;
 			for(Iterator it=paramsets.iterator(); it.hasNext(); i++)
 			{

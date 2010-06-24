@@ -1,24 +1,17 @@
 package jadex.bdi.runtime.impl.flyweights;
 
-import jadex.bdi.model.OAVBDIMetaModel;
-import jadex.bdi.runtime.IBelief;
-import jadex.bdi.runtime.IBeliefSet;
-import jadex.bdi.runtime.IChangeEvent;
 import jadex.bdi.runtime.IElement;
-import jadex.bdi.runtime.IExpression;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.impl.IFlyweightCreator;
+import jadex.bdi.runtime.impl.eaflyweights.EAParameterFlyweight;
+import jadex.bdi.runtime.impl.eaflyweights.EAParameterSetFlyweight;
+import jadex.bdi.runtime.impl.eaflyweights.EAProcessableElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.rules.state.IOAVState;
-import jadex.rules.state.OAVObjectType;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *  Flyweight for all runtime elements.
@@ -57,7 +50,9 @@ public abstract class ElementFlyweight implements IElement
 		assert !(scope instanceof ElementFlyweight);
 //		if(handle==null && !(this instanceof ParameterFlyweight || this instanceof ParameterSetFlyweight))
 //			Thread.dumpStack();
-		assert handle!=null || this instanceof ParameterFlyweight || this instanceof ParameterSetFlyweight || this instanceof ProcessableElementFlyweight: this;
+		assert handle!=null || this instanceof ParameterFlyweight || this instanceof ParameterSetFlyweight
+			|| this instanceof EAParameterFlyweight || this instanceof EAParameterSetFlyweight
+			|| this instanceof ProcessableElementFlyweight || this instanceof EAProcessableElementFlyweight: this;
 		
 		this.state = state;
 		this.scope = scope;

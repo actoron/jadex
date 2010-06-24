@@ -1,22 +1,26 @@
 package jadex.tools.convcenter;
 
 import jadex.base.DefaultResultListener;
+import jadex.base.SwingDefaultResultListener;
 import jadex.base.fipa.SFipa;
+import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAMessageEvent;
 import jadex.bdi.runtime.IEAParameter;
 import jadex.bdi.runtime.IEAParameterSet;
+import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bridge.ContentException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageType;
 import jadex.bridge.MessageType.ParameterSpecification;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.ISuspendable;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.service.IServiceContainer;
+import jadex.commons.ThreadSuspendable;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.FipaMessagePanel;
 import jadex.tools.common.GuiProperties;
@@ -112,9 +116,9 @@ public class FipaConversationPanel extends JSplitPane
 		this.regmsgs = new ArrayList();
 		
 		// Right side starts with initial send panel only.
-		agent.getEventbase().createMessageEvent("fipamsg").addResultListener(new DefaultResultListener()
+		agent.getEventbase().createMessageEvent("fipamsg").addResultListener(new SwingDefaultResultListener(this)
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
 				IEAMessageEvent	msg	= (IEAMessageEvent)result;
 				msg.setParameterValue(SFipa.SENDER, agent.getComponentIdentifier());
@@ -131,56 +135,54 @@ public class FipaConversationPanel extends JSplitPane
 					{
 						// Hack! For handling conversations.
 						// If no replies are sent sentmessages are 
-						cloneMessage(sendpanel.getMessage()).addResultListener(new DefaultResultListener()
+						cloneMessage(sendpanel.getMessage()).addResultListener(new SwingDefaultResultListener(FipaConversationPanel.this)
 						{
-							public void resultAvailable(Object source, Object result) 
+							public void customResultAvailable(Object source, Object result) 
 							{
 								final IEAMessageEvent msgevent = (IEAMessageEvent)result;
-								
+		
 								MessageType mt = msgevent.getMessageType();
 								String ri = mt.getReceiverIdentifier();
 								ParameterSpecification ris = mt.getParameter(ri);
 								
-								if((ris.isSet() && msgevent.getParameterSet(ri).getValues().length==0)
-									|| (!ris.isSet() && msgevent.getParameter(ri).getValue()==null))
+								// Check if receiver is specified
+								if(ris.isSet())
 								{
-									String text = SUtil.wrapText("Cannot not send message, no receiver specified.");
-									JOptionPane.showMessageDialog(SGUI.getWindowParent(FipaConversationPanel.this), text,
-										"Message Error", JOptionPane.INFORMATION_MESSAGE);
+									msgevent.getParameterSetValues(ri).addResultListener(new SwingDefaultResultListener(FipaConversationPanel.this)
+									{
+										public void customResultAvailable(Object source, Object result)
+										{
+											Object[]	values = (Object[])result;
+											if(values.length==0)
+											{
+												noReceiverSpecified();
+											}
+											else
+											{
+												sendMessage(agent, msgevent);
+											}
+										}
+									});
 								}
 								else
 								{
-									if(msgevent.getParameter(SFipa.CONVERSATION_ID).getValue()!=null
-										|| msgevent.getParameter(SFipa.REPLY_WITH).getValue()!=null)
+									msgevent.getParameterValue(ri).addResultListener(new SwingDefaultResultListener(FipaConversationPanel.this)
 									{
-										agent.getEventbase().registerMessageEvent(msgevent);
-										regmsgs.add(msgevent);
-										
-										/*msgevent.addMessageEventListener(new IMessageEventListener()
+										public void customResultAvailable(Object source, Object result)
 										{
-											public void messageEventReceived(AgentEvent ae)
+											if(result==null)
 											{
-												agent.getEventbase().deregisterMessageEvent(msgevent);
-												msgevent.removeMessageEventListener(this);
+												noReceiverSpecified();
 											}
-											public void messageEventSent(AgentEvent ae)
+											else
 											{
+												sendMessage(agent, msgevent);
 											}
-										});*/
-									}
-									agent.getEventbase().sendMessage(msgevent);
-									((DefaultListModel)sentmsgs.getModel()).addElement(msgevent);
+										}
+									});
 								}
-							};
+							}
 						});
-							
-						// todo
-		//				catch(Exception e)
-		//				{
-		//					String text = SUtil.wrapText("Could not send message: "+e.getMessage());
-		//					JOptionPane.showMessageDialog(SGUI.getWindowParent(FipaConversationPanel.this), text,
-		//						"Message Error", JOptionPane.INFORMATION_MESSAGE);
-		//				}
 					}
 				});
 		
@@ -243,18 +245,12 @@ public class FipaConversationPanel extends JSplitPane
 							{
 								public void actionPerformed(ActionEvent ae)
 								{
-									cloneMessage(msg).addResultListener(new DefaultResultListener()
+									cloneMessage(msg).addResultListener(new SwingDefaultResultListener()
 									{
-										public void resultAvailable(Object source, final Object result) 
+										public void customResultAvailable(Object source, final Object result) 
 										{
-											SwingUtilities.invokeLater(new Runnable()
-											{
-												public void run() 
-												{
-													sendpanel.setMessage((IEAMessageEvent)result);
-													tabs.setSelectedComponent(sendtab);
-												};
-											});
+											sendpanel.setMessage((IEAMessageEvent)result);
+											tabs.setSelectedComponent(sendtab);
 										}
 									});
 									
@@ -474,6 +470,17 @@ public class FipaConversationPanel extends JSplitPane
 	}
 	
 	//-------- methods --------
+
+	/**
+	 *  Show error when no receiver is specified.
+	 */
+	protected void	noReceiverSpecified()
+	{
+		String text = SUtil.wrapText("Cannot not send message, no receiver specified.");
+		JOptionPane.showMessageDialog(SGUI.getWindowParent(FipaConversationPanel.this), text,
+			"Message Error", JOptionPane.INFORMATION_MESSAGE);
+	}
+
 	
 	/**
 	 *  Get the message as a title.
@@ -537,11 +544,19 @@ public class FipaConversationPanel extends JSplitPane
 	 */
 	public void	reset()
 	{
-		resetMessage();
-		setSentMessages(new IEAMessageEvent[0]);
-		setReceivedMessages(new IEAMessageEvent[0]);
-		while(tabs.getTabCount()>1)
-			tabs.removeTabAt(tabs.getTabCount()-1);
+		// Hack!!! Constructor chages thread context from swing to agent and back.
+		// Make sure to call reset() afterwards.
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				resetMessage();
+				setSentMessages(new IEAMessageEvent[0]);
+				setReceivedMessages(new IEAMessageEvent[0]);
+				while(tabs.getTabCount()>1)
+					tabs.removeTabAt(tabs.getTabCount()-1);
+			}
+		});
 	}
 	
 	/**
@@ -620,7 +635,7 @@ public class FipaConversationPanel extends JSplitPane
 									Object[] vals = (Object[])result;
 									for(int j=0; j<vals.length; j++)
 									{
-										clone.addParameterSetValue(paramset.getName(), result);
+										clone.addParameterSetValue(paramset.getName(), vals[j]);
 									}
 									
 									if(last)
@@ -844,10 +859,14 @@ public class FipaConversationPanel extends JSplitPane
 	 */
 	public Properties	getProperties()
 	{
+		if(!SwingUtilities.isEventDispatchThread())
+			throw new RuntimeException("Can only save properties from swing thread");
+		ISuspendable	sus	= new ThreadSuspendable(this);
+			
 		Properties	props	= new Properties();
 		// Save message displayed in message panel.
 		IEAMessageEvent	message	= getMessagePanel().getMessage();
-		String msg = encodeMessage(message);
+		String msg = (String)encodeMessage(message).get(sus);
 		props.addProperty(new Property(ConversationPlugin.LAST_MESSAGE, msg));
 		
 		// Save list of sent messages (limit to 5 messages).
@@ -855,7 +874,7 @@ public class FipaConversationPanel extends JSplitPane
 		Set	saved	= new HashSet();	// Used to avoid duplicates;
 		for(int i=msgs.length-1; i>=0 && saved.size()<5; i--)	// Backward loop to save newest messages.
 		{
-			msg	= encodeMessage(msgs[i]);
+			msg	= (String)encodeMessage(msgs[i]).get(sus);
 			if(!saved.contains(msg))
 			{
 				props.addProperty(new Property(ConversationPlugin.SENT_MESSAGE, msg));
@@ -913,6 +932,67 @@ public class FipaConversationPanel extends JSplitPane
 	}
 	
 	/**
+	 *  Send a message.
+	 * @param agent
+	 * @param msgevent
+	 */
+	protected void sendMessage(final IBDIExternalAccess agent, final IEAMessageEvent msgevent)
+	{
+		// Register message for conversations / replies.
+		msgevent.getParameterValue(SFipa.CONVERSATION_ID).addResultListener(new SwingDefaultResultListener(FipaConversationPanel.this)
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				if(result!=null)
+				{
+					registerMessage(agent, msgevent);
+					agent.getEventbase().sendMessage(msgevent);
+					((DefaultListModel)sentmsgs.getModel()).addElement(msgevent);
+				}
+				else
+				{
+					msgevent.getParameterValue(SFipa.REPLY_WITH).addResultListener(new SwingDefaultResultListener(FipaConversationPanel.this)
+					{
+						public void customResultAvailable(Object source, Object result)
+						{
+							if(result!=null)
+							{
+								registerMessage(agent, msgevent);
+							}
+							agent.getEventbase().sendMessage(msgevent);
+							((DefaultListModel)sentmsgs.getModel()).addElement(msgevent);
+						}
+					});
+				}
+			}
+		});
+	}
+
+	/**
+	 *  Register a message for conversations / replies.
+	 * @param agent
+	 * @param msgevent
+	 */
+	protected void registerMessage(final IBDIExternalAccess agent,
+			final IEAMessageEvent msgevent)
+	{
+		agent.getEventbase().registerMessageEvent(msgevent);
+		regmsgs.add(msgevent);
+		
+		msgevent.addMessageEventListener(new IMessageEventListener()
+		{
+			public void messageEventReceived(AgentEvent ae)
+			{
+				agent.getEventbase().deregisterMessageEvent(msgevent);
+				msgevent.removeMessageEventListener(this);
+			}
+			public void messageEventSent(AgentEvent ae)
+			{
+			}
+		});
+	}
+
+	/**
 	 *  Display messages with performative and content instead of type.
 	 *  This is because the type of messages is always "fipamsg" in the
 	 *  conversation center.
@@ -928,7 +1008,7 @@ public class FipaConversationPanel extends JSplitPane
 				String perf = "n/a";
 				try
 				{
-					perf = (String)msg.getParameterValue(SFipa.PERFORMATIVE);
+					perf = (String)msg.getParameterValue(SFipa.PERFORMATIVE).get(new ThreadSuspendable(this));
 				}
 				catch(Exception e)
 				{
