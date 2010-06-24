@@ -7,11 +7,10 @@ import jadex.application.space.envsupport.environment.space2d.Space2D;
 import jadex.application.space.envsupport.math.IVector1;
 import jadex.application.space.envsupport.math.IVector2;
 import jadex.application.space.envsupport.math.Vector1Double;
+import jadex.base.DefaultResultListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bdi.runtime.IBelief;
-import jadex.bdi.runtime.IBeliefSet;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
@@ -101,12 +100,12 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 					
 					for(int i=0; i<metainfos.length; i++)
 					{
-						IParsedExpression	cond	= metainfos[i].length==2 ? null
+						final IParsedExpression	cond	= metainfos[i].length==2 ? null
 							: (IParsedExpression)getProperty(metainfos[i][2]);
-						SimpleValueFetcher	fetcher	= null;
+						final SimpleValueFetcher fetcher = new SimpleValueFetcher();
 						if(cond!=null)
 						{
-							fetcher	= new SimpleValueFetcher();
+//							fetcher	= new SimpleValueFetcher();
 							fetcher.setValue("$space", space);
 							fetcher.setValue("$percept", percept);
 							fetcher.setValue("$avatar", avatar);
@@ -114,71 +113,189 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 							fetcher.setValue("$aid", agent);
 							fetcher.setValue("$scope", exta);
 						}
+						final String name = metainfos[i][1];
 
 						if(ADD.equals(metainfos[i][0]))
 						{
-							IBeliefSet belset = exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
-							if(cond!=null)
-								fetcher.setValue("$facts", belset.getFacts());
-							if(!belset.containsFact(percept) && (cond==null || evaluate(cond, fetcher)))
+//							IBeliefSet belset = exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
+							
+							exta.getBeliefbase().getBeliefSetFacts(name).addResultListener(new DefaultResultListener()
 							{
-								belset.addFact(percept);
-//								System.out.println("added: "+percept+" to: "+belset);
-							}
+								public void resultAvailable(Object source, Object result)
+								{
+									if(cond!=null)
+										fetcher.setValue("$facts", result);
+									
+									if(!SUtil.arrayContains(result, percept)&& (cond==null || evaluate(cond, fetcher)))
+									{
+										exta.getBeliefbase().addBeliefSetFact(name, percept);
+//										System.out.println("added: "+percept+" to: "+belset);
+									}
+								}
+							});
 						}
 						else if(REMOVE.equals(metainfos[i][0]))
 						{
-							IBeliefSet belset = exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
-							if(cond!=null)
-								fetcher.setValue("$facts", belset.getFacts());
-							if(belset.containsFact(percept) && (cond==null || evaluate(cond, fetcher)))
+							exta.getBeliefbase().getBeliefSetFacts(metainfos[i][1]).addResultListener(new DefaultResultListener()
 							{
-								belset.removeFact(percept);
-//								System.out.println("removed: "+percept+" from: "+belset);
-							}
+								public void resultAvailable(Object source, Object result)
+								{
+									if(cond!=null)
+										fetcher.setValue("$facts", result);
+									
+									if(SUtil.arrayContains(result, percept)&& (cond==null || evaluate(cond, fetcher)))
+									{
+										exta.getBeliefbase().removeBeliefSetFact(name, percept);
+//										System.out.println("added: "+percept+" to: "+belset);
+									}
+								}
+							});
 						}
 						else if(SET.equals(metainfos[i][0]))
 						{
-							IBelief bel = exta.getBeliefbase().getBelief(metainfos[i][1]);
-							if(cond!=null)
-								fetcher.setValue("$fact", bel.getFact());
-							if(cond==null || evaluate(cond, fetcher))
-								bel.setFact(percept);
-//							System.out.println("set: "+percept+" in bel: "+bel);
+							exta.getBeliefbase().getBeliefFact(metainfos[i][1]).addResultListener(new DefaultResultListener()
+							{
+								public void resultAvailable(Object source, Object result)
+								{
+									if(cond!=null)
+										fetcher.setValue("$fact", result);
+									
+									if((cond==null || evaluate(cond, fetcher)))
+									{
+										exta.getBeliefbase().setBeliefFact(name, percept);
+//										System.out.println("added: "+percept+" to: "+belset);
+									}
+								}
+							});
 						}
 						else if(UNSET.equals(metainfos[i][0]))
 						{
-							IBelief bel = exta.getBeliefbase().getBelief(metainfos[i][1]);
-							if(cond!=null)
-								fetcher.setValue("$fact", bel.getFact());
-							if(cond==null || evaluate(cond, fetcher))
-								bel.setFact(null);
-//							System.out.println("unset: "+percept+" in bel: "+bel);
+							exta.getBeliefbase().getBeliefFact(metainfos[i][1]).addResultListener(new DefaultResultListener()
+							{
+								public void resultAvailable(Object source, Object result)
+								{
+									if(cond!=null)
+										fetcher.setValue("$fact", result);
+									
+									if((cond==null || evaluate(cond, fetcher)))
+									{
+										exta.getBeliefbase().setBeliefFact(name, null);
+//										System.out.println("added: "+percept+" to: "+belset);
+									}
+								}
+							});
 						}
 						else if(REMOVE_OUTDATED.equals(metainfos[i][0]) && percept.equals(avatar))
 						{
-							IBeliefSet belset = exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
-							if(cond!=null)
-								fetcher.setValue("$facts", belset.getFacts());
-							if(cond==null || evaluate(cond, fetcher))
+							exta.getBeliefbase().getBeliefSetFacts(metainfos[i][1]).addResultListener(new DefaultResultListener()
 							{
-								IVector1 vision	= getRange(avatar);
-								Space2D	space2d	= (Space2D)space;
-								IVector2	mypos	= (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
-								ISpaceObject[]	known	= (ISpaceObject[])belset.getFacts();
-								Set	seen	= space2d.getNearObjects(mypos, vision);
-								for(int j=0; j<known.length; j++)
+								public void resultAvailable(Object source, Object result)
 								{
-									IVector2	knownpos	= (IVector2)known[j].getProperty(Space2D.PROPERTY_POSITION);
-									// Hack!!! Shouldn't react to knownpos==null
-									if(!seen.contains(known[j]) && (knownpos==null || !vision.less(space2d.getDistance(mypos, knownpos))))
+									if(cond!=null)
+										fetcher.setValue("$facts", result);
+									
+									if((cond==null || evaluate(cond, fetcher)))
 									{
-//										System.out.println("Removing disappeared object: "+percept+", "+known[j]);
-										belset.removeFact(known[j]);
+										IVector1 vision	= getRange(avatar);
+										Space2D	space2d	= (Space2D)space;
+										IVector2	mypos	= (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
+										ISpaceObject[]	known	= (ISpaceObject[])result;
+										Set	seen = space2d.getNearObjects(mypos, vision);
+										for(int j=0; j<known.length; j++)
+										{
+											IVector2	knownpos	= (IVector2)known[j].getProperty(Space2D.PROPERTY_POSITION);
+											// Hack!!! Shouldn't react to knownpos==null
+											if(!seen.contains(known[j]) && (knownpos==null || !vision.less(space2d.getDistance(mypos, knownpos))))
+											{
+//												System.out.println("Removing disappeared object: "+percept+", "+known[j]);
+												exta.getBeliefbase().removeBeliefSetFact(name, known[j]);
+											}
+										}
 									}
 								}
-							}
+							});
 						}
+						
+//						for(int i=0; i<metainfos.length; i++)
+//						{
+//							IParsedExpression	cond	= metainfos[i].length==2 ? null
+//								: (IParsedExpression)getProperty(metainfos[i][2]);
+//							SimpleValueFetcher	fetcher	= null;
+//							if(cond!=null)
+//							{
+//								fetcher	= new SimpleValueFetcher();
+//								fetcher.setValue("$space", space);
+//								fetcher.setValue("$percept", percept);
+//								fetcher.setValue("$avatar", avatar);
+//								fetcher.setValue("$type", type);
+//								fetcher.setValue("$aid", agent);
+//								fetcher.setValue("$scope", exta);
+//							}
+//
+//							if(ADD.equals(metainfos[i][0]))
+//							{
+//								IBeliefSet belset = exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
+//								if(cond!=null)
+//									fetcher.setValue("$facts", belset.getFacts());
+//								if(!belset.containsFact(percept) && (cond==null || evaluate(cond, fetcher)))
+//								{
+//									belset.addFact(percept);
+////									System.out.println("added: "+percept+" to: "+belset);
+//								}
+//							}
+//							else if(REMOVE.equals(metainfos[i][0]))
+//							{
+//								IBeliefSet belset = exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
+//								if(cond!=null)
+//									fetcher.setValue("$facts", belset.getFacts());
+//								if(belset.containsFact(percept) && (cond==null || evaluate(cond, fetcher)))
+//								{
+//									belset.removeFact(percept);
+////									System.out.println("removed: "+percept+" from: "+belset);
+//								}
+//							}
+//							else if(SET.equals(metainfos[i][0]))
+//							{
+//								IBelief bel = exta.getBeliefbase().getBelief(metainfos[i][1]);
+//								if(cond!=null)
+//									fetcher.setValue("$fact", bel.getFact());
+//								if(cond==null || evaluate(cond, fetcher))
+//									bel.setFact(percept);
+////								System.out.println("set: "+percept+" in bel: "+bel);
+//							}
+//							else if(UNSET.equals(metainfos[i][0]))
+//							{
+//								IBelief bel = exta.getBeliefbase().getBelief(metainfos[i][1]);
+//								if(cond!=null)
+//									fetcher.setValue("$fact", bel.getFact());
+//								if(cond==null || evaluate(cond, fetcher))
+//									bel.setFact(null);
+////								System.out.println("unset: "+percept+" in bel: "+bel);
+//							}
+//							else if(REMOVE_OUTDATED.equals(metainfos[i][0]) && percept.equals(avatar))
+//							{
+//								IBeliefSet belset = exta.getBeliefbase().getBeliefSet(metainfos[i][1]);
+//								if(cond!=null)
+//									fetcher.setValue("$facts", belset.getFacts());
+//								if(cond==null || evaluate(cond, fetcher))
+//								{
+//									IVector1 vision	= getRange(avatar);
+//									Space2D	space2d	= (Space2D)space;
+//									IVector2	mypos	= (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
+//									ISpaceObject[]	known	= (ISpaceObject[])belset.getFacts();
+//									Set	seen	= space2d.getNearObjects(mypos, vision);
+//									for(int j=0; j<known.length; j++)
+//									{
+//										IVector2	knownpos	= (IVector2)known[j].getProperty(Space2D.PROPERTY_POSITION);
+//										// Hack!!! Shouldn't react to knownpos==null
+//										if(!seen.contains(known[j]) && (knownpos==null || !vision.less(space2d.getDistance(mypos, knownpos))))
+//										{
+////											System.out.println("Removing disappeared object: "+percept+", "+known[j]);
+//											belset.removeFact(known[j]);
+//										}
+//									}
+//								}
+//							}
 					}
 					
 //					exta.invokeLater(new Runnable()
