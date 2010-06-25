@@ -101,23 +101,14 @@ public class RuntimeManagerPlan extends Plan {
 
 				ContinuousSpace2D space = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace");
 
-				// Hack: Works right now only for ISpaceObjects and only for
-				// single objects not all of that type...
+				// Hack: Works right now only for single objects but not for all
+				// of that type...
 				// Additionally: only one part of the equation can be an
 				// object...
 				if (targetFunct.getObjectSource().getType().equalsIgnoreCase(Constants.ISPACE_OBJECT)) {
-					// ISpaceObject object =
-					// space.getSpaceObjectsByType(targetFunct.getObjectSource().getName())[0];
-					//
-					// SimpleValueFetcher fetcher = new SimpleValueFetcher();
-					// fetcher.setValue("$object",object);
-					// fetcher.setValue("$space", space);
-					//
+
 					// // String expression =
 					// "$object.getProperty(\"ore\") >= 10";
-					// String expression = targetFunct.getFunction();
-					// Object val = SJavaParser.evaluateExpression(expression,
-					// fetcher);
 
 					boolean res = EvaluateExpression.evaluate(space, targetFunct.getFunction(), targetFunct.getObjectSource().getName(), targetFunct.getObjectSource().getType());
 
@@ -127,9 +118,9 @@ public class RuntimeManagerPlan extends Plan {
 						break;
 					}
 				} else {
-					IComponentIdentifier agentIdentifier = AgentMethods.getIComponentIdentifier(space, targetFunct.getObjectSource().getName());					
-					IFuture fut = ((IComponentManagementService) space.getContext().getServiceContainer().getService(IComponentManagementService.class)).getExternalAccess(agentIdentifier);					
-					IExternalAccess exta = (IExternalAccess) fut.get(this);					
+					IComponentIdentifier agentIdentifier = AgentMethods.getIComponentIdentifier(space, targetFunct.getObjectSource().getName());
+					IFuture fut = ((IComponentManagementService) space.getContext().getServiceContainer().getService(IComponentManagementService.class)).getExternalAccess(agentIdentifier);
+					IExternalAccess exta = (IExternalAccess) fut.get(this);
 
 					IOAVState state = ((ElementFlyweight) exta).getState();
 					Object rCapability = ((ElementFlyweight) exta).getScope();
@@ -137,7 +128,7 @@ public class RuntimeManagerPlan extends Plan {
 					// Evaluate condition/expression
 					OAVBDIFetcher fetcher = new OAVBDIFetcher(state, rCapability);
 					boolean res = EvaluateExpression.evaluateExpression(fetcher, targetFunct.getFunction());
-										
+
 					if (res) {
 						System.out.println("#Client:RuntimeManagerPlan# Terminate experiment: Semantic termination condition has been evaluated being true.");
 						// Experiment has reached Target Function. Terminate
@@ -150,32 +141,9 @@ public class RuntimeManagerPlan extends Plan {
 			System.err.println("#RunTimeManagerPlan# Terminate Condition missing " + simConf);
 		}
 
-		// waitFor(3000);
 
-		// while (true) {
-		// waitFor(1000);
-		// ContinuousSpace2D space = (ContinuousSpace2D) getExternalAccess()
-		// .getApplicationContext().getSpace("my2dspace");
-		// ISpaceObject object = space.getSpaceObjectsByType("homebase")[0];
-		// Integer ore = (Integer) object.getProperty("ore");
-		// Long missiontime = (Long) object.getProperty("missiontime");
-		// System.out.println("Trace: " + ore + " - " + missiontime);
-		// long currentTime = System.currentTimeMillis();
-		// Long.valueOf(currentTime);
-		// if (missiontime.compareTo(Long.valueOf(currentTime)) <= 0) {
-		// break;
-		// }
-		// }
-
-		// getTerminationTime(1);
-		// waitFor(getTerminationTime(1).longValue());
-		// getPlanbase().getPlans("start_observer")[0].abortPlan();
-		//
-		// System.out.println("Simulation Finished....");
 		// Stop Siumlation when target condition true.
 		IServiceContainer container = getExternalAccess().getServiceContainer();
-		// IExecutionService exeServ = (IExecutionService) container
-		// .getService(IExecutionService.class);
 		ISimulationService simServ = (ISimulationService) container.getService(ISimulationService.class);
 		// waitFor(5000);
 		// simServ.pause();
@@ -196,26 +164,6 @@ public class RuntimeManagerPlan extends Plan {
 		// getExternalAccess().getApplicationContext().killComponent(null);
 
 	}
-
-	// private void startApp() {
-	// IServiceContainer container = getExternalAccess()
-	// .getApplicationContext().getServiceContainer();
-	// String appName = "CleanerWorldSpace";
-	// String fileName =
-	// "..\\jadex-applications-bdi\\target\\classes\\jadex\\bdi\\examples\\cleanerworld\\CleanerWorld.application.xml";
-	// String configName = "One cleaner";
-	// Map args = new HashMap();
-	//
-	// try {
-	// SComponentFactory.createApplication(container, appName, fileName,
-	// configName, args);
-	// } catch (Exception e) {
-	// // JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this),
-	// // "Could not start application: "+e,
-	// // "Application Problem", JOptionPane.INFORMATION_MESSAGE);
-	// System.out.println("Could not start application...." + e);
-	// }
-	// }
 
 	private void sendResult() {
 		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
@@ -240,15 +188,9 @@ public class RuntimeManagerPlan extends Plan {
 		} catch (Exception e) {
 			System.out.println("#RuntimeManagerPlan# Error on sending result message to Master Simulation Manager");
 		}
-
-		// IMessageEvent mevent = createMessageEvent("inform_target");
-		// mevent.getParameterSet(SFipa.RECEIVERS).addValues(sentries);
-		// mevent.getParameter(SFipa.CONTENT).setValue(target);
-		// sendMessage(mevent);
 	}
 
 	private IComponentIdentifier getMasterAgent() {
-		// System.out.println("Searching dealer...");
 		// Create a service description to search for.
 		IDF df = (IDF) getScope().getServiceContainer().getService(IDF.class);
 		IDFServiceDescription sd = df.createDFServiceDescription("master_simulation_agent", null, null);
@@ -269,12 +211,7 @@ public class RuntimeManagerPlan extends Plan {
 			// at least one matching component found,
 			getLogger().info(result.length + " master simulation agent found");
 
-			// choose one dealer randomly out of all the dealer-agents
-			// IComponentIdentifier dealer = result[new
-			// Random().nextInt(result.length)].getName();
 			IComponentIdentifier masterAgent = result[0].getName();
-			// System.out.println("Found Simulation Master Agent: "
-			// + masterAgent.getName());
 			return masterAgent;
 		}
 		return null;
@@ -285,20 +222,7 @@ public class RuntimeManagerPlan extends Plan {
 	 */
 	private void init() {
 
-		// final IClockService clockservice =
-		// (IClockService)container.getService(IClockService.class);
-
-		// ContinuousSpace2D space = (ContinuousSpace2D)
-		// ((IApplicationExternalAccess)
-		// getScope().getParent()).getSpace("my2dspace");
-
 		IClockService clockservice = (IClockService) getScope().getServiceContainer().getService(IClockService.class);
-		// long clockService = clockservice.getTime();
-		// long systemTime = new Long(System.currentTimeMillis());
-
-		// System.out.println("***********************************************************"
-		// + clockService + " - " + systemTime);
-
 		Map facts = (Map) getBeliefbase().getBelief("simulationFacts").getFact();
 		facts.put(Constants.EXPERIMENT_START_TIME, new Long(clockservice.getTime()));
 		getBeliefbase().getBelief("simulationFacts").setFact(facts);
