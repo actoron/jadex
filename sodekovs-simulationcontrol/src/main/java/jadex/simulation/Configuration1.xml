@@ -115,8 +115,9 @@
 			<TerminateCondition>
 				<!-- <Time value="5000" type="relative" /> -->
 				<!-- Hack: Terminate Condition does not work for BDIAgents and for more than one object yet.-->
-				<TargetFunction function="$object.getProperty(&quot;ore&quot;) >= 10">
-					<ObjectSource type="ISpaceObject" name="homebase" />
+				<!-- <TargetFunction function="$object.getProperty(&quot;ore&quot;) >= 10"> -->
+				<TargetFunction function="$beliefbase.tmpCounter>= 13">
+					<ObjectSource type="BDI_AGENT" name="Sentry" />
 				</TargetFunction>
 			</TerminateCondition>
 		</Rows>

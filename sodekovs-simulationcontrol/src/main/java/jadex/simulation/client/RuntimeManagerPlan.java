@@ -1,7 +1,6 @@
 package jadex.simulation.client;
 
 import jadex.application.runtime.IApplicationExternalAccess;
-import jadex.application.space.envsupport.environment.ISpaceObject;
 import jadex.application.space.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.base.ISimulationService;
 import jadex.base.fipa.IDF;
@@ -11,13 +10,18 @@ import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.bdi.runtime.impl.ElementFlyweight;
+import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
-import jadex.javaparser.SJavaParser;
-import jadex.javaparser.SimpleValueFetcher;
+import jadex.bridge.IExternalAccess;
+import jadex.commons.IFuture;
+import jadex.rules.state.IOAVState;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
+import jadex.simulation.helper.AgentMethods;
 import jadex.simulation.helper.Constants;
+import jadex.simulation.helper.EvaluateExpression;
 import jadex.simulation.helper.TimeConverter;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.TargetFunction;
@@ -56,8 +60,6 @@ public class RuntimeManagerPlan extends Plan {
 
 		// TEST
 		ContinuousSpace2D spaceTMP = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace");
-		// IExecutionService exeservice = (IExecutionService)
-		// space.getContext().getServiceContainer().getService(IExecutionService.class);
 		IServiceContainer exeservice = spaceTMP.getContext().getServiceContainer();
 		// DeltaTimeExecutor4Simulation exeservice =
 		// (DeltaTimeExecutor4Simulation)
@@ -99,46 +101,48 @@ public class RuntimeManagerPlan extends Plan {
 
 				ContinuousSpace2D space = (ContinuousSpace2D) ((IApplicationExternalAccess) getScope().getParent()).getSpace("my2dspace");
 
-				//Hack: Works right now only for ISpaceObjects and only for single objects not all of that type...
+				// Hack: Works right now only for ISpaceObjects and only for
+				// single objects not all of that type...
+				// Additionally: only one part of the equation can be an
+				// object...
 				if (targetFunct.getObjectSource().getType().equalsIgnoreCase(Constants.ISPACE_OBJECT)) {
-					ISpaceObject object = space.getSpaceObjectsByType(targetFunct.getObjectSource().getName())[0];
-//					Integer ore = (Integer) object.getProperty("ore");
+					// ISpaceObject object =
+					// space.getSpaceObjectsByType(targetFunct.getObjectSource().getName())[0];
+					//
+					// SimpleValueFetcher fetcher = new SimpleValueFetcher();
+					// fetcher.setValue("$object",object);
+					// fetcher.setValue("$space", space);
+					//
+					// // String expression =
+					// "$object.getProperty(\"ore\") >= 10";
+					// String expression = targetFunct.getFunction();
+					// Object val = SJavaParser.evaluateExpression(expression,
+					// fetcher);
 
-					// **********************TEST**********************
-					SimpleValueFetcher fetcher = new SimpleValueFetcher();
-					fetcher.setValue("$object",object);
-					fetcher.setValue("$space", space);
+					boolean res = EvaluateExpression.evaluate(space, targetFunct.getFunction(), targetFunct.getObjectSource().getName(), targetFunct.getObjectSource().getType());
 
-//					String expression = "$object.getProperty(\"ore\") >= 10";
-					String expression = targetFunct.getFunction();
-					Object val = SJavaParser.evaluateExpression(expression, fetcher);
-
-					if (val instanceof Boolean) {
-						if ((Boolean) val) {
-							System.out.println("#Client:RuntimeManagerPlan# Terminate experiment: Semantic termination condition has been evaluated being true.");
-							// Experiment has reached Target Function. Terminate
-							break;
-						}
-					} else {
-						System.err.println("#Client:RuntimeManagerPlan# Could not evaluate semantic termination condition due invalid expression: " + val);
+					if (res) {
+						System.out.println("#Client:RuntimeManagerPlan# Terminate experiment: Semantic termination condition has been evaluated being true.");
+						// Experiment has reached Target Function. Terminate
+						break;
 					}
-					// **********************TEST**********************
-
-					// if (ore.intValue() == 55) {
-					// Experiment has reached Target Function. Terminate
-					// break;
-					// }
-					// long currentTime = System.currentTimeMillis();
-					// Long.valueOf(currentTime);
-					// if (missiontime.compareTo(Long.valueOf(currentTime)) <=
-					// 0) {
-					// Long missiontime = (Long)
-					// object.getProperty("missiontime");
-					// break;
-					// }
 				} else {
-					System.err.println("#RunTimeManagerPlan# Terminate Condition for BDIAgents can not be evaluated right now " + targetFunct);
-					break;
+					IComponentIdentifier agentIdentifier = AgentMethods.getIComponentIdentifier(space, targetFunct.getObjectSource().getName());					
+					IFuture fut = ((IComponentManagementService) space.getContext().getServiceContainer().getService(IComponentManagementService.class)).getExternalAccess(agentIdentifier);					
+					IExternalAccess exta = (IExternalAccess) fut.get(this);					
+
+					IOAVState state = ((ElementFlyweight) exta).getState();
+					Object rCapability = ((ElementFlyweight) exta).getScope();
+
+					// Evaluate condition/expression
+					OAVBDIFetcher fetcher = new OAVBDIFetcher(state, rCapability);
+					boolean res = EvaluateExpression.evaluateExpression(fetcher, targetFunct.getFunction());
+										
+					if (res) {
+						System.out.println("#Client:RuntimeManagerPlan# Terminate experiment: Semantic termination condition has been evaluated being true.");
+						// Experiment has reached Target Function. Terminate
+						break;
+					}
 				}
 			}
 

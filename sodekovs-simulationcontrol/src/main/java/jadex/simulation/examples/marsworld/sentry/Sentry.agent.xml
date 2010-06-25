@@ -22,13 +22,13 @@
 		<import>jadex.bdi.examples.marsworld.movement.*</import>
 		<!-- <import>jadex.bdi.examples.marsworld.movement.MoveTask</import> -->
 		<import>jadex.bdi.examples.marsworld.sentry.*</import>
-		<!-- <import>jadex.bdi.examples.marsworld.sentry.AnalyzeTargetTask</import> -->
+		<!-- <import>jadex.bdi.examples.marsworld.sentry.AnalyzeTargetTask</import>-->
 	</imports>
 
 	<capabilities>
 		<!-- Include the move capability as move for basic movement. -->
 		<capability name="move" file="Movement" />
-		<!-- <capability name="transcap" file="jadex/bdi/tutorial/TranslationD1.capability.xml"/> -->
+		<!-- <capability name="transcap" file="jadex/bdi/tutorial/TranslationD1.capability.xml"/>-->
 	</capabilities>
 
 	<beliefs>
@@ -41,14 +41,18 @@
 		<belief name="myPos" class="Vector2Double" evaluationmode="push">
 			<fact language="jcl">$beliefbase.myself.position</fact>
 		</belief>		
-				
+		
+		<!--  TMP: Counter -->
+		<belief name="tmpCounter" class="int">
+			<fact>0</fact>
+		</belief>				
 		
 		<!-- The seen targets. -->
 		<beliefsetref name="my_targets">
 			<concrete ref="move.my_targets"/>
 		</beliefsetref>
 
-		<!-- Missionend belief is used in drop condition of analyze target goal. -->
+		<!-- Missionend belief is used in drop condition of analyze target goal.-->
 		<beliefref name="missionend">
 			<concrete ref="move.missionend"/>
 		</beliefref>		
@@ -58,7 +62,7 @@
 		<!-- Analyze a target.-->
 		<achievegoal name="analyze_target" retry="false">
 			<!-- The parameter target is bound to one
-				of the facts in the belief my_targets. -->
+				of the facts in the belief my_targets.-->
 			<parameter name="target" class="ISpaceObject">
 <!-- 					// Hack!!! Condition can also match target object from message
 					// $beliefbase.environment.getTarget($target.getId())
@@ -69,7 +73,7 @@
 			</parameter>
 			<unique/>
 			<!-- Create a new goal when a target was added
-				and the mission is going on. -->
+				and the mission is going on.-->
 			<creationcondition language="jcl">
 				//!$beliefbase.missionend &amp;&amp;
 				ISpaceObject $target &amp;&amp;
@@ -125,7 +129,7 @@
  
 				// ?rgoal	= (goal (parameterelement_has_parameters["target"].parameter_has_value ?target))
 				// (beliefset (element_has_model.melement_has_name "analysed_targets") (beliefset_has_facts contains ?target))
- 			</targetcondition> -->
+ 			</targetcondition>-->
 		</achievegoal>
 	</goals>
 
@@ -148,11 +152,16 @@
 				<messageevent ref="target_inform"/>
 			</trigger>
 		</plan>
+		
+		<!-- TMP: Counter. -->
+		<plan name="tmpCounterPlan">
+			<body class="CounterPlan"/>			
+		</plan>
 	</plans>
 
 	<events>
 		<!-- Other agents inform the sentries about discovered
-			potential ore resources. -->
+			potential ore resources.-->
 		<messageevent name="target_inform" type="fipa" direction="receive">
 			<parameter name="performative" class="String" direction="fixed">
 				<value>SFipa.INFORM</value>
@@ -174,8 +183,11 @@
 		<configuration name="default">
 			<goals>
 				<!-- Create a goal for walking around. -->
-				<initialgoal ref="move.walk_around"/>
+				<initialgoal ref="move.walk_around"/>				
 			</goals>
+			<plans>
+			<initialplan ref="tmpCounterPlan"/>
+			</plans>			
 		</configuration>
 	</configurations>
 </agent>

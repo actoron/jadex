@@ -34,11 +34,7 @@
 		<belief name="simulationFacts" class="Map">
 			<fact>new HashMap()</fact>
 		</belief>
-
-		<belief name="msg" class="String" exported="true">
-			<fact>"Welcome to Jadex."</fact>
-		</belief>
-
+		
 		<belief name="observedEventsMap" class="HashMap">
 			<fact>new HashMap()</fact>
 		</belief>
