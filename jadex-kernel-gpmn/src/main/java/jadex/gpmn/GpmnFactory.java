@@ -10,6 +10,7 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.gpmn.model2.MGpmnModel;
 import jadex.service.IService;
@@ -20,6 +21,7 @@ import jadex.service.library.ILibraryServiceListener;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -64,6 +66,9 @@ public class GpmnFactory implements IComponentFactory, IService
 	/** The properties. */
 	protected Map properties;
 	
+	/** The library service. */
+	protected ILibraryService libservice;
+	
 	//-------- constructors --------
 	
 	/**
@@ -77,15 +82,21 @@ public class GpmnFactory implements IComponentFactory, IService
 		this.legacyconverter = new GpmnBDIConverter();
 		this.converter = new GpmnBDIConverter2();
 		
-		for(Iterator it=container.getServices(IComponentFactory.class).iterator(); 
-			it.hasNext() && factory==null; )
+		container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
 		{
-			IComponentFactory tmp = (IComponentFactory)it.next();
-			if(tmp instanceof BDIAgentFactory)
-				this.factory = (BDIAgentFactory)tmp;
-		}
-		if(factory == null)
-			throw new RuntimeException("No bdi agent factory found.");
+			public void resultAvailable(Object source, Object result)
+			{
+				Collection facts = (Collection)result;
+				for(Iterator it=facts.iterator(); it.hasNext() && factory==null; )
+				{
+					IComponentFactory tmp = (IComponentFactory)it.next();
+					if(tmp instanceof BDIAgentFactory)
+						factory = (BDIAgentFactory)tmp;
+				}
+				if(factory == null)
+					throw new RuntimeException("No bdi agent factory found.");
+			}
+		});
 	}
 	
 	//-------- methods --------
@@ -129,21 +140,27 @@ public class GpmnFactory implements IComponentFactory, IService
 //		long startup = System.currentTimeMillis() - starttime;
 //		((Platform)container).getLogger().info("Platform startup time: " + startup + " ms.");
 		
-		final ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
-		loader.setClassLoader(libservice.getClassLoader());
-		ILibraryServiceListener lsl = new ILibraryServiceListener()
+		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
-			public void urlAdded(URL url)
+			public void resultAvailable(Object source, Object result)
 			{
+				libservice = (ILibraryService)result;
 				loader.setClassLoader(libservice.getClassLoader());
+				ILibraryServiceListener lsl = new ILibraryServiceListener()
+				{
+					public void urlAdded(URL url)
+					{
+						loader.setClassLoader(libservice.getClassLoader());
+					}
+					
+					public void urlRemoved(URL url)
+					{
+						loader.setClassLoader(libservice.getClassLoader());
+					}
+				};
+				libservice.addLibraryServiceListener(lsl);
 			}
-			
-			public void urlRemoved(URL url)
-			{
-				loader.setClassLoader(libservice.getClassLoader());
-			}
-		};
-		libservice.addLibraryServiceListener(lsl);
+		});
 	}
 	
 	/**
@@ -168,7 +185,7 @@ public class GpmnFactory implements IComponentFactory, IService
 		ILoadableComponentModel ret = null;
 		try
 		{
-			ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
+//			ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 			ClassLoader	cl = libservice.getClassLoader();
 			ResourceInfo rinfo = SUtil.getResourceInfo0(model, cl);
 			BufferedReader br = new BufferedReader(new InputStreamReader(rinfo.getInputStream()));
@@ -279,7 +296,7 @@ public class GpmnFactory implements IComponentFactory, IService
 	 */
 	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
 	{
-		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
+//		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 		
 		//MGpmnModel gmodel = (MGpmnModel)model;
 		OAVAgentModel amodel = null;

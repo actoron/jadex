@@ -1,5 +1,8 @@
 package jadex.service;
 
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 
 import java.util.Collection;
@@ -36,18 +39,42 @@ public class HierarchicalServiceContainer extends BasicServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding platform services.
 	 */
-	public Collection getServices(Class type)
+	public IFuture getServices(final Class type)
 	{
-		Collection	ret	= parent!=null? parent.getServices(type): null;
+		final Future ret = new Future();
 		
-		if(ret==null || ret.size()==0)
+		if(parent!=null)
 		{
+			parent.getServices(type).addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					Collection res = (Collection)result;
+					
+					if(res==null || res.size()==0)
+					{
+						Map tmp = getServiceMap(type);
+						if(tmp != null)
+							res	= tmp.values();
+						else
+							res	= Collections.EMPTY_SET;
+				//			throw new RuntimeException("No services found of type: " + type);
+					}
+					
+					ret.setResult(res);
+				}
+			});
+		}
+		else
+		{
+			Collection res;
 			Map tmp = getServiceMap(type);
 			if(tmp != null)
-				ret	= tmp.values();
+				res	= tmp.values();
 			else
-				ret	= Collections.EMPTY_SET;
+				res	= Collections.EMPTY_SET;
 	//			throw new RuntimeException("No services found of type: " + type);
+			ret.setResult(res);
 		}
 		
 		return ret;
@@ -58,18 +85,40 @@ public class HierarchicalServiceContainer extends BasicServiceContainer
 	 *  @param name The name.
 	 *  @return The corresponding platform service.
 	 */
-	public Object getService(Class type, String name)
+	public IFuture getService(final Class type, final String name)
 	{
-		Object ret = parent!=null? parent.getService(type, name): null;
-
-		if(ret==null)
+		final Future ret = new Future();
+		
+		if(parent!=null)
 		{
+			parent.getService(type, name).addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					Object res = result;
+					
+					if(result==null)
+					{
+						Map tmp = getServiceMap(type);
+						if(tmp != null)
+							res = tmp.get(name);
+				//		if(ret == null)
+				//			throw new RuntimeException("Service not found");
+					}
+					
+					ret.setResult(res);
+				}
+			});
+		}
+		else
+		{
+			Object res = null; 
 			Map tmp = getServiceMap(type);
 			if(tmp != null)
-			 ret = tmp.get(name);
-	//		if(ret == null)
-	//			throw new RuntimeException("Service not found");
+				res = tmp.get(name);
+			ret.setResult(res);
 		}
+		
 		return ret;
 	}
 
@@ -78,18 +127,41 @@ public class HierarchicalServiceContainer extends BasicServiceContainer
 	 *  @param type The type.
 	 *  @return The corresponding platform service.
 	 */
-	public Object getService(Class type)
+	public IFuture getService(final Class type)
 	{
-		Object ret = parent!=null? parent.getService(type): null;
-
-		if(ret==null)
+		final Future ret = new Future();
+		
+		if(parent!=null)
 		{
+			parent.getService(type).addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					Object res = null;
+					if(ret==null)
+					{
+						Map tmp = getServiceMap(type);
+						if(tmp != null && !tmp.isEmpty())
+							res = tmp.values().iterator().next();
+				//		if(ret == null)
+				//			throw new RuntimeException("Service not found");
+					}
+					
+					ret.setResult(res);
+				}
+			});
+		}
+		else
+		{
+			Object res = null;
 			Map tmp = getServiceMap(type);
 			if(tmp != null && !tmp.isEmpty())
-				ret = tmp.values().iterator().next();
+				res = tmp.values().iterator().next();
 	//		if(ret == null)
 	//			throw new RuntimeException("Service not found");
+			ret.setResult(res);
 		}
+		
 		return ret;
 	}
 	

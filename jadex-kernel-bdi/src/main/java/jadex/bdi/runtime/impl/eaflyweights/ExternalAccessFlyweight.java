@@ -1127,7 +1127,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 *  @param type The type.
 	 *  @return The corresponding service.
 	 */
-	public Object getService(final Class type)
+	public IFuture getService(final Class type)
 	{
 		if(getInterpreter().isExternalThread())
 		{
@@ -1139,7 +1139,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 					object = sp.getService(type);
 				}
 			};
-			return invoc.object;
+			return (IFuture)invoc.object;
 		}
 		else
 		{
@@ -1182,7 +1182,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public Collection getServices(final Class type)
+	public IFuture getServices(final Class type)
 	{
 		if(getInterpreter().isExternalThread())
 		{
@@ -1194,7 +1194,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 					object = sp.getServices(type);
 				}
 			};
-			return (Collection)invoc.object;
+			return (IFuture)invoc.object;
 		}
 		else
 		{
@@ -1208,7 +1208,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 *  @param name The name.
 	 *  @return The corresponding service.
 	 */
-	public Object getService(final Class type, final String name)
+	public IFuture getService(final Class type, final String name)
 	{
 		if(getInterpreter().isExternalThread())
 		{
@@ -1220,7 +1220,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 					object = sp.getService(type, name);
 				}
 			};
-			return (Collection)invoc.object;
+			return (IFuture)invoc.object;
 		}
 		else
 		{
@@ -1233,7 +1233,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 *  Get the available service types.
 	 *  @return The service types.
 	 */
-	public Class[] getServicesTypes()
+	public IFuture getServicesTypes()
 	{
 		if(getInterpreter().isExternalThread())
 		{
@@ -1245,7 +1245,7 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 					object = sp.getServicesTypes();
 				}
 			};
-			return (Class[])invoc.object;
+			return (IFuture)invoc.object;
 		}
 		else
 		{

@@ -3,6 +3,8 @@ package jadex.tools.starter;
 import jadex.base.SComponentFactory;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.tools.common.CombiIcon;
 import jadex.tools.common.modeltree.DefaultNodeFunctionality;
 import jadex.tools.common.modeltree.DirNode;
@@ -177,70 +179,87 @@ public class StarterNodeFunctionality extends DefaultNodeFunctionality
 //			System.out.println("Check: "+node.getToolTipText());
 			if(node instanceof FileNode)
 			{
-				FileNode fn = (FileNode)node;
+				final FileNode fn = (FileNode)node;
 				Boolean	val	= (Boolean)fn.getProperties().get(VALID);
-				boolean	oldvalid	= val==null || val.booleanValue();
-				boolean	newvalid	= false;
+				final boolean	oldvalid	= val==null || val.booleanValue();
+//				final boolean	newvalid	= false;
 				
 				// Check directory.
 				if(node instanceof DirNode)
 				{
-					newvalid	= true;
+					boolean newvalid	= true;
 					List	children	= getChildren(fn);
 					for(int i=0; newvalid && children!=null && i<children.size(); i++)
 					{
 						newvalid	= isValid((IExplorerTreeNode)children.get(i));
 					}
+					
+					renew(fn, oldvalid, newvalid);
 				}
 				
 				// Check file.
 				else
 				{
-					String	file	= fn.getFile().getAbsolutePath();
-					try
+					final String	file	= fn.getFile().getAbsolutePath();
+					
+					SComponentFactory.isLoadable(jcc.getServiceContainer(), file).addResultListener(new DefaultResultListener()
 					{
-//						if(jcc.getComponent().getPlatform().getComponentFactory().isLoadable(file))
-						if(SComponentFactory.isLoadable(jcc.getServiceContainer(), file))
+						public void resultAvailable(Object source, Object result)
 						{
-//							ILoadableElementModel model = jcc.getComponent().getPlatform().getComponentFactory().loadModel(file);
-							ILoadableComponentModel model = SComponentFactory.loadModel(jcc.getServiceContainer(), file);
-							if(model!=null)
+							if(((Boolean)result).booleanValue())
 							{
-								newvalid	= model.getReport().isEmpty();
+								SComponentFactory.loadModel(jcc.getServiceContainer(), file).addResultListener(new SwingDefaultResultListener()
+								{
+									public void customResultAvailable(Object source, Object result)
+									{
+										boolean newvalid = false;
+										ILoadableComponentModel model = (ILoadableComponentModel)result;
+										if(model!=null)
+										{
+											newvalid	= model.getReport().isEmpty();
+										}
+										
+										renew(fn, oldvalid, newvalid);
+									}
+									
+									public void customExceptionOccurred(Object source, Exception exception)
+									{
+										renew(fn, oldvalid, false);
+									}
+								});
+							}
+							else
+							{
+								renew(fn, oldvalid, false);
 							}
 						}
-//						else if(jcc.getComponent().getPlatform().getApplicationFactory().isLoadable(file))
-//						{
-//							ILoadableElementModel model = jcc.getComponent().getPlatform().getApplicationFactory().loadModel(file);
-//							if(model!=null)
-//							{
-//								newvalid	= model.getReport().isEmpty();
-//							}
-//						}
-						// else unknown jadex file type -> ignore.
-					}
-					catch(Exception e)
-					{
-						System.err.println("Error checking: "+node.getToolTipText());
-//							e.printStackTrace();
-						newvalid	= false;
-					}
+					});
 				}
-				
-				fn.getProperties().put(VALID, new Boolean(newvalid));	// Add always, because old value could be null.
-				fn.getProperties().put(VALID_DATE, new Date());
-				if(oldvalid!=newvalid)
+			}
+		}
+		
+		/**
+		 * 
+		 * @param fn
+		 * @param oldtest
+		 * @param newtest
+		 */
+		protected void renew(FileNode fn, boolean oldvalid, boolean newvalid)
+		{
+			fn.getProperties().put(VALID, new Boolean(newvalid));	// Add always, because old value could be null.
+			fn.getProperties().put(VALID_DATE, new Date());
+			if(oldvalid!=newvalid)
+			{
+				if(node.getParent() instanceof DirNode)
+					childrenChanged((DirNode) node.getParent());
 				{
-					if(node.getParent() instanceof DirNode)
-						childrenChanged((DirNode) node.getParent());
-					
 					SwingUtilities.invokeLater(new Runnable()
 					{
 						public void run()
 						{
 							((ModelExplorerTreeModel)explorer.getModel()).fireNodeChanged(node);
 						}
-					});	
+					});
 				}
 			}
 		}

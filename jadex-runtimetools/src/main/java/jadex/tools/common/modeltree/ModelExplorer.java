@@ -6,6 +6,7 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.TreeExpansionHandler;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IThreadPool;
@@ -660,7 +661,7 @@ public class ModelExplorer extends JTree
 //		String[] filetypes = (String[])SUtil.joinArrays(ft1, ft2);
 //		
 		
-		Collection facts = container.getServices(IComponentFactory.class);
+		Collection facts = (Collection)container.getServices(IComponentFactory.class).get(new ThreadSuspendable());
 		
 		if(facts!=null)
 		{
@@ -719,7 +720,8 @@ public class ModelExplorer extends JTree
 						public boolean accept(File file)
 						{
 							return file.isDirectory() 
-								|| SComponentFactory.isLoadable(container, file.getAbsolutePath());
+								|| ((Boolean)SComponentFactory.isLoadable(
+									container, file.getAbsolutePath()).get(new ThreadSuspendable())).booleanValue();
 						}
 					};
 				}

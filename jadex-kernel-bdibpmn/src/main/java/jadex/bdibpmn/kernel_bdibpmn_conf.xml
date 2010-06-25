@@ -25,7 +25,7 @@
 					new Object[]
 					{
 						new jadex.base.fipa.FIPAMessageType(), 
-						new jadex.bdi.runtime.impl.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class)),
+						new jadex.bdi.runtime.impl.JavaStandardPlanExecutor($platform.getService(jadex.service.threadpool.ThreadPoolService.class).get(new jadex.commons.ThreadSuspendable())),
 						new java.lang.Long(10000),
 						Boolean.TRUE,
 						new jadex.bdibpmn.BpmnPlanExecutor($platform),

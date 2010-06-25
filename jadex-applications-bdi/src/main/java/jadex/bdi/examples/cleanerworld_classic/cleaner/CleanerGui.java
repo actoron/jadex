@@ -60,7 +60,7 @@ public class CleanerGui	extends JFrame
 	
 					// As paint components is called on swing thread there is no chance to use
 					// callbacks. Instead blocking calls are used.
-					ThreadSuspendable sus = new ThreadSuspendable(new Object());
+					ThreadSuspendable sus = new ThreadSuspendable();
 					
 					// Get world state from beliefs.
 					boolean	daytime	= ((Boolean)agent.getBeliefbase().getBeliefFact("daytime").get(sus)).booleanValue();

@@ -15,6 +15,14 @@ public class ThreadSuspendable implements ISuspendable
 	/**
 	 *  Create a new suspendable.
 	 */
+	public ThreadSuspendable()
+	{
+		this(new Object());
+	}
+	
+	/**
+	 *  Create a new suspendable.
+	 */
 	public ThreadSuspendable(Object monitor)
 	{
 		this.monitor = monitor;

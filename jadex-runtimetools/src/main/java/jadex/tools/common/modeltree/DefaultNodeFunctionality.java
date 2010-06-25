@@ -2,6 +2,7 @@ package jadex.tools.common.modeltree;
 
 import jadex.base.SComponentFactory;
 import jadex.commons.SGUI;
+import jadex.commons.ThreadSuspendable;
 import jadex.tools.common.plugin.IControlCenter;
 
 import java.io.File;
@@ -176,16 +177,16 @@ public class	DefaultNodeFunctionality
 				
 //				IAgentFactory agfac = jcc.getAgent().getPlatform().getAgentFactory();
 //				String	type = agfac.getFileType(fn.getFile().getAbsolutePath());
-				String type = SComponentFactory.getFileType(jcc.getServiceContainer(), fn.getFile().getAbsolutePath());
+				String type = (String)SComponentFactory.getFileType(jcc.getServiceContainer(), fn.getFile().getAbsolutePath()).get(new ThreadSuspendable());
 				if(type!=null)
-					icon = SComponentFactory.getFileTypeIcon(jcc.getServiceContainer(), type);
+					icon = (Icon)SComponentFactory.getFileTypeIcon(jcc.getServiceContainer(), type).get(new ThreadSuspendable());
 				
 				if(icon==null)
 				{
 //					IApplicationFactory apfac = jcc.getAgent().getPlatform().getApplicationFactory();
-					type = SComponentFactory.getFileType(jcc.getServiceContainer(), fn.getFile().getAbsolutePath());
+					type = (String)SComponentFactory.getFileType(jcc.getServiceContainer(), fn.getFile().getAbsolutePath()).get(new ThreadSuspendable());
 					if(type!=null)
-						icon = SComponentFactory.getFileTypeIcon(jcc.getServiceContainer(), type);
+						icon = (Icon)SComponentFactory.getFileTypeIcon(jcc.getServiceContainer(), type).get(new ThreadSuspendable());
 				}
 			}
 		}

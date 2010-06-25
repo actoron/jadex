@@ -11,7 +11,9 @@ import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.tools.common.CombiIcon;
 import jadex.tools.common.ComponentTreeTable;
 import jadex.tools.common.ComponentTreeTableNodeType;
@@ -226,12 +228,16 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 					//  +-classes2
 					//  |  +- MyComponent.component.xml
 
-					String model = ((FileNode)node).getRelativePath();
+					final String model = ((FileNode)node).getRelativePath();
 //					if(getJCC().getComponent().getPlatform().getComponentFactory().isLoadable(model))
-					if(SComponentFactory.isLoadable(getJCC().getServiceContainer(), model))
+					SComponentFactory.isLoadable(getJCC().getServiceContainer(), model).addResultListener(new SwingDefaultResultListener()
 					{
-						loadModel(model);
-					}
+						public void customResultAvailable(Object source, Object result)
+						{
+							if(((Boolean)result).booleanValue())
+								loadModel(model);
+						}
+					});
 //					else if(getJCC().getComponent().getPlatform().getApplicationFactory().isLoadable(model))
 //					{
 //						loadModel(model);
@@ -252,12 +258,18 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 						if(node instanceof FileNode)
 						{
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-							String type = ((FileNode)node).getFile().getAbsolutePath();
+							final String type = ((FileNode)node).getFile().getAbsolutePath();
 //							if(getJCC().getComponent().getPlatform().getComponentFactory().isStartable(type))
 							// todo: resultcollect = false?
-							if(SComponentFactory.isStartable(getJCC().getServiceContainer(), type))
-								createComponent(type, null, null, null, false, null);
-							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+							SComponentFactory.isStartable(getJCC().getServiceContainer(), type).addResultListener(new SwingDefaultResultListener()
+							{
+								public void customResultAvailable(Object source, Object result)
+								{
+									if(((Boolean)result).booleanValue())
+										createComponent(type, null, null, null, false, null);
+									mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+								}
+							});
 						}
 					}
 				}
@@ -779,12 +791,13 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 				if(node instanceof FileNode)
 				{
 					final String type = ((FileNode)node).getFile().getAbsolutePath();
-					if(SComponentFactory.isStartable(getJCC().getServiceContainer(), type))//&& ((FileNode)node).isValid())
+					
+					if(((Boolean)SComponentFactory.isStartable(getJCC().getServiceContainer(), type).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
 					{
 						try
 						{
 //							IComponentFactory componentfactory = getJCC().getComponent().getPlatform().getComponentFactory();
-							ILoadableComponentModel model = SComponentFactory.loadModel(getJCC().getServiceContainer(), type);
+							ILoadableComponentModel model = (ILoadableComponentModel)SComponentFactory.loadModel(getJCC().getServiceContainer(), type).get(new ThreadSuspendable());
 							String[] inistates = model.getConfigurations();
 //							IMBDIComponent model = SXML.loadComponentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
@@ -857,7 +870,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 			if(node instanceof FileNode)
 			{
 				String type = ((FileNode)node).getFile().getAbsolutePath();
-				if(SComponentFactory.isStartable(getJCC().getServiceContainer(), type))
+				if(((Boolean)SComponentFactory.isStartable(getJCC().getServiceContainer(), type).get(new ThreadSuspendable())))
 					ret = true;
 			}
 			return ret;

@@ -13,7 +13,9 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.AgentSelectorDialog;
@@ -644,34 +646,65 @@ public class StarterPanel extends JPanel
 		
 		if(adf!=null)
 		{
-			try
+			SComponentFactory.isLoadable(starter.getJCC().getServiceContainer(), adf).addResultListener(new SwingDefaultResultListener()
 			{
-				if(SComponentFactory.isLoadable(starter.getJCC().getServiceContainer(), adf))
+				public void customResultAvailable(Object source, Object result)
 				{
-					model = SComponentFactory.loadModel(starter.getJCC().getServiceContainer(), adf);
+					if(((Boolean)result).booleanValue())
+					{
+						SComponentFactory.loadModel(starter.getJCC().getServiceContainer(), adf).addResultListener(new SwingDefaultResultListener()
+						{
+							public void customResultAvailable(Object source, Object result)
+							{
+								model = (ILoadableComponentModel)result;
+							}
+							
+							public void customExceptionOccurred(Object source, Exception exception)
+							{
+								model = null;
+								StringWriter sw = new StringWriter();
+								exception.printStackTrace(new PrintWriter(sw));
+								error = sw.toString();
+							}
+						});
+						
+						updateGuiForNewModel(adf);
+					}
+					else
+					{
+						model = null;
+						updateGuiForNewModel(adf);
+					}
 				}
-				else
-				{
-					model = null;
-				}
-			}
-			catch(Exception e)
-			{
-				//e.printStackTrace();
-				model = null;
-				StringWriter sw = new StringWriter();
-				e.printStackTrace(new PrintWriter(sw));
-				error = sw.toString();
-			}
-			lastfile = adf;
+			});
+			
+//			try
+//			{
+//				if(SComponentFactory.isLoadable(starter.getJCC().getServiceContainer(), adf))
+//				{
+//					model = SComponentFactory.loadModel(starter.getJCC().getServiceContainer(), adf);
+//				}
+//				else
+//				{
+//					model = null;
+//				}
+//			}
+//			catch(Exception e)
+//			{
+//				//e.printStackTrace();
+//				model = null;
+//				StringWriter sw = new StringWriter();
+//				e.printStackTrace(new PrintWriter(sw));
+//				error = sw.toString();
+//			}
+//			lastfile = adf;
 		}
 		else
 		{
 			model = null;
 			error = null;
+			updateGuiForNewModel(adf);
 		}
-
-		updateGuiForNewModel(adf);
 	}
 
 	

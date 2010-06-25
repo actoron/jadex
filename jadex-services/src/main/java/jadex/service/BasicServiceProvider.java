@@ -1,5 +1,8 @@
 package jadex.service;
 
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,16 +27,19 @@ public class BasicServiceProvider implements IServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding platform services.
 	 */
-	public Collection getServices(Class type)
+	public IFuture getServices(Class type)
 	{
-		Collection	ret	= null;
+		Future ret = new Future();
+		
+		Collection	coll = null;
 		Map tmp = getServiceMap(type);
 		if(tmp != null)
-			ret	= tmp.values();
+			coll = tmp.values();
 		else
-			ret	= Collections.EMPTY_SET;
+			coll = Collections.EMPTY_SET;
 //			throw new RuntimeException("No services found of type: " + type);
 
+		ret.setResult(coll);
 		return ret;
 	}
 
@@ -42,14 +48,18 @@ public class BasicServiceProvider implements IServiceProvider
 	 *  @param name The name.
 	 *  @return The corresponding platform service.
 	 */
-	public Object getService(Class type, String name)
+	public IFuture getService(Class type, String name)
 	{
-		Object ret	= null;
+		Future ret = new Future();
+		
+		Object res	= null;
 		Map tmp = getServiceMap(type);
 		if(tmp != null)
-			ret = tmp.get(name);
+			res = tmp.get(name);
 //		if(ret == null)
 //			throw new RuntimeException("Service not found");
+		
+		ret.setResult(res);
 		return ret;
 	}
 
@@ -58,14 +68,18 @@ public class BasicServiceProvider implements IServiceProvider
 	 *  @param type The type.
 	 *  @return The corresponding platform service.
 	 */
-	public Object getService(Class type)
+	public IFuture getService(Class type)
 	{
-		Object ret	= null;
+		Future ret = new Future();
+		
+		Object res	= null;
 		Map tmp = getServiceMap(type);
 		if(tmp != null && !tmp.isEmpty())
-			ret = tmp.values().iterator().next();
+			res = tmp.values().iterator().next();
 //		if(ret == null)
 //			throw new RuntimeException("Service not found");
+		
+		ret.setResult(res);
 		return ret;
 	}
 	
@@ -73,9 +87,11 @@ public class BasicServiceProvider implements IServiceProvider
 	 *  Get the available service types.
 	 *  @return The service types.
 	 */
-	public Class[] getServicesTypes()
+	public IFuture getServicesTypes()
 	{
-		return services==null? new Class[0]: (Class[])services.keySet().toArray(new Class[services.size()]);
+		Future ret = new Future();
+		ret.setResult(services==null? new Class[0]: (Class[])services.keySet().toArray(new Class[services.size()]));
+		return ret;
 	}
 	
 	//-------- methods --------

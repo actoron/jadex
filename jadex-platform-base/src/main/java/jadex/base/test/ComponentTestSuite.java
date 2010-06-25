@@ -6,11 +6,13 @@ import jadex.bridge.IArgument;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SReflect;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,10 +35,10 @@ public class ComponentTestSuite extends TestSuite
 	/**
 	 * Create a component test suite for the given components.
 	 */
-	public ComponentTestSuite(String name, String[] components) throws Exception
+	public ComponentTestSuite(String name, final String[] components) throws Exception
 	{
 		super(name);
-		
+	
 		// Hack!!! Make configurations configurable.
 		String[]	confs	= new String[]
 		{
@@ -55,13 +57,17 @@ public class ComponentTestSuite extends TestSuite
 		platform	= (IServiceContainer)pfcon.newInstance(new Object[]{confs, this.getClass().getClassLoader()});
 		platform.start();
 		
-		IComponentManagementService cms = (IComponentManagementService)platform
-			.getService(IComponentManagementService.class);
-		
-		for(int i=0; i<components.length; i++)
+		platform.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
-			addTest(new ComponentTest(cms, components[i]));
-		}
+			public void resultAvailable(Object source, Object result)
+			{
+				IComponentManagementService cms = (IComponentManagementService)result;
+				for(int i=0; i<components.length; i++)
+				{
+					addTest(new ComponentTest(cms, components[i]));
+				}
+			}
+		});
 	}
 	
 	/**
@@ -79,63 +85,90 @@ public class ComponentTestSuite extends TestSuite
 	 * @param path	The path to look for test cases in.
 	 * @param root	The classpath root corresponding to the path.
 	 */
-	public ComponentTestSuite(File path, File root, String[] excludes) throws Exception
+	public ComponentTestSuite(final File path, final File root, final String[] excludes) throws Exception
 	{
 		this(path.getName(), new String[0]);
 		
-		IComponentManagementService cms = (IComponentManagementService)platform
-			.getService(IComponentManagementService.class);
-		ILibraryService	libsrv	= (ILibraryService)platform.getService(ILibraryService.class);
-		libsrv.addURL(root.toURI().toURL());
-		
-		// Scan for test cases.
-		List	todo	= new LinkedList();
-		todo.add(path);
-		while(!todo.isEmpty())
+		platform.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
-			File	file	= (File)todo.remove(0);
-			String	abspath	= file.getAbsolutePath();
-			boolean	exclude	= false;
-			for(int i=0; !exclude && excludes!=null && i<excludes.length; i++)
+			public void resultAvailable(Object source, Object result)
 			{
-				exclude	= abspath.indexOf(excludes[i])!=-1;
-			}
-			
-			if(!exclude)
-			{
-				boolean	istest	= false;
-	
-				if(file.isDirectory())
+				final IComponentManagementService cms = (IComponentManagementService)result;
+				platform.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 				{
-					File[]	subs	= file.listFiles();
-					todo.addAll(Arrays.asList(subs));
-				}
-				else if(SComponentFactory.isLoadable(platform,  abspath))
-				{
-					try
+					public void resultAvailable(Object source, Object result)
 					{
-						ILoadableComponentModel model = SComponentFactory.loadModel(platform,  abspath);
-						
-						if(model!=null && model.getReport().isEmpty())
+						ILibraryService	libsrv	= (ILibraryService)result;
+						try
 						{
-							IArgument[]	results	= model.getResults();
-							for(int i=0; !istest && i<results.length; i++)
+							URL url = root.toURI().toURL();
+							libsrv.addURL(url);
+						}
+						catch(Exception e)
+						{
+							throw new RuntimeException(e);
+						}
+						
+						
+						// Scan for test cases.
+						List	todo	= new LinkedList();
+						todo.add(path);
+						while(!todo.isEmpty())
+						{
+							File	file	= (File)todo.remove(0);
+							final String	abspath	= file.getAbsolutePath();
+							boolean	exclude	= false;
+							for(int i=0; !exclude && excludes!=null && i<excludes.length; i++)
 							{
-								if(results[i].getName().equals("testresults") && results[i].getTypename().equals("Testcase"))
-									istest	= true;
+								exclude	= abspath.indexOf(excludes[i])!=-1;
+							}
+							
+							if(!exclude)
+							{
+								if(file.isDirectory())
+								{
+									File[]	subs	= file.listFiles();
+									todo.addAll(Arrays.asList(subs));
+								}
+								else
+								{
+									final String fabspath = abspath;
+									SComponentFactory.isLoadable(platform,  abspath).addResultListener(new DefaultResultListener()
+									{
+										public void resultAvailable(Object source, Object result)
+										{
+											if(((Boolean)result).booleanValue())
+											{
+												SComponentFactory.loadModel(platform, fabspath).addResultListener(new DefaultResultListener()
+												{
+													public void resultAvailable(Object source, Object result)
+													{
+														boolean istest = false;
+														ILoadableComponentModel model = (ILoadableComponentModel)result;
+														if(model!=null && model.getReport().isEmpty())
+														{
+															IArgument[]	results	= model.getResults();
+															for(int i=0; !istest && i<results.length; i++)
+															{
+																if(results[i].getName().equals("testresults") && results[i].getTypename().equals("Testcase"))
+																	istest	= true;
+															}
+														}
+														if(istest)
+														{
+															addTest(new ComponentTest(cms, abspath));
+														}
+													}
+												});
+											}
+										}
+									});
+								}
 							}
 						}
 					}
-					catch(Exception e)
-					{
-					}
-				}
-				
-				if(istest)
-				{
-					addTest(new ComponentTest(cms, abspath));
-				}
+				});
 			}
-		}
+		});
 	}
 }

@@ -557,7 +557,7 @@ public class FipaMessagePanel extends JPanel
 		if(!editable)
 			return this.message;
 		else
-			this.message = (IEAMessageEvent)agent.createMessageEvent("fipamsg").get(new ThreadSuspendable(new Object()));
+			this.message = (IEAMessageEvent)agent.createMessageEvent("fipamsg").get(new ThreadSuspendable());
 		
 		// Set parameter values.
 		setParameter(SFipa.PERFORMATIVE, (String)performative.getSelectedItem());

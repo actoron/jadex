@@ -18,6 +18,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
@@ -109,7 +110,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	 *  @param listener The result listener (if any). Will receive the id of the component as result, when the component has been created.
 	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
-	public IFuture createComponent(String name, String model, CreationInfo info, final IResultListener killlistener)
+	public IFuture createComponent(final String name, final String model, CreationInfo info, final IResultListener killlistener)
 	{
 		final Future ret = new Future();
 		
@@ -131,113 +132,119 @@ public class ComponentManagementService implements IComponentManagementService, 
 		*/
 			
 		// Load the model with fitting factory.
-		
-		IComponentFactory factory = null;
-		String	type	= null;
-		Collection facts = container.getServices(IComponentFactory.class);
-		if(facts!=null)
+		container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
 		{
-			for(Iterator it=facts.iterator(); factory==null && it.hasNext(); )
+			public void resultAvailable(Object source, Object result)
 			{
-				IComponentFactory	cf	= (IComponentFactory)it.next();
-				if(cf.isLoadable(model, cinfo.getImports()))
+				Collection facts = (Collection)result;
+				IComponentFactory factory = null;
+				String	type	= null;
+				if(facts!=null)
 				{
-					factory	= cf;
-					type	= factory.getComponentType(model, cinfo.getImports());
-				}
-			}
-		}
-		if(factory==null)
-			throw new RuntimeException("No factory found for component: "+model);
-		final ILoadableComponentModel lmodel = factory.loadModel(model, cinfo.getImports());
-
-		// Create id and adapter.
-		
-		final ComponentIdentifier cid;
-		final StandaloneComponentAdapter adapter;
-		final CMSComponentDescription ad;
-		StandaloneComponentAdapter pad	= null;
-		synchronized(adapters)
-		{
-			synchronized(descs)
-			{
-				if(name==null)
-				{
-					cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName());
-				}
-				else
-				{
-					cid = new ComponentIdentifier(name+"@"+container.getName()); // Hack?!
-					if(adapters.containsKey(cid))
+					for(Iterator it=facts.iterator(); factory==null && it.hasNext(); )
 					{
-						ret.setException(new RuntimeException("Component name already exists on platform: "+cid));
-						return ret;
+						IComponentFactory	cf	= (IComponentFactory)it.next();
+						if(cf.isLoadable(model, cinfo.getImports()))
+						{
+							factory	= cf;
+							type	= factory.getComponentType(model, cinfo.getImports());
+						}
 					}
-					IMessageService	ms	= (IMessageService)container.getService(IMessageService.class);
-					if(ms!=null)
-						cid.setAddresses(ms.getAddresses());
 				}
-		
-				ad	= new CMSComponentDescription(cid, type, cinfo.getParent(), cinfo.isMaster(), cinfo.isDaemon());
 				
-				// Increase daemon cnt
-				if(cinfo.isDaemon())
-					daemons++;
+				if(factory==null)
+					throw new RuntimeException("No factory found for component: "+model);
+				final ILoadableComponentModel lmodel = factory.loadModel(model, cinfo.getImports());
+
+				// Create id and adapter.
 				
-				CMSComponentDescription padesc = (CMSComponentDescription)descs.get(cinfo.getParent());
-				
-				// Suspend when set to suspend or when parent is also suspended or when specified in model.
-				Object	debugging 	= lmodel.getProperties().get("debugging");
-				if(cinfo.isSuspend() || (padesc!=null && (IComponentDescription.STATE_SUSPENDED.equals(padesc.getState()) || IComponentDescription.STATE_WAITING.equals(padesc.getState())))
-					|| debugging instanceof Boolean && ((Boolean)debugging).booleanValue())
+				final ComponentIdentifier cid;
+				final StandaloneComponentAdapter adapter;
+				final CMSComponentDescription ad;
+				StandaloneComponentAdapter pad	= null;
+				synchronized(adapters)
 				{
-					ad.setState(IComponentDescription.STATE_SUSPENDED);
+					synchronized(descs)
+					{
+						if(name==null)
+						{
+							cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName());
+						}
+						else
+						{
+							cid = new ComponentIdentifier(name+"@"+container.getName()); // Hack?!
+							if(adapters.containsKey(cid))
+							{
+								ret.setException(new RuntimeException("Component name already exists on platform: "+cid));
+								return;
+							}
+							IMessageService	ms	= (IMessageService)container.getService(IMessageService.class);
+							if(ms!=null)
+								cid.setAddresses(ms.getAddresses());
+						}
+				
+						ad	= new CMSComponentDescription(cid, type, cinfo.getParent(), cinfo.isMaster(), cinfo.isDaemon());
+						
+						// Increase daemon cnt
+						if(cinfo.isDaemon())
+							daemons++;
+						
+						CMSComponentDescription padesc = (CMSComponentDescription)descs.get(cinfo.getParent());
+						
+						// Suspend when set to suspend or when parent is also suspended or when specified in model.
+						Object	debugging 	= lmodel.getProperties().get("debugging");
+						if(cinfo.isSuspend() || (padesc!=null && (IComponentDescription.STATE_SUSPENDED.equals(padesc.getState()) || IComponentDescription.STATE_WAITING.equals(padesc.getState())))
+							|| debugging instanceof Boolean && ((Boolean)debugging).booleanValue())
+						{
+							ad.setState(IComponentDescription.STATE_SUSPENDED);
+						}
+						else
+						{
+							ad.setState(IComponentDescription.STATE_ACTIVE);
+						}
+						descs.put(cid, ad);
+						if(cinfo.getParent()!=null)
+						{
+//							children.put(parent, cid);
+							padesc.addChild(cid);
+						}
+					}
+
+					adapter = new StandaloneComponentAdapter(container, ad);
+					adapters.put(cid, adapter);
+
+					if(cinfo.getParent()!=null)
+					{
+						pad	= (StandaloneComponentAdapter)adapters.get(cinfo.getParent());
+					}
+				}
+
+				if(pad!=null)
+				{
+//					final IResultListener	rl	= listener;
+					final IComponentFactory	cf	= factory;
+					final StandaloneComponentAdapter	fpad	= pad;
+					pad.getComponentInstance().getExternalAccess(new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							createComponentInstance(cinfo.getConfiguration(), cinfo.getArguments(), cinfo.isSuspend(), ret,
+								killlistener, cf, lmodel, cid, adapter, fpad, ad, (IExternalAccess)result);
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							ret.setException(exception);
+						}
+					});
 				}
 				else
-				{
-					ad.setState(IComponentDescription.STATE_ACTIVE);
-				}
-				descs.put(cid, ad);
-				if(cinfo.getParent()!=null)
-				{
-//					children.put(parent, cid);
-					padesc.addChild(cid);
-				}
-			}
-
-			adapter = new StandaloneComponentAdapter(container, ad);
-			adapters.put(cid, adapter);
-
-			if(cinfo.getParent()!=null)
-			{
-				pad	= (StandaloneComponentAdapter)adapters.get(cinfo.getParent());
-			}
-		}
-
-		if(pad!=null)
-		{
-//			final IResultListener	rl	= listener;
-			final IComponentFactory	cf	= factory;
-			final StandaloneComponentAdapter	fpad	= pad;
-			pad.getComponentInstance().getExternalAccess(new IResultListener()
-			{
-				public void resultAvailable(Object source, Object result)
 				{
 					createComponentInstance(cinfo.getConfiguration(), cinfo.getArguments(), cinfo.isSuspend(), ret,
-						killlistener, cf, lmodel, cid, adapter, fpad, ad, (IExternalAccess)result);
+						killlistener, factory, lmodel, cid, adapter, null, ad, null);
 				}
-				
-				public void exceptionOccurred(Object source, Exception exception)
-				{
-					ret.setException(exception);
-				}
-			});
-		}
-		else
-		{
-			createComponentInstance(cinfo.getConfiguration(), cinfo.getArguments(), cinfo.isSuspend(), ret,
-				killlistener, factory, lmodel, cid, adapter, null, ad, null);
-		}
+			}
+		});
 		
 		return ret;
 	}

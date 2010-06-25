@@ -5,6 +5,8 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.tools.common.PopupBuilder;
 import jadex.tools.common.ToolTipAction;
 import jadex.tools.common.modeltree.DirNode;
@@ -232,16 +234,18 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 					Object	node = mpanel.getLastSelectedPathComponent();
 					if(node instanceof FileNode)
 					{
-						String model = ((FileNode)node).getRelativePath();
+						final String model = ((FileNode)node).getRelativePath();
 //						if(SXML.isAgentFilename(model))
-						if(SComponentFactory.isStartable(getJCC().getServiceContainer(), model))
+						SComponentFactory.isStartable(getJCC().getServiceContainer(), model).addResultListener(new SwingDefaultResultListener()
 						{
-							tcpanel.getTestList().addEntry(model);
-						}
-						else
-						{
-							jcc.setStatusText("Only agents can be added as testcases.");
-						}
+							public void customResultAvailable(Object source, Object result)
+							{
+								if(((Boolean)result).booleanValue())
+									tcpanel.getTestList().addEntry(model);
+								else
+									jcc.setStatusText("Only agents can be added as testcases.");
+							}
+						});
 					}
 				}
 			}
@@ -322,7 +326,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	 *  Add testcases for a file or directory recusively.
 	 *  @param node The file/dir node to start.
 	 */
-	protected void addTestcases(IExplorerTreeNode node)
+	protected void addTestcases(final IExplorerTreeNode node)
 	{
 		if(node instanceof DirNode)
 		{
@@ -330,31 +334,43 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 			nodes.add(node);
 			while(nodes.size()>0)
 			{
-				IExplorerTreeNode n = (IExplorerTreeNode)nodes.remove(0);
+				final IExplorerTreeNode n = (IExplorerTreeNode)nodes.remove(0);
 				List	lchildren	= nof.getChildren((FileNode)n);
 				for(int j=0; lchildren!=null && j<lchildren.size(); j++)
 					nodes.add(lchildren.get(j));
 					
 				if(n instanceof FileNode && !(n instanceof DirNode))
 				{
-					String model = ((FileNode)n).getRelativePath();
-					if(SComponentFactory.isStartable(getJCC().getServiceContainer(), model)
-						&& nof.isTestcase((IExplorerTreeNode) n))
+					final String model = ((FileNode)n).getRelativePath();
+					SComponentFactory.isStartable(getJCC().getServiceContainer(), model).addResultListener(new SwingDefaultResultListener()
 					{
-						tcpanel.getTestList().addEntry(model);
-					}
+						public void customResultAvailable(Object source, Object result)
+						{
+							if(((Boolean)result).booleanValue()
+								&& nof.isTestcase((IExplorerTreeNode) n))
+							{
+								tcpanel.getTestList().addEntry(model);
+							}
+						}
+					});
 				}
 			}
 		}
 		else
 		{
-			String model = ((FileNode)node).getRelativePath();
+			final String model = ((FileNode)node).getRelativePath();
 //			if(SXML.isAgentFilename(model) && ((FileNode)node).isValid())
-			if(SComponentFactory.isStartable(getJCC().getServiceContainer(), model)
-				&& nof.isTestcase((IExplorerTreeNode) node))
+			SComponentFactory.isStartable(getJCC().getServiceContainer(), model).addResultListener(new SwingDefaultResultListener()
 			{
-				tcpanel.getTestList().addEntry(model);
-			}
+				public void customResultAvailable(Object source, Object result)
+				{
+					if(((Boolean)result).booleanValue()
+						&& nof.isTestcase((IExplorerTreeNode)node))
+					{
+						tcpanel.getTestList().addEntry(model);
+					}
+				}
+			});
 		}
 	}
 	

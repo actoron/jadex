@@ -13,6 +13,7 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.BrowserPane;
@@ -137,7 +138,8 @@ public class TestCenterPanel extends JSplitPane
 			{
 				String name = f.getName();
 //				return f.isDirectory() || SXML.isAgentFilename(name);
-				return f.isDirectory() || SComponentFactory.isStartable(plugin.getJCC().getServiceContainer(), name);
+				return f.isDirectory() || ((Boolean)SComponentFactory.isStartable(plugin.getJCC()
+					.getServiceContainer(), name).get(new ThreadSuspendable())).booleanValue();
 			}
 		};
 		addchooser.addChoosableFileFilter(load_filter);

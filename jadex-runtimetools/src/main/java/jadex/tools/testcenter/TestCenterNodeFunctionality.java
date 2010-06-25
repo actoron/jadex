@@ -4,6 +4,7 @@ import jadex.base.SComponentFactory;
 import jadex.bridge.IArgument;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.tools.common.CombiIcon;
 import jadex.tools.common.modeltree.DefaultNodeFunctionality;
 import jadex.tools.common.modeltree.DirNode;
@@ -177,62 +178,91 @@ public class TestCenterNodeFunctionality extends DefaultNodeFunctionality
 		{
 			if(node instanceof FileNode)
 			{
-				FileNode fn = (FileNode)node;
+				final FileNode fn = (FileNode)node;
 				Boolean	val	= (Boolean)fn.getProperties().get(TESTCASE);
-				boolean	oldtest	= val!=null && val.booleanValue();
-				boolean	newtest	= false;
+				final boolean	oldtest	= val!=null && val.booleanValue();
 				
 				// Check directory.
 				if(node instanceof DirNode)
 				{
+					boolean	newtest	= false;
 					List	children	= getChildren(fn);
 					for(int i=0; !newtest && children!=null && i<children.size(); i++)
 					{
 						newtest	= isTestcase((IExplorerTreeNode)children.get(i));
 					}
+					
+					renew(fn, oldtest, newtest);
 				}
 				
 				// Check file.
 				else
 				{
-					String	file	= fn.getFile().getAbsolutePath();
-					if(SComponentFactory.isLoadable(jcc.getServiceContainer(), file))
+					final String file	= fn.getFile().getAbsolutePath();
+					SComponentFactory.isLoadable(jcc.getServiceContainer(), file).addResultListener(new DefaultResultListener()
 					{
-						try
+						public void resultAvailable(Object source, Object result)
 						{
-							ILoadableComponentModel model = SComponentFactory.loadModel(jcc.getServiceContainer(), file);
-							
-							if(model!=null && model.getReport().isEmpty())
+							if(((Boolean)result).booleanValue())
 							{
-								IArgument[]	results	= model.getResults();
-								for(int i=0; !newtest && i<results.length; i++)
+								SComponentFactory.loadModel(jcc.getServiceContainer(), file).addResultListener(new DefaultResultListener()
 								{
-									if(results[i].getName().equals("testresults") && results[i].getTypename().equals("Testcase"))
-										newtest	= true;
-								}
+									public void resultAvailable(Object source, Object result)
+									{
+										boolean	newtest	= false;
+										ILoadableComponentModel model = (ILoadableComponentModel)result;
+										if(model!=null && model.getReport().isEmpty())
+										{
+											IArgument[]	results	= model.getResults();
+											for(int i=0; !newtest && i<results.length; i++)
+											{
+												if(results[i].getName().equals("testresults") && results[i].getTypename().equals("Testcase"))
+													newtest	= true;
+											}
+										}
+										
+										renew(fn, oldtest, newtest);
+									}
+									
+									public void exceptionOccurred(Object source, Exception exception)
+									{
+										renew(fn, oldtest, false);
+									}
+								});
+							}
+							else
+							{
+								renew(fn, oldtest, false);
 							}
 						}
-						catch(Exception e)
-						{
-						}
-					}
+					});
 				}
-				
-				fn.getProperties().put(TESTCASE, new Boolean(newtest));	// Add always, because old value could be null.
-				fn.getProperties().put(TESTCASE_DATE, new Date());
-				if(oldtest!=newtest)
+			}
+		}
+		
+		/**
+		 * 
+		 * @param fn
+		 * @param oldtest
+		 * @param newtest
+		 */
+		protected void renew(FileNode fn, boolean oldtest, boolean newtest)
+		{
+			fn.getProperties().put(TESTCASE, new Boolean(newtest));	// Add always, because old value could be null.
+			fn.getProperties().put(TESTCASE_DATE, new Date());
+			if(oldtest!=newtest)
+			{
+				if(node.getParent() instanceof DirNode)
+					childrenChanged((DirNode) node.getParent());
 				{
-					if(node.getParent() instanceof DirNode)
-						childrenChanged((DirNode) node.getParent());
-					
 					SwingUtilities.invokeLater(new Runnable()
 					{
 						public void run()
 						{
 							((ModelExplorerTreeModel)explorer.getModel()).fireNodeChanged(node);
 						}
-					});	
-				}
+					});
+				}	
 			}
 		}
 	}

@@ -21,6 +21,7 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.BasicServiceProvider;
 import jadex.service.IServiceContainer;
@@ -254,69 +255,80 @@ public class Application implements IApplication, IComponentInstance
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The newly created component.
 	 */
-	public void	componentCreated(IComponentDescription desc, ILoadableComponentModel model)
+	public void	componentCreated(final IComponentDescription desc, final ILoadableComponentModel model)
 	{
-		IComponentIdentifier comp = desc.getName();
-		List	atypes	= this.model.getApplicationType().getMComponentTypes();
-		boolean	found	= false;
-		String	type	= null;
-		for(int i=0; !found	&& i<atypes.size(); i++)
+		// Checks if loaded model is defined in the application component types
+		
+		adapter.getServiceContainer().getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
 		{
-			MComponentType	atype	= (MComponentType)atypes.get(i);
-			
-			// Hack!!! simplify lookup!?
-			IComponentFactory factory = null;
-			Collection facts = adapter.getServiceContainer().getServices(IComponentFactory.class);
-			if(facts!=null)
+			public void resultAvailable(Object source, Object result)
 			{
-				for(Iterator it=facts.iterator(); factory==null && it.hasNext(); )
+				Collection facts = (Collection)result;
+				
+				IComponentIdentifier comp = desc.getName();
+				List atypes	= Application.this.model.getApplicationType().getMComponentTypes();
+				boolean	found	= false;
+				String	type	= null;
+				
+				for(int i=0; !found	&& i<atypes.size(); i++)
 				{
-					IComponentFactory	cf	= (IComponentFactory)it.next();
-					if(cf.isLoadable(atype.getFilename(), this.model.getApplicationType().getAllImports()))
+					MComponentType	atype	= (MComponentType)atypes.get(i);
+					
+					// Hack!!! simplify lookup!?
+					IComponentFactory factory = null;
+					if(facts!=null)
 					{
-						factory	= cf;
+						for(Iterator it=facts.iterator(); factory==null && it.hasNext(); )
+						{
+							IComponentFactory	cf	= (IComponentFactory)it.next();
+							if(cf.isLoadable(atype.getFilename(), Application.this.model.getApplicationType().getAllImports()))
+							{
+								factory	= cf;
+							}
+						}
+					}
+					ILoadableComponentModel amodel = factory.loadModel(atype.getFilename(), Application.this.model.getApplicationType().getAllImports());
+					
+					if(SUtil.equals(amodel.getPackage(), model.getPackage()) && amodel.getName().equals(model.getName()))
+//					if(amodel.getFilename().equals(model.getFilename()))
+					{
+						synchronized(this)
+						{
+							if(ctypes==null)
+								ctypes	= new HashMap();
+							ctypes.put(comp, atype.getName());
+						}
+						type	= atype.getName();
+						found	= true;
 					}
 				}
-			}
-			ILoadableComponentModel amodel = factory.loadModel(atype.getFilename(), this.model.getApplicationType().getAllImports());
-			
-			if(SUtil.equals(amodel.getPackage(), model.getPackage()) && amodel.getName().equals(model.getName()))
-//			if(amodel.getFilename().equals(model.getFilename()))
-			{
+				if(!found)
+				{
+					throw new RuntimeException("Unsupported component for application: "+model.getFilename());
+				}
+				
+				ISpace[]	aspaces	= null;
 				synchronized(this)
 				{
-					if(ctypes==null)
-						ctypes	= new HashMap();
-					ctypes.put(comp, atype.getName());
+					if(spaces!=null)
+					{
+						aspaces	= (ISpace[])spaces.values().toArray(new ISpace[spaces.size()]);
+					}
 				}
-				type	= atype.getName();
-				found	= true;
-			}
-		}
-		if(!found)
-		{
-			throw new RuntimeException("Unsupported component for application: "+model.getFilename());
-		}
-		
-		ISpace[]	aspaces	= null;
-		synchronized(this)
-		{
-			if(spaces!=null)
-			{
-				aspaces	= (ISpace[])spaces.values().toArray(new ISpace[spaces.size()]);
-			}
-		}
 
-		if(aspaces!=null)
-		{
-			for(int i=0; i<aspaces.length; i++)
-			{
-				aspaces[i].componentAdded(comp, type);
+				if(aspaces!=null)
+				{
+					for(int i=0; i<aspaces.length; i++)
+					{
+						aspaces[i].componentAdded(comp, type);
+					}
+				}
+				
+				if(!desc.isDaemon())
+					children++;
 			}
-		}
-		
-		if(!desc.isDaemon())
-			children++;
+		});
+	
 	}
 	
 	/**

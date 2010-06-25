@@ -3,10 +3,12 @@ package jadex.tools.common;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.commons.SGUI;
+import jadex.commons.ThreadSuspendable;
 import jadex.service.IServiceContainer;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 import jadex.tools.common.jtreetable.TreeTableNodeType;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import javax.swing.Icon;
@@ -56,7 +58,8 @@ public class ComponentTreeTableNodeType extends TreeTableNodeType
 		String type	= ad.getType();
 		if(type!=null)
 		{
-			Iterator	factories	= container.getServices(IComponentFactory.class).iterator();
+			Collection coll = (Collection)container.getServices(IComponentFactory.class).get(new ThreadSuspendable());
+			Iterator factories	= coll.iterator();
 			while(ret==null && factories.hasNext())
 				ret	= ((IComponentFactory)factories.next()).getComponentTypeIcon(type);
 		}

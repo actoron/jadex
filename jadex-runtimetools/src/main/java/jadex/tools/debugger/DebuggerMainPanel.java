@@ -8,6 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.IFuture;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.debugger.common.ObjectInspectorDebuggerPanel;
@@ -114,35 +115,42 @@ public class DebuggerMainPanel extends JSplitPane
 						}
 						
 						// Sub panels of right panel.
-						Map props2	= SComponentFactory.getProperties(DebuggerMainPanel.this.jcc.getServiceContainer(), DebuggerMainPanel.this.desc.getType());
-						if(props2!=null && props2.containsKey(KEY_DEBUGGER_PANELS))
+						SComponentFactory.getProperties(DebuggerMainPanel.this.jcc.getServiceContainer(), DebuggerMainPanel.this.desc.getType())
+							.addResultListener(new SwingDefaultResultListener()
 						{
-							final ILibraryService	libservice	= (ILibraryService)DebuggerMainPanel.this.jcc.getServiceContainer().getService(ILibraryService.class);
-							String	panels	= (String)props2.get(KEY_DEBUGGER_PANELS);
-							StringTokenizer	stok	= new StringTokenizer(panels, ", \t\n\r\f");
-							while(stok.hasMoreTokens())
+							public void customResultAvailable(Object source, Object result)
 							{
-								String classname	= stok.nextToken();
-								try
+								Map props2	= (Map)result;
+								if(props2!=null && props2.containsKey(KEY_DEBUGGER_PANELS))
 								{
-									Class clazz	= SReflect.classForName(classname, libservice.getClassLoader());
-									IDebuggerPanel	panel	= (IDebuggerPanel)clazz.newInstance();
+									final ILibraryService	libservice	= (ILibraryService)DebuggerMainPanel.this.jcc.getServiceContainer().getService(ILibraryService.class);
+									String	panels	= (String)props2.get(KEY_DEBUGGER_PANELS);
+									StringTokenizer	stok	= new StringTokenizer(panels, ", \t\n\r\f");
+									while(stok.hasMoreTokens())
+									{
+										String classname	= stok.nextToken();
+										try
+										{
+											Class clazz	= SReflect.classForName(classname, libservice.getClassLoader());
+											IDebuggerPanel	panel	= (IDebuggerPanel)clazz.newInstance();
+											panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
+											tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
+										}
+										catch(Exception e)
+										{
+											e.printStackTrace();
+											DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panel.", "Debugger panel class: "+classname, e);
+										}
+									}
+								}
+								else
+								{
+									ObjectInspectorDebuggerPanel panel = new ObjectInspectorDebuggerPanel();
 									panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
 									tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
 								}
-								catch(Exception e)
-								{
-									e.printStackTrace();
-									DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panel.", "Debugger panel class: "+classname, e);
-								}
 							}
-						}
-						else
-						{
-							ObjectInspectorDebuggerPanel panel = new ObjectInspectorDebuggerPanel();
-							panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
-							tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
-						}
+						});
 					}
 				});
 			}
