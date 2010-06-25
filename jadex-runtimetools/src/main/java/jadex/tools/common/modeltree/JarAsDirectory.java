@@ -10,9 +10,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
@@ -149,18 +151,39 @@ public class JarAsDirectory	extends File
 			this.lastmodified	= new File(jarpath).lastModified();
 			// Read entries into multi-collection (path->entries).
 			MultiCollection	entries	= new MultiCollection();
+			Set	contained	= new HashSet();
 			try
 			{
 				JarFile	jar = new JarFile(jarpath);
 				Enumeration	e	= jar.entries();
 				while(e.hasMoreElements())
 				{
-					String	dir	= "/";
 					ZipEntry	entry	= (ZipEntry)e.nextElement();
-					int	slash	= entry.getName().lastIndexOf("/", entry.getName().length()-2);
-					if(slash!=-1)
-						dir	= entry.getName().substring(0, slash+1);
-					entries.put(dir, entry);
+					boolean	finished	= false;
+					while(!finished)
+					{
+						String	dir	= "/";
+						int	slash	= entry.getName().lastIndexOf("/", entry.getName().length()-2);
+						if(slash!=-1)
+						{
+							dir	= entry.getName().substring(0, slash+1);
+						}
+						if(!contained.contains(entry.getName()))
+						{
+							entries.put(dir, entry);
+							contained.add(entry.getName());
+						}
+						
+						if(dir.equals("/"))
+						{
+							finished	= true;
+						}
+						else
+						{
+							// Add directory entries manually, because some tools (like eclipse) do not include these in the jar.
+							entry	= new ZipEntry(dir);
+						}
+					}
 				}
 			}
 			catch(IOException e)
