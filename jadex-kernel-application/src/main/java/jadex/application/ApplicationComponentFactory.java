@@ -18,6 +18,7 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -78,6 +79,9 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 	
 	/** The xml reader. */
 	protected Reader reader;
+	
+	/** The library service. */
+	protected ILibraryService libservice;
 	
 	//-------- constructors --------
 	
@@ -180,7 +184,14 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 	 */
 	public void startService()
 	{
-		
+		// todo: use IFuture return value for siganlling when startup is finished?
+		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				libservice = (ILibraryService)result;
+			}
+		});
 	}
 	
 	/**
@@ -253,7 +264,8 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 			ResourceInfo	rinfo	= null;
 			try
 			{
-				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
+//				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
+				ClassLoader cl = libservice.getClassLoader();
 				rinfo	= getResourceInfo(model, FILE_EXTENSION_APPLICATION, imports, cl);
 				apptype = (MApplicationType)reader.read(rinfo.getInputStream(), cl, null);
 				ret = new ApplicationModel(apptype, rinfo.getFilename(), cl);
