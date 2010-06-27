@@ -87,7 +87,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 				}
 			};
 			
-			IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
+			IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class).get(this);
 			ces.addComponentListener(null, listener);
 			
 			IFuture fut = ces.getComponentDescriptions();

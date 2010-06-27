@@ -8,6 +8,7 @@ import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
@@ -97,6 +98,9 @@ public class TCPTransport implements ITransport
 	/** The logger. */
 	protected Logger logger;
 	
+	/** The library service. */
+	protected ILibraryService libservice;
+	
 	//-------- constructors --------
 	
 	/**
@@ -172,41 +176,62 @@ public class TCPTransport implements ITransport
 			addresses = (String[])addrs.toArray(new String[addrs.size()]);
 			
 			// Start the receiver thread.
-			((IThreadPool)container.getService(ThreadPoolService.class)).execute(new Runnable()
+			container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 			{
-				public void run()
+				public void resultAvailable(Object source, Object result)
 				{
-					//try{serversocket.setSoTimeout(10000);} catch(SocketException e) {}
-					while(!serversocket.isClosed())
+					libservice = (ILibraryService)result;
+
+					container.getService(ThreadPoolService.class).addResultListener(new DefaultResultListener()
 					{
-						try
+						public void resultAvailable(Object source, Object result)
 						{
-							ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
-							final TCPInputConnection con = new TCPInputConnection(serversocket.accept(), codecfac, cl);
-							if(!async)
+							IThreadPool tp = (IThreadPool)result;
+							tp.execute(new Runnable()
 							{
-								TCPTransport.this.deliverMessages(con);
-							}
-							else
-							{
-								// Each accepted incoming connection request is handled
-								// in a separate thread in async mode.
-								((IThreadPool)container.getService(ThreadPoolService.class)).execute(new Runnable()
+								public void run()
 								{
-									public void run()
+									//try{serversocket.setSoTimeout(10000);} catch(SocketException e) {}
+									while(!serversocket.isClosed())
 									{
-										TCPTransport.this.deliverMessages(con);
+										try
+										{
+//											ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
+											final TCPInputConnection con = new TCPInputConnection(serversocket.accept(), codecfac, libservice.getClassLoader());
+											if(!async)
+											{
+												TCPTransport.this.deliverMessages(con);
+											}
+											else
+											{
+												// Each accepted incoming connection request is handled
+												// in a separate thread in async mode.
+												container.getService(ThreadPoolService.class).addResultListener(new DefaultResultListener()
+												{
+													public void resultAvailable(Object source, Object result)
+													{
+														((IThreadPool)result).execute(new Runnable()
+														{
+															public void run()
+															{
+																TCPTransport.this.deliverMessages(con);
+															}
+														});
+													}
+												});
+											}
+										}
+										catch(IOException e)
+										{
+											//logger.warning("TCPTransport receiver connect error: "+e);
+											//e.printStackTrace();
+										}
 									}
-								});
-							}
+									logger.warning("TCPTransport serversocket closed.");
+								}
+							});
 						}
-						catch(IOException e)
-						{
-							//logger.warning("TCPTransport receiver connect error: "+e);
-							//e.printStackTrace();
-						}
-					}
-					logger.warning("TCPTransport serversocket closed.");
+					});
 				}
 			});
 		}
@@ -368,8 +393,8 @@ public class TCPTransport implements ITransport
 					iport = DEFAULT_PORT;
 				}
 
-				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
-				ret = new TCPOutputConnection(InetAddress.getByName(hostname), iport, codecfac, new Cleaner(address), cl);
+//				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
+				ret = new TCPOutputConnection(InetAddress.getByName(hostname), iport, codecfac, new Cleaner(address), libservice.getClassLoader());
 				connections.put(address, ret);
 			}
 			catch(Exception e)
@@ -402,22 +427,28 @@ public class TCPTransport implements ITransport
 	 *  for disptaching to the components.
 	 *  @param con The connection.
 	 */
-	protected void deliverMessages(TCPInputConnection con)
+	protected void deliverMessages(final TCPInputConnection con)
 	{
-		try
+		container.getService(IMessageService.class).addResultListener(new DefaultResultListener()
 		{
-			for(MessageEnvelope msg=con.read(); msg!=null; msg=con.read())
+			public void resultAvailable(Object source, Object result)
 			{
-				((IMessageService)container.getService(IMessageService.class))
-				.deliverMessage(msg.getMessage(), msg.getTypeName(), msg.getReceivers());
+				IMessageService ms = (IMessageService)result;
+				try
+				{
+					for(MessageEnvelope msg=con.read(); msg!=null; msg=con.read())
+					{
+						ms.deliverMessage(msg.getMessage(), msg.getTypeName(), msg.getReceivers());
+					}
+				}
+				catch(Exception e)
+				{
+					logger.warning("TCPTransport receiving error: "+e);
+					e.printStackTrace();
+					con.close();
+				}
 			}
-		}
-		catch(Exception e)
-		{
-			logger.warning("TCPTransport receiving error: "+e);
-			e.printStackTrace();
-			con.close();
-		}
+		});
 	}
 	
 	/**

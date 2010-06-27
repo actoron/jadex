@@ -12,6 +12,7 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bpmn.runtime.handler.EventEndErrorActivityHandler.EventEndErrorException;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
@@ -41,21 +42,27 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 	public BpmnPlanExecutor(IServiceContainer container)
 	{
 		this.loader = new BpmnModelLoader();
-		final ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
-		loader.setClassLoader(libservice.getClassLoader());
-		ILibraryServiceListener lsl = new ILibraryServiceListener()
+		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
-			public void urlAdded(URL url)
+			public void resultAvailable(Object source, Object result)
 			{
+				final ILibraryService libservice = (ILibraryService)result;
 				loader.setClassLoader(libservice.getClassLoader());
+				ILibraryServiceListener lsl = new ILibraryServiceListener()
+				{
+					public void urlAdded(URL url)
+					{
+						loader.setClassLoader(libservice.getClassLoader());
+					}
+					
+					public void urlRemoved(URL url)
+					{
+						loader.setClassLoader(libservice.getClassLoader());
+					}
+				};
+				libservice.addLibraryServiceListener(lsl);
 			}
-			
-			public void urlRemoved(URL url)
-			{
-				loader.setClassLoader(libservice.getClassLoader());
-			}
-		};
-		libservice.addLibraryServiceListener(lsl);
+		});
 	}
 
 	//-------- IPlanExecutor interface --------

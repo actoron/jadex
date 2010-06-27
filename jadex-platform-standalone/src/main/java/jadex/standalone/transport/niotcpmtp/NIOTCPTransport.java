@@ -8,6 +8,7 @@ import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
@@ -93,6 +94,9 @@ public class NIOTCPTransport implements ITransport
 	
 	/** The logger. */
 	protected Logger logger;
+	
+	/** The library service. */
+	protected ILibraryService libservice;
 
 	//-------- constructors --------
 	
@@ -160,81 +164,102 @@ public class NIOTCPTransport implements ITransport
 			addresses = (String[])addrs.toArray(new String[addrs.size()]);
 			
 			// Start receiver thread.
-			((IThreadPool)container.getService(ThreadPoolService.class)).execute(new Runnable()
+			
+			container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 			{
-				public void run()
+				public void resultAvailable(Object source, Object result)
 				{
-					while(ssc.isOpen())
+					libservice = (ILibraryService)result;
+					container.getService(ThreadPoolService.class).addResultListener(new DefaultResultListener()
 					{
-						// This is a blocking call that only returns when traffic occurs.
-						Iterator it = null;
-						try
+						public void resultAvailable(Object source, Object result)
 						{
-							selector.select();
-							it = selector.selectedKeys().iterator();
-						}
-						catch(IOException e)
-						{
-							logger.warning("NIOTCP selector error.");
-							//e.printStackTrace();
-						}
-						
-						while(it!=null && it.hasNext())
-						{
-				            // Get the selection key
-				            SelectionKey key = (SelectionKey)it.next();
-				    
-				            // Remove it from the list to indicate that it is being processed
-				            it.remove();
-				            
-							if(key.isValid() && key.isAcceptable())
+							IThreadPool tp = (IThreadPool)result;
+							tp.execute(new Runnable()
 							{
-								try
+								public void run()
 								{
-									// Returns only null if no connection request is available.
-									SocketChannel sc = ssc.accept();
-									if(sc!=null) 
+									while(ssc.isOpen())
 									{
-										sc.configureBlocking(false);
-										ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
-										sc.register(selector, SelectionKey.OP_READ, new NIOTCPInputConnection(sc, codecfac, cl));
+										// This is a blocking call that only returns when traffic occurs.
+										Iterator it = null;
+										try
+										{
+											selector.select();
+											it = selector.selectedKeys().iterator();
+										}
+										catch(IOException e)
+										{
+											logger.warning("NIOTCP selector error.");
+											//e.printStackTrace();
+										}
+										
+										while(it!=null && it.hasNext())
+										{
+								            // Get the selection key
+								            final SelectionKey key = (SelectionKey)it.next();
+								    
+								            // Remove it from the list to indicate that it is being processed
+								            it.remove();
+								            
+											if(key.isValid() && key.isAcceptable())
+											{
+												try
+												{
+													// Returns only null if no connection request is available.
+													SocketChannel sc = ssc.accept();
+													if(sc!=null) 
+													{
+														sc.configureBlocking(false);
+//														ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
+														sc.register(selector, SelectionKey.OP_READ, new NIOTCPInputConnection(sc, codecfac, libservice.getClassLoader()));
+													}
+												}
+												catch(IOException e)
+												{
+													logger.warning("NIOTCP connection error on receiver side.");
+													//e.printStackTrace();
+													key.cancel();
+												}
+											}
+											else if(key.isValid() && key.isReadable())
+											{
+												final NIOTCPInputConnection con = (NIOTCPInputConnection)key.attachment();
+												container.getService(IMessageService.class).addResultListener(new DefaultResultListener()
+												{
+													public void resultAvailable(Object source, Object result)
+													{
+														try
+														{
+															IMessageService ms = (IMessageService)result;
+															for(MessageEnvelope msg=con.read(); msg!=null; msg=con.read())
+															{
+																ms.deliverMessage(msg.getMessage(), msg.getTypeName(), msg.getReceivers());
+															}
+														}
+														catch(IOException e)
+														{ 
+															logger.warning("NIOTCP receiving error while reading data.");
+				//											e.printStackTrace();
+															con.close();
+															key.cancel();
+														}
+													}
+												});
+											}
+											else
+											{
+												key.cancel();
+											}
+										}
 									}
+									logger.info("TCPNIO receiver closed.");
 								}
-								catch(IOException e)
-								{
-									logger.warning("NIOTCP connection error on receiver side.");
-									//e.printStackTrace();
-									key.cancel();
-								}
-							}
-							else if(key.isValid() && key.isReadable())
-							{
-								NIOTCPInputConnection con = (NIOTCPInputConnection)key.attachment();
-								try
-								{
-									for(MessageEnvelope msg=con.read(); msg!=null; msg=con.read())
-									{
-										((IMessageService)container.getService(IMessageService.class))
-										.deliverMessage(msg.getMessage(), msg.getTypeName(), msg.getReceivers());
-									}
-								}
-								catch(IOException e)
-								{ 
-									logger.warning("NIOTCP receiving error while reading data.");
-//									e.printStackTrace();
-									con.close();
-									key.cancel();
-								}
-							}
-							else
-							{
-								key.cancel();
-							}
+							});
 						}
-					}
-					logger.info("TCPNIO receiver closed.");
+					});
 				}
-			});
+			});		
 			//platform.getLogger().info("Local address: "+getServiceSchema()+lhostname+":"+listen_port);
 		}
 		catch(Exception e)
@@ -447,8 +472,8 @@ public class NIOTCPTransport implements ITransport
 					iport = DEFAULT_PORT;
 				}
 			
-				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
-				ret = new NIOTCPOutputConnection(InetAddress.getByName(hostname), iport, codecfac, new Cleaner(address), cl);
+//				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader()
+				ret = new NIOTCPOutputConnection(InetAddress.getByName(hostname), iport, codecfac, new Cleaner(address), libservice.getClassLoader());
 				connections.put(address, ret);
 			}
 			catch(Exception e)
@@ -507,12 +532,18 @@ public class NIOTCPTransport implements ITransport
 			/*if(timer!=null)
 				timer.cancel();
 			timer = platform.getClock().createTimer(System.currentTimeMillis()+MAX_KEEPALIVE, this);*/
-			IClockService clock = (IClockService)container.getService(IClockService.class);
-			long time = clock.getTime()+MAX_KEEPALIVE;
-			if(timer==null)
-				timer = clock.createTimer(time, this);
-			else
-				timer.setNotificationTime(time);
+			container.getService(IClockService.class).addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					IClockService clock = (IClockService)result;
+					long time = clock.getTime()+MAX_KEEPALIVE;
+					if(timer==null)
+						timer = clock.createTimer(time, Cleaner.this);
+					else
+						timer.setNotificationTime(time);
+				}
+			});
 		}
 		
 		/**

@@ -5,6 +5,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -268,38 +269,43 @@ public class Platform extends AbstractPlatform
 			}
 		}
 		
-		IComponentManagementService	ces	= (IComponentManagementService)getService(IComponentManagementService.class);
-		
-		// Create components.
-		Property[] props = Properties.getProperties(configurations, COMPONENT);
-		for(int i = 0; i < props.length; i++)
+		getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
-			ces.createComponent(props[i].getName(), props[i].getValue(), null, null);
-		}
-		Properties[] subprops = Properties.getSubproperties(configurations, COMPONENT);
-		for(int i = 0; i < subprops.length; i++)
-		{
-			Map args = getArguments(subprops[i]);
-			Property model = subprops[i].getProperty(MODEL);
-			Property config = subprops[i].getProperty(CONFIG);
-			int number = subprops[i].getIntProperty(NUMBER);
-			boolean master = subprops[i].getBooleanProperty(MASTER);
-			boolean suspend = subprops[i].getBooleanProperty(SUSPEND);
-			boolean daemon = subprops[i].getBooleanProperty(DAEMON);
-			
-			CreationInfo cinfo = new CreationInfo(config!=null? config.getValue(): null, args, null, suspend, master, daemon);
-			if(number>1)
+			public void resultAvailable(Object source, Object result)
 			{
-				for(int j=0; j<number; j++)
+				IComponentManagementService	ces	= (IComponentManagementService)result;
+				// Create components.
+				Property[] props = Properties.getProperties(configurations, COMPONENT);
+				for(int i = 0; i < props.length; i++)
 				{
-					ces.createComponent(null, model.getValue(), cinfo, null);
+					ces.createComponent(props[i].getName(), props[i].getValue(), null, null);
+				}
+				Properties[] subprops = Properties.getSubproperties(configurations, COMPONENT);
+				for(int i = 0; i < subprops.length; i++)
+				{
+					Map args = getArguments(subprops[i]);
+					Property model = subprops[i].getProperty(MODEL);
+					Property config = subprops[i].getProperty(CONFIG);
+					int number = subprops[i].getIntProperty(NUMBER);
+					boolean master = subprops[i].getBooleanProperty(MASTER);
+					boolean suspend = subprops[i].getBooleanProperty(SUSPEND);
+					boolean daemon = subprops[i].getBooleanProperty(DAEMON);
+					
+					CreationInfo cinfo = new CreationInfo(config!=null? config.getValue(): null, args, null, suspend, master, daemon);
+					if(number>1)
+					{
+						for(int j=0; j<number; j++)
+						{
+							ces.createComponent(null, model.getValue(), cinfo, null);
+						}
+					}
+					else
+					{
+						ces.createComponent(subprops[i].getName(), model.getValue(), cinfo, null);
+					}
 				}
 			}
-			else
-			{
-				ces.createComponent(subprops[i].getName(), model.getValue(), cinfo, null);
-			}
-		}
+		});
 		
 		configurations = null;
 	}

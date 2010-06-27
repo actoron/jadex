@@ -13,6 +13,7 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.MessageType;
 import jadex.commons.ICommand;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IServiceContainer;
@@ -156,7 +157,13 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			|| IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))	// Hack!!! external entries must also be executed in suspended state.
 		{
 			//System.out.println("wakeup called: "+state);
-			((IExecutionService)container.getService(IExecutionService.class)).execute(this);
+			container.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					((IExecutionService)result).execute(StandaloneComponentAdapter.this);
+				}
+			});
 		}
 	}
 

@@ -79,7 +79,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 	protected boolean autoshutdown;
 
 	/** The exception of a component during execution (if any). */
-	protected Map	exceptions;
+	protected Map exceptions;
 	
     //-------- constructors --------
 
@@ -178,9 +178,16 @@ public class ComponentManagementService implements IComponentManagementService, 
 								ret.setException(new RuntimeException("Component name already exists on platform: "+cid));
 								return;
 							}
-							IMessageService	ms	= (IMessageService)container.getService(IMessageService.class);
-							if(ms!=null)
-								cid.setAddresses(ms.getAddresses());
+							// todo: hmm adresses may be set too late? use cached message service?
+							container.getService(IMessageService.class).addResultListener(new DefaultResultListener()
+							{
+								public void resultAvailable(Object source, Object result)
+								{
+									IMessageService	ms	= (IMessageService)result;
+									if(ms!=null)
+										cid.setAddresses(ms.getAddresses());
+								}
+							});
 						}
 				
 						ad	= new CMSComponentDescription(cid, type, cinfo.getParent(), cinfo.isMaster(), cinfo.isDaemon());
@@ -382,7 +389,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 					}
 				}
 
-				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
+				final StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
 				ad = (CMSComponentDescription)descs.get(componentid);
 				if(adapter==null || ad==null)
 				{
@@ -397,17 +404,23 @@ public class ComponentManagementService implements IComponentManagementService, 
 				}
 				
 				ad.setState(IComponentDescription.STATE_SUSPENDED);
-				IExecutionService exe = (IExecutionService)container.getService(IExecutionService.class);
-				exe.cancel(adapter, new IResultListener()
+				container.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						ret.setResult(result);
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						ret.setException(exception);
+						IExecutionService exe = (IExecutionService)result;
+						exe.cancel(adapter, new IResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								ret.setResult(result);
+							}
+							
+							public void exceptionOccurred(Object source, Exception exception)
+							{
+								ret.setException(exception);
+							}
+						});
 					}
 				});
 			}
@@ -506,7 +519,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		{
 			synchronized(descs)
 			{
-				StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
+				final StandaloneComponentAdapter adapter = (StandaloneComponentAdapter)adapters.get(componentid);
 				IComponentDescription cd = (IComponentDescription)descs.get(componentid);
 				if(adapter==null || cd==null)
 				{
@@ -531,8 +544,14 @@ public class ComponentManagementService implements IComponentManagementService, 
 						ret.setException(exception);
 					}
 				});
-				IExecutionService exe = (IExecutionService)container.getService(IExecutionService.class);
-				exe.execute(adapter);
+				container.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						IExecutionService exe = (IExecutionService)result;
+						exe.execute(adapter);
+					}
+				});
 			}
 		}
 		

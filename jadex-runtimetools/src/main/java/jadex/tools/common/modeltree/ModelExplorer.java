@@ -8,6 +8,7 @@ import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.TreeExpansionHandler;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.LoadManagingExecutionService;
@@ -137,8 +138,16 @@ public class ModelExplorer extends JTree
 		this.refresh	= true;
 		this.pubuilder = pubuilder!=null? pubuilder: new PopupBuilder(
 			new Action[]{ADD_PATH, REMOVE_PATH, REFRESH});
-		this.worker	= new LoadManagingExecutionService(
-			((IThreadPool)container.getService(ThreadPoolService.class)));
+//		this.worker	= new LoadManagingExecutionService(
+//			((IThreadPool)container.getService(ThreadPoolService.class)));
+	
+		container.getService(ThreadPoolService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				worker	= new LoadManagingExecutionService((IThreadPool)result);
+			}
+		});
 		
 		setCellRenderer(new ModelTreeCellRenderer(nof));
 		setRowHeight(16);
@@ -242,33 +251,39 @@ public class ModelExplorer extends JTree
 		});
 		ToolTipManager.sharedInstance().registerComponent(this);
 		
-		final ILibraryService ls = (ILibraryService)container.getService(ILibraryService.class);
-		ls.addLibraryServiceListener(new ILibraryServiceListener()
+		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
-			public void urlAdded(URL url)
+			public void resultAvailable(Object source, Object result)
 			{
-			}
-			public void urlRemoved(URL url)
-			{
-				List cs = getRootNode().getChildren();
-				for(int i=0; cs!=null && i<cs.size(); i++)
+				ILibraryService ls = (ILibraryService)result;
+				ls.addLibraryServiceListener(new ILibraryServiceListener()
 				{
-					try
+					public void urlAdded(URL url)
 					{
-						FileNode fn = (FileNode)cs.get(i);
-						URL furl = fn.getFile().toURI().toURL();
-						if(url.equals(furl))
+					}
+					public void urlRemoved(URL url)
+					{
+						List cs = getRootNode().getChildren();
+						for(int i=0; cs!=null && i<cs.size(); i++)
 						{
-							int	index	= ((ModelExplorerTreeModel)getModel()).getIndexOfChild(root, fn);
-							getRootNode().removePathEntry(fn);
-							((ModelExplorerTreeModel)getModel()).fireNodeRemoved(getRootNode(), fn, index);
+							try
+							{
+								FileNode fn = (FileNode)cs.get(i);
+								URL furl = fn.getFile().toURI().toURL();
+								if(url.equals(furl))
+								{
+									int	index	= ((ModelExplorerTreeModel)getModel()).getIndexOfChild(root, fn);
+									getRootNode().removePathEntry(fn);
+									((ModelExplorerTreeModel)getModel()).fireNodeRemoved(getRootNode(), fn, index);
+								}
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
+							}
 						}
 					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
+				});
 			}
 		});
 		
@@ -924,16 +939,23 @@ public class ModelExplorer extends JTree
 						IExplorerTreeNode	node	= getRootNode().addPathEntry(file);
 						
 						// todo: jars
-						ILibraryService ls = (ILibraryService)container.getService(ILibraryService.class);
-						file = new File(file.getParentFile(), file.getName());
-						try
+						final File fcopy = file;
+						container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 						{
-							ls.addURL(file.toURI().toURL());
-						}
-						catch(MalformedURLException ex)
-						{
-							ex.printStackTrace();
-						}
+							public void resultAvailable(Object source, Object result)
+							{
+								ILibraryService ls = (ILibraryService)result;
+								File f = new File(fcopy.getParentFile(), fcopy.getName());
+								try
+								{
+									ls.addURL(f.toURI().toURL());
+								}
+								catch(MalformedURLException ex)
+								{
+									ex.printStackTrace();
+								}
+							}
+						});
 						
 						((ModelExplorerTreeModel)getModel()).fireNodeAdded(getRootNode(), node,
 							((ModelExplorerTreeModel)getModel()).getChildCount(root)-1);

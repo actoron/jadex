@@ -12,6 +12,7 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.ThreadSuspendable;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.tools.common.CombiIcon;
@@ -334,22 +335,29 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		
 		// todo: ?! is this ok?
 		
-		IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
-		IFuture ret = ces.getComponentDescriptions();
-		ret.addResultListener(new IResultListener()
+		jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				IComponentDescription[] res = (IComponentDescription[])result;
-				for(int i=0; i<res.length; i++)
-					componentAdded(res[i]);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
+				IComponentManagementService ces = (IComponentManagementService)result;
+				IFuture ret = ces.getComponentDescriptions();
+				ret.addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						IComponentDescription[] res = (IComponentDescription[])result;
+						for(int i=0; i<res.length; i++)
+							componentAdded(res[i]);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+					}
+				});
+				ces.addComponentListener(null, StarterPlugin.this);
 			}
 		});
-		ces.addComponentListener(null, this);
+		
 
 //		SwingUtilities.invokeLater(new Runnable()
 //		{

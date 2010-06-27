@@ -8,6 +8,7 @@ import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
@@ -53,6 +54,9 @@ public class BpmnFactory implements IComponentFactory, IService
 	/** The properties. */
 	protected Map properties;
 	
+	/** The library service. */
+	protected ILibraryService libservice;
+	
 	//-------- constructors --------
 	
 	/**
@@ -73,21 +77,28 @@ public class BpmnFactory implements IComponentFactory, IService
 	 */
 	public void startService()
 	{
-		final ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
-		loader.setClassLoader(libservice.getClassLoader());
-		ILibraryServiceListener lsl = new ILibraryServiceListener()
+		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
-			public void urlAdded(URL url)
+			public void resultAvailable(Object source, Object result)
 			{
+				libservice = (ILibraryService)result;
 				loader.setClassLoader(libservice.getClassLoader());
+				ILibraryServiceListener lsl = new ILibraryServiceListener()
+				{
+					public void urlAdded(URL url)
+					{
+						loader.setClassLoader(libservice.getClassLoader());
+					}
+					
+					public void urlRemoved(URL url)
+					{
+						loader.setClassLoader(libservice.getClassLoader());
+					}
+				};
+				libservice.addLibraryServiceListener(lsl);
 			}
-			
-			public void urlRemoved(URL url)
-			{
-				loader.setClassLoader(libservice.getClassLoader());
-			}
-		};
-		libservice.addLibraryServiceListener(lsl);
+		});
+		
 	}
 	
 	/**
@@ -113,7 +124,6 @@ public class BpmnFactory implements IComponentFactory, IService
 		try
 		{
 			ret = loader.loadBpmnModel(model, imports);
-			ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 			ClassLoader	cl = libservice.getClassLoader();
 			ret.setClassloader(cl);
 		}

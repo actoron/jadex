@@ -10,6 +10,7 @@ import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVTypeModel;
@@ -98,21 +99,27 @@ public class BDIAgentFactory implements IComponentFactory, IService
 	{
 		if(libservice==null)
 		{
-			libservice = (ILibraryService)container.getService(ILibraryService.class);
-			loader.setClassLoader(libservice.getClassLoader());
-			ILibraryServiceListener lsl = new ILibraryServiceListener()
+			container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 			{
-				public void urlAdded(URL url)
+				public void resultAvailable(Object source, Object result)
 				{
+					libservice = (ILibraryService)result;
 					loader.setClassLoader(libservice.getClassLoader());
+					ILibraryServiceListener lsl = new ILibraryServiceListener()
+					{
+						public void urlAdded(URL url)
+						{
+							loader.setClassLoader(libservice.getClassLoader());
+						}
+						
+						public void urlRemoved(URL url)
+						{
+							loader.setClassLoader(libservice.getClassLoader());
+						}
+					};
+					libservice.addLibraryServiceListener(lsl);
 				}
-				
-				public void urlRemoved(URL url)
-				{
-					loader.setClassLoader(libservice.getClassLoader());
-				}
-			};
-			libservice.addLibraryServiceListener(lsl);
+			});
 		}
 	}
 	

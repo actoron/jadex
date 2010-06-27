@@ -7,11 +7,14 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
+import jadex.service.library.ILibraryServiceListener;
 
+import java.net.URL;
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -43,6 +46,9 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	/** The properties. */
 	protected Map properties;
 	
+	/** The library service. */
+	protected ILibraryService libservice;
+	
 	//-------- constructors --------
 	
 	/**
@@ -61,7 +67,13 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	 */
 	public void startService()
 	{
-		
+		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				libservice = (ILibraryService)result;
+			}
+		});
 	}
 	
 	/**

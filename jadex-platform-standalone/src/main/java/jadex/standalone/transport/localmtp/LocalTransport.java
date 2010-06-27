@@ -4,6 +4,7 @@ import jadex.base.fipa.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageService;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.IServiceContainer;
 import jadex.standalone.transport.ITransport;
 
@@ -24,7 +25,7 @@ public class LocalTransport implements ITransport
 	//-------- attributes --------
 	
 	/** The message service. */
-//	protected IMessageService msgservice;
+	protected IMessageService msgservice;
 	
 	/** The addresses. */
 	protected String[] addresses;
@@ -44,7 +45,13 @@ public class LocalTransport implements ITransport
 	 */
 	public LocalTransport(IServiceContainer container)
 	{
-//		this.msgservice = (IMessageService)platform.getService(IMessageService.class, SFipa.MESSAGE_SERVICE);
+		container.getService(IMessageService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				msgservice = (IMessageService)result;
+			}
+		});
 		this.container = container;
 		this.addresses = new String[0];
 //		this.platformname = platform.getName();
@@ -91,7 +98,7 @@ public class LocalTransport implements ITransport
 		}
 		if(todeliver.size()>0)
 		{
-			((IMessageService)container.getService(IMessageService.class)).deliverMessage(message, msgtype, (IComponentIdentifier[])todeliver
+			msgservice.deliverMessage(message, msgtype, (IComponentIdentifier[])todeliver
 				.toArray(new IComponentIdentifier[todeliver.size()]));
 		}
 		

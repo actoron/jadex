@@ -4,11 +4,14 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.ThreadSuspendable;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
 import jadex.tools.common.EditableList;
 import jadex.tools.common.EditableListEvent;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
+import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.starter.StarterPlugin;
 
 import java.awt.BorderLayout;
@@ -60,7 +63,25 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	/** The list. */
 	protected EditableList classpaths;
 	
+	/** The library service. */
+//	protected ILibraryService libservice;
+	
 	//-------- methods --------
+	
+	/** 
+	 *  Initialize the plugin.
+	 * /
+	public void init(IControlCenter jcc)
+	{
+		super.init(jcc);
+		getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				libservice = (ILibraryService)result;
+			}
+		});
+	}*/
 	
 	/**
 	 *  Test if this plugin should be initialized lazily.
@@ -261,20 +282,26 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		lists.add("System Classpath Entries", otherview);
 
 		// Add a library service listener to be informed about library changes.
-		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
-		ls.addLibraryServiceListener(new ILibraryServiceListener()
+		getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
-			public void urlAdded(URL url)
+			public void resultAvailable(Object source, Object result)
 			{
-				// todo: make synchronized
-				if(!classpaths.containsEntry(url.toString()))
-					classpaths.addEntry(url.toString());
-			}
-			public void urlRemoved(URL url)
-			{
-				// todo: make synchronized
-				if(classpaths.containsEntry(url.toString()))
-					classpaths.removeEntry(url.toString());
+				ILibraryService ls = (ILibraryService)result;
+				ls.addLibraryServiceListener(new ILibraryServiceListener()
+				{
+					public void urlAdded(URL url)
+					{
+						// todo: make synchronized
+						if(!classpaths.containsEntry(url.toString()))
+							classpaths.addEntry(url.toString());
+					}
+					public void urlRemoved(URL url)
+					{
+						// todo: make synchronized
+						if(classpaths.containsEntry(url.toString()))
+							classpaths.removeEntry(url.toString());
+					}
+				});
 			}
 		});
 		
@@ -368,7 +395,8 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	protected java.util.List fetchManagedClasspathEntries()
 	{
 		List ret = new ArrayList();
-		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
+		// todo: hack!!!
+		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class).get(new ThreadSuspendable());
 		List urls = ls.getURLs();
 		for(Iterator it=urls.iterator(); it.hasNext(); )
 		{
@@ -400,7 +428,9 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	{
 		java.util.List	ret	= new ArrayList();
 
-		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
+//		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
+		// todo: hack
+		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class).get(new ThreadSuspendable());
 		ClassLoader	cl	= ls.getClassLoader();
 		
 		List cps = SUtil.getClasspathURLs(cl!=null ? cl.getParent() : null);	// todo: classpath?
