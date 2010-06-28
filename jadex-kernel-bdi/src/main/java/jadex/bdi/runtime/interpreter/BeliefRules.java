@@ -18,7 +18,6 @@ import jadex.rules.rulesystem.rules.OrConstraint;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
-import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 
 import java.beans.PropertyChangeListener;
@@ -407,8 +406,7 @@ public class BeliefRules
 						}
 		//					// changed *.class to *.TYPE due to javaflow bug
 						state.setAttributeValue(rparam, OAVBDIRuntimeModel.typedelement_has_timer, 
-							((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer()
-							.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
+								BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
 					}
 					
 					// Not possible because rparam is not in state any more
@@ -420,8 +418,7 @@ public class BeliefRules
 				
 		//			// changed *.class to *.TYPE due to javaflow bug
 				state.setAttributeValue(rparam, OAVBDIRuntimeModel.typedelement_has_timer, 
-					((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer()
-					.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
+						BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
 			}
 		}
 		
@@ -481,15 +478,13 @@ public class BeliefRules
 						}
 						// changed *.class to *.TYPE due to javaflow bug
 						state.setAttributeValue(rparamset, OAVBDIRuntimeModel.typedelement_has_timer, 
-							((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer()
-							.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
+							BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
 					}
 				});
 				
 				// changed *.class to *.TYPE due to javaflow bug
 				state.setAttributeValue(rparamset, OAVBDIRuntimeModel.typedelement_has_timer, 
-					((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer()
-					.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
+					BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
 			}
 		}
 		

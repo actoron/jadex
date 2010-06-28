@@ -21,7 +21,6 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
-import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimer;
 
 import java.util.Collection;
@@ -1083,10 +1082,9 @@ public class GoalProcessingRules
 			if(retrydelay>0)
 			{
 //				// changed *.class to *.TYPE due to javaflow bug
-				IClockService clock = (IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter()
-					.getServiceContainer().getService(IClockService.TYPE);
-				state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_retrytimer, clock.createTimer(retrydelay, 
-					new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
+				state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_retrytimer,
+					BDIInterpreter.getInterpreter(state).getClockService().createTimer(retrydelay, 
+						new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
 				{
 					public void run()
 					{
@@ -1333,10 +1331,9 @@ public class GoalProcessingRules
 				if(recurdelay>0)
 				{
 //					// changed *.class to *.TYPE due to javaflow bug
-//					IClockService clock = (IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getPlatform().getService(IClockService.class);
-					IClockService clock = (IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer().getService(IClockService.TYPE);
-					state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_recurtimer, clock.createTimer(recurdelay, 
-						new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
+					state.setAttributeValue(rgoal, OAVBDIRuntimeModel.goal_has_recurtimer,
+						BDIInterpreter.getInterpreter(state).getClockService().createTimer(recurdelay, 
+							new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
 					{
 						public void run()
 						{

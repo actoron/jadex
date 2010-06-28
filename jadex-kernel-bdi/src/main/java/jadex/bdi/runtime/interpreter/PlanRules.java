@@ -32,7 +32,6 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
-import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimer;
 
 import java.io.PrintWriter;
@@ -2098,8 +2097,7 @@ public class PlanRules
 				// timer runs on other thread.
 				TimeoutAction toa = new TimeoutAction(state, rplan, rcapa, to);
 				
-				ITimer timer = ((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer()
-					.getService(IClockService.class)).createTimer(timeout, new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), toa));
+				ITimer timer = BDIInterpreter.getInterpreter(state).getClockService().createTimer(timeout, new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), toa));
 				toa.setTimer(timer); // This works because isValid() will always be executed on agent thread (InterpreterTimedObject).
 				
 	//			System.out.println("Timer created: "+start);
@@ -2109,8 +2107,7 @@ public class PlanRules
 			{
 				TimeoutAction toa = new TimeoutAction(state, rplan, rcapa, to);
 				
-				ITimer timer = ((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer()
-					.getService(IClockService.class)).createTickTimer(new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), toa));
+				ITimer timer = BDIInterpreter.getInterpreter(state).getClockService().createTickTimer(new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), toa));
 				toa.setTimer(timer); // This works because isValid() will always be executed on agent thread (InterpreterTimedObject).
 
 //				System.out.println("Tick timer created: "+timer);

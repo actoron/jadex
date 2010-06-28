@@ -17,7 +17,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.rules.state.IOAVState;
 import jadex.service.IServiceContainer;
-import jadex.service.clock.IClockService;
 
 import java.util.logging.Logger;
 
@@ -398,14 +397,14 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 			{
 				public void run()
 				{
-					longint = ((IClockService)getAgentAdapter().getServiceContainer().getService(IClockService.TYPE)).getTime();
+					longint = getInterpreter().getClockService().getTime();
 				}
 			};
 			return invoc.longint;
 		}
 		else
 		{
-			return ((IClockService)getAgentAdapter().getServiceContainer().getService(IClockService.TYPE)).getTime();
+			return getInterpreter().getClockService().getTime();
 		}
 	}
 

@@ -28,7 +28,6 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVObjectType;
 import jadex.service.BasicServiceProvider;
-import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimedObject;
 import jadex.service.clock.ITimer;
 
@@ -1524,15 +1523,13 @@ public class AgentRules
 					}
 	//					// changed *.class to *.TYPE due to javaflow bug
 					state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
-						((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer()
-						.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
+						BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
 				}
 			});
 			
 	//			// changed *.class to *.TYPE due to javaflow bug
 			state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
-				((IClockService)BDIInterpreter.getInterpreter(state).getAgentAdapter().getServiceContainer()
-				.getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
+				BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
 		}
 		
 		registerAssignTos(state, rcapa, mbel, OAVBDIMetaModel.beliefreference_type, OAVBDIMetaModel.capability_has_beliefrefs);
@@ -1738,13 +1735,11 @@ public class AgentRules
 						BDIInterpreter.getInterpreter(state).getLogger(rcapa).severe("Could not evaluate belief expression: "+name+" "+state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content));
 					}
 					// changed *.class to *.TYPE due to javaflow bug
-					state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, ((IClockService)BDIInterpreter.getInterpreter(state)
-						.getAgentAdapter().getServiceContainer().getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
+					state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
 				}
 			});
 //			// changed *.class to *.TYPE due to javaflow bug
-			state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, ((IClockService)BDIInterpreter.getInterpreter(state)
-				.getAgentAdapter().getServiceContainer().getService(IClockService.TYPE)).createTimer(update.longValue(), to[0]));
+			state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
 		}
 
 		registerAssignTos(state, rcapa, mbelset, OAVBDIMetaModel.beliefsetreference_type, OAVBDIMetaModel.capability_has_beliefsetrefs);
@@ -3012,8 +3007,7 @@ public class AgentRules
 		long tt = prop!=null? prop.longValue(): 10000;
 		
 		// changed *.class to *.TYPE due to javaflow bug
-		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_timer, ((IClockService)interpreter.getAgentAdapter().getServiceContainer()
-			.getService(IClockService.TYPE)).createTimer(tt, new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
+		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_timer, interpreter.getClockService().createTimer(tt, new InterpreterTimedObject(BDIInterpreter.getInterpreter(state).getAgentAdapter(), new CheckedAction()
 			{
 				public boolean isValid()
 				{

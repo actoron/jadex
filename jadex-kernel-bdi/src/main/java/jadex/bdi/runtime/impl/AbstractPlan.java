@@ -508,7 +508,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public IClockService getClock()
 	{
-		return (IClockService)interpreter.getAgentAdapter().getServiceContainer().getService(IClockService.class);
+		return (IClockService)interpreter.getClockService();
 	}
 
 	/**

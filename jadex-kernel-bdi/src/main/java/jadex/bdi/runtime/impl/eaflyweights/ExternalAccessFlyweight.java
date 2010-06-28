@@ -9,7 +9,6 @@ import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
 import jadex.bdi.runtime.impl.WakeupAction;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
-import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
@@ -21,7 +20,6 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.rules.state.IOAVState;
 import jadex.service.IServiceProvider;
-import jadex.service.clock.IClockService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -994,13 +992,13 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 //					final long start = System.currentTimeMillis(); 
 					
 //					System.out.println("Timer created: "+start);
-					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer, ((IClockService)getInterpreter()
-						.getAgentAdapter().getServiceContainer().getService(IClockService.class)).createTimer(timeout, new InterpreterTimedObject(BDIInterpreter.getInterpreter(getState()).getAgentAdapter(), wakeup)));
+					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer,
+						getInterpreter().getClockService().createTimer(timeout, new InterpreterTimedObject(getInterpreter().getAgentAdapter(), wakeup)));
 				}
 				else if(timeout==PlanRules.TICK_TIMER)
 				{
-					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer, ((IClockService)getInterpreter()
-						.getAgentAdapter().getServiceContainer().getService(IClockService.class)).createTickTimer(new InterpreterTimedObject(BDIInterpreter.getInterpreter(getState()).getAgentAdapter(), wakeup)));
+					getState().setAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_timer,
+						getInterpreter().getClockService().createTickTimer(new InterpreterTimedObject(getInterpreter().getAgentAdapter(), wakeup)));
 				}				
 			}
 		});

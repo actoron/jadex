@@ -934,7 +934,7 @@ public class OAVBDIRuntimeModel
 		// agent
 		agent_has_name = agent_type.createAttributeType("agent_has_name", OAVJavaType.java_string_type);
 		agent_has_localname = agent_type.createAttributeType("agent_has_localname", OAVJavaType.java_string_type);
-		agent_has_state = agent_type.createAttributeType("agent_has_state", OAVJavaType.java_string_type, OAVAttributeType.NONE, AGENTLIFECYCLESTATE_CREATING);
+		agent_has_state = agent_type.createAttributeType("agent_has_state", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 		// todo: use IMessageAdapter?
 		agent_has_inbox = agent_type.createAttributeType("agent_has_inbox", java_imessageadapter_type, OAVAttributeType.LIST, null);
 //		agent_has_actions = agent_type.createAttributeType("agent_has_actions", java_runnable_type, OAVAttributeType.LIST, null);

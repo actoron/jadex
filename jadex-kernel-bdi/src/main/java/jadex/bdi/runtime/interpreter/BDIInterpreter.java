@@ -24,6 +24,7 @@ import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.ISynchronizator;
 import jadex.javaparser.IParsedExpression;
@@ -37,6 +38,7 @@ import jadex.rules.rulesystem.Rulebase;
 import jadex.rules.rulesystem.rules.Rule;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
+import jadex.service.clock.IClockService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -100,6 +102,10 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	
 	/** The event reificator creates changeevent objects for relevant state changes. */
 	protected EventReificator reificator;
+	
+	/** The clock service. */
+	//hack???
+	protected IClockService	clockservice;
 	
 	//-------- null on init --------
 	
@@ -241,7 +247,17 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 			Boolean mps = (Boolean)kernelprops.get("microplansteps");
 			if(mps!=null)
 				this.microplansteps = mps.booleanValue();
-		}		
+		}
+		
+		// Get the clock service.
+		adapter.getServiceContainer().getService(IClockService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				BDIInterpreter.this.clockservice	= (IClockService)result;
+				BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
+			}
+		});
 		
 		// This is the clean way to init the logger, but since 
 		// Java 7 the LogManager is a memory leak
@@ -721,10 +737,15 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	 */
 	public void	killAgent()
 	{
-		((IComponentManagementService)adapter.getServiceContainer()
-			.getService(IComponentManagementService.class))
-			.destroyComponent(adapter.getComponentIdentifier());
+		adapter.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier());
+			}
+		});
 	}
+	
 	/**
 	 *  Get the agent state.
 	 *  @return The agent state.
@@ -732,6 +753,15 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	public IOAVState getState()
 	{
 		return this.state;
+	}
+
+	/**
+	 *  Get the cached clock service
+	 */
+	// hack!!! to avoid dealing with futures.
+	public IClockService	getClockService()
+	{
+		return clockservice;
 	}
 	
 	/**

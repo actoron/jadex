@@ -1,7 +1,6 @@
 package jadex.bridge;
 
-import jadex.commons.IFuture;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.clock.ITimedObject;
 
 /**
@@ -18,12 +17,6 @@ public class InterpreterTimedObject implements ITimedObject
 	/** The runnable. */
 	protected CheckedAction action;
 	
-	/** The component execution service. */
-	protected IComponentManagementService ces;
-
-	/** The component identifier. */
-	protected IComponentIdentifier cid;
-	
 	//-------- constructors --------
 	
 	/**
@@ -33,8 +26,6 @@ public class InterpreterTimedObject implements ITimedObject
 	{
 		this.adapter = adapter;
 		this.action = runnable;
-		this.ces = (IComponentManagementService)adapter.getServiceContainer().getService(IComponentManagementService.class);
-		this.cid = adapter.getComponentIdentifier();
 	}
 	
 	//-------- methods --------
@@ -46,30 +37,31 @@ public class InterpreterTimedObject implements ITimedObject
 	 */
 	public void timeEventOccurred(long currenttime)
 	{
-		IFuture ret = ces.getComponentDescription(cid);
-		ret.addResultListener(new IResultListener()
+		adapter.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				IComponentDescription desc = (IComponentDescription)result;
-				if(desc!=null && !IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
+				IComponentManagementService	ces	= (IComponentManagementService)result;
+				ces.getComponentDescription(adapter.getComponentIdentifier()).addResultListener(new DefaultResultListener()
 				{
-					try
+					public void resultAvailable(Object source, Object result)
 					{
-						adapter.invokeLater(action);
+						IComponentDescription desc = (IComponentDescription)result;
+						if(desc!=null && !IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
+						{
+							try
+							{
+								adapter.invokeLater(action);
+							}
+							catch(ComponentTerminatedException e)
+							{
+							}
+						}						
+						// else component was terminated
 					}
-					catch(ComponentTerminatedException e)
-					{
-					}
-				}
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
+				});
 			}
 		});
-		
-		// else component was terminated
 	}
 	
 	/**
