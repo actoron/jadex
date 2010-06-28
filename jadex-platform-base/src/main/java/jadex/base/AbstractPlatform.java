@@ -190,7 +190,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 				});
 				
 				// Kill the given components.
-				IResultListener	rl	= new IResultListener()
+				final IResultListener	rl	= new IResultListener()
 				{
 					int cnt	= 0;
 					public void resultAvailable(Object source, Object result)
@@ -225,14 +225,25 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 					}
 				};
 				
-				IComponentManagementService	ces	= (IComponentManagementService)getService(IComponentManagementService.class);
-				for(int i=0; i < comps.size(); i++)
+				getService(IComponentManagementService.class).addResultListener(new IResultListener()
 				{
-					//System.out.println("Killing component: "+comps.get(i));
-					CMSComponentDescription desc = (CMSComponentDescription)comps.get(i);
-					IFuture ret = ces.destroyComponent(desc.getName());
-					ret.addResultListener(rl);
-				}
+					public void resultAvailable(Object source, Object result)
+					{
+						IComponentManagementService	ces	= (IComponentManagementService)result;
+						for(int i=0; i < comps.size(); i++)
+						{
+							//System.out.println("Killing component: "+comps.get(i));
+							CMSComponentDescription desc = (CMSComponentDescription)comps.get(i);
+							IFuture ret = ces.destroyComponent(desc.getName());
+							ret.addResultListener(rl);
+						}
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						listener.exceptionOccurred(source, exception);
+					}
+				});
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)

@@ -5,6 +5,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
@@ -242,7 +243,7 @@ public class Platform extends AbstractPlatform
 		Property[] libpaths = Properties.getProperties(configurations, LIBPATH);
 		if(libpaths.length>0)
 		{
-			ILibraryService ls = (ILibraryService)getService(ILibraryService.class);
+			ILibraryService ls = (ILibraryService)getService(ILibraryService.class).get(new ThreadSuspendable());	// Hack!!!
 			if(ls==null)
 				throw new RuntimeException("No library service available for setting lib paths.");
 

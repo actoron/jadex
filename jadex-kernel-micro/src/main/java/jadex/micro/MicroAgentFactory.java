@@ -104,7 +104,6 @@ public class MicroAgentFactory implements IComponentFactory, IService
 	{
 //		System.out.println("loading micro: "+model);
 		ILoadableComponentModel ret = null;
-		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 		
 		String clname = model;
 		
