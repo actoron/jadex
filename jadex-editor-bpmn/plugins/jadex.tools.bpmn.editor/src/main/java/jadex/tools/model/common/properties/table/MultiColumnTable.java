@@ -355,6 +355,87 @@ public class MultiColumnTable
 		return buffer.toString();
 	}
 	
+//	/**
+//	 * Convert a string representation of a MultiColumnTableRow list into a
+//	 * MultiColumnTableRow list
+//	 * 
+//	 * @param stringToConvert
+//	 * @param columnCount number of columns to expect in the table (e.g. attribute count)
+//	 * @param uniqueColumn, set to -1 for no unique column (beware, someone could get confused!)
+//	 * @return List of column rows from String, each column rows has set the unique column attribute
+//	 * @deprecated We use a annotation as table now
+//	 */
+//	public static MultiColumnTable convertMultiColumnTableString(
+//			String stringToConvert, int columnCount, int uniqueColumn)
+//	{
+//		// replace the old deprecated delimiter with the new one used
+//		//stringToConvert = convertDeprecatedDelimiter(stringToConvert);
+//		
+//		StringTokenizer listTokens = new StringTokenizer(stringToConvert, LIST_ELEMENT_DELIMITER, false);
+//		
+//		//MultiColumnTable tableRowList = new MultiColumnTable(listTokens.countTokens());
+//		
+//		long countTokens = listTokens.countTokens();
+//		MultiColumnTable tableRowList = new MultiColumnTable((int)countTokens/2, uniqueColumn);
+//		
+//		while (listTokens.hasMoreElements())
+//		{
+//			String parameterElement = listTokens.nextToken();
+//			StringTokenizer parameterTokens = new StringTokenizer(
+//					parameterElement,
+//					LIST_ELEMENT_ATTRIBUTE_DELIMITER, true);
+//	
+//			// number of columns is the index that will be used.
+//			// initialize array with empty strings because we 
+//			// don't check the values
+//			String[] attributes = new String[columnCount];
+//			for (int index = 0; index < attributes.length; index++)
+//			{
+//				attributes[index] = attributes[index] != null ? attributes[index] : "";
+//			}
+//			
+//			int attributeIndexCounter = 0;	
+//			String lastToken = null;
+//	
+//			while (parameterTokens.hasMoreElements())
+//			{
+//				String attributeToken = parameterTokens.nextToken();
+//	
+//				if (!attributeToken.equals(LIST_ELEMENT_ATTRIBUTE_DELIMITER))
+//				{
+//					attributes[attributeIndexCounter] = attributeToken;
+//					attributeIndexCounter++;
+//				}
+//				// we found a delimiter
+//				else
+//				{
+//					if (	// we found a delimiter at the first position
+//							lastToken == null 
+//							// we found a delimiter at the last position, 
+//							|| !parameterTokens.hasMoreElements()
+//							// we found two delimiter without any content between
+//							|| attributeToken.equals(lastToken))
+//					{
+//						attributes[attributeIndexCounter] = "";
+//						attributeIndexCounter++;
+//					}
+//					
+//				}
+//	
+//				// remember last token
+//				lastToken = attributeToken;
+//	
+//			} // end while paramTokens
+//	
+//			MultiColumnTableRow newRow = tableRowList.new MultiColumnTableRow(attributes, uniqueColumn);
+//			//addUniqueRowValue(newRow.getColumnValueAt(uniqueColumnIndex));
+//			tableRowList.add(newRow);
+//	
+//		} // end while listTokens
+//		
+//		return tableRowList;
+//	}
+	
 	/**
 	 * Convert a string representation of a MultiColumnTableRow list into a
 	 * MultiColumnTableRow list
@@ -366,17 +447,15 @@ public class MultiColumnTable
 	 * @deprecated We use a annotation as table now
 	 */
 	public static MultiColumnTable convertMultiColumnTableString(
-			String stringToConvert, int columnCount, int uniqueColumn)
+			String stringToConvert, int uniqueColumn)
 	{
-		// replace the old deprecated delimiter with the new one used
-		//stringToConvert = convertDeprecatedDelimiter(stringToConvert);
-		
+
 		StringTokenizer listTokens = new StringTokenizer(stringToConvert, LIST_ELEMENT_DELIMITER, false);
 		
 		//MultiColumnTable tableRowList = new MultiColumnTable(listTokens.countTokens());
 		
-		long countTokens = listTokens.countTokens();
-		MultiColumnTable tableRowList = new MultiColumnTable((int)countTokens/2, uniqueColumn);
+		long countRowTokens = listTokens.countTokens();
+		MultiColumnTable tableRowList = new MultiColumnTable((int)countRowTokens/2, uniqueColumn);
 		
 		while (listTokens.hasMoreElements())
 		{
@@ -385,13 +464,14 @@ public class MultiColumnTable
 					parameterElement,
 					LIST_ELEMENT_ATTRIBUTE_DELIMITER, true);
 	
-			// number of columns is the index that will be used.
+			// number of columns (tokens / 2 +1) is the index that will be used.
+			int countColumnTokens = ((int)(parameterTokens.countTokens() / 2))+1;
 			// initialize array with empty strings because we 
 			// don't check the values
-			String[] attributes = new String[columnCount];
+			String[] attributes = new String[countColumnTokens];
 			for (int index = 0; index < attributes.length; index++)
 			{
-				attributes[index] = attributes[index] != null ? attributes[index] : "";
+				attributes[index] = "";
 			}
 			
 			int attributeIndexCounter = 0;	

@@ -152,6 +152,21 @@ public class JadexBpmnPropertiesUtil
 	// ---- static methods ----
 	
 	/**
+	 * Create the annotation identifier from util values
+	 * 
+	 * @return
+	 */
+	protected static String getTableAnnotationIdentifier(String annotationID, String detailID)
+	{
+		return annotationID
+				+ JADEX_COMBINED_KEY_DELIMITER
+				+ detailID
+				+ JADEX_COMBINED_KEY_DELIMITER
+				+ JADEX_TABLE_KEY_EXTENSION;
+	}
+
+
+	/**
 	 * Update annotation detail
 	 * @param element
 	 * @param annotationIdentifier
@@ -368,6 +383,39 @@ public class JadexBpmnPropertiesUtil
 		
 	}
 	
+	/**
+	 * Check if have to convert the annotation to new format
+	 * 
+	 * @return true if a conversion is done
+	 */
+	@SuppressWarnings("deprecation")
+	public static boolean checkAnnotationConversion(EModelElement modelElement,
+			String annotationId, String detailId, int uniqueColumnIndex)
+	{
+		EAnnotation ea = modelElement.getEAnnotation(annotationId);
+		if (ea != null)
+		{
+			String value = (String) ea.getDetails().get(detailId);
+			if (value != null)
+			{
+				// Old format, convert to new format and remove detail.
+				// TableColumn[] columns = tableViewer.getTable().getColumns();
+				MultiColumnTable table = MultiColumnTable
+						.convertMultiColumnTableString(value, /* columns.length, */
+						uniqueColumnIndex);
+				// save the new annotation
+				JadexBpmnPropertiesUtil.updateJadexEAnnotationTable(
+						modelElement, getTableAnnotationIdentifier(annotationId, detailId), table);
+				// remove the old detail, this removes annotation if details are
+				// empty too
+				JadexBpmnPropertiesUtil.updateJadexEAnnotationDetail(
+						modelElement, annotationId,
+						detailId, null);
+				return true;
+			}
+		}
+		return false;
+	}
 	
 }
 

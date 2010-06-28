@@ -516,4 +516,49 @@
       </propertySections>
    </extension>
  
+ 
+ <!-- define custom commands -->
+	<extension point="org.eclipse.ui.commands">
+		<?gmfgen generated="false"?>
+		<category 
+			name="Converter" 
+			description="Commands related to convert BPMN diagrams." 
+			id="jadex.tools.bpmn.diagram.ui.category.bpmn.convert"/>
+				<command 
+					categoryId="jadex.tools.bpmn.diagram.ui.category.bpmn.convert" 
+					description="Convert properties tables" 
+					id="jadex.tools.bpmn.diagram.ui.commands.bpmn.convertTables" 
+					name="Convert Jadex properties">
+				</command>
+	</extension>
+	
+	<!-- add custom commands to menu -->
+	<extension point="org.eclipse.ui.popupMenus">
+	<?gmfgen generated="false"?>
+	  <!-- BpmnDiagram -->
+	  <objectContribution
+	    adaptable="false"
+	    id="jadex.tools.bpmn.diagram.ui.objectContribution.BpmnDiagramEditPart1"
+	    objectClass="org.eclipse.stp.bpmn.diagram.edit.parts.BpmnDiagramEditPart">
+		 <!--
+		 <menu 
+		    id="BPMN" 
+		    label="BPMN" 
+		    path="additions"> 
+		    <separator name="group1"/>
+		 </menu>
+		 -->
+		 <action
+		       class="jadex.tools.bpmn.diagram.actions.ConvertDiagramPropertiesAction"
+		       definitionId="jadex.tools.bpmn.diagram.ui.commands.bpmn.convertTables"
+		       enablesFor="1"
+		       id="jadex.tools.bpmn.diagram.actions.ConvertDiagramPropertiesActionID"
+		       label="Convert property tables">
+		       <!--
+		       menubarPath="BPMN/group1">
+		       -->
+		 </action>
+	 </objectContribution>
+	</extension>
+ 
 </plugin>

@@ -410,6 +410,39 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 				getTableAnnotationIdentifier(), table);
 	}
 
+//	/**
+//	 * Check if have to convert the annotation to new format
+//	 * 
+//	 * @return true if a conversion is done
+//	 */
+//	private boolean checkAnnotationConversion()
+//	{
+//		EAnnotation ea = modelElement
+//				.getEAnnotation(util.containerEAnnotationName);
+//		if (ea != null)
+//		{
+//			String value = (String) ea.getDetails().get(
+//					util.annotationDetailName);
+//			if (value != null)
+//			{
+//				// This is the old format, so convert to new format an remove
+//				// detail.
+//				//TableColumn[] columns = tableViewer.getTable().getColumns();
+//				MultiColumnTable table = MultiColumnTable
+//						.convertMultiColumnTableString(value, /*columns.length,*/
+//								uniqueColumnIndex);
+//				// save the new annotation
+//				JadexBpmnPropertiesUtil.updateJadexEAnnotationTable(
+//						modelElement, getTableAnnotationIdentifier(), table);
+//				// remove the old detail, this removes annotation if details are
+//				// empty too
+//				util.updateJadexEAnnotation(util.annotationDetailName, null);
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
+	
 	/**
 	 * Check if have to convert the annotation to new format
 	 * 
@@ -417,30 +450,8 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	 */
 	private boolean checkAnnotationConversion()
 	{
-		EAnnotation ea = modelElement
-				.getEAnnotation(util.containerEAnnotationName);
-		if (ea != null)
-		{
-			String value = (String) ea.getDetails().get(
-					util.annotationDetailName);
-			if (value != null)
-			{
-				// This is the old format, so convert to new format an remove
-				// detail.
-				TableColumn[] columns = tableViewer.getTable().getColumns();
-				MultiColumnTable table = MultiColumnTable
-						.convertMultiColumnTableString(value, columns.length,
-								uniqueColumnIndex);
-				// save the new annotation
-				JadexBpmnPropertiesUtil.updateJadexEAnnotationTable(
-						modelElement, getTableAnnotationIdentifier(), table);
-				// remove the old detail, this removes annotation if details are
-				// empty too
-				util.updateJadexEAnnotation(util.annotationDetailName, null);
-				return true;
-			}
-		}
-		return false;
+		return JadexBpmnPropertiesUtil.checkAnnotationConversion(modelElement,
+				util.containerEAnnotationName, util.annotationDetailName, uniqueColumnIndex);
 	}
 
 	/**
@@ -450,26 +461,10 @@ public abstract class AbstractBpmnMultiColumnTablePropertySection extends
 	 */
 	private String getTableAnnotationIdentifier()
 	{
-		return getTableAnnotationIdentifier(util.containerEAnnotationName,
+		return JadexBpmnPropertiesUtil.getTableAnnotationIdentifier(util.containerEAnnotationName,
 				util.annotationDetailName);
 	}
 	
-	/**
-	 * Create the annotation identifier from util values
-	 * 
-	 * @return
-	 */
-	protected static String getTableAnnotationIdentifier(String annotationID, String detailID)
-	{
-		return annotationID
-				+ JadexBpmnPropertiesUtil.JADEX_COMBINED_KEY_DELIMITER
-				+ detailID
-				+ JadexBpmnPropertiesUtil.JADEX_COMBINED_KEY_DELIMITER
-				+ JadexBpmnPropertiesUtil.JADEX_TABLE_KEY_EXTENSION;
-	}
-
-	// ---- internal used classes ----
-
 	/**
 	 * Simple content provider that reflects the table values of the specified
 	 * annotation detail given as value from containing class.

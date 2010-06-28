@@ -14,6 +14,8 @@ public class JadexBpmnDiagramImportsSection extends
 		AbstractBpmnMultiColumnTablePropertySection
 {
 
+	public static final int UNIQUE_COLUMN_INDEX = 0;
+
 	public static final String[] DEFAULT_IMPORT_VALUE = new String[]{"jadex.*"};
 	
 	public static final String[] IMPORT_COLUMN_LABELS = new String[]{"import"};
@@ -26,7 +28,7 @@ public class JadexBpmnDiagramImportsSection extends
 		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, 
 				JadexBpmnPropertiesUtil.JADEX_IMPORT_LIST_DETAIL,
 				"Imports", 
-				0);
+				UNIQUE_COLUMN_INDEX);
 	}
 
 	@Override

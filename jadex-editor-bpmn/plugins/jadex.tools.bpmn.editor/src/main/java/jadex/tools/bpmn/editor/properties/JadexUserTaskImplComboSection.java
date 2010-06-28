@@ -269,7 +269,7 @@ public class JadexUserTaskImplComboSection extends
 		MultiColumnTable parameterTable = JadexBpmnPropertiesUtil
 					.getJadexEAnnotationTable(
 							modelElement,
-							AbstractBpmnMultiColumnTablePropertySection
+							JadexBpmnPropertiesUtil
 									.getTableAnnotationIdentifier(
 											JadexCommonParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
 											JadexCommonParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER)); 
@@ -285,7 +285,7 @@ public class JadexUserTaskImplComboSection extends
 		JadexBpmnPropertiesUtil
 				.updateJadexEAnnotationTable(
 						modelElement,
-						AbstractBpmnMultiColumnTablePropertySection
+						JadexBpmnPropertiesUtil
 								.getTableAnnotationIdentifier(
 										JadexCommonParameterSection.PARAMETER_ANNOTATION_IDENTIFIER,
 										JadexCommonParameterSection.PARAMETER_ANNOTATION_DETAIL_IDENTIFIER),
