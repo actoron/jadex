@@ -147,8 +147,13 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		// Change back to suspended, when previously waiting.
 		if(IComponentDescription.STATE_WAITING.equals(desc.getState()))
 		{
-			ComponentManagementService	ces	= (ComponentManagementService)container.getService(IComponentManagementService.class);
-			ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
+			container.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					((ComponentManagementService)result).setComponentState(cid, IComponentDescription.STATE_SUSPENDED);
+				}
+			});
 		}
 
 		// Resume execution of the component (when active or terminating).
@@ -428,8 +433,13 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		{
 			if(component.isAtBreakpoint(desc.getBreakpoints()))
 			{
-				ComponentManagementService	ces	= (ComponentManagementService)container.getService(IComponentManagementService.class);
-				ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
+				container.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						((ComponentManagementService)result).setComponentState(cid, IComponentDescription.STATE_SUSPENDED);
+					}
+				});
 			}
 		}
 		
@@ -441,8 +451,13 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 			// Set state to waiting before step. (may be reset by wakup() call in step)
 			if(dostep && IComponentDescription.STATE_SUSPENDED.equals(desc.getState()))
 			{
-				ComponentManagementService	ces	= (ComponentManagementService)container.getService(IComponentManagementService.class);
-				ces.setComponentState(cid, IComponentDescription.STATE_WAITING);	// I hope this doesn't cause any deadlocks :-/
+				container.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						((ComponentManagementService)result).setComponentState(cid, IComponentDescription.STATE_WAITING);
+					}
+				});
 			}
 
 			try
@@ -460,8 +475,13 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 				// Set back to suspended if components is still waiting but wants to execute again.
 				if(again && IComponentDescription.STATE_WAITING.equals(desc.getState()))
 				{
-					ComponentManagementService	ces	= (ComponentManagementService)container.getService(IComponentManagementService.class);
-					ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
+					container.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							((ComponentManagementService)result).setComponentState(cid, IComponentDescription.STATE_SUSPENDED);
+						}
+					});
 				}
 				again	= again && IComponentDescription.STATE_ACTIVE.equals(desc.getState());
 				if(steplistener!=null)
@@ -474,8 +494,13 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		{
 			if(component.isAtBreakpoint(desc.getBreakpoints()))
 			{
-				ComponentManagementService	ces	= (ComponentManagementService)container.getService(IComponentManagementService.class);
-				ces.setComponentState(cid, IComponentDescription.STATE_SUSPENDED);	// I hope this doesn't cause any deadlocks :-/
+				container.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						((ComponentManagementService)result).setComponentState(cid, IComponentDescription.STATE_SUSPENDED);
+					}
+				});
 			}
 		}
 

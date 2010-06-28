@@ -1,8 +1,5 @@
 package jadex.commons.concurrent;
 
-import jadex.commons.concurrent.IResultListener;
-
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**
@@ -27,7 +24,7 @@ public abstract class DefaultResultListener implements IResultListener
 	 */
 	public DefaultResultListener()
 	{
-		this.logger = LogManager.getLogManager().getLogger(""+this);
+		this.logger = Logger.getLogger("default-result-listener");
 	}
 	
 	/**

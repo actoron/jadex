@@ -17,6 +17,7 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
@@ -80,6 +81,9 @@ public class MessageService implements IMessageService, IService
 	
 	/** The listeners. */
 	protected List listeners;
+	
+	/** The cashed clock service. */
+	protected IClockService	clockservice;
 
 	//-------- constructors --------
 
@@ -108,13 +112,13 @@ public class MessageService implements IMessageService, IService
 	 *  @param message The native message.
 	 */
 //	public void sendMessage(Map msg, MessageType type, IComponentIdentifier sender, ClassLoader cl)
-	public void sendMessage(Map msg, MessageType type, IComponentAdapter adapter, ClassLoader cl)
+	public void sendMessage(final Map msg, final MessageType type, final IComponentAdapter adapter, final ClassLoader cl)
 	{
 		IComponentIdentifier sender = adapter.getComponentIdentifier();
 		if(sender==null)
 			throw new RuntimeException("Sender must not be null: "+msg);
 	
-		Map msgcopy = new HashMap(msg);
+		final Map msgcopy = new HashMap(msg);
 		
 		// Automatically add optional meta information.
 		String senid = type.getSenderIdentifier();
@@ -127,15 +131,31 @@ public class MessageService implements IMessageService, IService
 		if(id==null)
 			msgcopy.put(idid, SUtil.createUniqueId(sender.getLocalName()));
 
-		String sd = type.getTimestampIdentifier();
+		final String sd = type.getTimestampIdentifier();
 		Object senddate = msgcopy.get(sd);
 		if(senddate==null)
 		{
-			IClockService	clock	= (IClockService) platform.getService(IClockService.class);
-			if(clock!=null)
-				msgcopy.put(sd, ""+clock.getTime());
+			platform.getService(IClockService.class).addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					if(result!=null)
+						msgcopy.put(sd, ""+((IClockService)result).getTime());
+					doSendMessage(msg, type, adapter, cl, msgcopy);
+				}
+			});
 		}
-		
+		else
+		{
+			doSendMessage(msg, type, adapter, cl, msgcopy);
+		}
+	}
+
+	/**
+	 *  Extracted method to be callable from listener.
+	 */
+	protected void doSendMessage(Map msg, MessageType type, IComponentAdapter adapter, ClassLoader cl, Map msgcopy)
+	{
 		IComponentIdentifier[] receivers = null;
 		Object tmp = msgcopy.get(type.getReceiverIdentifier());
 		if(tmp instanceof Collection)
@@ -378,11 +398,27 @@ public class MessageService implements IMessageService, IService
 			}
 		}
 		
-		Future	ret	= new Future();
+		final Future	ret	= new Future();
 		if(transports.size()==0)
+		{
 			ret.setException(new RuntimeException("MessageService has no working transport for sending messages."));
+		}
 		else
-			ret.setResult(null);
+		{
+			platform.getService(IClockService.class).addResultListener(new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					clockservice	= (IClockService)result;
+					ret.setResult(null);
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
+		}
 		return ret;
 	}
 	
@@ -477,78 +513,83 @@ public class MessageService implements IMessageService, IService
 		final MessageType	messagetype	= getMessageType(type);
 		final Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
 		
-		for(int i = 0; i < receivers.length; i++)
+		platform.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
-			((ComponentManagementService)platform.getService(IComponentManagementService.class)).getComponentAdapter(receivers[i], new IResultListener()
+			public void resultAvailable(Object source, Object result)
 			{
-				public void resultAvailable(Object source, Object result)
+				for(int i = 0; i < receivers.length; i++)
 				{
-					StandaloneComponentAdapter component = (StandaloneComponentAdapter)result;
-					if(component != null)
+					((ComponentManagementService)result).getComponentAdapter(receivers[i], new IResultListener()
 					{
-						ClassLoader cl = component.getComponentInstance().getClassLoader();
-						Map	message	= (Map) decoded.get(cl);
-						if(message==null)
+						public void resultAvailable(Object source, Object result)
 						{
-							if(receivers.length>1)
+							StandaloneComponentAdapter component = (StandaloneComponentAdapter)result;
+							if(component != null)
 							{
-								message	= new HashMap(msg);
-								decoded.put(cl, message);
+								ClassLoader cl = component.getComponentInstance().getClassLoader();
+								Map	message	= (Map) decoded.get(cl);
+								if(message==null)
+								{
+									if(receivers.length>1)
+									{
+										message	= new HashMap(msg);
+										decoded.put(cl, message);
+									}
+									else
+									{
+										// Skip creation of copy when only one receiver.
+										message	= msg;
+									}
+
+									// Conversion via platform specific codecs
+									IContentCodec[] compcodecs = getContentCodecs(component);
+									for(Iterator it=message.keySet().iterator(); it.hasNext(); )
+									{
+										String name = (String)it.next();
+										Object value = message.get(name);
+										
+										IContentCodec codec = messagetype.findContentCodec(compcodecs, message, name);
+										if(codec==null)
+											codec = messagetype.findContentCodec(DEFCODECS, message, name);
+										
+										if(codec!=null)
+										{
+											message.put(name, codec.decode((String)value, cl));
+										}
+									}
+								}
+
+								try
+								{
+									component.receiveMessage(message, messagetype);
+								}
+								catch(ComponentTerminatedException ate)
+								{
+									logger.warning("Message could not be delivered to receiver(s): " + message);
+
+									// todo: notify sender that message could not be delivered!
+									// Problem: there is no connection back to the sender, so that
+									// the only chance is sending a separate failure message.
+								}
 							}
 							else
 							{
-								// Skip creation of copy when only one receiver.
-								message	= msg;
-							}
+								logger.warning("Message could not be delivered to receiver(s): " + msg);
 
-							// Conversion via platform specific codecs
-							IContentCodec[] compcodecs = getContentCodecs(component);
-							for(Iterator it=message.keySet().iterator(); it.hasNext(); )
-							{
-								String name = (String)it.next();
-								Object value = message.get(name);
-								
-								IContentCodec codec = messagetype.findContentCodec(compcodecs, message, name);
-								if(codec==null)
-									codec = messagetype.findContentCodec(DEFCODECS, message, name);
-								
-								if(codec!=null)
-								{
-									message.put(name, codec.decode((String)value, cl));
-								}
+								// todo: notify sender that message could not be delivered!
+								// Problem: there is no connection back to the sender, so that
+								// the only chance is sending a separate failure message.
 							}
 						}
 
-						try
+						public void exceptionOccurred(Object source, Exception exception)
 						{
-							component.receiveMessage(message, messagetype);
+							logger.severe("Exception occurred: "+exception);
 						}
-						catch(ComponentTerminatedException ate)
-						{
-							logger.warning("Message could not be delivered to receiver(s): " + message);
-
-							// todo: notify sender that message could not be delivered!
-							// Problem: there is no connection back to the sender, so that
-							// the only chance is sending a separate failure message.
-						}
-					}
-					else
-					{
-						logger.warning("Message could not be delivered to receiver(s): " + msg);
-
-						// todo: notify sender that message could not be delivered!
-						// Problem: there is no connection back to the sender, so that
-						// the only chance is sending a separate failure message.
-					}
+					});
 				}
-
-				public void exceptionOccurred(Object source, Exception exception)
-				{
-					logger.severe("Exception occurred: "+exception);
-				}
-			});
-			
-		}
+			}	
+		});
 	}
 	
 	/**
@@ -593,7 +634,13 @@ public class MessageService implements IMessageService, IService
 		public synchronized void addMessage(Map message, String type, IComponentIdentifier[] receivers)
 		{
 			messages.add(new Object[]{message, type, receivers});
-			((IExecutionService)platform.getService(IExecutionService.class)).execute(this);
+			platform.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					((IExecutionService)result).execute(SendMessage.this);
+				}
+			});
 		}
 	}
 	
@@ -638,7 +685,13 @@ public class MessageService implements IMessageService, IService
 		public synchronized void addMessage(Map message, String type, IComponentIdentifier[] receivers)
 		{
 			messages.add(new Object[]{message, type, receivers});
-			((IExecutionService)platform.getService(IExecutionService.class)).execute(this);
+			platform.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					((IExecutionService)result).execute(DeliverMessage.this);
+				}
+			});
 		}
 	}
 }

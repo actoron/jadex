@@ -138,7 +138,7 @@ public class HierarchicalServiceContainer extends BasicServiceContainer
 				public void resultAvailable(Object source, Object result)
 				{
 					Object res = null;
-					if(ret==null)
+					if(result==null)
 					{
 						Map tmp = getServiceMap(type);
 						if(tmp != null && !tmp.isEmpty())
@@ -175,24 +175,7 @@ public class HierarchicalServiceContainer extends BasicServiceContainer
 		if(parent!=null)
 			parent.start();
 			
-		// Start the services.
-		if(services!=null)
-		{
-			for(Iterator it=services.keySet().iterator(); it.hasNext(); )
-			{
-				Object key = it.next();
-				Map tmp = (Map)services.get(key);
-				if(tmp!=null)
-				{
-					for(Iterator it2=tmp.keySet().iterator(); it2.hasNext(); )
-					{
-						Object key2 = it2.next();
-						IService service = (IService)tmp.get(key2);
-						service.startService();
-					}
-				}
-			}
-		}
+		super.start();
 	}
 	
 	/**

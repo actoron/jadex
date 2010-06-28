@@ -14,6 +14,7 @@ import jadex.bridge.ISearchConstraints;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.collection.IndexMap;
+import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
@@ -33,6 +34,12 @@ public class DirectoryFacilitatorService implements IDF, IService
 
 	/** The platform. */
 	protected IServiceContainer platform;
+	
+	/** The cached component management service. */
+	protected IComponentManagementService cms;
+	
+	/** The cached clock service. */
+	protected IClockService clockservice;
 	
 	/** The registered components. */
 	protected IndexMap	components;
@@ -59,11 +66,10 @@ public class DirectoryFacilitatorService implements IDF, IService
 		Future ret = new Future();
 		
 		//System.out.println("Registered: "+adesc.getName()+" "+adesc.getLeaseTime());
-		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, (IComponentManagementService)platform.getService(IComponentManagementService.class), this);
+		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, cms, this);
 
 		// Add description, when valid.
-		IClockService clock = (IClockService)platform.getService(IClockService.class);
-		if(clone.getLeaseTime()==null || clone.getLeaseTime().getTime()>clock.getTime())
+		if(clone.getLeaseTime()==null || clone.getLeaseTime().getTime()>clockservice.getTime())
 		{
 			synchronized(components)
 			{
@@ -120,11 +126,10 @@ public class DirectoryFacilitatorService implements IDF, IService
 		Future ret = new Future();
 		
 		// Use clone to avoid caller manipulating object after insertion.
-		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, (IComponentManagementService)platform.getService(IComponentManagementService.class), this);
+		IDFComponentDescription clone = SFipa.cloneDFComponentDescription(cdesc, cms, this);
 
 		// Change description, when valid.
-		IClockService clock = (IClockService)platform.getService(IClockService.class);
-		if(clone.getLeaseTime()==null || clone.getLeaseTime().getTime()>clock.getTime())
+		if(clone.getLeaseTime()==null || clone.getLeaseTime().getTime()>clockservice.getTime())
 		{
 			// Automatically throws exception, when key does not exist.
 			synchronized(components)
@@ -164,8 +169,7 @@ public class DirectoryFacilitatorService implements IDF, IService
 				{
 					DFComponentDescription ad = (DFComponentDescription)components.get(adesc.getName());
 					// Remove description when invalid.
-					IClockService clock = (IClockService)platform.getService(IClockService.class);
-					if(ad.getLeaseTime()!=null && ad.getLeaseTime().getTime()<clock.getTime())
+					if(ad.getLeaseTime()!=null && ad.getLeaseTime().getTime()<clockservice.getTime())
 						components.removeKey(ad.getName());
 					else
 						ret.add(ad);
@@ -182,8 +186,7 @@ public class DirectoryFacilitatorService implements IDF, IService
 				for(int i=0; (con==null || con.getMaxResults()==-1 || ret.size()<con.getMaxResults()) && i<descs.length; i++)
 				{
 					// Remove description when invalid.
-					IClockService clock = (IClockService)platform.getService(IClockService.class);
-					if(descs[i].getLeaseTime()!=null && descs[i].getLeaseTime().getTime()<clock.getTime())
+					if(descs[i].getLeaseTime()!=null && descs[i].getLeaseTime().getTime()<clockservice.getTime())
 					{
 						components.removeKey(descs[i].getName());
 					}
@@ -332,8 +335,49 @@ public class DirectoryFacilitatorService implements IDF, IService
 	 */
 	public IFuture	startService()
 	{
-		// nothing to do.
-		return new Future(null); // Already done.
+		final Future	ret	= new Future();
+		final boolean[]	services	= new boolean[2];
+		platform.getService(IComponentManagementService.class).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				cms	= (IComponentManagementService)result;
+				boolean	setresult;
+				synchronized(services)
+				{
+					services[0]	= true;
+					setresult	= services[0] && services[1];
+				}
+				if(setresult)
+					ret.setResult(null);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		platform.getService(IClockService.class).addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				clockservice	= (IClockService)result;
+				boolean	setresult;
+				synchronized(services)
+				{
+					services[1]	= true;
+					setresult	= services[0] && services[1];
+				}
+				if(setresult)
+					ret.setResult(null);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+		return ret;
 	}
 	
 	/**

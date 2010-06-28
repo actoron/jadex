@@ -273,37 +273,43 @@ public class Platform extends AbstractPlatform
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				IComponentManagementService	ces	= (IComponentManagementService)result;
-				// Create components.
-				Property[] props = Properties.getProperties(configurations, COMPONENT);
-				for(int i = 0; i < props.length; i++)
+				final IComponentManagementService	ces	= (IComponentManagementService)result;
+				getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 				{
-					ces.createComponent(props[i].getName(), props[i].getValue(), null, null);
-				}
-				Properties[] subprops = Properties.getSubproperties(configurations, COMPONENT);
-				for(int i = 0; i < subprops.length; i++)
-				{
-					Map args = getArguments(subprops[i]);
-					Property model = subprops[i].getProperty(MODEL);
-					Property config = subprops[i].getProperty(CONFIG);
-					int number = subprops[i].getIntProperty(NUMBER);
-					boolean master = subprops[i].getBooleanProperty(MASTER);
-					boolean suspend = subprops[i].getBooleanProperty(SUSPEND);
-					boolean daemon = subprops[i].getBooleanProperty(DAEMON);
-					
-					CreationInfo cinfo = new CreationInfo(config!=null? config.getValue(): null, args, null, suspend, master, daemon);
-					if(number>1)
+					public void resultAvailable(Object source, Object result)
 					{
-						for(int j=0; j<number; j++)
+						// Create components.
+						Property[] props = Properties.getProperties(configurations, COMPONENT);
+						for(int i = 0; i < props.length; i++)
 						{
-							ces.createComponent(null, model.getValue(), cinfo, null);
+							ces.createComponent(props[i].getName(), props[i].getValue(), null, null);
+						}
+						Properties[] subprops = Properties.getSubproperties(configurations, COMPONENT);
+						for(int i = 0; i < subprops.length; i++)
+						{
+							Map args = getArguments(subprops[i], (ILibraryService)result);
+							Property model = subprops[i].getProperty(MODEL);
+							Property config = subprops[i].getProperty(CONFIG);
+							int number = subprops[i].getIntProperty(NUMBER);
+							boolean master = subprops[i].getBooleanProperty(MASTER);
+							boolean suspend = subprops[i].getBooleanProperty(SUSPEND);
+							boolean daemon = subprops[i].getBooleanProperty(DAEMON);
+							
+							CreationInfo cinfo = new CreationInfo(config!=null? config.getValue(): null, args, null, suspend, master, daemon);
+							if(number>1)
+							{
+								for(int j=0; j<number; j++)
+								{
+									ces.createComponent(null, model.getValue(), cinfo, null);
+								}
+							}
+							else
+							{
+								ces.createComponent(subprops[i].getName(), model.getValue(), cinfo, null);
+							}
 						}
 					}
-					else
-					{
-						ces.createComponent(subprops[i].getName(), model.getValue(), cinfo, null);
-					}
-				}
+				});
 			}
 		});
 		
@@ -315,7 +321,7 @@ public class Platform extends AbstractPlatform
 	 *  @param props The argument properties.
 	 *  @return The map of arguments.
 	 */
-	protected Map getArguments(Properties props)
+	protected Map getArguments(Properties props, ILibraryService ls)
 	{
 		Map arguments = new HashMap();
 		SimpleValueFetcher fetcher = new SimpleValueFetcher();
@@ -327,7 +333,6 @@ public class Platform extends AbstractPlatform
 			Object arg = null;
 			try
 			{
-				ILibraryService ls = (ILibraryService)getService(ILibraryService.class);
 				arg = new JavaCCExpressionParser().parseExpression(args[i].getValue(), null, null, ls.getClassLoader()).getValue(fetcher);
 				arguments.put(args[i].getName(), arg);
 			}
@@ -342,7 +347,6 @@ public class Platform extends AbstractPlatform
 			Object arg = null;
 			try
 			{
-				ILibraryService ls = (ILibraryService)getService(ILibraryService.class);
 				arg = new JavaCCExpressionParser().parseExpression(argsets[i].getValue(), null, null, ls.getClassLoader()).getValue(fetcher);
 				arguments.put(argsets[i].getName(), arg);
 			}

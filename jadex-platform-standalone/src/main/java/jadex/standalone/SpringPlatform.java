@@ -4,6 +4,7 @@ import jadex.base.AbstractPlatform;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.IService;
 
 import java.net.InetAddress;
@@ -167,55 +168,60 @@ public class SpringPlatform extends AbstractPlatform
 //		}
 		
 		// Create application components.
-		IComponentManagementService	ces	= (IComponentManagementService)getService(IComponentManagementService.class);
 		if(components != null)
 		{
-			for(Iterator it = components.keySet().iterator(); it.hasNext();)
+			getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 			{
-				String name = (String)it.next();
-				String model;
-				String config = null;
-				int number = 1;
-				boolean master = false;
-				boolean daemon = false;
-				boolean suspend = false;
-				Map args = null;
-				Object tmp = components.get(name);
-				if(tmp instanceof String)
+				public void resultAvailable(Object source, Object result)
 				{
-					model = (String)tmp;
-				}
-				else
-				{
-					args = (Map)tmp;
-					model = (String)args.remove("model");
-					config = (String)args.remove("config");
-					Number num = (Number)args.remove("number");
-					if(num!=null)
-						number = num.intValue();
-					Boolean mas = (Boolean)args.remove("master");
-					if(mas!=null)
-						master = mas.booleanValue();
-					Boolean dae = (Boolean)args.remove("daemon");
-					if(dae!=null)
-						daemon = dae.booleanValue();
-					Boolean sus = (Boolean)args.remove("suspend");
-					if(sus!=null)
-						suspend = sus.booleanValue();
-				}
-				CreationInfo cinfo = new CreationInfo(config, args, null, suspend, master, daemon);
-				if(number>1)
-				{
-					for(int j=0; j<number; j++)
+					for(Iterator it = components.keySet().iterator(); it.hasNext();)
 					{
-						ces.createComponent(null, model, cinfo, null);
+						String name = (String)it.next();
+						String model;
+						String config = null;
+						int number = 1;
+						boolean master = false;
+						boolean daemon = false;
+						boolean suspend = false;
+						Map args = null;
+						Object tmp = components.get(name);
+						if(tmp instanceof String)
+						{
+							model = (String)tmp;
+						}
+						else
+						{
+							args = (Map)tmp;
+							model = (String)args.remove("model");
+							config = (String)args.remove("config");
+							Number num = (Number)args.remove("number");
+							if(num!=null)
+								number = num.intValue();
+							Boolean mas = (Boolean)args.remove("master");
+							if(mas!=null)
+								master = mas.booleanValue();
+							Boolean dae = (Boolean)args.remove("daemon");
+							if(dae!=null)
+								daemon = dae.booleanValue();
+							Boolean sus = (Boolean)args.remove("suspend");
+							if(sus!=null)
+								suspend = sus.booleanValue();
+						}
+						CreationInfo cinfo = new CreationInfo(config, args, null, suspend, master, daemon);
+						if(number>1)
+						{
+							for(int j=0; j<number; j++)
+							{
+								((IComponentManagementService)result).createComponent(null, model, cinfo, null);
+							}
+						}
+						else
+						{
+							((IComponentManagementService)result).createComponent(name, model, cinfo, null);
+						}
 					}
 				}
-				else
-				{
-					ces.createComponent(name, model, cinfo, null);
-				}
-			}
+			});
 		}
 	}
 	

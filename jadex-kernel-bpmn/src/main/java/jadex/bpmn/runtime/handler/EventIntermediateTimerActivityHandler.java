@@ -4,7 +4,12 @@ import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
 import jadex.bridge.CheckedAction;
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.InterpreterTimedObject;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimer;
 
@@ -22,28 +27,40 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	 *  @param thread	The process thread.
 	 *  @param duration	The duration to wait.
 	 */
-	public Object doWait(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, long duration)
+	public void	doWait(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, final long duration)
 	{
-		IClockService cs = (IClockService)instance.getComponentAdapter().getServiceContainer().getService(IClockService.class);
-		
-		CheckedAction ta = new CheckedAction()
+		final Future	wifuture	= new Future(); 
+		instance.getComponentAdapter().getServiceContainer().getService(IClockService.class)
+			.addResultListener(new ComponentResultListener(new IResultListener()
 		{
-			public void run()
+			public void resultAvailable(Object source, Object result)
 			{
-				instance.notify(activity, thread, TIMER_EVENT);
+				CheckedAction ta = new CheckedAction()
+				{
+					public void run()
+					{
+						instance.notify(activity, thread, TIMER_EVENT);
+					}
+				};
+				
+				Object waitinfo; 
+				if(duration==TICK_TIMER)
+				{
+					waitinfo = ((IClockService)result).createTickTimer(new InterpreterTimedObject(instance.getComponentAdapter(), ta));
+				}
+				else
+				{
+					waitinfo = ((IClockService)result).createTimer(duration, new InterpreterTimedObject(instance.getComponentAdapter(), ta));
+				}
+				wifuture.setResult(waitinfo);
 			}
-		};
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				wifuture.setException(exception);
+			}
+		}, instance.getComponentAdapter()));
 		
-		Object ret; 
-		if(duration==TICK_TIMER)
-		{
-			ret = cs.createTickTimer(new InterpreterTimedObject(instance.getComponentAdapter(), ta));
-		}
-		else
-		{
-			ret = cs.createTimer(duration, new InterpreterTimedObject(instance.getComponentAdapter(), ta));
-		}
-		return ret;
+		thread.setWaitInfo(wifuture);	// Immediate result required for multiple events handler
 	}
 	
 	/**
@@ -55,14 +72,19 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	 */
 	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
-		Object wi = thread.getWaitInfo();
-		if(wi instanceof ITimer)
+		((IFuture)thread.getWaitInfo()).addResultListener(new DefaultResultListener()
 		{
-			((ITimer)wi).cancel();
-		}
-		else
-		{
-			throw new RuntimeException("Internal timer error: "+wi);
-		}
+			public void resultAvailable(Object source, Object result)
+			{
+				if(result instanceof ITimer)
+				{
+					((ITimer)result).cancel();
+				}
+				else
+				{
+					throw new RuntimeException("Internal timer error: "+result);
+				}
+			}
+		});
 	}
 }

@@ -31,6 +31,7 @@ import jadex.bridge.MessageType;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.IFilter;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.IValueFetcher;
@@ -299,10 +300,14 @@ public class BpmnInterpreter implements IComponentInstance
 			
 			if(!finishing && isFinished(pool, lane))
 			{
-				((IComponentManagementService)adapter.getServiceContainer()
-					.getService(IComponentManagementService.class))
-					.destroyComponent(adapter.getComponentIdentifier());
 				finishing = true;
+				adapter.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier());
+					}
+				});
 			}
 			
 //			System.out.println("Process wants: "+this.getComponentAdapter().getComponentIdentifier().getLocalName()+" "+!isFinished(null, null)+" "+isReady(null, null));

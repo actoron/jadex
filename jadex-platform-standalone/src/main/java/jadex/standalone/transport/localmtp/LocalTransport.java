@@ -45,13 +45,6 @@ public class LocalTransport implements ITransport
 	 */
 	public LocalTransport(IServiceContainer container)
 	{
-		container.getService(IMessageService.class).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object source, Object result)
-			{
-				msgservice = (IMessageService)result;
-			}
-		});
 		this.container = container;
 		this.addresses = new String[0];
 //		this.platformname = platform.getName();
@@ -62,7 +55,13 @@ public class LocalTransport implements ITransport
 	 */
 	public void start()
 	{
-		// nothing to do.
+		container.getService(IMessageService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				msgservice = (IMessageService)result;
+			}
+		});
 	}
 	
 	/**

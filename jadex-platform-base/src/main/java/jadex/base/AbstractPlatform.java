@@ -81,59 +81,70 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 		}
 		
 		// Step 1: Find existing components.
-		final IComponentManagementService	ces	= (IComponentManagementService)getService(IComponentManagementService.class);
-		IFuture ret = ces.getComponentDescriptions();
-		ret.addResultListener(new IResultListener()
+		getService(IComponentManagementService.class).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				// Step 2: Kill existing components excepts daemons.
-				final List comps = new ArrayList(Arrays.asList((IComponentDescription[])result));
-				for(int i=comps.size()-1; i>-1; i--)
-				{
-					if(((CMSComponentDescription)comps.get(i)).isDaemon())
-						comps.remove(i);
-				}
-				
-				killComponents(comps, shutdowntime!=0 ? shutdowntime : MAX_SHUTDOWM_TIME, new IResultListener()
+				final IComponentManagementService	cms	= (IComponentManagementService)result;
+				IFuture ret = cms.getComponentDescriptions();
+				ret.addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						// Step 3: Find remaining components.
-						IFuture ret = ces.getComponentDescriptions();
-						ret.addResultListener(new IResultListener()
+						// Step 2: Kill existing components excepts daemons.
+						final List comps = new ArrayList(Arrays.asList((IComponentDescription[])result));
+						for(int i=comps.size()-1; i>-1; i--)
+						{
+							if(((CMSComponentDescription)comps.get(i)).isDaemon())
+								comps.remove(i);
+						}
+						
+						killComponents(comps, shutdowntime!=0 ? shutdowntime : MAX_SHUTDOWM_TIME, new IResultListener()
 						{
 							public void resultAvailable(Object source, Object result)
 							{
-								// Step 4: Kill remaining components.
-								killComponents(Arrays.asList((IComponentDescription[])result), shutdowntime!=0 ? shutdowntime : MAX_SHUTDOWM_TIME, new IResultListener()
+								// Step 3: Find remaining components.
+								IFuture ret = cms.getComponentDescriptions();
+								ret.addResultListener(new IResultListener()
 								{
 									public void resultAvailable(Object source, Object result)
 									{
-										// Step 5: Stop the services.
-										AbstractPlatform.super.shutdown(listener);
+										// Step 4: Kill remaining components.
+										killComponents(Arrays.asList((IComponentDescription[])result), shutdowntime!=0 ? shutdowntime : MAX_SHUTDOWM_TIME, new IResultListener()
+										{
+											public void resultAvailable(Object source, Object result)
+											{
+												// Step 5: Stop the services.
+												AbstractPlatform.super.shutdown(listener);
+											}
+											public void exceptionOccurred(Object source, Exception exception)
+											{
+												listener.exceptionOccurred(source, exception);
+											}
+										});
 									}
+
 									public void exceptionOccurred(Object source, Exception exception)
 									{
 										listener.exceptionOccurred(source, exception);
 									}
-								});
+								});		
 							}
-
+							
 							public void exceptionOccurred(Object source, Exception exception)
 							{
 								listener.exceptionOccurred(source, exception);
 							}
-						});		
+						});
 					}
-					
+
 					public void exceptionOccurred(Object source, Exception exception)
 					{
 						listener.exceptionOccurred(source, exception);
 					}
 				});
 			}
-
+			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
 				listener.exceptionOccurred(source, exception);
@@ -147,78 +158,88 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 	 *  @param timeout	The time after which to inform the listener anyways.
 	 *  @param listener	The result listener.
 	 */
-	protected void killComponents(final List comps, long timeout, final IResultListener listener)
+	protected void killComponents(final List comps, final long timeout, final IResultListener listener)
 	{
 		if(comps.isEmpty())
 			listener.resultAvailable(this, null);
 		
-		// Timer entry to notify lister after timeout.
-		final	boolean	notified[]	= new boolean[1];
-		IClockService clock	= (IClockService)getService(IClockService.class);
-		final ITimer killtimer	= clock.createTimer(timeout, new ITimedObject()
+		getService(IClockService.class).addResultListener(new IResultListener()
 		{
-			public void timeEventOccurred(long currenttime)
-			{
-				boolean	notify	= false;
-				synchronized(notified)
-				{
-					if(!notified[0])
-					{
-						notify	= true;
-						notified[0]	= true;
-					}
-				}
-				if(notify)
-				{
-					listener.resultAvailable(this, null);
-				}
-			}
-		});
-		
-		// Kill the given components.
-		IResultListener	rl	= new IResultListener()
-		{
-			int cnt	= 0;
 			public void resultAvailable(Object source, Object result)
 			{
-				testFinished();
-			}
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				testFinished();
-			}
-			protected synchronized void testFinished()
-			{
-				cnt++;
-//				System.out.println("here: "+cnt+" "+comps.size());
-				if(cnt==comps.size())
+				// Timer entry to notify lister after timeout.
+				final	boolean	notified[]	= new boolean[1];
+				final ITimer killtimer	= ((IClockService)result).createTimer(timeout, new ITimedObject()
 				{
-					killtimer.cancel();
-					boolean	notify	= false;
-					synchronized(notified)
+					public void timeEventOccurred(long currenttime)
 					{
-						if(!notified[0])
+						boolean	notify	= false;
+						synchronized(notified)
 						{
-							notify	= true;
-							notified[0]	= true;
+							if(!notified[0])
+							{
+								notify	= true;
+								notified[0]	= true;
+							}
+						}
+						if(notify)
+						{
+							listener.resultAvailable(this, null);
 						}
 					}
-					if(notify)
+				});
+				
+				// Kill the given components.
+				IResultListener	rl	= new IResultListener()
+				{
+					int cnt	= 0;
+					public void resultAvailable(Object source, Object result)
 					{
-						listener.resultAvailable(this, null);
+						testFinished();
 					}
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						testFinished();
+					}
+					protected synchronized void testFinished()
+					{
+						cnt++;
+//						System.out.println("here: "+cnt+" "+comps.size());
+						if(cnt==comps.size())
+						{
+							killtimer.cancel();
+							boolean	notify	= false;
+							synchronized(notified)
+							{
+								if(!notified[0])
+								{
+									notify	= true;
+									notified[0]	= true;
+								}
+							}
+							if(notify)
+							{
+								listener.resultAvailable(this, null);
+							}
+						}
+					}
+				};
+				
+				IComponentManagementService	ces	= (IComponentManagementService)getService(IComponentManagementService.class);
+				for(int i=0; i < comps.size(); i++)
+				{
+					//System.out.println("Killing component: "+comps.get(i));
+					CMSComponentDescription desc = (CMSComponentDescription)comps.get(i);
+					IFuture ret = ces.destroyComponent(desc.getName());
+					ret.addResultListener(rl);
 				}
 			}
-		};
-		
-		IComponentManagementService	ces	= (IComponentManagementService)getService(IComponentManagementService.class);
-		for(int i=0; i < comps.size(); i++)
-		{
-			//System.out.println("Killing component: "+comps.get(i));
-			CMSComponentDescription desc = (CMSComponentDescription)comps.get(i);
-			IFuture ret = ces.destroyComponent(desc.getName());
-			ret.addResultListener(rl);
-		}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				listener.exceptionOccurred(source, exception);
+			}
+		});
 	}
 
 }

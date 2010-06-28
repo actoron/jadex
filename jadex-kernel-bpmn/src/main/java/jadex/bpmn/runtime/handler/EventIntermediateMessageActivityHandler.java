@@ -3,6 +3,7 @@ package jadex.bpmn.runtime.handler;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
@@ -10,6 +11,7 @@ import jadex.bridge.MessageType;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.DefaultResultListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,70 +66,84 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.
 	 */
-	protected void sendMessage(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
+	protected void sendMessage(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread)
 	{
-		IMessageService ms = (IMessageService)instance.getComponentAdapter().getServiceContainer().getService(IMessageService.class);
-		String mtname = (String)thread.getPropertyValue(PROPERTY_MESSAGETYPE, activity);
-		MessageType mt = mtname!=null? ms.getMessageType(mtname): ms.getMessageType("fipa");
-		
-		Map msg;
-		
-		if(thread.hasPropertyValue(PROPERTY_MESSAGE))
+		instance.getComponentAdapter().getServiceContainer().getService(IMessageService.class)
+			.addResultListener(new ComponentResultListener(new DefaultResultListener()
 		{
-			msg = (Map)thread.getPropertyValue(PROPERTY_MESSAGE);
-		}
-		else
-		{
-			msg = new HashMap();
-		}
-			
-		// Convenience conversion of strings to component identifiers for receivers.
-		String ri = mt.getReceiverIdentifier();
-		if(thread.hasPropertyValue(ri))
-		{
-			Object recs = thread.getPropertyValue(ri);
-			if(SReflect.isIterable(recs))
+			public void resultAvailable(Object source, Object result)
 			{
-				IComponentManagementService ces = (IComponentManagementService)instance.getComponentAdapter().getServiceContainer().getService(IComponentManagementService.class);
-				List newrecs = new ArrayList();
-				for(Iterator it=SReflect.getIterator(recs); it.hasNext(); )
+				final IMessageService	ms	= (IMessageService)result;
+				instance.getComponentAdapter().getServiceContainer().getService(IComponentManagementService.class)
+					.addResultListener(new ComponentResultListener(new DefaultResultListener()
 				{
-					Object rec = it.next();
-					if(rec instanceof String)
+					public void resultAvailable(Object source, Object result)
 					{
-						newrecs.add(ces.createComponentIdentifier((String)rec, true, null));
+						IComponentManagementService ces = (IComponentManagementService)result;
+						String mtname = (String)thread.getPropertyValue(PROPERTY_MESSAGETYPE, activity);
+						MessageType mt = mtname!=null? ms.getMessageType(mtname): ms.getMessageType("fipa");
+						
+						Map msg;
+						
+						if(thread.hasPropertyValue(PROPERTY_MESSAGE))
+						{
+							msg = (Map)thread.getPropertyValue(PROPERTY_MESSAGE);
+						}
+						else
+						{
+							msg = new HashMap();
+						}
+							
+						// Convenience conversion of strings to component identifiers for receivers.
+						String ri = mt.getReceiverIdentifier();
+						if(thread.hasPropertyValue(ri))
+						{
+							Object recs = thread.getPropertyValue(ri);
+							if(SReflect.isIterable(recs))
+							{
+								List newrecs = new ArrayList();
+								for(Iterator it=SReflect.getIterator(recs); it.hasNext(); )
+								{
+									Object rec = it.next();
+									if(rec instanceof String)
+									{
+										newrecs.add(ces.createComponentIdentifier((String)rec, true, null));
+									}
+									else
+									{
+										newrecs.add(rec);
+									}
+								}
+								recs = newrecs;
+							}
+							msg.put(ri, recs);
+						}
+						
+						String[] params	= mt.getParameterNames();
+						for(int i=0; params!=null && i<params.length; i++)
+						{
+							if(thread.hasPropertyValue(params[i]) && !params[i].equals(ri))
+							{
+								msg.put(params[i], thread.getPropertyValue(params[i]));
+							}
+						}
+						
+						String[] paramsets	= mt.getParameterSetNames();
+						for(int i=0; paramsets!=null && i<paramsets.length; i++)
+						{
+							if(thread.hasPropertyValue(paramsets[i]) && !paramsets[i].equals(ri))
+							{
+								msg.put(paramsets[i], thread.getPropertyValue(paramsets[i]));
+							}
+						}
+						
+//						ms.sendMessage(msg, mt, instance.getComponentAdapter().getComponentIdentifier(), instance.getClassLoader());
+						ms.sendMessage(msg, mt, instance.getComponentAdapter(), instance.getClassLoader());
+						instance.getStepHandler(activity).step(activity, instance, thread, null);
 					}
-					else
-					{
-						newrecs.add(rec);
-					}
-				}
-				recs = newrecs;
+				}, instance.getComponentAdapter()));
 			}
-			msg.put(ri, recs);
-		}
-		
-		String[] params	= mt.getParameterNames();
-		for(int i=0; params!=null && i<params.length; i++)
-		{
-			if(thread.hasPropertyValue(params[i]) && !params[i].equals(ri))
-			{
-				msg.put(params[i], thread.getPropertyValue(params[i]));
-			}
-		}
-		
-		String[] paramsets	= mt.getParameterSetNames();
-		for(int i=0; paramsets!=null && i<paramsets.length; i++)
-		{
-			if(thread.hasPropertyValue(paramsets[i]) && !paramsets[i].equals(ri))
-			{
-				msg.put(paramsets[i], thread.getPropertyValue(paramsets[i]));
-			}
-		}
-		
-//		ms.sendMessage(msg, mt, instance.getComponentAdapter().getComponentIdentifier(), instance.getClassLoader());
-		ms.sendMessage(msg, mt, instance.getComponentAdapter(), instance.getClassLoader());
-		instance.getStepHandler(activity).step(activity, instance, thread, null);
+		}, instance.getComponentAdapter()));
 	}
 	
 	/**

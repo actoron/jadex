@@ -14,7 +14,7 @@ import java.util.List;
 public class EventIntermediateMultipleActivityHandler extends DefaultActivityHandler
 {
 	/**
-	 *  Execute an activity. Empty default implementation.
+	 *  Execute an activity.
 	 *  @param activity	The activity to execute.
 	 *  @param instance	The process instance.
 	 *  @param thread	The process thread.

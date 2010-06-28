@@ -496,12 +496,18 @@ public class TCPTransport implements ITransport
 			/*if(timer!=null)
 				timer.cancel();
 			timer = platform.getClock().createTimer(System.currentTimeMillis()+MAX_KEEPALIVE, this);*/
-			IClockService clock = (IClockService)container.getService(IClockService.class);
-			long time = clock.getTime()+MAX_KEEPALIVE;
-			if(timer==null)
-				timer = clock.createTimer(time, this);
-			else
-				timer.setNotificationTime(time);
+			container.getService(IClockService.class).addResultListener(new DefaultResultListener()
+			{
+				// Todo: synchronize?
+				public void resultAvailable(Object source, Object result)
+				{
+					long time = ((IClockService)result).getTime()+MAX_KEEPALIVE;
+					if(timer==null)
+						timer = ((IClockService)result).createTimer(time, Cleaner.this);
+					else
+						timer.setNotificationTime(time);
+				}
+			});
 		}
 		
 		/**

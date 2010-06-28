@@ -4,6 +4,7 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.concurrent.IResultListener;
@@ -38,75 +39,84 @@ public class CreateComponentTask implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public void execute(final ITaskContext context, BpmnInterpreter instance, final IResultListener listener)
+	public void execute(final ITaskContext context, final BpmnInterpreter instance, final IResultListener listener)
 	{
-		String name = (String)context.getParameterValue("name");
-		String model = (String)context.getParameterValue("model");
-		String config = (String)context.getParameterValue("configuration");
-		boolean suspend = context.getParameterValue("suspend")!=null? ((Boolean)context.getParameterValue("suspend")).booleanValue(): false;
-		boolean sub = context.getParameterValue("subcomponent")!=null? ((Boolean)context.getParameterValue("subcomponent")).booleanValue(): false;
-		final IResultListener killlistener = (IResultListener)context.getParameterValue("killlistener");
-		final String[] resultmapping = (String[])context.getParameterValue("resultmapping");
-		boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): resultmapping!=null;
-		boolean master = context.getParameterValue("master")!=null? ((Boolean)context.getParameterValue("master")).booleanValue(): false;
-		boolean daemon = context.getParameterValue("daemon")!=null? ((Boolean)context.getParameterValue("daemon")).booleanValue(): false;
-		
-		Map args = (Map)context.getParameterValue("arguments");
-		if(args==null)
+		instance.getComponentAdapter().getServiceContainer().getService(IComponentManagementService.class).addResultListener(new ComponentResultListener(new IResultListener()
 		{
-			args = new HashMap();
-			Map params = context.getActivity().getParameters();
-			if(params!=null)
+			public void resultAvailable(Object source, Object result)
 			{
-				for(Iterator it=params.values().iterator(); it.hasNext(); )
-				{
-					MParameter param = (MParameter)it.next();
-					if(!reserved.contains(param.getName()))
-						args.put(param.getName(), context.getParameterValue(param.getName()));
-				}
-			}
-		}
-//		System.out.println("args: "+args);
-
-		IComponentManagementService ces = (IComponentManagementService)instance.getComponentAdapter().getServiceContainer().getService(IComponentManagementService.class);
+				IComponentManagementService	cms	= (IComponentManagementService)result;
+				String name = (String)context.getParameterValue("name");
+				String model = (String)context.getParameterValue("model");
+				String config = (String)context.getParameterValue("configuration");
+				boolean suspend = context.getParameterValue("suspend")!=null? ((Boolean)context.getParameterValue("suspend")).booleanValue(): false;
+				boolean sub = context.getParameterValue("subcomponent")!=null? ((Boolean)context.getParameterValue("subcomponent")).booleanValue(): false;
+				final IResultListener killlistener = (IResultListener)context.getParameterValue("killlistener");
+				final String[] resultmapping = (String[])context.getParameterValue("resultmapping");
+				boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): resultmapping!=null;
+				boolean master = context.getParameterValue("master")!=null? ((Boolean)context.getParameterValue("master")).booleanValue(): false;
+				boolean daemon = context.getParameterValue("daemon")!=null? ((Boolean)context.getParameterValue("daemon")).booleanValue(): false;
 				
-		IResultListener lis = killlistener;
-		if(wait)
-		{
-			lis = new IResultListener()
-			{
-				public void resultAvailable(Object source, Object result)
+				Map args = (Map)context.getParameterValue("arguments");
+				if(args==null)
 				{
-					if(result!=null)
+					args = new HashMap();
+					Map params = context.getActivity().getParameters();
+					if(params!=null)
 					{
-						Map results = (Map)result;
-						for(int i=0; i<resultmapping.length/2; i++)
+						for(Iterator it=params.values().iterator(); it.hasNext(); )
 						{
-							Object value = results.get(resultmapping[i]);
-							context.setParameterValue(resultmapping[i+1], value);
-							
-//							System.out.println("Mapped result value: "+value+" "+resultmapping[i]+" "+resultmapping[i+1]);
+							MParameter param = (MParameter)it.next();
+							if(!reserved.contains(param.getName()))
+								args.put(param.getName(), context.getParameterValue(param.getName()));
 						}
 					}
-					if(killlistener!=null)
-						killlistener.resultAvailable(CreateComponentTask.this, result);
-					listener.resultAvailable(CreateComponentTask.this, null);
+				}
+//				System.out.println("args: "+args);
+				IResultListener lis = killlistener;
+				if(wait)
+				{
+					lis = new IResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							if(result!=null)
+							{
+								Map results = (Map)result;
+								for(int i=0; i<resultmapping.length/2; i++)
+								{
+									Object value = results.get(resultmapping[i]);
+									context.setParameterValue(resultmapping[i+1], value);
+									
+//									System.out.println("Mapped result value: "+value+" "+resultmapping[i]+" "+resultmapping[i+1]);
+								}
+							}
+							if(killlistener!=null)
+								killlistener.resultAvailable(CreateComponentTask.this, result);
+							listener.resultAvailable(CreateComponentTask.this, null);
+						}
+						
+						public void exceptionOccurred(Object source, Exception exception)
+						{
+							if(killlistener!=null)
+								killlistener.exceptionOccurred(CreateComponentTask.this, exception);
+							listener.exceptionOccurred(CreateComponentTask.this, exception);
+						}
+					};
 				}
 				
-				public void exceptionOccurred(Object source, Exception exception)
-				{
-					if(killlistener!=null)
-						killlistener.exceptionOccurred(CreateComponentTask.this, exception);
-					listener.exceptionOccurred(CreateComponentTask.this, exception);
-				}
-			};
-		}
-		
-		ces.createComponent(name, model,
-			new CreationInfo(config, args, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, suspend, master, daemon, instance.getModelElement().getAllImports()), lis);
+				cms.createComponent(name, model,
+					new CreationInfo(config, args, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, suspend, master, daemon, instance.getModelElement().getAllImports()), lis);
 
-		if(!wait)
-			listener.resultAvailable(this, null);
+				if(!wait)
+					listener.resultAvailable(this, null);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				listener.exceptionOccurred(source, exception);
+			}
+		}, instance.getComponentAdapter()));
 	}
 	
 	/**

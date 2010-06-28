@@ -19,10 +19,9 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	 *  @param thread	The process thread.
 	 *  @param duration	The duration to wait.
 	 */
-	public Object doWait(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, long duration)
+	public void	doWait(final MActivity activity, final BpmnInterpreter instance, final ProcessThread thread, long duration)
 	{
 		((BpmnPlanBodyInstance)instance).addTimer(thread, duration);
-		return null;
 	}
 	
 	/**
