@@ -42,7 +42,6 @@ import jadex.bdi.runtime.interpreter.InternalEventRules;
 import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
 import jadex.javaparser.IExpressionParser;
@@ -944,8 +943,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	 */
 	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
 	{
-		IComponentManagementService cms = (IComponentManagementService)interpreter.getAgentAdapter().getServiceContainer().getService(IComponentManagementService.class);	
-		return cms.createComponentIdentifier(name, local, addresses);
+		return interpreter.getCMS().createComponentIdentifier(name, local, addresses);
 	}
 	
 	//-------- static part -------

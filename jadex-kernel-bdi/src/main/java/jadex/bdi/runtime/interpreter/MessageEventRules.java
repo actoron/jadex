@@ -11,6 +11,7 @@ import jadex.bridge.MessageType.ParameterSpecification;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.javaparser.IValueFetcher;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
@@ -713,11 +714,17 @@ public class MessageEventRules
 					}
 				}
 				
-				IMessageAdapter msg = new DefaultMessageAdapter(message, mtype);
+				final IMessageAdapter msg = new DefaultMessageAdapter(message, mtype);
 				
-				BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
-				IMessageService ms = ((IMessageService)interpreter.getAgentAdapter().getServiceContainer().getService(IMessageService.class));
-				ms.sendMessage(msg.getParameterMap(), msg.getMessageType(), interpreter.getAgentAdapter(), interpreter.getModel().getTypeModel().getClassLoader());
+				final BDIInterpreter interpreter = BDIInterpreter.getInterpreter(state);
+				interpreter.getAgentAdapter().getServiceContainer().getService(IMessageService.class)
+					.addResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						((IMessageService)result).sendMessage(msg.getParameterMap(), msg.getMessageType(), interpreter.getAgentAdapter(), interpreter.getModel().getTypeModel().getClassLoader());
+					}
+				});
 
 //				interpreter.getComponentAdapter().sendMessage(message, mtype);
 				
@@ -1327,7 +1334,7 @@ public class MessageEventRules
 	{
 		String	mtype	= (String)state.getAttributeValue(mme, OAVBDIMetaModel.messageevent_has_type);
 		BDIInterpreter	bdii	= BDIInterpreter.getInterpreter(state);
-		MessageType ret	= ((IMessageService)bdii.getAgentAdapter().getServiceContainer().getService(IMessageService.class)).getMessageType(mtype);
+		MessageType ret	= bdii.getMessageService().getMessageType(mtype);
 		return ret;
 	}
 }

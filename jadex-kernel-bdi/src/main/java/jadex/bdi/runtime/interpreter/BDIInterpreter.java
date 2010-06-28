@@ -22,6 +22,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.IMessageService;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
@@ -106,6 +107,14 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	/** The clock service. */
 	//hack???
 	protected IClockService	clockservice;
+	
+	/** The component management service. */
+	//hack???
+	protected IComponentManagementService	cms;
+	
+	/** The message service. */
+	//hack???
+	protected IMessageService	msgservice;
 	
 	//-------- null on init --------
 	
@@ -249,13 +258,51 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 				this.microplansteps = mps.booleanValue();
 		}
 		
-		// Get the clock service.
+		// Get the services.
+		final boolean services[]	= new boolean[3];
 		adapter.getServiceContainer().getService(IClockService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				BDIInterpreter.this.clockservice	= (IClockService)result;
-				BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
+				boolean	startagent;
+				synchronized(services)
+				{
+					services[0]	= true;
+					startagent	= services[0] && services[1] && services[2];
+				}
+				if(startagent)
+					BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
+			}
+		});
+		adapter.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				BDIInterpreter.this.cms	= (IComponentManagementService)result;
+				boolean	startagent;
+				synchronized(services)
+				{
+					services[1]	= true;
+					startagent	= services[0] && services[1] && services[2];
+				}
+				if(startagent)
+					BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
+			}
+		});
+		adapter.getServiceContainer().getService(IMessageService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				BDIInterpreter.this.msgservice	= (IMessageService)result;
+				boolean	startagent;
+				synchronized(services)
+				{
+					services[2]	= true;
+					startagent	= services[0] && services[1] && services[2];
+				}
+				if(startagent)
+					BDIInterpreter.this.state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state,OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING);
 			}
 		});
 		
@@ -762,6 +809,24 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	public IClockService	getClockService()
 	{
 		return clockservice;
+	}
+
+	/**
+	 *  Get the cached component management service
+	 */
+	// hack!!! to avoid dealing with futures.
+	public IComponentManagementService	getCMS()
+	{
+		return cms;
+	}
+
+	/**
+	 *  Get the cached message service
+	 */
+	// hack!!! to avoid dealing with futures.
+	public IMessageService	getMessageService()
+	{
+		return msgservice;
 	}
 	
 	/**
