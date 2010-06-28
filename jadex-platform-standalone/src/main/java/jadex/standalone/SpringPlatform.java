@@ -2,13 +2,8 @@ package jadex.standalone;
 
 import jadex.base.AbstractPlatform;
 import jadex.bridge.CreationInfo;
-import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
-import jadex.commons.Properties;
-import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 
 import java.net.InetAddress;

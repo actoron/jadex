@@ -45,6 +45,16 @@ public class Future implements IFuture
 		this.callers = Collections.synchronizedMap(new HashMap());
 	}
 	
+	/**
+	 *  Create a future that is already done.
+	 *  @param result	The result, if any.
+	 */
+	public Future(Object result)
+	{
+		this();
+		setResult(result);
+	}
+	
 	//-------- methods --------
 
 	/**

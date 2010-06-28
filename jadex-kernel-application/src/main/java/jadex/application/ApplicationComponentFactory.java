@@ -15,13 +15,13 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.SJavaParser;
-import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
@@ -120,8 +120,6 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "agenttype")), new ObjectInfo(MComponentType.class)));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "application")), new ObjectInfo(MApplicationInstance.class, new IPostProcessor()
 		{
-			JavaCCExpressionParser parser = new JavaCCExpressionParser();
-			
 			public Object postProcess(IContext context, Object object)
 			{
 				MApplicationInstance app = (MApplicationInstance)object;
@@ -182,26 +180,31 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 	/**
 	 *  Start the service.
 	 */
-	public void startService()
+	public IFuture	startService()
 	{
-		// todo: use IFuture return value for siganlling when startup is finished?
-		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+		final Future	ret = new Future(); 
+		container.getService(ILibraryService.class).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				libservice = (ILibraryService)result;
+				ret.setResult(null);
+			}
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
 			}
 		});
+		return ret;
 	}
 	
 	/**
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdownService(IResultListener listener)
+	public IFuture	shutdownService()
 	{
-		if(listener!=null)
-			listener.resultAvailable(this, null);
+		return new Future(null);
 	}
 	
 	//-------- IComponentFactory interface --------

@@ -34,7 +34,6 @@ public class DFLocalRegisterPlan extends Plan
 
 		getLogger().info("Trying to register: "+desc);
 
-		SyncResultListener lis = new SyncResultListener();
 		IFuture ret = ((IDF)getScope().getServiceContainer().getService(IDF.class)).register(desc);
 		// todo: supply return value or throw exception?
 		desc = (IDFComponentDescription)ret.get(this);

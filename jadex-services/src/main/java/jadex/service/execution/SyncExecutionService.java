@@ -1,6 +1,8 @@
 package jadex.service.execution;
 
+import jadex.commons.Future;
 import jadex.commons.ICommand;
+import jadex.commons.IFuture;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
@@ -217,48 +219,38 @@ public class SyncExecutionService	implements	IExecutionService, IService
 	 *  Start the executor service.
 	 *  Resumes all tasks.
 	 */
-	public synchronized void startService()
+	public synchronized IFuture	startService()
 	{
+		IFuture	ret	= new Future(null); // Already done.
+		
 		if(shutdown)
-			return;
+			return ret;
 		
 		running = true;
 		// Wake up the main executor for executing tasks
 		executor.execute();
+
+		return ret;
 	}
 
-	/**
-	 * 	Stop the executor service.
-	 *  Suspends all tasks. The tasks will not
-	 *  be executed until start is called again. 
-	 */
-	public synchronized void stop(IResultListener listener)
-	{
-		if(!running || shutdown)
-		{
-			listener.exceptionOccurred(this, new RuntimeException("Not running."));
-			return;
-		}
-		
-		stoplistener = listener;
-		running = false;
-	}
 		
 	/**
 	 *  Shutdown the executor service.
 	 */
-	public synchronized void shutdownService(IResultListener listener)
+	public synchronized IFuture	shutdownService()
 	{
 		if(!running || shutdown)
 		{
-			listener.exceptionOccurred(this, new RuntimeException("Not running."));
-			return;
+			Future	ret	= new Future();
+			ret.setException(new RuntimeException("Not running."));
+			return ret;
 		}
 		
 		this.running = false;
 		this.shutdown = true;
-		executor.shutdown(listener);
+		IFuture	ret	= executor.shutdown();
 		queue = null;
+		return ret;
 	}
 
 	

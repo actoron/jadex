@@ -1,6 +1,6 @@
 package jadex.service;
 
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.IFuture;
 
 /**
  *  The interface for platform services.
@@ -9,12 +9,13 @@ public interface IService
 {
 	/**
 	 *  Start the service.
+	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public void startService();
+	public IFuture	startService();
 	
 	/**
 	 *  Shutdown the service.
-	 *  @param listener The listener.
+	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
-	public void shutdownService(IResultListener listener);
+	public IFuture	shutdownService();
 }

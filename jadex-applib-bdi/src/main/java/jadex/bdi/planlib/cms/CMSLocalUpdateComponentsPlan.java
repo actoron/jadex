@@ -1,13 +1,11 @@
 package jadex.bdi.planlib.cms;
 
-import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IEABeliefSet;
-import jadex.bdi.runtime.IEABeliefbase;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentListener;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 
 /**

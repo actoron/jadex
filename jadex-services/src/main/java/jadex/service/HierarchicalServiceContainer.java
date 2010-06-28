@@ -217,7 +217,7 @@ public class HierarchicalServiceContainer extends BasicServiceContainer
 	//					System.out.println("Service shutdown: " + service);
 						try
 						{
-							service.shutdownService(null); // Todo: use result listener?
+							service.shutdownService(); // Todo: use result listener?
 						}
 						catch(Exception e)
 						{

@@ -4,15 +4,9 @@
   <groupId>jadex</groupId>
   <artifactId>jadex-distributed</artifactId>
   <packaging>jar</packaging>
-  <version>2.0-rc2</version>
+  <version>2.0-rc3</version>
   <name>jadex-distributed</name>
   <!-- <url>http://jadex.sourceforge.net</url> -->
-  <parent>
-    <groupId>jadex</groupId>
-    <artifactId>jadex-settings</artifactId>
-    <version>2.0-rc2</version>
-    <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
-  </parent>
   <build>
    <plugins>
       <!-- Java 1.5 Thread Pool. -->
@@ -44,39 +38,39 @@
     <dependency>
     	<groupId>jadex</groupId>
     	<artifactId>jadex-bridge</artifactId>
-    	<version>2.0-rc2</version>
+    	<version>2.0-rc3</version>
     </dependency>
     <dependency>
     	<groupId>jadex</groupId>
     	<artifactId>jadex-commons</artifactId>
-    	<version>2.0-rc2</version>
+    	<version>2.0-rc3</version>
     </dependency>
     <dependency>
     	<groupId>jadex</groupId>
     	<artifactId>jadex-platform-base</artifactId>
-    	<version>2.0-rc2</version>
+    	<version>2.0-rc3</version>
     </dependency>
     
     <dependency>
     	<groupId>jadex</groupId>
     	<artifactId>jadex-platform-standalone</artifactId>
-    	<version>2.0-rc2</version>
+    	<version>2.0-rc3</version>
     </dependency>
      
     <dependency>
     	<groupId>jadex</groupId>
     	<artifactId>jadex-runtimetools</artifactId>
-    	<version>2.0-rc2</version>
+    	<version>2.0-rc3</version>
     </dependency>
     <dependency>
     	<groupId>jadex</groupId>
     	<artifactId>jadex-services</artifactId>
-    	<version>2.0-rc2</version>
+    	<version>2.0-rc3</version>
     </dependency>
     <dependency>
     	<groupId>jadex</groupId>
     	<artifactId>jadex-kernel-bdibpmn</artifactId>
-    	<version>2.0-rc2</version>
+    	<version>2.0-rc3</version>
     </dependency>
     
   </dependencies>

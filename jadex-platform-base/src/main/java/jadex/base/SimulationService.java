@@ -1,20 +1,19 @@
 package jadex.base;
 
 import jadex.commons.ChangeEvent;
+import jadex.commons.Future;
 import jadex.commons.IChangeListener;
 import jadex.commons.ICommand;
+import jadex.commons.IFuture;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
-import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.ClockService;
 import jadex.service.clock.IClock;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimer;
 import jadex.service.execution.IExecutionService;
-import jadex.service.library.ILibraryService;
 
 import java.util.List;
 
@@ -23,7 +22,7 @@ import java.util.List;
  *  execution of one application. It provides basic features for
  *  starting, stopping and stepwise execution.
  */
-public class SimulationService implements ISimulationService, IService
+public class SimulationService implements ISimulationService
 {		
 	//-------- attributes --------
 
@@ -109,11 +108,10 @@ public class SimulationService implements ISimulationService, IService
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdownService(IResultListener listener)
+	public IFuture	shutdownService()
 	{
 		pause();
-		if(listener!=null)
-			listener.resultAvailable(this, null);
+		return new Future(null);	// Already done.
 	}
 	
 	//-------- methods --------
@@ -121,13 +119,24 @@ public class SimulationService implements ISimulationService, IService
 	/**
 	 *  Start (and run) the execution. 
 	 */
-	public void startService()
+	public IFuture	startService()
 	{
+		final Future	ret	= new Future();
+		final boolean[]	services	= new boolean[2];
+
 		container.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
 				exeservice = (IExecutionService)result;
+				boolean	setresult;
+				synchronized(services)
+				{
+					services[0]	= true;
+					setresult	= services[0] && services[1];
+				}
+				if(setresult)
+					ret.setResult(null);
 			}
 		});
 				
@@ -160,8 +169,19 @@ public class SimulationService implements ISimulationService, IService
 					getClockService().start();
 					
 				getExecutorService().startService();
+
+				boolean	setresult;
+				synchronized(services)
+				{
+					services[1]	= true;
+					setresult	= services[0] && services[1];
+				}
+				if(setresult)
+					ret.setResult(null);
 			}
 		});
+
+		return ret;
 	}
 	
 	/**

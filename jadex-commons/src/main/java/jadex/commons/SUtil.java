@@ -9,6 +9,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
@@ -17,7 +20,6 @@ import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -358,7 +360,6 @@ public class SUtil
 		List lens = new ArrayList(); 
 		Class cls = array.getClass(); 
 		
-		Object tmp = array;
 		while(cls.isArray()) 
 		{ 
 			lens.add(new Integer(Array.getLength(array)));
@@ -1085,17 +1086,17 @@ public class SUtil
 				if(url.getProtocol().equals("file"))
 				{
 					// Find out default encoding (might fail in applets).
-					/*String	encoding	= "ISO-8859-1";
+					String	encoding	= "ISO-8859-1";
 					try
 					{
 						encoding	= System.getProperty("file.encoding");
 					}
-					catch(SecurityException e){}*/
+					catch(SecurityException e){}
 
-					//try
-					//{
-						//file	= new File(URLDecoder.decode(url.getFile(), encoding)); // does only work since 1.4.
-						file	= new File(URLDecoder.decode(url.getFile())); // problem decode is deprecated.
+					try
+					{
+						file	= new File(URLDecoder.decode(url.getFile(), encoding)); // does only work since 1.4.
+//						file	= new File(URLDecoder.decode(url.getFile())); // problem decode is deprecated.
 						if(file.exists())
 						{
 							if(file.isDirectory())
@@ -1114,13 +1115,13 @@ public class SUtil
 								}
 							}
 						}
-					//}
-					/*catch(UnsupportedEncodingException e)
+					}
+					catch(UnsupportedEncodingException e)
 					{
 						StringWriter	sw	= new StringWriter();
 						e.printStackTrace(new PrintWriter(sw));
 						throw new RuntimeException(sw.toString());
-					}*/
+					}
 				}
 
 				// Remote or jar file...

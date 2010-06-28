@@ -110,7 +110,7 @@ public class ContinuousClock extends AbstractClock implements IContinuousClock
 	 */
 	public void dispose()
 	{
-		executor.shutdown(null);
+		executor.shutdown();
 //		notificator.shutdown(null);
 	}
 

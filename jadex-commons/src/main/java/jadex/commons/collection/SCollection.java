@@ -451,12 +451,12 @@ public class SCollection
 	{
 		for(int i=1; i<5000; i++)
 		{
-			Object	test1	= createArrayList();
-			Object	test2	= createHashMap();
-			Object	test3	= createHashSet();
-			Object	test4	= createHashtable();
-			Object	test5	= createIndexMap();
-			Object	test6	= createVector();
+			createArrayList();
+			createHashMap();
+			createHashSet();
+			createHashtable();
+			createIndexMap();
+			createVector();
 			Thread.sleep(10);
 		}
 		System.out.println("finished");

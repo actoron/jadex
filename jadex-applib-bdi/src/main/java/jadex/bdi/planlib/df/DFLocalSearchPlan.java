@@ -21,7 +21,6 @@ public class DFLocalSearchPlan extends Plan
 		IDFComponentDescription desc = (IDFComponentDescription)getParameter("description").getValue();
 		ISearchConstraints	con	= (ISearchConstraints)getParameter("constraints").getValue();
 		
-		SyncResultListener lis = new SyncResultListener();
 		IFuture ret = ((IDF)getScope().getServiceContainer().getService(IDF.class)).search(desc, con);
 		IDFComponentDescription[] result = (IDFComponentDescription[])ret.get(this);
 		

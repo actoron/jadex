@@ -7,12 +7,13 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.gpmn.model2.MGpmnModel;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
@@ -104,7 +105,7 @@ public class GpmnFactory implements IComponentFactory, IService
 	/**
 	 *  Start the service.
 	 */
-	public void startService()
+	public IFuture	startService()
 	{
 //		// Absolute start time (for testing and benchmarking).
 //		long starttime = System.currentTimeMillis();
@@ -140,7 +141,9 @@ public class GpmnFactory implements IComponentFactory, IService
 //		long startup = System.currentTimeMillis() - starttime;
 //		((Platform)container).getLogger().info("Platform startup time: " + startup + " ms.");
 		
-		container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+		final Future	ret	= new Future();
+		
+		container.getService(ILibraryService.class).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -159,18 +162,26 @@ public class GpmnFactory implements IComponentFactory, IService
 					}
 				};
 				libservice.addLibraryServiceListener(lsl);
+				
+				ret.setResult(null);
+			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
 			}
 		});
+		
+		return ret;
 	}
 	
 	/**
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdownService(IResultListener listener)
+	public IFuture	shutdownService()
 	{
-		if(listener!=null)
-			listener.resultAvailable(this, null);
+		return new Future(null);
 	}
 	
 	/**

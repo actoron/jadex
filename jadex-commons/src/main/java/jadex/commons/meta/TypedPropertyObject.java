@@ -1,7 +1,5 @@
 package jadex.commons.meta;
 
-import java.util.Map;
-
 import jadex.commons.SimplePropertyObject;
 
 public class TypedPropertyObject extends SimplePropertyObject implements

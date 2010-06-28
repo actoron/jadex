@@ -94,6 +94,10 @@
 		</parent>
 	-->
 
+	<properties>
+		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+  	</properties>
+
 	<build>
 		<resources>
 			<resource>
@@ -102,14 +106,14 @@
 					<exclude>**/*.java</exclude>
 					<exclude>**/.svn/*</exclude>
 				</excludes>
-			</resource>
-
+			</resource><!-- 
 			<resource>
-				<directory>src/test/resources</directory>
+				<directory>src/test/java</directory>
 				<excludes>
+					<exclude>**/*.java</exclude>
 					<exclude>**/.svn/*</exclude>
 				</excludes>
-			</resource>
+			</resource> -->
 		</resources>
 
 		<plugins>
@@ -126,6 +130,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.1</version>
 				<executions>
 					<execution>
 						<id>sign-artifacts</id>

@@ -387,7 +387,7 @@ public class BrowserLauncher
 				}
 				try
 				{
-					mrjFileUtilsClass = Class.forName("com.apple.mrj.MRJFileUtils");
+					mrjFileUtilsClass = Class.forName(className);
 					openURL = mrjFileUtilsClass.getDeclaredMethod("openURL", new Class[]{String.class});
 				}
 				catch(ClassNotFoundException cnfe)

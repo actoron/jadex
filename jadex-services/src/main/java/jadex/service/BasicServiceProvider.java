@@ -116,7 +116,7 @@ public class BasicServiceProvider implements IServiceProvider
 		}
 		Object old = tmp.put(name, service);
 		if(old instanceof IService)
-			((IService)old).shutdownService(null);
+			((IService)old).shutdownService();
 	}
 
 	/**
@@ -135,7 +135,7 @@ public class BasicServiceProvider implements IServiceProvider
 		if(service == null && tmp.size() == 1)
 		{
 			IService rem = (IService)tmp.remove(tmp.keySet().iterator().next());
-			rem.shutdownService(null);
+			rem.shutdownService();
 			removed = true;
 		}
 		else
@@ -147,7 +147,7 @@ public class BasicServiceProvider implements IServiceProvider
 				{
 					Object rem = tmp.remove(key);
 					if(rem instanceof IService)
-						((IService)rem).shutdownService(null);
+						((IService)rem).shutdownService();
 					removed = true;
 				}
 			}

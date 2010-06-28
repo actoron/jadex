@@ -13,9 +13,10 @@ import jadex.bridge.IMessageListener;
 import jadex.bridge.IMessageService;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
@@ -361,7 +362,7 @@ public class MessageService implements IMessageService, IService
 	/**
 	 *  Start the service.
 	 */
-	public void startService()
+	public IFuture	startService()
 	{
 		ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
 		for(int i=0; i<tps.length; i++)
@@ -377,24 +378,25 @@ public class MessageService implements IMessageService, IService
 			}
 		}
 		
+		Future	ret	= new Future();
 		if(transports.size()==0)
-			throw new RuntimeException("MessageService has no working transport for sending messages.");
+			ret.setException(new RuntimeException("MessageService has no working transport for sending messages."));
+		else
+			ret.setResult(null);
+		return ret;
 	}
 	
 	/**
 	 *  Called when the platform shuts down. Do necessary cleanup here (if any).
 	 */
-	public void shutdownService(IResultListener listener)
+	public IFuture	shutdownService()
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
-		
 		for(int i = 0; i < transports.size(); i++)
 		{
 			((ITransport)transports.get(i)).shutdown();
 		}
 		
-		listener.resultAvailable(this, null);
+		return new Future(null); // Already done.
 	}
 
 	/**

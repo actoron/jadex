@@ -1,5 +1,8 @@
 package jadex.commons.concurrent;
 
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,8 +43,8 @@ public class Executor implements Runnable
 	/** The executable. */
 	protected IExecutable executable;
 	
-	/** The shutdown listener. */
-	protected List shutdownlisteners;
+	/** The shutdown futures. */
+	protected List shutdownfutures;
 		
 	//--------- constructors --------
 
@@ -65,7 +68,7 @@ public class Executor implements Runnable
 		
 		this.threadpool = threadpool;
 		this.executable = executable;
-		this.shutdownlisteners = Collections.synchronizedList(new ArrayList());
+		this.shutdownfutures = Collections.synchronizedList(new ArrayList());
 	}
 		
 	//-------- methods --------
@@ -107,15 +110,15 @@ public class Executor implements Runnable
 		}
 
 		// Notify shutdown listeners when execution has ended.
-		synchronized(shutdownlisteners)
+		synchronized(shutdownfutures)
 		{
 			if(shutdown)
 			{
-				if(shutdownlisteners!=null)
+				if(shutdownfutures!=null)
 				{
-					for(int i=0; i<shutdownlisteners.size(); i++)
-						((IResultListener)shutdownlisteners.get(i)).resultAvailable(null, null);
-					shutdownlisteners.clear();
+					for(int i=0; i<shutdownfutures.size(); i++)
+						((Future)shutdownfutures.get(i)).setResult(null);
+					shutdownfutures.clear();
 				}
 				shutdowned = true;
 			}
@@ -157,24 +160,24 @@ public class Executor implements Runnable
 	/**
 	 *  Shutdown the executor.
 	 */
-	public void shutdown(IResultListener listener)
+	public IFuture	shutdown()
 	{
-		synchronized(shutdownlisteners)
+		Future	ret	= new Future();
+		
+		synchronized(shutdownfutures)
 		{
 			shutdown = true;
-			
-			if(listener!=null)
+			if(!shutdowned)
 			{
-				if(!shutdowned)
-				{
-					shutdownlisteners.add(listener);
-				}
-				else
-				{
-					listener.resultAvailable(null, null);
-				}
+				shutdownfutures.add(ret);
+			}
+			else
+			{
+				ret.setResult(null);
 			}
 		}
+		
+		return ret;
 	}
 	
 	/**

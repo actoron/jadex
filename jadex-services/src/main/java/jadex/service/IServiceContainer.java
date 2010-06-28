@@ -2,8 +2,6 @@ package jadex.service;
 
 import jadex.commons.concurrent.IResultListener;
 
-import java.util.Collection;
-
 /**
  *  Interface for a service container. Allows
  *  fetching service per type (and name). 

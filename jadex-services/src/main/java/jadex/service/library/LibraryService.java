@@ -1,6 +1,7 @@
 package jadex.service.library;
 
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.service.IService;
 
 import java.io.File;
@@ -323,10 +324,11 @@ public class LibraryService implements IService, ILibraryService
 	/**
 	 *  Start the service.
 	 */
-	public void startService()
+	public IFuture	startService()
 	{
 //		baseClassLoader = Thread.currentThread().getContextClassLoader();
 //		libraryClassLoader = new DynamicMemoryClassLoader(baseClassLoader, null, null);
+		return new Future(null); // Already done.
 	}
 
 	/** 
@@ -334,16 +336,13 @@ public class LibraryService implements IService, ILibraryService
 	 *  Releases all cached resources and shuts down the library service.
 	 *  @param listener The listener.
 	 */
-	public void shutdownService(IResultListener listener)
+	public IFuture	shutdownService()
 	{
 		basecl = null;
 		libcl = null;
 		listeners.clear();
 
-		if(listener != null)
-		{
-			listener.resultAvailable(this, null);
-		}
+		return new Future(null); // Already done.
 	}
 
 	/**

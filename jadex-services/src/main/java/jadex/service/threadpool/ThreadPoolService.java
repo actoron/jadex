@@ -1,6 +1,7 @@
 package jadex.service.threadpool;
 
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.IService;
 
@@ -29,9 +30,10 @@ public class ThreadPoolService implements IThreadPool, IService
 	/**
 	 *  Start the service.
 	 */
-	public void startService()
+	public IFuture	startService()
 	{
 		// Nothing to do.
+		return new Future(null); // Already done.
 	}
 	
 	/**
@@ -47,11 +49,10 @@ public class ThreadPoolService implements IThreadPool, IService
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdownService(IResultListener listener)
+	public IFuture	shutdownService()
 	{
 		threadpool.dispose();
-		if(listener!=null)
-			listener.resultAvailable(this, null);
+		return new Future(null); // Already done.
 	}
 	
 	/**

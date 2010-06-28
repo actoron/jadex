@@ -9,8 +9,9 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SGUI;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVTypeModel;
@@ -77,29 +78,29 @@ public class BDIAgentFactory implements IComponentFactory, IService
 	/**
 	 *  Start the service.
 	 */
-	public void startService()
+	public IFuture	startService()
 	{
-		init();
+		return init();
 	}
 	
 	/**
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdownService(IResultListener listener)
+	public IFuture	shutdownService()
 	{
-		if(listener!=null)
-			listener.resultAvailable(this, null);
+		return new Future(null);
 	}
 	
 	/**
 	 *  Init the factory.
 	 */
-	protected void init()
+	protected IFuture init()
 	{
 		if(libservice==null)
 		{
-			container.getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+			final Future	ret	= new Future();
+			container.getService(ILibraryService.class).addResultListener(new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
@@ -118,8 +119,19 @@ public class BDIAgentFactory implements IComponentFactory, IService
 						}
 					};
 					libservice.addLibraryServiceListener(lsl);
+					ret.setResult(null);
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
 				}
 			});
+			return ret;
+		}
+		else
+		{
+			return null;
 		}
 	}
 	
@@ -136,7 +148,7 @@ public class BDIAgentFactory implements IComponentFactory, IService
 	 */
 	public IComponentInstance createComponentInstance(IComponentAdapter adapter, ILoadableComponentModel model, String config, Map arguments, IExternalAccess parent)
 	{
-		init();
+//		init();
 		
 		OAVAgentModel amodel = (OAVAgentModel)model;
 		
@@ -158,7 +170,7 @@ public class BDIAgentFactory implements IComponentFactory, IService
 	 */
 	public ILoadableComponentModel loadModel(String filename, String[] imports)
 	{
-		init();
+//		init();
 		
 		try
 		{
@@ -181,7 +193,7 @@ public class BDIAgentFactory implements IComponentFactory, IService
 	 */
 	public boolean isLoadable(String model, String[] imports)
 	{
-		init();
+//		init();
 
 		return model.toLowerCase().endsWith(".agent.xml") || model.toLowerCase().endsWith(".capability.xml");
 //		return loader.isLoadable(model, null);

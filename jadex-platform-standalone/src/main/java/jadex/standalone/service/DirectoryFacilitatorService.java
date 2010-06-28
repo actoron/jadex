@@ -14,8 +14,6 @@ import jadex.bridge.ISearchConstraints;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.collection.IndexMap;
-import jadex.commons.concurrent.DefaultResultListener;
-import jadex.commons.concurrent.IResultListener;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
@@ -332,21 +330,19 @@ public class DirectoryFacilitatorService implements IDF, IService
 	/**
 	 *  Start the service.
 	 */
-	public void startService()
+	public IFuture	startService()
 	{
 		// nothing to do.
+		return new Future(null); // Already done.
 	}
 	
 	/**
 	 *  Called when the platform shuts down.
 	 *  Do necessary cleanup here (if any).
 	 */
-	public void shutdownService(IResultListener listener)
+	public IFuture	shutdownService()
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
-		
-		listener.resultAvailable(this, null);
+		return new Future(null); // Already done.
 	}
 
 	//-------- helper methods --------

@@ -81,6 +81,12 @@ public class ComponentManagementService implements IComponentManagementService, 
 	/** The exception of a component during execution (if any). */
 	protected Map exceptions;
 	
+	/** The execution service (cached to avoid using futures). */
+	protected IExecutionService	exeservice;
+	
+	/** The message service (cached to avoid using futures). */
+	protected IMessageService	msgservice;
+	
     //-------- constructors --------
 
     /**
@@ -404,23 +410,16 @@ public class ComponentManagementService implements IComponentManagementService, 
 				}
 				
 				ad.setState(IComponentDescription.STATE_SUSPENDED);
-				container.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
+				exeservice.cancel(adapter, new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
-						IExecutionService exe = (IExecutionService)result;
-						exe.cancel(adapter, new IResultListener()
-						{
-							public void resultAvailable(Object source, Object result)
-							{
-								ret.setResult(result);
-							}
-							
-							public void exceptionOccurred(Object source, Exception exception)
-							{
-								ret.setException(exception);
-							}
-						});
+						ret.setResult(result);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						ret.setException(exception);
 					}
 				});
 			}
@@ -544,14 +543,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 						ret.setException(exception);
 					}
 				});
-				container.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
-					{
-						IExecutionService exe = (IExecutionService)result;
-						exe.execute(adapter);
-					}
-				});
+				exeservice.execute(adapter);
 			}
 		}
 		
@@ -663,7 +655,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 					ccs.remove(cid);
 					
 					// Stop execution of component.
-					((IExecutionService)container.getService(IExecutionService.class)).cancel(adapter, null);
+					exeservice.cancel(adapter, null);
 					
 					// Deregister destroyed component at parent.
 					if(desc.getParent()!=null)
@@ -1075,9 +1067,8 @@ public class ComponentManagementService implements IComponentManagementService, 
 			while(adapters.containsKey(ret));
 		}
 		
-		IMessageService	ms	= (IMessageService)container.getService(IMessageService.class);
-		if(ms!=null)
-			ret.setAddresses(ms.getAddresses());
+		if(msgservice!=null)
+			ret.setAddresses(msgservice.getAddresses());
 
 		return ret;
 	}
@@ -1140,20 +1131,53 @@ public class ComponentManagementService implements IComponentManagementService, 
 	
 	/**
 	 *  Start the service.
+	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public void startService()
+	public IFuture	startService()
 	{
-		
+		final Future	ret	= new Future();
+		final boolean[]	services	= new boolean[2];
+		container.getService(IExecutionService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				exeservice	= (IExecutionService)result;
+				boolean	setresult;
+				synchronized(services)
+				{
+					services[0]	= true;
+					setresult	= services[0] && services[1];
+				}
+				if(setresult)
+					ret.setResult(null);
+			}
+		});
+		container.getService(IMessageService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				msgservice	= (IMessageService)result;
+				boolean	setresult;
+				synchronized(services)
+				{
+					services[1]	= true;
+					setresult	= services[0] && services[1];
+				}
+				if(setresult)
+					ret.setResult(null);
+			}
+		});
+		return ret;
 	}
-
+	
 	/**
 	 *  Shutdown the service.
-	 *  @param listener The listener.
+	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
-	public void shutdownService(IResultListener listener)
+	public IFuture	shutdownService()
 	{
-		if(listener!=null)
-			listener.resultAvailable(this, null);
+		// Todo: destroy running components.
+		return new Future(null);	// Already done.
 	}
 	
 	//-------- service handling --------

@@ -1,7 +1,8 @@
 package jadex.service.clock;
 
+import jadex.commons.Future;
 import jadex.commons.IChangeListener;
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.IService;
 
@@ -216,20 +217,20 @@ public class ClockService implements IClockService, IService
 	/**
 	 *  Start the service.
 	 */
-	public void startService()
+	public IFuture	startService()
 	{
 		clock.start();
+		return new Future(null);	// Already done.
 	}
 	
 	/**
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdownService(IResultListener listener)
+	public IFuture	shutdownService()
 	{
 		clock.dispose();
-		if(listener!=null)
-			listener.resultAvailable(this, null);
+		return new Future(null);	// Already done.
 	}
 	
 	//--------- methods --------

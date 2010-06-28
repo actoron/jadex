@@ -26,8 +26,8 @@ public class SendICQPlan extends Plan
 			fail();
 		
 		// Message settings.
-		String	content	= (String)getParameter("content").getValue();
-		String[] receivers	= (String[])getParameterSet("receivers").getValues();
+//		String	content	= (String)getParameter("content").getValue();
+//		String[] receivers	= (String[])getParameterSet("receivers").getValues();
 		
 //		AIM aim = new AIM(account.getID(), account.getPassword());
 //		

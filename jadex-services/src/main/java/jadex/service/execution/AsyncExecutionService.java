@@ -1,6 +1,8 @@
 package jadex.service.execution;
 
+import jadex.commons.Future;
 import jadex.commons.ICommand;
+import jadex.commons.IFuture;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
@@ -185,7 +187,7 @@ public class AsyncExecutionService	implements IExecutionService, IService
 					}
 				}
 			};
-			exe.shutdown(lis);
+			exe.shutdown().addResultListener(lis);
 //			executors.remove(task);
 		}
 		else
@@ -196,42 +198,10 @@ public class AsyncExecutionService	implements IExecutionService, IService
 	}
 	
 	/**
-	 *  Stop the execution service.
-	 *  Suspends all tasks. The tasks will not
-	 *  be executed until resume is called. 
-	 *  // todo: make callable more than once
-	 */
-	public synchronized void stop(final IResultListener listener)
-	{
-		if(!running || shutdown)
-		{
-			listener.exceptionOccurred(this, new RuntimeException("Not running."));
-			return;
-		}
-		
-		running	= false;
-		
-		// Remove current executors and create new executors
-		// for currently running tasks. New executed will
-		// not be started until start() is called on the execution service.
-		final IExecutable[] keys = (IExecutable[])executors.keySet()
-			.toArray(new IExecutable[executors.size()]);
-		
-		// One listener counts until all executors have shutdowned.
-		IResultListener lis = listener==null? null: new CounterListener(keys.length, listener);
-		
-		for(int i=0; i<keys.length; i++)
-		{	
-			cancel(keys[i], lis);
-			execute(keys[i]);
-		}
-	}
-	
-	/**
 	 *  Start the execution service.
 	 *  Resumes all scheduled tasks. 
 	 */
-	public synchronized void startService()
+	public synchronized IFuture	startService()
 	{
 		if(shutdown)
 			throw new RuntimeException("Cannot start: shutdowning service.");
@@ -255,19 +225,21 @@ public class AsyncExecutionService	implements IExecutionService, IService
 				((ICommand)it.next()).execute(null);
 			}
 		}
+		return new Future(null);	// Already done.
 	}
 	
 	/**
 	 *  Shutdown the executor service.
 	 *  // todo: make callable more than once
 	 */
-	public synchronized void shutdownService(IResultListener listener)
+	public synchronized IFuture	shutdownService()
 	{
+		final Future	ret	= new Future();
+		
 		if(shutdown)
 		{
-			if(listener!=null)
-				listener.exceptionOccurred(this, new RuntimeException("Already shutdowned."));
-			return;
+			ret.setException((new RuntimeException("Already shutdowned.")));
+			return ret;
 		}
 		
 		shutdown = true;
@@ -278,22 +250,33 @@ public class AsyncExecutionService	implements IExecutionService, IService
 		if(keys.length>0)
 		{
 			// One listener counts until all executors have shutdowned.
-			IResultListener lis = listener==null? null: new CounterListener(keys.length, listener);
+			IResultListener lis = new CounterListener(keys.length, new IResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					ret.setResult(result);
+				}
+				
+				public void exceptionOccurred(Object source, Exception exception)
+				{
+					ret.setException(exception);
+				}
+			});
 			
 			for(int i=0; i<keys.length; i++)
 			{
 				Executor exe = (Executor)executors.get(keys[i]);
 				if(exe!=null)
-					exe.shutdown(lis);
+					exe.shutdown().addResultListener(lis);
 			}
 		}
 		else
 		{
-			if(listener!=null)
-				listener.resultAvailable(this, null);
+			ret.setResult(null);
 		}
 				
 		executors = null;
+		return ret;
 	}
 
 	

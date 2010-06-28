@@ -59,7 +59,7 @@
 		
 			<property type="jadex.service.execution.IExecutionService" name="execution_service">
 				new jadex.service.execution.SyncExecutionService(
-					$platform.getService(jadex.service.threadpool.ThreadPoolService.class))
+					$platform.getService(jadex.service.threadpool.ThreadPoolService.class).get(new jadex.commons.ThreadSuspendable()))
 			</property>
 		</properties>
 	</properties>
