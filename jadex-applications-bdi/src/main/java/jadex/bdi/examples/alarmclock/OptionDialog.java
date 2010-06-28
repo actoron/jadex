@@ -3,6 +3,7 @@ package jadex.bdi.examples.alarmclock;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.SwingDefaultResultListener;
+import jadex.service.clock.IClockService;
 
 import java.awt.BorderLayout;
 import java.awt.Dialog;
@@ -235,7 +236,7 @@ public class OptionDialog extends JDialog
 							try
 							{
 								File file = filechooser.getSelectedFile();
-								Settings ns = Settings.loadSettings(file.getAbsolutePath(), agent);
+								Settings ns = Settings.loadSettings(file.getAbsolutePath());
 								agent.getBeliefbase().setBeliefFact("settings", ns);
 								agent.getBeliefbase().removeBeliefSetFacts("alarms");
 								agent.getBeliefbase().addBeliefSetFacts("alarms", ns.getAlarms());
@@ -252,6 +253,14 @@ public class OptionDialog extends JDialog
 									JOptionPane.ERROR_MESSAGE);
 								//System.out.println("Could not load settings: "+ex);
 							}
+							
+//							agent.getServiceContainer().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
+//							{
+//								public void customResultAvailable(Object source, Object result)
+//								{
+//									
+//								}
+//							});
 						}
 					}
 				});

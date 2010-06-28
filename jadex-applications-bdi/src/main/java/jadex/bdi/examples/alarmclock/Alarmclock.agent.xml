@@ -26,7 +26,7 @@
 			<fact>"./alarmclock_settings.ser"</fact>
 		</belief>
 		<belief name="settings" class="Settings">
-			<fact>Settings.loadSettings($beliefbase.settingsfile, $scope.getExternalAccess())</fact>
+			<fact>Settings.loadSettings($beliefbase.settingsfile)</fact>
 		</belief>
 
 		<beliefset name="alarms" class="Alarm">
@@ -46,7 +46,7 @@
 			</parameter>
 			<unique/>
 			<creationcondition language="jcl">
-				Alarm $alarm &amp;&amp; $alarm.isActive() &amp;&amp; $alarm.getAlarmtime()!=Alarm.NO_ALARM
+				Alarm $alarm &amp;&amp; $alarm.isActive() &amp;&amp; $alarm.getAlarmtime($scope.getTime())!=Alarm.NO_ALARM
 			</creationcondition>
 			<contextcondition language="jcl">
 				$goal.alarm.isActive()
@@ -56,7 +56,7 @@
 				!Arrays.asList($beliefbase.alarms).contains($goal.alarm)
 			</dropcondition>
 			<targetcondition language="jcl">
-				$goal.alarm.getAlarmtime()==Alarm.NO_ALARM
+				$goal.alarm.getAlarmtime($scope.getTime())==Alarm.NO_ALARM
 			</targetcondition>
 		</achievegoal>
 
@@ -129,7 +129,7 @@
 			<beliefs>
 				<initialbeliefset ref="alarms">
 					<!-- todo: call setAlarmtime() on alarms? -->
-					<facts>
+					<!--<facts>
 						((Settings)$beliefbase.settings).getAlarms().length!=0?
 						((Settings)$beliefbase.settings).getAlarms():
 						//jadex.commons.SUtil.joinArrays(((Settings)$beliefbase.settings).getAlarms(),
@@ -139,6 +139,18 @@
 							"jadex/bdi/examples/alarmclock/alarm.mp3", "Chimes", true, (IClockService)$scope.getServiceContainer().getService(IClockService.class)),
 						new Alarm(Alarm.HOURLY, new Time(0,15,0,0,0,0,0),
 							"jadex/bdi/examples/alarmclock/alarm.mp3", "Chimes quartely", true, (IClockService)$scope.getServiceContainer().getService(IClockService.class))}//)
+					</facts>  -->
+					
+					<facts>
+						((Settings)$beliefbase.settings).getAlarms().length!=0?
+						((Settings)$beliefbase.settings).getAlarms():
+						//jadex.commons.SUtil.joinArrays(((Settings)$beliefbase.settings).getAlarms(),
+						new Alarm[]{new Alarm(Alarm.ONCE, new Time(new Date($scope.getTime()+10000)),
+							"jadex/bdi/examples/alarmclock/alarm.mp3", "Built-in start alarm", true),
+						new Alarm(Alarm.HOURLY, new Time(0,0,0,0,0,0,0),
+							"jadex/bdi/examples/alarmclock/alarm.mp3", "Chimes", true),
+						new Alarm(Alarm.HOURLY, new Time(0,15,0,0,0,0,0),
+							"jadex/bdi/examples/alarmclock/alarm.mp3", "Chimes quartely", true)}//)
 					
 					</facts>
 					<!--<fact>

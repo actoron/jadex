@@ -266,7 +266,7 @@ public class Settings implements Cloneable, Serializable
 	 *  @param settings_loc The settings location.
 	 *  @return The loaded settings.
 	 */
-	public static Settings loadSettings(String settings_loc, IBDIExternalAccess agent)
+	public static Settings loadSettings(String settings_loc)
 	{
 		Settings ret = null;
 		try
@@ -283,8 +283,8 @@ public class Settings implements Cloneable, Serializable
 			ret = new Settings("./alarmclock_settings.ser");
 		}
 		Alarm[]	alarms	= ret.getAlarms();
-		for(int i=0; i<alarms.length; i++)
-			alarms[i].setClock((IClockService)agent.getServiceContainer().getService(IClockService.class));
+//		for(int i=0; i<alarms.length; i++)
+//			alarms[i].setClock(clock);
 		return ret;
 	}
 	

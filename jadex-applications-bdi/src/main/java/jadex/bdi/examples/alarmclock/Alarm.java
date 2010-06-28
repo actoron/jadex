@@ -74,7 +74,7 @@ public class Alarm implements Cloneable, Serializable
 	protected boolean active;
 
 	/** The clock. */
-	public transient IClockService clock;
+//	public transient IClockService clock;
 
 	/** The helper object for bean events. */
 	public transient PropertyChangeSupport pcs;
@@ -88,7 +88,7 @@ public class Alarm implements Cloneable, Serializable
 	 */
 	public Alarm()
 	{
-		this(ONCE, new Time(), null, null, true, null);
+		this(ONCE, new Time(), null, null, true);
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class Alarm implements Cloneable, Serializable
 	 *  @param filename The alarm sound.
 	 *  @param message The alarm message.
 	 */
-	public Alarm(String mode, Time time, String filename, String message, boolean active, IClockService clock)
+	public Alarm(String mode, Time time, String filename, String message, boolean active)//, IClockService clock)
 	{
 		this.mode = mode;
 		this.time = time;
@@ -107,7 +107,7 @@ public class Alarm implements Cloneable, Serializable
 		this.active = active;
 		this.alarmdate = UNKNOWN;
 		this.calc_allowed = true;
-		this.clock = clock;
+//		this.clock = clock;
 	}
 
 	//-------- methods --------
@@ -214,14 +214,14 @@ public class Alarm implements Cloneable, Serializable
 	/**
 	 *  Get the alarm time.
 	 */
-	public long getAlarmtime()
+	public long getAlarmtime(long currenttime)
 	{
 		//System.out.println("getAlarmtime: "+getMessage());
 		//Thread.dumpStack();
 		//if(alarmdate==UNKNOWN || (alarmdate!=NO_ALARM && alarmdate<clock.getTime()))
 		// Check that a call can't dealock through trying to enter setNextAlarmdate
 		if(calc_allowed)
-			setNextAlarmtime();
+			setNextAlarmtime(currenttime);
 		//System.out.println("alt: "+alarmdate);
 		return alarmdate;
 	}
@@ -260,13 +260,13 @@ public class Alarm implements Cloneable, Serializable
 	/**
 	 *  Calculate and save the next alarmtime.
 	 */
-	public synchronized void setNextAlarmtime()
+	public synchronized void setNextAlarmtime(long currenttime)
 	{
 		// Check repeated for different threads that want to enter here.
 		if(!calc_allowed)
 			return;
 
-		long currenttime = clock.getTime();
+//		long currenttime = clock.getTime();
 		long ret = NO_ALARM;
 
 		if(mode.equals(ONCE))
@@ -403,11 +403,11 @@ public class Alarm implements Cloneable, Serializable
 
 	/**
 	 *  Set the clock.
-	 */
+	 * /
 	public void	setClock(IClockService clock)
 	{
 		this.clock	= clock;
-	}
+	}*/
 	
 	/**
 	 *  Test two object for equality.

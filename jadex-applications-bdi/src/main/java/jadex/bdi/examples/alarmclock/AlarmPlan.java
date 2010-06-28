@@ -24,7 +24,7 @@ public class AlarmPlan extends Plan
 			Alarm alarm = (Alarm)getParameter("alarm").getValue();
 //			System.out.println("Alarmplan got alarm: "+alarm);
 			
-			long alarmtime = alarm.getAlarmtime();
+			long alarmtime = alarm.getAlarmtime(getTime());
 //			System.out.println("Alarm plan alarmtime: "+alarmtime);
 			if(alarmtime==Alarm.NO_ALARM)
 			{

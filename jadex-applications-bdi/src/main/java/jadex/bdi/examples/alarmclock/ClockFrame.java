@@ -326,35 +326,40 @@ public class ClockFrame extends JFrame
 		final boolean[] firsttime = new boolean[]{true};
 		try
 		{
-			
-			
 			agent.getBeliefbase().getBeliefFact("settings").addResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					Settings sets = (Settings)result;
-					IClockService cs = (IClockService)agent.getServiceContainer().getService(IClockService.class);
-					Date current = new Date(cs.getTime());
-					
-					if(sets.isAMPM()!=last_ampm || sets.getFontsize()!=last_fontsize || firsttime[0] )
+					final Settings sets = (Settings)result;
+					agent.getServiceContainer().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
 					{
-						if(sets.isAMPM())
-							format.applyPattern("hh:mm:ss a");
-						else
-							format.applyPattern("HH:mm:ss");
-						firsttime[0] = false;
-						time.setFont(time.getFont().deriveFont((float)sets.getFontsize()));
-						time.setText(format.format(current));
-						pack();
-						last_ampm = sets.isAMPM();
-						last_fontsize = sets.getFontsize();
-					}
-					else
-					{
-						time.setText(format.format(current));
-					}
-					if(ti!=null)
-						ti.setToolTip(format.format(current));
+						
+						public void customResultAvailable(Object source, Object result)
+						{
+							IClockService cs = (IClockService)result;
+							Date current = new Date(cs.getTime());
+							
+							if(sets.isAMPM()!=last_ampm || sets.getFontsize()!=last_fontsize || firsttime[0] )
+							{
+								if(sets.isAMPM())
+									format.applyPattern("hh:mm:ss a");
+								else
+									format.applyPattern("HH:mm:ss");
+								firsttime[0] = false;
+								time.setFont(time.getFont().deriveFont((float)sets.getFontsize()));
+								time.setText(format.format(current));
+								pack();
+								last_ampm = sets.isAMPM();
+								last_fontsize = sets.getFontsize();
+							}
+							else
+							{
+								time.setText(format.format(current));
+							}
+							if(ti!=null)
+								ti.setToolTip(format.format(current));
+						}
+					});
 				}
 			});
 			
