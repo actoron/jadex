@@ -1,5 +1,6 @@
 package jadex.micro;
 
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
@@ -593,12 +594,12 @@ public class MicroAgentInterpreter implements IComponentInstance
 	 */
 	public IResultListener createResultListener(IResultListener listener)
 	{
-		return new MicroListener(listener);
+		return new ComponentResultListener(listener, adapter);
 	}
 	
 	/**
 	 *  The micro listener for executing listener invocations as an agent step.
-	 */
+	 * /
 	class MicroListener implements IResultListener
 	{
 		protected IResultListener listener;
@@ -638,7 +639,7 @@ public class MicroAgentInterpreter implements IComponentInstance
 				}
 			});
 		}
-	}
+	}*/
 	
 	/**
 	 *  Add a change listener.

@@ -490,7 +490,7 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 	 * 	Called when an error occurs during component execution.
 	 *  @param e	The error.
 	 */
-	protected void fatalError(Exception e)
+	protected void fatalError(final Exception e)
 	{
 		// Fatal error!
 		fatalerror	= true;
@@ -500,9 +500,15 @@ public class StandaloneComponentAdapter implements IComponentAdapter, IExecutabl
 		getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
 			
 		// Remove component from platform.
-		ComponentManagementService	cms	= (ComponentManagementService)container.getService(IComponentManagementService.class);
-		cms.setComponentException(cid, e);
-		cms.destroyComponent(cid);
+		container.getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				ComponentManagementService	cms	= (ComponentManagementService)result;
+				cms.setComponentException(cid, e);
+				cms.destroyComponent(cid);
+			}
+		});
 	}
 	
 	/**

@@ -559,111 +559,118 @@ public class Gui extends JFrame
 		private JTextField deadline = new JTextField(20);
 		private boolean aborted;
 
-		InputDialog(boolean buy)
+		InputDialog(final boolean buy)
 		{
 			super(Gui.this, addorderlabel, true);
 
 			// Add some default entry for easy testing of the gui.
 			// This order are not added to the agent (see manager.agent.xml).
-			IClockService clock = (IClockService)agent.getServiceContainer().getService(IClockService.class);
-			if(buy)
+			agent.getServiceContainer().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
 			{
-				orders.addItem(new Order("All about agents", null, 100, 120, buy, clock));
-				orders.addItem(new Order("All about web services", null, 40, 60, buy, clock));
-				orders.addItem(new Order("Harry Potter", null, 5, 10, buy, clock));
-				orders.addItem(new Order("Agents in the real world", null, 30, 65, buy, clock));
-			}
-			else
-			{
-				orders.addItem(new Order("All about agents", null, 130, 110, buy, clock));
-				orders.addItem(new Order("All about web services", null, 50, 30, buy, clock));
-				orders.addItem(new Order("Harry Potter", null, 15, 9, buy, clock));
-				orders.addItem(new Order("Agents in the real world", null, 100, 60, buy, clock));
-			}
-			
-			JPanel center = new JPanel(new GridBagLayout());
-			center.setBorder(new EmptyBorder(5, 5, 5, 5));
-			getContentPane().add(BorderLayout.CENTER, center);
-
-			JLabel label;
-			Dimension labeldim = new JLabel("Preset orders ").getPreferredSize();
-			int row = 0;
-			GridBagConstraints leftcons = new GridBagConstraints(0, 0, 1, 1, 0, 0,
-					GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0);
-			GridBagConstraints rightcons = new GridBagConstraints(1, 0, GridBagConstraints.REMAINDER, 1, 1, 0,
-					GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0);
-
-			leftcons.gridy = rightcons.gridy = row++;
-			label = new JLabel("Preset orders");
-			label.setMinimumSize(labeldim);
-			label.setPreferredSize(labeldim);
-			center.add(label, leftcons);
-			center.add(orders, rightcons);
-
-			leftcons.gridy = rightcons.gridy = row++;
-			label = new JLabel("Title");
-			label.setMinimumSize(labeldim);
-			label.setPreferredSize(labeldim);
-			center.add(label, leftcons);
-			center.add(title, rightcons);
-
-			leftcons.gridy = rightcons.gridy = row++;
-			label = new JLabel("Start price");
-			label.setMinimumSize(labeldim);
-			label.setPreferredSize(labeldim);
-			center.add(label, leftcons);
-			center.add(start, rightcons);
-
-			leftcons.gridy = rightcons.gridy = row++;
-			label = new JLabel("Price limit");
-			label.setMinimumSize(labeldim);
-			label.setPreferredSize(labeldim);
-			center.add(label, leftcons);
-			center.add(limit, rightcons);
-
-			leftcons.gridy = rightcons.gridy = row++;
-			label = new JLabel("Deadline");
-			label.setMinimumSize(labeldim);
-			label.setPreferredSize(labeldim);
-			center.add(label, leftcons);
-			center.add(deadline, rightcons);
-
-
-			JPanel south = new JPanel();
-			// south.setBorder(new TitledBorder(new EtchedBorder(), " Control "));
-			this.getContentPane().add(BorderLayout.SOUTH, south);
-
-			JButton ok = new JButton("Ok");
-			JButton cancel = new JButton("Cancel");
-			ok.setMinimumSize(cancel.getMinimumSize());
-			ok.setPreferredSize(cancel.getPreferredSize());
-			south.add(ok);
-			south.add(cancel);
-
-			ok.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
+				
+				public void customResultAvailable(Object source, Object result)
 				{
-					aborted = false;
-					setVisible(false);
-				}
-			});
-			cancel.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					setVisible(false);
-				}
-			});
+					IClockService clock = (IClockService)result;
+					if(buy)
+					{
+						orders.addItem(new Order("All about agents", null, 100, 120, buy, clock));
+						orders.addItem(new Order("All about web services", null, 40, 60, buy, clock));
+						orders.addItem(new Order("Harry Potter", null, 5, 10, buy, clock));
+						orders.addItem(new Order("Agents in the real world", null, 30, 65, buy, clock));
+					}
+					else
+					{
+						orders.addItem(new Order("All about agents", null, 130, 110, buy, clock));
+						orders.addItem(new Order("All about web services", null, 50, 30, buy, clock));
+						orders.addItem(new Order("Harry Potter", null, 15, 9, buy, clock));
+						orders.addItem(new Order("Agents in the real world", null, 100, 60, buy, clock));
+					}
+					
+					JPanel center = new JPanel(new GridBagLayout());
+					center.setBorder(new EmptyBorder(5, 5, 5, 5));
+					getContentPane().add(BorderLayout.CENTER, center);
 
-			orders.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					Order order = (Order)orders.getSelectedItem();
-					title.setText(order.getTitle());
-					limit.setText("" + order.getLimit());
-					start.setText("" + order.getStartPrice());
+					JLabel label;
+					Dimension labeldim = new JLabel("Preset orders ").getPreferredSize();
+					int row = 0;
+					GridBagConstraints leftcons = new GridBagConstraints(0, 0, 1, 1, 0, 0,
+							GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0);
+					GridBagConstraints rightcons = new GridBagConstraints(1, 0, GridBagConstraints.REMAINDER, 1, 1, 0,
+							GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(1, 1, 1, 1), 0, 0);
+
+					leftcons.gridy = rightcons.gridy = row++;
+					label = new JLabel("Preset orders");
+					label.setMinimumSize(labeldim);
+					label.setPreferredSize(labeldim);
+					center.add(label, leftcons);
+					center.add(orders, rightcons);
+
+					leftcons.gridy = rightcons.gridy = row++;
+					label = new JLabel("Title");
+					label.setMinimumSize(labeldim);
+					label.setPreferredSize(labeldim);
+					center.add(label, leftcons);
+					center.add(title, rightcons);
+
+					leftcons.gridy = rightcons.gridy = row++;
+					label = new JLabel("Start price");
+					label.setMinimumSize(labeldim);
+					label.setPreferredSize(labeldim);
+					center.add(label, leftcons);
+					center.add(start, rightcons);
+
+					leftcons.gridy = rightcons.gridy = row++;
+					label = new JLabel("Price limit");
+					label.setMinimumSize(labeldim);
+					label.setPreferredSize(labeldim);
+					center.add(label, leftcons);
+					center.add(limit, rightcons);
+
+					leftcons.gridy = rightcons.gridy = row++;
+					label = new JLabel("Deadline");
+					label.setMinimumSize(labeldim);
+					label.setPreferredSize(labeldim);
+					center.add(label, leftcons);
+					center.add(deadline, rightcons);
+
+
+					JPanel south = new JPanel();
+					// south.setBorder(new TitledBorder(new EtchedBorder(), " Control "));
+					getContentPane().add(BorderLayout.SOUTH, south);
+
+					JButton ok = new JButton("Ok");
+					JButton cancel = new JButton("Cancel");
+					ok.setMinimumSize(cancel.getMinimumSize());
+					ok.setPreferredSize(cancel.getPreferredSize());
+					south.add(ok);
+					south.add(cancel);
+
+					ok.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							aborted = false;
+							setVisible(false);
+						}
+					});
+					cancel.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							setVisible(false);
+						}
+					});
+
+					orders.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							Order order = (Order)orders.getSelectedItem();
+							title.setText(order.getTitle());
+							limit.setText("" + order.getLimit());
+							start.setText("" + order.getStartPrice());
+						}
+					});
 				}
 			});
 		}

@@ -1,8 +1,11 @@
 package jadex.application.model;
 
 import jadex.application.runtime.IApplication;
+import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.service.clock.IClock;
+import jadex.service.clock.IClockService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -209,12 +212,14 @@ public class MComponentInstance
 	 *  Get the number of components to start.
 	 *  @return The number.
 	 */
-	public int getNumber(IApplication context, ClassLoader classloader)
+	// todo: hack, remove clock somehow
+	public int getNumber(IApplication context, ClassLoader classloader, IValueFetcher fetcher)
 	{
-		SimpleValueFetcher fetcher = new SimpleValueFetcher();
-		fetcher.setValue("$platform", context.getServiceContainer());
-		fetcher.setValue("$args", context.getArguments());
-		fetcher.setValue("$results", context.getResults());
+//		SimpleValueFetcher fetcher = new SimpleValueFetcher();
+//		fetcher.setValue("$platform", context.getServiceContainer());
+//		fetcher.setValue("$args", context.getArguments());
+//		fetcher.setValue("$results", context.getResults());
+//		fetcher.setValue("$clock", clock);
 
 		String[] imports = context.getApplicationType().getAllImports();
 		if(parser==null)
@@ -265,7 +270,8 @@ public class MComponentInstance
 	 *  Get the arguments.
 	 *  @return The arguments as a map of name-value pairs.
 	 */
-	public Map getArguments(IApplication context, ClassLoader classloader)
+	// todo: hack, remove clock somehow
+	public Map getArguments(IApplication context, ClassLoader classloader, IValueFetcher fetcher)
 	{
 		Map ret = null;
 
@@ -273,10 +279,11 @@ public class MComponentInstance
 		{
 			ret = new HashMap();
 
-			SimpleValueFetcher fetcher = new SimpleValueFetcher();
-			fetcher.setValue("$platform", context.getServiceContainer());
-			fetcher.setValue("$args", context.getArguments());
-			fetcher.setValue("$results", context.getResults());
+//			SimpleValueFetcher fetcher = new SimpleValueFetcher();
+//			fetcher.setValue("$platform", context.getServiceContainer());
+//			fetcher.setValue("$args", context.getArguments());
+//			fetcher.setValue("$results", context.getResults());
+//			fetcher.setValue("$clock", clock);
 
 			String[] imports = context.getApplicationType().getAllImports();
 			for(int i=0; i<arguments.size(); i++)

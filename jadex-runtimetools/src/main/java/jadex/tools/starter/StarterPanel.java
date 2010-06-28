@@ -538,7 +538,7 @@ public class StarterPanel extends JPanel
 		if(adf!=null && adf.equals(lastfile))
 			return;
 		
-		System.out.println("loadModel: "+adf);
+//		System.out.println("loadModel: "+adf);
 //		String	error	= null;
 		
 		if(adf!=null)

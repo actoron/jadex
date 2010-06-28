@@ -8,6 +8,7 @@ import jadex.application.model.MComponentType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
 import jadex.application.runtime.ISpace;
+import jadex.bridge.ComponentResultListener;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentAdapter;
@@ -23,8 +24,10 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
+import jadex.javaparser.SimpleValueFetcher;
 import jadex.service.BasicServiceProvider;
 import jadex.service.IServiceContainer;
+import jadex.service.clock.IClockService;
 import jadex.service.library.ILibraryService;
 
 import java.util.Collection;
@@ -61,7 +64,7 @@ public class Application implements IApplication, IComponentInstance
 	protected IExternalAccess parent;
 	
 	/** Flag to indicate that the application is already inited. */
-	protected boolean	inited;
+	protected boolean initstarted;
 	
 	/** Flag to indicate that the context is about to be deleted
 	 * (no more components can be added). */
@@ -700,8 +703,10 @@ public class Application implements IApplication, IComponentInstance
 	 */
 	public boolean executeStep()
 	{
-		if(!inited)
+		if(!initstarted)
 		{
+			initstarted = true;
+			
 			// Create spaces for context.
 			List spaces = config.getMSpaceInstances();
 			if(spaces!=null)
@@ -723,27 +728,54 @@ public class Application implements IApplication, IComponentInstance
 				}
 			}
 			
-			List components = config.getMComponentInstances();
-			ClassLoader cl = ((ILibraryService)adapter.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
-			for(int i=0; i<components.size(); i++)
+			final List components = config.getMComponentInstances();
+			adapter.getServiceContainer().getService(ILibraryService.class).addResultListener(createResultListener(new DefaultResultListener()
 			{
-				final MComponentInstance component = (MComponentInstance)components.get(i);
-				
-	//			System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration());
-				int num = component.getNumber(this, cl);
-				for(int j=0; j<num; j++)
+				public void resultAvailable(Object source, Object result)
 				{
-					IComponentManagementService	ces	= (IComponentManagementService)adapter.getServiceContainer().getService(IComponentManagementService.class);
-					ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(),
-						new CreationInfo(component.getConfiguration(), component.getArguments(this, cl), adapter.getComponentIdentifier(),
-							component.isSuspended(), component.isMaster(), component.isDaemon(), model.getApplicationType().getAllImports()), null);					
-	//				context.createComponent(component.getName(), component.getTypeName(),
-	//					component.getConfiguration(), component.getArguments(container, apptype, cl), component.isStart(), component.isMaster(),
-	//					DefaultResultListener.getInstance(), null);	
+					final ILibraryService ls = (ILibraryService)result;
+					final ClassLoader cl = ls.getClassLoader();
+					adapter.getServiceContainer().getService(IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
+					{
+						public void resultAvailable(Object source, Object result)
+						{
+							final IComponentManagementService	ces	= (IComponentManagementService)result;
+							adapter.getServiceContainer().getService(IClockService.class).addResultListener(createResultListener(new DefaultResultListener()
+							{
+								public void resultAvailable(Object source, Object result)
+								{
+									IClockService clock = (IClockService)result;
+									
+									SimpleValueFetcher fetcher = new SimpleValueFetcher();
+									fetcher.setValue("$platform", getServiceContainer());
+									fetcher.setValue("$args", getArguments());
+									fetcher.setValue("$results", getResults());
+									// todo: hack remove clock somehow (problem services are behind future in xml)
+									fetcher.setValue("$clock", clock);
+									
+									for(int i=0; i<components.size(); i++)
+									{
+										final MComponentInstance component = (MComponentInstance)components.get(i);
+										
+							//			System.out.println("Create: "+component.getName()+" "+component.getTypeName()+" "+component.getConfiguration());
+										int num = component.getNumber(Application.this, cl, fetcher);
+										for(int j=0; j<num; j++)
+										{
+				//							IComponentManagementService	ces	= (IComponentManagementService)adapter.getServiceContainer().getService(IComponentManagementService.class);
+											ces.createComponent(component.getName(), component.getType(model.getApplicationType()).getFilename(),
+												new CreationInfo(component.getConfiguration(), component.getArguments(Application.this, cl, fetcher), adapter.getComponentIdentifier(),
+													component.isSuspended(), component.isMaster(), component.isDaemon(), model.getApplicationType().getAllImports()), null);					
+							//				context.createComponent(component.getName(), component.getTypeName(),
+							//					component.getConfiguration(), component.getArguments(container, apptype, cl), component.isStart(), component.isMaster(),
+							//					DefaultResultListener.getInstance(), null);	
+										}
+									}
+								}
+							}));
+						}
+					}));
 				}
-			}
-			
-			inited	= true;
+			}));
 		}
 		// todo: is this necessary? can we ensure that this is not called?
 //		else
@@ -872,5 +904,15 @@ public class Application implements IApplication, IComponentInstance
 	public IExternalAccess getParent()
 	{
 		return parent;
+	}
+	
+	/**
+	 *  Create a result listener which is executed as an agent step.
+	 *  @param The original listener to be called.
+	 *  @return The listener.
+	 */
+	public IResultListener createResultListener(IResultListener listener)
+	{
+		return new ComponentResultListener(listener, adapter);
 	}
 }

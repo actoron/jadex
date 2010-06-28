@@ -27,7 +27,7 @@
 			<components>
 				<component type="Buyer" >
 					<arguments>
-						<argument name="initial_orders">
+						<!-- <argument name="initial_orders">
 							new Order[]
 							{
 								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)$platform.getService(IClockService.class)),
@@ -35,18 +35,36 @@
 								new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 5, 10, true, (IClockService)$platform.getService(IClockService.class)),
 								new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 30, 65, true, (IClockService)$platform.getService(IClockService.class))
 							}
+						</argument> -->
+						<argument name="initial_orders">
+							new Order[]
+							{
+								new Order("All about agents", new Date($clock.getTime()+60000), 100, 120, true, $clock),
+								new Order("All about web services", new Date($clock.getTime()+60000), 40, 60, true, $clock),
+								new Order("Harry Potter", new Date($clock.getTime()+60000), 5, 10, true, $clock),
+								new Order("Agents in the real world", new Date($clock.getTime()+60000), 30, 65, true, $clock)
+							}
 						</argument>
 					</arguments>
 				</component>
 				<component type="Seller">
 					<arguments>
-						<argument name="initial_orders">
+						<!-- <argument name="initial_orders">
 							new Order[]
 							{
 								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)$platform.getService(IClockService.class)),
 								new Order("All about web services", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 50, 30, false, (IClockService)$platform.getService(IClockService.class)),
 								new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 15, 9, false, (IClockService)$platform.getService(IClockService.class)),
 								new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 60, false, (IClockService)$platform.getService(IClockService.class))
+							}
+						</argument> -->
+						<argument name="initial_orders">
+							new Order[]
+							{
+								new Order("All about agents", new Date($clock.getTime()+60000), 130, 110, false, $clock),
+								new Order("All about web services", new Date($clock.getTime()+60000), 50, 30, false, $clock),
+								new Order("Harry Potter", new Date($clock.getTime()+60000), 15, 9, false, $clock),
+								new Order("Agents in the real world", new Date($clock.getTime()+60000), 100, 60, false, $clock)
 							}
 						</argument>
 					</arguments>
@@ -57,20 +75,32 @@
 			<components>
 				<component type="Buyer" >
 					<arguments>
-						<argument name="initial_orders">
+						<!-- <argument name="initial_orders">
 							new Order[]
 							{
 								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)$platform.getService(IClockService.class))
+							}
+						</argument> -->
+						<argument name="initial_orders">
+							new Order[]
+							{
+								new Order("All about agents", new Date($clock.getTime()+60000), 100, 120, true, $clock)
 							}
 						</argument>
 					</arguments>
 				</component>
 				<component type="Seller">
 					<arguments>
-						<argument name="initial_orders">
+						<!-- <argument name="initial_orders">
 							new Order[]
 							{
 								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)$platform.getService(IClockService.class))
+							}
+						</argument> -->
+						<argument name="initial_orders">
+							new Order[]
+							{
+								new Order("All about agents", new Date($clock.getTime()+60000), 130, 110, false, $clock)
 							}
 						</argument>
 					</arguments>
@@ -81,7 +111,7 @@
 			<components>
 				<component type="Buyer" number="3">
 					<arguments>
-						<argument name="initial_orders">
+						<!-- <argument name="initial_orders">
 							new Order[]
 							{
 								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 120, true, (IClockService)$platform.getService(IClockService.class)),
@@ -89,18 +119,36 @@
 								new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 5, 10, true, (IClockService)$platform.getService(IClockService.class)),
 								new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 30, 65, true, (IClockService)$platform.getService(IClockService.class))
 							}
+						</argument> -->
+						<argument name="initial_orders">
+							new Order[]
+							{
+								new Order("All about agents", new Date($clock.getTime()+60000), 100, 120, true, $clock),
+								new Order("All about web services", new Date($clock.getTime()+60000), 40, 60, true, $clock),
+								new Order("Harry Potter", new Date($clock.getTime()+60000), 5, 10, true, $clock),
+								new Order("Agents in the real world", new Date($clock.getTime()+60000), 30, 65, true, $clock)
+							}
 						</argument>
 					</arguments>
 				</component>
 				<component type="Seller">
 					<arguments>
-						<argument name="initial_orders">
+						<!-- <argument name="initial_orders">
 							new Order[]
 							{
 								new Order("All about agents", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 130, 110, false, (IClockService)$platform.getService(IClockService.class)),
 								new Order("All about web services", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 50, 30, false, (IClockService)$platform.getService(IClockService.class)),
 								new Order("Harry Potter", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 15, 9, false, (IClockService)$platform.getService(IClockService.class)),
 								new Order("Agents in the real world", new Date(((IClockService)$platform.getService(IClockService.class)).getTime()+60000), 100, 60, false, (IClockService)$platform.getService(IClockService.class))
+							}
+						</argument> -->
+						<argument name="initial_orders">
+							new Order[]
+							{
+								new Order("All about agents", new Date($clock.getTime()+60000), 130, 110, false, $clock),
+								new Order("All about web services", new Date($clock.getTime()+60000), 50, 30, false, $clock),
+								new Order("Harry Potter", new Date($clock.getTime()+60000), 15, 9, false, $clock),
+								new Order("Agents in the real world", new Date($clock.getTime()+60000), 100, 60, false, $clock)
 							}
 						</argument>
 					</arguments>
