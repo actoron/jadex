@@ -163,8 +163,11 @@ public class MBeliefSetArgument	implements IArgument
 				if(vals==null)
 				{
 					Object exp = state.getAttributeValue(handle, OAVBDIMetaModel.beliefset_has_factsexpression);
-					IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content);
-					ret = parsedexp.getExpressionText();
+					if(exp!=null)
+					{
+						IParsedExpression parsedexp = (IParsedExpression)state.getAttributeValue(exp, OAVBDIMetaModel.expression_has_content);
+						ret = parsedexp.getExpressionText();
+					}
 				}
 				else
 				{
@@ -223,7 +226,7 @@ public class MBeliefSetArgument	implements IArgument
 	{
 		Class	ret	= null;
 		
-		if(OAVBDIMetaModel.belief_type.equals(state.getType(handle)))
+		if(OAVBDIMetaModel.beliefset_type.equals(state.getType(handle)))
 		{
 			ret	= (Class)state.getAttributeValue(handle, OAVBDIMetaModel.typedelement_has_class);
 		}

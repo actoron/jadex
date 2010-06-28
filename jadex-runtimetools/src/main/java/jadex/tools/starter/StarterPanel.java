@@ -161,106 +161,6 @@ public class StarterPanel extends JPanel
 		
 		JPanel content = new JPanel(new GridBagLayout());
 
-	   	// The browse button.
-		//final JButton browse = new JButton("browse...");
-//		final JButton browse = new JButton(icons.getIcon("Browse"));
-//		browse.setToolTipText("Browse via file requester to locate a model");
-//		browse.setMargin(new Insets(0,0,0,0));
-//		// Create the filechooser.
-//		// Hack!!! might trhow exception in applet / webstart
-//		try
-//		{
-//			filechooser = new JFileChooser(".");
-//			filechooser.setAcceptAllFileFilterUsed(true);
-//			javax.swing.filechooser.FileFilter filter = new javax.swing.filechooser.FileFilter()
-//			{
-//				public String getDescription()
-//				{
-//					return "Active components";
-//				}
-//
-//				public boolean accept(File f)
-//				{
-//					String name = f.getName();
-////					return f.isDirectory() || name.endsWith(SXML.FILE_EXTENSION_AGENT) || name.endsWith(SXML.FILE_EXTENSION_CAPABILITY);
-////					boolean	ret	= f.isDirectory() || componentfactory.isLoadable(name) || appfactory.isLoadable(name);
-//					boolean	ret	= f.isDirectory() || SComponentFactory.isLoadable(starter.getJCC().getServiceContainer(), name);
-//
-////					Thread.currentThread().setContextClassLoader(oldcl);
-//
-//					return ret;
-//				}
-//			};
-//			filechooser.addChoosableFileFilter(filter);
-//		}
-//		catch(SecurityException e)
-//		{
-//			browse.setEnabled(false);
-//		}
-//		browse.addActionListener(new ActionListener()
-//		{
-//			public void actionPerformed(ActionEvent ae)
-//			{
-//				if(filechooser.showDialog(SGUI.getWindowParent(StarterPanel.this)
-//					, "Load")==JFileChooser.APPROVE_OPTION)
-//				{
-//					File file = filechooser.getSelectedFile();
-//					String	model	= file!=null ? ""+file : null;
-//
-////					if(file!=null && file.getName().endsWith(".jar"))
-////					{
-////						// Start looking into the jar-file for description-files
-////						try
-////						{
-////							DynamicURLClassLoader.addURLToInstance(new URL("file", "", file.toString()));
-////
-////							JarFile jarFile = new JarFile(file);
-////							Enumeration e = jarFile.entries();
-////							java.util.List	models	= new ArrayList();
-////							while (e.hasMoreElements())
-////							{
-////								ZipEntry jarFileEntry = (ZipEntry) e.nextElement();
-////								if(SXML.isJadexFilename(jarFileEntry.getName()))
-////								{
-////									models.add(jarFileEntry.getName());
-////								}
-////							}
-////							jarFile.close();
-////
-////							if(models.size()>1)
-////							{
-////								Object[]	choices	= models.toArray(new String[models.size()]);
-////								JTreeDialog td = new JTreeDialog(
-////									null,
-//////									(Frame)StarterGui.this.getParent(),
-////									"Select Model", true,
-////									"Select an model to load:",
-////									(String[])choices, (String)choices[0]);
-////								td.setVisible(true);
-////								model = td.getResult();
-////							}
-////							else if(models.size()==1)
-////							{
-////								model	= (String)models.get(0);
-////							}
-////							else
-////							{
-////								model	= null;
-////							}
-////						}
-////						catch(Exception e)
-////						{
-////							//e.printStackTrace();
-////						}
-////					}
-//
-//					//System.out.println("... load model: "+model);
-////					lastfile	= model;
-//					loadModel(model);
-//				}
-//			}
-//		});
-
 		// Create the filename combo box.
 		filename = new JTextField();
 		filename.setEditable(false);
@@ -331,56 +231,59 @@ public class StarterPanel extends JPanel
 		// The start button.
 		this.start = new JButton("Start");
 		start.setToolTipText("Start selected model");
+		
 		start.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
 				if(model!=null)
 				{
-					String configname = (String)config.getModel().getSelectedItem();
-					Map args = SCollection.createHashMap();
-					String errortext = null;
-					for(int i=0; i<argelems.size(); i++)
+					StarterPanel.this.starter.getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 					{
-						String argname = ((JLabel)arguments.getComponent(i*4+1)).getText();
-						String argval = ((JTextField)arguments.getComponent(i*4+3)).getText();
-						if(argval.length()>0)
+						public void customResultAvailable(Object source, Object result)
 						{
-							Object arg = null;
-							try
+							ILibraryService ls = (ILibraryService)result;
+							String configname = (String)config.getModel().getSelectedItem();
+							Map args = SCollection.createHashMap();
+							String errortext = null;
+							for(int i=0; i<argelems.size(); i++)
 							{
-								ILibraryService ls = (ILibraryService)StarterPanel.this.starter.getJCC().getServiceContainer().getService(ILibraryService.class);
-								arg = new JavaCCExpressionParser().parseExpression(argval, null, null, ls.getClassLoader()).getValue(null);
-							}
-							catch(Exception e)
-							{
-								if(errortext==null)
-									errortext = "Error within argument expressions:\n";
-								errortext += argname+" "+e.getMessage()+"\n";
-							}
-							args.put(argname, arg);
-						}
-					}
-					if(errortext!=null)
-					{
-						JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), errortext, 
-							"Display Problem", JOptionPane.INFORMATION_MESSAGE);
-					}
-					else
-					{
-						String typename = /*ac!=null? ac.getComponentType(filename.getText()):*/ filename.getText();
-						final String fullname = model.getPackage()+"."+model.getName();
-						IResultListener killlistener = null;
-						final ILoadableComponentModel mymodel = model;
-						if(storeresults!=null && storeresults.isSelected())
-						{
-							killlistener = new IResultListener()
-							{
-								public void resultAvailable(final Object source, final Object result)
+								String argname = ((JLabel)arguments.getComponent(i*4+1)).getText();
+								String argval = ((JTextField)arguments.getComponent(i*4+3)).getText();
+								if(argval.length()>0)
 								{
-									SwingUtilities.invokeLater(new Runnable()
+									Object arg = null;
+									try
 									{
-										public void run()
+										arg = new JavaCCExpressionParser().parseExpression(argval, null, null, ls.getClassLoader()).getValue(null);
+									}
+									catch(Exception e)
+									{
+										if(errortext==null)
+											errortext = "Error within argument expressions:\n";
+										errortext += argname+" "+e.getMessage()+"\n";
+									}
+									args.put(argname, arg);
+									
+								}
+							}
+							
+							if(errortext!=null)
+							{
+								JOptionPane.showMessageDialog(SGUI.getWindowParent(StarterPanel.this), errortext, 
+									"Display Problem", JOptionPane.INFORMATION_MESSAGE);
+							}
+							else
+							{
+								String typename = /*ac!=null? ac.getComponentType(filename.getText()):*/ filename.getText();
+								final String fullname = model.getPackage()+"."+model.getName();
+								IResultListener killlistener = null;
+								final ILoadableComponentModel mymodel = model;
+								if(storeresults!=null && storeresults.isSelected())
+								{
+									killlistener = new SwingDefaultResultListener()
+									{
+										public void customResultAvailable(Object source, Object result)
 										{
 //											System.out.println("fullname: "+fullname+" "+model.getFilename());
 											String tmp = (String)mymodel.getPackage()+"."+mymodel.getName();
@@ -391,31 +294,26 @@ public class StarterPanel extends JPanel
 												refreshResults();
 											}
 										}
-									});
+									};
 								}
-								
-								public void exceptionOccurred(Object source, Exception exception)
+										
+								String an = genname.isSelected()?  null: componentname.getText();
+								if(an==null) // i.e. name auto generate
 								{
-									// todo?!
-//											resultsets.put(typename, exception);
+									int max = ((Integer)numcomponents.getValue()).intValue();
+									for(int i=0; i<max; i++)
+									{
+										starter.createComponent(typename, an, configname, args, suspend.isSelected(), killlistener);
+									}
 								}
-							};
-						}
-								
-						String an = genname.isSelected()?  null: componentname.getText();
-						if(an==null) // i.e. name auto generate
-						{
-							int max = ((Integer)numcomponents.getValue()).intValue();
-							for(int i=0; i<max; i++)
-							{
-								starter.createComponent(typename, an, configname, args, suspend.isSelected(), killlistener);
+								else
+								{
+									starter.createComponent(typename, an, configname, args, suspend.isSelected(), killlistener);
+								}
 							}
+							
 						}
-						else
-						{
-							starter.createComponent(typename, an, configname, args, suspend.isSelected(), killlistener);
-						}
-					}
+					});
 				}
 			}
 		});
@@ -640,7 +538,7 @@ public class StarterPanel extends JPanel
 		if(adf!=null && adf.equals(lastfile))
 			return;
 		
-		//System.out.println("loadModel: "+adf+" "+modelname.getActionListeners().length+" "+SUtil.arrayToString(modelname.getActionListeners()));
+		System.out.println("loadModel: "+adf);
 //		String	error	= null;
 		
 		if(adf!=null)
@@ -656,6 +554,7 @@ public class StarterPanel extends JPanel
 							public void customResultAvailable(Object source, Object result)
 							{
 								model = (ILoadableComponentModel)result;
+								updateGuiForNewModel(adf);
 							}
 							
 							public void customExceptionOccurred(Object source, Exception exception)
@@ -664,10 +563,9 @@ public class StarterPanel extends JPanel
 								StringWriter sw = new StringWriter();
 								exception.printStackTrace(new PrintWriter(sw));
 								error = sw.toString();
+								updateGuiForNewModel(adf);
 							}
 						});
-						
-						updateGuiForNewModel(adf);
 					}
 					else
 					{
@@ -713,7 +611,7 @@ public class StarterPanel extends JPanel
 	 */
 	void updateGuiForNewModel(final String adf)
 	{
-//		System.out.println("updategui "+adf);
+		System.out.println("updategui "+adf);
 		
 		ItemListener[] lis = config.getItemListeners();
 		for(int i=0; i<lis.length; i++)
@@ -963,23 +861,30 @@ public class StarterPanel extends JPanel
 	 */
 	protected void createArguments()
 	{
-		argelems = SCollection.createArrayList();
-		arguments.removeAll();
-		arguments.setBorder(null);
-		
-		if(model!=null)
+		StarterPanel.this.starter.getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 		{
-			IArgument[] args = model.getArguments();
-			
-			for(int i=0; i<args.length; i++)
+			public void customResultAvailable(Object source, Object result)
 			{
-				argelems.add(args[i]);
-				createArgumentGui(args[i], i);
+				ILibraryService ls = (ILibraryService)result;
+				argelems = SCollection.createArrayList();
+				arguments.removeAll();
+				arguments.setBorder(null);
+				
+				if(model!=null)
+				{
+					IArgument[] args = model.getArguments();
+					
+					for(int i=0; i<args.length; i++)
+					{
+						argelems.add(args[i]);
+						createArgumentGui(args[i], i, ls);
+					}
+					
+					if(args.length>0)
+						arguments.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Arguments "));
+				}
 			}
-			
-			if(args.length>0)
-				arguments.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Arguments "));
-		}
+		});
 	}
 	
 	/**
@@ -1121,49 +1026,42 @@ public class StarterPanel extends JPanel
 	 *  @param arg The belief or belief reference.
 	 *  @param y The row number where to add.
 	 */
-	protected void createArgumentGui(final IArgument arg, final int y)
+	protected void createArgumentGui(final IArgument arg, final int y, ILibraryService ls)
 	{
 		// todo:
-		StarterPanel.this.starter.getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
-		{
-			public void customResultAvailable(Object source, Object result)
-			{
-				ILibraryService ls = (ILibraryService)result;
-				
-				JLabel namel = new JLabel(arg.getName());
-				final JValidatorTextField valt = new JValidatorTextField(15);
-				valt.setValidator(new ParserValidator(ls.getClassLoader()));
-				
-				String configname = (String)config.getSelectedItem();
-				JTextField mvalt = new JTextField(""+arg.getDefaultValue(configname));
-				// Java JTextField bug: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4247013
-				//mvalt.setMinimumSize(new Dimension(mvalt.getPreferredSize().width/4, mvalt.getPreferredSize().height/4));
-				mvalt.setEditable(false);
-				
-				JLabel typel = new JLabel(arg.getTypename()!=null? arg.getTypename(): "undefined");
-				
-				String description = arg.getDescription();
-				if(description!=null)
-				{
-					namel.setToolTipText(description);
-					valt.setToolTipText(description);
-					mvalt.setToolTipText(description);
-//					typel.setToolTipText(description);
-				}
-				
-				int x = 0;
-				arguments.add(typel, new GridBagConstraints(x++, y, 1, 1, 0, 0, GridBagConstraints.WEST,
-					GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-				arguments.add(namel, new GridBagConstraints(x++, y, 1, 1, 0, 0, GridBagConstraints.WEST,
-					GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-				arguments.add(mvalt, new GridBagConstraints(x++, y, 1, 1, 1, 0, GridBagConstraints.WEST,
-					GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-				arguments.add(valt, new GridBagConstraints(x++, y, 1, 1, 1, 0, GridBagConstraints.WEST,
-					GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-//				y++;
-			}
-		});
+		System.out.println("argument gui: "+arg+" "+model);
 		
+		JLabel namel = new JLabel(arg.getName());
+		final JValidatorTextField valt = new JValidatorTextField(15);
+		valt.setValidator(new ParserValidator(ls.getClassLoader()));
+		
+		String configname = (String)config.getSelectedItem();
+		JTextField mvalt = new JTextField(""+arg.getDefaultValue(configname));
+		// Java JTextField bug: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4247013
+		//mvalt.setMinimumSize(new Dimension(mvalt.getPreferredSize().width/4, mvalt.getPreferredSize().height/4));
+		mvalt.setEditable(false);
+		
+		JLabel typel = new JLabel(arg.getTypename()!=null? arg.getTypename(): "undefined");
+		
+		String description = arg.getDescription();
+		if(description!=null)
+		{
+			namel.setToolTipText(description);
+			valt.setToolTipText(description);
+			mvalt.setToolTipText(description);
+//					typel.setToolTipText(description);
+		}
+		
+		int x = 0;
+		arguments.add(typel, new GridBagConstraints(x++, y, 1, 1, 0, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+		arguments.add(namel, new GridBagConstraints(x++, y, 1, 1, 0, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+		arguments.add(mvalt, new GridBagConstraints(x++, y, 1, 1, 1, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+		arguments.add(valt, new GridBagConstraints(x++, y, 1, 1, 1, 0, GridBagConstraints.WEST,
+			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+//				y++;
 	}
 	
 	/**
