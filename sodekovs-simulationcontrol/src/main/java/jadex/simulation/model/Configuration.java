@@ -1,5 +1,7 @@
 package jadex.simulation.model;
 
+import java.util.ArrayList;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -11,6 +13,7 @@ public class Configuration {
 	private int step;
 	private String classname;
 	private String values;
+	private ArrayList<String> valuesAsList;
 	
 	@XmlAttribute(name="start")
 	public int getStart() {
@@ -56,5 +59,22 @@ public class Configuration {
 
 	public void setValues(String values) {
 		this.values = values;
+	}
+	
+	/**
+	 * Returns the values, initially "only" a string of values, as a arraylist of separated values.
+	 * @return
+	 */
+	public ArrayList<String> getValuesAsList() {
+		if(valuesAsList == null){
+			valuesAsList = new ArrayList<String>();
+			String tmpValues = this.values;
+			
+			while(tmpValues.indexOf(";") != -1){
+				valuesAsList.add(tmpValues.substring(0, tmpValues.indexOf(";")));
+				tmpValues = tmpValues.substring(tmpValues.indexOf(";")+1);
+			}		
+		}
+		return this.valuesAsList;	
 	}
 }

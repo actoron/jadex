@@ -209,13 +209,28 @@ public class StartSimulationExperimentsPlan extends Plan {
 		String parameterName = opt.getData().getName();
 		int val = -1;
 
-		if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
-			val = opt.getParameterSweeping().getConfiguration().getStart();
+		// iterate through parameter space with step size
+		if (opt.getParameterSweeping().getType().equalsIgnoreCase(Constants.OPTIMIZATION_TYPE_SPACE)) {
+			if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
+				val = opt.getParameterSweeping().getConfiguration().getStart();
 
+			} else {
+				int step = opt.getParameterSweeping().getConfiguration().getStep();
+				int currentVal = opt.getParameterSweeping().getCurrentValue();
+				val = currentVal + step;
+				
+			}
+			// iterate through list of parameters
+		} else if (opt.getParameterSweeping().getType().equalsIgnoreCase(Constants.OPTIMIZATION_TYPE_LIST)) {
+			if (opt.getParameterSweeping().getParameterSweepCounter() == 0) {
+				val = Integer.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(0));
+				
+			} else {
+				val = Integer.valueOf(opt.getParameterSweeping().getConfiguration().getValuesAsList().get(opt.getParameterSweeping().getParameterSweepCounter()));
+				
+			}
 		} else {
-			int step = opt.getParameterSweeping().getConfiguration().getStep();
-			int currentVal = opt.getParameterSweeping().getCurrentValue();
-			val = currentVal + step;
+			System.err.println("#StartSimulationExperiment# Error on identifying type for sweeping parameter(s): " + opt.getParameterSweeping().getType());
 		}
 
 		// update SimulationConf to be up to date

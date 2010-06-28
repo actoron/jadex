@@ -78,4 +78,12 @@ public class Constants {
 	
 	//Denotes that the observer should observe/evaluate the data object onChange
 	public static final String ON_CHANGE_EVALUATION_MODE = "onChange";
+	
+	//-- Denotes the three types that are available for parameter sweeping: list, space, algorithm
+	// Use of a parameter space with: start, end and step values
+	public static final String OPTIMIZATION_TYPE_LIST = "list";
+	// Use of a list of parameters
+	public static final String OPTIMIZATION_TYPE_SPACE = "space";
+	// Use of a dedicated optimization algorithm
+	public static final String OPTIMIZATION_TYPE_ALGORITHM = "algorithm";
 }

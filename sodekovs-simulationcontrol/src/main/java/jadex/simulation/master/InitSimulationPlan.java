@@ -2,15 +2,15 @@ package jadex.simulation.master;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.commons.collection.SCollection;
 import jadex.simulation.controlcenter.ControlCenter;
 import jadex.simulation.helper.Constants;
+import jadex.simulation.helper.TimeConverter;
 import jadex.simulation.helper.XMLHandler;
 import jadex.simulation.model.SimulationConfiguration;
+import jadex.simulation.model.StartTime;
 import jadex.simulation.model.result.IntermediateResult;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class InitSimulationPlan extends Plan{
 
@@ -18,8 +18,22 @@ public class InitSimulationPlan extends Plan{
 		System.out.println("#InitSim# Init Master Simulation Agent with configuration file: " + (String) getBeliefbase().getBelief("simulationDescriptionFile").getFact());		
 		String simulationDescription = (String) getBeliefbase().getBelief("simulationDescriptionFile").getFact();
 		SimulationConfiguration simConf = (SimulationConfiguration) XMLHandler.parseXML(simulationDescription, SimulationConfiguration.class);
-		initSettings(simConf);
+		System.out.println("value: " + TimeConverter.longTime2DateString(System.currentTimeMillis()));
+		//Postpone start of simulation?
+		if(simConf.getRunConfiguration().getGeneral().getStartTime() != null){
+			StartTime sTime = simConf.getRunConfiguration().getGeneral().getStartTime();
+			if(sTime.getType().equalsIgnoreCase(Constants.RELATIVE_TIME_EXPRESSION)){
+				System.out.println("#InitSim# Start of simulation postponed till: " + TimeConverter.longTime2DateString(System.currentTimeMillis() + Long.valueOf(sTime.getValue())) + " due relative start time condition.");
+				waitFor(Long.valueOf(sTime.getValue()));
+			}else if(sTime.getType().equalsIgnoreCase(Constants.ABSOLUTE_TIME_EXPRESSION)){
+				long absoluteStartTime = TimeConverter.dateString2LongTime(sTime.getValue());
+				System.out.println("#InitSim# Start of simulation postponed till: " + TimeConverter.longTime2DateString(absoluteStartTime - System.currentTimeMillis()) + " due absolute start time condition.");
+				waitFor(absoluteStartTime - System.currentTimeMillis());
+			}
+		}
 		
+		initSettings(simConf);
+				
 		IGoal goal = createGoal("StartSimulationExperiments");
 		System.out.println("#InitSim# Starting first round of Simulation Experiments.");
 		dispatchTopLevelGoal(goal);
