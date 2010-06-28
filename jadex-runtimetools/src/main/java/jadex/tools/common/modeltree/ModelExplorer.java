@@ -12,6 +12,7 @@ import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.commons.concurrent.LoadManagingExecutionService;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
@@ -413,11 +414,14 @@ public class ModelExplorer extends JTree
 	{
 		// Load root node.
 		String	treexml	= props.getStringProperty("tree");
+		// todo: hack!
+		ILibraryService ls = (ILibraryService)container.getService(ILibraryService.class).get(new ThreadSuspendable());
 		if(treexml!=null)
 		{
 			try
 			{
-				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
+				// todo: hack!
+				ClassLoader cl = ls.getClassLoader();
 				ModelExplorerProperties	mep	= (ModelExplorerProperties)JavaReader.objectFromXML(treexml, cl); 	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
 //				ModelExplorerProperties	mep	= (ModelExplorerProperties)Nuggets.objectFromXML(treexml, cl);
 				this.root	= mep.root;
@@ -459,7 +463,6 @@ public class ModelExplorer extends JTree
 	//			}
 //				try
 				{
-					ILibraryService ls = (ILibraryService)container.getService(ILibraryService.class);
 //					ls.addPath(file.getAbsolutePath());
 					try
 					{
@@ -544,34 +547,40 @@ public class ModelExplorer extends JTree
 //		}		
 
 		// Remove libraries.
-		Object[] cs = getRootNode().getChildCount()>0 ? getRootNode().getChildren().toArray() : null;
+		final Object[] cs = getRootNode().getChildCount()>0 ? getRootNode().getChildren().toArray() : null;
 		if(cs!=null)
 		{
-			ILibraryService ls = (ILibraryService)container.getService(ILibraryService.class);
-			for(int i=0; i<cs.length; i++)
+			container.getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 			{
-				try
+				public void customResultAvailable(Object source, Object result)
 				{
-					FileNode fn = (FileNode)cs[i];
-					ls.removeURL(fn.getFile().toURI().toURL());
+					ILibraryService ls = (ILibraryService)result;
+					for(int i=0; i<cs.length; i++)
+					{
+						try
+						{
+							FileNode fn = (FileNode)cs[i];
+							ls.removeURL(fn.getFile().toURI().toURL());
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
+					
+					root.reset();
+					
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							refreshmenu.setSelected(refresh);
+							((ModelExplorerTreeModel)getModel()).fireTreeStructureChanged(root);
+						}
+					});
 				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
+			});
 		}
-
-		root.reset();
-		
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				refreshmenu.setSelected(refresh);
-				((ModelExplorerTreeModel)getModel()).fireTreeStructureChanged(root);
-			}
-		});
 	}
 	
 	/**
@@ -995,26 +1004,33 @@ public class ModelExplorer extends JTree
 		{
 			if(isEnabled())
 			{
-				FileNode	node	= (FileNode)getLastSelectedPathComponent();
-				int index	= ((ModelExplorerTreeModel)getModel()).getIndexOfChild(root, node);
+				final FileNode	node = (FileNode)getLastSelectedPathComponent();
+				final int index	= ((ModelExplorerTreeModel)getModel()).getIndexOfChild(root, node);
 				getRootNode().removePathEntry(node);
 				
 				// todo: jars
-				ILibraryService ls = (ILibraryService)container.getService(ILibraryService.class);
-				File file = node.getFile();
-				file = new File(file.getParentFile(), file.getName());
-				try
+				container.getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 				{
-					ls.removeURL(file.toURI().toURL());
-				}
-				catch(MalformedURLException ex)
-				{
-					ex.printStackTrace();
-				}
-				
-				resetCrawler();
+					public void customResultAvailable(Object source, Object result)
+					{
+						ILibraryService ls = (ILibraryService)result;
+						File file = node.getFile();
+						file = new File(file.getParentFile(), file.getName());
+						try
+						{
+							ls.removeURL(file.toURI().toURL());
+						}
+						catch(MalformedURLException ex)
+						{
+							ex.printStackTrace();
+						}
+						
+						resetCrawler();
 
-				((ModelExplorerTreeModel)getModel()).fireNodeRemoved(getRootNode(), node, index);
+						((ModelExplorerTreeModel)getModel()).fireNodeRemoved(getRootNode(), node, index);
+			
+					}
+				});
 			}
 		}
 

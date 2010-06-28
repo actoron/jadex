@@ -13,7 +13,6 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
@@ -1122,42 +1121,49 @@ public class StarterPanel extends JPanel
 	 *  @param arg The belief or belief reference.
 	 *  @param y The row number where to add.
 	 */
-	protected void createArgumentGui(final IArgument arg, int y)
+	protected void createArgumentGui(final IArgument arg, final int y)
 	{
-		JLabel namel = new JLabel(arg.getName());
-		final JValidatorTextField valt = new JValidatorTextField(15);
-		
 		// todo:
-		ILibraryService ls = (ILibraryService)StarterPanel.this.starter.getJCC().getServiceContainer().getService(ILibraryService.class);
-		valt.setValidator(new ParserValidator(ls.getClassLoader()));
-		
-		String configname = (String)config.getSelectedItem();
-		JTextField mvalt = new JTextField(""+arg.getDefaultValue(configname));
-		// Java JTextField bug: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4247013
-		//mvalt.setMinimumSize(new Dimension(mvalt.getPreferredSize().width/4, mvalt.getPreferredSize().height/4));
-		mvalt.setEditable(false);
-		
-		JLabel typel = new JLabel(arg.getTypename()!=null? arg.getTypename(): "undefined");
-		
-		String description = arg.getDescription();
-		if(description!=null)
+		StarterPanel.this.starter.getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 		{
-			namel.setToolTipText(description);
-			valt.setToolTipText(description);
-			mvalt.setToolTipText(description);
-//			typel.setToolTipText(description);
-		}
+			public void customResultAvailable(Object source, Object result)
+			{
+				ILibraryService ls = (ILibraryService)result;
+				
+				JLabel namel = new JLabel(arg.getName());
+				final JValidatorTextField valt = new JValidatorTextField(15);
+				valt.setValidator(new ParserValidator(ls.getClassLoader()));
+				
+				String configname = (String)config.getSelectedItem();
+				JTextField mvalt = new JTextField(""+arg.getDefaultValue(configname));
+				// Java JTextField bug: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4247013
+				//mvalt.setMinimumSize(new Dimension(mvalt.getPreferredSize().width/4, mvalt.getPreferredSize().height/4));
+				mvalt.setEditable(false);
+				
+				JLabel typel = new JLabel(arg.getTypename()!=null? arg.getTypename(): "undefined");
+				
+				String description = arg.getDescription();
+				if(description!=null)
+				{
+					namel.setToolTipText(description);
+					valt.setToolTipText(description);
+					mvalt.setToolTipText(description);
+//					typel.setToolTipText(description);
+				}
+				
+				int x = 0;
+				arguments.add(typel, new GridBagConstraints(x++, y, 1, 1, 0, 0, GridBagConstraints.WEST,
+					GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+				arguments.add(namel, new GridBagConstraints(x++, y, 1, 1, 0, 0, GridBagConstraints.WEST,
+					GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+				arguments.add(mvalt, new GridBagConstraints(x++, y, 1, 1, 1, 0, GridBagConstraints.WEST,
+					GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+				arguments.add(valt, new GridBagConstraints(x++, y, 1, 1, 1, 0, GridBagConstraints.WEST,
+					GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
+//				y++;
+			}
+		});
 		
-		int x = 0;
-		arguments.add(typel, new GridBagConstraints(x++, y, 1, 1, 0, 0, GridBagConstraints.WEST,
-			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-		arguments.add(namel, new GridBagConstraints(x++, y, 1, 1, 0, 0, GridBagConstraints.WEST,
-			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-		arguments.add(mvalt, new GridBagConstraints(x++, y, 1, 1, 1, 0, GridBagConstraints.WEST,
-			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-		arguments.add(valt, new GridBagConstraints(x++, y, 1, 1, 1, 0, GridBagConstraints.WEST,
-			GridBagConstraints.BOTH, new Insets(2, 2, 2, 2), 0, 0));
-		y++;
 	}
 	
 	/**

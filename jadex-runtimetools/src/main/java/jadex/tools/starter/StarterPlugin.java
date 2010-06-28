@@ -937,28 +937,32 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 		return filename!=null && filename.toLowerCase().endsWith(FILE_EXTENSION_CAPABILITY);
 	}*/
 
-
 	/**
 	 *  Create a new component on the platform.
 	 *  Any errors will be displayed in a dialog to the user.
 	 */
-	public void createComponent(String type, String name, String configname, Map arguments, boolean suspend, IResultListener killlistener)
+	public void createComponent(final String type, final String name, final String configname, final Map arguments, final boolean suspend, final IResultListener killlistener)
 	{
-		final IComponentManagementService	ces	= (IComponentManagementService)getJCC().getServiceContainer().getService(IComponentManagementService.class);
-		
-		IResultListener lis = new IResultListener()
+		getJCC().getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				getJCC().setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
+				IComponentManagementService cms = (IComponentManagementService)result;
+				IResultListener lis = new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						getJCC().setStatusText("Created component: " + ((IComponentIdentifier)result).getLocalName());
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
+					}
+				};
+				IFuture ret = cms.createComponent(name, type, new CreationInfo(configname, arguments, spanel.parent, suspend, false), killlistener);
+				ret.addResultListener(lis);
 			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
-			}
-		};
-		IFuture ret = ces.createComponent(name, type, new CreationInfo(configname, arguments, spanel.parent, suspend, false), killlistener);
-		ret.addResultListener(lis);
+		});
 	}
 }

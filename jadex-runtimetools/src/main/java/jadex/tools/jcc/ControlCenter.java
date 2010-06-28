@@ -5,6 +5,8 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.PropertiesXMLHelper;
 import jadex.service.library.ILibraryService;
@@ -251,111 +253,117 @@ public class ControlCenter implements IControlCenter
 	/**
 	 * Open a given project.
 	 */
-	public void openProject(File pd) throws Exception
+	public void openProject(final File pd) throws Exception
 	{
 //		System.out.println("openPro: "+Thread.currentThread().getName());
 		
 		// Read project properties
-		try
+		container.getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 		{
-			FileInputStream fis = new FileInputStream(pd);
-			
-//			try
-//			{
-//				DataInputStream dis = new DataInputStream(fis);
-//				while(dis.available()!=0)
-//					System.out.println(dis.readLine());
-//			}
-//			catch(Exception e)
-//			{
-//			}
-//			fis = new FileInputStream(pd);
-			
-			props = (Properties)PropertiesXMLHelper.getPropertyReader().read(fis, ((ILibraryService)container
-				.getService(ILibraryService.class)).getClassLoader(), null);
-//			props = XMLPropertiesReader.readProperties(fis,
-//					((ILibraryService)agent.getPlatform().getService(
-//							ILibraryService.class)).getClassLoader());
-			fis.close();
-		}
-		catch(Exception e)
-		{
-//			e.printStackTrace();
-			
-			final String failed = SUtil.wrapText("Could not open project\n\n"+ e.getMessage());
-			SwingUtilities.invokeLater(new Runnable()
+			public void customResultAvailable(Object source, Object result)
 			{
-				public void run()
+				try
 				{
-					JOptionPane.showMessageDialog(window, failed, "Project Error",
-						JOptionPane.ERROR_MESSAGE);
+					ClassLoader cl = ((ILibraryService)result).getClassLoader();
+					FileInputStream fis = new FileInputStream(pd);
+					
+		//			try
+		//			{
+		//				DataInputStream dis = new DataInputStream(fis);
+		//				while(dis.available()!=0)
+		//					System.out.println(dis.readLine());
+		//			}
+		//			catch(Exception e)
+		//			{
+		//			}
+		//			fis = new FileInputStream(pd);
+					
+					props = (Properties)PropertiesXMLHelper.getPropertyReader().read(fis, cl, null);
+		//			props = XMLPropertiesReader.readProperties(fis,
+		//					((ILibraryService)agent.getPlatform().getService(
+		//							ILibraryService.class)).getClassLoader());
+					fis.close();
+					
+					setCurrentProject(pd);
+					
+					Properties windowprops = props.getSubproperty("window");
+					if(windowprops != null)
+					{
+						int w = windowprops.getIntProperty("width");
+						int h = windowprops.getIntProperty("height");
+						int x = windowprops.getIntProperty("x");
+						int y = windowprops.getIntProperty("y");
+						window.setBounds(x, y, w, h);
+			
+						window.setVisible(true); // otherwise it will not be extended (jdk5)
+						int es = windowprops.getIntProperty("extendedState");
+						window.setExtendedState(es);
+			
+						// Load the console heights.
+						Properties consoleheights = windowprops
+								.getSubproperty("consoleheights");
+						if(consoleheights != null)
+						{
+							Property[] chps = consoleheights.getProperties("consoleheight");
+							Map chs = window.getConsoleHeights();
+							for(int i = 0; i < chps.length; i++)
+							{
+								chs.put(chps[i].getName(), new Integer(chps[i].getValue()));
+							}
+						}
+						boolean conon = windowprops.getBooleanProperty("console_on");
+						window.setConsoleEnabled(conon);
+			
+						jccexit = windowprops.getStringProperty("jccexit");
+					}
+			
+					// Configure all active plugins.
+					// Todo: support deactivation of plugins to speedup project switching?
+					for(Iterator it = plugins.keySet().iterator(); it.hasNext();)
+					{
+						IControlCenterPlugin p = (IControlCenterPlugin)it.next();
+						if(plugins.get(p) != null)
+						{
+							setPluginProperties(p);
+						}
+					}
+			
+					// Use perspective as set in project...
+					IControlCenterPlugin plugin = null;
+					String pwnd = props.getStringProperty("perspective");
+					if(pwnd != null)
+					{
+						plugin = getPluginForName(pwnd);
+					}
+					// ...or use first available plugin.
+					if(plugin == null)
+					{
+						plugin = (IControlCenterPlugin)plugins.keySet().iterator().next();
+					}
+					activatePlugin(plugin);
+			
+					setStatusText("Project opened successfully: " + pd.getName());
 				}
-			});
-			
-			throw e;
-			// e.printStackTrace();
-			// return;
-		}
-
-		setCurrentProject(pd);
-
-		Properties windowprops = props.getSubproperty("window");
-		if(windowprops != null)
-		{
-			int w = windowprops.getIntProperty("width");
-			int h = windowprops.getIntProperty("height");
-			int x = windowprops.getIntProperty("x");
-			int y = windowprops.getIntProperty("y");
-			window.setBounds(x, y, w, h);
-
-			window.setVisible(true); // otherwise it will not be extended (jdk5)
-			int es = windowprops.getIntProperty("extendedState");
-			window.setExtendedState(es);
-
-			// Load the console heights.
-			Properties consoleheights = windowprops
-					.getSubproperty("consoleheights");
-			if(consoleheights != null)
-			{
-				Property[] chps = consoleheights.getProperties("consoleheight");
-				Map chs = window.getConsoleHeights();
-				for(int i = 0; i < chps.length; i++)
+				catch(Exception e)
 				{
-					chs.put(chps[i].getName(), new Integer(chps[i].getValue()));
+		//			e.printStackTrace();
+					
+					final String failed = SUtil.wrapText("Could not open project\n\n"+ e.getMessage());
+					SwingUtilities.invokeLater(new Runnable()
+					{
+						public void run()
+						{
+							JOptionPane.showMessageDialog(window, failed, "Project Error",
+								JOptionPane.ERROR_MESSAGE);
+						}
+					});
+					
+//					throw e;
+					// e.printStackTrace();
+					// return;
 				}
 			}
-			boolean conon = windowprops.getBooleanProperty("console_on");
-			window.setConsoleEnabled(conon);
-
-			jccexit = windowprops.getStringProperty("jccexit");
-		}
-
-		// Configure all active plugins.
-		// Todo: support deactivation of plugins to speedup project switching?
-		for(Iterator it = plugins.keySet().iterator(); it.hasNext();)
-		{
-			IControlCenterPlugin p = (IControlCenterPlugin)it.next();
-			if(plugins.get(p) != null)
-			{
-				setPluginProperties(p);
-			}
-		}
-
-		// Use perspective as set in project...
-		IControlCenterPlugin plugin = null;
-		String pwnd = props.getStringProperty("perspective");
-		if(pwnd != null)
-		{
-			plugin = getPluginForName(pwnd);
-		}
-		// ...or use first available plugin.
-		if(plugin == null)
-		{
-			plugin = (IControlCenterPlugin)plugins.keySet().iterator().next();
-		}
-		activatePlugin(plugin);
-
-		setStatusText("Project opened successfully: " + pd.getName());
+		});
 	}
 
 	/**

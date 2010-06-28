@@ -6,6 +6,7 @@ import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.library.ILibraryService;
 import jadex.service.library.ILibraryServiceListener;
 import jadex.tools.common.EditableList;
@@ -166,21 +167,27 @@ public class LibraryPlugin extends AbstractJCCPlugin
 				if(cchooser.showDialog(SGUI.getWindowParent(classview)
 					, "Load")==JFileChooser.APPROVE_OPTION)
 				{
-					File[] files = cchooser.getSelectedFiles();
-					ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
-					for(int i=0; i<files.length; i++)
+					final File[] files = cchooser.getSelectedFiles();
+					getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 					{
-						try
+						public void customResultAvailable(Object source, Object result)
 						{
-							URL url = files[i].toURI().toURL();
-							ls.addURL(url);
-							classpaths.addEntry(url.toString());
+							ILibraryService ls = (ILibraryService)result;
+							for(int i=0; i<files.length; i++)
+							{
+								try
+								{
+									URL url = files[i].toURI().toURL();
+									ls.addURL(url);
+									classpaths.addEntry(url.toString());
+								}
+								catch(MalformedURLException ex)
+								{
+									ex.printStackTrace();
+								}
+							}
 						}
-						catch(MalformedURLException ex)
-						{
-							ex.printStackTrace();
-						}
-					}
+					});
 				}
 			}
 		});
@@ -188,22 +195,30 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				int[] sel = classpaths.getSelectedRows();
-				String[] entries = classpaths.getEntries();
-				for(int i=0; i<sel.length; i++)
+				final int[] sel = classpaths.getSelectedRows();
+				final String[] entries = classpaths.getEntries();
+				
+				getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 				{
-					classpaths.removeEntry(entries[sel[i]]);
-					ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
-					try
+					public void customResultAvailable(Object source, Object result)
 					{
-						ls.removeURL(new URL("file:///"+entries[sel[i]]));
+						ILibraryService ls = (ILibraryService)result;
+						
+						for(int i=0; i<sel.length; i++)
+						{
+							classpaths.removeEntry(entries[sel[i]]);
+							try
+							{
+								ls.removeURL(new URL("file:///"+entries[sel[i]]));
+							}
+							catch(MalformedURLException ex)
+							{
+								System.out.println(entries[sel[i]]);
+								ex.printStackTrace();
+							}	
+						}
 					}
-					catch(MalformedURLException ex)
-					{
-						System.out.println(entries[sel[i]]);
-						ex.printStackTrace();
-					}					
-				}
+				});
 			}
 		});
 //		fetch.addActionListener(new ActionListener()
@@ -224,26 +239,32 @@ public class LibraryPlugin extends AbstractJCCPlugin
 			{
 				if(e.getType()== TableModelEvent.DELETE && (e instanceof EditableListEvent))
 				{
-					EditableListEvent ele = (EditableListEvent)e;
-					int start = e.getFirstRow();
-					int end = e.getLastRow();
+					final EditableListEvent ele = (EditableListEvent)e;
+					final int start = e.getFirstRow();
+					final int end = e.getLastRow();
 
-					for(int i=0; i<=end-start; i++)
+					getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 					{
-						ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
-						if(ele.getData(i)!=null && ((String)ele.getData(i)).length()>0)
+						public void customResultAvailable(Object source, Object result)
 						{
-							try
+							ILibraryService ls = (ILibraryService)result;
+							for(int i=0; i<=end-start; i++)
 							{
-								ls.removeURL(new URL(ele.getData(i).toString()));
+								if(ele.getData(i)!=null && ((String)ele.getData(i)).length()>0)
+								{
+									try
+									{
+										ls.removeURL(new URL(ele.getData(i).toString()));
+									}
+									catch(MalformedURLException ex)
+									{
+										System.out.println(ele.getData(i));
+										ex.printStackTrace();
+									}	
+								}
 							}
-							catch(MalformedURLException ex)
-							{
-								System.out.println(ele.getData(i));
-								ex.printStackTrace();
-							}	
 						}
-					}
+					});
 				}
 			}
 		});
@@ -314,7 +335,8 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	public void setProperties(Properties props)
 	{
 		Property[] ps = props.getProperties("cp");
-		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
+		// Hack: todo!?
+		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class).get(new ThreadSuspendable());
 		for(int i=0; i<ps.length; i++)
 		{
 			try
@@ -344,7 +366,8 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	public Properties	getProperties()
 	{
 		Properties	props	= new Properties();
-		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
+		// Hack: todo!?
+		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class).get(new ThreadSuspendable());
 		List urls = ls.getURLs();
 
 		for(int i=0; i<urls.size(); i++)
@@ -379,13 +402,19 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	 */
 	public void	reset()
 	{
-		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
-		URL[]	urls	= (URL[])ls.getURLs().toArray(new URL[ls.getURLs().size()]);
-
-		for(int i=0; i<urls.length; i++)
+		getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
-			ls.removeURL(urls[i]);
-		}
+			public void resultAvailable(Object source, Object result)
+			{
+				ILibraryService ls = (ILibraryService)result;
+				URL[]	urls	= (URL[])ls.getURLs().toArray(new URL[ls.getURLs().size()]);
+
+				for(int i=0; i<urls.length; i++)
+				{
+					ls.removeURL(urls[i]);
+				}
+			}
+		});
 	}
 	
 	/**
