@@ -20,7 +20,7 @@ public class CMSLocalSearchComponentsPlan extends Plan
 		IComponentDescription	desc	= (IComponentDescription)getParameter("description").getValue();
 		ISearchConstraints	constraints	= (ISearchConstraints)getParameter("constraints").getValue();
 		
-		IFuture ret = ((IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class)).searchComponents(desc, constraints);
+		IFuture ret = ((IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class).get(this)).searchComponents(desc, constraints);
 		IComponentDescription[]	result =  (IComponentDescription[])ret.get(this);
 		for(int i=0; i<result.length; i++)
 			getParameterSet("result").addValue(result[i]);

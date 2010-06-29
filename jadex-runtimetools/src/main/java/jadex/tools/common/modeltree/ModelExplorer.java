@@ -375,7 +375,8 @@ public class ModelExplorer extends JTree
 				}
 			}
 		}
-		ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
+		// todo: remove ThreadSuspendable()
+		ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class).get(new ThreadSuspendable())).getClassLoader();
 		String	treesave	= JavaWriter.objectToXML(mep, cl);	// Doesn't support inner classes: ModelExplorer$ModelExplorerProperties
 //		String	treesave	= Nuggets.objectToXML(mep, cl);
 		props.addProperty(new Property("tree", treesave));

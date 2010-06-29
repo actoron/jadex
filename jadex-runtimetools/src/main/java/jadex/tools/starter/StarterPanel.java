@@ -3,6 +3,7 @@ package jadex.tools.starter;
 import jadex.base.SComponentFactory;
 import jadex.bridge.IArgument;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IReport;
 import jadex.commons.FixedJComboBox;
@@ -387,9 +388,16 @@ public class StarterPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				IComponentIdentifier newparent	= agentselector.selectAgent(parent);
-				if(newparent!=null)
-					setParent(newparent);
+				final IComponentIdentifier paid = (IComponentIdentifier)parent;
+				StarterPanel.this.starter.getJCC().getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						IComponentIdentifier newparent	= agentselector.selectAgent(paid, (IComponentManagementService)result);
+						if(newparent!=null)
+							setParent(newparent);
+					}
+				});
 			}
 		});
 		JButton	clearparent	= new JButton(icons.getIcon("delete"));

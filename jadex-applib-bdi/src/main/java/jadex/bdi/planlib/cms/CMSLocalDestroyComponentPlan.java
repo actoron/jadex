@@ -22,7 +22,7 @@ public class CMSLocalDestroyComponentPlan extends Plan
 		final IServiceContainer plat	= getScope().getServiceContainer();
 		try
 		{
-			IFuture ret = ((IComponentManagementService)plat.getService(IComponentManagementService.class)).destroyComponent(cid);
+			IFuture ret = ((IComponentManagementService)plat.getService(IComponentManagementService.class).get(this)).destroyComponent(cid);
 			ret.get(this);
 		}
 		catch(Exception e)

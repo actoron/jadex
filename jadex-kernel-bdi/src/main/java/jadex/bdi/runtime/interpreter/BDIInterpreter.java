@@ -803,7 +803,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	}
 
 	/**
-	 *  Get the cached clock service
+	 *  Get the cached clock service.
 	 */
 	// hack!!! to avoid dealing with futures.
 	public IClockService	getClockService()
@@ -812,7 +812,7 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	}
 
 	/**
-	 *  Get the cached component management service
+	 *  Get the cached component management service.
 	 */
 	// hack!!! to avoid dealing with futures.
 	public IComponentManagementService	getCMS()
@@ -821,13 +821,22 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	}
 
 	/**
-	 *  Get the cached message service
+	 *  Get the cached message service.
 	 */
 	// hack!!! to avoid dealing with futures.
 	public IMessageService	getMessageService()
 	{
 		return msgservice;
 	}
+	
+	/**
+	 *  Get the cached df service.
+	 * /
+	// hack!!! to avoid dealing with futures.
+	public IDF	getDFService()
+	{
+		return msgservice;
+	}*/
 	
 	/**
 	 *  Invoke some code with agent behaviour synchronized on the agent.

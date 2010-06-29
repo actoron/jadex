@@ -7,6 +7,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.jtable.ResizeableTableHeader;
 import jadex.tools.common.jtreetable.DefaultTreeTableNode;
 
@@ -123,7 +124,7 @@ public class AgentSelectorDialog
 	 *  Open a modal dialog to select/enter an agent identifier.
 	 *  @return	The selected agent identifier or null, when dialog was aborted.
 	 */
-	public IComponentIdentifier selectAgent(final IComponentIdentifier def)
+	public IComponentIdentifier selectAgent(final IComponentIdentifier def, IComponentManagementService cms)
 	{
 		this.singleselection	= true;
 
@@ -135,7 +136,7 @@ public class AgentSelectorDialog
 		}
 
 		// Create dialog.
-		this.dia	= createDialog();
+		this.dia	= createDialog(cms);
 
 		// Refresh agent lists in gui.
 		refreshAgentTree();
@@ -156,7 +157,7 @@ public class AgentSelectorDialog
 	 *  Select/edit a list of agents.
 	 *  @return	The (possibly empty) list of agent identifiers or null, when dialog was aborted.
 	 */
-	public IComponentIdentifier[] selectAgents(IComponentIdentifier[] receivers)
+	public IComponentIdentifier[] selectAgents(IComponentIdentifier[] receivers, IComponentManagementService cms)
 	{
 		// Pre-init list of selected agents.
 		sellist.clear();
@@ -164,7 +165,7 @@ public class AgentSelectorDialog
 			sellist.add(receivers[i]);
 
 		// Create dialog.
-		this.dia	= createDialog();
+		this.dia	= createDialog(cms);
 
 		// Refresh agent lists in gui.
 		refreshAgentTree();
@@ -191,45 +192,50 @@ public class AgentSelectorDialog
 		// Todo: fetch agent lists from added remote platforms.
 		
 		// todo: show errors in option panel
-		final IComponentManagementService cms = (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
-			
-		agent.createGoal("cms_search_components").addResultListener(new DefaultResultListener()
+		agent.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result) 
+			public void resultAvailable(Object source, Object result)
 			{
-				final IEAGoal search = (IEAGoal)result;
-				search.setParameterValue("description", cms.createComponentDescription(null, null, null, null, null));
-				search.setParameterValue("constraints", cms.createSearchConstraints(-1, 0));
-
-				agent.dispatchTopLevelGoalAndWait(search, 10000).addResultListener(new DefaultResultListener()
+				final IComponentManagementService cms = (IComponentManagementService)result;
+				agent.createGoal("cms_search_components").addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result) 
 					{
-						//agent.dispatchTopLevelGoalAndWait(search);
-						search.getParameterSetValues("result").addResultListener(new DefaultResultListener()
+						final IEAGoal search = (IEAGoal)result;
+						search.setParameterValue("description", cms.createComponentDescription(null, null, null, null, null));
+						search.setParameterValue("constraints", cms.createSearchConstraints(-1, 0));
+
+						agent.dispatchTopLevelGoalAndWait(search, 10000).addResultListener(new DefaultResultListener()
 						{
-							public void resultAvailable(Object source, final Object result) 
+							public void resultAvailable(Object source, Object result) 
 							{
-								SwingUtilities.invokeLater(new Runnable() 
+								//agent.dispatchTopLevelGoalAndWait(search);
+								search.getParameterSetValues("result").addResultListener(new DefaultResultListener()
 								{
-									public void run() 
+									public void resultAvailable(Object source, final Object result) 
 									{
-										IComponentDescription[]	descs = (IComponentDescription[])result;
-										// Create agent tree of known agents.
-										tree.removeComponents();
-										for(int i=0; i<descs.length; i++)
-											tree.addComponent(descs[i]);
-										((ResizeableTableHeader)tree.getTreetable().getTableHeader()).resizeAllColumns();
-										Dimension	pref	= tree.getTreetable().getPreferredSize();
-										tree.getTreetable().setPreferredScrollableViewportSize(new Dimension(Math.min(pref.width, 400), Math.max(100, (int)Math.min(pref.height*1.25, 300))));
+										SwingUtilities.invokeLater(new Runnable() 
+										{
+											public void run() 
+											{
+												IComponentDescription[]	descs = (IComponentDescription[])result;
+												// Create agent tree of known agents.
+												tree.removeComponents();
+												for(int i=0; i<descs.length; i++)
+													tree.addComponent(descs[i]);
+												((ResizeableTableHeader)tree.getTreetable().getTableHeader()).resizeAllColumns();
+												Dimension	pref	= tree.getTreetable().getPreferredSize();
+												tree.getTreetable().setPreferredScrollableViewportSize(new Dimension(Math.min(pref.width, 400), Math.max(100, (int)Math.min(pref.height*1.25, 300))));
+											}
+										});
 									}
 								});
 							}
 						});
 					}
-				});
+				});	
 			}
-		});	
+		});
 		
 //		try
 //		{
@@ -267,44 +273,51 @@ public class AgentSelectorDialog
 	 */
 	protected void refreshSelectedTree()
 	{
-		IComponentManagementService cms = (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
-			
-		// Create agent tree of selected agents.
-		int	row	= seltree.getTreetable().getSelectionModel().getMinSelectionIndex();
-		seltree.removeComponents();
-		DefaultTreeTableNode[]	known	= tree.getAllComponents();
-		for(int i=0; i<sellist.size(); i++)
+		agent.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
-			// Try to find in known agents.
-			boolean	found	= false;
-			IComponentIdentifier	cid	= (IComponentIdentifier)sellist.get(i);
-			for(int j=0; !found && j<known.length; j++)
+			public void resultAvailable(Object source, Object result)
 			{
-				IComponentDescription	desc	= (IComponentDescription)known[j].getUserObject();
-				if(desc.getName().equals(cid))
+				final IComponentManagementService cms = (IComponentManagementService)result;
+		
+				// Create agent tree of selected agents.
+				int	row	= seltree.getTreetable().getSelectionModel().getMinSelectionIndex();
+				seltree.removeComponents();
+				DefaultTreeTableNode[]	known	= tree.getAllComponents();
+				for(int i=0; i<sellist.size(); i++)
 				{
-					found	= true;
-					seltree.addComponent(desc);
+					// Try to find in known agents.
+					boolean	found	= false;
+					IComponentIdentifier	cid	= (IComponentIdentifier)sellist.get(i);
+					for(int j=0; !found && j<known.length; j++)
+					{
+						IComponentDescription	desc	= (IComponentDescription)known[j].getUserObject();
+						if(desc.getName().equals(cid))
+						{
+							found	= true;
+							seltree.addComponent(desc);
+						}
+					}
+					
+					if(!found)
+					{
+						seltree.addComponent(cms.createComponentDescription(cid, null, null, "unknown-component-type", null));
+					}
 				}
+				// Force table repaint (hack???).
+				seltree.getTreetable().tableChanged(new TableModelEvent(seltree.getTreetable().getModel(), TableModelEvent.HEADER_ROW));
+				((ResizeableTableHeader)seltree.getTreetable().getTableHeader()).resizeAllColumns();
+				Dimension	pref	= seltree.getTreetable().getPreferredSize();
+				seltree.getTreetable().setPreferredScrollableViewportSize(new Dimension(Math.min(pref.width, 400), Math.max(100, (int)Math.min(pref.height*1.25, 300))));
+				if(sellist.size()>0)
+				{
+					row	= Math.min(row, sellist.size()-1);
+					seltree.getTreetable().getSelectionModel().setSelectionInterval(row, row);
+					// Hack!!! why row+1!?
+					seltree.getTreetable().scrollRectToVisible(seltree.getTreetable().getCellRect(row+1, seltree.getTreetable().convertColumnIndexToView(0), true));
+				}		
 			}
-			
-			if(!found)
-			{
-				seltree.addComponent(cms.createComponentDescription(cid, null, null, "unknown-component-type", null));
-			}
-		}
-		// Force table repaint (hack???).
-		seltree.getTreetable().tableChanged(new TableModelEvent(seltree.getTreetable().getModel(), TableModelEvent.HEADER_ROW));
-		((ResizeableTableHeader)seltree.getTreetable().getTableHeader()).resizeAllColumns();
-		Dimension	pref	= seltree.getTreetable().getPreferredSize();
-		seltree.getTreetable().setPreferredScrollableViewportSize(new Dimension(Math.min(pref.width, 400), Math.max(100, (int)Math.min(pref.height*1.25, 300))));
-		if(sellist.size()>0)
-		{
-			row	= Math.min(row, sellist.size()-1);
-			seltree.getTreetable().getSelectionModel().setSelectionInterval(row, row);
-			// Hack!!! why row+1!?
-			seltree.getTreetable().scrollRectToVisible(seltree.getTreetable().getCellRect(row+1, seltree.getTreetable().convertColumnIndexToView(0), true));
-		}		
+		});
+	}
 				
 				
 		// Create agent tree of selected agents.
@@ -344,12 +357,12 @@ public class AgentSelectorDialog
 //			// Hack!!! why row+1!?
 //			seltree.getTreetable().scrollRectToVisible(seltree.getTreetable().getCellRect(row+1, seltree.getTreetable().convertColumnIndexToView(0), true));
 //		}
-	}
+//	}
 
 	/**
 	 *  Create the dialog.
 	 */
-	protected JDialog createDialog()
+	protected JDialog createDialog(IComponentManagementService cms)
 	{
 		// Create  buttons.
 		select	= new JButton(icons.getIcon("arrow_right"));
@@ -386,8 +399,6 @@ public class AgentSelectorDialog
 		remove.setEnabled(false);
 		removeall.setEnabled(sellist.size()>0);
 		ok.setEnabled(!singleselection || sellist.size()>0);
-
-		IComponentManagementService ces = (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
 		
 		this.tree = new ComponentTreeTable(agent.getServiceContainer());
 		this.tree.setPreferredSize(new Dimension(200, 100));
@@ -396,7 +407,7 @@ public class AgentSelectorDialog
 		this.seltree.setPreferredSize(new Dimension(200, 100));
 		seltree.getTreetable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		seltree.getTreetable().getTree().setRootVisible(false);	// Don't show platform node.
-		this.aidpanel = new ComponentIdentifierPanel(null, ces)
+		this.aidpanel = new ComponentIdentifierPanel(null, cms)
 		{
 			protected void aidChanged()
 			{
@@ -475,15 +486,22 @@ public class AgentSelectorDialog
 						if(val instanceof IComponentDescription)
 						{
 							// Use clone to keep original aid unchanged.
-							final IComponentManagementService cms	= (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
-							final IComponentIdentifier id	= ((IComponentDescription)val).getName();
-							addSelectedAgent(cms.createComponentIdentifier(id.getName(), false, id.getAddresses()));
+							agent.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+							{
+								public void customResultAvailable(Object source, Object result)
+								{
+									IComponentManagementService cms = (IComponentManagementService)result;
+									final IComponentIdentifier id	= ((IComponentDescription)val).getName();
+									addSelectedAgent(cms.createComponentIdentifier(id.getName(), false, id.getAddresses()));
+								}
+							});
 						}
 					}
 				}
 			}
 		});
 
+							
 		parent = SGUI.getWindowParent(parent);
 		final JDialog	dia	= parent instanceof Frame
 			? new JDialog((Frame)parent, "Select/Enter Agent Identifier", true)
@@ -515,9 +533,15 @@ public class AgentSelectorDialog
 					final Object val = ((DefaultTreeTableNode)tree.getTreetable().getTree().getPathForRow(tree.getTreetable().getSelectionModel().getMinSelectionIndex()).getLastPathComponent()).getUserObject();
 					if(val instanceof IComponentDescription)
 					{
-						IComponentManagementService cms	= (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
-						IComponentIdentifier id	= ((IComponentDescription)val).getName();
-						addSelectedAgent(cms.createComponentIdentifier(id.getName(), false, id.getAddresses()));
+						agent.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+						{
+							public void customResultAvailable(Object source, Object result)
+							{
+								IComponentManagementService cms = (IComponentManagementService)result;
+								IComponentIdentifier id	= ((IComponentDescription)val).getName();
+								addSelectedAgent(cms.createComponentIdentifier(id.getName(), false, id.getAddresses()));
+							}
+						});
 					}
 				}
 			}
@@ -526,8 +550,14 @@ public class AgentSelectorDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				IComponentManagementService cms	= (IComponentManagementService)agent.getServiceContainer().getService(IComponentManagementService.class);
-				addSelectedAgent(cms.createComponentIdentifier("", true, null));
+				agent.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						IComponentManagementService cms = (IComponentManagementService)result;
+						addSelectedAgent(cms.createComponentIdentifier("", true, null));
+					}
+				});
 			}
 		});
 		remove.addActionListener(new ActionListener()

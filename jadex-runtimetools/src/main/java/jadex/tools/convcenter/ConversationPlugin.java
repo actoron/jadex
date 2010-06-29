@@ -90,34 +90,40 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		public void actionPerformed(ActionEvent e)
 		{
 			DefaultTreeTableNode node = (DefaultTreeTableNode)agents.getTreetable().getTree().getSelectionPath().getLastPathComponent();
-			IComponentDescription desc = (IComponentDescription)node.getUserObject();
+			final IComponentDescription desc = (IComponentDescription)node.getUserObject();
 			// Use clone, as added component id might be modified by user.
-			IComponentManagementService ces  = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
-			IComponentIdentifier rec = desc.getName();
-			final IComponentIdentifier receiver = ces.createComponentIdentifier(rec.getName(), false, rec.getAddresses());
-			final IEAMessageEvent	message	= convcenter.getMessagePanel().getMessage();
-			message.getParameterSet(SFipa.RECEIVERS).addResultListener(new SwingDefaultResultListener(convcenter)
+			jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 			{
-				public void customResultAvailable(Object source, Object result) 
+				public void customResultAvailable(Object source, Object result)
 				{
-					final IEAParameterSet rcvs = (IEAParameterSet)result;
-					
-					rcvs.containsValue(receiver).addResultListener(new SwingDefaultResultListener(convcenter)
+					IComponentManagementService cms  = (IComponentManagementService)result;
+					IComponentIdentifier rec = desc.getName();
+					final IComponentIdentifier receiver = cms.createComponentIdentifier(rec.getName(), false, rec.getAddresses());
+					final IEAMessageEvent	message	= convcenter.getMessagePanel().getMessage();
+					message.getParameterSet(SFipa.RECEIVERS).addResultListener(new SwingDefaultResultListener(convcenter)
 					{
 						public void customResultAvailable(Object source, Object result) 
 						{
-							if(((Boolean)result).booleanValue())
+							final IEAParameterSet rcvs = (IEAParameterSet)result;
+							
+							rcvs.containsValue(receiver).addResultListener(new SwingDefaultResultListener(convcenter)
 							{
-								rcvs.removeValue(receiver);
-							}
-							else
-							{
-								rcvs.addValue(receiver);
-							}
-							convcenter.getMessagePanel().setMessage(message);
-						}
+								public void customResultAvailable(Object source, Object result) 
+								{
+									if(((Boolean)result).booleanValue())
+									{
+										rcvs.removeValue(receiver);
+									}
+									else
+									{
+										rcvs.addValue(receiver);
+									}
+									convcenter.getMessagePanel().setMessage(message);
+								}
+							});
+						};
 					});
-				};
+				}
 			});
 			
 //			if(rcvs.containsValue(receiver))

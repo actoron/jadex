@@ -13,6 +13,7 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SReflect;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.service.clock.IClockService;
 import jadex.service.library.ILibraryService;
@@ -201,8 +202,14 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 	 */
 	public void shutdown()
 	{
-		IMessageService ms = (IMessageService)getJCC().getServiceContainer().getService(IMessageService.class);
-		ms.removeMessageListener(this);
+		getJCC().getServiceContainer().getService(IMessageService.class).addResultListener(new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				IMessageService ms = (IMessageService)result;
+				ms.removeMessageListener(ComanalyzerPlugin.this);
+			}
+		});
 	}
 
 	//-------- IControlCenterPlugin interface --------
@@ -473,37 +480,44 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 
 //		jcc.addAgentListListener(this);
 		
-		IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
-		IFuture ret = ces.getComponentDescriptions();
-		ret.addResultListener(new IResultListener()
+		jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				IComponentDescription[] res = (IComponentDescription[])result;
-				for(int i=0; i<res.length; i++)
-					agentBorn(res[i]);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-			}
-		});
-		ces.addComponentListener(null, new IComponentListener()
-		{
-			public void componentRemoved(IComponentDescription desc, Map results)
-			{
-				agentDied(desc);
-			}
-			
-			public void componentAdded(IComponentDescription desc)
-			{
-				agentBorn(desc);
-			}
+				IComponentManagementService cms = (IComponentManagementService)result;
+				
+				cms.getComponentDescriptions().addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						IComponentDescription[] res = (IComponentDescription[])result;
+						for(int i=0; i<res.length; i++)
+							agentBorn(res[i]);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+					}
+				});
+				cms.addComponentListener(null, new IComponentListener()
+				{
+					public void componentRemoved(IComponentDescription desc, Map results)
+					{
+						agentDied(desc);
+					}
+					
+					public void componentAdded(IComponentDescription desc)
+					{
+						agentBorn(desc);
+					}
 
-			public void componentChanged(IComponentDescription desc)
-			{
+					public void componentChanged(IComponentDescription desc)
+					{
+					}
+				});
 			}
 		});
+		
 		
 //		SwingUtilities.invokeLater(new Runnable()
 //		{
@@ -518,9 +532,15 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin implements IMessageList
 		applyAgentFilter(dummy);
 		componentlist.addAgent(dummy);
 		
-
-		IMessageService ms = (IMessageService)getJCC().getServiceContainer().getService(IMessageService.class);
-		ms.addMessageListener(this);
+		getJCC().getServiceContainer().getService(IMessageService.class).addResultListener(new DefaultResultListener()
+		{
+			
+			public void resultAvailable(Object source, Object result)
+			{
+				IMessageService ms = (IMessageService)result;
+				ms.addMessageListener(ComanalyzerPlugin.this);
+			}
+		});
 		
 		return split;
 	}

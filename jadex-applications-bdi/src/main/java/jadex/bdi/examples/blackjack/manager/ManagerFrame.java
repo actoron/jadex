@@ -120,20 +120,33 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		dealerpan = new JPanel();
 		dealerpan.setBorder(BorderFactory.createTitledBorder(" Dealer "));
 		dealerpan.setBackground(Color.WHITE);
-		final IComponentManagementService ces = (IComponentManagementService)access.getServiceContainer().getService(IComponentManagementService.class);
-		dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, true, null);
+		access.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				final IComponentManagementService ces = (IComponentManagementService)result;
+				dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, true, null);
+				dealertf.setText(dealeraid.getName());
+			}
+		});
+		
 		dealertf = new JTextField(20);
 		dealertf.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
-				IComponentManagementService ces = (IComponentManagementService)access.getServiceContainer().getService(IComponentManagementService.class);
-				dealeraid = ces.createComponentIdentifier(dealertf.getText(), false, null);
+				access.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						final IComponentManagementService ces = (IComponentManagementService)result;
+						dealeraid = ces.createComponentIdentifier(dealertf.getText(), false, null);
+					}
+				});
 			}
 		});
 		
 		//dealertf.setEditable(false);
-		dealertf.setText(dealeraid.getName());
 		/*JButton dealerbut = new JButton("...");
 		dealerbut.setMargin(new Insets(0,0,0,0));
 		dealerbut.setToolTipText("Set dealer agent identifier");

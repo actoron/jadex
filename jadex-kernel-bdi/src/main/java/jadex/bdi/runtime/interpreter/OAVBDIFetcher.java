@@ -117,6 +117,11 @@ public class OAVBDIFetcher extends SimpleValueFetcher
 			ret = InternalEventFlyweight.getInternalEventFlyweight(state, rcapa, rinternalevent);
 		else if(name.equals("$plan") && rplan!=null)
 			ret = PlanFlyweight.getPlanFlyweight(state, rcapa, rplan);
+		
+		// Hack! todo: remove and replace with async service call
+//		else if(name.equals("$clock"))
+//			ret = BDIInterpreter.getInterpreter(state).getClockService();
+		
 		else
 			ret = super.fetchValue(name);
 		

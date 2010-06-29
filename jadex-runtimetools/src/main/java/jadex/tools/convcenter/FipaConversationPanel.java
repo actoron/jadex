@@ -817,37 +817,45 @@ public class FipaConversationPanel extends JSplitPane
 	/**
 	 *  Fill in message values from string.
 	 */
-	public IFuture decodeMessage(String msg)
+	public IFuture decodeMessage(final String msg)
 	{
 		final Future ret = new Future();
 		
-		ClassLoader cl = ((ILibraryService)agent.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
-		final Map map = (Map)JavaReader.objectFromXML(msg, cl);
-		agent.createMessageEvent((String)map.get(ConversationPlugin.ENCODED_MESSAGE_TYPE)).addResultListener(new SwingDefaultResultListener(this)
+		agent.getServiceContainer().getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
-			public void customResultAvailable(Object source, Object result)
+			public void resultAvailable(Object source, Object result)
 			{
-				IEAMessageEvent	message	= (IEAMessageEvent)result;	
+				ILibraryService ls = (ILibraryService)result;
+				ClassLoader cl = ls.getClassLoader();
 				
-				String[] params	= message.getMessageType().getParameterNames();
-				for(int i=0; i<params.length; i++)
+				final Map map = (Map)JavaReader.objectFromXML(msg, cl);
+				agent.createMessageEvent((String)map.get(ConversationPlugin.ENCODED_MESSAGE_TYPE)).addResultListener(new SwingDefaultResultListener(FipaConversationPanel.this)
 				{
-					message.setParameterValue(params[i], map.get(params[i]));
-				}
-				String[] paramsets	= message.getMessageType().getParameterSetNames();
-				for(int i=0; i<paramsets.length; i++)
-				{
-					if(map.get(paramsets[i])!=null)
+					public void customResultAvailable(Object source, Object result)
 					{
-						message.removeParameterSetValues(paramsets[i]);
-						Object[] vals = (Object[])map.get(paramsets[i]);
-						for(int j=0; j<vals.length; j++)
-							message.addParameterSetValue(paramsets[i], vals[j]);
+						IEAMessageEvent	message	= (IEAMessageEvent)result;	
+						
+						String[] params	= message.getMessageType().getParameterNames();
+						for(int i=0; i<params.length; i++)
+						{
+							message.setParameterValue(params[i], map.get(params[i]));
+						}
+						String[] paramsets	= message.getMessageType().getParameterSetNames();
+						for(int i=0; i<paramsets.length; i++)
+						{
+							if(map.get(paramsets[i])!=null)
+							{
+								message.removeParameterSetValues(paramsets[i]);
+								Object[] vals = (Object[])map.get(paramsets[i]);
+								for(int j=0; j<vals.length; j++)
+									message.addParameterSetValue(paramsets[i], vals[j]);
+							}
+						}
+						
+						// todo: Hack! scheduled actions might not have been executed
+						ret.setResult(message);
 					}
-				}
-				
-				// todo: Hack! scheduled actions might not have been executed
-				ret.setResult(message);
+				});
 			}
 		});
 
@@ -920,9 +928,15 @@ public class FipaConversationPanel extends JSplitPane
 					
 					if(last)
 					{
-						ClassLoader cl = ((ILibraryService)agent.getServiceContainer().getService(ILibraryService.class)).getClassLoader();
-						String	msg	= JavaWriter.objectToXML(map, cl);
-						ret.setResult(msg);
+						agent.getServiceContainer().getService(ILibraryService.class).addResultListener(new DefaultResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								ClassLoader cl = ((ILibraryService)result).getClassLoader();
+								String	msg	= JavaWriter.objectToXML(map, cl);
+								ret.setResult(msg);
+							}
+						});
 					}
 				}
 			});

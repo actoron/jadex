@@ -8,6 +8,7 @@ import jadex.commons.IBreakpointPanel;
 import jadex.commons.IChangeListener;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.rules.tools.common.TableSorter;
 import jadex.service.IServiceContainer;
@@ -272,7 +273,8 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 					{
 						bps.remove(breakpoints.get(sorter.modelIndex(rowIndex)));
 					}
-					((IComponentManagementService)container.getService(IComponentManagementService.class))
+					// Hack! remove thread suspendabel
+					((IComponentManagementService)container.getService(IComponentManagementService.class).get(new ThreadSuspendable()))
 						.setComponentBreakpoints(description.getName(), (String[])bps.toArray(new String[bps.size()]));
 				}
 			});

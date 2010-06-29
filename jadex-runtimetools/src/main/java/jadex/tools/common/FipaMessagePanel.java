@@ -6,6 +6,7 @@ import jadex.bdi.runtime.IEAMessageEvent;
 import jadex.bdi.runtime.IEAParameter;
 import jadex.bdi.runtime.IEAParameterSet;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentManagementService;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
@@ -89,7 +90,7 @@ public class FipaMessagePanel extends JPanel
 	/**
 	 *  Create the panel with an initial message.
 	 */
-	public FipaMessagePanel(IEAMessageEvent message, IBDIExternalAccess agent)
+	public FipaMessagePanel(IEAMessageEvent message, final IBDIExternalAccess agent)
 	{
 		super(new GridBagLayout());
 		this.editable	= true;
@@ -301,13 +302,19 @@ public class FipaMessagePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				IComponentIdentifier	aid	= agentselector.selectAgent(sender);
-				if(aid!=null)
+				agent.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 				{
-					sender	= aid;
-					tfsender.setText(aid.toString());
-					tfsender.setCaretPosition(0);
-				}
+					public void customResultAvailable(Object source, Object result)
+					{
+						IComponentIdentifier aid = agentselector.selectAgent(sender, (IComponentManagementService)result);
+						if(aid!=null)
+						{
+							sender	= aid;
+							tfsender.setText(aid.toString());
+							tfsender.setCaretPosition(0);
+						}
+					}
+				});
 			}
 		});
 		clearsender.addActionListener(new ActionListener()
@@ -322,13 +329,19 @@ public class FipaMessagePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				IComponentIdentifier	aid	= agentselector.selectAgent(replyto);
-				if(aid!=null)
+				agent.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 				{
-					replyto	= aid;
-					tfreplyto.setText(aid.toString());
-					tfreplyto.setCaretPosition(0);
-				}
+					public void customResultAvailable(Object source, Object result)
+					{
+						IComponentIdentifier	aid	= agentselector.selectAgent(replyto, (IComponentManagementService)result);
+						if(aid!=null)
+						{
+							replyto	= aid;
+							tfreplyto.setText(aid.toString());
+							tfreplyto.setCaretPosition(0);
+						}
+					}
+				});
 			}
 		});
 		clearreplyto.addActionListener(new ActionListener()
@@ -343,21 +356,27 @@ public class FipaMessagePanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				IComponentIdentifier[]	aids	= agentselector.selectAgents(receivers);
-				if(aids!=null)
+				agent.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 				{
-					if(aids.length>0)
+					public void customResultAvailable(Object source, Object result)
 					{
-						receivers	= aids;
-						tfreceivers.setText(SUtil.arrayToString(receivers));
-						tfreceivers.setCaretPosition(0);
+						IComponentIdentifier[]	aids	= agentselector.selectAgents(receivers, (IComponentManagementService)result);
+						if(aids!=null)
+						{
+							if(aids.length>0)
+							{
+								receivers	= aids;
+								tfreceivers.setText(SUtil.arrayToString(receivers));
+								tfreceivers.setCaretPosition(0);
+							}
+							else
+							{
+								receivers	= null;
+								tfreceivers.setText("");
+							}
+						}
 					}
-					else
-					{
-						receivers	= null;
-						tfreceivers.setText("");
-					}
-				}
+				});
 			}
 		});
 		clearreceivers.addActionListener(new ActionListener()

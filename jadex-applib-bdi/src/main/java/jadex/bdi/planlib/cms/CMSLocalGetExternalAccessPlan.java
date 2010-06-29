@@ -21,7 +21,7 @@ public class CMSLocalGetExternalAccessPlan extends Plan
 		final IServiceContainer plat = getScope().getServiceContainer();
 		try
 		{
-			IFuture fut = ((IComponentManagementService)plat.getService(IComponentManagementService.class)).getExternalAccess(aid);
+			IFuture fut = ((IComponentManagementService)plat.getService(IComponentManagementService.class).get(this)).getExternalAccess(aid);
 			Object ret = fut.get(this);
 			getParameter("result").setValue(ret);
 		}
