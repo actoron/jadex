@@ -414,7 +414,6 @@ public class ControlCenter implements IControlCenter
 					AbstractJCCPlugin.addSubproperties(props, plugin.getName(), plugprops);
 			}
 
-
 			container.getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener(window)
 			{
 				public void customResultAvailable(Object source, Object result)

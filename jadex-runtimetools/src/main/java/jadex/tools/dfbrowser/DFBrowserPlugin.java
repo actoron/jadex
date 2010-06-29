@@ -448,46 +448,52 @@ public class DFBrowserPlugin extends AbstractJCCPlugin
 	{
 //		System.out.println("refresh: "+getSelectedDF());
 		
-		
 		if(getSelectedDF() != null)
 		{
 			IServiceContainer sc = (IServiceContainer)((AgentControlCenter)getJCC()).getAgent().getServiceContainer();
-			final IDF df = (IDF)sc.getService(IDF.class);
-					
-			// Use a subgoal to search
-			((AgentControlCenter)getJCC()).getAgent().createGoal("df_search").addResultListener(new SwingDefaultResultListener(split1)
+			sc.getService(IDF.class).addResultListener(new SwingDefaultResultListener()
 			{
-				public void customResultAvailable(Object source, Object result) 
+				public void customResultAvailable(Object source, Object result)
 				{
-					final IEAGoal ft = (IEAGoal)result; 
-					ft.setParameterValue("description", df.createDFComponentDescription(null, null));
-					ft.setParameterValue("df", getSelectedDF().getName());
+					final IDF df = (IDF)result;
 					
-					((AgentControlCenter)getJCC()).getAgent().dispatchTopLevelGoalAndWait(ft).addResultListener(new SwingDefaultResultListener(split1)
+					// Use a subgoal to search
+					((AgentControlCenter)getJCC()).getAgent().createGoal("df_search").addResultListener(new SwingDefaultResultListener(split1)
 					{
 						public void customResultAvailable(Object source, Object result) 
 						{
-							ft.getParameterSetValues("result").addResultListener(new DefaultResultListener()
+							final IEAGoal ft = (IEAGoal)result; 
+							ft.setParameterValue("description", df.createDFComponentDescription(null, null));
+							ft.setParameterValue("df", getSelectedDF().getName());
+							
+							((AgentControlCenter)getJCC()).getAgent().dispatchTopLevelGoalAndWait(ft).addResultListener(new SwingDefaultResultListener(split1)
 							{
-								public void resultAvailable(Object source, Object result)
+								public void customResultAvailable(Object source, Object result) 
 								{
-									IDFComponentDescription[] ads = (IDFComponentDescription[])result;
-									System.out.println("Found: "+SUtil.arrayToString(ads));
-									
-									if(old_ads == null || !Arrays.equals(old_ads, ads))
+									ft.getParameterSetValues("result").addResultListener(new DefaultResultListener()
 									{
-										agent_table.setAgentDescriptions(ads);
-										updateServices(ads);
-										updateDetailedService();
-										old_ads = ads;
-									}
-								}
+										public void resultAvailable(Object source, Object result)
+										{
+											IDFComponentDescription[] ads = (IDFComponentDescription[])result;
+											System.out.println("Found: "+SUtil.arrayToString(ads));
+											
+											if(old_ads == null || !Arrays.equals(old_ads, ads))
+											{
+												agent_table.setAgentDescriptions(ads);
+												updateServices(ads);
+												updateDetailedService();
+												old_ads = ads;
+											}
+										}
+									});
+								}	
 							});
-						}	
+						}
 					});
 				}
 			});
 		}
+			
 	}
 	
 	/**

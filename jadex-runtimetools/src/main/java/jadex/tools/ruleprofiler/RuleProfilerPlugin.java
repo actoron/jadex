@@ -7,6 +7,7 @@ import jadex.bridge.IComponentListener;
 import jadex.commons.IFuture;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceContainer;
 import jadex.tools.common.CombiIcon;
 import jadex.tools.common.ComponentTreeTable;
@@ -215,25 +216,27 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements IComponentL
 //		jcc.addAgentListListener(this);
 		// todo: ?! is this ok?
 		
-		IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
-		IFuture ret = ces.getComponentDescriptions();
-		ret.addResultListener(new IResultListener()
+		jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
-				IComponentDescription[] res = (IComponentDescription[])result;
-				for(int i=0; i<res.length; i++)
+				IComponentManagementService cms = (IComponentManagementService)result;
+				cms.addComponentListener(null, RuleProfilerPlugin.this);
+				cms.getComponentDescriptions().addResultListener(new SwingDefaultResultListener()
 				{
-					if(BDIAgentFactory.FILETYPE_BDIAGENT.equals(res[i].getType()))
-						componentAdded(res[i]);
-				}
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
+					public void customResultAvailable(Object source, Object result)
+					{
+						IComponentDescription[] res = (IComponentDescription[])result;
+						for(int i=0; i<res.length; i++)
+						{
+							if(BDIAgentFactory.FILETYPE_BDIAGENT.equals(res[i].getType()))
+								componentAdded(res[i]);
+						}
+					}
+				});
 			}
 		});
-		ces.addComponentListener(null, this);
+		
 		
 //		SwingUtilities.invokeLater(new Runnable()
 //		{

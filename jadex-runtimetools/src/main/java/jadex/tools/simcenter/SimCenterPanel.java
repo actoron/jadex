@@ -2,6 +2,7 @@ package jadex.tools.simcenter;
 
 import jadex.base.ISimulationService;
 import jadex.commons.TimeFormat;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceContainer;
 
 import java.awt.BorderLayout;
@@ -57,27 +58,35 @@ public class SimCenterPanel extends JPanel
 		super(new BorderLayout());
 		this.simcenter = simcenter;
 		
-		ISimulationService simservice = (ISimulationService)simcenter.getJCC().getServiceContainer().getService(ISimulationService.class);
-		if(simservice==null)
-			throw new RuntimeException("Could not find simulation service: "+simservice);
+		simcenter.getJCC().getServiceContainer().getService(ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+		{
+			public void customResultAvailable(Object source, Object result)
+			{
+				ISimulationService simservice = (ISimulationService)result;
+				
+				if(simservice==null)
+					throw new RuntimeException("Could not find simulation service: "+simservice);
+				
+				dateformat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss S");
+				
+				//this.clockp	= new ClockPanel(getClock());
+				clockp	= new ClockPanel(SimCenterPanel.this);
+				contextp	= new ContextPanel(SimCenterPanel.this);
+				JPanel left	= new JPanel(new BorderLayout());
+				left.add(clockp, BorderLayout.NORTH);
+				left.add(contextp, BorderLayout.SOUTH);
+				
+				timerp	= new TimerPanel(SimCenterPanel.this);
+				
+				JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+				sp.setOneTouchExpandable(true);
+				sp.add(left);
+				sp.add(timerp);
+				
+				add(sp, "Center");
+			}
+		});
 		
-		this.dateformat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss S");
-		
-		//this.clockp	= new ClockPanel(getClock());
-		this.clockp	= new ClockPanel(this);
-		this.contextp	= new ContextPanel(this);
-		JPanel left	= new JPanel(new BorderLayout());
-		left.add(clockp, BorderLayout.NORTH);
-		left.add(contextp, BorderLayout.SOUTH);
-		
-		this.timerp	= new TimerPanel(this);
-		
-		JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		sp.setOneTouchExpandable(true);
-		sp.add(left);
-		sp.add(timerp);
-		
-		this.add(sp, "Center");
 		
 		/*Timer t = new Timer(100, new ActionListener()
 		{

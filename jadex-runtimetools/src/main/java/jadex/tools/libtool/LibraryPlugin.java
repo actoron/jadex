@@ -12,7 +12,6 @@ import jadex.service.library.ILibraryServiceListener;
 import jadex.tools.common.EditableList;
 import jadex.tools.common.EditableListEvent;
 import jadex.tools.common.plugin.AbstractJCCPlugin;
-import jadex.tools.common.plugin.IControlCenter;
 import jadex.tools.starter.StarterPlugin;
 
 import java.awt.BorderLayout;
@@ -273,12 +272,19 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		classview.add("South", buts);
 		
 		final JPanel otherview = new JPanel(new BorderLayout());
-		DefaultListModel dlm = new DefaultListModel();
-		entries = fetchOtherClasspathEntries();
-		for(int i=0; i<entries.size(); i++)
+		final DefaultListModel dlm = new DefaultListModel();
+		getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 		{
-			dlm.addElement(entries.get(i));
-		}
+			public void customResultAvailable(Object source, Object result)
+			{
+				List entries = fetchOtherClasspathEntries((ILibraryService)result);
+				for(int i=0; i<entries.size(); i++)
+				{
+					dlm.addElement(entries.get(i));
+				}
+			}
+		});
+		
 		final JList otherlist = new JList(dlm);
 		JPanel obuts = new JPanel(new BorderLayout());
 		JButton refresh = new JButton("Refresh");
@@ -287,13 +293,19 @@ public class LibraryPlugin extends AbstractJCCPlugin
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				DefaultListModel dlm = (DefaultListModel)otherlist.getModel();
-				dlm.removeAllElements();
-				java.util.List entries = fetchOtherClasspathEntries();				
-				for(int i=0; i<entries.size(); i++)
+				getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 				{
-					dlm.addElement((String)entries.get(i));
-				}
+					public void customResultAvailable(Object source, Object result)
+					{
+						List entries = fetchOtherClasspathEntries((ILibraryService)result);
+						DefaultListModel dlm = (DefaultListModel)otherlist.getModel();
+						dlm.removeAllElements();
+						for(int i=0; i<entries.size(); i++)
+						{
+							dlm.addElement((String)entries.get(i));
+						}
+					}
+				});
 			}
 		});
 		otherview.add("Center", new JScrollPane(otherlist));
@@ -453,13 +465,13 @@ public class LibraryPlugin extends AbstractJCCPlugin
 	 *  Fetch the current classpath
 	 *  @return classpath entries as a list of strings.
 	 */
-	protected java.util.List fetchOtherClasspathEntries()
+	protected java.util.List fetchOtherClasspathEntries(ILibraryService ls)
 	{
 		java.util.List	ret	= new ArrayList();
 
 //		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
 		// todo: hack
-		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class).get(new ThreadSuspendable());
+//		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class).get(new ThreadSuspendable());
 		ClassLoader	cl	= ls.getClassLoader();
 		
 		List cps = SUtil.getClasspathURLs(cl!=null ? cl.getParent() : null);	// todo: classpath?
