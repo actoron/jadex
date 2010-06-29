@@ -170,36 +170,42 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			}
 		});
 
-		IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
-		IFuture ret = ces.getComponentDescriptions();
-		ret.addResultListener(new IResultListener()
+		jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
-				IComponentDescription[] res = (IComponentDescription[])result;
-				for(int i=0; i<res.length; i++)
-					agentBorn(res[i]);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-			}
-		});
-		
-		ces.addComponentListener(null, new IComponentListener()
-		{
-			public void componentRemoved(IComponentDescription desc, java.util.Map results)
-			{
-				agentDied(desc);
-			}
-			
-			public void componentAdded(IComponentDescription desc)
-			{
-				agentBorn(desc);
-			}
+				IComponentManagementService cms = (IComponentManagementService)result;
+				IFuture ret = cms.getComponentDescriptions();
+				ret.addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						IComponentDescription[] res = (IComponentDescription[])result;
+						for(int i=0; i<res.length; i++)
+							agentBorn(res[i]);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+					}
+				});
+				
+				cms.addComponentListener(null, new IComponentListener()
+				{
+					public void componentRemoved(IComponentDescription desc, java.util.Map results)
+					{
+						agentDied(desc);
+					}
+					
+					public void componentAdded(IComponentDescription desc)
+					{
+						agentBorn(desc);
+					}
 
-			public void componentChanged(IComponentDescription desc)
-			{
+					public void componentChanged(IComponentDescription desc)
+					{
+					}
+				});
 			}
 		});
 		

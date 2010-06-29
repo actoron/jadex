@@ -80,83 +80,13 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 		this.breakpoints = new ArrayList(breakpoints);
 		this.description	= description;
 		this.container	= container;
-		
-		TableModel lm = new AbstractTableModel()
-		{
-			public int getColumnCount()
-			{
-				return 2;
-			}
-			public int getRowCount()
-			{
-				return BreakpointPanel.this.breakpoints.size();
-			}
-			public Object getValueAt(int row, int column)
-			{
-				return column==1 ? BreakpointPanel.this.breakpoints.get(row) : null;
-			}
-			public boolean isCellEditable(int row, int column)
-			{
-				return column==0;
-			}
-			public Class getColumnClass(int column)
-			{
-				return column==0 ? JToggleButton.class : String.class;
-			}
-		};
 				
-		this.list = new JTable(new TableSorter(lm));
-		TableSorter sorter = (TableSorter)list.getModel();
-		sorter.setTableHeader(list.getTableHeader());
-
-		this.setLayout(new BorderLayout());
-		JScrollPane sp = new JScrollPane(list);
-		this.add(sp, BorderLayout.CENTER);
-//		this.setBorder(BorderFactory.createTitledBorder("Rulebase"));
-
-		// Hack!!! Set header preferred size and afterwards set title text to "" (bug in JDK1.5).
-		list.getTableHeader().setPreferredSize(list.getTableHeader().getPreferredSize());
-		list.getColumnModel().getColumn(0).setHeaderRenderer(new DefaultTableCellRenderer()
-		{
-	        public Component getTableCellRendererComponent(JTable table, 
-	        	Object obj, boolean selected, boolean focus, int row, int column)
-	        {
-	        	setIcon(icons.getIcon("breakpoint"));
-	            setBorder(UIManager.getBorder("TableHeader.cellBorder"));
-	            setHorizontalAlignment(JLabel.CENTER);
-				setToolTipText("Use checkbox to enable/disable breakpoint on a rule.");
-	            return this;
-	        }
-	    });
-		list.getColumnModel().getColumn(1).setHeaderValue("Breakpoints");
-
-		list.setDefaultRenderer(JToggleButton.class, new ButtonCellManager());
-		list.setDefaultEditor(JToggleButton.class, new ButtonCellManager());
-		JCheckBox	but	= new JCheckBox();
-		but.setMargin(new Insets(0,0,0,0));
-		list.getColumnModel().getColumn(0).setMaxWidth(but.getPreferredSize().width+4);
-		
-		list.getSelectionModel().addListSelectionListener(new ListSelectionListener()
-		{
-			public void valueChanged(ListSelectionEvent e)
-			{
-				 if(!e.getValueIsAdjusting() && listeners!=null)
-				 {
-					 ChangeEvent	ce	= new ChangeEvent(this, EVENT_TYPE_SELECTED);
-					 for(int i=0; i<listeners.size(); i++)
-					 {
-						 ((IChangeListener)listeners.get(i)).changeOccurred(ce);
-					 }
-				 }
-			}
-		});
-		
 		container.getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				IComponentManagementService	ces	= (IComponentManagementService)result;
-				ces.addComponentListener(description.getName(), new IComponentListener()
+				IComponentManagementService	cms	= (IComponentManagementService)result;
+				cms.addComponentListener(description.getName(), new IComponentListener()
 				{
 					public void componentRemoved(IComponentDescription desc, Map results)
 					{
@@ -172,10 +102,79 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 					{
 					}
 				});
+				
+				TableModel lm = new AbstractTableModel()
+				{
+					public int getColumnCount()
+					{
+						return 2;
+					}
+					public int getRowCount()
+					{
+						return BreakpointPanel.this.breakpoints.size();
+					}
+					public Object getValueAt(int row, int column)
+					{
+						return column==1 ? BreakpointPanel.this.breakpoints.get(row) : null;
+					}
+					public boolean isCellEditable(int row, int column)
+					{
+						return column==0;
+					}
+					public Class getColumnClass(int column)
+					{
+						return column==0 ? JToggleButton.class : String.class;
+					}
+				};
+				
+				list = new JTable(new TableSorter(lm));
+				TableSorter sorter = (TableSorter)list.getModel();
+				sorter.setTableHeader(list.getTableHeader());
+
+				setLayout(new BorderLayout());
+				JScrollPane sp = new JScrollPane(list);
+				add(sp, BorderLayout.CENTER);
+//				this.setBorder(BorderFactory.createTitledBorder("Rulebase"));
+
+				// Hack!!! Set header preferred size and afterwards set title text to "" (bug in JDK1.5).
+				list.getTableHeader().setPreferredSize(list.getTableHeader().getPreferredSize());
+				list.getColumnModel().getColumn(0).setHeaderRenderer(new DefaultTableCellRenderer()
+				{
+			        public Component getTableCellRendererComponent(JTable table, 
+			        	Object obj, boolean selected, boolean focus, int row, int column)
+			        {
+			        	setIcon(icons.getIcon("breakpoint"));
+			            setBorder(UIManager.getBorder("TableHeader.cellBorder"));
+			            setHorizontalAlignment(JLabel.CENTER);
+						setToolTipText("Use checkbox to enable/disable breakpoint on a rule.");
+			            return this;
+			        }
+			    });
+				list.getColumnModel().getColumn(1).setHeaderValue("Breakpoints");
+
+				list.setDefaultRenderer(JToggleButton.class, new ButtonCellManager(cms));
+				list.setDefaultEditor(JToggleButton.class, new ButtonCellManager(cms));
+				JCheckBox	but	= new JCheckBox();
+				but.setMargin(new Insets(0,0,0,0));
+				list.getColumnModel().getColumn(0).setMaxWidth(but.getPreferredSize().width+4);
+				
+				list.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+				{
+					public void valueChanged(ListSelectionEvent e)
+					{
+						 if(!e.getValueIsAdjusting() && listeners!=null)
+						 {
+							 ChangeEvent	ce	= new ChangeEvent(this, EVENT_TYPE_SELECTED);
+							 for(int i=0; i<listeners.size(); i++)
+							 {
+								 ((IChangeListener)listeners.get(i)).changeOccurred(ce);
+							 }
+						 }
+					}
+				});
 			}
 		});
 	}
-	
 	
 	/**
 	 *  Dispose the panel
@@ -241,6 +240,13 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 	 */
 	public class ButtonCellManager	extends AbstractCellEditor	implements TableCellRenderer, TableCellEditor
 	{
+		protected IComponentManagementService cms;
+		
+		public ButtonCellManager(IComponentManagementService cms)
+		{
+			this.cms = cms;
+		}
+		
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int rowIndex, int column)
 		{
 			TableSorter sorter = (TableSorter)list.getModel();
@@ -273,9 +279,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 					{
 						bps.remove(breakpoints.get(sorter.modelIndex(rowIndex)));
 					}
-					// Hack! remove thread suspendabel
-					((IComponentManagementService)container.getService(IComponentManagementService.class).get(new ThreadSuspendable()))
-						.setComponentBreakpoints(description.getName(), (String[])bps.toArray(new String[bps.size()]));
+					cms.setComponentBreakpoints(description.getName(), (String[])bps.toArray(new String[bps.size()]));
 				}
 			});
 			return	ret;
