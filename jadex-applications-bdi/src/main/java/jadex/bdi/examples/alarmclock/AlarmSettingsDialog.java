@@ -4,6 +4,7 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.clock.IClockService;
 
@@ -227,6 +228,12 @@ public class AlarmSettingsDialog extends JDialog
 								agent.dispatchTopLevelGoalAndWait(playing).addResultListener(new DefaultResultListener()
 								{
 									public void resultAvailable(Object source, Object result)
+									{
+										play.setIcon(icons.getIcon("Play"));
+										stopPlaying();
+									}
+									
+									public void exceptionOccurred(Object source, Exception exception)
 									{
 										play.setIcon(icons.getIcon("Play"));
 										stopPlaying();
@@ -467,15 +474,21 @@ public class AlarmSettingsDialog extends JDialog
 	{
 		if(playing!=null)
 		{
-			playing.isFinished().addResultListener(new DefaultResultListener()
-			{
-				public void resultAvailable(Object source, Object result)
-				{
-					if(!((Boolean)result).booleanValue())
-						playing.drop();
-					playing = null;
-				}
-			});
+			playing.drop();
+//			playing.isFinished().addResultListener(new IResultListener()
+//			{
+//				public void resultAvailable(Object source, Object result)
+//				{
+//					if(!((Boolean)result).booleanValue())
+//						playing.drop();
+//					playing = null;
+//				}
+//				
+//				public void exceptionOccurred(Object source, Exception exception)
+//				{
+//					playing = null;
+//				}
+//			});
 		}
 	}
 

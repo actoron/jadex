@@ -73,8 +73,7 @@ public class PlaySongPlan extends Plan
 					try
 					{
 						AudioDevice dev = FactoryRegistry.systemRegistry().createAudioDevice();
-	
-						Player player = new Player(in, dev);
+						player = new Player(in, dev);
 						player.play();
 						lis.resultAvailable(PlaySongPlan.this, null);
 					}
