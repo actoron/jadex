@@ -74,58 +74,62 @@ public class WakeupAction extends CheckedAction
 	public void run()
 	{
 		Object ret = null;
-		
+		Exception e = null;
+
 		if(isTimeout())
 		{
 			if(wa!=null)
 			{
-				state.removeAttributeValue(scope, OAVBDIRuntimeModel.capability_has_externalaccesses, ea);
-				throw new TimeoutException();
+//				state.removeAttributeValue(scope, OAVBDIRuntimeModel.capability_has_externalaccesses, ea);
+				e = new TimeoutException();
 			}
 		}
-
-		Object de = state.getAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_dispatchedelement);
-		if(de!=null)
+		else
 		{
-			OAVObjectType type = state.getType(de);
-			if(OAVBDIRuntimeModel.goal_type.equals(type))
+			Object de = state.getAttributeValue(ea, OAVBDIRuntimeModel.externalaccess_has_dispatchedelement);
+			if(de!=null)
 			{
-				// When goal is not succeeded (or idle for maintaingoals) throw exception.
-				if(!OAVBDIRuntimeModel.GOALPROCESSINGSTATE_SUCCEEDED.equals(
-					state.getAttributeValue(de, OAVBDIRuntimeModel.goal_has_processingstate)))
+				OAVObjectType type = state.getType(de);
+				if(OAVBDIRuntimeModel.goal_type.equals(type))
 				{
-					Object	mgoal	= state.getAttributeValue(de, OAVBDIRuntimeModel.element_has_model);
-					if(!state.getType(mgoal).isSubtype(OAVBDIMetaModel.maintaingoal_type)
-						|| !OAVBDIRuntimeModel.GOALPROCESSINGSTATE_IDLE.equals(
-							state.getAttributeValue(de, OAVBDIRuntimeModel.goal_has_processingstate)))
+					// When goal is not succeeded (or idle for maintaingoals) throw exception.
+					if(!OAVBDIRuntimeModel.GOALPROCESSINGSTATE_SUCCEEDED.equals(
+						state.getAttributeValue(de, OAVBDIRuntimeModel.goal_has_processingstate)))
 					{
-						state.removeAttributeValue(scope, OAVBDIRuntimeModel.capability_has_externalaccesses, ea);
-						throw new GoalFailureException("Goal failed: "+de);
+						Object	mgoal	= state.getAttributeValue(de, OAVBDIRuntimeModel.element_has_model);
+						if(!state.getType(mgoal).isSubtype(OAVBDIMetaModel.maintaingoal_type)
+							|| !OAVBDIRuntimeModel.GOALPROCESSINGSTATE_IDLE.equals(
+								state.getAttributeValue(de, OAVBDIRuntimeModel.goal_has_processingstate)))
+						{
+//							state.removeAttributeValue(scope, OAVBDIRuntimeModel.capability_has_externalaccesses, ea);
+							e = new GoalFailureException("Goal failed: "+de+" "+state.getAttributeValue(mgoal, OAVBDIMetaModel.modelelement_has_name));
+						}
 					}
+					ret = EAGoalFlyweight.getGoalFlyweight(state, scope, de);
 				}
-				ret = EAGoalFlyweight.getGoalFlyweight(state, scope, de);
-			}
-			else if(OAVBDIRuntimeModel.internalevent_type.equals(type))
-			{
-				// Todo: Hack!!! wrong scope
-				ret = InternalEventFlyweight.getInternalEventFlyweight(state, scope, de);
-			}
-			else if(OAVBDIRuntimeModel.messageevent_type.equals(type))
-			{
-				// Todo: Hack!!! wrong scope
-				ret = MessageEventFlyweight.getMessageEventFlyweight(state, scope, de);
-			}
-			else if(OAVBDIRuntimeModel.changeevent_type.equals(type))
-			{
-				// Todo: Hack!!! wrong scope
-				ret = new ChangeEventFlyweight(state, scope, de);
-			}
-			else if(OAVBDIMetaModel.condition_type.equals(type))
-			{
-				// Todo: change event for triggered condition. 
-				ret = state.getAttributeValue(de, OAVBDIMetaModel.modelelement_has_name);
+				else if(OAVBDIRuntimeModel.internalevent_type.equals(type))
+				{
+					// Todo: Hack!!! wrong scope
+					ret = InternalEventFlyweight.getInternalEventFlyweight(state, scope, de);
+				}
+				else if(OAVBDIRuntimeModel.messageevent_type.equals(type))
+				{
+					// Todo: Hack!!! wrong scope
+					ret = MessageEventFlyweight.getMessageEventFlyweight(state, scope, de);
+				}
+				else if(OAVBDIRuntimeModel.changeevent_type.equals(type))
+				{
+					// Todo: Hack!!! wrong scope
+					ret = new ChangeEventFlyweight(state, scope, de);
+				}
+				else if(OAVBDIMetaModel.condition_type.equals(type))
+				{
+					// Todo: change event for triggered condition. 
+					ret = state.getAttributeValue(de, OAVBDIMetaModel.modelelement_has_name);
+				}
 			}
 		}
+		
 		state.removeAttributeValue(scope, OAVBDIRuntimeModel.capability_has_externalaccesses, ea);
 		if(wa!=null)
 			state.removeExternalObjectUsage(wa, eafly);
@@ -137,7 +141,10 @@ public class WakeupAction extends CheckedAction
 				ip.getEventReificator().removeObservedElement(observeds.get(i));
 		}
 		
-		future.setResult(ret);
+		if(e!=null)
+			future.setException(e);
+		else
+			future.setResult(ret);
 	}
 	
 	/**

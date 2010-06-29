@@ -80,7 +80,7 @@ public class AlarmsGui extends JFrame
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				final IClockService clock = (IClockService)result;
+				final IClockService cs = (IClockService)result;
 				alarms = new JTable(tadata)
 				{
 					public Component prepareRenderer(
@@ -91,8 +91,8 @@ public class AlarmsGui extends JFrame
 						if(!isRowSelected(row))
 						{
 							Alarm alarm = (Alarm)tadata.getObjectForRow(row);
-							IClockService cs = (IClockService)agent.getServiceContainer().getService(IClockService.class);
-							if(alarm.getAlarmtime(clock.getTime())<cs.getTime())
+//							IClockService cs = (IClockService)agent.getServiceContainer().getService(IClockService.class);
+							if(alarm.getAlarmtime(cs.getTime())<cs.getTime())
 							{
 								c.setBackground(new Color(255, 211, 156));
 							}
@@ -191,6 +191,7 @@ public class AlarmsGui extends JFrame
 //					}
 //				});
 				getContentPane().add("Center", pan);
+				pack();
 			}
 		});
 		

@@ -77,151 +77,166 @@ public class DebuggerMainPanel extends JSplitPane
 		this.setOneTouchExpandable(true);
 		setDividerLocation(150);
 		
-		IComponentManagementService	ces	= ((IComponentManagementService)
-			jcc.getServiceContainer().getService(IComponentManagementService.class));
-		
-		// The right panel (step & custom tabs)
-		JPanel	rightpanel	= new JPanel();
-		this.setRightComponent(rightpanel);
-		rightpanel.setLayout(new GridBagLayout());
-		
-		final JTabbedPane	tabs	= new JTabbedPane();		
-		IFuture ret = ces.getExternalAccess(desc.getName());
-		ret.addResultListener(new IResultListener()
-		{			
-			public void resultAvailable(Object source, final Object result)
-			{
-				// The left panel (breakpoints)
-				final IExternalAccess exta = (IExternalAccess)result;
-				final BreakpointPanel[] leftpanel = new BreakpointPanel[1];
-				final Map props = ((IExternalAccess)result).getModel().getProperties();
-				SwingUtilities.invokeLater(new Runnable()
-				{
-					public void run()
-					{
-						if(props!=null && props.containsKey(KEY_DEBUGGER_BREAKPOINTS))
-						{
-							Collection	breakpoints	= (Collection)props.get(KEY_DEBUGGER_BREAKPOINTS);
-							leftpanel[0] = new BreakpointPanel(breakpoints, desc, jcc.getServiceContainer());
-							DebuggerMainPanel.this.setLeftComponent(leftpanel[0]);
-							DebuggerMainPanel.this.setDividerLocation(150);	// Hack???
-						}
-						else
-						{
-							JPanel nobreakpoints = new JPanel();
-							nobreakpoints.add(new JLabel("no breakpoints"));
-							DebuggerMainPanel.this.setLeftComponent(nobreakpoints);
-							DebuggerMainPanel.this.setDividerLocation(0);
-						}
-						
-						// Sub panels of right panel.
-						SComponentFactory.getProperties(DebuggerMainPanel.this.jcc.getServiceContainer(), DebuggerMainPanel.this.desc.getType())
-							.addResultListener(new SwingDefaultResultListener()
-						{
-							public void customResultAvailable(Object source, Object result)
-							{
-								Map props2	= (Map)result;
-								if(props2!=null && props2.containsKey(KEY_DEBUGGER_PANELS))
-								{
-									final ILibraryService	libservice	= (ILibraryService)DebuggerMainPanel.this.jcc.getServiceContainer().getService(ILibraryService.class);
-									String	panels	= (String)props2.get(KEY_DEBUGGER_PANELS);
-									StringTokenizer	stok	= new StringTokenizer(panels, ", \t\n\r\f");
-									while(stok.hasMoreTokens())
-									{
-										String classname	= stok.nextToken();
-										try
-										{
-											Class clazz	= SReflect.classForName(classname, libservice.getClassLoader());
-											IDebuggerPanel	panel	= (IDebuggerPanel)clazz.newInstance();
-											panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
-											tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
-										}
-										catch(Exception e)
-										{
-											e.printStackTrace();
-											DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panel.", "Debugger panel class: "+classname, e);
-										}
-									}
-								}
-								else
-								{
-									ObjectInspectorDebuggerPanel panel = new ObjectInspectorDebuggerPanel();
-									panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
-									tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
-								}
-							}
-						});
-					}
-				});
-			}
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-				DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panels.", null, exception);
-			}
-		});
-		
-		this.step = new JButton("Step");
-		step.addActionListener(new ActionListener()
+		jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			public void customResultAvailable(Object source, Object result)
 			{
-				step.setEnabled(false);
-				run.setEnabled(false);
-				IComponentManagementService	ces	= (IComponentManagementService)
-					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentManagementService.class);
-				IFuture ret = ces.stepComponent(DebuggerMainPanel.this.desc.getName());
+				IComponentManagementService	ces	= (IComponentManagementService)result;
+				// The right panel (step & custom tabs)
+				JPanel	rightpanel	= new JPanel();
+				setRightComponent(rightpanel);
+				rightpanel.setLayout(new GridBagLayout());
+				
+				final JTabbedPane	tabs	= new JTabbedPane();		
+				IFuture ret = ces.getExternalAccess(desc.getName());
 				ret.addResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object source, Object result)
+				{			
+					public void resultAvailable(Object source, final Object result)
 					{
-						updatePanel((IComponentDescription)result);
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
-						// Hack!!! keep tool reactive in case of error!?
+						// The left panel (breakpoints)
+						final IExternalAccess exta = (IExternalAccess)result;
+						final BreakpointPanel[] leftpanel = new BreakpointPanel[1];
+						final Map props = ((IExternalAccess)result).getModel().getProperties();
 						SwingUtilities.invokeLater(new Runnable()
 						{
 							public void run()
 							{
-								step.setEnabled(true);
-								run.setEnabled(true);
+								if(props!=null && props.containsKey(KEY_DEBUGGER_BREAKPOINTS))
+								{
+									Collection	breakpoints	= (Collection)props.get(KEY_DEBUGGER_BREAKPOINTS);
+									leftpanel[0] = new BreakpointPanel(breakpoints, desc, jcc.getServiceContainer());
+									DebuggerMainPanel.this.setLeftComponent(leftpanel[0]);
+									DebuggerMainPanel.this.setDividerLocation(150);	// Hack???
+								}
+								else
+								{
+									JPanel nobreakpoints = new JPanel();
+									nobreakpoints.add(new JLabel("no breakpoints"));
+									DebuggerMainPanel.this.setLeftComponent(nobreakpoints);
+									DebuggerMainPanel.this.setDividerLocation(0);
+								}
+								
+								// Sub panels of right panel.
+								SComponentFactory.getProperties(DebuggerMainPanel.this.jcc.getServiceContainer(), DebuggerMainPanel.this.desc.getType())
+									.addResultListener(new SwingDefaultResultListener()
+								{
+									public void customResultAvailable(Object source, Object result)
+									{
+										final Map props2 = (Map)result;
+										if(props2!=null && props2.containsKey(KEY_DEBUGGER_PANELS))
+										{
+											DebuggerMainPanel.this.jcc.getServiceContainer().getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
+											{
+												public void customResultAvailable(Object source, Object result)
+												{
+													final ILibraryService	libservice	= (ILibraryService)result;
+													String	panels	= (String)props2.get(KEY_DEBUGGER_PANELS);
+													StringTokenizer	stok	= new StringTokenizer(panels, ", \t\n\r\f");
+													while(stok.hasMoreTokens())
+													{
+														String classname	= stok.nextToken();
+														try
+														{
+															Class clazz	= SReflect.classForName(classname, libservice.getClassLoader());
+															IDebuggerPanel	panel	= (IDebuggerPanel)clazz.newInstance();
+															panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
+															tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
+														}
+														catch(Exception e)
+														{
+															e.printStackTrace();
+															DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panel.", "Debugger panel class: "+classname, e);
+														}
+													}
+												}
+											});
+										}
+										else
+										{
+											ObjectInspectorDebuggerPanel panel = new ObjectInspectorDebuggerPanel();
+											panel.init(DebuggerMainPanel.this.jcc, leftpanel[0], DebuggerMainPanel.this.desc.getName(), exta);
+											tabs.addTab(panel.getTitle(), panel.getIcon(), panel.getComponent(), panel.getTooltipText());
+										}
+									}
+								});
+							}
+						});
+					}
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+						DebuggerMainPanel.this.jcc.displayError("Error initializing debugger panels.", null, exception);
+					}
+				});
+				
+				
+				step = new JButton("Step");
+				step.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						step.setEnabled(false);
+						run.setEnabled(false);
+						DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
+						{
+							public void customResultAvailable(Object source, Object result)
+							{
+								IComponentManagementService	ces	= (IComponentManagementService)result;
+								IFuture ret = ces.stepComponent(DebuggerMainPanel.this.desc.getName());
+								ret.addResultListener(new IResultListener()
+								{
+									public void resultAvailable(Object source, Object result)
+									{
+										updatePanel((IComponentDescription)result);
+									}
+									
+									public void exceptionOccurred(Object source, Exception exception)
+									{
+										// Hack!!! keep tool reactive in case of error!?
+										step.setEnabled(true);
+										run.setEnabled(true);
+									}
+								});
 							}
 						});
 					}
 				});
-			}
-		});
-		
-		this.run = new JButton("Run");
-		run.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				step.setEnabled(false);
-				run.setEnabled(false);
-				stepmode.setSelected(false);
-				final IComponentManagementService	ces	= (IComponentManagementService)
-					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentManagementService.class);
-				IFuture ret = ces.stepComponent(DebuggerMainPanel.this.desc.getName());
-				ret.addResultListener(new IResultListener()
+				
+				run = new JButton("Run");
+				run.addActionListener(new ActionListener()
 				{
-					public void resultAvailable(Object source, Object result)
+					public void actionPerformed(ActionEvent e)
 					{
-						IFuture ret = ces.resumeComponent(DebuggerMainPanel.this.desc.getName()); 
-						ret.addResultListener(new IResultListener()
+						step.setEnabled(false);
+						run.setEnabled(false);
+						stepmode.setSelected(false);
+						DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 						{
-							public void resultAvailable(Object source, Object result)
+							public void customResultAvailable(Object source, Object result)
 							{
-								updatePanel((IComponentDescription)result);
-							}
-							
-							public void exceptionOccurred(Object source, Exception exception)
-							{
-								// Hack!!! keep tool reactive in case of error!?
-								SwingUtilities.invokeLater(new Runnable()
+								final IComponentManagementService	ces	= (IComponentManagementService)result;
+								IFuture ret = ces.stepComponent(DebuggerMainPanel.this.desc.getName());
+								ret.addResultListener(new IResultListener()
 								{
-									public void run()
+									public void resultAvailable(Object source, Object result)
+									{
+										IFuture ret = ces.resumeComponent(DebuggerMainPanel.this.desc.getName()); 
+										ret.addResultListener(new IResultListener()
+										{
+											public void resultAvailable(Object source, Object result)
+											{
+												updatePanel((IComponentDescription)result);
+											}
+											
+											public void exceptionOccurred(Object source, Exception exception)
+											{
+												step.setEnabled(true);
+												run.setEnabled(true);
+												stepmode.setSelected(true);
+											}
+										});
+									}
+									
+									public void exceptionOccurred(Object source, Exception exception)
 									{
 										step.setEnabled(true);
 										run.setEnabled(true);
@@ -231,73 +246,64 @@ public class DebuggerMainPanel extends JSplitPane
 							}
 						});
 					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
+				});
+				
+				stepmode = new JCheckBox("Step Mode");
+				stepmode.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
 					{
-						// Hack!!! keep tool reactive in case of error!?
-						SwingUtilities.invokeLater(new Runnable()
+						DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 						{
-							public void run()
+							public void customResultAvailable(Object source, Object result)
 							{
-								step.setEnabled(true);
-								run.setEnabled(true);
-								stepmode.setSelected(true);
+								IComponentManagementService	ces	= (IComponentManagementService)result;
+								if(stepmode.isSelected())
+								{
+									ces.suspendComponent(DebuggerMainPanel.this.desc.getName());
+								}
+								else
+								{
+									ces.resumeComponent(DebuggerMainPanel.this.desc.getName());
+								}
+								step.setEnabled(stepmode.isSelected());		
+								run.setEnabled(stepmode.isSelected());	
 							}
 						});
 					}
 				});
-			}
-		});
-		
-		this.stepmode = new JCheckBox("Step Mode");
-		stepmode.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				IComponentManagementService	ces	= (IComponentManagementService)
-					DebuggerMainPanel.this.jcc.getServiceContainer().getService(IComponentManagementService.class);
-				if(stepmode.isSelected())
-				{
-					ces.suspendComponent(DebuggerMainPanel.this.desc.getName());
-				}
-				else
-				{
-					ces.resumeComponent(DebuggerMainPanel.this.desc.getName());
-				}
-				step.setEnabled(stepmode.isSelected());		
-				run.setEnabled(stepmode.isSelected());		
-			}
-		});
+						
+				int row	= 0;
+				int	col	= 0;
+				rightpanel.add(tabs, new GridBagConstraints(col++, row, GridBagConstraints.REMAINDER, 1,
+						1,1, GridBagConstraints.LINE_END, GridBagConstraints.BOTH, new Insets(1,1,1,1), 0,0));
+				row++;
+				col	= 0;
+				rightpanel.add(stepmode, new GridBagConstraints(col++, row, 1, 1,
+					1,0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
+				rightpanel.add(step, new GridBagConstraints(col++, row, 1, 1,
+						0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
+				rightpanel.add(run, new GridBagConstraints(col, row++, GridBagConstraints.REMAINDER, 1,
+						0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
+
 				
-		int row	= 0;
-		int	col	= 0;
-		rightpanel.add(tabs, new GridBagConstraints(col++, row, GridBagConstraints.REMAINDER, 1,
-				1,1, GridBagConstraints.LINE_END, GridBagConstraints.BOTH, new Insets(1,1,1,1), 0,0));
-		row++;
-		col	= 0;
-		rightpanel.add(stepmode, new GridBagConstraints(col++, row, 1, 1,
-			1,0, GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
-		rightpanel.add(step, new GridBagConstraints(col++, row, 1, 1,
-				0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
-		rightpanel.add(run, new GridBagConstraints(col, row++, GridBagConstraints.REMAINDER, 1,
-				0,0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(1,1,1,1), 0,0));
+				updatePanel((IComponentDescription)desc);
 
-		
-		updatePanel((IComponentDescription)desc);
-
-		ces.addComponentListener(desc.getName(), new IComponentListener()
-		{			
-			public void componentChanged(IComponentDescription desc)
-			{
-				updatePanel(desc);
+				ces.addComponentListener(desc.getName(), new IComponentListener()
+				{			
+					public void componentChanged(IComponentDescription desc)
+					{
+						updatePanel(desc);
+					}
+					public void componentRemoved(IComponentDescription desc, Map results)
+					{
+					}			
+					public void componentAdded(IComponentDescription desc)
+					{
+					}
+				});		
 			}
-			public void componentRemoved(IComponentDescription desc, Map results)
-			{
-			}			
-			public void componentAdded(IComponentDescription desc)
-			{
-			}
-		});		
+		});
 	}
 
 	/**

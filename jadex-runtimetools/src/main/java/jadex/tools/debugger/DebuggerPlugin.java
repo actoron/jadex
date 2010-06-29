@@ -7,6 +7,7 @@ import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.SGUI;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.tools.common.CombiIcon;
 import jadex.tools.common.ComponentTreeTable;
 import jadex.tools.common.ComponentTreeTableNodeType;
@@ -242,37 +243,44 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 			}
 		});
 
-		IComponentManagementService ces = (IComponentManagementService)jcc.getServiceContainer().getService(IComponentManagementService.class);
-		IFuture ret = ces.getComponentDescriptions();
-		ret.addResultListener(new IResultListener()
+		jcc.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 		{
-			public void resultAvailable(Object source, Object result)
+			public void customResultAvailable(Object source, Object result)
 			{
-				IComponentDescription[] res = (IComponentDescription[])result;
-				for(int i=0; i<res.length; i++)
-					agentBorn(res[i]);
-			}
-			
-			public void exceptionOccurred(Object source, Exception exception)
-			{
-			}
-		});
-		ces.addComponentListener(null, new IComponentListener()
-		{
-			public void componentRemoved(IComponentDescription desc, Map results)
-			{
-				agentDied(desc);
-			}
-			
-			public void componentAdded(IComponentDescription desc)
-			{
-				agentBorn(desc);
-			}
+				IComponentManagementService ces = (IComponentManagementService)result;
+				IFuture ret = ces.getComponentDescriptions();
+				ret.addResultListener(new IResultListener()
+				{
+					public void resultAvailable(Object source, Object result)
+					{
+						IComponentDescription[] res = (IComponentDescription[])result;
+						for(int i=0; i<res.length; i++)
+							agentBorn(res[i]);
+					}
+					
+					public void exceptionOccurred(Object source, Exception exception)
+					{
+					}
+				});
+				ces.addComponentListener(null, new IComponentListener()
+				{
+					public void componentRemoved(IComponentDescription desc, Map results)
+					{
+						agentDied(desc);
+					}
+					
+					public void componentAdded(IComponentDescription desc)
+					{
+						agentBorn(desc);
+					}
 
-			public void componentChanged(IComponentDescription desc)
-			{
+					public void componentChanged(IComponentDescription desc)
+					{
+					}
+				});
 			}
 		});
+		
 		
 //		SwingUtilities.invokeLater(new Runnable()
 //		{

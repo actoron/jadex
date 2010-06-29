@@ -278,17 +278,13 @@ public class ClockFrame extends JFrame
 				ex.printStackTrace();
 			}
 		}
-		
 
-		pack();
-		setLocation(SGUI.calculateMiddlePosition(ClockFrame.this));
-		setVisible(true);
-
-		timer	= new Timer(1000, new ActionListener()
+		refresh(true);
+		timer = new Timer(1000, new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				refresh();
+				refresh(false);
 			}
 		});
 		timer.setRepeats(true);
@@ -321,9 +317,9 @@ public class ClockFrame extends JFrame
 	/**
 	 *  Refresh the clock.
 	 */
-	public void refresh()
+	public void refresh(final boolean init)
 	{
-		final boolean[] firsttime = new boolean[]{true};
+//		final boolean[] firsttime = new boolean[]{true};
 		try
 		{
 			agent.getBeliefbase().getBeliefFact("settings").addResultListener(new DefaultResultListener()
@@ -333,22 +329,22 @@ public class ClockFrame extends JFrame
 					final Settings sets = (Settings)result;
 					agent.getServiceContainer().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
 					{
-						
 						public void customResultAvailable(Object source, Object result)
 						{
 							IClockService cs = (IClockService)result;
 							Date current = new Date(cs.getTime());
 							
-							if(sets.isAMPM()!=last_ampm || sets.getFontsize()!=last_fontsize || firsttime[0] )
+							if(sets.isAMPM()!=last_ampm || sets.getFontsize()!=last_fontsize || init)
 							{
 								if(sets.isAMPM())
 									format.applyPattern("hh:mm:ss a");
 								else
 									format.applyPattern("HH:mm:ss");
-								firsttime[0] = false;
 								time.setFont(time.getFont().deriveFont((float)sets.getFontsize()));
 								time.setText(format.format(current));
 								pack();
+								setLocation(SGUI.calculateMiddlePosition(ClockFrame.this));
+								setVisible(true);
 								last_ampm = sets.isAMPM();
 								last_fontsize = sets.getFontsize();
 							}

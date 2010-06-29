@@ -315,7 +315,7 @@ public class OptionDialog extends JDialog
 		to.setFilename(from.getFilename());
 		to.setFontsize(from.getFontsize());
 		if(rep)
-			((ClockFrame)getParent()).refresh();
+			((ClockFrame)getParent()).refresh(false);
 	}
 
 	/**

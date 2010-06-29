@@ -258,13 +258,13 @@ public abstract class EACapabilityFlyweight extends ElementFlyweight implements 
 			{
 				public void run()
 				{
-					ret.setResult(((IClockService)getAgentAdapter().getServiceContainer().getService(IClockService.TYPE)).getTime());
+					ret.setResult(getInterpreter().getClockService().getTime());
 				}
 			});
 		}
 		else
 		{
-			ret.setResult(((IClockService)getAgentAdapter().getServiceContainer().getService(IClockService.TYPE)).getTime());
+			ret.setResult(getInterpreter().getClockService().getTime());
 		}
 		
 		return ret;

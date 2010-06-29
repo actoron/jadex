@@ -8,6 +8,7 @@ import jadex.commons.IBreakpointPanel;
 import jadex.commons.IChangeListener;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.rules.tools.common.TableSorter;
 import jadex.service.IServiceContainer;
 
@@ -73,7 +74,7 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 	/**
 	 *  Create a new rulebase panel.
 	 */
-	public BreakpointPanel(Collection breakpoints, IComponentDescription description, IServiceContainer container)
+	public BreakpointPanel(Collection breakpoints, final IComponentDescription description, IServiceContainer container)
 	{
 		this.breakpoints = new ArrayList(breakpoints);
 		this.description	= description;
@@ -149,21 +150,27 @@ public class BreakpointPanel extends JPanel	implements IBreakpointPanel
 			}
 		});
 		
-		IComponentManagementService	ces	= (IComponentManagementService)container.getService(IComponentManagementService.class);
-		ces.addComponentListener(description.getName(), new IComponentListener()
+		container.getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 		{
-			public void componentRemoved(IComponentDescription desc, Map results)
+			public void customResultAvailable(Object source, Object result)
 			{
-			}
-			
-			public void componentChanged(IComponentDescription desc)
-			{
-				BreakpointPanel.this.description	= desc;
-				// Todo: update gui?
-			}
-			
-			public void componentAdded(IComponentDescription desc)
-			{
+				IComponentManagementService	ces	= (IComponentManagementService)result;
+				ces.addComponentListener(description.getName(), new IComponentListener()
+				{
+					public void componentRemoved(IComponentDescription desc, Map results)
+					{
+					}
+					
+					public void componentChanged(IComponentDescription desc)
+					{
+						BreakpointPanel.this.description	= desc;
+						// Todo: update gui?
+					}
+					
+					public void componentAdded(IComponentDescription desc)
+					{
+					}
+				});
 			}
 		});
 	}
