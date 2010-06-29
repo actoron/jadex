@@ -5,7 +5,6 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SGUI;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.PropertiesXMLHelper;
@@ -19,7 +18,6 @@ import jadex.tools.common.plugin.IControlCenterPlugin;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -417,36 +415,27 @@ public class ControlCenter implements IControlCenter
 			}
 
 
-			try
+			container.getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener(window)
 			{
-				// Todo: save project
-//				FileOutputStream os = new FileOutputStream(project);
-//				XMLPropertiesReader.writeProperties(props, os);
-//				os.close();
-//				setStatusText("Project saved successfully: "+ project.getAbsolutePath());
-				
-				// for testing the writer
-				FileOutputStream os = new FileOutputStream(project);
-				PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)container
-					.getService(ILibraryService.class)).getClassLoader(), null);
-				os.close();
-				setStatusText("Project saved successfully: "+ project.getAbsolutePath());
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-				final String failed = SUtil
-					.wrapText("Could not save data in properties file\n\n"+ e.getMessage());
-				SwingUtilities.invokeLater(new Runnable()
+				public void customResultAvailable(Object source, Object result)
 				{
-					public void run()
+					try
 					{
-						JOptionPane.showMessageDialog(window, failed,
-							"Properties Error", JOptionPane.ERROR_MESSAGE);
+						FileOutputStream os = new FileOutputStream(project);
+						PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)result).getClassLoader(), null);
+						os.close();
+						setStatusText("Project saved successfully: "+ project.getAbsolutePath());
 					}
-				});
-				// e2.printStackTrace();
-			}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+						String failed = SUtil
+							.wrapText("Could not save data in properties file\n\n"+ e.getMessage());
+						JOptionPane.showMessageDialog(window, failed,
+									"Properties Error", JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			});
 		}
 	}
 

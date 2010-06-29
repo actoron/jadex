@@ -1085,7 +1085,7 @@ public class AgentRules
 		final OAVBDIFetcher fetcher = new OAVBDIFetcher(state, rcapa);
 //		InitFetcher fet = new InitFetcher(state, rcapa, parents, arguments);
 
-		// Register belief(set) types for mplan triggers (most be done before beliefs are initialized).
+		// Register belief(set) types for mplan triggers (must be done before beliefs are initialized).
 		Collection	mplans	= state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_plans);
 		if(mplans!=null)
 		{

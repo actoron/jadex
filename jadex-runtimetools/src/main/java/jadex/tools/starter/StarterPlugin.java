@@ -603,25 +603,32 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 			TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
 			for(int i=0; paths!=null && i<paths.length; i++) 
 			{
-				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
+				final DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
 				if(node!=null && node.getUserObject() instanceof IComponentDescription)
 				{
-					IComponentManagementService ces = (IComponentManagementService)getJCC().getServiceContainer().getService(IComponentManagementService.class);
-					
-					IResultListener lis = new IResultListener()
+					getJCC().getServiceContainer().getService(IComponentManagementService.class).addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
-							getJCC().setStatusText("Killed component: " + result);
-						}						
+							((IComponentManagementService)result).destroyComponent(((IComponentDescription)node.getUserObject()).getName()).addResultListener(new IResultListener()
+							{
+								public void resultAvailable(Object source, Object result)
+								{
+									getJCC().setStatusText("Killed component: " + result);
+								}
+								
+								public void exceptionOccurred(Object source, Exception exception)
+								{
+									getJCC().displayError("Problem Killing Component", "Component could not be killed.", exception);
+								}
+							});
+						}
+						
 						public void exceptionOccurred(Object source, Exception exception)
 						{
 							getJCC().displayError("Problem Killing Component", "Component could not be killed.", exception);
 						}
-					};
-					
-					IFuture ret = ces.destroyComponent(((IComponentDescription)node.getUserObject()).getName());
-					ret.addResultListener(lis);
+					});					
 				}
 			}
 		}

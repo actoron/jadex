@@ -82,7 +82,7 @@
 					<env:property name="text" class="String" dynamic="true">
 						"Collected ore: "+$object.getProperty("ore")+" \n"+
 						"Remaining time: "+new SimpleDateFormat("mm:ss").format(new Date(Math.max(0, $object.getProperty("missiontime")
-							- $object.getProperty("space").getContext().getServiceContainer().getService(IClockService.class).getTime())))
+							- $clock.getTime())))
 					</env:property>
 				</env:objecttype>
 			</env:objecttypes>
@@ -207,7 +207,7 @@
 							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
 							<env:property name="space">$space</env:property><!-- hack!!! -->
 							<env:property name="missiontime">
-								90000 + $space.getContext().getServiceContainer().getService(IClockService.class).getTime()
+								90000 + $clock.getTime()
 							</env:property>
 						</env:object>
 						<env:object type="target">
@@ -291,7 +291,7 @@
 						<env:object type="homebase">
 							<env:property name="space">$space</env:property><!-- hack!!! -->
 							<env:property name="missiontime">
-								3000000 + $space.getContext().getServiceContainer().getService(IClockService.class).getTime()
+								3000000 + $clock.getTime()
 							</env:property>
 						</env:object>
 						<env:object type="target" number="20">
