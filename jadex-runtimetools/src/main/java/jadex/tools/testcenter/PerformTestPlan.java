@@ -36,7 +36,7 @@ public class PerformTestPlan extends Plan
 		getLogger().info("Performing testcase: "+testcase.getType());
 		long	starttime	= getTime();
 
-		IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
+		IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class).get(this);
 		try
 		{
 //			SyncResultListener	id	= new SyncResultListener();
@@ -87,10 +87,9 @@ public class PerformTestPlan extends Plan
 	{
 		if(testagent!=null)
 		{
-			IComponentManagementService	ces	= (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
+			IComponentManagementService	cms	= (IComponentManagementService)getScope().getServiceContainer().getService(IComponentManagementService.class);
 			// Empty listener avoids failures printed to console.
-			IFuture ret = ces.destroyComponent(testagent);
-			ret.get(this);
+			cms.destroyComponent(testagent).get(this);
 			/*, new IResultListener()
 			{
 				public void resultAvailable(Object source, Object result)

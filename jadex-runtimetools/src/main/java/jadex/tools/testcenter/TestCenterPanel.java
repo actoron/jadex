@@ -3,8 +3,6 @@ package jadex.tools.testcenter;
 import jadex.base.SComponentFactory;
 import jadex.base.test.Testcase;
 import jadex.bdi.runtime.AgentEvent;
-import jadex.bdi.runtime.IEABelief;
-import jadex.bdi.runtime.IEABeliefbase;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
@@ -15,6 +13,7 @@ import jadex.commons.SGUI;
 import jadex.commons.SUtil;
 import jadex.commons.ThreadSuspendable;
 import jadex.commons.concurrent.IResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.library.ILibraryService;
 import jadex.tools.common.BrowserPane;
 import jadex.tools.common.EditableList;
@@ -318,30 +317,46 @@ public class TestCenterPanel extends JSplitPane
 				if(loadsavechooser.showDialog(SGUI.getWindowParent(TestCenterPanel.this)
 					, "Save")==JFileChooser.APPROVE_OPTION)
 				{
-					File file = loadsavechooser.getSelectedFile();
-					if(file!=null)
+					plugin.getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 					{
-						try
+						public void customResultAvailable(Object source, Object result)
 						{
-							if(!file.getName().endsWith(FILEEXTENSION_TESTS))
+							try
 							{
-								file	= new File(file.getParentFile(), file.getName()+FILEEXTENSION_TESTS);
-								loadsavechooser.setSelectedFile(file);
+								File file = loadsavechooser.getSelectedFile();
+								if(file!=null)
+								{
+									if(!file.getName().endsWith(FILEEXTENSION_TESTS))
+									{
+										file = new File(file.getParentFile(), file.getName()+FILEEXTENSION_TESTS);
+										loadsavechooser.setSelectedFile(file);
+									}
+									FileWriter fos = new FileWriter(file);
+									fos.write(JavaWriter.objectToXML(teststable.getEntries(), ((ILibraryService)result).getClassLoader()));
+									fos.close();
+								}
 							}
-							ClassLoader cl = ((ILibraryService)plugin.getJCC().getServiceContainer().getService(ILibraryService.class)).getClassLoader();
-							FileWriter fos = new FileWriter(file);
-							fos.write(JavaWriter.objectToXML(teststable.getEntries(), cl));
-							fos.close();
+							catch(Exception e)
+							{
+								e.printStackTrace();
+							}
 						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
-						}
-					}
+					});
 				}
 			}
 		});
 
+		SwingDefaultResultListener d = new SwingDefaultResultListener()
+		{
+			
+			@Override
+			public void customResultAvailable(Object source, Object result)
+			{
+				// TODO Auto-generated method stub
+				
+			}
+		};
+		
 		load.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent ae)
@@ -349,40 +364,45 @@ public class TestCenterPanel extends JSplitPane
 				if(loadsavechooser.showDialog(SGUI.getWindowParent(TestCenterPanel.this)
 					, "Load")==JFileChooser.APPROVE_OPTION)
 				{
-					File file = loadsavechooser.getSelectedFile();
-					if(file!=null)
+					plugin.getJCC().getServiceContainer().getService(ILibraryService.class).addResultListener(new SwingDefaultResultListener()
 					{
-						FileReader fis = null;
-						try
+						public void customResultAvailable(Object source, Object result) 
 						{
-							fis = new FileReader(file);
-							StringBuffer out = new StringBuffer();
-							char[] b = new char[4096];
-							for(int n; (n = fis.read(b)) != -1;) 
+							File file = loadsavechooser.getSelectedFile();
+							if(file!=null)
 							{
-								out.append(new String(b, 0, n));
-							}
-							ClassLoader cl = ((ILibraryService)plugin.getJCC().getServiceContainer().getService(ILibraryService.class)).getClassLoader();
-							String[] names = (String[])JavaReader.objectFromXML(out.toString(), cl);
-							teststable.setEntries(names);
-						}
-						catch(Exception e)
-						{
-						}
-						finally
-						{
-							if(fis!=null)
-							{
+								FileReader fis = null;
 								try
 								{
-									fis.close();
+									fis = new FileReader(file);
+									StringBuffer out = new StringBuffer();
+									char[] b = new char[4096];
+									for(int n; (n = fis.read(b)) != -1;) 
+									{
+										out.append(new String(b, 0, n));
+									}
+									String[] names = (String[])JavaReader.objectFromXML(out.toString(), ((ILibraryService)result).getClassLoader());
+									teststable.setEntries(names);
 								}
 								catch(Exception e)
 								{
 								}
+								finally
+								{
+									if(fis!=null)
+									{
+										try
+										{
+											fis.close();
+										}
+										catch(Exception e)
+										{
+										}
+									}
+								}
 							}
-						}
-					}
+						};
+					});
 				}
 			}
 		});
@@ -1125,37 +1145,33 @@ public class TestCenterPanel extends JSplitPane
 		 */
 		public void goalFinished(final AgentEvent ae)
 		{			
-			((IGoal)ae.getSource()).removeGoalListener(this);
-			SwingUtilities.invokeLater(new Runnable()
+			((IEAGoal)ae.getSource()).removeGoalListener(this);
+			// Handling of finished goal.
+			final IEAGoal goal = (IEAGoal)ae.getSource();
+			
+			// Ignore if goal is leftover from aborted execution.
+			if(goals.remove(goal))
 			{
-				public void run()
+				goal.isSucceeded().addResultListener(new SwingDefaultResultListener()
 				{
-					try
+					public void customResultAvailable(Object source, Object result)
 					{
-						// Handling of finished goal.
-						IGoal	goal	= (IGoal)ae.getSource();
-						
-						// Ignore if goal is leftover from aborted execution.
-						if(goals.remove(goal))
+						if(!((Boolean)result).booleanValue() && !aborted)
 						{
-							if(!goal.isSucceeded() && !aborted)
-							{
-								String text = SUtil.wrapText("Testcase error: "+goal.getException().getMessage());
-								JOptionPane.showMessageDialog(SGUI.getWindowParent(TestCenterPanel.this),
-									text, "Testcase problem", JOptionPane.INFORMATION_MESSAGE);
-							}
-							
-	//						System.out.println("Goal finished: "+goal);
-							startNextTestcases();
-							updateProgress();
-							updateDetails();
+//								String text = SUtil.wrapText("Testcase error: "+goal.getException().getMessage());
+							String text = SUtil.wrapText("Testcase error: "+goal);
+							JOptionPane.showMessageDialog(SGUI.getWindowParent(TestCenterPanel.this),
+								text, "Testcase problem", JOptionPane.INFORMATION_MESSAGE);
 						}
+						
+						startNextTestcases();
+						updateProgress();
+						updateDetails();
 					}
-					catch(ComponentTerminatedException cte)
-					{
-					}
-				}
-			});
+				});
+				
+//						System.out.println("Goal finished: "+goal);
+			}
 		}
 		
 		/**

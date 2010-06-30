@@ -58,32 +58,30 @@ public class SimCenterPanel extends JPanel
 		super(new BorderLayout());
 		this.simcenter = simcenter;
 		
+		dateformat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss S");
+		
+		//this.clockp	= new ClockPanel(getClock());
+		clockp	= new ClockPanel(SimCenterPanel.this);
+		contextp	= new ContextPanel(SimCenterPanel.this);
+		JPanel left	= new JPanel(new BorderLayout());
+		left.add(clockp, BorderLayout.NORTH);
+		left.add(contextp, BorderLayout.SOUTH);
+		
+		timerp	= new TimerPanel(SimCenterPanel.this);
+		
+		JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		sp.setOneTouchExpandable(true);
+		sp.add(left);
+		sp.add(timerp);
+		
+		add(sp, "Center");
+		
 		simcenter.getJCC().getServiceContainer().getService(ISimulationService.class).addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object source, Object result)
 			{
-				ISimulationService simservice = (ISimulationService)result;
-				
-				if(simservice==null)
-					throw new RuntimeException("Could not find simulation service: "+simservice);
-				
-				dateformat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss S");
-				
-				//this.clockp	= new ClockPanel(getClock());
-				clockp	= new ClockPanel(SimCenterPanel.this);
-				contextp	= new ContextPanel(SimCenterPanel.this);
-				JPanel left	= new JPanel(new BorderLayout());
-				left.add(clockp, BorderLayout.NORTH);
-				left.add(contextp, BorderLayout.SOUTH);
-				
-				timerp	= new TimerPanel(SimCenterPanel.this);
-				
-				JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-				sp.setOneTouchExpandable(true);
-				sp.add(left);
-				sp.add(timerp);
-				
-				add(sp, "Center");
+				if(result==null)
+					throw new RuntimeException("Could not find simulation service.");
 			}
 		});
 		

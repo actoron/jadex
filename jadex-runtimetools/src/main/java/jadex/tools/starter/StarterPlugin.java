@@ -340,18 +340,13 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 			public void resultAvailable(Object source, Object result)
 			{
 				IComponentManagementService ces = (IComponentManagementService)result;
-				IFuture ret = ces.getComponentDescriptions();
-				ret.addResultListener(new IResultListener()
+				ces.getComponentDescriptions().addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
 						IComponentDescription[] res = (IComponentDescription[])result;
 						for(int i=0; i<res.length; i++)
 							componentAdded(res[i]);
-					}
-					
-					public void exceptionOccurred(Object source, Exception exception)
-					{
 					}
 				});
 				ces.addComponentListener(null, StarterPlugin.this);
@@ -504,27 +499,34 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
-			for(int i=0; paths!=null && i<paths.length; i++) 
+			final TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
+			getJCC().getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 			{
-				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-				if(node!=null && node.getUserObject() instanceof IComponentDescription)
+				public void customResultAvailable(Object source, Object result)
 				{
-					IComponentManagementService ces = (IComponentManagementService)getJCC().getServiceContainer().getService(IComponentManagementService.class);
-					IFuture ret = ces.suspendComponent(((IComponentDescription)node.getUserObject()).getName());
-					ret.addResultListener(new IResultListener()
+					IComponentManagementService ces = (IComponentManagementService)result;
+			
+					for(int i=0; paths!=null && i<paths.length; i++) 
 					{
-						public void resultAvailable(Object source, Object result)
+						DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
+						if(node!=null && node.getUserObject() instanceof IComponentDescription)
 						{
-							getJCC().setStatusText("Suspended component: " + result);
-						}						
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-							getJCC().displayError("Problem Suspending Component", "Component could not be suspended.", exception);
+							IFuture ret = ces.suspendComponent(((IComponentDescription)node.getUserObject()).getName());
+							ret.addResultListener(new IResultListener()
+							{
+								public void resultAvailable(Object source, Object result)
+								{
+									getJCC().setStatusText("Suspended component: " + result);
+								}						
+								public void exceptionOccurred(Object source, Exception exception)
+								{
+									getJCC().displayError("Problem Suspending Component", "Component could not be suspended.", exception);
+								}
+							});
 						}
-					});
+					}
 				}
-			}
+			});
 		}
 
 		public boolean isEnabled()
@@ -551,27 +553,34 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
-			for(int i=0; paths!=null && i<paths.length; i++)
+			final TreePath[] paths = components.getTreetable().getTree().getSelectionPaths();
+			
+			getJCC().getServiceContainer().getService(IComponentManagementService.class).addResultListener(new SwingDefaultResultListener()
 			{
-				DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
-				if(node!=null && node.getUserObject() instanceof IComponentDescription)
+				public void customResultAvailable(Object source, Object result)
 				{
-					IComponentManagementService ces = (IComponentManagementService)getJCC().getServiceContainer().getService(IComponentManagementService.class);
-					IFuture ret = ces.resumeComponent(((IComponentDescription)node.getUserObject()).getName());
-					ret.addResultListener(new IResultListener()
+					IComponentManagementService ces = (IComponentManagementService)result;
+					for(int i=0; paths!=null && i<paths.length; i++)
 					{
-						public void resultAvailable(Object source, Object result)
+						DefaultTreeTableNode node = (DefaultTreeTableNode)paths[i].getLastPathComponent();
+						if(node!=null && node.getUserObject() instanceof IComponentDescription)
 						{
-							getJCC().setStatusText("Resumed component: " + result);
-						}						
-						public void exceptionOccurred(Object source, Exception exception)
-						{
-							getJCC().displayError("Problem Resuming Component", "Component could not be resumed.", exception);
+							IFuture ret = ces.resumeComponent(((IComponentDescription)node.getUserObject()).getName());
+							ret.addResultListener(new IResultListener()
+							{
+								public void resultAvailable(Object source, Object result)
+								{
+									getJCC().setStatusText("Resumed component: " + result);
+								}						
+								public void exceptionOccurred(Object source, Exception exception)
+								{
+									getJCC().displayError("Problem Resuming Component", "Component could not be resumed.", exception);
+								}
+							});
 						}
-					});
+					}
 				}
-			}
+			});
 		}
 		
 		public boolean isEnabled()
@@ -610,17 +619,17 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 					{
 						public void resultAvailable(Object source, Object result)
 						{
-							((IComponentManagementService)result).destroyComponent(((IComponentDescription)node.getUserObject()).getName()).addResultListener(new IResultListener()
+							((IComponentManagementService)result).destroyComponent(((IComponentDescription)node.getUserObject()).getName()).addResultListener(new SwingDefaultResultListener(spanel)
 							{
-								public void resultAvailable(Object source, Object result)
+								public void customResultAvailable(Object source, Object result)
 								{
 									getJCC().setStatusText("Killed component: " + result);
+									
 								}
-								
-								public void exceptionOccurred(Object source, Exception exception)
-								{
-									getJCC().displayError("Problem Killing Component", "Component could not be killed.", exception);
-								}
+//								public void exceptionOccurred(Object source, Exception exception)
+//								{
+//									getJCC().displayError("Problem Killing Component", "Component could not be killed.", exception);
+//								}
 							});
 						}
 						
@@ -701,26 +710,10 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-//			IComponentManagementService ces = (IComponentManagementService)getJCC().getServiceContainer().getService(IComponentManagementService.class);
-//			ces.shutdownPlatform(new IResultListener()
-//			{
-//				public void resultAvailable(Object result)
-//				{
-//				}						
-//				public void exceptionOccurred(Exception exception)
-//				{
-//					getJCC().displayError("Platform Shutdown Problem", "Could not kill platform.", exception);
-//				}
-//			});
-			
-			getJCC().getServiceContainer().shutdown(new IResultListener()
+			getJCC().getServiceContainer().shutdown(new SwingDefaultResultListener(spanel)
 			{
-				public void resultAvailable(Object source, Object result)
+				public void customResultAvailable(Object source, Object result)
 				{
-				}						
-				public void exceptionOccurred(Object source,Exception exception)
-				{
-					getJCC().displayError("Platform Shutdown Problem", "Could not kill platform.", exception);
 				}
 			});
 		}

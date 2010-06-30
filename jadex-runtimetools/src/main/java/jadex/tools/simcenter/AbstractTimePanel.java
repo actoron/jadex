@@ -3,6 +3,8 @@ package jadex.tools.simcenter;
 import jadex.base.ISimulationService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
+import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 
@@ -65,24 +67,32 @@ public abstract class AbstractTimePanel extends JPanel
 		
 		// The simservice listener is used for getting informed when the clock is exchanged 
 		// and when the its execution state changes.
-		contextlistener = new IChangeListener()
-		{
-			IClockService oldclock	= getClockService();
-			public void changeOccurred(ChangeEvent e)
-			{
-				IClockService newclock	= getClockService();
-				if(oldclock!=newclock)
-				{
-					oldclock.removeChangeListener(clocklistener);
-					newclock.addChangeListener(clocklistener);
-					
-					// Inform listener that clock has changed.
-					clocklistener.changeOccurred(e);
-				}
-				
-				invokeUpdateView();
-			}
-		};
+		contextlistener = new SimChangeListener();
+		
+//		contextlistener = new IChangeListener(IClockService clock)
+//		{
+//			protected IClockService oldclock;
+//			public IChangeListener(IClockService clock)
+//			{
+//				this.oldclock = clock;
+//			}
+//			
+////			IClockService oldclock	= getClockService();
+//			public void changeOccurred(ChangeEvent e)
+//			{
+//				IClockService newclock	= getClockService();
+//				if(oldclock!=newclock)
+//				{
+//					oldclock.removeChangeListener(clocklistener);
+//					newclock.addChangeListener(clocklistener);
+//					
+//					// Inform listener that clock has changed.
+//					clocklistener.changeOccurred(e);
+//				}
+//				
+//				invokeUpdateView();
+//			}
+//		};
 	}
 	
 	/**
@@ -96,14 +106,38 @@ public abstract class AbstractTimePanel extends JPanel
 			this.active = active;
 			if(active)
 			{
-				getSimulationService().addChangeListener(contextlistener);
-				getClockService().addChangeListener(clocklistener);
-				updateView();
+				getPlatform().getService(ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						((ISimulationService)result).addChangeListener(contextlistener);
+						getPlatform().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
+						{
+							public void customResultAvailable(Object source, Object result)
+							{
+								((IClockService)result).addChangeListener(clocklistener);
+								updateView();
+							}
+						});
+					}
+				});
 			}
 			else
 			{
-				getSimulationService().removeChangeListener(contextlistener);
-				getClockService().removeChangeListener(clocklistener);
+				getPlatform().getService(ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						((ISimulationService)result).removeChangeListener(contextlistener);
+						getPlatform().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
+						{
+							public void customResultAvailable(Object source, Object result)
+							{
+								((IClockService)result).removeChangeListener(clocklistener);
+							}
+						});
+					}
+				});
 			}
 		}
 	}
@@ -120,20 +154,20 @@ public abstract class AbstractTimePanel extends JPanel
 	/**
 	 *  Get the simulation service.
 	 *  @return The simulation service.
-	 */
+	 * /
 	protected ISimulationService getSimulationService()
 	{
 		return (ISimulationService)getPlatform().getService(ISimulationService.class);
-	}
+	}*/
 	
 	/**
 	 *  Get the simulation service.
 	 *  @return The simulation service.
-	 */
+	 * /
 	protected IClockService getClockService()
 	{
 		return (IClockService)getPlatform().getService(IClockService.class);
-	}
+	}*/
 	
 	/**
 	 *  Update the view.
@@ -167,4 +201,44 @@ public abstract class AbstractTimePanel extends JPanel
 			}
 		}
 	}
+	
+	class SimChangeListener implements IChangeListener
+	{
+		protected IClockService clock;
+		
+		public SimChangeListener()
+		{
+			container.getService(IClockService.class).addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					clock = (IClockService)result;
+				}
+			});
+		}
+		
+		public void changeOccurred(final ChangeEvent e)
+		{
+			container.getService(IClockService.class).addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					IClockService newclock = (IClockService)result;//getClockService();
+					if(clock!=newclock)
+					{
+						clock.removeChangeListener(clocklistener);
+						newclock.addChangeListener(clocklistener);
+						
+						// Inform listener that clock has changed.
+						clocklistener.changeOccurred(e);
+					}
+					
+					invokeUpdateView();
+				}
+			});
+		}
+	};
 }
+
+
+

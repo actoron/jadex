@@ -351,7 +351,7 @@ public class EAGoalFlyweight extends EAProcessableElementFlyweight implements IE
 				bool = OAVBDIRuntimeModel.GOALPROCESSINGSTATE_IDLE.equals(pstate);
 			else
 				bool = OAVBDIRuntimeModel.GOALPROCESSINGSTATE_SUCCEEDED.equals(pstate);	
-			return ret;
+			ret.setResult(bool? Boolean.TRUE: Boolean.FALSE);
 		}
 		
 		return ret;

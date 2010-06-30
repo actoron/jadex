@@ -1,6 +1,7 @@
 package jadex.tools.simcenter;
 
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.commons.jtable.ObjectTableModel;
 import jadex.service.clock.IClockService;
 import jadex.service.clock.ITimer;
@@ -133,7 +134,7 @@ public class TimerPanel extends AbstractTimePanel
 	/**
 	 *  Update the view.
 	 */
-	public synchronized void updateView()
+	public void updateView()
 	{
 //		cnt++;
 //		if(System.currentTimeMillis()-time>1000)
@@ -143,111 +144,117 @@ public class TimerPanel extends AbstractTimePanel
 //			time	= System.currentTimeMillis();
 //		}
 
-		if(!active)
-			return;
-		
-		ITimer[] t = ((IClockService)getPlatform().getService(IClockService.class)).getTimers();
-		//System.out.println(SUtil.arrayToString(t));
-		model.removeAllRows();
-	
-//		Color first = timerst.getBackground();
-//		Color sec = Color.yellow;
-//		Color first = new Color(255, 247, 231);
-//		Color sec = new Color(222, 239, 255);
-		Color first = Color.WHITE;
-		Color sec = new Color(224, 226, 229);
-		
-		if(t.length>0)
+		getPlatform().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
 		{
-			for(int i=0; i<t.length; i++)
+			public void customResultAvailable(Object source, Object result)
 			{
-				//model.addRow(new String[]{""+eventcnt++, ""+t[i].getNextTimepoint(), 
-				//	""+((jadex.commons.concurrent.Timer)t[i]).getTimedObject()}, t[i]);
-				model.addRow(new String[]{simp.formatTime(t[i].getNotificationTime()), 
-					""+((Timer)t[i]).getTimedObject()}, t[i]);
-				//Long time = new Long(t[i].getNextTimepoint());
-				//Color col = (Color)rowcols.get(time);
-				Color col = (Color)rowcols.get(t[i]);
-				if(col==null)
+				if(!active)
+					return;
+				
+				ITimer[] t = ((IClockService)result).getTimers();
+				//System.out.println(SUtil.arrayToString(t));
+				model.removeAllRows();
+			
+//				Color first = timerst.getBackground();
+//				Color sec = Color.yellow;
+//				Color first = new Color(255, 247, 231);
+//				Color sec = new Color(222, 239, 255);
+				Color first = Color.WHITE;
+				Color sec = new Color(224, 226, 229);
+				
+				if(t.length>0)
 				{
-					// Find out first color.
-					if(i==0)
+					for(int i=0; i<t.length; i++)
 					{
-						if(rowcols.size()==0 || t.length==1)
+						//model.addRow(new String[]{""+eventcnt++, ""+t[i].getNextTimepoint(), 
+						//	""+((jadex.commons.concurrent.Timer)t[i]).getTimedObject()}, t[i]);
+						model.addRow(new String[]{simp.formatTime(t[i].getNotificationTime()), 
+							""+((Timer)t[i]).getTimedObject()}, t[i]);
+						//Long time = new Long(t[i].getNextTimepoint());
+						//Color col = (Color)rowcols.get(time);
+						Color col = (Color)rowcols.get(t[i]);
+						if(col==null)
 						{
-							//col = Color.red;
-							col = first;
-						}
-						else
-						{
-							boolean same = true;
-							long time = t[0].getNotificationTime();
-							for(int j=1; j<t.length && col==null; j++)
+							// Find out first color.
+							if(i==0)
 							{
-								if(time!=t[j].getNotificationTime())
+								if(rowcols.size()==0 || t.length==1)
 								{
-									time = t[j].getNotificationTime();
-									same = false;
+									//col = Color.red;
+									col = first;
 								}
-								Color tmp = (Color)rowcols.get(t[j]);
-								if(tmp!=null)
+								else
 								{
-									//col = same? tmp: (tmp==Color.red? Color.green: Color.red);
-									col = same? tmp: (tmp==first? sec: first);
+									boolean same = true;
+									long time = t[0].getNotificationTime();
+									for(int j=1; j<t.length && col==null; j++)
+									{
+										if(time!=t[j].getNotificationTime())
+										{
+											time = t[j].getNotificationTime();
+											same = false;
+										}
+										Color tmp = (Color)rowcols.get(t[j]);
+										if(tmp!=null)
+										{
+											//col = same? tmp: (tmp==Color.red? Color.green: Color.red);
+											col = same? tmp: (tmp==first? sec: first);
+										}
+									}
 								}
+								//System.out.println("first color "+i+" "+col);
+							}
+							else
+							{
+								Color tmp = (Color)rowcols.get(t[i-1]);
+								boolean same = t[i].getNotificationTime()==t[i-1].getNotificationTime();
+								col = same? tmp: (tmp==first? sec: first);
+								//System.out.println("...color "+i+" "+col);
 							}
 						}
-						//System.out.println("first color "+i+" "+col);
+						if(i==0)
+							rowcols.clear();
+						rowcols.put(t[i], col);
 					}
+					//System.out.println("end.....");
+				}
+				
+				//System.out.println("saved: "+rowcols.size());
+				
+				/*Set timers = SUtil.arrayToSet(t);
+				// First check which old timers are obsolete
+				Set contained = SCollection.createHashSet();
+				for(int i=model.getRowCount()-1; i>=0 ; i--)
+				{
+					if(!timers.contains(model.getObjectForRow(i)))
+						model.removeRow(i);
 					else
-					{
-						Color tmp = (Color)rowcols.get(t[i-1]);
-						boolean same = t[i].getNotificationTime()==t[i-1].getNotificationTime();
-						col = same? tmp: (tmp==first? sec: first);
-						//System.out.println("...color "+i+" "+col);
-					}
+						contained.add(model.getObjectForRow(i));
 				}
-				if(i==0)
-					rowcols.clear();
-				rowcols.put(t[i], col);
-			}
-			//System.out.println("end.....");
-		}
-		
-		//System.out.println("saved: "+rowcols.size());
-		
-		/*Set timers = SUtil.arrayToSet(t);
-		// First check which old timers are obsolete
-		Set contained = SCollection.createHashSet();
-		for(int i=model.getRowCount()-1; i>=0 ; i--)
-		{
-			if(!timers.contains(model.getObjectForRow(i)))
-				model.removeRow(i);
-			else
-				contained.add(model.getObjectForRow(i));
-		}
-		
-		// Secondly insert new timers.
-		for(int i=0; i<t.length; i++)
-		{
-			if(!contained.contains(t[i]))
-			{
-				boolean added = false;
-				for(int j=0; j<model.getRowCount() && !added; j++)
+				
+				// Secondly insert new timers.
+				for(int i=0; i<t.length; i++)
 				{
-					if(t[i].getNextTimepoint()<((ITimer)model.getObjectForRow(j)).getNextTimepoint())
+					if(!contained.contains(t[i]))
 					{
-						model.insertRow(j, new String[]{""+eventcnt++, ""+t[i].getNextTimepoint(), 
-							""+((jadex.commons.concurrent.Timer)t[i]).getTimedObject()}, t[i]);
-						added = true;
+						boolean added = false;
+						for(int j=0; j<model.getRowCount() && !added; j++)
+						{
+							if(t[i].getNextTimepoint()<((ITimer)model.getObjectForRow(j)).getNextTimepoint())
+							{
+								model.insertRow(j, new String[]{""+eventcnt++, ""+t[i].getNextTimepoint(), 
+									""+((jadex.commons.concurrent.Timer)t[i]).getTimedObject()}, t[i]);
+								added = true;
+							}
+						}
+						if(!added)
+						{
+							model.addRow(new String[]{""+eventcnt++, ""+t[i].getNextTimepoint(), 
+								""+((jadex.commons.concurrent.Timer)t[i]).getTimedObject()}, t[i]);
+						}
 					}
-				}
-				if(!added)
-				{
-					model.addRow(new String[]{""+eventcnt++, ""+t[i].getNextTimepoint(), 
-						""+((jadex.commons.concurrent.Timer)t[i]).getTimedObject()}, t[i]);
-				}
+				}*/
 			}
-		}*/
+		});
 	}
 }

@@ -1,7 +1,10 @@
 package jadex.tools.simcenter;
 
+import jadex.base.ISimulationService;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.clock.IClock;
+import jadex.service.clock.IClockService;
 import jadex.service.threadpool.ThreadPoolService;
 
 import java.awt.FlowLayout;
@@ -195,46 +198,102 @@ public class ClockPanel extends AbstractTimePanel
 		//this.add(buts, new GridBagConstraints(x=0,++y,2,1,1,0,
 		//	GridBagConstraints.EAST,GridBagConstraints.NONE,new Insets(4,2,2,4),0,0));
 	
-		final IThreadPool tp = (IThreadPool)getPlatform().getService(ThreadPoolService.class);
+//		final IThreadPool tp = (IThreadPool)getPlatform().getService(ThreadPoolService.class);
 		emode.addItemListener(new ItemListener()
 		{
 			public void itemStateChanged(ItemEvent e)
 			{
 				if("System".equals(emode.getSelectedItem()))
 				{
-					if(!IClock.TYPE_SYSTEM.equals(lastclocktype))
+					getPlatform().getService(ThreadPoolService.class).addResultListener(new SwingDefaultResultListener()
 					{
-						getSimulationService().setClockType(IClock.TYPE_SYSTEM, tp);
-//						updateView();
-						simp.updateView();
-					}
+						public void customResultAvailable(Object source, Object result)
+						{
+							final IThreadPool tp = (IThreadPool)result;
+							getPlatform().getService(ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+							{
+								public void customResultAvailable(Object source, Object result)
+								{
+									ISimulationService sims = (ISimulationService)result;
+									if(!IClock.TYPE_SYSTEM.equals(lastclocktype))
+									{
+										sims.setClockType(IClock.TYPE_SYSTEM, tp);
+		//								updateView();
+										simp.updateView();
+									}
+								}
+							});
+						}
+					});
 				}
 				else if("Continuous".equals(emode.getSelectedItem()))
 				{
-					if(!IClock.TYPE_CONTINUOUS.equals(lastclocktype))
+					getPlatform().getService(ThreadPoolService.class).addResultListener(new SwingDefaultResultListener()
 					{
-						getSimulationService().setClockType(IClock.TYPE_CONTINUOUS, tp);
-//						updateView();
-						simp.updateView();
-					}
+						public void customResultAvailable(Object source, Object result)
+						{
+							final IThreadPool tp = (IThreadPool)result;
+							getPlatform().getService(ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+							{
+								public void customResultAvailable(Object source, Object result)
+								{
+									ISimulationService sims = (ISimulationService)result;
+									if(!IClock.TYPE_CONTINUOUS.equals(lastclocktype))
+									{
+										sims.setClockType(IClock.TYPE_CONTINUOUS, tp);
+				//						updateView();
+										simp.updateView();
+									}
+								}
+							});
+						}
+					});
 				}
 				else if("Time Stepped".equals(emode.getSelectedItem()))
 				{
-					if(!IClock.TYPE_TIME_DRIVEN.equals(lastclocktype))
+					getPlatform().getService(ThreadPoolService.class).addResultListener(new SwingDefaultResultListener()
 					{
-						getSimulationService().setClockType(IClock.TYPE_TIME_DRIVEN, tp);
-//						updateView();
-						simp.updateView();
-					}
+						public void customResultAvailable(Object source, Object result)
+						{
+							final IThreadPool tp = (IThreadPool)result;
+							getPlatform().getService(ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+							{
+								public void customResultAvailable(Object source, Object result)
+								{
+									ISimulationService sims = (ISimulationService)result;
+									if(!IClock.TYPE_TIME_DRIVEN.equals(lastclocktype))
+									{
+										sims.setClockType(IClock.TYPE_TIME_DRIVEN, tp);
+				//						updateView();
+										simp.updateView();
+									}
+								}
+							});
+						}
+					});
 				}
 				else if("Event Driven".equals(emode.getSelectedItem()))
 				{
-					if(!IClock.TYPE_EVENT_DRIVEN.equals(lastclocktype))
+					getPlatform().getService(ThreadPoolService.class).addResultListener(new SwingDefaultResultListener()
 					{
-						getSimulationService().setClockType(IClock.TYPE_EVENT_DRIVEN, tp);
-//						updateView();
-						simp.updateView();
-					}
+						public void customResultAvailable(Object source, Object result)
+						{
+							final IThreadPool tp = (IThreadPool)result;
+							getPlatform().getService(ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+							{
+								public void customResultAvailable(Object source, Object result)
+								{
+									ISimulationService sims = (ISimulationService)result;
+									if(!IClock.TYPE_EVENT_DRIVEN.equals(lastclocktype))
+									{
+										sims.setClockType(IClock.TYPE_EVENT_DRIVEN, tp);
+				//						updateView();
+										simp.updateView();
+									}
+								}
+							});
+						}
+					});
 				}
 				else
 				{
@@ -247,17 +306,24 @@ public class ClockPanel extends AbstractTimePanel
 		{
 			public void stateChanged(ChangeEvent e)
 			{
-				if(!IClock.TYPE_CONTINUOUS.equals(getClockService().getClockType()))
-					return;
+				getPlatform().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						IClockService cs = (IClockService)result;
+						if(!IClock.TYPE_CONTINUOUS.equals(cs.getClockType()))
+							return;
 				
-				try
-				{
-					double dil = ((Double)dilation.getValue()).doubleValue();
-					getClockService().setDilation(dil);
-				}
-				catch(NumberFormatException ex)
-				{
-				}
+						try
+						{
+							double dil = ((Double)dilation.getValue()).doubleValue();
+							cs.setDilation(dil);
+						}
+						catch(NumberFormatException ex)
+						{
+						}
+					}
+				});
 			}
 		});
 		
@@ -265,16 +331,23 @@ public class ClockPanel extends AbstractTimePanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				try
+				getPlatform().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
 				{
-					long tick = Long.parseLong(ticksize.getText());
-					getClockService().setDelta(tick);
-					//System.out.println("Setting tick size to: "+tick);
-				}
-				catch(NumberFormatException ex)
-				{
-					ex.printStackTrace();
-				}
+					public void customResultAvailable(Object source, Object result)
+					{
+						IClockService cs = (IClockService)result;
+						try
+						{
+							long tick = Long.parseLong(ticksize.getText());
+							cs.setDelta(tick);
+							//System.out.println("Setting tick size to: "+tick);
+						}
+						catch(NumberFormatException ex)
+						{
+							ex.printStackTrace();
+						}
+					}
+				});
 			}
 		});
 		
@@ -316,87 +389,102 @@ public class ClockPanel extends AbstractTimePanel
 //			time	= System.currentTimeMillis();
 //		}
 		
-		String	tsstring	= curticksize.getText();
-		String	tsstring_new	= ""+numberformat.format(getClockService().getDelta());
-		
-		if(!tsstring.equals(tsstring_new))
-			curticksize.setText(tsstring_new);
-
-		String	ststring	= starttime.getText();
-		String	ststring_new	= ""+getClockService().getStarttime();
-		if(!ststring.equals(ststring_new))
-			starttime.setText(ststring_new);
-		
-		//name.setText(""+getContext().getClock());
-		/*if(relative.isSelected())
-			currenttime.setText(""+timeformat.format(getContext().getClock().getTime()));
-		else
-			currenttime.setText(""+dateformat.format(new Date(getContext().getClock().getTime())));
-		*/
-		currenttime.setText(simp.formatTime(getClockService().getTime()));
-		
-		tickcount.setText(""+getClockService().getTick());
-		systemtime.setText(simp.formatTime(System.currentTimeMillis()));
-			
-		if(getClockService().getClockType().equals(IClock.TYPE_CONTINUOUS))
+		getPlatform().getService(IClockService.class).addResultListener(new SwingDefaultResultListener()
 		{
-			String	dstring	= curdilation.getText();
-			String	dstring_new	= ""+getClockService().getDilation();
-			if(!dstring.equals(dstring_new))
+			public void customResultAvailable(Object source, Object result)
 			{
-				curdilation.setText(dstring_new);
-			}
-		}
+				final IClockService cs = (IClockService)result;
+				getPlatform().getService(ISimulationService.class).addResultListener(new SwingDefaultResultListener()
+				{
+					public void customResultAvailable(Object source, Object result)
+					{
+						ISimulationService sims = (ISimulationService)result;
 		
-		// Clock change actions
-		if(lastclocktype==null || !lastclocktype.equals(getClockService().getClockType()))
-		{
-			lastclocktype	= getClockService().getClockType();
-			curticksize.setText(""+getClockService().getDelta());
-			ticksize.setText(""+getClockService().getDelta());
-			if(lastclocktype.equals(IClock.TYPE_SYSTEM))
-			{
-				emode.setSelectedItem("System");
-				dilation.setValue(new Double(0));
-				curdilation.setText("");
+						String	tsstring	= curticksize.getText();
+						String	tsstring_new	= ""+numberformat.format(cs.getDelta());
+						
+						if(!tsstring.equals(tsstring_new))
+							curticksize.setText(tsstring_new);
+				
+						String	ststring	= starttime.getText();
+						String	ststring_new	= ""+cs.getStarttime();
+						if(!ststring.equals(ststring_new))
+							starttime.setText(ststring_new);
+						
+						//name.setText(""+getContext().getClock());
+						/*if(relative.isSelected())
+							currenttime.setText(""+timeformat.format(getContext().getClock().getTime()));
+						else
+							currenttime.setText(""+dateformat.format(new Date(getContext().getClock().getTime())));
+						*/
+						currenttime.setText(simp.formatTime(cs.getTime()));
+						
+						tickcount.setText(""+cs.getTick());
+						systemtime.setText(simp.formatTime(System.currentTimeMillis()));
+							
+						if(cs.getClockType().equals(IClock.TYPE_CONTINUOUS))
+						{
+							String	dstring	= curdilation.getText();
+							String	dstring_new	= ""+cs.getDilation();
+							if(!dstring.equals(dstring_new))
+							{
+								curdilation.setText(dstring_new);
+							}
+						}
+						
+						// Clock change actions
+						if(lastclocktype==null || !lastclocktype.equals(cs.getClockType()))
+						{
+							lastclocktype	= cs.getClockType();
+							curticksize.setText(""+cs.getDelta());
+							ticksize.setText(""+cs.getDelta());
+							if(lastclocktype.equals(IClock.TYPE_SYSTEM))
+							{
+								emode.setSelectedItem("System");
+								dilation.setValue(new Double(0));
+								curdilation.setText("");
+							}
+							else if(lastclocktype.equals(IClock.TYPE_CONTINUOUS))
+							{
+								emode.setSelectedItem("Continuous");
+								dilation.setValue(new Double(cs.getDilation()));
+								curdilation.setText(""+cs.getDilation());
+							}
+							else if(lastclocktype.equals(IClock.TYPE_TIME_DRIVEN))
+							{
+								emode.setSelectedItem("Time Stepped");
+								dilation.setValue(new Double(0));
+								curdilation.setText("");
+							}
+							else if(lastclocktype.equals(IClock.TYPE_EVENT_DRIVEN))
+							{
+								emode.setSelectedItem("Event Driven");
+								dilation.setValue(new Double(0));
+								curdilation.setText("");
+							}
+						}
+						
+						if(lastclocktype.equals(IClock.TYPE_CONTINUOUS))// && !getContext().isRunning())
+						{
+							if(!dilation.isEnabled())
+							{
+								dilation.setEnabled(true);
+								((JSpinner.DefaultEditor)dilation.getEditor()).getTextField().setEditable(true);
+							}
+						}
+						else
+						{
+							if(dilation.isEnabled())
+							{
+								dilation.setEnabled(false);
+								((JSpinner.DefaultEditor)dilation.getEditor()).getTextField().setEditable(false);
+							}
+						}
+						emode.setEnabled(!sims.isExecuting());
+					}
+				});
 			}
-			else if(lastclocktype.equals(IClock.TYPE_CONTINUOUS))
-			{
-				emode.setSelectedItem("Continuous");
-				dilation.setValue(new Double(getClockService().getDilation()));
-				curdilation.setText(""+getClockService().getDilation());
-			}
-			else if(lastclocktype.equals(IClock.TYPE_TIME_DRIVEN))
-			{
-				emode.setSelectedItem("Time Stepped");
-				dilation.setValue(new Double(0));
-				curdilation.setText("");
-			}
-			else if(lastclocktype.equals(IClock.TYPE_EVENT_DRIVEN))
-			{
-				emode.setSelectedItem("Event Driven");
-				dilation.setValue(new Double(0));
-				curdilation.setText("");
-			}
-		}
-		
-		if(lastclocktype.equals(IClock.TYPE_CONTINUOUS))// && !getContext().isRunning())
-		{
-			if(!dilation.isEnabled())
-			{
-				dilation.setEnabled(true);
-				((JSpinner.DefaultEditor)dilation.getEditor()).getTextField().setEditable(true);
-			}
-		}
-		else
-		{
-			if(dilation.isEnabled())
-			{
-				dilation.setEnabled(false);
-				((JSpinner.DefaultEditor)dilation.getEditor()).getTextField().setEditable(false);
-			}
-		}
-		emode.setEnabled(!getSimulationService().isExecuting());
+		});
 	}
 }
 

@@ -2,7 +2,10 @@ package jadex.tools.simcenter;
 
 import jadex.base.ISimulationService;
 import jadex.commons.SGUI;
+import jadex.commons.ThreadSuspendable;
+import jadex.commons.concurrent.SwingDefaultResultListener;
 import jadex.service.clock.IClock;
+import jadex.service.clock.IClockService;
 import jadex.tools.common.ToolTipAction;
 
 import java.awt.FlowLayout;
@@ -117,32 +120,34 @@ public class ContextPanel extends AbstractTimePanel
 	public final Action START = new ToolTipAction(null, icons.getIcon("start"),
 		"Start the execution of the application")
 	{
-		/**
-		 *  Called when action should be performed.
-		 *  @param e The event.
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
-			try
+			getPlatform().getService(ISimulationService.class).addResultListener(new SwingDefaultResultListener()
 			{
-				getSimulationService().startService();
-			}
-			catch(Exception ex)
-			{
-				ex.printStackTrace();
-			}
+				public void customResultAvailable(Object source, Object result)
+				{
+					try
+					{
+						((ISimulationService)result).startService();
+					}
+					catch(Exception ex)
+					{
+						ex.printStackTrace();
+					}
+				}
+			});
 		}
 
-		/**
-		 *  Test if action is enabled.
-		 *  @return True, if enabled.
-		 */
 		public boolean isEnabled()
 		{
-			boolean clockok = getClockService().getNextTimer()!=null 
-				|| getClockService().getClockType().equals(IClock.TYPE_CONTINUOUS)
-				|| getClockService().getClockType().equals(IClock.TYPE_SYSTEM);
-			return !getSimulationService().isExecuting() && clockok;
+			// todo: hack!
+			// problem: clock service must be fetched fresh!
+			IClockService cs = (IClockService)getPlatform().getService(IClockService.class).get(new ThreadSuspendable());
+			ISimulationService sims = (ISimulationService)getPlatform().getService(ISimulationService.class).get(new ThreadSuspendable());
+			boolean clockok = cs.getNextTimer()!=null 
+				|| cs.getClockType().equals(IClock.TYPE_CONTINUOUS)
+				|| cs.getClockType().equals(IClock.TYPE_SYSTEM);
+			return !sims.isExecuting() && clockok;
 		}
 	};
 	
@@ -152,32 +157,34 @@ public class ContextPanel extends AbstractTimePanel
 	public final Action STEP_EVENT = new ToolTipAction(null, icons.getIcon("step_event"),
 		"Execute one timer entry.")
 	{
-		/**
-		 *  Called when action should be performed.
-		 *  @param e The event.
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
-			try
+			getPlatform().getService(ISimulationService.class).addResultListener(new SwingDefaultResultListener()
 			{
-				getSimulationService().stepEvent();
-			}
-			catch(Exception ex)
-			{
-				ex.printStackTrace();
-			}
+				public void customResultAvailable(Object source, Object result)
+				{
+					try
+					{
+						((ISimulationService)result).stepEvent();
+					}
+					catch(Exception ex)
+					{
+						ex.printStackTrace();
+					}
+				}
+			});
 		}
 		
-		/**
-		 *  Test if action is enabled.
-		 *  @return True, if enabled.
-		 */
 		public boolean isEnabled()
 		{
-			boolean clockok = getClockService().getNextTimer()!=null; 
-			return !getClockService().getClockType().equals(IClock.TYPE_CONTINUOUS) 
-				&& !getClockService().getClockType().equals(IClock.TYPE_SYSTEM) 
-				&& !getSimulationService().isExecuting() && clockok;
+			// todo: hack!
+			// problem: clock service must be fetched fresh!
+			IClockService cs = (IClockService)getPlatform().getService(IClockService.class).get(new ThreadSuspendable());
+			ISimulationService sims = (ISimulationService)getPlatform().getService(ISimulationService.class).get(new ThreadSuspendable());
+			boolean clockok = cs.getNextTimer()!=null; 
+			return !cs.getClockType().equals(IClock.TYPE_CONTINUOUS) 
+				&& !cs.getClockType().equals(IClock.TYPE_SYSTEM) 
+				&& !sims.isExecuting() && clockok;
 		}
 	};
 	
@@ -187,32 +194,34 @@ public class ContextPanel extends AbstractTimePanel
 	public final Action STEP_TIME = new ToolTipAction(null, icons.getIcon("step_time"),
 		"Execute all timer entries belonging to the current time point.")
 	{
-		/**
-		 *  Called when action should be performed.
-		 *  @param e The event.
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
-			try
+			getPlatform().getService(ISimulationService.class).addResultListener(new SwingDefaultResultListener()
 			{
-				getSimulationService().stepTime();
-			}
-			catch(Exception ex)
-			{
-				ex.printStackTrace();
-			}
+				public void customResultAvailable(Object source, Object result)
+				{
+					try
+					{
+						((ISimulationService)result).stepTime();
+					}
+					catch(Exception ex)
+					{
+						ex.printStackTrace();
+					}
+				}
+			});
 		}
 		
-		/**
-		 *  Test if action is enabled.
-		 *  @return True, if enabled.
-		 */
 		public boolean isEnabled()
 		{
-			boolean clockok = getClockService().getNextTimer()!=null;
-			return !getClockService().getClockType().equals(IClock.TYPE_CONTINUOUS)
-				&& !getClockService().getClockType().equals(IClock.TYPE_SYSTEM)
-				&& !getSimulationService().isExecuting() && clockok;
+			// todo: hack!
+			// problem: clock service must be fetched fresh!
+			IClockService cs = (IClockService)getPlatform().getService(IClockService.class).get(new ThreadSuspendable());
+			ISimulationService sims = (ISimulationService)getPlatform().getService(ISimulationService.class).get(new ThreadSuspendable());
+			boolean clockok = cs.getNextTimer()!=null;
+			return !cs.getClockType().equals(IClock.TYPE_CONTINUOUS)
+				&& !cs.getClockType().equals(IClock.TYPE_SYSTEM)
+				&& !sims.isExecuting() && clockok;
 		}
 	};
 	
@@ -222,30 +231,29 @@ public class ContextPanel extends AbstractTimePanel
 	public final Action PAUSE = new ToolTipAction(null , icons.getIcon("pause"),
 		"Pause the current execution.")
 	{
-		/**
-		 *  Called when action should be performed.
-		 *  @param e The event.
-		 */
 		public void actionPerformed(ActionEvent e)
 		{
-			try
+			getPlatform().getService(ISimulationService.class).addResultListener(new SwingDefaultResultListener()
 			{
-				getSimulationService().pause();
-			}
-			catch(Exception ex)
-			{
-				ex.printStackTrace();
-			}
-			
+				public void customResultAvailable(Object source, Object result)
+				{
+					try
+					{
+						((ISimulationService)result).pause();
+					}
+					catch(Exception ex)
+					{
+						ex.printStackTrace();
+					}
+				}
+			});
 		}
 		
-		/**
-		 *  Test if action is enabled.
-		 *  @return True, if enabled.
-		 */
 		public boolean isEnabled()
 		{
-			return getSimulationService().isExecuting() && getSimulationService().getMode()
+			// todo: hack!
+			ISimulationService sims = (ISimulationService)getPlatform().getService(ISimulationService.class).get(new ThreadSuspendable());
+			return sims.isExecuting() && sims.getMode()
 				.equals(ISimulationService.MODE_NORMAL);
 		}
 	};
