@@ -1,11 +1,10 @@
-package jadex.service.execution;
+package jadex.commons.concurrent;
 
-import jadex.commons.concurrent.IResultListener;
 
 /**
  *  Counter listener
  */
-class CounterListener implements IResultListener
+public class CounterListener implements IResultListener
 {
 	//-------- attributes --------
 	

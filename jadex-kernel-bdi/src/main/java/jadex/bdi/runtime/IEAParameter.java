@@ -14,7 +14,7 @@ public interface IEAParameter extends IEAElement
 	 *  Set a value of a parameter.
 	 *  @param value The new value.
 	 */
-	public void setValue(Object value);
+	public IFuture setValue(Object value);
 
 	/**
 	 *  Get the value of a parameter.

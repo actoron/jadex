@@ -2,6 +2,7 @@ package jadex.service;
 
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.CounterListener;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 
@@ -169,53 +170,62 @@ public class HierarchicalServiceContainer extends BasicServiceContainer
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public IFuture start()
 	{
+		final Future ret = new Future();
+		
+		IResultListener listener = new DefaultResultListener()
+		{
+			public void resultAvailable(Object source, Object result)
+			{
+				ret.setResult(null);
+			}
+		};
+		
 		// Start parent container.
 		if(parent!=null)
-			parent.start();
-			
-		super.start();
+		{
+			CounterListener lis = new CounterListener(2, listener);
+			parent.start().addResultListener(lis);
+			super.start().addResultListener(lis);
+		}
+		else
+		{
+			super.start().addResultListener(listener);
+		}
+		
+		return ret;
 	}
 	
 	/**
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public IFuture shutdown()
 	{
-		// Stop the services.
-		if(services!=null)
+		final Future ret = new Future();
+		
+		IResultListener listener = new DefaultResultListener()
 		{
-			for(Iterator it = services.keySet().iterator(); it.hasNext();)
+			public void resultAvailable(Object source, Object result)
 			{
-				Object key = it.next();
-				Map tmp = (Map)services.get(key);
-				if(tmp != null)
-				{
-					for(Iterator it2 = tmp.keySet().iterator(); it2.hasNext();)
-					{
-						Object key2 = it2.next();
-						IService service = (IService)tmp.get(key2);
-	//					System.out.println("Service shutdown: " + service);
-						try
-						{
-							service.shutdownService(); // Todo: use result listener?
-						}
-						catch(Exception e)
-						{
-							
-						}
-					}
-				}
+				ret.setResult(null);
 			}
+		};
+		
+		// Start parent container.
+		if(parent!=null)
+		{
+			CounterListener lis = new CounterListener(2, listener);
+			parent.shutdown().addResultListener(lis);
+			super.shutdown().addResultListener(lis);
+		}
+		else
+		{
+			super.shutdown().addResultListener(listener);
 		}
 		
-		// Shutdown parent container.
-		if(parent!=null)
-			parent.shutdown(listener);
-		else if(listener!=null)
-			listener.resultAvailable(this, null);
+		return ret;
 	}
 
 	//-------- additional methods --------

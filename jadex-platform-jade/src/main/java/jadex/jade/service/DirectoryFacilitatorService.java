@@ -584,21 +584,18 @@ public class DirectoryFacilitatorService implements IDF, IService
 	/**
 	 *  Start the service.
 	 */
-	public void startService()
+	public IFuture startService()
 	{
-		// nothing to do.
+		return new Future(null);
 	}
 	
 	/**
 	 *  Called when the platform shuts down.
 	 *  Do necessary cleanup here (if any).
 	 */
-	public void shutdownService(IResultListener listener)
+	public IFuture shutdownService()
 	{
-		if(listener==null)
-			listener = DefaultResultListener.getInstance();
-		
-		listener.resultAvailable(this, null);
+		return new Future(null);
 	}
 
 	//-------- helper methods --------

@@ -16,6 +16,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.Future;
 import jadex.commons.IFuture;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.rules.state.IOAVState;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
@@ -299,8 +300,10 @@ public abstract class EACapabilityFlyweight extends ElementFlyweight implements 
 	/**
 	 *  Kill the agent.
 	 */
-	public void killAgent()
+	public IFuture killAgent()
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			adapter.invokeLater(new Runnable()
@@ -311,7 +314,7 @@ public abstract class EACapabilityFlyweight extends ElementFlyweight implements 
 					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_CREATING.equals(cs) 
 						|| OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 					{
-						getInterpreter().killAgent();
+						getInterpreter().killAgent().addResultListener(new DelegationResultListener(ret));
 					}
 				}
 			});
@@ -324,10 +327,12 @@ public abstract class EACapabilityFlyweight extends ElementFlyweight implements 
 			{
 				//	System.out.println("set to terminating");
 				getInterpreter().startMonitorConsequences();
-				getInterpreter().killAgent();
+				getInterpreter().killAgent().addResultListener(new DelegationResultListener(ret));
 				getInterpreter().endMonitorConsequences();
 			}
 		}
+		
+		return ret;
 	}
 
 	/**

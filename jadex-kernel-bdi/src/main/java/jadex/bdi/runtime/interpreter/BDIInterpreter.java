@@ -23,9 +23,12 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILoadableComponentModel;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageService;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.ISynchronizator;
 import jadex.javaparser.IParsedExpression;
@@ -782,15 +785,20 @@ public class BDIInterpreter implements IComponentInstance //, ISynchronizator
 	/**
 	 *  Kill the component.
 	 */
-	public void	killAgent()
+	public IFuture killAgent()
 	{
+		final Future ret = new Future();
+		
 		adapter.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
-				((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier());
+				((IComponentManagementService)result).destroyComponent(adapter.getComponentIdentifier())
+					.addResultListener(new DelegationResultListener(ret));
 			}
 		});
+		
+		return ret;
 	}
 	
 	/**

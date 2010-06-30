@@ -134,8 +134,10 @@ public class EAPlanbaseFlyweight extends ElementFlyweight implements IEAPlanbase
 	 *  @param type	The goal type.
 	 *  @param listener The plan listener.
 	 */
-	public void addPlanListener(final String type, final IPlanListener listener)
+	public IFuture addPlanListener(final String type, final IPlanListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -144,6 +146,7 @@ public class EAPlanbaseFlyweight extends ElementFlyweight implements IEAPlanbase
 				{
 					Object mplan = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
 					addEventListener(listener, mplan);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -151,7 +154,10 @@ public class EAPlanbaseFlyweight extends ElementFlyweight implements IEAPlanbase
 		{
 			Object mplan = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
 			addEventListener(listener, mplan);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -159,8 +165,10 @@ public class EAPlanbaseFlyweight extends ElementFlyweight implements IEAPlanbase
 	 *  @param type	The goal type.
 	 *  @param listener The goal listener.
 	 */
-	public void removePlanListener(final String type, final IPlanListener listener)
+	public IFuture removePlanListener(final String type, final IPlanListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -169,6 +177,7 @@ public class EAPlanbaseFlyweight extends ElementFlyweight implements IEAPlanbase
 				{
 					Object mplan = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
 					removeEventListener(listener, mplan, false);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -176,7 +185,10 @@ public class EAPlanbaseFlyweight extends ElementFlyweight implements IEAPlanbase
 		{
 			Object mplan = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_plans);
 			removeEventListener(listener, mplan, false);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	//-------- element interface --------

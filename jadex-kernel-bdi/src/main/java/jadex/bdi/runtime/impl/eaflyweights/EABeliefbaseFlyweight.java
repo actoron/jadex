@@ -465,8 +465,10 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 	 *  @param belief The belief name.
 	 *  @param fact The fact.
 	 */
-	public void setBeliefFact(final String belief, final Object fact)
+	public IFuture setBeliefFact(final String belief, final Object fact)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -475,6 +477,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 				{
 					IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
 					bel.setFact(fact);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -482,8 +485,10 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		{
 			IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
 			bel.setFact(fact);
+			ret.setResult(null);
 		}
 		
+		return ret;
 	}
 	
 	/**
@@ -518,8 +523,10 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 	 *  Add a belief listener.
 	 *  @param listener The belief listener.
 	 */
-	public void addBeliefListener(final String belief, final IBeliefListener listener)
+	public IFuture addBeliefListener(final String belief, final IBeliefListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -528,6 +535,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 				{
 					IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
 					bel.addBeliefListener(listener);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -535,15 +543,20 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		{
 			IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
 			bel.addBeliefListener(listener);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
 	 *  Remove a belief listener.
 	 *  @param listener The belief listener.
 	 */
-	public void removeBeliefListener(final String belief, final IBeliefListener listener)
+	public IFuture removeBeliefListener(final String belief, final IBeliefListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -552,6 +565,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 				{
 					IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
 					bel.removeBeliefListener(listener);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -559,7 +573,10 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		{
 			IBelief bel = (IBelief)FlyweightFunctionality.getBelief(getState(), getHandle(), getScope(), belief, false);
 			bel.removeBeliefListener(listener);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -567,8 +584,10 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 	 *  @param beliefset The beliefset name.
 	 *  @param fact The fact.
 	 */
-	public void addBeliefSetFact(final String beliefset, final Object fact)
+	public IFuture addBeliefSetFact(final String beliefset, final Object fact)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -577,6 +596,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 				{
 					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 					belset.addFact(fact);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -584,7 +604,10 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		{
 			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 			belset.addFact(fact);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -592,8 +615,10 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 	 *  @param beliefset The beliefset name.
 	 *  @param facts The facts.
 	 */
-	public void addBeliefSetFacts(final String beliefset, final Object[] facts)
+	public IFuture addBeliefSetFacts(final String beliefset, final Object[] facts)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -602,6 +627,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 				{
 					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 					belset.addFacts(facts);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -609,7 +635,10 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		{
 			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 			belset.addFacts(facts);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -617,8 +646,10 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 	 *  @param beliefset The beliefset name.
 	 *  @param fact The fact.
 	 */
-	public void removeBeliefSetFact(final String beliefset, final Object fact)
+	public IFuture removeBeliefSetFact(final String beliefset, final Object fact)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -627,6 +658,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 				{
 					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 					belset.removeFact(fact);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -634,15 +666,20 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		{
 			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 			belset.removeFact(fact);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
 	 *  Remove fact from a beliefset.
 	 *  @param beliefset The beliefset name.
 	 */
-	public void removeBeliefSetFacts(final String beliefset)
+	public IFuture removeBeliefSetFacts(final String beliefset)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -651,6 +688,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 				{
 					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 					belset.removeFacts();
+					ret.setResult(null);
 				}
 			});
 		}
@@ -658,7 +696,10 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		{
 			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 			belset.removeFacts();
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -723,8 +764,10 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 	 *  Add a belief listener.
 	 *  @param listener The belief listener.
 	 */
-	public void addBeliefSetListener(final String beliefset, final IBeliefSetListener listener)
+	public IFuture addBeliefSetListener(final String beliefset, final IBeliefSetListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -733,6 +776,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 				{
 					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 					belset.addBeliefSetListener(listener);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -740,15 +784,20 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		{
 			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 			belset.addBeliefSetListener(listener);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
 	 *  Remove a belief listener.
 	 *  @param listener The belief listener.
 	 */
-	public void removeBeliefSetListener(final String beliefset, final IBeliefSetListener listener)
+	public IFuture removeBeliefSetListener(final String beliefset, final IBeliefSetListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -757,6 +806,7 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 				{
 					IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 					belset.removeBeliefSetListener(listener);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -764,7 +814,10 @@ public class EABeliefbaseFlyweight extends ElementFlyweight implements IEABelief
 		{
 			IBeliefSet belset = (IBeliefSet)FlyweightFunctionality.getBeliefSet(getState(), getHandle(), getScope(), beliefset, false);
 			belset.removeBeliefSetListener(listener);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 }

@@ -26,7 +26,7 @@ public interface IEAWaitqueue extends IEAWaitAbstraction
 	 *  Remove an element.
 	 *  @param element The element to remove.
 	 */
-	public void removeElement(Object element);
+	public IFuture removeElement(Object element);
 	
 	/**
 	 *  Get the number of events in the waitqueue.

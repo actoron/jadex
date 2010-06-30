@@ -182,8 +182,10 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 	 *  Dispatch a new top-level goal.
 	 *  @param goal The new goal.
 	 */
-	public void	dispatchTopLevelGoal(final IEAGoal goal)
+	public IFuture	dispatchTopLevelGoal(final IEAGoal goal)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -191,6 +193,7 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 				public void run()
 				{
 					GoalLifecycleRules.adoptGoal(getState(), ((ElementFlyweight)goal).getScope(), ((ElementFlyweight)goal).getHandle());
+					ret.setResult(null);
 				}
 			});
 		}
@@ -199,7 +202,10 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 			getInterpreter().startMonitorConsequences();
 			GoalLifecycleRules.adoptGoal(getState(), ((ElementFlyweight)goal).getScope(), ((ElementFlyweight)goal).getHandle());		
 			getInterpreter().endMonitorConsequences();
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**
@@ -245,8 +251,10 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 	 *  @param type	The goal type.
 	 *  @param listener The goal listener.
 	 */
-	public void addGoalListener(final String type, final IGoalListener listener)
+	public IFuture addGoalListener(final String type, final IGoalListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -255,6 +263,7 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 				{
 					Object mgoal = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
 					addEventListener(listener, mgoal);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -262,7 +271,10 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 		{
 			Object mgoal = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
 			addEventListener(listener, mgoal);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	
@@ -271,8 +283,10 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 	 *  @param type	The goal type.
 	 *  @param listener The goal listener.
 	 */
-	public void removeGoalListener(final String type, final IGoalListener listener)
+	public IFuture removeGoalListener(final String type, final IGoalListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -281,6 +295,7 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 				{
 					Object mgoal = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
 					removeEventListener(listener, mgoal, false);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -288,7 +303,10 @@ public class EAGoalbaseFlyweight extends ElementFlyweight implements IEAGoalbase
 		{
 			Object mgoal = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_goals);
 			removeEventListener(listener, mgoal, false);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	//-------- element interface --------

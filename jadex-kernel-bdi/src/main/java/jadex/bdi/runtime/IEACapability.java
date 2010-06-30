@@ -112,7 +112,7 @@ public interface IEACapability extends IEAElement
 	/**
 	 *  Kill the agent.
 	 */
-	public void killAgent();
+	public IFuture killAgent();
 	
 	/**
 	 *  Add an agent listener

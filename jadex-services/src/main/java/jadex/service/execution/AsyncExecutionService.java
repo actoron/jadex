@@ -4,6 +4,7 @@ import jadex.commons.Future;
 import jadex.commons.ICommand;
 import jadex.commons.IFuture;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.CounterListener;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.concurrent.IResultListener;

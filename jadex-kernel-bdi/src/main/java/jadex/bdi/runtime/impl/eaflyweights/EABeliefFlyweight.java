@@ -51,8 +51,10 @@ public class EABeliefFlyweight extends ElementFlyweight implements IEABelief
 	 *  Set a fact of a belief.
 	 *  @param fact The new fact.
 	 */
-	public void setFact(final Object fact)
+	public IFuture setFact(final Object fact)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -60,13 +62,17 @@ public class EABeliefFlyweight extends ElementFlyweight implements IEABelief
 				public void run()
 				{
 					FlyweightFunctionality.setFact(getState(), getHandle(), fact);
+					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
 			FlyweightFunctionality.setFact(getState(), getHandle(), fact);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**
@@ -100,8 +106,10 @@ public class EABeliefFlyweight extends ElementFlyweight implements IEABelief
 	 *  Calling this method causes an internal fact changed
 	 *  event that might cause dependent actions.
 	 */
-	public void modified()
+	public IFuture modified()
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -110,6 +118,7 @@ public class EABeliefFlyweight extends ElementFlyweight implements IEABelief
 				{
 					Object	fact = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.belief_has_fact);
 					getInterpreter().getEventReificator().objectModified(getHandle(), getState().getType(getHandle()), OAVBDIRuntimeModel.belief_has_fact, fact, fact);
+					ret.setResult(true);
 				}
 			});
 		}
@@ -119,7 +128,10 @@ public class EABeliefFlyweight extends ElementFlyweight implements IEABelief
 			Object	fact = getState().getAttributeValue(getHandle(), OAVBDIRuntimeModel.belief_has_fact);
 			getInterpreter().getEventReificator().objectModified(getHandle(), getState().getType(getHandle()), OAVBDIRuntimeModel.belief_has_fact, fact, fact);
 			getInterpreter().endMonitorConsequences();
+			ret.setResult(true);
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -156,8 +168,10 @@ public class EABeliefFlyweight extends ElementFlyweight implements IEABelief
 	 *  Add a belief listener.
 	 *  @param listener The belief listener.
 	 */
-	public void addBeliefListener(final IBeliefListener listener)
+	public IFuture addBeliefListener(final IBeliefListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -165,21 +179,27 @@ public class EABeliefFlyweight extends ElementFlyweight implements IEABelief
 				public void run()
 				{
 					addEventListener(listener, getHandle());
+					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
 			addEventListener(listener, getHandle());
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
 	 *  Remove a belief listener.
 	 *  @param listener The belief listener.
 	 */
-	public void removeBeliefListener(final IBeliefListener listener)
+	public IFuture removeBeliefListener(final IBeliefListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -187,13 +207,17 @@ public class EABeliefFlyweight extends ElementFlyweight implements IEABelief
 				public void run()
 				{
 					removeEventListener(listener, getHandle(), false);
+					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
 			removeEventListener(listener, getHandle(), false);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	//-------- element interface --------

@@ -745,7 +745,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 			
 			// Shudown platform when last (non-daemon) component was destroyed
 			if(shutdown)
-				container.shutdown(null);
+				container.shutdown();
 		}
 		
 		public void exceptionOccurred(Object source, Exception exception)

@@ -50,8 +50,10 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 *  @param goal The new goal.
 	 *  Note: plan step is interrupted after call.
 	 */
-	public void dispatchTopLevelGoal(final IEAGoal goal)
+	public IFuture dispatchTopLevelGoal(final IEAGoal goal)
 	{
+		final Future ret = new Future();
+		
 //		getGoalbase().dispatchTopLevelGoal(goal);
 		
 		if(!getInterpreter().isPlanThread())
@@ -61,13 +63,17 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 				public void run() 
 				{
 					GoalLifecycleRules.adoptGoal(getState(), ((ElementFlyweight)goal).getScope(), ((ElementFlyweight)goal).getHandle());
+					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
 			GoalLifecycleRules.adoptGoal(getState(), ((ElementFlyweight)goal).getScope(), ((ElementFlyweight)goal).getHandle());
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**
@@ -109,8 +115,10 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 *  @param me	The message event.
 	 *  @return The filter to wait for an answer.
 	 */
-	public void	sendMessage(final IEAMessageEvent me)
+	public IFuture	sendMessage(final IEAMessageEvent me)
 	{
+		final Future ret = new Future();
+		
 //		getEventbase().sendMessage(me);
 		
 		if(!getInterpreter().isPlanThread())
@@ -120,13 +128,17 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 				public void run() 
 				{
 					MessageEventRules.sendMessage(getState(), getScope(), ((ElementFlyweight)me).getHandle());
+					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
 			MessageEventRules.sendMessage(getState(), getScope(), ((ElementFlyweight)me).getHandle());
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**
@@ -134,8 +146,10 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 	 *  @param event The event.
 	 *  Note: plan step is interrupted after call.
 	 */
-	public void dispatchInternalEvent(final IEAInternalEvent event)
+	public IFuture dispatchInternalEvent(final IEAInternalEvent event)
 	{
+		final Future ret = new Future();
+		
 //		getEventbase().dispatchInternalEvent(event);
 		
 		if(!getInterpreter().isPlanThread())
@@ -145,13 +159,17 @@ public class ExternalAccessFlyweight extends EACapabilityFlyweight implements IB
 				public void run() 
 				{
 					InternalEventRules.adoptInternalEvent(getState(), getScope(), ((ElementFlyweight)event).getHandle());
+					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
 			InternalEventRules.adoptInternalEvent(getState(), getScope(), ((ElementFlyweight)event).getHandle());
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**

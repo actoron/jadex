@@ -48,12 +48,12 @@ public interface IEAPlanbase extends IEAElement
 	 *  @param type	The goal type.
 	 *  @param listener The plan listener.
 	 */
-	public void addPlanListener(String type, IPlanListener listener);	
+	public IFuture addPlanListener(String type, IPlanListener listener);	
 	
 	/**
 	 *  Remove a goal listener.
 	 *  @param type	The goal type.
 	 *  @param listener The goal listener.
 	 */
-	public void removePlanListener(String type, IPlanListener listener);
+	public IFuture removePlanListener(String type, IPlanListener listener);
 }

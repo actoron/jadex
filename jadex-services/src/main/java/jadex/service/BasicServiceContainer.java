@@ -1,6 +1,9 @@
 package jadex.service;
 
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
+import jadex.commons.concurrent.CounterListener;
+import jadex.commons.concurrent.DefaultResultListener;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -34,11 +37,21 @@ public class BasicServiceContainer extends BasicServiceProvider implements IServ
 	/**
 	 *  Start the service.
 	 */
-	public void start()
+	public IFuture start()
 	{
+		final Future ret = new Future();
+		
 		// Start the services.
-		if(services!=null)
+		if(services!=null && services.size()>0)
 		{
+			// Start notifies the future when all services have been started.
+			CounterListener lis = new CounterListener(services.size(), new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					ret.setResult(null);
+				}
+			});
 			for(Iterator it=services.keySet().iterator(); it.hasNext(); )
 			{
 				Object key = it.next();
@@ -49,22 +62,36 @@ public class BasicServiceContainer extends BasicServiceProvider implements IServ
 					{
 						Object key2 = it2.next();
 						IService service = (IService)tmp.get(key2);
-						service.startService();
+						service.startService().addResultListener(lis);
 					}
 				}
 			}
 		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
 	}
 	
 	/**
 	 *  Shutdown the service.
-	 *  @param listener The listener.
 	 */
-	public void shutdown(IResultListener listener)
+	public IFuture shutdown()
 	{
+		final Future ret = new Future();
+		
 		// Stop the services.
-		if(services!=null)
+		if(services!=null && services.size()>0)
 		{
+			CounterListener lis = new CounterListener(services.size(), new DefaultResultListener()
+			{
+				public void resultAvailable(Object source, Object result)
+				{
+					ret.setResult(null);
+				}
+			});
 			for(Iterator it = services.keySet().iterator(); it.hasNext();)
 			{
 				Object key = it.next();
@@ -76,11 +103,17 @@ public class BasicServiceContainer extends BasicServiceProvider implements IServ
 						Object key2 = it2.next();
 						IService service = (IService)tmp.get(key2);
 	//					System.out.println("Service shutdown: " + service);
-						service.shutdownService(); // Todo: use result listener?
+						service.shutdownService().addResultListener(lis); 
 					}
 				}
 			}
 		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
 	}
 	
 	//-------- methods --------
@@ -93,67 +126,4 @@ public class BasicServiceContainer extends BasicServiceProvider implements IServ
 	{
 		this.name = name;
 	}
-	
-	/**
-	 *  Add a service to the platform.
-	 *  If under the same name and type a service was contained,
-	 *  the old one is removed and shutdowned.
-	 *  @param name The name.
-	 *  @param service The service.
-	 * /
-	public void addService(Class type, String name, IService service)
-	{
-//		System.out.println("Adding service: " + name + " " + type + " " + service);
-		Map tmp = getServiceMap(type);
-		if(tmp == null)
-		{
-			tmp = new HashMap();
-			if(services==null)
-				services = new HashMap();
-			services.put(type, tmp);
-		}
-		IService old = (IService)tmp.put(name, service);
-		if(old!=null)
-			old.shutdownService(null);
-	}*/
-
-	/**
-	 *  Removes a service from the platform (shutdowns also the service).
-	 *  @param name The name.
-	 *  @param service The service.
-	 * /
-	public void removeService(Class type, IService service)
-	{
-		//		System.out.println("Removing service: " + type + " " + service);
-		Map tmp = getServiceMap(type);
-		if(tmp == null || (service != null && !tmp.containsValue(service)))
-			throw new RuntimeException("Service not found: " + service);
-
-		boolean removed = false;
-		if(service == null && tmp.size() == 1)
-		{
-			IService rem = (IService)tmp.remove(tmp.keySet().iterator().next());
-			rem.shutdownService(null);
-			removed = true;
-		}
-		else
-		{
-			for(Iterator it = tmp.keySet().iterator(); it.hasNext();)
-			{
-				Object key = it.next();
-				if(tmp.get(key).equals(service))
-				{
-					IService rem = (IService)tmp.remove(key);
-					rem.shutdownService(null);
-					removed = true;
-				}
-			}
-		}
-
-		if(!removed)
-			throw new RuntimeException("Service not found: " + service);
-
-		if(tmp.size() == 0)
-			services.remove(type);
-	}*/
 }

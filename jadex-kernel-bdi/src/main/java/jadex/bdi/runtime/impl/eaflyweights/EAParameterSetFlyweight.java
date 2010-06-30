@@ -75,8 +75,10 @@ public class EAParameterSetFlyweight extends ElementFlyweight implements IEAPara
 	 *  Add a value to a parameter set.
 	 *  @param value The new value.
 	 */
-	public void addValue(final Object value)
+	public IFuture addValue(final Object value)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -103,6 +105,7 @@ public class EAParameterSetFlyweight extends ElementFlyweight implements IEAPara
 							+direction+" "+getName());
 
 					BeliefRules.addParameterSetValue(getState(), getHandle(), value);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -130,15 +133,20 @@ public class EAParameterSetFlyweight extends ElementFlyweight implements IEAPara
 			getInterpreter().startMonitorConsequences();
 			BeliefRules.addParameterSetValue(getState(), getHandle(), value);
 			getInterpreter().endMonitorConsequences();
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**
 	 *  Remove a value to a parameter set.
 	 *  @param value The new value.
 	 */
-	public void removeValue(final Object value)
+	public IFuture removeValue(final Object value)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -161,6 +169,7 @@ public class EAParameterSetFlyweight extends ElementFlyweight implements IEAPara
 					if(!hasHandle())
 						throw new RuntimeException("Value not contained: "+value);
 					BeliefRules.removeParameterSetValue(getState(), getHandle(), value);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -185,16 +194,20 @@ public class EAParameterSetFlyweight extends ElementFlyweight implements IEAPara
 			getInterpreter().startMonitorConsequences();
 			BeliefRules.removeParameterSetValue(getState(), getHandle(), value);
 			getInterpreter().endMonitorConsequences();
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**
 	 *  Add values to a parameter set.
 	 */
-	public void addValues(final Object[] values)
+	public IFuture addValues(final Object[] values)
 	{
-		if(values==null)
-			return;
+		final Future ret = new Future();
+//		if(values==null)
+//			return;
 	
 		if(getInterpreter().isExternalThread())
 		{
@@ -222,8 +235,12 @@ public class EAParameterSetFlyweight extends ElementFlyweight implements IEAPara
 						throw new RuntimeException("Write access not allowed to parameter set: "
 							+direction+" "+getName());
 
-					for(int i=0; i<values.length; i++)
-						BeliefRules.addParameterSetValue(getState(), getHandle(), values[i]);
+					if(values!=null)
+					{
+						for(int i=0; i<values.length; i++)
+							BeliefRules.addParameterSetValue(getState(), getHandle(), values[i]);
+					}
+					ret.setResult(null);
 				}
 			});
 		}
@@ -249,17 +266,25 @@ public class EAParameterSetFlyweight extends ElementFlyweight implements IEAPara
 					+direction+" "+getName());
 
 			getInterpreter().startMonitorConsequences();
-			for(int i=0; i<values.length; i++)
-				BeliefRules.addParameterSetValue(getState(), getHandle(), values[i]);
+			if(values!=null)
+			{
+				for(int i=0; i<values.length; i++)
+					BeliefRules.addParameterSetValue(getState(), getHandle(), values[i]);
+			}
 			getInterpreter().endMonitorConsequences();
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**
 	 *  Remove all values from a parameter set.
 	 */
-	public void removeValues()
+	public IFuture removeValues()
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -289,6 +314,7 @@ public class EAParameterSetFlyweight extends ElementFlyweight implements IEAPara
 								BeliefRules.removeParameterSetValue(getState(), getHandle(), avals[i]);
 						}				
 					}
+					ret.setResult(null);
 				}
 			});
 		}
@@ -319,7 +345,10 @@ public class EAParameterSetFlyweight extends ElementFlyweight implements IEAPara
 					getInterpreter().endMonitorConsequences();
 				}				
 			}
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**

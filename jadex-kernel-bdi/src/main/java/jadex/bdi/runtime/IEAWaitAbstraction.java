@@ -1,5 +1,7 @@
 package jadex.bdi.runtime;
 
+import jadex.commons.IFuture;
+
 
 /**
  *  Definition of aspects to wait for.
@@ -80,61 +82,61 @@ public interface IEAWaitAbstraction
 	 *  Remove a message event.
 	 *  @param type The type.
 	 */
-	public void removeMessageEvent(String type);
+	public IFuture removeMessageEvent(String type);
 
 	/**
 	 *  Remove a message event reply.
 	 *  @param me The message event.
 	 */
-	public void removeReply(IEAMessageEvent me);
+	public IFuture removeReply(IEAMessageEvent me);
 
 	/**
 	 *  Remove an internal event.
 	 *  @param type The type.
 	 */
-	public void removeInternalEvent(String type);
+	public IFuture removeInternalEvent(String type);
 
 	/**
 	 *  Remove a goal.
 	 *  @param type The type.
 	 */
-	public void removeGoal(String type);
+	public IFuture removeGoal(String type);
 
 	/**
 	 *  Remove a goal.
 	 *  @param goal The goal.
 	 */
-	public void removeGoal(IEAGoal goal);
+	public IFuture removeGoal(IEAGoal goal);
 	
 	/**
 	 *  Remove a fact changed.
 	 *  @param belief The belief or beliefset.
 	 */
-	public void removeFactChanged(String belief);
+	public IFuture removeFactChanged(String belief);
 
 	/**
 	 *  Remove a fact added.
 	 *  @param beliefset The beliefset.
 	 */
-	public void removeFactAdded(String beliefset);
+	public IFuture removeFactAdded(String beliefset);
 
 
 	/**
 	 *  Remove a fact removed.
 	 *  @param beliefset The beliefset.
 	 */
-	public void removeFactRemoved(String beliefset);	
+	public IFuture removeFactRemoved(String beliefset);	
 
 	/**
 	 *  Remove a condition.
 	 *  @param condition the condition name.
 	 */
-	public void removeCondition(String condition);
+	public IFuture removeCondition(String condition);
 	
 	/**
 	 *  Remove an external condition.
 	 *  @param condition the condition.
 	 */
-	public void	removeExternalCondition(IExternalCondition condition);
+	public IFuture	removeExternalCondition(IExternalCondition condition);
 }
 

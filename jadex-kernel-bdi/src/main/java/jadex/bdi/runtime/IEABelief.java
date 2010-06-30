@@ -11,7 +11,7 @@ public interface IEABelief extends IEAElement
 	 *  Set a fact of a belief.
 	 *  @param fact The new fact.
 	 */
-	public void setFact(Object fact);
+	public IFuture setFact(Object fact);
 
 	/**
 	 *  Get the fact of a belief.
@@ -24,7 +24,7 @@ public interface IEABelief extends IEAElement
 	 *  Calling this method causes an internal fact changed
 	 *  event that might cause dependent actions.
 	 */
-	public void modified();
+	public IFuture modified();
 	
 	/**
 	 *  Get the value class.
@@ -44,12 +44,12 @@ public interface IEABelief extends IEAElement
 	 *  Add a belief listener.
 	 *  @param listener The belief listener.
 	 */
-	public void addBeliefListener(IBeliefListener listener);
+	public IFuture addBeliefListener(IBeliefListener listener);
 	
 	/**
 	 *  Remove a belief listener.
 	 *  @param listener The belief listener.
 	 */
-	public void removeBeliefListener(IBeliefListener listener);
+	public IFuture removeBeliefListener(IBeliefListener listener);
 
 }

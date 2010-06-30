@@ -619,7 +619,7 @@ public class StarterPanel extends JPanel
 	 */
 	void updateGuiForNewModel(final String adf)
 	{
-		System.out.println("updategui "+adf);
+//		System.out.println("updategui "+adf);
 		
 		ItemListener[] lis = config.getItemListeners();
 		for(int i=0; i<lis.length; i++)
@@ -1037,7 +1037,7 @@ public class StarterPanel extends JPanel
 	protected void createArgumentGui(final IArgument arg, final int y, ILibraryService ls)
 	{
 		// todo:
-		System.out.println("argument gui: "+arg+" "+model);
+//		System.out.println("argument gui: "+arg+" "+model);
 		
 		JLabel namel = new JLabel(arg.getName());
 		final JValidatorTextField valt = new JValidatorTextField(15);

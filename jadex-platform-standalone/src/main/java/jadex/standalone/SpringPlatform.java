@@ -4,6 +4,7 @@ import jadex.base.AbstractPlatform;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.service.IService;
 
@@ -124,7 +125,7 @@ public class SpringPlatform extends AbstractPlatform
 	/**
 	 *  Start the platform.
 	 */
-	public void start()
+	public IFuture start()
 	{
 		// Start the services.
 		for(Iterator it=services.keySet().iterator(); it.hasNext(); )
@@ -223,6 +224,9 @@ public class SpringPlatform extends AbstractPlatform
 				}
 			});
 		}
+		
+		// hack: todo
+		return null;
 	}
 	
 	/**

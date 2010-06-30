@@ -388,8 +388,10 @@ public class EAGoalFlyweight extends EAProcessableElementFlyweight implements IE
 	 *  Causes all associated process goals
 	 *  and subgoals to be dropped.
 	 */
-	public void drop()
+	public IFuture drop()
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -397,6 +399,7 @@ public class EAGoalFlyweight extends EAProcessableElementFlyweight implements IE
 				public void run()
 				{
 					GoalLifecycleRules.dropGoal(getState(), getHandle());
+					ret.setResult(null);
 				}
 			});
 		}
@@ -405,7 +408,10 @@ public class EAGoalFlyweight extends EAProcessableElementFlyweight implements IE
 			getInterpreter().startMonitorConsequences();
 			GoalLifecycleRules.dropGoal(getState(), getHandle());
 			getInterpreter().endMonitorConsequences();
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**
@@ -477,8 +483,10 @@ public class EAGoalFlyweight extends EAProcessableElementFlyweight implements IE
 	 *  Add a goal listener.
 	 *  @param listener The goal listener.
 	 */
-	public void addGoalListener(final IGoalListener listener)
+	public IFuture addGoalListener(final IGoalListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -486,21 +494,27 @@ public class EAGoalFlyweight extends EAProcessableElementFlyweight implements IE
 				public void run()
 				{
 					addEventListener(listener, getHandle());
+					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
 			addEventListener(listener, getHandle());
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
 	 *  Remove a goal listener.
 	 *  @param listener The goal listener.
 	 */
-	public void removeGoalListener(final IGoalListener listener)
+	public IFuture removeGoalListener(final IGoalListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -509,6 +523,7 @@ public class EAGoalFlyweight extends EAProcessableElementFlyweight implements IE
 				{
 					// If goal is already finished, do safe removal, because listener may have been automatically removed.
 					removeEventListener(listener, getHandle(), internalIsFinished());
+					ret.setResult(null);
 				}
 			});
 		}
@@ -516,7 +531,10 @@ public class EAGoalFlyweight extends EAProcessableElementFlyweight implements IE
 		{
 			// If goal is already finished, do safe removal, because listener may have been automatically removed.
 			removeEventListener(listener, getHandle(), internalIsFinished());
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	//-------- element interface --------

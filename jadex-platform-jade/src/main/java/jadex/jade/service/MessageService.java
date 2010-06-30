@@ -38,6 +38,8 @@ import jadex.bridge.IMessageListener;
 import jadex.bridge.IMessageService;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.MessageType;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IResultListener;
@@ -454,17 +456,17 @@ public class MessageService implements IMessageService, IService
 	/**
 	 *  Start the service.
 	 */
-	public void startService()
+	public IFuture startService()
 	{
+		return new Future(null);
 	}
 	
 	/**
 	 *  Called when the platform shuts down. Do necessary cleanup here (if any).
 	 */
-	public void shutdownService(IResultListener listener)
+	public IFuture shutdownService()
 	{
-		if(listener!=null)
-			listener.resultAvailable(this, null);
+		return new Future(null);
 	}
 }
 

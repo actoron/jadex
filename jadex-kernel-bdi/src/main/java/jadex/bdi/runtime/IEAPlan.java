@@ -36,7 +36,7 @@ public interface IEAPlan extends IEAParameterElement
 	/**
 	 *  Abort a running plan. 
 	 */
-	public void abortPlan();
+	public IFuture abortPlan();
 	
 	//-------- listeners --------
 	
@@ -44,11 +44,11 @@ public interface IEAPlan extends IEAParameterElement
 	 *  Add a goal listener.
 	 *  @param listener The goal listener.
 	 */
-	public void addPlanListener(IPlanListener listener);
+	public IFuture addPlanListener(IPlanListener listener);
 	
 	/**
 	 *  Remove a goal listener.
 	 *  @param listener The goal listener.
 	 */
-	public void removePlanListener(IPlanListener listener);
+	public IFuture removePlanListener(IPlanListener listener);
 }

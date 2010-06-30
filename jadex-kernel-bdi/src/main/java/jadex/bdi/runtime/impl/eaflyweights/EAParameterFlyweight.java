@@ -91,8 +91,10 @@ public class EAParameterFlyweight extends ElementFlyweight implements IEAParamet
 	 *  Set a value of a parameter.
 	 *  @param value The new value.
 	 */
-	public void setValue(final Object value)
+	public IFuture setValue(final Object value)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -120,6 +122,7 @@ public class EAParameterFlyweight extends ElementFlyweight implements IEAParamet
 							+direction+" "+getName());
 
 					BeliefRules.setParameterValue(getState(), getHandle(), value);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -148,7 +151,10 @@ public class EAParameterFlyweight extends ElementFlyweight implements IEAParamet
 			getInterpreter().startMonitorConsequences();
 			BeliefRules.setParameterValue(getState(), getHandle(), value);
 			getInterpreter().endMonitorConsequences();
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**

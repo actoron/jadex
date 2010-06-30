@@ -69,11 +69,11 @@ public interface IEAMessageEvent extends IEAProcessableElement
 	 *  Add a message event listener.
 	 *  @param listener The message event listener.
 	 */
-	public void addMessageEventListener(IMessageEventListener listener);
+	public IFuture addMessageEventListener(IMessageEventListener listener);
 	
 	/**
 	 *  Remove a message event listener.
 	 *  @param listener The message event listener.
 	 */
-	public void removeMessageEventListener(IMessageEventListener listener);
+	public IFuture removeMessageEventListener(IMessageEventListener listener);
 }

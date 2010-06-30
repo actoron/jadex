@@ -13,8 +13,6 @@ public class CMSLocalShutdownPlatformPlan extends Plan
 	 */
 	public void body()
 	{
-		SyncResultListener lis = new SyncResultListener();
-		getScope().getServiceContainer().shutdown(lis);
-		lis.waitForResult();
+		getScope().getServiceContainer().shutdown().get(this);
 	}
 }

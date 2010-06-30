@@ -48,7 +48,7 @@ public interface IEAGoalbase extends IEAElement
 	 *  Dispatch a new top-level goal.
 	 *  @param goal The new goal.
 	 */
-	public void	dispatchTopLevelGoal(IEAGoal goal);
+	public IFuture dispatchTopLevelGoal(IEAGoal goal);
 
 	/**
 	 *  Register a new goal model.
@@ -81,12 +81,12 @@ public interface IEAGoalbase extends IEAElement
 	 *  @param type	The goal type.
 	 *  @param listener The goal listener.
 	 */
-	public void addGoalListener(String type, IGoalListener listener);	
+	public IFuture addGoalListener(String type, IGoalListener listener);	
 	
 	/**
 	 *  Remove a goal listener.
 	 *  @param type	The goal type.
 	 *  @param listener The goal listener.
 	 */
-	public void removeGoalListener(String type, IGoalListener listener);
+	public IFuture removeGoalListener(String type, IGoalListener listener);
 }

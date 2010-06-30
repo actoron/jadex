@@ -57,8 +57,10 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 	 *  Add a fact to a belief.
 	 *  @param fact The new fact.
 	 */
-	public void addFact(final Object fact)
+	public IFuture addFact(final Object fact)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -66,6 +68,7 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 				public void run()
 				{
 					BeliefRules.addBeliefSetValue(getState(), getHandle(), fact);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -74,15 +77,20 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 			getInterpreter().startMonitorConsequences();
 			BeliefRules.addBeliefSetValue(getState(), getHandle(), fact);
 			getInterpreter().endMonitorConsequences();
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**
 	 *  Remove a fact to a belief.
 	 *  @param fact The new fact.
 	 */
-	public void removeFact(final Object fact)
+	public IFuture removeFact(final Object fact)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -90,6 +98,7 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 				public void run()
 				{
 					FlyweightFunctionality.removeFact(getState(), getHandle(), fact);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -98,15 +107,20 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 			getInterpreter().startMonitorConsequences();
 			FlyweightFunctionality.removeFact(getState(), getHandle(), fact);
 			getInterpreter().endMonitorConsequences();
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**
 	 *  Add facts to a parameter set.
 	 *  @param facts The facts.
 	 */
-	public void addFacts(final Object[] facts)
+	public IFuture addFacts(final Object[] facts)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -114,6 +128,7 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 				public void run()
 				{
 					FlyweightFunctionality.addFacts(getState(), getHandle(), facts);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -122,14 +137,19 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 			getInterpreter().startMonitorConsequences();
 			FlyweightFunctionality.addFacts(getState(), getHandle(), facts);
 			getInterpreter().endMonitorConsequences();
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**
 	 *  Remove all facts from a belief.
 	 */
-	public void removeFacts()
+	public IFuture removeFacts()
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -137,13 +157,17 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 				public void run()
 				{
 					FlyweightFunctionality.removeFacts(getState(), getHandle());
+					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
 			FlyweightFunctionality.removeFacts(getState(), getHandle());
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**
@@ -160,13 +184,13 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 			{
 				public void run()
 				{
-					FlyweightFunctionality.getFact(getState(), getHandle(), getScope(), oldval);
+					ret.setResult(FlyweightFunctionality.getFact(getState(), getHandle(), getScope(), oldval));
 				}
 			});
 		}
 		else
 		{
-			FlyweightFunctionality.getFact(getState(), getHandle(), getScope(), oldval);
+			ret.setResult(FlyweightFunctionality.getFact(getState(), getHandle(), getScope(), oldval));
 		}
 		
 		return ret;
@@ -246,8 +270,10 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 	 *  value with equals, removes it and stores the new fact.
 	 *  @param newfact The new fact.
 	 */
-	public void updateFact(final Object newfact)
+	public IFuture updateFact(final Object newfact)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -255,6 +281,7 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 				public void run()
 				{
 					FlyweightFunctionality.updateFact(getState(), getHandle(), newfact);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -263,7 +290,10 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 			getInterpreter().startMonitorConsequences();
 			FlyweightFunctionality.updateFact(getState(), getHandle(), newfact);
 			getInterpreter().endMonitorConsequences();
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**
@@ -300,8 +330,10 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 	 *  Calling this method causes an internal facts changed
 	 *  event that might cause dependent actions.
 	 */
-	public void modified(final Object fact)
+	public IFuture modified(final Object fact)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -309,6 +341,7 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 				public void run()
 				{
 					getInterpreter().getEventReificator().objectModified(getHandle(), getState().getType(getHandle()), OAVBDIRuntimeModel.beliefset_has_facts, fact, fact);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -317,7 +350,10 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 			getInterpreter().startMonitorConsequences();
 			getInterpreter().getEventReificator().objectModified(getHandle(), getState().getType(getHandle()), OAVBDIRuntimeModel.beliefset_has_facts, fact, fact);
 			getInterpreter().endMonitorConsequences();
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**
@@ -394,8 +430,10 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 	 *  Add a belief listener.
 	 *  @param listener The belief listener.
 	 */
-	public void addBeliefSetListener(final IBeliefSetListener listener)
+	public IFuture addBeliefSetListener(final IBeliefSetListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -403,21 +441,27 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 				public void run()
 				{
 					addEventListener(listener, getHandle());
+					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
 			addEventListener(listener, getHandle());
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
 	 *  Remove a belief listener.
 	 *  @param listener The belief listener.
 	 */
-	public void removeBeliefSetListener(final IBeliefSetListener listener)
+	public IFuture removeBeliefSetListener(final IBeliefSetListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -425,13 +469,17 @@ public class EABeliefSetFlyweight extends ElementFlyweight implements IEABeliefS
 				public void run()
 				{
 					removeEventListener(listener, getHandle(), false);
+					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
 			removeEventListener(listener, getHandle(), false);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	//-------- element interface --------

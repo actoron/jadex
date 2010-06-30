@@ -804,7 +804,7 @@ public class ControlCenter implements IControlCenter
 			closePlugins();
 			killed = true;
 			
-			container.shutdown(null);
+			container.shutdown();
 			
 		}
 		else if(JOptionPane.NO_OPTION == choice)
@@ -818,7 +818,7 @@ public class ControlCenter implements IControlCenter
 			closePlugins();
 			killed = true;
 			
-			container.shutdown(null);
+			container.shutdown();
 		}
 		// else CANCEL
 

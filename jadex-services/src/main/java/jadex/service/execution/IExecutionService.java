@@ -37,13 +37,6 @@ public interface IExecutionService	extends IService
 	public void cancel(IExecutable task, IResultListener listener);
 		
 	/**
-	 *  Shutdown the executor service.
-	 *  @param listener Called when execution has stopped.
-	 */
-//	Already defined in IPlatformService
-//	public void shutdown(IResultListener listener);
-	
-	/**
 	 *  Test if the executor is currently idle.
 	 */
 	public boolean isIdle();

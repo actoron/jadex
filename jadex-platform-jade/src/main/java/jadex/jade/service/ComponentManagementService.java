@@ -1061,21 +1061,19 @@ public class ComponentManagementService implements IComponentManagementService, 
 	/**
 	 *  Start the service.
 	 */
-	public void startService()
+	public IFuture startService()
 	{
-		
+		return new Future(null);
 	}
 
 	/**
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public void shutdownService(IResultListener listener)
+	public IFuture shutdownService()
 	{
-		if(listener!=null)
-			listener.resultAvailable(this, null);
+		return new Future(null);
 	}
-	
 }
 
 	

@@ -114,6 +114,8 @@ public class MessageService implements IMessageService, IService
 //	public void sendMessage(Map msg, MessageType type, IComponentIdentifier sender, ClassLoader cl)
 	public void sendMessage(final Map msg, final MessageType type, final IComponentAdapter adapter, final ClassLoader cl)
 	{
+		final Future ret = new Future();
+		
 		IComponentIdentifier sender = adapter.getComponentIdentifier();
 		if(sender==null)
 			throw new RuntimeException("Sender must not be null: "+msg);

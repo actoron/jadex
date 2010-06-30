@@ -150,8 +150,10 @@ public class EAPlanFlyweight extends EAParameterElementFlyweight implements IEAP
 	/**
 	 *  Abort a running plan. 
 	 */
-	public void abortPlan()
+	public IFuture abortPlan()
 	{
+		final Future ret = new Future();
+		
 		// what about when the plan is handling a goal.
 		// is the goal properly executed?
 		
@@ -162,13 +164,17 @@ public class EAPlanFlyweight extends EAParameterElementFlyweight implements IEAP
 				public void run()
 				{
 					PlanRules.abortPlan(getState(), getScope(), getHandle());
+					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
 			PlanRules.abortPlan(getState(), getScope(), getHandle());
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	//-------- listeners --------
@@ -177,8 +183,10 @@ public class EAPlanFlyweight extends EAParameterElementFlyweight implements IEAP
 	 *  Add a plan listener.
 	 *  @param listener The plan listener.
 	 */
-	public void addPlanListener(final IPlanListener listener)
+	public IFuture addPlanListener(final IPlanListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -186,21 +194,26 @@ public class EAPlanFlyweight extends EAParameterElementFlyweight implements IEAP
 				public void run()
 				{
 					addEventListener(listener, getHandle());
+					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
 			addEventListener(listener, getHandle());
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
 	 *  Remove a plan listener.
 	 *  @param listener The plan listener.
 	 */
-	public void removePlanListener(final IPlanListener listener)
+	public IFuture removePlanListener(final IPlanListener listener)
 	{
+		final Future ret = new Future();
 		// Todo: safe removal when plan is already finished.
 		
 		if(getInterpreter().isExternalThread())
@@ -210,13 +223,17 @@ public class EAPlanFlyweight extends EAParameterElementFlyweight implements IEAP
 				public void run()
 				{
 					removeEventListener(listener, getHandle(), false);
+					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
 			removeEventListener(listener, getHandle(), false);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	//-------- element interface --------

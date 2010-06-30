@@ -2,6 +2,7 @@ package jadex.base;
 
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.IFuture;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
@@ -218,9 +219,12 @@ public class Platform extends AbstractPlatform
 	/**
 	 *  Start the platform.
 	 */
-	public void start()
+	public IFuture start()
 	{
-		// Start the services.
+		
+		
+		// Start the services. ??? why not call super?
+	
 		if(services!=null)
 		{
 			for(Iterator it=services.keySet().iterator(); it.hasNext(); )
@@ -315,6 +319,8 @@ public class Platform extends AbstractPlatform
 		});
 		
 		configurations = null;
+		
+		return null; // todo: hack
 	}
 	
 	/**

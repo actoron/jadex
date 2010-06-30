@@ -81,7 +81,7 @@ public interface IEAGoal extends IEAProcessableElement
 	 *  Causes all associated process goals
 	 *  and subgoals to be dropped.
 	 */
-	public void drop();
+	public IFuture drop();
 
 	/**
 	 *  Get the exception (if any).
@@ -123,11 +123,11 @@ public interface IEAGoal extends IEAProcessableElement
 	 *  Add a goal listener.
 	 *  @param listener The goal listener.
 	 */
-	public void addGoalListener(IGoalListener listener);
+	public IFuture addGoalListener(IGoalListener listener);
 	
 	/**
 	 *  Remove a goal listener.
 	 *  @param listener The goal listener.
 	 */
-	public void removeGoalListener(IGoalListener listener);
+	public IFuture removeGoalListener(IGoalListener listener);
 }

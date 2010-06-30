@@ -131,8 +131,10 @@ public class EAWaitqueueFlyweight extends EAWaitAbstractionFlyweight implements 
 	/**
 	 *  Remove an element.
 	 */
-	public void removeElement(final Object element)
+	public IFuture removeElement(final Object element)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -140,13 +142,17 @@ public class EAWaitqueueFlyweight extends EAWaitAbstractionFlyweight implements 
 				public void run()
 				{
 					getState().removeAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements, ((ElementFlyweight)element).getHandle());
+					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
 			getState().removeAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_waitqueueelements, ((ElementFlyweight)element).getHandle());
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**

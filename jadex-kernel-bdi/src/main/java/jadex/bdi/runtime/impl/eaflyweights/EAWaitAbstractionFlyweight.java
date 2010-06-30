@@ -1,19 +1,16 @@
 package jadex.bdi.runtime.impl.eaflyweights;
 
-import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IEAGoal;
 import jadex.bdi.runtime.IEAMessageEvent;
 import jadex.bdi.runtime.IEAWaitAbstraction;
 import jadex.bdi.runtime.IExternalCondition;
 import jadex.bdi.runtime.impl.FlyweightFunctionality;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
-import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
-import jadex.bdi.runtime.interpreter.MessageEventRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.commons.Future;
+import jadex.commons.IFuture;
 import jadex.rules.state.IOAVState;
-
-import java.util.Collection;
 
 /**
  *  Flyweight for a waitabstraction.
@@ -317,8 +314,10 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 	 *  Remove a message event.
 	 *  @param type The type.
 	 */
-	public void removeMessageEvent(final String type)
+	public IFuture removeMessageEvent(final String type)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -327,6 +326,7 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 				{
 					Object wa = getWaitAbstraction();
 					FlyweightFunctionality.removeMessageEvent(getState(), getScope(), type, wa);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -334,15 +334,20 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 		{
 			Object wa = getWaitAbstraction();
 			FlyweightFunctionality.removeMessageEvent(getState(), getScope(), type, wa);
+			ret.setResult(null);
 		}
+
+		return ret;
 	}
 
 	/**
 	 *  Remove a message event reply.
 	 *  @param me The message event.
 	 */
-	public void removeReply(final IEAMessageEvent me)
+	public IFuture removeReply(final IEAMessageEvent me)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -351,6 +356,7 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 				{
 					Object wa = getWaitAbstraction();
 					FlyweightFunctionality.removeReply(getState(), getScope(), (ElementFlyweight)me, wa);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -358,15 +364,20 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 		{
 			Object wa = getWaitAbstraction();
 			FlyweightFunctionality.removeReply(getState(), getScope(), (ElementFlyweight)me, wa);
+			ret.setResult(null);
 		}
+
+		return ret;
 	}
 
 	/**
 	 *  Remove an internal event.
 	 *  @param type The type.
 	 */
-	public void removeInternalEvent(final String type)
+	public IFuture removeInternalEvent(final String type)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -375,6 +386,7 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 				{
 					Object wa = getWaitAbstraction();
 					FlyweightFunctionality.removeInternalEvent(getState(), getScope(), type, wa);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -382,15 +394,20 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 		{
 			Object wa = getWaitAbstraction();
 			FlyweightFunctionality.removeInternalEvent(getState(), getScope(), type, wa);
+			ret.setResult(null);
 		}
+
+		return ret;
 	}
 
 	/**
 	 *  Remove a goal.
 	 *  @param type The type.
 	 */
-	public void removeGoal(final String type)
+	public IFuture removeGoal(final String type)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -399,6 +416,7 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 				{
 					Object wa = getWaitAbstraction();
 					FlyweightFunctionality.removeGoal(getState(), getScope(), type, wa);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -406,15 +424,20 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 		{
 			Object wa = getWaitAbstraction();
 			FlyweightFunctionality.removeGoal(getState(), getScope(), type, wa);
+			ret.setResult(null);
 		}
+
+		return ret;
 	}
 
 	/**
 	 *  Remove a goal.
 	 *  @param goal The goal.
 	 */
-	public void removeGoal(final IEAGoal goal)
+	public IFuture removeGoal(final IEAGoal goal)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -423,6 +446,7 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 				{
 					Object wa = getWaitAbstraction();
 					FlyweightFunctionality.removeGoal(getState(), (ElementFlyweight)goal, wa);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -430,15 +454,20 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 		{
 			Object wa = getWaitAbstraction();
 			FlyweightFunctionality.removeGoal(getState(), (ElementFlyweight)goal, wa);
+			ret.setResult(null);
 		}
+
+		return ret;
 	}
 	
 	/**
 	 *  Remove a fact changed.
 	 *  @param belief The belief or beliefset.
 	 */
-	public void removeFactChanged(final String belief)
+	public IFuture removeFactChanged(final String belief)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -447,6 +476,7 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 				{
 					Object wa = getWaitAbstraction();
 					FlyweightFunctionality.removeFactChanged(getState(), getScope(), belief, wa);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -454,15 +484,20 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 		{
 			Object wa = getWaitAbstraction();
 			FlyweightFunctionality.removeFactChanged(getState(), getScope(), belief, wa);
+			ret.setResult(null);
 		}
+
+		return ret;
 	}
 	
 	/**
 	 *  Remove a fact added.
 	 *  @param beliefset The beliefset.
 	 */
-	public void removeFactAdded(final String beliefset)
+	public IFuture removeFactAdded(final String beliefset)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -471,6 +506,7 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 				{
 					Object wa = getWaitAbstraction();
 					FlyweightFunctionality.removeFactAdded(getState(), getScope(), beliefset, wa);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -478,7 +514,10 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 		{
 			Object wa = getWaitAbstraction();
 			FlyweightFunctionality.removeFactAdded(getState(), getScope(), beliefset, wa);
+			ret.setResult(null);
 		}
+
+		return ret;
 	}
 
 
@@ -486,8 +525,10 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 	 *  Remove a fact removed.
 	 *  @param beliefset The beliefset.
 	 */
-	public void removeFactRemoved(final String beliefset)
+	public IFuture removeFactRemoved(final String beliefset)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -496,6 +537,7 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 				{
 					Object wa = getWaitAbstraction();
 					FlyweightFunctionality.removeFactRemoved(getState(), getScope(), beliefset, wa);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -503,15 +545,20 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 		{
 			Object wa = getWaitAbstraction();
 			FlyweightFunctionality.removeFactRemoved(getState(), getScope(), beliefset, wa);
+			ret.setResult(null);
 		}
+
+		return ret;
 	}
 	
 	/**
 	 *  Remove a condition.
 	 *  @param type The condition.
 	 */
-	public void removeCondition(final String type)
+	public IFuture removeCondition(final String type)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -520,6 +567,7 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 				{
 					Object wa = getWaitAbstraction();
 					FlyweightFunctionality.removeCondition(getState(), getScope(), type, wa);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -527,15 +575,20 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 		{
 			Object wa = getWaitAbstraction();
 			FlyweightFunctionality.removeCondition(getState(), getScope(), type, wa);
+			ret.setResult(null);
 		}
+
+		return ret;
 	}
 	
 	/**
 	 *  Remove an external condition.
 	 *  @param condition The condition.
 	 */
-	public void removeExternalCondition(final IExternalCondition condition)
+	public IFuture removeExternalCondition(final IExternalCondition condition)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -544,6 +597,7 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 				{
 					Object wa = getWaitAbstraction();
 					FlyweightFunctionality.removeExternalCondition(getState(), condition, wa);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -551,7 +605,10 @@ public class EAWaitAbstractionFlyweight extends ElementFlyweight implements IEAW
 		{
 			Object wa = getWaitAbstraction();
 			FlyweightFunctionality.removeExternalCondition(getState(), condition, wa);
+			ret.setResult(null);
 		}
+
+		return ret;
 	}
 
 	/**

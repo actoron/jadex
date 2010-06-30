@@ -68,7 +68,7 @@ public interface IEAParameterElement extends IEAElement
 	 *  @param parameter The parameter name.
 	 *  @param value The value.
 	 */
-	public void setParameterValue(String parameter, Object value);
+	public IFuture setParameterValue(String parameter, Object value);
 	
 	/**
 	 *  Get the values of a parameterset.
@@ -81,27 +81,27 @@ public interface IEAParameterElement extends IEAElement
 	 *  @param parameterset The parameterset name.
 	 *  @param value The value.
 	 */
-	public void addParameterSetValue(String parameterset, Object value);
+	public IFuture addParameterSetValue(String parameterset, Object value);
 	
 	/**
 	 *  Add values to a parameterset.
 	 *  @param parameterset The parameterset name.
 	 *  @param values The values.
 	 */
-	public void addParameterSetValues(String parameterset, Object[] values);
+	public IFuture addParameterSetValues(String parameterset, Object[] values);
 	
 	/**
 	 *  Remove a value to a parameterset.
 	 *  @param parameterset The parameterset name.
 	 *  @param value The value.
 	 */
-	public void removeParameterSetValue(final String parameterset, final Object value);
+	public IFuture removeParameterSetValue(final String parameterset, final Object value);
 	
 	/**
 	 *  Remove all values from a parameterset.
 	 *  @param parameterset The parameterset name.
 	 */
-	public void removeParameterSetValues(final String parameterset);
+	public IFuture removeParameterSetValues(final String parameterset);
 	
 	/**
 	 *  Remove a value to a parameterset.

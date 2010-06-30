@@ -144,7 +144,7 @@ public interface IEABeliefbase extends IEAElement
 	 *  @param belief The belief name.
 	 *  @param fact The fact.
 	 */
-	public void setBeliefFact(final String belief, final Object fact);
+	public IFuture setBeliefFact(final String belief, final Object fact);
 	
 	/**
 	 *  Get the facts of a beliefset.
@@ -156,41 +156,41 @@ public interface IEABeliefbase extends IEAElement
 	 *  Add a belief listener.
 	 *  @param listener The belief listener.
 	 */
-	public void addBeliefListener(final String belief, final IBeliefListener listener);
+	public IFuture addBeliefListener(final String belief, final IBeliefListener listener);
 	
 	/**
 	 *  Remove a belief listener.
 	 *  @param listener The belief listener.
 	 */
-	public void removeBeliefListener(final String belief, final IBeliefListener listener);
+	public IFuture removeBeliefListener(final String belief, final IBeliefListener listener);
 	
 	/**
 	 *  Add a fact to a beliefset.
 	 *  @param beliefset The beliefset name.
 	 *  @param fact The fact.
 	 */
-	public void addBeliefSetFact(final String beliefset, final Object fact);
+	public IFuture addBeliefSetFact(final String beliefset, final Object fact);
 	
 	/**
 	 *  Add a fact to a beliefset.
 	 *  @param beliefset The beliefset name.
 	 *  @param facts The facts.
 	 */
-	public void addBeliefSetFacts(final String beliefset, final Object[] facts);
+	public IFuture addBeliefSetFacts(final String beliefset, final Object[] facts);
 
 	/**
 	 *  Remove a fact to a beliefset.
 	 *  @param beliefset The beliefset name.
 	 *  @param fact The fact.
 	 */
-	public void removeBeliefSetFact(final String beliefset, final Object fact);
+	public IFuture removeBeliefSetFact(final String beliefset, final Object fact);
 	
 	/**
 	 *  Remove a fact to a beliefset.
 	 *  @param beliefset The beliefset name.
 	 *  @param fact The fact.
 	 */
-	public void removeBeliefSetFacts(final String beliefset);
+	public IFuture removeBeliefSetFacts(final String beliefset);
 	
 	/**
 	 *  Remove a fact to a beliefset.
@@ -210,12 +210,12 @@ public interface IEABeliefbase extends IEAElement
 	 *  Add a belief listener.
 	 *  @param listener The belief listener.
 	 */
-	public void addBeliefSetListener(final String beliefset, final IBeliefSetListener listener);
+	public IFuture addBeliefSetListener(final String beliefset, final IBeliefSetListener listener);
 	
 	/**
 	 *  Remove a belief listener.
 	 *  @param listener The belief listener.
 	 */
-	public void removeBeliefSetListener(final String beliefset, final IBeliefSetListener listener);
+	public IFuture removeBeliefSetListener(final String beliefset, final IBeliefSetListener listener);
 	
 }

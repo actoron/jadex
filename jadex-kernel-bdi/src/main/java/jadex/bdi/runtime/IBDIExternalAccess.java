@@ -15,7 +15,7 @@ public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 	 *  @param goal The new goal.
 	 *  Note: plan step is interrupted after call.
 	 */
-	public void dispatchTopLevelGoal(IEAGoal goal);
+	public IFuture dispatchTopLevelGoal(IEAGoal goal);
 
 	/**
 	 *  Create a goal from a template goal.
@@ -34,14 +34,14 @@ public interface IBDIExternalAccess extends IExternalAccess, IEACapability
 	 *  @param me	The message event.
 	 *  @return The filter to wait for an answer.
 	 */
-	public void	sendMessage(IEAMessageEvent me);
+	public IFuture sendMessage(IEAMessageEvent me);
 
 	/**
 	 *  Dispatch an internal event.
 	 *  @param event The event.
 	 *  Note: plan step is interrupted after call.
 	 */
-	public void dispatchInternalEvent(IEAInternalEvent event);
+	public IFuture dispatchInternalEvent(IEAInternalEvent event);
 
 	/**
 	 *  Create a new message event.

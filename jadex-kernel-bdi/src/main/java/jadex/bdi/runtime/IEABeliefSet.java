@@ -11,23 +11,23 @@ public interface IEABeliefSet extends IEAElement
 	 *  Add a fact to a belief.
 	 *  @param fact The new fact.
 	 */
-	public void addFact(Object fact);
+	public IFuture addFact(Object fact);
 
 	/**
 	 *  Remove a fact to a belief.
 	 *  @param fact The new fact.
 	 */
-	public void removeFact(Object fact);
+	public IFuture removeFact(Object fact);
 
 	/**
 	 *  Add facts to a parameter set.
 	 */
-	public void addFacts(Object[] values);
+	public IFuture addFacts(Object[] values);
 
 	/**
 	 *  Remove all facts from a belief.
 	 */
-	public void removeFacts();
+	public IFuture removeFacts();
 
 	/**
 	 *  Get a value equal to the given object.
@@ -67,7 +67,7 @@ public interface IEABeliefSet extends IEAElement
 	 *  Calling this method causes an internal facts changed
 	 *  event that might cause dependent actions.
 	 */
-	public void modified(Object fact);
+	public IFuture modified(Object fact);
 
 	/**
 	 *  Update or add a fact. When the fact is already
@@ -102,11 +102,11 @@ public interface IEABeliefSet extends IEAElement
 	 *  Add a belief set listener.
 	 *  @param listener The belief set listener.
 	 */
-	public void addBeliefSetListener(IBeliefSetListener listener);
+	public IFuture addBeliefSetListener(IBeliefSetListener listener);
 	
 	/**
 	 *  Remove a belief set listener.
 	 *  @param listener The belief set listener.
 	 */
-	public void removeBeliefSetListener(IBeliefSetListener listener);
+	public IFuture removeBeliefSetListener(IBeliefSetListener listener);
 }

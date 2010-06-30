@@ -710,7 +710,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			getJCC().getServiceContainer().shutdown(new SwingDefaultResultListener(spanel)
+			getJCC().getServiceContainer().shutdown().addResultListener(new SwingDefaultResultListener(spanel)
 			{
 				public void customResultAvailable(Object source, Object result)
 				{

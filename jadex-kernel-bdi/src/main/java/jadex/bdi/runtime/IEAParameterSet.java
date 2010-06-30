@@ -13,23 +13,23 @@ public interface IEAParameterSet extends IEAElement
 	 *  Add a value to a parameter set.
 	 *  @param value The new value.
 	 */
-	public void addValue(Object value);
+	public IFuture addValue(Object value);
 
 	/**
 	 *  Remove a value to a parameter set.
 	 *  @param value The new value.
 	 */
-	public void removeValue(Object value);
+	public IFuture removeValue(Object value);
 
 	/**
 	 *  Add values to a parameter set.
 	 */
-	public void addValues(Object[] values);
+	public IFuture addValues(Object[] values);
 
 	/**
 	 *  Remove all values from a parameter set.
 	 */
-	public void removeValues();
+	public IFuture removeValues();
 
 	/**
 	 *  Get a value equal to the given object.

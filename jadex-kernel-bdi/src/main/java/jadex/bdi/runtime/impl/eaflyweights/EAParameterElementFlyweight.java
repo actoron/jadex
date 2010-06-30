@@ -249,8 +249,9 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 	 *  @param parameter The parameter name.
 	 *  @param value The value.
 	 */
-	public void setParameterValue(final String parameter, final Object value)
+	public IFuture setParameterValue(final String parameter, final Object value)
 	{
+		final Future ret = new Future();
 		
 		if(getInterpreter().isExternalThread())
 		{
@@ -260,6 +261,7 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 				{
 					IParameter param = (IParameter)FlyweightFunctionality.getParameter(getState(), getScope(), getHandle(), parameter, false);
 					param.setValue(value);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -267,8 +269,10 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 		{
 			IParameter param = (IParameter)FlyweightFunctionality.getParameter(getState(), getScope(), getHandle(), parameter, false);
 			param.setValue(value);
+			ret.setResult(null);
 		}
 		
+		return ret;
 	}
 	
 	/**
@@ -304,8 +308,10 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 	 *  @param parameterset The parameterset name.
 	 *  @param value The value.
 	 */
-	public void addParameterSetValue(final String parameterset, final Object value)
+	public IFuture addParameterSetValue(final String parameterset, final Object value)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -314,6 +320,7 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 				{
 					IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 					paramset.addValue(value);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -321,7 +328,10 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 		{
 			IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 			paramset.addValue(value);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -329,8 +339,10 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 	 *  @param parameterset The parameterset name.
 	 *  @param values The values.
 	 */
-	public void addParameterSetValues(final String parameterset, final Object[] values)
+	public IFuture addParameterSetValues(final String parameterset, final Object[] values)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -339,6 +351,7 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 				{
 					IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 					paramset.addValues(values);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -346,7 +359,10 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 		{
 			IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 			paramset.addValues(values);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -354,8 +370,10 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 	 *  @param parameterset The parameterset name.
 	 *  @param value The value.
 	 */
-	public void removeParameterSetValue(final String parameterset, final Object value)
+	public IFuture removeParameterSetValue(final String parameterset, final Object value)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -364,6 +382,7 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 				{
 					IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 					paramset.removeValue(value);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -371,15 +390,20 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 		{
 			IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 			paramset.removeValue(value);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
 	 *  Remove all values of a parameterset.
 	 *  @param parameterset The parameterset name.
 	 */
-	public void removeParameterSetValues(final String parameterset)
+	public IFuture removeParameterSetValues(final String parameterset)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -388,6 +412,7 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 				{
 					IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 					paramset.removeValues();
+					ret.setResult(null);
 				}
 			});
 		}
@@ -395,7 +420,10 @@ public abstract class EAParameterElementFlyweight extends ElementFlyweight imple
 		{
 			IParameterSet paramset = (IParameterSet)FlyweightFunctionality.getParameterSet(getState(), getScope(), getHandle(), parameterset, false);
 			paramset.removeValues();
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**

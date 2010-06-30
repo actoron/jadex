@@ -61,8 +61,10 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 	 *  @param me	The message event.
 	 *  @return The filter to wait for an answer.
 	 */
-	public void	sendMessage(final IEAMessageEvent me)
+	public IFuture sendMessage(final IEAMessageEvent me)
 	{
+		final Future ret = new Future(); 
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -71,6 +73,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 				{
 					Object revent = ((EAMessageEventFlyweight)me).getHandle();
 					MessageEventRules.sendMessage(getState(), getScope(), revent);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -78,15 +81,20 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 		{
 			Object revent = ((EAMessageEventFlyweight)me).getHandle();
 			MessageEventRules.sendMessage(getState(), getScope(), revent);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**
 	 *  Dispatch an event.
 	 *  @param event The event.
 	 */
-	public void dispatchInternalEvent(final IEAInternalEvent event)
+	public IFuture dispatchInternalEvent(final IEAInternalEvent event)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -95,6 +103,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 				{
 					Object revent = ((ElementFlyweight)event).getHandle();
 					InternalEventRules.adoptInternalEvent(getState(), getScope(), revent);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -104,7 +113,10 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 			Object revent = ((ElementFlyweight)event).getHandle();
 			InternalEventRules.adoptInternalEvent(getState(), getScope(), revent);
 			getInterpreter().endMonitorConsequences();
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 
 	/**
@@ -247,8 +259,10 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 	 *  @param type	The internal event type.
 	 *  @param listener The internal event listener.
 	 */
-	public void addInternalEventListener(final String type, final IInternalEventListener listener)
+	public IFuture addInternalEventListener(final String type, final IInternalEventListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -257,6 +271,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 				{			
 					Object mevent = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_internalevents);
 					addEventListener(listener, mevent);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -264,7 +279,10 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 		{
 			Object mevent = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_internalevents);
 			addEventListener(listener, mevent);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -272,8 +290,10 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 	 *  @param type	The internal event type.
 	 *  @param listener The internal event listener.
 	 */
-	public void removeInternalEventListener(final String type, final IInternalEventListener listener)
+	public IFuture removeInternalEventListener(final String type, final IInternalEventListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -282,6 +302,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 				{
 					Object mevent = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_internalevents);
 					removeEventListener(listener, mevent, false);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -289,7 +310,10 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 		{
 			Object mevent = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_internalevents);
 			removeEventListener(listener, mevent, false);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -297,8 +321,10 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 	 *  @param type	The message event type.
 	 *  @param listener The message event listener.
 	 */
-	public void addMessageEventListener(final String type, final IMessageEventListener listener)
+	public IFuture addMessageEventListener(final String type, final IMessageEventListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -307,6 +333,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 				{
 					Object mevent = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_messageevents);
 					addEventListener(listener, mevent);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -314,7 +341,10 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 		{
 			Object mevent = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_messageevents);
 			addEventListener(listener, mevent);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -322,8 +352,10 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 	 *  @param type	The message event type.
 	 *  @param listener The message event listener.
 	 */
-	public void removeMessageEventListener(final String type, final IMessageEventListener listener)
+	public IFuture removeMessageEventListener(final String type, final IMessageEventListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -332,6 +364,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 				{
 					Object mevent = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_messageevents);
 					removeEventListener(listener, mevent, false);
+					ret.setResult(null);
 				}
 			});
 		}
@@ -339,7 +372,10 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 		{
 			Object mevent = FlyweightFunctionality.checkElementType(getState(), getScope(), type, OAVBDIMetaModel.capability_has_messageevents);
 			removeEventListener(listener, mevent, false);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -348,8 +384,10 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 	 *  @param msgevent The message event.
 	 *  todo: indexing for msgevents for speed.
 	 */
-	public void registerMessageEvent(final IEAMessageEvent mevent)
+	public IFuture registerMessageEvent(final IEAMessageEvent mevent)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -358,6 +396,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 				{
 					EAMessageEventFlyweight mef = (EAMessageEventFlyweight)mevent;
 					MessageEventRules.registerMessageEvent(getState(), mef.getHandle(), mef.getScope());
+					ret.setResult(null);
 				}
 			});
 		}
@@ -365,15 +404,20 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 		{
 			EAMessageEventFlyweight mef = (EAMessageEventFlyweight)mevent;
 			MessageEventRules.registerMessageEvent(getState(), mef.getHandle(), mef.getScope());
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
 	 *  Remove a registered message event.
 	 *  @param msgevent The message event.
 	 */
-	public void deregisterMessageEvent(final IEAMessageEvent mevent)
+	public IFuture deregisterMessageEvent(final IEAMessageEvent mevent)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -382,6 +426,7 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 				{
 					EAMessageEventFlyweight mef = (EAMessageEventFlyweight)mevent;
 					MessageEventRules.deregisterMessageEvent(getState(), mef.getHandle(), mef.getScope());
+					ret.setResult(null);
 				}
 			});
 		}
@@ -389,7 +434,10 @@ public class EAEventbaseFlyweight extends ElementFlyweight implements IEAEventba
 		{
 			EAMessageEventFlyweight mef = (EAMessageEventFlyweight)mevent;
 			MessageEventRules.deregisterMessageEvent(getState(), mef.getHandle(), mef.getScope());
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**

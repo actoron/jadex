@@ -14,13 +14,13 @@ public interface IEAEventbase extends IEAElement
 	 *  @param me	The message event.
 	 *  @return The filter to wait for an answer.
 	 */
-	public void	sendMessage(IEAMessageEvent me);
+	public IFuture sendMessage(IEAMessageEvent me);
 
 	/**
 	 *  Dispatch an event.
 	 *  @param event The event.
 	 */
-	public void dispatchInternalEvent(IEAInternalEvent event);
+	public IFuture dispatchInternalEvent(IEAInternalEvent event);
 
 	/**
 	 *  Create a new message event.
@@ -81,13 +81,13 @@ public interface IEAEventbase extends IEAElement
 	 *  @param msgevent The message event.
 	 *  todo: indexing for msgevents for speed.
 	 */
-	public void registerMessageEvent(IEAMessageEvent mevent);
+	public IFuture registerMessageEvent(IEAMessageEvent mevent);
 	
 	/**
 	 *  Remove a registered message event.
 	 *  @param msgevent The message event.
 	 */
-	public void deregisterMessageEvent(IEAMessageEvent mevent);
+	public IFuture deregisterMessageEvent(IEAMessageEvent mevent);
 	
 	/**
 	 *  Create component identifier.
@@ -124,14 +124,14 @@ public interface IEAEventbase extends IEAElement
 	 *  @param listener The internal event listener.
 	 *  @param async True, if the notification should be done on a separate thread.
 	 */
-	public void addInternalEventListener(String type, IInternalEventListener listener);
+	public IFuture addInternalEventListener(String type, IInternalEventListener listener);
 	
 	/**
 	 *  Remove a internal event listener.
 	 *  @param type	The internal event type.
 	 *  @param listener The internal event listener.
 	 */
-	public void removeInternalEventListener(String type, IInternalEventListener listener);
+	public IFuture removeInternalEventListener(String type, IInternalEventListener listener);
 	
 	/**
 	 *  Add a message event listener.
@@ -139,13 +139,13 @@ public interface IEAEventbase extends IEAElement
 	 *  @param listener The message event listener.
 	 *  @param async True, if the notification should be done on a separate thread.
 	 */
-	public void addMessageEventListener(String type, IMessageEventListener listener);
+	public IFuture addMessageEventListener(String type, IMessageEventListener listener);
 	
 	/**
 	 *  Remove a message event listener.
 	 *  @param type	The message event type.
 	 *  @param listener The message event listener.
 	 */
-	public void removeMessageEventListener(String type, IMessageEventListener listener);
+	public IFuture removeMessageEventListener(String type, IMessageEventListener listener);
 
 }

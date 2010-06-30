@@ -1,6 +1,6 @@
 package jadex.service;
 
-import jadex.commons.concurrent.IResultListener;
+import jadex.commons.IFuture;
 
 /**
  *  Interface for a service container. Allows
@@ -14,14 +14,17 @@ public interface IServiceContainer extends IServiceProvider
 	 */
 	public String getName();
 	
+	//-------- internal methods --------
+	
 	/**
 	 *  Start the service.
+	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public void start();
+	public IFuture start();
 	
 	/**
 	 *  Shutdown the service.
-	 *  @param listener The listener.
+	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
-	public void shutdown(IResultListener listener);
+	public IFuture shutdown();
 }

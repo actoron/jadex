@@ -3,8 +3,9 @@ package jadex.base;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentManagementService;
+import jadex.commons.Future;
 import jadex.commons.IFuture;
-import jadex.commons.concurrent.DefaultResultListener;
+import jadex.commons.concurrent.DelegationResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.service.PropertyServiceContainer;
@@ -64,18 +65,16 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 	/**
 	 *  Shutdown the platform.
 	 */
-	public void shutdown(IResultListener rl)
+	public IFuture shutdown()
 	{
-		if(rl==null)
-			rl	= DefaultResultListener.getInstance();
-		final IResultListener	listener	= rl;
+		final Future ret = new Future();
 		
 		//System.out.println("Shutting down the platform: "+getName());
 		// Hack !!! Should be synchronized with CES.
 		synchronized(this)
 		{
 			if(shuttingdown)
-				return;
+				return null; // todo: hack
 
 			this.shuttingdown = true;
 		}
@@ -86,8 +85,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 			public void resultAvailable(Object source, Object result)
 			{
 				final IComponentManagementService	cms	= (IComponentManagementService)result;
-				IFuture ret = cms.getComponentDescriptions();
-				ret.addResultListener(new IResultListener()
+				cms.getComponentDescriptions().addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -104,8 +102,7 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 							public void resultAvailable(Object source, Object result)
 							{
 								// Step 3: Find remaining components.
-								IFuture ret = cms.getComponentDescriptions();
-								ret.addResultListener(new IResultListener()
+								cms.getComponentDescriptions().addResultListener(new IResultListener()
 								{
 									public void resultAvailable(Object source, Object result)
 									{
@@ -115,41 +112,48 @@ public abstract class AbstractPlatform extends PropertyServiceContainer
 											public void resultAvailable(Object source, Object result)
 											{
 												// Step 5: Stop the services.
-												AbstractPlatform.super.shutdown(listener);
+												AbstractPlatform.super.shutdown().addResultListener(new DelegationResultListener(ret));
 											}
 											public void exceptionOccurred(Object source, Exception exception)
 											{
-												listener.exceptionOccurred(source, exception);
+												ret.setException(exception);
+//												listener.exceptionOccurred(source, exception);
 											}
 										});
 									}
 
 									public void exceptionOccurred(Object source, Exception exception)
 									{
-										listener.exceptionOccurred(source, exception);
+										ret.setException(exception);
+//										listener.exceptionOccurred(source, exception);
 									}
 								});		
 							}
 							
 							public void exceptionOccurred(Object source, Exception exception)
 							{
-								listener.exceptionOccurred(source, exception);
+								ret.setException(exception);
+//								listener.exceptionOccurred(source, exception);
 							}
 						});
 					}
 
 					public void exceptionOccurred(Object source, Exception exception)
 					{
-						listener.exceptionOccurred(source, exception);
+						ret.setException(exception);
+//						listener.exceptionOccurred(source, exception);
 					}
 				});
 			}
 			
 			public void exceptionOccurred(Object source, Exception exception)
 			{
-				listener.exceptionOccurred(source, exception);
+				ret.setException(exception);
+//				listener.exceptionOccurred(source, exception);
 			}
 		});
+		
+		return ret;
 	}
 	
 	/**

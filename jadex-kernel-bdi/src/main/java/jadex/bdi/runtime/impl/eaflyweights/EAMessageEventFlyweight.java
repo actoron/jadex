@@ -150,8 +150,10 @@ public class EAMessageEventFlyweight extends EAProcessableElementFlyweight imple
 	 *  Add a message event listener.
 	 *  @param listener The message event listener.
 	 */
-	public void addMessageEventListener(final IMessageEventListener listener)
+	public IFuture addMessageEventListener(final IMessageEventListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -159,21 +161,27 @@ public class EAMessageEventFlyweight extends EAProcessableElementFlyweight imple
 				public void run()
 				{
 					addEventListener(listener, getHandle());
+					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
 			addEventListener(listener, getHandle());
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	/**
 	 *  Remove a message event listener.
 	 *  @param listener The message event listener.
 	 */
-	public void removeMessageEventListener(final IMessageEventListener listener)
+	public IFuture removeMessageEventListener(final IMessageEventListener listener)
 	{
+		final Future ret = new Future();
+		
 		if(getInterpreter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
@@ -181,13 +189,17 @@ public class EAMessageEventFlyweight extends EAProcessableElementFlyweight imple
 				public void run()
 				{
 					removeEventListener(listener, getHandle(), false);
+					ret.setResult(null);
 				}
 			});
 		}
 		else
 		{
 			removeEventListener(listener, getHandle(), false);
+			ret.setResult(null);
 		}
+		
+		return ret;
 	}
 	
 	//-------- element interface --------
