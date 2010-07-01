@@ -6,6 +6,7 @@ import jadex.application.model.MApplicationType;
 import jadex.application.model.MArgument;
 import jadex.application.model.MComponentInstance;
 import jadex.application.model.MComponentType;
+import jadex.application.model.MExpressionType;
 import jadex.application.model.MSpaceInstance;
 import jadex.application.model.MSpaceType;
 import jadex.application.runtime.impl.Application;
@@ -168,6 +169,12 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 			}, null)));
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "component"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(MArgument.class), 
 			new MappingInfo(null, null, "value")));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "service")), new ObjectInfo(MExpressionType.class), 
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "className"))
+				}, null)));
+
 				
 		for(int i=0; mappings!=null && i<mappings.length; i++)
 		{

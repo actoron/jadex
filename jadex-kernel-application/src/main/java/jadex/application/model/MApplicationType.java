@@ -43,6 +43,9 @@ public class MApplicationType
 	/** The results. */
 	protected List results;
 	
+	/** The services. */
+	protected List services;
+	
 	//-------- constructors --------
 	
 	/**
@@ -56,6 +59,7 @@ public class MApplicationType
 		this.applications = new ArrayList();
 		this.arguments = new ArrayList();
 		this.results = new ArrayList();
+		this.services = new ArrayList();
 		this.autoshutdown = true;
 	}
 	
@@ -185,6 +189,15 @@ public class MApplicationType
 	public void addResult(Argument result)
 	{
 		this.results.add(result);
+	}
+	
+	/**
+	 *  Add a service.
+	 *  @param service The .
+	 */
+	public void addService(MExpressionType service)
+	{
+		this.services.add(service);
 	}
 	
 	/**
@@ -320,5 +333,14 @@ public class MApplicationType
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Get the services.
+	 *  @return The services.
+	 */
+	public List getServices()
+	{
+		return this.services;
 	}
 }
