@@ -14,6 +14,9 @@ public class SimpleValueFetcher implements IValueFetcher
 	/** The values. */
 	protected Map values;
 	
+	/** The parent fetcher if any. */
+	protected IValueFetcher	parent;
+	
 	//-------- constructors --------
 	
 	/**
@@ -21,6 +24,14 @@ public class SimpleValueFetcher implements IValueFetcher
 	 */
 	public SimpleValueFetcher()
 	{
+	}
+	
+	/**
+	 *  Create a new fetcher.
+	 */
+	public SimpleValueFetcher(IValueFetcher parent)
+	{
+		this.parent	= parent;
 	}
 	
 	//-------- IValueFetcher methods --------
@@ -32,13 +43,20 @@ public class SimpleValueFetcher implements IValueFetcher
 	 */
 	public Object fetchValue(String name)
 	{
-		Object ret = null;
+		Object ret	= null;
 		
 		if(name==null)
+		{
 			throw new RuntimeException("Name must not be null.");
-		
-		else if(values!=null)
+		}
+		else if(values!=null && values.containsKey(name))
+		{
 			ret = values.get(name);
+		}
+		else if(parent!=null)
+		{
+			ret	= parent.fetchValue(name);
+		}
 		
 		return ret;
 	}
@@ -51,7 +69,17 @@ public class SimpleValueFetcher implements IValueFetcher
 	 */
 	public Object fetchValue(String name, Object object)
 	{
-		throw new RuntimeException("Unkown object type: "+name);
+		Object	ret;
+		if(parent!=null)
+		{
+			ret	= parent.fetchValue(name, object);
+		}
+		else
+		{
+			throw new RuntimeException("Unkown object type: "+name);
+		}
+		
+		return ret;
 	}
 
 	//-------- additional methods --------

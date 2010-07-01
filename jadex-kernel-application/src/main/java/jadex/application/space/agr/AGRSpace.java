@@ -4,6 +4,7 @@ import jadex.application.model.MSpaceInstance;
 import jadex.application.runtime.IApplication;
 import jadex.application.runtime.ISpace;
 import jadex.bridge.IComponentIdentifier;
+import jadex.javaparser.IValueFetcher;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -80,7 +81,7 @@ public class AGRSpace implements ISpace
 		// nothing to do.
 	}
 	
-	public void initSpace(IApplication context, MSpaceInstance config) throws Exception
+	public void initSpace(IApplication context, MSpaceInstance config, IValueFetcher fetcher) throws Exception
 	{
 		MGroupInstance[]	mgroups	= ((MAGRSpaceInstance)config).getMGroupInstances();
 		for(int g=0; g<mgroups.length; g++)

@@ -26,10 +26,11 @@ import jadex.bridge.IComponentManagementService;
 import jadex.commons.IFuture;
 import jadex.commons.IPropertyObject;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
-import jadex.commons.meta.IPropertyMetaData;
 import jadex.commons.meta.IPropertyMetaDataSet;
 import jadex.javaparser.IParsedExpression;
+import jadex.javaparser.IValueFetcher;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.service.library.ILibraryService;
 
@@ -38,7 +39,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -164,16 +164,13 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 	/**
 	 *  Create a space.
 	 */
-	public void	initSpace(IApplication context, MSpaceInstance config) throws Exception
+	public void	initSpace(final IApplication context, MSpaceInstance config, IValueFetcher pfetcher) throws Exception
 	{
 		MEnvSpaceInstance	si	= (MEnvSpaceInstance)config;
-		MEnvSpaceType	mspacetype	= (MEnvSpaceType)config.getType();
+		final MEnvSpaceType	mspacetype	= (MEnvSpaceType)config.getType();
 		
-		SimpleValueFetcher fetcher = new SimpleValueFetcher();
+		final SimpleValueFetcher fetcher = new SimpleValueFetcher(pfetcher);
 		fetcher.setValue("$space", this);
-		fetcher.setValue("$platform", context.getServiceContainer());
-		fetcher.setValue("$args", context.getArguments());
-		fetcher.setValue("$results", context.getResults());
 		this.setFetcher(fetcher);
 		
 		List mspaceprops = mspacetype.getPropertyList("properties");
@@ -538,14 +535,13 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 			{				
 				Map observer = (Map)observers.get(i);
 				
-				String title = MEnvSpaceInstance.getProperty(observer, "name")!=null? (String)MEnvSpaceInstance.getProperty(observer, "name"): "Default Observer";
-				Boolean	killonexit	= (Boolean)MEnvSpaceInstance.getProperty(observer, "killonexit");
+				final String title = MEnvSpaceInstance.getProperty(observer, "name")!=null? (String)MEnvSpaceInstance.getProperty(observer, "name"): "Default Observer";
+				final Boolean	killonexit	= (Boolean)MEnvSpaceInstance.getProperty(observer, "killonexit");
 				
 				List plugs = (List)observer.get("plugins");
-				List plugins = null;
+				final List plugins = plugs!=null ? new ArrayList() : null;
 				if(plugs!=null)
 				{
-					plugins = new ArrayList();
 					for(int j=0; j<plugs.size(); j++)
 					{
 						Map plug = (Map)plugs.get(j);
@@ -556,40 +552,59 @@ public abstract class AbstractEnvironmentSpace extends SynchronizedPropertyObjec
 					}
 				}
 				
-				final ObserverCenter oc = new ObserverCenter(title, this, (ILibraryService)context.getServiceContainer().getService(ILibraryService.class), plugins,
-					killonexit!=null ? killonexit.booleanValue() : true);
-							
-				IComponentManagementService cs = (IComponentManagementService)context.getServiceContainer().getService(IComponentManagementService.class);
-				cs.addComponentListener(context.getComponentIdentifier(), new IComponentListener()
+				context.getServiceContainer().getService(ILibraryService.class).addResultListener(new DefaultResultListener()
 				{
-					public void componentRemoved(IComponentDescription desc, Map results)
+					public void resultAvailable(Object source, Object result)
 					{
-						oc.dispose();
+						final ObserverCenter oc = new ObserverCenter(title, AbstractEnvironmentSpace.this, (ILibraryService)result, plugins,
+								killonexit!=null ? killonexit.booleanValue() : true);
+										
+						context.getServiceContainer().getService(IComponentManagementService.class).addResultListener(new DefaultResultListener()
+						{
+							public void resultAvailable(Object source, Object result)
+							{
+								((IComponentManagementService)result).addComponentListener(context.getComponentIdentifier(), new IComponentListener()
+								{
+									public void componentRemoved(IComponentDescription desc, Map results)
+									{
+										oc.dispose();
+									}
+									
+									public void componentChanged(IComponentDescription desc)
+									{
+									}
+									
+									public void componentAdded(IComponentDescription desc)
+									{
+									}
+								});
+							}
+						});
+
+						List perspectives = mspacetype.getPropertyList("perspectives");
+						for(int j=0; j<perspectives.size(); j++)
+						{
+							Map sourcepers = (Map)perspectives.get(j);
+							Map args = new HashMap();
+							args.put("object", sourcepers);
+							args.put("fetcher", fetcher);
+							try
+							{
+								IPerspective persp	= (IPerspective)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcepers, "creator")).createObject(args);
+								
+								List props = (List)sourcepers.get("properties");
+								MEnvSpaceInstance.setProperties(persp, props, fetcher);
+								
+								oc.addPerspective((String)MEnvSpaceInstance.getProperty(sourcepers, "name"), persp);
+							}
+							catch(Exception e)
+							{
+								System.out.println("Exception while creating perspective: "+sourcepers);
+								e.printStackTrace();
+							}
+						}
 					}
-					
-					public void componentChanged(IComponentDescription desc)
-					{
-					}
-					
-					public void componentAdded(IComponentDescription desc)
-					{
-					}
-				});
-				
-				List perspectives = mspacetype.getPropertyList("perspectives");
-				for(int j=0; j<perspectives.size(); j++)
-				{
-					Map sourcepers = (Map)perspectives.get(j);
-					Map args = new HashMap();
-					args.put("object", sourcepers);
-					args.put("fetcher", fetcher);
-					IPerspective persp	= (IPerspective)((IObjectCreator)MEnvSpaceInstance.getProperty(sourcepers, "creator")).createObject(args);
-					
-					List props = (List)sourcepers.get("properties");
-					MEnvSpaceInstance.setProperties(persp, props, fetcher);
-					
-					oc.addPerspective((String)MEnvSpaceInstance.getProperty(sourcepers, "name"), persp);
-				}
+				});				
 			}
 		}
 		

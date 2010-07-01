@@ -25,7 +25,6 @@ import jadex.commons.SUtil;
 import jadex.commons.concurrent.DefaultResultListener;
 import jadex.commons.concurrent.IResultListener;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.service.BasicServiceProvider;
 import jadex.service.IServiceContainer;
 import jadex.service.clock.IClockService;
 import jadex.service.library.ILibraryService;
@@ -707,51 +706,52 @@ public class Application implements IApplication, IComponentInstance
 		{
 			initstarted = true;
 			
-			// Create spaces for context.
-			List spaces = config.getMSpaceInstances();
-			if(spaces!=null)
-			{
-				for(int i=0; i<spaces.size(); i++)
-				{
-					MSpaceInstance si = (MSpaceInstance)spaces.get(i);
-					try
-					{
-						ISpace space = (ISpace)si.getClazz().newInstance();
-						this.addSpace(si.getName(), space);
-						space.initSpace(this, si);
-					}
-					catch(Exception e)
-					{
-						System.out.println("Exception while creating space: "+si.getName());
-						e.printStackTrace();
-					}
-				}
-			}
-			
-			final List components = config.getMComponentInstances();
-			adapter.getServiceContainer().getService(ILibraryService.class).addResultListener(createResultListener(new DefaultResultListener()
+			adapter.getServiceContainer().getService(IClockService.class).addResultListener(createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object source, Object result)
 				{
-					final ILibraryService ls = (ILibraryService)result;
-					final ClassLoader cl = ls.getClassLoader();
-					adapter.getServiceContainer().getService(IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
+					IClockService clock = (IClockService)result;
+					
+					final SimpleValueFetcher fetcher = new SimpleValueFetcher();
+					fetcher.setValue("$platform", getServiceContainer());
+					fetcher.setValue("$args", getArguments());
+					fetcher.setValue("$results", getResults());
+					// todo: hack remove clock somehow (problem services are behind future in xml)
+					fetcher.setValue("$clock", clock);
+
+					// Create spaces for context.
+					List spaces = config.getMSpaceInstances();
+					if(spaces!=null)
+					{
+						for(int i=0; i<spaces.size(); i++)
+						{
+							MSpaceInstance si = (MSpaceInstance)spaces.get(i);
+							try
+							{
+								ISpace space = (ISpace)si.getClazz().newInstance();
+								addSpace(si.getName(), space);
+								space.initSpace(Application.this, si, fetcher);
+							}
+							catch(Exception e)
+							{
+								System.out.println("Exception while creating space: "+si.getName());
+								e.printStackTrace();
+							}
+						}
+					}
+
+					final List components = config.getMComponentInstances();
+					adapter.getServiceContainer().getService(ILibraryService.class).addResultListener(createResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object source, Object result)
 						{
-							final IComponentManagementService	ces	= (IComponentManagementService)result;
-							adapter.getServiceContainer().getService(IClockService.class).addResultListener(createResultListener(new DefaultResultListener()
+							final ILibraryService ls = (ILibraryService)result;
+							final ClassLoader cl = ls.getClassLoader();
+							adapter.getServiceContainer().getService(IComponentManagementService.class).addResultListener(createResultListener(new DefaultResultListener()
 							{
 								public void resultAvailable(Object source, Object result)
 								{
-									IClockService clock = (IClockService)result;
-									
-									SimpleValueFetcher fetcher = new SimpleValueFetcher();
-									fetcher.setValue("$platform", getServiceContainer());
-									fetcher.setValue("$args", getArguments());
-									fetcher.setValue("$results", getResults());
-									// todo: hack remove clock somehow (problem services are behind future in xml)
-									fetcher.setValue("$clock", clock);
+									final IComponentManagementService	ces	= (IComponentManagementService)result;
 									
 									for(int i=0; i<components.size(); i++)
 									{

@@ -2,10 +2,7 @@ package jadex.application.model;
 
 import jadex.application.runtime.IApplication;
 import jadex.javaparser.IValueFetcher;
-import jadex.javaparser.SimpleValueFetcher;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-import jadex.service.clock.IClock;
-import jadex.service.clock.IClockService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
