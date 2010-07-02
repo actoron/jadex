@@ -10,12 +10,13 @@
 	
 	<imports>
 		<import>jadex.commons.*</import>
-		<import>jadex.bride.*</import>
-		<import>jadex.service.library.*</import>
-		<import>jadex.service.threadpool.*</import>
+		<import>jadex.bridge.*</import>
 		<import>jadex.service.clock.*</import>
 		<import>jadex.service.execution.*</import>
+		<import>jadex.service.library.*</import>
+		<import>jadex.service.threadpool.*</import>
 		<import>jadex.base.fipa.*</import>
+		<import>jadex.base.*</import>
 		<import>jadex.commons.concurrent.*</import>
 		<import>jadex.standalone.service.*</import>
 		<import>jadex.standalone.transport.*</import>

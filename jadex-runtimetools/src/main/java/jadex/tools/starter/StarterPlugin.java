@@ -948,7 +948,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 			public void resultAvailable(Object source, Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
-				IResultListener lis = new IResultListener()
+				cms.createComponent(name, type, new CreationInfo(configname, arguments, spanel.parent, suspend, false), killlistener).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object source, Object result)
 					{
@@ -959,9 +959,7 @@ public class StarterPlugin extends AbstractJCCPlugin	implements IComponentListen
 					{
 						getJCC().displayError("Problem Starting Component", "Component could not be started.", exception);
 					}
-				};
-				IFuture ret = cms.createComponent(name, type, new CreationInfo(configname, arguments, spanel.parent, suspend, false), killlistener);
-				ret.addResultListener(lis);
+				});
 			}
 		});
 	}

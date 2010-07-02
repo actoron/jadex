@@ -138,7 +138,7 @@ public class ComponentManagementService implements IComponentManagementService, 
 		*/
 			
 		// Load the model with fitting factory.
-		container.getServices(IComponentFactory.class).addResultListener(new DefaultResultListener()
+		container.getServices(IComponentFactory.class).addResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object source, Object result)
 			{
@@ -257,6 +257,11 @@ public class ComponentManagementService implements IComponentManagementService, 
 						killlistener, factory, lmodel, cid, adapter, null, ad, null);
 				}
 			}
+			
+			public void exceptionOccurred(Object source, Exception exception)
+			{
+				ret.setException(exception);
+			}
 		});
 		
 		return ret;
@@ -273,38 +278,45 @@ public class ComponentManagementService implements IComponentManagementService, 
 		CMSComponentDescription ad, IExternalAccess parent)
 	{
 		// Create the component instance.
-		IComponentInstance instance = factory.createComponentInstance(adapter, lmodel, config, args, parent);
-		adapter.setComponent(instance, lmodel);
-		
-//		System.out.println("added: "+descs.size()+", "+aid);
-		
-		// Register component at parent.
-		if(pad!=null)
+		try
 		{
-			pad.getComponentInstance().componentCreated(ad, lmodel);
+			IComponentInstance instance = factory.createComponentInstance(adapter, lmodel, config, args, parent);
+			adapter.setComponent(instance, lmodel);
+			
+	//		System.out.println("added: "+descs.size()+", "+aid);
+			
+			// Register component at parent.
+			if(pad!=null)
+			{
+				pad.getComponentInstance().componentCreated(ad, lmodel);
+			}
+	
+			IComponentListener[]	alisteners;
+			synchronized(listeners)
+			{
+				Set	slisteners	= new HashSet(listeners.getCollection(null));
+				slisteners.addAll(listeners.getCollection(cid));
+				alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
+			}
+			// todo: can be called after listener has (concurrently) deregistered
+			for(int i=0; i<alisteners.length; i++)
+			{
+				alisteners[i].componentAdded(ad);
+			}
+			
+			if(killlistener!=null)
+				killresultlisteners.put(cid, killlistener);
+			
+			ret.setResult(cid.clone());
+			
+			if(!suspend)
+			{
+				adapter.wakeup();			
+			}
 		}
-
-		IComponentListener[]	alisteners;
-		synchronized(listeners)
+		catch(Exception e)
 		{
-			Set	slisteners	= new HashSet(listeners.getCollection(null));
-			slisteners.addAll(listeners.getCollection(cid));
-			alisteners	= (IComponentListener[])slisteners.toArray(new IComponentListener[slisteners.size()]);
-		}
-		// todo: can be called after listener has (concurrently) deregistered
-		for(int i=0; i<alisteners.length; i++)
-		{
-			alisteners[i].componentAdded(ad);
-		}
-		
-		if(killlistener!=null)
-			killresultlisteners.put(cid, killlistener);
-		
-		ret.setResult(cid.clone());
-		
-		if(!suspend)
-		{
-			adapter.wakeup();			
+			ret.setException(e);
 		}
 	}
 	

@@ -20,9 +20,13 @@ import jadex.commons.Future;
 import jadex.commons.IFuture;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SGUI;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.concurrent.IResultListener;
+import jadex.javaparser.IExpressionParser;
+import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
+import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.service.IService;
 import jadex.service.IServiceContainer;
 import jadex.service.library.ILibraryService;
@@ -170,11 +174,10 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "component"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(MArgument.class), 
 			new MappingInfo(null, null, "value")));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "service")), new ObjectInfo(MExpressionType.class), 
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "service")), new ObjectInfo(MExpressionType.class, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "className"))
-				}, null)));
-
+			new AttributeInfo(new AccessInfo("class", "className"))
+			}, null)));
 				
 		for(int i=0; mappings!=null && i<mappings.length; i++)
 		{
@@ -234,7 +237,7 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 				
 		// Select application instance according to configuraion.
 		MApplicationInstance app = null;
-		if(config==null)
+		if(config==null && apps.size()>0)
 			app = (MApplicationInstance)apps.get(0);
 		
 		for(int i=0; app==null && i<apps.size(); i++)
@@ -418,4 +421,73 @@ public class ApplicationComponentFactory	implements IComponentFactory, IService
 
 		return ret;
 	}	
+	
+	//-------- helper classes --------
+	
+	/**
+	 *  Parse expression text.
+	 */
+	public static class ExpressionProcessor	implements IPostProcessor
+	{
+		// Hack!!! Should be configurable.
+		protected static IExpressionParser	exp_parser	= new JavaCCExpressionParser();
+		
+		/**
+		 *  Parse expression text.
+		 */
+		public Object postProcess(IContext context, Object object)
+		{
+			MApplicationType app = (MApplicationType)context.getRootObject();
+			MExpressionType exp = (MExpressionType)object;
+			
+			String classname = exp.getClassName();
+			if(classname!=null)
+			{
+				try
+				{
+					Class clazz = SReflect.findClass(classname, app.getAllImports(), context.getClassLoader());
+					exp.setClazz(clazz);
+				}
+				catch(Exception e)
+				{
+	//					report.put(se, e.toString());
+					e.printStackTrace();
+				}
+			}
+			
+			String lang = exp.getLanguage();
+			String value = exp.getValue(); 
+			if(value!=null)
+			{
+				if(lang==null || "java".equals(lang))
+				{
+					try
+					{
+						IParsedExpression pexp = exp_parser.parseExpression(value, app.getAllImports(), null, context.getClassLoader());
+						exp.setParsedValue(pexp);
+					}
+					catch(Exception e)
+					{
+	//					report.put(se, e.toString());
+						e.printStackTrace();
+					}
+				}	
+				else
+				{
+					throw new RuntimeException("Unknown condition language: "+lang);
+				}
+			}
+			
+			return null;
+		}
+		
+		/**
+		 *  Get the pass number.
+		 *  @return The pass number.
+		 */
+		public int getPass()
+		{
+			return 0;
+		}
+	}
 }

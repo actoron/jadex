@@ -15,9 +15,18 @@ public class MExpressionType
 	/** The class name. */
 	protected String classname;
 	
+	/** The class. */
+	protected Class clazz;
+	
 	/** The value. */
 	protected String value;
+	
+	/** The parsed value. */
+	protected IParsedExpression parsedvalue;
 
+	/** The language. */
+	protected String language;
+	
 	//-------- constructors --------
 
 	/**
@@ -48,8 +57,8 @@ public class MExpressionType
 	}
 
 	/**
-	 *  Get the clazz.
-	 *  @return The clazz.
+	 *  Get the clazz name.
+	 *  @return The clazz name.
 	 */
 	public String getClassName()
 	{
@@ -57,8 +66,8 @@ public class MExpressionType
 	}
 
 	/**
-	 *  Set the clazz.
-	 *  @param clazz The clazz.
+	 *  Set the clazz name.
+	 *  @param clazz The clazz name.
 	 */
 	public void setClassName(String classname)
 	{
@@ -66,22 +75,40 @@ public class MExpressionType
 	}
 
 	/**
+	 *  Get the clazz.
+	 *  @return The clazz.
+	 */
+	public Class getClazz()
+	{
+		return clazz;
+	}
+
+	/**
+	 *  Set the clazz.
+	 *  @param clazz The clazz.
+	 */
+	public void setClazz(Class clazz)
+	{
+		this.clazz = clazz;
+	}
+
+	/**
 	 *  Get the value.
 	 *  @return The value.
-	 * /
-	public IParsedExpression getValue()
+	 */
+	public IParsedExpression getParsedValue()
 	{
-		return this.value;
-	}*/
+		return this.parsedvalue;
+	}
 
 	/**
 	 *  Set the value.
 	 *  @param value The value to set.
-	 * /
-	public void setValue(IParsedExpression value)
+	 */
+	public void setParsedValue(IParsedExpression parsedvalue)
 	{
-		this.value = value;
-	}*/
+		this.parsedvalue = parsedvalue;
+	}
 	
 	/**
 	 *  Get the value.
@@ -99,5 +126,23 @@ public class MExpressionType
 	public void setValue(String value)
 	{
 		this.value = value;
+	}
+
+	/**
+	 *  Get the language.
+	 *  @return The language.
+	 */
+	public String getLanguage()
+	{
+		return language;
+	}
+
+	/**
+	 *  Set the language.
+	 *  @param language The language.
+	 */
+	public void setLanguage(String language)
+	{
+		this.language = language;
 	}
 }
